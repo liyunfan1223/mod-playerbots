@@ -6,27 +6,27 @@
 ## BASE SQL
 
 DB_AUTH_CUSTOM_PATHS+=(
-	"$MOD_SKELETON_ROOT/sql/auth/base/"
+	$MOD_PLAYERBOTS_ROOT"/sql/auth/base/"
 )
 
 DB_CHARACTERS_CUSTOM_PATHS+=(
-	"$MOD_SKELETON_ROOT/sql/characters/base/"
+	$MOD_PLAYERBOTS_ROOT"/sql/characters/base/"
 )
 
 DB_WORLD_CUSTOM_PATHS+=(
-	"$MOD_SKELETON_ROOT/sql/world/base/"
+	$MOD_PLAYERBOTS_ROOT"/sql/world/base/"
 )
 
 ## UPDATES
 
-DB_AUTH_UPDATES_PATHS+=(
-	"$MOD_SKELETON_ROOT/sql/auth/updates/"
+DB_AUTH_UPDATE_PATHS+=(
+	$MOD_PLAYERBOTS_ROOT"/sql/auth/updates/"
 )
 
-DB_CHARACTERS_UPDATES_PATHS+=(
-	"$MOD_SKELETON_ROOT/sql/characters/updates/"
+DB_CHARACTERS_UPDATE_PATHS+=(
+	$MOD_PLAYERBOTS_ROOT"/sql/characters/updates/"
 )
 
-DB_WORLD_UPDATES_PATHS+=(
-	"$MOD_SKELETON_ROOT/sql/world/updates/"
+DB_WORLD_UPDATE_PATHS+=(
+	$MOD_PLAYERBOTS_ROOT"/sql/world/updates/"
 )

@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-          path: 'modules/skeleton-module'
+          path: 'modules/mod_playerbots'
       - name: Cache
         uses: actions/cache@v2
         with:
