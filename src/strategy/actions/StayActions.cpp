@@ -14,7 +14,7 @@ bool StayActionBase::Stay()
     //if (!urand(0, 10))
         //botAI->PlaySound(TEXT_EMOTE_YAWN);
 
-    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE || bot->IsFlying())
+    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
         return false;
 
     uint32 sitDelay = sPlayerbotAIConfig->sitDelay / 1000;

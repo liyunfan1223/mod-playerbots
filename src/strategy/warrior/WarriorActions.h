@@ -69,7 +69,7 @@ BUFF_ACTION(CastDeathWishAction, "death wish");
 MELEE_ACTION(CastBloodthirstAction, "bloodthirst");
 DEBUFF_ACTION_R(CastPiercingHowlAction, "piercing howl", 8.0f);
 // fury talents 2.4.3
-SPELL_ACTION(CastRampageAction, "rampage");
+BUFF_ACTION(CastRampageAction, "rampage");
 
 // protection
 MELEE_ACTION_U(CastTauntAction, "taunt", GetTarget() && GetTarget()->GetTarget() != bot->GetGUID());

@@ -39,7 +39,7 @@ void AttackersValue::AddAttackersOf(Group* group, std::set<Unit*>& targets)
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
     {
         Player *member = ObjectAccessor::FindPlayer(itr->guid);
-        if (!member || !member->IsAlive() || member == bot || member->GetMapId() != bot->GetMapId())
+        if (!member || !member->IsAlive() || member == bot || member->GetMapId() != bot->GetMapId() || sServerFacade->GetDistance2d(bot, member) > sPlayerbotAIConfig->sightDistance)
             continue;
 
         AddAttackersOf(member, targets);

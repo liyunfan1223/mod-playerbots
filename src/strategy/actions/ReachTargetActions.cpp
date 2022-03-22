@@ -26,7 +26,7 @@ bool ReachTargetAction::Execute(Event event)
         bool inLos = bot->IsWithinLOSInMap(target);
         bool  isFriend  = bot->IsFriendlyTo(target);
         float chaseDist = inLos ? distance : isFriend ? distance / 2 : distance;
-        return ChaseTo(target, chaseDist + combatReach, bot->GetAngle(target));
+        return ChaseTo(target, chaseDist - sPlayerbotAIConfig->contactDistance, bot->GetAngle(target));
     }
 }
 

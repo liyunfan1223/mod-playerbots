@@ -396,7 +396,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
     else
     {
-        botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot->GetGUID().GetCounter()));
+        botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
     }
 
     if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))

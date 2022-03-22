@@ -146,6 +146,7 @@ class PlayerbotAIConfig
         bool autoLearnTrainerSpells;
         bool autoDoQuests;
         bool syncLevelWithPlayers;
+        bool freeFood;
         bool autoLearnQuestSpells;
         bool randomBotSayWithoutMaster;
         bool randomBotGroupNearby;

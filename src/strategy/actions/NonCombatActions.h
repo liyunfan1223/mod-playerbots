@@ -16,6 +16,7 @@ class DrinkAction : public UseItemAction
 
         bool Execute(Event event) override;
         bool isUseful() override;
+        bool isPossible() override;
 };
 
 class EatAction : public UseItemAction
@@ -25,6 +26,7 @@ class EatAction : public UseItemAction
 
         bool Execute(Event event) override;
         bool isUseful() override;
+        bool isPossible() override;
 };
 
 #endif

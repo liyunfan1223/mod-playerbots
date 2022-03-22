@@ -27,7 +27,8 @@ class GiveFoodAction : public GiveItemAction
     public:
         GiveFoodAction(PlayerbotAI* botAI) : GiveItemAction(botAI, "give food", "conjured food") { }
 
-        Unit* GetTarget() override;
+    bool isUseful() override;
+    Unit* GetTarget() override;
 };
 
 class GiveWaterAction : public GiveItemAction
@@ -35,7 +36,8 @@ class GiveWaterAction : public GiveItemAction
     public:
         GiveWaterAction(PlayerbotAI* botAI) : GiveItemAction(botAI, "give water", "conjured water") { }
 
-        Unit* GetTarget() override;
+    bool isUseful() override;
+    Unit* GetTarget() override;
 };
 
 #endif

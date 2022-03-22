@@ -692,7 +692,7 @@ bool BGLeaveAction::Execute(Event event)
     uint16 unk = 0x1F90;
     uint8 unk2 = 0x0;
     bool isArena = false;
-    bool IsRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot->GetGUID().GetCounter());
+    bool IsRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot);
 
     ArenaType arenaType = ArenaType(BattlegroundMgr::BGArenaType(queueTypeId));
     if (arenaType)
@@ -801,7 +801,7 @@ bool BGStatusAction::Execute(Event event)
             break;
     }
 
-    bool IsRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot->GetGUID().GetCounter());
+    bool IsRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot);
     BattlegroundQueueTypeId queueTypeId = bot->GetBattlegroundQueueTypeId(QueueSlot);
     BattlegroundTypeId _bgTypeId = BattlegroundMgr::BGTemplateId(queueTypeId);
     if (!queueTypeId)

@@ -72,7 +72,28 @@ Unit* GiveFoodAction::GetTarget()
     return AI_VALUE(Unit*, "party member without food");
 }
 
+bool GiveFoodAction::isUseful()
+{
+    if (!GetTarget())
+        return false;
+
+    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player*) GetTarget());
+
+    return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
+}
+
 Unit* GiveWaterAction::GetTarget()
 {
     return AI_VALUE(Unit*, "party member without water");
+}
+
+
+bool GiveWaterAction::isUseful()
+{
+    if (!GetTarget())
+        return false;
+
+    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player*)GetTarget());
+
+    return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
 }

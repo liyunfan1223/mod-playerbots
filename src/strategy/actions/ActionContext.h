@@ -219,6 +219,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["rpg craft"] = &ActionContext::rpg_craft;
             creators["rpg trade useful"] = &ActionContext::rpg_trade_useful;
             creators["rpg duel"] = &ActionContext::rpg_duel;
+            creators["rpg mount anim"] = &ActionContext::rpg_mount_anim;
         }
 
     private:
@@ -377,6 +378,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* rpg_craft(PlayerbotAI* botAI) { return new RpgCraftAction(botAI); }
         static Action* rpg_trade_useful(PlayerbotAI* botAI) { return new RpgTradeUsefulAction(botAI); }
         static Action* rpg_duel(PlayerbotAI* botAI) { return new RpgDuelAction(botAI); }
+        static Action* rpg_mount_anim(PlayerbotAI* botAI) { return new RpgMountAnimAction(botAI); }
 };
 
 #endif

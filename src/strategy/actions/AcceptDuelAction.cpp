@@ -15,6 +15,14 @@ bool AcceptDuelAction::Execute(Event event)
     ObjectGuid playerGuid;
     p >> playerGuid;
 
+    // do not auto duel with low hp
+    if ((!botAI->HasRealPlayerMaster() || (botAI->GetMaster() && botAI->GetMaster()->GetGUID() != playerGuid)) && AI_VALUE2(uint8, "health", "self target") < 90)
+    {
+        WorldPacket packet(CMSG_DUEL_CANCELLED, 8);
+        packet << flagGuid;
+        bot->GetSession()->HandleDuelCancelledOpcode(packet);
+    }
+
     WorldPacket packet(CMSG_DUEL_ACCEPTED, 8);
     packet << flagGuid;
     bot->GetSession()->HandleDuelAcceptedOpcode(packet);

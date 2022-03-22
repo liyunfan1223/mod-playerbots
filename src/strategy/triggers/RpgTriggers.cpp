@@ -291,6 +291,10 @@ bool RpgHomeBindTrigger::IsActive()
 
 bool RpgQueueBGTrigger::IsActive()
 {
+    // skip bots not in continents
+    if (!WorldPosition(bot).isOverworld()) // bg, raid, dungeon
+        return false;
+
     GuidPosition guidP(getGuidP());
 
     if (!guidP.IsCreature())
@@ -420,6 +424,22 @@ bool RpgDuelTrigger::IsActive()
     if (!botAI->HasStrategy("start duel", BOT_STATE_NON_COMBAT))
         return false;
 
+    // Less spammy duels
+    if (bot->getLevel() < 3)
+        return false;
+
+    if (botAI->HasRealPlayerMaster())
+    {
+        // do not auto duel if master is not afk
+        if (botAI->GetMaster() && !botAI->GetMaster()->isAFK())
+            return false;
+    }
+
+    // do not auto duel with low hp
+    if (AI_VALUE2(uint8, "health", "self target") < 90)
+        return false;
+
+
     GuidPosition guidP(getGuidP());
 
     if (!guidP.IsPlayer())
@@ -433,7 +453,7 @@ bool RpgDuelTrigger::IsActive()
     if (player->getLevel() > bot->getLevel() + 3)
         return false;
 
-    if (bot->getLevel() > player->getLevel() + 20)
+    if (bot->getLevel() > player->getLevel() + 10)
         return false;
 
     // caster or target already have requested duel

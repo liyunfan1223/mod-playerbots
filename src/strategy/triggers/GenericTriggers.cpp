@@ -64,6 +64,9 @@ bool PanicTrigger::IsActive()
 
 bool OutNumberedTrigger::IsActive()
 {
+    if (bot->GetMap() && (bot->GetMap()->IsDungeon() || bot->GetMap()->IsRaid()))
+        return false;
+
     int32 botLevel = bot->getLevel();
     uint32 friendPower = 200;
     uint32 foePower = 0;
@@ -144,11 +147,19 @@ bool AoeTrigger::IsActive()
 
 bool NoFoodTrigger::IsActive()
 {
+    bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot);
+    if (isRandomBot && sPlayerbotAIConfig->freeFood)
+        return false;
+
     return AI_VALUE2(std::vector<Item*>, "inventory items", "conjured food").empty();
 }
 
 bool NoDrinkTrigger::IsActive()
 {
+    bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot);
+    if (isRandomBot && sPlayerbotAIConfig->freeFood)
+        return false;
+
     return AI_VALUE2(std::vector<Item*>, "inventory items", "conjured water").empty();
 }
 

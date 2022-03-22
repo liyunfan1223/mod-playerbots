@@ -127,6 +127,10 @@ AiPlayerbot.SyncQuestForPlayer = 0
 # Default: 0 (disabled)
 AiPlayerbot.SyncLevelWithPlayers = 0
 
+# Give free food to random bots
+# Default: 1 (enabled)
+AiPlayerbot.FreeFood = 1
+
 # Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
 AiPlayerbot.AutoTrainSpells = yes
 
@@ -531,7 +535,7 @@ AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11
 AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323""
 
 # Spells every random bot will learn on randomize (54197 - cold weather flying)
-AiPlayerbot.RandomBotSpellIds = "1""
+AiPlayerbot.RandomBotSpellIds = "54197""
 
 # Level diff between random bots and nearby creatures for random teleports
 AiPlayerbot.RandomBotTeleLevel = 5

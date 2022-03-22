@@ -255,4 +255,13 @@ class RpgDuelAction : public RpgSubAction
         bool Execute(Event event) override;
 };
 
+class RpgMountAnimAction : public RpgSubAction
+{
+    public:
+        RpgMountAnimAction(PlayerbotAI* botAI, std::string const name = "rpg mount anim") : RpgSubAction(botAI, name) {}
+
+        bool isUseful() override;
+        bool Execute(Event event) override;
+};
+
 #endif

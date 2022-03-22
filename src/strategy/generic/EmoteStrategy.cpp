@@ -19,4 +19,5 @@ void EmoteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("seldom", NextAction::array(0, new NextAction("talk", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("receive text emote", NextAction::array(0, new NextAction("emote", 10.0f), nullptr)));
     triggers.push_back(new TriggerNode("receive emote", NextAction::array(0, new NextAction("emote", 10.0f), nullptr)));
+    triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("rpg mount anim", 1.0f), nullptr)));
 }

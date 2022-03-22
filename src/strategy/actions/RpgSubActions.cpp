@@ -470,10 +470,6 @@ bool RpgDuelAction::isUseful()
         return false;
     }
 
-    // Less spammy duels
-    if (bot->getLevel() == 1)
-        return false;
-
     return true;
 }
 
@@ -487,4 +483,18 @@ bool RpgDuelAction::Execute(Event event)
         return false;
 
     return botAI->DoSpecificAction("cast custom spell", Event("rpg action", chat->FormatWorldobject(player) + " 7266"), true);
+}
+
+
+bool RpgMountAnimAction::isUseful()
+{
+    return AI_VALUE2(bool, "mounted", "self target") && !AI_VALUE2(bool, "moving", "self target");
+}
+
+bool RpgMountAnimAction::Execute(Event event)
+{
+    WorldPacket p;
+    bot->GetSession()->HandleMountSpecialAnimOpcode(p);
+
+    return true;
 }

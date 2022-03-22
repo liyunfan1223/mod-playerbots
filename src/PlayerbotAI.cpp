@@ -698,7 +698,7 @@ void PlayerbotAI::ChangeEngine(BotState type)
 
 void PlayerbotAI::DoNextAction(bool min)
 {
-    if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
+    if (!bot->IsInWorld() || bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
     {
         SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
         return;
@@ -814,6 +814,9 @@ void PlayerbotAI::DoNextAction(bool min)
                 // same BG
                 if (bot->InBattleground() && bot->GetBattleground()->GetBgTypeID() == BATTLEGROUND_AV && !GET_PLAYERBOT_AI(member) && member->InBattleground() && bot->GetMapId() == member->GetMapId())
                 {
+                    // TODO disable move to objective if have master in bg
+                    continue;
+
                     if (!group->SameSubGroup(bot, member))
                         continue;
 
