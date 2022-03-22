@@ -12,6 +12,9 @@
 #include "Trigger.h"
 #include "Value.h"
 
+#include <sstream>
+#include <string>
+
 class PlayerbotAI;
 
 class AiObjectContext : public PlayerbotAIAware

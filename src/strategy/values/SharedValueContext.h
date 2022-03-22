@@ -9,6 +9,7 @@
 #include "LootValues.h"
 #include "PvpValues.h"
 #include "QuestValues.h"
+#include "Playerbots.h"
 
 class PlayerbotAI;
 

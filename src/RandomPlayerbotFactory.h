@@ -9,6 +9,7 @@
 
 #include <map>
 #include <unordered_map>
+#include <vector>
 
 class Player;
 class WorldSession;

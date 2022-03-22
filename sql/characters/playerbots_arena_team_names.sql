@@ -1,14 +1,14 @@
-DROP TABLE IF EXISTS `playerbot_arena_team_names`;
-CREATE TABLE `playerbot_arena_team_names` (
-  `name_id` mediumint(8) NOT NULL AUTO_INCREMENT UNIQUE,
-  `name` varchar(24) NOT NULL UNIQUE,
-  `type` TINYINT(3) NOT NULL,
-  PRIMARY KEY (`name_id`)
+DROP TABLE IF EXISTS `playerbots_arena_team_names`;
+CREATE TABLE `playerbots_arena_team_names` (
+                                               `name_id` mediumint(8) NOT NULL AUTO_INCREMENT UNIQUE,
+                                               `name` varchar(24) NOT NULL UNIQUE,
+                                               `type` TINYINT(3) NOT NULL,
+                                               PRIMARY KEY (`name_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Playerbot arena team names';
 
 
-DELETE FROM `playerbot_arena_team_names`;
-INSERT INTO `playerbot_arena_team_names` (`name_id`,`name`, `type`) VALUES
+DELETE FROM `playerbots_arena_team_names`;
+INSERT INTO `playerbots_arena_team_names` (`name_id`,`name`, `type`) VALUES
 (NULL, 'out of coverage',2),
 (NULL, 'Dead or Alive',2),
 (NULL, 'Noßrain',2),

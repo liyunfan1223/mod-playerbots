@@ -6,6 +6,7 @@
 #include "Playerbots.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
+#include "WorldSession.h"
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false)
 {

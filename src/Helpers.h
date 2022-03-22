@@ -13,6 +13,8 @@
 #include <cctype>
 #include <locale>
 #include <sstream>
+#include <stdio.h>
+#include <string>
 
 void split(std::vector<std::string>& dest, std::string const str, char const* delim)
 {

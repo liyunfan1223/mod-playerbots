@@ -1,12 +1,12 @@
-DROP TABLE IF EXISTS `playerbot_names`;
-CREATE TABLE `playerbot_names` (
+DROP TABLE IF EXISTS `playerbots_names`;
+CREATE TABLE `playerbots_names` (
   `name_id` INT(11) NOT NULL UNIQUE,
   `name` varchar(255) NOT NULL,
   `gender` tinyint(3) unsigned NOT NULL,
 PRIMARY KEY (`name_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Playerbot RandomBot names';
 
-INSERT INTO `playerbot_names` VALUES
+INSERT INTO `playerbots_names` VALUES
 (1,'Aalart',0),
 (2,'Aalef',0),
 (3,'Aalot',0),
@@ -10687,5 +10687,5 @@ INSERT INTO `playerbot_names` VALUES
 (10678,'Zuzene',1),
 (10679,'Zwaante',1);
 
-DELETE FROM `playerbot_names` WHERE LENGTH(`name`) > 12;
-ALTER TABLE `playerbot_names` MODIFY `name` varchar(12);
+DELETE FROM `playerbots_names` WHERE LENGTH(`name`) > 12;
+ALTER TABLE `playerbots_names` MODIFY `name` varchar(12);

@@ -7,7 +7,7 @@
 
 #include "Common.h"
 #include "SharedDefines.h"
-#include "TalentSpec.h"
+#include "Talentspec.h"
 
 #include <mutex>
 

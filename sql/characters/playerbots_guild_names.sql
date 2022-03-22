@@ -1,11 +1,11 @@
-DROP TABLE IF EXISTS `playerbot_guild_names`;
-CREATE TABLE `playerbot_guild_names` (
-  `name_id` INT(11) NOT NULL AUTO_INCREMENT UNIQUE,
-  `name` varchar(24) NOT NULL UNIQUE,
-  PRIMARY KEY (`name_id`)
+DROP TABLE IF EXISTS `playerbots_guild_names`;
+CREATE TABLE `playerbots_guild_names` (
+                                          `name_id` INT(11) NOT NULL AUTO_INCREMENT UNIQUE,
+                                          `name` varchar(24) NOT NULL UNIQUE,
+                                          PRIMARY KEY (`name_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Playerbot guild names';
 
-INSERT INTO `playerbot_guild_names` VALUES
+INSERT INTO `playerbots_guild_names` VALUES
 (NULL, 'Black Guard'),
 (NULL, 'Abyssal Kingdoms'),
 (NULL, 'Acid Evil'),

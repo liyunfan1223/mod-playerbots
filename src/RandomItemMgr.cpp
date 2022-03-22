@@ -2108,7 +2108,7 @@ void RandomItemMgr::BuildEquipCache()
                             stmt->SetData(1, level);
                             stmt->SetData(2, slot);
                             stmt->SetData(3, quality);
-                            stmt->SetData(4, quality);
+                            stmt->SetData(4, proto->ItemId);
                             PlayerbotsDatabase.Execute(stmt);
                         }
 

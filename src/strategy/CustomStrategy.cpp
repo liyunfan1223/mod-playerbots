@@ -97,7 +97,7 @@ void CustomStrategy::LoadActionLines(uint32 owner)
         do
         {
             Field* fields = result->Fetch();
-            std::string const action = fields[0].Get<std::string>();
+            std::string const action = fields[1].Get<std::string>();
             actionLines.push_back(action);
         }
         while (result->NextRow());

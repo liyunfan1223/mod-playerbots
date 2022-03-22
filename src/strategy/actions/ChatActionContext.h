@@ -46,7 +46,7 @@
 #include "ReviveFromCorpseAction.h"
 #include "RewardAction.h"
 #include "RtiAction.h"
-#include "RTSCAction.h"
+#include "RtscAction.h"
 #include "SaveManaAction.h"
 #include "SellAction.h"
 #include "SetCraftAction.h"
