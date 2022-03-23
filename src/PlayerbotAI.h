@@ -361,6 +361,12 @@ class PlayerbotAI : public PlayerbotAIBase
         static bool IsOpposing(uint8 race1, uint8 race2);
         PlayerbotSecurity* GetSecurity() { return &security; }
 
+        Position GetJumpDestination() { return jumpDestination; }
+        void SetJumpDestination(Position pos) { jumpDestination = pos; }
+        void ResetJumpDestination() { jumpDestination = Position(); }
+
+        bool CanMove();
+
     private:
         void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
         bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
@@ -387,6 +393,7 @@ class PlayerbotAI : public PlayerbotAIBase
         time_t allowActiveCheckTimer[MAX_ACTIVITY_TYPE];
         bool inCombat = false;
         BotCheatMask cheatMask = BotCheatMask::none;
+        Position jumpDestination = Position();
 };
 
 #endif

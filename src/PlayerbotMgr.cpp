@@ -70,7 +70,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     Player* bot = botSession->GetPlayer();
     if (!bot)
     {
-        LogoutPlayerBot(bot->GetGUID());
+        LogoutPlayerBot(holder.GetGuid());
         LOG_ERROR("playerbots", "Error logging in bot {}, please try to reset all random bots", holder.GetGuid().ToString().c_str());
         return;
     }

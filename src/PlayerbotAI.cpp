@@ -26,6 +26,7 @@
 #include "SpellAuraEffects.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "../../../src/server/game/Entities/Object/Object.h"
 
 std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems);
 std::vector<std::string> split(std::string const s, char delim);
@@ -61,17 +62,6 @@ void PacketHandlingHelper::AddPacket(WorldPacket const& packet)
 {
     if (packet.empty())
         return;
-
-    if (packet.GetOpcode() == SMSG_EMOTE)
-    {
-        WorldPacket p = packet;
-        ObjectGuid source;
-        uint32 emoteId;
-        p.rpos(0);
-        p >> emoteId >> source;
-        if (!source.IsPlayer())
-            return;
-    }
 
 	if (handlers.find(packet.GetOpcode()) != handlers.end())
         queue.push(WorldPacket(packet));
@@ -217,6 +207,14 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         inCombat = false;
     }
 
+    // force stop if moving but should not
+    if (bot->isMoving() && !CanMove() && !bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING))
+    {
+        bot->StopMoving();
+        bot->GetMotionMaster()->Clear();
+        bot->GetMotionMaster()->MoveIdle();
+    }
+
     // cheat options
     if (bot->IsAlive() && ((uint32)GetCheat() > 0 || (uint32)sPlayerbotAIConfig->botCheatMask > 0))
     {
@@ -250,7 +248,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     UpdateAIInternal(elapsed, min);
 
     // test fix lags because of BG
-    if (bot && !bot->IsInCombat())
+    if (bot && !inCombat)
         min = true;
 
     YieldThread(min);
@@ -625,6 +623,87 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 			    IncreaseNextCheckDelay(delaytime);
 		    return;
 	    }
+        case SMSG_EMOTE: // do not react to NPC emotes
+        {
+            WorldPacket p(packet);
+            ObjectGuid source;
+            uint32 emoteId;
+            p.rpos(0);
+            p >> emoteId >> source;
+            if (!source.IsPlayer())
+                return;
+            else
+                botOutgoingPacketHandlers.AddPacket(packet);
+
+            return;
+        }
+        case SMSG_MOVE_KNOCK_BACK: // handle knockbacks
+        {
+            WorldPacket p(packet);
+            p.rpos(0);
+
+            ObjectGuid guid;
+            uint32 counter;
+            float vcos, vsin, horizontalSpeed, verticalSpeed = 0.f;
+
+            p >> guid.ReadAsPacked() >> counter >> vcos >> vsin >> horizontalSpeed >> verticalSpeed;
+            verticalSpeed = -verticalSpeed;
+
+            // calculate rough knockback time
+            float moveTimeHalf = verticalSpeed / 19.29f;
+
+            float dis = 2 * moveTimeHalf * horizontalSpeed;
+            float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -verticalSpeed);
+            float disHalf = dis / 3.0f;
+            float ox, oy, oz;
+            bot->GetPosition(ox, oy, oz);
+            float fx = ox + dis * vcos;
+            float fy = oy + dis * vsin;
+            float fz = oz + 0.5f;
+            bot->GetMap()->GetObjectHitPos(bot->GetPhaseMask(), ox, oy, oz + max_height, fx, fy, fz, fx, fy, fz, -0.5f);
+            bot->UpdateAllowedPositionZ(fx, fy, fz);
+
+            // stop casting
+            InterruptSpell();
+
+            // stop movement
+            bot->StopMoving();
+            bot->GetMotionMaster()->Clear();
+            bot->GetMotionMaster()->MoveIdle();
+
+            // set delay based on actual distance
+            float newdis = sqrt(sServerFacade->GetDistance2d(bot, fx, fy));
+            SetNextCheckDelay((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
+
+            // add moveflags
+            bot->m_movementInfo.SetMovementFlags(MOVEMENTFLAG_FALLING);
+            bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FORWARD);
+            bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
+
+            // copy MovementInfo
+            MovementInfo movementInfo = bot->m_movementInfo;
+
+            // send ack
+            WorldPacket ack(CMSG_MOVE_KNOCK_BACK_ACK);
+            movementInfo.jump.cosAngle = vcos;
+            movementInfo.jump.sinAngle = vsin;
+            movementInfo.jump.zspeed = -verticalSpeed;
+            movementInfo.jump.xyspeed = horizontalSpeed;
+            ack << bot->GetGUID().WriteAsPacked();
+            bot->m_mover->BuildMovementPacket(&ack);
+            ack << movementInfo.jump.sinAngle;
+            ack << movementInfo.jump.cosAngle;
+            ack << movementInfo.jump.xyspeed;
+            ack << movementInfo.jump.zspeed;
+            bot->GetSession()->HandleMoveKnockBackAck(ack);
+
+            // set jump destination for MSG_LAND packet
+            SetJumpDestination(Position(fx, fy, fz, bot->GetOrientation()));
+
+            //bot->SendHeartBeat();
+
+            return;
+        }
 	    default:
 		    botOutgoingPacketHandlers.AddPacket(packet);
 	}
@@ -903,35 +982,35 @@ void PlayerbotAI::DoNextAction(bool min)
             bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
     }
 
-    /*if (!bot->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLING) && !bot->IsInCombat())
+    // land after kncokback/jump
+    if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING))
     {
-        if (!urand(0, 10) && !bot->IsInCombat())
-        {
-            WorldPacket jump(MSG_MOVE_JUMP);
-            MovementInfo movementInfo = bot->m_movementInfo;
-            movementInfo.jump.velocity = -7.96f;
-            movementInfo.jump.cosAngle = 1.0f;
-            movementInfo.jump.sinAngle = 0.f;
-            movementInfo.jump.xyspeed = sServerFacade->isMoving(bot) ? bot->GetSpeed(MOVE_RUN) : 0.f;
-            movementInfo.jump.start = movementInfo.pos;
-            movementInfo.jump.startClientTime = time(nullptr);
-            movementInfo.pos = bot->GetPosition();
-            jump << movementInfo;
-            bot->GetSession()->HandleMovementOpcodes(jump);
-            bot->m_movementInfo.AddMovementFlag(MOVEFLAG_FALLING);
-        }
-    }
-    else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLING))
-    {
-        bot->SendHeartBeat();
-        bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_FALLING);
+        // stop movement
+        bot->StopMoving();
+        bot->GetMotionMaster()->Clear();
+        bot->GetMotionMaster()->MoveIdle();
 
-        std::unique_ptr<WorldPacket> jump(new WorldPacket(MSG_MOVE_FALL_LAND));
-        MovementInfo movementInfo = bot->m_movementInfo;
-        movementInfo.pos = bot->GetPosition();
-        *jump << movementInfo;
-        bot->GetSession()->QueuePacket(std::move(jump));
-    }*/
+        // remove moveFlags
+        bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FALLING);
+        bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_PENDING_STOP);
+
+        // set jump destination
+        bot->m_movementInfo.pos = !GetJumpDestination().m_positionZ == 0 ? GetJumpDestination() : bot->GetPosition();
+        bot->m_movementInfo.jump = MovementInfo::JumpInfo();
+
+        WorldPacket land(MSG_MOVE_FALL_LAND);
+        land << bot->GetGUID().WriteAsPacked();
+        bot->m_mover->BuildMovementPacket(&land);
+        bot->GetSession()->HandleMovementOpcodes(land);
+
+        // move stop
+        WorldPacket stop(MSG_MOVE_STOP);
+        stop << bot->GetGUID().WriteAsPacked();
+        bot->m_mover->BuildMovementPacket(&stop);
+        bot->GetSession()->HandleMovementOpcodes(stop);
+
+        ResetJumpDestination();
+    }
 }
 
 void PlayerbotAI::ReInitCurrentEngine()
@@ -2536,7 +2615,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (!member || !member->IsInWorld())
+            if (!member || !member->IsInWorld() && member->GetMapId() != bot->GetMapId())
                 continue;
 
             if (member == bot)
@@ -3408,4 +3487,19 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, std::string const spellname)
     }
 
     return bcount;
+}
+
+bool PlayerbotAI::CanMove()
+{
+    // do not allow if not vehicle driver
+    if (IsInVehicle() && !IsInVehicle(true))
+        return false;
+
+    if (bot->isFrozen() || bot->IsPolymorphed() || (bot->isDead() && !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)) || bot->IsBeingTeleported() ||
+        bot->isInRoots() || bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) || bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || bot->IsCharmed() ||
+        bot->HasAuraType(SPELL_AURA_MOD_STUN) || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
+        bot->HasUnitState(UNIT_STATE_LOST_CONTROL))
+        return false;
+
+    return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE;
 }
