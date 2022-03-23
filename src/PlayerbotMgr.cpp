@@ -1023,6 +1023,10 @@ void PlayerbotMgr::CheckTellErrors(uint32 elapsed)
 
 void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
 {
+    if (!player)
+    {
+        return;
+    }
     if (!isBotAI)
     {
         PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);
@@ -1048,6 +1052,10 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
+    if (!player)
+    {
+        return nullptr;
+    }
     auto itr = _playerbotsMap.find(player->GetGUID());
     if (itr != _playerbotsMap.end())
     {
@@ -1060,6 +1068,10 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
 {
+    if (!player)
+    {
+        return nullptr;
+    }
     auto itr = _playerbotsMap.find(player->GetGUID());
     if (itr != _playerbotsMap.end())
     {
