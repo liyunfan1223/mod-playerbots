@@ -996,6 +996,13 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         return i == sPlayerbotAIConfig->randomBotMaps.end();
     }), tlocs.end());
 
+    // Check locs again in case all possible locations were removed
+    if (locs.empty())
+    {
+        LOG_DEBUG("playerbots", "Cannot teleport bot {} - all locations removed by filter", bot->GetName().c_str());
+        return;
+    }
+
     //Random shuffle based on distance. Closer distances are more likely (but not exclusivly) to be at the begin of the list.
     tlocs = sTravelMgr->getNextPoint(WorldPosition(bot), tlocs, 0);
 
