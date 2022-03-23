@@ -3955,6 +3955,10 @@ std::vector<WorldPosition> TravelMgr::getNextPoint(WorldPosition center, std::ve
                 rnd -= weights[i];
     }
 
+    // Peiru: Crash failsafe - if the retVec is still empty but points exist, return first point
+    if (retVec.empty() && points.size() > 0)
+        retVec.push_back(points[0]);
+
     if (!retVec.empty())
         return retVec;
 
