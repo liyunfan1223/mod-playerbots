@@ -997,7 +997,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     }), tlocs.end());
 
     // Check locs again in case all possible locations were removed
-    if (locs.empty())
+    if (tlocs.empty())
     {
         LOG_DEBUG("playerbots", "Cannot teleport bot {} - all locations removed by filter", bot->GetName().c_str());
         return;
