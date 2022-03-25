@@ -1350,6 +1350,9 @@ uint32 RandomPlayerbotMgr::GetZoneLevel(uint16 mapId, float teleX, float teleY, 
 void RandomPlayerbotMgr::Refresh(Player* bot)
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return;
+
     if (bot->isDead())
     {
         bot->ResurrectPlayer(1.0f);
