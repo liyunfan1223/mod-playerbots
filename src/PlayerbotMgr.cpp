@@ -1027,6 +1027,12 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
     {
         return;
     }
+    // If the guid already exists in the map, remove it
+    std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMap.find(player->GetGUID());
+    if (itr != _playerbotsMap.end())
+    {
+        _playerbotsMap.erase(itr);
+    }
     if (!isBotAI)
     {
         PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);
