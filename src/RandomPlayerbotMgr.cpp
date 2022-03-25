@@ -1071,9 +1071,11 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
             }
 
             bot->GetMotionMaster()->Clear();
+            PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+            if (botAI)
+                botAI->Reset();
             bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
             bot->SendMovementFlagUpdate();
-            GET_PLAYERBOT_AI(bot)->Reset();
 
             if (pmo)
                 pmo->finish();
