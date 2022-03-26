@@ -1181,6 +1181,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                     newItem->AddToWorld();
                     newItem->AddToUpdateQueueOf(bot);
                     bot->AutoUnequipOffhandIfNeed();
+                    newItem->SetOwnerGUID(bot->GetGUID());
                     EnchantItem(newItem);
                     found = true;
                     break;
@@ -1325,6 +1326,7 @@ void PlayerbotFactory::InitSecondEquipmentSet()
 
             if (Item* newItem = StoreNewItemInInventorySlot(bot, newItemId, 1))
             {
+                newItem->SetOwnerGUID(bot->GetGUID());
                 EnchantItem(newItem);
                 newItem->AddToWorld();
                 newItem->AddToUpdateQueueOf(bot);
