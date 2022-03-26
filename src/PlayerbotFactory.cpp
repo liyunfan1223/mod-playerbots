@@ -1061,6 +1061,7 @@ void PlayerbotFactory::InitEquipmentNew(bool incremental)
                         newItem->AddToWorld();
                         newItem->AddToUpdateQueueOf(bot);
                         bot->AutoUnequipOffhandIfNeed();
+                        newItem->SetOwnerGUID(bot->GetGUID());
                         EnchantItem(newItem);
                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}, Old item: {}",
                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), newItemId, slot, itemInSlot);
@@ -1086,6 +1087,7 @@ void PlayerbotFactory::InitEquipmentNew(bool incremental)
                     if (newItem)
                     {
                         bot->AutoUnequipOffhandIfNeed();
+                        newItem->SetOwnerGUID(bot->GetGUID());
                         EnchantItem(newItem);
                         found = true;
                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}",
