@@ -361,7 +361,7 @@ bool GuildTaskMgr::SendKillAdvertisement(CharacterDatabaseTransaction& trans, ui
     if (!proto)
         return false;
 
-    QueryResult result = WorldDatabase.Query("SELECT map, position_x, position_y, position_z FROM creature WHERE id = {}", creatureId);
+    QueryResult result = WorldDatabase.Query("SELECT map, position_x, position_y, position_z FROM creature WHERE id1 = {}", creatureId);
     if (!result)
         return false;
 
