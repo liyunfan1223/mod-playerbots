@@ -254,6 +254,9 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
             target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
         }
 
+        // Peiru: Allow bots to always instant logout to see if this resolves logout crashes
+        logout = true;
+
         // if no instant logout, request normal logout
         if (!logout)
         {
