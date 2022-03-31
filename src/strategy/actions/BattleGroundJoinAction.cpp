@@ -411,8 +411,8 @@ bool BGJoinAction::isUseful()
 
 bool BGJoinAction::JoinQueue(uint32 type)
 {
-    // ignore if player is already in BG
-    if (bot->InBattleground())
+    // ignore if player is already in BG, is logging out, or already being teleport
+    if (!bot || (!bot->IsInWorld() && !bot->IsBeingTeleported()) || bot->InBattleground())
         return false;
 
     // get BG TypeId
