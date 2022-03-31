@@ -131,7 +131,7 @@ bool PetitionOfferAction::Execute(Event event)
     data << petitions.front()->GetGUID();
     data << guid;
 
-    QueryResult result = CharacterDatabase.Query("SELECT playerguid FROM petition_sign WHERE player_account = {} AND petitionguid = {}'",
+    QueryResult result = CharacterDatabase.Query("SELECT playerguid FROM petition_sign WHERE player_account = {} AND petitionguid = {}",
         player->GetSession()->GetAccountId(), petitions.front()->GetGUID().GetCounter());
     if (result)
     {
