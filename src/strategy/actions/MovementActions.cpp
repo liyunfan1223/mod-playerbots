@@ -301,7 +301,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 std::ostringstream out;
                 out << sPlayerbotAIConfig->GetTimestampStr() << "+00,";
                 out << bot->GetName() << ",";
-                if (telePos && telePos != movePosition)
+                if (telePos && telePos.GetExactDist(movePosition) > 0.001)
                     startPosition.printWKT({ startPosition, movePosition, telePos }, out, 1);
                 else
                     startPosition.printWKT({ startPosition, movePosition }, out, 1);
