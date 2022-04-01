@@ -557,7 +557,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     if (!isArena)
     {
         WorldPacket packet(CMSG_BATTLEMASTER_JOIN, 20);
-        packet << unit->GetGUID() << bgTypeId_ << instanceId << joinAsGroup;
+        packet << bot->GetGUID() << bgTypeId_ << instanceId << joinAsGroup;
         bot->GetSession()->HandleBattlemasterJoinOpcode(packet);
     }
     else
