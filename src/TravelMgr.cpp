@@ -1966,7 +1966,7 @@ void TravelMgr::LoadQuestTravelTable()
                     }
                     else
                     {
-                        uint32 objective;
+                        uint32 objective = 0;
                         if (flag & (uint32)QuestRelationFlag::objective1)
                             objective = 0;
                         else if (flag & (uint32)QuestRelationFlag::objective2)
