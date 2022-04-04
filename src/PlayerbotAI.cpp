@@ -26,7 +26,6 @@
 #include "SpellAuraEffects.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
-#include "../../../src/server/game/Entities/Unit/Unit.h"
 
 std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems);
 std::vector<std::string> split(std::string const s, char delim);
