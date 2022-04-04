@@ -452,7 +452,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     }
 
     //Log bot movement
-    if (sPlayerbotAIConfig->hasLog("bot_movement.csv") && lastMove.lastMoveShort != movePosition)
+    if (sPlayerbotAIConfig->hasLog("bot_movement.csv") && lastMove.lastMoveShort.GetExactDist(movePosition) > 0.001)
     {
         std::ostringstream out;
         out << sPlayerbotAIConfig->GetTimestampStr() << "+00,";
