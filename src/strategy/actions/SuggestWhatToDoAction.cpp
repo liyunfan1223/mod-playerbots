@@ -50,18 +50,18 @@ void SuggestWhatToDoAction::instance()
         instances["Gnomeregan"] = 35;
         instances["Razorfen Kraul"] = 35;
         instances["Maraudon"] = 50;
-        instances["Scarlet Monestery"] = 40;
+        instances["Scarlet Monastery"] = 40;
         instances["Uldaman"] = 45;
         instances["Dire Maul"] = 58;
         instances["Scholomance"] = 59;
         instances["Razorfen Downs"] = 40;
-        instances["Strathholme"] = 59;
+        instances["Stratholme"] = 59;
         instances["Zul'Farrak"] = 45;
         instances["Blackrock Depths"] = 55;
         instances["Temple of Atal'Hakkar"] = 55;
         instances["Lower Blackrock Spire"] = 57;
 
-        instances["Hellfire Citidel"] = 65;
+        instances["Hellfire Citadel"] = 65;
         instances["Coilfang Reservoir"] = 65;
         instances["Auchindoun"] = 65;
         instances["Cavens of Time"] = 68;
