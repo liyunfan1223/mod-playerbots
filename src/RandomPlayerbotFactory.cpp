@@ -289,18 +289,19 @@ void RandomPlayerbotFactory::CreateRandomBots()
                     }
                 }
                 else
-                    dels.push_back(std::async([accId]
-                    {
-                        AccountMgr::DeleteAccount(accId);
-                    }));
+                    AccountMgr::DeleteAccount(accId);
+//                    dels.push_back(std::async([accId]
+//                    {
+//                        AccountMgr::DeleteAccount(accId);
+//                    }));
 
             } while (results->NextRow());
         }
 
-        for (uint32 i = 0; i < dels.size(); i++)
+        /* for (uint32 i = 0; i < dels.size(); i++)
         {
             dels[i].wait();
-        }
+        }*/
 
         PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
 
@@ -406,6 +407,10 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES - count; ++cls)
         {
+            // skip nonexistent classes
+            if (!((1 << (cls - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(cls))
+                continue;
+
             if (cls != 10)
                 if (Player* playerBot = factory.CreateRandomBot(session, cls, names))
                     playerBots.emplace_back(playerBot, accountId);
@@ -680,7 +685,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
 
         // set random emblem
         uint32 backgroundColor = urand(0xFF000000, 0xFFFFFFFF);
-        uint32 emblemStyle = urand(0, 5);
+        uint32 emblemStyle = urand(0, 101);
         uint32 emblemColor = urand(0xFF000000, 0xFFFFFFFF);
         uint32 borderStyle = urand(0, 5);
         uint32 borderColor = urand(0xFF000000, 0xFFFFFFFF);
