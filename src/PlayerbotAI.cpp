@@ -26,6 +26,7 @@
 #include "SpellAuraEffects.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "../../../src/server/game/Entities/Unit/Unit.h"
 
 std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems);
 std::vector<std::string> split(std::string const s, char delim);
@@ -678,6 +679,8 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             bot->m_movementInfo.SetMovementFlags(MOVEMENTFLAG_FALLING);
             bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FORWARD);
             bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
+            if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
+                bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
 
             // copy MovementInfo
             MovementInfo movementInfo = bot->m_movementInfo;
