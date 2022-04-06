@@ -638,6 +638,8 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
         }
         case SMSG_MOVE_KNOCK_BACK: // handle knockbacks
         {
+            // Peiru: Disable Knockback handling for now until spline crash can be resolved
+            /*
             WorldPacket p(packet);
             p.rpos(0);
 
@@ -703,6 +705,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 
             //bot->SendHeartBeat();
 
+            */
             return;
         }
 	    default:
