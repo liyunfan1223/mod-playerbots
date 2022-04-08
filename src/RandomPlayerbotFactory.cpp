@@ -498,10 +498,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
             continue;
 
         if (sGuildMgr->GetGuildByName(guildName))
-        {
-            LOG_WARN("playerbots", "GuildName %s is busy. Skipped...", guildName.c_str());
             continue;
-        }
 
         if (availableLeaders.empty())
         {
@@ -517,6 +514,9 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
             LOG_ERROR("playerbots", "ObjectAccessor Cannot find player to set leader for guild {} . Skipped...", guildName.c_str());
             continue;
         }
+
+        if (player->GetGuildId())
+            continue;
 
         Guild* guild = new Guild();
         if (!guild->Create(player, guildName))
