@@ -521,8 +521,6 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         Guild* guild = new Guild();
         if (!guild->Create(player, guildName))
         {
-            // it very strange, but sometimes Guild can't be created by unknown reason
-            // We already checked that player is exists and guildName are correct
             LOG_ERROR("playerbots", "Error creating guild [ {} ] with leader [ {} ]", guildName.c_str(), player->GetName().c_str());
             delete guild;
             continue;
