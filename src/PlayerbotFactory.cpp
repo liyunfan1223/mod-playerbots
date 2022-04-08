@@ -2006,14 +2006,14 @@ void PlayerbotFactory::InitMounts()
             break;
         case RACE_NIGHTELF:
             slow = { 10789, 8394, 10793 };
-            fast = { 18766, 18767 };
+            fast = { 24252, 63637, 22723 };
             break;
         case RACE_UNDEAD_PLAYER:
             slow = { 17463, 17464, 17462 };
-            fast = { 17465, 23246 };
+            fast = { 17465, 23246, 66846 };
             break;
         case RACE_TAUREN:
-            slow = { 18990, 18989 };
+            slow = { 18990, 18989, 64657 };
             fast = { 23249, 23248, 23247 };
             break;
         case RACE_GNOME:
@@ -2021,7 +2021,7 @@ void PlayerbotFactory::InitMounts()
             fast = { 23225, 23223, 23222 };
             break;
         case RACE_TROLL:
-            slow = { 10796, 472 };
+            slow = { 10796, 10799, 8395, 472 };
             fast = { 23241, 23242, 23243 };
             break;
         case RACE_DRAENEI:
