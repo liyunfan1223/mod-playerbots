@@ -2021,7 +2021,7 @@ void PlayerbotFactory::InitMounts()
             fast = { 23225, 23223, 23222 };
             break;
         case RACE_TROLL:
-            slow = { 8588, 10796, 8592, 472 };
+            slow = { 10796, 472 };
             fast = { 23241, 23242, 23243 };
             break;
         case RACE_DRAENEI:
@@ -2412,14 +2412,14 @@ void PlayerbotFactory::InitInventoryEquip()
 
 void PlayerbotFactory::InitGuild()
 {
+    if (bot->GetGuildId())
+        return;
+
     bot->SaveToDB(false, false);
 
     // add guild tabard
     if (bot->GetGuildId() && !bot->HasItemCount(5976, 1))
         StoreItem(5976, 1);
-
-    if (bot->GetGuildId())
-        return;
 
     if (sPlayerbotAIConfig->randomBotGuilds.empty())
         RandomPlayerbotFactory::CreateRandomGuilds();
