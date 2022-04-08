@@ -918,7 +918,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         uint32 teleport = GetEventValue(bot, "teleport");
         if (!teleport)
         {
-            LOG_INFO("players", "Bot #%d <%s>: sent to grind", bot, player->GetName());
+            LOG_INFO("players", "Bot #{} <{}>: sent to grind", bot, player->GetName());
             RandomTeleportForLevel(player);
             Refresh(player);
             SetEventValue(bot, "teleport", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
