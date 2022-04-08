@@ -2006,7 +2006,7 @@ void PlayerbotFactory::InitMounts()
             break;
         case RACE_NIGHTELF:
             slow = { 10789, 8394, 10793 };
-            fast = { 18766, 18767, 18902 };
+            fast = { 18766, 18767 };
             break;
         case RACE_UNDEAD_PLAYER:
             slow = { 17463, 17464, 17462 };
