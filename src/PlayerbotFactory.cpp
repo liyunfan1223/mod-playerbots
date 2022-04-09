@@ -2576,8 +2576,7 @@ void PlayerbotFactory::InitArenaTeam()
         ObjectGuid capt = arenateam->GetCaptain();
         Player* botcaptain = ObjectAccessor::FindPlayer(capt);
 
-        if (sCharacterCache->GetCharacterArenaTeamIdByGuid(capt, arenateam->GetType()) != 0 || botcaptain->GetArenaTeamId(arenateam->GetType()))
-            return;
+        if ((bot && bot->GetArenaTeamId(arenateam->GetSlot())) || sCharacterCache->GetCharacterArenaTeamIdByGuid(bot->GetGUID(), arenateam->GetSlot()) != 0)
         
         if (botcaptain && botcaptain->GetTeamId() == bot->GetTeamId()) //need?
         {
