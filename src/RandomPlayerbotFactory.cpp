@@ -497,6 +497,9 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         if (guildName.empty())
             continue;
 
+        if (sGuildMgr->GetGuildByName(guildName))
+            continue;
+
         if (availableLeaders.empty())
         {
             LOG_ERROR("playerbots", "No leaders for random guilds available");
@@ -508,14 +511,17 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         Player* player = ObjectAccessor::FindPlayer(leader);
         if (!player)
         {
-            LOG_ERROR("playerbots", "Cannot find player for leader {}", player->GetName().c_str());
+            LOG_ERROR("playerbots", "ObjectAccessor Cannot find player to set leader for guild {} . Skipped...", guildName.c_str());
             continue;
         }
+
+        if (player->GetGuildId())
+            continue;
 
         Guild* guild = new Guild();
         if (!guild->Create(player, guildName))
         {
-            LOG_ERROR("playerbots", "Error creating guild {}", guildName.c_str());
+            LOG_ERROR("playerbots", "Error creating guild [ {} ] with leader [ {} ]", guildName.c_str(), player->GetName().c_str());
             delete guild;
             continue;
         }
