@@ -27,11 +27,11 @@ void DestroyItemAction::DestroyItem(FindItemVisitor* visitor)
     std::vector<Item*> items = visitor->GetResult();
 	for (Item* item : items)
     {
-        bot->DestroyItem(item->GetBagSlot(),item->GetSlot(), true);
-
         std::ostringstream out;
         out << chat->FormatItem(item->GetTemplate()) << " destroyed";
         botAI->TellMaster(out);
+
+        bot->DestroyItem(item->GetBagSlot(),item->GetSlot(), true);
     }
 }
 
