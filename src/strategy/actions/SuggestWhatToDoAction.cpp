@@ -205,7 +205,7 @@ void SuggestWhatToDoAction::grindReputation()
 
     std::ostringstream itemout;
     itemout << "|c004040b0" << allowedFactions[urand(0, allowedFactions.size() - 1)] << "|r";
-    placeholders["{}action"] = itemout.str();
+    placeholders["%faction"] = itemout.str();
 
     spam(sPlayerbotTextMgr->Format("suggest_faction", placeholders));
 }
