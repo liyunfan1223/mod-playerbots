@@ -23,6 +23,12 @@ AiPlayerbot.EnableGuildTasks = 1
 # Enable LFG for random bots
 AiPlayerbot.RandomBotJoinLfg = 1
 
+# Enable dungeon suggestions for random bots
+AiPlayerbot.RandomBotSuggestDungeons = 1
+
+# Enable dungeon suggestions in lower case randomly
+AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
+
 # Enable BG/Arena for random Bots
 AiPlayerbot.RandomBotJoinBG = 1
 

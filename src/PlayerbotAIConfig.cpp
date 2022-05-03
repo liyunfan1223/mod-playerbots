@@ -9,6 +9,7 @@
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
 #include "Talentspec.h"
+#include "PlayerbotDungeonSuggestionMgr.h"
 
 #include <iostream>
 
@@ -124,6 +125,8 @@ bool PlayerbotAIConfig::Initialize()
     minRandomBotsPriceChangeInterval = sConfigMgr->GetIntDefault("AiPlayerbot.MinRandomBotsPriceChangeInterval", 2 * HOUR);
     maxRandomBotsPriceChangeInterval = sConfigMgr->GetIntDefault("AiPlayerbot.MaxRandomBotsPriceChangeInterval", 48 * HOUR);
     randomBotJoinLfg = sConfigMgr->GetBoolDefault("AiPlayerbot.RandomBotJoinLfg", true);
+    randomBotSuggestDungeons = sConfigMgr->GetBoolDefault("AiPlayerbot.RandomBotSuggestDungeons", true);
+    suggestDungeonsInLowerCaseRandomly = sConfigMgr->GetBoolDefault("AiPlayerbot.SuggestDungeonsInLowerCaseRandomly", false);
     randomBotJoinBG = sConfigMgr->GetBoolDefault("AiPlayerbot.RandomBotJoinBG", true);
     logInGroupOnly = sConfigMgr->GetBoolDefault("AiPlayerbot.LogInGroupOnly", true);
     logValuesPerTick = sConfigMgr->GetBoolDefault("AiPlayerbot.LogValuesPerTick", false);
@@ -314,6 +317,11 @@ bool PlayerbotAIConfig::Initialize()
 
     if (sPlayerbotAIConfig->randomBotJoinBG)
         sRandomPlayerbotMgr->LoadBattleMastersCache();
+
+    if (sPlayerbotAIConfig->randomBotSuggestDungeons)
+    {
+        sPlayerbotDungeonSuggestionMgr->LoadDungeonSuggestions();
+    }
 
     LOG_INFO("server.loading", "---------------------------------------");
     LOG_INFO("server.loading", "        AI Playerbots initialized       ");
