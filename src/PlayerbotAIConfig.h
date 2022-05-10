@@ -70,6 +70,8 @@ class PlayerbotAIConfig
         uint32 randomBotsPerInterval;
         uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
         bool randomBotJoinLfg;
+        bool randomBotSuggestDungeons;
+        bool suggestDungeonsInLowerCaseRandomly;
         bool randomBotJoinBG;
         bool randomBotLoginAtStartup;
         uint32 randomBotTeleLevel;

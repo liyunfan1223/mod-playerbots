@@ -53,6 +53,7 @@
 #include "SayAction.h"
 #include "StayActions.h"
 #include "SuggestWhatToDoAction.h"
+#include "SuggestDungeonAction.h"
 #include "TravelAction.h"
 #include "XpGainAction.h"
 #include "VehicleActions.h"
@@ -117,6 +118,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["emote"] = &ActionContext::emote;
             creators["talk"] = &ActionContext::talk;
             creators["suggest what to do"] = &ActionContext::suggest_what_to_do;
+            creators["suggest dungeon"] = &ActionContext::suggest_dungeon;
             creators["suggest trade"] = &ActionContext::suggest_trade;
             creators["return"] = &ActionContext::_return;
             creators["move to loot"] = &ActionContext::move_to_loot;
@@ -264,6 +266,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* emote(PlayerbotAI* botAI) { return new EmoteAction(botAI); }
         static Action* talk(PlayerbotAI* botAI) { return new TalkAction(botAI); }
         static Action* suggest_what_to_do(PlayerbotAI* botAI) { return new SuggestWhatToDoAction(botAI); }
+        static Action* suggest_dungeon(PlayerbotAI* botAI) { return new SuggestDungeonAction(botAI); }
         static Action* suggest_trade(PlayerbotAI* botAI) { return new SuggestTradeAction(botAI); }
         static Action* attack_anything(PlayerbotAI* botAI) { return new AttackAnythingAction(botAI); }
         static Action* attack_least_hp_target(PlayerbotAI* botAI) { return new AttackLeastHpTargetAction(botAI); }

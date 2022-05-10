@@ -11,12 +11,10 @@
 #include "Playerbots.h"
 #include "PlayerbotTextMgr.h"
 
-std::map<std::string, uint8> SuggestWhatToDoAction::instances;
 std::map<std::string, uint8> SuggestWhatToDoAction::factions;
 
 SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* botAI, std::string const name) : InventoryAction(botAI, name)
 {
-    suggestions.push_back(&SuggestWhatToDoAction::instance);
     suggestions.push_back(&SuggestWhatToDoAction::specificQuest);
     suggestions.push_back(&SuggestWhatToDoAction::grindReputation);
     suggestions.push_back(&SuggestWhatToDoAction::something);
@@ -35,74 +33,6 @@ bool SuggestWhatToDoAction::Execute(Event event)
     botAI->GetAiObjectContext()->GetValue<time_t>("last said", qualifier)->Set(time(nullptr) + urand(1, 60));
 
     return true;
-}
-
-void SuggestWhatToDoAction::instance()
-{
-    if (instances.empty())
-    {
-        instances["Ragefire Chasm"] = 15;
-        instances["Deadmines"] = 18;
-        instances["Wailing Caverns"] = 18;
-        instances["Shadowfang Keep"] = 25;
-        instances["Blackfathom Deeps"] = 20;
-        instances["Stockade"] = 20;
-        instances["Gnomeregan"] = 35;
-        instances["Razorfen Kraul"] = 35;
-        instances["Maraudon"] = 50;
-        instances["Scarlet Monastery"] = 40;
-        instances["Uldaman"] = 45;
-        instances["Dire Maul"] = 58;
-        instances["Scholomance"] = 59;
-        instances["Razorfen Downs"] = 40;
-        instances["Stratholme"] = 59;
-        instances["Zul'Farrak"] = 45;
-        instances["Blackrock Depths"] = 55;
-        instances["Temple of Atal'Hakkar"] = 55;
-        instances["Lower Blackrock Spire"] = 57;
-
-        instances["Hellfire Citadel"] = 65;
-        instances["Coilfang Reservoir"] = 65;
-        instances["Auchindoun"] = 65;
-        instances["Cavens of Time"] = 68;
-        instances["Tempest Keep"] = 69;
-        instances["Magister's Terrace"] = 70;
-
-        instances["Utgarde Keep"] = 75;
-        instances["The Nexus"] = 75;
-        instances["Ahn'kahet: The Old Kingdom"] = 75;
-        instances["Azjol-Nerub"] = 75;
-        instances["Drak'Tharon Keep"] = 75;
-        instances["Violet Hold"] = 80;
-        instances["Gundrak"] = 77;
-        instances["Halls of Stone"] = 77;
-        instances["Halls of Lightning"] = 77;
-        instances["Oculus"] = 77;
-        instances["Utgarde Pinnacle"] = 77;
-        instances["Trial of the Champion"] = 80;
-        instances["Forge of Souls"] = 80;
-        instances["Pit of Saron"] = 80;
-        instances["Halls of Reflection"] = 80;
-    }
-
-    std::vector<std::string> allowedInstances;
-    for (std::map<std::string, uint8>::iterator i = instances.begin(); i != instances.end(); ++i)
-    {
-        if (bot->getLevel() >= i->second)
-            allowedInstances.push_back(i->first);
-    }
-
-    if (allowedInstances.empty())
-        return;
-
-    std::map<std::string, std::string> placeholders;
-    placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
-
-    std::ostringstream itemout;
-    itemout << "|c00b000b0" << allowedInstances[urand(0, allowedInstances.size() - 1)] << "|r";
-    placeholders["%instance"] = itemout.str();
-
-    spam(sPlayerbotTextMgr->Format("suggest_instance", placeholders));
 }
 
 std::vector<uint32> SuggestWhatToDoAction::GetIncompletedQuests()
@@ -226,7 +156,11 @@ void SuggestWhatToDoAction::something()
     spam(sPlayerbotTextMgr->Format("suggest_something", placeholders));
 }
 
-void SuggestWhatToDoAction::spam(std::string const msg, uint32 channelId)
+void SuggestWhatToDoAction::spam(
+    std::string msg,
+    uint32 channelId,
+    bool const isLowerCase
+)
 {
     std::set<std::string> said;
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
@@ -248,6 +182,10 @@ void SuggestWhatToDoAction::spam(std::string const msg, uint32 channelId)
                 if (Channel* chn = cMgr->GetJoinChannel(channelName, channel->ChannelID))
                 {
                     chn->JoinChannel(bot, "");
+                    if (isLowerCase)
+                    {
+                        strToLower(msg);
+                    }
                     chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
                 }
             }
