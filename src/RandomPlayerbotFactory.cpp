@@ -249,7 +249,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
 
         std::vector<std::future<void>> dels;
-        QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE ''{}'%%'", sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+        QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'", sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
         if (results)
         {
             do
