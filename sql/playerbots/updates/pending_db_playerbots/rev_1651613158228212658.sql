@@ -1,7 +1,5 @@
 USE acore_playerbots;
 
-INSERT INTO `version_db_playerbots` (`sql_rev`) VALUES ('1651613158228212658');
-
 DELETE FROM `playerbots_text` WHERE `key` = 'suggest_instance';
 INSERT INTO `playerbots_text` VALUES
 
