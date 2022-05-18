@@ -35,7 +35,7 @@ class PlayerbotHolder : public PlayerbotAIBase
         PlayerBotMap::const_iterator GetPlayerBotsBegin() const { return playerBots.begin(); }
         PlayerBotMap::const_iterator GetPlayerBotsEnd()   const { return playerBots.end();   }
 
-        void UpdateAIInternal(uint32 elapsed, bool minimal = false) override { };
+        void UpdateAIInternal() override { }; // unused params "uint32 elapsed, bool minimal = false" - whipowill
         void UpdateSessions();
         void HandleBotPackets(WorldSession* session);
 

@@ -124,7 +124,7 @@ class DeadTrigger : public Trigger
 class AoeHealTrigger : public Trigger
 {
     public:
-    	AoeHealTrigger(PlayerbotAI* botAI, std::string const name, std::string const type, int32 count) : Trigger(botAI, name), type(type), count(count) { }
+    	AoeHealTrigger(PlayerbotAI* botAI, std::string const name, std::string const type, int32 count) : Trigger(botAI, name), count(count) type(type), { } // type after count - whipowill
         bool IsActive() override;
 
     protected:

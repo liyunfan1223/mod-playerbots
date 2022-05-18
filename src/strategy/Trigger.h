@@ -19,8 +19,8 @@ class Trigger : public AiNamedObject
         virtual ~Trigger() { }
 
         virtual Event Check();
-        virtual void ExternalEvent(std::string const param, Player* owner = nullptr) { }
-        virtual void ExternalEvent(WorldPacket& packet, Player* owner = nullptr) { }
+        virtual void ExternalEvent() { } // unused params "std::string const param, Player* owner = nullptr" - whipowill
+        virtual void ExternalEvent() { } // unused params "WorldPacket& packet, Player* owner = nullptr" - whipowill
         virtual bool IsActive() { return false; }
         virtual NextAction** getHandlers() { return nullptr; }
         void Update() { }
@@ -39,7 +39,7 @@ class Trigger : public AiNamedObject
 class TriggerNode
 {
     public:
-        TriggerNode(std::string const name, NextAction** handlers = nullptr) : name(name), handlers(handlers), trigger(nullptr) { }
+        TriggerNode(std::string const name, NextAction** handlers = nullptr) : name(name), trigger(nullptr), handlers(handlers) { } // name after handlers, handlers after trigger - whipowill
 
         virtual ~TriggerNode()
         {
