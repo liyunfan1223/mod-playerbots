@@ -44,8 +44,8 @@ class Strategy : public PlayerbotAIAware
         virtual ~Strategy() { }
 
         virtual NextAction** getDefaultActions() { return nullptr; }
-        virtual void InitTriggers() { } // unused params "std::vector<TriggerNode*> &triggers" - whipowill
-        virtual void InitMultipliers() { } // unused params "std::vector<Multiplier*> &multipliers" - whipowill
+        virtual void InitTriggers([[maybe_unused]] std::vector<TriggerNode*> &triggers) { } // unused params - whipowill
+        virtual void InitMultipliers([[maybe_unused]] std::vector<Multiplier*> &multipliers) { } // unused params - whipowill
         virtual std::string const getName() = 0;
 		virtual uint32 GetType() const { return STRATEGY_TYPE_GENERIC; }
         virtual ActionNode* GetAction(std::string const name);

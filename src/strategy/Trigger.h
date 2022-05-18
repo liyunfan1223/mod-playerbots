@@ -19,8 +19,8 @@ class Trigger : public AiNamedObject
         virtual ~Trigger() { }
 
         virtual Event Check();
-        virtual void ExternalEvent() { } // unused params "std::string const param, Player* owner = nullptr" - whipowill
-        virtual void ExternalEvent() { } // unused params "WorldPacket& packet, Player* owner = nullptr" - whipowill
+        virtual void ExternalEvent([[maybe_unused]] std::string const param, [[maybe_unused]] Player* owner = nullptr) { } // unused params - whipowill
+        virtual void ExternalEvent([[maybe_unused]] WorldPacket& packet, [[maybe_unused]] Player* owner = nullptr) { } // unused params - whipowill
         virtual bool IsActive() { return false; }
         virtual NextAction** getHandlers() { return nullptr; }
         void Update() { }

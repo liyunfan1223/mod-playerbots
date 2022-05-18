@@ -557,7 +557,7 @@ class TravelDestination
         }
 
         virtual Quest const* GetQuestTemplate() { return nullptr; }
-        virtual bool isActive() { return false; } // unused param "Player* bot" - whipowill
+        virtual bool isActive([[maybe_unused]] Player* bot) { return false; } // unused param - whipowill
 
         bool isFull(bool ignoreFull = false);
 
@@ -600,13 +600,13 @@ class NullTravelDestination : public TravelDestination
 
         Quest const* GetQuestTemplate() override { return nullptr; }
 
-        bool isActive() override { return false; } // unused param "Player* bot" - whipowill
+        bool isActive([[maybe_unused]] Player* bot) override { return false; } // unused param - whipowill
 
         std::string const getName() override { return "NullTravelDestination"; }
         std::string const getTitle() override { return "no destination"; }
 
-        bool isIn() override { return true; } // unused params "WorldPosition* pos, float radius = 0.f" - whipowill
-        bool isOut() override { return false; } // unused params "WorldPosition* pos, float radius = 0.f" - whipowill
+        bool isIn([[maybe_unused]] WorldPosition* pos, [[maybe_unused]] float radius = 0.f) override { return true; } // unused params - whipowill
+        bool isOut([[maybe_unused]] WorldPosition* pos, [[maybe_unused]] float radius = 0.f) override { return false; } // unused params - whipowill
 };
 
 //A travel target specifically related to a quest.
