@@ -111,7 +111,7 @@ class FindItemsToTradeByClassVisitor : public IterateItemsVisitor
 {
     public:
         FindItemsToTradeByClassVisitor(uint32 itemClass, uint32 itemSubClass, uint32 count)
-            : IterateItemsVisitor(), itemClass(itemClass), count(count), itemSubClass(itemSubClass) { } // reorder args - whipowill
+            : IterateItemsVisitor(), itemClass(itemClass), itemSubClass(itemSubClass), count(count) { } // reorder args - whipowill
 
         bool Visit(Item* item) override
         {

@@ -66,7 +66,7 @@ class TravelNodePath
         //Constructor
         TravelNodePath(float distance = 0.1f, float extraCost = 0, uint8 pathType = (uint8)TravelNodePathType::walk, uint32 pathObject = 0, bool calculated = false,
             std::vector<uint8> maxLevelCreature = { 0, 0, 0 }, float swimDistance = 0)
-            : extraCost(extraCost), calculated(calculated), distance(distance), maxLevelCreature(maxLevelCreature), pathType(TravelNodePathType(pathType)), swimDistance(swimDistance), pathObject(pathObject) // reorder args - whipowill
+            : extraCost(extraCost), calculated(calculated), distance(distance), maxLevelCreature(maxLevelCreature), swimDistance(swimDistance), pathType(TravelNodePathType(pathType)), pathObject(pathObject) // reorder args - whipowill
         {
             if (pathType != (uint8)TravelNodePathType::walk)
                 complete = true;

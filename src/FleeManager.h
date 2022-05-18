@@ -46,7 +46,7 @@ class FleeManager
 
 		Player* bot;
 		float maxAllowedDistance;
-		float followAngle;
+		[[maybe_unused]] float followAngle; // unused - whipowill
 		bool forceMaxDistance;
         WorldPosition startPosition;
 };
