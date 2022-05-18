@@ -71,7 +71,7 @@ class ActionNode
 {
     public:
         ActionNode(std::string const name, NextAction** prerequisites = nullptr, NextAction** alternatives = nullptr, NextAction** continuers = nullptr) :
-            name(name), action(nullptr), alternatives(alternatives), continuers(continuers), prerequisites(prerequisites) { } // reorder arguments - whipowill
+            name(name), action(nullptr), continuers(continuers), alternatives(alternatives), prerequisites(prerequisites) { } // reorder arguments - whipowill
 
         virtual ~ActionNode()
         {

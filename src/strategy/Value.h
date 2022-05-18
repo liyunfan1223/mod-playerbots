@@ -24,7 +24,7 @@ class UntypedValue : public AiNamedObject
         virtual void Reset() { }
         virtual std::string const Format() { return "?"; }
         virtual std::string const Save() { return "?"; }
-        virtual bool Load(std::string const value) { return false; }
+        virtual bool Load([[maybe_unused]] std::string const value) { return false; } // unused param - whipowill
 };
 
 template<class T>
