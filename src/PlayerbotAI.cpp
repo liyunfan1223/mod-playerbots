@@ -79,7 +79,7 @@ PlayerbotAI::PlayerbotAI() : PlayerbotAIBase(true), bot(nullptr), aiObjectContex
     }
 }
 
-PlayerbotAI::PlayerbotAI(Player* bot) : PlayerbotAIBase(true), bot(bot), chatHelper(this), chatFilter(this), security(bot), master(nullptr)
+PlayerbotAI::PlayerbotAI(Player* bot) : PlayerbotAIBase(true), bot(bot), chatHelper(this), chatFilter(this), master(nullptr), security(bot) // reorder args - whipowill
 {
     if (!bot->isTaxiCheater() && HasCheat((BotCheatMask::taxi)))
         bot->SetTaxiCheater(true);
@@ -253,7 +253,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     YieldThread(min);
 }
 
-void PlayerbotAI::UpdateAIInternal(uint32 elapsed, bool minimal)
+void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal) // unused param - whipowill
 {
     if (bot->IsBeingTeleported() || !bot->IsInWorld())
         return;
@@ -801,7 +801,7 @@ void PlayerbotAI::DoNextAction(bool min)
         bot->GetMotionMaster()->MoveIdle();
 
         //Death Count to prevent skeleton piles
-        Player* master = GetMaster();
+        Player* master = GetMaster(); // warning here - whipowill
         if (!HasActivePlayerMaster() && !bot->InBattleground())
         {
             uint32 dCount = aiObjectContext->GetValue<uint32>("death count")->Get();
