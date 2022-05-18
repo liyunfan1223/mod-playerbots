@@ -135,7 +135,7 @@ class MemoryCalculatedValue : public CalculatedValue<T>
             return true;
         }
 
-        void Set(T value) override
+        void Set([[maybe_unused]] T value) override // unused param - whipowill
         {
             CalculatedValue<T>::Set(this->value);
             UpdateChange();

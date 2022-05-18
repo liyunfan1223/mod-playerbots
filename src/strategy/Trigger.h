@@ -39,7 +39,7 @@ class Trigger : public AiNamedObject
 class TriggerNode
 {
     public:
-        TriggerNode(std::string const name, NextAction** handlers = nullptr) : name(name), trigger(nullptr), handlers(handlers) { } // name after handlers, handlers after trigger - whipowill
+        TriggerNode(std::string const name, NextAction** handlers = nullptr) : trigger(nullptr), name(name), handlers(handlers) { } // reorder args - whipowill
 
         virtual ~TriggerNode()
         {

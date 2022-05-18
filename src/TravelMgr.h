@@ -346,7 +346,7 @@ inline ByteBuffer& operator<<(ByteBuffer& b, WorldPosition& guidP)
     return b;
 }
 
-inline ByteBuffer& operator>>(ByteBuffer& b) // additional argument "WorldPosition& g" was unused - whipowill
+inline ByteBuffer& operator>>(ByteBuffer& b, [[maybe_unused]] WorldPosition& g) // unused param - whipowill
 {
     uint32 mapid;
     float coord_x;
