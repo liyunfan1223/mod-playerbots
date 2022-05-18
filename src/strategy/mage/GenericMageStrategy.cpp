@@ -24,7 +24,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         }
 
     private:
-        static ActionNode* frostbolt(PlayerbotAI* botAI)
+        static ActionNode* frostbolt([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("frostbolt",
                 /*P*/ nullptr,
@@ -32,7 +32,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* fire_blast(PlayerbotAI* botAI)
+        static ActionNode* fire_blast([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("fire blast",
                 /*P*/ nullptr,
@@ -40,7 +40,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* scorch(PlayerbotAI* botAI)
+        static ActionNode* scorch([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("scorch",
                 /*P*/ nullptr,
@@ -48,7 +48,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* frost_nova(PlayerbotAI* botAI)
+        static ActionNode* frost_nova([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("frost nova",
                 /*P*/ nullptr,
@@ -56,7 +56,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                /*C*/ NextAction::array(0, new NextAction("flee"), nullptr));
         }
 
-        static ActionNode* icy_veins(PlayerbotAI* botAI)
+        static ActionNode* icy_veins([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("icy veins",
                 /*P*/ nullptr,
@@ -64,7 +64,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* combustion(PlayerbotAI* botAI)
+        static ActionNode* combustion([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("combustion",
                 /*P*/ nullptr,
@@ -72,7 +72,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* evocation(PlayerbotAI* botAI)
+        static ActionNode* evocation([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("evocation",
                 /*P*/ nullptr,
@@ -80,7 +80,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* dragons_breath(PlayerbotAI* botAI)
+        static ActionNode* dragons_breath([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("dragon's breath",
                 /*P*/ nullptr,
@@ -88,7 +88,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ NextAction::array(0, new NextAction("flamestrike", 71.0f), nullptr));
         }
 
-        static ActionNode* blast_wave(PlayerbotAI* botAI)
+        static ActionNode* blast_wave([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("blast wave",
                 /*P*/ nullptr,
@@ -96,7 +96,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ NextAction::array(0, new NextAction("flamestrike", 71.0f), nullptr));
         }
 
-        static ActionNode* remove_curse(PlayerbotAI* botAI)
+        static ActionNode* remove_curse([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("remove curse",
                 /*P*/ nullptr,
@@ -104,7 +104,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* remove_curse_on_party(PlayerbotAI* botAI)
+        static ActionNode* remove_curse_on_party([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("remove curse on party",
                 /*P*/ nullptr,

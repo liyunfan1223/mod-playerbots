@@ -50,7 +50,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 
         }
     private:
-	    static ActionNode* death_coil(PlayerbotAI* botAI)
+	    static ActionNode* death_coil([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 	    {
 		    return new ActionNode("death coil",
 			    /*P*/ nullptr,
@@ -58,7 +58,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* death_grip(PlayerbotAI* botAI)
+	    static ActionNode* death_grip([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 	    {
 		    return new ActionNode("death grip",
 			    /*P*/ nullptr,
@@ -66,7 +66,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* plague_strike(PlayerbotAI* botAI)
+	    static ActionNode* plague_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 	    {
 		    return new ActionNode("plague strike",
 			    /*P*/ nullptr,
@@ -74,7 +74,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* icy_touch(PlayerbotAI* botAI)
+	    static ActionNode* icy_touch([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 	    {
 		    return new ActionNode("icy touch",
 			    /*P*/ nullptr,
@@ -82,7 +82,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* heart_strike(PlayerbotAI* botAI)
+	    static ActionNode* heart_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 	    {
 		    return new ActionNode("heart strike",
 			    /*P*/ nullptr,
@@ -90,7 +90,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* pestilence(PlayerbotAI* botAI)
+	    static ActionNode* pestilence([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 	    {
 		    return new ActionNode("pestilence",
 			    /*P*/ nullptr,
@@ -98,7 +98,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-        static ActionNode* horn_of_winter(PlayerbotAI* botAI)
+        static ActionNode* horn_of_winter([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("horn of winter",
                 /*P*/ nullptr,
@@ -106,7 +106,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* bone_shield(PlayerbotAI* botAI)
+        static ActionNode* bone_shield([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("bone shield",
                 /*P*/ nullptr,
@@ -114,7 +114,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* killing_machine(PlayerbotAI* botAI)
+        static ActionNode* killing_machine([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("killing machine",
                 /*P*/ nullptr,
@@ -122,7 +122,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* corpse_explosion(PlayerbotAI* botAI)
+        static ActionNode* corpse_explosion([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("corpse explosion",
                 /*P*/ nullptr,
@@ -130,7 +130,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* anti_magic_zone(PlayerbotAI* botAI)
+        static ActionNode* anti_magic_zone([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("anti magic zone",
                 /*P*/ nullptr,
@@ -138,7 +138,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* icebound_fortitude(PlayerbotAI* botAI)
+        static ActionNode* icebound_fortitude([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("icebound fortitude",
                 /*P*/ nullptr,

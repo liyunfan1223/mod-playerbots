@@ -18,7 +18,7 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
         }
 
     private:
-        static ActionNode* thorns(PlayerbotAI* botAI)
+        static ActionNode* thorns([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode("thorns",
                 /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -26,7 +26,7 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
                 /*C*/ nullptr);
         }
 
-        static ActionNode* thorns_on_party(PlayerbotAI* botAI)
+        static ActionNode* thorns_on_party([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode("thorns on party",
                 /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -34,7 +34,7 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
                 /*C*/ nullptr);
         }
 
-        static ActionNode* mark_of_the_wild(PlayerbotAI* botAI)
+        static ActionNode* mark_of_the_wild([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("mark of the wild",
                 /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -42,7 +42,7 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
                 /*C*/ nullptr);
         }
 
-        static ActionNode* mark_of_the_wild_on_party(PlayerbotAI* botAI)
+        static ActionNode* mark_of_the_wild_on_party([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("mark of the wild on party",
                 /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -50,7 +50,7 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
                 /*C*/ nullptr);
         }
 
-        static ActionNode* innervate(PlayerbotAI* botAI)
+        static ActionNode* innervate([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("innervate",
                 /*P*/ nullptr,

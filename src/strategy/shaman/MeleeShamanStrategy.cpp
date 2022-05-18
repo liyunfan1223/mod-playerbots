@@ -16,7 +16,7 @@ class MeleeShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         }
 
     private:
-        static ActionNode* stormstrike(PlayerbotAI* botAI)
+        static ActionNode* stormstrike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("stormstrike",
                 /*P*/ nullptr,
@@ -24,7 +24,7 @@ class MeleeShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* lava_lash(PlayerbotAI* botAI)
+        static ActionNode* lava_lash([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("lava lash",
                 /*P*/ nullptr,
@@ -32,7 +32,7 @@ class MeleeShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* magma_totem(PlayerbotAI* botAI)
+        static ActionNode* magma_totem([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("magma totem",
                 /*P*/ nullptr,

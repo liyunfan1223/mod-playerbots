@@ -23,7 +23,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         }
 
     private:
-        static ActionNode* earth_shock(PlayerbotAI* botAI)
+        static ActionNode* earth_shock([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("earth shock",
                 /*P*/ nullptr,
@@ -31,7 +31,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* flametongue_weapon(PlayerbotAI* botAI)
+        static ActionNode* flametongue_weapon([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("flametongue weapon",
                 /*P*/ nullptr,
@@ -39,7 +39,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* frostbrand_weapon(PlayerbotAI* botAI)
+        static ActionNode* frostbrand_weapon([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("frostbrand weapon",
                 /*P*/ nullptr,
@@ -47,7 +47,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* windfury_weapon(PlayerbotAI* botAI)
+        static ActionNode* windfury_weapon([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("windfury weapon",
                 /*P*/ nullptr,
@@ -55,7 +55,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* lesser_healing_wave(PlayerbotAI* botAI)
+        static ActionNode* lesser_healing_wave([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("lesser healing wave",
                 /*P*/ nullptr,
@@ -63,7 +63,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* lesser_healing_wave_on_party(PlayerbotAI* botAI)
+        static ActionNode* lesser_healing_wave_on_party([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("lesser healing wave on party",
                 /*P*/ nullptr,
@@ -71,7 +71,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* chain_heal(PlayerbotAI* botAI)
+        static ActionNode* chain_heal([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("chain heal",
                 /*P*/ nullptr,
@@ -79,7 +79,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* riptide(PlayerbotAI* botAI)
+        static ActionNode* riptide([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("riptide",
                 /*P*/ nullptr,
@@ -87,7 +87,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* chain_heal_on_party(PlayerbotAI* botAI)
+        static ActionNode* chain_heal_on_party([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("chain heal on party",
                 /*P*/ nullptr,
@@ -95,7 +95,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* riptide_on_party(PlayerbotAI* botAI)
+        static ActionNode* riptide_on_party([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("riptide on party",
                 /*P*/ nullptr,

@@ -25,7 +25,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         }
 
     private:
-        static ActionNode* melee(PlayerbotAI* botAI)
+        static ActionNode* melee([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("melee",
                 /*P*/ NextAction::array(0, new NextAction("feral charge - bear"), nullptr),
@@ -33,7 +33,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* feral_charge_bear(PlayerbotAI* botAI)
+        static ActionNode* feral_charge_bear([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("feral charge - bear",
                 /*P*/ nullptr,
@@ -41,7 +41,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* swipe_bear(PlayerbotAI* botAI)
+        static ActionNode* swipe_bear([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("swipe (bear)",
                 /*P*/ nullptr,
@@ -49,7 +49,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* faerie_fire_feral(PlayerbotAI* botAI)
+        static ActionNode* faerie_fire_feral([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("faerie fire (feral)",
                 /*P*/ NextAction::array(0, new NextAction("feral charge - bear"), nullptr),
@@ -57,7 +57,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* bear_form(PlayerbotAI* botAI)
+        static ActionNode* bear_form([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("bear form",
                 /*P*/ nullptr,
@@ -65,7 +65,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* dire_bear_form(PlayerbotAI* botAI)
+        static ActionNode* dire_bear_form([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("dire bear form",
                 /*P*/ nullptr,
@@ -73,7 +73,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* mangle_bear(PlayerbotAI* botAI)
+        static ActionNode* mangle_bear([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("mangle (bear)",
                 /*P*/ nullptr,
@@ -81,7 +81,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* maul(PlayerbotAI* botAI)
+        static ActionNode* maul([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("maul",
                 /*P*/ nullptr,
@@ -89,7 +89,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* bash(PlayerbotAI* botAI)
+        static ActionNode* bash([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("bash",
                 /*P*/ nullptr,
@@ -97,7 +97,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* swipe(PlayerbotAI* botAI)
+        static ActionNode* swipe([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("swipe",
                 /*P*/ nullptr,
@@ -105,7 +105,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* lacerate(PlayerbotAI* botAI)
+        static ActionNode* lacerate([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("lacerate",
                 /*P*/ nullptr,
@@ -113,7 +113,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* growl(PlayerbotAI* botAI)
+        static ActionNode* growl([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("growl",
                 /*P*/ nullptr,
@@ -121,7 +121,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* demoralizing_roar(PlayerbotAI* botAI)
+        static ActionNode* demoralizing_roar([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("demoralizing roar",
                 /*P*/ nullptr,

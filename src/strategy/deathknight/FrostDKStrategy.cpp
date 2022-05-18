@@ -30,7 +30,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    }
 
 	private:
-		static ActionNode* obliterate(PlayerbotAI* botAI)
+		static ActionNode* obliterate([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 		{
 		    return new ActionNode("obliterate",
 			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
@@ -38,7 +38,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 		}
 
-		static ActionNode* rune_strike(PlayerbotAI* botAI)
+		static ActionNode* rune_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 		{
 		    return new ActionNode("rune strike",
 			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
@@ -46,7 +46,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 		}
 
-		static ActionNode* frost_strike(PlayerbotAI* botAI)
+		static ActionNode* frost_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 		{
 		    return new ActionNode("frost strike",
 			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
@@ -54,7 +54,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 		}
 
-		static ActionNode* howling_blast(PlayerbotAI* botAI)
+		static ActionNode* howling_blast([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
 		{
 		    return new ActionNode("howling blast",
 			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),

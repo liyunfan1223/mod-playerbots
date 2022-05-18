@@ -18,7 +18,7 @@ class DpsHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
         }
 
     private:
-        static ActionNode* viper_sting(PlayerbotAI* botAI)
+        static ActionNode* viper_sting([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("viper sting",
                 /*P*/ nullptr,
@@ -26,7 +26,7 @@ class DpsHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* aimed_shot(PlayerbotAI* botAI)
+        static ActionNode* aimed_shot([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("aimed shot",
                 /*P*/ nullptr,
@@ -34,7 +34,7 @@ class DpsHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* chimera_shot(PlayerbotAI* botAI)
+        static ActionNode* chimera_shot([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("chimera shot",
                 /*P*/ nullptr,
@@ -42,7 +42,7 @@ class DpsHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* explosive_shot(PlayerbotAI* botAI)
+        static ActionNode* explosive_shot([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("explosive shot",
                 /*P*/ nullptr,
@@ -50,7 +50,7 @@ class DpsHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* concussive_shot(PlayerbotAI* botAI)
+        static ActionNode* concussive_shot([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("concussive shot",
                 /*P*/ nullptr,

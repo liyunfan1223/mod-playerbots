@@ -15,7 +15,7 @@ class HealShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         }
 
     private:
-        static ActionNode* earthliving_weapon(PlayerbotAI* botAI)
+        static ActionNode* earthliving_weapon([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("earthliving weapon",
                 /*P*/ nullptr,
@@ -23,7 +23,7 @@ class HealShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*C*/ nullptr);
         }
 
-        static ActionNode* mana_tide_totem(PlayerbotAI* botAI)
+        static ActionNode* mana_tide_totem([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
         {
             return new ActionNode ("mana tide totem",
                 /*P*/ nullptr,
