@@ -158,6 +158,7 @@ INSERT INTO `playerbots_dungeon_suggestion_definition` VALUES
 (NULL, 'pos'   , 'Pit of Saron'			      , 2, 1, 80, 80, NULL),
 (NULL, 'hor'   , 'Halls of Reflection'	      , 2, 1, 80, 80, NULL);
 
+DROP TABLE `playerbots_dungeon_suggestion_abbrevation`;
 CREATE TABLE `playerbots_dungeon_suggestion_abbrevation` (
     `id`           TINYINT(3)   NOT NULL AUTO_INCREMENT UNIQUE,
     `definition_slug` VARCHAR(255) NOT NULL,
@@ -171,6 +172,7 @@ DEFAULT CHARSET=utf8
 ROW_FORMAT=FIXED
 COMMENT='Playerbot dungeon suggestion abbrevations';
 
+DROP TABLE `playerbots_dungeon_suggestion_strategy`;
 CREATE TABLE `playerbots_dungeon_suggestion_strategy` (
     `id`           TINYINT(3)   NOT NULL AUTO_INCREMENT UNIQUE,
     `definition_slug` VARCHAR(255) NOT NULL,
