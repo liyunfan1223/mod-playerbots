@@ -31,7 +31,7 @@ bool HasAggroValue::Calculate()
         ref = ref->next();
     }
 
-    ref = target->getThreatMgr().getCurrentVictim();
+    ref = target->GetThreatMgr().getCurrentVictim();
     if (ref)
     {
         if (Unit* victim = ref->getTarget())

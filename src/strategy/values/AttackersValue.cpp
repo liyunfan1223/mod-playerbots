@@ -72,7 +72,7 @@ void AttackersValue::AddAttackersOf(Player* player, std::set<Unit*>& targets)
     {
         if (!player->GetGroup())
         {
-            if (!unit->getThreatMgr().getThreat(player) && (!unit->getThreatMgr().getCurrentVictim() || unit->getThreatMgr().getCurrentVictim()->getTarget() != player))
+            if (!unit->GetThreatMgr().getThreat(player) && (!unit->GetThreatMgr().getCurrentVictim() || unit->GetThreatMgr().getCurrentVictim()->getTarget() != player))
                 continue;
         }
 
