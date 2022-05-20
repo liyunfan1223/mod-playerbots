@@ -999,7 +999,7 @@ void PlayerbotAI::DoNextAction(bool min)
         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_PENDING_STOP);
 
         // set jump destination
-        bot->m_movementInfo.pos = GetJumpDestination().m_positionZ != 0 ? GetJumpDestination() : bot->GetPosition();
+        bot->m_movementInfo.pos = !GetJumpDestination().m_positionZ == 0 ? GetJumpDestination() : bot->GetPosition();
         bot->m_movementInfo.jump = MovementInfo::JumpInfo();
 
         WorldPacket land(MSG_MOVE_FALL_LAND);
