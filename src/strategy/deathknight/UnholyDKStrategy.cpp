@@ -30,7 +30,7 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    }
 
     private:
-	    static ActionNode* death_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+	    static ActionNode* death_strike([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("death strike",
 			    /*P*/ NextAction::array(0, new NextAction("unholy pressence"), nullptr),
@@ -38,7 +38,7 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* corpse_explosion([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+	    static ActionNode* corpse_explosion([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("corpse explosion",
 			    /*P*/ NextAction::array(0, new NextAction("unholy pressence"), nullptr),
@@ -46,7 +46,7 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* scourge_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+	    static ActionNode* scourge_strike([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("scourge strike",
 			    /*P*/ NextAction::array(0, new NextAction("unholy pressence"), nullptr),

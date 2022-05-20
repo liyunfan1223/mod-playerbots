@@ -16,7 +16,7 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         }
 
     private:
-        static ActionNode* arcane_blast([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* arcane_blast([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("arcane blast",
                 /*P*/ nullptr,
@@ -24,7 +24,7 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*C*/ nullptr);
         }
 
-        static ActionNode* arcane_barrage([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* arcane_barrage([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("arcane barrage",
                 /*P*/ nullptr,
@@ -32,7 +32,7 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*C*/ nullptr);
         }
 
-        static ActionNode* arcane_missiles([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* arcane_missiles([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("arcane missiles",
                 /*P*/ nullptr,

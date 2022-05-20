@@ -17,7 +17,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         }
 
     private:
-        static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("seal of vengeance",
                 /*P*/ nullptr,
@@ -25,7 +25,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*C*/ nullptr);
         }
 
-        static ActionNode* seal_of_command([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* seal_of_command([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("seal of command",
                 /*P*/ nullptr,
@@ -33,7 +33,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*C*/ nullptr);
         }
 
-        static ActionNode* blessing_of_might([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* blessing_of_might([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("blessing of might",
                 /*P*/ nullptr,
@@ -41,7 +41,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*C*/ nullptr);
         }
 
-        static ActionNode* crusader_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* crusader_strike([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("crusader strike",
                 /*P*/ nullptr,

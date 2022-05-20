@@ -14,7 +14,7 @@ class DpsWarlockStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         }
 
     private:
-        static ActionNode* shadow_bolt([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* shadow_bolt([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("shadow bolt",
                 /*P*/ nullptr,

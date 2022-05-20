@@ -46,7 +46,7 @@ class Action : public AiNamedObject
         Action(PlayerbotAI* botAI, std::string const name = "action") : AiNamedObject(botAI, name), verbose(false) { } // verbose after ainamedobject - whipowill
         virtual ~Action(void) { }
 
-        virtual bool Execute([[maybe_unused]] Event event) { return true; } // unused param - whipowill
+        virtual bool Execute([[maybe_unused]] Event event) { return true; }
         virtual bool isPossible() { return true; }
         virtual bool isUseful() { return true; }
         virtual NextAction** getPrerequisites() { return nullptr; }

@@ -16,7 +16,7 @@ class Multiplier : public AiNamedObject
         Multiplier(PlayerbotAI* botAI, std::string const name) : AiNamedObject(botAI, name)  {}
         virtual ~Multiplier() { }
 
-        virtual float GetValue([[maybe_unused]] Action* action) { return 1.0f; } // unused param - whipowill
+        virtual float GetValue([[maybe_unused]] Action* action) { return 1.0f; }
 };
 
 #endif

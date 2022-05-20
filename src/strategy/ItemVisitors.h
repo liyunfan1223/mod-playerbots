@@ -181,7 +181,7 @@ class QueryNamedItemCountVisitor : public QueryItemCountVisitor
 class FindNamedItemVisitor : public FindItemVisitor
 {
     public:
-        FindNamedItemVisitor([[maybe_unused]] Player* bot, std::string const name) : FindItemVisitor(), name(name) { } // unused param - whipowill
+        FindNamedItemVisitor([[maybe_unused]] Player* bot, std::string const name) : FindItemVisitor(), name(name) { }
 
         bool Accept(ItemTemplate const* proto) override
         {

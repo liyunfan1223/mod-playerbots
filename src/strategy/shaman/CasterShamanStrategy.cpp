@@ -14,7 +14,7 @@ class CasterShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNo
         }
 
     private:
-        static ActionNode* magma_totem([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* magma_totem([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("magma totem",
                 /*P*/ nullptr,

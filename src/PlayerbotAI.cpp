@@ -253,7 +253,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     YieldThread(min);
 }
 
-void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal) // unused param - whipowill
+void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal)
 {
     if (bot->IsBeingTeleported() || !bot->IsInWorld())
         return;

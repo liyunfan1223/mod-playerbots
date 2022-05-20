@@ -16,7 +16,7 @@ class GenericHunterNonCombatStrategyActionNodeFactory : public NamedObjectFactor
         }
 
     private:
-        static ActionNode* rapid_fire([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* rapid_fire([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("rapid fire",
                 /*P*/ nullptr,
@@ -24,7 +24,7 @@ class GenericHunterNonCombatStrategyActionNodeFactory : public NamedObjectFactor
                 /*C*/ nullptr);
         }
 
-        static ActionNode* aspect_of_the_pack([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* aspect_of_the_pack([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("aspect of the pack",
                 /*P*/ nullptr,

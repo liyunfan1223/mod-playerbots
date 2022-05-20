@@ -346,7 +346,7 @@ inline ByteBuffer& operator<<(ByteBuffer& b, WorldPosition& guidP)
     return b;
 }
 
-inline ByteBuffer& operator>>(ByteBuffer& b, [[maybe_unused]] WorldPosition& g) // unused param - whipowill
+inline ByteBuffer& operator>>(ByteBuffer& b, [[maybe_unused]] WorldPosition& g)
 {
     uint32 mapid;
     float coord_x;
@@ -557,7 +557,7 @@ class TravelDestination
         }
 
         virtual Quest const* GetQuestTemplate() { return nullptr; }
-        virtual bool isActive([[maybe_unused]] Player* bot) { return false; } // unused param - whipowill
+        virtual bool isActive([[maybe_unused]] Player* bot) { return false; }
 
         bool isFull(bool ignoreFull = false);
 
@@ -600,13 +600,13 @@ class NullTravelDestination : public TravelDestination
 
         Quest const* GetQuestTemplate() override { return nullptr; }
 
-        bool isActive([[maybe_unused]] Player* bot) override { return false; } // unused param - whipowill
+        bool isActive([[maybe_unused]] Player* bot) override { return false; }
 
         std::string const getName() override { return "NullTravelDestination"; }
         std::string const getTitle() override { return "no destination"; }
 
-        bool isIn([[maybe_unused]] WorldPosition* pos, [[maybe_unused]] float radius = 0.f) override { return true; } // unused params - whipowill
-        bool isOut([[maybe_unused]] WorldPosition* pos, [[maybe_unused]] float radius = 0.f) override { return false; } // unused params - whipowill
+        bool isIn([[maybe_unused]] WorldPosition* pos, [[maybe_unused]] float radius = 0.f) override { return true; }
+        bool isOut([[maybe_unused]] WorldPosition* pos, [[maybe_unused]] float radius = 0.f) override { return false; }
 };
 
 //A travel target specifically related to a quest.

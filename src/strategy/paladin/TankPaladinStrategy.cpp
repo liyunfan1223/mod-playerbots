@@ -15,7 +15,7 @@ class TankPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         }
 
     private:
-        static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("seal of vengeance",
                 /*P*/ nullptr,

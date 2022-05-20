@@ -23,7 +23,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         }
 
     private:
-        static ActionNode* faerie_fire([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* faerie_fire([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("faerie fire",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -31,7 +31,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* hibernate([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* hibernate([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("hibernate",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -39,7 +39,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* entangling_roots([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* entangling_roots([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("entangling roots",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -47,7 +47,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* entangling_roots_on_cc([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* entangling_roots_on_cc([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("entangling roots on cc",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -55,7 +55,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* wrath([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* wrath([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("wrath",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -63,7 +63,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* starfall([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* starfall([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("starfall",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -71,7 +71,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* insect_swarm([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* insect_swarm([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("insect swarm",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -79,7 +79,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* moonfire([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* moonfire([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("moonfire",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
@@ -87,7 +87,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* starfire([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* starfire([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("starfire",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),

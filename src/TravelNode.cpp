@@ -579,7 +579,7 @@ bool TravelNode::isEqual(TravelNode* compareNode)
     return true;
 }
 
-void TravelNode::print([[maybe_unused]] bool printFailed) // unused param - whipowill
+void TravelNode::print([[maybe_unused]] bool printFailed)
 {
     WorldPosition* startPosition = getPosition();
 
@@ -901,7 +901,7 @@ float TravelNodeRoute::getTotalDistance()
     return totalLength;
 }
 
-TravelPath TravelNodeRoute::buildPath(std::vector<WorldPosition> pathToStart, std::vector<WorldPosition> pathToEnd, [[maybe_unused]] Unit* bot) // unused param - whipowill
+TravelPath TravelNodeRoute::buildPath(std::vector<WorldPosition> pathToStart, std::vector<WorldPosition> pathToEnd, [[maybe_unused]] Unit* bot)
 {
     TravelPath travelPath;
 
@@ -1036,7 +1036,7 @@ TravelNodeMap::TravelNodeMap(TravelNodeMap* baseMap)
     baseMap->m_nMapMtx.unlock_shared();
 }
 
-TravelNode* TravelNodeMap::addNode(WorldPosition pos, std::string const preferedName, bool isImportant, bool checkDuplicate, [[maybe_unused]] bool transport, [[maybe_unused]] uint32 transportId) // unused params - whipowill
+TravelNode* TravelNodeMap::addNode(WorldPosition pos, std::string const preferedName, bool isImportant, bool checkDuplicate, [[maybe_unused]] bool transport, [[maybe_unused]] uint32 transportId)
 {
     TravelNode* newNode;
 
@@ -1124,7 +1124,7 @@ std::vector<TravelNode*> TravelNodeMap::getNodes(WorldPosition pos, float range)
     return std::move(retVec);
 }
 
-TravelNode* TravelNodeMap::getNode(WorldPosition pos, [[maybe_unused]] std::vector<WorldPosition>& ppath, Unit* bot, float range) // unused param - whipowill
+TravelNode* TravelNodeMap::getNode(WorldPosition pos, [[maybe_unused]] std::vector<WorldPosition>& ppath, Unit* bot, float range)
 {
     float x = pos.getX();
     float y = pos.getY();

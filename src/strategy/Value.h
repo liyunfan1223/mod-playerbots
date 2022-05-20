@@ -24,7 +24,7 @@ class UntypedValue : public AiNamedObject
         virtual void Reset() { }
         virtual std::string const Format() { return "?"; }
         virtual std::string const Save() { return "?"; }
-        virtual bool Load([[maybe_unused]] std::string const value) { return false; } // unused param - whipowill
+        virtual bool Load([[maybe_unused]] std::string const value) { return false; }
 };
 
 template<class T>
@@ -135,7 +135,7 @@ class MemoryCalculatedValue : public CalculatedValue<T>
             return true;
         }
 
-        void Set([[maybe_unused]] T value) override // unused param - whipowill
+        void Set([[maybe_unused]] T value) override
         {
             CalculatedValue<T>::Set(this->value);
             UpdateChange();

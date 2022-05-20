@@ -19,7 +19,7 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         }
 
     private:
-        static ActionNode* rapid_fire([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* rapid_fire([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("rapid fire",
                 /*P*/ nullptr,
@@ -27,7 +27,7 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* aspect_of_the_pack([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* aspect_of_the_pack([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("aspect of the pack",
                 /*P*/ nullptr,
@@ -35,7 +35,7 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* feign_death([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* feign_death([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("feign death",
                 /*P*/ nullptr,
@@ -43,7 +43,7 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* wing_clip([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* wing_clip([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("wing clip",
                 /*P*/ nullptr,
@@ -51,7 +51,7 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ NextAction::array(0, new NextAction("flee"), nullptr));
         }
 
-        static ActionNode* raptor_strike([[maybe_unused]] PlayerbotAI* botAI) // unused param - whipowill
+        static ActionNode* raptor_strike([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("raptor strike",
                 /*P*/ NextAction::array(0, new NextAction("melee"), nullptr),
