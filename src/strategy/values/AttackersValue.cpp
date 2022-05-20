@@ -72,7 +72,7 @@ void AttackersValue::AddAttackersOf(Player* player, std::set<Unit*>& targets)
     {
         if (!player->GetGroup())
         {
-            if (!unit->getThreatMgr().getThreat(player) && (!unit->getThreatMgr().getCurrentVictim() || unit->getThreatMgr().getCurrentVictim()->getTarget() != player))
+            if (!unit->GetThreatMgr().getThreat(player) && (!unit->GetThreatMgr().getCurrentVictim() || unit->GetThreatMgr().getCurrentVictim()->getTarget() != player))
                 continue;
         }
 
@@ -107,7 +107,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
 
     bool leaderHasThreat = false;
     if (attacker && bot->GetGroup() && botAI->GetMaster())
-        leaderHasThreat = attacker->getThreatMgr().getThreat(botAI->GetMaster());
+        leaderHasThreat = attacker->GetThreatMgr().getThreat(botAI->GetMaster());
 
     bool isMemberBotGroup = false;
     if (bot->GetGroup() && botAI->GetMaster())
@@ -131,7 +131,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
 {
-    return  IsPossibleTarget(attacker, bot) && (attacker->getThreatMgr().getCurrentVictim() || attacker->GetGuidValue(UNIT_FIELD_TARGET) ||
+    return  IsPossibleTarget(attacker, bot) && (attacker->GetThreatMgr().getCurrentVictim() || attacker->GetGuidValue(UNIT_FIELD_TARGET) ||
         attacker->GetGUID().IsPlayer() || attacker->GetGUID() == GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get());
 }
 bool PossibleAddsValue::Calculate()
@@ -146,7 +146,7 @@ bool PossibleAddsValue::Calculate()
 
         if (Unit* add = botAI->GetUnit(guid))
         {
-            if (!add->GetTarget() && !add->getThreatMgr().getCurrentVictim() && add->IsHostileTo(bot))
+            if (!add->GetTarget() && !add->GetThreatMgr().getCurrentVictim() && add->IsHostileTo(bot))
             {
                 for (ObjectGuid const attackerGUID : attackers)
                 {

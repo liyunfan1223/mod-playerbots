@@ -21,7 +21,7 @@ Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
         if (!unit)
             continue;
 
-        ThreatMgr &ThreatMgr = unit->getThreatMgr();
+        ThreatMgr &ThreatMgr = unit->GetThreatMgr();
         strategy->CheckAttacker(unit, &ThreatMgr);
     }
 
