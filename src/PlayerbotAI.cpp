@@ -999,7 +999,7 @@ void PlayerbotAI::DoNextAction(bool min)
         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_PENDING_STOP);
 
         // set jump destination
-        bot->m_movementInfo.pos = !GetJumpDestination().m_positionZ == 0 ? GetJumpDestination() : bot->GetPosition();
+        bot->m_movementInfo.pos = GetJumpDestination().m_positionZ != 0 ? GetJumpDestination() : bot->GetPosition();
         bot->m_movementInfo.jump = MovementInfo::JumpInfo();
 
         WorldPacket land(MSG_MOVE_FALL_LAND);
@@ -3038,7 +3038,7 @@ std::string const PlayerbotAI::HandleRemoteCommand(std::string const command)
 
            out << " v: " << target->getDestination()->getVisitors();
 
-            if (!(*target->getPosition() == WorldPosition()))
+            if (*target->getPosition() != WorldPosition())
             {
                 out << "(" << target->getPosition()->getAreaName() << ")";
                 out << " distance: " << target->getPosition()->distance(bot) << "y";
