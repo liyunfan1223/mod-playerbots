@@ -3038,7 +3038,7 @@ std::string const PlayerbotAI::HandleRemoteCommand(std::string const command)
 
            out << " v: " << target->getDestination()->getVisitors();
 
-            if (*target->getPosition() != WorldPosition())
+            if (!(*target->getPosition() == WorldPosition()))
             {
                 out << "(" << target->getPosition()->getAreaName() << ")";
                 out << " distance: " << target->getPosition()->distance(bot) << "y";
