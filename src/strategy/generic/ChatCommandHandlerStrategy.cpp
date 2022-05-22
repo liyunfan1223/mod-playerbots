@@ -56,6 +56,7 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("warning", NextAction::array(0, new NextAction("runaway chat shortcut", relevance), nullptr)));
     triggers.push_back(new TriggerNode("max dps", NextAction::array(0, new NextAction("max dps chat shortcut", relevance), nullptr)));
     triggers.push_back(new TriggerNode("attackers", NextAction::array(0, new NextAction("tell attackers", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("target", NextAction::array(0, new NextAction("tell target", relevance), nullptr)));
     triggers.push_back(new TriggerNode("ready", NextAction::array(0, new NextAction("ready check", relevance), nullptr)));
 }
 

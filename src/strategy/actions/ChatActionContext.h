@@ -142,6 +142,7 @@ class ChatActionContext : public NamedObjectContext<Action>
             creators["save mana"] = &ChatActionContext::save_mana;
             creators["max dps chat shortcut"] = &ChatActionContext::max_dps_chat_shortcut;
             creators["tell attackers"] = &ChatActionContext::tell_attackers;
+            creators["tell target"] = &ChatActionContext::tell_target;
             creators["formation"] = &ChatActionContext::formation;
             creators["stance"] = &ChatActionContext::stance;
             creators["sendmail"] = &ChatActionContext::sendmail;
