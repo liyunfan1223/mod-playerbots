@@ -120,7 +120,7 @@ bool AttackAction::Attack(Unit* target)
         botAI->PlayEmote(sounds[urand(0, sounds.size() - 1)]);
     }
 
-    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target, sPlayerbotAIConfig->sightDistance))
+    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
         bot->SetFacingToObject(target);
 
     bool attacked = bot->Attack(target, !botAI->IsRanged(bot));
