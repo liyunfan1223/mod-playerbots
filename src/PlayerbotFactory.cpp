@@ -1197,6 +1197,10 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             continue;
         }
     }
+
+    // Update stats here so the bots will benefit from the new equipped items' stats
+    bot->InitStatsForLevel(true);
+    bot->UpdateAllStats();
 }
 
 bool PlayerbotFactory::IsDesiredReplacement(Item* item)
