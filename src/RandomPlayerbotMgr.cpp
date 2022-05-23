@@ -904,7 +904,9 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
             LOG_INFO("playerbots", "Bot #{} {}:{} {} <{}>: consumables refreshed", bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->getLevel(), player->GetName(), sGuildMgr->GetGuildById(player->GetGuildId())->GetName());
         }
 
-        if (!sPlayerbotAIConfig->autoDoQuests)
+        if (sPlayerbotAIConfig->autoDoQuests)
+            ChangeStrategyOnce(player);
+        else
             ChangeStrategy(player);
 
         uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotRandomizeTime, sPlayerbotAIConfig->maxRandomBotRandomizeTime);
@@ -1073,7 +1075,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
             bot->GetMotionMaster()->Clear();
             PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
             if (botAI)
-                botAI->Reset();
+                botAI->Reset(true);
             bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
             bot->SendMovementFlagUpdate();
 
@@ -1312,7 +1314,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 
     // teleport to a random inn for bot level
     GET_PLAYERBOT_AI(bot)->Reset(true);
-    RandomTeleportForRpg(bot);
+//    RandomTeleportForRpg(bot);
 
     if (bot->GetGroup())
         bot->RemoveFromGroup();
@@ -2145,7 +2147,7 @@ void RandomPlayerbotMgr::ChangeStrategy(Player* player)
 
     if (frand(0.f, 100.f) > sPlayerbotAIConfig->randomBotRpgChance)
     {
-        LOG_INFO("playerbots", "Changing strategy for #{} <{}> to grinding", bot, player->GetName().c_str());
+        LOG_INFO("playerbots", "Bot #{} <{}>: sent to grind spot", bot, player->GetName().c_str());
         ScheduleTeleport(bot, 30);
     }
     else
@@ -2157,6 +2159,23 @@ void RandomPlayerbotMgr::ChangeStrategy(Player* player)
     }
 
     ScheduleChangeStrategy(bot);
+}
+
+void RandomPlayerbotMgr::ChangeStrategyOnce(Player* player)
+{
+    uint32 bot = player->GetGUID().GetCounter();
+
+    if (frand(0.f, 100.f) > sPlayerbotAIConfig->randomBotRpgChance) // select grind / pvp
+    {
+        LOG_INFO("playerbots", "Bot #{} <{}>: sent to grind spot", bot, player->GetName().c_str());
+        RandomTeleportForLevel(player);
+        Refresh(player);
+    }
+    else
+    {
+        LOG_INFO("playerbots", "Bot #{} <{}>: sent to inn", bot, player->GetName().c_str());
+        RandomTeleportForRpg(player);
+    }
 }
 
 void RandomPlayerbotMgr::RandomTeleportForRpg(Player* bot)

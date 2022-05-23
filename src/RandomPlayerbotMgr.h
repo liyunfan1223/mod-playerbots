@@ -72,7 +72,8 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         bool ProcessBot(Player* player);
         void Revive(Player* player);
         void ChangeStrategy(Player* player);
-        uint32 GetValue(Player* bot, std::string const type);
+        void ChangeStrategyOnce(Player* player);
+    uint32 GetValue(Player* bot, std::string const type);
         uint32 GetValue(uint32 bot, std::string const type);
         std::string const GetData(uint32 bot, std::string const type);
         void SetValue(uint32 bot, std::string const type, uint32 value, std::string const data = "");
