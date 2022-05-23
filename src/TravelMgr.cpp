@@ -350,7 +350,7 @@ Map* WorldPosition::getMap()
     return sMapMgr->FindMap(GetMapId(), getMapEntry()->Instanceable() ? getInstanceId() : 0);
 }
 
-const float WorldPosition::getHeight()
+float WorldPosition::getHeight() // remove const - whipowill
 {
     return getMap()->GetHeight(getX(), getY(), getZ());
 }

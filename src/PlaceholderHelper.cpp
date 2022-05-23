@@ -74,7 +74,7 @@ void PlaceholderHelper::InsertDungeonStrategy(Insertion& insertion)
     }
 }
 
-void PlaceholderHelper::InsertDifficulty(Insertion& insertion, Player* bot)
+void PlaceholderHelper::InsertDifficulty(Insertion& insertion, [[maybe_unused]] Player* bot)
 {
     bool const hasHeroic = insertion.dungeonSuggestion->difficulty == DUNGEON_DIFFICULTY_HEROIC;
     std::string difficultyText;

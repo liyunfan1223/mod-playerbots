@@ -14,7 +14,7 @@ class HolyPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         }
 
     private:
-        static ActionNode* smite(PlayerbotAI* botAI)
+        static ActionNode* smite([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("smite",
                 /*P*/ nullptr,

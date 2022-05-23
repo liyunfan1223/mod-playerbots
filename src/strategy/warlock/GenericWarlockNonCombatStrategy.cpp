@@ -18,7 +18,7 @@ class GenericWarlockNonCombatStrategyActionNodeFactory : public NamedObjectFacto
         }
 
     private:
-        static ActionNode* fel_armor(PlayerbotAI* botAI)
+        static ActionNode* fel_armor([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("fel armor",
                 /*P*/ nullptr,
@@ -26,7 +26,7 @@ class GenericWarlockNonCombatStrategyActionNodeFactory : public NamedObjectFacto
                 /*C*/ nullptr);
         }
 
-        static ActionNode* demon_armor(PlayerbotAI* botAI)
+        static ActionNode* demon_armor([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("demon armor",
                 /*P*/ nullptr,
@@ -34,7 +34,7 @@ class GenericWarlockNonCombatStrategyActionNodeFactory : public NamedObjectFacto
                 /*C*/ nullptr);
         }
 
-        static ActionNode* summon_voidwalker(PlayerbotAI* botAI)
+        static ActionNode* summon_voidwalker([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("summon voidwalker",
                 /*P*/ nullptr,
@@ -42,7 +42,7 @@ class GenericWarlockNonCombatStrategyActionNodeFactory : public NamedObjectFacto
                 /*C*/ nullptr);
         }
 
-        static ActionNode* summon_felguard(PlayerbotAI* botAI)
+        static ActionNode* summon_felguard([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("summon felguard",
                 /*P*/ nullptr,

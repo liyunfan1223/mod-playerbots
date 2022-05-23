@@ -24,7 +24,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         }
 
     private:
-        static ActionNode* faerie_fire_feral(PlayerbotAI* botAI)
+        static ActionNode* faerie_fire_feral([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("faerie fire (feral)",
                 /*P*/ nullptr,
@@ -32,7 +32,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* melee(PlayerbotAI* botAI)
+        static ActionNode* melee([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("melee",
                 /*P*/ NextAction::array(0, new NextAction("feral charge - cat"), nullptr),
@@ -40,7 +40,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* feral_charge_cat(PlayerbotAI* botAI)
+        static ActionNode* feral_charge_cat([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("feral charge - cat",
                 /*P*/ nullptr,
@@ -48,7 +48,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* cat_form(PlayerbotAI* botAI)
+        static ActionNode* cat_form([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("cat form",
                 /*P*/ nullptr,
@@ -56,7 +56,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* claw(PlayerbotAI* botAI)
+        static ActionNode* claw([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("claw",
                 /*P*/ nullptr,
@@ -64,7 +64,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* mangle_cat(PlayerbotAI* botAI)
+        static ActionNode* mangle_cat([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("mangle (cat)",
                 /*P*/ nullptr,
@@ -72,7 +72,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* rake(PlayerbotAI* botAI)
+        static ActionNode* rake([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("rake",
                 /*P*/ nullptr,
@@ -80,7 +80,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* ferocious_bite(PlayerbotAI* botAI)
+        static ActionNode* ferocious_bite([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("ferocious bite",
                 /*P*/ nullptr,
@@ -88,7 +88,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* rip(PlayerbotAI* botAI)
+        static ActionNode* rip([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("rip",
                 /*P*/ nullptr,
@@ -96,7 +96,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* pounce(PlayerbotAI* botAI)
+        static ActionNode* pounce([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("pounce",
                 /*P*/ nullptr,
@@ -104,7 +104,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*C*/ nullptr);
         }
 
-        static ActionNode* ravage(PlayerbotAI* botAI)
+        static ActionNode* ravage([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("ravage",
                 /*P*/ nullptr,

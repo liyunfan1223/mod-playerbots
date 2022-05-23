@@ -111,7 +111,7 @@ class FindItemsToTradeByClassVisitor : public IterateItemsVisitor
 {
     public:
         FindItemsToTradeByClassVisitor(uint32 itemClass, uint32 itemSubClass, uint32 count)
-            : IterateItemsVisitor(), count(count), itemClass(itemClass), itemSubClass(itemSubClass) { }
+            : IterateItemsVisitor(), itemClass(itemClass), itemSubClass(itemSubClass), count(count) { } // reorder args - whipowill
 
         bool Visit(Item* item) override
         {
@@ -181,7 +181,7 @@ class QueryNamedItemCountVisitor : public QueryItemCountVisitor
 class FindNamedItemVisitor : public FindItemVisitor
 {
     public:
-        FindNamedItemVisitor(Player* bot, std::string const name) : FindItemVisitor(), name(name) { }
+        FindNamedItemVisitor([[maybe_unused]] Player* bot, std::string const name) : FindItemVisitor(), name(name) { }
 
         bool Accept(ItemTemplate const* proto) override
         {

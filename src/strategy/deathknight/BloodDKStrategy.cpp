@@ -33,7 +33,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
         }
 
     private:
-	    static ActionNode* rune_strike(PlayerbotAI* botAI)
+	    static ActionNode* rune_strike([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("rune strike",
 			    /*P*/ NextAction::array(0, new NextAction("frost presence"), nullptr),
@@ -41,7 +41,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*C*/ nullptr);
 	    }
 
-	    static ActionNode* heart_strike(PlayerbotAI* botAI)
+	    static ActionNode* heart_strike([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("heart strike",
                 /*P*/ NextAction::array(0, new NextAction("frost presence"), nullptr),
@@ -49,7 +49,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
 	    }
 
-	    static ActionNode* death_strike(PlayerbotAI* botAI)
+	    static ActionNode* death_strike([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("death strike",
 			    /*P*/ NextAction::array(0, new NextAction("frost presence"), nullptr),

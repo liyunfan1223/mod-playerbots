@@ -42,7 +42,7 @@ uint8 ThreatValue::Calculate(Unit* target)
     if (!group)
         return 0;
 
-    float botThreat = target->getThreatMgr().getThreat(bot);
+    float botThreat = target->GetThreatMgr().getThreat(bot);
     float maxThreat = -1.0f;
     bool hasTank = false;
 
@@ -55,7 +55,7 @@ uint8 ThreatValue::Calculate(Unit* target)
         if (botAI->IsTank(player))
         {
             hasTank = true;
-            float threat = target->getThreatMgr().getThreat(player);
+            float threat = target->GetThreatMgr().getThreat(player);
             if (maxThreat < threat)
                 maxThreat = threat;
         }

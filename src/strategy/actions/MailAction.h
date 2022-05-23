@@ -15,9 +15,9 @@ struct Mail;
 class MailProcessor
 {
     public:
-        virtual bool Before(PlayerbotAI* botAI) { return true; }
+        virtual bool Before([[maybe_unused]] PlayerbotAI* botAI) { return true; }
         virtual bool Process(uint32 index, Mail* mail, PlayerbotAI* botAI) = 0;
-        virtual bool After(PlayerbotAI* botAI) { return true; }
+        virtual bool After([[maybe_unused]] PlayerbotAI* botAI) { return true; }
 
         static ObjectGuid FindMailbox(PlayerbotAI* botAI);
 

@@ -16,7 +16,7 @@ class GenericWarlockStrategyActionNodeFactory : public NamedObjectFactory<Action
         }
 
     private:
-        static ActionNode* summon_voidwalker(PlayerbotAI* botAI)
+        static ActionNode* summon_voidwalker([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("summon voidwalker",
                 /*P*/ nullptr,
@@ -24,7 +24,7 @@ class GenericWarlockStrategyActionNodeFactory : public NamedObjectFactory<Action
                 /*C*/ nullptr);
         }
 
-        static ActionNode* summon_felguard(PlayerbotAI* botAI)
+        static ActionNode* summon_felguard([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("summon felguard",
                 /*P*/ nullptr,
@@ -32,7 +32,7 @@ class GenericWarlockStrategyActionNodeFactory : public NamedObjectFactory<Action
                 /*C*/ nullptr);
         }
 
-        static ActionNode* summon_succubus(PlayerbotAI* botAI)
+        static ActionNode* summon_succubus([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("summon succubus",
                 /*P*/ nullptr,

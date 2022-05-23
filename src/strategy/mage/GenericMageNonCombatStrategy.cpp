@@ -16,7 +16,7 @@ class GenericMageNonCombatStrategyActionNodeFactory : public NamedObjectFactory<
         }
 
     private:
-        static ActionNode* molten_armor(PlayerbotAI* botAI)
+        static ActionNode* molten_armor([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("molten armor",
                 /*P*/ nullptr,
@@ -24,7 +24,7 @@ class GenericMageNonCombatStrategyActionNodeFactory : public NamedObjectFactory<
                 /*C*/ nullptr);
         }
 
-        static ActionNode* mage_armor(PlayerbotAI* botAI)
+        static ActionNode* mage_armor([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("mage armor",
                 /*P*/ nullptr,
@@ -32,7 +32,7 @@ class GenericMageNonCombatStrategyActionNodeFactory : public NamedObjectFactory<
                 /*C*/ nullptr);
         }
 
-        static ActionNode* ice_armor(PlayerbotAI* botAI)
+        static ActionNode* ice_armor([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("ice armor",
                 /*P*/ nullptr,

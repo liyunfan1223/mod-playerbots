@@ -20,7 +20,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
         }
 
     private:
-        static ActionNode* riposte(PlayerbotAI* botAI)
+        static ActionNode* riposte([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("riposte",
                 /*P*/ nullptr,
@@ -28,7 +28,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* mutilate(PlayerbotAI* botAI)
+        static ActionNode* mutilate([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("mutilate",
                 /*P*/ nullptr,
@@ -36,7 +36,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* sinister_strike(PlayerbotAI* botAI)
+        static ActionNode* sinister_strike([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("sinister strike",
                 /*P*/ nullptr,
@@ -44,7 +44,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* kick(PlayerbotAI* botAI)
+        static ActionNode* kick([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("kick",
                 /*P*/ nullptr,
@@ -52,7 +52,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* kidney_shot(PlayerbotAI* botAI)
+        static ActionNode* kidney_shot([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("kidney shot",
                 /*P*/ nullptr,
@@ -60,7 +60,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* rupture(PlayerbotAI* botAI)
+        static ActionNode* rupture([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("rupture",
                 /*P*/ nullptr,
@@ -68,7 +68,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
-        static ActionNode* backstab(PlayerbotAI* botAI)
+        static ActionNode* backstab([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("backstab",
                 /*P*/ nullptr,

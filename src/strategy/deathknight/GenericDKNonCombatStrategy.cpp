@@ -15,7 +15,7 @@ class GenericDKNonCombatStrategyActionNodeFactory : public NamedObjectFactory<Ac
         }
 
     private:
-        static ActionNode* bone_shield(PlayerbotAI* botAI)
+        static ActionNode* bone_shield([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("bone shield",
                 /*P*/ nullptr,
@@ -23,7 +23,7 @@ class GenericDKNonCombatStrategyActionNodeFactory : public NamedObjectFactory<Ac
                 /*C*/ nullptr);
         }
 
-        static ActionNode* horn_of_winter(PlayerbotAI* botAI)
+        static ActionNode* horn_of_winter([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("horn of winter",
                 /*P*/ nullptr,
