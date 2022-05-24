@@ -85,6 +85,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
             creators["save mana"] = &ChatTriggerContext::save_mana;
             creators["max dps"] = &ChatTriggerContext::max_dps;
             creators["attackers"] = &ChatTriggerContext::attackers;
+            creators["target"] = &ChatTriggerContext::target;
             creators["formation"] = &ChatTriggerContext::formation;
             creators["stance"] = &ChatTriggerContext::stance;
             creators["sendmail"] = &ChatTriggerContext::sendmail;
@@ -128,6 +129,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
         static Trigger* formation(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "formation"); }
         static Trigger* stance(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "stance"); }
         static Trigger* attackers(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "attackers"); }
+        static Trigger* target(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "target"); }
         static Trigger* max_dps(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "max dps"); }
         static Trigger* save_mana(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "save mana"); }
         static Trigger* who(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "who"); }
