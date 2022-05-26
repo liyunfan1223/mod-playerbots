@@ -1771,7 +1771,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 	bot->SetTarget(target->GetGUID());
 
     WorldObject* faceTo = target;
-    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo, sPlayerbotAIConfig->sightDistance))
+    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo))
     {
         if (!bot->isMoving())
             bot->SetFacingToObject(faceTo);
