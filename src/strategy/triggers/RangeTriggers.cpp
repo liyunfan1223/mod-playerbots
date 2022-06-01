@@ -44,6 +44,34 @@ bool EnemyTooCloseForSpellTrigger::IsActive()
     return false;
 }
 
+bool EnemyTooCloseForAutoShotTrigger::IsActive()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+
+    if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) && GetSpeedInMotion(target) > GetSpeedInMotion(bot) * 0.65f)
+        return false;
+
+    bool isBoss = false;
+    bool isRaid = false;
+    float combatReach = bot->GetCombatReach() + target->GetCombatReach();
+    float targetDistance = sServerFacade->GetDistance2d(bot, target) + combatReach;
+    if (target->GetTypeId() == TYPEID_UNIT)
+    {
+        Creature* creature = botAI->GetCreature(target->GetGUID());
+        if (creature)
+        {
+            isBoss = creature->isWorldBoss();
+        }
+    }
+
+    if (bot->GetMap() && bot->GetMap()->IsRaid())
+        isRaid = true;
+
+    return sServerFacade->IsDistanceLessOrEqualThan(targetDistance, 5.0f);
+}
+
 bool EnemyTooCloseForShootTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
