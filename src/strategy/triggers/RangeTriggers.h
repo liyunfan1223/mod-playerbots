@@ -26,6 +26,14 @@ class EnemyTooCloseForShootTrigger : public Trigger
         bool IsActive() override;
 };
 
+class EnemyTooCloseForAutoShotTrigger : public Trigger
+{
+    public:
+        EnemyTooCloseForAutoShotTrigger(PlayerbotAI* botAI) : Trigger(botAI, "enemy too close for auto shot") { }
+
+        bool IsActive() override;
+};
+
 class EnemyTooCloseForMeleeTrigger : public Trigger
 {
     public:

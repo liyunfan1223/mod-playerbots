@@ -81,6 +81,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["enemy out of spell"] = &TriggerContext::EnemyOutOfSpell;
             creators["enemy too close for spell"] = &TriggerContext::enemy_too_close_for_spell;
             creators["enemy too close for shoot"] = &TriggerContext::enemy_too_close_for_shoot;
+            creators["enemy too close for auto shot"] = &TriggerContext::enemy_too_close_for_auto_shot;
             creators["enemy too close for melee"] = &TriggerContext::enemy_too_close_for_melee;
             creators["enemy is close"] = &TriggerContext::enemy_is_close;
             creators["party member to heal out of spell range"] = &TriggerContext::party_member_to_heal_out_of_spell_range;
@@ -256,6 +257,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* EnemyOutOfMelee(PlayerbotAI* botAI) { return new EnemyOutOfMeleeTrigger(botAI); }
         static Trigger* EnemyOutOfSpell(PlayerbotAI* botAI) { return new EnemyOutOfSpellRangeTrigger(botAI); }
         static Trigger* enemy_too_close_for_spell(PlayerbotAI* botAI) { return new EnemyTooCloseForSpellTrigger(botAI); }
+        static Trigger* enemy_too_close_for_auto_shot(PlayerbotAI* botAI) { return new EnemyTooCloseForAutoShotTrigger(botAI); }
         static Trigger* enemy_too_close_for_shoot(PlayerbotAI* botAI) { return new EnemyTooCloseForShootTrigger(botAI); }
         static Trigger* enemy_too_close_for_melee(PlayerbotAI* botAI) { return new EnemyTooCloseForMeleeTrigger(botAI); }
         static Trigger* enemy_is_close(PlayerbotAI* botAI) { return new EnemyIsCloseTrigger(botAI); }

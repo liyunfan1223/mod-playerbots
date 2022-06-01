@@ -83,6 +83,7 @@ class HunterTriggerFactoryInternal : public NamedObjectContext<Trigger>
         }
 
     private:
+        static Trigger* auto_shot(PlayerbotAI* botAI) { return new AutoShotTrigger(botAI); }
         static Trigger* scare_beast(PlayerbotAI* botAI) { return new ScareBeastTrigger(botAI); }
         static Trigger* concussive_shot_on_snare_target(PlayerbotAI* botAI) { return new ConsussiveShotSnareTrigger(botAI); }
         static Trigger* pet_not_happy(PlayerbotAI* botAI) { return new HunterPetNotHappy(botAI); }

@@ -12,6 +12,14 @@ class PlayerbotAI;
 BEGIN_TRIGGER(HunterNoStingsActiveTrigger, Trigger)
 END_TRIGGER()
 
+class AutoShotTrigger : public Trigger
+{
+    public:
+        AutoShotTrigger(PlayerbotAI* botAI) : Trigger(botAI, "auto shot") { }
+
+        bool IsActive() override;
+};
+
 class HunterAspectOfTheHawkTrigger : public BuffTrigger
 {
     public:
