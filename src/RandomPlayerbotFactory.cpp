@@ -14,6 +14,8 @@ std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
 
 RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(accountId)
 {
+    uint32 const expansion = sWorld->getIntConfig(CONFIG_EXPANSION);
+
     availableRaces[CLASS_WARRIOR].push_back(RACE_HUMAN);
     availableRaces[CLASS_WARRIOR].push_back(RACE_NIGHTELF);
     availableRaces[CLASS_WARRIOR].push_back(RACE_GNOME);
@@ -92,7 +94,8 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
 
     uint8 gender = rand() % 2 ? GENDER_MALE : GENDER_FEMALE;
 
-    uint8 race = availableRaces[cls][urand(0, availableRaces[cls].size() - 1)];
+    uint32 const randomRaceIndex = urand(0, availableRaces[cls].size() - 1);
+    uint8 race = availableRaces[cls][randomRaceIndex];
 
     std::string name;
     if (names.empty())
@@ -410,6 +413,14 @@ void RandomPlayerbotFactory::CreateRandomBots()
             // skip nonexistent classes
             if (!((1 << (cls - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(cls))
                 continue;
+
+            if (bool const isClassDeathKnight = cls == CLASS_DEATH_KNIGHT;
+                isClassDeathKnight &&
+                sWorld->getIntConfig(CONFIG_EXPANSION) !=
+                EXPANSION_WRATH_OF_THE_LICH_KING)
+            {
+                continue;
+            }
 
             if (cls != 10)
                 if (Player* playerBot = factory.CreateRandomBot(session, cls, names))
