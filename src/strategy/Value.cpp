@@ -53,8 +53,13 @@ CDPairCalculatedValue::CDPairCalculatedValue(PlayerbotAI* botAI, std::string con
 std::string const CDPairCalculatedValue::Format()
 {
     CreatureData const* creatureData = Calculate();
-    CreatureTemplate const* bmTemplate = sObjectMgr->GetCreatureTemplate(creatureData->id1);
-    return bmTemplate ? bmTemplate->Name : "<none>";
+    if (creatureData)
+    {
+        CreatureTemplate const* bmTemplate = sObjectMgr->GetCreatureTemplate(creatureData->id1);
+        return bmTemplate ? bmTemplate->Name : "<none>";
+    }
+
+    return "<none>";
 }
 
 CDPairListCalculatedValue::CDPairListCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
