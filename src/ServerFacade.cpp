@@ -23,12 +23,14 @@ float ServerFacade::GetDistance2d(Unit *unit, float x, float y)
 
 bool ServerFacade::IsDistanceLessThan(float dist1, float dist2)
 {
-    return dist1 - dist2 < sPlayerbotAIConfig->targetPosRecalcDistance;
+    //return dist1 - dist2 < sPlayerbotAIConfig->targetPosRecalcDistance;
+    return dist1 < dist2;
 }
 
 bool ServerFacade::IsDistanceGreaterThan(float dist1, float dist2)
 {
-    return dist1 - dist2 > sPlayerbotAIConfig->targetPosRecalcDistance;
+    //return dist1 - dist2 > sPlayerbotAIConfig->targetPosRecalcDistance;
+    return dist1 > dist2;
 }
 
 bool ServerFacade::IsDistanceGreaterOrEqualThan(float dist1, float dist2)
