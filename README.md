@@ -10,3 +10,5 @@ https://github.com/ZhengPeiRu21/azerothcore-wotlk/tree/Playerbot
 If encounter errors and crashes, please post as Github issues so that we can resolve them and improve this project together!
 
 An addon maintained by @whipowill is available to help control the bots. It is can be downloaded here: https://github.com/whipowill/wow-addon-playerbots
+
+Many, many thanks to celguar who is maintain mangosbot branch that this code is port from: https://github.com/celguar/mangosbot-bots
