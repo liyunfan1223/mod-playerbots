@@ -958,7 +958,7 @@ void PlayerbotMgr::OnPlayerLogin(Player* player)
         return;
 
     uint32 accountId = player->GetSession()->GetAccountId();
-    QueryResult results = CharacterDatabase.Query("SELECT name FROM characters WHERE account = {}'", accountId);
+    QueryResult results = CharacterDatabase.Query("SELECT name FROM characters WHERE account = {}", accountId);
     if (results)
     {
         std::ostringstream out;
