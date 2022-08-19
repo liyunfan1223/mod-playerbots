@@ -124,7 +124,6 @@ class PlayerbotsPlayerScript : public PlayerScript
                 if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
                 {
                     botAI->HandleCommand(type, msg, player);
-                    player->ResetSpeakTimers();
 
                     return false;
                 }
@@ -142,7 +141,6 @@ class PlayerbotsPlayerScript : public PlayerScript
                     if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(member))
                     {
                         botAI->HandleCommand(type, msg, player);
-                        player->ResetSpeakTimers();
                     }
                 }
             }
