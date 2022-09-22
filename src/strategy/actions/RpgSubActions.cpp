@@ -73,9 +73,9 @@ void RpgHelper::setFacing(GuidPosition guidPosition)
     if (guidPosition.IsPlayer())
         return;
 
-    Unit* unit = guidPosition.GetUnit();
+//    Unit* unit = guidPosition.GetUnit();
 
-    unit->SetFacingTo(unit->GetAngle(bot));
+//    unit->SetFacingTo(unit->GetAngle(bot));
 }
 
 void RpgHelper::setDelay(bool waitForGroup)
