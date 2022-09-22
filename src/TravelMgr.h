@@ -709,11 +709,13 @@ class ExploreTravelDestination : public TravelDestination
         bool isActive(Player* bot) override;
         std::string const getName() override { return "ExploreTravelDestination"; }
         int32 getEntry() override { return 0; }
-        std::string const getTitle() override;
+        std::string const getTitle() override { return title; };
+        virtual void setTitle(std::string newTitle) { title = newTitle; }
         virtual uint32 getAreaId() { return areaId; }
 
     protected:
         uint32 areaId;
+        std::string title = "";
 };
 
 //A location with zone exploration target(s)
