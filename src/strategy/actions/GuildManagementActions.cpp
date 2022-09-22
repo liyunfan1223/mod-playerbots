@@ -158,9 +158,6 @@ bool GuildManageNearbyAction::Execute(Event event)
         if (!player || bot == player)
             continue;
 
-        if (player->GetGuildId() != bot->GetGuildId())
-            continue;
-
         if (player->GetGuildId()) //Promote or demote nearby members based on chance.
         {
             Guild::Member* member = guild->GetMember(player->GetGUID());
@@ -231,7 +228,7 @@ bool GuildManageNearbyAction::isUseful()
     Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
     Guild::Member* botMember = guild->GetMember(bot->GetGUID());
 
-    return  guild->GetRankRights(botMember->GetRankId()) & (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
+    return guild->GetRankRights(botMember->GetRankId()) & (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
 }
 
 bool GuildLeaveAction::Execute(Event event)
