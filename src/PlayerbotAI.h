@@ -366,6 +366,7 @@ class PlayerbotAI : public PlayerbotAIBase
         void ResetJumpDestination() { jumpDestination = Position(); }
 
         bool CanMove();
+        bool IsInRealGuild();
 
     private:
         void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);

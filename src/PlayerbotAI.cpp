@@ -26,6 +26,7 @@
 #include "SpellAuraEffects.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "GuildMgr.h"
 
 std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems);
 std::vector<std::string> split(std::string const s, char delim);
@@ -241,14 +242,15 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     }
 
     bool min = minimal;
-    if (HasRealPlayerMaster())
-        min = false;
 
     UpdateAIInternal(elapsed, min);
 
     // test fix lags because of BG
     if (bot && !inCombat)
         min = true;
+
+    if (HasRealPlayerMaster())
+        min = false;
 
     YieldThread(min);
 }
@@ -3507,4 +3509,17 @@ bool PlayerbotAI::CanMove()
         return false;
 
     return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE;
+}
+
+bool PlayerbotAI::IsInRealGuild()
+{
+    if (!bot->GetGuildId())
+        return false;
+
+    Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    uint32 leaderAccount = sCharacterCache->GetCharacterAccountIdByGuid(guild->GetLeaderGUID());
+    if (!leaderAccount)
+        return false;
+
+    return sPlayerbotAIConfig->IsInRandomAccountList(leaderAccount);
 }
