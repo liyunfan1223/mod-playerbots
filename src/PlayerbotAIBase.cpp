@@ -9,6 +9,10 @@ PlayerbotAIBase::PlayerbotAIBase(bool isBotAI) : nextAICheckDelay(0), _isBotAI(i
 {
 }
 
+void PlayerbotAIBase::UpdateAIInternal(uint32 elapsed, bool minimal)
+{
+}
+
 void PlayerbotAIBase::UpdateAI(uint32 elapsed, bool minimal)
 {
     if (nextAICheckDelay > elapsed)
