@@ -186,7 +186,10 @@ void SuggestWhatToDoAction::spam(
                     {
                         strToLower(msg);
                     }
-                    chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+                    if (chn->GetName().length() > 0)
+                    {
+                        chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+                    }
                 }
             }
         }
