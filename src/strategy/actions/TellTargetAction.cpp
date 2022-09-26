@@ -46,7 +46,7 @@ bool TellAttackersAction::Execute(Event event)
     {
         ThreatMgr* threatMgr = ref->GetSource();
         Unit* unit = threatMgr->GetOwner();
-        float threat = ref->getThreat();
+        float threat = ref->GetThreat();
 
         std::ostringstream out;
         out << unit->GetName() << " (" << threat << ")";

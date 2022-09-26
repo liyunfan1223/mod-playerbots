@@ -17,7 +17,7 @@ class FindTargetForTankStrategy : public FindNonCcTargetStrategy
             if (IsCcTarget(creature))
                 return;
 
-            float threat = threatMgr->getThreat(bot);
+            float threat = threatMgr->GetThreat(bot);
             if (!result || (minThreat - threat) > 0.1f)
             {
                 minThreat = threat;
