@@ -431,7 +431,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     }
 
     // Battleground switch
-    if (player->InBattleground())
+    if (player->InBattleground() && player->GetBattleground())
     {
         BattlegroundTypeId bgType = player->GetBattlegroundTypeId();
         if (bgType == BATTLEGROUND_RB)
@@ -632,7 +632,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     }
 
     // Battleground switch
-    if (player->InBattleground())
+    if (player->InBattleground() && player->GetBattleground())
     {
         nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp", "collision", "dps assist", "attack tagged", "emote", nullptr);
         nonCombatEngine->removeStrategy("custom::say");

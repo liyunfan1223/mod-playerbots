@@ -897,7 +897,7 @@ void PlayerbotAI::DoNextAction(bool min)
                 }
 
                 // same BG
-                if (bot->InBattleground() && bot->GetBattleground()->GetBgTypeID() == BATTLEGROUND_AV && !GET_PLAYERBOT_AI(member) && member->InBattleground() && bot->GetMapId() == member->GetMapId())
+                if (bot->InBattleground() && bot->GetBattleground() && bot->GetBattleground()->GetBgTypeID() == BATTLEGROUND_AV && !GET_PLAYERBOT_AI(member) && member->InBattleground() && bot->GetMapId() == member->GetMapId())
                 {
                     // TODO disable move to objective if have master in bg
                     continue;

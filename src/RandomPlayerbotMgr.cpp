@@ -539,7 +539,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
             else
                 BgPlayers[queueTypeId][bracketId][teamId]++;
 
-            if (!player->IsInvitedForBattlegroundInstance() && (!player->InBattleground() || player->GetBattleground()->GetBgTypeID() != BattlegroundMgr::BGTemplateId(queueTypeId)))
+            if (!player->IsInvitedForBattlegroundInstance() && (!player->InBattleground() || (player->GetBattleground() && player->GetBattleground()->GetBgTypeID() != BattlegroundMgr::BGTemplateId(queueTypeId))))
             {
                 if (BattlegroundMgr::BGArenaType(queueTypeId))
                 {

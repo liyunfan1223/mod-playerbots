@@ -4880,6 +4880,11 @@ bool ArenaTactics::Execute(Event event)
 
 bool ArenaTactics::moveToCenter(Battleground* bg)
 {
+    // Sanity check
+    if (!bg)
+    {
+        return true;
+    }
     uint32 Preference = context->GetValue<uint32>("bg role")->Get();
     switch (bg->GetBgTypeID())
     {
