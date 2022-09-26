@@ -14,6 +14,7 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
 #include "WorldPacket.h"
+#include "PlayerbotTextMgr.h"
 
 #include <stack>
 #include <queue>
@@ -249,6 +250,7 @@ class PlayerbotAI : public PlayerbotAIBase
 
         std::string const HandleRemoteCommand(std::string const command);
         void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
+        void QueueChatResponse(uint8 msgtype, ObjectGuid guid1, ObjectGuid guid2, std::string message, std::string chanName, std::string name);
 	    void HandleBotOutgoingPacket(WorldPacket const& packet);
         void HandleMasterIncomingPacket(WorldPacket const& packet);
         void HandleMasterOutgoingPacket(WorldPacket const& packet);
@@ -382,6 +384,7 @@ class PlayerbotAI : public PlayerbotAIBase
         BotState currentState;
         ChatHelper chatHelper;
         std::queue<ChatCommandHolder> chatCommands;
+        std::queue<ChatQueuedReply> chatReplies;
         PacketHandlingHelper botOutgoingPacketHandlers;
         PacketHandlingHelper masterIncomingPacketHandlers;
         PacketHandlingHelper masterOutgoingPacketHandlers;

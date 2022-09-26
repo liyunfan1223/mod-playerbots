@@ -53,7 +53,6 @@
 #include "SayAction.h"
 #include "StayActions.h"
 #include "SuggestWhatToDoAction.h"
-#include "SuggestDungeonAction.h"
 #include "TravelAction.h"
 #include "XpGainAction.h"
 #include "VehicleActions.h"
@@ -75,7 +74,6 @@ class ActionContext : public NamedObjectContext<Action>
             creators["travel"] = &ActionContext::travel;
             creators["choose travel target"] = &ActionContext::choose_travel_target;
             creators["move to travel target"] = &ActionContext::move_to_travel_target;
-            creators["move out of collision"] = &ActionContext::move_out_of_collision;
             creators["move out of collision"] = &ActionContext::move_out_of_collision;
             creators["move random"] = &ActionContext::move_random;
             creators["attack"] = &ActionContext::melee;
@@ -118,7 +116,6 @@ class ActionContext : public NamedObjectContext<Action>
             creators["emote"] = &ActionContext::emote;
             creators["talk"] = &ActionContext::talk;
             creators["suggest what to do"] = &ActionContext::suggest_what_to_do;
-            creators["suggest dungeon"] = &ActionContext::suggest_dungeon;
             creators["suggest trade"] = &ActionContext::suggest_trade;
             creators["return"] = &ActionContext::_return;
             creators["move to loot"] = &ActionContext::move_to_loot;
@@ -138,12 +135,12 @@ class ActionContext : public NamedObjectContext<Action>
             creators["greet"] = &ActionContext::greet;
             creators["check values"] = &ActionContext::check_values;
             creators["ra"] = &ActionContext::ra;
-            creators["give food"] = &ActionContext::give_food;
-            creators["give water"] = &ActionContext::give_water;
             creators["apply poison"] = &ActionContext::apply_poison;
             creators["apply stone"] = &ActionContext::apply_stone;
             creators["apply oil"] = &ActionContext::apply_oil;
             creators["try emergency"] = &ActionContext::try_emergency;
+            creators["give food"] = &ActionContext::give_food;
+            creators["give water"] = &ActionContext::give_water;
             creators["mount"] = &ActionContext::mount;
             creators["war stomp"] = &ActionContext::war_stomp;
             creators["auto talents"] = &ActionContext::auto_talents;
@@ -266,7 +263,6 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* emote(PlayerbotAI* botAI) { return new EmoteAction(botAI); }
         static Action* talk(PlayerbotAI* botAI) { return new TalkAction(botAI); }
         static Action* suggest_what_to_do(PlayerbotAI* botAI) { return new SuggestWhatToDoAction(botAI); }
-        static Action* suggest_dungeon(PlayerbotAI* botAI) { return new SuggestDungeonAction(botAI); }
         static Action* suggest_trade(PlayerbotAI* botAI) { return new SuggestTradeAction(botAI); }
         static Action* attack_anything(PlayerbotAI* botAI) { return new AttackAnythingAction(botAI); }
         static Action* attack_least_hp_target(PlayerbotAI* botAI) { return new AttackLeastHpTargetAction(botAI); }

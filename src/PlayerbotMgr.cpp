@@ -7,6 +7,7 @@
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
 #include "WorldSession.h"
+#include "ChannelMgr.h"
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false)
 {
@@ -415,6 +416,53 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     botAI->SetNextCheckDelay(urand(2000, 4000));
 
     botAI->TellMaster("Hello!");
+
+    // bots join World chat if not solo oriented
+    if (bot->getLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
+    {
+        // TODO make action/config
+        // Make the bot join the world channel for chat
+        WorldPacket pkt(CMSG_JOIN_CHANNEL);
+        pkt << uint32(0) << uint8(0) << uint8(0);
+        pkt << std::string("World");
+        pkt << ""; // Pass
+        bot->GetSession()->HandleJoinChannel(pkt);
+    }
+    // join standard channels
+    AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(bot->GetAreaId());
+    ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+    std::string current_zone_name = current_zone ? current_zone->area_name[0] : "";
+
+    if (current_zone && cMgr)
+    {
+        for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
+        {
+            ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
+            if (!channel) continue;
+
+            bool isLfg = (channel->flags & CHANNEL_DBC_FLAG_LFG) != 0;
+
+            // skip non built-in channels or global channel without zone name in pattern
+            if (!isLfg && (!channel || (channel->flags & 4) == 4))
+                continue;
+
+            //  new channel
+            Channel* new_channel = nullptr;
+            if (isLfg)
+            {
+                std::string lfgChannelName = channel->pattern[0];
+                new_channel = cMgr->GetJoinChannel("LookingForGroup", channel->ChannelID);
+            }
+            else
+            {
+                char new_channel_name_buf[100];
+                snprintf(new_channel_name_buf, 100, channel->pattern[0], current_zone_name.c_str());
+                new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+            }
+            if (new_channel && new_channel->GetName().length() > 0)
+                new_channel->JoinChannel(bot, "");
+        }
+    }
 }
 
 std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin, uint32 masterAccountId, uint32 masterGuildId)
@@ -951,6 +999,9 @@ void PlayerbotMgr::OnBotLoginInternal(Player * const bot)
 
 void PlayerbotMgr::OnPlayerLogin(Player* player)
 {
+    // set locale priority for bot texts
+    sPlayerbotTextMgr->AddLocalePriority(player->GetSession()->GetSessionDbcLocale());
+
     if (sPlayerbotAIConfig->selfBotLevel > 2)
         HandlePlayerbotCommand("self", player);
 

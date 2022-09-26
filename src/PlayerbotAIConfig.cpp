@@ -140,8 +140,8 @@ bool PlayerbotAIConfig::Initialize()
 
     randomChangeMultiplier = sConfigMgr->GetOption<float>("AiPlayerbot.RandomChangeMultiplier", 1.0);
 
-    randomBotCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotCombatStrategies", "-threat");
-    randomBotNonCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotNonCombatStrategies", "");
+    randomBotCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotCombatStrategies", "-threat,+custom::say");
+    randomBotNonCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotNonCombatStrategies", "+custom::say");
     combatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.CombatStrategies", "+custom::say");
     nonCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.NonCombatStrategies", "+custom::say,+return");
 
@@ -308,6 +308,8 @@ bool PlayerbotAIConfig::Initialize()
     PlayerbotFactory::Init();
     sRandomItemMgr->Init();
     sRandomItemMgr->InitAfterAhBot();
+    sPlayerbotTextMgr->LoadBotTexts();
+    sPlayerbotTextMgr->LoadBotTextChance();
 
     if (!sPlayerbotAIConfig->autoDoQuests)
     {

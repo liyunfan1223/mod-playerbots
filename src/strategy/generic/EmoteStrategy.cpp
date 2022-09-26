@@ -8,8 +8,8 @@
 void EmoteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("seldom", NextAction::array(0, new NextAction("emote", 1.0f), nullptr)));
-    triggers.push_back(new TriggerNode("seldom", NextAction::array(0, new NextAction("suggest what to do", 1.0f), nullptr)));
-    triggers.push_back(new TriggerNode("seldom", NextAction::array(0, new NextAction("suggest trade", 1.0f), nullptr)));
+    triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("suggest what to do", 1.0f), nullptr)));
+    triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("suggest trade", 1.0f), nullptr)));
 
     if (sPlayerbotAIConfig->randomBotSuggestDungeons)
     {

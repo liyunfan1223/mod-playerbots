@@ -10,7 +10,9 @@
 #include "ChatHelper.h"
 #include "Playerbots.h"
 #include "PlayerbotTextMgr.h"
+#include "GuildMgr.h"
 
+std::map<std::string, uint8> SuggestWhatToDoAction::instances;
 std::map<std::string, uint8> SuggestWhatToDoAction::factions;
 
 SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* botAI, std::string const name) : InventoryAction(botAI, name)
@@ -33,6 +35,73 @@ bool SuggestWhatToDoAction::Execute(Event event)
     botAI->GetAiObjectContext()->GetValue<time_t>("last said", qualifier)->Set(time(nullptr) + urand(1, 60));
 
     return true;
+}
+
+void SuggestWhatToDoAction::instance()
+{
+    if (instances.empty())
+    {
+        instances["Ragefire Chasm"] = 15;
+        instances["Deadmines"] = 18;
+        instances["Wailing Caverns"] = 18;
+        instances["Shadowfang Keep"] = 25;
+        instances["Blackfathom Deeps"] = 20;
+        instances["Stockade"] = 20;
+        instances["Gnomeregan"] = 35;
+        instances["Razorfen Kraul"] = 35;
+        instances["Maraudon"] = 50;
+        instances["Scarlet Monestery"] = 40;
+        instances["Uldaman"] = 45;
+        instances["Dire Maul"] = 58;
+        instances["Scholomance"] = 59;
+        instances["Razorfen Downs"] = 40;
+        instances["Strathholme"] = 59;
+        instances["Zul'Farrak"] = 45;
+        instances["Blackrock Depths"] = 55;
+        instances["Temple of Atal'Hakkar"] = 55;
+        instances["Lower Blackrock Spire"] = 57;
+
+        instances["Hellfire Citidel"] = 65;
+        instances["Coilfang Reservoir"] = 65;
+        instances["Auchindoun"] = 65;
+        instances["Cavens of Time"] = 68;
+        instances["Tempest Keep"] = 69;
+        instances["Magister's Terrace"] = 70;
+
+        instances["Utgarde Keep"] = 75;
+        instances["The Nexus"] = 75;
+        instances["Ahn'kahet: The Old Kingdom"] = 75;
+        instances["Azjol-Nerub"] = 75;
+        instances["Drak'Tharon Keep"] = 75;
+        instances["Violet Hold"] = 80;
+        instances["Gundrak"] = 77;
+        instances["Halls of Stone"] = 77;
+        instances["Halls of Lightning"] = 77;
+        instances["Oculus"] = 77;
+        instances["Utgarde Pinnacle"] = 77;
+        instances["Trial of the Champion"] = 80;
+        instances["Forge of Souls"] = 80;
+        instances["Pit of Saron"] = 80;
+        instances["Halls of Reflection"] = 80;
+    }
+
+    std::vector<std::string> allowedInstances;
+    for (auto & instance : instances)
+    {
+        if (bot->getLevel() >= instance.second) allowedInstances.push_back(instance.first);
+    }
+
+    if (allowedInstances.empty()) return;
+
+    std::map<std::string, std::string> placeholders;
+    placeholders["%role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
+
+    std::ostringstream itemout;
+    //itemout << "|c00b000b0" << allowedInstances[urand(0, allowedInstances.size() - 1)] << "|r";
+    itemout << allowedInstances[urand(0, allowedInstances.size() - 1)];
+    placeholders["%instance"] = itemout.str();
+
+    spam(BOT_TEXT2("suggest_instance", placeholders), urand(0, 1) ? 0x50 : 0, urand(0, 2), urand(0, 2));
 }
 
 std::vector<uint32> SuggestWhatToDoAction::GetIncompletedQuests()
@@ -67,7 +136,7 @@ void SuggestWhatToDoAction::specificQuest()
     placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
     placeholders["%quest"] = chat->FormatQuest(quest);
 
-    spam(sPlayerbotTextMgr->Format("suggest_quest", placeholders));
+    spam(BOT_TEXT2("suggest_quest", placeholders), urand(0, 1) ? 0x18 : 0, urand(0, 2), urand(0, 2));
 }
 
 void SuggestWhatToDoAction::grindReputation()
@@ -134,10 +203,11 @@ void SuggestWhatToDoAction::grindReputation()
     placeholders["%rndK"] = rnd.str();
 
     std::ostringstream itemout;
-    itemout << "|c004040b0" << allowedFactions[urand(0, allowedFactions.size() - 1)] << "|r";
+//    itemout << "|c004040b0" << allowedFactions[urand(0, allowedFactions.size() - 1)] << "|r";
+    itemout << allowedFactions[urand(0, allowedFactions.size() - 1)];
     placeholders["%faction"] = itemout.str();
 
-    spam(sPlayerbotTextMgr->Format("suggest_faction", placeholders));
+    spam(BOT_TEXT2("suggest_faction", placeholders), 0x18, true);
 }
 
 void SuggestWhatToDoAction::something()
@@ -150,48 +220,88 @@ void SuggestWhatToDoAction::something()
         return;
 
     std::ostringstream out;
-    out << "|cffb04040" << entry->area_name[0] << "|r";
+//    out << "|cffb04040" << entry->area_name[0] << "|r";
+    out << entry->area_name[0];
     placeholders["%zone"] = out.str();
 
-    spam(sPlayerbotTextMgr->Format("suggest_something", placeholders));
+    spam(BOT_TEXT2("suggest_something", placeholders), urand(0, 1) ? 0x18 : 0, urand(0, 2), urand(0, 2));
 }
 
-void SuggestWhatToDoAction::spam(
-    std::string msg,
-    uint32 channelId,
-    bool const isLowerCase
-)
+void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, bool guild)
 {
-    std::set<std::string> said;
+    if (msg.empty())
+        return;
+
+    std::vector<std::string> channelNames;
+    ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+    if (!cMgr)
+        return;
+
+
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
-        if (!channel || channel->ChannelID != channelId) continue;
+        if (!channel) continue;
 
-        for (AreaTableEntry const* area : sAreaTableStore)
+        for (AreaTableEntry const* current_zone : sAreaTableStore)
         {
-            char channelName[255];
-            snprintf(channelName, 255, channel->pattern[0], area->area_name[0]);
-            if (said.find(channelName) != said.end())
+           if (!current_zone)
+               continue;
+
+
+            // combine full channel name
+            char channelName[100];
+            Channel* chn = nullptr;
+            if ((channel->flags & CHANNEL_DBC_FLAG_LFG) != 0)
+            {
+                std::string chanName = channel->pattern[0];
+                chn = cMgr->GetChannel(chanName, bot);
+            }
+            else
+            {
+                snprintf(channelName, 100, channel->pattern[0], current_zone->area_name[0]);
+                chn = cMgr->GetChannel(channelName, bot);
+            }
+            if (!chn)
+                continue;
+            // skip world chat here
+            if (chn->GetName() == "World")
                 continue;
 
-            said.insert(channelName);
+            if (flags != 0 && chn->GetFlags() != flags)
+                continue;
 
-            if (ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId()))
+            // skip local defense
+            //if (chn->GetFlags() == 0x18)
+            //    continue;
+
+            // no filter, pick several options
+            if (flags == CHANNEL_FLAG_NONE)
             {
-                if (Channel* chn = cMgr->GetJoinChannel(channelName, channel->ChannelID))
-                {
-                    chn->JoinChannel(bot, "");
-                    if (isLowerCase)
-                    {
-                        strToLower(msg);
-                    }
-                    if (chn->GetName().length() > 0)
-                    {
-                        chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
-                    }
-                }
+                channelNames.push_back(chn->GetName());
             }
+            else
+                chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+        }
+
+        if (!channelNames.empty())
+        {
+            std::string randomName = channelNames[urand(0, channelNames.size() - 1)];
+            if (Channel* chn = cMgr->GetChannel(randomName, bot))
+                chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+        }
+
+        if (worldChat)
+        {
+            if (Channel* worldChannel = cMgr->GetChannel("World", bot))
+                worldChannel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+        }
+
+        if (guild && bot->GetGuildId())
+        {
+            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+            if (guild)
+                guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
         }
     }
 }
@@ -290,7 +400,7 @@ bool SuggestTradeAction::Execute(Event event)
     placeholders["%item"] = chat->FormatItem(proto, count);
     placeholders["%gold"] = chat->formatMoney(price);
 
-    spam(sPlayerbotTextMgr->Format("suggest_sell", placeholders));
+    spam(BOT_TEXT2("suggest_sell", placeholders), urand(0, 1) ? 0x3C : 0, urand(0, 1), urand(0, 5));
     return true;
 }
 

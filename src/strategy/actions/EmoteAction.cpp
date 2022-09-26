@@ -6,6 +6,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "PlayerbotTextMgr.h"
 
 std::map<std::string, uint32> EmoteActionBase::emotes;
 std::map<std::string, uint32> EmoteActionBase::textEmotes;
@@ -778,7 +779,7 @@ bool EmoteAction::isUseful()
         return false;
 
     time_t lastEmote = AI_VALUE2(time_t, "last emote", qualifier);
-    return (time(nullptr) - lastEmote) >= sPlayerbotAIConfig->repeatDelay / 1000;
+    return time(nullptr) >= lastEmote;
 }
 
 bool TalkAction::Execute(Event event)

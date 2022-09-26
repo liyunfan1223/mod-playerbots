@@ -24,4 +24,13 @@ class SayAction : public Action, public Qualified
         static std::map<std::string, uint32> probabilityTable;
 };
 
+
+class ChatReplyAction : public Action
+{
+public:
+    ChatReplyAction(PlayerbotAI* ai) : Action(ai, "chat message") {}
+    virtual bool Execute(Event event) { return true; }
+    bool isUseful() { return true; }
+    static void ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName, std::string name);
+};
 #endif

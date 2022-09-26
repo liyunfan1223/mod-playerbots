@@ -22,6 +22,7 @@
 #include "PlayerbotCommandServer.h"
 #include "PlayerbotFactory.h"
 #include "ServerFacade.h"
+#include "ChannelMgr.h"
 
 #include <iomanip>
 #include <boost/thread/thread.hpp>
@@ -1693,11 +1694,24 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
     return true;
 }
 
-void RandomPlayerbotMgr::HandleCommand(uint32 type, std::string const text, Player* fromPlayer)
+void RandomPlayerbotMgr::HandleCommand(uint32 type, std::string const text, Player* fromPlayer, std::string channelName)
 {
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
+        if (!bot)
+            continue;
+
+        if (!channelName.empty())
+        {
+            if (ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId()))
+            {
+                Channel* chn = cMgr->GetChannel(channelName, bot);
+                if (!chn)
+                    continue;
+            }
+        }
+
         GET_PLAYERBOT_AI(bot)->HandleCommand(type, text, fromPlayer);
     }
 }

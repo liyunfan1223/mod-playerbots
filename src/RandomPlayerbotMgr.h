@@ -51,7 +51,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void IncreaseLevel(Player* bot);
         void ScheduleTeleport(uint32 bot, uint32 time = 0);
         void ScheduleChangeStrategy(uint32 bot, uint32 time = 0);
-        void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
+        void HandleCommand(uint32 type, std::string const text, Player* fromPlayer, std::string channelName = "");
         std::string const HandleRemoteCommand(std::string const request);
         void OnPlayerLogout(Player* player);
         void OnPlayerLogin(Player* player);
