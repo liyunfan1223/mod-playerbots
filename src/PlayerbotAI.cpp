@@ -3517,9 +3517,13 @@ bool PlayerbotAI::IsInRealGuild()
         return false;
 
     Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    if (!guild)
+    {
+        return false;
+    }
     uint32 leaderAccount = sCharacterCache->GetCharacterAccountIdByGuid(guild->GetLeaderGUID());
     if (!leaderAccount)
         return false;
 
-    return sPlayerbotAIConfig->IsInRandomAccountList(leaderAccount);
+    return !(sPlayerbotAIConfig->IsInRandomAccountList(leaderAccount));
 }
