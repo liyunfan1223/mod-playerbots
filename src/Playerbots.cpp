@@ -178,6 +178,24 @@ class PlayerbotsPlayerScript : public PlayerScript
 
             sRandomPlayerbotMgr->HandleCommand(type, msg, player);
         }
+
+        bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* /*criteria*/) override
+        {
+            if (sRandomPlayerbotMgr->IsRandomBot(player))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        bool OnBeforeAchiComplete(Player* player, AchievementEntry const* /*achievement*/) override
+        {
+            if (sRandomPlayerbotMgr->IsRandomBot(player))
+            {
+                return false;
+            }
+            return true;
+        }
 };
 
 class PlayerbotsMiscScript : public MiscScript
