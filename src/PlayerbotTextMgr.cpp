@@ -118,6 +118,9 @@ std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::
             proper_list.push_back(text);
     }
 
+    if (proper_list.empty())
+        return "";
+
     BotTextEntry textEntry = proper_list[urand(0, proper_list.size() - 1)];
     std::string botText = !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
     for (auto & placeholder : placeholders)
