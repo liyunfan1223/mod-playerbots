@@ -132,7 +132,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
             continue;
 
         GuidPosition guidP(unit);
-        if (!guidP)
+        if (!guidP || !guidP.getMap())
             continue;
 
         float priority = 1;
