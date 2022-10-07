@@ -600,7 +600,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
             if (type == CHAT_MSG_WHISPER)
             {
                 ObjectGuid receiver = sCharacterCache->GetCharacterGuidByName(name);
-                if (!receiver.IsPlayer())
+                if (!receiver || !receiver.IsPlayer() || !ObjectAccessor::FindPlayer(receiver))
                 {
                     return;
                 }
