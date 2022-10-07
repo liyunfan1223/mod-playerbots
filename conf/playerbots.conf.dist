@@ -18,7 +18,7 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 AiPlayerbot.BotAutologin = 0
 
 # Guild Task system
-AiPlayerbot.EnableGuildTasks = 1
+AiPlayerbot.EnableGuildTasks = 0
 
 # Enable LFG for random bots
 AiPlayerbot.RandomBotJoinLfg = 1
@@ -33,7 +33,7 @@ AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
 AiPlayerbot.RandomBotJoinBG = 1
 
 # Mark many quests <= Bot level as complete (slows down bot creation)
-AiPlayerbot.PreQuests = 1
+AiPlayerbot.PreQuests = 0
 
 # Random bot count
 AiPlayerbot.MinRandomBots = 50
@@ -81,7 +81,7 @@ AiPlayerbot.RandomBotShowCloak = 1
 
 # Disable random levels for randombots
 # Every bots started on the specified level and level up by killing mobs.
-AiPlayerbot.DisableRandomLevels = 0
+AiPlayerbot.DisableRandomLevels = 1
 
 # Set randombots starting level here if "AiPlayerbot.DisableRandomLevels" enabled
 # Recommended: 5+
@@ -93,7 +93,7 @@ AiPlayerbot.KillXPRate = 1
 
 # Specify percent of active bots
 # The default is 10. With 10% of all bots going active or inactive each minute.
-AiPlayerbot.BotActiveAlone = 10
+AiPlayerbot.BotActiveAlone = 100
 
 # Set minimum level of randombots where gets enchants on items (Maxlevel + 1 to disable)
 # Default: 60
@@ -101,7 +101,7 @@ AiPlayerbot.MinEnchantingBotLevel = 60
 
 # Randombots checking players gear score level and deny the group invite if it's too low
 # Default: 1 (enabled)
-AiPlayerbot.GearScoreCheck = 0
+AiPlayerbot.GearScoreCheck = 1
 
 # Quest that will be completed and rewarded to all random bots
 AiPlayerbot.RandomBotQuestIds = "7848,3802,5505,6502,7761"
@@ -153,7 +153,7 @@ AiPlayerbot.AutoLearnQuestSpells = 0
 
 # Random Bots will pick quests on their own and try to complete
 # Default: 0 (disabled)
-AiPlayerbot.AutoDoQuests = 0
+AiPlayerbot.AutoDoQuests = 1
 
 ##################################################################################
 #                                                                                #
@@ -441,25 +441,25 @@ AiPlayerbot.CommandPrefix = ""
 AiPlayerbot.CommandSeparator = "\\\\"
 
 # Max AI iterations per tick
-AiPlayerbot.IterationsPerTick = 100
+AiPlayerbot.IterationsPerTick = 10
 
 # Allow/deny bots from your guild
 AiPlayerbot.AllowGuildBots = 1
 
 # Delay between two short-time spells cast
-AiPlayerbot.GlobalCooldown = 1500
+AiPlayerbot.GlobalCooldown = 500
 
 # Max wait time when moving
 AiPlayerbot.MaxWaitForMove = 5000
 
 # Action expiration time
-AiPlayerbot.ExpireActionTime = 5000
+AiPlayerbot.ExpireActionTime = 500
 
 # Max dispel auras duration
-AiPlayerbot.DispelAuraDuration = 7000
+AiPlayerbot.DispelAuraDuration = 700
 
 # Delay between two bot actions
-AiPlayerbot.ReactDelay = 500
+AiPlayerbot.ReactDelay = 100
 
 # Inactivity delay
 AiPlayerbot.PassiveDelay = 10000
@@ -468,28 +468,28 @@ AiPlayerbot.PassiveDelay = 10000
 AiPlayerbot.RepeatDelay = 5000
 
 # Delay timers
-AiPlayerbot.ErrorDelay = 5000
+AiPlayerbot.ErrorDelay = 100
 AiPlayerbot.RpgDelay = 10000
-AiPlayerbot.SitDelay = 30000
-AiPlayerbot.ReturnDelay = 7000
+AiPlayerbot.SitDelay = 20000
+AiPlayerbot.ReturnDelay = 100
 AiPlayerbot.LootDelay = 1000
 
 # Distances
 AiPlayerbot.FarDistance = 20.0
-AiPlayerbot.SightDistance = 75.0
-AiPlayerbot.SpellDistance = 22.0
-AiPlayerbot.ShootDistance = 25.0
+AiPlayerbot.SightDistance = 60.0
+AiPlayerbot.SpellDistance = 26.0
+AiPlayerbot.ShootDistance = 26.0
 AiPlayerbot.ReactDistance = 150.0
 AiPlayerbot.GrindDistance = 75.0
 AiPlayerbot.HealDistance = 20.0
 AiPlayerbot.LootDistance = 15.0
-AiPlayerbot.FleeDistance = 7.5
+AiPlayerbot.FleeDistance = 15.0
 AiPlayerbot.TooCloseDistance = 5.0
 AiPlayerbot.MeleeDistance = 1.5
 AiPlayerbot.FollowDistance = 1.5
 AiPlayerbot.WhisperDistance = 6000.0
 AiPlayerbot.ContactDistance = 0.5
-AiPlayerbot.AoeRadius = 5
+AiPlayerbot.AoeRadius = 10
 AiPlayerbot.RpgDistance = 200
 AiPlayerbot.AggroDistance = 22
 
@@ -497,7 +497,7 @@ AiPlayerbot.AggroDistance = 22
 AiPlayerbot.FleeingEnabled = 1
 
 # Health/Mana levels
-AiPlayerbot.CriticalHealth = 20
+AiPlayerbot.CriticalHealth = 25
 AiPlayerbot.LowHealth = 45
 AiPlayerbot.MediumHealth = 65
 AiPlayerbot.AlmostFullHealth = 85
@@ -505,8 +505,8 @@ AiPlayerbot.LowMana = 15
 AiPlayerbot.MediumMana = 40
 
 # Random bot default strategies (applied after defaults)
-AiPlayerbot.RandomBotCombatStrategies = "-threat"
-AiPlayerbot.RandomBotNonCombatStrategies = ""
+AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
+AiPlayerbot.RandomBotNonCombatStrategies = "+grind,+loot,+rpg,+custom::say"
 AiPlayerbot.CombatStrategies = "+custom::say"
 AiPlayerbot.NonCombatStrategies = "+custom::say,+return"
 
@@ -516,7 +516,7 @@ AiPlayerbot.MaxGuildTaskChangeTime = 432000
 
 # Mail spam interval
 AiPlayerbot.MinGuildTaskAdvertisementTime = 300
-AiPlayerbot.MaxGuildTaskAdvertisementTime = 43200
+AiPlayerbot.MaxGuildTaskAdvertisementTime = 28800
 
 # Delay before reward is sent
 AiPlayerbot.MinGuildTaskRewardTime = 300
@@ -526,7 +526,7 @@ AiPlayerbot.MaxGuildTaskRewardTime = 3600
 AiPlayerbot.GuildTaskAdvertCleanupTime = 300
 
 # Specify max distance between victim and bot when creating guild kill task
-AiPlayerbot.GuildTaskKillTaskDistance = 2000
+AiPlayerbot.GuildTaskKillTaskDistance = 200
 
 # Distance margin for facade calculations
 AiPlayerbot.TargetPosRecalcDistance = 0.1
@@ -535,16 +535,16 @@ AiPlayerbot.TargetPosRecalcDistance = 0.1
 AiPlayerbot.RandomBotMaps = 0,1,530,571
 
 # Quest items to leave (do not destroy)
-AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000""
+AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000"
 
 # PvP Restricted Zones (bots don't pvp)
-AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323""
+AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395"
 
 # Spells every random bot will learn on randomize (54197 - cold weather flying)
-AiPlayerbot.RandomBotSpellIds = "54197""
+AiPlayerbot.RandomBotSpellIds = "1"
 
 # Level diff between random bots and nearby creatures for random teleports
-AiPlayerbot.RandomBotTeleLevel = 5
+AiPlayerbot.RandomBotTeleLevel = 3
 
 # ID of spell to open lootable chests
 AiPlayerbot.OpenGoSpell = 6477
@@ -553,15 +553,15 @@ AiPlayerbot.OpenGoSpell = 6477
 AiPlayerbot.RandomBotUpdateInterval = 60
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
-AiPlayerbot.MinRandomBotInWorldTime = 7200
-AiPlayerbot.MaxRandomBotInWorldTime = 43200
+AiPlayerbot.MinRandomBotInWorldTime = 3600
+AiPlayerbot.MaxRandomBotInWorldTime = 1209600
 AiPlayerbot.MinRandomBotRandomizeTime = 7200
 AiPlayerbot.MaxRandomRandomizeTime = 1209600
 AiPlayerbot.RandomBotsPerInterval = 60
 AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
 AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
-AiPlayerbot.MinRandomBotChangeStrategyTime = 1800
-AiPlayerbot.MaxRandomBotChangeStrategyTime = 7200
+AiPlayerbot.MinRandomBotChangeStrategyTime = 180
+AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
 AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 
