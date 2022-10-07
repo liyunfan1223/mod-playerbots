@@ -471,7 +471,8 @@ AiPlayerbot.RepeatDelay = 5000
 AiPlayerbot.ErrorDelay = 100
 AiPlayerbot.RpgDelay = 10000
 AiPlayerbot.SitDelay = 20000
-AiPlayerbot.ReturnDelay = 100
+# ReturnDelay has a minimum value of 2000 - lower values will cause a crash!
+AiPlayerbot.ReturnDelay = 2000
 AiPlayerbot.LootDelay = 1000
 
 # Distances
