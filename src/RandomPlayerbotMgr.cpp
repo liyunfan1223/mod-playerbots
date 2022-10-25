@@ -1646,7 +1646,7 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
         for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin(); i != sPlayerbotAIConfig->randomBotAccounts.end(); ++i)
         {
             uint32 account = *i;
-            if (QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters WHERE account = {} AND name like {}", account, name.c_str()))
+            if (QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters WHERE account = {} AND name like '{}'", account, name.c_str()))
             {
                 do
                 {
