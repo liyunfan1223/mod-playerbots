@@ -1,5 +1,3 @@
-USE acore_playerbots;
-
 DROP TABLE IF EXISTS `playerbots_dungeon_suggestion_definition`;
 CREATE TABLE `playerbots_dungeon_suggestion_definition` (
     `id`         TINYINT(3)   NOT NULL AUTO_INCREMENT UNIQUE,
