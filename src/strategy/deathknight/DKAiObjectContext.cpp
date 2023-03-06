@@ -82,8 +82,8 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 			creators["strangulate"] = &DeathKnightTriggerFactoryInternal::strangulate;
 			creators["strangulate on enemy healer"] = &DeathKnightTriggerFactoryInternal::strangulate_on_enemy_healer;
 			creators["blood tap"] = &DeathKnightTriggerFactoryInternal::blood_tap;
-			creators["rbotAIse dead"] = &DeathKnightTriggerFactoryInternal::rbotAIse_dead;
-			creators["chbotAIns of ice"] = &DeathKnightTriggerFactoryInternal::chbotAIns_of_ice;
+			creators["raise dead"] = &DeathKnightTriggerFactoryInternal::raise_dead;
+			creators["chains of ice"] = &DeathKnightTriggerFactoryInternal::chains_of_ice;
         }
 
     private:
@@ -102,8 +102,8 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 		static Trigger* strangulate(PlayerbotAI* botAI) { return new StrangulateInterruptSpellTrigger(botAI); }
 		static Trigger* strangulate_on_enemy_healer(PlayerbotAI* botAI) { return new StrangulateOnEnemyHealerTrigger(botAI); }
 		static Trigger* blood_tap(PlayerbotAI* botAI) { return new BloodTapTrigger(botAI); }
-		static Trigger* rbotAIse_dead(PlayerbotAI* botAI) { return new RbotAIseDeadTrigger(botAI); }
-		static Trigger* chbotAIns_of_ice(PlayerbotAI* botAI) { return new ChbotAInsOfIceSnareTrigger(botAI); }
+		static Trigger* raise_dead(PlayerbotAI* botAI) { return new RaiseDeadTrigger(botAI); }
+		static Trigger* chains_of_ice(PlayerbotAI* botAI) { return new ChainsOfIceSnareTrigger(botAI); }
 };
 
 class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
@@ -122,7 +122,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 			creators["scourge strike"] = &DeathKnightAiObjectContextInternal::scourge_strike;
 			creators["death and decay"] = &DeathKnightAiObjectContextInternal::death_and_decay;
 			creators["unholy pressence"] = &DeathKnightAiObjectContextInternal::unholy_pressence;
-			creators["rbotAIse dead"] = &DeathKnightAiObjectContextInternal::rbotAIse_dead;
+			creators["raise dead"] = &DeathKnightAiObjectContextInternal::raise_dead;
 			creators["army of the dead"] = &DeathKnightAiObjectContextInternal::army_of_the_dead;
 			creators["summon gargoyle"] = &DeathKnightAiObjectContextInternal::summon_gargoyle;
 			creators["anti magic shell"] = &DeathKnightAiObjectContextInternal::anti_magic_shell;
@@ -135,7 +135,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 			creators["obliterate"] = &DeathKnightAiObjectContextInternal::obliterate;
 			creators["howling blast"] = &DeathKnightAiObjectContextInternal::howling_blast;
 			creators["frost strike"] = &DeathKnightAiObjectContextInternal::frost_strike;
-			creators["chbotAIns of ice"] = &DeathKnightAiObjectContextInternal::chbotAIns_of_ice;
+			creators["chains of ice"] = &DeathKnightAiObjectContextInternal::chains_of_ice;
 			creators["rune strike"] = &DeathKnightAiObjectContextInternal::rune_strike;
 			//creators["icy clutch"] = &DeathKnightAiObjectContextInternal::icy_clutch;
 			creators["horn of winter"] = &DeathKnightAiObjectContextInternal::horn_of_winter;
@@ -179,7 +179,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 		static Action* scourge_strike(PlayerbotAI* botAI) { return new CastScourgeStrikeAction(botAI); }
 		static Action* death_and_decay(PlayerbotAI* botAI) { return new CastDeathAndDecayAction(botAI); }
 		static Action* unholy_pressence(PlayerbotAI* botAI) { return new CastUnholyPresenceAction(botAI); }
-		static Action* rbotAIse_dead(PlayerbotAI* botAI) { return new CastRbotAIseDeadAction(botAI); }
+		static Action* raise_dead(PlayerbotAI* botAI) { return new CastRaiseDeadAction(botAI); }
 		static Action* army_of_the_dead(PlayerbotAI* botAI) { return new CastArmyOfTheDeadAction(botAI); }
 		static Action* summon_gargoyle(PlayerbotAI* botAI) { return new CastSummonGargoyleAction(botAI); }
 		static Action* anti_magic_shell(PlayerbotAI* botAI) { return new CastAntiMagicShellAction(botAI); }
@@ -192,7 +192,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 		static Action* obliterate(PlayerbotAI* botAI) { return new CastObliterateAction(botAI); }
 		static Action* howling_blast(PlayerbotAI* botAI) { return new CastHowlingBlastAction(botAI); }
 		static Action* frost_strike(PlayerbotAI* botAI) { return new CastFrostStrikeAction(botAI); }
-		static Action* chbotAIns_of_ice(PlayerbotAI* botAI) { return new CastChbotAInsOfIceAction(botAI); }
+		static Action* chains_of_ice(PlayerbotAI* botAI) { return new CastChainsOfIceAction(botAI); }
 		static Action* rune_strike(PlayerbotAI* botAI) { return new CastRuneStrikeAction(botAI); }
 		//static Action* icy_clutch(PlayerbotAI* botAI) { return new CastIcyClutchAction(botAI); }
 		static Action* horn_of_winter(PlayerbotAI* botAI) { return new CastHornOfWinterAction(botAI); }

@@ -144,10 +144,10 @@ END_SPELL_ACTION()
 BEGIN_MELEE_SPELL_ACTION(CastAntiMagicZoneAction, "anti magic zone")
 END_SPELL_ACTION()
 
-class CastChbotAInsOfIceAction : public CastSpellAction
+class CastChainsOfIceAction : public CastSpellAction
 {
 	public:
-		CastChbotAInsOfIceAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "chbotAIns of ice") { }
+		CastChainsOfIceAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "chains of ice") { }
 };
 
 class CastHungeringColdAction : public CastMeleeSpellAction
@@ -258,10 +258,10 @@ class CastArmyOfTheDeadAction : public CastBuffSpellAction
 		CastArmyOfTheDeadAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "army of the dead") { }
 };
 
-class CastRbotAIseDeadAction : public CastBuffSpellAction
+class CastRaiseDeadAction : public CastBuffSpellAction
 {
 	public:
-		CastRbotAIseDeadAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "rbotAIse dead") { }
+		CastRaiseDeadAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "raise dead") { }
 };
 
 class CastKillingMachineAction : public CastBuffSpellAction

@@ -14,7 +14,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    creators["obliterate"] = &obliterate;
 		    creators["howling blast"] = &howling_blast;
 		    creators["frost strike"] = &frost_strike;
-		    //creators["chbotAIns of ice"] = &chbotAIns_of_ice;
+		    //creators["chains of ice"] = &chains_of_ice;
 		    creators["rune strike"] = &rune_strike;
 		    //creators["icy clutch"] = &icy_clutch;
 		    //creators["horn of winter"] = &horn_of_winter;

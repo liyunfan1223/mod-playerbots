@@ -20,7 +20,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    //creators["dark command"] = &dark_command; taunt
 
 		    //frost
-		    //creators["chbotAIns of ice"] = &chbotAIns_of_ice;
+		    //creators["chains of ice"] = &chains_of_ice;
 		    //creators["icy clutch"] = &icy_clutch;
 		    creators["horn of winter"] = &horn_of_winter;
 		    creators["killing machine"] = &killing_machine;	// buff
@@ -34,7 +34,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 
 		    //unholy
 		    //creators["death and decay"] = &death_and_decay;
-		    //creators["rbotAIse dead"] = &rbotAIse_dead;
+		    //creators["raise dead"] = &raise_dead;
 		    //creators["army of the dead"] = &army of the dead;
 		    //creators["summon gargoyle"] = &army of the dead;
 		    //creators["anti magic shell"] = &anti_magic_shell; cd
@@ -160,7 +160,7 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 	triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("anti magic shell", ACTION_NORMAL + 3), nullptr)));
 	triggers.push_back(new TriggerNode("death coil", NextAction::array(0, new NextAction("death coil", ACTION_NORMAL + 3), nullptr)));
 	triggers.push_back(new TriggerNode("critical aoe heal", NextAction::array(0, new NextAction("anti magic zone", ACTION_EMERGENCY + 1), nullptr)));
-	triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("rbotAIse dead", ACTION_NORMAL + 5), nullptr)));
+	triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("raise dead", ACTION_NORMAL + 5), nullptr)));
     triggers.push_back(new TriggerNode("mind freeze", NextAction::array(0, new NextAction("mind freeze", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode("bone shield", NextAction::array(0, new NextAction("bone shield", ACTION_NORMAL + 1), nullptr)));
 	triggers.push_back(new TriggerNode("horn of winter", NextAction::array(0, new NextAction("horn of winter", ACTION_NORMAL + 1), nullptr)));
