@@ -41,10 +41,10 @@ class BloodTapTrigger : public BuffTrigger
 		BloodTapTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blood tap") { }
 };
 
-class RbotAIseDeadTrigger : public BuffTrigger
+class RaiseDeadTrigger : public BuffTrigger
 {
 	public:
-	    RbotAIseDeadTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "rbotAIse dead") { }
+	    RaiseDeadTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "raise dead") { }
 };
 
 class RuneStrikeTrigger : public SpellCanBeCastTrigger
@@ -101,10 +101,10 @@ class MindFreezeOnEnemyHealerTrigger : public InterruptEnemyHealerTrigger
 		MindFreezeOnEnemyHealerTrigger(PlayerbotAI* botAI) : InterruptEnemyHealerTrigger(botAI, "mind freeze") { }
 };
 
-class ChbotAInsOfIceSnareTrigger : public SnareTargetTrigger
+class ChainsOfIceSnareTrigger : public SnareTargetTrigger
 {
 	public:
-		ChbotAInsOfIceSnareTrigger(PlayerbotAI* botAI) : SnareTargetTrigger(botAI, "chbotAIns of ice") { }
+		ChainsOfIceSnareTrigger(PlayerbotAI* botAI) : SnareTargetTrigger(botAI, "chains of ice") { }
 };
 
 class StrangulateOnEnemyHealerTrigger : public InterruptEnemyHealerTrigger

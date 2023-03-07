@@ -20,7 +20,7 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    creators["scourge strike"] = &scourge_strike;
 		    //creators["death and decay"] = &death_and_decay;
 		    //creators["unholy pressence"] = &unholy_pressence;
-		    //creators["rbotAIse dead"] = &rbotAIse_dead;
+		    //creators["raise dead"] = &raise_dead;
 		    //creators["army of the dead"] = &army of the dead;
 		    //creators["summon gargoyle"] = &army of the dead;
 		    //creators["anti magic shell"] = &anti_magic_shell;
@@ -70,7 +70,7 @@ void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void UnholyDKAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-	triggers.push_back(new TriggerNode("loot avbotAIlable", NextAction::array(0, new NextAction("corpse explosion", ACTION_NORMAL + 1), nullptr)));
+	triggers.push_back(new TriggerNode("loot available", NextAction::array(0, new NextAction("corpse explosion", ACTION_NORMAL + 1), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("death and decay", ACTION_NORMAL + 3),
         new NextAction("corpse explosion", ACTION_NORMAL + 3), nullptr)));
 }
