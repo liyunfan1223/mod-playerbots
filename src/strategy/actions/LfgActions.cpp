@@ -258,7 +258,7 @@ bool LfgRoleCheckAction::Execute(Event event)
         sLFGMgr->UpdateRoleCheck(group->GetGUID());
 
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: LFG roles checked",
-            bot->GetGUID().ToString().c_str(), bot->GetTeamId() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
+            bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
 
         return true;
     }
