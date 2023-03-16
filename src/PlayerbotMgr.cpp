@@ -1112,7 +1112,7 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    if (!player || (!player->IsInWorld() && !player->IsBeingTeleported()))
+    if (!(sPlayerbotAIConfig->enabled) || !player || (!player->IsInWorld() && !player->IsBeingTeleported()))
     {
         return nullptr;
     }
