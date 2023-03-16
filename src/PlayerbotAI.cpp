@@ -1479,7 +1479,7 @@ bool PlayerbotAI::TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel 
 
 bool PlayerbotAI::TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel)
 {
-    if (!TellMasterNoFacing(text, securityLevel))
+    if (!master || !TellMasterNoFacing(text, securityLevel))
         return false;
 
     if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId() && !bot->HasUnitState(UNIT_STATE_IN_FLIGHT) && !bot->IsFlying())
