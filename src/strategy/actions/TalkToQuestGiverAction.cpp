@@ -143,10 +143,18 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, WorldObject*
     {
         //Pick the first item of the best rewards.
         bestIds = BestRewards(quest);
-        ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
-        bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
+        if (!bestIds.empty())
+        {
+            ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
+            bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
+            out << "Rewarded " << ChatHelper::FormatItem(item);
+        }
+        else
+        {
+            out << "Unable to find suitable reward. Asking for help....";
+            AskToSelectReward(quest, out, true);
+        }
 
-        out << "Rewarded " << chat->FormatItem(item);
     }
     else if (sPlayerbotAIConfig->autoPickReward == "no")
     {
@@ -157,7 +165,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, WorldObject*
     {
         //Try to pick the usable item. If multiple list usable rewards.
         bestIds = BestRewards(quest);
-        if (bestIds.size() > 0)
+        if (!bestIds.empty())
         {
             AskToSelectReward(quest, out, true);
         }
@@ -167,7 +175,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, WorldObject*
             ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
             bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
 
-            out << "Rewarded " << chat->FormatItem(item);
+            out << "Rewarded " << ChatHelper::FormatItem(item);
         }
     }
 }
