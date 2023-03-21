@@ -79,6 +79,28 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     GameObject* go = botAI->GetGameObject(lootGUID);
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
+
+        bool isQuestItemOnly = false;
+
+        GameObjectQuestItemList const* items = sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
+        for (int i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
+        {
+            if (i >= items->size())
+                break;
+
+            auto itemId = uint32((*items)[i]);
+
+            if (IsNeededForQuest(bot, itemId))
+            {
+                this->guid = guid;
+                return;
+            }
+            isQuestItemOnly |= itemId > 0;
+        }
+
+        if (isQuestItemOnly)
+            return;
+
         uint32 goId = go->GetEntry();
         uint32 lockId = go->GetGOInfo()->GetLockId();
         LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
@@ -114,6 +136,37 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
                 }
         }
     }
+}
+
+bool LootObject::IsNeededForQuest(Player* bot, uint32 itemId)
+{
+    for (int qs = 0; qs < MAX_QUEST_LOG_SIZE; ++qs)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(qs);
+        if (questId == 0)
+            continue;
+
+        QuestStatusData& qData = bot->getQuestStatusMap()[questId];
+        if (qData.Status != QUEST_STATUS_INCOMPLETE)
+            continue;
+
+        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
+        if (!qInfo)
+            continue;
+
+        for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+        {
+            if (!qInfo->RequiredItemCount[i] || (qInfo->RequiredItemCount[i] - qData.ItemCount[i]) <= 0)
+                continue;
+
+            if (qInfo->RequiredItemId[i] != itemId)
+                continue;
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 WorldObject* LootObject::GetWorldObject(Player* bot)
