@@ -3,6 +3,8 @@
  */
 
 #include "SpellIdValue.h"
+
+#include <ranges>
 #include "ChatHelper.h"
 #include "Playerbots.h"
 #include "Vehicle.h"
@@ -95,22 +97,65 @@ uint32 SpellIdValue::Calculate()
     if (spellIds.empty()) return 0;
 
     int32 saveMana = (int32)round(AI_VALUE(double, "mana save level"));
-    int32 rank = 1;
-    int32 highest = 0;
-    int32 lowest = 0;
-    for (std::set<uint32>::reverse_iterator i = spellIds.rbegin(); i != spellIds.rend(); ++i)
+    uint32 rank = 1;
+    uint32 highestRank = 0;
+    uint32 highestSpellId = 0;
+    uint32 lowestRank = 0;
+    uint32 lowestSpellId = 0;
+    if (saveMana <= 1)
     {
-        if (!highest)
-            highest = *i;
+        for (uint32 spellId : std::ranges::reverse_view(spellIds))
+        {
+            const SpellInfo *pSpellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!pSpellInfo)
+                continue;
 
-        if (saveMana == rank)
-            return *i;
+            std::string spellName = pSpellInfo->Rank[0];
 
-        lowest = *i;
-        ++rank;
+            // For atoi, the input string has to start with a digit, so lets search for the first digit
+            size_t i = 0;
+            for (; i < spellName.length(); i++)
+            { if (isdigit(spellName[i])) break; }
+
+            // remove the first chars, which aren't digits
+            spellName = spellName.substr(i, spellName.length() - i);
+
+            // convert the remaining text to an integer
+            int id = atoi(spellName.c_str());
+
+            if (!id)
+            {
+                highestSpellId = spellId;
+                continue;
+            }
+
+            if (!highestRank || id > highestRank)
+            {
+                highestRank = id;
+                highestSpellId = spellId;
+            }
+
+            if (!lowestRank || (lowestRank && id < lowestRank))
+            {
+                lowestRank = id;
+                lowestSpellId = spellId;
+            }
+        }
+    }
+    else
+    {
+        for (uint32 spellId : std::ranges::reverse_view(spellIds))
+        {
+            if (!highestSpellId)
+                highestSpellId = spellId;
+            if (saveMana == rank)
+                return spellId;
+            lowestSpellId = spellId;
+            rank++;
+        }
     }
 
-    return saveMana > 1 ? lowest : highest;
+    return saveMana > 1 ? lowestSpellId  : highestSpellId;
 }
 
 uint32 VehicleSpellIdValue::Calculate()
