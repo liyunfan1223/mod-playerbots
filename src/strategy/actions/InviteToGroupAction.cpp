@@ -149,10 +149,10 @@ bool InviteGuildToGroupAction::Execute(Event event)
                 return false;
         }
 
-        if (player->getLevel() + 2 < bot->getLevel())
+        if (abs(int32(player->getLevel() - bot->getLevel())) > 4)
             continue;
 
-        if (player->getLevel() > bot->getLevel() + 20)
+        if (!botAI && sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)
             continue;
 
         return Invite(player);
