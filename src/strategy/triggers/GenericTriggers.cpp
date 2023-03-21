@@ -102,7 +102,7 @@ bool OutNumberedTrigger::IsActive()
 bool BuffTrigger::IsActive()
 {
     Unit* target = GetTarget();
-	return SpellTrigger::IsActive() && !botAI->HasAura(spell, target, true);
+	return SpellTrigger::IsActive() && !botAI->HasAura(spell, target, false, checkIsOwner);
 }
 
 Value<Unit*>* BuffOnPartyTrigger::GetTargetValue()

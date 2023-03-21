@@ -243,11 +243,14 @@ class HighAoeTrigger : public AoeTrigger
 class BuffTrigger : public SpellTrigger
 {
     public:
-        BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1) : SpellTrigger(botAI, spell, checkInterval) { }
+        BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : SpellTrigger(botAI, spell, checkInterval) { this->checkIsOwner = checkIsOwner; }
 
     public:
 		std::string const GetTargetName() override { return "self target"; }
         bool IsActive() override;
+
+    protected:
+        bool checkIsOwner;
 };
 
 class BuffOnPartyTrigger : public BuffTrigger
@@ -303,7 +306,7 @@ class TargetInSightTrigger : public Trigger
 class DebuffTrigger : public BuffTrigger
 {
     public:
-        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1) : BuffTrigger(botAI, spell, checkInterval) { }
+        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner) { }
 
 		std::string const GetTargetName() override { return "current target"; }
         bool IsActive() override;

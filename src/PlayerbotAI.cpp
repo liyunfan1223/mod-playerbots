@@ -1520,7 +1520,7 @@ bool IsRealAura(Player* bot, AuraEffect const* aurEff, Unit const* unit)
     return false;
 }
 
-bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack)
+bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, bool checkIsOwner, int maxAuraAmount)
 {
     if (!unit)
         return false;
@@ -1530,6 +1530,8 @@ bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack)
         return 0;
 
     wstrToLower(wnamepart);
+
+    int auraAmount = 0;
 
 	for (uint32 auraType = SPELL_AURA_BIND_SIGHT; auraType < TOTAL_AURAS; auraType++)
 	{
@@ -1547,10 +1549,35 @@ bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack)
 
 			if (IsRealAura(bot, aurEff, unit))
 			{
+                if (checkIsOwner && aurEff)
+                {
+                    if (aurEff->GetCasterGUID() != bot->GetGUID())
+                        continue;
+                }
 			    uint32 maxStackAmount = spellInfo->StackAmount;
-			    return maxStack && maxStackAmount ? aurEff->GetBase()->GetStackAmount() >= maxStackAmount : true;
+                uint32 maxProcCharges = spellInfo->ProcCharges;
+
+
+                if (maxStack)
+                {
+                    if (maxStackAmount && aurEff->GetBase()->GetStackAmount() >= maxStackAmount)
+                        auraAmount++;
+
+                    if (maxProcCharges && aurEff->GetBase()->GetCharges() >= maxProcCharges)
+                        auraAmount++;
+                }
+
+                auraAmount++;
+
+                if (maxAuraAmount < 0)
+                    return auraAmount > 0;
 			}
 		}
+    }
+
+    if (maxAuraAmount >= 0)
+    {
+        return auraAmount == maxAuraAmount || (auraAmount > 0 && auraAmount <= maxAuraAmount);
     }
 
     return false;
