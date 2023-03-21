@@ -1925,6 +1925,13 @@ uint32 RandomItemMgr::GetStatWeight(Player* player, uint32 itemId)
 
         if (m_weightScales[player->getClass()][specNum].info.name == specName)
             specId = m_weightScales[player->getClass()][specNum].info.id;
+
+
+        if (m_weightScales[player->getClass()][specNum].info.name == specName)
+        {
+            specId = specNum;
+            break;
+        }
     }
 
     if (!specId)
