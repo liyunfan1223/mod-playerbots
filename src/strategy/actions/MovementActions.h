@@ -84,10 +84,10 @@ class MoveOutOfEnemyContactAction : public MovementAction
         bool isUseful() override;
 };
 
-class SetFacingTargetAction : public MovementAction
+class SetFacingTargetAction : public Action
 {
     public:
-        SetFacingTargetAction(PlayerbotAI* botAI) : MovementAction(botAI, "set facing") { }
+        SetFacingTargetAction(PlayerbotAI* botAI) : Action(botAI, "set facing") { }
 
         bool Execute(Event event) override;
         bool isUseful() override;

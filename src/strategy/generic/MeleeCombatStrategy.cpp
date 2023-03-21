@@ -18,5 +18,5 @@ void SetBehindCombatStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("not behind target", NextAction::array(0, new NextAction("set behind", ACTION_NORMAL + 9), nullptr)));
+    triggers.push_back(new TriggerNode("not behind target", NextAction::array(0, new NextAction("set behind", ACTION_MOVE + 7), nullptr)));
 }
