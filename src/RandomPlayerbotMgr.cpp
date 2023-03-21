@@ -264,7 +264,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             activateCheckPlayersThread();
     }
 
-    if (sPlayerbotAIConfig->randomBotJoinBG && !players.empty())
+    if (sPlayerbotAIConfig->randomBotJoinBG/* && !players.empty()*/)
     {
         if (time(nullptr) > (BgCheckTimer + 30))
             activateCheckBgQueueThread();
@@ -1403,7 +1403,12 @@ bool RandomPlayerbotMgr::IsRandomBot(Player* bot)
             return false;
     }
     if (bot)
-        return IsRandomBot(bot->GetGUID().GetCounter()) || sPlayerbotAIConfig->IsInRandomAccountList(bot->GetSession()->GetAccountId());
+    {
+        if (sPlayerbotAIConfig->IsInRandomAccountList(bot->GetSession()->GetAccountId()))
+            return true;
+
+        return IsRandomBot(bot->GetGUID().GetCounter());
+    }
 
     return false;
 }
@@ -1411,7 +1416,10 @@ bool RandomPlayerbotMgr::IsRandomBot(Player* bot)
 bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
 {
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(bot);
-    return GetEventValue(bot, "add") || sPlayerbotAIConfig->IsInRandomAccountList(sCharacterCache->GetCharacterAccountIdByGuid(guid));
+    if (sPlayerbotAIConfig->IsInRandomAccountList(sCharacterCache->GetCharacterAccountIdByGuid(guid)))
+        return true;
+
+    return GetEventValue(bot, "add");
 }
 
 std::list<uint32> RandomPlayerbotMgr::GetBots()
