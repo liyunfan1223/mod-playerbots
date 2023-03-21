@@ -1984,11 +1984,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         }
     }
 
-    if (!urand(0, 50) && bot->IsInCombat())
-    {
-        PlaySound(RAND(TEXT_EMOTE_OPENFIRE, TEXT_EMOTE_CHARGE, TEXT_EMOTE_ATTACKMYTARGET));
-    }
-
     WaitForSpellCast(spell);
     aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, target->GetGUID(), time(nullptr));
     aiObjectContext->GetValue<PositionMap&>("position")->Get()["random"].Reset();
@@ -2119,14 +2114,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         }
     }
 
-    if (!urand(0, 50) && bot->IsInCombat() && HasStrategy("emote", BOT_STATE_NON_COMBAT))
-    {
-        std::vector<uint32> sounds;
-        sounds.push_back(TEXT_EMOTE_OPENFIRE);
-        sounds.push_back(305);
-        sounds.push_back(307);
-        PlayEmote(sounds[urand(0, sounds.size() - 1)]);
-    }
 
     WaitForSpellCast(spell);
     aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, bot->GetGUID(), time(nullptr));

@@ -86,24 +86,6 @@ bool DropTargetAction::Execute(Event event)
         }
     }
 
-    if (!urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
-    {
-        std::vector<uint32> sounds;
-        if (target && target->isDead())
-        {
-            sounds.push_back(TEXT_EMOTE_CHEER);
-            sounds.push_back(TEXT_EMOTE_CONGRATULATE);
-        }
-        else
-        {
-            sounds.push_back(304); // guard
-            sounds.push_back(325); // stay
-        }
-
-        if (!sounds.empty())
-            botAI->PlayEmote(sounds[urand(0, sounds.size() - 1)]);
-    }
-
     return true;
 }
 

@@ -111,15 +111,6 @@ bool AttackAction::Attack(Unit* target)
         }
     }
 
-    if (!urand(0, 300) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
-    {
-        std::vector<uint32> sounds;
-        sounds.push_back(TEXT_EMOTE_OPENFIRE);
-        sounds.push_back(305);
-        sounds.push_back(307);
-        botAI->PlayEmote(sounds[urand(0, sounds.size() - 1)]);
-    }
-
     if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
         bot->SetFacingToObject(target);
 
