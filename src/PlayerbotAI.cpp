@@ -713,6 +713,17 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                             if (bot->InBattleground() && bot->GetBattleground() && !(isMentioned || (msgtype != CHAT_MSG_CHANNEL && !isRandomBot)))
                                 return;
 
+                            // Reduce chat spam
+                            if (isRandomBot && HasManyPlayersNearby() && urand(0, 10))
+                                return;
+
+                            if (isRandomBot && (msgtype == CHAT_MSG_SAY || msgtype == CHAT_MSG_YELL) && urand(0, 10))
+                                return;
+
+                            if (isRandomBot && HasRealPlayerMaster() && urand(0, 5))
+                                return;
+
+
                             if (!message.empty() && ((isRandomBot && !isPaused && (!urand(0, 20) || (!urand(0, 10) && message.find(bot->GetName()) != std::string::npos))) || (!isRandomBot && (isMentioned || msgtype != CHAT_MSG_CHANNEL || !urand(0, 4)))))
                             {
                                 QueueChatResponse(msgtype, guid1, ObjectGuid(), message, chanName, name);
