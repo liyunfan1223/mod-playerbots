@@ -5,6 +5,8 @@
 #ifndef _PLAYERBOT_GENERICTRIGGERS_H
 #define _PLAYERBOT_GENERICTRIGGERS_H
 
+#include <utility>
+
 #include "RangeTriggers.h"
 #include "HealthTriggers.h"
 
@@ -131,6 +133,14 @@ class SpellCanBeCastTrigger : public SpellTrigger
 		SpellCanBeCastTrigger(PlayerbotAI* botAI, std::string const spell) : SpellTrigger(botAI, spell) { }
 
 		bool IsActive() override;
+};
+
+class SpellNoCooldownTrigger : public SpellTrigger
+{
+    public:
+        SpellNoCooldownTrigger(PlayerbotAI* botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
+
+         bool IsActive() override;
 };
 
 // TODO: check other targets
@@ -347,6 +357,21 @@ class AndTrigger : public Trigger
     protected:
         Trigger* ls;
         Trigger* rs;
+};
+
+class TwoTriggers : public Trigger
+{
+    public:
+        explicit TwoTriggers(PlayerbotAI* botAI, std::string name1 = "", std::string name2 = "") : Trigger(botAI)
+        {
+            this->name1 = std::move(name1);
+            this->name2 = std::move(name2);
+        }
+        bool IsActive() override;
+        std::string const getName() override;
+    protected:
+        std::string name1;
+        std::string name2;
 };
 
 class SnareTargetTrigger : public DebuffTrigger

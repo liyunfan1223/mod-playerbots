@@ -32,6 +32,7 @@ SNARE_TRIGGER(ThunderClapSnareTrigger, "thunder clap");
 DEBUFF_TRIGGER(ThunderClapTrigger, "thunder clap");
 SNARE_TRIGGER(TauntSnareTrigger, "taunt");
 SNARE_TRIGGER(InterceptSnareTrigger, "intercept");
+CD_TRIGGER(InterceptCanCastTrigger, "intercept");
 SNARE_TRIGGER(ShockwaveSnareTrigger, "shockwave");
 DEBUFF_TRIGGER(ShockwaveTrigger, "shockwave");
 BOOST_TRIGGER(DeathWishTrigger, "death wish");

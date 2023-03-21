@@ -184,6 +184,15 @@ bool SpellCanBeCastTrigger::IsActive()
 	return target && botAI->CanCastSpell(spell, target);
 }
 
+bool SpellNoCooldownTrigger::IsActive()
+{
+    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+    if (!spellId)
+        return false;
+
+    return !bot->HasSpellCooldown(spellId);
+}
+
 RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(time(nullptr))
 {
 }
@@ -202,7 +211,7 @@ bool RandomTrigger::IsActive()
 
 bool AndTrigger::IsActive()
 {
-    return ls->IsActive() && rs->IsActive();
+    return ls && rs && ls->IsActive() && rs->IsActive();
 }
 
 std::string const AndTrigger::getName()
@@ -210,6 +219,27 @@ std::string const AndTrigger::getName()
     std::string name(ls->getName());
     name = name + " and ";
     name = name + rs->getName();
+    return name;
+}
+
+bool TwoTriggers::IsActive()
+{
+    if (name1.empty() || name2.empty())
+        return false;
+
+    Trigger* trigger1 = botAI->GetAiObjectContext()->GetTrigger(name1);
+    Trigger* trigger2 = botAI->GetAiObjectContext()->GetTrigger(name2);
+
+    if (!trigger1 || !trigger2)
+        return false;
+
+    return trigger1->IsActive() && trigger2->IsActive();
+}
+
+std::string const TwoTriggers::getName()
+{
+    std::string name;
+    name = name1 + " and " + name2;
     return name;
 }
 

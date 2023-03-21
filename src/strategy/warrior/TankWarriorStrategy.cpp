@@ -22,6 +22,7 @@ class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         }
 
     private:
+        //ACTION_NODE_A(charge, "charge", "intercept with stance");
         ACTION_NODE_A(charge, "charge", "reach melee");
         ACTION_NODE_A(sunder_armor, "sunder armor", "melee");
         ACTION_NODE_A(commanding_shout, "commanding shout", "battle shout");
@@ -47,7 +48,11 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericWarriorStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("heroic throw", ACTION_MOVE + 10), new NextAction("charge", ACTION_MOVE + 9), nullptr)));
+    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("heroic throw", ACTION_MOVE + 11), new NextAction("charge", ACTION_MOVE + 10), nullptr)));
+    triggers.push_back(new TriggerNode("intercept and rage", NextAction::array(0, new NextAction("berserker stance", ACTION_MOVE + 14), nullptr)));
+    triggers.push_back(new TriggerNode("intercept and rage", NextAction::array(0, new NextAction("intercept", ACTION_MOVE + 13), nullptr)));
+    triggers.push_back(new TriggerNode("thunder clap and rage", NextAction::array(0, new NextAction("battle stance", ACTION_MOVE + 12), nullptr)));
+    triggers.push_back(new TriggerNode("thunder clap and rage", NextAction::array(0, new NextAction("thunder clap", ACTION_MOVE + 11), nullptr)));
     triggers.push_back(new TriggerNode("defensive stance", NextAction::array(0, new NextAction("defensive stance", ACTION_HIGH + 9), nullptr)));
     triggers.push_back(new TriggerNode("commanding shout", NextAction::array(0, new NextAction("commanding shout", ACTION_HIGH + 8), nullptr)));
     triggers.push_back(new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));

@@ -14,6 +14,7 @@ class ArmsWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["death wish"] = &death_wish;
             creators["piercing howl"] = &piercing_howl;
             creators["mocking blow"] = &mocking_blow;
+            creators["heroic strike"] = &heroic_strike;
         }
 
     private:
@@ -21,6 +22,7 @@ class ArmsWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         ACTION_NODE_A(death_wish, "death wish", "bloodrage");
         ACTION_NODE_A(piercing_howl, "piercing howl", "mocking blow");
         ACTION_NODE_A(mocking_blow, "mocking blow", "hamstring");
+        ACTION_NODE_A(heroic_strike, "heroic strike", "melee");
 };
 
 ArmsWarriorStrategy::ArmsWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStrategy(botAI)
@@ -30,7 +32,7 @@ ArmsWarriorStrategy::ArmsWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 
 NextAction** ArmsWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), nullptr);
+    return NextAction::array(0, new NextAction("heroic strike", ACTION_NORMAL), nullptr);
 }
 
 void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -47,9 +49,10 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("overpower", NextAction::array(0, new NextAction("overpower", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(new TriggerNode("taste for blood", NextAction::array(0, new NextAction("overpower", ACTION_HIGH + 3), nullptr)));
 	triggers.push_back(new TriggerNode("victory rush", NextAction::array(0, new NextAction("victory rush", ACTION_INTERRUPT), nullptr)));
-    triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("medium rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 10), nullptr)));
+    /*triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("slam", ACTION_HIGH + 1), nullptr)));*/
     triggers.push_back(new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("death wish", NextAction::array(0, new NextAction("death wish", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode("rend", NextAction::array(0, new NextAction("rend", ACTION_NORMAL + 1), nullptr)));
+    triggers.push_back(new TriggerNode("rend", NextAction::array(0, new NextAction("rend", ACTION_HIGH + 5), nullptr)));
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("intimidating shout", ACTION_EMERGENCY), nullptr)));
 }

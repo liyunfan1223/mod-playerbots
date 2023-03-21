@@ -143,6 +143,13 @@ class clazz : public SpellCanBeCastTrigger \
         bool IsActive() override; \
 }
 
+#define CD_TRIGGER(clazz, spell) \
+class clazz : public SpellNoCooldownTrigger \
+{ \
+    public: \
+        clazz(PlayerbotAI* botAI) : SpellNoCooldownTrigger(botAI, spell) {} \
+}
+
 #define INTERRUPT_TRIGGER(clazz, spell) \
 class clazz : public InterruptSpellTrigger \
 { \
@@ -491,7 +498,7 @@ static ActionNode* name(PlayerbotAI* botAI) \
     return new ActionNode(spell, \
         /*P*/ nullptr, \
         /*A*/ nullptr, \
-        /*C*/ NextAction::array(0, new NextAction(con), nullptr); \
+        /*C*/ NextAction::array(0, new NextAction(con), nullptr)); \
 }
 
 #endif

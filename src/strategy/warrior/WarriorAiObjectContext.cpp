@@ -89,6 +89,11 @@ class WarriorTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["shockwave"] = &WarriorTriggerFactoryInternal::shockwave;
             creators["shockwave on snare target"] = &WarriorTriggerFactoryInternal::shockwave_on_snare_target;
             creators["taste for blood"] = &WarriorTriggerFactoryInternal::taste_for_blood;
+
+            creators["thunder clap and rage"] = &WarriorTriggerFactoryInternal::thunderclap_and_rage;
+            creators["intercept can cast"] = &WarriorTriggerFactoryInternal::intercept_can_cast;
+            creators["intercept and far enemy"] = &WarriorTriggerFactoryInternal::intercept_and_far_enemy;
+            creators["intercept and rage"] = &WarriorTriggerFactoryInternal::intercept_and_rage;
         }
 
     private:
@@ -108,6 +113,12 @@ class WarriorTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* concussion_blow(PlayerbotAI* botAI) { return new ConcussionBlowTrigger(botAI); }
         static Trigger* SwordAndBoard(PlayerbotAI* botAI) { return new SwordAndBoardTrigger(botAI); }
         static Trigger* shield_bash_on_enemy_healer(PlayerbotAI* botAI) { return new ShieldBashInterruptEnemyHealerSpellTrigger(botAI); }
+
+        static Trigger* thunderclap_and_rage(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "thunderclap", "light rage available"); }
+        static Trigger* intercept_can_cast(PlayerbotAI* botAI) { return new InterceptCanCastTrigger(botAI); }
+        static Trigger* intercept_and_far_enemy(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "enemy is out of melee", "intercept can cast"); }
+        static Trigger* intercept_and_rage(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "intercept and far enemy", "light rage available"); }
+
         static Trigger* intercept_on_snare_target(PlayerbotAI* botAI) { return new InterceptSnareTrigger(botAI); }
         static Trigger* spell_reflection(PlayerbotAI* botAI) { return new SpellReflectionTrigger(botAI); }
         static Trigger* taste_for_blood(PlayerbotAI* botAI) { return new TasteForBloodTrigger(botAI); }
