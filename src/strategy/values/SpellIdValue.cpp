@@ -3,8 +3,6 @@
  */
 
 #include "SpellIdValue.h"
-
-#include <ranges>
 #include "ChatHelper.h"
 #include "Playerbots.h"
 #include "Vehicle.h"
@@ -104,8 +102,9 @@ uint32 SpellIdValue::Calculate()
     uint32 lowestSpellId = 0;
     if (saveMana <= 1)
     {
-        for (uint32 spellId : std::ranges::reverse_view(spellIds))
+        for (auto it = spellIds.rbegin(); it != spellIds.rend(); ++it)
         {
+            auto spellId = *it;
             const SpellInfo *pSpellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!pSpellInfo)
                 continue;
@@ -144,8 +143,9 @@ uint32 SpellIdValue::Calculate()
     }
     else
     {
-        for (uint32 spellId : std::ranges::reverse_view(spellIds))
+        for (auto it = spellIds.rbegin(); it != spellIds.rend(); ++it)
         {
+            auto spellId = *it;
             if (!highestSpellId)
                 highestSpellId = spellId;
             if (saveMana == rank)
