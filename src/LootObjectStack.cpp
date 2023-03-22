@@ -83,6 +83,9 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
         bool isQuestItemOnly = false;
 
         GameObjectQuestItemList const* items = sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
+        if (!items)
+            return;
+
         for (int i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
         {
             if (i >= items->size())
