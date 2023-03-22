@@ -538,7 +538,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
     {
         std::string const response = HandleRemoteCommand(filtered.substr(6));
         WorldPacket data;
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_ADDON, LANG_ADDON, nullptr, bot, response.c_str());
+        ChatHandler::BuildChatPacket(data, (ChatMsg)type, type == CHAT_MSG_ADDON ? LANG_ADDON : LANG_UNIVERSAL, bot, nullptr, response.c_str());
         fromPlayer->SendDirectMessage(&data);
         return;
     }
