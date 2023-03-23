@@ -213,12 +213,40 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
                 }
                 else
                 {
+                    if (botAI->HasStrategy("debug", BOT_STATE_NON_COMBAT))
+                    {
+                        std::ostringstream out;
+                        out << "do: ";
+                        out << action->getName();
+                        out << " impossible (";
+
+                        out << action->getRelevance() << ")";
+
+                        if (!event.GetSource().empty())
+                            out << " [" << event.GetSource() << "]";
+
+                        botAI->TellMasterNoFacing(out);
+                    }
                     LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
                     MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                 }
             }
             else
             {
+                if (botAI->HasStrategy("debug", BOT_STATE_NON_COMBAT))
+                {
+                    std::ostringstream out;
+                    out << "do: ";
+                    out << action->getName();
+                    out << " useless (";
+
+                    out << action->getRelevance() << ")";
+
+                    if (!event.GetSource().empty())
+                        out << " [" << event.GetSource() << "]";
+
+                    botAI->TellMasterNoFacing(out);
+                }
                 lastRelevance = relevance;
                 LogAction("A:%s - USELESS", action->getName().c_str());
             }
