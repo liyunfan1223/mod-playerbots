@@ -403,7 +403,7 @@ bool StoreLootAction::Execute(Event event)
         if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
-        if (proto->Quality >= ITEM_QUALITY_RARE && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
+        if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
         std::ostringstream out;
@@ -428,13 +428,13 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
     AiObjectContext* context = botAI->GetAiObjectContext();
     LootStrategy* lootStrategy = AI_VALUE(LootStrategy*, "loot strategy");
 
-    std::set<uint32>& lootItems = AI_VALUE(std::set<uint32>&, "always loot list");
-    if (lootItems.find(itemid) != lootItems.end())
-        return true;
-
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
     if (!proto)
         return false;
+
+    std::set<uint32>& lootItems = AI_VALUE(std::set<uint32>&, "always loot list");
+    if (lootItems.find(itemid) != lootItems.end())
+        return true;
 
     uint32 max = proto->MaxCount;
     if (max > 0 && botAI->GetBot()->HasItemCount(itemid, max, true))
@@ -448,10 +448,6 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
             return true;
     }
 
-    //if (proto->Bonding == BIND_QUEST_ITEM ||  //Still testing if it works ok without these lines.
-    //    proto->Bonding == BIND_QUEST_ITEM1 || //Eventually this has to be removed.
-    //    proto->Class == ITEM_CLASS_QUEST)
-    //{
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
         uint32 entry = botAI->GetBot()->GetQuestSlotQuestId(slot);
@@ -470,10 +466,15 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
                 }
 
                 if (AI_VALUE2(uint32, "item count", proto->Name1) < quest->RequiredItemCount[i])
-                    return true;
+                    return false;
             }
         }
     }
+
+    //if (proto->Bonding == BIND_QUEST_ITEM ||  //Still testing if it works ok without these lines.
+    //    proto->Bonding == BIND_QUEST_ITEM1 || //Eventually this has to be removed.
+    //    proto->Class == ITEM_CLASS_QUEST)
+    //{
 
     bool canLoot = lootStrategy->CanLoot(proto, context);
     //if (canLoot && proto->Bonding == BIND_WHEN_PICKED_UP && botAI->HasActivePlayerMaster())
