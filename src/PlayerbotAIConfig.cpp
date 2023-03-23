@@ -67,9 +67,9 @@ bool PlayerbotAIConfig::Initialize()
 
     farDistance = sConfigMgr->GetOption<float>("AiPlayerbot.FarDistance", 20.0f);
     sightDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SightDistance", 75.0f);
-    spellDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SpellDistance", 22.0f);
+    spellDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SpellDistance", 25.0f);
     shootDistance = sConfigMgr->GetOption<float>("AiPlayerbot.ShootDistance", 25.0f);
-    healDistance = sConfigMgr->GetOption<float>("AiPlayerbot.HealDistance", 20.0f);
+    healDistance = sConfigMgr->GetOption<float>("AiPlayerbot.HealDistance", 25.0f);
     lootDistance = sConfigMgr->GetOption<float>("AiPlayerbot.LootDistance", 15.0f);
     fleeDistance = sConfigMgr->GetOption<float>("AiPlayerbot.FleeDistance", 7.5f);
     aggroDistance = sConfigMgr->GetOption<float>("AiPlayerbot.AggroDistance", 22.0f);
