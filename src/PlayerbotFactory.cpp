@@ -1789,6 +1789,8 @@ void PlayerbotFactory::InitAvailableSpells()
                 bot->learnSpell(tSpell->spell);
 		}
     }
+    if (bot->IsSpellFitByClassAndRace(20271) && !bot->HasSpell(20271)) // judgement missing
+        bot->learnSpell(20271, false);
 }
 
 void PlayerbotFactory::InitSpecialSpells()
