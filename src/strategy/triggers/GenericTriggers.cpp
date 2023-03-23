@@ -67,6 +67,9 @@ bool OutNumberedTrigger::IsActive()
     if (bot->GetMap() && (bot->GetMap()->IsDungeon() || bot->GetMap()->IsRaid()))
         return false;
 
+    if (bot->GetGroup() && bot->GetGroup()->isRaidGroup())
+        return false;
+
     int32 botLevel = bot->getLevel();
     uint32 friendPower = 200;
     uint32 foePower = 0;
