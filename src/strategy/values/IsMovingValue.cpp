@@ -22,5 +22,5 @@ bool IsSwimmingValue::Calculate()
     if (!target)
         return false;
 
-    return target->IsUnderWater() || target->IsInWater();
+    return target->IsUnderWater() || (target->IsInWater() && target->CanSwim());
 }
