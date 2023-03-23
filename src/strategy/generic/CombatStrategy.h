@@ -18,4 +18,13 @@ class CombatStrategy : public Strategy
         uint32 GetType() const override { return STRATEGY_TYPE_COMBAT; }
 };
 
+class AvoidAoeStrategy : public Strategy
+{
+public:
+    explicit AvoidAoeStrategy(PlayerbotAI* ai);
+    const std::string getName() override { return "avoid aoe"; }
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
 #endif

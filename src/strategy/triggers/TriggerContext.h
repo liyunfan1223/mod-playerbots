@@ -77,6 +77,9 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["medium aoe"] = &TriggerContext::MediumAoe;
             creators["high aoe"] = &TriggerContext::HighAoe;
 
+            creators["has area debuff"] = &TriggerContext::HasAreaDebuff;
+
+
             creators["enemy out of melee"] = &TriggerContext::EnemyOutOfMelee;
             creators["enemy out of spell"] = &TriggerContext::EnemyOutOfSpell;
             creators["enemy too close for spell"] = &TriggerContext::enemy_too_close_for_spell;
@@ -224,6 +227,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* LightAoe(PlayerbotAI* botAI) { return new LightAoeTrigger(botAI); }
         static Trigger* MediumAoe(PlayerbotAI* botAI) { return new MediumAoeTrigger(botAI); }
         static Trigger* HighAoe(PlayerbotAI* botAI) { return new HighAoeTrigger(botAI); }
+        static Trigger* HasAreaDebuff(PlayerbotAI* botAI) { return new HasAreaDebuffTrigger(botAI); }
         static Trigger* LoseAggro(PlayerbotAI* botAI) { return new LoseAggroTrigger(botAI); }
         static Trigger* HasAggro(PlayerbotAI* botAI) { return new HasAggroTrigger(botAI); }
         static Trigger* LowHealth(PlayerbotAI* botAI) { return new LowHealthTrigger(botAI); }

@@ -7,6 +7,7 @@
 
 #include "Object.h"
 #include "Value.h"
+#include "AiObjectContext.h"
 
 class PlayerbotAI;
 
@@ -24,6 +25,20 @@ class AoeCountValue : public CalculatedValue<uint8>
         AoeCountValue(PlayerbotAI* botAI) : CalculatedValue<uint8>(botAI, "aoe count") { }
 
         uint8 Calculate() override;
+};
+
+class HasAreaDebuffValue : public BoolCalculatedValue, public Qualified
+{
+    public:
+        HasAreaDebuffValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI) {}
+
+        Unit* GetTarget()
+        {
+            AiObjectContext* ctx = AiObject::context;
+
+            return ctx->GetValue<Unit*>(qualifier)->Get();
+        }
+        virtual bool Calculate();
 };
 
 #endif

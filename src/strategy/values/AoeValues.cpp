@@ -5,6 +5,7 @@
 #include "AoeValues.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "SpellAuraEffects.h"
 
 GuidVector FindMaxDensity(Player* bot)
 {
@@ -84,4 +85,35 @@ WorldLocation AoePositionValue::Calculate()
 uint8 AoeCountValue::Calculate()
 {
     return FindMaxDensity(bot).size();
+}
+
+bool HasAreaDebuffValue::Calculate()
+{
+    for (uint32 auraType = SPELL_AURA_BIND_SIGHT; auraType < TOTAL_AURAS; auraType++)
+    {
+        Unit::AuraEffectList const& auras = botAI->GetBot()->GetAuraEffectsByType((AuraType)auraType);
+
+        if (auras.empty())
+            continue;
+
+        for (AuraEffect const* aurEff : auras)
+        {
+            SpellInfo const* proto = aurEff->GetSpellInfo();
+
+            if (!proto)
+                continue;
+
+            uint32 trigger_spell_id = proto->Effects[aurEff->GetEffIndex()].TriggerSpell;
+            if (trigger_spell_id == 29767) //Overload
+            {
+                return true;
+            }
+            else
+            {
+                return (!proto->IsPositive() && aurEff->IsPeriodic() && proto->HasAreaAuraEffect());
+            }
+        }
+    }
+
+    return false;
 }

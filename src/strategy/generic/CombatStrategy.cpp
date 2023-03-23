@@ -14,3 +14,61 @@ void CombatStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("combat stuck", NextAction::array(0, new NextAction("reset", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("combat long stuck", NextAction::array(0, new NextAction("hearthstone", 0.9f), new NextAction("repop", 0.8f), nullptr)));
 }
+
+
+AvoidAoeStrategy::AvoidAoeStrategy(PlayerbotAI* botAI) : Strategy(botAI)
+{
+}
+
+
+class AvoidAoeStrategyMultiplier : public Multiplier
+{
+public:
+    AvoidAoeStrategyMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "run away on area debuff") {}
+
+public:
+    virtual float GetValue(Action* action);
+
+private:
+};
+
+float AvoidAoeStrategyMultiplier::GetValue(Action* action)
+{
+    if (!action)
+        return 1.0f;
+
+    std::string name = action->getName();
+    if (name == "follow" || name == "co" || name == "nc" || name == "drop target")
+        return 1.0f;
+
+    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+    const SpellInfo* const pSpellInfo = sSpellMgr->GetSpellInfo(spellId);
+    if (!pSpellInfo) return 1.0f;
+
+    if (spellId && pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+        return 1.0f;
+    else if (spellId && pSpellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+        return 1.0f;
+
+    uint32 castTime = pSpellInfo->CalcCastTime();
+
+    if (AI_VALUE2(bool, "has area debuff", "self target") && spellId && castTime > 0)
+    {
+        return 0.0f;
+    }
+
+    return 1.0f;
+}
+
+
+void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode(
+            "has area debuff",
+            NextAction::array(0, new NextAction("flee", ACTION_EMERGENCY + 5), NULL)));
+}
+
+void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+{
+    multipliers.push_back(new AvoidAoeStrategyMultiplier(botAI));
+}

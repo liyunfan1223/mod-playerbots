@@ -702,4 +702,12 @@ class IsFallingFarTrigger : public Trigger
         bool IsActive() override;
 };
 
+
+class HasAreaDebuffTrigger : public Trigger {
+    public:
+        HasAreaDebuffTrigger(PlayerbotAI* botAI) : Trigger(botAI, "have area debuff") {}
+
+        bool IsActive() override;
+};
+
 #endif
