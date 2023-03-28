@@ -14,7 +14,7 @@ class FindLeastHpTargetStrategy : public FindTargetStrategy
         {
             if (Group* group = botAI->GetBot()->GetGroup())
             {
-                ObjectGuid guid = group->GetTargetIcon(4);
+                ObjectGuid guid = group->GetTargetIcons()[4];
                 if (guid && attacker->GetGUID() == guid)
                     return;
             }
@@ -46,7 +46,7 @@ class FindMaxHpTargetStrategy : public FindTargetStrategy
         {
             if (Group* group = botAI->GetBot()->GetGroup())
             {
-                ObjectGuid guid = group->GetTargetIcon(4);
+                ObjectGuid guid = group->GetTargetIcons()[4];
                 if (guid && attacker->GetGUID() == guid)
                     return;
             }

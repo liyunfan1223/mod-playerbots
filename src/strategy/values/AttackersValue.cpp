@@ -101,7 +101,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
     Creature* c = attacker->ToCreature();
     bool rti = false;
     if (attacker && bot->GetGroup())
-        rti = bot->GetGroup()->GetTargetIcon(7) == attacker->GetGUID();
+        rti = bot->GetGroup()->GetTargetIcons()[7] == attacker->GetGUID();
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
 
