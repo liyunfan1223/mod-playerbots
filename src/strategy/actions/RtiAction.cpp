@@ -75,7 +75,7 @@ bool MarkRtiAction::Execute(Event event)
         bool marked = false;
         for (uint8 i = 0; i < 8; i++)
         {
-            ObjectGuid iconGUID = group->GetTargetIcons()[i];
+            ObjectGuid iconGUID = group->GetTargetIcon(i);
             if (guid == unit->GetGUID())
             {
                 marked = true;

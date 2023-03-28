@@ -163,7 +163,7 @@ class RtiChatFilter : public ChatFilter
                 if (!isRti)
                     continue;
 
-                ObjectGuid rtiTarget = group->GetTargetIcons()[RtiTargetValue::GetRtiIndex(rti.substr(1))];
+                ObjectGuid rtiTarget = group->GetTargetIcon(RtiTargetValue::GetRtiIndex(rti.substr(1)));
                 if (bot->GetGUID() == rtiTarget)
                     return ChatFilter::Filter(message);
 

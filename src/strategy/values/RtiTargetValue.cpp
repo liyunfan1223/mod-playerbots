@@ -41,7 +41,7 @@ Unit* RtiTargetValue::Calculate()
     if (index == -1)
         return nullptr;
 
-    ObjectGuid guid = group->GetTargetIcons()[index];
+    ObjectGuid guid = group->GetTargetIcon(index);
     if (!guid)
         return nullptr;
 

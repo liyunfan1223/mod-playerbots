@@ -49,14 +49,14 @@ bool FindNonCcTargetStrategy::IsCcTarget(Unit* attacker)
                 int32 index = RtiTargetValue::GetRtiIndex(rti);
                 if (index != -1)
                 {
-                    if (ObjectGuid guid = group->GetTargetIcons()[index])
+                    if (ObjectGuid guid = group->GetTargetIcon(index))
                         if (attacker->GetGUID() == guid)
                             return true;
                 }
             }
         }
 
-        if (ObjectGuid guid = group->GetTargetIcons()[4])
+        if (ObjectGuid guid = group->GetTargetIcon(4))
             if (attacker->GetGUID() == guid)
                 return true;
     }
