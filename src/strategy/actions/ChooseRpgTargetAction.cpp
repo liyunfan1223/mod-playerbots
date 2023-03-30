@@ -303,7 +303,7 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
             return true;
     }
 
-    if (inDungeon && realMaster == master && distance > 5.0f)
+    if ((inDungeon || !master->HasPlayerFlag(PLAYER_FLAGS_RESTING)) && realMaster == master && distance > 5.0f)
         return false;
 
     if (!master->isMoving() && distance < 25.0f)
