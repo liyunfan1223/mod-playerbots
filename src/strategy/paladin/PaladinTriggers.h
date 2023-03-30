@@ -31,8 +31,18 @@ class SealTrigger : public BuffTrigger
 		bool IsActive() override;
 };
 
+// judgements
+DEBUFF_TRIGGER(JudgementTrigger, "judgement");
 DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light");
 DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom");
+
+DEBUFF_TRIGGER(ConsecrationTrigger, "consecration");
+
+// repentance triggers
+INTERRUPT_HEALER_TRIGGER(RepentanceOnHealerTrigger, "repentance on enemy healer");
+SNARE_TRIGGER(RepentanceSnareTrigger, "repentance on snare target");
+INTERRUPT_TRIGGER(RepentanceInterruptTrigger, "repentance");
+
 
 class BlessingOnPartyTrigger : public BuffOnPartyTrigger
 {
@@ -89,6 +99,9 @@ class DevotionAuraTrigger : public BuffTrigger
     public:
         DevotionAuraTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "devotion aura") { }
 };
+
+BUFF_TRIGGER(ConcentrationAuraTrigger, "concentration aura");
+
 
 class CleanseCureDiseaseTrigger : public NeedCureTrigger
 {

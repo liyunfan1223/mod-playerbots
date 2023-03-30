@@ -11,12 +11,6 @@
 class PlayerbotAI;
 class Unit;
 
-// judgements
-MELEE_ACTION(CastJudgementAction, "judgement");
-MELEE_ACTION(CastJudgementOfLightAction, "judgement of light");
-MELEE_ACTION(CastJudgementOfWisdomAction, "judgement of wisdom");
-MELEE_ACTION(CastJudgementOfJusticeAction, "judgement of justice");
-
 // seals
 BUFF_ACTION(CastSealOfRighteousnessAction, "seal of righteousness");
 BUFF_ACTION(CastSealOfJusticeAction, "seal of justice");
@@ -25,10 +19,40 @@ BUFF_ACTION(CastSealOfWisdomAction, "seal of wisdom");
 BUFF_ACTION(CastSealOfCommandAction, "seal of command");
 BUFF_ACTION(CastSealOfVengeanceAction, "seal of vengeance");
 
+// judgements
+DEBUFF_ACTION_R(CastJudgementAction, "judgement", 10.0f);
+DEBUFF_ACTION_R(CastJudgementOfLightAction, "judgement of light", 10.0f);
+DEBUFF_ACTION_R(CastJudgementOfWisdomAction, "judgement of wisdom", 10.0f);
+DEBUFF_ACTION_R(CastJudgementOfJusticeAction, "judgement of justice", 10.0f);
+
 // auras
 BUFF_ACTION(CastDevotionAuraAction, "devotion aura");
 BUFF_ACTION(CastRetributionAuraAction, "retribution aura");
 BUFF_ACTION(CastConcentrationAuraAction, "concentration aura");
+BUFF_ACTION(CastShadowResistanceAuraAction, "shadow resistance aura");
+BUFF_ACTION(CastFrostResistanceAuraAction, "frost resistance aura");
+BUFF_ACTION(CastFireResistanceAuraAction, "fire resistance aura");
+BUFF_ACTION(CastCrusaderAuraAction, "crusader aura");
+BUFF_ACTION(CastSanctityAuraAction, "sanctity aura");
+
+SPELL_ACTION(CastHolyShockAction, "holy shock");
+HEAL_PARTY_ACTION(CastHolyShockOnPartyAction, "holy shock");
+
+// consecration
+SPELL_ACTION(CastConsecrationAction, "consecration");
+
+// repentance
+SNARE_ACTION(CastRepentanceSnareAction, "repentance");
+DEBUFF_ACTION(CastRepentanceAction, "repentance");
+ENEMY_HEALER_ACTION(CastRepentanceOnHealerAction, "repentance");
+
+//hamme of wrath
+SPELL_ACTION(CastHammerOfWrathAction, "hammer of wrath");
+
+// buffs
+BUFF_ACTION(CastDivineFavorAction, "divine favor");
+
+// blessings
 
 // fury
 BUFF_ACTION(CastRighteousFuryAction, "righteous fury");
@@ -43,30 +67,6 @@ class CastCrusaderStrikeAction : public CastMeleeSpellAction
 {
 	public:
 		CastCrusaderStrikeAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "crusader strike") { }
-};
-
-class CastShadowResistanceAuraAction : public CastBuffSpellAction
-{
-	public:
-		CastShadowResistanceAuraAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "shadow resistance aura") { }
-};
-
-class CastFrostResistanceAuraAction : public CastBuffSpellAction
-{
-	public:
-		CastFrostResistanceAuraAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "frost resistance aura") { }
-};
-
-class CastFireResistanceAuraAction : public CastBuffSpellAction
-{
-	public:
-		CastFireResistanceAuraAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "fire resistance aura") { }
-};
-
-class CastCrusaderAuraAction : public CastBuffSpellAction
-{
-	public:
-		CastCrusaderAuraAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "crusader aura") { }
 };
 
 class CastSealSpellAction : public CastBuffSpellAction
@@ -157,8 +157,6 @@ class CastHolyLightOnPartyAction : public HealPartyMemberAction
 {
     public:
         CastHolyLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy light") { }
-
-        std::string const getName() override { return "holy light on party"; }
 };
 
 class CastFlashOfLightAction : public CastHealingSpellAction
@@ -171,8 +169,6 @@ class CastFlashOfLightOnPartyAction : public HealPartyMemberAction
 {
     public:
         CastFlashOfLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "flash of light") { }
-
-        std::string const getName() override { return "flash of light on party"; }
 };
 
 class CastLayOnHandsAction : public CastHealingSpellAction
@@ -185,8 +181,6 @@ class CastLayOnHandsOnPartyAction : public HealPartyMemberAction
 {
     public:
         CastLayOnHandsOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "lay on hands") { }
-
-        std::string const getName() override { return "lay on hands on party"; }
 };
 
 class CastDivineProtectionAction : public CastBuffSpellAction
@@ -209,12 +203,6 @@ class CastDivineShieldAction: public CastBuffSpellAction
 		CastDivineShieldAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "divine shield") { }
 };
 
-class CastConsecrationAction : public CastMeleeSpellAction
-{
-    public:
-	    CastConsecrationAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "consecration") { }
-};
-
 class CastHolyWrathAction : public CastMeleeSpellAction
 {
     public:
@@ -225,12 +213,6 @@ class CastHammerOfJusticeAction : public CastMeleeSpellAction
 {
     public:
         CastHammerOfJusticeAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "hammer of justice") { }
-};
-
-class CastHammerOfWrathAction : public CastMeleeSpellAction
-{
-	public:
-		CastHammerOfWrathAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "hammer of wrath") { }
 };
 
 class CastHammerOfTheRighteousAction : public CastMeleeSpellAction
@@ -349,12 +331,6 @@ class CastHammerOfJusticeSnareAction : public CastSnareSpellAction
 {
     public:
         CastHammerOfJusticeSnareAction(PlayerbotAI* botAI) : CastSnareSpellAction(botAI, "hammer of justice") { }
-};
-
-class CastDivineFavorAction : public CastBuffSpellAction
-{
-    public:
-        CastDivineFavorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "divine favor") { }
 };
 
 class CastTurnUndeadAction : public CastBuffSpellAction

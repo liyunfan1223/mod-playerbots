@@ -326,11 +326,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "barmor", "bstats", "close", "cc", nullptr);
+                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "baoe", "bstats", "close", "cc", nullptr);
             else if (tab == 0)
-                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "barmor", nullptr);
+                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "cc", nullptr);
             else
-                engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", "cc", nullptr);
+                engine->addStrategies("dps", "bdps", "dps assist", "cure", "close", "cc", nullptr);
 
             if (player->getLevel() < 14)
             {
@@ -492,11 +492,11 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", "bstats", nullptr);
+                nonCombatEngine->addStrategies("bthreat", "tank assist", "baoe", "bstats", nullptr);
             else if (tab == 0)
-                nonCombatEngine->addStrategies("dps assist", "barmor", "bmana", nullptr);
+                nonCombatEngine->addStrategies("dps assist", "bmana", nullptr);
             else
-                nonCombatEngine->addStrategies("dps assist", "baoe", "bdps", nullptr);
+                nonCombatEngine->addStrategies("dps assist", "bdps", nullptr);
 
             nonCombatEngine->addStrategies("cure", nullptr);
 

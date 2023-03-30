@@ -10,10 +10,16 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
     public:
         DpsPaladinStrategyActionNodeFactory()
         {
+            creators["sanctity aura"] = &sanctity_aura;
+            creators["retribution aura"] = &retribution_aura;
             creators["seal of vengeance"] = &seal_of_vengeance;
             creators["seal of command"] = &seal_of_command;
             creators["blessing of might"] = &blessing_of_might;
             creators["crusader strike"] = &crusader_strike;
+            creators["repentance"] = &repentance;
+            creators["repentance on enemy healer"] = &repentance_on_enemy_healer;
+            creators["repentance on snare target"] = &repentance_on_snare_target;
+            creators["repentance of shield"] = &repentance_or_shield;
         }
 
     private:
@@ -29,7 +35,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         {
             return new ActionNode ("seal of command",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of wisdom"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
                 /*C*/ nullptr);
         }
 
@@ -48,6 +54,12 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*A*/ NextAction::array(0, new NextAction("melee"), nullptr),
                 /*C*/ nullptr);
         }
+    ACTION_NODE_A(repentance, "repentance", "hammer of justice");
+    ACTION_NODE_A(repentance_on_enemy_healer, "repentance on enemy healer", "hammer of justice on enemy healer");
+    ACTION_NODE_A(repentance_on_snare_target, "repentance on snare target", "hammer of justice on snare target");
+    ACTION_NODE_A(sanctity_aura, "sanctity aura", "retribution aura");
+    ACTION_NODE_A(retribution_aura, "retribution aura", "devotion aura");
+    ACTION_NODE_A(repentance_or_shield, "repentance", "divine shield");
 };
 
 DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)
@@ -64,9 +76,17 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of wisdom", 90.0f), nullptr)));
-    triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("divine shield", ACTION_CRITICAL_HEAL + 2), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("judgement of wisdom", NextAction::array(0, new NextAction("judgement of wisdom", ACTION_NORMAL + 2), nullptr)));
+    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f), nullptr)));
+    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", 91.0f), nullptr)));
+    triggers.push_back(new TriggerNode("sanctity aura", NextAction::array(0, new NextAction("sanctity aura", 90.0f), nullptr)));
+    triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("repentance or shield", ACTION_CRITICAL_HEAL + 3), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), nullptr)));
+    triggers.push_back(new TriggerNode("judgement of wisdom", NextAction::array(0, new NextAction("judgement of wisdom", ACTION_NORMAL + 10), nullptr)));
+    triggers.push_back(new TriggerNode("judgement", NextAction::array(0, new NextAction("judgement", ACTION_HIGH + 10), nullptr)));
+    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("consecration", ACTION_INTERRUPT), nullptr)));
+    triggers.push_back(new TriggerNode("repentance on enemy healer", NextAction::array(0, new NextAction("repentance on enemy healer", ACTION_INTERRUPT + 2), nullptr)));
+    triggers.push_back(new TriggerNode("repentance on snare target", NextAction::array(0, new NextAction("repentance on snare target", ACTION_INTERRUPT + 2), nullptr)));
+    triggers.push_back(new TriggerNode("repentance", NextAction::array(0, new NextAction("repentance", ACTION_INTERRUPT + 2), nullptr)));
 	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("divine storm", ACTION_HIGH + 1), new NextAction("consecration", ACTION_HIGH + 1), nullptr)));
 	triggers.push_back(new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("hammer of wrath", ACTION_CRITICAL_HEAL), nullptr)));
 }

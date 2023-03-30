@@ -92,6 +92,7 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
     public:
         PaladinTriggerFactoryInternal()
         {
+            creators["judgement"] = &PaladinTriggerFactoryInternal::judgement;
             creators["judgement of wisdom"] = &PaladinTriggerFactoryInternal::judgement_of_wisdom;
             creators["judgement of light"] = &PaladinTriggerFactoryInternal::judgement_of_light;
             creators["blessing"] = &PaladinTriggerFactoryInternal::blessing;
@@ -101,6 +102,8 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["crusader aura"] = &PaladinTriggerFactoryInternal::crusader_aura;
             creators["retribution aura"] = &PaladinTriggerFactoryInternal::retribution_aura;
             creators["devotion aura"] = &PaladinTriggerFactoryInternal::devotion_aura;
+            creators["sanctity aura"] = &PaladinTriggerFactoryInternal::sanctity_aura;
+            creators["concentration aura"] = &PaladinTriggerFactoryInternal::concentration_aura;
             creators["shadow resistance aura"] = &PaladinTriggerFactoryInternal::shadow_resistance_aura;
             creators["frost resistance aura"] = &PaladinTriggerFactoryInternal::frost_resistance_aura;
             creators["fire resistance aura"] = &PaladinTriggerFactoryInternal::fire_resistance_aura;
@@ -119,6 +122,10 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["divine favor"] = &PaladinTriggerFactoryInternal::divine_favor;
             creators["turn undead"] = &PaladinTriggerFactoryInternal::turn_undead;
             creators["avenger's shield"] = &PaladinTriggerFactoryInternal::avenger_shield;
+            creators["consecration"] = &PaladinTriggerFactoryInternal::consecration;
+            creators["repentance on enemy healer"] = &PaladinTriggerFactoryInternal::repentance_on_enemy_healer;
+            creators["repentance on snare target"] = &PaladinTriggerFactoryInternal::repentance_on_snare_target;
+            creators["repentance interrupt"] = &PaladinTriggerFactoryInternal::repentance_interrupt;
         }
 
     private:
@@ -126,6 +133,7 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* divine_favor(PlayerbotAI* botAI) { return new DivineFavorTrigger(botAI); }
         static Trigger* holy_shield(PlayerbotAI* botAI) { return new HolyShieldTrigger(botAI); }
         static Trigger* righteous_fury(PlayerbotAI* botAI) { return new RighteousFuryTrigger(botAI); }
+        static Trigger* judgement(PlayerbotAI* botAI) { return new JudgementTrigger(botAI); }
         static Trigger* judgement_of_wisdom(PlayerbotAI* botAI) { return new JudgementOfWisdomTrigger(botAI); }
         static Trigger* judgement_of_light(PlayerbotAI* botAI) { return new JudgementOfLightTrigger(botAI); }
         static Trigger* blessing(PlayerbotAI* botAI) { return new BlessingTrigger(botAI); }
@@ -135,6 +143,8 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* crusader_aura(PlayerbotAI* botAI) { return new CrusaderAuraTrigger(botAI); }
         static Trigger* retribution_aura(PlayerbotAI* botAI) { return new RetributionAuraTrigger(botAI); }
         static Trigger* devotion_aura(PlayerbotAI* botAI) { return new DevotionAuraTrigger(botAI); }
+        static Trigger* sanctity_aura(PlayerbotAI* botAI) { return new SanctityAuraTrigger(botAI); }
+        static Trigger* concentration_aura(PlayerbotAI* botAI) { return new ConcentrationAuraTrigger(botAI); }
         static Trigger* shadow_resistance_aura(PlayerbotAI* botAI) { return new ShadowResistanceAuraTrigger(botAI); }
         static Trigger* frost_resistance_aura(PlayerbotAI* botAI) { return new FrostResistanceAuraTrigger(botAI); }
         static Trigger* fire_resistance_aura(PlayerbotAI* botAI) { return new FireResistanceAuraTrigger(botAI); }
@@ -149,6 +159,10 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* hammer_of_justice_on_enemy_target(PlayerbotAI* botAI) { return new HammerOfJusticeEnemyHealerTrigger(botAI); }
         static Trigger* hammer_of_justice_on_snare_target(PlayerbotAI* botAI) { return new HammerOfJusticeSnareTrigger(botAI); }
         static Trigger* avenger_shield(PlayerbotAI* botAI) { return new AvengerShieldTrigger(botAI); }
+        static Trigger* consecration(PlayerbotAI* botAI) { return new ConsecrationTrigger(ai); }
+        static Trigger* repentance_on_enemy_healer(PlayerbotAI* botAI) { return new RepentanceOnHealerTrigger(botAI); }
+        static Trigger* repentance_on_snare_target(PlayerbotAI* botAI) { return new RepentanceSnareTrigger(botAI); }
+        static Trigger* repentance_interrupt(PlayerbotAI* botAI) { return new RepentanceInterruptTrigger(botAI); }
 };
 
 class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
@@ -171,6 +185,7 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
             creators["crusader aura"] = &PaladinAiObjectContextInternal::crusader_aura;
             creators["seal of light"] = &PaladinAiObjectContextInternal::seal_of_light;
             creators["devotion aura"] = &PaladinAiObjectContextInternal::devotion_aura;
+            creators["concentration aura"] = &PaladinAiObjectContextInternal::concentration_aura;
             creators["holy wrath"] = &PaladinAiObjectContextInternal::holy_wrath;
             creators["consecration"] = &PaladinAiObjectContextInternal::consecration;
             creators["cleanse disease"] = &PaladinAiObjectContextInternal::cleanse_disease;
@@ -217,6 +232,12 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
             creators["turn undead"] = &PaladinAiObjectContextInternal::turn_undead;
             creators["blessing of protection on party"]   = &PaladinAiObjectContextInternal::blessing_of_protection_on_party;
             creators["righteous defense"] = &PaladinAiObjectContextInternal::righteous_defense;
+            creators["repentance"] = &PaladinAiObjectContextInternal::repentance;
+            creators["repentance on snare target"] = &PaladinAiObjectContextInternal::repentance_on_snare_target;
+            creators["repentance on enemy healer"] = &PaladinAiObjectContextInternal::repentance_on_enemy_healer;
+            creators["sanctity aura"] = &PaladinAiObjectContextInternal::sanctity_aura;
+            creators["holy shock"] = &PaladinAiObjectContextInternal::holy_shock;
+            creators["holy shock on party"] = &PaladinAiObjectContextInternal::holy_shock_on_party;
         }
 
     private:
@@ -239,6 +260,7 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* crusader_aura(PlayerbotAI* botAI) { return new CastCrusaderAuraAction(botAI); }
         static Action* seal_of_light(PlayerbotAI* botAI) { return new CastSealOfLightAction(botAI); }
         static Action* devotion_aura(PlayerbotAI* botAI) { return new CastDevotionAuraAction(botAI); }
+        static Action* concentration_aura(PlayerbotAI* botAI) { return new CastConcentrationAuraAction(botAI); }
         static Action* holy_wrath(PlayerbotAI* botAI) { return new CastHolyWrathAction(botAI); }
         static Action* consecration(PlayerbotAI* botAI) { return new CastConsecrationAction(botAI); }
         static Action* cleanse_poison(PlayerbotAI* botAI) { return new CastCleansePoisonAction(botAI); }
@@ -281,6 +303,12 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* hammer_of_justice_on_enemy_healer(PlayerbotAI* botAI) { return new CastHammerOfJusticeOnEnemyHealerAction(botAI); }
         static Action* hammer_of_justice_on_snare_target(PlayerbotAI* botAI) { return new CastHammerOfJusticeSnareAction(botAI); }
         static Action* righteous_defense(PlayerbotAI* botAI) { return new CastRighteousDefenseAction(botAI); }
+        static Action* repentance(PlayerbotAI* botAI) { return new CastRepentanceAction(botAI); }
+        static Action* repentance_on_snare_target(PlayerbotAI* botAI) { return new CastRepentanceSnareAction(botAI); }
+        static Action* repentance_on_enemy_healer(PlayerbotAI* botAI) { return new CastRepentanceOnHealerAction(botAI); }
+        static Action* sanctity_aura(PlayerbotAI* botAI) { return new CastSanctityAuraAction(botAI); }
+        static Action* holy_shock(PlayerbotAI* botAI) { return new CastHolyShockAction(botAI); }
+        static Action* holy_shock_on_party(PlayerbotAI* botAI) { return new CastHolyShockOnPartyAction(botAI); }
 };
 
 PaladinAiObjectContext::PaladinAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
