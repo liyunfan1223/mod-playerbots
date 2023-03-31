@@ -14,6 +14,7 @@ BUFF_TRIGGER(HolyShieldTrigger, "holy shield");
 BUFF_TRIGGER(RighteousFuryTrigger, "righteous fury");
 
 BUFF_TRIGGER(RetributionAuraTrigger, "retribution aura");
+BUFF_TRIGGER(SanctityAuraTrigger, "sanctity aura");
 
 class CrusaderAuraTrigger : public BuffTrigger
 {

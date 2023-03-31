@@ -159,7 +159,7 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* hammer_of_justice_on_enemy_target(PlayerbotAI* botAI) { return new HammerOfJusticeEnemyHealerTrigger(botAI); }
         static Trigger* hammer_of_justice_on_snare_target(PlayerbotAI* botAI) { return new HammerOfJusticeSnareTrigger(botAI); }
         static Trigger* avenger_shield(PlayerbotAI* botAI) { return new AvengerShieldTrigger(botAI); }
-        static Trigger* consecration(PlayerbotAI* botAI) { return new ConsecrationTrigger(ai); }
+        static Trigger* consecration(PlayerbotAI* botAI) { return new ConsecrationTrigger(botAI); }
         static Trigger* repentance_on_enemy_healer(PlayerbotAI* botAI) { return new RepentanceOnHealerTrigger(botAI); }
         static Trigger* repentance_on_snare_target(PlayerbotAI* botAI) { return new RepentanceSnareTrigger(botAI); }
         static Trigger* repentance_interrupt(PlayerbotAI* botAI) { return new RepentanceInterruptTrigger(botAI); }
