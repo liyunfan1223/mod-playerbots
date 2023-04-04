@@ -565,6 +565,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         if (!urand(0, 3))
             nonCombatEngine->addStrategy("start duel");
 
+        if (sPlayerbotAIConfig->randomBotJoinLfg)
+            nonCombatEngine->addStrategy("lfg");
+
         if (!player->GetGroup() || player->GetGroup()->GetLeaderGUID() == player->GetGUID())
         {
             // let 25% of random not grouped (or grp leader) bots help other players
@@ -582,9 +585,6 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategy("travel");
                 nonCombatEngine->addStrategy("rpg");
             }
-
-            if (sPlayerbotAIConfig->randomBotJoinLfg)
-                nonCombatEngine->addStrategy("lfg");
 
             if (sPlayerbotAIConfig->randomBotJoinBG)
                 nonCombatEngine->addStrategy("bg");
