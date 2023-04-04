@@ -73,6 +73,7 @@ class PlayerbotAIConfig
         bool randomBotSuggestDungeons;
         bool suggestDungeonsInLowerCaseRandomly;
         bool randomBotJoinBG;
+        bool randomBotAutoJoinBG;
         bool randomBotLoginAtStartup;
         uint32 randomBotTeleLevel;
         bool logInGroupOnly, logValuesPerTick;

@@ -32,6 +32,9 @@ AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
 # Enable BG/Arena for random Bots
 AiPlayerbot.RandomBotJoinBG = 1
 
+# Enable Auto join BG - bots randomly join WSG and 2v2 Arena if server is not lagging
+AiPlayerbot.RandomBotAutoJoinBG = 0
+
 # Mark many quests <= Bot level as complete (slows down bot creation)
 AiPlayerbot.PreQuests = 0
 
