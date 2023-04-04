@@ -15,6 +15,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
             creators["sinister strike"] = &sinister_strike;
             creators["kick"] = &kick;
             creators["kidney shot"] = &kidney_shot;
+            creators["slice and dice"] = &slice_and_dice;
             creators["rupture"] = &rupture;
             creators["backstab"] = &backstab;
         }
@@ -68,6 +69,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*C*/ nullptr);
         }
 
+        ACTION_NODE_A(slice_and_dice, "slice and dice", "rupture");
         static ActionNode* backstab([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("backstab",
@@ -91,7 +93,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("combo points available", NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("combo points available", NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 2), nullptr)));
 	triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("feint", ACTION_HIGH), nullptr)));
 	triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("evasion", ACTION_EMERGENCY), new NextAction("feint", ACTION_EMERGENCY), nullptr)));
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("blind", ACTION_EMERGENCY), new NextAction("vanish", ACTION_EMERGENCY), nullptr)));

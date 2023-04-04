@@ -81,6 +81,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
             creators["riposte"] = &RogueAiObjectContextInternal::riposte;
             creators["mutilate"] = &RogueAiObjectContextInternal::mutilate;
             creators["sinister strike"] = &RogueAiObjectContextInternal::sinister_strike;
+            creators["gouge"] = &RogueAiObjectContextInternal::gouge;
             creators["kidney shot"] = &RogueAiObjectContextInternal::kidney_shot;
             creators["rupture"] = &RogueAiObjectContextInternal::rupture;
             creators["slice and dice"] = &RogueAiObjectContextInternal::slice_and_dice;
@@ -111,6 +112,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* riposte(PlayerbotAI* botAI) { return new CastRiposteAction(botAI); }
         static Action* mutilate(PlayerbotAI* botAI) { return new CastMutilateAction(botAI); }
         static Action* sinister_strike(PlayerbotAI* botAI) { return new CastSinisterStrikeAction(botAI); }
+        static Action* gouge(PlayerbotAI* botAI) { return new CastGougeAction(botAI); }
         static Action* kidney_shot(PlayerbotAI* botAI) { return new CastKidneyShotAction(botAI); }
         static Action* rupture(PlayerbotAI* botAI) { return new CastRuptureAction(botAI); }
         static Action* slice_and_dice(PlayerbotAI* botAI) { return new CastSliceAndDiceAction(botAI); }
