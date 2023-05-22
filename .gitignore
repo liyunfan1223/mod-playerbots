@@ -48,3 +48,4 @@ local.properties
 .loadpath
 .project
 .cproject
+.vscode

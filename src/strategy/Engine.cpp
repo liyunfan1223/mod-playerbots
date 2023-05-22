@@ -643,7 +643,7 @@ void Engine::LogAction(char const* format, ...)
         if (sPlayerbotAIConfig->logInGroupOnly && !bot->GetGroup())
             return;
 
-        LOG_INFO("playerbots",  "{} {}", bot->GetName().c_str(), buf);
+        LOG_INFO("playerbots",  "{} {} {} {}", bot->GetName().c_str(), buf, sPlayerbotAIConfig->logInGroupOnly, bot->GetGroup()->GetGroupType());
     }
 }
 
