@@ -266,7 +266,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         if (bot->IsInCombat())
             return false;
 
-        bot->AddUnitState(UNIT_STAND_STATE_SIT);
+        bot->SetStandState(UNIT_STAND_STATE_SIT);
         botAI->InterruptSpell();
 
         float hp = bot->GetHealthPct();

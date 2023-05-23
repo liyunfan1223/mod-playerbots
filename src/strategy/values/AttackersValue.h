@@ -16,7 +16,7 @@ class Unit;
 class AttackersValue : public ObjectGuidListCalculatedValue
 {
 	public:
-        AttackersValue(PlayerbotAI* botAI) : ObjectGuidListCalculatedValue(botAI, "attackers", 2) { }
+        AttackersValue(PlayerbotAI* botAI) : ObjectGuidListCalculatedValue(botAI, "attackers", 1) { }
 
         GuidVector Calculate();
         static bool IsPossibleTarget(Unit* attacker, Player* bot, float range = sPlayerbotAIConfig->sightDistance);

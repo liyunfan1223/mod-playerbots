@@ -53,13 +53,13 @@ bool HunterHasAmmoTrigger::IsActive()
 bool SwitchToRangedTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return botAI->HasStrategy("close", BOT_STATE_COMBAT) && target && (target->GetVictim() != bot ||
+    return botAI->HasStrategy("close", BOT_STATE_COMBAT) && target && (target->GetVictim() != bot &&
         sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
 }
 
 bool SwitchToMeleeTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && target && (target->GetVictim() == bot ||
+    return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && target && (target->GetVictim() == bot &&
         sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
 }

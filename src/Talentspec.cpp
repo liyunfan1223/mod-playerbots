@@ -140,22 +140,11 @@ bool TalentSpec::CheckTalents(uint32 level, std::ostringstream* out)
 //Set the talents for the bots to the current spec.
 void TalentSpec::ApplyTalents(Player* bot, std::ostringstream* out)
 {
-    for (auto& entry : talents)
-        for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
-        {
-            uint32 spellId = entry.talentInfo->RankID[rank];
-            if (!spellId)
-                continue;
-
-            if (bot->HasSpell(spellId) && entry.rank - 1 != rank)
-            {
-                bot->removeSpell(spellId, false, false);
-            }
-            else if (!bot->HasSpell(spellId) && entry.rank - 1 == rank)
-            {
-                bot->learnSpell(spellId);
-            }
-        }
+    for (auto& entry : talents) {
+        if (entry.rank == 0)
+            continue;
+        bot->LearnTalent(entry.talentInfo->TalentID, entry.rank - 1);
+    }
 }
 
 //Returns a base talentlist for a class.

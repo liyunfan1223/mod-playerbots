@@ -428,7 +428,7 @@ void RandomPlayerbotMgr::LoadBattleMastersCache()
             bmTeam = TEAM_HORDE;
 
         BattleMastersCache[bmTeam][BattlegroundTypeId(bgTypeId)].insert(BattleMastersCache[bmTeam][BattlegroundTypeId(bgTypeId)].end(), entry);
-        LOG_INFO("playerbots", "Cached Battmemaster #{} for BG Type {} ({})", entry, bgTypeId, bmTeam == TEAM_ALLIANCE ? "Alliance" : bmTeam == TEAM_HORDE ? "Horde" : "Neutral");
+        LOG_DEBUG("playerbots", "Cached Battmemaster #{} for BG Type {} ({})", entry, bgTypeId, bmTeam == TEAM_ALLIANCE ? "Alliance" : bmTeam == TEAM_HORDE ? "Horde" : "Neutral");
 
     } while (result->NextRow());
 

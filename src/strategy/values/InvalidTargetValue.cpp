@@ -15,7 +15,15 @@ bool InvalidTargetValue::Calculate()
 
     if (target && qualifier == "current target")
     {
-        return !AttackersValue::IsValidTarget(target, bot);
+        return target->GetMapId() != bot->GetMapId() ||
+               !target->IsAlive() ||
+               target->IsPolymorphed() ||
+               target->IsCharmed() ||
+               target->isFeared() ||
+               target->HasUnitState(UNIT_STATE_ISOLATED) ||
+               target->IsFriendlyTo(bot) ||
+               !bot->IsWithinDistInMap(target, sPlayerbotAIConfig->sightDistance) ||
+               !bot->IsWithinLOSInMap(target);
     }
 
     return !target;

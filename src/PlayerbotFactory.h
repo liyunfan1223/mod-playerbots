@@ -128,6 +128,7 @@ class PlayerbotFactory : public InventoryAction
         void ClearSpells();
         void ClearSkills();
         void InitAvailableSpells();
+        void InitClassSpells();
         void InitSpecialSpells();
         void InitTalentsTree(bool incremental);
         void InitTalents(uint32 specNo);

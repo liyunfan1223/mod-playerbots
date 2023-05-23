@@ -128,7 +128,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
 {
     UpdateMovementState();
-
+    LOG_DEBUG("playerbots", "IsMovingAllowed {}", IsMovingAllowed());
     if (!IsMovingAllowed())
         return false;
 
@@ -137,6 +137,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     if (Vehicle* vehicle = bot->GetVehicle())
     {
         VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
+        LOG_DEBUG("playerbots", "!seat || !seat->CanControl() {}", !seat || !seat->CanControl());
         if (!seat || !seat->CanControl())
             return false;
 
@@ -150,6 +151,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         time_t now = time(nullptr);
         if (AI_VALUE(LastMovement&, "last movement").nextTeleport > now) // We can not teleport yet. Wait.
         {
+            LOG_DEBUG("playerbots", "AI_VALUE(LastMovement&, \"last movement\").nextTeleport > now");
             botAI->SetNextCheckDelay((AI_VALUE(LastMovement&, "last movement").nextTeleport - now) * 1000);
             return true;
         }
@@ -169,6 +171,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     if (!isVehicle && !IsMovingAllowed() && bot->isDead())
     {
         bot->StopMoving();
+        LOG_DEBUG("playerbots", "!isVehicle && !IsMovingAllowed() && bot->isDead()");
         return false;
     }
 
@@ -176,6 +179,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     {
         if (!bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
             bot->StopMoving();
+        LOG_DEBUG("playerbots", "!isVehicle && bot->isMoving() && !IsMovingAllowed()");
         return false;
     }
 
@@ -194,6 +198,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             AI_VALUE(LastMovement&, "last movement").clear();
 
         mover->StopMoving();
+        LOG_DEBUG("playerbots", "totalDistance < minDist");
         return false;
     }
 
@@ -222,6 +227,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                     else
                     {
                         lastMove.future = std::async(&TravelNodeMap::getFullPath, startPosition, endPosition, bot);
+                        LOG_DEBUG("playerbots", "lastMove.future = std::async(&TravelNodeMap::getFullPath, startPosition, endPosition, bot);");
                         return true;
                     }
                 }
@@ -240,6 +246,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                         bot->StopMoving();
                         if (botAI->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
                             botAI->TellMasterNoFacing("I have no path");
+                        LOG_DEBUG("playerbots", "sServerFacade->IsDistanceGreaterThan(totalDistance, maxDist * 3)");
                         return false;
                     }
 
@@ -276,7 +283,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
             if (botAI->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
                 botAI->TellMasterNoFacing("Too far from path. Rebuilding.");
-
+            LOG_DEBUG("playerbots", "movePath.empty()");
             return true;
         }
 
@@ -318,8 +325,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             {
                 AI_VALUE(LastMovement&, "last area trigger").lastAreaTrigger = entry;
             }
-            else
+            else {
+                LOG_DEBUG("playerbots", "!entry");
                 return bot->TeleportTo(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), movePosition.getO(), 0);
+            }
         }
 
         if (pathType == TravelNodePathType::transport && entry)
@@ -331,6 +340,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                         transport->AddPassenger(bot, true);
             }
             WaitForReach(100.0f);
+            LOG_DEBUG("playerbots", "pathType == TravelNodePathType::transport && entry");
             return true;
         }
 
@@ -367,7 +377,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 {
                     bot->SetMoney(botMoney);
                 }
-
+                LOG_DEBUG("playerbots", "goTaxi");
                 return goTaxi;
             }
         }
@@ -384,6 +394,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 {
                     movePath.clear();
                     AI_VALUE(LastMovement&, "last movement").setPath(movePath);
+                    LOG_DEBUG("playerbots", "bot->HasSpellCooldown(8690)");
                     return false;
                 }
             }
@@ -402,6 +413,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
         if (botAI->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
             botAI->TellMasterNoFacing("No point. Rebuilding.");
+        LOG_DEBUG("playerbots", "!movePosition || movePosition.getMapId() != bot->GetMapId()");
         return false;
     }
 
@@ -465,7 +477,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
         sPlayerbotAIConfig->log("bot_movement.csv", out.str().c_str());
     }
-
+    LOG_DEBUG("playerbots", "({}, {}) -> ({}, {})", startPosition.getX(), startPosition.getY(), movePosition.getX(), movePosition.getY());
     if (!react)
         if (totalDistance > maxDist)
             WaitForReach(startPosition.distance(movePosition) - 10.0f);
@@ -514,7 +526,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         time_t now = time(nullptr);
 
         AI_VALUE(LastMovement&, "last movement").nextTeleport = now + (time_t)MoveDelay(startPosition.distance(movePosition));
-
+        LOG_DEBUG("playerbots", "totalDistance > maxDist && !detailedMove && !botAI->HasPlayerNearby(&movePosition)");
         return bot->TeleportTo(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), startPosition.getAngleTo(movePosition));
     }
 
@@ -530,11 +542,13 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         bot->SetWalk(true);
 
     bot->SendMovementFlagUpdate();
-
+    LOG_DEBUG("playerbots", "normal move? {} {} {}", !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY), 
+        bot->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE), bot->getStandState());
     if (!bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY))
     {
         bot->SetWalk(masterWalking);
         bot->GetMotionMaster()->MovePoint(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), generatePath);
+        LOG_DEBUG("playerbots", "Movepoint to ({}, {})", movePosition.getX(), movePosition.getY());
     }
     else
     {
@@ -580,6 +594,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
 
         bot->GetMotionMaster()->MovePoint(movePosition.getMapId(), Position(movePosition.getX(), movePosition.getY(), movePosition.getZ(), 0.f));
+        LOG_DEBUG("playerbots", "Movepoint to ({}, {})", movePosition.getX(), movePosition.getY());
     }
 
     AI_VALUE(LastMovement&, "last movement").setShort(movePosition);
@@ -587,6 +602,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     if (!idle)
         ClearIdleState();
 
+    LOG_DEBUG("playerbots", "return true in the end");
     return true;
 }
 
@@ -990,8 +1006,9 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
         botAI->InterruptSpell();
     }
 
-    bot->GetMotionMaster()->Clear();
+    // bot->GetMotionMaster()->Clear();
     bot->GetMotionMaster()->MoveChase((Unit*) obj, distance, angle);
+    WaitForReach(bot->GetExactDist2d(obj) - distance);
     return true;
 }
 

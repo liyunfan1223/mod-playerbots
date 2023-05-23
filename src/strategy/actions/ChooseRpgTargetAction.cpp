@@ -188,7 +188,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     if (targets.empty())
     {
-        LOG_INFO("playerbots", "{} can't choose RPG target: all {} are not available", bot->GetName().c_str(), possibleTargets.size());
+        LOG_DEBUG("playerbots", "{} can't choose RPG target: all {} are not available", bot->GetName().c_str(), possibleTargets.size());
         RESET_AI_VALUE(GuidSet&, "ignore rpg target");
         RESET_AI_VALUE(GuidPosition, "rpg target");
         return false;

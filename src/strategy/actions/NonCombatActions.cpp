@@ -29,8 +29,7 @@ bool DrinkAction::Execute(Event event)
             botAI->SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
             return false;
         }
-
-        bot->AddUnitState(UNIT_STAND_STATE_SIT);
+        bot->SetStandState(UNIT_STAND_STATE_SIT);
         botAI->InterruptSpell();
 
         //float hp = bot->GetHealthPercent();
@@ -82,7 +81,7 @@ bool EatAction::Execute(Event event)
             return false;
         }
 
-        bot->AddUnitState(UNIT_STAND_STATE_SIT);
+        bot->SetStandState(UNIT_STAND_STATE_SIT);
         botAI->InterruptSpell();
 
         float hp = bot->GetHealthPct();

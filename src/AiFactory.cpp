@@ -91,39 +91,24 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
 
 std::map<uint8, uint32> AiFactory::GetPlayerSpecTabs(Player* bot)
 {
-    std::map<uint8, uint32> tabs;
-    for (uint32 i = 0; i < 3; i++)
-        tabs[i] = 0;
-
-    uint32 classMask = bot->getClassMask();
-    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    std::map<uint8, uint32> tabs = {{0, 0}, {0, 0}, {0, 0}};
+    const PlayerTalentMap& talentMap = bot->GetTalentMap();
+    for (PlayerTalentMap::const_iterator i = talentMap.begin(); i != talentMap.end(); ++i)
     {
-        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
+        uint32 spellId = i->first;
+        TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
+        if(!talentPos)
+            continue;
+
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentPos->talent_id);
         if (!talentInfo)
             continue;
 
-        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-        if (!talentTabInfo)
-            continue;
-
-        if ((classMask & talentTabInfo->ClassMask) == 0)
-            continue;
-
-        uint32 maxRank = 0;
-        for (int32 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
-        {
-            if (!talentInfo->RankID[rank])
-                continue;
-
-            uint32 spellid = talentInfo->RankID[rank];
-            if (spellid && bot->HasSpell(spellid))
-                maxRank = rank + 1;
-
-        }
-
-        tabs[talentTabInfo->tabpage] += maxRank;
+        uint32 const* talentTabIds = GetTalentTabPages(bot->getClass());
+        if (talentInfo->TalentTab == talentTabIds[0]) tabs[0]++;
+        if (talentInfo->TalentTab == talentTabIds[1]) tabs[1]++;
+        if (talentInfo->TalentTab == talentTabIds[2]) tabs[2]++;
     }
-
     return tabs;
 }
 
@@ -554,7 +539,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     if (!player->InBattleground())
     {
         nonCombatEngine->addStrategies("nc", "food", "chat", "follow",
-            "default", "quest", "loot", "gather", "duel", "emote", "buff", "mount", nullptr);
+            "default", "quest", "loot", "gather", "duel", "buff", "mount", nullptr);
     }
 
     if ((facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
@@ -578,7 +563,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategy("collision");
             nonCombatEngine->addStrategy("grind");
             // nonCombatEngine->addStrategy("group");
-            nonCombatEngine->addStrategy("guild");
+            // nonCombatEngine->addStrategy("guild");
 
             if (sPlayerbotAIConfig->autoDoQuests)
             {
@@ -607,7 +592,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         nonCombatEngine->addStrategy("collision");
                         nonCombatEngine->addStrategy("grind");
                         // nonCombatEngine->addStrategy("group");
-                        nonCombatEngine->addStrategy("guild");
+                        // nonCombatEngine->addStrategy("guild");
 
                         if (sPlayerbotAIConfig->autoDoQuests)
                         {
@@ -634,7 +619,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     // Battleground switch
     if (player->InBattleground() && player->GetBattleground())
     {
-        nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp", "collision", "dps assist", "attack tagged", "emote", nullptr);
+        nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp", "collision", "dps assist", "attack tagged", nullptr);
         nonCombatEngine->removeStrategy("custom::say");
         nonCombatEngine->removeStrategy("travel");
         nonCombatEngine->removeStrategy("rpg");

@@ -76,18 +76,19 @@ void PlayerbotFactory::Prepare()
 {
     if (!itemQuality)
     {
-        if (level < 20)
-            itemQuality = urand(ITEM_QUALITY_NORMAL, ITEM_QUALITY_UNCOMMON);
-        else if (level < 40)
-            itemQuality = urand(ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_RARE);
-        else if (level < 60)
-            itemQuality = urand(ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_EPIC);
-        else if (level < 70)
-            itemQuality = urand(ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC);
-        else if (level < 80)
-            itemQuality = urand(ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC);
-        else
-            itemQuality = urand(ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC);
+        itemQuality = ITEM_QUALITY_RARE;
+        // if (level < 20)
+        //     itemQuality = urand(ITEM_QUALITY_NORMAL, ITEM_QUALITY_UNCOMMON);
+        // else if (level < 40)
+        //     itemQuality = urand(ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_RARE);
+        // else if (level < 60)
+        //     itemQuality = urand(ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_EPIC);
+        // else if (level < 70)
+        //     itemQuality = urand(ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC);
+        // else if (level < 80)
+        //     itemQuality = urand(ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC);
+        // else
+        //     itemQuality = urand(ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC);
     }
 
     if (bot->isDead())
@@ -177,6 +178,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
     LOG_INFO("playerbots", "Initializing spells (step 1)...");
+    // InitClassSpells();
     InitAvailableSpells();
     if (pmo)
         pmo->finish();
@@ -184,7 +186,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     LOG_INFO("playerbots", "Initializing skills (step 1)...");
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills1");
     InitSkills();
-    InitTradeSkills();
+    // InitTradeSkills();
     if (pmo)
         pmo->finish();
 
@@ -213,7 +215,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills2");
     LOG_INFO("playerbots", "Initializing skills (step 2)...");
-    UpdateTradeSkills();
+    // UpdateTradeSkills();
     bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
@@ -281,7 +283,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
     LOG_INFO("playerbots", "Initializing inventory...");
-    InitInventory();
+    // InitInventory();
     if (pmo)
         pmo->finish();
 
@@ -1793,6 +1795,100 @@ void PlayerbotFactory::InitAvailableSpells()
         bot->learnSpell(20271, false);
 }
 
+void PlayerbotFactory::InitClassSpells()
+{
+    int32_t level = bot->getLevel();
+    switch (bot->getClass())
+    {
+        case CLASS_WARRIOR:
+            bot->learnSpell(78, false);
+            bot->learnSpell(2457, false);
+            if (level >= 10) {
+                bot->learnSpell(71, false); // Defensive Stance
+                bot->learnSpell(355, false); // Taunt
+                bot->learnSpell(7386, false); // Sunder Armor
+            }
+            if (level >= 30) {
+                bot->learnSpell(2458, false); // Berserker Stance
+            }
+            break;
+        case CLASS_PALADIN:
+            bot->learnSpell(21084, false);
+            bot->learnSpell(635, false);
+            if (level >= 12) {
+                bot->learnSpell(7328, false); // Redemption
+            }
+            break;
+        case CLASS_ROGUE:
+            bot->learnSpell(1752, false);
+            bot->learnSpell(2098, false);
+            break;
+        case CLASS_DEATH_KNIGHT:
+            bot->learnSpell(45477, false);
+            bot->learnSpell(47541, false);
+            bot->learnSpell(45462, false);
+            bot->learnSpell(45902, false);
+            //to leave DK starting area 
+            bot->learnSpell(50977, false);
+            break;
+        case CLASS_HUNTER:
+            bot->learnSpell(2973, false);
+            bot->learnSpell(75, false);
+            if (level >= 10) {
+                bot->learnSpell(883, false); // call pet
+                bot->learnSpell(1515, false); // tame pet
+                bot->learnSpell(6991, false); // feed pet
+                bot->learnSpell(982, false); // revive pet
+            }
+            break;
+        case CLASS_PRIEST:
+            bot->learnSpell(585, false);
+            bot->learnSpell(2050, false);
+            break;
+        case CLASS_MAGE:
+            bot->learnSpell(133, false);
+            bot->learnSpell(168, false);
+            break;
+        case CLASS_WARLOCK:
+            bot->learnSpell(687, false);
+            bot->learnSpell(686, false);
+            if (level >= 10) {
+                bot->learnSpell(697, false); // summon voidwalker
+            }
+            if (level >= 20) {
+                bot->learnSpell(712, false); // summon succubus
+            }
+            if (level >= 30) {
+                bot->learnSpell(691, false); // summon felhunter
+            }
+            break;
+        case CLASS_DRUID:
+            bot->learnSpell(5176, false);
+            bot->learnSpell(5185, false);
+            if (level >= 10) {
+                bot->learnSpell(5487, false); // bear form
+                bot->learnSpell(6795, false); // Growl
+                bot->learnSpell(6807, false); // Maul
+            }
+            break;
+        case CLASS_SHAMAN:
+            bot->learnSpell(403, false);
+            bot->learnSpell(331, false);
+            if (level >= 4) {
+                bot->learnSpell(8071, false); // stoneskin totem
+            }
+            if (level >= 10) {
+                bot->learnSpell(3599, false); // searing totem
+            }
+            if (level >= 20) {
+                bot->learnSpell(5394, false); // healing stream totem
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void PlayerbotFactory::InitSpecialSpells()
 {
     for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotSpellIds.begin(); i != sPlayerbotAIConfig->randomBotSpellIds.end(); ++i)
@@ -1800,6 +1896,11 @@ void PlayerbotFactory::InitSpecialSpells()
         uint32 spellId = *i;
         bot->learnSpell(spellId);
     }
+    // to leave DK starting area 
+	if (bot->getClass() == CLASS_DEATH_KNIGHT)
+	{
+		bot->learnSpell(50977, false);
+	}
 }
 
 void PlayerbotFactory::InitTalents(uint32 specNo)

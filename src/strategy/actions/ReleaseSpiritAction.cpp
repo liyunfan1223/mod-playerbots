@@ -124,7 +124,7 @@ bool AutoReleaseSpiritAction::isUseful()
 
 bool RepopAction::Execute(Event event)
 {
-    LOG_INFO("playerbots", "Bot {} {}:{} <{}> repops at graveyard", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
+    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> repops at graveyard", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
 
     int64 deadTime;
 
