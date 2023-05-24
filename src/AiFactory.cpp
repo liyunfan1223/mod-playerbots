@@ -560,7 +560,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategy("attack tagged");
 
             nonCombatEngine->addStrategy("pvp");
-            nonCombatEngine->addStrategy("collision");
+            // nonCombatEngine->addStrategy("collision");
             nonCombatEngine->addStrategy("grind");
             // nonCombatEngine->addStrategy("group");
             // nonCombatEngine->addStrategy("guild");
@@ -589,7 +589,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                     if (masterBotAI || sRandomPlayerbotMgr->IsRandomBot(player))
                     {
                         nonCombatEngine->addStrategy("pvp");
-                        nonCombatEngine->addStrategy("collision");
+                        // nonCombatEngine->addStrategy("collision");
                         nonCombatEngine->addStrategy("grind");
                         // nonCombatEngine->addStrategy("group");
                         // nonCombatEngine->addStrategy("guild");

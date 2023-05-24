@@ -42,10 +42,10 @@ bool DrinkAction::Execute(Event event)
         else
             delay = 20000.0f * (100 - p) / 100.0f;
 
-        botAI->CastSpell(24707, bot);
         botAI->SetNextCheckDelay(delay);
+        
 
-        return true;
+        return botAI->CastSpell(24707, bot);
     }
 
     return UseItemAction::Execute(event);

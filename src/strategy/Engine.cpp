@@ -545,7 +545,7 @@ std::vector<std::string> Engine::GetStrategies()
         result.push_back(i->first);
     }
 
-    return std::move(result);
+    return result;
 }
 
 void Engine::PushAgain(ActionNode* actionNode, float relevance, Event event)

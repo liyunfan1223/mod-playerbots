@@ -15,7 +15,7 @@ GuidVector AttackersValue::Calculate()
 
     GuidVector result;
     if (!botAI->AllowActivity(ALL_ACTIVITY))
-        return std::move(result);
+        return result;
 
     AddAttackersOf(bot, targets);
 
@@ -30,7 +30,7 @@ GuidVector AttackersValue::Calculate()
     if (bot->duel && bot->duel->Opponent)
         result.push_back(bot->duel->Opponent->GetGUID());
 
-	return std::move(result);
+	return result;
 }
 
 void AttackersValue::AddAttackersOf(Group* group, std::set<Unit*>& targets)

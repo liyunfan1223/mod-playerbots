@@ -73,7 +73,7 @@ std::vector<std::string> AiObjectContext::Save()
         result.push_back(out.str());
     }
 
-    return std::move(result);
+    return result;
 }
 
 void AiObjectContext::Load(std::vector<std::string> data)

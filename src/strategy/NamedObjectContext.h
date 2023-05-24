@@ -228,7 +228,7 @@ class NamedObjectContextList
                     result.insert(*j);
             }
 
-            return std::move(result);
+            return result;
         }
 
         std::set<std::string> GetCreated()
@@ -242,7 +242,7 @@ class NamedObjectContextList
                     result.insert(*j);
             }
 
-            return std::move(result);
+            return result;
         }
 
     private:

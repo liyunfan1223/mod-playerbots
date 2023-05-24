@@ -119,7 +119,7 @@ std::vector<uint32> SuggestWhatToDoAction::GetIncompletedQuests()
             result.push_back(questId);
     }
 
-    return std::move(result);
+    return result;
 }
 
 void SuggestWhatToDoAction::specificQuest()
