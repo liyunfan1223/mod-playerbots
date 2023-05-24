@@ -98,7 +98,7 @@ void PlayerbotFactory::Prepare()
 
     if (!sPlayerbotAIConfig->disableRandomLevels)
     {
-        bot->SetLevel(level);
+        bot->GiveLevel(level);
     }
     else if (bot->getLevel() < sPlayerbotAIConfig->randombotStartingLevel)
     {
@@ -125,7 +125,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     LOG_INFO("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
-
+    bot->SaveToDB(false, false);
     LOG_INFO("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
     bot->resetTalents(true);
@@ -143,6 +143,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
+    bot->resetTalents(true);
+    bot->SaveToDB(false, false);
     /*
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Immersive");
     LOG_INFO("playerbots", "Initializing immersive...");
@@ -178,7 +180,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
     LOG_INFO("playerbots", "Initializing spells (step 1)...");
-    // InitClassSpells();
+    InitClassSpells();
     InitAvailableSpells();
     if (pmo)
         pmo->finish();
@@ -1344,44 +1346,19 @@ void PlayerbotFactory::InitSecondEquipmentSet()
 
 void PlayerbotFactory::InitBags()
 {
-    std::vector<uint32> ids;
-
-    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-    for (auto const& itr : *itemTemplates)
-    {
-        ItemTemplate const* proto = &itr.second;
-        if (!proto || proto->Class != ITEM_CLASS_CONTAINER)
-            continue;
-
-        if (!CanEquipItem(proto, ITEM_QUALITY_NORMAL))
-            continue;
-
-        ids.push_back(itr.first);
-    }
-
-    if (ids.empty())
-    {
-        LOG_ERROR("playerbots", "{}: no bags found", bot->GetName().c_str());
-        return;
-    }
-
     for (uint8 slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; ++slot)
     {
-        for (uint32 attempts = 0; attempts < 15; attempts++)
+        uint32 newItemId = 23162;
+
+        uint16 dest;
+        if (!CanEquipUnseenItem(slot, dest, newItemId))
+            continue;
+
+        Item* newItem = bot->EquipNewItem(dest, newItemId, true);
+        if (newItem)
         {
-            uint32 index = urand(0, ids.size() - 1);
-            uint32 newItemId = ids[index];
-
-            uint16 dest;
-            if (!CanEquipUnseenItem(slot, dest, newItemId))
-                continue;
-
-            if (Item* newItem = bot->EquipNewItem(dest, newItemId, true))
-            {
-                newItem->AddToWorld();
-                newItem->AddToUpdateQueueOf(bot);
-                break;
-            }
+            newItem->AddToWorld();
+            newItem->AddToUpdateQueueOf(bot);
         }
     }
 }
@@ -1791,8 +1768,8 @@ void PlayerbotFactory::InitAvailableSpells()
                 bot->learnSpell(tSpell->spell);
 		}
     }
-    if (bot->IsSpellFitByClassAndRace(20271) && !bot->HasSpell(20271)) // judgement missing
-        bot->learnSpell(20271, false);
+    // if (bot->IsSpellFitByClassAndRace(20271) && !bot->HasSpell(20271)) // judgement missing
+    //     bot->learnSpell(20271, false);
 }
 
 void PlayerbotFactory::InitClassSpells()

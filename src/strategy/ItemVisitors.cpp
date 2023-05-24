@@ -85,3 +85,8 @@ bool FindItemUsageVisitor::Accept(ItemTemplate const* proto)
 
     return false;
 }
+
+bool FindUsableNamedItemVisitor::Accept(ItemTemplate const* proto)
+{
+    return true;
+}

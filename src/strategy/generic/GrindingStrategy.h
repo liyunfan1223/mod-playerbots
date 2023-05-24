@@ -16,7 +16,7 @@ class GrindingStrategy : public NonCombatStrategy
 
         std::string const getName() override { return "grind"; }
         uint32 GetType() const override { return STRATEGY_TYPE_DPS; }
-        NextAction** getDefaultActions();
+        NextAction** getDefaultActions() override;
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 

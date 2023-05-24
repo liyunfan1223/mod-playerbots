@@ -1525,7 +1525,7 @@ std::string const RandomPlayerbotMgr::GetEventData(uint32 bot, std::string const
         data = e.data;
     }
 
-    return std::move(data);
+    return data;
 }
 
 uint32 RandomPlayerbotMgr::SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn, std::string const data)

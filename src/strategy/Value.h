@@ -20,6 +20,7 @@ class UntypedValue : public AiNamedObject
 {
     public:
         UntypedValue(PlayerbotAI* botAI, std::string const name) : AiNamedObject(botAI, name) { }
+        virtual ~UntypedValue() { }
         virtual void Update() { }
         virtual void Reset() { }
         virtual std::string const Format() { return "?"; }

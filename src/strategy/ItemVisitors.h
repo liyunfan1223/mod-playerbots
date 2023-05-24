@@ -411,4 +411,12 @@ class FindItemUsageVisitor : public FindUsableItemVisitor
         ItemUsage usage;
 };
 
+class FindUsableNamedItemVisitor : public FindUsableItemVisitor
+{
+    public:
+        FindUsableNamedItemVisitor(Player* bot): FindUsableItemVisitor(bot) {}
+
+        bool Accept(ItemTemplate const* proto) override;
+
+};
 #endif
