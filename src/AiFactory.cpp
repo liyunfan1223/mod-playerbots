@@ -251,7 +251,7 @@ std::string AiFactory::GetPlayerSpecName(Player* player)
             break;
     }
 
-    return std::move(specName);
+    return specName;
 }
 
 void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const facade, Engine* engine)

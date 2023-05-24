@@ -24,7 +24,7 @@ struct BotTextEntry
 
 struct ChatReplyData
 {
-    ChatReplyData(uint32 guid, uint32 type, std::string chat) : m_guid(guid), m_type(type), m_chat(chat) {}
+    ChatReplyData(uint32 guid, uint32 type, std::string chat) : m_type(type), m_guid(guid), m_chat(chat) {}
     uint32 m_type, m_guid = 0;
     std::string m_chat = "";
 };
