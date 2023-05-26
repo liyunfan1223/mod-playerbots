@@ -84,6 +84,8 @@ class PlayerbotAIConfig
         uint32 randomBotMinLevel, randomBotMaxLevel;
         float randomChangeMultiplier;
         uint32 specProbability[MAX_CLASSES][10];
+        // [(tab, row, col, level)]
+        std::vector<std::vector<uint32>> defaultTalentsOrder[MAX_CLASSES][3];
         std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
         ClassSpecs classSpecs[MAX_CLASSES];
         std::string commandPrefix, commandSeparator;

@@ -3573,13 +3573,13 @@ void PlayerbotAI::EnchantItemT(uint32 spellid, uint8 slot)
     uint32 enchantid = spellInfo->Effects[0].MiscValue;
     if (!enchantid)
     {
-        LOG_ERROR("playerbots", "{}: Invalid enchantid ", enchantid, " report to devs", bot->GetName().c_str());
+        // LOG_ERROR("playerbots", "{}: Invalid enchantid ", enchantid, " report to devs", bot->GetName().c_str());
         return;
     }
 
     if (!((1 << pItem->GetTemplate()->SubClass) & spellInfo->EquippedItemSubClassMask) && !((1 << pItem->GetTemplate()->InventoryType) & spellInfo->EquippedItemInventoryTypeMask))
     {
-        LOG_ERROR("playerbots", "{}: items could not be enchanted, wrong item type equipped", bot->GetName().c_str());
+        // LOG_ERROR("playerbots", "{}: items could not be enchanted, wrong item type equipped", bot->GetName().c_str());
         return;
     }
 

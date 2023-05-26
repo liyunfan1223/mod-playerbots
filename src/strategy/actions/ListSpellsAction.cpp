@@ -13,6 +13,10 @@ bool CompareSpells(std::pair<uint32, std::string>& s1, std::pair<uint32, std::st
 {
     SpellInfo const* si1 = sSpellMgr->GetSpellInfo(s1.first);
     SpellInfo const* si2 = sSpellMgr->GetSpellInfo(s2.first);
+    if (!si1 || !si2) {
+        LOG_ERROR("playerbots", "SpellInfo missing.");
+        return false;
+    }
     uint32 p1 = si1->SchoolMask * 20000;
     uint32 p2 = si2->SchoolMask * 20000;
 
