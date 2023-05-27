@@ -158,6 +158,24 @@ bool PlayerbotAIConfig::Initialize()
 
     for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
     {
+        for (uint32 spec = 0; spec < 3; ++spec)
+        {
+            std::ostringstream os; os << "AiPlayerbot.RandomClassSpecProbability." << cls << "." << spec;
+            specProbability[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
+            
+            os.str("");
+            os.clear();
+            os << "AiPlayerbot.DefaultTalentsOrder." << cls << "." << spec;
+            std::string temp_talents_order = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
+            defaultTalentsOrder[cls][spec] = ParseTempTalentsOrder(temp_talents_order);
+            if (defaultTalentsOrder[cls][spec].size() > 0) {
+                sLog->outMessage("playerbot", LOG_LEVEL_INFO, "default talents order for cls %d spec %d loaded.", cls, spec);
+            }
+        }
+    }
+
+    for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
+    {
         classSpecs[cls] = ClassSpecs(1 << (cls - 1));
 
         for (uint32 spec = 0; spec < MAX_LEVEL; ++spec)
@@ -490,4 +508,38 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
             worldBuffs.push_back(wb);
         }
     }
+}
+
+static std::vector<std::string> split(const std::string &str, const std::string &pattern)
+{
+    std::vector<std::string> res;
+    if(str == "")
+        return res;
+    //在字符串末尾也加入分隔符，方便截取最后一段
+    std::string strs = str + pattern;
+    size_t pos = strs.find(pattern);
+
+    while(pos != strs.npos)
+    {
+        std::string temp = strs.substr(0, pos);
+        res.push_back(temp);
+        //去掉已分割的字符串,在剩下的字符串中进行分割
+        strs = strs.substr(pos+1, strs.size());
+        pos = strs.find(pattern);
+    }
+
+    return res;
+}
+
+std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(std::string temp_talents_order) {
+    std::vector<std::vector<uint32>> res;
+    std::vector<std::string> pieces = split(temp_talents_order, ",");
+    for (std::string piece : pieces) {
+        uint32 tab, row, col, lvl;
+        if (sscanf(piece.c_str(), "%u-%u-%u-%u", &tab, &row, &col, &lvl) == -1) {
+            break;
+        }
+        res.push_back({tab, row, col, lvl});
+    }
+    return res;
 }

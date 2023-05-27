@@ -3,11 +3,16 @@
  */
 
 #include "CharacterPackets.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "PlayerbotMgr.h"
 #include "Playerbots.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
 #include "WorldSession.h"
 #include "ChannelMgr.h"
+#include <cstring>
+#include <string>
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false)
 {
@@ -417,6 +422,10 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     botAI->TellMaster("Hello!");
 
+    if (master && master->GetGroup() && !group) {
+        master->GetGroup()->AddMember(bot);
+    }
+
     // bots join World chat if not solo oriented
     if (bot->getLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
     {
@@ -609,7 +618,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     if (!*args)
     {
         messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
-        return std::move(messages);
+        return messages;
     }
 
     char* cmd = strtok ((char*)args, " ");
@@ -617,13 +626,13 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     if (!cmd)
     {
         messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
-        return std::move(messages);
+        return messages;
     }
 
     if (!strcmp(cmd, "list"))
     {
         messages.push_back(ListBots(master));
-        return std::move(messages);
+        return messages;
     }
 
     if (!strcmp(cmd, "reload"))
@@ -663,10 +672,103 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         return messages;
     }
 
+    if (!strcmp(cmd, "lookup"))
+    {
+        messages.push_back(LookupBots(master));
+        return messages;
+    }
+
+    if (!strcmp(cmd, "addclass"))
+    {
+        uint8 claz;
+        if (!strcmp(charname, "warrior"))
+        {
+            claz = 1;
+        }
+        else if (!strcmp(charname, "paladin"))
+        {
+            claz = 2;
+        }                
+        else if (!strcmp(charname, "hunter"))
+        {
+            claz = 3;
+        }
+        else if (!strcmp(charname, "rogue"))
+        {
+            claz = 4;
+        }                
+        else if (!strcmp(charname, "priest"))
+        {
+            claz = 5;
+        }                
+        else if (!strcmp(charname, "shaman"))
+        {
+            claz = 7;
+        }                
+        else if (!strcmp(charname, "mage"))
+        {
+            claz = 8;
+        }                
+        else if (!strcmp(charname, "warlock"))
+        {
+            claz = 9;
+        }                
+        else if (!strcmp(charname, "druid"))
+        {
+            claz = 11;
+        }
+        else if (!strcmp(charname, "dk"))
+        {
+            claz = 6;
+        }
+        else
+        {
+            messages.push_back("Error: Invalid Class. Try again.");
+            return messages;
+        }
+        uint8 master_race = master->getRace();
+        std::string race_limit;
+        switch (master_race)
+        {
+            case 1:
+            case 3:
+            case 4:
+            case 7:
+            case 11:
+                race_limit = "1, 3, 4, 7, 11";
+                break;
+            case 2: 
+            case 5:
+            case 6:
+            case 8:
+            case 10:
+                race_limit = "2, 5, 6, 8, 10";
+                break;
+        }
+        QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) ORDER BY RAND() LIMIT 1", claz, race_limit);
+        if (results)
+        {
+            Field* fields = results->Fetch();
+            ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
+            AddPlayerBot(guid, master->GetSession()->GetAccountId());
+            
+            messages.push_back("addclass " + std::string(charname) + " ok");
+            return messages;
+        }
+        messages.push_back("addclass failed.");
+        return messages;
+    }
+
     if (!charname)
     {
-        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
-        return std::move(messages);
+        Player* tPlayer = ObjectAccessor::FindConnectedPlayer(master->GetTarget());
+        if (tPlayer) {
+            charname = new char[tPlayer->GetName().size() + 1];
+            strcpy(charname, tPlayer->GetName().c_str());
+        } else {
+            messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
+            return messages;
+        }
     }
 
     std::string const cmdStr = cmd;
@@ -679,7 +781,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         if (!group)
         {
             messages.push_back("you must be in group");
-            return std::move(messages);
+            return messages;
         }
 
         Group::MemberSlotList slots = group->GetMemberSlots();
@@ -754,7 +856,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         messages.push_back(out.str());
     }
 
-    return std::move(messages);
+    return messages;
 }
 
 uint32 PlayerbotHolder::GetAccountId(std::string const name)
@@ -868,6 +970,28 @@ std::string const PlayerbotHolder::ListBots(Player* master)
     }
 
     return out.str();
+}
+
+std::string const PlayerbotHolder::LookupBots(Player* master)
+{
+    std::list<std::string> messages;
+    messages.push_back("Classes Available:");
+    messages.push_back("|TInterface\\icons\\INV_Sword_27.png:25:25:0:-1|t Warrior");
+    messages.push_back("|TInterface\\icons\\INV_Hammer_01.png:25:25:0:-1|t Paladin");
+    messages.push_back("|TInterface\\icons\\INV_Weapon_Bow_07.png:25:25:0:-1|t Hunter");
+    messages.push_back("|TInterface\\icons\\INV_ThrowingKnife_04.png:25:25:0:-1|t Rogue");
+    messages.push_back("|TInterface\\icons\\INV_Staff_30.png:25:25:0:-1|t Priest");
+    messages.push_back("|TInterface\\icons\\inv_jewelry_talisman_04.png:25:25:0:-1|t Shaman");
+    messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Mage");
+    messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Warlock");
+    messages.push_back("|TInterface\\icons\\Ability_Druid_Maul.png:25:25:0:-1|t Druid");
+    messages.push_back("DK");
+    messages.push_back("(Usage: .bot lookup CLASS)");
+    std::string ret_msg;
+    for (std::string msg: messages) {
+        ret_msg += msg + "\n";
+    }
+    return ret_msg;
 }
 
 PlayerbotMgr::PlayerbotMgr(Player* const master) : PlayerbotHolder(),  master(master), lastErrorTell(0)

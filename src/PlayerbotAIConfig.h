@@ -170,7 +170,8 @@ class PlayerbotAIConfig
         void log(std::string const fileName, const char* str, ...);
 
         void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
-
+    private:
+        std::vector<std::vector<uint32>> ParseTempTalentsOrder(std::string temp_talents_order);
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

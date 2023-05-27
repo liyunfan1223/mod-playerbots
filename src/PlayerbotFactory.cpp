@@ -17,6 +17,7 @@
 #include "InventoryAction.h"
 #include "SharedDefines.h"
 #include <random>
+#include <utility>
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 #define ITEM_SUBCLASS_SINGLE_HAND (\
@@ -133,9 +134,9 @@ void PlayerbotFactory::Randomize(bool incremental)
     bot->SaveToDB(false, false);
     if (!incremental)
     {
-        ClearInventory();
         ResetQuests();
     }
+    ClearInventory();
     bot->SaveToDB(false, false);
 
     bot->GiveLevel(level);
@@ -1820,73 +1821,6 @@ void PlayerbotFactory::InitAvailableSpells()
             }
         }
     }
-    // bot->LearnDefaultSkills();
-    // bot->LearnCustomSpells();
-    // bot->learnQuestRewardedSpells();
-
-    // CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
-    // for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
-    // {
-    //     if (itr->second.trainer_type != TRAINER_TYPE_TRADESKILLS && itr->second.trainer_type != TRAINER_TYPE_CLASS)
-    //         continue;
-
-    //     if (itr->second.trainer_type == TRAINER_TYPE_CLASS && itr->second.trainer_class != bot->getClass())
-    //         continue;
-
-    //     TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(itr->second.Entry);
-    //     if (!trainer_spells)
-    //         continue;
-
-	// 	for (TrainerSpellMap::const_iterator iter = trainer_spells->spellList.begin(); iter != trainer_spells->spellList.end(); ++iter)
-	// 	{
-	// 		TrainerSpell const* tSpell = &iter->second;
-	// 		if (!tSpell)
-	// 			continue;
-
-	// 		TrainerSpellState state = bot->GetTrainerSpellState(tSpell);
-	// 		if (state != TRAINER_SPELL_GREEN)
-	// 			continue;
-
-	// 	    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tSpell->spell);
-	// 	    if (!spellInfo)
-	// 	        continue;
-
-    //         if (itr->second.trainer_type == TRAINER_TYPE_TRADESKILLS)
-    //         {
-    //             std::string const SpellName = spellInfo->SpellName[0];
-    //             if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_SKILL_STEP)
-    //             {
-    //                 uint32 skill = spellInfo->Effects[EFFECT_1].MiscValue;
-    //                 if (skill && !bot->HasSkill(skill))
-    //                 {
-    //                     SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
-    //                     if (pSkill)
-    //                     {
-    //                         if (SpellName.find("Apprentice") != std::string::npos && pSkill->categoryId == SKILL_CATEGORY_PROFESSION || pSkill->categoryId == SKILL_CATEGORY_SECONDARY)
-    //                             continue;
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         // bool learned = false;
-    //         // for (uint8 j = 0; j < 3; ++j)
-    //         // {
-    //         //     if (!tSpell->learnedSpell[j] && !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[j]))
-    //         //         continue;
-
-    //         //     if (spellInfo->Effects[j].Effect == SPELL_EFFECT_LEARN_SPELL)
-    //         //     {
-    //         //         uint32 learnedSpell = spellInfo->Effects[j].TriggerSpell;
-    //         //         bot->learnSpell(learnedSpell);
-    //         //         learned = true;
-    //         //     }
-    //         // }
-
-    //         // if (!learned)
-    //         bot->learnSpell(tSpell->spell);
-	// 	}
-    // }
 }
 
 void PlayerbotFactory::InitClassSpells()
@@ -1969,6 +1903,7 @@ void PlayerbotFactory::InitClassSpells()
         case CLASS_SHAMAN:
             bot->learnSpell(403, true);
             bot->learnSpell(331, true);
+            bot->learnSpell(66747, false); // Totem of the Earthen Ring
             if (level >= 4) {
                 bot->learnSpell(8071, false); // stoneskin totem
             }
@@ -2347,182 +2282,148 @@ void PlayerbotFactory::InitPotions()
 
 void PlayerbotFactory::InitFood()
 {
-    uint32 categories[] = { 11, 59 };
-    for (uint8 i = 0; i < 2; ++i)
+    std::map<uint32, std::vector<uint32> > items;
+    ItemTemplateContainer const* itemTemplateContainer = sObjectMgr->GetItemTemplateStore();
+    for (ItemTemplateContainer::const_iterator i = itemTemplateContainer->begin(); i != itemTemplateContainer->end(); ++i)
     {
-        uint32 category = categories[i];
-
-        FindFoodVisitor visitor(bot, category);
-        IterateItems(&visitor);
-        if (!visitor.GetResult().empty())
-            continue;
-
-        uint32 itemId = sRandomItemMgr->GetFood(level, category);
-        if (!itemId)
-        {
-            LOG_INFO("playerbots", "No food (category {}) available for bot {} ({} level)", category, bot->GetName().c_str(), bot->getLevel());
-            continue;
-        }
-
+        uint32 itemId = i->first;
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
 
-        uint32 maxCount = proto->GetMaxStackSize();
-        if (Item* newItem = StoreNewItemInInventorySlot(bot, itemId, urand(maxCount / 2, maxCount)))
-            newItem->AddToUpdateQueueOf(bot);
+        if (proto->Class != ITEM_CLASS_CONSUMABLE ||
+            proto->SubClass != ITEM_SUBCLASS_FOOD ||
+            (proto->Spells[0].SpellCategory != 11 && proto->Spells[0].SpellCategory != 59) ||
+            proto->Bonding != NO_BIND)
+            continue;
+
+        if (proto->RequiredLevel > bot->getLevel() || proto->RequiredLevel < bot->getLevel() - 9)
+            continue;
+
+        if (proto->RequiredSkill && !bot->HasSkill(proto->RequiredSkill))
+            continue;
+
+        if (proto->Area || proto->Map || proto->RequiredCityRank || proto->RequiredHonorRank)
+            continue;
+
+        items[proto->Spells[0].SpellCategory].push_back(itemId);
+    }
+
+    uint32 categories[] = { 11, 59 };
+    for (int i = 0; i < sizeof(categories) / sizeof(uint32); ++i)
+    {
+        uint32 category = categories[i];
+        std::vector<uint32>& ids = items[category];
+        int tries = 0;
+        for (int j = 0; j < 2; j++) {
+            uint32 index = urand(0, ids.size() - 1);
+            if (index >= ids.size())
+                continue;
+
+            uint32 itemId = ids[index];
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+            // beer / wine ... 
+            if (proto->Spells[0].SpellId == 11007 || proto->Spells[0].SpellId == 11008 || proto->Spells[0].SpellId == 11009 ||
+                proto->Spells[0].SpellId == 11629 || proto->Spells[0].SpellId == 50986)  
+            {
+                tries++;
+                if (tries > 5) {
+                    continue;
+                }
+                j--;
+                continue;
+            }
+            // bot->StoreNewItemInBestSlots(itemId, urand(1, proto->GetMaxStackSize()));
+            bot->StoreNewItemInBestSlots(itemId, proto->GetMaxStackSize());
+        }
    }
 }
 
 void PlayerbotFactory::InitReagents()
 {
-    std::vector<uint32> items;
-    uint32 regCount = 1;
-    switch (bot->getClass())
+    int level = bot->getLevel();
+    std::vector<std::pair<uint32, uint32>> items;
+    switch (bot->getClass()) 
     {
-        case CLASS_MAGE:
-            regCount = 2;
-            if (bot->getLevel() > 11)
-                items = { 17056 };
-            if (bot->getLevel() > 19)
-                items = { 17056, 17031 };
-            if (bot->getLevel() > 35)
-                items = { 17056, 17031, 17032 };
-            if (bot->getLevel() > 55)
-                items = { 17056, 17031, 17032, 17020 };
-            break;
-        case CLASS_DRUID:
-            regCount = 2;
-            if (bot->getLevel() > 19)
-                items = { 17034 };
-            if (bot->getLevel() > 29)
-                items = { 17035 };
-            if (bot->getLevel() > 39)
-                items = { 17036 };
-            if (bot->getLevel() > 49)
-                items = { 17037, 17021 };
-            if (bot->getLevel() > 59)
-                items = { 17038, 17026 };
-            if (bot->getLevel() > 69)
-                items = { 22147, 22148 };
-            break;
-        case CLASS_PALADIN:
-            regCount = 3;
-            if (bot->getLevel() > 50)
-                items = { 21177 };
+        case CLASS_ROGUE:
+        {
+            std::vector<int> instant_poison_ids = {43231, 43230, 21927, 8928, 8927, 8926, 6950, 6949, 6947};
+            std::vector<int> deadly_poison_ids = {43233, 43232, 22054, 22053, 20844, 8985, 8984, 2893, 2892};
+            for (int& itemId: deadly_poison_ids) {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > bot->getLevel())
+                    continue;
+                items.push_back({itemId, 20}); // deadly poison
+                break;    
+            }
+            for (int& itemId: instant_poison_ids) {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > bot->getLevel())
+                    continue;
+                items.push_back({itemId, 20}); // instant poison
+                break;    
+            }
+        }
             break;
         case CLASS_SHAMAN:
-            regCount = 1;
-            if (bot->getLevel() > 22)
-                items = { 17057 };
-            if (bot->getLevel() > 28)
-                items = { 17057, 17058 };
-            if (bot->getLevel() > 29)
-                items = { 17057, 17058, 17030 };
+            // items.push_back({46978, 1}); // Totem
+            if (bot->getLevel() >= 30)
+                items.push_back({17030, 40}); // Ankh
             break;
         case CLASS_WARLOCK:
-            regCount = 10;
-            if (bot->getLevel() > 9)
-                items = { 6265 };
+            items.push_back({6265, 10}); // shard
             break;
         case CLASS_PRIEST:
-            regCount = 3;
-            if (bot->getLevel() > 48)
-                items = { 17028 };
-            if (bot->getLevel() > 55)
-                items = { 17028, 17029 };
+            if (level >= 48 && level < 60) {
+                items.push_back({17028, 40});
+                // bot->StoreNewItemInBestSlots(17028, 40); // Wild Berries
+            } else if (level >= 60 && level < 80) {
+                items.push_back({17029, 40});
+                // bot->StoreNewItemInBestSlots(17029, 40); // Wild Berries
+            } else if (level >= 80) {
+                items.push_back({44615, 40});
+                // bot->StoreNewItemInBestSlots(44615, 40); // Wild Berries
+            }
             break;
-        case CLASS_ROGUE:
-            regCount = 1;
-            if (bot->getLevel() > 21)
-                items = { 5140 };
-            if (bot->getLevel() > 33)
-                items = { 5140, 5530 };
+        case CLASS_MAGE:
+            items.push_back({17020, 40});
+            // bot->StoreNewItemInBestSlots(17020, 40); // Arcane Powder
+            break;
+        case CLASS_DRUID:
+            if (level >= 20 && level < 30) {
+                items.push_back({17034, 40});
+            }
+            if (level >= 30 && level < 40) {
+                items.push_back({17035, 40});
+            }
+            if (level >= 40 && level < 50) {
+                items.push_back({17036, 40});
+            }
+            if (level >= 50 && level < 60) {
+                items.push_back({17037, 40});
+                items.push_back({17021, 40});
+            }
+            if (level >= 60 && level < 70) {
+                items.push_back({17038, 40});
+                items.push_back({17026, 40});
+            } 
+            if (level >= 70 && level < 80) {
+                items.push_back({22147, 40});
+                items.push_back({22148, 40});
+            } 
+            if (level >= 80) {
+                items.push_back({44614, 40});
+                items.push_back({44605, 40});
+            }
+            break;
+        case CLASS_PALADIN:
+            items.push_back({21177, 100});
+            break;
+        default:
             break;
     }
-
-    /*for (uint32 itemID : items)
-    {
-        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemID);
-        if (!proto)
-        {
-            LOG_ERROR("playerbots", "No reagent (ItemId {}) found for bot {} (Class:{})", i, bot->GetGUID().ToString().c_str(), bot->getClass());
-            continue;
-        }
-
-        uint32 maxCount = proto->GetMaxStackSize();
-
-        QueryItemCountVisitor visitor(itemID);
-        IterateItems(&visitor);
-        if (visitor.GetCount() > maxCount) continue;
-
-        uint32 randCount = urand(maxCount / 2, maxCount * regCount);
-
-        Item* newItem = bot->StoreNewItemInInventorySlot(*i, randCount);
-        if (newItem)
-            newItem->AddToUpdateQueueOf(bot);
-
-        LOG_INFO("playerbots", "Bot {} got reagent {} x{}", bot->GetGUID().ToString().c_str(), proto->Name1.c_str(), randCount);
-    }*/
-
-    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
-    {
-        uint32 spellId = itr->first;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo)
-            continue;
-
-        if (itr->second->State == PLAYERSPELL_REMOVED || itr->second->Active || spellInfo->IsPassive())
-            continue;
-
-        if (spellInfo->Effects[0].Effect == SPELL_EFFECT_LEARN_SPELL)
-            continue;
-
-        for (const auto& reagent : spellInfo->Reagent)
-        {
-            if (reagent)
-            {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(reagent);
-                if (!proto)
-                {
-                    LOG_ERROR("playerbots", "No reagent (ItemId {}) found for bot {} (Class:{})", reagent, bot->GetGUID().ToString().c_str(), bot->getClass());
-                    continue;
-                }
-
-                uint32 maxCount = proto->GetMaxStackSize();
-
-                QueryItemCountVisitor visitor(reagent);
-                IterateItems(&visitor);
-                if (visitor.GetCount() > maxCount) continue;
-
-                uint32 randCount = urand(maxCount / 2, maxCount * regCount);
-
-                Item* newItem = StoreNewItemInInventorySlot(bot, reagent, randCount);
-                if (newItem)
-                    newItem->AddToUpdateQueueOf(bot);
-
-                LOG_INFO("playerbots", "Bot {} got reagent {} x{}", bot->GetGUID().ToString().c_str(), proto->Name1.c_str(), randCount);
-            }
-        }
-
-        for (const auto& totem : spellInfo->Totem)
-        {
-            if (totem && !bot->HasItemCount(totem, 1))
-            {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(totem);
-                if (!proto)
-                {
-                    LOG_ERROR("playerbots", "No totem (ItemId {}) found for bot {} (Class:{})", totem, bot->GetGUID().ToString().c_str(), bot->getClass());
-                    continue;
-                }
-
-                Item* newItem = StoreNewItemInInventorySlot(bot, totem, 1);
-                if (newItem)
-                    newItem->AddToUpdateQueueOf(bot);
-
-                LOG_INFO("playerbots", "Bot {} got totem {} x{}", bot->GetGUID().ToString().c_str(), proto->Name1.c_str(), 1);
-            }
-        }
+    for (std::pair item : items) {
+        bot->StoreNewItemInBestSlots(item.first, item.second);
     }
 }
 

@@ -1658,12 +1658,12 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 
 	if (!itemTarget)
 	{
-        bool positiveSpell = spellInfo->IsPositive();
-        if (positiveSpell && bot->IsHostileTo(target))
-            return false;
+        // bool positiveSpell = spellInfo->IsPositive();
+        // if (positiveSpell && bot->IsHostileTo(target))
+        //     return false;
 
-        if (!positiveSpell && bot->IsFriendlyTo(target))
-            return false;
+        // if (!positiveSpell && bot->IsFriendlyTo(target))
+        //     return false;
 
         bool damage = false;
         for (uint8 i = EFFECT_0; i <= EFFECT_2; i++)
@@ -2103,7 +2103,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         bot->StopMoving();
         SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
         spell->cancel();
-        //delete spell;
+        delete spell;
         return false;
     }
 
@@ -2113,7 +2113,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         if (!loot.IsLootPossible(bot))
         {
             spell->cancel();
-            //delete spell;
+            delete spell;
             return false;
         }
     }
