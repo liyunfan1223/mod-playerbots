@@ -46,21 +46,21 @@ bool CheckMountStateAction::Execute(Event event)
         if (!bot->GetGroup() || bot->GetGroup()->GetLeaderGUID() != master->GetGUID())
             return false;
 
-        bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
+        // bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
         if (master->IsMounted() && !bot->IsMounted() && noattackers)
         {
             return Mount();
         }
 
-        if (!bot->IsMounted() && (chasedistance || (farFromMaster && botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))) && !bot->IsInCombat() && !dps)
-            return Mount();
+        // if (!bot->IsMounted() && (chasedistance || (farFromMaster && botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))) && !bot->IsInCombat() && !dps)
+        //     return Mount();
 
-        if (!bot->IsFlying() && ((!farFromMaster && !master->IsMounted()) || attackdistance) && bot->IsMounted())
-        {
-            WorldPacket emptyPacket;
-            bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
-            return true;
-        }
+        // if (!bot->IsFlying() && ((!farFromMaster && !master->IsMounted()) || attackdistance) && bot->IsMounted())
+        // {
+        //     WorldPacket emptyPacket;
+        //     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+        //     return true;
+        // }
 
         return false;
     }

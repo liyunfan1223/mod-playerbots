@@ -382,23 +382,23 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             }
         }
 
-        if (pathType == TravelNodePathType::teleportSpell && entry)
-        {
-            if (entry == 8690)
-            {
-                if (!bot->HasSpellCooldown(8690))
-                {
-                    return botAI->DoSpecificAction("hearthstone", Event("move action"));
-                }
-                else
-                {
-                    movePath.clear();
-                    AI_VALUE(LastMovement&, "last movement").setPath(movePath);
-                    LOG_DEBUG("playerbots", "bot->HasSpellCooldown(8690)");
-                    return false;
-                }
-            }
-        }
+        // if (pathType == TravelNodePathType::teleportSpell && entry)
+        // {
+        //     if (entry == 8690)
+        //     {
+        //         if (!bot->HasSpellCooldown(8690))
+        //         {
+        //             return botAI->DoSpecificAction("hearthstone", Event("move action"));
+        //         }
+        //         else
+        //         {
+        //             movePath.clear();
+        //             AI_VALUE(LastMovement&, "last movement").setPath(movePath);
+        //             LOG_DEBUG("playerbots", "bot->HasSpellCooldown(8690)");
+        //             return false;
+        //         }
+        //     }
+        // }
 
         //if (!isTransport && bot->GetTransport())
         //    bot->GetTransport()->RemovePassenger(bot);
