@@ -19,19 +19,7 @@ bool UseItemAction::Execute(Event event)
 
     if (gos.empty())
     {
-        if (items.size() > 1)
-        {
-            std::vector<Item*>::iterator i = items.begin();
-            Item* item = *i++;
-            Item* itemTarget = *i;
-
-            if (item->IsPotion() || item->GetTemplate()->Class == ITEM_CLASS_CONSUMABLE)
-                return UseItemAuto(item);
-            else
-                return UseItemOnItem(item, itemTarget);
-        }
-        else if (!items.empty())
-            return UseItemAuto(*items.begin());
+        return UseItemAuto(*items.begin());
     }
     else
     {

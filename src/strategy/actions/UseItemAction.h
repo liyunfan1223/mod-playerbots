@@ -73,7 +73,7 @@ class UseRandomRecipe : public UseItemAction
 
         bool isUseful() override;
         bool isPossible() override;
-        bool Execute(Event event);
+        bool Execute(Event event) override;
 };
 
 class UseRandomQuestItem : public UseItemAction
