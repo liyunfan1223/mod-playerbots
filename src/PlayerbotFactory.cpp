@@ -20,9 +20,9 @@
 #include <utility>
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
-#define ITEM_SUBCLASS_SINGLE_HAND (\
+#define ITEM_SUBCLASS_MASK_SINGLE_HAND (\
     (1 << ITEM_SUBCLASS_WEAPON_AXE) | (1 << ITEM_SUBCLASS_WEAPON_MACE) |\
-    (1 << ITEM_SUBCLASS_WEAPON_SWORD) | (1 << ITEM_SUBCLASS_WEAPON_DAGGER))
+    (1 << ITEM_SUBCLASS_WEAPON_SWORD) | (1 << ITEM_SUBCLASS_WEAPON_DAGGER) | (1 << ITEM_SUBCLASS_WEAPON_FIST))
 
 uint32 PlayerbotFactory::tradeSkills[] =
 {
@@ -282,7 +282,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EqSets");
     LOG_INFO("playerbots", "Initializing second equipment set...");
-    InitSecondEquipmentSet();
+    // InitSecondEquipmentSet();
     if (pmo)
         pmo->finish();
 
@@ -746,53 +746,48 @@ class DestroyItemsVisitor : public IterateItemsVisitor
 
 bool PlayerbotFactory::CanEquipArmor(ItemTemplate const* proto)
 {
-    if (bot->HasSkill(SKILL_SHIELD) && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-        return true;
-
-    if (bot->HasSkill(SKILL_PLATE_MAIL))
-    {
-        if (proto->SubClass != ITEM_SUBCLASS_ARMOR_PLATE)
-            return false;
+    if (proto->SubClass == ITEM_SUBCLASS_ARMOR_PLATE && !bot->HasSkill(SKILL_PLATE_MAIL)) {
+        return false;
     }
-    else if (bot->HasSkill(SKILL_MAIL))
-    {
-        if (proto->SubClass != ITEM_SUBCLASS_ARMOR_MAIL)
-            return false;
+    if (proto->SubClass == ITEM_SUBCLASS_ARMOR_MAIL && !bot->HasSkill(SKILL_MAIL)) {
+        return false;
     }
-    else if (bot->HasSkill(SKILL_LEATHER))
-    {
-        if (proto->SubClass != ITEM_SUBCLASS_ARMOR_LEATHER)
-            return false;
+    if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LEATHER && !bot->HasSkill(SKILL_LEATHER)) {
+        return false;
     }
-
-    if (proto->Quality <= ITEM_QUALITY_NORMAL)
-        return true;
-
-    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
-    {
-        if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
-            continue;
-
-        if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
-            continue;
-
-        if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_PALADIN && proto->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
-            continue;
+    if (proto->SubClass == ITEM_SUBCLASS_ARMOR_CLOTH && !bot->HasSkill(SKILL_CLOTH)) {
+        return false;
     }
-
-    uint8 sp = 0;
-    uint8 ap = 0;
-    uint8 tank = 0;
-    for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
-    {
-        // for ItemStatValue != 0
-        if(!proto->ItemStat[j].ItemStatValue)
-            continue;
-
-        AddItemStats(proto->ItemStat[j].ItemStatType, sp, ap, tank);
+    if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !bot->HasSkill(SKILL_SHIELD)) {
+        return false;
     }
+    
+    return true;
+    // for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+    // {
+    //     if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+    //         continue;
 
-    return CheckItemStats(sp, ap, tank);
+    //     if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
+    //         continue;
+
+    //     if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_PALADIN && proto->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
+    //         continue;
+    // }
+
+    // uint8 sp = 0;
+    // uint8 ap = 0;
+    // uint8 tank = 0;
+    // for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
+    // {
+    //     // for ItemStatValue != 0
+    //     if(!proto->ItemStat[j].ItemStatValue)
+    //         continue;
+
+    //     AddItemStats(proto->ItemStat[j].ItemStatType, sp, ap, tank);
+    // }
+
+    // return CheckItemStats(sp, ap, tank);
 }
 
 bool PlayerbotFactory::CheckItemStats(uint8 sp, uint8 ap, uint8 tank)
@@ -860,102 +855,94 @@ void PlayerbotFactory::AddItemStats(uint32 mod, uint8 &sp, uint8 &ap, uint8 &tan
 
 bool PlayerbotFactory::CanEquipWeapon(ItemTemplate const* proto)
 {
-    uint8 tab = AiFactory::GetPlayerSpecTab(bot);
-
     switch (bot->getClass())
     {
-        case CLASS_PRIEST:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF && proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE)
-                return false;
-            break;
-        case CLASS_MAGE:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF && proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
-                return false;
-            break;
-        case CLASS_WARLOCK:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
+    case CLASS_PRIEST:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE)
+            return false;
+        break;
+    case CLASS_MAGE:
+    case CLASS_WARLOCK:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-                return false;
-            break;
-        case CLASS_WARRIOR:
-            if (tab == 1) //fury
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST && proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-                    return false;
-            }
-            if ((tab == 0) && (bot->getLevel() > 10)) // arms
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&  proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM && proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-                    return false;
-            }
-            else // prot + lowlvl
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-                    return false;
-            }
-            break;
-        case CLASS_PALADIN:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+            return false;
+        break;
+    case CLASS_WARRIOR:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
+            return false;
+        break;
+    case CLASS_PALADIN:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-                return false;
-            break;
-        case CLASS_SHAMAN:
-            if (tab == 1) //enh
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2)
-                    return false;
-            }
-            else //ele,resto
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
-                    return false;
-            }
-            break;
-        case CLASS_DRUID:
-            if (tab == 1) // feral
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
-                    return false;
-            }
-            else // balance, resto
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
-                    return false;
-            }
-            break;
-        case CLASS_HUNTER:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF && proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+            return false;
+        break;
+	case CLASS_DEATH_KNIGHT:
+		if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+			return false;
+		break;
+    case CLASS_SHAMAN:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
+            return false;
+        break;
+    case CLASS_DRUID:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
+            return false;
+        break;
+    case CLASS_HUNTER:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW)
-                return false;
-            break;
-        case CLASS_ROGUE:
-            if (tab == 0) // assa
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-                    return false;
-            }
-            else
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-                    proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-                    return false;
-            }
-            break;
-        case CLASS_DEATH_KNIGHT:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2)
-                return false;
-            break;
+            return false;
+        break;
+    case CLASS_ROGUE:
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
+            return false;
+        break;
     }
 
     return true;
@@ -1256,7 +1243,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             newItem->AddToWorld();
             newItem->AddToUpdateQueueOf(bot);
             // bot->AutoUnequipOffhandIfNeed();
-            EnchantItem(newItem);
+            // EnchantItem(newItem);
         }
     }
 }
@@ -1616,7 +1603,7 @@ void PlayerbotFactory::InitSkills()
         bot->SetSkill(SKILL_RIDING, 0, 0, 0);
 
     uint32 skillLevel = bot->getLevel() < 40 ? 0 : 1;
-
+    uint32 dualWieldLevel = bot->getLevel() < 20 ? 0 : 1;
     switch (bot->getClass())
     {
         case CLASS_DRUID:
@@ -1642,6 +1629,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_POLEARMS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
             break;
         case CLASS_PALADIN:
@@ -1696,7 +1684,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
-            bot->SetSkill(SKILL_DUAL_WIELD, 0, bot->getLevel() < 20 ? 0 : 1, bot->getLevel() < 20 ? 0 : 1);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             break;
         case CLASS_ROGUE:
             SetRandomSkill(SKILL_SWORDS);
@@ -1717,6 +1705,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_2H_MACES);
             SetRandomSkill(SKILL_2H_AXES);
             SetRandomSkill(SKILL_POLEARMS);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             break;
         default:
             break;
@@ -2419,6 +2408,9 @@ void PlayerbotFactory::InitReagents()
         case CLASS_PALADIN:
             items.push_back({21177, 100});
             break;
+        case CLASS_DEATH_KNIGHT:
+            items.push_back({21177, 40});
+            break;
         default:
             break;
     }
@@ -2944,32 +2936,36 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id)
             + defense * 0.25 + dodge * 0.25 + armor * 0.5 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
-    if (NotSameArmorType(proto->SubClass))
+    if (proto->Class == ITEM_CLASS_ARMOR && NotSameArmorType(proto->SubClass))
     {
         score *= 0.8;
     }
-    bool isDoubleHand = proto->Class == ITEM_CLASS_WEAPON && 
-        !(ITEM_SUBCLASS_SINGLE_HAND & (1 << proto->SubClass)) && 
-        !(ITEM_SUBCLASS_MASK_WEAPON_RANGED & (1 << proto->SubClass));
-    // shield tank
-    if (isDoubleHand && IsShieldTank()) {
-        score *= 0.1;
-    }
-    // enhancement, rogue, ice/unholy dk
-    if (isDoubleHand && 
-        ((cls == CLASS_SHAMAN && tab == 1) ||
-         (cls == CLASS_ROGUE) ||
-         (cls == CLASS_DEATH_KNIGHT && tab != 0))
-       ) {
-        score *= 0.1;
-    }
-    // double hand penalty (except fury (talent), bear, retribution (cannot double-hand))
-    if (isDoubleHand && 
-        !(cls == CLASS_WARRIOR && tab == 1) && 
-        !(cls == CLASS_DRUID && tab == 1) &&
-        !(cls == CLASS_PALADIN && tab == 2) &&
-        !(cls == CLASS_DEATH_KNIGHT && tab == 0)) {
-        score *= 0.5;
+    if (proto->Class == ITEM_CLASS_WEAPON) {
+        bool isDoubleHand = proto->Class == ITEM_CLASS_WEAPON && 
+            !(ITEM_SUBCLASS_MASK_SINGLE_HAND & (1 << proto->SubClass)) && 
+            !(ITEM_SUBCLASS_MASK_WEAPON_RANGED & (1 << proto->SubClass));
+
+        if (isDoubleHand) {
+            score *= 0.5;
+        }
+        // spec without double hand
+        // enhancement, rogue, ice dk, shield tank
+        if (isDoubleHand && 
+            ((cls == CLASS_SHAMAN && tab == 1) ||
+            (cls == CLASS_ROGUE) ||
+            (cls == CLASS_DEATH_KNIGHT && tab == 1) ||
+            IsShieldTank())) {
+                score *= 0.1;
+        }
+        // spec with double hand
+        // fury with titan's grip, bear, retribution, blood dk
+        if (isDoubleHand && 
+            ((cls == CLASS_WARRIOR && tab == 1 && bot->HasSpell(46917)) ||
+            (cls == CLASS_DRUID && tab == 1) ||
+            (cls == CLASS_PALADIN && tab == 2) ||
+            (cls == CLASS_DEATH_KNIGHT && tab == 0))) {
+            score *= 10;
+        }
     }
     return (0.01 + score) * itemLevel * (quality + 1);   
     // return score;
