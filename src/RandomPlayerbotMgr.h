@@ -47,6 +47,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         bool IsRandomBot(Player* bot);
         bool IsRandomBot(ObjectGuid::LowType bot);
         void Randomize(Player* bot);
+        void Clear(Player* bot);
         void RandomizeFirst(Player* bot);
         void IncreaseLevel(Player* bot);
         void ScheduleTeleport(uint32 bot, uint32 time = 0);

@@ -15,6 +15,7 @@
 #include "RandomPlayerbotFactory.h"
 #include "ItemVisitors.h"
 #include "InventoryAction.h"
+#include "SharedDefines.h"
 #include <random>
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
@@ -121,6 +122,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     LOG_INFO("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
     // bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
     LOG_INFO("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
     bot->resetTalents(true);
@@ -128,20 +130,20 @@ void PlayerbotFactory::Randomize(bool incremental)
     ClearSkills();
     // bot->SaveToDB(false, false);
     ClearSpells();
-    // bot->SaveToDB(false, false);
+    bot->SaveToDB(false, false);
     if (!incremental)
     {
         ClearInventory();
         ResetQuests();
     }
-    // bot->SaveToDB(false, false);
+    bot->SaveToDB(false, false);
 
     bot->GiveLevel(level);
     bot->InitStatsForLevel();
     bot->SetHealth(bot->GetMaxHealth());
     bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     CancelAuras();
-    // bot->SaveToDB(false, false);
+    bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
 
@@ -180,7 +182,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
     LOG_INFO("playerbots", "Initializing spells (step 1)...");
-    bot->LearnDefaultSkills();
+    // bot->LearnDefaultSkills();
     InitClassSpells();
     // bot->SaveToDB(false, false);
     InitAvailableSpells();
@@ -540,7 +542,8 @@ void PlayerbotFactory::InitPet()
             CreatureTemplate const* co = sObjectMgr->GetCreatureTemplate(ids[index]);
             if (!co)
                 continue;
-
+            if (co->Name.size() > 21)
+                continue;
             uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
             uint32 pet_number = sObjectMgr->GeneratePetNumber();
             pet = new Pet(bot, HUNTER_PET);
@@ -561,6 +564,7 @@ void PlayerbotFactory::InitPet()
             pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
             pet->GetMap()->AddToMap(pet->ToCreature());
             // pet->InitPetCreateSpells();
+            pet->InitTalentForLevel();
             // pet->LearnPetPassives();
             pet->CastPetAuras(true);
             pet->UpdateAllStats();
@@ -571,7 +575,6 @@ void PlayerbotFactory::InitPet()
             LOG_INFO("playerbots",   "Bot {}: assign pet {} ({} level)", bot->GetName().c_str(), co->Entry, bot->getLevel());
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
             bot->PetSpellInitialize();
-            pet->SavePetToDB(PET_SAVE_AS_CURRENT);
             break;
         }
     }
@@ -616,6 +619,21 @@ void PlayerbotFactory::ClearSkills()
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(1), 0);
 }
 
+void PlayerbotFactory::ClearEverything()
+{
+    bot->SaveToDB(false, false);
+    LOG_INFO("playerbots", "Resetting player...");
+    bot->resetTalents(true);
+    bot->SaveToDB(false, false);
+    ClearSkills();
+    // bot->SaveToDB(false, false);
+    ClearSpells();
+    bot->SaveToDB(false, false);
+    ClearInventory();
+    ResetQuests();
+    bot->SaveToDB(false, false);
+}
+
 void PlayerbotFactory::ClearSpells()
 {
     std::list<uint32> spells;
@@ -623,8 +641,9 @@ void PlayerbotFactory::ClearSpells()
     {
         uint32 spellId = itr->first;
         const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if(itr->second->State == PLAYERSPELL_REMOVED)
+        if(itr->second->State == PLAYERSPELL_REMOVED) {
             continue;
+        }
 
         spells.push_back(spellId);
     }
@@ -1622,9 +1641,9 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_POLEARMS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
+            bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
             break;
         case CLASS_PALADIN:
-            bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
             SetRandomSkill(SKILL_SWORDS);
             SetRandomSkill(SKILL_AXES);
             SetRandomSkill(SKILL_MACES);
@@ -1632,6 +1651,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_2H_MACES);
             SetRandomSkill(SKILL_2H_AXES);
             SetRandomSkill(SKILL_POLEARMS);
+            bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
             break;
         case CLASS_PRIEST:
             SetRandomSkill(SKILL_MACES);
@@ -1647,6 +1667,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_2H_AXES);
             SetRandomSkill(SKILL_DAGGERS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
+            bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
             break;
         case CLASS_MAGE:
             SetRandomSkill(SKILL_SWORDS);
@@ -1674,6 +1695,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, bot->getLevel() < 20 ? 0 : 1, bot->getLevel() < 20 ? 0 : 1);
             break;
         case CLASS_ROGUE:
             SetRandomSkill(SKILL_SWORDS);
@@ -1699,19 +1721,19 @@ void PlayerbotFactory::InitSkills()
             break;
     }
 
-    switch (bot->getClass())
-    {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-            bot->SetSkill(SKILL_PLATE_MAIL, 1, skillLevel, skillLevel);
-            break;
-        case CLASS_SHAMAN:
-        case CLASS_HUNTER:
-            bot->SetSkill(SKILL_MAIL, 1, skillLevel, skillLevel);
-            break;
-        default:
-            break;
-    }
+    // switch (bot->getClass())
+    // {
+    //     case CLASS_WARRIOR:
+    //     case CLASS_PALADIN:
+    //         bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+    //         break;
+    //     case CLASS_SHAMAN:
+    //     case CLASS_HUNTER:
+    //         bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+    //         break;
+    //     default:
+    //         break;
+    // }
 }
 
 void PlayerbotFactory::SetRandomSkill(uint16 id)
@@ -1736,72 +1758,135 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 void PlayerbotFactory::InitAvailableSpells()
 {
     bot->LearnDefaultSkills();
-    bot->LearnCustomSpells();
-    bot->learnQuestRewardedSpells();
 
-    CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
-    for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
+    CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
+    for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin(); i != creatureTemplateContainer->end(); ++i)
     {
-        if (itr->second.trainer_type != TRAINER_TYPE_TRADESKILLS && itr->second.trainer_type != TRAINER_TYPE_CLASS)
+        CreatureTemplate const& co = i->second;
+        if (co.trainer_type != TRAINER_TYPE_TRADESKILLS && co.trainer_type != TRAINER_TYPE_CLASS)
             continue;
 
-        if (itr->second.trainer_type == TRAINER_TYPE_CLASS && itr->second.trainer_class != bot->getClass())
+        if (co.trainer_type == TRAINER_TYPE_CLASS && co.trainer_class != bot->getClass())
             continue;
 
-        TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(itr->second.Entry);
+		uint32 trainerId = co.Entry;
+
+		TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
+        if (!trainer_spells)
+            trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
+
         if (!trainer_spells)
             continue;
 
-		for (TrainerSpellMap::const_iterator iter = trainer_spells->spellList.begin(); iter != trainer_spells->spellList.end(); ++iter)
-		{
-			TrainerSpell const* tSpell = &iter->second;
-			if (!tSpell)
-				continue;
+        for (TrainerSpellMap::const_iterator itr =  trainer_spells->spellList.begin(); itr !=  trainer_spells->spellList.end(); ++itr)
+        {
+            TrainerSpell const* tSpell = &itr->second;
 
-			TrainerSpellState state = bot->GetTrainerSpellState(tSpell);
-			if (state != TRAINER_SPELL_GREEN)
-				continue;
+            if (!tSpell)
+                continue;
 
-		    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tSpell->spell);
-		    if (!spellInfo)
-		        continue;
+            if (!tSpell->learnedSpell[0] && !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[0]))
+                continue;
 
-            if (itr->second.trainer_type == TRAINER_TYPE_TRADESKILLS)
-            {
-                std::string const SpellName = spellInfo->SpellName[0];
-                if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_SKILL_STEP)
-                {
-                    uint32 skill = spellInfo->Effects[EFFECT_1].MiscValue;
-                    if (skill && !bot->HasSkill(skill))
-                    {
-                        SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
-                        if (pSkill)
-                        {
-                            if (SpellName.find("Apprentice") != std::string::npos && pSkill->categoryId == SKILL_CATEGORY_PROFESSION || pSkill->categoryId == SKILL_CATEGORY_SECONDARY)
-                                continue;
-                        }
-                    }
-                }
-            }
+            TrainerSpellState state = bot->GetTrainerSpellState(tSpell);
+            if (state != TRAINER_SPELL_GREEN)
+                continue;
 
-            bool learned = false;
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tSpell->spell);
+            bool learn = true;
             for (uint8 j = 0; j < 3; ++j)
             {
                 if (!tSpell->learnedSpell[j] && !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[j]))
                     continue;
 
-                if (spellInfo->Effects[j].Effect == SPELL_EFFECT_LEARN_SPELL)
+                if (spellInfo->Effects[j].Effect == SPELL_EFFECT_PROFICIENCY ||
+                    spellInfo->Effects[j].Effect == SPELL_EFFECT_SKILL_STEP ||
+                    spellInfo->Effects[j].Effect == SPELL_EFFECT_DUAL_WIELD)
                 {
-                    uint32 learnedSpell = spellInfo->Effects[j].TriggerSpell;
-                    bot->learnSpell(learnedSpell);
-                    learned = true;
+                    learn = false;
+                    break;
                 }
             }
+            if (!learn) {
+                continue;
+            }
 
-            if (!learned)
-                bot->learnSpell(tSpell->spell);
-		}
+            if (tSpell->learnedSpell[0]) {
+                bot->learnSpell(tSpell->learnedSpell[0], false);
+            }
+            else {
+                LOG_INFO("playerbots", "!tSpell->learnedSpell[0] {}", tSpell->spell);
+                botAI->CastSpell(tSpell->spell, bot);
+            }
+        }
     }
+    // bot->LearnDefaultSkills();
+    // bot->LearnCustomSpells();
+    // bot->learnQuestRewardedSpells();
+
+    // CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
+    // for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
+    // {
+    //     if (itr->second.trainer_type != TRAINER_TYPE_TRADESKILLS && itr->second.trainer_type != TRAINER_TYPE_CLASS)
+    //         continue;
+
+    //     if (itr->second.trainer_type == TRAINER_TYPE_CLASS && itr->second.trainer_class != bot->getClass())
+    //         continue;
+
+    //     TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(itr->second.Entry);
+    //     if (!trainer_spells)
+    //         continue;
+
+	// 	for (TrainerSpellMap::const_iterator iter = trainer_spells->spellList.begin(); iter != trainer_spells->spellList.end(); ++iter)
+	// 	{
+	// 		TrainerSpell const* tSpell = &iter->second;
+	// 		if (!tSpell)
+	// 			continue;
+
+	// 		TrainerSpellState state = bot->GetTrainerSpellState(tSpell);
+	// 		if (state != TRAINER_SPELL_GREEN)
+	// 			continue;
+
+	// 	    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tSpell->spell);
+	// 	    if (!spellInfo)
+	// 	        continue;
+
+    //         if (itr->second.trainer_type == TRAINER_TYPE_TRADESKILLS)
+    //         {
+    //             std::string const SpellName = spellInfo->SpellName[0];
+    //             if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_SKILL_STEP)
+    //             {
+    //                 uint32 skill = spellInfo->Effects[EFFECT_1].MiscValue;
+    //                 if (skill && !bot->HasSkill(skill))
+    //                 {
+    //                     SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
+    //                     if (pSkill)
+    //                     {
+    //                         if (SpellName.find("Apprentice") != std::string::npos && pSkill->categoryId == SKILL_CATEGORY_PROFESSION || pSkill->categoryId == SKILL_CATEGORY_SECONDARY)
+    //                             continue;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         // bool learned = false;
+    //         // for (uint8 j = 0; j < 3; ++j)
+    //         // {
+    //         //     if (!tSpell->learnedSpell[j] && !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[j]))
+    //         //         continue;
+
+    //         //     if (spellInfo->Effects[j].Effect == SPELL_EFFECT_LEARN_SPELL)
+    //         //     {
+    //         //         uint32 learnedSpell = spellInfo->Effects[j].TriggerSpell;
+    //         //         bot->learnSpell(learnedSpell);
+    //         //         learned = true;
+    //         //     }
+    //         // }
+
+    //         // if (!learned)
+    //         bot->learnSpell(tSpell->spell);
+	// 	}
+    // }
 }
 
 void PlayerbotFactory::InitClassSpells()
@@ -1810,8 +1895,8 @@ void PlayerbotFactory::InitClassSpells()
     switch (bot->getClass())
     {
         case CLASS_WARRIOR:
-            bot->learnSpell(78, false);
-            bot->learnSpell(2457, false);
+            bot->learnSpell(78, true);
+            bot->learnSpell(2457, true);
             if (level >= 10) {
                 bot->learnSpell(71, false); // Defensive Stance
                 bot->learnSpell(355, false); // Taunt
@@ -1822,27 +1907,27 @@ void PlayerbotFactory::InitClassSpells()
             }
             break;
         case CLASS_PALADIN:
-            bot->learnSpell(21084, false);
-            bot->learnSpell(635, false);
+            bot->learnSpell(21084, true);
+            bot->learnSpell(635, true);
             if (level >= 12) {
                 bot->learnSpell(7328, false); // Redemption
             }
             break;
         case CLASS_ROGUE:
-            bot->learnSpell(1752, false);
-            bot->learnSpell(2098, false);
+            bot->learnSpell(1752, true);
+            bot->learnSpell(2098, true);
             break;
         case CLASS_DEATH_KNIGHT:
-            bot->learnSpell(45477, false);
-            bot->learnSpell(47541, false);
-            bot->learnSpell(45462, false);
-            bot->learnSpell(45902, false);
+            bot->learnSpell(45477, true);
+            bot->learnSpell(47541, true);
+            bot->learnSpell(45462, true);
+            bot->learnSpell(45902, true);
             //to leave DK starting area 
             bot->learnSpell(50977, false);
             break;
         case CLASS_HUNTER:
-            bot->learnSpell(2973, false);
-            bot->learnSpell(75, false);
+            bot->learnSpell(2973, true);
+            bot->learnSpell(75, true);
             if (level >= 10) {
                 bot->learnSpell(883, false); // call pet
                 bot->learnSpell(1515, false); // tame pet
@@ -1852,16 +1937,16 @@ void PlayerbotFactory::InitClassSpells()
             }
             break;
         case CLASS_PRIEST:
-            bot->learnSpell(585, false);
-            bot->learnSpell(2050, false);
+            bot->learnSpell(585, true);
+            bot->learnSpell(2050, true);
             break;
         case CLASS_MAGE:
-            bot->learnSpell(133, false);
-            bot->learnSpell(168, false);
+            bot->learnSpell(133, true);
+            bot->learnSpell(168, true);
             break;
         case CLASS_WARLOCK:
-            bot->learnSpell(687, false);
-            bot->learnSpell(686, false);
+            bot->learnSpell(687, true);
+            bot->learnSpell(686, true);
             if (level >= 10) {
                 bot->learnSpell(697, false); // summon voidwalker
             }
@@ -1873,8 +1958,8 @@ void PlayerbotFactory::InitClassSpells()
             }
             break;
         case CLASS_DRUID:
-            bot->learnSpell(5176, false);
-            bot->learnSpell(5185, false);
+            bot->learnSpell(5176, true);
+            bot->learnSpell(5185, true);
             if (level >= 10) {
                 bot->learnSpell(5487, false); // bear form
                 bot->learnSpell(6795, false); // Growl
@@ -1882,8 +1967,8 @@ void PlayerbotFactory::InitClassSpells()
             }
             break;
         case CLASS_SHAMAN:
-            bot->learnSpell(403, false);
-            bot->learnSpell(331, false);
+            bot->learnSpell(403, true);
+            bot->learnSpell(331, true);
             if (level >= 4) {
                 bot->learnSpell(8071, false); // stoneskin totem
             }

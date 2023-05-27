@@ -1324,6 +1324,12 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
         pmo->finish();
 }
 
+void RandomPlayerbotMgr::Clear(Player* bot)
+{
+    PlayerbotFactory factory(bot, bot->GetLevel());
+    factory.ClearEverything();
+}
+
 uint32 RandomPlayerbotMgr::GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ)
 {
 	uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
@@ -1634,6 +1640,7 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
 
     std::map<std::string, ConsoleCommandHandler> handlers;
     handlers["init"] = &RandomPlayerbotMgr::RandomizeFirst;
+    handlers["clear"] = &RandomPlayerbotMgr::Clear;
     handlers["levelup"] = handlers["level"] = &RandomPlayerbotMgr::IncreaseLevel;
     handlers["refresh"] = &RandomPlayerbotMgr::Refresh;
     handlers["teleport"] = &RandomPlayerbotMgr::RandomTeleportForLevel;

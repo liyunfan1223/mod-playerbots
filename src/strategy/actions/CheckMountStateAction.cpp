@@ -79,20 +79,20 @@ bool CheckMountStateAction::Execute(Event event)
         return Mount();
     }
 
-    if (!bot->InBattleground())
-    {
-        if (AI_VALUE(GuidPosition, "rpg target"))
-        {
-            if (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "rpg target"), sPlayerbotAIConfig->farDistance) && noattackers && !dps && !enemy)
-                return Mount();
-        }
+    // if (!bot->InBattleground())
+    // {
+    //     if (AI_VALUE(GuidPosition, "rpg target"))
+    //     {
+    //         if (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "rpg target"), sPlayerbotAIConfig->farDistance) && noattackers && !dps && !enemy)
+    //             return Mount();
+    //     }
 
-        if (((!AI_VALUE(GuidVector, "possible rpg targets").empty()) && noattackers && !dps && !enemy) && urand(0, 100) > 50)
-            return Mount();
-    }
+    //     if (((!AI_VALUE(GuidVector, "possible rpg targets").empty()) && noattackers && !dps && !enemy) && urand(0, 100) > 50)
+    //         return Mount();
+    // }
 
-    if (!bot->IsMounted() && !attackdistance && (fartarget || chasedistance))
-        return Mount();
+    // if (!bot->IsMounted() && !attackdistance && (fartarget || chasedistance))
+    //     return Mount();
 
     if (!bot->IsFlying() && attackdistance && bot->IsMounted() && (enemy || dps || (!noattackers && bot->IsInCombat())))
     {

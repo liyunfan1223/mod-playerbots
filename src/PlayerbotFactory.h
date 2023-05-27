@@ -110,6 +110,7 @@ class PlayerbotFactory : public InventoryAction
         void Refresh();
         void Randomize(bool incremental);
         static std::list<uint32> classQuestIds;
+        void ClearEverything();
         void InitSkills();
 
         static uint32 tradeSkills[];
