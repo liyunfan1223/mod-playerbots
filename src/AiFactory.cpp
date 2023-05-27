@@ -279,7 +279,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("heal", "threat", nullptr);
 
-            engine->addStrategies("dps assist", "flee", "cure", "ranged", "cc", nullptr);
+            engine->addStrategies("dps assist", "flee", "cure", "ranged", nullptr);
             break;
         case CLASS_MAGE:
             if (tab == 0)
@@ -289,7 +289,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("frost", "frost aoe", "threat", "dps aoe", nullptr);
 
-            engine->addStrategies("dps", "dps assist", "flee", "cure", "ranged", "cc", nullptr);
+            engine->addStrategies("dps", "dps assist", "flee", "cure", "ranged", nullptr);
             break;
         case CLASS_WARRIOR:
             if (tab == 2)
@@ -311,11 +311,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "baoe", "bstats", "close", "cc", nullptr);
+                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "baoe", "bstats", "close", nullptr);
             else if (tab == 0)
-                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "cc", nullptr);
+                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", nullptr);
             else
-                engine->addStrategies("dps", "bdps", "dps assist", "cure", "close", "cc", nullptr);
+                engine->addStrategies("dps", "bdps", "dps assist", "cure", "close", nullptr);
 
             if (player->getLevel() < 14)
             {
@@ -330,31 +330,32 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_DRUID:
             if (tab == 0)
             {
-                engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "ranged", "cc", nullptr);
+                engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "ranged", nullptr);
                 if (player->getLevel() > 19)
                     engine->addStrategy("caster debuff");
             }
             else if (tab == 2)
-                engine->addStrategies("heal", "cure", "flee", "dps assist", "ranged", "cc", nullptr);
+                engine->addStrategies("heal", "cure", "flee", "dps assist", "ranged", nullptr);
             else
             {
                 engine->removeStrategy("ranged");
+                engine->removeStrategy("flee");
                 engine->addStrategies("bear", "tank assist", "flee", "close", nullptr);
             }
             break;
         case CLASS_HUNTER:
-            engine->addStrategies("dps", "bdps", "threat", "dps assist", "ranged", "pet", "cc", nullptr);
+            engine->addStrategies("dps", "bdps", "threat", "dps assist", "ranged", "pet", nullptr);
             if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
             break;
         case CLASS_ROGUE:
-            engine->addStrategies("dps", "threat", "dps assist", "aoe", "close", "cc", "behind", "stealth", nullptr);
+            engine->addStrategies("dps", "threat", "dps assist", "aoe", "close", "behind", "stealth", nullptr);
             break;
         case CLASS_WARLOCK:
             if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
 
-            engine->addStrategies("dps assist", "dps", "flee", "ranged", "cc", "pet", "threat", nullptr);
+            engine->addStrategies("dps assist", "dps", "flee", "ranged", "pet", "threat", nullptr);
             break;
         case CLASS_DEATH_KNIGHT:
             if (tab == 0)
@@ -364,7 +365,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("unholy", "unholy aoe", "dps assist", "threat", nullptr);
 
-            engine->addStrategies("dps assist", "flee", "close", "cc", nullptr);
+            engine->addStrategies("dps assist", "flee", "close", nullptr);
 
             break;
     }

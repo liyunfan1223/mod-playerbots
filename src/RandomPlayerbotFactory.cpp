@@ -120,10 +120,14 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     LOG_DEBUG("playerbots",  "Creating new random bot for class {}", cls);
 
     uint8 gender = rand() % 2 ? GENDER_MALE : GENDER_FEMALE;
-
-    uint32 const randomRaceIndex = urand(0, availableRaces[cls].size() - 1);
-    uint8 race = availableRaces[cls][randomRaceIndex];
-
+    uint8 alliance = rand() % 2;
+    uint8 race;
+    for (int attempt = 0; attempt < 15; attempt++) {
+        race = availableRaces[cls][urand(0, availableRaces[cls].size() - 1)];
+        if ((alliance && IsAlliance(race)) || (!alliance && !IsAlliance(race))) {
+            break;
+        }
+    }
     std::string name;
     if (names.empty())
         name = CreateRandomBotName(gender);
@@ -188,6 +192,10 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
 
+    if (player->getClass() == CLASS_DEATH_KNIGHT)
+	{
+		player->learnSpell(50977, false);
+	}
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId, name.c_str(), race, cls);
 
     return player;
@@ -207,17 +215,27 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
     Field* fields = result->Fetch();
     uint32 maxId = fields[0].Get<uint32>();
 
-    result = CharacterDatabase.Query("SELECT n.name FROM playerbots_names n "
-        "LEFT OUTER JOIN characters e ON e.name = n.name WHERE e.guid IS NULL AND n.gender = {} ORDER BY RAND() LIMIT 1", gender);
-    if (!result)
-    {
-        LOG_ERROR("playerbots", "No more names left for random bots");
-        return std::move(botName);
+    int tries = 10;
+    while(--tries) {
+        uint32 id = urand(0, maxId / 2);
+        result = CharacterDatabase.Query("SELECT n.name FROM playerbots_names n "
+                "LEFT OUTER JOIN characters e ON e.name = n.name "
+                "WHERE e.guid IS NULL AND n.name_id >= '{}' AND n.in_use=0 LIMIT 1", id);
+        if (!result)
+        {
+            continue;
+        }
+        fields = result->Fetch();
+        std::string ret = fields[0].Get<std::string>();
+        if (ret.size()) {
+            CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use=1 WHERE name='{}'", ret);
+        }
+        return ret;
     }
-
-	fields = result->Fetch();
-    botName = fields[0].Get<std::string>();
-
+    LOG_ERROR("playerbots", "No more names left for random bots. Simply random.");
+    for (uint8 i = 0; i < 10; i++) {
+        botName += (i == 0 ? 'A' : 'a') + rand() % 26;
+    }
     return std::move(botName);
 }
 
@@ -340,7 +358,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     uint32 totalAccCount = sPlayerbotAIConfig->randomBotAccountCount;
 
-    LOG_INFO("server.loading", "Creating random bot accounts...");
+    LOG_INFO("playerbots", "Creating random bot accounts...");
 
     std::vector<std::future<void>> account_creations;
     for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
@@ -385,20 +403,20 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     LOG_INFO("server.loading", "Loading available names...");
     std::unordered_map<uint8,std::vector<std::string>> names;
-    QueryResult result = CharacterDatabase.Query("SELECT n.gender, n.name FROM playerbots_names n LEFT OUTER JOIN characters e ON e.name = n.name WHERE e.guid IS NULL");
-    if (!result)
-    {
-        LOG_ERROR("server.loading", "No more names left for random bots");
-        return;
-    }
+    // QueryResult result = CharacterDatabase.Query("SELECT n.gender, n.name FROM playerbots_names n LEFT OUTER JOIN characters e ON e.name = n.name WHERE e.guid IS NULL");
+    // if (!result)
+    // {
+    //     LOG_ERROR("server.loading", "No more names left for random bots");
+    //     return;
+    // }
 
-    do
-    {
-        Field* fields = result->Fetch();
-        uint8 gender = fields[0].Get<uint8>();
-        std::string const bname = fields[1].Get<std::string>();
-        names[gender].push_back(bname);
-    } while (result->NextRow());
+    // do
+    // {
+    //     Field* fields = result->Fetch();
+    //     uint8 gender = fields[0].Get<uint8>();
+    //     std::string const bname = fields[1].Get<std::string>();
+    //     names[gender].push_back(bname);
+    // } while (result->NextRow());
 
     LOG_INFO("playerbots", "Creating random bot characters...");
     uint32 totalRandomBotChars = 0;
