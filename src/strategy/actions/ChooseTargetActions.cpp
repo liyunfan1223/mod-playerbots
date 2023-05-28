@@ -82,6 +82,7 @@ bool DropTargetAction::Execute(Event event)
         {
             pet->SetReactState(REACT_PASSIVE);
             pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            pet->GetCharmInfo()->SetIsCommandFollow(true);
             pet->AttackStop();
         }
     }

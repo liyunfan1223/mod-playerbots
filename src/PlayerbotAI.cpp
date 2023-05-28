@@ -1718,7 +1718,6 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 	}
 
 	ObjectGuid oldSel = bot->GetTarget();
-	bot->SetTarget(target->GetGUID());
 	Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetUnitTarget(target);
@@ -1933,7 +1932,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     }
 
 	ObjectGuid oldSel = bot->GetTarget();
-	bot->SetTarget(target->GetGUID());
+	bot->SetSelection(target->GetGUID());
 
     WorldObject* faceTo = target;
     if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo))

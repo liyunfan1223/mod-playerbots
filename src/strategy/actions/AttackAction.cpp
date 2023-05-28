@@ -8,6 +8,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "CreatureAI.h"
+#include "Unit.h"
 
 bool AttackAction::Execute(Event event)
 {
@@ -40,7 +41,7 @@ bool AttackMyTargetAction::Execute(Event event)
     return result;
 }
 
-bool AttackAction::Attack(Unit* target)
+bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
 {
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE || bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {
@@ -93,21 +94,25 @@ bool AttackAction::Attack(Unit* target)
     }
 
     ObjectGuid guid = target->GetGUID();
-    bot->SetTarget(target->GetGUID());
+    bot->SetSelection(target->GetGUID());
 
     Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
     context->GetValue<Unit*>("old target")->Set(oldTarget);
 
     context->GetValue<Unit*>("current target")->Set(target);
     context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
-
+    
     if (Pet* pet = bot->GetPet())
     {
-        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
-        {
-            pet->SetReactState(REACT_PASSIVE);
+        pet->SetReactState(REACT_PASSIVE);
+        if (with_pet) {
+            pet->SetTarget(target->GetGUID());
             pet->GetCharmInfo()->SetCommandState(COMMAND_ATTACK);
-            creatureAI->AttackStart(target);
+            pet->GetCharmInfo()->SetIsCommandAttack(true);
+            pet->AI()->AttackStart(target);
+        } else {
+            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            pet->GetCharmInfo()->SetIsCommandFollow(true);
         }
     }
 

@@ -4,6 +4,7 @@
 
 #include "ReachTargetActions.h"
 #include "Event.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -18,7 +19,8 @@ bool ReachTargetAction::Execute(Event event)
     float combatReach = bot->GetCombatReach() + target->GetCombatReach() + 4.0f / 3.0f;
     if (distance < std::max(5.0f, combatReach))
     {
-        return ChaseTo(target, 0.0f, GetFollowAngle());
+        // return MoveTo(target, 0.0f);
+        return ChaseTo(target, 0.0f, bot->GetAngle(target));
     }
     else
     {
@@ -27,6 +29,7 @@ bool ReachTargetAction::Execute(Event event)
         bool  isFriend  = bot->IsFriendlyTo(target);
         float chaseDist = inLos ? distance : isFriend ? distance / 2 : distance;
         return ChaseTo(target, chaseDist - sPlayerbotAIConfig->contactDistance, bot->GetAngle(target));
+        // return MoveTo(target, chaseDist - sPlayerbotAIConfig->contactDistance);
     }
 }
 

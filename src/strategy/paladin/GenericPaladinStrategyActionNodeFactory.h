@@ -100,7 +100,7 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         {
             return new ActionNode ("lay on hands on party",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("flash of light"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("flash of light on party"), nullptr),
                 /*C*/ nullptr);
         }
 

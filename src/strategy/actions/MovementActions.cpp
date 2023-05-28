@@ -636,7 +636,6 @@ bool MovementAction::MoveTo(Unit* target, float distance)
     float distanceToTarget = sServerFacade->GetDistance2d(bot, tx, ty);
     if (sServerFacade->IsDistanceGreaterThan(distanceToTarget, sPlayerbotAIConfig->targetPosRecalcDistance))
     {
-        /*
         float angle = bot->GetAngle(tx, ty);
         float needToGo = distanceToTarget - distance;
 
@@ -649,15 +648,10 @@ bool MovementAction::MoveTo(Unit* target, float distance)
         float dx = cos(angle) * needToGo + bx;
         float dy = sin(angle) * needToGo + by;
         float dz = bz + (tz - bz) * needToGo / distanceToTarget;
-        */
-
-        float dx = tx;
-        float dy = ty;
-        float dz = tz;
         return MoveTo(target->GetMapId(), dx, dy, dz);
     }
 
-    return true;
+    return false;
 }
 
 float MovementAction::GetFollowAngle()
@@ -991,7 +985,7 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
             return false;
 
         //vehicle->GetMotionMaster()->Clear();
-        vehicle->GetBase()->GetMotionMaster()->MoveChase((Unit*)obj, 30.0f, angle);
+        vehicle->GetBase()->GetMotionMaster()->MoveChase((Unit*)obj, 30.0f);
         return true;
     }
 
@@ -1007,7 +1001,7 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
     }
 
     // bot->GetMotionMaster()->Clear();
-    bot->GetMotionMaster()->MoveChase((Unit*) obj, distance, angle);
+    bot->GetMotionMaster()->MoveChase((Unit*) obj, distance);
     WaitForReach(bot->GetExactDist2d(obj) - distance);
     return true;
 }
@@ -1224,15 +1218,15 @@ bool FleeAction::Execute(Event event)
 
 bool FleeWithPetAction::Execute(Event event)
 {
-    if (Pet* pet = bot->GetPet())
-    {
-        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
-        {
-            pet->SetReactState(REACT_PASSIVE);
-            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-            pet->AttackStop();
-        }
-    }
+    // if (Pet* pet = bot->GetPet())
+    // {
+    //     if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
+    //     {
+    //         pet->SetReactState(REACT_PASSIVE);
+    //         pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+    //         pet->AttackStop();
+    //     }
+    // }
 
     return Flee(AI_VALUE(Unit*, "current target"));
 }
