@@ -3,6 +3,7 @@
  */
 
 #include "CharacterPackets.h"
+#include "Common.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PlayerbotMgr.h"
@@ -519,6 +520,10 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
         if (!bot)
             return "bot not found";
+        
+        if (!isRandomAccount || !isRandomBot) {
+            return "ERROR: You can not use this command on non-ramdom bot.";
+        }
 
         if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
         {
@@ -846,7 +851,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         }
         else if (master && member != master->GetGUID())
         {
-            out << ProcessBotCommand(cmdStr, member, master->GetGUID(), master->GetSession()->GetSecurity() >= SEC_GAMEMASTER, master->GetSession()->GetAccountId(), master->GetGuildId());
+            out << ProcessBotCommand(cmdStr, member, master->GetGUID(), true, master->GetSession()->GetAccountId(), master->GetGuildId());
         }
         else if (!master)
         {

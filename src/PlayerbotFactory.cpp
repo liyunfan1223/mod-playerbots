@@ -335,15 +335,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Save");
     LOG_INFO("playerbots", "Saving to DB...");
-    if (incremental)
-    {
-        uint32 money = bot->GetMoney();
-        bot->SetMoney(money + 1000 * sqrt(urand(1, level * 5)));
-    }
-    else
-    {
-        bot->SetMoney(10000 * sqrt(urand(1, level * 5)));
-    }
+    bot->SetMoney(urand(level * 100000, level * 5 * 100000));
     bot->SaveToDB(false, false);
     LOG_INFO("playerbots", "Done.");
     if (pmo)
@@ -353,10 +345,25 @@ void PlayerbotFactory::Randomize(bool incremental)
 void PlayerbotFactory::Refresh()
 {
     Prepare();
+    InitEquipment(true);
     InitAmmo();
     InitFood();
-    InitPotions();
     InitReagents();
+    InitPotions();
+    InitTalents(true);
+    InitClassSpells();
+    InitAvailableSpells();
+    bot->DurabilityRepairAll(false, 1.0f, false);
+    uint32 money = urand(level * 1000, level * 5 * 1000);
+    if (bot->GetMoney() < money)
+        bot->SetMoney(money);
+    bot->SaveToDB(false, false);
+
+    // Prepare();
+    // InitAmmo();
+    // InitFood();
+    // InitPotions();
+    
     //bot->SaveToDB();
 }
 
@@ -1731,12 +1738,13 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
     uint32 maxValue = level * 5;
 
     // do not let skill go beyond limit even if maxlevel > blizzlike
-    if (level > 60)
-    {
-        maxValue = (level + 10) * 5;
-    }
+    // if (level > 60)
+    // {
+    //     maxValue = (level + 10) * 5;
+    // }
 
-    uint32 value = urand(maxValue - level, maxValue);
+    // uint32 value = urand(maxValue - level, maxValue);
+    uint32 value = maxValue;
     uint32 curValue = bot->GetSkillValue(id);
 
     uint16 step = bot->GetSkillValue(id) ? bot->GetSkillStep(id) : 1;

@@ -36,7 +36,7 @@ class MovementAction : public Action
         bool Flee(Unit *target);
         void ClearIdleState();
         void UpdateMovementState();
-
+        bool MoveAway(Unit* target);
         void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
 };
 

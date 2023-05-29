@@ -1648,11 +1648,21 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
         if (pet->HasSpell(spellid))
             return true;
 
-    if (checkHasSpell && !bot->HasSpell(spellid))
+    if (checkHasSpell && !bot->HasSpell(spellid)) {
+        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Bot not has spell. - target name: {}, spellid: {}, bot name: {}", 
+                target->GetName(), spellid, bot->GetName());
+        }
         return false;
+    }
 
-    if (bot->HasSpellCooldown(spellid))
+    if (bot->HasSpellCooldown(spellid)) {
+        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Spell not has cooldown. - target name: {}, spellid: {}, bot name: {}", 
+                target->GetName(), spellid, bot->GetName());
+        }
         return false;
+    }
 
 	SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
 	if (!spellInfo)

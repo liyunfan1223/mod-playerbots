@@ -148,6 +148,10 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
             creators["bestial wrath"] = &HunterAiObjectContextInternal::bestial_wrath;
             creators["scare beast"] = &HunterAiObjectContextInternal::scare_beast;
             creators["scare beast on cc"] = &HunterAiObjectContextInternal::scare_beast_on_cc;
+            creators["aspect of the dragonhawk"] = &HunterAiObjectContextInternal::aspect_of_the_dragonhawk;
+            creators["tranquilizing shot"] = &HunterAiObjectContextInternal::tranquilizing_shot;
+            creators["steady shot"] = &HunterAiObjectContextInternal::steady_shot;
+            creators["kill shot"] = &HunterAiObjectContextInternal::kill_shot;
         }
 
     private:
@@ -186,6 +190,10 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* aspect_of_the_cheetah(PlayerbotAI* botAI) { return new CastAspectOfTheCheetahAction(botAI); }
         static Action* wing_clip(PlayerbotAI* botAI) { return new CastWingClipAction(botAI); }
         static Action* raptor_strike(PlayerbotAI* botAI) { return new CastRaptorStrikeAction(botAI); }
+        static Action* aspect_of_the_dragonhawk(PlayerbotAI* ai) { return new CastAspectOfTheDragonhawkAction(ai); }
+        static Action* tranquilizing_shot(PlayerbotAI* ai) { return new CastTranquilizingShortAction(ai); }
+        static Action* steady_shot(PlayerbotAI* ai) { return new CastSteadyShotAction(ai); }
+        static Action* kill_shot(PlayerbotAI* ai) { return new CastKillShotAction(ai); }
 };
 
 HunterAiObjectContext::HunterAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

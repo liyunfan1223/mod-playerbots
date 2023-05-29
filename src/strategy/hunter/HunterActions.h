@@ -62,10 +62,25 @@ END_SPELL_ACTION()
 BEGIN_RANGED_SPELL_ACTION(CastScorpidStingAction, "scorpid sting")
 END_SPELL_ACTION()
 
+BEGIN_RANGED_SPELL_ACTION(CastSteadyShotAction, "steady shot")
+END_SPELL_ACTION()
+
+BEGIN_RANGED_SPELL_ACTION(CastKillShotAction, "kill shot")
+END_SPELL_ACTION()
+
+BEGIN_RANGED_SPELL_ACTION(CastTranquilizingShortAction, "tranquilizing shot")
+END_SPELL_ACTION()
+
 class CastAspectOfTheHawkAction : public CastBuffSpellAction
 {
 	public:
 		CastAspectOfTheHawkAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "aspect of the hawk") { }
+};
+
+class CastAspectOfTheDragonhawkAction : public CastBuffSpellAction
+{
+public:
+    CastAspectOfTheDragonhawkAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "aspect of the dragonhawk") {}
 };
 
 class CastAspectOfTheWildAction : public CastBuffSpellAction

@@ -24,6 +24,7 @@ class HunterAspectOfTheHawkTrigger : public BuffTrigger
 {
     public:
         HunterAspectOfTheHawkTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "aspect of the hawk") { }
+        bool IsActive() override;
 };
 
 class HunterAspectOfTheWildTrigger : public BuffTrigger

@@ -225,19 +225,19 @@ class NoDrinkTrigger : public Trigger
 class LightAoeTrigger : public AoeTrigger
 {
     public:
-        LightAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 2, 15.0f) { }
+        LightAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 2, 8.0f) { }
 };
 
 class MediumAoeTrigger : public AoeTrigger
 {
     public:
-        MediumAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 3, 17.0f) { }
+        MediumAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 3, 8.0f) { }
 };
 
 class HighAoeTrigger : public AoeTrigger
 {
     public:
-        HighAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 4, 20.0f) { }
+        HighAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 4, 8.0f) { }
 };
 
 class BuffTrigger : public SpellTrigger
@@ -413,7 +413,7 @@ END_TRIGGER()
 class NoPetTrigger : public Trigger
 {
     public:
-        NoPetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no pet", 30) { }
+        NoPetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no pet", 5) { }
 
         bool IsActive() override;
 };

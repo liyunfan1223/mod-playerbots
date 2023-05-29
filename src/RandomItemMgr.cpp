@@ -2195,7 +2195,7 @@ void RandomItemMgr::BuildAmmoCache()
 
 uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass)
 {
-    return ammoCache[(level - 1) / 10][subClass];
+    return ammoCache[level / 10][subClass];
 }
 
 void RandomItemMgr::BuildPotionCache()

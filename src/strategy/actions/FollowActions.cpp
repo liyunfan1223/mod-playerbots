@@ -27,6 +27,16 @@ bool FollowAction::Execute(Event event)
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
 
+    if (Pet* pet = bot->GetPet())
+    {
+        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
+        {
+            pet->SetReactState(REACT_PASSIVE);
+            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            pet->GetCharmInfo()->SetIsFollowing(true);
+            pet->AttackStop();
+        }
+    }
     //if (moved)
         //botAI->SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
 

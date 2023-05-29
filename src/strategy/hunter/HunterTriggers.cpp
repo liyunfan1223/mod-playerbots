@@ -7,6 +7,14 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
+bool HunterAspectOfTheHawkTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    return SpellTrigger::IsActive() &&
+        !botAI->HasAura("aspect of the hawk", target) && !botAI->HasAura("aspect of the dragonhawk", target) &&
+        (!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > 70);
+}
+
 bool HunterNoStingsActiveTrigger::IsActive()
 {
 	Unit* target = AI_VALUE(Unit*, "current target");
@@ -16,6 +24,8 @@ bool HunterNoStingsActiveTrigger::IsActive()
 
 bool HuntersPetDeadTrigger::IsActive()
 {
+    // Unit* pet = AI_VALUE(Unit*, "pet target");
+    // return pet && AI_VALUE2(bool, "dead", "pet target") && !AI_VALUE2(bool, "mounted", "self target");
     return AI_VALUE(bool, "pet dead") && !AI_VALUE2(bool, "mounted", "self target");
 }
 
@@ -32,7 +42,8 @@ bool HunterPetNotHappy::IsActive()
 
 bool HunterAspectOfTheViperTrigger::IsActive()
 {
-    return SpellTrigger::IsActive() && !botAI->HasAura(spell, GetTarget());
+    return SpellTrigger::IsActive() && !botAI->HasAura(spell, GetTarget()) && 
+                AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;;
 }
 
 bool HunterAspectOfThePackTrigger::IsActive()

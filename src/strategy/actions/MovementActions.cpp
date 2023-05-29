@@ -4,6 +4,7 @@
 
 #include "MovementActions.h"
 #include "MovementGenerator.h"
+#include "PlayerbotAIConfig.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
 #include "LastMovementValue.h"
@@ -1211,22 +1212,33 @@ void MovementAction::ClearIdleState()
     context->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 }
 
+bool MovementAction::MoveAway(Unit* target)
+{
+    float angle = target->GetAngle(bot);
+    float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
+    float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+    float dz = bot->GetPositionZ();
+    return MoveTo(target->GetMapId(), dx, dy, dz);
+}
+
 bool FleeAction::Execute(Event event)
 {
-    return Flee(AI_VALUE(Unit*, "current target"));
+    // return Flee(AI_VALUE(Unit*, "current target"));
+    return MoveAway(AI_VALUE(Unit*, "current target"));
 }
 
 bool FleeWithPetAction::Execute(Event event)
 {
-    // if (Pet* pet = bot->GetPet())
-    // {
-    //     if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
-    //     {
-    //         pet->SetReactState(REACT_PASSIVE);
-    //         pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-    //         pet->AttackStop();
-    //     }
-    // }
+    if (Pet* pet = bot->GetPet())
+    {
+        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
+        {
+            pet->SetReactState(REACT_PASSIVE);
+            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            pet->GetCharmInfo()->SetIsFollowing(true);
+            pet->AttackStop();
+        }
+    }
 
     return Flee(AI_VALUE(Unit*, "current target"));
 }

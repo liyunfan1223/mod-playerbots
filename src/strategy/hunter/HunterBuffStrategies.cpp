@@ -7,6 +7,7 @@
 
 void HunterBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+    triggers.push_back(new TriggerNode("aspect of the hawk", NextAction::array(0, new NextAction("aspect of the dragonhawk", 90.0f), nullptr)));
 	triggers.push_back(new TriggerNode("aspect of the hawk", NextAction::array(0, new NextAction("aspect of the hawk", 90.0f), nullptr)));
 }
 

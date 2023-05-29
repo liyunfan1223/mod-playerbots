@@ -69,13 +69,13 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("enemy too close for auto shot", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy too close for auto shot", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("wing clip", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("feign death", 35.0f), nullptr)));
     triggers.push_back(new TriggerNode("hunters pet low health", NextAction::array(0, new NextAction("mend pet", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode("switch to melee", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), nullptr)));
-    triggers.push_back(new TriggerNode("switch to ranged", NextAction::array(0, new NextAction("switch to ranged", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode("no ammo", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), new NextAction("say::no ammo", ACTION_HIGH), nullptr)));
+    // triggers.push_back(new TriggerNode("no ammo", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), new NextAction("say::no ammo", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("aspect of the viper", NextAction::array(0, new NextAction("aspect of the viper", ACTION_HIGH), NULL)));
+    triggers.push_back(new TriggerNode("enemy too close for shoot", NextAction::array(0, new NextAction("flee", ACTION_HIGH + 3), NULL)));
 }
 
 NextAction** HunterBoostStrategy::getDefaultActions()
