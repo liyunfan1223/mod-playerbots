@@ -1198,7 +1198,7 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     uint8 race = bot->getRace();
     LOG_INFO("playerbots", "Random teleporting bot {} for RPG ({} locations available)", bot->GetName().c_str(), rpgLocsCacheLevel[race][level].size());
     RandomTeleport(bot, rpgLocsCacheLevel[race][level]);
-    Refresh(bot);
+    // Refresh(bot);
 }
 
 void RandomPlayerbotMgr::RandomTeleport(Player* bot)

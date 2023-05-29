@@ -106,7 +106,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
             ChatHandler ch(masterSession);
             ch.PSendSysMessage("You are not allowed to control bot {}", bot->GetName());
         }
-
+        OnBotLogin(bot);
         LogoutPlayerBot(bot->GetGUID());
 
         LOG_ERROR("playerbots", "Attempt to add not allowed bot {}, please try to reset all random bots", bot->GetName());
