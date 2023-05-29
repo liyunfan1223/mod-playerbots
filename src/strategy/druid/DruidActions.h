@@ -236,4 +236,21 @@ class CastNaturesSwiftnessAction : public CastBuffSpellAction
         CastNaturesSwiftnessAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "nature's swiftness") { }
 };
 
+class CastWildGrowthOnPartyAction : public HealPartyMemberAction
+{
+public:
+	CastWildGrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "wild growth") {}
+};
+
+class CastPartySwiftmendAction : public HealPartyMemberAction
+{
+public:
+	CastPartySwiftmendAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "swiftmend") {}
+};
+
+class CastPartyNourishAction : public HealPartyMemberAction
+{
+public:
+	CastPartyNourishAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
+};
 #endif

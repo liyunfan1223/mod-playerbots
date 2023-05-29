@@ -85,6 +85,7 @@ class ChatActionContext : public NamedObjectContext<Action>
             creators["reputation"] = &ChatActionContext::reputation;
             creators["log"] = &ChatActionContext::log;
             creators["los"] = &ChatActionContext::los;
+            creators["aura"] = &ChatActionContext::aura;
             creators["drop"] = &ChatActionContext::drop;
             creators["clean quest log"] = &ChatActionContext::clean_quest_log;
             creators["share"] = &ChatActionContext::share;
@@ -238,6 +239,7 @@ class ChatActionContext : public NamedObjectContext<Action>
         static Action* reputation(PlayerbotAI* botAI) { return new TellReputationAction(botAI); }
         static Action* log(PlayerbotAI* botAI) { return new LogLevelAction(botAI); }
         static Action* los(PlayerbotAI* botAI) { return new TellLosAction(botAI); }
+        static Action* aura(PlayerbotAI* ai) { return new TellAuraAction(ai); }
         static Action* ll(PlayerbotAI* botAI) { return new LootStrategyAction(botAI); }
         static Action* ss(PlayerbotAI* botAI) { return new SkipSpellsListAction(botAI); }
         static Action* add_all_loot(PlayerbotAI* botAI) { return new AddAllLootAction(botAI); }

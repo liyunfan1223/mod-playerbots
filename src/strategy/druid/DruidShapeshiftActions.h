@@ -36,6 +36,7 @@ class CastTreeFormAction : public CastBuffSpellAction
 {
     public:
         CastTreeFormAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "tree of life") { }
+        bool isUseful() override;
 };
 
 class CastMoonkinFormAction : public CastBuffSpellAction

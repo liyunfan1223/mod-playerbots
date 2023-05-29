@@ -2568,7 +2568,7 @@ bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
                 continue;
 
             if (sPlayerbotAIConfig->dispelAuraDuration && aura->GetDuration() && aura->GetDuration() < (int32)sPlayerbotAIConfig->dispelAuraDuration)
-                return false;
+                continue;
 
             if (canDispel(spellInfo, dispelType))
                 return true;
@@ -2946,7 +2946,7 @@ void PlayerbotAI::RemoveShapeshift()
     RemoveAura("swift flight form");
     RemoveAura("aquatic form");
     RemoveAura("ghost wolf");
-    RemoveAura("tree of life");
+    // RemoveAura("tree of life");
 }
 
 uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBank)

@@ -45,12 +45,19 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
                 }
             }
         }
+    } else {
+        std::vector<Player*> vec;
+        vec.push_back(bot);
+        Unit* target = FindPartyMember(&vec, predicate);
+        if (target)
+            return target;
+        return NULL;
     }
 
     if (!ignoreOutOfGroup && !nearestPlayers.empty() && nearestPlayers.size() < 100)
         nearestGroupPlayers.insert(nearestGroupPlayers.end(), nearestPlayers.begin(), nearestPlayers.end());
 
-    nearestPlayers.insert(nearestPlayers.end(), nearestGroupPlayers.begin(), nearestGroupPlayers.end());
+    // nearestPlayers.insert(nearestP   layers.end(), nearestGroupPlayers.begin(), nearestGroupPlayers.end());
 
     std::vector<Player*> healers;
     std::vector<Player*> tanks;
@@ -93,7 +100,10 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
 
 bool PartyMemberValue::Check(Unit* player)
 {
-    return player && player != bot && player->GetMapId() == bot->GetMapId() && bot->IsWithinDistInMap(player, sPlayerbotAIConfig->sightDistance, false);
+    // return player && player != bot && player->GetMapId() == bot->GetMapId() && bot->IsWithinDistInMap(player, sPlayerbotAIConfig->sightDistance, false);
+    return player && player->GetMapId() == bot->GetMapId() &&
+        bot->GetDistance(player) < sPlayerbotAIConfig->spellDistance * 2 &&
+        bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 
 bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &predicate)

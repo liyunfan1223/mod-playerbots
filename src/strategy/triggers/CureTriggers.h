@@ -13,7 +13,7 @@ class Unit;
 class NeedCureTrigger : public SpellTrigger
 {
     public:
-        NeedCureTrigger(PlayerbotAI* botAI, std::string const spell, uint32 dispelType) : SpellTrigger(botAI, spell, 5), dispelType(dispelType) { }
+        NeedCureTrigger(PlayerbotAI* botAI, std::string const spell, uint32 dispelType) : SpellTrigger(botAI, spell, 1), dispelType(dispelType) { }
 
         std::string const GetTargetName() override { return "self target"; }
         bool IsActive() override;

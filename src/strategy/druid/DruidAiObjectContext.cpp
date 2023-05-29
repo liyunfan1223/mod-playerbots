@@ -199,6 +199,9 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
             creators["shred"] = &DruidAiObjectContextInternal::shred;
             creators["ravage"] = &DruidAiObjectContextInternal::ravage;
             creators["pounce"] = &DruidAiObjectContextInternal::pounce;
+            creators["wild growth on party"] = &DruidAiObjectContextInternal::wild_growth_on_party;
+            creators["swiftmend on party"] = &DruidAiObjectContextInternal::swiftmend_on_party;
+            creators["nourish on party"] = &DruidAiObjectContextInternal::nourish_on_party;
         }
 
     private:
@@ -270,6 +273,9 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* prowl(PlayerbotAI* botAI) { return new CastProwlAction(botAI); }
         static Action* dash(PlayerbotAI* botAI) { return new CastDashAction(botAI); }
         static Action* shred(PlayerbotAI* botAI) { return new CastShredAction(botAI); }
+        static Action* wild_growth_on_party(PlayerbotAI* ai) { return new CastWildGrowthOnPartyAction(ai); }
+        static Action* swiftmend_on_party(PlayerbotAI *ai) { return new CastPartySwiftmendAction(ai); }
+        static Action* nourish_on_party(PlayerbotAI *ai) { return new CastPartyNourishAction(ai); }
 };
 
 DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

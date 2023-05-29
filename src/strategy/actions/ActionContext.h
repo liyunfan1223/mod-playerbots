@@ -219,6 +219,8 @@ class ActionContext : public NamedObjectContext<Action>
             creators["rpg trade useful"] = &ActionContext::rpg_trade_useful;
             creators["rpg duel"] = &ActionContext::rpg_duel;
             creators["rpg mount anim"] = &ActionContext::rpg_mount_anim;
+
+            creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
         }
 
     private:
@@ -378,6 +380,8 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* rpg_trade_useful(PlayerbotAI* botAI) { return new RpgTradeUsefulAction(botAI); }
         static Action* rpg_duel(PlayerbotAI* botAI) { return new RpgDuelAction(botAI); }
         static Action* rpg_mount_anim(PlayerbotAI* botAI) { return new RpgMountAnimAction(botAI); }
+
+        static Action* toggle_pet_spell(PlayerbotAI* ai) { return new TogglePetSpellAutoCastAction(ai); }
 };
 
 #endif

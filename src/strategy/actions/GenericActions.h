@@ -18,4 +18,11 @@ class MeleeAction : public AttackAction
         bool isUseful() override;
 };
 
+class TogglePetSpellAutoCastAction: public Action
+{
+public:
+    TogglePetSpellAutoCastAction(PlayerbotAI* ai): Action(ai, "toggle pet spell") {}
+    virtual bool Execute(Event event) override;
+};
+
 #endif

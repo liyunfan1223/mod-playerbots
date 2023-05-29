@@ -21,6 +21,10 @@ bool NoPetTrigger::IsActive()
     return !AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target");
 }
 
+bool HasPetTrigger::IsActive() {
+    return AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target");;
+}
+
 bool HighManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < 65;

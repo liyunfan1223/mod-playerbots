@@ -42,7 +42,7 @@ bool BearFormTrigger::IsActive()
 
 bool TreeFormTrigger::IsActive()
 {
-    return !botAI->HasAura("tree of life", bot);
+    return !botAI->HasAura(33891, bot);
 }
 
 bool CatFormTrigger::IsActive()

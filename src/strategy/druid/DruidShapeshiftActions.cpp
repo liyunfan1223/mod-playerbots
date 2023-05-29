@@ -39,3 +39,8 @@ bool CastCasterFormAction::Execute(Event event)
     botAI->RemoveShapeshift();
     return true;
 }
+
+bool CastTreeFormAction::isUseful() {
+    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != nullptr) && 
+        CastSpellAction::isUseful() && !botAI->HasAura(33891, bot);
+}

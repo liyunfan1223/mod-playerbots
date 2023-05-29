@@ -418,6 +418,14 @@ class NoPetTrigger : public Trigger
         bool IsActive() override;
 };
 
+class HasPetTrigger : public Trigger
+{
+public:
+    HasPetTrigger(PlayerbotAI* ai) : Trigger(ai, "no pet", 5) {}
+
+    virtual bool IsActive() override;
+};
+
 class ItemCountTrigger : public Trigger
 {
 	public:

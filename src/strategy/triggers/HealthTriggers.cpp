@@ -30,3 +30,8 @@ bool AoeHealTrigger::IsActive()
     return AI_VALUE2(uint8, "aoe heal", type) >= count;
 }
 
+bool AoeInGroupTrigger::IsActive()
+{
+    Group *group = bot->GetGroup();
+    return group && AI_VALUE2(uint8, "aoe heal", type) >= (group->GetMembersCount() * ratio);
+}
