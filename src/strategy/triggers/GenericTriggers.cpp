@@ -18,11 +18,11 @@ bool MediumManaTrigger::IsActive()
 
 bool NoPetTrigger::IsActive()
 {
-    return !AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target");
+    return !AI_VALUE(Unit*, "pet target") && !bot->GetGuardianPet() && !AI_VALUE2(bool, "mounted", "self target");
 }
 
 bool HasPetTrigger::IsActive() {
-    return AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target");;
+    return (AI_VALUE(Unit*, "pet target") || bot->GetGuardianPet()) && !AI_VALUE2(bool, "mounted", "self target");;
 }
 
 bool HighManaTrigger::IsActive()

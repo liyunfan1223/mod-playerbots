@@ -1237,6 +1237,8 @@ bool FleeWithPetAction::Execute(Event event)
             pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
             pet->GetCharmInfo()->SetIsFollowing(true);
             pet->AttackStop();
+            pet->GetCharmInfo()->IsReturning();
+            pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
     }
 
