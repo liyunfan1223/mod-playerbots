@@ -85,7 +85,7 @@ void AttackersValue::RemoveNonThreating(std::set<Unit*>& targets)
     for (std::set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
         Unit* unit = *tIter;
-        if (!IsValidTarget(unit, bot))
+        if (!IsValidTarget(unit, bot) || !bot->IsWithinLOSInMap(unit))
         {
             std::set<Unit*>::iterator tIter2 = tIter;
             ++tIter;
@@ -129,8 +129,8 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
         !(attacker->GetGUID().IsPet() && enemy) &&
         !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER && !attacker->IsInCombat()) && !(sPlayerbotAIConfig->IsInPvpProhibitedZone(attacker->GetAreaId()) &&
         (attacker->GetGUID().IsPlayer() || attacker->GetGUID().IsPet())) && (!c || (!c->IsInEvadeMode() && ((!isMemberBotGroup && botAI->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) ||
-        leaderHasThreat || (!c->hasLootRecipient() && (!c->GetVictim() || c->GetVictim() && ((!c->GetVictim()->IsPlayer() || bot->IsInSameGroupWith(c->GetVictim()->ToPlayer())) ||
-        (botAI->GetMaster() && c->GetVictim() == botAI->GetMaster())))) || c->isTappedBy(bot))));
+        leaderHasThreat || (!c->hasLootRecipient() && (!c->GetVictim() || (c->GetVictim() && ((!c->GetVictim()->IsPlayer() || bot->IsInSameGroupWith(c->GetVictim()->ToPlayer())) ||
+        (botAI->GetMaster() && c->GetVictim() == botAI->GetMaster()))))) || c->isTappedBy(bot))));
 }
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
