@@ -481,11 +481,11 @@ AiPlayerbot.LootDelay = 1000
 # Distances
 AiPlayerbot.FarDistance = 20.0
 AiPlayerbot.SightDistance = 60.0
-AiPlayerbot.SpellDistance = 26.0
+AiPlayerbot.SpellDistance = 28.5
 AiPlayerbot.ShootDistance = 5.0
 AiPlayerbot.ReactDistance = 150.0
 AiPlayerbot.GrindDistance = 75.0
-AiPlayerbot.HealDistance = 20.0
+AiPlayerbot.HealDistance = 38.5
 AiPlayerbot.LootDistance = 15.0
 AiPlayerbot.FleeDistance = 5.0
 AiPlayerbot.TooCloseDistance = 5.0
