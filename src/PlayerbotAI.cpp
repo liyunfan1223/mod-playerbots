@@ -1679,44 +1679,44 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 
 	if (!itemTarget)
 	{
-        // bool positiveSpell = spellInfo->IsPositive();
+        bool positiveSpell = spellInfo->IsPositive();
         // if (positiveSpell && bot->IsHostileTo(target))
         //     return false;
 
         // if (!positiveSpell && bot->IsFriendlyTo(target))
         //     return false;
 
-        // bool damage = false;
-        // for (uint8 i = EFFECT_0; i <= EFFECT_2; i++)
-        // {
-        //     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
-        //     {
-        //         damage = true;
-        //         break;
-        //     }
-        // }
+        bool damage = false;
+        for (uint8 i = EFFECT_0; i <= EFFECT_2; i++)
+        {
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
+            {
+                damage = true;
+                break;
+            }
+        }
 
-        // if (target->IsImmunedToSpell(spellInfo)) {
-        //     if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-        //         LOG_DEBUG("playerbots", "target is immuned to spell - target name: {}, spellid: {}, bot name: {}", 
-        //             target->GetName(), spellid, bot->GetName());
-        //     }
-        //     return false;
-        // }
+        if (target->IsImmunedToSpell(spellInfo)) {
+            if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+                LOG_DEBUG("playerbots", "target is immuned to spell - target name: {}, spellid: {}, bot name: {}", 
+                    target->GetName(), spellid, bot->GetName());
+            }
+            return false;
+        }
 
-        // if (!damage)
-        // {
-        //     for (uint8 i = EFFECT_0; i <= EFFECT_2; i++)
-        //     {
-        //         if (target->IsImmunedToSpellEffect(spellInfo, i)) {
-        //             if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-        //                 LOG_DEBUG("playerbots", "target is immuned to spell effect - target name: {}, spellid: {}, bot name: {}", 
-        //                     target->GetName(), spellid, bot->GetName());
-        //             }
-        //             return false;
-        //         }
-        //     }
-        // }
+        if (!damage)
+        {
+            for (uint8 i = EFFECT_0; i <= EFFECT_2; i++)
+            {
+                if (target->IsImmunedToSpellEffect(spellInfo, i)) {
+                    if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+                        LOG_DEBUG("playerbots", "target is immuned to spell effect - target name: {}, spellid: {}, bot name: {}", 
+                            target->GetName(), spellid, bot->GetName());
+                    }
+                    return false;
+                }
+            }
+        }
 
         if (bot != target && sServerFacade->GetDistance2d(bot, target) > sPlayerbotAIConfig->sightDistance) {
             if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
@@ -2036,20 +2036,20 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 
     spell->prepare(&targets);
 
-    if (spellInfo->Effects[0].Effect == SPELL_EFFECT_OPEN_LOCK || spellInfo->Effects[0].Effect == SPELL_EFFECT_SKINNING)
-    {
-        LootObject loot = *aiObjectContext->GetValue<LootObject>("loot target");
-        if (!loot.IsLootPossible(bot))
-        {
-            spell->cancel();
-            delete spell;
-            if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-                LOG_DEBUG("playerbots", "Spell cast loot - target name: {}, spellid: {}, bot name: {}", 
-                    target->GetName(), spellId, bot->GetName());
-            }
-            return false;
-        }
-    }
+    // if (spellInfo->Effects[0].Effect == SPELL_EFFECT_OPEN_LOCK || spellInfo->Effects[0].Effect == SPELL_EFFECT_SKINNING)
+    // {
+    //     LootObject loot = *aiObjectContext->GetValue<LootObject>("loot target");
+    //     if (!loot.IsLootPossible(bot))
+    //     {
+    //         spell->cancel();
+    //         delete spell;
+    //         if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+    //             LOG_DEBUG("playerbots", "Spell cast loot - target name: {}, spellid: {}, bot name: {}", 
+    //                 target->GetName(), spellId, bot->GetName());
+    //         }
+    //         return false;
+    //     }
+    // }
 
     WaitForSpellCast(spell);
     if (spell->GetCastTime())
@@ -2473,6 +2473,7 @@ void PlayerbotAI::WaitForSpellCast(Spell* spell)
 	if (spellInfo->IsChanneled())
     {
         int32 duration = spellInfo->GetDuration();
+        bot->ApplySpellMod(spellInfo->Id, SPELLMOD_DURATION, duration);
         if (duration > 0)
             castTime += duration;
     }
