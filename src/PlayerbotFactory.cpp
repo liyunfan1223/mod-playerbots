@@ -141,8 +141,6 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     bot->GiveLevel(level);
     bot->InitStatsForLevel();
-    bot->SetHealth(bot->GetMaxHealth());
-    bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     CancelAuras();
     bot->SaveToDB(false, false);
     if (pmo)
@@ -336,6 +334,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Save");
     LOG_INFO("playerbots", "Saving to DB...");
     bot->SetMoney(urand(level * 100000, level * 5 * 100000));
+    bot->SetHealth(bot->GetMaxHealth());
+    bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     bot->SaveToDB(false, false);
     LOG_INFO("playerbots", "Done.");
     if (pmo)
@@ -554,35 +554,71 @@ void PlayerbotFactory::InitPet()
                 continue;
             uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
             uint32 pet_number = sObjectMgr->GeneratePetNumber();
-            pet = new Pet(bot, HUNTER_PET);
-            if (!pet->Create(guid, bot->GetMap(), bot->GetPhaseMask(), co->Entry, pet_number))
+            if (bot->GetPetStable() && bot->GetPetStable()->CurrentPet) {
+                bot->GetPetStable()->CurrentPet.value();
+                // bot->GetPetStable()->CurrentPet.reset();
+                bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
+                bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+            }
+            if (bot->GetPetStable() && bot->GetPetStable()->GetUnslottedHunterPet()) {
+                bot->GetPetStable()->UnslottedPets.clear();
+                bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
+                bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+            }
+            // }
+            pet = bot->CreateTamedPetFrom(co->Entry, 0);
+            if (!pet)
             {
-                delete pet;
-                pet = nullptr;
+                LOG_ERROR("playerbots", "No pet.");
                 continue;
             }
 
-            pet->Relocate(bot);
-            pet->SetOwnerGUID(bot->GetGUID());
-            pet->SetGuidValue(UNIT_FIELD_CREATEDBY, bot->GetGUID());
-            pet->SetFaction(bot->GetFaction());
-            pet->SetLevel(bot->getLevel());
-            pet->InitStatsForLevel(bot->getLevel());
-            pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
-            pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
+            // prepare visual effect for levelup
+            pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel() - 1);
+
+            // add to world
             pet->GetMap()->AddToMap(pet->ToCreature());
-            // pet->InitPetCreateSpells();
+
+            // visual effect for levelup
+            pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel());
+
+            // caster have pet now
+            bot->SetMinion(pet, true);
+
             pet->InitTalentForLevel();
-            // pet->LearnPetPassives();
-            pet->CastPetAuras(true);
-            pet->UpdateAllStats();
 
-            PetStable& petStable = bot->GetOrInitPetStable();
-            pet->FillPetInfo(&petStable.CurrentPet.emplace());
-
-            LOG_INFO("playerbots",   "Bot {}: assign pet {} ({} level)", bot->GetName().c_str(), co->Entry, bot->getLevel());
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-            bot->PetSpellInitialize();
+            // bot->PetSpellInitialize();
+            // if (!pet->Create(guid, bot->GetMap(), bot->GetPhaseMask(), co->Entry, pet_number))
+            // {
+            //     delete pet;
+            //     pet = nullptr;
+            //     continue;
+            // }
+            
+            // pet->Relocate(bot);
+            // pet->SetOwnerGUID(bot->GetGUID());
+            // pet->SetGuidValue(UNIT_FIELD_CREATEDBY, bot->GetGUID());
+            // pet->SetFaction(bot->GetFaction());
+            // pet->SetLevel(bot->getLevel());
+            // pet->InitStatsForLevel(bot->getLevel());
+            // pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
+            // pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
+            // pet->GetMap()->AddToMap(pet->ToCreature());
+
+            // // bot->PetSpellInitialize();
+            
+            // bot->InitTamedPet(pet, bot->getLevel(), 0);
+            // pet->InitTalentForLevel();
+            // pet->CastPetAuras(true);
+            // pet->UpdateAllStats();
+
+            // PetStable& petStable = bot->GetOrInitPetStable();
+            // pet->FillPetInfo(&petStable.CurrentPet.emplace());
+
+            // LOG_INFO("playerbots",   "Bot {}: assign pet {} ({} level)", bot->GetName().c_str(), co->Entry, bot->getLevel());
+            // pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+            // // bot->PetSpellInitialize();
             break;
         }
     }
@@ -600,8 +636,11 @@ void PlayerbotFactory::InitPet()
         return;
     }
 
+    LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.", pet->m_spells.size(), pet->GetPetAutoSpellSize());
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
     {
+        // LOG_INFO("playerbots", "Start. Make spell {} for pet {} auto cast, bot: {}. state: {}", itr->first, pet->GetName(), bot->GetName(),
+            // itr->second.state);
         if (itr->second.state == PETSPELL_REMOVED)
             continue;
 
@@ -609,11 +648,19 @@ void PlayerbotFactory::InitPet()
         if (!spellInfo)
             continue;
 
-        if (spellInfo->IsPassive())
+        if (spellInfo->IsPassive()) {
+            // LOG_INFO("playerbots", "Start. Make spell {} for pet {} auto cast, bot: {}. Passive continue.", 
+            //     itr->first, pet->GetName(), bot->GetName());
             continue;
-
+        }
+        LOG_INFO("playerbots", "Make spell {} for pet {} auto cast, bot: {}. old_active: {}. old_state: {}.", 
+            itr->first, pet->GetName(), bot->GetName(), itr->second.active, itr->second.state);
         pet->ToggleAutocast(spellInfo, true);
+        LOG_INFO("playerbots", "AFTER - Make spell {} for pet {} auto cast, bot: {}. active: {}. state: {}.", 
+            itr->first, pet->GetName(), bot->GetName(), itr->second.active, itr->second.state);
     }
+    LOG_INFO("playerbots", "AFTER,  {} already auto casted.", pet->GetPetAutoSpellSize());
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
 void PlayerbotFactory::ClearSkills()
@@ -1611,6 +1658,7 @@ void PlayerbotFactory::InitSkills()
 
     uint32 skillLevel = bot->getLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->getLevel() < 20 ? 0 : 1;
+    SetRandomSkill(SKILL_DEFENSE);
     switch (bot->getClass())
     {
         case CLASS_DRUID:
@@ -2133,14 +2181,9 @@ void PlayerbotFactory::InitAmmo()
     if (!subClass)
         return;
 
-    uint32 entry = bot->GetUInt32Value(PLAYER_AMMO_ID);
+    uint32 entry = sRandomItemMgr->GetAmmo(level, subClass);
     uint32 count = bot->GetItemCount(entry) / 200;
     uint32 maxCount = 5 + level / 10;
-
-    if (!entry || count <= 2)
-    {
-        entry = sRandomItemMgr->GetAmmo(level, subClass);
-    }
 
     if (count < maxCount)
     {
