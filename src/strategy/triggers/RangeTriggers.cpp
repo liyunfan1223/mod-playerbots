@@ -166,7 +166,7 @@ bool PartyMemberToHealOutOfSpellRangeTrigger::IsActive()
 }
 
 PartyMemberToHealOutOfSpellRangeTrigger::PartyMemberToHealOutOfSpellRangeTrigger(PlayerbotAI* botAI) :
-    OutOfRangeTrigger(botAI, "party member to heal out of spell range", botAI->GetRange("heal"))
+    OutOfRangeTrigger(botAI, "party member to heal out of spell range", botAI->GetRange("spell"))
 {
 }
 

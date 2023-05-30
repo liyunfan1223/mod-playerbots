@@ -61,9 +61,11 @@ float DistanceValue::Calculate()
     }
     else if (qualifier == "current target")
     {
-        Stance* stance = AI_VALUE(Stance*, "stance");
-        WorldLocation loc = stance->GetLocation();
-        return sServerFacade->GetDistance2d(botAI->GetBot(), loc.GetPositionX(), loc.GetPositionY());
+        Unit* target = AI_VALUE(Unit*, qualifier);
+        if (!target || !target->IsInWorld())
+            return 0.0f;
+
+        return bot->GetDistance2d(target);
     }
     else
     {
