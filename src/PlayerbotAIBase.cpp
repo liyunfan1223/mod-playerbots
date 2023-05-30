@@ -29,13 +29,13 @@ void PlayerbotAIBase::UpdateAI(uint32 elapsed, bool minimal)
 
 void PlayerbotAIBase::SetNextCheckDelay(uint32 const delay)
 {
-    if (nextAICheckDelay < delay)
-        LOG_DEBUG("playerbots", "Setting lesser delay {} -> {}", nextAICheckDelay, delay);
+    // if (nextAICheckDelay < delay)
+        // LOG_DEBUG("playerbots", "Setting lesser delay {} -> {}", nextAICheckDelay, delay);
 
     nextAICheckDelay = delay;
 
-    if (nextAICheckDelay > sPlayerbotAIConfig->globalCoolDown)
-        LOG_DEBUG("playerbots",  "std::set next check delay: {}", nextAICheckDelay);
+    // if (nextAICheckDelay > sPlayerbotAIConfig->globalCoolDown)
+        // LOG_DEBUG("playerbots",  "std::set next check delay: {}", nextAICheckDelay);
 }
 
 void PlayerbotAIBase::IncreaseNextCheckDelay(uint32 delay)
