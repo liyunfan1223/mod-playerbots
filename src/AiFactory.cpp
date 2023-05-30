@@ -353,13 +353,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_DEATH_KNIGHT:
             if (tab == 0)
-                engine->addStrategies("blood", nullptr);
+                engine->addStrategies("blood", "tank assist", nullptr);
             else if (tab == 1)
                 engine->addStrategies("frost", "frost aoe", "dps assist", "threat", nullptr);
             else
                 engine->addStrategies("unholy", "unholy aoe", "dps assist", "threat", nullptr);
 
-            engine->addStrategies("dps assist", "close", nullptr);
+            engine->addStrategies("close", nullptr);
 
             break;
     }

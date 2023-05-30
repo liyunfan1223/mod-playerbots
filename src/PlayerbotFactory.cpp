@@ -3002,7 +3002,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id)
         // spec without double hand
         // enhancement, rogue, ice dk, shield tank
         if (isDoubleHand && 
-            ((cls == CLASS_SHAMAN && tab == 1) ||
+            ((cls == CLASS_SHAMAN && tab == 1 && bot->HasSpell(674)) ||
             (cls == CLASS_ROGUE) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 1) ||
             IsShieldTank())) {
@@ -3014,7 +3014,8 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id)
             ((cls == CLASS_WARRIOR && tab == 1 && bot->HasSpell(46917)) ||
             (cls == CLASS_DRUID && tab == 1) ||
             (cls == CLASS_PALADIN && tab == 2) ||
-            (cls == CLASS_DEATH_KNIGHT && tab == 0))) {
+            (cls == CLASS_DEATH_KNIGHT && tab == 0) ||
+            (cls == CLASS_SHAMAN && tab == 1 && !bot->HasSpell(674)))) {
             score *= 10;
         }
     }

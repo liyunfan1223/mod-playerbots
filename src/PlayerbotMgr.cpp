@@ -623,6 +623,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     if (!*args)
     {
         messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
+        messages.push_back("       addclass CLASSNAME");
         return messages;
     }
 
@@ -631,6 +632,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     if (!cmd)
     {
         messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
+        messages.push_back("       addclass CLASSNAME");
         return messages;
     }
 
