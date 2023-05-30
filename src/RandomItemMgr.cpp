@@ -2174,7 +2174,7 @@ void RandomItemMgr::BuildAmmoCache()
     LOG_INFO("server.loading", "Building ammo cache for {} levels", maxLevel);
 
     uint32 counter = 0;
-    for (uint32 level = 1; level <= maxLevel + 1; level += 10)
+    for (uint32 level = 1; level <= maxLevel; level += 1)
     {
         for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_BULLET; subClass++)
         {
@@ -2185,7 +2185,7 @@ void RandomItemMgr::BuildAmmoCache()
 
             Field* fields = results->Fetch();
             uint32 entry = fields[0].Get<uint32>();
-            ammoCache[level / 10][subClass] = entry;
+            ammoCache[level][subClass] = entry;
             ++counter;
         }
     }
@@ -2195,7 +2195,7 @@ void RandomItemMgr::BuildAmmoCache()
 
 uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass)
 {
-    return ammoCache[level / 10][subClass];
+    return ammoCache[level][subClass];
 }
 
 void RandomItemMgr::BuildPotionCache()

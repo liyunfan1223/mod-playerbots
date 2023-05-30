@@ -24,6 +24,7 @@
 #include "ServerFacade.h"
 #include "ChannelMgr.h"
 
+#include <cstdlib>
 #include <iomanip>
 #include <boost/thread/thread.hpp>
 
@@ -991,14 +992,14 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     std::vector<WorldPosition> tlocs;
     for (auto& loc : locs)
         tlocs.push_back(WorldPosition(loc));
-
+    LOG_INFO("playerbots", "Locs {} collected.", tlocs.size());
     //Do not teleport to maps disabled in config
     tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldPosition l)
     {
         std::vector<uint32>::iterator i = find(sPlayerbotAIConfig->randomBotMaps.begin(), sPlayerbotAIConfig->randomBotMaps.end(), l.getMapId());
         return i == sPlayerbotAIConfig->randomBotMaps.end();
     }), tlocs.end());
-
+    LOG_INFO("playerbots", "Locs {} after disabled in config.", tlocs.size());
     // Check locs again in case all possible locations were removed
     if (tlocs.empty())
     {
@@ -1007,21 +1008,21 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     }
 
     //Random shuffle based on distance. Closer distances are more likely (but not exclusivly) to be at the begin of the list.
-    tlocs = sTravelMgr->getNextPoint(WorldPosition(bot), tlocs, 0);
-
+    // tlocs = sTravelMgr->getNextPoint(WorldPosition(bot), tlocs, 0);
+    // LOG_INFO("playerbots", "Locs {} after shuffled.", tlocs.size());
     // 5% + 0.1% per level chance node on different map in selection.
-    tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l)
-    {
-        return l.GetMapId() != bot->GetMapId() && urand(1, 100) > 5 + 0.1 * bot->getLevel();
-    }), tlocs.end());
-
+    // tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l)
+    // {
+    //     return l.GetMapId() != bot->GetMapId() && urand(1, 100) > 5 + 0.1 * bot->getLevel();
+    // }), tlocs.end());
+    // LOG_INFO("playerbots", "Locs {} after remove different maps.", tlocs.size());
     // Continent is about 20.000 large
     // Bot will travel 0-5000 units + 75-150 units per level.
-    tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l)
-    {
-        return sServerFacade->GetDistance2d(bot, l.GetPositionX(), l.GetPositionY()) > urand(0, 5000) + bot->getLevel() * 15 * urand(5, 10);
-    }), tlocs.end());
-
+    // tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l)
+    // {
+    //     return sServerFacade->GetDistance2d(bot, l.GetPositionX(), l.GetPositionY()) > urand(0, 5000) + bot->getLevel() * 15 * urand(5, 10);
+    // }), tlocs.end());
+    // LOG_INFO("playerbots", "Locs {} after remove too far away.", tlocs.size());
     if (tlocs.empty())
     {
         LOG_DEBUG("playerbots", "Cannot teleport bot {} - no locations available", bot->GetName().c_str());
@@ -1035,7 +1036,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     {
         for (uint8 attemtps = 0; attemtps < 3; ++attemtps)
         {
-            WorldLocation loc = tlocs[i];
+            WorldLocation loc = tlocs[urand(0, tlocs.size() - 1)];
 
             float x = loc.GetPositionX() + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
             float y = loc.GetPositionY() + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);

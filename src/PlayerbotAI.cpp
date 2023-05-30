@@ -239,6 +239,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     // check activity
     AllowActivity();
 
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) {
+        return;
+    }
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (currentSpell && currentSpell->getState() == SPELL_STATE_CASTING && currentSpell->GetCastTime())
     {
@@ -448,7 +451,7 @@ void PlayerbotAI::Reset(bool full)
     aiObjectContext->GetValue<GuidSet&>("ignore rpg target")->Get().clear();
 
     bot->GetMotionMaster()->Clear();
-    bot->CleanupAfterTaxiFlight();
+    // bot->CleanupAfterTaxiFlight();
     InterruptSpell();
 
     if (full)
@@ -2470,13 +2473,13 @@ void PlayerbotAI::WaitForSpellCast(Spell* spell)
     SpellInfo const* spellInfo = spell->GetSpellInfo();
 
     float castTime = spell->GetCastTime();
-	if (spellInfo->IsChanneled())
-    {
-        int32 duration = spellInfo->GetDuration();
-        bot->ApplySpellMod(spellInfo->Id, SPELLMOD_DURATION, duration);
-        if (duration > 0)
-            castTime += duration;
-    }
+	// if (spellInfo->IsChanneled())
+    // {
+    //     int32 duration = spellInfo->GetDuration();
+    //     bot->ApplySpellMod(spellInfo->Id, SPELLMOD_DURATION, duration);
+    //     if (duration > 0)
+    //         castTime += duration;
+    // }
 
     castTime = ceil(castTime);
 

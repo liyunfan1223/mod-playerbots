@@ -21,7 +21,7 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("remove shadowform", 72.0f), new NextAction("power word: shield", 71.0f), new NextAction("flash heal", 70.0f), nullptr)));
     triggers.push_back(new TriggerNode("party member critical health", NextAction::array(0, new NextAction("remove shadowform", 62.0f), new NextAction("power word: shield on party", 61.0f), new NextAction("flash heal on party", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("fade", 55.0f), nullptr)));
-    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("psychic scream", 50.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("psychic scream", 50.0f), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("inner focus", 42.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("symbol of hope", ACTION_EMERGENCY), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("consume magic", 10.0f), nullptr)));
