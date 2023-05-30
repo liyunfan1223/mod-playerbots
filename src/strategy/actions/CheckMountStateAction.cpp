@@ -163,7 +163,7 @@ bool CheckMountStateAction::Mount()
 
 	Player* master = GetMaster();
 	botAI->RemoveShapeshift();
-
+    botAI->RemoveAura("tree of life");
     int32 masterSpeed = 59;
     SpellInfo const* masterSpell = nullptr;
 
