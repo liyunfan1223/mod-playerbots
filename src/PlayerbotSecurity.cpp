@@ -58,7 +58,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             }
         }
 
-        if ((int32)bot->getLevel() - (int8)from->getLevel() > 30)
+        if ((int32)bot->getLevel() - (int8)from->getLevel() > 5)
         {
             if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
             {
