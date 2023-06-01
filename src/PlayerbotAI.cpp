@@ -1985,8 +1985,9 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     }
     else if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
     {
-        WorldLocation aoe = aiObjectContext->GetValue<WorldLocation>("aoe position")->Get();
-        targets.SetDst(aoe);
+        // WorldLocation aoe = aiObjectContext->GetValue<WorldLocation>("aoe position")->Get();
+        // targets.SetDst(aoe);
+        targets.SetDst(*bot);
     }
     else if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
     {
