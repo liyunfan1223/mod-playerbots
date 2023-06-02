@@ -52,6 +52,12 @@ bool CheckMountStateAction::Execute(Event event)
             return Mount();
         }
 
+        if (!master->IsMounted() && bot->IsMounted())
+        {
+            WorldPacket emptyPacket;
+            bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+            return true;
+        }
         // if (!bot->IsMounted() && (chasedistance || (farFromMaster && botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))) && !bot->IsInCombat() && !dps)
         //     return Mount();
 

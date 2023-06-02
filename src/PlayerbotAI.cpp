@@ -2,6 +2,7 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
+#include "ObjectGuid.h"
 #include "Playerbots.h"
 #include "AiFactory.h"
 #include "BudgetValues.h"
@@ -1263,55 +1264,124 @@ void PlayerbotAI::ResetStrategies(bool load)
 
 bool PlayerbotAI::IsRanged(Player* player)
 {
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
-    if (botAI && !player->InBattleground())
-        return botAI->ContainsStrategy(STRATEGY_TYPE_RANGED);
+    PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
+    if (botAi)
+        return botAi->ContainsStrategy(STRATEGY_TYPE_RANGED);
 
+    int tab = AiFactory::GetPlayerSpecTab(player);
     switch (player->getClass())
     {
-        case CLASS_PALADIN:
-        case CLASS_WARRIOR:
-        case CLASS_ROGUE:
-        case CLASS_DEATH_KNIGHT:
+    case CLASS_DEATH_KNIGHT:
+    case CLASS_WARRIOR:
+    case CLASS_ROGUE:
+        return false;
+        break;
+    case CLASS_DRUID:
+        if (tab == 1) {
             return false;
-        case CLASS_DRUID:
-            return !HasAnyAuraOf(player, "cat form", "bear form", "dire bear form", nullptr);
+        }
+        break;
+    case CLASS_PALADIN:
+        if (tab != 0) {
+            return false;
+        }
+        break;
+    case CLASS_SHAMAN:
+        if (tab == 1) {
+            return false;
+        }
+        break;
     }
-
     return true;
 }
 
 bool PlayerbotAI::IsTank(Player* player)
 {
-    if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
-        return botAI->ContainsStrategy(STRATEGY_TYPE_TANK);
+    PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
+    if (botAi)
+        return botAi->ContainsStrategy(STRATEGY_TYPE_TANK);
 
+    int tab = AiFactory::GetPlayerSpecTab(player);
     switch (player->getClass())
     {
-        case CLASS_PALADIN:
-        case CLASS_WARRIOR:
         case CLASS_DEATH_KNIGHT:
-            return true;
+            if (tab == 0) {
+                return true;
+            }
+            break;
+        case CLASS_PALADIN:
+            if (tab == 1) {
+                return true;
+            }
+            break;
+        case CLASS_WARRIOR:
+            if (tab == 2) {
+                return true;
+            }
+            break;
         case CLASS_DRUID:
-            return HasAnyAuraOf(player, "bear form", "dire bear form", nullptr);
+            if (tab == 1 && HasAnyAuraOf(player, "bear form", "dire bear form", "thick hide", NULL)) {
+                return true;
+            }
+            break;
     }
-
     return false;
 }
 
 bool PlayerbotAI::IsHeal(Player* player)
 {
-    if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
-        return botAI->ContainsStrategy(STRATEGY_TYPE_HEAL);
+    PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
+    if (botAi)
+        return botAi->ContainsStrategy(STRATEGY_TYPE_HEAL);
 
+    int tab = AiFactory::GetPlayerSpecTab(player);
     switch (player->getClass())
     {
-        case CLASS_PRIEST:
+    case CLASS_PRIEST:
+        if (tab == PRIEST_TAB_DISIPLINE || tab == PRIEST_TAB_HOLY) {
             return true;
-        case CLASS_DRUID:
-            return HasAnyAuraOf(player, "tree of life form", nullptr);
+        }
+        break;
+    case CLASS_DRUID:
+        if (tab == DRUID_TAB_RESTORATION) {
+            return true;
+        }
+        break;
+    case CLASS_SHAMAN:
+        if (tab == SHAMAN_TAB_RESTORATION) {
+            return true;
+        }
+        break;
+    case CLASS_PALADIN:
+        if (tab == PALADIN_TAB_HOLY) {
+            return true;
+        }
+        break;
     }
+    return false;
+}
 
+bool PlayerbotAI::IsMainTank(Player* player)
+{
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return false;
+    }
+    ObjectGuid mainTank = ObjectGuid();
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    for (Group::member_citerator itr = slots.begin(); itr != slots.end(); ++itr) {
+        if (itr->flags & MEMBER_FLAG_MAINTANK)
+            mainTank = itr->guid;
+    }
+    if (mainTank != ObjectGuid::Empty) {
+        return player->GetGUID() == mainTank;
+    }
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (IsTank(member)) {
+            return player == member;
+        }
+    }
     return false;
 }
 
@@ -1987,7 +2057,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     {
         // WorldLocation aoe = aiObjectContext->GetValue<WorldLocation>("aoe position")->Get();
         // targets.SetDst(aoe);
-        targets.SetDst(*bot);
+        targets.SetDst(*target);
     }
     else if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
     {

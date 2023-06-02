@@ -208,6 +208,66 @@ enum BotRoles : uint8
     BOT_ROLE_DPS    = 0x04
 };
 
+enum HUNTER_TABS {
+    HUNTER_TAB_BEASTMASTER,
+    HUNTER_TAB_MARKSMANSHIP,
+    HUNTER_TAB_SURVIVAL,
+};
+
+enum ROGUE_TABS {
+    ROGUE_TAB_ASSASSINATION,
+    ROGUE_TAB_COMBAT,
+    ROGUE_TAB_SUBTLETY
+};
+
+enum PRIEST_TABS {
+    PRIEST_TAB_DISIPLINE,
+    PRIEST_TAB_HOLY,
+    PRIEST_TAB_SHADOW,
+};
+
+enum DEATHKNIGT_TABS {
+    DEATHKNIGT_TAB_BLOOD,
+    DEATHKNIGT_TAB_FROST,
+    DEATHKNIGT_TAB_UNHOLY,
+};
+
+enum DRUID_TABS {
+    DRUID_TAB_BALANCE,
+    DRUID_TAB_FERAL,
+    DRUID_TAB_RESTORATION,
+};
+
+enum MAGE_TABS {
+    MAGE_TAB_ARCANE,
+    MAGE_TAB_FIRE,
+    MAGE_TAB_FROST,
+};
+
+enum SHAMAN_TABS {
+    SHAMAN_TAB_ELEMENTAL,
+    SHAMAN_TAB_ENHANCEMENT,
+    SHAMAN_TAB_RESTORATION,
+};
+
+enum PALADIN_TABS {
+    PALADIN_TAB_HOLY,
+    PALADIN_TAB_PROTECTION,
+    PALADIN_TAB_RETRIBUTION,
+};
+
+enum WARLOCK_TABS {
+    WARLOCK_TAB_AFFLICATION,
+    WARLOCK_TAB_DEMONOLOGY,
+    WARLOCK_TAB_DESTRUCTION,
+};
+
+enum WARRIOR_TABS {
+    WARRIOR_TAB_ARMS,
+    WARRIOR_TAB_FURY,
+    WARRIOR_TAB_PROTECTION,
+};
+
 class PacketHandlingHelper
 {
     public:
@@ -270,6 +330,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsTank(Player* player);
         bool IsHeal(Player* player);
         bool IsRanged(Player* player);
+        bool IsMainTank(Player* player);
         Creature* GetCreature(ObjectGuid guid);
         Unit* GetUnit(ObjectGuid guid);
         Player* GetPlayer(ObjectGuid guid);

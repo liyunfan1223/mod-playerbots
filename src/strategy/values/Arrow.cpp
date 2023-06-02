@@ -19,6 +19,9 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float offset = 0.f;
 
     Player* master = botAI->GetMaster();
+    if (!master) {
+        return Formation::NullLocation;
+    }
     float orientation = master->GetOrientation();
     MultiLineUnitPlacer placer(orientation);
 
@@ -29,7 +32,7 @@ WorldLocation ArrowFormation::GetLocationInternal()
     melee.PlaceUnits(&placer);
     melee.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset += meleeLines * sPlayerbotAIConfig->followDistance;
+    offset += meleeLines * sPlayerbotAIConfig->followDistance + sPlayerbotAIConfig->tooCloseDistance;
     ranged.PlaceUnits(&placer);
     ranged.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 

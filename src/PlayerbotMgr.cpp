@@ -427,6 +427,14 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         master->GetGroup()->AddMember(bot);
     }
 
+    uint32 accountId = bot->GetSession()->GetAccountId();
+    bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
+    
+    if (master && isRandomAccount) {
+        PlayerbotFactory factory(bot, master->getLevel());
+        factory.Randomize(false);
+    }
+    
     // bots join World chat if not solo oriented
     if (bot->getLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
     {

@@ -77,18 +77,18 @@ bool DropTargetAction::Execute(Event event)
     botAI->InterruptSpell();
     bot->AttackStop();
 
-    if (Pet* pet = bot->GetPet())
-    {
-        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
-        {
-            pet->SetReactState(REACT_PASSIVE);
-            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-            pet->GetCharmInfo()->SetIsCommandFollow(true);
-            pet->AttackStop();
-            pet->GetCharmInfo()->IsReturning();
-            pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
-        }
-    }
+    // if (Pet* pet = bot->GetPet())
+    // {
+    //     if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
+    //     {
+    //         pet->SetReactState(REACT_PASSIVE);
+    //         pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+    //         pet->GetCharmInfo()->SetIsCommandFollow(true);
+    //         pet->AttackStop();
+    //         pet->GetCharmInfo()->IsReturning();
+    //         pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
+    //     }
+    // }
 
     return true;
 }
