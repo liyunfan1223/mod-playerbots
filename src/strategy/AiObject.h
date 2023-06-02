@@ -91,6 +91,13 @@ class clazz : public DebuffTrigger \
         clazz(PlayerbotAI* botAI) : DebuffTrigger(botAI, spell) { } \
 }
 
+#define DEBUFF_CHECKISOWNER_TRIGGER(clazz, spell) \
+class clazz : public DebuffTrigger \
+{ \
+    public: \
+        clazz(PlayerbotAI* botAI) : DebuffTrigger(botAI, spell, 1, true) { } \
+}
+
 #define DEBUFF_TRIGGER_A(clazz, spell) \
 class clazz : public DebuffTrigger \
 { \
@@ -357,6 +364,13 @@ class clazz : public CastDebuffSpellAction \
 { \
     public: \
         clazz(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, spell) { } \
+}
+
+#define DEBUFF_CHECKISOWNER_ACTION(clazz, spell) \
+class clazz : public CastDebuffSpellAction \
+{ \
+    public: \
+        clazz(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, spell, true) { } \
 }
 
 #define DEBUFF_ACTION_U(clazz, spell, useful) \

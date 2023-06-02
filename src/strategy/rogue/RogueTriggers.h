@@ -32,7 +32,7 @@ class AdrenalineRushTrigger : public BuffTrigger
 class RuptureTrigger : public DebuffTrigger
 {
     public:
-        RuptureTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rupture") { }
+        RuptureTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rupture", 1, true) { }
 };
 
 class ExposeArmorTrigger : public DebuffTrigger

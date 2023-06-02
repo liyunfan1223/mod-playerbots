@@ -25,9 +25,9 @@ class SpellstoneTrigger : public BuffTrigger
         bool IsActive() override;
 };
 
-DEBUFF_TRIGGER(CurseOfAgonyTrigger, "curse of agony");
-DEBUFF_TRIGGER(CorruptionTrigger, "corruption");
-DEBUFF_TRIGGER(SiphonLifeTrigger, "siphon life");
+DEBUFF_CHECKISOWNER_TRIGGER(CurseOfAgonyTrigger, "curse of agony");
+DEBUFF_CHECKISOWNER_TRIGGER(CorruptionTrigger, "corruption");
+DEBUFF_CHECKISOWNER_TRIGGER(SiphonLifeTrigger, "siphon life");
 
 class CorruptionOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
@@ -47,7 +47,7 @@ class SiphonLifeOnAttackerTrigger : public DebuffOnAttackerTrigger
         SiphonLifeOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "siphon life") { }
 };
 
-DEBUFF_TRIGGER(ImmolateTrigger, "immolate");
+DEBUFF_CHECKISOWNER_TRIGGER(ImmolateTrigger, "immolate");
 
 class ShadowTranceTrigger : public HasAuraTrigger
 {

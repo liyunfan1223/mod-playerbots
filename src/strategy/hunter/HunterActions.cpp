@@ -6,11 +6,6 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool CastSerpentStingAction::isUseful()
-{
-    return AI_VALUE2(uint8, "health", "current target") > 50;
-}
-
 bool CastViperStingAction::isUseful()
 {
     return AI_VALUE2(uint8, "mana", "self target") < 50 && AI_VALUE2(uint8, "mana", "current target") >= 30;

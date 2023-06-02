@@ -291,13 +291,13 @@ class CastCleanseSpiritDiseaseOnPartyAction : public CurePartyMemberAction
 class CastFlameShockAction : public CastDebuffSpellAction
 {
     public:
-        CastFlameShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flame shock") { }
+        CastFlameShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flame shock", true) { }
 };
 
 class CastEarthShockAction : public CastDebuffSpellAction
 {
     public:
-        CastEarthShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "earth shock") { }
+        CastEarthShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "earth shock", true) { }
 };
 
 class CastFrostShockAction : public CastSnareSpellAction

@@ -18,8 +18,10 @@ bool HunterAspectOfTheHawkTrigger::IsActive()
 bool HunterNoStingsActiveTrigger::IsActive()
 {
 	Unit* target = AI_VALUE(Unit*, "current target");
-    return target && AI_VALUE2(uint8, "health", "current target") > 40 && !botAI->HasAura("serpent sting", target) &&
-        !botAI->HasAura("scorpid sting", target) && !botAI->HasAura("viper sting", target);
+    return target && AI_VALUE2(uint8, "health", "current target") > 15 && 
+        !botAI->HasAura("serpent sting", target, false, true) &&
+        !botAI->HasAura("scorpid sting", target, false, true) && 
+        !botAI->HasAura("viper sting", target, false, true);
 }
 
 bool HuntersPetDeadTrigger::IsActive()

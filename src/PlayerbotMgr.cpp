@@ -430,7 +430,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     uint32 accountId = bot->GetSession()->GetAccountId();
     bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
     
-    if (master && isRandomAccount) {
+    if (master && isRandomAccount && master->GetLevel() < bot->GetLevel()) {
         PlayerbotFactory factory(bot, master->getLevel());
         factory.Randomize(false);
     }

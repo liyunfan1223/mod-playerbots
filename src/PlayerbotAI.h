@@ -366,7 +366,7 @@ class PlayerbotAI : public PlayerbotAIBase
 
         virtual bool CanCastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
         virtual bool CastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
-        virtual bool HasAura(std::string const spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false, int maxAmount = -1);
+        virtual bool HasAura(std::string const spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false, int maxAmount = -1, bool checkDuration = false);
         virtual bool HasAnyAuraOf(Unit* player, ...);
 
         virtual bool IsInterruptableSpellCasting(Unit* player, std::string const spell);

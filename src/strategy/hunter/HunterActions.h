@@ -5,6 +5,7 @@
 #ifndef _PLAYERBOT_HUNTERACTIONS_H
 #define _PLAYERBOT_HUNTERACTIONS_H
 
+#include "AiObject.h"
 #include "GenericSpellActions.h"
 
 class PlayerbotAI;
@@ -48,9 +49,7 @@ END_SPELL_ACTION()
 BEGIN_RANGED_SPELL_ACTION(CastVolleyAction, "volley")
 END_SPELL_ACTION()
 
-BEGIN_RANGED_SPELL_ACTION(CastSerpentStingAction, "serpent sting")
-bool isUseful() override;
-END_SPELL_ACTION()
+DEBUFF_CHECKISOWNER_ACTION(CastSerpentStingAction, "serpent sting");
 
 BEGIN_RANGED_SPELL_ACTION(CastWyvernStingAction, "wyvern sting")
 END_SPELL_ACTION()
@@ -156,7 +155,7 @@ class CastReadinessAction : public CastBuffSpellAction
 class CastBlackArrow : public CastDebuffSpellAction
 {
 	public:
-		CastBlackArrow(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "black arrow") { }
+		CastBlackArrow(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "black arrow", true) { }
 };
 
 class CastFreezingTrap : public CastDebuffSpellAction
@@ -187,7 +186,7 @@ class CastRaptorStrikeAction : public CastMeleeSpellAction
 class CastSerpentStingOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
     public:
-        CastSerpentStingOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "serpent sting") { }
+        CastSerpentStingOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "serpent sting", true) { }
 };
 
 class FeedPetAction : public Action

@@ -27,7 +27,7 @@ BUFF_ACTION(CastCommandingShoutAction, "commanding shout");
 // arms
 MELEE_ACTION(CastHeroicStrikeAction, "heroic strike");
 REACH_ACTION(CastChargeAction, "charge", 8.0f);
-DEBUFF_ACTION(CastRendAction, "rend");
+DEBUFF_CHECKISOWNER_ACTION(CastRendAction, "rend");
 DEBUFF_ENEMY_ACTION(CastRendOnAttackerAction, "rend");
 DEBUFF_ACTION_R(CastThunderClapAction, "thunder clap", 8.0f);
 SNARE_ACTION(CastThunderClapSnareAction, "thunder clap");

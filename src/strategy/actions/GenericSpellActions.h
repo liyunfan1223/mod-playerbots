@@ -56,7 +56,7 @@ class CastDebuffSpellAction : public CastAuraSpellAction
 class CastDebuffSpellOnAttackerAction : public CastAuraSpellAction
 {
     public:
-        CastDebuffSpellOnAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false) : CastAuraSpellAction(botAI, spell, isOwner) { }
+        CastDebuffSpellOnAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true) : CastAuraSpellAction(botAI, spell, isOwner) { }
 
         Value<Unit*>* GetTargetValue() override;
         std::string const getName() override { return spell + " on attacker"; }

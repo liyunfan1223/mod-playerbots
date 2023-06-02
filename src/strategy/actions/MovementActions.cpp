@@ -129,7 +129,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
 {
     UpdateMovementState();
-    LOG_DEBUG("playerbots", "IsMovingAllowed {}", IsMovingAllowed());
+    // LOG_DEBUG("playerbots", "IsMovingAllowed {}", IsMovingAllowed());
     if (!IsMovingAllowed())
         return false;
 
@@ -478,7 +478,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
         sPlayerbotAIConfig->log("bot_movement.csv", out.str().c_str());
     }
-    LOG_DEBUG("playerbots", "({}, {}) -> ({}, {})", startPosition.getX(), startPosition.getY(), movePosition.getX(), movePosition.getY());
+    // LOG_DEBUG("playerbots", "({}, {}) -> ({}, {})", startPosition.getX(), startPosition.getY(), movePosition.getX(), movePosition.getY());
     if (!react)
         if (totalDistance > maxDist)
             WaitForReach(startPosition.distance(movePosition) - 10.0f);
@@ -543,13 +543,13 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         bot->SetWalk(true);
 
     bot->SendMovementFlagUpdate();
-    LOG_DEBUG("playerbots", "normal move? {} {} {}", !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY), 
-        bot->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE), bot->getStandState());
+    // LOG_DEBUG("playerbots", "normal move? {} {} {}", !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY), 
+    //     bot->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE), bot->getStandState());
     if (!bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY))
     {
         bot->SetWalk(masterWalking);
         bot->GetMotionMaster()->MovePoint(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), generatePath);
-        LOG_DEBUG("playerbots", "Movepoint to ({}, {})", movePosition.getX(), movePosition.getY());
+        // LOG_DEBUG("playerbots", "Movepoint to ({}, {})", movePosition.getX(), movePosition.getY());
     }
     else
     {

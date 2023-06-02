@@ -12,19 +12,19 @@ class PlayerbotAI;
 BUFF_TRIGGER(HornOfWinterTrigger, "horn of winter");
 BUFF_TRIGGER(BoneShieldTrigger, "bone shield");
 BUFF_TRIGGER(ImprovedIcyTalonsTrigger, "improved icy talons");
-DEBUFF_TRIGGER(PlagueStrikeDebuffTrigger, "plague strike");
-DEBUFF_TRIGGER(IcyTouchDebuffTrigger, "icy touch");
+DEBUFF_CHECKISOWNER_TRIGGER(PlagueStrikeDebuffTrigger, "plague strike");
+DEBUFF_CHECKISOWNER_TRIGGER(IcyTouchDebuffTrigger, "icy touch");
 
 class PlagueStrikeDebuffOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
 	public:
-		PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "plague strike") { }
+		PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "plague strike", true) { }
 };
 
 class IcyTouchDebuffOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
 	public:
-		IcyTouchDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "icy touch") { }
+		IcyTouchDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "icy touch", true) { }
 };
 
 class DKPresenceTrigger : public BuffTrigger
@@ -68,13 +68,13 @@ class PestilenceTrigger : public DebuffTrigger
 class BloodStrikeTrigger : public DebuffTrigger
 {
 	public:
-	    BloodStrikeTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "blood strike") { }
+	    BloodStrikeTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "blood strike", 1, true) { }
 };
 
 class HowlingBlastTrigger : public DebuffTrigger
 {
 	public:
-		HowlingBlastTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "howling blast") { }
+		HowlingBlastTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "howling blast", 1, true) { }
 };
 
 class MindFreezeInterruptSpellTrigger : public InterruptSpellTrigger

@@ -12,5 +12,5 @@ NextAction** FollowMasterStrategy::getDefaultActions()
 
 void FollowMasterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("out of react range", NextAction::array(0, new NextAction("flee to master", ACTION_HIGH), nullptr)));
+    // triggers.push_back(new TriggerNode("out of react range", NextAction::array(0, new NextAction("flee to master", ACTION_HIGH), nullptr)));
 }

@@ -171,7 +171,7 @@ class PartyMemberCleanseSpiritDiseaseTrigger : public PartyMemberNeedCureTrigger
 class ShockTrigger : public DebuffTrigger
 {
     public:
-        ShockTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "earth shock") { }
+        ShockTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "earth shock", 1, true) { }
 
         bool IsActive() override;
 };

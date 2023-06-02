@@ -134,13 +134,13 @@ class CastHurricaneAction : public CastSpellAction
 class CastMoonfireAction : public CastDebuffSpellAction
 {
 	public:
-		CastMoonfireAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "moonfire") { }
+		CastMoonfireAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "moonfire", true) { }
 };
 
 class CastInsectSwarmAction : public CastDebuffSpellAction
 {
 	public:
-		CastInsectSwarmAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "insect swarm") { }
+		CastInsectSwarmAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "insect swarm", true) { }
 };
 
 class CastStarfireAction : public CastSpellAction

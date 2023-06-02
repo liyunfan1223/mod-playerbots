@@ -195,7 +195,7 @@ class CastSpellstealAction : public CastSpellAction
 class CastLivingBombAction : public CastDebuffSpellAction
 {
 	public:
-	    CastLivingBombAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "living bomb") { }
+	    CastLivingBombAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "living bomb", true) { }
 };
 
 class CastDragonsBreathAction : public CastSpellAction

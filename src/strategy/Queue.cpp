@@ -97,7 +97,7 @@ void Queue::RemoveExpired()
 
         if (ActionNode* action = basket->getAction())
         {
-            LOG_DEBUG("playerbots", "Action {} is expired", action->getName().c_str());
+            // LOG_DEBUG("playerbots", "Action {} is expired", action->getName().c_str());
             delete action;
         }
 

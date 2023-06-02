@@ -66,13 +66,13 @@ CURE_PARTY_ACTION(CastCureDiseaseOnPartyAction, "cure disease", DISPEL_DISEASE);
 CURE_ACTION(CastAbolishDiseaseAction, "abolish disease");
 CURE_PARTY_ACTION(CastAbolishDiseaseOnPartyAction, "abolish disease", DISPEL_DISEASE);
 
-DEBUFF_ACTION(CastHolyFireAction, "holy fire");
+DEBUFF_CHECKISOWNER_ACTION(CastHolyFireAction, "holy fire");
 // shadow 2.4.3
 BUFF_ACTION(CastShadowfiendAction, "shadowfiend");
 SPELL_ACTION(CastShadowWordDeathAction, "shadow word: death");
 
 // shadow
-DEBUFF_ACTION(CastPowerWordPainAction, "shadow word: pain");
+DEBUFF_CHECKISOWNER_ACTION(CastPowerWordPainAction, "shadow word: pain");
 DEBUFF_ENEMY_ACTION(CastPowerWordPainOnAttackerAction, "shadow word: pain");
 SPELL_ACTION(CastMindBlastAction, "mind blast");
 SPELL_ACTION(CastPsychicScreamAction, "psychic scream");
@@ -89,10 +89,10 @@ BUFF_ACTION(CastShadowformAction, "shadowform");
 SPELL_ACTION(CastSilenceAction, "silence");
 ENEMY_HEALER_ACTION(CastSilenceOnEnemyHealerAction, "silence");
 // shadow talents 2.4.3
-DEBUFF_ACTION(CastVampiricTouchAction, "vampiric touch");
+DEBUFF_CHECKISOWNER_ACTION(CastVampiricTouchAction, "vampiric touch");
 
 // racials
-DEBUFF_ACTION(CastDevouringPlagueAction, "devouring plague");
+DEBUFF_CHECKISOWNER_ACTION(CastDevouringPlagueAction, "devouring plague");
 BUFF_ACTION(CastTouchOfWeaknessAction, "touch of weakness");
 DEBUFF_ACTION(CastHexOfWeaknessAction, "hex of weakness");
 BUFF_ACTION(CastShadowguardAction, "shadowguard");

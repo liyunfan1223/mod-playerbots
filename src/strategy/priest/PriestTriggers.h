@@ -10,11 +10,11 @@
 
 class PlayerbotAI;
 
-DEBUFF_TRIGGER(HolyFireTrigger, "holy fire");
-DEBUFF_TRIGGER(PowerWordPainTrigger, "shadow word: pain");
+DEBUFF_CHECKISOWNER_TRIGGER(HolyFireTrigger, "holy fire");
+DEBUFF_CHECKISOWNER_TRIGGER(PowerWordPainTrigger, "shadow word: pain");
 DEBUFF_ENEMY_TRIGGER(PowerWordPainOnAttackerTrigger, "shadow word: pain");
-DEBUFF_TRIGGER(VampiricTouchTrigger, "vampiric touch");
-DEBUFF_TRIGGER(VampiricEmbraceTrigger, "vampiric embrace");
+DEBUFF_CHECKISOWNER_TRIGGER(VampiricTouchTrigger, "vampiric touch");
+BUFF_TRIGGER(VampiricEmbraceTrigger, "vampiric embrace");
 CURE_TRIGGER(DispelMagicTrigger, "dispel magic", DISPEL_MAGIC);
 CURE_PARTY_TRIGGER(DispelMagicPartyMemberTrigger, "dispel magic", DISPEL_MAGIC);
 CURE_TRIGGER(CureDiseaseTrigger, "cure disease", DISPEL_DISEASE);
@@ -30,7 +30,7 @@ INTERRUPT_TRIGGER(SilenceTrigger, "silence");
 INTERRUPT_HEALER_TRIGGER(SilenceEnemyHealerTrigger, "silence");
 
 // racials
-DEBUFF_TRIGGER(DevouringPlagueTrigger, "devouring plague");
+DEBUFF_CHECKISOWNER_TRIGGER(DevouringPlagueTrigger, "devouring plague");
 BUFF_TRIGGER(TouchOfWeaknessTrigger, "touch of weakness");
 DEBUFF_TRIGGER(HexOfWeaknessTrigger, "hex of weakness");
 BUFF_TRIGGER(ShadowguardTrigger, "shadowguard");

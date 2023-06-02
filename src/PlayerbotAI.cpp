@@ -1599,7 +1599,7 @@ bool IsRealAura(Player* bot, AuraEffect const* aurEff, Unit const* unit)
     return false;
 }
 
-bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, bool checkIsOwner, int maxAuraAmount)
+bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, bool checkIsOwner, int maxAuraAmount, bool checkDuration)
 {
     if (!unit)
         return false;
@@ -1628,26 +1628,29 @@ bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, boo
 
 			if (IsRealAura(bot, aurEff, unit))
 			{
-                if (checkIsOwner && aurEff)
-                {
+                if (checkIsOwner && aurEff) {
                     if (aurEff->GetCasterGUID() != bot->GetGUID())
                         continue;
+                }
+
+                if (checkDuration && aurEff) {
+                    if (aurEff->GetBase()->GetDuration() == -1) {
+                        continue;
+                    }
                 }
 			    uint32 maxStackAmount = spellInfo->StackAmount;
                 uint32 maxProcCharges = spellInfo->ProcCharges;
 
 
-                if (maxStack)
-                {
+                if (maxStack) {
                     if (maxStackAmount && aurEff->GetBase()->GetStackAmount() >= maxStackAmount)
                         auraAmount++;
 
                     if (maxProcCharges && aurEff->GetBase()->GetCharges() >= maxProcCharges)
                         auraAmount++;
+                } else {
+                    auraAmount++;
                 }
-
-                auraAmount++;
-
                 if (maxAuraAmount < 0)
                     return auraAmount > 0;
 			}

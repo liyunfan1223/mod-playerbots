@@ -94,7 +94,7 @@ END_SPELL_ACTION()
 class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
 	public:
-		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "icy touch") { }
+		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "icy touch", true) { }
 };
 
 //debuff ps
@@ -104,7 +104,7 @@ END_SPELL_ACTION()
 class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
 	public:
-		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "plague strike") { }
+		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "plague strike", true) { }
 };
 
 //debuff
@@ -114,7 +114,7 @@ END_SPELL_ACTION()
 class CastMarkOfBloodOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
 	public:
-		CastMarkOfBloodOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "mark of blood") { }
+		CastMarkOfBloodOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "mark of blood", true) { }
 };
 
 class CastUnholyBlightAction : public CastBuffSpellAction

@@ -118,7 +118,7 @@ CastMeleeSpellAction::CastMeleeSpellAction(PlayerbotAI* botAI, std::string const
 
 bool CastAuraSpellAction::isUseful()
 {
-    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != nullptr) && CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget(), true);
+    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != nullptr) && CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget(), true, isOwner);
 }
 
 CastEnchantItemAction::CastEnchantItemAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
@@ -135,7 +135,7 @@ bool CastEnchantItemAction::isPossible()
     return spellId && AI_VALUE2(Item*, "item for spell", spellId);
 }
 
-CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount) : CastAuraSpellAction(botAI, spell), estAmount(estAmount)
+CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount) : CastAuraSpellAction(botAI, spell, true), estAmount(estAmount)
 {
     range = botAI->GetRange("spell");
 }

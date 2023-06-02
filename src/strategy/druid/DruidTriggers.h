@@ -51,19 +51,19 @@ class OmenOfClarityTrigger : public BuffTrigger
 class RakeTrigger : public DebuffTrigger
 {
     public:
-        RakeTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rake") { }
+        RakeTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rake", 1, true) { }
 };
 
 class InsectSwarmTrigger : public DebuffTrigger
 {
     public:
-        InsectSwarmTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "insect swarm") { }
+        InsectSwarmTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "insect swarm", 1, true) { }
 };
 
 class MoonfireTrigger : public DebuffTrigger
 {
     public:
-        MoonfireTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "moonfire") { }
+        MoonfireTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "moonfire", 1, true) { }
 
         bool IsActive() override;
 };
