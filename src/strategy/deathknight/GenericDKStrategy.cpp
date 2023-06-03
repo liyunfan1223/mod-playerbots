@@ -54,7 +54,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    {
 		    return new ActionNode("death coil",
 			    /*P*/ nullptr,
-			    /*A*/ NextAction::array(0, new NextAction("death strike"), nullptr),
+			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
 
@@ -86,7 +86,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    {
 		    return new ActionNode("heart strike",
 			    /*P*/ nullptr,
-			    /*A*/ NextAction::array(0, new NextAction("blood strike"), nullptr),
+			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
 
@@ -158,21 +158,20 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 	MeleeCombatStrategy::InitTriggers(triggers);
 
 	triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("anti magic shell", ACTION_NORMAL + 3), nullptr)));
-	triggers.push_back(new TriggerNode("death coil", NextAction::array(0, new NextAction("death coil", ACTION_NORMAL + 3), nullptr)));
+	// triggers.push_back(new TriggerNode("death coil", NextAction::array(0, new NextAction("death coil", ACTION_NORMAL + 3), nullptr)));
 	triggers.push_back(new TriggerNode("critical aoe heal", NextAction::array(0, new NextAction("anti magic zone", ACTION_EMERGENCY + 1), nullptr)));
 	triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("raise dead", ACTION_NORMAL + 5), nullptr)));
     triggers.push_back(new TriggerNode("mind freeze", NextAction::array(0, new NextAction("mind freeze", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode("bone shield", NextAction::array(0, new NextAction("bone shield", ACTION_NORMAL + 1), nullptr)));
 	triggers.push_back(new TriggerNode("horn of winter", NextAction::array(0, new NextAction("horn of winter", ACTION_NORMAL + 1), nullptr)));
     triggers.push_back(new TriggerNode("mind freeze on enemy healer", NextAction::array(0, new NextAction("mind freeze on enemy healer", ACTION_HIGH + 1), nullptr)));
-	triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("icy touch", ACTION_NORMAL + 9),
-        new NextAction("death grip", ACTION_NORMAL + 9), new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
+	triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
 	triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("icebound fortitude", ACTION_HIGH + 5), new NextAction("rune tap", ACTION_HIGH + 4), nullptr)));
 	triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("rune tap", ACTION_NORMAL + 4), new NextAction("death strike", ACTION_NORMAL + 3), nullptr)));
-	triggers.push_back(new TriggerNode("icy touch on attacker", NextAction::array(0, new NextAction("icy touch", ACTION_HIGH + 1), nullptr)));
 	triggers.push_back(new TriggerNode("icy touch", NextAction::array(0, new NextAction("icy touch", ACTION_HIGH + 1), nullptr)));
+	// triggers.push_back(new TriggerNode("icy touch on attacker", NextAction::array(0, new NextAction("icy touch on attacker", ACTION_HIGH + 1), nullptr)));
 	triggers.push_back(new TriggerNode("plague strike", NextAction::array(0, new NextAction("plague strike", ACTION_HIGH + 1), nullptr)));
-	triggers.push_back(new TriggerNode("plague strike on attacker", NextAction::array(0, new NextAction("plague strike", ACTION_HIGH + 1), nullptr)));
+	// triggers.push_back(new TriggerNode("plague strike on attacker", NextAction::array(0, new NextAction("plague strike on attacker", ACTION_HIGH + 1), nullptr)));
 	triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("unholy blight", ACTION_NORMAL + 6), new NextAction("death and decay", ACTION_NORMAL + 5),
         new NextAction("pestilence", ACTION_NORMAL + 4), new NextAction("blood boil", ACTION_NORMAL + 3), nullptr)));
 	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("death and decay", ACTION_NORMAL + 5),

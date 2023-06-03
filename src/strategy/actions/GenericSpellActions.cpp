@@ -62,14 +62,23 @@ bool CastSpellAction::Execute(Event event)
 
 bool CastSpellAction::isPossible()
 {
-    if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))
+    if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true)) {
+        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
+                bot->GetName());
+        }
         return false;
+    }
 
     if (spell == "mount" && !bot->IsMounted() && !bot->IsInCombat())
         return true;
 
     if (spell == "mount" && bot->IsInCombat())
     {
+        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
+                bot->GetName());
+        }
         bot->Dismount();
         return false;
     }
@@ -118,7 +127,7 @@ CastMeleeSpellAction::CastMeleeSpellAction(PlayerbotAI* botAI, std::string const
 
 bool CastAuraSpellAction::isUseful()
 {
-    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != nullptr) && CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget(), true, isOwner);
+    return GetTarget() && (GetTarget() != nullptr) && CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget(), false, isOwner);
 }
 
 CastEnchantItemAction::CastEnchantItemAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)

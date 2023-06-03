@@ -5,6 +5,7 @@
 #include "WarlockAiObjectContext.h"
 #include "DpsWarlockStrategy.h"
 #include "GenericWarlockNonCombatStrategy.h"
+#include "Strategy.h"
 #include "TankWarlockStrategy.h"
 #include "WarlockActions.h"
 #include "WarlockTriggers.h"
@@ -51,6 +52,21 @@ class WarlockCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
         static Strategy* dps(PlayerbotAI* botAI) { return new DpsWarlockStrategy(botAI); }
 };
 
+class NonCombatBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
+{
+public:
+    NonCombatBuffStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
+    {
+        creators["bdps"] = &NonCombatBuffStrategyFactoryInternal::felguard;
+        creators["bmana"] = &NonCombatBuffStrategyFactoryInternal::felhunter;
+        creators["bhealth"] = &NonCombatBuffStrategyFactoryInternal::imp;
+    }
+private:
+    static Strategy* imp(PlayerbotAI* ai) { return new SummonImpStrategy(ai); }
+    static Strategy* felhunter(PlayerbotAI* ai) { return new SummonFelhunterStrategy(ai); }
+    static Strategy* felguard(PlayerbotAI* ai) { return new SummonFelguardStrategy(ai); }
+}; 
+
 class WarlockTriggerFactoryInternal : public NamedObjectContext<Trigger>
 {
     public:
@@ -73,6 +89,15 @@ class WarlockTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["amplify curse"] = &WarlockTriggerFactoryInternal::amplify_curse;
             creators["siphon life"] = &WarlockTriggerFactoryInternal::siphon_life;
             creators["siphon life on attacker"] = &WarlockTriggerFactoryInternal::siphon_life_on_attacker;
+
+            creators["immolate on attacker"] = &WarlockTriggerFactoryInternal::immolate_on_attacker;
+            creators["unstable affliction"] = &WarlockTriggerFactoryInternal::unstable_affliction;
+            creators["unstable affliction on attacker"] = &WarlockTriggerFactoryInternal::unstable_affliction_on_attacker;
+            creators["haunt"] = &WarlockTriggerFactoryInternal::haunt;
+            creators["decimation"] = &WarlockTriggerFactoryInternal::decimation;
+            creators["molten core"] = &WarlockTriggerFactoryInternal::molten_core;
+            creators["metamorphosis"] = &WarlockTriggerFactoryInternal::metamorphosis;
+            
         }
 
     private:
@@ -93,6 +118,13 @@ class WarlockTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* backlash(PlayerbotAI* botAI) { return new BacklashTrigger(botAI); }
         static Trigger* fear(PlayerbotAI* botAI) { return new FearTrigger(botAI); }
         static Trigger* immolate(PlayerbotAI* botAI) { return new ImmolateTrigger(botAI); }
+        static Trigger* immolate_on_attacker(PlayerbotAI* ai) { return new ImmolateOnAttackerTrigger(ai); }
+        static Trigger* unstable_affliction(PlayerbotAI* ai) { return new UnstableAfflictionTrigger(ai); }
+        static Trigger* unstable_affliction_on_attacker(PlayerbotAI* ai) { return new UnstableAfflictionOnAttackerTrigger(ai); }
+        static Trigger* haunt(PlayerbotAI* ai) { return new HauntTrigger(ai); }
+        static Trigger* decimation(PlayerbotAI* ai) { return new DecimationTrigger(ai); }
+        static Trigger* molten_core(PlayerbotAI* ai) { return new MoltenCoreTrigger(ai); }
+        static Trigger* metamorphosis(PlayerbotAI* ai) { return new MetamorphosisTrigger(ai); }
 };
 
 class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
@@ -109,6 +141,7 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
             creators["spellstone"] = &WarlockAiObjectContextInternal::spellstone;
             creators["summon voidwalker"] = &WarlockAiObjectContextInternal::summon_voidwalker;
             creators["summon felguard"] = &WarlockAiObjectContextInternal::summon_felguard;
+            creators["summon felhunter"] = &WarlockAiObjectContextInternal::summon_felhunter;
             creators["summon succubus"] = &WarlockAiObjectContextInternal::summon_succubus;
             creators["summon imp"] = &WarlockAiObjectContextInternal::summon_imp;
             creators["immolate"] = &WarlockAiObjectContextInternal::immolate;
@@ -133,6 +166,14 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
             creators["incinirate"] = &WarlockAiObjectContextInternal::incinirate;
             creators["conflagrate"] = &WarlockAiObjectContextInternal::conflagrate;
             creators["amplify curse"] = &WarlockAiObjectContextInternal::amplify_curse;
+
+            creators["unstable affliction"] = &WarlockAiObjectContextInternal::unstable_affliction;
+            creators["unstable affliction on attacker"] = &WarlockAiObjectContextInternal::unstable_affliction_on_attacker;
+            creators["haunt"] = &WarlockAiObjectContextInternal::haunt;
+            creators["demonic empowerment"] = &WarlockAiObjectContextInternal::demonic_empowerment;
+            creators["metamorphosis"] = &WarlockAiObjectContextInternal::metamorphosis;
+            creators["soul fire"] = &WarlockAiObjectContextInternal::soul_fire;
+            creators["incinerate"] = &WarlockAiObjectContextInternal::incinerate;
         }
 
     private:
@@ -153,6 +194,7 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* spellstone(PlayerbotAI* botAI) { return new UseSpellItemAction(botAI, "spellstone", true); }
         static Action* summon_voidwalker(PlayerbotAI* botAI) { return new CastSummonVoidwalkerAction(botAI); }
         static Action* summon_felguard(PlayerbotAI* botAI) { return new CastSummonFelguardAction(botAI); }
+        static Action* summon_felhunter(PlayerbotAI* botAI) { return new CastSummonFelhunterAction(botAI); }
         static Action* corruption(PlayerbotAI* botAI) { return new CastCorruptionAction(botAI); }
         static Action* corruption_on_attacker(PlayerbotAI* botAI) { return new CastCorruptionOnAttackerAction(botAI); }
         static Action* siphon_life(PlayerbotAI* botAI) { return new CastSiphonLifeAction(botAI); }
@@ -169,12 +211,20 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* rain_of_fire(PlayerbotAI* botAI) { return new CastRainOfFireAction(botAI); }
         static Action* shadowfury(PlayerbotAI* botAI) { return new CastShadowfuryAction(botAI); }
         static Action* life_tap(PlayerbotAI* botAI) { return new CastLifeTapAction(botAI); }
+        static Action* unstable_affliction(PlayerbotAI* ai) { return new CastUnstableAfflictionAction(ai); }
+        static Action* unstable_affliction_on_attacker(PlayerbotAI* ai) { return new CastUnstableAfflictionOnAttackerAction(ai); }
+        static Action* haunt(PlayerbotAI* ai) { return new CastHauntAction(ai); }
+        static Action* demonic_empowerment(PlayerbotAI* ai) { return new CastDemonicEmpowermentAction(ai); }
+        static Action* metamorphosis(PlayerbotAI* ai) { return new CastMetamorphosisAction(ai); }
+        static Action* soul_fire(PlayerbotAI* ai) { return new CastSoulFireAction(ai); }
+        static Action* incinerate(PlayerbotAI* ai) { return new CastIncinerateAction(ai); }
 };
 
 WarlockAiObjectContext::WarlockAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
 {
     strategyContexts.Add(new WarlockStrategyFactoryInternal());
     strategyContexts.Add(new WarlockCombatStrategyFactoryInternal());
+    strategyContexts.Add(new NonCombatBuffStrategyFactoryInternal());
     actionContexts.Add(new WarlockAiObjectContextInternal());
     triggerContexts.Add(new WarlockTriggerFactoryInternal());
 }

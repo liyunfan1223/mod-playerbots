@@ -33,7 +33,7 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    static ActionNode* death_strike([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("death strike",
-			    /*P*/ NextAction::array(0, new NextAction("unholy pressence"), nullptr),
+			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
 			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
@@ -41,7 +41,7 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    static ActionNode* corpse_explosion([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("corpse explosion",
-			    /*P*/ NextAction::array(0, new NextAction("unholy pressence"), nullptr),
+			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
 			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
@@ -49,15 +49,22 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    static ActionNode* scourge_strike([[maybe_unused]] PlayerbotAI* botAI)
 	    {
 		    return new ActionNode("scourge strike",
-			    /*P*/ NextAction::array(0, new NextAction("unholy pressence"), nullptr),
-			    /*A*/ NextAction::array(0, new NextAction("death strike"), nullptr),
+			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
+			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
 };
 
 NextAction** UnholyDKStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), new NextAction("scourge strike" , ACTION_NORMAL + 3), nullptr);
+    return NextAction::array(0, 
+		new NextAction("scourge strike", ACTION_NORMAL + 6), 
+		new NextAction("blood strike", ACTION_NORMAL + 5), 
+		new NextAction("death coil", ACTION_NORMAL + 4),
+		new NextAction("plague strike", ACTION_NORMAL + 3), 
+		new NextAction("icy touch", ACTION_NORMAL + 2), 
+		new NextAction("melee", ACTION_NORMAL), 
+		NULL);
 }
 
 void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

@@ -30,6 +30,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    //creators["hysteria"] = &hysteria;
 		    //creators["dancing weapon"] = &dancing_weapon;
 		    //creators["dark command"] = &dark_command;
+			creators["taunt spell"] = &dark_command;
         }
 
     private:
@@ -37,7 +38,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    {
 		    return new ActionNode("rune strike",
 			    /*P*/ NextAction::array(0, new NextAction("frost presence"), nullptr),
-			    /*A*/ NextAction::array(0, new NextAction("death coil"), nullptr),
+			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
 
@@ -56,6 +57,13 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
+		static ActionNode* dark_command([[maybe_unused]] PlayerbotAI* botAI)
+		{
+			return new ActionNode("dark command",
+				/*P*/ NextAction::array(0, new NextAction("frost presence"), NULL),
+				/*A*/ NextAction::array(0, new NextAction("death grip"), NULL),
+				/*C*/ NULL);
+		}
 };
 
 BloodDKStrategy::BloodDKStrategy(PlayerbotAI* botAI) : GenericDKStrategy(botAI)
@@ -65,8 +73,15 @@ BloodDKStrategy::BloodDKStrategy(PlayerbotAI* botAI) : GenericDKStrategy(botAI)
 
 NextAction** BloodDKStrategy::getDefaultActions()
 {
-	return NextAction::array(0, new NextAction("melee", ACTION_NORMAL + 2), new NextAction("heart strike", ACTION_NORMAL + 5),
-        new NextAction("death strike", ACTION_NORMAL + 4), new NextAction("rune strike", ACTION_NORMAL + 3), nullptr);
+	return NextAction::array(0,
+		new NextAction("rune strike", ACTION_NORMAL + 7), 
+		new NextAction("heart strike", ACTION_NORMAL + 6),
+		new NextAction("icy touch", ACTION_NORMAL + 5),
+		new NextAction("death coil", ACTION_NORMAL + 4),
+		new NextAction("plague strike", ACTION_NORMAL + 3),
+		new NextAction("blood strike", ACTION_NORMAL + 2),
+		new NextAction("melee", ACTION_NORMAL), 
+		NULL);
 }
 
 void BloodDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

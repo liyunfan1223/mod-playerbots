@@ -5,6 +5,7 @@
 #ifndef _PLAYERBOT_DKACTIONS_H
 #define _PLAYERBOT_DKACTIONS_H
 
+#include "Event.h"
 #include "GenericSpellActions.h"
 
 class PlayerbotAI;
@@ -80,16 +81,30 @@ class CastRuneStrikeAction : public CastMeleeSpellAction
 };
 
 //debuff
-BEGIN_DEBUFF_ACTION(CastPestilenceAction, "pestilence")
-END_SPELL_ACTION()
+// BEGIN_DEBUFF_ACTION(CastPestilenceAction, "pestilence")
+// END_SPELL_ACTION()
+
+class CastPestilenceAction : public CastSpellAction
+{
+	public:
+		CastPestilenceAction(PlayerbotAI* ai) : CastSpellAction(ai, "pestilence") {}
+		ActionThreatType getThreatType() override { return ActionThreatType::None; }
+};
+
 
 //debuff
 BEGIN_DEBUFF_ACTION(CastHowlingBlastAction, "howling blast")
 END_SPELL_ACTION()
 
 //debuff it
-BEGIN_DEBUFF_ACTION(CastIcyTouchAction, "icy touch")
-END_SPELL_ACTION()
+// BEGIN_DEBUFF_ACTION(CastIcyTouchAction, "icy touch")
+// END_SPELL_ACTION()
+
+class CastIcyTouchAction : public CastSpellAction
+{
+	public:
+		CastIcyTouchAction(PlayerbotAI* ai) : CastSpellAction(ai, "icy touch") {}
+};
 
 class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
@@ -189,13 +204,13 @@ class CastDeathStrikeAction : public CastMeleeSpellAction
 class CastScourgeStrikeAction : public CastMeleeSpellAction
 {
 	public:
-		CastScourgeStrikeAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "scorgue strike") { }
+		CastScourgeStrikeAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "scourge strike") { }
 };
 
 class CastDeathCoilAction : public CastSpellAction
 {
 	public:
-		CastDeathCoilAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "death coill") { }
+		CastDeathCoilAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "death coil") { }
 };
 
 class CastBloodBoilAction : public CastBuffSpellAction
@@ -262,6 +277,7 @@ class CastRaiseDeadAction : public CastBuffSpellAction
 {
 	public:
 		CastRaiseDeadAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "raise dead") { }
+		virtual bool Execute(Event event) override;
 };
 
 class CastKillingMachineAction : public CastBuffSpellAction

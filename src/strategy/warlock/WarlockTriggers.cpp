@@ -20,3 +20,25 @@ bool WarlockConjuredItemTrigger::IsActive()
 {
     return ItemCountTrigger::IsActive() && AI_VALUE2(uint32, "item count", "soul shard") > 0;
 }
+
+bool ImmolateOnAttackerTrigger::IsActive()
+{
+    return DebuffOnAttackerTrigger::IsActive() && 
+        // !botAI->HasAura("immolate", GetTarget(), false, true) && 
+        !botAI->HasAura("unstable affliction", GetTarget(), false, true);
+}
+
+bool UnstableAfflictionTrigger::IsActive()
+{
+    return DebuffTrigger::IsActive() && 
+        !botAI->HasAura("immolate", GetTarget(), false, true);
+        // !botAI->HasAura("unstable affliction", GetTarget(), false, true);
+}
+
+bool UnstableAfflictionOnAttackerTrigger::IsActive()
+{
+    return DebuffOnAttackerTrigger::IsActive() && 
+        !botAI->HasAura("immolate", GetTarget(), false, true);
+        // !botAI->HasAura("unstable affliction", GetTarget(), false, true);
+}
+

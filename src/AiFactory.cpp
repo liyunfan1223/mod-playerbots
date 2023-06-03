@@ -4,6 +4,7 @@
 
 #include "AiFactory.h"
 #include "BattlegroundMgr.h"
+#include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "Engine.h"
 #include "Group.h"
@@ -346,10 +347,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategies("dps", "threat", "dps assist", "aoe", "close", "behind", "stealth", nullptr);
             break;
         case CLASS_WARLOCK:
-            if (player->getLevel() > 19)
-                engine->addStrategy("dps debuff");
-
-            engine->addStrategies("dps assist", "dps", "aoe", "ranged", "pet", "threat", nullptr);
+            engine->addStrategies("dps assist", "dps", "dps debuff", "aoe", "ranged", "threat", nullptr);
             break;
         case CLASS_DEATH_KNIGHT:
             if (tab == 0)
@@ -518,7 +516,14 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategy("dps assist");
             break;
         case CLASS_WARLOCK:
-            nonCombatEngine->addStrategies("pet", "dps assist", nullptr);
+            if (tab == WARLOCK_TAB_AFFLICATION) {
+                nonCombatEngine->addStrategies("bmana", nullptr);
+            } else if (tab == WARLOCK_TAB_DEMONOLOGY) {
+                nonCombatEngine->addStrategies("bdps", nullptr);
+            } else if (tab == WARLOCK_TAB_DESTRUCTION) {
+                nonCombatEngine->addStrategies("bhealth", nullptr);
+            }
+            nonCombatEngine->addStrategies("dps assist", nullptr);
             break;
         case CLASS_DEATH_KNIGHT:
             if (tab == 0)

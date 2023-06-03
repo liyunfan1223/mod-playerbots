@@ -93,6 +93,12 @@ class CastSummonFelguardAction : public CastBuffSpellAction
 		CastSummonFelguardAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "summon felguard") { }
 };
 
+class CastSummonFelhunterAction : public CastBuffSpellAction
+{
+	public:
+		CastSummonFelhunterAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "summon felhunter") { }
+};
+
 class CastSummonImpAction : public CastBuffSpellAction
 {
 	public:
@@ -218,4 +224,45 @@ class CastSiphonLifeOnAttackerAction : public CastDebuffSpellOnAttackerAction
         CastSiphonLifeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "siphon life") { }
 };
 
+class CastUnstableAfflictionAction: public CastDebuffSpellAction
+{
+    public:
+        CastUnstableAfflictionAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "unstable affliction", true) {}
+};
+
+class CastHauntAction: public CastSpellAction
+{
+    public:
+        CastHauntAction(PlayerbotAI* ai) : CastSpellAction(ai, "haunt") {}
+};
+
+class CastDemonicEmpowermentAction : public CastBuffSpellAction
+{
+    public:
+        CastDemonicEmpowermentAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "demonic empowerment") {}
+};
+
+class CastMetamorphosisAction : public CastBuffSpellAction
+{
+    public:
+        CastMetamorphosisAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "metamorphosis") {}
+};
+
+class CastUnstableAfflictionOnAttackerAction : public CastDebuffSpellOnAttackerAction
+{
+    public:
+        CastUnstableAfflictionOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "unstable affliction", true) {}
+};
+
+class CastSoulFireAction : public CastSpellAction
+{
+    public:
+        CastSoulFireAction(PlayerbotAI* ai) : CastSpellAction(ai, "soul fire") {}
+};
+
+class CastIncinerateAction : public CastSpellAction
+{
+    public:
+        CastIncinerateAction(PlayerbotAI* ai) : CastSpellAction(ai, "incinerate") {}
+};
 #endif

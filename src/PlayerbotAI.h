@@ -13,6 +13,7 @@
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
+#include "SpellAuras.h"
 #include "WorldPacket.h"
 #include "PlayerbotTextMgr.h"
 
@@ -376,6 +377,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool CanCastSpell(uint32 spellid, float x, float y, float z, uint8 effectMask, bool checkHasSpell = true, Item* itemTarget = nullptr);
 
         bool HasAura(uint32 spellId, Unit const* player);
+        Aura* GetAura(std::string const spellName, Unit* unit, bool checkIsOwner = false, bool checkDuration = false, int checkStack = -1);
         bool CastSpell(uint32 spellId, Unit* target, Item* itemTarget = nullptr);
         bool CastSpell(uint32 spellId, float x, float y, float z, Item* itemTarget = nullptr);
         bool canDispel(SpellInfo const* spellInfo, uint32 dispelType);

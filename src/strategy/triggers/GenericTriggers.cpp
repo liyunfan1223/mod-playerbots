@@ -4,7 +4,11 @@
 
 #include "GenericTriggers.h"
 #include "BattlegroundWS.h"
+#include "ObjectGuid.h"
 #include "Playerbots.h"
+#include "SharedDefines.h"
+#include "TemporarySummon.h"
+#include <string>
 
 bool LowManaTrigger::IsActive()
 {
@@ -18,7 +22,20 @@ bool MediumManaTrigger::IsActive()
 
 bool NoPetTrigger::IsActive()
 {
-    return (!AI_VALUE(Unit*, "pet target")) && (!bot->GetGuardianPet()) && (!bot->GetFirstControlled()) && (!AI_VALUE2(bool, "mounted", "self target"));
+    // Guardian* gp = bot->GetGuardianPet();
+    // bot->getpet
+    // if (gp) {
+    //     bot->Yell("Guardian name: " + gp->GetName(), LANG_UNIVERSAL);
+    // }
+    // Minion* minion = bot->GetFirstMinion();
+    // if (minion) {
+    //     bot->Yell("has minion: " + minion->GetName(), LANG_UNIVERSAL);
+    // }
+    return (bot->GetMinionGUID().IsEmpty()) && 
+        (!AI_VALUE(Unit*, "pet target")) && 
+        (!bot->GetGuardianPet()) && 
+        (!bot->GetFirstControlled()) && 
+        (!AI_VALUE2(bool, "mounted", "self target"));
 }
 
 bool HasPetTrigger::IsActive() {
@@ -193,7 +210,7 @@ bool TargetInSightTrigger::IsActive()
 
 bool DebuffTrigger::IsActive()
 {
-	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > 15;
+	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > life_bound;
 }
 
 bool SpellTrigger::IsActive()
@@ -331,7 +348,7 @@ bool AttackerCountTrigger::IsActive()
 
 bool HasAuraTrigger::IsActive()
 {
-	return botAI->HasAura(getName(), GetTarget());
+	return botAI->HasAura(getName(), GetTarget(), false, false, -1, true);
 }
 
 bool TimerTrigger::IsActive()

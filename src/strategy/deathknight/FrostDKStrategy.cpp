@@ -34,7 +34,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		{
 		    return new ActionNode("obliterate",
 			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
-			    /*A*/ NextAction::array(0, new NextAction("frost strike"), nullptr),
+			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 		}
 
@@ -58,7 +58,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		{
 		    return new ActionNode("howling blast",
 			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
-			    /*A*/ NextAction::array(0, new NextAction("icy touch"), nullptr),
+			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 		}
 };
@@ -70,7 +70,13 @@ FrostDKStrategy::FrostDKStrategy(PlayerbotAI* botAI) : GenericDKStrategy(botAI)
 
 NextAction** FrostDKStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), new NextAction("frost strike", ACTION_NORMAL + 5), new NextAction("obliterate", ACTION_NORMAL + 4), nullptr);
+    return NextAction::array(0, 
+		new NextAction("obliterate", ACTION_NORMAL + 5), 
+		new NextAction("frost strike", ACTION_NORMAL + 4),
+		// new NextAction("death strike", ACTION_NORMAL + 3),
+		new NextAction("melee", ACTION_NORMAL), 
+		NULL
+	);
 }
 
 void FrostDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -78,6 +84,7 @@ void FrostDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericDKStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("empower weapon", NextAction::array(0, new NextAction("empower weapon", ACTION_NORMAL + 4), nullptr)));
+	triggers.push_back(new TriggerNode("pestilence", NextAction::array(0, new NextAction("pestilence", ACTION_HIGH + 9), NULL)));
 }
 
 void FrostDKAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

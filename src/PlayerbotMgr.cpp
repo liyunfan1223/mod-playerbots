@@ -2,6 +2,7 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
+#include "CharacterCache.h"
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "ObjectAccessor.h"
@@ -776,10 +777,12 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!charname)
     {
-        Player* tPlayer = ObjectAccessor::FindConnectedPlayer(master->GetTarget());
-        if (tPlayer) {
-            charname = new char[tPlayer->GetName().size() + 1];
-            strcpy(charname, tPlayer->GetName().c_str());
+        std::string name;
+        bool isPlayer = sCharacterCache->GetCharacterNameByGuid(master->GetTarget(), name);
+        // Player* tPlayer = ObjectAccessor::FindConnectedPlayer(master->GetTarget());
+        if (isPlayer) {
+            charname = new char[name.size() + 1];
+            strcpy(charname, name.c_str());
         } else {
             messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
             return messages;

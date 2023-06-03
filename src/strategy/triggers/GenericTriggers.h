@@ -306,10 +306,12 @@ class TargetInSightTrigger : public Trigger
 class DebuffTrigger : public BuffTrigger
 {
     public:
-        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner) { }
+        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false, float life_bound = 0.25) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner), life_bound(life_bound) { }
 
 		std::string const GetTargetName() override { return "current target"; }
         bool IsActive() override;
+    protected:
+        float life_bound;
 };
 
 class DebuffOnAttackerTrigger : public DebuffTrigger

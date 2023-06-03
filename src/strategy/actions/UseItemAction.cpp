@@ -254,9 +254,8 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         if (bot->IsInCombat())
             return false;
 
-        bot->SetStandState(UNIT_STAND_STATE_SIT);
+        // bot->SetStandState(UNIT_STAND_STATE_SIT);
         botAI->InterruptSpell();
-
         float hp = bot->GetHealthPct();
         float mp = bot->GetPower(POWER_MANA) * 100.0f / bot->GetMaxPower(POWER_MANA);
         float p = 0.f;
@@ -272,17 +271,18 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         }
         else if (isFood)
         {
-            p = hp;
+            p = std::min(hp, mp);
             TellConsumableUse(item, "Eating", p);
         }
 
         if (!bot->IsInCombat() && !bot->InBattleground())
-            botAI->SetNextCheckDelay(27000.0f * (100 - p) / 100.0f);
+            botAI->SetNextCheckDelay(std::max(10000.0f, 27000.0f * (100 - p) / 100.0f));
 
         if (!bot->IsInCombat() && bot->InBattleground())
-            botAI->SetNextCheckDelay(20000.0f * (100 - p) / 100.0f);
+            botAI->SetNextCheckDelay(std::max(10000.0f,20000.0f * (100 - p) / 100.0f));
 
         //botAI->SetNextCheckDelay(27000.0f * (100 - p) / 100.0f);
+        // botAI->SetNextCheckDelay(20000);
         bot->GetSession()->HandleUseItemOpcode(packet);
 
         return true;
