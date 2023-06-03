@@ -67,7 +67,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         {
             return new ActionNode ("starfall",
                 /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
-                /*A*/ NextAction::array(0, new NextAction("hurricane"), nullptr),
+                /*A*/ nullptr,
                 /*C*/ nullptr);
         }
 
@@ -104,7 +104,10 @@ CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI* botAI) : GenericDruidStrat
 
 NextAction** CasterDruidStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), new NextAction("wrath", ACTION_NORMAL + 1), nullptr);
+    return NextAction::array(0, 
+        new NextAction("starfall", ACTION_NORMAL + 3),
+        new NextAction("starfire", ACTION_NORMAL + 2), 
+        new NextAction("wrath", ACTION_NORMAL + 1), nullptr);
 }
 
 void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -112,16 +115,13 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericDruidStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_MOVE), nullptr)));
-    triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("regrowth", ACTION_MEDIUM_HEAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("party member medium health", NextAction::array(0, new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode("almost full health", NextAction::array(0, new NextAction("rejuvenation", ACTION_LIGHT_HEAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("party member almost full health", NextAction::array(0, new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 1), nullptr)));
-	triggers.push_back(new TriggerNode("insect swarm", NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), nullptr)));
+    triggers.push_back(new TriggerNode("insect swarm", NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), nullptr)));
 	triggers.push_back(new TriggerNode("moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
     triggers.push_back(new TriggerNode("eclipse (solar)", NextAction::array(0, new NextAction("wrath", ACTION_NORMAL + 6), nullptr)));
     triggers.push_back(new TriggerNode("eclipse (lunar)", NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 6), nullptr)));
     triggers.push_back(new TriggerNode("moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
-	triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("nature's grasp", ACTION_EMERGENCY), nullptr)));
+	triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 5), NULL)));
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", 49.0f), NULL)));
 }
 
 void CasterDruidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

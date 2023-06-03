@@ -22,15 +22,6 @@ bool MediumManaTrigger::IsActive()
 
 bool NoPetTrigger::IsActive()
 {
-    // Guardian* gp = bot->GetGuardianPet();
-    // bot->getpet
-    // if (gp) {
-    //     bot->Yell("Guardian name: " + gp->GetName(), LANG_UNIVERSAL);
-    // }
-    // Minion* minion = bot->GetFirstMinion();
-    // if (minion) {
-    //     bot->Yell("has minion: " + minion->GetName(), LANG_UNIVERSAL);
-    // }
     return (bot->GetMinionGUID().IsEmpty()) && 
         (!AI_VALUE(Unit*, "pet target")) && 
         (!bot->GetGuardianPet()) && 
@@ -351,6 +342,13 @@ bool HasAuraTrigger::IsActive()
 	return botAI->HasAura(getName(), GetTarget(), false, false, -1, true);
 }
 
+bool HasAuraStackTrigger::IsActive()
+{
+	Aura *aura = botAI->GetAura(getName(), GetTarget(), false, true, stack);
+	// sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "HasAuraStackTrigger::IsActive %s %d", getName(), aura ? aura->GetStackAmount() : -1);
+	return aura;
+}
+
 bool TimerTrigger::IsActive()
 {
     if (time(nullptr) != lastCheck)
@@ -552,4 +550,9 @@ bool IsFallingFarTrigger::IsActive()
 bool HasAreaDebuffTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has area debuff", "self target");
+}
+
+Value<Unit*>* BuffOnMainTankTrigger::GetTargetValue()
+{
+	return context->GetValue<Unit*>("main tank", spell);
 }

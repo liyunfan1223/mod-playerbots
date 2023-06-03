@@ -457,6 +457,17 @@ class HasAuraTrigger : public Trigger
 
 };
 
+class HasAuraStackTrigger : public Trigger {
+    public:
+        HasAuraStackTrigger(PlayerbotAI* ai, std::string spell, int stack, int checkInterval = 1) : Trigger(ai, spell, checkInterval),
+            stack(stack) {}
+
+        std::string const GetTargetName() { return "self target"; }
+        virtual bool IsActive();
+    private:
+        int stack;
+};
+
 class HasNoAuraTrigger : public Trigger
 {
     public:
@@ -720,4 +731,11 @@ class HasAreaDebuffTrigger : public Trigger {
         bool IsActive() override;
 };
 
+class BuffOnMainTankTrigger : public BuffTrigger
+{
+public:
+    BuffOnMainTankTrigger(PlayerbotAI* botAI, std::string spell, bool checkIsOwner = false) : BuffTrigger(botAI, spell, 1, checkIsOwner) {}
+public:
+    virtual Value<Unit*>* GetTargetValue();
+};
 #endif

@@ -35,4 +35,11 @@ class PartyMemberValue : public UnitCalculatedValue
         virtual bool Check(Unit* player);
 };
 
+class PartyMemberMainTankValue : public PartyMemberValue
+{
+public:
+    PartyMemberMainTankValue(PlayerbotAI* botAI) : PartyMemberValue(botAI) {}
+    virtual Unit* Calculate();
+};
+
 #endif

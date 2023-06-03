@@ -259,6 +259,7 @@ class CastRighteousDefenseAction : public CastSpellAction
 {
     public:
         CastRighteousDefenseAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "righteous defense") { }
+		virtual Unit* GetTarget() override;
 };
 
 class CastCleansePoisonAction : public CastCureSpellAction
@@ -343,4 +344,27 @@ class CastTurnUndeadAction : public CastBuffSpellAction
 
 PROTECT_ACTION(CastBlessingOfProtectionProtectAction, "blessing of protection");
 
+class CastDivinePleaAction : public CastBuffSpellAction
+{
+public:
+	CastDivinePleaAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine plea") {}
+};
+
+class ShieldOfRighteousnessAction : public CastMeleeSpellAction
+{
+public:
+	ShieldOfRighteousnessAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "shield of righteousness") {}
+};
+
+class CastBeaconOfLightOnMainTankAction : public BuffOnMainTankAction
+{
+public:
+	CastBeaconOfLightOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "beacon of light", true) {}
+};
+
+class CastSacredShieldOnMainTankAction : public BuffOnMainTankAction
+{
+public:
+	CastSacredShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "sacred shield", false) {}
+};
 #endif

@@ -133,4 +133,8 @@ class PresenceOfMindTrigger : public BuffTrigger
         PresenceOfMindTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "presence of mind") { }
 };
 
+class ArcaneBlastStackTrigger : public HasAuraStackTrigger {
+public:
+    ArcaneBlastStackTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "arcane blast", 3, 1) {}
+};
 #endif

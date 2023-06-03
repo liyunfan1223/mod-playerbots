@@ -24,7 +24,8 @@ HealPaladinStrategy::HealPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStr
 
 NextAction** HealPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("reach party member to heal", ACTION_NORMAL + 1), new NextAction("judgement", ACTION_NORMAL), nullptr);
+    return NextAction::array(0, new NextAction("judgement of light", ACTION_NORMAL + 2),
+        new NextAction("reach party member to heal", ACTION_NORMAL + 1), nullptr);
 }
 
 void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -32,16 +33,42 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericPaladinStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("concentration aura", NextAction::array(0, new NextAction("concentration aura", 90.0f), nullptr)));
-    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of light", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("judgement of light", ACTION_HIGH + 10), nullptr)));
-    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("judgement", ACTION_HIGH + 10), nullptr)));
+    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("divine favor", ACTION_HIGH + 1), nullptr)));
-    triggers.push_back(new TriggerNode("almost full health", NextAction::array(0, new NextAction("flash of light", ACTION_LIGHT_HEAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("party member almost full health", NextAction::array(0, new NextAction("flash of light on party", ACTION_LIGHT_HEAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("flash of light", ACTION_MEDIUM_HEAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("party member medium health", NextAction::array(0, new NextAction("flash of light on party", ACTION_MEDIUM_HEAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("divine favor", ACTION_MEDIUM_HEAL + 4), new NextAction("holy shock", ACTION_MEDIUM_HEAL + 3), new NextAction("holy light", ACTION_MEDIUM_HEAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("party member low health", NextAction::array(0, new NextAction("divine favor", ACTION_MEDIUM_HEAL + 7), new NextAction("holy shock on party", ACTION_MEDIUM_HEAL + 6), new NextAction("holy light on party", ACTION_MEDIUM_HEAL + 5), nullptr)));
-    triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of sanctuary", ACTION_HIGH + 9), nullptr)));
+    // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of sanctuary", ACTION_HIGH + 9), nullptr)));
     triggers.push_back(new TriggerNode("party member to heal out of spell range", NextAction::array(0, new NextAction("reach party member to heal", ACTION_EMERGENCY + 3), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "party member critical health",
+		NextAction::array(0,
+            new NextAction("holy shock on party", ACTION_CRITICAL_HEAL + 5), 
+            new NextAction("holy light on party", ACTION_CRITICAL_HEAL + 4),
+            NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member low health",
+		NextAction::array(0,
+            new NextAction("holy light on party", ACTION_MEDIUM_HEAL + 5), 
+            NULL)));
+
+	triggers.push_back(new TriggerNode(
+        "party member medium health",
+		NextAction::array(0,
+            new NextAction("holy light on party", ACTION_LIGHT_HEAL + 9),
+            new NextAction("flash of light on party", ACTION_LIGHT_HEAL + 8),
+            NULL)));
+    
+    triggers.push_back(new TriggerNode(
+        "party member almost full health",
+		NextAction::array(0, 
+            new NextAction("flash of light on party", ACTION_LIGHT_HEAL + 3),
+            NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "beacon of light on main tank",
+		NextAction::array(0, new NextAction("beacon of light on main tank", ACTION_CRITICAL_HEAL + 7), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "sacred shield on main tank",
+		NextAction::array(0, new NextAction("sacred shield on main tank", ACTION_CRITICAL_HEAL + 6), NULL)));
 }

@@ -213,7 +213,7 @@ Value<Unit*>* CastDebuffSpellOnAttackerAction::GetTargetValue()
     return context->GetValue<Unit*>("attacker without aura", spell);
 }
 
-CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell) : CastAuraSpellAction(botAI, spell)
+CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner) : CastAuraSpellAction(botAI, spell, checkIsOwner)
 {
     range = botAI->GetRange("spell");
 }
@@ -274,3 +274,9 @@ bool CastVehicleSpellAction::Execute(Event event)
     uint32 spellId = AI_VALUE2(uint32, "vehicle spell id", spell);
     return botAI->CastVehicleSpell(spellId, GetTarget());
 }
+
+Value<Unit*>* BuffOnMainTankAction::GetTargetValue()
+{
+    return context->GetValue<Unit*>("main tank", spell);
+}
+

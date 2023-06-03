@@ -160,4 +160,15 @@ class TurnUndeadTrigger : public HasCcTargetTrigger
 
 DEBUFF_TRIGGER(AvengerShieldTrigger, "avenger's shield");
 
+class BeaconOfLightOnMainTankTrigger : public BuffOnMainTankTrigger
+{
+public:
+    BeaconOfLightOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "beacon of light", true) {}
+};
+
+class SacredShieldOnMainTankTrigger : public BuffOnMainTankTrigger
+{
+public:
+    SacredShieldOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "sacred shield", false) {}
+};
 #endif

@@ -22,6 +22,7 @@ class MageStrategyFactoryInternal : public NamedObjectContext<Strategy>
             creators["pull"] = &MageStrategyFactoryInternal::pull;
             creators["fire aoe"] = &MageStrategyFactoryInternal::fire_aoe;
             creators["frost aoe"] = &MageStrategyFactoryInternal::frost_aoe;
+            creators["arcane aoe"] = &MageStrategyFactoryInternal::arcane_aoe;
             creators["cure"] = &MageStrategyFactoryInternal::cure;
             creators["buff"] = &MageStrategyFactoryInternal::buff;
             creators["boost"] = &MageStrategyFactoryInternal::boost;
@@ -33,6 +34,7 @@ class MageStrategyFactoryInternal : public NamedObjectContext<Strategy>
         static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
         static Strategy* fire_aoe(PlayerbotAI* botAI) { return new FireMageAoeStrategy(botAI); }
         static Strategy* frost_aoe(PlayerbotAI* botAI) { return new FrostMageAoeStrategy(botAI); }
+        static Strategy* arcane_aoe(PlayerbotAI* botAI) { return new ArcaneMageAoeStrategy(botAI); }
         static Strategy* cure(PlayerbotAI* botAI) { return new MageCureStrategy(botAI); }
         static Strategy* buff(PlayerbotAI* botAI) { return new MageBuffStrategy(botAI); }
         static Strategy* boost(PlayerbotAI* botAI) { return new MageBoostStrategy(botAI); }
@@ -95,7 +97,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["presence of mind"] = &MageTriggerFactoryInternal::presence_of_mind;
             creators["fire ward"] = &MageTriggerFactoryInternal::fire_ward;
             creators["frost ward"] = &MageTriggerFactoryInternal::frost_ward;
-
+            creators["arcane blast stack"] = &MageTriggerFactoryInternal::arcane_blast_stack;
         }
 
     private:
@@ -120,6 +122,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* missile_barrage(PlayerbotAI* botAI) { return new MissileBarrageTrigger(botAI); }
         static Trigger* arcane_blast(PlayerbotAI* botAI) { return new ArcaneBlastTrigger(botAI); }
         static Trigger* counterspell_enemy_healer(PlayerbotAI* botAI) { return new CounterspellEnemyHealerTrigger(botAI); }
+        static Trigger* arcane_blast_stack(PlayerbotAI* botAI) { return new ArcaneBlastStackTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>

@@ -139,3 +139,27 @@ bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &
 
     return false;
 }
+
+class FindMainTankPlayer : public FindPlayerPredicate
+{
+public:
+    FindMainTankPlayer(PlayerbotAI* botAI) : botAI(botAI) {}
+
+    virtual bool Check(Unit* unit)
+    {
+        Player* player = unit->ToPlayer();
+        if (!player) {
+            return false;
+        }
+        return botAI->IsMainTank(player);
+    }
+
+private:
+    PlayerbotAI* botAI;
+};
+
+Unit* PartyMemberMainTankValue::Calculate()
+{
+    FindMainTankPlayer findMainTankPlayer(botAI);
+    return FindPartyMember(findMainTankPlayer);
+}

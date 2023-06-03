@@ -285,6 +285,8 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["RTSC saved location"] = &ValueContext::RTSC_saved_location;
 
             creators["has area debuff"] = &ValueContext::has_area_debuff;
+
+            creators["main tank"] = &ValueContext::main_tank;
         }
 
     private:
@@ -475,6 +477,8 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* RTSC_saved_location(PlayerbotAI* botAI) { return new RTSCSavedLocationValue(botAI); }
 
         static UntypedValue* has_area_debuff(PlayerbotAI* botAI) { return new HasAreaDebuffValue(botAI); }
+
+        static UntypedValue* main_tank(PlayerbotAI* ai) { return new PartyMemberMainTankValue(ai); }
 };
 
 #endif

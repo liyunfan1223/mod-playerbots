@@ -19,4 +19,13 @@ class ArcaneMageStrategy : public GenericMageStrategy
         NextAction** getDefaultActions() override;
 };
 
+class ArcaneMageAoeStrategy : public CombatStrategy
+{
+public:
+    ArcaneMageAoeStrategy(PlayerbotAI* ai) : CombatStrategy(ai) {}
+
+public:
+    virtual void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "arcane aoe"; }
+};
 #endif

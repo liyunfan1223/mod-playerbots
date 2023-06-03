@@ -278,7 +278,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_MAGE:
             if (tab == 0)
-                engine->addStrategies("arcane", "threat", nullptr);
+                engine->addStrategies("arcane", "arcane aoe", "threat", nullptr);
             else if (tab == 1)
                 engine->addStrategies("fire", "fire aoe", "threat", nullptr);
             else

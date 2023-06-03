@@ -240,6 +240,7 @@ class CastDemonicEmpowermentAction : public CastBuffSpellAction
 {
     public:
         CastDemonicEmpowermentAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "demonic empowerment") {}
+        std::string const GetTargetName() override { return "pet target"; }
 };
 
 class CastMetamorphosisAction : public CastBuffSpellAction

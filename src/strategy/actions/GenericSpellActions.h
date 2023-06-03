@@ -66,7 +66,7 @@ class CastDebuffSpellOnAttackerAction : public CastAuraSpellAction
 class CastBuffSpellAction : public CastAuraSpellAction
 {
 	public:
-		CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell);
+		CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = false);
 
         std::string const GetTargetName() override { return "self target"; }
 };
@@ -322,4 +322,26 @@ class CastBladeSalvoAction : public CastVehicleSpellAction
         CastBladeSalvoAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "blade salvo") { }
 };
 
+class MainTankActionNameSupport {
+public:
+    MainTankActionNameSupport(std::string spell)
+    {
+        name = std::string(spell) + " on main tank";
+    }
+
+    virtual std::string const getName() { return name; }
+
+private:
+    std::string name;
+};
+
+class BuffOnMainTankAction : public CastBuffSpellAction, public MainTankActionNameSupport
+{
+public:
+    BuffOnMainTankAction(PlayerbotAI* ai, std::string spell, bool checkIsOwner = false) :
+        CastBuffSpellAction(ai, spell, checkIsOwner), MainTankActionNameSupport(spell) {}
+public:
+    virtual Value<Unit*>* GetTargetValue();
+    virtual std::string const getName() { return MainTankActionNameSupport::getName(); }
+};
 #endif
