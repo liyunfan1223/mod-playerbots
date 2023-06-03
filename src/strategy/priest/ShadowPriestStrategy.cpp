@@ -13,7 +13,12 @@ ShadowPriestStrategy::ShadowPriestStrategy(PlayerbotAI* botAI) : GenericPriestSt
 
 NextAction** ShadowPriestStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("mind blast", 10.0f), new NextAction("mana burn", 9.0f), new NextAction("starshards", 8.0f), new NextAction("shoot", 7.0f), nullptr);
+    return NextAction::array(0, 
+        new NextAction("mind blast", 13.0f), 
+        // new NextAction("shadow word: death", 12.0f), 
+        new NextAction("mind flay", 11.0f), 
+        new NextAction("shoot", 10.0f), 
+        NULL);
 }
 
 void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -26,9 +31,9 @@ void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("vampiric embrace", NextAction::array(0, new NextAction("vampiric embrace", 16.0f), nullptr)));
     triggers.push_back(new TriggerNode("silence", NextAction::array(0, new NextAction("silence", ACTION_INTERRUPT + 1), nullptr)));
     triggers.push_back(new TriggerNode("silence on enemy healer", NextAction::array(0, new NextAction("silence on enemy healer", ACTION_INTERRUPT), nullptr)));
-    triggers.push_back(new TriggerNode("shadowfiend", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("mana burn", ACTION_HIGH), nullptr)));
+    // triggers.push_back(new TriggerNode("shadowfiend", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
+    // triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
+    // triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("mana burn", ACTION_HIGH), nullptr)));
 }
 
 void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -41,6 +46,6 @@ void ShadowPriestDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("devouring plague", NextAction::array(0, new NextAction("devouring plague", 13.0f), nullptr)));
     triggers.push_back(new TriggerNode("vampiric touch", NextAction::array(0, new NextAction("vampiric touch", 11.0f), nullptr)));
     triggers.push_back(new TriggerNode("shadow word: pain", NextAction::array(0, new NextAction("shadow word: pain", 12.0f), nullptr)));
-    triggers.push_back(new TriggerNode("feedback", NextAction::array(0, new NextAction("feedback", 80.0f), nullptr)));
-    triggers.push_back(new TriggerNode("hex of weakness", NextAction::array(0, new NextAction("hex of weakness", 10.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("feedback", NextAction::array(0, new NextAction("feedback", 80.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("hex of weakness", NextAction::array(0, new NextAction("hex of weakness", 10.0f), nullptr)));
 }

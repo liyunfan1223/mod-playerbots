@@ -52,7 +52,7 @@ HEAL_PARTY_ACTION(CastRenewOnPartyAction, "renew");
 HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending");
 HEAL_PARTY_ACTION(CastBindingHealAction, "binding heal");
 
-BUFF_ACTION(CastPrayerOfHealingAction, "prayer of healing");
+HEAL_PARTY_ACTION(CastPrayerOfHealingAction, "prayer of healing");
 AOE_HEAL_ACTION(CastLightwellAction, "lightwell");
 AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing");
 
@@ -68,7 +68,7 @@ CURE_PARTY_ACTION(CastAbolishDiseaseOnPartyAction, "abolish disease", DISPEL_DIS
 
 DEBUFF_CHECKISOWNER_ACTION(CastHolyFireAction, "holy fire");
 // shadow 2.4.3
-BUFF_ACTION(CastShadowfiendAction, "shadowfiend");
+// BUFF_ACTION(CastShadowfiendAction, "shadowfiend");
 SPELL_ACTION(CastShadowWordDeathAction, "shadow word: death");
 
 // shadow
@@ -116,4 +116,37 @@ class CastRemoveShadowformAction : public Action
         bool Execute(Event event) override;
 };
 
+class CastDispersionAction : public CastSpellAction
+{
+public:
+    CastDispersionAction(PlayerbotAI* ai) : CastSpellAction(ai, "dispersion") {}
+    virtual std::string const GetTargetName() { return "self target"; }
+};
+
+class CastPenanceOnPartyAction : public HealPartyMemberAction
+{
+public:
+    CastPenanceOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "penance") {}
+};
+
+class CastHymnOfHopeAction : public CastSpellAction
+{
+public:
+    CastHymnOfHopeAction(PlayerbotAI* ai) : CastSpellAction(ai, "hymn of hope") {}
+    virtual std::string const GetTargetName() { return "self target"; }
+};
+
+class CastDivineHymnAction : public CastSpellAction
+{
+public:
+    CastDivineHymnAction(PlayerbotAI* ai) : CastSpellAction(ai, "divine hymn") {}
+    virtual std::string const GetTargetName() { return "self target"; }
+};
+
+class CastShadowfiendAction : public CastSpellAction
+{
+public:
+    CastShadowfiendAction(PlayerbotAI* ai) : CastSpellAction(ai, "shadowfiend") {}
+    virtual std::string const GetTargetName() { return "current target"; }
+};
 #endif

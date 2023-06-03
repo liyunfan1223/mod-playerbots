@@ -16,20 +16,38 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("greater heal", 25.0f), nullptr)));
-    triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("power word: shield", 61.0f), new NextAction("greater heal", 60.0f), nullptr)));
-    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("remove shadowform", 72.0f), new NextAction("power word: shield", 71.0f), new NextAction("flash heal", 70.0f), nullptr)));
-    triggers.push_back(new TriggerNode("party member critical health", NextAction::array(0, new NextAction("remove shadowform", 62.0f), new NextAction("power word: shield on party", 61.0f), new NextAction("flash heal on party", 60.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("greater heal", 25.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("power word: shield", 61.0f), new NextAction("greater heal", 60.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("remove shadowform", 72.0f), new NextAction("power word: shield", 71.0f), new NextAction("flash heal", 70.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("party member critical health", NextAction::array(0, new NextAction("remove shadowform", 62.0f), new NextAction("power word: shield on party", 61.0f), new NextAction("flash heal on party", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("fade", 55.0f), nullptr)));
     // triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("psychic scream", 50.0f), nullptr)));
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("inner focus", 42.0f), nullptr)));
-    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("symbol of hope", ACTION_EMERGENCY), nullptr)));
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("consume magic", 10.0f), nullptr)));
-    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("desperate prayer", ACTION_EMERGENCY), nullptr)));
-    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("elune's grace", ACTION_EMERGENCY), nullptr)));
-    triggers.push_back(new TriggerNode("chastise", NextAction::array(0, new NextAction("chastise", ACTION_INTERRUPT), nullptr)));
-    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("pain suppression", ACTION_EMERGENCY + 1), nullptr)));
-    triggers.push_back(new TriggerNode("protect party member", NextAction::array(0, new NextAction("pain suppression on party", ACTION_EMERGENCY), nullptr)));
+    // triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("inner focus", 42.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("symbol of hope", ACTION_EMERGENCY), nullptr)));
+    // triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("consume magic", 10.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("desperate prayer", ACTION_EMERGENCY), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("elune's grace", ACTION_EMERGENCY), nullptr)));
+    // triggers.push_back(new TriggerNode("chastise", NextAction::array(0, new NextAction("chastise", ACTION_INTERRUPT), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "critical health",
+        NextAction::array(0, new NextAction("power word: shield", ACTION_NORMAL), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "low health",
+        NextAction::array(0, new NextAction("power word: shield", ACTION_HIGH), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "medium mana",
+        NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH + 1), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "low mana",
+        NextAction::array(0, new NextAction("hymn of hope", ACTION_HIGH), NULL)));
+    
+    triggers.push_back(new TriggerNode(
+        "enemy too close for spell",
+		NextAction::array(0, new NextAction("flee", 49.0f), NULL)));
+
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
 }
 

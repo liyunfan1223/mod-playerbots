@@ -182,7 +182,7 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
             creators["psychic scream"] = &PriestAiObjectContextInternal::psychic_scream;
             creators["vampiric touch"] = &PriestAiObjectContextInternal::vampiric_touch;
             creators["vampiric embrace"] = &PriestAiObjectContextInternal::vampiric_embrace;
-            //creators["dispersion"] = &PriestAiObjectContextInternal::dispersion;
+            creators["dispersion"] = &PriestAiObjectContextInternal::dispersion;
             creators["shadow protection"] = &PriestAiObjectContextInternal::shadow_protection;
             creators["shadow protection on party"] = &PriestAiObjectContextInternal::shadow_protection_on_party;
             creators["shackle undead"] = &PriestAiObjectContextInternal::shackle_undead;
@@ -193,7 +193,7 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
             creators["silence on enemy healer"] = &PriestAiObjectContextInternal::silence_on_enemy_healer;
             creators["mana burn"] = &PriestAiObjectContextInternal::mana_burn;
             creators["levitate"] = &PriestAiObjectContextInternal::levitate;
-            creators["prayer of healing"] = &PriestAiObjectContextInternal::prayer_of_healing;
+            creators["prayer of healing on party"] = &PriestAiObjectContextInternal::prayer_of_healing;
             creators["lightwell"] = &PriestAiObjectContextInternal::lightwell;
             creators["mind soothe"] = &PriestAiObjectContextInternal::mind_soothe;
             creators["touch of weakness"] = &PriestAiObjectContextInternal::touch_of_weakness;
@@ -213,8 +213,11 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
             creators["mass dispel"] = &PriestAiObjectContextInternal::mass_dispel;
             creators["pain suppression"] = &PriestAiObjectContextInternal::pain_suppression;
             creators["pain suppression on party"] = &PriestAiObjectContextInternal::pain_suppression_on_party;
-            creators["prayer of mending"] = &PriestAiObjectContextInternal::prayer_of_mending;
+            creators["prayer of mending on party"] = &PriestAiObjectContextInternal::prayer_of_mending;
             creators["binding heal"] = &PriestAiObjectContextInternal::binding_heal;
+            creators["penance on party"] = &PriestAiObjectContextInternal::penance_on_party;
+            creators["hymn of hope"] = &PriestAiObjectContextInternal::hymn_of_hope;
+            creators["divine hymn"] = &PriestAiObjectContextInternal::divine_hymn;
         }
 
     private:
@@ -222,7 +225,7 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* shadow_protection(PlayerbotAI* botAI) { return new CastShadowProtectionAction(botAI); }
         static Action* power_infusion(PlayerbotAI* botAI) { return new CastPowerInfusionAction(botAI); }
         static Action* inner_focus(PlayerbotAI* botAI) { return new CastInnerFocusAction(botAI); }
-        //static Action* dispersion(PlayerbotAI* botAI) { return new CastDispersionAction(botAI); }
+        static Action* dispersion(PlayerbotAI* botAI) { return new CastDispersionAction(botAI); }
         static Action* vampiric_embrace(PlayerbotAI* botAI) { return new CastVampiricEmbraceAction(botAI); }
         static Action* vampiric_touch(PlayerbotAI* botAI) { return new CastVampiricTouchAction(botAI); }
         static Action* psychic_scream(PlayerbotAI* botAI) { return new CastPsychicScreamAction(botAI); }
@@ -293,6 +296,9 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* chastise(PlayerbotAI* botAI) { return new CastChastiseAction(botAI); }
         static Action* consume_magic(PlayerbotAI* botAI) { return new CastConsumeMagicAction(botAI); }
         static Action* symbol_of_hope(PlayerbotAI* botAI) { return new CastSymbolOfHopeAction(botAI); }
+        static Action* penance_on_party(PlayerbotAI* ai) { return new CastPenanceOnPartyAction(ai); }
+        static Action* hymn_of_hope(PlayerbotAI* ai) { return new CastHymnOfHopeAction(ai); }
+        static Action* divine_hymn(PlayerbotAI* ai) { return new CastDivineHymnAction(ai); }
 };
 
 PriestAiObjectContext::PriestAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
