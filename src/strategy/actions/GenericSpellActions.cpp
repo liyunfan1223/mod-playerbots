@@ -108,11 +108,11 @@ bool CastSpellAction::isUseful()
     if (!spellTarget->IsInWorld() || spellTarget->GetMapId() != bot->GetMapId())
         return false;
 
-    float combatReach = bot->GetCombatReach() + spellTarget->GetCombatReach();
-    if (!botAI->IsRanged(bot))
-        combatReach += 4.0f / 3.0f;
+    // float combatReach = bot->GetCombatReach() + spellTarget->GetCombatReach();
+    // if (!botAI->IsRanged(bot))
+    //     combatReach += 4.0f / 3.0f;
 
-    return spellTarget && AI_VALUE2(bool, "spell cast useful", spell) && sServerFacade->GetDistance2d(bot, spellTarget) <= (range + combatReach);
+    return spellTarget && AI_VALUE2(bool, "spell cast useful", spell); // && sServerFacade->GetDistance2d(bot, spellTarget) <= (range + combatReach);
 }
 
 CastMeleeSpellAction::CastMeleeSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)

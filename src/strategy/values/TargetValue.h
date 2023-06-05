@@ -7,6 +7,7 @@
 
 #include "TravelMgr.h"
 #include "Value.h"
+#include "NamedObjectContext.h"
 
 class PlayerbotAI;
 class ThreatMgr;
@@ -97,4 +98,28 @@ class PullTargetValue : public ManualSetValue<ObjectGuid>
         PullTargetValue(PlayerbotAI* botAI, std::string const name = "pull target") : ManualSetValue<ObjectGuid>(botAI, ObjectGuid::Empty, name) { }
 };
 
+class FindTargetValue : public UnitCalculatedValue, public Qualified
+{
+public:
+    FindTargetValue(PlayerbotAI* ai) : UnitCalculatedValue(ai) {}
+
+public:
+    Unit* Calculate();
+};
+
+class FindBossTargetStrategy : public FindTargetStrategy
+    {
+    public:
+        FindBossTargetStrategy(PlayerbotAI* ai) : FindTargetStrategy(ai) {}
+        virtual void CheckAttacker(Unit* attacker, ThreatMgr* threatManager);
+    };
+
+class BossTargetValue : public TargetValue, public Qualified
+{
+public:
+    BossTargetValue(PlayerbotAI* ai) : TargetValue(ai) {}
+
+public:
+    Unit* Calculate();
+};
 #endif

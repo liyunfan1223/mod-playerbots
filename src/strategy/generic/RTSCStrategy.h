@@ -15,7 +15,7 @@ class RTSCStrategy : public Strategy
         RTSCStrategy(PlayerbotAI* botAI);
 
         std::string const getName() override { return "RTSC"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers);
+        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
 #endif

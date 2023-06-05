@@ -38,7 +38,7 @@ bool HasAggroValue::Calculate()
         {
             if (Player* pl = victim->ToPlayer())
             {
-                if (botAI->IsTank(pl))
+                if (botAI->IsMainTank(pl))
                 {
                     return true;
                 }

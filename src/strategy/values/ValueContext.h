@@ -287,6 +287,8 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["has area debuff"] = &ValueContext::has_area_debuff;
 
             creators["main tank"] = &ValueContext::main_tank;
+            creators["find target"] = &ValueContext::find_target;
+            creators["boss target"] = &ValueContext::boss_target;
         }
 
     private:
@@ -479,6 +481,8 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* has_area_debuff(PlayerbotAI* botAI) { return new HasAreaDebuffValue(botAI); }
 
         static UntypedValue* main_tank(PlayerbotAI* ai) { return new PartyMemberMainTankValue(ai); }
+        static UntypedValue* find_target(PlayerbotAI* ai) { return new FindTargetValue(ai); }
+        static UntypedValue* boss_target(PlayerbotAI* ai) { return new BossTargetValue(ai); }
 };
 
 #endif

@@ -36,7 +36,7 @@ ReachSpellAction::ReachSpellAction(PlayerbotAI* botAI) : ReachTargetAction(botAI
 {
 }
 
-ReachPartyMemberToHealAction::ReachPartyMemberToHealAction(PlayerbotAI* botAI) : ReachTargetAction(botAI, "reach party member to heal", botAI->GetRange("spell"))
+ReachPartyMemberToHealAction::ReachPartyMemberToHealAction(PlayerbotAI* botAI) : ReachTargetAction(botAI, "reach party member to heal", botAI->GetRange("heal"))
 {
 }
 

@@ -37,6 +37,7 @@ class MovementAction : public Action
         void ClearIdleState();
         void UpdateMovementState();
         bool MoveAway(Unit* target);
+        bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->followDistance);
         void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
 };
 

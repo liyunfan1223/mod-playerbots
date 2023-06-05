@@ -76,6 +76,9 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("no ammo", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), new NextAction("say::no ammo", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("aspect of the viper", NextAction::array(0, new NextAction("aspect of the viper", ACTION_HIGH), NULL)));
     triggers.push_back(new TriggerNode("enemy too close for shoot", NextAction::array(0, new NextAction("flee", ACTION_HIGH + 3), NULL)));
+    triggers.push_back(new TriggerNode("misdirection on main tank", NextAction::array(0, new NextAction("misdirection on main tank", ACTION_HIGH + 7), NULL)));
+    triggers.push_back(new TriggerNode("tranquilizing shot", NextAction::array(0, new NextAction("tranquilizing shot", 61.0f), NULL)));
+
 }
 
 NextAction** HunterBoostStrategy::getDefaultActions()

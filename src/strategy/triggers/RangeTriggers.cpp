@@ -145,15 +145,15 @@ bool EnemyOutOfSpellRangeTrigger::IsActive()
     return target && (sServerFacade->GetDistance2d(bot, target) > (distance + combatReach + sPlayerbotAIConfig->contactDistance) || !bot->IsWithinLOSInMap(target));
 }
 
-bool EnemyOutOfMeleeTrigger::IsActive()
-{
-    Unit* target = AI_VALUE(Unit*, GetTargetName());
-    if (!target)
-        return false;
+// bool EnemyOutOfMeleeTrigger::IsActive()
+// {
+//     Unit* target = AI_VALUE(Unit*, GetTargetName());
+//     if (!target)
+//         return false;
 
-    float targetDistance = sServerFacade->GetDistance2d(bot, target);
-    return target && (targetDistance > std::max(5.0f, bot->GetCombatReach() + target->GetCombatReach()) || (!bot->IsWithinLOSInMap(target) && targetDistance > 5.0f));
-}
+//     float targetDistance = sServerFacade->GetDistance2d(bot, target);
+//     return target && (targetDistance > std::max(5.0f, bot->GetCombatReach() + target->GetCombatReach()) || (!bot->IsWithinLOSInMap(target) && targetDistance > 5.0f));
+// }
 
 bool PartyMemberToHealOutOfSpellRangeTrigger::IsActive()
 {
@@ -166,7 +166,7 @@ bool PartyMemberToHealOutOfSpellRangeTrigger::IsActive()
 }
 
 PartyMemberToHealOutOfSpellRangeTrigger::PartyMemberToHealOutOfSpellRangeTrigger(PlayerbotAI* botAI) :
-    OutOfRangeTrigger(botAI, "party member to heal out of spell range", botAI->GetRange("spell"))
+    OutOfRangeTrigger(botAI, "party member to heal out of spell range", botAI->GetRange("heal") + 1.0f)
 {
 }
 

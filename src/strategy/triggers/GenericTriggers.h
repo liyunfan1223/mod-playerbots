@@ -450,7 +450,7 @@ class AmmoCountTrigger : public ItemCountTrigger
 class HasAuraTrigger : public Trigger
 {
 	public:
-		HasAuraTrigger(PlayerbotAI* botAI, std::string const spell) : Trigger(botAI, spell) { }
+		HasAuraTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1) : Trigger(botAI, spell, checkInterval) { }
 
 		std::string const GetTargetName() override { return "self target"; }
 		bool IsActive() override;

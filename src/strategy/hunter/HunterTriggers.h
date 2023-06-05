@@ -7,6 +7,7 @@
 
 #include "GenericTriggers.h"
 #include "Trigger.h"
+#include "CureTriggers.h"
 
 class PlayerbotAI;
 
@@ -149,4 +150,15 @@ class SwitchToMeleeTrigger : public Trigger
         bool IsActive() override;
 };
 
+class MisdirectionOnMainTankTrigger : public BuffOnMainTankTrigger
+{
+    public:
+        MisdirectionOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "misdirection", true) {}
+};
+
+class TargetRemoveEnrageTrigger : public TargetAuraDispelTrigger
+{
+    public:
+        TargetRemoveEnrageTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_ENRAGE) {}
+};
 #endif

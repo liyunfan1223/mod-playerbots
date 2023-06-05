@@ -128,6 +128,43 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
 {
+    // if (!IsMovingAllowed(mapId, x, y, z))
+    //     return false;
+	// bot->UpdateGroundPositionZ(x, y, z);
+
+    // float distance = bot->GetDistance2d(x, y);
+    // if (distance > sPlayerbotAIConfig->contactDistance)
+    // {
+    //     WaitForReach(distance);
+
+    //     if (bot->IsSitState())
+    //         bot->SetStandState(UNIT_STAND_STATE_STAND);
+
+    //     if (bot->IsNonMeleeSpellCast(true))
+    //     {
+    //         bot->CastStop();
+    //         botAI->InterruptSpell();
+    //     }
+
+    //     bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
+    //             !bot->IsFlying() && !bot->IsUnderWater();
+    //     MotionMaster &mm = *bot->GetMotionMaster();
+    //     mm.Clear();
+
+    //     // float botZ = bot->GetPositionZ();
+	// 	// if (!bot->InBattleground() && z - botZ > 0.5f && bot->GetDistance2d(x, y) <= 5.0f)
+	// 	// {
+	// 	// 	float speed = bot->GetSpeed(MOVE_RUN);
+	// 	// 	mm.MoveJump(x, y, botZ + 0.5f, speed, speed, 1);
+	// 	// }
+	// 	// else
+    //         mm.MovePoint(mapId, x, y, z, generatePath);
+
+    //     AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
+    //     return true;
+    // }
+
+    // return false;
     UpdateMovementState();
     // LOG_DEBUG("playerbots", "IsMovingAllowed {}", IsMovingAllowed());
     if (!IsMovingAllowed())
@@ -507,20 +544,20 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     */
 
     // Clean movement if not already moving the same way.
-    if (mover->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
-    {
-        mover->StopMoving();
-        mover->GetMotionMaster()->Clear();
-    }
-    else
-    {
-        mover->GetMotionMaster()->GetDestination(x, y, z);
-        if (movePosition.distance(WorldPosition(movePosition.getMapId(), x, y, z, 0)) > minDist)
-        {
-            mover->StopMoving();
-            mover->GetMotionMaster()->Clear();
-        }
-    }
+    // if (mover->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
+    // {
+    //     mover->StopMoving();
+    //     mover->GetMotionMaster()->Clear();
+    // }
+    // else
+    // {
+    //     mover->GetMotionMaster()->GetDestination(x, y, z);
+    //     if (movePosition.distance(WorldPosition(movePosition.getMapId(), x, y, z, 0)) > minDist)
+    //     {
+    //         mover->StopMoving();
+    //         mover->GetMotionMaster()->Clear();
+    //     }
+    // }
 
     if (totalDistance > maxDist && !detailedMove && !botAI->HasPlayerNearby(&movePosition)) // Why walk if you can fly?
     {
@@ -549,6 +586,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     {
         bot->SetWalk(masterWalking);
         bot->GetMotionMaster()->MovePoint(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), generatePath);
+        WaitForReach(startPosition.distance(movePosition));
         // LOG_DEBUG("playerbots", "Movepoint to ({}, {})", movePosition.getX(), movePosition.getY());
     }
     else
@@ -595,6 +633,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
 
         bot->GetMotionMaster()->MovePoint(movePosition.getMapId(), Position(movePosition.getX(), movePosition.getY(), movePosition.getZ(), 0.f));
+        WaitForReach(startPosition.distance(movePosition));
         LOG_DEBUG("playerbots", "Movepoint to ({}, {})", movePosition.getX(), movePosition.getY());
     }
 
@@ -1219,6 +1258,14 @@ bool MovementAction::MoveAway(Unit* target)
     float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
     float dz = bot->GetPositionZ();
     return MoveTo(target->GetMapId(), dx, dy, dz);
+}
+
+bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float distance)
+{
+    if (bot->GetDistance2d(x, y) <= distance) {
+        return false;
+    }
+    return MoveNear(mapId, x, y, z, distance);
 }
 
 bool FleeAction::Execute(Event event)

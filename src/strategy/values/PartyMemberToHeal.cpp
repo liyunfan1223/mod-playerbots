@@ -45,7 +45,7 @@ Unit* PartyMemberToHeal::Calculate()
         if (player && Check(player) && player->IsAlive()) {
             uint8 health = player->GetHealthPct();
             if (isRaid || health < sPlayerbotAIConfig->mediumHealth || !IsTargetOfSpellCast(player, predicate)) {
-                if (player->GetDistance2d(bot) > sPlayerbotAIConfig->spellDistance) {
+                if (player->GetDistance2d(bot) > sPlayerbotAIConfig->healDistance) {
                     calc.probe(health + 30, player);
                 } else {
                     calc.probe(health + player->GetDistance2d(bot) / 10, player);
@@ -75,7 +75,7 @@ bool PartyMemberToHeal::Check(Unit* player)
     // return player && player != bot && player->GetMapId() == bot->GetMapId() && player->IsInWorld() &&
     //     sServerFacade->GetDistance2d(bot, player) < (player->IsPlayer() && botAI->IsTank((Player*)player) ? 50.0f : 40.0f);
     return player && player->GetMapId() == bot->GetMapId() &&
-        bot->GetDistance2d(player) < sPlayerbotAIConfig->spellDistance * 2 &&
+        bot->GetDistance2d(player) < sPlayerbotAIConfig->healDistance * 2 &&
         bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 

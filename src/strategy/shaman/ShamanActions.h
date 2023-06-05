@@ -342,30 +342,30 @@ class CastWindShearOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
         CastWindShearOnEnemyHealerAction(PlayerbotAI* botAI) : CastSpellOnEnemyHealerAction(botAI, "wind shear") { }
 };
 
-class CastCurePoisonAction : public CastCureSpellAction
-{
-    public:
-        CastCurePoisonAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure poison") { }
-};
+// class CastCurePoisonAction : public CastCureSpellAction
+// {
+//     public:
+//         CastCurePoisonAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure poison") { }
+// };
 
-class CastCurePoisonOnPartyAction : public CurePartyMemberAction
-{
-    public:
-        CastCurePoisonOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure poison", DISPEL_POISON) { }
-};
+// class CastCurePoisonOnPartyAction : public CurePartyMemberAction
+// {
+//     public:
+//         CastCurePoisonOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure poison", DISPEL_POISON) { }
+// };
 
-class CastCureDiseaseAction : public CastCureSpellAction
-{
-    public:
-        CastCureDiseaseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure disease") { }
-};
+// class CastCureDiseaseAction : public CastCureSpellAction
+// {
+//     public:
+//         CastCureDiseaseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure disease") { }
+// };
 
-class CastCureDiseaseOnPartyAction : public CurePartyMemberAction
-{
-    public:
-        CastCureDiseaseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure disease", DISPEL_DISEASE) { }
+// class CastCureDiseaseOnPartyAction : public CurePartyMemberAction
+// {
+//     public:
+//         CastCureDiseaseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure disease", DISPEL_DISEASE) { }
 
-        std::string const getName() override { return "cure disease on party"; }
-};
+//         std::string const getName() override { return "cure disease on party"; }
+// };
 
 #endif

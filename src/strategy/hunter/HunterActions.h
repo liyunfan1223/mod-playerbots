@@ -67,7 +67,7 @@ END_SPELL_ACTION()
 BEGIN_RANGED_SPELL_ACTION(CastKillShotAction, "kill shot")
 END_SPELL_ACTION()
 
-BEGIN_RANGED_SPELL_ACTION(CastTranquilizingShortAction, "tranquilizing shot")
+BEGIN_RANGED_SPELL_ACTION(CastTranquilizingShotAction, "tranquilizing shot")
 END_SPELL_ACTION()
 
 class CastAspectOfTheHawkAction : public CastBuffSpellAction
@@ -218,4 +218,9 @@ class CastScareBeastCcAction : public CastSpellAction
         bool Execute(Event event) override;
 };
 
+class CastMisdirectionOnMainTankAction : public BuffOnMainTankAction
+{
+    public:
+        CastMisdirectionOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "misdirection", true) {}
+};
 #endif

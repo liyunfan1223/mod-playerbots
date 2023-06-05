@@ -99,7 +99,7 @@ class ShamanATriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["wind shear on enemy healer"] = &ShamanATriggerFactoryInternal::wind_shear_on_enemy_healer;
             creators["cure poison"] = &ShamanATriggerFactoryInternal::cure_poison;
             creators["party member cure poison"] = &ShamanATriggerFactoryInternal::party_member_cure_poison;
-            creators["cure disease"] = &ShamanATriggerFactoryInternal::cure_disease;
+            // creators["cure disease"] = &ShamanATriggerFactoryInternal::cure_disease;
             creators["party member cure disease"] = &ShamanATriggerFactoryInternal::party_member_cure_disease;
         }
 
@@ -192,10 +192,10 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
             creators["thunderstorm"] = &ShamanAiObjectContextInternal::thunderstorm;
             creators["heroism"] = &ShamanAiObjectContextInternal::heroism;
             creators["bloodlust"] = &ShamanAiObjectContextInternal::bloodlust;
-            creators["cure disease"] = &ShamanAiObjectContextInternal::cure_disease;
-            creators["cure disease on party"] = &ShamanAiObjectContextInternal::cure_disease_on_party;
-            creators["cure poison"] = &ShamanAiObjectContextInternal::cure_poison;
-            creators["cure poison on party"] = &ShamanAiObjectContextInternal::cure_poison_on_party;
+            // creators["cure disease"] = &ShamanAiObjectContextInternal::cure_disease;
+            // creators["cure disease on party"] = &ShamanAiObjectContextInternal::cure_disease_on_party;
+            // creators["cure poison"] = &ShamanAiObjectContextInternal::cure_poison;
+            // creators["cure poison on party"] = &ShamanAiObjectContextInternal::cure_poison_on_party;
         }
 
     private:
@@ -248,10 +248,10 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* lava_lash(PlayerbotAI* botAI) { return new CastLavaLashAction(botAI); }
         static Action* ancestral_spirit(PlayerbotAI* botAI) { return new CastAncestralSpiritAction(botAI); }
         static Action* wind_shear_on_enemy_healer(PlayerbotAI* botAI) { return new CastWindShearOnEnemyHealerAction(botAI); }
-        static Action* cure_poison(PlayerbotAI* botAI) { return new CastCurePoisonAction(botAI); }
-        static Action* cure_poison_on_party(PlayerbotAI* botAI) { return new CastCurePoisonOnPartyAction(botAI); }
-        static Action* cure_disease(PlayerbotAI* botAI) { return new CastCureDiseaseAction(botAI); }
-        static Action* cure_disease_on_party(PlayerbotAI* botAI) { return new CastCureDiseaseOnPartyAction(botAI); }
+        // static Action* cure_poison(PlayerbotAI* botAI) { return new CastCurePoisonAction(botAI); }
+        // static Action* cure_poison_on_party(PlayerbotAI* botAI) { return new CastCurePoisonOnPartyAction(botAI); }
+        // static Action* cure_disease(PlayerbotAI* botAI) { return new CastCureDiseaseAction(botAI); }
+        // static Action* cure_disease_on_party(PlayerbotAI* botAI) { return new CastCureDiseaseOnPartyAction(botAI); }
 };
 
 ShamanAiObjectContext::ShamanAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

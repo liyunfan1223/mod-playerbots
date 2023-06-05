@@ -51,8 +51,8 @@ void GenericMageNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trigg
     NonCombatStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("arcane intellect", NextAction::array(0, new NextAction("arcane intellect", 21.0f), nullptr)));
-	triggers.push_back(new TriggerNode("no drink", NextAction::array(0, new NextAction("conjure water", 16.0f), nullptr)));
-	triggers.push_back(new TriggerNode("no food", NextAction::array(0, new NextAction("conjure food", 15.0f), nullptr)));
+	// triggers.push_back(new TriggerNode("no drink", NextAction::array(0, new NextAction("conjure water", 16.0f), nullptr)));
+	// triggers.push_back(new TriggerNode("no food", NextAction::array(0, new NextAction("conjure food", 15.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
 }
 
@@ -69,6 +69,6 @@ void MageBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void MageBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("arcane intellect on party", NextAction::array(0, new NextAction("arcane intellect on party", 20.0f), nullptr)));
-    triggers.push_back(new TriggerNode("give water", NextAction::array(0, new NextAction("give water", 14.0f), nullptr)));
-    triggers.push_back(new TriggerNode("give food", NextAction::array(0, new NextAction("give food", 13.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("give water", NextAction::array(0, new NextAction("give water", 14.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("give food", NextAction::array(0, new NextAction("give food", 13.0f), nullptr)));
 }
