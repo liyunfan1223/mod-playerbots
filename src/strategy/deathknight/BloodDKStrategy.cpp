@@ -29,7 +29,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    //creators["death rune_mastery"] = &death_rune_mastery;
 		    //creators["hysteria"] = &hysteria;
 		    //creators["dancing weapon"] = &dancing_weapon;
-		    //creators["dark command"] = &dark_command;
+		    creators["dark command"] = &dark_command;
 			creators["taunt spell"] = &dark_command;
         }
 
@@ -46,7 +46,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
         {
             return new ActionNode ("heart strike",
                 /*P*/ NextAction::array(0, new NextAction("frost presence"), nullptr),
-                /*A*/ NextAction::array(0, new NextAction("death strike"), nullptr),
+                /*A*/ nullptr,
                 /*C*/ nullptr);
 	    }
 

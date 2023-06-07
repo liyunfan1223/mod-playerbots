@@ -496,7 +496,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
             break;
         case CLASS_MAGE:
-            if (tab == 1)
+            if (tab == MAGE_TAB_ARCANE || tab == MAGE_TAB_FIRE)
                 nonCombatEngine->addStrategy("bdps");
             else
                 nonCombatEngine->addStrategy("bmana");

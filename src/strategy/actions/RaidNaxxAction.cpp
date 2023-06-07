@@ -131,7 +131,7 @@ bool HeiganDanceMeleeAction::Execute(Event event) {
         return false;
     }
     // botAI->TellMaster("Let\'s go " + std::to_string(curr_safe));
-    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), botAI->IsMainTank(bot) ? 0 : 0.5f);
+    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), botAI->IsMainTank(bot) ? 0 : 0);
 }
 
 bool HeiganDanceRangedAction::Execute(Event event) {
@@ -140,7 +140,7 @@ bool HeiganDanceRangedAction::Execute(Event event) {
         return MoveTo(bot->GetMapId(), platform.first, platform.second, 276.54f);
     }
     botAI->InterruptSpell();
-    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), 0.5f);
+    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), 0);
 }
 
 // bool ThaddiusAttackNearestPetAction::isUseful()

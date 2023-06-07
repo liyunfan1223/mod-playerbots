@@ -22,31 +22,57 @@ bool HasAggroValue::Calculate()
 
     while( ref )
     {
-        ThreatMgr* threatMgr = ref->GetSource();
-        Unit* attacker = threatMgr->GetOwner();
-        Unit* victim = attacker->GetVictim();
-        if (victim == bot && target == attacker)
+        ThreatMgr *threatManager = ref->GetSource();
+        Unit *attacker = threatManager->GetOwner();
+        if (attacker != target) {
+            ref = ref->next();
+            continue;
+        }
+        Unit *victim = attacker->GetVictim();
+        if (!victim) { 
             return true;
-
+        }
+        if ((victim == bot || (victim && victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer()))) && target == attacker)
+            return true;
         ref = ref->next();
     }
-
-    ref = target->GetThreatMgr().getCurrentVictim();
-    if (ref)
-    {
-        if (Unit* victim = ref->getTarget())
-        {
-            if (Player* pl = victim->ToPlayer())
-            {
-                if (botAI->IsMainTank(pl))
-                {
-                    return true;
-                }
-            }
-        }
-    }
-
     return false;
+
+    // Unit* target = GetTarget();
+    // if (!target)
+    //     return true;
+
+    // HostileReference *ref = bot->getHostileRefMgr().getFirst();
+    // if (!ref)
+    //     return true; // simulate as target is not atacking anybody yet
+
+    // while( ref )
+    // {
+    //     ThreatMgr* threatMgr = ref->GetSource();
+    //     Unit* attacker = threatMgr->GetOwner();
+    //     Unit* victim = attacker->GetVictim();
+    //     if (victim == bot && target == attacker)
+    //         return true;
+
+    //     ref = ref->next();
+    // }
+
+    // ref = target->GetThreatMgr().getCurrentVictim();
+    // if (ref)
+    // {
+    //     if (Unit* victim = ref->getTarget())
+    //     {
+    //         if (Player* pl = victim->ToPlayer())
+    //         {
+    //             if (botAI->IsMainTank(pl))
+    //             {
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    // }
+
+    // return false;
 }
 
 uint8 AttackerCountValue::Calculate()

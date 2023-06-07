@@ -41,7 +41,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 	if (dynamic_cast<HeiganDanceAction*>(action) || dynamic_cast<CurePartyMemberAction*>(action)) {
 		return 1.0f;
 	}
-	if (dynamic_cast<CastSpellAction*>(action))
+	if (dynamic_cast<CastSpellAction*>(action) && !dynamic_cast<CastMeleeSpellAction*>(action))
     {
         uint32 spellId = AI_VALUE2(uint32, "spell id", action->getName());
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
@@ -49,7 +49,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
             return 0.0f;
 		}
         uint32 castTime = spellInfo->CalcCastTime();
-        if (castTime == 0) {
+        if (castTime == 0 && !spellInfo->IsChanneled()) {
 			return 1.0f;
 		}
     }

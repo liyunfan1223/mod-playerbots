@@ -104,7 +104,7 @@ AiPlayerbot.MinEnchantingBotLevel = 60
 
 # Randombots checking players gear score level and deny the group invite if it's too low
 # Default: 1 (enabled)
-AiPlayerbot.GearScoreCheck = 1
+AiPlayerbot.GearScoreCheck = 0
 
 # Quest that will be completed and rewarded to all random bots
 AiPlayerbot.RandomBotQuestIds = "7848,3802,5505,6502,7761"

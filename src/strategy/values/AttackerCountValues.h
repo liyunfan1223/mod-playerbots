@@ -32,7 +32,7 @@ class MyAttackerCountValue : public Uint8CalculatedValue, public Qualified
 class HasAggroValue : public BoolCalculatedValue, public Qualified
 {
     public:
-        HasAggroValue(PlayerbotAI* botAI, std::string const name = "has agro") : BoolCalculatedValue(botAI, name) { }
+        HasAggroValue(PlayerbotAI* botAI, std::string const name = "has aggro") : BoolCalculatedValue(botAI, name) { }
 
         Unit* GetTarget();
         bool Calculate() override;

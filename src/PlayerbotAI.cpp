@@ -3,6 +3,8 @@
  */
 
 #include "ObjectGuid.h"
+#include "Player.h"
+#include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "AiFactory.h"
 #include "BudgetValues.h"
@@ -1306,22 +1308,22 @@ bool PlayerbotAI::IsTank(Player* player)
     switch (player->getClass())
     {
         case CLASS_DEATH_KNIGHT:
-            if (tab == 0) {
+            if (tab == DEATHKNIGT_TAB_BLOOD) {
                 return true;
             }
             break;
         case CLASS_PALADIN:
-            if (tab == 1) {
+            if (tab == PALADIN_TAB_PROTECTION) {
                 return true;
             }
             break;
         case CLASS_WARRIOR:
-            if (tab == 2) {
+            if (tab == WARRIOR_TAB_PROTECTION) {
                 return true;
             }
             break;
         case CLASS_DRUID:
-            if (tab == 1 && HasAnyAuraOf(player, "bear form", "dire bear form", "thick hide", NULL)) {
+            if (tab == DRUID_TAB_FERAL && HasAnyAuraOf(player, "bear form", "dire bear form", "thick hide", NULL)) {
                 return true;
             }
             break;
