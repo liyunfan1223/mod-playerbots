@@ -6,6 +6,7 @@
 #define _PLAYERBOT_SHAMANTRIGGERS_H
 
 #include "CureTriggers.h"
+#include "GenericTriggers.h"
 #include "SharedDefines.h"
 
 class PlayerbotAI;
@@ -194,10 +195,10 @@ class BloodlustTrigger : public BoostTrigger
         BloodlustTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "bloodlust") { }
 };
 
-class MaelstromWeaponTrigger : public HasAuraTrigger
+class MaelstromWeaponTrigger : public HasAuraStackTrigger
 {
     public:
-        MaelstromWeaponTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "maelstrom weapon") { }
+        MaelstromWeaponTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "maelstrom weapon", 5) { }
 };
 
 class WindShearInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
@@ -230,4 +231,32 @@ class PartyMemberCureDiseaseTrigger : public PartyMemberNeedCureTrigger
         PartyMemberCureDiseaseTrigger(PlayerbotAI* botAI) : PartyMemberNeedCureTrigger(botAI, "cure disease", DISPEL_DISEASE) { }
 };
 
+class NoFireTotemTrigger : public Trigger {
+    public:
+        NoFireTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "no fire totem") {}
+        virtual bool IsActive() override;
+};
+
+class NoWaterTotemTrigger : public Trigger {
+    public:
+        NoWaterTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "no water totem") {}
+        virtual bool IsActive() override;
+};
+
+class EarthShieldOnMainTankTrigger : public BuffOnMainTankTrigger
+{
+    public:
+        EarthShieldOnMainTankTrigger(PlayerbotAI* botAI) : BuffOnMainTankTrigger(botAI, "earth shield", true) {}
+};
+
+class FlameShockTrigger : public DebuffTrigger {
+    public:
+        FlameShockTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "flame shock", 1, true) {}
+};
+
+class WrathOfAirTotemTrigger : public TotemTrigger
+{
+	public:
+		WrathOfAirTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "wrath of air totem") {}
+};
 #endif

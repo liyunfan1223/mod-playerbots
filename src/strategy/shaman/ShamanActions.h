@@ -158,6 +158,7 @@ class CastCleansingTotemAction : public CastTotemAction
 {
     public:
         CastCleansingTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "cleansing totem") { }
+		virtual bool isUseful();
 };
 
 class CastFlametongueTotemAction : public CastTotemAction
@@ -368,4 +369,37 @@ class CastWindShearOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
 //         std::string const getName() override { return "cure disease on party"; }
 // };
 
+class CastLavaBurstAction : public CastSpellAction
+{
+    public:
+        CastLavaBurstAction(PlayerbotAI* ai) : CastSpellAction(ai, "lava burst") {}
+};
+
+class CastEarthShieldOnMainTankAction : public BuffOnMainTankAction
+{
+	public:
+		CastEarthShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "earth shield", true) {}
+};
+
+class CastTotemOfWrathAction : public CastTotemAction
+{
+    public:
+        CastTotemOfWrathAction(PlayerbotAI* ai) : CastTotemAction(ai, "totem of wrath") {}
+        virtual std::string const GetTargetName() override { return "self target"; }
+		virtual bool isUseful() override { return CastTotemAction::isUseful(); }
+};
+
+class CastFireElementalTotemAction : public CastTotemAction
+{
+    public:
+        CastFireElementalTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "fire elemental totem") {}
+        virtual std::string const GetTargetName() override { return "self target"; }
+		virtual bool isUseful() override { return CastTotemAction::isUseful(); }
+};
+
+class CastWrathOfAirTotemAction : public CastTotemAction
+{
+	public:
+		CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem") {}
+};
 #endif

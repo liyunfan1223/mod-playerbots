@@ -6,6 +6,7 @@
 #define _PLAYERBOT_ROGUEACTIONS_H
 
 #include "GenericSpellActions.h"
+#include "UseItemAction.h"
 
 class PlayerbotAI;
 
@@ -113,4 +114,32 @@ class CastKickOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
         CastKickOnEnemyHealerAction(PlayerbotAI* botAI) : CastSpellOnEnemyHealerAction(botAI, "kick") { }
 };
 
+class EnvenomAction : public CastMeleeSpellAction
+{
+	public:
+		EnvenomAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "envenom") {}
+};
+
+class CastTricksOfTheTradeOnMainTankAction : public BuffOnMainTankAction
+{
+	public:
+		CastTricksOfTheTradeOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "tricks of the trade", true) {}
+		virtual bool isUseful() override;
+};
+
+class UseDeadlyPoisonAction : public UseItemAction
+{
+	public:
+		UseDeadlyPoisonAction(PlayerbotAI* ai) : UseItemAction(ai, "Deadly Poison") {}
+		virtual bool Execute(Event event) override;
+		virtual bool isPossible() override;
+};
+
+class UseInstantPoisonAction : public UseItemAction
+{
+	public:
+		UseInstantPoisonAction(PlayerbotAI* ai) : UseItemAction(ai, "Instant Poison") {}
+		virtual bool Execute(Event event) override;
+		virtual bool isPossible() override;
+};
 #endif

@@ -253,4 +253,10 @@ class CastPartyNourishAction : public HealPartyMemberAction
 public:
 	CastPartyNourishAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
 };
+
+class CastDruidRemoveCurseOnPartyAction : public CurePartyMemberAction
+{
+    public:
+        CastDruidRemoveCurseOnPartyAction(PlayerbotAI* ai) : CurePartyMemberAction(ai, "remove curse", DISPEL_CURSE) {}
+};
 #endif

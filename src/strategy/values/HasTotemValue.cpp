@@ -20,6 +20,10 @@ bool HasTotemValue::Calculate()
         if (!creature || !creature->IsTotem())
             continue;
 
+        if (creature->GetOwner() != bot) {
+            continue;
+        }
+
         if (strstri(creature->GetName().c_str(), qualifier.c_str()) && bot->GetDistance(creature) <= botAI->GetRange("spell"))
             return true;
     }

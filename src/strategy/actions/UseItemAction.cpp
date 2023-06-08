@@ -19,7 +19,9 @@ bool UseItemAction::Execute(Event event)
 
     if (gos.empty())
     {
-        return UseItemAuto(*items.begin());
+        if (!items.empty()) {
+            return UseItemAuto(*items.begin());
+        }
     }
     else
     {

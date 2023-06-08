@@ -414,9 +414,10 @@ class FindItemUsageVisitor : public FindUsableItemVisitor
 class FindUsableNamedItemVisitor : public FindUsableItemVisitor
 {
     public:
-        FindUsableNamedItemVisitor(Player* bot): FindUsableItemVisitor(bot) {}
+        FindUsableNamedItemVisitor(Player* bot, std::string name): FindUsableItemVisitor(bot), name(name) {}
 
         bool Accept(ItemTemplate const* proto) override;
-
+    private:
+        std::string name;
 };
 #endif

@@ -13,6 +13,7 @@
 #include "NamedObjectContext.h"
 #include "PullStrategy.h"
 #include "Playerbots.h"
+#include "AssassinationRogueStrategy.h"
 
 class RogueStrategyFactoryInternal : public NamedObjectContext<Strategy>
 {
@@ -27,6 +28,7 @@ class RogueStrategyFactoryInternal : public NamedObjectContext<Strategy>
             creators["stealthed"] = &RogueStrategyFactoryInternal::stealthed;
             creators["stealth"] = &RogueStrategyFactoryInternal::stealth;
             creators["cc"] = &RogueStrategyFactoryInternal::cc;
+            creators["melee"] = &RogueStrategyFactoryInternal::melee;
         }
 
     private:
@@ -38,6 +40,7 @@ class RogueStrategyFactoryInternal : public NamedObjectContext<Strategy>
         static Strategy* stealthed(PlayerbotAI* botAI) { return new StealthedRogueStrategy(botAI); }
         static Strategy* stealth(PlayerbotAI* botAI) { return new StealthStrategy(botAI); }
         static Strategy* cc(PlayerbotAI* botAI) { return new RogueCcStrategy(botAI); }
+        static Strategy* melee(PlayerbotAI* botAI) { return new AssassinationRogueStrategy(botAI); }
 };
 
 class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
@@ -56,6 +59,9 @@ class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["no stealth"] = &RogueTriggerFactoryInternal::no_stealth;
             creators["stealth"] = &RogueTriggerFactoryInternal::stealth;
             creators["sprint"] = &RogueTriggerFactoryInternal::sprint;
+            creators["main hand weapon no enchant"] = &RogueTriggerFactoryInternal::main_hand_weapon_no_enchant;
+            creators["off hand weapon no enchant"] = &RogueTriggerFactoryInternal::off_hand_weapon_no_enchant;
+            creators["tricks of the trade on main tank"] = &RogueTriggerFactoryInternal::tricks_of_the_trade_on_main_tank;
         }
 
     private:
@@ -71,6 +77,9 @@ class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* no_stealth(PlayerbotAI* botAI) { return new NoStealthTrigger(botAI); }
         static Trigger* stealth(PlayerbotAI* botAI) { return new StealthTrigger(botAI); }
         static Trigger* sprint(PlayerbotAI* botAI) { return new SprintTrigger(botAI); }
+        static Trigger* main_hand_weapon_no_enchant(PlayerbotAI* ai) { return new MainHandWeaponNoEnchantTrigger(ai); }
+        static Trigger* off_hand_weapon_no_enchant(PlayerbotAI* ai) { return new OffHandWeaponNoEnchantTrigger(ai); }
+        static Trigger* tricks_of_the_trade_on_main_tank(PlayerbotAI* ai) { return new TricksOfTheTradeOnMainTankTrigger(ai); }
 };
 
 class RogueAiObjectContextInternal : public NamedObjectContext<Action>
@@ -104,6 +113,10 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
             creators["unstealth"] = &RogueAiObjectContextInternal::unstealth;
             creators["sap"] = &RogueAiObjectContextInternal::sap;
             creators["check stealth"] = &RogueAiObjectContextInternal::check_stealth;
+            creators["envenom"] = &RogueAiObjectContextInternal::envenom;
+            creators["tricks of the trade on main tank"] = &RogueAiObjectContextInternal::tricks_of_the_trade_on_main_tank;
+            creators["use instant poison"] = &RogueAiObjectContextInternal::use_instant_poison;
+            creators["use deadly poison"] = &RogueAiObjectContextInternal::use_deadly_poison;
         }
 
     private:
@@ -133,6 +146,10 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* check_stealth(PlayerbotAI* botAI) { return new CheckStealthAction(botAI); }
         static Action* sap(PlayerbotAI* botAI) { return new CastSapAction(botAI); }
         static Action* unstealth(PlayerbotAI* botAI) { return new UnstealthAction(botAI); }
+        static Action* envenom(PlayerbotAI* ai) { return new EnvenomAction(ai); }
+        static Action* tricks_of_the_trade_on_main_tank(PlayerbotAI* ai) { return new CastTricksOfTheTradeOnMainTankAction(ai); }
+        static Action* use_instant_poison(PlayerbotAI* ai) { return new UseInstantPoisonAction(ai); }
+        static Action* use_deadly_poison(PlayerbotAI* ai) { return new UseDeadlyPoisonAction(ai); }
 };
 
 RogueAiObjectContext::RogueAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

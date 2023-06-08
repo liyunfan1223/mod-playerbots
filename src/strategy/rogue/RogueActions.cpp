@@ -16,7 +16,7 @@ bool CastStealthAction::Execute(Event event)
 {
     if (botAI->CastSpell("stealth", bot))
     {
-        botAI->ChangeStrategy("-dps,+stealthed", BOT_STATE_COMBAT);
+        // botAI->ChangeStrategy("-dps,+stealthed", BOT_STATE_COMBAT);
     }
 
     return true;
@@ -25,7 +25,7 @@ bool CastStealthAction::Execute(Event event)
 bool UnstealthAction::Execute(Event event)
 {
     botAI->RemoveAura("stealth");
-    botAI->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
+    // botAI->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
 
     return true;
 }
@@ -48,4 +48,70 @@ bool CastVanishAction::isUseful()
 {
     // do not use with WSG flag or EYE flag
     return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) && !botAI->HasAura(34976, bot);
+}
+
+bool CastTricksOfTheTradeOnMainTankAction::isUseful() {
+    return CastSpellAction::isUseful() && AI_VALUE2(float, "distance", GetTargetName()) < 20.0f;
+}
+
+bool UseDeadlyPoisonAction::Execute(Event event) {
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
+    std::vector<Item*> items;
+    std::string poison_name;
+    for (std::string& suffix: poison_suffixs) {
+        poison_name = getName() + suffix;
+        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
+        if (!items.empty()) {
+            break;
+        }
+    }
+    if (items.empty()) {
+        return false;
+    }
+    return UseItemAuto(*items.begin());
+}
+
+bool UseDeadlyPoisonAction::isPossible() {
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
+    std::vector<Item*> items;
+    std::string poison_name;
+    for (std::string& suffix: poison_suffixs) {
+        poison_name = getName() + suffix;
+        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
+        if (!items.empty()) {
+            break;
+        }
+    }
+    return !items.empty();
+}
+
+bool UseInstantPoisonAction::Execute(Event event) {
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
+    std::vector<Item*> items;
+    std::string poison_name;
+    for (std::string& suffix: poison_suffixs) {
+        poison_name = getName() + suffix;
+        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
+        if (!items.empty()) {
+            break;
+        }
+    }
+    if (items.empty()) {
+        return false;
+    }
+    return UseItemAuto(*items.begin());
+}
+
+bool UseInstantPoisonAction::isPossible() {
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
+    std::vector<Item*> items;
+    std::string poison_name;
+    for (std::string& suffix: poison_suffixs) {
+        poison_name = getName() + suffix;
+        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
+        if (!items.empty()) {
+            break;
+        }
+    }
+    return !items.empty();
 }

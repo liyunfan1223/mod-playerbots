@@ -95,6 +95,7 @@ class DruidTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["eclipse (lunar)"] = &DruidTriggerFactoryInternal::eclipse_lunar;
             creators["bash on enemy healer"] = &DruidTriggerFactoryInternal::bash_on_enemy_healer;
             creators["nature's swiftness"] = &DruidTriggerFactoryInternal::natures_swiftness;
+            creators["party member remove curse"] = &DruidTriggerFactoryInternal::party_member_remove_curse;
         }
 
     private:
@@ -123,6 +124,7 @@ class DruidTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* tree_form(PlayerbotAI* botAI) { return new TreeFormTrigger(botAI); }
         static Trigger* bash_on_enemy_healer(PlayerbotAI* botAI) { return new BashInterruptEnemyHealerSpellTrigger(botAI); }
         static Trigger* omen_of_clarity(PlayerbotAI* botAI) { return new OmenOfClarityTrigger(botAI); }
+        static Trigger* party_member_remove_curse(PlayerbotAI* ai) { return new DruidPartyMemberRemoveCurseTrigger(ai); }
 };
 
 class DruidAiObjectContextInternal : public NamedObjectContext<Action>
@@ -202,6 +204,7 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
             creators["wild growth on party"] = &DruidAiObjectContextInternal::wild_growth_on_party;
             creators["swiftmend on party"] = &DruidAiObjectContextInternal::swiftmend_on_party;
             creators["nourish on party"] = &DruidAiObjectContextInternal::nourish_on_party;
+            creators["remove curse on party"] = &DruidAiObjectContextInternal::remove_curse_on_party;
         }
 
     private:
@@ -276,6 +279,7 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* wild_growth_on_party(PlayerbotAI* ai) { return new CastWildGrowthOnPartyAction(ai); }
         static Action* swiftmend_on_party(PlayerbotAI *ai) { return new CastPartySwiftmendAction(ai); }
         static Action* nourish_on_party(PlayerbotAI *ai) { return new CastPartyNourishAction(ai); }
+        static Action* remove_curse_on_party(PlayerbotAI *ai) { return new CastDruidRemoveCurseOnPartyAction(ai); }
 };
 
 DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

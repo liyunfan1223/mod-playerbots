@@ -2264,6 +2264,8 @@ void PlayerbotFactory::InitMounts()
             fslow = { 32244, 32245, 32243 };
             ffast = { 32295, 32297, 32246, 32296 };
             break;
+        default:
+            break;
     }
 
     mounts[bot->getRace()][0] = slow;

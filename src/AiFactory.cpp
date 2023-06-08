@@ -4,6 +4,7 @@
 
 #include "AiFactory.h"
 #include "BattlegroundMgr.h"
+#include "Item.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "Engine.h"
@@ -300,7 +301,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else if (tab == 2)
                 engine->addStrategies("heal", "bmana", "ranged", nullptr);
             else
-                engine->addStrategies("dps", "melee aoe", "bdps", "threat", "close", nullptr);
+                engine->addStrategies("melee", "melee aoe", "bdps", "threat", "close", nullptr);
 
             engine->addStrategies("dps assist", "cure", "totems", nullptr);
             break;
@@ -344,7 +345,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategy("dps debuff");
             break;
         case CLASS_ROGUE:
-            engine->addStrategies("dps", "threat", "dps assist", "aoe", "close", "behind", "stealth", nullptr);
+            if (tab == ROGUE_TAB_ASSASSINATION) {
+                engine->addStrategies("melee", "threat", "dps assist", "aoe", "close", "behind", nullptr);
+            } else {
+                engine->addStrategies("dps", "threat", "dps assist", "aoe", "close", "behind", nullptr);
+            }
             break;
         case CLASS_WARLOCK:
             engine->addStrategies("dps assist", "dps", "dps debuff", "aoe", "ranged", "threat", nullptr);

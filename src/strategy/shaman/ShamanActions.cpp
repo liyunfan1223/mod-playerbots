@@ -29,3 +29,8 @@ bool CastMagmaTotemAction::isUseful()
 {
     return CastMeleeSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
 }
+
+bool CastCleansingTotemAction::isUseful() 
+{ 
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "mana tide totem"); 
+}

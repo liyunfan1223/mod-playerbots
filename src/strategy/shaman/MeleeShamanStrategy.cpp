@@ -20,7 +20,8 @@ class MeleeShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         {
             return new ActionNode ("stormstrike",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("lava lash"), nullptr),
+                // /*A*/ NextAction::array(0, new NextAction("lava lash"), nullptr),
+                nullptr,
                 /*C*/ nullptr);
         }
 
@@ -35,9 +36,9 @@ class MeleeShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         static ActionNode* magma_totem([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("magma totem",
-                /*P*/ nullptr,
-                /*A*/ nullptr,
-                /*C*/ NextAction::array(0, new NextAction("fire nova"), nullptr));
+                /*P*/ NULL,
+                /*A*/ NextAction::array(0, new NextAction("searing totem"), NULL),
+                /*C*/ NULL);
         }
 };
 
@@ -48,24 +49,37 @@ MeleeShamanStrategy::MeleeShamanStrategy(PlayerbotAI* botAI) : GenericShamanStra
 
 NextAction** MeleeShamanStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("stormstrike", 10.0f), nullptr);
+    return NextAction::array(0, 
+        new NextAction("stormstrike", ACTION_NORMAL + 6), 
+        new NextAction("earth shock", ACTION_NORMAL + 5), 
+        new NextAction("fire nova", ACTION_NORMAL + 4), 
+        new NextAction("lava lash", ACTION_NORMAL + 1), 
+        new NextAction("melee", ACTION_NORMAL), 
+        NULL);
 }
 
 void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("windfury weapon", 22.0f), nullptr)));
-    triggers.push_back(new TriggerNode("searing totem", NextAction::array(0, new NextAction("reach melee", 22.0f), new NextAction("searing totem", 22.0f), nullptr)));
-    triggers.push_back(new TriggerNode("shock", NextAction::array(0, new NextAction("earth shock", 20.0f), nullptr)));
+    triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("searing totem", NextAction::array(0, new NextAction("reach melee", 22.0f), new NextAction("searing totem", 22.0f), nullptr)));
+    triggers.push_back(new TriggerNode("flame shock", NextAction::array(0, new NextAction("flame shock", 20.0f), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "maelstrom weapon",
+        NextAction::array(0, new NextAction("lightning bolt", 25.0f), NULL)));
     triggers.push_back(new TriggerNode("not facing target", NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), nullptr)));
-    triggers.push_back(new TriggerNode("enemy too close for melee", NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy too close for melee", NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("strength of earth totem", ACTION_LIGHT_HEAL), nullptr)));
+    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "no fire totem",
+        NextAction::array(0, new NextAction("reach melee", 23.0f), new NextAction("magma totem", 22.0f), NULL)));
 }
 
 void MeleeAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
+    
     triggers.push_back(new TriggerNode("magma totem", NextAction::array(0, new NextAction("magma totem", 26.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("fire nova", 25.0f), nullptr)));
 }

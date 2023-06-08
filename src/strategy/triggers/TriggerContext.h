@@ -91,6 +91,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["party member to heal out of spell range"] = &TriggerContext::party_member_to_heal_out_of_spell_range;
 
             creators["combo points available"] = &TriggerContext::ComboPointsAvailable;
+            creators["combo points 3 available"] = &TriggerContext::ComboPoints3Available;
 
             creators["medium threat"] = &TriggerContext::MediumThreat;
 
@@ -303,6 +304,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* enemy_is_close(PlayerbotAI* botAI) { return new EnemyIsCloseTrigger(botAI); }
         static Trigger* party_member_to_heal_out_of_spell_range(PlayerbotAI* botAI) { return new PartyMemberToHealOutOfSpellRangeTrigger(botAI); }
         static Trigger* ComboPointsAvailable(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI); }
+        static Trigger* ComboPoints3Available(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI, 3); }
         static Trigger* MediumThreat(PlayerbotAI* botAI) { return new MediumThreatTrigger(botAI); }
         static Trigger* Dead(PlayerbotAI* botAI) { return new DeadTrigger(botAI); }
         static Trigger* corpse_near(PlayerbotAI* botAI) { return new CorpseNearTrigger(botAI); }
@@ -391,3 +393,4 @@ class TriggerContext : public NamedObjectContext<Trigger>
 };
 
 #endif
+

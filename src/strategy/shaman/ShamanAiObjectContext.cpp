@@ -95,12 +95,17 @@ class ShamanATriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["frost shock snare"] = &ShamanATriggerFactoryInternal::frost_shock_snare;
             creators["heroism"] = &ShamanATriggerFactoryInternal::heroism;
             creators["bloodlust"] = &ShamanATriggerFactoryInternal::bloodlust;
-            creators["maelstrom weapon"] = &ShamanATriggerFactoryInternal::maelstrom_weapon;
             creators["wind shear on enemy healer"] = &ShamanATriggerFactoryInternal::wind_shear_on_enemy_healer;
             creators["cure poison"] = &ShamanATriggerFactoryInternal::cure_poison;
             creators["party member cure poison"] = &ShamanATriggerFactoryInternal::party_member_cure_poison;
-            // creators["cure disease"] = &ShamanATriggerFactoryInternal::cure_disease;
+            creators["cure disease"] = &ShamanATriggerFactoryInternal::cure_disease;
             creators["party member cure disease"] = &ShamanATriggerFactoryInternal::party_member_cure_disease;
+            creators["no fire totem"] = &ShamanATriggerFactoryInternal::no_fire_totem;
+            creators["no water totem"] = &ShamanATriggerFactoryInternal::no_water_totem;
+            creators["earth shield on main tank"] = &ShamanATriggerFactoryInternal::earth_shield_on_main_tank;
+            creators["maelstrom weapon"] = &ShamanATriggerFactoryInternal::maelstrom_weapon;
+            creators["flame shock"] = &ShamanATriggerFactoryInternal::flame_shock;
+            creators["wrath of air totem"] = &ShamanATriggerFactoryInternal::wrath_of_air_totem;
         }
 
     private:
@@ -136,6 +141,11 @@ class ShamanATriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* party_member_cure_poison(PlayerbotAI* botAI) { return new PartyMemberCurePoisonTrigger(botAI); }
         static Trigger* cure_disease(PlayerbotAI* botAI) { return new CureDiseaseTrigger(botAI); }
         static Trigger* party_member_cure_disease(PlayerbotAI* botAI) { return new PartyMemberCureDiseaseTrigger(botAI); }
+        static Trigger* no_fire_totem(PlayerbotAI* ai) { return new NoFireTotemTrigger(ai); }
+        static Trigger* no_water_totem(PlayerbotAI* ai) { return new NoWaterTotemTrigger(ai); }
+        static Trigger* earth_shield_on_main_tank(PlayerbotAI* ai) { return new EarthShieldOnMainTankTrigger(ai); }
+        static Trigger* flame_shock(PlayerbotAI* ai) { return new FlameShockTrigger(ai); }
+        static Trigger* wrath_of_air_totem(PlayerbotAI* ai) { return new WrathOfAirTotemTrigger(ai); }
 };
 
 class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
@@ -196,6 +206,12 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
             // creators["cure disease on party"] = &ShamanAiObjectContextInternal::cure_disease_on_party;
             // creators["cure poison"] = &ShamanAiObjectContextInternal::cure_poison;
             // creators["cure poison on party"] = &ShamanAiObjectContextInternal::cure_poison_on_party;
+            creators["lava burst"] = &ShamanAiObjectContextInternal::lava_burst;
+            creators["earth shield on main tank"] = &ShamanAiObjectContextInternal::earth_shield_on_main_tank;
+            creators["fire elemental totem"] = &ShamanAiObjectContextInternal::fire_elemental_totem;
+            creators["totem of wrath"] = &ShamanAiObjectContextInternal::totem_of_wrath;
+            creators["fire elemental totem"] = &ShamanAiObjectContextInternal::fire_elemental_totem;
+            creators["wrath of air totem"] = &ShamanAiObjectContextInternal::wrath_of_air_totem;
         }
 
     private:
@@ -252,6 +268,12 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
         // static Action* cure_poison_on_party(PlayerbotAI* botAI) { return new CastCurePoisonOnPartyAction(botAI); }
         // static Action* cure_disease(PlayerbotAI* botAI) { return new CastCureDiseaseAction(botAI); }
         // static Action* cure_disease_on_party(PlayerbotAI* botAI) { return new CastCureDiseaseOnPartyAction(botAI); }
+        static Action* lava_burst(PlayerbotAI* ai) { return new CastLavaBurstAction(ai); }
+        static Action* earth_shield_on_main_tank(PlayerbotAI* ai) { return new CastEarthShieldOnMainTankAction(ai); }
+        static Action* totem_of_wrath(PlayerbotAI* ai) { return new CastTotemOfWrathAction(ai); }
+        static Action* fire_elemental_totem(PlayerbotAI* ai) { return new CastFireElementalTotemAction(ai); }
+        static Action* wrath_of_air_totem(PlayerbotAI* ai) { return new CastWrathOfAirTotemAction(ai); }
+        
 };
 
 ShamanAiObjectContext::ShamanAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
