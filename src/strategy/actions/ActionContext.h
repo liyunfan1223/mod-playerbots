@@ -223,8 +223,9 @@ class ActionContext : public NamedObjectContext<Action>
 
             creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
 
-            // creators["rotate grobbulus"] = &ActionContext::rotate_grobbulus;
-            // creators["grobbulus move center"] = &ActionContext::grobbulus_move_center;
+            creators["grobbulus go behind the boss"] = &ActionContext::go_behind_the_boss;
+            creators["rotate grobbulus"] = &ActionContext::rotate_grobbulus;
+            creators["grobbulus move center"] = &ActionContext::grobbulus_move_center;
 
             creators["heigan dance melee"] = &ActionContext::heigan_dance_melee;
             creators["heigan dance ranged"] = &ActionContext::heigan_dance_ranged;
@@ -420,8 +421,9 @@ class ActionContext : public NamedObjectContext<Action>
 
         static Action* toggle_pet_spell(PlayerbotAI* ai) { return new TogglePetSpellAutoCastAction(ai); }
 
-        // static Action* rotate_grobbulus(PlayerbotAI* ai) { return new RotateGrobbulusAction(ai); }
-        // static Action* grobbulus_move_center(PlayerbotAI* ai) { return new GrobblulusMoveCenterAction(ai); }
+        static Action* go_behind_the_boss(PlayerbotAI* ai) { return new GoBehindTheBossAction(ai); }
+        static Action* rotate_grobbulus(PlayerbotAI* ai) { return new RotateGrobbulusAction(ai); }
+        static Action* grobbulus_move_center(PlayerbotAI* ai) { return new GrobblulusMoveCenterAction(ai); }
         static Action* heigan_dance_melee(PlayerbotAI* ai) { return new HeiganDanceMeleeAction(ai); }
         static Action* heigan_dance_ranged(PlayerbotAI* ai) { return new HeiganDanceRangedAction(ai); }
         // static Action* thaddius_attack_nearest_pet(PlayerbotAI* ai) { return new ThaddiusAttackNearestPetAction(ai); }

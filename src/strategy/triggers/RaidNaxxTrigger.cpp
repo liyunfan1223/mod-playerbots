@@ -2,30 +2,41 @@
 #include "RaidNaxxTrigger.h"
 #include "ScriptedCreature.h"
 
-// bool MutatingInjectionRemovedTrigger::IsActive()
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "grobbulus");
-//     if (!boss) {
-//         return false;
-//     }
-//     return HasNotAuraTrigger::IsActive() && botAI->GetCurrentState() == BOT_STATE_COMBAT && botAI->IsRanged(bot);
-// }
+bool AuraRemovedTrigger::IsActive() {
+    bool check = botAI->HasAura(name, bot, false, false, -1, true);
+    bool ret = false;
+    if (prev_check && !check) {
+        ret = true;
+    }
+    prev_check = check;
+    return ret;
+}
 
-// bool BossEventTrigger::IsActive()
-// {
-//     Unit* boss = AI_VALUE(Unit*, "boss target");
-//     if (!boss || boss->GetEntry() != boss_entry) {
-//         return false;
-//     }
-//     BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     const uint32 event_time = eventMap->GetNextEventTime(event_id);
-//     if (event_time != last_event_time) {
-//         last_event_time = event_time;
-//         return true;
-//     }
-//     return false;
-// }
+bool MutatingInjectionRemovedTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "grobbulus");
+    if (!boss) {
+        return false;
+    }
+    return HasNoAuraTrigger::IsActive() && botAI->GetState() == BOT_STATE_COMBAT && botAI->IsRanged(bot);
+}
+
+bool BossEventTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE(Unit*, "boss target");
+    if (!boss || boss->GetEntry() != boss_entry) {
+        return false;
+    }
+    if (!eventMap) {
+        return false;
+    }
+    const uint32 event_time = eventMap->GetNextEventTime(event_id);
+    if (event_time != last_event_time) {
+        last_event_time = event_time;
+        return true;
+    }
+    return false;
+}
 
 // bool BossPhaseTrigger::IsActive()
 // {

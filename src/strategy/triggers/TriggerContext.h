@@ -194,7 +194,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["rpg trade useful"] = &TriggerContext::rpg_trade_useful;
             creators["rpg duel"] = &TriggerContext::rpg_duel;
 
-            // creators["mutating injection"] = &TriggerContext::mutating_injection;
+            creators["mutating injection"] = &TriggerContext::mutating_injection;
             // creators["mutating injection removed"] = &TriggerContext::mutating_injection_removed;
             // creators["grobbulus cloud"] = &TriggerContext::grobbulus_cloud;
             creators["heigan melee"] = &TriggerContext::heigan_melee;
@@ -366,7 +366,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* rpg_trade_useful(PlayerbotAI* botAI) { return new RpgTradeUsefulTrigger(botAI); }
         static Trigger* rpg_duel(PlayerbotAI* botAI) { return new RpgDuelTrigger(botAI); }
 
-        // static Trigger* mutating_injection(PlayerbotAI* ai) { return new MutatingInjectionTrigger(ai); }
+        static Trigger* mutating_injection(PlayerbotAI* ai) { return new MutatingInjectionTrigger(ai); }
         // static Trigger* mutating_injection_removed(PlayerbotAI* ai) { return new MutatingInjectionRemovedTrigger(ai); }
         // static Trigger* grobbulus_cloud(PlayerbotAI* ai) { return new GrobbulusCloudTrigger(ai); }
         static Trigger* heigan_melee(PlayerbotAI* ai) { return new HeiganMeleeTrigger(ai); }

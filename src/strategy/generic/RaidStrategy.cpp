@@ -297,17 +297,17 @@ void RaidNaxxGenericStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// 	NextAction::array(0, new NextAction("try to get boss ai", ACTION_RAID), NULL)));
 	
 	// Grobbulus
-	// triggers.push_back(new TriggerNode(
-	// 	"mutating injection", 
-	// 	NextAction::array(0, new NextAction("grobbulus go behind the boss", ACTION_RAID + 2), NULL)));
+	triggers.push_back(new TriggerNode(
+		"mutating injection", 
+		NextAction::array(0, new NextAction("grobbulus go behind the boss", ACTION_RAID + 2), NULL)));
 	
-	// triggers.push_back(new TriggerNode(
-	// 	"mutating injection removed", 
-	// 	NextAction::array(0, new NextAction("grobbulus move center", ACTION_RAID + 1), NULL)));
+	triggers.push_back(new TriggerNode(
+		"mutating injection removed", 
+		NextAction::array(0, new NextAction("grobbulus move center", ACTION_RAID + 1), NULL)));
 
-	// triggers.push_back(new TriggerNode(
-	// 	"grobbulus cloud", 
-	// 	NextAction::array(0, new NextAction("rotate grobbulus", ACTION_RAID + 1), NULL)));
+	triggers.push_back(new TriggerNode(
+		"grobbulus cloud", 
+		NextAction::array(0, new NextAction("rotate grobbulus", ACTION_RAID + 1), NULL)));
 
 	// Heigan the Unclean
 	triggers.push_back(new TriggerNode(

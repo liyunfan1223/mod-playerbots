@@ -2,44 +2,37 @@
 #ifndef _PLAYERBOT_RAIDNAXXTRIGGER_H
 #define _PLAYERBOT_RAIDNAXXTRIGGER_H
 
+#include "EventMap.h"
 #include "Trigger.h"
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
+#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_grobbulus.h"
 
 using namespace std;
 
-// class MutatingInjectionTrigger : public HasAuraTrigger
-// {
-// public:
-//     MutatingInjectionTrigger(PlayerbotAI* ai): HasAuraTrigger(ai, "mutating injection", 1) {}
-// };
+class MutatingInjectionTrigger : public HasAuraTrigger
+{
+public:
+    MutatingInjectionTrigger(PlayerbotAI* ai): HasAuraTrigger(ai, "mutating injection", 1) {}
+};
 
-// class AuraRemovedTrigger : public Trigger
-// {
-// public:
-//     AuraRemovedTrigger(PlayerbotAI* ai, string name): Trigger(ai, name, 1) {
-//         this->prev_check = false;
-//     }
-//     virtual bool IsActive() {
-//         bool check = ai->HasAuraWithDuration(name, bot);
-//         bool ret = false;
-//         // bot->Yell(to_string(prev_check) + to_string(check), LANG_UNIVERSAL);
-//         if (prev_check && !check) {
-//             ret = true;
-//         }
-//         prev_check = check;
-//         return ret;
-//     }
-// protected:
-//     bool prev_check;
-// };
+class AuraRemovedTrigger : public Trigger
+{
+public:
+    AuraRemovedTrigger(PlayerbotAI* botAI, string name): Trigger(botAI, name, 1) {
+        this->prev_check = false;
+    }
+    virtual bool IsActive() override;
+protected:
+    bool prev_check;
+};
 
-// class MutatingInjectionRemovedTrigger : public HasNotAuraTrigger
-// {
-// public:
-//     MutatingInjectionRemovedTrigger(PlayerbotAI* ai): HasNotAuraTrigger(ai, "mutating injection", 1) {}
-//     virtual bool IsActive();
-// };
+class MutatingInjectionRemovedTrigger : public HasNoAuraTrigger
+{
+public:
+    MutatingInjectionRemovedTrigger(PlayerbotAI* ai): HasNoAuraTrigger(ai, "mutating injection") {}
+    virtual bool IsActive();
+};
 
 class BossEventTrigger : public Trigger
 {
@@ -52,6 +45,7 @@ public:
     virtual bool IsActive();
 protected:
     uint32 boss_entry, event_id, last_event_time;
+    EventMap *eventMap;
 };
 
 class BossPhaseTrigger : public Trigger
@@ -67,12 +61,14 @@ protected:
     uint32 phase_mask;
 };
 
-// class GrobbulusCloudTrigger : public BossEventTrigger
-// {
-// public:
-//     GrobbulusCloudTrigger(PlayerbotAI* ai): BossEventTrigger(ai, 15931, 2, "grobbulus cloud event") {}
-//     virtual bool IsActive();
-// };
+class GrobbulusCloudTrigger : public BossEventTrigger
+{
+public:
+    GrobbulusCloudTrigger(PlayerbotAI* ai): BossEventTrigger(ai, 15931, 2, "grobbulus cloud event") {
+        this->eventMap = boss_grobbulus::boss_grobbulusAI
+    }
+    virtual bool IsActive();
+};
 
 class HeiganMeleeTrigger : public Trigger
 {

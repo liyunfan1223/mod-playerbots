@@ -4,6 +4,7 @@
 #include "RaidStrategy.h"
 #include "ScriptedCreature.h"
 #include "../../../../src/server/scripts/Northrend/Naxxramas/boss_heigan.h"
+#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_grobbulus.h"
 
 using namespace std;
 
@@ -39,70 +40,70 @@ using namespace std;
     
 // }
 
-// bool GoBehindTheBossAction::Execute(Event event)
-// {
-//     Unit* boss = AI_VALUE(Unit*, "boss target");
-//     if (!boss) {
-//         return false;
-//     }
-//     // Position* pos = boss->GetPosition();
-//     float orientation = boss->GetOrientation() + M_PI + delta_angle;
-//     float x = boss->GetPositionX();
-//     float y = boss->GetPositionY();
-//     float z = boss->GetPositionZ();
-//     float rx = x + cos(orientation) * distance;
-//     float ry = y + sin(orientation) * distance;
-//     return MoveTo(bot->GetMapId(), rx, ry, z);
-// }
+bool GoBehindTheBossAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE(Unit*, "boss target");
+    if (!boss) {
+        return false;
+    }
+    // Position* pos = boss->GetPosition();
+    float orientation = boss->GetOrientation() + M_PI + delta_angle;
+    float x = boss->GetPositionX();
+    float y = boss->GetPositionY();
+    float z = boss->GetPositionZ();
+    float rx = x + cos(orientation) * distance;
+    float ry = y + sin(orientation) * distance;
+    return MoveTo(bot->GetMapId(), rx, ry, z);
+}
 
 // bool MoveToPointForceAction::Execute(Event event)
 // {
 //     return MoveTo(bot->GetMapId(), x, y, bot->GetPositionZ(), true);
 // }
 
-// bool MoveInsideAction::Execute(Event event)
-// {
-//     return MoveInside(bot->GetMapId(), x, y, bot->GetPositionZ(), distance);
-// }
+bool MoveInsideAction::Execute(Event event)
+{
+    return MoveInside(bot->GetMapId(), x, y, bot->GetPositionZ(), distance);
+}
 
-// bool RotateAroundTheCenterPointAction::Execute(Event event)
-// {
-//     // uint32 nearest = FindNearestWaypoint();
-//     // uint32 next_point = (nearest + 1) % intervals;
-//     uint32 next_point = GetCurrWaypoint();
-//     if (MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ())) {
-//         call_counters += 1;
-//         return true;
-//     }
-//     return false;
-// }
+bool RotateAroundTheCenterPointAction::Execute(Event event)
+{
+    // uint32 nearest = FindNearestWaypoint();
+    // uint32 next_point = (nearest + 1) % intervals;
+    uint32 next_point = GetCurrWaypoint();
+    if (MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ())) {
+        call_counters += 1;
+        return true;
+    }
+    return false;
+}
 
-// uint32 RotateAroundTheCenterPointAction::FindNearestWaypoint()
-// {
-//     float minDistance = 0;
-//     int ret = -1;
-//     for (int i = 0; i < intervals; i++) {
-//         float w_x = waypoints[i].first, w_y = waypoints[i].second;
-//         float dis = bot->GetDistance2d(w_x, w_y);
-//         if (ret == -1 || dis < minDistance) {
-//             ret = i;
-//             minDistance = dis;
-//         }
-//     }
-//     return ret;
-// }
+uint32 RotateAroundTheCenterPointAction::FindNearestWaypoint()
+{
+    float minDistance = 0;
+    int ret = -1;
+    for (int i = 0; i < intervals; i++) {
+        float w_x = waypoints[i].first, w_y = waypoints[i].second;
+        float dis = bot->GetDistance2d(w_x, w_y);
+        if (ret == -1 || dis < minDistance) {
+            ret = i;
+            minDistance = dis;
+        }
+    }
+    return ret;
+}
 
-// uint32 RotateGrobbulusAction::GetCurrWaypoint()
-// {
-//     Unit* boss = AI_VALUE(Unit*, "boss target");
-//     if (!boss) {
-//         return false;
-//     }
-//     BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     const uint32 event_time = eventMap->GetNextEventTime(2);
-//     return (event_time / 15000) % intervals;
-// }
+uint32 RotateGrobbulusAction::GetCurrWaypoint()
+{
+    Unit* boss = AI_VALUE(Unit*, "boss target");
+    if (!boss) {
+        return false;
+    }
+    BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
+    EventMap* eventMap = boss_ai->GetEvents();
+    const uint32 event_time = eventMap->GetNextEventTime(2);
+    return (event_time / 15000) % intervals;
+}
 
 bool HeiganDanceAction::CalculateSafe() {
     Unit* boss = AI_VALUE2(Unit*, "find target", "heigan the unclean");
