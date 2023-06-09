@@ -33,6 +33,11 @@
 #include "GuildMgr.h"
 #include "SayAction.h"
 
+std::vector<std::string> PlayerbotAI::dispel_whitelist = {
+    "mutating injection",
+    "frostbolt",
+};
+
 std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems);
 std::vector<std::string> split(std::string const s, char delim);
 char* strstri(char const* str1, char const* str2);
@@ -2748,6 +2753,16 @@ bool PlayerbotAI::canDispel(SpellInfo const* spellInfo, uint32 dispelType)
 {
     if (spellInfo->Dispel != dispelType)
         return false;
+    
+    if (!spellInfo->SpellName[0]) {
+        return true;
+    }
+
+    for (std::string &wl : dispel_whitelist) {
+        if (strcmpi((const char*)spellInfo->SpellName[0], wl.c_str()) == 0) {
+            return false;
+        }
+    }
 
     return !spellInfo->SpellName[0] || (strcmpi((const char*)spellInfo->SpellName[0], "demon skin") && strcmpi((const char*)spellInfo->SpellName[0], "mage armor") &&
         strcmpi((const char*)spellInfo->SpellName[0], "frost armor") && strcmpi((const char*)spellInfo->SpellName[0], "wavering will") &&

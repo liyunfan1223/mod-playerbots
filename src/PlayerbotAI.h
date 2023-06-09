@@ -432,7 +432,7 @@ class PlayerbotAI : public PlayerbotAIBase
 
         bool CanMove();
         bool IsInRealGuild();
-
+        static std::vector<std::string> dispel_whitelist;
     private:
         void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
         bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

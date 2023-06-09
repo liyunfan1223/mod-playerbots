@@ -35,7 +35,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 	if (dynamic_cast<SetBehindTargetAction*>(action)) {
 		return 0.0f;
 	}
-	if (curr_phase != PHASE_FAST_DANCE && (int32)curr_dance - curr_timer >= 3000) {
+	if (curr_phase != 1 && (int32)curr_dance - curr_timer >= 3000) {
 		return 1.0f;
 	}
 	if (dynamic_cast<HeiganDanceAction*>(action) || dynamic_cast<CurePartyMemberAction*>(action)) {

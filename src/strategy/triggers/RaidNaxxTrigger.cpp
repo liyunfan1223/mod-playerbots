@@ -1,3 +1,4 @@
+#include "EventMap.h"
 #include "Playerbots.h"
 #include "RaidNaxxTrigger.h"
 #include "ScriptedCreature.h"
@@ -21,12 +22,15 @@ bool MutatingInjectionRemovedTrigger::IsActive()
     return HasNoAuraTrigger::IsActive() && botAI->GetState() == BOT_STATE_COMBAT && botAI->IsRanged(bot);
 }
 
-bool BossEventTrigger::IsActive()
+template<class T>
+bool BossEventTrigger<T>::IsActive()
 {
     Unit* boss = AI_VALUE(Unit*, "boss target");
     if (!boss || boss->GetEntry() != boss_entry) {
         return false;
     }
+    T* ai = dynamic_cast<T*>(boss->GetAI());
+    EventMap *eventMap = &ai->events;
     if (!eventMap) {
         return false;
     }
@@ -54,18 +58,18 @@ bool BossEventTrigger::IsActive()
 //     return phase_mask == this->phase_mask;
 // }
 
-// bool GrobbulusCloudTrigger::IsActive()
-// {
-//     Unit* boss = AI_VALUE(Unit*, "boss target");
-//     if (!boss || boss->GetEntry() != boss_entry) {
-//         return false;
-//     }
-//     if (!botAI->IsMainTank(bot)) {
-//         return false;
-//     }
-//     // bot->Yell("has aggro on " + boss->GetName() + " : " + to_string(AI_VALUE2(bool, "has aggro", "boss target")), LANG_UNIVERSAL);
-//     return AI_VALUE2(bool, "has aggro", "boss target");
-// }
+bool GrobbulusCloudTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE(Unit*, "boss target");
+    if (!boss || boss->GetEntry() != boss_entry) {
+        return false;
+    }
+    if (!botAI->IsMainTank(bot)) {
+        return false;
+    }
+    // bot->Yell("has aggro on " + boss->GetName() + " : " + to_string(AI_VALUE2(bool, "has aggro", "boss target")), LANG_UNIVERSAL);
+    return AI_VALUE2(bool, "has aggro", "boss target");
+}
 
 bool HeiganMeleeTrigger::IsActive()
 {
@@ -160,3 +164,5 @@ bool HeiganRangedTrigger::IsActive()
 //     // bot->Yell("Time to taunt!", LANG_UNIVERSAL);
 //     return true;
 // }
+
+template bool BossEventTrigger<boss_grobbulus::boss_grobbulusAI>::IsActive();

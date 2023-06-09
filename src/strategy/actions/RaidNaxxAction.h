@@ -5,6 +5,8 @@
 #include "MovementActions.h"
 #include "AttackAction.h"
 #include "GenericActions.h"
+#include "PlayerbotAI.h"
+#include "Playerbots.h"
 
 // just for test
 // class TryToGetBossAIAction : public Action

@@ -99,8 +99,8 @@ uint32 RotateGrobbulusAction::GetCurrWaypoint()
     if (!boss) {
         return false;
     }
-    BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-    EventMap* eventMap = boss_ai->GetEvents();
+    auto* boss_ai = dynamic_cast<boss_grobbulus::boss_grobbulusAI*>(boss->GetAI());
+    EventMap* eventMap = &boss_ai->events;
     const uint32 event_time = eventMap->GetNextEventTime(2);
     return (event_time / 15000) % intervals;
 }
@@ -116,7 +116,7 @@ bool HeiganDanceAction::CalculateSafe() {
     uint32 curr_erupt = eventMap->GetNextEventTime(3);
     uint32 curr_dance = eventMap->GetNextEventTime(4);
     uint32 curr_timer = eventMap->GetTimer();
-    if ((curr_phase == PHASE_SLOW_DANCE && curr_dance - curr_timer >= 80000) || (curr_phase == PHASE_FAST_DANCE && curr_dance - curr_timer >= 40000)) {
+    if ((curr_phase == 0 && curr_dance - curr_timer >= 80000) || (curr_phase == 1 && curr_dance - curr_timer >= 40000)) {
         ResetSafe();
     } else if (curr_erupt != prev_erupt) {
         NextSafe();
@@ -128,16 +128,15 @@ bool HeiganDanceAction::CalculateSafe() {
 
 bool HeiganDanceMeleeAction::Execute(Event event) {
     CalculateSafe();
-    if (prev_phase == PHASE_SLOW_DANCE && botAI->IsMainTank(bot) && !AI_VALUE2(bool, "has aggro", "boss target")) {
+    if (prev_phase == 0 && botAI->IsMainTank(bot) && !AI_VALUE2(bool, "has aggro", "boss target")) {
         return false;
     }
-    // botAI->TellMaster("Let\'s go " + std::to_string(curr_safe));
     return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), botAI->IsMainTank(bot) ? 0 : 0);
 }
 
 bool HeiganDanceRangedAction::Execute(Event event) {
     CalculateSafe();
-    if (prev_phase != PHASE_FAST_DANCE) {
+    if (prev_phase != 1) {
         return MoveTo(bot->GetMapId(), platform.first, platform.second, 276.54f);
     }
     botAI->InterruptSpell();

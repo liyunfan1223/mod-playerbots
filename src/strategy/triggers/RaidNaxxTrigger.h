@@ -34,6 +34,7 @@ public:
     virtual bool IsActive();
 };
 
+template<class T>
 class BossEventTrigger : public Trigger
 {
 public:
@@ -45,7 +46,6 @@ public:
     virtual bool IsActive();
 protected:
     uint32 boss_entry, event_id, last_event_time;
-    EventMap *eventMap;
 };
 
 class BossPhaseTrigger : public Trigger
@@ -61,12 +61,10 @@ protected:
     uint32 phase_mask;
 };
 
-class GrobbulusCloudTrigger : public BossEventTrigger
+class GrobbulusCloudTrigger : public BossEventTrigger<boss_grobbulus::boss_grobbulusAI>
 {
 public:
-    GrobbulusCloudTrigger(PlayerbotAI* ai): BossEventTrigger(ai, 15931, 2, "grobbulus cloud event") {
-        this->eventMap = boss_grobbulus::boss_grobbulusAI
-    }
+    GrobbulusCloudTrigger(PlayerbotAI* ai): BossEventTrigger(ai, 15931, 2, "grobbulus cloud event") { }
     virtual bool IsActive();
 };
 
@@ -205,4 +203,6 @@ public:
 //     LoathebTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "loatheb", 0, "loatheb trigger") {}
 // };
     
+
+// template BossEventTrigger<class boss_grobbulus::boss_grobbulusAI>;
 #endif

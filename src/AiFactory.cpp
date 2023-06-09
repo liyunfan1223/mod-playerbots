@@ -283,7 +283,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else if (tab == 1)
                 engine->addStrategies("fire", "fire aoe", "threat", nullptr);
             else
-                engine->addStrategies("frost", "frost aoe", "threat", "dps aoe", nullptr);
+                engine->addStrategies("frost", "frost aoe", "threat", nullptr);
 
             engine->addStrategies("dps", "dps assist", "cure", "ranged", nullptr);
             break;
