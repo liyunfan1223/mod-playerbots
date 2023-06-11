@@ -145,9 +145,9 @@ bool CastEnchantItemAction::isPossible()
 
     uint32 spellId = AI_VALUE2(uint32, "spell id", spell);
     
-    bool ok = AI_VALUE2(Item*, "item for spell", spellId);
-    Item* item = AI_VALUE2(Item*, "item for spell", spellId);
-    botAI->TellMasterNoFacing("spell: " + spell + ", spell id: " + std::to_string(spellId) + " item for spell: " + std::to_string(ok));
+    // bool ok = AI_VALUE2(Item*, "item for spell", spellId);
+    // Item* item = AI_VALUE2(Item*, "item for spell", spellId);
+    // botAI->TellMasterNoFacing("spell: " + spell + ", spell id: " + std::to_string(spellId) + " item for spell: " + std::to_string(ok));
     return spellId && AI_VALUE2(Item*, "item for spell", spellId);
 }
 
