@@ -33,16 +33,13 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
     {
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
-            if (ref->GetSource() != bot)
+            if (ref->getSubGroup() != bot->GetSubGroup())
             {
-                if (ref->getSubGroup() != bot->GetSubGroup())
-                {
-                    nearestGroupPlayers.push_back(ref->GetSource()->GetGUID());
-                }
-                else
-                {
-                    nearestGroupPlayers.push_front(ref->GetSource()->GetGUID());
-                }
+                nearestGroupPlayers.push_back(ref->GetSource()->GetGUID());
+            }
+            else
+            {
+                nearestGroupPlayers.push_front(ref->GetSource()->GetGUID());
             }
         }
     } else {
@@ -69,7 +66,7 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
     for (ObjectGuid const guid : nearestPlayers)
     {
         Player* player = botAI->GetPlayer(guid);
-        if (!player || player == bot)
+        if (!player)
             continue;
 
         if (botAI->IsHeal(player))
@@ -115,7 +112,7 @@ bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &
     for (ObjectGuid const guid : nearestPlayers)
     {
         Player* player = botAI->GetPlayer(guid);
-        if (!player || player == bot)
+        if (!player)
             continue;
 
         if (player->IsNonMeleeSpellCast(true))

@@ -173,7 +173,7 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         }
         static ActionNode* avengers_shield(PlayerbotAI* ai)
         {
-            return new ActionNode ("righteous defense",
+            return new ActionNode ("avenger's shield",
                 /*P*/ NULL,
                 /*A*/ NextAction::array(0, new NextAction("judgement of wisdom"), NULL),
                 /*C*/ NULL);

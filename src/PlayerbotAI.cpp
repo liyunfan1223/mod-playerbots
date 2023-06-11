@@ -1387,7 +1387,7 @@ bool PlayerbotAI::IsMainTank(Player* player)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
         Player* member = ref->GetSource();
         if (IsTank(member)) {
-            return player == member;
+            return player->GetGUID() == member->GetGUID();
         }
     }
     return false;
@@ -1882,7 +1882,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
         }
 	}
 
-	ObjectGuid oldSel = bot->GetTarget();
+	ObjectGuid oldSel = bot->GetSelectedUnit()->GetGUID();
 	Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetUnitTarget(target);
@@ -1901,7 +1901,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     }
 
 	if (oldSel)
-		bot->SetTarget(oldSel);
+		bot->SetSelection(oldSel);
 
     switch (result)
     {

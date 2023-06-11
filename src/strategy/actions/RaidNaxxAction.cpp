@@ -116,7 +116,7 @@ bool HeiganDanceAction::CalculateSafe() {
     uint32 curr_erupt = eventMap->GetNextEventTime(3);
     uint32 curr_dance = eventMap->GetNextEventTime(4);
     uint32 curr_timer = eventMap->GetTimer();
-    if ((curr_phase == 0 && curr_dance - curr_timer >= 80000) || (curr_phase == 1 && curr_dance - curr_timer >= 40000)) {
+    if ((curr_phase == 0 && curr_dance - curr_timer >= 85000) || (curr_phase == 1 && curr_dance - curr_timer >= 40000)) {
         ResetSafe();
     } else if (curr_erupt != prev_erupt) {
         NextSafe();
@@ -131,6 +131,7 @@ bool HeiganDanceMeleeAction::Execute(Event event) {
     if (prev_phase == 0 && botAI->IsMainTank(bot) && !AI_VALUE2(bool, "has aggro", "boss target")) {
         return false;
     }
+    assert(curr_safe >= 0 && curr_safe <= 3);
     return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), botAI->IsMainTank(bot) ? 0 : 0);
 }
 

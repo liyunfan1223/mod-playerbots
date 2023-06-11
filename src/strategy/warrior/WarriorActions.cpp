@@ -7,5 +7,6 @@
 
 bool CastSunderArmorAction::isUseful()
 {
-    return CastSpellAction::isUseful();
+    Aura *aura = botAI->GetAura("sunder armor", GetTarget(), false, true);
+    return !aura || aura->GetStackAmount() < 5 || aura->GetDuration() <= 3000;
 }

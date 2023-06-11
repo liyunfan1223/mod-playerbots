@@ -101,8 +101,6 @@ void FeralDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("enemy too close for melee", NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), nullptr)));
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("survival instincts", ACTION_EMERGENCY + 1), nullptr)));
     triggers.push_back(new TriggerNode("omen of clarity", NextAction::array(0, new NextAction("omen of clarity", ACTION_HIGH + 9), nullptr)));
-    //triggers.push_back(new TriggerNode("player has no flag", NextAction::array(0, new NextAction("prowl", ACTION_HIGH + 1), nullptr)));
-    //triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("prowl", ACTION_INTERRUPT + 1), nullptr)));
     triggers.push_back(new TriggerNode("player has flag", NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
     triggers.push_back(new TriggerNode("enemy flagcarrier near", NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
 }

@@ -94,6 +94,7 @@ class WarriorTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["intercept can cast"] = &WarriorTriggerFactoryInternal::intercept_can_cast;
             creators["intercept and far enemy"] = &WarriorTriggerFactoryInternal::intercept_and_far_enemy;
             creators["intercept and rage"] = &WarriorTriggerFactoryInternal::intercept_and_rage;
+            // creators["slam"] = &WarriorTriggerFactoryInternal::slam;
         }
 
     private:
@@ -142,6 +143,7 @@ class WarriorTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* overpower(PlayerbotAI* botAI) { return new OverpowerAvailableTrigger(botAI); }
         static Trigger* revenge(PlayerbotAI* botAI) { return new RevengeAvailableTrigger(botAI); }
         static Trigger* sunder_armor(PlayerbotAI* botAI) { return new SunderArmorDebuffTrigger(botAI); }
+        // static Trigger* slam(PlayerbotAI* ai) { return new SlamTrigger(ai); }
 };
 
 

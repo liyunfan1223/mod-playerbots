@@ -41,7 +41,11 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), nullptr);
+    return NextAction::array(0, 
+        new NextAction("devastate", ACTION_NORMAL + 2), 
+        new NextAction("revenge", ACTION_NORMAL + 1), 
+        new NextAction("melee", ACTION_NORMAL), 
+        NULL);
 }
 
 void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

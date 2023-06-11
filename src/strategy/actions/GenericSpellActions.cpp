@@ -137,10 +137,16 @@ CastEnchantItemAction::CastEnchantItemAction(PlayerbotAI* botAI, std::string con
 
 bool CastEnchantItemAction::isPossible()
 {
-    if (!CastSpellAction::isPossible())
+    if (!CastSpellAction::isPossible()) {
+        
+        botAI->TellMasterNoFacing("Impossible: " + spell);
         return false;
+    }
 
     uint32 spellId = AI_VALUE2(uint32, "spell id", spell);
+    
+    bool ok = AI_VALUE2(Item*, "item for spell", spellId);
+    botAI->TellMasterNoFacing("spell: " + spell + ", spell id: " + std::to_string(spellId) + " item for spell: " + std::to_string(ok));
     return spellId && AI_VALUE2(Item*, "item for spell", spellId);
 }
 

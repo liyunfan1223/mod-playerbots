@@ -36,10 +36,10 @@ class CastDeathchillAction : public CastBuffSpellAction
         NextAction** getPrerequisites() override;
 };
 
-class CastDarkCommandAction : public CastBuffSpellAction
+class CastDarkCommandAction : public CastSpellAction
 {
 	public:
-		CastDarkCommandAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "dark command") { }
+		CastDarkCommandAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "dark command") { }
 
         NextAction** getPrerequisites() override;
 };

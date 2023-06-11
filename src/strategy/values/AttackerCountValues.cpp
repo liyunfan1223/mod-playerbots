@@ -16,28 +16,42 @@ bool HasAggroValue::Calculate()
     if (!target)
         return true;
 
-    HostileReference *ref = bot->getHostileRefMgr().getFirst();
-    if (!ref)
-        return true; // simulate as target is not atacking anybody yet
+    Unit* victim = target->GetVictim();
 
-    while( ref )
-    {
-        ThreatMgr *threatManager = ref->GetSource();
-        Unit *attacker = threatManager->GetOwner();
-        if (attacker != target) {
-            ref = ref->next();
-            continue;
-        }
-        Unit *victim = attacker->GetVictim();
-        if (!victim) { 
-            return true;
-        }
-        if ((victim == bot || (victim && victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer()))) && target == attacker)
-            return true;
-        ref = ref->next();
+    if (!victim) {
+        return true;
+    }
+
+    if (victim->GetGUID() == bot->GetGUID() || (victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer()))) {
+        return true;
+    }
+
+    botAI->TellMaster("target: " + target->GetName() + " victim: " + victim->GetName());
+    if (victim->ToPlayer() ) {
+        botAI->TellMaster("victim is mt: " + std::to_string(botAI->IsMainTank(victim->ToPlayer())));
     }
     return false;
+    // HostileReference *ref = bot->getHostileRefMgr().getFirst();
+    // if (!ref)
+    //     return true; // simulate as target is not atacking anybody yet
 
+    // while( ref )
+    // {
+    //     ThreatMgr *threatManager = ref->GetSource();
+    //     Unit *attacker = threatManager->GetOwner();
+    //     if (attacker->GetGUID() != target->GetGUID()) {
+    //         ref = ref->next();
+    //         continue;
+    //     }
+    //     Unit *victim = attacker->GetVictim();
+    //     if (!victim) { 
+    //         return true;
+    //     }
+    //     if ((victim->GetGUID() == bot->GetGUID() || (victim && victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer()))) && 
+    //         target->GetGUID() == attacker->GetGUID())
+    //         return true;
+    //     ref = ref->next();
+    // }
     // Unit* target = GetTarget();
     // if (!target)
     //     return true;

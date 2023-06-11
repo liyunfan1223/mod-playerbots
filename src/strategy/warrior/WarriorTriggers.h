@@ -52,4 +52,10 @@ class RendDebuffTrigger : public DebuffTrigger
     public:
         RendDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rend", 1, true) { }
 };
+
+// class SlamTrigger : public HasAuraTrigger
+// {
+// public:
+//     SlamTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "slam!") {}
+// };
 #endif

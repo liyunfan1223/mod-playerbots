@@ -77,7 +77,8 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         {
             return new ActionNode ("mangle (bear)",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("lacerate"), nullptr),
+                // /*A*/ NextAction::array(0, new NextAction("lacerate"), nullptr),
+                nullptr,
                 /*C*/ nullptr);
         }
 
@@ -138,10 +139,10 @@ BearTankDruidStrategy::BearTankDruidStrategy(PlayerbotAI* botAI) : FeralDruidStr
 NextAction** BearTankDruidStrategy::getDefaultActions()
 {
     return NextAction::array(0,
-            new NextAction("lacerate", ACTION_NORMAL + 4),
-            new NextAction("mangle (bear)", ACTION_NORMAL + 3),
+            new NextAction("mangle (bear)", ACTION_NORMAL + 5),
+            new NextAction("faerie fire (feral)", ACTION_NORMAL + 4),
+            new NextAction("lacerate", ACTION_NORMAL + 3),
             new NextAction("maul", ACTION_NORMAL + 2),
-            new NextAction("faerie fire (feral)", ACTION_NORMAL + 1),
             new NextAction("melee", ACTION_NORMAL),
             nullptr);
 }

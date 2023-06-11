@@ -113,13 +113,17 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 		"light aoe",
 		NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 3), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"enemy out of melee",
-		NextAction::array(0, new NextAction("stealth", ACTION_NORMAL + 9), new NextAction("reach melee", ACTION_NORMAL + 8), NULL)));
+	// triggers.push_back(new TriggerNode(
+	// 	"enemy out of melee",
+	// 	NextAction::array(0, new NextAction("stealth", ACTION_NORMAL + 9), new NextAction("reach melee", ACTION_NORMAL + 8), NULL)));
 
     triggers.push_back(new TriggerNode(
         "expose armor",
         NextAction::array(0, new NextAction("expose armor", ACTION_HIGH + 3), NULL)));
+    
+    triggers.push_back(new TriggerNode(
+		"tricks of the trade on main tank",
+		NextAction::array(0, new NextAction("tricks of the trade on main tank", ACTION_HIGH + 7), NULL)));
 }
 
 class StealthedRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>

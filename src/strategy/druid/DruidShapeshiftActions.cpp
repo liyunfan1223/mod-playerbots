@@ -41,6 +41,6 @@ bool CastCasterFormAction::Execute(Event event)
 }
 
 bool CastTreeFormAction::isUseful() {
-    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != nullptr) && 
+    return GetTarget() && 
         CastSpellAction::isUseful() && !botAI->HasAura(33891, bot);
 }

@@ -17,10 +17,10 @@ class CastFaerieFireAction : public CastDebuffSpellAction
 		CastFaerieFireAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "faerie fire") { }
 };
 
-class CastFaerieFireFeralAction : public CastDebuffSpellAction
+class CastFaerieFireFeralAction : public CastSpellAction
 {
     public:
-        CastFaerieFireFeralAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "faerie fire (feral)") { }
+        CastFaerieFireFeralAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "faerie fire (feral)") { }
 };
 
 class CastRejuvenationAction : public CastHealingSpellAction
