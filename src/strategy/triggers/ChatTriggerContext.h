@@ -112,6 +112,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
             creators["guild leave"] = &ChatTriggerContext::guild_leave;
             creators["rtsc"] = &ChatTriggerContext::rtsc;
             creators["drink"] = &ChatTriggerContext::drink;
+            creators["naxx"] = &ChatTriggerContext::naxx;
         }
 
     private:
@@ -204,6 +205,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
         static Trigger* guild_leave(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "guild leave"); }
         static Trigger* rtsc(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "rtsc"); }
         static Trigger* drink(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "drink"); }
+        static Trigger* naxx(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "naxx"); }
 };
 
 #endif

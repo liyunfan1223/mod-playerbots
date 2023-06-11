@@ -188,3 +188,16 @@ bool MaxDpsChatShortcutAction::Execute(Event event)
 
     return true;
 }
+
+bool NaxxChatShortcutAction::Execute(Event event)
+{
+    Player* master = GetMaster();
+    if (!master)
+        return false;
+
+    botAI->Reset();
+    botAI->ChangeStrategy("+naxx", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("+naxx", BOT_STATE_COMBAT);
+    bot->Say("Add Naxx Strategies!", LANG_UNIVERSAL);
+    return true;
+}

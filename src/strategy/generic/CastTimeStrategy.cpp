@@ -28,8 +28,8 @@ float CastTimeMultiplier::GetValue(Action* action)
             return 1.0f;
 
         uint32 castTime = spellInfo->CalcCastTime();
-        if (castTime >= 3000)
-            return 0.0f;
+        // if (castTime >= 3000)
+        //     return 0.0f;
 
         if (castTime >= 1500)
             return 0.5f;
