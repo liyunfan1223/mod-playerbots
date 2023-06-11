@@ -135,15 +135,15 @@ EnemyOutOfSpellRangeTrigger::EnemyOutOfSpellRangeTrigger(PlayerbotAI* botAI) : O
 {
 }
 
-bool EnemyOutOfSpellRangeTrigger::IsActive()
-{
-    Unit* target = AI_VALUE(Unit*, GetTargetName());
-    if (!target)
-        return false;
+// bool EnemyOutOfSpellRangeTrigger::IsActive()
+// {
+//     Unit* target = AI_VALUE(Unit*, GetTargetName());
+//     if (!target)
+//         return false;
 
-    float combatReach = bot->GetCombatReach() + target->GetCombatReach();
-    return target && (sServerFacade->GetDistance2d(bot, target) > (distance + combatReach + sPlayerbotAIConfig->contactDistance) || !bot->IsWithinLOSInMap(target));
-}
+//     float combatReach = bot->GetCombatReach() + target->GetCombatReach();
+//     return target && (sServerFacade->GetDistance2d(bot, target) > (distance + combatReach + sPlayerbotAIConfig->contactDistance) || !bot->IsWithinLOSInMap(target));
+// }
 
 // bool EnemyOutOfMeleeTrigger::IsActive()
 // {

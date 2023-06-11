@@ -74,8 +74,6 @@ class EnemyOutOfSpellRangeTrigger : public OutOfRangeTrigger
 {
     public:
         EnemyOutOfSpellRangeTrigger(PlayerbotAI* botAI);
-
-        bool IsActive() override;
 };
 
 class PartyMemberToHealOutOfSpellRangeTrigger : public OutOfRangeTrigger

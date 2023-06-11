@@ -15,6 +15,8 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
             creators["mark of the wild"] = &mark_of_the_wild;
             creators["mark of the wild on party"] = &mark_of_the_wild_on_party;
             // creators["innervate"] = &innervate;
+            creators["regrowth_on_party"] = &regrowth_on_party;
+            creators["rejuvenation on party"] = &rejuvenation_on_party;
         }
 
     private:
@@ -49,7 +51,20 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
                 /*A*/ nullptr,
                 /*C*/ nullptr);
         }
-
+        static ActionNode* regrowth_on_party(PlayerbotAI* ai)
+        {
+            return new ActionNode ("regrowth on party",
+                /*P*/ NextAction::array(0, new NextAction("caster form"), NULL),
+                /*A*/ NULL,
+                /*C*/ NULL);
+        }
+        static ActionNode* rejuvenation_on_party(PlayerbotAI* ai)
+        {
+            return new ActionNode ("rejuvenation on party",
+                /*P*/ NextAction::array(0, new NextAction("caster form"), NULL),
+                /*A*/ NULL,
+                /*C*/ NULL);
+        }
         // static ActionNode* innervate([[maybe_unused]] PlayerbotAI* botAI)
         // {
         //     return new ActionNode ("innervate",

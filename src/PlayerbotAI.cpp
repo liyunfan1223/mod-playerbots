@@ -264,6 +264,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 
     UpdateAIInternal(elapsed, min);
 
+    inCombat = bot->IsInCombat();
     // test fix lags because of BG
     if (bot && !inCombat)
         min = true;
@@ -3672,16 +3673,20 @@ Item* PlayerbotAI::FindStoneFor(Item* weapon) const
     {
         for (uint8 i = 0; i < std::size(uPriorizedSharpStoneIds); ++i)
         {
-            if (stone = FindConsumable(uPriorizedSharpStoneIds[i]))
-            return stone;
+            stone = FindConsumable(uPriorizedSharpStoneIds[i]);
+            if (stone) {
+                return stone;
+            }
         }
     }
     else if (pProto && (pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2))
     {
         for (uint8 i = 0; i < std::size(uPriorizedWeightStoneIds); ++i)
         {
-            if (stone = FindConsumable(uPriorizedWeightStoneIds[i]))
-            return stone;
+            stone = FindConsumable(uPriorizedWeightStoneIds[i]);
+            if (stone) {
+                return stone;
+            }
         }
     }
 

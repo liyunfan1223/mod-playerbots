@@ -60,14 +60,6 @@ bool ComboPointsAvailableTrigger::IsActive()
 
 bool LoseAggroTrigger::IsActive()
 {
-    // Unit* mt = AI_VALUE(Unit*, "main tank");
-    // if (mt) {
-    //     botAI->TellMasterNoFacing("Has aggro: " + std::to_string(AI_VALUE2(bool, "has aggro", "current target")) 
-    //         + " My main tank is: " + mt->GetName());
-    // } else {
-    //     botAI->TellMasterNoFacing("Has aggro: " + std::to_string(AI_VALUE2(bool, "has aggro", "current target")) 
-    //         + " No main tank detected");
-    // }
     return !AI_VALUE2(bool, "has aggro", "current target");
 }
 

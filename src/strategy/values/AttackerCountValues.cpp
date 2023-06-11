@@ -26,10 +26,10 @@ bool HasAggroValue::Calculate()
         return true;
     }
 
-    botAI->TellMaster("target: " + target->GetName() + " victim: " + victim->GetName());
-    if (victim->ToPlayer() ) {
-        botAI->TellMaster("victim is mt: " + std::to_string(botAI->IsMainTank(victim->ToPlayer())));
-    }
+    // botAI->TellMaster("target: " + target->GetName() + " victim: " + victim->GetName());
+    // if (victim->ToPlayer() ) {
+    //     botAI->TellMaster("victim is mt: " + std::to_string(botAI->IsMainTank(victim->ToPlayer())));
+    // }
     return false;
     // HostileReference *ref = bot->getHostileRefMgr().getFirst();
     // if (!ref)

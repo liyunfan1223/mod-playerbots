@@ -25,7 +25,7 @@ class SpellEntryPredicate
 class PartyMemberValue : public UnitCalculatedValue
 {
 	public:
-        PartyMemberValue(PlayerbotAI* botAI, std::string const name = "party member") : UnitCalculatedValue(botAI, name) { }
+        PartyMemberValue(PlayerbotAI* botAI, std::string const name = "party member", int checkInterval = 1) : UnitCalculatedValue(botAI, name, checkInterval) { }
 
         bool IsTargetOfSpellCast(Player* target, SpellEntryPredicate& predicate);
 

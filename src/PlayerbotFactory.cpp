@@ -3007,6 +3007,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id)
             ((cls == CLASS_SHAMAN && tab == 1 && bot->HasSpell(674)) ||
             (cls == CLASS_ROGUE) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 1) ||
+            (cls == CLASS_WARRIOR && tab == 1 && !bot->HasSpell(46917)) ||
             IsShieldTank())) {
                 score *= 0.1;
         }
