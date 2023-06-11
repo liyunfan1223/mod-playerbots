@@ -25,11 +25,11 @@ class WarrirorAoeStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
     public:
         WarrirorAoeStrategyActionNodeFactory()
         {
-            creators["whirlwind"] = &whirlwind;
+            // creators["whirlwind"] = &whirlwind;
         }
 
     private:
-        ACTION_NODE_A(whirlwind, "whirlwind", "cleave");
+        // ACTION_NODE_A(whirlwind, "whirlwind", "cleave");
 };
 
 WarrirorAoeStrategy::WarrirorAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI)

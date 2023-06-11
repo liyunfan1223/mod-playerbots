@@ -47,8 +47,12 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of vengeance", 90.0f), NULL)));
+    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f), NULL)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", 91.0f), nullptr)));
+    triggers.push_back(new TriggerNode(
+		"devotion aura",
+		NextAction::array(0, new NextAction("devotion aura", 90.0f), NULL)));
+
     // triggers.push_back(new TriggerNode("judgement of light", NextAction::array(0, new NextAction("judgement of light", ACTION_HIGH + 6), nullptr)));
     // triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("judgement of wisdom", ACTION_HIGH + 6), nullptr)));
     // triggers.push_back(new TriggerNode("judgement", NextAction::array(0, new NextAction("judgement", ACTION_HIGH + 6), nullptr)));

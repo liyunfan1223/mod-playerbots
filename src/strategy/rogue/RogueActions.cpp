@@ -4,6 +4,8 @@
 
 #include "RogueActions.h"
 #include "Event.h"
+#include "ObjectGuid.h"
+#include "Player.h"
 #include "Playerbots.h"
 
 bool CastStealthAction::isPossible()
@@ -68,7 +70,9 @@ bool UseDeadlyPoisonAction::Execute(Event event) {
     if (items.empty()) {
         return false;
     }
-    return UseItemAuto(*items.begin());
+    Item* const itemForSpell = bot->GetItemByPos( INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND );
+    return UseItem(*items.begin(), ObjectGuid::Empty, itemForSpell);
+    // return UseItemAuto(*items.begin());
 }
 
 bool UseDeadlyPoisonAction::isPossible() {
@@ -99,7 +103,8 @@ bool UseInstantPoisonAction::Execute(Event event) {
     if (items.empty()) {
         return false;
     }
-    return UseItemAuto(*items.begin());
+    Item* const itemForSpell = bot->GetItemByPos( INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND );
+    return UseItem(*items.begin(), ObjectGuid::Empty, itemForSpell);
 }
 
 bool UseInstantPoisonAction::isPossible() {

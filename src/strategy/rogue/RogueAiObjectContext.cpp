@@ -20,7 +20,6 @@ class RogueStrategyFactoryInternal : public NamedObjectContext<Strategy>
     public:
         RogueStrategyFactoryInternal()
         {
-            creators["dps"] = &RogueStrategyFactoryInternal::dps;
             creators["nc"] = &RogueStrategyFactoryInternal::nc;
             creators["pull"] = &RogueStrategyFactoryInternal::pull;
             creators["aoe"] = &RogueStrategyFactoryInternal::aoe;
@@ -28,18 +27,29 @@ class RogueStrategyFactoryInternal : public NamedObjectContext<Strategy>
             creators["stealthed"] = &RogueStrategyFactoryInternal::stealthed;
             creators["stealth"] = &RogueStrategyFactoryInternal::stealth;
             creators["cc"] = &RogueStrategyFactoryInternal::cc;
-            creators["melee"] = &RogueStrategyFactoryInternal::melee;
         }
 
     private:
         static Strategy* boost(PlayerbotAI* botAI) { return new RogueBoostStrategy(botAI); }
         static Strategy* aoe(PlayerbotAI* botAI) { return new RogueAoeStrategy(botAI); }
-        static Strategy* dps(PlayerbotAI* botAI) { return new DpsRogueStrategy(botAI); }
         static Strategy* nc(PlayerbotAI* botAI) { return new GenericRogueNonCombatStrategy(botAI); }
         static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
         static Strategy* stealthed(PlayerbotAI* botAI) { return new StealthedRogueStrategy(botAI); }
         static Strategy* stealth(PlayerbotAI* botAI) { return new StealthStrategy(botAI); }
         static Strategy* cc(PlayerbotAI* botAI) { return new RogueCcStrategy(botAI); }
+};
+
+class RogueCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
+{
+    public:
+        RogueCombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
+        {
+            creators["dps"] = &RogueCombatStrategyFactoryInternal::dps;
+            creators["melee"] = &RogueCombatStrategyFactoryInternal::melee;
+        }
+
+    private:
+        static Strategy* dps(PlayerbotAI* botAI) { return new DpsRogueStrategy(botAI); }
         static Strategy* melee(PlayerbotAI* botAI) { return new AssassinationRogueStrategy(botAI); }
 };
 
@@ -115,8 +125,8 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
             creators["check stealth"] = &RogueAiObjectContextInternal::check_stealth;
             creators["envenom"] = &RogueAiObjectContextInternal::envenom;
             creators["tricks of the trade on main tank"] = &RogueAiObjectContextInternal::tricks_of_the_trade_on_main_tank;
-            creators["use instant poison"] = &RogueAiObjectContextInternal::use_instant_poison;
-            creators["use deadly poison"] = &RogueAiObjectContextInternal::use_deadly_poison;
+            creators["use instant poison on main hand"] = &RogueAiObjectContextInternal::use_instant_poison;
+            creators["use deadly poison on off hand"] = &RogueAiObjectContextInternal::use_deadly_poison;
         }
 
     private:
@@ -155,6 +165,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
 RogueAiObjectContext::RogueAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
 {
     strategyContexts.Add(new RogueStrategyFactoryInternal());
+    strategyContexts.Add(new RogueCombatStrategyFactoryInternal());
     actionContexts.Add(new RogueAiObjectContextInternal());
     triggerContexts.Add(new RogueTriggerFactoryInternal());
 }

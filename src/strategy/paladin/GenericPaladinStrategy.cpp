@@ -15,7 +15,7 @@ void GenericPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("divine shield", ACTION_CRITICAL_HEAL + 2), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), nullptr)));
+    // triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("divine shield", ACTION_CRITICAL_HEAL + 2), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), nullptr)));
     triggers.push_back(new TriggerNode("hammer of justice interrupt", NextAction::array(0, new NextAction("hammer of justice", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("hammer of justice on enemy healer", NextAction::array(0, new NextAction("hammer of justice on enemy healer", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("hammer of justice on snare target", NextAction::array(0, new NextAction("hammer of justice on snare target", ACTION_INTERRUPT), nullptr)));

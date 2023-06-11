@@ -1882,7 +1882,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
         }
 	}
 
-	ObjectGuid oldSel = bot->GetSelectedUnit()->GetGUID();
+	Unit* oldSel = bot->GetSelectedUnit();
 	Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetUnitTarget(target);
@@ -1901,7 +1901,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     }
 
 	if (oldSel)
-		bot->SetSelection(oldSel);
+		bot->SetSelection(oldSel->GetGUID());
 
     switch (result)
     {

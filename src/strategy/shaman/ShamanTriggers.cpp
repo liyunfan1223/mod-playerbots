@@ -39,7 +39,7 @@ bool ShockTrigger::IsActive()
 
 bool TotemTrigger::IsActive()
 {
-    return AI_VALUE(uint8, "attacker count") >= attackerCount && !AI_VALUE2(bool, "has totem", name);
+    return AI_VALUE(uint8, "attacker count") >= attackerCount && !AI_VALUE2(bool, "has totem", name) && !botAI->HasAura(name, bot);
 }
 
 bool ManaSpringTotemTrigger::IsActive()
