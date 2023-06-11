@@ -63,20 +63,21 @@ void AttackersValue::AddAttackersOf(Player* player, std::set<Unit*>& targets)
     if (!player || !player->IsInWorld() || player->IsBeingTeleported())
         return;
 
-	std::list<Unit*> units;
-	Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(player, player, sPlayerbotAIConfig->sightDistance);
-    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(player, units, u_check);
-    Cell::VisitAllObjects(player, searcher, sPlayerbotAIConfig->sightDistance);
+	HostileRefMgr& refManager = player->getHostileRefMgr();
+    HostileReference *ref = refManager.getFirst();
+    if (!ref)
+        return;
 
-	for (Unit* unit : units)
+    while( ref )
     {
-        if (!player->GetGroup())
-        {
-            if (!unit->GetThreatMgr().GetThreat(player) && (!unit->GetThreatMgr().getCurrentVictim() || unit->GetThreatMgr().getCurrentVictim()->getTarget() != player))
-                continue;
-        }
+        ThreatMgr *threatMgr = ref->GetSource();
+        Unit *attacker = threatMgr->GetOwner();
+        Unit *victim = attacker->GetVictim();
 
-        targets.insert(unit);
+        if (player->IsValidAttackTarget(attacker) && player->GetDistance2d(attacker) < sPlayerbotAIConfig->sightDistance) {
+            targets.insert(attacker);
+        }
+        ref = ref->next();
     }
 }
 
