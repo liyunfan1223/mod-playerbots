@@ -25,7 +25,8 @@ class AttackersValue : public ObjectGuidListCalculatedValue
 	private:
         void AddAttackersOf(Group* group, std::set<Unit*>& targets);
         void AddAttackersOf(Player* player, std::set<Unit*>& targets);
-		void RemoveNonThreating(std::set<Unit*>& targets);
+        void RemoveNonThreating(std::set<Unit*>& targets);
+        bool hasRealThreat(Unit* attacker);
 };
 
 class PossibleAddsValue : public BoolCalculatedValue

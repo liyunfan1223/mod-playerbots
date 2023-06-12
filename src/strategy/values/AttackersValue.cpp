@@ -83,19 +83,40 @@ void AttackersValue::AddAttackersOf(Player* player, std::set<Unit*>& targets)
 
 void AttackersValue::RemoveNonThreating(std::set<Unit*>& targets)
 {
-    for (std::set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    for(std::set<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
         Unit* unit = *tIter;
-        if (!IsValidTarget(unit, bot) || !bot->IsWithinLOSInMap(unit))
+        if(!bot->IsWithinLOSInMap(unit) || bot->GetMapId() != unit->GetMapId() || !hasRealThreat(unit))
         {
-            std::set<Unit*>::iterator tIter2 = tIter;
+            std::set<Unit *>::iterator tIter2 = tIter;
             ++tIter;
             targets.erase(tIter2);
         }
         else
             ++tIter;
     }
+        // Unit* unit = *tIter;
+        // if (!IsValidTarget(unit, bot) || !bot->IsWithinLOSInMap(unit))
+        // {
+        //     std::set<Unit*>::iterator tIter2 = tIter;
+        //     ++tIter;
+        //     targets.erase(tIter2);
+        // }
+        // else
+        //     ++tIter;
 }
+
+bool AttackersValue::hasRealThreat(Unit *attacker)
+{
+    return attacker &&
+        attacker->IsInWorld() &&
+        attacker->IsAlive() &&
+        // !attacker->IsPolymorphed() &&
+        // !attacker->isInRoots() &&
+        !attacker->IsFriendlyTo(bot) &&
+        (attacker->GetThreatMgr().getCurrentVictim() || dynamic_cast<Player*>(attacker));
+}
+
 
 bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
 {
