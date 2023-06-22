@@ -250,8 +250,8 @@ class ActionContext : public NamedObjectContext<Action>
             // creators["kel'thuzad choose target"] = &ActionContext::kelthuzad_choose_target;
             // creators["kel'thuzad position"] = &ActionContext::kelthuzad_position;
 
-            // creators["anub'rekhan choose target"] = &ActionContext::anubrekhan_choose_target;
-            // creators["anub'rekhan position"] = &ActionContext::anubrekhan_position;
+            creators["anub'rekhan choose target"] = &ActionContext::anubrekhan_choose_target;
+            creators["anub'rekhan position"] = &ActionContext::anubrekhan_position;
 
             // creators["gluth choose target"] = &ActionContext::gluth_choose_target;
             // creators["gluth position"] = &ActionContext::gluth_position;
@@ -441,8 +441,8 @@ class ActionContext : public NamedObjectContext<Action>
         // static Action* sapphiron_avoid_chill(PlayerbotAI* ai) { return new SapphironAvoidChillAction(ai); }
         // static Action* kelthuzad_choose_target(PlayerbotAI* ai) { return new KelthuzadChooseTargetAction(ai); }
         // static Action* kelthuzad_position(PlayerbotAI* ai) { return new KelthuzadPositionAction(ai); }
-        // static Action* anubrekhan_choose_target(PlayerbotAI* ai) { return new AnubrekhanChooseTargetAction(ai); }
-        // static Action* anubrekhan_position(PlayerbotAI* ai) { return new AnubrekhanPositionAction(ai); }
+        static Action* anubrekhan_choose_target(PlayerbotAI* ai) { return new AnubrekhanChooseTargetAction(ai); }
+        static Action* anubrekhan_position(PlayerbotAI* ai) { return new AnubrekhanPositionAction(ai); }
         // static Action* gluth_choose_target(PlayerbotAI* ai) { return new GluthChooseTargetAction(ai); }
         // static Action* gluth_position(PlayerbotAI* ai) { return new GluthPositionAction(ai); }
         // static Action* gluth_slowdown(PlayerbotAI* ai) { return new GluthSlowdownAction(ai); }

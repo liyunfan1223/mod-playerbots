@@ -7,6 +7,7 @@
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
 #include "../../../../src/server/scripts/Northrend/Naxxramas/boss_grobbulus.h"
+#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_anubrekhan.h"
 
 using namespace std;
 
@@ -48,6 +49,7 @@ protected:
     uint32 boss_entry, event_id, last_event_time;
 };
 
+template<class T>
 class BossPhaseTrigger : public Trigger
 {
 public:
@@ -172,11 +174,11 @@ public:
 //     KelthuzadTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "kel'thuzad", 0, "kel'thuzad trigger") {}
 // };
 
-// class AnubrekhanTrigger : public BossPhaseTrigger
-// {
-// public:
-//     AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
-// };
+class AnubrekhanTrigger : public BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>
+{
+public:
+    AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
+};
 
 // class KelthuzadPhaseTwoTrigger : public BossPhaseTrigger
 // {

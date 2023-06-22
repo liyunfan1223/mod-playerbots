@@ -332,6 +332,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsHeal(Player* player);
         bool IsRanged(Player* player);
         bool IsMainTank(Player* player);
+        bool IsAssistTank(Player* player);
         Creature* GetCreature(ObjectGuid guid);
         Unit* GetUnit(ObjectGuid guid);
         Player* GetPlayer(ObjectGuid guid);
@@ -433,10 +434,10 @@ class PlayerbotAI : public PlayerbotAIBase
         bool CanMove();
         bool IsInRealGuild();
         static std::vector<std::string> dispel_whitelist;
+        bool EqualLowercaseName(std::string s1, std::string s2);
     private:
         void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
         bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
-
     protected:
 	    Player* bot;
 	    Player* master;

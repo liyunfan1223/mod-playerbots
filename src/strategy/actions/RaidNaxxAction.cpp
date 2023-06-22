@@ -5,6 +5,7 @@
 #include "ScriptedCreature.h"
 #include "../../../../src/server/scripts/Northrend/Naxxramas/boss_heigan.h"
 #include "../../../../src/server/scripts/Northrend/Naxxramas/boss_grobbulus.h"
+#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_anubrekhan.h"
 
 using namespace std;
 
@@ -852,92 +853,86 @@ bool HeiganDanceRangedAction::Execute(Event event) {
 //     return false;
 // }
 
-// bool AnubrekhanChooseTargetAction::Execute(Event event)
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
-//     if (!boss) {
-//         return false;
-//     }
-//     BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     list<ObjectGuid> attackers = context->GetValue<list<ObjectGuid> >("attackers")->Get();
-//     Unit* target = NULL;
-//     Unit *target_boss = NULL;
-//     vector<Unit*> target_guards;
-//     for (list<ObjectGuid>::iterator i = attackers.begin(); i != attackers.end(); ++i)
-//     {
-//         Unit* unit = botAI->GetUnit(*i);
-//         if (!unit)
-//             continue;
-//         if (botAI->EqualLowercaseName(unit->GetName(), "crypt guard")) {
-//             target_guards.push_back(unit);
-//             // target_guard = unit;
-//         }
-//         if (botAI->EqualLowercaseName(unit->GetName(), "anub'rekhan")) {
-//             target_boss = unit;
-//         }
-//     }
-//     // vector<Unit*> targets;
-//     if (botAI->IsMainTank(bot)) {
-//         target = target_boss;
-//     } else {
-//         if (target_guards.size() == 0) {
-//             target = target_boss;
-//         } else {
-//             if (botAI->IsAssistTank(bot)) {
-//                 for (Unit* t : target_guards) {
-//                     if (target == NULL || (target->GetVictim() && target->GetVictim()->ToPlayer() && botAI->IsTank(target->GetVictim()->ToPlayer()))) {
-//                         target = t;
-//                     }
-//                 }
-//             } else {
-//                 for (Unit* t : target_guards) {
-//                     if (target == NULL || target->GetHealthPct() > t->GetHealthPct()) {
-//                         target = t;
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     if (context->GetValue<Unit*>("current target")->Get() == target) {
-//         return false;
-//     }
-//     // if (target) {
-//     //     bot->Yell("Let\'s attack " + target->GetName(), LANG_UNIVERSAL);
-//     // }
-//     return Attack(target);
-// }
+bool AnubrekhanChooseTargetAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
+    if (!boss) {
+        return false;
+    }
+    BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
+    GuidVector attackers = context->GetValue<GuidVector >("attackers")->Get();
+    Unit* target = NULL;
+    Unit *target_boss = NULL;
+    vector<Unit*> target_guards;
+    for (ObjectGuid const guid : attackers)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit)
+            continue;
+        if (botAI->EqualLowercaseName(unit->GetName(), "crypt guard")) {
+            target_guards.push_back(unit);
+        }
+        if (botAI->EqualLowercaseName(unit->GetName(), "anub'rekhan")) {
+            target_boss = unit;
+        }
+    }
+    if (botAI->IsMainTank(bot)) {
+        target = target_boss;
+    } else {
+        if (target_guards.size() == 0) {
+            target = target_boss;
+        } else {
+            if (botAI->IsAssistTank(bot)) {
+                for (Unit* t : target_guards) {
+                    if (target == NULL || (target->GetVictim() && target->GetVictim()->ToPlayer() && botAI->IsTank(target->GetVictim()->ToPlayer()))) {
+                        target = t;
+                    }
+                }
+            } else {
+                for (Unit* t : target_guards) {
+                    if (target == NULL || target->GetHealthPct() > t->GetHealthPct()) {
+                        target = t;
+                    }
+                }
+            }
+        }
+    }
+    if (context->GetValue<Unit*>("current target")->Get() == target) {
+        return false;
+    }
+    return Attack(target);
+}
 
-// bool AnubrekhanPositionAction::Execute(Event event)
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
-//     if (!boss) {
-//         return false;
-//     }
-//     BossAI* b_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     if (!b_ai) {
-//         return false;
-//     }
-//     EventMap *eventMap = b_botAI->GetEvents();
-//     uint8 phase_mask = eventMap->GetPhaseMask();
-//     uint32 locust = eventMap->GetNextEventTime(2);
-//     uint32 timer = eventMap->GetTimer();
-//     if (phase_mask == 2 || (locust && locust - timer <= 5000)) {
-//         if (botAI->IsMainTank(bot)) {
-//             uint32 nearest = FindNearestWaypoint();
-//             uint32 next_point;
-//             if (phase_mask == 2) {
-//                 next_point = (nearest + 1) % intervals;
-//             } else {
-//                 next_point = nearest;
-//             }
-//             return MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ());
-//         } else {
-//             return MoveInside(533, 3272.49f, -3476.27f, bot->GetPositionZ(), 3.0f);
-//         }
-//     }
-//     return false;
-// }
+bool AnubrekhanPositionAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
+    if (!boss) {
+        return false;
+    }
+    boss_anubrekhan::boss_anubrekhanAI* boss_ai = dynamic_cast<boss_anubrekhan::boss_anubrekhanAI*>(boss->GetAI());
+    if (!boss_ai) {
+        return false;
+    }
+    EventMap *eventMap = &boss_ai->events;
+    uint32 locust = eventMap->GetNextEventTime(2);
+    uint32 timer = eventMap->GetTimer();
+    bool inPhase = botAI->HasAura("locust swarm", boss) || boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (inPhase || (locust && locust - timer <= 5000)) {
+        if (botAI->IsMainTank(bot)) {
+            uint32 nearest = FindNearestWaypoint();
+            uint32 next_point;
+            if (inPhase) {
+                next_point = (nearest + 1) % intervals;
+            } else {
+                next_point = nearest;
+            }
+            return MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ());
+        } else {
+            return MoveInside(533, 3272.49f, -3476.27f, bot->GetPositionZ(), 3.0f);
+        }
+    }
+    return false;
+}
 
 // bool GluthChooseTargetAction::Execute(Event event)
 // {

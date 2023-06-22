@@ -18,6 +18,7 @@
 #include "WarriorActions.h"
 #include <string>
 #include "../../../../src/server/scripts/Northrend/Naxxramas/boss_heigan.h"
+#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_anubrekhan.h"
 
 float HeiganDanceMultiplier::GetValue(Action* action)
 {
@@ -206,27 +207,29 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 // 	return 1.0f;
 // }
 
-// float AnubrekhanGenericMultiplier::GetValue(Action* action)
-// {
-// 	Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
-// 	if (!boss) {
-//         return 1.0f;
-//     }
-// 	if ((dynamic_cast<AttackLeastHpTargetAction*>(action) || 
-// 		 dynamic_cast<TankAssistAction*>(action) || 
-// 		 dynamic_cast<FollowAction*>(action))) {
-// 		return 0.0f;
-// 	}
-// 	BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-// 	EventMap* eventMap = boss_botAI->GetEvents();
-//     uint32 curr_phase = eventMap->GetPhaseMask();
-// 	if (curr_phase == 2) {
-// 		if (dynamic_cast<FleeAction*>(action)) {
-// 			return 0.0f;
-// 		}
-// 	}
-// 	return 1.0f;
-// }
+float AnubrekhanGenericMultiplier::GetValue(Action* action)
+{
+	Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
+	if (!boss) {
+        return 1.0f;
+    }
+	if (
+		// (dynamic_cast<AttackLeastHpTargetAction*>(action) || 
+		//  dynamic_cast<DpsAssistAction*>(action) ||
+		//  dynamic_cast<TankAssistAction*>(action) || 
+		 dynamic_cast<FollowAction*>(action)) {
+		return 0.0f;
+	}
+	// BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
+	// EventMap* eventMap = boss_ai->GetEvents();
+    // uint32 curr_phase = eventMap->GetPhaseMask();
+	if (botAI->HasAura("locust swarm", boss)) {
+		if (dynamic_cast<FleeAction*>(action)) {
+			return 0.0f;
+		}
+	}
+	return 1.0f;
+}
 
 // float FourhorsemanGenericMultiplier::GetValue(Action* action)
 // {
@@ -382,13 +385,13 @@ void RaidNaxxGenericStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
    	// 		new NextAction("kel'thuzad position", ACTION_RAID + 1),
 	// 	NULL)));
 
-	// // Anub'Rekhan
-	// triggers.push_back(new TriggerNode(
-	// 	"anub'rekhan", 
-	// 	NextAction::array(0, 
-	// 		new NextAction("anub'rekhan choose target", ACTION_RAID + 1), 
-   	// 		new NextAction("anub'rekhan position", ACTION_RAID + 1),
-	// 	NULL)));
+	// Anub'Rekhan
+	triggers.push_back(new TriggerNode(
+		"anub'rekhan", 
+		NextAction::array(0, 
+			// new NextAction("anub'rekhan choose target", ACTION_RAID + 1), 
+   			new NextAction("anub'rekhan position", ACTION_RAID + 1),
+		NULL)));
 
 	// // Gluth
 	// triggers.push_back(new TriggerNode(
@@ -420,7 +423,7 @@ void RaidNaxxGenericStrategy::InitMultipliers(std::vector<Multiplier*> &multipli
 	// multipliers.push_back(new SapphironGenericMultiplier(ai));
 	// multipliers.push_back(new InstructorRazuviousGenericMultiplier(ai));
 	// multipliers.push_back(new KelthuzadGenericMultiplier(ai));
-	// multipliers.push_back(new AnubrekhanGenericMultiplier(ai));
+	multipliers.push_back(new AnubrekhanGenericMultiplier(botAI));
 	// multipliers.push_back(new FourhorsemanGenericMultiplier(ai));
 	// multipliers.push_back(new GothikGenericMultiplier(ai));
 	// multipliers.push_back(new GluthGenericMultiplier(ai));

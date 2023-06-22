@@ -1394,6 +1394,11 @@ bool PlayerbotAI::IsMainTank(Player* player)
     return false;
 }
 
+bool PlayerbotAI::IsAssistTank(Player* player)
+{
+    return IsTank(player) && !IsMainTank(player);
+}
+
 namespace acore
 {
     class UnitByGuidInRangeCheck
@@ -3892,4 +3897,17 @@ bool PlayerbotAI::IsInRealGuild()
 void PlayerbotAI::QueueChatResponse(uint8 msgtype, ObjectGuid guid1, ObjectGuid guid2, std::string message, std::string chanName, std::string name)
 {
     chatReplies.push(ChatQueuedReply(msgtype, guid1.GetCounter(), guid2.GetCounter(), message, chanName, name, time(nullptr) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15)));
+}
+
+bool PlayerbotAI::EqualLowercaseName(std::string s1, std::string s2)
+{
+    if (s1.length() != s2.length()) {
+        return false;
+    }
+    for (int i = 0; i < s1.length(); i++) {
+        if (tolower(s1[i]) != tolower(s2[i])) {
+            return false;
+        }
+    }
+    return true;
 }

@@ -219,7 +219,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             // creators["kel'thuzad"] = &TriggerContext::kelthuzad;
             // creators["kel'thuzad phase two"] = &TriggerContext::kelthuzad_phase_two;
 
-            // creators["anub'rekhan"] = &TriggerContext::anubrekhan;
+            creators["anub'rekhan"] = &TriggerContext::anubrekhan;
 
             // creators["gluth"] = &TriggerContext::gluth;
             // creators["gluth main tank mortal wound"] = &TriggerContext::gluth_main_tank_mortal_wound;
@@ -386,7 +386,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         // static Trigger* sapphiron_ground_chill(PlayerbotAI* ai) { return new SapphironGroundChillTrigger(ai); }        
         // static Trigger* kelthuzad(PlayerbotAI* ai) { return new KelthuzadTrigger(ai); }
         // static Trigger* kelthuzad_phase_two(PlayerbotAI* ai) { return new KelthuzadPhaseTwoTrigger(ai); }
-        // static Trigger* anubrekhan(PlayerbotAI* ai) { return new AnubrekhanTrigger(ai); }
+        static Trigger* anubrekhan(PlayerbotAI* ai) { return new AnubrekhanTrigger(ai); }
         // static Trigger* gluth(PlayerbotAI* ai) { return new GluthTrigger(ai); }
         // static Trigger* gluth_main_tank_mortal_wound(PlayerbotAI* ai) { return new GluthMainTankMortalWoundTrigger(ai); }
         // static Trigger* loatheb(PlayerbotAI* ai) { return new LoathebTrigger(ai); }

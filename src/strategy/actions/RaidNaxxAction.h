@@ -267,19 +267,19 @@ protected:
 //     virtual bool Execute(Event event);
 // };
 
-// class AnubrekhanChooseTargetAction : public AttackAction
-// {
-// public:
-//     AnubrekhanChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "anub'rekhan choose target") {}
-//     virtual bool Execute(Event event);
-// };
+class AnubrekhanChooseTargetAction : public AttackAction
+{
+public:
+    AnubrekhanChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "anub'rekhan choose target") {}
+    virtual bool Execute(Event event);
+};
 
-// class AnubrekhanPositionAction : public RotateAroundTheCenterPointAction
-// {
-// public:
-//     AnubrekhanPositionAction(PlayerbotAI* ai) : RotateAroundTheCenterPointAction(ai, "anub'rekhan position", 3272.49f, -3476.27f, 45.0f, 16) {}
-//     virtual bool Execute(Event event);
-// };
+class AnubrekhanPositionAction : public RotateAroundTheCenterPointAction
+{
+public:
+    AnubrekhanPositionAction(PlayerbotAI* ai) : RotateAroundTheCenterPointAction(ai, "anub'rekhan position", 3272.49f, -3476.27f, 45.0f, 16) {}
+    virtual bool Execute(Event event);
+};
 
 // class GluthChooseTargetAction : public AttackAction
 // {
