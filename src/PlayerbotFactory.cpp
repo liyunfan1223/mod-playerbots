@@ -284,14 +284,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
-    {
-        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
-        LOG_INFO("playerbots", "Initializing enchant templates...");
-        ApplyEnchantTemplate();
-        if (pmo)
-            pmo->finish();
-    }
+    // if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
+    // {
+    //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
+    //     LOG_INFO("playerbots", "Initializing enchant templates...");
+    //     ApplyEnchantTemplate();
+    //     if (pmo)
+    //         pmo->finish();
+    // }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
     LOG_INFO("playerbots", "Initializing inventory...");
