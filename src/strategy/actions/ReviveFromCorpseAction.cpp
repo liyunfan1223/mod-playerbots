@@ -54,7 +54,7 @@ bool ReviveFromCorpseAction::Execute(Event event)
         }
     }
 
-    LOG_INFO("playerbots", "Bot {} {}:{} <{}> revives at body", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
+    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> revives at body", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
 
     bot->GetMotionMaster()->Clear();
     bot->StopMoving();
@@ -89,7 +89,7 @@ bool FindCorpseAction::Execute(Event event)
     {
         if (dCount >= 5)
         {
-            LOG_INFO("playerbots", "Bot {} {}:{} <{}>: died too many times and was sent to an inn",
+            LOG_DEBUG("playerbots", "Bot {} {}:{} <{}>: died too many times and was sent to an inn",
                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
             context->GetValue<uint32>("death count")->Set(0);
             sRandomPlayerbotMgr->RandomTeleportForRpg(bot);
