@@ -106,8 +106,9 @@ NextAction** CasterDruidStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
         new NextAction("starfall", ACTION_NORMAL + 3),
-        new NextAction("starfire", ACTION_NORMAL + 2), 
-        new NextAction("wrath", ACTION_NORMAL + 1), nullptr);
+        new NextAction("wrath", ACTION_NORMAL + 1), 
+        new NextAction("starfire", ACTION_NORMAL), 
+        nullptr);
 }
 
 void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -129,7 +130,14 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void CasterDruidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-	triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("starfall", ACTION_HIGH + 1), nullptr)));
+	triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode(
+		"light aoe",
+        NextAction::array(0,
+            new NextAction("starfall", ACTION_NORMAL + 4),
+		    new NextAction("insect swarm on attacker", ACTION_NORMAL + 3), 
+            new NextAction("moonfire on attacker", ACTION_NORMAL + 2),
+            NULL)));
 }
 
 void CasterDruidDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

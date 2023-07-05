@@ -205,6 +205,8 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
             creators["swiftmend on party"] = &DruidAiObjectContextInternal::swiftmend_on_party;
             creators["nourish on party"] = &DruidAiObjectContextInternal::nourish_on_party;
             creators["remove curse on party"] = &DruidAiObjectContextInternal::remove_curse_on_party;
+            creators["insect swarm on attacker"] = &DruidAiObjectContextInternal::insect_swarm_on_attacker;
+            creators["moonfire on attacker"] = &DruidAiObjectContextInternal::moonfire_on_attacker;
         }
 
     private:
@@ -280,6 +282,8 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* swiftmend_on_party(PlayerbotAI *ai) { return new CastPartySwiftmendAction(ai); }
         static Action* nourish_on_party(PlayerbotAI *ai) { return new CastPartyNourishAction(ai); }
         static Action* remove_curse_on_party(PlayerbotAI *ai) { return new CastDruidRemoveCurseOnPartyAction(ai); }
+        static Action* insect_swarm_on_attacker(PlayerbotAI* ai) { return new CastInsectSwarmOnAttackerAction(ai); }
+        static Action* moonfire_on_attacker(PlayerbotAI* ai) { return new CastMoonfireOnAttackerAction(ai); }
 };
 
 DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
