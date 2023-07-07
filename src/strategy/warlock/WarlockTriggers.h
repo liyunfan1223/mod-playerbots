@@ -38,7 +38,7 @@ class CorruptionOnAttackerTrigger : public DebuffOnAttackerTrigger
 class CastCurseOfAgonyOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
     public:
-        CastCurseOfAgonyOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "curse of agony") { }
+        CastCurseOfAgonyOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "curse of agony", true) { }
 };
 
 class SiphonLifeOnAttackerTrigger : public DebuffOnAttackerTrigger
