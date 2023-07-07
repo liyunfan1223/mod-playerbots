@@ -167,6 +167,7 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
             creators["conflagrate"] = &WarlockAiObjectContextInternal::conflagrate;
             creators["amplify curse"] = &WarlockAiObjectContextInternal::amplify_curse;
 
+            creators["immolate on attacker"] = &WarlockAiObjectContextInternal::immolate_on_attacker;
             creators["unstable affliction"] = &WarlockAiObjectContextInternal::unstable_affliction;
             creators["unstable affliction on attacker"] = &WarlockAiObjectContextInternal::unstable_affliction_on_attacker;
             creators["haunt"] = &WarlockAiObjectContextInternal::haunt;
@@ -211,6 +212,7 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* rain_of_fire(PlayerbotAI* botAI) { return new CastRainOfFireAction(botAI); }
         static Action* shadowfury(PlayerbotAI* botAI) { return new CastShadowfuryAction(botAI); }
         static Action* life_tap(PlayerbotAI* botAI) { return new CastLifeTapAction(botAI); }
+        static Action* immolate_on_attacker(PlayerbotAI* ai) { return new CastImmolateOnAttackerAction(ai); }
         static Action* unstable_affliction(PlayerbotAI* ai) { return new CastUnstableAfflictionAction(ai); }
         static Action* unstable_affliction_on_attacker(PlayerbotAI* ai) { return new CastUnstableAfflictionOnAttackerAction(ai); }
         static Action* haunt(PlayerbotAI* ai) { return new CastHauntAction(ai); }
