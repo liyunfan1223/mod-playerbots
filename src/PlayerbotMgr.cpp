@@ -8,6 +8,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PlayerbotMgr.h"
+#include "PlayerbotSecurity.h"
 #include "Playerbots.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
@@ -422,7 +423,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     // set delay on login
     botAI->SetNextCheckDelay(urand(2000, 4000));
 
-    botAI->TellMaster("Hello!");
+    botAI->TellMaster("Hello!", PLAYERBOT_SECURITY_TALK);
 
     if (master && master->GetGroup() && !group) {
         master->GetGroup()->AddMember(bot);
