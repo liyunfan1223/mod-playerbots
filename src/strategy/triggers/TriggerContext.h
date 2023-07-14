@@ -98,6 +98,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["dead"] = &TriggerContext::Dead;
             creators["corpse near"] = &TriggerContext::corpse_near;
             creators["party member dead"] = &TriggerContext::PartyMemberDead;
+            creators["combat party member dead"] = &TriggerContext::CombatPartyMemberDead;
             creators["no pet"] = &TriggerContext::no_pet;
             creators["has pet"] = &TriggerContext::has_pet;
             creators["has attackers"] = &TriggerContext::has_attackers;
@@ -309,6 +310,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* Dead(PlayerbotAI* botAI) { return new DeadTrigger(botAI); }
         static Trigger* corpse_near(PlayerbotAI* botAI) { return new CorpseNearTrigger(botAI); }
         static Trigger* PartyMemberDead(PlayerbotAI* botAI) { return new PartyMemberDeadTrigger(botAI); }
+        static Trigger* CombatPartyMemberDead(PlayerbotAI* botAI) { return new CombatPartyMemberDeadTrigger(botAI); }
         static Trigger* PartyMemberLowHealth(PlayerbotAI* botAI) { return new PartyMemberLowHealthTrigger(botAI); }
         static Trigger* PartyMemberMediumHealth(PlayerbotAI* botAI) { return new PartyMemberMediumHealthTrigger(botAI); }
         static Trigger* PartyMemberAlmostFullHealth(PlayerbotAI* botAI) { return new PartyMemberAlmostFullHealthTrigger(botAI); }

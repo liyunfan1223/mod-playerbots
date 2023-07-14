@@ -7,6 +7,7 @@
 
 #include "Trigger.h"
 #include "PlayerbotAIConfig.h"
+#include <stdexcept>
 
 class PlayerbotAI;
 
@@ -110,6 +111,14 @@ class PartyMemberDeadTrigger : public Trigger
 
         std::string const GetTargetName() override { return "party member to resurrect"; }
 		bool IsActive() override;
+};
+
+class CombatPartyMemberDeadTrigger : public Trigger 
+{
+    public:
+        CombatPartyMemberDeadTrigger(PlayerbotAI* ai) : Trigger(ai, "combat party member to resurrect", 1) {}
+        std::string const GetTargetName() override { return "party member to resurrect"; }
+        bool IsActive() override;
 };
 
 class DeadTrigger : public Trigger

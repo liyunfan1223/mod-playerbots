@@ -75,6 +75,7 @@ class CastRebirthAction : public ResurrectPartyMemberAction
 		CastRebirthAction(PlayerbotAI* botAI) : ResurrectPartyMemberAction(botAI, "rebirth") { }
 
         NextAction** getPrerequisites() override;
+		bool isUseful() override;
 };
 
 class CastMarkOfTheWildAction : public CastBuffSpellAction

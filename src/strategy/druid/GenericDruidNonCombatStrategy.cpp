@@ -118,5 +118,5 @@ void GenericDruidBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     NonCombatStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("mark of the wild on party", NextAction::array(0, new NextAction("mark of the wild on party", 13.0f), nullptr)));
-    triggers.push_back(new TriggerNode("thorns on party", NextAction::array(0, new NextAction("thorns on party", 11.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("thorns on party", NextAction::array(0, new NextAction("thorns on party", 11.0f), nullptr)));
 }
