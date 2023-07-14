@@ -136,7 +136,7 @@ class AoeInGroupTrigger : public Trigger {
     public:
     	AoeInGroupTrigger(PlayerbotAI* ai, std::string name, std::string type, float ratio) :
     		Trigger(ai, name), ratio(ratio), type(type) {}
-        virtual bool IsActive();
+        bool IsActive() override;
     protected:
         float ratio;
         std::string type;
