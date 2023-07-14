@@ -16,8 +16,9 @@ bool ReachTargetAction::Execute(Event event)
 bool ReachTargetAction::isUseful()
 {
     // do not move while casting
-    if (bot->IsNonMeleeSpellCast(true))
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
         return false;
+    }
 
     return AI_VALUE2(float, "distance", GetTargetName()) > (distance + sPlayerbotAIConfig->contactDistance);
 }
