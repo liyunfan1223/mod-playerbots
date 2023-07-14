@@ -63,7 +63,7 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
     if (master)
         masters.push_back(master);
 
-    for (ObjectGuid const guid : nearestPlayers)
+    for (ObjectGuid const guid : nearestGroupPlayers)
     {
         Player* player = botAI->GetPlayer(guid);
         if (!player)
