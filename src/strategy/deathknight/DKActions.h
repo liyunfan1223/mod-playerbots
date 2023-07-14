@@ -40,8 +40,6 @@ class CastDarkCommandAction : public CastSpellAction
 {
 	public:
 		CastDarkCommandAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "dark command") { }
-
-        NextAction** getPrerequisites() override;
 };
 
 BEGIN_RANGED_SPELL_ACTION(CastDeathGripAction, "death grip")

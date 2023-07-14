@@ -14,11 +14,6 @@ NextAction** CastDeathchillAction::getPrerequisites()
     return NextAction::merge(NextAction::array(0, new NextAction("frost presence"), nullptr), CastSpellAction::getPrerequisites());
 }
 
-NextAction** CastDarkCommandAction::getPrerequisites()
-{
-    return NextAction::merge(NextAction::array(0, new NextAction("blood presence"), nullptr), CastSpellAction::getPrerequisites());
-}
-
 NextAction** CastUnholyMeleeSpellAction::getPrerequisites()
 {
     return NextAction::merge(NextAction::array(0, new NextAction("unholy presence"), nullptr), CastMeleeSpellAction::getPrerequisites());
