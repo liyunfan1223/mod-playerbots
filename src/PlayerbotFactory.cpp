@@ -1271,7 +1271,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             if (!CanEquipUnseenItem(slot, dest, newItemId))
                 continue;
             
-            float cur_score = CalculateItemScore(newItemId);
+            float cur_score = CalculateItemScore(newItemId, bot);
             if (cur_score > bestScoreForSlot) {
                 bestScoreForSlot = cur_score;
                 bestItemForSlot = newItemId;
@@ -2866,7 +2866,7 @@ void PlayerbotFactory::LoadEnchantContainer()
    }
 }
 
-float PlayerbotFactory::CalculateItemScore(uint32 item_id)
+float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
 {
     float score = 0;
     int tab = AiFactory::GetPlayerSpecTab(bot);
@@ -2989,7 +2989,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id)
             + defense * 0.25 + dodge * 0.25 + armor * 0.5 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
-    if (proto->Class == ITEM_CLASS_ARMOR && NotSameArmorType(proto->SubClass))
+    if (proto->Class == ITEM_CLASS_ARMOR && NotSameArmorType(proto->SubClass, bot))
     {
         score *= 0.8;
     }
@@ -3008,7 +3008,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id)
             (cls == CLASS_ROGUE) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 1) ||
             (cls == CLASS_WARRIOR && tab == 1 && !bot->HasSpell(46917)) ||
-            IsShieldTank())) {
+            IsShieldTank(bot))) {
                 score *= 0.1;
         }
         // spec with double hand
@@ -3026,13 +3026,13 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id)
     // return score;
 }
 
-bool PlayerbotFactory::IsShieldTank() 
+bool PlayerbotFactory::IsShieldTank(Player* bot) 
 {
     int tab = AiFactory::GetPlayerSpecTab(bot);
     return (bot->getClass() == CLASS_WARRIOR && tab == 2) || (bot->getClass() == CLASS_PALADIN && tab == 1); 
 }
 
-bool PlayerbotFactory::NotSameArmorType(uint32 item_subclass_armor) 
+bool PlayerbotFactory::NotSameArmorType(uint32 item_subclass_armor, Player* bot) 
 {
     if (bot->HasSkill(SKILL_PLATE_MAIL)) {
         return item_subclass_armor != ITEM_SUBCLASS_ARMOR_PLATE;

@@ -3,8 +3,10 @@
  */
 
 #include "ItemUsageValue.h"
+#include "AiFactory.h"
 #include "ChatHelper.h"
 #include "GuildTaskMgr.h"
+#include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "ServerFacade.h"
@@ -180,8 +182,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     }
 
     bool shouldEquip = false;
-    uint32 statWeight = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
-    if (statWeight)
+    // uint32 statWeight = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
+    float itemScore = PlayerbotFactory::CalculateItemScore(itemProto->ItemId, bot);
+    if (itemScore)
         shouldEquip = true;
 
     if (itemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), itemProto))
@@ -201,10 +204,11 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     ItemTemplate const* oldItemProto = oldItem->GetTemplate();
     if (oldItem)
     {
-        uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
-        if (statWeight || oldStatWeight)
+        // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
+        float oldScore = PlayerbotFactory::CalculateItemScore(oldItemProto->ItemId, bot);
+        if (itemScore || oldScore)
         {
-            shouldEquip = statWeight >= oldStatWeight;
+            shouldEquip = itemScore >= oldScore * 1.2;
         }
     }
 

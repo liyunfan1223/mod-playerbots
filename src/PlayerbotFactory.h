@@ -114,6 +114,7 @@ class PlayerbotFactory : public InventoryAction
         void InitSkills();
 
         static uint32 tradeSkills[];
+        static float CalculateItemScore(uint32 item_id, Player* bot);
 
     private:
         void Prepare();
@@ -164,10 +165,9 @@ class PlayerbotFactory : public InventoryAction
         static void AddPrevQuests(uint32 questId, std::list<uint32>& questIds);
         void LoadEnchantContainer();
         void ApplyEnchantTemplate();
-        void ApplyEnchantTemplate(uint8 spec);
-        float CalculateItemScore(uint32 item_id);
-        bool IsShieldTank();
-        bool NotSameArmorType(uint32 item_subclass_armor);
+        void ApplyEnchantTemplate(uint8 spec);  
+        static bool IsShieldTank(Player* bot);
+        static bool NotSameArmorType(uint32 item_subclass_armor, Player* bot);
         EnchantContainer::const_iterator GetEnchantContainerBegin() { return m_EnchantContainer.begin(); }
         EnchantContainer::const_iterator GetEnchantContainerEnd() { return m_EnchantContainer.end(); }
 
