@@ -24,9 +24,9 @@ Unit* PartyMemberValue::FindPartyMember(std::vector<Player*>* party, FindPlayerP
 Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ignoreOutOfGroup)
 {
     Player* master = GetMaster();
-    GuidVector nearestPlayers;
-    if (botAI->AllowActivity(OUT_OF_PARTY_ACTIVITY))
-        nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
+    // GuidVector nearestPlayers;
+    // if (botAI->AllowActivity(OUT_OF_PARTY_ACTIVITY))
+    //     nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
 
     GuidList nearestGroupPlayers;
     if (Group* group = bot->GetGroup())
@@ -51,8 +51,8 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
         return NULL;
     }
 
-    if (!ignoreOutOfGroup && !nearestPlayers.empty() && nearestPlayers.size() < 100)
-        nearestGroupPlayers.insert(nearestGroupPlayers.end(), nearestPlayers.begin(), nearestPlayers.end());
+    // if (!ignoreOutOfGroup && !nearestPlayers.empty() && nearestPlayers.size() < 100)
+    //     nearestGroupPlayers.insert(nearestGroupPlayers.end(), nearestPlayers.begin(), nearestPlayers.end());
 
     // nearestPlayers.insert(nearestP   layers.end(), nearestGroupPlayers.begin(), nearestGroupPlayers.end());
 
@@ -105,14 +105,18 @@ bool PartyMemberValue::Check(Unit* player)
 
 bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &predicate)
 {
-    GuidVector nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
+    // GuidVector nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
     ObjectGuid targetGuid = target ? target->GetGUID() : bot->GetGUID();
     ObjectGuid corpseGuid = target && target->GetCorpse() ? target->GetCorpse()->GetGUID() : ObjectGuid::Empty;
 
-    for (ObjectGuid const guid : nearestPlayers)
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return false;
+    }
+    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
     {
-        Player* player = botAI->GetPlayer(guid);
-        if (!player)
+        Player* player = gref->GetSource();
+        if (!player || player == bot)
             continue;
 
         if (player->IsNonMeleeSpellCast(true))
