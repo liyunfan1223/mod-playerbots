@@ -57,7 +57,7 @@
 #include "XpGainAction.h"
 #include "VehicleActions.h"
 #include "WorldBuffAction.h"
-#include "RaidNaxxAction.h"
+#include "RaidNaxxActions.h"
 
 class PlayerbotAI;
 
@@ -223,42 +223,7 @@ class ActionContext : public NamedObjectContext<Action>
 
             creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
 
-            creators["grobbulus go behind the boss"] = &ActionContext::go_behind_the_boss;
-            creators["rotate grobbulus"] = &ActionContext::rotate_grobbulus;
-            creators["grobbulus move center"] = &ActionContext::grobbulus_move_center;
-
-            creators["heigan dance melee"] = &ActionContext::heigan_dance_melee;
-            creators["heigan dance ranged"] = &ActionContext::heigan_dance_ranged;
-
-            // creators["thaddius attack nearest pet"] = &ActionContext::thaddius_attack_nearest_pet;
-            // creators["thaddius melee to place"] = &ActionContext::thaddius_tank_to_place;
-            // creators["thaddius ranged to place"] = &ActionContext::thaddius_ranged_to_place;
-            // creators["thaddius move to platform"] = &ActionContext::thaddius_move_to_platform;
-            // creators["thaddius move polarity"] = &ActionContext::thaddius_move_polarity;
-
-            // creators["razuvious use obedience crystal"] = &ActionContext::razuvious_use_obedience_crystal;
-            // creators["razuvious target"] = &ActionContext::razuvious_target;
-
-            // creators["horseman attract alternatively"] = &ActionContext::horseman_attract_alternatively;
-            // creators["horseman attack in order"] = &ActionContext::horseman_attack_in_order;
             
-            // creators["sapphiron ground main tank position"] = &ActionContext::sapphiron_ground_main_tank_position;
-            // creators["sapphiron ground position"] = &ActionContext::sapphiron_ground_position;
-            // creators["sapphiron flight position"] = &ActionContext::sapphiron_flight_position;
-            // creators["sapphiron avoid chill"] = &ActionContext::sapphiron_avoid_chill;
-
-            // creators["kel'thuzad choose target"] = &ActionContext::kelthuzad_choose_target;
-            // creators["kel'thuzad position"] = &ActionContext::kelthuzad_position;
-
-            creators["anub'rekhan choose target"] = &ActionContext::anubrekhan_choose_target;
-            creators["anub'rekhan position"] = &ActionContext::anubrekhan_position;
-
-            // creators["gluth choose target"] = &ActionContext::gluth_choose_target;
-            // creators["gluth position"] = &ActionContext::gluth_position;
-            // creators["gluth slowdown"] = &ActionContext::gluth_slowdown;
-
-            // creators["loatheb position"] = &ActionContext::loatheb_position;
-            // creators["loatheb choose target"] = &ActionContext::loatheb_choose_target;
         }
 
     private:
@@ -421,33 +386,7 @@ class ActionContext : public NamedObjectContext<Action>
 
         static Action* toggle_pet_spell(PlayerbotAI* ai) { return new TogglePetSpellAutoCastAction(ai); }
 
-        static Action* go_behind_the_boss(PlayerbotAI* ai) { return new GoBehindTheBossAction(ai); }
-        static Action* rotate_grobbulus(PlayerbotAI* ai) { return new RotateGrobbulusAction(ai); }
-        static Action* grobbulus_move_center(PlayerbotAI* ai) { return new GrobblulusMoveCenterAction(ai); }
-        static Action* heigan_dance_melee(PlayerbotAI* ai) { return new HeiganDanceMeleeAction(ai); }
-        static Action* heigan_dance_ranged(PlayerbotAI* ai) { return new HeiganDanceRangedAction(ai); }
-        // static Action* thaddius_attack_nearest_pet(PlayerbotAI* ai) { return new ThaddiusAttackNearestPetAction(ai); }
-        // static Action* thaddius_tank_to_place(PlayerbotAI* ai) { return new ThaddiusMeleeToPlaceAction(ai); }
-        // static Action* thaddius_ranged_to_place(PlayerbotAI* ai) { return new ThaddiusRangedToPlaceAction(ai); }
-        // static Action* thaddius_move_to_platform(PlayerbotAI* ai) { return new ThaddiusMoveToPlatformAction(ai); }
-        // static Action* thaddius_move_polarity(PlayerbotAI* ai) { return new ThaddiusMovePolarityAction(ai); }
-        // static Action* razuvious_target(PlayerbotAI* ai) { return new RazuviousTargetAction(ai); }
-        // static Action* razuvious_use_obedience_crystal(PlayerbotAI* ai) { return new RazuviousUseObedienceCrystalAction(ai); }
-        // static Action* horseman_attract_alternatively(PlayerbotAI* ai) { return new HorsemanAttractAlternativelyAction(ai); }
-        // static Action* horseman_attack_in_order(PlayerbotAI* ai) { return new HorsemanAttactInOrderAction(ai); }
-        // static Action* sapphiron_ground_main_tank_position(PlayerbotAI* ai) { return new SapphironGroundMainTankPositionAction(ai); }
-        // static Action* sapphiron_ground_position(PlayerbotAI* ai) { return new SapphironGroundPositionAction(ai); }
-        // static Action* sapphiron_flight_position(PlayerbotAI* ai) { return new SapphironFlightPositionAction(ai); }
-        // static Action* sapphiron_avoid_chill(PlayerbotAI* ai) { return new SapphironAvoidChillAction(ai); }
-        // static Action* kelthuzad_choose_target(PlayerbotAI* ai) { return new KelthuzadChooseTargetAction(ai); }
-        // static Action* kelthuzad_position(PlayerbotAI* ai) { return new KelthuzadPositionAction(ai); }
-        static Action* anubrekhan_choose_target(PlayerbotAI* ai) { return new AnubrekhanChooseTargetAction(ai); }
-        static Action* anubrekhan_position(PlayerbotAI* ai) { return new AnubrekhanPositionAction(ai); }
-        // static Action* gluth_choose_target(PlayerbotAI* ai) { return new GluthChooseTargetAction(ai); }
-        // static Action* gluth_position(PlayerbotAI* ai) { return new GluthPositionAction(ai); }
-        // static Action* gluth_slowdown(PlayerbotAI* ai) { return new GluthSlowdownAction(ai); }
-        // static Action* loatheb_position(PlayerbotAI* ai) { return new LoathebPositionAction(ai); }
-        // static Action* loatheb_choose_target(PlayerbotAI* ai) { return new LoathebChooseTargetAction(ai); }
+        
 };
 
 #endif

@@ -1,11 +1,9 @@
 
 #include "Playerbots.h"
-#include "RaidNaxxAction.h"
-#include "RaidStrategy.h"
+#include "RaidNaxxActions.h"
+#include "RaidNaxxStrategy.h"
 #include "ScriptedCreature.h"
-#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_heigan.h"
-#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_grobbulus.h"
-#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_anubrekhan.h"
+
 
 using namespace std;
 

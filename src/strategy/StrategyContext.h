@@ -47,7 +47,7 @@
 #include "UseFoodStrategy.h"
 #include "UsePotionsStrategy.h"
 #include "WorldPacketHandlerStrategy.h"
-#include "RaidStrategy.h"
+#include "RaidNaxxStrategy.h"
 
 class StrategyContext : public NamedObjectContext<Strategy>
 {
@@ -221,15 +221,6 @@ class QuestStrategyContext : public NamedObjectContext<Strategy>
         static Strategy* accept_all_quests(PlayerbotAI* botAI) { return new AcceptAllQuestsStrategy(botAI); }
 };
 
-class RaidStrategyContext : public NamedObjectContext<Strategy>
-{
-    public:
-        RaidStrategyContext() : NamedObjectContext<Strategy>(false, true)
-        {
-            creators["naxx"] = &RaidStrategyContext::naxx;
-        }
-    private:
-        static Strategy* naxx(PlayerbotAI* botAI) { return new RaidNaxxGenericStrategy(botAI); }
-};
+
 
 #endif

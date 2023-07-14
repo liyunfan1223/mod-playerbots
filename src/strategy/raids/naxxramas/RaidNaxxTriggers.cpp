@@ -1,6 +1,6 @@
 #include "EventMap.h"
 #include "Playerbots.h"
-#include "RaidNaxxTrigger.h"
+#include "RaidNaxxTriggers.h"
 #include "ScriptedCreature.h"
 
 bool AuraRemovedTrigger::IsActive() {

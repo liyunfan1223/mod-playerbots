@@ -1,9 +1,8 @@
 
-#ifndef _PLAYERBOT_RAIDSTRATEGY_H
-#define _PLAYERBOT_RAIDSTRATEGY_H
+#ifndef _PLAYERRBOT_RAIDNAXXMULTIPLIERS_H_
+#define _PLAYERRBOT_RAIDNAXXMULTIPLIERS_H_
 
 #include "Multiplier.h"
-#include "Strategy.h"
 
 class HeiganDanceMultiplier : public Multiplier
 {
@@ -95,14 +94,4 @@ public:
 //     virtual float GetValue(Action* action);
 // };
 
-class RaidNaxxGenericStrategy : public Strategy
-{
-public:
-    RaidNaxxGenericStrategy(PlayerbotAI* ai) : Strategy(ai) {}
-    virtual std::string const getName() override { return "naxx"; }
-    virtual void InitTriggers(std::vector<TriggerNode*> &triggers) override;
-    virtual void InitMultipliers(std::vector<Multiplier*> &multipliers) override;
-};
-
-  
 #endif

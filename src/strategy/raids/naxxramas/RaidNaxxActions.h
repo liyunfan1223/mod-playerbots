@@ -1,5 +1,5 @@
-#ifndef _PLAYERBOT_RAIDNAXXACTION_H
-#define _PLAYERBOT_RAIDNAXXACTION_H
+#ifndef _PLAYERBOT_RAIDNAXXACTIONS_H
+#define _PLAYERBOT_RAIDNAXXACTIONS_H
 
 #include "Action.h"
 #include "MovementActions.h"
@@ -7,6 +7,7 @@
 #include "GenericActions.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
+#include "RaidNaxxScripts.h"
 
 // just for test
 // class TryToGetBossAIAction : public Action

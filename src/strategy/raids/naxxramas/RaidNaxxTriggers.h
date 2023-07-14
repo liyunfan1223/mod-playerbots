@@ -1,13 +1,12 @@
 
-#ifndef _PLAYERBOT_RAIDNAXXTRIGGER_H
-#define _PLAYERBOT_RAIDNAXXTRIGGER_H
+#ifndef _PLAYERBOT_RAIDNAXXTRIGGERS_H
+#define _PLAYERBOT_RAIDNAXXTRIGGERS_H
 
 #include "EventMap.h"
 #include "Trigger.h"
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
-#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_grobbulus.h"
-#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_anubrekhan.h"
+#include "RaidNaxxScripts.h"
 
 using namespace std;
 
