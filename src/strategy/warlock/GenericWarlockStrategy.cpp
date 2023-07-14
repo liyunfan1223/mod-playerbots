@@ -38,7 +38,7 @@ GenericWarlockStrategy::GenericWarlockStrategy(PlayerbotAI* botAI) : CombatStrat
 
 NextAction** GenericWarlockStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("shoot", 10.0f), nullptr);
+    return NextAction::array(0, nullptr);
 }
 
 void GenericWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
