@@ -55,8 +55,6 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
 
     if (bot->getLevel() >= 10 && ((tabs[0] + tabs[1] + tabs[2]) > 0))
     {
-        std::map<uint8, uint32> tabs = GetPlayerSpecTabs(bot);
-
         int8 tab = -1;
         uint32 max = 0;
         for (uint32 i = 0; i < uint32(3); i++)
@@ -98,10 +96,12 @@ std::map<uint8, uint32> AiFactory::GetPlayerSpecTabs(Player* bot)
     for (PlayerTalentMap::const_iterator i = talentMap.begin(); i != talentMap.end(); ++i)
     {
         uint32 spellId = i->first;
+        if ((bot->GetActiveSpecMask() & i->second->specMask) == 0) {
+            continue;
+        }
         TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
         if(!talentPos)
             continue;
-
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentPos->talent_id);
         if (!talentInfo)
             continue;
