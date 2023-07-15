@@ -51,8 +51,8 @@ void FuryWarriorStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("charge", ACTION_MOVE + 9), nullptr)));
     triggers.push_back(new TriggerNode("berserker stance", NextAction::array(0, new NextAction("berserker stance", ACTION_HIGH + 9), nullptr)));
     triggers.push_back(new TriggerNode("battle shout", NextAction::array(0, new NextAction("battle shout", ACTION_HIGH + 8), nullptr)));
-    triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), nullptr)));
-    triggers.push_back(new TriggerNode("sudden death", NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), nullptr)));
+    // triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), nullptr)));
+    // triggers.push_back(new TriggerNode("sudden death", NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), nullptr)));
 	triggers.push_back(new TriggerNode("hamstring", NextAction::array(0, new NextAction("piercing howl", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode("pummel on enemy healer", NextAction::array(0, new NextAction("pummel on enemy healer", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("pummel", NextAction::array(0, new NextAction("pummel", ACTION_INTERRUPT), nullptr)));
@@ -60,16 +60,9 @@ void FuryWarriorStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("intercept on snare target", NextAction::array(0, new NextAction("intercept on snare target", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("bloodthirst", NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("instant slam", NextAction::array(0, new NextAction("slam", ACTION_HIGH + 1), nullptr)));
-    // triggers.push_back(new TriggerNode("medium rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 10), nullptr)));
     triggers.push_back(new TriggerNode("berserker rage", NextAction::array(0, new NextAction("berserker rage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("death wish", NextAction::array(0, new NextAction("death wish", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("rampage", NextAction::array(0, new NextAction("rampage", ACTION_INTERRUPT + 1), nullptr)));
-    // triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("intimidating shout", ACTION_EMERGENCY), nullptr)));
-    // triggers.push_back(new TriggerNode(
-    //     "slam",
-    //     NextAction::array(0, new NextAction("slam", ACTION_HIGH + 2), NULL)));
-    triggers.push_back(new TriggerNode(
-        "high rage available",
-        NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 1), NULL)));
+    triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 1), NULL)));
 }
