@@ -127,11 +127,10 @@ bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &
                 if (spell && predicate.Check(spell->m_spellInfo))
                 {
                     ObjectGuid unitTarget = spell->m_targets.GetUnitTargetGUID();
-                    if (unitTarget == targetGuid)
+                    if (unitTarget && unitTarget == targetGuid)
                         return true;
-
                     ObjectGuid corpseTarget = spell->m_targets.GetCorpseTargetGUID();
-                    if (corpseTarget == corpseGuid)
+                    if (corpseTarget && corpseTarget == corpseGuid)
                         return true;
                 }
             }
