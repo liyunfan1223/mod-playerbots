@@ -5,6 +5,7 @@
 #include "PaladinActions.h"
 #include "Event.h"
 #include "Playerbots.h"
+#include "SharedDefines.h"
 
 inline std::string const GetActualBlessingOfMight(Unit* target)
 {
@@ -25,6 +26,7 @@ inline std::string const GetActualBlessingOfWisdom(Unit* target)
     {
         case CLASS_WARRIOR:
         case CLASS_ROGUE:
+        case CLASS_DEATH_KNIGHT:
             return "blessing of might";
     }
 
@@ -33,7 +35,7 @@ inline std::string const GetActualBlessingOfWisdom(Unit* target)
 
 Value<Unit*>* CastBlessingOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", "blessing of kings,blessing of might,blessing of wisdom");
+    return context->GetValue<Unit*>("party member without aura", name);
 }
 
 bool CastBlessingOfMightAction::Execute(Event event)
@@ -44,6 +46,12 @@ bool CastBlessingOfMightAction::Execute(Event event)
 
     return botAI->CastSpell(GetActualBlessingOfMight(target), target);
 }
+
+Value<Unit*>* CastBlessingOfMightOnPartyAction::GetTargetValue()
+{
+    return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom");
+}
+
 
 bool CastBlessingOfMightOnPartyAction::Execute(Event event)
 {
@@ -61,6 +69,11 @@ bool CastBlessingOfWisdomAction::Execute(Event event)
         return false;
 
     return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
+}
+
+Value<Unit*>* CastBlessingOfWisdomOnPartyAction::GetTargetValue()
+{
+    return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom");
 }
 
 bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)

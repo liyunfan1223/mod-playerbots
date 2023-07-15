@@ -10,6 +10,32 @@
 
 class PlayerbotAI;
 
+inline std::string const GetActualBlessingOfMight(Unit* target)
+{
+    switch (target->getClass())
+    {
+        case CLASS_MAGE:
+        case CLASS_PRIEST:
+        case CLASS_WARLOCK:
+            return "blessing of wisdom";
+    }
+
+    return "blessing of might";
+}
+
+inline std::string const GetActualBlessingOfWisdom(Unit* target)
+{
+    switch (target->getClass())
+    {
+        case CLASS_WARRIOR:
+        case CLASS_ROGUE:
+        case CLASS_DEATH_KNIGHT:
+            return "blessing of might";
+    }
+
+    return "blessing of wisdom";
+}
+
 BUFF_TRIGGER(HolyShieldTrigger, "holy shield");
 BUFF_TRIGGER(RighteousFuryTrigger, "righteous fury");
 
@@ -170,5 +196,23 @@ class SacredShieldOnMainTankTrigger : public BuffOnMainTankTrigger
 {
 public:
     SacredShieldOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "sacred shield", false) {}
+};
+
+class BlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
+{
+    public:
+        BlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings", 2) { }
+};
+
+class BlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
+{
+    public:
+        BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2) { }
+};
+
+class BlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
+{
+    public:
+        BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2) { }
 };
 #endif

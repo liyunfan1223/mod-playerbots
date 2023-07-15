@@ -128,6 +128,10 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["repentance interrupt"] = &PaladinTriggerFactoryInternal::repentance_interrupt;
             creators["beacon of light on main tank"] = &PaladinTriggerFactoryInternal::beacon_of_light_on_main_tank;
             creators["sacred shield on main tank"] = &PaladinTriggerFactoryInternal::sacred_shield_on_main_tank;
+
+            creators["blessing of kings on party"] = &PaladinTriggerFactoryInternal::blessing_of_kings_on_party;
+            creators["blessing of wisdom on party"] = &PaladinTriggerFactoryInternal::blessing_of_wisdom_on_party;
+            creators["blessing of might on party"] = &PaladinTriggerFactoryInternal::blessing_of_might_on_party;
         }
 
     private:
@@ -167,6 +171,10 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* repentance_interrupt(PlayerbotAI* botAI) { return new RepentanceInterruptTrigger(botAI); }
         static Trigger* beacon_of_light_on_main_tank(PlayerbotAI* ai) { return new BeaconOfLightOnMainTankTrigger(ai); }
         static Trigger* sacred_shield_on_main_tank(PlayerbotAI* ai) { return new SacredShieldOnMainTankTrigger(ai); }
+
+        static Trigger* blessing_of_kings_on_party(PlayerbotAI* botAI) { return new BlessingOfKingsOnPartyTrigger(botAI); }
+        static Trigger* blessing_of_wisdom_on_party(PlayerbotAI* botAI) { return new BlessingOfWisdomOnPartyTrigger(botAI); }
+        static Trigger* blessing_of_might_on_party(PlayerbotAI* botAI) { return new BlessingOfMightOnPartyTrigger(botAI); }
 };
 
 class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
