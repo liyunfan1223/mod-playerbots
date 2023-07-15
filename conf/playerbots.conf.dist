@@ -666,37 +666,37 @@ Logger.playerbots=5,Playerbots
 # Warrior
 AiPlayerbot.RandomClassSpecProbability.1.0 = 20
 AiPlayerbot.DefaultTalentsOrder.1.0 =
-AiPlayerbot.RandomClassSpecProbability.1.1 = 30
+AiPlayerbot.RandomClassSpecProbability.1.1 = 40
 AiPlayerbot.DefaultTalentsOrder.1.1 =
-AiPlayerbot.RandomClassSpecProbability.1.2 = 50
+AiPlayerbot.RandomClassSpecProbability.1.2 = 40
 AiPlayerbot.DefaultTalentsOrder.1.2 =
 # Paladin
-AiPlayerbot.RandomClassSpecProbability.2.0 = 20
+AiPlayerbot.RandomClassSpecProbability.2.0 = 30
 AiPlayerbot.DefaultTalentsOrder.2.0 =
-AiPlayerbot.RandomClassSpecProbability.2.1 = 50
+AiPlayerbot.RandomClassSpecProbability.2.1 = 40
 AiPlayerbot.DefaultTalentsOrder.2.1 =
 AiPlayerbot.RandomClassSpecProbability.2.2 = 30
 AiPlayerbot.DefaultTalentsOrder.2.2 =
 # Hunter
-AiPlayerbot.RandomClassSpecProbability.3.0 = 25
+AiPlayerbot.RandomClassSpecProbability.3.0 = 33
 AiPlayerbot.DefaultTalentsOrder.3.0 =
-AiPlayerbot.RandomClassSpecProbability.3.1 = 50
+AiPlayerbot.RandomClassSpecProbability.3.1 = 33
 AiPlayerbot.DefaultTalentsOrder.3.1 =
-AiPlayerbot.RandomClassSpecProbability.3.2 = 25
+AiPlayerbot.RandomClassSpecProbability.3.2 = 33
 AiPlayerbot.DefaultTalentsOrder.3.2 =
 # Rogue
 AiPlayerbot.RandomClassSpecProbability.4.0 = 40
 AiPlayerbot.DefaultTalentsOrder.4.0 = 0-0-2-5, 0-1-3-3, 0-1-0-3, 0-2-2-5, 0-3-2-5, 0-3-1-3, 0-4-1-1, 0-5-2-2, 0-5-1-5, 0-6-1-1, 0-2-1-2, 0-7-2-3, 0-7-0-3, 0-8-1-1, 0-8-0-3, 0-9-1-5, 0-10-1-1, 1-0-2-5, 1-1-3-5, 1-2-2-5, 1-3-2-3, 2-0-0-2
-AiPlayerbot.RandomClassSpecProbability.4.1 = 50
+AiPlayerbot.RandomClassSpecProbability.4.1 = 40
 AiPlayerbot.DefaultTalentsOrder.4.1 =
-AiPlayerbot.RandomClassSpecProbability.4.2 = 10
+AiPlayerbot.RandomClassSpecProbability.4.2 = 20
 AiPlayerbot.DefaultTalentsOrder.4.2 =
 # Priest
 AiPlayerbot.RandomClassSpecProbability.5.0 = 40
 AiPlayerbot.DefaultTalentsOrder.5.0 =
-AiPlayerbot.RandomClassSpecProbability.5.1 = 40
+AiPlayerbot.RandomClassSpecProbability.5.1 = 30
 AiPlayerbot.DefaultTalentsOrder.5.1 =
-AiPlayerbot.RandomClassSpecProbability.5.2 = 20
+AiPlayerbot.RandomClassSpecProbability.5.2 = 30
 AiPlayerbot.DefaultTalentsOrder.5.2 =
 # DeathKnight
 AiPlayerbot.RandomClassSpecProbability.6.0 = 33
@@ -706,32 +706,32 @@ AiPlayerbot.DefaultTalentsOrder.6.1 =
 AiPlayerbot.RandomClassSpecProbability.6.2 = 33
 AiPlayerbot.DefaultTalentsOrder.6.2 =
 # Shaman
-AiPlayerbot.RandomClassSpecProbability.7.0 = 10
+AiPlayerbot.RandomClassSpecProbability.7.0 = 33
 AiPlayerbot.DefaultTalentsOrder.7.0 =
-AiPlayerbot.RandomClassSpecProbability.7.1 = 45
+AiPlayerbot.RandomClassSpecProbability.7.1 = 33
 AiPlayerbot.DefaultTalentsOrder.7.1 =
-AiPlayerbot.RandomClassSpecProbability.7.2 = 45
+AiPlayerbot.RandomClassSpecProbability.7.2 = 33
 AiPlayerbot.DefaultTalentsOrder.7.2 =
 # Mage
 AiPlayerbot.RandomClassSpecProbability.8.0 = 20
 AiPlayerbot.DefaultTalentsOrder.8.0 =
-AiPlayerbot.RandomClassSpecProbability.8.1 = 10
+AiPlayerbot.RandomClassSpecProbability.8.1 = 20
 AiPlayerbot.DefaultTalentsOrder.8.1 =
-AiPlayerbot.RandomClassSpecProbability.8.2 = 70
+AiPlayerbot.RandomClassSpecProbability.8.2 = 60
 AiPlayerbot.DefaultTalentsOrder.8.2 =
 # Warlock
-AiPlayerbot.RandomClassSpecProbability.9.0 = 33
+AiPlayerbot.RandomClassSpecProbability.9.0 = 40
 AiPlayerbot.DefaultTalentsOrder.9.0 =
-AiPlayerbot.RandomClassSpecProbability.9.1 = 33
+AiPlayerbot.RandomClassSpecProbability.9.1 = 40
 AiPlayerbot.DefaultTalentsOrder.9.1 =
-AiPlayerbot.RandomClassSpecProbability.9.2 = 33
+AiPlayerbot.RandomClassSpecProbability.9.2 = 20
 AiPlayerbot.DefaultTalentsOrder.9.2 =
 # Druid
-AiPlayerbot.RandomClassSpecProbability.11.0 = 10
+AiPlayerbot.RandomClassSpecProbability.11.0 = 20
 AiPlayerbot.DefaultTalentsOrder.11.0 =
-AiPlayerbot.RandomClassSpecProbability.11.1 = 45
+AiPlayerbot.RandomClassSpecProbability.11.1 = 40
 AiPlayerbot.DefaultTalentsOrder.11.1 =
-AiPlayerbot.RandomClassSpecProbability.11.2 = 45
+AiPlayerbot.RandomClassSpecProbability.11.2 = 40
 AiPlayerbot.DefaultTalentsOrder.11.2 =
 
 # no idea - TC was requesting these.. so..
