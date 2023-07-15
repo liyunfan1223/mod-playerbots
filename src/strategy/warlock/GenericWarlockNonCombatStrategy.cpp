@@ -79,6 +79,7 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
 
     triggers.push_back(new TriggerNode("demon armor", NextAction::array(0, new NextAction("fel armor", 21.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
 }
 
 void WarlockPetStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
