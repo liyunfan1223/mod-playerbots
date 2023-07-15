@@ -7,6 +7,7 @@
 
 #include "CureTriggers.h"
 #include "SharedDefines.h"
+#include "Unit.h"
 
 class PlayerbotAI;
 
