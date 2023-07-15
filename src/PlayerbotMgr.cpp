@@ -647,6 +647,23 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         return messages;
     }
 
+    if (!strcmp(cmd, "initself")) {
+        if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
+            OnBotLogin(master);
+            PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_EPIC);
+            factory.Randomize(false);
+            // LogoutPlayerBot(master->GetGUID());
+            // DisablePlayerBot(master->GetGUID());
+            // sPlayerbotsMgr->AddPlayerbotData(master, false);
+            // sRandomPlayerbotMgr->OnPlayerLogin(master);
+            messages.push_back("initself ok. please logout to refresh.");
+            return messages;
+        } else {
+            messages.push_back("ERROR: Only GM can use this command.");
+            return messages;
+        }
+    }
+
     if (!strcmp(cmd, "list"))
     {
         messages.push_back(ListBots(master));
