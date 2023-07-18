@@ -291,6 +291,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["find target"] = &ValueContext::find_target;
             creators["boss target"] = &ValueContext::boss_target;
             creators["nearest triggers"] = &ValueContext::nearest_triggers;
+            creators["neglect threat"] = &ValueContext::neglect_threat;
         }
 
     private:
@@ -486,6 +487,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* find_target(PlayerbotAI* ai) { return new FindTargetValue(ai); }
         static UntypedValue* boss_target(PlayerbotAI* ai) { return new BossTargetValue(ai); }
         static UntypedValue* nearest_triggers(PlayerbotAI* ai) { return new NearestTriggersValue(ai); }
+        static UntypedValue* neglect_threat(PlayerbotAI* ai) { return new NeglectThreatResetValue(ai); }
 };
 
 #endif

@@ -48,6 +48,7 @@ class FleeAction : public MovementAction
         FleeAction(PlayerbotAI* botAI, float distance = sPlayerbotAIConfig->spellDistance) : MovementAction(botAI, "flee"), distance(distance) { }
 
         bool Execute(Event event) override;
+        bool isUseful() override;
 
 	private:
 		float distance;

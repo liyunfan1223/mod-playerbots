@@ -25,8 +25,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
             // creators["thaddius move to platform"] = &RaidNaxxActionContext::thaddius_move_to_platform;
             // creators["thaddius move polarity"] = &RaidNaxxActionContext::thaddius_move_polarity;
 
-            // creators["razuvious use obedience crystal"] = &RaidNaxxActionContext::razuvious_use_obedience_crystal;
-            // creators["razuvious target"] = &RaidNaxxActionContext::razuvious_target;
+            creators["razuvious use obedience crystal"] = &RaidNaxxActionContext::razuvious_use_obedience_crystal;
+            creators["razuvious target"] = &RaidNaxxActionContext::razuvious_target;
 
             // creators["horseman attract alternatively"] = &RaidNaxxActionContext::horseman_attract_alternatively;
             // creators["horseman attack in order"] = &RaidNaxxActionContext::horseman_attack_in_order;
@@ -60,8 +60,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
         // static Action* thaddius_ranged_to_place(PlayerbotAI* ai) { return new ThaddiusRangedToPlaceAction(ai); }
         // static Action* thaddius_move_to_platform(PlayerbotAI* ai) { return new ThaddiusMoveToPlatformAction(ai); }
         // static Action* thaddius_move_polarity(PlayerbotAI* ai) { return new ThaddiusMovePolarityAction(ai); }
-        // static Action* razuvious_target(PlayerbotAI* ai) { return new RazuviousTargetAction(ai); }
-        // static Action* razuvious_use_obedience_crystal(PlayerbotAI* ai) { return new RazuviousUseObedienceCrystalAction(ai); }
+        static Action* razuvious_target(PlayerbotAI* ai) { return new RazuviousTargetAction(ai); }
+        static Action* razuvious_use_obedience_crystal(PlayerbotAI* ai) { return new RazuviousUseObedienceCrystalAction(ai); }
         // static Action* horseman_attract_alternatively(PlayerbotAI* ai) { return new HorsemanAttractAlternativelyAction(ai); }
         // static Action* horseman_attack_in_order(PlayerbotAI* ai) { return new HorsemanAttactInOrderAction(ai); }
         // static Action* sapphiron_ground_main_tank_position(PlayerbotAI* ai) { return new SapphironGroundMainTankPositionAction(ai); }

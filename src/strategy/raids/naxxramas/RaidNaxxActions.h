@@ -127,19 +127,23 @@ protected:
 //     virtual bool isUseful();
 // };
 
-// class RazuviousUseObedienceCrystalAction : public MovementAction
-// {
-// public:
-//     RazuviousUseObedienceCrystalAction(PlayerbotAI* ai) : MovementAction(ai, "razuvious use obedience crystal") {}
-//     virtual bool Execute(Event event);
-// };
+class RazuviousUseObedienceCrystalAction : public MovementAction
+{
+    public:
+        RazuviousUseObedienceCrystalAction(PlayerbotAI* ai) : MovementAction(ai, "razuvious use obedience crystal"), helper(ai) {}
+        bool Execute(Event event) override;
+    private:
+        RazuviousBossHelper helper;
+};
 
-// class RazuviousTargetAction : public AttackAction
-// {
-// public:
-//     RazuviousTargetAction(PlayerbotAI* ai) : AttackAction(ai, "razuvious target") {}
-//     virtual bool Execute(Event event);
-// };
+class RazuviousTargetAction : public AttackAction
+{
+    public:
+        RazuviousTargetAction(PlayerbotAI* ai) : AttackAction(ai, "razuvious target"), helper(ai) {}
+        bool Execute(Event event) override;
+    private:
+        RazuviousBossHelper helper;
+};
 
 // class HorsemanAttractAlternativelyAction : public AttackAction
 // {

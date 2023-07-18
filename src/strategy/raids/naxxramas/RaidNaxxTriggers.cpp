@@ -91,23 +91,23 @@ bool HeiganRangedTrigger::IsActive()
     return botAI->IsRanged(bot);
 }
 
-// bool RazuviousTankTrigger::IsActive()
-// {
-//     Difficulty diff = bot->GetRaidDifficulty();
-//     if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
-//         return BossPhaseTrigger::IsActive() && botAI->IsTank(bot);
-//     }
-//     return BossPhaseTrigger::IsActive() && bot->getClass() == CLASS_PRIEST;
-// }
+bool RazuviousTankTrigger::IsActive()
+{
+    Difficulty diff = bot->GetRaidDifficulty();
+    if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
+        return helper.UpdateBossAI() && botAI->IsTank(bot);
+    }
+    return helper.UpdateBossAI() && bot->getClass() == CLASS_PRIEST;
+}
 
-// bool RazuviousNontankTrigger::IsActive()
-// {
-//     Difficulty diff = bot->GetRaidDifficulty();
-//     if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
-//         return BossPhaseTrigger::IsActive() && !(botAI->IsTank(bot));
-//     }
-//     return BossPhaseTrigger::IsActive() && !(bot->getClass() == CLASS_PRIEST);
-// }
+bool RazuviousNontankTrigger::IsActive()
+{
+    Difficulty diff = bot->GetRaidDifficulty();
+    if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
+        return helper.UpdateBossAI() && !(botAI->IsTank(bot));
+    }
+    return helper.UpdateBossAI() && !(bot->getClass() == CLASS_PRIEST);
+}
 
 // bool HorsemanAttractorsTrigger::IsActive()
 // {

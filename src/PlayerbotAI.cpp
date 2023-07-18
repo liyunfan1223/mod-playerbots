@@ -248,9 +248,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     // check activity
     AllowActivity();
 
-    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) {
-        return;
-    }
+    // if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) {
+    //     return;
+    // }
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (currentSpell && currentSpell->getState() == SPELL_STATE_CASTING && currentSpell->GetCastTime())
     {
@@ -2004,6 +2004,12 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
             LOG_DEBUG("playerbots", "Can cast spell failed. Bot not has spell. - target name: {}, spellid: {}, bot name: {}", 
                 target->GetName(), spellid, bot->GetName());
         }
+        return false;
+    }
+
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
+        LOG_DEBUG("playerbot", "CanCastSpell() target name: {}, spellid: {}, bot name: {}, failed because has current channeled spell", 
+            target->GetName(), spellid, bot->GetName());
         return false;
     }
 

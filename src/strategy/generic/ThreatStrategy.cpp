@@ -8,6 +8,10 @@
 
 float ThreatMultiplier::GetValue(Action* action)
 {
+    if (AI_VALUE(bool, "neglect threat")) {
+        return 1.0f;
+    }
+    
     if (!action || action->getThreatType() == Action::ActionThreatType::None)
         return 1.0f;
 

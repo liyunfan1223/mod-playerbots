@@ -97,5 +97,9 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "enemy too close for spell",
 		NextAction::array(0, new NextAction("flee", 49.0f), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "medium mana",
+        NextAction::array(0, new NextAction("mana tide totem", ACTION_HIGH + 5), NULL)));
+
     triggers.push_back(new TriggerNode("party member to heal out of spell range", NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), nullptr)));
 }

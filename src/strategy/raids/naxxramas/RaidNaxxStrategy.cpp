@@ -30,6 +30,22 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 		"heigan ranged", 
 		NextAction::array(0, new NextAction("heigan dance ranged", ACTION_RAID + 1), NULL)));
 
+	// Kel'Thuzad
+	triggers.push_back(new TriggerNode(
+		"kel'thuzad", 
+		NextAction::array(0, 
+			new NextAction("kel'thuzad choose target", ACTION_RAID + 1), 
+   			new NextAction("kel'thuzad position", ACTION_RAID + 1),
+		NULL)));
+
+	// Anub'Rekhan
+	triggers.push_back(new TriggerNode(
+		"anub'rekhan", 
+		NextAction::array(0, 
+			// new NextAction("anub'rekhan choose target", ACTION_RAID + 1), 
+   			new NextAction("anub'rekhan position", ACTION_RAID + 1),
+		NULL)));
+
 	// Thaddius
 	// triggers.push_back(new TriggerNode(
 	// 	"thaddius phase pet", 
@@ -51,14 +67,14 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// 	"thaddius phase thaddius", 
 	// 	NextAction::array(0, new NextAction("thaddius move polarity", ACTION_RAID + 1), NULL)));
 
-	// // Instructor Razuvious
-	// triggers.push_back(new TriggerNode(
-	// 	"razuvious tank", 
-	// 	NextAction::array(0, new NextAction("razuvious use obedience crystal", ACTION_RAID + 1), NULL)));
+	// Instructor Razuvious
+	triggers.push_back(new TriggerNode(
+		"razuvious tank", 
+		NextAction::array(0, new NextAction("razuvious use obedience crystal", ACTION_RAID + 1), NULL)));
 	
-	// triggers.push_back(new TriggerNode(
-	// 	"razuvious nontank", 
-	// 	NextAction::array(0, new NextAction("razuvious target", ACTION_RAID + 1), NULL)));
+	triggers.push_back(new TriggerNode(
+		"razuvious nontank", 
+		NextAction::array(0, new NextAction("razuvious target", ACTION_RAID + 1), NULL)));
 
 	// // four horseman
 	// triggers.push_back(new TriggerNode(
@@ -86,21 +102,7 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// 	"sapphiron chill", 
 	// 	NextAction::array(0, new NextAction("sapphiron avoid chill", ACTION_RAID + 1), NULL)));
 	
-	// Kel'Thuzad
-	triggers.push_back(new TriggerNode(
-		"kel'thuzad", 
-		NextAction::array(0, 
-			new NextAction("kel'thuzad choose target", ACTION_RAID + 1), 
-   			new NextAction("kel'thuzad position", ACTION_RAID + 1),
-		NULL)));
-
-	// Anub'Rekhan
-	triggers.push_back(new TriggerNode(
-		"anub'rekhan", 
-		NextAction::array(0, 
-			// new NextAction("anub'rekhan choose target", ACTION_RAID + 1), 
-   			new NextAction("anub'rekhan position", ACTION_RAID + 1),
-		NULL)));
+	
 
 	// // Gluth
 	// triggers.push_back(new TriggerNode(
@@ -115,6 +117,7 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// 	"gluth main tank mortal wound", 
 	// 	NextAction::array(0, 
 	// 		new NextAction("taunt spell", ACTION_RAID + 1), NULL)));
+
 	// // Loatheb
 	// triggers.push_back(new TriggerNode(
 	// 	"loatheb", 
@@ -130,7 +133,7 @@ void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 	// multipliers.push_back(new LoathebGenericMultiplier(ai));
 	// multipliers.push_back(new ThaddiusGenericMultiplier(ai));
 	// multipliers.push_back(new SapphironGenericMultiplier(ai));
-	// multipliers.push_back(new InstructorRazuviousGenericMultiplier(ai));
+	multipliers.push_back(new InstructorRazuviousGenericMultiplier(botAI));
 	multipliers.push_back(new KelthuzadGenericMultiplier(botAI));
 	multipliers.push_back(new AnubrekhanGenericMultiplier(botAI));
 	// multipliers.push_back(new FourhorsemanGenericMultiplier(ai));

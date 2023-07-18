@@ -79,9 +79,42 @@ public:
 
 class HeiganRangedTrigger : public Trigger
 {
+    public:
+        HeiganRangedTrigger(PlayerbotAI* ai): Trigger(ai, "heigan ranged") {}
+        bool IsActive() override;
+};
+
+class RazuviousTankTrigger : public Trigger
+{
+    public:
+        RazuviousTankTrigger(PlayerbotAI* ai) : Trigger(ai, "instructor razuvious tank"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        RazuviousBossHelper helper;
+};
+
+class RazuviousNontankTrigger : public Trigger
+{
+    public:
+        RazuviousNontankTrigger(PlayerbotAI* ai) : Trigger(ai, "instructor razuvious non-tank"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        RazuviousBossHelper helper;
+};
+
+class KelthuzadTrigger : public Trigger
+{
+    public:
+        KelthuzadTrigger(PlayerbotAI* ai) : Trigger(ai, "kel'thuzad trigger"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        KelthuzadBossHelper helper;
+};
+
+class AnubrekhanTrigger : public BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>
+{
 public:
-    HeiganRangedTrigger(PlayerbotAI* ai): Trigger(ai, "heigan ranged") {}
-    virtual bool IsActive();
+    AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
 };
 
 // class ThaddiusPhasePetTrigger : public BossPhaseTrigger
@@ -110,20 +143,6 @@ public:
 // {
 // public:
 //     ThaddiusPhaseThaddiusTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "thaddius", 1 << (4 - 1), "thaddius phase thaddius") {}
-// };
-
-// class RazuviousTankTrigger : public BossPhaseTrigger
-// {
-// public:
-//     RazuviousTankTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "instructor razuvious", 0, "razuvious tank") {}
-//     virtual bool IsActive();
-// };
-
-// class RazuviousNontankTrigger : public BossPhaseTrigger
-// {
-// public:
-//     RazuviousNontankTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "instructor razuvious", 0, "razuvious nontank") {}
-//     virtual bool IsActive();
 // };
 
 // class HorsemanAttractorsTrigger : public BossPhaseTrigger
@@ -168,20 +187,7 @@ public:
 //     virtual bool IsActive();
 // };
 
-class KelthuzadTrigger : public Trigger
-{
-    public:
-        KelthuzadTrigger(PlayerbotAI* ai) : Trigger(ai, "kel'thuzad trigger"), helper(ai) {}
-        bool IsActive() override;
-    private:
-        KelthuzadBossHelper helper;
-};
 
-class AnubrekhanTrigger : public BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>
-{
-public:
-    AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
-};
 
 // class KelthuzadPhaseTwoTrigger : public BossPhaseTrigger
 // {

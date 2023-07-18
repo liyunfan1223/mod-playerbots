@@ -18,22 +18,14 @@ const uint32 NAXX_MAP_ID = 533;
 
 template<class BossAiType>
 class GenericBossHelper : public AiObject {
-
-};
-
-class KelthuzadBossHelper: public AiObject {
     public:
-        std::pair<float, float> center = {3716.19f, -5106.58f};
-        std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
-        std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
-        KelthuzadBossHelper(PlayerbotAI *botAI): AiObject(botAI) {}
-
+        GenericBossHelper(PlayerbotAI* botAI, std::string name): AiObject(botAI), name_(name) {}
         bool UpdateBossAI() {
-            Unit* target = AI_VALUE2(Unit*, "find target", "kel'thuzad");
+            Unit* target = AI_VALUE2(Unit*, "find target", name_);
             if (!target) {
                 return false;
             }
-            ai_ = dynamic_cast<boss_kelthuzad::boss_kelthuzadAI *>(target->GetAI());
+            ai_ = dynamic_cast<BossAiType *>(target->GetAI());
             if (!ai_) {
                 return false;
             }
@@ -43,6 +35,18 @@ class KelthuzadBossHelper: public AiObject {
             }
             return true;
         }
+    protected:
+        std::string name_;
+        BossAiType *ai_;
+        EventMap* event_map_;
+};
+
+class KelthuzadBossHelper: public GenericBossHelper<boss_kelthuzad::boss_kelthuzadAI> {
+    public:
+        KelthuzadBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "kel'thuzad") {}
+        std::pair<float, float> center = {3716.19f, -5106.58f};
+        std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
+        std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
         bool IsPhaseOne() {
             return event_map_->GetNextEventTime(KELTHUZAD_EVENT_PHASE_2) != 0;
         }
@@ -63,10 +67,11 @@ class KelthuzadBossHelper: public AiObject {
             }
             return shadow_fissure;
         }
-    private:
-        boss_kelthuzad::boss_kelthuzadAI *ai_;
-        EventMap* event_map_;
 };
 
+class RazuviousBossHelper: public GenericBossHelper<boss_razuvious::boss_razuviousAI> {
+    public:
+        RazuviousBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "instructor razuvious") {}
+};
 
 #endif

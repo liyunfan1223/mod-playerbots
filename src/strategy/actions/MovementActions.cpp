@@ -1255,6 +1255,14 @@ bool FleeAction::Execute(Event event)
     return MoveAway(AI_VALUE(Unit*, "current target"));
 }
 
+bool FleeAction::isUseful()
+{
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
+        return false;
+    }
+    return true;
+}
+
 bool FleeWithPetAction::Execute(Event event)
 {
     if (Pet* pet = bot->GetPet())

@@ -25,8 +25,8 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
             // creators["thaddius phase transition"] = &RaidNaxxTriggerContext::thaddius_phase_transition;
             // creators["thaddius phase thaddius"] = &RaidNaxxTriggerContext::thaddius_phase_thaddius;
 
-            // creators["razuvious tank"] = &RaidNaxxTriggerContext::razuvious_tank;
-            // creators["razuvious nontank"] = &RaidNaxxTriggerContext::razuvious_nontank;
+            creators["razuvious tank"] = &RaidNaxxTriggerContext::razuvious_tank;
+            creators["razuvious nontank"] = &RaidNaxxTriggerContext::razuvious_nontank;
 
             // creators["horseman attractors"] = &RaidNaxxTriggerContext::horseman_attractors;
             // creators["horseman except attractors"] = &RaidNaxxTriggerContext::horseman_except_attractors;
@@ -56,8 +56,8 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
         // static Trigger* thaddius_phase_pet_lose_aggro(PlayerbotAI* ai) { return new ThaddiusPhasePetLoseAggroTrigger(ai); }
         // static Trigger* thaddius_phase_transition(PlayerbotAI* ai) { return new ThaddiusPhaseTransitionTrigger(ai); }
         // static Trigger* thaddius_phase_thaddius(PlayerbotAI* ai) { return new ThaddiusPhaseThaddiusTrigger(ai); }
-        // static Trigger* razuvious_tank(PlayerbotAI* ai) { return new RazuviousTankTrigger(ai); }
-        // static Trigger* razuvious_nontank(PlayerbotAI* ai) { return new RazuviousNontankTrigger(ai); }
+        static Trigger* razuvious_tank(PlayerbotAI* ai) { return new RazuviousTankTrigger(ai); }
+        static Trigger* razuvious_nontank(PlayerbotAI* ai) { return new RazuviousNontankTrigger(ai); }
         
         // static Trigger* horseman_attractors(PlayerbotAI* ai) { return new HorsemanAttractorsTrigger(ai); }
         // static Trigger* horseman_except_attractors(PlayerbotAI* ai) { return new HorsemanExceptAttractorsTrigger(ai); }

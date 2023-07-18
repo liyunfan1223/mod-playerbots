@@ -16,6 +16,7 @@
 #include "DruidActions.h"
 #include "PaladinActions.h"
 #include "WarriorActions.h"
+#include "DruidBearActions.h"
 
 float HeiganDanceMultiplier::GetValue(Action* action)
 {
@@ -63,7 +64,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 //     }
 // 	context->GetValue<bool>("neglect threat")->Set(true);
 // 	if (botAI->GetCurrentState() == BOT_STATE_COMBAT && 
-// 		(dynamic_cast<AttackLeastHpTargetAction*>(action) || 
+// 		(dynamic_cast<DpsAssistAction*>(action) || 
 // 		 dynamic_cast<TankAssistAction*>(action) ||
 // 		 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
 // 		 dynamic_cast<FleeAction*>(action))) {
@@ -91,7 +92,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 //     uint32 curr_phase = eventMap->GetPhaseMask();
 // 	// pet phase
 // 	if (curr_phase == 2 && 
-// 		( dynamic_cast<AttackLeastHpTargetAction*>(action) || 
+// 		( dynamic_cast<DpsAssistAction*>(action) || 
 // 		dynamic_cast<TankAssistAction*>(action) || 
 // 		dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
 // 		dynamic_cast<ReachPartyMemberToHealAction*>(action) || 
@@ -148,24 +149,23 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 // 	return 1.0f;
 // }
 
-// float InstructorRazuviousGenericMultiplier::GetValue(Action* action)
-// {
-// 	Unit* boss = AI_VALUE2(Unit*, "find target", "instructor razuvious");
-// 	if (!boss) {
-//         return 1.0f;
-//     }
-// 	context->GetValue<bool>("neglect threat")->Set(true);
-// 	if (botAI->GetCurrentState() == BOT_STATE_COMBAT &&
-// 	   (dynamic_cast<AttackLeastHpTargetAction*>(action) ||
-// 		dynamic_cast<TankAssistAction*>(action) || 
-// 		dynamic_cast<CastTauntAction*>(action) ||
-// 		dynamic_cast<CastDarkCommandAction*>(action) || 
-// 		dynamic_cast<CastHandOfReckoningAction*>(action) || 
-// 		dynamic_cast<CastGrowlAction*>(action))) {
-// 		return 0.0f;
-// 	}
-// 	return 1.0f;
-// }
+float InstructorRazuviousGenericMultiplier::GetValue(Action* action)
+{
+	if (!helper.UpdateBossAI()) {
+		return 1.0f;
+	}
+	context->GetValue<bool>("neglect threat")->Set(true);
+	if (botAI->GetState() == BOT_STATE_COMBAT &&
+	   (dynamic_cast<DpsAssistAction*>(action) ||
+		dynamic_cast<TankAssistAction*>(action) || 
+		dynamic_cast<CastTauntAction*>(action) ||
+		dynamic_cast<CastDarkCommandAction*>(action) || 
+		dynamic_cast<CastHandOfReckoningAction*>(action) || 
+		dynamic_cast<CastGrowlAction*>(action))) {
+		return 0.0f;
+	}
+	return 1.0f;
+}
 
 float KelthuzadGenericMultiplier::GetValue(Action* action)
 {
@@ -205,7 +205,7 @@ float AnubrekhanGenericMultiplier::GetValue(Action* action)
         return 1.0f;
     }
 	if (
-		// (dynamic_cast<AttackLeastHpTargetAction*>(action) || 
+		// (dynamic_cast<DpsAssistAction*>(action) || 
 		//  dynamic_cast<DpsAssistAction*>(action) ||
 		//  dynamic_cast<TankAssistAction*>(action) || 
 		 dynamic_cast<FollowAction*>(action)) {
@@ -228,7 +228,7 @@ float AnubrekhanGenericMultiplier::GetValue(Action* action)
 // 	if (!boss) {
 //         return 1.0f;
 //     }
-// 	if ((dynamic_cast<AttackLeastHpTargetAction*>(action) || 
+// 	if ((dynamic_cast<DpsAssistAction*>(action) || 
 // 		 dynamic_cast<TankAssistAction*>(action))) {
 // 		return 0.0f;
 // 	}
@@ -262,7 +262,7 @@ float AnubrekhanGenericMultiplier::GetValue(Action* action)
 // 	if (!boss) {
 //         return 1.0f;
 //     }
-// 	if ((dynamic_cast<AttackLeastHpTargetAction*>(action) || 
+// 	if ((dynamic_cast<DpsAssistAction*>(action) || 
 // 		 dynamic_cast<TankAssistAction*>(action) ||
 // 		 dynamic_cast<FleeAction*>(action) || 
 // 		 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||

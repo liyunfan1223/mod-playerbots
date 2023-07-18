@@ -7,6 +7,7 @@
 #include "Formations.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include <cstddef>
 
 bool FollowAction::Execute(Event event)
 {
@@ -23,8 +24,8 @@ bool FollowAction::Execute(Event event)
         WorldLocation loc = formation->GetLocation();
         if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
             return false;
-        
-        moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
+
+        moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ() + 2.0f);
     }
 
     if (Pet* pet = bot->GetPet())
@@ -47,6 +48,9 @@ bool FollowAction::Execute(Event event)
 
 bool FollowAction::isUseful()
 {
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
+        return false;
+    }
     Formation* formation = AI_VALUE(Formation*, "formation");
     std::string const target = formation->GetTargetName();
 

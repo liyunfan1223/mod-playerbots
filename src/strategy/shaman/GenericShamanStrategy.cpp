@@ -124,9 +124,7 @@ void GenericShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 	// triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("riptide", 26.0f), nullptr)));
 	triggers.push_back(new TriggerNode("heroism", NextAction::array(0, new NextAction("heroism", 31.0f), nullptr)));
 	triggers.push_back(new TriggerNode("bloodlust", NextAction::array(0, new NextAction("bloodlust", 30.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "medium mana",
-        NextAction::array(0, new NextAction("mana tide totem", ACTION_EMERGENCY + 5), NULL)));
+    
 }
 
 void ShamanBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
