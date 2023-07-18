@@ -4,6 +4,7 @@
 
 #include "AttackerCountValues.h"
 #include "Playerbots.h"
+#include "SharedDefines.h"
 
 uint8 MyAttackerCountValue::Calculate()
 {
@@ -13,80 +14,17 @@ uint8 MyAttackerCountValue::Calculate()
 bool HasAggroValue::Calculate()
 {
     Unit* target = GetTarget();
-    if (!target)
+    if (!target) {
         return true;
-
+    }
     Unit* victim = target->GetVictim();
-
     if (!victim) {
         return true;
     }
-
-    if (victim->GetGUID() == bot->GetGUID() || (victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer()))) {
+    if (victim && (victim->GetGUID() == bot->GetGUID() || (victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer())))) {
         return true;
     }
-
-    // botAI->TellMaster("target: " + target->GetName() + " victim: " + victim->GetName());
-    // if (victim->ToPlayer() ) {
-    //     botAI->TellMaster("victim is mt: " + std::to_string(botAI->IsMainTank(victim->ToPlayer())));
-    // }
     return false;
-    // HostileReference *ref = bot->getHostileRefMgr().getFirst();
-    // if (!ref)
-    //     return true; // simulate as target is not atacking anybody yet
-
-    // while( ref )
-    // {
-    //     ThreatMgr *threatManager = ref->GetSource();
-    //     Unit *attacker = threatManager->GetOwner();
-    //     if (attacker->GetGUID() != target->GetGUID()) {
-    //         ref = ref->next();
-    //         continue;
-    //     }
-    //     Unit *victim = attacker->GetVictim();
-    //     if (!victim) { 
-    //         return true;
-    //     }
-    //     if ((victim->GetGUID() == bot->GetGUID() || (victim && victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer()))) && 
-    //         target->GetGUID() == attacker->GetGUID())
-    //         return true;
-    //     ref = ref->next();
-    // }
-    // Unit* target = GetTarget();
-    // if (!target)
-    //     return true;
-
-    // HostileReference *ref = bot->getHostileRefMgr().getFirst();
-    // if (!ref)
-    //     return true; // simulate as target is not atacking anybody yet
-
-    // while( ref )
-    // {
-    //     ThreatMgr* threatMgr = ref->GetSource();
-    //     Unit* attacker = threatMgr->GetOwner();
-    //     Unit* victim = attacker->GetVictim();
-    //     if (victim == bot && target == attacker)
-    //         return true;
-
-    //     ref = ref->next();
-    // }
-
-    // ref = target->GetThreatMgr().getCurrentVictim();
-    // if (ref)
-    // {
-    //     if (Unit* victim = ref->getTarget())
-    //     {
-    //         if (Player* pl = victim->ToPlayer())
-    //         {
-    //             if (botAI->IsMainTank(pl))
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    // }
-
-    // return false;
 }
 
 uint8 AttackerCountValue::Calculate()

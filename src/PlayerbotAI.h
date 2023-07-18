@@ -330,9 +330,21 @@ class PlayerbotAI : public PlayerbotAIBase
         void Reset(bool full = false);
         bool IsTank(Player* player);
         bool IsHeal(Player* player);
+        bool IsDps(Player* player);
         bool IsRanged(Player* player);
+        bool IsRangedDps(Player* player);
         bool IsMainTank(Player* player);
         bool IsAssistTank(Player* player);
+
+        bool IsAssistTankOfIndex(Player* player, int index);
+        bool IsHealAssistantOfIndex(Player* player, int index);
+        bool IsRangedDpsAssistantOfIndex(Player* player, int index);
+        int32 GetGroupSlotIndex(Player* player);
+        int32 GetRangedIndex(Player* player);
+        int32 GetClassIndex(Player* player, uint8_t cls);
+        int32 GetRangedDpsIndex(Player* player);
+        int32 GetMeleeIndex(Player* player);
+
         Creature* GetCreature(ObjectGuid guid);
         Unit* GetUnit(ObjectGuid guid);
         Player* GetPlayer(ObjectGuid guid);

@@ -208,7 +208,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
         float oldScore = PlayerbotFactory::CalculateItemScore(oldItemProto->ItemId, bot);
         if (itemScore || oldScore)
         {
-            shouldEquip = itemScore >= oldScore * 1.2;
+            shouldEquip = itemScore >= oldScore * 1.5;
         }
     }
 

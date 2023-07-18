@@ -86,13 +86,13 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// 	"sapphiron chill", 
 	// 	NextAction::array(0, new NextAction("sapphiron avoid chill", ACTION_RAID + 1), NULL)));
 	
-	// // Kel'Thuzad
-	// triggers.push_back(new TriggerNode(
-	// 	"kel'thuzad", 
-	// 	NextAction::array(0, 
-	// 		new NextAction("kel'thuzad choose target", ACTION_RAID + 1), 
-   	// 		new NextAction("kel'thuzad position", ACTION_RAID + 1),
-	// 	NULL)));
+	// Kel'Thuzad
+	triggers.push_back(new TriggerNode(
+		"kel'thuzad", 
+		NextAction::array(0, 
+			new NextAction("kel'thuzad choose target", ACTION_RAID + 1), 
+   			new NextAction("kel'thuzad position", ACTION_RAID + 1),
+		NULL)));
 
 	// Anub'Rekhan
 	triggers.push_back(new TriggerNode(
@@ -131,7 +131,7 @@ void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 	// multipliers.push_back(new ThaddiusGenericMultiplier(ai));
 	// multipliers.push_back(new SapphironGenericMultiplier(ai));
 	// multipliers.push_back(new InstructorRazuviousGenericMultiplier(ai));
-	// multipliers.push_back(new KelthuzadGenericMultiplier(ai));
+	multipliers.push_back(new KelthuzadGenericMultiplier(botAI));
 	multipliers.push_back(new AnubrekhanGenericMultiplier(botAI));
 	// multipliers.push_back(new FourhorsemanGenericMultiplier(ai));
 	// multipliers.push_back(new GothikGenericMultiplier(ai));

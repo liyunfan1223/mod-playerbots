@@ -7,6 +7,7 @@
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
 #include "RaidNaxxScripts.h"
+#include "raids/naxxramas/RaidNaxxBossHelper.h"
 
 using namespace std;
 
@@ -167,11 +168,14 @@ public:
 //     virtual bool IsActive();
 // };
 
-// class KelthuzadTrigger : public BossPhaseTrigger
-// {
-// public:
-//     KelthuzadTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "kel'thuzad", 0, "kel'thuzad trigger") {}
-// };
+class KelthuzadTrigger : public Trigger
+{
+    public:
+        KelthuzadTrigger(PlayerbotAI* ai) : Trigger(ai, "kel'thuzad trigger"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        KelthuzadBossHelper helper;
+};
 
 class AnubrekhanTrigger : public BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>
 {

@@ -123,6 +123,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["low aoe heal"] = &TriggerContext::low_aoe_heal;
             creators["medium aoe heal"] = &TriggerContext::medium_aoe_heal;
             creators["group heal occasion"] = &TriggerContext::group_heal_occasion;
+            creators["medium group heal occasion"] = &TriggerContext::medium_group_heal_occasion;
             creators["invalid target"] = &TriggerContext::invalid_target;
             creators["lfg proposal active"] = &TriggerContext::lfg_proposal_active;
 
@@ -216,6 +217,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* low_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "low aoe heal", "low", 2); }
         static Trigger* medium_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "medium aoe heal", "medium", 2); }
         static Trigger* group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.4); }
+        static Trigger* medium_group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.4); }
         static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
         static Trigger* swimming(PlayerbotAI* botAI) { return new IsSwimmingTrigger(botAI); }
         static Trigger* no_possible_targets(PlayerbotAI* botAI) { return new NoPossibleTargetsTrigger(botAI); }

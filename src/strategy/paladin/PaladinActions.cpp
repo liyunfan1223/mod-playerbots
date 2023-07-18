@@ -13,7 +13,7 @@
 inline std::string const GetActualBlessingOfMight(Unit* target)
 {
     if (!target->ToPlayer()) {
-        return {""};
+        return "blessing of might";
     }
     int tab = AiFactory::GetPlayerSpecTab(target->ToPlayer());
     switch (target->getClass())
@@ -46,7 +46,7 @@ inline std::string const GetActualBlessingOfMight(Unit* target)
 inline std::string const GetActualBlessingOfWisdom(Unit* target)
 {
     if (!target->ToPlayer()) {
-        return {""};
+        return "blessing of might";
     }
     int tab = AiFactory::GetPlayerSpecTab(target->ToPlayer());
     switch (target->getClass())

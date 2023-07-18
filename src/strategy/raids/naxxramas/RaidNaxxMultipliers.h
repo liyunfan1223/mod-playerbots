@@ -3,6 +3,7 @@
 #define _PLAYERRBOT_RAIDNAXXMULTIPLIERS_H_
 
 #include "Multiplier.h"
+#include "raids/naxxramas/RaidNaxxBossHelper.h"
 
 class HeiganDanceMultiplier : public Multiplier
 {
@@ -49,14 +50,14 @@ public:
 //     virtual float GetValue(Action* action);
 // };
 
-// class KelthuzadGenericMultiplier : public Multiplier
-// {
-// public:
-//     KelthuzadGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "kelthuzad generic") {}
-
-// public:
-//     virtual float GetValue(Action* action);
-// };
+class KelthuzadGenericMultiplier : public Multiplier
+{
+    public:
+        KelthuzadGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "kelthuzad generic"), helper(ai) {}
+        virtual float GetValue(Action* action);
+    private:
+        KelthuzadBossHelper helper;
+};
 
 class AnubrekhanGenericMultiplier : public Multiplier
 {

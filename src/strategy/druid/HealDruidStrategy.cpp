@@ -33,7 +33,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("swiftmend on party", ACTION_CRITICAL_HEAL + 3), 
             new NextAction("wild growth", ACTION_CRITICAL_HEAL + 2),
             new NextAction("nourish on party", ACTION_CRITICAL_HEAL + 1),
-            // new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 0),
+            new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 0),
             NULL)));
 
     triggers.push_back(new TriggerNode(
@@ -41,7 +41,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("nature's swiftness", ACTION_CRITICAL_HEAL + 4), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "group heal occasion",
+        "medium group heal occasion",
         NextAction::array(0, new NextAction("tranquility", ACTION_CRITICAL_HEAL + 5), NULL)));
 
     // LOW
@@ -51,7 +51,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 8),
             new NextAction("swiftmend on party", ACTION_MEDIUM_HEAL + 7),
             new NextAction("nourish on party", ACTION_MEDIUM_HEAL + 6),
-            // new NextAction("healing touch on party", ACTION_MEDIUM_HEAL + 5), 
+            new NextAction("healing touch on party", ACTION_MEDIUM_HEAL + 5), 
             NULL)));
 
     // MEDIUM

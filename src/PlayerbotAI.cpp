@@ -1304,6 +1304,151 @@ bool PlayerbotAI::IsRanged(Player* player)
     return true;
 }
 
+bool PlayerbotAI::IsRangedDps(Player* player)
+{
+    return IsRanged(player) && IsDps(player);
+}
+
+bool PlayerbotAI::IsRangedDpsAssistantOfIndex(Player* player, int index)
+{
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return false;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (group->IsAssistant(member->GetGUID()) && IsRangedDps(member)) {
+            if (index == counter) {
+                return player == member;
+            }
+            counter++;
+        }
+    }
+    // not enough
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (!group->IsAssistant(member->GetGUID()) && IsRangedDps(member)) {
+            if (index == counter) {
+                return player == member;
+            }
+            counter++;
+        }
+    }
+    return false;
+}
+
+int32 PlayerbotAI::GetGroupSlotIndex(Player* player)
+{
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return -1;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (player == member) {
+            return counter;
+        }
+        counter++;
+    }
+    return 0;
+}
+
+int32 PlayerbotAI::GetRangedIndex(Player* player)
+{
+    if (!IsRanged(player)) {
+        return -1;
+    }
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return -1;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (player == member) {
+            return counter;
+        }
+        if (IsRanged(member)) {
+            counter++;
+        }
+    }
+    return 0;
+}
+
+int32 PlayerbotAI::GetClassIndex(Player* player, uint8_t cls)
+{
+    if (player->getClass() != cls) {
+        return -1;
+    }
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return -1;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (player == member) {
+            return counter;
+        }
+        if (member->getClass() == cls) {
+            counter++;
+        }
+    }
+    return 0;
+}
+int32 PlayerbotAI::GetRangedDpsIndex(Player* player)
+{
+    if (!IsRangedDps(player)) {
+        return -1;
+    }
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return -1;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (player == member) {
+            return counter;
+        }
+        if (IsRangedDps(member)) {
+            counter++;
+        }
+    }
+    return 0;
+}
+
+int32 PlayerbotAI::GetMeleeIndex(Player* player)
+{
+    if (IsRanged(player)) {
+        return -1;
+    }
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return -1;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (player == member) {
+            return counter;
+        }
+        if (!IsRanged(member)) {
+            counter++;
+        }
+    }
+    return 0;
+}
+
+
 bool PlayerbotAI::IsTank(Player* player)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
@@ -1370,6 +1515,54 @@ bool PlayerbotAI::IsHeal(Player* player)
     return false;
 }
 
+bool PlayerbotAI::IsDps(Player* player)
+{
+    PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
+    if (botAi)
+        return botAi->ContainsStrategy(STRATEGY_TYPE_DPS);
+
+    int tab = AiFactory::GetPlayerSpecTab(player);
+    switch (player->getClass())
+    {
+    case CLASS_MAGE:
+    case CLASS_WARLOCK:
+    case CLASS_HUNTER:
+    case CLASS_ROGUE:
+        return true;
+    case CLASS_PRIEST:
+        if (tab == PRIEST_TAB_SHADOW) {
+            return true;
+        }
+        break;
+    case CLASS_DRUID:
+        if (tab == DRUID_TAB_BALANCE) {
+            return true;
+        }
+        break;
+    case CLASS_SHAMAN:
+        if (tab != SHAMAN_TAB_RESTORATION) {
+            return true;
+        }
+        break;
+    case CLASS_PALADIN:
+        if (tab == PALADIN_TAB_RETRIBUTION) {
+            return true;
+        }
+        break;
+    case CLASS_DEATH_KNIGHT:
+        if (tab != DEATHKNIGT_TAB_BLOOD) {
+            return true;
+        }
+        break;
+    case CLASS_WARRIOR:
+        if (tab != WARRIOR_TAB_PROTECTION) {
+            return true;
+        }
+        break;
+    }
+    return false;
+}
+
 bool PlayerbotAI::IsMainTank(Player* player)
 {
     Group* group = bot->GetGroup();
@@ -1379,8 +1572,10 @@ bool PlayerbotAI::IsMainTank(Player* player)
     ObjectGuid mainTank = ObjectGuid();
     Group::MemberSlotList const& slots = group->GetMemberSlots();
     for (Group::member_citerator itr = slots.begin(); itr != slots.end(); ++itr) {
-        if (itr->flags & MEMBER_FLAG_MAINTANK)
+        if (itr->flags & MEMBER_FLAG_MAINTANK) {
             mainTank = itr->guid;
+            break;
+        }
     }
     if (mainTank != ObjectGuid::Empty) {
         return player->GetGUID() == mainTank;

@@ -36,8 +36,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
             // creators["sapphiron flight position"] = &RaidNaxxActionContext::sapphiron_flight_position;
             // creators["sapphiron avoid chill"] = &RaidNaxxActionContext::sapphiron_avoid_chill;
 
-            // creators["kel'thuzad choose target"] = &RaidNaxxActionContext::kelthuzad_choose_target;
-            // creators["kel'thuzad position"] = &RaidNaxxActionContext::kelthuzad_position;
+            creators["kel'thuzad choose target"] = &RaidNaxxActionContext::kelthuzad_choose_target;
+            creators["kel'thuzad position"] = &RaidNaxxActionContext::kelthuzad_position;
 
             creators["anub'rekhan choose target"] = &RaidNaxxActionContext::anubrekhan_choose_target;
             creators["anub'rekhan position"] = &RaidNaxxActionContext::anubrekhan_position;
@@ -50,8 +50,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
             // creators["loatheb choose target"] = &RaidNaxxActionContext::loatheb_choose_target;
         }
     private:
-        static Action* go_behind_the_boss(PlayerbotAI* ai) { return new GoBehindTheBossAction(ai); }
-        static Action* rotate_grobbulus(PlayerbotAI* ai) { return new RotateGrobbulusAction(ai); }
+        static Action* go_behind_the_boss(PlayerbotAI* ai) { return new GrobbulusGoBehindAction(ai); }
+        static Action* rotate_grobbulus(PlayerbotAI* ai) { return new GrobbulusRotateAction(ai); }
         static Action* grobbulus_move_center(PlayerbotAI* ai) { return new GrobblulusMoveCenterAction(ai); }
         static Action* heigan_dance_melee(PlayerbotAI* ai) { return new HeiganDanceMeleeAction(ai); }
         static Action* heigan_dance_ranged(PlayerbotAI* ai) { return new HeiganDanceRangedAction(ai); }
@@ -68,8 +68,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
         // static Action* sapphiron_ground_position(PlayerbotAI* ai) { return new SapphironGroundPositionAction(ai); }
         // static Action* sapphiron_flight_position(PlayerbotAI* ai) { return new SapphironFlightPositionAction(ai); }
         // static Action* sapphiron_avoid_chill(PlayerbotAI* ai) { return new SapphironAvoidChillAction(ai); }
-        // static Action* kelthuzad_choose_target(PlayerbotAI* ai) { return new KelthuzadChooseTargetAction(ai); }
-        // static Action* kelthuzad_position(PlayerbotAI* ai) { return new KelthuzadPositionAction(ai); }
+        static Action* kelthuzad_choose_target(PlayerbotAI* ai) { return new KelthuzadChooseTargetAction(ai); }
+        static Action* kelthuzad_position(PlayerbotAI* ai) { return new KelthuzadPositionAction(ai); }
         static Action* anubrekhan_choose_target(PlayerbotAI* ai) { return new AnubrekhanChooseTargetAction(ai); }
         static Action* anubrekhan_position(PlayerbotAI* ai) { return new AnubrekhanPositionAction(ai); }
         // static Action* gluth_choose_target(PlayerbotAI* ai) { return new GluthChooseTargetAction(ai); }

@@ -19,7 +19,7 @@ class FindTargetStrategy
         FindTargetStrategy(PlayerbotAI* botAI) : result(nullptr), botAI(botAI) { }
 
         Unit* GetResult();
-        virtual void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) = 0;
+        virtual void  CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) = 0;
         void GetPlayerCount(Unit* creature, uint32* tankCount, uint32* dpsCount);
 
     protected:

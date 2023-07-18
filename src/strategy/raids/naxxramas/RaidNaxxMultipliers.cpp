@@ -167,42 +167,36 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 // 	return 1.0f;
 // }
 
-// float KelthuzadGenericMultiplier::GetValue(Action* action)
-// {
-// 	Unit* boss = AI_VALUE2(Unit*, "find target", "kel'thuzad");
-// 	if (!boss) {
-//         return 1.0f;
-//     }
-// 	if ((dynamic_cast<AttackLeastHpTargetAction*>(action) || 
-// 		 dynamic_cast<TankAssistAction*>(action) || 
-// 		 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) || 
-// 		 dynamic_cast<FollowAction*>(action) || 
-// 		 dynamic_cast<FleeAction*>(action))) {
-// 		return 0.0f;
-// 	}
-// 	BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-// 	EventMap* eventMap = boss_botAI->GetEvents();
-//     uint32 curr_phase = eventMap->GetPhaseMask();
-	
-// 	if (curr_phase == 1) {
-// 		if (dynamic_cast<CastTotemAction*>(action) || 
-// 			dynamic_cast<CastShadowfiendAction*>(action) ||
-// 			dynamic_cast<CastRaiseDeadAction*>(action) ||
-// 			dynamic_cast<CastFeignDeathAction*>(action) || 
-// 			dynamic_cast<CastInvisibilityAction*>(action) ||
-// 			dynamic_cast<CastVanishAction*>(action)) {
-// 			return 0.0f;
-// 		}
-// 	}
-// 	if (curr_phase == 2) {
-// 		if (dynamic_cast<CastBlizzardAction*>(action) || 
-// 			dynamic_cast<CastFrostNovaAction*>(action)) {
-// 			return 0.0f;
-// 		}
-		
-// 	}
-// 	return 1.0f;
-// }
+float KelthuzadGenericMultiplier::GetValue(Action* action)
+{
+	if (!helper.UpdateBossAI()) {
+		return 1.0f;
+	}
+	if ((dynamic_cast<DpsAssistAction*>(action) || 
+		 dynamic_cast<TankAssistAction*>(action) || 
+		 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) || 
+		 dynamic_cast<FollowAction*>(action) || 
+		 dynamic_cast<FleeAction*>(action))) {
+		return 0.0f;
+	}
+	if (helper.IsPhaseOne()) {
+		if (dynamic_cast<CastTotemAction*>(action) || 
+			dynamic_cast<CastShadowfiendAction*>(action) ||
+			dynamic_cast<CastRaiseDeadAction*>(action) ||
+			dynamic_cast<CastFeignDeathAction*>(action) || 
+			dynamic_cast<CastInvisibilityAction*>(action) ||
+			dynamic_cast<CastVanishAction*>(action)) {
+			return 0.0f;
+		}
+	}
+	if (helper.IsPhaseTwo()) {
+		if (dynamic_cast<CastBlizzardAction*>(action) || 
+			dynamic_cast<CastFrostNovaAction*>(action)) {
+			return 0.0f;
+		}
+	}
+	return 1.0f;
+}
 
 float AnubrekhanGenericMultiplier::GetValue(Action* action)
 {

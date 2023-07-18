@@ -85,6 +85,7 @@
 #include "TankTargetValue.h"
 #include "ThreatValues.h"
 #include "TradeValues.h"
+#include "Value.h"
 
 class PlayerbotAI;
 
@@ -289,6 +290,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["main tank"] = &ValueContext::main_tank;
             creators["find target"] = &ValueContext::find_target;
             creators["boss target"] = &ValueContext::boss_target;
+            creators["nearest triggers"] = &ValueContext::nearest_triggers;
         }
 
     private:
@@ -483,6 +485,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* main_tank(PlayerbotAI* ai) { return new PartyMemberMainTankValue(ai); }
         static UntypedValue* find_target(PlayerbotAI* ai) { return new FindTargetValue(ai); }
         static UntypedValue* boss_target(PlayerbotAI* ai) { return new BossTargetValue(ai); }
+        static UntypedValue* nearest_triggers(PlayerbotAI* ai) { return new NearestTriggersValue(ai); }
 };
 
 #endif

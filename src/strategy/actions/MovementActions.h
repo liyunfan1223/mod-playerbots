@@ -7,6 +7,7 @@
 
 #include "Action.h"
 #include "PlayerbotAIConfig.h"
+#include <cmath>
 
 class Player;
 class PlayerbotAI;
@@ -123,4 +124,43 @@ class MoveRandomAction : public MovementAction
         bool isUseful() override;
 };
 
+class MoveInsideAction : public MovementAction
+{
+    public:
+        MoveInsideAction(PlayerbotAI* ai, float x, float y, float distance = 5.0f) : MovementAction(ai, "move inside") {
+            this->x = x;
+            this->y = y;
+            this->distance = distance;
+        }
+        virtual bool Execute(Event event);
+    protected:
+        float x, y, distance;
+};
+
+class RotateAroundTheCenterPointAction : public MovementAction
+{
+public:
+    RotateAroundTheCenterPointAction(PlayerbotAI* ai, std::string name, 
+        float center_x, float center_y, float radius = 40.0f, 
+        uint32 intervals = 16, bool clockwise = true, float start_angle = 0) : MovementAction(ai, name) {
+        this->center_x = center_x;
+        this->center_y = center_y;
+        this->radius = radius;
+        this->intervals = intervals;
+        this->clockwise = clockwise;
+        this->call_counters = 0;
+        for (int i = 0; i < intervals; i++) {
+            float angle = start_angle + 2 * M_PI * i / intervals;
+            waypoints.push_back(std::make_pair(center_x + cos(angle) * radius, center_y + sin(angle) * radius));
+        }
+    }
+    virtual bool Execute(Event event);
+protected:
+    virtual uint32 GetCurrWaypoint() { return 0; }
+    uint32 FindNearestWaypoint();
+    float center_x, center_y, radius;
+    uint32 intervals, call_counters;
+    bool clockwise;
+    std::vector<std::pair<float, float>> waypoints;
+};
 #endif

@@ -30,4 +30,13 @@ class NearestVehiclesValue : public NearestUnitsValue
         bool AcceptUnit(Unit* unit) override;
 };
 
+class NearestTriggersValue : public NearestUnitsValue
+{
+	public:
+        NearestTriggersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest triggers", range) { }
+
+    protected:
+        void FindUnits(std::list<Unit*>& targets) override;
+        bool AcceptUnit(Unit* unit) override;
+};
 #endif

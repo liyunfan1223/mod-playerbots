@@ -166,5 +166,9 @@ bool HeiganRangedTrigger::IsActive()
 //     return true;
 // }
 
+bool KelthuzadTrigger::IsActive() {
+    return helper.UpdateBossAI();
+}
+
 template bool BossEventTrigger<boss_grobbulus::boss_grobbulusAI>::IsActive();
 template bool BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>::IsActive();

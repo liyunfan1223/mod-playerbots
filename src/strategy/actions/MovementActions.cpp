@@ -1399,3 +1399,17 @@ bool MoveRandomAction::isUseful()
     return !botAI->HasRealPlayerMaster() && botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get().size() > urand(25, 100);
 }
 
+bool MoveInsideAction::Execute(Event event)
+{
+    return MoveInside(bot->GetMapId(), x, y, bot->GetPositionZ(), distance);
+}
+
+bool RotateAroundTheCenterPointAction::Execute(Event event)
+{
+    uint32 next_point = GetCurrWaypoint();
+    if (MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ())) {
+        call_counters += 1;
+        return true;
+    }
+    return false;
+}

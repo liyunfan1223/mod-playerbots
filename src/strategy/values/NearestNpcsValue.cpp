@@ -39,3 +39,15 @@ bool NearestVehiclesValue::AcceptUnit(Unit* unit)
 
     return true;
 }
+
+void NearestTriggersValue::FindUnits(std::list<Unit*>& targets)
+{
+    Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(bot, bot, range);
+    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
+    Cell::VisitAllObjects(bot, searcher, range);
+}
+
+bool NearestTriggersValue::AcceptUnit(Unit* unit)
+{
+    return !unit->IsPlayer();
+}
