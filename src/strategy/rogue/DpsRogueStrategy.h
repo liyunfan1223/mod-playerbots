@@ -18,7 +18,7 @@ class DpsRogueStrategy : public MeleeCombatStrategy
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
         std::string const getName() override { return "dps"; }
         NextAction** getDefaultActions() override;
-        virtual int GetType() { return MeleeCombatStrategy::GetType() | STRATEGY_TYPE_DPS; }
+        uint32 GetType() const override { return MeleeCombatStrategy::GetType() | STRATEGY_TYPE_DPS; }
 };
 
 class StealthedRogueStrategy : public Strategy
