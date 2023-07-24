@@ -2,6 +2,7 @@
 #include "Playerbots.h"
 #include "RaidNaxxTriggers.h"
 #include "ScriptedCreature.h"
+#include "Trigger.h"
 
 bool AuraRemovedTrigger::IsActive() {
     bool check = botAI->HasAura(name, bot, false, false, -1, true);
@@ -126,10 +127,21 @@ bool RazuviousNontankTrigger::IsActive()
 //           botAI->IsHealAssistantOfIndex(bot, 1) || botAI->IsHealAssistantOfIndex(bot, 2));
 // }
 
-// bool SapphironGroundMainTankTrigger::IsActive()
-// {
-//     return BossPhaseTrigger::IsActive() && botAI->IsMainTank(bot) && AI_VALUE2(bool, "has aggro", "boss target");
-// }
+bool SapphironGroundTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    return helper.IsPhaseGround();
+}
+
+bool SapphironFlightTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    return helper.IsPhaseFlight();
+}
 
 // bool SapphironGroundExceptMainTankTrigger::IsActive()
 // {

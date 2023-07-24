@@ -159,12 +159,14 @@ public:
 //     virtual bool IsActive();
 // };
 
-// class SapphironGroundMainTankTrigger : public BossPhaseTrigger
-// {
-// public:
-//     SapphironGroundMainTankTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sapphiron", (1 << (2 - 1)), "sapphiron ground main tank") {}
-//     virtual bool IsActive();
-// };
+class SapphironGroundTrigger : public Trigger
+{
+    public:
+        SapphironGroundTrigger(PlayerbotAI* ai) : Trigger(ai, "sapphiron ground"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        SapphironBossHelper helper;
+};
 
 // class SapphironGroundExceptMainTankTrigger : public BossPhaseTrigger
 // {
@@ -173,12 +175,14 @@ public:
 //     virtual bool IsActive();
 // };
 
-// class SapphironFlightTrigger : public BossPhaseTrigger
-// {
-// public:
-//     SapphironFlightTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sapphiron", (1 << (3 - 1)), "sapphiron flight") {}
-//     virtual bool IsActive();
-// };
+class SapphironFlightTrigger : public Trigger
+{
+    public:
+        SapphironFlightTrigger(PlayerbotAI* ai) : Trigger(ai, "sapphiron flight"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        SapphironBossHelper helper;
+};
 
 // class SapphironGroundChillTrigger : public BossPhaseTrigger
 // {

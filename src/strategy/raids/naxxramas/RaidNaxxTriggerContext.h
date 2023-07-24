@@ -31,11 +31,9 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
             // creators["horseman attractors"] = &RaidNaxxTriggerContext::horseman_attractors;
             // creators["horseman except attractors"] = &RaidNaxxTriggerContext::horseman_except_attractors;
 
-            // creators["sapphiron ground main tank"] = &RaidNaxxTriggerContext::sapphiron_ground_main_tank;
-            // creators["sapphiron ground except main tank"] = &RaidNaxxTriggerContext::sapphiron_ground_except_main_tank;
-            // creators["sapphiron flight"] = &RaidNaxxTriggerContext::sapphiron_flight;
-            // creators["sapphiron chill"] = &RaidNaxxTriggerContext::sapphiron_ground_chill;
-
+            creators["sapphiron ground"] = &RaidNaxxTriggerContext::sapphiron_ground;
+            creators["sapphiron flight"] = &RaidNaxxTriggerContext::sapphiron_flight;
+            
             creators["kel'thuzad"] = &RaidNaxxTriggerContext::kelthuzad;
             // creators["kel'thuzad phase two"] = &RaidNaxxTriggerContext::kelthuzad_phase_two;
 
@@ -61,9 +59,9 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
         
         // static Trigger* horseman_attractors(PlayerbotAI* ai) { return new HorsemanAttractorsTrigger(ai); }
         // static Trigger* horseman_except_attractors(PlayerbotAI* ai) { return new HorsemanExceptAttractorsTrigger(ai); }
-        // static Trigger* sapphiron_ground_main_tank(PlayerbotAI* ai) { return new SapphironGroundMainTankTrigger(ai); }
+        static Trigger* sapphiron_ground(PlayerbotAI* ai) { return new SapphironGroundTrigger(ai); }
+        static Trigger* sapphiron_flight(PlayerbotAI* ai) { return new SapphironFlightTrigger(ai); }
         // static Trigger* sapphiron_ground_except_main_tank(PlayerbotAI* ai) { return new SapphironGroundExceptMainTankTrigger(ai); }
-        // static Trigger* sapphiron_flight(PlayerbotAI* ai) { return new SapphironFlightTrigger(ai); }
         // static Trigger* sapphiron_ground_chill(PlayerbotAI* ai) { return new SapphironGroundChillTrigger(ai); }        
         static Trigger* kelthuzad(PlayerbotAI* ai) { return new KelthuzadTrigger(ai); }
         // static Trigger* kelthuzad_phase_two(PlayerbotAI* ai) { return new KelthuzadPhaseTwoTrigger(ai); }

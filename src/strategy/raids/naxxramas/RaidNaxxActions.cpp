@@ -526,120 +526,83 @@ bool RazuviousTargetAction::Execute(Event event)
 //     // return MoveTo(533, 3498.58f, -5245.35f, 137.29f);
 // }
 
-// bool SapphironGroundPositionAction::Execute(Event event)
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "sapphiron");
-//     if (!boss) {
-//         return false;
-//     }
-//     BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     const uint32 flight = eventMap->GetNextEventTime(6);
-//     const uint32 timer = eventMap->GetTimer();
-//     if (timer <= 2000 || (flight && flight != last_flight)) {
-//         reset = true;
-//         reset_timer = timer;
-//     }
-//     last_flight = flight;
-//     if (reset) {
-//         // bot->Yell("Let\'s go!", LANG_UNIVERSAL);
-//         std::pair<float, float> center = {3517.31f, -5253.74f};
-//         // std::pair<float, float> center = {3498.58f, -5245.35f};
-//         // std::pair<float, float> center = {boss->GetPositionX(), boss->GetPositionY()};
-//         uint32 index = botAI->GetGroupSlotIndex(bot);
-//         // float start_angle = 1.25 * M_PI;
-//         // float offset_angle = botAI->IsRanged(bot) ? -M_PI * 0.06 * index : -M_PI * 0.3;
-//         float start_angle = 0.85 * M_PI;
-//         float offset_angle = M_PI * 0.02 * index;
-//         float angle = start_angle + offset_angle;
-//         float distance = 30.0f;
-//         if (botAI->IsRangedDps(bot)) {
-//             distance = rand_norm() * 5 + 40.0f;
-//         } else if (botAI->IsHeal(bot)) {
-//             distance = rand_norm() * 5 + 25.0f;
-//         } else {
-//             distance = rand_norm() * 10;
-//         }
-//         if (MoveTo(533, center.first + cos(angle) * distance, center.second + sin(angle) * distance, 137.29f)) {
-//             return true;
-//         }
-//         if (timer - reset_timer >= 2000) {
-//             reset = false;
-//         }
-//     }
-//     return false;
-// }
+bool SapphironGroundPositionAction::Execute(Event event)
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    if (botAI->IsMainTank(bot)) {
+        if (AI_VALUE2(bool, "has aggro", "current target")) {
+            return MoveTo(NAXX_MAP_ID, helper.mainTankPos.first, helper.mainTankPos.second, helper.GENERIC_HEIGHT);
+        }
+        return false;
+    } 
+    if (helper.JustLanded()) {
+        uint32 index = botAI->GetGroupSlotIndex(bot);
+        float start_angle = 0.85 * M_PI;
+        float offset_angle = M_PI * 0.02 * index;
+        float angle = start_angle + offset_angle;
+        float distance;
+        if (botAI->IsRangedDps(bot)) {
+            distance = rand_norm() * 5 + 30.0f;
+        } else if (botAI->IsHeal(bot)) {
+            distance = rand_norm() * 5 + 20.0f;
+        } else {
+            distance = rand_norm() * 10;
+        }
+        if (MoveTo(NAXX_MAP_ID, helper.center.first + cos(angle) * distance, helper.center.second + sin(angle) * distance, helper.GENERIC_HEIGHT)) {
+            return true;
+        }
+    } else {
+        std::vector<float> dest;
+        if (helper.FindPosToAvoidChill(dest)) {
+            return MoveTo(NAXX_MAP_ID, dest[0], dest[1], dest[2]);
+        }
+    }
+    return false;
+}
 
-// bool SapphironFlightPositionAction::Execute(Event event)
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "sapphiron");
-//     if (!boss) {
-//         return false;
-//     }
-//     BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     const uint32 explosion = eventMap->GetNextEventTime(10);
-//     const uint32 land = eventMap->GetNextEventTime(11);
-//     const uint32 timer = eventMap->GetTimer();
-//     if (explosion && explosion != last_explosion) {
-//         move_ice_bolt = true;
-//     }
-//     last_explosion = explosion;
-//     if (land && land > timer) {
-//         move_ice_bolt = false;
-//     }
-//     // bool newexplosion = explosion && explosion != last_explosion;
-//     if (move_ice_bolt) {
-//         return MoveToNearestIcebolt();
-//     }
-    
-//     // before explosion
-//     std::pair<float, float> center = {boss->GetPositionX(), boss->GetPositionY()};
-//     const uint32 icebolt = eventMap->GetNextEventTime(8);
+bool SapphironFlightPositionAction::Execute(Event event)
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    if (helper.WaitForExplosion()) {
+        return MoveToNearestIcebolt();
+    } else {
+        std::vector<float> dest;
+        if (helper.FindPosToAvoidChill(dest)) {
+            return MoveTo(NAXX_MAP_ID, dest[0], dest[1], dest[2]);
+        }
+    }
+    return false;
+}
 
-//     // uint32 runBeforeIcebolt = botAI->IsRanged(bot) ? 1000 : 3000;
-//     // if ((icebolt <= timer && timer - icebolt <= 7000) || (icebolt >= timer && icebolt - timer <= runBeforeIcebolt)) {
-//     //     std::pair<float, float> center = {3517.31f, -5253.74f};
-//     //     uint32 index = botAI->GetGroupSlotIndex(bot);
-//     //     float start_angle = 0.9 * M_PI;
-//     //     float offset_angle = M_PI * 0.025 * index;
-//     //     float angle = start_angle + offset_angle;
-//     //     float distance = 45.0f;
-//     //     if (MoveTo(533, center.first + cos(angle) * distance, center.second + sin(angle) * distance, 137.29f)) {
-//     //         return true;
-//     //     }
-//     // }
-//     return false;
-// }
-
-// bool SapphironFlightPositionAction::MoveToNearestIcebolt()
-// {
-//     Group* group = bot->GetGroup();
-//     if (!group) {
-//         return 0;
-//     }
-//     Group::MemberSlotList const& slots = group->GetMemberSlots();
-//     int counter = 0;
-//     Player* playerWithIcebolt = nullptr;
-//     float minDistance;
-//     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
-//         Player* member = ref->GetSource();
-//         if (botAI->HasAuraWithDuration("icebolt", member)) {
-//             if (!playerWithIcebolt || minDistance > bot->GetDistance(member)) {
-//                 playerWithIcebolt = member;
-//                 minDistance = bot->GetDistance(member);
-//             }
-//         }
-//     }
-//     if (playerWithIcebolt) {
-//         Unit* boss = AI_VALUE2(Unit*, "find target", "sapphiron");
-//         float angle = boss->GetAngle(playerWithIcebolt);
-//         // bot->Yell("Find icebolt and let\'s move!", LANG_UNIVERSAL);
-//         return MoveTo(533, playerWithIcebolt->GetPositionX() + cos(angle) * 3.0f, playerWithIcebolt->GetPositionY() + sin(angle) * 3.0f, 137.29f);
-//     }
-//     // bot->Yell("No icebolt!", LANG_UNIVERSAL);
-//     return false;
-// }
+bool SapphironFlightPositionAction::MoveToNearestIcebolt()
+{
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return false;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    Player* playerWithIcebolt = nullptr;
+    float minDistance;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (botAI->HasAura("icebolt", member, false, false, -1, true)) {
+            if (!playerWithIcebolt || minDistance > bot->GetDistance(member)) {
+                playerWithIcebolt = member;
+                minDistance = bot->GetDistance(member);
+            }
+        }
+    }
+    if (playerWithIcebolt) {
+        Unit* boss = AI_VALUE2(Unit*, "find target", "sapphiron");
+        float angle = boss->GetAngle(playerWithIcebolt);
+        return MoveTo(NAXX_MAP_ID, playerWithIcebolt->GetPositionX() + cos(angle) * 3.0f, playerWithIcebolt->GetPositionY() + sin(angle) * 3.0f, helper.GENERIC_HEIGHT);
+    }
+    return false;
+}
 
 // bool SapphironAvoidChillAction::Execute(Event event)
 // {

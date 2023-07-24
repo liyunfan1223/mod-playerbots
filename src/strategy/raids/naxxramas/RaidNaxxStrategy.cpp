@@ -34,8 +34,8 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
 		"kel'thuzad", 
 		NextAction::array(0, 
+   			new NextAction("kel'thuzad position", ACTION_RAID + 2),
 			new NextAction("kel'thuzad choose target", ACTION_RAID + 1), 
-   			new NextAction("kel'thuzad position", ACTION_RAID + 1),
 		NULL)));
 
 	// Anub'Rekhan
@@ -85,18 +85,14 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// 	"horseman except attractors", 
 	// 	NextAction::array(0, new NextAction("horseman attack in order", ACTION_RAID + 1), NULL)));
 
-	// // sapphiron
-	// triggers.push_back(new TriggerNode(
-	// 	"sapphiron ground main tank", 
-	// 	NextAction::array(0, new NextAction("sapphiron ground main tank position", ACTION_RAID + 1), NULL)));
-	
-	// triggers.push_back(new TriggerNode(
-	// 	"sapphiron ground except main tank", 
-	// 	NextAction::array(0, new NextAction("sapphiron ground position", ACTION_RAID + 1), NULL)));
-	
-	// triggers.push_back(new TriggerNode(
-	// 	"sapphiron flight", 
-	// 	NextAction::array(0, new NextAction("sapphiron flight position", ACTION_RAID + 1), NULL)));
+	// sapphiron
+	triggers.push_back(new TriggerNode(
+		"sapphiron ground", 
+		NextAction::array(0, new NextAction("sapphiron ground position", ACTION_RAID + 1), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"sapphiron flight",
+		NextAction::array(0, new NextAction("sapphiron flight position", ACTION_RAID + 1), NULL)));
 	
 	// triggers.push_back(new TriggerNode(
 	// 	"sapphiron chill", 
@@ -132,7 +128,7 @@ void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 	multipliers.push_back(new HeiganDanceMultiplier(botAI));
 	// multipliers.push_back(new LoathebGenericMultiplier(ai));
 	// multipliers.push_back(new ThaddiusGenericMultiplier(ai));
-	// multipliers.push_back(new SapphironGenericMultiplier(ai));
+	multipliers.push_back(new SapphironGenericMultiplier(botAI));
 	multipliers.push_back(new InstructorRazuviousGenericMultiplier(botAI));
 	multipliers.push_back(new KelthuzadGenericMultiplier(botAI));
 	multipliers.push_back(new AnubrekhanGenericMultiplier(botAI));

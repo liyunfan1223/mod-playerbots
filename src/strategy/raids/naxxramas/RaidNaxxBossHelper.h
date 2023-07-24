@@ -4,6 +4,7 @@
 #include "AiObject.h"
 #include "AiObjectContext.h"
 #include "EventMap.h"
+#include "Log.h"
 #include "ObjectGuid.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
@@ -20,12 +21,16 @@ template<class BossAiType>
 class GenericBossHelper : public AiObject {
     public:
         GenericBossHelper(PlayerbotAI* botAI, std::string name): AiObject(botAI), name_(name) {}
-        bool UpdateBossAI() {
-            Unit* target = AI_VALUE2(Unit*, "find target", name_);
-            if (!target) {
+        virtual bool UpdateBossAI() {
+            Unit* unit = AI_VALUE2(Unit*, "find target", name_);
+            if (!unit) {
                 return false;
             }
-            ai_ = dynamic_cast<BossAiType *>(target->GetAI());
+            target_ = unit->ToCreature();
+            if (!target_) {
+                return false;
+            }
+            ai_ = dynamic_cast<BossAiType *>(target_->GetAI());
             if (!ai_) {
                 return false;
             }
@@ -33,20 +38,23 @@ class GenericBossHelper : public AiObject {
             if (!event_map_) {
                 return false;
             }
+            timer_ = event_map_->GetTimer();
             return true;
         }
     protected:
+        Creature* target_;
         std::string name_;
         BossAiType *ai_;
         EventMap* event_map_;
+        uint32 timer_;
 };
 
 class KelthuzadBossHelper: public GenericBossHelper<boss_kelthuzad::boss_kelthuzadAI> {
     public:
         KelthuzadBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "kel'thuzad") {}
-        std::pair<float, float> center = {3716.19f, -5106.58f};
-        std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
-        std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
+        const std::pair<float, float> center = {3716.19f, -5106.58f};
+        const std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
+        const std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
         bool IsPhaseOne() {
             return event_map_->GetNextEventTime(KELTHUZAD_EVENT_PHASE_2) != 0;
         }
@@ -72,6 +80,83 @@ class KelthuzadBossHelper: public GenericBossHelper<boss_kelthuzad::boss_kelthuz
 class RazuviousBossHelper: public GenericBossHelper<boss_razuvious::boss_razuviousAI> {
     public:
         RazuviousBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "instructor razuvious") {}
+};
+
+class SapphironBossHelper: public GenericBossHelper<boss_sapphiron::boss_sapphironAI> {
+    public:
+        const std::pair<float, float> mainTankPos = {3512.07f, -5274.06f};
+        const std::pair<float, float> center = {3517.31f, -5253.74f};
+        const float GENERIC_HEIGHT = 137.29f;
+        SapphironBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "sapphiron") {}
+        bool UpdateBossAI() override {
+            if (!GenericBossHelper::UpdateBossAI()) {
+                return false;
+            }
+            uint32 nextEventGround = event_map_->GetNextEventTime(EVENT_GROUND);
+            if (nextEventGround && nextEventGround != lastEventGround)
+                lastEventGround = nextEventGround;
+            return true;
+        }
+        bool IsPhaseGround() {
+            return target_->GetReactState() == REACT_AGGRESSIVE;
+        }
+        bool IsPhaseFlight() {
+            return !IsPhaseGround();
+        }
+        bool JustLanded() {
+            // if (event_map_->GetTimer() <= POSITION_TIME_AFTER_LANDED) {
+            //     return true;
+            // }
+            // LOG_DEBUG("playerbots", "JustLanded lastEventGround: {}", lastEventGround);
+            // return timer_ >= lastEventGround && timer_ - lastEventGround <= POSITION_TIME_AFTER_LANDED;
+            return (event_map_->GetNextEventTime(EVENT_FLIGHT_START) - timer_) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
+        }
+        bool WaitForExplosion() {
+            return event_map_->GetNextEventTime(EVENT_FLIGHT_SPELL_EXPLOSION);
+        }
+        bool FindPosToAvoidChill(std::vector<float> &dest) {
+            Aura* aura = botAI->GetAura("chill", bot);
+            if (!aura) {
+                return false;
+            }
+            DynamicObject* dyn_obj = aura->GetDynobjOwner();
+            if (!dyn_obj) {
+                return false;
+            }
+            Unit* currentTarget = AI_VALUE(Unit*, "current target");
+            float angle = 0;
+            uint32 index = botAI->GetGroupSlotIndex(bot);
+            if (currentTarget) {
+                if (botAI->IsRanged(bot)) {
+                    if (bot->GetExactDist2d(currentTarget) <= 45.0f) {
+                        angle = bot->GetAngle(dyn_obj) - M_PI + (rand_norm() - 0.5) * M_PI / 2;
+                    } else {
+                    if (index % 2 == 0) {
+                            angle = bot->GetAngle(currentTarget) + M_PI / 2;
+                        } else {
+                            angle = bot->GetAngle(currentTarget) - M_PI / 2;    
+                        }
+                    }
+                } else {
+                    if (index % 3 == 0) {
+                        angle = bot->GetAngle(currentTarget);
+                    } else if (index % 3 == 1) {
+                        angle = bot->GetAngle(currentTarget) + M_PI / 2;
+                    } else {
+                        angle = bot->GetAngle(currentTarget) - M_PI / 2;
+                    }
+                }
+            } else {
+                angle = bot->GetAngle(dyn_obj) - M_PI + (rand_norm() - 0.5) * M_PI / 2;
+            }
+            dest = {bot->GetPositionX() + cos(angle) * 5.0f, bot->GetPositionY() + sin(angle) * 5.0f, bot->GetPositionZ()};
+            return true;
+        }
+    private:
+        const uint32 POSITION_TIME_AFTER_LANDED = 5000;
+        const uint32 EVENT_FLIGHT_INTERVAL = 45000;
+        uint32 lastEventGround = 0;
+        
 };
 
 #endif

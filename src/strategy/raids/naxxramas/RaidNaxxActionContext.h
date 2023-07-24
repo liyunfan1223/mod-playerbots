@@ -32,8 +32,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
             // creators["horseman attack in order"] = &RaidNaxxActionContext::horseman_attack_in_order;
             
             // creators["sapphiron ground main tank position"] = &RaidNaxxActionContext::sapphiron_ground_main_tank_position;
-            // creators["sapphiron ground position"] = &RaidNaxxActionContext::sapphiron_ground_position;
-            // creators["sapphiron flight position"] = &RaidNaxxActionContext::sapphiron_flight_position;
+            creators["sapphiron ground position"] = &RaidNaxxActionContext::sapphiron_ground_position;
+            creators["sapphiron flight position"] = &RaidNaxxActionContext::sapphiron_flight_position;
             // creators["sapphiron avoid chill"] = &RaidNaxxActionContext::sapphiron_avoid_chill;
 
             creators["kel'thuzad choose target"] = &RaidNaxxActionContext::kelthuzad_choose_target;
@@ -65,8 +65,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
         // static Action* horseman_attract_alternatively(PlayerbotAI* ai) { return new HorsemanAttractAlternativelyAction(ai); }
         // static Action* horseman_attack_in_order(PlayerbotAI* ai) { return new HorsemanAttactInOrderAction(ai); }
         // static Action* sapphiron_ground_main_tank_position(PlayerbotAI* ai) { return new SapphironGroundMainTankPositionAction(ai); }
-        // static Action* sapphiron_ground_position(PlayerbotAI* ai) { return new SapphironGroundPositionAction(ai); }
-        // static Action* sapphiron_flight_position(PlayerbotAI* ai) { return new SapphironFlightPositionAction(ai); }
+        static Action* sapphiron_ground_position(PlayerbotAI* ai) { return new SapphironGroundPositionAction(ai); }
+        static Action* sapphiron_flight_position(PlayerbotAI* ai) { return new SapphironFlightPositionAction(ai); }
         // static Action* sapphiron_avoid_chill(PlayerbotAI* ai) { return new SapphironAvoidChillAction(ai); }
         static Action* kelthuzad_choose_target(PlayerbotAI* ai) { return new KelthuzadChooseTargetAction(ai); }
         static Action* kelthuzad_position(PlayerbotAI* ai) { return new KelthuzadPositionAction(ai); }

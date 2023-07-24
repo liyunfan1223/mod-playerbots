@@ -125,29 +125,17 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 // 	return 1.0f;
 // }
 
-// float SapphironGenericMultiplier::GetValue(Action* action)
-// {
-// 	Unit* boss = AI_VALUE2(Unit*, "find target", "sapphiron");
-// 	if (!boss) {
-//         return 1.0f;
-//     }
-// 	if (dynamic_cast<FollowAction*>(action) || 
-// 		dynamic_cast<CastDeathGripAction*>(action)) {
-// 		return 0.0f;
-// 	}
-// 	BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     uint32 curr_phase = eventMap->GetPhaseMask();
-// 	uint32 timer = eventMap->GetTimer();
-// 	uint32 explosion = eventMap->GetNextEventTime(10);
-// 	if (curr_phase == 4 && explosion > timer && 
-// 		(dynamic_cast<MovementAction*>(action) && 
-// 		 !dynamic_cast<SapphironFlightPositionAction*>(action) && 
-// 		 !dynamic_cast<SummonAction*>(action))) {
-// 		return 0.0f;
-// 	}
-// 	return 1.0f;
-// }
+float SapphironGenericMultiplier::GetValue(Action* action)
+{
+	if (!helper.UpdateBossAI()) {
+		return 1.0f;
+	}
+	if (dynamic_cast<FollowAction*>(action) || 
+		dynamic_cast<CastDeathGripAction*>(action)) {
+		return 0.0f;
+	}
+	return 1.0f;
+}
 
 float InstructorRazuviousGenericMultiplier::GetValue(Action* action)
 {

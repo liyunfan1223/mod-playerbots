@@ -171,33 +171,24 @@ class RazuviousTargetAction : public AttackAction
 //     virtual bool Execute(Event event);
 // };
 
-// class SapphironGroundPositionAction : public MovementAction
-// {
-// public:
-//     SapphironGroundPositionAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron ground position") {
-//         this->reset = 1;
-//         this->last_flight = 0;
-//         this->reset_timer = 0;
-//     }
-//     virtual bool Execute(Event event);
-// protected:
-//     bool reset;
-//     uint32 last_flight, reset_timer;
-// };
+class SapphironGroundPositionAction : public MovementAction
+{
+    public:
+        SapphironGroundPositionAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron ground position"), helper(ai) {}
+        bool Execute(Event event) override;
+    protected:
+        SapphironBossHelper helper;
+};
 
-// class SapphironFlightPositionAction : public MovementAction
-// {
-// public:
-//     SapphironFlightPositionAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron flight position") {
-//         this->last_explosion = 0;
-//         this->move_ice_bolt = 0;
-//     }
-//     virtual bool Execute(Event event);
-// protected:
-//     uint32 last_explosion;
-//     bool move_ice_bolt;
-//     bool MoveToNearestIcebolt();
-// };
+class SapphironFlightPositionAction : public MovementAction
+{
+    public:
+        SapphironFlightPositionAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron flight position"), helper(ai) {}
+        bool Execute(Event event) override;
+    protected:
+        SapphironBossHelper helper;
+        bool MoveToNearestIcebolt();
+};
 
 // class SapphironAvoidChillAction : public MovementAction
 // {

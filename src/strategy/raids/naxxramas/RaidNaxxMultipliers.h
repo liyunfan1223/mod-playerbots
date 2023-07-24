@@ -32,14 +32,15 @@ public:
 //     virtual float GetValue(Action* action);
 // };
 
-// class SapphironGenericMultiplier : public Multiplier
-// {
-// public:
-//     SapphironGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "sapphiron generic") {}
+class SapphironGenericMultiplier : public Multiplier
+{
+    public:
+        SapphironGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "sapphiron generic"), helper(ai) {}
 
-// public:
-//     virtual float GetValue(Action* action);
-// };
+        virtual float GetValue(Action* action);
+    private:
+        SapphironBossHelper helper;
+};
 
 class InstructorRazuviousGenericMultiplier : public Multiplier
 {
