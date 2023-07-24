@@ -24,12 +24,12 @@ void HealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "enemy out of spell",
         NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"medium aoe heal",
-		NextAction::array(0, 
-            new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), 
-            // new NextAction("power word: shield on almost full health below", ACTION_MEDIUM_HEAL + 7),
-            NULL)));
+	// triggers.push_back(new TriggerNode(
+	// 	"medium aoe heal",
+	// 	NextAction::array(0, 
+    //         new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), 
+    //         // new NextAction("power word: shield on almost full health below", ACTION_MEDIUM_HEAL + 7),
+    //         NULL)));
 
     triggers.push_back(new TriggerNode(
 		"group heal occasion",

@@ -21,3 +21,53 @@ bool CastRemoveShadowformAction::Execute(Event event)
     botAI->RemoveAura("shadowform");
     return true;
 }
+
+Unit* CastPowerWordShieldOnAlmostFullHealthBelow::GetTarget()
+{
+    Group *group = bot->GetGroup();
+    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* player = gref->GetSource();
+        if (!player)
+            continue;
+        if (player->isDead()) {
+            continue;
+        }
+        if (player->GetHealthPct() > sPlayerbotAIConfig->almostFullHealth) {
+            continue;
+        }
+        if (player->GetDistance2d(bot) > sPlayerbotAIConfig->spellDistance) {
+            continue;
+        }
+        if (botAI->HasAnyAuraOf(player, "weakened soul", "power word: shield", NULL)) {
+            continue;
+        }
+        return player;
+    }
+    return NULL;
+}
+
+bool CastPowerWordShieldOnAlmostFullHealthBelow::isUseful()
+{
+    Group *group = bot->GetGroup();
+    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* player = gref->GetSource();
+        if (!player)
+            continue;
+        if (player->isDead()) {
+            continue;
+        }
+        if (player->GetHealthPct() > sPlayerbotAIConfig->almostFullHealth) {
+            continue;
+        }
+        if (player->GetDistance2d(bot) > sPlayerbotAIConfig->spellDistance) {
+            continue;
+        }
+        if (botAI->HasAnyAuraOf(player, "weakened soul", "power word: shield", NULL)) {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}

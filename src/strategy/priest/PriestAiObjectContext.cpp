@@ -158,6 +158,7 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
             creators["divine spirit on party"] = &PriestAiObjectContextInternal::divine_spirit_on_party;
             creators["power word: shield"] = &PriestAiObjectContextInternal::power_word_shield;
             creators["power word: shield on party"] = &PriestAiObjectContextInternal::power_word_shield_on_party;
+            creators["power word: shield on almost full health below"] = &PriestAiObjectContextInternal::power_word_shield_on_almost_full_health_below;
             creators["renew"] = &PriestAiObjectContextInternal::renew;
             creators["renew on party"] = &PriestAiObjectContextInternal::renew_on_party;
             creators["greater heal"] = &PriestAiObjectContextInternal::greater_heal;
@@ -247,6 +248,7 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* divine_spirit_on_party(PlayerbotAI* botAI) { return new CastDivineSpiritOnPartyAction(botAI); }
         static Action* power_word_shield(PlayerbotAI* botAI) { return new CastPowerWordShieldAction(botAI); }
         static Action* power_word_shield_on_party(PlayerbotAI* botAI) { return new CastPowerWordShieldOnPartyAction(botAI); }
+        static Action* power_word_shield_on_almost_full_health_below(PlayerbotAI* ai) { return new CastPowerWordShieldOnAlmostFullHealthBelow(ai); }
         static Action* renew(PlayerbotAI* botAI) { return new CastRenewAction(botAI); }
         static Action* renew_on_party(PlayerbotAI* botAI) { return new CastRenewOnPartyAction(botAI); }
         static Action* greater_heal(PlayerbotAI* botAI) { return new CastGreaterHealAction(botAI); }

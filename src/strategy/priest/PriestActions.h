@@ -149,4 +149,11 @@ public:
     CastShadowfiendAction(PlayerbotAI* ai) : CastSpellAction(ai, "shadowfiend") {}
     virtual std::string const GetTargetName() { return "current target"; }
 };
+
+class CastPowerWordShieldOnAlmostFullHealthBelow : public HealPartyMemberAction {
+public:
+    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI* ai) : HealPartyMemberAction(ai, "power word: shield") {}
+    bool isUseful() override;
+    Unit* GetTarget() override;
+};
 #endif
