@@ -543,16 +543,14 @@ bool SapphironGroundPositionAction::Execute(Event event)
         float offset_angle = M_PI * 0.02 * index;
         float angle = start_angle + offset_angle;
         float distance;
-        if (botAI->IsRangedDps(bot)) {
-            distance = rand_norm() * 5 + 30.0f;
+        if (botAI->IsRanged(bot)) {
+            distance = 35.0f;
         } else if (botAI->IsHeal(bot)) {
-            distance = rand_norm() * 5 + 20.0f;
+            distance = 30.0f;
         } else {
-            distance = rand_norm() * 10;
+            distance = 5.0f;
         }
-        if (MoveTo(NAXX_MAP_ID, helper.center.first + cos(angle) * distance, helper.center.second + sin(angle) * distance, helper.GENERIC_HEIGHT)) {
-            return true;
-        }
+        return MoveTo(NAXX_MAP_ID, helper.center.first + cos(angle) * distance, helper.center.second + sin(angle) * distance, helper.GENERIC_HEIGHT);
     } else {
         std::vector<float> dest;
         if (helper.FindPosToAvoidChill(dest)) {

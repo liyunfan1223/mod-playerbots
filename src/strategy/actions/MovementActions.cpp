@@ -150,15 +150,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 !bot->IsFlying() && !bot->IsUnderWater();
         MotionMaster &mm = *bot->GetMotionMaster();
         mm.Clear();
-
-        // float botZ = bot->GetPositionZ();
-		// if (!bot->InBattleground() && z - botZ > 0.5f && bot->GetDistance2d(x, y) <= 5.0f)
-		// {
-		// 	float speed = bot->GetSpeed(MOVE_RUN);
-		// 	mm.MoveJump(x, y, botZ + 0.5f, speed, speed, 1);
-		// }
-		// else
-            mm.MovePoint(mapId, x, y, z, generatePath);
+        mm.MovePoint(mapId, x, y, z, generatePath);
 
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;

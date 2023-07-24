@@ -17,7 +17,7 @@ class ShadowPriestStrategy : public GenericPriestStrategy
         NextAction** getDefaultActions() override;
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
         std::string const getName() override { return "shadow"; }
-        uint32 GetType() const override { return STRATEGY_TYPE_DPS|STRATEGY_TYPE_RANGED; }
+        uint32 GetType() const override { return STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
 };
 
 class ShadowPriestAoeStrategy : public CombatStrategy

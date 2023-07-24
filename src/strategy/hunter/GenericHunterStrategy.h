@@ -6,6 +6,7 @@
 #define _PLAYERBOT_GENERICHUNTERSTRATEGY_H
 
 #include "CombatStrategy.h"
+#include "Strategy.h"
 
 class PlayerbotAI;
 
@@ -16,6 +17,7 @@ class GenericHunterStrategy : public CombatStrategy
 
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
         std::string const getName() override { return "hunter"; }
+        uint32 GetType() const override { return CombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
 };
 
 class HunterBoostStrategy : public Strategy

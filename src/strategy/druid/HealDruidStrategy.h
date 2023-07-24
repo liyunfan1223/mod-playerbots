@@ -6,6 +6,7 @@
 #define _PLAYERBOT_HEALDRUIDSTRATEGY_H
 
 #include "GenericDruidStrategy.h"
+#include "Strategy.h"
 
 class PlayerbotAI;
 
@@ -16,7 +17,7 @@ class HealDruidStrategy : public GenericDruidStrategy
 
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
         std::string const getName() override { return "heal"; }
-        uint32 GetType() const override { return STRATEGY_TYPE_HEAL; }
+        uint32 GetType() const override { return STRATEGY_TYPE_RANGED | STRATEGY_TYPE_HEAL; }
 };
 
 #endif
