@@ -309,9 +309,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 1)
                 engine->addStrategies("tank", "tank assist", "bthreat", "barmor", "cure", "close", nullptr);
             else if (tab == 0)
-                engine->addStrategies("heal", "dps assist", "baoe", "cure", nullptr);
+                engine->addStrategies("heal", "dps assist", "cure", nullptr);
             else
-                engine->addStrategies("dps", "dps assist", "cure", "close", nullptr);
+                engine->addStrategies("dps", "dps assist", "cure", "close", "baoe", nullptr);
 
             break;
         case CLASS_DRUID:
@@ -470,7 +470,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             else if (tab == 0)
                 nonCombatEngine->addStrategies("dps assist", "bmana", nullptr);
             else
-                nonCombatEngine->addStrategies("dps assist", "bdps", "baoe", nullptr);
+                nonCombatEngine->addStrategies("dps assist", "bdps", "baoe",nullptr);
 
             nonCombatEngine->addStrategies("cure", nullptr);
             break;
