@@ -86,7 +86,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("seal of vengeance", 89.0f), NULL)));
     // triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", 91.0f), nullptr)));
-    triggers.push_back(new TriggerNode("sanctity aura", NextAction::array(0, new NextAction("sanctity aura", 90.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("sanctity aura", NextAction::array(0, new NextAction("sanctity aura", 90.0f), nullptr)));
     // triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("repentance or shield", ACTION_CRITICAL_HEAL + 3), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), nullptr)));
     // triggers.push_back(new TriggerNode("judgement of wisdom", NextAction::array(0, new NextAction("judgement of wisdom", ACTION_NORMAL + 10), nullptr)));
     // triggers.push_back(new TriggerNode("judgement", NextAction::array(0, new NextAction("judgement", ACTION_HIGH + 10), nullptr)));

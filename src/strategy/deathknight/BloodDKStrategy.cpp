@@ -83,9 +83,9 @@ NextAction** BloodDKStrategy::getDefaultActions()
 		new NextAction("rune strike", ACTION_NORMAL + 7), 
 		new NextAction("icy touch", ACTION_NORMAL + 6),
 		new NextAction("heart strike", ACTION_NORMAL + 5),
-		new NextAction("death coil", ACTION_NORMAL + 4),
-		new NextAction("plague strike", ACTION_NORMAL + 3),
-		new NextAction("blood strike", ACTION_NORMAL + 2),
+		new NextAction("blood strike", ACTION_NORMAL + 4),
+		new NextAction("death coil", ACTION_NORMAL + 3),
+		new NextAction("plague strike", ACTION_NORMAL + 2),
 		new NextAction("melee", ACTION_NORMAL), 
 		NULL);
 }

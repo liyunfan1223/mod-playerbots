@@ -307,21 +307,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "baoe", "bstats", "close", nullptr);
+                engine->addStrategies("tank", "tank assist", "bthreat", "barmor", "cure", "close", nullptr);
             else if (tab == 0)
-                engine->addStrategies("heal", "bmana", "dps assist", "cure", nullptr);
+                engine->addStrategies("heal", "dps assist", "baoe", "cure", nullptr);
             else
-                engine->addStrategies("dps", "bdps", "dps assist", "cure", "close", nullptr);
+                engine->addStrategies("dps", "dps assist", "cure", "close", nullptr);
 
-            if (player->getLevel() < 14)
-            {
-                engine->addStrategy("bdps");
-            }
-
-            if (player->getLevel() < 16)
-            {
-                engine->addStrategy("barmor");
-            }
             break;
         case CLASS_DRUID:
             if (tab == 0)
@@ -475,19 +466,13 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                nonCombatEngine->addStrategies("bthreat", "tank assist", "baoe", "bstats", nullptr);
+                nonCombatEngine->addStrategies("bthreat", "tank assist", "bstats", "barmor", nullptr);
             else if (tab == 0)
                 nonCombatEngine->addStrategies("dps assist", "bmana", nullptr);
             else
-                nonCombatEngine->addStrategies("dps assist", "bdps", nullptr);
+                nonCombatEngine->addStrategies("dps assist", "bdps", "baoe", nullptr);
 
             nonCombatEngine->addStrategies("cure", nullptr);
-
-            if (player->getLevel() < 14)
-                nonCombatEngine->addStrategies("bdps", nullptr);
-
-            if (player->getLevel() < 16)
-                nonCombatEngine->addStrategies("barmor", nullptr);
             break;
         case CLASS_HUNTER:
             nonCombatEngine->addStrategies("bdps", "dps assist", "pet", nullptr);

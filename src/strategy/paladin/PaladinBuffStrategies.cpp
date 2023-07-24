@@ -51,7 +51,6 @@ void PaladinBuffAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void PaladinBuffThreatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("righteous fury", NextAction::array(0, new NextAction("righteous fury", ACTION_HIGH + 8), nullptr)));
-
 }
 
 void PaladinBuffStatsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
