@@ -14,7 +14,7 @@ bool ChangeTalentsAction::Execute(Event event)
     std::ostringstream out;
 
     TalentSpec botSpec(bot);
-
+    
     if (!param.empty())
     {
         if (param.find("auto") != std::string::npos)
@@ -28,6 +28,10 @@ bool ChangeTalentsAction::Execute(Event event)
         else  if (param.find("list") != std::string::npos)
         {
             listPremadePaths(getPremadePaths(""), &out);
+        } else if (param == "1") {
+            bot->ActivateSpec(0);
+        } else if (param == "2") {
+            bot->ActivateSpec(1);
         }
         else
         {
