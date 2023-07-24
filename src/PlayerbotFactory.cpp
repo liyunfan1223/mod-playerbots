@@ -3015,14 +3015,14 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             ((cls == CLASS_SHAMAN && tab == 1 && bot->HasSpell(674)) ||
             (cls == CLASS_ROGUE) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 1) ||
-            (cls == CLASS_WARRIOR && tab == 1 && !bot->HasSpell(46917)) ||
+            (cls == CLASS_WARRIOR && tab == 1 && !bot->HasSpell(49152)) ||
             IsShieldTank(bot))) {
                 score *= 0.1;
         }
         // spec with double hand
         // fury with titan's grip, bear, retribution, blood dk
         if (isDoubleHand && 
-            ((cls == CLASS_WARRIOR && tab == 1 && bot->HasSpell(46917)) ||
+            ((cls == CLASS_WARRIOR && tab == 1 && bot->HasSpell(49152)) ||
             (cls == CLASS_DRUID && tab == 1) ||
             (cls == CLASS_PALADIN && tab == 2) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 0) ||
