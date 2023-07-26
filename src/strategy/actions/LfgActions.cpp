@@ -250,8 +250,8 @@ bool LfgRoleCheckAction::Execute(Event event)
     {
         uint32 currentRoles = sLFGMgr->GetRoles(bot->GetGUID());
         uint32 newRoles = GetRoles();
-        // if (currentRoles == newRoles)
-        //     return false;
+        if (currentRoles == newRoles)
+            return false;
 
         sLFGMgr->SetRoles(bot->GetGUID(), newRoles);
 
