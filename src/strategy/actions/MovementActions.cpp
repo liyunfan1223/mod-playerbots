@@ -1226,6 +1226,9 @@ void MovementAction::ClearIdleState()
 
 bool MovementAction::MoveAway(Unit* target)
 {
+    if (!target) {
+        return false;
+    }
     float angle = target->GetAngle(bot);
     float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
     float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;

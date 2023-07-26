@@ -122,7 +122,7 @@ AiPlayerbot.AutoPickReward = yes
 
 # Bots equip upgrades (Bots will equip any item obtained from looting or a quest if they are upgrades)
 # Default: 0 (disabled)
-AiPlayerbot.AutoEquipUpgradeLoot = 1
+AiPlayerbot.AutoEquipUpgradeLoot = 0
 
 # Sync quests with player (Bots will complete quests the moment you hand them in. Bots will ignore looting quest items.)
 # Default: 0 (disabled)

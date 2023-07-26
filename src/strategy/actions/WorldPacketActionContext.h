@@ -123,8 +123,8 @@ class WorldPacketActionContext : public NamedObjectContext<Action>
         static Action* accept_quest(PlayerbotAI* botAI) { return new AcceptQuestAction(botAI); }
         static Action* accept_all_quests(PlayerbotAI* botAI) { return new AcceptAllQuestsAction(botAI); }
         static Action* accept_quest_share(PlayerbotAI* botAI) { return new AcceptQuestShareAction(botAI); }
-        static Action* loot_roll(PlayerbotAI* botAI) { return (QueryItemUsageAction*)new LootRollAction(botAI); }
-        static Action* master_loot_roll(PlayerbotAI* botAI) { return (QueryItemUsageAction*)new MasterLootRollAction(botAI); }
+        static Action* loot_roll(PlayerbotAI* botAI) { return new LootRollAction(botAI); }
+        static Action* master_loot_roll(PlayerbotAI* botAI) { return new MasterLootRollAction(botAI); }
         static Action* bg_join(PlayerbotAI* botAI) { return new BGJoinAction(botAI); }
         static Action* bg_leave(PlayerbotAI* botAI) { return new BGLeaveAction(botAI); }
         static Action* bg_status(PlayerbotAI* botAI) { return new BGStatusAction(botAI); }
