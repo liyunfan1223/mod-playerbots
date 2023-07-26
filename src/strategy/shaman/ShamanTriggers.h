@@ -246,7 +246,7 @@ class NoWaterTotemTrigger : public Trigger {
 class EarthShieldOnMainTankTrigger : public BuffOnMainTankTrigger
 {
     public:
-        EarthShieldOnMainTankTrigger(PlayerbotAI* botAI) : BuffOnMainTankTrigger(botAI, "earth shield", true) {}
+        EarthShieldOnMainTankTrigger(PlayerbotAI* botAI) : BuffOnMainTankTrigger(botAI, "earth shield", false) {}
 };
 
 class FlameShockTrigger : public DebuffTrigger {

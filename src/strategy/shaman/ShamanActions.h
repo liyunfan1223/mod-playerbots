@@ -378,7 +378,7 @@ class CastLavaBurstAction : public CastSpellAction
 class CastEarthShieldOnMainTankAction : public BuffOnMainTankAction
 {
 	public:
-		CastEarthShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "earth shield", true) {}
+		CastEarthShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "earth shield", false) {}
 };
 
 class CastTotemOfWrathAction : public CastTotemAction
