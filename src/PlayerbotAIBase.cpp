@@ -48,7 +48,7 @@ void PlayerbotAIBase::IncreaseNextCheckDelay(uint32 delay)
 
 bool PlayerbotAIBase::CanUpdateAI()
 {
-    return nextAICheckDelay < 100;
+    return nextAICheckDelay == 0;
 }
 
 void PlayerbotAIBase::YieldThread(bool delay)

@@ -38,7 +38,7 @@ class PartyMemberValue : public UnitCalculatedValue
 class PartyMemberMainTankValue : public PartyMemberValue
 {
 public:
-    PartyMemberMainTankValue(PlayerbotAI* botAI) : PartyMemberValue(botAI) {}
+    PartyMemberMainTankValue(PlayerbotAI* botAI) : PartyMemberValue(botAI, "main tank member", 2) {}
     virtual Unit* Calculate();
 };
 

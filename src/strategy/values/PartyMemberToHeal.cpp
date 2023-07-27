@@ -81,6 +81,7 @@ bool PartyMemberToHeal::Check(Unit* player)
 
 Unit* PartyMemberToProtect::Calculate()
 {
+    return nullptr;
     Group* group = bot->GetGroup();
     if (!group)
         return nullptr;

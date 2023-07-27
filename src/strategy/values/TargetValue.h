@@ -41,7 +41,7 @@ class FindNonCcTargetStrategy : public FindTargetStrategy
 class TargetValue : public UnitCalculatedValue
 {
 	public:
-        TargetValue(PlayerbotAI* botAI, std::string const name = "target") : UnitCalculatedValue(botAI, name) { }
+        TargetValue(PlayerbotAI* botAI, std::string const name = "target", int checkInterval = 1) : UnitCalculatedValue(botAI, name, checkInterval) { }
 
     protected:
         Unit* FindTarget(FindTargetStrategy* strategy);
@@ -101,7 +101,7 @@ class PullTargetValue : public ManualSetValue<ObjectGuid>
 class FindTargetValue : public UnitCalculatedValue, public Qualified
 {
 public:
-    FindTargetValue(PlayerbotAI* ai) : UnitCalculatedValue(ai) {}
+    FindTargetValue(PlayerbotAI* ai) : UnitCalculatedValue(ai, "find target", 2) {}
 
 public:
     Unit* Calculate();
@@ -117,7 +117,7 @@ class FindBossTargetStrategy : public FindTargetStrategy
 class BossTargetValue : public TargetValue, public Qualified
 {
 public:
-    BossTargetValue(PlayerbotAI* ai) : TargetValue(ai) {}
+    BossTargetValue(PlayerbotAI* ai) : TargetValue(ai, "boss target", 1) {}
 
 public:
     Unit* Calculate();

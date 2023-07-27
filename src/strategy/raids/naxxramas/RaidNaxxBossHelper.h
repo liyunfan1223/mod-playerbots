@@ -22,31 +22,37 @@ class GenericBossHelper : public AiObject {
     public:
         GenericBossHelper(PlayerbotAI* botAI, std::string name): AiObject(botAI), name_(name) {}
         virtual bool UpdateBossAI() {
-            Unit* unit = AI_VALUE2(Unit*, "find target", name_);
-            if (!unit) {
-                return false;
+            if(unit_ && !unit_->IsInWorld()) {
+                unit_ = nullptr;
             }
-            target_ = unit->ToCreature();
-            if (!target_) {
-                return false;
-            }
-            ai_ = dynamic_cast<BossAiType *>(target_->GetAI());
-            if (!ai_) {
-                return false;
-            }
-            event_map_ = &ai_->events;
-            if (!event_map_) {
-                return false;
+            if (!unit_) {
+                unit_ = AI_VALUE2(Unit*, "find target", name_);
+                if (!unit_) {
+                    return false;
+                }
+                target_ = unit_->ToCreature();
+                if (!target_) {
+                    return false;
+                }
+                ai_ = dynamic_cast<BossAiType *>(target_->GetAI());
+                if (!ai_) {
+                    return false;
+                }
+                event_map_ = &ai_->events;
+                if (!event_map_) {
+                    return false;
+                }
             }
             timer_ = event_map_->GetTimer();
             return true;
         }
     protected:
-        Creature* target_;
-        std::string name_;
-        BossAiType *ai_;
-        EventMap* event_map_;
-        uint32 timer_;
+        Unit* unit_ = nullptr;
+        Creature* target_ = nullptr;
+        std::string name_ = nullptr;
+        BossAiType *ai_ = nullptr;
+        EventMap* event_map_ = nullptr;
+        uint32 timer_ = 0;
 };
 
 class KelthuzadBossHelper: public GenericBossHelper<boss_kelthuzad::boss_kelthuzadAI> {

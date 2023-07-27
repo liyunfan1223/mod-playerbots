@@ -18,7 +18,9 @@ class FindLeastHpTargetStrategy : public FindTargetStrategy
                 if (guid && attacker->GetGUID() == guid)
                     return;
             }
-
+            if (!attacker->IsAlive()) {
+                return;
+            }
             if (!result || result->GetHealth() > attacker->GetHealth())
                 result = attacker;
         }

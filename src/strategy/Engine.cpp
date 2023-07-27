@@ -633,7 +633,7 @@ void Engine::LogAction(char const* format, ...)
     if (testMode)
     {
         FILE* file = fopen("test.log", "a");
-        fprintf(file, "'{}'", buf);
+        fprintf(file, "'%s'", buf);
         fprintf(file, "\n");
         fclose(file);
     }

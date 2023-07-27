@@ -4,6 +4,7 @@
 
 #include "TargetValue.h"
 #include "LastMovementValue.h"
+#include "ObjectGuid.h"
 #include "RtiTargetValue.h"
 #include "Playerbots.h"
 #include "ScriptedCreature.h"
@@ -117,31 +118,24 @@ WorldPosition HomeBindValue::Calculate()
 Unit* FindTargetValue::Calculate()
 {
     if (qualifier == "") {
-        return NULL;
+        return nullptr;
     }
     Group* group = bot->GetGroup();
     if (!group) {
-        return NULL;
+        return nullptr;
     }
-    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next()) {
-        Player* member = gref->GetSource();
-        if (!member) {
-            continue;
+    HostileReference *ref = bot->getHostileRefMgr().getFirst();
+    while (ref)
+    {
+        ThreatMgr *threatManager = ref->GetSource();
+        Unit *unit = threatManager->GetOwner();
+        std::wstring wnamepart;
+        Utf8toWStr(unit->GetName(), wnamepart);
+        wstrToLower(wnamepart);
+        if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart)) {
+            return unit;
         }
-        HostileReference *ref = member->getHostileRefMgr().getFirst();
-        while (ref)
-        {
-            ThreatMgr *threatManager = ref->GetSource();
-            Unit *unit = threatManager->GetOwner();
-            std::wstring wnamepart;
-            Utf8toWStr(unit->GetName(), wnamepart);
-            wstrToLower(wnamepart);
-            if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart)) {
-                return unit;
-            }
-            assert(ref);
-            ref = ref->next();
-        }
+        ref = ref->next();
     }
     return nullptr;
 }
