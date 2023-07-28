@@ -1247,7 +1247,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                 if (CanEquipUnseenItem(slot, dest, itemId))
                     items[slot].push_back(itemId);
             }
-        } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_NORMAL);
+        } while (items[slot].size() < 10 && desiredQuality-- > ITEM_QUALITY_NORMAL);
     }
 
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)

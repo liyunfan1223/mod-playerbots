@@ -61,13 +61,13 @@ bool DropTargetAction::Execute(Event event)
             context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
     }
 
-    ObjectGuid pullTarget = context->GetValue<ObjectGuid>("pull target")->Get();
-    GuidVector possible = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los")->Get();
+    // ObjectGuid pullTarget = context->GetValue<ObjectGuid>("pull target")->Get();
+    // GuidVector possible = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los")->Get();
 
-    if (pullTarget && find(possible.begin(), possible.end(), pullTarget) == possible.end())
-    {
-        context->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid::Empty);
-    }
+    // if (pullTarget && find(possible.begin(), possible.end(), pullTarget) == possible.end())
+    // {
+    //     context->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid::Empty);
+    // }
 
     context->GetValue<Unit*>("current target")->Set(nullptr);
 

@@ -113,8 +113,8 @@ Unit* EnemyPlayerValue::Calculate()
                     continue;
 
                 if (Unit* pAttacker = pMember->getAttackerForHelper())
-                    if (bot->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) && bot->IsWithinLOSInMap(pAttacker) && pAttacker != pVictim
-                        && pAttacker->CanSeeOrDetect(bot) && pAttacker->IsPlayer())
+                    if (pAttacker->IsPlayer() && bot->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) && bot->IsWithinLOSInMap(pAttacker) && pAttacker != pVictim
+                        && pAttacker->CanSeeOrDetect(bot))
                         return pAttacker;
             }
         }

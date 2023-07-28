@@ -13,7 +13,7 @@ GuidVector NearestUnitsValue::Calculate()
     GuidVector results;
     for (Unit* unit : targets)
     {
-        if ((ignoreLos || bot->IsWithinLOSInMap(unit)) && AcceptUnit(unit))
+        if (AcceptUnit(unit) && (ignoreLos || bot->IsWithinLOSInMap(unit)))
             results.push_back(unit->GetGUID());
     }
 
