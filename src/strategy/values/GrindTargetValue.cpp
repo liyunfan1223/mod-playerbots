@@ -50,9 +50,14 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
     for (ObjectGuid const guid : targets)
     {
         Unit* unit = botAI->GetUnit(guid);
+        
         if (!unit)
             continue;
 
+        if (!bot->IsHostileTo(unit) && unit->GetNpcFlags() != UNIT_NPC_FLAG_NONE) {
+            continue;
+        }
+        
         if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > sPlayerbotAIConfig->spellDistance)
             continue;
 
