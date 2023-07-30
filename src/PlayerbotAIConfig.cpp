@@ -20,9 +20,8 @@ void LoadList(std::string const value, T& list)
     for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++)
     {
         uint32 id = atoi((*i).c_str());
-        if (!id)
-            continue;
-
+        // if (!id)
+        //     continue;
         list.push_back(id);
     }
 }
