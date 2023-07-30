@@ -37,8 +37,8 @@ NextAction** DpsHunterStrategy::getDefaultActions()
         new NextAction("aimed shot", 14.0f), 
         new NextAction("arcane shot", 13.0f),
         new NextAction("steady shot", 12.0f),
-        new NextAction("auto shot", 10.0f), 
-        NULL);
+        new NextAction("auto shot", 10.0f),
+        nullptr);
     // return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new NextAction("auto attack", 9.0f), nullptr);
 }
 

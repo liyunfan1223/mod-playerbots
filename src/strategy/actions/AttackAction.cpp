@@ -120,7 +120,7 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
         bot->SetFacingToObject(target);
 
-    bool attacked = bot->Attack(target, !botAI->IsRanged(bot));
+    bool attacked = bot->Attack(target, true);
     botAI->ChangeEngine(BOT_STATE_COMBAT);
 
     return attacked;

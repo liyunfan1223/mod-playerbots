@@ -17,7 +17,7 @@ class HealPriestStrategy : public GenericPriestStrategy
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
         NextAction** getDefaultActions() override;
         std::string const getName() override { return "heal"; }
-		uint32 GetType() const override { return STRATEGY_TYPE_HEAL; }
+		uint32 GetType() const override { return STRATEGY_TYPE_HEAL | STRATEGY_TYPE_RANGED; }
 };
 
 #endif
