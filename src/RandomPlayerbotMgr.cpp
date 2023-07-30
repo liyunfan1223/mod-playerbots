@@ -977,8 +977,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     if (bot->InBattlegroundQueue())
         return;
 
-    if (bot->getLevel() < 5)
-        return;
+    // if (bot->getLevel() < 5)
+    //     return;
 
     if (sPlayerbotAIConfig->randomBotRpgChance < 0)
         return;
