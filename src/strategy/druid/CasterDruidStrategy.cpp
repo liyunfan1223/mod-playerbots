@@ -122,7 +122,7 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("eclipse (lunar)", NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 6), nullptr)));
     triggers.push_back(new TriggerNode("moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
 	triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 5), NULL)));
-    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", 49.0f), NULL)));
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode(
         "party member remove curse",
         NextAction::array(0, new NextAction("remove curse on party", ACTION_DISPEL + 7), NULL)));

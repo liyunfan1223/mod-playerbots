@@ -227,6 +227,13 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         }
         fields = result->Fetch();
         std::string ret = fields[0].Get<std::string>();
+        // check name limitations
+        if (ObjectMgr::CheckPlayerName(ret) != CHAR_NAME_SUCCESS ||
+            (sObjectMgr->IsReservedName(ret) || sObjectMgr->IsProfanityName(ret)))
+        {
+            continue;
+        }
+
         if (ret.size()) {
             CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use=1 WHERE name='{}'", ret);
         }
