@@ -150,6 +150,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
         !attacker->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) &&
         // !(attacker->GetGUID().IsPet() && enemy) &&
         !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER && !attacker->IsInCombat()) && !(sPlayerbotAIConfig->IsInPvpProhibitedZone(attacker->GetAreaId()) &&
+        !attacker->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && !attacker->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) &&
         bot->CanSeeOrDetect(attacker) &&
         (attacker->GetGUID().IsPlayer() || attacker->GetGUID().IsPet())) && (!c || (!c->IsInEvadeMode() && ((!isMemberBotGroup && botAI->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) ||
         leaderHasThreat || (!c->hasLootRecipient() && (!c->GetVictim() || (c->GetVictim() && ((!c->GetVictim()->IsPlayer() || bot->IsInSameGroupWith(c->GetVictim()->ToPlayer())) ||

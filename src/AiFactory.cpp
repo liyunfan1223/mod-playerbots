@@ -79,7 +79,7 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
                 tab = 1;
                 break;
             case CLASS_PALADIN:
-                tab = 0;
+                tab = 2;
                 break;
             case CLASS_PRIEST:
                 tab = 1;
@@ -366,7 +366,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             switch (player->getClass()) {
                 case CLASS_PRIEST: {
                     if (tab != PRIEST_TAB_SHADOW) {
-                        engine->addStrategies("dps", "shadow debuff", "shadow aoe", nullptr);
+                        engine->addStrategies("holy", "shadow debuff", "shadow aoe", nullptr);
                     }
                     break;
                 }
