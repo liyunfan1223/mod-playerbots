@@ -53,7 +53,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         
         if (!unit)
             continue;
-
+            
         if (!bot->IsHostileTo(unit) && unit->GetNpcFlags() != UNIT_NPC_FLAG_NONE) {
             continue;
         }

@@ -93,9 +93,7 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "earth shield on main tank",
 		NextAction::array(0, new NextAction("earth shield on main tank", ACTION_HIGH + 7), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "enemy too close for spell",
-		NextAction::array(0, new NextAction("flee", 49.0f), NULL)));
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "medium mana",

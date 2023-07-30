@@ -39,7 +39,7 @@ void RpgStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("rpg", NextAction::array(0, new NextAction("rpg work", 1.001f), nullptr)));
     triggers.push_back(new TriggerNode("rpg", NextAction::array(0, new NextAction("rpg emote", 1.001f), nullptr)));
     triggers.push_back(new TriggerNode("has rpg target", NextAction::array(0, new NextAction("rpg cancel", 1.001f), nullptr)));
-    triggers.push_back(new TriggerNode("rpg taxi", NextAction::array(0, new NextAction("rpg taxi", 1.005f), nullptr)));
+    // triggers.push_back(new TriggerNode("rpg taxi", NextAction::array(0, new NextAction("rpg taxi", 1.005f), nullptr)));
     triggers.push_back(new TriggerNode("rpg discover", NextAction::array(0, new NextAction("rpg discover", 1.110f), nullptr)));
     triggers.push_back(new TriggerNode("rpg start quest", NextAction::array(0, new NextAction("rpg start quest", 1.080f), nullptr)));
     triggers.push_back(new TriggerNode("rpg end quest", NextAction::array(0, new NextAction("rpg end quest", 1.090f), nullptr)));
