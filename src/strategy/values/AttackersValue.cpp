@@ -7,6 +7,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Playerbots.h"
+#include "ReputationMgr.h"
 #include "ServerFacade.h"
 
 GuidVector AttackersValue::Calculate()
@@ -126,7 +127,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
         rti = bot->GetGroup()->GetTargetIcon(7) == attacker->GetGUID();
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-
+    
     bool leaderHasThreat = false;
     if (attacker && bot->GetGroup() && botAI->GetMaster())
         leaderHasThreat = attacker->GetThreatMgr().GetThreat(botAI->GetMaster());
@@ -141,6 +142,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
 
     // bool inCannon = botAI->IsInVehicle(false, true);
     // bool enemy = botAI->GetAiObjectContext()->GetValue<Unit*>("enemy player target")->Get();
+    
     return attacker && 
         attacker->IsInWorld() && 
         attacker->GetMapId() == bot->GetMapId() && 
@@ -155,7 +157,8 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
         !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER && !attacker->IsInCombat()) && 
         !attacker->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC) && 
         !attacker->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) &&
-        !(sPlayerbotAIConfig->IsInPvpProhibitedZone(attacker->GetAreaId()) && bot->CanSeeOrDetect(attacker) && (attacker->GetGUID().IsPlayer() || attacker->GetGUID().IsPet())) && 
+        bot->CanSeeOrDetect(attacker) &&
+        !(sPlayerbotAIConfig->IsInPvpProhibitedZone(attacker->GetZoneId()) && (attacker->GetGUID().IsPlayer() || attacker->GetGUID().IsPet())) && 
         (!c || (!c->IsInEvadeMode() && ((!isMemberBotGroup && botAI->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) ||
         leaderHasThreat || (!c->hasLootRecipient() && (!c->GetVictim() || (c->GetVictim() && ((!c->GetVictim()->IsPlayer() || bot->IsInSameGroupWith(c->GetVictim()->ToPlayer())) ||
         (botAI->GetMaster() && c->GetVictim() == botAI->GetMaster()))))) || c->isTappedBy(bot))));

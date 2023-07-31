@@ -20,4 +20,11 @@ class GrindingStrategy : public NonCombatStrategy
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
+class MoveRandomStrategy : public NonCombatStrategy
+{
+public:
+    MoveRandomStrategy(PlayerbotAI* ai) : NonCombatStrategy(botAI) {}
+    std::string const getName() override { return "move random"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
 #endif

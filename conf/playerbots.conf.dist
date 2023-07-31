@@ -61,13 +61,13 @@ AiPlayerbot.RandomBotArenaTeamCount = 20
 AiPlayerbot.DeleteRandomBotArenaTeams = 0
 
 # Change random bot has lower gear
-AiPlayerbot.RandomGearLoweringChance = 0.15
+AiPlayerbot.RandomGearLoweringChance = 0
 
 # Chance random bot has max level on first randomize (default 0.15)
-AiPlayerbot.RandomBotMaxLevelChance = 0.15
+AiPlayerbot.RandomBotMaxLevelChance = 0
 
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
-AiPlayerbot.RandomBotRpgChance = 0.20
+AiPlayerbot.RandomBotRpgChance = 0.20 #unused now
 
 # Set randombots movement speed to walking anywhere
 AiPlayerbot.RandombotsWalkingRPG = 0
@@ -100,7 +100,7 @@ AiPlayerbot.BotActiveAlone = 100
 
 # Set minimum level of randombots where gets enchants on items (Maxlevel + 1 to disable)
 # Default: 60
-AiPlayerbot.MinEnchantingBotLevel = 60
+AiPlayerbot.MinEnchantingBotLevel = 60 # unused now
 
 # Randombots checking players gear score level and deny the group invite if it's too low
 # Default: 1 (enabled)
@@ -138,13 +138,13 @@ AiPlayerbot.SyncLevelWithPlayers = 0
 
 # Give free food to random bots
 # Default: 1 (enabled)
-AiPlayerbot.FreeFood = 0
+AiPlayerbot.FreeFood = 1
 
 # Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
 AiPlayerbot.AutoTrainSpells = yes
 
 # Bot automatically picks talent points based on current spec (full = pick spec based on probability if multiple are like current spec, semi = only apply points if 1 spec looks like current spec, no = no auto talent points)
-AiPlayerbot.AutoPickTalents = full
+AiPlayerbot.AutoPickTalents = no
 
 # Bots automatically learn trainable spells on levelup
 # Default: 0 (disabled)
@@ -156,7 +156,7 @@ AiPlayerbot.AutoLearnQuestSpells = 0
 
 # Random Bots will pick quests on their own and try to complete
 # Default: 0 (disabled)
-AiPlayerbot.AutoDoQuests = 0
+AiPlayerbot.AutoDoQuests = 1
 
 ##################################################################################
 #                                                                                #
@@ -543,7 +543,7 @@ AiPlayerbot.RandomBotMaps = 0,1,530,571
 AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000"
 
 # PvP Restricted Zones (bots don't pvp)
-AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395"
+AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703"
 
 # Spells every random bot will learn on randomize (54197 - cold weather flying)
 AiPlayerbot.RandomBotSpellIds = "54197"
@@ -562,13 +562,15 @@ AiPlayerbot.MinRandomBotInWorldTime = 3600
 AiPlayerbot.MaxRandomBotInWorldTime = 1209600
 AiPlayerbot.MinRandomBotRandomizeTime = 302400
 AiPlayerbot.MaxRandomRandomizeTime = 1209600
-AiPlayerbot.RandomBotsPerInterval = 50
+AiPlayerbot.RandomBotsPerInterval = 500
 AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
 AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
 AiPlayerbot.MinRandomBotChangeStrategyTime = 180
 AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
 AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
+AiPlayerbot.MinRandomBotTeleportInterval = 3600
+AiPlayerbot.MaxRandomBotTeleportInterval = 18000
 
 # How far random bots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
@@ -604,6 +606,9 @@ AiPlayerbot.BotCheats = "taxi"
 
 # Enables/Disables password to bot account
 AiPlayerbot.RandomBotRandomPassword = 0
+
+# Set RandomBotMaxLevel bots to RandomBotMinLevel or not
+AiPlayerbot.DowngradeMaxLevelBot = 1
 
 ##################################################################################
 #                                                                                #
@@ -747,3 +752,4 @@ AiPlayerbot.RandomClassSpecProbability.10.1 = 33
 AiPlayerbot.DefaultTalentsOrder.10.1 =
 AiPlayerbot.RandomClassSpecProbability.10.2 = 33
 AiPlayerbot.DefaultTalentsOrder.10.2 =
+

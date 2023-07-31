@@ -80,11 +80,11 @@ void PlayerbotFactory::Prepare()
 {
     if (!itemQuality)
     {
-        if (level < 80) {
-            itemQuality = ITEM_QUALITY_RARE;
-        } else {
-            itemQuality = ITEM_QUALITY_EPIC;
-        }
+        // if (level < 80) {
+        itemQuality = ITEM_QUALITY_RARE;
+        // } else {
+        //     itemQuality = ITEM_QUALITY_EPIC;
+        // }
     }
 
     if (bot->isDead())
@@ -115,10 +115,10 @@ void PlayerbotFactory::Prepare()
 
 void PlayerbotFactory::Randomize(bool incremental)
 {
-    if (sPlayerbotAIConfig->disableRandomLevels)
-    {
-        return;
-    }
+    // if (sPlayerbotAIConfig->disableRandomLevels)
+    // {
+    //     return;
+    // }
 
     LOG_INFO("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
@@ -1206,7 +1206,9 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             continue;
 
         uint32 desiredQuality = itemQuality;
-
+        if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL) {
+            desiredQuality--;
+        }
         do
         {
             ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();

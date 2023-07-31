@@ -66,6 +66,7 @@ class PlayerbotAIConfig
         uint32 minRandomBotRandomizeTime, maxRandomBotRandomizeTime;
         uint32 minRandomBotChangeStrategyTime, maxRandomBotChangeStrategyTime;
         uint32 minRandomBotReviveTime, maxRandomBotReviveTime;
+        uint32 minRandomBotTeleportInterval, maxRandomBotTeleportInterval;
         uint32 minRandomBotPvpTime, maxRandomBotPvpTime;
         uint32 randomBotsPerInterval;
         uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
@@ -162,7 +163,7 @@ class PlayerbotAIConfig
         std::vector<uint32> randomBotArenaTeams;
 
         uint32 selfBotLevel;
-
+        bool downgradeMaxLevelBot;
         std::string const GetTimestampStr();
         bool hasLog(std::string const fileName) { return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) != allowedLogFiles.end(); };
         bool openLog(std::string const fileName, char const* mode = "a");

@@ -110,6 +110,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
             creators["guild"] = &StrategyContext::guild;
             creators["grind"] = &StrategyContext::grind;
             creators["avoid aoe"] = &StrategyContext::avoid_aoe;
+            creators["move random"] = &StrategyContext::move_random;
         }
 
     private:
@@ -169,6 +170,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
         static Strategy* guild (PlayerbotAI* botAI) { return new GuildStrategy(botAI); }
         static Strategy* grind(PlayerbotAI* botAI) { return new GrindingStrategy(botAI); }
         static Strategy* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeStrategy(botAI); }
+        static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
 };
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>

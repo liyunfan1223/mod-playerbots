@@ -18,11 +18,14 @@
 #include "LFGMgr.h"
 #include "MapMgr.h"
 #include "PerformanceMonitor.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "PlayerbotCommandServer.h"
 #include "PlayerbotFactory.h"
+#include "Random.h"
 #include "ServerFacade.h"
 #include "ChannelMgr.h"
+#include "World.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -871,80 +874,70 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
 
     //GET_PLAYERBOT_AI(player)->GetAiObjectContext()->GetValue<bool>("random bot update")->Set(false);
 
-    bool randomiser = true;
-    if (player->GetGuildId())
-    {
-        if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
-        {
-            if (guild->GetLeaderGUID() == player->GetGUID())
-            {
-                for (std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i)
-                    sGuildTaskMgr->Update(*i, player);
-            }
+    // bool randomiser = true;
+    // if (player->GetGuildId())
+    // {
+    //     if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+    //     {
+    //         if (guild->GetLeaderGUID() == player->GetGUID())
+    //         {
+    //             for (std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i)
+    //                 sGuildTaskMgr->Update(*i, player);
+    //         }
 
-            uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guild->GetLeaderGUID());
-            if (!sPlayerbotAIConfig->IsInRandomAccountList(accountId))
-            {
-                uint8 rank = player->GetRank();
-                randomiser = rank < 4 ? false : true;
-            }
-        }
-    }
+    //         uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guild->GetLeaderGUID());
+    //         if (!sPlayerbotAIConfig->IsInRandomAccountList(accountId))
+    //         {
+    //             uint8 rank = player->GetRank();
+    //             randomiser = rank < 4 ? false : true;
+    //         }
+    //     }
+    // }
 
     uint32 randomize = GetEventValue(bot, "randomize");
     if (!randomize)
     {
-        if (randomiser)
-            Randomize(player);
-
-        if (randomiser)
-        {
-            LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: randomized", bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->getLevel(), player->GetName());
-        }
-        else
-        {
-            LOG_INFO("playerbots", "Bot #{} {}:{} {} <{}>: consumables refreshed", bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->getLevel(), player->GetName(), sGuildMgr->GetGuildById(player->GetGuildId())->GetName());
-        }
-
-        if (sPlayerbotAIConfig->autoDoQuests)
-            ChangeStrategyOnce(player);
-        else
-            ChangeStrategy(player);
-
+        // if (randomiser)
+        Randomize(player);
+        LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: randomized", bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->getLevel(), player->GetName());
         uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotRandomizeTime, sPlayerbotAIConfig->maxRandomBotRandomizeTime);
         ScheduleRandomize(bot, randomTime);
         return true;
+        // if (randomiser)
+        // {
+        // }
+        // else
+        // {
+        //     LOG_INFO("playerbots", "Bot #{} {}:{} {} <{}>: consumables refreshed", bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->getLevel(), player->GetName(), sGuildMgr->GetGuildById(player->GetGuildId())->GetName());
+        // }
+        // if (sPlayerbotAIConfig->autoDoQuests)
+        //     ChangeStrategyOnce(player);
+        // else
+        //     ChangeStrategy(player);
     }
 
     // enable random teleport logic if no auto traveling enabled
-    if (!sPlayerbotAIConfig->autoDoQuests)
+    // if (!sPlayerbotAIConfig->autoDoQuests)
+    // {
+    uint32 teleport = GetEventValue(bot, "teleport");
+    if (!teleport)
     {
-        uint32 teleport = GetEventValue(bot, "teleport");
-        if (!teleport)
-        {
-            LOG_INFO("players", "Bot #{} <{}>: sent to grind", bot, player->GetName());
-            RandomTeleportForLevel(player);
-            Refresh(player);
-            SetEventValue(bot, "teleport", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
-            return true;
-        }
-
-        uint32 changeStrategy = GetEventValue(bot, "change_strategy");
-        if (!changeStrategy)
-        {
-            LOG_INFO("playerbots", "Changing strategy for bot {} <{}>", bot, player->GetName());
-            ChangeStrategy(player);
-            return true;
-        }
-    }
-
-    uint32 changeStrategy = GetEventValue(bot, "change_strategy");
-    if (!changeStrategy)
-    {
-        LOG_INFO("playerbots", "Changing strategy for bot  #{} <{}>", bot, player->GetName().c_str());
-        ChangeStrategy(player);
+        LOG_INFO("players", "Bot #{} <{}>: teleport for level and refresh", bot, player->GetName());
+        RandomTeleportForLevel(player);
+        Refresh(player);
+        uint32 time = urand(sPlayerbotAIConfig->minRandomBotTeleportInterval, sPlayerbotAIConfig->maxRandomBotTeleportInterval);
+        ScheduleTeleport(bot, time);
         return true;
     }
+    // }
+
+    // uint32 changeStrategy = GetEventValue(bot, "change_strategy");
+    // if (!changeStrategy)
+    // {
+    //     LOG_INFO("playerbots", "Changing strategy for bot  #{} <{}>", bot, player->GetName().c_str());
+    //     ChangeStrategy(player);
+    //     return true;
+    // }
 
     return false;
 }
@@ -980,8 +973,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     // if (bot->getLevel() < 5)
     //     return;
 
-    if (sPlayerbotAIConfig->randomBotRpgChance < 0)
-        return;
+    // if (sPlayerbotAIConfig->randomBotRpgChance < 0)
+    //     return;
 
     if (locs.empty())
     {
@@ -1250,9 +1243,11 @@ void RandomPlayerbotMgr::Randomize(Player* bot)
         RandomizeFirst(bot);
     else if (bot->getLevel() < 57 && bot->getClass() == CLASS_DEATH_KNIGHT)
         RandomizeFirst(bot);
-    else
+    else if (bot->getLevel() < sPlayerbotAIConfig->randomBotMaxLevel || !sPlayerbotAIConfig->downgradeMaxLevelBot)
         IncreaseLevel(bot);
-
+    else {
+        RandomizeFirst(bot);
+    }
     //RandomTeleportForRpg(bot);
 }
 
@@ -1286,13 +1281,23 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
         maxLevel = std::max(sPlayerbotAIConfig->randomBotMinLevel, std::min(playersLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
 
 	PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomizeFirst");
-    uint32 level = urand(sPlayerbotAIConfig->randomBotMinLevel, maxLevel);
+    
+    uint32 level;
 
-    if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
-        level = maxLevel;
+    if (sPlayerbotAIConfig->downgradeMaxLevelBot && bot->GetLevel() == sPlayerbotAIConfig->randomBotMaxLevel) {
+        if (bot->getClass() == CLASS_DEATH_KNIGHT) {
+            level = sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
+        } else {
+            level = sPlayerbotAIConfig->randomBotMinLevel;
+        }
+    } else {
+        level = urand(sPlayerbotAIConfig->randomBotMinLevel, maxLevel);
+        if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
+            level = maxLevel;
 
-    if (bot->getClass() == CLASS_DEATH_KNIGHT)
-        level = urand(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), std::max(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), maxLevel));
+        if (bot->getClass() == CLASS_DEATH_KNIGHT)
+            level = urand(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), std::max(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), maxLevel));
+    }
 
     SetValue(bot, "level", level);
 

@@ -15,3 +15,9 @@ void GrindingStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("no target", NextAction::array(0, new NextAction("attack anything", 5.0f), nullptr)));
 }
 
+void MoveRandomStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode(
+        "often",
+        NextAction::array(0, new NextAction("move random", 1.5f), NULL)));
+}

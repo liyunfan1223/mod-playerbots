@@ -1399,7 +1399,7 @@ bool MoveRandomAction::Execute(Event event)
 
 bool MoveRandomAction::isUseful()
 {
-    return !botAI->HasRealPlayerMaster() && botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get().size() > urand(25, 100);
+    return !botAI->HasRealPlayerMaster();
 }
 
 bool MoveInsideAction::Execute(Event event)

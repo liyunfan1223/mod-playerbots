@@ -547,13 +547,15 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategy("pvp");
             // nonCombatEngine->addStrategy("collision");
             nonCombatEngine->addStrategy("grind");
-            // nonCombatEngine->addStrategy("group");
+            nonCombatEngine->addStrategy("group");
             // nonCombatEngine->addStrategy("guild");
 
             if (sPlayerbotAIConfig->autoDoQuests)
             {
                 nonCombatEngine->addStrategy("travel");
                 nonCombatEngine->addStrategy("rpg");
+            } else {
+                nonCombatEngine->addStrategy("move random");
             }
 
             if (sPlayerbotAIConfig->randomBotJoinBG)
@@ -576,13 +578,15 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         nonCombatEngine->addStrategy("pvp");
                         // nonCombatEngine->addStrategy("collision");
                         nonCombatEngine->addStrategy("grind");
-                        // nonCombatEngine->addStrategy("group");
+                        nonCombatEngine->addStrategy("group");
                         // nonCombatEngine->addStrategy("guild");
 
                         if (sPlayerbotAIConfig->autoDoQuests)
                         {
                             nonCombatEngine->addStrategy("travel");
                             nonCombatEngine->addStrategy("rpg");
+                        } else {
+                            nonCombatEngine->addStrategy("move random");
                         }
 
                         if (masterBotAI)
