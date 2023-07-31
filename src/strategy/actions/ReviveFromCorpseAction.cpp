@@ -92,7 +92,7 @@ bool FindCorpseAction::Execute(Event event)
             LOG_DEBUG("playerbots", "Bot {} {}:{} <{}>: died too many times and was sent to an inn",
                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
             context->GetValue<uint32>("death count")->Set(0);
-            sRandomPlayerbotMgr->RandomTeleportForRpg(bot);
+            sRandomPlayerbotMgr->RandomTeleportForLevel(bot);
             return true;
         }
     }

@@ -55,7 +55,7 @@ void RpgStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     //triggers.push_back(new TriggerNode("rpg spell", NextAction::array(0, new NextAction("rpg spell", 1.001f), nullptr)));
     //triggers.push_back(new TriggerNode("rpg craft", NextAction::array(0, new NextAction("rpg craft", 1.001f), nullptr)));
     // triggers.push_back(new TriggerNode("rpg trade useful", NextAction::array(0, new NextAction("rpg trade useful", 1.030f), nullptr)));
-    triggers.push_back(new TriggerNode("rpg duel", NextAction::array(0, new NextAction("rpg duel", 1.010f), nullptr)));
+    // triggers.push_back(new TriggerNode("rpg duel", NextAction::array(0, new NextAction("rpg duel", 1.010f), nullptr)));
 }
 
 void RpgStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

@@ -2192,7 +2192,7 @@ void RandomPlayerbotMgr::ChangeStrategy(Player* player)
     {
         LOG_INFO("playerbots", "Changing strategy for bot #{} <{}> to RPG", bot, player->GetName().c_str());
         LOG_INFO("playerbots", "Bot #{} <{}>: sent to inn", bot, player->GetName().c_str());
-        RandomTeleportForRpg(player);
+        RandomTeleportForLevel(player);
         SetEventValue(bot, "teleport", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
     }
 
@@ -2212,7 +2212,7 @@ void RandomPlayerbotMgr::ChangeStrategyOnce(Player* player)
     else
     {
         LOG_INFO("playerbots", "Bot #{} <{}>: sent to inn", bot, player->GetName().c_str());
-        RandomTeleportForRpg(player);
+        RandomTeleportForLevel(player);
     }
 }
 
