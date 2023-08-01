@@ -70,7 +70,7 @@ class AllLootStrategy : public LootStrategy
 
 LootStrategyValue::~LootStrategyValue()
 {
-    delete defaultValue;
+    // delete defaultValue;
 }
 
 LootStrategy* LootStrategyValue::normal = new NormalLootStrategy();

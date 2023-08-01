@@ -1144,7 +1144,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             "GroupedData g "
             "INNER JOIN creature c ON g.guid = c.guid "
             "INNER JOIN creature_template t on c.id1 = t.entry;", sPlayerbotAIConfig->randomBotMapsAsString.c_str());
-        
+    uint32 collected_locs = 0;
     if (results)
     {
         do
@@ -1156,7 +1156,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             float z = fields[3].Get<float>();
             uint32 avg_level = fields[4].Get<uint32>();
             WorldLocation loc(mapId, x, y, z, 0);
-            LOG_INFO("playerbots", "get location {} {} {} {}, level: {}", mapId, x, y, z, avg_level);
+            collected_locs++;
             for (int32 level = (int32)avg_level - (int32)sPlayerbotAIConfig->randomBotTeleHigerLevel; level <= (int32)avg_level + (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel; level++) {
                 if (level < 1 || level > maxLevel) {
                     continue;
@@ -1165,6 +1165,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             }
         } while (results->NextRow());
     }
+    LOG_INFO("playerbots", "{} locations for level collected.", collected_locs);
+    
     LOG_INFO("playerbots", "Preparing RPG teleport caches for {} factions...", sFactionTemplateStore.GetNumRows());
     results = WorldDatabase.Query("SELECT map, position_x, position_y, position_z, r.race, r.minl, r.maxl FROM creature c INNER JOIN playerbots_rpg_races r ON c.id1 = r.entry "
         "WHERE r.race < 15");

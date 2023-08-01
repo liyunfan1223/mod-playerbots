@@ -4,6 +4,7 @@
 
 #include "MovementActions.h"
 #include "MovementGenerator.h"
+#include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
 #include "SharedDefines.h"
@@ -139,9 +140,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     //     return false;
     // }
 	// bot->UpdateGroundPositionZ(x, y, z);
-    z += 15.0f;
+    z += 2.0f;
     bot->UpdateAllowedPositionZ(x, y, z);
-    z += 0.5f;
+    // z += 0.5f;
     float distance = bot->GetDistance2d(x, y);
     if (distance > sPlayerbotAIConfig->contactDistance)
     {
@@ -673,8 +674,11 @@ bool MovementAction::MoveTo(Unit* target, float distance)
 
     float dx = cos(angle) * needToGo + bx;
     float dy = sin(angle) * needToGo + by;
-    float dz = bz + (tz - bz) * (needToGo / distanceToTarget); // calc accurate z postion to avoid stuck
-    return MoveTo(target->GetMapId(), dx, dy, tz);
+    float dz = std::max(bz, tz); // calc accurate z position to avoid stuck
+    if (distanceToTarget > CONTACT_DISTANCE) {
+        dz = std::max(dz, bz + (tz - bz) * (needToGo / distanceToTarget));
+    }
+    return MoveTo(target->GetMapId(), dx, dy, dz);
 }
 
 float MovementAction::GetFollowAngle()

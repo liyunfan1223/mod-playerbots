@@ -347,7 +347,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 void PlayerbotFactory::Refresh()
 {
     Prepare();
-    InitEquipment(true);
+    // InitEquipment(true);
     InitAmmo();
     InitFood();
     InitReagents();
