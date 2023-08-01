@@ -871,6 +871,25 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
 
     //if (player->isDead())
         //return false;
+    if (player->isDead())
+    {
+        if (!GetEventValue(bot, "dead"))
+        {
+            uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
+            LOG_INFO("playerbots", "Mark bot {} as dead, will be revived in {}s.", player->GetName().c_str(), randomTime);
+            SetEventValue(bot, "dead", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
+            SetEventValue(bot, "revive", 1, randomTime);
+            return false;
+        }
+
+        if (!GetEventValue(bot, "revive"))
+        {
+			Revive(player);
+			return true;
+        }
+
+        return false;
+    }
 
     //GET_PLAYERBOT_AI(player)->GetAiObjectContext()->GetValue<bool>("random bot update")->Set(false);
 
@@ -946,17 +965,13 @@ void RandomPlayerbotMgr::Revive(Player* player)
 {
     uint32 bot = player->GetGUID().GetCounter();
 
-    //LOG_INFO("playerbots", "Bot {} revived", bot);
+    LOG_INFO("playerbots", "Bot {} revived", player->GetName().c_str());
     SetEventValue(bot, "dead", 0, 0);
     SetEventValue(bot, "revive", 0, 0);
 
-    if (player->getDeathState() == CORPSE)
-        RandomTeleport(player);
-    else
-    {
-        RandomTeleportForLevel(player);
-        Refresh(player);
-    }
+
+    RandomTeleportForLevel(player);
+    Refresh(player);
 }
 
 void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth)
@@ -985,8 +1000,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     std::vector<WorldPosition> tlocs;
     for (auto& loc : locs)
         tlocs.push_back(WorldPosition(loc));
-    // LOG_INFO("playerbots", "Locs {} collected.", tlocs.size());
-    //Do not teleport to maps disabled in config
+    // Do not teleport to maps disabled in config
     tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldPosition l)
     {
         std::vector<uint32>::iterator i = find(sPlayerbotAIConfig->randomBotMaps.begin(), sPlayerbotAIConfig->randomBotMaps.end(), l.getMapId());
@@ -1031,23 +1045,23 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         {
             WorldLocation loc = tlocs[urand(0, tlocs.size() - 1)];
 
-            float x = loc.GetPositionX() + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
-            float y = loc.GetPositionY() + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
+            float x = loc.GetPositionX(); // + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
+            float y = loc.GetPositionY(); // + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
             float z = loc.GetPositionZ();
 
             Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
             if (!map)
                 continue;
-
-            AreaTableEntry const* area = sAreaTableStore.LookupEntry(map->GetAreaId(bot->GetPhaseMask(), x, y, z));
-            if (!area)
+            
+            AreaTableEntry const* zone = sAreaTableStore.LookupEntry(map->GetZoneId(bot->GetPhaseMask(), x, y, z));
+            if (!zone)
                 continue;
 
             // Do not teleport to enemy zones if level is low
-            if (area->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE && bot->getLevel() < 40)
+            if (zone->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
                 continue;
 
-            if (area->team == 2 && bot->GetTeamId() == TEAM_HORDE && bot->getLevel() < 40)
+            if (zone->team == 2 && bot->GetTeamId() == TEAM_HORDE)
                 continue;
 
             if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
@@ -1060,11 +1074,11 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
             z = 0.05f + ground;
 
             LOG_INFO("playerbots", "Random teleporting bot {} to {} {},{},{} ({}/{} locations)",
-                bot->GetName().c_str(), area->area_name[0], x, y, z, attemtps, tlocs.size());
+                bot->GetName().c_str(), zone->area_name[0], x, y, z, attemtps, tlocs.size());
 
             if (hearth)
             {
-                bot->SetHomebind(loc, area->ID);
+                bot->SetHomebind(loc, zone->ID);
             }
 
             bot->GetMotionMaster()->Clear();
@@ -1093,66 +1107,66 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
     if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_TELE_CACHE)))
+    LOG_INFO("playerbots", "Preparing random teleport caches for {} levels...", maxLevel);
+    QueryResult results = WorldDatabase.Query(
+        "WITH GroupedData AS ( "
+            "SELECT "
+                "MIN( c.guid ) guid, "
+                "( "
+                "AVG( t.maxlevel ) + AVG( t.minlevel )) / 2 lvl "
+            "FROM "
+                "creature c "
+                "INNER JOIN creature_template t ON c.id1 = t.entry "
+            "WHERE "
+                "t.npcflag = 0 "
+                "AND t.lootid != 0 "
+                "AND t.unit_flags != 768 "
+                "AND map IN ({}) "
+                "AND t.maxlevel != 1 "
+            "GROUP BY "
+                "map, "
+                "ROUND( position_x / 250 ) * 250, "
+                "ROUND( position_y / 250 ) * 250, "
+                "ROUND( position_z / 5 ) * 5 "
+            "HAVING "
+                "count(*) > 10 "
+                "AND MAX( t.maxlevel ) - MIN( t.minlevel ) < 5 "
+            "ORDER BY "
+                "lvl "
+        ") "
+        "SELECT "
+            "map, "
+            "position_x, "
+            "position_y, "
+            "position_z, "
+            "t.maxlevel "
+        "FROM "
+            "GroupedData g "
+            "INNER JOIN creature c ON g.guid = c.guid "
+            "INNER JOIN creature_template t on c.id1 = t.entry;", sPlayerbotAIConfig->randomBotMapsAsString.c_str());
+        
+    if (results)
     {
-        LOG_INFO("playerbots", "Loading random teleport caches for {} levels...", maxLevel);
-
         do
         {
-            Field* fields = result->Fetch();
-            uint32 mapId = fields[0].Get<uint32>();
+            Field* fields = results->Fetch();
+            uint16 mapId = fields[0].Get<uint16>();
             float x = fields[1].Get<float>();
             float y = fields[2].Get<float>();
             float z = fields[3].Get<float>();
-            uint8 level = fields[4].Get<uint8>();
-
+            uint32 avg_level = fields[4].Get<uint32>();
             WorldLocation loc(mapId, x, y, z, 0);
-            locsPerLevelCache[level].push_back(std::move(loc));
-        }
-        while (result->NextRow());
-    }
-    else
-    {
-        LOG_INFO("playerbots", "Preparing random teleport caches for {} levels...", maxLevel);
-
-        for (uint8 level = 1; level <= maxLevel; level++)
-        {
-            QueryResult results = WorldDatabase.Query("SELECT map, position_x, position_y, position_z "
-                "FROM (SELECT map, position_x, position_y, position_z, AVG(t.maxlevel), AVG(t.minlevel), {} - (AVG(t.maxlevel) + AVG(t.minlevel)) / 2 delta "
-                "FROM creature c INNER JOIN creature_template t ON c.id1 = t.entry WHERE t.npcflag = 0 AND t.lootid != 0 AND t.unit_flags != 768 GROUP BY t.entry, map, position_x, position_y, position_z HAVING COUNT(*) > 1) q "
-                "WHERE delta >= 0 AND delta <= {} AND map IN ('{}') AND NOT EXISTS (SELECT map, position_x, position_y, position_z FROM "
-                "(SELECT map, c.position_x, c.position_y, c.position_z, AVG(t.maxlevel), AVG(t.minlevel), {} - (AVG(t.maxlevel) + AVG(t.minlevel)) / 2 delta "
-                "FROM creature c INNER JOIN creature_template t ON c.id1 = t.entry WHERE t.npcflag = 0 AND t.lootid != 0 GROUP BY t.entry, map, position_x, position_y, position_z) q1 WHERE abs(delta) > {} and q1.map = q.map AND SQRT("
-                "(q1.position_x - q.position_x) * (q1.position_x - q.position_x) + (q1.position_y - q.position_y) * (q1.position_y - q.position_y) + "
-                "(q1.position_z - q.position_z) * (q1.position_z - q.position_z)) < {})", level, sPlayerbotAIConfig->randomBotTeleLevel, sPlayerbotAIConfig->randomBotMapsAsString.c_str(),
-                level, sPlayerbotAIConfig->randomBotTeleLevel, (uint32) sPlayerbotAIConfig->sightDistance);
-            if (results)
-            {
-                do
-                {
-                    Field* fields = results->Fetch();
-                    uint16 mapId = fields[0].Get<uint16>();
-                    float x = fields[1].Get<float>();
-                    float y = fields[2].Get<float>();
-                    float z = fields[3].Get<float>();
-                    WorldLocation loc(mapId, x, y, z, 0);
-                    locsPerLevelCache[level].push_back(std::move(loc));
-
-                    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_TELE_CACHE);
-                    stmt->SetData(0, level);
-                    stmt->SetData(1, mapId);
-                    stmt->SetData(2, x);
-                    stmt->SetData(3, y);
-                    stmt->SetData(4, z);
-                    PlayerbotsDatabase.Execute(stmt);
-                } while (results->NextRow());
+            LOG_INFO("playerbots", "get location {} {} {} {}, level: {}", mapId, x, y, z, avg_level);
+            for (int32 level = (int32)avg_level - (int32)sPlayerbotAIConfig->randomBotTeleHigerLevel; level <= (int32)avg_level + (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel; level++) {
+                if (level < 1 || level > maxLevel) {
+                    continue;
+                }
+                locsPerLevelCache[(uint8)level].push_back(loc);
             }
-        }
+        } while (results->NextRow());
     }
-
     LOG_INFO("playerbots", "Preparing RPG teleport caches for {} factions...", sFactionTemplateStore.GetNumRows());
-
-    QueryResult results = WorldDatabase.Query("SELECT map, position_x, position_y, position_z, r.race, r.minl, r.maxl FROM creature c INNER JOIN playerbots_rpg_races r ON c.id1 = r.entry "
+    results = WorldDatabase.Query("SELECT map, position_x, position_y, position_z, r.race, r.minl, r.maxl FROM creature c INNER JOIN playerbots_rpg_races r ON c.id1 = r.entry "
         "WHERE r.race < 15");
     if (results)
     {
@@ -1190,9 +1204,8 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
 
     uint32 level = bot->getLevel();
     uint8 race = bot->getRace();
-    LOG_INFO("playerbots", "Random teleporting bot {} for level ({} locations available)", bot->GetName().c_str(), rpgLocsCacheLevel[race][level].size());
-    RandomTeleport(bot, rpgLocsCacheLevel[race][level]);
-    // Refresh(bot);
+    LOG_INFO("playerbots", "Random teleporting bot {} for level {} ({} locations available)", bot->GetName().c_str(), bot->GetLevel(), locsPerLevelCache[level].size());
+    RandomTeleport(bot, locsPerLevelCache[level]);
 }
 
 void RandomPlayerbotMgr::RandomTeleport(Player* bot)
@@ -1248,7 +1261,7 @@ void RandomPlayerbotMgr::Randomize(Player* bot)
     else {
         RandomizeFirst(bot);
     }
-    //RandomTeleportForRpg(bot);
+    RandomTeleportForLevel(bot);
 }
 
 void RandomPlayerbotMgr::IncreaseLevel(Player* bot)
@@ -1296,7 +1309,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
             level = maxLevel;
 
         if (bot->getClass() == CLASS_DEATH_KNIGHT)
-            level = urand(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), std::max(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), maxLevel));
+            level = urand(std::max(sPlayerbotAIConfig->randomBotMinLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)), std::max(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), maxLevel));
     }
 
     SetValue(bot, "level", level);
@@ -1710,11 +1723,11 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
         return true;
     }
 
-    std::vector<std::string> messages = sRandomPlayerbotMgr->HandlePlayerbotCommand(args);
-    for (std::vector<std::string>::iterator i = messages.begin(); i != messages.end(); ++i)
-    {
-        LOG_INFO("playerbots", "{}", i->c_str());
-    }
+    // std::vector<std::string> messages = sRandomPlayerbotMgr->HandlePlayerbotCommand(args);
+    // for (std::vector<std::string>::iterator i = messages.begin(); i != messages.end(); ++i)
+    // {
+    //     LOG_INFO("playerbots", "{}", i->c_str());
+    // }
     return true;
 }
 
@@ -2219,8 +2232,9 @@ void RandomPlayerbotMgr::ChangeStrategyOnce(Player* player)
 void RandomPlayerbotMgr::RandomTeleportForRpg(Player* bot)
 {
     uint32 race = bot->getRace();
-    LOG_INFO("playerbots", "Random teleporting bot {} for RPG ({} locations available)", bot->GetName().c_str(), rpgLocsCache[race].size());
-    RandomTeleport(bot, rpgLocsCache[race], true);
+    uint32 level = bot->GetLevel();
+    LOG_INFO("playerbots", "Random teleporting bot {} for RPG ({} locations available)", bot->GetName().c_str(), rpgLocsCacheLevel[race].size());
+    RandomTeleport(bot, rpgLocsCacheLevel[race][level], true);
 }
 
 void RandomPlayerbotMgr::Remove(Player* bot)
@@ -2291,14 +2305,14 @@ ObjectGuid const RandomPlayerbotMgr::GetBattleMasterGUID(Player* bot, Battlegrou
             break;
         }
 
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(Bm->GetAreaId());
-        if (!area)
+        AreaTableEntry const* zone = sAreaTableStore.LookupEntry(Bm->GetZoneId());
+        if (!zone)
             continue;
 
-        if (area->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
+        if (zone->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
             continue;
 
-        if (area->team == 2 && bot->GetTeamId() == TEAM_HORDE)
+        if (zone->team == 2 && bot->GetTeamId() == TEAM_HORDE)
             continue;
 
         if (Bm->getDeathState() == DEAD)

@@ -4,7 +4,9 @@
 
 #include "MovementActions.h"
 #include "MovementGenerator.h"
+#include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
+#include "SharedDefines.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
 #include "LastMovementValue.h"
@@ -15,6 +17,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 
@@ -128,10 +131,17 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
 {
-    if (!IsMovingAllowed(mapId, x, y, z))
+    if (!IsMovingAllowed(mapId, x, y, z)) {
         return false;
-	bot->UpdateGroundPositionZ(x, y, z);
-
+    }
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR)) {
+    //     bot->Yell("I'm falling!", LANG_UNIVERSAL);
+    //     return false;
+    // }
+	// bot->UpdateGroundPositionZ(x, y, z);
+    z += 15.0f;
+    bot->UpdateAllowedPositionZ(x, y, z);
+    z += 0.5f;
     float distance = bot->GetDistance2d(x, y);
     if (distance > sPlayerbotAIConfig->contactDistance)
     {
@@ -159,8 +169,8 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     return false;
     // UpdateMovementState();
     // // LOG_DEBUG("playerbots", "IsMovingAllowed {}", IsMovingAllowed());
-    // if (!IsMovingAllowed())
-    //     return false;
+    // bot->AddUnitMovementFlag()
+    
 
     // bool isVehicle = false;
     // Unit* mover = bot;
@@ -663,7 +673,7 @@ bool MovementAction::MoveTo(Unit* target, float distance)
 
     float dx = cos(angle) * needToGo + bx;
     float dy = sin(angle) * needToGo + by;
-
+    float dz = bz + (tz - bz) * (needToGo / distanceToTarget); // calc accurate z postion to avoid stuck
     return MoveTo(target->GetMapId(), dx, dy, tz);
 }
 
@@ -1265,9 +1275,7 @@ bool FleeWithPetAction::Execute(Event event)
         if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
         {
             pet->SetReactState(REACT_PASSIVE);
-            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-            pet->GetCharmInfo()->SetIsFollowing(true);
-            pet->AttackStop();
+            pet->GetCharmInfo()->SetIsCommandFollow(true);
             pet->GetCharmInfo()->IsReturning();
             pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
@@ -1384,17 +1392,27 @@ bool MoveOutOfCollisionAction::isUseful()
 
 bool MoveRandomAction::Execute(Event event)
 {
-    //uint32 randnum = bot->GetGUID().GetCounter();       // Semi-random but fixed number for each bot.
-    //uint32 cycle = floor(getMSTime() / (1000 * 60));    // Semi-random number adds 1 each minute.
+    float distance = sPlayerbotAIConfig->tooCloseDistance + sPlayerbotAIConfig->grindDistance * urand(3, 10) / 10.0f;
 
-    //randnum = ((randnum + cycle) % 1000) + 1;
+    Map* map = bot->GetMap();
+    for (int i = 0; i < 10; ++i)
+    {
+        float x = bot->GetPositionX();
+        float y = bot->GetPositionY();
+        float z = bot->GetPositionZ();
+        x += urand(0, distance) - distance / 2;
+        y += urand(0, distance) - distance / 2;
+        bot->UpdateGroundPositionZ(x, y, z);
 
-    uint32 randnum = urand(1, 2000);
+        if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
+            continue;
 
-    float angle = M_PI * (float)randnum / 1000; //urand(1, 1000);
-    float distance = urand(20, 200);
+        bool moved = MoveTo(bot->GetMapId(), x, y, z);
+        if (moved)
+            return true;
+    }
 
-    return MoveTo(bot->GetMapId(), bot->GetPositionX() + cos(angle) * distance, bot->GetPositionY() + sin(angle) * distance, bot->GetPositionZ());
+    return false;
 }
 
 bool MoveRandomAction::isUseful()

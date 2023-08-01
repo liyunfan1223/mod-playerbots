@@ -8,6 +8,7 @@
 #include "ArenaTeamMgr.h"
 #include "GuildMgr.h"
 #include "MapMgr.h"
+#include "PetDefines.h"
 #include "Playerbots.h"
 #include "PerformanceMonitor.h"
 #include "PlayerbotDbStore.h"
@@ -322,6 +323,7 @@ void PlayerbotFactory::Randomize(bool incremental)
             pmo->finish();
     }
 
+    bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
     if (bot->getLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
@@ -588,37 +590,6 @@ void PlayerbotFactory::InitPet()
             pet->InitTalentForLevel();
 
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-            // bot->PetSpellInitialize();
-            // if (!pet->Create(guid, bot->GetMap(), bot->GetPhaseMask(), co->Entry, pet_number))
-            // {
-            //     delete pet;
-            //     pet = nullptr;
-            //     continue;
-            // }
-            
-            // pet->Relocate(bot);
-            // pet->SetOwnerGUID(bot->GetGUID());
-            // pet->SetGuidValue(UNIT_FIELD_CREATEDBY, bot->GetGUID());
-            // pet->SetFaction(bot->GetFaction());
-            // pet->SetLevel(bot->getLevel());
-            // pet->InitStatsForLevel(bot->getLevel());
-            // pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
-            // pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
-            // pet->GetMap()->AddToMap(pet->ToCreature());
-
-            // // bot->PetSpellInitialize();
-            
-            // bot->InitTamedPet(pet, bot->getLevel(), 0);
-            // pet->InitTalentForLevel();
-            // pet->CastPetAuras(true);
-            // pet->UpdateAllStats();
-
-            // PetStable& petStable = bot->GetOrInitPetStable();
-            // pet->FillPetInfo(&petStable.CurrentPet.emplace());
-
-            // LOG_INFO("playerbots",   "Bot {}: assign pet {} ({} level)", bot->GetName().c_str(), co->Entry, bot->getLevel());
-            // pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-            // // bot->PetSpellInitialize();
             break;
         }
     }
@@ -634,7 +605,7 @@ void PlayerbotFactory::InitPet()
     {
         LOG_ERROR("playerbots", "Cannot create pet for bot {}", bot->GetName().c_str());
         return;
-    }
+}
 
     // LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.", pet->m_spells.size(), pet->GetPetAutoSpellSize());
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
@@ -1215,6 +1186,9 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
             {
                 uint32 itemId = i->first;
+                if (sRandomItemMgr->IsTestItem(itemId)) {
+                    continue;
+                }
                 ItemTemplate const* proto = &i->second;
                 if (!proto)
                     continue;
@@ -1364,7 +1338,6 @@ void PlayerbotFactory::InitSecondEquipmentSet()
             ItemTemplate const* proto = &itr.second;
             if (!proto)
                 continue;
-
             if (!CanEquipItem(proto, desiredQuality))
                 continue;
 

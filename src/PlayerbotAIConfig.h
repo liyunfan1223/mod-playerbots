@@ -76,7 +76,7 @@ class PlayerbotAIConfig
         bool randomBotJoinBG;
         bool randomBotAutoJoinBG;
         bool randomBotLoginAtStartup;
-        uint32 randomBotTeleLevel;
+        uint32 randomBotTeleLowerLevel, randomBotTeleHigerLevel;
         bool logInGroupOnly, logValuesPerTick;
         bool fleeingEnabled;
         bool summonAtInnkeepersEnabled;

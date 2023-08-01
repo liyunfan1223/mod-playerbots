@@ -12,6 +12,8 @@ NextAction** GrindingStrategy::getDefaultActions()
 
 void GrindingStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("drink", 7.0f), nullptr)));
+    triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("food", 6.0f), nullptr)));
     triggers.push_back(new TriggerNode("no target", NextAction::array(0, new NextAction("attack anything", 5.0f), nullptr)));
 }
 

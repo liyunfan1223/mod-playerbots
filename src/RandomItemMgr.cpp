@@ -945,8 +945,11 @@ void RandomItemMgr::BuildItemInfoCache()
             strstr(proto->Name1.c_str(), "Monster ") ||
             strstr(proto->Name1.c_str(), "[PH]") ||
             strstr(proto->Name1.c_str(), "(OLD)")
-            )
+            ) 
+        {
+            itemForTest.insert(proto->ItemId);
             continue;
+        }
 
         // skip items with rank/rep requirements
         /*if (proto->RequiredHonorRank > 0 ||

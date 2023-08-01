@@ -9,6 +9,7 @@
 #include "MapMgr.h"
 #include "Playerbots.h"
 #include "PlayerbotFactory.h"
+#include "RandomPlayerbotMgr.h"
 #include "ServerFacade.h"
 
 bool ReviveFromCorpseAction::Execute(Event event)
@@ -89,10 +90,11 @@ bool FindCorpseAction::Execute(Event event)
     {
         if (dCount >= 5)
         {
-            LOG_DEBUG("playerbots", "Bot {} {}:{} <{}>: died too many times and was sent to an inn",
+            LOG_INFO("playerbots", "Bot {} {}:{} <{}>: died too many times, was revived and teleported",
                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
             context->GetValue<uint32>("death count")->Set(0);
-            sRandomPlayerbotMgr->RandomTeleportForLevel(bot);
+            // sRandomPlayerbotMgr->RandomTeleportForLevel(bot);
+            sRandomPlayerbotMgr->Revive(bot);
             return true;
         }
     }

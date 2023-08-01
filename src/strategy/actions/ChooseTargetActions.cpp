@@ -33,9 +33,12 @@ bool AttackAnythingAction::isUseful()
     if (!AI_VALUE(bool, "can move around"))
         return false;
 
-    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
+    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && 
+        ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
         return false;
-
+    if (bot->IsInCombat()) {
+        return false;
+    }
     Unit* target = GetTarget();
 
     if (!target)

@@ -164,8 +164,8 @@ class RandomItemMgr
         float GetItemRarity(uint32 itemId);
         uint32 GetQuestIdForItem(uint32 itemId);
         std::vector<uint32> GetQuestIdsForItem(uint32 itemId);
-
         static bool IsUsedBySkill(ItemTemplate const* proto, uint32 skillId);
+        bool IsTestItem(uint32 itemId) { return itemForTest.find(itemId) != itemForTest.end(); }
 
     private:
         void BuildRandomItemCache();
@@ -195,7 +195,7 @@ class RandomItemMgr
         std::map<std::string, uint32 > weightStatLink;
         std::map<std::string, uint32 > weightRatingLink;
         std::map<uint32, ItemInfoEntry> itemInfoCache;
-
+        std::set<uint32> itemForTest;
         static std::set<uint32> itemCache;
 };
 

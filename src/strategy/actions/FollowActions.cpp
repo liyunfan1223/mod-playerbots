@@ -25,7 +25,7 @@ bool FollowAction::Execute(Event event)
         if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
             return false;
 
-        moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ() + 2.0f);
+        moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
 
     if (Pet* pet = bot->GetPet())
@@ -33,11 +33,14 @@ bool FollowAction::Execute(Event event)
         if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
         {
             pet->SetReactState(REACT_PASSIVE);
-            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-            pet->GetCharmInfo()->SetIsFollowing(true);
-            pet->AttackStop();
+            pet->GetCharmInfo()->SetIsCommandFollow(true);
             pet->GetCharmInfo()->IsReturning();
             pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
+            // pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            // pet->GetCharmInfo()->SetIsFollowing(true);
+            // pet->AttackStop();
+            // pet->GetCharmInfo()->IsReturning();
+            // pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
     }
     //if (moved)

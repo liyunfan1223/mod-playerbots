@@ -18,8 +18,8 @@ bool DrinkAction::Execute(Event event)
     if (sPlayerbotAIConfig->freeFood)
     {
         
-        if (bot->IsNonMeleeSpellCast(true))
-            return false;
+        // if (bot->IsNonMeleeSpellCast(true))
+        //     return false;
 
         bot->ClearUnitState(UNIT_STATE_CHASE);
         bot->ClearUnitState(UNIT_STATE_FOLLOW);
@@ -70,8 +70,8 @@ bool EatAction::Execute(Event event)
 
     if (sPlayerbotAIConfig->freeFood)
     {
-        if (bot->IsNonMeleeSpellCast(true))
-            return false;
+        // if (bot->IsNonMeleeSpellCast(true))
+        //     return false;
 
         bot->ClearUnitState(UNIT_STATE_CHASE);
         bot->ClearUnitState(UNIT_STATE_FOLLOW);
@@ -106,8 +106,8 @@ bool EatAction::Execute(Event event)
 }
 
 bool EatAction::isUseful()
-{
-    return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth;
+{ 
+    return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < 85;
 }
 
 bool EatAction::isPossible()

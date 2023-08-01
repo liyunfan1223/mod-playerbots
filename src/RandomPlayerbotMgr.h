@@ -121,7 +121,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         std::vector<Player*> players;
         uint32 processTicks;
         std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
-        std::map<uint32, std::vector<WorldLocation>> rpgLocsCache;
+        // std::map<uint32, std::vector<WorldLocation>> rpgLocsCache;
         std::map<uint32, std::map<uint32, std::vector<WorldLocation>>> rpgLocsCacheLevel;
         std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> BattleMastersCache;
         std::map<uint32, std::map<std::string, CachedEvent>> eventCache;
