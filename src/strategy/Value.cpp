@@ -5,10 +5,10 @@
 #include "Value.h"
 #include "PerformanceMonitor.h"
 #include "Playerbots.h"
+#include "Timer.h"
 
 UnitCalculatedValue::UnitCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) : CalculatedValue<Unit*>(botAI, name, checkInterval)
 {
-    lastCheckTime = time(nullptr) - checkInterval / 2;
 }
 
 std::string const UnitCalculatedValue::Format()
@@ -47,7 +47,7 @@ std::string const FloatCalculatedValue::Format()
 CDPairCalculatedValue::CDPairCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
     CalculatedValue<CreatureData const*>(botAI, name, checkInterval)
 {
-    lastCheckTime = time(nullptr) - checkInterval / 2;
+    // lastCheckTime = getMSTime() - checkInterval / 2;
 }
 
 std::string const CDPairCalculatedValue::Format()
@@ -65,7 +65,7 @@ std::string const CDPairCalculatedValue::Format()
 CDPairListCalculatedValue::CDPairListCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
     CalculatedValue<std::vector<CreatureData const*>>(botAI, name, checkInterval)
 {
-    lastCheckTime = time(nullptr) - checkInterval / 2;
+    // lastCheckTime = time(nullptr) - checkInterval / 2;
 }
 
 std::string const CDPairListCalculatedValue::Format()
@@ -84,7 +84,7 @@ std::string const CDPairListCalculatedValue::Format()
 ObjectGuidCalculatedValue::ObjectGuidCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
     CalculatedValue<ObjectGuid>(botAI, name, checkInterval)
 {
-    lastCheckTime = time(nullptr) - checkInterval / 2;
+    // lastCheckTime = time(nullptr) - checkInterval / 2;
 }
 
 std::string const ObjectGuidCalculatedValue::Format()
@@ -96,7 +96,6 @@ std::string const ObjectGuidCalculatedValue::Format()
 ObjectGuidListCalculatedValue::ObjectGuidListCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
     CalculatedValue<GuidVector>(botAI, name, checkInterval)
 {
-    lastCheckTime = time(nullptr) - checkInterval / 2;
 }
 
 std::string const ObjectGuidListCalculatedValue::Format()

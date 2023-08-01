@@ -343,7 +343,7 @@ class RandomTrigger : public Trigger
 
     protected:
         int32 probability;
-        time_t lastCheck;
+        uint32 lastCheck;
 };
 
 class AndTrigger : public Trigger
@@ -415,7 +415,7 @@ END_TRIGGER()
 class NoPetTrigger : public Trigger
 {
     public:
-        NoPetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no pet", 5) { }
+        NoPetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no pet", 5 * 1000) { }
 
         virtual bool IsActive() override;
 };
@@ -423,7 +423,7 @@ class NoPetTrigger : public Trigger
 class HasPetTrigger : public Trigger
 {
 public:
-    HasPetTrigger(PlayerbotAI* ai) : Trigger(ai, "has pet", 5) {}
+    HasPetTrigger(PlayerbotAI* ai) : Trigger(ai, "has pet", 5 * 1000) {}
 
     virtual bool IsActive() override;
 };
@@ -431,7 +431,7 @@ public:
 class ItemCountTrigger : public Trigger
 {
 	public:
-        ItemCountTrigger(PlayerbotAI* botAI, std::string const item, int32 count, int32 interval = 30) : Trigger(botAI, item, interval), item(item), count(count) { }
+        ItemCountTrigger(PlayerbotAI* botAI, std::string const item, int32 count, int32 interval = 30 * 1000) : Trigger(botAI, item, interval), item(item), count(count) { }
 
 		bool IsActive() override;
 		std::string const getName() override { return "item count"; }
@@ -444,7 +444,7 @@ class ItemCountTrigger : public Trigger
 class AmmoCountTrigger : public ItemCountTrigger
 {
     public:
-        AmmoCountTrigger(PlayerbotAI* botAI, std::string const item, uint32 count = 1, int32 interval = 30) : ItemCountTrigger(botAI, item, count, interval) { }
+        AmmoCountTrigger(PlayerbotAI* botAI, std::string const item, uint32 count = 1, int32 interval = 30 * 1000) : ItemCountTrigger(botAI, item, count, interval) { }
 };
 
 class HasAuraTrigger : public Trigger
@@ -612,7 +612,7 @@ class InterruptEnemyHealerTrigger : public SpellTrigger
 class RandomBotUpdateTrigger : public RandomTrigger
 {
     public:
-        RandomBotUpdateTrigger(PlayerbotAI* botAI) : RandomTrigger(botAI, "random bot update", 30) { }
+        RandomBotUpdateTrigger(PlayerbotAI* botAI) : RandomTrigger(botAI, "random bot update", 30 * 1000) { }
 
         bool IsActive() override;
 };
@@ -620,7 +620,7 @@ class RandomBotUpdateTrigger : public RandomTrigger
 class NoNonBotPlayersAroundTrigger : public Trigger
 {
     public:
-        NoNonBotPlayersAroundTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no non bot players around", 10) { }
+        NoNonBotPlayersAroundTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no non bot players around", 10 * 1000) { }
 
         bool IsActive() override;
 };
@@ -628,7 +628,7 @@ class NoNonBotPlayersAroundTrigger : public Trigger
 class NewPlayerNearbyTrigger : public Trigger
 {
     public:
-        NewPlayerNearbyTrigger(PlayerbotAI* botAI) : Trigger(botAI, "new player nearby", 10) { }
+        NewPlayerNearbyTrigger(PlayerbotAI* botAI) : Trigger(botAI, "new player nearby", 10 * 1000) { }
 
         bool IsActive() override;
 };
@@ -644,7 +644,7 @@ class CollisionTrigger : public Trigger
 class StayTimeTrigger : public Trigger
 {
     public:
-        StayTimeTrigger(PlayerbotAI* botAI, uint32 delay, std::string const name) : Trigger(botAI, name, 5), delay(delay) { }
+        StayTimeTrigger(PlayerbotAI* botAI, uint32 delay, std::string const name) : Trigger(botAI, name, 5 * 1000), delay(delay) { }
 
         bool IsActive() override;
 
@@ -667,7 +667,7 @@ class ReturnTrigger : public StayTimeTrigger
 class GiveItemTrigger : public Trigger
 {
     public:
-        GiveItemTrigger(PlayerbotAI* botAI, std::string const name, std::string const item) : Trigger(botAI, name, 2), item(item) { }
+        GiveItemTrigger(PlayerbotAI* botAI, std::string const name, std::string const item) : Trigger(botAI, name, 2 * 1000), item(item) { }
 
         bool IsActive() override;
 
@@ -702,7 +702,7 @@ class IsMountedTrigger : public Trigger
 class CorpseNearTrigger : public Trigger
 {
     public:
-        CorpseNearTrigger(PlayerbotAI* botAI) : Trigger(botAI, "corpse near", 10) { }
+        CorpseNearTrigger(PlayerbotAI* botAI) : Trigger(botAI, "corpse near", 10 * 1000) { }
 
         bool IsActive() override;
 };
@@ -710,7 +710,7 @@ class CorpseNearTrigger : public Trigger
 class IsFallingTrigger : public Trigger
 {
     public:
-        IsFallingTrigger(PlayerbotAI* botAI) : Trigger(botAI, "falling", 10) { }
+        IsFallingTrigger(PlayerbotAI* botAI) : Trigger(botAI, "falling", 10 * 1000) { }
 
         bool IsActive() override;
 };
@@ -718,7 +718,7 @@ class IsFallingTrigger : public Trigger
 class IsFallingFarTrigger : public Trigger
 {
     public:
-        IsFallingFarTrigger(PlayerbotAI* botAI) : Trigger(botAI, "falling far", 10) { }
+        IsFallingFarTrigger(PlayerbotAI* botAI) : Trigger(botAI, "falling far", 10 * 1000) { }
 
         bool IsActive() override;
 };

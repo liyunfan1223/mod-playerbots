@@ -14,7 +14,7 @@ class NearestGameObjects : public ObjectGuidListCalculatedValue
 {
 	public:
         NearestGameObjects(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance, bool ignoreLos = false, std::string const name = "nearest game objects") :
-            ObjectGuidListCalculatedValue(botAI, name), range(range) , ignoreLos(ignoreLos) { }
+            ObjectGuidListCalculatedValue(botAI, name, 2 * 1000), range(range) , ignoreLos(ignoreLos) { }
 
     protected:
         GuidVector Calculate() override;

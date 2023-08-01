@@ -7,7 +7,7 @@
 #include "Playerbots.h"
 #include "Vehicle.h"
 
-SpellIdValue::SpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "spell id")
+SpellIdValue::SpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "spell id", 20 * 1000)
 {
 }
 

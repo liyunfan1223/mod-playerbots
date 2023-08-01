@@ -8,6 +8,7 @@
 #include "AiObject.h"
 #include "ObjectGuid.h"
 #include "PerformanceMonitor.h"
+#include "Timer.h"
 
 #include <time.h>
 
@@ -45,23 +46,28 @@ class CalculatedValue : public UntypedValue, public Value<T>
 {
 	public:
         CalculatedValue(PlayerbotAI* botAI, std::string const name = "value", uint32 checkInterval = 1) : UntypedValue(botAI, name),
-            checkInterval(checkInterval), lastCheckTime(0) { }
+            checkInterval(checkInterval == 1 ? 1 : (checkInterval < 100 ? checkInterval * 1000 : checkInterval)) /*turn s -> ms?*/, lastCheckTime(0) { } 
 
         virtual ~CalculatedValue() { }
 
         T Get() override
         {
-            time_t now = time(nullptr);
-            if (!lastCheckTime || checkInterval < 2 || now - lastCheckTime >= checkInterval / 2)
-            {
-                lastCheckTime = now;
-
+            if (checkInterval < 2) {
                 PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
                 value = Calculate();
                 if (pmo)
                     pmo->finish();
+            } else {
+                time_t now = getMSTime();
+                if (!lastCheckTime || now - lastCheckTime >= checkInterval)
+                {
+                    lastCheckTime = now;
+                    PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+                    value = Calculate();
+                    if (pmo)
+                        pmo->finish();
+                }
             }
-
             return value;
         }
 
@@ -81,7 +87,7 @@ class CalculatedValue : public UntypedValue, public Value<T>
         virtual T Calculate() = 0;
 
 		uint32 checkInterval;
-		time_t lastCheckTime;
+		uint32 lastCheckTime;
         T value;
 };
 
