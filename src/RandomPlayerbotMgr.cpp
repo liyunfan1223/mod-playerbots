@@ -1156,7 +1156,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             uint32 avg_level = fields[4].Get<uint32>();
             WorldLocation loc(mapId, x, y, z, 0);
             collected_locs++;
-            for (int32 level = (int32)avg_level - (int32)sPlayerbotAIConfig->randomBotTeleHigerLevel; level <= (int32)avg_level + (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel; level++) {
+            for (int32 level = (int32)avg_level - (int32)sPlayerbotAIConfig->randomBotTeleHigherLevel; level <= (int32)avg_level + (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel; level++) {
                 if (level < 1 || level > maxLevel) {
                     continue;
                 }
