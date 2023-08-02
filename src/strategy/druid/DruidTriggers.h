@@ -68,10 +68,10 @@ class MoonfireTrigger : public DebuffTrigger
         bool IsActive() override;
 };
 
-class FaerieFireTrigger : public DebuffTrigger
+class FaerieFireTrigger : public DebuffOnBossTrigger
 {
     public:
-        FaerieFireTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "faerie fire") { }
+        FaerieFireTrigger(PlayerbotAI* botAI) : DebuffOnBossTrigger(botAI, "faerie fire") { }
 };
 
 class FaerieFireFeralTrigger : public DebuffTrigger

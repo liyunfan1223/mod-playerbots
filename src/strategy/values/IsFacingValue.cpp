@@ -11,5 +11,5 @@ bool IsFacingValue::Calculate()
     if (!target)
         return false;
 
-    return bot->HasInArc(CAST_ANGLE_IN_FRONT, target, sPlayerbotAIConfig->sightDistance);
+    return bot->HasInArc(CAST_ANGLE_IN_FRONT, target);
 }

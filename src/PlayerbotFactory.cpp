@@ -9,6 +9,7 @@
 #include "GuildMgr.h"
 #include "MapMgr.h"
 #include "PetDefines.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "PerformanceMonitor.h"
 #include "PlayerbotDbStore.h"
@@ -81,11 +82,7 @@ void PlayerbotFactory::Prepare()
 {
     if (!itemQuality)
     {
-        // if (level < 80) {
         itemQuality = ITEM_QUALITY_RARE;
-        // } else {
-        //     itemQuality = ITEM_QUALITY_EPIC;
-        // }
     }
 
     if (bot->isDead())
@@ -93,16 +90,8 @@ void PlayerbotFactory::Prepare()
 
     bot->CombatStop(true);
 
-    if (!sPlayerbotAIConfig->disableRandomLevels)
-    {
-        bot->GiveLevel(level);
-        // bot->SetLevel(level);
-    }
-    else if (bot->getLevel() < sPlayerbotAIConfig->randombotStartingLevel)
-    {
-        bot->SetLevel(sPlayerbotAIConfig->randombotStartingLevel);
-    }
-
+    bot->GiveLevel(level);
+    bot->SetUInt32Value(PLAYER_XP, 0);
     if (!sPlayerbotAIConfig->randomBotShowHelmet || !urand(0, 4))
     {
         bot->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
@@ -123,8 +112,6 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     LOG_INFO("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
-    // bot->SaveToDB(false, false);
-    // bot->SaveToDB(false, false);
     LOG_INFO("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
     bot->resetTalents(true);
@@ -163,14 +150,9 @@ void PlayerbotFactory::Randomize(bool incremental)
         InitQuests(specialQuestIds);
 
         // quest rewards boost bot level, so reduce back
-        if (!sPlayerbotAIConfig->disableRandomLevels)
-        {
-            bot->SetLevel(level);
-        }
-        else if (bot->getLevel() < sPlayerbotAIConfig->randombotStartingLevel)
-        {
-            bot->SetLevel(sPlayerbotAIConfig->randombotStartingLevel);
-        }
+        
+        bot->GiveLevel(level);
+        
 
         ClearInventory();
         bot->SetUInt32Value(PLAYER_XP, 0);
@@ -346,8 +328,9 @@ void PlayerbotFactory::Randomize(bool incremental)
 
 void PlayerbotFactory::Refresh()
 {
-    Prepare();
+    // Prepare();
     // InitEquipment(true);
+    ClearInventory();
     InitAmmo();
     InitFood();
     InitReagents();
@@ -656,6 +639,8 @@ void PlayerbotFactory::ClearSkills()
 void PlayerbotFactory::ClearEverything()
 {
     bot->SaveToDB(false, false);
+    bot->GiveLevel(bot->getClass() == CLASS_DEATH_KNIGHT ? sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL) : sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL));
+    bot->SetUInt32Value(PLAYER_XP, 0);
     LOG_INFO("playerbots", "Resetting player...");
     bot->resetTalents(true);
     bot->SaveToDB(false, false);

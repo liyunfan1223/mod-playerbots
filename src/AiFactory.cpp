@@ -552,7 +552,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 
             if (sPlayerbotAIConfig->autoDoQuests)
             {
-                nonCombatEngine->addStrategy("travel");
+                // nonCombatEngine->addStrategy("travel");
                 nonCombatEngine->addStrategy("rpg");
             } else {
                 nonCombatEngine->addStrategy("move random");
@@ -583,7 +583,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 
                         if (sPlayerbotAIConfig->autoDoQuests)
                         {
-                            nonCombatEngine->addStrategy("travel");
+                            // nonCombatEngine->addStrategy("travel");
                             nonCombatEngine->addStrategy("rpg");
                         } else {
                             nonCombatEngine->addStrategy("move random");

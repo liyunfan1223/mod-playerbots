@@ -314,6 +314,13 @@ class DebuffTrigger : public BuffTrigger
         float life_bound;
 };
 
+class DebuffOnBossTrigger : public DebuffTrigger
+{
+    public:
+        DebuffOnBossTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : DebuffTrigger(botAI, spell, checkInterval, checkIsOwner) {}
+        bool IsActive() override;
+};
+
 class DebuffOnAttackerTrigger : public DebuffTrigger
 {
     public:

@@ -22,7 +22,7 @@ class GenericBossHelper : public AiObject {
     public:
         GenericBossHelper(PlayerbotAI* botAI, std::string name): AiObject(botAI), name_(name) {}
         virtual bool UpdateBossAI() {
-            if(unit_ && !unit_->IsInWorld()) {
+            if(unit_ && (!unit_->IsInWorld() || !unit_->IsAlive())) {
                 unit_ = nullptr;
             }
             if (!unit_) {

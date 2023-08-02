@@ -205,6 +205,15 @@ bool DebuffTrigger::IsActive()
 	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > life_bound;
 }
 
+bool DebuffOnBossTrigger::IsActive()
+{
+    if (!DebuffTrigger::IsActive()) {
+        return false;
+    }
+    Creature *c = GetTarget()->ToCreature();
+    return c && ((c->IsDungeonBoss()) || (c->isWorldBoss()));
+}
+
 bool SpellTrigger::IsActive()
 {
 	return GetTarget();

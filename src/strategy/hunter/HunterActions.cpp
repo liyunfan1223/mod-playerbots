@@ -4,7 +4,13 @@
 
 #include "HunterActions.h"
 #include "Event.h"
+#include "GenericSpellActions.h"
 #include "Playerbots.h"
+
+bool CastHuntersMarkAction::isUseful()
+{
+    return CastDebuffSpellAction::isUseful();
+}
 
 bool CastViperStingAction::isUseful()
 {

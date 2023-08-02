@@ -942,8 +942,8 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     if (!teleport)
     {
         LOG_INFO("players", "Bot #{} <{}>: teleport for level and refresh", bot, player->GetName());
-        RandomTeleportForLevel(player);
         Refresh(player);
+        RandomTeleportForLevel(player);
         uint32 time = urand(sPlayerbotAIConfig->minRandomBotTeleportInterval, sPlayerbotAIConfig->maxRandomBotTeleportInterval);
         ScheduleTeleport(bot, time);
         return true;
@@ -1112,8 +1112,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "WITH GroupedData AS ( "
             "SELECT "
                 "MIN( c.guid ) guid, "
-                "( "
-                "AVG( t.maxlevel ) + AVG( t.minlevel )) / 2 lvl "
+                "(AVG( t.maxlevel ) + AVG( t.minlevel )) / 2 lvl "
             "FROM "
                 "creature c "
                 "INNER JOIN creature_template t ON c.id1 = t.entry "
@@ -1122,12 +1121,12 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 "AND t.lootid != 0 "
                 "AND t.unit_flags != 768 "
                 "AND map IN ({}) "
-                "AND t.maxlevel != 1 "
+                "AND c.id1 != 32820 "
             "GROUP BY "
                 "map, "
-                "ROUND( position_x / 250 ) * 250, "
-                "ROUND( position_y / 250 ) * 250, "
-                "ROUND( position_z / 5 ) * 5 "
+                "ROUND( position_x / 500 ), "
+                "ROUND( position_y / 500 ), "
+                "ROUND( position_z / 50 ) "
             "HAVING "
                 "count(*) > 10 "
                 "AND MAX( t.maxlevel ) - MIN( t.minlevel ) < 5 "
@@ -1254,12 +1253,12 @@ void RandomPlayerbotMgr::Randomize(Player* bot)
     if (bot->InBattleground())
         return;
 
-    if (bot->getLevel() < 3)
+    if (bot->getLevel() < 2 || (bot->getLevel() < 56 && bot->getClass() == CLASS_DEATH_KNIGHT)) {
         RandomizeFirst(bot);
-    else if (bot->getLevel() < 57 && bot->getClass() == CLASS_DEATH_KNIGHT)
-        RandomizeFirst(bot);
-    else if (bot->getLevel() < sPlayerbotAIConfig->randomBotMaxLevel || !sPlayerbotAIConfig->downgradeMaxLevelBot)
+    }
+    else if (bot->getLevel() < sPlayerbotAIConfig->randomBotMaxLevel || !sPlayerbotAIConfig->downgradeMaxLevelBot) {
         IncreaseLevel(bot);
+    }
     else {
         RandomizeFirst(bot);
     }
@@ -1314,6 +1313,12 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
             level = urand(std::max(sPlayerbotAIConfig->randomBotMinLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)), std::max(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), maxLevel));
     }
 
+    if (sPlayerbotAIConfig->disableRandomLevels) {
+        level = bot->getClass() == CLASS_DEATH_KNIGHT ? 
+            std::max(sPlayerbotAIConfig->randombotStartingLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)) : 
+            sPlayerbotAIConfig->randombotStartingLevel;
+    }
+
     SetValue(bot, "level", level);
 
     PlayerbotFactory factory(bot, level);
@@ -1338,6 +1343,41 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     GET_PLAYERBOT_AI(bot)->Reset(true);
 //    RandomTeleportForRpg(bot);
 
+    if (bot->GetGroup())
+        bot->RemoveFromGroup();
+
+	if (pmo)
+        pmo->finish();
+}
+
+void RandomPlayerbotMgr::RandomizeMin(Player* bot)
+{
+	PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomizeMin");
+    
+    uint32 level = sPlayerbotAIConfig->randomBotMinLevel;
+
+    SetValue(bot, "level", level);
+
+    PlayerbotFactory factory(bot, level);
+    factory.Randomize(false);
+
+    uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotRandomizeTime, sPlayerbotAIConfig->maxRandomBotRandomizeTime);
+    uint32 inworldTime = urand(sPlayerbotAIConfig->minRandomBotInWorldTime, sPlayerbotAIConfig->maxRandomBotInWorldTime);
+
+    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_UPD_RANDOM_BOTS);
+    stmt->SetData(0, randomTime);
+    stmt->SetData(1, "bot_delete");
+    stmt->SetData(2, bot->GetGUID().GetCounter());
+    PlayerbotsDatabase.Execute(stmt);
+
+    stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_UPD_RANDOM_BOTS);
+    stmt->SetData(0, inworldTime);
+    stmt->SetData(1, "logout");
+    stmt->SetData(2, bot->GetGUID().GetCounter());
+    PlayerbotsDatabase.Execute(stmt);
+
+    // teleport to a random inn for bot level
+    GET_PLAYERBOT_AI(bot)->Reset(true);
     if (bot->GetGroup())
         bot->RemoveFromGroup();
 
@@ -1660,6 +1700,7 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
     }
 
     std::map<std::string, ConsoleCommandHandler> handlers;
+    // handlers["initmin"] = &RandomPlayerbotMgr::RandomizeMin;
     handlers["init"] = &RandomPlayerbotMgr::RandomizeFirst;
     handlers["clear"] = &RandomPlayerbotMgr::Clear;
     handlers["levelup"] = handlers["level"] = &RandomPlayerbotMgr::IncreaseLevel;
