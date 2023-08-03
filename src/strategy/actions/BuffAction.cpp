@@ -38,7 +38,7 @@ class FindBuffVisitor : public IterateItemsVisitor
                     return true;
 
                 Item* itemForSpell = *GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<Item*>("item for spell", spellId);
-                if (itemForSpell && itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+                if (itemForSpell && itemForSpell->IsInWorld() && itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
                     return true;
 
                 if (items.find(proto->SubClass) == items.end())

@@ -261,7 +261,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
         lastRelevance = 0.0f;
         PushDefaultActions();
 
-        if (queue.Peek() && depth < 2)
+        if (queue.Peek() && depth < 1 && !minimal)
             return DoNextAction(unit, depth + 1, minimal);
     }
 
@@ -640,7 +640,7 @@ void Engine::LogAction(char const* format, ...)
     else
     {
         Player* bot = botAI->GetBot();
-        if (sPlayerbotAIConfig->logInGroupOnly && !bot->GetGroup())
+        if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()))
             return;
 
         LOG_DEBUG("playerbots",  "{} {}", bot->GetName().c_str(), buf);
@@ -677,7 +677,7 @@ void Engine::LogValues()
         return;
 
     Player* bot = botAI->GetBot();
-    if (sPlayerbotAIConfig->logInGroupOnly && !bot->GetGroup())
+    if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()))
         return;
 
     std::string const text = botAI->GetAiObjectContext()->FormatValues();

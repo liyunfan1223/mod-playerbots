@@ -267,14 +267,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    // if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
-    // {
-    //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
-    //     LOG_INFO("playerbots", "Initializing enchant templates...");
-    //     ApplyEnchantTemplate();
-    //     if (pmo)
-    //         pmo->finish();
-    // }
+    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
+    {
+        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
+        LOG_INFO("playerbots", "Initializing enchant templates...");
+        ApplyEnchantTemplate();
+        if (pmo)
+            pmo->finish();
+    }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
     LOG_INFO("playerbots", "Initializing inventory...");
@@ -306,6 +306,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     }
 
     bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
+    bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
     if (bot->getLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
@@ -339,17 +340,12 @@ void PlayerbotFactory::Refresh()
     InitClassSpells();
     InitAvailableSpells();
     bot->DurabilityRepairAll(false, 1.0f, false);
+    if (bot->isDead())
+        bot->ResurrectPlayer(1.0f, false);
     uint32 money = urand(level * 1000, level * 5 * 1000);
     if (bot->GetMoney() < money)
         bot->SetMoney(money);
     bot->SaveToDB(false, false);
-
-    // Prepare();
-    // InitAmmo();
-    // InitFood();
-    // InitPotions();
-    
-    //bot->SaveToDB();
 }
 
 void PlayerbotFactory::AddConsumables()
@@ -1203,7 +1199,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
 
                 if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
                     continue;
-
+                
                 uint16 dest = 0;
                 if (CanEquipUnseenItem(slot, dest, itemId))
                     items[slot].push_back(itemId);

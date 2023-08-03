@@ -1166,36 +1166,38 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
     }
     LOG_INFO("playerbots", "{} locations for level collected.", collected_locs);
     
-    LOG_INFO("playerbots", "Preparing RPG teleport caches for {} factions...", sFactionTemplateStore.GetNumRows());
-    results = WorldDatabase.Query("SELECT map, position_x, position_y, position_z, r.race, r.minl, r.maxl FROM creature c INNER JOIN playerbots_rpg_races r ON c.id1 = r.entry "
-        "WHERE r.race < 15");
-    if (results)
-    {
-        do
-        {
-            Field* fields = results->Fetch();
-            uint16 mapId = fields[0].Get<uint16>();
-            float x = fields[1].Get<float>();
-            float y = fields[2].Get<float>();
-            float z = fields[3].Get<float>();
-            uint32 race = fields[4].Get<uint32>();
-            uint32 minl = fields[5].Get<uint32>();
-            uint32 maxl = fields[6].Get<uint32>();
+    // temporary only use locsPerLevelCache, so disable rpgLocsCacheLevel cache
 
-            for (uint32 level = 1; level < sPlayerbotAIConfig->randomBotMaxLevel + 1; level++)
-            {
-                if (level > maxl || level < minl)
-                    continue;
+    // LOG_INFO("playerbots", "Preparing RPG teleport caches for {} factions...", sFactionTemplateStore.GetNumRows());
+    // results = WorldDatabase.Query("SELECT map, position_x, position_y, position_z, r.race, r.minl, r.maxl FROM creature c INNER JOIN playerbots_rpg_races r ON c.id1 = r.entry "
+    //     "WHERE r.race < 15");
+    // if (results)
+    // {
+    //     do
+    //     {
+    //         Field* fields = results->Fetch();
+    //         uint16 mapId = fields[0].Get<uint16>();
+    //         float x = fields[1].Get<float>();
+    //         float y = fields[2].Get<float>();
+    //         float z = fields[3].Get<float>();
+    //         uint32 race = fields[4].Get<uint32>();
+    //         uint32 minl = fields[5].Get<uint32>();
+    //         uint32 maxl = fields[6].Get<uint32>();
 
-                WorldLocation loc(mapId, x, y, z, 0);
-                for (uint32 r = 1; r < MAX_RACES; r++)
-                {
-                    if (race == r || race == 0)
-                        rpgLocsCacheLevel[r][level].push_back(loc);
-                }
-            }
-        } while (results->NextRow());
-    }
+    //         for (uint32 level = 1; level < sPlayerbotAIConfig->randomBotMaxLevel + 1; level++)
+    //         {
+    //             if (level > maxl || level < minl)
+    //                 continue;
+
+    //             WorldLocation loc(mapId, x, y, z, 0);
+    //             for (uint32 r = 1; r < MAX_RACES; r++)
+    //             {
+    //                 if (race == r || race == 0)
+    //                     rpgLocsCacheLevel[r][level].push_back(loc);
+    //             }
+    //         }
+    //     } while (results->NextRow());
+    // }
 }
 
 void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
@@ -1341,7 +1343,6 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 
     // teleport to a random inn for bot level
     GET_PLAYERBOT_AI(bot)->Reset(true);
-//    RandomTeleportForRpg(bot);
 
     if (bot->GetGroup())
         bot->RemoveFromGroup();
@@ -1457,6 +1458,9 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
 
     uint32 money = bot->GetMoney();
     bot->SetMoney(money + 500 * sqrt(urand(1, bot->getLevel() * 5)));
+
+    if (bot->GetGroup())
+        bot->RemoveFromGroup();
 
     if (pmo)
         pmo->finish();
@@ -1706,7 +1710,7 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
     handlers["levelup"] = handlers["level"] = &RandomPlayerbotMgr::IncreaseLevel;
     handlers["refresh"] = &RandomPlayerbotMgr::Refresh;
     handlers["teleport"] = &RandomPlayerbotMgr::RandomTeleportForLevel;
-    handlers["rpg"] = &RandomPlayerbotMgr::RandomTeleportForRpg;
+    // handlers["rpg"] = &RandomPlayerbotMgr::RandomTeleportForRpg;
     handlers["revive"] = &RandomPlayerbotMgr::Revive;
     handlers["grind"] = &RandomPlayerbotMgr::RandomTeleport;
     handlers["change_strategy"] = &RandomPlayerbotMgr::ChangeStrategy;

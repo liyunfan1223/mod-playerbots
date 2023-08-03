@@ -608,7 +608,7 @@ AiPlayerbot.BotCheats = "taxi"
 AiPlayerbot.RandomBotRandomPassword = 0
 
 # Set RandomBotMaxLevel bots to RandomBotMinLevel or not
-AiPlayerbot.DowngradeMaxLevelBot = 1
+AiPlayerbot.DowngradeMaxLevelBot = 0
 
 ##################################################################################
 #                                                                                #
