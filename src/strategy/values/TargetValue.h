@@ -64,7 +64,7 @@ class TravelTargetValue : public ManualSetValue<TravelTarget*>
 class LastLongMoveValue : public CalculatedValue<WorldPosition>
 {
     public:
-        LastLongMoveValue(PlayerbotAI* botAI) : CalculatedValue<WorldPosition>(botAI, "last long move", 30) { }
+        LastLongMoveValue(PlayerbotAI* botAI) : CalculatedValue<WorldPosition>(botAI, "last long move", 30 * 1000) { }
 
         WorldPosition Calculate() override;
 };
@@ -72,7 +72,7 @@ class LastLongMoveValue : public CalculatedValue<WorldPosition>
 class HomeBindValue : public CalculatedValue<WorldPosition>
 {
     public:
-        HomeBindValue(PlayerbotAI* botAI) : CalculatedValue<WorldPosition>(botAI, "home bind", 30) { }
+        HomeBindValue(PlayerbotAI* botAI) : CalculatedValue<WorldPosition>(botAI, "home bind", 30 * 1000) { }
 
         WorldPosition Calculate() override;
 };
@@ -101,7 +101,7 @@ class PullTargetValue : public ManualSetValue<ObjectGuid>
 class FindTargetValue : public UnitCalculatedValue, public Qualified
 {
 public:
-    FindTargetValue(PlayerbotAI* ai) : UnitCalculatedValue(ai, "find target", 2) {}
+    FindTargetValue(PlayerbotAI* ai) : UnitCalculatedValue(ai, "find target", 2 * 1000) {}
 
 public:
     Unit* Calculate();
@@ -117,7 +117,7 @@ class FindBossTargetStrategy : public FindTargetStrategy
 class BossTargetValue : public TargetValue, public Qualified
 {
 public:
-    BossTargetValue(PlayerbotAI* ai) : TargetValue(ai, "boss target", 1) {}
+    BossTargetValue(PlayerbotAI* ai) : TargetValue(ai, "boss target", 2 * 1000) {}
 
 public:
     Unit* Calculate();

@@ -75,13 +75,13 @@ INTERRUPT_TRIGGER(RepentanceInterruptTrigger, "repentance");
 class BlessingOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
-        BlessingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 2) { }
+        BlessingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 2 * 2000) { }
 };
 
 class BlessingTrigger : public BuffTrigger
 {
     public:
-        BlessingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of sanctuary", 2) { }
+        BlessingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of sanctuary", 2 * 2000) { }
 
         bool IsActive() override;
 };
@@ -202,18 +202,18 @@ public:
 class BlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
-        BlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings", 2) { }
+        BlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings", 2 * 2000) { }
 };
 
 class BlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
-        BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2) { }
+        BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2 * 2000) { }
 };
 
 class BlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
-        BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2) { }
+        BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2 * 2000) { }
 };
 #endif

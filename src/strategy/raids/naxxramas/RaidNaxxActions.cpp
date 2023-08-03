@@ -596,8 +596,10 @@ bool SapphironFlightPositionAction::MoveToNearestIcebolt()
     }
     if (playerWithIcebolt) {
         Unit* boss = AI_VALUE2(Unit*, "find target", "sapphiron");
-        float angle = boss->GetAngle(playerWithIcebolt);
-        return MoveTo(NAXX_MAP_ID, playerWithIcebolt->GetPositionX() + cos(angle) * 3.0f, playerWithIcebolt->GetPositionY() + sin(angle) * 3.0f, helper.GENERIC_HEIGHT);
+        if (boss) {
+            float angle = boss->GetAngle(playerWithIcebolt);
+            return MoveTo(NAXX_MAP_ID, playerWithIcebolt->GetPositionX() + cos(angle) * 3.0f, playerWithIcebolt->GetPositionY() + sin(angle) * 3.0f, helper.GENERIC_HEIGHT);
+        }
     }
     return false;
 }

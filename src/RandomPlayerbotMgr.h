@@ -49,6 +49,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void Randomize(Player* bot);
         void Clear(Player* bot);
         void RandomizeFirst(Player* bot);
+        void RandomizeMin(Player* bot);
         void IncreaseLevel(Player* bot);
         void ScheduleTeleport(uint32 bot, uint32 time = 0);
         void ScheduleChangeStrategy(uint32 bot, uint32 time = 0);

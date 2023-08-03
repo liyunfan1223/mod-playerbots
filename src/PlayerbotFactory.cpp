@@ -9,6 +9,7 @@
 #include "GuildMgr.h"
 #include "MapMgr.h"
 #include "PetDefines.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "PerformanceMonitor.h"
 #include "PlayerbotDbStore.h"
@@ -81,11 +82,7 @@ void PlayerbotFactory::Prepare()
 {
     if (!itemQuality)
     {
-        // if (level < 80) {
         itemQuality = ITEM_QUALITY_RARE;
-        // } else {
-        //     itemQuality = ITEM_QUALITY_EPIC;
-        // }
     }
 
     if (bot->isDead())
@@ -93,16 +90,8 @@ void PlayerbotFactory::Prepare()
 
     bot->CombatStop(true);
 
-    if (!sPlayerbotAIConfig->disableRandomLevels)
-    {
-        bot->GiveLevel(level);
-        // bot->SetLevel(level);
-    }
-    else if (bot->getLevel() < sPlayerbotAIConfig->randombotStartingLevel)
-    {
-        bot->SetLevel(sPlayerbotAIConfig->randombotStartingLevel);
-    }
-
+    bot->GiveLevel(level);
+    bot->SetUInt32Value(PLAYER_XP, 0);
     if (!sPlayerbotAIConfig->randomBotShowHelmet || !urand(0, 4))
     {
         bot->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
@@ -123,8 +112,6 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     LOG_INFO("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
-    // bot->SaveToDB(false, false);
-    // bot->SaveToDB(false, false);
     LOG_INFO("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
     bot->resetTalents(true);
@@ -163,14 +150,9 @@ void PlayerbotFactory::Randomize(bool incremental)
         InitQuests(specialQuestIds);
 
         // quest rewards boost bot level, so reduce back
-        if (!sPlayerbotAIConfig->disableRandomLevels)
-        {
-            bot->SetLevel(level);
-        }
-        else if (bot->getLevel() < sPlayerbotAIConfig->randombotStartingLevel)
-        {
-            bot->SetLevel(sPlayerbotAIConfig->randombotStartingLevel);
-        }
+        
+        bot->GiveLevel(level);
+        
 
         ClearInventory();
         bot->SetUInt32Value(PLAYER_XP, 0);
@@ -285,14 +267,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    // if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
-    // {
-    //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
-    //     LOG_INFO("playerbots", "Initializing enchant templates...");
-    //     ApplyEnchantTemplate();
-    //     if (pmo)
-    //         pmo->finish();
-    // }
+    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
+    {
+        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
+        LOG_INFO("playerbots", "Initializing enchant templates...");
+        ApplyEnchantTemplate();
+        if (pmo)
+            pmo->finish();
+    }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
     LOG_INFO("playerbots", "Initializing inventory...");
@@ -323,7 +305,10 @@ void PlayerbotFactory::Randomize(bool incremental)
             pmo->finish();
     }
 
-    bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
+    if (!incremental) {
+        bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
+        bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
+    }
     if (bot->getLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
@@ -346,8 +331,9 @@ void PlayerbotFactory::Randomize(bool incremental)
 
 void PlayerbotFactory::Refresh()
 {
-    Prepare();
+    // Prepare();
     // InitEquipment(true);
+    ClearInventory();
     InitAmmo();
     InitFood();
     InitReagents();
@@ -356,17 +342,12 @@ void PlayerbotFactory::Refresh()
     InitClassSpells();
     InitAvailableSpells();
     bot->DurabilityRepairAll(false, 1.0f, false);
+    if (bot->isDead())
+        bot->ResurrectPlayer(1.0f, false);
     uint32 money = urand(level * 1000, level * 5 * 1000);
     if (bot->GetMoney() < money)
         bot->SetMoney(money);
     bot->SaveToDB(false, false);
-
-    // Prepare();
-    // InitAmmo();
-    // InitFood();
-    // InitPotions();
-    
-    //bot->SaveToDB();
 }
 
 void PlayerbotFactory::AddConsumables()
@@ -656,6 +637,8 @@ void PlayerbotFactory::ClearSkills()
 void PlayerbotFactory::ClearEverything()
 {
     bot->SaveToDB(false, false);
+    bot->GiveLevel(bot->getClass() == CLASS_DEATH_KNIGHT ? sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL) : sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL));
+    bot->SetUInt32Value(PLAYER_XP, 0);
     LOG_INFO("playerbots", "Resetting player...");
     bot->resetTalents(true);
     bot->SaveToDB(false, false);
@@ -1166,6 +1149,7 @@ void PlayerbotFactory::InitEquipmentNew(bool incremental)
 
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
+    // todo(yunfan): to be refactored, too much time overhead
     DestroyItemsVisitor visitor(bot);
     IterateItems(&visitor, ITERATE_ALL_ITEMS);
 
@@ -1218,7 +1202,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
 
                 if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
                     continue;
-
+                
                 uint16 dest = 0;
                 if (CanEquipUnseenItem(slot, dest, itemId))
                     items[slot].push_back(itemId);
@@ -1234,13 +1218,11 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         std::vector<uint32>& ids = items[slot];
         if (ids.empty())
         {
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: no items to equip for slot %d", bot->GetName().c_str(), slot);
             continue;
         }
         Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
         if (incremental && !IsDesiredReplacement(oldItem)) {
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: doesn't desire to replace current slot %d", bot->GetName().c_str(), slot);
             continue;
         }
 
@@ -1262,7 +1244,6 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             }
         }
         if (bestItemForSlot == 0) {
-            // sLog->outMessage("playerbot", LOG_LEVEL_INFO,  "%s: equip failed for slot %d(bestItemForSlot == 0))", bot->GetName().c_str(), slot);
             continue;
         }
         if (oldItem)
@@ -1272,7 +1253,6 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         uint16 dest;
         if (!CanEquipUnseenItem(slot, dest, bestItemForSlot)) {
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: equip failed for slot %d", bot->GetName().c_str(), slot);
             continue;
         }
         Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);

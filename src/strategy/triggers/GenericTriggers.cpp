@@ -8,6 +8,7 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
+#include "Timer.h"
 #include <string>
 
 bool LowManaTrigger::IsActive()
@@ -204,6 +205,15 @@ bool DebuffTrigger::IsActive()
 	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > life_bound;
 }
 
+bool DebuffOnBossTrigger::IsActive()
+{
+    if (!DebuffTrigger::IsActive()) {
+        return false;
+    }
+    Creature *c = GetTarget()->ToCreature();
+    return c && ((c->IsDungeonBoss()) || (c->isWorldBoss()));
+}
+
 bool SpellTrigger::IsActive()
 {
 	return GetTarget();
@@ -224,16 +234,16 @@ bool SpellNoCooldownTrigger::IsActive()
     return !bot->HasSpellCooldown(spellId);
 }
 
-RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(time(nullptr))
+RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(getMSTime())
 {
 }
 
 bool RandomTrigger::IsActive()
 {
-    if (time(nullptr) - lastCheck < sPlayerbotAIConfig->repeatDelay / 1000)
+    if (getMSTime() - lastCheck < sPlayerbotAIConfig->repeatDelay)
         return false;
 
-    lastCheck = time(nullptr);
+    lastCheck = getMSTime();
     int32 k = (int32)(probability / sPlayerbotAIConfig->randomChangeMultiplier);
     if (k < 1)
         k = 1;

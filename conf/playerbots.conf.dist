@@ -87,7 +87,6 @@ AiPlayerbot.RandomBotShowCloak = 1
 AiPlayerbot.DisableRandomLevels = 0
 
 # Set randombots starting level here if "AiPlayerbot.DisableRandomLevels" enabled
-# Recommended: 5+
 AiPlayerbot.RandombotStartingLevel = 5
 
 # Set kill XP rate for bots (default: 1)
@@ -456,7 +455,7 @@ AiPlayerbot.GlobalCooldown = 500
 AiPlayerbot.MaxWaitForMove = 5000
 
 # Action expiration time
-AiPlayerbot.ExpireActionTime = 500
+AiPlayerbot.ExpireActionTime = 5000
 
 # Max dispel auras duration
 AiPlayerbot.DispelAuraDuration = 700
@@ -549,8 +548,8 @@ AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392
 AiPlayerbot.RandomBotSpellIds = "54197"
 
 # Level diff between random bots and nearby creatures for random teleports
-AiPlayerbot.randomBotTeleLowerLevel = 3
-AiPlayerbot.randomBotTeleHigerLevel = 1
+AiPlayerbot.RandomBotTeleLowerLevel = 3
+AiPlayerbot.RandomBotTeleHigherLevel = 1
 
 # ID of spell to open lootable chests
 AiPlayerbot.OpenGoSpell = 6477
@@ -609,7 +608,7 @@ AiPlayerbot.BotCheats = "taxi"
 AiPlayerbot.RandomBotRandomPassword = 0
 
 # Set RandomBotMaxLevel bots to RandomBotMinLevel or not
-AiPlayerbot.DowngradeMaxLevelBot = 1
+AiPlayerbot.DowngradeMaxLevelBot = 0
 
 ##################################################################################
 #                                                                                #

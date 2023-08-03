@@ -40,7 +40,7 @@ bool SpellCastUsefulValue::Calculate()
         qualifier == "rockbiter weapon" || qualifier == "earthliving weapon" || qualifier == "spellstone")
     {
         if (Item* item = AI_VALUE2(Item*, "item for spell", spellid))
-            if (item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+            if (item->IsInWorld() && item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
                 return false;
     }
 

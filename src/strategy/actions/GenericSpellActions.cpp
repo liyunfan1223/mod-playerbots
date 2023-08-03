@@ -63,10 +63,10 @@ bool CastSpellAction::Execute(Event event)
 bool CastSpellAction::isPossible()
 {
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true)) {
-        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
-                bot->GetName());
-        }
+        // if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+        //     LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
+        //         bot->GetName());
+        // }
         return false;
     }
 
@@ -75,10 +75,10 @@ bool CastSpellAction::isPossible()
 
     if (spell == "mount" && bot->IsInCombat())
     {
-        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
-                bot->GetName());
-        }
+        // if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+        //     LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
+        //         bot->GetName());
+        // }
         bot->Dismount();
         return false;
     }

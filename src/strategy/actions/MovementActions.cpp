@@ -135,11 +135,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     if (!IsMovingAllowed(mapId, x, y, z)) {
         return false;
     }
-    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR)) {
-    //     bot->Yell("I'm falling!", LANG_UNIVERSAL);
+    // if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_FALLING_FAR)) {
+    //     bot->Say("I'm falling!, flag:" + std::to_string(bot->m_movementInfo.GetMovementFlags()), LANG_UNIVERSAL);
     //     return false;
     // }
-	// bot->UpdateGroundPositionZ(x, y, z);
     z += 2.0f;
     bot->UpdateAllowedPositionZ(x, y, z);
     // z += 0.5f;
@@ -158,11 +157,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
 
         bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
-                !bot->IsFlying() && !bot->IsUnderWater();
+                !bot->IsFlying() && !bot->isSwimming();
         MotionMaster &mm = *bot->GetMotionMaster();
         mm.Clear();
         mm.MovePoint(mapId, x, y, z, generatePath);
-
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;
     }
@@ -674,9 +672,11 @@ bool MovementAction::MoveTo(Unit* target, float distance)
 
     float dx = cos(angle) * needToGo + bx;
     float dy = sin(angle) * needToGo + by;
-    float dz = std::max(bz, tz); // calc accurate z position to avoid stuck
+    float dz; // = std::max(bz, tz); // calc accurate z position to avoid stuck
     if (distanceToTarget > CONTACT_DISTANCE) {
-        dz = std::max(dz, bz + (tz - bz) * (needToGo / distanceToTarget));
+        dz = bz + (tz - bz) * (needToGo / distanceToTarget);
+    } else {
+        dz = tz;
     }
     return MoveTo(target->GetMapId(), dx, dy, dz);
 }

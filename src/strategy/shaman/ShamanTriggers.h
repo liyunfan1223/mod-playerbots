@@ -14,7 +14,7 @@ class PlayerbotAI;
 class ShamanWeaponTrigger : public BuffTrigger
 {
     public:
-        ShamanWeaponTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "rockbiter weapon", 2) { }
+        ShamanWeaponTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "rockbiter weapon", 2 * 2000) { }
 
         bool IsActive() override;
 
@@ -112,7 +112,7 @@ class WaterWalkingTrigger : public BuffTrigger
 class WaterBreathingTrigger : public BuffTrigger
 {
     public:
-        WaterBreathingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "water breathing", 5) { }
+        WaterBreathingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "water breathing", 5 * 2000) { }
 
         bool IsActive() override;
 };
@@ -120,7 +120,7 @@ class WaterBreathingTrigger : public BuffTrigger
 class WaterWalkingOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
-        WaterWalkingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "water walking on party", 2) { }
+        WaterWalkingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "water walking on party", 2 * 2000) { }
 
         bool IsActive() override;
 };
@@ -128,7 +128,7 @@ class WaterWalkingOnPartyTrigger : public BuffOnPartyTrigger
 class WaterBreathingOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
-        WaterBreathingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "water breathing on party", 2) { }
+        WaterBreathingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "water breathing on party", 2 * 2000) { }
 
         bool IsActive() override;
 };
