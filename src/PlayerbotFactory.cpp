@@ -305,8 +305,10 @@ void PlayerbotFactory::Randomize(bool incremental)
             pmo->finish();
     }
 
-    bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
-    bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
+    if (!incremental) {
+        bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
+        bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
+    }
     if (bot->getLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
@@ -1147,6 +1149,7 @@ void PlayerbotFactory::InitEquipmentNew(bool incremental)
 
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
+    // todo(yunfan): to be refactored, too much time overhead
     DestroyItemsVisitor visitor(bot);
     IterateItems(&visitor, ITERATE_ALL_ITEMS);
 
@@ -1215,13 +1218,11 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         std::vector<uint32>& ids = items[slot];
         if (ids.empty())
         {
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: no items to equip for slot %d", bot->GetName().c_str(), slot);
             continue;
         }
         Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
         if (incremental && !IsDesiredReplacement(oldItem)) {
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: doesn't desire to replace current slot %d", bot->GetName().c_str(), slot);
             continue;
         }
 
@@ -1243,7 +1244,6 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             }
         }
         if (bestItemForSlot == 0) {
-            // sLog->outMessage("playerbot", LOG_LEVEL_INFO,  "%s: equip failed for slot %d(bestItemForSlot == 0))", bot->GetName().c_str(), slot);
             continue;
         }
         if (oldItem)
@@ -1253,7 +1253,6 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         uint16 dest;
         if (!CanEquipUnseenItem(slot, dest, bestItemForSlot)) {
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: equip failed for slot %d", bot->GetName().c_str(), slot);
             continue;
         }
         Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);

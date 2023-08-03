@@ -1275,7 +1275,10 @@ void RandomPlayerbotMgr::IncreaseLevel(Player* bot)
 
 	PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "IncreaseLevel");
 	uint32 lastLevel = GetValue(bot, "level");
-	uint32 level = bot->getLevel();
+	uint8 level = bot->getLevel() + 1;
+    if (level > maxLevel) {
+        level = maxLevel;
+    }
 	if (lastLevel != level)
 	{
         PlayerbotFactory factory(bot, level);

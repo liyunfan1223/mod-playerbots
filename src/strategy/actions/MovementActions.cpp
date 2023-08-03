@@ -135,11 +135,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     if (!IsMovingAllowed(mapId, x, y, z)) {
         return false;
     }
-    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR)) {
-    //     bot->Yell("I'm falling!", LANG_UNIVERSAL);
+    // if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_FALLING_FAR)) {
+    //     bot->Say("I'm falling!, flag:" + std::to_string(bot->m_movementInfo.GetMovementFlags()), LANG_UNIVERSAL);
     //     return false;
     // }
-	// bot->UpdateGroundPositionZ(x, y, z);
     z += 2.0f;
     bot->UpdateAllowedPositionZ(x, y, z);
     // z += 0.5f;
