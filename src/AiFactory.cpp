@@ -547,7 +547,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategy("pvp");
             // nonCombatEngine->addStrategy("collision");
             nonCombatEngine->addStrategy("grind");
-            nonCombatEngine->addStrategy("group");
+            // nonCombatEngine->addStrategy("group");
             // nonCombatEngine->addStrategy("guild");
 
             if (sPlayerbotAIConfig->autoDoQuests)
@@ -578,7 +578,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         nonCombatEngine->addStrategy("pvp");
                         // nonCombatEngine->addStrategy("collision");
                         nonCombatEngine->addStrategy("grind");
-                        nonCombatEngine->addStrategy("group");
+                        // nonCombatEngine->addStrategy("group");
                         // nonCombatEngine->addStrategy("guild");
 
                         if (sPlayerbotAIConfig->autoDoQuests)
