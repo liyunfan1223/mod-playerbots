@@ -891,6 +891,11 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         return false;
     }
 
+    Group* group = player->GetGroup();
+    if (group && !group->isLFGGroup() && IsRandomBot(group->GetLeader())) {
+        player->RemoveFromGroup();
+        LOG_INFO("playerbots", "Bot {} remove from group since leader is random bot.", player->GetName().c_str());
+    }
     //GET_PLAYERBOT_AI(player)->GetAiObjectContext()->GetValue<bool>("random bot update")->Set(false);
 
     // bool randomiser = true;
@@ -922,17 +927,6 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotRandomizeTime, sPlayerbotAIConfig->maxRandomBotRandomizeTime);
         ScheduleRandomize(bot, randomTime);
         return true;
-        // if (randomiser)
-        // {
-        // }
-        // else
-        // {
-        //     LOG_INFO("playerbots", "Bot #{} {}:{} {} <{}>: consumables refreshed", bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->getLevel(), player->GetName(), sGuildMgr->GetGuildById(player->GetGuildId())->GetName());
-        // }
-        // if (sPlayerbotAIConfig->autoDoQuests)
-        //     ChangeStrategyOnce(player);
-        // else
-        //     ChangeStrategy(player);
     }
 
     // enable random teleport logic if no auto traveling enabled
