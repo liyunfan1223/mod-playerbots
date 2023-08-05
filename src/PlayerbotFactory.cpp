@@ -500,7 +500,7 @@ void PlayerbotFactory::InitPet()
     Pet* pet = bot->GetPet();
     if (!pet)
     {
-        if (bot->getClass() != CLASS_HUNTER)
+        if (bot->getClass() != CLASS_HUNTER || bot->GetLevel() < 10)
             return;
 
         Map* map = bot->GetMap();

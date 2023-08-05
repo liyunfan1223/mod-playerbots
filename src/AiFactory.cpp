@@ -561,8 +561,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             if (sPlayerbotAIConfig->randomBotJoinBG)
                 nonCombatEngine->addStrategy("bg");
 
-            if (!master || GET_PLAYERBOT_AI(master))
-                nonCombatEngine->addStrategy("maintenance");
+            // if (!master || GET_PLAYERBOT_AI(master))
+            //     nonCombatEngine->addStrategy("maintenance");
 
             nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig->randomBotNonCombatStrategies);
         }
@@ -589,8 +589,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                             nonCombatEngine->addStrategy("move random");
                         }
 
-                        if (masterBotAI)
-                            nonCombatEngine->addStrategy("maintenance");
+                        // if (masterBotAI)
+                        //     nonCombatEngine->addStrategy("maintenance");
 
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig->randomBotNonCombatStrategies);
                     }
