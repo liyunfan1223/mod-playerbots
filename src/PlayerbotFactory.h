@@ -119,6 +119,7 @@ class PlayerbotFactory : public InventoryAction
         void InitAvailableSpells();
         void InitClassSpells();
         void InitEquipment(bool incremental);
+        void InitPet();
 
     private:
         void Prepare();
@@ -136,7 +137,6 @@ class PlayerbotFactory : public InventoryAction
         void InitTalents(uint32 specNo);
         void InitTalentsByTemplate(uint32 specNo);
         void InitQuests(std::list<uint32>& questMap);
-        void InitPet();
         void ClearInventory();
         void ClearAllItems();
         void ResetQuests();
