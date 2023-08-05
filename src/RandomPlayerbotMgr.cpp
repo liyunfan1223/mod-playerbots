@@ -800,7 +800,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         AddPlayerBot(botGUID, 0);
         SetEventValue(bot, "login", 1, sPlayerbotAIConfig->randomBotUpdateInterval);
 
-        uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime * 5);
+        uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
         SetEventValue(bot, "update", 1, randomTime);
 
         return true;
@@ -812,7 +812,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         return false;
 
     uint32 update = GetEventValue(bot, "update");
-    if (!update && !sPlayerbotAIConfig->disableRandomLevels)
+    if (!update)
     {
         if (botAI)
             botAI->GetAiObjectContext()->GetValue<bool>("random bot update")->Set(true);

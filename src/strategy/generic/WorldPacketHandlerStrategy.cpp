@@ -35,7 +35,11 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     //triggers.push_back(new TriggerNode("no non bot players around", NextAction::array(0, new NextAction("delay", relevance), nullptr)));
     triggers.push_back(new TriggerNode("bg status", NextAction::array(0, new NextAction("bg status", relevance), nullptr)));
     triggers.push_back(new TriggerNode("xpgain", NextAction::array(0, new NextAction("xp gain", relevance), nullptr)));
-    triggers.push_back(new TriggerNode("levelup", NextAction::array(0, new NextAction("auto talents", relevance), new NextAction("auto learn spell", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("levelup", NextAction::array(0, 
+        new NextAction("auto talents", relevance), 
+        new NextAction("auto learn spell", relevance), 
+        new NextAction("auto teleport for level", relevance), 
+        nullptr)));
     triggers.push_back(new TriggerNode("see spell", NextAction::array(0, new NextAction("see spell", relevance), nullptr)));
     triggers.push_back(new TriggerNode("release spirit", NextAction::array(0, new NextAction("release", relevance), nullptr)));
     triggers.push_back(new TriggerNode("revive from corpse", NextAction::array(0, new NextAction("revive from corpse", relevance), nullptr)));

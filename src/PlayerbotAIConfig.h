@@ -148,12 +148,14 @@ class PlayerbotAIConfig
         bool syncQuestWithPlayer;
         bool syncQuestForPlayer;
         std::string autoTrainSpells;
-        std::string autoPickTalents;
+        bool autoPickTalents;
+        bool autoUpgradeEquip;
         bool autoLearnTrainerSpells;
         bool autoDoQuests;
         bool syncLevelWithPlayers;
         bool freeFood;
         bool autoLearnQuestSpells;
+        bool autoTeleportForLevel;
         bool randomBotSayWithoutMaster;
         bool randomBotGroupNearby;
         uint32 tweakValue; //Debugging config

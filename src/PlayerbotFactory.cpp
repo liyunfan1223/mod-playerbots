@@ -1149,12 +1149,14 @@ void PlayerbotFactory::InitEquipmentNew(bool incremental)
 
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
+
     // todo(yunfan): to be refactored, too much time overhead
-    DestroyItemsVisitor visitor(bot);
-    IterateItems(&visitor, ITERATE_ALL_ITEMS);
+    // DestroyItemsVisitor visitor(bot);
+    // IterateItems(&visitor, ITERATE_ALL_ITEMS);
 
     std::map<uint8, std::vector<uint32> > items;
     int tab = AiFactory::GetPlayerSpecTab(bot);
+    // todo(yunfan): make cache for this
     for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
@@ -1277,7 +1279,7 @@ bool PlayerbotFactory::IsDesiredReplacement(Item* item)
     {
         requiredLevel = sRandomItemMgr->GetMinLevelFromCache(proto->ItemId);
     }
-
+    
     uint32 delta = 1 + (80 - bot->getLevel()) / 10;
     return int32(bot->getLevel() - requiredLevel) > delta;
 }

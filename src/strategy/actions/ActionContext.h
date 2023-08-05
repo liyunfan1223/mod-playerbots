@@ -58,6 +58,7 @@
 #include "VehicleActions.h"
 #include "WorldBuffAction.h"
 #include "RaidNaxxActions.h"
+#include "AutoTeleportForLevelAction.h"
 
 class PlayerbotAI;
 
@@ -146,6 +147,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["war stomp"] = &ActionContext::war_stomp;
             creators["auto talents"] = &ActionContext::auto_talents;
             creators["auto learn spell"] = &ActionContext::auto_learn_spell;
+            creators["auto teleport for level"] = &ActionContext::auto_teleport_for_level;
             creators["xp gain"] = &ActionContext::xp_gain;
             creators["invite nearby"] = &ActionContext::invite_nearby;
             creators["invite guild"] = &ActionContext::invite_guild;
@@ -308,6 +310,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* war_stomp(PlayerbotAI* botAI) { return new CastWarStompAction(botAI); }
         static Action* auto_talents(PlayerbotAI* botAI) { return new AutoSetTalentsAction(botAI); }
         static Action* auto_learn_spell(PlayerbotAI* botAI) { return new AutoLearnSpellAction(botAI); }
+        static Action* auto_teleport_for_level(PlayerbotAI* botAI) { return new AutoTeleportForLevelAction(botAI); }
         static Action* xp_gain(PlayerbotAI* botAI) { return new XpGainAction(botAI); }
         static Action* invite_nearby(PlayerbotAI* botAI) { return new InviteNearbyToGroupAction(botAI); }
         static Action* invite_guild(PlayerbotAI* botAI) { return new InviteGuildToGroupAction(botAI); }

@@ -115,11 +115,14 @@ class PlayerbotFactory : public InventoryAction
 
         static uint32 tradeSkills[];
         static float CalculateItemScore(uint32 item_id, Player* bot);
+        void InitTalentsTree(bool incremental = false, bool use_template = true);
+        void InitAvailableSpells();
+        void InitClassSpells();
+        void InitEquipment(bool incremental);
 
     private:
         void Prepare();
         void InitSecondEquipmentSet();
-        void InitEquipment(bool incremental);
         void InitEquipmentNew(bool incremental);
         bool CanEquipItem(ItemTemplate const* proto, uint32 desiredQuality);
         bool CanEquipUnseenItem(uint8 slot, uint16& dest, uint32 item);
@@ -129,10 +132,7 @@ class PlayerbotFactory : public InventoryAction
         void InitSpells();
         void ClearSpells();
         void ClearSkills();
-        void InitAvailableSpells();
-        void InitClassSpells();
         void InitSpecialSpells();
-        void InitTalentsTree(bool incremental = false, bool use_template = true);
         void InitTalents(uint32 specNo);
         void InitTalentsByTemplate(uint32 specNo);
         void InitQuests(std::list<uint32>& questMap);

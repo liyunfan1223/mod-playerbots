@@ -109,7 +109,7 @@ AiPlayerbot.GearScoreCheck = 0
 AiPlayerbot.RandomBotQuestIds = "7848,3802,5505,6502,7761"
 
 # Randombots will group with nearby bots to do shared quests
-AiPlayerbot.RandomBotGroupNearby = 1
+AiPlayerbot.RandomBotGroupNearby = 0
 
 # Bots without a master will say their lines
 AiPlayerbot.RandomBotSayWithoutMaster = 0
@@ -142,19 +142,28 @@ AiPlayerbot.FreeFood = 1
 # Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
 AiPlayerbot.AutoTrainSpells = yes
 
-# Bot automatically picks talent points based on current spec (full = pick spec based on probability if multiple are like current spec, semi = only apply points if 1 spec looks like current spec, no = no auto talent points)
-AiPlayerbot.AutoPickTalents = no
-
-# Bots automatically learn trainable spells on levelup
-# Default: 0 (disabled)
-AiPlayerbot.AutoLearnTrainerSpells = 0
-
 # Bots automatically learn classquest reward spells on levelup
 # Default: 0 (disabled)
 AiPlayerbot.AutoLearnQuestSpells = 0
 
+# Bots automatically learn trainable spells on levelup
+# Default: 1 (enabled)
+AiPlayerbot.AutoLearnTrainerSpells = 1
+
+# Bots automatically teleport to another place for leveling on levelup
+# Default: 1 (enabled)
+AiPlayerbot.AutoTeleportForLevel = 1
+
+# Bot automatically picks talent points on levelup
+# Default: 1 (enabled)
+AiPlayerbot.AutoPickTalents = 1
+
+# Bot automatically upgrade equipments on levelup, may cause lagging
+# Default: 0 (enabled)
+AiPlayerbot.AutoUpgradeEquip = 0
+
 # Random Bots will pick quests on their own and try to complete
-# Default: 0 (disabled)
+# Default: 1 (enabled)
 AiPlayerbot.AutoDoQuests = 1
 
 ##################################################################################
