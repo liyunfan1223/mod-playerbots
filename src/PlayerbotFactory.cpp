@@ -124,7 +124,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         ResetQuests();
     }
-    ClearInventory();
+    ClearAllItems();
     bot->SaveToDB(false, false);
 
     bot->GiveLevel(level);
