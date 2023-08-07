@@ -337,10 +337,11 @@ void PlayerbotFactory::Refresh()
     InitAmmo();
     InitFood();
     InitReagents();
-    InitPotions();
-    InitTalents(true);
+    // InitPotions();
+    InitTalentsTree(true);
     InitClassSpells();
     InitAvailableSpells();
+    InitSkills();
     bot->DurabilityRepairAll(false, 1.0f, false);
     if (bot->isDead())
         bot->ResurrectPlayer(1.0f, false);
@@ -2144,6 +2145,9 @@ void PlayerbotFactory::InitAmmo()
         case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             subClass = ITEM_SUBCLASS_ARROW;
             break;
+        case ITEM_SUBCLASS_WEAPON_THROWN:
+            subClass = ITEM_SUBCLASS_THROWN;
+            break;
     }
 
     if (!subClass)
@@ -2292,6 +2296,9 @@ void PlayerbotFactory::InitPotions()
 
 void PlayerbotFactory::InitFood()
 {
+    if (sPlayerbotAIConfig->freeFood) {
+        return;
+    }
     std::map<uint32, std::vector<uint32> > items;
     ItemTemplateContainer const* itemTemplateContainer = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator i = itemTemplateContainer->begin(); i != itemTemplateContainer->end(); ++i)
@@ -2961,6 +2968,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     {
         score *= 0.8;
     }
+    // double hand
     if (proto->Class == ITEM_CLASS_WEAPON) {
         bool isDoubleHand = proto->Class == ITEM_CLASS_WEAPON && 
             !(ITEM_SUBCLASS_MASK_SINGLE_HAND & (1 << proto->SubClass)) && 
@@ -2988,6 +2996,11 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             (cls == CLASS_DEATH_KNIGHT && tab == 0) ||
             (cls == CLASS_SHAMAN && tab == 1 && !bot->HasSpell(674)))) {
             score *= 10;
+        }
+    }
+    if (proto->Class == ITEM_CLASS_WEAPON) {
+        if (cls == CLASS_HUNTER && proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN) {
+            score *= 0.1;
         }
     }
     return (0.01 + score) * itemLevel * (quality + 1);   

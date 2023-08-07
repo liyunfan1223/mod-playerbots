@@ -2179,7 +2179,7 @@ void RandomItemMgr::BuildAmmoCache()
     uint32 counter = 0;
     for (uint32 level = 1; level <= maxLevel; level += 1)
     {
-        for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_BULLET; subClass++)
+        for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_THROWN; subClass++)
         {
             QueryResult results = WorldDatabase.Query("SELECT entry FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} "
                 "ORDER BY RequiredLevel DESC", ITEM_CLASS_PROJECTILE, subClass, level);

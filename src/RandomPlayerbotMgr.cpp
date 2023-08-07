@@ -833,8 +833,8 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
                 }
             }
 
-            if (botAI->HasPlayerNearby(sPlayerbotAIConfig->grindDistance))
-                update = false;
+            // if (botAI->HasPlayerNearby(sPlayerbotAIConfig->grindDistance))
+            //     update = false;
         }
 
         if (update)
@@ -1428,8 +1428,8 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
         botAI->ResetStrategies(false);
     }
 
-    if (sPlayerbotAIConfig->disableRandomLevels)
-        return;
+    // if (sPlayerbotAIConfig->disableRandomLevels)
+    //     return;
 
     if (bot->InBattleground())
         return;
@@ -1472,9 +1472,6 @@ bool RandomPlayerbotMgr::IsRandomBot(Player* bot)
     }
     if (bot)
     {
-        if (sPlayerbotAIConfig->IsInRandomAccountList(bot->GetSession()->GetAccountId()))
-            return true;
-
         return IsRandomBot(bot->GetGUID().GetCounter());
     }
 

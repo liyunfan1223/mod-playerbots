@@ -30,8 +30,9 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "party member critical health",
         NextAction::array(0, 
-            new NextAction("swiftmend on party", ACTION_CRITICAL_HEAL + 3), 
-            new NextAction("wild growth", ACTION_CRITICAL_HEAL + 2),
+            new NextAction("swiftmend on party", ACTION_CRITICAL_HEAL + 4), 
+            new NextAction("wild growth", ACTION_CRITICAL_HEAL + 3),
+            new NextAction("regrowth on party", ACTION_CRITICAL_HEAL + 2),
             new NextAction("nourish on party", ACTION_CRITICAL_HEAL + 1),
             new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 0),
             NULL)));
