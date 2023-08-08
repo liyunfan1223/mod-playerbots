@@ -533,7 +533,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         return "bot not found";
     
     if (!isRandomAccount || isRandomBot) {
-        return "ERROR: You can not use this command on summoned random bot.";
+        return "ERROR: You can not use this command on non-summoned random bot.";
     }
 
     if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
