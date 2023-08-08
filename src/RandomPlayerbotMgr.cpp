@@ -797,6 +797,15 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
         SetEventValue(bot, "update", 1, randomTime);
 
+        // do not randomize or teleport immediately after server start (prevent lagging)
+        if (!GetEventValue(bot, "randomize")) {
+            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval, sPlayerbotAIConfig->randomBotUpdateInterval * 10);
+            ScheduleRandomize(bot, randomTime);
+        }
+        if (!GetEventValue(bot, "teleport")) {
+            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval, sPlayerbotAIConfig->randomBotUpdateInterval * 10);
+            ScheduleTeleport(bot, randomTime);
+        }
         return true;
     }
 
@@ -915,7 +924,6 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     uint32 randomize = GetEventValue(bot, "randomize");
     if (!randomize)
     {
-        // if (randomiser)
         Randomize(player);
         LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: randomized", bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->getLevel(), player->GetName());
         uint32 randomTime = urand(sPlayerbotAIConfig->minRandomBotRandomizeTime, sPlayerbotAIConfig->maxRandomBotRandomizeTime);
