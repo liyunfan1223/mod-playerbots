@@ -239,8 +239,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         SetEventValue(0, "bot_count", maxAllowedBotCount, urand(sPlayerbotAIConfig->randomBotCountChangeMinInterval, sPlayerbotAIConfig->randomBotCountChangeMaxInterval));
     }
 
-    std::list<uint32> availableBots = GetBots();
-    uint32 availableBotCount = availableBots.size();
+    GetBots();
+    uint32 availableBotCount = currentBots.size();
     uint32 onlineBotCount = playerBots.size();
 
     uint32 onlineBotFocus = 75;
@@ -272,10 +272,10 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     uint32 maxNewBots = onlineBotCount < maxAllowedBotCount ? maxAllowedBotCount - onlineBotCount : 0;
     uint32 loginBots = std::min(sPlayerbotAIConfig->randomBotsPerInterval - updateBots, maxNewBots);
 
-    if (!availableBots.empty())
+    if (!currentBots.empty())
     {
         // Update bots
-        for (auto bot : availableBots)
+        for (auto bot : currentBots)
         {
             if (!GetPlayerBot(bot))
                 continue;
@@ -297,7 +297,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             LOG_INFO("playerbots", "{} new bots", loginBots);
 
             //Log in bots
-            for (auto bot : availableBots)
+            for (auto bot : currentBots)
             {
                 if (GetPlayerBot(bot))
                     continue;
@@ -1096,41 +1096,43 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
     LOG_INFO("playerbots", "Preparing random teleport caches for {} levels...", maxLevel);
+
     QueryResult results = WorldDatabase.Query(
-        "WITH GroupedData AS ( "
-            "SELECT "
-                "MIN( c.guid ) guid, "
-                "(AVG( t.maxlevel ) + AVG( t.minlevel )) / 2 lvl "
-            "FROM "
-                "creature c "
-                "INNER JOIN creature_template t ON c.id1 = t.entry "
-            "WHERE "
-                "t.npcflag = 0 "
-                "AND t.lootid != 0 "
-                "AND t.unit_flags != 768 "
-                "AND map IN ({}) "
-                "AND c.id1 != 32820 "
-            "GROUP BY "
-                "map, "
-                "ROUND( position_x / 500 ), "
-                "ROUND( position_y / 500 ), "
-                "ROUND( position_z / 50 ) "
-            "HAVING "
-                "count(*) > 10 "
-                "AND MAX( t.maxlevel ) - MIN( t.minlevel ) < 5 "
-            "ORDER BY "
-                "lvl "
-        ") "
-        "SELECT "
-            "map, "
-            "position_x, "
-            "position_y, "
-            "position_z, "
-            "t.maxlevel "
+    "SELECT "
+		    "g.map, "
+		    "position_x, "
+		    "position_y, "
+		    "position_z, "
+		    "t.minlevel "
         "FROM "
-            "GroupedData g "
-            "INNER JOIN creature c ON g.guid = c.guid "
-            "INNER JOIN creature_template t on c.id1 = t.entry;", sPlayerbotAIConfig->randomBotMapsAsString.c_str());
+		    "(SELECT "
+		    "map, "
+		    "MIN( c.guid ) guid, "
+		    "t.entry "
+		    "FROM "
+				"creature c "
+				"INNER JOIN creature_template t ON c.id1 = t.entry "
+		    "WHERE "
+				"t.npcflag = 0 "
+				"AND t.lootid != 0 "
+				"AND t.unit_flags != 768 "
+				"AND t.maxlevel - t.minlevel < 3 "
+				"AND map IN ({}) "
+				"AND c.id1 != 32820 "
+				"AND c.spawntimesecs < 1000 "
+				"AND t.faction != 188 "
+		    "GROUP BY "
+				"map, "
+				"ROUND( position_x / 500 ), "
+				"ROUND( position_y / 500 ), "
+				"ROUND( position_z / 50), "
+				"t.entry "
+		    "HAVING "
+				"count(*) > 10) AS g "
+		    "INNER JOIN creature c ON g.guid = c.guid "
+		    "INNER JOIN creature_template t on c.id1 = t.entry "
+        "ORDER BY "
+	        "t.minlevel;", sPlayerbotAIConfig->randomBotMapsAsString.c_str());
     uint32 collected_locs = 0;
     if (results)
     {
@@ -1141,14 +1143,14 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             float x = fields[1].Get<float>();
             float y = fields[2].Get<float>();
             float z = fields[3].Get<float>();
-            uint32 avg_level = fields[4].Get<uint32>();
+            uint32 level = fields[4].Get<uint32>();
             WorldLocation loc(mapId, x, y, z, 0);
             collected_locs++;
-            for (int32 level = (int32)avg_level - (int32)sPlayerbotAIConfig->randomBotTeleHigherLevel; level <= (int32)avg_level + (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel; level++) {
-                if (level < 1 || level > maxLevel) {
+            for (int32 l = (int32)level - (int32)sPlayerbotAIConfig->randomBotTeleHigherLevel; l <= (int32)level + (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel; l++) {
+                if (l < 1 || l > maxLevel) {
                     continue;
                 }
-                locsPerLevelCache[(uint8)level].push_back(loc);
+                locsPerLevelCache[(uint8)l].push_back(loc);
             }
         } while (results->NextRow());
     }
@@ -1482,10 +1484,10 @@ bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
     return false;
 }
 
-std::list<uint32> RandomPlayerbotMgr::GetBots()
+void RandomPlayerbotMgr::GetBots()
 {
     if (!currentBots.empty())
-        return currentBots;
+        return;
 
     PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BY_OWNER_AND_EVENT);
     stmt->SetData(0, 0);
@@ -1501,8 +1503,6 @@ std::list<uint32> RandomPlayerbotMgr::GetBots()
         }
         while (result->NextRow());
     }
-
-    return std::move(currentBots);
 }
 
 std::vector<uint32> RandomPlayerbotMgr::GetBgBots(uint32 bracket)

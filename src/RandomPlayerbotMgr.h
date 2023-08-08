@@ -105,7 +105,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         uint32 GetEventValue(uint32 bot, std::string const event);
         std::string const GetEventData(uint32 bot, std::string const event);
         uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn, std::string const data = "");
-        std::list<uint32> GetBots();
+        void GetBots();
         std::vector<uint32> GetBgBots(uint32 bracket);
         time_t BgCheckTimer;
         time_t LfgCheckTimer;
