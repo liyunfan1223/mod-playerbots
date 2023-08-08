@@ -4013,7 +4013,7 @@ void PlayerbotAI::ImbueItem(Item* item, uint32 targetFlag, ObjectGuid targetGUID
 void PlayerbotAI::EnchantItemT(uint32 spellid, uint8 slot)
 {
     Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-    if (!pItem || !pItem->IsInWorld())
+    if (!pItem || !pItem->IsInWorld() || !pItem->GetOwner() || !pItem->GetOwner()->IsInWorld() || !pItem->GetOwner()->GetSession())
         return;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);

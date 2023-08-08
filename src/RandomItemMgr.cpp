@@ -3,6 +3,7 @@
  */
 
 #include "RandomItemMgr.h"
+#include "ItemTemplate.h"
 #include "LootValues.h"
 #include "Playerbots.h"
 
@@ -951,6 +952,10 @@ void RandomItemMgr::BuildItemInfoCache()
             continue;
         }
 
+        if (proto->Flags & ITEM_FLAG_DEPRECATED) {
+            itemForTest.insert(proto->ItemId);
+            continue;
+        }
         // skip items with rank/rep requirements
         /*if (proto->RequiredHonorRank > 0 ||
             proto->RequiredSkillRank > 0 ||
@@ -2179,17 +2184,23 @@ void RandomItemMgr::BuildAmmoCache()
     uint32 counter = 0;
     for (uint32 level = 1; level <= maxLevel; level += 1)
     {
-        for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_THROWN; subClass++)
+        for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_BULLET; subClass++)
         {
-            QueryResult results = WorldDatabase.Query("SELECT entry FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} "
-                "ORDER BY RequiredLevel DESC, Quality DESC, ItemLevel DESC", ITEM_CLASS_PROJECTILE, subClass, level);
+            QueryResult results = WorldDatabase.Query("SELECT entry, Flags FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} AND stackable = 1000 "
+                "ORDER BY RequiredLevel DESC", ITEM_CLASS_PROJECTILE, subClass, level);
             if (!results)
-                return;
-
-            Field* fields = results->Fetch();
-            uint32 entry = fields[0].Get<uint32>();
-            ammoCache[level][subClass] = entry;
-            ++counter;
+                continue;
+            do {
+                Field* fields = results->Fetch();
+                uint32 entry = fields[0].Get<uint32>();
+                uint32 flags = fields[1].Get<uint32>();
+                if (flags & ITEM_FLAG_DEPRECATED) {
+                    continue;
+                }
+                ammoCache[level][subClass] = entry;
+                ++counter;
+                break;
+            } while (results->NextRow());
         }
     }
 
