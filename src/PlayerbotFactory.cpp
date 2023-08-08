@@ -2154,18 +2154,15 @@ void PlayerbotFactory::InitAmmo()
         return;
 
     uint32 entry = sRandomItemMgr->GetAmmo(level, subClass);
-    uint32 count = bot->GetItemCount(entry) / 200;
-    uint32 maxCount = 5 + level / 10;
+    uint32 count = bot->GetItemCount(entry);
+    uint32 maxCount = 10000;
 
-    if (count < maxCount)
+    if (count < maxCount / 2)
     {
-        for (uint32 i = 0; i < maxCount - count; i++)
-        {
-            if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, 200))
-                newItem->AddToUpdateQueueOf(bot);
+        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount / 2)) {
+            newItem->AddToUpdateQueueOf(bot);
         }
     }
-
     bot->SetAmmo(entry);
 }
 
