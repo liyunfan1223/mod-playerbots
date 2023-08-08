@@ -261,13 +261,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         if (time(nullptr) > (PlayersCheckTimer + 60))
             activateCheckPlayersThread();
     }
-
-    if (sPlayerbotAIConfig->syncLevelWithPlayers && !players.empty())
-    {
-        if (time(nullptr) > (PlayersCheckTimer + 60))
-            activateCheckPlayersThread();
-    }
-
+    
     if (sPlayerbotAIConfig->randomBotJoinBG/* && !players.empty()*/)
     {
         if (time(nullptr) > (BgCheckTimer + 30))
@@ -1483,8 +1477,9 @@ bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(bot);
     if (!sPlayerbotAIConfig->IsInRandomAccountList(sCharacterCache->GetCharacterAccountIdByGuid(guid)))
         return false;
-
-    return GetEventValue(bot, "add");
+    if (std::find(currentBots.begin(), currentBots.end(), bot) != currentBots.end())
+        return true;
+    return false;
 }
 
 std::list<uint32> RandomPlayerbotMgr::GetBots()
@@ -1501,7 +1496,8 @@ std::list<uint32> RandomPlayerbotMgr::GetBots()
         {
             Field* fields = result->Fetch();
             uint32 bot = fields[0].Get<uint32>();
-            currentBots.push_back(bot);
+            if (GetEventValue(bot, "add"))
+                currentBots.push_back(bot);
         }
         while (result->NextRow());
     }
