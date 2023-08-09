@@ -458,7 +458,7 @@ bool Engine::HasStrategy(std::string const name)
 
 void Engine::ProcessTriggers(bool minimal)
 {
-    std::map<Trigger*, Event> fires;
+    std::unordered_map<Trigger*, Event> fires;
     for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
     {
         TriggerNode* node = *i;
@@ -614,6 +614,10 @@ bool Engine::ListenAndExecute(Action* action, Event event)
 
 void Engine::LogAction(char const* format, ...)
 {
+    Player* bot = botAI->GetBot();
+    if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()) && !testMode)
+        return;
+
     char buf[1024];
 
     va_list ap;
@@ -639,10 +643,6 @@ void Engine::LogAction(char const* format, ...)
     }
     else
     {
-        Player* bot = botAI->GetBot();
-        if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()))
-            return;
-
         LOG_DEBUG("playerbots",  "{} {}", bot->GetName().c_str(), buf);
     }
 }
