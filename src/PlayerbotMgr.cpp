@@ -780,7 +780,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
                 race_limit = "2, 5, 6, 8, 10";
                 break;
         }
-        QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) ORDER BY RAND() LIMIT 1", claz, race_limit);
+        QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) ORDER BY account DESC LIMIT 1", claz, race_limit);
         if (results)
         {
             Field* fields = results->Fetch();
