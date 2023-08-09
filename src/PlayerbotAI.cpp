@@ -639,8 +639,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 {
     if (packet.empty())
         return;
-    
-    if (!bot || !bot->IsInWorld()) {
+    if (!bot || !bot->IsInWorld() || !bot->IsDuringRemoveFromWorld()) {
         return;
     }
 	switch (packet.GetOpcode())
