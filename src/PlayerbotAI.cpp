@@ -639,7 +639,10 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 {
     if (packet.empty())
         return;
-
+    
+    if (!bot || !bot->IsInWorld()) {
+        return;
+    }
 	switch (packet.GetOpcode())
 	{
 	    case SMSG_SPELL_FAILURE:
