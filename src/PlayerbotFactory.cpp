@@ -2970,19 +2970,21 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             score *= 0.5;
         }
         // spec without double hand
-        // enhancement, rogue, ice dk, shield tank
+        // enhancement, rogue, ice dk, shield tank, fury warrior without titan's grip but with duel wield
         if (isDoubleHand && 
             ((cls == CLASS_SHAMAN && tab == 1 && bot->HasSpell(674)) ||
             (cls == CLASS_ROGUE) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 1) ||
-            (cls == CLASS_WARRIOR && tab == 1 && !bot->HasSpell(49152)) ||
+            (cls == CLASS_WARRIOR && tab == 1 && !bot->HasAura(49152) && bot->HasSpell(674)) ||
             IsShieldTank(bot))) {
                 score *= 0.1;
         }
         // spec with double hand
-        // fury with titan's grip, bear, retribution, blood dk
+        // fury with titan's grip, fury without duel wield, arms, bear, retribution, blood dk
         if (isDoubleHand && 
-            ((cls == CLASS_WARRIOR && tab == 1 && bot->HasSpell(49152)) ||
+            ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && bot->HasAura(49152)) ||
+            (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !bot->HasSpell(674)) ||
+            (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) ||
             (cls == CLASS_DRUID && tab == 1) ||
             (cls == CLASS_PALADIN && tab == 2) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 0) ||
@@ -2998,7 +3000,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             score *= 0.1;
         }
     }
-    return (0.01 + score) * itemLevel * (quality + 1);   
+    return (0.0001 + score) * itemLevel * (quality + 1);   
     // return score;
 }
 
