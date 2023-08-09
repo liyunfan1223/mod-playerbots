@@ -1246,8 +1246,9 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         if (oldItem)
         {
-            bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
-            oldItem->DestroyForPlayer(bot, false);
+            // bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
+            bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+            // oldItem->DestroyForPlayer(bot, false);
         }
         uint16 dest;
         if (!CanEquipUnseenItem(slot, dest, bestItemForSlot)) {
