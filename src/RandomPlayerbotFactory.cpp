@@ -5,10 +5,13 @@
 #include "RandomPlayerbotFactory.h"
 #include "ArenaTeamMgr.h"
 #include "AccountMgr.h"
+#include "DatabaseEnv.h"
 #include "GuildMgr.h"
 #include "Playerbots.h"
 #include "PlayerbotFactory.h"
+#include "ScriptMgr.h"
 #include "SocialMgr.h"
+#include <unistd.h>
 
 std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
 
@@ -129,21 +132,33 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         }
     }
     std::string name;
-    if (names.empty())
-        name = CreateRandomBotName(gender);
-    else
-    {
-        if (names[gender].empty())
-            return nullptr;
+    // int tries = 10;
+    // while (tries--) {
+    //     std::string cur_name;
+    //     if (names.empty())
+    name = CreateRandomBotName(gender);
+    //     else
+    //     {
+    //         if (names[gender].empty())
+    //             return nullptr;
 
-        uint32 i = urand(0, names[gender].size() - 1);
-        name = names[gender][i];
-        std::swap(names[gender][i], names[gender].back());
-        names[gender].pop_back();
-    }
+    //         uint32 i = urand(0, names[gender].size() - 1);
+    //         cur_name = names[gender][i];
+    //         std::swap(names[gender][i], names[gender].back());
+    //         names[gender].pop_back();
+    //     }
+    //     if (ObjectMgr::CheckPlayerName(name) != CHAR_NAME_SUCCESS)
+    //     {
+    //         name.clear();
+    //         continue;
+    //     }
+    // }
 
-    if (name.empty())
+    if (name.empty()) {
+        LOG_ERROR("playerbots", "Unable to get random bot name!");
         return nullptr;
+    }
+    CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use=1 WHERE name='{}'", name);
 
     std::vector<uint8> skinColors, facialHairTypes;
     std::vector<std::pair<uint8,uint8>> faces, hairs;
@@ -192,10 +207,12 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
 
-    if (player->getClass() == CLASS_DEATH_KNIGHT)
-	{
-		player->learnSpell(50977, false);
-	}
+    // player->SaveToDB(true, false);
+    // if (player->getClass() == CLASS_DEATH_KNIGHT)
+	// {
+	// 	player->learnSpell(50977, false);
+	// }
+    // player->RewardQuest(const Quest *quest, uint32 reward, Object *questGiver)
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId, name.c_str(), race, cls);
 
     return player;
@@ -206,26 +223,18 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
     std::string botName = "";
     int tries = 10;
     while(--tries) {
-        QueryResult result = CharacterDatabase.Query("SELECT n.name FROM playerbots_names n "
-                "LEFT OUTER JOIN characters e ON e.name = n.name "
-                "WHERE e.guid IS NULL AND n.in_use=0 ORDER BY RAND() LIMIT 1");
+        QueryResult result = CharacterDatabase.Query("SELECT name FROM playerbots_names "
+                "WHERE in_use = 0 AND gender = {} ORDER BY RAND() LIMIT 1", gender);
         if (!result)
         {
-            continue;
+            break;
         }
         Field* fields = result->Fetch();
         std::string ret = fields[0].Get<std::string>();
-        // check name limitations
-        if (ObjectMgr::CheckPlayerName(ret) != CHAR_NAME_SUCCESS ||
-            (sObjectMgr->IsReservedName(ret) || sObjectMgr->IsProfanityName(ret)))
+        if (ObjectMgr::CheckPlayerName(ret) == CHAR_NAME_SUCCESS)
         {
-            continue;
+            return ret;
         }
-
-        if (ret.size()) {
-            CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use=1 WHERE name='{}'", ret);
-        }
-        return ret;
     }
     LOG_ERROR("playerbots", "No more names left for random bots. Simply random.");
     tries = 10;
@@ -242,31 +251,14 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         return std::move(botName);
     }
     LOG_ERROR("playerbots", "Random name generation failed.");
+    botName.clear();
     return std::move(botName);
 }
 
 void RandomPlayerbotFactory::CreateRandomBots()
 {
-    // check if scheduled for delete
-    bool delAccs = false;
-    bool delFriends = false;
-
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_VALUE);
-    stmt->SetData(0, "bot_delete");
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
-    {
-        delAccs = true;
-
-        Field* fields = result->Fetch();
-        uint32 deleteType = fields[0].Get<uint32>();
-
-        if (deleteType > 1)
-            delFriends = true;
-
-        PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots WHERE event = 'bot_delete'");
-    }
-
-    if (sPlayerbotAIConfig->deleteRandomBotAccounts || delAccs)
+    /* multi-thread here is meaningless? since the async db operations */
+    if (sPlayerbotAIConfig->deleteRandomBotAccounts)
     {
         std::vector<uint32> botAccounts;
         std::vector<uint32> botFriends;
@@ -281,28 +273,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
                 botAccounts.push_back(accountId);
         }
 
-        // if (!delFriends)
-        //     LOG_INFO("playerbots", "Deleting random bot characters without friends/guild...");
-        // else
-            LOG_INFO("playerbots", "Deleting all random bot characters...");
-
-        // load list of friends
-        // if (!delFriends)
-        // {
-        //     QueryResult result = CharacterDatabase.Query("SELECT friend FROM character_social WHERE flags={}", SOCIAL_FLAG_FRIEND);
-        //     if (result)
-        //     {
-        //         do
-        //         {
-        //             Field* fields = result->Fetch();
-        //             uint32 guidlow = fields[0].Get<uint32>();
-        //             botFriends.push_back(guidlow);
-
-        //         } while (result->NextRow());
-        //     }
-        // }
-
-        // std::vector<std::future<void>> dels;
+        LOG_INFO("playerbots", "Deleting all random bot characters, {} accounts collected...", botAccounts.size());
         QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'", sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
         if (results)
         {
@@ -310,63 +281,24 @@ void RandomPlayerbotFactory::CreateRandomBots()
             {
                 Field* fields = results->Fetch();
                 uint32 accId = fields[0].Get<uint32>();
-
-                // if (!delFriends)
-                // {
-                //     // existing characters list
-                //     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
-                //     stmt->SetData(0, accId);
-                //     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-                //     {
-                //         do
-                //         {
-                //             Field* fields = result->Fetch();
-                //             uint32 guidlow = fields[0].Get<uint32>();
-                //             ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(guidlow);
-
-                //             // if bot is someone's friend - don't delete it
-                //             if ((find(botFriends.begin(), botFriends.end(), guidlow) != botFriends.end()) && !delFriends)
-                //                 continue;
-                //             // if bot is in someone's guild - don't delete it
-                //             uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(guid);
-                //             if (guildId && !delFriends)
-                //             {
-                //                 Guild* guild = sGuildMgr->GetGuildById(guildId);
-                //                 uint32 accountId = sRandomPlayerbotMgr->GetAccountId(guild->GetLeaderGUID());
-
-                //                 if (find(botAccounts.begin(), botAccounts.end(), accountId) == botAccounts.end())
-                //                     continue;
-                //             }
-
-                //             Player::DeleteFromDB(guidlow, accId, false, true);       // no need to update realm characters
-                //         } while (result->NextRow());
-                //     }
-                // }
-                // else
                 AccountMgr::DeleteAccount(accId);
-//                    dels.push_back(std::async([accId]
-//                    {
-//                        AccountMgr::DeleteAccount(accId);
-//                    }));
-
             } while (results->NextRow());
         }
 
-        /* for (uint32 i = 0; i < dels.size(); i++)
-        {
-            dels[i].wait();
-        }*/
-
         PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
-        CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use=0");
+        CharacterDatabase.Execute("UPDATE playerbots_names SET in_use=0 WHERE in_use=1");
+        /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created correctly
+           the better way is turning the async db operation to sync db operation */
+        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
         LOG_INFO("playerbots", "Random bot characters deleted");
     }
-
+    
     uint32 totalAccCount = sPlayerbotAIConfig->randomBotAccountCount;
 
     LOG_INFO("playerbots", "Creating random bot accounts...");
 
     std::vector<std::future<void>> account_creations;
+    bool account_creation = false;
     for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
     {
         std::ostringstream out;
@@ -380,7 +312,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         {
             continue;
         }
-
+        account_creation = true;
         std::string password = "";
         if (sPlayerbotAIConfig->randomBotRandomPassword)
         {
@@ -392,44 +324,24 @@ void RandomPlayerbotFactory::CreateRandomBots()
         else
             password = accountName;
 
-        account_creations.push_back(std::async([accountName, password]
-        {
-            AccountMgr::CreateAccount(accountName, password);
-        }));
+        AccountMgr::CreateAccount(accountName, password);
 
         LOG_DEBUG("playerbots", "Account {} created for random bots", accountName.c_str());
     }
 
-    for (uint32 i = 0; i < account_creations.size(); i++)
-    {
-        account_creations[i].wait();
+    if (account_creation) {
+        /* wait for async accounts create to make character create correctly, same as account delete */
+        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
     }
-
-    //LoginDatabase.Execute("UPDATE account SET expansion = {} WHERE username LIKE ''{}'%%'", EXPANSION_WRATH_OF_THE_LICH_KING, sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
-
-    LOG_INFO("server.loading", "Loading available names...");
-    std::unordered_map<uint8,std::vector<std::string>> names;
-    // QueryResult result = CharacterDatabase.Query("SELECT n.gender, n.name FROM playerbots_names n LEFT OUTER JOIN characters e ON e.name = n.name WHERE e.guid IS NULL");
-    // if (!result)
-    // {
-    //     LOG_ERROR("server.loading", "No more names left for random bots");
-    //     return;
-    // }
-
-    // do
-    // {
-    //     Field* fields = result->Fetch();
-    //     uint8 gender = fields[0].Get<uint8>();
-    //     std::string const bname = fields[1].Get<std::string>();
-    //     names[gender].push_back(bname);
-    // } while (result->NextRow());
 
     LOG_INFO("playerbots", "Creating random bot characters...");
     uint32 totalRandomBotChars = 0;
     uint32 totalCharCount = sPlayerbotAIConfig->randomBotAccountCount * 10;
 
+    std::unordered_map<uint8,std::vector<std::string>> names;
     std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
+    bool bot_creation = false;
     for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
     {
         std::ostringstream out;
@@ -453,7 +365,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
             totalRandomBotChars += count;
             continue;
         }
-
+        bot_creation = true;
+        LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1, sPlayerbotAIConfig->randomBotAccountCount);
         RandomPlayerbotFactory factory(accountId);
 
         WorldSession* session = new WorldSession(accountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0), LOCALE_enUS, 0, false, false, 0, true);
@@ -474,34 +387,28 @@ void RandomPlayerbotFactory::CreateRandomBots()
             }
 
             if (cls != 10)
-                if (Player* playerBot = factory.CreateRandomBot(session, cls, names))
-                    playerBots.emplace_back(playerBot, accountId);
+                if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
+                    playerBot->SaveToDB(true, false);
+                    sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(), 
+                        playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->getLevel());
+                    playerBot->CleanupsBeforeDelete();
+                    delete playerBot;
+                }
         }
-
-        totalRandomBotChars += AccountMgr::GetCharactersCount(accountId);
     }
 
-    std::vector<std::future<void>> bot_creations;
-    for (auto const& itr : playerBots)
-    {
-        Player* player = itr.first;
-        uint32 accountId = itr.second;
-        bot_creations.push_back(std::async([player, accountId]
-        {
-            player->SaveToDB(true, false);
-            sCharacterCache->AddCharacterCacheEntry(player->GetGUID(), accountId, player->GetName(), player->getGender(), player->getRace(), player->getClass(), player->getLevel());
-            player->CleanupsBeforeDelete();
-            delete player;
-        }));
-    }
-
-    for (uint32 i = 0; i < bot_creations.size(); i++)
-    {
-        bot_creations[i].wait();
+    if (bot_creation) {
+        LOG_INFO("playerbots", "Wait for {} characters load into database...", totalCharCount);
+        /* wait for characters load into database, or characters will fail to loggin */
+        std::this_thread::sleep_for(15ms * totalCharCount);
     }
 
     for (WorldSession* session : sessionBots)
         delete session;
+    
+    for (uint32 accountId : sPlayerbotAIConfig->randomBotAccounts) {
+        totalRandomBotChars += AccountMgr::GetCharactersCount(accountId);
+    }
 
     LOG_INFO("server.loading", "{} random bot accounts with {} characters available", sPlayerbotAIConfig->randomBotAccounts.size(), totalRandomBotChars);
 }

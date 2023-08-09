@@ -799,11 +799,11 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
         // do not randomize or teleport immediately after server start (prevent lagging)
         if (!GetEventValue(bot, "randomize")) {
-            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval, sPlayerbotAIConfig->randomBotUpdateInterval * 10);
+            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval * 5, sPlayerbotAIConfig->randomBotUpdateInterval * 20);
             ScheduleRandomize(bot, randomTime);
         }
         if (!GetEventValue(bot, "teleport")) {
-            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval, sPlayerbotAIConfig->randomBotUpdateInterval * 10);
+            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval * 5, sPlayerbotAIConfig->randomBotUpdateInterval * 20);
             ScheduleTeleport(bot, randomTime);
         }
         return true;
