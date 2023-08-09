@@ -9,6 +9,7 @@
 #include "GuildMgr.h"
 #include "MapMgr.h"
 #include "PetDefines.h"
+#include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "PerformanceMonitor.h"
@@ -2991,6 +2992,9 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     }
     if (proto->Class == ITEM_CLASS_WEAPON) {
         if (cls == CLASS_HUNTER && proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN) {
+            score *= 0.1;
+        }
+        if (cls == CLASS_ROGUE && tab == ROGUE_TAB_ASSASSINATION && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER) {
             score *= 0.1;
         }
     }
