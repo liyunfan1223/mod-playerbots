@@ -362,7 +362,6 @@ void RandomPlayerbotFactory::CreateRandomBots()
         uint32 count = AccountMgr::GetCharactersCount(accountId);
         if (count >= 10)
         {
-            totalRandomBotChars += count;
             continue;
         }
         bot_creation = true;

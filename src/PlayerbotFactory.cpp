@@ -572,6 +572,7 @@ void PlayerbotFactory::InitPet()
             pet->InitTalentForLevel();
 
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+            bot->PetSpellInitialize();
             break;
         }
     }
@@ -592,8 +593,6 @@ void PlayerbotFactory::InitPet()
     // LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.", pet->m_spells.size(), pet->GetPetAutoSpellSize());
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
     {
-        // LOG_INFO("playerbots", "Start. Make spell {} for pet {} auto cast, bot: {}. state: {}", itr->first, pet->GetName(), bot->GetName(),
-            // itr->second.state);
         if (itr->second.state == PETSPELL_REMOVED)
             continue;
 
@@ -602,18 +601,10 @@ void PlayerbotFactory::InitPet()
             continue;
 
         if (spellInfo->IsPassive()) {
-            // LOG_INFO("playerbots", "Start. Make spell {} for pet {} auto cast, bot: {}. Passive continue.", 
-            //     itr->first, pet->GetName(), bot->GetName());
             continue;
         }
-        // LOG_INFO("playerbots", "Make spell {} for pet {} auto cast, bot: {}. old_active: {}. old_state: {}.", 
-        //     itr->first, pet->GetName(), bot->GetName(), itr->second.active, itr->second.state);
         pet->ToggleAutocast(spellInfo, true);
-        // LOG_INFO("playerbots", "AFTER - Make spell {} for pet {} auto cast, bot: {}. active: {}. state: {}.", 
-        //     itr->first, pet->GetName(), bot->GetName(), itr->second.active, itr->second.state);
     }
-    // LOG_INFO("playerbots", "AFTER,  {} already auto casted.", pet->GetPetAutoSpellSize());
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
 void PlayerbotFactory::ClearSkills()
