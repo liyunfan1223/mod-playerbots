@@ -115,7 +115,7 @@ class PlayerbotFactory : public InventoryAction
 
         static uint32 tradeSkills[];
         static float CalculateItemScore(uint32 item_id, Player* bot);
-        void InitTalentsTree(bool incremental = false, bool use_template = true);
+        void InitTalentsTree(bool incremental = false, bool use_template = true, bool reset = false);
         void InitAvailableSpells();
         void InitClassSpells();
         void InitEquipment(bool incremental);

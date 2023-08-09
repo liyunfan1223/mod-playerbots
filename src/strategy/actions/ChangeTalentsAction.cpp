@@ -336,7 +336,7 @@ bool AutoSetTalentsAction::Execute(Event event)
         return false;
 
     PlayerbotFactory factory(bot, bot->GetLevel());
-    factory.InitTalentsTree(true);
+    factory.InitTalentsTree(true, true, true);
 
     botAI->TellMaster(out);
 

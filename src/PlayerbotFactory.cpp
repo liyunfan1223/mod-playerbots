@@ -705,7 +705,7 @@ void PlayerbotFactory::InitSpells()
     InitAvailableSpells();
 }
 
-void PlayerbotFactory::InitTalentsTree(bool increment/*false*/, bool use_template/*true*/)
+void PlayerbotFactory::InitTalentsTree(bool increment/*false*/, bool use_template/*true*/, bool reset/*false*/)
 {
     uint32 specNo;
     uint8 cls = bot->getClass();
@@ -716,6 +716,9 @@ void PlayerbotFactory::InitTalentsTree(bool increment/*false*/, bool use_templat
         uint32 p1 = sPlayerbotAIConfig->specProbability[cls][0];
         uint32 p2 = p1 + sPlayerbotAIConfig->specProbability[cls][1];
         specNo = (point < p1 ? 0 : (point < p2 ? 1 : 2));
+    }
+    if (reset) {
+        bot->resetTalents(true);
     }
     // use template if can
     if (use_template && sPlayerbotAIConfig->defaultTalentsOrder[cls][specNo].size() > 0) {
