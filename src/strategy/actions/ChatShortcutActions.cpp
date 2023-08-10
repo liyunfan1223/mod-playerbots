@@ -80,7 +80,7 @@ bool FollowChatShortcutAction::Execute(Event event)
     }
     */
 
-    botAI->TellMaster("Following");
+    botAI->TellMaster("Following");//bot will whisper after master send "follow" command
     return true;
 }
 
