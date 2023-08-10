@@ -529,7 +529,7 @@ void PlayerbotFactory::InitPet()
             return;
         }
 
-		for (uint32 i = 0; i < 100; i++)
+		for (uint32 i = 0; i < 10; i++)
 		{
 			uint32 index = urand(0, ids.size() - 1);
             CreatureTemplate const* co = sObjectMgr->GetCreatureTemplate(ids[index]);
@@ -554,7 +554,6 @@ void PlayerbotFactory::InitPet()
             pet = bot->CreateTamedPetFrom(co->Entry, 0);
             if (!pet)
             {
-                LOG_ERROR("playerbots", "No pet.");
                 continue;
             }
 
@@ -2019,7 +2018,7 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specNo)
     }
 
     // bot->SaveToDB();
-    for (std::vector<uint32> p : sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo]) {
+    for (std::vector<uint32> &p : sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo]) {
         uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
         uint32 talentID = -1;
 

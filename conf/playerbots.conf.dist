@@ -670,7 +670,7 @@ Playerbots.Updates.EnableDatabases = 1
 ##################################################################################
 
 Appender.Playerbots=2,5,0,Playerbots.log,w
-Logger.playerbots=5,Playerbots
+Logger.playerbots=5,Console Playerbots
 
 
 ##############################################
