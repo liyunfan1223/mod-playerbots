@@ -6,9 +6,9 @@
 #define _PLAYERBOT_PLAYERBOTFACTORY_H
 
 #include "InventoryAction.h"
+#include "Player.h"
 
 class Item;
-class Player;
 
 struct ItemTemplate;
 
@@ -123,8 +123,8 @@ class PlayerbotFactory : public InventoryAction
 
     private:
         void Prepare();
-        void InitSecondEquipmentSet();
-        void InitEquipmentNew(bool incremental);
+        // void InitSecondEquipmentSet();
+        // void InitEquipmentNew(bool incremental);
         bool CanEquipItem(ItemTemplate const* proto, uint32 desiredQuality);
         bool CanEquipUnseenItem(uint8 slot, uint16& dest, uint32 item);
         void InitTradeSkills();
@@ -166,15 +166,15 @@ class PlayerbotFactory : public InventoryAction
         void LoadEnchantContainer();
         void ApplyEnchantTemplate();
         void ApplyEnchantTemplate(uint8 spec);  
+        std::vector<InventoryType> GetPossibleInventoryTypeListBySlot(EquipmentSlots slot);
         static bool IsShieldTank(Player* bot);
         static bool NotSameArmorType(uint32 item_subclass_armor, Player* bot);
         EnchantContainer::const_iterator GetEnchantContainerBegin() { return m_EnchantContainer.begin(); }
         EnchantContainer::const_iterator GetEnchantContainerEnd() { return m_EnchantContainer.end(); }
-
         uint32 level;
         uint32 itemQuality;
         static std::list<uint32> specialQuestIds;
-
+        std::vector<uint32> trainerIdCache;
     protected:
         EnchantContainer m_EnchantContainer;
 };

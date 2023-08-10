@@ -6,9 +6,14 @@
 #include "AccountMgr.h"
 #include "AiFactory.h"
 #include "ArenaTeamMgr.h"
+#include "DBCStores.h"
 #include "GuildMgr.h"
+#include "ItemTemplate.h"
+#include "Log.h"
+#include "LootMgr.h"
 #include "MapMgr.h"
 #include "PetDefines.h"
+#include "Player.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
@@ -961,7 +966,7 @@ bool PlayerbotFactory::CanEquipWeapon(ItemTemplate const* proto)
 
 bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQuality)
 {
-    if (proto->Duration & 0x80000000)
+    if (proto->Duration != 0)
         return false;
 
     if (proto->Quality != desiredQuality)
@@ -1017,141 +1022,153 @@ void Shuffle(std::vector<uint32>& items)
     }
 }
 
-void PlayerbotFactory::InitEquipmentNew(bool incremental)
-{
-    if (incremental)
-    {
-        DestroyItemsVisitor visitor(bot);
-        IterateItems(&visitor, (IterateItemsMask)(ITERATE_ITEMS_IN_BAGS | ITERATE_ITEMS_IN_BANK));
-    }
-    else
-    {
-    DestroyItemsVisitor visitor(bot);
-    IterateItems(&visitor, ITERATE_ALL_ITEMS);
-    }
+// void PlayerbotFactory::InitEquipmentNew(bool incremental)
+// {
+//     if (incremental)
+//     {
+//         DestroyItemsVisitor visitor(bot);
+//         IterateItems(&visitor, (IterateItemsMask)(ITERATE_ITEMS_IN_BAGS | ITERATE_ITEMS_IN_BANK));
+//     }
+//     else
+//     {
+//     DestroyItemsVisitor visitor(bot);
+//     IterateItems(&visitor, ITERATE_ALL_ITEMS);
+//     }
 
-    std::string const& specName = AiFactory::GetPlayerSpecName(bot);
-    if (specName.empty())
-        return;
+//     std::string const& specName = AiFactory::GetPlayerSpecName(bot);
+//     if (specName.empty())
+//         return;
 
-    // look for upgrades
-    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
-    {
-        if (slot == EQUIPMENT_SLOT_TABARD && !bot->GetGuildId())
-            continue;
+//     // look for upgrades
+//     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+//     {
+//         if (slot == EQUIPMENT_SLOT_TABARD && !bot->GetGuildId())
+//             continue;
 
-        bool isUpgrade = false;
-        bool found = false;
-        bool noItem = false;
-        uint32 quality = urand(ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_EPIC);
-        uint32 attempts = 10;
-        if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && quality > ITEM_QUALITY_NORMAL) {
-            quality--;
-        }
-        // current item;
-        Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-        if (oldItem)
-            isUpgrade = true;
+//         bool isUpgrade = false;
+//         bool found = false;
+//         bool noItem = false;
+//         uint32 quality = urand(ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_EPIC);
+//         uint32 attempts = 10;
+//         if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && quality > ITEM_QUALITY_NORMAL) {
+//             quality--;
+//         }
+//         // current item;
+//         Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+//         if (oldItem)
+//             isUpgrade = true;
 
-        uint32 itemInSlot = isUpgrade ? oldItem->GetTemplate()->ItemId : 0;
+//         uint32 itemInSlot = isUpgrade ? oldItem->GetTemplate()->ItemId : 0;
 
-        uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-        if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-            maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+//         uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
+//         if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+//             maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
-        uint32 minLevel = sPlayerbotAIConfig->randomBotMinLevel;
-        if (minLevel < sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL))
-            minLevel = sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL);
+//         uint32 minLevel = sPlayerbotAIConfig->randomBotMinLevel;
+//         if (minLevel < sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL))
+//             minLevel = sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL);
 
-        // test
-        do
-        {
-            if (isUpgrade)
-            {
-                std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot, 0, itemInSlot);
-                if (!ids.empty())
-                    Shuffle(ids);
+//         // test
+//         do
+//         {
+//             if (isUpgrade)
+//             {
+//                 std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot, 0, itemInSlot);
+//                 if (!ids.empty())
+//                     Shuffle(ids);
 
-                for (uint32 index = 0; index < ids.size(); ++index)
-                {
-                    uint32 newItemId = ids[index];
-                    if (incremental && !IsDesiredReplacement(oldItem))
-                    {
-                        continue;
-                    }
+//                 for (uint32 index = 0; index < ids.size(); ++index)
+//                 {
+//                     uint32 newItemId = ids[index];
+//                     if (incremental && !IsDesiredReplacement(oldItem))
+//                     {
+//                         continue;
+//                     }
 
-                    uint16 dest;
-                    if (!CanEquipUnseenItem(slot, dest, newItemId))
-                        continue;
+//                     uint16 dest;
+//                     if (!CanEquipUnseenItem(slot, dest, newItemId))
+//                         continue;
 
-                    if (oldItem)
-                    {
-                        bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
-                        oldItem->DestroyForPlayer(bot);
-                    }
+//                     if (oldItem)
+//                     {
+//                         bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
+//                         oldItem->DestroyForPlayer(bot);
+//                     }
 
-                    Item* newItem = bot->EquipNewItem(dest, newItemId, true);
-                    if (newItem)
-                    {
-                        newItem->AddToWorld();
-                        newItem->AddToUpdateQueueOf(bot);
-                        bot->AutoUnequipOffhandIfNeed();
-                        newItem->SetOwnerGUID(bot->GetGUID());
-                        EnchantItem(newItem);
-                        LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}, Old item: {}",
-                            bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), newItemId, slot, itemInSlot);
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot, quality, itemInSlot);
-                if (!ids.empty())
-                    Shuffle(ids);
+//                     Item* newItem = bot->EquipNewItem(dest, newItemId, true);
+//                     if (newItem)
+//                     {
+//                         newItem->AddToWorld();
+//                         newItem->AddToUpdateQueueOf(bot);
+//                         bot->AutoUnequipOffhandIfNeed();
+//                         newItem->SetOwnerGUID(bot->GetGUID());
+//                         EnchantItem(newItem);
+//                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}, Old item: {}",
+//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), newItemId, slot, itemInSlot);
+//                         found = true;
+//                         break;
+//                     }
+//                 }
+//             }
+//             else
+//             {
+//                 std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot, quality, itemInSlot);
+//                 if (!ids.empty())
+//                     Shuffle(ids);
 
-                for (uint32 index = 0; index < ids.size(); ++index)
-                {
-                    uint32 newItemId = ids[index];
-                    uint16 dest;
-                    if (!CanEquipUnseenItem(slot, dest, newItemId))
-                        continue;
+//                 for (uint32 index = 0; index < ids.size(); ++index)
+//                 {
+//                     uint32 newItemId = ids[index];
+//                     uint16 dest;
+//                     if (!CanEquipUnseenItem(slot, dest, newItemId))
+//                         continue;
 
-                    Item* newItem = bot->EquipNewItem(dest, newItemId, true);
-                    if (newItem)
-                    {
-                        bot->AutoUnequipOffhandIfNeed();
-                        newItem->SetOwnerGUID(bot->GetGUID());
-                        EnchantItem(newItem);
-                        found = true;
-                        LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}",
-                            bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), newItemId, slot);
-                        break;
-                    }
-                }
-            }
-            quality--;
-        } while (!found && quality != ITEM_QUALITY_POOR);
-        if (!found)
-        {
-            LOG_INFO("playerbots", "Bot {} {}:{} <{}>: no item for slot {}",
-                bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), slot);
-            continue;
-        }
-    }
-}
+//                     Item* newItem = bot->EquipNewItem(dest, newItemId, true);
+//                     if (newItem)
+//                     {
+//                         bot->AutoUnequipOffhandIfNeed();
+//                         newItem->SetOwnerGUID(bot->GetGUID());
+//                         EnchantItem(newItem);
+//                         found = true;
+//                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}",
+//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), newItemId, slot);
+//                         break;
+//                     }
+//                 }
+//             }
+//             quality--;
+//         } while (!found && quality != ITEM_QUALITY_POOR);
+//         if (!found)
+//         {
+//             LOG_INFO("playerbots", "Bot {} {}:{} <{}>: no item for slot {}",
+//                 bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), slot);
+//             continue;
+//         }
+//     }
+// }
 
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
 
     // todo(yunfan): to be refactored, too much time overhead
-    // DestroyItemsVisitor visitor(bot);
-    // IterateItems(&visitor, ITERATE_ALL_ITEMS);
-
     std::map<uint8, std::vector<uint32> > items;
     int tab = AiFactory::GetPlayerSpecTab(bot);
-    // todo(yunfan): make cache for this
+    
+    uint32 blevel = bot->getLevel();
+    int32 delta = 2;
+    if (blevel < 15)
+        delta = 15;
+    else if (blevel < 40)
+        delta = 10;
+    else if (blevel < 60)
+        delta = 6;
+    else if (blevel < 70)
+        delta = 9;
+    else if (blevel < 80)
+        delta = 9;
+    else if (blevel == 80)
+        delta = 2;
+
     for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
@@ -1163,46 +1180,44 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         do
         {
-            ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-            for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
-            {
-                uint32 itemId = i->first;
-                if (sRandomItemMgr->IsTestItem(itemId)) {
-                    continue;
+            ItemTemplateContainer const* itemTemplate = sObjectMgr->GetItemTemplateStore();
+            for (uint32 requiredLevel = bot->GetLevel(); requiredLevel > std::max((int32)bot->GetLevel() - delta, 0); requiredLevel--) {
+                for (InventoryType inventoryType : GetPossibleInventoryTypeListBySlot((EquipmentSlots)slot)) {
+                    for (uint32 itemId : sRandomItemMgr->GetCachedEquipments(requiredLevel, inventoryType)) {
+                        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                        if (!proto)
+                            continue;
+
+                        if (proto->Class != ITEM_CLASS_WEAPON &&
+                            proto->Class != ITEM_CLASS_ARMOR)
+                            continue;
+
+                        if (!CanEquipItem(proto, desiredQuality))
+                            continue;
+
+                        if (proto->Class == ITEM_CLASS_ARMOR && (
+                            slot == EQUIPMENT_SLOT_HEAD ||
+                            slot == EQUIPMENT_SLOT_SHOULDERS ||
+                            slot == EQUIPMENT_SLOT_CHEST ||
+                            slot == EQUIPMENT_SLOT_WAIST ||
+                            slot == EQUIPMENT_SLOT_LEGS ||
+                            slot == EQUIPMENT_SLOT_FEET ||
+                            slot == EQUIPMENT_SLOT_WRISTS ||
+                            slot == EQUIPMENT_SLOT_HANDS) && !CanEquipArmor(proto))
+                                continue;
+
+                        if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
+                            continue;
+
+                        if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
+                            continue;
+                        
+                        uint16 dest = 0;
+                        if (CanEquipUnseenItem(slot, dest, itemId))
+                            items[slot].push_back(itemId);
+                    }
                 }
-                ItemTemplate const* proto = &i->second;
-                if (!proto)
-                    continue;
-
-                if (proto->Class != ITEM_CLASS_WEAPON &&
-                    proto->Class != ITEM_CLASS_ARMOR &&
-                    proto->Class != ITEM_CLASS_CONTAINER &&
-                    proto->Class != ITEM_CLASS_PROJECTILE)
-                    continue;
-
-                if (!CanEquipItem(proto, desiredQuality))
-                    continue;
-
-                if (proto->Class == ITEM_CLASS_ARMOR && (
-                    slot == EQUIPMENT_SLOT_HEAD ||
-                    slot == EQUIPMENT_SLOT_SHOULDERS ||
-                    slot == EQUIPMENT_SLOT_CHEST ||
-                    slot == EQUIPMENT_SLOT_WAIST ||
-                    slot == EQUIPMENT_SLOT_LEGS ||
-                    slot == EQUIPMENT_SLOT_FEET ||
-                    slot == EQUIPMENT_SLOT_WRISTS ||
-                    slot == EQUIPMENT_SLOT_HANDS) && !CanEquipArmor(proto))
-                        continue;
-
-                if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
-                    continue;
-
-                if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
-                    continue;
-                
-                uint16 dest = 0;
-                if (CanEquipUnseenItem(slot, dest, itemId))
-                    items[slot].push_back(itemId);
+                if (items[slot].size() >= 10) break;
             }
         } while (items[slot].size() < 10 && desiredQuality-- > ITEM_QUALITY_NORMAL);
     }
@@ -1245,9 +1260,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         if (oldItem)
         {
-            // bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
             bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
-            // oldItem->DestroyForPlayer(bot, false);
         }
         uint16 dest;
         if (!CanEquipUnseenItem(slot, dest, bestItemForSlot)) {
@@ -1271,10 +1284,13 @@ bool PlayerbotFactory::IsDesiredReplacement(Item* item)
 
     ItemTemplate const* proto = item->GetTemplate();
     uint32 requiredLevel = proto->RequiredLevel;
-    if (!requiredLevel)
-    {
-        requiredLevel = sRandomItemMgr->GetMinLevelFromCache(proto->ItemId);
+    if (!requiredLevel) {
+        return true;
     }
+    // if (!requiredLevel)
+    // {
+    //     requiredLevel = sRandomItemMgr->GetMinLevelFromCache(proto->ItemId);
+    // }
     
     uint32 delta = 1 + (80 - bot->getLevel()) / 10;
     return int32(bot->getLevel() - requiredLevel) > delta;
@@ -1295,110 +1311,110 @@ inline Item* StoreNewItemInInventorySlot(Player* player, uint32 newItemId, uint3
     return nullptr;
 }
 
-void PlayerbotFactory::InitSecondEquipmentSet()
-{
-    if (bot->getClass() == CLASS_MAGE || bot->getClass() == CLASS_WARLOCK || bot->getClass() == CLASS_PRIEST)
-        return;
+// void PlayerbotFactory::InitSecondEquipmentSet()
+// {
+//     if (bot->getClass() == CLASS_MAGE || bot->getClass() == CLASS_WARLOCK || bot->getClass() == CLASS_PRIEST)
+//         return;
 
-    std::map<uint32, std::vector<uint32>> items;
+//     std::map<uint32, std::vector<uint32>> items;
 
-    uint32 desiredQuality = itemQuality;
-    while (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
-    {
-        desiredQuality--;
-    }
+//     uint32 desiredQuality = itemQuality;
+//     while (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
+//     {
+//         desiredQuality--;
+//     }
 
-    ItemTemplateContainer const* itemTemplate = sObjectMgr->GetItemTemplateStore();
-    do
-    {
-        for (auto const& itr : *itemTemplate)
-        {
-            ItemTemplate const* proto = &itr.second;
-            if (!proto)
-                continue;
-            if (!CanEquipItem(proto, desiredQuality))
-                continue;
+//     ItemTemplateContainer const* itemTemplate = sObjectMgr->GetItemTemplateStore();
+//     do
+//     {
+//         for (auto const& itr : *itemTemplate)
+//         {
+//             ItemTemplate const* proto = &itr.second;
+//             if (!proto)
+//                 continue;
+//             if (!CanEquipItem(proto, desiredQuality))
+//                 continue;
 
-            if (proto->Class == ITEM_CLASS_WEAPON)
-            {
-                //if (!CanEquipWeapon(proto))
-                //    continue;
+//             if (proto->Class == ITEM_CLASS_WEAPON)
+//             {
+//                 //if (!CanEquipWeapon(proto))
+//                 //    continue;
 
-                if (sRandomItemMgr->HasStatWeight(proto->ItemId))
-                {
-                    if (!sRandomItemMgr->GetLiveStatWeight(bot, proto->ItemId))
-                        continue;
-                }
+//                 if (sRandomItemMgr->HasStatWeight(proto->ItemId))
+//                 {
+//                     if (!sRandomItemMgr->GetLiveStatWeight(bot, proto->ItemId))
+//                         continue;
+//                 }
 
-                Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-                if (existingItem)
-                {
-                    switch (existingItem->GetTemplate()->SubClass)
-                    {
-                        case ITEM_SUBCLASS_WEAPON_AXE:
-                        case ITEM_SUBCLASS_WEAPON_DAGGER:
-                        case ITEM_SUBCLASS_WEAPON_FIST:
-                        case ITEM_SUBCLASS_WEAPON_MACE:
-                        case ITEM_SUBCLASS_WEAPON_SWORD:
-                            if (proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE || proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER || proto->SubClass == ITEM_SUBCLASS_WEAPON_FIST ||
-                                proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD)
-                                continue;
-                            break;
-                        default:
-                            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
-                                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-                                continue;
-                            break;
-                    }
-                }
-            }
-            else if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-            {
-                //if (!CanEquipArmor(proto))
-                //    continue;
+//                 Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+//                 if (existingItem)
+//                 {
+//                     switch (existingItem->GetTemplate()->SubClass)
+//                     {
+//                         case ITEM_SUBCLASS_WEAPON_AXE:
+//                         case ITEM_SUBCLASS_WEAPON_DAGGER:
+//                         case ITEM_SUBCLASS_WEAPON_FIST:
+//                         case ITEM_SUBCLASS_WEAPON_MACE:
+//                         case ITEM_SUBCLASS_WEAPON_SWORD:
+//                             if (proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE || proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER || proto->SubClass == ITEM_SUBCLASS_WEAPON_FIST ||
+//                                 proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD)
+//                                 continue;
+//                             break;
+//                         default:
+//                             if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+//                                 proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+//                                 continue;
+//                             break;
+//                     }
+//                 }
+//             }
+//             else if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+//             {
+//                 //if (!CanEquipArmor(proto))
+//                 //    continue;
 
-                if (sRandomItemMgr->HasStatWeight(proto->ItemId))
-                {
-                    if (!sRandomItemMgr->GetLiveStatWeight(bot, proto->ItemId))
-                        continue;
-                }
+//                 if (sRandomItemMgr->HasStatWeight(proto->ItemId))
+//                 {
+//                     if (!sRandomItemMgr->GetLiveStatWeight(bot, proto->ItemId))
+//                         continue;
+//                 }
 
-                if (Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                    if (existingItem->GetTemplate()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-                        continue;
-            }
-            else
-                continue;
+//                 if (Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+//                     if (existingItem->GetTemplate()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+//                         continue;
+//             }
+//             else
+//                 continue;
 
-            items[proto->Class].push_back(itr.first);
-        }
-    } while (items[ITEM_CLASS_ARMOR].empty() && items[ITEM_CLASS_WEAPON].empty() && desiredQuality-- > ITEM_QUALITY_NORMAL);
+//             items[proto->Class].push_back(itr.first);
+//         }
+//     } while (items[ITEM_CLASS_ARMOR].empty() && items[ITEM_CLASS_WEAPON].empty() && desiredQuality-- > ITEM_QUALITY_NORMAL);
 
-    for (std::map<uint32, std::vector<uint32>>::iterator i = items.begin(); i != items.end(); ++i)
-    {
-        std::vector<uint32>& ids = i->second;
-        if (ids.empty())
-        {
-            LOG_DEBUG("playerbots",   "{}: no items to make second equipment set for slot {}", bot->GetName().c_str(), i->first);
-            continue;
-        }
+//     for (std::map<uint32, std::vector<uint32>>::iterator i = items.begin(); i != items.end(); ++i)
+//     {
+//         std::vector<uint32>& ids = i->second;
+//         if (ids.empty())
+//         {
+//             LOG_DEBUG("playerbots",   "{}: no items to make second equipment set for slot {}", bot->GetName().c_str(), i->first);
+//             continue;
+//         }
 
-        for (uint32 attempts = 0; attempts < 15; attempts++)
-        {
-            uint32 index = urand(0, ids.size() - 1);
-            uint32 newItemId = ids[index];
+//         for (uint32 attempts = 0; attempts < 15; attempts++)
+//         {
+//             uint32 index = urand(0, ids.size() - 1);
+//             uint32 newItemId = ids[index];
 
-            if (Item* newItem = StoreNewItemInInventorySlot(bot, newItemId, 1))
-            {
-                newItem->SetOwnerGUID(bot->GetGUID());
-                EnchantItem(newItem);
-                newItem->AddToWorld();
-                newItem->AddToUpdateQueueOf(bot);
-                break;
-            }
-        }
-    }
-}
+//             if (Item* newItem = StoreNewItemInInventorySlot(bot, newItemId, 1))
+//             {
+//                 newItem->SetOwnerGUID(bot->GetGUID());
+//                 EnchantItem(newItem);
+//                 newItem->AddToWorld();
+//                 newItem->AddToUpdateQueueOf(bot);
+//                 break;
+//             }
+//         }
+//     }
+// }
 
 void PlayerbotFactory::InitBags()
 {
@@ -1769,18 +1785,22 @@ void PlayerbotFactory::InitAvailableSpells()
 {
     bot->LearnDefaultSkills();
 
-    CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
-    for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin(); i != creatureTemplateContainer->end(); ++i)
-    {
-        CreatureTemplate const& co = i->second;
-        if (co.trainer_type != TRAINER_TYPE_TRADESKILLS && co.trainer_type != TRAINER_TYPE_CLASS)
-            continue;
+    if (trainerIdCache.empty()) {
+        CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
+        for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin(); i != creatureTemplateContainer->end(); ++i)
+        {
+            CreatureTemplate const& co = i->second;
+            if (co.trainer_type != TRAINER_TYPE_TRADESKILLS && co.trainer_type != TRAINER_TYPE_CLASS)
+                continue;
 
-        if (co.trainer_type == TRAINER_TYPE_CLASS && co.trainer_class != bot->getClass())
-            continue;
+            if (co.trainer_type == TRAINER_TYPE_CLASS && co.trainer_class != bot->getClass())
+                continue;
 
-		uint32 trainerId = co.Entry;
-
+            uint32 trainerId = co.Entry;
+            trainerIdCache.push_back(trainerId);
+        }
+    }
+    for (uint32 trainerId : trainerIdCache) {
 		TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
         if (!trainer_spells)
             trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
@@ -1788,7 +1808,7 @@ void PlayerbotFactory::InitAvailableSpells()
         if (!trainer_spells)
             continue;
 
-        for (TrainerSpellMap::const_iterator itr =  trainer_spells->spellList.begin(); itr !=  trainer_spells->spellList.end(); ++itr)
+        for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr !=  trainer_spells->spellList.end(); ++itr)
         {
             TrainerSpell const* tSpell = &itr->second;
 
@@ -1825,7 +1845,6 @@ void PlayerbotFactory::InitAvailableSpells()
                 bot->learnSpell(tSpell->learnedSpell[0], false);
             }
             else {
-                LOG_INFO("playerbots", "!tSpell->learnedSpell[0] {}", tSpell->spell);
                 botAI->CastSpell(tSpell->spell, bot);
             }
         }
@@ -2808,6 +2827,74 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
    for (EnchantContainer::const_iterator itr = GetEnchantContainerBegin(); itr != GetEnchantContainerEnd(); ++itr)
       if ((*itr).ClassId == bot->getClass() && (*itr).SpecId == spec)
          botAI->EnchantItemT((*itr).SpellId, (*itr).SlotId);
+}
+
+std::vector<InventoryType> PlayerbotFactory::GetPossibleInventoryTypeListBySlot(EquipmentSlots slot) {
+    std::vector<InventoryType> ret;
+    switch (slot) {
+        case EQUIPMENT_SLOT_HEAD:
+            ret.push_back(INVTYPE_HEAD);
+            break;
+        case EQUIPMENT_SLOT_NECK:
+            ret.push_back(INVTYPE_NECK);
+            break;
+        case EQUIPMENT_SLOT_SHOULDERS:
+            ret.push_back(INVTYPE_SHOULDERS);
+            break;
+        case EQUIPMENT_SLOT_BODY:
+            ret.push_back(INVTYPE_BODY);
+            break;
+        case EQUIPMENT_SLOT_CHEST:
+            ret.push_back(INVTYPE_CHEST);
+            ret.push_back(INVTYPE_ROBE);
+            break;
+        case EQUIPMENT_SLOT_WAIST:
+            ret.push_back(INVTYPE_WAIST);
+            break;
+        case EQUIPMENT_SLOT_LEGS:
+            ret.push_back(INVTYPE_LEGS);
+            break;
+        case EQUIPMENT_SLOT_FEET:
+            ret.push_back(INVTYPE_FEET);
+            break;
+        case EQUIPMENT_SLOT_WRISTS:
+            ret.push_back(INVTYPE_WRISTS);
+            break;
+        case EQUIPMENT_SLOT_HANDS:
+            ret.push_back(INVTYPE_HANDS);
+            break;
+        case EQUIPMENT_SLOT_FINGER1:
+        case EQUIPMENT_SLOT_FINGER2:
+            ret.push_back(INVTYPE_FINGER);
+            break;
+        case EQUIPMENT_SLOT_TRINKET1:
+        case EQUIPMENT_SLOT_TRINKET2:
+            ret.push_back(INVTYPE_TRINKET);
+            break;
+        case EQUIPMENT_SLOT_BACK:
+            ret.push_back(INVTYPE_CLOAK);
+            break;
+        case EQUIPMENT_SLOT_MAINHAND:
+            ret.push_back(INVTYPE_WEAPON);
+            ret.push_back(INVTYPE_2HWEAPON);
+            ret.push_back(INVTYPE_WEAPONMAINHAND);
+            break;
+        case EQUIPMENT_SLOT_OFFHAND:
+            ret.push_back(INVTYPE_WEAPON);
+            ret.push_back(INVTYPE_2HWEAPON);
+            ret.push_back(INVTYPE_WEAPONOFFHAND);
+            ret.push_back(INVTYPE_SHIELD);
+            ret.push_back(INVTYPE_HOLDABLE);
+            break;
+        case EQUIPMENT_SLOT_RANGED:
+            ret.push_back(INVTYPE_RANGED);
+            ret.push_back(INVTYPE_RANGEDRIGHT);
+            ret.push_back(INVTYPE_RELIC);
+            break;
+        default:
+            break;
+    }
+    return ret;
 }
 
 void PlayerbotFactory::LoadEnchantContainer()
