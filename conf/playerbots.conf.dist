@@ -166,6 +166,9 @@ AiPlayerbot.AutoUpgradeEquip = 0
 # Default: 1 (enabled)
 AiPlayerbot.AutoDoQuests = 1
 
+# Define group member pick loot method, 1 is roll, 0 is pass
+AiPlayerbot.LootMethod = 1
+
 ##################################################################################
 #                                                                                #
 # All other parameters are optional but can be changed by uncommenting them here #

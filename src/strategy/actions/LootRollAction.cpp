@@ -78,6 +78,15 @@ bool LootRollAction::Execute(Event event)
     {
         case MASTER_LOOT:
         case FREE_FOR_ALL:
+        if(sPlayerbotAIConfig->lootMethod){
+            group->CountRollVote(bot->GetGUID(), guid, GREED);
+        }
+            group->CountRollVote(bot->GetGUID(), guid, PASS);
+            break;
+        case GROUP_LOOT:
+        if(sPlayerbotAIConfig->lootMethod){
+            group->CountRollVote(bot->GetGUID(), guid, NEED);
+        }
             group->CountRollVote(bot->GetGUID(), guid, PASS);
             break;
         default:

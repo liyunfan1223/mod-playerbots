@@ -158,6 +158,7 @@ class PlayerbotAIConfig
         bool autoTeleportForLevel;
         bool randomBotSayWithoutMaster;
         bool randomBotGroupNearby;
+        bool lootMethod;
         uint32 tweakValue; //Debugging config
 
         uint32 randomBotArenaTeamCount;

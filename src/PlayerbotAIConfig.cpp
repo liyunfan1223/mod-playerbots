@@ -321,6 +321,7 @@ bool PlayerbotAIConfig::Initialize()
     freeFood = sConfigMgr->GetOption<bool>("AiPlayerbot.FreeFood", true);
     randomBotSayWithoutMaster = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotSayWithoutMaster", false);
     randomBotGroupNearby = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotGroupNearby", true);
+    lootMethod = sConfigMgr->GetOption<bool>("AiPlayerbot.LootMethod", true);
 
     // arena
     randomBotArenaTeamCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotArenaTeamCount", 20);
