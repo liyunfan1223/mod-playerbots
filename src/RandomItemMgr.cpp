@@ -154,6 +154,7 @@ void RandomItemMgr::Init()
 {
     BuildItemInfoCache();
     // BuildEquipCache();
+    BuildEquipCacheNew();
     BuildAmmoCache();
     BuildPotionCache();
     BuildFoodCache();
@@ -439,6 +440,11 @@ bool RandomItemMgr::CheckItemStats(uint8 clazz, uint8 sp, uint8 ap, uint8 tank)
     }
 
     return sp || ap || tank;
+}
+
+std::vector<uint32> RandomItemMgr::GetCachedEquipments(uint32 requiredLevel, uint32 inventoryType)
+{
+    return equipCacheNew[requiredLevel][inventoryType];
 }
 
 bool RandomItemMgr::ShouldEquipArmorForSpec(uint8 playerclass, uint8 spec, ItemTemplate const* proto)
@@ -2136,6 +2142,23 @@ void RandomItemMgr::BuildEquipCache()
         }
 
         LOG_INFO("server.loading", "Equipment cache saved to DB");
+    }
+}
+
+void RandomItemMgr::BuildEquipCacheNew()
+{
+    LOG_INFO("playerbots", "Loading equipments cache...");
+    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
+    for (auto const& itr : *itemTemplates)
+    {
+        ItemTemplate const* proto = &itr.second;
+        if (!proto)
+            continue;
+        uint32 itemId = proto->ItemId;
+        if (IsTestItem(itemId)) {
+            continue;
+        }
+        equipCacheNew[proto->RequiredLevel][proto->InventoryType].push_back(itemId);
     }
 }
 
