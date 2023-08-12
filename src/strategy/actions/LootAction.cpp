@@ -87,8 +87,8 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
 
         switch (skill)
         {
-            case SKILL_ENGINEERING:
-                return botAI->HasSkill(SKILL_ENGINEERING) ? botAI->CastSpell(ENGINEERING, creature) : false;
+            // case SKILL_ENGINEERING:
+            //     return botAI->HasSkill(SKILL_ENGINEERING) ? botAI->CastSpell(ENGINEERING, creature) : false;
             case SKILL_HERBALISM:
                 return botAI->HasSkill(SKILL_HERBALISM) ? botAI->CastSpell(32605, creature) : false;
             case SKILL_MINING:
@@ -110,6 +110,9 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
 
     if (lootObject.skillId == SKILL_HERBALISM)
         return botAI->HasSkill(SKILL_HERBALISM) ? botAI->CastSpell(HERB_GATHERING, bot) : false;
+    
+    if(lootObject.skillId == SKILL_SKINNING)
+        return botAI->HasSkill(SKILL_SKINNING) ? botAI->CastSpell(SKINNING, bot) : false;
 
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
