@@ -152,7 +152,6 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
     case ITEM_USAGE_REPLACE:
     case ITEM_USAGE_GUILD_TASK:
     case ITEM_USAGE_BAD_EQUIP:
-        bot->Say("this is Bad_EQUIP roll", LANG_UNIVERSAL);
         needVote = NEED;
         break;
     case ITEM_USAGE_SKILL:
@@ -160,7 +159,6 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
     case ITEM_USAGE_DISENCHANT:
     case ITEM_USAGE_AH:
     case ITEM_USAGE_VENDOR:
-        bot->Say("this is USAGE_VENDOR roll", LANG_UNIVERSAL);
         needVote = GREED;
         break;
     }
