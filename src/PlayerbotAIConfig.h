@@ -41,7 +41,7 @@ class PlayerbotAIConfig
         bool allowGuildBots;
         uint32 globalCoolDown, reactDelay, maxWaitForMove, expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay,
             errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
-        float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance,
+        float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shooterAviodDistance,
             fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance,
             aoeRadius, rpgDistance, targetPosRecalcDistance, farDistance, healDistance, aggroDistance;
         uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;

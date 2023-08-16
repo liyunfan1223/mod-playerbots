@@ -79,7 +79,8 @@ bool EnemyTooCloseForAutoShotTrigger::IsActive()
 bool EnemyTooCloseForShootTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return target && target->GetVictim() != bot && AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->shootDistance;
+    // return target && target->GetVictim() != bot && AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->shootDistance;
+    return target && target->GetVictim() != bot && AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->shooterAviodDistance;
 
 //     Unit* target = AI_VALUE(Unit*, "current target");
 //     if (!target)

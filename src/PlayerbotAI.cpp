@@ -3706,7 +3706,7 @@ float PlayerbotAI::GetRange(std::string const type)
         return sPlayerbotAIConfig->spellDistance;
 
     if (type == "shoot")
-        return sPlayerbotAIConfig->shootDistance;
+        return sPlayerbotAIConfig->shooterAviodDistance;
 
     if (type == "flee")
         return sPlayerbotAIConfig->fleeDistance;
