@@ -88,11 +88,10 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
 
     uint32 masterAccount = holder.GetMasterAccountId();
     WorldSession* masterSession = masterAccount ? sWorld->FindSession(masterAccount) : nullptr;
-
     bool allowed = false;
     if (botAccountId == masterAccount)
         allowed = true;
-    else if (masterSession && sPlayerbotAIConfig->allowGuildBots && bot->GetGuildId() == masterSession->GetPlayer()->GetGuildId())
+    else if (masterSession && sPlayerbotAIConfig->allowGuildBots && bot->GetGuildId() != 0 && bot->GetGuildId() == masterSession->GetPlayer()->GetGuildId())
         allowed = true;
     else if (sPlayerbotAIConfig->IsInRandomAccountList(botAccountId))
         allowed = true;
@@ -106,7 +105,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         if (masterSession)
         {
             ChatHandler ch(masterSession);
-            ch.PSendSysMessage("You are not allowed to control bot {}", bot->GetName());
+            ch.PSendSysMessage("You are not allowed to control bot %s", bot->GetName());
         }
         OnBotLogin(bot);
         LogoutPlayerBot(bot->GetGUID());
@@ -780,7 +779,10 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
                 race_limit = "2, 5, 6, 8, 10";
                 break;
         }
-        QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) ORDER BY account DESC LIMIT 1", claz, race_limit);
+        // find a bot fit conditions and not in any guild
+        QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters "
+            "WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) AND guid NOT IN ( SELECT guid FROM guild_member ) "
+            "ORDER BY account DESC LIMIT 1", claz, race_limit);
         if (results)
         {
             Field* fields = results->Fetch();
@@ -794,22 +796,24 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         return messages;
     }
 
+    std::string charnameStr;
+
     if (!charname)
     {
         std::string name;
         bool isPlayer = sCharacterCache->GetCharacterNameByGuid(master->GetTarget(), name);
         // Player* tPlayer = ObjectAccessor::FindConnectedPlayer(master->GetTarget());
         if (isPlayer) {
-            charname = new char[name.size() + 1];
-            strcpy(charname, name.c_str());
+            charnameStr = name;
         } else {
             messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
             return messages;
         }
+    } else {
+        charnameStr = charname;
     }
 
     std::string const cmdStr = cmd;
-    std::string const charnameStr = charname;
     
     std::set<std::string> bots;
     if (charnameStr == "*" && master)
