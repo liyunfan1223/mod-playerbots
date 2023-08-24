@@ -224,12 +224,13 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     // }
 
     // force stop if moving but should not
-    if (bot->isMoving() && !CanMove() && !bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING))
-    {
-        bot->StopMoving();
-        bot->GetMotionMaster()->Clear();
-        bot->GetMotionMaster()->MoveIdle();
-    }
+    // shouldn't stop charging
+    // if (bot->isMoving() && !CanMove() && !bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING))
+    // {
+    //     bot->StopMoving();
+    //     bot->GetMotionMaster()->Clear();
+    //     bot->GetMotionMaster()->MoveIdle();
+    // }
 
     // cheat options
     if (bot->IsAlive() && ((uint32)GetCheat() > 0 || (uint32)sPlayerbotAIConfig->botCheatMask > 0))
@@ -1106,6 +1107,7 @@ void PlayerbotAI::DoNextAction(bool min)
             bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
     }
 
+/*
     // land after kncokback/jump
     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING))
     {
@@ -1135,6 +1137,7 @@ void PlayerbotAI::DoNextAction(bool min)
 
         ResetJumpDestination();
     }
+*/
 }
 
 void PlayerbotAI::ReInitCurrentEngine()
