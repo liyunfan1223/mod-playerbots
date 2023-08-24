@@ -29,10 +29,10 @@ bool TogglePetSpellAutoCastAction::Execute(Event event) {
         if (spellInfo->IsPassive())
             continue;
 
-        // imp's spell, felhunte's intelligence, ghoul's leap
+        // imp's spell, felhunte's intelligence, ghoul's leap, cat stealth
         if (spellId == 4511 || spellId == 1742 || 
             spellId == 54424 || spellId == 57564 || spellId == 57565 || spellId == 57566 || spellId == 57567 || 
-            spellId == 47482) {
+            spellId == 47482 || spellId == 24450) {
             pet->ToggleAutocast(spellInfo, false);
         } else {
             pet->ToggleAutocast(spellInfo, true);
