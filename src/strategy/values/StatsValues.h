@@ -75,7 +75,7 @@ class ManaValue : public Uint8CalculatedValue, public Qualified
 class HasManaValue : public BoolCalculatedValue, public Qualified
 {
     public:
-        HasManaValue(PlayerbotAI* botAI, std::string const name = "has mana") : BoolCalculatedValue(botAI, name) { }
+        HasManaValue(PlayerbotAI* botAI, std::string const name = "has mana") : BoolCalculatedValue(botAI, name, 2 * 1000) { }
 
         Unit* GetTarget();
         bool Calculate() override;
