@@ -11,7 +11,6 @@
 #include "PlayerbotFactory.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
-#include <unistd.h>
 
 std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
 
