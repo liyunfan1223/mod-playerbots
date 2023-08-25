@@ -146,8 +146,14 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    z += 2.0f;
-    bot->UpdateAllowedPositionZ(x, y, z);
+    float modified_z = z + 0.5f;
+    bot->UpdateAllowedPositionZ(x, y, modified_z);
+    // prevent falling when bot on slope
+    if (modified_z < z - 20.0f) {
+        modified_z = z + 5.0f;
+        bot->UpdateAllowedPositionZ(x, y, modified_z);
+    }
+    z = modified_z;
     // z += 0.5f;
     float distance = bot->GetDistance2d(x, y);
     if (distance > sPlayerbotAIConfig->contactDistance)
@@ -164,7 +170,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
 
         bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
-                !bot->IsFlying() && !bot->isSwimming();
+                !bot->IsFlying() && !bot->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !bot->IsInWater();
         MotionMaster &mm = *bot->GetMotionMaster();
         mm.Clear();
         mm.MovePoint(mapId, x, y, z, generatePath);
@@ -758,13 +764,11 @@ void MovementAction::UpdateMovementState()
 {
     if (bot->Unit::IsInWater() || bot->Unit::IsUnderWater())
     {
-        bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_SWIMMING);
-        bot->UpdateSpeed(MOVE_SWIM, true);
+        bot->SetSwim(true);
     }
     else
     {
-        bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_SWIMMING);
-        bot->UpdateSpeed(MOVE_SWIM, true);
+        bot->SetSwim(false);
     }
 
     if (bot->IsFlying())
