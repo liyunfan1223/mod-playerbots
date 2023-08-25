@@ -1293,7 +1293,7 @@ bool PlayerbotFactory::IsDesiredReplacement(Item* item)
     // }
     
     uint32 delta = 1 + (80 - bot->getLevel()) / 10;
-    return int32(bot->getLevel() - requiredLevel) > delta;
+    return proto->Quality < ITEM_QUALITY_RARE || int32(bot->getLevel() - requiredLevel) > delta;
 }
 
 inline Item* StoreNewItemInInventorySlot(Player* player, uint32 newItemId, uint32 count)
