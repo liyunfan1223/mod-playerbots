@@ -60,7 +60,7 @@ bool DrinkAction::isUseful()
 
 bool DrinkAction::isPossible()
 {
-    return sPlayerbotAIConfig->freeFood || UseItemAction::isPossible();
+    return !bot->IsInCombat() && (sPlayerbotAIConfig->freeFood || UseItemAction::isPossible());
 }
 
 bool EatAction::Execute(Event event)
@@ -112,5 +112,5 @@ bool EatAction::isUseful()
 
 bool EatAction::isPossible()
 {
-    return sPlayerbotAIConfig->freeFood || UseItemAction::isPossible();
+    return !bot->IsInCombat() && (sPlayerbotAIConfig->freeFood || UseItemAction::isPossible());
 }

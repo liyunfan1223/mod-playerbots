@@ -132,16 +132,28 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
 {
+    UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z)) {
         return false;
     }
-    UpdateMovementState();
-    // if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_FALLING_FAR)) {
+    // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling!, flag:" + std::to_string(bot->m_movementInfo.GetMovementFlags()), LANG_UNIVERSAL);
     //     return false;
     // }
-    z += 2.0f;
-    bot->UpdateAllowedPositionZ(x, y, z);
+    // if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING)) {
+    //     bot->Say("I'm swimming", LANG_UNIVERSAL);
+    // }
+    // if (bot->Unit::IsFalling()) {
+    //     bot->Say("I'm falling", LANG_UNIVERSAL);
+    // }
+    float modified_z = z + 0.5f;
+    bot->UpdateAllowedPositionZ(x, y, modified_z);
+    // prevent falling when bot on slope
+    if (modified_z < z - 20.0f) {
+        modified_z = z + 5.0f;
+        bot->UpdateAllowedPositionZ(x, y, modified_z);
+    }
+    z = modified_z;
     // z += 0.5f;
     float distance = bot->GetDistance2d(x, y);
     if (distance > sPlayerbotAIConfig->contactDistance)
@@ -158,7 +170,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
 
         bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
-                !bot->IsFlying() && !bot->isSwimming();
+                !bot->IsFlying() && !bot->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !bot->IsInWater();
         MotionMaster &mm = *bot->GetMotionMaster();
         mm.Clear();
         mm.MovePoint(mapId, x, y, z, generatePath);
@@ -750,15 +762,13 @@ bool MovementAction::Follow(Unit* target, float distance)
 
 void MovementAction::UpdateMovementState()
 {
-    if (bot->IsInWater() || bot->IsUnderWater())
+    if (bot->Unit::IsInWater() || bot->Unit::IsUnderWater())
     {
-        bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_SWIMMING);
-        bot->UpdateSpeed(MOVE_SWIM, true);
+        bot->SetSwim(true);
     }
     else
     {
-        bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_SWIMMING);
-        bot->UpdateSpeed(MOVE_SWIM, true);
+        bot->SetSwim(false);
     }
 
     if (bot->IsFlying())
@@ -769,69 +779,69 @@ void MovementAction::UpdateMovementState()
         //bot->SetSpeedRate(MOVE_RUN, 1.1f);
 
     // check if target is not reachable (from Vmangos)
-    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE && bot->CanNotReachTarget() && !bot->InBattleground())
-    {
-        if (Unit* pTarget = sServerFacade->GetChaseTarget(bot))
-        {
-            if (!bot->IsWithinMeleeRange(pTarget) && pTarget->GetTypeId() == TYPEID_UNIT)
-            {
-                float angle = bot->GetAngle(pTarget);
-                float distance = 5.0f;
-                float x = bot->GetPositionX() + cos(angle) * distance;
-                float y = bot->GetPositionY() + sin(angle) * distance;
-                float z = bot->GetPositionZ();
+    // if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE && bot->CanNotReachTarget() && !bot->InBattleground())
+    // {
+    //     if (Unit* pTarget = sServerFacade->GetChaseTarget(bot))
+    //     {
+    //         if (!bot->IsWithinMeleeRange(pTarget) && pTarget->GetTypeId() == TYPEID_UNIT)
+    //         {
+    //             float angle = bot->GetAngle(pTarget);
+    //             float distance = 5.0f;
+    //             float x = bot->GetPositionX() + cos(angle) * distance;
+    //             float y = bot->GetPositionY() + sin(angle) * distance;
+    //             float z = bot->GetPositionZ();
 
-                z += CONTACT_DISTANCE;
-                bot->UpdateAllowedPositionZ(x, y, z);
+    //             z += CONTACT_DISTANCE;
+    //             bot->UpdateAllowedPositionZ(x, y, z);
 
-                bot->StopMoving();
-                bot->GetMotionMaster()->Clear();
-                bot->NearTeleportTo(x, y, z, bot->GetOrientation());
-                //bot->GetMotionMaster()->MovePoint(bot->GetMapId(), x, y, z, FORCED_MOVEMENT_RUN, false);
-                return;
-                /*if (pTarget->IsCreature() && !bot->isMoving() && bot->IsWithinDist(pTarget, 10.0f))
-                {
-                    // Cheating to prevent getting stuck because of bad mmaps.
-                    bot->StopMoving();
-                    bot->GetMotionMaster()->Clear();
-                    bot->GetMotionMaster()->MovePoint(bot->GetMapId(), pTarget->GetPosition(), FORCED_MOVEMENT_RUN, false);
-                    return;
-                }*/
-            }
-        }
-    }
+    //             bot->StopMoving();
+    //             bot->GetMotionMaster()->Clear();
+    //             bot->NearTeleportTo(x, y, z, bot->GetOrientation());
+    //             //bot->GetMotionMaster()->MovePoint(bot->GetMapId(), x, y, z, FORCED_MOVEMENT_RUN, false);
+    //             return;
+    //             /*if (pTarget->IsCreature() && !bot->isMoving() && bot->IsWithinDist(pTarget, 10.0f))
+    //             {
+    //                 // Cheating to prevent getting stuck because of bad mmaps.
+    //                 bot->StopMoving();
+    //                 bot->GetMotionMaster()->Clear();
+    //                 bot->GetMotionMaster()->MovePoint(bot->GetMapId(), pTarget->GetPosition(), FORCED_MOVEMENT_RUN, false);
+    //                 return;
+    //             }*/
+    //         }
+    //     }
+    // }
 
-    if ((bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE ||
-        bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE) && bot->CanNotReachTarget() && !bot->InBattleground())
-    {
-        if (Unit* pTarget = sServerFacade->GetChaseTarget(bot))
-        {
-            if (pTarget != botAI->GetGroupMaster())
-                return;
+    // if ((bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE ||
+    //     bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE) && bot->CanNotReachTarget() && !bot->InBattleground())
+    // {
+    //     if (Unit* pTarget = sServerFacade->GetChaseTarget(bot))
+    //     {
+    //         if (pTarget != botAI->GetGroupMaster())
+    //             return;
 
-            if (!bot->IsWithinMeleeRange(pTarget))
-            {
-                if (!bot->isMoving() && bot->IsWithinDist(pTarget, 10.0f))
-                {
-                    // Cheating to prevent getting stuck because of bad mmaps.
-                    float angle = bot->GetAngle(pTarget);
-                    float distance = 5.0f;
-                    float x = bot->GetPositionX() + cos(angle) * distance;
-                    float y = bot->GetPositionY() + sin(angle) * distance;
-                    float z = bot->GetPositionZ();
+    //         if (!bot->IsWithinMeleeRange(pTarget))
+    //         {
+    //             if (!bot->isMoving() && bot->IsWithinDist(pTarget, 10.0f))
+    //             {
+    //                 // Cheating to prevent getting stuck because of bad mmaps.
+    //                 float angle = bot->GetAngle(pTarget);
+    //                 float distance = 5.0f;
+    //                 float x = bot->GetPositionX() + cos(angle) * distance;
+    //                 float y = bot->GetPositionY() + sin(angle) * distance;
+    //                 float z = bot->GetPositionZ();
 
-                    z += CONTACT_DISTANCE;
-                    bot->UpdateAllowedPositionZ(x, y, z);
+    //                 z += CONTACT_DISTANCE;
+    //                 bot->UpdateAllowedPositionZ(x, y, z);
 
-                    bot->StopMoving();
-                    bot->GetMotionMaster()->Clear();
-                    bot->NearTeleportTo(x, y, z, bot->GetOrientation());
-                    //bot->GetMotionMaster()->MovePoint(bot->GetMapId(), x, y, z, FORCED_MOVEMENT_RUN, false);
-                    return;
-                }
-            }
-        }
-    }
+    //                 bot->StopMoving();
+    //                 bot->GetMotionMaster()->Clear();
+    //                 bot->NearTeleportTo(x, y, z, bot->GetOrientation());
+    //                 //bot->GetMotionMaster()->MovePoint(bot->GetMapId(), x, y, z, FORCED_MOVEMENT_RUN, false);
+    //                 return;
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 bool MovementAction::Follow(Unit* target, float distance, float angle)

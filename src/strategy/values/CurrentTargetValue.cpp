@@ -11,8 +11,8 @@ Unit* CurrentTargetValue::Get()
         return nullptr;
 
     Unit* unit = ObjectAccessor::GetUnit(*bot, selection);
-    if (unit && !bot->IsWithinLOSInMap(unit))
-        return nullptr;
+    // if (unit && !bot->IsWithinLOSInMap(unit))
+    //     return nullptr;
 
     return unit;
 }

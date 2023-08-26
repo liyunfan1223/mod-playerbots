@@ -24,7 +24,7 @@ class NearestEnemyPlayersValue : public PossibleTargetsValue
 class EnemyPlayerValue : public UnitCalculatedValue
 {
     public:
-        EnemyPlayerValue(PlayerbotAI* botAI, std::string const name = "enemy player") : UnitCalculatedValue(botAI, name, 2 * 1000) { }
+        EnemyPlayerValue(PlayerbotAI* botAI, std::string const name = "enemy player") : UnitCalculatedValue(botAI, name, 5 * 1000) { }
 
         Unit* Calculate() override;
 

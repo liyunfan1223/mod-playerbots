@@ -297,19 +297,19 @@ void PlayerbotFactory::Randomize(bool incremental)
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
     LOG_INFO("playerbots", "Initializing guilds...");
     bot->SaveToDB(false, false);
-    InitGuild();
+    // InitGuild();
     // bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
 
-    if (bot->getLevel() >= 70)
-    {
-        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Arenas");
-        LOG_INFO("playerbots", "Initializing arena teams...");
-        InitArenaTeam();
-        if (pmo)
-            pmo->finish();
-    }
+    // if (bot->getLevel() >= 70)
+    // {
+    //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Arenas");
+    //     LOG_INFO("playerbots", "Initializing arena teams...");
+    //     InitArenaTeam();
+    //     if (pmo)
+    //         pmo->finish();
+    // }
 
     if (!incremental) {
         bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
@@ -338,13 +338,13 @@ void PlayerbotFactory::Randomize(bool incremental)
 void PlayerbotFactory::Refresh()
 {
     // Prepare();
-    // InitEquipment(true);
+    InitEquipment(true);
     ClearInventory();
     InitAmmo();
     InitFood();
     InitReagents();
     // InitPotions();
-    InitTalentsTree(true);
+    InitTalentsTree(true, true, true);
     InitClassSpells();
     InitAvailableSpells();
     InitSkills();
@@ -705,7 +705,7 @@ void PlayerbotFactory::InitTalentsTree(bool increment/*false*/, bool use_templat
 {
     uint32 specNo;
     uint8 cls = bot->getClass();
-    if (increment && bot->getLevel() > 10) {
+    if (increment && bot->GetFreeTalentPoints() <= 2) {
         specNo = AiFactory::GetPlayerSpecTab(bot);
     } else {
         uint32 point = urand(0, 100);
@@ -1293,7 +1293,7 @@ bool PlayerbotFactory::IsDesiredReplacement(Item* item)
     // }
     
     uint32 delta = 1 + (80 - bot->getLevel()) / 10;
-    return int32(bot->getLevel() - requiredLevel) > delta;
+    return proto->Quality < ITEM_QUALITY_RARE || int32(bot->getLevel() - requiredLevel) > delta;
 }
 
 inline Item* StoreNewItemInInventorySlot(Player* player, uint32 newItemId, uint32 count)
