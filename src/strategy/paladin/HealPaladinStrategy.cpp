@@ -4,6 +4,7 @@
 
 #include "HealPaladinStrategy.h"
 #include "Playerbots.h"
+#include "Strategy.h"
 
 class HealPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
@@ -31,7 +32,7 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("concentration aura", NextAction::array(0, new NextAction("concentration aura", 90.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("concentration aura", NextAction::array(0, new NextAction("concentration aura", ACTION_NORMAL), nullptr)));
     triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("divine favor", ACTION_HIGH + 1), nullptr)));
     // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of sanctuary", ACTION_HIGH + 9), nullptr)));

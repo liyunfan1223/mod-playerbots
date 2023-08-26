@@ -43,6 +43,7 @@ class PaladinResistanceStrategyFactoryInternal : public NamedObjectContext<Strat
             creators["rfire"] = &PaladinResistanceStrategyFactoryInternal::rfire;
             creators["baoe"] = &PaladinResistanceStrategyFactoryInternal::baoe;
             creators["barmor"] = &PaladinResistanceStrategyFactoryInternal::barmor;
+            creators["bcast"] = &PaladinResistanceStrategyFactoryInternal::bcast;
         }
 
     private:
@@ -51,6 +52,7 @@ class PaladinResistanceStrategyFactoryInternal : public NamedObjectContext<Strat
         static Strategy* rfire(PlayerbotAI* botAI) { return new PaladinFireResistanceStrategy(botAI); }
         static Strategy* baoe(PlayerbotAI* botAI) { return new PaladinBuffAoeStrategy(botAI); }
         static Strategy* barmor(PlayerbotAI* botAI) { return new PaladinBuffArmorStrategy(botAI); }
+        static Strategy* bcast(PlayerbotAI* botAI) { return new PaladinBuffCastStrategy(botAI); }
 };
 
 class PaladinBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
