@@ -15,7 +15,7 @@ static float GetSpeedInMotion(Unit* target)
 bool EnemyTooCloseForSpellTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return target && target->GetVictim() != bot && 
+    return target && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) && 
         target->GetObjectSize() <= 10.0f && 
         AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->tooCloseDistance;
 //     Unit* target = AI_VALUE(Unit*, "current target");

@@ -1099,7 +1099,7 @@ void PlayerbotMgr::HandleMasterIncomingPacket(WorldPacket const& packet)
     {
         Player* const bot = it->second;
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        if (botAI->GetMaster() == GetMaster())
+        if (botAI && botAI->GetMaster() == GetMaster())
             botAI->HandleMasterIncomingPacket(packet);
     }
 

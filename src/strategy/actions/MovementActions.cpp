@@ -150,7 +150,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     bot->UpdateAllowedPositionZ(x, y, modified_z);
     // prevent falling when bot on slope
     if (modified_z < z - 20.0f) {
-        modified_z = z + 5.0f;
+        modified_z = z + 15.0f;
         bot->UpdateAllowedPositionZ(x, y, modified_z);
     }
     z = modified_z;

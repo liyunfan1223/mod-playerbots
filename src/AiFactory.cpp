@@ -310,7 +310,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 1)
                 engine->addStrategies("tank", "tank assist", "bthreat", "barmor", "cure", nullptr);
             else if (tab == 0)
-                engine->addStrategies("heal", "dps assist", "cure", nullptr);
+                engine->addStrategies("heal", "dps assist", "cure", "bcast", nullptr);
             else
                 engine->addStrategies("dps", "dps assist", "cure", "baoe", nullptr);
 
@@ -463,7 +463,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             if (tab == 1)
                 nonCombatEngine->addStrategies("bthreat", "tank assist", "bstats", "barmor", nullptr);
             else if (tab == 0)
-                nonCombatEngine->addStrategies("dps assist", "bmana", nullptr);
+                nonCombatEngine->addStrategies("dps assist", "bmana", "bcast", nullptr);
             else
                 nonCombatEngine->addStrategies("dps assist", "bdps", "baoe",nullptr);
 
