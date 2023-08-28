@@ -104,20 +104,20 @@ class CastIcyTouchAction : public CastSpellAction
 		CastIcyTouchAction(PlayerbotAI* ai) : CastSpellAction(ai, "icy touch") {}
 };
 
-class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnAttackerAction
+class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
 	public:
-		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "icy touch", true) { }
+		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true) { }
 };
 
 //debuff ps
 BEGIN_DEBUFF_ACTION(CastPlagueStrikeAction, "plague strike")
 END_SPELL_ACTION()
 
-class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnAttackerAction
+class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
 	public:
-		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "plague strike", true) { }
+		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true) { }
 };
 
 //debuff

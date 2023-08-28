@@ -3717,6 +3717,9 @@ float PlayerbotAI::GetRange(std::string const type)
     if (type == "heal")
         return sPlayerbotAIConfig->healDistance;
 
+    if (type == "melee")
+        return sPlayerbotAIConfig->meleeDistance;
+    
     return 0;
 }
 

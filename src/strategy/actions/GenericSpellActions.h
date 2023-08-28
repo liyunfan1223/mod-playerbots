@@ -63,6 +63,16 @@ class CastDebuffSpellOnAttackerAction : public CastAuraSpellAction
         ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
+class CastDebuffSpellOnMeleeAttackerAction : public CastAuraSpellAction
+{
+    public:
+        CastDebuffSpellOnMeleeAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true) : CastAuraSpellAction(botAI, spell, isOwner) { }
+
+        Value<Unit*>* GetTargetValue() override;
+        std::string const getName() override { return spell + " on attacker"; }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+};
+
 class CastBuffSpellAction : public CastAuraSpellAction
 {
 	public:

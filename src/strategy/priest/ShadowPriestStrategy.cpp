@@ -44,8 +44,8 @@ void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void ShadowPriestDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("devouring plague", NextAction::array(0, new NextAction("devouring plague", 13.0f), nullptr)));
-    triggers.push_back(new TriggerNode("vampiric touch", NextAction::array(0, new NextAction("vampiric touch", 11.0f), nullptr)));
-    triggers.push_back(new TriggerNode("shadow word: pain", NextAction::array(0, new NextAction("shadow word: pain", 12.0f), nullptr)));
+    triggers.push_back(new TriggerNode("shadow word: pain", NextAction::array(0, new NextAction("shadow word: pain", 11.0f), nullptr)));
+    triggers.push_back(new TriggerNode("vampiric touch", NextAction::array(0, new NextAction("vampiric touch", 12.0f), nullptr)));
     // triggers.push_back(new TriggerNode("feedback", NextAction::array(0, new NextAction("feedback", 80.0f), nullptr)));
     // triggers.push_back(new TriggerNode("hex of weakness", NextAction::array(0, new NextAction("hex of weakness", 10.0f), nullptr)));
 }

@@ -116,6 +116,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["log level"] = &ValueContext::log_level;
             creators["party member without aura"] = &ValueContext::party_member_without_aura;
             creators["attacker without aura"] = &ValueContext::attacker_without_aura;
+            creators["melee attacker without aura"] = &ValueContext::melee_attacker_without_aura;
             creators["party member to heal"] = &ValueContext::party_member_to_heal;
             creators["party member to resurrect"] = &ValueContext::party_member_to_resurrect;
             creators["current target"] = &ValueContext::current_target;
@@ -376,6 +377,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* nearest_adds(PlayerbotAI* botAI) { return new NearestAddsValue(botAI); }
         static UntypedValue* party_member_without_aura(PlayerbotAI* botAI) { return new PartyMemberWithoutAuraValue(botAI); }
         static UntypedValue* attacker_without_aura(PlayerbotAI* botAI) { return new AttackerWithoutAuraTargetValue(botAI); }
+        static UntypedValue* melee_attacker_without_aura(PlayerbotAI* botAI) { return new MeleeAttackerWithoutAuraTargetValue(botAI); }
         static UntypedValue* party_member_to_heal(PlayerbotAI* botAI) { return new PartyMemberToHeal(botAI); }
         static UntypedValue* party_member_to_resurrect(PlayerbotAI* botAI) { return new PartyMemberToResurrect(botAI); }
         static UntypedValue* party_member_to_dispel(PlayerbotAI* botAI) { return new PartyMemberToDispel(botAI); }

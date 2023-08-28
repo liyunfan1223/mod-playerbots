@@ -78,5 +78,6 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("victory rush", NextAction::array(0, new NextAction("victory rush", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("sword and board", NextAction::array(0, new NextAction("shield slam", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("rend", NextAction::array(0, new NextAction("rend", ACTION_NORMAL + 1), nullptr)));
+    triggers.push_back(new TriggerNode("rend on attacker", NextAction::array(0, new NextAction("rend on attacker", ACTION_NORMAL + 1), nullptr)));
     triggers.push_back(new TriggerNode("protect party member", NextAction::array(0, new NextAction("intervene", ACTION_EMERGENCY), nullptr)));
 }

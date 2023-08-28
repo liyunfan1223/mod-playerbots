@@ -6,6 +6,7 @@
 #define _PLAYERBOT_WARRIORTRIGGERS_H
 
 #include "GenericTriggers.h"
+#include "PlayerbotAI.h"
 
 BUFF_TRIGGER(BattleShoutTrigger, "battle shout");
 BUFF_TRIGGER(BattleStanceTrigger, "battle stance");
@@ -16,7 +17,14 @@ BUFF_TRIGGER(CommandingShoutTrigger, "commanding shout");
 DEBUFF_TRIGGER(DisarmDebuffTrigger, "disarm");
 DEBUFF_TRIGGER(SunderArmorDebuffTrigger, "sunder armor");
 DEBUFF_TRIGGER(MortalStrikeDebuffTrigger, "mortal strike");
-DEBUFF_ENEMY_TRIGGER(RendDebuffOnAttackerTrigger, "rend");
+// DEBUFF_ENEMY_TRIGGER(RendDebuffOnAttackerTrigger, "rend");
+
+class RendDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger 
+{
+    public:
+        RendDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "rend") {}
+};
+
 CAN_CAST_TRIGGER(RevengeAvailableTrigger, "revenge");
 CAN_CAST_TRIGGER(OverpowerAvailableTrigger, "overpower");
 BUFF_TRIGGER(RampageAvailableTrigger, "rampage");

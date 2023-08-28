@@ -8,19 +8,27 @@
 Unit* AttackerWithoutAuraTargetValue::Calculate()
 {
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector >("attackers")->Get();
-    Unit* target = botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
+    // Unit* target = botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
+    uint32 max_health = 0;
+    Unit* result = nullptr;
     for (ObjectGuid const guid : attackers)
     {
         Unit* unit = botAI->GetUnit(guid);
-        if (!unit || unit == target)
+        if (!unit || !unit->IsAlive())
             continue;
 
-        if (bot->GetDistance(unit) > botAI->GetRange("spell"))
+        if (bot->GetDistance(unit) > botAI->GetRange(range))
             continue;
 
-        if (!botAI->HasAura(qualifier, unit, false, true))
-            return unit;
+        if (unit->GetHealth() < max_health) {
+            continue;
+        }
+        
+        if (!botAI->HasAura(qualifier, unit, false, true)) {
+            max_health = unit->GetHealth();
+            result = unit;
+        }
     }
 
-    return nullptr;
+    return result;
 }

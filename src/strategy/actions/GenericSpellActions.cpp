@@ -220,6 +220,11 @@ Value<Unit*>* CastDebuffSpellOnAttackerAction::GetTargetValue()
     return context->GetValue<Unit*>("attacker without aura", spell);
 }
 
+Value<Unit*>* CastDebuffSpellOnMeleeAttackerAction::GetTargetValue()
+{
+    return context->GetValue<Unit*>("melee attacker without aura", spell);
+}
+
 CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner) : CastAuraSpellAction(botAI, spell, checkIsOwner)
 {
     range = botAI->GetRange("spell");
