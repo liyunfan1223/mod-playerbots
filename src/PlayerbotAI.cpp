@@ -1879,7 +1879,7 @@ bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, boo
     return false;
 }
 
-bool PlayerbotAI::HasAura(uint32 spellId,  Unit const* unit)
+bool PlayerbotAI::HasAura(uint32 spellId, Unit const* unit)
 {
 	if (!spellId || !unit)
 		return false;
