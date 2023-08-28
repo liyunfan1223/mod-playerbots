@@ -54,7 +54,7 @@ class CrusaderAuraTrigger : public BuffTrigger
 class SealTrigger : public BuffTrigger
 {
 	public:
-		SealTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "seal of justice") { }
+		SealTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "seal") { }
 
 		bool IsActive() override;
 };

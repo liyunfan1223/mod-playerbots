@@ -19,6 +19,7 @@ BUFF_ACTION(CastSealOfLightAction, "seal of light");
 BUFF_ACTION(CastSealOfWisdomAction, "seal of wisdom");
 BUFF_ACTION(CastSealOfCommandAction, "seal of command");
 BUFF_ACTION(CastSealOfVengeanceAction, "seal of vengeance");
+BUFF_ACTION(CastSealOfCorruptionAction, "seal of corruption");
 
 // judgements
 SPELL_ACTION(CastJudgementAction, "judgement");

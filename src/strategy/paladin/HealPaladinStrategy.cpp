@@ -9,13 +9,13 @@
 class HealPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    HealPaladinStrategyActionNodeFactory()
-    {
-        creators["concentration aura"] = &concentration_aura;
-    }
+    // HealPaladinStrategyActionNodeFactory()
+    // {
+    //     creators["concentration aura"] = &concentration_aura;
+    // }
 
 private:
-    ACTION_NODE_A(concentration_aura, "concentration aura", "devotion aura");
+    // ACTION_NODE_A(concentration_aura, "concentration aura", "devotion aura");
 };
 
 HealPaladinStrategy::HealPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)

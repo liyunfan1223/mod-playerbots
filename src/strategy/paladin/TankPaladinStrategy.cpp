@@ -10,19 +10,44 @@ class TankPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
     public:
         TankPaladinStrategyActionNodeFactory()
         {
+            // creators["seal of vengeance"] = &seal_of_vengeance;
+            creators["seal of corruption"] = &seal_of_corruption;
             creators["seal of vengeance"] = &seal_of_vengeance;
+            creators["seal of command"] = &seal_of_command;
             creators["hand of reckoning"] = &hand_of_reckoning;
         }
 
     private:
+        // static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
+        // {
+        //     return new ActionNode("seal of vengeance",
+        //         /*P*/ nullptr,
+        //         /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+        //         /*C*/ nullptr);
+        // }
+        static ActionNode* seal_of_corruption([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("seal of corruption",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("seal of vengeance"), nullptr),
+                /*C*/ nullptr);
+        }
+
         static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
         {
-            return new ActionNode("seal of vengeance",
+            return new ActionNode ("seal of vengeance",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("seal of command"), nullptr),
+                /*C*/ nullptr);
+        }
+
+        static ActionNode* seal_of_command([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("seal of command",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
                 /*C*/ nullptr);
         }
-
         ACTION_NODE_A(hand_of_reckoning, "hand of reckoning", "righteous defense");
 };
 
@@ -47,7 +72,7 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f), nullptr)));
+    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of corruption", 90.0f), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", 91.0f), nullptr)));
     // triggers.push_back(new TriggerNode("devotion aura", NextAction::array(0, new NextAction("devotion aura", 90.0f), NULL)));
 

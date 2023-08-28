@@ -186,6 +186,7 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
         {
             creators["seal of command"] = &PaladinAiObjectContextInternal::seal_of_command;
             creators["seal of vengeance"] = &PaladinAiObjectContextInternal::seal_of_vengeance;
+            creators["seal of corruption"] = &PaladinAiObjectContextInternal::seal_of_corruption;
             creators["blessing of might"] = &PaladinAiObjectContextInternal::blessing_of_might;
             creators["blessing of wisdom"] = &PaladinAiObjectContextInternal::blessing_of_wisdom;
             creators["blessing of kings"] = &PaladinAiObjectContextInternal::blessing_of_kings;
@@ -265,6 +266,7 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* righteous_fury(PlayerbotAI* botAI) { return new CastRighteousFuryAction(botAI); }
         static Action* seal_of_command(PlayerbotAI* botAI) { return new CastSealOfCommandAction(botAI); }
         static Action* seal_of_vengeance(PlayerbotAI* botAI) { return new CastSealOfVengeanceAction(botAI); }
+        static Action* seal_of_corruption(PlayerbotAI* botAI) { return new CastSealOfCorruptionAction(botAI); }
         static Action* blessing_of_sanctuary(PlayerbotAI* botAI) { return new CastBlessingOfSanctuaryAction(botAI); }
         static Action* blessing_of_might(PlayerbotAI* botAI) { return new CastBlessingOfMightAction(botAI); }
         static Action* blessing_of_wisdom(PlayerbotAI* botAI) { return new CastBlessingOfWisdomAction(botAI); }
