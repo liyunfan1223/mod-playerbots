@@ -3043,7 +3043,9 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             + defense * 0.25 + dodge * 0.25 + armor * 0.5 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
-    if (proto->Class == ITEM_CLASS_ARMOR && NotSameArmorType(proto->SubClass, bot))
+    // penalty for different type armor
+    if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass >= ITEM_SUBCLASS_ARMOR_CLOTH &&
+        proto->SubClass <= ITEM_SUBCLASS_ARMOR_PLATE && NotSameArmorType(proto->SubClass, bot))
     {
         score *= 0.8;
     }
@@ -3087,8 +3089,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             score *= 0.1;
         }
     }
-    return (0.0001 + score) * itemLevel * (quality + 1);   
-    // return score;
+    return (0.0001 + score) * itemLevel * (quality + 1);
 }
 
 bool PlayerbotFactory::IsShieldTank(Player* bot) 

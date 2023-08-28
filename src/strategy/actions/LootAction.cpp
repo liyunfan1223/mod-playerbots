@@ -9,6 +9,7 @@
 #include "LootStrategyValue.h"
 #include "LootObjectStack.h"
 #include "GuildTaskMgr.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -29,6 +30,10 @@ bool LootAction::Execute(Event event)
 
     context->GetValue<LootObject>("loot target")->Set(lootObject);
     return true;
+}
+
+bool LootAction::isUseful() {
+    return sPlayerbotAIConfig->freeMethodLoot || !bot->GetGroup() || bot->GetGroup()->GetLootMethod() != FREE_FOR_ALL;
 }
 
 enum ProfessionSpells
@@ -406,9 +411,9 @@ bool StoreLootAction::Execute(Event event)
         if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
-        std::ostringstream out;
-        out << "Looting " << chat->FormatItem(proto);
-        botAI->TellMasterNoFacing(out.str());
+        // std::ostringstream out;
+        // out << "Looting " << chat->FormatItem(proto);
+        // botAI->TellMasterNoFacing(out.str());
 
         //ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", proto->ItemId);
         //LOG_ERROR("playerbots", "Bot {} is looting {} {} for usage {}.", bot->GetName().c_str(), itemcount, proto->Name1.c_str(), usage);
@@ -442,10 +447,7 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
 
     if (proto->StartQuest)
     {
-        if (sPlayerbotAIConfig->syncQuestWithPlayer)
-            return false; //Quest is autocomplete for the bot so no item needed.
-        else
-            return true;
+        return true;
     }
 
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
@@ -459,14 +461,13 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
         {
             if (quest->RequiredItemId[i] == itemid)
             {
-                if (quest->RequiredItemId[i] == itemid && AI_VALUE2(uint32, "item count", proto->Name1) < quest->RequiredItemCount[i])
+                if (AI_VALUE2(uint32, "item count", proto->Name1) < quest->RequiredItemCount[i])
                 {
                     if (botAI->GetMaster() && sPlayerbotAIConfig->syncQuestWithPlayer)
                         return false; //Quest is autocomplete for the bot so no item needed.
                 }
 
-                if (AI_VALUE2(uint32, "item count", proto->Name1) < quest->RequiredItemCount[i])
-                    return false;
+                return true;
             }
         }
     }
