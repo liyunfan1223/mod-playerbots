@@ -113,6 +113,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
             creators["rtsc"] = &ChatTriggerContext::rtsc;
             creators["drink"] = &ChatTriggerContext::drink;
             creators["naxx"] = &ChatTriggerContext::naxx;
+            creators["bwl"] = &ChatTriggerContext::bwl;
         }
 
     private:
@@ -206,6 +207,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
         static Trigger* rtsc(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "rtsc"); }
         static Trigger* drink(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "drink"); }
         static Trigger* naxx(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "naxx"); }
+        static Trigger* bwl(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "bwl"); }
 };
 
 #endif

@@ -47,7 +47,6 @@
 #include "UseFoodStrategy.h"
 #include "UsePotionsStrategy.h"
 #include "WorldPacketHandlerStrategy.h"
-#include "RaidNaxxStrategy.h"
 
 class StrategyContext : public NamedObjectContext<Strategy>
 {

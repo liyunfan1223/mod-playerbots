@@ -201,3 +201,16 @@ bool NaxxChatShortcutAction::Execute(Event event)
     bot->Say("Add Naxx Strategies!", LANG_UNIVERSAL);
     return true;
 }
+
+bool BwlChatShortcutAction::Execute(Event event)
+{
+    Player* master = GetMaster();
+    if (!master)
+        return false;
+
+    botAI->Reset();
+    botAI->ChangeStrategy("+bwl", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("+bwl", BOT_STATE_COMBAT);
+    bot->Say("Add Bwl Strategies!", LANG_UNIVERSAL);
+    return true;
+}

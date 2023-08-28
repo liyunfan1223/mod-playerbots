@@ -13,9 +13,11 @@
 #include "WorldPacketTriggerContext.h"
 #include "ValueContext.h"
 #include "Playerbots.h"
-#include "RaidStrategyContext.h"
-#include "RaidNaxxActionContext.h"
-#include "RaidNaxxTriggerContext.h"
+#include "raids/RaidTriggerContext.h"
+#include "raids/RaidActionContext.h"
+#include "raids/RaidStrategyContext.h"
+#include "raids/naxxramas/RaidNaxxActionContext.h"
+#include "raids/naxxramas/RaidNaxxTriggerContext.h"
 
 AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
 {
@@ -28,11 +30,13 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new ActionContext());
     actionContexts.Add(new ChatActionContext());
     actionContexts.Add(new WorldPacketActionContext());
+    actionContexts.Add(new RaidActionContext());
     actionContexts.Add(new RaidNaxxActionContext());
 
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
     triggerContexts.Add(new WorldPacketTriggerContext());
+    triggerContexts.Add(new RaidTriggerContext());
     triggerContexts.Add(new RaidNaxxTriggerContext());
 
     valueContexts.Add(new ValueContext());
