@@ -1587,7 +1587,7 @@ bool PlayerbotAI::IsMainTank(Player* player)
     }
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
         Player* member = ref->GetSource();
-        if (IsTank(member)) {
+        if (IsTank(member) && member->IsAlive()) {
             return player->GetGUID() == member->GetGUID();
         }
     }
