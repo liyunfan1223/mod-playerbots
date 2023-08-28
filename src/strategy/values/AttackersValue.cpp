@@ -12,7 +12,7 @@
 
 GuidVector AttackersValue::Calculate()
 {
-    std::set<Unit*> targets;
+    std::unordered_set<Unit*> targets;
 
     GuidVector result;
     if (!botAI->AllowActivity(ALL_ACTIVITY))
@@ -34,7 +34,7 @@ GuidVector AttackersValue::Calculate()
 	return result;
 }
 
-void AttackersValue::AddAttackersOf(Group* group, std::set<Unit*>& targets)
+void AttackersValue::AddAttackersOf(Group* group, std::unordered_set<Unit*>& targets)
 {
     Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
@@ -59,7 +59,7 @@ struct AddGuardiansHelper
     std::vector<Unit*> &units;
 };
 
-void AttackersValue::AddAttackersOf(Player* player, std::set<Unit*>& targets)
+void AttackersValue::AddAttackersOf(Player* player, std::unordered_set<Unit*>& targets)
 {
     if (!player || !player->IsInWorld() || player->IsBeingTeleported())
         return;
@@ -82,14 +82,14 @@ void AttackersValue::AddAttackersOf(Player* player, std::set<Unit*>& targets)
     }
 }
 
-void AttackersValue::RemoveNonThreating(std::set<Unit*>& targets)
+void AttackersValue::RemoveNonThreating(std::unordered_set<Unit*>& targets)
 {
-    for(std::set<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
+    for(std::unordered_set<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
         Unit* unit = *tIter;
         if(bot->GetMapId() != unit->GetMapId() || !hasRealThreat(unit) || !IsValidTarget(unit, bot) || !bot->IsWithinLOSInMap(unit))
         {
-            std::set<Unit *>::iterator tIter2 = tIter;
+            std::unordered_set<Unit *>::iterator tIter2 = tIter;
             ++tIter;
             targets.erase(tIter2);
         }
@@ -99,7 +99,7 @@ void AttackersValue::RemoveNonThreating(std::set<Unit*>& targets)
         // Unit* unit = *tIter;
         // if (!IsValidTarget(unit, bot) || !bot->IsWithinLOSInMap(unit))
         // {
-        //     std::set<Unit*>::iterator tIter2 = tIter;
+        //     std::unordered_set<Unit*>::iterator tIter2 = tIter;
         //     ++tIter;
         //     targets.erase(tIter2);
         // }
