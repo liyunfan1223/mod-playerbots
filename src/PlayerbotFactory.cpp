@@ -1642,6 +1642,7 @@ void PlayerbotFactory::InitSkills()
 
     uint32 skillLevel = bot->getLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->getLevel() < 20 ? 0 : 1;
+    uint32 dualWieldLevelForRogue = bot->getLevel() < 10 ? 0 : 1;
     SetRandomSkill(SKILL_DEFENSE);
     switch (bot->getClass())
     {
@@ -1735,6 +1736,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_CROSSBOWS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevelForRogue, dualWieldLevelForRogue);
             break;
         case CLASS_DEATH_KNIGHT:
             SetRandomSkill(SKILL_SWORDS);
