@@ -156,4 +156,10 @@ public:
     bool isUseful() override;
     Unit* GetTarget() override;
 };
+
+class CastMindSearAction : public CastSpellAction
+{
+    public:
+        CastMindSearAction(PlayerbotAI* ai) : CastSpellAction(ai, "mind sear") {}
+};
 #endif

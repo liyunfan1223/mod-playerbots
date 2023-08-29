@@ -38,14 +38,15 @@ void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("shadow word: pain on attacker", NextAction::array(0, new NextAction("shadow word: pain on attacker", 11.0f), nullptr)));
+    triggers.push_back(new TriggerNode("shadow word: pain on attacker", NextAction::array(0, new NextAction("shadow word: pain on attacker", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("mind sear", ACTION_HIGH + 4), nullptr)));
 }
 
 void ShadowPriestDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("devouring plague", NextAction::array(0, new NextAction("devouring plague", 13.0f), nullptr)));
-    triggers.push_back(new TriggerNode("shadow word: pain", NextAction::array(0, new NextAction("shadow word: pain", 11.0f), nullptr)));
-    triggers.push_back(new TriggerNode("vampiric touch", NextAction::array(0, new NextAction("vampiric touch", 12.0f), nullptr)));
+    triggers.push_back(new TriggerNode("devouring plague", NextAction::array(0, new NextAction("devouring plague", ACTION_HIGH + 3), nullptr)));
+    triggers.push_back(new TriggerNode("vampiric touch", NextAction::array(0, new NextAction("vampiric touch", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("shadow word: pain", NextAction::array(0, new NextAction("shadow word: pain", ACTION_HIGH + 1), nullptr)));
     // triggers.push_back(new TriggerNode("feedback", NextAction::array(0, new NextAction("feedback", 80.0f), nullptr)));
     // triggers.push_back(new TriggerNode("hex of weakness", NextAction::array(0, new NextAction("hex of weakness", 10.0f), nullptr)));
 }

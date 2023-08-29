@@ -2013,8 +2013,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     }
 
     if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
-        LOG_DEBUG("playerbot", "CanCastSpell() target name: {}, spellid: {}, bot name: {}, failed because has current channeled spell", 
-            target->GetName(), spellid, bot->GetName());
+        // LOG_DEBUG("playerbots", "CanCastSpell() target name: {}, spellid: {}, bot name: {}, failed because has current channeled spell", 
+        //     target->GetName(), spellid, bot->GetName());
         return false;
     }
 
