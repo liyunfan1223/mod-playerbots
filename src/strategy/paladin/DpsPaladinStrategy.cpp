@@ -4,6 +4,7 @@
 
 #include "DpsPaladinStrategy.h"
 #include "Playerbots.h"
+#include "Strategy.h"
 
 class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
@@ -12,6 +13,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         {
             creators["sanctity aura"] = &sanctity_aura;
             creators["retribution aura"] = &retribution_aura;
+            creators["seal of corruption"] = &seal_of_corruption;
             creators["seal of vengeance"] = &seal_of_vengeance;
             creators["seal of command"] = &seal_of_command;
             creators["blessing of might"] = &blessing_of_might;
@@ -23,6 +25,14 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         }
 
     private:
+        static ActionNode* seal_of_corruption([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("seal of corruption",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("seal of vengeance"), nullptr),
+                /*C*/ nullptr);
+        }
+
         static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("seal of vengeance",
@@ -83,7 +93,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "seal",
-        NextAction::array(0, new NextAction("seal of vengeance", 89.0f), NULL)));
+        NextAction::array(0, new NextAction("seal of corruption", ACTION_HIGH), NULL)));
     // triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", 91.0f), nullptr)));
     // triggers.push_back(new TriggerNode("sanctity aura", NextAction::array(0, new NextAction("sanctity aura", 90.0f), nullptr)));

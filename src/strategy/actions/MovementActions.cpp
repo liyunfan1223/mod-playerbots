@@ -146,7 +146,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    float modified_z = z + 0.5f;
+    float modified_z = z + 5.0f;
     bot->UpdateAllowedPositionZ(x, y, modified_z);
     // prevent falling when bot on slope
     if (modified_z < z - 20.0f) {

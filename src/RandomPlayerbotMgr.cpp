@@ -9,6 +9,7 @@
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "Define.h"
 #include "FleeManager.h"
 #include "GameTime.h"
 #include "GuildMgr.h"
@@ -240,7 +241,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     }
 
     GetBots();
-    uint32 availableBotCount = currentBots.size();
+    std::list<uint32> availableBots = currentBots;
+    uint32 availableBotCount = availableBots.size();
     uint32 onlineBotCount = playerBots.size();
 
     uint32 onlineBotFocus = 75;
@@ -272,10 +274,10 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     uint32 maxNewBots = onlineBotCount < maxAllowedBotCount ? maxAllowedBotCount - onlineBotCount : 0;
     uint32 loginBots = std::min(sPlayerbotAIConfig->randomBotsPerInterval - updateBots, maxNewBots);
 
-    if (!currentBots.empty())
+    if (!availableBots.empty())
     {
         // Update bots
-        for (auto bot : currentBots)
+        for (auto bot : availableBots)
         {
             if (!GetPlayerBot(bot))
                 continue;
@@ -297,7 +299,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             LOG_INFO("playerbots", "{} new bots", loginBots);
 
             //Log in bots
-            for (auto bot : currentBots)
+            for (auto bot : availableBots)
             {
                 if (GetPlayerBot(bot))
                     continue;

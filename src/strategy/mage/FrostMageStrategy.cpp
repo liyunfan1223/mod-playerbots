@@ -23,5 +23,5 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void FrostMageAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("blizzard", 40.0f), nullptr)));
+	triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("blizzard", 40.0f), nullptr)));
 }

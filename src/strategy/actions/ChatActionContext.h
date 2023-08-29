@@ -165,6 +165,8 @@ class ChatActionContext : public NamedObjectContext<Action>
             creators["guild leave"] = &ChatActionContext::guild_leave;
             creators["rtsc"] = &ChatActionContext::rtsc;
             creators["naxx chat shortcut"] = &ChatActionContext::naxx_chat_shortcut;
+            creators["bwl chat shortcut"] = &ChatActionContext::bwl_chat_shortcut;
+            
         }
 
     private:
@@ -255,6 +257,7 @@ class ChatActionContext : public NamedObjectContext<Action>
         static Action* guild_leave(PlayerbotAI* botAI) { return new GuildLeaveAction(botAI); }
         static Action* rtsc(PlayerbotAI* botAI) { return new RTSCAction(botAI); }
         static Action* naxx_chat_shortcut(PlayerbotAI* ai) { return new NaxxChatShortcutAction(ai); }
+        static Action* bwl_chat_shortcut(PlayerbotAI* ai) { return new BwlChatShortcutAction(ai); }
 };
 
 #endif

@@ -15,16 +15,16 @@ BUFF_TRIGGER(ImprovedIcyTalonsTrigger, "improved icy talons");
 DEBUFF_CHECKISOWNER_TRIGGER(PlagueStrikeDebuffTrigger, "blood plague");
 DEBUFF_CHECKISOWNER_TRIGGER(IcyTouchDebuffTrigger, "frost fever");
 
-class PlagueStrikeDebuffOnAttackerTrigger : public DebuffOnAttackerTrigger
+class PlagueStrikeDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
 	public:
-		PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "blood plague", true) { }
+		PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "blood plague", true) { }
 };
 
-class IcyTouchDebuffOnAttackerTrigger : public DebuffOnAttackerTrigger
+class IcyTouchDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
 	public:
-		IcyTouchDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "frost fever", true) { }
+		IcyTouchDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "frost fever", true) { }
 };
 
 class DKPresenceTrigger : public BuffTrigger

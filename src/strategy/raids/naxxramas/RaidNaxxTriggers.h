@@ -7,9 +7,7 @@
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
 #include "RaidNaxxScripts.h"
-#include "raids/naxxramas/RaidNaxxBossHelper.h"
-
-using namespace std;
+#include "RaidNaxxBossHelper.h"
 
 class MutatingInjectionTrigger : public HasAuraTrigger
 {
@@ -20,7 +18,7 @@ public:
 class AuraRemovedTrigger : public Trigger
 {
 public:
-    AuraRemovedTrigger(PlayerbotAI* botAI, string name): Trigger(botAI, name, 1) {
+    AuraRemovedTrigger(PlayerbotAI* botAI, std::string name): Trigger(botAI, name, 1) {
         this->prev_check = false;
     }
     virtual bool IsActive() override;
@@ -39,7 +37,7 @@ template<class T>
 class BossEventTrigger : public Trigger
 {
 public:
-    BossEventTrigger(PlayerbotAI* ai, uint32 boss_entry, uint32 event_id, string name = "boss event"): Trigger(ai, name, 1) {
+    BossEventTrigger(PlayerbotAI* ai, uint32 boss_entry, uint32 event_id, std::string name = "boss event"): Trigger(ai, name, 1) {
         this->boss_entry = boss_entry;
         this->event_id = event_id;
         this->last_event_time = -1;
@@ -53,13 +51,13 @@ template<class T>
 class BossPhaseTrigger : public Trigger
 {
 public:
-    BossPhaseTrigger(PlayerbotAI* ai, string boss_name, uint32 phase_mask, string name = "boss event"): Trigger(ai, name, 1) {
+    BossPhaseTrigger(PlayerbotAI* ai, std::string boss_name, uint32 phase_mask, std::string name = "boss event"): Trigger(ai, name, 1) {
         this->boss_name = boss_name;
         this->phase_mask = phase_mask;
     }
     virtual bool IsActive();
 protected:
-    string boss_name;
+    std::string boss_name;
     uint32 phase_mask;
 };
 

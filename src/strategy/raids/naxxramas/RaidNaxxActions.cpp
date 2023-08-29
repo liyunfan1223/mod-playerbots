@@ -5,11 +5,7 @@
 #include "RaidNaxxStrategy.h"
 #include "ScriptedCreature.h"
 #include "SharedDefines.h"
-#include "raids/naxxramas/RaidNaxxBossHelper.h"
-#include <algorithm>
-
-
-using namespace std;
+#include "RaidNaxxBossHelper.h"
 
 // bool TryToGetBossAIAction::Execute(Event event) {
 //     Unit* boss = AI_VALUE(Unit*, "boss target");
@@ -698,7 +694,7 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
             target_kelthuzad = unit;
         }
     }
-    vector<Unit*> targets;
+    std::vector<Unit*> targets;
     if (botAI->IsRanged(bot)) {
         if (botAI->GetRangedDpsIndex(bot) <= 1) {
             targets = {target_soldier, target_weaver, target_abomination, target_kelthuzad};
@@ -788,7 +784,7 @@ bool AnubrekhanChooseTargetAction::Execute(Event event)
     GuidVector attackers = context->GetValue<GuidVector >("attackers")->Get();
     Unit* target = nullptr;
     Unit *target_boss = nullptr;
-    vector<Unit*> target_guards;
+    std::vector<Unit*> target_guards;
     for (ObjectGuid const guid : attackers)
     {
         Unit* unit = botAI->GetUnit(guid);

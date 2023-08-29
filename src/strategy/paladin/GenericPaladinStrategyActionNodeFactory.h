@@ -15,13 +15,13 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
     public:
         GenericPaladinStrategyActionNodeFactory()
         {
-            creators["seal of light"] = &seal_of_light;
+            // creators["seal of light"] = &seal_of_light;
             creators["cleanse poison"] = &cleanse_poison;
             creators["cleanse disease"] = &cleanse_disease;
             creators["cleanse magic"] = &cleanse_magic;
             creators["cleanse poison on party"] = &cleanse_poison_on_party;
             creators["cleanse disease on party"] = &cleanse_disease_on_party;
-            creators["seal of wisdom"] = &seal_of_wisdom;
+            // creators["seal of wisdom"] = &seal_of_wisdom;
             creators["seal of justice"] = &seal_of_justice;
             creators["hand of reckoning"] = &hand_of_reckoning;
             creators["judgement"] = &judgement;
@@ -101,13 +101,13 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
                 /*A*/ NULL, // NextAction::array(0, new NextAction("flash of light"), NULL),
                 /*C*/ NULL);
         }
-        static ActionNode* seal_of_light(PlayerbotAI* ai)
-        {
-            return new ActionNode ("seal of light",
-                /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("seal of justice"), NULL),
-                /*C*/ NULL);
-        }
+        // static ActionNode* seal_of_light(PlayerbotAI* ai)
+        // {
+        //     return new ActionNode ("seal of light",
+        //         /*P*/ NULL,
+        //         /*A*/ NextAction::array(0, new NextAction("seal of justice"), NULL),
+        //         /*C*/ NULL);
+        // }
         static ActionNode* cleanse_poison(PlayerbotAI* ai)
         {
             return new ActionNode ("cleanse poison",
@@ -143,13 +143,13 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
                 /*A*/ NextAction::array(0, new NextAction("purify disease on party"), NULL),
                 /*C*/ NULL);
         }
-        static ActionNode* seal_of_wisdom(PlayerbotAI* ai)
-        {
-            return new ActionNode ("seal of wisdom",
-                /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("seal of justice"), NULL),
-                /*C*/ NULL);
-        }
+        // static ActionNode* seal_of_wisdom(PlayerbotAI* ai)
+        // {
+        //     return new ActionNode ("seal of wisdom",
+        //         /*P*/ NULL,
+        //         /*A*/ NextAction::array(0, new NextAction("seal of justice"), NULL),
+        //         /*C*/ NULL);
+        // }
         static ActionNode* seal_of_justice(PlayerbotAI* ai)
         {
             return new ActionNode ("seal of justice",

@@ -143,6 +143,7 @@ class PlayerbotAIConfig
         uint32 playerbotsXPrate;
         uint32 botActiveAlone;
 
+        bool freeMethodLoot;
         std::string autoPickReward;
         bool autoEquipUpgradeLoot;
         bool syncQuestWithPlayer;

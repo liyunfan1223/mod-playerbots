@@ -330,6 +330,15 @@ class DebuffOnAttackerTrigger : public DebuffTrigger
         std::string const getName() override { return spell + " on attacker"; }
 };
 
+class DebuffOnMeleeAttackerTrigger : public DebuffTrigger
+{
+    public:
+        DebuffOnMeleeAttackerTrigger(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = true) : DebuffTrigger(botAI, spell, 1, checkIsOwner) { }
+
+        Value<Unit*>* GetTargetValue() override;
+        std::string const getName() override { return spell + " on attacker"; }
+};
+
 class BoostTrigger : public BuffTrigger
 {
 	public:

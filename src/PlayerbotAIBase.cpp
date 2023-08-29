@@ -42,8 +42,8 @@ void PlayerbotAIBase::IncreaseNextCheckDelay(uint32 delay)
 {
     nextAICheckDelay += delay;
 
-    if (nextAICheckDelay > sPlayerbotAIConfig->globalCoolDown)
-        LOG_DEBUG("playerbots",  "increase next check delay: {}", nextAICheckDelay);
+    // if (nextAICheckDelay > sPlayerbotAIConfig->globalCoolDown)
+    //     LOG_DEBUG("playerbots",  "increase next check delay: {}", nextAICheckDelay);
 }
 
 bool PlayerbotAIBase::CanUpdateAI()

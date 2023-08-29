@@ -116,8 +116,12 @@ AiPlayerbot.RandomBotSayWithoutMaster = 0
 
 # Automation
 
+# Bots keep looting when group loop method is free for all
+# Default: 0 (disabled)
+AiPlayerbot.FreeMethodLoot = 0
+
 # Bots pick their quest reward (yes = picks first useful item, no = list all rewards, ask = pick useful item and lists if multiple)
-AiPlayerbot.AutoPickReward = yes
+AiPlayerbot.AutoPickReward = no
 
 # Bots equip upgrades (Bots will equip any item obtained from looting or a quest if they are upgrades)
 # Default: 0 (disabled)
@@ -158,9 +162,9 @@ AiPlayerbot.AutoTeleportForLevel = 1
 # Default: 1 (enabled)
 AiPlayerbot.AutoPickTalents = 1
 
-# Bot automatically upgrade equipments on levelup, may cause lagging
-# Default: 0 (enabled)
-AiPlayerbot.AutoUpgradeEquip = 0
+# Bot automatically upgrade equipments on levelup
+# Default: 1 (enabled)
+AiPlayerbot.AutoUpgradeEquip = 1
 
 # Random Bots will pick quests on their own and try to complete
 # Default: 1 (enabled)

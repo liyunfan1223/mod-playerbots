@@ -78,9 +78,9 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
     }
 
     std::vector<std::vector<Player*>*> lists;
+    lists.push_back(&masters);
     lists.push_back(&healers);
     lists.push_back(&tanks);
-    lists.push_back(&masters);
     lists.push_back(&others);
 
     for (std::vector<std::vector<Player*>*>::iterator i = lists.begin(); i != lists.end(); ++i)

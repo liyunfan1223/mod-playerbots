@@ -1587,7 +1587,7 @@ bool PlayerbotAI::IsMainTank(Player* player)
     }
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
         Player* member = ref->GetSource();
-        if (IsTank(member)) {
+        if (IsTank(member) && member->IsAlive()) {
             return player->GetGUID() == member->GetGUID();
         }
     }
@@ -1879,7 +1879,7 @@ bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, boo
     return false;
 }
 
-bool PlayerbotAI::HasAura(uint32 spellId,  Unit const* unit)
+bool PlayerbotAI::HasAura(uint32 spellId, Unit const* unit)
 {
 	if (!spellId || !unit)
 		return false;
@@ -3717,6 +3717,9 @@ float PlayerbotAI::GetRange(std::string const type)
     if (type == "heal")
         return sPlayerbotAIConfig->healDistance;
 
+    if (type == "melee")
+        return sPlayerbotAIConfig->meleeDistance;
+    
     return 0;
 }
 

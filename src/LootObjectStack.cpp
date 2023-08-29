@@ -206,11 +206,11 @@ bool LootObject::IsLootPossible(Player* bot)
 
     if (abs(GetWorldObject(bot)->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE)
         return false;
-
+    
     Creature* creature = botAI->GetCreature(guid);
     if (creature && creature->getDeathState() == CORPSE)
     {
-        if (!creature->loot.hasItemFor(bot) && skillId != SKILL_SKINNING)
+        if (!bot->isAllowedToLoot(creature) && skillId != SKILL_SKINNING)
             return false;
     }
 
@@ -290,7 +290,7 @@ std::vector<LootObject> LootObjectStack::OrderByDistance(float maxDistance)
         LootObject lootObject(bot, guid);
         if (!lootObject.IsLootPossible(bot))
             continue;
-
+        
         float distance = bot->GetDistance(lootObject.GetWorldObject(bot));
         if (!maxDistance || distance <= maxDistance)
             sortedMap[distance] = lootObject;
