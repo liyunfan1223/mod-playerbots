@@ -142,4 +142,11 @@ class UseInstantPoisonAction : public UseItemAction
 		virtual bool Execute(Event event) override;
 		virtual bool isPossible() override;
 };
+
+class FanOfKnivesAction : public CastMeleeSpellAction
+{
+	public:
+		FanOfKnivesAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "fan of knives") {}
+};
+
 #endif
