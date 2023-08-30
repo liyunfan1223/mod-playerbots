@@ -145,6 +145,7 @@ class PlayerbotFactory : public InventoryAction
         void InitPotions();
         void InitFood();
         void InitReagents();
+        void InitGlyphs();
         bool CanEquipArmor(ItemTemplate const* proto);
         bool CanEquipWeapon(ItemTemplate const* proto);
         void EnchantItem(Item* item);

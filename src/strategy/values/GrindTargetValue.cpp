@@ -69,7 +69,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
             continue;
         }
         
-        if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > sPlayerbotAIConfig->spellDistance)
+        if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > INTERACTION_DISTANCE)
             continue;
 
         if (!bot->InBattleground() && GetTargetingPlayerCount(unit) > assistCount)

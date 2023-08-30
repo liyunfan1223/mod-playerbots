@@ -207,6 +207,7 @@ void StealthedRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     /*triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("food", ACTION_EMERGENCY + 1), nullptr)));*/
     triggers.push_back(new TriggerNode("no stealth", NextAction::array(0, new NextAction("check stealth", ACTION_EMERGENCY), nullptr)));
     triggers.push_back(new TriggerNode("sprint", NextAction::array(0, new NextAction("sprint", ACTION_INTERRUPT), nullptr)));
+    
 }
 
 void StealthStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -217,6 +218,9 @@ void StealthStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void RogueAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode(
+		"medium aoe",
+		NextAction::array(0, new NextAction("fan of knives", ACTION_NORMAL + 5), NULL)));
 }
 
 void RogueBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

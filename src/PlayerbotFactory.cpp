@@ -293,10 +293,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     AddConsumables();
     if (pmo)
         pmo->finish();
-
-    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
-    LOG_INFO("playerbots", "Initializing guilds...");
+    
+    LOG_INFO("playerbots", "Initializing glyphs...");
     bot->SaveToDB(false, false);
+    InitGlyphs();
+    
+    // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
+    // LOG_INFO("playerbots", "Initializing guilds...");
+    // bot->SaveToDB(false, false);
     // InitGuild();
     // bot->SaveToDB(false, false);
     if (pmo)
@@ -1638,6 +1642,7 @@ void PlayerbotFactory::InitSkills()
 
     uint32 skillLevel = bot->getLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->getLevel() < 20 ? 0 : 1;
+    uint32 dualWieldLevelForRogue = bot->getLevel() < 10 ? 0 : 1;
     SetRandomSkill(SKILL_DEFENSE);
     switch (bot->getClass())
     {
@@ -1731,6 +1736,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_CROSSBOWS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevelForRogue, dualWieldLevelForRogue);
             break;
         case CLASS_DEATH_KNIGHT:
             SetRandomSkill(SKILL_SWORDS);
@@ -2455,6 +2461,113 @@ void PlayerbotFactory::InitReagents()
     }
     for (std::pair item : items) {
         bot->StoreNewItemInBestSlots(item.first, item.second);
+    }
+}
+
+void PlayerbotFactory::InitGlyphs()
+{
+    bot->InitGlyphsForLevel();
+
+    for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
+    {
+        bot->SetGlyph(slotIndex, 0, true);
+    }
+
+    uint32 level = bot->getLevel();
+    uint32 maxSlot = 0;
+    if (level >= 15)
+        maxSlot = 2;
+    if (level >= 30)
+        maxSlot = 3;
+    if (level >= 50)
+        maxSlot = 4;
+    if (level >= 70)
+        maxSlot = 5;
+    if (level >= 80)
+        maxSlot = 6;
+
+    if (!maxSlot)
+        return;
+
+    std::list<uint32> glyphs;
+    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
+    for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
+    {
+        uint32 itemId = i->first;
+        ItemTemplate const* proto = &i->second;
+        if (!proto)
+            continue;
+
+        if (proto->Class != ITEM_CLASS_GLYPH)
+            continue;
+
+        if ((proto->AllowableClass & bot->getClassMask()) == 0 || (proto->AllowableRace & bot->getRaceMask()) == 0)
+            continue;
+
+        for (uint32 spell = 0; spell < MAX_ITEM_PROTO_SPELLS; spell++)
+        {
+            uint32 spellId = proto->Spells[spell].SpellId;
+            SpellInfo const *entry = sSpellMgr->GetSpellInfo(spellId);
+            if (!entry)
+                continue;
+
+            for (uint32 effect = 0; effect <= EFFECT_2; ++effect)
+            {
+                if (entry->Effects[effect].Effect != SPELL_EFFECT_APPLY_GLYPH)
+                    continue;
+
+                uint32 glyph = entry->Effects[effect].MiscValue;
+                glyphs.push_back(glyph);
+            }
+        }
+    }
+
+    if (glyphs.empty())
+    {
+        LOG_INFO("playerbots", "No glyphs found for bot {}", bot->GetName().c_str());
+        return;
+    }
+
+    std::unordered_set<uint32> chosen;
+    for (uint32 slotIndex = 0; slotIndex < maxSlot; ++slotIndex)
+    {
+        uint32 slot = bot->GetGlyphSlot(slotIndex);
+        GlyphSlotEntry const *gs = sGlyphSlotStore.LookupEntry(slot);
+        if (!gs)
+            continue;
+
+        std::vector<uint32> ids;
+        for (std::list<uint32>::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
+        {
+            uint32 id = *i;
+            GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(id);
+            if (!gp || gp->TypeFlags != gs->TypeFlags)
+                continue;
+
+            ids.push_back(id);
+        }
+
+        int maxCount = urand(0, 3);
+        int count = 0;
+        bool found = false;
+        for (int attempts = 0; attempts < 15; ++attempts)
+        {
+            uint32 index = urand(0, ids.size() - 1);
+            if (index >= ids.size())
+                continue;
+
+            uint32 id = ids[index];
+            if (chosen.find(id) != chosen.end())
+                continue;
+
+            chosen.insert(id);
+
+            bot->SetGlyph(slotIndex, id, true);
+            found = true;
+            break;
+        }
+        if (!found)
+            LOG_INFO("playerbots", "No glyphs found for bot {} index {} slot {}", bot->GetName().c_str(), slotIndex, slot);
     }
 }
 

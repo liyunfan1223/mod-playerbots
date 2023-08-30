@@ -1255,7 +1255,7 @@ void RandomPlayerbotMgr::Randomize(Player* bot)
     if (bot->InBattleground())
         return;
 
-    if (bot->getLevel() < 2 || (bot->getLevel() < 56 && bot->getClass() == CLASS_DEATH_KNIGHT)) {
+    if (bot->getLevel() < 3 || (bot->getLevel() < 56 && bot->getClass() == CLASS_DEATH_KNIGHT)) {
         RandomizeFirst(bot);
     }
     else if (bot->getLevel() < sPlayerbotAIConfig->randomBotMaxLevel || !sPlayerbotAIConfig->downgradeMaxLevelBot) {

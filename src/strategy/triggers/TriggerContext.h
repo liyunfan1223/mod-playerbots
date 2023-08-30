@@ -68,7 +68,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["not dps target active"] = &TriggerContext::not_dps_target_active;
             creators["not dps aoe target active"] = &TriggerContext::not_dps_aoe_target_active;
             creators["has nearest adds"] = &TriggerContext::has_nearest_adds;
-            creators["enemy player inear"] = &TriggerContext::enemy_player_near;
+            creators["enemy player near"] = &TriggerContext::enemy_player_near;
 
             creators["tank assist"] = &TriggerContext::TankAssist;
             creators["lose aggro"] = &TriggerContext::LoseAggro;
