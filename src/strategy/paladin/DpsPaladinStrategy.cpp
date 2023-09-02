@@ -79,8 +79,9 @@ DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrat
 
 NextAction** DpsPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("crusader strike", ACTION_NORMAL + 6),
-        new NextAction("judgement of wisdom", ACTION_NORMAL + 5),
+    return NextAction::array(0, 
+        new NextAction("judgement of wisdom", ACTION_NORMAL + 6),
+        new NextAction("crusader strike", ACTION_NORMAL + 5),
         new NextAction("divine storm", ACTION_NORMAL + 4),
         new NextAction("consecration", ACTION_NORMAL + 3),
         new NextAction("melee", ACTION_NORMAL), 
@@ -95,7 +96,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "seal",
         NextAction::array(0, new NextAction("seal of corruption", ACTION_HIGH), NULL)));
     // triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f), nullptr)));
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", 91.0f), nullptr)));
+    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 5), nullptr)));
     // triggers.push_back(new TriggerNode("sanctity aura", NextAction::array(0, new NextAction("sanctity aura", 90.0f), nullptr)));
     // triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("repentance or shield", ACTION_CRITICAL_HEAL + 3), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), nullptr)));
     // triggers.push_back(new TriggerNode("judgement of wisdom", NextAction::array(0, new NextAction("judgement of wisdom", ACTION_NORMAL + 10), nullptr)));
@@ -106,10 +107,10 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("repentance", NextAction::array(0, new NextAction("repentance", ACTION_INTERRUPT + 2), nullptr)));
 	// triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("divine storm", ACTION_HIGH + 1), new NextAction("consecration", ACTION_HIGH + 1), nullptr)));
 	triggers.push_back(new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("hammer of wrath", ACTION_CRITICAL_HEAL), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "not facing target",
-        NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), NULL)));
+    triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("hammer of wrath", ACTION_HIGH), nullptr)));
+    // triggers.push_back(new TriggerNode(
+    //     "not facing target",
+    //     NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), NULL)));
 
     triggers.push_back(new TriggerNode(
         "enemy out of melee",

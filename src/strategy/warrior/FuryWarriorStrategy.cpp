@@ -63,6 +63,6 @@ void FuryWarriorStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("berserker rage", NextAction::array(0, new NextAction("berserker rage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("death wish", NextAction::array(0, new NextAction("death wish", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode("rampage", NextAction::array(0, new NextAction("rampage", ACTION_INTERRUPT + 1), nullptr)));
+    // triggers.push_back(new TriggerNode("rampage", NextAction::array(0, new NextAction("rampage", ACTION_INTERRUPT + 1), nullptr)));
     triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 1), NULL)));
 }

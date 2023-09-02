@@ -23,7 +23,6 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    //creators["deathchill"] = &deathchill;
 		    //creators["icebound fortitude"] = &icebound_fortitude;
 		    //creators["mind freeze"] = &mind_freeze;
-		    //creators["empower weapon"] = &empower_weapon;
 		    //creators["hungering cold"] = &hungering_cold;
 		    //creators["unbreakable armor"] = &unbreakable_armor;
 		    //creators["improved icy talons"] = &improved_icy_talons;
@@ -74,6 +73,7 @@ NextAction** FrostDKStrategy::getDefaultActions()
 		new NextAction("obliterate", ACTION_NORMAL + 5), 
 		new NextAction("frost strike", ACTION_NORMAL + 4),
 		// new NextAction("death strike", ACTION_NORMAL + 3),
+		new NextAction("empower rune weapon", ACTION_NORMAL + 2),
 		new NextAction("melee", ACTION_NORMAL), 
 		NULL
 	);
@@ -82,9 +82,8 @@ NextAction** FrostDKStrategy::getDefaultActions()
 void FrostDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
-
-    triggers.push_back(new TriggerNode("empower weapon", NextAction::array(0, new NextAction("empower weapon", ACTION_NORMAL + 4), nullptr)));
-	triggers.push_back(new TriggerNode("pestilence", NextAction::array(0, new NextAction("pestilence", ACTION_HIGH + 9), NULL)));
+	triggers.push_back(new TriggerNode("unbreakable armor", NextAction::array(0, new NextAction("unbreakable armor", ACTION_NORMAL + 4), nullptr)));
+    // triggers.push_back(new TriggerNode("empower rune weapon", NextAction::array(0, new NextAction("empower rune weapon", ACTION_NORMAL + 4), nullptr)));
 }
 
 void FrostDKAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

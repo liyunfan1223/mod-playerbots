@@ -77,6 +77,7 @@ class PriestTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["divine spirit on party"] = &PriestTriggerFactoryInternal::divine_spirit_on_party;
             creators["inner fire"] = &PriestTriggerFactoryInternal::inner_fire;
             creators["vampiric touch"] = &PriestTriggerFactoryInternal::vampiric_touch;
+            creators["vampiric touch on attacker"] = &PriestTriggerFactoryInternal::vampiric_touch_on_attacker;
             creators["shadowform"] = &PriestTriggerFactoryInternal::shadowform;
             creators["vampiric embrace"] = &PriestTriggerFactoryInternal::vampiric_embrace;
             creators["power infusion"] = &PriestTriggerFactoryInternal::power_infusion;
@@ -103,6 +104,7 @@ class PriestTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* vampiric_embrace(PlayerbotAI* botAI) { return new VampiricEmbraceTrigger(botAI); }
         static Trigger* shadowform(PlayerbotAI* botAI) { return new ShadowformTrigger(botAI); }
         static Trigger* vampiric_touch(PlayerbotAI* botAI) { return new VampiricTouchTrigger(botAI); }
+        static Trigger* vampiric_touch_on_attacker(PlayerbotAI* botAI) { return new VampiricTouchOnAttackerTrigger(botAI); }
         static Trigger* devouring_plague(PlayerbotAI* botAI) { return new DevouringPlagueTrigger(botAI); }
         static Trigger* shadow_word_pain(PlayerbotAI* botAI) { return new PowerWordPainTrigger(botAI); }
         static Trigger* shadow_word_pain_on_attacker(PlayerbotAI* botAI) { return new PowerWordPainOnAttackerTrigger(botAI); }
@@ -182,6 +184,7 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
             creators["circle of healing"] = &PriestAiObjectContextInternal::circle_of_healing;
             creators["psychic scream"] = &PriestAiObjectContextInternal::psychic_scream;
             creators["vampiric touch"] = &PriestAiObjectContextInternal::vampiric_touch;
+            creators["vampiric touch on attacker"] = &PriestAiObjectContextInternal::vampiric_touch_on_attacker;
             creators["vampiric embrace"] = &PriestAiObjectContextInternal::vampiric_embrace;
             creators["dispersion"] = &PriestAiObjectContextInternal::dispersion;
             creators["shadow protection"] = &PriestAiObjectContextInternal::shadow_protection;
@@ -230,6 +233,7 @@ class PriestAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* dispersion(PlayerbotAI* botAI) { return new CastDispersionAction(botAI); }
         static Action* vampiric_embrace(PlayerbotAI* botAI) { return new CastVampiricEmbraceAction(botAI); }
         static Action* vampiric_touch(PlayerbotAI* botAI) { return new CastVampiricTouchAction(botAI); }
+        static Action* vampiric_touch_on_attacker(PlayerbotAI* botAI) { return new CastVampiricTouchOnAttackerAction(botAI); }
         static Action* psychic_scream(PlayerbotAI* botAI) { return new CastPsychicScreamAction(botAI); }
         static Action* circle_of_healing(PlayerbotAI* botAI) { return new CastCircleOfHealingAction(botAI); }
         static Action* resurrection(PlayerbotAI* botAI) { return new CastResurrectionAction(botAI); }

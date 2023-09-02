@@ -239,6 +239,15 @@ bool SpellNoCooldownTrigger::IsActive()
     return !bot->HasSpellCooldown(spellId);
 }
 
+bool SpellCooldownTrigger::IsActive()
+{
+    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+    if (!spellId)
+        return false;
+    
+    return bot->HasSpellCooldown(spellId);
+}
+
 RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(getMSTime())
 {
 }

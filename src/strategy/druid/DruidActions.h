@@ -108,6 +108,12 @@ class CastThornsOnPartyAction : public BuffOnPartyAction
         CastThornsOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "thorns") { }
 };
 
+class CastThornsOnMainTankAction : public BuffOnMainTankAction
+{
+    public:
+        CastThornsOnMainTankAction(PlayerbotAI* botAI) : BuffOnMainTankAction(botAI, "thorns", false) { }
+};
+
 class CastOmenOfClarityAction : public CastBuffSpellAction
 {
 	public:

@@ -6,6 +6,7 @@
 #define _PLAYERBOT_MAGETRIGGERS_H
 
 #include "CureTriggers.h"
+#include "GenericTriggers.h"
 #include "SharedDefines.h"
 
 class PlayerbotAI;
@@ -137,4 +138,11 @@ class ArcaneBlastStackTrigger : public HasAuraStackTrigger {
 public:
     ArcaneBlastStackTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "arcane blast", 3, 1) {}
 };
+
+class MirrorImageTrigger : public BoostTrigger 
+{
+    public:
+    MirrorImageTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "mirror image") {}
+};
+
 #endif

@@ -84,6 +84,7 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 			creators["blood tap"] = &DeathKnightTriggerFactoryInternal::blood_tap;
 			creators["raise dead"] = &DeathKnightTriggerFactoryInternal::raise_dead;
 			creators["chains of ice"] = &DeathKnightTriggerFactoryInternal::chains_of_ice;
+			creators["unbreakable armor"] = &DeathKnightTriggerFactoryInternal::unbreakable_armor;
         }
 
     private:
@@ -104,6 +105,7 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 		static Trigger* blood_tap(PlayerbotAI* botAI) { return new BloodTapTrigger(botAI); }
 		static Trigger* raise_dead(PlayerbotAI* botAI) { return new RaiseDeadTrigger(botAI); }
 		static Trigger* chains_of_ice(PlayerbotAI* botAI) { return new ChainsOfIceSnareTrigger(botAI); }
+		static Trigger* unbreakable_armor(PlayerbotAI* botAI) { return new UnbreakableArmorTrigger(botAI); }
 };
 
 class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>

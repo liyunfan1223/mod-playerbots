@@ -143,6 +143,15 @@ class SpellNoCooldownTrigger : public SpellTrigger
          bool IsActive() override;
 };
 
+class SpellCooldownTrigger : public SpellTrigger
+{
+	public:
+		SpellCooldownTrigger(PlayerbotAI* botAI, std::string const spell) : SpellTrigger(botAI, spell) { }
+
+		std::string const GetTargetName() override { return "self target"; }
+		bool IsActive() override;
+};
+
 // TODO: check other targets
 class InterruptSpellTrigger : public SpellTrigger
 {
@@ -470,7 +479,6 @@ class HasAuraTrigger : public Trigger
 
 		std::string const GetTargetName() override { return "self target"; }
 		bool IsActive() override;
-
 };
 
 class HasAuraStackTrigger : public Trigger {
@@ -750,7 +758,7 @@ class HasAreaDebuffTrigger : public Trigger {
 class BuffOnMainTankTrigger : public BuffTrigger
 {
 public:
-    BuffOnMainTankTrigger(PlayerbotAI* botAI, std::string spell, bool checkIsOwner = false) : BuffTrigger(botAI, spell, 1, checkIsOwner) {}
+    BuffOnMainTankTrigger(PlayerbotAI* botAI, std::string spell, bool checkIsOwner = false, int checkInterval = 1) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner) {}
 public:
     virtual Value<Unit*>* GetTargetValue();
 };

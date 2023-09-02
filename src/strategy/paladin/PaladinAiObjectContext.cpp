@@ -134,6 +134,8 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["blessing of kings on party"] = &PaladinTriggerFactoryInternal::blessing_of_kings_on_party;
             creators["blessing of wisdom on party"] = &PaladinTriggerFactoryInternal::blessing_of_wisdom_on_party;
             creators["blessing of might on party"] = &PaladinTriggerFactoryInternal::blessing_of_might_on_party;
+
+            creators["avenging wrath"] = &PaladinTriggerFactoryInternal::avenging_wrath;
         }
 
     private:
@@ -177,6 +179,8 @@ class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* blessing_of_kings_on_party(PlayerbotAI* botAI) { return new BlessingOfKingsOnPartyTrigger(botAI); }
         static Trigger* blessing_of_wisdom_on_party(PlayerbotAI* botAI) { return new BlessingOfWisdomOnPartyTrigger(botAI); }
         static Trigger* blessing_of_might_on_party(PlayerbotAI* botAI) { return new BlessingOfMightOnPartyTrigger(botAI); }
+
+        static Trigger* avenging_wrath(PlayerbotAI* botAI) { return new AvengingWrathTrigger(botAI); }
 };
 
 class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
@@ -257,6 +261,7 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
             creators["shield of righteousness"] = &PaladinAiObjectContextInternal::shield_of_righteousness;
             creators["beacon of light on main tank"] = &PaladinAiObjectContextInternal::beacon_of_light_on_main_tank;
             creators["sacred shield on main tank"] = &PaladinAiObjectContextInternal::sacred_shield_on_main_tank;
+            creators["avenging wrath"] = &PaladinAiObjectContextInternal::avenging_wrath;
         }
 
     private:
@@ -333,6 +338,7 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* shield_of_righteousness(PlayerbotAI* ai) { return new ShieldOfRighteousnessAction(ai); }
         static Action* beacon_of_light_on_main_tank(PlayerbotAI* ai) { return new CastBeaconOfLightOnMainTankAction(ai); }
         static Action* sacred_shield_on_main_tank(PlayerbotAI* ai) { return new CastSacredShieldOnMainTankAction(ai); }
+        static Action* avenging_wrath(PlayerbotAI* ai) { return new CastAvengingWrathAction(ai); }
 };
 
 PaladinAiObjectContext::PaladinAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

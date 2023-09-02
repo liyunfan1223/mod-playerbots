@@ -14,7 +14,7 @@ BUFF_TRIGGER(BoneShieldTrigger, "bone shield");
 BUFF_TRIGGER(ImprovedIcyTalonsTrigger, "improved icy talons");
 DEBUFF_CHECKISOWNER_TRIGGER(PlagueStrikeDebuffTrigger, "blood plague");
 DEBUFF_CHECKISOWNER_TRIGGER(IcyTouchDebuffTrigger, "frost fever");
-
+BUFF_TRIGGER(UnbreakableArmorTrigger, "unbreakable armor");
 class PlagueStrikeDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
 	public:

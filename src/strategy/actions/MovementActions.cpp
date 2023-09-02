@@ -758,6 +758,10 @@ bool MovementAction::IsMovingAllowed()
     if (bot->GetMotionMaster()->GetMotionSlot(MOTION_SLOT_CONTROLLED)) {
         return false;
     }
+
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
+    //     return false;
+    // }
     return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE;
 }
 
@@ -779,7 +783,6 @@ void MovementAction::UpdateMovementState()
 
     if (bot->IsFlying())
         bot->UpdateSpeed(MOVE_FLIGHT, true);
-
     // Temporary speed increase in group
     //if (botAI->HasRealPlayerMaster())
         //bot->SetSpeedRate(MOVE_RUN, 1.1f);

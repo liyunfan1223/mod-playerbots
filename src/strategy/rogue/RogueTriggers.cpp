@@ -6,10 +6,10 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-bool AdrenalineRushTrigger::isPossible()
-{
-    return !botAI->HasAura("stealth", bot);
-}
+// bool AdrenalineRushTrigger::isPossible()
+// {
+//     return !botAI->HasAura("stealth", bot);
+// }
 
 bool UnstealthTrigger::IsActive()
 {

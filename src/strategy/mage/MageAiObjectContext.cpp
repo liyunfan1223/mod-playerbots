@@ -98,6 +98,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["fire ward"] = &MageTriggerFactoryInternal::fire_ward;
             creators["frost ward"] = &MageTriggerFactoryInternal::frost_ward;
             creators["arcane blast stack"] = &MageTriggerFactoryInternal::arcane_blast_stack;
+            creators["mirror image"] = &MageTriggerFactoryInternal::mirror_image;
         }
 
     private:
@@ -123,6 +124,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* arcane_blast(PlayerbotAI* botAI) { return new ArcaneBlastTrigger(botAI); }
         static Trigger* counterspell_enemy_healer(PlayerbotAI* botAI) { return new CounterspellEnemyHealerTrigger(botAI); }
         static Trigger* arcane_blast_stack(PlayerbotAI* botAI) { return new ArcaneBlastStackTrigger(botAI); }
+        static Trigger* mirror_image(PlayerbotAI* botAI) { return new MirrorImageTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
@@ -169,6 +171,7 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
             creators["counterspell on enemy healer"] = &MageAiObjectContextInternal::counterspell_on_enemy_healer;
             creators["fire ward"] = &MageAiObjectContextInternal::fire_ward;
             creators["frost ward"] = &MageAiObjectContextInternal::frost_ward;
+            creators["mirror image"] = &MageAiObjectContextInternal::mirror_image;
         }
 
     private:
@@ -211,6 +214,7 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* invisibility(PlayerbotAI* botAI) { return new CastInvisibilityAction(botAI); }
         static Action* evocation(PlayerbotAI* botAI) { return new CastEvocationAction(botAI); }
         static Action* counterspell_on_enemy_healer(PlayerbotAI* botAI) { return new CastCounterspellOnEnemyHealerAction(botAI); }
+        static Action* mirror_image(PlayerbotAI* botAI) { return new CastMirrorImageAction(botAI); }
 };
 
 MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

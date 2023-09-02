@@ -212,6 +212,7 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
             creators["totem of wrath"] = &ShamanAiObjectContextInternal::totem_of_wrath;
             creators["fire elemental totem"] = &ShamanAiObjectContextInternal::fire_elemental_totem;
             creators["wrath of air totem"] = &ShamanAiObjectContextInternal::wrath_of_air_totem;
+            creators["shamanistic rage"] = &ShamanAiObjectContextInternal::shamanistic_rage;
         }
 
     private:
@@ -273,6 +274,8 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* totem_of_wrath(PlayerbotAI* ai) { return new CastTotemOfWrathAction(ai); }
         static Action* fire_elemental_totem(PlayerbotAI* ai) { return new CastFireElementalTotemAction(ai); }
         static Action* wrath_of_air_totem(PlayerbotAI* ai) { return new CastWrathOfAirTotemAction(ai); }
+        static Action* shamanistic_rage(PlayerbotAI* ai) { return new CastShamanisticRageAction(ai); }
+        
         
 };
 

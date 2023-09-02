@@ -105,9 +105,9 @@ CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI* botAI) : GenericDruidStrat
 NextAction** CasterDruidStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("starfall", ACTION_NORMAL + 3),
+        new NextAction("starfall", ACTION_NORMAL + 2),
         new NextAction("wrath", ACTION_NORMAL + 1), 
-        new NextAction("starfire", ACTION_NORMAL), 
+        // new NextAction("starfire", ACTION_NORMAL), 
         nullptr);
 }
 
@@ -119,9 +119,11 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("insect swarm", NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), nullptr)));
 	triggers.push_back(new TriggerNode("moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
     triggers.push_back(new TriggerNode("eclipse (solar)", NextAction::array(0, new NextAction("wrath", ACTION_NORMAL + 6), nullptr)));
+    triggers.push_back(new TriggerNode("eclipse (lunar) cooldown", NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), nullptr)));
     triggers.push_back(new TriggerNode("eclipse (lunar)", NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 6), nullptr)));
+    triggers.push_back(new TriggerNode("eclipse (solar) cooldown", NextAction::array(0, new NextAction("wrath", ACTION_NORMAL + 2), nullptr)));
     triggers.push_back(new TriggerNode("moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
-	triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 5), NULL)));
+	triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 9), NULL)));
     triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode(
         "party member remove curse",
@@ -134,9 +136,9 @@ void CasterDruidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
 		"light aoe",
         NextAction::array(0,
-            new NextAction("starfall", ACTION_NORMAL + 4),
+            new NextAction("starfall", ACTION_NORMAL + 5),
 		    new NextAction("insect swarm on attacker", ACTION_NORMAL + 3), 
-            new NextAction("moonfire on attacker", ACTION_NORMAL + 2),
+            new NextAction("moonfire on attacker", ACTION_NORMAL + 3),
             NULL)));
 }
 

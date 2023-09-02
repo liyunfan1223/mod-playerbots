@@ -6,7 +6,9 @@
 #define _PLAYERBOT_DRUIDTRIGGERS_H
 
 #include "CureTriggers.h"
+#include "GenericTriggers.h"
 #include "SharedDefines.h"
+#include "Player.h"
 
 class PlayerbotAI;
 
@@ -32,6 +34,13 @@ class ThornsOnPartyTrigger : public BuffOnPartyTrigger
         ThornsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "thorns", 2 * 2000) { }
 
         bool IsActive() override;
+};
+
+class ThornsOnMainTankTrigger : public BuffOnMainTankTrigger
+{
+    public:
+        ThornsOnMainTankTrigger(PlayerbotAI* botAI) : BuffOnMainTankTrigger(botAI, "thorns", false, 2 * 2000) { }
+
 };
 
 class ThornsTrigger : public BuffTrigger
@@ -183,4 +192,23 @@ class DruidPartyMemberRemoveCurseTrigger : public PartyMemberNeedCureTrigger
     public:
         DruidPartyMemberRemoveCurseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "druid remove curse", DISPEL_CURSE) {}
 };
+
+class EclipseSolarCooldownTrigger : public SpellCooldownTrigger
+{
+    public:
+        EclipseSolarCooldownTrigger(PlayerbotAI* ai): SpellCooldownTrigger(ai, "eclipse (solar)") {}
+        bool IsActive() override {
+            return bot->HasSpellCooldown(48517);
+        }
+};
+
+class EclipseLunarCooldownTrigger : public SpellCooldownTrigger
+{
+    public:
+        EclipseLunarCooldownTrigger(PlayerbotAI* ai): SpellCooldownTrigger(ai, "eclipse (lunar)") {}
+        bool IsActive() override {
+            return bot->HasSpellCooldown(48518);
+        }
+};
+
 #endif
