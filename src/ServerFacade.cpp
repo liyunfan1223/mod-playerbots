@@ -46,13 +46,13 @@ bool ServerFacade::IsDistanceLessOrEqualThan(float dist1, float dist2)
 void ServerFacade::SetFacingTo(Player* bot, WorldObject* wo, bool force)
 {
     float angle = bot->GetAngle(wo);
-    if (!force && bot->isMoving())
-        bot->SetFacingTo(bot->GetAngle(wo));
-    else
-    {
+    // if (!force && bot->isMoving())
+    //     bot->SetFacingTo(bot->GetAngle(wo));
+    // else
+    // {
         bot->SetOrientation(angle);
         bot->SendMovementFlagUpdate();
-    }
+    // }
 }
 
 Unit* ServerFacade::GetChaseTarget(Unit* target)
