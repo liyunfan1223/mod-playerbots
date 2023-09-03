@@ -71,8 +71,10 @@ bool HasAggroTrigger::IsActive()
 
 bool PanicTrigger::IsActive()
 {
-    return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth &&
-		(!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana);
+    // return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth &&
+		// (!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana);
+    return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth || 
+    AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;// garfieldz90 - i think low health or with less mana would be reasonable for paicn
 }
 
 bool OutNumberedTrigger::IsActive()
@@ -82,19 +84,21 @@ bool OutNumberedTrigger::IsActive()
 
     if (bot->GetGroup() && bot->GetGroup()->isRaidGroup())
         return false;
-
+               
     int32 botLevel = bot->getLevel();
-    uint32 friendPower = 200;
+    // uint32 friendPower = 200;
+    uint32 friendPower = 0;
     uint32 foePower = 0;
     for (auto& attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
     {
         Creature* creature = botAI->GetCreature(attacker);
-        if (!creature)
-            continue;
+        // if (!creature)
+        //     continue;
 
-        int32 dLevel = creature->getLevel() - botLevel;
-        if (dLevel > -10)
-            foePower = std::max(100 + 10 * dLevel, dLevel * 200);
+        // int32 dLevel = creature->getLevel() - botLevel;
+        // if (dLevel > -10)
+        //     foePower = std::max(100 + 10 * dLevel, dLevel * 200);
+        foePower =+ creature->getLevel();
     }
 
     if (!foePower)
@@ -106,13 +110,22 @@ bool OutNumberedTrigger::IsActive()
         if (!player || player == bot)
             continue;
 
-        int32 dLevel = player->getLevel() - botLevel;
+        // int32 dLevel = player->getLevel() - botLevel;
 
-        if (dLevel > -10 && bot->GetDistance(player) < 10.0f)
-            friendPower += std::max(200 + 20 * dLevel, dLevel * 200);
+        // if (dLevel > -10 && bot->GetDistance(player) < 10.0f)
+        //     friendPower += std::max(200 + 20 * dLevel, dLevel * 200);
+
+        if (bot->GetDistance(player) < sPlayerbotAIConfig->farDistance)
+        {
+            uint32 calculatedFriendPower = player->getLevel() - botLevel;
+            if (calculatedFriendPower <= 0) 
+                calculatedFriendPower = 1;
+            friendPower =+ calculatedFriendPower;
+        }
     }
-
-    return friendPower < foePower;
+    
+    // return friendPower < foePower;
+    return bot->getLevel() + friendPower - foePower < -10;
 }
 
 bool BuffTrigger::IsActive()

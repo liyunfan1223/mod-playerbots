@@ -17,6 +17,7 @@ void NearestFriendlyPlayersValue::FindUnits(std::list<Unit*>& targets)
 
 bool NearestFriendlyPlayersValue::AcceptUnit(Unit* unit)
 {
-    ObjectGuid guid = unit->GetGUID();
-    return guid.IsPlayer() && guid != botAI->GetBot()->GetGUID();
+    // ObjectGuid guid = unit->GetGUID();
+    // return guid.IsPlayer() && guid != botAI->GetBot()->GetGUID();
+    return unit->GetGUID();// garfieldz90 - i think bot player is friendly player too
 }

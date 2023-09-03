@@ -21,6 +21,8 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 
 MovementAction::MovementAction(PlayerbotAI* botAI, std::string const name) : Action(botAI, name)
 {
@@ -1282,6 +1284,41 @@ bool FleeAction::isUseful()
     }
     return true;
 }
+
+bool MovementAction::AutoRunAway(Unit* target)
+{
+    std::vector<Unit*> targets;
+    Unit* botVictim = bot->GetVictim();
+    HostileReference* botRef = bot->getHostileRefMgr().getFirst();
+    while (botRef)
+    {
+        ThreatMgr* threatMgr = botRef->GetSource();
+        if (Unit* botTarget = threatMgr->GetOwner())
+        {
+            if (botTarget->CanSeeOrDetect(bot))
+        }
+    }
+    
+    return false;
+}
+
+bool AutoFleeAction::Execute(Event event)
+{
+    return AutoRunAway(AI_VALUE(Unit*, "current target"));
+}
+
+bool AutoFleeAction::isUseful()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    HostileReference* ref = target->GetThreatMgr().getCurrentVictim();
+    if (ref && ref->getTarget() == bot)
+    {
+        return true;
+    }
+    return false;
+}
+
+
 
 bool FleeWithPetAction::Execute(Event event)
 {
