@@ -217,38 +217,44 @@ class KelthuzadPositionAction : public MovementAction
 
 class AnubrekhanChooseTargetAction : public AttackAction
 {
-public:
-    AnubrekhanChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "anub'rekhan choose target") {}
-    virtual bool Execute(Event event);
+    public:
+        AnubrekhanChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "anub'rekhan choose target") {}
+        bool Execute(Event event) override;
 };
 
 class AnubrekhanPositionAction : public RotateAroundTheCenterPointAction
 {
-public:
-    AnubrekhanPositionAction(PlayerbotAI* ai) : RotateAroundTheCenterPointAction(ai, "anub'rekhan position", 3272.49f, -3476.27f, 45.0f, 16) {}
-    virtual bool Execute(Event event);
+    public:
+        AnubrekhanPositionAction(PlayerbotAI* ai) : RotateAroundTheCenterPointAction(ai, "anub'rekhan position", 3272.49f, -3476.27f, 45.0f, 16) {}
+        bool Execute(Event event) override;
 };
 
-// class GluthChooseTargetAction : public AttackAction
-// {
-// public:
-//     GluthChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "gluth choose target") {}
-//     virtual bool Execute(Event event);
-// };
+class GluthChooseTargetAction : public AttackAction
+{
+    public:
+        GluthChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "gluth choose target"), helper(ai) {}
+        bool Execute(Event event) override;
+    private:
+        GluthBossHelper helper;
+};
 
-// class GluthPositionAction : public RotateAroundTheCenterPointAction
-// {
-// public:
-//     GluthPositionAction(PlayerbotAI* ai) : RotateAroundTheCenterPointAction(ai, "gluth position", 3293.61f, -3149.01f, 12.0f, 12) {}
-//     virtual bool Execute(Event event);
-// };
+class GluthPositionAction : public RotateAroundTheCenterPointAction
+{
+    public:
+        GluthPositionAction(PlayerbotAI* ai) : RotateAroundTheCenterPointAction(ai, "gluth position", 3293.61f, -3149.01f, 12.0f, 12), helper(ai) {}
+        bool Execute(Event event) override;
+    private:
+        GluthBossHelper helper;
+};
 
-// class GluthSlowdownAction : public Action
-// {
-// public:
-//     GluthSlowdownAction(PlayerbotAI* ai) : Action(ai, "slowdown") {}
-//     virtual bool Execute(Event event);
-// };
+class GluthSlowdownAction : public Action
+{
+    public:
+        GluthSlowdownAction(PlayerbotAI* ai) : Action(ai, "gluth slowdown"), helper(ai) {}
+        bool Execute(Event event) override;
+    private:
+        GluthBossHelper helper;
+};
 
 // class LoathebPositionAction : public MovementAction
 // {

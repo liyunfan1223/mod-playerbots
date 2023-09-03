@@ -7,7 +7,7 @@
 #include "HealPriestStrategy.h"
 #include "Playerbots.h"
 
-GenericPriestStrategy::GenericPriestStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI)
+GenericPriestStrategy::GenericPriestStrategy(PlayerbotAI* botAI) : RangedCombatStrategy(botAI)
 {
     actionNodeFactories.Add(new GenericPriestStrategyActionNodeFactory());
 }

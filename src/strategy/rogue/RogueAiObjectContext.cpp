@@ -72,6 +72,7 @@ class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["main hand weapon no enchant"] = &RogueTriggerFactoryInternal::main_hand_weapon_no_enchant;
             creators["off hand weapon no enchant"] = &RogueTriggerFactoryInternal::off_hand_weapon_no_enchant;
             creators["tricks of the trade on main tank"] = &RogueTriggerFactoryInternal::tricks_of_the_trade_on_main_tank;
+            creators["adrenaline rush"] = &RogueTriggerFactoryInternal::adrenaline_rush;
         }
 
     private:
@@ -128,6 +129,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
             creators["use instant poison on main hand"] = &RogueAiObjectContextInternal::use_instant_poison;
             creators["use deadly poison on off hand"] = &RogueAiObjectContextInternal::use_deadly_poison;
             creators["fan of knives"] = &RogueAiObjectContextInternal::fan_of_knives;
+            creators["killing spree"] = &RogueAiObjectContextInternal::killing_spree;
         }
 
     private:
@@ -162,6 +164,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* use_instant_poison(PlayerbotAI* ai) { return new UseInstantPoisonAction(ai); }
         static Action* use_deadly_poison(PlayerbotAI* ai) { return new UseDeadlyPoisonAction(ai); }
         static Action* fan_of_knives(PlayerbotAI* ai) { return new FanOfKnivesAction(ai); }
+        static Action* killing_spree(PlayerbotAI* ai) { return new CastKillingSpreeAction(ai); }
 };
 
 RogueAiObjectContext::RogueAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

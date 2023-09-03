@@ -60,7 +60,7 @@ class CastDebuffSpellOnAttackerAction : public CastAuraSpellAction
 
         Value<Unit*>* GetTargetValue() override;
         std::string const getName() override { return spell + " on attacker"; }
-        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+        // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastDebuffSpellOnMeleeAttackerAction : public CastAuraSpellAction
@@ -70,7 +70,7 @@ class CastDebuffSpellOnMeleeAttackerAction : public CastAuraSpellAction
 
         Value<Unit*>* GetTargetValue() override;
         std::string const getName() override { return spell + " on attacker"; }
-        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+        // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastBuffSpellAction : public CastAuraSpellAction

@@ -720,11 +720,11 @@ AiPlayerbot.DefaultTalentsOrder.5.1 =
 AiPlayerbot.RandomClassSpecProbability.5.2 = 30
 AiPlayerbot.DefaultTalentsOrder.5.2 =
 # DeathKnight
-AiPlayerbot.RandomClassSpecProbability.6.0 = 33
+AiPlayerbot.RandomClassSpecProbability.6.0 = 30
 AiPlayerbot.DefaultTalentsOrder.6.0 =
-AiPlayerbot.RandomClassSpecProbability.6.1 = 33
+AiPlayerbot.RandomClassSpecProbability.6.1 = 40
 AiPlayerbot.DefaultTalentsOrder.6.1 =
-AiPlayerbot.RandomClassSpecProbability.6.2 = 33
+AiPlayerbot.RandomClassSpecProbability.6.2 = 30
 AiPlayerbot.DefaultTalentsOrder.6.2 =
 # Shaman
 AiPlayerbot.RandomClassSpecProbability.7.0 = 33

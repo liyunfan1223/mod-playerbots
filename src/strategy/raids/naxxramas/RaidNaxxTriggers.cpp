@@ -158,27 +158,32 @@ bool SapphironFlightTrigger::IsActive()
 //     return BossPhaseTrigger::IsActive() && !botAI->IsMainTank(bot) && botAI->HasAura("chill", bot);
 // }
 
-// bool GluthMainTankMortalWoundTrigger::IsActive()
-// {
-//     if (!BossPhaseTrigger::IsActive()) {
-//         return false;
-//     }
-//     if (!botAI->IsAssistTankOfIndex(bot, 0)) {
-//         return false;
-//     }
-//     Unit* mt = AI_VALUE(Unit*, "main tank");
-//     if (!mt) {
-//         return false;
-//     }
-//     Aura* aura = botAI->GetAuraWithDuration("mortal wound", mt);
-//     if (!aura || aura->GetStackAmount() < 5) {
-//         return false;
-//     }
-//     // bot->Yell("Time to taunt!", LANG_UNIVERSAL);
-//     return true;
-// }
+bool GluthTrigger::IsActive()
+{
+    return helper.UpdateBossAI();
+}
 
-bool KelthuzadTrigger::IsActive() {
+bool GluthMainTankMortalWoundTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    if (!botAI->IsAssistTankOfIndex(bot, 0)) {
+        return false;
+    }
+    Unit* mt = AI_VALUE(Unit*, "main tank");
+    if (!mt) {
+        return false;
+    }
+    Aura* aura = botAI->GetAura("mortal wound", mt, false, true);
+    if (!aura || aura->GetStackAmount() < 5) {
+        return false;
+    }
+    return true;
+}
+
+bool KelthuzadTrigger::IsActive() 
+{
     return helper.UpdateBossAI();
 }
 

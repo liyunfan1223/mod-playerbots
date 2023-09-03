@@ -146,6 +146,7 @@ class CastGhoulFrenzyAction : public CastBuffSpellAction
 {
 	public:
 		CastGhoulFrenzyAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ghoul frenzy") { }
+		std::string const GetTargetName() override { return "pet target"; }
 };
 
 BEGIN_MELEE_SPELL_ACTION(CastCorpseExplosionAction, "corpse explosion")

@@ -242,4 +242,10 @@ class CastPresenceOfMindAction : public CastBuffSpellAction
         CastPresenceOfMindAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "presence of mind") { }
 };
 
+class CastMirrorImageAction : public CastBuffSpellAction
+{
+    public:
+        CastMirrorImageAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mirror image") {}
+};
+
 #endif

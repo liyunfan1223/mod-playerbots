@@ -99,4 +99,5 @@ void BloodDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("lose aggro", NextAction::array(0, new NextAction("dark command", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("blood tap", ACTION_HIGH + 5),
         new NextAction("vampiric blood", ACTION_HIGH + 3), new NextAction("death strike", ACTION_HIGH + 4), nullptr)));
+	
 }

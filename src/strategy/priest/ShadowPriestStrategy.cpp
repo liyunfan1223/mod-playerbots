@@ -25,7 +25,7 @@ void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPriestStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_MOVE + 9), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_MOVE + 9), nullptr)));
     triggers.push_back(new TriggerNode("shadowform", NextAction::array(0, new NextAction("shadowform", ACTION_HIGH), nullptr)));
     //triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("dispersion", ACTION_EMERGENCY + 5), nullptr)));
     triggers.push_back(new TriggerNode("vampiric embrace", NextAction::array(0, new NextAction("vampiric embrace", 16.0f), nullptr)));
@@ -38,8 +38,9 @@ void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("shadow word: pain on attacker", NextAction::array(0, new NextAction("shadow word: pain on attacker", ACTION_HIGH + 1), nullptr)));
-    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("mind sear", ACTION_HIGH + 4), nullptr)));
+    triggers.push_back(new TriggerNode("shadow word: pain on attacker", NextAction::array(0, new NextAction("shadow word: pain on attacker", ACTION_NORMAL + 5), nullptr)));
+    triggers.push_back(new TriggerNode("vampiric touch on attacker", NextAction::array(0, new NextAction("vampiric touch on attacker", ACTION_NORMAL + 4), nullptr)));
+    // triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("mind sear", ACTION_HIGH + 4), nullptr)));
 }
 
 void ShadowPriestDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

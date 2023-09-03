@@ -22,6 +22,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
             creators["swipe"] = &swipe;
             creators["lacerate"] = &lacerate;
             creators["demoralizing roar"] = &demoralizing_roar;
+            creators["taunt spell"] = &growl;
         }
 
     private:

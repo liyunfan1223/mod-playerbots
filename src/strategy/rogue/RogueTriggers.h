@@ -21,12 +21,12 @@ class SliceAndDiceTrigger : public BuffTrigger
         SliceAndDiceTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "slice and dice") { }
 };
 
-class AdrenalineRushTrigger : public BuffTrigger
+class AdrenalineRushTrigger : public BoostTrigger
 {
     public:
-        AdrenalineRushTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "adrenaline rush") { }
+        AdrenalineRushTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "adrenaline rush") { }
 
-        bool isPossible();
+        // bool isPossible();
 };
 
 class RuptureTrigger : public DebuffTrigger

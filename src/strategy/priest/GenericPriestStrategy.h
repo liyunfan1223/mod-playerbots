@@ -6,10 +6,11 @@
 #define _PLAYERBOT_GENERICPRIESTSTRATEGY_H
 
 #include "CombatStrategy.h"
+#include "RangedCombatStrategy.h"
 
 class PlayerbotAI;
 
-class GenericPriestStrategy : public CombatStrategy
+class GenericPriestStrategy : public RangedCombatStrategy
 {
     public:
         GenericPriestStrategy(PlayerbotAI* botAI);

@@ -36,9 +36,9 @@ bool AttackAnythingAction::isUseful()
     if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && 
         ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
         return false;
-    if (bot->IsInCombat()) {
-        return false;
-    }
+    // if (bot->IsInCombat()) {
+    //     return false;
+    // }
     Unit* target = GetTarget();
 
     if (!target)
@@ -107,7 +107,7 @@ bool AttackAnythingAction::Execute(Event event)
             {
                 context->GetValue<ObjectGuid>("pull target")->Set(grindTarget->GetGUID());
                 bot->GetMotionMaster()->Clear();
-                bot->StopMoving();
+                // bot->StopMoving();
             }
         }
     }

@@ -19,6 +19,7 @@ class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["heroic throw on snare target"] = &heroic_throw_on_snare_target;
             creators["heroic throw taunt"] = &heroic_throw_taunt;
             creators["taunt"] = &taunt;
+            creators["taunt spell"] = &taunt;
         }
 
     private:

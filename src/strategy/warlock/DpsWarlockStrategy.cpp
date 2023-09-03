@@ -78,19 +78,23 @@ void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
 		"decimation",
 		NextAction::array(0, new NextAction("soul fire", 16.0f), NULL)));
+    
+    triggers.push_back(new TriggerNode(
+		"metamorphosis",
+		NextAction::array(0, new NextAction("metamorphosis", 20.0f), NULL)));
 }
 
 void DpsAoeWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("rain of fire", 37.0f), nullptr)));
     triggers.push_back(new TriggerNode("corruption on attacker", NextAction::array(0, new NextAction("corruption on attacker", 27.0f), nullptr)));
-    // triggers.push_back(new TriggerNode("curse of agony on attacker", NextAction::array(0, new NextAction("curse of agony on attacker", 28.0f), nullptr)));
     triggers.push_back(new TriggerNode("unstable affliction on attacker", NextAction::array(0, new NextAction("unstable affliction on attacker", 26.0f), NULL)));
+    triggers.push_back(new TriggerNode("curse of agony on attacker", NextAction::array(0, new NextAction("curse of agony on attacker", 25.0f), nullptr)));
 }
 
 void DpsWarlockDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("corruption", NextAction::array(0, new NextAction("corruption", 22.0f), nullptr)));
-    triggers.push_back(new TriggerNode("curse of agony", NextAction::array(0, new NextAction("curse of agony", 20.0f), nullptr)));
     triggers.push_back(new TriggerNode("unstable affliction", NextAction::array(0, new NextAction("unstable affliction", 21.0f), NULL)));
+    triggers.push_back(new TriggerNode("curse of agony", NextAction::array(0, new NextAction("curse of agony", 20.0f), nullptr)));
 }
