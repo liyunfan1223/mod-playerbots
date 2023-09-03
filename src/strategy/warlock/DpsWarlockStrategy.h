@@ -6,6 +6,7 @@
 #define _PLAYERBOT_DPSWARLOCKSTRATEGY_H
 
 #include "GenericWarlockStrategy.h"
+#include "Strategy.h"
 
 class PlayerbotAI;
 
@@ -17,6 +18,7 @@ class DpsWarlockStrategy : public GenericWarlockStrategy
         std::string const getName() override { return "dps"; }
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
         NextAction** getDefaultActions() override;
+        uint32 GetType() const override { return GenericWarlockStrategy::GetType() | STRATEGY_TYPE_DPS; }
 };
 
 class DpsAoeWarlockStrategy : public CombatStrategy

@@ -15,6 +15,7 @@ class TankPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["seal of vengeance"] = &seal_of_vengeance;
             creators["seal of command"] = &seal_of_command;
             creators["hand of reckoning"] = &hand_of_reckoning;
+            creators["taunt spell"] = &hand_of_reckoning;
         }
 
     private:

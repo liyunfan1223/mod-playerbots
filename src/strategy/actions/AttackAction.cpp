@@ -104,16 +104,17 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     
     if (Pet* pet = bot->GetPet())
     {
-        pet->SetReactState(REACT_PASSIVE);
         if (with_pet) {
+            pet->SetReactState(REACT_DEFENSIVE);
             pet->SetTarget(target->GetGUID());
             pet->GetCharmInfo()->SetIsCommandAttack(true);
             pet->AI()->AttackStart(target);
             // pet->SetReactState(REACT_DEFENSIVE);
         } else {
+            pet->SetReactState(REACT_PASSIVE);
             pet->GetCharmInfo()->SetIsCommandFollow(true);
             pet->GetCharmInfo()->IsReturning();
-            pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
+            // pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
     }
 

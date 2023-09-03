@@ -24,7 +24,7 @@ class CastAutoShotAction : public CastSpellAction
 {
     public:
         CastAutoShotAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "auto shot") { }
-
+        ActionThreatType getThreatType() override { return ActionThreatType::None; }
         bool isUseful() override;
 };
 

@@ -197,18 +197,23 @@ class SapphironFlightTrigger : public Trigger
 //     KelthuzadPhaseTwoTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "kel'thuzad", 1 << (2 - 1), "kel'thuzad trigger") {}
 // };
 
-// class GluthTrigger : public BossPhaseTrigger
-// {
-// public:
-//     GluthTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "gluth", 0, "gluth trigger") {}
-// };
+class GluthTrigger : public Trigger
+{
+    public:
+        GluthTrigger(PlayerbotAI* ai) : Trigger(ai, "gluth trigger"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        GluthBossHelper helper;
+};
 
-// class GluthMainTankMortalWoundTrigger : public BossPhaseTrigger
-// {
-// public:
-//     GluthMainTankMortalWoundTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "gluth", 0, "gluth main tank mortal wound trigger") {}
-//     virtual bool IsActive();
-// };
+class GluthMainTankMortalWoundTrigger : public Trigger
+{
+    public:
+        GluthMainTankMortalWoundTrigger(PlayerbotAI* ai) : Trigger(ai, "gluth main tank mortal wound trigger"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        GluthBossHelper helper;
+};
 
 // class LoathebTrigger : public BossPhaseTrigger
 // {

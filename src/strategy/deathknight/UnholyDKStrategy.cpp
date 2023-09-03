@@ -63,23 +63,30 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		}
 };
 
+UnholyDKStrategy::UnholyDKStrategy(PlayerbotAI* botAI) : GenericDKStrategy(botAI)
+{
+    actionNodeFactories.Add(new UnholyDKStrategyActionNodeFactory());
+}
+
+
 NextAction** UnholyDKStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
 		new NextAction("scourge strike", ACTION_NORMAL + 6), 
 		new NextAction("blood strike", ACTION_NORMAL + 5), 
-		new NextAction("death coil", ACTION_NORMAL + 4),
-		new NextAction("plague strike", ACTION_NORMAL + 3), 
-		new NextAction("icy touch", ACTION_NORMAL + 2), 
+		new NextAction("ghoul frenzy", ACTION_NORMAL + 4), 
+		new NextAction("death coil", ACTION_NORMAL + 3),
+		new NextAction("plague strike", ACTION_NORMAL + 2), 
+		new NextAction("icy touch", ACTION_NORMAL + 1), 
 		new NextAction("melee", ACTION_NORMAL), 
-		NULL);
+		nullptr);
 }
 
 void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
 
-	triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("ghoul frenzy", ACTION_NORMAL + 2), nullptr)));
+	// triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction(, ACTION_NORMAL + 2), nullptr)));
 	triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("death pact", ACTION_EMERGENCY + 1), nullptr)));
 }
 

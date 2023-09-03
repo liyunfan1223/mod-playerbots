@@ -2,6 +2,7 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
+#include "MotionMaster.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectGuid.h"
@@ -31,6 +32,7 @@
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
+#include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
 #include "GuildMgr.h"
@@ -210,7 +212,35 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             TellMaster("Logout cancelled!");
         }
     }
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
+    //     bot->Say("Falling!", LANG_UNIVERSAL);
+    // }
+    // if (!bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && bot->GetPositionZ() - bot->GetFloorZ() > 0.1f) {
+    //     bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    //     // bot->GetMotionMaster()->MoveFall();
+    // }
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && bot->GetPositionZ() - bot->GetFloorZ() <= 0.1f) {
+    //     bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    // }
+    //  else {
+    //     bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    // }
 
+    // bot->SendMovementFlagUpdate();
+
+    // bot->GetMotionMaster()->MoveFall();
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
+    //     // bot->GetUnitMovementFlags();
+    //     bot->Say("falling... flag: " + std::to_string(bot->GetUnitMovementFlags()), LANG_UNIVERSAL);
+    // }
+    // bot->SendMovementFlagUpdate();
+    // float x, y, z;
+    // bot->GetPosition(x, y, z);
+    // bot->UpdateGroundPositionZ(x, y, z);
+    // if (bot->GetPositionZ() - z > 0.1f) {
+
+    // }
+    
     // wake up if in combat
     // if (bot->IsInCombat())
     // {
@@ -804,6 +834,11 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             // bot->Say(speak, LANG_UNIVERSAL);
             // bot->GetClosePoint(x, y, z, bot->GetObjectSize(), dist, bot->GetAngle(vcos, vsin));
             bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, bot->GetSelectedUnit());
+            // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+            // bot->AddUnitMovementFlag(MOVEMENTFLAG_FORWARD);
+            // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
+            // if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
+            //     bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
             // bot->GetMotionMaster()->MoveIdle();
             // Position dest = bot->GetPosition();
             // float moveTimeHalf = verticalSpeed / Movement::gravity;
@@ -818,33 +853,30 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             // SetNextCheckDelay((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
 
             // // add moveflags
-            // bot->m_movementInfo.SetMovementFlags(MOVEMENTFLAG_FALLING);
-            // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FORWARD);
-            // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
-            // if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
-            //     bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
 
             // // copy MovementInfo
             // MovementInfo movementInfo = bot->m_movementInfo;
 
             // // send ack
             // WorldPacket ack(CMSG_MOVE_KNOCK_BACK_ACK);
-            // movementInfo.jump.cosAngle = vcos;
-            // movementInfo.jump.sinAngle = vsin;
-            // movementInfo.jump.zspeed = -verticalSpeed;
-            // movementInfo.jump.xyspeed = horizontalSpeed;
+            // // movementInfo.jump.cosAngle = vcos;
+            // // movementInfo.jump.sinAngle = vsin;
+            // // movementInfo.jump.zspeed = -verticalSpeed;
+            // // movementInfo.jump.xyspeed = horizontalSpeed;
             // ack << bot->GetGUID().WriteAsPacked();
-            // bot->m_mover->BuildMovementPacket(&ack);
-            // ack << movementInfo.jump.sinAngle;
-            // ack << movementInfo.jump.cosAngle;
-            // ack << movementInfo.jump.xyspeed;
-            // ack << movementInfo.jump.zspeed;
+            // // bot->m_mover->BuildMovementPacket(&ack);
+            // ack << (uint32)0;
+            // bot->BuildMovementPacket(&ack);
+            // // ack << movementInfo.jump.sinAngle;
+            // // ack << movementInfo.jump.cosAngle;
+            // // ack << movementInfo.jump.xyspeed;
+            // // ack << movementInfo.jump.zspeed;
             // bot->GetSession()->HandleMoveKnockBackAck(ack);
 
-            // // set jump destination for MSG_LAND packet
-            // SetJumpDestination(Position(fx, fy, fz, bot->GetOrientation()));
-
-            //bot->SendHeartBeat();
+            // // // set jump destination for MSG_LAND packet
+            // SetJumpDestination(Position(x, y, z, bot->GetOrientation()));
+            
+            // bot->Heart();
 
             // */
             return;
@@ -1617,6 +1649,37 @@ bool PlayerbotAI::IsMainTank(Player* player)
 bool PlayerbotAI::IsAssistTank(Player* player)
 {
     return IsTank(player) && !IsMainTank(player);
+}
+
+bool PlayerbotAI::IsAssistTankOfIndex(Player* player, int index)
+{
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return false;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (group->IsAssistant(member->GetGUID()) && IsAssistTank(member)) {
+            if (index == counter) {
+                return player == member;
+            }
+            counter++;
+        }
+    }
+    // not enough
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (!group->IsAssistant(member->GetGUID()) && IsAssistTank(member)) {
+            if (index == counter) {
+                return player == member;
+            }
+            counter++;
+        }
+    }
+    return false;
+    
 }
 
 namespace acore
@@ -2876,8 +2939,8 @@ void PlayerbotAI::WaitForSpellCast(Spell* spell)
     castTime = ceil(castTime);
 
     uint32 globalCooldown = CalculateGlobalCooldown(spellInfo->Id);
-    if (castTime < globalCooldown)
-        castTime = globalCooldown;
+    // if (castTime < globalCooldown)
+    //     castTime = globalCooldown;
 
     SetNextCheckDelay(castTime + sPlayerbotAIConfig->reactDelay);
 }

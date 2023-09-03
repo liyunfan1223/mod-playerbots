@@ -39,8 +39,8 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
 
             creators["anub'rekhan"] = &RaidNaxxTriggerContext::anubrekhan;
 
-            // creators["gluth"] = &RaidNaxxTriggerContext::gluth;
-            // creators["gluth main tank mortal wound"] = &RaidNaxxTriggerContext::gluth_main_tank_mortal_wound;
+            creators["gluth"] = &RaidNaxxTriggerContext::gluth;
+            creators["gluth main tank mortal wound"] = &RaidNaxxTriggerContext::gluth_main_tank_mortal_wound;
             
             // creators["loatheb"] = &RaidNaxxTriggerContext::loatheb;
         }
@@ -66,8 +66,8 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
         static Trigger* kelthuzad(PlayerbotAI* ai) { return new KelthuzadTrigger(ai); }
         // static Trigger* kelthuzad_phase_two(PlayerbotAI* ai) { return new KelthuzadPhaseTwoTrigger(ai); }
         static Trigger* anubrekhan(PlayerbotAI* ai) { return new AnubrekhanTrigger(ai); }
-        // static Trigger* gluth(PlayerbotAI* ai) { return new GluthTrigger(ai); }
-        // static Trigger* gluth_main_tank_mortal_wound(PlayerbotAI* ai) { return new GluthMainTankMortalWoundTrigger(ai); }
+        static Trigger* gluth(PlayerbotAI* ai) { return new GluthTrigger(ai); }
+        static Trigger* gluth_main_tank_mortal_wound(PlayerbotAI* ai) { return new GluthMainTankMortalWoundTrigger(ai); }
         // static Trigger* loatheb(PlayerbotAI* ai) { return new LoathebTrigger(ai); }
 };
 

@@ -407,7 +407,8 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
     else
     {
-        botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
+        // botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
+        botAI->ResetStrategies();
     }
 
     if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))

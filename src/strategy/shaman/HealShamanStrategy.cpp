@@ -41,7 +41,7 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), nullptr)));
     triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("earthliving weapon", 22.0f), nullptr)));
     triggers.push_back(new TriggerNode(
 		"group heal occasion",
