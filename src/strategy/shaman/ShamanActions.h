@@ -402,4 +402,10 @@ class CastWrathOfAirTotemAction : public CastTotemAction
 	public:
 		CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem") {}
 };
+
+class CastShamanisticRageAction : public CastBuffSpellAction
+{
+	public:
+		CastShamanisticRageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "shamanistic rage") {}
+};
 #endif

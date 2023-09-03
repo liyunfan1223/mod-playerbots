@@ -87,13 +87,13 @@ public:
 //     virtual float GetValue(Action* action);
 // };
 
-// class GluthGenericMultiplier : public Multiplier
-// {
-// public:
-//     GluthGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "gluth generic") {}
-
-// public:
-//     virtual float GetValue(Action* action);
-// };
+class GluthGenericMultiplier : public Multiplier
+{
+    public:
+        GluthGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "gluth generic"), helper(ai) {}
+        float GetValue(Action* action) override;
+    private:
+        GluthBossHelper helper;
+};
 
 #endif

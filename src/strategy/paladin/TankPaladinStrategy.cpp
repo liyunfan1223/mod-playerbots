@@ -15,6 +15,7 @@ class TankPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["seal of vengeance"] = &seal_of_vengeance;
             creators["seal of command"] = &seal_of_command;
             creators["hand of reckoning"] = &hand_of_reckoning;
+            creators["taunt spell"] = &hand_of_reckoning;
         }
 
     private:
@@ -25,6 +26,13 @@ class TankPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         //         /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
         //         /*C*/ nullptr);
         // }
+        static ActionNode* seal_of_command([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("seal of command",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("seal of corruption"), nullptr),
+                /*C*/ nullptr);
+        }
         static ActionNode* seal_of_corruption([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("seal of corruption",
@@ -36,14 +44,6 @@ class TankPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("seal of vengeance",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of command"), nullptr),
-                /*C*/ nullptr);
-        }
-
-        static ActionNode* seal_of_command([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("seal of command",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
                 /*C*/ nullptr);
@@ -72,8 +72,8 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of corruption", 90.0f), nullptr)));
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", 91.0f), nullptr)));
+    triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 9), nullptr)));
     // triggers.push_back(new TriggerNode("devotion aura", NextAction::array(0, new NextAction("devotion aura", 90.0f), NULL)));
 
     triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("avenger's shield", ACTION_HIGH + 5), nullptr)));

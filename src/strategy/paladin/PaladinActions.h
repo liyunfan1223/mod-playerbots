@@ -375,4 +375,10 @@ class CastSacredShieldOnMainTankAction : public BuffOnMainTankAction
 public:
 	CastSacredShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "sacred shield", false) {}
 };
+
+class CastAvengingWrathAction : public CastBuffSpellAction
+{
+	public:
+		CastAvengingWrathAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "avenging wrath") {}
+};
 #endif

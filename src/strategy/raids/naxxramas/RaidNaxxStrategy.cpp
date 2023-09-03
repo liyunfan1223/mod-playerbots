@@ -98,21 +98,19 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// 	"sapphiron chill", 
 	// 	NextAction::array(0, new NextAction("sapphiron avoid chill", ACTION_RAID + 1), NULL)));
 	
+	// Gluth
+	triggers.push_back(new TriggerNode(
+		"gluth", 
+		NextAction::array(0, 
+			new NextAction("gluth choose target", ACTION_RAID + 1), 
+   			new NextAction("gluth position", ACTION_RAID + 1),
+			new NextAction("gluth slowdown", ACTION_RAID),
+		NULL)));
 	
-
-	// // Gluth
-	// triggers.push_back(new TriggerNode(
-	// 	"gluth", 
-	// 	NextAction::array(0, 
-	// 		new NextAction("gluth choose target", ACTION_RAID + 1), 
-   	// 		new NextAction("gluth position", ACTION_RAID + 1),
-	// 		new NextAction("gluth slowdown", ACTION_RAID),
-	// 	NULL)));
-	
-	// triggers.push_back(new TriggerNode(
-	// 	"gluth main tank mortal wound", 
-	// 	NextAction::array(0, 
-	// 		new NextAction("taunt spell", ACTION_RAID + 1), NULL)));
+	triggers.push_back(new TriggerNode(
+		"gluth main tank mortal wound", 
+		NextAction::array(0, 
+			new NextAction("taunt spell", ACTION_RAID + 1), NULL)));
 
 	// // Loatheb
 	// triggers.push_back(new TriggerNode(
@@ -126,13 +124,13 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
 	multipliers.push_back(new HeiganDanceMultiplier(botAI));
-	// multipliers.push_back(new LoathebGenericMultiplier(ai));
-	// multipliers.push_back(new ThaddiusGenericMultiplier(ai));
+	// multipliers.push_back(new LoathebGenericMultiplier(botAI));
+	// multipliers.push_back(new ThaddiusGenericMultiplier(botAI));
 	multipliers.push_back(new SapphironGenericMultiplier(botAI));
 	multipliers.push_back(new InstructorRazuviousGenericMultiplier(botAI));
 	multipliers.push_back(new KelthuzadGenericMultiplier(botAI));
 	multipliers.push_back(new AnubrekhanGenericMultiplier(botAI));
-	// multipliers.push_back(new FourhorsemanGenericMultiplier(ai));
-	// multipliers.push_back(new GothikGenericMultiplier(ai));
-	// multipliers.push_back(new GluthGenericMultiplier(ai));
+	// multipliers.push_back(new FourhorsemanGenericMultiplier(botAI));
+	// multipliers.push_back(new GothikGenericMultiplier(botAI));
+	multipliers.push_back(new GluthGenericMultiplier(botAI));
 }

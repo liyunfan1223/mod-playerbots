@@ -110,11 +110,6 @@ class SapphironBossHelper: public GenericBossHelper<boss_sapphiron::boss_sapphir
             return !IsPhaseGround();
         }
         bool JustLanded() {
-            // if (event_map_->GetTimer() <= POSITION_TIME_AFTER_LANDED) {
-            //     return true;
-            // }
-            // LOG_DEBUG("playerbots", "JustLanded lastEventGround: {}", lastEventGround);
-            // return timer_ >= lastEventGround && timer_ - lastEventGround <= POSITION_TIME_AFTER_LANDED;
             return (event_map_->GetNextEventTime(EVENT_FLIGHT_START) - timer_) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
         }
         bool WaitForExplosion() {
@@ -161,8 +156,28 @@ class SapphironBossHelper: public GenericBossHelper<boss_sapphiron::boss_sapphir
     private:
         const uint32 POSITION_TIME_AFTER_LANDED = 5000;
         const uint32 EVENT_FLIGHT_INTERVAL = 45000;
-        uint32 lastEventGround = 0;
+        uint32 lastEventGround = 0;    
+};
+
+class GluthBossHelper: public GenericBossHelper<boss_gluth::boss_gluthAI> {
+    public:
+        const std::pair<float, float> mainTankPos25 = {3331.48f, -3109.06f};
+        const std::pair<float, float> mainTankPos10 = {3278.29f, -3162.06f};
+        const std::pair<float, float> beforeDecimatePos = {3267.34f, -3175.68f};
+        const std::pair<float, float> leftSlowDownPos = {3290.68f, -3141.65f};
+        const std::pair<float, float> rightSlowDownPos = {3300.78f, -3151.98f};
+        const std::pair<float, float> rangedPos = {3301.45f, -3139.29f};
+        const std::pair<float, float> healPos = {3303.09f, -3135.24f};
         
+        const float decimatedZombiePct = 10.0f;
+        GluthBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "gluth") {}
+        bool BeforeDecimate() {
+            uint32 decimate = event_map_->GetNextEventTime(GLUTH_EVENT_DECIMATE);
+            return decimate && decimate - timer_ <= 3000;
+        }
+        bool JustStartCombat() {
+            return timer_ < 10000;
+        }
 };
 
 #endif

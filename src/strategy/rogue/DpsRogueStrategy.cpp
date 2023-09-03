@@ -70,7 +70,9 @@ DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* botAI) : MeleeCombatStrategy(bot
 
 NextAction** DpsRogueStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
+    return NextAction::array(0, 
+        new NextAction("killing spree", ACTION_NORMAL + 1),
+        new NextAction("melee", ACTION_NORMAL), NULL);
 }
 
 void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -105,9 +107,9 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 		"kick on enemy healer",
 		NextAction::array(0, new NextAction("kick on enemy healer", ACTION_INTERRUPT + 1), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "behind target",
-        NextAction::array(0, new NextAction("backstab", ACTION_NORMAL), NULL)));
+    // triggers.push_back(new TriggerNode(
+    //     "behind target",
+    //     NextAction::array(0, new NextAction("backstab", ACTION_NORMAL), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"light aoe",

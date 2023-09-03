@@ -17,11 +17,14 @@ bool PestilenceTrigger::IsActive() {
     if (!SpellTrigger::IsActive()) {
         return false;
     }
+    if (!bot->HasAura(63334)) {
+        return false;
+    }
     Aura *blood_plague = botAI->GetAura("blood plague", GetTarget(), true, true);
     Aura *frost_fever = botAI->GetAura("frost fever", GetTarget(), true, true);
-    if ((blood_plague && blood_plague->GetDuration() <= 5000) ||
-        (frost_fever && frost_fever->GetDuration() <= 5000)) {
+    if ((blood_plague && blood_plague->GetDuration() <= 3000) ||
+        (frost_fever && frost_fever->GetDuration() <= 3000)) {
             return true;
-        }
+    }
     return false;
 }

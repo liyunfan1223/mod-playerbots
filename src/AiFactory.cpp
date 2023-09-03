@@ -263,7 +263,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (!player->InBattleground())
     {
+<<<<<<< HEAD
         engine->addStrategies("racials", "chat", "default", "cast time", "duel", "auto flee", nullptr);
+=======
+        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
+>>>>>>> 7bdc771c7523ca400b04b75cfcfc915bc70b06c6
     }
 
     switch (player->getClass())
@@ -302,7 +306,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else if (tab == 2)
                 engine->addStrategies("heal", "bmana", nullptr);
             else
-                engine->addStrategies("melee", "melee aoe", "bdps", "threat", nullptr);
+                engine->addStrategies("melee", "melee aoe", "bmana", "threat", nullptr);
 
             engine->addStrategies("dps assist", "cure", "totems", nullptr);
             break;

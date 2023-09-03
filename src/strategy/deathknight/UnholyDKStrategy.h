@@ -12,7 +12,7 @@ class PlayerbotAI;
 class UnholyDKStrategy : public GenericDKStrategy
 {
     public:
-        UnholyDKStrategy(PlayerbotAI* botAI) : GenericDKStrategy(botAI) { }
+        UnholyDKStrategy(PlayerbotAI* botAI);
 
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;
         std::string const getName() override { return "unholy"; }

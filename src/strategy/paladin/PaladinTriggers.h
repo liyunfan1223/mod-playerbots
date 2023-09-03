@@ -6,6 +6,7 @@
 #define _PLAYERBOT_PALADINTRIGGERS_H
 
 #include "CureTriggers.h"
+#include "GenericTriggers.h"
 #include "SharedDefines.h"
 #include "Unit.h"
 
@@ -215,5 +216,11 @@ class BlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
         BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2 * 2000) { }
+};
+
+class AvengingWrathTrigger : public BoostTrigger
+{
+    public:
+        AvengingWrathTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "avenging wrath") {}
 };
 #endif

@@ -407,7 +407,8 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
     else
     {
-        botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
+        // botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
+        botAI->ResetStrategies();
     }
 
     if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))
@@ -641,8 +642,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     char* charname = strtok (nullptr, " ");
     if (!cmd)
     {
-        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
-        messages.push_back("       addclass CLASSNAME");
+        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME");
         return messages;
     }
 
@@ -714,6 +714,10 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "addclass"))
     {
+        if (!charname) {
+            messages.push_back("addclass: invalid CLASSNAME(warrior/paladin/hunter/rogue/priest/shaman/mage/warlock/druid/dk)");
+            return messages;
+        }
         uint8 claz;
         if (!strcmp(charname, "warrior"))
         {

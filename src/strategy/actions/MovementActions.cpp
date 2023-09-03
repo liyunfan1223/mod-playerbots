@@ -3,6 +3,7 @@
  */
 
 #include "MovementActions.h"
+#include "MotionMaster.h"
 #include "MovementGenerator.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
@@ -170,9 +171,11 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             bot->CastStop();
             botAI->InterruptSpell();
         }
-
         bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
                 !bot->IsFlying() && !bot->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !bot->IsInWater();
+        // char speak[100];
+        // sprintf(speak, "Move to : (%.2f, %.2f, %.2f), generatePath: %d", x, y, z, generatePath);
+        // bot->Say(speak, LANG_UNIVERSAL);
         MotionMaster &mm = *bot->GetMotionMaster();
         mm.Clear();
         mm.MovePoint(mapId, x, y, z, generatePath);
@@ -754,6 +757,13 @@ bool MovementAction::IsMovingAllowed()
         bot->HasUnitState(UNIT_STATE_LOST_CONTROL))
         return false;
 
+    if (bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE) {
+        return false;
+    }
+
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
+    //     return false;
+    // }
     return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE;
 }
 
@@ -775,7 +785,6 @@ void MovementAction::UpdateMovementState()
 
     if (bot->IsFlying())
         bot->UpdateSpeed(MOVE_FLIGHT, true);
-
     // Temporary speed increase in group
     //if (botAI->HasRealPlayerMaster())
         //bot->SetSpeedRate(MOVE_RUN, 1.1f);

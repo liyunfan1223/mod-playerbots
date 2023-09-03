@@ -325,7 +325,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool ContainsStrategy(StrategyType type);
         bool HasStrategy(std::string const name, BotState type);
         BotState GetState() { return currentState; };
-        void ResetStrategies(bool load = true);
+        void ResetStrategies(bool load = false);
         void ReInitCurrentEngine();
         void Reset(bool full = false);
         bool IsTank(Player* player);
@@ -335,7 +335,6 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsRangedDps(Player* player);
         bool IsMainTank(Player* player);
         bool IsAssistTank(Player* player);
-
         bool IsAssistTankOfIndex(Player* player, int index);
         bool IsHealAssistantOfIndex(Player* player, int index);
         bool IsRangedDpsAssistantOfIndex(Player* player, int index);

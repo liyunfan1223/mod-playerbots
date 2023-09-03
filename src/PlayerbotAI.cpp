@@ -2,6 +2,9 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
+#include "MotionMaster.h"
+#include "MoveSpline.h"
+#include "MoveSplineInit.h"
 #include "ObjectGuid.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
@@ -23,15 +26,19 @@
 #include "PerformanceMonitor.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotMgr.h"
+#include "PointMovementGenerator.h"
 #include "PositionValue.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
+#include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
 #include "GuildMgr.h"
 #include "SayAction.h"
+#include <cmath>
+#include <string>
 
 std::vector<std::string> PlayerbotAI::dispel_whitelist = {
     "mutating injection",
@@ -187,6 +194,10 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     else
         nextAICheckDelay = 0;
 
+    if (!bot || !bot->IsInWorld()) {
+        return;
+    }
+
     // cancel logout in combat
     if (!bot->GetSession()) {
         return;
@@ -201,7 +212,35 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             TellMaster("Logout cancelled!");
         }
     }
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
+    //     bot->Say("Falling!", LANG_UNIVERSAL);
+    // }
+    // if (!bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && bot->GetPositionZ() - bot->GetFloorZ() > 0.1f) {
+    //     bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    //     // bot->GetMotionMaster()->MoveFall();
+    // }
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && bot->GetPositionZ() - bot->GetFloorZ() <= 0.1f) {
+    //     bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    // }
+    //  else {
+    //     bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    // }
 
+    // bot->SendMovementFlagUpdate();
+
+    // bot->GetMotionMaster()->MoveFall();
+    // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
+    //     // bot->GetUnitMovementFlags();
+    //     bot->Say("falling... flag: " + std::to_string(bot->GetUnitMovementFlags()), LANG_UNIVERSAL);
+    // }
+    // bot->SendMovementFlagUpdate();
+    // float x, y, z;
+    // bot->GetPosition(x, y, z);
+    // bot->UpdateGroundPositionZ(x, y, z);
+    // if (bot->GetPositionZ() - z > 0.1f) {
+
+    // }
+    
     // wake up if in combat
     // if (bot->IsInCombat())
     // {
@@ -256,7 +295,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     if (currentSpell && currentSpell->getState() == SPELL_STATE_CASTING && currentSpell->GetCastTime())
     {
         nextAICheckDelay = currentSpell->GetCastTime() + sPlayerbotAIConfig->reactDelay;
-
+        SetNextCheckDelay(nextAICheckDelay);
         if (!CanUpdateAI())
             return;
     }
@@ -759,8 +798,6 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
         }
         case SMSG_MOVE_KNOCK_BACK: // handle knockbacks
         {
-            // Peiru: Disable Knockback handling for now until spline crash can be resolved
-            /*
             WorldPacket p(packet);
             p.rpos(0);
 
@@ -769,21 +806,10 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             float vcos, vsin, horizontalSpeed, verticalSpeed = 0.f;
 
             p >> guid.ReadAsPacked() >> counter >> vcos >> vsin >> horizontalSpeed >> verticalSpeed;
+            if (horizontalSpeed <= 0.1f) {
+                break;
+            }
             verticalSpeed = -verticalSpeed;
-
-            // calculate rough knockback time
-            float moveTimeHalf = verticalSpeed / 19.29f;
-
-            float dis = 2 * moveTimeHalf * horizontalSpeed;
-            float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -verticalSpeed);
-            float disHalf = dis / 3.0f;
-            float ox, oy, oz;
-            bot->GetPosition(ox, oy, oz);
-            float fx = ox + dis * vcos;
-            float fy = oy + dis * vsin;
-            float fz = oz + 0.5f;
-            bot->GetMap()->GetObjectHitPos(bot->GetPhaseMask(), ox, oy, oz + max_height, fx, fy, fz, fx, fy, fz, -0.5f);
-            bot->UpdateAllowedPositionZ(fx, fy, fz);
 
             // stop casting
             InterruptSpell();
@@ -791,42 +817,68 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             // stop movement
             bot->StopMoving();
             bot->GetMotionMaster()->Clear();
-            bot->GetMotionMaster()->MoveIdle();
 
-            // set delay based on actual distance
-            float newdis = sqrt(sServerFacade->GetDistance2d(bot, fx, fy));
-            SetNextCheckDelay((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
 
-            // add moveflags
-            bot->m_movementInfo.SetMovementFlags(MOVEMENTFLAG_FALLING);
-            bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FORWARD);
-            bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
-            if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
-                bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+            float moveTimeHalf = horizontalSpeed / Movement::gravity;
+            float dist = 2 * moveTimeHalf * horizontalSpeed;
+            Position dest = bot->GetPosition();
 
-            // copy MovementInfo
-            MovementInfo movementInfo = bot->m_movementInfo;
+            bot->MovePositionToFirstCollision(dest, dist, bot->GetRelativeAngle(bot->GetPositionX() + vcos, bot->GetPositionY() + vsin));
+            float x, y, z;
+            x = dest.GetPositionX();
+            y = dest.GetPositionY();
+            z = dest.GetPositionZ();
+            // char speak[1024];
+            // sprintf(speak, "SMSG_MOVE_KNOCK_BACK: %.2f %.2f, horizontalSpeed: %.2f, verticalSpeed: %.2f, tX: %.2f, tY: %.2f, tZ: %.2f, relativeAngle: %.2f, orientation: %.2f",
+            //     vcos, vsin, horizontalSpeed, verticalSpeed, x, y, z, bot->GetRelativeAngle(vcos, vsin), bot->GetOrientation());
+            // bot->Say(speak, LANG_UNIVERSAL);
+            // bot->GetClosePoint(x, y, z, bot->GetObjectSize(), dist, bot->GetAngle(vcos, vsin));
+            bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, bot->GetSelectedUnit());
+            // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+            // bot->AddUnitMovementFlag(MOVEMENTFLAG_FORWARD);
+            // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
+            // if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
+            //     bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+            // bot->GetMotionMaster()->MoveIdle();
+            // Position dest = bot->GetPosition();
+            // float moveTimeHalf = verticalSpeed / Movement::gravity;
+            // float dist = 2 * moveTimeHalf * horizontalSpeed;
+            // float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -verticalSpeed);
 
-            // send ack
-            WorldPacket ack(CMSG_MOVE_KNOCK_BACK_ACK);
-            movementInfo.jump.cosAngle = vcos;
-            movementInfo.jump.sinAngle = vsin;
-            movementInfo.jump.zspeed = -verticalSpeed;
-            movementInfo.jump.xyspeed = horizontalSpeed;
-            ack << bot->GetGUID().WriteAsPacked();
-            bot->m_mover->BuildMovementPacket(&ack);
-            ack << movementInfo.jump.sinAngle;
-            ack << movementInfo.jump.cosAngle;
-            ack << movementInfo.jump.xyspeed;
-            ack << movementInfo.jump.zspeed;
-            bot->GetSession()->HandleMoveKnockBackAck(ack);
+            // Use a mmap raycast to get a valid destination.
+            // bot->GetMotionMaster()->MoveKnockbackFrom(fx, fy, horizontalSpeed, verticalSpeed);
 
-            // set jump destination for MSG_LAND packet
-            SetJumpDestination(Position(fx, fy, fz, bot->GetOrientation()));
+            // // set delay based on actual distance
+            // float newdis = sqrt(sServerFacade->GetDistance2d(bot, fx, fy));
+            // SetNextCheckDelay((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
 
-            //bot->SendHeartBeat();
+            // // add moveflags
 
-            */
+            // // copy MovementInfo
+            // MovementInfo movementInfo = bot->m_movementInfo;
+
+            // // send ack
+            // WorldPacket ack(CMSG_MOVE_KNOCK_BACK_ACK);
+            // // movementInfo.jump.cosAngle = vcos;
+            // // movementInfo.jump.sinAngle = vsin;
+            // // movementInfo.jump.zspeed = -verticalSpeed;
+            // // movementInfo.jump.xyspeed = horizontalSpeed;
+            // ack << bot->GetGUID().WriteAsPacked();
+            // // bot->m_mover->BuildMovementPacket(&ack);
+            // ack << (uint32)0;
+            // bot->BuildMovementPacket(&ack);
+            // // ack << movementInfo.jump.sinAngle;
+            // // ack << movementInfo.jump.cosAngle;
+            // // ack << movementInfo.jump.xyspeed;
+            // // ack << movementInfo.jump.zspeed;
+            // bot->GetSession()->HandleMoveKnockBackAck(ack);
+
+            // // // set jump destination for MSG_LAND packet
+            // SetJumpDestination(Position(x, y, z, bot->GetOrientation()));
+            
+            // bot->Heart();
+
+            // */
             return;
         }
 	    default:
@@ -1599,6 +1651,37 @@ bool PlayerbotAI::IsAssistTank(Player* player)
     return IsTank(player) && !IsMainTank(player);
 }
 
+bool PlayerbotAI::IsAssistTankOfIndex(Player* player, int index)
+{
+    Group* group = bot->GetGroup();
+    if (!group) {
+        return false;
+    }
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (group->IsAssistant(member->GetGUID()) && IsAssistTank(member)) {
+            if (index == counter) {
+                return player == member;
+            }
+            counter++;
+        }
+    }
+    // not enough
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next()) {
+        Player* member = ref->GetSource();
+        if (!group->IsAssistant(member->GetGUID()) && IsAssistTank(member)) {
+            if (index == counter) {
+                return player == member;
+            }
+            counter++;
+        }
+    }
+    return false;
+    
+}
+
 namespace acore
 {
     class UnitByGuidInRangeCheck
@@ -2298,8 +2381,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         return false;
     }
 
-	bot->ClearUnitState(UNIT_STATE_CHASE);
-	bot->ClearUnitState(UNIT_STATE_FOLLOW);
+	// bot->ClearUnitState(UNIT_STATE_CHASE);
+	// bot->ClearUnitState(UNIT_STATE_FOLLOW);
 
 	bool failWithDelay = false;
     if (!bot->IsStandState())
@@ -2386,11 +2469,11 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 
     if (bot->isMoving() && spell->GetCastTime())
     {
-        bot->StopMoving();
-//        SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
-//        spell->cancel();
-        //delete spell;
-//        return false;
+        // bot->StopMoving();
+        SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
+        spell->cancel();
+        delete spell;
+        return false;
     }
 
     // spell->m_targets.SetUnitTarget(target);
@@ -2481,8 +2564,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     if (bot->IsFlying() || bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
         return false;
 
-    bot->ClearUnitState(UNIT_STATE_CHASE);
-    bot->ClearUnitState(UNIT_STATE_FOLLOW);
+    // bot->ClearUnitState(UNIT_STATE_CHASE);
+    // bot->ClearUnitState(UNIT_STATE_FOLLOW);
 
     bool failWithDelay = false;
     if (!bot->IsStandState())
@@ -2540,7 +2623,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
 
     if (bot->isMoving() && spell->GetCastTime())
     {
-        bot->StopMoving();
+        // bot->StopMoving();
         SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
         spell->cancel();
         delete spell;
@@ -2856,8 +2939,8 @@ void PlayerbotAI::WaitForSpellCast(Spell* spell)
     castTime = ceil(castTime);
 
     uint32 globalCooldown = CalculateGlobalCooldown(spellInfo->Id);
-    if (castTime < globalCooldown)
-        castTime = globalCooldown;
+    // if (castTime < globalCooldown)
+    //     castTime = globalCooldown;
 
     SetNextCheckDelay(castTime + sPlayerbotAIConfig->reactDelay);
 }
@@ -3236,14 +3319,16 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         return true;
 
     // friends always active
-    for (auto& player : sRandomPlayerbotMgr->GetPlayers())
-    {
-        if (!player || !player->IsInWorld())
-            continue;
+    
+    // HasFriend sometimes cause crash, disable
+    // for (auto& player : sRandomPlayerbotMgr->GetPlayers())
+    // {
+    //     if (!player || !player->IsInWorld())
+    //         continue;
 
-        if (player->GetSocial()->HasFriend(bot->GetGUID()))
-            return true;
-    }
+    //     if (player->GetSocial()->HasFriend(bot->GetGUID()))
+    //         return true;
+    // }
 
     if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY) //Many bots nearby. Do not do heavy area checks.
         if (HasManyPlayersNearby())
