@@ -755,7 +755,7 @@ bool MovementAction::IsMovingAllowed()
         bot->HasUnitState(UNIT_STATE_LOST_CONTROL))
         return false;
 
-    if (bot->GetMotionMaster()->GetMotionSlot(MOTION_SLOT_CONTROLLED)) {
+    if (bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE) {
         return false;
     }
 

@@ -36,9 +36,9 @@ bool AttackAnythingAction::isUseful()
     if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && 
         ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
         return false;
-    if (bot->IsInCombat()) {
-        return false;
-    }
+    // if (bot->IsInCombat()) {
+    //     return false;
+    // }
     Unit* target = GetTarget();
 
     if (!target)
