@@ -172,6 +172,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["turn in petition"] = &ActionContext::turn_in_petition;
             creators["buy tabard"] = &ActionContext::buy_tabard;
             creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
+            creators["auto flee"] = *ActionContext::auto_flee;
 
             // BG Tactics
             creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -266,6 +267,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* arcane_torrent(PlayerbotAI* botAI) { return new CastArcaneTorrentAction(botAI); }
         static Action* mana_tap(PlayerbotAI* botAI) { return new CastManaTapAction(botAI); }
         static Action* end_pull(PlayerbotAI* botAI) { return new ChangeCombatStrategyAction(botAI, "-pull"); }
+        static Action* auto_flee(PlayerbotAI* botAI) { return new AutoFleeAction(botAI); }
 
         static Action* emote(PlayerbotAI* botAI) { return new EmoteAction(botAI); }
         static Action* talk(PlayerbotAI* botAI) { return new TalkAction(botAI); }
