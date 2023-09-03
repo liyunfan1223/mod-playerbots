@@ -10,7 +10,7 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
     public:
 	    FrostDKStrategyActionNodeFactory()
 	    {
-		    //creators["icy touch"] = &icy_touch;
+		    creators["icy touch"] = &icy_touch;
 		    creators["obliterate"] = &obliterate;
 		    creators["howling blast"] = &howling_blast;
 		    creators["frost strike"] = &frost_strike;
@@ -29,6 +29,14 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 	    }
 
 	private:
+		static ActionNode* icy_touch([[maybe_unused]] PlayerbotAI* botAI)
+		{
+		    return new ActionNode("icy touch",
+			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
+			    /*A*/ nullptr,
+			    /*C*/ nullptr);
+		}
+
 		static ActionNode* obliterate([[maybe_unused]] PlayerbotAI* botAI)
 		{
 		    return new ActionNode("obliterate",

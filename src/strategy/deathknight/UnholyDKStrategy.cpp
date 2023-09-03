@@ -27,6 +27,7 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    //creators["anti magic zone"] = &anti_magic_zone;
 		    //creators["ghoul frenzy"] = &ghoul_frenzy;
 		    creators["corpse explosion"] = &corpse_explosion;
+			creators["icy touch"] = &icy_touch;
 	    }
 
     private:
@@ -53,6 +54,13 @@ class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
+		static ActionNode* icy_touch([[maybe_unused]] PlayerbotAI* botAI)
+		{
+		    return new ActionNode("icy touch",
+			    /*P*/ NextAction::array(0, new NextAction("blood presence"), nullptr),
+			    /*A*/ nullptr,
+			    /*C*/ nullptr);
+		}
 };
 
 NextAction** UnholyDKStrategy::getDefaultActions()
