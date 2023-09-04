@@ -1424,7 +1424,7 @@ void PlayerbotFactory::InitBags()
 {
     for (uint8 slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; ++slot)
     {
-        uint32 newItemId = 23162;
+        uint32 newItemId = 51809;
         Item *old_bag = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
         if (old_bag && old_bag->GetTemplate()->ItemId == newItemId) {
             continue;
