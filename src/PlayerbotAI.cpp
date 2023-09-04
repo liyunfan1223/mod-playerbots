@@ -807,7 +807,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 
             p >> guid.ReadAsPacked() >> counter >> vcos >> vsin >> horizontalSpeed >> verticalSpeed;
             if (horizontalSpeed <= 0.1f) {
-                break;
+                horizontalSpeed = 0.11f;
             }
             verticalSpeed = -verticalSpeed;
 
@@ -819,7 +819,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             bot->GetMotionMaster()->Clear();
 
 
-            float moveTimeHalf = horizontalSpeed / Movement::gravity;
+            float moveTimeHalf = verticalSpeed / Movement::gravity;
             float dist = 2 * moveTimeHalf * horizontalSpeed;
             Position dest = bot->GetPosition();
 
