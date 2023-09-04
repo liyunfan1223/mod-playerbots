@@ -207,7 +207,7 @@ bool TargetInSightTrigger::IsActive()
 
 bool DebuffTrigger::IsActive()
 {
-	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > life_bound;
+	return BuffTrigger::IsActive() && GetTarget() && (1000 * GetTarget()->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
 }
 
 bool DebuffOnBossTrigger::IsActive()
