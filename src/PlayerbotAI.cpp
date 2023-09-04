@@ -202,15 +202,15 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     if (!bot->GetSession()) {
         return;
     }
-
     if (bot->GetSession()->isLogingOut())
     {
-        if (bot->IsInCombat() || (master && master->IsInCombat() && sServerFacade->GetDistance2d(bot, master) < 30.0f))
-        {
-            WorldPackets::Character::LogoutCancel data = WorldPacket(CMSG_LOGOUT_CANCEL);
-            bot->GetSession()->HandleLogoutCancelOpcode(data);
-            TellMaster("Logout cancelled!");
-        }
+        // if (bot->IsInCombat() || (master && master->IsInCombat() && sServerFacade->GetDistance2d(bot, master) < 30.0f))
+        // {
+        //     WorldPackets::Character::LogoutCancel data = WorldPacket(CMSG_LOGOUT_CANCEL);
+        //     bot->GetSession()->HandleLogoutCancelOpcode(data);
+        //     TellMaster("Logout cancelled!");
+        // }
+        return;
     }
     // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
     //     bot->Say("Falling!", LANG_UNIVERSAL);

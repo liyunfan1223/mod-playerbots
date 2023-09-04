@@ -21,6 +21,7 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["blast wave"] = &blast_wave;
             creators["remove curse"] = &remove_curse;
             creators["remove curse on party"] = &remove_curse_on_party;
+            creators["firebolt"] = &firebolt;
         }
 
     private:
@@ -109,6 +110,13 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             return new ActionNode ("remove curse on party",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("remove lesser curse on party"), nullptr),
+                /*C*/ nullptr);
+        }
+        static ActionNode* firebolt([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("firebolt",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
                 /*C*/ nullptr);
         }
 };

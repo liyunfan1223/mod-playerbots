@@ -473,10 +473,10 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategies("bdps", "dps assist", "pet", nullptr);
             break;
         case CLASS_SHAMAN:
-            if (tab == 0 || tab == 2)
-                nonCombatEngine->addStrategy("bmana");
-            else
-                nonCombatEngine->addStrategy("bdps");
+            // if (tab == 0 || tab == 2)
+            nonCombatEngine->addStrategy("bmana");
+            // else
+                // nonCombatEngine->addStrategy("bdps");
 
             nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
             break;
