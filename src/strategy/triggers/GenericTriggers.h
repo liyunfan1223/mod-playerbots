@@ -315,7 +315,7 @@ class TargetInSightTrigger : public Trigger
 class DebuffTrigger : public BuffTrigger
 {
     public:
-        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false, float needLifeTime = 8000.0f) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner), needLifeTime(needLifeTime) { }
+        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false, float needLifeTime = 8.0f) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner), needLifeTime(needLifeTime) { }
 
 		std::string const GetTargetName() override { return "current target"; }
         bool IsActive() override;

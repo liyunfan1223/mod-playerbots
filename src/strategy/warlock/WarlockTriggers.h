@@ -29,7 +29,7 @@ class SpellstoneTrigger : public BuffTrigger
 class CurseOfAgonyTrigger : public DebuffTrigger
 {
     public:
-        CurseOfAgonyTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "curse of agony", 1, true, 20000.0f) { }
+        CurseOfAgonyTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "curse of agony", 1, true, 20.0f) { }
 };
 
 DEBUFF_CHECKISOWNER_TRIGGER(CorruptionTrigger, "corruption");
@@ -44,7 +44,7 @@ class CorruptionOnAttackerTrigger : public DebuffOnAttackerTrigger
 class CastCurseOfAgonyOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
     public:
-        CastCurseOfAgonyOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "curse of agony", true, 20000.0f) { }
+        CastCurseOfAgonyOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "curse of agony", true, 20.0f) { }
 };
 
 class SiphonLifeOnAttackerTrigger : public DebuffOnAttackerTrigger

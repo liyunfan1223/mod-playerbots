@@ -9,7 +9,7 @@ float ExpectedLifetimeValue::Calculate()
         return 0.0f;
     }
     float dps = AI_VALUE(float, "expected group dps");
-    float res = target->GetHealth() / dps * 1000;
+    float res = target->GetHealth() / dps;
     // bot->Say(target->GetName() + " lifetime: " + std::to_string(res), LANG_UNIVERSAL);
     return res;
 }
