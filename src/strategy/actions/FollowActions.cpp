@@ -7,6 +7,7 @@
 #include "Formations.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "SharedDefines.h"
 #include <cstddef>
 
 bool FollowAction::Execute(Event event)

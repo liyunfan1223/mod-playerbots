@@ -149,13 +149,17 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
     float modified_z;
-    for (float delta = 2.0f; delta <= 15.0f; delta++) {
+    float delta;
+    for (delta = -5.0f; delta <= 10.0f; delta++) {
         modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, modified_z);
         if (gen.GetPathType() == PATHFIND_NORMAL) {
             break;
         }
+    }
+    if (delta > 10.0f) {
+        return false;
     }
     // z += 0.5f;
     float distance = bot->GetDistance2d(x, y);
@@ -173,12 +177,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
         bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
                 !bot->IsFlying() && !bot->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !bot->IsInWater();
-        // char speak[100];
-        // sprintf(speak, "Move to : (%.2f, %.2f, %.2f), generatePath: %d", x, y, z, generatePath);
-        // bot->Say(speak, LANG_UNIVERSAL);
         MotionMaster &mm = *bot->GetMotionMaster();
+        
         mm.Clear();
-        mm.MovePoint(mapId, x, y, z, generatePath);
+        mm.MovePoint(mapId, x, y, modified_z, generatePath);
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;
     }
