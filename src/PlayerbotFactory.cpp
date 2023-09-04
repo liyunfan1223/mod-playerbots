@@ -1914,6 +1914,7 @@ void PlayerbotFactory::InitClassSpells()
         case CLASS_WARLOCK:
             bot->learnSpell(687, true);
             bot->learnSpell(686, true);
+            bot->learnSpell(688, true); // summon imp
             if (level >= 10) {
                 bot->learnSpell(697, false); // summon voidwalker
             }
@@ -1936,7 +1937,7 @@ void PlayerbotFactory::InitClassSpells()
         case CLASS_SHAMAN:
             bot->learnSpell(403, true);
             bot->learnSpell(331, true);
-            bot->learnSpell(66747, false); // Totem of the Earthen Ring
+            // bot->learnSpell(66747, true); // Totem of the Earthen Ring
             if (level >= 4) {
                 bot->learnSpell(8071, false); // stoneskin totem
             }
@@ -2399,7 +2400,7 @@ void PlayerbotFactory::InitReagents()
         }
             break;
         case CLASS_SHAMAN:
-            // items.push_back({46978, 1}); // Totem
+            items.push_back({46978, 1}); // Totem
             if (bot->getLevel() >= 30)
                 items.push_back({17030, 40}); // Ankh
             break;

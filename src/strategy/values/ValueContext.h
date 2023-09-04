@@ -25,6 +25,7 @@
 #include "DistanceValue.h"
 #include "EnemyHealerTargetValue.h"
 #include "EnemyPlayerValue.h"
+#include "ExpectedLifetimeValue.h"
 #include "Formations.h"
 #include "GroupValues.h"
 #include "GrindTargetValue.h"
@@ -293,6 +294,8 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["boss target"] = &ValueContext::boss_target;
             creators["nearest triggers"] = &ValueContext::nearest_triggers;
             creators["neglect threat"] = &ValueContext::neglect_threat;
+            creators["expected lifetime"] =  &ValueContext::expected_lifetime;
+            creators["expected group dps"] =  &ValueContext::expected_group_dps;
         }
 
     private:
@@ -490,6 +493,9 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* boss_target(PlayerbotAI* ai) { return new BossTargetValue(ai); }
         static UntypedValue* nearest_triggers(PlayerbotAI* ai) { return new NearestTriggersValue(ai); }
         static UntypedValue* neglect_threat(PlayerbotAI* ai) { return new NeglectThreatResetValue(ai); }
+        static UntypedValue* expected_lifetime(PlayerbotAI* ai) { return new ExpectedLifetimeValue(ai); }
+        static UntypedValue* expected_group_dps(PlayerbotAI* ai) { return new ExpectedGroupDpsValue(ai); }
+        
 };
 
 #endif

@@ -231,6 +231,9 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
         WorldSession* botWorldSessionPtr = bot->GetSession();
         WorldSession* masterWorldSessionPtr = nullptr;
 
+        if (botWorldSessionPtr->isLogingOut())
+            return;
+
         Player* master = botAI->GetMaster();
         if (master)
             masterWorldSessionPtr = master->GetSession();

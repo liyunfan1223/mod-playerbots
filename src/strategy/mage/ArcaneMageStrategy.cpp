@@ -13,7 +13,7 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
             creators["arcane blast"] = &arcane_blast;
             creators["arcane barrage"] = &arcane_barrage;
             creators["arcane missiles"] = &arcane_missiles;
-            creators["firebolt"] = &firebolt;
+            // creators["firebolt"] = &firebolt;
         }
 
     private:
@@ -41,13 +41,13 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
                 /*C*/ nullptr);
         }
 
-        static ActionNode* firebolt([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("firebolt",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
-                /*C*/ nullptr);
-        }
+        // static ActionNode* firebolt([[maybe_unused]] PlayerbotAI* botAI)
+        // {
+        //     return new ActionNode ("firebolt",
+        //         /*P*/ nullptr,
+        //         /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
+        //         /*C*/ nullptr);
+        // }
 };
 
 ArcaneMageStrategy::ArcaneMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy(botAI)
