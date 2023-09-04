@@ -85,10 +85,12 @@ bool OutNumberedTrigger::IsActive()
     if (bot->GetGroup() && bot->GetGroup()->isRaidGroup())
         return false;
                
-    int32 botLevel = bot->getLevel();
+    // int32 botLevel = bot->getLevel();
+    int32 botLevel = bot->GetLevel();
     // uint32 friendPower = 200;
-    uint32 friendPower = 0;
-    uint32 foePower = 0;
+    int32 friendPower = 0;
+    int32 foePower = 0;
+    int32 calculatedFriendPower = 0;
     for (auto& attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
     {
         Creature* creature = botAI->GetCreature(attacker);
@@ -98,14 +100,14 @@ bool OutNumberedTrigger::IsActive()
         // int32 dLevel = creature->getLevel() - botLevel;
         // if (dLevel > -10)
         //     foePower = std::max(100 + 10 * dLevel, dLevel * 200);
-        foePower =+ creature->getLevel();
+        foePower += creature->GetLevel();
     }
 
     if (!foePower)
         return false;
 
     for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
-    {
+    {   
         Unit* player = botAI->GetUnit(helper);
         if (!player || player == bot)
             continue;
@@ -117,15 +119,19 @@ bool OutNumberedTrigger::IsActive()
 
         if (bot->GetDistance(player) < sPlayerbotAIConfig->farDistance)
         {
-            uint32 calculatedFriendPower = player->getLevel() - botLevel;
+            calculatedFriendPower = player->GetLevel() - botLevel;
             if (calculatedFriendPower <= 0) 
+            {
                 calculatedFriendPower = 1;
-            friendPower =+ calculatedFriendPower;
+            }
+            friendPower += calculatedFriendPower;
         }
     }
+    int32 wPower = friendPower + botLevel;
+    int32 result = wPower - foePower;
     
     // return friendPower < foePower;
-    return bot->getLevel() + friendPower - foePower < -10;
+    return result < -10; // garfieldz90 - 他妈的我都被这个值搞混了，-6大过-10！
 }
 
 bool BuffTrigger::IsActive()

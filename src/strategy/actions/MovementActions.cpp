@@ -1315,7 +1315,7 @@ bool MovementAction::AutoRunAway(Unit* target)
 
     for (Unit* target : targets)
     {
-        if (bot->GetDistance(target) <= sPlayerbotAIConfig->sightDistance)
+        if (bot->GetDistance(target) <= sPlayerbotAIConfig->reactDistance)
         {
             float angle = target->GetAngle(bot);
             float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
@@ -1340,10 +1340,9 @@ bool AutoFleeAction::isUseful()
     {
         return true;
     }
+
     return false;
 }
-
-
 
 bool FleeWithPetAction::Execute(Event event)
 {
