@@ -7,6 +7,7 @@
 #include "MovementGenerator.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
+#include "PathGenerator.h"
 #include "PlayerbotAIConfig.h"
 #include "SharedDefines.h"
 #include "TargetedMovementGenerator.h"
@@ -147,14 +148,15 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    float modified_z = z + 5.0f;
-    bot->UpdateAllowedPositionZ(x, y, modified_z);
-    // prevent falling when bot on slope
-    if (modified_z < z - 20.0f) {
-        modified_z = z + 15.0f;
-        bot->UpdateAllowedPositionZ(x, y, modified_z);
+    float modified_z;
+    for (float delta = 2.0f; delta <= 15.0f; delta++) {
+        modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
+        PathGenerator gen(bot);
+        gen.CalculatePath(x, y, modified_z);
+        if (gen.GetPathType() == PATHFIND_NORMAL) {
+            break;
+        }
     }
-    z = modified_z;
     // z += 0.5f;
     float distance = bot->GetDistance2d(x, y);
     if (distance > sPlayerbotAIConfig->contactDistance)
