@@ -333,7 +333,7 @@ class DebuffOnBossTrigger : public DebuffTrigger
 class DebuffOnAttackerTrigger : public DebuffTrigger
 {
     public:
-        DebuffOnAttackerTrigger(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = true, float needLifeTime = 8000.0f) : DebuffTrigger(botAI, spell, 1, checkIsOwner, needLifeTime) { }
+        DebuffOnAttackerTrigger(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = true, float needLifeTime = 8.0f) : DebuffTrigger(botAI, spell, 1, checkIsOwner, needLifeTime) { }
 
         Value<Unit*>* GetTargetValue() override;
         std::string const getName() override { return spell + " on attacker"; }

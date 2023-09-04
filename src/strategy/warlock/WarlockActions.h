@@ -141,7 +141,7 @@ class CastBanishAction : public CastBuffSpellAction
 class CastSeedOfCorruptionAction : public CastDebuffSpellAction
 {
     public:
-        CastSeedOfCorruptionAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "seed of corruption", true) { }
+        CastSeedOfCorruptionAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "seed of corruption", true, 0) { }
 };
 
 class CastRainOfFireAction : public CastSpellAction

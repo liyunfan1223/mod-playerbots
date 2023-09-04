@@ -11,10 +11,10 @@
 
 class PlayerbotAI;
 
-class HunterNoStingsActiveTrigger : public Trigger
+class HunterNoStingsActiveTrigger : public DebuffTrigger
 {
     public:
-        HunterNoStingsActiveTrigger(PlayerbotAI* botAI): Trigger(botAI, "no stings") {}
+        HunterNoStingsActiveTrigger(PlayerbotAI* botAI): DebuffTrigger(botAI, "no stings") {}
         bool IsActive() override;
 };
 

@@ -3,6 +3,7 @@
  */
 
 #include "HunterTriggers.h"
+#include "GenericTriggers.h"
 #include "HunterActions.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
@@ -18,7 +19,7 @@ bool HunterAspectOfTheHawkTrigger::IsActive()
 bool HunterNoStingsActiveTrigger::IsActive()
 {
 	Unit* target = AI_VALUE(Unit*, "current target");
-    return target && AI_VALUE2(uint8, "health", "current target") > 15 && 
+    return DebuffTrigger::IsActive() && target && 
         !botAI->HasAura("serpent sting", target, false, true) &&
         !botAI->HasAura("scorpid sting", target, false, true) && 
         !botAI->HasAura("viper sting", target, false, true);

@@ -50,13 +50,16 @@ class CastMeleeSpellAction : public CastSpellAction
 class CastDebuffSpellAction : public CastAuraSpellAction
 {
     public:
-        CastDebuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false) : CastAuraSpellAction(botAI, spell, isOwner) { }
+        CastDebuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false, float needLifeTime = 8.0f) : CastAuraSpellAction(botAI, spell, isOwner), needLifeTime(needLifeTime) { }
+        bool isUseful() override;
+    private:
+        float needLifeTime;
 };
 
-class CastDebuffSpellOnAttackerAction : public CastAuraSpellAction
+class CastDebuffSpellOnAttackerAction : public CastDebuffSpellAction
 {
     public:
-        CastDebuffSpellOnAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true) : CastAuraSpellAction(botAI, spell, isOwner) { }
+        CastDebuffSpellOnAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true, float needLifeTime = 8.0f) : CastDebuffSpellAction(botAI, spell, isOwner, needLifeTime) { }
 
         Value<Unit*>* GetTargetValue() override;
         std::string const getName() override { return spell + " on attacker"; }

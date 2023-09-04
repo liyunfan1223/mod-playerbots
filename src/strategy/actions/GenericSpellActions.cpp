@@ -292,3 +292,7 @@ Value<Unit*>* BuffOnMainTankAction::GetTargetValue()
     return context->GetValue<Unit*>("main tank", spell);
 }
 
+bool CastDebuffSpellAction::isUseful()
+{
+    return CastAuraSpellAction::isUseful() && GetTarget() && (GetTarget()->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+}
