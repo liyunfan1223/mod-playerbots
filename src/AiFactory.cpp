@@ -263,11 +263,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (!player->InBattleground())
     {
-<<<<<<< HEAD
-        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "auto flee", nullptr);
-=======
-        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
->>>>>>> 7bdc771c7523ca400b04b75cfcfc915bc70b06c6
+        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", "auto flee", nullptr);
     }
 
     switch (player->getClass())
