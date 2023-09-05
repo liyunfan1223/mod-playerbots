@@ -294,5 +294,9 @@ Value<Unit*>* BuffOnMainTankAction::GetTargetValue()
 
 bool CastDebuffSpellAction::isUseful()
 {
-    return CastAuraSpellAction::isUseful() && GetTarget() && (GetTarget()->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+    Unit* target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+        return false;
+    }
+    return CastAuraSpellAction::isUseful() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
 }

@@ -38,7 +38,12 @@ float CastTimeMultiplier::GetValue(Action* action)
                 castTime += duration;
         }
 
-        if (castTime > (1000 * action->GetTarget()->GetHealth() / AI_VALUE(float, "expected group dps"))) {
+        Unit* target = action->GetTarget();
+        if (!target || !target->IsAlive() || !target->IsInWorld()) {
+            return false;
+        }
+
+        if (castTime > (1000 * target->GetHealth() / AI_VALUE(float, "expected group dps"))) {
             return 0.0f;
         }
     }
