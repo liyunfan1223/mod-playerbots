@@ -158,6 +158,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             break;
         }
     }
+    if (delta > 10.0f) {
+        delta = 0.5f;
+    }
     // if (delta > 10.0f) {
     //     return false;
     // }
