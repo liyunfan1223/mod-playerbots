@@ -148,23 +148,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    float modified_z;
-    float delta;
-    for (delta = -5.0f; delta <= 10.0f; delta++) {
-        modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
-        PathGenerator gen(bot);
-        gen.CalculatePath(x, y, modified_z);
-        if (gen.GetPathType() == PATHFIND_NORMAL) {
-            break;
-        }
-    }
-    if (delta > 10.0f) {
-        delta = 0.5f;
-    }
-    // if (delta > 10.0f) {
-    //     return false;
-    // }
-    // z += 0.5f;
     float distance = bot->GetDistance2d(x, y);
     if (distance > sPlayerbotAIConfig->contactDistance)
     {
@@ -183,7 +166,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         MotionMaster &mm = *bot->GetMotionMaster();
         
         mm.Clear();
-        mm.MovePoint(mapId, x, y, modified_z, generatePath);
+        mm.MovePoint(mapId, x, y, SearchBestGroundZForPath(x, y, z), generatePath);
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;
     }
@@ -1284,6 +1267,38 @@ bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float d
     }
     return MoveNear(mapId, x, y, z, distance);
 }
+
+float MovementAction::SearchBestGroundZForPath(float x, float y, float z, float range)
+{
+    float modified_z;
+    float delta;
+    for (delta = 0.0f; delta <= range / 2; delta++) {
+        modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
+        PathGenerator gen(bot);
+        gen.CalculatePath(x, y, modified_z);
+        if (gen.GetPathType() == PATHFIND_NORMAL) {
+            return modified_z;
+        }
+    }
+    for (delta = -1.0f; delta >= -range / 2; delta--) {
+        modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
+        PathGenerator gen(bot);
+        gen.CalculatePath(x, y, modified_z);
+        if (gen.GetPathType() == PATHFIND_NORMAL) {
+            return modified_z;
+        }
+    }
+    for (delta = range / 2 + 1.0f; delta <= range; delta++) {
+        modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
+        PathGenerator gen(bot);
+        gen.CalculatePath(x, y, modified_z);
+        if (gen.GetPathType() == PATHFIND_NORMAL) {
+            return modified_z;
+        }
+    }
+    return z;
+}
+    
 
 bool FleeAction::Execute(Event event)
 {
