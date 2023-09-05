@@ -1432,7 +1432,10 @@ void PlayerbotFactory::InitBags()
         uint16 dest;
         if (!CanEquipUnseenItem(slot, dest, newItemId))
             continue;
-
+        
+        if (old_bag) {
+            bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+        }
         Item* newItem = bot->EquipNewItem(dest, newItemId, true);
         if (newItem)
         {
@@ -2421,6 +2424,8 @@ void PlayerbotFactory::InitReagents()
             break;
         case CLASS_MAGE:
             items.push_back({17020, 40});
+            items.push_back({17031, 40}); // portal
+            items.push_back({17032, 40}); // portal
             // bot->StoreNewItemInBestSlots(17020, 40); // Arcane Powder
             break;
         case CLASS_DRUID:
