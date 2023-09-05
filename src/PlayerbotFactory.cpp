@@ -1188,6 +1188,9 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             for (uint32 requiredLevel = bot->GetLevel(); requiredLevel > std::max((int32)bot->GetLevel() - delta, 0); requiredLevel--) {
                 for (InventoryType inventoryType : GetPossibleInventoryTypeListBySlot((EquipmentSlots)slot)) {
                     for (uint32 itemId : sRandomItemMgr->GetCachedEquipments(requiredLevel, inventoryType)) {
+                        if (itemId == 46978) { // shaman earth ring totem
+                            continue;
+                        }
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;

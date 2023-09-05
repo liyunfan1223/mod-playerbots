@@ -292,13 +292,13 @@ bool ListSpellsAction::Execute(Event event)
     {
         botAI->TellMasterNoFacing(i->second);
 
-        if (++count >= 50)
-        {
-            std::ostringstream msg;
-            msg << (spells.size() - 50) << " more...";
-            botAI->TellMasterNoFacing(msg.str());
-            break;
-        }
+        // if (++count >= 50)
+        // {
+        //     std::ostringstream msg;
+        //     msg << (spells.size() - 50) << " more...";
+        //     botAI->TellMasterNoFacing(msg.str());
+        //     break;
+        // }
     }
 
     return true;

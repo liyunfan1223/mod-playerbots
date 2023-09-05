@@ -54,14 +54,14 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
         static ActionNode* regrowth_on_party(PlayerbotAI* ai)
         {
             return new ActionNode ("regrowth on party",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), NULL),
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                 /*A*/ NULL,
                 /*C*/ NULL);
         }
         static ActionNode* rejuvenation_on_party(PlayerbotAI* ai)
         {
             return new ActionNode ("rejuvenation on party",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), NULL),
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                 /*A*/ NULL,
                 /*C*/ NULL);
         }

@@ -31,7 +31,7 @@ bool CastTravelFormAction::isUseful()
 bool CastCasterFormAction::isUseful()
 {
     return botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form",
-        "flight form", "swift flight form", "moonkin form", nullptr);
+        "flight form", "swift flight form", "moonkin form", nullptr) && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth;
 }
 
 bool CastCasterFormAction::Execute(Event event)

@@ -2206,8 +2206,15 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
         case SPELL_FAILED_MOVING:
         case SPELL_FAILED_TRY_AGAIN:
         case SPELL_CAST_OK:
+        case SPELL_FAILED_NOT_SHAPESHIFT:
             return true;
         default:
+            // if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+            //     if (result != SPELL_FAILED_NOT_READY && result != SPELL_CAST_OK) {
+            //         LOG_DEBUG("playerbots", "CanCastSpell Check Failed. - target name: {}, spellid: {}, bot name: {}, result: {}", 
+            //             target->GetName(), spellid, bot->GetName(), result);
+            //     }
+            // }
             return false;
     }
 }
