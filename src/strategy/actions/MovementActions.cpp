@@ -1483,5 +1483,52 @@ bool RotateAroundTheCenterPointAction::Execute(Event event)
 
 bool SafeFleeAction::Execute(Event event)
 {
-    
+    return SafeRunAway(AI_VALUE(Unit*, "current target"));
+}
+
+bool SafeFleeAction::isUseful()
+{
+    if (sPlayerbotAIConfig->fleeingEnabled == 0)
+        return false;
+    Unit* target = AI_VALUE(Unit*, "current target");
+    HostileReference* ref = target->GetThreatMgr().getCurrentVictim();
+    if (ref && ref->getTarget() == bot)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool MovementAction::SafeRunAway(Unit* target)
+{
+    std::vector<Unit*> targets;
+    Unit* botVictim = bot->GetVictim();
+    HostileReference* botRef = bot->getHostileRefMgr().getFirst();
+    while (botRef)
+    {
+        ThreatMgr* threatMgr = botRef->GetSource();
+        if (Unit* botTarget = threatMgr->GetOwner())
+        {
+            if (bot->CanSeeOrDetect(botTarget) && bot->IsWithinDist(botTarget, VISIBILITY_DISTANCE_NORMAL)){
+                targets.push_back(botTarget);
+            }
+        }
+        botRef = botRef->next();
+    }
+    if (targets.empty())
+        return false;
+
+    for (Unit* target : targets)
+    {
+        if (bot->GetDistance(target) <= sPlayerbotAIConfig->farDistance)
+        {
+            float angle = target->GetAngle(bot);
+            float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
+            float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+            float dz = bot->GetPositionZ();
+            return MoveTo(target->GetMapId(), dx, dy, dz);
+        }
+    }
+    return false;
 }

@@ -40,6 +40,7 @@ class MovementAction : public Action
         bool MoveAway(Unit* target);
         bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->followDistance);
         void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
+        bool SafeRunAway(Unit* target);
     private:
         float SearchBestGroundZForPath(float x, float y, float z, float range = 10.0f);
 };
@@ -50,6 +51,7 @@ class SafeFleeAction : public MovementAction
         SafeFleeAction(PlayerbotAI* botAI, float distance = sPlayerbotAIConfig->spellDistance) : MovementAction(botAI, "safe flee"), distance(distance) { }
 
         bool Execute(Event event) override;
+        bool isUseful() override;
 
     private:
         float distance;
