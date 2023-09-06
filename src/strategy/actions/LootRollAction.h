@@ -22,6 +22,9 @@ class LootRollAction : public QueryItemUsageAction
 
     protected:
         RollVote CalculateRollVote(ItemTemplate const* proto);
+
+    private:
+        inline uint8 randomRoll();
 };
 
 class MasterLootRollAction : public LootRollAction

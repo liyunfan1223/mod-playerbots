@@ -20,12 +20,91 @@ bool LootRollAction::Execute(Event event)
     ObjectGuid guid;
     uint32 slot;
     uint8 rollType;
+    uint8 blevel;
     p.rpos(0); //reset packet pointer
     p >> guid; //guid of the item rolled
     p >> slot; //number of players invited to roll
     p >> rollType; //need,greed or pass on roll
 
-    RollVote vote = PASS;
+    RollVote vote;
+
+    if (!sPlayerbotAIConfig->autoRollForLoot)
+        vote = PASS;
+    else
+    {
+        blevel = bot->getLevel();
+        std::vector<Roll*> rolls = group->GetRolls();
+        for (std::vector<Roll*>::iterator i = rolls.begin(); i != rolls.end(); ++i)
+        {
+            if ((*i)->isValid() && (*i)->itemGUID == guid && (*i)->itemSlot == slot)
+            {
+                uint32 itemId = (*i)->itemid;
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                bot->Say("roll for :" + std::string(chat->FormatItem(proto) + ", entry:") + std::to_string(itemId), LANG_UNIVERSAL);
+                if (!proto)
+                    continue;
+                uint32 protoClass = proto->Class;
+                if (protoClass == ITEM_CLASS_WEAPON || protoClass == ITEM_CLASS_ARMOR)
+                {
+                    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+                    {
+                        if (Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                        {
+                            ItemTemplate const* equipItem = item->GetTemplate();
+                            if (equipItem->InventoryType == proto->InventoryType)
+                            {
+                                uint32 equipItemValue = 0;
+                                uint32 protoValue = 0;
+                                switch (protoClass)
+                                {
+                                case ITEM_CLASS_WEAPON:
+                                    equipItemValue = equipItem->GetItemLevelIncludingQuality(blevel) + equipItem->getDPS();
+                                    protoValue = proto->GetItemLevelIncludingQuality(blevel) + proto->getDPS();
+                                    break;
+                                case ITEM_CLASS_ARMOR:
+                                    if(proto->SubClass == equipItem->SubClass)
+                                    {
+                                        equipItemValue = equipItem->GetItemLevelIncludingQuality(blevel) + equipItem->Armor;
+                                        protoValue = proto->GetItemLevelIncludingQuality(blevel) + proto->Armor;
+                                    }
+                                    break;
+                                default:
+                                    equipItemValue = equipItem->GetItemLevelIncludingQuality(blevel) * 1000.0f + equipItem->BuyPrice;
+                                    protoValue = proto->GetItemLevelIncludingQuality(blevel) * 1000.0f + equipItem->BuyPrice;
+                                    break;
+                                }
+                                if (protoValue > equipItemValue)
+                                {
+                                    bot->Say(chat->FormatItem(proto) + " is better than my " + chat->FormatItem(equipItem) + ", i want it!", LANG_UNIVERSAL);
+                                    vote = NEED;
+                                    break;
+                                }
+                                else
+                                {
+                                    if(randomRoll() == 0)
+                                        vote = PASS;
+                                    else
+                                        vote = GREED;
+                                }
+                            }
+                            else
+                            {
+                                if(randomRoll() == 0)
+                                    vote = PASS;
+                                else
+                                    vote = GREED;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    bot->Say("Money~Money~Money!", LANG_UNIVERSAL);
+                    vote = GREED;
+                }
+            }
+        }
+    }
 
     // std::vector<Roll*> rolls = group->GetRolls();
     // bot->Say("guid:" + std::to_string(guid.GetCounter()) + 
@@ -77,15 +156,21 @@ bool LootRollAction::Execute(Event event)
     switch (group->GetLootMethod())
     {
         case MASTER_LOOT:
-        case FREE_FOR_ALL:
-            group->CountRollVote(bot->GetGUID(), guid, PASS);
+        case GROUP_LOOT:    
+            group->CountRollVote(bot->GetGUID(), guid, vote);
             break;
         default:
-            group->CountRollVote(bot->GetGUID(), guid, vote);
+            group->CountRollVote(bot->GetGUID(), guid, PASS);
             break;
     }
 
     return true;
+}
+
+inline uint8 LootRollAction::randomRoll()
+{
+    std::srand(std::time(0));
+    return std::rand() % 2;
 }
 
 RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)

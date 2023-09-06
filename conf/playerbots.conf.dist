@@ -170,6 +170,10 @@ AiPlayerbot.AutoUpgradeEquip = 1
 # Default: 1 (enabled)
 AiPlayerbot.AutoDoQuests = 1
 
+# Random Bots will do roll for loot
+# Default: 1 (enabled)
+AiPlayerbot.AutoRollForLoot = 1
+
 ##################################################################################
 #                                                                                #
 # All other parameters are optional but can be changed by uncommenting them here #

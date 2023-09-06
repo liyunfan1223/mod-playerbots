@@ -160,6 +160,7 @@ class PlayerbotAIConfig
         bool randomBotSayWithoutMaster;
         bool randomBotGroupNearby;
         uint32 tweakValue; //Debugging config
+        bool autoRollForLoot;
 
         uint32 randomBotArenaTeamCount;
         bool deleteRandomBotArenaTeams;
