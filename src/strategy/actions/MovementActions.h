@@ -44,6 +44,17 @@ class MovementAction : public Action
         float SearchBestGroundZForPath(float x, float y, float z, float range = 10.0f);
 };
 
+class SafeFleeAction : public MovementAction
+{
+    public:
+        SafeFleeAction(PlayerbotAI* botAI, float distance = sPlayerbotAIConfig->spellDistance) : MovementAction(botAI, "safe flee"), distance(distance) { }
+
+        bool Execute(Event event) override;
+
+    private:
+        float distance;
+};
+
 class FleeAction : public MovementAction
 {
     public:

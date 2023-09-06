@@ -1480,3 +1480,8 @@ bool RotateAroundTheCenterPointAction::Execute(Event event)
     }
     return false;
 }
+
+bool SafeFleeAction::Execute(Event event)
+{
+    
+}

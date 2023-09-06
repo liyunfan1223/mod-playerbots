@@ -27,4 +27,13 @@ class FleeFromAddsStrategy : public Strategy
         std::string const getName() override { return "flee from adds"; };
 };
 
+class SafeFleeStrategy : public Strategy
+{
+    public:
+        SafeFleeStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+
+        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+        std::string const getName() override { return "safe flee"; };
+};
+
 #endif
