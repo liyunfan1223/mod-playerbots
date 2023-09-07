@@ -21,5 +21,5 @@ void AutoTeleportForLevelAction::AutoUpgradeEquip() {
     }
     PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
     factory.InitEquipment(true);
-    factory.InitSkills();
+    factory.InitAmmo();
 }

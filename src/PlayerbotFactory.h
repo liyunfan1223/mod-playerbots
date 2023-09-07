@@ -120,6 +120,7 @@ class PlayerbotFactory : public InventoryAction
         void InitClassSpells();
         void InitEquipment(bool incremental);
         void InitPet();
+        void InitAmmo();
 
     private:
         void Prepare();
@@ -140,7 +141,6 @@ class PlayerbotFactory : public InventoryAction
         void ClearInventory();
         void ClearAllItems();
         void ResetQuests();
-        void InitAmmo();
         void InitMounts();
         void InitPotions();
         void InitFood();
