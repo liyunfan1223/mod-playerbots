@@ -43,6 +43,7 @@ void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
     PlayerbotFactory factory(bot, bot->GetLevel());
     factory.InitClassSpells();
     factory.InitAvailableSpells();
+    factory.InitSkills();
     factory.InitPet();
     // bot->LearnDefaultSkills();
 

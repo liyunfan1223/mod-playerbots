@@ -2406,7 +2406,11 @@ void PlayerbotFactory::InitReagents()
         }
             break;
         case CLASS_SHAMAN:
-            items.push_back({46978, 1}); // Totem
+            // items.push_back({46978, 1}); // Totem
+            items.push_back({5175, 1}); // Earth Totem
+            items.push_back({5176, 1}); // Flame Totem
+            items.push_back({5177, 1}); // Water Totem
+            items.push_back({5178, 1}); // Air Totem
             if (bot->getLevel() >= 30)
                 items.push_back({17030, 40}); // Ankh
             break;
