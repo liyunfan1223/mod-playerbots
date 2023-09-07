@@ -91,8 +91,14 @@ class CastPestilenceAction : public CastSpellAction
 
 
 //debuff
-BEGIN_DEBUFF_ACTION(CastHowlingBlastAction, "howling blast")
-END_SPELL_ACTION()
+// BEGIN_DEBUFF_ACTION(CastHowlingBlastAction, "howling blast")
+// END_SPELL_ACTION()
+
+class CastHowlingBlastAction : public CastSpellAction
+{
+	public:
+		CastHowlingBlastAction(PlayerbotAI* ai) : CastSpellAction(ai, "howling blast") {}
+};
 
 //debuff it
 // BEGIN_DEBUFF_ACTION(CastIcyTouchAction, "icy touch")

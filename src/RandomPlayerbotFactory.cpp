@@ -396,7 +396,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     }
 
     if (bot_creation) {
-        LOG_INFO("playerbots", "Wait for {} characters load into database...", totalCharCount);
+        LOG_INFO("playerbots", "Waiting for {} characters load into database...", totalCharCount);
         /* wait for characters load into database, or characters will fail to loggin */
         std::this_thread::sleep_for(15ms * totalCharCount);
     }

@@ -13,6 +13,7 @@ float ExpectedLifetimeValue::Calculate()
     // bot->Say(target->GetName() + " lifetime: " + std::to_string(res), LANG_UNIVERSAL);
     return res;
 }
+
 float ExpectedGroupDpsValue::Calculate()
 {
     float dps_num;
@@ -37,7 +38,7 @@ float ExpectedGroupDpsValue::Calculate()
     } else if (bot->GetLevel() < 80) {
         dps_efficiency = 12;
     } else {
-        dps_efficiency = 30;
+        dps_efficiency = 25;
     }
     return dps_num * bot->GetLevel() * dps_efficiency;
 }

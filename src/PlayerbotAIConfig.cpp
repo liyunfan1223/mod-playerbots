@@ -162,9 +162,9 @@ bool PlayerbotAIConfig::Initialize()
     {
         for (uint32 spec = 0; spec < 3; ++spec)
         {
-            std::ostringstream os; os << "AiPlayerbot.RandomClassSpecProbability." << cls << "." << spec;
+            std::ostringstream os; 
+            os << "AiPlayerbot.RandomClassSpecProbability." << cls << "." << spec;
             specProbability[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
-            
             os.str("");
             os.clear();
             os << "AiPlayerbot.DefaultTalentsOrder." << cls << "." << spec;
