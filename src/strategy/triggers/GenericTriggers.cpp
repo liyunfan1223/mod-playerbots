@@ -142,7 +142,7 @@ bool OutNumberedTrigger::IsActive()
     for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
     {
         Unit* player = botAI->GetUnit(helper);
-        if (!player || player == bot)
+        if (!player || player == bot || !player->IsPlayer()) // garfieldz90 - cheeck real player is near for optimal performance
             continue;
 
         if (bot->GetDistance(player) < sPlayerbotAIConfig->farDistance)
@@ -153,8 +153,9 @@ bool OutNumberedTrigger::IsActive()
                 calculatedFriendPower = 1;
             }
             friendPower += calculatedFriendPower;
-        }
+        }   
     }
+    
     int32 wPower = friendPower + botLevel;
     int32 result = wPower - foePower;
 

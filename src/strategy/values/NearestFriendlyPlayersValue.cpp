@@ -18,5 +18,6 @@ void NearestFriendlyPlayersValue::FindUnits(std::list<Unit*>& targets)
 bool NearestFriendlyPlayersValue::AcceptUnit(Unit* unit)
 {
     ObjectGuid guid = unit->GetGUID();
-    return guid.IsPlayer() && guid != botAI->GetBot()->GetGUID();
+    // return guid.IsPlayer() && guid != botAI->GetBot()->GetGUID();
+    return guid != botAI->GetBot()->GetGUID(); // garfieldz90 - bot and NPC also is near friendly power
 }

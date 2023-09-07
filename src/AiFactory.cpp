@@ -263,7 +263,8 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (!player->InBattleground())
     {
-        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
+        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", "safe flee", nullptr);
+        engine->addStrategy("safe flee");
     }
 
     switch (player->getClass())
@@ -362,6 +363,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategy("boost");
             engine->addStrategy("dps assist");
             engine->removeStrategy("threat");
+            engine->addStrategy("safe flee");
             // engine-
             switch (player->getClass()) {
                 case CLASS_PRIEST: {
