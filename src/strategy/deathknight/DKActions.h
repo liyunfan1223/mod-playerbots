@@ -113,17 +113,23 @@ class CastIcyTouchAction : public CastSpellAction
 class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
 	public:
-		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true) { }
+		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true, .0f) { }
 };
 
 //debuff ps
-BEGIN_DEBUFF_ACTION(CastPlagueStrikeAction, "plague strike")
-END_SPELL_ACTION()
+
+class CastPlagueStrikeAction : public CastSpellAction
+{
+	public:
+		CastPlagueStrikeAction(PlayerbotAI* ai) : CastSpellAction(ai, "plague strike") {}
+};
+// BEGIN_DEBUFF_ACTION(CastPlagueStrikeAction, "plague strike")
+// END_SPELL_ACTION()
 
 class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
 	public:
-		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true) { }
+		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true, .0f) { }
 };
 
 //debuff
@@ -142,10 +148,10 @@ class CastUnholyBlightAction : public CastBuffSpellAction
 		CastUnholyBlightAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "unholy blight") { }
 };
 
-class CastSummonGargoyleAction : public CastBuffSpellAction
+class CastSummonGargoyleAction : public CastSpellAction
 {
 	public:
-		CastSummonGargoyleAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "summon gargoyle") { }
+		CastSummonGargoyleAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "summon gargoyle") { }
 };
 
 class CastGhoulFrenzyAction : public CastBuffSpellAction
@@ -230,10 +236,10 @@ class CastDeathAndDecayAction : public CastSpellAction
 		CastDeathAndDecayAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "death and decay") { }
 };
 
-class CastHornOfWinterAction : public CastBuffSpellAction
+class CastHornOfWinterAction : public CastSpellAction
 {
 	public:
-		CastHornOfWinterAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "horn of winter") { }
+		CastHornOfWinterAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "horn of winter") { }
 };
 
 class CastImprovedIcyTalonsAction : public CastBuffSpellAction
@@ -260,10 +266,10 @@ class CastDeathRuneMasteryAction : public CastBuffSpellAction
 		CastDeathRuneMasteryAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "death rune mastery") { }
 };
 
-class CastDancingWeaponAction : public CastBuffSpellAction
+class CastDancingRuneWeaponAction : public CastSpellAction
 {
 	public:
-		CastDancingWeaponAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "dancing weapon") { }
+		CastDancingRuneWeaponAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "dancing rune weapon") { }
 };
 
 class CastEmpowerRuneWeaponAction : public CastBuffSpellAction

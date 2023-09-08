@@ -37,7 +37,7 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         {
             return new ActionNode ("arcane missiles",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("firebolt"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("fireball"), nullptr),
                 /*C*/ nullptr);
         }
 

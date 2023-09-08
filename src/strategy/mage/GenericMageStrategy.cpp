@@ -21,13 +21,13 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["blast wave"] = &blast_wave;
             creators["remove curse"] = &remove_curse;
             creators["remove curse on party"] = &remove_curse_on_party;
-            creators["firebolt"] = &firebolt;
+            creators["fireball"] = &fireball;
         }
 
     private:
-        static ActionNode* frostbolt([[maybe_unused]] PlayerbotAI* botAI)
+        static ActionNode* fireball([[maybe_unused]] PlayerbotAI* botAI)
         {
-            return new ActionNode ("frostbolt",
+            return new ActionNode ("fireball",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
                 /*C*/ nullptr);

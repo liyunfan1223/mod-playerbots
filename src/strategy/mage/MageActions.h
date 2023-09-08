@@ -61,6 +61,7 @@ class CastFlamestrikeAction : public CastSpellAction
 {
     public:
         CastFlamestrikeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "flamestrike") { }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastFrostNovaAction : public CastSpellAction

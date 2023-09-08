@@ -206,11 +206,11 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
 
-    // player->SaveToDB(true, false);
-    // if (player->getClass() == CLASS_DEATH_KNIGHT)
-	// {
-	// 	player->learnSpell(50977, false);
-	// }
+    player->SaveToDB(true, false);
+    if (player->getClass() == CLASS_DEATH_KNIGHT)
+	{
+		player->learnSpell(50977, false);
+	}
     // player->RewardQuest(const Quest *quest, uint32 reward, Object *questGiver)
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId, name.c_str(), race, cls);
 
