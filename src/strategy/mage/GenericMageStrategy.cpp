@@ -25,9 +25,9 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         }
 
     private:
-        static ActionNode* fireball([[maybe_unused]] PlayerbotAI* botAI)
+        static ActionNode* frostbolt([[maybe_unused]] PlayerbotAI* botAI)
         {
-            return new ActionNode ("fireball",
+            return new ActionNode ("frostbolt",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
                 /*C*/ nullptr);
@@ -112,9 +112,9 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*A*/ NextAction::array(0, new NextAction("remove lesser curse on party"), nullptr),
                 /*C*/ nullptr);
         }
-        static ActionNode* firebolt([[maybe_unused]] PlayerbotAI* botAI)
+        static ActionNode* fireball([[maybe_unused]] PlayerbotAI* botAI)
         {
-            return new ActionNode ("firebolt",
+            return new ActionNode ("fireball",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
                 /*C*/ nullptr);
