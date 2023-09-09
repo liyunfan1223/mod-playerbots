@@ -1483,25 +1483,38 @@ bool RotateAroundTheCenterPointAction::Execute(Event event)
 
 bool SafeFleeAction::Execute(Event event)
 {
-    return SafeRunAway(AI_VALUE(Unit*, "current target"));
+    return SafeRunAway();
 }
 
 bool SafeFleeAction::isUseful()
 {
     if (sPlayerbotAIConfig->fleeingEnabled == 0)
         return false;
-    Unit* target = AI_VALUE(Unit*, "current target");
-    HostileReference* ref = target->GetThreatMgr().getCurrentVictim();
-    if (ref && ref->getTarget() == bot)
-    {
-        return true;
-    }
 
-    return false;
+
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && target->GetDistance(bot) > 8)
+    {
+        // after bot run out the dagger they will give up attack old target
+        bot->Attack(target, false);
+        botAI->ChangeEngine(BOT_STATE_NON_COMBAT);
+        bot->SetSelection(bot->GetGUID());
+    }
+         
+    return true;
 }
 
-bool MovementAction::SafeRunAway(Unit* target)
+bool MovementAction::SafeRunAway()
 {
+    // check real player is near for optimal prefomance
+    for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
+    {
+        Unit* player = botAI->GetUnit(helper);
+         if (!player || player == bot)
+            continue;
+    }
+
+
     std::vector<Unit*> targets;
     Unit* botVictim = bot->GetVictim();
     HostileReference* botRef = bot->getHostileRefMgr().getFirst();
@@ -1521,7 +1534,7 @@ bool MovementAction::SafeRunAway(Unit* target)
 
     for (Unit* target : targets)
     {
-        if (bot->GetDistance(target) <= sPlayerbotAIConfig->farDistance)
+        if (target && target->GetDistance(bot) <= 40)
         {
             float angle = target->GetAngle(bot);
             float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
@@ -1530,5 +1543,6 @@ bool MovementAction::SafeRunAway(Unit* target)
             return MoveTo(target->GetMapId(), dx, dy, dz);
         }
     }
+
     return false;
 }

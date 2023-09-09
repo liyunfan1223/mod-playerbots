@@ -71,11 +71,30 @@ bool HasAggroTrigger::IsActive()
 
 bool PanicTrigger::IsActive()
 {
-    // return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth &&
-	// 	(!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana);
+    if (AI_VALUE(Unit*, "current target")->GetHealthPct() < bot->GetHealthPct())
+    {
+        return false;
+    }
 
-    return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth ||
-    AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;// garfieldz90 - i think low health or with less mana would be reasonable for paicn
+    if (!bot->GetGroup())
+    {
+        return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->mediumHealth ||
+        AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->mediumHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;
+    }
+    
+    uint8 botClass = bot->getClass();
+    if (botClass == CLASS_WARRIOR || botClass == CLASS_PALADIN || botClass == CLASS_DEATH_KNIGHT)
+    {
+        return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth ||
+        AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;
+    }
+    else if (botClass == CLASS_DRUID)
+    {
+        return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth ||
+        AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;
+    }
+    return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->mediumHealth ||
+    AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->mediumHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;// garfieldz90 - i think low health or with less mana would be reasonable for paicn
 }
 
 // bool OutNumberedTrigger::IsActive()
@@ -126,23 +145,23 @@ bool OutNumberedTrigger::IsActive()
     if (bot->GetGroup() && bot->GetGroup()->isRaidGroup())
         return false;
 
-    int32 botLevel = bot->GetLevel();
+    int8 botLevel = bot->GetLevel();
     int32 friendPower = 0;
     int32 foePower = 0;
     int32 calculatedFriendPower = 0;
     for (auto& attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
     {
         Creature* creature = botAI->GetCreature(attacker);
-        foePower += creature->GetLevel();
-    }
-
+        foePower += 6;
+    }    
+    
     if (!foePower)
         return false;
 
     for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
     {
         Unit* player = botAI->GetUnit(helper);
-        if (!player || player == bot || !player->IsPlayer()) // garfieldz90 - cheeck real player is near for optimal performance
+        if (!player || player == bot)
             continue;
 
         if (bot->GetDistance(player) < sPlayerbotAIConfig->farDistance)
