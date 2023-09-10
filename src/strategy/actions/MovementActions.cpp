@@ -1496,6 +1496,7 @@ bool SafeFleeAction::isUseful()
     if (target && target->GetDistance(bot) > 8)
     {
         // after bot run out the dagger they will give up attack old target
+        bot->SetSpeed(MOVE_RUN, 1.0f, true);
         bot->Attack(target, false);
         botAI->ChangeEngine(BOT_STATE_NON_COMBAT);
         bot->SetSelection(bot->GetGUID());
@@ -1531,6 +1532,8 @@ bool MovementAction::SafeRunAway()
     }
     if (targets.empty())
         return false;
+
+    bot->SetSpeed(MOVE_RUN, 1.28f, true);
 
     for (Unit* target : targets)
     {
