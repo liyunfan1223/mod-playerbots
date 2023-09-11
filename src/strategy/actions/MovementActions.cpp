@@ -1490,12 +1490,6 @@ bool SafeFleeAction::isUseful()
 {
     if (sPlayerbotAIConfig->fleeingEnabled == 0)
         return false;    
-
-    if (bot->isDead())
-    {
-        bot->SetSpeed(MOVE_RUN, 1.0f, true);
-        return false;
-    }
     
     Unit* target = AI_VALUE(Unit*, "current target");
     if (target && !target->IsInCombat() || !target)
@@ -1507,14 +1501,14 @@ bool SafeFleeAction::isUseful()
         bot->SetSpeed(MOVE_RUN, 1.0f, true);
         return false;
     }
-
+    
     return true;
 }
 
 
 
 bool MovementAction::SafeRunAway()
-{
+{   
     std::vector<Unit*> targets;
     HostileRefMgr& refManager = bot->getHostileRefMgr();
     HostileReference* ref = refManager.getFirst();
@@ -1542,13 +1536,15 @@ bool MovementAction::SafeRunAway()
     {
         bot->SetSpeed(MOVE_RUN, 1.38f, true);
     }
-        
-    
+         
     for (Unit* target : targets)
     {
-        if (bot->IsWithinRange(target, 40.0f))
+        if (!target)
+            continue;
+        
+        if (bot->IsWithinCombatRange(target, 20.0f))
         {
-            float angle = target->GetAngle(bot);
+            float angle = target->GetAngle(bot) * 2.0f;
             float x = bot->GetPositionX() + cos(angle) * 16.0f;
             float y = bot->GetPositionY() + sin(angle) * 16.0f;
             float z = bot->GetPositionZ();

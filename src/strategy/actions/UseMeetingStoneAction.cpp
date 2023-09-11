@@ -172,7 +172,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                     bot->DurabilityRepairAll(false, 1.0f, false);
                     botAI->TellMasterNoFacing("I live, again!");
                 }
-
+                
+                bot->SetSpeed(MOVE_RUN, 1.0f, true);
                 player->GetMotionMaster()->Clear();
                 player->TeleportTo(mapId, x, y, z, 0);
                 return true;
