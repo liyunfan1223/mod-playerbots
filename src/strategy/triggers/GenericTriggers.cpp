@@ -71,7 +71,11 @@ bool HasAggroTrigger::IsActive()
 
 bool PanicTrigger::IsActive()
 {
-    if (AI_VALUE(Unit*, "current target")->GetHealthPct() < bot->GetHealthPct())
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+
+    if (target->GetHealthPct() < bot->GetHealthPct())
     {
         return false;
     }

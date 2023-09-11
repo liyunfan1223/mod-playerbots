@@ -1489,63 +1489,70 @@ bool SafeFleeAction::Execute(Event event)
 bool SafeFleeAction::isUseful()
 {
     if (sPlayerbotAIConfig->fleeingEnabled == 0)
-        return false;
+        return false;    
 
-
-    Unit* target = AI_VALUE(Unit*, "current target");
-    if (target && target->GetDistance(bot) > 8)
+    if (bot->isDead())
     {
-        // after bot run out the dagger they will give up attack old target
         bot->SetSpeed(MOVE_RUN, 1.0f, true);
+        return false;
+    }
+    
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && !target->IsInCombat() || !target)
+    {
+        // bot stop attack after escape danger
         bot->Attack(target, false);
         botAI->ChangeEngine(BOT_STATE_NON_COMBAT);
         bot->SetSelection(bot->GetGUID());
+        bot->SetSpeed(MOVE_RUN, 1.0f, true);
+        return false;
     }
-         
+
     return true;
 }
 
+
+
 bool MovementAction::SafeRunAway()
 {
-    // check real player is near for optimal prefomance
-    for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
-    {
-        Unit* player = botAI->GetUnit(helper);
-         if (!player || player == bot)
-            continue;
-    }
-
-
     std::vector<Unit*> targets;
-    Unit* botVictim = bot->GetVictim();
-    HostileReference* botRef = bot->getHostileRefMgr().getFirst();
-    while (botRef)
+    HostileRefMgr& refManager = bot->getHostileRefMgr();
+    HostileReference* ref = refManager.getFirst();
+    
+    if (!ref)
+        return false;
+
+    while(ref)
     {
-        ThreatMgr* threatMgr = botRef->GetSource();
-        if (Unit* botTarget = threatMgr->GetOwner())
+        Unit* HosTarget = ref->GetOwner();
+        if (bot->GetDistance2d(HosTarget) < sPlayerbotAIConfig->sightDistance)
         {
-            if (bot->CanSeeOrDetect(botTarget) && bot->IsWithinDist(botTarget, VISIBILITY_DISTANCE_NORMAL)){
-                targets.push_back(botTarget);
-            }
+            if (!HosTarget)
+                continue;
+
+            targets.push_back(HosTarget);
         }
-        botRef = botRef->next();
+        ref = ref->next();
     }
+
     if (targets.empty())
         return false;
 
-    bot->SetSpeed(MOVE_RUN, 1.28f, true);
-
+    if (bot->GetSpeed(MOVE_RUN) != 1.38f)
+    {
+        bot->SetSpeed(MOVE_RUN, 1.38f, true);
+    }
+        
+    
     for (Unit* target : targets)
     {
-        if (target && target->GetDistance(bot) <= 40)
+        if (bot->IsWithinRange(target, 40.0f))
         {
             float angle = target->GetAngle(bot);
-            float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
-            float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
-            float dz = bot->GetPositionZ();
-            return MoveTo(target->GetMapId(), dx, dy, dz);
-        }
+            float x = bot->GetPositionX() + cos(angle) * 16.0f;
+            float y = bot->GetPositionY() + sin(angle) * 16.0f;
+            float z = bot->GetPositionZ();
+            return MoveTo(target->GetMapId(), x, y, z);
+        }    
     }
-
-    return false;
 }

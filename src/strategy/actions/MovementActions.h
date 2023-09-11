@@ -49,9 +49,10 @@ class SafeFleeAction : public MovementAction
 {
     public:
         SafeFleeAction(PlayerbotAI* botAI) : MovementAction(botAI, "safe flee") { }
-
+        
         bool Execute(Event event) override;
         bool isUseful() override;
+        
 };
 
 class FleeAction : public MovementAction
