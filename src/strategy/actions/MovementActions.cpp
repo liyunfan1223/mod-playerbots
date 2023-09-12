@@ -1536,19 +1536,23 @@ bool MovementAction::SafeRunAway()
     {
         bot->SetSpeed(MOVE_RUN, 1.38f, true);
     }
-         
+
+    float angle = 0;
+    int8 counter = 0;
     for (Unit* target : targets)
     {
         if (!target)
             continue;
-        
-        if (bot->IsWithinCombatRange(target, 20.0f))
-        {
-            float angle = target->GetAngle(bot) * 2.0f;
-            float x = bot->GetPositionX() + cos(angle) * 16.0f;
-            float y = bot->GetPositionY() + sin(angle) * 16.0f;
-            float z = bot->GetPositionZ();
-            return MoveTo(target->GetMapId(), x, y, z);
-        }    
+
+        if (bot->GetDistance(target) <= sPlayerbotAIConfig->fleeDistance && counter < 1)
+        {    
+            angle += target->GetAngle(bot);
+            counter++;
+        }          
     }
+
+    float x = bot->GetPositionX() + cos(angle) * 32.0f;
+    float y = bot->GetPositionY() + sin(angle) * 32.0f;
+    float z = bot->GetPositionZ();
+    return MoveTo(bot->GetMapId(), x, y, z);
 }

@@ -71,13 +71,17 @@ bool HasAggroTrigger::IsActive()
 
 bool PanicTrigger::IsActive()
 {
-    Unit* target = AI_VALUE(Unit*, "current target");
-    if (!target)
-        return false;
-
-    if (target->GetHealthPct() < bot->GetHealthPct())
+    HostileRefMgr& refManager = bot->getHostileRefMgr();
+    if (refManager.getSize() == 1)
     {
-        return false;
+        Unit* target = AI_VALUE(Unit*, "current target");
+        if (!target)
+            return false;
+
+        if (target->GetHealthPct() < bot->GetHealthPct())
+        {
+            return false;
+        }
     }
 
     if (!bot->GetGroup())
@@ -92,7 +96,7 @@ bool PanicTrigger::IsActive()
         return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth ||
         AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;
     }
-    else if (botClass == CLASS_DRUID)
+    else if (botClass == CLASS_DRUID || botClass == CLASS_ROGUE)
     {
         return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth ||
         AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;
@@ -100,46 +104,6 @@ bool PanicTrigger::IsActive()
     return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->mediumHealth ||
     AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->mediumHealth && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;// garfieldz90 - i think low health or with less mana would be reasonable for paicn
 }
-
-// bool OutNumberedTrigger::IsActive()
-// {
-//     if (bot->GetMap() && (bot->GetMap()->IsDungeon() || bot->GetMap()->IsRaid()))
-//         return false;
-
-//     if (bot->GetGroup() && bot->GetGroup()->isRaidGroup())
-//         return false;
-
-//     int32 botLevel = bot->getLevel();
-//     uint32 friendPower = 200;
-//     uint32 foePower = 0;
-//     for (auto& attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
-//     {
-//         Creature* creature = botAI->GetCreature(attacker);
-//         if (!creature)
-//             continue;
-
-//         int32 dLevel = creature->getLevel() - botLevel;
-//         if (dLevel > -10)
-//             foePower = std::max(100 + 10 * dLevel, dLevel * 200);
-//     }
-
-//     if (!foePower)
-//         return false;
-
-//     for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
-//     {
-//         Unit* player = botAI->GetUnit(helper);
-//         if (!player || player == bot)
-//             continue;
-
-//         int32 dLevel = player->getLevel() - botLevel;
-
-//         if (dLevel > -10 && bot->GetDistance(player) < 10.0f)
-//             friendPower += std::max(200 + 20 * dLevel, dLevel * 200);
-//     }
-
-//     return friendPower < foePower;
-// }
 
 bool OutNumberedTrigger::IsActive()
 {
