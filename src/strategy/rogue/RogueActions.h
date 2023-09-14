@@ -147,6 +147,7 @@ class FanOfKnivesAction : public CastMeleeSpellAction
 {
 	public:
 		FanOfKnivesAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "fan of knives") {}
+		ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 #endif

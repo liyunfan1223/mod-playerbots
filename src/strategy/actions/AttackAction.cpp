@@ -102,6 +102,10 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     context->GetValue<Unit*>("current target")->Set(target);
     context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
     
+    /* prevent pet dead immediately in group */
+    if (bot->GetGroup() && !target->IsInCombat()) {
+        with_pet = false;
+    }
     if (Pet* pet = bot->GetPet())
     {
         if (with_pet) {
@@ -118,8 +122,10 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
         }
     }
 
-    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
-        bot->SetFacingToObject(target);
+    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target)) {
+        sServerFacade->SetFacingTo(bot, target);
+    }
+        // bot->SetFacingToObject(target);
 
     bool attacked = bot->Attack(target, true);
     botAI->ChangeEngine(BOT_STATE_COMBAT);

@@ -53,6 +53,7 @@ BEGIN_RANGED_SPELL_ACTION(CastMultiShotAction, "multi-shot")
 END_SPELL_ACTION()
 
 BEGIN_RANGED_SPELL_ACTION(CastVolleyAction, "volley")
+    ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 END_SPELL_ACTION()
 
 DEBUFF_CHECKISOWNER_ACTION(CastSerpentStingAction, "serpent sting");

@@ -48,5 +48,5 @@ NextAction** CastRebirthAction::getPrerequisites()
 
 bool CastRebirthAction::isUseful()
 {
-    return AI_VALUE2(float, "distance", GetTargetName()) <= sPlayerbotAIConfig->spellDistance;
+    return CastSpellAction::isUseful() && AI_VALUE2(float, "distance", GetTargetName()) <= sPlayerbotAIConfig->spellDistance;
 }

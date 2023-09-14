@@ -85,6 +85,8 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 			creators["raise dead"] = &DeathKnightTriggerFactoryInternal::raise_dead;
 			creators["chains of ice"] = &DeathKnightTriggerFactoryInternal::chains_of_ice;
 			creators["unbreakable armor"] = &DeathKnightTriggerFactoryInternal::unbreakable_armor;
+			creators["high blood rune"] = &DeathKnightTriggerFactoryInternal::high_blood_rune;
+			creators["freezing fog"] = &DeathKnightTriggerFactoryInternal::freezing_fog;
         }
 
     private:
@@ -106,6 +108,9 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 		static Trigger* raise_dead(PlayerbotAI* botAI) { return new RaiseDeadTrigger(botAI); }
 		static Trigger* chains_of_ice(PlayerbotAI* botAI) { return new ChainsOfIceSnareTrigger(botAI); }
 		static Trigger* unbreakable_armor(PlayerbotAI* botAI) { return new UnbreakableArmorTrigger(botAI); }
+		static Trigger* high_blood_rune(PlayerbotAI* botAI) { return new HighBloodRuneTrigger(botAI); }
+		static Trigger* freezing_fog(PlayerbotAI* botAI) { return new FreezingFogTrigger(botAI); }
+		
 };
 
 class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
@@ -164,7 +169,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 			creators["death pact"] = &DeathKnightAiObjectContextInternal::death_pact;
 			creators["death rune_mastery"] = &DeathKnightAiObjectContextInternal::death_rune_mastery;
 			//creators["hysteria"] = &DeathKnightAiObjectContextInternal::hysteria;
-			creators["dancing weapon"] = &DeathKnightAiObjectContextInternal::dancing_weapon;
+			creators["dancing rune weapon"] = &DeathKnightAiObjectContextInternal::dancing_rune_weapon;
 			creators["dark command"] = &DeathKnightAiObjectContextInternal::dark_command;
         }
 
@@ -221,7 +226,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 		static Action* death_pact(PlayerbotAI* botAI) { return new CastDeathPactAction(botAI); }
 		static Action* death_rune_mastery(PlayerbotAI* botAI) { return new CastDeathRuneMasteryAction(botAI); }
 		//static Action* hysteria(PlayerbotAI* botAI) { return new CastHysteriaAction(botAI); }
-		static Action* dancing_weapon(PlayerbotAI* botAI) { return new CastDancingWeaponAction(botAI); }
+		static Action* dancing_rune_weapon(PlayerbotAI* botAI) { return new CastDancingRuneWeaponAction(botAI); }
 		static Action* dark_command(PlayerbotAI* botAI) { return new CastDarkCommandAction(botAI); }
         static Action* mind_freeze_on_enemy_healer(PlayerbotAI* botAI) { return new CastMindFreezeOnEnemyHealerAction(botAI); }
 };

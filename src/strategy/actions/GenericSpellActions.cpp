@@ -63,10 +63,10 @@ bool CastSpellAction::Execute(Event event)
 bool CastSpellAction::isPossible()
 {
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true)) {
-        // if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-        //     LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
-        //         bot->GetName());
-        // }
+        if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster())) {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
+                bot->GetName());
+        }
         return false;
     }
 
@@ -75,10 +75,10 @@ bool CastSpellAction::isPossible()
 
     if (spell == "mount" && bot->IsInCombat())
     {
-        // if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-        //     LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
-        //         bot->GetName());
-        // }
+        if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster())) {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
+                bot->GetName());
+        }
         bot->Dismount();
         return false;
     }
@@ -153,7 +153,7 @@ bool CastEnchantItemAction::isPossible()
 
 CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount) : CastAuraSpellAction(botAI, spell, true), estAmount(estAmount)
 {
-    range = botAI->GetRange("spell");
+    range = botAI->GetRange("heal");
 }
 
 bool CastHealingSpellAction::isUseful()
@@ -168,7 +168,7 @@ bool CastAoeHealSpellAction::isUseful()
 
 CastCureSpellAction::CastCureSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
 {
-    range = botAI->GetRange("spell");
+    range = botAI->GetRange("heal");
 }
 
 Value<Unit*>* CurePartyMemberAction::GetTargetValue()

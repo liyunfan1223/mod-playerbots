@@ -504,7 +504,7 @@ AiPlayerbot.TooCloseDistance = 5.0
 AiPlayerbot.MeleeDistance = 0.01
 AiPlayerbot.FollowDistance = 1.5
 AiPlayerbot.WhisperDistance = 6000.0
-AiPlayerbot.ContactDistance = 0.01
+AiPlayerbot.ContactDistance = 0.45
 AiPlayerbot.AoeRadius = 10
 AiPlayerbot.RpgDistance = 200
 AiPlayerbot.AggroDistance = 22
@@ -622,6 +622,13 @@ AiPlayerbot.RandomBotRandomPassword = 0
 
 # Set RandomBotMaxLevel bots to RandomBotMinLevel or not
 AiPlayerbot.DowngradeMaxLevelBot = 0
+
+# Enable/Disable bot equipments persistence (stop random initialization) after certain level (EquipmentPersistenceLevel)
+# default: 0 (disable)
+AiPlayerbot.EquipmentPersistence = 0
+
+# default: 80
+AiPlayerbot.EquipmentPersistenceLevel = 80
 
 ##################################################################################
 #                                                                                #

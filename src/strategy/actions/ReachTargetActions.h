@@ -54,4 +54,13 @@ class ReachPartyMemberToHealAction : public ReachTargetAction
         std::string const GetTargetName() override;
 };
 
+class ReachPartyMemberToResurrectAction : public ReachTargetAction
+{
+    public:
+        ReachPartyMemberToResurrectAction(PlayerbotAI* botAI);
+
+        std::string const GetTargetName() override;
+};
+
+
 #endif
