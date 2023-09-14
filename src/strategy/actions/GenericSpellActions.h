@@ -6,6 +6,8 @@
 #define _PLAYERBOT_GENERICSPELLACTIONS_H
 
 #include "Action.h"
+#include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Value.h"
 
 class PlayerbotAI;
@@ -150,9 +152,14 @@ class HealPartyMemberAction : public CastHealingSpellAction, public PartyMemberA
 class ResurrectPartyMemberAction : public CastSpellAction
 {
 	public:
-		ResurrectPartyMemberAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) { }
+		ResurrectPartyMemberAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) {
+        }
 
 		std::string const GetTargetName() override { return "party member to resurrect"; }
+        NextAction** getPrerequisites() override
+		{
+            return NextAction::merge( NextAction::array(0, new NextAction("reach party member to resurrect"), NULL), Action::getPrerequisites());
+		}
 };
 
 class CurePartyMemberAction : public CastSpellAction, public PartyMemberActionNameSupport

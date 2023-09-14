@@ -153,7 +153,7 @@ bool CastEnchantItemAction::isPossible()
 
 CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount) : CastAuraSpellAction(botAI, spell, true), estAmount(estAmount)
 {
-    range = botAI->GetRange("spell");
+    range = botAI->GetRange("heal");
 }
 
 bool CastHealingSpellAction::isUseful()
@@ -168,7 +168,7 @@ bool CastAoeHealSpellAction::isUseful()
 
 CastCureSpellAction::CastCureSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
 {
-    range = botAI->GetRange("spell");
+    range = botAI->GetRange("heal");
 }
 
 Value<Unit*>* CurePartyMemberAction::GetTargetValue()
