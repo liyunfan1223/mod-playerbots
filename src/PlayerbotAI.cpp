@@ -2207,6 +2207,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
         case SPELL_FAILED_TRY_AGAIN:
         case SPELL_CAST_OK:
         case SPELL_FAILED_NOT_SHAPESHIFT:
+        case SPELL_FAILED_OUT_OF_RANGE:
             return true;
         default:
             if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster())) {
