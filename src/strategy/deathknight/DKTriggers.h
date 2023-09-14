@@ -12,19 +12,31 @@ class PlayerbotAI;
 BUFF_TRIGGER(HornOfWinterTrigger, "horn of winter");
 BUFF_TRIGGER(BoneShieldTrigger, "bone shield");
 BUFF_TRIGGER(ImprovedIcyTalonsTrigger, "improved icy talons");
-DEBUFF_CHECKISOWNER_TRIGGER(PlagueStrikeDebuffTrigger, "blood plague");
-DEBUFF_CHECKISOWNER_TRIGGER(IcyTouchDebuffTrigger, "frost fever");
+// DEBUFF_CHECKISOWNER_TRIGGER(PlagueStrikeDebuffTrigger, "blood plague");
+class PlagueStrikeDebuffTrigger : public DebuffTrigger
+{
+	public:
+		PlagueStrikeDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "blood plague", true, .0f) { }
+};
+
+// DEBUFF_CHECKISOWNER_TRIGGER(IcyTouchDebuffTrigger, "frost fever");
+class IcyTouchDebuffTrigger : public DebuffTrigger
+{
+	public:
+		IcyTouchDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost fever", true, .0f) { }
+};
+
 BUFF_TRIGGER(UnbreakableArmorTrigger, "unbreakable armor");
 class PlagueStrikeDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
 	public:
-		PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "blood plague", true) { }
+		PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "blood plague", true, .0f) { }
 };
 
 class IcyTouchDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
 	public:
-		IcyTouchDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "frost fever", true) { }
+		IcyTouchDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "frost fever", true, .0f) { }
 };
 
 class DKPresenceTrigger : public BuffTrigger
@@ -112,6 +124,19 @@ class StrangulateOnEnemyHealerTrigger : public InterruptEnemyHealerTrigger
 {
 	public:
 		StrangulateOnEnemyHealerTrigger(PlayerbotAI* botAI) : InterruptEnemyHealerTrigger(botAI, "strangulate") { }
+};
+
+class HighBloodRuneTrigger : public Trigger
+{
+	public:
+		HighBloodRuneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "high blood rune") { }
+		bool IsActive() override;
+};
+
+class FreezingFogTrigger : public HasAuraTrigger
+{
+	public:
+		FreezingFogTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "freezing fog") { }
 };
 
 #endif

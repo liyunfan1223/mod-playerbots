@@ -53,7 +53,7 @@ class GenericWarlockNonCombatStrategyActionNodeFactory : public NamedObjectFacto
         {
             return new ActionNode("summon felhunter",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("summon succubus"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("summon voidwalker"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* summon_felguard([[maybe_unused]] PlayerbotAI* botAI)

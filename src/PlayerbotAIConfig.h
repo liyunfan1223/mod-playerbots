@@ -168,6 +168,8 @@ class PlayerbotAIConfig
 
         uint32 selfBotLevel;
         bool downgradeMaxLevelBot;
+        bool equipmentPersistence;
+        int32 equipmentPersistenceLevel;
         std::string const GetTimestampStr();
         bool hasLog(std::string const fileName) { return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) != allowedLogFiles.end(); };
         bool openLog(std::string const fileName, char const* mode = "a");

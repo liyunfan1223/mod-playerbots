@@ -45,3 +45,12 @@ std::string const ReachPartyMemberToHealAction::GetTargetName()
 {
     return "party member to heal";
 }
+
+ReachPartyMemberToResurrectAction::ReachPartyMemberToResurrectAction(PlayerbotAI* botAI) : ReachTargetAction(botAI, "reach party member to resurrect", botAI->GetRange("spell"))
+{
+}
+
+std::string const ReachPartyMemberToResurrectAction::GetTargetName()
+{
+    return "party member to resurrect";
+}

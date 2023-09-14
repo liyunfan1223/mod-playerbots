@@ -17,6 +17,8 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
             // creators["innervate"] = &innervate;
             creators["regrowth_on_party"] = &regrowth_on_party;
             creators["rejuvenation on party"] = &rejuvenation_on_party;
+            creators["remove curse on party"] = &remove_curse_on_party;
+            creators["abolish poison on party"] = &abolish_poison_on_party;
         }
 
     private:
@@ -65,6 +67,20 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
                 /*A*/ NULL,
                 /*C*/ NULL);
         }
+        static ActionNode* remove_curse_on_party(PlayerbotAI* ai)
+        {
+            return new ActionNode ("remove curse on party",
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                /*A*/ NULL,
+                /*C*/ NULL);
+        }
+        static ActionNode* abolish_poison_on_party(PlayerbotAI* ai)
+        {
+            return new ActionNode ("abolish poison on party",
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                /*A*/ NULL,
+                /*C*/ NULL);
+        }
         // static ActionNode* innervate([[maybe_unused]] PlayerbotAI* botAI)
         // {
         //     return new ActionNode ("innervate",
@@ -84,7 +100,7 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
     NonCombatStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("mark of the wild", NextAction::array(0, new NextAction("mark of the wild", 14.0f), nullptr)));
-    triggers.push_back(new TriggerNode("thorns", NextAction::array(0, new NextAction("thorns", 12.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("thorns", NextAction::array(0, new NextAction("thorns", 12.0f), nullptr)));
     // triggers.push_back(new TriggerNode("cure poison", NextAction::array(0, new NextAction("abolish poison", 21.0f), nullptr)));
     triggers.push_back(new TriggerNode("party member cure poison", NextAction::array(0, new NextAction("abolish poison on party", 20.0f), nullptr)));
 	triggers.push_back(new TriggerNode("party member dead", NextAction::array(0, new NextAction("revive", ACTION_CRITICAL_HEAL + 10), nullptr)));
@@ -106,6 +122,9 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
 
     triggers.push_back(new TriggerNode("party member almost full health",
         NextAction::array(0, new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 2), NULL)));
+    
+    triggers.push_back(new TriggerNode("party member remove curse",
+        NextAction::array(0, new NextAction("remove curse on party", ACTION_DISPEL + 7), NULL)));
 }
 
 GenericDruidBuffStrategy::GenericDruidBuffStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI)

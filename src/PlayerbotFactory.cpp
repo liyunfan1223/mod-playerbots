@@ -130,7 +130,9 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         ResetQuests();
     }
-    ClearAllItems();
+    if (!sPlayerbotAIConfig->equipmentPersistence || level < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+        ClearAllItems();
+    }
     bot->SaveToDB(false, false);
 
     bot->GiveLevel(level);
@@ -222,7 +224,9 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
     LOG_INFO("playerbots", "Initializing equipmemt...");
-    InitEquipment(incremental);
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+        InitEquipment(incremental);
+    }
     // bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
@@ -342,7 +346,9 @@ void PlayerbotFactory::Randomize(bool incremental)
 void PlayerbotFactory::Refresh()
 {
     // Prepare();
-    InitEquipment(true);
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+        InitEquipment(true);
+    }
     ClearInventory();
     InitAmmo();
     InitFood();
@@ -1153,9 +1159,7 @@ void Shuffle(std::vector<uint32>& items)
 
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
-
-    // todo(yunfan): to be refactored, too much time overhead
-    std::map<uint8, std::vector<uint32> > items;
+    std::unordered_map<uint8, std::vector<uint32> > items;
     int tab = AiFactory::GetPlayerSpecTab(bot);
     
     uint32 blevel = bot->getLevel();

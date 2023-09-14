@@ -148,6 +148,7 @@ class CastRainOfFireAction : public CastSpellAction
 {
     public:
         CastRainOfFireAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "rain of fire") { }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastShadowfuryAction : public CastSpellAction

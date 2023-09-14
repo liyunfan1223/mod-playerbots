@@ -6,6 +6,8 @@
 #define _PLAYERBOT_GENERICSPELLACTIONS_H
 
 #include "Action.h"
+#include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Value.h"
 
 class PlayerbotAI;
@@ -66,10 +68,10 @@ class CastDebuffSpellOnAttackerAction : public CastDebuffSpellAction
         // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
-class CastDebuffSpellOnMeleeAttackerAction : public CastAuraSpellAction
+class CastDebuffSpellOnMeleeAttackerAction : public CastDebuffSpellAction
 {
     public:
-        CastDebuffSpellOnMeleeAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true) : CastAuraSpellAction(botAI, spell, isOwner) { }
+        CastDebuffSpellOnMeleeAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true, float needLifeTime = 8.0f) : CastDebuffSpellAction(botAI, spell, isOwner, needLifeTime) { }
 
         Value<Unit*>* GetTargetValue() override;
         std::string const getName() override { return spell + " on attacker"; }
@@ -150,9 +152,14 @@ class HealPartyMemberAction : public CastHealingSpellAction, public PartyMemberA
 class ResurrectPartyMemberAction : public CastSpellAction
 {
 	public:
-		ResurrectPartyMemberAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) { }
+		ResurrectPartyMemberAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) {
+        }
 
 		std::string const GetTargetName() override { return "party member to resurrect"; }
+        NextAction** getPrerequisites() override
+		{
+            return NextAction::merge( NextAction::array(0, new NextAction("reach party member to resurrect"), NULL), Action::getPrerequisites());
+		}
 };
 
 class CurePartyMemberAction : public CastSpellAction, public PartyMemberActionNameSupport

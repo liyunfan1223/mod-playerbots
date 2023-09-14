@@ -234,19 +234,19 @@ class NoDrinkTrigger : public Trigger
 class LightAoeTrigger : public AoeTrigger
 {
     public:
-        LightAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 2, 10.0f) { }
+        LightAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 2, 8.0f) { }
 };
 
 class MediumAoeTrigger : public AoeTrigger
 {
     public:
-        MediumAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 3, 10.0f) { }
+        MediumAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 3, 8.0f) { }
 };
 
 class HighAoeTrigger : public AoeTrigger
 {
     public:
-        HighAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 4, 10.0f) { }
+        HighAoeTrigger(PlayerbotAI* botAI) : AoeTrigger(botAI, 4, 8.0f) { }
 };
 
 class BuffTrigger : public SpellTrigger
@@ -342,7 +342,7 @@ class DebuffOnAttackerTrigger : public DebuffTrigger
 class DebuffOnMeleeAttackerTrigger : public DebuffTrigger
 {
     public:
-        DebuffOnMeleeAttackerTrigger(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = true) : DebuffTrigger(botAI, spell, 1, checkIsOwner) { }
+        DebuffOnMeleeAttackerTrigger(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = true, float needLifeTime = 8.0f) : DebuffTrigger(botAI, spell, 1, checkIsOwner, needLifeTime) { }
 
         Value<Unit*>* GetTargetValue() override;
         std::string const getName() override { return spell + " on attacker"; }
@@ -523,7 +523,7 @@ class TankAssistTrigger : public NoAttackersTrigger
 class IsBehindTargetTrigger : public Trigger
 {
     public:
-        IsBehindTargetTrigger(PlayerbotAI* botAI) : Trigger(botAI) { }
+        IsBehindTargetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "behind target") { }
 
         bool IsActive() override;
 };
@@ -531,7 +531,7 @@ class IsBehindTargetTrigger : public Trigger
 class IsNotBehindTargetTrigger : public Trigger
 {
     public:
-        IsNotBehindTargetTrigger(PlayerbotAI* botAI) : Trigger(botAI) { }
+        IsNotBehindTargetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "is not behind target") { }
 
         bool IsActive() override;
 };
@@ -539,7 +539,7 @@ class IsNotBehindTargetTrigger : public Trigger
 class IsNotFacingTargetTrigger : public Trigger
 {
     public:
-        IsNotFacingTargetTrigger(PlayerbotAI* botAI) : Trigger(botAI) { }
+        IsNotFacingTargetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "not facing target") { }
 
         bool IsActive() override;
 };

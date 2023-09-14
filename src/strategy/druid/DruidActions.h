@@ -136,6 +136,7 @@ class CastHurricaneAction : public CastSpellAction
 {
 	public:
 	    CastHurricaneAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "hurricane") { }
+		ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastMoonfireAction : public CastDebuffSpellAction

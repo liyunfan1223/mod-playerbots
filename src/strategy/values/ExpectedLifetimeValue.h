@@ -28,7 +28,7 @@ class ExpectedGroupDpsValue : public FloatCalculatedValue
 {
     public:
         ExpectedGroupDpsValue(PlayerbotAI* botAI) :
-            FloatCalculatedValue(botAI, "expected group dps") { }
+            FloatCalculatedValue(botAI, "expected group dps", 20 * 1000) { }
 
     public:
         float Calculate() override;

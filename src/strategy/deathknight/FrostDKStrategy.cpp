@@ -82,6 +82,7 @@ NextAction** FrostDKStrategy::getDefaultActions()
 		new NextAction("frost strike", ACTION_NORMAL + 4),
 		// new NextAction("death strike", ACTION_NORMAL + 3),
 		new NextAction("empower rune weapon", ACTION_NORMAL + 2),
+		new NextAction("horn of winter", ACTION_NORMAL), 
 		new NextAction("melee", ACTION_NORMAL), 
 		NULL
 	);
@@ -91,10 +92,13 @@ void FrostDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
 	triggers.push_back(new TriggerNode("unbreakable armor", NextAction::array(0, new NextAction("unbreakable armor", ACTION_NORMAL + 4), nullptr)));
+	triggers.push_back(new TriggerNode("high blood rune", NextAction::array(0, new NextAction("blood strike", ACTION_NORMAL + 1), nullptr)));
+	triggers.push_back(new TriggerNode("freezing fog", NextAction::array(0, new NextAction("howling blast", ACTION_HIGH + 1), nullptr)));
+	
     // triggers.push_back(new TriggerNode("empower rune weapon", NextAction::array(0, new NextAction("empower rune weapon", ACTION_NORMAL + 4), nullptr)));
 }
 
 void FrostDKAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-	triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("howling blast", ACTION_NORMAL + 4), nullptr)));
+	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("howling blast", ACTION_HIGH + 4), nullptr)));
 }

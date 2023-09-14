@@ -107,7 +107,7 @@ class TargetCriticalHealthTrigger : public TargetLowHealthTrigger
 class PartyMemberDeadTrigger : public Trigger
 {
 	public:
-		PartyMemberDeadTrigger(PlayerbotAI* botAI) : Trigger(botAI, "resurrect", 3) { }
+		PartyMemberDeadTrigger(PlayerbotAI* botAI) : Trigger(botAI, "resurrect", 1 * 1000) { }
 
         std::string const GetTargetName() override { return "party member to resurrect"; }
 		bool IsActive() override;
