@@ -20,6 +20,8 @@ void AutoTeleportForLevelAction::AutoUpgradeEquip() {
         return;
     }
     PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
-    factory.InitEquipment(true);
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+        factory.InitEquipment(true);
+    }
     factory.InitAmmo();
 }

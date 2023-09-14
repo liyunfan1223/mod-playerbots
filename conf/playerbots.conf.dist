@@ -623,6 +623,13 @@ AiPlayerbot.RandomBotRandomPassword = 0
 # Set RandomBotMaxLevel bots to RandomBotMinLevel or not
 AiPlayerbot.DowngradeMaxLevelBot = 0
 
+# Enable/Disable bot equipments persistence (stop random initialization) after certain level (EquipmentPersistenceLevel)
+# default: 0 (disable)
+AiPlayerbot.EquipmentPersistence = 0
+
+# default: 80
+AiPlayerbot.EquipmentPersistenceLevel = 80
+
 ##################################################################################
 #                                                                                #
 # Database Stuff 																 #
