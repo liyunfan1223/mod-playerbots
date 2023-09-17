@@ -148,7 +148,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    float distance = bot->GetDistance2d(x, y);
+    float distance = bot->GetDistance(x, y, z);
     if (distance > sPlayerbotAIConfig->contactDistance)
     {
         WaitForReach(distance);
@@ -166,7 +166,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         MotionMaster &mm = *bot->GetMotionMaster();
         
         mm.Clear();
-        mm.MovePoint(mapId, x, y, SearchBestGroundZForPath(x, y, z), generatePath);
+        mm.MovePoint(mapId, x, y, SearchBestGroundZForPath(x, y, z, generatePath), generatePath);
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;
     }
@@ -1268,8 +1268,11 @@ bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float d
     return MoveNear(mapId, x, y, z, distance);
 }
 
-float MovementAction::SearchBestGroundZForPath(float x, float y, float z, float range)
+float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range)
 {
+    if (!generatePath) {
+        return z;
+    }
     float modified_z;
     float delta;
     for (delta = 0.0f; delta <= range / 2; delta++) {
