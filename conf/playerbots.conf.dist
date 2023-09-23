@@ -743,7 +743,7 @@ AiPlayerbot.DefaultTalentsOrder.5.2 = 0503203--325023051223010323152301351
 # DeathKnight
 AiPlayerbot.RandomClassSpecProbability.6.0 = 30
 AiPlayerbot.DefaultTalentsOrderLowLevel.6.0 =
-AiPlayerbot.DefaultTalentsOrder.6.0 = 0355220530003313221020131351305-0052
+AiPlayerbot.DefaultTalentsOrder.6.0 = 0355021533003313201020131351-005-005032
 AiPlayerbot.RandomClassSpecProbability.6.1 = 40
 AiPlayerbot.DefaultTalentsOrderLowLevel.6.1 =
 AiPlayerbot.DefaultTalentsOrder.6.1 = 03-32002350352203012300033101351-230200305
