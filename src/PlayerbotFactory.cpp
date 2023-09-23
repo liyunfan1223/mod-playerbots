@@ -2053,12 +2053,46 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specNo)
     }
 
     // bot->SaveToDB();
+    if (bot->GetLevel() < 80 && sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo].size() != 0) {
+        for (std::vector<uint32> &p : sPlayerbotAIConfig->defaultTalentsOrderLowLevel[bot->getClass()][specNo]) {
+            uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
+            uint32 talentID = -1;
+
+            std::vector<TalentEntry const*> &spells = spells_row[row];
+            if (spells.size() <= 0) {
+                return;
+            }
+            // assert(spells.size() > 0);
+            for (TalentEntry const* talentInfo : spells) {
+                if (talentInfo->Col != col) {
+                    continue;
+                }
+                TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
+                if (talentTabInfo->tabpage != tab) {
+                    continue;
+                }
+                if (talentInfo->DependsOn) {
+                    bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));            
+                }
+                talentID = talentInfo->TalentID;
+            }
+            assert(talentID != -1);
+            bot->LearnTalent(talentID, std::min(lvl, bot->GetFreeTalentPoints()) - 1);
+            if (bot->GetFreeTalentPoints() == 0) {
+                break;
+            }
+        }
+    }
+
     for (std::vector<uint32> &p : sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo]) {
         uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
         uint32 talentID = -1;
 
         std::vector<TalentEntry const*> &spells = spells_row[row];
-        assert(spells.size() > 0);
+        if (spells.size() <= 0) {
+            return;
+        }
+        // assert(spells.size() > 0);
         for (TalentEntry const* talentInfo : spells) {
             if (talentInfo->Col != col) {
                 continue;
@@ -2066,6 +2100,9 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specNo)
             TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
             if (talentTabInfo->tabpage != tab) {
                 continue;
+            }
+            if (talentInfo->DependsOn) {
+                bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));            
             }
             talentID = talentInfo->TalentID;
         }
