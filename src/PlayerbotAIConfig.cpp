@@ -589,7 +589,7 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
             }
             int lvl = tab_links[tab][i] - '0';
             if (lvl == 0) continue;
-            orders[tab].push_back({tab, spells[tab][i]->Row, spells[tab][i]->Col, lvl});
+            orders[tab].push_back({(uint32)tab, spells[tab][i]->Row, spells[tab][i]->Col, (uint32)lvl});
         }
     }
     // sort by talent tab size
