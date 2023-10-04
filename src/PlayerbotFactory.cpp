@@ -150,6 +150,8 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
     */
     InitInstanceQuests();
+    // clear quest reward inventory
+    ClearInventory();
     bot->GiveLevel(level);
 
     if (sPlayerbotAIConfig->randomBotPreQuests)
