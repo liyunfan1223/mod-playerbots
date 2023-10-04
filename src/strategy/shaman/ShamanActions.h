@@ -295,10 +295,10 @@ class CastFlameShockAction : public CastDebuffSpellAction
         CastFlameShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flame shock", true) { }
 };
 
-class CastEarthShockAction : public CastDebuffSpellAction
+class CastEarthShockAction : public CastSpellAction
 {
     public:
-        CastEarthShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "earth shock", true) { }
+        CastEarthShockAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "earth shock") { }
 };
 
 class CastFrostShockAction : public CastSnareSpellAction
