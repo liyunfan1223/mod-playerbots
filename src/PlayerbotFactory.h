@@ -138,6 +138,7 @@ class PlayerbotFactory : public InventoryAction
         void InitTalents(uint32 specNo);
         void InitTalentsByTemplate(uint32 specNo);
         void InitQuests(std::list<uint32>& questMap);
+        void InitInstanceQuests();
         void ClearInventory();
         void ClearAllItems();
         void ResetQuests();

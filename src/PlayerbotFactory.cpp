@@ -149,6 +149,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
     */
+    InitInstanceQuests();
+    bot->GiveLevel(level);
 
     if (sPlayerbotAIConfig->randomBotPreQuests)
     {
@@ -2179,6 +2181,24 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap)
     }
 
     ClearInventory();
+}
+
+void PlayerbotFactory::InitInstanceQuests()
+{
+    // The Caverns of Time
+    if (bot->GetLevel() >= 64) {
+        uint32 questId = 10277;
+        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
+        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
+        bot->RewardQuest(quest, 0, bot, false);
+    }
+    // Return to Andormu
+    if (bot->GetLevel() >= 66) {
+        uint32 questId = 10285;
+        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
+        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
+        bot->RewardQuest(quest, 0, bot, false);
+    }
 }
 
 void PlayerbotFactory::ClearInventory()
