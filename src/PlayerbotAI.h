@@ -400,7 +400,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsInVehicle(bool canControl = false, bool canCast = false, bool canAttack = false, bool canTurn = false, bool fixed = false);
 
         uint32 GetEquipGearScore(Player* player, bool withBags, bool withBank);
-        static uint32 GetMixedGearScore(Player* player, bool withBags, bool withBank);
+        static uint32 GetMixedGearScore(Player* player, bool withBags, bool withBank, uint32 topN = 0);
         bool HasSkill(SkillType skill);
         bool IsAllowedCommand(std::string const text);
         float GetRange(std::string const type);

@@ -573,10 +573,10 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         }
         else if (cmd == "init=auto")
         {
-            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, true) * 1.1f;
+            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 10) * 1.1f;
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
             factory.Randomize(false);
-            return "ok, gear score limit: " + std::to_string(mixedGearScore);
+            return "ok, gear score limit: " + std::to_string(mixedGearScore / 5) + "(for epic)";
         }
     }
 
