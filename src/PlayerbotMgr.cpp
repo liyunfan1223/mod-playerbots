@@ -571,6 +571,13 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             factory.Randomize(false);
             return "ok";
         }
+        else if (cmd == "init=auto")
+        {
+            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, true) * 1.1f;
+            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+            factory.Randomize(false);
+            return "ok, gear score limit: " + std::to_string(mixedGearScore);
+        }
     }
 
     if (cmd == "levelup" || cmd == "level")

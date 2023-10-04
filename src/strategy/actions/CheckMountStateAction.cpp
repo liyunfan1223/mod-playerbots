@@ -160,12 +160,12 @@ bool CheckMountStateAction::Mount()
 {
     uint32 secondmount = 40;
 
-    // if (bot->isMoving())
-    // {
-    //     bot->StopMoving();
-    //     bot->GetMotionMaster()->Clear();
-    //     // bot->GetMotionMaster()->MoveIdle();
-    // }
+    if (bot->isMoving())
+    {
+        bot->StopMoving();
+        // bot->GetMotionMaster()->Clear();
+        // bot->GetMotionMaster()->MoveIdle();
+    }
 
 	Player* master = GetMaster();
 	botAI->RemoveShapeshift();

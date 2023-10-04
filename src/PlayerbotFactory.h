@@ -103,7 +103,7 @@ enum PriorizedConsumables
 class PlayerbotFactory : public InventoryAction
 {
     public:
-        PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality = 0);
+        PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality = 0, uint32 gearScoreLimit = 0);
 
         static ObjectGuid GetRandomBot();
         static void Init();
@@ -121,7 +121,7 @@ class PlayerbotFactory : public InventoryAction
         void InitEquipment(bool incremental);
         void InitPet();
         void InitAmmo();
-
+        static uint32 CalcMixedGearScore(uint32 gs, uint32 quality);
     private:
         void Prepare();
         // void InitSecondEquipmentSet();
@@ -175,6 +175,7 @@ class PlayerbotFactory : public InventoryAction
         EnchantContainer::const_iterator GetEnchantContainerEnd() { return m_EnchantContainer.end(); }
         uint32 level;
         uint32 itemQuality;
+        uint32 gearScoreLimit;
         static std::list<uint32> specialQuestIds;
         std::vector<uint32> trainerIdCache;
     protected:

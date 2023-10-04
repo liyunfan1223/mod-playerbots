@@ -52,7 +52,7 @@ uint32 PlayerbotFactory::tradeSkills[] =
 std::list<uint32> PlayerbotFactory::classQuestIds;
 std::list<uint32> PlayerbotFactory::specialQuestIds;
 
-PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality) : level(level), itemQuality(itemQuality), InventoryAction(GET_PLAYERBOT_AI(bot), "factory")
+PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality, uint32 gearScoreLimit) : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), InventoryAction(GET_PLAYERBOT_AI(bot), "factory")
 {
 }
 
@@ -984,7 +984,7 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
     if (proto->Quality != desiredQuality)
         return false;
 
-    if (proto->Bonding == BIND_QUEST_ITEM || proto->Bonding == BIND_WHEN_USE)
+    if (proto->Bonding == BIND_QUEST_ITEM /*|| proto->Bonding == BIND_WHEN_USE*/)
         return false;
 
     if (proto->Class == ITEM_CLASS_CONTAINER)
@@ -1200,7 +1200,10 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
-
+                        
+                        if (gearScoreLimit != 0 && CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit) {
+                            continue;
+                        }
                         if (proto->Class != ITEM_CLASS_WEAPON &&
                             proto->Class != ITEM_CLASS_ARMOR)
                             continue;
@@ -2251,6 +2254,11 @@ void PlayerbotFactory::InitAmmo()
         }
     }
     bot->SetAmmo(entry);
+}
+
+uint32 PlayerbotFactory::CalcMixedGearScore(uint32 gs, uint32 quality)
+{
+    return gs * (quality + 1);
 }
 
 void PlayerbotFactory::InitMounts()
