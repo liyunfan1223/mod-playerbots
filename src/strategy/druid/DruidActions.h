@@ -279,4 +279,11 @@ class CastMoonfireOnAttackerAction : public CastDebuffSpellOnAttackerAction
 public:
 	CastMoonfireOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "moonfire") {}
 };
+
+class CastEnrageAction : public CastBuffSpellAction
+{
+public:
+	CastEnrageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "enrage") {}
+};
+
 #endif

@@ -208,6 +208,7 @@ class CastBestialWrathAction : public CastBuffSpellAction
 {
     public:
         CastBestialWrathAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "bestial wrath") { }
+        std::string const GetTargetName() override { return "pet target"; }
 };
 
 class CastScareBeastAction : public CastSpellAction

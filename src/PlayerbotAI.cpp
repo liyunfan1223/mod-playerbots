@@ -212,6 +212,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         // }
         return;
     }
+    if (!GetMaster() || !GetMaster()->IsInWorld() || !GetMaster()->GetSession() || GetMaster()->GetSession()->isLogingOut()) {
+        return;
+    }
     // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
     //     bot->Say("Falling!", LANG_UNIVERSAL);
     // }
@@ -959,7 +962,7 @@ void PlayerbotAI::DoNextAction(bool min)
         SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
         return;
     }
-
+    
     if (bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {
         SetNextCheckDelay(sPlayerbotAIConfig->passiveDelay);
@@ -3511,7 +3514,111 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBa
     return 0;
 }
 
-void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore)
+uint32 PlayerbotAI::GetMixedGearScore(Player* player, bool withBags, bool withBank, uint32 topN)
+{
+    std::vector<uint32> gearScore(EQUIPMENT_SLOT_END);
+    uint32 twoHandScore = 0;
+
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            _fillGearScoreData(player, item, &gearScore, twoHandScore, true);
+    }
+
+    if (withBags)
+    {
+        // check inventory
+        for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        {
+            if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                _fillGearScoreData(player, item, &gearScore, twoHandScore, true);
+        }
+
+        // check bags
+        for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        {
+            if (Bag* pBag = (Bag*)player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                {
+                    if (Item* item2 = pBag->GetItemByPos(j))
+                        _fillGearScoreData(player, item2, &gearScore, twoHandScore, true);
+                }
+            }
+        }
+    }
+
+    if (withBank)
+    {
+        for (uint8 i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        {
+            if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                _fillGearScoreData(player, item, &gearScore, twoHandScore, true);
+        }
+
+        for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+        {
+            if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                if (item->IsBag())
+                {
+                    Bag* bag = (Bag*)item;
+                    for (uint8 j = 0; j < bag->GetBagSize(); ++j)
+                    {
+                        if (Item* item2 = bag->GetItemByPos(j))
+                            _fillGearScoreData(player, item2, &gearScore, twoHandScore, true);
+                    }
+                }
+            }
+        }
+    }
+    if (!topN) {
+        uint8 count = EQUIPMENT_SLOT_END - 2;   // ignore body and tabard slots
+        uint32 sum = 0;
+
+        // check if 2h hand is higher level than main hand + off hand
+        if (gearScore[EQUIPMENT_SLOT_MAINHAND] + gearScore[EQUIPMENT_SLOT_OFFHAND] < twoHandScore * 2)
+        {
+            gearScore[EQUIPMENT_SLOT_OFFHAND] = 0;  // off hand is ignored in calculations if 2h weapon has higher score
+            --count;
+            gearScore[EQUIPMENT_SLOT_MAINHAND] = twoHandScore;
+        }
+
+        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+        {
+            sum += gearScore[i];
+        }
+
+        if (count)
+        {
+            uint32 res = uint32(sum / count);
+            return res;
+        }
+
+        return 0;
+    }
+    // topN != 0
+    if (gearScore[EQUIPMENT_SLOT_MAINHAND] + gearScore[EQUIPMENT_SLOT_OFFHAND] < twoHandScore * 2)
+    {
+        gearScore[EQUIPMENT_SLOT_OFFHAND] = twoHandScore;
+        gearScore[EQUIPMENT_SLOT_MAINHAND] = twoHandScore;
+    }
+    std::vector<uint32> topGearScore;
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        topGearScore.push_back(gearScore[i]);
+    }
+    std::sort(topGearScore.begin(), topGearScore.end(), [&](const uint32 lhs, const uint32 rhs) {
+        return lhs > rhs;
+    });
+    uint32 sum = 0;
+    for (int i = 0; i < std::min((uint32)topGearScore.size(), topN); i++) {
+        sum += topGearScore[i];
+    }
+    return sum / topN;
+}
+
+void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore, bool mixed)
 {
     if (!item)
         return;
@@ -3521,7 +3628,7 @@ void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uin
         return;
 
     uint8 type   = proto->InventoryType;
-    uint32 level = proto->ItemLevel;
+    uint32 level = mixed ? proto->ItemLevel * (1 + proto->Quality) : proto->ItemLevel;
 
     switch (type)
     {

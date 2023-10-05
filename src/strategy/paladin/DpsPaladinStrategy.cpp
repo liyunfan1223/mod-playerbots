@@ -105,7 +105,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("repentance on enemy healer", NextAction::array(0, new NextAction("repentance on enemy healer", ACTION_INTERRUPT + 2), nullptr)));
     // triggers.push_back(new TriggerNode("repentance on snare target", NextAction::array(0, new NextAction("repentance on snare target", ACTION_INTERRUPT + 2), nullptr)));
     // triggers.push_back(new TriggerNode("repentance", NextAction::array(0, new NextAction("repentance", ACTION_INTERRUPT + 2), nullptr)));
-	// triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("divine storm", ACTION_HIGH + 1), new NextAction("consecration", ACTION_HIGH + 1), nullptr)));
+	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 3), nullptr)));
 	triggers.push_back(new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("hammer of wrath", ACTION_HIGH), nullptr)));
     // triggers.push_back(new TriggerNode(

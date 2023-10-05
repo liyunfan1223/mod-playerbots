@@ -400,6 +400,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsInVehicle(bool canControl = false, bool canCast = false, bool canAttack = false, bool canTurn = false, bool fixed = false);
 
         uint32 GetEquipGearScore(Player* player, bool withBags, bool withBank);
+        static uint32 GetMixedGearScore(Player* player, bool withBags, bool withBank, uint32 topN = 0);
         bool HasSkill(SkillType skill);
         bool IsAllowedCommand(std::string const text);
         float GetRange(std::string const type);
@@ -447,7 +448,7 @@ class PlayerbotAI : public PlayerbotAIBase
         static std::vector<std::string> dispel_whitelist;
         bool EqualLowercaseName(std::string s1, std::string s2);
     private:
-        void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
+        static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore, bool mixed = false);
         bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     protected:
 	    Player* bot;

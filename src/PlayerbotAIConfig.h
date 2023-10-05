@@ -87,6 +87,7 @@ class PlayerbotAIConfig
         uint32 specProbability[MAX_CLASSES][10];
         // [(tab, row, col, level)]
         std::vector<std::vector<uint32>> defaultTalentsOrder[MAX_CLASSES][3];
+        std::vector<std::vector<uint32>> defaultTalentsOrderLowLevel[MAX_CLASSES][3];
         std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
         ClassSpecs classSpecs[MAX_CLASSES];
         std::string commandPrefix, commandSeparator;
@@ -178,7 +179,7 @@ class PlayerbotAIConfig
 
         void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
     private:
-        std::vector<std::vector<uint32>> ParseTempTalentsOrder(std::string temp_talents_order);
+        std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

@@ -87,7 +87,7 @@ bool FollowAction::isUseful()
         if (Formation::IsNullLocation(loc) || bot->GetMapId() != loc.GetMapId())
             return false;
 
-        distance = sServerFacade->GetDistance2d(bot, loc.GetPositionX(), loc.GetPositionY());
+        distance = bot->GetDistance(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
 
     return sServerFacade->IsDistanceGreaterThan(distance, formation->GetMaxDistance());

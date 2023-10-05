@@ -42,7 +42,7 @@ class MovementAction : public Action
         void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
         bool SafeRunAway();
     private:
-        float SearchBestGroundZForPath(float x, float y, float z, float range = 10.0f);
+        float SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range = 10.0f);
 };
 
 class SafeFleeAction : public MovementAction

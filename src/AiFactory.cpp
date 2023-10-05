@@ -583,13 +583,13 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         // nonCombatEngine->addStrategy("group");
                         // nonCombatEngine->addStrategy("guild");
 
-                        if (sPlayerbotAIConfig->autoDoQuests)
-                        {
-                            // nonCombatEngine->addStrategy("travel");
-                            nonCombatEngine->addStrategy("rpg");
-                        } else {
-                            nonCombatEngine->addStrategy("move random");
-                        }
+                        // if (sPlayerbotAIConfig->autoDoQuests)
+                        // {
+                        //     // nonCombatEngine->addStrategy("travel");
+                        //     nonCombatEngine->addStrategy("rpg");
+                        // } else {
+                        //     nonCombatEngine->addStrategy("move random");
+                        // }
 
                         // if (masterBotAI)
                         //     nonCombatEngine->addStrategy("maintenance");

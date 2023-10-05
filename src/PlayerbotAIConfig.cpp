@@ -169,9 +169,23 @@ bool PlayerbotAIConfig::Initialize()
             os.clear();
             os << "AiPlayerbot.DefaultTalentsOrder." << cls << "." << spec;
             std::string temp_talents_order = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
-            defaultTalentsOrder[cls][spec] = ParseTempTalentsOrder(temp_talents_order);
+            defaultTalentsOrder[cls][spec] = ParseTempTalentsOrder(cls, temp_talents_order);
             if (defaultTalentsOrder[cls][spec].size() > 0) {
                 sLog->outMessage("playerbot", LOG_LEVEL_INFO, "default talents order for cls %d spec %d loaded.", cls, spec);
+            }
+        }
+        for (uint32 spec = 0; spec < 3; ++spec)
+        {
+            std::ostringstream os; 
+            os << "AiPlayerbot.RandomClassSpecProbability." << cls << "." << spec;
+            specProbability[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
+            os.str("");
+            os.clear();
+            os << "AiPlayerbot.DefaultTalentsOrderLowLevel." << cls << "." << spec;
+            std::string temp_talents_order = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
+            defaultTalentsOrderLowLevel[cls][spec] = ParseTempTalentsOrder(cls, temp_talents_order);
+            if (defaultTalentsOrderLowLevel[cls][spec].size() > 0) {
+                sLog->outMessage("playerbot", LOG_LEVEL_INFO, "default low level talents order for cls %d spec %d loaded.", cls, spec);
             }
         }
     }
@@ -540,15 +554,83 @@ static std::vector<std::string> split(const std::string &str, const std::string 
     return res;
 }
 
-std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(std::string temp_talents_order) {
+std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32 cls, std::string tab_link) {
+    // check bad link
+    uint32 classMask = 1 << (cls - 1);    
     std::vector<std::vector<uint32>> res;
-    std::vector<std::string> pieces = split(temp_talents_order, ",");
-    for (std::string piece : pieces) {
-        uint32 tab, row, col, lvl;
-        if (sscanf(piece.c_str(), "%u-%u-%u-%u", &tab, &row, &col, &lvl) == -1) {
+    std::vector<std::string> tab_links = split(tab_link, "-");
+    std::map<uint32, std::vector<TalentEntry const*>> spells;
+    std::vector<std::vector<std::vector<uint32>>> orders(3);
+    // orders.assign(3);
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    {
+        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
+        if(!talentInfo)
+            continue;
+
+        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
+        if(!talentTabInfo)
+            continue;
+
+        if( (classMask & talentTabInfo->ClassMask) == 0 )
+            continue;
+
+        spells[talentTabInfo->tabpage].push_back(talentInfo);
+    }
+    for (int tab = 0; tab < 3; tab++) {
+        if (tab_links.size() <= tab) {
             break;
         }
-        res.push_back({tab, row, col, lvl});
+        std::sort(spells[tab].begin(), spells[tab].end(), [&](TalentEntry const* lhs, TalentEntry const* rhs) {
+            return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col;
+        });
+        for (int i = 0; i < tab_links[tab].size(); i++) {
+            if (i >= spells[tab].size()) {
+                break;
+            }
+            int lvl = tab_links[tab][i] - '0';
+            if (lvl == 0) continue;
+            orders[tab].push_back({(uint32)tab, spells[tab][i]->Row, spells[tab][i]->Col, (uint32)lvl});
+        }
     }
+    // sort by talent tab size
+    std::sort(orders.begin(), orders.end(), [&](auto &lhs, auto &rhs) {
+        return lhs.size() > rhs.size();
+    });
+    for (auto &order : orders) {
+        res.insert(res.end(), order.begin(), order.end());
+    }
+    // for (std::vector<uint32> &p : sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo]) {
+    //     uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
+    //     uint32 talentID = -1;
+
+    //     std::vector<TalentEntry const*> &spells = spells_row[row];
+    //     assert(spells.size() > 0);
+    //     for (TalentEntry const* talentInfo : spells) {
+    //         if (talentInfo->Col != col) {
+    //             continue;
+    //         }
+    //         TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
+    //         if (talentTabInfo->tabpage != tab) {
+    //             continue;
+    //         }
+    //         talentID = talentInfo->TalentID;
+    //     }
+    //     assert(talentID != -1);
+    //     bot->LearnTalent(talentID, std::min(lvl, bot->GetFreeTalentPoints()) - 1);
+    //     if (bot->GetFreeTalentPoints() == 0) {
+    //         break;
+    //     }
+    // }
+    // // for (int tab = 0; tab < 3; tab++) {
+
+    // // }
+    // for (std::string piece : pieces) {
+    //     uint32 tab, row, col, lvl;
+    //     if (sscanf(piece.c_str(), "%u-%u-%u-%u", &tab, &row, &col, &lvl) == -1) {
+    //         break;
+    //     }
+    //     res.push_back({tab, row, col, lvl});
+    // }
     return res;
 }

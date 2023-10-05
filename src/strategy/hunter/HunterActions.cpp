@@ -40,7 +40,10 @@ bool CastAutoShotAction::isUseful()
 {
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))
         return false;
-
+    
+    if (bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)) {
+        return false;
+    }
     return AI_VALUE(uint32, "active spell") != AI_VALUE2(uint32, "spell id", getName());
 }
 

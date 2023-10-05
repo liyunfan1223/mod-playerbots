@@ -52,7 +52,7 @@ uint32 PlayerbotFactory::tradeSkills[] =
 std::list<uint32> PlayerbotFactory::classQuestIds;
 std::list<uint32> PlayerbotFactory::specialQuestIds;
 
-PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality) : level(level), itemQuality(itemQuality), InventoryAction(GET_PLAYERBOT_AI(bot), "factory")
+PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality, uint32 gearScoreLimit) : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), InventoryAction(GET_PLAYERBOT_AI(bot), "factory")
 {
 }
 
@@ -149,6 +149,10 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
     */
+    InitInstanceQuests();
+    // clear quest reward inventory
+    ClearInventory();
+    bot->GiveLevel(level);
 
     if (sPlayerbotAIConfig->randomBotPreQuests)
     {
@@ -982,7 +986,7 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
     if (proto->Quality != desiredQuality)
         return false;
 
-    if (proto->Bonding == BIND_QUEST_ITEM || proto->Bonding == BIND_WHEN_USE)
+    if (proto->Bonding == BIND_QUEST_ITEM /*|| proto->Bonding == BIND_WHEN_USE*/)
         return false;
 
     if (proto->Class == ITEM_CLASS_CONTAINER)
@@ -1198,7 +1202,10 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
-
+                        
+                        if (gearScoreLimit != 0 && CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit) {
+                            continue;
+                        }
                         if (proto->Class != ITEM_CLASS_WEAPON &&
                             proto->Class != ITEM_CLASS_ARMOR)
                             continue;
@@ -2053,12 +2060,46 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specNo)
     }
 
     // bot->SaveToDB();
+    if (bot->GetLevel() < 80 && sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo].size() != 0) {
+        for (std::vector<uint32> &p : sPlayerbotAIConfig->defaultTalentsOrderLowLevel[bot->getClass()][specNo]) {
+            uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
+            uint32 talentID = -1;
+
+            std::vector<TalentEntry const*> &spells = spells_row[row];
+            if (spells.size() <= 0) {
+                return;
+            }
+            // assert(spells.size() > 0);
+            for (TalentEntry const* talentInfo : spells) {
+                if (talentInfo->Col != col) {
+                    continue;
+                }
+                TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
+                if (talentTabInfo->tabpage != tab) {
+                    continue;
+                }
+                if (talentInfo->DependsOn) {
+                    bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));            
+                }
+                talentID = talentInfo->TalentID;
+            }
+            assert(talentID != -1);
+            bot->LearnTalent(talentID, std::min(lvl, bot->GetFreeTalentPoints()) - 1);
+            if (bot->GetFreeTalentPoints() == 0) {
+                break;
+            }
+        }
+    }
+
     for (std::vector<uint32> &p : sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo]) {
         uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
         uint32 talentID = -1;
 
         std::vector<TalentEntry const*> &spells = spells_row[row];
-        assert(spells.size() > 0);
+        if (spells.size() <= 0) {
+            return;
+        }
+        // assert(spells.size() > 0);
         for (TalentEntry const* talentInfo : spells) {
             if (talentInfo->Col != col) {
                 continue;
@@ -2066,6 +2107,9 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specNo)
             TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
             if (talentTabInfo->tabpage != tab) {
                 continue;
+            }
+            if (talentInfo->DependsOn) {
+                bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));            
             }
             talentID = talentInfo->TalentID;
         }
@@ -2144,6 +2188,24 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap)
     ClearInventory();
 }
 
+void PlayerbotFactory::InitInstanceQuests()
+{
+    // The Caverns of Time
+    if (bot->GetLevel() >= 64) {
+        uint32 questId = 10277;
+        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
+        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
+        bot->RewardQuest(quest, 0, bot, false);
+    }
+    // Return to Andormu
+    if (bot->GetLevel() >= 66) {
+        uint32 questId = 10285;
+        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
+        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
+        bot->RewardQuest(quest, 0, bot, false);
+    }
+}
+
 void PlayerbotFactory::ClearInventory()
 {
     DestroyItemsVisitor visitor(bot);
@@ -2194,6 +2256,11 @@ void PlayerbotFactory::InitAmmo()
         }
     }
     bot->SetAmmo(entry);
+}
+
+uint32 PlayerbotFactory::CalcMixedGearScore(uint32 gs, uint32 quality)
+{
+    return gs * (quality + 1);
 }
 
 void PlayerbotFactory::InitMounts()

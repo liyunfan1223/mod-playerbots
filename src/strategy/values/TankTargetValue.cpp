@@ -13,6 +13,9 @@ class FindTargetForTankStrategy : public FindNonCcTargetStrategy
 
         void CheckAttacker(Unit* creature, ThreatMgr* threatMgr) override
         {
+            if (!creature || !creature->IsAlive()) {
+                return;
+            }
             Player* bot = botAI->GetBot();
             float threat = threatMgr->GetThreat(bot);
             if (!result) {
