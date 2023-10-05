@@ -152,8 +152,8 @@ void MageBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 50.0f), nullptr)));
     triggers.push_back(new TriggerNode("presence of mind", NextAction::array(0, new NextAction("presence of mind", 42.0f), nullptr)));
-    triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 41.0f), nullptr)));
-    triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 41.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 41.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 41.0f), nullptr)));
 }
 
 void MageCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

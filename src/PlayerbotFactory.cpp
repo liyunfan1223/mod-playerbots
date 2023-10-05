@@ -332,6 +332,7 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
         LOG_INFO("playerbots", "Initializing pet...");
         InitPet();
+        InitPetTalents();
         if (pmo)
             pmo->finish();
     }
@@ -516,6 +517,67 @@ void PlayerbotFactory::AddConsumables()
     }
 }
 
+void PlayerbotFactory::InitPetTalents()
+{
+    Pet* pet = bot->GetPet();
+    if (!pet) {
+        return;
+    }
+    CreatureTemplate const* ci = pet->GetCreatureTemplate();
+    if (!ci) {
+        return;
+    }
+    CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
+    if (pet_family->petTalentType < 0) {
+        return;
+    }
+    std::map<uint32, std::vector<TalentEntry const*> > spells;
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    {
+        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
+        if(!talentInfo)
+            continue;
+
+        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
+
+         // prevent learn talent for different family (cheating)
+        if (!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
+            return;
+
+        spells[talentInfo->Row].push_back(talentInfo);
+    }
+
+    uint32 curTalentPoints = pet->GetFreeTalentPoints();
+    uint32 maxTalentPoints = pet->GetMaxTalentPointsForLevel(pet->GetLevel());
+    int row = -1;
+    for (std::map<uint32, std::vector<TalentEntry const*> >::iterator i = spells.begin(); i != spells.end(); ++i, ++row)
+    {
+        std::vector<TalentEntry const*> &spells_row = i->second;
+        if (spells_row.empty())
+        {
+            sLog->outMessage("playerbot", LOG_LEVEL_ERROR, "%s: No spells for talent row %d", bot->GetName().c_str(), i->first);
+            continue;
+        }
+        int attemptCount = 0;
+        while (!spells_row.empty() && ((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * row && attemptCount++ < 3 && pet->GetFreeTalentPoints())
+        {
+            int index = urand(0, spells_row.size() - 1);
+            TalentEntry const *talentInfo = spells_row[index];
+            int maxRank = 0;
+            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints()); ++rank)
+            {
+                uint32 spellId = talentInfo->RankID[rank];
+                if (!spellId)
+                    continue;
+
+                maxRank = rank;
+            }
+            bot->LearnPetTalent(pet->GetGUID(), talentInfo->TalentID, maxRank);
+			spells_row.erase(spells_row.begin() + index);
+        }
+    }
+}
+
 void PlayerbotFactory::InitPet()
 {
     Pet* pet = bot->GetPet();
@@ -538,7 +600,7 @@ void PlayerbotFactory::InitPet()
 
             if (itr->second.minlevel > bot->getLevel())
                 continue;
-
+            
 			ids.push_back(itr->first);
 		}
 
