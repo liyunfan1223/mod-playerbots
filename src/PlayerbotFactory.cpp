@@ -565,12 +565,14 @@ void PlayerbotFactory::InitPetTalents()
             continue;
         }
         int attemptCount = 0;
-        while (!spells_row.empty() && ((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * (row + 1) && attemptCount++ < 10 && pet->GetFreeTalentPoints())
+        // keep learning for the last row
+        while (!spells_row.empty() && ((((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * (row + 1)) || (row == 5)) 
+            && attemptCount++ < 10 && pet->GetFreeTalentPoints())
         {
             int index = urand(0, spells_row.size() - 1);
             TalentEntry const *talentInfo = spells_row[index];
             int maxRank = 0;
-            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints() - 1); ++rank)
+            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints()); ++rank)
             {
                 uint32 spellId = talentInfo->RankID[rank];
                 if (!spellId)
@@ -1071,7 +1073,7 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
     uint32 level = bot->getLevel();
     uint32 delta = 2;
     if (level < 15)
-        delta = 15; // urand(7, 15);
+        delta = std::min(level, 15u); // urand(7, 15);
     // else if (proto->Class == ITEM_CLASS_WEAPON || proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
     //     delta = urand(2, 3);
     // else if (!(level % 10) || (level % 10) == 9)
@@ -1241,7 +1243,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
     uint32 blevel = bot->getLevel();
     int32 delta = 2;
     if (blevel < 15)
-        delta = 15;
+        delta = std::min(blevel, 15u);
     else if (blevel < 40)
         delta = 10;
     else if (blevel < 60)
@@ -2091,7 +2093,7 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
             int index = urand(0, spells_row.size() - 1);
             TalentEntry const *talentInfo = spells_row[index];
             int maxRank = 0;
-            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, bot->GetFreeTalentPoints() - 1); ++rank)
+            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, bot->GetFreeTalentPoints()); ++rank)
             {
                 uint32 spellId = talentInfo->RankID[rank];
                 if (!spellId)
@@ -2264,19 +2266,21 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap)
 
 void PlayerbotFactory::InitInstanceQuests()
 {
+    // Yunfan: use configuration instead of hard code
+
     // The Caverns of Time
     if (bot->GetLevel() >= 64) {
         uint32 questId = 10277;
         Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 0, bot, false);
+        bot->RewardQuest(quest, 5, bot, false);
     }
     // Return to Andormu
     if (bot->GetLevel() >= 66) {
         uint32 questId = 10285;
         Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 0, bot, false);
+        bot->RewardQuest(quest, 5, bot, false);
     }
 }
 
@@ -3300,17 +3304,17 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
                (cls == CLASS_PALADIN && tab == 1)) {
         // TANK WITH SHIELD
         score = strength * 1 + agility * 2 + attack_power * 0.2
-            + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.5 + stamina * 3
+            + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3
             + hit * 1 + crit * 0.2 + haste * 0.5 + expertise * 3;
     } else if (cls == CLASS_DEATH_KNIGHT && tab == 0){
         // BLOOD DK TANK
         score = strength * 1 + agility * 2 + attack_power * 0.2
-            + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.5 + stamina * 2.5 
+            + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 
             + hit * 2 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
     } else {
         // BEAR DRUID TANK (AND FERAL DRUID...?)
         score = agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + dps * 2
-            + defense * 0.25 + dodge * 0.25 + armor * 0.5 + stamina * 1.5
+            + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
     // penalty for different type armor
