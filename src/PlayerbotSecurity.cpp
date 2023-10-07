@@ -4,6 +4,7 @@
 
 #include "PlayerbotSecurity.h"
 #include "LFGMgr.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
 PlayerbotSecurity::PlayerbotSecurity(Player* const bot) : bot(bot)
@@ -58,7 +59,14 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             }
         }
 
-        if ((int32)bot->getLevel() - (int8)from->getLevel() > 5)
+        if (sPlayerbotAIConfig->groupInvitationPermission <= 0) {
+            if (reason)
+                *reason = PLAYERBOT_DENY_NONE;
+
+            return PLAYERBOT_SECURITY_TALK;
+        }
+
+        if (sPlayerbotAIConfig->groupInvitationPermission <= 1 && (int32)bot->getLevel() - (int8)from->getLevel() > 5)
         {
             if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
             {

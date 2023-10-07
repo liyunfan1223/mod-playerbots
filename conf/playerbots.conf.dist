@@ -63,8 +63,8 @@ AiPlayerbot.DeleteRandomBotArenaTeams = 0
 # Change random bot has lower gear
 AiPlayerbot.RandomGearLoweringChance = 0
 
-# Chance random bot has max level on first randomize (default 0.15)
-AiPlayerbot.RandomBotMaxLevelChance = 0
+# Chance random bot has max level on first randomize (default 0.0)
+AiPlayerbot.RandomBotMaxLevelChance = 0.0
 
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
 AiPlayerbot.RandomBotRpgChance = 0.20 #unused now
@@ -99,7 +99,7 @@ AiPlayerbot.BotActiveAlone = 100
 
 # Set minimum level of randombots where gets enchants on items (Maxlevel + 1 to disable)
 # Default: 60
-AiPlayerbot.MinEnchantingBotLevel = 60 # unused now
+AiPlayerbot.MinEnchantingBotLevel = 60
 
 # Randombots checking players gear score level and deny the group invite if it's too low
 # Default: 1 (enabled)
@@ -113,6 +113,37 @@ AiPlayerbot.RandomBotGroupNearby = 0
 
 # Bots without a master will say their lines
 AiPlayerbot.RandomBotSayWithoutMaster = 0
+
+# Set RandomBotMaxLevel bots to RandomBotMinLevel or not
+AiPlayerbot.DowngradeMaxLevelBot = 0
+
+# Enable/Disable bot equipments persistence (stop random initialization) after certain level (EquipmentPersistenceLevel)
+# default: 0 (disable)
+AiPlayerbot.EquipmentPersistence = 0
+
+# default: 80
+AiPlayerbot.EquipmentPersistenceLevel = 80
+
+# Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
+# default: 1 (accept based on level)
+AiPlayerbot.GroupInvitationPermission = 1
+
+# Enable/Disable bot revive and repair gear when summon
+# default: 1 (enable)
+AiPlayerbot.BotReviveWhenSummon = 1
+
+# Non-GM player can only use init=auto to initialize bots based on their own level and gear score
+# default: 0 (not allowed for non-gm player)
+AiPlayerbot.AutoInitOnly = 0
+
+# The upper limit ratio of bot equipment level for init=auto
+# default: 1.0 (same with the player)
+AiPlayerbot.AutoInitEquipLevelLimitRatio = 1.0
+
+# Enable/Disable create bot by addclass command (0 = GM only, 1 = enable)
+# default: 1 (enable)
+AiPlayerbot.AddClassCommand = 1
+
 
 # Automation
 
@@ -619,16 +650,6 @@ AiPlayerbot.BotCheats = "taxi"
 
 # Enables/Disables password to bot account
 AiPlayerbot.RandomBotRandomPassword = 0
-
-# Set RandomBotMaxLevel bots to RandomBotMinLevel or not
-AiPlayerbot.DowngradeMaxLevelBot = 0
-
-# Enable/Disable bot equipments persistence (stop random initialization) after certain level (EquipmentPersistenceLevel)
-# default: 0 (disable)
-AiPlayerbot.EquipmentPersistence = 0
-
-# default: 80
-AiPlayerbot.EquipmentPersistenceLevel = 80
 
 ##################################################################################
 #                                                                                #

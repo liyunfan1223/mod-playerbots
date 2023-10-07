@@ -7,11 +7,13 @@
 #include "Common.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "PlayerbotAIConfig.h"
 #include "PlayerbotMgr.h"
 #include "PlayerbotSecurity.h"
 #include "Playerbots.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
+#include "SharedDefines.h"
 #include "WorldSession.h"
 #include "ChannelMgr.h"
 #include <cstring>
@@ -541,6 +543,9 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
     {
+        if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig->autoInitOnly && cmd != "init=auto") {
+            return "The command is not allowed, use init=auto instead.";
+        }
         if (cmd == "init=white" || cmd == "init=common")
         {
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
@@ -573,10 +578,10 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         }
         else if (cmd == "init=auto")
         {
-            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 10) * 1.1f;
+            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
             factory.Randomize(false);
-            return "ok, gear score limit: " + std::to_string(mixedGearScore / 5) + "(for epic)";
+            return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
         }
     }
 
@@ -724,6 +729,10 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "addclass"))
     {
+        if (sPlayerbotAIConfig->addClassCommand == 0) {
+            messages.push_back("addclass command was disabled, please check your configuration");
+            return messages;
+        }
         if (!charname) {
             messages.push_back("addclass: invalid CLASSNAME(warrior/paladin/hunter/rogue/priest/shaman/mage/warlock/druid/dk)");
             return messages;

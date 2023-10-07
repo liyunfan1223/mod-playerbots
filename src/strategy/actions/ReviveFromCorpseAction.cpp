@@ -35,8 +35,8 @@ bool ReviveFromCorpseAction::Execute(Event event)
     if (!corpse)
         return false;
 
-    if (corpse->GetGhostTime() + bot->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP) > time(nullptr))
-        return false;
+    // if (corpse->GetGhostTime() + bot->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP) > time(nullptr))
+    //     return false;
 
     if (master)
     {
@@ -77,12 +77,12 @@ bool FindCorpseAction::Execute(Event event)
     if (!corpse)
         return false;
 
-    if (master)
-    {
-        if (!GET_PLAYERBOT_AI(master) &&
-            sServerFacade->IsDistanceLessThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig->farDistance))
-            return false;
-    }
+    // if (master)
+    // {
+    //     if (!GET_PLAYERBOT_AI(master) &&
+    //         sServerFacade->IsDistanceLessThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig->farDistance))
+    //         return false;
+    // }
 
     uint32 dCount = AI_VALUE(uint32, "death count");
 
