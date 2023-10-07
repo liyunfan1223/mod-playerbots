@@ -122,6 +122,7 @@ class PlayerbotFactory : public InventoryAction
         void InitPet();
         void InitAmmo();
         static uint32 CalcMixedGearScore(uint32 gs, uint32 quality);
+        void InitPetTalents();
     private:
         void Prepare();
         // void InitSecondEquipmentSet();

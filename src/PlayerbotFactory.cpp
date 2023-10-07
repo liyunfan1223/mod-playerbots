@@ -10,6 +10,7 @@
 #include "GuildMgr.h"
 #include "ItemTemplate.h"
 #include "Log.h"
+#include "LogCommon.h"
 #include "LootMgr.h"
 #include "MapMgr.h"
 #include "PetDefines.h"
@@ -332,6 +333,8 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
         LOG_INFO("playerbots", "Initializing pet...");
         InitPet();
+        bot->SaveToDB(false, false);
+        InitPetTalents();
         if (pmo)
             pmo->finish();
     }
@@ -516,6 +519,77 @@ void PlayerbotFactory::AddConsumables()
     }
 }
 
+void PlayerbotFactory::InitPetTalents()
+{
+    Pet* pet = bot->GetPet();
+    if (!pet) {
+        // LOG_INFO("playerbots", "{} init pet talents failed with no pet", bot->GetName().c_str());
+        return;
+    }
+    CreatureTemplate const* ci = pet->GetCreatureTemplate();
+    if (!ci) {
+        // LOG_INFO("playerbots", "{} init pet talents failed with no creature template", bot->GetName().c_str());
+        return;
+    }
+    CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
+    if (pet_family->petTalentType < 0) {
+        // LOG_INFO("playerbots", "{} init pet talents failed with petTalentType < 0({})", bot->GetName().c_str(), pet_family->petTalentType);
+        return;
+    }
+    std::map<uint32, std::vector<TalentEntry const*> > spells;
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    {
+        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
+        if(!talentInfo)
+            continue;
+
+        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
+
+         // prevent learn talent for different family (cheating)
+        if (!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
+            continue;
+
+        spells[talentInfo->Row].push_back(talentInfo);
+    }
+
+    uint32 curTalentPoints = pet->GetFreeTalentPoints();
+    uint32 maxTalentPoints = pet->GetMaxTalentPointsForLevel(pet->GetLevel());
+    int row = 0;
+    // LOG_INFO("playerbots", "{} learning, max talent points: {}, cur: {}", bot->GetName().c_str(), maxTalentPoints, curTalentPoints);
+    for (std::map<uint32, std::vector<TalentEntry const*> >::iterator i = spells.begin(); i != spells.end(); ++i, ++row)
+    {
+        std::vector<TalentEntry const*> &spells_row = i->second;
+        if (spells_row.empty())
+        {
+            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(), i->first);
+            continue;
+        }
+        int attemptCount = 0;
+        // keep learning for the last row
+        while (!spells_row.empty() && ((((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * (row + 1)) || (row == 5)) 
+            && attemptCount++ < 10 && pet->GetFreeTalentPoints())
+        {
+            int index = urand(0, spells_row.size() - 1);
+            TalentEntry const *talentInfo = spells_row[index];
+            int maxRank = 0;
+            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints()); ++rank)
+            {
+                uint32 spellId = talentInfo->RankID[rank];
+                if (!spellId)
+                    continue;
+
+                maxRank = rank;
+            }
+            // LOG_INFO("playerbots", "{} learn pet talent {}({})", bot->GetName().c_str(), talentInfo->TalentID, maxRank);
+            if (talentInfo->DependsOn) {
+                bot->LearnPetTalent(pet->GetGUID(), talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));            
+            }
+            bot->LearnPetTalent(pet->GetGUID(), talentInfo->TalentID, maxRank);
+			spells_row.erase(spells_row.begin() + index);
+        }
+    }
+}
+
 void PlayerbotFactory::InitPet()
 {
     Pet* pet = bot->GetPet();
@@ -538,7 +612,7 @@ void PlayerbotFactory::InitPet()
 
             if (itr->second.minlevel > bot->getLevel())
                 continue;
-
+            
 			ids.push_back(itr->first);
 		}
 
@@ -999,7 +1073,7 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
     uint32 level = bot->getLevel();
     uint32 delta = 2;
     if (level < 15)
-        delta = 15; // urand(7, 15);
+        delta = std::min(level, 15u); // urand(7, 15);
     // else if (proto->Class == ITEM_CLASS_WEAPON || proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
     //     delta = urand(2, 3);
     // else if (!(level % 10) || (level % 10) == 9)
@@ -1169,7 +1243,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
     uint32 blevel = bot->getLevel();
     int32 delta = 2;
     if (blevel < 15)
-        delta = 15;
+        delta = std::min(blevel, 15u);
     else if (blevel < 40)
         delta = 10;
     else if (blevel < 60)
@@ -2010,7 +2084,7 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
         std::vector<TalentEntry const*> &spells_row = i->second;
         if (spells_row.empty())
         {
-            sLog->outMessage("playerbot", LOG_LEVEL_ERROR, "%s: No spells for talent row %d", bot->GetName().c_str(), i->first);
+            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(), i->first);
             continue;
         }
         int attemptCount = 0;
@@ -2027,7 +2101,9 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
 
                 maxRank = rank;
             }
-
+            if (talentInfo->DependsOn) {
+                bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));            
+            }
             bot->LearnTalent(talentInfo->TalentID, maxRank);
 			spells_row.erase(spells_row.begin() + index);
         }
@@ -2190,19 +2266,21 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap)
 
 void PlayerbotFactory::InitInstanceQuests()
 {
+    // Yunfan: use configuration instead of hard code
+
     // The Caverns of Time
     if (bot->GetLevel() >= 64) {
         uint32 questId = 10277;
         Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 0, bot, false);
+        bot->RewardQuest(quest, 5, bot, false);
     }
     // Return to Andormu
     if (bot->GetLevel() >= 66) {
         uint32 questId = 10285;
         Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 0, bot, false);
+        bot->RewardQuest(quest, 5, bot, false);
     }
 }
 
@@ -3226,17 +3304,17 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
                (cls == CLASS_PALADIN && tab == 1)) {
         // TANK WITH SHIELD
         score = strength * 1 + agility * 2 + attack_power * 0.2
-            + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.5 + stamina * 3
+            + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3
             + hit * 1 + crit * 0.2 + haste * 0.5 + expertise * 3;
     } else if (cls == CLASS_DEATH_KNIGHT && tab == 0){
         // BLOOD DK TANK
         score = strength * 1 + agility * 2 + attack_power * 0.2
-            + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.5 + stamina * 2.5 
+            + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 
             + hit * 2 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
     } else {
         // BEAR DRUID TANK (AND FERAL DRUID...?)
         score = agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + dps * 2
-            + defense * 0.25 + dodge * 0.25 + armor * 0.5 + stamina * 1.5
+            + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
     // penalty for different type armor
