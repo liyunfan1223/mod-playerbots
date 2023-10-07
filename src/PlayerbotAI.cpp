@@ -212,9 +212,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         // }
         return;
     }
-    if (!GetMaster() || !GetMaster()->IsInWorld() || !GetMaster()->GetSession() || GetMaster()->GetSession()->isLogingOut()) {
-        return;
-    }
+    // if (!GetMaster() || !GetMaster()->IsInWorld() || !GetMaster()->GetSession() || GetMaster()->GetSession()->isLogingOut()) {
+    //     return;
+    // }
     // if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)) {
     //     bot->Say("Falling!", LANG_UNIVERSAL);
     // }
