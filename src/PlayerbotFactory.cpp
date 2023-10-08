@@ -53,8 +53,9 @@ uint32 PlayerbotFactory::tradeSkills[] =
 std::list<uint32> PlayerbotFactory::classQuestIds;
 std::list<uint32> PlayerbotFactory::specialQuestIds;
 
-PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality, uint32 gearScoreLimit) : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), InventoryAction(GET_PLAYERBOT_AI(bot), "factory")
+PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality, uint32 gearScoreLimit) : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), bot(bot)
 {
+    botAI = GET_PLAYERBOT_AI(bot);
 }
 
 void PlayerbotFactory::Init()
@@ -201,9 +202,11 @@ void PlayerbotFactory::Randomize(bool incremental)
     InitTalentsTree();
     // bot->SaveToDB(false, false);
     sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specNo", 0);
-    sPlayerbotDbStore->Reset(botAI);
-    // botAI->DoSpecificAction("auto talents");
-    botAI->ResetStrategies(false); // fix wrong stored strategy
+    if (botAI) {
+        sPlayerbotDbStore->Reset(botAI);
+        // botAI->DoSpecificAction("auto talents");
+        botAI->ResetStrategies(false); // fix wrong stored strategy
+    }
     if (pmo)
         pmo->finish();
 
@@ -3099,8 +3102,35 @@ void PlayerbotFactory::ApplyEnchantTemplate()
 void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
 {
    for (EnchantContainer::const_iterator itr = GetEnchantContainerBegin(); itr != GetEnchantContainerEnd(); ++itr)
-      if ((*itr).ClassId == bot->getClass() && (*itr).SpecId == spec)
-         botAI->EnchantItemT((*itr).SpellId, (*itr).SlotId);
+      if ((*itr).ClassId == bot->getClass() && (*itr).SpecId == spec) {
+        uint32 spellid = (*itr).SpellId;
+        uint32 slot =  (*itr).SlotId;
+        Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!pItem || !pItem->IsInWorld() || !pItem->GetOwner() || !pItem->GetOwner()->IsInWorld() || !pItem->GetOwner()->GetSession())
+            return;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+        if (!spellInfo)
+            return;
+
+        uint32 enchantid = spellInfo->Effects[0].MiscValue;
+        if (!enchantid)
+        {
+            // LOG_ERROR("playerbots", "{}: Invalid enchantid ", enchantid, " report to devs", bot->GetName().c_str());
+            return;
+        }
+
+        if (!((1 << pItem->GetTemplate()->SubClass) & spellInfo->EquippedItemSubClassMask) && !((1 << pItem->GetTemplate()->InventoryType) & spellInfo->EquippedItemInventoryTypeMask))
+        {
+            // LOG_ERROR("playerbots", "{}: items could not be enchanted, wrong item type equipped", bot->GetName().c_str());
+            return;
+        }
+
+        bot->ApplyEnchantment(pItem, PERM_ENCHANTMENT_SLOT, false);
+        pItem->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantid, 0, 0);
+        bot->ApplyEnchantment(pItem, PERM_ENCHANTMENT_SLOT, true);
+    }
+    // botAI->EnchantItemT((*itr).SpellId, (*itr).SlotId);
 }
 
 std::vector<InventoryType> PlayerbotFactory::GetPossibleInventoryTypeListBySlot(EquipmentSlots slot) {
@@ -3384,4 +3414,83 @@ bool PlayerbotFactory::NotSameArmorType(uint32 item_subclass_armor, Player* bot)
         return item_subclass_armor != ITEM_SUBCLASS_ARMOR_LEATHER;
     }
     return false;
+}
+
+void PlayerbotFactory::IterateItems(IterateItemsVisitor* visitor, IterateItemsMask mask)
+{
+    if (mask & ITERATE_ITEMS_IN_BAGS)
+        IterateItemsInBags(visitor);
+
+    if (mask & ITERATE_ITEMS_IN_EQUIP)
+        IterateItemsInEquip(visitor);
+
+    if (mask == ITERATE_ITEMS_IN_BANK)
+        IterateItemsInBank(visitor);
+}
+
+void PlayerbotFactory::IterateItemsInBags(IterateItemsVisitor* visitor)
+{
+    for (uint32 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (!visitor->Visit(pItem))
+                return;
+
+    for (uint32 i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
+        if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (!visitor->Visit(pItem))
+                return;
+
+    for (uint32 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Bag *pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            for(uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                if (Item* pItem = pBag->GetItemByPos(j))
+                    if (!visitor->Visit(pItem))
+                        return;
+}
+
+void PlayerbotFactory::IterateItemsInEquip(IterateItemsVisitor* visitor)
+{
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
+    {
+        Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!pItem)
+            continue;
+
+        if (!visitor->Visit(pItem))
+            return;
+    }
+}
+
+void PlayerbotFactory::IterateItemsInBank(IterateItemsVisitor* visitor)
+{
+    for (uint8 slot = BANK_SLOT_ITEM_START; slot < BANK_SLOT_ITEM_END; slot++)
+    {
+        Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if(!pItem)
+            continue;
+
+        if (!visitor->Visit(pItem))
+            return;
+    }
+
+    for (uint32 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pBag)
+            {
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                {
+                    if (Item* pItem = pBag->GetItemByPos(j))
+                    {
+                        if(!pItem)
+                            continue;
+
+                        if (!visitor->Visit(pItem))
+                            return;
+                    }
+                }
+            }
+        }
+    }
 }

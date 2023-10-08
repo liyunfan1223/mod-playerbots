@@ -5,6 +5,7 @@
 #include "CharacterCache.h"
 #include "CharacterPackets.h"
 #include "Common.h"
+#include "Define.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAIConfig.h"
@@ -16,6 +17,7 @@
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include "ChannelMgr.h"
+#include <cstdio>
 #include <cstring>
 #include <string>
 
@@ -666,18 +668,58 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "initself")) {
         if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
-            OnBotLogin(master);
+            // OnBotLogin(master);
             PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_EPIC);
             factory.Randomize(false);
-            // LogoutPlayerBot(master->GetGUID());
-            // DisablePlayerBot(master->GetGUID());
-            // sPlayerbotsMgr->AddPlayerbotData(master, false);
-            // sRandomPlayerbotMgr->OnPlayerLogin(master);
-            messages.push_back("initself ok. please logout to refresh.");
+            messages.push_back("initself ok");
             return messages;
         } else {
             messages.push_back("ERROR: Only GM can use this command.");
             return messages;
+        }
+    }
+
+    
+
+    
+    
+    if (!strncmp(cmd, "initself=", 9)) {
+        if (!strcmp(cmd, "initself=rare")) {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_RARE);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            } else {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        if (!strcmp(cmd, "initself=epic")) {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            } else {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        int32 gs;
+        if (sscanf(cmd, "initself=%d", &gs) != -1) {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                factory.Randomize(false);
+                messages.push_back("initself ok, gs = " + std::to_string(gs));
+                return messages;
+            } else {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
         }
     }
 
