@@ -63,8 +63,8 @@ AiPlayerbot.DeleteRandomBotArenaTeams = 0
 # Change random bot has lower gear
 AiPlayerbot.RandomGearLoweringChance = 0
 
-# Chance random bot has max level on first randomize (default 0.0)
-AiPlayerbot.RandomBotMaxLevelChance = 0.0
+# Chance random bot has max level on first randomize (default 0.15)
+AiPlayerbot.RandomBotMaxLevelChance = 0.15
 
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
 AiPlayerbot.RandomBotRpgChance = 0.20 #unused now
@@ -133,7 +133,7 @@ AiPlayerbot.GroupInvitationPermission = 1
 AiPlayerbot.BotReviveWhenSummon = 1
 
 # Non-GM player can only use init=auto to initialize bots based on their own level and gear score
-# default: 0 (not allowed for non-gm player)
+# default: 0 (non-gm player can use any intialization commands)
 AiPlayerbot.AutoInitOnly = 0
 
 # The upper limit ratio of bot equipment level for init=auto
