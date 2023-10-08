@@ -439,7 +439,10 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     
     bot->SaveToDB(false, false);
     if (master && isRandomAccount && master->GetLevel() < bot->GetLevel()) {
-        PlayerbotFactory factory(bot, master->getLevel());
+        // PlayerbotFactory factory(bot, master->getLevel());
+        // factory.Randomize(false);
+        uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+        PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
         factory.Randomize(false);
     }
     
