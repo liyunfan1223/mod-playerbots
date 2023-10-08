@@ -173,7 +173,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
             if (summoner->IsWithinLOS(x, y, z))
             {
-                if (sPlayerbotAIConfig->botReviveWhenSummon && bot->isDead() && botAI->GetMaster()->IsAlive())
+                if (sPlayerbotAIConfig->botReviveWhenSummon && bot->isDead())
                 {
                     bot->ResurrectPlayer(1.0f, false);
                     bot->DurabilityRepairAll(false, 1.0f, false);
