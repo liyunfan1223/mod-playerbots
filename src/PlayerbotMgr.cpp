@@ -551,6 +551,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig->autoInitOnly && cmd != "init=auto") {
             return "The command is not allowed, use init=auto instead.";
         }
+        int gs;
         if (cmd == "init=white" || cmd == "init=common")
         {
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
@@ -587,6 +588,13 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
             factory.Randomize(false);
             return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
+        }
+        else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
+        {
+            // uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
+            factory.Randomize(false);
+            return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
         }
     }
 

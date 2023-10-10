@@ -1090,7 +1090,7 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
     else if (level < 80)
         delta = 9; // urand(2, 4);
     else if (level == 80)
-        delta = 2; // urand(2, 4);
+        delta = 9; // urand(2, 4);
 
     if (desiredQuality > ITEM_QUALITY_NORMAL &&
             (requiredLevel > level || requiredLevel < level - delta))
@@ -1256,7 +1256,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
     else if (blevel < 80)
         delta = 9;
     else if (blevel == 80)
-        delta = 2;
+        delta = 9;
 
     for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {

@@ -152,7 +152,7 @@ NextAction** BearTankDruidStrategy::getDefaultActions()
 void BearTankDruidStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     FeralDruidStrategy::InitTriggers(triggers);
-    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("feral charge - bear", ACTION_MOVE + 8), nullptr)));
+    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("feral charge - bear", ACTION_NORMAL + 8), nullptr)));
     triggers.push_back(new TriggerNode("thorns", NextAction::array(0, new NextAction("thorns", ACTION_HIGH + 9), nullptr)));
     triggers.push_back(new TriggerNode("bear form", NextAction::array(0, new NextAction("dire bear form", ACTION_HIGH + 8), nullptr)));
     triggers.push_back(new TriggerNode("faerie fire (feral)", NextAction::array(0, new NextAction("faerie fire (feral)", ACTION_HIGH + 7), nullptr)));
