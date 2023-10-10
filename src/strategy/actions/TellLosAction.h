@@ -28,4 +28,12 @@ class TellAuraAction : public Action
         
         virtual bool Execute(Event event);
 };
+
+class TellExpectedDpsAction : public Action 
+{
+    public:
+        TellExpectedDpsAction(PlayerbotAI* ai) : Action(ai, "tell expected dps") {}
+        
+        virtual bool Execute(Event event);
+};
 #endif
