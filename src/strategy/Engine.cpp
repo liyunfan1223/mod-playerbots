@@ -8,6 +8,7 @@
 #include "Queue.h"
 #include "PerformanceMonitor.h"
 #include "Playerbots.h"
+#include "Strategy.h"
 
 Engine::Engine(PlayerbotAI* botAI, AiObjectContext* factory) : PlayerbotAIAware(botAI), aiObjectContext(factory)
 {
@@ -69,6 +70,14 @@ ActionExecutionListeners::~ActionExecutionListeners()
 Engine::~Engine(void)
 {
     Reset();
+
+    for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
+    {
+        Strategy* strategy = i->second;
+        if (strategy) {
+            delete strategy;
+        }
+    }
 
     strategies.clear();
 }
@@ -200,7 +209,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
                     if (actionExecuted)
                     {
                         LogAction("A:%s - OK", action->getName().c_str());
-                        MultiplyAndPush(actionNode->getContinuers(), 0, false, event, "cont");
+                        MultiplyAndPush(actionNode->getContinuers(), relevance, false, event, "cont");
                         lastRelevance = relevance;
                         delete actionNode;
                         break;
