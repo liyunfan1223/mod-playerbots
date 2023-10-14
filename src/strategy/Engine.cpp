@@ -71,13 +71,13 @@ Engine::~Engine(void)
 {
     Reset();
 
-    for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
-    {
-        Strategy* strategy = i->second;
-        if (strategy) {
-            delete strategy;
-        }
-    }
+    // for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
+    // {
+    //     Strategy* strategy = i->second;
+    //     if (strategy) {
+    //         delete strategy;
+    //     }
+    // }
 
     strategies.clear();
 }
