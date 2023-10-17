@@ -128,8 +128,8 @@ AiPlayerbot.EquipmentPersistenceLevel = 80
 # default: 1 (accept based on level)
 AiPlayerbot.GroupInvitationPermission = 1
 
-# Enable/Disable bot revive and repair gear when summon
-# default: 1 (enable)
+# Enable/Disable bot revive and repair gear when summon (0 = never, 1 = enable when non-combat and alive, 2 = enable always)
+# default: 1 (enable for non-combat)
 AiPlayerbot.BotReviveWhenSummon = 1
 
 # Non-GM player can only use init=auto to initialize bots based on their own level and gear score

@@ -171,7 +171,7 @@ class PlayerbotAIConfig
         bool equipmentPersistence;
         int32 equipmentPersistenceLevel;
         int32 groupInvitationPermission;
-        bool botReviveWhenSummon;
+        int32 botReviveWhenSummon;
         bool autoInitOnly;
         float autoInitEquipLevelLimitRatio;
         int32 addClassCommand;
