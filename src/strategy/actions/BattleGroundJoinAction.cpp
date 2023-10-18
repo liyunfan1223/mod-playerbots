@@ -8,6 +8,7 @@
 #include "BattlegroundMgr.h"
 #include "Event.h"
 #include "GroupMgr.h"
+#include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
 
@@ -466,7 +467,8 @@ bool BGJoinAction::JoinQueue(uint32 type)
     // get battlemaster
     Unit* unit = botAI->GetUnit(AI_VALUE2(CreatureData const*, "bg master", bgTypeId));
     if (!unit && isArena)
-    {
+    { 
+        botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
         LOG_DEBUG("playerbots", "Bot {} could not find Battlemaster to join", bot->GetGUID().ToString().c_str());
         return false;
     }
@@ -1101,4 +1103,18 @@ bool BGStatusCheckAction::Execute(Event event)
 bool BGStatusCheckAction::isUseful()
 {
     return bot->InBattlegroundQueue();
+}
+
+bool BGStrategyCheckAction::Execute(Event event)
+{
+    bool inside_bg = bot->InBattleground() && bot->GetBattleground();;
+    if (!inside_bg && botAI->HasStrategy("battleground", BOT_STATE_NON_COMBAT)) {
+        botAI->ResetStrategies();
+        return true;
+    }
+    if (inside_bg && !botAI->HasStrategy("battleground", BOT_STATE_NON_COMBAT)) {
+        botAI->ResetStrategies();
+        return false;
+    }
+    return false;
 }

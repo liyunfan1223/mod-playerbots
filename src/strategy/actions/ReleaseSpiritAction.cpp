@@ -5,6 +5,8 @@
 #include "ReleaseSpiritAction.h"
 #include "Event.h"
 #include "GameGraveyard.h"
+#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -43,17 +45,34 @@ bool ReleaseSpiritAction::Execute(Event event)
     packet << uint8(0);
     bot->GetSession()->HandleRepopRequestOpcode(packet);
 
-    // add waiting for ress aura
-    if (bot->InBattleground() && !botAI->HasAura(2584, bot))
-    {
-        // cast Waiting for Resurrect
-        bot->CastSpell(bot, 2584, true);
-    }
-
-    // add waiting for ress aura
-    if (bot->InBattleground())
-        bot->CastSpell(bot, 2584, true);
-
+    // // add waiting for ress aura
+    // if (bot->InBattleground() && !botAI->HasAura(SPELL_WAITING_FOR_RESURRECT, bot) && !bot->IsAlive())
+    // {
+    //     // cast Waiting for Resurrect
+    //     GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
+    //     ObjectGuid guid;
+    //     Unit* unit;
+    //     for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
+    //     {
+    //         unit = botAI->GetUnit(*i);
+    //         if (unit && unit->IsSpiritService())
+    //         {
+    //             guid = unit->GetGUID();
+    //             break;
+    //         }
+    //     }
+    //     if (!guid) {
+    //         return true;
+    //     }
+    //     if (bot->GetDistance(unit) >= INTERACTION_DISTANCE) {
+    //         bot->GetMotionMaster()->MoveChase(unit);
+    //     } else {
+    //         WorldPacket packet(CMSG_GOSSIP_HELLO);
+    //         packet << guid;
+    //         bot->GetSession()->HandleGossipHelloOpcode(packet);
+    //     }
+    // }
+    
     return true;
 }
 
@@ -75,10 +94,31 @@ bool AutoReleaseSpiritAction::Execute(Event event)
 
     LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> releases spirit", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
 
-    if (bot->InBattleground() && !botAI->HasAura(2584, bot))
+    if (bot->InBattleground() && (time(NULL) - bg_gossip_time >= 15 || !bot->HasAura(SPELL_WAITING_FOR_RESURRECT)))
     {
-        // cast Waiting for Resurrect
-        bot->CastSpell(bot, 2584, true);
+        GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
+        ObjectGuid guid;
+        Unit* unit;
+        for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
+        {
+            unit = botAI->GetUnit(*i);
+            if (unit && unit->IsSpiritService())
+            {
+                guid = unit->GetGUID();
+                break;
+            }
+        }
+        if (!guid) {
+            return true;
+        }
+        if (bot->GetDistance(unit) >= INTERACTION_DISTANCE) {
+            bot->GetMotionMaster()->MoveChase(unit);
+        } else {
+            bg_gossip_time = time(NULL);
+            WorldPacket packet(CMSG_GOSSIP_HELLO);
+            packet << guid;
+            bot->GetSession()->HandleGossipHelloOpcode(packet);
+        }
     }
 
     return true;
@@ -93,7 +133,7 @@ bool AutoReleaseSpiritAction::isUseful()
         return false;
 
     if (bot->InBattleground())
-        return !bot->GetCorpse();
+        return true;
 
     if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         return false;

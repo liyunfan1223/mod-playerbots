@@ -1327,8 +1327,8 @@ void PlayerbotAI::ResetStrategies(bool load)
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
 
-    if (load)
-        sPlayerbotDbStore->Load(this);
+    // if (load)
+    //     sPlayerbotDbStore->Load(this);
 }
 
 bool PlayerbotAI::IsRanged(Player* player)
@@ -1969,15 +1969,16 @@ bool PlayerbotAI::HasAura(uint32 spellId, Unit const* unit)
 {
 	if (!spellId || !unit)
 		return false;
+    
+    return unit->HasAura(spellId);
+	// for (uint8 effect = EFFECT_0; effect <= EFFECT_2; effect++)
+	// {
+	// 	AuraEffect const* aurEff = unit->GetAuraEffect(spellId, effect);
+	// 	if (IsRealAura(bot, aurEff, unit))
+	// 		return true;
+	// }
 
-	for (uint8 effect = EFFECT_0; effect <= EFFECT_2; effect++)
-	{
-		AuraEffect const* aurEff = unit->GetAuraEffect(spellId, effect);
-		if (IsRealAura(bot, aurEff, unit))
-			return true;
-	}
-
-	return false;
+	// return false;
 }
 
 Aura* PlayerbotAI::GetAura(std::string const name, Unit* unit, bool checkIsOwner, bool checkDuration, int checkStack)

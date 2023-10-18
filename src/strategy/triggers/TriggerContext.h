@@ -146,6 +146,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["bg waiting"] = &TriggerContext::bg_waiting;
             creators["bg active"] = &TriggerContext::bg_active;
             creators["bg invite active"] = &TriggerContext::bg_invite_active;
+            creators["inside bg"] = &TriggerContext::inside_bg;
             creators["player has no flag"] = &TriggerContext::player_has_no_flag;
             creators["player has flag"] = &TriggerContext::player_has_flag;
             creators["team has flag"] = &TriggerContext::team_has_flag;
@@ -295,6 +296,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* bg_waiting(PlayerbotAI* botAI) { return new BgWaitingTrigger(botAI); }
         static Trigger* bg_active(PlayerbotAI* botAI) { return new BgActiveTrigger(botAI); }
         static Trigger* bg_invite_active(PlayerbotAI* botAI) { return new BgInviteActiveTrigger(botAI); }
+        static Trigger* inside_bg(PlayerbotAI* botAI) { return new InsideBGTrigger(botAI); }
         static Trigger* player_has_no_flag(PlayerbotAI* botAI) { return new PlayerHasNoFlag(botAI); }
         static Trigger* player_has_flag(PlayerbotAI* botAI) { return new PlayerHasFlag(botAI); }
         static Trigger* team_has_flag(PlayerbotAI* botAI) { return new TeamHasFlag(botAI); }

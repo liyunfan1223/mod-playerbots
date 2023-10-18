@@ -29,6 +29,35 @@ class FindLeastHpTargetStrategy : public FindTargetStrategy
         float minHealth;
 };
 
+class FindMaxThreatGapTargetStrategy : public FindTargetStrategy
+{
+    public:
+        FindMaxThreatGapTargetStrategy(PlayerbotAI* botAI) : FindTargetStrategy(botAI), minThreat(0) { }
+
+        void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
+        {
+            if (Group* group = botAI->GetBot()->GetGroup())
+            {
+                ObjectGuid guid = group->GetTargetIcon(4);
+                if (guid && attacker->GetGUID() == guid)
+                    return;
+            }
+            if (!attacker->IsAlive()) {
+                return;
+            }
+            Unit* victim = attacker->GetVictim();
+            if (!result || CalcThreatGap(attacker, threatMgr) > CalcThreatGap(result, &result->GetThreatMgr()))
+                result = attacker;
+        }
+        float CalcThreatGap(Unit* attacker, ThreatMgr* threatMgr) {
+            Unit* victim = attacker->GetVictim();
+            return threatMgr->GetThreat(victim) - threatMgr->GetThreat(attacker); 
+        }
+
+    protected:
+        float minThreat;
+};
+
 Unit* DpsTargetValue::Calculate()
 {
     Unit* rti = RtiTargetValue::Calculate();
@@ -36,6 +65,7 @@ Unit* DpsTargetValue::Calculate()
         return rti;
 
     FindLeastHpTargetStrategy strategy(botAI);
+    // FindMaxThreatGapTargetStrategy strategy(botAI);
     return TargetValue::FindTarget(&strategy);
 }
 

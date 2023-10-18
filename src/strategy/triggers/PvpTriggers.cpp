@@ -93,6 +93,11 @@ bool BgInviteActiveTrigger::IsActive()
     return false;
 }
 
+bool InsideBGTrigger::IsActive()
+{
+    return bot->InBattleground() && bot->GetBattleground();
+}
+
 bool PlayerIsInBattlegroundWithoutFlag::IsActive()
 {
     if (botAI->GetBot()->InBattleground())

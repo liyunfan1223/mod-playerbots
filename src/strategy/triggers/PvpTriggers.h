@@ -97,6 +97,13 @@ class BgInviteActiveTrigger : public Trigger
         bool IsActive() override;
 };
 
+class InsideBGTrigger : public Trigger
+{
+    public:
+        InsideBGTrigger(PlayerbotAI* botAI) : Trigger(botAI, "inside bg", 1) { }
+
+        bool IsActive() override;
+};
 class PlayerIsInBattlegroundWithoutFlag : public Trigger
 {
     public:

@@ -7,8 +7,9 @@
 
 void BGStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
-    triggers.push_back(new TriggerNode("random", NextAction::array(0, new NextAction("bg join", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("bg join", relevance), nullptr)));
     triggers.push_back(new TriggerNode("bg invite active", NextAction::array(0, new NextAction("bg status check", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("bg strategy check", relevance), nullptr)));
 }
 
 BGStrategy::BGStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)

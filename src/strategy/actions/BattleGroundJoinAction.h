@@ -66,4 +66,11 @@ class BGStatusCheckAction : public Action
         bool isUseful() override;
 };
 
+class BGStrategyCheckAction : public Action
+{
+    public:
+        BGStrategyCheckAction(PlayerbotAI* botAI, std::string const name = "bg strategy check") : Action(botAI, name) { }
+
+        bool Execute(Event event) override;
+};
 #endif

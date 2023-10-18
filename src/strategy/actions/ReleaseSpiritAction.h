@@ -7,6 +7,7 @@
 
 #include "Action.h"
 #include "ReviveFromCorpseAction.h"
+#include <cstdint>
 
 class PlayerbotAI;
 
@@ -25,6 +26,8 @@ class AutoReleaseSpiritAction : public ReleaseSpiritAction
 
         bool Execute(Event event) override;
         bool isUseful() override;
+    private:
+        uint32_t bg_gossip_time = 0;
 };
 
 class RepopAction : public SpiritHealerAction
