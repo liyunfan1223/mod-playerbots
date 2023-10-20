@@ -17,6 +17,7 @@ class ShadowPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionNo
         {
             creators["mind blast"] = &mind_blast;
             creators["dispersion"] = &dispersion;
+            creators["mind flay"] = &mind_flay;
         }
 
     private:
@@ -28,6 +29,13 @@ class ShadowPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionNo
                 /*C*/ nullptr);
         }
 
+        static ActionNode* mind_flay(PlayerbotAI* botAI)
+        {
+            return new ActionNode ("mind flay",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
+                /*C*/ nullptr);
+        }
         static ActionNode* dispersion(PlayerbotAI* botAI)
         {
             return new ActionNode ("dispersion",

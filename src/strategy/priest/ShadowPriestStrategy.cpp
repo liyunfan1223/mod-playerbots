@@ -17,7 +17,7 @@ NextAction** ShadowPriestStrategy::getDefaultActions()
         new NextAction("mind blast", 13.0f), 
         // new NextAction("shadow word: death", 12.0f), 
         new NextAction("mind flay", 11.0f), 
-        new NextAction("shoot", 10.0f), 
+        // new NextAction("shoot", 10.0f), 
         NULL);
 }
 
