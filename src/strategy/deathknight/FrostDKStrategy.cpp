@@ -78,12 +78,12 @@ FrostDKStrategy::FrostDKStrategy(PlayerbotAI* botAI) : GenericDKStrategy(botAI)
 NextAction** FrostDKStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-		new NextAction("obliterate", ACTION_NORMAL + 5), 
-		new NextAction("frost strike", ACTION_NORMAL + 4),
+		new NextAction("obliterate", ACTION_DEFAULT + 0.5f), 
+		new NextAction("frost strike", ACTION_DEFAULT + 0.4f),
 		// new NextAction("death strike", ACTION_NORMAL + 3),
-		new NextAction("empower rune weapon", ACTION_NORMAL + 2),
-		new NextAction("horn of winter", ACTION_NORMAL), 
-		new NextAction("melee", ACTION_NORMAL), 
+		new NextAction("empower rune weapon", ACTION_DEFAULT + 0.2f),
+		new NextAction("horn of winter", ACTION_DEFAULT + 0.1f), 
+		new NextAction("melee", ACTION_DEFAULT), 
 		NULL
 	);
 }

@@ -443,7 +443,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     if (master && isRandomAccount && master->GetLevel() < bot->GetLevel()) {
         // PlayerbotFactory factory(bot, master->getLevel());
         // factory.Randomize(false);
-        uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+        uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
         PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
         factory.Randomize(false);
     }
@@ -584,14 +584,13 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         }
         else if (cmd == "init=auto")
         {
-            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
             factory.Randomize(false);
             return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
         }
         else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
         {
-            // uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
             factory.Randomize(false);
             return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";

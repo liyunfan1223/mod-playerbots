@@ -292,9 +292,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 2)
                 engine->addStrategies("tank", "tank assist", "aoe", "mark rti", nullptr);
             else if (player->getLevel() < 30 || tab == 0)
-                engine->addStrategies("arms", "aoe", "dps assist", "threat", "behind", nullptr);
+                engine->addStrategies("arms", "aoe", "dps assist", "threat", /*"behind",*/ nullptr);
             else
-                engine->addStrategies("fury", "aoe", "dps assist", "threat", "behind", nullptr);
+                engine->addStrategies("fury", "aoe", "dps assist", "threat", /*"behind",*/ nullptr);
             break;
         case CLASS_SHAMAN:
             if (tab == 0)
@@ -335,9 +335,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_ROGUE:
             if (tab == ROGUE_TAB_ASSASSINATION) {
-                engine->addStrategies("melee", "threat", "dps assist", "aoe", "behind", nullptr);
+                engine->addStrategies("melee", "threat", "dps assist", "aoe", /*"behind",*/ nullptr);
             } else {
-                engine->addStrategies("dps", "threat", "dps assist", "aoe", "behind", nullptr);
+                engine->addStrategies("dps", "threat", "dps assist", "aoe", /*"behind",*/ nullptr);
             }
             break;
         case CLASS_WARLOCK:
@@ -436,10 +436,10 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategies("caster", "caster aoe", nullptr);
 
         if (player->getClass() == CLASS_DRUID && tab == 1)
-            engine->addStrategies("behind", "dps", nullptr);
+            engine->addStrategies(/*"behind",*/ "dps", nullptr);
 
         if (player->getClass() == CLASS_ROGUE)
-            engine->addStrategies("behind", "stealth", nullptr);
+            engine->addStrategies(/*"behind",*/ "stealth", nullptr);
     }
 }
 

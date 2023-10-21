@@ -80,15 +80,15 @@ BloodDKStrategy::BloodDKStrategy(PlayerbotAI* botAI) : GenericDKStrategy(botAI)
 NextAction** BloodDKStrategy::getDefaultActions()
 {
 	return NextAction::array(0,
-		new NextAction("rune strike", ACTION_NORMAL + 8), 
-		new NextAction("icy touch", ACTION_NORMAL + 7),
-		new NextAction("heart strike", ACTION_NORMAL + 6),
-		new NextAction("blood strike", ACTION_NORMAL + 5),
-		new NextAction("dancing rune weapon", ACTION_NORMAL + 4),
-		new NextAction("death coil", ACTION_NORMAL + 3),
-		new NextAction("plague strike", ACTION_NORMAL + 2),
-		new NextAction("horn of winter", ACTION_NORMAL + 1), 
-		new NextAction("melee", ACTION_NORMAL), 
+		new NextAction("rune strike", ACTION_DEFAULT + 0.8f), 
+		new NextAction("icy touch", ACTION_DEFAULT + 0.7f),
+		new NextAction("heart strike", ACTION_DEFAULT + 0.6f),
+		new NextAction("blood strike", ACTION_DEFAULT + 0.5f),
+		new NextAction("dancing rune weapon", ACTION_DEFAULT + 0.4f),
+		new NextAction("death coil", ACTION_DEFAULT + 0.3f),
+		new NextAction("plague strike", ACTION_DEFAULT + 0.2f),
+		new NextAction("horn of winter", ACTION_DEFAULT + 0.1f), 
+		new NextAction("melee", ACTION_DEFAULT), 
 		NULL);
 }
 

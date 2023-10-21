@@ -1399,6 +1399,19 @@ bool PlayerbotAI::IsRangedDpsAssistantOfIndex(Player* player, int index)
     return false;
 }
 
+bool PlayerbotAI::HasAggro(Unit* unit)
+{
+    if (!unit) {
+        return false;
+    }
+    bool isMT = IsMainTank(bot);
+    Unit* victim = unit->GetVictim();
+    if (victim && (victim->GetGUID() == bot->GetGUID() || (!isMT && victim->ToPlayer() && IsTank(victim->ToPlayer())))) {
+        return true;
+    }
+    return false;
+}
+
 int32 PlayerbotAI::GetGroupSlotIndex(Player* player)
 {
     Group* group = bot->GetGroup();
