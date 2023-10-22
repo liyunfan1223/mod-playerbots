@@ -45,7 +45,7 @@ float ExpectedGroupDpsValue::Calculate()
     } else if (level <= 70) {
         basic_dps = 350 + (level - 60) * 40;
     } else {
-        basic_dps = 750 + (level - 70) * 100;
+        basic_dps = 750 + (level - 70) * 125;
     }
 
     if (level <= 8) {
@@ -59,10 +59,12 @@ float ExpectedGroupDpsValue::Calculate()
     } else if (level <= 80) {
         basic_gs = (155 + (level - 70) * 4) * 4;
     }
+    float gap = mixedGearScore - basic_gs;
+    float gs_modifier = (float)mixedGearScore / basic_gs - 1;
+    gs_modifier = gs_modifier * 3 + 1;
 
-    float gs_modifier = (float)mixedGearScore / basic_gs;
     if (gs_modifier < 0.5) gs_modifier = 0.5;
-    if (gs_modifier > 3) gs_modifier = 3;
+    if (gs_modifier > 4) gs_modifier = 3;
 
     return dps_num * basic_dps * gs_modifier;
 }
