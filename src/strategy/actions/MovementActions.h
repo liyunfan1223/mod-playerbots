@@ -22,7 +22,7 @@ class MovementAction : public Action
     protected:
         bool MoveNear(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->contactDistance);
         bool MoveToLOS(WorldObject* target, bool ranged = false);
-        bool MoveTo(uint32 mapId, float x, float y, float z, bool idle = false, bool react = false);
+        bool MoveTo(uint32 mapId, float x, float y, float z, bool idle = false, bool react = false, bool normal_only = false);
         bool MoveTo(Unit* target, float distance = 0.0f);
         bool MoveNear(WorldObject* target, float distance = sPlayerbotAIConfig->contactDistance);
         float GetFollowAngle();
@@ -41,7 +41,7 @@ class MovementAction : public Action
         bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->followDistance);
         void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
     private:
-        float SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range = 10.0f);
+        float SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range = 10.0f, bool normal_only = false);
 };
 
 class FleeAction : public MovementAction

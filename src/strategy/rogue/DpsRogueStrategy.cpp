@@ -71,8 +71,8 @@ DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* botAI) : MeleeCombatStrategy(bot
 NextAction** DpsRogueStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("killing spree", ACTION_NORMAL + 1),
-        new NextAction("melee", ACTION_NORMAL), NULL);
+        new NextAction("killing spree", ACTION_DEFAULT + 0.1f),
+        new NextAction("melee", ACTION_DEFAULT), NULL);
 }
 
 void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

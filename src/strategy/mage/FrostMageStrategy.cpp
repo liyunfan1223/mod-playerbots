@@ -11,7 +11,11 @@ FrostMageStrategy::FrostMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy(b
 
 NextAction** FrostMageStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("frostbolt", 7.0f), nullptr);
+    return NextAction::array(0, 
+        new NextAction("frostbolt", ACTION_DEFAULT + 0.1f), 
+        new NextAction("shoot", ACTION_DEFAULT), 
+        nullptr);
+
 }
 
 void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

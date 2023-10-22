@@ -43,9 +43,9 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("devastate", ACTION_NORMAL + 2), 
-        new NextAction("revenge", ACTION_NORMAL + 1), 
-        new NextAction("melee", ACTION_NORMAL), 
+        new NextAction("devastate", ACTION_DEFAULT + 0.2f), 
+        new NextAction("revenge", ACTION_DEFAULT + 0.1f), 
+        new NextAction("melee", ACTION_DEFAULT), 
         NULL);
 }
 

@@ -132,7 +132,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
     return false;
 }
 
-bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
+bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only)
 {
     UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z)) {
@@ -166,7 +166,11 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         MotionMaster &mm = *bot->GetMotionMaster();
         
         mm.Clear();
-        mm.MovePoint(mapId, x, y, SearchBestGroundZForPath(x, y, z, generatePath), generatePath);
+        float modifiedZ = SearchBestGroundZForPath(x, y, z, generatePath, normal_only);
+        if (modifiedZ == INVALID_HEIGHT) {
+            return false;
+        }
+        mm.MovePoint(mapId, x, y, modifiedZ, generatePath);
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;
     }
@@ -1257,7 +1261,7 @@ bool MovementAction::MoveAway(Unit* target)
     float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
     float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
     float dz = bot->GetPositionZ();
-    return MoveTo(target->GetMapId(), dx, dy, dz);
+    return MoveTo(target->GetMapId(), dx, dy, dz, false, false, true);
 }
 
 bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float distance)
@@ -1268,7 +1272,7 @@ bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float d
     return MoveNear(mapId, x, y, z, distance);
 }
 
-float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range)
+float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range, bool normal_only)
 {
     if (!generatePath) {
         return z;
@@ -1298,6 +1302,9 @@ float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool g
         if (gen.GetPathType() == PATHFIND_NORMAL) {
             return modified_z;
         }
+    }
+    if (normal_only) {
+        return INVALID_HEIGHT;
     }
     return z;
 }

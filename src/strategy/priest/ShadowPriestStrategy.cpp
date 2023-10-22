@@ -14,10 +14,10 @@ ShadowPriestStrategy::ShadowPriestStrategy(PlayerbotAI* botAI) : GenericPriestSt
 NextAction** ShadowPriestStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("mind blast", 13.0f), 
+        new NextAction("mind blast", ACTION_DEFAULT + 0.2f), 
         // new NextAction("shadow word: death", 12.0f), 
-        new NextAction("mind flay", 11.0f), 
-        // new NextAction("shoot", 10.0f), 
+        new NextAction("mind flay", ACTION_DEFAULT + 0.1f), 
+        new NextAction("shoot", ACTION_DEFAULT), 
         NULL);
 }
 

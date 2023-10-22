@@ -50,11 +50,11 @@ MeleeShamanStrategy::MeleeShamanStrategy(PlayerbotAI* botAI) : GenericShamanStra
 NextAction** MeleeShamanStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("stormstrike", ACTION_NORMAL + 6), 
-        new NextAction("earth shock", ACTION_NORMAL + 5), 
-        new NextAction("fire nova", ACTION_NORMAL + 4), 
-        new NextAction("lava lash", ACTION_NORMAL + 1), 
-        new NextAction("melee", ACTION_NORMAL), 
+        new NextAction("stormstrike", ACTION_DEFAULT + 0.4f), 
+        new NextAction("earth shock", ACTION_DEFAULT + 0.3f), 
+        new NextAction("fire nova", ACTION_DEFAULT + 0.2f), 
+        new NextAction("lava lash", ACTION_DEFAULT + 0.1f), 
+        new NextAction("melee", ACTION_DEFAULT), 
         NULL);
 }
 

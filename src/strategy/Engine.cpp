@@ -146,7 +146,8 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     time_t currentTime = time(nullptr);
     aiObjectContext->Update();
     ProcessTriggers(minimal);
-
+    PushDefaultActions();
+    
     uint32 iterations = 0;
     uint32 iterationsPerTick = queue.Size() * (minimal ? 2 : sPlayerbotAIConfig->iterationsPerTick);
     do
@@ -265,15 +266,15 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     }
     while (basket && ++iterations <= iterationsPerTick);
 
-    if (!basket)
-    {
-        lastRelevance = 0.0f;
-        PushDefaultActions();
+    // if (!basket)
+    // {
+    //     lastRelevance = 0.0f;
+    //     PushDefaultActions();
 
-        // prevent the delay after pushing default actions
-        if (queue.Peek() && depth < 1 && !minimal)
-            return DoNextAction(unit, depth + 1, minimal);
-    }
+    //     // prevent the delay after pushing default actions
+    //     if (queue.Peek() && depth < 1 && !minimal)
+    //         return DoNextAction(unit, depth + 1, minimal);
+    // }
 
     // MEMORY FIX TEST
     /*

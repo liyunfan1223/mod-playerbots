@@ -31,13 +31,13 @@ DpsHunterStrategy::DpsHunterStrategy(PlayerbotAI* botAI) : GenericHunterStrategy
 NextAction** DpsHunterStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("kill shot", 16.0f),
-        new NextAction("chimera shot", 15.0f),
-        new NextAction("explosive shot", 15.0f),
-        new NextAction("aimed shot", 14.0f), 
-        new NextAction("arcane shot", 13.0f),
-        new NextAction("steady shot", 12.0f),
-        new NextAction("auto shot", 10.0f),
+        new NextAction("kill shot", ACTION_DEFAULT + 0.6f),
+        new NextAction("chimera shot", ACTION_DEFAULT + 0.5f),
+        new NextAction("explosive shot", ACTION_DEFAULT + 0.4f),
+        new NextAction("aimed shot", ACTION_DEFAULT + 0.3f), 
+        new NextAction("arcane shot", ACTION_DEFAULT + 0.2f),
+        new NextAction("steady shot", ACTION_DEFAULT + 0.1f),
+        new NextAction("auto shot", ACTION_DEFAULT),
         nullptr);
     // return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new NextAction("auto attack", 9.0f), nullptr);
 }

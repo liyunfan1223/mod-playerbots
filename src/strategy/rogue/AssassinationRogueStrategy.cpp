@@ -35,7 +35,7 @@ AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI* ai) : MeleeC
 NextAction** AssassinationRogueStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("melee", ACTION_NORMAL),
+        new NextAction("melee", ACTION_DEFAULT),
         NULL);
 }
 
