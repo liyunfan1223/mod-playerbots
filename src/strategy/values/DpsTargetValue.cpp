@@ -3,6 +3,7 @@
  */
 
 #include "DpsTargetValue.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
 class FindLeastHpTargetStrategy : public FindTargetStrategy
@@ -85,27 +86,36 @@ class FindTargetSmartStrategy : public FindTargetStrategy
             float new_time = new_unit->GetHealth() / dps_;
             float old_time = old_unit->GetHealth() / dps_;
             // [5-20] > (5-0] > (20-inf)
-            if (GetIntervalLevel(new_time) > GetIntervalLevel(old_time)) {
+            if (GetIntervalLevel(new_unit) > GetIntervalLevel(old_unit)) {
                 return true;
             }
-            int32_t interval = GetIntervalLevel(new_time);
-            if (interval == 2 || interval == 0) {
+            int32_t level = GetIntervalLevel(new_unit);
+            if (level % 10 == 2 || level % 10 == 0) {
                 return new_time < old_time;
             }
             // dont switch targets when all of them with low health
-            if (botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get() == old_unit) {
+            Unit* currentTarget = botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
+            if (currentTarget == new_unit) {
+                return true;
+            }
+            if (currentTarget == old_unit) {
                 return false;
             }
             return new_time > old_time;
         }
-        int32_t GetIntervalLevel(float time) {
+        int32_t GetIntervalLevel(Unit* unit) {
+            float time = unit->GetHealth() / dps_;
+            float dis = unit->GetDistance(botAI->GetBot());
+            float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance : sPlayerbotAIConfig->meleeDistance;
+            attackRange += 5.0f;
+            int level = dis < attackRange ? 10 : 0;
             if (time >= 5 && time <= 20) {
-                return 2;
+                return level + 2;
             }
             if (time < 5) {
-                return 1;
+                return level + 1;
             }
-            return 0;
+            return level;
         }
 
     protected:
