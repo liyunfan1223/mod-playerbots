@@ -7,6 +7,7 @@
 #include "HunterActions.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "SharedDefines.h"
 
 bool HunterAspectOfTheHawkTrigger::IsActive()
 {
@@ -76,4 +77,10 @@ bool SwitchToMeleeTrigger::IsActive()
     Unit* target = AI_VALUE(Unit*, "current target");
     return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && target && (target->GetVictim() == bot &&
         sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
+}
+
+bool TargetRemoveEnrageTrigger::IsActive()
+{
+	Unit* target = GetTarget();
+	return target && (botAI->HasAuraToDispel(target, DISPEL_ENRAGE) || botAI->HasAuraToDispel(target, DISPEL_MAGIC));
 }

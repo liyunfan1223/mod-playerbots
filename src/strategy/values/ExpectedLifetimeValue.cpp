@@ -64,7 +64,7 @@ float ExpectedGroupDpsValue::Calculate()
     gs_modifier = gs_modifier * 3 + 1;
 
     if (gs_modifier < 0.5) gs_modifier = 0.5;
-    if (gs_modifier > 4) gs_modifier = 3;
+    if (gs_modifier > 4) gs_modifier = 4;
 
     return dps_num * basic_dps * gs_modifier;
 }

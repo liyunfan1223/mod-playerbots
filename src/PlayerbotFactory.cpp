@@ -1335,7 +1335,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
 
         float bestScoreForSlot = -1;
         uint32 bestItemForSlot = 0;
-        for (int attempts = 0; attempts < std::min((int)ids.size(), 25); attempts++)
+        for (int attempts = 0; attempts < std::max((int)(ids.size() * 0.75), 1); attempts++)
         {
             uint32 index = urand(0, ids.size() - 1);
             uint32 newItemId = ids[index];
