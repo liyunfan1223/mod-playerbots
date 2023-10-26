@@ -1473,8 +1473,9 @@ bool MoveRandomAction::Execute(Event event)
         float x = bot->GetPositionX();
         float y = bot->GetPositionY();
         float z = bot->GetPositionZ();
-        x += urand(0, distance) - distance / 2;
-        y += urand(0, distance) - distance / 2;
+        float angle = (float)rand_norm() * static_cast<float>(M_PI);
+        x += urand(0, distance) * cos(angle);
+        y += urand(0, distance) * sin(angle);
         bot->UpdateGroundPositionZ(x, y, z);
 
         if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
