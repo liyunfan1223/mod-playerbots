@@ -9,6 +9,7 @@
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
 #include "PlayerbotAIConfig.h"
+#include "Random.h"
 #include "SharedDefines.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
@@ -1257,11 +1258,27 @@ bool MovementAction::MoveAway(Unit* target)
     if (!target) {
         return false;
     }
-    float angle = target->GetAngle(bot);
-    float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
-    float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
-    float dz = bot->GetPositionZ();
-    return MoveTo(target->GetMapId(), dx, dy, dz, false, false, true);
+    float init_angle = target->GetAngle(bot);
+    for (float delta = 0; delta <= M_PI / 2; delta += M_PI / 8) {
+        float angle = init_angle + delta;
+        float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
+        float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+        float dz = bot->GetPositionZ();
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true)) {
+            return true;
+        }
+        if (delta == 0) {
+            continue;
+        }
+        angle = init_angle - delta;
+        dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
+        dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+        dz = bot->GetPositionZ();
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float distance)
@@ -1463,7 +1480,7 @@ bool MoveRandomAction::Execute(Event event)
         if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
             continue;
 
-        bool moved = MoveTo(bot->GetMapId(), x, y, z);
+        bool moved = MoveTo(bot->GetMapId(), x, y, z, false, false, true);
         if (moved)
             return true;
     }
