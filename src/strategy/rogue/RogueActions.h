@@ -32,7 +32,6 @@ class CastStealthAction : public CastBuffSpellAction
         std::string const GetTargetName() override { return "self target"; }
 
         bool isPossible() override;
-        bool Execute(Event event) override;
 };
 
 class UnstealthAction : public Action

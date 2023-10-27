@@ -9,6 +9,7 @@
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
 #include "PlayerbotAIConfig.h"
+#include "Random.h"
 #include "SharedDefines.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
@@ -132,7 +133,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
     return false;
 }
 
-bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
+bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only)
 {
     UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z)) {
@@ -166,7 +167,11 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         MotionMaster &mm = *bot->GetMotionMaster();
         
         mm.Clear();
-        mm.MovePoint(mapId, x, y, SearchBestGroundZForPath(x, y, z, generatePath), generatePath);
+        float modifiedZ = SearchBestGroundZForPath(x, y, z, generatePath, normal_only);
+        if (modifiedZ == INVALID_HEIGHT) {
+            return false;
+        }
+        mm.MovePoint(mapId, x, y, modifiedZ, generatePath);
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;
     }
@@ -1253,11 +1258,27 @@ bool MovementAction::MoveAway(Unit* target)
     if (!target) {
         return false;
     }
-    float angle = target->GetAngle(bot);
-    float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
-    float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
-    float dz = bot->GetPositionZ();
-    return MoveTo(target->GetMapId(), dx, dy, dz);
+    float init_angle = target->GetAngle(bot);
+    for (float delta = 0; delta <= M_PI / 2; delta += M_PI / 8) {
+        float angle = init_angle + delta;
+        float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
+        float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+        float dz = bot->GetPositionZ();
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true)) {
+            return true;
+        }
+        if (delta == 0) {
+            continue;
+        }
+        angle = init_angle - delta;
+        dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
+        dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+        dz = bot->GetPositionZ();
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float distance)
@@ -1268,7 +1289,7 @@ bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float d
     return MoveNear(mapId, x, y, z, distance);
 }
 
-float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range)
+float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range, bool normal_only)
 {
     if (!generatePath) {
         return z;
@@ -1298,6 +1319,9 @@ float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool g
         if (gen.GetPathType() == PATHFIND_NORMAL) {
             return modified_z;
         }
+    }
+    if (normal_only) {
+        return INVALID_HEIGHT;
     }
     return z;
 }
@@ -1449,14 +1473,15 @@ bool MoveRandomAction::Execute(Event event)
         float x = bot->GetPositionX();
         float y = bot->GetPositionY();
         float z = bot->GetPositionZ();
-        x += urand(0, distance) - distance / 2;
-        y += urand(0, distance) - distance / 2;
+        float angle = (float)rand_norm() * static_cast<float>(M_PI);
+        x += urand(0, distance) * cos(angle);
+        y += urand(0, distance) * sin(angle);
         bot->UpdateGroundPositionZ(x, y, z);
 
         if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
             continue;
 
-        bool moved = MoveTo(bot->GetMapId(), x, y, z);
+        bool moved = MoveTo(bot->GetMapId(), x, y, z, false, false, true);
         if (moved)
             return true;
     }

@@ -80,11 +80,11 @@ DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrat
 NextAction** DpsPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("judgement of wisdom", ACTION_NORMAL + 6),
-        new NextAction("crusader strike", ACTION_NORMAL + 5),
-        new NextAction("divine storm", ACTION_NORMAL + 4),
-        new NextAction("consecration", ACTION_NORMAL + 3),
-        new NextAction("melee", ACTION_NORMAL), 
+        new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.4f),
+        new NextAction("crusader strike", ACTION_DEFAULT + 0.3f),
+        new NextAction("divine storm", ACTION_DEFAULT + 0.2f),
+        new NextAction("consecration", ACTION_DEFAULT + 0.1f),
+        new NextAction("melee", ACTION_DEFAULT), 
         NULL);
 }
 

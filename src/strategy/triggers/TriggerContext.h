@@ -217,7 +217,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* critical_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "critical aoe heal", "critical", 2); }
         static Trigger* low_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "low aoe heal", "low", 2); }
         static Trigger* medium_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "medium aoe heal", "medium", 2); }
-        static Trigger* group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.4); }
+        static Trigger* group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.6); }
         static Trigger* medium_group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.4); }
         static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
         static Trigger* swimming(PlayerbotAI* botAI) { return new IsSwimmingTrigger(botAI); }

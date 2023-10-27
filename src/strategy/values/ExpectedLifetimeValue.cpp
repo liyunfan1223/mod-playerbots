@@ -21,11 +21,11 @@ float ExpectedGroupDpsValue::Calculate()
     float dps_num;
     Group* group = bot->GetGroup();
     if (!group) {
-        dps_num = 1;
+        dps_num = 0.7;
     } else {
         dps_num = group->GetMembersCount() * 0.7;
     }
-    uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(bot, false, false, 12);
+    uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(bot, true, false, 12);
     // efficiency record based on rare gear level, is there better calculation method?
     // float dps_efficiency = 1;
     float basic_dps;
@@ -45,7 +45,7 @@ float ExpectedGroupDpsValue::Calculate()
     } else if (level <= 70) {
         basic_dps = 350 + (level - 60) * 40;
     } else {
-        basic_dps = 750 + (level - 70) * 100;
+        basic_dps = 750 + (level - 70) * 125;
     }
 
     if (level <= 8) {
@@ -59,10 +59,12 @@ float ExpectedGroupDpsValue::Calculate()
     } else if (level <= 80) {
         basic_gs = (155 + (level - 70) * 4) * 4;
     }
+    float gap = mixedGearScore - basic_gs;
+    float gs_modifier = (float)mixedGearScore / basic_gs - 1;
+    gs_modifier = gs_modifier * 3 + 1;
 
-    float gs_modifier = (float)mixedGearScore / basic_gs;
     if (gs_modifier < 0.5) gs_modifier = 0.5;
-    if (gs_modifier > 3) gs_modifier = 3;
+    if (gs_modifier > 4) gs_modifier = 4;
 
     return dps_num * basic_dps * gs_modifier;
 }

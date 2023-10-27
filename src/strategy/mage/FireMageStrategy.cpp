@@ -7,7 +7,10 @@
 
 NextAction** FireMageStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("fireball", ACTION_NORMAL + 1), NULL);
+    return NextAction::array(0, 
+        new NextAction("fireball", ACTION_DEFAULT + 0.1f), 
+        new NextAction("shoot", ACTION_DEFAULT), 
+        NULL);
 }
 
 void FireMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

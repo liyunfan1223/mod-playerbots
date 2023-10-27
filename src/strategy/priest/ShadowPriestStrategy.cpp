@@ -14,10 +14,10 @@ ShadowPriestStrategy::ShadowPriestStrategy(PlayerbotAI* botAI) : GenericPriestSt
 NextAction** ShadowPriestStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("mind blast", 13.0f), 
+        new NextAction("mind blast", ACTION_DEFAULT + 0.2f), 
         // new NextAction("shadow word: death", 12.0f), 
-        new NextAction("mind flay", 11.0f), 
-        // new NextAction("shoot", 10.0f), 
+        new NextAction("mind flay", ACTION_DEFAULT + 0.1f), 
+        new NextAction("shoot", ACTION_DEFAULT), 
         NULL);
 }
 
@@ -40,7 +40,7 @@ void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("shadow word: pain on attacker", NextAction::array(0, new NextAction("shadow word: pain on attacker", ACTION_NORMAL + 5), nullptr)));
     triggers.push_back(new TriggerNode("vampiric touch on attacker", NextAction::array(0, new NextAction("vampiric touch on attacker", ACTION_NORMAL + 4), nullptr)));
-    // triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("mind sear", ACTION_HIGH + 4), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("mind sear", ACTION_HIGH + 4), nullptr)));
 }
 
 void ShadowPriestDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

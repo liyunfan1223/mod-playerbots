@@ -32,7 +32,7 @@ ArmsWarriorStrategy::ArmsWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 
 NextAction** ArmsWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("heroic strike", ACTION_NORMAL), nullptr);
+    return NextAction::array(0, new NextAction("heroic strike", ACTION_DEFAULT), nullptr);
 }
 
 void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

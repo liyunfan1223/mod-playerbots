@@ -47,9 +47,10 @@ DpsWarlockStrategy::DpsWarlockStrategy(PlayerbotAI* botAI) : GenericWarlockStrat
 NextAction** DpsWarlockStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("haunt", 14.0f), 
-        new NextAction("demonic empowerment", 13.0f),
-		new NextAction("shadow bolt", 10.0f), 
+        new NextAction("haunt", ACTION_DEFAULT + 0.3f), 
+        new NextAction("demonic empowerment", ACTION_DEFAULT + 0.2f),
+		new NextAction("shadow bolt", ACTION_DEFAULT + 0.1f), 
+        new NextAction("shoot", ACTION_DEFAULT), 
         nullptr);
 }
 

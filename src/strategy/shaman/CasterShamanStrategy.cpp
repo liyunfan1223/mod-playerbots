@@ -39,8 +39,8 @@ CasterShamanStrategy::CasterShamanStrategy(PlayerbotAI* botAI) : GenericShamanSt
 NextAction** CasterShamanStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("lava burst", 11.0f),
-        new NextAction("lightning bolt", 10.0f), 
+        new NextAction("lava burst", ACTION_DEFAULT + 0.1f),
+        new NextAction("lightning bolt", ACTION_DEFAULT), 
         NULL);
 }
 

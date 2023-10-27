@@ -57,7 +57,7 @@ TankWarlockStrategy::TankWarlockStrategy(PlayerbotAI* botAI) : GenericWarlockStr
 
 NextAction** TankWarlockStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("shoot", 10.0f), nullptr);
+    return NextAction::array(0, new NextAction("shoot", ACTION_DEFAULT), nullptr);
 }
 
 void TankWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

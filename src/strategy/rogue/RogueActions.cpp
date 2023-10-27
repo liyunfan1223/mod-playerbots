@@ -14,16 +14,6 @@ bool CastStealthAction::isPossible()
     return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) && !botAI->HasAura(34976, bot);
 }
 
-bool CastStealthAction::Execute(Event event)
-{
-    if (botAI->CastSpell("stealth", bot))
-    {
-        // botAI->ChangeStrategy("-dps,+stealthed", BOT_STATE_COMBAT);
-    }
-
-    return true;
-}
-
 bool UnstealthAction::Execute(Event event)
 {
     botAI->RemoveAura("stealth");

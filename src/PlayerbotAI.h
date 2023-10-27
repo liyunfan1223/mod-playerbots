@@ -338,6 +338,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsAssistTankOfIndex(Player* player, int index);
         bool IsHealAssistantOfIndex(Player* player, int index);
         bool IsRangedDpsAssistantOfIndex(Player* player, int index);
+        bool HasAggro(Unit* unit);
         int32 GetGroupSlotIndex(Player* player);
         int32 GetRangedIndex(Player* player);
         int32 GetClassIndex(Player* player, uint8_t cls);

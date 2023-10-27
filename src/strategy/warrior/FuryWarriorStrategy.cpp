@@ -35,12 +35,12 @@ FuryWarriorStrategy::FuryWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 NextAction** FuryWarriorStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("bloodthirst", ACTION_NORMAL + 5), 
-        new NextAction("whirlwind", ACTION_NORMAL + 4), 
-        new NextAction("sunder armor", ACTION_NORMAL + 3), 
-        new NextAction("execute", ACTION_NORMAL + 2), 
-        new NextAction("overpower", ACTION_NORMAL + 1), 
-        new NextAction("melee", ACTION_NORMAL), 
+        new NextAction("bloodthirst", ACTION_DEFAULT + 0.5f), 
+        new NextAction("whirlwind", ACTION_DEFAULT + 0.4f), 
+        new NextAction("sunder armor", ACTION_DEFAULT + 0.3f), 
+        new NextAction("execute", ACTION_DEFAULT + 0.2f), 
+        new NextAction("overpower", ACTION_DEFAULT + 0.1f), 
+        new NextAction("melee", ACTION_DEFAULT), 
     NULL);
 }
 

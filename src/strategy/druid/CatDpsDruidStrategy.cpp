@@ -120,7 +120,7 @@ CatDpsDruidStrategy::CatDpsDruidStrategy(PlayerbotAI* botAI) : FeralDruidStrateg
 
 NextAction** CatDpsDruidStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("mangle (cat)", ACTION_NORMAL + 1), nullptr);
+    return NextAction::array(0, new NextAction("mangle (cat)", ACTION_DEFAULT + 0.1f), nullptr);
 }
 
 void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

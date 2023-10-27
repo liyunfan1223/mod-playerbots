@@ -406,7 +406,7 @@ bool TankAssistTrigger::IsActive()
     if (!tankTarget || currentTarget == tankTarget)
         return false;
 
-    return currentTarget->GetVictim() == AI_VALUE(Unit*, "self target");
+    return AI_VALUE2(bool, "has aggro", "current target");
 }
 
 bool IsBehindTargetTrigger::IsActive()

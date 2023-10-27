@@ -160,5 +160,6 @@ class TargetRemoveEnrageTrigger : public TargetAuraDispelTrigger
 {
     public:
         TargetRemoveEnrageTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_ENRAGE) {}
+        bool IsActive() override;
 };
 #endif

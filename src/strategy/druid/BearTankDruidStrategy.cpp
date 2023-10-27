@@ -140,12 +140,12 @@ BearTankDruidStrategy::BearTankDruidStrategy(PlayerbotAI* botAI) : FeralDruidStr
 NextAction** BearTankDruidStrategy::getDefaultActions()
 {
     return NextAction::array(0,
-            new NextAction("mangle (bear)", ACTION_NORMAL + 5),
-            new NextAction("faerie fire (feral)", ACTION_NORMAL + 4),
-            new NextAction("lacerate", ACTION_NORMAL + 3),
-            new NextAction("maul", ACTION_NORMAL + 2),
-            new NextAction("enrage", ACTION_NORMAL + 1),
-            new NextAction("melee", ACTION_NORMAL),
+            new NextAction("mangle (bear)", ACTION_DEFAULT + 0.5f),
+            new NextAction("faerie fire (feral)", ACTION_DEFAULT + 0.4f),
+            new NextAction("lacerate", ACTION_DEFAULT + 0.3f),
+            new NextAction("maul", ACTION_DEFAULT + 0.2f),
+            new NextAction("enrage", ACTION_DEFAULT + 0.1f),
+            new NextAction("melee", ACTION_DEFAULT),
             nullptr);
 }
 

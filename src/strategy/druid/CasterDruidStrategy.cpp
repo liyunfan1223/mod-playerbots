@@ -105,8 +105,8 @@ CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI* botAI) : GenericDruidStrat
 NextAction** CasterDruidStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("starfall", ACTION_NORMAL + 2),
-        new NextAction("wrath", ACTION_NORMAL + 1), 
+        new NextAction("starfall", ACTION_DEFAULT + 0.2f),
+        new NextAction("wrath", ACTION_DEFAULT + 0.1f), 
         // new NextAction("starfire", ACTION_NORMAL), 
         nullptr);
 }

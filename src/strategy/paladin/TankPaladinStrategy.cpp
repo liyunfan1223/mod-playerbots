@@ -59,12 +59,12 @@ TankPaladinStrategy::TankPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStr
 NextAction** TankPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0,
-        new NextAction("shield of righteousness", ACTION_NORMAL + 6),
-        new NextAction("hammer of the righteous", ACTION_NORMAL + 5),
-        new NextAction("judgement of wisdom", ACTION_NORMAL + 4),
+        new NextAction("shield of righteousness", ACTION_DEFAULT + 0.6f),
+        new NextAction("hammer of the righteous", ACTION_DEFAULT + 0.5f),
+        new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.4f),
         // new NextAction("avenger's shield", ACTION_NORMAL + 3), 
         // new NextAction("consecration", ACTION_NORMAL + 2),
-        new NextAction("melee", ACTION_NORMAL), 
+        new NextAction("melee", ACTION_DEFAULT), 
         NULL);
 }
 

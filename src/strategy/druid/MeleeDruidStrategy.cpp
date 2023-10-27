@@ -12,8 +12,8 @@ MeleeDruidStrategy::MeleeDruidStrategy(PlayerbotAI* botAI) : CombatStrategy(botA
 NextAction** MeleeDruidStrategy::getDefaultActions()
 {
     return NextAction::array(0,
-            new NextAction("faerie fire", ACTION_NORMAL + 1),
-            new NextAction("melee", ACTION_NORMAL),
+            new NextAction("faerie fire", ACTION_DEFAULT + 0.1f),
+            new NextAction("melee", ACTION_DEFAULT),
             nullptr);
 }
 

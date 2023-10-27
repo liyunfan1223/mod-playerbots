@@ -4,6 +4,7 @@
 
 #include "HealShamanStrategy.h"
 #include "Playerbots.h"
+#include "Strategy.h"
 
 class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
@@ -116,7 +117,7 @@ void GenericShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("wind shear", NextAction::array(0, new NextAction("wind shear", 23.0f), nullptr)));
     triggers.push_back(new TriggerNode("wind shear on enemy healer", NextAction::array(0, new NextAction("wind shear on enemy healer", 23.0f), nullptr)));
-	triggers.push_back(new TriggerNode("purge", NextAction::array(0, new NextAction("purge", 10.0f), nullptr)));
+	triggers.push_back(new TriggerNode("purge", NextAction::array(0, new NextAction("purge", ACTION_DISPEL), nullptr)));
 	// triggers.push_back(new TriggerNode("party member medium health", NextAction::array(0, new NextAction("lesser healing wave on party", 25.0f), nullptr)));
 	// triggers.push_back(new TriggerNode("party member low health", NextAction::array(0, new NextAction("riptide on party", 25.0f), nullptr)));
 	// triggers.push_back(new TriggerNode("medium aoe heal", NextAction::array(0, new NextAction("chain heal", 27.0f), nullptr)));
