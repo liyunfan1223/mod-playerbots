@@ -273,7 +273,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     //     bot->GetMotionMaster()->Clear();
     //     bot->GetMotionMaster()->MoveIdle();
     // }
-
     // cheat options
     if (bot->IsAlive() && ((uint32)GetCheat() > 0 || (uint32)sPlayerbotAIConfig->botCheatMask > 0))
     {
@@ -303,6 +302,14 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             return;
     }
 
+    if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup()) {
+        Player* leader = bot->GetGroup()->GetLeader();
+        PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
+        if (leaderAI && !leaderAI->IsRealPlayer()) {
+            bot->RemoveFromGroup();
+        }
+    }
+    
     bool min = minimal;
     UpdateAIInternal(elapsed, min);
     inCombat = bot->IsInCombat();
