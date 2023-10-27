@@ -51,6 +51,7 @@ class PlayerbotAIConfig
         bool randomBotAutologin;
         bool botAutologin;
         std::string randomBotMapsAsString;
+        float probTeleToBankers;
         std::vector<uint32> randomBotMaps;
         std::vector<uint32> randomBotQuestItems;
         std::vector<uint32> randomBotAccounts;

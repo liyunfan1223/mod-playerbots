@@ -968,7 +968,7 @@ void RandomPlayerbotMgr::Revive(Player* player)
     SetEventValue(bot, "revive", 0, 0);
 
 
-    RandomTeleportForLevel(player);
+    RandomTeleportGrindForLevel(player);
     Refresh(player);
 }
 
@@ -1004,30 +1004,12 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         std::vector<uint32>::iterator i = find(sPlayerbotAIConfig->randomBotMaps.begin(), sPlayerbotAIConfig->randomBotMaps.end(), l.getMapId());
         return i == sPlayerbotAIConfig->randomBotMaps.end();
     }), tlocs.end());
-    // LOG_INFO("playerbots", "Locs {} after disabled in config.", tlocs.size());
-    // Check locs again in case all possible locations were removed
     if (tlocs.empty())
     {
         LOG_DEBUG("playerbots", "Cannot teleport bot {} - all locations removed by filter", bot->GetName().c_str());
         return;
     }
 
-    //Random shuffle based on distance. Closer distances are more likely (but not exclusivly) to be at the begin of the list.
-    // tlocs = sTravelMgr->getNextPoint(WorldPosition(bot), tlocs, 0);
-    // LOG_INFO("playerbots", "Locs {} after shuffled.", tlocs.size());
-    // 5% + 0.1% per level chance node on different map in selection.
-    // tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l)
-    // {
-    //     return l.GetMapId() != bot->GetMapId() && urand(1, 100) > 5 + 0.1 * bot->getLevel();
-    // }), tlocs.end());
-    // LOG_INFO("playerbots", "Locs {} after remove different maps.", tlocs.size());
-    // Continent is about 20.000 large
-    // Bot will travel 0-5000 units + 75-150 units per level.
-    // tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l)
-    // {
-    //     return sServerFacade->GetDistance2d(bot, l.GetPositionX(), l.GetPositionY()) > urand(0, 5000) + bot->getLevel() * 15 * urand(5, 10);
-    // }), tlocs.end());
-    // LOG_INFO("playerbots", "Locs {} after remove too far away.", tlocs.size());
     if (tlocs.empty())
     {
         LOG_DEBUG("playerbots", "Cannot teleport bot {} - no locations available", bot->GetName().c_str());
@@ -1166,6 +1148,60 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
     }
     LOG_INFO("playerbots", "{} locations for level collected.", collected_locs);
     
+    results = WorldDatabase.Query(
+    "SELECT "
+		    "map, "
+		    "position_x, "
+		    "position_y, "
+		    "position_z, "
+            "orientation, "
+		    "t.minlevel "
+        "FROM "
+		    "creature c "
+		    "INNER JOIN creature_template t on c.id1 = t.entry "
+        "WHERE "
+            "t.npcflag & 131072 "
+            "AND t.npcflag != 135298 "
+            "AND t.minlevel != 55 "
+            "AND t.minlevel != 65 "
+            "AND t.faction != 35 "
+            "AND t.faction != 474 "
+            "AND map IN ({}) "
+        "ORDER BY "
+	        "t.minlevel;", sPlayerbotAIConfig->randomBotMapsAsString.c_str());
+    collected_locs = 0;
+    if (results)
+    {
+        do
+        {
+            Field* fields = results->Fetch();
+            uint16 mapId = fields[0].Get<uint16>();
+            float x = fields[1].Get<float>();
+            float y = fields[2].Get<float>();
+            float z = fields[3].Get<float>();
+            float orient = fields[4].Get<float>();
+            uint32 level = fields[5].Get<uint32>();
+            WorldLocation loc(mapId, x + cos(orient) * 10.0f, y + sin(orient) * 10.0f, z, orient + M_PI);
+            collected_locs++;
+            for (int32 l = 1; l <= maxLevel; l++) {
+                if (l <= 60 && level >= 60) {
+                    continue;
+                }
+                if (l <= 70 && level >= 70) {
+                    continue;
+                }
+                if (l >= 70 && level >= 60 && level <= 70) {
+                    continue;
+                }
+                if (l >= 30 && level <= 30) {
+                    continue;
+                }
+                bankerLocsPerLevelCache[(uint8)l].push_back(loc);
+            }
+        } while (results->NextRow());
+    }
+    LOG_INFO("playerbots", "{} banker locations for level collected.", collected_locs);
+
     // temporary only use locsPerLevelCache, so disable rpgLocsCacheLevel cache
 
     // LOG_INFO("playerbots", "Preparing RPG teleport caches for {} factions...", sFactionTemplateStore.GetNumRows());
@@ -1208,6 +1244,22 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     uint32 level = bot->getLevel();
     uint8 race = bot->getRace();
     LOG_INFO("playerbots", "Random teleporting bot {} for level {} ({} locations available)", bot->GetName().c_str(), bot->GetLevel(), locsPerLevelCache[level].size());
+    if (urand(0, 100) < sPlayerbotAIConfig->probTeleToBankers * 100) {
+        RandomTeleport(bot, bankerLocsPerLevelCache[level], true);
+    } else {
+        RandomTeleport(bot, locsPerLevelCache[level]);
+    }
+}
+
+void RandomPlayerbotMgr::RandomTeleportGrindForLevel(Player* bot)
+{
+    if (bot->InBattleground())
+        return;
+
+    uint32 level = bot->getLevel();
+    uint8 race = bot->getRace();
+    LOG_INFO("playerbots", "Random teleporting bot {} for level {} ({} locations available)", bot->GetName().c_str(), bot->GetLevel(), locsPerLevelCache[level].size());
+
     RandomTeleport(bot, locsPerLevelCache[level]);
 }
 
