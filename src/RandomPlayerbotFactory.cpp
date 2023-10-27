@@ -206,11 +206,11 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
 
-    player->SaveToDB(true, false);
     if (player->getClass() == CLASS_DEATH_KNIGHT)
 	{
 		player->learnSpell(50977, false);
 	}
+    // player->SaveToDB(true, false);
     // player->RewardQuest(const Quest *quest, uint32 reward, Object *questGiver)
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId, name.c_str(), race, cls);
 
@@ -274,12 +274,14 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         LOG_INFO("playerbots", "Deleting all random bot characters, {} accounts collected...", botAccounts.size());
         QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'", sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+        int32 deletion_count = 0;
         if (results)
         {
             do
             {
                 Field* fields = results->Fetch();
                 uint32 accId = fields[0].Get<uint32>();
+                LOG_INFO("playerbots", "Deleting account accID: {}({})...", accId, ++deletion_count);
                 AccountMgr::DeleteAccount(accId);
             } while (results->NextRow());
         }
@@ -288,8 +290,11 @@ void RandomPlayerbotFactory::CreateRandomBots()
         CharacterDatabase.Execute("UPDATE playerbots_names SET in_use=0 WHERE in_use=1");
         /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created correctly
            the better way is turning the async db operation to sync db operation */
-        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
-        LOG_INFO("playerbots", "Random bot characters deleted");
+        std::this_thread::sleep_for(100ms * sPlayerbotAIConfig->randomBotAccountCount);
+        LOG_INFO("playerbots", "Random bot characters deleted.");
+        LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
+        World::StopNow(SHUTDOWN_EXIT_CODE);
+        return;
     }
     
     uint32 totalAccCount = sPlayerbotAIConfig->randomBotAccountCount;
@@ -330,7 +335,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     if (account_creation) {
         /* wait for async accounts create to make character create correctly, same as account delete */
-        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
+        std::this_thread::sleep_for(100ms * sPlayerbotAIConfig->randomBotAccountCount);
     }
 
     LOG_INFO("playerbots", "Creating random bot characters...");
