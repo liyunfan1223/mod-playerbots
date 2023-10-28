@@ -16,6 +16,7 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
             creators["kidney shot"] = &kidney_shot;
             creators["backstab"] = &backstab;
             creators["melee"] = &melee;
+            creators["rupture"] = &rupture;
         }
 
     private:
@@ -61,6 +62,14 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
                 /*A*/ NextAction::array(0, new NextAction("mutilate"), NULL),
                 /*C*/ NULL);
         }
+        static ActionNode* rupture(PlayerbotAI* botAI)
+        {
+            return new ActionNode ("rupture",
+                /*P*/ NULL,
+                /*A*/ NextAction::array(0, new NextAction("eviscerate"), NULL),
+                /*C*/ NULL);
+        }
+        
 };
 
 DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* botAI) : MeleeCombatStrategy(botAI)
@@ -89,7 +98,8 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "combo points available",
-        NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 1), NULL)));
+        NextAction::array(0, 
+            new NextAction("rupture", ACTION_HIGH + 1), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"medium threat",

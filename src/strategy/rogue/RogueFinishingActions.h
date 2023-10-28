@@ -21,16 +21,16 @@ class CastSliceAndDiceAction : public CastMeleeSpellAction
 		CastSliceAndDiceAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "slice and dice") { }
 };
 
-class CastExposeArmorAction : public CastMeleeSpellAction
+class CastExposeArmorAction : public CastDebuffSpellAction
 {
 	public:
-		CastExposeArmorAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "expose armor") { }
+		CastExposeArmorAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "expose armor", false, 25.0f) { }
 };
 
-class CastRuptureAction : public CastMeleeSpellAction
+class CastRuptureAction : public CastDebuffSpellAction
 {
 	public:
-		CastRuptureAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "rupture") { }
+		CastRuptureAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "rupture") { }
 };
 
 class CastKidneyShotAction : public CastMeleeSpellAction
