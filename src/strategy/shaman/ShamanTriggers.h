@@ -65,6 +65,12 @@ class StrengthOfEarthTotemTrigger : public TotemTrigger
         StrengthOfEarthTotemTrigger(PlayerbotAI* botAI) : TotemTrigger(botAI, "strength of earth totem") { }
 };
 
+class FireElementalTotemTrigger : public BoostTrigger
+{
+    public:
+        FireElementalTotemTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "fire elemental totem") { }
+};
+
 class MagmaTotemTrigger : public TotemTrigger
 {
     public:
@@ -234,13 +240,13 @@ class PartyMemberCureDiseaseTrigger : public PartyMemberNeedCureTrigger
 class NoFireTotemTrigger : public Trigger {
     public:
         NoFireTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "no fire totem") {}
-        virtual bool IsActive() override;
+        bool IsActive() override;
 };
 
 class NoWaterTotemTrigger : public Trigger {
     public:
         NoWaterTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "no water totem") {}
-        virtual bool IsActive() override;
+        bool IsActive() override;
 };
 
 class EarthShieldOnMainTankTrigger : public BuffOnMainTankTrigger
@@ -258,5 +264,12 @@ class WrathOfAirTotemTrigger : public TotemTrigger
 {
 	public:
 		WrathOfAirTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "wrath of air totem") {}
+};
+
+class NoAirTotemTrigger : public TotemTrigger
+{
+	public:
+		NoAirTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "no air totem") {}
+        bool IsActive() override;
 };
 #endif

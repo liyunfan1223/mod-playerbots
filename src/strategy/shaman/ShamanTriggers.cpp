@@ -85,3 +85,9 @@ bool NoWaterTotemTrigger::IsActive()
         !AI_VALUE2(bool, "has totem", "mana spring totem") &&
         !AI_VALUE2(bool, "has totem", "healing stream totem");
 }
+
+bool NoAirTotemTrigger::IsActive()
+{
+    return !AI_VALUE2(bool, "has totem", "wrath of air totem") &&
+        !AI_VALUE2(bool, "has totem", "windfury totem");
+}

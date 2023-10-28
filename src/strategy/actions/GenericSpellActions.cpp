@@ -118,9 +118,9 @@ bool CastSpellAction::isUseful()
 CastMeleeSpellAction::CastMeleeSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
 {
     range = ATTACK_DISTANCE;
-    Unit* target = AI_VALUE(Unit*, "current target");
-    if (target)
-        range = bot->GetMeleeRange(target);
+    // Unit* target = AI_VALUE(Unit*, "current target");
+    // if (target)
+    //     range = bot->GetMeleeRange(target);
 
     // range = target->GetCombinedCombatReach();
 }

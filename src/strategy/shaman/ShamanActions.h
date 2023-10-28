@@ -5,7 +5,9 @@
 #ifndef _PLAYERBOT_SHAMANACTIONS_H
 #define _PLAYERBOT_SHAMANACTIONS_H
 
+#include "Define.h"
 #include "GenericSpellActions.h"
+#include "Playerbots.h"
 #include "SharedDefines.h"
 
 class PlayerbotAI;
@@ -109,9 +111,19 @@ class CastWindfuryWeaponAction : public CastEnchantItemAction
 class CastTotemAction : public CastBuffSpellAction
 {
     public:
-        CastTotemAction(PlayerbotAI* botAI, std::string const spell) : CastBuffSpellAction(botAI, spell) { }
+        CastTotemAction(PlayerbotAI* botAI, std::string const spell, std::string const buffName = "", float needLifeTime = 8.0f) 
+            : CastBuffSpellAction(botAI, spell), needLifeTime(needLifeTime) {
+            if (buffName == "") {
+                buff = spell;
+            } else {
+                buff = buffName;
+            }
+        }
 
         bool isUseful() override;
+    protected:
+        float needLifeTime;
+        std::string buff;
 };
 
 class CastStoneskinTotemAction : public CastTotemAction
@@ -129,13 +141,13 @@ class CastEarthbindTotemAction : public CastTotemAction
 class CastStrengthOfEarthTotemAction : public CastTotemAction
 {
     public:
-        CastStrengthOfEarthTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "strength of earth totem") { }
+        CastStrengthOfEarthTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "strength of earth totem", "strength of earth", 20.0f) { }
 };
 
 class CastManaSpringTotemAction : public CastTotemAction
 {
     public:
-        CastManaSpringTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "mana spring totem") { }
+        CastManaSpringTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "mana spring totem", "mana spring", 20.0f) { }
 
         bool isUseful() override;
 };
@@ -164,7 +176,7 @@ class CastCleansingTotemAction : public CastTotemAction
 class CastFlametongueTotemAction : public CastTotemAction
 {
     public:
-        CastFlametongueTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "flametongue totem") { }
+        CastFlametongueTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "flametongue totem", "", 20.0f) { }
 
         bool isUseful() override;
 };
@@ -184,16 +196,16 @@ class CastGraceOfAirTotemAction : public CastTotemAction
 class CastSearingTotemAction : public CastTotemAction
 {
     public:
-        CastSearingTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "searing totem") { }
+        CastSearingTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "searing totem", "", 0.0f) { }
 
         std::string const GetTargetName() override { return "self target"; }
         bool isUseful() override;
 };
 
-class CastMagmaTotemAction : public CastMeleeSpellAction
+class CastMagmaTotemAction : public CastTotemAction
 {
     public:
-        CastMagmaTotemAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "magma totem") { }
+        CastMagmaTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "magma totem", "", 0.0f) { }
 
         std::string const GetTargetName() override { return "self target"; }
         bool isUseful() override;
@@ -392,7 +404,7 @@ class CastTotemOfWrathAction : public CastTotemAction
 class CastFireElementalTotemAction : public CastTotemAction
 {
     public:
-        CastFireElementalTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "fire elemental totem") {}
+        CastFireElementalTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "fire elemental totem", "", 0.0f) {}
         virtual std::string const GetTargetName() override { return "self target"; }
 		virtual bool isUseful() override { return CastTotemAction::isUseful(); }
 };
@@ -400,12 +412,18 @@ class CastFireElementalTotemAction : public CastTotemAction
 class CastWrathOfAirTotemAction : public CastTotemAction
 {
 	public:
-		CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem") {}
+		CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem", "wrath of air totem") {}
 };
 
 class CastShamanisticRageAction : public CastBuffSpellAction
 {
 	public:
 		CastShamanisticRageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "shamanistic rage") {}
+};
+
+class CastFeralSpiritAction : public CastSpellAction
+{
+	public:
+		CastFeralSpiritAction(PlayerbotAI* ai) : CastSpellAction(ai, "feral spirit") {}
 };
 #endif

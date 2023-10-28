@@ -81,9 +81,9 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "party member cleanse spirit curse",
         NextAction::array(0, new NextAction("cleanse spirit curse on party", ACTION_DISPEL + 2), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "no fire totem",
-        NextAction::array(0, new NextAction("fire elemental totem", 11.0f), new NextAction("flametongue totem", 10.0f), NULL)));
+    // triggers.push_back(new TriggerNode(
+    //     "no fire totem",
+    //     NextAction::array(0, new NextAction("flametongue totem", 10.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "no water totem",

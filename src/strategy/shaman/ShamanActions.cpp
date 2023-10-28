@@ -7,7 +7,14 @@
 
 bool CastTotemAction::isUseful()
 {
-    return CastBuffSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
+    if (needLifeTime > 0.1f) {
+        Unit* target = AI_VALUE(Unit*, "current target");
+        float dps = AI_VALUE(float, "expected group dps");
+        if (target->GetHealth() / dps < needLifeTime) {
+            return false;
+        }
+    }
+    return CastBuffSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name) && !botAI->HasAura(buff, bot);
 }
 
 bool CastManaSpringTotemAction::isUseful()
@@ -27,7 +34,7 @@ bool CastSearingTotemAction::isUseful()
 
 bool CastMagmaTotemAction::isUseful()
 {
-    return CastMeleeSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
 }
 
 bool CastCleansingTotemAction::isUseful() 

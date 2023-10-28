@@ -50,9 +50,10 @@ MeleeShamanStrategy::MeleeShamanStrategy(PlayerbotAI* botAI) : GenericShamanStra
 NextAction** MeleeShamanStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("stormstrike", ACTION_DEFAULT + 0.4f), 
-        new NextAction("earth shock", ACTION_DEFAULT + 0.3f), 
-        new NextAction("fire nova", ACTION_DEFAULT + 0.2f), 
+        new NextAction("stormstrike", ACTION_DEFAULT + 0.5f), 
+        new NextAction("earth shock", ACTION_DEFAULT + 0.4f), 
+        new NextAction("feral spirit", ACTION_DEFAULT + 0.3f),
+        new NextAction("fire nova", ACTION_DEFAULT + 0.2f),
         new NextAction("lava lash", ACTION_DEFAULT + 0.1f), 
         new NextAction("melee", ACTION_DEFAULT), 
         NULL);
@@ -72,9 +73,23 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("enemy too close for melee", NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("strength of earth totem", ACTION_LIGHT_HEAL), nullptr)));
     triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
+
     triggers.push_back(new TriggerNode(
         "no fire totem",
-        NextAction::array(0, new NextAction("reach melee", 23.0f), new NextAction("magma totem", 22.0f), nullptr)));
+        NextAction::array(0, 
+        new NextAction("reach melee", 23.0f), 
+        new NextAction("magma totem", 22.0f), nullptr)));
+
+    triggers.push_back(new TriggerNode("fire elemental totem", 
+        NextAction::array(0, 
+            new NextAction("reach melee", 33.0f), 
+            new NextAction("fire elemental totem", 32.0f), 
+            nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "no air totem",
+        NextAction::array(0, new NextAction("windfury totem", 20.0f), nullptr)));
+
     triggers.push_back(new TriggerNode(
         "medium mana",
         NextAction::array(0, new NextAction("shamanistic rage", 23.0f), nullptr)));
@@ -83,6 +98,6 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void MeleeAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     
-    triggers.push_back(new TriggerNode("magma totem", NextAction::array(0, new NextAction("magma totem", 26.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("magma totem", NextAction::array(0, new NextAction("magma totem", 26.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("fire nova", 25.0f), nullptr)));
 }
