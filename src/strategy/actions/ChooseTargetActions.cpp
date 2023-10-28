@@ -16,7 +16,7 @@ bool AttackEnemyPlayerAction::isUseful()
     if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
         return false;
 
-    return !sPlayerbotAIConfig->IsInPvpProhibitedZone(bot->GetZoneId());
+    return !sPlayerbotAIConfig->IsPvpProhibited(bot->GetZoneId(), bot->GetAreaId());
 }
 
 bool AttackEnemyFlagCarrierAction::isUseful()

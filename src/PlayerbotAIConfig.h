@@ -35,7 +35,9 @@ class PlayerbotAIConfig
         bool Initialize();
         bool IsInRandomAccountList(uint32 id);
         bool IsInRandomQuestItemList(uint32 id);
+        bool IsPvpProhibited(uint32 zoneId, uint32 areaId);
         bool IsInPvpProhibitedZone(uint32 id);
+        bool IsInPvpProhibitedArea(uint32 id);
 
         bool enabled;
         bool allowGuildBots;
@@ -100,6 +102,7 @@ class PlayerbotAIConfig
         bool deleteRandomBotGuilds;
         std::vector<uint32> randomBotGuilds;
         std::vector<uint32> pvpProhibitedZoneIds;
+        std::vector<uint32> pvpProhibitedAreaIds;
 
         bool randombotsWalkingRPG;
         bool randombotsWalkingRPGInDoors;
