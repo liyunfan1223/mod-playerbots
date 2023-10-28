@@ -2282,8 +2282,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, uint8 effec
     if (sServerFacade->GetDistance2d(bot, goTarget) > sPlayerbotAIConfig->sightDistance)
         return false;
 
-    ObjectGuid oldSel = bot->GetTarget();
-    bot->SetTarget(goTarget->GetGUID());
+    // ObjectGuid oldSel = bot->GetTarget();
+    // bot->SetTarget(goTarget->GetGUID());
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetGOTarget(goTarget);
@@ -2292,8 +2292,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, uint8 effec
 
     SpellCastResult result = spell->CheckCast(true);
     delete spell;
-    if (oldSel)
-        bot->SetTarget(oldSel);
+    // if (oldSel)
+    //     bot->SetTarget(oldSel);
 
     switch (result)
     {
@@ -2422,7 +2422,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         failWithDelay = true;
     }
 
-	ObjectGuid oldSel = bot->GetTarget();
+	ObjectGuid oldSel = bot->GetSelectedUnit() ? bot->GetSelectedUnit()->GetGUID() : ObjectGuid();
 	bot->SetSelection(target->GetGUID());
 
     WorldObject* faceTo = target;
@@ -2547,7 +2547,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     aiObjectContext->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 
     if (oldSel)
-        bot->SetTarget(oldSel);
+        bot->SetSelection(oldSel);
 
 
     if (HasStrategy("debug spell", BOT_STATE_NON_COMBAT))
@@ -2605,7 +2605,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         failWithDelay = true;
     }
 
-    ObjectGuid oldSel = bot->GetTarget();
+    ObjectGuid oldSel = bot->GetSelectedUnit() ? bot->GetSelectedUnit()->GetGUID() : ObjectGuid();
 
     if (!bot->isMoving())
         bot->SetFacingTo(bot->GetAngle(x, y));
@@ -2678,7 +2678,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     aiObjectContext->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 
     if (oldSel)
-        bot->SetTarget(oldSel);
+        bot->SetSelection(oldSel);
 
     if (HasStrategy("debug spell", BOT_STATE_NON_COMBAT))
     {

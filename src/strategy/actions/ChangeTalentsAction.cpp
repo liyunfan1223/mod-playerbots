@@ -18,118 +18,118 @@ bool ChangeTalentsAction::Execute(Event event)
     
     if (!param.empty())
     {
-        if (param.find("auto") != std::string::npos)
-        {
-            AutoSelectTalents(&out);
-        }
-        else  if (param.find("list ") != std::string::npos)
-        {
-            listPremadePaths(getPremadePaths(param.substr(5)), &out);
-        }
-        else  if (param.find("list") != std::string::npos)
-        {
-            listPremadePaths(getPremadePaths(""), &out);
-        } else if (param == "1") {
+        // if (param.find("auto") != std::string::npos)
+        // {
+        //     AutoSelectTalents(&out);
+        // }
+        // else  if (param.find("list ") != std::string::npos)
+        // {
+        //     listPremadePaths(getPremadePaths(param.substr(5)), &out);
+        // }
+        // else  if (param.find("list") != std::string::npos)
+        // {
+        //     listPremadePaths(getPremadePaths(""), &out);
+        if (param == "1") {
             bot->ActivateSpec(0);
         } else if (param == "2") {
             bot->ActivateSpec(1);
         }
-        else
-        {
-            bool crop = false;
-            bool shift = false;
-            if (param.find("do ") != std::string::npos)
-            {
-                crop = true;
-                param = param.substr(3);
-            }
-            else if (param.find("shift ") != std::string::npos)
-            {
-                shift = true;
-                param = param.substr(6);
-            }
+        // else
+        // {
+        //     bool crop = false;
+        //     bool shift = false;
+        //     if (param.find("do ") != std::string::npos)
+        //     {
+        //         crop = true;
+        //         param = param.substr(3);
+        //     }
+        //     else if (param.find("shift ") != std::string::npos)
+        //     {
+        //         shift = true;
+        //         param = param.substr(6);
+        //     }
 
-            out << "Apply talents [" << param << "] ";
-            if (botSpec.CheckTalentLink(param, &out))
-            {
-                TalentSpec newSpec(bot, param);
-                std::string const specLink = newSpec.GetTalentLink();
+        //     out << "Apply talents [" << param << "] ";
+        //     if (botSpec.CheckTalentLink(param, &out))
+        //     {
+        //         TalentSpec newSpec(bot, param);
+        //         std::string const specLink = newSpec.GetTalentLink();
 
-                if (crop)
-                {
-                    newSpec.CropTalents(bot->getLevel());
-                    out << "becomes: " << newSpec.GetTalentLink();
-                }
+        //         if (crop)
+        //         {
+        //             newSpec.CropTalents(bot->getLevel());
+        //             out << "becomes: " << newSpec.GetTalentLink();
+        //         }
 
-                if (shift)
-                {
-                    TalentSpec botSpec(bot);
-                    newSpec.ShiftTalents(&botSpec, bot->getLevel());
-                    out << "becomes: " << newSpec.GetTalentLink();
-                }
+        //         if (shift)
+        //         {
+        //             TalentSpec botSpec(bot);
+        //             newSpec.ShiftTalents(&botSpec, bot->getLevel());
+        //             out << "becomes: " << newSpec.GetTalentLink();
+        //         }
 
-                if (newSpec.CheckTalents(bot->getLevel(), &out))
-                {
-                    newSpec.ApplyTalents(bot, &out);
-                    sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specNo", 0);
-                    sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specLink", 1, specLink);
-                }
-            }
-            else
-            {
-                std::vector<TalentPath*> paths = getPremadePaths(param);
-                if (paths.size() > 0)
-                {
-                    out.str("");
-                    out.clear();
+        //         if (newSpec.CheckTalents(bot->getLevel(), &out))
+        //         {
+        //             newSpec.ApplyTalents(bot, &out);
+        //             sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specNo", 0);
+        //             sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specLink", 1, specLink);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         std::vector<TalentPath*> paths = getPremadePaths(param);
+        //         if (paths.size() > 0)
+        //         {
+        //             out.str("");
+        //             out.clear();
 
-                    if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/)
-                    {
-                        out << "Found multiple specs: ";
-                        listPremadePaths(paths, &out);
-                    }
-                    else
-                    {
-                        if (paths.size() > 1)
-                            out << "Found " << paths.size() << " possible specs to choose from. ";
+        //             if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/)
+        //             {
+        //                 out << "Found multiple specs: ";
+        //                 listPremadePaths(paths, &out);
+        //             }
+        //             else
+        //             {
+        //                 if (paths.size() > 1)
+        //                     out << "Found " << paths.size() << " possible specs to choose from. ";
 
-                        TalentPath* path = PickPremadePath(paths, sRandomPlayerbotMgr->IsRandomBot(bot));
-                        TalentSpec newSpec = *GetBestPremadeSpec(path->id);
-                        std::string const specLink = newSpec.GetTalentLink();
-                        newSpec.CropTalents(bot->getLevel());
-                        newSpec.ApplyTalents(bot, &out);
+        //                 TalentPath* path = PickPremadePath(paths, sRandomPlayerbotMgr->IsRandomBot(bot));
+        //                 TalentSpec newSpec = *GetBestPremadeSpec(path->id);
+        //                 std::string const specLink = newSpec.GetTalentLink();
+        //                 newSpec.CropTalents(bot->getLevel());
+        //                 newSpec.ApplyTalents(bot, &out);
 
-                        if (newSpec.GetTalentPoints() > 0)
-                        {
-                            out << "Apply spec " << "|h|cffffffff" << path->name << " " << newSpec.FormatSpec(bot);
-                            sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specNo", path->id + 1);
-                            sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specLink", 0);
-                        }
-                    }
-                }
-            }
-        }
+        //                 if (newSpec.GetTalentPoints() > 0)
+        //                 {
+        //                     out << "Apply spec " << "|h|cffffffff" << path->name << " " << newSpec.FormatSpec(bot);
+        //                     sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specNo", path->id + 1);
+        //                     sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specLink", 0);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
-    else
-    {
-        uint32 specId = sRandomPlayerbotMgr->GetValue(bot->GetGUID().GetCounter(), "specNo") - 1;
-        std::string specName = "";
-        TalentPath* specPath;
-        if (specId)
-        {
-            specPath = getPremadePath(specId);
-            if (specPath->id == specId)
-                specName = specPath->name;
-        }
+    // else
+    // {
+    //     uint32 specId = sRandomPlayerbotMgr->GetValue(bot->GetGUID().GetCounter(), "specNo") - 1;
+    //     std::string specName = "";
+    //     TalentPath* specPath;
+    //     if (specId)
+    //     {
+    //         specPath = getPremadePath(specId);
+    //         if (specPath->id == specId)
+    //             specName = specPath->name;
+    //     }
 
-        out << "My current talent spec is: " << "|h|cffffffff";
-        if (specName != "")
-            out << specName << " (" << botSpec.FormatSpec(bot) << ")";
-        else
-            out << chat->FormatClass(bot, botSpec.highestTree());
-        out << " Link: ";
-        out << botSpec.GetTalentLink();
-    }
+    //     out << "My current talent spec is: " << "|h|cffffffff";
+    //     if (specName != "")
+    //         out << specName << " (" << botSpec.FormatSpec(bot) << ")";
+    //     else
+    //         out << chat->FormatClass(bot, botSpec.highestTree());
+    //     out << " Link: ";
+    //     out << botSpec.GetTalentLink();
+    // }
 
     botAI->TellMaster(out);
 

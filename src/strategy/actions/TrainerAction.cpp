@@ -89,11 +89,15 @@ bool TrainerAction::Execute(Event event)
     Player* master = GetMaster();
 
     Creature* creature = botAI->GetCreature(bot->GetTarget());
-    if (AI_VALUE(GuidPosition, "rpg target") != bot->GetTarget())
-        if (master)
-            creature = botAI->GetCreature(master->GetTarget());
-        else
-            return false;
+
+    if (master) {
+        creature = master->GetSelectedUnit() ? master->GetSelectedUnit()->ToCreature() : nullptr;
+    }
+    // if (AI_VALUE(GuidPosition, "rpg target") != bot->GetTarget())
+    //     if (master)
+    //         creature = botAI->GetCreature(master->GetTarget());
+    //     else
+    //         return false;
 
     if (!creature || !creature->IsTrainer())
         return false;
