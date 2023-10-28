@@ -1491,7 +1491,7 @@ bool MoveRandomAction::Execute(Event event)
 
 bool MoveRandomAction::isUseful()
 {
-    return !botAI->HasRealPlayerMaster();
+    return !AI_VALUE(GuidPosition, "rpg target") && !botAI->HasRealPlayerMaster();
 }
 
 bool MoveInsideAction::Execute(Event event)
