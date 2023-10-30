@@ -9,6 +9,9 @@ bool CastTotemAction::isUseful()
 {
     if (needLifeTime > 0.1f) {
         Unit* target = AI_VALUE(Unit*, "current target");
+        if (!target) {
+            return false;
+        }
         float dps = AI_VALUE(float, "expected group dps");
         if (target->GetHealth() / dps < needLifeTime) {
             return false;
@@ -24,7 +27,7 @@ bool CastManaSpringTotemAction::isUseful()
 
 bool CastFlametongueTotemAction::isUseful()
 {
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "magma totem");
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "magma totem") && !botAI->HasAura("totem of wrath", bot);
 }
 
 bool CastSearingTotemAction::isUseful()

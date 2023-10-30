@@ -34,18 +34,18 @@ float ExpectedGroupDpsValue::Calculate()
     
     if (level <= 15) {
         basic_dps = 5 + level * 1;
-    } else if (level <= 30) {
+    } else if (level <= 25) {
         basic_dps = 20 + (level - 15) * 2;
     } else if (level <= 40) {
-        basic_dps = 50 + (level - 30) * 3;
+        basic_dps = 40 + (level - 30) * 4;
     } else if (level <= 55) {
-        basic_dps = 80 + (level - 45) * 8;
+        basic_dps = 100 + (level - 45) * 20;
     } else if (level <= 60) {
-        basic_dps = 200 + (level - 55) * 30;
+        basic_dps = 300 + (level - 55) * 50;
     } else if (level <= 70) {
-        basic_dps = 350 + (level - 60) * 40;
+        basic_dps = 450 + (level - 60) * 40;
     } else {
-        basic_dps = 750 + (level - 70) * 125;
+        basic_dps = 750 + (level - 70) * 175;
     }
 
     if (level <= 8) {
