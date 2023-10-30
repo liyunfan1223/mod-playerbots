@@ -951,7 +951,8 @@ void RandomItemMgr::BuildItemInfoCache()
             strstr(proto->Name1.c_str(), "Unused ") ||
             strstr(proto->Name1.c_str(), "Monster ") ||
             strstr(proto->Name1.c_str(), "[PH]") ||
-            strstr(proto->Name1.c_str(), "(OLD)")
+            strstr(proto->Name1.c_str(), "(OLD)") ||
+            strstr(proto->Name1.c_str(), "QR")
             ) 
         {
             itemForTest.insert(proto->ItemId);
