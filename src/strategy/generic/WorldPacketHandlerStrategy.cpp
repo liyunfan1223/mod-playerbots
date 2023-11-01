@@ -32,6 +32,7 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("lfg proposal", NextAction::array(0, new NextAction("lfg accept", relevance), nullptr)));
     triggers.push_back(new TriggerNode("lfg proposal active", NextAction::array(0, new NextAction("lfg accept", relevance), nullptr)));
     triggers.push_back(new TriggerNode("arena team invite", NextAction::array(0, new NextAction("arena team accept", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("quest confirm accept", NextAction::array(0, new NextAction("quest confirm accept", relevance), nullptr)));
     //triggers.push_back(new TriggerNode("no non bot players around", NextAction::array(0, new NextAction("delay", relevance), nullptr)));
     triggers.push_back(new TriggerNode("bg status", NextAction::array(0, new NextAction("bg status", relevance), nullptr)));
     triggers.push_back(new TriggerNode("xpgain", NextAction::array(0, new NextAction("xp gain", relevance), nullptr)));

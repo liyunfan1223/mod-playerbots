@@ -166,7 +166,8 @@ PlayerbotAI::PlayerbotAI(Player* bot) : PlayerbotAIBase(true), bot(bot), chatHel
     botOutgoingPacketHandlers.AddHandler(SMSG_EMOTE, "receive emote");
     botOutgoingPacketHandlers.AddHandler(SMSG_LOOT_START_ROLL, "master loot roll");
     botOutgoingPacketHandlers.AddHandler(SMSG_ARENA_TEAM_INVITE, "arena team invite");
-
+    botOutgoingPacketHandlers.AddHandler(SMSG_QUEST_CONFIRM_ACCEPT, "quest confirm accept");
+    
     masterOutgoingPacketHandlers.AddHandler(SMSG_PARTY_COMMAND_RESULT, "party command");
     masterOutgoingPacketHandlers.AddHandler(MSG_RAID_READY_CHECK, "ready check");
     masterOutgoingPacketHandlers.AddHandler(MSG_RAID_READY_CHECK_FINISHED, "ready check finished");
