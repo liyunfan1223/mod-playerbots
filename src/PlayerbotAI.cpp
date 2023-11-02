@@ -308,6 +308,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
         if (leaderAI && !leaderAI->IsRealPlayer()) {
             bot->RemoveFromGroup();
+            ResetStrategies();
         }
     }
     
