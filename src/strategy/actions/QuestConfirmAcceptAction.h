@@ -5,6 +5,7 @@
 #ifndef _PLAYERBOT_QUESTCONFIRMACCEPTACTION_H
 #define _PLAYERBOT_QUESTCONFIRMACCEPTACTION_H
 
+#include "AiObjectContext.h"
 #include "PlayerbotAI.h"
 #include "QuestAction.h"
 #include "Player.h"
