@@ -6,6 +6,7 @@
 #include "AiFactory.h"
 #include "ChatHelper.h"
 #include "GuildTaskMgr.h"
+#include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
@@ -208,7 +209,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
         // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
         if (itemScore || oldScore)
         {
-            shouldEquip = itemScore > oldScore * 1.1;
+            shouldEquip = itemScore > oldScore * sPlayerbotAIConfig->equipUpgradeThreshold;
         }
     }
 

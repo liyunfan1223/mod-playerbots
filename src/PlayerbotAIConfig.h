@@ -151,6 +151,7 @@ class PlayerbotAIConfig
         bool freeMethodLoot;
         std::string autoPickReward;
         bool autoEquipUpgradeLoot;
+        float equipUpgradeThreshold;
         bool syncQuestWithPlayer;
         bool syncQuestForPlayer;
         std::string autoTrainSpells;
