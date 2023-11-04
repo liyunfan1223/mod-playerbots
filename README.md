@@ -34,9 +34,9 @@ The module primarily emphasizes the following key features, and we have implemen
 
 - **Bots in Battleground:** Bots are now capable of actively participating in battlegrounds alongside real players, adding depth and excitement to these PvP scenarios.
 
-- **Player Progression Path:** We have improved the interaction between real players and bots, enabling players to complete quests and level up with multiple characters while collaborating with bot companions.
-
 - **Interation with Bots:** We have improved the interaction between real players and bots, enabling players to complete quests and level up with multiple characters while collaborating with the bot companions.
+
+- **Player Progression Path:** We have improved the interaction between real players and bots, enabling players to complete quests and level up with multiple characters while collaborating with bot companions.
 
 - **Stability:** Our efforts have focused on enhancing the overall stability of AzerothCore when using the Playerbots module. These improvements aim to prevent server crashes and ensure a smoother experience for all users.
 
