@@ -14,7 +14,7 @@ void QuestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     PassTroughStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("quest share", NextAction::array(0, new NextAction("accept quest share", relevance), nullptr)));
+    // triggers.push_back(new TriggerNode("quest share", NextAction::array(0, new NextAction("accept quest share", relevance), nullptr)));
 }
 
 void DefaultQuestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

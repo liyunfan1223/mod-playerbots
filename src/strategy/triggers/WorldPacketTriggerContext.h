@@ -61,6 +61,9 @@ class WorldPacketTriggerContext : public NamedObjectContext<Trigger>
             creators["receive text emote"] = &WorldPacketTriggerContext::receive_text_emote;
             creators["arena team invite"] = &WorldPacketTriggerContext::arena_team_invite;
             creators["quest confirm accept"] = &WorldPacketTriggerContext::quest_confirm_accept;
+            creators["group destroyed"] = &WorldPacketTriggerContext::group_destroyed;
+            creators["group list"] = &WorldPacketTriggerContext::group_list;
+            creators["questgiver quest details"] = &WorldPacketTriggerContext::questgiver_quest_details;
         }
 
     private:
@@ -111,6 +114,9 @@ class WorldPacketTriggerContext : public NamedObjectContext<Trigger>
         static Trigger* receive_text_emote(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "receive text emote"); }
         static Trigger* arena_team_invite(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "arena team invite"); }
         static Trigger* quest_confirm_accept(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "quest confirm accept"); }
+        static Trigger* group_destroyed(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "group destroyed"); }
+        static Trigger* group_list(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "group list"); }
+        static Trigger* questgiver_quest_details(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "questgiver quest details"); }
 };
 
 #endif

@@ -41,6 +41,10 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         new NextAction("auto learn spell", relevance), 
         new NextAction("auto teleport for level", relevance), 
         nullptr)));
+    // triggers.push_back(new TriggerNode("group destroyed", NextAction::array(0, new NextAction("reset botAI", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("questgiver quest details", NextAction::array(0, new NextAction("turn in query quest", relevance), nullptr)));
+    
+    triggers.push_back(new TriggerNode("group list", NextAction::array(0, new NextAction("reset botAI", relevance), nullptr)));
     triggers.push_back(new TriggerNode("see spell", NextAction::array(0, new NextAction("see spell", relevance), nullptr)));
     triggers.push_back(new TriggerNode("release spirit", NextAction::array(0, new NextAction("release", relevance), nullptr)));
     triggers.push_back(new TriggerNode("revive from corpse", NextAction::array(0, new NextAction("revive from corpse", relevance), nullptr)));

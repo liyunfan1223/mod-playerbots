@@ -14,18 +14,24 @@ class WorldObject;
 class TalkToQuestGiverAction : public QuestAction
 {
     public:
-        TalkToQuestGiverAction(PlayerbotAI* botAI) : QuestAction(botAI, "talk to quest giver") { }
+        TalkToQuestGiverAction(PlayerbotAI* botAI, std::string name = "talk to quest giver") : QuestAction(botAI, name) { }
 
     protected:
-        void ProcessQuest(Quest const* quest, WorldObject* questGiver) override;
+        void ProcessQuest(Quest const* quest, Object* questGiver) override;
+        void TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out);
 
     private:
-        void TurnInQuest(Quest const* quest, WorldObject* questGiver, std::ostringstream& out);
-        void RewardNoItem(Quest const* quest, WorldObject* questGiver, std::ostringstream& out);
-        void RewardSingleItem(Quest const* quest, WorldObject* questGiver, std::ostringstream& out);
+        void RewardNoItem(Quest const* quest, Object* questGiver, std::ostringstream& out);
+        void RewardSingleItem(Quest const* quest, Object* questGiver, std::ostringstream& out);
         std::set<uint32> BestRewards(Quest const* quest);
-        void RewardMultipleItem(Quest const* quest, WorldObject* questGiver, std::ostringstream& out);
+        void RewardMultipleItem(Quest const* quest, Object* questGiver, std::ostringstream& out);
         void AskToSelectReward(Quest const* quest, std::ostringstream& out, bool forEquip);
 };
 
+class TurnInQueryQuestAction : public TalkToQuestGiverAction
+{
+    public:
+        TurnInQueryQuestAction(PlayerbotAI* botAI) : TalkToQuestGiverAction(botAI, "turn in query quest") {}
+        bool Execute(Event event) override;
+};
 #endif

@@ -6,9 +6,11 @@
 #include "Event.h"
 #include "ChatHelper.h"
 #include "ItemUsageValue.h"
+#include "Object.h"
 #include "Playerbots.h"
+#include "WorldPacket.h"
 
-void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, WorldObject* questGiver)
+void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver)
 {
     std::ostringstream out;
     out << "Quest ";
@@ -56,7 +58,7 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, WorldObject* quest
     botAI->TellMaster(out);
 }
 
-void TalkToQuestGiverAction::TurnInQuest(Quest const* quest, WorldObject* questGiver, std::ostringstream& out)
+void TalkToQuestGiverAction::TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out)
 {
     uint32 questID = quest->GetQuestId();
 
@@ -75,7 +77,7 @@ void TalkToQuestGiverAction::TurnInQuest(Quest const* quest, WorldObject* questG
     }
 }
 
-void TalkToQuestGiverAction::RewardNoItem(Quest const* quest, WorldObject* questGiver, std::ostringstream& out)
+void TalkToQuestGiverAction::RewardNoItem(Quest const* quest, Object* questGiver, std::ostringstream& out)
 {
     if (bot->CanRewardQuest(quest, false))
     {
@@ -88,7 +90,7 @@ void TalkToQuestGiverAction::RewardNoItem(Quest const* quest, WorldObject* quest
     }
 }
 
-void TalkToQuestGiverAction::RewardSingleItem(Quest const* quest, WorldObject* questGiver, std::ostringstream& out)
+void TalkToQuestGiverAction::RewardSingleItem(Quest const* quest, Object* questGiver, std::ostringstream& out)
 {
     int index = 0;
     ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[index]);
@@ -134,7 +136,7 @@ ItemIds TalkToQuestGiverAction::BestRewards(Quest const* quest)
     }
 }
 
-void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, WorldObject* questGiver, std::ostringstream& out)
+void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* questGiver, std::ostringstream& out)
 {
     std::set<uint32> bestIds;
 
@@ -198,4 +200,61 @@ void TalkToQuestGiverAction::AskToSelectReward(Quest const* quest, std::ostrings
 
     botAI->TellMaster(msg);
     out << "Reward pending";
+}
+
+bool TurnInQueryQuestAction::Execute(Event event)
+{
+    WorldPacket pakcet = event.getPacket();
+    ObjectGuid guid;
+    uint32 questId;
+    ObjectGuid unk1;
+    pakcet >> guid >> questId;
+    Object* object = ObjectAccessor::GetObjectByTypeMask(*bot, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+    if (!object || (!object->hasQuest(questId) && !object->hasInvolvedQuest(questId)))
+    {
+        return false;
+    }
+    Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+    QuestStatus status = bot->GetQuestStatus(quest->GetQuestId());
+    Player* master = GetMaster();
+
+    if (sPlayerbotAIConfig->syncQuestForPlayer && master)
+    {
+        PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master);
+        if (!masterBotAI || masterBotAI->IsRealPlayer())
+        {
+            QuestStatus masterStatus = master->GetQuestStatus(quest->GetQuestId());
+            if (masterStatus == QUEST_STATUS_INCOMPLETE || masterStatus == QUEST_STATUS_FAILED)
+                CompleteQuest(master, quest->GetQuestId());
+        }
+    }
+
+    if (sPlayerbotAIConfig->syncQuestWithPlayer)
+    {
+        if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED)
+        {
+            CompleteQuest(bot, quest->GetQuestId());
+            status = bot->GetQuestStatus(quest->GetQuestId());
+        }
+    }
+    std::ostringstream out;
+    switch (status)
+    {
+        case QUEST_STATUS_COMPLETE:
+            TurnInQuest(quest, object, out);
+            break;
+        case QUEST_STATUS_INCOMPLETE:
+            out << "|cffff0000Incompleted|r";
+            break;
+        case QUEST_STATUS_NONE:
+            out << "|cff00ff00Available|r";
+            break;
+        case QUEST_STATUS_FAILED:
+            out << "|cffff0000Failed|r";
+            break;
+    }
+
+    out << ": " << chat->FormatQuest(quest);
+    botAI->TellMaster(out);
+    return true;
 }

@@ -198,7 +198,8 @@ bool NaxxChatShortcutAction::Execute(Event event)
     botAI->Reset();
     botAI->ChangeStrategy("+naxx", BOT_STATE_NON_COMBAT);
     botAI->ChangeStrategy("+naxx", BOT_STATE_COMBAT);
-    bot->Say("Add Naxx Strategies!", LANG_UNIVERSAL);
+    botAI->TellMasterNoFacing("Add Naxx Strategies!");
+    // bot->Say("Add Naxx Strategies!", LANG_UNIVERSAL);
     return true;
 }
 
@@ -211,6 +212,6 @@ bool BwlChatShortcutAction::Execute(Event event)
     botAI->Reset();
     botAI->ChangeStrategy("+bwl", BOT_STATE_NON_COMBAT);
     botAI->ChangeStrategy("+bwl", BOT_STATE_COMBAT);
-    bot->Say("Add Bwl Strategies!", LANG_UNIVERSAL);
+    botAI->TellMasterNoFacing("Add Bwl Strategies!");
     return true;
 }

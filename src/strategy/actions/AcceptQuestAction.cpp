@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-void AcceptAllQuestsAction::ProcessQuest(Quest const* quest, WorldObject* questGiver)
+void AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 {
     AcceptQuest(quest, questGiver->GetGUID());
     bot->PlayDistanceSound(620);

@@ -27,6 +27,7 @@
 #include "ReadyCheckAction.h"
 #include "RememberTaxiAction.h"
 #include "ReviveFromCorpseAction.h"
+#include "RewardAction.h"
 #include "SeeSpellAction.h"
 #include "SecurityCheckAction.h"
 #include "TalkToQuestGiverAction.h"
@@ -90,6 +91,7 @@ class WorldPacketActionContext : public NamedObjectContext<Action>
             creators["lfg teleport"] = &WorldPacketActionContext::lfg_teleport;
             creators["see spell"] = &WorldPacketActionContext::see_spell;
             creators["arena team accept"] = &WorldPacketActionContext::arena_team_accept;
+            creators["turn in query quest"] = &WorldPacketActionContext::turn_in_query_quest;
         }
 
     private:
@@ -140,6 +142,7 @@ class WorldPacketActionContext : public NamedObjectContext<Action>
         static Action* lfg_join(PlayerbotAI* botAI) { return new LfgJoinAction(botAI); }
         static Action* see_spell(PlayerbotAI* botAI) { return new SeeSpellAction(botAI); }
         static Action* arena_team_accept(PlayerbotAI* botAI) { return new ArenaTeamAcceptAction(botAI); }
+        static Action* turn_in_query_quest(PlayerbotAI* botAI) { return new TurnInQueryQuestAction(botAI); }
 };
 
 #endif

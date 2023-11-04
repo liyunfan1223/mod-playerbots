@@ -6,12 +6,14 @@
 #define _PLAYERBOT_QUESTACTION_H
 
 #include "Action.h"
+#include "Object.h"
 
 class ObjectGuid;
 class Quest;
 class Player;
 class PlayerbotAI;
 class WorldObject;
+class Object;
 
 class QuestAction : public Action
 {
@@ -22,7 +24,7 @@ class QuestAction : public Action
 
     protected:
         bool CompleteQuest(Player* player, uint32 entry);
-        virtual void ProcessQuest(Quest const* quest, WorldObject* questGiver) = 0;
+        virtual void ProcessQuest(Quest const* quest, Object* questGiver) = 0;
         bool AcceptQuest(Quest const* quest, ObjectGuid questGiver);
         bool ProcessQuests(ObjectGuid questGiver);
         bool ProcessQuests(WorldObject* questGiver);
