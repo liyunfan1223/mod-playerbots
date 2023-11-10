@@ -172,13 +172,13 @@ class GenericPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*A*/ NextAction::array(0, new NextAction("fade"), NULL),
                 /*C*/ NULL);
         }
-        static ActionNode* fade(PlayerbotAI* ai)
-        {
-            return new ActionNode ("fade",
-                /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("flee"), NULL),
-                /*C*/ NULL);
-        }
+        // static ActionNode* fade(PlayerbotAI* ai)
+        // {
+        //     return new ActionNode ("fade",
+        //         /*P*/ NULL,
+        //         /*A*/ NextAction::array(0, new NextAction("flee"), NULL),
+        //         /*C*/ NULL);
+        // }
         static ActionNode* shadowfiend(PlayerbotAI* ai)
         {
             return new ActionNode ("shadowfiend",

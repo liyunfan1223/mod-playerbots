@@ -43,13 +43,13 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
                 /*C*/ nullptr);
         }
 
-        static ActionNode* wing_clip([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode("wing clip",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("raptor strike"), nullptr),
-                /*C*/ NextAction::array(0, new NextAction("flee"), nullptr));
-        }
+        // static ActionNode* wing_clip([[maybe_unused]] PlayerbotAI* botAI)
+        // {
+        //     return new ActionNode("wing clip",
+        //         /*P*/ nullptr,
+        //         /*A*/ NextAction::array(0, new NextAction("raptor strike"), nullptr),
+        //         /*C*/ NextAction::array(0, new NextAction("flee"), nullptr));
+        // }
 
         static ActionNode* raptor_strike([[maybe_unused]] PlayerbotAI* botAI)
         {
