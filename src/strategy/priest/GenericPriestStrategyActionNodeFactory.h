@@ -32,7 +32,7 @@ class GenericPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionN
             creators["flash heal"] = &flash_heal;
             creators["flash heal on party"] = &flash_heal_on_party;
             creators["psychic scream"] = &psychic_scream;
-            creators["fade"] = &fade;
+            // creators["fade"] = &fade;
             creators["shadowfiend"] = &shadowfiend;
         }
 
