@@ -33,7 +33,7 @@ bool IsDeadValue::Calculate()
     if (!target)
         return false;
 
-    return target->getDeathState() != ALIVE;
+    return target->getDeathState() != DeathState::Alive;
 }
 
 bool PetIsDeadValue::Calculate()
@@ -51,7 +51,7 @@ bool PetIsDeadValue::Calculate()
     if (bot->GetPetGUID() && !bot->GetPet())
         return true;
 
-    return bot->GetPet() && bot->GetPet()->getDeathState() != ALIVE;
+    return bot->GetPet() && bot->GetPet()->getDeathState() != DeathState::Alive;
 }
 
 bool PetIsHappyValue::Calculate()

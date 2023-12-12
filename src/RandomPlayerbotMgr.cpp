@@ -26,6 +26,7 @@
 #include "Random.h"
 #include "ServerFacade.h"
 #include "ChannelMgr.h"
+#include "Unit.h"
 #include "World.h"
 
 #include <cstdlib>
@@ -2415,7 +2416,7 @@ ObjectGuid const RandomPlayerbotMgr::GetBattleMasterGUID(Player* bot, Battlegrou
         if (zone->team == 2 && bot->GetTeamId() == TEAM_HORDE)
             continue;
 
-        if (Bm->getDeathState() == DEAD)
+        if (Bm->getDeathState() == DeathState::Dead)
             continue;
 
         float dist2 = sServerFacade->GetDistance2d(bot, data->posX, data->posY);

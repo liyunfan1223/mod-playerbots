@@ -151,7 +151,7 @@ CreatureData const* BgMasterValue::NearestBm(bool allowDead)
                 continue;
 
             //Is the unit dead?
-            if (unit->getDeathState() == DEAD)
+            if (unit->getDeathState() == DeathState::Dead)
                 continue;
         }
 

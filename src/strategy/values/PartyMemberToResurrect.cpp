@@ -29,7 +29,7 @@ class FindDeadPlayer : public FindPlayerPredicate
         bool Check(Unit* unit) override
         {
             Player* player = unit->ToPlayer();
-            return player && !player->isResurrectRequested() && player->getDeathState() == CORPSE && !value->IsTargetOfSpellCast(player, predicate);
+            return player && !player->isResurrectRequested() && player->getDeathState() == DeathState::Corpse && !value->IsTargetOfSpellCast(player, predicate);
         }
 
     private:

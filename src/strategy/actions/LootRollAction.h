@@ -11,7 +11,7 @@ class PlayerbotAI;
 
 struct ItemTemplate;
 
-enum RollVote : uint32;
+enum RollVote : uint8;
 
 class LootRollAction : public QueryItemUsageAction
 {

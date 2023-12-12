@@ -2915,7 +2915,7 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     if (Creature* pBalinda = bg->GetBGCreature(AV_NPC_A_CAPTAIN))
                     {
-                        if (pBalinda->getDeathState() != DEAD)
+                        if (pBalinda->getDeathState() != DeathState::Dead)
                         {
                             uint32 attackCount = 0;
                             attackCount += getDefendersCount(AV_STONEHEARTH_WAITING_HORDE, 10.0f, false);
@@ -2973,7 +2973,7 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     if (Creature* mBossNeutral = bg->GetBGCreature(AV_CPLACE_MINE_N_3))
                     {
-                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DEAD && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_OTHER)
+                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_OTHER)
                         {
                             BgObjective = mBossNeutral;
                             //std::ostringstream out;
@@ -2984,7 +2984,7 @@ bool BGTactics::selectObjective(bool reset)
 
                     if (Creature* mBossAlly = bg->GetBGCreature(AV_CPLACE_MINE_N_3))
                     {
-                        if (!BgObjective && bot->IsWithinDist(mBossAlly, 400.0f) && mBossAlly->getDeathState() != DEAD && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_ALLIANCE)
+                        if (!BgObjective && bot->IsWithinDist(mBossAlly, 400.0f) && mBossAlly->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_ALLIANCE)
                         {
                             BgObjective = mBossAlly;
                             //std::ostringstream out;
@@ -3075,7 +3075,7 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     if (Creature* mBossNeutral = bg->GetBGCreature(AV_CPLACE_MINE_S_3))
                     {
-                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DEAD && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_OTHER)
+                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_OTHER)
                         {
                             BgObjective = mBossNeutral;
                             //std::ostringstream out;
@@ -3086,7 +3086,7 @@ bool BGTactics::selectObjective(bool reset)
 
                     if (Creature* mBossHorde = bg->GetBGCreature(AV_CPLACE_MINE_S_3))
                     {
-                        if (!BgObjective && bot->IsWithinDist(mBossHorde, 400.0f) && mBossHorde->getDeathState() != DEAD && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_HORDE)
+                        if (!BgObjective && bot->IsWithinDist(mBossHorde, 400.0f) && mBossHorde->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_HORDE)
                         {
                             BgObjective = mBossHorde;
                             //std::ostringstream out;
@@ -3320,9 +3320,9 @@ bool BGTactics::selectObjective(bool reset)
 
                         for (auto const& objective : AB_AttackObjectives)
                         {
-                            if (arathiBasinBG->GetCapturePointInfo(objective)._ownerTeamId == BG_AB_NODE_STATE_NEUTRAL ||
-                                ((!defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._ownerTeamId == BG_AB_NODE_STATE_ALLY_OCCUPIED) ||
-                                ((defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._ownerTeamId == BG_AB_NODE_STATE_ALLY_CONTESTED))
+                            if (arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_NEUTRAL ||
+                                ((!defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_ALLY_OCCUPIED) ||
+                                ((defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_ALLY_CONTESTED))
                             {
                                 if (GameObject* pGO = bg->GetBGObject(objective))
                                 {
