@@ -1399,7 +1399,8 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     PlayerbotsDatabase.Execute(stmt);
 
     // teleport to a random inn for bot level
-    GET_PLAYERBOT_AI(bot)->Reset(true);
+    if (GET_PLAYERBOT_AI(bot))
+        GET_PLAYERBOT_AI(bot)->Reset(true);
 
     if (bot->GetGroup())
         bot->RemoveFromGroup();
@@ -1435,7 +1436,9 @@ void RandomPlayerbotMgr::RandomizeMin(Player* bot)
     PlayerbotsDatabase.Execute(stmt);
 
     // teleport to a random inn for bot level
-    GET_PLAYERBOT_AI(bot)->Reset(true);
+    if (GET_PLAYERBOT_AI(bot))
+        GET_PLAYERBOT_AI(bot)->Reset(true);
+
     if (bot->GetGroup())
         bot->RemoveFromGroup();
 
@@ -1862,7 +1865,7 @@ void RandomPlayerbotMgr::OnPlayerLogout(Player* player)
     {
         Player* const bot = it->second;
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        if (player == botAI->GetMaster())
+        if (botAI && player == botAI->GetMaster())
         {
             botAI->SetMaster(nullptr);
             if (!bot->InBattleground())
@@ -1906,7 +1909,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
         {
             Player* member = gref->GetSource();
             PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-            if (member == player && (!botAI->GetMaster() || GET_PLAYERBOT_AI(botAI->GetMaster())))
+            if (botAI && member == player && (!botAI->GetMaster() || GET_PLAYERBOT_AI(botAI->GetMaster())))
             {
                 if (!bot->InBattleground())
                 {

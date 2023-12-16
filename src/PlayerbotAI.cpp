@@ -204,10 +204,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     }
 
     // cancel logout in combat
-    if (!bot->GetSession()) {
-        return;
-    }
-    if (bot->GetSession()->isLogingOut())
+    if (!bot->GetSession() || bot->GetSession()->isLogingOut())
     {
         // if (bot->IsInCombat() || (master && master->IsInCombat() && sServerFacade->GetDistance2d(bot, master) < 30.0f))
         // {
@@ -1047,7 +1044,9 @@ void PlayerbotAI::DoNextAction(bool min)
     if ((!master || (masterBotAI && !masterBotAI->IsRealPlayer())) && group)
     {
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-
+        if (!botAI) {
+            return;
+        }
         // Ideally we want to have the leader as master.
         Player* newMaster = botAI->GetGroupMaster();
         Player* playerMaster = nullptr;

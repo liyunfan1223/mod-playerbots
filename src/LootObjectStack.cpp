@@ -59,6 +59,9 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     guid.Clear();
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI) {
+        return;
+    }
     Creature* creature = botAI->GetCreature(lootGUID);
     if (creature && creature->getDeathState() == DeathState::Corpse)
     {
@@ -175,7 +178,9 @@ WorldObject* LootObject::GetWorldObject(Player* bot)
     Refresh(bot, guid);
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-
+    if (!botAI) {
+        return nullptr;
+    }
     Creature* creature = botAI->GetCreature(guid);
     if (creature && creature->getDeathState() == DeathState::Corpse)
         return creature;
@@ -201,7 +206,9 @@ bool LootObject::IsLootPossible(Player* bot)
         return false;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-
+    if (!botAI) {
+        return false;
+    }
     if (reqItem && !bot->HasItemCount(reqItem, 1))
         return false;
 

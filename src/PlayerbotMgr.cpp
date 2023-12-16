@@ -84,7 +84,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     if (!bot)
     {
         LogoutPlayerBot(holder.GetGuid());
-        LOG_ERROR("playerbots", "Error logging in bot {}, please try to reset all random bots", holder.GetGuid().ToString().c_str());
+        // LOG_ERROR("playerbots", "Error logging in bot {}, please try to reset all random bots", holder.GetGuid().ToString().c_str());
         return;
     }
 
@@ -114,7 +114,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         OnBotLogin(bot);
         LogoutPlayerBot(bot->GetGUID());
 
-        LOG_ERROR("playerbots", "Attempt to add not allowed bot {}, please try to reset all random bots", bot->GetName());
+        // LOG_ERROR("playerbots", "Attempt to add not allowed bot {}, please try to reset all random bots", bot->GetName());
     }
 }
 
@@ -125,7 +125,10 @@ void PlayerbotHolder::UpdateSessions()
         Player* const bot = itr->second;
         if (bot->IsBeingTeleported())
         {
-            GET_PLAYERBOT_AI(bot)->HandleTeleportAck();
+            PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+            if (botAI) {
+                botAI->HandleTeleportAck();
+            }
         }
         else if (bot->IsInWorld())
         {
@@ -315,6 +318,9 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
     if (Player* bot = GetPlayerBot(guid))
     {
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (!botAI) {
+            return;
+        }
         botAI->TellMaster("Goodbye!");
         bot->StopMoving();
         bot->GetMotionMaster()->Clear();
@@ -363,6 +369,9 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     playerBots[bot->GetGUID()] = bot;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI) {
+        return;
+    }
     Player* master = botAI->GetMaster();
     if (master)
     {
@@ -546,54 +555,56 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         return "ERROR: You can not use this command on non-summoned random bot.";
     }
 
-    if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
-    {
-        if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig->autoInitOnly && cmd != "init=auto") {
-            return "The command is not allowed, use init=auto instead.";
-        }
-        int gs;
-        if (cmd == "init=white" || cmd == "init=common")
+    if (GET_PLAYERBOT_AI(bot)) {
+        if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
         {
-            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
-            factory.Randomize(false);
-            return "ok";
-        }
-        else if (cmd == "init=green" || cmd == "init=uncommon")
-        {
-            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_UNCOMMON);
-            factory.Randomize(false);
-            return "ok";
-        }
-        else if (cmd == "init=blue" || cmd == "init=rare")
-        {
-            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_RARE);
-            factory.Randomize(false);
-            return "ok";
-        }
-        else if (cmd == "init=epic" || cmd == "init=purple")
-        {
-            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_EPIC);
-            factory.Randomize(false);
-            return "ok";
-        }
-        else if (cmd == "init=legendary" || cmd == "init=yellow")
-        {
-            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY);
-            factory.Randomize(false);
-            return "ok";
-        }
-        else if (cmd == "init=auto")
-        {
-            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
-            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
-            factory.Randomize(false);
-            return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
-        }
-        else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
-        {
-            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
-            factory.Randomize(false);
-            return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
+            if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig->autoInitOnly && cmd != "init=auto") {
+                return "The command is not allowed, use init=auto instead.";
+            }
+            int gs;
+            if (cmd == "init=white" || cmd == "init=common")
+            {
+                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=green" || cmd == "init=uncommon")
+            {
+                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_UNCOMMON);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=blue" || cmd == "init=rare")
+            {
+                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_RARE);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=epic" || cmd == "init=purple")
+            {
+                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=legendary" || cmd == "init=yellow")
+            {
+                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=auto")
+            {
+                uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+                factory.Randomize(false);
+                return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
+            }
+            else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
+            {
+                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                factory.Randomize(false);
+                return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
+            }
         }
     }
 
@@ -1147,14 +1158,16 @@ void PlayerbotMgr::HandleCommand(uint32 type, std::string const text)
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
-        GET_PLAYERBOT_AI(bot)->HandleCommand(type, text, master);
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+            botAI->HandleCommand(type, text, master);
     }
 
     for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin(); it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        if (botAI->GetMaster() == master)
+        if (botAI && botAI->GetMaster() == master)
             botAI->HandleCommand(type, text, master);
     }
 }
@@ -1166,8 +1179,9 @@ void PlayerbotMgr::HandleMasterIncomingPacket(WorldPacket const& packet)
         Player* const bot = it->second;
         if (!bot)
             continue;
-
-        GET_PLAYERBOT_AI(bot)->HandleMasterIncomingPacket(packet);
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+            botAI->HandleMasterIncomingPacket(packet);
     }
 
     for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin(); it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
@@ -1200,7 +1214,9 @@ void PlayerbotMgr::HandleMasterOutgoingPacket(WorldPacket const& packet)
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
-        GET_PLAYERBOT_AI(bot)->HandleMasterOutgoingPacket(packet);
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI) 
+            botAI->HandleMasterOutgoingPacket(packet);
     }
 
     for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin(); it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
@@ -1223,7 +1239,7 @@ void PlayerbotMgr::SaveToDB()
     for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin(); it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
-        if (GET_PLAYERBOT_AI(bot)->GetMaster() == GetMaster())
+        if (GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetMaster() == GetMaster())
             bot->SaveToDB(false, false);
     }
 }
@@ -1231,6 +1247,9 @@ void PlayerbotMgr::SaveToDB()
 void PlayerbotMgr::OnBotLoginInternal(Player * const bot)
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI) {
+        return;
+    }
     botAI->SetMaster(master);
     botAI->ResetStrategies();
 

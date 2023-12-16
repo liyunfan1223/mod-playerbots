@@ -16,6 +16,9 @@ void FleeManager::calculateDistanceToCreatures(FleePoint *point)
     point->minDistance = -1.0f;
     point->sumDistance = 0.0f;
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI) {
+        return;
+    }
 	GuidVector units = *botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los");
 	for (GuidVector::iterator i = units.begin(); i != units.end(); ++i)
     {
@@ -45,6 +48,9 @@ bool intersectsOri(float angle, std::vector<float>& angles, float angleIncrement
 void FleeManager::calculatePossibleDestinations(std::vector<FleePoint*> &points)
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI) {
+        return;
+    }
     Unit* target = *botAI->GetAiObjectContext()->GetValue<Unit*>("current target");
 
 	float botPosX = startPosition.getX();
@@ -153,6 +159,9 @@ bool FleeManager::CalculateDestination(float* rx, float* ry, float* rz)
 bool FleeManager::isUseful()
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI) {
+        return false;
+    }
     GuidVector units = *botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los");
     for (GuidVector::iterator i = units.begin(); i != units.end(); ++i)
     {
