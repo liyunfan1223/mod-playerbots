@@ -29,6 +29,9 @@ bool StealthTrigger::IsActive()
     float distance = 30.f;
 
     Unit* target = AI_VALUE(Unit*, "enemy player target");
+    if (target && !target->IsInWorld()) {
+        return false;
+    }
     if (!target)
         target = AI_VALUE(Unit*, "grind target");
 
@@ -76,6 +79,10 @@ bool SprintTrigger::IsActive()
 
     Unit* dps = AI_VALUE(Unit*, "dps target");
     Unit* enemyPlayer = AI_VALUE(Unit*, "enemy player target");
+
+    if (enemyPlayer && !enemyPlayer->IsInWorld()) {
+        return false;
+    }
     if (dps)
         targeted = (dps == AI_VALUE(Unit*, "current target"));
 
