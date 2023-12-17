@@ -1375,6 +1375,9 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     {
         return nullptr;
     }
+    if (player->GetSession()->isLogingOut()) {
+        return nullptr;
+    }
     auto itr = _playerbotsMap.find(player->GetGUID());
     if (itr != _playerbotsMap.end())
     {
