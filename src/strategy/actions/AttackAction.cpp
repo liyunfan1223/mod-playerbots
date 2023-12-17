@@ -15,7 +15,10 @@ bool AttackAction::Execute(Event event)
     Unit* target = GetTarget();
     if (!target)
         return false;
-
+    
+    if (!target->IsInWorld()) {
+        return false;
+    }
     return Attack(target);
 }
 
