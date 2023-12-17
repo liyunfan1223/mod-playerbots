@@ -37,7 +37,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         {
             return new ActionNode ("seal of vengeance",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of command"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
                 /*C*/ nullptr);
         }
 
@@ -45,7 +45,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         {
             return new ActionNode ("seal of command",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("seal of corruption"), nullptr),
                 /*C*/ nullptr);
         }
 
@@ -94,7 +94,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "seal",
-        NextAction::array(0, new NextAction("seal of corruption", ACTION_HIGH), NULL)));
+        NextAction::array(0, new NextAction("seal of command", ACTION_HIGH), NULL)));
     // triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 5), nullptr)));
     // triggers.push_back(new TriggerNode("sanctity aura", NextAction::array(0, new NextAction("sanctity aura", 90.0f), nullptr)));
