@@ -6,13 +6,14 @@
 #define _PLAYERBOT_ACCEPTINVITATIONACTION_H
 
 #include "Action.h"
+#include "UseMeetingStoneAction.h"
 
 class PlayerbotAI;
 
-class AcceptInvitationAction : public Action
+class AcceptInvitationAction : public SummonAction
 {
     public:
-        AcceptInvitationAction(PlayerbotAI* botAI) : Action(botAI, "accept invitation") { }
+        AcceptInvitationAction(PlayerbotAI* botAI) : SummonAction(botAI, "accept invitation") { }
 
         bool Execute(Event event) override;
 };

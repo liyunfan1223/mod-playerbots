@@ -41,5 +41,9 @@ bool AcceptInvitationAction::Execute(Event event)
     botAI->Reset();
 
     botAI->TellMaster("Hello");
+
+    if (sPlayerbotAIConfig->summonWhenGroup) {
+        Teleport(inviter, bot);
+    }
     return true;
 }

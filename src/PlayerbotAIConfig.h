@@ -142,6 +142,7 @@ class PlayerbotAIConfig
         bool perfMonEnabled;
 
         bool enableGreet;
+        bool summonWhenGroup;
         bool randomBotShowHelmet;
         bool randomBotShowCloak;
         bool disableRandomLevels;

@@ -78,6 +78,9 @@ AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
 # Bots greet to the players
 AiPlayerbot.EnableGreet = 0
 
+# Bots will be summoned to player when accept group invitation
+AiPlayerbot.SummonWhenGroup = 1
+
 # Show helmet and cloak on randombots (reset required)
 AiPlayerbot.RandomBotShowHelmet = 1
 AiPlayerbot.RandomBotShowCloak = 1
