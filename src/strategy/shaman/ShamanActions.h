@@ -331,10 +331,10 @@ class CastLightningBoltAction : public CastSpellAction
         CastLightningBoltAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "lightning bolt") { }
 };
 
-class CastThunderstormAction : public CastMeleeSpellAction
+class CastThunderstormAction : public CastSpellAction
 {
     public:
-        CastThunderstormAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "thunderstorm") { }
+        CastThunderstormAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "thunderstorm") { }
 };
 
 class CastHeroismAction : public CastBuffSpellAction
