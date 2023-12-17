@@ -13,9 +13,10 @@ To install this module, please refer to the AzerothCore Wiki for detailed instru
 We've provided a simple method to clone the module:
 
 ```bash
-git clone https://github.com/liyunfan1223/azerothcore-wotlk.git --branch=Playerbot --depth=1
+git clone https://github.com/liyunfan1223/azerothcore-wotlk.git --branch=Playerbot
+cd azerothcore-wotlk
 cd module
-git clone https://github.com/liyunfan1223/mod-playerbots.git --branch=master --depth=1
+git clone https://github.com/liyunfan1223/mod-playerbots.git --branch=master
 ```
 
 ## Quick Start & Documentation
@@ -28,7 +29,7 @@ Please be aware that documentation for newly added commands is currently lacking
 
 The module primarily emphasizes the following key features, and we have implemented improvements in these areas:
 
-- **Random Bots:** We have enhanced the behavior of random bots to make them mimic real players more closely, creating a more authentic player server environment.
+- **Bots in World (Random bot):** We have enhanced the behavior of random bots to make them mimic real players more closely, creating a more authentic player server environment.
 
 - **Bots in Raid:** We've empowered bots to conquer challenging raid content by implementing specific strategies for various bosses, making raid encounters more engaging. Additionally, we have enhanced bots' capabilities in various roles such as DPS, healing, and tanking, ensuring they contribute effectively to the success of raid groups.
 
