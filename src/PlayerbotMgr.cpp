@@ -1371,13 +1371,13 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    if (!(sPlayerbotAIConfig->enabled) || !player || (!player->IsInWorld() && !player->IsBeingTeleported()))
+    if (!(sPlayerbotAIConfig->enabled) || !player)
     {
         return nullptr;
     }
-    if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
-        return nullptr;
-    }
+    // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
+    //     return nullptr;
+    // }
     auto itr = _playerbotsMap.find(player->GetGUID());
     if (itr != _playerbotsMap.end())
     {
@@ -1390,7 +1390,7 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
 {
-    if (!(sPlayerbotAIConfig->enabled) || !player || (!player->IsInWorld() && !player->IsBeingTeleported()))
+    if (!(sPlayerbotAIConfig->enabled) || !player)
     {
         return nullptr;
     }

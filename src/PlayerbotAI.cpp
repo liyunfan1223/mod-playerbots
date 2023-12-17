@@ -203,15 +203,11 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         return;
     }
 
-    // cancel logout in combat
     if (!bot->GetSession() || bot->GetSession()->isLogingOut())
     {
-        // if (bot->IsInCombat() || (master && master->IsInCombat() && sServerFacade->GetDistance2d(bot, master) < 30.0f))
-        // {
-        //     WorldPackets::Character::LogoutCancel data = WorldPacket(CMSG_LOGOUT_CANCEL);
-        //     bot->GetSession()->HandleLogoutCancelOpcode(data);
-        //     TellMaster("Logout cancelled!");
-        // }
+        return;
+    }
+    if (bot->IsDuringRemoveFromWorld()) {
         return;
     }
     // if (!GetMaster() || !GetMaster()->IsInWorld() || !GetMaster()->GetSession() || GetMaster()->GetSession()->isLogingOut()) {
