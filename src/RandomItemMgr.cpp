@@ -996,240 +996,240 @@ void RandomItemMgr::BuildItemInfoCache()
             continue;
 
         // Init Item cache
-        ItemInfoEntry cacheInfo;
+        // ItemInfoEntry cacheInfo;
 
-        for (uint8 clazz = CLASS_WARRIOR; clazz < MAX_CLASSES; ++clazz)
-        {
-            // skip nonexistent classes
-            if (!((1 << (clazz - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(clazz))
-                continue;
+        // for (uint8 clazz = CLASS_WARRIOR; clazz < MAX_CLASSES; ++clazz)
+        // {
+        //     // skip nonexistent classes
+        //     if (!((1 << (clazz - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(clazz))
+        //         continue;
 
-            // skip wrong classes
-            if ((proto->AllowableClass & (1 << (clazz - 1))) == 0)
-                continue;
+        //     // skip wrong classes
+        //     if ((proto->AllowableClass & (1 << (clazz - 1))) == 0)
+        //         continue;
 
-            for (uint32 spec = 1; spec < 5; ++spec)
-            {
-                if (!m_weightScales[clazz][spec].info.id)
-                    continue;
+        //     for (uint32 spec = 1; spec < 5; ++spec)
+        //     {
+        //         if (!m_weightScales[clazz][spec].info.id)
+        //             continue;
 
-                // check possible armor for spec
-                if (m_weightScales)
-                if (proto->Class == ITEM_CLASS_ARMOR && (
-                    slot == EQUIPMENT_SLOT_HEAD ||
-                    slot == EQUIPMENT_SLOT_SHOULDERS ||
-                    slot == EQUIPMENT_SLOT_CHEST ||
-                    slot == EQUIPMENT_SLOT_WAIST ||
-                    slot == EQUIPMENT_SLOT_LEGS ||
-                    slot == EQUIPMENT_SLOT_FEET ||
-                    slot == EQUIPMENT_SLOT_WRISTS ||
-                    slot == EQUIPMENT_SLOT_HANDS) &&
-                    !ShouldEquipArmorForSpec(clazz, spec, proto))
-                    continue;
+        //         // check possible armor for spec
+        //         if (m_weightScales)
+        //         if (proto->Class == ITEM_CLASS_ARMOR && (
+        //             slot == EQUIPMENT_SLOT_HEAD ||
+        //             slot == EQUIPMENT_SLOT_SHOULDERS ||
+        //             slot == EQUIPMENT_SLOT_CHEST ||
+        //             slot == EQUIPMENT_SLOT_WAIST ||
+        //             slot == EQUIPMENT_SLOT_LEGS ||
+        //             slot == EQUIPMENT_SLOT_FEET ||
+        //             slot == EQUIPMENT_SLOT_WRISTS ||
+        //             slot == EQUIPMENT_SLOT_HANDS) &&
+        //             !ShouldEquipArmorForSpec(clazz, spec, proto))
+        //             continue;
 
-                // check possible weapon for spec
-                if ((proto->Class == ITEM_CLASS_WEAPON || (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD || (proto->SubClass == ITEM_SUBCLASS_ARMOR_MISC && proto->InventoryType == INVTYPE_HOLDABLE))) &&
-                    !ShouldEquipWeaponForSpec(clazz, spec, proto))
-                    continue;
+        //         // check possible weapon for spec
+        //         if ((proto->Class == ITEM_CLASS_WEAPON || (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD || (proto->SubClass == ITEM_SUBCLASS_ARMOR_MISC && proto->InventoryType == INVTYPE_HOLDABLE))) &&
+        //             !ShouldEquipWeaponForSpec(clazz, spec, proto))
+        //             continue;
 
-                StatWeight statWeight;
-                statWeight.id = m_weightScales[clazz][spec].info.id;
-                uint32 statW = CalculateStatWeight(clazz, spec, proto);
-                // set stat weight = 1 for items that can be equipped but have no proper stats
-                statWeight.weight = statW ? statW : 1;
-                //statWeight.weight = statW;
-                // save item statWeight into ItemCache
-                cacheInfo.weights[statWeight.id] = statWeight.weight;
-                LOG_DEBUG("playerbots", "Item: {}, weight: {}, class: {}, spec: {}", proto->ItemId, statWeight.weight, clazz, m_weightScales[clazz][spec].info.name);
-            }
-        }
+        //         StatWeight statWeight;
+        //         statWeight.id = m_weightScales[clazz][spec].info.id;
+        //         uint32 statW = CalculateStatWeight(clazz, spec, proto);
+        //         // set stat weight = 1 for items that can be equipped but have no proper stats
+        //         statWeight.weight = statW ? statW : 1;
+        //         //statWeight.weight = statW;
+        //         // save item statWeight into ItemCache
+        //         cacheInfo.weights[statWeight.id] = statWeight.weight;
+        //         LOG_DEBUG("playerbots", "Item: {}, weight: {}, class: {}, spec: {}", proto->ItemId, statWeight.weight, clazz, m_weightScales[clazz][spec].info.name);
+        //     }
+        // }
 
-        cacheInfo.team = TEAM_NEUTRAL;
+        // cacheInfo.team = TEAM_NEUTRAL;
 
-        // check faction
-        if (proto->Flags2 & ITEM_FLAG2_FACTION_HORDE)
-            cacheInfo.team = TEAM_HORDE;
+        // // check faction
+        // if (proto->Flags2 & ITEM_FLAG2_FACTION_HORDE)
+        //     cacheInfo.team = TEAM_HORDE;
 
-        if (proto->Flags2 & ITEM_FLAG2_FACTION_ALLIANCE)
-            cacheInfo.team = TEAM_ALLIANCE;
+        // if (proto->Flags2 & ITEM_FLAG2_FACTION_ALLIANCE)
+        //     cacheInfo.team = TEAM_ALLIANCE;
 
-        if (cacheInfo.team == TEAM_NEUTRAL && proto->AllowableRace > 1 && proto->AllowableRace < 8388607)
-        {
-            if (FactionEntry const* faction = sFactionStore.LookupEntry(HORDE))
-                if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) != 0)
-                    cacheInfo.team = TEAM_HORDE;
+        // if (cacheInfo.team == TEAM_NEUTRAL && proto->AllowableRace > 1 && proto->AllowableRace < 8388607)
+        // {
+        //     if (FactionEntry const* faction = sFactionStore.LookupEntry(HORDE))
+        //         if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) != 0)
+        //             cacheInfo.team = TEAM_HORDE;
 
-            if (FactionEntry const* faction = sFactionStore.LookupEntry(ALLIANCE))
-                if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) != 0)
-                    cacheInfo.team = TEAM_ALLIANCE;
-        }
+        //     if (FactionEntry const* faction = sFactionStore.LookupEntry(ALLIANCE))
+        //         if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) != 0)
+        //             cacheInfo.team = TEAM_ALLIANCE;
+        // }
 
-        if (cacheInfo.team < TEAM_NEUTRAL)
-            LOG_DEBUG("playerbots", "Item: {}, team (item): {}", proto->ItemId, cacheInfo.team == TEAM_ALLIANCE ? "Alliance" : "Horde");
+        // if (cacheInfo.team < TEAM_NEUTRAL)
+        //     LOG_DEBUG("playerbots", "Item: {}, team (item): {}", proto->ItemId, cacheInfo.team == TEAM_ALLIANCE ? "Alliance" : "Horde");
 
-        // check min level
-        if (proto->RequiredLevel)
-            cacheInfo.minLevel = proto->RequiredLevel;
+        // // check min level
+        // if (proto->RequiredLevel)
+        //     cacheInfo.minLevel = proto->RequiredLevel;
 
-        // check item source
+        // // check item source
 
-        if (proto->Flags & ITEM_FLAG_NO_DISENCHANT)
-        {
-            cacheInfo.source = ITEM_SOURCE_PVP;
-            LOG_DEBUG("playerbots", "Item: {}, source: PvP Reward", proto->ItemId);
-        }
+        // if (proto->Flags & ITEM_FLAG_NO_DISENCHANT)
+        // {
+        //     cacheInfo.source = ITEM_SOURCE_PVP;
+        //     LOG_DEBUG("playerbots", "Item: {}, source: PvP Reward", proto->ItemId);
+        // }
 
-        // check quests
-        if (cacheInfo.source == ITEM_SOURCE_NONE)
-        {
-            std::vector<uint32> questIds = GetQuestIdsForItem(proto->ItemId);
-            if (questIds.size())
-            {
-                bool isAlly = false;
-                bool isHorde = false;
-                for (std::vector<uint32>::iterator i = questIds.begin(); i != questIds.end(); ++i)
-                {
-                    Quest const* quest = sObjectMgr->GetQuestTemplate(*i);
-                    if (quest)
-                    {
-                        cacheInfo.source = ITEM_SOURCE_QUEST;
-                        cacheInfo.sourceId = *i;
-                        if (!cacheInfo.minLevel)
-                            cacheInfo.minLevel = quest->GetMinLevel();
+        // // check quests
+        // if (cacheInfo.source == ITEM_SOURCE_NONE)
+        // {
+        //     std::vector<uint32> questIds = GetQuestIdsForItem(proto->ItemId);
+        //     if (questIds.size())
+        //     {
+        //         bool isAlly = false;
+        //         bool isHorde = false;
+        //         for (std::vector<uint32>::iterator i = questIds.begin(); i != questIds.end(); ++i)
+        //         {
+        //             Quest const* quest = sObjectMgr->GetQuestTemplate(*i);
+        //             if (quest)
+        //             {
+        //                 cacheInfo.source = ITEM_SOURCE_QUEST;
+        //                 cacheInfo.sourceId = *i;
+        //                 if (!cacheInfo.minLevel)
+        //                     cacheInfo.minLevel = quest->GetMinLevel();
 
-                        // check quest team
-                        if (cacheInfo.team == TEAM_NEUTRAL)
-                        {
-                            uint32 reqRace = quest->GetAllowableRaces();
-                            if (reqRace)
-                            {
-                                if ((reqRace & RACEMASK_ALLIANCE) != 0)
-                                    isAlly = true;
-                                else if ((reqRace & RACEMASK_HORDE) != 0)
-                                    isHorde = true;
-                            }
-                        }
-                    }
-                }
+        //                 // check quest team
+        //                 if (cacheInfo.team == TEAM_NEUTRAL)
+        //                 {
+        //                     uint32 reqRace = quest->GetAllowableRaces();
+        //                     if (reqRace)
+        //                     {
+        //                         if ((reqRace & RACEMASK_ALLIANCE) != 0)
+        //                             isAlly = true;
+        //                         else if ((reqRace & RACEMASK_HORDE) != 0)
+        //                             isHorde = true;
+        //                     }
+        //                 }
+        //             }
+        //         }
 
-                if (isAlly && isHorde)
-                    cacheInfo.team = TEAM_NEUTRAL;
-                else if (isAlly)
-                    cacheInfo.team = TEAM_ALLIANCE;
-                else if (isHorde)
-                    cacheInfo.team = TEAM_HORDE;
+        //         if (isAlly && isHorde)
+        //             cacheInfo.team = TEAM_NEUTRAL;
+        //         else if (isAlly)
+        //             cacheInfo.team = TEAM_ALLIANCE;
+        //         else if (isHorde)
+        //             cacheInfo.team = TEAM_HORDE;
 
-                LOG_DEBUG("playerbots", "Item: {}, team (quest): {}", proto->ItemId, cacheInfo.team == TEAM_ALLIANCE ? "Alliance" : cacheInfo.team == TEAM_HORDE ? "Horde" : "Both");
-                LOG_DEBUG("playerbots", "Item: {}, source: quest {}, minlevel: {}", proto->ItemId, cacheInfo.sourceId, cacheInfo.minLevel);
-            }
-        }
+        //         LOG_DEBUG("playerbots", "Item: {}, team (quest): {}", proto->ItemId, cacheInfo.team == TEAM_ALLIANCE ? "Alliance" : cacheInfo.team == TEAM_HORDE ? "Horde" : "Both");
+        //         LOG_DEBUG("playerbots", "Item: {}, source: quest {}, minlevel: {}", proto->ItemId, cacheInfo.sourceId, cacheInfo.minLevel);
+        //     }
+        // }
 
-        if (cacheInfo.minLevel)
-            LOG_DEBUG("playerbots", "Item: {}, minlevel: {}", proto->ItemId, cacheInfo.minLevel);
+        // if (cacheInfo.minLevel)
+        //     LOG_DEBUG("playerbots", "Item: {}, minlevel: {}", proto->ItemId, cacheInfo.minLevel);
 
-        // check vendors
-        if (cacheInfo.source == ITEM_SOURCE_NONE)
-        {
-            for (std::set<uint32>::iterator i = vendorItems.begin(); i != vendorItems.end(); ++i)
-            {
-                if (proto->ItemId == *i)
-                {
-                    cacheInfo.source = ITEM_SOURCE_VENDOR;
-                    LOG_DEBUG("playerbots", "Item: {} source: vendor", proto->ItemId);
-                    break;
-                }
-            }
-        }
+        // // check vendors
+        // if (cacheInfo.source == ITEM_SOURCE_NONE)
+        // {
+        //     for (std::set<uint32>::iterator i = vendorItems.begin(); i != vendorItems.end(); ++i)
+        //     {
+        //         if (proto->ItemId == *i)
+        //         {
+        //             cacheInfo.source = ITEM_SOURCE_VENDOR;
+        //             LOG_DEBUG("playerbots", "Item: {} source: vendor", proto->ItemId);
+        //             break;
+        //         }
+        //     }
+        // }
 
-        // check drops
-        std::vector<int32> creatures;
-        std::vector<int32> gameobjects;
-        auto range = dropMap->equal_range(itr.first);
+        // // check drops
+        // std::vector<int32> creatures;
+        // std::vector<int32> gameobjects;
+        // auto range = dropMap->equal_range(itr.first);
 
-        for (auto iter = range.first; iter != range.second; ++iter)
-        {
-            if (iter->second > 0)
-                creatures.push_back(iter->second);
-            else
-                gameobjects.push_back(abs(iter->second));
-        }
+        // for (auto iter = range.first; iter != range.second; ++iter)
+        // {
+        //     if (iter->second > 0)
+        //         creatures.push_back(iter->second);
+        //     else
+        //         gameobjects.push_back(abs(iter->second));
+        // }
 
-        // check creature drop
-        if (cacheInfo.source == ITEM_SOURCE_NONE)
-        {
-            if (creatures.size())
-            {
-                if (creatures.size() == 1)
-                {
-                    cacheInfo.source = ITEM_SOURCE_DROP;
-                    cacheInfo.sourceId = creatures.front();
-                    LOG_DEBUG("playerbots", "Item: {}, source: creature drop, ID: {}", proto->ItemId, creatures.front());
-                }
-                else
-                {
-                    cacheInfo.source = ITEM_SOURCE_DROP;
-                    LOG_DEBUG("playerbots", "Item: {}, source: creatures drop, number: {}", proto->ItemId, creatures.size());
-                }
-            }
-        }
+        // // check creature drop
+        // if (cacheInfo.source == ITEM_SOURCE_NONE)
+        // {
+        //     if (creatures.size())
+        //     {
+        //         if (creatures.size() == 1)
+        //         {
+        //             cacheInfo.source = ITEM_SOURCE_DROP;
+        //             cacheInfo.sourceId = creatures.front();
+        //             LOG_DEBUG("playerbots", "Item: {}, source: creature drop, ID: {}", proto->ItemId, creatures.front());
+        //         }
+        //         else
+        //         {
+        //             cacheInfo.source = ITEM_SOURCE_DROP;
+        //             LOG_DEBUG("playerbots", "Item: {}, source: creatures drop, number: {}", proto->ItemId, creatures.size());
+        //         }
+        //     }
+        // }
 
-        // check gameobject drop
-        if (cacheInfo.source == ITEM_SOURCE_NONE || (cacheInfo.source == ITEM_SOURCE_DROP && !cacheInfo.sourceId))
-        {
-            if (gameobjects.size())
-            {
-                if (gameobjects.size() == 1)
-                {
-                    cacheInfo.source = ITEM_SOURCE_DROP;
-                    cacheInfo.sourceId = gameobjects.front();
-                    LOG_INFO("playerbots", "Item: {}, source: gameobject, ID: {}", proto->ItemId, gameobjects.front());
-                }
-                else
-                {
-                    cacheInfo.source = ITEM_SOURCE_DROP;
-                    LOG_INFO("playerbots", "Item: {}, source: gameobjects, number: {}", proto->ItemId, gameobjects.size());
-                }
-            }
-        }
+        // // check gameobject drop
+        // if (cacheInfo.source == ITEM_SOURCE_NONE || (cacheInfo.source == ITEM_SOURCE_DROP && !cacheInfo.sourceId))
+        // {
+        //     if (gameobjects.size())
+        //     {
+        //         if (gameobjects.size() == 1)
+        //         {
+        //             cacheInfo.source = ITEM_SOURCE_DROP;
+        //             cacheInfo.sourceId = gameobjects.front();
+        //             LOG_INFO("playerbots", "Item: {}, source: gameobject, ID: {}", proto->ItemId, gameobjects.front());
+        //         }
+        //         else
+        //         {
+        //             cacheInfo.source = ITEM_SOURCE_DROP;
+        //             LOG_INFO("playerbots", "Item: {}, source: gameobjects, number: {}", proto->ItemId, gameobjects.size());
+        //         }
+        //     }
+        // }
 
-        // check faction
-        if (proto->RequiredReputationFaction > 0 && proto->RequiredReputationFaction != 35 && proto->RequiredReputationRank < 15)
-        {
-            cacheInfo.repFaction = proto->RequiredReputationFaction;
-            cacheInfo.repRank = proto->RequiredReputationRank;
-        }
+        // // check faction
+        // if (proto->RequiredReputationFaction > 0 && proto->RequiredReputationFaction != 35 && proto->RequiredReputationRank < 15)
+        // {
+        //     cacheInfo.repFaction = proto->RequiredReputationFaction;
+        //     cacheInfo.repRank = proto->RequiredReputationRank;
+        // }
 
-        cacheInfo.quality = proto->Quality;
-        cacheInfo.itemId = proto->ItemId;
-        cacheInfo.slot = slot;
+        // cacheInfo.quality = proto->Quality;
+        // cacheInfo.itemId = proto->ItemId;
+        // cacheInfo.slot = slot;
 
-        // save cache
-        PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_EQUIP_CACHE_NEW);
-        stmt->SetData(0, proto->ItemId);
-        trans->Append(stmt);
+        // // save cache
+        // PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_EQUIP_CACHE_NEW);
+        // stmt->SetData(0, proto->ItemId);
+        // trans->Append(stmt);
 
-        stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_EQUIP_CACHE_NEW);
-        stmt->SetData(0, cacheInfo.itemId);
-        stmt->SetData(1, cacheInfo.quality);
-        stmt->SetData(2, cacheInfo.slot);
-        stmt->SetData(3, cacheInfo.source);
-        stmt->SetData(4, cacheInfo.sourceId);
-        stmt->SetData(5, cacheInfo.team);
-        stmt->SetData(6, cacheInfo.repFaction);
-        stmt->SetData(7, cacheInfo.repRank);
-        stmt->SetData(8, cacheInfo.minLevel);
+        // stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_EQUIP_CACHE_NEW);
+        // stmt->SetData(0, cacheInfo.itemId);
+        // stmt->SetData(1, cacheInfo.quality);
+        // stmt->SetData(2, cacheInfo.slot);
+        // stmt->SetData(3, cacheInfo.source);
+        // stmt->SetData(4, cacheInfo.sourceId);
+        // stmt->SetData(5, cacheInfo.team);
+        // stmt->SetData(6, cacheInfo.repFaction);
+        // stmt->SetData(7, cacheInfo.repRank);
+        // stmt->SetData(8, cacheInfo.minLevel);
 
-        for (uint8 i = 1; i <= MAX_STAT_SCALES; ++i)
-        {
-            if (cacheInfo.weights[i])
-                stmt->SetData(8 + i, cacheInfo.weights[i]);
-            else
-                stmt->SetData(8 + i, 0);
-        }
+        // for (uint8 i = 1; i <= MAX_STAT_SCALES; ++i)
+        // {
+        //     if (cacheInfo.weights[i])
+        //         stmt->SetData(8 + i, cacheInfo.weights[i]);
+        //     else
+        //         stmt->SetData(8 + i, 0);
+        // }
 
-        trans->Append(stmt);
+        // trans->Append(stmt);
 
-        itemInfoCache[cacheInfo.itemId] = std::move(cacheInfo);
+        // itemInfoCache[cacheInfo.itemId] = std::move(cacheInfo);
     }
 
     PlayerbotsDatabase.CommitTransaction(trans);
