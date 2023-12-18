@@ -106,7 +106,7 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
     
     /* prevent pet dead immediately in group */
-    if (bot->GetGroup() && !target->IsInCombat()) {
+    if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
         with_pet = false;
     }
     if (Pet* pet = bot->GetPet())
