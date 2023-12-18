@@ -365,6 +365,8 @@ void PlayerbotFactory::Refresh()
     InitReagents();
     // InitPotions();
     InitTalentsTree(true, true, true);
+    InitPet();
+    InitPetTalents();
     InitClassSpells();
     InitAvailableSpells();
     InitSkills();
