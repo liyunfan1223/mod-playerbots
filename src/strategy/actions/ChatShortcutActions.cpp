@@ -31,8 +31,8 @@ bool FollowChatShortcutAction::Execute(Event event)
         return false;
 
     botAI->Reset();
-    botAI->ChangeStrategy("+follow,-passive", BOT_STATE_NON_COMBAT);
-    botAI->ChangeStrategy("-follow,-passive", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("+follow,-passive,-grind", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-follow,-passive,-grind", BOT_STATE_COMBAT);
 
     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
     PositionInfo pos = posMap["return"];
