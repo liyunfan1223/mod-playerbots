@@ -26,6 +26,12 @@ class AutoShotTrigger : public Trigger
         bool IsActive() override;
 };
 
+class HunterAspectOfTheMonkeyTrigger : public BuffTrigger
+{
+    public:
+        HunterAspectOfTheMonkeyTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "aspect of the monkey") { }
+};
+
 class HunterAspectOfTheHawkTrigger : public BuffTrigger
 {
     public:

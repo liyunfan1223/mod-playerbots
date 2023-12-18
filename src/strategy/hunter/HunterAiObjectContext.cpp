@@ -68,6 +68,7 @@ class HunterTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["aspect of the pack"] = &HunterTriggerFactoryInternal::aspect_of_the_pack;
             creators["rapid fire"] = &HunterTriggerFactoryInternal::rapid_fire;
             creators["aspect of the hawk"] = &HunterTriggerFactoryInternal::aspect_of_the_hawk;
+            creators["aspect of the monkey"] = &HunterTriggerFactoryInternal::aspect_of_the_monkey;
             creators["aspect of the wild"] = &HunterTriggerFactoryInternal::aspect_of_the_wild;
             creators["aspect of the viper"] = &HunterTriggerFactoryInternal::aspect_of_the_viper;
             creators["trueshot aura"] = &HunterTriggerFactoryInternal::trueshot_aura;
@@ -101,6 +102,7 @@ class HunterTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* aspect_of_the_pack(PlayerbotAI* botAI) { return new HunterAspectOfThePackTrigger(botAI); }
         static Trigger* rapid_fire(PlayerbotAI* botAI) { return new RapidFireTrigger(botAI); }
         static Trigger* aspect_of_the_hawk(PlayerbotAI* botAI) { return new HunterAspectOfTheHawkTrigger(botAI); }
+        static Trigger* aspect_of_the_monkey(PlayerbotAI* botAI) { return new HunterAspectOfTheMonkeyTrigger(botAI); }
         static Trigger* aspect_of_the_wild(PlayerbotAI* botAI) { return new HunterAspectOfTheWildTrigger(botAI); }
         static Trigger* low_ammo(PlayerbotAI* botAI) { return new HunterLowAmmoTrigger(botAI); }
         static Trigger* no_ammo(PlayerbotAI* botAI) { return new HunterNoAmmoTrigger(botAI); }
@@ -140,6 +142,7 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
             creators["boost"] = &HunterAiObjectContextInternal::rapid_fire;
             creators["readiness"] = &HunterAiObjectContextInternal::readiness;
             creators["aspect of the hawk"] = &HunterAiObjectContextInternal::aspect_of_the_hawk;
+            creators["aspect of the monkey"] = &HunterAiObjectContextInternal::aspect_of_the_monkey;
             creators["aspect of the wild"] = &HunterAiObjectContextInternal::aspect_of_the_wild;
             creators["aspect of the viper"] = &HunterAiObjectContextInternal::aspect_of_the_viper;
             creators["aspect of the pack"] = &HunterAiObjectContextInternal::aspect_of_the_pack;
@@ -189,6 +192,7 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* rapid_fire(PlayerbotAI* botAI) { return new CastRapidFireAction(botAI); }
         static Action* readiness(PlayerbotAI* botAI) { return new CastReadinessAction(botAI); }
         static Action* aspect_of_the_hawk(PlayerbotAI* botAI) { return new CastAspectOfTheHawkAction(botAI); }
+        static Action* aspect_of_the_monkey(PlayerbotAI* botAI) { return new CastAspectOfTheMonkeyAction(botAI); }
         static Action* aspect_of_the_wild(PlayerbotAI* botAI) { return new CastAspectOfTheWildAction(botAI); }
         static Action* aspect_of_the_viper(PlayerbotAI* botAI) { return new CastAspectOfTheViperAction(botAI); }
         static Action* aspect_of_the_pack(PlayerbotAI* botAI) { return new CastAspectOfThePackAction(botAI); }

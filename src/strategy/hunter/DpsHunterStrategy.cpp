@@ -18,7 +18,7 @@ class DpsHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
         {
             return new ActionNode ("aimed shot",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("multi-shot", 10.0f), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("multi-shot"), nullptr),
                 /*C*/ nullptr);
         }
 };

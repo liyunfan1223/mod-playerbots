@@ -83,6 +83,12 @@ class CastAspectOfTheHawkAction : public CastBuffSpellAction
 		CastAspectOfTheHawkAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "aspect of the hawk") { }
 };
 
+class CastAspectOfTheMonkeyAction : public CastBuffSpellAction
+{
+	public:
+		CastAspectOfTheMonkeyAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "aspect of the monkey") { }
+};
+
 class CastAspectOfTheDragonhawkAction : public CastBuffSpellAction
 {
 public:

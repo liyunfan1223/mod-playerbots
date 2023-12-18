@@ -30,7 +30,7 @@ class HunterBuffManaStrategy : public NonCombatStrategy
 class HunterBuffDpsStrategy : public NonCombatStrategy
 {
 	public:
-		HunterBuffDpsStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+		HunterBuffDpsStrategy(PlayerbotAI* botAI);
 
 		std::string const getName() override { return "bdps"; }
 		void InitTriggers(std::vector<TriggerNode*>& triggers) override;
