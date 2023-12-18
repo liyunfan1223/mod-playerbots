@@ -88,6 +88,14 @@ bool AcceptQuestShareAction::Execute(Event event)
         return false;
 
     quest = qInfo->GetQuestId();
+
+    if (bot->HasQuest(quest))
+    {
+        bot->SetDivider(ObjectGuid::Empty);
+        botAI->TellError("I have this quest");
+        return false;
+    }
+
     if (!bot->CanTakeQuest(qInfo, false))
     {
         // can't take quest

@@ -660,7 +660,7 @@ class NewPlayerNearbyTrigger : public Trigger
 class CollisionTrigger : public Trigger
 {
     public:
-        CollisionTrigger(PlayerbotAI* botAI) : Trigger(botAI, "collision", 5) { }
+        CollisionTrigger(PlayerbotAI* botAI) : Trigger(botAI, "collision", 5 * 1000) { }
 
         bool IsActive() override;
 };
