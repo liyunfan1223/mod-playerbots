@@ -282,7 +282,7 @@ AiPlayerbot.MediumMana = 40
 # Random bot default strategies (applied after defaults)
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
 # AiPlayerbot.RandomBotNonCombatStrategies = "+grind,+loot,+rpg,+custom::say"
-AiPlayerbot.RandomBotNonCombatStrategies = "+grind,+loot"
+AiPlayerbot.RandomBotNonCombatStrategies = ""
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
 

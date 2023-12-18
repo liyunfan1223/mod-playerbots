@@ -541,8 +541,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         if (!player->GetGroup() || player->GetGroup()->GetLeaderGUID() == player->GetGUID())
         {
             // let 25% of random not grouped (or grp leader) bots help other players
-            if (!urand(0, 3))
-                nonCombatEngine->addStrategy("attack tagged");
+            // if (!urand(0, 3))
+            //     nonCombatEngine->addStrategy("attack tagged");
 
             nonCombatEngine->addStrategy("pvp");
             // nonCombatEngine->addStrategy("collision");
@@ -577,7 +577,6 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                     {
                         nonCombatEngine->addStrategy("pvp");
                         // nonCombatEngine->addStrategy("collision");
-                        nonCombatEngine->addStrategy("grind");
                         // nonCombatEngine->addStrategy("group");
                         // nonCombatEngine->addStrategy("guild");
 

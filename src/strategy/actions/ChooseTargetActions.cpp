@@ -48,8 +48,8 @@ bool AttackAnythingAction::isUseful()
     if (!name.empty() && name.find("Dummy") != std::string::npos) // Target is not a targetdummy
         return false;
 
-    if (!ChooseRpgTargetAction::isFollowValid(bot, target))                               //Do not grind mobs far away from master.
-        return false;
+    // if (!ChooseRpgTargetAction::isFollowValid(bot, target))                               //Do not grind mobs far away from master.
+    //     return false;
 
     return true;
 }
