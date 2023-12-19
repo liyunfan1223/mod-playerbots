@@ -59,7 +59,7 @@ bool CastScareBeastCcAction::Execute(Event event)
 
 bool CastWingClipAction::isUseful()
 {
-    return CastMeleeSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget());
+    return CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget());
 }
 
 NextAction** CastWingClipAction::getPrerequisites()
@@ -67,7 +67,7 @@ NextAction** CastWingClipAction::getPrerequisites()
     return nullptr;
 }
 
-bool CastRaptorStrikeAction::isUseful()
-{
-    return CastMeleeSpellAction::isUseful() && botAI->HasStrategy("close", BOT_STATE_COMBAT);
-}
+// bool CastRaptorStrikeAction::isUseful()
+// {
+//     return CastMeleeSpellAction::isUseful() && botAI->HasStrategy("close", BOT_STATE_COMBAT);
+// }

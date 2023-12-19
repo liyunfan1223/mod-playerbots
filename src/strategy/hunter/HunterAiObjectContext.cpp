@@ -151,6 +151,7 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
             creators["feign death"] = &HunterAiObjectContextInternal::feign_death;
             creators["wing clip"] = &HunterAiObjectContextInternal::wing_clip;
             creators["raptor strike"] = &HunterAiObjectContextInternal::raptor_strike;
+            creators["mongoose bite"] = &HunterAiObjectContextInternal::mongoose_bite;
             creators["feed pet"] = &HunterAiObjectContextInternal::feed_pet;
             creators["bestial wrath"] = &HunterAiObjectContextInternal::bestial_wrath;
             creators["scare beast"] = &HunterAiObjectContextInternal::scare_beast;
@@ -199,6 +200,7 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* aspect_of_the_cheetah(PlayerbotAI* botAI) { return new CastAspectOfTheCheetahAction(botAI); }
         static Action* wing_clip(PlayerbotAI* botAI) { return new CastWingClipAction(botAI); }
         static Action* raptor_strike(PlayerbotAI* botAI) { return new CastRaptorStrikeAction(botAI); }
+        static Action* mongoose_bite(PlayerbotAI* botAI) { return new CastMongooseBiteAction(botAI); }
         static Action* aspect_of_the_dragonhawk(PlayerbotAI* ai) { return new CastAspectOfTheDragonhawkAction(ai); }
         static Action* tranquilizing_shot(PlayerbotAI* ai) { return new CastTranquilizingShotAction(ai); }
         static Action* steady_shot(PlayerbotAI* ai) { return new CastSteadyShotAction(ai); }

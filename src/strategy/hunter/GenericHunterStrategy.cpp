@@ -15,6 +15,7 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
             creators["aspect of the pack"] = &aspect_of_the_pack;
             creators["feign death"] = &feign_death;
             creators["wing clip"] = &wing_clip;
+            creators["mongoose bite"] = &mongoose_bite;
             creators["raptor strike"] = &raptor_strike;
         }
 
@@ -47,6 +48,15 @@ class GenericHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         {
             return new ActionNode("wing clip",
                 /*P*/ nullptr,
+                // /*A*/ NextAction::array(0, new NextAction("mongoose bite"), nullptr),
+                nullptr,
+                /*C*/ nullptr);
+        }
+
+        static ActionNode* mongoose_bite([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode("mongoose bite",
+                /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("raptor strike"), nullptr),
                 /*C*/ nullptr);
         }
@@ -70,12 +80,16 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     CombatStrategy::InitTriggers(triggers);
 
     // triggers.push_back(new TriggerNode("enemy too close for auto shot", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("wing clip", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("enemy is close", 
+        NextAction::array(0, 
+            new NextAction("wing clip", ACTION_HIGH + 1),
+            new NextAction("mongoose bite", ACTION_HIGH), 
+            nullptr)));
     triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("feign death", 35.0f), nullptr)));
     triggers.push_back(new TriggerNode("hunters pet low health", NextAction::array(0, new NextAction("mend pet", ACTION_HIGH + 2), nullptr)));
     // triggers.push_back(new TriggerNode("no ammo", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), new NextAction("say::no ammo", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("aspect of the viper", NextAction::array(0, new NextAction("aspect of the viper", ACTION_HIGH), NULL)));
-    triggers.push_back(new TriggerNode("enemy too close for shoot", NextAction::array(0, new NextAction("flee", ACTION_HIGH + 3), NULL)));
+    triggers.push_back(new TriggerNode("enemy too close for shoot", NextAction::array(0, new NextAction("flee", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(new TriggerNode("misdirection on main tank", NextAction::array(0, new NextAction("misdirection on main tank", ACTION_HIGH + 7), NULL)));
     triggers.push_back(new TriggerNode("tranquilizing shot", NextAction::array(0, new NextAction("tranquilizing shot", 61.0f), NULL)));
     

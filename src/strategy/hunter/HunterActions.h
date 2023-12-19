@@ -179,21 +179,25 @@ class CastFreezingTrap : public CastDebuffSpellAction
         Value<Unit*>* GetTargetValue() override;
 };
 
-class CastWingClipAction : public CastMeleeSpellAction
+class CastWingClipAction : public CastSpellAction
 {
     public:
-        CastWingClipAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "wing clip") { }
+        CastWingClipAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "wing clip") { }
 
         bool isUseful() override;
         NextAction** getPrerequisites() override;
 };
 
-class CastRaptorStrikeAction : public CastMeleeSpellAction
+class CastRaptorStrikeAction : public CastSpellAction
 {
     public:
-        CastRaptorStrikeAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "raptor strike") { }
+        CastRaptorStrikeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "raptor strike") { }
+};
 
-        bool isUseful() override;
+class CastMongooseBiteAction : public CastSpellAction
+{
+    public:
+        CastMongooseBiteAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "mongoose bite") { }
 };
 
 class CastSerpentStingOnAttackerAction : public CastDebuffSpellOnAttackerAction
