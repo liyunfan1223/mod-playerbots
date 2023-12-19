@@ -13,7 +13,13 @@ bool MoveToRpgTargetAction::Execute(Event event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
     Unit* unit = botAI->GetUnit(guidP);
+    if (unit && !unit->IsInWorld()) {
+        return false;
+    }
     GameObject* go = botAI->GetGameObject(guidP);
+    if (go && !go->IsInWorld()) {
+        return false;
+    }
     Player* player = guidP.GetPlayer();
 
     WorldObject* wo = nullptr;
@@ -90,7 +96,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
     if (bot->IsWithinLOS(x, y, z))
         couldMove = MoveNear(mapId, x, y, z, 0);
     else
-        couldMove = MoveTo(mapId, x, y, z, false, false);
+        couldMove = MoveTo(mapId, x, y, z, false, false, true);
 
     if (!couldMove && WorldPosition(mapId, x, y, z).distance(bot) > INTERACTION_DISTANCE)
     {
