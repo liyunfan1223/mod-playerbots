@@ -76,5 +76,5 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "medium mana",
         NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 5), NULL)));
     
-    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
 }

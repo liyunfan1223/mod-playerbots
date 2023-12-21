@@ -60,7 +60,7 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             // new NextAction("fire elemental totem", 16.0f), 
             new NextAction("totem of wrath", 15.0f), NULL)));
 
-    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
 }
 
 void CasterAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

@@ -72,5 +72,4 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "sacred shield on main tank",
 		NextAction::array(0, new NextAction("sacred shield on main tank", ACTION_CRITICAL_HEAL + 6), NULL)));
 
-    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
 }
