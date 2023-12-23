@@ -969,8 +969,8 @@ void RandomPlayerbotMgr::Revive(Player* player)
     SetEventValue(bot, "revive", 0, 0);
 
 
-    RandomTeleportGrindForLevel(player);
     Refresh(player);
+    RandomTeleportGrindForLevel(player);
 }
 
 void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth)
