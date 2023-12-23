@@ -541,6 +541,7 @@ void PlayerbotFactory::InitPetTalents()
         // LOG_INFO("playerbots", "{} init pet talents failed with petTalentType < 0({})", bot->GetName().c_str(), pet_family->petTalentType);
         return;
     }
+    pet->resetTalents();
     std::map<uint32, std::vector<TalentEntry const*> > spells;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
