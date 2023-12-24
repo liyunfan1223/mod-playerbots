@@ -799,7 +799,9 @@ void PlayerbotFactory::InitTalentsTree(bool increment/*false*/, bool use_templat
 {
     uint32 specNo;
     uint8 cls = bot->getClass();
-    if (increment && bot->GetFreeTalentPoints() <= 2) {
+    std::map<uint8, uint32> tabs = AiFactory::GetPlayerSpecTabs(bot);
+    uint32 total_tabs = tabs[0] + tabs[1] + tabs[2];
+    if (increment && bot->GetFreeTalentPoints() <= 2 && total_tabs != 0) {
         specNo = AiFactory::GetPlayerSpecTab(bot);
     } else {
         uint32 point = urand(0, 100);
