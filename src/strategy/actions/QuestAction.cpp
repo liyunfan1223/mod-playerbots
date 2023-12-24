@@ -179,7 +179,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
         p.rpos(0);
         bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(p);
 
-        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && !sPlayerbotAIConfig->syncQuestWithPlayer)
+        if (bot->GetQuestStatus(questId ) == QUEST_STATUS_NONE && sPlayerbotAIConfig->syncQuestWithPlayer)
         {
             Object* pObject = ObjectAccessor::GetObjectByTypeMask(*bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
             bot->AddQuest(quest, pObject);
@@ -191,6 +191,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
             botAI->TellMaster(out);
             return true;
         }
+        out << "Cannot accept";
     }
 
     out << " " << chat->FormatQuest(quest);
