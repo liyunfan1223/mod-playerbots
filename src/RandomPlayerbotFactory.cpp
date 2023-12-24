@@ -287,7 +287,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
 
         PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
-        CharacterDatabase.Execute("UPDATE playerbots_names SET in_use=0 WHERE in_use=1");
+        CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use = 0 WHERE in_use = 1");
         /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created correctly
            the better way is turning the async db operation to sync db operation */
         std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
