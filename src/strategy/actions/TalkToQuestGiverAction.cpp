@@ -8,6 +8,7 @@
 #include "ItemUsageValue.h"
 #include "Object.h"
 #include "Playerbots.h"
+#include "QuestDef.h"
 #include "WorldPacket.h"
 
 void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver)
@@ -238,6 +239,7 @@ bool TurnInQueryQuestAction::Execute(Event event)
         }
     }
     std::ostringstream out;
+    out << "Quest ";
     switch (status)
     {
         case QUEST_STATUS_COMPLETE:
@@ -251,6 +253,9 @@ bool TurnInQueryQuestAction::Execute(Event event)
             break;
         case QUEST_STATUS_FAILED:
             out << "|cffff0000Failed|r";
+            break;
+        case QUEST_STATUS_REWARDED:
+            out << "|cffff0000Rewarded|r";
             break;
     }
 

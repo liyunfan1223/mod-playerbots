@@ -16,10 +16,10 @@ class Player;
 class PlayerbotAI;
 class WorldObject;
 
-class QuestConfirmAcceptAction : public QuestAction
+class QuestConfirmAcceptAction : public Action
 {
     public:
-        QuestConfirmAcceptAction(PlayerbotAI* botAI) : QuestAction(botAI, "quest confirm accept") {}
+        QuestConfirmAcceptAction(PlayerbotAI* botAI) : Action(botAI, "quest confirm accept") {}
         bool Execute(Event event) override;
 };
 

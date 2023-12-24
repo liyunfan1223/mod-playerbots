@@ -13,6 +13,9 @@ bool QuestConfirmAcceptAction::Execute(Event event)
     if (!quest || !bot->CanAddQuest(quest, true)) {
         return false;
     }
+    std::ostringstream out;
+    out << "Quest: " << chat->FormatQuest(quest) << " confirm accept";
+    botAI->TellMaster(out);
     bot->GetSession()->HandleQuestConfirmAccept(sendPacket);
     return true;
 }
