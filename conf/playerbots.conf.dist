@@ -44,6 +44,13 @@ AiPlayerbot.MaxRandomBots = 50
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
 
+# Enable/Disable rotation of bots (randomly select a bot from the bots pool to go online and rotate them periodically)
+# default: 0 (disable, the online bots are fixed)
+AiPlayerbot.EnableRotation = 0
+
+# Bots pool size for rotation (should be less than RandomBotAccountCount * 10)
+AiPlayerbot.RotationPoolSize = 500
+
 # Accounts to create for random bots
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 AiPlayerbot.RandomBotAccountCount = 200
@@ -251,7 +258,7 @@ AiPlayerbot.LootDelay = 1000
 
 # Distances
 AiPlayerbot.FarDistance = 20.0
-AiPlayerbot.SightDistance = 100.0
+AiPlayerbot.SightDistance = 75.0
 AiPlayerbot.SpellDistance = 28.5
 AiPlayerbot.ShootDistance = 5.0
 AiPlayerbot.ReactDistance = 150.0
@@ -338,7 +345,7 @@ AiPlayerbot.RandomBotUpdateInterval = 20
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
 AiPlayerbot.MinRandomBotInWorldTime = 3600
-AiPlayerbot.MaxRandomBotInWorldTime = 1209600
+AiPlayerbot.MaxRandomBotInWorldTime = 43200
 AiPlayerbot.MinRandomBotRandomizeTime = 302400
 AiPlayerbot.MaxRandomRandomizeTime = 1209600
 AiPlayerbot.RandomBotsPerInterval = 500
@@ -350,6 +357,7 @@ AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
 AiPlayerbot.MaxRandomBotTeleportInterval = 18000
+AiPlayerbot.RandomBotInWorldWithRotaionDisabled = 31104000
 
 # How far random bots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
