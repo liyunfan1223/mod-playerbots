@@ -49,7 +49,7 @@ It's essential to note that there is still a significant amount of work to be do
 
 For enhanced control over the bots and to simplify command usage, you can also make use of our addon: [Unbot Addon](https://github.com/liyunfan1223/unbot-addon). Currently, this addon offers better support only for Simplified Chinese client.
 
-## FAQ (Frequently Asked Questions)
+## Frequently Asked Questions
 
 **Why won't my bot cast spells?**
 

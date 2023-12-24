@@ -79,7 +79,6 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    // triggers.push_back(new TriggerNode("enemy too close for auto shot", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("enemy is close", 
         NextAction::array(0, 
             new NextAction("wing clip", ACTION_HIGH + 1),
