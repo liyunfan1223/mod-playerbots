@@ -24,6 +24,7 @@
 #include "QuestAction.h"
 #include "PassLeadershipToMasterAction.h"
 #include "PetitionSignAction.h"
+#include "QuestConfirmAcceptAction.h"
 #include "ReadyCheckAction.h"
 #include "RememberTaxiAction.h"
 #include "ReviveFromCorpseAction.h"
@@ -36,6 +37,7 @@
 #include "TradeStatusAction.h"
 #include "UseMeetingStoneAction.h"
 #include "NamedObjectContext.h"
+#include "QuestConfirmAcceptAction.h"
 
 class PlayerbotAI;
 
@@ -92,6 +94,7 @@ class WorldPacketActionContext : public NamedObjectContext<Action>
             creators["see spell"] = &WorldPacketActionContext::see_spell;
             creators["arena team accept"] = &WorldPacketActionContext::arena_team_accept;
             creators["turn in query quest"] = &WorldPacketActionContext::turn_in_query_quest;
+            creators["quest confirm accept"] = &WorldPacketActionContext::quest_confirm_accept;
         }
 
     private:
@@ -143,6 +146,7 @@ class WorldPacketActionContext : public NamedObjectContext<Action>
         static Action* see_spell(PlayerbotAI* botAI) { return new SeeSpellAction(botAI); }
         static Action* arena_team_accept(PlayerbotAI* botAI) { return new ArenaTeamAcceptAction(botAI); }
         static Action* turn_in_query_quest(PlayerbotAI* botAI) { return new TurnInQueryQuestAction(botAI); }
+        static Action* quest_confirm_accept(PlayerbotAI* botAI) { return new QuestConfirmAcceptAction(botAI); }
 };
 
 #endif

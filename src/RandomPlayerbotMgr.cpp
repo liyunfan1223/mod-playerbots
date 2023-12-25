@@ -337,6 +337,11 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin(); i != sPlayerbotAIConfig->randomBotAccounts.end(); i++)
         {
             uint32 accountId = *i;
+            if (sPlayerbotAIConfig->enableRotation) {
+                uint32 limit = std::min((uint32)sPlayerbotAIConfig->randomBotAccounts.size(), sPlayerbotAIConfig->rotationPoolSize / 10 + 1);
+                uint32 index = urand(0, limit);
+                accountId = sPlayerbotAIConfig->randomBotAccounts[index];
+            }
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
             stmt->SetData(0, accountId);
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -359,8 +364,12 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
                 if (std::find(currentBots.begin(), currentBots.end(), guid) != currentBots.end())
                     continue;
-
-                SetEventValue(guid, "add", 1, urand(sPlayerbotAIConfig->minRandomBotInWorldTime, sPlayerbotAIConfig->maxRandomBotInWorldTime));
+                
+                uint32 add_time = sPlayerbotAIConfig->enableRotation ? 
+                    urand(sPlayerbotAIConfig->minRandomBotInWorldTime, sPlayerbotAIConfig->maxRandomBotInWorldTime) :
+                    sPlayerbotAIConfig->randomBotInWorldWithRotaionDisabled;
+                    
+                SetEventValue(guid, "add", 1, add_time);
                 SetEventValue(guid, "logout", 0, 0);
                 currentBots.push_back(guid);
 
@@ -969,8 +978,8 @@ void RandomPlayerbotMgr::Revive(Player* player)
     SetEventValue(bot, "revive", 0, 0);
 
 
-    RandomTeleportGrindForLevel(player);
     Refresh(player);
+    RandomTeleportGrindForLevel(player);
 }
 
 void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth)

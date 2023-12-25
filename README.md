@@ -49,6 +49,18 @@ It's essential to note that there is still a significant amount of work to be do
 
 For enhanced control over the bots and to simplify command usage, you can also make use of our addon: [Unbot Addon](https://github.com/liyunfan1223/unbot-addon). Currently, this addon offers better support only for Simplified Chinese client.
 
+## Frequently Asked Questions
+
+**Why won't my bot cast spells?**
+
+- Ensure the presence of the required English DBC file (enUS).
+
+**Compilation failed on Windows?**
+
+- Developed primarily on Linux, I may miss cross-platform compilation issues. Feel free to report them.
+
+- Future plans include implementing an auto build workflow to prevent such issues.
+
 ## Acknowledgements
 
 The code for this module is ported from [ZhengPeiRu21/mod-playerbots](https://github.com/ZhengPeiRu21/mod-playerbots) and [celguar/mangosbot-bots](https://github.com/celguar/mangosbot-bots). We extend our gratitude to @ZhengPeiRu21 and @celguar for the continued efforts in maintaining the module. 

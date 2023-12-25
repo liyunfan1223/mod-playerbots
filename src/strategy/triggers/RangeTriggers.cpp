@@ -4,6 +4,7 @@
 
 #include "RangeTriggers.h"
 #include "MoveSplineInit.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -16,8 +17,8 @@ bool EnemyTooCloseForSpellTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
     return target && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) && 
-        target->GetObjectSize() <= 10.0f && 
-        AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->tooCloseDistance;
+        target->GetObjectSize() <= 10.0f &&
+        target->IsWithinCombatRange(bot, MIN_MELEE_REACH);
 //     Unit* target = AI_VALUE(Unit*, "current target");
 //     if (!target) {
 //         return false;
@@ -79,7 +80,9 @@ bool EnemyTooCloseForAutoShotTrigger::IsActive()
 bool EnemyTooCloseForShootTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return target && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) && AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->shootDistance;
+    // target->IsWithinCombatRange()
+
+    return target && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) && target->IsWithinCombatRange(bot, MIN_MELEE_REACH);
 
 //     Unit* target = AI_VALUE(Unit*, "current target");
 //     if (!target)

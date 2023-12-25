@@ -287,10 +287,10 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
 
         PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
-        CharacterDatabase.Execute("UPDATE playerbots_names SET in_use=0 WHERE in_use=1");
+        CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use = 0 WHERE in_use = 1");
         /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created correctly
            the better way is turning the async db operation to sync db operation */
-        std::this_thread::sleep_for(100ms * sPlayerbotAIConfig->randomBotAccountCount);
+        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
         LOG_INFO("playerbots", "Random bot characters deleted.");
         LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
         World::StopNow(SHUTDOWN_EXIT_CODE);
@@ -335,7 +335,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     if (account_creation) {
         /* wait for async accounts create to make character create correctly, same as account delete */
-        std::this_thread::sleep_for(100ms * sPlayerbotAIConfig->randomBotAccountCount);
+        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
     }
 
     LOG_INFO("playerbots", "Creating random bot characters...");
@@ -403,7 +403,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     if (bot_creation) {
         LOG_INFO("playerbots", "Waiting for {} characters loading into database...", totalCharCount);
         /* wait for characters load into database, or characters will fail to loggin */
-        std::this_thread::sleep_for(15ms * totalCharCount);
+        std::this_thread::sleep_for(10s);
     }
 
     for (WorldSession* session : sessionBots)
