@@ -105,6 +105,11 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     context->GetValue<Unit*>("current target")->Set(target);
     context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
     
+    bool attacked = bot->Attack(target, true);
+
+    if (!attacked) {
+        return false;
+    }
     /* prevent pet dead immediately in group */
     if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
         with_pet = false;
@@ -130,10 +135,10 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     }
         // bot->SetFacingToObject(target);
 
-    bool attacked = bot->Attack(target, true);
+    
     botAI->ChangeEngine(BOT_STATE_COMBAT);
 
-    return attacked;
+    return true;
 }
 
 bool AttackDuelOpponentAction::isUseful()

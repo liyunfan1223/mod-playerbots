@@ -31,7 +31,7 @@ bool FeedPetAction::Execute(Event event)
 {
     if (Pet* pet = bot->GetPet())
         if (pet->getPetType() == HUNTER_PET && pet->GetHappinessState() != HAPPY)
-            pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
+            pet->SetPower(POWER_HAPPINESS, pet->GetMaxPower(Powers(POWER_HAPPINESS)));
 
     return true;
 }

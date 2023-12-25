@@ -679,7 +679,7 @@ void PlayerbotFactory::InitPet()
     {
         pet->InitStatsForLevel(bot->getLevel());
         pet->SetLevel(bot->getLevel());
-        pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
+        pet->SetPower(POWER_HAPPINESS, pet->GetMaxPower(Powers(POWER_HAPPINESS)));
         pet->SetHealth(pet->GetMaxHealth());
     }
     else
