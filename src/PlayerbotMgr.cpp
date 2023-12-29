@@ -364,7 +364,7 @@ Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
     sPlayerbotsMgr->AddPlayerbotData(bot, true);
-	OnBotLoginInternal(bot);
+    OnBotLoginInternal(bot);
 
     playerBots[bot->GetGUID()] = bot;
 
@@ -447,7 +447,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     uint32 accountId = bot->GetSession()->GetAccountId();
     bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
-    
+
     bot->SaveToDB(false, false);
     if (master && isRandomAccount && master->GetLevel() < bot->GetLevel()) {
         // PlayerbotFactory factory(bot, master->getLevel());
@@ -456,7 +456,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
         factory.Randomize(false);
     }
-    
+
     // bots join World chat if not solo oriented
     if (bot->getLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
     {
@@ -550,7 +550,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (!bot)
         return "bot not found";
-    
+
     if (!isRandomAccount || isRandomBot) {
         return "ERROR: You can not use this command on non-summoned random bot.";
     }
@@ -632,11 +632,11 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
 bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* args)
 {
-	if (!sPlayerbotAIConfig->enabled)
-	{
-		handler->PSendSysMessage("|cffff0000Playerbot system is currently disabled!");
+    if (!sPlayerbotAIConfig->enabled)
+    {
+        handler->PSendSysMessage("|cffff0000Playerbot system is currently disabled!");
         return false;
-	}
+    }
 
     WorldSession* m_session = handler->GetSession();
     if (!m_session)
@@ -697,10 +697,6 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         }
     }
 
-    
-
-    
-    
     if (!strncmp(cmd, "initself=", 9)) {
         if (!strcmp(cmd, "initself=rare")) {
             if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
@@ -792,8 +788,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "addclass"))
     {
-        if (sPlayerbotAIConfig->addClassCommand == 0) {
-            messages.push_back("addclass command was disabled, please check your configuration");
+        if (sPlayerbotAIConfig->addClassCommand == 0 && master->GetSession()->GetSecurity() < SEC_GAMEMASTER) {
+            messages.push_back("You do not have permission to create bot by addclass command");
             return messages;
         }
         if (!charname) {
@@ -808,7 +804,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         else if (!strcmp(charname, "paladin"))
         {
             claz = 2;
-        }                
+        }
         else if (!strcmp(charname, "hunter"))
         {
             claz = 3;
@@ -816,23 +812,23 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         else if (!strcmp(charname, "rogue"))
         {
             claz = 4;
-        }                
+        }
         else if (!strcmp(charname, "priest"))
         {
             claz = 5;
-        }                
+        }
         else if (!strcmp(charname, "shaman"))
         {
             claz = 7;
-        }                
+        }
         else if (!strcmp(charname, "mage"))
         {
             claz = 8;
-        }                
+        }
         else if (!strcmp(charname, "warlock"))
         {
             claz = 9;
-        }                
+        }
         else if (!strcmp(charname, "druid"))
         {
             claz = 11;
@@ -857,7 +853,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             case 11:
                 race_limit = "1, 3, 4, 7, 11";
                 break;
-            case 2: 
+            case 2:
             case 5:
             case 6:
             case 8:
@@ -874,7 +870,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             Field* fields = results->Fetch();
             ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
             AddPlayerBot(guid, master->GetSession()->GetAccountId());
-            
+
             messages.push_back("addclass " + std::string(charname) + " ok");
             return messages;
         }
@@ -900,7 +896,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     }
 
     std::string const cmdStr = cmd;
-    
+
     std::set<std::string> bots;
     if (charnameStr == "*" && master)
     {
@@ -914,14 +910,14 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         Group::MemberSlotList slots = group->GetMemberSlots();
         for (Group::member_citerator i = slots.begin(); i != slots.end(); i++)
         {
-			ObjectGuid member = i->guid;
+            ObjectGuid member = i->guid;
 
-			if (member == master->GetGUID())
-				continue;
+            if (member == master->GetGUID())
+                continue;
 
-			std::string bot;
-			if (sCharacterCache->GetCharacterNameByGuid(member, bot))
-			    bots.insert(bot);
+            std::string bot;
+            if (sCharacterCache->GetCharacterNameByGuid(member, bot))
+                bots.insert(bot);
         }
     }
 
@@ -957,7 +953,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
                 bots.insert(charName);
             } while (results->NextRow());
         }
-	}
+    }
 
     for (std::set<std::string>::iterator i = bots.begin(); i != bots.end(); ++i)
     {
@@ -1215,7 +1211,7 @@ void PlayerbotMgr::HandleMasterOutgoingPacket(WorldPacket const& packet)
     {
         Player* const bot = it->second;
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        if (botAI) 
+        if (botAI)
             botAI->HandleMasterOutgoingPacket(packet);
     }
 
