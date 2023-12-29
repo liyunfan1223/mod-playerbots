@@ -386,7 +386,7 @@ AiPlayerbot.AllowedLogFiles = ""
 # WorldBuff.Faction.Class.MinLevel.MaxLevel
 
 # Added following config
-# Selfbot permission level (0 = disabled, 1 = gm only (default), 2 = all players, 3 = activate on login) # AiPlayerbot.SelfBotLevel = 1
+# Selfbot permission level (0 = disabled, 1 = gm only (default), 2 = all players, 3 = activate on login)
 AiPlayerbot.SelfBotLevel = 1
 
 # Enables/Disables bot cheating
