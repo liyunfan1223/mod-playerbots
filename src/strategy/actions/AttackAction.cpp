@@ -107,7 +107,12 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     
     bool attacked = bot->Attack(target, true);
 
-    if (!attacked) {
+    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target)) {
+        sServerFacade->SetFacingTo(bot, target);
+    }
+    botAI->ChangeEngine(BOT_STATE_COMBAT);
+
+    if (!bot->GetVictim()) {
         return false;
     }
     /* prevent pet dead immediately in group */
@@ -121,23 +126,12 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
             pet->SetTarget(target->GetGUID());
             pet->GetCharmInfo()->SetIsCommandAttack(true);
             pet->AI()->AttackStart(target);
-            // pet->SetReactState(REACT_DEFENSIVE);
         } else {
             pet->SetReactState(REACT_PASSIVE);
             pet->GetCharmInfo()->SetIsCommandFollow(true);
             pet->GetCharmInfo()->IsReturning();
-            // pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
     }
-
-    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target)) {
-        sServerFacade->SetFacingTo(bot, target);
-    }
-        // bot->SetFacingToObject(target);
-
-    
-    botAI->ChangeEngine(BOT_STATE_COMBAT);
-
     return true;
 }
 
