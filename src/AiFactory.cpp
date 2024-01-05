@@ -291,7 +291,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_WARRIOR:
             if (tab == 2)
                 engine->addStrategies("tank", "tank assist", "aoe", "mark rti", nullptr);
-            else if (player->getLevel() < 30 || tab == 0)
+            else if (player->getLevel() < 36 || tab == 0)
                 engine->addStrategies("arms", "aoe", "dps assist", "threat", /*"behind",*/ nullptr);
             else
                 engine->addStrategies("fury", "aoe", "dps assist", "threat", /*"behind",*/ nullptr);
