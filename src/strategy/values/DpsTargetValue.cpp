@@ -157,7 +157,7 @@ class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
             }
             // attack enemy in range and with lowest health
             int level = GetIntervalLevel(new_unit);
-            if (level == 0) {
+            if (level == 10) {
                 return new_time < old_time;
             }
             // all targets are far away, choose the closest one
