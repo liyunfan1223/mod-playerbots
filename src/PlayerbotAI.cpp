@@ -1372,6 +1372,11 @@ bool PlayerbotAI::IsRanged(Player* player)
     return true;
 }
 
+bool PlayerbotAI::IsCaster(Player* player)
+{
+    return IsRanged(player) && player->getClass() != CLASS_HUNTER;
+}
+
 bool PlayerbotAI::IsRangedDps(Player* player)
 {
     return IsRanged(player) && IsDps(player);
