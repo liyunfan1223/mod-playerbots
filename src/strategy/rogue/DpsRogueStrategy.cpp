@@ -101,6 +101,11 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, 
             new NextAction("rupture", ACTION_HIGH + 1), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "target with combo points almost dead",
+        NextAction::array(0, 
+            new NextAction("eviscerate", ACTION_HIGH + 1), NULL)));
+
 	triggers.push_back(new TriggerNode(
 		"medium threat",
 		NextAction::array(0, new NextAction("vanish", ACTION_HIGH), NULL)));

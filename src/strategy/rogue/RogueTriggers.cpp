@@ -3,6 +3,7 @@
  */
 
 #include "RogueTriggers.h"
+#include "GenericTriggers.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -116,4 +117,12 @@ bool OffHandWeaponNoEnchantTrigger::IsActive() {
     if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
         return false;
     return true;
+}
+
+bool TargetWithComboPointsLowerHealTrigger::IsActive() {
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+        return false;
+    }
+    return ComboPointsAvailableTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) <= lifeTime;
 }
