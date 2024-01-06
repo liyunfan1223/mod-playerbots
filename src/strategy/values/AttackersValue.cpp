@@ -112,7 +112,7 @@ bool AttackersValue::hasRealThreat(Unit *attacker)
     return attacker &&
         attacker->IsInWorld() &&
         attacker->IsAlive() &&
-        // !attacker->IsPolymorphed() &&
+        !attacker->IsPolymorphed() &&
         // !attacker->isInRoots() &&
         !attacker->IsFriendlyTo(bot) &&
         (attacker->GetThreatMgr().getCurrentVictim() || dynamic_cast<Player*>(attacker));
