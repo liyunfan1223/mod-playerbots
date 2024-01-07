@@ -172,6 +172,7 @@ class WarriorAiObjectContextInternal : public NamedObjectContext<Action>
             creators["heroic strike"] = &WarriorAiObjectContextInternal::heroic_strike;
             creators["intimidating shout"] = &WarriorAiObjectContextInternal::intimidating_shout;
             creators["demoralizing shout"] = &WarriorAiObjectContextInternal::demoralizing_shout;
+            creators["demoralizing shout without life time check"] = &WarriorAiObjectContextInternal::demoralizing_shout_without_life_time_check;
             creators["challenging shout"] = &WarriorAiObjectContextInternal::challenging_shout;
             creators["shield wall"] = &WarriorAiObjectContextInternal::shield_wall;
             creators["battle shout"] = &WarriorAiObjectContextInternal::battle_shout;
@@ -245,6 +246,7 @@ class WarriorAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* heroic_strike(PlayerbotAI* botAI) { return new CastHeroicStrikeAction(botAI); }
         static Action* intimidating_shout(PlayerbotAI* botAI) { return new CastIntimidatingShoutAction(botAI); }
         static Action* demoralizing_shout(PlayerbotAI* botAI) { return new CastDemoralizingShoutAction(botAI); }
+        static Action* demoralizing_shout_without_life_time_check(PlayerbotAI* botAI) { return new CastDemoralizingShoutWithoutLifeTimeCheckAction(botAI); }
         static Action* challenging_shout(PlayerbotAI* botAI) { return new CastChallengingShoutAction(botAI); }
         static Action* shield_wall(PlayerbotAI* botAI) { return new CastShieldWallAction(botAI); }
         static Action* battle_shout(PlayerbotAI* botAI) { return new CastBattleShoutAction(botAI); }

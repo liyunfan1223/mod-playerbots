@@ -49,8 +49,9 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-        new NextAction("devastate", ACTION_DEFAULT + 0.2f), 
-        new NextAction("revenge", ACTION_DEFAULT + 0.1f), 
+        new NextAction("devastate", ACTION_DEFAULT + 0.3f), 
+        new NextAction("revenge", ACTION_DEFAULT + 0.2f), 
+        new NextAction("demoralizing shout", ACTION_DEFAULT + 0.1f), 
         new NextAction("melee", ACTION_DEFAULT), 
         NULL);
 }
@@ -60,9 +61,9 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericWarriorStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("heroic throw", ACTION_MOVE + 11), new NextAction("charge", ACTION_MOVE + 10), nullptr)));
-    triggers.push_back(new TriggerNode("intercept and rage", NextAction::array(0, new NextAction("berserker stance", ACTION_MOVE + 14), nullptr)));
-    triggers.push_back(new TriggerNode("intercept and rage", NextAction::array(0, new NextAction("intercept", ACTION_MOVE + 13), nullptr)));
-    triggers.push_back(new TriggerNode("thunder clap and rage", NextAction::array(0, new NextAction("battle stance", ACTION_MOVE + 12), nullptr)));
+    // triggers.push_back(new TriggerNode("intercept and rage", NextAction::array(0, new NextAction("berserker stance", ACTION_MOVE + 14), nullptr)));
+    // triggers.push_back(new TriggerNode("intercept and rage", NextAction::array(0, new NextAction("intercept", ACTION_MOVE + 13), nullptr)));
+    // triggers.push_back(new TriggerNode("thunder clap and rage", NextAction::array(0, new NextAction("battle stance", ACTION_MOVE + 12), nullptr)));
     triggers.push_back(new TriggerNode("thunder clap and rage", NextAction::array(0, new NextAction("thunder clap", ACTION_MOVE + 11), nullptr)));
     triggers.push_back(new TriggerNode("defensive stance", NextAction::array(0, new NextAction("defensive stance", ACTION_HIGH + 9), nullptr)));
     triggers.push_back(new TriggerNode("commanding shout", NextAction::array(0, new NextAction("commanding shout", ACTION_HIGH + 8), nullptr)));
