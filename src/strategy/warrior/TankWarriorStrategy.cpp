@@ -76,7 +76,7 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("taunt on snare target", NextAction::array(0, new NextAction("heroic throw on snare target", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("shield wall", ACTION_MEDIUM_HEAL), nullptr)));
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("last stand", ACTION_EMERGENCY + 3), nullptr)));
-    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("battle shout taunt", ACTION_HIGH + 1), nullptr)));
+    // triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("battle shout taunt", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("challenging shout", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(new TriggerNode("concussion blow", NextAction::array(0, new NextAction("concussion blow", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("shield bash", NextAction::array(0, new NextAction("shield bash", ACTION_INTERRUPT), nullptr)));
