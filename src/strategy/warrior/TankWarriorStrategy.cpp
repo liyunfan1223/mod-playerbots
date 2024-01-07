@@ -32,7 +32,13 @@ class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         ACTION_NODE_A(last_stand, "last stand", "intimidating shout");
         ACTION_NODE_A(heroic_throw_on_snare_target, "heroic throw on snare target", "taunt on snare target");
         ACTION_NODE_A(heroic_throw_taunt, "heroic throw", "taunt");
-        ACTION_NODE_A(taunt, "taunt", "battle shout taunt");
+        static ActionNode* taunt(PlayerbotAI* botAI)
+        {
+            return new ActionNode("taunt",
+                /*P*/ nullptr,
+                /*A*/ nullptr,
+                /*C*/ nullptr);
+        }
 };
 
 TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStrategy(botAI)
