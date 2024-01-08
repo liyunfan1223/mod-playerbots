@@ -190,29 +190,36 @@ AiPlayerbot.SyncLevelWithPlayers = 0
 AiPlayerbot.FreeFood = 1
 
 # Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
+# Only for random bots
 AiPlayerbot.AutoTrainSpells = yes
 
 # Bots automatically learn classquest reward spells on levelup
+# Only for random bots
 # Default: 0 (disabled)
 AiPlayerbot.AutoLearnQuestSpells = 0
 
 # Bots automatically learn trainable spells on levelup
+# Only for random bots
 # Default: 1 (enabled)
 AiPlayerbot.AutoLearnTrainerSpells = 1
 
 # Bots automatically teleport to another place for leveling on levelup
+# Only for random bots
 # Default: 1 (enabled)
 AiPlayerbot.AutoTeleportForLevel = 1
 
 # Bot automatically picks talent points on levelup
+# Only for random bots
 # Default: 1 (enabled)
 AiPlayerbot.AutoPickTalents = 1
 
 # Bot automatically upgrade equipments on levelup
+# Only for random bots
 # Default: 1 (enabled)
 AiPlayerbot.AutoUpgradeEquip = 1
 
 # Random Bots will pick quests on their own and try to complete
+# Only for random bots
 # Default: 1 (enabled)
 AiPlayerbot.AutoDoQuests = 1
 
@@ -437,23 +444,11 @@ PlayerbotsDatabase.SynchThreads     = 1
 #                     0  - (Disabled)
 
 Playerbots.Updates.EnableDatabases = 1
-#
-
-##################################################################################
-#                                                                                #
-# Logging Stuff 																 #
-#                                                                                #
-##################################################################################
-
-Appender.Playerbots=2,5,0,Playerbots.log,w
-Logger.playerbots=5,Console Playerbots
 
 
 ##############################################
 # TalentSpec                                 #
 ##############################################
-
-# DefaultTalentsOrder: tab - row - col - lvl
 
 # Warrior
 AiPlayerbot.RandomClassSpecProbability.1.0 = 20
@@ -576,3 +571,11 @@ AiPlayerbot.RandomClassSpecProbability.10.2 = 33
 AiPlayerbot.DefaultTalentsOrderLowLevel.10.2 =
 AiPlayerbot.DefaultTalentsOrder.10.2 =
 
+##################################################################################
+#                                                                                #
+# Logging Stuff 																 #
+#                                                                                #
+##################################################################################
+
+Appender.Playerbots=2,5,0,Playerbots.log,w
+Logger.playerbots=5,Console Playerbots
