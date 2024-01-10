@@ -46,7 +46,7 @@ void WarrirorAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new NextAction("shockwave", ACTION_HIGH + 4),
         new NextAction("sweeping strikes", ACTION_HIGH + 3),
         new NextAction("bladestorm", ACTION_HIGH + 3),
-        new NextAction("whirlwind", ACTION_HIGH + 2),
+        // new NextAction("whirlwind", ACTION_HIGH + 2),
         new NextAction("demoralizing shout without life time check", ACTION_HIGH + 1), 
         new NextAction("cleave", ACTION_HIGH),
         nullptr)));
