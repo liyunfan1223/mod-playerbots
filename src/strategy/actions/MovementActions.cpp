@@ -1500,7 +1500,7 @@ bool MoveRandomAction::Execute(Event event)
         if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
             continue;
 
-        bool moved = MoveTo(bot->GetMapId(), x, y, z, false, false, true);
+        bool moved = MoveTo(bot->GetMapId(), x, y, z);
         if (moved)
             return true;
     }

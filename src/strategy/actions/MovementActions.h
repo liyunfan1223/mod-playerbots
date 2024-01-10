@@ -41,7 +41,7 @@ class MovementAction : public Action
         bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->followDistance);
         void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
     private:
-        float SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range = 20.0f, bool normal_only = false);
+        float SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range = 10.0f, bool normal_only = false);
 };
 
 class FleeAction : public MovementAction
