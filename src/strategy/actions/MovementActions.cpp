@@ -1290,50 +1290,49 @@ bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float d
     return MoveNear(mapId, x, y, z, distance);
 }
 
-float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range, bool normal_only)
+float MovementAction::SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range, bool normal_only, float step)
 {
     if (!generatePath) {
         return z;
     }
-    float min_length = MAX_PATH_LENGTH;
+    float min_length = 100000.0f;
     float current_z = INVALID_HEIGHT;
     float modified_z;
     float delta;
-    for (delta = 0.0f; delta <= range / 2; delta += 2) {
+    for (delta = 0.0f; delta <= range / 2; delta += step) {
         modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, modified_z);
-        
         if (gen.GetPathType() == PATHFIND_NORMAL && gen.getPathLength() < min_length) {
             min_length = gen.getPathLength();
             current_z = modified_z;
-            // if (abs(current_z - z) < 0.1f) {
-            //     return current_z;
-            // }
+            if (abs(current_z - z) < 0.5f) {
+                return current_z;
+            }
         }
     }
-    for (delta = -1.0f; delta >= -range / 2; delta -= 2) {
+    for (delta = -step; delta >= -range / 2; delta -= step) {
         modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, modified_z);
         if (gen.GetPathType() == PATHFIND_NORMAL && gen.getPathLength() < min_length) {
             min_length = gen.getPathLength();
             current_z = modified_z;
-            // if (abs(current_z - z) < 0.1f) {
-            //     return current_z;
-            // }
+            if (abs(current_z - z) < 0.5f) {
+                return current_z;
+            }
         }
     }
-    for (delta = range / 2 + 1.0f; delta <= range; delta += 2) {
+    for (delta = range / 2 + step; delta <= range; delta += 2) {
         modified_z = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, modified_z);
         if (gen.GetPathType() == PATHFIND_NORMAL && gen.getPathLength() < min_length) {
             min_length = gen.getPathLength();
             current_z = modified_z;
-            // if (abs(current_z - z) < 0.1f) {
-            //     return current_z;
-            // }
+            if (abs(current_z - z) < 0.5f) {
+                return current_z;
+            }
         }
     }
     if (current_z == INVALID_HEIGHT && normal_only) {
