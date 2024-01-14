@@ -175,7 +175,7 @@ bool PlayerbotAIConfig::Initialize()
             for (uint32 level = 0; level < MAX_LEVEL; ++level) {
                 std::ostringstream os;
                 os << "AiPlayerbot.PremadeSpecLink." << cls << "." << spec << "." << level;
-                premadeSpecLink[cls][spec][level] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
+                premadeSpecLink[cls][spec][level] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
                 parsedSpecLinkOrder[cls][spec][level] = ParseTempTalentsOrder(cls, premadeSpecLink[cls][spec][level]);
             }
         }
