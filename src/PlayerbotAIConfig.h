@@ -6,6 +6,7 @@
 #define _PLAYERBOT_PLAYERbotAICONFIG_H
 
 #include "Common.h"
+#include "DBCEnums.h"
 #include "SharedDefines.h"
 #include "Talentspec.h"
 
@@ -21,6 +22,8 @@ enum class BotCheatMask : uint32
     power   = 16,
     maxMask = 32
 };
+
+#define MAX_SPECNO 20
 
 class PlayerbotAIConfig
 {
@@ -88,12 +91,17 @@ class PlayerbotAIConfig
         std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
         uint32 randomBotMinLevel, randomBotMaxLevel;
         float randomChangeMultiplier;
-        uint32 specProbability[MAX_CLASSES][10];
-        // [(tab, row, col, level)]
-        std::vector<std::vector<uint32>> defaultTalentsOrder[MAX_CLASSES][3];
-        std::vector<std::vector<uint32>> defaultTalentsOrderLowLevel[MAX_CLASSES][3];
-        std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
-        ClassSpecs classSpecs[MAX_CLASSES];
+        
+        
+        // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
+        // ClassSpecs classSpecs[MAX_CLASSES];
+        
+        std::string premadeSpecName[MAX_CLASSES][MAX_SPECNO];
+        std::string premadeSpecLink[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+        std::vector<std::vector<uint32>> parsedSpecLinkOrder[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+        uint32 randomClassSpecProb[MAX_CLASSES][MAX_SPECNO];
+        uint32 randomClassSpecIndex[MAX_CLASSES][MAX_SPECNO];
+
         std::string commandPrefix, commandSeparator;
         std::string randomBotAccountPrefix;
         uint32 randomBotAccountCount;
@@ -192,8 +200,7 @@ class PlayerbotAIConfig
         void log(std::string const fileName, const char* str, ...);
 
         void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
-    private:
-        std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
+        static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

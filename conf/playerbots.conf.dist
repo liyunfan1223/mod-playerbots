@@ -445,131 +445,191 @@ PlayerbotsDatabase.SynchThreads     = 1
 
 Playerbots.Updates.EnableDatabases = 1
 
-
 ##############################################
-# TalentSpec                                 #
+# PremadeSpec                                #
 ##############################################
+# AiPlayerbot.PremadeSpecName.<class>.<specno> = <name>         #Name of the talent specialisation
+# AiPlayerbot.PremadeSpecLink.<class>.<specno>.<level> = <link> #Wowhead style link the bot should work towards at given level.
+# 0 <= specno < 20, 1 <= level <= 80
 
 # Warrior
-AiPlayerbot.RandomClassSpecProbability.1.0 = 20
-AiPlayerbot.DefaultTalentsOrderLowLevel.1.0 =
-AiPlayerbot.DefaultTalentsOrder.1.0 = 3022032123335100202012013031251-32505010002
-AiPlayerbot.RandomClassSpecProbability.1.1 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.1.1 =
-AiPlayerbot.DefaultTalentsOrder.1.1 = 30202300233-305053000500310153120511351
-AiPlayerbot.RandomClassSpecProbability.1.2 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.1.2 =
-AiPlayerbot.DefaultTalentsOrder.1.2 = 3500030023-301-053351225000210521030113321
+AiPlayerbot.PremadeSpecName.1.0 = arms pve
+AiPlayerbot.PremadeSpecLink.1.0.60 = 
+AiPlayerbot.PremadeSpecLink.1.0.80 = 3022032123335100202012013031251-32505010002
+# AiPlayerbot.PremadeSpecGlyph.1.0 = 0,0,0,0,0,0
+AiPlayerbot.PremadeSpecName.1.1 = fury pve
+AiPlayerbot.PremadeSpecLink.1.1.60 = 
+AiPlayerbot.PremadeSpecLink.1.1.80 = 30202300233-305053000500310153120511351
+AiPlayerbot.PremadeSpecName.1.2 = prot pve
+AiPlayerbot.PremadeSpecLink.1.2.60 = 
+AiPlayerbot.PremadeSpecLink.1.2.80 = 3500030023-301-053351225000210521030113321
 # Paladin
-AiPlayerbot.RandomClassSpecProbability.2.0 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.2.0 =
-AiPlayerbot.DefaultTalentsOrder.2.0 = 50350152220013053100515221-503201312
-AiPlayerbot.RandomClassSpecProbability.2.1 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.2.1 =
-AiPlayerbot.DefaultTalentsOrder.2.1 = -05005135203132311333312321-5023005
-AiPlayerbot.RandomClassSpecProbability.2.2 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.2.2 =
-AiPlayerbot.DefaultTalentsOrder.2.2 = 050501-05-05232051203331302133231331
-# Hunter
-AiPlayerbot.RandomClassSpecProbability.3.0 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.3.0 = 51200201505112243100511351
-AiPlayerbot.DefaultTalentsOrder.3.0 = 51200201505112253100531351-015305021
-AiPlayerbot.RandomClassSpecProbability.3.1 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.3.1 =
-AiPlayerbot.DefaultTalentsOrder.3.1 = 502-035305101230013233135031351-5000002
-AiPlayerbot.RandomClassSpecProbability.3.2 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.3.2 =
-AiPlayerbot.DefaultTalentsOrder.3.2 = -0053041-5000032500033330523134321331
-# Rogue
-AiPlayerbot.RandomClassSpecProbability.4.0 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.4.0 =
-AiPlayerbot.DefaultTalentsOrder.4.0 = 005323005350100520103331051-005005003-502 # 0-0-2-5, 0-1-3-3, 0-1-0-3, 0-2-2-5, 0-3-2-5, 0-3-1-3, 0-4-1-1, 0-5-2-2, 0-5-1-5, 0-6-1-1, 0-2-1-2, 0-7-2-3, 0-7-0-3, 0-8-1-1, 0-8-0-3, 0-9-1-5, 0-10-1-1, 1-0-2-5, 1-1-3-5, 1-2-2-5, 1-3-2-3, 2-0-0-2
-AiPlayerbot.RandomClassSpecProbability.4.1 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.4.1 =
-AiPlayerbot.DefaultTalentsOrder.4.1 = 30530000522-0252051000035015223100501251
-AiPlayerbot.RandomClassSpecProbability.4.2 = 20
-AiPlayerbot.DefaultTalentsOrderLowLevel.4.2 =
-AiPlayerbot.DefaultTalentsOrder.4.2 = 0053231-2-5120222030321121050135231251
-# Priest
-AiPlayerbot.RandomClassSpecProbability.5.0 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.5.0 =
-AiPlayerbot.DefaultTalentsOrder.5.0 = 0503203130300512331323231251-03530003
-AiPlayerbot.RandomClassSpecProbability.5.1 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.5.1 =
-AiPlayerbot.DefaultTalentsOrder.5.1 = 05032031-235050032302152530000331351
-AiPlayerbot.RandomClassSpecProbability.5.2 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.5.2 =
-AiPlayerbot.DefaultTalentsOrder.5.2 = 0503203--325023051223010323152301351
-# DeathKnight
-AiPlayerbot.RandomClassSpecProbability.6.0 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.6.0 =
-AiPlayerbot.DefaultTalentsOrder.6.0 = 0355021533003313201020131351-005-005032
-AiPlayerbot.RandomClassSpecProbability.6.1 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.6.1 =
-AiPlayerbot.DefaultTalentsOrder.6.1 = 03-32002350352203012300033101351-230200305
-AiPlayerbot.RandomClassSpecProbability.6.2 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.6.2 =
-AiPlayerbot.DefaultTalentsOrder.6.2 = 23050202--2302003350032152003150003133151
-# Shaman
-AiPlayerbot.RandomClassSpecProbability.7.0 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.7.0 =
-AiPlayerbot.DefaultTalentsOrder.7.0 = 3530001523213351322301351-005050031
-AiPlayerbot.RandomClassSpecProbability.7.1 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.7.1 =
-AiPlayerbot.DefaultTalentsOrder.7.1 = 053030052-30205033005021333031131131051
-AiPlayerbot.RandomClassSpecProbability.7.2 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.7.2 =
-AiPlayerbot.DefaultTalentsOrder.7.2 = -00505031-50005331335310501022331251
-# Mage
-AiPlayerbot.RandomClassSpecProbability.8.0 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.8.0 =
-AiPlayerbot.DefaultTalentsOrder.8.0 = 235005030100230150323102505321-03-203023001
-AiPlayerbot.RandomClassSpecProbability.8.1 = 30
-AiPlayerbot.DefaultTalentsOrderLowLevel.8.1 =
-AiPlayerbot.DefaultTalentsOrder.8.1 = 23000503310003-0055030012303330053120300351
-AiPlayerbot.RandomClassSpecProbability.8.2 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.8.2 =
-AiPlayerbot.DefaultTalentsOrder.8.2 = 23002322010203--3533103310203100232102231151
-# Warlock
-AiPlayerbot.RandomClassSpecProbability.9.0 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.9.0 =
-AiPlayerbot.DefaultTalentsOrder.9.0 = 2350020021123510253500331151--55000005
-AiPlayerbot.RandomClassSpecProbability.9.1 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.9.1 =
-AiPlayerbot.DefaultTalentsOrder.9.1 = -003203301135212530135211351-55000005 # 1-0-2-3, 1-0-3-2, 1-1-1-3, 1-1-2-3, 1-2-1-1, 1-2-2-1, 1-2-2-3, 1-3-1-5, 1-3-2-2, 1-4-0-1, 1-4-2-2
-AiPlayerbot.RandomClassSpecProbability.9.2 = 20
-AiPlayerbot.DefaultTalentsOrderLowLevel.9.2 =
-AiPlayerbot.DefaultTalentsOrder.9.2 = -03310030003-05203205210331051335230351
-# Druid
-AiPlayerbot.RandomClassSpecProbability.11.0 = 20
-AiPlayerbot.DefaultTalentsOrderLowLevel.11.0 =
-AiPlayerbot.DefaultTalentsOrder.11.0 = 5012203125331103213305301231--205003212
-AiPlayerbot.RandomClassSpecProbability.11.1 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.11.1 =
-AiPlayerbot.DefaultTalentsOrder.11.1 = -501232130322110353120303313511-20350001
-AiPlayerbot.RandomClassSpecProbability.11.2 = 40
-AiPlayerbot.DefaultTalentsOrderLowLevel.11.2 =
-AiPlayerbot.DefaultTalentsOrder.11.2 = 05320001--230033312031512531153313051
+AiPlayerbot.PremadeSpecName.2.0 = holy pve
+AiPlayerbot.PremadeSpecLink.2.0.60 = 
+AiPlayerbot.PremadeSpecLink.2.0.80 = 50350152220013053100515221-503201312
+AiPlayerbot.PremadeSpecName.2.1 = prot pve
+AiPlayerbot.PremadeSpecLink.2.1.60 = 
+AiPlayerbot.PremadeSpecLink.2.1.80 = -05005135203132311333312321-5023005
+AiPlayerbot.PremadeSpecName.2.2 = ret pve
+AiPlayerbot.PremadeSpecLink.2.2.60 = 
+AiPlayerbot.PremadeSpecLink.2.2.80 = 050501-05-05232051203331302133231331
 
-# no idea - TC was requesting these.. so..
-AiPlayerbot.RandomClassSpecProbability.0.0 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.0.0 =
-AiPlayerbot.DefaultTalentsOrder.0.0 =
-AiPlayerbot.RandomClassSpecProbability.0.1 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.0.1 =
-AiPlayerbot.DefaultTalentsOrder.0.1 =
-AiPlayerbot.RandomClassSpecProbability.0.2 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.0.2 =
-AiPlayerbot.DefaultTalentsOrder.0.2 =
-AiPlayerbot.RandomClassSpecProbability.10.0 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.10.0 =
-AiPlayerbot.DefaultTalentsOrder.10.0 =
-AiPlayerbot.RandomClassSpecProbability.10.1 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.10.1 =
-AiPlayerbot.DefaultTalentsOrder.10.1 =
-AiPlayerbot.RandomClassSpecProbability.10.2 = 33
-AiPlayerbot.DefaultTalentsOrderLowLevel.10.2 =
-AiPlayerbot.DefaultTalentsOrder.10.2 =
+# Hunter
+AiPlayerbot.PremadeSpecName.3.0 = bm pve
+AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112243100511351
+AiPlayerbot.PremadeSpecLink.3.0.80 = 51200201505112253100531351-015305021
+AiPlayerbot.PremadeSpecName.3.1 = mm pve
+AiPlayerbot.PremadeSpecLink.3.1.60 = 
+AiPlayerbot.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
+AiPlayerbot.PremadeSpecName.3.2 = surv pve
+AiPlayerbot.PremadeSpecLink.3.2.60 = 
+AiPlayerbot.PremadeSpecLink.3.2.80 = -0053041-5000032500033330523134321331
+# Rogue
+AiPlayerbot.PremadeSpecName.4.0 = ass pve
+AiPlayerbot.PremadeSpecLink.4.0.60 = 
+AiPlayerbot.PremadeSpecLink.4.0.80 = 005323005350100520103331051-005005003-502
+AiPlayerbot.PremadeSpecName.4.1 = combat pve
+AiPlayerbot.PremadeSpecLink.4.1.60 = 
+AiPlayerbot.PremadeSpecLink.4.1.80 = 30530000522-0252051000035015223100501251
+AiPlayerbot.PremadeSpecName.4.2 = subtlety pve
+AiPlayerbot.PremadeSpecLink.4.2.60 = 
+AiPlayerbot.PremadeSpecLink.4.2.80 = 0053231-2-5120222030321121050135231251
+# Priest
+AiPlayerbot.PremadeSpecName.5.0 = disc pve
+AiPlayerbot.PremadeSpecLink.5.0.60 = 
+AiPlayerbot.PremadeSpecLink.5.0.80 = 0503203130300512331323231251-03530003
+AiPlayerbot.PremadeSpecName.5.1 = holy pve
+AiPlayerbot.PremadeSpecLink.5.1.60 = 
+AiPlayerbot.PremadeSpecLink.5.1.80 = 05032031-235050032302152530000331351
+AiPlayerbot.PremadeSpecName.5.2 = shadow pve
+AiPlayerbot.PremadeSpecLink.5.2.60 = 
+AiPlayerbot.PremadeSpecLink.5.2.80 = 0053231-2-5120222030321121050135231251
+# DeathKnight
+AiPlayerbot.PremadeSpecName.6.0 = blood pve
+AiPlayerbot.PremadeSpecLink.6.0.60 = 
+AiPlayerbot.PremadeSpecLink.6.0.80 = 0355021533003313201020131351-005-005032
+AiPlayerbot.PremadeSpecName.6.1 = frost pve
+AiPlayerbot.PremadeSpecLink.6.1.60 = 
+AiPlayerbot.PremadeSpecLink.6.1.80 = 03-32002350352203012300033101351-230200305
+AiPlayerbot.PremadeSpecName.6.2 = unholy pve
+AiPlayerbot.PremadeSpecLink.6.2.60 = 
+AiPlayerbot.PremadeSpecLink.6.2.80 = 23050202--2302003350032152003150003133151
+# Shaman
+AiPlayerbot.PremadeSpecName.7.0 = ele pve
+AiPlayerbot.PremadeSpecLink.7.0.60 = 
+AiPlayerbot.PremadeSpecLink.7.0.80 = 3530001523213351322301351-005050031
+AiPlayerbot.PremadeSpecName.7.1 = enh pve
+AiPlayerbot.PremadeSpecLink.7.1.60 = 
+AiPlayerbot.PremadeSpecLink.7.1.80 = 053030052-30205033005021333031131131051
+AiPlayerbot.PremadeSpecName.7.2 = resto pve
+AiPlayerbot.PremadeSpecLink.7.2.60 = 
+AiPlayerbot.PremadeSpecLink.7.2.80 = -00505031-50005331335310501022331251
+# Mage
+AiPlayerbot.PremadeSpecName.8.0 = arcane pve
+AiPlayerbot.PremadeSpecLink.8.0.60 = 
+AiPlayerbot.PremadeSpecLink.8.0.80 = 235005030100230150323102505321-03-203023001
+AiPlayerbot.PremadeSpecName.8.1 = fire pve
+AiPlayerbot.PremadeSpecLink.8.1.60 = 
+AiPlayerbot.PremadeSpecLink.8.1.80 = 23000503310003-0055030012303330053120300351
+AiPlayerbot.PremadeSpecName.8.2 = frost pve
+AiPlayerbot.PremadeSpecLink.8.2.60 = 
+AiPlayerbot.PremadeSpecLink.8.2.80 = 23002322010203--3533103310203100232102231151
+# Warlock
+AiPlayerbot.PremadeSpecName.9.0 = affli pve
+AiPlayerbot.PremadeSpecLink.9.0.60 = 
+AiPlayerbot.PremadeSpecLink.9.0.80 = 2350020021123510253500331151--55000005
+AiPlayerbot.PremadeSpecName.9.1 = emo pve
+AiPlayerbot.PremadeSpecLink.9.1.60 = 
+AiPlayerbot.PremadeSpecLink.9.1.80 = -003203301135212530135211351-55000005
+AiPlayerbot.PremadeSpecName.9.2 = destro pve
+AiPlayerbot.PremadeSpecLink.9.2.60 = 
+AiPlayerbot.PremadeSpecLink.9.2.80 = -03310030003-05203205210331051335230351
+# Druid
+AiPlayerbot.PremadeSpecName.11.0 = balance pve
+AiPlayerbot.PremadeSpecLink.11.0.60 = 
+AiPlayerbot.PremadeSpecLink.11.0.80 = 5012203125331103213305301231--205003212
+AiPlayerbot.PremadeSpecName.11.1 = feral pve
+AiPlayerbot.PremadeSpecLink.11.1.60 = 
+AiPlayerbot.PremadeSpecLink.11.1.80 = -501232130322110353120303313511-20350001
+AiPlayerbot.PremadeSpecName.11.2 = resto pve
+AiPlayerbot.PremadeSpecLink.11.2.60 = 
+AiPlayerbot.PremadeSpecLink.11.2.80 = 05320001--230033312031512531153313051
+
+##############################################
+# Default TalentSpec for random bots         #
+##############################################
+# AiPlayerbot.RandomClassSpecProb.<class>.<specno>  # The probability to choose the spec
+# AiPlayerbot.RandomClassSpecIndex.<class>.<specno> # The spec index in PremadeSpec
+# Warrior
+AiPlayerbot.RandomClassSpecProb.1.0 = 20
+AiPlayerbot.RandomClassSpecIndex.1.0 = 0
+AiPlayerbot.RandomClassSpecProb.1.1 = 40
+AiPlayerbot.RandomClassSpecIndex.1.1 = 1
+AiPlayerbot.RandomClassSpecProb.1.2 = 40
+AiPlayerbot.RandomClassSpecIndex.1.2 = 2
+# Paladin
+AiPlayerbot.RandomClassSpecProb.2.0 = 30
+AiPlayerbot.RandomClassSpecIndex.2.0 = 0
+AiPlayerbot.RandomClassSpecProb.2.1 = 40
+AiPlayerbot.RandomClassSpecIndex.2.1 = 1
+AiPlayerbot.RandomClassSpecProb.2.2 = 30
+AiPlayerbot.RandomClassSpecIndex.2.2 = 2
+# Hunter
+AiPlayerbot.RandomClassSpecProb.3.0 = 33
+AiPlayerbot.RandomClassSpecIndex.3.0 = 0
+AiPlayerbot.RandomClassSpecProb.3.1 = 33
+AiPlayerbot.RandomClassSpecIndex.3.1 = 1
+AiPlayerbot.RandomClassSpecProb.3.2 = 33
+AiPlayerbot.RandomClassSpecIndex.3.2 = 2
+# Rogue
+AiPlayerbot.RandomClassSpecProb.4.0 = 45
+AiPlayerbot.RandomClassSpecIndex.4.0 = 0
+AiPlayerbot.RandomClassSpecProb.4.1 = 45
+AiPlayerbot.RandomClassSpecIndex.4.1 = 1
+AiPlayerbot.RandomClassSpecProb.4.2 = 10
+AiPlayerbot.RandomClassSpecIndex.4.2 = 2
+# Priest
+AiPlayerbot.RandomClassSpecProb.5.0 = 40
+AiPlayerbot.RandomClassSpecIndex.5.0 = 0
+AiPlayerbot.RandomClassSpecProb.5.1 = 35
+AiPlayerbot.RandomClassSpecIndex.5.1 = 1
+AiPlayerbot.RandomClassSpecProb.5.2 = 25
+AiPlayerbot.RandomClassSpecIndex.5.2 = 2
+# DeathKnight
+AiPlayerbot.RandomClassSpecProb.6.0 = 30
+AiPlayerbot.RandomClassSpecIndex.6.0 = 0
+AiPlayerbot.RandomClassSpecProb.6.1 = 40
+AiPlayerbot.RandomClassSpecIndex.6.1 = 1
+AiPlayerbot.RandomClassSpecProb.6.2 = 30
+AiPlayerbot.RandomClassSpecIndex.6.2 = 2
+# Shaman
+AiPlayerbot.RandomClassSpecProb.7.0 = 33
+AiPlayerbot.RandomClassSpecIndex.7.0 = 0
+AiPlayerbot.RandomClassSpecProb.7.1 = 33
+AiPlayerbot.RandomClassSpecIndex.7.1 = 1
+AiPlayerbot.RandomClassSpecProb.7.2 = 33
+AiPlayerbot.RandomClassSpecIndex.7.2 = 2
+# Mage
+AiPlayerbot.RandomClassSpecProb.8.0 = 30
+AiPlayerbot.RandomClassSpecIndex.8.0 = 0
+AiPlayerbot.RandomClassSpecProb.8.1 = 30
+AiPlayerbot.RandomClassSpecIndex.8.1 = 1
+AiPlayerbot.RandomClassSpecProb.8.2 = 40
+AiPlayerbot.RandomClassSpecIndex.8.2 = 2
+# Warlock
+AiPlayerbot.RandomClassSpecProb.9.0 = 40
+AiPlayerbot.RandomClassSpecIndex.9.0 = 0
+AiPlayerbot.RandomClassSpecProb.9.1 = 40
+AiPlayerbot.RandomClassSpecIndex.9.1 = 1
+AiPlayerbot.RandomClassSpecProb.9.2 = 20
+AiPlayerbot.RandomClassSpecIndex.9.2 = 2
+# Druid
+AiPlayerbot.RandomClassSpecProb.11.0 = 20
+AiPlayerbot.RandomClassSpecIndex.11.0 = 0
+AiPlayerbot.RandomClassSpecProb.11.1 = 40
+AiPlayerbot.RandomClassSpecIndex.11.1 = 1
+AiPlayerbot.RandomClassSpecProb.11.2 = 40
+AiPlayerbot.RandomClassSpecIndex.11.2 = 2
 
 ##################################################################################
 #                                                                                #

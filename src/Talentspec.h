@@ -18,6 +18,7 @@ struct TalentTabEntry;
 #define ADDED_POINTS 2
 #define REMOVED_POINTS -2
 
+// unused currently
 class TalentSpec
 {
     public:

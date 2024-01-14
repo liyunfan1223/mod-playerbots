@@ -16,15 +16,19 @@ class ChangeTalentsAction : public Action
         ChangeTalentsAction(PlayerbotAI* botAI, std::string const name = "talents") : Action(botAI, name) { }
 
         bool Execute(Event event);
-        bool AutoSelectTalents(std::ostringstream* out);
+        // bool AutoSelectTalents(std::ostringstream* out);
 
     private:
-        std::vector<TalentPath*> getPremadePaths(std::string const findName);
-        std::vector<TalentPath*> getPremadePaths(TalentSpec* oldSpec);
-        TalentPath* getPremadePath(uint32 id);
-        void listPremadePaths(std::vector<TalentPath*> paths, std::ostringstream* out);
-        TalentPath* PickPremadePath(std::vector<TalentPath*> paths, bool useProbability);
-        TalentSpec* GetBestPremadeSpec(uint32 spec);
+        // std::vector<TalentPath*> getPremadePaths(std::string const findName);
+        // std::vector<TalentPath*> getPremadePaths(TalentSpec* oldSpec);
+        // TalentPath* getPremadePath(uint32 id);
+        // void listPremadePaths(std::vector<TalentPath*> paths, std::ostringstream* out);
+        // TalentPath* PickPremadePath(std::vector<TalentPath*> paths, bool useProbability);
+        // TalentSpec* GetBestPremadeSpec(uint32 spec);
+        std::string TalentsHelp();
+        std::string SpecList();
+        std::string SpecPick(std::string param);
+        std::string SpecApply(std::string param);
 };
 
 class AutoSetTalentsAction : public ChangeTalentsAction

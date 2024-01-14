@@ -164,95 +164,32 @@ bool PlayerbotAIConfig::Initialize()
 
     for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
     {
-        for (uint32 spec = 0; spec < 3; ++spec)
+        if (cls == 10) {
+            continue;
+        }
+        for (uint32 spec = 0; spec < MAX_SPECNO; ++spec)
         {
             std::ostringstream os; 
-            os << "AiPlayerbot.RandomClassSpecProbability." << cls << "." << spec;
-            specProbability[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
-            os.str("");
-            os.clear();
-            os << "AiPlayerbot.DefaultTalentsOrder." << cls << "." << spec;
-            std::string temp_talents_order = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
-            defaultTalentsOrder[cls][spec] = ParseTempTalentsOrder(cls, temp_talents_order);
-            if (defaultTalentsOrder[cls][spec].size() > 0) {
-                sLog->outMessage("playerbot", LOG_LEVEL_INFO, "default talents order for cls %d spec %d loaded.", cls, spec);
+            os << "AiPlayerbot.PremadeSpecName." << cls << "." << spec;
+            premadeSpecName[cls][spec] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
+            for (uint32 level = 0; level < MAX_LEVEL; ++level) {
+                std::ostringstream os;
+                os << "AiPlayerbot.PremadeSpecLink." << cls << "." << spec << "." << level;
+                premadeSpecLink[cls][spec][level] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
+                parsedSpecLinkOrder[cls][spec][level] = ParseTempTalentsOrder(cls, premadeSpecLink[cls][spec][level]);
             }
         }
         for (uint32 spec = 0; spec < 3; ++spec)
         {
             std::ostringstream os; 
-            os << "AiPlayerbot.RandomClassSpecProbability." << cls << "." << spec;
-            specProbability[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
+            os << "AiPlayerbot.RandomClassSpecProb." << cls << "." << spec;
+            randomClassSpecProb[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
             os.str("");
             os.clear();
-            os << "AiPlayerbot.DefaultTalentsOrderLowLevel." << cls << "." << spec;
-            std::string temp_talents_order = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
-            defaultTalentsOrderLowLevel[cls][spec] = ParseTempTalentsOrder(cls, temp_talents_order);
-            if (defaultTalentsOrderLowLevel[cls][spec].size() > 0) {
-                sLog->outMessage("playerbot", LOG_LEVEL_INFO, "default low level talents order for cls %d spec %d loaded.", cls, spec);
-            }
+            os << "AiPlayerbot.RandomClassSpecIndex." << cls << "." << spec;
+            randomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), spec + 1);
         }
     }
-
-    // for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
-    // {
-    //     classSpecs[cls] = ClassSpecs(1 << (cls - 1));
-
-    //     for (uint32 spec = 0; spec < MAX_LEVEL; ++spec)
-    //     {
-    //         std::ostringstream os;
-    //         os << "AiPlayerbot.PremadeSpecName." << cls << "." << spec;
-
-    //         std::string const specName = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
-    //         if (!specName.empty())
-    //         {
-    //             std::ostringstream os;
-    //             os << "AiPlayerbot.PremadeSpecProb." << cls << "." << spec;
-    //             uint32 probability = sConfigMgr->GetOption<int32>(os.str().c_str(), 100, false);
-
-    //             TalentPath talentPath(spec, specName, probability);
-
-    //             for (uint32 level = 10; level <= 80; level++)
-    //             {
-    //                 std::ostringstream os;
-    //                 os << "AiPlayerbot.PremadeSpecLink." << cls << "." << spec << "." << level;
-
-    //                 std::string specLink = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
-    //                 specLink = specLink.substr(0, specLink.find("#", 0));;
-    //                 specLink = specLink.substr(0, specLink.find(" ", 0));;
-
-    //                 if (!specLink.empty())
-    //                 {
-    //                     std::ostringstream out;
-
-    //                     // Ignore bad specs.
-    //                     if (!classSpecs[cls].baseSpec.CheckTalentLink(specLink, &out))
-    //                     {
-    //                         LOG_ERROR("playerbots", "Error with premade spec link: {}", specLink.c_str());
-    //                         LOG_ERROR("playerbots", "{}", out.str().c_str());
-    //                         continue;
-    //                     }
-
-    //                     TalentSpec linkSpec(&classSpecs[cls].baseSpec, specLink);
-
-    //                     if (!linkSpec.CheckTalents(level, &out))
-    //                     {
-    //                         LOG_ERROR("playerbots", "Error with premade spec: {}", specLink.c_str());
-    //                         LOG_ERROR("playerbots", "{}", out.str().c_str());
-    //                         continue;
-    //                     }
-
-
-    //                     talentPath.talentSpec.push_back(linkSpec);
-    //                 }
-    //             }
-
-    //             // Only add paths that have atleast 1 spec.
-    //             if (talentPath.talentSpec.size() > 0)
-    //                 classSpecs[cls].talentPath.push_back(talentPath);
-    //         }
-    //     }
-    // }
 
     botCheats.clear();
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi"), botCheats);
@@ -561,7 +498,7 @@ static std::vector<std::string> split(const std::string &str, const std::string 
     std::vector<std::string> res;
     if(str == "")
         return res;
-    //在字符串末尾也加入分隔符，方便截取最后一段
+    // Also add separators to string connections to facilitate intercepting the last paragraph.
     std::string strs = str + pattern;
     size_t pos = strs.find(pattern);
 
@@ -569,7 +506,7 @@ static std::vector<std::string> split(const std::string &str, const std::string 
     {
         std::string temp = strs.substr(0, pos);
         res.push_back(temp);
-        //去掉已分割的字符串,在剩下的字符串中进行分割
+        // Remove the split string and split the remaining string
         strs = strs.substr(pos+1, strs.size());
         pos = strs.find(pattern);
     }
@@ -584,7 +521,6 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
     std::vector<std::string> tab_links = split(tab_link, "-");
     std::map<uint32, std::vector<TalentEntry const*>> spells;
     std::vector<std::vector<std::vector<uint32>>> orders(3);
-    // orders.assign(3);
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -623,37 +559,5 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
     for (auto &order : orders) {
         res.insert(res.end(), order.begin(), order.end());
     }
-    // for (std::vector<uint32> &p : sPlayerbotAIConfig->defaultTalentsOrder[bot->getClass()][specNo]) {
-    //     uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
-    //     uint32 talentID = -1;
-
-    //     std::vector<TalentEntry const*> &spells = spells_row[row];
-    //     assert(spells.size() > 0);
-    //     for (TalentEntry const* talentInfo : spells) {
-    //         if (talentInfo->Col != col) {
-    //             continue;
-    //         }
-    //         TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
-    //         if (talentTabInfo->tabpage != tab) {
-    //             continue;
-    //         }
-    //         talentID = talentInfo->TalentID;
-    //     }
-    //     assert(talentID != -1);
-    //     bot->LearnTalent(talentID, std::min(lvl, bot->GetFreeTalentPoints()) - 1);
-    //     if (bot->GetFreeTalentPoints() == 0) {
-    //         break;
-    //     }
-    // }
-    // // for (int tab = 0; tab < 3; tab++) {
-
-    // // }
-    // for (std::string piece : pieces) {
-    //     uint32 tab, row, col, lvl;
-    //     if (sscanf(piece.c_str(), "%u-%u-%u-%u", &tab, &row, &col, &lvl) == -1) {
-    //         break;
-    //     }
-    //     res.push_back({tab, row, col, lvl});
-    // }
     return res;
 }
