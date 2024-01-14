@@ -171,7 +171,7 @@ bool PlayerbotAIConfig::Initialize()
         {
             std::ostringstream os; 
             os << "AiPlayerbot.PremadeSpecName." << cls << "." << spec;
-            premadeSpecName[cls][spec] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "");
+            premadeSpecName[cls][spec] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
             for (uint32 level = 0; level < MAX_LEVEL; ++level) {
                 std::ostringstream os;
                 os << "AiPlayerbot.PremadeSpecLink." << cls << "." << spec << "." << level;
