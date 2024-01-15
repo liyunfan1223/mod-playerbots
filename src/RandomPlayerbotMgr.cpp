@@ -33,6 +33,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <boost/thread/thread.hpp>
+#include <random>
 
 void PrintStatsThread()
 {
@@ -368,7 +369,8 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 guids.push_back(guid);
             } while (result->NextRow());
 
-            std::random_shuffle(guids.begin(), guids.end());
+            std::mt19937 rnd(time(0));
+            std::shuffle(guids.begin(), guids.end(), rnd);
 
             for (uint32 &guid : guids) {
                 uint32 add_time = sPlayerbotAIConfig->enableRotation ? 
