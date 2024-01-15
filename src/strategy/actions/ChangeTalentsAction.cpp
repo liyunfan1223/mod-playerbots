@@ -81,7 +81,7 @@ std::string ChangeTalentsAction::SpecList()
         std::vector<std::vector<uint32>> parsed = sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][80];
         std::unordered_map<int, int> tabCount;
         tabCount[0] = tabCount[1] = tabCount[2] = 0;
-        for (auto item : parsed) {
+        for (auto &item : parsed) {
             tabCount[item[0]] += item[3];
         }
         out << specFound << ". " << sPlayerbotAIConfig->premadeSpecName[cls][specNo] << " (";

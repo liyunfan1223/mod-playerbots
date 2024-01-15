@@ -29,6 +29,7 @@
 #include "Unit.h"
 #include "World.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <iomanip>
 #include <boost/thread/thread.hpp>
@@ -347,7 +348,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
             if (!result)
                 continue;
-
+            std::vector<uint32> guids;
             do
             {
                 Field* fields = result->Fetch();
@@ -364,10 +365,15 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
                 if (std::find(currentBots.begin(), currentBots.end(), guid) != currentBots.end())
                     continue;
-                
+                guids.push_back(guid);
+            } while (result->NextRow());
+
+            std::random_shuffle(guids.begin(), guids.end());
+
+            for (uint32 &guid : guids) {
                 uint32 add_time = sPlayerbotAIConfig->enableRotation ? 
-                    urand(sPlayerbotAIConfig->minRandomBotInWorldTime, sPlayerbotAIConfig->maxRandomBotInWorldTime) :
-                    sPlayerbotAIConfig->randomBotInWorldWithRotaionDisabled;
+                urand(sPlayerbotAIConfig->minRandomBotInWorldTime, sPlayerbotAIConfig->maxRandomBotInWorldTime) :
+                sPlayerbotAIConfig->randomBotInWorldWithRotaionDisabled;
                     
                 SetEventValue(guid, "add", 1, add_time);
                 SetEventValue(guid, "logout", 0, 0);
@@ -376,8 +382,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 maxAllowedBotCount--;
                 if (!maxAllowedBotCount)
                     break;
-
-            } while (result->NextRow());
+            }
 
             if (!maxAllowedBotCount)
                 break;
