@@ -13,7 +13,7 @@ class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["charge"] = &charge;
             creators["sunder armor"] = &sunder_armor;
             creators["commanding shout"] = &commanding_shout;
-            creators["shield slam"] = &shield_slam;
+            // creators["shield slam"] = &shield_slam;
             creators["devastate"] = &devastate;
             creators["last stand"] = &last_stand;
             creators["heroic throw on snare target"] = &heroic_throw_on_snare_target;
@@ -27,7 +27,7 @@ class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         ACTION_NODE_A(charge, "charge", "reach melee");
         ACTION_NODE_A(sunder_armor, "sunder armor", "melee");
         ACTION_NODE_A(commanding_shout, "commanding shout", "battle shout");
-        ACTION_NODE_A(shield_slam, "shield slam", "heroic strike");
+        // ACTION_NODE_A(shield_slam, "shield slam", "heroic strike");
         ACTION_NODE_A(devastate, "devastate", "sunder armor");
         ACTION_NODE_A(last_stand, "last stand", "intimidating shout");
         ACTION_NODE_A(heroic_throw_on_snare_target, "heroic throw on snare target", "taunt on snare target");
@@ -36,7 +36,7 @@ class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         {
             return new ActionNode("taunt",
                 /*P*/ nullptr,
-                /*A*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("shield slam"), nullptr),
                 /*C*/ nullptr);
         }
 };
@@ -73,7 +73,7 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("shield block", NextAction::array(0, new NextAction("shield block", ACTION_INTERRUPT + 1), nullptr)));
     triggers.push_back(new TriggerNode("revenge", NextAction::array(0, new NextAction("revenge", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("disarm", NextAction::array(0, new NextAction("disarm", ACTION_HIGH + 1), nullptr)));
-    triggers.push_back(new TriggerNode("lose aggro", NextAction::array(0, new NextAction("heroic throw taunt", ACTION_INTERRUPT + 1), nullptr)));
+    triggers.push_back(new TriggerNode("lose aggro", NextAction::array(0, new NextAction("taunt", ACTION_INTERRUPT + 1), nullptr)));
     triggers.push_back(new TriggerNode("taunt on snare target", NextAction::array(0, new NextAction("heroic throw on snare target", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("shield wall", ACTION_MEDIUM_HEAL), nullptr)));
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("last stand", ACTION_EMERGENCY + 3), nullptr)));

@@ -460,8 +460,14 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
             break;
         case CLASS_PALADIN:
-            if (tab == 1)
-                nonCombatEngine->addStrategies("bthreat", "tank assist", "bstats", "barmor", nullptr);
+            if (tab == 1) {
+                nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", nullptr);
+                if (player->GetLevel() >= 20) {
+                    nonCombatEngine->addStrategy("bstats");
+                } else {
+                    nonCombatEngine->addStrategy("bdps");
+                }
+            }
             else if (tab == 0)
                 nonCombatEngine->addStrategies("dps assist", "bmana", "bcast", nullptr);
             else

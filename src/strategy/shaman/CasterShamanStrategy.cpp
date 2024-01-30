@@ -40,7 +40,6 @@ NextAction** CasterShamanStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
         new NextAction("lava burst", ACTION_DEFAULT + 0.2f),
-        new NextAction("thunderstorm", ACTION_DEFAULT + 0.1f),
         new NextAction("lightning bolt", ACTION_DEFAULT), 
         NULL);
 }
@@ -57,8 +56,10 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "no fire totem",
         NextAction::array(0, 
-            // new NextAction("fire elemental totem", 16.0f), 
             new NextAction("totem of wrath", 15.0f), NULL)));
+
+    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
 
     triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
 }

@@ -61,7 +61,7 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         {
             return new ActionNode ("crusader strike",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("melee"), nullptr),
+                /*A*/ nullptr,
                 /*C*/ nullptr);
         }
     ACTION_NODE_A(repentance, "repentance", "hammer of justice");
