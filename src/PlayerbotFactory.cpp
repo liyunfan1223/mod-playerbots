@@ -2616,8 +2616,7 @@ void PlayerbotFactory::InitFood()
                 j--;
                 continue;
             }
-            // bot->StoreNewItemInBestSlots(itemId, urand(1, proto->GetMaxStackSize()));
-            bot->StoreNewItemInBestSlots(itemId, proto->GetMaxStackSize());
+            StoreItem(itemId, proto->GetMaxStackSize());
         }
    }
 }
@@ -2662,21 +2661,17 @@ void PlayerbotFactory::InitReagents()
             break;
         case CLASS_PRIEST:
             if (level >= 48 && level < 60) {
-                items.push_back({17028, 40});
-                // bot->StoreNewItemInBestSlots(17028, 40); // Wild Berries
+                items.push_back({17028, 40}); // Wild Berries
             } else if (level >= 60 && level < 80) {
-                items.push_back({17029, 40});
-                // bot->StoreNewItemInBestSlots(17029, 40); // Wild Berries
+                items.push_back({17029, 40}); // Wild Berries
             } else if (level >= 80) {
-                items.push_back({44615, 40});
-                // bot->StoreNewItemInBestSlots(44615, 40); // Wild Berries
+                items.push_back({44615, 40}); // Wild Berries
             }
             break;
         case CLASS_MAGE:
-            items.push_back({17020, 40});
+            items.push_back({17020, 40}); // Arcane Powder
             items.push_back({17031, 40}); // portal
             items.push_back({17032, 40}); // portal
-            // bot->StoreNewItemInBestSlots(17020, 40); // Arcane Powder
             break;
         case CLASS_DRUID:
             if (level >= 20 && level < 30) {
@@ -2715,7 +2710,7 @@ void PlayerbotFactory::InitReagents()
             break;
     }
     for (std::pair item : items) {
-        bot->StoreNewItemInBestSlots(item.first, item.second);
+        StoreItem(item.first, item.second);
     }
 }
 

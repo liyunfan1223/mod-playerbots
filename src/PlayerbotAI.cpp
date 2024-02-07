@@ -2963,8 +2963,8 @@ bool PlayerbotAI::IsInVehicle(bool canControl, bool canCast, bool canAttack, boo
 void PlayerbotAI::WaitForSpellCast(Spell* spell)
 {
     SpellInfo const* spellInfo = spell->GetSpellInfo();
-
-    float castTime = spell->GetCastTime();
+    uint32 castTime = spellInfo->CalcCastTime(bot, spell);
+    // float castTime = spell->GetCastTime();
 	// if (spellInfo->IsChanneled())
     // {
     //     int32 duration = spellInfo->GetDuration();
@@ -2973,9 +2973,9 @@ void PlayerbotAI::WaitForSpellCast(Spell* spell)
     //         castTime += duration;
     // }
 
-    castTime = ceil(castTime);
+    // castTime = ceil(castTime);
 
-    uint32 globalCooldown = CalculateGlobalCooldown(spellInfo->Id);
+    // uint32 globalCooldown = CalculateGlobalCooldown(spellInfo->Id);
     // if (castTime < globalCooldown)
     //     castTime = globalCooldown;
 

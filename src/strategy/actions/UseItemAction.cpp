@@ -293,7 +293,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     if (!spellId)
         return false;
 
-    botAI->SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
+    // botAI->SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
     botAI->TellMasterNoFacing(out.str());
     bot->GetSession()->HandleUseItemOpcode(packet);
     return true;
