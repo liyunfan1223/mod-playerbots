@@ -225,7 +225,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["rpg mount anim"] = &ActionContext::rpg_mount_anim;
 
             creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
-
+            creators["pet attack"] = &ActionContext::pet_attack;
             
         }
 
@@ -390,7 +390,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* rpg_mount_anim(PlayerbotAI* botAI) { return new RpgMountAnimAction(botAI); }
 
         static Action* toggle_pet_spell(PlayerbotAI* ai) { return new TogglePetSpellAutoCastAction(ai); }
-
+        static Action* pet_attack(PlayerbotAI* ai) { return new PetAttackAction(ai); }
         
 };
 

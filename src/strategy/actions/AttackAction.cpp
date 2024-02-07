@@ -116,22 +116,22 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
         return false;
     }
     /* prevent pet dead immediately in group */
-    if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
-        with_pet = false;
-    }
-    if (Pet* pet = bot->GetPet())
-    {
-        if (with_pet) {
-            pet->SetReactState(REACT_DEFENSIVE);
-            pet->SetTarget(target->GetGUID());
-            pet->GetCharmInfo()->SetIsCommandAttack(true);
-            pet->AI()->AttackStart(target);
-        } else {
-            pet->SetReactState(REACT_PASSIVE);
-            pet->GetCharmInfo()->SetIsCommandFollow(true);
-            pet->GetCharmInfo()->IsReturning();
-        }
-    }
+    // if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
+    //     with_pet = false;
+    // }
+    // if (Pet* pet = bot->GetPet())
+    // {
+    //     if (with_pet) {
+    //         pet->SetReactState(REACT_DEFENSIVE);
+    //         pet->SetTarget(target->GetGUID());
+    //         pet->GetCharmInfo()->SetIsCommandAttack(true);
+    //         pet->AI()->AttackStart(target);
+    //     } else {
+    //         pet->SetReactState(REACT_PASSIVE);
+    //         pet->GetCharmInfo()->SetIsCommandFollow(true);
+    //         pet->GetCharmInfo()->IsReturning();
+    //     }
+    // }
     return true;
 }
 

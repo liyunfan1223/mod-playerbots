@@ -4,6 +4,7 @@
 
 #include "GenericTriggers.h"
 #include "BattlegroundWS.h"
+#include "CreatureAI.h"
 #include "ObjectGuid.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
@@ -32,6 +33,25 @@ bool NoPetTrigger::IsActive()
 
 bool HasPetTrigger::IsActive() {
     return (AI_VALUE(Unit*, "pet target")) && !AI_VALUE2(bool, "mounted", "self target");;
+}
+
+bool PetAttackTrigger::IsActive() 
+{
+    Guardian* pet = bot->GetGuardianPet();
+    if (!pet) {
+        return false;
+    }
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target) {
+        return false;
+    }
+    if (pet->GetVictim() == target && pet->GetCharmInfo()->IsCommandAttack()) {
+        return false;
+    }
+    if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
+        return false;
+    }
+    return true;
 }
 
 bool HighManaTrigger::IsActive()

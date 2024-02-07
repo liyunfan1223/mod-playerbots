@@ -31,12 +31,12 @@ class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         ACTION_NODE_A(devastate, "devastate", "sunder armor");
         ACTION_NODE_A(last_stand, "last stand", "intimidating shout");
         ACTION_NODE_A(heroic_throw_on_snare_target, "heroic throw on snare target", "taunt on snare target");
-        ACTION_NODE_A(heroic_throw_taunt, "heroic throw", "taunt");
+        ACTION_NODE_A(heroic_throw_taunt, "heroic throw", "shield slam");
         static ActionNode* taunt(PlayerbotAI* botAI)
         {
             return new ActionNode("taunt",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("shield slam"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("heroic throw taunt"), nullptr),
                 /*C*/ nullptr);
         }
 };

@@ -3,6 +3,7 @@
  */
 
 #include "GenericActions.h"
+#include "CreatureAI.h"
 #include "Playerbots.h"
 
 bool MeleeAction::isUseful()
@@ -39,4 +40,29 @@ bool TogglePetSpellAutoCastAction::Execute(Event event) {
         }
     }
     return true; 
+}
+
+bool PetAttackAction::Execute(Event event)
+{
+    Guardian* pet = bot->GetGuardianPet();
+    if (!pet) {
+        return false;
+    }
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target) {
+        return false;
+    }
+    // pet->SetReactState(REACT_DEFENSIVE);
+    pet->ClearUnitState(UNIT_STATE_FOLLOW);
+    pet->AttackStop();
+    pet->SetTarget(target->GetGUID());
+
+    pet->GetCharmInfo()->SetIsCommandAttack(true);
+    pet->GetCharmInfo()->SetIsAtStay(false);
+    pet->GetCharmInfo()->SetIsFollowing(false);
+    pet->GetCharmInfo()->SetIsCommandFollow(false);
+    pet->GetCharmInfo()->SetIsReturning(false);
+
+    pet->ToCreature()->AI()->AttackStart(target);
+    return true;
 }

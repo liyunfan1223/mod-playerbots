@@ -1,4 +1,5 @@
 #include "RaidNaxxMultipliers.h"
+#include "GenericActions.h"
 #include "MovementActions.h"
 #include "ScriptedCreature.h"
 #include "RaidNaxxActions.h"
@@ -173,7 +174,8 @@ float KelthuzadGenericMultiplier::GetValue(Action* action)
 			dynamic_cast<CastRaiseDeadAction*>(action) ||
 			dynamic_cast<CastFeignDeathAction*>(action) || 
 			dynamic_cast<CastInvisibilityAction*>(action) ||
-			dynamic_cast<CastVanishAction*>(action)) {
+			dynamic_cast<CastVanishAction*>(action) ||
+			dynamic_cast<PetAttackAction*>(action)) {
 			return 0.0f;
 		}
 	}
@@ -266,6 +268,12 @@ float GluthGenericMultiplier::GetValue(Action* action)
 				dynamic_cast<CastGrowlAction*>(action)) {
 				return 0.0f;
 			}
+		}
+	}
+	if (dynamic_cast<PetAttackAction*>(action)) {
+		Unit* target = AI_VALUE(Unit*, "current target");
+		if (target && target->GetEntry() == NPC_ZOMBIE_CHOW) {
+			return 0.0f;
 		}
 	}
 	return 1.0f;
