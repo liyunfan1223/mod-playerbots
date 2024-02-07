@@ -84,6 +84,11 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
         return true;
     }
 
+    if (bot->isMoving()) 
+    {
+        bot->StopMoving();
+    }
+
     if (creature)
     {
         SkillType skill = creature->GetCreatureTemplate()->GetRequiredLootSkill();
@@ -119,7 +124,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;
-
+    
     return botAI->CastSpell(spellId, bot);
 }
 
