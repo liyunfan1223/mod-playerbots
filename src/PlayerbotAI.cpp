@@ -38,6 +38,7 @@
 #include "GuildMgr.h"
 #include "SayAction.h"
 #include <cmath>
+#include <sstream>
 #include <string>
 
 std::vector<std::string> PlayerbotAI::dispel_whitelist = {
@@ -2441,10 +2442,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     if (failWithDelay)
     {
         SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
-        // if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster())) {
-        //     LOG_DEBUG("playerbots", "Spell cast fail with delay - target name: {}, spellid: {}, bot name: {}", 
-        //         target->GetName(), spellId, bot->GetName());
-        // }
         return false;
     }
 
@@ -2963,7 +2960,7 @@ bool PlayerbotAI::IsInVehicle(bool canControl, bool canCast, bool canAttack, boo
 void PlayerbotAI::WaitForSpellCast(Spell* spell)
 {
     SpellInfo const* spellInfo = spell->GetSpellInfo();
-    uint32 castTime = spellInfo->CalcCastTime(bot, spell);
+    uint32 castTime = spell->GetCastTime();
     // float castTime = spell->GetCastTime();
 	// if (spellInfo->IsChanneled())
     // {

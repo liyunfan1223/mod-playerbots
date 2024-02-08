@@ -230,10 +230,8 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
                 targetSelected = true;
                 out << " on "<< chat->FormatItem(itemForSpell->GetTemplate());
             }
-
-            Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
-            botAI->WaitForSpellCast(spell);
-            delete spell;
+            uint32 castTime = spellInfo->CalcCastTime();
+            botAI->SetNextCheckDelay(castTime + sPlayerbotAIConfig->reactDelay);
         }
 
         break;
