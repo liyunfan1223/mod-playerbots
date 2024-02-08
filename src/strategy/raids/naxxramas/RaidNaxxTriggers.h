@@ -146,7 +146,7 @@ public:
 class HorsemanAttractorsTrigger : public Trigger
 {
     public:
-        HorsemanAttractorsTrigger(PlayerbotAI* ai) : Trigger(ai, "fourhorsemen"), helper(ai) {}
+        HorsemanAttractorsTrigger(PlayerbotAI* ai) : Trigger(ai, "fourhorsemen attractors"), helper(ai) {}
         bool IsActive() override;
     private:
         FourhorsemanBossHelper helper;
@@ -155,7 +155,7 @@ class HorsemanAttractorsTrigger : public Trigger
 class HorsemanExceptAttractorsTrigger : public Trigger
 {
     public:
-        HorsemanExceptAttractorsTrigger(PlayerbotAI* ai) : Trigger(ai, "fourhorsemen"), helper(ai) {}
+        HorsemanExceptAttractorsTrigger(PlayerbotAI* ai) : Trigger(ai, "fourhorsemen except attractors"), helper(ai) {}
         bool IsActive() override;
     private:
         FourhorsemanBossHelper helper;

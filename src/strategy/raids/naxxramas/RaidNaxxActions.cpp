@@ -419,6 +419,9 @@ bool HorsemanAttractAlternativelyAction::Execute(Event event)
 
 bool HorsemanAttactInOrderAction::Execute(Event event)
 {
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
     Unit* target = nullptr;
     Unit* thane = AI_VALUE2(Unit*, "find target", "thane korth'azz");
     Unit* baron = AI_VALUE2(Unit*, "find target", "baron rivendare");
@@ -431,7 +434,7 @@ bool HorsemanAttactInOrderAction::Execute(Event event)
         attack_order = {thane, baron, lady, sir};
     }
     for (Unit* t : attack_order) {
-        if (t) {
+        if (t && t->IsAlive()) {
             target = t;
             break;
         }

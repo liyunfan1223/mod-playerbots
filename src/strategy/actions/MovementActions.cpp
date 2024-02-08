@@ -170,7 +170,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         if (modifiedZ == INVALID_HEIGHT) {
             return false;
         }
-        // mm.Clear();
+        mm.Clear();
         mm.MovePoint(mapId, x, y, modifiedZ, generatePath);
         AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
         return true;

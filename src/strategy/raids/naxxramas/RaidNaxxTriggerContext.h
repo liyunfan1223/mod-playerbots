@@ -58,6 +58,7 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
         
         static Trigger* horseman_attractors(PlayerbotAI* ai) { return new HorsemanAttractorsTrigger(ai); }
         static Trigger* horseman_except_attractors(PlayerbotAI* ai) { return new HorsemanExceptAttractorsTrigger(ai); }
+        
         static Trigger* sapphiron_ground(PlayerbotAI* ai) { return new SapphironGroundTrigger(ai); }
         static Trigger* sapphiron_flight(PlayerbotAI* ai) { return new SapphironFlightTrigger(ai); }
         static Trigger* kelthuzad(PlayerbotAI* ai) { return new KelthuzadTrigger(ai); }
