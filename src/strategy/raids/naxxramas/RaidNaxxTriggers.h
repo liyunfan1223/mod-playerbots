@@ -215,11 +215,14 @@ class GluthMainTankMortalWoundTrigger : public Trigger
         GluthBossHelper helper;
 };
 
-// class LoathebTrigger : public BossPhaseTrigger
-// {
-// public:
-//     LoathebTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "loatheb", 0, "loatheb trigger") {}
-// };
+class LoathebTrigger : public Trigger
+{
+    public:
+        LoathebTrigger(PlayerbotAI* ai) : Trigger(ai, "loatheb"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        LoathebBossHelper helper;
+};
     
 
 // template BossEventTrigger<class boss_grobbulus::boss_grobbulusAI>;

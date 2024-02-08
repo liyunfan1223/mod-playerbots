@@ -20,39 +20,39 @@ const uint32 NAXX_MAP_ID = 533;
 template<class BossAiType>
 class GenericBossHelper : public AiObject {
     public:
-        GenericBossHelper(PlayerbotAI* botAI, std::string name): AiObject(botAI), name_(name) {}
+        GenericBossHelper(PlayerbotAI* botAI, std::string name): AiObject(botAI), _name(name) {}
         virtual bool UpdateBossAI() {
-            if(unit_ && (!unit_->IsInWorld() || !unit_->IsAlive())) {
-                unit_ = nullptr;
+            if(_unit && (!_unit->IsInWorld() || !_unit->IsAlive())) {
+                _unit = nullptr;
             }
-            if (!unit_) {
-                unit_ = AI_VALUE2(Unit*, "find target", name_);
-                if (!unit_) {
+            if (!_unit) {
+                _unit = AI_VALUE2(Unit*, "find target", _name);
+                if (!_unit) {
                     return false;
                 }
-                target_ = unit_->ToCreature();
-                if (!target_) {
+                _target = _unit->ToCreature();
+                if (!_target) {
                     return false;
                 }
-                ai_ = dynamic_cast<BossAiType *>(target_->GetAI());
-                if (!ai_) {
+                _ai = dynamic_cast<BossAiType *>(_target->GetAI());
+                if (!_ai) {
                     return false;
                 }
-                event_map_ = &ai_->events;
-                if (!event_map_) {
+                _event_map = &_ai->events;
+                if (!_event_map) {
                     return false;
                 }
             }
-            timer_ = event_map_->GetTimer();
+            _timer = _event_map->GetTimer();
             return true;
         }
     protected:
-        Unit* unit_ = nullptr;
-        Creature* target_ = nullptr;
-        std::string name_ = nullptr;
-        BossAiType *ai_ = nullptr;
-        EventMap* event_map_ = nullptr;
-        uint32 timer_ = 0;
+        Unit* _unit = nullptr;
+        Creature* _target = nullptr;
+        std::string _name = nullptr;
+        BossAiType *_ai = nullptr;
+        EventMap* _event_map = nullptr;
+        uint32 _timer = 0;
 };
 
 class KelthuzadBossHelper: public GenericBossHelper<boss_kelthuzad::boss_kelthuzadAI> {
@@ -62,7 +62,7 @@ class KelthuzadBossHelper: public GenericBossHelper<boss_kelthuzad::boss_kelthuz
         const std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
         const std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
         bool IsPhaseOne() {
-            return event_map_->GetNextEventTime(KELTHUZAD_EVENT_PHASE_2) != 0;
+            return _event_map->GetNextEventTime(KELTHUZAD_EVENT_PHASE_2) != 0;
         }
         bool IsPhaseTwo() {
             return !IsPhaseOne();
@@ -98,22 +98,22 @@ class SapphironBossHelper: public GenericBossHelper<boss_sapphiron::boss_sapphir
             if (!GenericBossHelper::UpdateBossAI()) {
                 return false;
             }
-            uint32 nextEventGround = event_map_->GetNextEventTime(EVENT_GROUND);
+            uint32 nextEventGround = _event_map->GetNextEventTime(EVENT_GROUND);
             if (nextEventGround && nextEventGround != lastEventGround)
                 lastEventGround = nextEventGround;
             return true;
         }
         bool IsPhaseGround() {
-            return target_->GetReactState() == REACT_AGGRESSIVE;
+            return _target->GetReactState() == REACT_AGGRESSIVE;
         }
         bool IsPhaseFlight() {
             return !IsPhaseGround();
         }
         bool JustLanded() {
-            return (event_map_->GetNextEventTime(EVENT_FLIGHT_START) - timer_) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
+            return (_event_map->GetNextEventTime(EVENT_FLIGHT_START) - _timer) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
         }
         bool WaitForExplosion() {
-            return event_map_->GetNextEventTime(EVENT_FLIGHT_SPELL_EXPLOSION);
+            return _event_map->GetNextEventTime(EVENT_FLIGHT_SPELL_EXPLOSION);
         }
         bool FindPosToAvoidChill(std::vector<float> &dest) {
             Aura* aura = botAI->GetAura("chill", bot);
@@ -172,12 +172,19 @@ class GluthBossHelper: public GenericBossHelper<boss_gluth::boss_gluthAI> {
         const float decimatedZombiePct = 10.0f;
         GluthBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "gluth") {}
         bool BeforeDecimate() {
-            uint32 decimate = event_map_->GetNextEventTime(GLUTH_EVENT_DECIMATE);
-            return decimate && decimate - timer_ <= 3000;
+            uint32 decimate = _event_map->GetNextEventTime(GLUTH_EVENT_DECIMATE);
+            return decimate && decimate - _timer <= 3000;
         }
         bool JustStartCombat() {
-            return timer_ < 10000;
+            return _timer < 10000;
         }
+};
+
+class LoathebBossHelper: public GenericBossHelper<boss_loatheb::boss_loathebAI> {
+    public:
+        const std::pair<float, float> mainTankPos = {2877.57f, -3967.00f};
+        const std::pair<float, float> rangePos = {2896.96f, -3980.61f};
+        LoathebBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "loatheb") {}
 };
 
 #endif

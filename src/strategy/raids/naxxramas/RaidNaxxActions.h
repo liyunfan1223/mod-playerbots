@@ -256,19 +256,23 @@ class GluthSlowdownAction : public Action
         GluthBossHelper helper;
 };
 
-// class LoathebPositionAction : public MovementAction
-// {
-// public:
-//     LoathebPositionAction(PlayerbotAI* ai) : MovementAction(ai, "loatheb position") {}
-//     virtual bool Execute(Event event);
-// };
+class LoathebPositionAction : public MovementAction
+{
+    public:
+        LoathebPositionAction(PlayerbotAI* ai) : MovementAction(ai, "loatheb position"), helper(ai) {}
+        virtual bool Execute(Event event);
+    private:
+        LoathebBossHelper helper;
+};
 
-// class LoathebChooseTargetAction : public AttackAction
-// {
-// public:
-//     LoathebChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "loatheb choose target") {}
-//     virtual bool Execute(Event event);
-// };
+class LoathebChooseTargetAction : public AttackAction
+{
+    public:
+        LoathebChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "loatheb choose target"), helper(ai) {}
+        virtual bool Execute(Event event);
+    private:
+        LoathebBossHelper helper;
+};
     
 
 #endif

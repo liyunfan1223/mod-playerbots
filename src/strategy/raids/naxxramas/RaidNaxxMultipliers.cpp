@@ -56,31 +56,29 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 	return 0.0f;
 }
 
-// float LoathebGenericMultiplier::GetValue(Action* action)
-// {
-// 	Unit* boss = AI_VALUE2(Unit*, "find target", "loatheb");
-//     if (!boss) {
-// 		// bot->Yell("Can\'t find Loatheb...", LANG_UNIVERSAL);
-//         return 1.0f;
-//     }
-// 	context->GetValue<bool>("neglect threat")->Set(true);
-// 	if (botAI->GetCurrentState() == BOT_STATE_COMBAT && 
-// 		(dynamic_cast<DpsAssistAction*>(action) || 
-// 		 dynamic_cast<TankAssistAction*>(action) ||
-// 		 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
-// 		 dynamic_cast<FleeAction*>(action))) {
-// 		return 0.0f;
-// 	}
-// 	if (!dynamic_cast<CastHealingSpellAction*>(action)) {
-// 		return 1.0f;
-// 	}
-// 	// bot->Yell("It\'s a healing spell!", LANG_UNIVERSAL);
-// 	Aura* aura = botAI->GetAura("necrotic aura", bot);
-// 	if (!aura || aura->GetDuration() <= 1500) {
-// 		return 1.0f;
-// 	}
-// 	return 0.0f;
-// }
+float LoathebGenericMultiplier::GetValue(Action* action)
+{
+	Unit* boss = AI_VALUE2(Unit*, "find target", "loatheb");
+    if (!boss) {
+        return 1.0f;
+    }
+	context->GetValue<bool>("neglect threat")->Set(true);
+	if (botAI->GetState() == BOT_STATE_COMBAT && 
+		(dynamic_cast<DpsAssistAction*>(action) || 
+		 dynamic_cast<TankAssistAction*>(action) ||
+		 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
+		 dynamic_cast<FleeAction*>(action))) {
+		return 0.0f;
+	}
+	if (!dynamic_cast<CastHealingSpellAction*>(action)) {
+		return 1.0f;
+	}
+	Aura* aura = botAI->GetAura("necrotic aura", bot);
+	if (!aura || aura->GetDuration() <= 1500) {
+		return 1.0f;
+	}
+	return 0.0f;
+}
 
 // float ThaddiusGenericMultiplier::GetValue(Action* action)
 // {

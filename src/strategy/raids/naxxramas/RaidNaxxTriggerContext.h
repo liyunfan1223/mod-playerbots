@@ -35,14 +35,13 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
             creators["sapphiron flight"] = &RaidNaxxTriggerContext::sapphiron_flight;
             
             creators["kel'thuzad"] = &RaidNaxxTriggerContext::kelthuzad;
-            // creators["kel'thuzad phase two"] = &RaidNaxxTriggerContext::kelthuzad_phase_two;
 
             creators["anub'rekhan"] = &RaidNaxxTriggerContext::anubrekhan;
 
             creators["gluth"] = &RaidNaxxTriggerContext::gluth;
             creators["gluth main tank mortal wound"] = &RaidNaxxTriggerContext::gluth_main_tank_mortal_wound;
             
-            // creators["loatheb"] = &RaidNaxxTriggerContext::loatheb;
+            creators["loatheb"] = &RaidNaxxTriggerContext::loatheb;
         }
     private:
         static Trigger* mutating_injection(PlayerbotAI* ai) { return new MutatingInjectionTrigger(ai); }
@@ -61,14 +60,11 @@ class RaidNaxxTriggerContext : public NamedObjectContext<Trigger>
         // static Trigger* horseman_except_attractors(PlayerbotAI* ai) { return new HorsemanExceptAttractorsTrigger(ai); }
         static Trigger* sapphiron_ground(PlayerbotAI* ai) { return new SapphironGroundTrigger(ai); }
         static Trigger* sapphiron_flight(PlayerbotAI* ai) { return new SapphironFlightTrigger(ai); }
-        // static Trigger* sapphiron_ground_except_main_tank(PlayerbotAI* ai) { return new SapphironGroundExceptMainTankTrigger(ai); }
-        // static Trigger* sapphiron_ground_chill(PlayerbotAI* ai) { return new SapphironGroundChillTrigger(ai); }        
         static Trigger* kelthuzad(PlayerbotAI* ai) { return new KelthuzadTrigger(ai); }
-        // static Trigger* kelthuzad_phase_two(PlayerbotAI* ai) { return new KelthuzadPhaseTwoTrigger(ai); }
         static Trigger* anubrekhan(PlayerbotAI* ai) { return new AnubrekhanTrigger(ai); }
         static Trigger* gluth(PlayerbotAI* ai) { return new GluthTrigger(ai); }
         static Trigger* gluth_main_tank_mortal_wound(PlayerbotAI* ai) { return new GluthMainTankMortalWoundTrigger(ai); }
-        // static Trigger* loatheb(PlayerbotAI* ai) { return new LoathebTrigger(ai); }
+        static Trigger* loatheb(PlayerbotAI* ai) { return new LoathebTrigger(ai); }
 };
 
 #endif

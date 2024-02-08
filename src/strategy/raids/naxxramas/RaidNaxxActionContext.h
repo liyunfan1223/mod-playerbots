@@ -31,10 +31,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
             // creators["horseman attract alternatively"] = &RaidNaxxActionContext::horseman_attract_alternatively;
             // creators["horseman attack in order"] = &RaidNaxxActionContext::horseman_attack_in_order;
             
-            // creators["sapphiron ground main tank position"] = &RaidNaxxActionContext::sapphiron_ground_main_tank_position;
             creators["sapphiron ground position"] = &RaidNaxxActionContext::sapphiron_ground_position;
             creators["sapphiron flight position"] = &RaidNaxxActionContext::sapphiron_flight_position;
-            // creators["sapphiron avoid chill"] = &RaidNaxxActionContext::sapphiron_avoid_chill;
 
             creators["kel'thuzad choose target"] = &RaidNaxxActionContext::kelthuzad_choose_target;
             creators["kel'thuzad position"] = &RaidNaxxActionContext::kelthuzad_position;
@@ -46,8 +44,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
             creators["gluth position"] = &RaidNaxxActionContext::gluth_position;
             creators["gluth slowdown"] = &RaidNaxxActionContext::gluth_slowdown;
 
-            // creators["loatheb position"] = &RaidNaxxActionContext::loatheb_position;
-            // creators["loatheb choose target"] = &RaidNaxxActionContext::loatheb_choose_target;
+            creators["loatheb position"] = &RaidNaxxActionContext::loatheb_position;
+            creators["loatheb choose target"] = &RaidNaxxActionContext::loatheb_choose_target;
         }
     private:
         static Action* go_behind_the_boss(PlayerbotAI* ai) { return new GrobbulusGoBehindAction(ai); }
@@ -75,8 +73,8 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
         static Action* gluth_choose_target(PlayerbotAI* ai) { return new GluthChooseTargetAction(ai); }
         static Action* gluth_position(PlayerbotAI* ai) { return new GluthPositionAction(ai); }
         static Action* gluth_slowdown(PlayerbotAI* ai) { return new GluthSlowdownAction(ai); }
-        // static Action* loatheb_position(PlayerbotAI* ai) { return new LoathebPositionAction(ai); }
-        // static Action* loatheb_choose_target(PlayerbotAI* ai) { return new LoathebChooseTargetAction(ai); }
+        static Action* loatheb_position(PlayerbotAI* ai) { return new LoathebPositionAction(ai); }
+        static Action* loatheb_choose_target(PlayerbotAI* ai) { return new LoathebChooseTargetAction(ai); }
 };
 
 #endif

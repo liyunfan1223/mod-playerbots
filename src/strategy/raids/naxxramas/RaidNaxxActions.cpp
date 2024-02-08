@@ -991,56 +991,52 @@ bool GluthSlowdownAction::Execute(Event event)
     return false;
 }
 
-// bool LoathebPositionAction::Execute(Event event)
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "loatheb");
-//     if (!boss) {
-//         return false;
-//     }
-//     if (botAI->IsTank(bot)) {
-//         if (AI_VALUE2(bool, "has aggro", "boss target")) {
-//             return MoveTo(533, 2877.57, -3967.00, bot->GetPositionZ());
-//         }
-//     } else if (botAI->IsRanged(bot)) {
-//         return MoveInside(533, 2896.96f, -3980.61f, bot->GetPositionZ(), 1.0f);
-//     }
-//     return false;
-// }
+bool LoathebPositionAction::Execute(Event event)
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    if (botAI->IsTank(bot)) {
+        if (AI_VALUE2(bool, "has aggro", "boss target")) {
+            return MoveTo(533, helper.mainTankPos.first, helper.mainTankPos.second, bot->GetPositionZ());
+        }
+    } else if (botAI->IsRanged(bot)) {
+        return MoveInside(533, helper.rangePos.first, helper.rangePos.second, bot->GetPositionZ(), 1.0f);
+    }
+    return false;
+}
 
-// bool LoathebChooseTargetAction::Execute(Event event)
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "loatheb");
-//     if (!boss) {
-//         return false;
-//     }
-//     BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     list<ObjectGuid> attackers = context->GetValue<list<ObjectGuid> >("attackers")->Get();
-//     Unit* target = nullptr;
-//     Unit *target_boss = nullptr;
-//     Unit *target_spore = nullptr;
-//     for (list<ObjectGuid>::iterator i = attackers.begin(); i != attackers.end(); ++i)
-//     {
-//         Unit* unit = botAI->GetUnit(*i);
-//         if (!unit)
-//             continue;
-//         if (!unit->IsAlive()) {
-//             continue;
-//         }
-//         if (botAI->EqualLowercaseName(unit->GetName(), "spore")) {
-//             target_spore = unit;
-//         }
-//         if (botAI->EqualLowercaseName(unit->GetName(), "loatheb")) {
-//             target_boss = unit;
-//         }
-//     }
-//     if (target_spore && bot->GetDistance2d(target_spore) <= 1.0f) {
-//         target = target_spore;
-//     } else {
-//         target = target_boss;
-//     }
-//     if (!target || context->GetValue<Unit*>("current target")->Get() == target) {
-//         return false;
-//     }
-//     return Attack(target);
-// }
+bool LoathebChooseTargetAction::Execute(Event event)
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
+    Unit* target = nullptr;
+    Unit *target_boss = nullptr;
+    Unit *target_spore = nullptr;
+    for (auto i = attackers.begin(); i != attackers.end(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(*i);
+        if (!unit)
+            continue;
+        if (!unit->IsAlive()) {
+            continue;
+        }
+        if (botAI->EqualLowercaseName(unit->GetName(), "spore")) {
+            target_spore = unit;
+        }
+        if (botAI->EqualLowercaseName(unit->GetName(), "loatheb")) {
+            target_boss = unit;
+        }
+    }
+    if (target_spore && bot->GetDistance2d(target_spore) <= 1.0f) {
+        target = target_spore;
+    } else {
+        target = target_boss;
+    }
+    if (!target || context->GetValue<Unit*>("current target")->Get() == target) {
+        return false;
+    }
+    return Attack(target);
+}
