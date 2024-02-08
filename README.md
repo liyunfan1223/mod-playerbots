@@ -14,8 +14,7 @@ We've provided a simple method to clone the module:
 
 ```bash
 git clone https://github.com/liyunfan1223/azerothcore-wotlk.git --branch=Playerbot
-cd azerothcore-wotlk
-cd module
+cd azerothcore-wotlk/modules
 git clone https://github.com/liyunfan1223/mod-playerbots.git --branch=master
 ```
 

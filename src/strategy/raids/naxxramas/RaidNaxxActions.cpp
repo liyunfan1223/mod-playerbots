@@ -56,15 +56,6 @@ bool GrobbulusGoBehindAction::Execute(Event event)
     return MoveTo(bot->GetMapId(), rx, ry, z);
 }
 
-// bool MoveToPointForceAction::Execute(Event event)
-// {
-//     return MoveTo(bot->GetMapId(), x, y, bot->GetPositionZ(), true);
-// }
-
-
-
-
-
 uint32 RotateAroundTheCenterPointAction::FindNearestWaypoint()
 {
     float minDistance = 0;
@@ -409,119 +400,53 @@ bool RazuviousTargetAction::Execute(Event event)
     return Attack(target);
 }
 
-// bool HorsemanAttractAlternativelyAction::Execute(Event event)
-// {
-//     Unit* sir = AI_VALUE2(Unit*, "find target", "sir zeliek");
-//     Unit* lady = AI_VALUE2(Unit*, "find target", "lady blaumeux");
-//     bool raid25 = bot->GetRaidDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL;
-//     if (!sir) {
-//         return false;
-//     }
-//     std::vector<std::pair<float, float>> position = {
-//         // left (sir zeliek)
-//         {2502.03f, -2910.90f},
-//         // right (lady blaumeux)
-//         {2484.61f, -2947.07f},
-//     };
-//     float pos_z = 241.27f;
-//     BossAI* boss_ai = dynamic_cast<BossAI*>(sir->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     const uint32 timer = eventMap->GetTimer();
-//     if (lady) {
-//         BossAI* lady_ai = dynamic_cast<BossAI*>(lady->GetAI());
-//         EventMap* ladyEventMap = lady_botAI->GetEvents();
-//         const uint32 voidZone = ladyEventMap->GetNextEventTime(5);
-//         if (!voidZone) {
-//             voidzone_counter = 0;
-//         }
-//         if (voidZone && last_voidzone != voidZone) {
-//             voidzone_counter = (voidzone_counter + 1) % 8;
-//         }
-//         last_voidzone = voidZone;
-//     }
-//     int pos_to_go;
-//     if (!lady) {
-//         pos_to_go = 0;
-//     } else {
-//         // 24 - 15 - 15 - ...
-//         if (timer <= 9000 || ((timer - 9000) / 67500) % 2 == 0) {
-//             pos_to_go = 0;
-//         } else {
-//             pos_to_go = 1;
-//         }
-//         if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) || (raid25 && botAI->IsHealAssistantOfIndex(bot, 1))) {
-//             pos_to_go = 1 - pos_to_go;
-//         }
-//     }
-//     // bot->Yell("pos to go: " + std::to_string(pos_to_go), LANG_UNIVERSAL);
-//     float pos_x = position[pos_to_go].first, pos_y = position[pos_to_go].second;
-//     if (pos_to_go == 1) {
-//         float offset_x;
-//         float offset_y;
-//         if (voidzone_counter < 4) {
-//             offset_x = voidzone_counter * (-4.5f);
-//             offset_y = voidzone_counter * (4.5f);
-//         }
-//         if (voidzone_counter >= 4) {
-//             offset_x = (7 - voidzone_counter) * (-4.5f);
-//             offset_y = (7 - voidzone_counter) * (4.5f);
-//             offset_x += 4.5f;
-//             offset_y += 4.5f;
-//         }
-//         pos_x += offset_x;
-//         pos_y += offset_y;
-//     }
-//     if (MoveTo(bot->GetMapId(), pos_x, pos_y, pos_z)) {
-//         return true;
-//     }
-//     Unit* attackTarget;
-//     if (pos_to_go == 0) {
-//         attackTarget = sir;
-//     } else {
-//         attackTarget = lady;
-//     }
-//     if (context->GetValue<Unit*>("current target")->Get() != attackTarget) {
-//         return Attack(attackTarget);
-//     }
-//     return false;
-// }
+bool HorsemanAttractAlternativelyAction::Execute(Event event)
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    helper.CalculatePosToGo(bot);
+    auto [posX, posY] = helper.CurrentAttractPos();
+    if (MoveTo(bot->GetMapId(), posX, posY, helper.posZ)) {
+        return true;
+    }
+    Unit* attackTarget = helper.CurrentAttackTarget();
+    if (context->GetValue<Unit*>("current target")->Get() != attackTarget) {
+        return Attack(attackTarget);
+    }
+    return false;
+}
 
-// bool HorsemanAttactInOrderAction::Execute(Event event)
-// {
-//     Unit* target = nullptr;
-//     Unit* thane = AI_VALUE2(Unit*, "find target", "thane korth'azz");
-//     Unit* baron = AI_VALUE2(Unit*, "find target", "baron rivendare");
-//     Unit* lady = AI_VALUE2(Unit*, "find target", "lady blaumeux");
-//     Unit* sir = AI_VALUE2(Unit*, "find target", "sir zeliek");
-//     vector<Unit*> attack_order;
-//     if (botAI->IsAssistTank(bot)) {
-//         attack_order = {baron, thane, lady, sir};
-//     } else {
-//         attack_order = {thane, baron, lady, sir};
-//     }
-//     for (Unit* t : attack_order) {
-//         if (t) {
-//             target = t;
-//             break;
-//         }
-//     }
-//     if (target) {
-//         if (context->GetValue<Unit*>("current target")->Get() == target && botAI->GetCurrentState() == BOT_STATE_COMBAT) {
-//             return false;
-//         }
-//         if (!bot->IsWithinLOSInMap(target)) {
-//             return MoveNear(target, 10.0f);
-//         }
-//         return Attack(target);
-//     }
-//     return false;
-// }
-
-// bool SapphironGroundMainTankPositionAction::Execute(Event event)
-// {
-//     return MoveTo(533, 3512.07f, -5274.06f, 137.29f);
-//     // return MoveTo(533, 3498.58f, -5245.35f, 137.29f);
-// }
+bool HorsemanAttactInOrderAction::Execute(Event event)
+{
+    Unit* target = nullptr;
+    Unit* thane = AI_VALUE2(Unit*, "find target", "thane korth'azz");
+    Unit* baron = AI_VALUE2(Unit*, "find target", "baron rivendare");
+    Unit* lady = AI_VALUE2(Unit*, "find target", "lady blaumeux");
+    Unit* sir = AI_VALUE2(Unit*, "find target", "sir zeliek");
+    std::vector<Unit*> attack_order;
+    if (botAI->IsAssistTank(bot)) {
+        attack_order = {baron, thane, lady, sir};
+    } else {
+        attack_order = {thane, baron, lady, sir};
+    }
+    for (Unit* t : attack_order) {
+        if (t) {
+            target = t;
+            break;
+        }
+    }
+    if (target) {
+        if (context->GetValue<Unit*>("current target")->Get() == target && botAI->GetState() == BOT_STATE_COMBAT) {
+            return false;
+        }
+        if (!bot->IsWithinLOSInMap(target)) {
+            return MoveNear(target, 22.0f);
+        }
+        return Attack(target);
+    }
+    return false;
+}
 
 bool SapphironGroundPositionAction::Execute(Event event)
 {
@@ -982,9 +907,6 @@ bool GluthSlowdownAction::Execute(Event event)
         case CLASS_HUNTER:
             return botAI->CastSpell("frost trap", bot);
             break;
-        // case CLASS_MAGE:
-        //     return botAI->CastSpell("frost nova", bot);
-        //     break;
         default:
             break;
     }

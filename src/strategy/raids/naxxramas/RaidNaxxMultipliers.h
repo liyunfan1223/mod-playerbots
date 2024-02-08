@@ -69,14 +69,14 @@ public:
     virtual float GetValue(Action* action);
 };
 
-// class FourhorsemanGenericMultiplier : public Multiplier
-// {
-// public:
-//     FourhorsemanGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "fourhorseman generic") {}
+class FourhorsemanGenericMultiplier : public Multiplier
+{
+public:
+    FourhorsemanGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "fourhorseman generic") {}
 
-// public:
-//     virtual float GetValue(Action* action);
-// };
+public:
+    virtual float GetValue(Action* action);
+};
 
 // class GothikGenericMultiplier : public Multiplier
 // {

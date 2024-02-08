@@ -4,10 +4,6 @@
 
 void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
-	// triggers.push_back(new TriggerNode(
-	// 	"often", 
-	// 	NextAction::array(0, new NextAction("try to get boss ai", ACTION_RAID), nullptr)));
-	
 	// Grobbulus
 	triggers.push_back(new TriggerNode(
 		"mutating injection", 
@@ -41,8 +37,7 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 	// Anub'Rekhan
 	triggers.push_back(new TriggerNode(
 		"anub'rekhan", 
-		NextAction::array(0, 
-			// new NextAction("anub'rekhan choose target", ACTION_RAID + 1), 
+		NextAction::array(0,
    			new NextAction("anub'rekhan position", ACTION_RAID + 1),
 		nullptr)));
 
@@ -76,14 +71,14 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 		"razuvious nontank", 
 		NextAction::array(0, new NextAction("razuvious target", ACTION_RAID + 1), nullptr)));
 
-	// // four horseman
-	// triggers.push_back(new TriggerNode(
-	// 	"horseman attractors", 
-	// 	NextAction::array(0, new NextAction("horseman attract alternatively", ACTION_RAID + 1), nullptr)));
+	// four horseman
+	triggers.push_back(new TriggerNode(
+		"horseman attractors", 
+		NextAction::array(0, new NextAction("horseman attract alternatively", ACTION_RAID + 1), nullptr)));
 	
-	// triggers.push_back(new TriggerNode(
-	// 	"horseman except attractors", 
-	// 	NextAction::array(0, new NextAction("horseman attack in order", ACTION_RAID + 1), nullptr)));
+	triggers.push_back(new TriggerNode(
+		"horseman except attractors", 
+		NextAction::array(0, new NextAction("horseman attack in order", ACTION_RAID + 1), nullptr)));
 
 	// sapphiron
 	triggers.push_back(new TriggerNode(
@@ -126,7 +121,7 @@ void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 	multipliers.push_back(new InstructorRazuviousGenericMultiplier(botAI));
 	multipliers.push_back(new KelthuzadGenericMultiplier(botAI));
 	multipliers.push_back(new AnubrekhanGenericMultiplier(botAI));
-	// multipliers.push_back(new FourhorsemanGenericMultiplier(botAI));
+	multipliers.push_back(new FourhorsemanGenericMultiplier(botAI));
 	// multipliers.push_back(new GothikGenericMultiplier(botAI));
 	multipliers.push_back(new GluthGenericMultiplier(botAI));
 }

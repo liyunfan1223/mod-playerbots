@@ -143,19 +143,23 @@ public:
 //     ThaddiusPhaseThaddiusTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "thaddius", 1 << (4 - 1), "thaddius phase thaddius") {}
 // };
 
-// class HorsemanAttractorsTrigger : public BossPhaseTrigger
-// {
-// public:
-//     HorsemanAttractorsTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sir zeliek", 0, "horseman attractors") {}
-//     virtual bool IsActive();
-// };
+class HorsemanAttractorsTrigger : public Trigger
+{
+    public:
+        HorsemanAttractorsTrigger(PlayerbotAI* ai) : Trigger(ai, "fourhorsemen"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        FourhorsemanBossHelper helper;
+};
 
-// class HorsemanExceptAttractorsTrigger : public BossPhaseTrigger
-// {
-// public:
-//     HorsemanExceptAttractorsTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sir zeliek", 0, "horseman except attractors") {}
-//     virtual bool IsActive();
-// };
+class HorsemanExceptAttractorsTrigger : public Trigger
+{
+    public:
+        HorsemanExceptAttractorsTrigger(PlayerbotAI* ai) : Trigger(ai, "fourhorsemen"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        FourhorsemanBossHelper helper;
+};
 
 class SapphironGroundTrigger : public Trigger
 {

@@ -22,6 +22,9 @@ class GenericBossHelper : public AiObject {
     public:
         GenericBossHelper(PlayerbotAI* botAI, std::string name): AiObject(botAI), _name(name) {}
         virtual bool UpdateBossAI() {
+            if (!bot->IsInCombat()) {
+                _unit = nullptr;
+            }
             if(_unit && (!_unit->IsInWorld() || !_unit->IsAlive())) {
                 _unit = nullptr;
             }
@@ -46,10 +49,17 @@ class GenericBossHelper : public AiObject {
             _timer = _event_map->GetTimer();
             return true;
         }
+        virtual void Reset() {
+            _unit = nullptr;
+            _target = nullptr;
+            _ai = nullptr;
+            _event_map = nullptr;
+            _timer = 0;
+        }
     protected:
+        std::string _name;
         Unit* _unit = nullptr;
         Creature* _target = nullptr;
-        std::string _name = nullptr;
         BossAiType *_ai = nullptr;
         EventMap* _event_map = nullptr;
         uint32 _timer = 0;
@@ -185,6 +195,104 @@ class LoathebBossHelper: public GenericBossHelper<boss_loatheb::boss_loathebAI> 
         const std::pair<float, float> mainTankPos = {2877.57f, -3967.00f};
         const std::pair<float, float> rangePos = {2896.96f, -3980.61f};
         LoathebBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "loatheb") {}
+};
+
+class FourhorsemanBossHelper: public GenericBossHelper<boss_four_horsemen::boss_four_horsemenAI> {
+    public:
+        const float posZ = 241.27f;
+        const std::pair<float, float> attractPos[2] = {{2502.03f, -2910.90f}, {2484.61f, -2947.07f}}; // left (sir zeliek), right (lady blaumeux)
+        FourhorsemanBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "sir zeliek") {}
+        bool UpdateBossAI() override {
+            if (!GenericBossHelper::UpdateBossAI()) {
+                return false;
+            }
+            if (!bot->IsInCombat()) {
+                Reset();
+            }
+            sir = _unit;
+            lady = AI_VALUE2(Unit*, "find target", "lady blaumeux");
+            if (!lady) {
+                return true;
+            }
+            ladyAI = dynamic_cast<boss_four_horsemen::boss_four_horsemenAI *>(lady->GetAI());
+            if (!ladyAI) {
+                return true;
+            }
+            ladyEvent = &ladyAI->events;
+            const uint32 voidZone = ladyEvent->GetNextEventTime(EVENT_SECONDARY_SPELL);
+            if (voidZone && lastEventVoidZone != voidZone) {
+                voidZoneCounter++;
+                voidZoneCounter %= 8;
+                lastEventVoidZone = voidZone;
+            }
+            return true;
+        }
+        void Reset() override {
+            GenericBossHelper::Reset();
+            sir = nullptr;
+            lady = nullptr;
+            ladyAI = nullptr;
+            ladyEvent = nullptr;
+            lastEventVoidZone = 0;
+            voidZoneCounter = 0;
+            posToGo = 0;
+        }
+        bool IsAttracter(Player* bot) {
+            Difficulty diff = bot->GetRaidDifficulty();
+            if (diff == RAID_DIFFICULTY_25MAN_NORMAL) {
+                return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0) || 
+                       botAI->IsHealAssistantOfIndex(bot, 1) || botAI->IsHealAssistantOfIndex(bot, 2);
+            }
+            return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0);
+        }
+        void CalculatePosToGo(Player* bot) {
+            bool raid25 = bot->GetRaidDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL;
+            if (!lady) {
+                posToGo = 0;
+            } else {
+                // Interval: 24s - 15s - 15s - ...
+                posToGo = !(_timer <= 9000 || ((_timer - 9000) / 67500) % 2 == 0);
+                if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) || (raid25 && botAI->IsHealAssistantOfIndex(bot, 1))) {
+                    posToGo = 1 - posToGo;
+                }
+            }
+        }
+        std::pair<float, float> CurrentAttractPos()
+        {
+            float posX = attractPos[posToGo].first, posY = attractPos[posToGo].second;
+            if (posToGo == 1) {
+                float offset_x;
+                float offset_y;
+                if (voidZoneCounter < 4) {
+                    offset_x = voidZoneCounter * (-4.5f);
+                    offset_y = voidZoneCounter * (4.5f);
+                }
+                if (voidZoneCounter >= 4) {
+                    offset_x = (7 - voidZoneCounter) * (-4.5f);
+                    offset_y = (7 - voidZoneCounter) * (4.5f);
+                    offset_x += 4.5f;
+                    offset_y += 4.5f;
+                }
+                posX += offset_x;
+                posY += offset_y;
+            }
+            return {posX, posY};
+        }
+        Unit* CurrentAttackTarget()
+        {
+            if (posToGo == 0) {
+                return sir;
+            }
+            return lady;
+        }
+    protected:
+        Unit* sir = nullptr;
+        Unit* lady = nullptr;
+        boss_four_horsemen::boss_four_horsemenAI* ladyAI = nullptr;
+        EventMap* ladyEvent = nullptr;
+        uint32 lastEventVoidZone = 0;
+        uint32 voidZoneCounter = 0;
+        int posToGo = 0;
 };
 
 #endif

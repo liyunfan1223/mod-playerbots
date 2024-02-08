@@ -145,24 +145,23 @@ class RazuviousTargetAction : public AttackAction
         RazuviousBossHelper helper;
 };
 
-// class HorsemanAttractAlternativelyAction : public AttackAction
-// {
-// public:
-//     HorsemanAttractAlternativelyAction(PlayerbotAI* ai) : AttackAction(ai, "horseman attract alternatively") {
-//         this->last_voidzone = 0;
-//         this->voidzone_counter = 0;
-//     }
-//     virtual bool Execute(Event event);
-// protected:
-//     uint32 last_voidzone, voidzone_counter;
-// };
+class HorsemanAttractAlternativelyAction : public AttackAction
+{
+    public:
+        HorsemanAttractAlternativelyAction(PlayerbotAI* ai) : AttackAction(ai, "horseman attract alternatively"), helper(ai) {}
+        bool Execute(Event event) override;
+    protected:
+        FourhorsemanBossHelper helper;
+};
 
-// class HorsemanAttactInOrderAction : public AttackAction
-// {
-// public:
-//     HorsemanAttactInOrderAction(PlayerbotAI* ai) : AttackAction(ai, "horseman attact in order") {}
-//     virtual bool Execute(Event event);
-// };
+class HorsemanAttactInOrderAction : public AttackAction
+{
+    public:
+        HorsemanAttactInOrderAction(PlayerbotAI* ai) : AttackAction(ai, "horseman attact in order"), helper(ai) {}
+        bool Execute(Event event) override;
+    protected:
+        FourhorsemanBossHelper helper;
+};
 
 // class SapphironGroundMainTankPositionAction : public MovementAction
 // {

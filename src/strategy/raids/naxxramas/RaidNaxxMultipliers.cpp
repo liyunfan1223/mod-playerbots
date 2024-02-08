@@ -210,18 +210,19 @@ float AnubrekhanGenericMultiplier::GetValue(Action* action)
 	return 1.0f;
 }
 
-// float FourhorsemanGenericMultiplier::GetValue(Action* action)
-// {
-// 	Unit* boss = AI_VALUE2(Unit*, "find target", "sir zeliek");
-// 	if (!boss) {
-//         return 1.0f;
-//     }
-// 	if ((dynamic_cast<DpsAssistAction*>(action) || 
-// 		 dynamic_cast<TankAssistAction*>(action))) {
-// 		return 0.0f;
-// 	}
-// 	return 1.0f;
-// }
+float FourhorsemanGenericMultiplier::GetValue(Action* action)
+{
+	Unit* boss = AI_VALUE2(Unit*, "find target", "sir zeliek");
+	if (!boss) {
+        return 1.0f;
+    }
+	context->GetValue<bool>("neglect threat")->Set(true);
+	if ((dynamic_cast<DpsAssistAction*>(action) || 
+		 dynamic_cast<TankAssistAction*>(action))) {
+		return 0.0f;
+	}
+	return 1.0f;
+}
 
 // float GothikGenericMultiplier::GetValue(Action* action)
 // {
