@@ -191,5 +191,29 @@ bool LoathebTrigger::IsActive()
     return helper.UpdateBossAI();
 }
 
+bool ThaddiusPhasePetTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    return helper.IsPhasePet();
+}
+
+bool ThaddiusPhaseTransitionTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    return helper.IsPhaseTransition();
+}
+
+bool ThaddiusPhaseThaddiusTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    return helper.IsPhaseThaddius();
+}
+
 template bool BossEventTrigger<boss_grobbulus::boss_grobbulusAI>::IsActive();
 template bool BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>::IsActive();

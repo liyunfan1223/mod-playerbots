@@ -42,25 +42,23 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 		nullptr)));
 
 	// Thaddius
-	// triggers.push_back(new TriggerNode(
-	// 	"thaddius phase pet", 
-	// 	NextAction::array(0, 
-	// 		new NextAction("thaddius attack nearest pet", ACTION_RAID + 1), 
-	// 		new NextAction("thaddius melee to place", ACTION_RAID),
-	// 		new NextAction("thaddius ranged to place", ACTION_RAID),
-	// 		nullptr)));
+	triggers.push_back(new TriggerNode(
+		"thaddius phase pet", 
+		NextAction::array(0, 
+			new NextAction("thaddius attack nearest pet", ACTION_RAID + 1),
+			nullptr)));
 
-	// triggers.push_back(new TriggerNode(
-	// 	"thaddius phase pet lose aggro", 
-	// 	NextAction::array(0, new NextAction("taunt spell", ACTION_RAID + 2), nullptr)));
+	triggers.push_back(new TriggerNode(
+		"thaddius phase pet lose aggro", 
+		NextAction::array(0, new NextAction("taunt spell", ACTION_RAID + 2), nullptr)));
 
-	// triggers.push_back(new TriggerNode(
-	// 	"thaddius phase transition", 
-	// 	NextAction::array(0, new NextAction("thaddius move to platform", ACTION_RAID + 1), nullptr)));
+	triggers.push_back(new TriggerNode(
+		"thaddius phase transition", 
+		NextAction::array(0, new NextAction("thaddius move to platform", ACTION_RAID + 1), nullptr)));
 
-	// triggers.push_back(new TriggerNode(
-	// 	"thaddius phase thaddius", 
-	// 	NextAction::array(0, new NextAction("thaddius move polarity", ACTION_RAID + 1), nullptr)));
+	triggers.push_back(new TriggerNode(
+		"thaddius phase thaddius", 
+		NextAction::array(0, new NextAction("thaddius move polarity", ACTION_RAID + 1), nullptr)));
 
 	// Instructor Razuvious
 	triggers.push_back(new TriggerNode(
@@ -116,7 +114,7 @@ void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
 	multipliers.push_back(new HeiganDanceMultiplier(botAI));
 	multipliers.push_back(new LoathebGenericMultiplier(botAI));
-	// multipliers.push_back(new ThaddiusGenericMultiplier(botAI));
+	multipliers.push_back(new ThaddiusGenericMultiplier(botAI));
 	multipliers.push_back(new SapphironGenericMultiplier(botAI));
 	multipliers.push_back(new InstructorRazuviousGenericMultiplier(botAI));
 	multipliers.push_back(new KelthuzadGenericMultiplier(botAI));

@@ -19,11 +19,11 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
 
             creators["heigan dance melee"] = &RaidNaxxActionContext::heigan_dance_melee;
             creators["heigan dance ranged"] = &RaidNaxxActionContext::heigan_dance_ranged;
-            // creators["thaddius attack nearest pet"] = &RaidNaxxActionContext::thaddius_attack_nearest_pet;
+            creators["thaddius attack nearest pet"] = &RaidNaxxActionContext::thaddius_attack_nearest_pet;
             // creators["thaddius melee to place"] = &RaidNaxxActionContext::thaddius_tank_to_place;
             // creators["thaddius ranged to place"] = &RaidNaxxActionContext::thaddius_ranged_to_place;
-            // creators["thaddius move to platform"] = &RaidNaxxActionContext::thaddius_move_to_platform;
-            // creators["thaddius move polarity"] = &RaidNaxxActionContext::thaddius_move_polarity;
+            creators["thaddius move to platform"] = &RaidNaxxActionContext::thaddius_move_to_platform;
+            creators["thaddius move polarity"] = &RaidNaxxActionContext::thaddius_move_polarity;
 
             creators["razuvious use obedience crystal"] = &RaidNaxxActionContext::razuvious_use_obedience_crystal;
             creators["razuvious target"] = &RaidNaxxActionContext::razuvious_target;
@@ -53,11 +53,11 @@ class RaidNaxxActionContext : public NamedObjectContext<Action>
         static Action* grobbulus_move_center(PlayerbotAI* ai) { return new GrobblulusMoveCenterAction(ai); }
         static Action* heigan_dance_melee(PlayerbotAI* ai) { return new HeiganDanceMeleeAction(ai); }
         static Action* heigan_dance_ranged(PlayerbotAI* ai) { return new HeiganDanceRangedAction(ai); }
-        // static Action* thaddius_attack_nearest_pet(PlayerbotAI* ai) { return new ThaddiusAttackNearestPetAction(ai); }
+        static Action* thaddius_attack_nearest_pet(PlayerbotAI* ai) { return new ThaddiusAttackNearestPetAction(ai); }
         // static Action* thaddius_tank_to_place(PlayerbotAI* ai) { return new ThaddiusMeleeToPlaceAction(ai); }
         // static Action* thaddius_ranged_to_place(PlayerbotAI* ai) { return new ThaddiusRangedToPlaceAction(ai); }
-        // static Action* thaddius_move_to_platform(PlayerbotAI* ai) { return new ThaddiusMoveToPlatformAction(ai); }
-        // static Action* thaddius_move_polarity(PlayerbotAI* ai) { return new ThaddiusMovePolarityAction(ai); }
+        static Action* thaddius_move_to_platform(PlayerbotAI* ai) { return new ThaddiusMoveToPlatformAction(ai); }
+        static Action* thaddius_move_polarity(PlayerbotAI* ai) { return new ThaddiusMovePolarityAction(ai); }
         static Action* razuvious_target(PlayerbotAI* ai) { return new RazuviousTargetAction(ai); }
         static Action* razuvious_use_obedience_crystal(PlayerbotAI* ai) { return new RazuviousUseObedienceCrystalAction(ai); }
         static Action* horseman_attract_alternatively(PlayerbotAI* ai) { return new HorsemanAttractAlternativelyAction(ai); }

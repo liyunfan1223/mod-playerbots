@@ -80,49 +80,44 @@ float LoathebGenericMultiplier::GetValue(Action* action)
 	return 0.0f;
 }
 
-// float ThaddiusGenericMultiplier::GetValue(Action* action)
-// {
-// 	Unit* boss = AI_VALUE2(Unit*, "find target", "thaddius");
-// 	if (!boss) {
-//         return 1.0f;
-//     }
-// 	BossAI* boss_ai = dynamic_cast<BossAI*>(boss->GetAI());
-//     EventMap* eventMap = boss_botAI->GetEvents();
-//     uint32 curr_phase = eventMap->GetPhaseMask();
-// 	// pet phase
-// 	if (curr_phase == 2 && 
-// 		( dynamic_cast<DpsAssistAction*>(action) || 
-// 		dynamic_cast<TankAssistAction*>(action) || 
-// 		dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
-// 		dynamic_cast<ReachPartyMemberToHealAction*>(action) || 
-// 		dynamic_cast<BuffOnMainTankAction*>(action) )) {
-// 		return 0.0f;
-// 	}
-// 	// die at the same time
-// 	Unit* target = AI_VALUE(Unit*, "current target");
-// 	Unit* feugen = AI_VALUE2(Unit*, "find target", "feugen");
-//     Unit* stalagg = AI_VALUE2(Unit*, "find target", "stalagg");
-// 	if (curr_phase == 2 && target && feugen && stalagg && 
-// 		target->GetHealthPct() <= 40 && 
-// 		(feugen->GetHealthPct() >= target->GetHealthPct() + 3 || stalagg->GetHealthPct() >= target->GetHealthPct() + 3)) {
-// 		if (dynamic_cast<CastSpellAction*>(action) && !dynamic_cast<CastHealingSpellAction*>(action)) {
-// 			return 0.0f;
-// 		}
-// 	}
-// 	// magnetic pull
-// 	// uint32 curr_timer = eventMap->GetTimer();
-// 	// // if (curr_phase == 2 && bot->GetPositionZ() > 312.5f && dynamic_cast<MovementAction*>(action)) {
-// 	// if (curr_phase == 2 && (curr_timer % 20000 >= 18000 || curr_timer % 20000 <= 2000) && dynamic_cast<MovementAction*>(action)) {
-// 	// 	// MotionMaster *mm = bot->GetMotionMaster();
-// 	// 	// mm->Clear();
-// 	// 	return 0.0f;
-// 	// }
-// 	// thaddius phase
-// 	if (curr_phase == 8 && dynamic_cast<FleeAction*>(action)) {
-// 			return 0.0f;
-// 	}
-// 	return 1.0f;
-// }
+float ThaddiusGenericMultiplier::GetValue(Action* action)
+{
+	if (!helper.UpdateBossAI()) {
+		return 1.0f;
+	}
+	// pet phase
+	if (helper.IsPhasePet() && 
+		(dynamic_cast<DpsAssistAction*>(action) || 
+		dynamic_cast<TankAssistAction*>(action) || 
+		dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
+		dynamic_cast<ReachPartyMemberToHealAction*>(action) || 
+		dynamic_cast<BuffOnMainTankAction*>(action))) {
+		return 0.0f;
+	}
+	// die at the same time
+	Unit* target = AI_VALUE(Unit*, "current target");
+	Unit* feugen = AI_VALUE2(Unit*, "find target", "feugen");
+    Unit* stalagg = AI_VALUE2(Unit*, "find target", "stalagg");
+	if (helper.IsPhasePet() && target && feugen && stalagg && target->GetHealthPct() <= 40 && 
+		(feugen->GetHealthPct() >= target->GetHealthPct() + 3 || stalagg->GetHealthPct() >= target->GetHealthPct() + 3)) {
+		if (dynamic_cast<CastSpellAction*>(action) && !dynamic_cast<CastHealingSpellAction*>(action)) {
+			return 0.0f;
+		}
+	}
+	// magnetic pull
+	// uint32 curr_timer = eventMap->GetTimer();
+	// // if (curr_phase == 2 && bot->GetPositionZ() > 312.5f && dynamic_cast<MovementAction*>(action)) {
+	// if (curr_phase == 2 && (curr_timer % 20000 >= 18000 || curr_timer % 20000 <= 2000) && dynamic_cast<MovementAction*>(action)) {
+	// 	// MotionMaster *mm = bot->GetMotionMaster();
+	// 	// mm->Clear();
+	// 	return 0.0f;
+	// }
+	// thaddius phase
+	// if (curr_phase == 8 && dynamic_cast<FleeAction*>(action)) {
+	// 		return 0.0f;
+	// }
+	return 1.0f;
+}
 
 float SapphironGenericMultiplier::GetValue(Action* action)
 {

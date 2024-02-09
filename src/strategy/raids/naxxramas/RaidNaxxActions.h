@@ -87,13 +87,15 @@ protected:
     std::pair<float, float> platform;
 };
 
-// class ThaddiusAttackNearestPetAction : public AttackAction
-// {
-// public:
-//     ThaddiusAttackNearestPetAction(PlayerbotAI* ai) : AttackAction(ai, "thaddius attack nearest pet") {}
-//     virtual bool Execute(Event event);
-//     virtual bool isUseful();
-// };
+class ThaddiusAttackNearestPetAction : public AttackAction
+{
+    public:
+        ThaddiusAttackNearestPetAction(PlayerbotAI* ai) : AttackAction(ai, "thaddius attack nearest pet"), helper(ai) {}
+        virtual bool Execute(Event event);
+        virtual bool isUseful();
+    private:
+        ThaddiusBossHelper helper;
+};
 
 // class ThaddiusMeleeToPlaceAction : public MovementAction
 // {
@@ -111,21 +113,21 @@ protected:
 //     virtual bool isUseful();
 // };
 
-// class ThaddiusMoveToPlatformAction : public MovementAction
-// {
-// public:
-//     ThaddiusMoveToPlatformAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius move to platform") {}
-//     virtual bool Execute(Event event);
-//     virtual bool isUseful();
-// };
+class ThaddiusMoveToPlatformAction : public MovementAction
+{
+    public:
+        ThaddiusMoveToPlatformAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius move to platform") {}
+        virtual bool Execute(Event event);
+        virtual bool isUseful();
+};
 
-// class ThaddiusMovePolarityAction : public MovementAction
-// {
-// public:
-//     ThaddiusMovePolarityAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius move polarity") {}
-//     virtual bool Execute(Event event);
-//     virtual bool isUseful();
-// };
+class ThaddiusMovePolarityAction : public MovementAction
+{
+    public:
+        ThaddiusMovePolarityAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius move polarity") {}
+        virtual bool Execute(Event event);
+        virtual bool isUseful();
+};
 
 class RazuviousUseObedienceCrystalAction : public MovementAction
 {

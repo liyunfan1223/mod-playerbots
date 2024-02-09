@@ -8,7 +8,17 @@
 class HealDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
     public:
-        HealDruidStrategyActionNodeFactory() { }
+        HealDruidStrategyActionNodeFactory() {
+            creators["nourish on party"] = &nourtish_on_party;
+        }
+    private:
+        static ActionNode* nourtish_on_party([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("nourish on party",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("healing touch on party"), nullptr),
+                /*C*/ nullptr);
+        }
 };
 
 HealDruidStrategy::HealDruidStrategy(PlayerbotAI* botAI) : GenericDruidStrategy(botAI)
@@ -34,7 +44,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("wild growth", ACTION_CRITICAL_HEAL + 3),
             new NextAction("regrowth on party", ACTION_CRITICAL_HEAL + 2),
             new NextAction("nourish on party", ACTION_CRITICAL_HEAL + 1),
-            new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 0),
+            // new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 0),
             NULL)));
 
     triggers.push_back(new TriggerNode(
@@ -52,7 +62,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 8),
             new NextAction("swiftmend on party", ACTION_MEDIUM_HEAL + 7),
             new NextAction("nourish on party", ACTION_MEDIUM_HEAL + 6),
-            new NextAction("healing touch on party", ACTION_MEDIUM_HEAL + 5), 
+            // new NextAction("healing touch on party", ACTION_MEDIUM_HEAL + 5), 
             NULL)));
 
     // MEDIUM

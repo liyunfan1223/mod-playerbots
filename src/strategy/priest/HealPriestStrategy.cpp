@@ -40,6 +40,10 @@ void HealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             NULL)));
 
     triggers.push_back(new TriggerNode(
+        "medium group heal occasion",
+        NextAction::array(0, new NextAction("divine hymn", ACTION_CRITICAL_HEAL + 5), NULL)));
+
+    triggers.push_back(new TriggerNode(
         "party member critical health",
 		NextAction::array(0,
             new NextAction("power word: shield on party", ACTION_CRITICAL_HEAL + 6),

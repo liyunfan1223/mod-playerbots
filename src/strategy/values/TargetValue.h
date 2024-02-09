@@ -101,7 +101,7 @@ class PullTargetValue : public ManualSetValue<ObjectGuid>
 class FindTargetValue : public UnitCalculatedValue, public Qualified
 {
 public:
-    FindTargetValue(PlayerbotAI* ai) : UnitCalculatedValue(ai, "find target", 2 * 1000) {}
+    FindTargetValue(PlayerbotAI* ai) : UnitCalculatedValue(ai, "find target", /*2 * 1000*/1) {}
 
 public:
     Unit* Calculate();

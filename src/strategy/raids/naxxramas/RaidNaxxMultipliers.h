@@ -23,14 +23,16 @@ public:
     virtual float GetValue(Action* action);
 };
 
-// class ThaddiusGenericMultiplier : public Multiplier
-// {
-// public:
-//     ThaddiusGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "thaddius generic") {}
+class ThaddiusGenericMultiplier : public Multiplier
+{
+    public:
+        ThaddiusGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "thaddius generic"), helper(ai) {}
 
-// public:
-//     virtual float GetValue(Action* action);
-// };
+    public:
+        virtual float GetValue(Action* action);
+    private:
+        ThaddiusBossHelper helper;    
+};
 
 class SapphironGenericMultiplier : public Multiplier
 {

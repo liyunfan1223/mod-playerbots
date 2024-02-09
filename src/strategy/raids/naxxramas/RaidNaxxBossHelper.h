@@ -46,6 +46,9 @@ class GenericBossHelper : public AiObject {
                     return false;
                 }
             }
+            if (!_event_map) {
+                return false;
+            }
             _timer = _event_map->GetTimer();
             return true;
         }
@@ -293,6 +296,60 @@ class FourhorsemanBossHelper: public GenericBossHelper<boss_four_horsemen::boss_
         uint32 lastEventVoidZone = 0;
         uint32 voidZoneCounter = 0;
         int posToGo = 0;
+};
+class ThaddiusBossHelper: public GenericBossHelper<boss_thaddius::boss_thaddiusAI> {
+    public:
+        const std::pair<float, float> tankPosFeugen = {3522.94f, -3002.60f};
+        const std::pair<float, float> tankPosStalagg = {3436.14f, -2919.98f};
+        const std::pair<float, float> rangedPosFeugen = {3500.45f, -2997.92f};
+        const std::pair<float, float> rangedPosStalagg = {3441.01f, -2942.04f};
+        const float tankPosZ = 312.61f;
+        ThaddiusBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "thaddius") {}
+        bool UpdateBossAI() override {
+            if (!GenericBossHelper::UpdateBossAI()) {
+                return false;
+            }
+            feugen = AI_VALUE2(Unit*, "find target", "feugen");
+            stalagg = AI_VALUE2(Unit*, "find target", "stalagg");
+            return true;
+        }
+        bool IsPhasePet() {
+            return (feugen && feugen->IsAlive()) || (stalagg && stalagg->IsAlive());
+        }
+        bool IsPhaseTransition() {
+            if (IsPhasePet()) {
+                return false;
+            }
+            return _unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        }
+        bool IsPhaseThaddius() {
+            return !IsPhasePet() && !IsPhaseTransition();
+        }
+        Unit* GetNearestPet() {
+            Unit* unit = nullptr;
+            if (feugen && feugen->IsAlive()) {
+                unit = feugen;
+            }
+            if (stalagg && stalagg->IsAlive() && (!feugen || bot->GetDistance(stalagg) < bot->GetDistance(feugen))) {
+                unit = stalagg;
+            }
+            return unit;
+        }
+        std::pair<float, float> PetPhaseGetPosForTank() {
+            if (GetNearestPet() == feugen) {
+                return tankPosFeugen;
+            }
+            return tankPosStalagg;
+        }
+        std::pair<float, float> PetPhaseGetPosForRanged() {
+            if (GetNearestPet() == feugen) {
+                return rangedPosFeugen;
+            }
+            return rangedPosStalagg;
+        }
+    protected:
+        Unit* feugen = nullptr;
+        Unit* stalagg = nullptr;
 };
 
 #endif
