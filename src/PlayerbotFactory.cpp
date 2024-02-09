@@ -2261,8 +2261,8 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
         }
         for (std::vector<uint32> &p : sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specIndex][level]) {
             uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
-            uint32 talentID = -1;
-
+            uint32 talentID = 0;
+            uint32 learnLevel = 0;
             std::vector<TalentEntry const*> &spells = spells_row[row];
             if (spells.size() <= 0) {
                 return;
@@ -2279,8 +2279,19 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
                     bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));            
                 }
                 talentID = talentInfo->TalentID;
+
+                uint32 currentTalentRank = 0;
+                for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
+                {
+                    if (talentInfo->RankID[rank] && bot->HasTalent(talentInfo->RankID[rank], bot->GetActiveSpec()))
+                    {
+                        currentTalentRank = rank + 1;
+                        break;
+                    }
+                }
+                learnLevel = std::min(lvl, bot->GetFreeTalentPoints() + currentTalentRank) - 1;
             }
-            bot->LearnTalent(talentID, std::min(lvl, bot->GetFreeTalentPoints()) - 1);
+            bot->LearnTalent(talentID, learnLevel);
             if (bot->GetFreeTalentPoints() == 0) {
                 break;
             }
