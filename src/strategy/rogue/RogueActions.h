@@ -16,6 +16,12 @@ class CastEvasionAction : public CastBuffSpellAction
 		CastEvasionAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "evasion") { }
 };
 
+class CastHungerForBloodAction : public CastBuffSpellAction
+{
+	public:
+		CastHungerForBloodAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "hunger for blood") { }
+};
+
 class CastSprintAction : public CastBuffSpellAction
 {
 	public:

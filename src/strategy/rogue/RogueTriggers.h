@@ -21,6 +21,12 @@ class SliceAndDiceTrigger : public BuffTrigger
         SliceAndDiceTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "slice and dice") { }
 };
 
+class HungerForBloodTrigger : public BuffTrigger
+{
+    public:
+        HungerForBloodTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "hunger for blood") { }
+};
+
 class AdrenalineRushTrigger : public BoostTrigger
 {
     public:

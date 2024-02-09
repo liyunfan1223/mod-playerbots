@@ -19,10 +19,10 @@ class CastSapAction : public CastMeleeSpellAction
         bool isUseful() override { return true; }
 };
 
-class CastGarroteAction : public CastMeleeSpellAction
+class CastGarroteAction : public CastDebuffSpellAction
 {
 	public:
-		CastGarroteAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "garrote") { }
+		CastGarroteAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "garrote", true, 8.0f) { }
 };
 
 class CastCheapShotAction : public CastMeleeSpellAction

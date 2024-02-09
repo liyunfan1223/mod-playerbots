@@ -61,6 +61,7 @@ class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["kick"] = &RogueTriggerFactoryInternal::kick;
             creators["rupture"] = &RogueTriggerFactoryInternal::rupture;
             creators["slice and dice"] = &RogueTriggerFactoryInternal::slice_and_dice;
+            creators["hunger for blood"] = &RogueTriggerFactoryInternal::hunger_for_blood;
             creators["expose armor"] = &RogueTriggerFactoryInternal::expose_armor;
             creators["kick on enemy healer"] = &RogueTriggerFactoryInternal::kick_on_enemy_healer;
             creators["unstealth"] = &RogueTriggerFactoryInternal::unstealth;
@@ -81,6 +82,7 @@ class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* kick(PlayerbotAI* botAI) { return new KickInterruptSpellTrigger(botAI); }
         static Trigger* rupture(PlayerbotAI* botAI) { return new RuptureTrigger(botAI); }
         static Trigger* slice_and_dice(PlayerbotAI* botAI) { return new SliceAndDiceTrigger(botAI); }
+        static Trigger* hunger_for_blood(PlayerbotAI* botAI) { return new HungerForBloodTrigger(botAI); }
         static Trigger* expose_armor(PlayerbotAI* botAI) { return new ExposeArmorTrigger(botAI); }
         static Trigger* kick_on_enemy_healer(PlayerbotAI* botAI) { return new KickInterruptEnemyHealerSpellTrigger(botAI); }
         static Trigger* unstealth(PlayerbotAI* botAI) { return new UnstealthTrigger(botAI); }
@@ -107,6 +109,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
             creators["kidney shot"] = &RogueAiObjectContextInternal::kidney_shot;
             creators["rupture"] = &RogueAiObjectContextInternal::rupture;
             creators["slice and dice"] = &RogueAiObjectContextInternal::slice_and_dice;
+            creators["hunger for blood"] = &RogueAiObjectContextInternal::hunger_for_blood;
             creators["eviscerate"] = &RogueAiObjectContextInternal::eviscerate;
             creators["vanish"] = &RogueAiObjectContextInternal::vanish;
             creators["evasion"] = &RogueAiObjectContextInternal::evasion;
@@ -144,6 +147,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* kidney_shot(PlayerbotAI* botAI) { return new CastKidneyShotAction(botAI); }
         static Action* rupture(PlayerbotAI* botAI) { return new CastRuptureAction(botAI); }
         static Action* slice_and_dice(PlayerbotAI* botAI) { return new CastSliceAndDiceAction(botAI); }
+        static Action* hunger_for_blood(PlayerbotAI* botAI) { return new CastHungerForBloodAction(botAI); }
         static Action* eviscerate(PlayerbotAI* botAI) { return new CastEviscerateAction(botAI); }
         static Action* vanish(PlayerbotAI* botAI) { return new CastVanishAction(botAI); }
         static Action* evasion(PlayerbotAI* botAI) { return new CastEvasionAction(botAI); }
