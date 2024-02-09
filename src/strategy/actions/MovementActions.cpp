@@ -149,7 +149,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    float distance = bot->GetDistance(x, y, z);
+    float distance = bot->GetExactDist(x, y, z);
     if (distance > sPlayerbotAIConfig->contactDistance)
     {
         WaitForReach(distance);
@@ -671,7 +671,41 @@ bool MovementAction::MoveTo(Unit* target, float distance)
     float ty = target->GetPositionY();
     float tz = target->GetPositionZ();
 
-    float distanceToTarget = bot->GetDistance2d(target);
+    float distanceToTarget = bot->GetDistance(target);
+    float angle = bot->GetAngle(target);
+    float needToGo = distanceToTarget - distance;
+
+    float maxDistance = sPlayerbotAIConfig->spellDistance;
+    if (needToGo > 0 && needToGo > maxDistance)
+        needToGo = maxDistance;
+    else if (needToGo < 0 && needToGo < -maxDistance)
+        needToGo = -maxDistance;
+
+    float dx = cos(angle) * needToGo + bx;
+    float dy = sin(angle) * needToGo + by;
+    float dz; // = std::max(bz, tz); // calc accurate z position to avoid stuck
+    if (distanceToTarget > CONTACT_DISTANCE) {
+        dz = bz + (tz - bz) * (needToGo / distanceToTarget);
+    } else {
+        dz = tz;
+    }
+    return MoveTo(target->GetMapId(), dx, dy, dz);
+}
+
+bool MovementAction::ReachCombatTo(Unit* target, float distance)
+{
+    if (!IsMovingAllowed(target))
+        return false;
+
+    float bx = bot->GetPositionX();
+    float by = bot->GetPositionY();
+    float bz = bot->GetPositionZ();
+
+    float tx = target->GetPositionX();
+    float ty = target->GetPositionY();
+    float tz = target->GetPositionZ();
+    float combatDistance = bot->GetCombatReach() + target->GetCombatReach();
+    float distanceToTarget = bot->GetExactDist(target) - combatDistance;
     float angle = bot->GetAngle(target);
     float needToGo = distanceToTarget - distance;
 

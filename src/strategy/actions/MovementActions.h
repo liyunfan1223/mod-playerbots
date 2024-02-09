@@ -29,6 +29,7 @@ class MovementAction : public Action
         bool Follow(Unit* target, float distance = sPlayerbotAIConfig->followDistance);
         bool Follow(Unit* target, float distance, float angle);
         bool ChaseTo(WorldObject* obj, float distance = 0.0f, float angle = 0.0f);
+        bool ReachCombatTo(Unit* target, float distance = 0.0f);
         float MoveDelay(float distance);
         void WaitForReach(float distance);
         bool IsMovingAllowed(Unit* target);

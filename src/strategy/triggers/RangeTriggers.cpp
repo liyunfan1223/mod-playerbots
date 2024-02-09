@@ -131,7 +131,9 @@ bool EnemyIsCloseTrigger::IsActive()
 bool OutOfRangeTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, GetTargetName());
-    return target && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", GetTargetName()), distance);
+    // increase contact distance to prevent calculation error
+    float dis = distance + CONTACT_DISTANCE;
+    return target && !bot->IsWithinCombatRange(target, dis); // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", GetTargetName()), distance);
 }
 
 EnemyOutOfSpellRangeTrigger::EnemyOutOfSpellRangeTrigger(PlayerbotAI* botAI) : OutOfRangeTrigger(botAI, "enemy out of spell range", botAI->GetRange("spell"))
