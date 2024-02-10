@@ -9,7 +9,7 @@
 bool NeedCureTrigger::IsActive()
 {
 	Unit* target = GetTarget();
-	return target && botAI->HasAuraToDispel(target, dispelType);
+	return target && target->IsInWorld() && botAI->HasAuraToDispel(target, dispelType);
 }
 
 Value<Unit*>* PartyMemberNeedCureTrigger::GetTargetValue()

@@ -9,6 +9,7 @@
 #include "ObjectGuid.h"
 #include "PerformanceMonitor.h"
 #include "Timer.h"
+#include "Unit.h"
 
 #include <time.h>
 
@@ -257,6 +258,7 @@ class UnitCalculatedValue : public CalculatedValue<Unit*>
         UnitCalculatedValue(PlayerbotAI* botAI, std::string const name = "value", int32 checkInterval = 1);
 
         std::string const Format() override;
+        Unit* Get() override;
 };
 
 class CDPairCalculatedValue : public CalculatedValue<CreatureData const*>
