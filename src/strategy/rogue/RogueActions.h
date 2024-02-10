@@ -20,6 +20,7 @@ class CastHungerForBloodAction : public CastBuffSpellAction
 {
 	public:
 		CastHungerForBloodAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "hunger for blood") { }
+		std::string const GetTargetName() override { return "current target"; }
 };
 
 class CastSprintAction : public CastBuffSpellAction

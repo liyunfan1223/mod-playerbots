@@ -91,8 +91,8 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "high energy available",
         NextAction::array(0, 
-            new NextAction("garrote", ACTION_HIGH + 0.3f),
-            new NextAction("ambush", ACTION_HIGH + 0.2f), nullptr)));
+            new NextAction("garrote", ACTION_HIGH + 7),
+            new NextAction("ambush", ACTION_HIGH + 6), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "high energy available",
