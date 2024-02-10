@@ -42,6 +42,7 @@ CD_TRIGGER(InterceptCanCastTrigger, "intercept");
 SNARE_TRIGGER(ShockwaveSnareTrigger, "shockwave");
 DEBUFF_TRIGGER(ShockwaveTrigger, "shockwave");
 BOOST_TRIGGER(DeathWishTrigger, "death wish");
+BOOST_TRIGGER(RecklessnessTrigger, "recklessness");
 BUFF_TRIGGER(BloodthirstBuffTrigger, "bloodthirst");
 BUFF_TRIGGER(BerserkerRageBuffTrigger, "berserker rage");
 INTERRUPT_HEALER_TRIGGER(ShieldBashInterruptEnemyHealerSpellTrigger, "shield bash");

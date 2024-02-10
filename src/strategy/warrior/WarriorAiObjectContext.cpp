@@ -53,6 +53,7 @@ class WarriorTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["hamstring"] = &WarriorTriggerFactoryInternal::hamstring;
             creators["victory rush"] = &WarriorTriggerFactoryInternal::victory_rush;
             creators["death wish"] = &WarriorTriggerFactoryInternal::death_wish;
+            creators["recklessness"] = &WarriorTriggerFactoryInternal::recklessness;
             creators["battle shout"] = &WarriorTriggerFactoryInternal::battle_shout;
             creators["rend"] = &WarriorTriggerFactoryInternal::rend;
             creators["rend on attacker"] = &WarriorTriggerFactoryInternal::rend_on_attacker;
@@ -105,6 +106,7 @@ class WarriorTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* hamstring(PlayerbotAI* botAI) { return new HamstringTrigger(botAI); }
         static Trigger* victory_rush(PlayerbotAI* botAI) { return new VictoryRushTrigger(botAI); }
         static Trigger* death_wish(PlayerbotAI* botAI) { return new DeathWishTrigger(botAI); }
+        static Trigger* recklessness(PlayerbotAI* botAI) { return new RecklessnessTrigger(botAI); }
         static Trigger* battle_shout(PlayerbotAI* botAI) { return new BattleShoutTrigger(botAI); }
         static Trigger* rend(PlayerbotAI* botAI) { return new RendDebuffTrigger(botAI); }
         static Trigger* rend_on_attacker(PlayerbotAI* botAI) { return new RendDebuffOnAttackerTrigger(botAI); }
@@ -160,6 +162,7 @@ class WarriorAiObjectContextInternal : public NamedObjectContext<Action>
             creators["rend on attacker"] = &WarriorAiObjectContextInternal::rend_on_attacker;
             creators["mocking blow"] = &WarriorAiObjectContextInternal::mocking_blow;
             creators["death wish"] = &WarriorAiObjectContextInternal::death_wish;
+            creators["recklessness"] = &WarriorAiObjectContextInternal::recklessness;
             creators["berserker rage"] = &WarriorAiObjectContextInternal::berserker_rage;
             creators["victory rush"] = &WarriorAiObjectContextInternal::victory_rush;
             creators["execute"] = &WarriorAiObjectContextInternal::execute;
@@ -234,6 +237,7 @@ class WarriorAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* rend_on_attacker(PlayerbotAI* botAI) { return new CastRendOnAttackerAction(botAI); }
         static Action* mocking_blow(PlayerbotAI* botAI) { return new CastMockingBlowAction(botAI); }
         static Action* death_wish(PlayerbotAI* botAI) { return new CastDeathWishAction(botAI); }
+        static Action* recklessness(PlayerbotAI* botAI) { return new CastRecklessnessAction(botAI); }
         static Action* berserker_rage(PlayerbotAI* botAI) { return new CastBerserkerRageAction(botAI); }
         static Action* victory_rush(PlayerbotAI* botAI) { return new CastVictoryRushAction(botAI); }
         static Action* execute(PlayerbotAI* botAI) { return new CastExecuteAction(botAI); }
@@ -266,7 +270,6 @@ class WarriorAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* whirlwind(PlayerbotAI* botAI) { return new CastWhirlwindAction(botAI); }
         static Action* pummel(PlayerbotAI* botAI) { return new CastPummelAction (botAI); }
         static Action* pummel_on_enemy_healer(PlayerbotAI* botAI) { return new CastPummelOnEnemyHealerAction(botAI); }
-        static Action* recklessness(PlayerbotAI* botAI) { return new CastRecklessnessAction(botAI); }
         static Action* piercing_howl(PlayerbotAI* botAI) { return new CastPiercingHowlAction(botAI); }
         static Action* rampage(PlayerbotAI* botAI) { return new CastRampageAction(botAI); }
         static Action* intervene(PlayerbotAI* botAI) { return new CastInterveneAction(botAI); }

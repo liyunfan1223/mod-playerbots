@@ -51,5 +51,5 @@ void WarrirorAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new NextAction("cleave", ACTION_HIGH),
         nullptr)));
     triggers.push_back(new TriggerNode("shockwave on snare target", NextAction::array(0, new NextAction("shockwave on snare target", ACTION_HIGH + 5), nullptr)));
-    triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("whirlwind", ACTION_HIGH + 10), nullptr)));
+    // triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("whirlwind", ACTION_HIGH + 10), nullptr)));
 }

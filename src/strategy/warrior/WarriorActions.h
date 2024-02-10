@@ -74,7 +74,6 @@ BUFF_ACTION(CastBerserkerRageAction, "berserker rage");
 MELEE_ACTION(CastWhirlwindAction, "whirlwind");
 MELEE_ACTION(CastPummelAction, "pummel");
 ENEMY_HEALER_ACTION(CastPummelOnEnemyHealerAction, "pummel");
-BUFF_ACTION(CastRecklessnessAction, "recklessness");
 // fury 2.4.3
 MELEE_ACTION(CastVictoryRushAction, "victory rush");
 // fury 3.3.5
@@ -83,6 +82,7 @@ BUFF_ACTION(CastHeroicFuryAction, "heroic fury");
 
 // fury talents
 BUFF_ACTION(CastDeathWishAction, "death wish");
+BUFF_ACTION(CastRecklessnessAction, "recklessness");
 MELEE_ACTION(CastBloodthirstAction, "bloodthirst");
 DEBUFF_ACTION_R(CastPiercingHowlAction, "piercing howl", 8.0f);
 // fury talents 2.4.3
