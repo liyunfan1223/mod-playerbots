@@ -1378,6 +1378,13 @@ bool PlayerbotAI::IsCaster(Player* player)
     return IsRanged(player) && player->getClass() != CLASS_HUNTER;
 }
 
+bool PlayerbotAI::IsCombo(Player* player)
+{
+    int tab = AiFactory::GetPlayerSpecTab(player);
+    return player->getClass() == CLASS_ROGUE ||
+        (player->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL && !IsTank(bot));
+}
+
 bool PlayerbotAI::IsRangedDps(Player* player)
 {
     return IsRanged(player) && IsDps(player);

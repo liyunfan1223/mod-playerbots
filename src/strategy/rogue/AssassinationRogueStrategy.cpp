@@ -34,9 +34,7 @@ AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI* ai) : MeleeC
 
 NextAction** AssassinationRogueStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
-        new NextAction("garrote", ACTION_DEFAULT + 0.2f),
-        new NextAction("ambush", ACTION_DEFAULT + 0.1f),
+    return NextAction::array(0,
         new NextAction("melee", ACTION_DEFAULT),
         NULL);
 }
@@ -44,6 +42,12 @@ NextAction** AssassinationRogueStrategy::getDefaultActions()
 void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     MeleeCombatStrategy::InitTriggers(triggers);
+    
+    triggers.push_back(new TriggerNode(
+        "high energy available",
+        NextAction::array(0, 
+            new NextAction("garrote", ACTION_HIGH + 0.3f),
+            new NextAction("ambush", ACTION_HIGH + 0.2f), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "high energy available",
