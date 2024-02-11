@@ -2715,7 +2715,7 @@ void PlayerbotFactory::InitReagents()
             items.push_back({21177, 100});
             break;
         case CLASS_DEATH_KNIGHT:
-            items.push_back({21177, 40});
+            items.push_back({37201, 40});
             break;
         default:
             break;
