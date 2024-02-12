@@ -61,8 +61,8 @@ bool GossipHelloAction::Execute(Event event)
 	else
 	{
 	    menuToSelect = atoi(text.c_str());
-	    if (menuToSelect > 0)
-            menuToSelect--;
+	    // if (menuToSelect > 0)
+        //     menuToSelect--;
 
         ProcessGossip(menuToSelect);
 	}
@@ -104,11 +104,11 @@ void GossipHelloAction::TellGossipMenus()
         TellGossipText(textId);
     }
 
-    for (uint32 i = 0; i < menu.GetMenuItemCount(); i++)
-    {
-        GossipMenuItem const* item = menu.GetItem(i);
+    GossipMenuItemContainer const &items = menu.GetMenuItems();
+    for (auto iter = items.begin(); iter != items.end(); iter++) {
+        GossipMenuItem const* item = &(iter->second);
         std::ostringstream out;
-        out << "[" << (i+1) << "] " << item->Message;
+        out << "[" << iter->first << "] " << item->Message;
         botAI->TellMasterNoFacing(out.str());
     }
 }
@@ -117,7 +117,7 @@ void GossipHelloAction::TellGossipMenus()
 bool GossipHelloAction::ProcessGossip(int32 menuToSelect)
 {
     GossipMenu& menu = bot->PlayerTalkClass->GetGossipMenu();
-    if (menuToSelect != -1 && menuToSelect >= menu.GetMenuItemCount())
+    if (menuToSelect != -1 && !menu.GetItem(menuToSelect))
     {
         botAI->TellError("Unknown gossip option");
         return false;
