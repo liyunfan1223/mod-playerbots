@@ -195,7 +195,9 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
     LOG_INFO("playerbots", "Initializing talents...");
-    InitTalentsTree();
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+        InitTalentsTree();
+    }
     sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specNo", 0);
     if (botAI) {
         sPlayerbotDbStore->Reset(botAI);
