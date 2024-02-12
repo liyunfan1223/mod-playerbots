@@ -162,6 +162,10 @@ AiPlayerbot.AddClassCommand = 1
 # Default: 0 (disabled)
 AiPlayerbot.FreeMethodLoot = 0
 
+# Bots loot roll level (0 = pass, 1 = greed, 2 = need)
+# Default: 1 (greed)
+AiPlayerbot.LootRollLevel = 1
+
 # Bots pick their quest reward (yes = picks first useful item, no = list all rewards, ask = pick useful item and lists if multiple)
 AiPlayerbot.AutoPickReward = no
 

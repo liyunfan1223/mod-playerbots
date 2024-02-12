@@ -161,6 +161,7 @@ class PlayerbotAIConfig
         uint32 botActiveAlone;
 
         bool freeMethodLoot;
+        int32 lootRollLevel;
         std::string autoPickReward;
         bool autoEquipUpgradeLoot;
         float equipUpgradeThreshold;

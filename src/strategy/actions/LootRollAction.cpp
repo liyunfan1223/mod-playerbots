@@ -4,7 +4,9 @@
 
 #include "LootRollAction.h"
 #include "Event.h"
+#include "Group.h"
 #include "ItemUsageValue.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "LootAction.h"
 
@@ -16,16 +18,62 @@ bool LootRollAction::Execute(Event event)
     if (!group)
         return false;
 
-    WorldPacket p(event.getPacket()); //WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
-    ObjectGuid guid;
-    uint32 slot;
-    uint8 rollType;
-    p.rpos(0); //reset packet pointer
-    p >> guid; //guid of the item rolled
-    p >> slot; //number of players invited to roll
-    p >> rollType; //need,greed or pass on roll
+    std::vector<Roll*> rolls = group->GetRolls();
+    for (Roll* &roll : rolls) {
+        if (roll->playerVote.find(bot->GetGUID())->second != NOT_EMITED_YET) {
+            continue;
+        }
+        ObjectGuid guid = roll->itemGUID;
+        uint32 slot = roll->itemSlot;
+        uint32 itemId = roll->itemid;
 
-    RollVote vote = PASS;
+        RollVote vote = PASS;
+        ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
+        if (!proto)
+            continue;
+        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
+        switch (proto->Class)
+        {
+            case ITEM_CLASS_WEAPON:
+            case ITEM_CLASS_ARMOR:
+                if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE) {
+                    vote = NEED;
+                }
+                else if (usage != ITEM_USAGE_NONE) {
+                    vote = GREED;
+                }
+                break;
+            default:
+                if (StoreLootAction::IsLootAllowed(itemId, botAI))
+                    vote = NEED;
+                break;
+        }
+        if (sPlayerbotAIConfig->lootRollLevel == 0) {
+            vote = PASS;
+        } else if (sPlayerbotAIConfig->lootRollLevel == 1) {
+            if (vote == NEED) {
+                vote = GREED;
+            } else if (vote == GREED) {
+                vote = PASS;
+            }
+        }
+        switch (group->GetLootMethod())
+        {
+            case MASTER_LOOT:
+            case FREE_FOR_ALL:
+                group->CountRollVote(bot->GetGUID(), guid, PASS);
+                break;
+            default:
+                group->CountRollVote(bot->GetGUID(), guid, vote);
+                break;
+        }
+    }
+    // WorldPacket p(event.getPacket()); //WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
+    // p.rpos(0); //reset packet pointer
+    // p >> guid; //guid of the item rolled
+    // p >> slot; //number of players invited to roll
+    // p >> rollType; //need,greed or pass on roll
+
 
     // std::vector<Roll*> rolls = group->GetRolls();
     // bot->Say("guid:" + std::to_string(guid.GetCounter()) + 
@@ -73,17 +121,6 @@ bool LootRollAction::Execute(Event event)
     //             break;
     //     }
     // }
-
-    switch (group->GetLootMethod())
-    {
-        case MASTER_LOOT:
-        case FREE_FOR_ALL:
-            group->CountRollVote(bot->GetGUID(), guid, PASS);
-            break;
-        default:
-            group->CountRollVote(bot->GetGUID(), guid, vote);
-            break;
-    }
 
     return true;
 }
