@@ -56,6 +56,9 @@ bool FollowAction::isUseful()
         return false;
     }
     Formation* formation = AI_VALUE(Formation*, "formation");
+    if (!formation) {
+        return false;
+    }
     std::string const target = formation->GetTargetName();
 
     Unit* fTarget = nullptr;

@@ -86,7 +86,9 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         if (item->GetTemplate()->Spells[i].SpellId > 0)
         {
             spellId = item->GetTemplate()->Spells[i].SpellId;
-            break;
+            if (!botAI->CanCastSpell(spellId, bot, false, item)) {
+                return false;
+            }
         }
     }
 
@@ -195,7 +197,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
     {
-        spellId = item->GetTemplate()->Spells[i].SpellId;
+        uint32 spellId = item->GetTemplate()->Spells[i].SpellId;
         if (!spellId)
             continue;
 

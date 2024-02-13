@@ -97,9 +97,11 @@ void PlayerbotFactory::Prepare()
         bot->ResurrectPlayer(1.0f, false);
 
     bot->CombatStop(true);
-
+    uint32 currentLevel = bot->GetLevel();
     bot->GiveLevel(level);
-    bot->SetUInt32Value(PLAYER_XP, 0);
+    if (level != currentLevel) {
+        bot->SetUInt32Value(PLAYER_XP, 0);
+    }
     if (!sPlayerbotAIConfig->randomBotShowHelmet || !urand(0, 4))
     {
         bot->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
@@ -158,6 +160,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     if (sPlayerbotAIConfig->randomBotPreQuests)
     {
+        uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
         LOG_INFO("playerbots", "Initializing quests...");
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Quests");
         InitQuests(classQuestIds);
@@ -169,7 +172,7 @@ void PlayerbotFactory::Randomize(bool incremental)
         
 
         ClearInventory();
-        bot->SetUInt32Value(PLAYER_XP, 0);
+        bot->SetUInt32Value(PLAYER_XP, currentXP);
         CancelAuras();
         bot->SaveToDB(false, false);
         if (pmo)

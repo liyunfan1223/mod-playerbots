@@ -19,6 +19,7 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
             creators["rejuvenation on party"] = &rejuvenation_on_party;
             creators["remove curse on party"] = &remove_curse_on_party;
             creators["abolish poison on party"] = &abolish_poison_on_party;
+            creators["revive"] = &revive;
         }
 
     private:
@@ -77,6 +78,13 @@ class GenericDruidNonCombatStrategyActionNodeFactory : public NamedObjectFactory
         static ActionNode* abolish_poison_on_party(PlayerbotAI* ai)
         {
             return new ActionNode ("abolish poison on party",
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                /*A*/ NULL,
+                /*C*/ NULL);
+        }
+        static ActionNode* revive(PlayerbotAI* ai)
+        {
+            return new ActionNode ("revive",
                 /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                 /*A*/ NULL,
                 /*C*/ NULL);

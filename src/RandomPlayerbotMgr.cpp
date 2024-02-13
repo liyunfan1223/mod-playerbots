@@ -1329,7 +1329,10 @@ void RandomPlayerbotMgr::Randomize(Player* bot)
         RandomizeFirst(bot);
     }
     else if (bot->getLevel() < sPlayerbotAIConfig->randomBotMaxLevel || !sPlayerbotAIConfig->downgradeMaxLevelBot) {
-        IncreaseLevel(bot);
+        uint8 level = bot->getLevel();
+        PlayerbotFactory factory(bot, level);
+        factory.Randomize(true);
+        // IncreaseLevel(bot);
     }
     else {
         RandomizeFirst(bot);
