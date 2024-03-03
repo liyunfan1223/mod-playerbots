@@ -222,7 +222,7 @@ class PlayerbotsServerScript : public ServerScript
     public:
         PlayerbotsServerScript() : ServerScript("PlayerbotsServerScript") { }
 
-        void OnPacketReceived(WorldSession* session, WorldPacket& packet) override
+        void OnPacketReceived(WorldSession* session, WorldPacket const& packet) override
         {
             if (Player* player = session->GetPlayer())
                 if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
