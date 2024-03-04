@@ -23,7 +23,7 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         build_type: [Release]
         c_compiler: [gcc, clang, cl]
         include:
@@ -60,43 +60,46 @@ jobs:
         
     - name: Clone Playerbot Module
       run: git clone --depth=1 --branch=master https://github.com/liyunfan1223/mod-playerbots.git modules/mod-playerbot
-
-    - name: Cache
-      uses: actions/cache@v3
-      with:
-        path: var/ccache
-        key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
-        restore-keys: |
-          ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
-          ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+    
+    - name: Install Requirements
+      run: sudo apt-get update && sudo apt-get install git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev mysql-server libboost-all-dev
+      
+    # - name: Cache
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: var/ccache
+    #     key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+    #     restore-keys: |
+    #       ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
+    #       ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
             
-    - name: Configure OS
-      run: source ./acore.sh install-deps
-      env:
-        CONTINUOUS_INTEGRATION: true
+    # - name: Configure OS
+    #   run: source ./acore.sh install-deps
+    #   env:
+    #     CONTINUOUS_INTEGRATION: true
         
-    - name: Create conf/config.sh
-      run: source ./apps/ci/ci-conf-core.sh
+    # - name: Create conf/config.sh
+    #   run: source ./apps/ci/ci-conf-core.sh
       
-    - name: Process pending sql
-      run: bash bin/acore-db-pendings
+    # - name: Process pending sql
+    #   run: bash bin/acore-db-pendings
       
-    - name: Build
-      run: source ./apps/ci/ci-compile.sh
-        
-    # - name: Configure CMake
-    #   # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-    #   # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-    #   run: >
-    #     cmake -B ${{ steps.strings.outputs.build-output-dir }}
-    #     -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-    #     -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-    #     -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-    #     -S ${{ github.workspace }}
-
     # - name: Build
-    #   # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-    #   run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+    #   run: source ./apps/ci/ci-compile.sh
+        
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+
+    - name: Build
+      # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     # - name: Test
     #   working-directory: ${{ steps.strings.outputs.build-output-dir }}
