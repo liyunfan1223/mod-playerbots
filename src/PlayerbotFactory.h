@@ -126,6 +126,12 @@ class PlayerbotFactory
         void InitAmmo();
         static uint32 CalcMixedGearScore(uint32 gs, uint32 quality);
         void InitPetTalents();
+        
+        void InitReagents();
+        void InitGlyphs();
+        void InitFood();
+        void InitMounts();
+        void InitBags(bool destroyOld = true);
     private:
         void Prepare();
         // void InitSecondEquipmentSet();
@@ -146,11 +152,8 @@ class PlayerbotFactory
         void ClearInventory();
         void ClearAllItems();
         void ResetQuests();
-        void InitMounts();
         void InitPotions();
-        void InitFood();
-        void InitReagents();
-        void InitGlyphs();
+        
         bool CanEquipArmor(ItemTemplate const* proto);
         bool CanEquipWeapon(ItemTemplate const* proto);
         void EnchantItem(Item* item);
@@ -158,7 +161,6 @@ class PlayerbotFactory
         bool CheckItemStats(uint8 sp, uint8 ap, uint8 tank);
         void CancelAuras();
         bool IsDesiredReplacement(Item* item);
-        void InitBags();
         void InitInventory();
         void InitInventoryTrade();
         void InitInventoryEquip();

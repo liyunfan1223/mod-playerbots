@@ -88,6 +88,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("nc");
     supported.push_back("de");
     supported.push_back("trainer");
+    supported.push_back("maintenance");
     supported.push_back("chat");
     supported.push_back("home");
     supported.push_back("destroy");

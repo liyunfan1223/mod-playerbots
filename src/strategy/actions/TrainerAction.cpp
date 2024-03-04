@@ -5,6 +5,7 @@
 #include "TrainerAction.h"
 #include "BudgetValues.h"
 #include "Event.h"
+#include "PlayerbotFactory.h"
 #include "Playerbots.h"
 
 void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, std::ostringstream& msg)
@@ -145,4 +146,25 @@ void TrainerAction::TellFooter(uint32 totalCost)
         out << "Total cost: " << chat->formatMoney(totalCost);
         botAI->TellMaster(out);
     }
+}
+
+bool MaintenanceAction::Execute(Event event)
+{
+    if (!sPlayerbotAIConfig->maintenanceCommand)
+        return false;
+    botAI->TellMaster("maintenance");
+    PlayerbotFactory factory(bot, bot->GetLevel());
+    factory.InitBags(false);
+    factory.InitAmmo();
+    factory.InitFood();
+    factory.InitReagents();
+    factory.InitTalentsTree(true);
+    factory.InitPet();
+    factory.InitPetTalents();
+    factory.InitClassSpells();
+    factory.InitAvailableSpells();
+    factory.InitSkills();
+    factory.InitMounts();
+    bot->DurabilityRepairAll(false, 1.0f, false);
+    return true;
 }

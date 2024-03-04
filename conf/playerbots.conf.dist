@@ -155,6 +155,9 @@ AiPlayerbot.AutoInitEquipLevelLimitRatio = 1.0
 # default: 1 (enable)
 AiPlayerbot.AddClassCommand = 1
 
+# Enable/Disable maintenance command, learn all available spells and skills, supplement consumables, repair, etc.
+# default: 1 (enable)
+AiPlayerbot.MaintenanceCommand = 1
 
 # Automation
 

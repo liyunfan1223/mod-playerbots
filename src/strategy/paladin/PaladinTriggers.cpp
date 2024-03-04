@@ -11,8 +11,8 @@ bool SealTrigger::IsActive()
 {
 	Unit* target = GetTarget();
 	return !botAI->HasAura("seal of justice", target) && !botAI->HasAura("seal of command", target) && !botAI->HasAura("seal of vengeance", target) &&
-        !botAI->HasAura("seal of corruption", target) && !botAI->HasAura("seal of righteousness", target) && !botAI->HasAura("seal of light", target) && (!botAI->HasAura("seal of wisdom", target) || AI_VALUE2(uint8, "mana", "self target") > 70) &&
-        AI_VALUE2(bool, "combat", "self target");
+        !botAI->HasAura("seal of corruption", target) && !botAI->HasAura("seal of righteousness", target) && !botAI->HasAura("seal of light", target) && 
+        (!botAI->HasAura("seal of wisdom", target) || AI_VALUE2(uint8, "mana", "self target") > 70);
 }
 
 bool CrusaderAuraTrigger::IsActive()

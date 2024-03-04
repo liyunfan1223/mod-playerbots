@@ -28,4 +28,10 @@ class TrainerAction : public Action
         void TellFooter(uint32 totalCost);
 };
 
+class MaintenanceAction : public Action
+{
+    public:
+		MaintenanceAction(PlayerbotAI* botAI) : Action(botAI, "maintenance") { }
+        bool Execute(Event event) override;
+};
 #endif

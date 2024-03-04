@@ -369,6 +369,7 @@ void PlayerbotFactory::Refresh()
     InitClassSpells();
     InitAvailableSpells();
     InitSkills();
+    InitMounts();
     bot->DurabilityRepairAll(false, 1.0f, false);
     if (bot->isDead())
         bot->ResurrectPlayer(1.0f, false);
@@ -1628,7 +1629,7 @@ inline Item* StoreNewItemInInventorySlot(Player* player, uint32 newItemId, uint3
 //     }
 // }
 
-void PlayerbotFactory::InitBags()
+void PlayerbotFactory::InitBags(bool destroyOld)
 {
     for (uint8 slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; ++slot)
     {
@@ -1641,8 +1642,11 @@ void PlayerbotFactory::InitBags()
         if (!CanEquipUnseenItem(slot, dest, newItemId))
             continue;
         
-        if (old_bag) {
+        if (old_bag && destroyOld) {
             bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+        }
+        if (old_bag) {
+            return;
         }
         Item* newItem = bot->EquipNewItem(dest, newItemId, true);
         if (newItem)
@@ -2435,7 +2439,7 @@ void PlayerbotFactory::InitAmmo()
 
     uint32 entry = sRandomItemMgr->GetAmmo(level, subClass);
     uint32 count = bot->GetItemCount(entry);
-    uint32 maxCount = 10000;
+    uint32 maxCount = 5000;
 
     if (count < maxCount / 2)
     {
@@ -2726,7 +2730,9 @@ void PlayerbotFactory::InitReagents()
             break;
     }
     for (std::pair item : items) {
-        StoreItem(item.first, item.second);
+        int count = (int)item.second - (int)bot->GetItemCount(item.first);
+        if (count > 0)
+            StoreItem(item.first, count);
     }
 }
 
@@ -3233,6 +3239,7 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
         bot->ApplyEnchantment(pItem, PERM_ENCHANTMENT_SLOT, true);
     }
     // botAI->EnchantItemT((*itr).SpellId, (*itr).SlotId);
+    // const SpellItemEnchantmentEntry* a = sSpellItemEnchantmentStore.LookupEntry(1);
 }
 
 std::vector<InventoryType> PlayerbotFactory::GetPossibleInventoryTypeListBySlot(EquipmentSlots slot) {
