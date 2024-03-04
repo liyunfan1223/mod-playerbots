@@ -97,6 +97,8 @@ class PlayerbotAIConfig
         // ClassSpecs classSpecs[MAX_CLASSES];
         
         std::string premadeSpecName[MAX_CLASSES][MAX_SPECNO];
+        std::string premadeSpecGlyph[MAX_CLASSES][MAX_SPECNO];
+        std::vector<uint32> parsedSpecGlyph[MAX_CLASSES][MAX_SPECNO];
         std::string premadeSpecLink[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
         std::vector<std::vector<uint32>> parsedSpecLinkOrder[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
         uint32 randomClassSpecProb[MAX_CLASSES][MAX_SPECNO];

@@ -33,7 +33,7 @@ uint32 LfgJoinAction::GetRoles()
         case CLASS_DRUID:
             if (spec == 2)
                 return PLAYER_ROLE_HEALER;
-            else if (spec == 1 && bot->getLevel() >= 20)
+            else if (spec == 1)
                 return (PLAYER_ROLE_TANK | PLAYER_ROLE_DAMAGE);
             else
                 return PLAYER_ROLE_DAMAGE;
