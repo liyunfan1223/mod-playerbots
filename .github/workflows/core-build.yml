@@ -17,16 +17,16 @@ jobs:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         include:
           - os: ubuntu-20.04
-            c_compiler: clang12
-            cpp_compiler: clang12++
+            c_compiler: clang
+            cpp_compiler: clang++
             build_type: Release
           - os: ubuntu-20.04
-            c_compiler: gcc10
-            cpp_compiler: g++10
+            c_compiler: gcc
+            cpp_compiler: g++
             build_type: Release
-            
+
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.cpp_compiler }}
 
     steps:
     - name: Checkout AzerothCore
