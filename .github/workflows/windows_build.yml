@@ -22,7 +22,7 @@ jobs:
           repository: 'liyunfan1223/azerothcore-wotlk'
           ref: 'Playerbot'
       - name: Clone Playerbot Module
-        run: git clone --depth=1 --branch=master https://github.com/liyunfan1223/mod-playerbots.git modules/mod-playerbot
+        run: git clone --depth=1 --branch=master https://github.com/liyunfan1223/mod-playerbots.git modules/mod-playerbots
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.9
       - name: Configure OS
