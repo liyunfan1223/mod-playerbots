@@ -26,6 +26,10 @@ jobs:
         os: [ubuntu-latest]
         build_type: [Release]
         c_compiler: [clang]
+        include:
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
 
     steps:
     - name: Checkout AzerothCore
