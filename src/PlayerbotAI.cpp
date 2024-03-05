@@ -2125,7 +2125,7 @@ bool PlayerbotAI::CanCastSpell(std::string const name, Unit* target, Item* itemT
     return CanCastSpell(aiObjectContext->GetValue<uint32>("spell id", name)->Get(), target, true, itemTarget);
 }
 
-bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell, Item* itemTarget)
+bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell, Item* itemTarget, Item* castItem)
 {
     if (!spellid) {
         if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster())) {
@@ -2249,9 +2249,11 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 	Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetUnitTarget(target);
-
-    spell->m_CastItem = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();
-    spell->m_targets.SetItemTarget(spell->m_CastItem);
+    spell->m_CastItem = castItem;
+    if (itemTarget == nullptr) {
+        itemTarget = aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();;
+    }
+    spell->m_targets.SetItemTarget(itemTarget);
 
     SpellCastResult result = spell->CheckCast(true);
     delete spell;

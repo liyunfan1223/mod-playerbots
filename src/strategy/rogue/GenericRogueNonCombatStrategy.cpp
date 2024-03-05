@@ -5,6 +5,29 @@
 #include "GenericRogueNonCombatStrategy.h"
 #include "Playerbots.h"
 
+
+class GenericRogueNonCombatStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+{
+    public:
+        GenericRogueNonCombatStrategyActionNodeFactory()
+        {
+            creators["use deadly poison on off hand"] = &use_deadly_poison_on_off_hand;
+        }
+
+    private:
+        static ActionNode* use_deadly_poison_on_off_hand(PlayerbotAI* botAI)
+        {
+            return new ActionNode ("use deadly poison on off hand",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("use instant poison on off hand"), nullptr),
+                /*C*/ nullptr);
+        }
+};
+
+GenericRogueNonCombatStrategy::GenericRogueNonCombatStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { 
+	actionNodeFactories.Add(new GenericRogueNonCombatStrategyActionNodeFactory());
+}
+
 void GenericRogueNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);

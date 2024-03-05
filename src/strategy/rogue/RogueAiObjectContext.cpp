@@ -133,6 +133,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
             creators["tricks of the trade on main tank"] = &RogueAiObjectContextInternal::tricks_of_the_trade_on_main_tank;
             creators["use instant poison on main hand"] = &RogueAiObjectContextInternal::use_instant_poison;
             creators["use deadly poison on off hand"] = &RogueAiObjectContextInternal::use_deadly_poison;
+            creators["use instant poison on off hand"] = &RogueAiObjectContextInternal::use_instant_poison_off_hand;
             creators["fan of knives"] = &RogueAiObjectContextInternal::fan_of_knives;
             creators["killing spree"] = &RogueAiObjectContextInternal::killing_spree;
         }
@@ -169,6 +170,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* tricks_of_the_trade_on_main_tank(PlayerbotAI* ai) { return new CastTricksOfTheTradeOnMainTankAction(ai); }
         static Action* use_instant_poison(PlayerbotAI* ai) { return new UseInstantPoisonAction(ai); }
         static Action* use_deadly_poison(PlayerbotAI* ai) { return new UseDeadlyPoisonAction(ai); }
+        static Action* use_instant_poison_off_hand(PlayerbotAI* ai) { return new UseInstantPoisonOffHandAction(ai); }
         static Action* fan_of_knives(PlayerbotAI* ai) { return new FanOfKnivesAction(ai); }
         static Action* killing_spree(PlayerbotAI* ai) { return new CastKillingSpreeAction(ai); }
 };

@@ -86,7 +86,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         if (item->GetTemplate()->Spells[i].SpellId > 0)
         {
             spellId = item->GetTemplate()->Spells[i].SpellId;
-            if (!botAI->CanCastSpell(spellId, bot, false, item)) {
+            if (!botAI->CanCastSpell(spellId, bot, false, itemTarget, item)) {
                 return false;
             }
         }

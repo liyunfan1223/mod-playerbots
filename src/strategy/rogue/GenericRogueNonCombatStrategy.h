@@ -12,7 +12,7 @@ class PlayerbotAI;
 class GenericRogueNonCombatStrategy : public NonCombatStrategy
 {
     public:
-        GenericRogueNonCombatStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+        GenericRogueNonCombatStrategy(PlayerbotAI* botAI);
 
         std::string const getName() override { return "nc"; }
         void InitTriggers(std::vector<TriggerNode*>& triggers) override;

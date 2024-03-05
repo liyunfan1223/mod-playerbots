@@ -51,7 +51,7 @@ bool UseDeadlyPoisonAction::Execute(Event event) {
     std::vector<Item*> items;
     std::string poison_name;
     for (std::string& suffix: poison_suffixs) {
-        poison_name = getName() + suffix;
+        poison_name = "Deadly Poison" + suffix;
         items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
         if (!items.empty()) {
             break;
@@ -70,7 +70,7 @@ bool UseDeadlyPoisonAction::isPossible() {
     std::vector<Item*> items;
     std::string poison_name;
     for (std::string& suffix: poison_suffixs) {
-        poison_name = getName() + suffix;
+        poison_name = "Deadly Poison" + suffix;
         items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
         if (!items.empty()) {
             break;
@@ -84,7 +84,7 @@ bool UseInstantPoisonAction::Execute(Event event) {
     std::vector<Item*> items;
     std::string poison_name;
     for (std::string& suffix: poison_suffixs) {
-        poison_name = getName() + suffix;
+        poison_name = "Instant Poison" + suffix;
         items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
         if (!items.empty()) {
             break;
@@ -102,7 +102,39 @@ bool UseInstantPoisonAction::isPossible() {
     std::vector<Item*> items;
     std::string poison_name;
     for (std::string& suffix: poison_suffixs) {
-        poison_name = getName() + suffix;
+        poison_name = "Instant Poison" + suffix;
+        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
+        if (!items.empty()) {
+            break;
+        }
+    }
+    return !items.empty();
+}
+
+bool UseInstantPoisonOffHandAction::Execute(Event event) {
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
+    std::vector<Item*> items;
+    std::string poison_name;
+    for (std::string& suffix: poison_suffixs) {
+        poison_name = "Instant Poison" + suffix;
+        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
+        if (!items.empty()) {
+            break;
+        }
+    }
+    if (items.empty()) {
+        return false;
+    }
+    Item* const itemForSpell = bot->GetItemByPos( INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND );
+    return UseItem(*items.begin(), ObjectGuid::Empty, itemForSpell);
+}
+
+bool UseInstantPoisonOffHandAction::isPossible() {
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
+    std::vector<Item*> items;
+    std::string poison_name;
+    for (std::string& suffix: poison_suffixs) {
+        poison_name = "Instant Poison" + suffix;
         items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
         if (!items.empty()) {
             break;

@@ -149,6 +149,14 @@ class UseInstantPoisonAction : public UseItemAction
 		virtual bool isPossible() override;
 };
 
+class UseInstantPoisonOffHandAction : public UseItemAction
+{
+	public:
+		UseInstantPoisonOffHandAction(PlayerbotAI* ai) : UseItemAction(ai, "Instant Poison Off Hand") {}
+		virtual bool Execute(Event event) override;
+		virtual bool isPossible() override;
+};
+
 class FanOfKnivesAction : public CastMeleeSpellAction
 {
 	public:
