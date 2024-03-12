@@ -237,7 +237,7 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         }
         static ActionNode* melee_consecration([[maybe_unused]] PlayerbotAI* botAI)
         {
-            return new ActionNode ("melee consecration",
+            return new ActionNode ("consecration",
                 /*P*/ NextAction::array(0, new NextAction("reach melee"), nullptr),
                 /*A*/ nullptr,
                 /*C*/ nullptr);
