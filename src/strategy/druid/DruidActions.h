@@ -96,6 +96,13 @@ class CastSurvivalInstinctsAction : public CastBuffSpellAction
 		CastSurvivalInstinctsAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "survival instincts") { }
 };
 
+class CastFrenziedRegenerationAction : public CastBuffSpellAction
+{
+	public:
+		CastFrenziedRegenerationAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "frenzied regeneration") { }
+};
+
+
 class CastThornsAction : public CastBuffSpellAction
 {
 	public:

@@ -67,6 +67,9 @@ END_TRIGGER()
 BEGIN_TRIGGER(HuntersPetLowHealthTrigger, Trigger)
 END_TRIGGER()
 
+BEGIN_TRIGGER(HuntersPetMediumHealthTrigger, Trigger)
+END_TRIGGER()
+
 class BlackArrowTrigger : public DebuffTrigger
 {
     public:

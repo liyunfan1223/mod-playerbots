@@ -75,13 +75,16 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
     NonCombatStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("demon armor", NextAction::array(0, new NextAction("fel armor", 21.0f), nullptr)));
-    triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no healthstone", NextAction::array(0, new NextAction("create healthstone", 15.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no spellstone", NextAction::array(0, new NextAction("create spellstone", 13.0f), nullptr)));
+    triggers.push_back(new TriggerNode("spellstone", NextAction::array(0, new NextAction("spellstone", 13.0f), nullptr)));
 }
 
 void WarlockPetStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felguard", 60.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felguard", 60.0f), nullptr)));
     // TODO Warlock pets
 }
 

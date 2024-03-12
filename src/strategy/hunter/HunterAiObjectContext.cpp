@@ -63,6 +63,7 @@ class HunterTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["no stings"] = &HunterTriggerFactoryInternal::NoStings;
             creators["hunters pet dead"] = &HunterTriggerFactoryInternal::hunters_pet_dead;
             creators["hunters pet low health"] = &HunterTriggerFactoryInternal::hunters_pet_low_health;
+            creators["hunters pet medium health"] = &HunterTriggerFactoryInternal::hunters_pet_medium_health;
             creators["hunter's mark"] = &HunterTriggerFactoryInternal::hunters_mark;
             creators["freezing trap"] = &HunterTriggerFactoryInternal::freezing_trap;
             creators["aspect of the pack"] = &HunterTriggerFactoryInternal::aspect_of_the_pack;
@@ -97,6 +98,7 @@ class HunterTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* NoStings(PlayerbotAI* botAI) { return new HunterNoStingsActiveTrigger(botAI); }
         static Trigger* hunters_pet_dead(PlayerbotAI* botAI) { return new HuntersPetDeadTrigger(botAI); }
         static Trigger* hunters_pet_low_health(PlayerbotAI* botAI) { return new HuntersPetLowHealthTrigger(botAI); }
+        static Trigger* hunters_pet_medium_health(PlayerbotAI* botAI) { return new HuntersPetMediumHealthTrigger(botAI); }
         static Trigger* hunters_mark(PlayerbotAI* botAI) { return new HuntersMarkTrigger(botAI); }
         static Trigger* freezing_trap(PlayerbotAI* botAI) { return new FreezingTrapTrigger(botAI); }
         static Trigger* aspect_of_the_pack(PlayerbotAI* botAI) { return new HunterAspectOfThePackTrigger(botAI); }

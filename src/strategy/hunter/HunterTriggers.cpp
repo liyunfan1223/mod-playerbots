@@ -5,6 +5,7 @@
 #include "HunterTriggers.h"
 #include "GenericTriggers.h"
 #include "HunterActions.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
@@ -37,6 +38,12 @@ bool HuntersPetLowHealthTrigger::IsActive()
 {
     Unit* pet = AI_VALUE(Unit*, "pet target");
     return pet && AI_VALUE2(uint8, "health", "pet target") < 40 && !AI_VALUE2(bool, "dead", "pet target") && !AI_VALUE2(bool, "mounted", "self target");
+}
+
+bool HuntersPetMediumHealthTrigger::IsActive()
+{
+    Unit* pet = AI_VALUE(Unit*, "pet target");
+    return pet && AI_VALUE2(uint8, "health", "pet target") < sPlayerbotAIConfig->mediumHealth && !AI_VALUE2(bool, "dead", "pet target") && !AI_VALUE2(bool, "mounted", "self target");
 }
 
 bool HunterPetNotHappy::IsActive()

@@ -176,6 +176,7 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
             creators["rip"] = &DruidAiObjectContextInternal::rip;
             creators["cower"] = &DruidAiObjectContextInternal::cower;
             creators["survival instincts"] = &DruidAiObjectContextInternal::survival_instincts;
+            creators["frenzied regeneration"] = &DruidAiObjectContextInternal::frenzied_regeneration;
             creators["thorns"] = &DruidAiObjectContextInternal::thorns;
             creators["thorns on party"] = &DruidAiObjectContextInternal::thorns_on_party;
             creators["thorns on main tank"] = &DruidAiObjectContextInternal::thorns_on_main_tank;
@@ -258,6 +259,7 @@ class DruidAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* rip(PlayerbotAI* botAI) { return new CastRipAction(botAI); }
         static Action* cower(PlayerbotAI* botAI) { return new CastCowerAction(botAI); }
         static Action* survival_instincts(PlayerbotAI* botAI) { return new CastSurvivalInstinctsAction(botAI); }
+        static Action* frenzied_regeneration(PlayerbotAI* botAI) { return new CastFrenziedRegenerationAction(botAI); }
         static Action* thorns(PlayerbotAI* botAI) { return new CastThornsAction(botAI); }
         static Action* thorns_on_party(PlayerbotAI* botAI) { return new CastThornsOnPartyAction(botAI); }
         static Action* thorns_on_main_tank(PlayerbotAI* botAI) { return new CastThornsOnMainTankAction(botAI); }

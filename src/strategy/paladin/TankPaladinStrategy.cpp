@@ -78,7 +78,7 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("avenger's shield", ACTION_HIGH + 5), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, 
-        new NextAction("consecration", ACTION_HIGH + 7), 
+        new NextAction("melee consecration", ACTION_HIGH + 7), 
         new NextAction("avenger's shield", ACTION_HIGH + 6), nullptr)));
     // triggers.push_back(new TriggerNode("avenger's shield", NextAction::array(0, new NextAction("avenger's shield", ACTION_HIGH + 7), nullptr)));
     triggers.push_back(new TriggerNode("lose aggro", NextAction::array(0, new NextAction("hand of reckoning", ACTION_HIGH + 7), nullptr)));

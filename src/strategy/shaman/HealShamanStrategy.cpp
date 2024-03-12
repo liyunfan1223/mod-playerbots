@@ -49,11 +49,11 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         
     triggers.push_back(new TriggerNode(
         "party member critical health",
-		NextAction::array(0, new NextAction("riptide on party", 24.0f), new NextAction("lesser healing wave on party", 23.0f), NULL)));
+		NextAction::array(0, new NextAction("riptide on party", 24.0f), new NextAction("healing wave on party", 23.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member low health",
-		NextAction::array(0, new NextAction("riptide on party", 18.0f), new NextAction("lesser healing wave on party", 17.0f), NULL)));
+		NextAction::array(0, new NextAction("riptide on party", 18.0f), new NextAction("healing wave on party", 17.0f), NULL)));
 
 	triggers.push_back(new TriggerNode(
         "party member medium health",

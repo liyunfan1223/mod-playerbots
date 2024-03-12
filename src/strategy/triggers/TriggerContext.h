@@ -124,6 +124,8 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["critical aoe heal"] = &TriggerContext::critical_aoe_heal;
             creators["low aoe heal"] = &TriggerContext::low_aoe_heal;
             creators["medium aoe heal"] = &TriggerContext::medium_aoe_heal;
+            creators["almost full aoe heal"] = &TriggerContext::almost_full_aoe_heal;
+
             creators["group heal occasion"] = &TriggerContext::group_heal_occasion;
             creators["medium group heal occasion"] = &TriggerContext::medium_group_heal_occasion;
             creators["invalid target"] = &TriggerContext::invalid_target;
@@ -219,6 +221,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* critical_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "critical aoe heal", "critical", 2); }
         static Trigger* low_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "low aoe heal", "low", 2); }
         static Trigger* medium_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "medium aoe heal", "medium", 2); }
+        static Trigger* almost_full_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "almost full aoe heal", "almost full", 2); }
         static Trigger* group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.6); }
         static Trigger* medium_group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.4); }
         static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
