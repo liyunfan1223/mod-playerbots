@@ -6,6 +6,7 @@
 #include "AiFactory.h"
 #include "Event.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
@@ -146,4 +147,11 @@ Unit* CastRighteousDefenseAction::GetTarget()
         return NULL;
     }
     return current_target->GetVictim();
+}
+
+bool CastMeleeConsecrationAction::isUseful()
+{
+    Unit* target = GetTarget();
+    // float dis = distance + CONTACT_DISTANCE;
+    return target && bot->IsWithinCombatRange(target, sPlayerbotAIConfig->meleeDistance); // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", GetTargetName()), distance);
 }

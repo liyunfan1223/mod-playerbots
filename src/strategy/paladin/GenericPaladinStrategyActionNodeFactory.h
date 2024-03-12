@@ -43,7 +43,6 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
             creators["taunt spell"] = &hand_of_reckoning;
             creators["righteous defense"] = &righteous_defense;
             creators["avenger's shield"] = &avengers_shield;
-            creators["melee consecration"] = &melee_consecration;
         }
     private:
         static ActionNode* blessing_of_sanctuary(PlayerbotAI* ai)
@@ -234,13 +233,6 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
             /*P*/ nullptr,
             /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), NULL),
             /*C*/ nullptr);
-        }
-        static ActionNode* melee_consecration([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("consecration",
-                /*P*/ NextAction::array(0, new NextAction("reach melee"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
         }
 };
 
