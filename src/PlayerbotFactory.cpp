@@ -52,6 +52,8 @@ uint32 PlayerbotFactory::tradeSkills[] =
 
 std::list<uint32> PlayerbotFactory::classQuestIds;
 std::list<uint32> PlayerbotFactory::specialQuestIds;
+std::vector<uint32> PlayerbotFactory::enchantSpellIdCache;
+std::vector<uint32> PlayerbotFactory::enchantGemIdCache;
 
 PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality, uint32 gearScoreLimit) : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), bot(bot)
 {
@@ -84,6 +86,48 @@ void PlayerbotFactory::Init()
         specialQuestIds.remove(questId);
         specialQuestIds.push_back(questId);
     }
+
+    for (uint32 id = 1; id < sSpellMgr->GetSpellInfoStoreSize(); ++id)
+    {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
+        if (!spellInfo)
+            continue;
+
+        uint32 requiredLevel = spellInfo->BaseLevel;
+
+        for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+        {
+            if (spellInfo->Effects[j].Effect != SPELL_EFFECT_ENCHANT_ITEM)
+                continue;
+
+            uint32 enchant_id = spellInfo->Effects[j].MiscValue;
+            if (!enchant_id)
+                continue;
+
+            SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+            if (!enchant || enchant->slot != PERM_ENCHANTMENT_SLOT)
+                continue;
+
+			SpellInfo const* enchantSpell = sSpellMgr->GetSpellInfo(enchant->spellid[0]);
+            if (!enchantSpell)
+                continue;
+            
+            enchantSpellIdCache.push_back(id);
+        }
+    }
+    LOG_INFO("playerbots", "Loading {} enchantment spells", enchantSpellIdCache.size());
+    for (auto iter = sSpellItemEnchantmentStore.begin(); iter != sSpellItemEnchantmentStore.end(); iter++) {
+        uint32 gemId = iter->GemID;
+        if (gemId == 0) {
+            continue;
+        }
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
+        if (!proto || !sGemPropertiesStore.LookupEntry(proto->GemProperties)) {
+            continue;
+        }
+        enchantGemIdCache.push_back(gemId);
+    }
+    LOG_INFO("playerbots", "Loading {} enchantment gems", enchantGemIdCache.size());
 }
 
 void PlayerbotFactory::Prepare()
@@ -3503,6 +3547,13 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
         }
     }
     return (0.0001 + score) * itemLevel * (quality + 1);
+}
+
+float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
+{
+    SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+    
+    return 0.0f;
 }
 
 bool PlayerbotFactory::IsShieldTank(Player* bot) 
