@@ -1373,6 +1373,11 @@ bool PlayerbotAI::IsRanged(Player* player)
     return true;
 }
 
+bool PlayerbotAI::IsMelee(Player *player)
+{
+    return !IsRanged(player);
+}
+
 bool PlayerbotAI::IsCaster(Player* player)
 {
     return IsRanged(player) && player->getClass() != CLASS_HUNTER;

@@ -86,11 +86,17 @@ void PlayerbotFactory::Init()
         specialQuestIds.remove(questId);
         specialQuestIds.push_back(questId);
     }
-
-    for (uint32 id = 1; id < sSpellMgr->GetSpellInfoStoreSize(); ++id)
+    uint32 maxStoreSize = sSpellMgr->GetSpellInfoStoreSize();
+    for (uint32 id = 1; id < maxStoreSize; ++id)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
         if (!spellInfo)
+            continue;
+
+        if (id == 47181 || id == 50358 || id == 47242 || id == 52639 || id == 47147 || id == 6043) // Test Enchant
+            continue;
+
+        if (strstr(spellInfo->SpellName[0], "Test"))
             continue;
 
         uint32 requiredLevel = spellInfo->BaseLevel;
@@ -105,14 +111,15 @@ void PlayerbotFactory::Init()
                 continue;
 
             SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-            if (!enchant || enchant->slot != PERM_ENCHANTMENT_SLOT)
-                continue;
-
-			SpellInfo const* enchantSpell = sSpellMgr->GetSpellInfo(enchant->spellid[0]);
-            if (!enchantSpell)
+            if (!enchant || (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT))
                 continue;
             
+			// SpellInfo const* enchantSpell = sSpellMgr->GetSpellInfo(enchant->spellid[0]);
+            // if (!enchantSpell)
+            //     continue;
+            
             enchantSpellIdCache.push_back(id);
+            // LOG_INFO("playerbots", "Add {} to enchantment spells", id);
         }
     }
     LOG_INFO("playerbots", "Loading {} enchantment spells", enchantSpellIdCache.size());
@@ -282,14 +289,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
-    {
-        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Enchant");
-        LOG_INFO("playerbots", "Initializing enchant templates...");
-        LoadEnchantContainer();
-        if (pmo)
-            pmo->finish();
-    }
+    // if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
+    // {
+    //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Enchant");
+    //     LOG_INFO("playerbots", "Initializing enchant templates...");
+    //     LoadEnchantContainer();
+    //     if (pmo)
+    //         pmo->finish();
+    // }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Bags");
     LOG_INFO("playerbots", "Initializing bags...");
@@ -328,14 +335,16 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
-    {
-        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
-        LOG_INFO("playerbots", "Initializing enchant templates...");
-        ApplyEnchantTemplate();
-        if (pmo)
-            pmo->finish();
+    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+        ApplyEnchantAndGemsNew();
     }
+    // {
+        // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EnchantTemplate");
+        // LOG_INFO("playerbots", "Initializing enchant templates...");
+        // ApplyEnchantTemplate();
+        // if (pmo)
+        //     pmo->finish();
+    // }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
     LOG_INFO("playerbots", "Initializing inventory...");
@@ -414,6 +423,9 @@ void PlayerbotFactory::Refresh()
     InitAvailableSpells();
     InitSkills();
     InitMounts();
+    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+        ApplyEnchantAndGemsNew();
+    }
     bot->DurabilityRepairAll(false, 1.0f, false);
     if (bot->isDead())
         bot->ResurrectPlayer(1.0f, false);
@@ -3286,6 +3298,88 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
     // const SpellItemEnchantmentEntry* a = sSpellItemEnchantmentStore.LookupEntry(1);
 }
 
+void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
+{
+    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+            continue;
+        Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!item) {
+            continue;
+        }
+        int32 bestEnchantId = -1;
+        float bestScore = 0;
+        for (const uint32 &enchantSpell : enchantSpellIdCache) {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(enchantSpell);
+            if (!spellInfo)
+                continue;
+
+            uint32 requiredLevel = spellInfo->BaseLevel;
+
+            if (requiredLevel > bot->GetLevel()) {
+                continue;
+            }
+            
+            // disable next expansion
+            if (bot->GetLevel() <= 60 && enchantSpell > 23144) {
+                continue;
+            }
+
+            if (bot->GetLevel() <= 70 && enchantSpell > 48557) {
+                continue;
+            }
+
+            if (!item->IsFitToSpellRequirements(spellInfo)) {
+                continue;
+            }
+
+            for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+            {
+                if (spellInfo->Effects[j].Effect != SPELL_EFFECT_ENCHANT_ITEM)
+                    continue;
+
+                uint32 enchant_id = spellInfo->Effects[j].MiscValue;
+                if (!enchant_id)
+                    continue;
+                
+                SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                if (!enchant || (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT)) {
+                    continue;
+                }
+                if (enchant->requiredSkill && bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue) {
+                    continue;
+                }
+                
+                if (enchant->requiredLevel > bot->GetLevel()) {
+                    continue;
+                }
+                
+                // // disable next expansion
+                // if (bot->GetLevel() < 80 && enchant->requiredLevel >= bot->GetLevel()) {
+                //     continue;
+                // }
+
+                // if (enchant->EnchantmentCondition && !bot->EnchantmentFitsRequirements(enchant->EnchantmentCondition, -1)) {
+                //     continue;
+                // }
+
+                float score = CalculateEnchantScore(enchant_id, bot);
+                if (score >= bestScore) {
+                    bestScore = score;
+                    bestEnchantId = enchant_id;
+                }
+            }
+        }
+        // enchant item
+        if (bestEnchantId != -1) {
+            bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, false);
+            item->SetEnchantment(PERM_ENCHANTMENT_SLOT, bestEnchantId, 0, 0, bot->GetGUID());
+            bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, true);
+        }
+    }
+}
+
 std::vector<InventoryType> PlayerbotFactory::GetPossibleInventoryTypeListBySlot(EquipmentSlots slot) {
     std::vector<InventoryType> ret;
     switch (slot) {
@@ -3552,8 +3646,366 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
 float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
 {
     SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-    
-    return 0.0f;
+    if (!enchant) {
+        return 0;
+    }
+    int agility = 0, strength = 0, intellect = 0, spirit = 0;
+    int stamina = 0, defense = 0, dodge = 0, parry = 0, block = 0, resilience = 0;
+    int hit = 0, crit = 0, haste = 0, expertise = 0, attack_power = 0;
+    int mana_regeneration = 0, spell_power = 0, armor_penetration = 0, spell_penetration = 0;
+    int armor = 0, dps = 0;
+    // int mongoose = 0, crusader = 0;
+    for (int s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
+    {
+        uint32 enchant_display_type = enchant->type[s];
+        uint32 enchant_amount = enchant->amount[s];
+        uint32 enchant_spell_id = enchant->spellid[s];
+
+        switch (enchant_display_type)
+        {
+            case ITEM_ENCHANTMENT_TYPE_NONE:
+                break;
+            case ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL:
+            {
+                if (botAI->IsMelee(bot) && enchant_spell_id == 28093) { // mongoose
+                    agility += 40;
+                } else if (botAI->IsMelee(bot) && enchant_spell_id == 20007) { // crusader
+                    strength += 30;
+                } else if (botAI->IsMelee(bot) && enchant_spell_id == 59620) { // Berserk 
+                    attack_power += 120;
+                } else if (botAI->IsMelee(bot) && enchant_spell_id == 64440) { // Blade Warding
+                    parry += 50;
+                }
+                break;
+            }   
+                // processed in Player::CastItemCombatSpell
+            case ITEM_ENCHANTMENT_TYPE_DAMAGE:
+                // if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
+                dps += float(enchant_amount);
+                // }
+                // if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
+                //     HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, float(enchant_amount), apply);
+                // else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
+                //     HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, float(enchant_amount), apply);
+                // else if (item->GetSlot() == EQUIPMENT_SLOT_RANGED)
+                //     HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
+                break;
+            case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
+            {
+                int allStatsAmount = 0;
+                switch (enchant_spell_id)
+                {
+                    case 13624:
+                        allStatsAmount = 1;
+                        break;
+                    case 13625:
+                        allStatsAmount = 2;
+                        break;
+                    case 13824:
+                        allStatsAmount = 3;
+                        break;
+                    case 19988:
+                    case 44627:
+                    case 56527:
+                        allStatsAmount = 4;
+                        break;
+                    case 27959:
+                    case 56529:
+                        allStatsAmount = 6;
+                        break;
+                    case 44624:
+                        allStatsAmount = 8;
+                        break;
+                    case 60694:
+                    case 68251:
+                        allStatsAmount = 10;
+                        break;
+                    default:
+                        break;
+                }
+                if (allStatsAmount != 0) {
+                    agility += allStatsAmount;
+                    strength += allStatsAmount;
+                    intellect += allStatsAmount;
+                    spirit += allStatsAmount;
+                    stamina += allStatsAmount;
+                }
+                if (botAI->IsMelee(bot) && enchant_spell_id == 64571) { // Blood Draining 
+                    stamina += 80;
+                }
+                // if (enchant_spell_id)
+                // {
+                //     if (apply)
+                //     {
+                //         int32 basepoints = 0;
+                //         // Random Property Exist - try found basepoints for spell (basepoints depends from item suffix factor)
+                //         if (item->GetItemRandomPropertyId())
+                //         {
+                //             ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
+                //             if (item_rand)
+                //             {
+                //                 // Search enchant_amount
+                //                 for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+                //                 {
+                //                     if (item_rand->Enchantment[k] == enchant_id)
+                //                     {
+                //                         basepoints = int32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
+                //                         break;
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //         // Cast custom spell vs all equal basepoints got from enchant_amount
+                //         if (basepoints)
+                //             CastCustomSpell(this, enchant_spell_id, &basepoints, &basepoints, &basepoints, true, item);
+                //         else
+                //             CastSpell(this, enchant_spell_id, true, item);
+                //     }
+                //     else
+                //         RemoveAurasDueToItemSpell(enchant_spell_id, item->GetGUID());
+                // }
+                break;
+            }
+            case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
+                // if (!enchant_amount)
+                // {
+                //     ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
+                //     if (item_rand)
+                //     {
+                //         for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+                //         {
+                //             if (item_rand->Enchantment[k] == enchant_id)
+                //             {
+                //                 enchant_amount = uint32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
+                //                 break;
+                //             }
+                //         }
+                //     }
+                // }
+
+                // HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + enchant_spell_id), TOTAL_VALUE, float(enchant_amount), apply);
+                break;
+            case ITEM_ENCHANTMENT_TYPE_STAT:
+            {
+                if (!enchant_amount)
+                {
+                    // ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
+                    // if (item_rand_suffix)
+                    // {
+                    //     for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+                    //     {
+                    //         if (item_rand_suffix->Enchantment[k] == enchant_id)
+                    //         {
+                    //             enchant_amount = uint32((item_rand_suffix->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
+                    //             break;
+                    //         }
+                    //     }
+                    // }
+                    break;
+                }
+                switch (enchant_spell_id)
+                {
+                    case ITEM_MOD_MANA:
+                        break;
+                    case ITEM_MOD_HEALTH:
+                        break;
+                    case ITEM_MOD_AGILITY:
+                        agility += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_STRENGTH:
+                        strength += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_INTELLECT:
+                        intellect += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_SPIRIT:
+                        spirit += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_STAMINA:
+                        stamina += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_DEFENSE_SKILL_RATING:
+                        defense += float(enchant_amount);
+                        break;
+                    case  ITEM_MOD_DODGE_RATING:
+                        dodge += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_PARRY_RATING:
+                        parry += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_BLOCK_RATING:
+                        block += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_HIT_MELEE_RATING:
+                        if (botAI->IsMelee(bot)) {
+                            hit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HIT_RANGED_RATING:
+                        if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
+                            hit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HIT_SPELL_RATING:
+                        if (botAI->IsCaster(bot)) {
+                            hit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_CRIT_MELEE_RATING:
+                        if (botAI->IsMelee(bot)) {
+                            crit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_CRIT_RANGED_RATING:
+                        if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
+                            crit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_CRIT_SPELL_RATING:
+                        if (botAI->IsCaster(bot)) {
+                            crit += float(enchant_amount);
+                        } 
+                        break;
+                    case ITEM_MOD_HASTE_RANGED_RATING:
+                        if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
+                            crit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HASTE_SPELL_RATING:
+                        if (botAI->IsCaster(bot)) {
+                            haste += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HIT_RATING:
+                        hit += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_CRIT_RATING:
+                        crit += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_RESILIENCE_RATING:
+                        resilience += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_HASTE_RATING:
+                        haste += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_EXPERTISE_RATING:
+                        expertise += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_ATTACK_POWER:
+                        attack_power += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_RANGED_ATTACK_POWER:
+                        if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
+                            attack_power += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_MANA_REGENERATION:
+                        mana_regeneration += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_ARMOR_PENETRATION_RATING:
+                        armor_penetration += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_SPELL_POWER:
+                        spell_power += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_HEALTH_REGEN:
+                        // no calculation
+                        break;
+                    case ITEM_MOD_SPELL_PENETRATION:
+                        spell_penetration += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_BLOCK_VALUE:
+                        block += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_SPELL_HEALING_DONE:   // deprecated
+                    case ITEM_MOD_SPELL_DAMAGE_DONE:    // deprecated
+                    default:
+                        break;
+                }
+                break;
+            }
+            case ITEM_ENCHANTMENT_TYPE_TOTEM:           // Shaman Rockbiter Weapon
+            {
+                // if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY))
+                // {
+                //     float addValue = 0.0f;
+                //     if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
+                //     {
+                //         addValue = float(enchant_amount * item->GetTemplate()->Delay / 1000.0f);
+                //         HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, addValue, apply);
+                //     }
+                //     else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
+                //     {
+                //         addValue = float(enchant_amount * item->GetTemplate()->Delay / 1000.0f);
+                //         HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, addValue, apply);
+                //     }
+                // }
+                break;
+            }
+            case ITEM_ENCHANTMENT_TYPE_USE_SPELL:
+                // processed in Player::CastItemUseSpell
+                break;
+            case ITEM_ENCHANTMENT_TYPE_PRISMATIC_SOCKET:
+                // nothing do..
+                break;
+            default:
+                // LOG_ERROR("entities.player", "Unknown item enchantment (id = {}) display type: {}", enchant_id, enchant_display_type);
+                break;
+        }                                               /*switch (enchant_display_type)*/
+    }
+    int tab = AiFactory::GetPlayerSpecTab(bot);
+    uint8 cls = bot->getClass();
+    float score = 0;
+    if (cls == CLASS_HUNTER) {
+        // AGILITY only
+        score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 3 + crit * 2 + haste * 2.5 + intellect;
+    } else if (cls == CLASS_WARLOCK || 
+               cls == CLASS_MAGE || 
+               (cls == CLASS_PRIEST && tab == 2) || // shadow
+               (cls == CLASS_SHAMAN && tab == 0) || // element
+               (cls == CLASS_DRUID && tab == 0) // balance
+              ) {
+        // SPELL DPS
+        score = intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration 
+            + hit * 1.5 + crit * 0.7 + haste * 1;       
+    } else if ((cls == CLASS_PALADIN && tab == 0) || // holy
+               (cls == CLASS_PRIEST && tab != 2) || // discipline / holy
+               (cls == CLASS_SHAMAN && tab == 2) || // heal
+               (cls == CLASS_DRUID && tab == 2)
+              ) {
+        // HEALER
+        score = intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1;       
+    } else if (cls == CLASS_ROGUE) {
+        // AGILITY mainly (STRENGTH also)
+        score = agility * 2 + strength + attack_power + armor_penetration * 1 + dps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+    } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
+                (cls == CLASS_WARRIOR && tab != 2) || // arm / fury
+                (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
+               ) {
+        // STRENGTH mainly (AGILITY also)
+        score = strength * 2 + agility + attack_power + armor_penetration + dps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+    } else if ((cls == CLASS_SHAMAN && tab == 1)) { // enhancement
+        // STRENGTH mainly (AGILITY, INTELLECT also)
+        score = strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + dps * 5
+            + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2;
+    } else if ((cls == CLASS_WARRIOR && tab == 2) || 
+               (cls == CLASS_PALADIN && tab == 1)) {
+        // TANK WITH SHIELD
+        score = strength * 1 + agility * 2 + attack_power * 0.2
+            + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3
+            + hit * 1 + crit * 0.2 + haste * 0.5 + expertise * 3;
+    } else if (cls == CLASS_DEATH_KNIGHT && tab == 0){
+        // BLOOD DK TANK
+        score = strength * 1 + agility * 2 + attack_power * 0.2
+            + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 
+            + hit * 2 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
+    } else {
+        // BEAR DRUID TANK (AND FERAL DRUID...?)
+        score = agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + dps * 2
+            + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5
+            + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
+    }
+    return score;
 }
 
 bool PlayerbotFactory::IsShieldTank(Player* bot) 

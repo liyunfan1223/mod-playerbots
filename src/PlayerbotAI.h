@@ -332,6 +332,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsHeal(Player* player);
         bool IsDps(Player* player);
         bool IsRanged(Player* player);
+        bool IsMelee(Player* player);
         bool IsCaster(Player* player);
         bool IsCombo(Player* player);
         bool IsRangedDps(Player* player);

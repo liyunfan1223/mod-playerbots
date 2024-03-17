@@ -116,7 +116,7 @@ class PlayerbotFactory
 
         static uint32 tradeSkills[];
         static float CalculateItemScore(uint32 item_id, Player* bot);
-        static float CalculateEnchantScore(uint32 enchant_id, Player* bot);
+        float CalculateEnchantScore(uint32 enchant_id, Player* bot);
         void InitTalentsTree(bool incremental = false, bool use_template = true, bool reset = false);
         static void InitTalentsBySpecNo(Player* bot, int specNo, bool reset);
         static void InitTalentsByParsedSpecLink(Player* bot, std::vector<std::vector<uint32>> parsedSpecLink, bool reset);
@@ -133,6 +133,7 @@ class PlayerbotFactory
         void InitFood();
         void InitMounts();
         void InitBags(bool destroyOld = true);
+        void ApplyEnchantAndGemsNew(bool destoryOld = true);
     private:
         void Prepare();
         // void InitSecondEquipmentSet();
