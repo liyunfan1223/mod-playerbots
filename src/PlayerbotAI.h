@@ -184,7 +184,7 @@ enum class GuilderType : uint8
     SMALL  = 50,
     MEDIUM = 70,
     LARGE  = 120,
-    HUGE   = 250
+    VERY_LARGE   = 250
 };
 
 enum ActivityType
