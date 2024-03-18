@@ -3547,7 +3547,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     }
     if (cls == CLASS_HUNTER) {
         // AGILITY only
-        score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 3 + crit * 2 + haste * 2.5 + intellect;
+        score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
     } else if (cls == CLASS_WARLOCK || 
                cls == CLASS_MAGE || 
                (cls == CLASS_PRIEST && tab == 2) || // shadow
@@ -3556,7 +3556,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
               ) {
         // SPELL DPS
         score = intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration 
-            + hit * 1.5 + crit * 0.7 + haste * 1;       
+            + hit * 1.2 + crit * 0.7 + haste * 1;       
     } else if ((cls == CLASS_PALADIN && tab == 0) || // holy
                (cls == CLASS_PRIEST && tab != 2) || // discipline / holy
                (cls == CLASS_SHAMAN && tab == 2) || // heal
@@ -3958,7 +3958,7 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
     float score = 0;
     if (cls == CLASS_HUNTER) {
         // AGILITY only
-        score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 3 + crit * 2 + haste * 2.5 + intellect;
+        score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
     } else if (cls == CLASS_WARLOCK || 
                cls == CLASS_MAGE || 
                (cls == CLASS_PRIEST && tab == 2) || // shadow
@@ -3967,7 +3967,7 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
               ) {
         // SPELL DPS
         score = intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration 
-            + hit * 1.5 + crit * 0.7 + haste * 1;       
+            + hit * 1.2 + crit * 0.7 + haste * 1;       
     } else if ((cls == CLASS_PALADIN && tab == 0) || // holy
                (cls == CLASS_PRIEST && tab != 2) || // discipline / holy
                (cls == CLASS_SHAMAN && tab == 2) || // heal
