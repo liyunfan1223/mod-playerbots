@@ -945,7 +945,7 @@ GuidPosition::GuidPosition(CreatureData const& creData) : ObjectGuid(HighGuid::U
     loadedFromDB = true;
 }
 
-GuidPosition::GuidPosition(GameObjectData const& goData) : ObjectGuid(HighGuid::GameObject, goData.id, goData.spawnId), WorldPosition(goData.mapid, goData.posX, goData.posY, goData.posZ, goData.orientation)
+GuidPosition::GuidPosition(GameObjectData const& goData) : ObjectGuid(HighGuid::GameObject, goData.id), WorldPosition(goData.mapid, goData.posX, goData.posY, goData.posZ, goData.orientation)
 {
     loadedFromDB = true;
 }

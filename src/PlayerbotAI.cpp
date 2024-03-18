@@ -1836,21 +1836,21 @@ GameObject* PlayerbotAI::GetGameObject(ObjectGuid guid)
     return ObjectAccessor::GetGameObject(*bot, guid);
 }
 
-GameObject* PlayerbotAI::GetGameObject(GameObjectData const* gameObjectData)
-{
-    if (!gameObjectData)
-        return nullptr;
+// GameObject* PlayerbotAI::GetGameObject(GameObjectData const* gameObjectData)
+// {
+//     if (!gameObjectData)
+//         return nullptr;
 
-    Map* map = sMapMgr->FindMap(gameObjectData->mapid, 0);
-    if (!map)
-        return nullptr;
+//     Map* map = sMapMgr->FindMap(gameObjectData->mapid, 0);
+//     if (!map)
+//         return nullptr;
 
-    auto gameobjectBounds = map->GetGameObjectBySpawnIdStore().equal_range(gameObjectData->spawnId);
-    if (gameobjectBounds.first == gameobjectBounds.second)
-        return nullptr;
+//     auto gameobjectBounds = map->GetGameObjectBySpawnIdStore().equal_range(gameObjectData->spawnId);
+//     if (gameobjectBounds.first == gameobjectBounds.second)
+//         return nullptr;
 
-    return gameobjectBounds.first->second;
-}
+//     return gameobjectBounds.first->second;
+// }
 
 WorldObject* PlayerbotAI::GetWorldObject(ObjectGuid guid)
 {

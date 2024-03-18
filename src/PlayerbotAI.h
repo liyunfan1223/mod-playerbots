@@ -353,7 +353,7 @@ class PlayerbotAI : public PlayerbotAIBase
         Player* GetPlayer(ObjectGuid guid);
         static Unit* GetUnit(CreatureData const* creatureData);
         GameObject* GetGameObject(ObjectGuid guid);
-        static GameObject* GetGameObject(GameObjectData const* gameObjectData);
+        // static GameObject* GetGameObject(GameObjectData const* gameObjectData);
         WorldObject* GetWorldObject(ObjectGuid guid);
         bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
         bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
