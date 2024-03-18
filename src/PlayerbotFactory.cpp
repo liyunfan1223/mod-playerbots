@@ -7,7 +7,9 @@
 #include "AiFactory.h"
 #include "ArenaTeamMgr.h"
 #include "DBCStores.h"
+#include "DBCStructure.h"
 #include "GuildMgr.h"
+#include "Item.h"
 #include "ItemTemplate.h"
 #include "Log.h"
 #include "LogCommon.h"
@@ -119,7 +121,7 @@ void PlayerbotFactory::Init()
             //     continue;
             
             enchantSpellIdCache.push_back(id);
-            // LOG_INFO("playerbots", "Add {} to enchantment spells", id);
+            LOG_INFO("playerbots", "Add {} to enchantment spells", id);
         }
     }
     LOG_INFO("playerbots", "Loading {} enchantment spells", enchantSpellIdCache.size());
@@ -132,6 +134,7 @@ void PlayerbotFactory::Init()
         if (!proto || !sGemPropertiesStore.LookupEntry(proto->GemProperties)) {
             continue;
         }
+        // LOG_INFO("playerbots", "Add {} to enchantment gems", gemId);
         enchantGemIdCache.push_back(gemId);
     }
     LOG_INFO("playerbots", "Loading {} enchantment gems", enchantGemIdCache.size());
@@ -3300,6 +3303,58 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
 
 void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
 {
+    int32 bestGemEnchantId[4] = {-1, -1, -1, -1}; // 1, 2, 4, 8 color
+    float bestGemScore[4] = {0, 0, 0, 0};
+    for (const uint32 &enchantGem : enchantGemIdCache) {
+        ItemTemplate const* gemTemplate = sObjectMgr->GetItemTemplate(enchantGem);
+        if (!gemTemplate)
+            continue;
+
+        const GemPropertiesEntry* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
+        if (!gemProperties) 
+            continue;
+
+        uint32 requiredLevel = gemTemplate->ItemLevel;
+
+        if (requiredLevel > bot->GetLevel()) {
+            continue;
+        }
+
+        uint32 enchant_id = gemProperties->spellitemenchantement;
+        if (!enchant_id)
+            continue;
+        
+        SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        if (!enchant || (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT)) {
+            continue;
+        }
+        if (enchant->requiredSkill && bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue) {
+            continue;
+        }
+        
+        if (enchant->requiredLevel > bot->GetLevel()) {
+            continue;
+        }
+
+        float score = CalculateEnchantScore(enchant_id, bot);
+        if ((gemProperties->color & 1) && score >= bestGemScore[0]) {
+            bestGemScore[0] = score;
+            bestGemEnchantId[0] = enchant_id;
+        }
+        if ((gemProperties->color & 2) && score >= bestGemScore[1]) {
+            bestGemScore[1] = score;
+            bestGemEnchantId[1] = enchant_id;
+        }
+        if ((gemProperties->color & 4) && score >= bestGemScore[2]) {
+            bestGemScore[2] = score;
+            bestGemEnchantId[2] = enchant_id;
+        }
+        if ((gemProperties->color & 8) && score >= bestGemScore[3]) {
+            bestGemScore[2] = score;
+            bestGemEnchantId[2] = enchant_id;
+        }
+    }
+
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
@@ -3322,11 +3377,11 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             }
             
             // disable next expansion
-            if (bot->GetLevel() <= 60 && enchantSpell > 23144) {
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 69 && enchantSpell >= 25072) {
                 continue;
             }
 
-            if (bot->GetLevel() <= 70 && enchantSpell > 48557) {
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 79 && enchantSpell > 48557) {
                 continue;
             }
 
@@ -3354,15 +3409,6 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 if (enchant->requiredLevel > bot->GetLevel()) {
                     continue;
                 }
-                
-                // // disable next expansion
-                // if (bot->GetLevel() < 80 && enchant->requiredLevel >= bot->GetLevel()) {
-                //     continue;
-                // }
-
-                // if (enchant->EnchantmentCondition && !bot->EnchantmentFitsRequirements(enchant->EnchantmentCondition, -1)) {
-                //     continue;
-                // }
 
                 float score = CalculateEnchantScore(enchant_id, bot);
                 if (score >= bestScore) {
@@ -3376,6 +3422,20 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, false);
             item->SetEnchantment(PERM_ENCHANTMENT_SLOT, bestEnchantId, 0, 0, bot->GetGUID());
             bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, true);
+        }
+        if (!item->HasSocket())
+            continue;
+        
+        for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + 3; ++enchant_slot)
+        {
+            
+            uint8 socketColor = item->GetTemplate()->Socket[enchant_slot - SOCK_ENCHANTMENT_SLOT].Color;
+            if (!socketColor) {
+                continue;
+            }
+            bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), false);
+            item->SetEnchantment(EnchantmentSlot(enchant_slot), bestGemEnchantId[socketColor], 0, 0, bot->GetGUID());
+            bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), true);
         }
     }
 }
@@ -3473,7 +3533,6 @@ void PlayerbotFactory::LoadEnchantContainer()
 
 float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
 {
-    float score = 0;
     int tab = AiFactory::GetPlayerSpecTab(bot);
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     ItemTemplate const* proto = &itemTemplates->at(item_id);
@@ -3545,6 +3604,10 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
                 break;
         }
     }
+    // Basic score
+    float score = (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
+        resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
+        spell_penetration + armor + dps) * 0.001;
     if (cls == CLASS_HUNTER) {
         // AGILITY only
         score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
@@ -3681,7 +3744,7 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
                 // processed in Player::CastItemCombatSpell
             case ITEM_ENCHANTMENT_TYPE_DAMAGE:
                 // if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
-                dps += float(enchant_amount);
+                //     dps += float(enchant_amount);
                 // }
                 // if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
                 //     HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, float(enchant_amount), apply);
@@ -3955,7 +4018,10 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
     }
     int tab = AiFactory::GetPlayerSpecTab(bot);
     uint8 cls = bot->getClass();
-    float score = 0;
+    // Basic score
+    float score = (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
+        resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
+        spell_penetration + armor + dps) * 0.001;
     if (cls == CLASS_HUNTER) {
         // AGILITY only
         score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;

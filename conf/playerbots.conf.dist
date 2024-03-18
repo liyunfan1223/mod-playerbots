@@ -112,6 +112,10 @@ AiPlayerbot.BotActiveAlone = 100
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
 
+# Enable expansion limitation
+# Default: 1
+AiPlayerbot.LimitEnchantExpansion = 1
+
 # Randombots checking players gear score level and deny the group invite if it's too low
 # Default: 1 (enabled)
 AiPlayerbot.GearScoreCheck = 0
