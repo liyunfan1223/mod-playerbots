@@ -3350,8 +3350,8 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             bestGemEnchantId[2] = enchant_id;
         }
         if ((gemProperties->color & 8) && score >= bestGemScore[3]) {
-            bestGemScore[2] = score;
-            bestGemEnchantId[2] = enchant_id;
+            bestGemScore[3] = score;
+            bestGemEnchantId[3] = enchant_id;
         }
     }
 
