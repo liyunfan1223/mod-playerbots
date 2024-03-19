@@ -55,6 +55,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
             creators["de"] = &ChatTriggerContext::dead;
             creators["trainer"] = &ChatTriggerContext::trainer;
             creators["maintenance"] = &ChatTriggerContext::maintenance;
+            creators["equip upgrade"] = &ChatTriggerContext::equip_upgrade;
             creators["attack"] = &ChatTriggerContext::attack;
             creators["chat"] = &ChatTriggerContext::chat;
             creators["accept"] = &ChatTriggerContext::accept;
@@ -166,6 +167,7 @@ class ChatTriggerContext : public NamedObjectContext<Trigger>
         static Trigger* attack(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "attack"); }
         static Trigger* trainer(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "trainer"); }
         static Trigger* maintenance(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "maintenance"); }
+        static Trigger* equip_upgrade(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "equip upgrade"); }
         static Trigger* co(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "co"); }
         static Trigger* nc(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "nc"); }
         static Trigger* dead(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "de"); }

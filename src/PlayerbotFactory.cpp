@@ -3370,8 +3370,11 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             if (!spellInfo)
                 continue;
 
-            uint32 requiredLevel = spellInfo->BaseLevel;
+            if (!item->IsFitToSpellRequirements(spellInfo)) {
+                continue;
+            }
 
+            uint32 requiredLevel = spellInfo->BaseLevel;
             if (requiredLevel > bot->GetLevel()) {
                 continue;
             }
@@ -3385,9 +3388,6 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 continue;
             }
 
-            if (!item->IsFitToSpellRequirements(spellInfo)) {
-                continue;
-            }
 
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
             {
@@ -3602,6 +3602,32 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
                 break;
             default:
                 break;
+        }
+    }
+    for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
+    {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
+        if (!spellInfo)
+            continue;
+
+        for (uint8 i = 0 ; i < 3; i++)
+        {
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA)
+            {
+                switch (spellInfo->Effects[i].ApplyAuraName)
+                {
+                    case SPELL_AURA_MOD_DAMAGE_DONE:
+                    // case SPELL_AURA_MOD_HEALING_DONE: duplicated
+                        spell_power += spellInfo->Effects[i].BasePoints + 1;
+                        break;
+                    case SPELL_AURA_MOD_ATTACK_POWER:
+                        attack_power += spellInfo->Effects[i].BasePoints + 1;
+                    case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
+                        block += spellInfo->Effects[i].BasePoints + 1;
+                    default:
+                        break;
+                }
+            }
         }
     }
     // Basic score
