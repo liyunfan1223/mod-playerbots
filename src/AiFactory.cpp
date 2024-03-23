@@ -266,7 +266,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     {
         engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
     }
-
+    if (sPlayerbotAIConfig->autoSaveMana) {
+        engine->addStrategy("auto save mana");
+    }
     switch (player->getClass())
     {
         case CLASS_PRIEST:
@@ -364,9 +366,6 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategy("boost");
             engine->addStrategy("dps assist");
             engine->removeStrategy("threat");
-            if (sPlayerbotAIConfig->autoSaveMana) {
-                engine->addStrategy("auto save mana");
-            }
             // engine-
             switch (player->getClass()) {
                 case CLASS_PRIEST: {
@@ -537,7 +536,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         nonCombatEngine->addStrategies("nc", "food", "chat", "follow",
             "default", "quest", "loot", "gather", "duel", "buff", "mount", nullptr);
     }
-
+    if (sPlayerbotAIConfig->autoSaveMana) {
+        nonCombatEngine->addStrategy("auto save mana");
+    }
     if ((facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
     {
         Player* master = facade->GetMaster();
@@ -607,9 +608,6 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                     else {
                         nonCombatEngine->addStrategy("pvp");
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig->nonCombatStrategies);
-                    }
-                    if (sPlayerbotAIConfig->autoSaveMana) {
-                        nonCombatEngine->addStrategy("auto save mana");
                     }
                 }
             }
