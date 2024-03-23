@@ -6,6 +6,7 @@
 #include "BattlegroundMgr.h"
 #include "Item.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "Engine.h"
 #include "Group.h"
@@ -273,8 +274,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             {
                 engine->addStrategies("dps", "shadow debuff", "shadow aoe", "threat", nullptr);
             }
-            else
+            else {
                 engine->addStrategies("heal", "threat", nullptr);
+            }
 
             engine->addStrategies("dps assist", "cure", nullptr);
             break;
@@ -362,6 +364,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategy("boost");
             engine->addStrategy("dps assist");
             engine->removeStrategy("threat");
+            if (sPlayerbotAIConfig->autoSaveMana) {
+                engine->addStrategy("auto save mana");
+            }
             // engine-
             switch (player->getClass()) {
                 case CLASS_PRIEST: {
@@ -426,7 +431,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategy("arena");
         }
 
-        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "conserve mana", "cast time", "dps assist", nullptr);
+        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "cast time", "dps assist", nullptr);
         engine->removeStrategy("custom::say");
         engine->removeStrategy("flee");
         engine->removeStrategy("threat");
@@ -602,6 +607,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                     else {
                         nonCombatEngine->addStrategy("pvp");
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig->nonCombatStrategies);
+                    }
+                    if (sPlayerbotAIConfig->autoSaveMana) {
+                        nonCombatEngine->addStrategy("auto save mana");
                     }
                 }
             }

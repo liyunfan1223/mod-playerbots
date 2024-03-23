@@ -21,7 +21,7 @@ class CastLesserHealingWaveAction : public CastHealingSpellAction
 class CastLesserHealingWaveOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastLesserHealingWaveOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "lesser healing wave") { }
+        CastLesserHealingWaveOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "lesser healing wave", 25.0f, HealingManaEfficiency::LOW) { }
 };
 
 class CastHealingWaveAction : public CastHealingSpellAction
@@ -33,13 +33,13 @@ class CastHealingWaveAction : public CastHealingSpellAction
 class CastHealingWaveOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastHealingWaveOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "healing wave") { }
+        CastHealingWaveOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "healing wave", 50.0f, HealingManaEfficiency::MEDIUM) { }
 };
 
 class CastChainHealAction : public CastAoeHealSpellAction
 {
     public:
-        CastChainHealAction(PlayerbotAI* botAI) : CastAoeHealSpellAction(botAI, "chain heal") { }
+        CastChainHealAction(PlayerbotAI* botAI) : CastAoeHealSpellAction(botAI, "chain heal", 15.0f, HealingManaEfficiency::HIGH) { }
 };
 
 class CastRiptideAction : public CastHealingSpellAction
@@ -51,7 +51,7 @@ class CastRiptideAction : public CastHealingSpellAction
 class CastRiptideOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastRiptideOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "riptide") { }
+        CastRiptideOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "riptide", 15.0f, HealingManaEfficiency::VERY_HIGH) { }
 };
 
 class CastEarthShieldAction : public CastBuffSpellAction

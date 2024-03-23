@@ -91,7 +91,7 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
                 return true;
             }
             int32_t level = GetIntervalLevel(new_unit);
-            if (level % 10 == 2 || level % 10 == 0) {
+            if (level % 10 == 2 || level % 10 == 1) {
                 return new_time < old_time;
             }
             // dont switch targets when all of them with low health
@@ -110,10 +110,10 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
             float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance : sPlayerbotAIConfig->meleeDistance;
             attackRange += 5.0f;
             int level = dis < attackRange ? 10 : 0;
-            if (time >= 5 && time <= 20) {
+            if (time >= 3 && time <= 20) {
                 return level + 2;
             }
-            if (time < 5) {
+            if (time > 20) {
                 return level + 1;
             }
             return level;

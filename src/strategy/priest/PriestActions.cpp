@@ -39,12 +39,12 @@ Unit* CastPowerWordShieldOnAlmostFullHealthBelow::GetTarget()
         if (player->GetDistance2d(bot) > sPlayerbotAIConfig->spellDistance) {
             continue;
         }
-        if (botAI->HasAnyAuraOf(player, "weakened soul", "power word: shield", NULL)) {
+        if (botAI->HasAnyAuraOf(player, "weakened soul", "power word: shield", nullptr)) {
             continue;
         }
         return player;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool CastPowerWordShieldOnAlmostFullHealthBelow::isUseful()
@@ -64,7 +64,7 @@ bool CastPowerWordShieldOnAlmostFullHealthBelow::isUseful()
         if (player->GetDistance2d(bot) > sPlayerbotAIConfig->spellDistance) {
             continue;
         }
-        if (botAI->HasAnyAuraOf(player, "weakened soul", "power word: shield", NULL)) {
+        if (botAI->HasAnyAuraOf(player, "weakened soul", "power word: shield", nullptr)) {
             continue;
         }
         return true;

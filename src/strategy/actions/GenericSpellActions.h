@@ -98,20 +98,23 @@ class CastEnchantItemAction : public CastSpellAction
 class CastHealingSpellAction : public CastAuraSpellAction
 {
     public:
-        CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f);
+        CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f, HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM);
 
         std::string const GetTargetName() override { return "self target"; }
         bool isUseful() override;
         ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
-
-    protected:
+        // Yunfan: Mana efficiency tell the bot how to save mana. The higher the better.
+        HealingManaEfficiency manaEfficiency;
         uint8 estAmount;
+
+    // protected:
 };
 
 class CastAoeHealSpellAction : public CastHealingSpellAction
 {
     public:
-    	CastAoeHealSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f) : CastHealingSpellAction(botAI, spell, estAmount) { }
+    	CastAoeHealSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f, HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM) 
+            : CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency) { }
 
 		std::string const GetTargetName() override { return "party member to heal"; }
         bool isUseful() override;
@@ -142,8 +145,8 @@ class PartyMemberActionNameSupport
 class HealPartyMemberAction : public CastHealingSpellAction, public PartyMemberActionNameSupport
 {
     public:
-        HealPartyMemberAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f) :
-			CastHealingSpellAction(botAI, spell, estAmount), PartyMemberActionNameSupport(spell) { }
+        HealPartyMemberAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f, HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM) :
+			CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency), PartyMemberActionNameSupport(spell) { }
 
 		std::string const GetTargetName() override { return "party member to heal"; }
 		std::string const getName() override { return PartyMemberActionNameSupport::getName(); }

@@ -58,7 +58,8 @@ class StrategyContext : public NamedObjectContext<Strategy>
             creators["gather"] = &StrategyContext::gather;
             creators["emote"] = &StrategyContext::emote;
             creators["passive"] = &StrategyContext::passive;
-            creators["conserve mana"] = &StrategyContext::conserve_mana;
+            // creators["conserve mana"] = &StrategyContext::conserve_mana;
+            creators["auto save mana"] = &StrategyContext::auto_save_mana;
             creators["food"] = &StrategyContext::food;
             creators["chat"] = &StrategyContext::chat;
             creators["default"] = &StrategyContext::world_packet;
@@ -131,7 +132,8 @@ class StrategyContext : public NamedObjectContext<Strategy>
         static Strategy* gather(PlayerbotAI* botAI) { return new GatherStrategy(botAI); }
         static Strategy* emote(PlayerbotAI* botAI) { return new EmoteStrategy(botAI); }
         static Strategy* passive(PlayerbotAI* botAI) { return new PassiveStrategy(botAI); }
-        static Strategy* conserve_mana(PlayerbotAI* botAI) { return new ConserveManaStrategy(botAI); }
+        // static Strategy* conserve_mana(PlayerbotAI* botAI) { return new ConserveManaStrategy(botAI); }
+        static Strategy* auto_save_mana(PlayerbotAI* botAI) { return new HealerAutoSaveManaStrategy(botAI); }
         static Strategy* food(PlayerbotAI* botAI) { return new UseFoodStrategy(botAI); }
         static Strategy* chat(PlayerbotAI* botAI) { return new ChatCommandHandlerStrategy(botAI); }
         static Strategy* world_packet(PlayerbotAI* botAI) { return new WorldPacketHandlerStrategy(botAI); }

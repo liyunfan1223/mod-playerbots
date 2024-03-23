@@ -306,6 +306,16 @@ AiPlayerbot.LowMana = 15
 AiPlayerbot.MediumMana = 40
 
 # Random bot default strategies (applied after defaults)
+
+# Enable healer bot save mana
+# Default: 1 (enable)
+AiPlayerbot.AutoSaveMana = 1
+
+# Healer bot save mana threshold
+# Default: 100 (full)
+AiPlayerbot.SaveManaThreshold = 100
+
+
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
 # AiPlayerbot.RandomBotNonCombatStrategies = "+grind,+loot,+rpg,+custom::say"
 AiPlayerbot.RandomBotNonCombatStrategies = ""

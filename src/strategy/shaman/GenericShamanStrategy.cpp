@@ -18,7 +18,6 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
             creators["lesser healing wave on party"] = &lesser_healing_wave_on_party;
             creators["chain heal"] = &chain_heal;
             creators["riptide"] = &riptide;
-            creators["chain heal on party"] = &chain_heal_on_party;
             creators["riptide on party"] = &riptide_on_party;
             creators["earth shock"] = &earth_shock;
         }
@@ -85,14 +84,6 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
             return new ActionNode ("riptide",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("healing wave"), nullptr),
-                /*C*/ nullptr);
-        }
-
-        static ActionNode* chain_heal_on_party([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("chain heal on party",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("lesser healing wave on party"), nullptr),
                 /*C*/ nullptr);
         }
 
