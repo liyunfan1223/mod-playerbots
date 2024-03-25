@@ -147,7 +147,7 @@ class CastStrengthOfEarthTotemAction : public CastTotemAction
 class CastManaSpringTotemAction : public CastTotemAction
 {
     public:
-        CastManaSpringTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "mana spring totem", "mana spring", 20.0f) { }
+        CastManaSpringTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "mana spring totem", "mana spring", 0.0f) { }
 
         bool isUseful() override;
 };
