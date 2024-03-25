@@ -89,7 +89,7 @@ bool PlayerbotAIConfig::Initialize()
     lowMana = sConfigMgr->GetOption<int32>("AiPlayerbot.LowMana", 15);
     mediumMana = sConfigMgr->GetOption<int32>("AiPlayerbot.MediumMana", 40);
     autoSaveMana = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoSaveMana", true);
-    saveManaThreshold = sConfigMgr->GetOption<int32>("AiPlayerbot.SaveManaThreshold", 100);
+    saveManaThreshold = sConfigMgr->GetOption<int32>("AiPlayerbot.SaveManaThreshold", 60);
 
     randomGearLoweringChance = sConfigMgr->GetOption<float>("AiPlayerbot.RandomGearLoweringChance", 0.15f);
     randomBotMaxLevelChance = sConfigMgr->GetOption<float>("AiPlayerbot.RandomBotMaxLevelChance", 0.15f);

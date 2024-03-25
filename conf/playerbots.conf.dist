@@ -312,8 +312,8 @@ AiPlayerbot.MediumMana = 40
 AiPlayerbot.AutoSaveMana = 1
 
 # Healer bot save mana threshold
-# Default: 100 (full)
-AiPlayerbot.SaveManaThreshold = 100
+# Default: 60 (60%)
+AiPlayerbot.SaveManaThreshold = 60
 
 
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
