@@ -6,6 +6,7 @@
 #define _PLAYERBOT_PRIESTACTIONS_H
 
 #include "GenericSpellActions.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
 class PlayerbotAI;
@@ -15,7 +16,7 @@ BUFF_ACTION(CastPowerWordFortitudeAction, "power word: fortitude");
 BUFF_PARTY_ACTION(CastPowerWordFortitudeOnPartyAction, "power word: fortitude");
 BUFF_PARTY_ACTION(CastPrayerOfFortitudeOnPartyAction, "prayer of fortitude");
 BUFF_ACTION(CastPowerWordShieldAction, "power word: shield");
-HEAL_PARTY_ACTION(CastPowerWordShieldOnPartyAction, "power word: shield");
+
 BUFF_ACTION(CastInnerFireAction, "inner fire");
 CURE_ACTION(CastDispelMagicAction, "dispel magic");
 CURE_PARTY_ACTION(CastDispelMagicOnPartyAction, "dispel magic", DISPEL_MAGIC);
@@ -39,22 +40,21 @@ PROTECT_ACTION(CastPainSuppressionProtectAction, "pain suppression");
 
 // holy
 HEAL_ACTION(CastLesserHealAction, "lesser heal");
-HEAL_PARTY_ACTION(CastLesserHealOnPartyAction, "lesser heal");
 HEAL_ACTION(CastHealAction, "heal");
-HEAL_PARTY_ACTION(CastHealOnPartyAction, "heal");
 HEAL_ACTION(CastGreaterHealAction, "greater heal");
-HEAL_PARTY_ACTION(CastGreaterHealOnPartyAction, "greater heal");
 HEAL_ACTION(CastFlashHealAction, "flash heal");
-HEAL_PARTY_ACTION(CastFlashHealOnPartyAction, "flash heal");
 HEAL_ACTION(CastRenewAction, "renew");
-HEAL_PARTY_ACTION(CastRenewOnPartyAction, "renew");
-// holy 2.4.3
-HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending");
-HEAL_PARTY_ACTION(CastBindingHealAction, "binding heal");
-
-HEAL_PARTY_ACTION(CastPrayerOfHealingAction, "prayer of healing");
-AOE_HEAL_ACTION(CastLightwellAction, "lightwell");
-AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing");
+HEAL_PARTY_ACTION(CastLesserHealOnPartyAction, "lesser heal", 50.0f, HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastHealOnPartyAction, "heal", 50.0f, HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastGreaterHealOnPartyAction, "greater heal", 50.0f, HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastPowerWordShieldOnPartyAction, "power word: shield", 15.0f, HealingManaEfficiency::VERY_HIGH);
+HEAL_PARTY_ACTION(CastFlashHealOnPartyAction, "flash heal", 15.0f, HealingManaEfficiency::LOW);
+HEAL_PARTY_ACTION(CastRenewOnPartyAction, "renew", 15.0f, HealingManaEfficiency::VERY_HIGH);
+HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending", 15.0f, HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastBindingHealAction, "binding heal", 15.0f, HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastPrayerOfHealingAction, "prayer of healing", 15.0f, HealingManaEfficiency::MEDIUM);
+AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing", 15.0f, HealingManaEfficiency::HIGH);
+AOE_HEAL_ACTION(CastLightwellAction, "lightwell", 15.0f, HealingManaEfficiency::MEDIUM);
 
 SPELL_ACTION(CastSmiteAction, "smite");
 SPELL_ACTION(CastHolyNovaAction, "holy nova");
@@ -126,7 +126,7 @@ public:
 class CastPenanceOnPartyAction : public HealPartyMemberAction
 {
 public:
-    CastPenanceOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "penance") {}
+    CastPenanceOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "penance", 25.0f, HealingManaEfficiency::HIGH) {}
 };
 
 class CastHymnOfHopeAction : public CastSpellAction
@@ -152,7 +152,7 @@ public:
 
 class CastPowerWordShieldOnAlmostFullHealthBelow : public HealPartyMemberAction {
 public:
-    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI* ai) : HealPartyMemberAction(ai, "power word: shield") {}
+    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI* ai) : HealPartyMemberAction(ai, "power word: shield", 15.0f, HealingManaEfficiency::HIGH) {}
     bool isUseful() override;
     Unit* GetTarget() override;
 };

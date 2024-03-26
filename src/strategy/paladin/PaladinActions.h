@@ -39,7 +39,6 @@ BUFF_ACTION(CastCrusaderAuraAction, "crusader aura");
 BUFF_ACTION(CastSanctityAuraAction, "sanctity aura");
 
 SPELL_ACTION(CastHolyShockAction, "holy shock");
-HEAL_PARTY_ACTION(CastHolyShockOnPartyAction, "holy shock");
 
 // consecration
 MELEE_ACTION(CastConsecrationAction, "consecration");
@@ -168,10 +167,16 @@ class CastHolyLightAction : public CastHealingSpellAction
         CastHolyLightAction(PlayerbotAI* botAI) : CastHealingSpellAction(botAI, "holy light") { }
 };
 
+class CastHolyShockOnPartyAction : public HealPartyMemberAction
+{
+    public:
+        CastHolyShockOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy shock", 25.0f, HealingManaEfficiency::MEDIUM) { }
+};
+
 class CastHolyLightOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastHolyLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy light") { }
+        CastHolyLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy light", 50.0f, HealingManaEfficiency::HIGH) { }
 };
 
 class CastFlashOfLightAction : public CastHealingSpellAction
@@ -183,7 +188,7 @@ class CastFlashOfLightAction : public CastHealingSpellAction
 class CastFlashOfLightOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastFlashOfLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "flash of light") { }
+        CastFlashOfLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "flash of light", 15.0f, HealingManaEfficiency::LOW) { }
 };
 
 class CastLayOnHandsAction : public CastHealingSpellAction

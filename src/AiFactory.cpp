@@ -6,6 +6,7 @@
 #include "BattlegroundMgr.h"
 #include "Item.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "Engine.h"
 #include "Group.h"
@@ -265,7 +266,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     {
         engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
     }
-
+    if (sPlayerbotAIConfig->autoSaveMana) {
+        engine->addStrategy("auto save mana");
+    }
     switch (player->getClass())
     {
         case CLASS_PRIEST:
@@ -273,8 +276,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             {
                 engine->addStrategies("dps", "shadow debuff", "shadow aoe", "threat", nullptr);
             }
-            else
+            else {
                 engine->addStrategies("heal", "threat", nullptr);
+            }
 
             engine->addStrategies("dps assist", "cure", nullptr);
             break;
@@ -426,7 +430,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategy("arena");
         }
 
-        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "conserve mana", "cast time", "dps assist", nullptr);
+        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "cast time", "dps assist", nullptr);
         engine->removeStrategy("custom::say");
         engine->removeStrategy("flee");
         engine->removeStrategy("threat");
@@ -532,7 +536,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         nonCombatEngine->addStrategies("nc", "food", "chat", "follow",
             "default", "quest", "loot", "gather", "duel", "buff", "mount", nullptr);
     }
-
+    if (sPlayerbotAIConfig->autoSaveMana) {
+        nonCombatEngine->addStrategy("auto save mana");
+    }
     if ((facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
     {
         Player* master = facade->GetMaster();

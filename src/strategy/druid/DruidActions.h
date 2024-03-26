@@ -46,19 +46,19 @@ class CastHealingTouchAction : public CastHealingSpellAction
 class CastRejuvenationOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastRejuvenationOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "rejuvenation") { }
+        CastRejuvenationOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "rejuvenation", 15.0f, HealingManaEfficiency::VERY_HIGH) { }
 };
 
 class CastRegrowthOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastRegrowthOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "regrowth") { }
+        CastRegrowthOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "regrowth", 35.0f, HealingManaEfficiency::HIGH) { }
 };
 
 class CastHealingTouchOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastHealingTouchOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "healing touch") { }
+        CastHealingTouchOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "healing touch", 50.0f, HealingManaEfficiency::LOW) { }
 };
 
 class CastReviveAction : public ResurrectPartyMemberAction
@@ -242,7 +242,7 @@ class CastInnervateAction : public CastSpellAction
 class CastTranquilityAction : public CastAoeHealSpellAction
 {
     public:
-        CastTranquilityAction(PlayerbotAI* botAI) : CastAoeHealSpellAction(botAI, "tranquility") { }
+        CastTranquilityAction(PlayerbotAI* botAI) : CastAoeHealSpellAction(botAI, "tranquility", 15.0f, HealingManaEfficiency::MEDIUM) { }
 };
 
 class CastNaturesSwiftnessAction : public CastBuffSpellAction
@@ -254,19 +254,19 @@ class CastNaturesSwiftnessAction : public CastBuffSpellAction
 class CastWildGrowthOnPartyAction : public HealPartyMemberAction
 {
 public:
-	CastWildGrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "wild growth") {}
+	CastWildGrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "wild growth", 15.0f, HealingManaEfficiency::VERY_HIGH) {}
 };
 
 class CastPartySwiftmendAction : public HealPartyMemberAction
 {
 public:
-	CastPartySwiftmendAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "swiftmend") {}
+	CastPartySwiftmendAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "swiftmend", 15.0f, HealingManaEfficiency::MEDIUM) {}
 };
 
 class CastPartyNourishAction : public HealPartyMemberAction
 {
 public:
-	CastPartyNourishAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
+	CastPartyNourishAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish", 25.0f, HealingManaEfficiency::LOW) {}
 };
 
 class CastDruidRemoveCurseOnPartyAction : public CurePartyMemberAction

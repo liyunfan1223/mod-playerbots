@@ -151,7 +151,8 @@ bool CastEnchantItemAction::isPossible()
     return spellId && AI_VALUE2(Item*, "item for spell", spellId);
 }
 
-CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount) : CastAuraSpellAction(botAI, spell, true), estAmount(estAmount)
+CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount, HealingManaEfficiency manaEfficiency) 
+    : CastAuraSpellAction(botAI, spell, true), estAmount(estAmount), manaEfficiency(manaEfficiency)
 {
     range = botAI->GetRange("heal");
 }

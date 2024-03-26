@@ -23,6 +23,16 @@ enum class BotCheatMask : uint32
     maxMask = 32
 };
 
+enum class HealingManaEfficiency : uint8
+{
+    VERY_LOW    = 1,
+    LOW         = 2,
+    MEDIUM      = 4,
+    HIGH        = 8,
+    VERY_HIGH   = 16,
+    SUPERIOR    = 32
+};
+
 #define MAX_SPECNO 20
 
 class PlayerbotAIConfig
@@ -51,6 +61,8 @@ class PlayerbotAIConfig
             aoeRadius, rpgDistance, targetPosRecalcDistance, farDistance, healDistance, aggroDistance;
         uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
         uint32 lowMana, mediumMana;
+        bool autoSaveMana;
+        uint32 saveManaThreshold;
 
         uint32 openGoSpell;
         bool randomBotAutologin;

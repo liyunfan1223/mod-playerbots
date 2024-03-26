@@ -302,14 +302,14 @@ class clazz : public CastHealingSpellAction \
         bool isUseful() override { return useful; } \
 }
 
-#define HEAL_PARTY_ACTION(clazz, spell) \
+#define HEAL_PARTY_ACTION(clazz, spell, estAmount, manaEfficiency) \
 class clazz : public HealPartyMemberAction \
 { \
     public: \
-        clazz(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, spell) { } \
+        clazz(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, spell, estAmount, manaEfficiency) { } \
 }
 
-#define AOE_HEAL_ACTION(clazz, spell) \
+#define AOE_HEAL_ACTION(clazz, spell, estAmount, manaEfficiency) \
 class clazz : public CastAoeHealSpellAction \
 { \
     public: \

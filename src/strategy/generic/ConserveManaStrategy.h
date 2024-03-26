@@ -9,29 +9,57 @@
 
 class PlayerbotAI;
 
-class ConserveManaMultiplier : public Multiplier
+// Yunfan: deprecate old save mana method.
+
+// class ConserveManaMultiplier : public Multiplier
+// {
+//     public:
+//         ConserveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "conserve mana") { }
+
+//         float GetValue(Action* action) override;
+// };
+
+// class SaveManaMultiplier : public Multiplier
+// {
+//     public:
+//         SaveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "save mana") { }
+
+//         float GetValue(Action* action) override;
+// };
+
+// class ConserveManaStrategy : public Strategy
+// {
+//     public:
+//         ConserveManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+
+//         void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
+//         std::string const getName() override { return "conserve mana"; }
+// };
+
+// class HealerSaveManaStrategy : public Strategy
+// {
+//     public:
+//         HealerSaveManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+
+//         void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
+//         std::string const getName() override { return "healer save mana"; }
+// };
+
+class HealerAutoSaveManaMultiplier : public Multiplier
 {
     public:
-        ConserveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "conserve mana") { }
+        HealerAutoSaveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "auto save mana") { }
 
         float GetValue(Action* action) override;
 };
 
-class SaveManaMultiplier : public Multiplier
+class HealerAutoSaveManaStrategy : public Strategy
 {
     public:
-        SaveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "save mana") { }
-
-        float GetValue(Action* action) override;
-};
-
-class ConserveManaStrategy : public Strategy
-{
-    public:
-        ConserveManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+        HealerAutoSaveManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
 
         void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
-        std::string const getName() override { return "conserve mana"; }
+        std::string const getName() override { return "auto save mana"; }
 };
 
 #endif

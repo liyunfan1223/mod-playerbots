@@ -121,7 +121,7 @@ void PlayerbotFactory::Init()
             //     continue;
             
             enchantSpellIdCache.push_back(id);
-            LOG_INFO("playerbots", "Add {} to enchantment spells", id);
+            // LOG_INFO("playerbots", "Add {} to enchantment spells", id);
         }
     }
     LOG_INFO("playerbots", "Loading {} enchantment spells", enchantSpellIdCache.size());
