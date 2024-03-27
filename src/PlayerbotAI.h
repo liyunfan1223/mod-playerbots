@@ -10,6 +10,7 @@
 #include "ChatFilter.h"
 #include "Common.h"
 #include "Event.h"
+#include "Item.h"
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
@@ -451,6 +452,8 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsInRealGuild();
         static std::vector<std::string> dispel_whitelist;
         bool EqualLowercaseName(std::string s1, std::string s2);
+        InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
+        uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
     private:
         static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore, bool mixed = false);
         bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
