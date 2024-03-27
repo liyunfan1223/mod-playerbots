@@ -43,6 +43,7 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
             creators["taunt spell"] = &hand_of_reckoning;
             creators["righteous defense"] = &righteous_defense;
             creators["avenger's shield"] = &avengers_shield;
+            creators["divine sacrifice"] = &divine_sacrifice;
         }
     private:
         static ActionNode* blessing_of_sanctuary(PlayerbotAI* ai)
@@ -84,7 +85,7 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         {
             return new ActionNode ("retribution aura",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("devotion aura"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("devotion aura"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* lay_on_hands(PlayerbotAI* ai)
@@ -112,7 +113,7 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         {
             return new ActionNode ("cleanse poison",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("purify poison"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("purify poison"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* cleanse_magic(PlayerbotAI* ai)
@@ -126,21 +127,21 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         {
             return new ActionNode ("cleanse disease",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("purify disease"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("purify disease"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* cleanse_poison_on_party(PlayerbotAI* ai)
         {
             return new ActionNode ("cleanse poison on party",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("purify poison on party"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("purify poison on party"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* cleanse_disease_on_party(PlayerbotAI* ai)
         {
             return new ActionNode ("cleanse disease on party",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("purify disease on party"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("purify disease on party"), nullptr),
                 /*C*/ nullptr);
         }
         // static ActionNode* seal_of_wisdom(PlayerbotAI* ai)
@@ -154,35 +155,42 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         {
             return new ActionNode ("seal of justice",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* hand_of_reckoning(PlayerbotAI* ai)
         {
             return new ActionNode ("hand of reckoning",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("righteous defense"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("righteous defense"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* righteous_defense(PlayerbotAI* ai)
         {
             return new ActionNode ("righteous defense",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("avenger's shield"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("avenger's shield"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* avengers_shield(PlayerbotAI* ai)
         {
             return new ActionNode ("avenger's shield",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("judgement of wisdom"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("judgement of wisdom"), nullptr),
                 /*C*/ nullptr);
+        }
+        static ActionNode* divine_sacrifice(PlayerbotAI* ai)
+        {
+            return new ActionNode ("divine sacrifice",
+                /*P*/ nullptr,
+                /*A*/ nullptr,
+                /*C*/ NextAction::array(0, new NextAction("cancel divine sacrifice"), nullptr));
         }
         static ActionNode* judgement_of_wisdom(PlayerbotAI* ai)
         {
             return new ActionNode ("judgement of wisdom",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("judgement of light"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("judgement of light"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* judgement(PlayerbotAI* ai)
@@ -196,21 +204,21 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         {
             return new ActionNode ("divine shield",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("divine protection"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("divine protection"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* flash_of_light(PlayerbotAI* ai)
         {
             return new ActionNode ("flash of light",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("holy light"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("holy light"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* flash_of_light_on_party(PlayerbotAI* ai)
         {
             return new ActionNode ("flash of light on party",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("holy light on party"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("holy light on party"), nullptr),
                 /*C*/ nullptr);
         }
         static ActionNode* holy_wrath(PlayerbotAI* ai)
@@ -231,7 +239,7 @@ class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<Action
         {
             return new ActionNode ("seal of command",
             /*P*/ nullptr,
-            /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
             /*C*/ nullptr);
         }
 };

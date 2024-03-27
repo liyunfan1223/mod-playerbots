@@ -263,6 +263,9 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
             creators["beacon of light on main tank"] = &PaladinAiObjectContextInternal::beacon_of_light_on_main_tank;
             creators["sacred shield on main tank"] = &PaladinAiObjectContextInternal::sacred_shield_on_main_tank;
             creators["avenging wrath"] = &PaladinAiObjectContextInternal::avenging_wrath;
+            creators["divine illumination"] = &PaladinAiObjectContextInternal::divine_illumination;
+            creators["divine sacrifice"] = &PaladinAiObjectContextInternal::divine_sacrifice;
+            creators["cancel divine sacrifice"] = &PaladinAiObjectContextInternal::cancel_divine_sacrifice;
         }
 
     private:
@@ -341,6 +344,9 @@ class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* beacon_of_light_on_main_tank(PlayerbotAI* ai) { return new CastBeaconOfLightOnMainTankAction(ai); }
         static Action* sacred_shield_on_main_tank(PlayerbotAI* ai) { return new CastSacredShieldOnMainTankAction(ai); }
         static Action* avenging_wrath(PlayerbotAI* ai) { return new CastAvengingWrathAction(ai); }
+        static Action* divine_illumination(PlayerbotAI* ai) { return new CastDivineIlluminationAction(ai); }
+        static Action* divine_sacrifice(PlayerbotAI* ai) { return new CastDivineSacrificeAction(ai); }
+        static Action* cancel_divine_sacrifice(PlayerbotAI* ai) { return new CastCancelDivineSacrificeAction(ai); }
 };
 
 PaladinAiObjectContext::PaladinAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

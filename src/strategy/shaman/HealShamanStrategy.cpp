@@ -49,19 +49,19 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         
     triggers.push_back(new TriggerNode(
         "party member critical health",
-		NextAction::array(0, new NextAction("riptide on party", 24.0f), new NextAction("lesser healing wave on party", 23.0f), nullptr)));
+		NextAction::array(0, new NextAction("riptide on party", 25.0f), new NextAction("healing wave on party", 24.0f), new NextAction("lesser healing wave on party", 23.0f), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "party member low health",
-		NextAction::array(0, new NextAction("riptide on party", 18.0f), new NextAction("lesser healing wave on party", 17.0f), nullptr)));
+		NextAction::array(0, new NextAction("riptide on party", 19.0f), new NextAction("healing wave on party", 18.0f), new NextAction("lesser healing wave on party", 17.0f), nullptr)));
 
 	triggers.push_back(new TriggerNode(
         "party member medium health",
-		NextAction::array(0, new NextAction("riptide on party", 15.0f), new NextAction("lesser healing wave on party", 14.0f), nullptr)));
+		NextAction::array(0, new NextAction("riptide on party", 16.0f), new NextAction("healing wave on party", 15.0f), new NextAction("lesser healing wave on party", 14.0f), nullptr)));
     
     triggers.push_back(new TriggerNode(
         "party member almost full health",
-		NextAction::array(0, new NextAction("riptide on party", 12.0f), nullptr)));
+		NextAction::array(0, new NextAction("riptide on party", 12.0f), new NextAction("lesser healing wave on party", 11.0f), nullptr)));
     
     triggers.push_back(new TriggerNode(
         "party member cleanse spirit poison",

@@ -170,13 +170,13 @@ class CastHolyLightAction : public CastHealingSpellAction
 class CastHolyShockOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastHolyShockOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy shock", 25.0f, HealingManaEfficiency::MEDIUM) { }
+        CastHolyShockOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy shock", 25.0f, HealingManaEfficiency::LOW) { }
 };
 
 class CastHolyLightOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastHolyLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy light", 50.0f, HealingManaEfficiency::HIGH) { }
+        CastHolyLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "holy light", 50.0f, HealingManaEfficiency::MEDIUM) { }
 };
 
 class CastFlashOfLightAction : public CastHealingSpellAction
@@ -188,7 +188,7 @@ class CastFlashOfLightAction : public CastHealingSpellAction
 class CastFlashOfLightOnPartyAction : public HealPartyMemberAction
 {
     public:
-        CastFlashOfLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "flash of light", 15.0f, HealingManaEfficiency::LOW) { }
+        CastFlashOfLightOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "flash of light", 15.0f, HealingManaEfficiency::HIGH) { }
 };
 
 class CastLayOnHandsAction : public CastHealingSpellAction
@@ -392,5 +392,26 @@ class CastAvengingWrathAction : public CastBuffSpellAction
 {
 	public:
 		CastAvengingWrathAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "avenging wrath") {}
+};
+
+class CastDivineIlluminationAction : public CastBuffSpellAction
+{
+	public:
+		CastDivineIlluminationAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "divine illumination") {}
+};
+
+class CastDivineSacrificeAction : public CastBuffSpellAction
+{
+	public:
+		CastDivineSacrificeAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "divine sacrifice") {}
+		bool isUseful() override;
+};
+
+class CastCancelDivineSacrificeAction : public Action
+{
+	public:
+		CastCancelDivineSacrificeAction(PlayerbotAI* botAI) : Action(botAI, "cancel divine sacrifice") {}
+		bool Execute(Event event) override;
+		bool isUseful() override;
 };
 #endif
