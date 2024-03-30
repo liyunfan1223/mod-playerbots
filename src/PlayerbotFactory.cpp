@@ -131,7 +131,7 @@ void PlayerbotFactory::Init()
         if (gemId == 0) {
             continue;
         }
-        if (gemId == 1629) { // unique gem
+        if (gemId == 49110) { // unique gem
             continue;
         }
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
