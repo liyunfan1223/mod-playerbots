@@ -18,7 +18,8 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 AiPlayerbot.BotAutologin = 0
 
 # Allow login other players' characters as bots
-AiPlayerbot.allowPlayerBots = 0
+# Default: 0 (disabled)
+AiPlayerbot.AllowPlayerBots = 0
 
 # Guild Task system
 AiPlayerbot.EnableGuildTasks = 0
