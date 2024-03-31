@@ -129,7 +129,7 @@ class PlayerbotFactory
         void InitPetTalents();
         
         void InitReagents();
-        void InitGlyphs();
+        void InitGlyphs(bool increment = false);
         void InitFood();
         void InitMounts();
         void InitBags(bool destroyOld = true);

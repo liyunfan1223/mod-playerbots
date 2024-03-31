@@ -15,6 +15,7 @@
 #include "LogCommon.h"
 #include "LootMgr.h"
 #include "MapMgr.h"
+#include "ObjectMgr.h"
 #include "PetDefines.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
@@ -128,6 +129,9 @@ void PlayerbotFactory::Init()
     for (auto iter = sSpellItemEnchantmentStore.begin(); iter != sSpellItemEnchantmentStore.end(); iter++) {
         uint32 gemId = iter->GemID;
         if (gemId == 0) {
+            continue;
+        }
+        if (gemId == 49110) { // unique gem
             continue;
         }
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
@@ -2795,13 +2799,15 @@ void PlayerbotFactory::InitReagents()
     }
 }
 
-void PlayerbotFactory::InitGlyphs()
+void PlayerbotFactory::InitGlyphs(bool increment)
 {
     bot->InitGlyphsForLevel();
 
-    for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
-    {
-        bot->SetGlyph(slotIndex, 0, true);
+    if (!increment) {
+        for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
+        {
+            bot->SetGlyph(slotIndex, 0, true);
+        }
     }
 
     uint32 level = bot->getLevel();
@@ -2816,10 +2822,14 @@ void PlayerbotFactory::InitGlyphs()
         maxSlot = 5;
     if (level >= 80)
         maxSlot = 6;
+    
+    uint8 glyphOrder[6] = {0, 1, 3, 2, 4, 5};
 
     if (!maxSlot)
         return;
-
+    
+    uint8 cls = bot->getClass();
+    uint8 tab = AiFactory::GetPlayerSpecTab(bot);
     std::list<uint32> glyphs;
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
@@ -2853,52 +2863,84 @@ void PlayerbotFactory::InitGlyphs()
         }
     }
 
-    if (glyphs.empty())
-    {
-        LOG_INFO("playerbots", "No glyphs found for bot {}", bot->GetName().c_str());
-        return;
-    }
-
     std::unordered_set<uint32> chosen;
     for (uint32 slotIndex = 0; slotIndex < maxSlot; ++slotIndex)
     {
-        uint32 slot = bot->GetGlyphSlot(slotIndex);
-        GlyphSlotEntry const *gs = sGlyphSlotStore.LookupEntry(slot);
-        if (!gs)
+        uint8 realSlot = glyphOrder[slotIndex];
+        if (bot->GetGlyph(realSlot)) {
             continue;
-
-        std::vector<uint32> ids;
-        for (std::list<uint32>::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
-        {
-            uint32 id = *i;
-            GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(id);
-            if (!gp || gp->TypeFlags != gs->TypeFlags)
-                continue;
-
-            ids.push_back(id);
         }
-
-        int maxCount = urand(0, 3);
-        int count = 0;
-        bool found = false;
-        for (int attempts = 0; attempts < 15; ++attempts)
-        {
-            uint32 index = urand(0, ids.size() - 1);
-            if (index >= ids.size())
+        // uint32 slot = bot->GetGlyphSlot(slotIndex);
+        // GlyphSlotEntry const *gs = sGlyphSlotStore.LookupEntry(slot);
+        // if (!gs)
+        //     continue;
+        if (sPlayerbotAIConfig->parsedSpecGlyph[cls][tab].size() > slotIndex && sPlayerbotAIConfig->parsedSpecGlyph[cls][tab][slotIndex] != 0) {
+            uint32 itemId = sPlayerbotAIConfig->parsedSpecGlyph[cls][tab][slotIndex];
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+            if (proto->Class != ITEM_CLASS_GLYPH)
                 continue;
 
-            uint32 id = ids[index];
-            if (chosen.find(id) != chosen.end())
+            if ((proto->AllowableClass & bot->getClassMask()) == 0 || (proto->AllowableRace & bot->getRaceMask()) == 0)
                 continue;
 
-            chosen.insert(id);
+            uint32 glyph = 0;
+            for (uint32 spell = 0; spell < MAX_ITEM_PROTO_SPELLS; spell++)
+            {
+                uint32 spellId = proto->Spells[spell].SpellId;
+                SpellInfo const *entry = sSpellMgr->GetSpellInfo(spellId);
+                if (!entry)
+                    continue;
 
-            bot->SetGlyph(slotIndex, id, true);
-            found = true;
-            break;
+                for (uint32 effect = 0; effect <= EFFECT_2; ++effect)
+                {
+                    if (entry->Effects[effect].Effect != SPELL_EFFECT_APPLY_GLYPH)
+                        continue;
+
+                    glyph = entry->Effects[effect].MiscValue;
+                }
+            }
+            if (!glyph) {
+                continue;
+            }
+            bot->SetGlyph(realSlot, glyph, true);
+            chosen.insert(glyph);
+        } else {
+            uint32 slot = bot->GetGlyphSlot(realSlot);
+            GlyphSlotEntry const *gs = sGlyphSlotStore.LookupEntry(slot);
+            if (!gs)
+                continue;
+
+            std::vector<uint32> ids;
+            for (std::list<uint32>::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
+            {
+                uint32 id = *i;
+                GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(id);
+                if (!gp || gp->TypeFlags != gs->TypeFlags)
+                    continue;
+
+                ids.push_back(id);
+            }
+
+            int maxCount = urand(0, 3);
+            int count = 0;
+            bool found = false;
+            for (int attempts = 0; attempts < 15; ++attempts)
+            {
+                uint32 index = urand(0, ids.size() - 1);
+                if (index >= ids.size())
+                    continue;
+
+                uint32 id = ids[index];
+                if (chosen.find(id) != chosen.end())
+                    continue;
+
+                chosen.insert(id);
+
+                bot->SetGlyph(realSlot, id, true);
+                found = true;
+                break;
+            }
         }
-        if (!found)
-            LOG_INFO("playerbots", "No glyphs found for bot {} index {} slot {}", bot->GetName().c_str(), slotIndex, slot);
     }
 }
 
@@ -3360,7 +3402,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
             continue;
         Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-        if (!item) {
+        if (!item || !item->GetOwner()) {
             continue;
         }
         int32 bestEnchantId = -1;
@@ -3544,7 +3586,12 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     int armor = 0;
     int itemLevel = proto->ItemLevel;
     int quality = proto->Quality;
-    int dps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * proto->Delay / 1000;
+    int meleeDps = 0, rangeDps = 0;
+    if (proto->IsRangedWeapon()) {
+        rangeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * proto->Delay / 1000;
+    } else if (proto->IsWeapon()) {
+        meleeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * proto->Delay / 1000;
+    }
     armor += proto->Armor;
     block += proto->Block;
     for (int i = 0; i < proto->StatsCount; i++) {
@@ -3609,6 +3656,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
         if (!spellInfo)
             continue;
+        // spell category check?
 
         for (uint8 i = 0 ; i < 3; i++)
         {
@@ -3633,10 +3681,10 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     // Basic score
     float score = (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
         resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
-        spell_penetration + armor + dps) * 0.001;
+        spell_penetration + armor + rangeDps + meleeDps) * 0.001;
     if (cls == CLASS_HUNTER) {
         // AGILITY only
-        score = agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
+        score = agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
     } else if (cls == CLASS_WARLOCK || 
                cls == CLASS_MAGE || 
                (cls == CLASS_PRIEST && tab == 2) || // shadow
@@ -3645,26 +3693,26 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
               ) {
         // SPELL DPS
         score = intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration 
-            + hit * 1.2 + crit * 0.7 + haste * 1;       
+            + hit * 1.2 + crit * 0.7 + haste * 1 + rangeDps;       
     } else if ((cls == CLASS_PALADIN && tab == 0) || // holy
                (cls == CLASS_PRIEST && tab != 2) || // discipline / holy
                (cls == CLASS_SHAMAN && tab == 2) || // heal
                (cls == CLASS_DRUID && tab == 2)
               ) {
         // HEALER
-        score = intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1;       
+        score = intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1 + rangeDps;       
     } else if (cls == CLASS_ROGUE) {
         // AGILITY mainly (STRENGTH also)
-        score = agility * 2 + strength + attack_power + armor_penetration * 1 + dps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+        score = agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
                 (cls == CLASS_WARRIOR && tab != 2) || // arm / fury
                 (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
                ) {
         // STRENGTH mainly (AGILITY also)
-        score = strength * 2 + agility + attack_power + armor_penetration + dps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+        score = strength * 2 + agility + attack_power + armor_penetration + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
     } else if ((cls == CLASS_SHAMAN && tab == 1)) { // enhancement
         // STRENGTH mainly (AGILITY, INTELLECT also)
-        score = strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + dps * 5
+        score = strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + meleeDps * 5
             + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2;
     } else if ((cls == CLASS_WARRIOR && tab == 2) || 
                (cls == CLASS_PALADIN && tab == 1)) {
@@ -3679,7 +3727,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             + hit * 2 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
     } else {
         // BEAR DRUID TANK (AND FERAL DRUID...?)
-        score = agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + dps * 2
+        score = agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + meleeDps * 2
             + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
