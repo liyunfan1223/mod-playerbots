@@ -17,6 +17,9 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 # auto-login all player alts as bots on player login
 AiPlayerbot.BotAutologin = 0
 
+# Allow login other players' characters as bots
+AiPlayerbot.allowPlayerBots = 0
+
 # Guild Task system
 AiPlayerbot.EnableGuildTasks = 0
 
