@@ -53,7 +53,7 @@ class PlayerbotAIConfig
         bool IsInPvpProhibitedArea(uint32 id);
 
         bool enabled;
-        bool allowGuildBots;
+        bool allowGuildBots, allowPlayerBots;
         uint32 globalCoolDown, reactDelay, maxWaitForMove, expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay,
             errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
         float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance,
@@ -103,11 +103,11 @@ class PlayerbotAIConfig
         std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
         uint32 randomBotMinLevel, randomBotMaxLevel;
         float randomChangeMultiplier;
-        
-        
+
+
         // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
         // ClassSpecs classSpecs[MAX_CLASSES];
-        
+
         std::string premadeSpecName[MAX_CLASSES][MAX_SPECNO];
         std::string premadeSpecGlyph[MAX_CLASSES][MAX_SPECNO];
         std::vector<uint32> parsedSpecGlyph[MAX_CLASSES][MAX_SPECNO];
