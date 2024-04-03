@@ -475,28 +475,30 @@ Playerbots.Updates.EnableDatabases = 1
 ##############################################
 # AiPlayerbot.PremadeSpecName.<class>.<specno> = <name>         #Name of the talent specialisation
 # AiPlayerbot.PremadeSpecLink.<class>.<specno>.<level> = <link> #Wowhead style link the bot should work towards at given level.
+# e.g., formulate the link on https://www.wowhead.com/wotlk/talent-calc/warrior/3022032123335100202012013031251-32505010002
 # 0 <= specno < 20, 1 <= level <= 80
 
 # Warrior
 AiPlayerbot.PremadeSpecName.1.0 = arms pve
-AiPlayerbot.PremadeSpecLink.1.0.60 = 
+AiPlayerbot.PremadeSpecLink.1.0.60 = 3022032023335100202012013031241
 AiPlayerbot.PremadeSpecLink.1.0.80 = 3022032123335100202012013031251-32505010002
 # AiPlayerbot.PremadeSpecGlyph.1.0 = 0,0,0,0,0,0
 AiPlayerbot.PremadeSpecName.1.1 = fury pve
-AiPlayerbot.PremadeSpecLink.1.1.60 = 
+AiPlayerbot.PremadeSpecLink.1.1.60 = -305053000500310053120501351
 AiPlayerbot.PremadeSpecLink.1.1.80 = 30202300233-305053000500310153120511351
 AiPlayerbot.PremadeSpecName.1.2 = prot pve
-AiPlayerbot.PremadeSpecLink.1.2.60 = 
+AiPlayerbot.PremadeSpecLink.1.2.60 = --053351225000210521030113321
 AiPlayerbot.PremadeSpecLink.1.2.80 = 3500030023-301-053351225000210521030113321
 # Paladin
 AiPlayerbot.PremadeSpecName.2.0 = holy pve
-AiPlayerbot.PremadeSpecLink.2.0.60 = 
+AiPlayerbot.PremadeSpecLink.2.0.60 = 50350151020013053100515221
 AiPlayerbot.PremadeSpecLink.2.0.80 = 50350152220013053100515221-503201312
 AiPlayerbot.PremadeSpecName.2.1 = prot pve
-AiPlayerbot.PremadeSpecLink.2.1.60 = 
+AiPlayerbot.PremadeSpecLink.2.1.60 = -05005135203102311333112321
 AiPlayerbot.PremadeSpecLink.2.1.80 = -05005135203132311333312321-5023005
 AiPlayerbot.PremadeSpecName.2.2 = ret pve
-AiPlayerbot.PremadeSpecLink.2.2.60 = 
+AiPlayerbot.PremadeSpecLink.2.2.60 = --05230051203331302133231131
+AiPlayerbot.PremadeSpecLink.2.2.65 = -05-05230051203331302133231131
 AiPlayerbot.PremadeSpecLink.2.2.80 = 050501-05-05232051203331302133231331
 
 # Hunter
@@ -504,83 +506,91 @@ AiPlayerbot.PremadeSpecName.3.0 = bm pve
 AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112243100511351
 AiPlayerbot.PremadeSpecLink.3.0.80 = 51200201505112253100531351-015305021
 AiPlayerbot.PremadeSpecName.3.1 = mm pve
-AiPlayerbot.PremadeSpecLink.3.1.60 = 
+AiPlayerbot.PremadeSpecLink.3.1.60 = -015305101230013233135030051
 AiPlayerbot.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
 AiPlayerbot.PremadeSpecName.3.2 = surv pve
-AiPlayerbot.PremadeSpecLink.3.2.60 = 
-AiPlayerbot.PremadeSpecLink.3.2.80 = -0053041-5000032500033330523134321331
+AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135001331
+AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330522135301331
 # Rogue
 AiPlayerbot.PremadeSpecName.4.0 = as pve
-AiPlayerbot.PremadeSpecLink.4.0.60 = 
-AiPlayerbot.PremadeSpecLink.4.0.80 = 005323005350100520103331051-005005003-502
+AiPlayerbot.PremadeSpecLink.4.0.60 = 005323005350100520103331051
+AiPlayerbot.PremadeSpecLink.4.0.80 = 005323005350100520103331051-005005005003-2
 AiPlayerbot.PremadeSpecName.4.1 = combat pve
-AiPlayerbot.PremadeSpecLink.4.1.60 = 
-AiPlayerbot.PremadeSpecLink.4.1.80 = 30530000522-0252051000035015223100501251
+AiPlayerbot.PremadeSpecLink.4.1.60 = -0252051000035015223100501251
+AiPlayerbot.PremadeSpecLink.4.1.80 = 00532000523-0252051000035015223100501251
 AiPlayerbot.PremadeSpecName.4.2 = subtlety pve
-AiPlayerbot.PremadeSpecLink.4.2.60 = 
+AiPlayerbot.PremadeSpecLink.4.2.60 = --5120122030321121050135031241
 AiPlayerbot.PremadeSpecLink.4.2.80 = 0053231-2-5120222030321121050135231251
 # Priest
 AiPlayerbot.PremadeSpecName.5.0 = disc pve
-AiPlayerbot.PremadeSpecLink.5.0.60 = 
-AiPlayerbot.PremadeSpecLink.5.0.80 = 0503203130300512331323231251-03530003
+AiPlayerbot.PremadeSpecLink.5.0.60 = 0503203130300512301323131051
+AiPlayerbot.PremadeSpecLink.5.0.80 = 0503203130300512331323231251-03520103
 AiPlayerbot.PremadeSpecName.5.1 = holy pve
-AiPlayerbot.PremadeSpecLink.5.1.60 = 
+AiPlayerbot.PremadeSpecLink.5.1.60 = -035050031301152530000331331
 AiPlayerbot.PremadeSpecLink.5.1.80 = 05032031-235050032302152530000331351
 AiPlayerbot.PremadeSpecName.5.2 = shadow pve
-AiPlayerbot.PremadeSpecLink.5.2.60 = 
+AiPlayerbot.PremadeSpecLink.5.2.60 = --325003041203010323150301351
 AiPlayerbot.PremadeSpecLink.5.2.80 = 0503203--325023051223010323152301351
 # DeathKnight
 AiPlayerbot.PremadeSpecName.6.0 = blood pve
-AiPlayerbot.PremadeSpecLink.6.0.60 = 
+AiPlayerbot.PremadeSpecLink.6.0.60 = 0055021533003313201020131151
 AiPlayerbot.PremadeSpecLink.6.0.80 = 0355021533003313201020131351-005-005032
 AiPlayerbot.PremadeSpecName.6.1 = frost pve
-AiPlayerbot.PremadeSpecLink.6.1.60 = 
-AiPlayerbot.PremadeSpecLink.6.1.80 = 03-32002350352203012300033101351-230200305
+AiPlayerbot.PremadeSpecLink.6.1.60 = -32003350332203012300023101351
+AiPlayerbot.PremadeSpecLink.6.1.80 = -32002350352203012300033101351-230200305003
 AiPlayerbot.PremadeSpecGlyph.6.1 = 45805,43673,43547,43544,43672,43543
 AiPlayerbot.PremadeSpecName.6.2 = unholy pve
-AiPlayerbot.PremadeSpecLink.6.2.60 = 
-AiPlayerbot.PremadeSpecLink.6.2.80 = 23050202--2302003350032152003150003133151
+AiPlayerbot.PremadeSpecLink.6.2.60 = --2300303330032152000150013130151
+AiPlayerbot.PremadeSpecLink.6.2.80 = -320050500002-2300303330032152000150013133151
+AiPlayerbot.PremadeSpecName.6.3 = double aura blood pve
+AiPlayerbot.PremadeSpecLink.6.3.60 = 005512153330030320102013-305
+AiPlayerbot.PremadeSpecLink.6.3.80 = 005512153330030320102013-3050505002023001-002
 # Shaman
 AiPlayerbot.PremadeSpecName.7.0 = ele pve
-AiPlayerbot.PremadeSpecLink.7.0.60 = 
+AiPlayerbot.PremadeSpecLink.7.0.60 = 4530001520213351102301351
 AiPlayerbot.PremadeSpecLink.7.0.80 = 3530001523213351322301351-005050031
 AiPlayerbot.PremadeSpecName.7.1 = enh pve
-AiPlayerbot.PremadeSpecLink.7.1.60 = 
+AiPlayerbot.PremadeSpecLink.7.1.60 = -30205033005001333031131131051
 AiPlayerbot.PremadeSpecLink.7.1.80 = 053030052-30205033005021333031131131051
 AiPlayerbot.PremadeSpecName.7.2 = resto pve
-AiPlayerbot.PremadeSpecLink.7.2.60 = 
+AiPlayerbot.PremadeSpecLink.7.2.60 = --50005301335310501002331241
 AiPlayerbot.PremadeSpecLink.7.2.80 = -00505031-50005331335310501022331251
 # Mage
 AiPlayerbot.PremadeSpecName.8.0 = arcane pve
-AiPlayerbot.PremadeSpecLink.8.0.60 = 
-AiPlayerbot.PremadeSpecLink.8.0.80 = 235005030100230150323102505321-03-203023001
+AiPlayerbot.PremadeSpecLink.8.0.60 = 23000503110033014032310150532
+AiPlayerbot.PremadeSpecLink.8.0.80 = 23000523310033015032310250532-03-203203001
 AiPlayerbot.PremadeSpecName.8.1 = fire pve
-AiPlayerbot.PremadeSpecLink.8.1.60 = 
+AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030012303330053120300351
 AiPlayerbot.PremadeSpecLink.8.1.80 = 23000503310003-0055030012303330053120300351
 AiPlayerbot.PremadeSpecName.8.2 = frost pve
-AiPlayerbot.PremadeSpecLink.8.2.60 = 
+AiPlayerbot.PremadeSpecLink.8.2.60 = --3533103310203100232102231151
 AiPlayerbot.PremadeSpecLink.8.2.80 = 23002322010203--3533103310203100232102231151
 # Warlock
 AiPlayerbot.PremadeSpecName.9.0 = affli pve
-AiPlayerbot.PremadeSpecLink.9.0.60 = 
-AiPlayerbot.PremadeSpecLink.9.0.80 = 2350020021123510253500331151--55000005
+AiPlayerbot.PremadeSpecLink.9.0.60 = 2350022001113510053500131151
+AiPlayerbot.PremadeSpecLink.9.0.70 = 2350022001113510053500131151--55
+AiPlayerbot.PremadeSpecLink.9.0.80 = 2350022001113510253500331151--5500000501
 AiPlayerbot.PremadeSpecName.9.1 = emo pve
-AiPlayerbot.PremadeSpecLink.9.1.60 = 
-AiPlayerbot.PremadeSpecLink.9.1.80 = -003203301135212530135211351-55000005
+AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530131201-55
+AiPlayerbot.PremadeSpecLink.9.1.70 = -003203301135112530135201051-55
+AiPlayerbot.PremadeSpecLink.9.1.80 = -003203301135112530135221351-55000005
 AiPlayerbot.PremadeSpecName.9.2 = destro pve
-AiPlayerbot.PremadeSpecLink.9.2.60 = 
+AiPlayerbot.PremadeSpecLink.9.2.60 = --05203205210131051313230351
 AiPlayerbot.PremadeSpecLink.9.2.80 = -03310030003-05203205210331051335230351
 # Druid
 AiPlayerbot.PremadeSpecName.11.0 = balance pve
-AiPlayerbot.PremadeSpecLink.11.0.60 = 
+AiPlayerbot.PremadeSpecLink.11.0.60 = 5012203115331003213302301231
 AiPlayerbot.PremadeSpecLink.11.0.80 = 5012203125331103213305301231--205003212
-AiPlayerbot.PremadeSpecName.11.1 = feral pve
-AiPlayerbot.PremadeSpecLink.11.1.60 = 
+AiPlayerbot.PremadeSpecName.11.1 = bear pve
+AiPlayerbot.PremadeSpecLink.11.1.60 = -500232130322110353100301310501
 AiPlayerbot.PremadeSpecLink.11.1.80 = -501232130322110353120303313511-20350001
 AiPlayerbot.PremadeSpecGlyph.11.1 = 40897,43331,46372,43335,43332
 AiPlayerbot.PremadeSpecName.11.2 = resto pve
-AiPlayerbot.PremadeSpecLink.11.2.60 = 
+AiPlayerbot.PremadeSpecLink.11.2.60 = --230033312031501531050013051
 AiPlayerbot.PremadeSpecLink.11.2.80 = 05320001--230033312031512531153313051
+AiPlayerbot.PremadeSpecName.11.3 = cat pve
+AiPlayerbot.PremadeSpecLink.11.3.60 = -553202032322010052100030310501
+AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 
 ##############################################
 # Default TalentSpec for random bots         #
