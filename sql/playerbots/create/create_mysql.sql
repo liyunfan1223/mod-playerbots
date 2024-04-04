@@ -1,4 +1,4 @@
-create user 'acore'@'localhost' identified by 'acore';
+create user IF NOT EXISTS 'acore'@'localhost' identified by 'acore';
 
 GRANT ALL PRIVILEGES ON * . * TO 'acore'@'localhost' WITH GRANT OPTION;
 
