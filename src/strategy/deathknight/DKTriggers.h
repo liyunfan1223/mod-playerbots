@@ -139,4 +139,11 @@ class FreezingFogTrigger : public HasAuraTrigger
 		FreezingFogTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "freezing fog") { }
 };
 
+class DesolationTrigger : public HasAuraTrigger
+{
+	public:
+		DesolationTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "desolation") { }
+		bool IsActive() override;
+};
+
 #endif

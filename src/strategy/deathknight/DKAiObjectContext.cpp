@@ -87,6 +87,7 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 			creators["unbreakable armor"] = &DeathKnightTriggerFactoryInternal::unbreakable_armor;
 			creators["high blood rune"] = &DeathKnightTriggerFactoryInternal::high_blood_rune;
 			creators["freezing fog"] = &DeathKnightTriggerFactoryInternal::freezing_fog;
+			creators["no desolation"] = &DeathKnightTriggerFactoryInternal::no_desolation;
         }
 
     private:
@@ -110,7 +111,7 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 		static Trigger* unbreakable_armor(PlayerbotAI* botAI) { return new UnbreakableArmorTrigger(botAI); }
 		static Trigger* high_blood_rune(PlayerbotAI* botAI) { return new HighBloodRuneTrigger(botAI); }
 		static Trigger* freezing_fog(PlayerbotAI* botAI) { return new FreezingFogTrigger(botAI); }
-		
+		static Trigger* no_desolation(PlayerbotAI* botAI) { return new DesolationTrigger(botAI); }
 };
 
 class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
