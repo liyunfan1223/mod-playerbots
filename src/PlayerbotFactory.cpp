@@ -2885,7 +2885,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
             
             if (proto->RequiredLevel > bot->GetLevel())
                 continue;
-            
+
             uint32 glyph = 0;
             for (uint32 spell = 0; spell < MAX_ITEM_PROTO_SPELLS; spell++)
             {
@@ -3669,12 +3669,12 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
                 {
                     case SPELL_AURA_MOD_DAMAGE_DONE:
                     // case SPELL_AURA_MOD_HEALING_DONE: duplicated
-                        spell_power += spellInfo->Effects[i].BasePoints + 1;
+                        spell_power += (spellInfo->Effects[i].BasePoints + 1) * 0.2;
                         break;
                     case SPELL_AURA_MOD_ATTACK_POWER:
-                        attack_power += spellInfo->Effects[i].BasePoints + 1;
+                        attack_power += (spellInfo->Effects[i].BasePoints + 1) * 0.2;
                     case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
-                        block += spellInfo->Effects[i].BasePoints + 1;
+                        block += (spellInfo->Effects[i].BasePoints + 1) * 0.2;
                     default:
                         break;
                 }
