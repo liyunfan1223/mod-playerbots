@@ -3750,25 +3750,25 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
             score *= 0.5;
         }
         // spec without double hand
-        // enhancement, rogue, ice dk, shield tank, fury warrior without titan's grip but with duel wield
+        // enhancement, rogue, ice dk, unholy dk, shield tank, fury warrior without titan's grip but with duel wield
         if (isDoubleHand && 
-            ((cls == CLASS_SHAMAN && tab == 1 && bot->HasSpell(674)) ||
+            ((cls == CLASS_SHAMAN && tab == 1 && bot->CanDualWield()) ||
             (cls == CLASS_ROGUE) ||
-            (cls == CLASS_DEATH_KNIGHT && tab == 1) ||
-            (cls == CLASS_WARRIOR && tab == 1 && !bot->HasAura(49152) && bot->HasSpell(674)) ||
+            (cls == CLASS_DEATH_KNIGHT && tab != 0) ||
+            (cls == CLASS_WARRIOR && tab == 1 && !bot->CanTitanGrip() && bot->CanDualWield()) ||
             IsShieldTank(bot))) {
                 score *= 0.1;
         }
         // spec with double hand
         // fury with titan's grip, fury without duel wield, arms, bear, retribution, blood dk
         if (isDoubleHand && 
-            ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && bot->HasAura(49152)) ||
-            (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !bot->HasSpell(674)) ||
+            ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && bot->CanTitanGrip()) ||
+            (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !bot->CanDualWield()) ||
             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) ||
             (cls == CLASS_DRUID && tab == 1) ||
             (cls == CLASS_PALADIN && tab == 2) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 0) ||
-            (cls == CLASS_SHAMAN && tab == 1 && !bot->HasSpell(674)))) {
+            (cls == CLASS_SHAMAN && tab == 1 && !bot->CanDualWield()))) {
             score *= 10;
         }
     }
@@ -3779,6 +3779,9 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
         if (cls == CLASS_ROGUE && tab == ROGUE_TAB_ASSASSINATION && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER) {
             score *= 0.1;
         }
+    }
+    if (proto->ItemSet != 0) {
+        score *= 1.1;
     }
     return (0.0001 + score) * itemLevel * (quality + 1);
 }
