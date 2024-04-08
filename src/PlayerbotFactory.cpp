@@ -2882,7 +2882,10 @@ void PlayerbotFactory::InitGlyphs(bool increment)
 
             if ((proto->AllowableClass & bot->getClassMask()) == 0 || (proto->AllowableRace & bot->getRaceMask()) == 0)
                 continue;
-
+            
+            if (proto->RequiredLevel > bot->GetLevel())
+                continue;
+            
             uint32 glyph = 0;
             for (uint32 spell = 0; spell < MAX_ITEM_PROTO_SPELLS; spell++)
             {
