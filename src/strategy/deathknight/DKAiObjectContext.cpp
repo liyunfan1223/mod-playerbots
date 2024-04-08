@@ -129,7 +129,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 			creators["unholy blight"] = &DeathKnightAiObjectContextInternal::unholy_blight;
 			creators["scourge strike"] = &DeathKnightAiObjectContextInternal::scourge_strike;
 			creators["death and decay"] = &DeathKnightAiObjectContextInternal::death_and_decay;
-			creators["unholy pressence"] = &DeathKnightAiObjectContextInternal::unholy_pressence;
+			creators["unholy presence"] = &DeathKnightAiObjectContextInternal::unholy_presence;
 			creators["raise dead"] = &DeathKnightAiObjectContextInternal::raise_dead;
 			creators["army of the dead"] = &DeathKnightAiObjectContextInternal::army_of_the_dead;
 			creators["summon gargoyle"] = &DeathKnightAiObjectContextInternal::summon_gargoyle;
@@ -186,7 +186,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 		static Action* unholy_blight(PlayerbotAI* botAI) { return new CastUnholyBlightAction(botAI); }
 		static Action* scourge_strike(PlayerbotAI* botAI) { return new CastScourgeStrikeAction(botAI); }
 		static Action* death_and_decay(PlayerbotAI* botAI) { return new CastDeathAndDecayAction(botAI); }
-		static Action* unholy_pressence(PlayerbotAI* botAI) { return new CastUnholyPresenceAction(botAI); }
+		static Action* unholy_presence(PlayerbotAI* botAI) { return new CastUnholyPresenceAction(botAI); }
 		static Action* raise_dead(PlayerbotAI* botAI) { return new CastRaiseDeadAction(botAI); }
 		static Action* army_of_the_dead(PlayerbotAI* botAI) { return new CastArmyOfTheDeadAction(botAI); }
 		static Action* summon_gargoyle(PlayerbotAI* botAI) { return new CastSummonGargoyleAction(botAI); }

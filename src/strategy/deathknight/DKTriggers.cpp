@@ -36,5 +36,5 @@ bool HighBloodRuneTrigger::IsActive() {
 }
 
 bool DesolationTrigger::IsActive() {
-    return bot->HasAura(66817) && HasAuraTrigger::IsActive();
+    return bot->HasAura(66817) && !botAI->HasAura("desolation", GetTarget(), false, true, -1, true);
 }
