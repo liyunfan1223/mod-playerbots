@@ -75,12 +75,12 @@ NextAction** UnholyDKStrategy::getDefaultActions()
 		// new NextAction("scourge strike", ACTION_DEFAULT + 0.8f), 
 		new NextAction("death and decay", ACTION_DEFAULT + 0.8),
 		new NextAction("ghoul frenzy", ACTION_DEFAULT + 0.7f), 
-		new NextAction("blood boil", ACTION_DEFAULT + 0.6f), 
 		new NextAction("icy touch", ACTION_DEFAULT + 0.5f),
+		new NextAction("blood boil", ACTION_DEFAULT + 0.6f), 
 		new NextAction("plague strike", ACTION_DEFAULT + 0.4f), 
+		new NextAction("horn of winter", ACTION_DEFAULT + 0.1f), 
 		new NextAction("summon gargoyle", ACTION_DEFAULT + 0.3f),
 		new NextAction("death coil", ACTION_DEFAULT + 0.2f),
-		new NextAction("horn of winter", ACTION_DEFAULT + 0.1f), 
 		new NextAction("melee", ACTION_DEFAULT), 
 		nullptr);
 }
