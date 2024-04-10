@@ -139,4 +139,24 @@ class FreezingFogTrigger : public HasAuraTrigger
 		FreezingFogTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "freezing fog") { }
 };
 
+class DesolationTrigger : public BuffTrigger
+{
+	public:
+		DesolationTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "desolation") { }
+		bool IsActive() override;
+};
+
+class DeathAndDecayCooldownTrigger : public SpellCooldownTrigger
+{
+	public:
+		DeathAndDecayCooldownTrigger(PlayerbotAI* botAI) : SpellCooldownTrigger(botAI, "death and decay") { }
+		bool IsActive() override;
+};
+
+class ArmyOfTheDeadTrigger : public BoostTrigger
+{
+	public:
+		ArmyOfTheDeadTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "army of the dead") { }
+};
+
 #endif

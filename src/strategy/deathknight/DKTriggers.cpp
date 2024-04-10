@@ -3,6 +3,7 @@
  */
 
 #include "DKTriggers.h"
+#include "GenericTriggers.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include <string>
@@ -32,4 +33,16 @@ bool PestilenceTrigger::IsActive() {
 bool HighBloodRuneTrigger::IsActive() {
     // bot->Say(std::to_string(bot->GetBaseRune(0)) + "_" + std::to_string(bot->GetRuneCooldown(0)) + " " + std::to_string(bot->GetBaseRune(1)) + "_" + std::to_string(bot->GetRuneCooldown(1)), LANG_UNIVERSAL);
     return !bot->GetRuneCooldown(0) && !bot->GetRuneCooldown(1);
+}
+
+bool DesolationTrigger::IsActive() {
+    return bot->HasAura(66817) && !botAI->HasAura("desolation", GetTarget(), false, true, -1, true);
+}
+
+bool DeathAndDecayCooldownTrigger::IsActive() {
+    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+    if (!spellId)
+        return true;
+    
+    return bot->HasSpellCooldown(spellId);
 }

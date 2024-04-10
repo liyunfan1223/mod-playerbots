@@ -87,6 +87,9 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 			creators["unbreakable armor"] = &DeathKnightTriggerFactoryInternal::unbreakable_armor;
 			creators["high blood rune"] = &DeathKnightTriggerFactoryInternal::high_blood_rune;
 			creators["freezing fog"] = &DeathKnightTriggerFactoryInternal::freezing_fog;
+			creators["no desolation"] = &DeathKnightTriggerFactoryInternal::no_desolation;
+			creators["death and decay cooldown"] = &DeathKnightTriggerFactoryInternal::death_and_decay_cooldown;
+			creators["army of the dead"] = &DeathKnightTriggerFactoryInternal::army_of_the_dead;
         }
 
     private:
@@ -110,7 +113,9 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 		static Trigger* unbreakable_armor(PlayerbotAI* botAI) { return new UnbreakableArmorTrigger(botAI); }
 		static Trigger* high_blood_rune(PlayerbotAI* botAI) { return new HighBloodRuneTrigger(botAI); }
 		static Trigger* freezing_fog(PlayerbotAI* botAI) { return new FreezingFogTrigger(botAI); }
-		
+		static Trigger* no_desolation(PlayerbotAI* botAI) { return new DesolationTrigger(botAI); }
+		static Trigger* death_and_decay_cooldown(PlayerbotAI* botAI) { return new DeathAndDecayCooldownTrigger(botAI); }
+		static Trigger* army_of_the_dead(PlayerbotAI* botAI) { return new ArmyOfTheDeadTrigger(botAI); }
 };
 
 class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
@@ -128,7 +133,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 			creators["unholy blight"] = &DeathKnightAiObjectContextInternal::unholy_blight;
 			creators["scourge strike"] = &DeathKnightAiObjectContextInternal::scourge_strike;
 			creators["death and decay"] = &DeathKnightAiObjectContextInternal::death_and_decay;
-			creators["unholy pressence"] = &DeathKnightAiObjectContextInternal::unholy_pressence;
+			creators["unholy presence"] = &DeathKnightAiObjectContextInternal::unholy_presence;
 			creators["raise dead"] = &DeathKnightAiObjectContextInternal::raise_dead;
 			creators["army of the dead"] = &DeathKnightAiObjectContextInternal::army_of_the_dead;
 			creators["summon gargoyle"] = &DeathKnightAiObjectContextInternal::summon_gargoyle;
@@ -185,7 +190,7 @@ class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
 		static Action* unholy_blight(PlayerbotAI* botAI) { return new CastUnholyBlightAction(botAI); }
 		static Action* scourge_strike(PlayerbotAI* botAI) { return new CastScourgeStrikeAction(botAI); }
 		static Action* death_and_decay(PlayerbotAI* botAI) { return new CastDeathAndDecayAction(botAI); }
-		static Action* unholy_pressence(PlayerbotAI* botAI) { return new CastUnholyPresenceAction(botAI); }
+		static Action* unholy_presence(PlayerbotAI* botAI) { return new CastUnholyPresenceAction(botAI); }
 		static Action* raise_dead(PlayerbotAI* botAI) { return new CastRaiseDeadAction(botAI); }
 		static Action* army_of_the_dead(PlayerbotAI* botAI) { return new CastArmyOfTheDeadAction(botAI); }
 		static Action* summon_gargoyle(PlayerbotAI* botAI) { return new CastSummonGargoyleAction(botAI); }

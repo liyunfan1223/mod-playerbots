@@ -1388,7 +1388,7 @@ bool PlayerbotAI::IsCombo(Player* player)
 {
     int tab = AiFactory::GetPlayerSpecTab(player);
     return player->getClass() == CLASS_ROGUE ||
-        (player->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL && !IsTank(bot));
+        (player->getClass() == CLASS_DRUID && player->HasAura(768)); // cat druid
 }
 
 bool PlayerbotAI::IsRangedDps(Player* player)

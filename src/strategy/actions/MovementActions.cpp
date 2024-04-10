@@ -151,7 +151,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // }
     bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
             !bot->IsFlying() && !bot->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !bot->IsInWater();
-    float modifiedZ = SearchBestGroundZForPath(x, y, z, generatePath, 20.0f, normal_only);
+    float modifiedZ = SearchBestGroundZForPath(x, y, z, generatePath, 20.0f, normal_only, 8.0f);
     if (modifiedZ == INVALID_HEIGHT) {
         return false;
     }

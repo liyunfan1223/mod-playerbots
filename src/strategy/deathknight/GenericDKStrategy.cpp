@@ -33,7 +33,7 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    //creators["improved icy talons"] = &improved_icy_talons; boost party
 
 		    //unholy
-		    //creators["death and decay"] = &death_and_decay;
+		    creators["death and decay"] = &death_and_decay;
 		    //creators["raise dead"] = &raise_dead;
 		    //creators["army of the dead"] = &army of the dead;
 		    //creators["summon gargoyle"] = &army of the dead;
@@ -127,6 +127,14 @@ class GenericDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
             return new ActionNode ("corpse explosion",
                 /*P*/ nullptr,
                 /*A*/ nullptr,
+                /*C*/ nullptr);
+        }
+
+		static ActionNode* death_and_decay([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("death and decay",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("blood tap"), nullptr),
                 /*C*/ nullptr);
         }
 
