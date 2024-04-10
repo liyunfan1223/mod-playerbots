@@ -5,6 +5,7 @@
 #ifndef _PLAYERBOT_ENEMYPLAYERVALUE_H
 #define _PLAYERBOT_ENEMYPLAYERVALUE_H
 
+#include "PlayerbotAIConfig.h"
 #include "TargetValue.h"
 #include "PossibleTargetsValue.h"
 
@@ -14,7 +15,7 @@ class Unit;
 class NearestEnemyPlayersValue : public PossibleTargetsValue
 {
     public:
-        NearestEnemyPlayersValue(PlayerbotAI* botAI, float range = 120.0f) :
+        NearestEnemyPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->grindDistance) :
             PossibleTargetsValue(botAI, "nearest enemy players", range) { }
 
     public:
