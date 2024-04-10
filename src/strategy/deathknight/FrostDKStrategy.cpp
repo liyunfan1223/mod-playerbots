@@ -91,6 +91,7 @@ NextAction** FrostDKStrategy::getDefaultActions()
 void FrostDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
+	triggers.push_back(new TriggerNode("army of the dead", NextAction::array(0, new NextAction("army of the dead", ACTION_HIGH + 6), nullptr)));
 	triggers.push_back(new TriggerNode("unbreakable armor", NextAction::array(0, new NextAction("unbreakable armor", ACTION_NORMAL + 4), nullptr)));
 	triggers.push_back(new TriggerNode("high blood rune", NextAction::array(0, new NextAction("blood strike", ACTION_NORMAL + 1), nullptr)));
 	triggers.push_back(new TriggerNode("freezing fog", NextAction::array(0, new NextAction("howling blast", ACTION_HIGH + 1), nullptr)));

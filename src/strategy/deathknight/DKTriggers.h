@@ -153,4 +153,10 @@ class DeathAndDecayCooldownTrigger : public SpellCooldownTrigger
 		bool IsActive() override;
 };
 
+class ArmyOfTheDeadTrigger : public BoostTrigger
+{
+	public:
+		ArmyOfTheDeadTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "army of the dead") { }
+};
+
 #endif

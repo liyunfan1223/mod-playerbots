@@ -86,6 +86,7 @@ void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericDKStrategy::InitTriggers(triggers);
 
 	// triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction(, ACTION_NORMAL + 2), nullptr)));
+	triggers.push_back(new TriggerNode("army of the dead", NextAction::array(0, new NextAction("army of the dead", ACTION_HIGH + 6), nullptr)));
 	triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("death pact", ACTION_HIGH + 5), nullptr)));
 	triggers.push_back(new TriggerNode("no desolation", NextAction::array(0, new NextAction("blood strike", ACTION_HIGH + 4), nullptr)));
 	triggers.push_back(new TriggerNode("death and decay cooldown", 

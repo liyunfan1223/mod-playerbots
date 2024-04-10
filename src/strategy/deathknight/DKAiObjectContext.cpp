@@ -89,6 +89,7 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 			creators["freezing fog"] = &DeathKnightTriggerFactoryInternal::freezing_fog;
 			creators["no desolation"] = &DeathKnightTriggerFactoryInternal::no_desolation;
 			creators["death and decay cooldown"] = &DeathKnightTriggerFactoryInternal::death_and_decay_cooldown;
+			creators["army of the dead"] = &DeathKnightTriggerFactoryInternal::army_of_the_dead;
         }
 
     private:
@@ -114,7 +115,7 @@ class DeathKnightTriggerFactoryInternal : public NamedObjectContext<Trigger>
 		static Trigger* freezing_fog(PlayerbotAI* botAI) { return new FreezingFogTrigger(botAI); }
 		static Trigger* no_desolation(PlayerbotAI* botAI) { return new DesolationTrigger(botAI); }
 		static Trigger* death_and_decay_cooldown(PlayerbotAI* botAI) { return new DeathAndDecayCooldownTrigger(botAI); }
-		
+		static Trigger* army_of_the_dead(PlayerbotAI* botAI) { return new ArmyOfTheDeadTrigger(botAI); }
 };
 
 class DeathKnightAiObjectContextInternal : public NamedObjectContext<Action>
