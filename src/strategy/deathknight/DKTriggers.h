@@ -146,4 +146,11 @@ class DesolationTrigger : public BuffTrigger
 		bool IsActive() override;
 };
 
+class DeathAndDecayCooldownTrigger : public SpellCooldownTrigger
+{
+	public:
+		DeathAndDecayCooldownTrigger(PlayerbotAI* botAI) : SpellCooldownTrigger(botAI, "death and decay") { }
+		bool IsActive() override;
+};
+
 #endif
