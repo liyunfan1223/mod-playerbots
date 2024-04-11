@@ -1482,6 +1482,16 @@ bool FleeWithPetAction::Execute(Event event)
     return Flee(AI_VALUE(Unit*, "current target"));
 }
 
+bool AvoidAoeAction::isUseful()
+{
+    return false;
+}
+
+bool AvoidAoeAction::Execute(Event event)
+{
+    return false;
+}
+
 bool RunAwayAction::Execute(Event event)
 {
     return Flee(AI_VALUE(Unit*, "master target"));

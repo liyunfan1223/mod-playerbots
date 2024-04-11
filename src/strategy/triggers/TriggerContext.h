@@ -80,7 +80,6 @@ class TriggerContext : public NamedObjectContext<Trigger>
 
             creators["has area debuff"] = &TriggerContext::HasAreaDebuff;
 
-
             creators["enemy out of melee"] = &TriggerContext::EnemyOutOfMelee;
             creators["enemy out of spell"] = &TriggerContext::EnemyOutOfSpell;
             creators["enemy too close for spell"] = &TriggerContext::enemy_too_close_for_spell;

@@ -295,8 +295,9 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["boss target"] = &ValueContext::boss_target;
             creators["nearest triggers"] = &ValueContext::nearest_triggers;
             creators["neglect threat"] = &ValueContext::neglect_threat;
-            creators["expected lifetime"] =  &ValueContext::expected_lifetime;
-            creators["expected group dps"] =  &ValueContext::expected_group_dps;
+            creators["expected lifetime"] = &ValueContext::expected_lifetime;
+            creators["expected group dps"] = &ValueContext::expected_group_dps;
+            creators["area debuff"] = &ValueContext::area_debuff;
         }
 
     private:
@@ -497,7 +498,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* neglect_threat(PlayerbotAI* ai) { return new NeglectThreatResetValue(ai); }
         static UntypedValue* expected_lifetime(PlayerbotAI* ai) { return new ExpectedLifetimeValue(ai); }
         static UntypedValue* expected_group_dps(PlayerbotAI* ai) { return new ExpectedGroupDpsValue(ai); }
-        
+        static UntypedValue* area_debuff(PlayerbotAI* ai) { return new AreaDebuffValue(ai); }
 };
 
 #endif
