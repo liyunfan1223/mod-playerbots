@@ -1993,7 +1993,7 @@ bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, boo
 		{
             SpellInfo const* spellInfo = aurEff->GetSpellInfo();
 
-			std::string const auraName = spellInfo->SpellName[0];
+			std::string_view const auraName = spellInfo->SpellName[0];
 			if (auraName.empty() || auraName.length() != wnamepart.length() || !Utf8FitTo(auraName, wnamepart))
 				continue;
 

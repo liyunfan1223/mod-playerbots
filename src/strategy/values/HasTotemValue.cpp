@@ -9,7 +9,7 @@ char* strstri(char const* str1, char const* str2);
 
 bool HasTotemValue::Calculate()
 {
-    GuidVector units = *context->GetValue<GuidVector>("nearest npcs");
+    GuidVector units = *context->GetValue<GuidVector>("nearest totems");
     for (ObjectGuid const guid : units)
     {
         Unit* unit = botAI->GetUnit(guid);
@@ -17,14 +17,12 @@ bool HasTotemValue::Calculate()
             continue;
 
         Creature* creature = dynamic_cast<Creature*>(unit);
-        if (!creature || !creature->IsTotem())
-            continue;
 
         if (creature->GetOwner() != bot) {
             continue;
         }
 
-        if (strstri(creature->GetName().c_str(), qualifier.c_str()) && bot->GetDistance(creature) <= botAI->GetRange("spell"))
+        if (strstri(creature->GetName().c_str(), qualifier.c_str()))
             return true;
     }
 

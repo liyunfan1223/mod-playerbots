@@ -265,7 +265,7 @@ class NamedObjectFactoryList
             factories.push_front(context);
         }
 
-        T* GetContextObject(std::string const name, PlayerbotAI* botAI)
+        T* GetContextObject(std::string const &name, PlayerbotAI* botAI)
         {
             for (typename std::list<NamedObjectFactory<T>*>::iterator i = factories.begin(); i != factories.end(); i++)
             {

@@ -39,4 +39,15 @@ class NearestTriggersValue : public NearestUnitsValue
         void FindUnits(std::list<Unit*>& targets) override;
         bool AcceptUnit(Unit* unit) override;
 };
+
+class NearestTotemsValue : public NearestUnitsValue
+{
+	public:
+        NearestTotemsValue(PlayerbotAI* botAI, float range = 30.0f) : NearestUnitsValue(botAI, "nearest npcs", range, true) { }
+
+    protected:
+        void FindUnits(std::list<Unit*>& targets) override;
+        bool AcceptUnit(Unit* unit) override;
+};
+
 #endif
