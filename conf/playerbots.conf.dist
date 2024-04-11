@@ -256,6 +256,10 @@ AiPlayerbot.GlobalCooldown = 500
 # Max wait time when moving
 AiPlayerbot.MaxWaitForMove = 5000
 
+# Max search time for movement (higher for better movement on slopes)
+# default: 3
+AiPlayerbot.MaxMovementSearchTime = 3
+
 # Action expiration time
 AiPlayerbot.ExpireActionTime = 5000
 
