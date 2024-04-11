@@ -900,7 +900,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     std::string const cmdStr = cmd;
 
-    std::set<std::string> bots;
+    std::unordered_set<std::string> bots;
     if (charnameStr == "*" && master)
     {
         Group* group = master->GetGroup();
@@ -958,7 +958,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         }
     }
 
-    for (std::set<std::string>::iterator i = bots.begin(); i != bots.end(); ++i)
+    for (auto i = bots.begin(); i != bots.end(); ++i)
     {
         std::string const bot = *i;
 

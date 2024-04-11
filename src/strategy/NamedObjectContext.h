@@ -7,8 +7,9 @@
 
 #include "Common.h"
 
-#include <map>
+#include <unordered_map>
 #include <set>
+#include <unordered_set>
 #include <list>
 #include <vector>
 
@@ -46,7 +47,7 @@ class NamedObjectFactory
 {
     protected:
         typedef T*(*ActionCreator)(PlayerbotAI* botAI);
-        std::map<std::string, ActionCreator> creators;
+        std::unordered_map<std::string, ActionCreator> creators;
 
     public:
         T* create(std::string name, PlayerbotAI* botAI)
@@ -77,7 +78,7 @@ class NamedObjectFactory
         std::set<std::string> supports()
         {
             std::set<std::string> keys;
-            for (typename std::map<std::string, ActionCreator>::iterator it = creators.begin(); it != creators.end(); it++)
+            for (typename std::unordered_map<std::string, ActionCreator>::iterator it = creators.begin(); it != creators.end(); it++)
                 keys.insert(it->first);
 
             return keys;
@@ -106,7 +107,7 @@ class NamedObjectContext : public NamedObjectFactory<T>
 
         void Clear()
         {
-            for (typename std::map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+            for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
             {
                 if (i->second)
                     delete i->second;
@@ -117,7 +118,7 @@ class NamedObjectContext : public NamedObjectFactory<T>
 
         void Update()
         {
-            for (typename std::map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+            for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
             {
                 if (i->second)
                     i->second->Update();
@@ -126,7 +127,7 @@ class NamedObjectContext : public NamedObjectFactory<T>
 
         void Reset()
         {
-            for (typename std::map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+            for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
             {
                 if (i->second)
                     i->second->Reset();
@@ -139,14 +140,14 @@ class NamedObjectContext : public NamedObjectFactory<T>
         std::set<std::string> GetCreated()
         {
             std::set<std::string> keys;
-            for (typename std::map<std::string, T*>::iterator it = created.begin(); it != created.end(); it++)
+            for (typename std::unordered_map<std::string, T*>::iterator it = created.begin(); it != created.end(); it++)
                 keys.insert(it->first);
 
             return keys;
         }
 
     protected:
-        std::map<std::string, T*> created;
+        std::unordered_map<std::string, T*> created;
         bool shared;
         bool supportsSiblings;
 };
