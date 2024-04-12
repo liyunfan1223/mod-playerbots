@@ -103,6 +103,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["nearest game objects no los"] = &ValueContext::nearest_game_objects_no_los;
             creators["closest game objects"] = &ValueContext::closest_game_objects;
             creators["nearest npcs"] = &ValueContext::nearest_npcs;
+            creators["nearest totems"] = &ValueContext::nearest_totems;
             creators["nearest vehicles"] = &ValueContext::nearest_vehicles;
             creators["nearest friendly players"] = &ValueContext::nearest_friendly_players;
             creators["closest friendly players"] = &ValueContext::closest_friendly_players;
@@ -367,6 +368,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* closest_game_objects(PlayerbotAI* botAI) { return new NearestGameObjects(botAI, INTERACTION_DISTANCE); }
         static UntypedValue* log_level(PlayerbotAI* botAI) { return new LogLevelValue(botAI); }
         static UntypedValue* nearest_npcs(PlayerbotAI* botAI) { return new NearestNpcsValue(botAI); }
+        static UntypedValue* nearest_totems(PlayerbotAI* botAI) { return new NearestTotemsValue(botAI); }
         static UntypedValue* nearest_vehicles(PlayerbotAI* botAI) { return new NearestVehiclesValue(botAI); }
         static UntypedValue* nearest_friendly_players(PlayerbotAI* botAI) { return new NearestFriendlyPlayersValue(botAI); }
         static UntypedValue* closest_friendly_players(PlayerbotAI* botAI) { return new NearestFriendlyPlayersValue(botAI, INTERACTION_DISTANCE); }

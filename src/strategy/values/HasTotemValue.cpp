@@ -9,24 +9,59 @@ char* strstri(char const* str1, char const* str2);
 
 bool HasTotemValue::Calculate()
 {
-    GuidVector units = *context->GetValue<GuidVector>("nearest npcs");
-    for (ObjectGuid const guid : units)
+    for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
     {
-        Unit* unit = botAI->GetUnit(guid);
-        if (!unit)
-            continue;
-
-        Creature* creature = dynamic_cast<Creature*>(unit);
-        if (!creature || !creature->IsTotem())
-            continue;
-
-        if (creature->GetOwner() != bot) {
+        if (!bot->m_SummonSlot[i])
+        {
             continue;
         }
 
-        if (strstri(creature->GetName().c_str(), qualifier.c_str()) && bot->GetDistance(creature) <= botAI->GetRange("spell"))
-            return true;
+        if (Creature* OldTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[i]))
+        {
+            if (OldTotem->IsSummon() && OldTotem->GetDistance(bot) <= 30.0f)
+            {
+                if (strstri(OldTotem->GetName().c_str(), qualifier.c_str()))
+                    return true;
+            }
+        }
     }
-
     return false;
 }
+
+// bool HasTotemValue::Calculate()
+// {
+//     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+//     {
+//         if (!bot->m_SummonSlot[i])
+//         {
+//             continue;
+//         }
+
+//         if (Creature* OldTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[i]))
+//         {
+//             if (OldTotem->IsSummon())
+//             {
+//                 if (strstri(creature->GetName().c_str(), qualifier.c_str()))
+//                     return true;
+//             }
+//         }
+//     }
+
+//     GuidVector units = *context->GetValue<GuidVector>("nearest totems");
+//     for (ObjectGuid const guid : units)
+//     {
+//         Unit* unit = botAI->GetUnit(guid);
+//         if (!unit)
+//             continue;
+//         Creature* creature = dynamic_cast<Creature*>(unit);
+
+//         if (creature->GetOwner() != bot) {
+//             continue;
+//         }
+
+//         if (strstri(creature->GetName().c_str(), qualifier.c_str()))
+//             return true;
+//     }
+
+//     return false;
+// }

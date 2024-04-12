@@ -605,7 +605,7 @@ void PlayerbotFactory::InitPetTalents()
         return;
     }
     pet->resetTalents();
-    std::map<uint32, std::vector<TalentEntry const*> > spells;
+    std::unordered_map<uint32, std::vector<TalentEntry const*> > spells;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -625,7 +625,7 @@ void PlayerbotFactory::InitPetTalents()
     uint32 maxTalentPoints = pet->GetMaxTalentPointsForLevel(pet->GetLevel());
     int row = 0;
     // LOG_INFO("playerbots", "{} learning, max talent points: {}, cur: {}", bot->GetName().c_str(), maxTalentPoints, curTalentPoints);
-    for (std::map<uint32, std::vector<TalentEntry const*> >::iterator i = spells.begin(); i != spells.end(); ++i, ++row)
+    for (auto i = spells.begin(); i != spells.end(); ++i, ++row)
     {
         std::vector<TalentEntry const*> &spells_row = i->second;
         if (spells_row.empty())
@@ -893,7 +893,7 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player* bot, int specNo, bool reset)
     uint32 cls = bot->getClass();
     int startLevel = bot->GetLevel();
     uint32 classMask = bot->getClassMask();
-    std::map<uint32, std::vector<TalentEntry const*> > spells_row;
+    std::unordered_map<uint32, std::vector<TalentEntry const*> > spells_row;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -954,7 +954,7 @@ void PlayerbotFactory::InitTalentsByParsedSpecLink(Player* bot, std::vector<std:
         bot->resetTalents(true);
     }
     uint32 classMask = bot->getClassMask();
-    std::map<uint32, std::vector<TalentEntry const*> > spells_row;
+    std::unordered_map<uint32, std::vector<TalentEntry const*> > spells_row;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -2248,7 +2248,7 @@ void PlayerbotFactory::InitSpecialSpells()
 void PlayerbotFactory::InitTalents(uint32 specNo)
 {
     uint32 classMask = bot->getClassMask();
-    std::map<uint32, std::vector<TalentEntry const*> > spells;
+    std::unordered_map<uint32, std::vector<TalentEntry const*> > spells;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -2266,7 +2266,7 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
     }
 
     uint32 freePoints = bot->GetFreeTalentPoints();
-    for (std::map<uint32, std::vector<TalentEntry const*> >::iterator i = spells.begin(); i != spells.end(); ++i)
+    for (auto i = spells.begin(); i != spells.end(); ++i)
     {
         std::vector<TalentEntry const*> &spells_row = i->second;
         if (spells_row.empty())
@@ -2308,7 +2308,7 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
     int startLevel = bot->GetLevel();
     uint32 specIndex = sPlayerbotAIConfig->randomClassSpecIndex[cls][specTab];
     uint32 classMask = bot->getClassMask();
-    std::map<uint32, std::vector<TalentEntry const*> > spells_row;
+    std::unordered_map<uint32, std::vector<TalentEntry const*> > spells_row;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -2648,7 +2648,7 @@ void PlayerbotFactory::InitFood()
     if (sPlayerbotAIConfig->freeFood) {
         return;
     }
-    std::map<uint32, std::vector<uint32> > items;
+    std::unordered_map<uint32, std::vector<uint32> > items;
     ItemTemplateContainer const* itemTemplateContainer = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator i = itemTemplateContainer->begin(); i != itemTemplateContainer->end(); ++i)
     {

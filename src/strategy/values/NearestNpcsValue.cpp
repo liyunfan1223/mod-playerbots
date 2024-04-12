@@ -51,3 +51,15 @@ bool NearestTriggersValue::AcceptUnit(Unit* unit)
 {
     return !unit->IsPlayer();
 }
+
+void NearestTotemsValue::FindUnits(std::list<Unit*>& targets)
+{
+    Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
+    Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
+    Cell::VisitAllObjects(bot, searcher, range);
+}
+
+bool NearestTotemsValue::AcceptUnit(Unit* unit)
+{
+    return unit->IsTotem();
+}
