@@ -1604,7 +1604,7 @@ bool PlayerbotAI::IsTank(Player* player)
             }
             break;
         case CLASS_DRUID:
-            if (tab == DRUID_TAB_FERAL && HasAnyAuraOf(player, "bear form", "dire bear form", "thick hide", NULL)) {
+            if (tab == DRUID_TAB_FERAL && (player->GetShapeshiftForm() == FORM_BEAR || player->GetShapeshiftForm() == FORM_DIREBEAR || player->HasAura(16931))) {
                 return true;
             }
             break;
@@ -1695,7 +1695,7 @@ bool PlayerbotAI::IsDps(Player* player)
 
 bool PlayerbotAI::IsMainTank(Player* player)
 {
-    Group* group = bot->GetGroup();
+    Group* group = player->GetGroup();
     if (!group) {
         return false;
     }
