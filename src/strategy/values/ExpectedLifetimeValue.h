@@ -34,13 +34,4 @@ class ExpectedGroupDpsValue : public FloatCalculatedValue
         float Calculate() override;
 };
 
-class AreaDebuffValue : public CalculatedValue<Aura*>
-{
-    public:
-        AreaDebuffValue(PlayerbotAI* botAI) :
-            CalculatedValue<Aura*>(botAI, "area debuff", 20 * 1000) { }
-
-        Aura* Calculate() override;
-};
-
 #endif

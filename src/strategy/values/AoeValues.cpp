@@ -117,3 +117,26 @@ bool HasAreaDebuffValue::Calculate()
 
     return false;
 }
+
+Aura* AreaDebuffValue::Calculate()
+{
+    Unit::AuraApplicationMap& map = bot->GetAppliedAuras();
+	for (Unit::AuraApplicationMap::iterator i = map.begin(); i != map.end(); ++i)
+	{
+		Aura *aura = i->second->GetBase();
+		if (!aura)
+			continue;
+
+		AuraObjectType type = aura->GetType();
+        // bool is_area = aura->IsArea();
+        bool isPositive = aura->GetSpellInfo()->IsPositive();
+        if (type == DYNOBJ_AURA_TYPE && !isPositive) {
+            DynamicObject* dynOwner = aura->GetDynobjOwner();
+            if (!dynOwner) {
+                continue;
+            }
+            return aura;
+        }
+	}
+	return nullptr;
+}

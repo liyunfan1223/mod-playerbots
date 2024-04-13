@@ -155,22 +155,25 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             !bot->IsFlying() && !bot->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !bot->IsInWater();
     if (!generatePath) {
         float distance = bot->GetExactDist(x, y, z);
-        WaitForReach(distance);
-
-        if (bot->IsSitState())
-            bot->SetStandState(UNIT_STAND_STATE_STAND);
-
-        if (bot->IsNonMeleeSpellCast(true))
+        if (distance > sPlayerbotAIConfig->contactDistance)
         {
-            bot->CastStop();
-            botAI->InterruptSpell();
+            WaitForReach(distance);
+
+            if (bot->IsSitState())
+                bot->SetStandState(UNIT_STAND_STATE_STAND);
+
+            if (bot->IsNonMeleeSpellCast(true))
+            {
+                bot->CastStop();
+                botAI->InterruptSpell();
+            }
+            MotionMaster &mm = *bot->GetMotionMaster();
+            
+            mm.Clear();
+            mm.MovePoint(mapId, x, y, z, generatePath);
+            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
+            return true;
         }
-        MotionMaster &mm = *bot->GetMotionMaster();
-        
-        mm.Clear();
-        mm.MovePoint(mapId, x, y, z, generatePath);
-        AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
-        return true;
     } else {
         float modifiedZ;
         Movement::PointsArray path = SearchForBestPath(x, y, z, modifiedZ, sPlayerbotAIConfig->maxMovementSearchTime);
@@ -197,7 +200,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
             return true;
         }
-
     }
 
     return false;
@@ -1484,11 +1486,62 @@ bool FleeWithPetAction::Execute(Event event)
 
 bool AvoidAoeAction::isUseful()
 {
-    return false;
+    return AI_VALUE(Aura*, "area debuff");
 }
 
 bool AvoidAoeAction::Execute(Event event)
 {
+    // Case #1: Aura with dynamic object
+    Aura* aura = AI_VALUE(Aura*, "area debuff");
+    if (!aura) {
+        return false;
+    }
+    if (!aura->GetSpellInfo()) {
+        return false;
+    }
+    if (!bot->HasAura(aura->GetSpellInfo()->Id)) {
+        return false;
+    }
+    DynamicObject* dynOwner = aura->GetDynobjOwner();
+    if (!dynOwner || !dynOwner->IsInWorld()) {
+        return false;
+    }
+    float radius = dynOwner->GetRadius();
+    if (bot->GetExactDist(dynOwner) > radius) {
+        return false;
+    }
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+    std::vector<float> possibleAngles;
+    if (currentTarget) {
+        float angleLeft = bot->GetAngle(currentTarget) + M_PI / 2;
+        float angleRight = bot->GetAngle(currentTarget) - M_PI / 2;
+        possibleAngles.push_back(angleLeft);
+        possibleAngles.push_back(angleRight);
+    } else {
+        float angleTo = bot->GetAngle(dynOwner) - M_PI;
+        possibleAngles.push_back(angleTo);
+    }
+    float farestDis = 0.0f;
+    Position bestPos;
+    // float disToDyn = bot->GetExactDist(dynOwner);
+    // float maxDisToGo = radius > disToDyn ? std::sqrt(radius * radius - disToDyn * disToDyn) + 0.5f : 0.5f;
+    for (float &angle : possibleAngles) {
+        float fleeDis = sPlayerbotAIConfig->fleeDistance;
+        Position pos{bot->GetPositionX() + cos(angle) * fleeDis,
+            bot->GetPositionY() + sin(angle) * fleeDis, 
+            bot->GetPositionZ()};
+        // todo(Yunfan): check carefully
+        if (dynOwner->GetExactDist(pos) > farestDis) {
+            farestDis = dynOwner->GetExactDist(pos);
+            bestPos = pos;
+        }
+    }
+    if (farestDis > 0.0f) {
+        std::ostringstream out;
+        out << "I'm avoiding aoe spell [" << aura->GetSpellInfo()->SpellName[0] << "]...";
+        bot->Say(out.str(), LANG_UNIVERSAL);
+        return MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true);
+    }
     return false;
 }
 

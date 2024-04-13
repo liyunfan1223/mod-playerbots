@@ -41,4 +41,13 @@ class HasAreaDebuffValue : public BoolCalculatedValue, public Qualified
         virtual bool Calculate();
 };
 
+class AreaDebuffValue : public CalculatedValue<Aura*>
+{
+    public:
+        AreaDebuffValue(PlayerbotAI* botAI) :
+            CalculatedValue<Aura*>(botAI, "area debuff", 1 * 1000) { }
+
+        Aura* Calculate() override;
+};
+
 #endif

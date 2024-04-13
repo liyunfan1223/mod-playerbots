@@ -110,6 +110,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["nearest enemy players"] = &ValueContext::nearest_enemy_players;
             creators["possible targets"] = &ValueContext::possible_targets;
             creators["possible targets no los"] = &ValueContext::possible_targets_no_los;
+            creators["possible triggers"] = &ValueContext::possible_triggers;
             creators["possible adds"] = &ValueContext::possible_adds;
             creators["all targets"] = &ValueContext::all_targets;
             creators["possible rpg targets"] = &ValueContext::possible_rpg_targets;
@@ -377,6 +378,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* nearest_corpses(PlayerbotAI* botAI) { return new NearestCorpsesValue(botAI); }
         static UntypedValue* possible_rpg_targets(PlayerbotAI* botAI) { return new PossibleRpgTargetsValue(botAI); }
         static UntypedValue* possible_targets(PlayerbotAI* botAI) { return new PossibleTargetsValue(botAI); }
+        static UntypedValue* possible_triggers(PlayerbotAI* botAI) { return new PossibleTriggersValue(botAI); }
         static UntypedValue* possible_targets_no_los(PlayerbotAI* botAI) { return new PossibleTargetsValue(botAI, "possible targets", sPlayerbotAIConfig->sightDistance, true); }
         static UntypedValue* possible_adds(PlayerbotAI* botAI) { return new PossibleAddsValue(botAI); }
         static UntypedValue* all_targets(PlayerbotAI* botAI) { return new AllTargetsValue(botAI); }
