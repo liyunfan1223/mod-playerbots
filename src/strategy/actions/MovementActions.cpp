@@ -1492,6 +1492,16 @@ bool AvoidAoeAction::isUseful()
 bool AvoidAoeAction::Execute(Event event)
 {
     // Case #1: Aura with dynamic object
+    if (AvoidAuraWithDynamicObj()) {
+        return true;
+    }
+    // Case #2: Trap game object with spell
+    // Case #3: Trigger npc
+    return false;
+}
+
+bool AvoidAoeAction::AvoidAuraWithDynamicObj()
+{
     Aura* aura = AI_VALUE(Aura*, "area debuff");
     if (!aura) {
         return false;
@@ -1523,24 +1533,24 @@ bool AvoidAoeAction::Execute(Event event)
     }
     float farestDis = 0.0f;
     Position bestPos;
-    // float disToDyn = bot->GetExactDist(dynOwner);
-    // float maxDisToGo = radius > disToDyn ? std::sqrt(radius * radius - disToDyn * disToDyn) + 0.5f : 0.5f;
     for (float &angle : possibleAngles) {
         float fleeDis = sPlayerbotAIConfig->fleeDistance;
         Position pos{bot->GetPositionX() + cos(angle) * fleeDis,
             bot->GetPositionY() + sin(angle) * fleeDis, 
             bot->GetPositionZ()};
-        // todo(Yunfan): check carefully
+        // todo (Yunfan): check carefully
         if (dynOwner->GetExactDist(pos) > farestDis) {
             farestDis = dynOwner->GetExactDist(pos);
             bestPos = pos;
         }
     }
     if (farestDis > 0.0f) {
-        std::ostringstream out;
-        out << "I'm avoiding aoe spell [" << aura->GetSpellInfo()->SpellName[0] << "]...";
-        bot->Say(out.str(), LANG_UNIVERSAL);
-        return MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true);
+        if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
+            std::ostringstream out;
+            out << "I'm avoiding aoe spell [" << aura->GetSpellInfo()->SpellName[0] << "]...";
+            bot->Say(out.str(), LANG_UNIVERSAL);
+            return true;
+        }
     }
     return false;
 }

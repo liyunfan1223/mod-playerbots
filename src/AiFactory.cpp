@@ -266,8 +266,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     {
         engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
     }
-    if (sPlayerbotAIConfig->autoSaveMana) {
+    if (sPlayerbotAIConfig->autoSaveMana) 
+    {
         engine->addStrategy("auto save mana");
+    }
+    if (sPlayerbotAIConfig->autoAvoidAoe && facade->HasRealPlayerMaster())
+    {
+        engine->addStrategy("avoid aoe");
     }
     switch (player->getClass())
     {

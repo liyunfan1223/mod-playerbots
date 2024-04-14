@@ -7,6 +7,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Playerbots.h"
+#include "SharedDefines.h"
 
 class AnyGameObjectInObjectRangeCheck
 {
@@ -42,3 +43,30 @@ GuidVector NearestGameObjects::Calculate()
 
     return result;
 }
+
+GuidVector NearestTrapWithDamageValue::Calculate()
+{
+    std::list<GameObject*> targets;
+    AnyGameObjectInObjectRangeCheck u_check(bot, range);
+    Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
+    Cell::VisitAllObjects(bot, searcher, range);
+
+    GuidVector result;
+    for (GameObject* go : targets)
+    {
+        if (go->GetGoType() != GAMEOBJECT_TYPE_TRAP)
+        {
+            continue;
+        }
+        uint32 spellId = go->GetSpellId();
+        if (!spellId)
+        {
+            continue;
+        }
+        // if (ignoreLos || bot->IsWithinLOSInMap(go))
+        result.push_back(go->GetGUID());
+    }
+
+    return result;
+}
+

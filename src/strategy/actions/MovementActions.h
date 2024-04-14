@@ -73,6 +73,9 @@ class AvoidAoeAction : public MovementAction
 
         bool isUseful() override;
         bool Execute(Event event) override;
+    
+    protected:
+        bool AvoidAuraWithDynamicObj();
 };
 
 class RunAwayAction : public MovementAction

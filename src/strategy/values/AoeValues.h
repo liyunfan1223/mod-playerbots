@@ -5,6 +5,7 @@
 #ifndef _PLAYERBOT_AOEVALUES_H
 #define _PLAYERBOT_AOEVALUES_H
 
+#include "GameObject.h"
 #include "Object.h"
 #include "Value.h"
 #include "AiObjectContext.h"

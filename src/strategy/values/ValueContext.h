@@ -299,6 +299,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["expected lifetime"] = &ValueContext::expected_lifetime;
             creators["expected group dps"] = &ValueContext::expected_group_dps;
             creators["area debuff"] = &ValueContext::area_debuff;
+            creators["nearest trap with damage"] = &ValueContext::nearest_trap_with_damange;
         }
 
     private:
@@ -501,6 +502,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* expected_lifetime(PlayerbotAI* ai) { return new ExpectedLifetimeValue(ai); }
         static UntypedValue* expected_group_dps(PlayerbotAI* ai) { return new ExpectedGroupDpsValue(ai); }
         static UntypedValue* area_debuff(PlayerbotAI* ai) { return new AreaDebuffValue(ai); }
+        static UntypedValue* nearest_trap_with_damange(PlayerbotAI* ai) { return new NearestTrapWithDamageValue(ai); }
 };
 
 #endif

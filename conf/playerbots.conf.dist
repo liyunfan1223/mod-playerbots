@@ -322,6 +322,9 @@ AiPlayerbot.AutoSaveMana = 1
 # Default: 60 (60%)
 AiPlayerbot.SaveManaThreshold = 60
 
+# Enable auto avoid aoe (experimental)
+# Default: 0 (disable)
+AiPlayerbot.AutoAvoidAoe = 0
 
 # Random bot default strategies (applied after defaults)
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
