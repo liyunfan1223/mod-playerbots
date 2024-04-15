@@ -3,6 +3,7 @@
  */
 
 #include "MovementActions.h"
+#include "GameObject.h"
 #include "Map.h"
 #include "MotionMaster.h"
 #include "MoveSplineInitArgs.h"
@@ -13,6 +14,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Random.h"
 #include "SharedDefines.h"
+#include "SpellInfo.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
 #include "LastMovementValue.h"
@@ -1486,17 +1488,21 @@ bool FleeWithPetAction::Execute(Event event)
 
 bool AvoidAoeAction::isUseful()
 {
-    return AI_VALUE(Aura*, "area debuff");
+    GuidVector traps = AI_VALUE(GuidVector, "nearest trap with damage");
+    return AI_VALUE(Aura*, "area debuff") || !traps.empty();
 }
 
 bool AvoidAoeAction::Execute(Event event)
 {
-    // Case #1: Aura with dynamic object
+    // Case #1: Aura with dynamic object (e.g. rain of fire)
     if (AvoidAuraWithDynamicObj()) {
         return true;
     }
-    // Case #2: Trap game object with spell
-    // Case #3: Trigger npc
+    // Case #2: Trap game object with spell (e.g. lava bomb)
+    if (AvoidGameObjectWithDamage()) {
+        return true;
+    }
+    // Case #3: Trigger npc (e.g. Lesser shadow fissure)
     return false;
 }
 
@@ -1506,10 +1512,11 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
     if (!aura) {
         return false;
     }
-    if (!aura->GetSpellInfo()) {
+    const SpellInfo* spellInfo = aura->GetSpellInfo();
+    if (!spellInfo) {
         return false;
     }
-    if (!bot->HasAura(aura->GetSpellInfo()->Id)) {
+    if (!bot->HasAura(spellInfo->Id)) {
         return false;
     }
     DynamicObject* dynOwner = aura->GetDynobjOwner();
@@ -1520,6 +1527,69 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
     if (bot->GetDistance(dynOwner) > radius) {
         return false;
     }
+    std::ostringstream name;
+    name << "[" << spellInfo->SpellName[0] << "](aura)";
+    if (FleePostion(dynOwner->GetPosition(), radius, name.str())) {
+        return true;
+    }
+    return false;
+}
+
+bool AvoidAoeAction::AvoidGameObjectWithDamage()
+{
+    GuidVector traps = AI_VALUE(GuidVector, "nearest trap with damage");
+    if (traps.empty()) {
+        return false;
+    }
+    for (ObjectGuid &guid : traps) {
+        GameObject* go = botAI->GetGameObject(guid);
+        if (!go || !go->IsInWorld()) {
+            continue;
+        }
+        if (go->GetGoType() != GAMEOBJECT_TYPE_TRAP)
+        {
+            continue;
+        }
+        const GameObjectTemplate* goInfo = go->GetGOInfo();
+        if (!goInfo)
+        {
+            continue;
+        }
+        uint32 spellId = goInfo->trap.spellId;
+        if (!spellId)
+        {
+            continue;
+        }
+        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (spellInfo->IsPositive()) {
+            continue;
+        }
+        float radius = 5.0f;
+        for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA) {
+                if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE) {
+                    radius = spellInfo->Effects[i].CalcRadius();
+                    break;
+                }
+            } else if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
+                break;
+            }
+        }
+        if (bot->GetDistance(go) > radius) {
+            return false;
+        }
+        std::ostringstream name;
+        name << "[" << spellInfo->SpellName[0] << "](object)";
+        if (FleePostion(go->GetPosition(), radius, name.str())) {
+            return true;
+        }
+        
+    }
+    return false;
+}
+
+bool AvoidAoeAction::FleePostion(Position pos, float radius, std::string name)
+{
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     std::vector<float> possibleAngles;
     if (currentTarget) {
@@ -1528,26 +1598,26 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
         possibleAngles.push_back(angleLeft);
         possibleAngles.push_back(angleRight);
     } else {
-        float angleTo = bot->GetAngle(dynOwner) - M_PI;
+        float angleTo = bot->GetAngle(&pos) - M_PI;
         possibleAngles.push_back(angleTo);
     }
     float farestDis = 0.0f;
     Position bestPos;
     for (float &angle : possibleAngles) {
         float fleeDis = sPlayerbotAIConfig->fleeDistance;
-        Position pos{bot->GetPositionX() + cos(angle) * fleeDis,
+        Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis,
             bot->GetPositionY() + sin(angle) * fleeDis, 
             bot->GetPositionZ()};
         // todo (Yunfan): check carefully
-        if (dynOwner->GetExactDist(pos) > farestDis) {
-            farestDis = dynOwner->GetExactDist(pos);
-            bestPos = pos;
+        if (pos.GetExactDist(fleePos) > farestDis) {
+            farestDis = pos.GetExactDist(fleePos);
+            bestPos = fleePos;
         }
     }
     if (farestDis > 0.0f) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
             std::ostringstream out;
-            out << "I'm avoiding aoe spell [" << aura->GetSpellInfo()->SpellName[0] << "]...";
+            out << "I'm avoiding aoe spell " << name << "...";
             bot->Say(out.str(), LANG_UNIVERSAL);
             return true;
         }
