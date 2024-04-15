@@ -313,7 +313,6 @@ AiPlayerbot.AlmostFullHealth = 85
 AiPlayerbot.LowMana = 15
 AiPlayerbot.MediumMana = 40
 
-
 # Enable healer bot save mana
 # Default: 1 (enable)
 AiPlayerbot.AutoSaveMana = 1

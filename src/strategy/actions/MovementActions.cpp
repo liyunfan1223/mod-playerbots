@@ -1517,7 +1517,7 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
         return false;
     }
     float radius = dynOwner->GetRadius();
-    if (bot->GetExactDist(dynOwner) > radius) {
+    if (bot->GetDistance(dynOwner) > radius) {
         return false;
     }
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
