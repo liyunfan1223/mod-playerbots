@@ -1528,7 +1528,7 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
         return false;
     }
     std::ostringstream name;
-    name << "[" << spellInfo->SpellName[0] << "](aura)";
+    name << "[" << spellInfo->SpellName[0] << "] (aura)";
     if (FleePostion(dynOwner->GetPosition(), radius, name.str())) {
         return true;
     }
@@ -1579,7 +1579,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             return false;
         }
         std::ostringstream name;
-        name << "[" << spellInfo->SpellName[0] << "](object)";
+        name << "[" << spellInfo->SpellName[0] << "] (object)";
         if (FleePostion(go->GetPosition(), radius, name.str())) {
             return true;
         }
@@ -1617,7 +1617,7 @@ bool AvoidAoeAction::FleePostion(Position pos, float radius, std::string name)
     if (farestDis > 0.0f) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
             std::ostringstream out;
-            out << "I'm avoiding aoe spell " << name << "...";
+            out << "Avoiding spell " << name << "...";
             bot->Say(out.str(), LANG_UNIVERSAL);
             return true;
         }
