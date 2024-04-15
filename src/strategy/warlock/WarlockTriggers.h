@@ -142,6 +142,7 @@ class DecimationTrigger : public HasAuraTrigger
 {
     public:
         DecimationTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "decimation") {}
+        bool IsActive() override;
 };
 
 class MoltenCoreTrigger : public HasAuraTrigger
