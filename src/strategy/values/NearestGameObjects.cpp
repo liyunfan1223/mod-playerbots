@@ -59,6 +59,11 @@ GuidVector NearestTrapWithDamageValue::Calculate()
         {
             continue;
         }
+        Unit* owner = go->GetOwner();
+        if (owner && owner->IsFriendlyTo(bot))
+        {
+            continue;
+        }
         const GameObjectTemplate* goInfo = go->GetGOInfo();
         if (!goInfo)
         {

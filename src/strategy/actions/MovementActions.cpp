@@ -170,7 +170,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 botAI->InterruptSpell();
             }
             MotionMaster &mm = *bot->GetMotionMaster();
-            
             mm.Clear();
             mm.MovePoint(mapId, x, y, z, generatePath);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
@@ -1564,17 +1563,17 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
         if (spellInfo->IsPositive()) {
             continue;
         }
-        float radius = 5.0f;
-        for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA) {
-                if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE) {
-                    radius = spellInfo->Effects[i].CalcRadius();
-                    break;
-                }
-            } else if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
-                break;
-            }
-        }
+        float radius = (float)goInfo->trap.diameter / 2;
+        // for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
+        //     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA) {
+        //         if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE) {
+        //             radius = spellInfo->Effects[i].CalcRadius();
+        //             break;
+        //         }
+        //     } else if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
+        //         break;
+        //     }
+        // }
         if (bot->GetDistance(go) > radius) {
             return false;
         }
