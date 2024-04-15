@@ -33,4 +33,5 @@ class ExpectedGroupDpsValue : public FloatCalculatedValue
     public:
         float Calculate() override;
 };
+
 #endif

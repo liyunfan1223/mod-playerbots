@@ -5,6 +5,7 @@
 #ifndef _PLAYERBOT_AOEVALUES_H
 #define _PLAYERBOT_AOEVALUES_H
 
+#include "GameObject.h"
 #include "Object.h"
 #include "Value.h"
 #include "AiObjectContext.h"
@@ -39,6 +40,15 @@ class HasAreaDebuffValue : public BoolCalculatedValue, public Qualified
             return ctx->GetValue<Unit*>(qualifier)->Get();
         }
         virtual bool Calculate();
+};
+
+class AreaDebuffValue : public CalculatedValue<Aura*>
+{
+    public:
+        AreaDebuffValue(PlayerbotAI* botAI) :
+            CalculatedValue<Aura*>(botAI, "area debuff", 1 * 1000) { }
+
+        Aura* Calculate() override;
 };
 
 #endif

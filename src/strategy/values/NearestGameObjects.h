@@ -24,4 +24,17 @@ class NearestGameObjects : public ObjectGuidListCalculatedValue
         bool ignoreLos;
 };
 
+class NearestTrapWithDamageValue : public ObjectGuidListCalculatedValue
+{
+    public:
+        NearestTrapWithDamageValue(PlayerbotAI* botAI, float range = 10.0f) :
+            ObjectGuidListCalculatedValue(botAI, "nearest trap with damage", 1 * 1000), range(range) { }
+
+    protected:
+        GuidVector Calculate() override;
+    
+    private:
+        float range;
+};
+
 #endif

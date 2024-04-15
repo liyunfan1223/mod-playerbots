@@ -66,11 +66,25 @@ class FleeWithPetAction : public MovementAction
         bool Execute(Event event) override;
 };
 
+class AvoidAoeAction : public MovementAction
+{
+    public:
+        AvoidAoeAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid aoe") { }
+
+        bool isUseful() override;
+        bool Execute(Event event) override;
+    
+    protected:
+        bool AvoidAuraWithDynamicObj();
+        bool AvoidGameObjectWithDamage();
+        bool FleePostion(Position pos, float radius, std::string name);
+};
+
 class RunAwayAction : public MovementAction
 {
     public:
         RunAwayAction(PlayerbotAI* botAI) : MovementAction(botAI, "runaway") { }
-
+        
         bool Execute(Event event) override;
 };
 

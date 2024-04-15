@@ -42,3 +42,8 @@ bool UnstableAfflictionOnAttackerTrigger::IsActive()
         // !botAI->HasAura("unstable affliction", GetTarget(), false, true);
 }
 
+bool DecimationTrigger::IsActive()
+{
+    Aura *aura = botAI->GetAura(getName(), GetTarget(), false, true);
+    return aura && aura->GetDuration() > 3000;
+}
