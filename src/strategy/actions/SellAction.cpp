@@ -74,13 +74,18 @@ bool SellAction::Execute(Event event)
         return true;
     }
 
-    std::vector<Item*> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
-    for (Item* item : items)
+    if (text == "all")
     {
-        Sell(item);
+        std::vector<Item *> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
+        for (Item *item : items)
+        {
+            Sell(item);
+        }
+        return true;
     }
 
-    return true;
+    botAI->TellError("Usage: s gray/*/vendor/all");
+    return false;
 }
 
 void SellAction::Sell(FindItemVisitor* visitor)
