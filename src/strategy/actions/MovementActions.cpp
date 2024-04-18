@@ -14,8 +14,6 @@
 #include "PlayerbotAIConfig.h"
 #include "Random.h"
 #include "SharedDefines.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
@@ -1415,13 +1413,13 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
     PathGenerator gen(bot);
     gen.CalculatePath(x, y, tempZ);
     Movement::PointsArray result = gen.GetPath();
-    modified_z = tempZ;
     float min_length = gen.getPathLength();
     if (gen.GetPathType() == PATHFIND_NORMAL && abs(tempZ - z) < 0.5f) {
+        modified_z = tempZ;
         return result;
     }
     // Start searching
-    if (gen.GetPathType() == PATHFIND_NORMAL) {
+    if (gen.GetPathType() & PATHFIND_NORMAL) {
         found = true;
     }
     int count = 1;
@@ -1432,7 +1430,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
-        if (gen.GetPathType() == PATHFIND_NORMAL && gen.getPathLength() < min_length) {
+        if (gen.GetPathType() & PATHFIND_NORMAL && gen.getPathLength() < min_length) {
             found = true;
             min_length = gen.getPathLength();
             result = gen.GetPath();
@@ -1446,7 +1444,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
-        if (gen.GetPathType() == PATHFIND_NORMAL && gen.getPathLength() < min_length) {
+        if (gen.GetPathType() & PATHFIND_NORMAL && gen.getPathLength() < min_length) {
             found = true;
             min_length = gen.getPathLength();
             result = gen.GetPath();
@@ -1520,14 +1518,15 @@ bool AvoidAoeAction::Execute(Event event)
 bool AvoidAoeAction::AvoidAuraWithDynamicObj()
 {
     Aura* aura = AI_VALUE(Aura*, "area debuff");
-    if (!aura) {
+    if (!aura || aura->IsRemoved() || aura->IsExpired()) {
+        return false;
+    }
+    // Crash fix: maybe change owner due to check interval
+    if (aura->GetType() != DYNOBJ_AURA_TYPE) {
         return false;
     }
     const SpellInfo* spellInfo = aura->GetSpellInfo();
     if (!spellInfo) {
-        return false;
-    }
-    if (!bot->HasAura(spellInfo->Id)) {
         return false;
     }
     DynamicObject* dynOwner = aura->GetDynobjOwner();
@@ -1599,84 +1598,12 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
     return false;
 }
 
-bool AvoidAoeAction::AvoidUnitWithDamageAura()
-{
-    GuidVector traps = AI_VALUE(GuidVector, "possible triggers");
-    if (traps.empty()) {
-        return false;
-    }
-    for (ObjectGuid &guid : traps) {
-        Unit* unit = botAI->GetUnit(guid);
-        if (!unit || !unit->IsInWorld()) {
-            continue;
-        }
-        if (!unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)) {
-            return false;
-        }
-        Unit::AuraEffectList const& auras = unit->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        for (auto i = auras.begin(); i != auras.end(); ++i)
-        {
-            AuraEffect* aurEff = *i;
-            const SpellInfo* spellInfo = aurEff->GetSpellInfo();
-            if (!spellInfo)
-                continue;
-            const SpellInfo* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[aurEff->GetEffIndex()].TriggerSpell);
-            if (!triggerSpellInfo)
-                continue;
-            for (int j = 0; j < MAX_SPELL_EFFECTS; j++) {
-                if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
-                    float radius = triggerSpellInfo->Effects[j].CalcRadius();
-                    if (bot->GetDistance(unit) > radius) {
-                        break;
-                    }
-                    std::ostringstream name;
-                    name << "[" << triggerSpellInfo->SpellName[0] << "] (unit)";
-                    if (FleePostion(unit->GetPosition(), radius, name.str())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        // Unit::AuraApplicationMap& map = unit->GetAppliedAuras();
-        // for (Unit::AuraApplicationMap::iterator i = map.begin(); i != map.end(); ++i)
-        // {
-        //     Aura *aura = i->second->GetBase();
-        //     if (!aura)
-        //         continue;
-        //     const SpellInfo* spellInfo = aura->GetSpellInfo();
-        //     if (!spellInfo)
-        //         continue;
-        //     for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
-        //         if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA && 
-        //             spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_TRIGGER_SPELL) {
-        //                 const SpellInfo* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
-        //                 if (!triggerSpellInfo)
-        //                     continue;
-        //                 for (int j = 0; j < MAX_SPELL_EFFECTS; j++) {
-        //                     if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
-        //                         float radius = triggerSpellInfo->Effects[j].CalcRadius();
-        //                         if (bot->GetDistance(unit) > radius) {
-        //                             break;
-        //                         }
-        //                         std::ostringstream name;
-        //                         name << "[" << triggerSpellInfo->SpellName[0] << "] (unit)";
-        //                         if (FleePostion(unit->GetPosition(), radius, name.str())) {
-        //                             return true;
-        //                         }
-        //                     }
-        //                 }
-        //         }
-        //     }
-        // }
-    }
-    return false;
-}
-
 bool AvoidAoeAction::FleePostion(Position pos, float radius, std::string name)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     std::vector<float> possibleAngles;
     if (currentTarget) {
+        // Normally, move to left or right is the best position
         float angleLeft = bot->GetAngle(currentTarget) + M_PI / 2;
         float angleRight = bot->GetAngle(currentTarget) - M_PI / 2;
         possibleAngles.push_back(angleLeft);

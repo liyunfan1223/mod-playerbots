@@ -78,7 +78,6 @@ bool TellAuraAction::Execute(Event event)
 		Aura * aura  = i->second->GetBase();
 		if (!aura)
 			continue;
-
 		const std::string auraName = aura->GetSpellInfo()->SpellName[0];
         sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "Info of Aura - name: " + auraName);
 		AuraObjectType type = aura->GetType();

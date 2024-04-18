@@ -5,9 +5,14 @@
 #include "PossibleTargetsValue.h"
 #include "AttackersValue.h"
 #include "CellImpl.h"
+#include "DBCStructure.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Playerbots.h"
+#include "SharedDefines.h"
+#include "SpellAuraDefines.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "Unit.h"
 
 void PossibleTargetsValue::FindUnits(std::list<Unit*>& targets)
@@ -31,7 +36,26 @@ void PossibleTriggersValue::FindUnits(std::list<Unit*>& targets)
 
 bool PossibleTriggersValue::AcceptUnit(Unit* unit)
 {
-    return unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) && unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-    return true; // AttackersValue::IsPossibleTarget(unit, bot, range);
+    if (!unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)) {
+        return false;
+    }
+    Unit::AuraEffectList const& auras = unit->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+	for (auto i = auras.begin(); i != auras.end(); ++i)
+	{
+        AuraEffect* aurEff = *i;
+        const SpellInfo* spellInfo = aurEff->GetSpellInfo();
+        if (!spellInfo)
+            continue;
+        const SpellInfo* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[aurEff->GetEffIndex()].TriggerSpell);
+        if (!triggerSpellInfo)
+            continue;
+        for (int j = 0; j < MAX_SPELL_EFFECTS; j++) {
+            if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
+                return true;
+            }
+        }
+	}
+    return false;
+    // return true; // AttackersValue::IsPossibleTarget(unit, bot, range);
 }
 
