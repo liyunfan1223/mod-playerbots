@@ -844,7 +844,8 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             //     vcos, vsin, horizontalSpeed, verticalSpeed, x, y, z, bot->GetRelativeAngle(vcos, vsin), bot->GetOrientation());
             // bot->Say(speak, LANG_UNIVERSAL);
             // bot->GetClosePoint(x, y, z, bot->GetObjectSize(), dist, bot->GetAngle(vcos, vsin));
-            bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, bot->GetSelectedUnit());
+            Unit* currentTarget = GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
+            bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, currentTarget);
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FORWARD);
             // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);

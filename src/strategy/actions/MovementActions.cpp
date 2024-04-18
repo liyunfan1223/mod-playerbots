@@ -14,6 +14,8 @@
 #include "PlayerbotAIConfig.h"
 #include "Random.h"
 #include "SharedDefines.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
@@ -177,7 +179,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
     } else {
         float modifiedZ;
-        Movement::PointsArray path = SearchForBestPath(x, y, z, modifiedZ, sPlayerbotAIConfig->maxMovementSearchTime);
+        Movement::PointsArray path = SearchForBestPath(x, y, z, modifiedZ, sPlayerbotAIConfig->maxMovementSearchTime, normal_only);
         if (modifiedZ == INVALID_HEIGHT) {
             return false;
         }
@@ -1409,23 +1411,25 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
 {
     bool found = false;
     modified_z = INVALID_HEIGHT;
-    float tempZ = bot->GetMapWaterOrGroundLevel(x, y, z);
+    float tempZ = bot->GetMapHeight(x, y, z);
     PathGenerator gen(bot);
     gen.CalculatePath(x, y, tempZ);
     Movement::PointsArray result = gen.GetPath();
+    modified_z = tempZ;
     float min_length = gen.getPathLength();
     if (gen.GetPathType() == PATHFIND_NORMAL && abs(tempZ - z) < 0.5f) {
-        modified_z = tempZ;
         return result;
     }
     // Start searching
     if (gen.GetPathType() == PATHFIND_NORMAL) {
         found = true;
-        modified_z = tempZ;
     }
     int count = 1;
     for (float delta = step; count < maxSearchCount / 2 + 1; count++, delta += step) {
-        tempZ = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
+        tempZ = bot->GetMapHeight(x, y, z + delta);
+        if (tempZ == INVALID_HEIGHT) {
+            continue;
+        }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
         if (gen.GetPathType() == PATHFIND_NORMAL && gen.getPathLength() < min_length) {
@@ -1436,7 +1440,10 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
     }
     for (float delta = -step; count < maxSearchCount; count++, delta -= step) {
-        tempZ = bot->GetMapWaterOrGroundLevel(x, y, z + delta);
+        tempZ = bot->GetMapHeight(x, y, z + delta);
+        if (tempZ == INVALID_HEIGHT) {
+            continue;
+        }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
         if (gen.GetPathType() == PATHFIND_NORMAL && gen.getPathLength() < min_length) {
@@ -1447,6 +1454,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
     }
     if (!found && normal_only) {
+        modified_z = INVALID_HEIGHT;
         return Movement::PointsArray{};
     }
     if (!found && !normal_only) {
@@ -1488,7 +1496,8 @@ bool FleeWithPetAction::Execute(Event event)
 bool AvoidAoeAction::isUseful()
 {
     GuidVector traps = AI_VALUE(GuidVector, "nearest trap with damage");
-    return AI_VALUE(Aura*, "area debuff") || !traps.empty();
+    GuidVector triggers = AI_VALUE(GuidVector, "possible triggers");
+    return AI_VALUE(Aura*, "area debuff") || !traps.empty() || !triggers.empty();
 }
 
 bool AvoidAoeAction::Execute(Event event)
@@ -1502,6 +1511,9 @@ bool AvoidAoeAction::Execute(Event event)
         return true;
     }
     // Case #3: Trigger npc (e.g. Lesser shadow fissure)
+    if (AvoidUnitWithDamageAura()) {
+        return true;
+    }
     return false;
 }
 
@@ -1575,7 +1587,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
         //     }
         // }
         if (bot->GetDistance(go) > radius) {
-            return false;
+            continue;
         }
         std::ostringstream name;
         name << "[" << spellInfo->SpellName[0] << "] (object)";
@@ -1583,6 +1595,79 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             return true;
         }
         
+    }
+    return false;
+}
+
+bool AvoidAoeAction::AvoidUnitWithDamageAura()
+{
+    GuidVector traps = AI_VALUE(GuidVector, "possible triggers");
+    if (traps.empty()) {
+        return false;
+    }
+    for (ObjectGuid &guid : traps) {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsInWorld()) {
+            continue;
+        }
+        if (!unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)) {
+            return false;
+        }
+        Unit::AuraEffectList const& auras = unit->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        for (auto i = auras.begin(); i != auras.end(); ++i)
+        {
+            AuraEffect* aurEff = *i;
+            const SpellInfo* spellInfo = aurEff->GetSpellInfo();
+            if (!spellInfo)
+                continue;
+            const SpellInfo* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[aurEff->GetEffIndex()].TriggerSpell);
+            if (!triggerSpellInfo)
+                continue;
+            for (int j = 0; j < MAX_SPELL_EFFECTS; j++) {
+                if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
+                    float radius = triggerSpellInfo->Effects[j].CalcRadius();
+                    if (bot->GetDistance(unit) > radius) {
+                        break;
+                    }
+                    std::ostringstream name;
+                    name << "[" << triggerSpellInfo->SpellName[0] << "] (unit)";
+                    if (FleePostion(unit->GetPosition(), radius, name.str())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        // Unit::AuraApplicationMap& map = unit->GetAppliedAuras();
+        // for (Unit::AuraApplicationMap::iterator i = map.begin(); i != map.end(); ++i)
+        // {
+        //     Aura *aura = i->second->GetBase();
+        //     if (!aura)
+        //         continue;
+        //     const SpellInfo* spellInfo = aura->GetSpellInfo();
+        //     if (!spellInfo)
+        //         continue;
+        //     for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
+        //         if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA && 
+        //             spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_TRIGGER_SPELL) {
+        //                 const SpellInfo* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
+        //                 if (!triggerSpellInfo)
+        //                     continue;
+        //                 for (int j = 0; j < MAX_SPELL_EFFECTS; j++) {
+        //                     if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
+        //                         float radius = triggerSpellInfo->Effects[j].CalcRadius();
+        //                         if (bot->GetDistance(unit) > radius) {
+        //                             break;
+        //                         }
+        //                         std::ostringstream name;
+        //                         name << "[" << triggerSpellInfo->SpellName[0] << "] (unit)";
+        //                         if (FleePostion(unit->GetPosition(), radius, name.str())) {
+        //                             return true;
+        //                         }
+        //                     }
+        //                 }
+        //         }
+        //     }
+        // }
     }
     return false;
 }

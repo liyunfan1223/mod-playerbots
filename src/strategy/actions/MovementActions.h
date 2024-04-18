@@ -77,6 +77,7 @@ class AvoidAoeAction : public MovementAction
     protected:
         bool AvoidAuraWithDynamicObj();
         bool AvoidGameObjectWithDamage();
+        bool AvoidUnitWithDamageAura();
         bool FleePostion(Position pos, float radius, std::string name);
 };
 
