@@ -14,6 +14,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Random.h"
 #include "SharedDefines.h"
+#include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "TargetedMovementGenerator.h"
 #include "Event.h"
@@ -1594,6 +1595,48 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             return true;
         }
         
+    }
+    return false;
+}
+
+bool AvoidAoeAction::AvoidUnitWithDamageAura()
+{
+    GuidVector triggers = AI_VALUE(GuidVector, "possible triggers");
+    if (triggers.empty()) {
+        return false;
+    }
+    for (ObjectGuid &guid : triggers) {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsInWorld()) {
+            continue;
+        }
+        if (!unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)) {
+            return false;
+        }
+        Unit::AuraEffectList const& auras = unit->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        for (auto i = auras.begin(); i != auras.end(); ++i)
+        {
+            AuraEffect* aurEff = *i;
+            const SpellInfo* spellInfo = aurEff->GetSpellInfo();
+            if (!spellInfo)
+                continue;
+            const SpellInfo* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[aurEff->GetEffIndex()].TriggerSpell);
+            if (!triggerSpellInfo)
+                continue;
+            for (int j = 0; j < MAX_SPELL_EFFECTS; j++) {
+                if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
+                    float radius = triggerSpellInfo->Effects[j].CalcRadius();
+                    if (bot->GetDistance(unit) > radius) {
+                        break;
+                    }
+                    std::ostringstream name;
+                    name << "[" << triggerSpellInfo->SpellName[0] << "] (unit)";
+                    if (FleePostion(unit->GetPosition(), radius, name.str())) {
+                        return true;
+                    }
+                }
+            }
+        }
     }
     return false;
 }
