@@ -121,37 +121,23 @@ bool HasAreaDebuffValue::Calculate()
 Aura* AreaDebuffValue::Calculate()
 {
     // Unit::AuraApplicationMap& map = bot->GetAppliedAuras();
-    Unit::AuraEffectList const& auras = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
-    for (auto i = auras.begin(); i != auras.end(); ++i)
-    {
-        AuraEffect* aurEff = *i;
-        Aura *aura = aurEff->GetBase();
-        AuraObjectType type = aura->GetType();
-        bool isPositive = aura->GetSpellInfo()->IsPositive();
-        if (type == DYNOBJ_AURA_TYPE && !isPositive) {
-            DynamicObject* dynOwner = aura->GetDynobjOwner();
-            if (!dynOwner) {
-                continue;
+    Unit::AuraEffectList const& aurasPeriodicDamage = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+    Unit::AuraEffectList const& aurasPeriodicTriggerSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    for (const Unit::AuraEffectList& list : {aurasPeriodicDamage, aurasPeriodicTriggerSpell}) {
+        for (auto i = list.begin(); i != list.end(); ++i)
+        {
+            AuraEffect* aurEff = *i;
+            Aura *aura = aurEff->GetBase();
+            AuraObjectType type = aura->GetType();
+            bool isPositive = aura->GetSpellInfo()->IsPositive();
+            if (type == DYNOBJ_AURA_TYPE && !isPositive) {
+                DynamicObject* dynOwner = aura->GetDynobjOwner();
+                if (!dynOwner) {
+                    continue;
+                }
+                return aura;
             }
-            return aura;
         }
     }
-	// for (Unit::AuraApplicationMap::iterator i = map.begin(); i != map.end(); ++i)
-	// {
-	// 	Aura *aura = i->second->GetBase();
-	// 	if (!aura)
-	// 		continue;
-
-	// 	AuraObjectType type = aura->GetType();
-    //     // bool is_area = aura->IsArea();
-    //     bool isPositive = aura->GetSpellInfo()->IsPositive();
-    //     if (type == DYNOBJ_AURA_TYPE && !isPositive) {
-    //         DynamicObject* dynOwner = aura->GetDynobjOwner();
-    //         if (!dynOwner) {
-    //             continue;
-    //         }
-    //         return aura;
-    //     }
-	// }
 	return nullptr;
 }
