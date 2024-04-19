@@ -39,8 +39,8 @@ bool PossibleTriggersValue::AcceptUnit(Unit* unit)
     if (!unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)) {
         return false;
     }
-    Unit::AuraEffectList const& aurasPeriodicTriggerSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-    Unit::AuraEffectList const& aurasPeriodicTriggerWithValueSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
+    Unit::AuraEffectList const& aurasPeriodicTriggerSpell = unit->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    Unit::AuraEffectList const& aurasPeriodicTriggerWithValueSpell = unit->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
     for (const Unit::AuraEffectList& list : {aurasPeriodicTriggerSpell, aurasPeriodicTriggerWithValueSpell}) {
         for (auto i = list.begin(); i != list.end(); ++i)
         {
@@ -59,6 +59,4 @@ bool PossibleTriggersValue::AcceptUnit(Unit* unit)
         }
     }
     return false;
-    // return true; // AttackersValue::IsPossibleTarget(unit, bot, range);
 }
-
