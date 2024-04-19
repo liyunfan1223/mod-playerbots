@@ -2478,9 +2478,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 
 	ObjectGuid oldSel = bot->GetSelectedUnit() ? bot->GetSelectedUnit()->GetGUID() : ObjectGuid();
 	bot->SetSelection(target->GetGUID());
-
     WorldObject* faceTo = target;
-    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo))
+    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo) && (spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT))
     {
         sServerFacade->SetFacingTo(bot, faceTo);
         //failWithDelay = true;
