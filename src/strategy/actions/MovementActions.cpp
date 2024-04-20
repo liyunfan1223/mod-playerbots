@@ -1415,7 +1415,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
     gen.CalculatePath(x, y, tempZ);
     Movement::PointsArray result = gen.GetPath();
     float min_length = gen.getPathLength();
-    if (gen.GetPathType() == PATHFIND_NORMAL && abs(tempZ - z) < 0.5f) {
+    if ((gen.GetPathType() & PATHFIND_NORMAL) && abs(tempZ - z) < 0.5f) {
         modified_z = tempZ;
         return result;
     }
@@ -1431,7 +1431,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
-        if (gen.GetPathType() & PATHFIND_NORMAL && gen.getPathLength() < min_length) {
+        if ((gen.GetPathType() & PATHFIND_NORMAL) && gen.getPathLength() < min_length) {
             found = true;
             min_length = gen.getPathLength();
             result = gen.GetPath();
@@ -1445,7 +1445,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
-        if (gen.GetPathType() & PATHFIND_NORMAL && gen.getPathLength() < min_length) {
+        if ((gen.GetPathType() & PATHFIND_NORMAL) && gen.getPathLength() < min_length) {
             found = true;
             min_length = gen.getPathLength();
             result = gen.GetPath();
