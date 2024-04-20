@@ -65,6 +65,7 @@ class PlayerbotAIConfig
         bool autoSaveMana;
         uint32 saveManaThreshold;
         bool autoAvoidAoe;
+        bool tellWhenAvoidAoe;
         
         uint32 openGoSpell;
         bool randomBotAutologin;

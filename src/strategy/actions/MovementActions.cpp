@@ -1674,9 +1674,11 @@ bool AvoidAoeAction::FleePostion(Position pos, float radius, std::string name)
     }
     if (farestDis > 0.0f) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
-            std::ostringstream out;
-            out << "Avoiding spell " << name << "...";
-            bot->Say(out.str(), LANG_UNIVERSAL);
+            if (sPlayerbotAIConfig->tellWhenAvoidAoe) {
+                std::ostringstream out;
+                out << "Avoiding spell " << name << "...";
+                bot->Say(out.str(), LANG_UNIVERSAL);
+            }
             return true;
         }
     }
