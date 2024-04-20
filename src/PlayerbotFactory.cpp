@@ -3593,9 +3593,9 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     int meleeDps = 0, rangeDps = 0;
     float score = 0;
     if (proto->IsRangedWeapon()) {
-        rangeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * proto->Delay / 1000;
+        rangeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * 1000 / proto->Delay;
     } else if (proto->IsWeapon()) {
-        meleeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * proto->Delay / 1000;
+        meleeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * 1000 / proto->Delay;
     }
     armor += proto->Armor;
     block += proto->Block;
