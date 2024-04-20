@@ -1421,6 +1421,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
     }
     // Start searching
     if (gen.GetPathType() & PATHFIND_NORMAL) {
+        modified_z = tempZ;
         found = true;
     }
     int count = 1;
