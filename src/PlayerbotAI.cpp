@@ -844,7 +844,8 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             //     vcos, vsin, horizontalSpeed, verticalSpeed, x, y, z, bot->GetRelativeAngle(vcos, vsin), bot->GetOrientation());
             // bot->Say(speak, LANG_UNIVERSAL);
             // bot->GetClosePoint(x, y, z, bot->GetObjectSize(), dist, bot->GetAngle(vcos, vsin));
-            bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, bot->GetSelectedUnit());
+            Unit* currentTarget = GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
+            bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, currentTarget);
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FORWARD);
             // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
@@ -2477,9 +2478,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 
 	ObjectGuid oldSel = bot->GetSelectedUnit() ? bot->GetSelectedUnit()->GetGUID() : ObjectGuid();
 	bot->SetSelection(target->GetGUID());
-
     WorldObject* faceTo = target;
-    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo))
+    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo) && (spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT))
     {
         sServerFacade->SetFacingTo(bot, faceTo);
         //failWithDelay = true;
@@ -4408,11 +4408,12 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
 
             if (pItem->IsBindedNotWith(bot))
                 return EQUIP_ERR_DONT_OWN_THAT_ITEM;
-
-            // check count of items (skip for auto move for same player from bank)
-            InventoryResult res = bot->CanTakeMoreSimilarItems(pItem);
-            if (res != EQUIP_ERR_OK)
-                return res;
+            
+            // Yunfan: skip it
+            // // check count of items (skip for auto move for same player from bank)
+            // InventoryResult res = bot->CanTakeMoreSimilarItems(pItem);
+            // if (res != EQUIP_ERR_OK)
+            //     return res;
 
             ScalingStatDistributionEntry const* ssd = pProto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(pProto->ScalingStatDistribution) : 0;
             // check allowed level (extend range to upper values if MaxLevel more or equal max player level, this let GM set high level with 1...max range items)
@@ -4427,7 +4428,7 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
             if (!bot->CanUseAttackType(bot->GetAttackBySlot(eslot)))
                 return EQUIP_ERR_NOT_WHILE_DISARMED;
 
-            res = bot->CanUseItem(pItem, not_loading);
+            InventoryResult res = bot->CanUseItem(pItem, not_loading);
             if (res != EQUIP_ERR_OK)
                 return res;
 

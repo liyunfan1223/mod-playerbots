@@ -88,7 +88,8 @@ class NearFormation : public MoveAheadFormation
             float x = master->GetPositionX() + cos(angle) * range;
             float y = master->GetPositionY() + sin(angle) * range;
             float z = master->GetPositionZ();
-            float ground = master->GetMap()->GetHeight(x, y, z + 30.0f);
+            
+            float ground = master->GetMapHeight(x, y, z + 30.0f);
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
@@ -126,7 +127,7 @@ class ChaosFormation : public MoveAheadFormation
             float x = master->GetPositionX() + cos(angle) * range + dx;
             float y = master->GetPositionY() + sin(angle) * range + dy;
             float z = master->GetPositionZ();
-            float ground = master->GetMap()->GetHeight(x, y, z + 30.0f);
+            float ground = master->GetMapHeight(x, y, z + 30.0f);
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
@@ -183,7 +184,7 @@ class CircleFormation : public MoveFormation
             float x = target->GetPositionX() + cos(angle) * range;
             float y = target->GetPositionY() + sin(angle) * range;
             float z = target->GetPositionZ();
-            float ground = target->GetMap()->GetHeight(x, y, z + 30.0f);
+            float ground = target->GetMapHeight(x, y, z + 30.0f);
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
@@ -327,7 +328,7 @@ class FarFormation : public FollowFormation
             float y = master->GetPositionY() + sin(angle) * range + sin(followAngle) * followRange;
             float z = master->GetPositionZ();
 
-            float ground = master->GetMap()->GetHeight(x, y, z + 30.0f);
+            float ground = master->GetMapHeight(x, y, z + 30.0f);
             if (ground <= INVALID_HEIGHT)
             {
                 float minDist = 0, minX = 0, minY = 0;
@@ -336,7 +337,7 @@ class FarFormation : public FollowFormation
                     x = master->GetPositionX() + cos(angle) * range + cos(followAngle) * followRange;
                     y = master->GetPositionY() + sin(angle) * range + sin(followAngle) * followRange;
                     float dist = sServerFacade->GetDistance2d(bot, x, y);
-                    float ground = master->GetMap()->GetHeight(x, y, z + 30.0f);
+                    float ground = master->GetMapHeight(x, y, z + 30.0f);
                     if (ground > INVALID_HEIGHT && (!minDist || minDist > dist))
                     {
                         minDist = dist;
@@ -613,7 +614,7 @@ WorldLocation MoveFormation::MoveSingleLine(std::vector<Player*> line, float dif
             float lx = x + cos(angle) * radius;
             float ly = y + sin(angle) * radius;
             float lz = cz;
-            float ground = bot->GetMap()->GetHeight(lx, ly, lz + 30.0f);
+            float ground = bot->GetMapHeight(lx, ly, lz + 30.0f);
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
