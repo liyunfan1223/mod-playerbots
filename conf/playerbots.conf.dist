@@ -604,7 +604,7 @@ AiPlayerbot.PremadeSpecLink.8.1.80 = 23000503310003-0055030012303330053120300351
 AiPlayerbot.PremadeSpecName.8.2 = frost pve
 AiPlayerbot.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
 AiPlayerbot.PremadeSpecLink.8.2.60 = --3533103310203100232102231151
-AiPlayerbot.PremadeSpecLink.8.2.80 = 23002322010203--3533103310203100232102231151
+AiPlayerbot.PremadeSpecLink.8.2.80 = 23002322010203--0533003313203100232112231151
 
 # Warlock
 AiPlayerbot.PremadeSpecName.9.0 = affli pve
