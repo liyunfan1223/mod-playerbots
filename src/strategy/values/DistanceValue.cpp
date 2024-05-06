@@ -19,7 +19,7 @@ float DistanceValue::Calculate()
             return 0.0f;
 
         WorldObject* obj = loot.GetWorldObject(bot);
-        if (!obj)
+        if (!obj || !obj->IsInWorld())
             return 0.0f;
 
         return sServerFacade->GetDistance2d(botAI->GetBot(), obj);
