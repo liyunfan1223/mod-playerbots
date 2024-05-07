@@ -201,7 +201,7 @@ class PlayerbotsPlayerScript : public PlayerScript
 class PlayerbotsMiscScript : public MiscScript
 {
     public:
-        PlayerbotsMiscScript() : MiscScript("PlayerbotsMiscScript") { }
+        PlayerbotsMiscScript() : MiscScript("PlayerbotsMiscScript", {MISCHOOK_ON_DESTRUCT_PLAYER}) { }
 
         void OnDestructPlayer(Player* player) override
         {
