@@ -50,13 +50,15 @@ class PriestCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
             creators["heal"] = &PriestCombatStrategyFactoryInternal::heal;
             creators["shadow"] = &PriestCombatStrategyFactoryInternal::dps;
             creators["dps"] = &PriestCombatStrategyFactoryInternal::dps;
-            creators["holy"] = &PriestCombatStrategyFactoryInternal::holy;
+            creators["holy dps"] = &PriestCombatStrategyFactoryInternal::holy_dps;
+            creators["holy heal"] = &PriestCombatStrategyFactoryInternal::holy_heal;
         }
 
     private:
         static Strategy* heal(PlayerbotAI* botAI) { return new HealPriestStrategy(botAI); }
         static Strategy* dps(PlayerbotAI* botAI) { return new ShadowPriestStrategy(botAI); }
-        static Strategy* holy(PlayerbotAI* botAI) { return new HolyPriestStrategy(botAI); }
+        static Strategy* holy_dps(PlayerbotAI* botAI) { return new HolyPriestStrategy(botAI); }
+        static Strategy* holy_heal(PlayerbotAI* botAI) { return new HolyHealPriestStrategy(botAI); }
 };
 
 class PriestTriggerFactoryInternal : public NamedObjectContext<Trigger>
