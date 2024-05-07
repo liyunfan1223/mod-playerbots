@@ -277,12 +277,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     switch (player->getClass())
     {
         case CLASS_PRIEST:
-            if (tab == 2)
-            {
+            if (tab == 2) {
                 engine->addStrategies("dps", "shadow debuff", "shadow aoe", "threat", nullptr);
-            }
-            else {
-                engine->addStrategies("heal", "threat", nullptr);
+            } else if (tab == PRIEST_TAB_DISIPLINE) {
+                engine->addStrategies("heal", nullptr);
+            } else {
+                engine->addStrategies("holy heal", nullptr);
             }
 
             engine->addStrategies("dps assist", "cure", nullptr);
@@ -375,7 +375,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             switch (player->getClass()) {
                 case CLASS_PRIEST: {
                     if (tab != PRIEST_TAB_SHADOW) {
-                        engine->addStrategies("holy", "shadow debuff", "shadow aoe", nullptr);
+                        engine->addStrategies("holy dps", "shadow debuff", "shadow aoe", nullptr);
                     }
                     break;
                 }

@@ -182,11 +182,11 @@ WorldObject* LootObject::GetWorldObject(Player* bot)
         return nullptr;
     }
     Creature* creature = botAI->GetCreature(guid);
-    if (creature && creature->getDeathState() == DeathState::Corpse)
+    if (creature && creature->getDeathState() == DeathState::Corpse && creature->IsInWorld())
         return creature;
 
     GameObject* go = botAI->GetGameObject(guid);
-    if (go && go->isSpawned())
+    if (go && go->isSpawned() && go->IsInWorld())
         return go;
 
     return nullptr;

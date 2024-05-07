@@ -26,17 +26,17 @@ inline std::string const GetActualBlessingOfMight(Unit* target)
             break;
         case CLASS_SHAMAN:
             if (tab == SHAMAN_TAB_ELEMENTAL || tab == SHAMAN_TAB_RESTORATION) {
-                return "bless of wisdom";
+                return "blessing of wisdom";
             }
             break;
         case CLASS_DRUID:
             if (tab == DRUID_TAB_RESTORATION || tab == DRUID_TAB_BALANCE) {
-                return "bless of wisdom";
+                return "blessing of wisdom";
             }
             break;
         case CLASS_PALADIN:
             if (tab == PALADIN_TAB_HOLY) {
-                return "bless of wisdom";
+                return "blessing of wisdom";
             }
             break;
     }
