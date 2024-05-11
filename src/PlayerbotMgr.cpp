@@ -364,9 +364,9 @@ Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
     sPlayerbotsMgr->AddPlayerbotData(bot, true);
+    playerBots[bot->GetGUID()] = bot;
     OnBotLoginInternal(bot);
 
-    playerBots[bot->GetGUID()] = bot;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI) {
