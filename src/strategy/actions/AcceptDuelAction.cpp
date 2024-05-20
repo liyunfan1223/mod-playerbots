@@ -21,6 +21,7 @@ bool AcceptDuelAction::Execute(Event event)
         WorldPacket packet(CMSG_DUEL_CANCELLED, 8);
         packet << flagGuid;
         bot->GetSession()->HandleDuelCancelledOpcode(packet);
+        return false;
     }
 
     WorldPacket packet(CMSG_DUEL_ACCEPTED, 8);
