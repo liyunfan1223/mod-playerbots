@@ -167,6 +167,18 @@ AiPlayerbot.AddClassCommand = 1
 # default: 1 (enable)
 AiPlayerbot.MaintenanceCommand = 1
 
+# Enable/Disable autogear command, auto upgrade player bots gears, the quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
+# default: 1 (enable)
+AiPlayerbot.AutoGearCommand = 1
+
+# Equips quality limitation for auto gear command (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
+# default: 3 (rare)
+AiPlayerbot.AutoGearQualityLimit = 3
+
+# Equips quality limitation for auto gear command (0 = no limit)
+# default: 0 (no limit)
+AiPlayerbot.AutoGearScoreLimit = 0
+
 # Automation
 
 # Bots keep looting when group loop method is free for all

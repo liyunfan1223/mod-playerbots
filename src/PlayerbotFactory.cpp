@@ -1523,6 +1523,10 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             uint32 newItemId = ids[index];
             
             uint16 dest;
+
+            if (oldItem && oldItem->GetTemplate()->ItemId == newItemId)
+                continue;
+            
             if (!CanEquipUnseenItem(slot, dest, newItemId))
                 continue;
             
@@ -1537,10 +1541,15 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         if (oldItem)
         {
+            // uint8 dstBag = NULL_BAG;
+            // WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
+            // packet << INVENTORY_SLOT_BAG_0 << slot << dstBag;
+            // bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
             bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
         }
         uint16 dest;
-        if (!CanEquipUnseenItem(slot, dest, bestItemForSlot)) {
+        if (!CanEquipUnseenItem(slot, dest, bestItemForSlot))
+        {
             continue;
         }
         Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);

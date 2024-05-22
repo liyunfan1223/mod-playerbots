@@ -212,6 +212,7 @@ class PlayerbotAIConfig
         float autoInitEquipLevelLimitRatio;
         int32 addClassCommand;
         int32 maintenanceCommand;
+        int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
 
         std::string const GetTimestampStr();
         bool hasLog(std::string const fileName) { return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) != allowedLogFiles.end(); };
