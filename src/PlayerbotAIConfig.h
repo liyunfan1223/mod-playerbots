@@ -177,6 +177,8 @@ class PlayerbotAIConfig
         bool disableRandomLevels;
         uint32 playerbotsXPrate;
         uint32 botActiveAlone;
+        uint32 diffWithPlayer;
+        uint32 diffEmpty;
 
         bool freeMethodLoot;
         int32 lootRollLevel;

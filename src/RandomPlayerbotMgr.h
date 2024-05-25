@@ -27,6 +27,29 @@ class CachedEvent
         std::string data;
 };
 
+//https://gist.github.com/bradley219/5373998
+
+class botPIDImpl;
+class botPID
+{
+public:
+    // Kp -  proportional gain
+    // Ki -  Integral gain
+    // Kd -  derivative gain
+    // dt -  loop interval time
+    // max - maximum value of manipulated variable
+    // min - minimum value of manipulated variable
+    botPID(double dt, double max, double min, double Kp, double Ki, double Kd);
+    void adjust(double Kp, double Ki, double Kd);
+    void reset();
+
+    double calculate(double setpoint, double pv);
+    ~botPID();
+
+private:
+    botPIDImpl* pimpl;
+};
+
 class RandomPlayerbotMgr : public PlayerbotHolder
 {
     public:
@@ -40,6 +63,9 @@ class RandomPlayerbotMgr : public PlayerbotHolder
 
         void LogPlayerLocation();
         void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
+
+    private:
+        void ScaleBotActivity();   
 
 	public:
         uint32 activeBots = 0;
@@ -99,10 +125,17 @@ class RandomPlayerbotMgr : public PlayerbotHolder
 
         std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> getBattleMastersCache() { return BattleMastersCache; }
 
+        float getActivityMod() { return activityMod; }
+        float getActivityPercentage() { return activityMod * 100.0f; }
+        void setActivityPercentage(float percentage) { activityMod = percentage / 100.0f; }
+
 	protected:
 	    void OnBotLoginInternal(Player* const bot) override;
 
     private:
+        //pid values are set in constructor
+        botPID pid = botPID(1, 50, -50, 0, 0, 0);
+        float activityMod = 0.25;
         uint32 GetEventValue(uint32 bot, std::string const event);
         std::string const GetEventData(uint32 bot, std::string const event);
         uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn, std::string const data = "");
