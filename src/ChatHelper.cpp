@@ -259,17 +259,17 @@ ItemIds ChatHelper::parseItems(std::string const text)
     uint8 pos = 0;
     while (true)
     {
-        uint32 i = text.find("Hitem:", pos);
-        if (i == -1)
+        auto i = text.find("Hitem:", pos);
+        if (i == std::string::npos)
             break;
 
         pos = i + 6;
-        uint32 endPos = text.find(':', pos);
-        if (endPos == -1)
+        auto endPos = text.find(':', pos);
+        if (endPos == std::string::npos)
             break;
 
         std::string const idC = text.substr(pos, endPos - pos);
-        uint32 id = atol(idC.c_str());
+        auto id = atol(idC.c_str());
         pos = endPos;
         if (id)
             itemIds.insert(id);
@@ -383,6 +383,8 @@ std::string const ChatHelper::FormatChat(ChatMsg chat)
             return "whisper";
         case CHAT_MSG_RAID:
             return "raid";
+        default:
+            break;
     }
 
     return "unknown";
@@ -406,13 +408,13 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
     while (true)
     {
         // extract GO guid
-        uint32 i = text.find("Hfound:", pos);     // base H = 11
-        if (i == -1)     // break if error
+        auto i = text.find("Hfound:", pos);     // base H = 11
+        if (i == std::string::npos)     // break if error
             break;
 
         pos = i + 7;     //start of window in text 11 + 7 = 18
-        uint32 endPos = text.find(':', pos);     // end of window in text 22
-        if (endPos == -1)     //break if error
+        auto endPos = text.find(':', pos);     // end of window in text 22
+        if (endPos == std::string::npos)     //break if error
             break;
 
         std::istringstream stream(text.substr(pos, endPos - pos));
@@ -422,7 +424,7 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
         // extract GO entry
         pos = endPos + 1;
         endPos = text.find(':', pos);     // end of window in text
-        if (endPos == -1)     //break if error
+        if (endPos == std::string::npos)     //break if error
             break;
 
         std::string const entryC = text.substr(pos, endPos - pos);     // get std::string const within window i.e entry

@@ -56,7 +56,7 @@ float ExpectedGroupDpsValue::Calculate()
         basic_gs = (level + 5) * 4;
     } else if (level <= 70) {
         basic_gs = (85 + (level - 60) * 3) * 4;
-    } else if (level <= 80) {
+    } else {
         basic_gs = (155 + (level - 70) * 4) * 4;
     }
     float gap = mixedGearScore - basic_gs;

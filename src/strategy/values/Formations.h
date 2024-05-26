@@ -17,7 +17,7 @@ class Formation : public AiNamedObject
 {
     public:
         Formation(PlayerbotAI* botAI, std::string const name) : AiNamedObject(botAI, name) { }
-
+        virtual ~Formation() = default;
         virtual std::string const GetTargetName() { return ""; }
         virtual WorldLocation GetLocation() { return NullLocation; }
         virtual float GetMaxDistance() { return sPlayerbotAIConfig->followDistance; }

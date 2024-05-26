@@ -673,6 +673,7 @@ Engine* AiFactory::createNonCombatEngine(Player* player, PlayerbotAI* const faca
 
 void AiFactory::AddDefaultDeadStrategies(Player* player, PlayerbotAI* const facade, Engine* deadEngine)
 {
+    (void)facade;   // unused and remove warning
     deadEngine->addStrategies("dead", "stay", "chat", "default", "follow", nullptr);
 
     if (sRandomPlayerbotMgr->IsRandomBot(player) && !player->GetGroup())

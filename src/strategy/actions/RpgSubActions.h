@@ -17,7 +17,7 @@ class RpgHelper : public AiObject
 {
     public:
         RpgHelper(PlayerbotAI* botAI) : AiObject(botAI) { }
-
+        virtual ~RpgHelper() = default;
         void OnExecute(std::string nextAction = "rpg");
         void BeforeExecute();
         void AfterExecute(bool doDelay = true,  bool waitForGroup = false);
