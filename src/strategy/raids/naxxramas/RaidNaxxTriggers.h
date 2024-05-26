@@ -61,7 +61,7 @@ protected:
     uint32 phase_mask;
 };
 
-class GrobbulusCloudTrigger : public BossEventTrigger<boss_grobbulus::boss_grobbulusAI>
+class GrobbulusCloudTrigger : public BossEventTrigger<Grobbulus::boss_grobbulus::boss_grobbulusAI>
 {
 public:
     GrobbulusCloudTrigger(PlayerbotAI* ai): BossEventTrigger(ai, 15931, 2, "grobbulus cloud event") { }
@@ -109,7 +109,7 @@ class KelthuzadTrigger : public Trigger
         KelthuzadBossHelper helper;
 };
 
-class AnubrekhanTrigger : public BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>
+class AnubrekhanTrigger : public BossPhaseTrigger<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI>
 {
 public:
     AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
