@@ -212,29 +212,11 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
     */
-    InitInstanceQuests();
-    // clear quest reward inventory
-    ClearInventory();
-    bot->GiveLevel(level);
 
-    if (sPlayerbotAIConfig->randomBotPreQuests)
-    {
-        uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
-        LOG_INFO("playerbots", "Initializing quests...");
+    if (sPlayerbotAIConfig->randomBotPreQuests){
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Quests");
-        InitQuests(classQuestIds);
-        InitQuests(specialQuestIds);
-
-        // quest rewards boost bot level, so reduce back
-        
-        bot->GiveLevel(level);
-        
-
-        ClearInventory();
-        bot->SetUInt32Value(PLAYER_XP, currentXP);
-        CancelAuras();
-        bot->SaveToDB(false, false);
-        if (pmo)
+        InitInstanceQuests();
+        if (pmo) 
             pmo->finish();
     }
 
@@ -2454,21 +2436,17 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap)
 void PlayerbotFactory::InitInstanceQuests()
 {
     // Yunfan: use configuration instead of hard code
+    uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
+    LOG_INFO("playerbots", "Initializing quests...");
+    InitQuests(classQuestIds);
+    InitQuests(specialQuestIds);
 
-    // The Caverns of Time
-    if (bot->GetLevel() >= 64) {
-        uint32 questId = 10277;
-        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
-        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 5, bot, false);
-    }
-    // Return to Andormu
-    if (bot->GetLevel() >= 66) {
-        uint32 questId = 10285;
-        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
-        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 5, bot, false);
-    }
+    // quest rewards boost bot level, so reduce back
+    bot->GiveLevel(level);
+    
+    ClearInventory();
+    bot->SetUInt32Value(PLAYER_XP, currentXP);
+    bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::ClearInventory()

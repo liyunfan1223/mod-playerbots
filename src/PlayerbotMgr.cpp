@@ -628,6 +628,11 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         sRandomPlayerbotMgr->Randomize(bot);
         return "ok";
     }
+    else if (cmd == "quests"){
+        PlayerbotFactory factory(bot, bot->getLevel());
+        factory.InitInstanceQuests();
+        return "Initialization quests";
+    }
     // }
 
     return "unknown command";
