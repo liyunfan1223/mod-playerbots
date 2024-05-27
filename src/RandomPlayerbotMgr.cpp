@@ -28,6 +28,7 @@
 #include "ChannelMgr.h"
 #include "Unit.h"
 #include "World.h"
+#include "UpdateTime.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -77,6 +78,106 @@ void activateCheckPlayersThread()
 {
     boost::thread t(CheckPlayersThread);
     t.detach();
+}
+
+class botPIDImpl
+{
+public:
+    botPIDImpl(double dt, double max, double min, double Kp, double Ki, double Kd);
+    ~botPIDImpl();
+    double calculate(double setpoint, double pv);
+    void adjust(double Kp, double Ki, double Kd) { _Kp = Kp; _Ki = Ki; _Kd = Kd; }
+    void reset() { _integral = 0; }
+
+private:
+    double _dt;
+    double _max;
+    double _min;
+    double _Kp;
+    double _Ki;
+    double _Kd;
+    double _pre_error;
+    double _integral;
+};
+
+
+botPID::botPID(double dt, double max, double min, double Kp, double Ki, double Kd)
+{
+    pimpl = new botPIDImpl(dt, max, min, Kp, Ki, Kd);
+}
+void botPID::adjust(double Kp, double Ki, double Kd)
+{
+    pimpl->adjust(Kp, Ki, Kd);
+}
+void botPID::reset()
+{
+    pimpl->reset();
+}
+double botPID::calculate(double setpoint, double pv)
+{
+    return pimpl->calculate(setpoint, pv);
+}
+botPID::~botPID()
+{
+    delete pimpl;
+}
+
+
+/**
+ * Implementation
+ */
+botPIDImpl::botPIDImpl(double dt, double max, double min, double Kp, double Ki, double Kd) :
+    _dt(dt),
+    _max(max),
+    _min(min),
+    _Kp(Kp),
+    _Ki(Ki),
+    _Kd(Kd),
+    _pre_error(0),
+    _integral(0)
+{
+}
+
+double botPIDImpl::calculate(double setpoint, double pv)
+{
+
+    // Calculate error
+    double error = setpoint - pv;
+
+    // Proportional term
+    double Pout = _Kp * error;
+
+    // Integral term
+    _integral += error * _dt;
+    double Iout = _Ki * _integral;
+
+    // Derivative term
+    double derivative = (error - _pre_error) / _dt;
+    double Dout = _Kd * derivative;
+
+    // Calculate total output
+    double output = Pout + Iout + Dout;
+
+    // Restrict to max/min
+    if (output > _max)
+    {
+        output = _max;
+        _integral -= error * _dt; //Stop integral buildup at max
+    }
+    else if (output < _min)
+    {
+        output = _min;
+        _integral -= error * _dt; //Stop integral buildup at min
+    }
+
+    // Save error to previous error
+    _pre_error = error;
+
+    return output;
+}
+
+botPIDImpl::~botPIDImpl()
+{
 }
 
 RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0), totalPmo(nullptr)
@@ -236,6 +337,14 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     if (!sPlayerbotAIConfig->randomBotAutologin || !sPlayerbotAIConfig->enabled)
         return;
 
+    if (sPlayerbotAIConfig->enablePrototypePerformanceDiff)
+    {
+		LOG_INFO("playerbots", "---------------------------------------");
+		LOG_INFO("playerbots", "PROTOTYPE: Playerbot performance enhancements are active. Issues and instability may occur.");
+		LOG_INFO("playerbots", "---------------------------------------");
+        ScaleBotActivity();
+    }
+
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
     if (!maxAllowedBotCount || (maxAllowedBotCount < sPlayerbotAIConfig->minRandomBots || maxAllowedBotCount > sPlayerbotAIConfig->maxRandomBots))
     {
@@ -325,6 +434,23 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     {
         LogPlayerLocation();
     }
+}
+
+void RandomPlayerbotMgr::ScaleBotActivity()
+{
+    float activityPercentage = getActivityPercentage();
+
+    //if (activityPercentage >= 100.0f || activityPercentage <= 0.0f) pid.reset(); //Stop integer buildup during max/min activity
+
+    //    % increase/decrease                   wanted diff                                         , avg diff
+    float activityPercentageMod = pid.calculate(sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer, sWorldUpdateTime.GetAverageUpdateTime());
+
+    activityPercentage = activityPercentageMod + 50;
+
+    //Cap the percentage between 0 and 100.
+    activityPercentage = std::max(0.0f, std::min(100.0f, activityPercentage));
+
+    setActivityPercentage(activityPercentage);
 }
 
 uint32 RandomPlayerbotMgr::AddRandomBots()

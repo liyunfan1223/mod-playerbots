@@ -449,6 +449,11 @@ AiPlayerbot.BotCheats = "taxi"
 # Enables/Disables password to bot account
 AiPlayerbot.RandomBotRandomPassword = 0
 
+# Diff with/without player in server. The server will tune bot activity to reach the desired server tick speed (in ms).
+# AiPlayerbot.EnablePrototypePerformanceDiff = 0
+# AiPlayerbot.DiffWithPlayer = 100
+# AiPlayerbot.DiffEmpty = 200
+
 ##################################################################################
 #                                                                                #
 # Database Stuff 																 #
