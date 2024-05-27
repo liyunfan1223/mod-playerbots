@@ -135,7 +135,6 @@ class PlayerbotFactory
         void InitMounts();
         void InitBags(bool destroyOld = true);
         void ApplyEnchantAndGemsNew(bool destoryOld = true);
-        void InitInstanceQuests();
     private:
         void Prepare();
         // void InitSecondEquipmentSet();
@@ -152,6 +151,7 @@ class PlayerbotFactory
         void InitTalents(uint32 specNo);
         void InitTalentsByTemplate(uint32 specNo);
         void InitQuests(std::list<uint32>& questMap);
+        void InitInstanceQuests();
         void ClearInventory();
         void ClearAllItems();
         void ResetQuests();

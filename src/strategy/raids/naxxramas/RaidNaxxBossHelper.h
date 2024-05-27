@@ -5,7 +5,6 @@
 #include "AiObjectContext.h"
 #include "EventMap.h"
 #include "Log.h"
-#include "NamedObjectContext.h"
 #include "ObjectGuid.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
@@ -69,14 +68,14 @@ class GenericBossHelper : public AiObject {
         uint32 _timer = 0;
 };
 
-class KelthuzadBossHelper: public GenericBossHelper<Kelthuzad::boss_kelthuzad::boss_kelthuzadAI> {
+class KelthuzadBossHelper: public GenericBossHelper<boss_kelthuzad::boss_kelthuzadAI> {
     public:
         KelthuzadBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "kel'thuzad") {}
         const std::pair<float, float> center = {3716.19f, -5106.58f};
         const std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
         const std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
         bool IsPhaseOne() {
-            return _event_map->GetNextEventTime(Kelthuzad::KELTHUZAD_EVENT_PHASE_2) != 0;
+            return _event_map->GetNextEventTime(KELTHUZAD_EVENT_PHASE_2) != 0;
         }
         bool IsPhaseTwo() {
             return !IsPhaseOne();
@@ -97,12 +96,12 @@ class KelthuzadBossHelper: public GenericBossHelper<Kelthuzad::boss_kelthuzad::b
         }
 };
 
-class RazuviousBossHelper: public GenericBossHelper<Razuvious::boss_razuvious::boss_razuviousAI> {
+class RazuviousBossHelper: public GenericBossHelper<boss_razuvious::boss_razuviousAI> {
     public:
         RazuviousBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "instructor razuvious") {}
 };
 
-class SapphironBossHelper: public GenericBossHelper<Sapphiron::boss_sapphiron::boss_sapphironAI> {
+class SapphironBossHelper: public GenericBossHelper<boss_sapphiron::boss_sapphironAI> {
     public:
         const std::pair<float, float> mainTankPos = {3512.07f, -5274.06f};
         const std::pair<float, float> center = {3517.31f, -5253.74f};
@@ -112,7 +111,7 @@ class SapphironBossHelper: public GenericBossHelper<Sapphiron::boss_sapphiron::b
             if (!GenericBossHelper::UpdateBossAI()) {
                 return false;
             }
-            uint32 nextEventGround = _event_map->GetNextEventTime(Sapphiron::EVENT_GROUND);
+            uint32 nextEventGround = _event_map->GetNextEventTime(EVENT_GROUND);
             if (nextEventGround && nextEventGround != lastEventGround)
                 lastEventGround = nextEventGround;
             return true;
@@ -124,10 +123,10 @@ class SapphironBossHelper: public GenericBossHelper<Sapphiron::boss_sapphiron::b
             return !IsPhaseGround();
         }
         bool JustLanded() {
-            return (_event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_START) - _timer) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
+            return (_event_map->GetNextEventTime(EVENT_FLIGHT_START) - _timer) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
         }
         bool WaitForExplosion() {
-            return _event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_SPELL_EXPLOSION);
+            return _event_map->GetNextEventTime(EVENT_FLIGHT_SPELL_EXPLOSION);
         }
         bool FindPosToAvoidChill(std::vector<float> &dest) {
             Aura* aura = botAI->GetAura("chill", bot);
@@ -173,7 +172,7 @@ class SapphironBossHelper: public GenericBossHelper<Sapphiron::boss_sapphiron::b
         uint32 lastEventGround = 0;    
 };
 
-class GluthBossHelper: public GenericBossHelper<Gluth::boss_gluth::boss_gluthAI> {
+class GluthBossHelper: public GenericBossHelper<boss_gluth::boss_gluthAI> {
     public:
         const std::pair<float, float> mainTankPos25 = {3331.48f, -3109.06f};
         const std::pair<float, float> mainTankPos10 = {3278.29f, -3162.06f};
@@ -186,7 +185,7 @@ class GluthBossHelper: public GenericBossHelper<Gluth::boss_gluth::boss_gluthAI>
         const float decimatedZombiePct = 10.0f;
         GluthBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "gluth") {}
         bool BeforeDecimate() {
-            uint32 decimate = _event_map->GetNextEventTime(Gluth::GLUTH_EVENT_DECIMATE);
+            uint32 decimate = _event_map->GetNextEventTime(GLUTH_EVENT_DECIMATE);
             return decimate && decimate - _timer <= 3000;
         }
         bool JustStartCombat() {
@@ -194,14 +193,14 @@ class GluthBossHelper: public GenericBossHelper<Gluth::boss_gluth::boss_gluthAI>
         }
 };
 
-class LoathebBossHelper: public GenericBossHelper<Loatheb::boss_loatheb::boss_loathebAI> {
+class LoathebBossHelper: public GenericBossHelper<boss_loatheb::boss_loathebAI> {
     public:
         const std::pair<float, float> mainTankPos = {2877.57f, -3967.00f};
         const std::pair<float, float> rangePos = {2896.96f, -3980.61f};
         LoathebBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "loatheb") {}
 };
 
-class FourhorsemanBossHelper: public GenericBossHelper<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI> {
+class FourhorsemanBossHelper: public GenericBossHelper<boss_four_horsemen::boss_four_horsemenAI> {
     public:
         const float posZ = 241.27f;
         const std::pair<float, float> attractPos[2] = {{2502.03f, -2910.90f}, {2484.61f, -2947.07f}}; // left (sir zeliek), right (lady blaumeux)
@@ -218,12 +217,12 @@ class FourhorsemanBossHelper: public GenericBossHelper<FourHorsemen::boss_four_h
             if (!lady) {
                 return true;
             }
-            ladyAI = dynamic_cast<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI *>(lady->GetAI());
+            ladyAI = dynamic_cast<boss_four_horsemen::boss_four_horsemenAI *>(lady->GetAI());
             if (!ladyAI) {
                 return true;
             }
             ladyEvent = &ladyAI->events;
-            const uint32 voidZone = ladyEvent->GetNextEventTime(FourHorsemen::EVENT_SECONDARY_SPELL);
+            const uint32 voidZone = ladyEvent->GetNextEventTime(EVENT_SECONDARY_SPELL);
             if (voidZone && lastEventVoidZone != voidZone) {
                 voidZoneCounter++;
                 voidZoneCounter %= 8;
@@ -292,13 +291,13 @@ class FourhorsemanBossHelper: public GenericBossHelper<FourHorsemen::boss_four_h
     protected:
         Unit* sir = nullptr;
         Unit* lady = nullptr;
-        FourHorsemen::boss_four_horsemen::boss_four_horsemenAI* ladyAI = nullptr;
+        boss_four_horsemen::boss_four_horsemenAI* ladyAI = nullptr;
         EventMap* ladyEvent = nullptr;
         uint32 lastEventVoidZone = 0;
         uint32 voidZoneCounter = 0;
         int posToGo = 0;
 };
-class ThaddiusBossHelper: public GenericBossHelper<Thaddius::boss_thaddius::boss_thaddiusAI> {
+class ThaddiusBossHelper: public GenericBossHelper<boss_thaddius::boss_thaddiusAI> {
     public:
         const std::pair<float, float> tankPosFeugen = {3522.94f, -3002.60f};
         const std::pair<float, float> tankPosStalagg = {3436.14f, -2919.98f};
