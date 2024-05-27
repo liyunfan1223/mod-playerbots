@@ -215,5 +215,5 @@ bool ThaddiusPhaseThaddiusTrigger::IsActive()
     return helper.IsPhaseThaddius();
 }
 
-template bool BossEventTrigger<boss_grobbulus::boss_grobbulusAI>::IsActive();
-template bool BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>::IsActive();
+template bool BossEventTrigger<Grobbulus::boss_grobbulus::boss_grobbulusAI>::IsActive();
+template bool BossPhaseTrigger<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI>::IsActive();
