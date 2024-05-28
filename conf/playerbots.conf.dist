@@ -412,7 +412,7 @@ AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
 AiPlayerbot.MaxRandomBotTeleportInterval = 18000
-AiPlayerbot.RandomBotInWorldWithRotaionDisabled = 31104000
+AiPlayerbot.RandomBotInWorldWithRotationDisabled = 31104000
 
 # How far random bots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100

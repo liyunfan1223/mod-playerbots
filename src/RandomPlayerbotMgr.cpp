@@ -501,7 +501,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             for (uint32 &guid : guids) {
                 uint32 add_time = sPlayerbotAIConfig->enableRotation ? 
                 urand(sPlayerbotAIConfig->minRandomBotInWorldTime, sPlayerbotAIConfig->maxRandomBotInWorldTime) :
-                sPlayerbotAIConfig->randomBotInWorldWithRotaionDisabled;
+                sPlayerbotAIConfig->randomBotInWorldWithRotationDisabled;
                     
                 SetEventValue(guid, "add", 1, add_time);
                 SetEventValue(guid, "logout", 0, 0);

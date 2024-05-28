@@ -130,7 +130,7 @@ bool PlayerbotAIConfig::Initialize()
     maxRandomBotReviveTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotReviveTime", 5 * MINUTE);
     minRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotTeleportInterval", 1 * HOUR);
     maxRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotTeleportInterval", 5 * HOUR);
-    randomBotInWorldWithRotaionDisabled = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotInWorldWithRotaionDisabled", 1 * YEAR);
+    randomBotInWorldWithRotationDisabled = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotInWorldWithRotationDisabled", 1 * YEAR);
     randomBotTeleportDistance = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotTeleportDistance", 100);
     randomBotsPerInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotsPerInterval", MINUTE);
     minRandomBotsPriceChangeInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotsPriceChangeInterval", 2 * HOUR);
