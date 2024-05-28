@@ -11,6 +11,7 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
+#include "UpdateTime.h"
 
 bool BGJoinAction::Execute(Event event)
 {
@@ -239,6 +240,7 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
 
     bool isArena = false;
     bool isRated = false;
+    bool noLag = sWorldUpdateTime.GetAverageUpdateTime() < (sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer) * 1.1;
 
     ArenaType type = ArenaType(BattlegroundMgr::BGArenaType(queueTypeId));
     if (type != ARENA_TYPE_NONE)
@@ -246,11 +248,32 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
 
     bool hasPlayers = (sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE]) > 0;
     bool hasBots = (sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE]) >= bg->GetMinPlayersPerTeam();
+    
     if (!sPlayerbotAIConfig->randomBotAutoJoinBG && !hasPlayers)
+    {
         return false;
 
-    if (!(hasPlayers || hasBots))
+        if (sPlayerbotAIConfig->enablePrototypePerformanceDiff)
+        {
+            if (!noLag)
+            {
+                return false;
+            }
+        }
+    }
+    
+    if (!hasPlayers && !(isArena)) 
+    {
         return false;
+
+        if (sPlayerbotAIConfig->enablePrototypePerformanceDiff) 
+        {
+            if (!noLag) 
+            {
+                return false;
+            }
+        }
+    }
 
     uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
     uint32 TeamSize = bg->GetMaxPlayersPerTeam();
@@ -584,6 +607,7 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
 
     bool isArena = false;
     bool isRated = false;
+    bool noLag = sWorldUpdateTime.GetAverageUpdateTime() < (sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer) * 1.1;
 
     ArenaType type = ArenaType(BattlegroundMgr::BGArenaType(queueTypeId));
     if (type != ARENA_TYPE_NONE)

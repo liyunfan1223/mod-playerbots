@@ -412,7 +412,7 @@ AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
 AiPlayerbot.MaxRandomBotTeleportInterval = 18000
-AiPlayerbot.RandomBotInWorldWithRotaionDisabled = 31104000
+AiPlayerbot.RandomBotInWorldWithRotationDisabled = 31104000
 
 # How far random bots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
@@ -448,6 +448,11 @@ AiPlayerbot.BotCheats = "taxi"
 
 # Enables/Disables password to bot account
 AiPlayerbot.RandomBotRandomPassword = 0
+
+# Diff with/without player in server. The server will tune bot activity to reach the desired server tick speed (in ms).
+# AiPlayerbot.EnablePrototypePerformanceDiff = 0
+# AiPlayerbot.DiffWithPlayer = 100
+# AiPlayerbot.DiffEmpty = 200
 
 ##################################################################################
 #                                                                                #

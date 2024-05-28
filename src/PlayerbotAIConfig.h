@@ -88,7 +88,7 @@ class PlayerbotAIConfig
         uint32 minRandomBotChangeStrategyTime, maxRandomBotChangeStrategyTime;
         uint32 minRandomBotReviveTime, maxRandomBotReviveTime;
         uint32 minRandomBotTeleportInterval, maxRandomBotTeleportInterval;
-        uint32 randomBotInWorldWithRotaionDisabled;
+        uint32 randomBotInWorldWithRotationDisabled;
         uint32 minRandomBotPvpTime, maxRandomBotPvpTime;
         uint32 randomBotsPerInterval;
         uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
@@ -177,6 +177,10 @@ class PlayerbotAIConfig
         bool disableRandomLevels;
         uint32 playerbotsXPrate;
         uint32 botActiveAlone;
+
+        uint32 enablePrototypePerformanceDiff;
+        uint32 diffWithPlayer;
+        uint32 diffEmpty;
 
         bool freeMethodLoot;
         int32 lootRollLevel;
