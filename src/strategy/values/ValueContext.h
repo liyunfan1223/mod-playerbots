@@ -112,6 +112,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["possible targets no los"] = &ValueContext::possible_targets_no_los;
             creators["possible triggers"] = &ValueContext::possible_triggers;
             creators["possible adds"] = &ValueContext::possible_adds;
+            creators["prioritized targets"] = &ValueContext::prioritized_targets;
             creators["all targets"] = &ValueContext::all_targets;
             creators["possible rpg targets"] = &ValueContext::possible_rpg_targets;
             creators["nearest adds"] = &ValueContext::nearest_adds;
@@ -382,6 +383,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* possible_triggers(PlayerbotAI* botAI) { return new PossibleTriggersValue(botAI); }
         static UntypedValue* possible_targets_no_los(PlayerbotAI* botAI) { return new PossibleTargetsValue(botAI, "possible targets", sPlayerbotAIConfig->sightDistance, true); }
         static UntypedValue* possible_adds(PlayerbotAI* botAI) { return new PossibleAddsValue(botAI); }
+        static UntypedValue* prioritized_targets(PlayerbotAI* botAI) { return new PrioritizedTargetsValue(botAI); }
         static UntypedValue* all_targets(PlayerbotAI* botAI) { return new AllTargetsValue(botAI); }
         static UntypedValue* nearest_adds(PlayerbotAI* botAI) { return new NearestAddsValue(botAI); }
         static UntypedValue* party_member_without_aura(PlayerbotAI* botAI) { return new PartyMemberWithoutAuraValue(botAI); }

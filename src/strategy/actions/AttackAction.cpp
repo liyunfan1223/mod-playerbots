@@ -36,7 +36,8 @@ bool AttackMyTargetAction::Execute(Event event)
 
         return false;
     }
-
+    
+    botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({guid});
     bool result = Attack(botAI->GetUnit(guid));
     if (result)
         context->GetValue<ObjectGuid>("pull target")->Set(guid);

@@ -23,6 +23,20 @@ GuidVector AttackersValue::Calculate()
     if (Group* group = bot->GetGroup())
         AddAttackersOf(group, targets);
 
+    // prioritize target
+    GuidVector prioritizedTargets = AI_VALUE(GuidVector, "prioritized targets");
+    for (ObjectGuid target : prioritizedTargets) {
+        Unit* unit = botAI->GetUnit(target);
+        if (unit) {
+            targets.insert(unit);
+        }
+    }
+    ObjectGuid skullGuid = bot->GetGroup()->GetTargetIcon(4);
+    Unit* skullTarget = botAI->GetUnit(skullGuid);
+    if (skullTarget) {
+        targets.insert(skullTarget);
+    }
+
     RemoveNonThreating(targets);
 
 	for (Unit* unit : targets)
@@ -30,7 +44,7 @@ GuidVector AttackersValue::Calculate()
 
     if (bot->duel && bot->duel->Opponent)
         result.push_back(bot->duel->Opponent->GetGUID());
-
+    
 	return result;
 }
 

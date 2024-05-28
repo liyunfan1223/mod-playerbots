@@ -16,8 +16,17 @@ class FindLeastHpTargetStrategy : public FindTargetStrategy
             if (Group* group = botAI->GetBot()->GetGroup())
             {
                 ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
+                if (guid && attacker->GetGUID() == guid) {
+                    result = attacker;
                     return;
+                }
+            }
+            GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+            for (ObjectGuid targetGuid : prioritizedTargets) {
+                if (targetGuid && attacker->GetGUID() == targetGuid) {
+                    result = attacker;
+                    return;
+                }
             }
             if (!attacker->IsAlive()) {
                 return;
@@ -40,8 +49,17 @@ class FindMaxThreatGapTargetStrategy : public FindTargetStrategy
             if (Group* group = botAI->GetBot()->GetGroup())
             {
                 ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
+                if (guid && attacker->GetGUID() == guid) {
+                    result = attacker;
                     return;
+                }
+            }
+            GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+            for (ObjectGuid targetGuid : prioritizedTargets) {
+                if (targetGuid && attacker->GetGUID() == targetGuid) {
+                    result = attacker;
+                    return;
+                }
             }
             if (!attacker->IsAlive()) {
                 return;
@@ -70,8 +88,17 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
             if (Group* group = botAI->GetBot()->GetGroup())
             {
                 ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
+                if (guid && attacker->GetGUID() == guid) {
+                    result = attacker;
                     return;
+                }
+            }
+            GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+            for (ObjectGuid targetGuid : prioritizedTargets) {
+                if (targetGuid && attacker->GetGUID() == targetGuid) {
+                    result = attacker;
+                    return;
+                }
             }
             if (!attacker->IsAlive()) {
                 return;
@@ -135,8 +162,17 @@ class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
             if (Group* group = botAI->GetBot()->GetGroup())
             {
                 ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
+                if (guid && attacker->GetGUID() == guid) {
+                    result = attacker;
                     return;
+                }
+            }
+            GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+            for (ObjectGuid targetGuid : prioritizedTargets) {
+                if (targetGuid && attacker->GetGUID() == targetGuid) {
+                    result = attacker;
+                    return;
+                }
             }
             if (!attacker->IsAlive()) {
                 return;
@@ -188,8 +224,17 @@ class ComboFindTargetSmartStrategy : public FindTargetStrategy
             if (Group* group = botAI->GetBot()->GetGroup())
             {
                 ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
+                if (guid && attacker->GetGUID() == guid) {
+                    result = attacker;
                     return;
+                }
+            }
+            GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+            for (ObjectGuid targetGuid : prioritizedTargets) {
+                if (targetGuid && attacker->GetGUID() == targetGuid) {
+                    result = attacker;
+                    return;
+                }
             }
             if (!attacker->IsAlive()) {
                 return;
