@@ -329,8 +329,8 @@ class PlayerbotAI : public PlayerbotAIBase
         void ResetStrategies(bool load = false);
         void ReInitCurrentEngine();
         void Reset(bool full = false);
-        static bool IsTank(Player* player);
-        static bool IsHeal(Player* player);
+        static bool IsTank(Player* player, bool inGroup = true);
+        static bool IsHeal(Player* player, bool inGroup = true);
         static bool IsDps(Player* player);
         static bool IsRanged(Player* player);
         static bool IsMelee(Player* player);
@@ -423,6 +423,13 @@ class PlayerbotAI : public PlayerbotAIBase
         //Checks if the bot is summoned as alt of a player
         bool IsAlt();
         Player* GetGroupMaster();
+
+        /*
+        //Check if player is safe to use.
+        bool IsSafe(Player* player) { return player && player->GetMapId() == bot->GetMapId() && player->GetInstanceId() == bot->GetInstanceId() && !player->IsBeingTeleported(); }
+        bool IsSafe(WorldObject* obj) { return obj && obj->GetMapId() == bot->GetMapId() && obj->GetInstanceId() == bot->GetInstanceId() && (!obj->IsPlayer() || !((Player*)obj)->IsBeingTeleported()); }
+        */
+
         //Returns a semi-random (cycling) number that is fixed for each bot.
         uint32 GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum = 100, float cyclePerMin = 1);
         GrouperType GetGrouperType();

@@ -535,6 +535,7 @@ bool PlayerbotAI::IsAllowedCommand(std::string const text)
         unsecuredCommands.insert("sendmail");
         unsecuredCommands.insert("invite");
         unsecuredCommands.insert("leave");
+        unsecuredCommands.insert("lfg");
     }
 
     for (std::set<std::string>::iterator i = unsecuredCommands.begin(); i != unsecuredCommands.end(); ++i)
@@ -1579,8 +1580,7 @@ int32 PlayerbotAI::GetMeleeIndex(Player* player)
     return 0;
 }
 
-
-bool PlayerbotAI::IsTank(Player* player)
+bool PlayerbotAI::IsTank(Player* player, bool inGroup)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
     if (botAi)
@@ -1613,7 +1613,7 @@ bool PlayerbotAI::IsTank(Player* player)
     return false;
 }
 
-bool PlayerbotAI::IsHeal(Player* player)
+bool PlayerbotAI::IsHeal(Player* player, bool inGroup)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
     if (botAi)

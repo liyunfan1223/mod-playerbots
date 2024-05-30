@@ -17,7 +17,15 @@ class InviteToGroupAction : public Action
 
         bool Execute(Event event) override;
 
-        virtual bool Invite(Player* player);
+        virtual bool Invite(Player* inviter, Player* player);
+};
+
+class LfgAction : public InviteToGroupAction
+{
+    public:
+        LfgAction(PlayerbotAI* ai, std::string const name = "lfg") : InviteToGroupAction(botAI, name) { }
+
+        virtual bool Execute(Event event) override;
 };
 
 class InviteNearbyToGroupAction : public InviteToGroupAction

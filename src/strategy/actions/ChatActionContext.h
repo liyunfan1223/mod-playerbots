@@ -136,6 +136,7 @@ class ChatActionContext : public NamedObjectContext<Action>
             creators["cast custom spell"] = &ChatActionContext::cast_custom_spell;
             creators["cast custom nc spell"] = &ChatActionContext::cast_custom_nc_spell;
             creators["invite"] = &ChatActionContext::invite;
+            creators["lfg"] = &ChatActionContext::lfg;
             creators["spell"] = &ChatActionContext::spell;
             creators["rti"] = &ChatActionContext::rti;
             creators["spirit healer"] = &ChatActionContext::spirit_healer;
@@ -196,6 +197,7 @@ class ChatActionContext : public NamedObjectContext<Action>
         static Action* spirit_healer(PlayerbotAI* botAI) { return new SpiritHealerAction(botAI); }
         static Action* rti(PlayerbotAI* botAI) { return new RtiAction(botAI); }
         static Action* invite(PlayerbotAI* botAI) { return new InviteToGroupAction(botAI); }
+        static Action* lfg(PlayerbotAI* botAI) { return new LfgAction(botAI); }
         static Action* spell(PlayerbotAI* botAI) { return new TellSpellAction(botAI); }
         static Action* cast_custom_spell(PlayerbotAI* botAI) { return new CastCustomSpellAction(botAI); }
         static Action* cast_custom_nc_spell(PlayerbotAI* botAI) { return new CastCustomNcSpellAction(botAI); }
