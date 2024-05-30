@@ -144,16 +144,15 @@ WorldPosition::operator bool() const
     return GetMapId() != 0 || GetPositionX() != 0 || GetPositionY() != 0 || GetPositionZ() != 0;
 }
 
-bool WorldPosition::operator==(WorldPosition const& p1)
+bool operator==(WorldPosition const& p1, const WorldPosition &p2)
 {
-    return GetMapId() == GetMapId() && GetPositionX() == p1.GetPositionX() &&
-        GetPositionY() == p1.GetPositionY() && GetPositionZ() == p1.GetPositionZ() && GetOrientation() == p1.GetOrientation();
+    return p1.GetMapId() == p2.GetMapId() && p2.GetPositionX() == p1.GetPositionX() &&
+        p2.GetPositionY() == p1.GetPositionY() && p2.GetPositionZ() == p1.GetPositionZ() && p2.GetOrientation() == p1.GetOrientation();
 }
 
-bool WorldPosition::operator!=(WorldPosition const& p1)
+bool operator!=(WorldPosition const& p1, const WorldPosition &p2)
 {
-    return GetMapId() != GetMapId() || GetPositionX() != p1.GetPositionX() || GetPositionY() != p1.GetPositionY() ||
-        GetPositionZ() != p1.GetPositionZ() || GetOrientation() != p1.GetOrientation();
+    return !(p1 == p2);
 }
 
 WorldPosition& WorldPosition::operator+=(WorldPosition const& p1)

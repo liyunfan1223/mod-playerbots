@@ -113,9 +113,10 @@ class WorldPosition : public WorldLocation
 
         //Getters
         operator bool() const;
-        bool operator==(WorldPosition const& p1);
-        bool operator!=(WorldPosition const& p1);
+        friend bool operator==(WorldPosition const& p1, const WorldPosition &p2);
+        friend bool operator!=(WorldPosition const& p1, const WorldPosition &p2);
 
+        WorldPosition& operator=(WorldPosition const&) = default;
         WorldPosition& operator+=(WorldPosition const& p1);
         WorldPosition& operator-=(WorldPosition const& p1);
 
@@ -515,6 +516,7 @@ class TravelDestination
         {
             points = points1;  radiusMin = radiusMin1; radiusMax = radiusMax1;
         }
+        virtual ~TravelDestination() = default;
 
         void addPoint(WorldPosition* pos)
         {
