@@ -583,7 +583,7 @@ void PlayerbotFactory::InitPetTalents()
         return;
     }
     CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
-    if (pet_family->petTalentType < 0) {
+    if (!pet_family || pet_family->petTalentType < 0) {
         // LOG_INFO("playerbots", "{} init pet talents failed with petTalentType < 0({})", bot->GetName().c_str(), pet_family->petTalentType);
         return;
     }
