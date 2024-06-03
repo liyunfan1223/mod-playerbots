@@ -175,7 +175,7 @@ AiPlayerbot.AutoGearCommand = 1
 # default: 3 (rare)
 AiPlayerbot.AutoGearQualityLimit = 3
 
-# Equips quality limitation for auto gear command (0 = no limit)
+# Equips gear score limitation for auto gear command (0 = no limit)
 # default: 0 (no limit)
 AiPlayerbot.AutoGearScoreLimit = 0
 
@@ -450,9 +450,9 @@ AiPlayerbot.BotCheats = "taxi"
 AiPlayerbot.RandomBotRandomPassword = 0
 
 # Diff with/without player in server. The server will tune bot activity to reach the desired server tick speed (in ms).
-# AiPlayerbot.EnablePrototypePerformanceDiff = 0
-# AiPlayerbot.DiffWithPlayer = 100
-# AiPlayerbot.DiffEmpty = 200
+AiPlayerbot.EnablePrototypePerformanceDiff = 0
+AiPlayerbot.DiffWithPlayer = 100
+AiPlayerbot.DiffEmpty = 200
 
 ##################################################################################
 #                                                                                #
