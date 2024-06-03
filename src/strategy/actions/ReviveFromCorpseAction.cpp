@@ -300,7 +300,7 @@ bool SpiritHealerAction::Execute(Event event)
             Unit* unit = botAI->GetUnit(*i);
             if (unit && unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER))
             {
-                LOG_INFO("playerbots", "Bot {} {}:{} <{}> revives at spirit healer",
+                LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> revives at spirit healer",
                     bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName());
                 PlayerbotChatHandler ch(bot);
                 bot->ResurrectPlayer(0.5f);
