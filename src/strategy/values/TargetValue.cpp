@@ -100,6 +100,24 @@ void FindTargetStrategy::GetPlayerCount(Unit* creature, uint32* tankCount, uint3
     dpsCountCache[creature] = *dpsCount;
 }
 
+bool FindTargetStrategy::IsHighPriority(Unit* attacker)
+{
+    if (Group* group = botAI->GetBot()->GetGroup())
+    {
+        ObjectGuid guid = group->GetTargetIcon(4);
+        if (guid && attacker->GetGUID() == guid) {
+            return true;
+        }
+    }
+    GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+    for (ObjectGuid targetGuid : prioritizedTargets) {
+        if (targetGuid && attacker->GetGUID() == targetGuid) {
+            return true;
+        }
+    }
+    return false;
+}
+
 WorldPosition LastLongMoveValue::Calculate()
 {
     LastMovement& lastMove = *context->GetValue<LastMovement&>("last movement");
