@@ -1196,8 +1196,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
 
             z = 0.05f + ground;
 
-            LOG_INFO("playerbots", "Random teleporting bot (level {}) {} to {} {},{},{} ({}/{} locations)",
-                bot->GetLevel(), bot->GetName().c_str(), zone->area_name[0], x, y, z, attemtps, tlocs.size());
+            LOG_INFO("playerbots", "Random teleporting bot {} (level {}) to {} {},{},{} ({}/{} locations)",
+                bot->GetName().c_str(), bot->GetLevel(), zone->area_name[0], x, y, z, attemtps, tlocs.size());
 
             if (hearth)
             {

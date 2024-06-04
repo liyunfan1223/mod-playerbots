@@ -3090,6 +3090,10 @@ bool PlayerbotAI::IsInterruptableSpellCasting(Unit* target, std::string const sp
 
 bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
 {
+    if (!target->IsInWorld())
+    {
+        return false;
+    }
     bool isFriend = bot->IsFriendlyTo(target);
     for (uint32 type = SPELL_AURA_NONE; type < TOTAL_AURAS; ++type)
     {
