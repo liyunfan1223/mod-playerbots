@@ -137,3 +137,11 @@ Unit* UnitCalculatedValue::Get()
         return value;
     return nullptr;
 }
+
+Unit* UnitManualSetValue::Get()
+{
+    // Prevent crashing by InWorld check
+    if (value && value->IsInWorld())
+        return value;
+    return nullptr;
+}
