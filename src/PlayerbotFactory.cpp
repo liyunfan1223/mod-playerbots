@@ -178,8 +178,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     // {
     //     return;
     // }
-
-    LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
+    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"), bot->GetName().c_str(), bot->GetLevel(), bot->getClass());
+    // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
     LOG_DEBUG("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
