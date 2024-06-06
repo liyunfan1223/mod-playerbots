@@ -469,14 +469,16 @@ bool PossibleAddsTrigger::IsActive()
 
 bool NotDpsTargetActiveTrigger::IsActive()
 {
-    Unit* dps = AI_VALUE(Unit*, "dps target");
     Unit* target = AI_VALUE(Unit*, "current target");
-    Unit* enemy = AI_VALUE(Unit*, "enemy player target");
-
     // do not switch if enemy target
-    if (target && target == enemy && target->IsAlive())
-        return false;
+    if (target && target->IsAlive()) {
 
+        Unit* enemy = AI_VALUE(Unit*, "enemy player target");
+        if (target == enemy)
+            return false;
+    }
+
+    Unit* dps = AI_VALUE(Unit*, "dps target");
     return dps && target != dps;
 }
 

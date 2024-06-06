@@ -27,6 +27,7 @@ bool InvalidTargetValue::Calculate()
                target->isFeared() ||
                target->HasUnitState(UNIT_STATE_ISOLATED) ||
                target->IsFriendlyTo(bot) ||
+               !AttackersValue::IsValidTarget(target, bot) ||
             //    !bot->IsWithinDistInMap(target, sPlayerbotAIConfig->sightDistance) ||
                !bot->IsWithinLOSInMap(target);
     }

@@ -5,22 +5,30 @@
 #include "Multiplier.h"
 #include "raids/naxxramas/RaidNaxxBossHelper.h"
 
+class GrobbulusMultiplier : public Multiplier
+{
+    public:
+        GrobbulusMultiplier(PlayerbotAI* ai) : Multiplier(ai, "grobbulus") {}
+
+    public:
+        virtual float GetValue(Action* action);
+};
 class HeiganDanceMultiplier : public Multiplier
 {
-public:
-    HeiganDanceMultiplier(PlayerbotAI* ai) : Multiplier(ai, "helgan dance") {}
+    public:
+        HeiganDanceMultiplier(PlayerbotAI* ai) : Multiplier(ai, "helgan dance") {}
 
-public:
-    virtual float GetValue(Action* action);
+    public:
+        virtual float GetValue(Action* action);
 };
 
 class LoathebGenericMultiplier : public Multiplier
 {
-public:
-    LoathebGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "loatheb generic") {}
+    public:
+        LoathebGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "loatheb generic") {}
 
-public:
-    virtual float GetValue(Action* action);
+    public:
+        virtual float GetValue(Action* action);
 };
 
 class ThaddiusGenericMultiplier : public Multiplier

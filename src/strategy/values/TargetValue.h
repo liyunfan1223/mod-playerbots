@@ -21,12 +21,14 @@ class FindTargetStrategy
         Unit* GetResult();
         virtual void  CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) = 0;
         void GetPlayerCount(Unit* creature, uint32* tankCount, uint32* dpsCount);
+        bool IsHighPriority(Unit* attacker);
 
     protected:
         Unit* result;
         PlayerbotAI* botAI;
         std::map<Unit*, uint32> tankCountCache;
         std::map<Unit*, uint32> dpsCountCache;
+        bool foundHighPriority = false;
 };
 
 class FindNonCcTargetStrategy : public FindTargetStrategy

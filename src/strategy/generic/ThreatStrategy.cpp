@@ -4,6 +4,7 @@
 
 #include "ThreatStrategy.h"
 #include "GenericSpellActions.h"
+#include "Map.h"
 #include "Playerbots.h"
 
 float ThreatMultiplier::GetValue(Action* action)
@@ -35,4 +36,23 @@ float ThreatMultiplier::GetValue(Action* action)
 void ThreatStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new ThreatMultiplier(botAI));
+}
+
+float FocusMultiplier::GetValue(Action* action)
+{
+    if (!action) {
+        return 1.0f;
+    }
+    if (action->getThreatType() == Action::ActionThreatType::Aoe && !dynamic_cast<CastHealingSpellAction*>(action)) {
+        return 0.0f;
+    }
+    if (dynamic_cast<CastDebuffSpellOnAttackerAction*>(action)) {
+        return 0.0f;
+    }
+    return 1.0f;
+}
+
+void FocusStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+{
+    multipliers.push_back(new FocusMultiplier(botAI));
 }

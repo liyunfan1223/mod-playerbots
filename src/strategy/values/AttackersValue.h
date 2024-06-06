@@ -37,4 +37,10 @@ class PossibleAddsValue : public BoolCalculatedValue
         bool Calculate() override;
 };
 
+class PrioritizedTargetsValue : public ManualSetValue<GuidVector>
+{       
+    public:
+        PrioritizedTargetsValue(PlayerbotAI* botAI, std::string const name = "prioritized targets"): ManualSetValue(botAI, GuidVector(), name) {}
+};
+
 #endif

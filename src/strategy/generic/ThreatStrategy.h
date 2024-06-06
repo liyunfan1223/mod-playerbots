@@ -26,4 +26,21 @@ class ThreatStrategy : public Strategy
         std::string const getName() override { return "threat"; }
 };
 
+class FocusMultiplier : public Multiplier
+{
+    public:
+        FocusMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "focus") { }
+
+        float GetValue(Action* action) override;
+};
+
+class FocusStrategy : public Strategy
+{
+    public:
+        FocusStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+
+        void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
+        std::string const getName() override { return "focus"; }
+};
+
 #endif
