@@ -178,10 +178,10 @@ void PlayerbotFactory::Randomize(bool incremental)
     // {
     //     return;
     // }
-
-    LOG_INFO("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
+    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"), bot->GetName().c_str(), bot->GetLevel(), bot->getClass());
+    // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
-    LOG_INFO("playerbots", "Resetting player...");
+    LOG_DEBUG("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
     bot->resetTalents(true);
     // bot->SaveToDB(false, false);
@@ -221,14 +221,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
-    LOG_INFO("playerbots", "Initializing spells (step 1)...");
+    LOG_DEBUG("playerbots", "Initializing spells (step 1)...");
     // bot->LearnDefaultSkills();
     InitClassSpells();
     InitAvailableSpells();
     if (pmo)
         pmo->finish();
 
-    LOG_INFO("playerbots", "Initializing skills (step 1)...");
+    LOG_DEBUG("playerbots", "Initializing skills (step 1)...");
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills1");
     InitSkills();
     InitSpecialSpells();
@@ -238,7 +238,7 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
-    LOG_INFO("playerbots", "Initializing talents...");
+    LOG_DEBUG("playerbots", "Initializing talents...");
     if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
         InitTalentsTree();
     }
@@ -252,13 +252,13 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells2");
-    LOG_INFO("playerbots", "Initializing spells (step 2)...");
+    LOG_DEBUG("playerbots", "Initializing spells (step 2)...");
     InitAvailableSpells();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Mounts");
-    LOG_INFO("playerbots", "Initializing mounts...");
+    LOG_DEBUG("playerbots", "Initializing mounts...");
     InitMounts();
     bot->SaveToDB(false, false);
     if (pmo)
@@ -271,7 +271,7 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
-    LOG_INFO("playerbots", "Initializing equipmemt...");
+    LOG_DEBUG("playerbots", "Initializing equipmemt...");
     if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
         InitEquipment(incremental);
     }
@@ -289,38 +289,38 @@ void PlayerbotFactory::Randomize(bool incremental)
     // }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Bags");
-    LOG_INFO("playerbots", "Initializing bags...");
+    LOG_DEBUG("playerbots", "Initializing bags...");
     InitBags();
     // bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Ammo");
-    LOG_INFO("playerbots", "Initializing ammo...");
+    LOG_DEBUG("playerbots", "Initializing ammo...");
     InitAmmo();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Food");
-    LOG_INFO("playerbots", "Initializing food...");
+    LOG_DEBUG("playerbots", "Initializing food...");
     InitFood();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Potions");
-    LOG_INFO("playerbots", "Initializing potions...");
+    LOG_DEBUG("playerbots", "Initializing potions...");
     InitPotions();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reagents");
-    LOG_INFO("playerbots", "Initializing reagents...");
+    LOG_DEBUG("playerbots", "Initializing reagents...");
     InitReagents();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EqSets");
-    LOG_INFO("playerbots", "Initializing second equipment set...");
+    LOG_DEBUG("playerbots", "Initializing second equipment set...");
     // InitSecondEquipmentSet();
     if (pmo)
         pmo->finish();
@@ -337,18 +337,18 @@ void PlayerbotFactory::Randomize(bool incremental)
     // }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
-    LOG_INFO("playerbots", "Initializing inventory...");
+    LOG_DEBUG("playerbots", "Initializing inventory...");
     // InitInventory();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Consumable");
-    LOG_INFO("playerbots", "Initializing consumables...");
+    LOG_DEBUG("playerbots", "Initializing consumables...");
     AddConsumables();
     if (pmo)
         pmo->finish();
     
-    LOG_INFO("playerbots", "Initializing glyphs...");
+    LOG_DEBUG("playerbots", "Initializing glyphs...");
     bot->SaveToDB(false, false);
     InitGlyphs();
     
@@ -385,12 +385,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Save");
-    LOG_INFO("playerbots", "Saving to DB...");
+    LOG_DEBUG("playerbots", "Saving to DB...");
     bot->SetMoney(urand(level * 100000, level * 5 * 100000));
     bot->SetHealth(bot->GetMaxHealth());
     bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     bot->SaveToDB(false, false);
-    LOG_INFO("playerbots", "Done.");
+    LOG_INFO("playerbots", "Initialization Done.");
     if (pmo)
         pmo->finish();
 }
@@ -587,7 +587,7 @@ void PlayerbotFactory::InitPetTalents()
         // LOG_INFO("playerbots", "{} init pet talents failed with petTalentType < 0({})", bot->GetName().c_str(), pet_family->petTalentType);
         return;
     }
-    pet->resetTalents();
+    // pet->resetTalents();
     std::unordered_map<uint32, std::vector<TalentEntry const*> > spells;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {

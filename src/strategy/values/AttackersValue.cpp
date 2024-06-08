@@ -23,14 +23,31 @@ GuidVector AttackersValue::Calculate()
     if (Group* group = bot->GetGroup())
         AddAttackersOf(group, targets);
 
+
     RemoveNonThreating(targets);
+
+    // prioritized target
+    GuidVector prioritizedTargets = AI_VALUE(GuidVector, "prioritized targets");
+    for (ObjectGuid target : prioritizedTargets) {
+        Unit* unit = botAI->GetUnit(target);
+        if (unit && IsValidTarget(unit, bot)) {
+            targets.insert(unit);
+        }
+    }
+    if (Group* group = bot->GetGroup()) {
+        ObjectGuid skullGuid = group->GetTargetIcon(4);
+        Unit* skullTarget = botAI->GetUnit(skullGuid);
+        if (skullTarget && IsValidTarget(skullTarget, bot)) {
+            targets.insert(skullTarget);
+        }
+    }
 
 	for (Unit* unit : targets)
 		result.push_back(unit->GetGUID());
 
     if (bot->duel && bot->duel->Opponent)
         result.push_back(bot->duel->Opponent->GetGUID());
-
+    
 	return result;
 }
 
@@ -114,7 +131,7 @@ bool AttackersValue::hasRealThreat(Unit *attacker)
         attacker->IsAlive() &&
         !attacker->IsPolymorphed() &&
         // !attacker->isInRoots() &&
-        !attacker->IsFriendlyTo(bot) &&
+        !attacker->IsFriendlyTo(bot);
         (attacker->GetThreatMgr().getCurrentVictim() || dynamic_cast<Player*>(attacker));
 }
 

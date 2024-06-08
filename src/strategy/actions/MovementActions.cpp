@@ -829,7 +829,7 @@ bool MovementAction::Follow(Unit* target, float distance)
 
 void MovementAction::UpdateMovementState()
 {
-    if (bot->Unit::IsInWater() || bot->Unit::IsUnderWater())
+    if (bot->Unit::IsUnderWater())
     {
         bot->SetSwim(true);
     }

@@ -23,10 +23,10 @@ bool ChangeTalentsAction::Execute(Event event)
         if (param.find("help") != std::string::npos) {
             out << TalentsHelp();
         } else if (param.find("switch") != std::string::npos) {
-            if (param == "1") {
+            if (param.find("switch 1")) {
                 bot->ActivateSpec(0);
                 out << "Active first talent";
-            } else if (param == "2") {
+            } else if (param.find("switch 2")) {
                 bot->ActivateSpec(1);
                 out << "Active second talent";
             }

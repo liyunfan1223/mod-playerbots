@@ -29,7 +29,10 @@ uint8 AoeHealValue::Calculate()
 		Player* player = ObjectAccessor::FindPlayer(itr->guid);
 		if (!player || !player->IsAlive())
 			continue;
-
+		
+		if (player->GetDistance(bot) >= sPlayerbotAIConfig->sightDistance)
+			continue;
+		
 	    float percent = (static_cast<float> (player->GetHealth()) / player->GetMaxHealth()) * 100;
 	    if (percent <= range)
             ++count;

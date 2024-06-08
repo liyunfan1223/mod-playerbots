@@ -72,6 +72,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
             creators["potions"] = &StrategyContext::potions;
             creators["cast time"] = &StrategyContext::cast_time;
             creators["threat"] = &StrategyContext::threat;
+            creators["focus"] = &StrategyContext::focus;
             creators["tell target"] = &StrategyContext::tell_target;
             creators["pvp"] = &StrategyContext::pvp;
             creators["return"] = &StrategyContext::_return;
@@ -120,6 +121,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
         static Strategy* mark_rti(PlayerbotAI* botAI) { return new MarkRtiStrategy(botAI); }
         static Strategy* tell_target(PlayerbotAI* botAI) { return new TellTargetStrategy(botAI); }
         static Strategy* threat(PlayerbotAI* botAI) { return new ThreatStrategy(botAI); }
+        static Strategy* focus(PlayerbotAI* botAI) { return new FocusStrategy(botAI); }
         static Strategy* cast_time(PlayerbotAI* botAI) { return new CastTimeStrategy(botAI); }
         static Strategy* potions(PlayerbotAI* botAI) { return new UsePotionsStrategy(botAI); }
         static Strategy* kite(PlayerbotAI* botAI) { return new KiteStrategy(botAI); }

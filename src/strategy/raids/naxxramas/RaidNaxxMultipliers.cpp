@@ -19,6 +19,18 @@
 #include "WarriorActions.h"
 #include "DruidBearActions.h"
 
+float GrobbulusMultiplier::GetValue(Action* action)
+{
+	Unit* boss = AI_VALUE2(Unit*, "find target", "grobbulus");
+    if (!boss) {
+        return 1.0f;
+    }
+	if (dynamic_cast<AvoidAoeAction*>(action)) {
+		return 0.0f;
+	}
+	return 1.0f;
+}
+
 float HeiganDanceMultiplier::GetValue(Action* action)
 {
 	Unit* boss = AI_VALUE2(Unit*, "find target", "heigan the unclean");

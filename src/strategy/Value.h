@@ -323,6 +323,7 @@ class UnitManualSetValue : public ManualSetValue<Unit*>
             ManualSetValue<Unit*>(botAI, defaultValue, name) { }
 
         std::string const Format() override;
+        Unit* Get() override;
 };
 
 #endif

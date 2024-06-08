@@ -13,13 +13,15 @@ class FindLeastHpTargetStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
-            if (Group* group = botAI->GetBot()->GetGroup())
-            {
-                ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
-                    return;
-            }
             if (!attacker->IsAlive()) {
+                return;
+            }
+            if (foundHighPriority) {
+                return;
+            }
+            if (IsHighPriority(attacker)) {
+                result = attacker;
+                foundHighPriority = true;
                 return;
             }
             if (!result || result->GetHealth() > attacker->GetHealth())
@@ -37,13 +39,15 @@ class FindMaxThreatGapTargetStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
-            if (Group* group = botAI->GetBot()->GetGroup())
-            {
-                ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
-                    return;
-            }
             if (!attacker->IsAlive()) {
+                return;
+            }
+            if (foundHighPriority) {
+                return;
+            }
+            if (IsHighPriority(attacker)) {
+                result = attacker;
+                foundHighPriority = true;
                 return;
             }
             Unit* victim = attacker->GetVictim();
@@ -67,13 +71,15 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
-            if (Group* group = botAI->GetBot()->GetGroup())
-            {
-                ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
-                    return;
-            }
             if (!attacker->IsAlive()) {
+                return;
+            }
+            if (foundHighPriority) {
+                return;
+            }
+            if (IsHighPriority(attacker)) {
+                result = attacker;
+                foundHighPriority = true;
                 return;
             }
             float expectedLifeTime = attacker->GetHealth() / dps_;
@@ -132,13 +138,15 @@ class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
-            if (Group* group = botAI->GetBot()->GetGroup())
-            {
-                ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
-                    return;
-            }
             if (!attacker->IsAlive()) {
+                return;
+            }
+            if (foundHighPriority) {
+                return;
+            }
+            if (IsHighPriority(attacker)) {
+                result = attacker;
+                foundHighPriority = true;
                 return;
             }
             float expectedLifeTime = attacker->GetHealth() / dps_;
@@ -185,13 +193,15 @@ class ComboFindTargetSmartStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
-            if (Group* group = botAI->GetBot()->GetGroup())
-            {
-                ObjectGuid guid = group->GetTargetIcon(4);
-                if (guid && attacker->GetGUID() == guid)
-                    return;
-            }
             if (!attacker->IsAlive()) {
+                return;
+            }
+            if (foundHighPriority) {
+                return;
+            }
+            if (IsHighPriority(attacker)) {
+                result = attacker;
+                foundHighPriority = true;
                 return;
             }
             float expectedLifeTime = attacker->GetHealth() / dps_;
