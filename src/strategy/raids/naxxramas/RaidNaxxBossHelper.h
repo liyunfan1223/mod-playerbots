@@ -76,7 +76,7 @@ class KelthuzadBossHelper: public GenericBossHelper<Kelthuzad::boss_kelthuzad::b
         const std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
         const std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
         bool IsPhaseOne() {
-            return _event_map->GetNextEventTime(Kelthuzad::KELTHUZAD_EVENT_PHASE_2) != 0;
+            return _event_map->GetNextEventTime(Kelthuzad::EVENT_PHASE_2) != 0;
         }
         bool IsPhaseTwo() {
             return !IsPhaseOne();
@@ -186,7 +186,7 @@ class GluthBossHelper: public GenericBossHelper<Gluth::boss_gluth::boss_gluthAI>
         const float decimatedZombiePct = 10.0f;
         GluthBossHelper(PlayerbotAI *botAI): GenericBossHelper(botAI, "gluth") {}
         bool BeforeDecimate() {
-            uint32 decimate = _event_map->GetNextEventTime(Gluth::GLUTH_EVENT_DECIMATE);
+            uint32 decimate = _event_map->GetNextEventTime(Gluth::EVENT_DECIMATE);
             return decimate && decimate - _timer <= 3000;
         }
         bool JustStartCombat() {
