@@ -376,7 +376,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (bot->getLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
-        LOG_INFO("playerbots", "Initializing pet...");
+        LOG_DEBUG("playerbots", "Initializing pet...");
         InitPet();
         bot->SaveToDB(false, false);
         InitPetTalents();
@@ -733,7 +733,7 @@ void PlayerbotFactory::InitPet()
     {
         LOG_ERROR("playerbots", "Cannot create pet for bot {}", bot->GetName().c_str());
         return;
-}
+    }
 
     // LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.", pet->m_spells.size(), pet->GetPetAutoSpellSize());
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
