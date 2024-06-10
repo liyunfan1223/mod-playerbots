@@ -2624,6 +2624,24 @@ void PlayerbotFactory::InitMounts()
     }
 }
 
+void PlayerbotFactory::UnbindInstance(){
+    Player* p = bot;
+    ObjectGuid guid = p->GetGUID();
+
+    for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
+    {
+        std::vector<InstanceSave*> toUnbind;
+        BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(guid, Difficulty(d));
+        for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
+        {
+            InstanceSave* instanceSave = itr->second.save;
+            toUnbind.push_back(instanceSave);
+        }
+        for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+            sInstanceSaveMgr->PlayerUnbindInstance(guid, (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);
+    }
+}
+
 void PlayerbotFactory::InitPotions()
 {
     uint32 effects[] = { SPELL_EFFECT_HEAL, SPELL_EFFECT_ENERGIZE };
