@@ -36,12 +36,13 @@ void HealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, 
             new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), 
             new NextAction("power word: shield on almost full health below", ACTION_MEDIUM_HEAL + 7),
-            new NextAction("prayer of healing on party", ACTION_MEDIUM_HEAL + 6),
             NULL)));
 
     triggers.push_back(new TriggerNode(
         "medium group heal occasion",
-        NextAction::array(0, new NextAction("divine hymn", ACTION_CRITICAL_HEAL + 5), NULL)));
+        NextAction::array(0,
+            new NextAction("prayer of healing on party", ACTION_CRITICAL_HEAL + 6),
+            new NextAction("divine hymn", ACTION_CRITICAL_HEAL + 5), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "party member critical health",
