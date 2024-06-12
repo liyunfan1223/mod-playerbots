@@ -3466,8 +3466,19 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             if (!socketColor) {
                 continue;
             }
+            int32 gemId;
+            if (1 == socketColor)//meta
+                gemId = bestGemEnchantId[0];
+            else if (2 == socketColor)//red
+                gemId = bestGemEnchantId[1];
+            else if (4 == socketColor)//yellow
+                gemId = bestGemEnchantId[2];
+            else if (8 == socketColor)//blue
+                gemId = bestGemEnchantId[3];
+            else
+                continue;
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), false);
-            item->SetEnchantment(EnchantmentSlot(enchant_slot), bestGemEnchantId[socketColor], 0, 0, bot->GetGUID());
+            item->SetEnchantment(EnchantmentSlot(enchant_slot), gemId, 0, 0, bot->GetGUID());
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), true);
         }
     }
