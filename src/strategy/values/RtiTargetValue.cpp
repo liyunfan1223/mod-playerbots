@@ -45,9 +45,18 @@ Unit* RtiTargetValue::Calculate()
     if (!guid)
         return nullptr;
 
-    GuidVector attackers = context->GetValue<GuidVector >("attackers")->Get();
-    if (find(attackers.begin(), attackers.end(), guid) == attackers.end())
+    if (!bot->IsInCombat())
         return nullptr;
+
+    //////////////////////////////////////////////////////begin: delete below check
+    // Some units that need to be killed in battle are not on the list of attackers, 
+    // such as the Kor'kron Battle-Mage in Icecrown Citadel.
+
+    // GuidVector attackers = context->GetValue<GuidVector >("attackers")->Get();
+    // if (find(attackers.begin(), attackers.end(), guid) == attackers.end())
+    //     return nullptr;
+    //
+    //////////////////////////////////////////////////////end: delete below check
 
     Unit* unit = botAI->GetUnit(guid);
     if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) || sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, unit), sPlayerbotAIConfig->sightDistance))
