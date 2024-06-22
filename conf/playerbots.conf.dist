@@ -49,7 +49,7 @@ AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
 
 # Enable/Disable rotation of bots (randomly select a bot from the bots pool to go online and rotate them periodically)
-# Need reset rndbot after changing the setting
+# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 # default: 0 (disable, the online bots are fixed)
 AiPlayerbot.EnableRotation = 0
 
@@ -107,6 +107,10 @@ AiPlayerbot.RandombotStartingLevel = 5
 # Set kill XP rate for bots (default: 1)
 # Server XP Rate * AiPlayerbot.KillXPRate
 AiPlayerbot.KillXPRate = 1
+
+# Disable death knight for bots login
+# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
+AiPlayerbot.DisableDeathKnightLogin = 0
 
 # Specify percent of active bots
 # The default is 10. With 10% of all bots going active or inactive each minute.
@@ -213,8 +217,8 @@ AiPlayerbot.SyncQuestForPlayer = 0
 AiPlayerbot.SyncLevelWithPlayers = 0
 
 # Give free food to random bots
-# Default: 1 (enabled)
-AiPlayerbot.FreeFood = 1
+# Default: 0 (disabled)
+AiPlayerbot.FreeFood = 0
 
 # Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
 # Only for random bots

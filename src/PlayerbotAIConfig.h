@@ -176,6 +176,7 @@ class PlayerbotAIConfig
         bool randomBotShowCloak;
         bool disableRandomLevels;
         uint32 playerbotsXPrate;
+        bool disableDeathKnightLogin;
         uint32 botActiveAlone;
 
         uint32 enablePrototypePerformanceDiff;
