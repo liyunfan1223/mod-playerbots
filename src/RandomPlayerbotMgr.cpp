@@ -1195,9 +1195,21 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
                 continue;
 
             z = 0.05f + ground;
+            PlayerInfo const* pInfo = sObjectMgr->GetPlayerInfo(bot->getRace(true), bot->getClass());
+            float dis = loc.GetExactDist(pInfo->positionX, pInfo->positionY, pInfo->positionZ);
+            // yunfan: distance check for low level
+            if (bot->GetLevel() <= 4 && (loc.GetMapId() != pInfo->mapId || dis > 500.0f)) {
+                continue;
+            }
+            if (bot->GetLevel() <= 10 && (loc.GetMapId() != pInfo->mapId || dis > 3000.0f)) {
+                continue;
+            }
+            if (bot->GetLevel() <= 18 && (loc.GetMapId() != pInfo->mapId || dis > 10000.0f)) {
+                continue;
+            }
 
             LOG_INFO("playerbots", "Random teleporting bot {} (level {}) to {} {},{},{} ({}/{} locations)",
-                bot->GetName().c_str(), bot->GetLevel(), zone->area_name[0], x, y, z, attemtps, tlocs.size());
+                bot->GetName().c_str(), bot->GetLevel(), zone->area_name[0], x, y, z, i + 1, tlocs.size());
 
             if (hearth)
             {
