@@ -1524,7 +1524,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     
     uint32 level;
 
-    if (sPlayerbotAIConfig->downgradeMaxLevelBot && bot->GetLevel() == sPlayerbotAIConfig->randomBotMaxLevel) {
+    if (sPlayerbotAIConfig->downgradeMaxLevelBot && bot->GetLevel() >= sPlayerbotAIConfig->randomBotMaxLevel) {
         if (bot->getClass() == CLASS_DEATH_KNIGHT) {
             level = sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
         } else {
@@ -1532,7 +1532,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
         }
     } else {
         level = urand(sPlayerbotAIConfig->randomBotMinLevel, maxLevel);
-        if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
+        if (urand(1, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
             level = maxLevel;
 
         if (bot->getClass() == CLASS_DEATH_KNIGHT)

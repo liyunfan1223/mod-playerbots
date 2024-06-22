@@ -2617,7 +2617,7 @@ void PlayerbotFactory::InitPotions()
         uint32 itemId = sRandomItemMgr->GetRandomPotion(level, effect);
         if (!itemId)
         {
-            LOG_INFO("playerbots", "No potions (type {}) available for bot {} ({} level)", effect, bot->GetName().c_str(), bot->getLevel());
+            // LOG_INFO("playerbots", "No potions (type {}) available for bot {} ({} level)", effect, bot->GetName().c_str(), bot->getLevel());
             continue;
         }
 
