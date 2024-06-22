@@ -960,6 +960,8 @@ void PlayerbotAI::ChangeEngine(BotState type)
             case BOT_STATE_DEAD:
                 // LOG_DEBUG("playerbots",  "=== {} DEAD ===", bot->GetName().c_str());
                 break;
+            default:
+                break;
         }
     }
 }
