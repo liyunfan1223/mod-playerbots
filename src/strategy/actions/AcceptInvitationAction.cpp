@@ -4,6 +4,7 @@
 
 #include "AcceptInvitationAction.h"
 #include "Event.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "PlayerbotSecurity.h"
 
@@ -42,7 +43,7 @@ bool AcceptInvitationAction::Execute(Event event)
 
     botAI->TellMaster("Hello");
 
-    if (sPlayerbotAIConfig->summonWhenGroup) {
+    if (sPlayerbotAIConfig->summonWhenGroup && bot->GetDistance(inviter) > sPlayerbotAIConfig->sightDistance) {
         Teleport(inviter, bot);
     }
     return true;
