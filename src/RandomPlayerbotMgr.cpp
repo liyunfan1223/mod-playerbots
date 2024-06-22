@@ -1174,79 +1174,76 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
 
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomTeleportByLocations");
 
-    uint32 index = 0;
+    std::shuffle(std::begin(tlocs), std::end(tlocs), RandomEngine::Instance());
     for (uint32 i = 0; i < tlocs.size(); i++)
     {
-        for (uint8 attemtps = 0; attemtps < 3; ++attemtps)
-        {
-            WorldLocation loc = tlocs[urand(0, tlocs.size() - 1)];
+        WorldLocation loc = tlocs[i];
 
-            float x = loc.GetPositionX(); // + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
-            float y = loc.GetPositionY(); // + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
-            float z = loc.GetPositionZ();
+        float x = loc.GetPositionX(); // + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
+        float y = loc.GetPositionY(); // + (attemtps > 0 ? urand(0, sPlayerbotAIConfig->grindDistance) - sPlayerbotAIConfig->grindDistance / 2 : 0);
+        float z = loc.GetPositionZ();
 
-            Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
-            if (!map)
-                continue;
-            
-            AreaTableEntry const* zone = sAreaTableStore.LookupEntry(map->GetZoneId(bot->GetPhaseMask(), x, y, z));
-            if (!zone)
-                continue;
+        Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
+        if (!map)
+            continue;
+        
+        AreaTableEntry const* zone = sAreaTableStore.LookupEntry(map->GetZoneId(bot->GetPhaseMask(), x, y, z));
+        if (!zone)
+            continue;
 
-            // Do not teleport to enemy zones if level is low
-            if (zone->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
-                continue;
+        // Do not teleport to enemy zones if level is low
+        if (zone->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
+            continue;
 
-            if (zone->team == 2 && bot->GetTeamId() == TEAM_HORDE)
-                continue;
+        if (zone->team == 2 && bot->GetTeamId() == TEAM_HORDE)
+            continue;
 
-            if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
-                continue;
+        if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
+            continue;
 
-            float ground = map->GetHeight(x, y, z + 0.5f);
-            if (ground <= INVALID_HEIGHT)
-                continue;
+        float ground = map->GetHeight(bot->GetPhaseMask(), x, y, z + 0.5f);
+        if (ground <= INVALID_HEIGHT)
+            continue;
 
-            z = 0.05f + ground;
-            PlayerInfo const* pInfo = sObjectMgr->GetPlayerInfo(bot->getRace(true), bot->getClass());
-            float dis = loc.GetExactDist(pInfo->positionX, pInfo->positionY, pInfo->positionZ);
-            // yunfan: distance check for low level
-            if (bot->GetLevel() <= 4 && (loc.GetMapId() != pInfo->mapId || dis > 500.0f)) {
-                continue;
-            }
-            if (bot->GetLevel() <= 10 && (loc.GetMapId() != pInfo->mapId || dis > 3000.0f)) {
-                continue;
-            }
-            if (bot->GetLevel() <= 18 && (loc.GetMapId() != pInfo->mapId || dis > 10000.0f)) {
-                continue;
-            }
-
-            LOG_INFO("playerbots", "Random teleporting bot {} (level {}) to {} {},{},{} ({}/{} locations)",
-                bot->GetName().c_str(), bot->GetLevel(), zone->area_name[0], x, y, z, i + 1, tlocs.size());
-
-            if (hearth)
-            {
-                bot->SetHomebind(loc, zone->ID);
-            }
-
-            bot->GetMotionMaster()->Clear();
-            PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-            if (botAI)
-                botAI->Reset(true);
-            bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
-            bot->SendMovementFlagUpdate();
-
-            if (pmo)
-                pmo->finish();
-
-            return;
+        z = 0.05f + ground;
+        PlayerInfo const* pInfo = sObjectMgr->GetPlayerInfo(bot->getRace(true), bot->getClass());
+        float dis = loc.GetExactDist(pInfo->positionX, pInfo->positionY, pInfo->positionZ);
+        // yunfan: distance check for low level
+        if (bot->GetLevel() <= 4 && (loc.GetMapId() != pInfo->mapId || dis > 500.0f)) {
+            continue;
         }
+        if (bot->GetLevel() <= 10 && (loc.GetMapId() != pInfo->mapId || dis > 3000.0f)) {
+            continue;
+        }
+        if (bot->GetLevel() <= 18 && (loc.GetMapId() != pInfo->mapId || dis > 10000.0f)) {
+            continue;
+        }
+
+        LOG_INFO("playerbots", "Random teleporting bot {} (level {}) to {} {},{},{} ({}/{} locations)",
+            bot->GetName().c_str(), bot->GetLevel(), zone->area_name[0], x, y, z, i + 1, tlocs.size());
+
+        if (hearth)
+        {
+            bot->SetHomebind(loc, zone->ID);
+        }
+
+        bot->GetMotionMaster()->Clear();
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+            botAI->Reset(true);
+        bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
+        bot->SendMovementFlagUpdate();
+
+        if (pmo)
+            pmo->finish();
+
+        return;
     }
 
     if (pmo)
         pmo->finish();
 
-    LOG_ERROR("playerbots", "Cannot teleport bot {} - no locations available", bot->GetName().c_str());
+    LOG_ERROR("playerbots", "Cannot teleport bot {} - no locations available ({} locations)", bot->GetName().c_str(), tlocs.size());
 }
 
 void RandomPlayerbotMgr::PrepareTeleportCache()
@@ -1413,7 +1410,7 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     uint32 level = bot->getLevel();
     uint8 race = bot->getRace();
     LOG_DEBUG("playerbots", "Random teleporting bot {} for level {} ({} locations available)", bot->GetName().c_str(), bot->GetLevel(), locsPerLevelCache[level].size());
-    if (urand(0, 100) < sPlayerbotAIConfig->probTeleToBankers * 100) {
+    if (level > 10 && urand(0, 100) < sPlayerbotAIConfig->probTeleToBankers * 100) {
         RandomTeleport(bot, bankerLocsPerLevelCache[level], true);
     } else {
         RandomTeleport(bot, locsPerLevelCache[level]);
