@@ -281,11 +281,12 @@ bool PlayerbotAIConfig::Initialize()
     autoGearScoreLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearScoreLimit", 0);
 
     playerbotsXPrate = sConfigMgr->GetOption<int32>("AiPlayerbot.KillXPRate", 1);
+    disableDeathKnightLogin = sConfigMgr->GetOption<bool>("AiPlayerbot.DisableDeathKnightLogin", 0);
     botActiveAlone = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAlone", 10);
 
     enablePrototypePerformanceDiff = sConfigMgr->GetOption<bool>("AiPlayerbot.EnablePrototypePerformanceDiff", false);
-    diffWithPlayer = sConfigMgr->GetOption("AiPlayerbot.DiffWithPlayer", 100);
-    diffEmpty = sConfigMgr->GetIntDefault("AiPlayerbot.DiffEmpty", 200);
+    diffWithPlayer = sConfigMgr->GetOption<int32>("AiPlayerbot.DiffWithPlayer", 100);
+    diffEmpty = sConfigMgr->GetOption<int32>("AiPlayerbot.DiffEmpty", 200);
 
     randombotsWalkingRPG = sConfigMgr->GetOption<bool>("AiPlayerbot.RandombotsWalkingRPG", false);
     randombotsWalkingRPGInDoors = sConfigMgr->GetOption<bool>("AiPlayerbot.RandombotsWalkingRPG.InDoors", false);

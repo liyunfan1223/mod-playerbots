@@ -9,6 +9,7 @@
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "DatabaseEnv.h"
 #include "Define.h"
 #include "FleeManager.h"
 #include "GameTime.h"
@@ -26,6 +27,7 @@
 #include "Random.h"
 #include "ServerFacade.h"
 #include "ChannelMgr.h"
+#include "SharedDefines.h"
 #include "Unit.h"
 #include "World.h"
 #include "UpdateTime.h"
@@ -480,7 +482,6 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             {
                 Field* fields = result->Fetch();
                 ObjectGuid::LowType guid = fields[0].Get<uint32>();
-
                 if (GetEventValue(guid, "add"))
                     continue;
 
@@ -492,6 +493,18 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
                 if (std::find(currentBots.begin(), currentBots.end(), guid) != currentBots.end())
                     continue;
+                    
+                if (sPlayerbotAIConfig->disableDeathKnightLogin) {
+                    QueryResult result = CharacterDatabase.Query("Select class from characters where guid = {}", guid);
+                    if (!result) {
+                        continue;
+                    }
+                    Field* fields = result->Fetch();
+                    uint32 rClass = fields[0].Get<uint32>();
+                    if (rClass == CLASS_DEATH_KNIGHT) {
+                        continue;
+                    }
+                }
                 guids.push_back(guid);
             } while (result->NextRow());
 
