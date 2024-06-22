@@ -1212,7 +1212,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         if (bot->GetLevel() <= 4 && (loc.GetMapId() != pInfo->mapId || dis > 500.0f)) {
             continue;
         }
-        if (bot->GetLevel() <= 10 && (loc.GetMapId() != pInfo->mapId || dis > 3000.0f)) {
+        if (bot->GetLevel() <= 10 && (loc.GetMapId() != pInfo->mapId || dis > 2500.0f)) {
             continue;
         }
         if (bot->GetLevel() <= 18 && (loc.GetMapId() != pInfo->mapId || dis > 10000.0f)) {
