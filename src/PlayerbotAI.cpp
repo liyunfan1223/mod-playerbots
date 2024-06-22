@@ -3123,7 +3123,7 @@ bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
 #ifndef WIN32
 inline int strcmpi(char const* s1, char const* s2)
 {
-    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2);
+    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2) {}
         return *s1 - *s2;
 }
 #endif
@@ -3950,6 +3950,8 @@ std::string const PlayerbotAI::HandleRemoteCommand(std::string const command)
                     break;
                 case NeedMoneyFor::guild:
                     out << "guild";
+                    break;
+                default:
                     break;
             }
 

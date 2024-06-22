@@ -1285,7 +1285,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 				"ROUND( position_z / 50), "
 				"t.entry "
 		    "HAVING "
-				"count(*) > 10) AS g "
+				"count(*) > 7) AS g "
 		    "INNER JOIN creature c ON g.guid = c.guid "
 		    "INNER JOIN creature_template t on c.id1 = t.entry "
         "ORDER BY "
