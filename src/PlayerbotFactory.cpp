@@ -1486,7 +1486,13 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
             continue;
         
-        if (slot == EQUIPMENT_SLOT_NECK && level < 40)
+        if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
+            continue;
+
+        if (level < 25 && slot == EQUIPMENT_SLOT_NECK)
+            continue;
+        
+        if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
             continue;
 
         std::vector<uint32>& ids = items[slot];
