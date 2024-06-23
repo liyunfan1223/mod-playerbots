@@ -1347,7 +1347,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             float z = fields[3].Get<float>();
             float orient = fields[4].Get<float>();
             uint32 level = fields[5].Get<uint32>();
-            WorldLocation loc(mapId, x + cos(orient) * 10.0f, y + sin(orient) * 10.0f, z, orient + M_PI);
+            WorldLocation loc(mapId, x + cos(orient) * 6.0f, y + sin(orient) * 6.0f, z + 2.0f, orient + M_PI);
             collected_locs++;
             for (int32 l = 1; l <= maxLevel; l++) {
                 if (l <= 60 && level >= 60) {
