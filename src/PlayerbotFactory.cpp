@@ -188,7 +188,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     ClearSkills();
     // bot->SaveToDB(false, false);
     ClearSpells();
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
     if (!incremental)
     {
         ResetQuests();
@@ -196,12 +196,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (!sPlayerbotAIConfig->equipmentPersistence || level < sPlayerbotAIConfig->equipmentPersistenceLevel) {
         ClearAllItems();
     }
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 
     bot->GiveLevel(level);
     bot->InitStatsForLevel();
     CancelAuras();
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
 
@@ -260,7 +260,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Mounts");
     LOG_DEBUG("playerbots", "Initializing mounts...");
     InitMounts();
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
 
@@ -349,8 +349,8 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
     
     LOG_DEBUG("playerbots", "Initializing glyphs...");
-    bot->SaveToDB(false, false);
     InitGlyphs();
+    // bot->SaveToDB(false, false);
     
     // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
     // LOG_INFO("playerbots", "Initializing guilds...");
@@ -372,13 +372,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (!incremental) {
         bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
         bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
+        // bot->SaveToDB(false, false);
     }
     if (bot->getLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
         LOG_DEBUG("playerbots", "Initializing pet...");
         InitPet();
-        bot->SaveToDB(false, false);
+        // bot->SaveToDB(false, false);
         InitPetTalents();
         if (pmo)
             pmo->finish();
@@ -1422,9 +1423,18 @@ void PlayerbotFactory::InitEquipment(bool incremental)
     else if (blevel == 80)
         delta = 9;
 
-    for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+            continue;
+        
+        if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
+            continue;
+
+        if (level < 25 && slot == EQUIPMENT_SLOT_NECK)
+            continue;
+        
+        if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
             continue;
 
         uint32 desiredQuality = itemQuality;
