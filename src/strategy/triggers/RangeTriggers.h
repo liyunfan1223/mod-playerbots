@@ -50,6 +50,14 @@ class EnemyIsCloseTrigger : public Trigger
         bool IsActive() override;
 };
 
+class EnemyWithinMeleeTrigger : public Trigger
+{
+    public:
+        EnemyWithinMeleeTrigger(PlayerbotAI* botAI) : Trigger(botAI, "enemy within melee") { }
+
+        bool IsActive() override;
+};
+
 class OutOfRangeTrigger : public Trigger
 {
     public:

@@ -52,29 +52,29 @@ bool EnemyTooCloseForSpellTrigger::IsActive()
 bool EnemyTooCloseForAutoShotTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    if (!target)
-        return false;
+    
+    return target && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) && bot->IsWithinMeleeRange(target);
 
-    if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) && GetSpeedInMotion(target) > GetSpeedInMotion(bot) * 0.65f)
-        return false;
+    // if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) && GetSpeedInMotion(target) > GetSpeedInMotion(bot) * 0.65f)
+    //     return false;
 
-    bool isBoss = false;
-    bool isRaid = false;
-    float combatReach = bot->GetCombatReach() + target->GetCombatReach();
-    float targetDistance = sServerFacade->GetDistance2d(bot, target) + combatReach;
-    if (target->GetTypeId() == TYPEID_UNIT)
-    {
-        Creature* creature = botAI->GetCreature(target->GetGUID());
-        if (creature)
-        {
-            isBoss = creature->isWorldBoss();
-        }
-    }
+    // bool isBoss = false;
+    // bool isRaid = false;
+    // float combatReach = bot->GetCombatReach() + target->GetCombatReach();
+    // float targetDistance = sServerFacade->GetDistance2d(bot, target) + combatReach;
+    // if (target->GetTypeId() == TYPEID_UNIT)
+    // {
+    //     Creature* creature = botAI->GetCreature(target->GetGUID());
+    //     if (creature)
+    //     {
+    //         isBoss = creature->isWorldBoss();
+    //     }
+    // }
 
-    if (bot->GetMap() && bot->GetMap()->IsRaid())
-        isRaid = true;
+    // if (bot->GetMap() && bot->GetMap()->IsRaid())
+    //     isRaid = true;
 
-    return sServerFacade->IsDistanceLessOrEqualThan(targetDistance, 5.0f);
+    // return sServerFacade->IsDistanceLessOrEqualThan(targetDistance, 5.0f);
 }
 
 bool EnemyTooCloseForShootTrigger::IsActive()
@@ -126,6 +126,12 @@ bool EnemyIsCloseTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
     return target && sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), sPlayerbotAIConfig->tooCloseDistance);
+}
+
+bool EnemyWithinMeleeTrigger::IsActive()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    return target && bot->IsWithinMeleeRange(target);
 }
 
 bool OutOfRangeTrigger::IsActive()
