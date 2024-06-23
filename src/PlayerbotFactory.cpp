@@ -1431,10 +1431,13 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
             continue;
 
-        if (level < 25 && slot == EQUIPMENT_SLOT_NECK)
+        if (level < 30 && slot == EQUIPMENT_SLOT_NECK)
             continue;
         
         if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
+            continue;
+        
+        if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
             continue;
 
         uint32 desiredQuality = itemQuality;
