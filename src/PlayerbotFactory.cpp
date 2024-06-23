@@ -178,7 +178,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     // {
     //     return;
     // }
-    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"), bot->GetName().c_str(), bot->GetLevel(), bot->getClass());
+    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"), bot->GetName().c_str(), level, bot->getClass());
     // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
     LOG_DEBUG("playerbots", "Resetting player...");

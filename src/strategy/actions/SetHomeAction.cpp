@@ -13,11 +13,12 @@ bool SetHomeAction::Execute(Event event)
     ObjectGuid selection = bot->GetTarget();
     bool isRpgAction = AI_VALUE(GuidPosition, "rpg target") == selection;
 
-    if (!isRpgAction)
+    if (!isRpgAction) {
         if (master)
             selection = master->GetTarget();
         else
             return false;
+    }
 
     if (Unit* unit = botAI->GetUnit(selection))
         if (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_INNKEEPER))
