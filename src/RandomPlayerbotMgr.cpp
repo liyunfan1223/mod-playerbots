@@ -1332,6 +1332,9 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             "AND t.faction != 35 "
             "AND t.faction != 474 "
             "AND t.faction != 69 "
+            "AND t.entry != 30606 "
+            "AND t.entry != 30608 "
+            "AND t.faction != 69 "
             "AND map IN ({}) "
         "ORDER BY "
 	        "t.minlevel;", sPlayerbotAIConfig->randomBotMapsAsString.c_str());
