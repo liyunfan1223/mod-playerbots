@@ -110,7 +110,8 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     context->GetValue<Unit*>("current target")->Set(target);
     context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
     
-    bool attacked = bot->Attack(target, true);
+    bool melee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
+    bot->Attack(target, melee);
 
     if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target)) {
         sServerFacade->SetFacingTo(bot, target);
