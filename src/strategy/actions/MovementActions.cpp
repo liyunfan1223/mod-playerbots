@@ -1540,8 +1540,8 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
         return false;
     }
     std::ostringstream name;
-    name << "[" << spellInfo->SpellName[0] << "] (aura)";
-    if (FleePostion(dynOwner->GetPosition(), radius, name.str())) {
+    name << spellInfo->SpellName[0]; // << "] (aura)";
+    if (FleePosition(dynOwner->GetPosition(), radius, name.str())) {
         return true;
     }
     return false;
@@ -1591,8 +1591,8 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             continue;
         }
         std::ostringstream name;
-        name << "[" << spellInfo->SpellName[0] << "] (object)";
-        if (FleePostion(go->GetPosition(), radius, name.str())) {
+        name << spellInfo->SpellName[0]; // << "] (object)";
+        if (FleePosition(go->GetPosition(), radius, name.str())) {
             return true;
         }
         
@@ -1633,8 +1633,8 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                             break;
                         }
                         std::ostringstream name;
-                        name << "[" << triggerSpellInfo->SpellName[0] << "] (unit)";
-                        if (FleePostion(unit->GetPosition(), radius, name.str())) {
+                        name << triggerSpellInfo->SpellName[0]; //<< "] (unit)";
+                        if (FleePosition(unit->GetPosition(), radius, name.str())) {
                             return true;
                         }
                     }
@@ -1645,7 +1645,7 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
     return false;
 }
 
-bool AvoidAoeAction::FleePostion(Position pos, float radius, std::string name)
+bool AvoidAoeAction::FleePosition(Position pos, float radius, std::string name)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     std::vector<float> possibleAngles;
@@ -1674,9 +1674,10 @@ bool AvoidAoeAction::FleePostion(Position pos, float radius, std::string name)
     }
     if (farestDis > 0.0f) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
-            if (sPlayerbotAIConfig->tellWhenAvoidAoe) {
+            if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
+                lastTellTimer = time(NULL);
                 std::ostringstream out;
-                out << "Avoiding spell " << name << "...";
+                out << "I'm avoiding " << name << "...";
                 bot->Say(out.str(), LANG_UNIVERSAL);
             }
             return true;

@@ -196,11 +196,13 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     Item* oldItem = bot->GetItemByPos(dest);
 
     //No item equiped
-    if (!oldItem)
+    if (!oldItem) {
         if (shouldEquip)
             return ITEM_USAGE_EQUIP;
-        else
+        else {
             return ITEM_USAGE_BAD_EQUIP;
+        }
+    }
 
     ItemTemplate const* oldItemProto = oldItem->GetTemplate();
     float oldScore = PlayerbotFactory::CalculateItemScore(oldItemProto->ItemId, bot);
@@ -214,11 +216,13 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     }
 
     // Bigger quiver
-    if (itemProto->Class == ITEM_CLASS_QUIVER)
-        if (!oldItem || oldItemProto->ContainerSlots < itemProto->ContainerSlots)
+    if (itemProto->Class == ITEM_CLASS_QUIVER) {
+        if (!oldItem || oldItemProto->ContainerSlots < itemProto->ContainerSlots) {
             return ITEM_USAGE_EQUIP;
-        else
+        } else {
             return ITEM_USAGE_NONE;
+        }
+    }
 
     bool existingShouldEquip = true;
     if (oldItemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), oldItemProto))

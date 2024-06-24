@@ -13,6 +13,7 @@ class PlayerbotAI;
 class FindPlayerPredicate
 {
     public:
+        virtual ~FindPlayerPredicate() = default;
         virtual bool Check(Unit* /*unit*/) = 0;
 };
 

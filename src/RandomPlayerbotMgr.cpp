@@ -1285,7 +1285,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 				"ROUND( position_z / 50), "
 				"t.entry "
 		    "HAVING "
-				"count(*) > 10) AS g "
+				"count(*) > 7) AS g "
 		    "INNER JOIN creature c ON g.guid = c.guid "
 		    "INNER JOIN creature_template t on c.id1 = t.entry "
         "ORDER BY "
@@ -1332,6 +1332,9 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             "AND t.faction != 35 "
             "AND t.faction != 474 "
             "AND t.faction != 69 "
+            "AND t.entry != 30606 "
+            "AND t.entry != 30608 "
+            "AND t.faction != 69 "
             "AND map IN ({}) "
         "ORDER BY "
 	        "t.minlevel;", sPlayerbotAIConfig->randomBotMapsAsString.c_str());
@@ -1347,7 +1350,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             float z = fields[3].Get<float>();
             float orient = fields[4].Get<float>();
             uint32 level = fields[5].Get<uint32>();
-            WorldLocation loc(mapId, x + cos(orient) * 10.0f, y + sin(orient) * 10.0f, z, orient + M_PI);
+            WorldLocation loc(mapId, x + cos(orient) * 6.0f, y + sin(orient) * 6.0f, z + 2.0f, orient + M_PI);
             collected_locs++;
             for (int32 l = 1; l <= maxLevel; l++) {
                 if (l <= 60 && level >= 60) {
@@ -1524,7 +1527,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     
     uint32 level;
 
-    if (sPlayerbotAIConfig->downgradeMaxLevelBot && bot->GetLevel() == sPlayerbotAIConfig->randomBotMaxLevel) {
+    if (sPlayerbotAIConfig->downgradeMaxLevelBot && bot->GetLevel() >= sPlayerbotAIConfig->randomBotMaxLevel) {
         if (bot->getClass() == CLASS_DEATH_KNIGHT) {
             level = sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
         } else {
@@ -1532,7 +1535,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
         }
     } else {
         level = urand(sPlayerbotAIConfig->randomBotMinLevel, maxLevel);
-        if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
+        if (urand(1, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
             level = maxLevel;
 
         if (bot->getClass() == CLASS_DEATH_KNIGHT)

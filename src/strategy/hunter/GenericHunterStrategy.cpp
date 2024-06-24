@@ -79,7 +79,7 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("enemy is close", 
+    triggers.push_back(new TriggerNode("enemy within melee", 
         NextAction::array(0, 
             new NextAction("wing clip", ACTION_HIGH + 1),
             new NextAction("mongoose bite", ACTION_HIGH), 
@@ -88,7 +88,7 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("hunters pet medium health", NextAction::array(0, new NextAction("mend pet", ACTION_HIGH + 2), nullptr)));
     // triggers.push_back(new TriggerNode("no ammo", NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), new NextAction("say::no ammo", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("aspect of the viper", NextAction::array(0, new NextAction("aspect of the viper", ACTION_HIGH), NULL)));
-    triggers.push_back(new TriggerNode("enemy too close for shoot", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
+    triggers.push_back(new TriggerNode("enemy too close for auto shot", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
     triggers.push_back(new TriggerNode("misdirection on main tank", NextAction::array(0, new NextAction("misdirection on main tank", ACTION_HIGH + 7), NULL)));
     triggers.push_back(new TriggerNode("tranquilizing shot", NextAction::array(0, new NextAction("tranquilizing shot", 61.0f), NULL)));
     
