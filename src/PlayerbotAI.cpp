@@ -3432,23 +3432,20 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 
     if (sPlayerbotAIConfig->botActiveAlone >= 100)
         return true;
-
-    if (maxDiff > 1000)
-        return false;
-
-    uint32 mod = 100;
+	
+	float mod = sRandomPlayerbotMgr->getActivityMod();
 
     // if has real players - slow down continents without player
-    if (maxDiff > 100)
+    if (mod > 100)
         mod = 50;
 
-    if (maxDiff > 150)
+    if (mod > 150)
         mod = 25;
 
-    if (maxDiff > 200)
+    if (mod > 200)
         mod = 10;
 
-    if (maxDiff > 250)
+    if (mod > 250)
     {
         if (Map* map = bot->GetMap())
         {
@@ -3463,9 +3460,9 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         }
     }
 
-    uint32 ActivityNumber = GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100, sPlayerbotAIConfig->botActiveAlone * static_cast<float>(mod) / 100 * 0.01f);
+    uint32 ActivityNumber = GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100, sPlayerbotAIConfig->botActiveAlone * mod * 0.01f); // The last number if the amount it cycles per min. Currently set to 1% of the active bots.
 
-    return ActivityNumber <= (sPlayerbotAIConfig->botActiveAlone * mod) / 100;           //The given percentage of bots should be active and rotate 1% of those active bots each minute.
+    return ActivityNumber <= (sPlayerbotAIConfig->botActiveAlone * mod); // The given percentage of bots should be active and rotate 1% of those active bots each minute.
 }
 
 bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)

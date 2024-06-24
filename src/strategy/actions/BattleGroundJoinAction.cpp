@@ -240,40 +240,46 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
 
     bool isArena = false;
     bool isRated = false;
+    bool hasTeam = false;
+    bool isTeamLead = false;
     bool noLag = sWorldUpdateTime.GetAverageUpdateTime() < (sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer) * 1.1;
 
     ArenaType type = ArenaType(BattlegroundMgr::BGArenaType(queueTypeId));
     if (type != ARENA_TYPE_NONE)
         isArena = true;
 
+    for (uint8 i = 0; i < MAX_ARENA_SLOT; ++i)
+    {
+        if (uint32 a_id = bot->GetArenaTeamId(i))
+        {
+            hasTeam = true;
+            break;
+        }
+    }
+
+    isTeamLead = sArenaTeamMgr->GetArenaTeamByCaptain(bot->GetGUID());
     bool hasPlayers = (sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE]) > 0;
     bool hasBots = (sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE]) >= bg->GetMinPlayersPerTeam();
     
     if (!sPlayerbotAIConfig->randomBotAutoJoinBG && !hasPlayers)
-    {
         return false;
 
-        if (sPlayerbotAIConfig->enablePrototypePerformanceDiff)
-        {
-            if (!noLag)
-            {
-                return false;
-            }
-        }
-    }
-    
-    if (!hasPlayers && !(isArena)) 
-    {
+    if (!hasPlayers && (sPlayerbotAIConfig->enablePrototypePerformanceDiff && !noLag))
         return false;
 
-        if (sPlayerbotAIConfig->enablePrototypePerformanceDiff) 
-        {
-            if (!noLag) 
-            {
-                return false;
-            }
-        }
-    }
+    /*
+    if (!hasPlayers && !noLag)
+        return false;
+    */
+
+    if (botAI->HasRealPlayerMaster())
+        return false;
+
+    if (!hasPlayers && isArena && !hasTeam)
+        return false;
+
+    if (!hasPlayers && isArena && !hasTeam)
+        return false;
 
     uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
     uint32 TeamSize = bg->GetMaxPlayersPerTeam();
