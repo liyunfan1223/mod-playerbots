@@ -122,9 +122,10 @@ Aura* AreaDebuffValue::Calculate()
 {
     // Unit::AuraApplicationMap& map = bot->GetAppliedAuras();
     Unit::AuraEffectList const& aurasPeriodicDamage = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+    Unit::AuraEffectList const& aurasPeriodicDamagePercent = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
     Unit::AuraEffectList const& aurasPeriodicTriggerSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     Unit::AuraEffectList const& aurasPeriodicTriggerWithValueSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
-    for (const Unit::AuraEffectList& list : {aurasPeriodicDamage, aurasPeriodicTriggerSpell, aurasPeriodicTriggerWithValueSpell}) {
+    for (const Unit::AuraEffectList& list : {aurasPeriodicDamage, aurasPeriodicDamagePercent, aurasPeriodicTriggerSpell, aurasPeriodicTriggerWithValueSpell}) {
         for (auto i = list.begin(); i != list.end(); ++i)
         {
             AuraEffect* aurEff = *i;
