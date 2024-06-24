@@ -1674,7 +1674,8 @@ bool AvoidAoeAction::FleePosition(Position pos, float radius, std::string name)
     }
     if (farestDis > 0.0f) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
-            if (sPlayerbotAIConfig->tellWhenAvoidAoe) {
+            if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
+                lastTellTimer = time(NULL);
                 std::ostringstream out;
                 out << "I'm avoiding " << name << "...";
                 bot->Say(out.str(), LANG_UNIVERSAL);

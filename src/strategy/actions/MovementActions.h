@@ -82,6 +82,7 @@ class AvoidAoeAction : public MovementAction
         // Position PositionForMelee(Position pos, float radius);
         // Position PositionForRanged(Position pos, float radius);
         bool FleePosition(Position pos, float radius, std::string name);
+        time_t lastTellTimer = 0;
 };
 
 class RunAwayAction : public MovementAction
