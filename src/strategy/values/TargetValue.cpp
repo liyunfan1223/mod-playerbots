@@ -104,7 +104,7 @@ bool FindTargetStrategy::IsHighPriority(Unit* attacker)
 {
     if (Group* group = botAI->GetBot()->GetGroup())
     {
-        ObjectGuid guid = group->GetTargetIcon(4);
+        ObjectGuid guid = group->GetTargetIcon(7);
         if (guid && attacker->GetGUID() == guid) {
             return true;
         }

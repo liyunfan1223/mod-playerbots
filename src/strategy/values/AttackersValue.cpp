@@ -35,7 +35,7 @@ GuidVector AttackersValue::Calculate()
         }
     }
     if (Group* group = bot->GetGroup()) {
-        ObjectGuid skullGuid = group->GetTargetIcon(4);
+        ObjectGuid skullGuid = group->GetTargetIcon(7);
         Unit* skullTarget = botAI->GetUnit(skullGuid);
         if (skullTarget && IsValidTarget(skullTarget, bot)) {
             targets.insert(skullTarget);
