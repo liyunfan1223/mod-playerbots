@@ -78,9 +78,8 @@ class AvoidAoeAction : public MovementAction
         bool AvoidAuraWithDynamicObj();
         bool AvoidGameObjectWithDamage();
         bool AvoidUnitWithDamageAura();
-        // Position PositionForTank(Position pos, float radius);
-        // Position PositionForMelee(Position pos, float radius);
-        // Position PositionForRanged(Position pos, float radius);
+        Position BestPositionForMelee(Position pos, float radius);
+        Position BestPositionForRanged(Position pos, float radius);
         bool FleePosition(Position pos, float radius, std::string name);
         time_t lastTellTimer = 0;
 };

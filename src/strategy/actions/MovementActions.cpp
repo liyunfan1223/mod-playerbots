@@ -1645,16 +1645,23 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
     return false;
 }
 
-bool AvoidAoeAction::FleePosition(Position pos, float radius, std::string name)
+Position AvoidAoeAction::BestPositionForMelee(Position pos, float radius)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     std::vector<float> possibleAngles;
     if (currentTarget) {
         // Normally, move to left or right is the best position
-        float angleLeft = bot->GetAngle(currentTarget) + M_PI / 2;
-        float angleRight = bot->GetAngle(currentTarget) - M_PI / 2;
+        bool isTanking = (currentTarget->CanFreeMove()) && (currentTarget->GetVictim() == bot);
+        float angle = bot->GetAngle(currentTarget);
+        float angleLeft = angle + M_PI / 2;
+        float angleRight = angle - M_PI / 2;
         possibleAngles.push_back(angleLeft);
         possibleAngles.push_back(angleRight);
+        if (isTanking) {
+            possibleAngles.push_back(angle + M_PI);
+            possibleAngles.push_back(angle);
+            possibleAngles.push_back(bot->GetAngle(&pos) - M_PI);
+        }
     } else {
         float angleTo = bot->GetAngle(&pos) - M_PI;
         possibleAngles.push_back(angleTo);
@@ -1673,6 +1680,67 @@ bool AvoidAoeAction::FleePosition(Position pos, float radius, std::string name)
         }
     }
     if (farestDis > 0.0f) {
+        return bestPos;
+    }
+    return Position();
+}
+
+Position AvoidAoeAction::BestPositionForRanged(Position pos, float radius)
+{
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+    std::vector<float> possibleAngles;
+    float angleToTarget = 0.0f;
+    float angleFleeFromCenter = bot->GetAngle(&pos) - M_PI;
+    if (currentTarget) {
+        // Normally, move to left or right is the best position
+        angleToTarget = bot->GetAngle(currentTarget);
+        float angleLeft = angleToTarget + M_PI / 2;
+        float angleRight = angleToTarget - M_PI / 2;
+        possibleAngles.push_back(angleLeft);
+        possibleAngles.push_back(angleRight);
+        possibleAngles.push_back(angleToTarget + M_PI);
+        possibleAngles.push_back(angleToTarget);
+        possibleAngles.push_back(angleFleeFromCenter);
+    } else {
+        possibleAngles.push_back(angleFleeFromCenter);
+    }
+    float farestDis = 0.0f;
+    Position bestPos;
+    for (float &angle : possibleAngles) {
+        float fleeDis = sPlayerbotAIConfig->fleeDistance;
+        Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis,
+            bot->GetPositionY() + sin(angle) * fleeDis, 
+            bot->GetPositionZ()};
+        // backward, flee
+        if (currentTarget && (angle == angleToTarget + M_PI || angle == angleFleeFromCenter) 
+                && fleePos.GetExactDist(currentTarget) > sPlayerbotAIConfig->spellDistance) {
+            continue;
+        }
+        // forward, flee
+        if (currentTarget && (angle == angleToTarget || angle == angleFleeFromCenter) 
+                && fleePos.GetExactDist(currentTarget) < (sPlayerbotAIConfig->tooCloseDistance + 5.0f)) {
+            continue;
+        }
+        if (pos.GetExactDist(fleePos) > farestDis) {
+            farestDis = pos.GetExactDist(fleePos);
+            bestPos = fleePos;
+        }
+    }
+    if (farestDis > 0.0f) {
+        return bestPos;
+    }
+    return Position();
+}
+
+bool AvoidAoeAction::FleePosition(Position pos, float radius, std::string name)
+{
+    Position bestPos;
+    if (botAI->IsMelee(bot)) {
+        bestPos = BestPositionForMelee(pos, radius);
+    } else if (botAI->IsRanged(bot)) {
+        bestPos = BestPositionForRanged(pos, radius);
+    }
+    if (bestPos != Position()) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
             if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
                 lastTellTimer = time(NULL);
