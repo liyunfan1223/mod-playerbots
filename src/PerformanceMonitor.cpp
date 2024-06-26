@@ -59,7 +59,7 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
                 total += map.second->totalTime;
 
         LOG_INFO("playerbots", "--------------------------------------[TOTAL BOT]------------------------------------------------------");
-        LOG_INFO("playerbots", "percentage   time    |   min  ..    max (     avg  of     count ) - type : name                        ");
+        LOG_INFO("playerbots", "percentage     time  |    min ..    max (      avg  of      count) - type      : name");
 
         for (std::map<PerformanceMetric, std::map<std::string, PerformanceData*>>::iterator i = data.begin(); i != data.end(); ++i)
         {
@@ -115,7 +115,7 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
 
                 if (avg >= 0.5f || pd->maxTime > 10)
                 {
-                    LOG_INFO("playerbots", "%7.3f%% %10.3fs | %6u .. %6u (%9.4f of %10u) - {}    : {}"
+                    LOG_INFO("playerbots", "{:7.3f}% {:10.3f}s | {:6d} .. {:6d} ({:10.3f} of {:10d}) - {:6}    : {}"
                         , perc
                         , secs
                         , pd->minTime
@@ -134,10 +134,8 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
         float totalCount = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->count;
         total = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->totalTime;
 
-        LOG_INFO("playerbots", " ");
-        LOG_INFO("playerbots", " ");
         LOG_INFO("playerbots", "---------------------------------------[PER TICK]------------------------------------------------------");
-        LOG_INFO("playerbots", "percentage   time    |   min  ..    max (     avg  of     count ) - type : name                        ");
+        LOG_INFO("playerbots", "percentage     time  |    min ..    max (      avg  of      count) - type      : name");
 
         for (std::map<PerformanceMetric, std::map<std::string, PerformanceData*>>::iterator i = data.begin(); i != data.end(); ++i)
         {
@@ -190,7 +188,7 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
 
                 if (avg >= 0.5f || pd->maxTime > 10)
                 {
-                    LOG_INFO("playerbots", "%7.3f%% %9ums | %6u .. %6u (%9.4f of %10.3f) - {}    : {}"
+                    LOG_INFO("playerbots", "{:7.3f}% {:9d}ms | {:6d} .. {:6d} ({:10.3f} of {:10.3f}) - {:6}    : {}"
                         , perc
                         , secs
                         , pd->minTime

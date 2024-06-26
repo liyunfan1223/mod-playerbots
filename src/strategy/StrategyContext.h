@@ -87,7 +87,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
             creators["map full"] = &StrategyContext::map_full;
             creators["sit"] = &StrategyContext::sit;
             creators["mark rti"] = &StrategyContext::mark_rti;
-            creators["ads"] = &StrategyContext::possible_adds;
+            creators["adds"] = &StrategyContext::possible_adds;
             creators["close"] = &StrategyContext::close;
             creators["ranged"] = &StrategyContext::ranged;
             creators["behind"] = &StrategyContext::behind;
