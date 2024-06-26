@@ -357,8 +357,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     // bot->SaveToDB(false, false);
     // InitGuild();
     // bot->SaveToDB(false, false);
-    if (pmo)
-        pmo->finish();
+    //if (pmo)
+    //    pmo->finish();
 
     // if (bot->getLevel() >= 70)
     // {
