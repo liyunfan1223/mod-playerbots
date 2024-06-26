@@ -250,30 +250,13 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
     bool hasBots = (sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE]) >= bg->GetMinPlayersPerTeam();
     
     if (!sPlayerbotAIConfig->randomBotAutoJoinBG && !hasPlayers)
-    {
         return false;
 
-        if (sPlayerbotAIConfig->enablePrototypePerformanceDiff)
-        {
-            if (!noLag)
-            {
-                return false;
-            }
-        }
-    }
-    
-    if (!hasPlayers && !(isArena)) 
-    {
+    if (!(hasPlayers || hasBots))
         return false;
 
-        if (sPlayerbotAIConfig->enablePrototypePerformanceDiff) 
-        {
-            if (!noLag) 
-            {
-                return false;
-            }
-        }
-    }
+    if (sPlayerbotAIConfig->enablePrototypePerformanceDiff && !hasPlayers && !noLag)
+        return false;
 
     uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
     uint32 TeamSize = bg->GetMaxPlayersPerTeam();
@@ -607,7 +590,6 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
 
     bool isArena = false;
     bool isRated = false;
-    bool noLag = sWorldUpdateTime.GetAverageUpdateTime() < (sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer) * 1.1;
 
     ArenaType type = ArenaType(BattlegroundMgr::BGArenaType(queueTypeId));
     if (type != ARENA_TYPE_NONE)
