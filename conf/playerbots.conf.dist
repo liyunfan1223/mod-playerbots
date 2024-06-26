@@ -338,8 +338,8 @@ AiPlayerbot.AutoSaveMana = 1
 AiPlayerbot.SaveManaThreshold = 60
 
 # Enable auto avoid aoe (experimental)
-# Default: 0 (disable)
-AiPlayerbot.AutoAvoidAoe = 0
+# Default: 1 (enable)
+AiPlayerbot.AutoAvoidAoe = 1
 
 # Tell which spell is avoiding (experimental)
 # Default: 1 (enable)
