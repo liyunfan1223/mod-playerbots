@@ -1711,13 +1711,11 @@ Position AvoidAoeAction::BestPositionForRanged(Position pos, float radius)
         Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis,
             bot->GetPositionY() + sin(angle) * fleeDis, 
             bot->GetPositionZ()};
-        // backward, flee
-        if (currentTarget && (angle == angleToTarget + M_PI || angle == angleFleeFromCenter) 
+        if (currentTarget // && (angle == angleToTarget + M_PI || angle == angleFleeFromCenter) 
                 && fleePos.GetExactDist(currentTarget) > sPlayerbotAIConfig->spellDistance) {
             continue;
         }
-        // forward, flee
-        if (currentTarget && (angle == angleToTarget || angle == angleFleeFromCenter) 
+        if (currentTarget // && (angle == angleToTarget || angle == angleFleeFromCenter) 
                 && fleePos.GetExactDist(currentTarget) < (sPlayerbotAIConfig->tooCloseDistance + 5.0f)) {
             continue;
         }
@@ -1737,7 +1735,7 @@ bool AvoidAoeAction::FleePosition(Position pos, float radius, std::string name)
     Position bestPos;
     if (botAI->IsMelee(bot)) {
         bestPos = BestPositionForMelee(pos, radius);
-    } else if (botAI->IsRanged(bot)) {
+    } else {
         bestPos = BestPositionForRanged(pos, radius);
     }
     if (bestPos != Position()) {
