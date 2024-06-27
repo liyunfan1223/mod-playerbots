@@ -11,11 +11,6 @@ bool XpGainAction::Execute(Event event)
 {
     context->GetValue<uint32>("death count")->Set(0);
 
-    if (sRandomPlayerbotMgr->IsRandomBot(bot) && sPlayerbotAIConfig->randomBotFixedLevel) {
-        bot->SetUInt32Value(PLAYER_XP, 0);
-        return true;
-    }
-
     if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->playerbotsXPrate == 1)
         return true;
 
