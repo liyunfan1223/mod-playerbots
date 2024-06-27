@@ -97,6 +97,10 @@ AiPlayerbot.SummonWhenGroup = 1
 AiPlayerbot.RandomBotShowHelmet = 1
 AiPlayerbot.RandomBotShowCloak = 1
 
+# Fix the level of random bot (won't level up by grinding)
+# Default: 0 (disable)
+AiPlayerbot.RandomBotFixedLevel = 0
+
 # Disable random levels for randombots
 # Every bots started on the specified level and level up by killing mobs.
 AiPlayerbot.DisableRandomLevels = 0

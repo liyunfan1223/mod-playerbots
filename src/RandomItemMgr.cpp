@@ -2159,6 +2159,9 @@ void RandomItemMgr::BuildEquipCacheNew()
         if (IsTestItem(itemId)) {
             continue;
         }
+        if (itemId == 22784) { // Sunwell Orb
+            continue;
+        }
         equipCacheNew[proto->RequiredLevel][proto->InventoryType].push_back(itemId);
     }
 }

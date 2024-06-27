@@ -4,12 +4,18 @@
 
 #include "XpGainAction.h"
 #include "Event.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
 bool XpGainAction::Execute(Event event)
 {
     context->GetValue<uint32>("death count")->Set(0);
 
+    if (sPlayerbotAIConfig->randomBotFixedLevel) {
+        bot->SetUInt32Value(PLAYER_XP, 0);
+        return true;
+    }
+    
     if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->playerbotsXPrate == 1)
         return true;
 
