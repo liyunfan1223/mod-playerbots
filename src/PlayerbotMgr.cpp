@@ -450,7 +450,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     if (isRandomAccount && sPlayerbotAIConfig->randomBotFixedLevel) {
         bot->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
-    } else {
+    } else if (isRandomAccount && !sPlayerbotAIConfig->randomBotFixedLevel) {
         bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
     }
 

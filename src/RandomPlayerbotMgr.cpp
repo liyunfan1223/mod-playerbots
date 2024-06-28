@@ -1257,9 +1257,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
 
 void RandomPlayerbotMgr::PrepareTeleportCache()
 {
-    uint8 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-    if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
     LOG_INFO("playerbots", "Preparing random teleport caches for {} levels...", maxLevel);
 

@@ -2502,8 +2502,7 @@ void PlayerbotFactory::InitAmmo()
         case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             subClass = ITEM_SUBCLASS_ARROW;
             break;
-        case ITEM_SUBCLASS_WEAPON_THROWN:
-            subClass = ITEM_SUBCLASS_THROWN;
+        default:
             break;
     }
 
@@ -2516,7 +2515,7 @@ void PlayerbotFactory::InitAmmo()
 
     if (count < maxCount / 2)
     {
-        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount / 2)) {
+        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount)) {
             newItem->AddToUpdateQueueOf(bot);
         }
     }
