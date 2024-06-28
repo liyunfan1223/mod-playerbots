@@ -2515,7 +2515,7 @@ void PlayerbotFactory::InitAmmo()
 
     if (count < maxCount / 2)
     {
-        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount)) {
+        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount / 2)) {
             newItem->AddToUpdateQueueOf(bot);
         }
     }
