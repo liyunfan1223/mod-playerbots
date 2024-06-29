@@ -3891,7 +3891,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
         // fury with titan's grip
         if (isDoubleHand && proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM && 
             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && bot->CanTitanGrip())) {
-            score *= 0.1;
+            score *= 10;
         }
     }
     if (proto->Class == ITEM_CLASS_WEAPON) {
