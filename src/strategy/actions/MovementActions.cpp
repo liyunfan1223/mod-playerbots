@@ -1653,17 +1653,17 @@ Position AvoidAoeAction::BestPositionForMelee(Position pos, float radius)
         // Normally, move to left or right is the best position
         bool isTanking = (currentTarget->CanFreeMove()) && (currentTarget->GetVictim() == bot);
         float angle = bot->GetAngle(currentTarget);
-        float angleLeft = angle + M_PI / 2;
-        float angleRight = angle - M_PI / 2;
+        float angleLeft = angle + (float)M_PI / 2;
+        float angleRight = angle - (float)M_PI / 2;
         possibleAngles.push_back({angleLeft, false});
         possibleAngles.push_back({angleRight, false});
         possibleAngles.push_back({angle, true});
         if (isTanking) {
-            possibleAngles.push_back({angle + M_PI, false});
-            possibleAngles.push_back({bot->GetAngle(&pos) - M_PI, false});
+            possibleAngles.push_back({angle + (float)M_PI, false});
+            possibleAngles.push_back({bot->GetAngle(&pos) - (float)M_PI, false});
         }
     } else {
-        float angleTo = bot->GetAngle(&pos) - M_PI;
+        float angleTo = bot->GetAngle(&pos) - (float)M_PI;
         possibleAngles.push_back({angleTo, false});
     }
     float farestDis = 0.0f;
@@ -1695,15 +1695,15 @@ Position AvoidAoeAction::BestPositionForRanged(Position pos, float radius)
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     std::vector<CheckAngle> possibleAngles;
     float angleToTarget = 0.0f;
-    float angleFleeFromCenter = bot->GetAngle(&pos) - M_PI;
+    float angleFleeFromCenter = bot->GetAngle(&pos) - (float)M_PI;
     if (currentTarget) {
         // Normally, move to left or right is the best position
         angleToTarget = bot->GetAngle(currentTarget);
-        float angleLeft = angleToTarget + M_PI / 2;
-        float angleRight = angleToTarget - M_PI / 2;
+        float angleLeft = angleToTarget + (float)M_PI / 2;
+        float angleRight = angleToTarget - (float)M_PI / 2;
         possibleAngles.push_back({angleLeft, false});
         possibleAngles.push_back({angleRight, false});
-        possibleAngles.push_back({angleToTarget + M_PI, true});
+        possibleAngles.push_back({angleToTarget + (float)M_PI, true});
         possibleAngles.push_back({angleToTarget, true});
         possibleAngles.push_back({angleFleeFromCenter, true});
     } else {
