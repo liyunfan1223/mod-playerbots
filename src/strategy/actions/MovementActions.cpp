@@ -1648,32 +1648,37 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
 Position AvoidAoeAction::BestPositionForMelee(Position pos, float radius)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
-    std::vector<float> possibleAngles;
+    std::vector<CheckAngle> possibleAngles;
     if (currentTarget) {
         // Normally, move to left or right is the best position
         bool isTanking = (currentTarget->CanFreeMove()) && (currentTarget->GetVictim() == bot);
         float angle = bot->GetAngle(currentTarget);
         float angleLeft = angle + M_PI / 2;
         float angleRight = angle - M_PI / 2;
-        possibleAngles.push_back(angleLeft);
-        possibleAngles.push_back(angleRight);
+        possibleAngles.push_back({angleLeft, false});
+        possibleAngles.push_back({angleRight, false});
+        possibleAngles.push_back({angle, true});
         if (isTanking) {
-            possibleAngles.push_back(angle + M_PI);
-            possibleAngles.push_back(angle);
-            possibleAngles.push_back(bot->GetAngle(&pos) - M_PI);
+            possibleAngles.push_back({angle + M_PI, false});
+            possibleAngles.push_back({bot->GetAngle(&pos) - M_PI, false});
         }
     } else {
         float angleTo = bot->GetAngle(&pos) - M_PI;
-        possibleAngles.push_back(angleTo);
+        possibleAngles.push_back({angleTo, false});
     }
     float farestDis = 0.0f;
     Position bestPos;
-    for (float &angle : possibleAngles) {
+    for (CheckAngle &checkAngle : possibleAngles) {
+        float angle = checkAngle.angle;
+        bool strict = checkAngle.strict;
         float fleeDis = sPlayerbotAIConfig->fleeDistance;
         Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis,
             bot->GetPositionY() + sin(angle) * fleeDis, 
             bot->GetPositionZ()};
-        // todo (Yunfan): check carefully
+        if (strict && currentTarget
+                && fleePos.GetExactDist(currentTarget) - currentTarget->GetCombatReach() > sPlayerbotAIConfig->tooCloseDistance) {
+            continue;
+        }
         if (pos.GetExactDist(fleePos) > farestDis) {
             farestDis = pos.GetExactDist(fleePos);
             bestPos = fleePos;
@@ -1688,7 +1693,7 @@ Position AvoidAoeAction::BestPositionForMelee(Position pos, float radius)
 Position AvoidAoeAction::BestPositionForRanged(Position pos, float radius)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
-    std::vector<float> possibleAngles;
+    std::vector<CheckAngle> possibleAngles;
     float angleToTarget = 0.0f;
     float angleFleeFromCenter = bot->GetAngle(&pos) - M_PI;
     if (currentTarget) {
@@ -1696,27 +1701,29 @@ Position AvoidAoeAction::BestPositionForRanged(Position pos, float radius)
         angleToTarget = bot->GetAngle(currentTarget);
         float angleLeft = angleToTarget + M_PI / 2;
         float angleRight = angleToTarget - M_PI / 2;
-        possibleAngles.push_back(angleLeft);
-        possibleAngles.push_back(angleRight);
-        possibleAngles.push_back(angleToTarget + M_PI);
-        possibleAngles.push_back(angleToTarget);
-        possibleAngles.push_back(angleFleeFromCenter);
+        possibleAngles.push_back({angleLeft, false});
+        possibleAngles.push_back({angleRight, false});
+        possibleAngles.push_back({angleToTarget + M_PI, true});
+        possibleAngles.push_back({angleToTarget, true});
+        possibleAngles.push_back({angleFleeFromCenter, true});
     } else {
-        possibleAngles.push_back(angleFleeFromCenter);
+        possibleAngles.push_back({angleFleeFromCenter, false});
     }
     float farestDis = 0.0f;
     Position bestPos;
-    for (float &angle : possibleAngles) {
+    for (CheckAngle &checkAngle : possibleAngles) {
+        float angle = checkAngle.angle;
+        bool strict = checkAngle.strict;
         float fleeDis = sPlayerbotAIConfig->fleeDistance;
         Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis,
             bot->GetPositionY() + sin(angle) * fleeDis, 
             bot->GetPositionZ()};
-        if (currentTarget // && (angle == angleToTarget + M_PI || angle == angleFleeFromCenter) 
-                && fleePos.GetExactDist(currentTarget) > sPlayerbotAIConfig->spellDistance) {
+        if (strict && currentTarget
+                && fleePos.GetExactDist(currentTarget) - currentTarget->GetCombatReach() > sPlayerbotAIConfig->spellDistance) {
             continue;
         }
-        if (currentTarget // && (angle == angleToTarget || angle == angleFleeFromCenter) 
-                && fleePos.GetExactDist(currentTarget) < (sPlayerbotAIConfig->tooCloseDistance + 5.0f)) {
+        if (strict && currentTarget
+                && fleePos.GetExactDist(currentTarget) - currentTarget->GetCombatReach() < (sPlayerbotAIConfig->tooCloseDistance)) {
             continue;
         }
         if (pos.GetExactDist(fleePos) > farestDis) {

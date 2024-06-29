@@ -82,6 +82,10 @@ class AvoidAoeAction : public MovementAction
         Position BestPositionForRanged(Position pos, float radius);
         bool FleePosition(Position pos, float radius, std::string name);
         time_t lastTellTimer = 0;
+        struct CheckAngle {
+            float angle;
+            bool strict;
+        };
 };
 
 class RunAwayAction : public MovementAction
