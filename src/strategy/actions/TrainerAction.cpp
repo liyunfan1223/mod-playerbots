@@ -175,6 +175,15 @@ bool MaintenanceAction::Execute(Event event)
     return true;
 }
 
+bool RemoveGlyphAction::Execute(Event event)
+{
+    for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
+    {
+        bot->SetGlyph(slotIndex, 0, true);
+    }
+    return true;
+}
+
 bool AutoGearAction::Execute(Event event)
 {
     if (!sPlayerbotAIConfig->autoGearCommand) {

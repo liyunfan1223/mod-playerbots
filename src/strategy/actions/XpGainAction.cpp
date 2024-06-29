@@ -4,6 +4,7 @@
 
 #include "XpGainAction.h"
 #include "Event.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
 bool XpGainAction::Execute(Event event)

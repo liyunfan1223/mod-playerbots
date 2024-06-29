@@ -81,8 +81,10 @@ bool SummonAction::Execute(Event event)
         pet->GetCharmInfo()->IsReturning();
     }
 
-    if (master->GetSession()->GetSecurity() >= SEC_PLAYER)
+    if (master->GetSession()->GetSecurity() >= SEC_PLAYER) {
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
         return Teleport(master, bot);
+    }
 
     if (SummonUsingGos(master, bot) || SummonUsingNpcs(master, bot))
     {
