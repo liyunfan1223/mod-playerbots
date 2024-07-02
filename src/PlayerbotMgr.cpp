@@ -448,6 +448,12 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     uint32 accountId = bot->GetSession()->GetAccountId();
     bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
 
+    if (isRandomAccount && sPlayerbotAIConfig->randomBotFixedLevel) {
+        bot->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    } else if (isRandomAccount && !sPlayerbotAIConfig->randomBotFixedLevel) {
+        bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    }
+
     bot->SaveToDB(false, false);
     if (master && isRandomAccount && master->GetLevel() < bot->GetLevel()) {
         // PlayerbotFactory factory(bot, master->getLevel());

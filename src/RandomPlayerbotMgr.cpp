@@ -1190,6 +1190,10 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         AreaTableEntry const* zone = sAreaTableStore.LookupEntry(map->GetZoneId(bot->GetPhaseMask(), x, y, z));
         if (!zone)
             continue;
+        
+        AreaTableEntry const* area = sAreaTableStore.LookupEntry(map->GetAreaId(bot->GetPhaseMask(), x, y, z));
+        if (!area)
+            continue;
 
         // Do not teleport to enemy zones if level is low
         if (zone->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
@@ -1218,9 +1222,14 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         if (bot->GetLevel() <= 18 && (loc.GetMapId() != pInfo->mapId || dis > 10000.0f)) {
             continue;
         }
-
-        LOG_INFO("playerbots", "Random teleporting bot {} (level {}) to {} {},{},{} ({}/{} locations)",
-            bot->GetName().c_str(), bot->GetLevel(), zone->area_name[0], x, y, z, i + 1, tlocs.size());
+        LocaleConstant locale = sWorld->GetDefaultDbcLocale();
+        
+        LOG_INFO("playerbots", "Random teleporting bot {} (level {}) to Map: {} ({}) Zone: {} ({}) Area: {} ({}) {},{},{} ({}/{} locations)",
+            bot->GetName().c_str(), bot->GetLevel(), 
+            map->GetId(), map->GetMapName(), 
+            zone->ID, zone->area_name[locale], 
+            area->ID, area->area_name[locale], 
+            x, y, z, i + 1, tlocs.size());
 
         if (hearth)
         {
@@ -1248,9 +1257,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
 
 void RandomPlayerbotMgr::PrepareTeleportCache()
 {
-    uint8 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-    if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
     LOG_INFO("playerbots", "Preparing random teleport caches for {} levels...", maxLevel);
 

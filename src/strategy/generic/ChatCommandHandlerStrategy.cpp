@@ -89,6 +89,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("de");
     supported.push_back("trainer");
     supported.push_back("maintenance");
+    supported.push_back("remove glyph");
     supported.push_back("autogear");
     supported.push_back("equip upgrade");
     supported.push_back("chat");
