@@ -6,6 +6,8 @@ Welcome to the Playerbots Module for AzerothCore, a work in progress project bas
 
 If you encounter any errors or experience crashes, we kindly request that you report them as GitHub issues. Your valuable feedback will help us improve and enhance this project collaboratively.
 
+You can also get more information in our [discord](https://discord.gg/NQm5QShwf9).
+
 ## Installation
 
 Please note that this module requires specific custom changes to AzerothCore. To ensure compatibility, you must compile it with a custom branch from my fork, which can be found here: [liyunfan1223/azerothcore-wotlk/tree/Playerbot](https://github.com/liyunfan1223/azerothcore-wotlk/tree/Playerbot).
@@ -48,7 +50,9 @@ It's essential to note that there is still a significant amount of work to be do
 
 ## Addon
 
-For enhanced control over the bots and to simplify command usage, you can also make use of our addon: [Unbot Addon](https://github.com/liyunfan1223/unbot-addon). Currently, this addon offers better support only for Simplified Chinese client.
+For enhanced control over the bots and to simplify command usage, you can also make use of our addon:
+- Chinese version: [Unbot Addon (zh)](https://github.com/liyunfan1223/unbot-addon). 
+- English version (maintained by @Revision): [Unbot Addon (en)](https://github.com/noisiver/unbot-addon/tree/english).
 
 ## Frequently Asked Questions
 
