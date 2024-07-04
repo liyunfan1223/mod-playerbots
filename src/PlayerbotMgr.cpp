@@ -533,8 +533,11 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         if (ObjectAccessor::FindPlayer(guid))
             return "player already logged in";
 
-        if (!sPlayerbotAIConfig->allowPlayerBots && !isRandomAccount && !isMasterAccount)
-            return "You cannot login another player's character as bot.";
+        if (!admin)
+        {
+            if (!sPlayerbotAIConfig->allowPlayerBots && !isRandomAccount && !isMasterAccount)
+                return "You cannot login another player's character as bot.";
+        }
 
         AddPlayerBot(guid, masterAccountId);
         return "ok";
@@ -560,7 +563,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     if (!bot)
         return "bot not found";
 
-    if (!isRandomAccount || isRandomBot) {
+    if (!admin && (!isRandomAccount || isRandomBot)) {
         return "ERROR: You can not use this command on non-summoned random bot.";
     }
 
