@@ -2607,6 +2607,13 @@ bool BGTactics::Execute(Event event)
     if (bg->GetStatus() == STATUS_WAIT_LEAVE)
         return false;
 
+    if (bg->isArena())
+    {
+        // can't use this in arena - it will crash server wehen vPaths/vFlagIds are used uninitialized
+        botAI->ResetStrategies();
+        return false;
+    }
+
     if (bg->GetStatus() == STATUS_IN_PROGRESS)
         botAI->ChangeStrategy("-buff", BOT_STATE_NON_COMBAT);
 
@@ -4866,11 +4873,12 @@ bool ArenaTactics::Execute(Event event)
     if (botAI->HasStrategy("buff", BOT_STATE_NON_COMBAT))
         botAI->ChangeStrategy("-buff", BOT_STATE_NON_COMBAT);
 
-    if (sBattlegroundMgr->IsArenaType(bg->GetBgTypeID()))
-    {
-        botAI->ResetStrategies(false);
-        botAI->SetMaster(nullptr);
-    }
+// this causes bot to reset constantly in arena
+//    if (sBattlegroundMgr->IsArenaType(bg->GetBgTypeID()))
+//    {
+//        botAI->ResetStrategies(false);
+//        botAI->SetMaster(nullptr);
+//    }
 
     if (!bot->IsInCombat())
         return moveToCenter(bg);
