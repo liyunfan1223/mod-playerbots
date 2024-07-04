@@ -2659,7 +2659,6 @@ bool BGTactics::Execute(Event event)
             // can't use this in this BG - no vPaths/vFlagIds (will crash server)
             botAI->ResetStrategies();
             return false;
-            break;
     }
 
     if (getName() == "move to start")
@@ -4924,7 +4923,7 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
             }
             break;
         case BATTLEGROUND_RV:
-            MoveTo(bg->GetMapId(), 764.65f + frand(-1, +1), -283.85f + frand(-2, +2), 28.28f, false, true);
+            MoveTo(bg->GetMapId(), 764.65f + frand(-2, +2), -283.85f + frand(-2, +2), 28.28f, false, true);
             break;
         default:
             break;
