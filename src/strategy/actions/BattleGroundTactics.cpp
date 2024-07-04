@@ -4914,6 +4914,18 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
         case BATTLEGROUND_NA:
             MoveTo(bg->GetMapId(), 4055.0f + frand(-5, +5), 2921.0f + frand(-5, +5), 15.1f, false, true);
             break;
+        case BATTLEGROUND_DS:
+            if (!MoveTo(bg->GetMapId(), 1291.58f + frand(-5, +5), 790.87f + frand(-5, +5), 7.8f, false, true)) {
+                // they like to hang around at the tip of the pipes doing nothing, so we just teleport them down
+                if (bot->GetDistance(1333.07f, 817.18f, 13.35f) < 2)
+                    bot->TeleportTo(bg->GetMapId(), 1330.96f, 816.75f, 3.2f, bot->GetOrientation());
+                if (bot->GetDistance(1250.13f, 764.79f, 13.34f) < 2)
+                    bot->TeleportTo(bg->GetMapId(), 1252.19f, 765.41f, 3.2f, bot->GetOrientation());
+            }
+            break;
+        case BATTLEGROUND_RV:
+            MoveTo(bg->GetMapId(), 764.65f + frand(-1, +1), -283.85f + frand(-2, +2), 28.28f, false, true);
+            break;
         default:
             break;
     }
