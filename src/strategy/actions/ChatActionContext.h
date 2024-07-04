@@ -115,6 +115,7 @@ class ChatActionContext : public NamedObjectContext<Action>
             creators["de"] = &ChatActionContext::dead;
             creators["trainer"] = &ChatActionContext::trainer;
             creators["maintenance"] = &ChatActionContext::maintenance;
+            creators["remove glyph"] = &ChatActionContext::remove_glyph;
             creators["autogear"] = &ChatActionContext::autogear;
             creators["equip upgrade"] = &ChatActionContext::equip_upgrade;
             creators["attack my target"] = &ChatActionContext::attack_my_target;
@@ -215,6 +216,7 @@ class ChatActionContext : public NamedObjectContext<Action>
         static Action* attack_my_target(PlayerbotAI* botAI) { return new AttackMyTargetAction(botAI); }
         static Action* trainer(PlayerbotAI* botAI) { return new TrainerAction(botAI); }
         static Action* maintenance(PlayerbotAI* botAI) { return new MaintenanceAction(botAI); }
+        static Action* remove_glyph(PlayerbotAI* botAI) { return new RemoveGlyphAction(botAI); }
         static Action* autogear(PlayerbotAI* botAI) { return new AutoGearAction(botAI); }
         static Action* equip_upgrade(PlayerbotAI* botAI) { return new EquipUpgradeAction(botAI); }
         static Action* co(PlayerbotAI* botAI) { return new ChangeCombatStrategyAction(botAI); }

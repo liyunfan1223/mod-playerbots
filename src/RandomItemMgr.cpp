@@ -2159,6 +2159,9 @@ void RandomItemMgr::BuildEquipCacheNew()
         if (IsTestItem(itemId)) {
             continue;
         }
+        if (itemId == 22784) { // Sunwell Orb
+            continue;
+        }
         equipCacheNew[proto->RequiredLevel][proto->InventoryType].push_back(itemId);
     }
 }
@@ -2199,9 +2202,7 @@ RandomItemList RandomItemMgr::Query(uint32 level, uint8 clazz, uint8 slot, uint3
 
 void RandomItemMgr::BuildAmmoCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-    if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
     LOG_INFO("server.loading", "Building ammo cache for {} levels", maxLevel);
 
@@ -2238,9 +2239,9 @@ uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass)
 
 void RandomItemMgr::BuildPotionCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-    if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    // if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    //     maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
     LOG_INFO("server.loading", "Building potion cache for {} levels", maxLevel);
 

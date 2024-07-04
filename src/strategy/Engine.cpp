@@ -144,7 +144,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     ActionBasket* basket = nullptr;
 
     time_t currentTime = time(nullptr);
-    aiObjectContext->Update();
+    // aiObjectContext->Update();
     ProcessTriggers(minimal);
     PushDefaultActions();
     
@@ -469,7 +469,7 @@ bool Engine::HasStrategy(std::string const name)
 
 void Engine::ProcessTriggers(bool minimal)
 {
-    std::unordered_map<Trigger*, Event> fires;
+    // std::unordered_map<Trigger*, Event> fires;
     for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
     {
         TriggerNode* node = *i;
@@ -499,21 +499,22 @@ void Engine::ProcessTriggers(bool minimal)
             if (!event)
                 continue;
 
-            fires[trigger] = event;
+            // fires[trigger] = event;
             LogAction("T:%s", trigger->getName().c_str());
+            MultiplyAndPush(node->getHandlers(), 0.0f, false, event, "trigger");
         }
     }
 
-    for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
-    {
-        TriggerNode* node = *i;
-        Trigger* trigger = node->getTrigger();
-        Event event = fires[trigger];
-        if (!event)
-            continue;
+    // for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
+    // {
+    //     TriggerNode* node = *i;
+    //     Trigger* trigger = node->getTrigger();
+    //     if (fires.find(trigger) == fires.end())
+    //         continue;
 
-        MultiplyAndPush(node->getHandlers(), 0.0f, false, event, "trigger");
-    }
+    //     Event event = fires[trigger];
+
+    // }
 
     for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
     {

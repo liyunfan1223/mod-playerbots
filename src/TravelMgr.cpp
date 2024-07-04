@@ -1495,6 +1495,8 @@ void TravelTarget::setStatus(TravelStatus status)
             break;
         case TRAVEL_STATUS_COOLDOWN:
             statusTime = tDestination->getCooldownDelay();
+        default:
+            break;
     }
 }
 
@@ -3687,7 +3689,7 @@ void TravelMgr::LoadQuestTravelTable()
                         }
                     }
                     else
-                        "all";
+                        out << "all";
 
                     out << "\n";
                 }

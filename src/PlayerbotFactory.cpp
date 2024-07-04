@@ -2502,8 +2502,7 @@ void PlayerbotFactory::InitAmmo()
         case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             subClass = ITEM_SUBCLASS_ARROW;
             break;
-        case ITEM_SUBCLASS_WEAPON_THROWN:
-            subClass = ITEM_SUBCLASS_THROWN;
+        default:
             break;
     }
 
@@ -2512,7 +2511,7 @@ void PlayerbotFactory::InitAmmo()
 
     uint32 entry = sRandomItemMgr->GetAmmo(level, subClass);
     uint32 count = bot->GetItemCount(entry);
-    uint32 maxCount = 5000;
+    uint32 maxCount = 6000;
 
     if (count < maxCount / 2)
     {
@@ -3879,15 +3878,19 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
                 score *= 0.1;
         }
         // spec with double hand
-        // fury with titan's grip, fury without duel wield, arms, bear, retribution, blood dk
-        if (isDoubleHand && 
-            ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && bot->CanTitanGrip()) ||
-            (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !bot->CanDualWield()) ||
+        // fury without duel wield, arms, bear, retribution, blood dk
+        if (isDoubleHand &&
+            ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !bot->CanDualWield()) ||
             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) ||
             (cls == CLASS_DRUID && tab == 1) ||
             (cls == CLASS_PALADIN && tab == 2) ||
             (cls == CLASS_DEATH_KNIGHT && tab == 0) ||
             (cls == CLASS_SHAMAN && tab == 1 && !bot->CanDualWield()))) {
+            score *= 10;
+        }
+        // fury with titan's grip
+        if (isDoubleHand && proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM && 
+            (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && bot->CanTitanGrip())) {
             score *= 10;
         }
     }

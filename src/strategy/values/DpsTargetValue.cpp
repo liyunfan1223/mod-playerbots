@@ -71,6 +71,12 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
+            if (Group* group = botAI->GetBot()->GetGroup())
+            {
+                ObjectGuid guid = group->GetTargetIcon(4);
+                if (guid && attacker->GetGUID() == guid)
+                    return;
+            }
             if (!attacker->IsAlive()) {
                 return;
             }
@@ -138,6 +144,12 @@ class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
+            if (Group* group = botAI->GetBot()->GetGroup())
+            {
+                ObjectGuid guid = group->GetTargetIcon(4);
+                if (guid && attacker->GetGUID() == guid)
+                    return;
+            }
             if (!attacker->IsAlive()) {
                 return;
             }
@@ -193,6 +205,12 @@ class ComboFindTargetSmartStrategy : public FindTargetStrategy
 
         void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
         {
+            if (Group* group = botAI->GetBot()->GetGroup())
+            {
+                ObjectGuid guid = group->GetTargetIcon(4);
+                if (guid && attacker->GetGUID() == guid)
+                    return;
+            }
             if (!attacker->IsAlive()) {
                 return;
             }

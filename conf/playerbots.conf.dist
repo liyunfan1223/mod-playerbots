@@ -97,6 +97,10 @@ AiPlayerbot.SummonWhenGroup = 1
 AiPlayerbot.RandomBotShowHelmet = 1
 AiPlayerbot.RandomBotShowCloak = 1
 
+# Fix the level of random bot (won't level up by grinding)
+# Default: 0 (disable)
+AiPlayerbot.RandomBotFixedLevel = 0
+
 # Disable random levels for randombots
 # Every bots started on the specified level and level up by killing mobs.
 AiPlayerbot.DisableRandomLevels = 0
@@ -125,7 +129,7 @@ AiPlayerbot.MinEnchantingBotLevel = 60
 AiPlayerbot.LimitEnchantExpansion = 1
 
 # Randombots checking players gear score level and deny the group invite if it's too low
-# Default: 1 (enabled)
+# Default: 0 (disabled)
 AiPlayerbot.GearScoreCheck = 0
 
 # Quest that will be completed and rewarded to all random bots
@@ -338,8 +342,8 @@ AiPlayerbot.AutoSaveMana = 1
 AiPlayerbot.SaveManaThreshold = 60
 
 # Enable auto avoid aoe (experimental)
-# Default: 0 (disable)
-AiPlayerbot.AutoAvoidAoe = 0
+# Default: 1 (enable)
+AiPlayerbot.AutoAvoidAoe = 1
 
 # Tell which spell is avoiding (experimental)
 # Default: 1 (enable)

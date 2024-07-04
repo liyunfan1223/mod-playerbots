@@ -174,6 +174,7 @@ class PlayerbotAIConfig
         bool summonWhenGroup;
         bool randomBotShowHelmet;
         bool randomBotShowCloak;
+        bool randomBotFixedLevel;
         bool disableRandomLevels;
         uint32 playerbotsXPrate;
         bool disableDeathKnightLogin;
