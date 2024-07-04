@@ -2609,7 +2609,7 @@ bool BGTactics::Execute(Event event)
 
     if (bg->isArena())
     {
-        // can't use this in arena - it will crash server wehen vPaths/vFlagIds are used uninitialized
+        // can't use this in arena - no vPaths/vFlagIds (will crash server)
         botAI->ResetStrategies();
         return false;
     }
@@ -2656,6 +2656,9 @@ bool BGTactics::Execute(Event event)
             break;
         }
         default:
+            // can't use this in this BG - no vPaths/vFlagIds (will crash server)
+            botAI->ResetStrategies();
+            return false;
             break;
     }
 
