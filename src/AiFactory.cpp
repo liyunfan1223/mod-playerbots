@@ -274,6 +274,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     {
         engine->addStrategy("avoid aoe");
     }
+    engine->addStrategy("combat formation");
     switch (player->getClass())
     {
         case CLASS_PRIEST:

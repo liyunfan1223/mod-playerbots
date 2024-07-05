@@ -326,4 +326,10 @@ class UnitManualSetValue : public ManualSetValue<Unit*>
         Unit* Get() override;
 };
 
+class DisperseDistanceValue : public ManualSetValue<float>
+{
+    public:
+        DisperseDistanceValue(PlayerbotAI* botAI, float defaultValue = -1.0f, std::string const name = "disperse value") :
+            ManualSetValue<float>(botAI, defaultValue, name) { }
+};
 #endif

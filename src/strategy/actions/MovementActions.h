@@ -41,6 +41,14 @@ class MovementAction : public Action
         bool MoveAway(Unit* target);
         bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->followDistance);
         void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
+        Position BestPositionForMeleeToFlee(Position pos, float radius);
+        Position BestPositionForRangedToFlee(Position pos, float radius);
+        bool FleePosition(Position pos, float radius);
+    protected:
+        struct CheckAngle {
+            float angle;
+            bool strict;
+        };
     private:
         // float SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range = 20.0f, bool normal_only = false, float step = 8.0f);
         const Movement::PointsArray SearchForBestPath(float x, float y, float z, float &modified_z, int maxSearchCount = 5, bool normal_only = false, float step = 8.0f);
@@ -69,7 +77,8 @@ class FleeWithPetAction : public MovementAction
 class AvoidAoeAction : public MovementAction
 {
     public:
-        AvoidAoeAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid aoe") { }
+        AvoidAoeAction(PlayerbotAI* botAI, int moveInterval = 1000) : MovementAction(botAI, "avoid aoe"),
+            moveInterval(moveInterval) { }
 
         bool isUseful() override;
         bool Execute(Event event) override;
@@ -78,14 +87,36 @@ class AvoidAoeAction : public MovementAction
         bool AvoidAuraWithDynamicObj();
         bool AvoidGameObjectWithDamage();
         bool AvoidUnitWithDamageAura();
-        Position BestPositionForMelee(Position pos, float radius);
-        Position BestPositionForRanged(Position pos, float radius);
-        bool FleePosition(Position pos, float radius, std::string name);
         time_t lastTellTimer = 0;
-        struct CheckAngle {
-            float angle;
-            bool strict;
-        };
+        int lastMoveTimer = 0;
+        int moveInterval;
+        
+};
+
+class CombatFormationMoveAction : public MovementAction
+{
+    public:
+        CombatFormationMoveAction(PlayerbotAI* botAI, int moveInterval = 1000) : MovementAction(botAI, "combat formation move"),
+            moveInterval(moveInterval) { }
+
+        bool isUseful() override;
+        bool Execute(Event event) override;
+    
+    protected:
+        Position AverageGroupPos(float dis = sPlayerbotAIConfig->sightDistance);
+        Player* NearestGroupMember(float dis = sPlayerbotAIConfig->sightDistance);
+        int lastMoveTimer = 0;
+        int moveInterval;
+};
+
+class DisperseSetAction : public Action
+{
+    public:
+        DisperseSetAction(PlayerbotAI* botAI, std::string const name = "disperse set") : Action(botAI, name) { }
+
+        bool Execute(Event event) override;
+        float DEFAULT_DISPERSE_DISTANCE_RANGED = 5.0f;
+        float DEFAULT_DISPERSE_DISTANCE_MELEE = 2.0f;
 };
 
 class RunAwayAction : public MovementAction
