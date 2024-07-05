@@ -474,6 +474,48 @@ BattleBotPath vPath_AB_AllianceBase_to_Stables =
     { 1167.98f, 1202.9f, -56.4743f, nullptr },
 };
 
+// Blacksmith to Lumber Mill
+BattleBotPath vPath_AB_Blacksmith_to_LumberMill =
+{
+    { 967.04f, 1039.03f, -45.091f, nullptr },
+    { 933.67f, 1016.49f, -50.5154f, nullptr },
+    { 904.02f, 996.63f, -62.3461f, nullptr },
+    { 841.74f, 985.23f, -58.8920f, nullptr },
+    { 796.25f, 1009.93f, -44.3286f, nullptr },
+    { 781.29f, 1034.49f, -32.887f, nullptr },
+    { 793.17f, 1107.21f, 5.5663f, nullptr },
+    { 848.98f, 1155.9f, 11.3453f, nullptr },
+};
+
+// Blacksmith to GoldMine
+BattleBotPath vPath_AB_Blacksmith_to_GoldMine =
+{
+    { 1035.98f, 1015.66f, -46.0278f, nullptr },
+    { 1096.86f, 1002.05f, -60.8013f, nullptr },
+    { 1159.93f, 1003.69f, -63.8378f, nullptr },
+    { 1198.03f, 1064.09f, -65.8385f, nullptr },
+    { 1218.58f, 1016.96f, -76.9848f, nullptr },
+    { 1192.83f, 956.25f, -93.6974f, nullptr },
+    { 1162.93f, 908.92f, -108.6703f, nullptr },
+    { 1144.94f, 860.09f, -111.2100f, nullptr },
+};
+
+// Farm to Stables
+BattleBotPath vPath_AB_Farm_to_Stable =
+{
+    { 749.88f, 878.23f, -55.1523f, nullptr },
+    { 819.77f, 931.13f, -57.5882f, nullptr },
+    { 842.34f, 984.76f, -59.0333f, nullptr },
+    { 863.03f, 1051.47f, -58.0495f, nullptr },
+    { 899.28f, 1098.27f, -57.4149f, nullptr },
+    { 949.22f, 1153.27f, -54.4464f, nullptr },
+    { 999.07f, 1189.47f, -49.9125f, nullptr },
+    { 1063.11f, 1211.55f, -53.4164f, nullptr },
+    { 1098.45f, 1225.47f, -53.1301f, nullptr },
+    { 1146.02f, 1226.34f, -53.8979f, nullptr },
+    { 1167.10f, 1204.31f, -56.55f, nullptr },
+};
+
 // Alliance Base to Gold Mine
 BattleBotPath vPath_AB_AllianceBase_to_GoldMine =
 {
@@ -2070,6 +2112,9 @@ std::vector<BattleBotPath*> const vPaths_AB =
     &vPath_AB_Stables_to_LumberMill,
     &vPath_AB_Farm_to_GoldMine,
     &vPath_AB_Farm_to_LumberMill,
+    &vPath_AB_Blacksmith_to_LumberMill,
+    &vPath_AB_Blacksmith_to_GoldMine,
+    &vPath_AB_Farm_to_Stable,
 };
 
 std::vector<BattleBotPath*> const vPaths_AV =
