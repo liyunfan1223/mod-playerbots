@@ -252,6 +252,9 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
     if (!sPlayerbotAIConfig->randomBotAutoJoinBG && !hasPlayers)
         return false;
 
+    if (!hasPlayers && isArena) // avoid many arena's being created when 1 player queues a skirmish
+        return false;
+
     if (!(hasPlayers || hasBots))
         return false;
 
@@ -471,7 +474,8 @@ bool BGJoinAction::JoinQueue(uint32 type)
         isArena = true;
 
     // get battlemaster
-    Unit* unit = botAI->GetUnit(AI_VALUE2(CreatureData const*, "bg master", bgTypeId));
+    //Unit* unit = botAI->GetUnit(AI_VALUE2(CreatureData const*, "bg master", bgTypeId));
+    Unit* unit = botAI->GetUnit(sRandomPlayerbotMgr->GetBattleMasterGUID(bot, bgTypeId));
     if (!unit && isArena)
     { 
         botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
@@ -950,7 +954,8 @@ bool BGStatusAction::Execute(Event event)
         {
             if (ginfo.IsInvitedToBGInstanceGUID && !bot->InBattleground())
             {
-                Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, _bgTypeId);
+                // BattlegroundMgr::GetBattleground() does not return battleground if bgTypeId==BATTLEGROUND_AA
+                Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, _bgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : _bgTypeId);
                 if (bg)
                 {
                     if (isArena)
@@ -972,6 +977,10 @@ bool BGStatusAction::Execute(Event event)
                     bot->GetSession()->HandleBattleFieldPortOpcode(packet);
 
                     botAI->ResetStrategies(false);
+                    if (!bot->GetBattleground()) {
+                        // first bot to join wont have battleground and PlayerbotAI::ResetStrategies() wont set them up properly, set bg for "bg strategy check" to fix that
+                        botAI->ChangeStrategy("+bg", BOT_STATE_NON_COMBAT);
+                    }
                     context->GetValue<uint32>("bg role")->Set(urand(0, 9));
                     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
                     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
@@ -1049,7 +1058,8 @@ bool BGStatusAction::Execute(Event event)
 
             if (ginfo.IsInvitedToBGInstanceGUID)
             {
-                Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, _bgTypeId);
+                // BattlegroundMgr::GetBattleground() does not return battleground if bgTypeId==BATTLEGROUND_AA
+                Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, _bgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : _bgTypeId);
                 if (!bg)
                 {
                     LOG_ERROR("playerbots", "Bot {} {}:{} <{}>: Missing QueueInfo for {} {}",
@@ -1077,6 +1087,10 @@ bool BGStatusAction::Execute(Event event)
         bot->GetSession()->HandleBattleFieldPortOpcode(packet);
 
         botAI->ResetStrategies(false);
+        if (!bot->GetBattleground()) {
+            // first bot to join wont have battleground and PlayerbotAI::ResetStrategies() wont set them up properly, set bg for "bg strategy check" to fix that
+            botAI->ChangeStrategy("+bg", BOT_STATE_NON_COMBAT);
+        }
         context->GetValue<uint32>("bg role")->Set(urand(0, 9));
         PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
         PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];

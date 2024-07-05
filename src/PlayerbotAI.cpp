@@ -1808,6 +1808,16 @@ Player* PlayerbotAI::GetPlayer(ObjectGuid guid)
     return unit ? unit->ToPlayer() : nullptr;
 }
 
+uint32 GetCreatureIdForCreatureTemplateId(uint32 creatureTemplateId)
+{
+    QueryResult results = WorldDatabase.Query("SELECT guid FROM `acore_world`.`creature` WHERE id1 = {} LIMIT 1;", creatureTemplateId);
+    if (results) {
+        Field* fields = results->Fetch();
+        return fields[0].Get<uint32>();
+    }
+    return 0;
+}
+
 Unit* PlayerbotAI::GetUnit(CreatureData const* creatureData)
 {
     if (!creatureData)
@@ -1817,7 +1827,10 @@ Unit* PlayerbotAI::GetUnit(CreatureData const* creatureData)
     if (!map)
         return nullptr;
 
-    auto creatureBounds = map->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
+    uint32 spawnId = creatureData->spawnId;
+    if (!spawnId) // workaround for CreatureData with missing spawnId (this just uses first matching creatureId in DB, but thats ok this method is only used for battlemasters and theres only 1 of each type)
+        spawnId = GetCreatureIdForCreatureTemplateId(creatureData->id1);
+    auto creatureBounds = map->GetCreatureBySpawnIdStore().equal_range(spawnId);
     if (creatureBounds.first == creatureBounds.second)
         return nullptr;
 
