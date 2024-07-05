@@ -224,8 +224,8 @@ AiPlayerbot.SyncQuestForPlayer = 0
 AiPlayerbot.SyncLevelWithPlayers = 0
 
 # Give free food to random bots
-# Default: 0 (disabled)
-AiPlayerbot.FreeFood = 0
+# Default: 1 (enabled)
+AiPlayerbot.FreeFood = 1
 
 # Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
 # Only for random bots
@@ -351,6 +351,10 @@ AiPlayerbot.AutoAvoidAoe = 1
 # Tell which spell is avoiding (experimental)
 # Default: 1 (enable)
 AiPlayerbot.TellWhenAvoidAoe = 1
+
+# Premade spell to avoid (undetected spells)
+# spellid-radius, ...
+AiPlayerbot.PremadeAvoidAoe = 62234-4
 
 # Random bot default strategies (applied after defaults)
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
