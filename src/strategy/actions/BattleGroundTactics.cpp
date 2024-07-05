@@ -3333,7 +3333,7 @@ bool BGTactics::selectObjective(bool reset)
                                 ((!defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_ALLY_OCCUPIED) ||
                                 ((defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_ALLY_CONTESTED))
                             {
-                                if (GameObject* pGO = bg->GetBGObject(objective))
+                                if (GameObject* pGO = bg->GetBGObject(objective * BG_AB_OBJECTS_PER_NODE))
                                 {
                                     float const distance = sqrt(bot->GetDistance(pGO));
                                     if (attackObjectiveDistance > distance)
@@ -3375,11 +3375,11 @@ bool BGTactics::selectObjective(bool reset)
 
                     for (const auto& objective : AB_AttackObjectives)
                     {
-                        if (arathiBasinBG->GetCapturePointInfo(objective)._ownerTeamId == BG_AB_NODE_STATE_NEUTRAL ||
-                            ((!defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._ownerTeamId == BG_AB_NODE_STATE_HORDE_OCCUPIED) ||
-                            ((defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._ownerTeamId == BG_AB_NODE_STATE_HORDE_CONTESTED))
+                        if (arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_NEUTRAL ||
+                            ((!defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_HORDE_OCCUPIED) ||
+                            ((defender || !objectives.size()) && arathiBasinBG->GetCapturePointInfo(objective)._state == BG_AB_NODE_STATE_HORDE_CONTESTED))
                         {
-                            if (GameObject* pGO = bg->GetBGObject(objective))
+                            if (GameObject* pGO = bg->GetBGObject(objective * BG_AB_OBJECTS_PER_NODE))
                             {
                                 float const distance = sqrt(bot->GetDistance(pGO));
                                 if (attackObjectiveDistance > distance)
