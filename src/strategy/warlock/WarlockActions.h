@@ -67,12 +67,20 @@ class CastCorruptionAction : public CastDebuffSpellAction
 {
 	public:
 		CastCorruptionAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "corruption", true) { }
+        bool isUseful() override {
+            return CastDebuffSpellAction::isUseful() && !botAI->HasAura("seed of corruption", GetTarget(), false, true) ;
+        }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastCorruptionOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
 	public:
 	    CastCorruptionOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "corruption", true) { }
+        bool isUseful() override {
+            return CastDebuffSpellOnAttackerAction::isUseful() && !botAI->HasAura("seed of corruption", GetTarget(), false, true) ;
+        }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastCurseOfAgonyOnAttackerAction : public CastDebuffSpellOnAttackerAction
@@ -142,6 +150,18 @@ class CastSeedOfCorruptionAction : public CastDebuffSpellAction
 {
     public:
         CastSeedOfCorruptionAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "seed of corruption", true, 0) { }
+        bool isUseful() override {
+            return CastDebuffSpellAction::isUseful() && !botAI->HasAura("corruption", GetTarget(), false, true) ;
+        }
+};
+
+class CastSeedOfCorruptionOnAttackerAction : public CastDebuffSpellOnAttackerAction
+{
+	public:
+	    CastSeedOfCorruptionOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "seed of corruption", true, 0) { }
+        bool isUseful() override {
+            return CastDebuffSpellOnAttackerAction::isUseful() && !botAI->HasAura("corruption", GetTarget(), false, true) ;
+        }
 };
 
 class CastRainOfFireAction : public CastSpellAction
