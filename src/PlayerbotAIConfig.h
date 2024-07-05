@@ -201,6 +201,7 @@ class PlayerbotAIConfig
         bool autoLearnQuestSpells;
         bool autoTeleportForLevel;
         bool randomBotSayWithoutMaster;
+        bool sayWhenCollectingItems;
         bool randomBotGroupNearby;
         uint32 tweakValue; //Debugging config
 
