@@ -136,6 +136,7 @@ class PlayerbotFactory
         void InitBags(bool destroyOld = true);
         void ApplyEnchantAndGemsNew(bool destoryOld = true);
         void InitInstanceQuests();
+        void UnbindInstance();
     private:
         void Prepare();
         // void InitSecondEquipmentSet();
