@@ -141,6 +141,9 @@ AiPlayerbot.RandomBotGroupNearby = 0
 # Bots without a master will say their lines
 AiPlayerbot.RandomBotSayWithoutMaster = 0
 
+# Bots will say information about items when collecting them
+AiPlayerbot.SayWhenCollectingItems = 1
+
 # Set RandomBotMaxLevel bots to RandomBotMinLevel or not
 AiPlayerbot.DowngradeMaxLevelBot = 0
 

@@ -13,6 +13,9 @@ bool QueryItemUsageAction::Execute(Event event)
     if (!GetMaster() && !sPlayerbotAIConfig->randomBotSayWithoutMaster)
         return false;
 
+    if (!sPlayerbotAIConfig->sayWhenCollectingItems)
+        return false;
+
     WorldPacket& data = event.getPacket();
     if (!data.empty())
     {

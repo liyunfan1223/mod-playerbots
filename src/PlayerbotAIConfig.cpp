@@ -317,6 +317,7 @@ bool PlayerbotAIConfig::Initialize()
     syncLevelWithPlayers = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncLevelWithPlayers", false);
     freeFood = sConfigMgr->GetOption<bool>("AiPlayerbot.FreeFood", true);
     randomBotSayWithoutMaster = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotSayWithoutMaster", false);
+    sayWhenCollectingItems = sConfigMgr->GetOption<bool>("AiPlayerbot.SayWhenCollectingItems", true);
     randomBotGroupNearby = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotGroupNearby", true);
 
     // arena

@@ -618,6 +618,14 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
                 return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
             }
         }
+
+        if (cmd == "refresh=raid")
+        {   // TODO: This function is not perfect yet. If you are already in a raid, 
+            // after the command is executed, the AI ​​needs to go back online or exit the raid and re-enter.
+            PlayerbotFactory factory(bot, bot->getLevel());
+            factory.UnbindInstance();
+            return "ok";
+        }
     }
 
     if (cmd == "levelup" || cmd == "level")
