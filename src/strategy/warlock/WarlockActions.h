@@ -70,7 +70,6 @@ class CastCorruptionAction : public CastDebuffSpellAction
         bool isUseful() override {
             return CastDebuffSpellAction::isUseful() && !botAI->HasAura("seed of corruption", GetTarget(), false, true) ;
         }
-        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastCorruptionOnAttackerAction : public CastDebuffSpellOnAttackerAction
@@ -80,7 +79,6 @@ class CastCorruptionOnAttackerAction : public CastDebuffSpellOnAttackerAction
         bool isUseful() override {
             return CastDebuffSpellOnAttackerAction::isUseful() && !botAI->HasAura("seed of corruption", GetTarget(), false, true) ;
         }
-        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastCurseOfAgonyOnAttackerAction : public CastDebuffSpellOnAttackerAction
@@ -153,6 +151,7 @@ class CastSeedOfCorruptionAction : public CastDebuffSpellAction
         bool isUseful() override {
             return CastDebuffSpellAction::isUseful() && !botAI->HasAura("corruption", GetTarget(), false, true) ;
         }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastSeedOfCorruptionOnAttackerAction : public CastDebuffSpellOnAttackerAction
@@ -162,6 +161,7 @@ class CastSeedOfCorruptionOnAttackerAction : public CastDebuffSpellOnAttackerAct
         bool isUseful() override {
             return CastDebuffSpellOnAttackerAction::isUseful() && !botAI->HasAura("corruption", GetTarget(), false, true) ;
         }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastRainOfFireAction : public CastSpellAction

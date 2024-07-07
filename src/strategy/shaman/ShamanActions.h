@@ -323,6 +323,7 @@ class CastChainLightningAction : public CastSpellAction
 {
     public:
         CastChainLightningAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "chain lightning") { }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastLightningBoltAction : public CastSpellAction

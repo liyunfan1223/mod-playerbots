@@ -82,7 +82,7 @@ bool SummonAction::Execute(Event event)
     }
 
     if (master->GetSession()->GetSecurity() >= SEC_PLAYER) {
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
+        // botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
         return Teleport(master, bot);
     }
 
