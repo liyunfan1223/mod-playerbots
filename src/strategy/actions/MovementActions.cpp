@@ -1911,10 +1911,10 @@ bool DisperseSetAction::Execute(Event event)
         return true;
     }
     std::ostringstream out;
-    out << "Usage: disperse [enable|disable|increase|decrease|set {distance}]" << "\n";
+    out << "Usage: disperse [enable | disable | increase | decrease | set {distance}]";
     float dis = AI_VALUE(float, "disperse distance");
     if (dis > 0.0f) {
-        out << "Current disperse distance: " << std::setprecision(2) << dis;
+        out << "(Current disperse distance: " << std::setprecision(2) << dis << ")";
     }
     botAI->TellMasterNoFacing(out.str());
     return true;
