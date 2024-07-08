@@ -302,6 +302,8 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["area debuff"] = &ValueContext::area_debuff;
             creators["nearest trap with damage"] = &ValueContext::nearest_trap_with_damange;
             creators["disperse distance"] = &ValueContext::disperse_distance;
+            creators["last flee angle"] = &ValueContext::last_flee_angle;
+            creators["last flee timestamp"] = &ValueContext::last_flee_timestamp;
         }
 
     private:
@@ -507,6 +509,8 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* area_debuff(PlayerbotAI* ai) { return new AreaDebuffValue(ai); }
         static UntypedValue* nearest_trap_with_damange(PlayerbotAI* ai) { return new NearestTrapWithDamageValue(ai); }
         static UntypedValue* disperse_distance(PlayerbotAI* ai) { return new DisperseDistanceValue(ai); }
+        static UntypedValue* last_flee_angle(PlayerbotAI* ai) { return new LastFleeAngleValue(ai); }
+        static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
 };
 
 #endif

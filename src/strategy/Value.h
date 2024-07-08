@@ -329,7 +329,22 @@ class UnitManualSetValue : public ManualSetValue<Unit*>
 class DisperseDistanceValue : public ManualSetValue<float>
 {
     public:
-        DisperseDistanceValue(PlayerbotAI* botAI, float defaultValue = -1.0f, std::string const name = "disperse value") :
+        DisperseDistanceValue(PlayerbotAI* botAI, float defaultValue = -1.0f, std::string const name = "disperse distance") :
             ManualSetValue<float>(botAI, defaultValue, name) { }
 };
+
+class LastFleeAngleValue : public ManualSetValue<float>
+{
+    public:
+        LastFleeAngleValue(PlayerbotAI* botAI, float defaultValue = 0.0f, std::string const name = "last flee angle") :
+            ManualSetValue<float>(botAI, defaultValue, name) { }
+};
+
+class LastFleeTimestampValue : public ManualSetValue<uint32>
+{
+    public:
+        LastFleeTimestampValue(PlayerbotAI* botAI, uint32 defaultValue = 0, std::string const name = "last flee timestamp") :
+            ManualSetValue<uint32>(botAI, defaultValue, name) { }
+};
+
 #endif

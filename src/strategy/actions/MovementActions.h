@@ -44,6 +44,7 @@ class MovementAction : public Action
         Position BestPositionForMeleeToFlee(Position pos, float radius);
         Position BestPositionForRangedToFlee(Position pos, float radius);
         bool FleePosition(Position pos, float radius);
+        bool CheckLastFlee(float curAngle, float lastAngle, uint32 lastTS);
     protected:
         struct CheckAngle {
             float angle;

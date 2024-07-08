@@ -4,6 +4,7 @@
 
 #include "MovementActions.h"
 #include "GameObject.h"
+#include "Geometry.h"
 #include "Map.h"
 #include "MotionMaster.h"
 #include "MoveSplineInitArgs.h"
@@ -31,6 +32,8 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
+#include <cmath>
+#include <cstdlib>
 #include <iomanip>
 #include <string>
 
@@ -1511,17 +1514,14 @@ bool AvoidAoeAction::Execute(Event event)
 {
     // Case #1: Aura with dynamic object (e.g. rain of fire)
     if (AvoidAuraWithDynamicObj()) {
-        lastMoveTimer = getMSTime();
         return true;
     }
     // Case #2: Trap game object with spell (e.g. lava bomb)
     if (AvoidGameObjectWithDamage()) {
-        lastMoveTimer = getMSTime();
         return true;
     }
     // Case #3: Trigger npc (e.g. Lesser shadow fissure)
     if (AvoidUnitWithDamageAura()) {
-        lastMoveTimer = getMSTime();
         return true;
     }
     return false;
@@ -1550,10 +1550,11 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
         return false;
     }
     std::ostringstream name;
-    name << spellInfo->SpellName[0]; // << "] (aura)";
+    name << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()]; // << "] (aura)";
     if (FleePosition(dynOwner->GetPosition(), radius)) {
         if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
             lastTellTimer = time(NULL);
+            lastMoveTimer = getMSTime();
             std::ostringstream out;
             out << "I'm avoiding " << name.str() << "...";
             bot->Say(out.str(), LANG_UNIVERSAL);
@@ -1607,10 +1608,11 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             continue;
         }
         std::ostringstream name;
-        name << spellInfo->SpellName[0]; // << "] (object)";
+        name << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()]; // << "] (object)";
         if (FleePosition(go->GetPosition(), radius)) {
             if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
                 lastTellTimer = time(NULL);
+                lastMoveTimer = getMSTime();
                 std::ostringstream out;
                 out << "I'm avoiding " << name.str() << "...";
                 bot->Say(out.str(), LANG_UNIVERSAL);
@@ -1655,10 +1657,11 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                             break;
                         }
                         std::ostringstream name;
-                        name << triggerSpellInfo->SpellName[0]; //<< "] (unit)";
+                        name << triggerSpellInfo->SpellName[sWorld->GetDefaultDbcLocale()]; //<< "] (unit)";
                         if (FleePosition(unit->GetPosition(), radius)) {
                             if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
                                 lastTellTimer = time(NULL);
+                                lastMoveTimer = getMSTime();
                                 std::ostringstream out;
                                 out << "I'm avoiding " << name.str() << "...";
                                 bot->Say(out.str(), LANG_UNIVERSAL);
@@ -1697,6 +1700,11 @@ Position MovementAction::BestPositionForMeleeToFlee(Position pos, float radius)
     Position bestPos;
     for (CheckAngle &checkAngle : possibleAngles) {
         float angle = checkAngle.angle;
+        float lastFleeAngle = AI_VALUE(float, "last flee angle");
+        uint32 lastFleeTimestamp = AI_VALUE(uint32, "last flee timestamp");
+        if (!CheckLastFlee(angle, lastFleeAngle, lastFleeTimestamp)) {
+            continue;
+        }
         bool strict = checkAngle.strict;
         float fleeDis = std::min(radius + 1.0f, sPlayerbotAIConfig->fleeDistance);
         Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis,
@@ -1740,6 +1748,11 @@ Position MovementAction::BestPositionForRangedToFlee(Position pos, float radius)
     Position bestPos;
     for (CheckAngle &checkAngle : possibleAngles) {
         float angle = checkAngle.angle;
+        float lastFleeAngle = AI_VALUE(float, "last flee angle");
+        uint32 lastFleeTimestamp = AI_VALUE(uint32, "last flee timestamp");
+        if (!CheckLastFlee(angle, lastFleeAngle, lastFleeTimestamp)) {
+            continue;
+        }
         bool strict = checkAngle.strict;
         float fleeDis = std::min(radius + 1.0f, sPlayerbotAIConfig->fleeDistance);
         Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis,
@@ -1774,10 +1787,27 @@ bool MovementAction::FleePosition(Position pos, float radius)
     }
     if (bestPos != Position()) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
+            SET_AI_VALUE(float, "last flee angle", bot->GetAngle(&bestPos));
+            SET_AI_VALUE(uint32, "last flee timestamp", getMSTime());
             return true;
         }
     }
     return false;
+}
+
+bool MovementAction::CheckLastFlee(float curAngle, float lastAngle, uint32 lastTS)
+{
+    // more than 5 sec
+    if (lastTS + 5000 < getMSTime()) {
+        return true;
+    }
+    float revAngle = fmod(lastAngle + M_PI, 2 * M_PI);
+    curAngle = fmod(curAngle, 2 * M_PI);
+    // angle too close
+    if (fabs(revAngle - curAngle) < M_PI / 8) {
+        return false;
+    }
+    return true;
 }
 
 bool CombatFormationMoveAction::isUseful()
