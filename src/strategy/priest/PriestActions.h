@@ -161,5 +161,6 @@ class CastMindSearAction : public CastSpellAction
 {
     public:
         CastMindSearAction(PlayerbotAI* ai) : CastSpellAction(ai, "mind sear") {}
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 #endif

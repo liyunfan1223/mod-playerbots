@@ -51,7 +51,7 @@ class CatDpsDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         static ActionNode* cat_form([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("cat form",
-                /*P*/ nullptr,
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                 /*A*/ nullptr,
                 /*C*/ nullptr);
         }
