@@ -203,12 +203,14 @@ class CastDragonsBreathAction : public CastSpellAction
 {
 	public:
 	    CastDragonsBreathAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "dragon's breath") { }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastBlastWaveAction : public CastSpellAction
 {
 	public:
 	    CastBlastWaveAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "blast wave") { }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastInvisibilityAction : public CastBuffSpellAction

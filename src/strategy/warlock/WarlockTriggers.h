@@ -6,6 +6,7 @@
 #define _PLAYERBOT_WARLOCKTRIGGERS_H
 
 #include "GenericTriggers.h"
+#include "PlayerbotAI.h"
 
 class PlayerbotAI;
 
@@ -32,13 +33,24 @@ class CurseOfAgonyTrigger : public DebuffTrigger
         CurseOfAgonyTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "curse of agony", 1, true, 20.0f) { }
 };
 
-DEBUFF_CHECKISOWNER_TRIGGER(CorruptionTrigger, "corruption");
+class CorruptionTrigger : public DebuffTrigger
+{
+    public:
+        CorruptionTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "corruption", 1, true) { } \
+        bool IsActive() override {
+            return DebuffTrigger::IsActive() && !botAI->HasAura("seed of corruption", GetTarget(), false, true) ;
+        }
+};
+
 DEBUFF_CHECKISOWNER_TRIGGER(SiphonLifeTrigger, "siphon life");
 
 class CorruptionOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
     public:
         CorruptionOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "corruption", true) { }
+        bool IsActive() override {
+            return DebuffOnAttackerTrigger::IsActive() && !botAI->HasAura("seed of corruption", GetTarget(), false, true) ;
+        }
 };
 
 class CastCurseOfAgonyOnAttackerTrigger : public DebuffOnAttackerTrigger

@@ -112,6 +112,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
             creators["grind"] = &StrategyContext::grind;
             creators["avoid aoe"] = &StrategyContext::avoid_aoe;
             creators["move random"] = &StrategyContext::move_random;
+            creators["combat formation"] = &StrategyContext::combat_formation;
         }
 
     private:
@@ -174,6 +175,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
         static Strategy* grind(PlayerbotAI* botAI) { return new GrindingStrategy(botAI); }
         static Strategy* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeStrategy(botAI); }
         static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
+        static Strategy* combat_formation(PlayerbotAI* ai) { return new CombatFormationStrategy(ai); }
 };
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>

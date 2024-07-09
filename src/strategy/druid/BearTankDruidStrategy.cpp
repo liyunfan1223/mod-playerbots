@@ -69,7 +69,7 @@ class BearTankDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         static ActionNode* dire_bear_form([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("dire bear form",
-                /*P*/ nullptr,
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                 /*A*/ NextAction::array(0, new NextAction("bear form"), nullptr),
                 /*C*/ nullptr);
         }
