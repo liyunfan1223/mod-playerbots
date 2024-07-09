@@ -1710,7 +1710,8 @@ Position MovementAction::BestPositionForMeleeToFlee(Position pos, float radius)
             bot->GetPositionY() + sin(angle) * fleeDis, 
             bot->GetPositionZ()};
         if (strict && currentTarget
-                && fleePos.GetExactDist(currentTarget) - currentTarget->GetCombatReach() > sPlayerbotAIConfig->tooCloseDistance) {
+                && fleePos.GetExactDist(currentTarget) - currentTarget->GetCombatReach() > sPlayerbotAIConfig->tooCloseDistance
+                && bot->IsWithinMeleeRange(currentTarget)) {
             continue;
         }
         if (pos.GetExactDist(fleePos) > farestDis) {
@@ -1819,7 +1820,7 @@ bool MovementAction::CheckLastFlee(float curAngle, std::list<FleeInfo>& infoList
         }
         float revAngle = fmod(info.angle + M_PI, 2 * M_PI);
         // angle too close
-        if (fabs(revAngle - curAngle) < M_PI / 8) {
+        if (fabs(revAngle - curAngle) < M_PI / 4) {
             return false;
         }
     }
