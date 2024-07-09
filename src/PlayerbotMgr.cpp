@@ -74,6 +74,12 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
 
 void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder)
 {
+    // has bot already been added?
+    Player* loginBot = ObjectAccessor::FindConnectedPlayer(holder.GetGuid());
+    if (loginBot && loginBot->IsInWorld()) {
+        return;
+    }
+
     uint32 botAccountId = holder.GetAccountId();
 
     WorldSession* botSession = new WorldSession(botAccountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0), LOCALE_enUS, 0, false, false, 0, true);
