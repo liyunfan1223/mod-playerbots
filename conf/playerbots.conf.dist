@@ -21,17 +21,8 @@ AiPlayerbot.BotAutologin = 0
 # Default: 0 (disabled)
 AiPlayerbot.AllowPlayerBots = 0
 
-# Guild Task system
-AiPlayerbot.EnableGuildTasks = 0
-
 # Enable LFG for random bots
 AiPlayerbot.RandomBotJoinLfg = 1
-
-# Enable dungeon suggestions for random bots
-AiPlayerbot.RandomBotSuggestDungeons = 1
-
-# Enable dungeon suggestions in lower case randomly
-AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
 
 # Enable BG/Arena for random Bots
 AiPlayerbot.RandomBotJoinBG = 1
@@ -60,12 +51,6 @@ AiPlayerbot.RotationPoolSize = 500
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 AiPlayerbot.RandomBotAccountCount = 200
 
-# Random bot guild count
-AiPlayerbot.RandomBotGuildCount = 20
-
-# Delete all random bot guilds
-AiPlayerbot.DeleteRandomBotGuilds = 0
-
 # Random bot arena team count
 AiPlayerbot.RandomBotArenaTeamCount = 20
 
@@ -77,18 +62,6 @@ AiPlayerbot.RandomGearLoweringChance = 0
 
 # Chance random bot has max level on first randomize (default 0.15)
 AiPlayerbot.RandomBotMaxLevelChance = 0.15
-
-# Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
-AiPlayerbot.RandomBotRpgChance = 0.20 #unused now
-
-# Set randombots movement speed to walking anywhere
-AiPlayerbot.RandombotsWalkingRPG = 0
-
-# Set randombots movement speed to walking only inside buildings
-AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
-
-# Bots greet to the players
-AiPlayerbot.EnableGreet = 0
 
 # Bots will be summoned to player when accept group invitation
 AiPlayerbot.SummonWhenGroup = 1
@@ -115,10 +88,6 @@ AiPlayerbot.KillXPRate = 1
 # Disable death knight for bots login
 # Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 AiPlayerbot.DisableDeathKnightLogin = 0
-
-# Specify percent of active bots
-# The default is 10. With 10% of all bots going active or inactive each minute.
-AiPlayerbot.BotActiveAlone = 100
 
 # Set minimum level of randombots where gets enchants on items (Maxlevel + 1 to disable)
 # Default: 60
@@ -296,7 +265,7 @@ AiPlayerbot.ReactDelay = 100
 AiPlayerbot.PassiveDelay = 10000
 
 # Minimum delay between repeating actions (chat messages, emotes etc)
-AiPlayerbot.RepeatDelay = 5000
+AiPlayerbot.RepeatDelay = 2000
 
 # Delay timers
 AiPlayerbot.ErrorDelay = 100
@@ -352,37 +321,12 @@ AiPlayerbot.AutoAvoidAoe = 1
 # Default: 1 (enable)
 AiPlayerbot.TellWhenAvoidAoe = 1
 
-# Premade spell to avoid (undetected spells)
-# spellid-radius, ...
-AiPlayerbot.PremadeAvoidAoe = 62234-4
-
 # Random bot default strategies (applied after defaults)
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
 # AiPlayerbot.RandomBotNonCombatStrategies = "+grind,+loot,+rpg,+custom::say"
 AiPlayerbot.RandomBotNonCombatStrategies = ""
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
-
-# How often tasks are changed
-AiPlayerbot.MinGuildTaskChangeTime = 172800
-AiPlayerbot.MaxGuildTaskChangeTime = 432000
-
-# Mail spam interval
-AiPlayerbot.MinGuildTaskAdvertisementTime = 300
-AiPlayerbot.MaxGuildTaskAdvertisementTime = 28800
-
-# Delay before reward is sent
-AiPlayerbot.MinGuildTaskRewardTime = 300
-AiPlayerbot.MaxGuildTaskRewardTime = 3600
-
-# Cleanup of guild tasks interval
-AiPlayerbot.GuildTaskAdvertCleanupTime = 300
-
-# Specify max distance between victim and bot when creating guild kill task
-AiPlayerbot.GuildTaskKillTaskDistance = 200
-
-# Distance margin for facade calculations
-AiPlayerbot.TargetPosRecalcDistance = 0.1
 
 # Maps where bots can be teleported to
 AiPlayerbot.RandomBotMaps = 0,1,530,571
@@ -417,12 +361,8 @@ AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
 AiPlayerbot.MinRandomBotInWorldTime = 3600
 AiPlayerbot.MaxRandomBotInWorldTime = 43200
 AiPlayerbot.MinRandomBotRandomizeTime = 302400
-AiPlayerbot.MaxRandomRandomizeTime = 1209600
+AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
 AiPlayerbot.RandomBotsPerInterval = 500
-AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
-AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
-AiPlayerbot.MinRandomBotChangeStrategyTime = 180
-AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
 AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
@@ -443,9 +383,6 @@ AiPlayerbot.CommandServerPort = 8888
 
 # Enables/Disables performance monitor
 AiPlayerbot.PerfMonEnabled = 0
-
-# Allow bots to be summoned near innkeepers
-AiPlayerbot.SummonAtInnkeepersEnabled = 1
 
 # Custom config to allow logfiles to be created.
 # Example: AiPlayerbot.AllowedLogFiles = travelNodes.csv,travelPaths.csv,TravelNodeStore.h,bot_movement.csv,bot_location.csv
@@ -747,6 +684,74 @@ AiPlayerbot.RandomClassSpecProb.11.1 = 40
 AiPlayerbot.RandomClassSpecIndex.11.1 = 1
 AiPlayerbot.RandomClassSpecProb.11.2 = 40
 AiPlayerbot.RandomClassSpecIndex.11.2 = 2
+
+##############################################
+# Deprecated (temporary)                     #
+##############################################
+# Guild Task system
+AiPlayerbot.EnableGuildTasks = 0
+
+# Enable dungeon suggestions for random bots
+AiPlayerbot.RandomBotSuggestDungeons = 1
+
+# Enable dungeon suggestions in lower case randomly
+AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
+
+# Random bot guild count
+AiPlayerbot.RandomBotGuildCount = 20
+
+# Delete all random bot guilds
+AiPlayerbot.DeleteRandomBotGuilds = 0
+
+# Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
+AiPlayerbot.RandomBotRpgChance = 0.20 #unused now
+
+# Set randombots movement speed to walking anywhere
+AiPlayerbot.RandombotsWalkingRPG = 0
+
+# Set randombots movement speed to walking only inside buildings
+AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
+
+# Bots greet to the players
+AiPlayerbot.EnableGreet = 0
+
+# Specify percent of active bots
+# The default is 10. With 10% of all bots going active or inactive each minute.
+AiPlayerbot.BotActiveAlone = 100
+
+# Premade spell to avoid (undetected spells)
+# spellid-radius, ...
+AiPlayerbot.PremadeAvoidAoe = 62234-4
+
+AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
+AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
+AiPlayerbot.MinRandomBotChangeStrategyTime = 180
+AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
+
+
+# How often tasks are changed
+AiPlayerbot.MinGuildTaskChangeTime = 172800
+AiPlayerbot.MaxGuildTaskChangeTime = 432000
+
+# Mail spam interval
+AiPlayerbot.MinGuildTaskAdvertisementTime = 300
+AiPlayerbot.MaxGuildTaskAdvertisementTime = 28800
+
+# Delay before reward is sent
+AiPlayerbot.MinGuildTaskRewardTime = 300
+AiPlayerbot.MaxGuildTaskRewardTime = 3600
+
+# Cleanup of guild tasks interval
+AiPlayerbot.GuildTaskAdvertCleanupTime = 300
+
+# Specify max distance between victim and bot when creating guild kill task
+AiPlayerbot.GuildTaskKillTaskDistance = 200
+
+# Distance margin for facade calculations
+AiPlayerbot.TargetPosRecalcDistance = 0.1
+
+# Allow bots to be summoned near innkeepers
+AiPlayerbot.SummonAtInnkeepersEnabled = 1
 
 ##################################################################################
 #                                                                                #
