@@ -13,6 +13,7 @@ class Player;
 class PlayerbotAI;
 class Unit;
 class WorldObject;
+class Position;
 
 class MovementAction : public Action
 {
@@ -44,7 +45,7 @@ class MovementAction : public Action
         Position BestPositionForMeleeToFlee(Position pos, float radius);
         Position BestPositionForRangedToFlee(Position pos, float radius);
         bool FleePosition(Position pos, float radius);
-        bool CheckLastFlee(float curAngle, float lastAngle, uint32 lastTS);
+        bool CheckLastFlee(float curAngle, std::list<FleeInfo>& infoList);
     protected:
         struct CheckAngle {
             float angle;

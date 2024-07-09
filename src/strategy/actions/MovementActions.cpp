@@ -1700,9 +1700,8 @@ Position MovementAction::BestPositionForMeleeToFlee(Position pos, float radius)
     Position bestPos;
     for (CheckAngle &checkAngle : possibleAngles) {
         float angle = checkAngle.angle;
-        float lastFleeAngle = AI_VALUE(float, "last flee angle");
-        uint32 lastFleeTimestamp = AI_VALUE(uint32, "last flee timestamp");
-        if (!CheckLastFlee(angle, lastFleeAngle, lastFleeTimestamp)) {
+        auto& infoList = AI_VALUE_REF(std::list<FleeInfo>, "recently flee info");
+        if (!CheckLastFlee(angle, infoList)) {
             continue;
         }
         bool strict = checkAngle.strict;
@@ -1748,9 +1747,8 @@ Position MovementAction::BestPositionForRangedToFlee(Position pos, float radius)
     Position bestPos;
     for (CheckAngle &checkAngle : possibleAngles) {
         float angle = checkAngle.angle;
-        float lastFleeAngle = AI_VALUE(float, "last flee angle");
-        uint32 lastFleeTimestamp = AI_VALUE(uint32, "last flee timestamp");
-        if (!CheckLastFlee(angle, lastFleeAngle, lastFleeTimestamp)) {
+        auto& infoList = AI_VALUE_REF(std::list<FleeInfo>, "recently flee info");
+        if (!CheckLastFlee(angle, infoList)) {
             continue;
         }
         bool strict = checkAngle.strict;
@@ -1787,25 +1785,43 @@ bool MovementAction::FleePosition(Position pos, float radius)
     }
     if (bestPos != Position()) {
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false, false, true)) {
-            SET_AI_VALUE(float, "last flee angle", bot->GetAngle(&bestPos));
-            SET_AI_VALUE(uint32, "last flee timestamp", getMSTime());
+            auto& infoList = AI_VALUE_REF(std::list<FleeInfo>, "recently flee info");
+            uint32 curTS = getMSTime();
+            while (!infoList.empty()) {
+                if (infoList.size() > 10 || infoList.front().timestamp + 5000 < curTS) {
+                    infoList.pop_front();
+                } else {
+                    break;
+                }
+            }
+            infoList.push_back({pos, radius, bot->GetAngle(&bestPos), curTS});
             return true;
         }
     }
     return false;
 }
 
-bool MovementAction::CheckLastFlee(float curAngle, float lastAngle, uint32 lastTS)
+bool MovementAction::CheckLastFlee(float curAngle, std::list<FleeInfo>& infoList)
 {
-    // more than 5 sec
-    if (lastTS + 5000 < getMSTime()) {
-        return true;
-    }
-    float revAngle = fmod(lastAngle + M_PI, 2 * M_PI);
+    uint32 curTS = getMSTime();
     curAngle = fmod(curAngle, 2 * M_PI);
-    // angle too close
-    if (fabs(revAngle - curAngle) < M_PI / 8) {
-        return false;
+    while (!infoList.empty()) {
+        if (infoList.size() > 10 || infoList.front().timestamp + 5000 < curTS) {
+            infoList.pop_front();
+        } else {
+            break;
+        }
+    }
+    for (FleeInfo& info : infoList) {
+        // more than 5 sec
+        if (info.timestamp + 5000 < curTS) {
+            continue;
+        }
+        float revAngle = fmod(info.angle + M_PI, 2 * M_PI);
+        // angle too close
+        if (fabs(revAngle - curAngle) < M_PI / 8) {
+            return false;
+        }
     }
     return true;
 }

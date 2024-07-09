@@ -304,6 +304,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["disperse distance"] = &ValueContext::disperse_distance;
             creators["last flee angle"] = &ValueContext::last_flee_angle;
             creators["last flee timestamp"] = &ValueContext::last_flee_timestamp;
+            creators["recently flee info"] = &ValueContext::recently_flee_info;
         }
 
     private:
@@ -511,6 +512,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* disperse_distance(PlayerbotAI* ai) { return new DisperseDistanceValue(ai); }
         static UntypedValue* last_flee_angle(PlayerbotAI* ai) { return new LastFleeAngleValue(ai); }
         static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
+        static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
 };
 
 #endif

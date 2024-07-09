@@ -83,6 +83,7 @@ bool SummonAction::Execute(Event event)
 
     if (master->GetSession()->GetSecurity() >= SEC_PLAYER) {
         // botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
+        SET_AI_VALUE(std::list<FleeInfo>, "recently flee info", {});
         return Teleport(master, bot);
     }
 
