@@ -20,6 +20,7 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             creators["insect swarm"] = &insect_swarm;
             creators["moonfire"] = &moonfire;
             creators["starfire"] = &starfire;
+            creators["moonkin form"] = &moonkin_form;
         }
 
     private:
@@ -94,6 +95,15 @@ class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
                 /*A*/ nullptr,
                 /*C*/ nullptr);
         }
+
+        static ActionNode* moonkin_form([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("moonkin form",
+                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                /*A*/ nullptr,
+                /*C*/ nullptr);
+        }
+        
 };
 
 CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI* botAI) : GenericDruidStrategy(botAI)

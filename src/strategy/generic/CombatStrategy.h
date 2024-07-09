@@ -28,4 +28,12 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
+class CombatFormationStrategy : public Strategy
+{
+public:
+    CombatFormationStrategy(PlayerbotAI* ai): Strategy(ai) {}
+    const std::string getName() override { return "combat formation"; }
+    NextAction** getDefaultActions() override;
+};
+
 #endif

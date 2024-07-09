@@ -16,6 +16,16 @@
 class PlayerbotAI;
 class Unit;
 
+class FleeInfo
+{
+    public:
+        Position fromPos;
+        float radius;
+        float angle;
+        uint32 timestamp;
+        int GetAngleRangeIndex() { return (angle + 2 * M_PI) / (M_PI / 2); } // [0, 7)
+};
+
 struct CreatureData;
 
 class UntypedValue : public AiNamedObject
@@ -37,6 +47,7 @@ class Value
         virtual ~Value() { }
         virtual T Get() = 0;
         virtual T LazyGet() = 0;
+        virtual T& RefGet() = 0;
         virtual void Reset() { }
         virtual void Set(T value) = 0;
         operator T() { return Get(); }
@@ -79,7 +90,26 @@ class CalculatedValue : public UntypedValue, public Value<T>
 
             return value;
         }
-
+        T& RefGet() override
+        {
+            if (checkInterval < 2) {
+                // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+                value = Calculate();
+                // if (pmo)
+                //     pmo->finish();
+            } else {
+                time_t now = getMSTime();
+                if (!lastCheckTime || now - lastCheckTime >= checkInterval)
+                {
+                    lastCheckTime = now;
+                    // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+                    value = Calculate();
+                    // if (pmo)
+                    //     pmo->finish();
+                }
+            }
+            return value;
+        }
         void Set(T val) override { value = val; }
         void Update() override {}
         void Reset() override { lastCheckTime = 0; }
@@ -304,6 +334,7 @@ class ManualSetValue : public UntypedValue, public Value<T>
 
         T Get() override { return value; }
         T LazyGet() override { return value; }
+        T& RefGet() override { return value; }
         void Set(T val) override { value = val; }
         void Update() override {}
         void Reset() override
@@ -324,6 +355,34 @@ class UnitManualSetValue : public ManualSetValue<Unit*>
 
         std::string const Format() override;
         Unit* Get() override;
+};
+
+class DisperseDistanceValue : public ManualSetValue<float>
+{
+    public:
+        DisperseDistanceValue(PlayerbotAI* botAI, float defaultValue = -1.0f, std::string const name = "disperse distance") :
+            ManualSetValue<float>(botAI, defaultValue, name) { }
+};
+
+class LastFleeAngleValue : public ManualSetValue<float>
+{
+    public:
+        LastFleeAngleValue(PlayerbotAI* botAI, float defaultValue = 0.0f, std::string const name = "last flee angle") :
+            ManualSetValue<float>(botAI, defaultValue, name) { }
+};
+
+class LastFleeTimestampValue : public ManualSetValue<uint32>
+{
+    public:
+        LastFleeTimestampValue(PlayerbotAI* botAI, uint32 defaultValue = 0, std::string const name = "last flee timestamp") :
+            ManualSetValue<uint32>(botAI, defaultValue, name) { }
+};
+
+class RecentlyFleeInfo : public ManualSetValue<std::list<FleeInfo>>
+{
+    public:
+        RecentlyFleeInfo(PlayerbotAI* botAI, std::list<FleeInfo> defaultValue = {}, std::string const name = "recently flee info") :
+            ManualSetValue<std::list<FleeInfo>>(botAI, defaultValue, name) { }
 };
 
 #endif

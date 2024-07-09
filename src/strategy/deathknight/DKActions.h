@@ -234,8 +234,6 @@ class CastDeathAndDecayAction : public CastSpellAction
 {
 	public:
 		CastDeathAndDecayAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "death and decay") { }
-
-		ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastHornOfWinterAction : public CastSpellAction

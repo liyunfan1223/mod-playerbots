@@ -363,6 +363,11 @@ Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
 
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
+    // Prevent duplicate login
+    if (playerBots.find(bot->GetGUID()) != playerBots.end()) {
+        return;
+    }
+
     sPlayerbotsMgr->AddPlayerbotData(bot, true);
     playerBots[bot->GetGUID()] = bot;
     OnBotLoginInternal(bot);

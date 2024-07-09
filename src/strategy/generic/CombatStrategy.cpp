@@ -82,3 +82,10 @@ void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     // multipliers.push_back(new AvoidAoeStrategyMultiplier(botAI));
 }
+
+NextAction** CombatFormationStrategy::getDefaultActions()
+{
+    return NextAction::array(0, 
+		new NextAction("combat formation move", ACTION_EMERGENCY),
+		nullptr);
+}

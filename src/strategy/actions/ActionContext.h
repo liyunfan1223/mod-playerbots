@@ -89,6 +89,8 @@ class ActionContext : public NamedObjectContext<Action>
             creators["flee"] = &ActionContext::flee;
             creators["flee with pet"] = &ActionContext::flee_with_pet;
             creators["avoid aoe"] = &ActionContext::avoid_aoe;
+            creators["combat formation move"] = &ActionContext::combat_formation_move;
+            creators["disperse set"] = &ActionContext::disperse_set;
             creators["gift of the naaru"] = &ActionContext::gift_of_the_naaru;
             creators["shoot"] = &ActionContext::shoot;
             creators["lifeblood"] = &ActionContext::lifeblood;
@@ -265,6 +267,8 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* flee(PlayerbotAI* botAI) { return new FleeAction(botAI); }
         static Action* flee_with_pet(PlayerbotAI* botAI) { return new FleeWithPetAction(botAI); }
         static Action* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeAction(botAI); }
+        static Action* combat_formation_move(PlayerbotAI* botAI) { return new CombatFormationMoveAction(botAI); }
+        static Action* disperse_set(PlayerbotAI* botAI) { return new DisperseSetAction(botAI); }
         static Action* gift_of_the_naaru(PlayerbotAI* botAI) { return new CastGiftOfTheNaaruAction(botAI); }
         static Action* lifeblood(PlayerbotAI* botAI) { return new CastLifeBloodAction(botAI); }
         static Action* arcane_torrent(PlayerbotAI* botAI) { return new CastArcaneTorrentAction(botAI); }

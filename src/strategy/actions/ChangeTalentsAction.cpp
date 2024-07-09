@@ -44,9 +44,11 @@ bool ChangeTalentsAction::Execute(Event event)
         } else if (param.find("spec ") != std::string::npos) {
             param = param.substr(5);
             out << SpecPick(param);
+            botAI->ResetStrategies();
         } else if (param.find("apply ") != std::string::npos) {
             param = param.substr(6);
             out << SpecApply(param);
+            botAI->ResetStrategies();
         } else {
             out << "Unknown command.";
         }
