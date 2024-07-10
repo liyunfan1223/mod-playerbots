@@ -1817,7 +1817,7 @@ Player* PlayerbotAI::GetPlayer(ObjectGuid guid)
 
 uint32 GetCreatureIdForCreatureTemplateId(uint32 creatureTemplateId)
 {
-    QueryResult results = WorldDatabase.Query("SELECT guid FROM `acore_world`.`creature` WHERE id1 = {} LIMIT 1;", creatureTemplateId);
+    QueryResult results = WorldDatabase.Query("SELECT guid FROM `creature` WHERE id1 = {} LIMIT 1;", creatureTemplateId);
     if (results) {
         Field* fields = results->Fetch();
         return fields[0].Get<uint32>();
