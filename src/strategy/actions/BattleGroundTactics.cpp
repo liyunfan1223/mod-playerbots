@@ -4162,99 +4162,84 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
     if (bgType == BATTLEGROUND_WS /* && (bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG))*/)
         return wsgPaths();
 
-    BattleBotPath* pClosestPath = nullptr;
-    uint32 closestPoint = 0;
-    float closestDistanceToTarget = FLT_MAX;
-    bool reverse = false;
-    float maxDistanceToPoint = 50.0f;
-    if (bgType == BATTLEGROUND_IC)
-        maxDistanceToPoint = 80.0f;
+    float chosenPathScore = FLT_MAX;//lower score is better
+    BattleBotPath* chosenPath = nullptr;
+    uint32 chosenPathPoint = 0;
+    bool chosenPathReverse = false;
 
-    for (auto const& pPath : vPaths)
+    float botDistanceLimit = 50.0f; // limit for how far path can be from bot
+    float botDistanceScoreSubtract = 8.0f; // path score modifier - lower = less likely to chose a further path (it's basically the distance from bot that's ignored)
+    float botDistanceScoreMultiply = 3.0f; // path score modifier - higher = less likely to chose a further path (it's basically a multiplier on distance from bot - makes distance from bot more signifcant than distance from destination)
+
+    if (bgType == BATTLEGROUND_IC)
+        botDistanceLimit = 80.0f;
+    else if (bgType == BATTLEGROUND_AB)
+    {
+        botDistanceScoreSubtract = 2.0f;
+        botDistanceScoreMultiply = 4.0f;
+    }
+
+    for (auto const& path : vPaths)
     {
         // skip mine paths of own faction
-        if (bot->GetTeamId() == TEAM_ALLIANCE && std::find(vPaths_AllyMine.begin(), vPaths_AllyMine.end(), pPath) != vPaths_AllyMine.end())
+        if (bot->GetTeamId() == TEAM_ALLIANCE && std::find(vPaths_AllyMine.begin(), vPaths_AllyMine.end(), path) != vPaths_AllyMine.end())
             continue;
 
-        if (bot->GetTeamId() == TEAM_HORDE && std::find(vPaths_HordeMine.begin(), vPaths_HordeMine.end(), pPath) != vPaths_HordeMine.end())
+        if (bot->GetTeamId() == TEAM_HORDE && std::find(vPaths_HordeMine.begin(), vPaths_HordeMine.end(), path) != vPaths_HordeMine.end())
             continue;
 
-        BattleBotWaypoint& lastPoint = ((*pPath)[pPath->size() - 1]);
-        float const distanceFromPathEndToTarget = sqrt(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(lastPoint.x, lastPoint.y, lastPoint.z));
-        if (closestDistanceToTarget > distanceFromPathEndToTarget)
+        BattleBotWaypoint& startPoint = ((*path)[0]);
+        float const startPointDistToDestination = sqrt(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(startPoint.x, startPoint.y, startPoint.z));
+        BattleBotWaypoint& endPoint = ((*path)[path->size() - 1]);
+        float const endPointDistToDestination = sqrt(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(endPoint.x, endPoint.y, endPoint.z));
+
+        bool reverse = startPointDistToDestination < endPointDistToDestination;
+
+        // dont travel reverse if it's a reverse paths
+        if (reverse && std::find(vPaths_NoReverseAllowed.begin(), vPaths_NoReverseAllowed.end(), path) != vPaths_NoReverseAllowed.end())
+            continue;
+
+        int closestPointIndex = -1;
+        float closestPointDistToBot = FLT_MAX;
+        for (uint32 i = 0; i < path->size(); i++)
         {
-            float closestDistanceFromMeToPoint = FLT_MAX;
-
-            for (uint32 i = 0; i < pPath->size(); i++)
+            BattleBotWaypoint& waypoint = ((*path)[i]);
+            float const distToBot = sqrt(bot->GetDistance(waypoint.x, waypoint.y, waypoint.z));
+            if (closestPointDistToBot > distToBot)
             {
-                BattleBotWaypoint& waypoint = ((*pPath)[i]);
-                float const distanceFromMeToPoint = sqrt(bot->GetDistance(waypoint.x, waypoint.y, waypoint.z));
-                if (distanceFromMeToPoint < maxDistanceToPoint && closestDistanceFromMeToPoint > distanceFromMeToPoint)
-                {
-                    reverse = false;
-                    pClosestPath = pPath;
-                    closestPoint = i;
-                    closestDistanceToTarget = distanceFromPathEndToTarget;
-                    closestDistanceFromMeToPoint = distanceFromMeToPoint;
-                }
+                closestPointDistToBot = distToBot;
+                closestPointIndex = i;
             }
         }
 
-        // skip no reverse paths
-        if (std::find(vPaths_NoReverseAllowed.begin(), vPaths_NoReverseAllowed.end(), pPath) != vPaths_NoReverseAllowed.end())
+        // don't pick path where bot is already closest to the paths closest point to target (it means path cant lead it anywhere)
+        // don't pick path where closest point is too far away
+        if (closestPointIndex == (reverse ? 0 : path->size() - 1) || closestPointDistToBot > botDistanceLimit)
             continue;
 
-        // skip mine paths of own faction
-        if (bot->GetTeamId() == TEAM_ALLIANCE && std::find(vPaths_AllyMine.begin(), vPaths_AllyMine.end(), pPath) != vPaths_AllyMine.end())
-            continue;
 
-        if (bot->GetTeamId() == TEAM_HORDE && std::find(vPaths_HordeMine.begin(), vPaths_HordeMine.end(), pPath) != vPaths_HordeMine.end())
-            continue;
+        // creates a score based on dist-to-bot and dist-to-destination, where lower is better, and dist-to-bot is more important (when its beyond a certain distance)
+        // dist-to-bot is more important because otherwise they cant reach it at all (or will fly through air with MM::MovePoint()), also bot may need to use multiple
+		// paths (one after another) anyway
+        float distToDestination = reverse ? startPointDistToDestination : endPointDistToDestination;
+        float pathScore = (closestPointDistToBot < botDistanceScoreSubtract ? 0.0f : ((closestPointDistToBot - botDistanceScoreSubtract) * botDistanceScoreMultiply)) + distToDestination;
 
-        {
-            BattleBotWaypoint& firstPoint = ((*pPath)[0]);
-            float const distanceFromPathBeginToTarget = sqrt(Position(pos.x, pos.y, pos.z, 0).GetExactDist(firstPoint.x, firstPoint.y, firstPoint.z));
-            if (closestDistanceToTarget > distanceFromPathBeginToTarget)
-            {
-                float closestDistanceFromMeToPoint = FLT_MAX;
+        //LOG_INFO("playerbots", "bot={}\t{:6.1f}\t{:4.1f}\t{:4.1f}\t{}", bot->GetName(), pathScore, closestPointDistToBot, distToDestination, vPaths_AB_name[pathNum]);
 
-                for (uint32 i = 0; i < pPath->size(); i++)
-                {
-                    BattleBotWaypoint& waypoint = ((*pPath)[i]);
-                    float const distanceFromMeToPoint = sqrt(bot->GetDistance(waypoint.x, waypoint.y, waypoint.z));
-                    if (distanceFromMeToPoint < maxDistanceToPoint && closestDistanceFromMeToPoint > distanceFromMeToPoint)
-                    {
-                        reverse = true;
-                        pClosestPath = pPath;
-                        closestPoint = i;
-                        closestDistanceToTarget = distanceFromPathBeginToTarget;
-                        closestDistanceFromMeToPoint = distanceFromMeToPoint;
-                    }
-                }
-            }
+        if (chosenPathScore > pathScore) {
+            chosenPathScore = pathScore;
+            chosenPath = path;
+            chosenPathPoint = closestPointIndex;
+            chosenPathReverse = reverse;
         }
     }
 
-    if (!pClosestPath)
+    if (!chosenPath)
         return false;
 
-    // Prevent picking last point of path.
-    // It means we are already there.
-    if (reverse)
-    {
-        if (closestPoint == 0)
-            return false;
-    }
-    else
-    {
-        if (closestPoint == pClosestPath->size() - 1)
-            return false;
-    }
+    //LOG_INFO("playerbots", "bot={} {}", bot->GetName(), vPaths_AB_name[chosenPathNum]);
 
-    BattleBotPath* currentPath = pClosestPath;
-    uint32 currentPoint = reverse ? closestPoint + 1 : closestPoint - 1;
-
-    return moveToObjectiveWp(currentPath, currentPoint, reverse);
+    return moveToObjectiveWp(chosenPath, chosenPathPoint, chosenPathReverse);
 
     return false;
 }
