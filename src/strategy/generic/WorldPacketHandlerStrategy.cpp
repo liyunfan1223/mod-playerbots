@@ -37,9 +37,10 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("bg status", NextAction::array(0, new NextAction("bg status", relevance), nullptr)));
     triggers.push_back(new TriggerNode("xpgain", NextAction::array(0, new NextAction("xp gain", relevance), nullptr)));
     triggers.push_back(new TriggerNode("levelup", NextAction::array(0, 
-        new NextAction("auto talents", relevance), 
-        new NextAction("auto learn spell", relevance), 
-        new NextAction("auto teleport for level", relevance), 
+        new NextAction("auto teleport for level", relevance + 3), 
+        new NextAction("auto talents", relevance + 2), 
+        new NextAction("auto learn spell", relevance + 1), 
+        new NextAction("auto upgrade equip", relevance), 
         nullptr)));
     // triggers.push_back(new TriggerNode("group destroyed", NextAction::array(0, new NextAction("reset botAI", relevance), nullptr)));
     triggers.push_back(new TriggerNode("questgiver quest details", NextAction::array(0, new NextAction("turn in query quest", relevance), nullptr)));

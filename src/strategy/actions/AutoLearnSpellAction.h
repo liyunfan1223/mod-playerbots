@@ -23,4 +23,12 @@ class AutoLearnSpellAction : public Action
         void LearnSpell(uint32 spellId, std::ostringstream* out);
 };
 
+class AutoUpgradeEquipAction : public Action
+{
+    public:
+        AutoUpgradeEquipAction(PlayerbotAI* botAI, std::string const name = "auto upgrade equip") : Action(botAI, name) { }
+
+        bool Execute(Event event);
+};
+
 #endif
