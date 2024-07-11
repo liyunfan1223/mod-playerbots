@@ -176,6 +176,9 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
             if (summoner->IsWithinLOS(x, y, z))
             {
+                if (sPlayerbotAIConfig->botRepairWhenSummon) // .conf option to repair bot gear when summoned 0 = off, 1 = on
+                    bot->DurabilityRepairAll(false, 1.0f, false);
+
                 if (sPlayerbotAIConfig->botReviveWhenSummon < 2)
                 {
                     if (master->IsInCombat())
@@ -200,7 +203,6 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                 if (sPlayerbotAIConfig->botReviveWhenSummon > 0 && bot->isDead())
                 {
                     bot->ResurrectPlayer(1.0f, false);
-                    bot->DurabilityRepairAll(false, 1.0f, false);
                     botAI->TellMasterNoFacing("I live, again!");
                 }
 
