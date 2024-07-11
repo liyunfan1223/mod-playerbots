@@ -149,7 +149,10 @@ void PlayerbotFactory::Prepare()
 {
     if (!itemQuality)
     {
-        itemQuality = ITEM_QUALITY_RARE;
+        uint32 gs = sPlayerbotAIConfig->randomGearScoreLimit == 0 ? 0 :
+            PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->randomGearScoreLimit, sPlayerbotAIConfig->randomGearQualityLimit);
+        itemQuality = sPlayerbotAIConfig->randomGearScoreLimit;
+        gearScoreLimit = gs;
     }
 
     if (bot->isDead())

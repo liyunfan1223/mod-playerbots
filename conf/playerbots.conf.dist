@@ -891,6 +891,14 @@ AiPlayerbot.AutoPickTalents = 1
 #
 #
 
+# Equips quality limitation for random bots (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
+# default: 3 (rare)
+AiPlayerbot.RandomGearQualityLimit = 3
+
+# Equips gear score limitation for random bots (0 = no limit)
+# default: 0 (no limit)
+AiPlayerbot.RandomGearScoreLimit = 0
+
 # Change random bot has lower gear
 AiPlayerbot.RandomGearLoweringChance = 0
 
