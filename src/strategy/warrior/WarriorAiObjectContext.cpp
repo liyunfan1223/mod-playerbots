@@ -117,7 +117,7 @@ class WarriorTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* SwordAndBoard(PlayerbotAI* botAI) { return new SwordAndBoardTrigger(botAI); }
         static Trigger* shield_bash_on_enemy_healer(PlayerbotAI* botAI) { return new ShieldBashInterruptEnemyHealerSpellTrigger(botAI); }
 
-        static Trigger* thunderclap_and_rage(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "thunderclap", "light rage available"); }
+        static Trigger* thunderclap_and_rage(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "thunder clap", "light rage available"); }
         static Trigger* intercept_can_cast(PlayerbotAI* botAI) { return new InterceptCanCastTrigger(botAI); }
         static Trigger* intercept_and_far_enemy(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "enemy is out of melee", "intercept can cast"); }
         static Trigger* intercept_and_rage(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "intercept and far enemy", "light rage available"); }
