@@ -132,7 +132,7 @@ AiPlayerbot.GroupInvitationPermission = 1
 AiPlayerbot.BotReviveWhenSummon = 1
 
 # Enable/Disable bot repair gear when summon (0 = no, 1 = yes)
-# default: 1 (enable for non-combat)
+# default: 1
 AiPlayerbot.BotRepairWhenSummon = 1
 
 # Non-GM player can only use init=auto to initialize bots based on their own level and gear score
