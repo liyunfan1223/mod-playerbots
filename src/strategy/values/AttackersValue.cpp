@@ -47,8 +47,21 @@ GuidVector AttackersValue::Calculate()
 
     if (bot->duel && bot->duel->Opponent)
         result.push_back(bot->duel->Opponent->GetGUID());
-    
-	return result;
+
+    // workaround for bots of same faction not fighting in arena
+    if (bot->InArena())
+    {
+        GuidVector possibleTargets = AI_VALUE(GuidVector, "possible targets");
+        for (ObjectGuid const guid : possibleTargets)
+        {
+            Unit* unit = botAI->GetUnit(guid);
+            if (unit && unit->IsPlayer() && IsValidTarget(unit, bot)) {
+                result.push_back(unit->GetGUID());
+            }
+        }
+    }
+
+    return result;
 }
 
 void AttackersValue::AddAttackersOf(Group* group, std::unordered_set<Unit*>& targets)
