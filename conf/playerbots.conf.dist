@@ -614,11 +614,11 @@ AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330522135301331
 #
 
 AiPlayerbot.PremadeSpecName.4.0 = as pve
-AiPlayerbot.PremadeSpecGlyph.4.0 = 45768,43379,45761,43380,43378,45767
+AiPlayerbot.PremadeSpecGlyph.4.0 = 45768,43379,45761,43380,43378,45766
 AiPlayerbot.PremadeSpecLink.4.0.60 = 005323005350100520103331051
 AiPlayerbot.PremadeSpecLink.4.0.80 = 005323005350100520103331051-005005005003-2
 AiPlayerbot.PremadeSpecName.4.1 = combat pve
-AiPlayerbot.PremadeSpecGlyph.4.1 = 45762,43379,45767,43380,43378,45766
+AiPlayerbot.PremadeSpecGlyph.4.1 = 42962,43379,45762,43380,43378,42969
 AiPlayerbot.PremadeSpecLink.4.1.60 = -0252051000035015223100501251
 AiPlayerbot.PremadeSpecLink.4.1.80 = 00532000523-0252051000035015223100501251
 AiPlayerbot.PremadeSpecName.4.2 = subtlety pve
