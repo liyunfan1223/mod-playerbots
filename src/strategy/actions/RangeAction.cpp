@@ -17,7 +17,7 @@ bool RangeAction::Execute(Event event)
         PrintRange("flee");
     }
 
-    uint32 pos = param.find(" ");
+    size_t pos = param.find(" ");
     if (pos == std::string::npos)
         return false;
 

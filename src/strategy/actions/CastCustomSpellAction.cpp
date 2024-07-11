@@ -11,7 +11,7 @@
 
 uint32 FindLastSeparator(std::string const text, std::string const sep)
 {
-    uint32 pos = text.rfind(sep);
+    size_t pos = text.rfind(sep);
     if (pos == std::string::npos)
         return pos;
 
@@ -64,7 +64,7 @@ bool CastCustomSpellAction::Execute(Event event)
 
     Item* itemTarget = nullptr;
 
-    uint32 pos = FindLastSeparator(text, " ");
+    size_t pos = FindLastSeparator(text, " ");
     uint32 castCount = 1;
     if (pos != std::string::npos)
     {
