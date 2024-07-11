@@ -3821,6 +3821,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     score += (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
         resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
         spell_penetration + armor + rangeDps + meleeDps) * 0.001;
+    // todo: remove duplicate code
     if (cls == CLASS_HUNTER) {
         // AGILITY only
         score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
@@ -3840,7 +3841,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
               ) {
         // HEALER
         score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1 + rangeDps;       
-    } else if (cls == CLASS_ROGUE) {
+    } else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot))) {
         // AGILITY mainly (STRENGTH also)
         score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
@@ -4242,6 +4243,7 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
     float score = (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
         resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
         spell_penetration + armor + dps) * 0.001;
+    // todo: remove duplicate code
     if (cls == CLASS_HUNTER) {
         // AGILITY only
         score += agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
@@ -4261,7 +4263,7 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
               ) {
         // HEALER
         score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1;       
-    } else if (cls == CLASS_ROGUE) {
+    } else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot))) {
         // AGILITY mainly (STRENGTH also)
         score += agility * 2 + strength + attack_power + armor_penetration * 1 + dps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
@@ -4521,6 +4523,7 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player* bot, uint32
         }
     }
     float score = 0;
+    // todo: remove duplicate code
     if (cls == CLASS_HUNTER) {
         // AGILITY only
         score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
@@ -4540,7 +4543,7 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player* bot, uint32
               ) {
         // HEALER
         score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1 + rangeDps;       
-    } else if (cls == CLASS_ROGUE) {
+    } else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot))) {
         // AGILITY mainly (STRENGTH also)
         score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
