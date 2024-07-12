@@ -157,7 +157,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         LOG_ERROR("playerbots", "Unable to get random bot name!");
         return nullptr;
     }
-    CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use=1 WHERE name='{}'", name);
+    PlayerbotsDatabase.DirectExecute("UPDATE playerbots_names SET in_use=1 WHERE name='{}'", name);
 
     std::vector<uint8> skinColors, facialHairTypes;
     std::vector<std::pair<uint8,uint8>> faces, hairs;
@@ -222,7 +222,7 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
     std::string botName = "";
     int tries = 10;
     while(--tries) {
-        QueryResult result = CharacterDatabase.Query("SELECT name FROM playerbots_names "
+        QueryResult result = PlayerbotsDatabase.Query("SELECT name FROM playerbots_names "
                 "WHERE in_use = 0 AND gender = {} ORDER BY RAND() LIMIT 1", gender);
         if (!result)
         {
@@ -287,7 +287,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
 
         PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
-        CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use = 0 WHERE in_use = 1");
+        PlayerbotsDatabase.DirectExecute("UPDATE playerbots_names SET in_use = 0 WHERE in_use = 1");
         /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created correctly
            the better way is turning the async db operation to sync db operation */
         std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
