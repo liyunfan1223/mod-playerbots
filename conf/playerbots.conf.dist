@@ -127,7 +127,19 @@ AiPlayerbot.EquipmentPersistenceLevel = 80
 # default: 1 (accept based on level)
 AiPlayerbot.GroupInvitationPermission = 1
 
-# Enable/Disable bot revive when summon (0 = never, 1 = enable when non-combat and alive, 2 = enable always)
+# Enable/Disable summoning bots when the master is in combat
+# default: 1 (enabled)
+AiPlayerbot.AllowSummonInCombat = 1
+
+# Enable/Disable summoning bots when the master is dead
+# default: 1 (enabled)
+AiPlayerbot.AllowSummonWhenMasterIsDead = 1
+
+# Enable/Disable summoning bots when they are dead (0 = only when the bots are ghosts, 1 = always)
+# default: 1 (always)
+AiPlayerbot.AllowSummonWhenBotIsDead = 1
+
+# Enable/Disable bot revive when summon (0 = never, 1 = enable when non-combat, 2 = enable always)
 # default: 1 (enable for non-combat)
 AiPlayerbot.BotReviveWhenSummon = 1
 

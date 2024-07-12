@@ -214,6 +214,9 @@ class PlayerbotAIConfig
         bool equipmentPersistence;
         int32 equipmentPersistenceLevel;
         int32 groupInvitationPermission;
+        bool allowSummonInCombat;
+        bool allowSummonWhenMasterIsDead;
+        bool allowSummonWhenBotIsDead;
         int32 botReviveWhenSummon;
         bool botRepairWhenSummon;
         bool autoInitOnly;
