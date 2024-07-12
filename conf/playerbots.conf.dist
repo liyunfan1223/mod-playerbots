@@ -139,9 +139,9 @@ AiPlayerbot.AllowSummonWhenMasterIsDead = 1
 # default: 1 (always)
 AiPlayerbot.AllowSummonWhenBotIsDead = 1
 
-# Enable/Disable bot revive when summon (0 = never, 1 = enable when non-combat, 2 = enable always)
-# default: 1 (enable for non-combat)
-AiPlayerbot.BotReviveWhenSummon = 1
+# Enable/Disable reviving the bots when summoning them
+# default: 1 (enable)
+AiPlayerbot.ReviveBotWhenSummoned = 1
 
 # Enable/Disable bot repair gear when summon (0 = no, 1 = yes)
 # default: 1
