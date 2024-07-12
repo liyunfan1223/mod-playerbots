@@ -15,6 +15,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <string.h>
+#include <algorithm>
 
 void split(std::vector<std::string>& dest, std::string const str, char const* delim)
 {

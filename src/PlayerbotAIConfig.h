@@ -54,8 +54,8 @@ class PlayerbotAIConfig
 
         bool enabled;
         bool allowGuildBots, allowPlayerBots;
-        uint32 globalCoolDown, reactDelay, maxWaitForMove, maxMovementSearchTime, expireActionTime, 
-            dispelAuraDuration, passiveDelay, repeatDelay,
+        uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime,
+            expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay,
             errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
         float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance,
             fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance,
@@ -214,7 +214,11 @@ class PlayerbotAIConfig
         bool equipmentPersistence;
         int32 equipmentPersistenceLevel;
         int32 groupInvitationPermission;
-        int32 botReviveWhenSummon;
+        bool allowSummonInCombat;
+        bool allowSummonWhenMasterIsDead;
+        bool allowSummonWhenBotIsDead;
+        bool reviveBotWhenSummoned;
+        bool botRepairWhenSummon;
         bool autoInitOnly;
         float autoInitEquipLevelLimitRatio;
         int32 addClassCommand;
