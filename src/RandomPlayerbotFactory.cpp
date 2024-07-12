@@ -55,9 +55,9 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_PRIEST].push_back(RACE_NIGHTELF);
     availableRaces[CLASS_PRIEST].push_back(RACE_TROLL);
     availableRaces[CLASS_PRIEST].push_back(RACE_UNDEAD_PLAYER);
-    availableRaces[CLASS_PRIEST].push_back(RACE_DRAENEI);
     if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
+        availableRaces[CLASS_PRIEST].push_back(RACE_DRAENEI);
         availableRaces[CLASS_PRIEST].push_back(RACE_BLOODELF);
     }
 

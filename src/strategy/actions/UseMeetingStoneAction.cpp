@@ -179,28 +179,25 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                 if (sPlayerbotAIConfig->botRepairWhenSummon) // .conf option to repair bot gear when summoned 0 = off, 1 = on
                     bot->DurabilityRepairAll(false, 1.0f, false);
 
-                if (sPlayerbotAIConfig->botReviveWhenSummon < 2)
+                if (master->IsInCombat() && !sPlayerbotAIConfig->allowSummonInCombat)
                 {
-                    if (master->IsInCombat())
-                    {
-                        botAI->TellError("You cannot summon me while you're in combat");
-                        return false;
-                    }
-
-                    if (!master->IsAlive())
-                    {
-                        botAI->TellError("You cannot summon me while you're dead");
-                        return false;
-                    }
-
-                    if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
-                    {
-                        botAI->TellError("You cannot summon me while I'm dead, you need to release my spirit first");
-                        return false;
-                    }
+                    botAI->TellError("You cannot summon me while you're in combat");
+                    return false;
                 }
 
-                if (sPlayerbotAIConfig->botReviveWhenSummon > 0 && bot->isDead())
+                if (!master->IsAlive() && !sPlayerbotAIConfig->allowSummonWhenMasterIsDead)
+                {
+                    botAI->TellError("You cannot summon me while you're dead");
+                    return false;
+                }
+
+                if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) && !sPlayerbotAIConfig->allowSummonWhenBotIsDead)
+                {
+                    botAI->TellError("You cannot summon me while I'm dead, you need to release my spirit first");
+                    return false;
+                }
+
+                if (sPlayerbotAIConfig->botReviveWhenSummon == 2 || (sPlayerbotAIConfig->botReviveWhenSummon == 1 && !master->IsInCombat() && master->IsAlive()))
                 {
                     bot->ResurrectPlayer(1.0f, false);
                     botAI->TellMasterNoFacing("I live, again!");

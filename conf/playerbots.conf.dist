@@ -341,6 +341,13 @@ AiPlayerbot.GlobalCooldown = 500
 # Max wait time when moving
 AiPlayerbot.MaxWaitForMove = 5000
 
+# Disables use of MoveSplinePath for bot movement, will result in more erratic bot movement but means stun/snare/root/etc
+# will work on bots (they wont reliably work when MoveSplinePath is enabled, though slowing effects still work ok)
+# Default: 0 - MoveSplinePath enabled
+#          1 - MoveSplinePath disabled in BG/Arena only
+#          2 - MoveSplinePath disabled everywhere
+AiPlayerbot.DisableMoveSplinePath = 0
+
 # Max search time for movement (higher for better movement on slopes)
 # default: 3
 AiPlayerbot.MaxMovementSearchTime = 3
