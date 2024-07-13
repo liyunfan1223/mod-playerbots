@@ -201,6 +201,12 @@ class BloodlustTrigger : public BoostTrigger
         BloodlustTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "bloodlust") { }
 };
 
+class ElementalMasteryTrigger : public BoostTrigger
+{
+    public:
+        ElementalMasteryTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "elemental mastery") { }
+};
+
 class MaelstromWeaponTrigger : public HasAuraStackTrigger
 {
     public:

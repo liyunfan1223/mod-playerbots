@@ -8,7 +8,7 @@
 
 void CombatStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
-    triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_MOVE + 11), nullptr)));
+    triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("invalid target", NextAction::array(0, new NextAction("drop target", 100), nullptr)));
     triggers.push_back(new TriggerNode("mounted", NextAction::array(0, new NextAction("check mount state", 54), nullptr)));
     // triggers.push_back(new TriggerNode("out of react range", NextAction::array(0, new NextAction("flee to master", 55), nullptr)));
@@ -24,44 +24,44 @@ AvoidAoeStrategy::AvoidAoeStrategy(PlayerbotAI* botAI) : Strategy(botAI)
 }
 
 
-class AvoidAoeStrategyMultiplier : public Multiplier
-{
-public:
-    AvoidAoeStrategyMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "run away on area debuff") {}
+// class AvoidAoeStrategyMultiplier : public Multiplier
+// {
+// public:
+//     AvoidAoeStrategyMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "run away on area debuff") {}
 
-public:
-    virtual float GetValue(Action* action);
+// public:
+//     virtual float GetValue(Action* action);
 
-private:
-};
+// private:
+// };
 
-float AvoidAoeStrategyMultiplier::GetValue(Action* action)
-{
-    if (!action)
-        return 1.0f;
+// float AvoidAoeStrategyMultiplier::GetValue(Action* action)
+// {
+//     if (!action)
+//         return 1.0f;
 
-    std::string name = action->getName();
-    if (name == "follow" || name == "co" || name == "nc" || name == "drop target")
-        return 1.0f;
+//     std::string name = action->getName();
+//     if (name == "follow" || name == "co" || name == "nc" || name == "drop target")
+//         return 1.0f;
 
-    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
-    const SpellInfo* const pSpellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!pSpellInfo) return 1.0f;
+//     uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+//     const SpellInfo* const pSpellInfo = sSpellMgr->GetSpellInfo(spellId);
+//     if (!pSpellInfo) return 1.0f;
 
-    if (spellId && pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
-        return 1.0f;
-    else if (spellId && pSpellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
-        return 1.0f;
+//     if (spellId && pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+//         return 1.0f;
+//     else if (spellId && pSpellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+//         return 1.0f;
 
-    uint32 castTime = pSpellInfo->CalcCastTime(bot);
+//     uint32 castTime = pSpellInfo->CalcCastTime(bot);
 
-    if (AI_VALUE2(bool, "has area debuff", "self target") && spellId && castTime > 0)
-    {
-        return 0.0f;
-    }
+//     if (AI_VALUE2(bool, "has area debuff", "self target") && spellId && castTime > 0)
+//     {
+//         return 0.0f;
+//     }
 
-    return 1.0f;
-}
+//     return 1.0f;
+// }
 
 NextAction** AvoidAoeStrategy::getDefaultActions()
 {
@@ -86,6 +86,6 @@ void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 NextAction** CombatFormationStrategy::getDefaultActions()
 {
     return NextAction::array(0, 
-		new NextAction("combat formation move", ACTION_EMERGENCY),
+		new NextAction("combat formation move", ACTION_NORMAL),
 		nullptr);
 }

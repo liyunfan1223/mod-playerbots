@@ -30,6 +30,14 @@ class HighManaTrigger : public Trigger
         bool IsActive() override;
 };
 
+class EnoughManaTrigger : public Trigger
+{
+    public:
+        EnoughManaTrigger(PlayerbotAI* botAI) : Trigger(botAI, "enough mana") { }
+
+        bool IsActive() override;
+};
+
 class AlmostFullManaTrigger : public Trigger
 {
     public:

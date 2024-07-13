@@ -71,10 +71,10 @@ class DeathCoilTrigger : public SpellCanBeCastTrigger
 		DeathCoilTrigger(PlayerbotAI* botAI) : SpellCanBeCastTrigger(botAI, "death coil") { }
 };
 
-class PestilenceTrigger : public DebuffTrigger
+class PestilenceGlyphTrigger : public SpellTrigger
 {
 	public:
-		PestilenceTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "pestilence") { }
+		PestilenceGlyphTrigger(PlayerbotAI* botAI) : SpellTrigger(botAI, "pestilence") { }
 		virtual bool IsActive() override;
 };
 

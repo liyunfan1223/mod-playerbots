@@ -15,8 +15,6 @@ class AutoTeleportForLevelAction : public Action
         AutoTeleportForLevelAction(PlayerbotAI* botAI, std::string const name = "auto teleport for level") : Action(botAI, name) { }
 
         bool Execute(Event event);
-    private:
-        void AutoUpgradeEquip();
 };
 
 #endif

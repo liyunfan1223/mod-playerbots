@@ -614,11 +614,11 @@ AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330522135301331
 #
 
 AiPlayerbot.PremadeSpecName.4.0 = as pve
-AiPlayerbot.PremadeSpecGlyph.4.0 = 45768,43379,45761,43380,43378,45767
+AiPlayerbot.PremadeSpecGlyph.4.0 = 45768,43379,45761,43380,43378,45766
 AiPlayerbot.PremadeSpecLink.4.0.60 = 005323005350100520103331051
 AiPlayerbot.PremadeSpecLink.4.0.80 = 005323005350100520103331051-005005005003-2
 AiPlayerbot.PremadeSpecName.4.1 = combat pve
-AiPlayerbot.PremadeSpecGlyph.4.1 = 45762,43379,45767,43380,43378,45766
+AiPlayerbot.PremadeSpecGlyph.4.1 = 42962,43379,45762,43380,43378,42969
 AiPlayerbot.PremadeSpecLink.4.1.60 = -0252051000035015223100501251
 AiPlayerbot.PremadeSpecLink.4.1.80 = 00532000523-0252051000035015223100501251
 AiPlayerbot.PremadeSpecName.4.2 = subtlety pve
@@ -696,8 +696,8 @@ AiPlayerbot.PremadeSpecLink.7.1.60 = -30205033005001333031131131051
 AiPlayerbot.PremadeSpecLink.7.1.80 = 053030052-30205033005021333031131131051
 AiPlayerbot.PremadeSpecName.7.2 = resto pve
 AiPlayerbot.PremadeSpecGlyph.7.2 = 41517,43385,41527,43386,44923,45775
-AiPlayerbot.PremadeSpecLink.7.2.60 = --50005301335310501002331241
-AiPlayerbot.PremadeSpecLink.7.2.80 = -00505031-50005331335310501022331251
+AiPlayerbot.PremadeSpecLink.7.2.60 = --50005301235310501102321251
+AiPlayerbot.PremadeSpecLink.7.2.80 = -00502033-50005331335310501122331251
 
 #
 #
@@ -715,8 +715,8 @@ AiPlayerbot.PremadeSpecLink.8.0.60 = 23000503110033014032310150532
 AiPlayerbot.PremadeSpecLink.8.0.80 = 23000523310033015032310250532-03-203203001
 AiPlayerbot.PremadeSpecName.8.1 = fire pve
 AiPlayerbot.PremadeSpecGlyph.8.1 = 42739,43339,45737,43364,44920,42751
-AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030012303330053120300351
-AiPlayerbot.PremadeSpecLink.8.1.80 = 23000503310003-0055030012303330053120300351
+AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
+AiPlayerbot.PremadeSpecLink.8.1.80 = 23000503110003-0055030011302331053120321351
 AiPlayerbot.PremadeSpecName.8.2 = frost pve
 AiPlayerbot.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
 AiPlayerbot.PremadeSpecLink.8.2.60 = --3533103310203100232102231151
@@ -890,6 +890,14 @@ AiPlayerbot.AutoPickTalents = 1
 # GEAR
 #
 #
+
+# Equips quality limitation for random bots (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
+# default: 3 (rare)
+AiPlayerbot.RandomGearQualityLimit = 3
+
+# Equips gear score limitation for random bots (0 = no limit)
+# default: 0 (no limit)
+AiPlayerbot.RandomGearScoreLimit = 0
 
 # Change random bot has lower gear
 AiPlayerbot.RandomGearLoweringChance = 0

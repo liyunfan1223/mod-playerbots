@@ -45,6 +45,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["medium mana"] = &TriggerContext::MediumMana;
             creators["high mana"] = &TriggerContext::HighMana;
             creators["almost full mana"] = &TriggerContext::AlmostFullMana;
+            creators["enough mana"] = &TriggerContext::EnoughMana;
 
             creators["party member critical health"] = &TriggerContext::PartyMemberCriticalHealth;
             creators["party member low health"] = &TriggerContext::PartyMemberLowHealth;
@@ -253,6 +254,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* MediumMana(PlayerbotAI* botAI) { return new MediumManaTrigger(botAI); }
         static Trigger* HighMana(PlayerbotAI* botAI) { return new HighManaTrigger(botAI); }
         static Trigger* AlmostFullMana(PlayerbotAI* botAI) { return new AlmostFullManaTrigger(botAI); }
+        static Trigger* EnoughMana(PlayerbotAI* botAI) { return new EnoughManaTrigger(botAI); }
         static Trigger* LightRageAvailable(PlayerbotAI* botAI) { return new LightRageAvailableTrigger(botAI); }
         static Trigger* MediumRageAvailable(PlayerbotAI* botAI) { return new MediumRageAvailableTrigger(botAI); }
         static Trigger* HighRageAvailable(PlayerbotAI* botAI) { return new HighRageAvailableTrigger(botAI); }

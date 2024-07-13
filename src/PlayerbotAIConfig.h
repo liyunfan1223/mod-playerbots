@@ -79,6 +79,8 @@ class PlayerbotAIConfig
         std::vector<uint32> randomBotQuestIds;
         uint32 randomBotTeleportDistance;
         float randomGearLoweringChance;
+        int32 randomGearQualityLimit;
+        int32 randomGearScoreLimit;
         float randomBotMaxLevelChance;
         float randomBotRpgChance;
         uint32 minRandomBots, maxRandomBots;

@@ -53,6 +53,8 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
         case QUEST_STATUS_FAILED:
             out << "|cffff0000Failed|r";
             break;
+        default:
+            break;
     }
 
     out << ": " << chat->FormatQuest(quest);
@@ -256,6 +258,8 @@ bool TurnInQueryQuestAction::Execute(Event event)
             break;
         case QUEST_STATUS_REWARDED:
             out << "|cffff0000Rewarded|r";
+            break;
+        default:
             break;
     }
 
