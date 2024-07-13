@@ -220,6 +220,21 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
 std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
 {
     std::string botName = "";
+    
+    const std::string groupCategory = "CVK";
+    const std::string groupForm[2][6] = {
+  	    {"CV","CVC","CVC","CVK","VC","VK"},
+        {"CV","CVC","CVK","KVC","VC","VK"}
+    };
+    const std::string letterGroup[2][3] = {
+  	    {"tnNsrdlSmTqwfgypbCvhkjxqzs","eaoiue",  "ptkbdg"},
+  	    {"tnNsrdlSmTqwfgypbCvhkjxqzr","aaaoiiue","ptkbdg"}
+    };
+    const std::string replaceRules[2][10] = {
+  	    {"ST",   "ka","ko","ku","kr","S", "T", "C", "N", "jj"},
+	    {"st'th","ca","co","cu","cr","sh","th","ch","ng","dg"}
+    };
+        
     int tries = 10;
     while(--tries) {
         QueryResult result = CharacterDatabase.Query("SELECT name FROM playerbots_names "
@@ -235,7 +250,45 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
             return ret;
         }
     }
-    LOG_ERROR("playerbots", "No more names left for random bots. Simply random.");
+
+    //NEW COLANG RANDOM NAME GENERATION
+    LOG_ERROR("playerbots", "No more names left for random bots. Attempting conlang name generation.");
+    tries = 10;
+    while (--tries) {
+        botName.clear();
+        
+        //Build name from groupForms
+        for (int i = 0; i < rand()%4 + 1 + rand()%2; i++) {
+  	        botName += groupForm[gender][rand() % 6];
+  	    }
+        
+        //replace Catagory value with random Letter from that Catagory's Letter string for a given bot gender
+        for (int i=0; i < botName.size(); i++) {
+  	        botName[i] = letterGroup[gender][groupCategory.find(botName[i])][rand()%letterGroup[gender][groupCategory.find(botName[i])].size()];
+  	    }
+  
+        //itterate over replace rules
+        for (int i = 0; i < 10; i++) {
+            int j = botName.find(replaceRule[0][i]);
+            while ( j > -1) {
+                botName.replace(j,replaceRule[0][i].size(),replaceRule[1][i]);
+                j = botName.find(replaceRule[0][i]);
+            }    
+        }
+  
+        //Capitalize first letter
+        botName[0] -= 32;
+
+        if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS ||
+            (sObjectMgr->IsReservedName(botName) || sObjectMgr->IsProfanityName(botName)))
+        {
+            botName.clear();
+            continue;
+        }
+        return std::move(botName);
+    }
+    
+    LOG_ERROR("playerbots", "Con​lang name generation failed. True random name fallback.");
     tries = 10;
     while(--tries) {
         for (uint8 i = 0; i < 10; i++) {
