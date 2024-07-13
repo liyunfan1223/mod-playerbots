@@ -352,10 +352,16 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
         Player* owner = holder.GetOwner();
         if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
         {
-            std::ostringstream out;
-            out << "Unknown command " << command;
-            TellMaster(out);
-            helper.ParseChatCommand("help");
+             // To prevent spam caused by WIM
+            if (!(command.rfind("WIM", 0) == 0) &&
+                !(command.rfind("QHpr", 0) == 0)
+                )
+            {
+                std::ostringstream out;
+                out << "Unknown command " << command;
+                TellMaster(out);
+                helper.ParseChatCommand("help");
+            }
         }
 
         chatCommands.pop();
