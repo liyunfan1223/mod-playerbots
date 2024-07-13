@@ -459,7 +459,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     // get BG MapId
     uint32 bgTypeId_ = bgTypeId;
     uint32 instanceId = 0; // 0 = First Available
-    bool joinAsGroup = bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() == bot->GetGUID();
+    
     bool isPremade = false;
     bool isArena = false;
     bool isRated = false;
@@ -483,6 +483,11 @@ bool BGJoinAction::JoinQueue(uint32 type)
         return false;
     }
 
+    // refresh food/regs
+    sRandomPlayerbotMgr->Refresh(bot);
+
+    bool joinAsGroup = bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() == bot->GetGUID();
+    
     // in wotlk only arena requires battlemaster guid
     ObjectGuid guid = isArena ? unit->GetGUID() : bot->GetGUID();
 
@@ -546,8 +551,6 @@ bool BGJoinAction::JoinQueue(uint32 type)
         bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str(), _bgType.c_str(),
         isRated ? "Rated Arena" : isArena ? "Arena" : "");
 
-    // refresh food/regs
-    sRandomPlayerbotMgr->Refresh(bot);
 
     if (isArena)
     {
