@@ -61,7 +61,7 @@ void FuryWarriorStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("bloodthirst", NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 7), nullptr)));
     triggers.push_back(new TriggerNode("instant slam", NextAction::array(0, new NextAction("slam", ACTION_HIGH + 5), nullptr)));
     triggers.push_back(new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 1), NULL)));
+    triggers.push_back(new TriggerNode("medium rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 1), NULL)));
     // triggers.push_back(new TriggerNode("berserker rage", NextAction::array(0, new NextAction("berserker rage", ACTION_HIGH + 2), nullptr)));
     // triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, 
     //     new NextAction("whirlwind", ACTION_HIGH + 2),

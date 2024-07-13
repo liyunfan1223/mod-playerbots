@@ -95,6 +95,9 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "medium group heal occasion",
         NextAction::array(0, new NextAction("divine sacrifice", ACTION_HIGH + 5), nullptr)));
     triggers.push_back(new TriggerNode(
+        "enough mana",
+        NextAction::array(0, new NextAction("melee consecration", ACTION_HIGH + 4), nullptr)));
+    triggers.push_back(new TriggerNode(
         "not facing target",
         NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), nullptr)));
     triggers.push_back(new TriggerNode(

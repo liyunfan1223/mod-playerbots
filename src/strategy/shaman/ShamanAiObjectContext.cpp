@@ -96,6 +96,7 @@ class ShamanATriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["frost shock snare"] = &ShamanATriggerFactoryInternal::frost_shock_snare;
             creators["heroism"] = &ShamanATriggerFactoryInternal::heroism;
             creators["bloodlust"] = &ShamanATriggerFactoryInternal::bloodlust;
+            creators["elemental mastery"] = &ShamanATriggerFactoryInternal::elemental_mastery;
             creators["wind shear on enemy healer"] = &ShamanATriggerFactoryInternal::wind_shear_on_enemy_healer;
             creators["cure poison"] = &ShamanATriggerFactoryInternal::cure_poison;
             creators["party member cure poison"] = &ShamanATriggerFactoryInternal::party_member_cure_poison;
@@ -114,6 +115,7 @@ class ShamanATriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* maelstrom_weapon(PlayerbotAI* botAI) { return new MaelstromWeaponTrigger(botAI); }
         static Trigger* heroism(PlayerbotAI* botAI) { return new HeroismTrigger(botAI); }
         static Trigger* bloodlust(PlayerbotAI* botAI) { return new BloodlustTrigger(botAI); }
+        static Trigger* elemental_mastery(PlayerbotAI* botAI) { return new ElementalMasteryTrigger(botAI); }
         static Trigger* party_member_cleanse_disease(PlayerbotAI* botAI) { return new PartyMemberCleanseSpiritDiseaseTrigger(botAI); }
         static Trigger* party_member_cleanse_curse(PlayerbotAI* botAI) { return new PartyMemberCleanseSpiritCurseTrigger(botAI); }
         static Trigger* party_member_cleanse_poison(PlayerbotAI* botAI) { return new PartyMemberCleanseSpiritPoisonTrigger(botAI); }
@@ -206,6 +208,7 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
             creators["thunderstorm"] = &ShamanAiObjectContextInternal::thunderstorm;
             creators["heroism"] = &ShamanAiObjectContextInternal::heroism;
             creators["bloodlust"] = &ShamanAiObjectContextInternal::bloodlust;
+            creators["elemental mastery"] = &ShamanAiObjectContextInternal::elemental_mastery;
             // creators["cure disease"] = &ShamanAiObjectContextInternal::cure_disease;
             // creators["cure disease on party"] = &ShamanAiObjectContextInternal::cure_disease_on_party;
             // creators["cure poison"] = &ShamanAiObjectContextInternal::cure_poison;
@@ -222,6 +225,7 @@ class ShamanAiObjectContextInternal : public NamedObjectContext<Action>
     private:
         static Action* heroism(PlayerbotAI* botAI) { return new CastHeroismAction(botAI); }
         static Action* bloodlust(PlayerbotAI* botAI) { return new CastBloodlustAction(botAI); }
+        static Action* elemental_mastery(PlayerbotAI* botAI) { return new CastElementalMasteryAction(botAI); }
         static Action* thunderstorm(PlayerbotAI* botAI) { return new CastThunderstormAction(botAI); }
         static Action* lightning_bolt(PlayerbotAI* botAI) { return new CastLightningBoltAction(botAI); }
         static Action* chain_lightning(PlayerbotAI* botAI) { return new CastChainLightningAction(botAI); }

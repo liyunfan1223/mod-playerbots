@@ -350,6 +350,12 @@ class CastBloodlustAction : public CastBuffSpellAction
         CastBloodlustAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "bloodlust") { }
 };
 
+class CastElementalMasteryAction : public CastBuffSpellAction
+{
+    public:
+        CastElementalMasteryAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "elemental mastery") { }
+};
+
 class CastWindShearOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
 {
     public:

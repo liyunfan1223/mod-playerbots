@@ -10,7 +10,7 @@
 bool CustomStrategyEditAction::Execute(Event event)
 {
     std::string text = event.getParam();
-    uint32 pos = text.find(" ");
+    size_t pos = text.find(" ");
     if (pos == std::string::npos)
         return PrintHelp();
 

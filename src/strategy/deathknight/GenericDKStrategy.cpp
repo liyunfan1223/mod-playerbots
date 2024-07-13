@@ -192,5 +192,5 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 	// triggers.push_back(new TriggerNode("light aoe", NextAction::array(0,
 	// 	new NextAction("pestilence", ACTION_NORMAL + 4),
 	// 	nullptr)));
-	triggers.push_back(new TriggerNode("pestilence", NextAction::array(0, new NextAction("pestilence", ACTION_HIGH + 9), NULL)));
+	triggers.push_back(new TriggerNode("pestilence glyph", NextAction::array(0, new NextAction("pestilence", ACTION_HIGH + 9), NULL)));
 }

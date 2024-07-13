@@ -384,6 +384,12 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             activateCheckBgQueueThread();
     }
 
+    if (sPlayerbotAIConfig->randomBotJoinLfg/* && !players.empty()*/)
+    {
+        if (time(nullptr) > (LfgCheckTimer + 30))
+            activateCheckLfgQueueThread();
+    }
+
     uint32 updateBots = sPlayerbotAIConfig->randomBotsPerInterval * onlineBotFocus / 100;
     uint32 maxNewBots = onlineBotCount < maxAllowedBotCount ? maxAllowedBotCount - onlineBotCount : 0;
     uint32 loginBots = std::min(sPlayerbotAIConfig->randomBotsPerInterval - updateBots, maxNewBots);
