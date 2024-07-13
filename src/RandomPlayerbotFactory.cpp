@@ -224,15 +224,15 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
     const std::string groupCategory = "CVK";
     const std::string groupForm[2][6] = {
   	    {"CV","CVC","CVC","CVK","VC","VK"},
-        {"CV","CVC","CVK","KVC","VC","VK"}
+        {"CV","VC","CVK","KVC","CVC","VK"}
     };
     const std::string letterGroup[2][3] = {
-  	    {"tnNsrdlSmTqwfgypbCvhkjxqzs","eaoiue",  "ptkbdg"},
-  	    {"tnNsrdlSmTqwfgypbCvhkjxqzr","aaaoiiue","ptkbdg"}
+  	    {"tnNsrdlSmTqwfgypbCvhkjxqzs","eaAoiue", "ptkbdg"},
+  	    {"tnNsrdlSmTqwfgypbCvhkjxrzr","aaAoiOuE","ptkbdg"}
     };
-    const std::string replaceRules[2][10] = {
-  	    {"ST",   "ka","ko","ku","kr","S", "T", "C", "N", "jj"},
-	    {"st'th","ca","co","cu","cr","sh","th","ch","ng","dg"}
+    const std::string replaceRules[2][13] = {
+  	    {"ST" ,"ka","ko","ku","kr","S" ,"T" ,"C" ,"N" , "jj,"A" ,"E", "O" },
+	    {"sth","ca","co","cu","cr","sh","th","ch","ng","dg","ai","ei","ou"}
     };
         
     int tries = 10;
@@ -258,7 +258,7 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         botName.clear();
         
         //Build name from groupForms
-        for (int i = 0; i < rand()%4 + 1 + rand()%2; i++) {
+        for (int i = 0; i < rand()%3 + rand()%2 + 1; i++) {
   	        botName += groupForm[gender][rand() % 6];
   	    }
         
@@ -268,7 +268,7 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
   	    }
   
         //itterate over replace rules
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 13; i++) {
             int j = botName.find(replaceRule[0][i]);
             while ( j > -1) {
                 botName.replace(j,replaceRule[0][i].size(),replaceRule[1][i]);
