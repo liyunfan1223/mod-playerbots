@@ -575,6 +575,13 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         return "ERROR: You can not use this command on non-summoned random bot.";
     }
 
+    if (!admin) {
+        Player* master = ObjectAccessor::FindConnectedPlayer(masterguid);
+        if (master && (master->IsInCombat() || bot->IsInCombat())) {
+            return "ERROR: You can not use this command during combat.";
+        }
+    }
+    
     if (GET_PLAYERBOT_AI(bot)) {
         if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
         {
