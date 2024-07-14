@@ -268,10 +268,10 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
   
         //itterate over replace rules
         for (int i = 0; i < 13; i++) {
-            int j = botName.find(replaceRule[0][i]);
+            int j = botName.find(replaceRules[0][i]);
             while ( j > -1) {
-                botName.replace(j,replaceRule[0][i].size(),replaceRule[1][i]);
-                j = botName.find(replaceRule[0][i]);
+                botName.replace(j,replaceRules[0][i].size(),replaceRules[1][i]);
+                j = botName.find(replaceRules[0][i]);
             }    
         }
   
