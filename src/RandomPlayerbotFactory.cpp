@@ -231,7 +231,7 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
   	    {"tnNsrdlSmTqwfgypbCvhkjxrzr","aaAoiOuE","ptkbdg"}
     };
     const std::string replaceRules[2][13] = {
-  	    {"ST" ,"ka","ko","ku","kr","S" ,"T" ,"C" ,"N" , "jj,"A" ,"E", "O" },
+  	    {"ST" ,"ka","ko","ku","kr","S" ,"T" ,"C" ,"N" ,"jj","A" ,"E", "O" },
 	    {"sth","ca","co","cu","cr","sh","th","ch","ng","dg","ai","ei","ou"}
     };
         
