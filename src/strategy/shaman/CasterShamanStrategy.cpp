@@ -53,6 +53,7 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("main hand weapon no imbue", NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
     // triggers.push_back(new TriggerNode("searing totem", NextAction::array(0, new NextAction("searing totem", 19.0f), nullptr)));
     triggers.push_back(new TriggerNode("flame shock", NextAction::array(0, new NextAction("flame shock", 20.0f), nullptr)));
+    triggers.push_back(new TriggerNode("elemental mastery", NextAction::array(0, new NextAction("elemental mastery", 27.0f), nullptr)));
     // triggers.push_back(new TriggerNode("frost shock snare", NextAction::array(0, new NextAction("frost shock", 21.0f), nullptr)));
     triggers.push_back(new TriggerNode(
         "no fire totem",
