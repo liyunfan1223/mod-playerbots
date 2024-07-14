@@ -219,22 +219,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
 
 std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
 {
-    std::string botName = "";
-    
-    const std::string groupCategory = "CVK";
-    const std::string groupForm[2][6] = {
-  	    {"CV","CVC","CVC","CVK","VC","VK"},
-        {"CV","VC","CVK","KVC","CVC","VK"}
-    };
-    const std::string letterGroup[2][3] = {
-  	    {"tnNsrdlSmTqwfgypbCvhkjxqzs","eaAoiue", "ptkbdg"},
-  	    {"tnNsrdlSmTqwfgypbCvhkjxrzr","aaAoiOuE","ptkbdg"}
-    };
-    const std::string replaceRules[2][13] = {
-  	    {"ST" ,"ka","ko","ku","kr","S" ,"T" ,"C" ,"N" ,"jj","A" ,"E", "O" },
-	    {"sth","ca","co","cu","cr","sh","th","ch","ng","dg","ai","ei","ou"}
-    };
-        
+    std::string botName = "";        
     int tries = 10;
     while(--tries) {
         QueryResult result = CharacterDatabase.Query("SELECT name FROM playerbots_names "
@@ -252,6 +237,20 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
     }
 
     //NEW COLANG RANDOM NAME GENERATION
+    const std::string groupCategory = "CVK";
+    const std::string groupForm[2][6] = {
+  	    {"CV","CVC","CVC","CVK","VC","VK"},
+        {"CV","VC","CVK","KVC","CVC","VK"}
+    };
+    const std::string letterGroup[2][3] = {
+  	    {"tnNsrdlSmTqwfgypbCvhkjxqzs","eaAoiue", "ptkbdg"},
+  	    {"tnNsrdlSmTqwfgypbCvhkjxrzr","aaAoiOuE","ptkbdg"}
+    };
+    const std::string replaceRules[2][13] = {
+  	    {"ST" ,"ka","ko","ku","kr","S" ,"T" ,"C" ,"N" ,"jj","A" ,"E", "O" },
+	    {"sth","ca","co","cu","cr","sh","th","ch","ng","dg","ai","ei","ou"}
+    };
+    
     LOG_ERROR("playerbots", "No more names left for random bots. Attempting conlang name generation.");
     tries = 10;
     while (--tries) {
