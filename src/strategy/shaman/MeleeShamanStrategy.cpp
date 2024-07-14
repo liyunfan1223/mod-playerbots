@@ -63,7 +63,9 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
+    //triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
+    triggers.push_back(new TriggerNode("main hand weapon no imbue", NextAction::array(0, new NextAction("windfury weapon", 22.0f), nullptr)));
+    triggers.push_back(new TriggerNode("off hand weapon no imbue", NextAction::array(0, new NextAction("flametongue weapon", 21.0f), nullptr)));
     // triggers.push_back(new TriggerNode("searing totem", NextAction::array(0, new NextAction("reach melee", 22.0f), new NextAction("searing totem", 22.0f), nullptr)));
     triggers.push_back(new TriggerNode("flame shock", NextAction::array(0, new NextAction("flame shock", 20.0f), nullptr)));
     triggers.push_back(new TriggerNode(

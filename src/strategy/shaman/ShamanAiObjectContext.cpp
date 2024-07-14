@@ -79,7 +79,9 @@ class ShamanATriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["searing totem"] = &ShamanATriggerFactoryInternal::searing_totem;
             creators["wind shear"] = &ShamanATriggerFactoryInternal::wind_shear;
             creators["purge"] = &ShamanATriggerFactoryInternal::purge;
-            creators["shaman weapon"] = &ShamanATriggerFactoryInternal::shaman_weapon;
+            //creators["shaman weapon"] = &ShamanATriggerFactoryInternal::shaman_weapon;
+            creators["main hand weapon no imbue"] = &ShamanATriggerFactoryInternal::main_hand_weapon_no_imbue;
+            creators["off hand weapon no imbue"] = &ShamanATriggerFactoryInternal::off_hand_weapon_no_imbue;
             creators["water shield"] = &ShamanATriggerFactoryInternal::water_shield;
             creators["lightning shield"] = &ShamanATriggerFactoryInternal::lightning_shield;
             creators["water breathing"] = &ShamanATriggerFactoryInternal::water_breathing;
@@ -136,7 +138,9 @@ class ShamanATriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* searing_totem(PlayerbotAI* botAI) { return new SearingTotemTrigger(botAI); }
         static Trigger* wind_shear(PlayerbotAI* botAI) { return new WindShearInterruptSpellTrigger(botAI); }
         static Trigger* purge(PlayerbotAI* botAI) { return new PurgeTrigger(botAI); }
-        static Trigger* shaman_weapon(PlayerbotAI* botAI) { return new ShamanWeaponTrigger(botAI); }
+        //static Trigger* shaman_weapon(PlayerbotAI* botAI) { return new ShamanWeaponTrigger(botAI); }
+        static Trigger* main_hand_weapon_no_imbue(PlayerbotAI* botAI) { return new MainHandWeaponNoImbueTrigger(botAI); }
+        static Trigger* off_hand_weapon_no_imbue(PlayerbotAI* botAI) { return new OffHandWeaponNoImbueTrigger(botAI); }
         static Trigger* water_shield(PlayerbotAI* botAI) { return new WaterShieldTrigger(botAI); }
         static Trigger* lightning_shield(PlayerbotAI* botAI) { return new LightningShieldTrigger(botAI); }
         static Trigger* shock(PlayerbotAI* botAI) { return new ShockTrigger(botAI); }

@@ -11,6 +11,7 @@
 
 class PlayerbotAI;
 
+/*
 class ShamanWeaponTrigger : public BuffTrigger
 {
     public:
@@ -20,6 +21,21 @@ class ShamanWeaponTrigger : public BuffTrigger
 
     private:
         static std::vector<std::string> spells;
+};
+*/
+
+class MainHandWeaponNoImbueTrigger : public BuffTrigger
+{
+    public:
+        MainHandWeaponNoImbueTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "main hand", 1) {}
+        virtual bool IsActive();
+};
+
+class OffHandWeaponNoImbueTrigger : public BuffTrigger
+{
+    public:
+        OffHandWeaponNoImbueTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "off hand", 1) {}
+        virtual bool IsActive();
 };
 
 class TotemTrigger : public Trigger
