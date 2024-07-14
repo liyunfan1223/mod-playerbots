@@ -511,9 +511,15 @@ AiPlayerbot.RandomGearScoreLimit = 0
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
 
-# Enable expansion limitation
-# Default: 1
-AiPlayerbot.LimitEnchantExpansion = 1
+# Enable expansion limitation for enchants - ie: level <= 60 bot only uses enchants
+# available in vanilla, level <= 70 bot only uses enchants available in TBC)
+# Default: 0
+AiPlayerbot.LimitEnchantExpansion = 0
+
+# Enable expansion limitation for gear - ie: level <= 60 bot only uses gear
+# available in vanilla, level <= 70 bot only uses gear available in TBC)
+# Default: 0
+AiPlayerbot.LimitGearExpansion = 0
 
 # Change random bot has lower gear
 AiPlayerbot.RandomGearLoweringChance = 0

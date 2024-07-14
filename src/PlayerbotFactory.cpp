@@ -1456,6 +1456,14 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                         if (itemId == 46978) { // shaman earth ring totem
                             continue;
                         }
+
+                        // disable next expansion gear
+                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 60 && itemId >= 23728)
+                            continue;
+
+                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 70 && itemId >= 35570 && itemId != 36737 && itemId != 37739 && itemId != 37740)//transition point from TBC -> WOTLK isn't as clear, and there are other wearable TBC items above 35570 but nothing of significance
+                            continue;
+
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
@@ -3454,15 +3462,12 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 continue;
             }
             
-            // disable next expansion
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 69 && enchantSpell >= 25072) {
+            // disable next expansion enchantments
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 60 && enchantSpell >= 25072)
                 continue;
-            }
 
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 79 && enchantSpell > 48557) {
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 && enchantSpell > 48557)
                 continue;
-            }
-
 
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
             {

@@ -136,6 +136,7 @@ class PlayerbotAIConfig
         bool randombotsWalkingRPGInDoors;
         uint32 minEnchantingBotLevel;
         uint32 limitEnchantExpansion;
+        uint32 limitGearExpansion;
         uint32 randombotStartingLevel;
         bool enableRotation;
         uint32 rotationPoolSize;
