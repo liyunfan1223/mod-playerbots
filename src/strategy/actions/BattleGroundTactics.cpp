@@ -1622,6 +1622,27 @@ BattleBotPath vPath_AV_Frostdagger_Pass_Lower_to_Iceblood_Garrison =
     { -492.17f, -187.077f, 57.1342f, nullptr },
 };
 
+BattleBotPath vPath_AV_Icewing_Bunker_Crossroad_to_Frostdagger_Pass_Lower =
+{
+    { 119.693f, -351.311f, 42.728f, nullptr },
+    { 107.710f, -321.162f, 37.168f, nullptr },
+    { 84.953f, -273.434f, 23.944f, nullptr },
+    { 47.073f, -245.696f, 15.417f, nullptr },
+    { 2.455f, -240.346f, 11.867f, nullptr },
+    { -38.451f, -231.493f, 10.284f, nullptr },
+    { -70.606f, -230.758f, 9.919f, nullptr },
+    { -83.955f, -214.666f, 12.873f, nullptr },
+    { -111.412f, -175.575f, 13.515f, nullptr },
+    { -129.634f, -141.359f, 20.921f, nullptr },
+    { -140.904f, -105.104f, 28.097f, nullptr },
+    { -167.552f, -74.891f, 31.524f, nullptr },
+    { -210.442f, -54.664f, 37.525f, nullptr },
+    { -247.372f, -38.489f, 36.438f, nullptr },
+    { -280.423f, -48.095f, 32.709f, nullptr },
+    { -309.757f, -58.032f, 28.778f, nullptr },
+    { -345.274f, -71.566f, 28.005f, nullptr },
+};
+
 BattleBotPath vPath_EY_Horde_Spawn_to_Crossroad1Horde =
 {
     { 1809.102f, 1540.854f, 1267.142f, nullptr },
@@ -2189,6 +2210,7 @@ std::vector<BattleBotPath*> const vPaths_AV =
     &vPath_AV_Coldtooth_Mine_Entrance_to_Coldtooth_Mine_Boss,
     &vPath_AV_Stormpike_Crossroad_to_Irontooth_Mine_Entrance,
     &vPath_AV_Irontooth_Mine_Entrance_to_Irontooth_Mine_Boss,
+    &vPath_AV_Icewing_Bunker_Crossroad_to_Frostdagger_Pass_Lower,
 };
 
 std::vector<BattleBotPath*> const vPaths_EY =
@@ -2934,52 +2956,84 @@ bool BGTactics::selectObjective(bool reset)
     {
         case BATTLEGROUND_AV:
         {
-            // Alliance and Horde code is intentionally different.
-            // Horde bots are more united and always go together.
-            // Alliance bots can pick random objective.
-
             BattlegroundAV* alterValleyBG = (BattlegroundAV*)bg;
+            uint32 role = context->GetValue<uint32>("bg role")->Get();
+            bool supportDefense = role < 3;
+            bool advancedAttack = role < 7;
 
             if (bot->GetTeamId() == TEAM_HORDE)
             {
-                bool endBoss = false;
                 // End Boss
-                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_SOUTH).TotalOwnerId != TEAM_ALLIANCE &&
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FIRSTAID_STATION).TotalOwnerId != TEAM_ALLIANCE &&
                     alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_NORTH).TotalOwnerId != TEAM_ALLIANCE &&
+                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_SOUTH).TotalOwnerId != TEAM_ALLIANCE &&
                     alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEWING_BUNKER).TotalOwnerId != TEAM_ALLIANCE &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_STONEHEART_BUNKER).TotalOwnerId != TEAM_ALLIANCE &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FIRSTAID_STATION).TotalOwnerId != TEAM_ALLIANCE)
+                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_STONEHEART_BUNKER).TotalOwnerId != TEAM_ALLIANCE)
                 {
                     if (Creature* pVanndar = bg->GetBGCreature(AV_CPLACE_TRIGGER17))
                     {
                         BgObjective = pVanndar;
-                        endBoss = true;
-                        std::ostringstream out;
-                        out << "Attacking Vanndar!";
+                        //std::ostringstream out;
+                        //out << "Attacking Vanndar!";
                         //bot->Say(out.str(), LANG_UNIVERSAL);
                     }
                 }
 
-                uint32 role = context->GetValue<uint32>("bg role")->Get();
-                bool supporter = role < 3; // first bunker strike team
-
                 // Only go to Snowfall Graveyard if already close to it.
-                // Need to fix AV script
-                if (!BgObjective && supporter &&
+                if (!BgObjective && supportDefense &&
                     (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE).OwnerId == TEAM_ALLIANCE ||
-                        alterValleyBG->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE).OwnerId == TEAM_OTHER))
+                        alterValleyBG->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE).OwnerId == TEAM_NEUTRAL))
                 {
-                    if (GameObject* pGO = bg->GetBGObject(BG_AV_NODES_SNOWFALL_GRAVE))
-                        if (bot->IsWithinDist(pGO, 200.f))
+                    if (GameObject* pGO = bg->GetBGObject(BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE))
+                        if (bot->IsWithinDist(pGO, 100.f))
                         {
                             BgObjective = pGO;
-                            std::ostringstream out;
-                            out << "Attacking Snowfall GY!";
+                            //std::ostringstream out;
+                            //out << "Attacking Snowfall GY!";
                             //bot->Say(out.str(), LANG_UNIVERSAL);
                         }
                 }
 
-                if (!BgObjective && alterValleyBG->IsCaptainAlive(0))
+                // defend
+                if (!BgObjective  && supportDefense)
+                {
+                    for (const auto& objective : AV_HordeDefendObjectives)
+                    {
+                        if (!BgObjective &&
+                            alterValleyBG->GetAVNodeInfo(objective.first).State != POINT_DESTROYED &&
+                            alterValleyBG->GetAVNodeInfo(objective.first).OwnerId == TEAM_ALLIANCE)
+                        {
+                            if (GameObject* pGO = bg->GetBGObject(objective.second))
+                            {
+                                BgObjective = pGO;
+                                //std::ostringstream out;
+                                //out << "Defending Node #" << objective.first;
+                                //bot->Say(out.str(), LANG_UNIVERSAL);
+                            }
+                        }
+                    }
+                    // defend captain or boss if close
+                    if (!BgObjective && alterValleyBG->IsCaptainAlive(TEAM_HORDE))
+                    {
+                        if (Creature* myNpc = bg->GetBGCreature(AV_CPLACE_TRIGGER18))//galvangar
+                        {
+                            if (myNpc->getDeathState() != DeathState::Dead && bot->IsWithinDist(myNpc, 100.f))
+                                BgObjective = myNpc;
+
+                        }
+                    }
+                    if (!BgObjective)
+                    {
+                        if (Creature* myNpc = bg->GetBGCreature(AV_CPLACE_TRIGGER19))//drek
+                        {
+                            if (myNpc->getDeathState() != DeathState::Dead && bot->IsWithinDist(myNpc, 300.f))
+                                BgObjective = myNpc;
+
+                        }
+                    }
+                }
+
+                if (!BgObjective && alterValleyBG->IsCaptainAlive(TEAM_ALLIANCE))
                 {
                     if (Creature* pBalinda = bg->GetBGCreature(AV_CPLACE_TRIGGER16))
                     {
@@ -2995,9 +3049,8 @@ bool BGTactics::selectObjective(bool reset)
                                     AV_STONEHEARTH_WAITING_HORDE.GetPositionY(),
                                     AV_STONEHEARTH_WAITING_HORDE.GetPositionZ(),
                                     bg->GetMapId());
-
-                                std::ostringstream out;
-                                out << "Taking position at Stonehearth!";
+                                //std::ostringstream out;
+                                //out << "Taking position at Stonehearth!";
                                 //bot->Say(out.str(), LANG_UNIVERSAL);
                             }
                             else
@@ -3007,51 +3060,26 @@ bool BGTactics::selectObjective(bool reset)
                                     AV_STONEHEARTH_ATTACKING_HORDE.GetPositionY(),
                                     AV_STONEHEARTH_ATTACKING_HORDE.GetPositionZ(),
                                     bg->GetMapId());
-
-                                std::ostringstream out;
-                                out << "Attacking Balinda!";
+                                //std::ostringstream out;
+                                //out << "Attacking Balinda!";
                                 //bot->Say(out.str(), LANG_UNIVERSAL);
                             }
-
                             BgObjective = pBalinda;
-
-                            // set skull on captain
-                            //if (bot->IsWithinDistInMap(pBalinda, 50.0f))
-                            //{
-                            //    bot->GetGroup()->SetTargetIcon(7, pBalinda->GetGUID());
-                            //}
                         }
                     }
                 }
 
-                if (!BgObjective)
-                {
-                    for (const auto& objective : AV_HordeDefendObjectives)
-                    {
-                        if (!BgObjective && alterValleyBG->GetAVNodeInfo(objective.first).OwnerId == TEAM_ALLIANCE)
-                        {
-                            if (GameObject* pGO = bg->GetBGObject(objective.second))
-                                if (bot->IsWithinDist(pGO, 400.0f))
-                                {
-                                    BgObjective = pGO;
-                                    //std::ostringstream out;
-                                   // out << "Defending Node #" << objective.first;
-                                    //bot->Say(out.str(), LANG_UNIVERSAL);
-                                }
-                        }
-                    }
-                }
-
-                // Mine capture (need paths & script fix)
-                if (!BgObjective && supporter && !endBoss &&
-                    (alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_ALLIANCE || alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_OTHER) &&
+                // Mine capture (disabled for now)
+                if (false && !BgObjective && supportDefense &&
+                    (alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_ALLIANCE || alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_NEUTRAL) &&
                     alterValleyBG->GetAVNodeInfo(BG_AV_NODES_STORMPIKE_GRAVE).OwnerId != TEAM_ALLIANCE)
                 {
                     if (Creature* mBossNeutral = bg->GetBGCreature(AV_CPLACE_MINE_N_3))
                     {
-                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_OTHER)
+                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_NEUTRAL)
                         {
                             BgObjective = mBossNeutral;
+                            LOG_INFO("playerbots", "HORDE bot={} Attacking Neutral Mine Boss!", bot->GetName());
                             //std::ostringstream out;
                             //out << "Attacking Neutral Mine Boss!";
                             //bot->Say(out.str(), LANG_UNIVERSAL);
@@ -3060,9 +3088,10 @@ bool BGTactics::selectObjective(bool reset)
 
                     if (Creature* mBossAlly = bg->GetBGCreature(AV_CPLACE_MINE_N_3))
                     {
-                        if (!BgObjective && bot->IsWithinDist(mBossAlly, 400.0f) && mBossAlly->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_ALLIANCE)
+                        if (!BgObjective && bot->IsWithinDist(mBossAlly, 400.0f) && mBossAlly->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_NORTH_MINE) == TEAM_NEUTRAL)
                         {
                             BgObjective = mBossAlly;
+                            LOG_INFO("playerbots", "HORDE bot={} Attacking Ally Mine Boss!", bot->GetName());
                             //std::ostringstream out;
                             //out << "Attacking Ally Mine Boss!";
                             //bot->Say(out.str(), LANG_UNIVERSAL);
@@ -3070,118 +3099,111 @@ bool BGTactics::selectObjective(bool reset)
                     }
                 }
 
-                //bool strifeTime = bg->GetStartTime() < (uint32)(5 * MINUTE * IN_MILLISECONDS);
-                // small strike team to first bunker
-                if (!BgObjective/* || (!endBoss && supporter)*/)
+                if (!BgObjective)
                 {
+                    // Attack closest objective
+                    WorldObject* pAttackObjectiveObject = nullptr;
+                    float attackObjectiveDistance = FLT_MAX;
                     for (const auto& objective : AV_HordeAttackObjectives)
                     {
-                        if ((!BgObjective/* || (supporter && objective.first == BG_AV_NODES_STONEHEART_BUNKER && !bg->IsActiveEvent(BG_AV_NODE_CAPTAIN_DEAD_A, 0))*/) &&
-                            alterValleyBG->GetAVNodeInfo(objective.first).TotalOwnerId == TEAM_ALLIANCE)//need to check TotalOwnerId for attack objectives
+                        if ((!advancedAttack && alterValleyBG->GetAVNodeInfo(objective.first).TotalOwnerId == TEAM_ALLIANCE) ||
+                            (alterValleyBG->GetAVNodeInfo(objective.first).OwnerId == TEAM_ALLIANCE))//TotalOwnerId only changes when its fully captured/destroyed, OwnerId changes when it's assaulted (meaning advancedAttack bots move on to next point)
+                        {
+                            if (GameObject* pGO = bg->GetBGObject(objective.second))
+                            {
+                                float const distance = sqrt(bot->GetDistance(pGO));
+                                if (attackObjectiveDistance > distance)
+                                {
+                                    pAttackObjectiveObject = pGO;
+                                    attackObjectiveDistance = distance;
+                                    //std::ostringstream out;
+                                    //out << "Attacking Node #" << objective.first;
+                                    //bot->Say(out.str(), LANG_UNIVERSAL);
+                                }
+                            }
+                        }
+                    }
+                    if (pAttackObjectiveObject)
+                        BgObjective = pAttackObjectiveObject;
+                }
+            }
+            else //TEAM_ALLIANCE
+            {
+                // End Boss
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_HUT).TotalOwnerId != TEAM_HORDE &&
+                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_WTOWER).TotalOwnerId != TEAM_HORDE &&
+                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_ETOWER).TotalOwnerId != TEAM_HORDE &&
+                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_TOWER_POINT).TotalOwnerId != TEAM_HORDE &&
+                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEBLOOD_TOWER).TotalOwnerId != TEAM_HORDE)
+                {
+                    if (Creature* pDrek = bg->GetBGCreature(AV_CPLACE_TRIGGER19))
+                    {
+                        BgObjective = pDrek;
+                        //std::ostringstream out;
+                        //out << "Attacking DrekThar!";
+                        //bot->Say(out.str(), LANG_UNIVERSAL);
+                    }
+                }
+
+                // Only go to Snowfall Graveyard if already close to it.
+                if (!BgObjective && supportDefense &&
+                    (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE).OwnerId == TEAM_HORDE ||
+                        alterValleyBG->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE).OwnerId == TEAM_NEUTRAL))
+                {
+                    if (GameObject* pGO = bg->GetBGObject(BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE))
+                        if (bot->IsWithinDist(pGO, 100.f))
+                        {
+                            BgObjective = pGO;
+                            //std::ostringstream out;
+                            //out << "Attacking Snowfall GY!";
+                            //bot->Say(out.str(), LANG_UNIVERSAL);
+                        }
+                }
+
+                // defend
+                if (!BgObjective && supportDefense)
+                {
+                    for (const auto& objective : AV_AllianceDefendObjectives)
+                    {
+                        if (!BgObjective &&
+                            alterValleyBG->GetAVNodeInfo(objective.first).State != POINT_DESTROYED &&
+                            alterValleyBG->GetAVNodeInfo(objective.first).OwnerId == TEAM_HORDE)
                         {
                             if (GameObject* pGO = bg->GetBGObject(objective.second))
                             {
                                 BgObjective = pGO;
                                 //std::ostringstream out;
-                                //out << "Attacking Node #" << objective.first;
+                                //out << "Defending Node #" << objective.first;
                                 //bot->Say(out.str(), LANG_UNIVERSAL);
                             }
                         }
                     }
-                }
-            }
-            else // ALLIANCE
-            {
-                bool endBoss = false;
-                // End boss
-                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEBLOOD_TOWER).TotalOwnerId != TEAM_HORDE &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_TOWER_POINT).TotalOwnerId != TEAM_HORDE &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_ETOWER).TotalOwnerId != TEAM_HORDE &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_WTOWER).TotalOwnerId != TEAM_HORDE &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_HUT).TotalOwnerId != TEAM_HORDE)
-                {
-                    if (Creature* pDrek = bg->GetBGCreature(AV_CPLACE_TRIGGER19))
+                    // defend captain or boss if close
+                    if (!BgObjective && alterValleyBG->IsCaptainAlive(TEAM_ALLIANCE))
                     {
-                        BgObjective = pDrek;
-                        endBoss = true;
-                        std::ostringstream out;
-                        out << "Attacking DrekThar!";
-                        //bot->Say(out.str(), LANG_UNIVERSAL);
-                    }
-                }
-
-                uint32 role = context->GetValue<uint32>("bg role")->Get();
-                bool supporter = role < 3;
-
-                // Only go to Snowfall Graveyard if already close to it.
-                if (!BgObjective && supporter &&
-                    (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE).OwnerId == TEAM_HORDE ||
-                        alterValleyBG->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE).OwnerId == TEAM_OTHER))
-                {
-                    if (GameObject* pGO = bg->GetBGObject(BG_AV_NODES_SNOWFALL_GRAVE))
-                        if (bot->IsWithinDist(pGO, 200.f))
+                        if (Creature* myNpc = bg->GetBGCreature(AV_CPLACE_TRIGGER16))//balinda
                         {
-                            BgObjective = pGO;
-                            std::ostringstream out;
-                            out << "Attacking Snowfall GY!";
-                            //bot->Say(out.str(), LANG_UNIVERSAL);
+                            if (myNpc->getDeathState() != DeathState::Dead && bot->IsWithinDist(myNpc, 100.f))
+                                BgObjective = myNpc;
+
                         }
-                }
-
-                // Chance to defend.
-                if (!BgObjective && (!endBoss && supporter))
-                {
-                    for (const auto& objective : AV_AllianceDefendObjectives)
+                    }
+                    if (!BgObjective)
                     {
-                        if (!BgObjective && alterValleyBG->GetAVNodeInfo(objective.first).OwnerId == TEAM_HORDE)
+                        if (Creature* myNpc = bg->GetBGCreature(AV_CPLACE_TRIGGER16))//vanndar
                         {
-                            if (GameObject* pGO = bg->GetBGObject(objective.second))
-                            {
-                                BgObjective = pGO;
-                                //std::ostringstream out; out << "Defending Node #" << objective.first;
-                                //bot->Say(out.str(), LANG_UNIVERSAL);
-                            }
+                            if (myNpc->getDeathState() != DeathState::Dead && bot->IsWithinDist(myNpc, 300.f))
+                                BgObjective = myNpc;
+
                         }
                     }
                 }
 
-                // Mine capture (need paths & script fix)
-                if (!BgObjective && supporter && !endBoss &&
-                    (alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_HORDE || alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_OTHER) &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_GRAVE).TotalOwnerId != TEAM_HORDE)
+                if (!BgObjective && alterValleyBG->IsCaptainAlive(TEAM_HORDE))
                 {
-                    if (Creature* mBossNeutral = bg->GetBGCreature(AV_CPLACE_MINE_S_3))
+                    if (Creature* pGalvangar = bg->GetBGCreature(AV_CPLACE_TRIGGER18))
                     {
-                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_OTHER)
-                        {
-                            BgObjective = mBossNeutral;
-                            //std::ostringstream out;
-                            //out << "Attacking Neutral Mine Boss!";
-                            //bot->Say(out.str(), LANG_UNIVERSAL);
-                        }
-                    }
-
-                    if (Creature* mBossHorde = bg->GetBGCreature(AV_CPLACE_MINE_S_3))
-                    {
-                        if (!BgObjective && bot->IsWithinDist(mBossHorde, 400.0f) && mBossHorde->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_HORDE)
-                        {
-                            BgObjective = mBossHorde;
-                            //std::ostringstream out;
-                            //out << "Attacking Horde Mine Boss!";
-                            //bot->Say(out.str(), LANG_UNIVERSAL);
-                        }
-                    }
-                }
-
-                if (!BgObjective)
-                {
-                    // Attack closest objective.
-                    WorldObject* pAttackObjectiveObject = nullptr;
-                    float attackObjectiveDistance = FLT_MAX;
-
-                    if (alterValleyBG->IsCaptainAlive(1))
-                    {
-                        if (Creature* pGalvangar = bg->GetBGCreature(AV_CPLACE_TRIGGER18))
+                        if (pGalvangar->getDeathState() != DeathState::Dead)
                         {
                             uint32 attackCount = getDefendersCount(AV_ICEBLOOD_GARRISON_WAITING_ALLIANCE, 10.0f, false) + getDefendersCount(AV_ICEBLOOD_GARRISON_ATTACKING_ALLIANCE, 10.0f, false);
 
@@ -3193,9 +3215,8 @@ bool BGTactics::selectObjective(bool reset)
                                     AV_ICEBLOOD_GARRISON_WAITING_ALLIANCE.GetPositionY(),
                                     AV_ICEBLOOD_GARRISON_WAITING_ALLIANCE.GetPositionZ(),
                                     bg->GetMapId());
-
                                 //std::ostringstream out;
-                                //out << "Taking position at Iceblood Outpost!";
+                                //out << "Taking position at Stonehearth!";
                                 //bot->Say(out.str(), LANG_UNIVERSAL);
                             }
                             else
@@ -3205,19 +3226,54 @@ bool BGTactics::selectObjective(bool reset)
                                     AV_ICEBLOOD_GARRISON_ATTACKING_ALLIANCE.GetPositionY(),
                                     AV_ICEBLOOD_GARRISON_ATTACKING_ALLIANCE.GetPositionZ(),
                                     bg->GetMapId());
-
                                 //std::ostringstream out;
-                                // out << "Attacking Galvangar!";
+                                //out << "Attacking Galvangar!";
                                 //bot->Say(out.str(), LANG_UNIVERSAL);
                             }
-                            pAttackObjectiveObject = pGalvangar;
-                            attackObjectiveDistance = sqrt(bot->GetDistance(pGalvangar));
+                            BgObjective = pGalvangar;
+                        }
+                    }
+                }
+
+                // Mine capture (disabled for now)
+                if (false && !BgObjective && supportDefense &&
+                    (alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_HORDE || alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_NEUTRAL) &&
+                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_GRAVE).TotalOwnerId != TEAM_HORDE)
+                {
+                    if (Creature* mBossNeutral = bg->GetBGCreature(AV_CPLACE_MINE_S_3))
+                    {
+                        if (bot->IsWithinDist(mBossNeutral, 400.0f) && mBossNeutral->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_NEUTRAL)
+                        {
+                            BgObjective = mBossNeutral;
+                            LOG_INFO("playerbots", "ALLIANCE bot={} Attacking Neutral Mine Boss!", bot->GetName());
+                            //std::ostringstream out;
+                            //out << "Attacking Neutral Mine Boss!";
+                            //bot->Say(out.str(), LANG_UNIVERSAL);
                         }
                     }
 
+                    if (Creature* mBossHorde = bg->GetBGCreature(AV_CPLACE_MINE_S_3))
+                    {
+                        if (!BgObjective && bot->IsWithinDist(mBossHorde, 400.0f) && mBossHorde->getDeathState() != DeathState::Dead && alterValleyBG->GetMineOwner(AV_SOUTH_MINE) == TEAM_HORDE)
+                        {
+                            BgObjective = mBossHorde;
+                            LOG_INFO("playerbots", "ALLIANCE bot={} Attacking Horde Mine Boss!", bot->GetName());
+                            //std::ostringstream out;
+                            //out << "Attacking Horde Mine Boss!";
+                            //bot->Say(out.str(), LANG_UNIVERSAL);
+                        }
+                    }
+                }
+
+                if (!BgObjective)
+                {
+                    // Attack closest objective
+                    WorldObject* pAttackObjectiveObject = nullptr;
+                    float attackObjectiveDistance = FLT_MAX;
                     for (const auto& objective : AV_AllianceAttackObjectives)
                     {
-                        if (alterValleyBG->GetAVNodeInfo(objective.first).TotalOwnerId == TEAM_HORDE)//need to check TotalOwnerId for attack objectives
+                        if ((!advancedAttack && alterValleyBG->GetAVNodeInfo(objective.first).TotalOwnerId == TEAM_HORDE) ||
+                            (alterValleyBG->GetAVNodeInfo(objective.first).OwnerId == TEAM_HORDE))//TotalOwnerId only changes when its fully captured/destroyed, OwnerId changes when it's assaulted (meaning advancedAttack bots move on to next point)
                         {
                             if (GameObject* pGO = bg->GetBGObject(objective.second))
                             {
@@ -3227,17 +3283,14 @@ bool BGTactics::selectObjective(bool reset)
                                     pAttackObjectiveObject = pGO;
                                     attackObjectiveDistance = distance;
                                     //std::ostringstream out;
-                                    // out << "Attacking Node #" << objective.first;
+                                    //out << "Attacking Node #" << objective.first;
                                     //bot->Say(out.str(), LANG_UNIVERSAL);
                                 }
                             }
                         }
                     }
-
                     if (pAttackObjectiveObject)
-                    {
                         BgObjective = pAttackObjectiveObject;
-                    }
                 }
             }
             if (BgObjective)
@@ -3246,7 +3299,6 @@ bool BGTactics::selectObjective(bool reset)
                     pos.Set(BgObjective->GetPositionX(), BgObjective->GetPositionY(), BgObjective->GetPositionZ(), BgObjective->GetMapId());
 
                 posMap["bg objective"] = pos;
-
                 //std::ostringstream out;
                 //out << "BG objective set to " << BgObjective->GetName() << " " << pos.x << " " << pos.y;
                 //bot->Say(out.str(), LANG_UNIVERSAL);
@@ -4249,7 +4301,7 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
 
         // creates a score based on dist-to-bot and dist-to-destination, where lower is better, and dist-to-bot is more important (when its beyond a certain distance)
         // dist-to-bot is more important because otherwise they cant reach it at all (or will fly through air with MM::MovePoint()), also bot may need to use multiple
-		// paths (one after another) anyway
+        // paths (one after another) anyway
         float distToDestination = reverse ? startPointDistToDestination : endPointDistToDestination;
         float pathScore = (closestPointDistToBot < botDistanceScoreSubtract ? 0.0f : ((closestPointDistToBot - botDistanceScoreSubtract) * botDistanceScoreMultiply)) + distToDestination;
 
@@ -4280,7 +4332,8 @@ bool BGTactics::resetObjective()
         return false;
 
     // sometimes change role
-    if (!urand(0, 5) && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)))
+    uint32 rollChangeOdds = BATTLEGROUND_AV == bg->GetBgTypeID() ? 31 : 5;
+    if (!urand(0, rollChangeOdds) && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)))
         context->GetValue<uint32>("bg role")->Set(urand(0, 9));
 
     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
