@@ -14,7 +14,7 @@ bool DKPresenceTrigger::IsActive()
     return !botAI->HasAura("blood presence", target) && !botAI->HasAura("unholy presence", target) && !botAI->HasAura("frost presence", target);
 }
 
-bool PestilenceTrigger::IsActive() {
+bool PestilenceGlyphTrigger::IsActive() {
     if (!SpellTrigger::IsActive()) {
         return false;
     }

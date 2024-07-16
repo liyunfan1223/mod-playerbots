@@ -5,6 +5,7 @@
 #include "ShamanTriggers.h"
 #include "Playerbots.h"
 
+/*
 std::vector<std::string> ShamanWeaponTrigger::spells;
 
 bool ShamanWeaponTrigger::IsActive()
@@ -29,6 +30,21 @@ bool ShamanWeaponTrigger::IsActive()
     }
 
     return false;
+}
+*/
+
+bool MainHandWeaponNoImbueTrigger::IsActive() {
+    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND );
+    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+        return false;
+    return true;
+}
+
+bool OffHandWeaponNoImbueTrigger::IsActive() {
+    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND );
+    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+        return false;
+    return true;
 }
 
 bool ShockTrigger::IsActive()

@@ -13,7 +13,6 @@ bool StayActionBase::Stay()
 
     //if (!urand(0, 10))
         //botAI->PlaySound(TEXT_EMOTE_YAWN);
-
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
         return false;
 
@@ -26,12 +25,13 @@ bool StayActionBase::Stay()
         context->GetValue<time_t>("stay time")->Set(stayTime);
     }
 
-    if (!bot->isMoving())
-        return false;
-
-    bot->StopMoving();
-	bot->ClearUnitState(UNIT_STATE_CHASE);
-	bot->ClearUnitState(UNIT_STATE_FOLLOW);
+    // Stop the bot from moving immediately when action is called
+    if (bot->isMoving())
+    {
+        bot->StopMoving();
+        bot->ClearUnitState(UNIT_STATE_CHASE);
+        bot->ClearUnitState(UNIT_STATE_FOLLOW);
+    }
 
     return true;
 }
@@ -43,7 +43,8 @@ bool StayAction::Execute(Event event)
 
 bool StayAction::isUseful()
 {
-    return !AI_VALUE2(bool, "moving", "self target");
+    // Only useful if the bot is currently moving
+    return AI_VALUE2(bool, "moving", "self target");
 }
 
 bool SitAction::Execute(Event event)

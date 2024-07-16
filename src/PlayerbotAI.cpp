@@ -352,10 +352,16 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
         Player* owner = holder.GetOwner();
         if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
         {
-            std::ostringstream out;
-            out << "Unknown command " << command;
-            TellMaster(out);
-            helper.ParseChatCommand("help");
+             // To prevent spam caused by WIM
+            if (!(command.rfind("WIM", 0) == 0) &&
+                !(command.rfind("QHpr", 0) == 0)
+                )
+            {
+                std::ostringstream out;
+                out << "Unknown command " << command;
+                TellMaster(out);
+                helper.ParseChatCommand("help");
+            }
         }
 
         chatCommands.pop();
@@ -1810,7 +1816,7 @@ Player* PlayerbotAI::GetPlayer(ObjectGuid guid)
 
 uint32 GetCreatureIdForCreatureTemplateId(uint32 creatureTemplateId)
 {
-    QueryResult results = WorldDatabase.Query("SELECT guid FROM `acore_world`.`creature` WHERE id1 = {} LIMIT 1;", creatureTemplateId);
+    QueryResult results = WorldDatabase.Query("SELECT guid FROM `creature` WHERE id1 = {} LIMIT 1;", creatureTemplateId);
     if (results) {
         Field* fields = results->Fetch();
         return fields[0].Get<uint32>();
@@ -1900,19 +1906,19 @@ bool PlayerbotAI::TellMasterNoFacing(std::string const text, PlayerbotSecurityLe
         return false;
 
     time_t lastSaid = whispers[text];
-    // Yunfan: Remove tell cooldown
-    // if (!lastSaid || (time(nullptr) - lastSaid) >= sPlayerbotAIConfig->repeatDelay / 1000)
-    // {
-    whispers[text] = time(nullptr);
+    
+    if (!lastSaid || (time(nullptr) - lastSaid) >= sPlayerbotAIConfig->repeatDelay / 1000)
+    {
+        whispers[text] = time(nullptr);
 
-    ChatMsg type = CHAT_MSG_WHISPER;
-    if (currentChat.second - time(nullptr) >= 1)
-        type = currentChat.first;
+        ChatMsg type = CHAT_MSG_WHISPER;
+        if (currentChat.second - time(nullptr) >= 1)
+            type = currentChat.first;
 
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, type == CHAT_MSG_ADDON ? CHAT_MSG_PARTY : type, type == CHAT_MSG_ADDON ? LANG_ADDON : LANG_UNIVERSAL, bot, nullptr, text.c_str());
-    master->SendDirectMessage(&data);
-    // }
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, type == CHAT_MSG_ADDON ? CHAT_MSG_PARTY : type, type == CHAT_MSG_ADDON ? LANG_ADDON : LANG_UNIVERSAL, bot, nullptr, text.c_str());
+        master->SendDirectMessage(&data);
+    }
 
     return true;
 }

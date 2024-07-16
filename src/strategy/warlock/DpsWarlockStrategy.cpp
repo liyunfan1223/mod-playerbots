@@ -87,7 +87,10 @@ void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void DpsAoeWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("rain of fire", 37.0f), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, 
+        new NextAction("seed of corruption", 39.0f),
+        new NextAction("seed of corruption on attacker", 38.0f),
+        new NextAction("rain of fire", 37.0f), nullptr)));
     triggers.push_back(new TriggerNode("corruption on attacker", NextAction::array(0, new NextAction("corruption on attacker", 27.0f), nullptr)));
     triggers.push_back(new TriggerNode("unstable affliction on attacker", NextAction::array(0, new NextAction("unstable affliction on attacker", 26.0f), NULL)));
     triggers.push_back(new TriggerNode("curse of agony on attacker", NextAction::array(0, new NextAction("curse of agony on attacker", 25.0f), nullptr)));

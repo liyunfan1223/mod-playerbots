@@ -47,8 +47,21 @@ GuidVector AttackersValue::Calculate()
 
     if (bot->duel && bot->duel->Opponent)
         result.push_back(bot->duel->Opponent->GetGUID());
-    
-	return result;
+
+    // workaround for bots of same faction not fighting in arena
+    if (bot->InArena())
+    {
+        GuidVector possibleTargets = AI_VALUE(GuidVector, "possible targets");
+        for (ObjectGuid const guid : possibleTargets)
+        {
+            Unit* unit = botAI->GetUnit(guid);
+            if (unit && unit->IsPlayer() && IsValidTarget(unit, bot)) {
+                result.push_back(unit->GetGUID());
+            }
+        }
+    }
+
+    return result;
 }
 
 void AttackersValue::AddAttackersOf(Group* group, std::unordered_set<Unit*>& targets)
@@ -159,7 +172,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
         // (inCannon || !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE)) && attacker->CanSeeOrDetect(bot) &&
         // !(attacker->HasUnitState(UNIT_STATE_STUNNED) && botAI->HasAura("shackle undead", attacker)) && !((attacker->IsPolymorphed() || botAI->HasAura("sap", attacker) || /*attacker->IsCharmed() ||*/ attacker->isFeared()) && !rti) &&
         /*!sServerFacade->IsInRoots(attacker) &&*/
-        !attacker->IsFriendlyTo(bot) && bot->IsWithinDistInMap(attacker, range) &&
+        !attacker->IsFriendlyTo(bot) &&
         !attacker->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) &&
         // !(attacker->GetGUID().IsPet() && enemy) &&
         !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER && !attacker->IsInCombat()) && 

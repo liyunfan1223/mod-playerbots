@@ -54,8 +54,8 @@ class PlayerbotAIConfig
 
         bool enabled;
         bool allowGuildBots, allowPlayerBots;
-        uint32 globalCoolDown, reactDelay, maxWaitForMove, maxMovementSearchTime, expireActionTime, 
-            dispelAuraDuration, passiveDelay, repeatDelay,
+        uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime,
+            expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay,
             errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
         float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance,
             fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance,
@@ -79,6 +79,8 @@ class PlayerbotAIConfig
         std::vector<uint32> randomBotQuestIds;
         uint32 randomBotTeleportDistance;
         float randomGearLoweringChance;
+        int32 randomGearQualityLimit;
+        int32 randomGearScoreLimit;
         float randomBotMaxLevelChance;
         float randomBotRpgChance;
         uint32 minRandomBots, maxRandomBots;
@@ -134,6 +136,7 @@ class PlayerbotAIConfig
         bool randombotsWalkingRPGInDoors;
         uint32 minEnchantingBotLevel;
         uint32 limitEnchantExpansion;
+        uint32 limitGearExpansion;
         uint32 randombotStartingLevel;
         bool enableRotation;
         uint32 rotationPoolSize;
@@ -214,7 +217,11 @@ class PlayerbotAIConfig
         bool equipmentPersistence;
         int32 equipmentPersistenceLevel;
         int32 groupInvitationPermission;
-        int32 botReviveWhenSummon;
+        bool allowSummonInCombat;
+        bool allowSummonWhenMasterIsDead;
+        bool allowSummonWhenBotIsDead;
+        bool reviveBotWhenSummoned;
+        bool botRepairWhenSummon;
         bool autoInitOnly;
         float autoInitEquipLevelLimitRatio;
         int32 addClassCommand;

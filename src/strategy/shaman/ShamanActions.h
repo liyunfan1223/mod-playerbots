@@ -323,6 +323,7 @@ class CastChainLightningAction : public CastSpellAction
 {
     public:
         CastChainLightningAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "chain lightning") { }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastLightningBoltAction : public CastSpellAction
@@ -347,6 +348,12 @@ class CastBloodlustAction : public CastBuffSpellAction
 {
     public:
         CastBloodlustAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "bloodlust") { }
+};
+
+class CastElementalMasteryAction : public CastBuffSpellAction
+{
+    public:
+        CastElementalMasteryAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "elemental mastery") { }
 };
 
 class CastWindShearOnEnemyHealerAction : public CastSpellOnEnemyHealerAction

@@ -34,6 +34,8 @@ int strcmpi(char const* s1, char const* s2);
 #define AI_VALUE_LAZY(type, name) context->GetValue<type>(name)->LazyGet()
 #define AI_VALUE2_LAZY(type, name, param) context->GetValue<type>(name, param)->LazyGet()
 
+#define AI_VALUE_REF(type, name) context->GetValue<type>(name)->RefGet()
+
 #define SET_AI_VALUE(type, name, value) context->GetValue<type>(name)->Set(value)
 #define SET_AI_VALUE2(type, name, param, value) context->GetValue<type>(name, param)->Set(value)
 #define RESET_AI_VALUE(type, name) context->GetValue<type>(name)->Reset()

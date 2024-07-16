@@ -198,6 +198,7 @@ bool AutoGearAction::Execute(Event event)
         sPlayerbotAIConfig->autoGearQualityLimit,
         gs);
     factory.InitEquipment(true);
+    factory.InitAmmo();
     if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
         factory.ApplyEnchantAndGemsNew();
     }

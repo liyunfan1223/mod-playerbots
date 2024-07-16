@@ -158,6 +158,7 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
             creators["banish"] = &WarlockAiObjectContextInternal::banish;
             creators["banish on cc"] = &WarlockAiObjectContextInternal::banish_on_cc;
             creators["seed of corruption"] = &WarlockAiObjectContextInternal::seed_of_corruption;
+            creators["seed of corruption on attacker"] = &WarlockAiObjectContextInternal::seed_of_corruption_on_attacker;
             creators["rain of fire"] = &WarlockAiObjectContextInternal::rain_of_fire;
             creators["shadowfury"] = &WarlockAiObjectContextInternal::shadowfury;
             creators["life tap"] = &WarlockAiObjectContextInternal::life_tap;
@@ -209,6 +210,7 @@ class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* banish(PlayerbotAI* botAI) { return new CastBanishAction(botAI); }
         static Action* banish_on_cc(PlayerbotAI* botAI) { return new CastBanishAction(botAI); }
         static Action* seed_of_corruption(PlayerbotAI* botAI) { return new CastSeedOfCorruptionAction(botAI); }
+        static Action* seed_of_corruption_on_attacker(PlayerbotAI* botAI) { return new CastSeedOfCorruptionOnAttackerAction(botAI); }
         static Action* rain_of_fire(PlayerbotAI* botAI) { return new CastRainOfFireAction(botAI); }
         static Action* shadowfury(PlayerbotAI* botAI) { return new CastShadowfuryAction(botAI); }
         static Action* life_tap(PlayerbotAI* botAI) { return new CastLifeTapAction(botAI); }

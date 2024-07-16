@@ -64,6 +64,11 @@ bool AlmostFullManaTrigger::IsActive()
     return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > 85;
 }
 
+bool EnoughManaTrigger::IsActive()
+{
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > 65;
+}
+
 bool RageAvailable::IsActive()
 {
     return AI_VALUE2(uint8, "rage", "self target") >= amount;

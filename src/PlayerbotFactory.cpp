@@ -149,7 +149,10 @@ void PlayerbotFactory::Prepare()
 {
     if (!itemQuality)
     {
-        itemQuality = ITEM_QUALITY_RARE;
+        uint32 gs = sPlayerbotAIConfig->randomGearScoreLimit == 0 ? 0 :
+            PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->randomGearScoreLimit, sPlayerbotAIConfig->randomGearQualityLimit);
+        itemQuality = sPlayerbotAIConfig->randomGearQualityLimit;
+        gearScoreLimit = gs;
     }
 
     if (bot->isDead())
@@ -1453,6 +1456,14 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                         if (itemId == 46978) { // shaman earth ring totem
                             continue;
                         }
+
+                        // disable next expansion gear
+                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 60 && itemId >= 23728)
+                            continue;
+
+                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 70 && itemId >= 35570 && itemId != 36737 && itemId != 37739 && itemId != 37740)//transition point from TBC -> WOTLK isn't as clear, and there are other wearable TBC items above 35570 but nothing of significance
+                            continue;
+
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
@@ -3451,15 +3462,12 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 continue;
             }
             
-            // disable next expansion
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 69 && enchantSpell >= 25072) {
+            // disable next expansion enchantments
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 60 && enchantSpell >= 25072)
                 continue;
-            }
 
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 79 && enchantSpell > 48557) {
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 && enchantSpell > 48557)
                 continue;
-            }
-
 
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
             {
@@ -3821,9 +3829,10 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     score += (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
         resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
         spell_penetration + armor + rangeDps + meleeDps) * 0.001;
+    // todo: remove duplicate code
     if (cls == CLASS_HUNTER) {
         // AGILITY only
-        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
+        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2 + crit * 2 + haste * 2 + intellect;
     } else if (cls == CLASS_WARLOCK || 
                cls == CLASS_MAGE || 
                (cls == CLASS_PRIEST && tab == 2) || // shadow
@@ -3832,7 +3841,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
               ) {
         // SPELL DPS
         score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration 
-            + hit * 1.2 + crit * 0.7 + haste * 1 + rangeDps;       
+            + hit * 1 + crit * 0.7 + haste * 1 + rangeDps;       
     } else if ((cls == CLASS_PALADIN && tab == 0) || // holy
                (cls == CLASS_PRIEST && tab != 2) || // discipline / holy
                (cls == CLASS_SHAMAN && tab == 2) || // heal
@@ -3840,9 +3849,9 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
               ) {
         // HEALER
         score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1 + rangeDps;       
-    } else if (cls == CLASS_ROGUE) {
+    } else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot))) {
         // AGILITY mainly (STRENGTH also)
-        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
                 (cls == CLASS_WARRIOR && tab != 2) || // arm / fury
                 (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
@@ -3852,20 +3861,20 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player* bot)
     } else if ((cls == CLASS_SHAMAN && tab == 1)) { // enhancement
         // STRENGTH mainly (AGILITY, INTELLECT also)
         score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + meleeDps * 5
-            + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2;
+            + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
     } else if ((cls == CLASS_WARRIOR && tab == 2) || 
                (cls == CLASS_PALADIN && tab == 1)) {
         // TANK WITH SHIELD
         score += strength * 1 + agility * 2 + attack_power * 0.2
             + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3
-            + hit * 1 + crit * 0.2 + haste * 0.5 + expertise * 3;
+            + hit * 0.5 + crit * 0.2 + haste * 0.5 + expertise * 3;
     } else if (cls == CLASS_DEATH_KNIGHT && tab == 0){
         // BLOOD DK TANK
         score += strength * 1 + agility * 2 + attack_power * 0.2
             + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 
-            + hit * 2 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
+            + hit * 0.5 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
     } else {
-        // BEAR DRUID TANK (AND FERAL DRUID...?)
+        // BEAR DRUID TANK
         score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + meleeDps * 2
             + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
@@ -4242,9 +4251,10 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
     float score = (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
         resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
         spell_penetration + armor + dps) * 0.001;
+    // todo: remove duplicate code
     if (cls == CLASS_HUNTER) {
         // AGILITY only
-        score += agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
+        score += agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2 + crit * 2 + haste * 2.5 + intellect;
     } else if (cls == CLASS_WARLOCK || 
                cls == CLASS_MAGE || 
                (cls == CLASS_PRIEST && tab == 2) || // shadow
@@ -4253,7 +4263,7 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
               ) {
         // SPELL DPS
         score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration 
-            + hit * 1.2 + crit * 0.7 + haste * 1;       
+            + hit * 1 + crit * 0.7 + haste * 1;       
     } else if ((cls == CLASS_PALADIN && tab == 0) || // holy
                (cls == CLASS_PRIEST && tab != 2) || // discipline / holy
                (cls == CLASS_SHAMAN && tab == 2) || // heal
@@ -4261,9 +4271,9 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
               ) {
         // HEALER
         score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1;       
-    } else if (cls == CLASS_ROGUE) {
+    } else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot))) {
         // AGILITY mainly (STRENGTH also)
-        score += agility * 2 + strength + attack_power + armor_penetration * 1 + dps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+        score += agility * 2 + strength + attack_power + armor_penetration * 1 + dps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
                 (cls == CLASS_WARRIOR && tab != 2) || // arm / fury
                 (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
@@ -4273,20 +4283,20 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player* bot)
     } else if ((cls == CLASS_SHAMAN && tab == 1)) { // enhancement
         // STRENGTH mainly (AGILITY, INTELLECT also)
         score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + dps * 5
-            + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2;
+            + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
     } else if ((cls == CLASS_WARRIOR && tab == 2) || 
                (cls == CLASS_PALADIN && tab == 1)) {
         // TANK WITH SHIELD
         score += strength * 1 + agility * 2 + attack_power * 0.2
             + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3
-            + hit * 1 + crit * 0.2 + haste * 0.5 + expertise * 3;
+            + hit * 0.5 + crit * 0.2 + haste * 0.5 + expertise * 3;
     } else if (cls == CLASS_DEATH_KNIGHT && tab == 0){
         // BLOOD DK TANK
         score += strength * 1 + agility * 2 + attack_power * 0.2
             + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 
-            + hit * 2 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
+            + hit * 0.5 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
     } else {
-        // BEAR DRUID TANK (AND FERAL DRUID...?)
+        // BEAR DRUID TANK
         score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + dps * 2
             + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
@@ -4521,9 +4531,10 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player* bot, uint32
         }
     }
     float score = 0;
+    // todo: remove duplicate code
     if (cls == CLASS_HUNTER) {
         // AGILITY only
-        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2.5 + crit * 2 + haste * 2.5 + intellect;
+        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2 + crit * 2 + haste * 2.5 + intellect;
     } else if (cls == CLASS_WARLOCK || 
                cls == CLASS_MAGE || 
                (cls == CLASS_PRIEST && tab == 2) || // shadow
@@ -4532,7 +4543,7 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player* bot, uint32
               ) {
         // SPELL DPS
         score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration 
-            + hit * 1.2 + crit * 0.7 + haste * 1 + rangeDps;       
+            + hit * 1 + crit * 0.7 + haste * 1 + rangeDps;       
     } else if ((cls == CLASS_PALADIN && tab == 0) || // holy
                (cls == CLASS_PRIEST && tab != 2) || // discipline / holy
                (cls == CLASS_SHAMAN && tab == 2) || // heal
@@ -4540,9 +4551,9 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player* bot, uint32
               ) {
         // HEALER
         score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1 + rangeDps;       
-    } else if (cls == CLASS_ROGUE) {
+    } else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot))) {
         // AGILITY mainly (STRENGTH also)
-        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     } else if  ((cls == CLASS_PALADIN && tab == 2) || // retribution
                 (cls == CLASS_WARRIOR && tab != 2) || // arm / fury
                 (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
@@ -4552,20 +4563,20 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player* bot, uint32
     } else if ((cls == CLASS_SHAMAN && tab == 1)) { // enhancement
         // STRENGTH mainly (AGILITY, INTELLECT also)
         score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + meleeDps * 5
-            + hit * 2 + crit * 1.5 + haste * 1.5 + expertise * 2;
+            + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
     } else if ((cls == CLASS_WARRIOR && tab == 2) || 
                (cls == CLASS_PALADIN && tab == 1)) {
         // TANK WITH SHIELD
         score += strength * 1 + agility * 2 + attack_power * 0.2
             + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3
-            + hit * 1 + crit * 0.2 + haste * 0.5 + expertise * 3;
+            + hit * 0.5 + crit * 0.2 + haste * 0.5 + expertise * 3;
     } else if (cls == CLASS_DEATH_KNIGHT && tab == 0){
         // BLOOD DK TANK
         score += strength * 1 + agility * 2 + attack_power * 0.2
             + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 
-            + hit * 2 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
+            + hit * 0.5 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
     } else {
-        // BEAR DRUID TANK (AND FERAL DRUID...?)
+        // BEAR DRUID TANK
         score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + meleeDps * 2
             + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5
             + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
