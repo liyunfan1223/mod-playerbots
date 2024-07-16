@@ -3042,7 +3042,7 @@ bool BGTactics::selectObjective(bool reset)
                             uint32 attackCount = getDefendersCount(AV_STONEHEARTH_WAITING_HORDE, 10.0f, false) + getDefendersCount(AV_STONEHEARTH_ATTACKING_HORDE, 10.0f, false);
 
                             // prepare to attack Captain
-                            if (attackCount < 10 && !pBalinda->IsInCombat())
+                            if (attackCount < 15 && !pBalinda->IsInCombat())
                             {
                                 // get in position to attack Captain
                                 pos.Set(AV_STONEHEARTH_WAITING_HORDE.GetPositionX(),
@@ -3190,7 +3190,7 @@ bool BGTactics::selectObjective(bool reset)
                     }
                     if (!BgObjective)
                     {
-                        if (Creature* myNpc = bg->GetBGCreature(AV_CPLACE_TRIGGER16))//vanndar
+                        if (Creature* myNpc = bg->GetBGCreature(AV_CPLACE_TRIGGER17))//vanndar
                         {
                             if (myNpc->getDeathState() != DeathState::Dead && bot->IsWithinDist(myNpc, 300.f))
                                 BgObjective = myNpc;
@@ -3208,7 +3208,7 @@ bool BGTactics::selectObjective(bool reset)
                             uint32 attackCount = getDefendersCount(AV_ICEBLOOD_GARRISON_WAITING_ALLIANCE, 10.0f, false) + getDefendersCount(AV_ICEBLOOD_GARRISON_ATTACKING_ALLIANCE, 10.0f, false);
 
                             // prepare to attack Captain
-                            if (attackCount < 10 && !pGalvangar->IsInCombat())
+                            if (attackCount < 15 && !pGalvangar->IsInCombat())
                             {
                                 // get in position to attack Captain
                                 pos.Set(AV_ICEBLOOD_GARRISON_WAITING_ALLIANCE.GetPositionX(),
@@ -4260,8 +4260,11 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
         botDistanceScoreMultiply = 4.0f;
     }
 
+    //uint32 index = -1;
+    //uint32 chosenPathIndex = -1;
     for (auto const& path : vPaths)
     {
+        //index++;
         // skip mine paths of own faction
         if (bot->GetTeamId() == TEAM_ALLIANCE && std::find(vPaths_AllyMine.begin(), vPaths_AllyMine.end(), path) != vPaths_AllyMine.end())
             continue;
@@ -4312,13 +4315,14 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
             chosenPath = path;
             chosenPathPoint = closestPointIndex;
             chosenPathReverse = reverse;
+            //chosenPathIndex = index;
         }
     }
 
     if (!chosenPath)
         return false;
 
-    //LOG_INFO("playerbots", "bot={} {}", bot->GetName(), vPaths_AB_name[chosenPathNum]);
+    //LOG_INFO("playerbots", "{} bot={} path={}", (bot->GetTeamId() == TEAM_HORDE ? "HORDE" : "ALLIANCE"), bot->GetName(), chosenPathIndex);
 
     return moveToObjectiveWp(chosenPath, chosenPathPoint, chosenPathReverse);
 
