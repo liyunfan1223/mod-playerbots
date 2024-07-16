@@ -1535,6 +1535,9 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
     if (!aura || aura->IsRemoved() || aura->IsExpired()) {
         return false;
     }
+    if (!aura->GetOwner() || !aura->GetOwner()->IsInWorld()) {
+        return false;
+    }
     // Crash fix: maybe change owner due to check interval
     if (aura->GetType() != DYNOBJ_AURA_TYPE) {
         return false;
