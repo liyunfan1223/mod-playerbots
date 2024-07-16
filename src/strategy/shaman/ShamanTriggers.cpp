@@ -42,7 +42,7 @@ bool MainHandWeaponNoImbueTrigger::IsActive() {
 
 bool OffHandWeaponNoImbueTrigger::IsActive() {
     Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) || itemForSpell->GetTemplate()->InventoryType != INVTYPE_WEAPONOFFHAND)
+    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) || itemForSpell->GetTemplate()->InventoryType != INVTYPE_WEAPON)
         return false;
     return true;
 }
