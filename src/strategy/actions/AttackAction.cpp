@@ -67,6 +67,19 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     {
         return false;
     }
+
+    // Check if target is a player and PvP flag is not set
+    if (Player* playerTarget = target->ToPlayer())
+    {
+        if (!playerTarget->IsPvP() && !(bot->duel && bot->duel->Opponent == playerTarget && bot->duel->StartTime))
+        {
+            if (verbose)
+                botAI->TellError("Target is a player without PvP flag set!");
+
+            return false;
+        }
+    }
+
     std::ostringstream msg;
     msg << target->GetName();
 
