@@ -12,21 +12,18 @@
 
 bool IsValidPvpTarget(Player* bot, Unit* target)
 {
-    // If the target is a player and is not flagged for PvP, return false
+    // Check if the target is a player
     if (Player* player = target->ToPlayer())
     {
-        if (!player->IsPvP() && !bot->duel)
-            return false;
-
-        if (bot->duel && bot->duel->Opponent != player)
-            return false;
-
-        // Ensure the bot only attacks when the duel has actually started
-        if (bot->duel && bot->duel->Opponent == player && bot->duel->StartTime > time(nullptr))
-            return false;
+        // If the bot is not in a duel, the target is valid only if they are flagged for PvP
+        if (!bot->duel)
+            return player->IsPvP();
+        else
+            // If the bot is in a duel, the target is valid, only if it is the bot's dueling opponent and the duel has started
+            return bot->duel->Opponent == player && time(nullptr) >= bot->duel->StartTime;
     }
+    // If the target is not a player, it's always valid
     return true;
-}
 
 bool AttackEnemyPlayerAction::isUseful()
 {
@@ -44,10 +41,7 @@ bool AttackEnemyPlayerAction::isUseful()
 bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
-    if (!target || !IsValidPvpTarget(bot, target))
-        return false;
-
-    return sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
+    return target && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
 }
 
 bool AttackAnythingAction::isUseful()
