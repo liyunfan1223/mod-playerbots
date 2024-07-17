@@ -164,6 +164,15 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player)
 bool SummonAction::Teleport(Player* summoner, Player* player)
 {
     Player* master = GetMaster();
+    if (master->GetMap() && master->GetMap()->IsDungeon()) {
+        InstanceMap* map = master->GetMap()->ToInstanceMap();
+        if (map) {
+            if (map->CannotEnter(player) == Map::CANNOT_ENTER_MAX_PLAYERS) {
+                botAI->TellError("I can not enter this dungeon");
+                    return false;
+            }
+        }
+    }
     if (!summoner->IsBeingTeleported() && !player->IsBeingTeleported())
     {
         float followAngle = GetFollowAngle();

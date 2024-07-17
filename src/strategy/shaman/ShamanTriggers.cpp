@@ -34,15 +34,15 @@ bool ShamanWeaponTrigger::IsActive()
 */
 
 bool MainHandWeaponNoImbueTrigger::IsActive() {
-    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND );
+    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
     if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
         return false;
     return true;
 }
 
 bool OffHandWeaponNoImbueTrigger::IsActive() {
-    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND );
-    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) || itemForSpell->GetTemplate()->InventoryType != INVTYPE_WEAPON)
         return false;
     return true;
 }
