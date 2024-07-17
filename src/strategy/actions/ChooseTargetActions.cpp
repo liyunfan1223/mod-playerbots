@@ -10,10 +10,32 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
+bool IsValidPvpTarget(Player* bot, Unit* target)
+{
+    // If the target is a player and is not flagged for PvP, return false
+    if (Player* player = target->ToPlayer())
+    {
+        if (!player->IsPvP() && !bot->duel)
+            return false;
+
+        if (bot->duel && bot->duel->Opponent != player)
+            return false;
+
+        // Ensure the bot only attacks when the duel has actually started
+        if (bot->duel && bot->duel->Opponent == player && bot->duel->StartTime > time(nullptr))
+            return false;
+    }
+    return true;
+}
+
 bool AttackEnemyPlayerAction::isUseful()
 {
     // if carry flag, do not start fight
     if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
+        return false;
+
+    Unit* target = context->GetValue<Unit*>("current target")->Get();
+    if (target && !IsValidPvpTarget(bot, target))
         return false;
 
     return !sPlayerbotAIConfig->IsPvpProhibited(bot->GetZoneId(), bot->GetAreaId());
@@ -22,7 +44,10 @@ bool AttackEnemyPlayerAction::isUseful()
 bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
-    return target && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
+    if (!target || !IsValidPvpTarget(bot, target))
+        return false;
+
+    return sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
 }
 
 bool AttackAnythingAction::isUseful()
@@ -41,7 +66,7 @@ bool AttackAnythingAction::isUseful()
     // }
     Unit* target = GetTarget();
 
-    if (!target)
+    if (!target || !IsValidPvpTarget(bot, target))
         return false;
 
     std::string const name = std::string(target->GetName());
@@ -124,6 +149,10 @@ bool DpsAssistAction::isUseful()
 {
     // if carry flag, do not start fight
     if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
+        return false;
+
+    Unit* target = context->GetValue<Unit*>("current target")->Get();
+    if (target && !IsValidPvpTarget(bot, target))
         return false;
 
     return true;

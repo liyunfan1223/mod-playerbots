@@ -87,4 +87,5 @@ class DropTargetAction : public Action
         bool Execute(Event event) override;
 };
 
+bool IsValidPvpTarget(Player* bot, Unit* target);
 #endif
