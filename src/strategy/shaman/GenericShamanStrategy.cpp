@@ -35,7 +35,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         {
             return new ActionNode ("flametongue weapon",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("flametongue weapon"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("rockbiter weapon"), nullptr),
                 /*C*/ nullptr);
         }
 
@@ -43,7 +43,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         {
             return new ActionNode ("frostbrand weapon",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("frostbrand weapon"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("flametongue weapon"), nullptr),
                 /*C*/ nullptr);
         }
 
@@ -51,7 +51,7 @@ class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionN
         {
             return new ActionNode ("windfury weapon",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("windfury weapon"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("flametongue weapon"), nullptr),
                 /*C*/ nullptr);
         }
 
