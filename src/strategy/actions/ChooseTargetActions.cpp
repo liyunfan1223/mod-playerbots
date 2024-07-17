@@ -24,7 +24,7 @@ bool IsValidPvpTarget(Player* bot, Unit* target)
     }
     // If the target is not a player, it's always valid
     return true;
-
+}
 bool AttackEnemyPlayerAction::isUseful()
 {
     // if carry flag, do not start fight
