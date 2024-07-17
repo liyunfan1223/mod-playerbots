@@ -19,7 +19,7 @@ class HealShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
         {
             return new ActionNode ("earthliving weapon",
                 /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("earthliving weapon"), nullptr),
+                /*A*/ NextAction::array(0, new NextAction("flametongue weapon"), nullptr),
                 /*C*/ nullptr);
         }
 
