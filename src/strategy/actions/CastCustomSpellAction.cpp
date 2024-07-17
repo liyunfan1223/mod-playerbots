@@ -9,14 +9,14 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-uint32 FindLastSeparator(std::string const text, std::string const sep)
+size_t FindLastSeparator(std::string const text, std::string const sep)
 {
     size_t pos = text.rfind(sep);
     if (pos == std::string::npos)
         return pos;
 
-    uint32 lastLinkBegin = text.rfind("|H");
-    uint32 lastLinkEnd = text.find("|h|r", lastLinkBegin + 1);
+    size_t lastLinkBegin = text.rfind("|H");
+    size_t lastLinkEnd = text.find("|h|r", lastLinkBegin + 1);
     if (pos >= lastLinkBegin && pos <= lastLinkEnd)
         pos = text.find_last_of(sep, lastLinkBegin);
 
