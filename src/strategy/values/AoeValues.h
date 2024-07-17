@@ -46,7 +46,7 @@ class AreaDebuffValue : public CalculatedValue<Aura*>
 {
     public:
         AreaDebuffValue(PlayerbotAI* botAI) :
-            CalculatedValue<Aura*>(botAI, "area debuff", 1 * 1000) { }
+            CalculatedValue<Aura*>(botAI, "area debuff", 1) { }
 
         Aura* Calculate() override;
 };
