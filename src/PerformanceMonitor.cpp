@@ -105,7 +105,7 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
             });
 
             uint64 typeTotalTime = 0;
-            uint64 typeMinTime = MAXINT32;
+            uint64 typeMinTime = 0xffffffffu;
             uint64 typeMaxTime = 0;
             uint32 typeCount = 0;
             for (auto& name : names)
@@ -204,7 +204,7 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
             });
 
             uint64 typeTotalTime = 0;
-            uint64 typeMinTime = MAXINT32;
+            uint64 typeMinTime = 0xffffffffu;
             uint64 typeMaxTime = 0;
             uint32 typeCount = 0;
             for (auto& name : names)
