@@ -842,7 +842,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         if (GET_PLAYERBOT_AI(master))
         {
             messages.push_back("Disable player botAI");
-            DisablePlayerBot(master->GetGUID());
+            delete GET_PLAYERBOT_AI(master);
         }
         else if (sPlayerbotAIConfig->selfBotLevel == 0)
             messages.push_back("Self-bot is disabled");
@@ -851,7 +851,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         else
         {
             messages.push_back("Enable player botAI");
-            OnBotLogin(master);
+            sPlayerbotsMgr->AddPlayerbotData(master, true);
+            GET_PLAYERBOT_AI(master)->SetMaster(master);
         }
 
         return messages;
@@ -1427,27 +1428,28 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
         return;
     }
     // If the guid already exists in the map, remove it
-    std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
-    if (itr != _playerbotsAIMap.end())
-    {
-        _playerbotsAIMap.erase(itr);
-    }
-    itr = _playerbotsMgrMap.find(player->GetGUID());
-    if (itr != _playerbotsMgrMap.end())
-    {
-        _playerbotsMgrMap.erase(itr);
-    }
+    
     if (!isBotAI)
     {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
+        if (itr != _playerbotsMgrMap.end())
+        {
+            _playerbotsMgrMap.erase(itr);
+        }
         PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);
-        ASSERT(_playerbotsAIMap.emplace(player->GetGUID(), playerbotMgr).second);
+        ASSERT(_playerbotsMgrMap.emplace(player->GetGUID(), playerbotMgr).second);
 
         playerbotMgr->OnPlayerLogin(player);
     }
     else
     {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
+        if (itr != _playerbotsAIMap.end())
+        {
+            _playerbotsAIMap.erase(itr);
+        }
         PlayerbotAI* botAI = new PlayerbotAI(player);
-        ASSERT(_playerbotsMgrMap.emplace(player->GetGUID(), botAI).second);
+        ASSERT(_playerbotsAIMap.emplace(player->GetGUID(), botAI).second);
     }
 }
 
