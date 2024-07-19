@@ -1738,7 +1738,7 @@ void PlayerbotFactory::InitBags(bool destroyOld)
             bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
         }
         if (old_bag) {
-            return;
+            continue;
         }
         Item* newItem = bot->EquipNewItem(dest, newItemId, true);
         if (newItem)

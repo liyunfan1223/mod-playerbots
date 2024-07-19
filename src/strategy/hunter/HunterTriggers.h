@@ -88,10 +88,10 @@ class FreezingTrapTrigger : public HasCcTargetTrigger
         FreezingTrapTrigger(PlayerbotAI* botAI) : HasCcTargetTrigger(botAI, "freezing trap") { }
 };
 
-class RapidFireTrigger : public BuffTrigger
+class RapidFireTrigger : public BoostTrigger
 {
     public:
-        RapidFireTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "rapid fire") { }
+        RapidFireTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "rapid fire") { }
 };
 
 class TrueshotAuraTrigger : public BuffTrigger
