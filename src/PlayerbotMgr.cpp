@@ -6,6 +6,8 @@
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "Define.h"
+#include "Group.h"
+#include "GroupMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAIConfig.h"
@@ -19,6 +21,7 @@
 #include "ChannelMgr.h"
 #include <cstdio>
 #include <cstring>
+#include <istream>
 #include <string>
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false)
@@ -89,25 +92,42 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     Player* bot = botSession->GetPlayer();
     if (!bot)
     {
-        LogoutPlayerBot(holder.GetGuid());
+        botSession->LogoutPlayer(true);
+        delete botSession;
         // LOG_ERROR("playerbots", "Error logging in bot {}, please try to reset all random bots", holder.GetGuid().ToString().c_str());
         return;
     }
 
-    sRandomPlayerbotMgr->OnPlayerLogin(bot);
-
     uint32 masterAccount = holder.GetMasterAccountId();
     WorldSession* masterSession = masterAccount ? sWorld->FindSession(masterAccount) : nullptr;
+    std::ostringstream out;
     bool allowed = false;
-    if (botAccountId == masterAccount)
+    if (botAccountId == masterAccount) {
         allowed = true;
-    else if (masterSession && sPlayerbotAIConfig->allowGuildBots && bot->GetGuildId() != 0 && bot->GetGuildId() == masterSession->GetPlayer()->GetGuildId())
+    } else if (masterSession && sPlayerbotAIConfig->allowGuildBots && bot->GetGuildId() != 0 && bot->GetGuildId() == masterSession->GetPlayer()->GetGuildId()) {
         allowed = true;
-    else if (sPlayerbotAIConfig->IsInRandomAccountList(botAccountId))
+    } else if (sPlayerbotAIConfig->IsInRandomAccountList(botAccountId)) {
         allowed = true;
-
+    } else {
+        allowed = false;
+        out << "Failure: You are not allowed to control bot " << bot->GetName().c_str();
+    }
+    if (allowed && masterSession) {
+        Player* player = masterSession->GetPlayer();
+        PlayerbotMgr *mgr = GET_PLAYERBOT_MGR(player);
+        uint32 count = mgr->GetPlayerbotsCount();
+        uint32 cls_count = mgr->GetPlayerbotsCountByClass(bot->getClass());
+        if (count >= sPlayerbotAIConfig->maxAddedBots) {
+            allowed = false;
+            out << "Failure: You have added too many bots";
+        } else if (cls_count >= sPlayerbotAIConfig->maxAddedBotsPerClass) {
+            allowed = false;
+            out << "Failure: You have added too many bots for this class";
+        }
+    }
     if (allowed)
     {
+        sRandomPlayerbotMgr->OnPlayerLogin(bot);
         OnBotLogin(bot);
     }
     else
@@ -115,10 +135,12 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         if (masterSession)
         {
             ChatHandler ch(masterSession);
-            ch.PSendSysMessage("You are not allowed to control bot %s", bot->GetName());
+            ch.SendSysMessage(out.str());
         }
-        OnBotLogin(bot);
-        LogoutPlayerBot(bot->GetGUID());
+        botSession->LogoutPlayer(true);
+        delete botSession;
+        // OnBotLogin(bot);
+        // LogoutPlayerBot(bot->GetGUID());
 
         // LOG_ERROR("playerbots", "Attempt to add not allowed bot {}, please try to reset all random bots", bot->GetName());
     }
@@ -453,7 +475,22 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     botAI->TellMaster("Hello!", PLAYERBOT_SECURITY_TALK);
 
     if (master && master->GetGroup() && !group) {
-        master->GetGroup()->AddMember(bot);
+        Group* mgroup = master->GetGroup();
+        if (mgroup->GetMembersCount() >= 5) {
+            if (!mgroup->isRaidGroup() && !mgroup->isLFGGroup() && !mgroup->isBGGroup() && !mgroup->isBFGroup()) {
+                mgroup->ConvertToRaid();
+            }
+            if (mgroup->isRaidGroup()) {
+                mgroup->AddMember(bot);
+            }
+        } else {
+            mgroup->AddMember(bot);
+        }
+    } else if (master && !group) {
+        Group* newGroup = new Group();
+        newGroup->Create(master);
+        sGroupMgr->AddGroup(newGroup);
+        newGroup->AddMember(bot);
     }
 
     uint32 accountId = bot->GetSession()->GetAccountId();
@@ -1155,6 +1192,19 @@ std::string const PlayerbotHolder::LookupBots(Player* master)
         ret_msg += msg + "\n";
     }
     return ret_msg;
+}
+
+uint32 PlayerbotHolder::GetPlayerbotsCountByClass(uint32 cls)
+{
+    uint32 count = 0;
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        if (bot->getClass() == cls) {
+            count++;
+        }
+    }
+    return count;
 }
 
 PlayerbotMgr::PlayerbotMgr(Player* const master) : PlayerbotHolder(),  master(master), lastErrorTell(0)
