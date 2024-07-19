@@ -644,6 +644,7 @@ void PlayerbotFactory::InitPetTalents()
 			spells_row.erase(spells_row.begin() + index);
         }
     }
+    bot->SendTalentsInfoData(true);
 }
 
 void PlayerbotFactory::InitPet()
@@ -870,6 +871,7 @@ void PlayerbotFactory::InitTalentsTree(bool increment/*false*/, bool use_templat
         if (bot->GetFreeTalentPoints())
             InitTalents((specTab + 1) % 3);
     }
+    bot->SendTalentsInfoData(false);
 }
 
 void PlayerbotFactory::InitTalentsBySpecNo(Player* bot, int specNo, bool reset)
@@ -933,6 +935,7 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player* bot, int specNo, bool reset)
             break;
         }
     }
+    bot->SendTalentsInfoData(false);
 }
 
 void PlayerbotFactory::InitTalentsByParsedSpecLink(Player* bot, std::vector<std::vector<uint32>> parsedSpecLink, bool reset)
@@ -983,6 +986,7 @@ void PlayerbotFactory::InitTalentsByParsedSpecLink(Player* bot, std::vector<std:
             break;
         }
     }
+    bot->SendTalentsInfoData(false);
 }
 
 class DestroyItemsVisitor : public IterateItemsVisitor
@@ -2983,6 +2987,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
             }
         }
     }
+    bot->SendTalentsInfoData(false);
 }
 
 void PlayerbotFactory::CancelAuras()
