@@ -1214,7 +1214,7 @@ PlayerbotMgr::PlayerbotMgr(Player* const master) : PlayerbotHolder(),  master(ma
 PlayerbotMgr::~PlayerbotMgr()
 {
     if (master)
-        sPlayerbotsMgr->RemovePlayerBotData(master->GetGUID());
+        sPlayerbotsMgr->RemovePlayerBotData(master->GetGUID(), false);
 }
 
 void PlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
@@ -1427,31 +1427,44 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
         return;
     }
     // If the guid already exists in the map, remove it
-    std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMap.find(player->GetGUID());
-    if (itr != _playerbotsMap.end())
+    std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
+    if (itr != _playerbotsAIMap.end())
     {
-        _playerbotsMap.erase(itr);
+        _playerbotsAIMap.erase(itr);
+    }
+    itr = _playerbotsMgrMap.find(player->GetGUID());
+    if (itr != _playerbotsMgrMap.end())
+    {
+        _playerbotsMgrMap.erase(itr);
     }
     if (!isBotAI)
     {
         PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);
-        ASSERT(_playerbotsMap.emplace(player->GetGUID(), playerbotMgr).second);
+        ASSERT(_playerbotsAIMap.emplace(player->GetGUID(), playerbotMgr).second);
 
         playerbotMgr->OnPlayerLogin(player);
     }
     else
     {
         PlayerbotAI* botAI = new PlayerbotAI(player);
-        ASSERT(_playerbotsMap.emplace(player->GetGUID(), botAI).second);
+        ASSERT(_playerbotsMgrMap.emplace(player->GetGUID(), botAI).second);
     }
 }
 
-void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid)
+void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 {
-    std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMap.find(guid);
-    if (itr != _playerbotsMap.end())
-    {
-        _playerbotsMap.erase(itr);
+    if (is_AI) {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(guid);
+        if (itr != _playerbotsAIMap.end())
+        {
+            _playerbotsAIMap.erase(itr);
+        }
+    } else {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(guid);
+        if (itr != _playerbotsMgrMap.end())
+        {
+            _playerbotsMgrMap.erase(itr);
+        }
     }
 }
 
@@ -1464,8 +1477,8 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
     //     return nullptr;
     // }
-    auto itr = _playerbotsMap.find(player->GetGUID());
-    if (itr != _playerbotsMap.end())
+    auto itr = _playerbotsAIMap.find(player->GetGUID());
+    if (itr != _playerbotsAIMap.end())
     {
         if (itr->second->IsBotAI())
             return reinterpret_cast<PlayerbotAI*>(itr->second);
@@ -1480,8 +1493,8 @@ PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
     {
         return nullptr;
     }
-    auto itr = _playerbotsMap.find(player->GetGUID());
-    if (itr != _playerbotsMap.end())
+    auto itr = _playerbotsMgrMap.find(player->GetGUID());
+    if (itr != _playerbotsMgrMap.end())
     {
         if (!itr->second->IsBotAI())
             return reinterpret_cast<PlayerbotMgr*>(itr->second);
