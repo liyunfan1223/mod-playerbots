@@ -27,7 +27,7 @@ private:
     
     static ActionNode* ice_barrier([[maybe_unused]] PlayerbotAI* botAI)
         {
-            return new ActionNode ("ice_barrier",
+            return new ActionNode ("ice barrier",
                 /*P*/ nullptr,
                 /*A*/ nullptr,
                 /*C*/ nullptr);
