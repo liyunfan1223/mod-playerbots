@@ -10,6 +10,9 @@ class FrostMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 public:
     FrostMageStrategyActionNodeFactory()
     {
+        creators["cold snap"] = &cold_snap;
+        creators["ice barrier"] = &ice_barrier;
+        creators["summon water elemental"] = &summon_water_elemental;
         creators["deep freeze"] = &deep_freeze;
         creators["frostbolt and deep freeze"] = &frostbolt_and_deep_freeze;
     }
