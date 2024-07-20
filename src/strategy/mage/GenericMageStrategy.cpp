@@ -12,9 +12,12 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
         GenericMageStrategyActionNodeFactory()
         {
             creators["frostbolt"] = &frostbolt;
+            creators["frostfire bolt"] = &frostfire_bolt;
+            creators["ice lance"] = &ice_lance;
             creators["fire blast"] = &fire_blast;
             creators["scorch"] = &scorch;
             creators["frost nova"] = &frost_nova;
+            creators["cone of cold"] = &cone_of_cold;
             creators["icy veins"] = &icy_veins;
             creators["combustion"] = &combustion;
             creators["evocation"] = &evocation;
@@ -31,6 +34,22 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             return new ActionNode ("frostbolt",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
+                /*C*/ nullptr);
+        }
+
+        static ActionNode* frostfire_bolt([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("frostfire bolt",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("fireball"), nullptr),
+                /*C*/ nullptr);
+        }
+
+        static ActionNode* ice_lance([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("ice lance",
+                /*P*/ nullptr,
+                /*A*/ nullptr,
                 /*C*/ nullptr);
         }
 
@@ -55,7 +74,15 @@ class GenericMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
             return new ActionNode ("frost nova",
                 /*P*/ nullptr,
                 /*A*/ nullptr,
-               /*C*/ nullptr);
+                /*C*/ nullptr);
+        }
+
+        static ActionNode* cone_of_cold([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode ("cone of cold",
+                /*P*/ nullptr,
+                /*A*/ nullptr,
+                /*C*/ nullptr);
         }
 
         static ActionNode* icy_veins([[maybe_unused]] PlayerbotAI* botAI)

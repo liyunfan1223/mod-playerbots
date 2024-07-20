@@ -74,6 +74,24 @@ class ArcaneBlastTrigger : public BuffTrigger
         ArcaneBlastTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane blast") { }
 };
 
+class FingersOfFrostSingleTrigger : public HasAuraStackTrigger
+{
+public:
+    FingersOfFrostSingleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 1, 1) {}
+};
+
+class FingersOfFrostDoubleTrigger : public HasAuraStackTrigger
+{
+public:
+    FingersOfFrostDoubleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 2, 1) {}
+};
+
+class BrainFreezeTrigger : public HasAuraTrigger
+{
+    public:
+        BrainFreezeTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "fireball!") { }
+};
+
 class CounterspellInterruptSpellTrigger : public InterruptSpellTrigger
 {
     public:
@@ -90,6 +108,18 @@ class IcyVeinsTrigger : public BoostTrigger
 {
     public:
         IcyVeinsTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "icy veins") { }
+};
+
+class ColdSnapTrigger : public BoostTrigger
+{
+    public:
+        ColdSnapTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "cold snap") { }
+};
+
+class IceBarrierTrigger : public BuffTrigger
+{
+    public:
+        IceBarrierTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "ice barrier") { }
 };
 
 class PolymorphTrigger : public HasCcTargetTrigger
@@ -134,7 +164,8 @@ class PresenceOfMindTrigger : public BuffTrigger
         PresenceOfMindTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "presence of mind") { }
 };
 
-class ArcaneBlastStackTrigger : public HasAuraStackTrigger {
+class ArcaneBlastStackTrigger : public HasAuraStackTrigger
+{
 public:
     ArcaneBlastStackTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "arcane blast", 3, 1) {}
 };
