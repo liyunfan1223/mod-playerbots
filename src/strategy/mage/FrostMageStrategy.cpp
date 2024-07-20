@@ -56,7 +56,7 @@ private:
         return new ActionNode ("frostbolt",
             /*P*/ nullptr,
             /*A*/ nullptr,
-            /*C*/ NextAction::array(0, new NextAction("deep freeze"), NULL));
+            /*C*/ NextAction::array(0, new NextAction("deep freeze"), nullptr));
     }
 };
 
