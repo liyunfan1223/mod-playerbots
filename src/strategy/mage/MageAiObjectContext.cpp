@@ -172,7 +172,7 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
             creators["icy veins"] = &MageAiObjectContextInternal::icy_veins;
             creators["cold snap"] = &MageAiObjectContextInternal::cold_snap;
             creators["ice barrier"] = &MageAiObjectContextInternal::ice_barrier;
-            creators["summon_water_elemental"] = &MageAiObjectContextInternal::summon_water_elemental;
+            creators["summon water elemental"] = &MageAiObjectContextInternal::summon_water_elemental;
             creators["combustion"] = &MageAiObjectContextInternal::combustion;
             creators["ice block"] = &MageAiObjectContextInternal::ice_block;
             creators["polymorph"] = &MageAiObjectContextInternal::polymorph;
