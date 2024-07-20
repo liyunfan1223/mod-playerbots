@@ -81,7 +81,8 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // No logic currently for cold snap usage.. possibly use right after icy veins drops off?
     // triggers.push_back(new TriggerNode("cold snap", NextAction::array(0, new NextAction("cold snap", 50.0f), nullptr)));
 
-    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon water elemental", 70.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon water elemental", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("ice barrier", NextAction::array(0, new NextAction("ice barrier", 30.0f), nullptr)));
     
     triggers.push_back(new TriggerNode("brain freeze", NextAction::array(0, new NextAction("frostfire bolt", 60.0f), nullptr)));
