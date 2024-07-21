@@ -7,6 +7,7 @@
 
 #include "MovementActions.h"
 
+class ChatHandler;
 class Battleground;
 class PlayerbotAI;
 struct Position;
@@ -36,6 +37,8 @@ extern std::vector<BattleBotPath*> const vPaths_IC;
 class BGTactics : public MovementAction
 {
     public:
+        static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
+
         BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) { }
 
         bool Execute(Event event) override;

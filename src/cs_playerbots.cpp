@@ -19,6 +19,7 @@
 #include "PlayerbotMgr.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
+#include "BattleGroundTactics.h"
 
 class playerbots_commandscript : public CommandScript
 {
@@ -27,17 +28,23 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
+        static std::vector<ChatCommand> playerbotsDebugCommandTable =
+        {
+            { "bg",             SEC_GAMEMASTER,     true,   &HandleDebugBGCommand,             nullptr },
+        };
+
         static std::vector<ChatCommand> playerbotsCommandTable =
         {
             { "bot",            SEC_PLAYER,         false,  &HandlePlayerbotCommand,           nullptr },
             { "gtask",          SEC_GAMEMASTER,     true,   &HandleGuildTaskCommand,           nullptr },
             { "pmon",           SEC_GAMEMASTER,     true,   &HandlePerfMonCommand,             nullptr },
-            { "rndbot",         SEC_GAMEMASTER,     true,   &HandleRandomPlayerbotCommand,     nullptr }
+            { "rndbot",         SEC_GAMEMASTER,     true,   &HandleRandomPlayerbotCommand,     nullptr },
+            { "debug",          SEC_GAMEMASTER,     true,   nullptr, "",    playerbotsDebugCommandTable},
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "playerbots",     SEC_PLAYER,         true,   nullptr, "",  playerbotsCommandTable },
+            { "playerbots",     SEC_PLAYER,         true,   nullptr, "",        playerbotsCommandTable },
         };
 
         return commandTable;
@@ -80,6 +87,11 @@ public:
 
         sPerformanceMonitor->PrintStats();
         return true;
+    }
+
+    static bool HandleDebugBGCommand(ChatHandler* handler, char const* args)
+    {
+        return BGTactics::HandleConsoleCommand(handler, args);
     }
 };
 
