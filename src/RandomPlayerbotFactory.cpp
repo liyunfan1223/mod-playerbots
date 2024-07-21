@@ -466,7 +466,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
                 if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
                     playerBot->SaveToDB(true, false);
                     sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(), 
-                        playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->getLevel());
+                        playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->GetLevel());
                     playerBot->CleanupsBeforeDelete();
                     delete playerBot;
                 }
@@ -666,7 +666,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         {
             Player* player = ObjectAccessor::FindConnectedPlayer(captain);
 
-            if (!arenateam && player && player->getLevel() >= 70)
+            if (!arenateam && player && player->GetLevel() >= 70)
                 availableCaptains.push_back(captain);
         }
     }
@@ -692,7 +692,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
             continue;
         }
 
-        if (player->getLevel() < 70)
+        if (player->GetLevel() < 70)
         {
             LOG_ERROR("playerbots", "Bot {} must be level 70 to create an arena team", captain.ToString().c_str());
             continue;

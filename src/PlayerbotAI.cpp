@@ -1104,7 +1104,7 @@ void PlayerbotAI::DoNextAction(bool min)
                     if (!group->SameSubGroup(bot, member))
                         continue;
 
-                    if (member->getLevel() < bot->getLevel())
+                    if (member->GetLevel() < bot->GetLevel())
                         continue;
 
                     // follow real player only if he has more honor/arena points

@@ -87,8 +87,8 @@ bool LfgJoinAction::JoinLFG()
     ItemCountByQuality visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
     bool random = urand(0, 100) < 20;
-    bool heroic = urand(0, 100) < 50 && (visitor.count[ITEM_QUALITY_EPIC] >= 3 || visitor.count[ITEM_QUALITY_RARE] >= 10) && bot->getLevel() >= 70;
-    bool rbotAId = !heroic && (urand(0, 100) < 50 && visitor.count[ITEM_QUALITY_EPIC] >= 5 && (bot->getLevel() == 60 || bot->getLevel() == 70 || bot->getLevel() == 80));
+    bool heroic = urand(0, 100) < 50 && (visitor.count[ITEM_QUALITY_EPIC] >= 3 || visitor.count[ITEM_QUALITY_RARE] >= 10) && bot->GetLevel() >= 70;
+    bool rbotAId = !heroic && (urand(0, 100) < 50 && visitor.count[ITEM_QUALITY_EPIC] >= 5 && (bot->GetLevel() == 60 || bot->GetLevel() == 70 || bot->GetLevel() == 80));
 
     LfgDungeonSet list;
     std::vector<uint32> selected;
@@ -103,7 +103,7 @@ bool LfgJoinAction::JoinLFG()
         if (!dungeon || (dungeon->TypeID != LFG_TYPE_RANDOM && dungeon->TypeID != LFG_TYPE_DUNGEON && dungeon->TypeID != LFG_TYPE_HEROIC && dungeon->TypeID != LFG_TYPE_RAID))
             continue;
 
-        uint32 botLevel = bot->getLevel();
+        uint32 botLevel = bot->GetLevel();
         if (dungeon->MinLevel && botLevel < dungeon->MinLevel)
             continue;
 
@@ -133,7 +133,7 @@ bool LfgJoinAction::JoinLFG()
             dungeon->type != LFG_TYPE_RAID))
             continue;
 
-        uint32 botLevel = bot->getLevel();
+        uint32 botLevel = bot->GetLevel();
         if (dungeon->MinLevel && botLevel < dungeon->MinLevel)
             continue;
 
@@ -173,7 +173,7 @@ bool LfgJoinAction::JoinLFG()
 
     LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, Dungeon as {} ({})",
         bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-        bot->getLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
+        bot->GetLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
 
     /*if (lfgState->IsSingleRole())
     {
@@ -213,7 +213,7 @@ bool LfgJoinAction::JoinLFG()
 
         pState->SetType(LFG_TYPE_RANDOM_DUNGEON);
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, Random Dungeon as {} ({})",
-        bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str(), _roles, dungeon->Name[0]);
+        bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), _roles, dungeon->Name[0]);
         return true;
     }
     else if (heroic)
@@ -221,19 +221,19 @@ bool LfgJoinAction::JoinLFG()
         pState->SetType(LFG_TYPE_HEROIC_DUNGEON);
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, Heroic Dungeon as {} ({})",
         bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-        bot->getLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
+        bot->GetLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
     }
     else if (rbotAId)
     {
         pState->SetType(LFG_TYPE_RAID);
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, RbotAId as {} ({})",
-        bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
+        bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
     }
     else
     {
         pState->SetType(LFG_TYPE_DUNGEON);
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, Dungeon as {} ({})",
-        bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
+        bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
     }*/
 
     // Set RbotAId Browser comment
@@ -258,7 +258,7 @@ bool LfgRoleCheckAction::Execute(Event event)
         sLFGMgr->UpdateRoleCheck(group->GetGUID(), bot->GetGUID(), newRoles);
 
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: LFG roles checked",
-            bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str());
+            bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
 
         return true;
     }
@@ -281,13 +281,13 @@ bool LfgAcceptAction::Execute(Event event)
         if (bot->IsInCombat() || bot->isDead())
         {
             LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
-                bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str(), id);
+                bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), id);
             sLFGMgr->UpdateProposal(id, bot->GetGUID(), false);
             return true;
         }
 
         LOG_INFO("playerbots", "Bot {} {}:{} <{}> accepts LFG proposal {}",
-            bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName().c_str(), id);
+            bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), id);
 
         botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
 
@@ -363,7 +363,7 @@ bool LfgJoinAction::isUseful()
         return false;
     }
 
-    if (bot->getLevel() < 15)
+    if (bot->GetLevel() < 15)
         return false;
 
     if ((botAI->GetMaster() && !GET_PLAYERBOT_AI(botAI->GetMaster())) || bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() != bot->GetGUID())
