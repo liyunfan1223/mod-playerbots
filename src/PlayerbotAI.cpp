@@ -450,22 +450,28 @@ void PlayerbotAI::HandleTeleportAck()
 
 	bot->GetMotionMaster()->Clear(true);
 	bot->StopMoving();
-	if (bot->IsBeingTeleportedNear())
-	{
-		WorldPacket p = WorldPacket(MSG_MOVE_TELEPORT_ACK, 8 + 4 + 4);
-        p << bot->GetGUID().WriteAsPacked();
-		p << (uint32) 0; // supposed to be flags? not used currently
-		p << (uint32) time(nullptr); // time - not currently used
-        bot->GetSession()->HandleMoveTeleportAck(p);
-
-        // add delay to simulate teleport delay
+    if (bot->IsBeingTeleportedNear()) {
+        // Temporary fix for instance can not enter
+        if (!bot->IsInWorld()) {
+            bot->GetMap()->AddPlayerToMap(bot);
+        }
+        while (bot->IsInWorld() && bot->IsBeingTeleportedNear()) {
+            Player* plMover = bot->m_mover->ToPlayer();
+            if (!plMover)
+                return;
+            WorldPacket p = WorldPacket(MSG_MOVE_TELEPORT_ACK, 20);
+            p << plMover->GetPackGUID();
+            p << (uint32) 0; // supposed to be flags? not used currently
+            p << (uint32) 0; // time - not currently used
+            bot->GetSession()->HandleMoveTeleportAck(p);
+        }
         SetNextCheckDelay(urand(1000, 3000));
-	}
-	else if (bot->IsBeingTeleportedFar())
+    }
+	if (bot->IsBeingTeleportedFar())
 	{
-        bot->GetSession()->HandleMoveWorldportAck();
-
-        // add delay to simulate teleport delay
+        while (bot->IsBeingTeleportedFar()) {
+            bot->GetSession()->HandleMoveWorldportAck();
+        }
         SetNextCheckDelay(urand(2000, 5000));
     }
 

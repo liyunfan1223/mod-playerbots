@@ -51,5 +51,5 @@ void GenericRogueNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
 
 	triggers.push_back(new TriggerNode(
 		"often",
-		NextAction::array(0, new NextAction("unstealth", 10.0f), NULL)));
+		NextAction::array(0, new NextAction("unstealth", 30.0f), NULL)));
 }

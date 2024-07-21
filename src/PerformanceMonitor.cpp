@@ -50,16 +50,17 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
     if (data.empty())
         return;
 
-    uint32 total = 0;
 
     if (!perTick)
     {
+        float updateAITotalTime = 0;
         for (auto& map : data[PERF_MON_TOTAL])
             if (map.first.find("PlayerbotAI::UpdateAIInternal") != std::string::npos)
-                total += map.second->totalTime;
+                updateAITotalTime += map.second->totalTime;
 
         LOG_INFO("playerbots", "--------------------------------------[TOTAL BOT]------------------------------------------------------");
-        LOG_INFO("playerbots", "percentage     time  |    min ..    max (      avg  of      count) - type      : name");
+        LOG_INFO("playerbots", "percentage     time  |     min ..     max (      avg  of      count) - type      : name");
+        LOG_INFO("playerbots", "-------------------------------------------------------------------------------------------------------");
 
         for (std::map<PerformanceMetric, std::map<std::string, PerformanceData*>>::iterator i = data.begin(); i != data.end(); ++i)
         {
@@ -103,39 +104,66 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
                 return pdMap.at(i)->totalTime < pdMap.at(j)->totalTime;
             });
 
-           for (auto& name : names)
+            uint64 typeTotalTime = 0;
+            uint64 typeMinTime = 0xffffffffu;
+            uint64 typeMaxTime = 0;
+            uint32 typeCount = 0;
+            for (auto& name : names)
             {
                 PerformanceData* pd = pdMap[name];
-                float perc = (float)pd->totalTime / (float)total * 100.0f;
-                float secs = (float)pd->totalTime / 1000.0f;
-                float avg = (float)pd->totalTime / (float)pd->count;
+                typeTotalTime += pd->totalTime;
+                typeCount += pd->count;
+                if (typeMinTime > pd->minTime)
+                    typeMinTime = pd->minTime;
+                if (typeMaxTime < pd->maxTime)
+                    typeMaxTime = pd->maxTime;
+                float perc = (float)pd->totalTime / updateAITotalTime * 100.0f;
+                float time = (float)pd->totalTime / 1000000.0f;
+                float minTime = (float)pd->minTime / 1000.0f;
+                float maxTime = (float)pd->maxTime / 1000.0f;
+                float avg = (float)pd->totalTime / (float)pd->count / 1000.0f;
                 std::string disName = name;
                 if (!fullStack && disName.find("|") != std::string::npos)
                     disName = disName.substr(0, disName.find("|")) + "]";
 
-                if (avg >= 0.5f || pd->maxTime > 10)
+                if (perc >= 0.1f || avg >= 0.25f || pd->maxTime > 1000)
                 {
-                    LOG_INFO("playerbots", "{:7.3f}% {:10.3f}s | {:6d} .. {:6d} ({:10.3f} of {:10d}) - {:6}    : {}"
+                    LOG_INFO("playerbots", "{:7.3f}% {:10.3f}s | {:7.1f} .. {:7.1f} ({:10.3f} of {:10d}) - {:6}    : {}"
                         , perc
-                        , secs
-                        , pd->minTime
-                        , pd->maxTime
+                        , time
+                        , minTime
+                        , maxTime
                         , avg
                         , pd->count
                         , key.c_str()
                         , disName.c_str());
                 }
             }
+            float tPerc = (float)typeTotalTime / (float)updateAITotalTime * 100.0f;
+            float tTime = (float)typeTotalTime / 1000000.0f;
+            float tMinTime = (float)typeMinTime / 1000.0f;
+            float tMaxTime = (float)typeMaxTime / 1000.0f;
+            float tAvg = (float)typeTotalTime / (float)typeCount / 1000.0f;
+            LOG_INFO("playerbots", "{:7.3f}% {:10.3f}s | {:7.1f} .. {:7.1f} ({:10.3f} of {:10d}) - {:6}    : {}"
+                , tPerc
+                , tTime
+                , tMinTime
+                , tMaxTime
+                , tAvg
+                , typeCount
+                , key.c_str()
+                , "Total");
             LOG_INFO("playerbots", " ");
         }
     }
     else
     {
-        float totalCount = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->count;
-        total = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->totalTime;
+        float fullTickCount = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->count;
+        float fullTickTotalTime = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->totalTime;
 
         LOG_INFO("playerbots", "---------------------------------------[PER TICK]------------------------------------------------------");
-        LOG_INFO("playerbots", "percentage     time  |    min ..    max (      avg  of      count) - type      : name");
+        LOG_INFO("playerbots", "percentage     time  |     min ..     max (      avg  of      count) - type      : name");
+        LOG_INFO("playerbots", "-------------------------------------------------------------------------------------------------------");
 
         for (std::map<PerformanceMetric, std::map<std::string, PerformanceData*>>::iterator i = data.begin(); i != data.end(); ++i)
         {
@@ -175,29 +203,58 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
                 return pdMap.at(i)->totalTime < pdMap.at(j)->totalTime;
             });
 
+            uint64 typeTotalTime = 0;
+            uint64 typeMinTime = 0xffffffffu;
+            uint64 typeMaxTime = 0;
+            uint32 typeCount = 0;
             for (auto& name : names)
             {
                 PerformanceData* pd = pdMap[name];
-                float perc = (float)pd->totalTime / (float)total * 100.0f;
-                uint32 secs = pd->totalTime / totalCount;
-                float avg = (float)pd->totalTime / (float)pd->count;
-                float amount = (float)pd->count / (float)totalCount;
+                typeTotalTime += pd->totalTime;
+                typeCount += pd->count;
+                if (typeMinTime > pd->minTime)
+                    typeMinTime = pd->minTime;
+                if (typeMaxTime < pd->maxTime)
+                    typeMaxTime = pd->maxTime;
+                float perc = (float)pd->totalTime / fullTickTotalTime * 100.0f;
+                float time = (float)pd->totalTime / fullTickCount / 1000.0f;
+                float minTime = (float)pd->minTime / 1000.0f;
+                float maxTime = (float)pd->maxTime / 1000.0f;
+                float avg = (float)pd->totalTime / (float)pd->count / 1000.0f;
+                float amount = (float)pd->count / fullTickCount;
                 std::string disName = name;
                 if (!fullStack && disName.find("|") != std::string::npos)
                     disName = disName.substr(0, disName.find("|")) + "]";
-
-                if (avg >= 0.5f || pd->maxTime > 10)
+                if (perc >= 0.1f || avg >= 0.25f || pd->maxTime > 1000)
                 {
-                    LOG_INFO("playerbots", "{:7.3f}% {:9d}ms | {:6d} .. {:6d} ({:10.3f} of {:10.3f}) - {:6}    : {}"
+                    LOG_INFO("playerbots", "{:7.3f}% {:9.3f}ms | {:7.1f} .. {:7.1f} ({:10.3f} of {:10.2f}) - {:6}    : {}"
                         , perc
-                        , secs
-                        , pd->minTime
-                        , pd->maxTime
+                        , time
+                        , minTime
+                        , maxTime
                         , avg
                         , amount
                         , key.c_str()
                         , disName.c_str());
                 }
+            }
+            if (PERF_MON_TOTAL != i->first)
+            {
+                float tPerc = (float)typeTotalTime / (float)fullTickTotalTime * 100.0f;
+                float tTime = (float)typeTotalTime / fullTickCount / 1000.0f;
+                float tMinTime = (float)typeMinTime / 1000.0f;
+                float tMaxTime = (float)typeMaxTime / 1000.0f;
+                float tAvg = (float)typeTotalTime / (float)typeCount / 1000.0f;
+                float tAmount = (float)typeCount / fullTickCount;
+                LOG_INFO("playerbots", "{:7.3f}% {:9.3f}ms | {:7.1f} .. {:7.1f} ({:10.3f} of {:10.2f}) - {:6}    : {}"
+                    , tPerc
+                    , tTime
+                    , tMinTime
+                    , tMaxTime
+                    , tAvg
+                    , tAmount
+                    , key.c_str()
+                    , "Total");
             }
             LOG_INFO("playerbots", " ");
         }
@@ -223,13 +280,13 @@ void PerformanceMonitor::Reset()
 
 PerformanceMonitorOperation::PerformanceMonitorOperation(PerformanceData* data, std::string const name, PerformanceStack* stack) : data(data), name(name), stack(stack)
 {
-    started = (std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now())).time_since_epoch();
+    started = (std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now())).time_since_epoch();
 }
 
 void PerformanceMonitorOperation::finish()
 {
-    std::chrono::milliseconds finished = (std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now())).time_since_epoch();
-    uint32 elapsed = (finished - started).count();
+    std::chrono::microseconds finished = (std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now())).time_since_epoch();
+    uint64_t elapsed = (finished - started).count();
 
     std::lock_guard<std::mutex> guard(data->lock);
     if (elapsed > 0)
