@@ -939,20 +939,22 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
                 race_limit = "2, 5, 6, 8, 10";
                 break;
         }
+        uint32 maxAccountId = sPlayerbotAIConfig->randomBotAccounts.back();
         // find a bot fit conditions and not in any guild
         QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters "
             "WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) AND guid NOT IN ( SELECT guid FROM guild_member ) "
-            "ORDER BY account DESC LIMIT 1", claz, race_limit);
+            "AND account <= {} "
+            "ORDER BY account DESC LIMIT 1", claz, race_limit, maxAccountId);
         if (results)
         {
             Field* fields = results->Fetch();
             ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
             AddPlayerBot(guid, master->GetSession()->GetAccountId());
 
-            messages.push_back("addclass " + std::string(charname) + " ok");
+            messages.push_back("Add class " + std::string(charname));
             return messages;
         }
-        messages.push_back("addclass failed.");
+        messages.push_back("Add class failed.");
         return messages;
     }
 
