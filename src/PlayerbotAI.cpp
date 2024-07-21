@@ -451,11 +451,15 @@ void PlayerbotAI::HandleTeleportAck()
 	bot->GetMotionMaster()->Clear(true);
 	bot->StopMoving();
     if (bot->IsBeingTeleportedNear()) {
+        // Temporary fix for instance can not enter
+        if (!bot->IsInWorld()) {
+            bot->GetMap()->AddPlayerToMap(bot);
+        }
         while (bot->IsInWorld() && bot->IsBeingTeleportedNear()) {
             Player* plMover = bot->m_mover->ToPlayer();
             if (!plMover)
                 return;
-            WorldPacket p = WorldPacket(MSG_MOVE_TELEPORT_ACK, 8 + 4 + 4);
+            WorldPacket p = WorldPacket(MSG_MOVE_TELEPORT_ACK, 20);
             p << plMover->GetPackGUID();
             p << (uint32) 0; // supposed to be flags? not used currently
             p << (uint32) 0; // time - not currently used

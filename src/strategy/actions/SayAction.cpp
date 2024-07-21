@@ -588,11 +588,12 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
             if (ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId()))
             {
                 std::string worldChan = "World";
-                if (Channel* chn = cMgr->GetJoinChannel(worldChan.c_str(), 0))
+                if (Channel* chn = cMgr->GetJoinChannel(worldChan.c_str(), 0)) {
                     if (bot->GetTeamId() == TEAM_ALLIANCE)
                         chn->Say(bot->GetGUID(), c, LANG_COMMON);
                     else
                         chn->Say(bot->GetGUID(), c, LANG_ORCISH);
+                }
             }
         }
         else
