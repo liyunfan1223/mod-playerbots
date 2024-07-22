@@ -14,7 +14,6 @@ public:
         creators["ice barrier"] = &ice_barrier;
         creators["summon water elemental"] = &summon_water_elemental;
         creators["deep freeze"] = &deep_freeze;
-        creators["frostbolt and deep freeze"] = &frostbolt_and_deep_freeze;
     }
 private:
     static ActionNode* cold_snap([[maybe_unused]] PlayerbotAI* botAI)
@@ -48,16 +47,6 @@ private:
                 /*A*/ NextAction::array(0, new NextAction("ice lance"), nullptr),
                 /*C*/ nullptr);
         }
-    
-    static ActionNode* frostbolt_and_deep_freeze([[maybe_unused]] PlayerbotAI* botAI)
-    // Combo cast the last charge of fingers of frost for double crits.
-    // Should only do this on the final charge of FoF.
-    {
-        return new ActionNode ("frostbolt",
-            /*P*/ nullptr,
-            /*A*/ nullptr,
-            /*C*/ NextAction::array(0, new NextAction("deep freeze"), nullptr));
-    }
 };
 
 FrostMageStrategy::FrostMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy(botAI)
@@ -81,15 +70,20 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // No logic currently for cold snap usage.. possibly use right after icy veins drops off?
     // triggers.push_back(new TriggerNode("cold snap", NextAction::array(0, new NextAction("cold snap", 50.0f), nullptr)));
 
-    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon water elemental", 60.0f), nullptr)));
-    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
-    triggers.push_back(new TriggerNode("ice barrier", NextAction::array(0, new NextAction("ice barrier", 30.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon water elemental", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("ice barrier", NextAction::array(0, new NextAction("ice barrier", ACTION_HIGH), nullptr)));
     
     triggers.push_back(new TriggerNode("brain freeze", NextAction::array(0, new NextAction("frostfire bolt", 60.0f), nullptr)));
-    triggers.push_back(new TriggerNode("fingers of frost single", NextAction::array(0, new NextAction("frostbolt and deep freeze", 20.0f), nullptr)));
+    // Combo cast the last charge of fingers of frost for double crits.
+    // Should only do this on the final charge of FoF.
+    triggers.push_back(new TriggerNode("fingers of frost single", NextAction::array(0,
+        new NextAction("frostbolt", ACTION_NORMAL + 2),
+        new NextAction("deep freeze", ACTION_NORMAL + 1),
+        nullptr)));
     // May not need this, frostbolt is the default action so probably don't need to specify.
     // Maybe uncomment if you find the mage is prioritising auxillary spells while this buff is up, and wasting the proc.
-    // triggers.push_back(new TriggerNode("fingers of frost double", NextAction::array(0, new NextAction("frostbolt", 10.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("fingers of frost double", NextAction::array(0, new NextAction("frostbolt", ACTION_NORMAL), nullptr)));
 }
 
 void FrostMageAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
