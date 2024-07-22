@@ -2413,33 +2413,33 @@ bool BGTactics::HandleConsoleCommand(ChatHandler* handler, char const* args)
         handler->PSendSysMessage("|cffff0000Playerbot system is currently disabled!");
         return true;
     }
-    WorldSession* m_session = handler->GetSession();
-    if (!m_session)
+    WorldSession* session = handler->GetSession();
+    if (!session)
     {
         handler->PSendSysMessage("Command can only be used from an active session");
         return true;
     }
-    Player* player = m_session->GetPlayer();
+    std::string const commandOutput = HandleConsoleCommand(session, args);
+    if (!commandOutput.empty())
+        handler->PSendSysMessage(commandOutput.c_str());
+    return true;
+}
+
+std::string const BGTactics::HandleConsoleCommand(WorldSession* session, char const* args)
+{
+    Player* player = session->GetPlayer();
     if (!player)
-    {
-        handler->PSendSysMessage("Error - session player not found");
-        return true;
-    }
-    if (player->GetSession()->GetSecurity() < SEC_GAMEMASTER) {
-        handler->PSendSysMessage("Command can only be used by a GM");
-        return true;
-    }
+        return "Error - session player not found";
+    if (player->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        return "Command can only be used by a GM";
     Battleground* bg = player->GetBattleground();
     if (!bg)
-    {
-        handler->PSendSysMessage("Command can only be used within a battleground");
-        return true;
-    }
+        return "Command can only be used within a battleground";
     BattlegroundTypeId bgType = bg->GetBgTypeID();
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
     char* cmd = strtok((char*)args, " ");
-    char* charname = strtok(nullptr, " ");
+    //char* charname = strtok(nullptr, " ");
 
     if (!strncmp(cmd, "showpath", 8))
     {
@@ -2447,10 +2447,7 @@ bool BGTactics::HandleConsoleCommand(ChatHandler* handler, char const* args)
         if (!strncmp(cmd, "showpath=", 9))
         {
             if (sscanf(cmd, "showpath=%d", &num) == -1 || num < 0)
-            {
-                handler->PSendSysMessage("Bad showpath parameter");
-                return true;
-            }
+                return "Bad showpath parameter";
         }
         std::vector<BattleBotPath*> const* vPaths;
         switch (bgType)
@@ -2463,10 +2460,7 @@ bool BGTactics::HandleConsoleCommand(ChatHandler* handler, char const* args)
             default: vPaths = nullptr; break;
         }
         if (!vPaths)
-        {
-            handler->PSendSysMessage("This battleground has no paths and is unsupported");
-            return true;
-        }
+            return "This battleground has no paths and is unsupported";
         if (num == -1) {
             float closestPoint = FLT_MAX;
             for (uint32 j = 0; j < vPaths->size(); j++)
@@ -2484,10 +2478,7 @@ bool BGTactics::HandleConsoleCommand(ChatHandler* handler, char const* args)
             }
         }
         if (num >= (*vPaths).size())
-        {
-            handler->PSendSysMessage(fmt::format("Path out of range of 0 - {}", vPaths->size() - 1).c_str());
-            return true;
-        }
+            return fmt::format("Path out of range of 0 - {}", vPaths->size() - 1);
         auto const& path = (*vPaths)[num];
         for (uint32 i = 0; i < path->size(); i++)
         {
@@ -2495,52 +2486,36 @@ bool BGTactics::HandleConsoleCommand(ChatHandler* handler, char const* args)
             Creature* wpCreature = player->SummonCreature(15631, waypoint.x, waypoint.y, waypoint.z, 0, TEMPSUMMON_TIMED_DESPAWN, 15000u);
             wpCreature->SetOwnerGUID(player->GetGUID());
         }
-        handler->PSendSysMessage(fmt::format("Showing path {}", num).c_str());
-        return true;
+        return fmt::format("Showing path {}", num);
     }
 
     if (!strncmp(cmd, "showcreature=", 13))
     {
         uint32 num;
         if (sscanf(cmd, "showcreature=%u", &num) == -1)
-        {
-            handler->PSendSysMessage("Bad showcreature parameter");
-            return true;
-        }
+            return "Bad showcreature parameter";
         Creature* c = bg->GetBGCreature(num);
         if (!c)
-        {
-            handler->PSendSysMessage("Creature not found");
-            return true;
-        }
+            return "Creature not found";
         Creature* wpCreature = player->SummonCreature(15631, c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000u);
         wpCreature->SetOwnerGUID(player->GetGUID());
-        handler->PSendSysMessage(fmt::format("Showing location of Creature {}", num).c_str());
-        return true;
+        return fmt::format("Showing location of Creature {}", num);
     }
 
     if (!strncmp(cmd, "showobject=", 11))
     {
         uint32 num;
         if (sscanf(cmd, "showobject=%u", &num) == -1)
-        {
-            handler->PSendSysMessage("Bad showobject parameter");
-            return true;
-        }
+            return "Bad showobject parameter";
         GameObject* o = bg->GetBGObject(num);
         if (!o)
-        {
-            handler->PSendSysMessage("GameObject not found");
-            return true;
-        }
+            return "GameObject not found";
         Creature* wpCreature = player->SummonCreature(15631, o->GetPositionX(), o->GetPositionY(), o->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000u);
         wpCreature->SetOwnerGUID(player->GetGUID());
-        handler->PSendSysMessage(fmt::format("Showing location of GameObject {}", num).c_str());
-        return true;
+        return fmt::format("Showing location of GameObject {}", num);
     }
 
-    handler->PSendSysMessage("Unknown command");
-    return true;
+    return "usage: showpath(=[num]) / showcreature=[num] / showobject=[num]";
 }
 
 //
@@ -3139,8 +3114,7 @@ bool BGTactics::selectObjective(bool reset)
             BattlegroundAV* alterValleyBG = (BattlegroundAV*)bg;
             uint32 role = context->GetValue<uint32>("bg role")->Get();
             bool supportDefense = role < 3;//defensive role and mine capture (mine capture disabled for now)
-            // TODO fix advancedAttack - its supposed to be mutually exclusive with above (ie: a > check). leaving as-is for now as it seems to effect horde vs ally balance
-            bool advancedAttack = role < 7;//doesnt wait for point to be fully captured before moving on
+            bool advancedAttack = role > 5;//doesnt wait for point to be fully captured before moving on
 
             // some of the code below is a bit inefficent (lots of rechecking same variables, could be made more efficient with a refactor)
             // but it's been left this way so it can be easily reordered. in future we could implement different strategies (eg: focus on
@@ -3187,7 +3161,7 @@ bool BGTactics::selectObjective(bool reset)
                 // (supportDefense) defend objectives under attack
                 if (!BgObjective && supportDefense)
                 {
-                    // go to first defend objective under attack (the one closest to boss)
+                    // go to first defence objective under attack (the one closest to boss)
                     for (const auto& objective : AV_HordeDefendObjectives)
                     {
                         if (alterValleyBG->GetAVNodeInfo(objective.first).State != POINT_DESTROYED &&
@@ -4524,7 +4498,7 @@ bool BGTactics::resetObjective()
     if (!bg)
         return false;
 
-    // sometimes change role
+    // sometimes change role - should do so less often on larger BG's otherwise bots will spend too much time running around map instead of doing something useful
     uint32 rollChangeOdds = BATTLEGROUND_AV == bg->GetBgTypeID() ? 63 : 5;
     if (!urand(0, rollChangeOdds) && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)))
         context->GetValue<uint32>("bg role")->Set(urand(0, 9));
