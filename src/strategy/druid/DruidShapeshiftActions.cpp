@@ -22,7 +22,7 @@ NextAction** CastDireBearFormAction::getAlternatives()
 
 bool CastTravelFormAction::isUseful()
 {
-    bool firstmount = bot->getLevel() >= 20;
+    bool firstmount = bot->GetLevel() >= 20;
 
     // useful if no mount or with wsg flag
     return !bot->IsMounted() && (!firstmount || (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))) && !botAI->HasAura("dash", bot);

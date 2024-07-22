@@ -60,7 +60,7 @@ bool InviteNearbyToGroupAction::Execute(Event event)
                 return false;
         }
 
-        if (abs(int32(player->getLevel() - bot->getLevel())) > 2)
+        if (abs(int32(player->GetLevel() - bot->GetLevel())) > 2)
             continue;
 
         if (sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)
@@ -135,7 +135,7 @@ bool InviteGuildToGroupAction::Execute(Event event)
             if (botAI->HasActivePlayerMaster()) //Do not invite alts of active players.
                 continue;
 
-            if (player->getLevel() > bot->getLevel() + 5) // Only invite higher levels that need money so they can grind money and help out.
+            if (player->GetLevel() > bot->GetLevel() + 5) // Only invite higher levels that need money so they can grind money and help out.
             {
                 AiObjectContext* botContext = botAI->GetAiObjectContext();
 
@@ -149,7 +149,7 @@ bool InviteGuildToGroupAction::Execute(Event event)
                 return false;
         }
 
-        if (abs(int32(player->getLevel() - bot->getLevel())) > 4)
+        if (abs(int32(player->GetLevel() - bot->GetLevel())) > 4)
             continue;
 
         if (!botAI && sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)

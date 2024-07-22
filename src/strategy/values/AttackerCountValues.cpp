@@ -62,7 +62,7 @@ uint8 BalancePercentValue::Calculate()
             if (!player || !player->IsAlive())
                 continue;
 
-            playerLevel += player->getLevel();
+            playerLevel += player->GetLevel();
         }
     }
 
@@ -73,7 +73,7 @@ uint8 BalancePercentValue::Calculate()
         if (!creature || !creature->IsAlive())
             continue;
 
-        uint32 level = creature->getLevel();
+        uint32 level = creature->GetLevel();
 
         switch (creature->GetCreatureTemplate()->rank)
         {

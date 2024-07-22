@@ -68,14 +68,14 @@ class LevelChatFilter : public ChatFilter
                 uint32 fromLevel = atoi(message.substr(message.find("@") + 1, message.find("-")).c_str());
                 uint32 toLevel = atoi(message.substr(message.find("-") + 1, message.find(" ")).c_str());
 
-                if (bot->getLevel() >= fromLevel && bot->getLevel() <= toLevel)
+                if (bot->GetLevel() >= fromLevel && bot->GetLevel() <= toLevel)
                     return ChatFilter::Filter(message);
 
                 return message;
             }
 
 		    uint32 level = atoi(message.substr(message.find("@") + 1, message.find(" ")).c_str());
-            if (bot->getLevel() == level)
+            if (bot->GetLevel() == level)
                 return ChatFilter::Filter(message);
 
             return message;

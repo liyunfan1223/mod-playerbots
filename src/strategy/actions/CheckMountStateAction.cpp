@@ -133,7 +133,7 @@ bool CheckMountStateAction::isUseful()
     if (!GET_PLAYERBOT_AI(bot)->HasStrategy("mount", BOT_STATE_NON_COMBAT) && !bot->IsMounted())
         return false;
 
-    bool firstmount = bot->getLevel() >= 20;
+    bool firstmount = bot->GetLevel() >= 20;
     if (!firstmount)
         return false;
 
@@ -198,7 +198,7 @@ bool CheckMountStateAction::Mount()
         }
     }
 
-    if (bot->GetPureSkillValue(SKILL_RIDING) <= 75 && bot->getLevel() < secondmount)
+    if (bot->GetPureSkillValue(SKILL_RIDING) <= 75 && bot->GetLevel() < secondmount)
         masterSpeed = 59;
 
     if (bot->InBattleground() && masterSpeed > 99)

@@ -126,7 +126,7 @@ float TravelNodePath::getCost(Player* bot, uint32 cGold)
         if (bot->HasSpell(1066))
             swimSpeed *= 1.5;
 
-        uint32 level = bot->getLevel();
+        uint32 level = bot->GetLevel();
         bool isAlliance = Unit::GetFactionReactionTo(bot->GetFactionTemplateEntry(), sFactionTemplateStore.LookupEntry(1)) > REP_NEUTRAL;
 
         int factionAnnoyance = 0;

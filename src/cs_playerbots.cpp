@@ -21,30 +21,31 @@
 #include "ScriptMgr.h"
 #include "BattleGroundTactics.h"
 
+using namespace Acore::ChatCommands;
+
 class playerbots_commandscript : public CommandScript
 {
 public:
     playerbots_commandscript() : CommandScript("playerbots_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> playerbotsDebugCommandTable =
+        static ChatCommandTable playerbotsDebugCommandTable =
         {
-            { "bg",             SEC_GAMEMASTER,     true,   &HandleDebugBGCommand,             nullptr },
+            { "bg",             HandleDebugBGCommand,         SEC_GAMEMASTER,     Console::Yes },
+        };
+        static ChatCommandTable playerbotsCommandTable =
+        {
+            { "bot",            HandlePlayerbotCommand,       SEC_PLAYER,         Console::No  },
+            { "gtask",          HandleGuildTaskCommand,       SEC_GAMEMASTER,     Console::Yes },
+            { "pmon",           HandlePerfMonCommand,         SEC_GAMEMASTER,     Console::Yes },
+            { "rndbot",         HandleRandomPlayerbotCommand, SEC_GAMEMASTER,     Console::Yes },
+            { "debug",          playerbotsDebugCommandTable },
         };
 
-        static std::vector<ChatCommand> playerbotsCommandTable =
+        static ChatCommandTable commandTable =
         {
-            { "bot",            SEC_PLAYER,         false,  &HandlePlayerbotCommand,           nullptr },
-            { "gtask",          SEC_GAMEMASTER,     true,   &HandleGuildTaskCommand,           nullptr },
-            { "pmon",           SEC_GAMEMASTER,     true,   &HandlePerfMonCommand,             nullptr },
-            { "rndbot",         SEC_GAMEMASTER,     true,   &HandleRandomPlayerbotCommand,     nullptr },
-            { "debug",          SEC_GAMEMASTER,     true,   nullptr, "",    playerbotsDebugCommandTable},
-        };
-
-        static std::vector<ChatCommand> commandTable =
-        {
-            { "playerbots",     SEC_PLAYER,         true,   nullptr, "",        playerbotsCommandTable },
+            { "playerbots",     playerbotsCommandTable },
         };
 
         return commandTable;

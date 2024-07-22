@@ -155,7 +155,7 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //     // for (auto& path : sPlayerbotAIConfig->classSpecs[bot->getClass()].talentPath)
 //     // {
 //     //     TalentSpec newSpec = *GetBestPremadeSpec(path.id);
-//     //     newSpec.CropTalents(bot->getLevel());
+//     //     newSpec.CropTalents(bot->GetLevel());
 //     //     if (oldSpec->isEarlierVersionOf(newSpec))
 //     //     {
 //     //         ret.push_back(&path);
@@ -225,7 +225,7 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 // bool ChangeTalentsAction::AutoSelectTalents(std::ostringstream* out)
 // {
 //     // Does the bot have talentpoints?
-//     if (bot->getLevel() < 10)
+//     if (bot->GetLevel() < 10)
 //     {
 //         *out << "No free talent points.";
 //         return false;
@@ -239,7 +239,7 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //     if (specNo > 0)
 //     {
 //         TalentSpec newSpec = *GetBestPremadeSpec(specId);
-//         newSpec.CropTalents(bot->getLevel());
+//         newSpec.CropTalents(bot->GetLevel());
 //         newSpec.ApplyTalents(bot, out);
 //         if (newSpec.GetTalentPoints() > 0)
 //         {
@@ -249,7 +249,7 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //     else if (!specLink.empty())
 //     {
 //         TalentSpec newSpec(bot, specLink);
-//         newSpec.CropTalents(bot->getLevel());
+//         newSpec.CropTalents(bot->GetLevel());
 //         newSpec.ApplyTalents(bot, out);
 //         if (newSpec.GetTalentPoints() > 0)
 //         {
@@ -288,7 +288,7 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //             specId = PickPremadePath(paths, sRandomPlayerbotMgr->IsRandomBot(bot))->id;
 //             TalentSpec newSpec = *GetBestPremadeSpec(specId);
 //             specLink = newSpec.GetTalentLink();
-//             newSpec.CropTalents(bot->getLevel());
+//             newSpec.CropTalents(bot->GetLevel());
 //             newSpec.ApplyTalents(bot, out);
 
 //             if (paths.size() > 1)

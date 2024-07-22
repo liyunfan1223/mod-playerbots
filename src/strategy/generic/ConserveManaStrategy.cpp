@@ -39,7 +39,7 @@
 //     if (mediumMana && dynamic_cast<CastBuffSpellAction*>(action))
 //         return 0.0f;
 
-//     if (target && ((int)target->getLevel() - (int)bot->getLevel()) >= 0)
+//     if (target && ((int)target->GetLevel() - (int)bot->GetLevel()) >= 0)
 //         return 1.0f;
 
 //     return 1.0f;
