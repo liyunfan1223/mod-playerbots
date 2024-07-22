@@ -19,6 +19,7 @@
 #include "PlayerbotMgr.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
+#include "BattleGroundTactics.h"
 
 using namespace Acore::ChatCommands;
 
@@ -29,12 +30,17 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable playerbotsDebugCommandTable =
+        {
+            { "bg",             HandleDebugBGCommand,         SEC_GAMEMASTER,     Console::Yes },
+        };
         static ChatCommandTable playerbotsCommandTable =
         {
-            { "bot",            HandlePlayerbotCommand,       SEC_PLAYER,         Console::No },
+            { "bot",            HandlePlayerbotCommand,       SEC_PLAYER,         Console::No  },
             { "gtask",          HandleGuildTaskCommand,       SEC_GAMEMASTER,     Console::Yes },
             { "pmon",           HandlePerfMonCommand,         SEC_GAMEMASTER,     Console::Yes },
-            { "rndbot",         HandleRandomPlayerbotCommand, SEC_GAMEMASTER,     Console::Yes }
+            { "rndbot",         HandleRandomPlayerbotCommand, SEC_GAMEMASTER,     Console::Yes },
+            { "debug",          playerbotsDebugCommandTable },
         };
 
         static ChatCommandTable commandTable =
@@ -82,6 +88,11 @@ public:
 
         sPerformanceMonitor->PrintStats();
         return true;
+    }
+
+    static bool HandleDebugBGCommand(ChatHandler* handler, char const* args)
+    {
+        return BGTactics::HandleConsoleCommand(handler, args);
     }
 };
 

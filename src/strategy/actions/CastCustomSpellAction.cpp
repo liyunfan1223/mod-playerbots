@@ -74,8 +74,7 @@ bool CastCustomSpellAction::Execute(Event event)
             itemTarget = *items.begin();
         else
         {
-            castCount = atoi(param.c_str());
-            if (castCount > 0)
+            if (atoi(param.c_str()) > 0)
                 text = text.substr(0, pos);
         }
     }
