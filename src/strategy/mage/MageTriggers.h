@@ -26,7 +26,6 @@ class ArcaneIntellectTrigger : public BuffTrigger
 {
     public:
         ArcaneIntellectTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane intellect", 2 * 2000) { }
-
         bool IsActive() override;
 };
 
@@ -34,7 +33,6 @@ class MageArmorTrigger : public BuffTrigger
 {
     public:
         MageArmorTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "mage armor", 5 * 2000) { }
-
         bool IsActive() override;
 };
 
@@ -78,12 +76,14 @@ class FingersOfFrostSingleTrigger : public HasAuraStackTrigger
 {
 public:
     FingersOfFrostSingleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 1, 1) {}
+    bool IsActive() override;
 };
 
 class FingersOfFrostDoubleTrigger : public HasAuraStackTrigger
 {
 public:
     FingersOfFrostDoubleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 2, 1) {}
+    // bool IsActive() override;
 };
 
 class BrainFreezeTrigger : public HasAuraTrigger
