@@ -2419,13 +2419,14 @@ bool BGTactics::HandleConsoleCommand(ChatHandler* handler, char const* args)
         handler->PSendSysMessage("Command can only be used from an active session");
         return true;
     }
-    std::string const commandOutput = HandleConsoleCommand(session, args);
+    std::string const commandOutput = HandleConsoleCommandPrivate(session, args);
     if (!commandOutput.empty())
         handler->PSendSysMessage(commandOutput.c_str());
     return true;
 }
 
-std::string const BGTactics::HandleConsoleCommand(WorldSession* session, char const* args)
+// has different name to above as some compilers get confused
+std::string const BGTactics::HandleConsoleCommandPrivate(WorldSession* session, char const* args)
 {
     Player* player = session->GetPlayer();
     if (!player)
@@ -2477,7 +2478,7 @@ std::string const BGTactics::HandleConsoleCommand(WorldSession* session, char co
                 }
             }
         }
-        if (num >= (*vPaths).size())
+        if (num >= vPaths->size())
             return fmt::format("Path out of range of 0 - {}", vPaths->size() - 1);
         auto const& path = (*vPaths)[num];
         for (uint32 i = 0; i < path->size(); i++)
@@ -2494,6 +2495,8 @@ std::string const BGTactics::HandleConsoleCommand(WorldSession* session, char co
         uint32 num;
         if (sscanf(cmd, "showcreature=%u", &num) == -1)
             return "Bad showcreature parameter";
+        if (num >= bg->BgCreatures.size())
+            return fmt::format("Creature out of range of 0 - {}", bg->BgCreatures.size() - 1);
         Creature* c = bg->GetBGCreature(num);
         if (!c)
             return "Creature not found";
@@ -2507,6 +2510,8 @@ std::string const BGTactics::HandleConsoleCommand(WorldSession* session, char co
         uint32 num;
         if (sscanf(cmd, "showobject=%u", &num) == -1)
             return "Bad showobject parameter";
+        if (num >= bg->BgObjects.size())
+            return fmt::format("Object out of range of 0 - {}", bg->BgObjects.size() - 1);
         GameObject* o = bg->GetBGObject(num);
         if (!o)
             return "GameObject not found";

@@ -44,6 +44,7 @@ class BGTactics : public MovementAction
         bool Execute(Event event) override;
 
     private:
+        static std::string const HandleConsoleCommandPrivate(WorldSession* session, char const* args);
         bool moveToStart(bool force = false);
         bool selectObjective(bool reset = false);
         bool moveToObjective();
