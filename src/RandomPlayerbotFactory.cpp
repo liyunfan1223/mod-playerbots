@@ -219,7 +219,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
 
 std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
 {
-    std::string botName = "";
+    std::string botName = "";        
     int tries = 10;
     while(--tries) {
         QueryResult result = CharacterDatabase.Query("SELECT name FROM playerbots_names "
@@ -235,7 +235,80 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
             return ret;
         }
     }
-    LOG_ERROR("playerbots", "No more names left for random bots. Simply random.");
+
+    //CONLANG NAME GENERATION
+    LOG_ERROR("playerbots", "No more names left for random bots. Attempting conlang name generation.");
+    const std::string groupCategory = "SCVKRU";
+    const std::string groupFormStart[2][4] = {
+  	    {"SV","SV","VK","RV"},
+        {"V" ,"SU","VS","RV"}
+    };
+    const std::string groupFormMid[2][6] = {
+  	    {"CV","CVC","CVC","CVK","VC","VK"},
+        {"CV","CVC","CVK","KVC","VC","KV"}
+    };
+    const std::string groupFormEnd[2][4] = {
+  	    {"CV","VC","VK","CV"},
+        {"RU","UR","VR","V" }
+    };
+    const std::string groupLetter[2][6] = {
+    	//S           C                            V               K           R         U
+  	    {"dtspkThfS","bcCdfghjkmnNqqrrlsStTvwxyz","aaeeiouA"     ,"ppttkkbdg","lmmnrr" ,"AEO" },
+  	    {"dtskThfS" ,"bcCdfghjkmmnNqrrlssStTvwyz","aaaeeiiuAAEIO","ppttkbbdg","lmmnrrr","AEOy"}
+    };
+    const std::string replaceRule[2][17] = {
+  	    {"ST" ,"ka","ko","ku","kr","S" ,"T" ,"C" ,"N" ,"jj","AA","AI" ,"A" ,"E" ,"O" ,"I" ,"aa"},
+	    {"sth","ca","co","cu","cr","sh","th","ch","ng","dg","A" ,"ayu","ai","ei","ou","iu","ae"}
+    };
+    
+    tries = 10;
+    while (--tries)
+    {
+        botName.clear();
+        //Build name from groupForms
+        //Pick random start group
+    	botName = groupFormStart[gender][rand()%4];
+        //Pick up to 2 and then up to 1 additional middle group
+    	for (int i = 0; i < rand()%3 + rand()%2; i++)
+        {
+      	    botName += groupFormMid[gender][rand()%6];
+      	}
+        //Pick up to 1 end group
+      	botName += rand()%2 ? groupFormEnd[gender][rand()%4] : "";
+        //If name is single letter add random end group
+        botName += (botName.size() < 2) ? groupFormEnd[gender][rand()%4] : "";
+        
+        //Replace Catagory value with random Letter from that Catagory's Letter string for a given bot gender
+        for (int i=0; i < botName.size(); i++)
+        {
+			botName[i] = groupLetter[gender][groupCategory.find(botName[i])][rand()%groupLetter[gender][groupCategory.find(botName[i])].size()];
+  	    }
+  
+        //Itterate over replace rules
+        for (int i = 0; i < 17; i++)
+        {
+            int j = botName.find(replaceRule[0][i]);
+            while ( j > -1)
+            {
+                botName.replace(j,replaceRule[0][i].size(),replaceRule[1][i]);
+                j = botName.find(replaceRule[0][i]);
+            }    
+        }
+  
+        //Capitalize first letter
+        botName[0] -= 32;
+
+        if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS ||
+            (sObjectMgr->IsReservedName(botName) || sObjectMgr->IsProfanityName(botName)))
+        {
+            botName.clear();
+            continue;
+        }
+        return std::move(botName);
+    }
+
+    //TRUE RANDOM NAME GENERATION
+    LOG_ERROR("playerbots", "Con​lang name generation failed. True random name fallback.");
     tries = 10;
     while(--tries) {
         for (uint8 i = 0; i < 10; i++) {
@@ -393,7 +466,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
                 if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
                     playerBot->SaveToDB(true, false);
                     sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(), 
-                        playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->getLevel());
+                        playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->GetLevel());
                     playerBot->CleanupsBeforeDelete();
                     delete playerBot;
                 }
@@ -593,7 +666,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         {
             Player* player = ObjectAccessor::FindConnectedPlayer(captain);
 
-            if (!arenateam && player && player->getLevel() >= 70)
+            if (!arenateam && player && player->GetLevel() >= 70)
                 availableCaptains.push_back(captain);
         }
     }
@@ -619,7 +692,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
             continue;
         }
 
-        if (player->getLevel() < 70)
+        if (player->GetLevel() < 70)
         {
             LOG_ERROR("playerbots", "Bot {} must be level 70 to create an arena team", captain.ToString().c_str());
             continue;

@@ -13,7 +13,8 @@ bool CheckMountStateAction::Execute(Event event)
 {
     bool noattackers = AI_VALUE2(bool, "combat", "self target") ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true) : true;
     bool enemy = AI_VALUE(Unit*, "enemy player target");
-    bool dps = (AI_VALUE(Unit*, "dps target") || AI_VALUE(Unit*, "grind target"));
+    // ignore grind target in BG or bots will dismount near any creature (eg: the rams in AV)
+    bool dps = (AI_VALUE(Unit*, "dps target") || (!bot->InBattleground() && AI_VALUE(Unit*, "grind target")));
     bool fartarget = (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 40.0f)) ||
         (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
     bool attackdistance = false;
@@ -132,7 +133,7 @@ bool CheckMountStateAction::isUseful()
     if (!GET_PLAYERBOT_AI(bot)->HasStrategy("mount", BOT_STATE_NON_COMBAT) && !bot->IsMounted())
         return false;
 
-    bool firstmount = bot->getLevel() >= 20;
+    bool firstmount = bot->GetLevel() >= 20;
     if (!firstmount)
         return false;
 
@@ -197,7 +198,7 @@ bool CheckMountStateAction::Mount()
         }
     }
 
-    if (bot->GetPureSkillValue(SKILL_RIDING) <= 75 && bot->getLevel() < secondmount)
+    if (bot->GetPureSkillValue(SKILL_RIDING) <= 75 && bot->GetLevel() < secondmount)
         masterSpeed = 59;
 
     if (bot->InBattleground() && masterSpeed > 99)

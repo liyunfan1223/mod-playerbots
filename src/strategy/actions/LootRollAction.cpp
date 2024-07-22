@@ -147,6 +147,8 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
         case ITEM_USAGE_VENDOR:
             needVote = GREED;
             break;
+        default:
+            break;
     }
 
     return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? needVote : PASS;

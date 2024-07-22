@@ -151,7 +151,7 @@ void TrainerAction::TellFooter(uint32 totalCost)
 bool MaintenanceAction::Execute(Event event)
 {
     if (!sPlayerbotAIConfig->maintenanceCommand) {
-        botAI->TellMaster("maintenance command is not allowed, please check the configuration.");
+        botAI->TellError("maintenance command is not allowed, please check the configuration.");
         return false;
     }
     botAI->TellMaster("I'm maintaining");
@@ -168,7 +168,7 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitSkills();
     factory.InitMounts();
     factory.InitGlyphs(true);
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
         factory.ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);
@@ -187,7 +187,7 @@ bool RemoveGlyphAction::Execute(Event event)
 bool AutoGearAction::Execute(Event event)
 {
     if (!sPlayerbotAIConfig->autoGearCommand) {
-        botAI->TellMaster("autogear command is not allowed, please check the configuration.");
+        botAI->TellError("autogear command is not allowed, please check the configuration.");
         return false;
     }
     botAI->TellMaster("I'm auto gearing");
@@ -199,7 +199,7 @@ bool AutoGearAction::Execute(Event event)
         gs);
     factory.InitEquipment(true);
     factory.InitAmmo();
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
         factory.ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);

@@ -63,7 +63,7 @@ bool MoveToDarkPortalAction::Execute(Event event)
         if (bot->GetGroup()->GetLeaderGUID() != bot->GetGUID() && !GET_PLAYERBOT_AI(GET_PLAYERBOT_AI(bot)->GetGroupMaster()))
             return false;
 
-    if (bot->getLevel() > 57)
+    if (bot->GetLevel() > 57)
     {
         if ((bot->GetTeamId() == TEAM_ALLIANCE && bot->GetQuestStatus(10119) == QUEST_STATUS_NONE) || (bot->GetTeamId() == TEAM_HORDE && bot->GetQuestStatus(9407) == QUEST_STATUS_NONE))
         {
@@ -104,12 +104,12 @@ bool MoveToDarkPortalAction::Execute(Event event)
 
 bool MoveToDarkPortalAction::isUseful()
 {
-    return bot->getLevel() > 54;
+    return bot->GetLevel() > 54;
 }
 
 bool DarkPortalAzerothAction::Execute(Event event)
 {
-    if (bot->getLevel() > 57)
+    if (bot->GetLevel() > 57)
     {
         WorldPacket packet(CMSG_AREATRIGGER);
         packet << 4354;
@@ -122,7 +122,7 @@ bool DarkPortalAzerothAction::Execute(Event event)
 
 bool DarkPortalAzerothAction::isUseful()
 {
-    return bot->getLevel() > 57;
+    return bot->GetLevel() > 57;
 }
 
 bool MoveFromDarkPortalAction::Execute(Event event)

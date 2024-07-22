@@ -425,7 +425,7 @@ bool RpgDuelTrigger::IsActive()
         return false;
 
     // Less spammy duels
-    if (bot->getLevel() < 3)
+    if (bot->GetLevel() < 3)
         return false;
 
     if (botAI->HasRealPlayerMaster())
@@ -450,10 +450,10 @@ bool RpgDuelTrigger::IsActive()
     if (!player)
         return false;
 
-    if (player->getLevel() > bot->getLevel() + 3)
+    if (player->GetLevel() > bot->GetLevel() + 3)
         return false;
 
-    if (bot->getLevel() > player->getLevel() + 10)
+    if (bot->GetLevel() > player->GetLevel() + 10)
         return false;
 
     // caster or target already have requested duel

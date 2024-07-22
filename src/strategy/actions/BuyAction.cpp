@@ -91,6 +91,8 @@ bool BuyAction::Execute(Event event)
                         case ITEM_USAGE_SKILL:
                             needMoneyFor = NeedMoneyFor::tradeskill;
                             break;
+                        default:
+                            break;
                     }
 
                     if (needMoneyFor == NeedMoneyFor::none)

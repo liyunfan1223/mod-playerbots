@@ -64,6 +64,11 @@ bool AlmostFullManaTrigger::IsActive()
     return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > 85;
 }
 
+bool EnoughManaTrigger::IsActive()
+{
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > 65;
+}
+
 bool RageAvailable::IsActive()
 {
     return AI_VALUE2(uint8, "rage", "self target") >= amount;
@@ -103,7 +108,7 @@ bool OutNumberedTrigger::IsActive()
     if (bot->GetGroup() && bot->GetGroup()->isRaidGroup())
         return false;
 
-    int32 botLevel = bot->getLevel();
+    int32 botLevel = bot->GetLevel();
     uint32 friendPower = 200;
     uint32 foePower = 0;
     for (auto& attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
@@ -112,7 +117,7 @@ bool OutNumberedTrigger::IsActive()
         if (!creature)
             continue;
 
-        int32 dLevel = creature->getLevel() - botLevel;
+        int32 dLevel = creature->GetLevel() - botLevel;
         if (dLevel > -10)
             foePower = std::max(100 + 10 * dLevel, dLevel * 200);
     }
@@ -126,7 +131,7 @@ bool OutNumberedTrigger::IsActive()
         if (!player || player == bot)
             continue;
 
-        int32 dLevel = player->getLevel() - botLevel;
+        int32 dLevel = player->GetLevel() - botLevel;
 
         if (dLevel > -10 && bot->GetDistance(player) < 10.0f)
             friendPower += std::max(200 + 20 * dLevel, dLevel * 200);

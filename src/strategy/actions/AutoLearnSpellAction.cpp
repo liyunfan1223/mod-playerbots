@@ -24,7 +24,6 @@ bool AutoLearnSpellAction::Execute(Event event)
         out << ".";
         botAI->TellMaster(out);
     }
-
     return true;
 }
 
@@ -122,7 +121,7 @@ void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream* out)
         if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
             continue;
 
-        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->getLevel() || !bot->SatisfyQuestRace(quest, false))
+        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() || !bot->SatisfyQuestRace(quest, false))
             continue;
 
         if (quest->GetRewSpellCast() > 0)
@@ -180,4 +179,16 @@ void AutoLearnSpellAction::LearnSpell(uint32 spellId, std::ostringstream* out)
             *out << FormatSpell(proto) << ", ";
         }
     }
+}
+
+bool AutoUpgradeEquipAction::Execute(Event event) {
+    if (!sPlayerbotAIConfig->autoUpgradeEquip || !sRandomPlayerbotMgr->IsRandomBot(bot)) {
+        return false;
+    }
+    PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+        factory.InitEquipment(true);
+    }
+    factory.InitAmmo();
+    return true;
 }

@@ -143,7 +143,7 @@ uint32 MoneyNeededForValue::Calculate()
 
 	uint32 moneyWanted = 0;
 
-	uint32 level = bot->getLevel();
+	uint32 level = bot->GetLevel();
 
     switch (needMoneyFor)
     {
@@ -179,6 +179,8 @@ uint32 MoneyNeededForValue::Calculate()
             break;
         case NeedMoneyFor::tradeskill:
             moneyWanted = (level * level * level); //Or level^3 (10s @ lvl10, 3g @ lvl30, 20g @ lvl60, 50g @ lvl80): Todo replace (Should be buyable reagents that combined allow crafting of usefull items)
+            break;
+        default:
             break;
     }
 

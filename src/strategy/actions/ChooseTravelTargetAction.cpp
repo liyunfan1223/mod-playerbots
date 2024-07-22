@@ -46,19 +46,19 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
         foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_BANKER,UNIT_NPC_FLAG_BATTLEMASTER,UNIT_NPC_FLAG_AUCTIONEER });
 
     //Grind for money
-    if (!foundTarget && AI_VALUE(bool, "should get money"))
+    if (!foundTarget && AI_VALUE(bool, "should get money")) {
         if (urand(1, 100) > 66)
         {
             foundTarget = SetQuestTarget(newTarget, true);                    //Turn in quests for money.
 
             if (!foundTarget)
                 foundTarget = SetQuestTarget(newTarget);                     //Do low level quests
-        }
-        else if (urand(1, 100) > 50)
+        } else if (urand(1, 100) > 50) {
             foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
-        else
+        } else {
             foundTarget = SetNewQuestTarget(newTarget);                      //Find a low level quest to do
-
+        }
+    }
 
     //Continue
     if (!foundTarget && urand(1, 100) > 10)                               //90% chance
@@ -789,7 +789,7 @@ bool ChooseTravelTargetAction::needForQuest(Unit* target)
         {
             QuestStatusData questStatus = quest.second;
 
-            if (questTemplate->GetQuestLevel() > bot->getLevel())
+            if (questTemplate->GetQuestLevel() > bot->GetLevel())
                 continue;
 
             for (int j = 0; j < QUEST_OBJECTIVES_COUNT; j++)

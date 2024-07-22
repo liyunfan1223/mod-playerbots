@@ -19,25 +19,33 @@
 #include "PlayerbotMgr.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
+#include "BattleGroundTactics.h"
+
+using namespace Acore::ChatCommands;
 
 class playerbots_commandscript : public CommandScript
 {
 public:
     playerbots_commandscript() : CommandScript("playerbots_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> playerbotsCommandTable =
+        static ChatCommandTable playerbotsDebugCommandTable =
         {
-            { "bot",            SEC_PLAYER,         false,  &HandlePlayerbotCommand,           nullptr },
-            { "gtask",          SEC_GAMEMASTER,     true,   &HandleGuildTaskCommand,           nullptr },
-            { "pmon",           SEC_GAMEMASTER,     true,   &HandlePerfMonCommand,             nullptr },
-            { "rndbot",         SEC_GAMEMASTER,     true,   &HandleRandomPlayerbotCommand,     nullptr }
+            { "bg",             HandleDebugBGCommand,         SEC_GAMEMASTER,     Console::Yes },
+        };
+        static ChatCommandTable playerbotsCommandTable =
+        {
+            { "bot",            HandlePlayerbotCommand,       SEC_PLAYER,         Console::No  },
+            { "gtask",          HandleGuildTaskCommand,       SEC_GAMEMASTER,     Console::Yes },
+            { "pmon",           HandlePerfMonCommand,         SEC_GAMEMASTER,     Console::Yes },
+            { "rndbot",         HandleRandomPlayerbotCommand, SEC_GAMEMASTER,     Console::Yes },
+            { "debug",          playerbotsDebugCommandTable },
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
-            { "playerbots",     SEC_PLAYER,         true,   nullptr, "",  playerbotsCommandTable },
+            { "playerbots",     playerbotsCommandTable },
         };
 
         return commandTable;
@@ -80,6 +88,11 @@ public:
 
         sPerformanceMonitor->PrintStats();
         return true;
+    }
+
+    static bool HandleDebugBGCommand(ChatHandler* handler, char const* args)
+    {
+        return BGTactics::HandleConsoleCommand(handler, args);
     }
 };
 

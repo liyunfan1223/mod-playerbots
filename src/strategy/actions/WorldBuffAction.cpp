@@ -36,10 +36,10 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
         if (wb.classId != 0 && wb.classId != unit->getClass())
             continue;
 
-        if (wb.minLevel != 0 && wb.minLevel > unit->getLevel())
+        if (wb.minLevel != 0 && wb.minLevel > unit->GetLevel())
             continue;
 
-        if (wb.maxLevel != 0 && wb.maxLevel < unit->getLevel())
+        if (wb.maxLevel != 0 && wb.maxLevel < unit->GetLevel())
             continue;
 
         if (unit->HasAura(wb.spellId))

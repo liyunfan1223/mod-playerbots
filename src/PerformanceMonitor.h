@@ -17,9 +17,9 @@ typedef std::vector<std::string> PerformanceStack;
 
 struct PerformanceData
 {
-    uint32 minTime;
-    uint32 maxTime;
-    uint32 totalTime;
+    uint64 minTime;
+    uint64 maxTime;
+    uint64 totalTime;
     uint32 count;
     std::mutex lock;
 };
@@ -43,7 +43,7 @@ class PerformanceMonitorOperation
         PerformanceData* data;
         std::string const name;
         PerformanceStack* stack;
-        std::chrono::milliseconds started;
+        std::chrono::microseconds started;
 };
 
 class PerformanceMonitor
