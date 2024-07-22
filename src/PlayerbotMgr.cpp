@@ -504,15 +504,15 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     bot->SaveToDB(false, false);
     if (master && isRandomAccount && master->GetLevel() < bot->GetLevel()) {
-        // PlayerbotFactory factory(bot, master->getLevel());
+        // PlayerbotFactory factory(bot, master->GetLevel());
         // factory.Randomize(false);
         uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
-        PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+        PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
         factory.Randomize(false);
     }
 
     // bots join World chat if not solo oriented
-    if (bot->getLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
+    if (bot->GetLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
     {
         // TODO make action/config
         // Make the bot join the world channel for chat
@@ -628,44 +628,44 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             int gs;
             if (cmd == "init=white" || cmd == "init=common")
             {
-                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_NORMAL);
                 factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=green" || cmd == "init=uncommon")
             {
-                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_UNCOMMON);
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_UNCOMMON);
                 factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=blue" || cmd == "init=rare")
             {
-                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_RARE);
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_RARE);
                 factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=epic" || cmd == "init=purple")
             {
-                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_EPIC);
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_EPIC);
                 factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=legendary" || cmd == "init=yellow")
             {
-                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY);
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY);
                 factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=auto")
             {
                 uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
-                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
                 factory.Randomize(false);
                 return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
             }
             else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
             {
-                PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
                 factory.Randomize(false);
                 return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
             }
@@ -674,7 +674,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         if (cmd == "refresh=raid")
         {   // TODO: This function is not perfect yet. If you are already in a raid, 
             // after the command is executed, the AI ​​needs to go back online or exit the raid and re-enter.
-            PlayerbotFactory factory(bot, bot->getLevel());
+            PlayerbotFactory factory(bot, bot->GetLevel());
             factory.UnbindInstance();
             return "ok";
         }
@@ -682,13 +682,13 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (cmd == "levelup" || cmd == "level")
     {
-        PlayerbotFactory factory(bot, bot->getLevel());
+        PlayerbotFactory factory(bot, bot->GetLevel());
         factory.Randomize(true);
         return "ok";
     }
     else if (cmd == "refresh")
     {
-        PlayerbotFactory factory(bot, bot->getLevel());
+        PlayerbotFactory factory(bot, bot->GetLevel());
         factory.Refresh();
         return "ok";
     }
@@ -698,7 +698,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         return "ok";
     }
     else if (cmd == "quests"){
-        PlayerbotFactory factory(bot, bot->getLevel());
+        PlayerbotFactory factory(bot, bot->GetLevel());
         factory.InitInstanceQuests();
         return "Initialization quests";
     }
@@ -764,7 +764,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     if (!strcmp(cmd, "initself")) {
         if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
             // OnBotLogin(master);
-            PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_EPIC);
+            PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
             factory.Randomize(false);
             messages.push_back("initself ok");
             return messages;
@@ -778,7 +778,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         if (!strcmp(cmd, "initself=rare")) {
             if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
                 // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_RARE);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_RARE);
                 factory.Randomize(false);
                 messages.push_back("initself ok");
                 return messages;
@@ -790,7 +790,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         if (!strcmp(cmd, "initself=epic")) {
             if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
                 // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_EPIC);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
                 factory.Randomize(false);
                 messages.push_back("initself ok");
                 return messages;
@@ -803,7 +803,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         if (sscanf(cmd, "initself=%d", &gs) != -1) {
             if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
                 // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
                 factory.Randomize(false);
                 messages.push_back("initself ok, gs = " + std::to_string(gs));
                 return messages;

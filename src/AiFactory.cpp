@@ -55,7 +55,7 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
 {
     std::map<uint8, uint32> tabs = GetPlayerSpecTabs(bot);
 
-    if (bot->getLevel() >= 10 && ((tabs[0] + tabs[1] + tabs[2]) > 0))
+    if (bot->GetLevel() >= 10 && ((tabs[0] + tabs[1] + tabs[2]) > 0))
     {
         int8 tab = -1;
         uint32 max = 0;
@@ -301,7 +301,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_WARRIOR:
             if (tab == 2)
                 engine->addStrategies("tank", "tank assist", "aoe", "mark rti", nullptr);
-            else if (player->getLevel() < 36 || tab == 0)
+            else if (player->GetLevel() < 36 || tab == 0)
                 engine->addStrategies("arms", "aoe", "dps assist",/*"behind",*/ nullptr);
             else
                 engine->addStrategies("fury", "aoe", "dps assist",/*"behind",*/ nullptr);

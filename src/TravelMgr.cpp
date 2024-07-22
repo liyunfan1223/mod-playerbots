@@ -1063,7 +1063,7 @@ bool QuestRelationTravelDestination::isActive(Player* bot)
 {
     if (relation == 0)
     {
-        if (questTemplate->GetQuestLevel() >= bot->getLevel() + 5)
+        if (questTemplate->GetQuestLevel() >= bot->GetLevel() + 5)
             return false;
 
         //if (questTemplate->XPValue(bot) == 0)
@@ -1135,19 +1135,19 @@ std::string const QuestRelationTravelDestination::getTitle()
 
 bool QuestObjectiveTravelDestination::isActive(Player* bot)
 {
-    if (questTemplate->GetQuestLevel() > bot->getLevel() + 1)
+    if (questTemplate->GetQuestLevel() > bot->GetLevel() + 1)
         return false;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     AiObjectContext* context = botAI->GetAiObjectContext();
-    if (questTemplate->GetQuestLevel() + 5 > bot->getLevel() && !AI_VALUE(bool, "can fight equal"))
+    if (questTemplate->GetQuestLevel() + 5 > bot->GetLevel() && !AI_VALUE(bool, "can fight equal"))
         return false;
 
     //Check mob level
     if (getEntry() > 0)
     {
         CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(getEntry());
-        if (cInfo && (int)cInfo->maxlevel - (int)bot->getLevel() > 4)
+        if (cInfo && (int)cInfo->maxlevel - (int)bot->GetLevel() > 4)
             return false;
 
          // Do not try to hand-in dungeon/elite quests in instances without a group.
@@ -1258,7 +1258,7 @@ bool ExploreTravelDestination::isActive(Player* bot)
 {
     AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
 
-    if (area->area_level && (uint32)area->area_level > bot->getLevel() && bot->getLevel() < DEFAULT_MAX_LEVEL)
+    if (area->area_level && (uint32)area->area_level > bot->GetLevel() && bot->GetLevel() < DEFAULT_MAX_LEVEL)
         return false;
 
     if (area->exploreFlag == 0xffff)
@@ -1290,7 +1290,7 @@ bool GrindTravelDestination::isActive(Player* bot)
 
     CreatureTemplate const* cInfo = GetCreatureTemplate();
 
-    int32 botLevel = bot->getLevel();
+    int32 botLevel = bot->GetLevel();
 
     uint8 botPowerLevel = AI_VALUE(uint8, "durability");
     float levelMod = botPowerLevel / 500.0f; //(0-0.2f)
@@ -1345,7 +1345,7 @@ bool BossTravelDestination::isActive(Player* bot)
     CreatureTemplate const* cInfo = getCreatureTemplate();
 
     /*
-    int32 botLevel = bot->getLevel();
+    int32 botLevel = bot->GetLevel();
 
     uint8 botPowerLevel = AI_VALUE(uint8, "durability");
     float levelMod = botPowerLevel / 500.0f; //(0-0.2f)
@@ -1362,7 +1362,7 @@ bool BossTravelDestination::isActive(Player* bot)
         return false;
     */
 
-    if ((int32)cInfo->maxlevel > bot->getLevel() + 3)
+    if ((int32)cInfo->maxlevel > bot->GetLevel() + 3)
         return false;
 
     FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->faction);
@@ -3842,7 +3842,7 @@ uint32 TravelMgr::getDialogStatus(Player* pPlayer, int32 questgiver, Quest const
                     {
                         dialogStatusNew = DIALOG_STATUS_REWARD_REP;
                     }
-                    else if (lowLevelDiff < 0 || pPlayer->getLevel() <= pPlayer->GetQuestLevel(pQuest) + uint32(lowLevelDiff))
+                    else if (lowLevelDiff < 0 || pPlayer->GetLevel() <= pPlayer->GetQuestLevel(pQuest) + uint32(lowLevelDiff))
                     {
                         dialogStatusNew = DIALOG_STATUS_AVAILABLE;
                     }

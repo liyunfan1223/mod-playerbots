@@ -54,7 +54,7 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
         return;
     }
 
-    uint32 level = bot->getLevel();
+    uint32 level = bot->GetLevel();
 
     // XP to money conversion processed in Player::RewardQuest
     if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
@@ -80,7 +80,7 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
             bot->GiveLevel(level + 1);
         }
 
-        level = bot->getLevel();
+        level = bot->GetLevel();
         nextLvlXP = bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     }
 

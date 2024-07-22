@@ -111,9 +111,9 @@ void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isG
             numQuest++;
 
         int32 lowLevelDiff = sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF);
-        if (lowLevelDiff < 0 || bot->getLevel() <= bot->GetQuestLevel(quest) + uint32(lowLevelDiff)) // Quest is not gray
+        if (lowLevelDiff < 0 || bot->GetLevel() <= bot->GetQuestLevel(quest) + uint32(lowLevelDiff)) // Quest is not gray
         {
-            if (bot->getLevel() + 5 > bot->GetQuestLevel(quest)) // Quest is not red
+            if (bot->GetLevel() + 5 > bot->GetQuestLevel(quest)) // Quest is not red
                 if (!isGreen)
                     continue;
         }

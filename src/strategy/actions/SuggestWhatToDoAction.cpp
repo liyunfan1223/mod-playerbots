@@ -88,7 +88,7 @@ void SuggestWhatToDoAction::instance()
     std::vector<std::string> allowedInstances;
     for (auto & instance : instances)
     {
-        if (bot->getLevel() >= instance.second) allowedInstances.push_back(instance.first);
+        if (bot->GetLevel() >= instance.second) allowedInstances.push_back(instance.first);
     }
 
     if (allowedInstances.empty()) return;
@@ -187,7 +187,7 @@ void SuggestWhatToDoAction::grindReputation()
     std::vector<std::string> allowedFactions;
     for (std::map<std::string, uint8>::iterator i = factions.begin(); i != factions.end(); ++i)
     {
-        if (bot->getLevel() >= i->second)
+        if (bot->GetLevel() >= i->second)
             allowedFactions.push_back(i->first);
     }
 

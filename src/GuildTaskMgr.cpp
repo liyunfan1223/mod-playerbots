@@ -173,11 +173,11 @@ private:
 
 bool GuildTaskMgr::CreateItemTask(Player* player, uint32 guildId)
 {
-    if (!player || player->getLevel() < 5)
+    if (!player || player->GetLevel() < 5)
         return false;
 
     RandomItemBySkillGuildTaskPredicate predicate(player);
-    uint32 itemId = sRandomItemMgr->GetRandomItem(player->getLevel() - 5, RANDOM_ITEM_GUILD_TASK, &predicate);
+    uint32 itemId = sRandomItemMgr->GetRandomItem(player->GetLevel() - 5, RANDOM_ITEM_GUILD_TASK, &predicate);
     if (!itemId)
     {
         LOG_ERROR("playerbots",  "{} / {}: no items avaible for item task", sGuildMgr->GetGuildById(guildId)->GetName().c_str(), player->GetName().c_str());
@@ -203,7 +203,7 @@ bool GuildTaskMgr::CreateKillTask(Player* player, uint32 guildId)
 
     std::vector<uint32> ids;
 
-    uint32 level = player->getLevel();
+    uint32 level = player->GetLevel();
     QueryResult results = WorldDatabase.Query("SELECT ct.Entry, c.map, c.position_x, c.position_y, ct.Name FROM creature_template ct "
         "JOIN creature c ON ct.Entry = c.id1 WHERE ct.MaxLevel < {} AND ct.MinLevel > {} AND ct.Rank = {} ", level + 4, level - 3, rank);
     if (results)
@@ -910,7 +910,7 @@ bool GuildTaskMgr::Reward(CharacterDatabaseTransaction& trans, uint32 owner, uin
         body << guild->GetName() << "\n";
         body << leader->GetName() << "\n";
         rewardType = proto->Quality > ITEM_QUALITY_NORMAL ? RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_BLUE : RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_GREEN;
-        itemId = sRandomItemMgr->GetRandomItem(player->getLevel() - 5, rewardType);
+        itemId = sRandomItemMgr->GetRandomItem(player->GetLevel() - 5, rewardType);
     }
     else if (killTask)
     {
@@ -924,7 +924,7 @@ bool GuildTaskMgr::Reward(CharacterDatabaseTransaction& trans, uint32 owner, uin
         body << guild->GetName() << "\n";
         body << leader->GetName() << "\n";
         rewardType = proto->rank == CREATURE_ELITE_RARE ? RANDOM_ITEM_GUILD_TASK_REWARD_TRADE : RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE;
-        itemId = sRandomItemMgr->GetRandomItem(player->getLevel(), rewardType);
+        itemId = sRandomItemMgr->GetRandomItem(player->GetLevel(), rewardType);
         if (itemId)
         {
             ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemId);

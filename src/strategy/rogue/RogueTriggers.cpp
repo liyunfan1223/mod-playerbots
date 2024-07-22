@@ -59,7 +59,7 @@ bool StealthTrigger::IsActive()
 
 bool SapTrigger::IsPossible()
 {
-    return bot->getLevel() > 10 && bot->HasSpell(6770) && !bot->IsInCombat();
+    return bot->GetLevel() > 10 && bot->HasSpell(6770) && !bot->IsInCombat();
 }
 
 bool SprintTrigger::IsPossible()
