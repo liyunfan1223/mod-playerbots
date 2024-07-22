@@ -95,16 +95,6 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
         return false;
     }
 
-    if (target->IsPlayer() && !target->IsPvP() && !target->IsFFAPvP() && (!bot->duel || bot->duel->Opponent != target || bot->duel->StartTime))
-    {
-        if (verbose)
-        {
-            botAI->TellError(Acore::StringFormat("%s is not flagged for pvp", target->GetName()));
-        }
-
-        return false;
-    }
-
     if (bot->IsMounted() && bot->IsWithinLOSInMap(target))
     {
         WorldPacket emptyPacket;
