@@ -168,7 +168,7 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitSkills();
     factory.InitMounts();
     factory.InitGlyphs(true);
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
         factory.ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);
@@ -199,7 +199,7 @@ bool AutoGearAction::Execute(Event event)
         gs);
     factory.InitEquipment(true);
     factory.InitAmmo();
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
         factory.ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);

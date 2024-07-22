@@ -3545,7 +3545,7 @@ bool BGTactics::selectObjective(bool reset)
                         {
                             // Capture front objectives before attacking back objectives
                             // LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Get Front Objectives",
-                            // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName());
+                            // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
                             if (role < 6)
                             {
                                 BgObjective = bg->GetBGObject(attackObjectivesFront[0]);
@@ -3559,7 +3559,7 @@ bool BGTactics::selectObjective(bool reset)
                         {
                             // Now capture all objectives with priority on back
                             // LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Get All Objectives",
-                            // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName());
+                            // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
                             if (role < 4)
                             {
                                 BgObjective = bg->GetBGObject(attackObjectivesFront[0]);
@@ -3632,7 +3632,7 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     //Retreat with flag
                     //LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Retreat with flag",
-                    //bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName());
+                    //bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
                     if (rootTeam == TEAM_HORDE)
                     {
                         areaTrigger = 0;
@@ -3648,7 +3648,7 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     //Deliver flag
                     //LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Deliver flag",
-                    //bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName());
+                    //bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
                     if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[0])._ownerTeamId == rootTeamIndex)
                     {
                         areaTrigger = AT_FEL_REAVER_POINT;

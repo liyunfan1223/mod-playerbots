@@ -282,7 +282,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    // if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
+    // if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
     // {
     //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Enchant");
     //     LOG_INFO("playerbots", "Initializing enchant templates...");
@@ -328,7 +328,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
         ApplyEnchantAndGemsNew();
     }
     // {
@@ -363,7 +363,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     //if (pmo)
     //    pmo->finish();
 
-    // if (bot->getLevel() >= 70)
+    // if (bot->GetLevel() >= 70)
     // {
     //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Arenas");
     //     LOG_INFO("playerbots", "Initializing arena teams...");
@@ -377,7 +377,7 @@ void PlayerbotFactory::Randomize(bool incremental)
         bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
         // bot->SaveToDB(false, false);
     }
-    if (bot->getLevel() >= 10)
+    if (bot->GetLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
         LOG_DEBUG("playerbots", "Initializing pet...");
@@ -417,7 +417,7 @@ void PlayerbotFactory::Refresh()
     InitAvailableSpells();
     InitSkills();
     InitMounts();
-    if (bot->getLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
         ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);
@@ -666,7 +666,7 @@ void PlayerbotFactory::InitPet()
             if (!itr->second.IsTameable(bot->CanTameExoticPets()))
                 continue;
 
-            if (itr->second.minlevel > bot->getLevel())
+            if (itr->second.minlevel > bot->GetLevel())
                 continue;
             
 			ids.push_back(itr->first);
@@ -674,7 +674,7 @@ void PlayerbotFactory::InitPet()
 
         if (ids.empty())
         {
-            LOG_ERROR("playerbots", "No pets available for bot {} ({} level)", bot->GetName().c_str(), bot->getLevel());
+            LOG_ERROR("playerbots", "No pets available for bot {} ({} level)", bot->GetName().c_str(), bot->GetLevel());
             return;
         }
 
@@ -728,8 +728,8 @@ void PlayerbotFactory::InitPet()
 
     if (pet)
     {
-        pet->InitStatsForLevel(bot->getLevel());
-        pet->SetLevel(bot->getLevel());
+        pet->InitStatsForLevel(bot->GetLevel());
+        pet->SetLevel(bot->GetLevel());
         pet->SetPower(POWER_HAPPINESS, pet->GetMaxPower(Powers(POWER_HAPPINESS)));
         pet->SetHealth(pet->GetMaxHealth());
     }
@@ -1241,7 +1241,7 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
     if (!requiredLevel)
         return false;
 
-    uint32 level = bot->getLevel();
+    uint32 level = bot->GetLevel();
     uint32 delta = 2;
     if (level < 15)
         delta = std::min(level, 15u); // urand(7, 15);
@@ -1363,7 +1363,7 @@ void Shuffle(std::vector<uint32>& items)
 //                         newItem->SetOwnerGUID(bot->GetGUID());
 //                         EnchantItem(newItem);
 //                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}, Old item: {}",
-//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), newItemId, slot, itemInSlot);
+//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->GetLevel(), bot->GetName(), newItemId, slot, itemInSlot);
 //                         found = true;
 //                         break;
 //                     }
@@ -1390,7 +1390,7 @@ void Shuffle(std::vector<uint32>& items)
 //                         EnchantItem(newItem);
 //                         found = true;
 //                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}",
-//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), newItemId, slot);
+//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->GetLevel(), bot->GetName(), newItemId, slot);
 //                         break;
 //                     }
 //                 }
@@ -1400,7 +1400,7 @@ void Shuffle(std::vector<uint32>& items)
 //         if (!found)
 //         {
 //             LOG_INFO("playerbots", "Bot {} {}:{} <{}>: no item for slot {}",
-//                 bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->getLevel(), bot->GetName(), slot);
+//                 bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->GetLevel(), bot->GetName(), slot);
 //             continue;
 //         }
 //     }
@@ -1411,7 +1411,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
     std::unordered_map<uint8, std::vector<uint32> > items;
     int tab = AiFactory::GetPlayerSpecTab(bot);
     
-    uint32 blevel = bot->getLevel();
+    uint32 blevel = bot->GetLevel();
     int32 delta = 2;
     if (blevel < 15)
         delta = std::min(blevel, 15u);
@@ -1593,8 +1593,8 @@ bool PlayerbotFactory::IsDesiredReplacement(Item* item)
     //     requiredLevel = sRandomItemMgr->GetMinLevelFromCache(proto->ItemId);
     // }
     
-    uint32 delta = 1 + (80 - bot->getLevel()) / 10;
-    return proto->Quality < ITEM_QUALITY_RARE || int32(bot->getLevel() - requiredLevel) > delta;
+    uint32 delta = 1 + (80 - bot->GetLevel()) / 10;
+    return proto->Quality < ITEM_QUALITY_RARE || int32(bot->GetLevel() - requiredLevel) > delta;
 }
 
 inline Item* StoreNewItemInInventorySlot(Player* player, uint32 newItemId, uint32 count)
@@ -1747,7 +1747,7 @@ void PlayerbotFactory::InitBags(bool destroyOld)
 
 void PlayerbotFactory::EnchantItem(Item* item)
 {
-    if (bot->getLevel() < sPlayerbotAIConfig->minEnchantingBotLevel)
+    if (bot->GetLevel() < sPlayerbotAIConfig->minEnchantingBotLevel)
         return;
 
     if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance)
@@ -1932,19 +1932,19 @@ void PlayerbotFactory::InitSkills()
 
     uint16 step = bot->GetSkillValue(SKILL_RIDING) ? bot->GetSkillStep(SKILL_RIDING) : 1;
 
-    if (bot->getLevel() >= 70)
+    if (bot->GetLevel() >= 70)
         bot->SetSkill(SKILL_RIDING, step, 300, 300);
-    else if (bot->getLevel() >= 60)
+    else if (bot->GetLevel() >= 60)
         bot->SetSkill(SKILL_RIDING, step, 225, 225);
-    else if (bot->getLevel() >= 40)
+    else if (bot->GetLevel() >= 40)
         bot->SetSkill(SKILL_RIDING, step, 150, 150);
-    else if (bot->getLevel() >= 20)
+    else if (bot->GetLevel() >= 20)
         bot->SetSkill(SKILL_RIDING, step, 75, 75);
     else
         bot->SetSkill(SKILL_RIDING, 0, 0, 0);
 
-    uint32 skillLevel = bot->getLevel() < 40 ? 0 : 1;
-    uint32 dualWieldLevel = bot->getLevel() < 20 ? 0 : 1;
+    uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
+    uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;
     SetRandomSkill(SKILL_DEFENSE);
     switch (bot->getClass())
     {
@@ -2161,7 +2161,7 @@ void PlayerbotFactory::InitAvailableSpells()
 
 void PlayerbotFactory::InitClassSpells()
 {
-    int32_t level = bot->getLevel();
+    int32_t level = bot->GetLevel();
     switch (bot->getClass())
     {
         case CLASS_WARRIOR:
@@ -2450,14 +2450,14 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap)
         uint32 questId = *i;
         Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
 
-        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->getLevel() || !bot->SatisfyQuestRace(quest, false))
+        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() || !bot->SatisfyQuestRace(quest, false))
             continue;
 
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
         bot->RewardQuest(quest, 0, bot, false);
 
         LOG_INFO("playerbots", "Bot {} ({} level) rewarded quest {}: {} (MinLevel={}, QuestLevel={})",
-            bot->GetName().c_str(), bot->getLevel(), questId, quest->GetTitle().c_str(), quest->GetMinLevel(), quest->GetQuestLevel());
+            bot->GetName().c_str(), bot->GetLevel(), questId, quest->GetTitle().c_str(), quest->GetMinLevel(), quest->GetQuestLevel());
 
         if (!(count++ % 10))
             ClearInventory();
@@ -2545,7 +2545,7 @@ void PlayerbotFactory::InitMounts()
     uint32 thirdmount = 60;
     uint32 fourthmount = 70;
 
-    if (bot->getLevel() < firstmount)
+    if (bot->GetLevel() < firstmount)
         return;
 
     std::map<uint8, std::map<uint32, std::vector<uint32>>> mounts;
@@ -2616,13 +2616,13 @@ void PlayerbotFactory::InitMounts()
 
     for (uint32 type = 0; type < 4; type++)
     {
-        if (bot->getLevel() < secondmount && type == 1)
+        if (bot->GetLevel() < secondmount && type == 1)
             continue;
 
-        if (bot->getLevel() < thirdmount && type == 2)
+        if (bot->GetLevel() < thirdmount && type == 2)
             continue;
 
-        if (bot->getLevel() < fourthmount && type == 3)
+        if (bot->GetLevel() < fourthmount && type == 3)
             continue;
 
         uint32 index = urand(0, mounts[bot->getRace()][type].size() - 1);
@@ -2630,7 +2630,7 @@ void PlayerbotFactory::InitMounts()
         if (spell)
         {
             bot->learnSpell(spell);
-            LOG_DEBUG("playerbots", "Bot {} ({}) learned {} mount {}", bot->GetGUID().ToString().c_str(), bot->getLevel(), type == 0 ? "slow" : (type == 1 ? "fast" : "flying"), spell);
+            LOG_DEBUG("playerbots", "Bot {} ({}) learned {} mount {}", bot->GetGUID().ToString().c_str(), bot->GetLevel(), type == 0 ? "slow" : (type == 1 ? "fast" : "flying"), spell);
         }
     }
 }
@@ -2667,7 +2667,7 @@ void PlayerbotFactory::InitPotions()
         uint32 itemId = sRandomItemMgr->GetRandomPotion(level, effect);
         if (!itemId)
         {
-            // LOG_INFO("playerbots", "No potions (type {}) available for bot {} ({} level)", effect, bot->GetName().c_str(), bot->getLevel());
+            // LOG_INFO("playerbots", "No potions (type {}) available for bot {} ({} level)", effect, bot->GetName().c_str(), bot->GetLevel());
             continue;
         }
 
@@ -2701,7 +2701,7 @@ void PlayerbotFactory::InitFood()
             proto->Bonding != NO_BIND)
             continue;
 
-        if (proto->RequiredLevel > bot->getLevel() || proto->RequiredLevel < bot->getLevel() - 9)
+        if (proto->RequiredLevel > bot->GetLevel() || proto->RequiredLevel < bot->GetLevel() - 9)
             continue;
 
         if (proto->RequiredSkill && !bot->HasSkill(proto->RequiredSkill))
@@ -2744,7 +2744,7 @@ void PlayerbotFactory::InitFood()
 
 void PlayerbotFactory::InitReagents()
 {
-    int level = bot->getLevel();
+    int level = bot->GetLevel();
     std::vector<std::pair<uint32, uint32>> items;
     switch (bot->getClass()) 
     {
@@ -2754,14 +2754,14 @@ void PlayerbotFactory::InitReagents()
             std::vector<int> deadly_poison_ids = {43233, 43232, 22054, 22053, 20844, 8985, 8984, 2893, 2892};
             for (int& itemId: deadly_poison_ids) {
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                if (proto->RequiredLevel > bot->getLevel())
+                if (proto->RequiredLevel > bot->GetLevel())
                     continue;
                 items.push_back({itemId, 20}); // deadly poison
                 break;    
             }
             for (int& itemId: instant_poison_ids) {
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                if (proto->RequiredLevel > bot->getLevel())
+                if (proto->RequiredLevel > bot->GetLevel())
                     continue;
                 items.push_back({itemId, 20}); // instant poison
                 break;    
@@ -2774,7 +2774,7 @@ void PlayerbotFactory::InitReagents()
             items.push_back({5176, 1}); // Flame Totem
             items.push_back({5177, 1}); // Water Totem
             items.push_back({5178, 1}); // Air Totem
-            if (bot->getLevel() >= 30)
+            if (bot->GetLevel() >= 30)
                 items.push_back({17030, 40}); // Ankh
             break;
         case CLASS_WARLOCK:
@@ -2848,7 +2848,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
         }
     }
 
-    uint32 level = bot->getLevel();
+    uint32 level = bot->GetLevel();
     uint32 maxSlot = 0;
     if (level >= 15)
         maxSlot = 2;
@@ -3041,7 +3041,7 @@ void PlayerbotFactory::InitInventoryTrade()
     uint32 itemId = sRandomItemMgr->GetRandomTrade(level);
     if (!itemId)
     {
-        LOG_ERROR("playerbots", "No trade items available for bot {} ({} level)", bot->GetName().c_str(), bot->getLevel());
+        LOG_ERROR("playerbots", "No trade items available for bot {} ({} level)", bot->GetName().c_str(), bot->GetLevel());
         return;
     }
 
@@ -3151,7 +3151,7 @@ void PlayerbotFactory::InitGuild()
         guild->AddMember(bot->GetGUID(), urand(GR_OFFICER, GR_INITIATE));
 
     // add guild tabard
-    if (bot->GetGuildId() && bot->getLevel() > 9 && urand(0, 4) && !bot->HasItemCount(5976, 1))
+    if (bot->GetGuildId() && bot->GetLevel() > 9 && urand(0, 4) && !bot->HasItemCount(5976, 1))
         StoreItem(5976, 1);
 
     bot->SaveToDB(false, false);
@@ -3229,7 +3229,7 @@ void PlayerbotFactory::InitImmersive()
         {
             Stats from = (Stats)urand(STAT_STRENGTH, MAX_STATS - 1);
             Stats to = (Stats)urand(STAT_STRENGTH, MAX_STATS - 1);
-            int32 delta = urand(0, 5 + bot->getLevel() / 3);
+            int32 delta = urand(0, 5 + bot->GetLevel() / 3);
             if (from != to && percentMap[to] + delta <= 100 && percentMap[from] - delta >= 0)
             {
                 percentMap[to] += delta;
@@ -3275,7 +3275,7 @@ void PlayerbotFactory::InitArenaTeam()
         return;
     }
 
-    if (arenateam->GetMembersSize() < ((uint32)arenateam->GetType() * 2) && bot->getLevel() >= 70)
+    if (arenateam->GetMembersSize() < ((uint32)arenateam->GetType() * 2) && bot->GetLevel() >= 70)
     {
         ObjectGuid capt = arenateam->GetCaptain();
         Player* botcaptain = ObjectAccessor::FindPlayer(capt);
