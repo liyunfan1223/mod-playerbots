@@ -106,7 +106,7 @@ class CastConeOfColdAction : public CastSpellAction
 	public:
 		CastConeOfColdAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "cone of cold") { }
         ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
-        // bool isUseful() override;
+        bool isUseful() override;
 };
 
 class CastArcaneIntellectAction : public CastBuffSpellAction
