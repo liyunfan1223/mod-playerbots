@@ -180,6 +180,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
         !attacker->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) &&
         bot->CanSeeOrDetect(attacker) &&
         !(sPlayerbotAIConfig->IsPvpProhibited(attacker->GetZoneId(), attacker->GetAreaId()) && (attacker->GetGUID().IsPlayer() || attacker->GetGUID().IsPet())) && 
+        !(attacker->IsPlayer() && !attacker->IsPvP() && !attacker->IsFFAPvP() && (!bot->duel || bot->duel->Opponent != attacker)) &&
         (!c || (!c->IsInEvadeMode() && ((!isMemberBotGroup && botAI->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) ||
         leaderHasThreat || (!c->hasLootRecipient() && (!c->GetVictim() || (c->GetVictim() && ((!c->GetVictim()->IsPlayer() || bot->IsInSameGroupWith(c->GetVictim()->ToPlayer())) ||
         (botAI->GetMaster() && c->GetVictim() == botAI->GetMaster()))))) || c->isTappedBy(bot))));
