@@ -104,8 +104,8 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["frost ward"] = &MageTriggerFactoryInternal::frost_ward;
             creators["arcane blast stack"] = &MageTriggerFactoryInternal::arcane_blast_stack;
             creators["mirror image"] = &MageTriggerFactoryInternal::mirror_image;
-            creators["frost nova on target"] = &MageTriggerFactoryInternal::mirror_image;
-            creators["frostbite on target"] = &MageTriggerFactoryInternal::mirror_image;
+            creators["frost nova on target"] = &MageTriggerFactoryInternal::frost_nova_on_target;
+            creators["frostbite on target"] = &MageTriggerFactoryInternal::frostbite_on_target;
         }
 
     private:

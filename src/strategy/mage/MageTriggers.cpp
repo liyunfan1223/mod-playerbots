@@ -36,10 +36,7 @@ bool FrostNovaOnTargetTrigger::IsActive()
     if (!target || !target->IsAlive() || !target->IsInWorld()) {
         return false;
     }
-    bool aura = botAI->HasAura("frostbite", target);
-    if (aura)
-        LOG_DEBUG("playerbots", ":: FROST NOVA ACTIVE");
-	return !botAI->HasAura("frost nova", target);
+	return botAI->HasAura(spell, target);
 }
 
 bool FrostbiteOnTargetTrigger::IsActive()
@@ -48,8 +45,5 @@ bool FrostbiteOnTargetTrigger::IsActive()
     if (!target || !target->IsAlive() || !target->IsInWorld()) {
         return false;
     }
-    bool aura = botAI->HasAura("frostbite", target);
-    if (aura)
-        LOG_DEBUG("playerbots", ":: FROSTBITE ACTIVE");
-	return botAI->HasAura("frostbite", target);
+	return botAI->HasAura(spell, target);
 }
