@@ -179,13 +179,15 @@ class MirrorImageTrigger : public BoostTrigger
 class FrostNovaOnTargetTrigger : public DebuffTrigger
 {
     public:
-    FrostNovaOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost nova", 1, false, 2.0f) {}
+    FrostNovaOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost nova", 1, false) {}
+    bool IsActive() override;
 };
 
 class FrostbiteOnTargetTrigger : public DebuffTrigger
 {
     public:
-    FrostbiteOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frostbite", 1, false, 2.0f) {}
+    FrostbiteOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frostbite", 1, false) {}
+    bool IsActive() override;
 };
 
 #endif

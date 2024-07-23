@@ -29,3 +29,27 @@ bool FingersOfFrostSingleTrigger::IsActive()
     Aura *aura = botAI->GetAura(getName(), GetTarget(), false, true, -1);
 	return (aura && aura->GetCharges() == 1);
 }
+
+bool FrostNovaOnTargetTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+        return false;
+    }
+    bool aura = botAI->HasAura("frostbite", target);
+    if (aura)
+        LOG_DEBUG("playerbots", ":: FROST NOVA ACTIVE");
+	return !botAI->HasAura("frost nova", target);
+}
+
+bool FrostbiteOnTargetTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+        return false;
+    }
+    bool aura = botAI->HasAura("frostbite", target);
+    if (aura)
+        LOG_DEBUG("playerbots", ":: FROSTBITE ACTIVE");
+	return botAI->HasAura("frostbite", target);
+}
