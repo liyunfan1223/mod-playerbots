@@ -167,13 +167,25 @@ class PresenceOfMindTrigger : public BuffTrigger
 class ArcaneBlastStackTrigger : public HasAuraStackTrigger
 {
 public:
-    ArcaneBlastStackTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "arcane blast", 3, 1) {}
+    ArcaneBlastStackTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "arcane blast", 3, 1) {}
 };
 
-class MirrorImageTrigger : public BoostTrigger 
+class MirrorImageTrigger : public BoostTrigger
 {
     public:
-    MirrorImageTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "mirror image") {}
+    MirrorImageTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "mirror image") {}
+};
+
+class FrostNovaOnTargetTrigger : public DebuffTrigger
+{
+    public:
+    FrostNovaOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost nova", 1, false, 2.0f) {}
+};
+
+class FrostbiteOnTargetTrigger : public DebuffTrigger
+{
+    public:
+    FrostbiteOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frostbite", 1, false, 2.0f) {}
 };
 
 #endif

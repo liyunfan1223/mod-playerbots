@@ -74,7 +74,7 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode("ice barrier", NextAction::array(0, new NextAction("ice barrier", ACTION_HIGH), nullptr)));
     
-    triggers.push_back(new TriggerNode("brain freeze", NextAction::array(0, new NextAction("frostfire bolt", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("brain freeze", NextAction::array(0, new NextAction("frostfire bolt", ACTION_NORMAL + 3), nullptr)));
     // Combo cast the last charge of fingers of frost for double crits.
     // Should only do this on the final charge of FoF.
     triggers.push_back(new TriggerNode("fingers of frost single", NextAction::array(0,
@@ -84,6 +84,14 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // May not need this, frostbolt is the default action so probably don't need to specify.
     // Maybe uncomment if you find the mage is prioritising auxillary spells while this buff is up, and wasting the proc.
     // triggers.push_back(new TriggerNode("fingers of frost double", NextAction::array(0, new NextAction("frostbolt", ACTION_NORMAL), nullptr)));
+    triggers.push_back(new TriggerNode("frost nova on target", NextAction::array(0,
+        new NextAction("fireball", ACTION_NORMAL + 2),
+        new NextAction("scorch", ACTION_NORMAL + 1),
+        nullptr)));
+    triggers.push_back(new TriggerNode("frostbite on target", NextAction::array(0,
+        new NextAction("arcane missiles", ACTION_NORMAL + 2),
+        new NextAction("arcane explosion", ACTION_NORMAL + 1),
+        nullptr)));
 }
 
 void FrostMageAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

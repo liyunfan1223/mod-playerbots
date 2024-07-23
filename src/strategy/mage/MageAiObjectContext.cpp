@@ -104,6 +104,8 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["frost ward"] = &MageTriggerFactoryInternal::frost_ward;
             creators["arcane blast stack"] = &MageTriggerFactoryInternal::arcane_blast_stack;
             creators["mirror image"] = &MageTriggerFactoryInternal::mirror_image;
+            creators["frost nova on target"] = &MageTriggerFactoryInternal::mirror_image;
+            creators["frostbite on target"] = &MageTriggerFactoryInternal::mirror_image;
         }
 
     private:
@@ -135,6 +137,8 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* counterspell_enemy_healer(PlayerbotAI* botAI) { return new CounterspellEnemyHealerTrigger(botAI); }
         static Trigger* arcane_blast_stack(PlayerbotAI* botAI) { return new ArcaneBlastStackTrigger(botAI); }
         static Trigger* mirror_image(PlayerbotAI* botAI) { return new MirrorImageTrigger(botAI); }
+        static Trigger* frost_nova_on_target(PlayerbotAI* botAI) { return new FrostNovaOnTargetTrigger(botAI); }
+        static Trigger* frostbite_on_target(PlayerbotAI* botAI) { return new FrostbiteOnTargetTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
