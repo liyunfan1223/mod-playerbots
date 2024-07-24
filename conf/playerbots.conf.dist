@@ -1289,7 +1289,7 @@ AiPlayerbot.RandomBotGuildCount = 20
 AiPlayerbot.DeleteRandomBotGuilds = 0
 
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
-AiPlayerbot.RandomBotRpgChance = 0.20 #unused now
+AiPlayerbot.RandomBotRpgChance = 0.20
 
 # Set randombots movement speed to walking anywhere
 AiPlayerbot.RandombotsWalkingRPG = 0
