@@ -172,6 +172,7 @@ bool MaintenanceAction::Execute(Event event)
         factory.ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);
+    bot->SendTalentsInfoData(false);
     return true;
 }
 
@@ -181,6 +182,7 @@ bool RemoveGlyphAction::Execute(Event event)
     {
         bot->SetGlyph(slotIndex, 0, true);
     }
+    bot->SendTalentsInfoData(false);
     return true;
 }
 

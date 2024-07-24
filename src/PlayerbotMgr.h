@@ -99,13 +99,14 @@ class PlayerbotsMgr
         }
 
         void AddPlayerbotData(Player* player, bool isBotAI);
-        void RemovePlayerBotData(ObjectGuid const& guid);
+        void RemovePlayerBotData(ObjectGuid const& guid, bool is_AI);
 
         PlayerbotAI* GetPlayerbotAI(Player* player);
         PlayerbotMgr* GetPlayerbotMgr(Player* player);
 
     private:
-        std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsMap;
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsAIMap;
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsMgrMap;
 };
 
 #define sPlayerbotsMgr PlayerbotsMgr::instance()

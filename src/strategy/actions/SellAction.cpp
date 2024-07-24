@@ -74,7 +74,7 @@ bool SellAction::Execute(Event event)
         return true;
     }
 
-    if (text == "all")
+    if (text != "")
     {
         std::vector<Item *> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
         for (Item *item : items)
@@ -84,7 +84,7 @@ bool SellAction::Execute(Event event)
         return true;
     }
 
-    botAI->TellError("Usage: s gray/*/vendor/all");
+    botAI->TellError("Usage: s gray/*/vendor/[item link]");
     return false;
 }
 

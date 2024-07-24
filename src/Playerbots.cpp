@@ -299,7 +299,7 @@ class PlayerbotsScript : public PlayerbotScript
             {
                 botAI->HandleBotOutgoingPacket(*packet);
             }
-            else if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
             {
                 playerbotMgr->HandleMasterOutgoingPacket(*packet);
             }
