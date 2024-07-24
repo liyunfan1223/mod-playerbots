@@ -1634,9 +1634,9 @@ BattleBotPath vPath_AV_Frostdagger_Pass_Lower_to_Iceblood_Garrison =
 BattleBotPath vPath_AV_Icewing_Bunker_Crossroad_to_Frostdagger_Pass_Lower =
 {
     //these are to cause bot to pick this when resurrecting at stonehearth (not really needed anymore as they get captain down in first wave since uneeded dismounting was fixed)
-    //{ 68.793f, -396.742f, 45.299f, nullptr },
-    //{ 99.042f, -389.310f, 45.101f, nullptr },
-    //{ 123.787f, -373.551f, 42.893f, nullptr },
+    { 68.793f, -396.742f, 45.299f, nullptr },
+    { 99.042f, -389.310f, 45.101f, nullptr },
+    { 123.787f, -373.551f, 42.893f, nullptr },
     { 119.693f, -351.311f, 42.728f, nullptr },
     { 107.710f, -321.162f, 37.168f, nullptr },
     { 84.953f, -273.434f, 23.944f, nullptr },
@@ -2397,12 +2397,12 @@ static uint32 AB_AttackObjectives[] =
     { BG_AB_NODE_GOLD_MINE }
 };
 
-static uint32 EY_AttackObjectives[] =
+static std::pair<uint32, uint32> EY_AttackObjectives[] =
 {
-    { POINT_FEL_REAVER },
-    { POINT_BLOOD_ELF },
-    { POINT_DRAENEI_RUINS },
-    { POINT_MAGE_TOWER }
+    { POINT_FEL_REAVER, BG_EY_OBJECT_FLAG_FEL_REAVER},
+    { POINT_BLOOD_ELF, BG_EY_OBJECT_FLAG_BLOOD_ELF },
+    { POINT_DRAENEI_RUINS, BG_EY_OBJECT_FLAG_DRAENEI_RUINS },
+    { POINT_MAGE_TOWER, BG_EY_OBJECT_FLAG_MAGE_TOWER }
 };
 
 // useful commands for fixing BG bugs and checking waypoints/paths
@@ -2935,6 +2935,7 @@ bool BGTactics::Execute(Event event)
 
         switch (bot->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
+            //TODO: should ESCORT_MOTION_TYPE be here seeing as bots use it by default?
             case IDLE_MOTION_TYPE:
             case CHASE_MOTION_TYPE:
             case POINT_MOTION_TYPE:
@@ -3712,8 +3713,8 @@ bool BGTactics::selectObjective(bool reset)
             uint8 rootTeamIndex = TEAM_NEUTRAL;
             uint32 role = context->GetValue<uint32>("bg role")->Get();
 
-            uint32 attackObjectivesFront[2];
-            uint32 attackObjectivesBack[2];
+            std::pair<uint32, uint32> attackObjectivesFront[2];
+            std::pair<uint32, uint32> attackObjectivesBack[2];
             uint32 areaTrigger;
             Position flagDeliverPoint;
             TeamId rootTeam = bot->GetTeamId();
@@ -3741,29 +3742,29 @@ bool BGTactics::selectObjective(bool reset)
             {
                 if (role == 1) //Harass left back
                 {
-                    BgObjective = bg->GetBGObject(attackObjectivesBack[0]);
+                    BgObjective = bg->GetBGObject(attackObjectivesBack[0].second);
                 }
                 else if (role == 2) //Harass right back
                 {
-                    BgObjective = bg->GetBGObject(attackObjectivesBack[1]);
+                    BgObjective = bg->GetBGObject(attackObjectivesBack[1].second);
                 }
                 else if (role < 8) //Attack and Defend
                 {
                     while (BgObjective == nullptr)
                     {
-                        if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[0])._ownerTeamId != rootTeamIndex ||
-                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[1])._ownerTeamId != rootTeamIndex)
+                        if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[0].first)._ownerTeamId != rootTeamIndex ||
+                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[1].first)._ownerTeamId != rootTeamIndex)
                         {
                             // Capture front objectives before attacking back objectives
                             // LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Get Front Objectives",
                             // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
                             if (role < 6)
                             {
-                                BgObjective = bg->GetBGObject(attackObjectivesFront[0]);
+                                BgObjective = bg->GetBGObject(attackObjectivesFront[0].second);
                             }
                             else if (role < 8)
                             {
-                                BgObjective = bg->GetBGObject(attackObjectivesFront[1]);
+                                BgObjective = bg->GetBGObject(attackObjectivesFront[1].second);
                             }
                         }
                         else
@@ -3773,29 +3774,29 @@ bool BGTactics::selectObjective(bool reset)
                             // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
                             if (role < 4)
                             {
-                                BgObjective = bg->GetBGObject(attackObjectivesFront[0]);
+                                BgObjective = bg->GetBGObject(attackObjectivesFront[0].second);
                             }
                             else if (role < 5)
                             {
-                                BgObjective = bg->GetBGObject(attackObjectivesFront[1]);
+                                BgObjective = bg->GetBGObject(attackObjectivesFront[1].second);
                             }
                             else if (role < 8)
                             {
-                                if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[0])._ownerTeamId != rootTeamIndex)
+                                if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[0].first)._ownerTeamId != rootTeamIndex)
                                 {
-                                    BgObjective = bg->GetBGObject(attackObjectivesBack[0]);
+                                    BgObjective = bg->GetBGObject(attackObjectivesBack[0].second);
                                 }
-                                else if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[1])._ownerTeamId != rootTeamIndex)
+                                else if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[1].first)._ownerTeamId != rootTeamIndex)
                                 {
-                                    BgObjective = bg->GetBGObject(attackObjectivesBack[1]);
+                                    BgObjective = bg->GetBGObject(attackObjectivesBack[1].second);
                                 }
                             }
                         }
 
-                        if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[0])._ownerTeamId == rootTeamIndex &&
-                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[1])._ownerTeamId == rootTeamIndex &&
-                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[0])._ownerTeamId == rootTeamIndex &&
-                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[1])._ownerTeamId == rootTeamIndex)
+                        if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[0].first)._ownerTeamId == rootTeamIndex &&
+                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[1].first)._ownerTeamId == rootTeamIndex &&
+                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[0].first)._ownerTeamId == rootTeamIndex &&
+                            eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[1].first)._ownerTeamId == rootTeamIndex)
                         {
                             role = urand(0, 9);
                         }
@@ -3838,8 +3839,8 @@ bool BGTactics::selectObjective(bool reset)
             {
                 BgObjective = nullptr;
 
-                if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[0])._ownerTeamId != rootTeamIndex && eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[1])._ownerTeamId != rootTeamIndex &&
-                    eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[0])._ownerTeamId !=rootTeamIndex && eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[1])._ownerTeamId !=rootTeamIndex)
+                if (eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[0].first)._ownerTeamId != rootTeamIndex && eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesFront[1].first)._ownerTeamId != rootTeamIndex &&
+                    eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[0].first)._ownerTeamId != rootTeamIndex && eyeOfTheStormBG->GetCapturePointInfo(attackObjectivesBack[1].first)._ownerTeamId != rootTeamIndex)
                 {
                     //Retreat with flag
                     //LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Retreat with flag",
@@ -3860,22 +3861,22 @@ bool BGTactics::selectObjective(bool reset)
                     //Deliver flag
                     //LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Deliver flag",
                     //bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
-                    if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[0])._ownerTeamId == rootTeamIndex)
+                    if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[0].first)._ownerTeamId == rootTeamIndex)
                     {
                         areaTrigger = AT_FEL_REAVER_POINT;
                         flagDeliverPoint = EY_FLAG_RETURN_POS_REAVER_RUINS;
                     }
-                    else if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[1])._ownerTeamId == rootTeamIndex)
+                    else if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[1].first)._ownerTeamId == rootTeamIndex)
                     {
                         areaTrigger = AT_BLOOD_ELF_POINT;
                         flagDeliverPoint = EY_FLAG_RETURN_POS_BLOOD_ELF_TOWER;
                     }
-                    else if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[2])._ownerTeamId == rootTeamIndex)
+                    else if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[2].first)._ownerTeamId == rootTeamIndex)
                     {
                         areaTrigger = AT_DRAENEI_RUINS_POINT;
                         flagDeliverPoint = EY_FLAG_RETURN_POS_DRAENEI_RUINS;
                     }
-                    else if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[3])._ownerTeamId == rootTeamIndex)
+                    else if (eyeOfTheStormBG->GetCapturePointInfo(EY_AttackObjectives[3].first)._ownerTeamId == rootTeamIndex)
                     {
                         areaTrigger = AT_MAGE_TOWER_POINT;
                         flagDeliverPoint = EY_FLAG_RETURN_POS_MAGE_TOWER;
@@ -4350,6 +4351,14 @@ bool BGTactics::moveToObjective()
         if (sqrt(bot->GetDistance(caveSpawn)) < 4.0f) {
             return moveToStart(true);
         }
+    }
+    else if (bgType == BATTLEGROUND_EY)
+    {
+        // just teleport them down for now
+        if (bot->GetDistance(1831.673f, 1541.025f, 1256.794f) < 16)
+            bot->TeleportTo(bg->GetMapId(), 1867.821f, 1541.739f, 1209.07f, bot->GetOrientation());
+        if (bot->GetDistance(2496.949f, 1596.353f, 1257.225f) < 16)
+            bot->TeleportTo(bg->GetMapId(), 2471.215f, 1604.309f, 1213.61f, bot->GetOrientation());
     }
 
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
