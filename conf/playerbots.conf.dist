@@ -125,11 +125,11 @@ AiPlayerbot.BotAutologin = 0
 # Default: 0 (disabled)
 AiPlayerbot.AllowPlayerBots = 0
 
-# Bots will be summoned to player when accept group invitation
-AiPlayerbot.SummonWhenGroup = 1
-
 # Allow/deny bots from your guild
 AiPlayerbot.AllowGuildBots = 1
+
+# Bots will be summoned to player when accept group invitation
+AiPlayerbot.SummonWhenGroup = 1
 
 # Added following config
 # Selfbot permission level (0 = disabled, 1 = gm only (default), 2 = all players, 3 = activate on login)
@@ -541,7 +541,7 @@ AiPlayerbot.EquipmentPersistence = 0
 # default: 80
 AiPlayerbot.EquipmentPersistenceLevel = 80
 
-# Bot automatically upgrade equipments on levelup
+# Randombots automatically upgrade equipments on levelup
 # Default: 1 (enabled)
 AiPlayerbot.AutoUpgradeEquip = 1
 
@@ -578,15 +578,15 @@ AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11
 #
 #
 
-# Bots automatically learn classquest reward spells on levelup
+# Randombots automatically learn classquest reward spells on levelup
 # Default: 0 (disabled)
 AiPlayerbot.AutoLearnQuestSpells = 0
 
-# Bots automatically learn trainable spells on levelup
+# Randombots automatically learn trainable spells on levelup
 # Default: 1 (enabled)
 AiPlayerbot.AutoLearnTrainerSpells = 1
 
-# Bot automatically picks talent points on levelup
+# Randombots automatically picks talent points on levelup
 # Default: 1 (enabled)
 AiPlayerbot.AutoPickTalents = 1
 
@@ -635,7 +635,6 @@ AiPlayerbot.RandomBotTeleLowerLevel = 3
 AiPlayerbot.RandomBotTeleHigherLevel = 1
 
 # Bots automatically teleport to another place for leveling on levelup
-# Only for random bots
 # Default: 1 (enabled)
 AiPlayerbot.AutoTeleportForLevel = 1
 

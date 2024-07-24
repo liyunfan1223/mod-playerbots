@@ -26,7 +26,6 @@ class ArcaneIntellectTrigger : public BuffTrigger
 {
     public:
         ArcaneIntellectTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane intellect", 2 * 2000) { }
-
         bool IsActive() override;
 };
 
@@ -34,7 +33,6 @@ class MageArmorTrigger : public BuffTrigger
 {
     public:
         MageArmorTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "mage armor", 5 * 2000) { }
-
         bool IsActive() override;
 };
 
@@ -74,6 +72,26 @@ class ArcaneBlastTrigger : public BuffTrigger
         ArcaneBlastTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane blast") { }
 };
 
+class FingersOfFrostSingleTrigger : public HasAuraStackTrigger
+{
+public:
+    FingersOfFrostSingleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 1, 1) {}
+    bool IsActive() override;
+};
+
+class FingersOfFrostDoubleTrigger : public HasAuraStackTrigger
+{
+public:
+    FingersOfFrostDoubleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 2, 1) {}
+    // bool IsActive() override;
+};
+
+class BrainFreezeTrigger : public HasAuraTrigger
+{
+    public:
+        BrainFreezeTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "fireball!") { }
+};
+
 class CounterspellInterruptSpellTrigger : public InterruptSpellTrigger
 {
     public:
@@ -90,6 +108,18 @@ class IcyVeinsTrigger : public BoostTrigger
 {
     public:
         IcyVeinsTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "icy veins") { }
+};
+
+class ColdSnapTrigger : public BoostTrigger
+{
+    public:
+        ColdSnapTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "cold snap") { }
+};
+
+class IceBarrierTrigger : public BuffTrigger
+{
+    public:
+        IceBarrierTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "ice barrier") { }
 };
 
 class PolymorphTrigger : public HasCcTargetTrigger
@@ -134,15 +164,30 @@ class PresenceOfMindTrigger : public BuffTrigger
         PresenceOfMindTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "presence of mind") { }
 };
 
-class ArcaneBlastStackTrigger : public HasAuraStackTrigger {
+class ArcaneBlastStackTrigger : public HasAuraStackTrigger
+{
 public:
-    ArcaneBlastStackTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "arcane blast", 3, 1) {}
+    ArcaneBlastStackTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "arcane blast", 3, 1) {}
 };
 
-class MirrorImageTrigger : public BoostTrigger 
+class MirrorImageTrigger : public BoostTrigger
 {
     public:
-    MirrorImageTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "mirror image") {}
+    MirrorImageTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "mirror image") {}
+};
+
+class FrostNovaOnTargetTrigger : public DebuffTrigger
+{
+    public:
+    FrostNovaOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost nova", 1, false) {}
+    bool IsActive() override;
+};
+
+class FrostbiteOnTargetTrigger : public DebuffTrigger
+{
+    public:
+    FrostbiteOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frostbite", 1, false) {}
+    bool IsActive() override;
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include "ChatHelper.h"
 #include "Playerbots.h"
 #include "Vehicle.h"
+#include "World.h"
 
 SpellIdValue::SpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "spell id", 20 * 1000)
 {
@@ -34,7 +35,7 @@ uint32 SpellIdValue::Calculate()
     char firstSymbol = tolower(namepart[0]);
     int spellLength = wnamepart.length();
 
-    LocaleConstant loc = bot->GetSession()->GetSessionDbcLocale();
+    LocaleConstant loc = LOCALE_enUS;
 
     std::set<uint32> spellIds;
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)

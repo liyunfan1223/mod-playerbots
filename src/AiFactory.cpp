@@ -553,7 +553,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     if (sPlayerbotAIConfig->autoSaveMana) {
         nonCombatEngine->addStrategy("auto save mana");
     }
-    if ((facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
+    if ((sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
     {
         Player* master = facade->GetMaster();
 

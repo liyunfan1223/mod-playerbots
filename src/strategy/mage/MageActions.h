@@ -35,7 +35,6 @@ class CastArcaneBlastAction : public CastBuffSpellAction
 {
     public:
         CastArcaneBlastAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane blast") { }
-
         std::string const GetTargetName() override { return "current target"; }
 };
 
@@ -68,7 +67,6 @@ class CastFrostNovaAction : public CastSpellAction
 {
     public:
         CastFrostNovaAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "frost nova") { }
-
         bool isUseful() override;
 };
 
@@ -78,12 +76,37 @@ class CastFrostboltAction : public CastSpellAction
 		CastFrostboltAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "frostbolt") { }
 };
 
+class CastFrostfireBoltAction : public CastSpellAction
+{
+	public:
+		CastFrostfireBoltAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "frostfire bolt") { }
+};
+
+class CastIceLanceAction : public CastSpellAction
+{
+	public:
+		CastIceLanceAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "ice lance") { }
+};
+
+class CastDeepFreezeAction : public CastSpellAction
+{
+	public:
+		CastDeepFreezeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "deep freeze") { }
+};
+
 class CastBlizzardAction : public CastSpellAction
 {
 	public:
 		CastBlizzardAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "blizzard") { }
-
         ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+};
+
+class CastConeOfColdAction : public CastSpellAction
+{
+	public:
+		CastConeOfColdAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "cone of cold") { }
+        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+        bool isUseful() override;
 };
 
 class CastArcaneIntellectAction : public CastBuffSpellAction
@@ -114,6 +137,24 @@ class CastIcyVeinsAction : public CastBuffSpellAction
 {
 	public:
 		CastIcyVeinsAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "icy veins") { }
+};
+
+class CastColdSnapAction : public CastBuffSpellAction
+{
+	public:
+		CastColdSnapAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "cold snap") { }
+};
+
+class CastIceBarrierAction : public CastBuffSpellAction
+{
+	public:
+		CastIceBarrierAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ice barrier") { }
+};
+
+class CastSummonWaterElementalAction : public CastBuffSpellAction
+{
+	public:
+		CastSummonWaterElementalAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "summon water elemental") { }
 };
 
 class CastCombustionAction : public CastBuffSpellAction
@@ -183,7 +224,6 @@ class CastPolymorphAction : public CastBuffSpellAction
 {
     public:
         CastPolymorphAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "polymorph") { }
-
         Value<Unit*>* GetTargetValue() override;
 };
 
@@ -223,7 +263,6 @@ class CastEvocationAction : public CastSpellAction
 {
 	public:
 	    CastEvocationAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "evocation") { }
-
 	    std::string const GetTargetName() override { return "self target"; }
 };
 

@@ -19,7 +19,7 @@ bool InviteToGroupAction::Execute(Event event)
 
 bool InviteToGroupAction::Invite(Player* player)
 {
-    if (!player)
+    if (!player || !player->IsInWorld())
         return false;
 
     if (!GET_PLAYERBOT_AI(player) && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, true, player))
