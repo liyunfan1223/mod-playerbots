@@ -10,6 +10,16 @@
 #include "GuildMgr.h"
 #include <regex>
 
+static const std::unordered_set<std::string> noReplyMsgs = {
+  "join", "leave", "follow", "attack", "pull", "flee", "reset", "reset ai",
+  "all ?", "talents", "talents list", "talents auto", "talk", "stay", "stats",
+  "who", "items", "leave", "join", "repair", "summon", "nc ?", "co ?", "de ?",
+  "dead ?", "follow", "los", "guard", "do accept invitation", "stats", "react ?",
+  "reset strats", "home",
+};
+static const std::unordered_set<std::string> noReplyMsgParts = { "+", "-","@" , "follow target", "focus heal", "cast ", "accept [", "e [", "destroy [", "go zone" };
+static const std::unordered_set<std::string> noReplyMsgStarts = { "e ", "accept ", "cast ", "destroy " };
+
 SayAction::SayAction(PlayerbotAI* botAI) : Action(botAI, "say"), Qualified()
 {
 }
@@ -114,8 +124,40 @@ bool SayAction::isUseful()
 
 void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName, std::string name)
 {
+    LOG_INFO("playerbots", "{} Handle chat reply", bot->GetName());
+
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
     std::string respondsText = "";
+
+    // if we're just commanding bots around, don't respond...
+    // first one is for exact word matches
+    if (noReplyMsgs.find(msg) != noReplyMsgs.end()) {
+        std::ostringstream out;
+        out << "DEBUG ChatReplyDo decided to ignore exact blocklist match" << msg;
+        bot->Say(out.str(), LANG_UNIVERSAL);
+        return;
+    }
+
+    // second one is for partial matches like + or - where we change strats
+    if (std::any_of(noReplyMsgParts.begin(), noReplyMsgParts.end(), [&msg](const std::string& part) { return msg.find(part) != std::string::npos; })) {
+        std::ostringstream out;
+        out << "DEBUG ChatReplyDo decided to ignore partial blocklist match" << msg;
+        bot->Say(out.str(), LANG_UNIVERSAL);
+
+        return;
+    }
+
+    if (std::any_of(noReplyMsgStarts.begin(), noReplyMsgStarts.end(), [&msg](const std::string& start) {
+        return msg.find(start) == 0;  // Check if the start matches the beginning of msg
+        })) {
+        std::ostringstream out;
+        out << "DEBUG ChatReplyDo decided to ignore start blocklist match" << msg;
+        bot->Say(out.str(), LANG_UNIVERSAL);
+        return;
+    }
+
+    ObjectGuid receiver = sCharacterCache->GetCharacterGuidByName(name);
+    Player* plr = ObjectAccessor::FindPlayer(receiver);
 
     // Chat Logic
     int32 verb_pos = -1;
@@ -152,17 +194,14 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
     // Responds
     for (uint32 i = 0; i < 8; i++)
     {
-//        // blame gm with chat tag
-//        if (Player* plr = sObjectMgr->GetPlayer(ObjectGuid(HIGHGUID_PLAYER, guid1)))
-//        {
-//            if (plr->isGMChat())
-//            {
-//                replyType = REPLY_ADMIN_ABUSE;
-//                found = true;
-//                break;
-//            }
-//        }
-//
+        // blame gm with chat tag
+        if (plr && plr->isGMChat())
+        {
+            replyType = REPLY_ADMIN_ABUSE;
+            found = true;
+            break;
+        }
+
         if (word[i] == "hi" || word[i] == "hey" || word[i] == "hello" || word[i] == "wazzup"
             || word[i] == "salut" || word[i] == "plop" || word[i] == "yo")
         {
@@ -173,11 +212,13 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
 
         if (verb_type < 4)
         {
-            if (word[i] == "am" || word[i] == "are" || word[i] == "is" || word[i] == "suis" || word[i] == "a" || word[i] == "est"
+            if (word[i] == "am" || word[i] == "are" || word[i] == "is" || word[i] == "suis" || word[i] == "as" || word[i] == "est"
             || word[i] == "dois" || word[i] == "doit")
             {
                 verb_pos = i;
                 verb_type = 2; // present
+                if (verb_pos == 0)
+                    is_quest = 1;
             }
             else if (word[i] == "will" || word[i] == "vais" || word[i] == "sera")
             {
@@ -605,19 +646,19 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         {
             if (type == CHAT_MSG_WHISPER)
             {
-                ObjectGuid receiver = sCharacterCache->GetCharacterGuidByName(name);
-                if (!receiver || !receiver.IsPlayer() || !ObjectAccessor::FindPlayer(receiver))
+                if (plr)
                 {
-                    return;
-                }
-                if (bot->GetTeamId() == TEAM_ALLIANCE)
-                {
-                    bot->Whisper(c, LANG_COMMON, ObjectAccessor::FindPlayer(receiver));
+                    if (bot->GetTeamId() == TEAM_ALLIANCE)
+                    {
+                        bot->Whisper(c, LANG_COMMON, plr);
+                    }
+                    else
+                    {
+                        bot->Whisper(c, LANG_ORCISH, plr);
+                    }
                 }
                 else
-                {
-                    bot->Whisper(c, LANG_ORCISH, ObjectAccessor::FindPlayer(receiver));
-                }
+                    LOG_ERROR("playerbots", "plr pointer is nullptr chat whisper");
             }
 
             if (type == CHAT_MSG_SAY)
@@ -646,6 +687,11 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
                     return;
 
                 guild->BroadcastToGuild(bot->GetSession(), false, respondsText, LANG_UNIVERSAL);
+            }
+
+            else
+            {
+                LOG_ERROR("playerbots", "Unknown chat type {}", type);
             }
         }
         GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(nullptr) + urand(5, 25));
