@@ -23,6 +23,7 @@ class SuggestWhatToDoAction : public InventoryAction
         void instance();
         void specificQuest();
         void grindReputation();
+        void grindMaterials();
         void something();
         void spam(std::string msg, uint8 flags = 0, bool worldChat = false, bool guild = false);
 
@@ -31,6 +32,7 @@ class SuggestWhatToDoAction : public InventoryAction
     private:
         static std::map<std::string, uint8> instances;
         static std::map<std::string, uint8> factions;
+        const int32_t& _dbc_locale;
 };
 
 class SuggestTradeAction : public SuggestWhatToDoAction

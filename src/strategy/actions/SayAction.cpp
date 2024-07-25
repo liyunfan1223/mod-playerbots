@@ -105,6 +105,9 @@ bool SayAction::isUseful()
     if (!botAI->AllowActivity())
         return false;
 
+    if (botAI->HasStrategy("silent", BotState::BOT_STATE_NON_COMBAT))
+        return false;
+
     time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
     return (time(nullptr) - lastSaid) > 30;
 }
@@ -160,7 +163,8 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
 //            }
 //        }
 //
-        if (word[i] == "hi" || word[i] == "hey" || word[i] == "hello" || word[i] == "wazzup")
+        if (word[i] == "hi" || word[i] == "hey" || word[i] == "hello" || word[i] == "wazzup"
+            || word[i] == "salut" || word[i] == "plop" || word[i] == "yo")
         {
             replyType = REPLY_HELLO;
             found = true;
@@ -169,22 +173,23 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
 
         if (verb_type < 4)
         {
-            if (word[i] == "am" || word[i] == "are" || word[i] == "is")
+            if (word[i] == "am" || word[i] == "are" || word[i] == "is" || word[i] == "suis" || word[i] == "a" || word[i] == "est"
+            || word[i] == "dois" || word[i] == "doit")
             {
                 verb_pos = i;
                 verb_type = 2; // present
             }
-            else if (word[i] == "will")
+            else if (word[i] == "will" || word[i] == "vais" || word[i] == "sera")
             {
                 verb_pos = i;
                 verb_type = 3; // future
             }
-            else if (word[i] == "was" || word[i] == "were")
+            else if (word[i] == "was" || word[i] == "were" || word[i] == "été" || word[i] == "ai" || word[i] == "eu" || word[i] == "étions" || word[i] == "etion" )
             {
                 verb_pos = i;
                 verb_type = 1; // past
             }
-            else if (word[i] == "shut" || word[i] == "noob")
+            else if (word[i] == "shut" || word[i] == "noob" || word[i] == "tg")
             {
                 if (msg.find(bot->GetName()) == std::string::npos)
                 {
