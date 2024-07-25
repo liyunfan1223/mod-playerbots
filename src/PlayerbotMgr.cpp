@@ -545,7 +545,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
             if (isLfg)
             {
                 std::string lfgChannelName = channel->pattern[sWorld->GetDefaultDbcLocale()];
-                new_channel = cMgr->GetJoinChannel(lfgChannelName, channel->ChannelID);
+                new_channel = cMgr->GetJoinChannel("LookingForGroup", channel->ChannelID);
             }
             else
             {

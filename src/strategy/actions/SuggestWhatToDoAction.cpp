@@ -109,7 +109,7 @@ void SuggestWhatToDoAction::instance()
         instances["Halls of Reflection"] = 80;
     }
 
-    std::vector<std::string_view> allowedInstances;
+    std::vector<std::string> allowedInstances;
     for (const auto& instance : instances)
     {
         if (bot->GetLevel() >= instance.second)
@@ -248,12 +248,12 @@ void SuggestWhatToDoAction::grindReputation()
         factions["The Wyrmrest Accord"] = 77;
     }
 
-    std::vector<std::string_view> levels;
+    std::vector<std::string> levels;
     levels.push_back("honored");
     levels.push_back("revered");
     levels.push_back("exalted");
 
-    std::vector<std::string_view> allowedFactions;
+    std::vector<std::string> allowedFactions;
     for (const auto& i : factions)
     {
         if (bot->GetLevel() >= i.second)
@@ -310,7 +310,10 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
         if (!channel) continue;
 
-        LOG_INFO("playerbots", "Loop on channel: {}", channel->pattern[_dbc_locale]);
+        if (channel->pattern[_dbc_locale])
+            LOG_INFO("playerbots", "Loop on channel: {}", channel->pattern[_dbc_locale]);
+        else
+            LOG_ERROR("playerbots", "channel->pattern[_dbc_locale] is null");
 
         for (AreaTableEntry const* current_zone : sAreaTableStore)
         {

@@ -192,7 +192,6 @@ uint32 PlayerbotTextMgr::GetLocalePriority()
             topLocale = i;
     }
 
-    LOG_INFO("playerbots", "GetLocalePriority: {}", topLocale);
     return topLocale;
 }
 
