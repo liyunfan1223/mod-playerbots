@@ -1595,7 +1595,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             continue;
         }
         const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (spellInfo->IsPositive()) {
+        if (!spellInfo || spellInfo->IsPositive()) {
             continue;
         }
         float radius = (float)goInfo->trap.diameter / 2;

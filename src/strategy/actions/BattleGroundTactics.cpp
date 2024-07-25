@@ -2390,19 +2390,19 @@ static std::pair<uint32, uint32> AV_AllianceDefendObjectives[] =
 static uint32 AB_AttackObjectives[] =
 {
     // Attack
-    { BG_AB_NODE_STABLES },
-    { BG_AB_NODE_BLACKSMITH },
-    { BG_AB_NODE_FARM },
-    { BG_AB_NODE_LUMBER_MILL },
-    { BG_AB_NODE_GOLD_MINE }
+    BG_AB_NODE_STABLES,
+    BG_AB_NODE_BLACKSMITH,
+    BG_AB_NODE_FARM,
+    BG_AB_NODE_LUMBER_MILL,
+    BG_AB_NODE_GOLD_MINE
 };
 
 static uint32 EY_AttackObjectives[] =
 {
-    { POINT_FEL_REAVER },
-    { POINT_BLOOD_ELF },
-    { POINT_DRAENEI_RUINS },
-    { POINT_MAGE_TOWER }
+    POINT_FEL_REAVER,
+    POINT_BLOOD_ELF,
+    POINT_DRAENEI_RUINS,
+    POINT_MAGE_TOWER
 };
 
 // useful commands for fixing BG bugs and checking waypoints/paths

@@ -350,7 +350,7 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
 
         std::string const command = holder.GetCommand();
         Player* owner = holder.GetOwner();
-        if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
+        if (owner == master && !helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
         {
              // To prevent spam caused by WIM
             if (!(command.rfind("WIM", 0) == 0) &&

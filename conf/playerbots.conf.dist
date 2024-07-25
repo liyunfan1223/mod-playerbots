@@ -172,8 +172,8 @@ AiPlayerbot.AllowSummonWhenMasterIsDead = 1
 # default: 1 (always)
 AiPlayerbot.AllowSummonWhenBotIsDead = 1
 
-# Enable/Disable reviving the bots when summoning them
-# default: 1 (enable)
+# Enable/Disable reviving the bots when summoning them (0 = disable, 1 = disable in combat, 2 = enable)
+# default: 1 (disable in combat)
 AiPlayerbot.ReviveBotWhenSummoned = 1
 
 # Enable/Disable bot repair gear when summon (0 = no, 1 = yes)
@@ -899,8 +899,8 @@ AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
 AiPlayerbot.PremadeSpecLink.8.1.80 = 23000503110003-0055030011302331053120321351
 AiPlayerbot.PremadeSpecName.8.2 = frost pve
 AiPlayerbot.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
-AiPlayerbot.PremadeSpecLink.8.2.60 = --3533103310203100232102231151
-AiPlayerbot.PremadeSpecLink.8.2.80 = 23002322010203--0533003313203100232112231151
+AiPlayerbot.PremadeSpecLink.8.2.60 = --0533030313203100030152231151
+AiPlayerbot.PremadeSpecLink.8.2.80 = 23002303110003--0533030313203100030152231351
 
 #
 #
@@ -1289,7 +1289,7 @@ AiPlayerbot.RandomBotGuildCount = 20
 AiPlayerbot.DeleteRandomBotGuilds = 0
 
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
-AiPlayerbot.RandomBotRpgChance = 0.20 #unused now
+AiPlayerbot.RandomBotRpgChance = 0.20
 
 # Set randombots movement speed to walking anywhere
 AiPlayerbot.RandombotsWalkingRPG = 0
