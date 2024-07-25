@@ -447,7 +447,7 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_RASP:
             emoteId = EMOTE_ONESHOT_RUDE;
             textEmote = TEXT_EMOTE_RASP;
-            emoteText = "Right back at you, bub!", LANG_UNIVERSAL;
+            emoteText = "Right back at you, bub!"; // , LANG_UNIVERSAL;
             break;
         case TEXT_EMOTE_ROAR:
         case TEXT_EMOTE_THREATEN:

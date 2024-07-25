@@ -2620,6 +2620,16 @@ void PlayerbotFactory::InitMounts()
 
     for (uint32 type = 0; type < 4; type++)
     {
+        bool hasMount = false;
+        for (uint32 &spell : mounts[bot->getRace()][type]) {
+            if (bot->HasSpell(spell)) {
+                hasMount = true;
+                break;
+            }
+        }
+        if (hasMount)
+            continue;
+        
         if (bot->GetLevel() < secondmount && type == 1)
             continue;
 
