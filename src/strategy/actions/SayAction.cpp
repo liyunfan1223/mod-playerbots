@@ -124,8 +124,6 @@ bool SayAction::isUseful()
 
 void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName, std::string name)
 {
-    LOG_INFO("playerbots", "{} Handle chat reply", bot->GetName());
-
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
     std::string respondsText = "";
 
@@ -143,7 +141,6 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         std::ostringstream out;
         out << "DEBUG ChatReplyDo decided to ignore partial blocklist match" << msg;
         bot->Say(out.str(), LANG_UNIVERSAL);
-
         return;
     }
 
@@ -657,13 +654,10 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
                         bot->Whisper(c, LANG_ORCISH, plr);
                     }
                 }
-                else
-                    LOG_ERROR("playerbots", "plr pointer is nullptr chat whisper");
             }
 
             else if (type == CHAT_MSG_SAY)
             {
-                LOG_INFO("playerbots", "say respond: {}", respondsText);
                 if (bot->GetTeamId() == TEAM_ALLIANCE)
                     bot->Say(respondsText, LANG_COMMON);
                 else
@@ -688,11 +682,6 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
                     return;
 
                 guild->BroadcastToGuild(bot->GetSession(), false, respondsText, LANG_UNIVERSAL);
-            }
-
-            else
-            {
-                LOG_ERROR("playerbots", "Unknown chat type {}", type);
             }
         }
         GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(nullptr) + urand(5, 25));

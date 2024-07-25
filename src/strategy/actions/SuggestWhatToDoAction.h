@@ -18,7 +18,7 @@ class SuggestWhatToDoAction : public InventoryAction
         bool isUseful() override;
 
     protected:
-        typedef void (SuggestWhatToDoAction::*Suggestion)();
+        using Suggestion = std::function<void()>;
         std::vector<Suggestion> suggestions;
         void instance();
         void specificQuest();
@@ -32,7 +32,7 @@ class SuggestWhatToDoAction : public InventoryAction
     private:
         static std::map<std::string, uint8> instances;
         static std::map<std::string, uint8> factions;
-        const int32_t& _dbc_locale;
+        const int32_t _dbc_locale;
 };
 
 class SuggestTradeAction : public SuggestWhatToDoAction

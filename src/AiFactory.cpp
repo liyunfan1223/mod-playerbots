@@ -264,7 +264,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (!player->InBattleground())
     {
-        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
+        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", "emote", nullptr);
     }
     if (sPlayerbotAIConfig->autoSaveMana) 
     {
@@ -548,7 +548,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     if (!player->InBattleground())
     {
         nonCombatEngine->addStrategies("nc", "food", "chat", "follow",
-            "default", "quest", "loot", "gather", "duel", "buff", "mount", nullptr);
+            "default", "quest", "loot", "gather", "duel", "buff", "mount", "emote", nullptr);
     }
     if (sPlayerbotAIConfig->autoSaveMana) {
         nonCombatEngine->addStrategy("auto save mana");

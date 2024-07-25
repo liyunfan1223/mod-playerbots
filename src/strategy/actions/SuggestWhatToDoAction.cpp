@@ -13,6 +13,8 @@
 #include "GuildMgr.h"
 #include "Config.h"
 
+#include <functional>
+
 enum eTalkType
 {
     General             = ChannelFlags::CHANNEL_FLAG_GENERAL  | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
@@ -29,11 +31,11 @@ SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* botAI, std::string con
     : InventoryAction{ botAI, name }
     , _dbc_locale{ sWorld->GetDefaultDbcLocale() }
 {
-    suggestions.push_back(&SuggestWhatToDoAction::specificQuest);
-    suggestions.push_back(&SuggestWhatToDoAction::grindReputation);
-    suggestions.push_back(&SuggestWhatToDoAction::something);
-    suggestions.push_back(&SuggestWhatToDoAction::instance);
-    suggestions.push_back(&SuggestWhatToDoAction::grindMaterials);
+    suggestions.push_back(std::bind(&SuggestWhatToDoAction::specificQuest, this));
+    suggestions.push_back(std::bind(&SuggestWhatToDoAction::grindReputation, this));
+    suggestions.push_back(std::bind(&SuggestWhatToDoAction::something, this));
+    suggestions.push_back(std::bind(&SuggestWhatToDoAction::instance, this));
+    suggestions.push_back(std::bind(&SuggestWhatToDoAction::grindMaterials, this));
 }
 
 bool SuggestWhatToDoAction::isUseful()
@@ -48,11 +50,9 @@ bool SuggestWhatToDoAction::isUseful()
 
 bool SuggestWhatToDoAction::Execute(Event event)
 {
-    if (!sRandomPlayerbotMgr->IsRandomBot(bot) || bot->GetGroup() || bot->GetInstanceId())
-        return false;
-
     uint32 index = rand() % suggestions.size();
-    (this->*suggestions[index])();
+    auto fnct_ptr = suggestions[index];
+    fnct_ptr();
 
     std::string const qualifier = "suggest what to do";
     time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
@@ -310,11 +310,6 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
         if (!channel) continue;
 
-        if (channel->pattern[_dbc_locale])
-            LOG_INFO("playerbots", "Loop on channel: {}", channel->pattern[_dbc_locale]);
-        else
-            LOG_ERROR("playerbots", "channel->pattern[_dbc_locale] is null");
-
         for (AreaTableEntry const* current_zone : sAreaTableStore)
         {
            if (!current_zone)
@@ -327,14 +322,12 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
             if ((channel->flags & CHANNEL_DBC_FLAG_LFG) != 0)
             {
                 std::string chanName = channel->pattern[_dbc_locale];
-                LOG_INFO("playerbots", "Trying to chat on channel: {}", chanName);
                 chn = cMgr->GetChannel(chanName, bot);
             }
             else
             {
                 snprintf(channelName, 100, channel->pattern[_dbc_locale], current_zone->area_name[_dbc_locale]);
                 chn = cMgr->GetChannel(channelName, bot);
-                LOG_INFO("playerbots", "Trying to chat on channel: {}", channelName);
             }
             if (!chn)
                 continue;
@@ -355,16 +348,19 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
                 channelNames.push_back(chn->GetName());
             }
             else
+            {
                 chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+                LOG_DEBUG("playerbots", "send grind {} - {}", bot->GetName().c_str(), msg.c_str());
+            }
         }
 
         if (!channelNames.empty())
         {
             std::string randomName = channelNames[urand(0, channelNames.size() - 1)];
-            LOG_INFO("playerbots", "Chatting on channel: {}", randomName);
             if (Channel* chn = cMgr->GetChannel(randomName, bot))
             {
                 chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+                LOG_DEBUG("playerbots", "send grind {} - {}", bot->GetName().c_str(), msg.c_str());
             }
         }
 

@@ -671,9 +671,9 @@ bool EmoteAction::Execute(Event event)
         if (pSource && (pSource->GetGUID() != bot->GetGUID()) && ((urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f)) ||
             (namlen > 1 && strstri(bot->GetName().c_str(), nam.c_str()))))
         {
-            LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_TEXT_EMOTE {} from player {} <{}>",
+            /*LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_TEXT_EMOTE {} from player {} <{}>",
                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
-                bot->GetName(), text_emote, pSource->GetGUID().ToString().c_str(), pSource->GetName());
+                bot->GetName(), text_emote, pSource->GetGUID().ToString().c_str(), pSource->GetName());*/
 
             emote = text_emote;
         }
@@ -693,9 +693,9 @@ bool EmoteAction::Execute(Event event)
             if ((pSource->GetGUID() != bot->GetGUID()) && (pSource->GetTarget() == bot->GetGUID() ||
                 (urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f))))
             {
-                LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_EMOTE {} from player {} <{}>",
+                /*LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_EMOTE {} from player {} <{}>",
                     bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                    emoteId, pSource->GetGUID().ToString().c_str(), pSource->GetName());
+                    emoteId, pSource->GetGUID().ToString().c_str(), pSource->GetName());*/
 
                 std::vector<uint32> types;
                 for (int32 i = sEmotesTextStore.GetNumRows(); i >= 0; --i)
