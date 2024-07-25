@@ -350,7 +350,7 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
             else
             {
                 chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
-                LOG_DEBUG("playerbots", "send grind {} - {}", bot->GetName().c_str(), msg.c_str());
+                LOG_INFO("playerbots", "{} - {} channel {}", bot->GetName().c_str(), msg.c_str(), chn->GetName());
             }
         }
 
@@ -360,7 +360,7 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
             if (Channel* chn = cMgr->GetChannel(randomName, bot))
             {
                 chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
-                LOG_DEBUG("playerbots", "send grind {} - {}", bot->GetName().c_str(), msg.c_str());
+                LOG_INFO("playerbots", "{} - {} channel {}", bot->GetName().c_str(), msg.c_str(), chn->GetName());
             }
         }
 
