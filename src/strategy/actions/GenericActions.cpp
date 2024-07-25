@@ -20,6 +20,7 @@ bool TogglePetSpellAutoCastAction::Execute(Event event) {
     if (!pet) {
         return false;
     }
+    bool toggled = false;
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
     {
         if(itr->second.state == PETSPELL_REMOVED)
@@ -29,17 +30,29 @@ bool TogglePetSpellAutoCastAction::Execute(Event event) {
         const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (spellInfo->IsPassive())
             continue;
-
+        
+        bool shouldApply = true;
         // imp's spell, felhunte's intelligence, ghoul's leap, cat stealth
         if (spellId == 4511 || spellId == 1742 || 
             spellId == 54424 || spellId == 57564 || spellId == 57565 || spellId == 57566 || spellId == 57567 || 
             spellId == 47482 || spellId == 24450) {
-            pet->ToggleAutocast(spellInfo, false);
-        } else {
-            pet->ToggleAutocast(spellInfo, true);
+            shouldApply = false;
+        }
+        bool isAutoCast = false;
+        for (unsigned int &m_autospell : pet->m_autospells)
+	    {
+	        if (m_autospell == spellId)
+	        {
+	            isAutoCast = true;
+	            break;
+	        }
+	    }
+        if (shouldApply != isAutoCast) {
+            pet->ToggleAutocast(spellInfo, shouldApply);
+            toggled = true;
         }
     }
-    return true; 
+    return toggled; 
 }
 
 bool PetAttackAction::Execute(Event event)
