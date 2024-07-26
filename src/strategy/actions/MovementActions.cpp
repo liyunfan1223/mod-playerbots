@@ -57,6 +57,16 @@ void MovementAction::CreateWp(Player* wpOwner, float x, float y, float z, float 
         wpCreature->SetObjectScale(0.5f);
 }
 
+void MovementAction::JumpTo(uint32 mapId, float x, float y, float z) {
+    float botZ = bot->GetPositionZ();
+    float speed = bot->GetSpeed(MOVE_RUN);
+    MotionMaster& mm = *bot->GetMotionMaster();
+    botAI->SetNextCheckDelay(1000);
+    mm.Clear();
+    mm.MoveJump(x, y, z, speed, speed, 1);
+    AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
+}
+
 bool MovementAction::MoveNear(uint32 mapId, float x, float y, float z, float distance)
 {
     float angle = GetFollowAngle();
