@@ -53,10 +53,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ matrix.c_compiler }}:${{ github.sha }}
+          key: ccache:${{ matrix.os }}:${{ matrix.c_compiler }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:${{ matrix.os }}:${{ github.ref }}:${{ matrix.c_compiler }}
-            ccache:${{ matrix.os }}:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.c_compiler }}:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.c_compiler }}
             ccache:${{ matrix.os }}
 
       - name: Install Requirements
