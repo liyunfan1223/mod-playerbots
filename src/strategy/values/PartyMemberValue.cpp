@@ -6,14 +6,14 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-Unit* PartyMemberValue::FindPartyMember(std::vector<Player*>* party, FindPlayerPredicate& predicate)
+Unit *PartyMemberValue::FindPartyMember(std::vector<Player*> *party, FindPlayerPredicate &predicate)
 {
-    for (Player* player : *party)
+    for (Player *player : *party)
     {
         if (Check(player) && predicate.Check(player))
             return player;
 
-        if (Pet* pet = player->GetPet())
+        if (Pet *pet = player->GetPet())
             if (Check(pet) && predicate.Check(pet))
                 return pet;
     }
@@ -21,17 +21,17 @@ Unit* PartyMemberValue::FindPartyMember(std::vector<Player*>* party, FindPlayerP
     return nullptr;
 }
 
-Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ignoreOutOfGroup)
+Unit *PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate, bool ignoreOutOfGroup)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     // GuidVector nearestPlayers;
     // if (botAI->AllowActivity(OUT_OF_PARTY_ACTIVITY))
     //     nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
 
     GuidList nearestGroupPlayers;
-    if (Group* group = bot->GetGroup())
+    if (Group *group = bot->GetGroup())
     {
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             if (ref->getSubGroup() != bot->GetSubGroup())
             {
@@ -42,10 +42,12 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
                 nearestGroupPlayers.push_front(ref->GetSource()->GetGUID());
             }
         }
-    } else {
+    }
+    else
+    {
         std::vector<Player*> vec;
         vec.push_back(bot);
-        Unit* target = FindPartyMember(&vec, predicate);
+        Unit *target = FindPartyMember(&vec, predicate);
         if (target)
             return target;
         return NULL;
@@ -65,7 +67,7 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
 
     for (ObjectGuid const guid : nearestGroupPlayers)
     {
-        Player* player = botAI->GetPlayer(guid);
+        Player *player = botAI->GetPlayer(guid);
         if (!player)
             continue;
 
@@ -85,9 +87,9 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
 
     for (std::vector<std::vector<Player*>*>::iterator i = lists.begin(); i != lists.end(); ++i)
     {
-        std::vector<Player*>* party = *i;
+        std::vector<Player*> *party = *i;
 
-        Unit* target = FindPartyMember(party, predicate);
+        Unit *target = FindPartyMember(party, predicate);
         if (target)
             return target;
     }
@@ -95,27 +97,28 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
     return nullptr;
 }
 
-bool PartyMemberValue::Check(Unit* player)
+bool PartyMemberValue::Check(Unit *player)
 {
     // return player && player != bot && player->GetMapId() == bot->GetMapId() && bot->IsWithinDistInMap(player, sPlayerbotAIConfig->sightDistance, false);
     return player && player->GetMapId() == bot->GetMapId() &&
-        bot->GetDistance(player) < sPlayerbotAIConfig->spellDistance * 2 &&
-        bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+           bot->GetDistance(player) < sPlayerbotAIConfig->spellDistance * 2 &&
+           bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 
-bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &predicate)
+bool PartyMemberValue::IsTargetOfSpellCast(Player *target, SpellEntryPredicate &predicate)
 {
     // GuidVector nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
     ObjectGuid targetGuid = target ? target->GetGUID() : bot->GetGUID();
     ObjectGuid corpseGuid = target && target->GetCorpse() ? target->GetCorpse()->GetGUID() : ObjectGuid::Empty;
 
-    Group* group = bot->GetGroup();
-    if (!group) {
+    Group *group = bot->GetGroup();
+    if (!group)
+    {
         return false;
     }
     for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
     {
-        Player* player = gref->GetSource();
+        Player *player = gref->GetSource();
         if (!player || player == bot)
             continue;
 
@@ -123,7 +126,7 @@ bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &
         {
             for (uint8 type = CURRENT_GENERIC_SPELL; type < CURRENT_MAX_SPELL; type++)
             {
-                Spell* spell = player->GetCurrentSpell((CurrentSpellTypes)type);
+                Spell *spell = player->GetCurrentSpell((CurrentSpellTypes)type);
                 if (spell && predicate.Check(spell->m_spellInfo))
                 {
                     ObjectGuid unitTarget = spell->m_targets.GetUnitTargetGUID();
@@ -143,22 +146,23 @@ bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &
 class FindMainTankPlayer : public FindPlayerPredicate
 {
 public:
-    FindMainTankPlayer(PlayerbotAI* botAI) : botAI(botAI) {}
+    FindMainTankPlayer(PlayerbotAI *botAI) : botAI(botAI) {}
 
-    virtual bool Check(Unit* unit)
+    virtual bool Check(Unit *unit)
     {
-        Player* player = unit->ToPlayer();
-        if (!player) {
+        Player *player = unit->ToPlayer();
+        if (!player)
+        {
             return false;
         }
         return botAI->IsMainTank(player);
     }
 
 private:
-    PlayerbotAI* botAI;
+    PlayerbotAI *botAI;
 };
 
-Unit* PartyMemberMainTankValue::Calculate()
+Unit *PartyMemberMainTankValue::Calculate()
 {
     FindMainTankPlayer findMainTankPlayer(botAI);
     return FindPartyMember(findMainTankPlayer);

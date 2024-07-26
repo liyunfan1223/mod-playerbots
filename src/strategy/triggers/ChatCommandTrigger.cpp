@@ -5,11 +5,11 @@
 #include "ChatCommandTrigger.h"
 #include "Playerbots.h"
 
-ChatCommandTrigger::ChatCommandTrigger(PlayerbotAI* botAI, std::string const command) : Trigger(botAI, command), triggered(false), owner(nullptr)
+ChatCommandTrigger::ChatCommandTrigger(PlayerbotAI *botAI, std::string const command) : Trigger(botAI, command), triggered(false), owner(nullptr)
 {
 }
 
-void ChatCommandTrigger::ExternalEvent(std::string const paramName, Player* eventPlayer)
+void ChatCommandTrigger::ExternalEvent(std::string const paramName, Player *eventPlayer)
 {
     param = paramName;
     owner = eventPlayer;

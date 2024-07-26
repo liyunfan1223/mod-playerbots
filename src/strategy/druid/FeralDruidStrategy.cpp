@@ -7,92 +7,92 @@
 
 class FeralDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-    public:
-        FeralDruidStrategyActionNodeFactory()
-        {
-            creators["survival instincts"] = &survival_instincts;
-            creators["thorns"] = &thorns;
-            creators["omen of clarity"] = &omen_of_clarity;
-            creators["cure poison"] = &cure_poison;
-            creators["cure poison on party"] = &cure_poison_on_party;
-            creators["abolish poison"] = &abolish_poison;
-            creators["abolish poison on party"] = &abolish_poison_on_party;
-            creators["prowl"] = &prowl;
-        }
+public:
+    FeralDruidStrategyActionNodeFactory()
+    {
+        creators["survival instincts"] = &survival_instincts;
+        creators["thorns"] = &thorns;
+        creators["omen of clarity"] = &omen_of_clarity;
+        creators["cure poison"] = &cure_poison;
+        creators["cure poison on party"] = &cure_poison_on_party;
+        creators["abolish poison"] = &abolish_poison;
+        creators["abolish poison on party"] = &abolish_poison_on_party;
+        creators["prowl"] = &prowl;
+    }
 
-    private:
-        static ActionNode* survival_instincts([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("survival instincts",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("barskin"), nullptr),
-                /*C*/ nullptr);
-        }
+private:
+    static ActionNode *survival_instincts([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("survival instincts",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("barskin"), nullptr),
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* thorns([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("thorns",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
+    static ActionNode *thorns([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("thorns",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* omen_of_clarity([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("omen of clarity",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
+    static ActionNode *omen_of_clarity([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("omen of clarity",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* cure_poison([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("cure poison",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
+    static ActionNode *cure_poison([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("cure poison",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* cure_poison_on_party([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("cure poison on party",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
+    static ActionNode *cure_poison_on_party([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("cure poison on party",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* abolish_poison([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("abolish poison",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
+    static ActionNode *abolish_poison([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("abolish poison",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* abolish_poison_on_party([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("abolish poison on party",
-                /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
+    static ActionNode *abolish_poison_on_party([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("abolish poison on party",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* prowl([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode("prowl",
-                /*P*/ NextAction::array(0, new NextAction("cat form"), nullptr),
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
+    static ActionNode *prowl([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("prowl",
+                              /*P*/ NextAction::array(0, new NextAction("cat form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 };
 
-FeralDruidStrategy::FeralDruidStrategy(PlayerbotAI* botAI) : GenericDruidStrategy(botAI)
+FeralDruidStrategy::FeralDruidStrategy(PlayerbotAI *botAI) : GenericDruidStrategy(botAI)
 {
     actionNodeFactories.Add(new FeralDruidStrategyActionNodeFactory());
     actionNodeFactories.Add(new ShapeshiftDruidStrategyActionNodeFactory());
 }
 
-void FeralDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void FeralDruidStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     GenericDruidStrategy::InitTriggers(triggers);
 
@@ -104,4 +104,3 @@ void FeralDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("player has flag", NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
     triggers.push_back(new TriggerNode("enemy flagcarrier near", NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
 }
-

@@ -14,33 +14,32 @@ class PlayerbotAI;
 
 class EquipAction : public InventoryAction
 {
-    public:
-        EquipAction(PlayerbotAI* botAI, std::string const name = "equip") : InventoryAction(botAI, name) { }
+public:
+    EquipAction(PlayerbotAI *botAI, std::string const name = "equip") : InventoryAction(botAI, name) {}
 
-        bool Execute(Event event) override;
-        void EquipItems(ItemIds ids);
+    bool Execute(Event event) override;
+    void EquipItems(ItemIds ids);
 
-    private:
-        void EquipItem(FindItemVisitor* visitor);
-        uint8 GetSmallestBagSlot();
-        void EquipItem(Item* item);
+private:
+    void EquipItem(FindItemVisitor *visitor);
+    uint8 GetSmallestBagSlot();
+    void EquipItem(Item *item);
 };
 
 class EquipUpgradesAction : public EquipAction
 {
-    public:
-        EquipUpgradesAction(PlayerbotAI* botAI, std::string const name = "equip upgrades") : EquipAction(botAI, name) { }
+public:
+    EquipUpgradesAction(PlayerbotAI *botAI, std::string const name = "equip upgrades") : EquipAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class EquipUpgradeAction : public EquipAction
 {
-    public:
-        EquipUpgradeAction(PlayerbotAI* botAI, std::string const name = "equip upgrade") : EquipAction(botAI, name) { }
+public:
+    EquipUpgradeAction(PlayerbotAI *botAI, std::string const name = "equip upgrade") : EquipAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
-
 
 #endif

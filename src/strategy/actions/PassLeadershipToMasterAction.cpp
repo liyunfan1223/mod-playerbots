@@ -8,7 +8,7 @@
 
 bool PassLeadershipToMasterAction::Execute(Event event)
 {
-    if (Player* master = GetMaster())
+    if (Player *master = GetMaster())
         if (master && master != bot && bot->GetGroup() && bot->GetGroup()->IsMember(master->GetGUID()))
         {
             WorldPacket p(SMSG_GROUP_SET_LEADER, 8);

@@ -8,9 +8,9 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-Player* GuidManageAction::GetPlayer(Event event)
+Player *GuidManageAction::GetPlayer(Event event)
 {
-    Player* player = nullptr;
+    Player *player = nullptr;
     ObjectGuid guid = event.getObject();
 
     if (guid)
@@ -36,11 +36,11 @@ Player* GuidManageAction::GetPlayer(Event event)
         return nullptr;
     }
 
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
-          guid = bot->GetTarget();
+        guid = bot->GetTarget();
     else
-            guid = master->GetTarget();
+        guid = master->GetTarget();
 
     player = ObjectAccessor::FindPlayer(guid);
 
@@ -50,14 +50,14 @@ Player* GuidManageAction::GetPlayer(Event event)
     player = event.getOwner();
 
     if (player)
-       return player;
+        return player;
 
     return nullptr;
 }
 
 bool GuidManageAction::Execute(Event event)
 {
-    Player* player = GetPlayer(event);
+    Player *player = GetPlayer(event);
 
     if (!player || !PlayerIsValid(player) || player == bot)
         return false;
@@ -69,12 +69,12 @@ bool GuidManageAction::Execute(Event event)
     return true;
 }
 
-bool GuidManageAction::PlayerIsValid(Player* member)
+bool GuidManageAction::PlayerIsValid(Player *member)
 {
     return !member->GetGuildId();
 }
 
-uint8 GuidManageAction::GetRankId(Player* member)
+uint8 GuidManageAction::GetRankId(Player *member)
 {
     return sGuildMgr->GetGuildById(member->GetGuildId())->GetMember(member->GetGUID())->GetRankId();
 }
@@ -90,7 +90,7 @@ void GuildInviteAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildInviteOpcode(data);
 }
 
-bool GuildInviteAction::PlayerIsValid(Player* member)
+bool GuildInviteAction::PlayerIsValid(Player *member)
 {
     return !member->GetGuildId();
 }
@@ -106,7 +106,7 @@ void GuildPromoteAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildPromoteOpcode(data);
 }
 
-bool GuildPromoteAction::PlayerIsValid(Player* member)
+bool GuildPromoteAction::PlayerIsValid(Player *member)
 {
     return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member) - 1;
 }
@@ -122,7 +122,7 @@ void GuildDemoteAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildDemoteOpcode(data);
 }
 
-bool GuildDemoteAction::PlayerIsValid(Player* member)
+bool GuildDemoteAction::PlayerIsValid(Player *member)
 {
     return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member);
 }
@@ -138,7 +138,7 @@ void GuildRemoveAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildRemoveOpcode(data);
 }
 
-bool GuildRemoveAction::PlayerIsValid(Player* member)
+bool GuildRemoveAction::PlayerIsValid(Player *member)
 {
     return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member);
 };
@@ -147,20 +147,20 @@ bool GuildManageNearbyAction::Execute(Event event)
 {
     uint32 found = 0;
 
-    Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-    Guild::Member* botMember = guild->GetMember(bot->GetGUID());
+    Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    Guild::Member *botMember = guild->GetMember(bot->GetGUID());
 
     GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
-    for (auto& guid : nearGuids)
+    for (auto &guid : nearGuids)
     {
-        Player* player = ObjectAccessor::FindPlayer(guid);
+        Player *player = ObjectAccessor::FindPlayer(guid);
 
         if (!player || bot == player)
             continue;
 
-        if (player->GetGuildId()) //Promote or demote nearby members based on chance.
+        if (player->GetGuildId()) // Promote or demote nearby members based on chance.
         {
-            Guild::Member* member = guild->GetMember(player->GetGUID());
+            Guild::Member *member = guild->GetMember(player->GetGUID());
             uint32 dCount = AI_VALUE(uint32, "death count");
 
             if ((dCount < 2 || !urand(0, 10)) && guild->GetRankRights(botMember->GetRankId() & GR_RIGHT_PROMOTE))
@@ -192,16 +192,15 @@ bool GuildManageNearbyAction::Execute(Event event)
         if (player->GetGuildIdInvited())
             continue;
 
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+        PlayerbotAI *botAI = GET_PLAYERBOT_AI(player);
 
         if (botAI)
         {
 
-            if (botAI->GetGuilderType() == GuilderType::SOLO && !botAI->HasRealPlayerMaster()) //Do not invite solo players.
+            if (botAI->GetGuilderType() == GuilderType::SOLO && !botAI->HasRealPlayerMaster()) // Do not invite solo players.
                 continue;
 
-
-            if (botAI->HasActivePlayerMaster()) //Do not invite alts of active players.
+            if (botAI->HasActivePlayerMaster()) // Do not invite alts of active players.
                 continue;
         }
         else
@@ -225,15 +224,15 @@ bool GuildManageNearbyAction::isUseful()
     if (!bot->GetGuildId())
         return false;
 
-    Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-    Guild::Member* botMember = guild->GetMember(bot->GetGUID());
+    Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    Guild::Member *botMember = guild->GetMember(bot->GetGUID());
 
     return guild->GetRankRights(botMember->GetRankId()) & (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
 }
 
 bool GuildLeaveAction::Execute(Event event)
 {
-    Player* owner = event.getOwner();
+    Player *owner = event.getOwner();
     if (owner && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, owner, true))
     {
         botAI->TellError("Sorry, I am happy in my guild :)");

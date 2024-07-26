@@ -17,7 +17,7 @@ bool AddLootAction::Execute(Event event)
     if (!guid)
         return false;
 
-    return AI_VALUE(LootObjectStack*, "available loot")->Add(guid);
+    return AI_VALUE(LootObjectStack *, "available loot")->Add(guid);
 }
 
 bool AddAllLootAction::Execute(Event event)
@@ -47,14 +47,14 @@ bool AddAllLootAction::isUseful()
 
 bool AddAllLootAction::AddLoot(ObjectGuid guid)
 {
-    return AI_VALUE(LootObjectStack*, "available loot")->Add(guid);
+    return AI_VALUE(LootObjectStack *, "available loot")->Add(guid);
 }
 
 bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 {
     LootObject loot(bot, guid);
 
-    WorldObject* wo = loot.GetWorldObject(bot);
+    WorldObject *wo = loot.GetWorldObject(bot);
     if (loot.IsEmpty() || !wo)
         return false;
 

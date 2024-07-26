@@ -14,19 +14,19 @@ class WorldPosition;
 
 class SeeSpellAction : public MovementAction
 {
-    public:
-        SeeSpellAction(PlayerbotAI* botAI, std::string const name = "see spell") : MovementAction(botAI, name) { }
+public:
+    SeeSpellAction(PlayerbotAI *botAI, std::string const name = "see spell") : MovementAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-        bool SelectSpell(WorldPosition& spellPosition);
-        bool MoveSpell(WorldPosition& spellPosition);
+    bool SelectSpell(WorldPosition &spellPosition);
+    bool MoveSpell(WorldPosition &spellPosition);
 
-        virtual bool MoveToSpell(WorldPosition& spellPosition, bool inFormation = true);
-        void SetFormationOffset(WorldPosition& spellPosition);
+    virtual bool MoveToSpell(WorldPosition &spellPosition, bool inFormation = true);
+    void SetFormationOffset(WorldPosition &spellPosition);
 
-    private:
-        Creature* CreateWps(Player* wpOwner, float x, float y, float z, float o, uint32 entry, Creature* lastWp, bool important = false);
+private:
+    Creature *CreateWps(Player *wpOwner, float x, float y, float z, float o, uint32 entry, Creature *lastWp, bool important = false);
 };
 
 #endif

@@ -9,14 +9,14 @@
 
 class PlayerbotAI;
 
-#define RTSC_MOVE_SPELL 30758 //Aedm (Awesome Energetic do move)
+#define RTSC_MOVE_SPELL 30758 // Aedm (Awesome Energetic do move)
 
 class RTSCAction : public SeeSpellAction
 {
-    public:
-        RTSCAction(PlayerbotAI* botAI) : SeeSpellAction(botAI, "rtsc") { }
+public:
+    RTSCAction(PlayerbotAI *botAI) : SeeSpellAction(botAI, "rtsc") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

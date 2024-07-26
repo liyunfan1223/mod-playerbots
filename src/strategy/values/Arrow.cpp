@@ -19,8 +19,9 @@ WorldLocation ArrowFormation::GetLocationInternal()
     uint32 healerLines = 1 + healers.Size() / 6;
     float offset = 0.f;
 
-    Player* master = botAI->GetMaster();
-    if (!master) {
+    Player *master = botAI->GetMaster();
+    if (!master)
+    {
         return Formation::NullLocation;
     }
     float orientation = master->GetOrientation();
@@ -44,7 +45,7 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float x = master->GetPositionX() - masterUnit->GetX() + botUnit->GetX();
     float y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
     float z = master->GetPositionZ();
-    
+
     float ground = master->GetMapHeight(x, y, z + 30.0f);
     if (ground <= INVALID_HEIGHT)
         return Formation::NullLocation;
@@ -63,7 +64,7 @@ void ArrowFormation::Build()
     built = true;
 }
 
-FormationSlot* ArrowFormation::FindSlot(Player* member)
+FormationSlot *ArrowFormation::FindSlot(Player *member)
 {
     if (botAI->IsTank(member))
         return &tanks;
@@ -77,12 +78,12 @@ FormationSlot* ArrowFormation::FindSlot(Player* member)
 
 void ArrowFormation::FillSlotsExceptMaster()
 {
-    Group* group = bot->GetGroup();
-    GroupReference* gref = group->GetFirstMember();
+    Group *group = bot->GetGroup();
+    GroupReference *gref = group->GetFirstMember();
     uint32 index = 0;
     while (gref)
     {
-        Player* member = gref->GetSource();
+        Player *member = gref->GetSource();
 
         if (member == bot)
             FindSlot(member)->AddLast(botUnit = new FormationUnit(index, false));
@@ -96,12 +97,12 @@ void ArrowFormation::FillSlotsExceptMaster()
 
 void ArrowFormation::AddMasterToSlot()
 {
-    Group* group = bot->GetGroup();
-    GroupReference* gref = group->GetFirstMember();
+    Group *group = bot->GetGroup();
+    GroupReference *gref = group->GetFirstMember();
     uint32 index = 0;
     while (gref)
     {
-        Player* member = gref->GetSource();
+        Player *member = gref->GetSource();
 
         if (member == botAI->GetMaster())
         {
@@ -114,11 +115,11 @@ void ArrowFormation::AddMasterToSlot()
     }
 }
 
-void FormationSlot::PlaceUnits(UnitPlacer* placer)
+void FormationSlot::PlaceUnits(UnitPlacer *placer)
 {
     uint32 index = 0;
     uint32 count = units.size();
-    for (FormationUnit* unit : units)
+    for (FormationUnit *unit : units)
     {
         unit->SetLocation(placer->Place(unit, index, count));
         ++index;
@@ -149,7 +150,7 @@ UnitPosition SingleLineUnitPlacer::Place(FormationUnit *unit, uint32 index, uint
 
 void FormationSlot::Move(float dx, float dy)
 {
-    for (FormationUnit* unit : units)
+    for (FormationUnit *unit : units)
     {
         unit->SetLocation(unit->GetX() + dx, unit->GetY() + dy);
     }
@@ -157,7 +158,7 @@ void FormationSlot::Move(float dx, float dy)
 
 FormationSlot::~FormationSlot()
 {
-    for (FormationUnit* unit : units)
+    for (FormationUnit *unit : units)
     {
         delete unit;
     }

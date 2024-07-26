@@ -8,37 +8,37 @@
 template <class TValue, class TOwner>
 class LazyCalculatedValue
 {
-    public:
-        typedef TValue (TOwner::*Calculator)();
+public:
+    typedef TValue (TOwner::*Calculator)();
 
-    public:
-        LazyCalculatedValue(TOwner* owner, Calculator calculator) : calculator(calculator), owner(owner)
+public:
+    LazyCalculatedValue(TOwner *owner, Calculator calculator) : calculator(calculator), owner(owner)
+    {
+        Reset();
+    }
+
+public:
+    TValue GetValue()
+    {
+        if (!calculated)
         {
-            Reset();
+            value = (owner->*calculator)();
+            calculated = true;
         }
 
-    public:
-        TValue GetValue()
-        {
-            if (!calculated)
-            {
-                value = (owner->*calculator)();
-                calculated = true;
-            }
+        return value;
+    }
 
-            return value;
-        }
+    void Reset()
+    {
+        calculated = false;
+    }
 
-        void Reset()
-        {
-            calculated = false;
-        }
-
-    protected:
-        Calculator calculator;
-        TOwner* owner;
-        bool calculated;
-        TValue value;
+protected:
+    Calculator calculator;
+    TOwner *owner;
+    bool calculated;
+    TValue value;
 };
 
 #endif

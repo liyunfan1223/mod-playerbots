@@ -10,10 +10,10 @@ GuidVector GroupMembersValue::Calculate()
 {
     GuidVector members;
 
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (group)
     {
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             members.push_back(ref->GetSource()->GetGUID());
         }
@@ -23,7 +23,6 @@ GuidVector GroupMembersValue::Calculate()
 
     return members;
 }
-
 
 bool IsFollowingPartyValue::Calculate()
 {
@@ -38,7 +37,7 @@ bool IsFollowingPartyValue::Calculate()
 
 bool IsNearLeaderValue::Calculate()
 {
-    Player* groupMaster = botAI->GetGroupMaster();
+    Player *groupMaster = botAI->GetGroupMaster();
 
     if (!groupMaster)
         return false;
@@ -55,7 +54,7 @@ bool BoolANDValue::Calculate()
 
     for (auto value : values)
     {
-        if(!AI_VALUE(bool, value))
+        if (!AI_VALUE(bool, value))
             return false;
     }
 
@@ -68,7 +67,7 @@ uint32 GroupBoolCountValue::Calculate()
 
     for (ObjectGuid guid : AI_VALUE(GuidVector, "group members"))
     {
-        Player* player = ObjectAccessor::FindPlayer(guid);
+        Player *player = ObjectAccessor::FindPlayer(guid);
 
         if (!player)
             continue;
@@ -90,7 +89,7 @@ bool GroupBoolANDValue::Calculate()
 {
     for (ObjectGuid guid : AI_VALUE(GuidVector, "group members"))
     {
-        Player* player = ObjectAccessor::FindPlayer(guid);
+        Player *player = ObjectAccessor::FindPlayer(guid);
 
         if (!player)
             continue;
@@ -101,7 +100,7 @@ bool GroupBoolANDValue::Calculate()
         if (!GET_PLAYERBOT_AI(player))
             continue;
 
-        if (!PAI_VALUE2(bool,"and", getQualifier()))
+        if (!PAI_VALUE2(bool, "and", getQualifier()))
             return false;
     }
 
@@ -112,7 +111,7 @@ bool GroupBoolORValue::Calculate()
 {
     for (ObjectGuid guid : AI_VALUE(GuidVector, "group members"))
     {
-        Player* player = ObjectAccessor::FindPlayer(guid);
+        Player *player = ObjectAccessor::FindPlayer(guid);
 
         if (!player)
             continue;
@@ -136,14 +135,14 @@ bool GroupReadyValue::Calculate()
 
     for (ObjectGuid guid : AI_VALUE(GuidVector, "group members"))
     {
-        Player* member = ObjectAccessor::FindPlayer(guid);
+        Player *member = ObjectAccessor::FindPlayer(guid);
 
         if (!member)
             continue;
 
-        if (inDungeon) //In dungeons all following members need to be alive before continueing.
+        if (inDungeon) // In dungeons all following members need to be alive before continueing.
         {
-            PlayerbotAI* memberAi = GET_PLAYERBOT_AI(member);
+            PlayerbotAI *memberAi = GET_PLAYERBOT_AI(member);
 
             bool isFollowing = memberAi ? memberAi->HasStrategy("follow", BOT_STATE_NON_COMBAT) : true;
 
@@ -151,7 +150,7 @@ bool GroupReadyValue::Calculate()
                 return false;
         }
 
-        //We only wait for members that are in range otherwise we might be waiting for bots stuck in dead loops forever.
+        // We only wait for members that are in range otherwise we might be waiting for bots stuck in dead loops forever.
         if (botAI->GetGroupMaster() && sServerFacade->GetDistance2d(member, botAI->GetGroupMaster()) > sPlayerbotAIConfig->sightDistance)
             continue;
 
@@ -161,7 +160,7 @@ bool GroupReadyValue::Calculate()
         if (!member->GetPower(POWER_MANA))
             continue;
 
-        float mana = (static_cast<float> (member->GetPower(POWER_MANA)) / member->GetMaxPower(POWER_MANA)) * 100;
+        float mana = (static_cast<float>(member->GetPower(POWER_MANA)) / member->GetMaxPower(POWER_MANA)) * 100;
 
         if (mana < sPlayerbotAIConfig->mediumMana)
             return false;

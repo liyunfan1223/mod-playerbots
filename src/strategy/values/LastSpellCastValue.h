@@ -11,24 +11,24 @@ class PlayerbotAI;
 
 class LastSpellCast
 {
-    public:
-        LastSpellCast();
+public:
+    LastSpellCast();
 
-        void Set(uint32 id, ObjectGuid target, time_t time);
-        void Reset();
+    void Set(uint32 id, ObjectGuid target, time_t time);
+    void Reset();
 
-        uint32 id;
-        ObjectGuid target;
-        time_t timer;
+    uint32 id;
+    ObjectGuid target;
+    time_t timer;
 };
 
-class LastSpellCastValue : public ManualSetValue<LastSpellCast&>
+class LastSpellCastValue : public ManualSetValue<LastSpellCast &>
 {
-	public:
-        LastSpellCastValue(PlayerbotAI* botAI, std::string const name = "last spell cast") : ManualSetValue<LastSpellCast&>(botAI, data, name) { }
+public:
+    LastSpellCastValue(PlayerbotAI *botAI, std::string const name = "last spell cast") : ManualSetValue<LastSpellCast &>(botAI, data, name) {}
 
-    private:
-        LastSpellCast data;
+private:
+    LastSpellCast data;
 };
 
 #endif

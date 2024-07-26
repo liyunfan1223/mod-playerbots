@@ -11,11 +11,11 @@ bool TaxiAction::Execute(Event event)
 {
     botAI->RemoveShapeshift();
 
-    LastMovement& movement = context->GetValue<LastMovement&>("last taxi")->Get();
+    LastMovement &movement = context->GetValue<LastMovement &>("last taxi")->Get();
 
-    WorldPacket& p = event.getPacket();
+    WorldPacket &p = event.getPacket();
     std::string const param = event.getParam();
-	if ((!p.empty() && (p.GetOpcode() == CMSG_TAXICLEARALLNODES || p.GetOpcode() == CMSG_TAXICLEARNODE)) || param == "clear")
+    if ((!p.empty() && (p.GetOpcode() == CMSG_TAXICLEARALLNODES || p.GetOpcode() == CMSG_TAXICLEARNODE)) || param == "clear")
     {
         movement.taxiNodes.clear();
         movement.Set(nullptr);
@@ -26,7 +26,7 @@ bool TaxiAction::Execute(Event event)
     GuidVector units = *context->GetValue<GuidVector>("nearest npcs");
     for (ObjectGuid const guid : units)
     {
-        Creature* npc = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
+        Creature *npc = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
         if (!npc)
             continue;
 
@@ -35,7 +35,7 @@ bool TaxiAction::Execute(Event event)
         std::vector<uint32> nodes;
         for (uint32 i = 0; i < sTaxiPathStore.GetNumRows(); ++i)
         {
-            if (TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(i))
+            if (TaxiPathEntry const *entry = sTaxiPathStore.LookupEntry(i))
                 if (entry->from == curloc)
                 {
                     uint8 field = uint8((i - 1) / 32);
@@ -51,11 +51,11 @@ bool TaxiAction::Execute(Event event)
             uint32 index = 1;
             for (uint32 node : nodes)
             {
-                TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(node);
+                TaxiPathEntry const *entry = sTaxiPathStore.LookupEntry(node);
                 if (!entry)
                     continue;
 
-                TaxiNodesEntry const* dest = sTaxiNodesStore.LookupEntry(entry->to);
+                TaxiNodesEntry const *dest = sTaxiNodesStore.LookupEntry(entry->to);
                 if (!dest)
                     continue;
 
@@ -71,11 +71,11 @@ bool TaxiAction::Execute(Event event)
         if (selected)
         {
             uint32 path = nodes[selected - 1];
-            TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(path);
+            TaxiPathEntry const *entry = sTaxiPathStore.LookupEntry(path);
             if (!entry)
                 return false;
 
-            return bot->ActivateTaxiPathTo({ entry->from, entry->to }, npc, 0);
+            return bot->ActivateTaxiPathTo({entry->from, entry->to}, npc, 0);
         }
 
         if (!movement.taxiNodes.empty() && !bot->ActivateTaxiPathTo(movement.taxiNodes, npc))

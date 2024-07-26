@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class LogLevelValue : public ManualSetValue<LogLevel>
 {
-	public:
-        LogLevelValue(PlayerbotAI* botAI, std::string const name = "log level") : ManualSetValue<LogLevel>(botAI, LOG_LEVEL_DEBUG, name) { }
+public:
+        LogLevelValue(PlayerbotAI *botAI, std::string const name = "log level") : ManualSetValue<LogLevel>(botAI, LOG_LEVEL_DEBUG, name) {}
 };
 
 #endif

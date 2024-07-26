@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class DKAiObjectContext : public AiObjectContext
 {
-    public:
-        DKAiObjectContext(PlayerbotAI* botAI);
+public:
+    DKAiObjectContext(PlayerbotAI *botAI);
 };
 
 #endif

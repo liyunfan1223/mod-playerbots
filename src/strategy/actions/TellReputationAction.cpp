@@ -9,7 +9,7 @@
 
 bool TellReputationAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -17,13 +17,13 @@ bool TellReputationAction::Execute(Event event)
     if (selection.IsEmpty())
         return false;
 
-    Unit* unit = ObjectAccessor::GetUnit(*master, selection);
+    Unit *unit = ObjectAccessor::GetUnit(*master, selection);
     if (!unit)
         return false;
 
-    FactionTemplateEntry const* factionTemplate = unit->GetFactionTemplateEntry();
+    FactionTemplateEntry const *factionTemplate = unit->GetFactionTemplateEntry();
     uint32 faction = factionTemplate->faction;
-    FactionEntry const* entry = sFactionStore.LookupEntry(faction);
+    FactionEntry const *entry = sFactionStore.LookupEntry(faction);
     int32 reputation = bot->GetReputationMgr().GetReputation(faction);
 
     std::ostringstream out;
@@ -33,33 +33,33 @@ bool TellReputationAction::Execute(Event event)
     ReputationRank rank = bot->GetReputationMgr().GetRank(entry);
     switch (rank)
     {
-        case REP_HATED:
-            out << "cc2222hated";
-            break;
-        case REP_HOSTILE:
-            out << "ff0000hostile";
-            break;
-        case REP_UNFRIENDLY:
-            out << "ee6622unfriendly";
-            break;
-        case REP_NEUTRAL:
-            out << "ffff00neutral";
-            break;
-        case REP_FRIENDLY:
-            out << "00ff00friendly";
-            break;
-        case REP_HONORED:
-            out << "00ff88honored";
-            break;
-        case REP_REVERED:
-            out << "00ffccrevered";
-            break;
-        case REP_EXALTED:
-            out << "00ffffexalted";
-            break;
-        default:
-            out << "808080unknown";
-            break;
+    case REP_HATED:
+        out << "cc2222hated";
+        break;
+    case REP_HOSTILE:
+        out << "ff0000hostile";
+        break;
+    case REP_UNFRIENDLY:
+        out << "ee6622unfriendly";
+        break;
+    case REP_NEUTRAL:
+        out << "ffff00neutral";
+        break;
+    case REP_FRIENDLY:
+        out << "00ff00friendly";
+        break;
+    case REP_HONORED:
+        out << "00ff88honored";
+        break;
+    case REP_REVERED:
+        out << "00ffccrevered";
+        break;
+    case REP_EXALTED:
+        out << "00ffffexalted";
+        break;
+    default:
+        out << "808080unknown";
+        break;
     }
 
     out << "|cffffffff";

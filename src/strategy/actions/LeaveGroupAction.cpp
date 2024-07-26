@@ -9,13 +9,13 @@
 
 bool LeaveGroupAction::Execute(Event event)
 {
-    Player* master = event.getOwner();
+    Player *master = event.getOwner();
     return Leave(master);
 }
 
 bool PartyCommandAction::Execute(Event event)
 {
-    WorldPacket& p = event.getPacket();
+    WorldPacket &p = event.getPacket();
     p.rpos(0);
     uint32 operation;
     std::string member;
@@ -25,7 +25,7 @@ bool PartyCommandAction::Execute(Event event)
     if (operation != PARTY_OP_LEAVE)
         return false;
 
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (master && member == master->GetName())
         return Leave(bot);
 
@@ -34,7 +34,7 @@ bool PartyCommandAction::Execute(Event event)
 
 bool UninviteAction::Execute(Event event)
 {
-    WorldPacket& p = event.getPacket();
+    WorldPacket &p = event.getPacket();
     if (p.GetOpcode() == CMSG_GROUP_UNINVITE)
     {
         p.rpos(0);
@@ -64,7 +64,7 @@ bool UninviteAction::Execute(Event event)
     return false;
 }
 
-bool LeaveGroupAction::Leave(Player* player)
+bool LeaveGroupAction::Leave(Player *player)
 {
     if (player && !GET_PLAYERBOT_AI(player) && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, player))
         return false;
@@ -114,12 +114,12 @@ bool LeaveFarAwayAction::isUseful()
     if (!bot->GetGroup())
         return false;
 
-    Player* master = botAI->GetGroupMaster();
-    Player* trueMaster = botAI->GetMaster();
+    Player *master = botAI->GetGroupMaster();
+    Player *trueMaster = botAI->GetMaster();
     if (!master || (bot == master && !botAI->IsRealPlayer()))
         return false;
 
-    PlayerbotAI* masterBotAI = nullptr;
+    PlayerbotAI *masterBotAI = nullptr;
     if (master)
         masterBotAI = GET_PLAYERBOT_AI(master);
     if (master && !masterBotAI)
@@ -154,9 +154,10 @@ bool LeaveFarAwayAction::isUseful()
     if (abs(int32(master->GetLevel() - bot->GetLevel())) > 4)
         return true;
 
-    if (bot->GetMapId() != master->GetMapId() || bot->GetDistance2d(master) >= 2 * sPlayerbotAIConfig->rpgDistance) {
+    if (bot->GetMapId() != master->GetMapId() || bot->GetDistance2d(master) >= 2 * sPlayerbotAIConfig->rpgDistance)
+    {
         return true;
     }
-    
+
     return false;
 }

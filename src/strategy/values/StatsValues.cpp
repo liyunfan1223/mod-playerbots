@@ -6,30 +6,30 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-Unit* HealthValue::GetTarget()
+Unit *HealthValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 uint8 HealthValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return 100;
 
-    return (static_cast<float> (target->GetHealth()) / target->GetMaxHealth()) * 100;
+    return (static_cast<float>(target->GetHealth()) / target->GetMaxHealth()) * 100;
 }
 
-Unit* IsDeadValue::GetTarget()
+Unit *IsDeadValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 bool IsDeadValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return false;
 
@@ -59,105 +59,105 @@ bool PetIsHappyValue::Calculate()
     return !bot->GetPet() || bot->GetPet()->GetHappinessState() == HAPPY;
 }
 
-Unit* RageValue::GetTarget()
+Unit *RageValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 uint8 RageValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return 0;
 
     return (target->GetPower(POWER_RAGE) / 10.0f);
 }
 
-Unit* EnergyValue::GetTarget()
+Unit *EnergyValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 uint8 EnergyValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return 0;
 
-    return (static_cast<float> (target->GetPower(POWER_ENERGY)));
+    return (static_cast<float>(target->GetPower(POWER_ENERGY)));
 }
 
-Unit* ManaValue::GetTarget()
+Unit *ManaValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 uint8 ManaValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return 100;
 
-    return (static_cast<float> (target->GetPower(POWER_MANA)) / target->GetMaxPower(POWER_MANA)) * 100;
+    return (static_cast<float>(target->GetPower(POWER_MANA)) / target->GetMaxPower(POWER_MANA)) * 100;
 }
 
-Unit* HasManaValue::GetTarget()
+Unit *HasManaValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 bool HasManaValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return false;
 
     return target->GetPower(POWER_MANA);
 }
 
-Unit* ComboPointsValue::GetTarget()
+Unit *ComboPointsValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 uint8 ComboPointsValue::Calculate()
 {
-    Unit* target = GetTarget();
-	if (!target || target->GetGUID() != bot->GetComboTargetGUID())
-		return 0;
+    Unit *target = GetTarget();
+    if (!target || target->GetGUID() != bot->GetComboTargetGUID())
+        return 0;
 
     return bot->GetComboPoints();
 }
 
-Unit* IsMountedValue::GetTarget()
+Unit *IsMountedValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 bool IsMountedValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return false;
 
     return target->IsMounted();
 }
 
-Unit* IsInCombatValue::GetTarget()
+Unit *IsInCombatValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 bool IsInCombatValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return false;
 
@@ -166,9 +166,9 @@ bool IsInCombatValue::Calculate()
 
     if (target == bot)
     {
-        if (Group* group = bot->GetGroup())
+        if (Group *group = bot->GetGroup())
         {
-            Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
+            Group::MemberSlotList const &groupSlot = group->GetMemberSlots();
             for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
             {
                 Player *member = ObjectAccessor::FindPlayer(itr->guid);
@@ -201,10 +201,10 @@ uint8 BagSpaceValue::Calculate()
     uint32 totalfree = 16 - totalused;
     for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
     {
-        const Bag* const pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
+        const Bag *const pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
         if (pBag)
         {
-            ItemTemplate const* pBagProto = pBag->GetTemplate();
+            ItemTemplate const *pBagProto = pBag->GetTemplate();
             if (pBagProto->Class == ITEM_CLASS_CONTAINER && pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
             {
                 total += pBag->GetBagSize();
@@ -212,10 +212,9 @@ uint8 BagSpaceValue::Calculate()
                 totalused += pBag->GetBagSize() - pBag->GetFreeSlots();
             }
         }
-
     }
 
-    return (static_cast<float> (totalused) / total) * 100;
+    return (static_cast<float>(totalused) / total) * 100;
 }
 
 uint8 DurabilityValue::Calculate()
@@ -225,7 +224,7 @@ uint8 DurabilityValue::Calculate()
     for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
         uint16 pos = ((INVENTORY_SLOT_BAG_0 << 8) | i);
-        Item* item = bot->GetItemByPos(pos);
+        Item *item = bot->GetItemByPos(pos);
 
         if (!item)
             continue;
@@ -244,22 +243,22 @@ uint8 DurabilityValue::Calculate()
     if (total == 0)
         return 0;
 
-    return (static_cast<float> (total) / totalMax) * 100;
+    return (static_cast<float>(total) / totalMax) * 100;
 }
 
-Unit* SpeedValue::GetTarget()
+Unit *SpeedValue::GetTarget()
 {
-    AiObjectContext* ctx = AiObject::context;
+    AiObjectContext *ctx = AiObject::context;
     return ctx->GetValue<Unit*>(qualifier)->Get();
 }
 
 uint8 SpeedValue::Calculate()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return 100;
 
-    return (uint8) (100.0f * target->GetSpeedRate(MOVE_RUN));
+    return (uint8)(100.0f * target->GetSpeedRate(MOVE_RUN));
 }
 
 bool IsInGroupValue::Calculate()

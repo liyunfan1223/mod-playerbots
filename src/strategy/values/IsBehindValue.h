@@ -12,8 +12,8 @@ class PlayerbotAI;
 
 class IsBehindValue : public BoolCalculatedValue, public Qualified
 {
-	public:
-        IsBehindValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI) { }
+public:
+        IsBehindValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI) {}
 
         bool Calculate() override;
 };

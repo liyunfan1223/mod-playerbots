@@ -14,41 +14,40 @@ class PlayerbotAI;
 
 class AoePositionValue : public CalculatedValue<WorldLocation>
 {
-	public:
-        AoePositionValue(PlayerbotAI* botAI) : CalculatedValue<WorldLocation>(botAI, "aoe position") { }
+public:
+    AoePositionValue(PlayerbotAI *botAI) : CalculatedValue<WorldLocation>(botAI, "aoe position") {}
 
-        WorldLocation Calculate() override;
+    WorldLocation Calculate() override;
 };
 
 class AoeCountValue : public CalculatedValue<uint8>
 {
-	public:
-        AoeCountValue(PlayerbotAI* botAI) : CalculatedValue<uint8>(botAI, "aoe count") { }
+public:
+    AoeCountValue(PlayerbotAI *botAI) : CalculatedValue<uint8>(botAI, "aoe count") {}
 
-        uint8 Calculate() override;
+    uint8 Calculate() override;
 };
 
 class HasAreaDebuffValue : public BoolCalculatedValue, public Qualified
 {
-    public:
-        HasAreaDebuffValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI) {}
+public:
+    HasAreaDebuffValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI) {}
 
-        Unit* GetTarget()
-        {
-            AiObjectContext* ctx = AiObject::context;
+    Unit *GetTarget()
+    {
+        AiObjectContext *ctx = AiObject::context;
 
-            return ctx->GetValue<Unit*>(qualifier)->Get();
-        }
-        virtual bool Calculate();
+        return ctx->GetValue<Unit *>(qualifier)->Get();
+    }
+    virtual bool Calculate();
 };
 
-class AreaDebuffValue : public CalculatedValue<Aura*>
+class AreaDebuffValue : public CalculatedValue<Aura *>
 {
-    public:
-        AreaDebuffValue(PlayerbotAI* botAI) :
-            CalculatedValue<Aura*>(botAI, "area debuff", 1) { }
+public:
+    AreaDebuffValue(PlayerbotAI *botAI) : CalculatedValue<Aura *>(botAI, "area debuff", 1) {}
 
-        Aura* Calculate() override;
+    Aura *Calculate() override;
 };
 
 #endif

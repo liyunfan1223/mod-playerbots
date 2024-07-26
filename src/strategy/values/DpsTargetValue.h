@@ -11,18 +11,18 @@ class PlayerbotAI;
 
 class DpsTargetValue : public RtiTargetValue
 {
-	public:
-        DpsTargetValue(PlayerbotAI* botAI, std::string const type = "rti", std::string const name = "dps target") : RtiTargetValue(botAI, type, name) { }
+public:
+        DpsTargetValue(PlayerbotAI *botAI, std::string const type = "rti", std::string const name = "dps target") : RtiTargetValue(botAI, type, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 class DpsAoeTargetValue : public RtiTargetValue
 {
-	public:
-        DpsAoeTargetValue(PlayerbotAI* botAI, std::string const type = "rti", std::string const name = "dps aoe target") : RtiTargetValue(botAI, type, name) { }
+public:
+        DpsAoeTargetValue(PlayerbotAI *botAI, std::string const type = "rti", std::string const name = "dps aoe target") : RtiTargetValue(botAI, type, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 #endif

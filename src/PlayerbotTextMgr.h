@@ -54,39 +54,40 @@ enum ChatReplyType
 
 class PlayerbotTextMgr
 {
-    public:
-        PlayerbotTextMgr() {
-            for (uint8 i = 0; i < MAX_LOCALES; ++i)
-            {
-                botTextLocalePriority[i] = 0;
-            }
-        };
-        virtual ~PlayerbotTextMgr() { };
-        static PlayerbotTextMgr* instance()
+public:
+    PlayerbotTextMgr()
+    {
+        for (uint8 i = 0; i < MAX_LOCALES; ++i)
         {
-            static PlayerbotTextMgr instance;
-            return &instance;
+            botTextLocalePriority[i] = 0;
         }
+    };
+    virtual ~PlayerbotTextMgr() {};
+    static PlayerbotTextMgr *instance()
+    {
+        static PlayerbotTextMgr instance;
+        return &instance;
+    }
 
-        std::string GetBotText(std::string name, std::map<std::string, std::string> placeholders);
-        std::string GetBotText(std::string name);
-        std::string GetBotText(ChatReplyType replyType, std::map<std::string, std::string> placeholders);
-        std::string GetBotText(ChatReplyType replyType, std::string name);
-        bool GetBotText(std::string name, std::string& text);
-        bool GetBotText(std::string name, std::string& text, std::map<std::string, std::string> placeholders);
-        void LoadBotTexts();
-        void LoadBotTextChance();
-        static void replaceAll(std::string& str, const std::string& from, const std::string& to);
-        bool rollTextChance(std::string text);
+    std::string GetBotText(std::string name, std::map<std::string, std::string> placeholders);
+    std::string GetBotText(std::string name);
+    std::string GetBotText(ChatReplyType replyType, std::map<std::string, std::string> placeholders);
+    std::string GetBotText(ChatReplyType replyType, std::string name);
+    bool GetBotText(std::string name, std::string &text);
+    bool GetBotText(std::string name, std::string &text, std::map<std::string, std::string> placeholders);
+    void LoadBotTexts();
+    void LoadBotTextChance();
+    static void replaceAll(std::string &str, const std::string &from, const std::string &to);
+    bool rollTextChance(std::string text);
 
-        uint32 GetLocalePriority();
-        void AddLocalePriority(uint32 locale);
-        void ResetLocalePriority();
+    uint32 GetLocalePriority();
+    void AddLocalePriority(uint32 locale);
+    void ResetLocalePriority();
 
-    private:
-        std::map<std::string, std::vector<BotTextEntry>> botTexts;
-        std::map<std::string, uint32 > botTextChance;
-        uint32 botTextLocalePriority[MAX_LOCALES];
+private:
+    std::map<std::string, std::vector<BotTextEntry>> botTexts;
+    std::map<std::string, uint32> botTextChance;
+    uint32 botTextLocalePriority[MAX_LOCALES];
 };
 
 #define sPlayerbotTextMgr PlayerbotTextMgr::instance()

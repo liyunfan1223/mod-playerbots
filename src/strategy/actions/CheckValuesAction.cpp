@@ -7,7 +7,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-CheckValuesAction::CheckValuesAction(PlayerbotAI* botAI) : Action(botAI, "check values")
+CheckValuesAction::CheckValuesAction(PlayerbotAI *botAI) : Action(botAI, "check values")
 {
 }
 

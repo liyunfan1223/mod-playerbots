@@ -8,81 +8,88 @@
 
 class IsTargetOfHealingSpell : public SpellEntryPredicate
 {
-    public:
-        bool Check(SpellInfo const* spellInfo) override
+public:
+    bool Check(SpellInfo const *spellInfo) override
+    {
+        for (uint8 i = 0; i < 3; ++i)
         {
-            for (uint8 i = 0; i < 3; ++i)
-            {
-                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL || spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
-                    spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MECHANICAL)
-                    return true;
-            }
-
-            return false;
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL || spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+                spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MECHANICAL)
+                return true;
         }
+
+        return false;
+    }
 };
 
-inline bool compareByHealth(Unit const* u1, Unit const* u2)
+inline bool compareByHealth(Unit const *u1, Unit const *u2)
 {
     return u1->GetHealthPct() < u2->GetHealthPct();
 }
 
-Unit* PartyMemberToHeal::Calculate()
+Unit *PartyMemberToHeal::Calculate()
 {
 
     IsTargetOfHealingSpell predicate;
 
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (!group)
         return bot;
 
     bool isRaid = bot->GetGroup()->isRaidGroup();
     MinValueCalculator calc(100);
-    
+
     for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
     {
-        Player* player = gref->GetSource();
-        if (player && Check(player) && player->IsAlive()) {
+        Player *player = gref->GetSource();
+        if (player && Check(player) && player->IsAlive())
+        {
             uint8 health = player->GetHealthPct();
-            if (isRaid || health < sPlayerbotAIConfig->mediumHealth || !IsTargetOfSpellCast(player, predicate)) {
-                if (player->GetDistance2d(bot) > sPlayerbotAIConfig->healDistance) {
+            if (isRaid || health < sPlayerbotAIConfig->mediumHealth || !IsTargetOfSpellCast(player, predicate))
+            {
+                if (player->GetDistance2d(bot) > sPlayerbotAIConfig->healDistance)
+                {
                     calc.probe(health + 30, player);
-                } else {
+                }
+                else
+                {
                     calc.probe(health + player->GetDistance2d(bot) / 10, player);
                 }
             }
         }
 
-        Pet* pet = player->GetPet();
-        if (pet && Check(pet) && pet->IsAlive()) {
-            uint8 health = ((Unit*)pet)->GetHealthPct();
+        Pet *pet = player->GetPet();
+        if (pet && Check(pet) && pet->IsAlive())
+        {
+            uint8 health = ((Unit *)pet)->GetHealthPct();
             if (isRaid || health < sPlayerbotAIConfig->mediumHealth)
                 calc.probe(health + 30, pet);
         }
 
-        Unit* charm = player->GetCharm();
-        if (charm && Check(charm) && charm->IsAlive()) {
+        Unit *charm = player->GetCharm();
+        if (charm && Check(charm) && charm->IsAlive())
+        {
             uint8 health = charm->GetHealthPct();
             if (isRaid || health < sPlayerbotAIConfig->mediumHealth)
                 calc.probe(health, charm);
         }
     }
-    return (Unit*)calc.param;
+    return (Unit *)calc.param;
 }
 
-bool PartyMemberToHeal::Check(Unit* player)
+bool PartyMemberToHeal::Check(Unit *player)
 {
     // return player && player != bot && player->GetMapId() == bot->GetMapId() && player->IsInWorld() &&
     //     sServerFacade->GetDistance2d(bot, player) < (player->IsPlayer() && botAI->IsTank((Player*)player) ? 50.0f : 40.0f);
     return player->GetMapId() == bot->GetMapId() && !player->IsCharmed() &&
-        bot->GetDistance2d(player) < sPlayerbotAIConfig->healDistance * 2 &&
-        bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+           bot->GetDistance2d(player) < sPlayerbotAIConfig->healDistance * 2 &&
+           bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 
-Unit* PartyMemberToProtect::Calculate()
+Unit *PartyMemberToProtect::Calculate()
 {
     return nullptr;
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (!group)
         return nullptr;
 
@@ -91,11 +98,11 @@ Unit* PartyMemberToProtect::Calculate()
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
     for (GuidVector::iterator i = attackers.begin(); i != attackers.end(); ++i)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit *unit = botAI->GetUnit(*i);
         if (!unit)
             continue;
 
-        Unit* pVictim = unit->GetVictim();
+        Unit *pVictim = unit->GetVictim();
         if (!pVictim || !pVictim->IsPlayer())
             continue;
 
@@ -106,7 +113,7 @@ Unit* PartyMemberToProtect::Calculate()
         if (sServerFacade->GetDistance2d(pVictim, unit) > attackDistance)
             continue;
 
-        if (botAI->IsTank((Player*)pVictim) && pVictim->GetHealthPct() > 10)
+        if (botAI->IsTank((Player *)pVictim) && pVictim->GetHealthPct() > 10)
             continue;
         else if (pVictim->GetHealthPct() > 30)
             continue;
@@ -115,11 +122,10 @@ Unit* PartyMemberToProtect::Calculate()
             needProtect.push_back(pVictim);
     }
 
-   if (needProtect.empty())
+    if (needProtect.empty())
         return nullptr;
 
     sort(needProtect.begin(), needProtect.end(), compareByHealth);
 
     return needProtect[0];
 }
-

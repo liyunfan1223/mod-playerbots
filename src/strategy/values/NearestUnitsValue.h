@@ -13,18 +13,17 @@ class PlayerbotAI;
 
 class NearestUnitsValue : public ObjectGuidListCalculatedValue
 {
-	public:
-        NearestUnitsValue(PlayerbotAI* botAI, std::string const name = "nearest units", float range = sPlayerbotAIConfig->sightDistance, bool ignoreLos = false, uint32 checkInterval = 1) :
-            ObjectGuidListCalculatedValue(botAI, name, checkInterval), range(range), ignoreLos(ignoreLos) { }
+public:
+    NearestUnitsValue(PlayerbotAI *botAI, std::string const name = "nearest units", float range = sPlayerbotAIConfig->sightDistance, bool ignoreLos = false, uint32 checkInterval = 1) : ObjectGuidListCalculatedValue(botAI, name, checkInterval), range(range), ignoreLos(ignoreLos) {}
 
-        GuidVector Calculate() override;
+    GuidVector Calculate() override;
 
-    protected:
-        virtual void FindUnits(std::list<Unit*>& targets) = 0;
-        virtual bool AcceptUnit(Unit* unit) = 0;
+protected:
+    virtual void FindUnits(std::list<Unit *> &targets) = 0;
+    virtual bool AcceptUnit(Unit *unit) = 0;
 
-        float range;
-        bool ignoreLos;
+    float range;
+    bool ignoreLos;
 };
 
 #endif

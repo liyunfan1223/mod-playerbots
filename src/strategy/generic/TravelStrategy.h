@@ -11,37 +11,37 @@ class PlayerbotAI;
 
 class TravelStrategy : public Strategy
 {
-    public:
-        TravelStrategy(PlayerbotAI* botAI);
+public:
+    TravelStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "travel"; }
+    std::string const getName() override { return "travel"; }
 
-        NextAction** getDefaultActions() override;
-        void InitTriggers(std::vector<TriggerNode*> &triggers) override;
+    NextAction **getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class ExploreStrategy : public Strategy
 {
-    public:
-        ExploreStrategy(PlayerbotAI* botAI) : Strategy(botAI) { };
+public:
+    ExploreStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
-        std::string const getName() override { return "explore"; }
+    std::string const getName() override { return "explore"; }
 };
 
 class MapStrategy : public Strategy
 {
-    public:
-        MapStrategy(PlayerbotAI* botAI) : Strategy(botAI) { };
+public:
+    MapStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
-        std::string const getName() override { return "map"; }
+    std::string const getName() override { return "map"; }
 };
 
 class MapFullStrategy : public Strategy
 {
-    public:
-        MapFullStrategy(PlayerbotAI* botAI) : Strategy(botAI) { };
+public:
+    MapFullStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
-        std::string const getName() override { return "map full"; }
+    std::string const getName() override { return "map full"; }
 };
 
 #endif

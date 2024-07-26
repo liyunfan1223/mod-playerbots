@@ -17,7 +17,7 @@ float HealthInRangeTrigger::GetValue()
 
 bool PartyMemberDeadTrigger::IsActive()
 {
-	return GetTarget();
+    return GetTarget();
 }
 
 bool CombatPartyMemberDeadTrigger::IsActive()

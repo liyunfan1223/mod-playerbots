@@ -15,7 +15,7 @@
 std::map<std::string, uint8> SuggestWhatToDoAction::instances;
 std::map<std::string, uint8> SuggestWhatToDoAction::factions;
 
-SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* botAI, std::string const name) : InventoryAction(botAI, name)
+SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI *botAI, std::string const name) : InventoryAction(botAI, name)
 {
     suggestions.push_back(&SuggestWhatToDoAction::specificQuest);
     suggestions.push_back(&SuggestWhatToDoAction::grindReputation);
@@ -86,18 +86,20 @@ void SuggestWhatToDoAction::instance()
     }
 
     std::vector<std::string> allowedInstances;
-    for (auto & instance : instances)
+    for (auto &instance : instances)
     {
-        if (bot->GetLevel() >= instance.second) allowedInstances.push_back(instance.first);
+        if (bot->GetLevel() >= instance.second)
+            allowedInstances.push_back(instance.first);
     }
 
-    if (allowedInstances.empty()) return;
+    if (allowedInstances.empty())
+        return;
 
     std::map<std::string, std::string> placeholders;
     placeholders["%role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
 
     std::ostringstream itemout;
-    //itemout << "|c00b000b0" << allowedInstances[urand(0, allowedInstances.size() - 1)] << "|r";
+    // itemout << "|c00b000b0" << allowedInstances[urand(0, allowedInstances.size() - 1)] << "|r";
     itemout << allowedInstances[urand(0, allowedInstances.size() - 1)];
     placeholders["%instance"] = itemout.str();
 
@@ -130,7 +132,7 @@ void SuggestWhatToDoAction::specificQuest()
 
     uint32 index = rand() % quests.size();
 
-    Quest const* quest = sObjectMgr->GetQuestTemplate(quests[index]);
+    Quest const *quest = sObjectMgr->GetQuestTemplate(quests[index]);
 
     std::map<std::string, std::string> placeholders;
     placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
@@ -203,7 +205,7 @@ void SuggestWhatToDoAction::grindReputation()
     placeholders["%rndK"] = rnd.str();
 
     std::ostringstream itemout;
-//    itemout << "|c004040b0" << allowedFactions[urand(0, allowedFactions.size() - 1)] << "|r";
+    //    itemout << "|c004040b0" << allowedFactions[urand(0, allowedFactions.size() - 1)] << "|r";
     itemout << allowedFactions[urand(0, allowedFactions.size() - 1)];
     placeholders["%faction"] = itemout.str();
 
@@ -215,12 +217,12 @@ void SuggestWhatToDoAction::something()
     std::map<std::string, std::string> placeholders;
     placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
 
-    AreaTableEntry const* entry = sAreaTableStore.LookupEntry(bot->GetAreaId());
+    AreaTableEntry const *entry = sAreaTableStore.LookupEntry(bot->GetAreaId());
     if (!entry)
         return;
 
     std::ostringstream out;
-//    out << "|cffb04040" << entry->area_name[0] << "|r";
+    //    out << "|cffb04040" << entry->area_name[0] << "|r";
     out << entry->area_name[0];
     placeholders["%zone"] = out.str();
 
@@ -233,25 +235,24 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         return;
 
     std::vector<std::string> channelNames;
-    ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+    ChannelMgr *cMgr = ChannelMgr::forTeam(bot->GetTeamId());
     if (!cMgr)
         return;
 
-
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
-        ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
-        if (!channel) continue;
+        ChatChannelsEntry const *channel = sChatChannelsStore.LookupEntry(i);
+        if (!channel)
+            continue;
 
-        for (AreaTableEntry const* current_zone : sAreaTableStore)
+        for (AreaTableEntry const *current_zone : sAreaTableStore)
         {
-           if (!current_zone)
-               continue;
-
+            if (!current_zone)
+                continue;
 
             // combine full channel name
             char channelName[100];
-            Channel* chn = nullptr;
+            Channel *chn = nullptr;
             if ((channel->flags & CHANNEL_DBC_FLAG_LFG) != 0)
             {
                 std::string chanName = channel->pattern[0];
@@ -272,7 +273,7 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
                 continue;
 
             // skip local defense
-            //if (chn->GetFlags() == 0x18)
+            // if (chn->GetFlags() == 0x18)
             //    continue;
 
             // no filter, pick several options
@@ -287,19 +288,19 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         if (!channelNames.empty())
         {
             std::string randomName = channelNames[urand(0, channelNames.size() - 1)];
-            if (Channel* chn = cMgr->GetChannel(randomName, bot))
+            if (Channel *chn = cMgr->GetChannel(randomName, bot))
                 chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
         }
 
         if (worldChat)
         {
-            if (Channel* worldChannel = cMgr->GetChannel("World", bot))
+            if (Channel *worldChannel = cMgr->GetChannel("World", bot))
                 worldChannel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
         }
 
         if (guild && bot->GetGuildId())
         {
-            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+            Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
             if (guild)
                 guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
         }
@@ -308,36 +309,36 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
 
 class FindTradeItemsVisitor : public IterateItemsVisitor
 {
-    public:
-        FindTradeItemsVisitor(uint32 quality) : quality(quality), IterateItemsVisitor() { }
+public:
+    FindTradeItemsVisitor(uint32 quality) : quality(quality), IterateItemsVisitor() {}
 
-        bool Visit(Item* item) override
-        {
-            ItemTemplate const* proto = item->GetTemplate();
-            if (proto->Quality != quality)
-                return true;
-
-            if (proto->Class == ITEM_CLASS_TRADE_GOODS && proto->Bonding == NO_BIND)
-            {
-                if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 && item->GetCount() == item->GetMaxStackCount())
-                    stacks.push_back(proto->ItemId);
-
-                items.push_back(proto->ItemId);
-                count[proto->ItemId] += item->GetCount();
-            }
-
+    bool Visit(Item *item) override
+    {
+        ItemTemplate const *proto = item->GetTemplate();
+        if (proto->Quality != quality)
             return true;
+
+        if (proto->Class == ITEM_CLASS_TRADE_GOODS && proto->Bonding == NO_BIND)
+        {
+            if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 && item->GetCount() == item->GetMaxStackCount())
+                stacks.push_back(proto->ItemId);
+
+            items.push_back(proto->ItemId);
+            count[proto->ItemId] += item->GetCount();
         }
 
-        std::map<uint32, uint32> count;
-        std::vector<uint32> stacks;
-        std::vector<uint32> items;
+        return true;
+    }
 
-    private:
-        uint32 quality;
+    std::map<uint32, uint32> count;
+    std::vector<uint32> stacks;
+    std::vector<uint32> items;
+
+private:
+    uint32 quality;
 };
 
-SuggestTradeAction::SuggestTradeAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest trade")
+SuggestTradeAction::SuggestTradeAction(PlayerbotAI *botAI) : SuggestWhatToDoAction(botAI, "suggest trade")
 {
 }
 
@@ -388,7 +389,7 @@ bool SuggestTradeAction::Execute(Event event)
     if (!item || !count)
         return false;
 
-    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
+    ItemTemplate const *proto = sObjectMgr->GetItemTemplate(item);
     if (!proto)
         return false;
 

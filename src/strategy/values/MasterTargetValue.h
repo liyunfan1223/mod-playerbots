@@ -12,10 +12,10 @@ class Unit;
 
 class MasterTargetValue : public UnitCalculatedValue
 {
-	public:
-        MasterTargetValue(PlayerbotAI* botAI, std::string const name = "master target") : UnitCalculatedValue(botAI, name) { }
+public:
+        MasterTargetValue(PlayerbotAI *botAI, std::string const name = "master target") : UnitCalculatedValue(botAI, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 #endif

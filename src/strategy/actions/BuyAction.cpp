@@ -30,7 +30,7 @@ bool BuyAction::Execute(Event event)
     for (GuidVector::iterator i = vendors.begin(); i != vendors.end(); ++i)
     {
         ObjectGuid vendorguid = *i;
-        Creature* pCreature = bot->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
+        Creature *pCreature = bot->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
         if (!pCreature)
             continue;
 
@@ -42,29 +42,30 @@ bool BuyAction::Execute(Event event)
             // For each item the bot checks again if an item is usefull.
             // Bot will buy until no usefull items are left.
 
-            VendorItemData const* tItems = pCreature->GetVendorItems();
+            VendorItemData const *tItems = pCreature->GetVendorItems();
             if (!tItems)
                 continue;
 
             VendorItemList m_items_sorted = tItems->m_items;
 
-            m_items_sorted.erase(std::remove_if(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem* i)
-            {
+            m_items_sorted.erase(std::remove_if(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem *i)
+                                                {
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(i->item);
-                return !proto;
-            }), m_items_sorted.end());
+                return !proto; }),
+                                 m_items_sorted.end());
 
             if (m_items_sorted.empty())
                 continue;
 
-            std::sort(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem* i, VendorItem* j) { return sObjectMgr->GetItemTemplate(i->item)->ItemLevel > sObjectMgr->GetItemTemplate(j->item)->ItemLevel; });
+            std::sort(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem *i, VendorItem *j)
+                      { return sObjectMgr->GetItemTemplate(i->item)->ItemLevel > sObjectMgr->GetItemTemplate(j->item)->ItemLevel; });
 
-            for (auto& tItem : m_items_sorted)
+            for (auto &tItem : m_items_sorted)
             {
                 for (uint32 i = 0; i < 10; i++) // Buy 10 times or until no longer usefull/possible
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
-                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
+                    ItemTemplate const *proto = sObjectMgr->GetItemTemplate(tItem->item);
 
                     uint32 price = proto->BuyPrice;
 
@@ -75,24 +76,24 @@ bool BuyAction::Execute(Event event)
 
                     switch (usage)
                     {
-                        case ITEM_USAGE_REPLACE:
-                        case ITEM_USAGE_EQUIP:
-                            needMoneyFor = NeedMoneyFor::gear;
-                            break;
-                        case ITEM_USAGE_AMMO:
-                            needMoneyFor = NeedMoneyFor::ammo;
-                            break;
-                        case ITEM_USAGE_QUEST:
-                            needMoneyFor = NeedMoneyFor::anything;
-                            break;
-                        case ITEM_USAGE_USE:
-                            needMoneyFor = NeedMoneyFor::consumables;
-                            break;
-                        case ITEM_USAGE_SKILL:
-                            needMoneyFor = NeedMoneyFor::tradeskill;
-                            break;
-                        default:
-                            break;
+                    case ITEM_USAGE_REPLACE:
+                    case ITEM_USAGE_EQUIP:
+                        needMoneyFor = NeedMoneyFor::gear;
+                        break;
+                    case ITEM_USAGE_AMMO:
+                        needMoneyFor = NeedMoneyFor::ammo;
+                        break;
+                    case ITEM_USAGE_QUEST:
+                        needMoneyFor = NeedMoneyFor::anything;
+                        break;
+                    case ITEM_USAGE_USE:
+                        needMoneyFor = NeedMoneyFor::consumables;
+                        break;
+                    case ITEM_USAGE_SKILL:
+                        needMoneyFor = NeedMoneyFor::tradeskill;
+                        break;
+                    default:
+                        break;
                     }
 
                     if (needMoneyFor == NeedMoneyFor::none)
@@ -120,7 +121,7 @@ bool BuyAction::Execute(Event event)
             for (ItemIds::iterator i = itemIds.begin(); i != itemIds.end(); i++)
             {
                 uint32 itemId = *i;
-                ItemTemplate const* proto  = sObjectMgr->GetItemTemplate(itemId);
+                ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
                 if (!proto)
                     continue;
 
@@ -145,7 +146,7 @@ bool BuyAction::Execute(Event event)
     return true;
 }
 
-bool BuyAction::BuyItem(VendorItemData const* tItems, ObjectGuid vendorguid, ItemTemplate const* proto)
+bool BuyAction::BuyItem(VendorItemData const *tItems, ObjectGuid vendorguid, ItemTemplate const *proto)
 {
     uint32 oldCount = AI_VALUE2(uint32, "item count", proto->Name1);
 

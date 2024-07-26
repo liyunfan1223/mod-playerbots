@@ -11,21 +11,21 @@ class PlayerbotAI;
 
 class RpgActionMultiplier : public Multiplier
 {
-    public:
-        RpgActionMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rpg action") { }
+public:
+    RpgActionMultiplier(PlayerbotAI *botAI) : Multiplier(botAI, "rpg action") {}
 
-        float GetValue(Action* action) override;
+    float GetValue(Action *action) override;
 };
 
 class RpgStrategy : public Strategy
 {
-    public:
-        RpgStrategy(PlayerbotAI* botAI);
+public:
+    RpgStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "rpg"; }
-        NextAction** getDefaultActions() override;
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
+    std::string const getName() override { return "rpg"; }
+    NextAction **getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    void InitMultipliers(std::vector<Multiplier *> &multipliers) override;
 };
 
 #endif

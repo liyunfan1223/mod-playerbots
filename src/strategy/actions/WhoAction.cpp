@@ -9,16 +9,18 @@
 #include "Playerbots.h"
 
 #ifndef WIN32
-inline int strcmpi(char const* s1, char const* s2)
+inline int strcmpi(char const *s1, char const *s2)
 {
-    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2) {}
+    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2)
+    {
+    }
     return *s1 - *s2;
 }
 #endif
 
 bool WhoAction::Execute(Event event)
 {
-    Player* owner = event.getOwner();
+    Player *owner = event.getOwner();
     if (!owner)
         return false;
 
@@ -39,7 +41,7 @@ bool WhoAction::Execute(Event event)
 
     if (!out.str().empty())
     {
-        if (AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(bot->GetAreaId()))
+        if (AreaTableEntry const *areaEntry = sAreaTableStore.LookupEntry(bot->GetAreaId()))
         {
             out << ", (|cffb04040" << areaEntry->area_name[0] << "|r)";
         }
@@ -58,7 +60,7 @@ bool WhoAction::Execute(Event event)
         return false;
 
     // ignore random bot chat filter
-	bot->Whisper(tell, LANG_UNIVERSAL, owner);
+    bot->Whisper(tell, LANG_UNIVERSAL, owner);
     return true;
 }
 
@@ -67,7 +69,7 @@ std::string const WhoAction::QueryTrade(std::string const text)
     std::ostringstream out;
 
     std::vector<Item*> items = InventoryAction::parseItems(text);
-    for (Item* sell : items)
+    for (Item *sell : items)
     {
         int32 sellPrice = sell->GetTemplate()->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot) * sell->GetCount();
         if (!sellPrice)
@@ -95,8 +97,8 @@ std::string const WhoAction::QuerySkill(std::string const text)
 
     std::string const data = "0";
     out << "|cFFFFFF00|Htrade:" << spellId << ":" << value << ":" << maxSkill << ":" << std::hex << std::uppercase << guid.GetRawValue()
-            << std::nouppercase << std::dec << ":" << data << "|h[" << skillName << "]|h|r" << " |h|cff00ff00" << value << "|h|cffffffff/"
-            << "|h|cff00ff00" << maxSkill << "|h|cffffffff ";
+        << std::nouppercase << std::dec << ":" << data << "|h[" << skillName << "]|h|r" << " |h|cff00ff00" << value << "|h|cffffffff/"
+        << "|h|cff00ff00" << maxSkill << "|h|cffffffff ";
 
     return out.str();
 }

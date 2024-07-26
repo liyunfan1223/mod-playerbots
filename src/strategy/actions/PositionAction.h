@@ -11,47 +11,46 @@ class PlayerbotAI;
 
 class PositionAction : public Action
 {
-    public:
-        PositionAction(PlayerbotAI* botAI) : Action(botAI, "position") { }
+public:
+    PositionAction(PlayerbotAI *botAI) : Action(botAI, "position") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class MoveToPositionAction : public MovementAction
 {
-    public:
-        MoveToPositionAction(PlayerbotAI* botAI, std::string const name, std::string const qualifier, bool idle = false) :
-            MovementAction(botAI, name), qualifier(qualifier), idle(idle) { }
+public:
+    MoveToPositionAction(PlayerbotAI *botAI, std::string const name, std::string const qualifier, bool idle = false) : MovementAction(botAI, name), qualifier(qualifier), idle(idle) {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 
-    protected:
-        std::string const qualifier;
-        bool idle;
+protected:
+    std::string const qualifier;
+    bool idle;
 };
 
 class GuardAction : public MoveToPositionAction
 {
-    public:
-        GuardAction(PlayerbotAI* botAI) : MoveToPositionAction(botAI, "move to position", "guard") { }
+public:
+    GuardAction(PlayerbotAI *botAI) : MoveToPositionAction(botAI, "move to position", "guard") {}
 };
 
 class SetReturnPositionAction : public Action
 {
-    public:
-        SetReturnPositionAction(PlayerbotAI* botAI) : Action(botAI, "set return position") { }
+public:
+    SetReturnPositionAction(PlayerbotAI *botAI) : Action(botAI, "set return position") {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class ReturnAction : public MoveToPositionAction
 {
-    public:
-        ReturnAction(PlayerbotAI* botAI) : MoveToPositionAction(botAI, "return", "return", true) { }
+public:
+    ReturnAction(PlayerbotAI *botAI) : MoveToPositionAction(botAI, "return", "return", true) {}
 
-        bool isUseful() override;
+    bool isUseful() override;
 };
 
 #endif

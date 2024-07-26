@@ -8,6 +8,4 @@
 #include "RaidUlduarScripts.h"
 #include "RaidUlduarBossHelper.h"
 
-
-
 #endif

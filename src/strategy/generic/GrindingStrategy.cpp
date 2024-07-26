@@ -5,19 +5,19 @@
 #include "GrindingStrategy.h"
 #include "Playerbots.h"
 
-NextAction** GrindingStrategy::getDefaultActions()
+NextAction **GrindingStrategy::getDefaultActions()
 {
     return nullptr;
 }
 
-void GrindingStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void GrindingStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("drink", 4.2f), nullptr)));
     triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("food", 4.1f), nullptr)));
     triggers.push_back(new TriggerNode("no target", NextAction::array(0, new NextAction("attack anything", 4.0f), nullptr)));
 }
 
-void MoveRandomStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void MoveRandomStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "often",

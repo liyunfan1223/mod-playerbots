@@ -10,16 +10,17 @@
 
 bool ReachTargetAction::Execute(Event event)
 {
-    return ReachCombatTo(AI_VALUE(Unit*, GetTargetName()), distance);
+    return ReachCombatTo(AI_VALUE(Unit *, GetTargetName()), distance);
 }
 
 bool ReachTargetAction::isUseful()
 {
     // do not move while casting
-    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr)
+    {
         return false;
     }
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     // float dis = distance + CONTACT_DISTANCE;
     return target && !bot->IsWithinCombatRange(target, distance); // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", GetTargetName()), distance);
 }
@@ -34,11 +35,11 @@ bool CastReachTargetSpellAction::isUseful()
     return sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), (distance + sPlayerbotAIConfig->contactDistance));
 }
 
-ReachSpellAction::ReachSpellAction(PlayerbotAI* botAI) : ReachTargetAction(botAI, "reach spell", botAI->GetRange("spell"))
+ReachSpellAction::ReachSpellAction(PlayerbotAI *botAI) : ReachTargetAction(botAI, "reach spell", botAI->GetRange("spell"))
 {
 }
 
-ReachPartyMemberToHealAction::ReachPartyMemberToHealAction(PlayerbotAI* botAI) : ReachTargetAction(botAI, "reach party member to heal", botAI->GetRange("heal"))
+ReachPartyMemberToHealAction::ReachPartyMemberToHealAction(PlayerbotAI *botAI) : ReachTargetAction(botAI, "reach party member to heal", botAI->GetRange("heal"))
 {
 }
 
@@ -47,7 +48,7 @@ std::string const ReachPartyMemberToHealAction::GetTargetName()
     return "party member to heal";
 }
 
-ReachPartyMemberToResurrectAction::ReachPartyMemberToResurrectAction(PlayerbotAI* botAI) : ReachTargetAction(botAI, "reach party member to resurrect", botAI->GetRange("spell"))
+ReachPartyMemberToResurrectAction::ReachPartyMemberToResurrectAction(PlayerbotAI *botAI) : ReachTargetAction(botAI, "reach party member to resurrect", botAI->GetRange("spell"))
 {
 }
 

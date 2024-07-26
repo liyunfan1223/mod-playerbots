@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class PassiveStrategy : public Strategy
 {
-    public:
-        PassiveStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    PassiveStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
-        std::string const getName() override { return "passive"; }
+    void InitMultipliers(std::vector<Multiplier *> &multipliers) override;
+    std::string const getName() override { return "passive"; }
 };
 
 #endif

@@ -12,15 +12,15 @@ class Item;
 class PlayerbotAI;
 class SpellInfo;
 
-class ItemForSpellValue : public CalculatedValue<Item*>, public Qualified
+class ItemForSpellValue : public CalculatedValue<Item *>, public Qualified
 {
-	public:
-        ItemForSpellValue(PlayerbotAI* botAI, std::string const name = "item for spell") : CalculatedValue<Item*>(botAI, name, 1) { }
+public:
+    ItemForSpellValue(PlayerbotAI *botAI, std::string const name = "item for spell") : CalculatedValue<Item *>(botAI, name, 1) {}
 
-        Item* Calculate() override;
+    Item *Calculate() override;
 
-    private:
-        Item* GetItemFitsToSpellRequirements(uint8 slot, SpellInfo const *spellInfo);
+private:
+    Item *GetItemFitsToSpellRequirements(uint8 slot, SpellInfo const *spellInfo);
 };
 
 #endif

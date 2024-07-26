@@ -12,15 +12,15 @@ class PlayerbotAI;
 
 class TradeStatusAction : public QueryItemUsageAction
 {
-    public:
-        TradeStatusAction(PlayerbotAI* botAI) : QueryItemUsageAction(botAI, "accept trade") { }
+public:
+    TradeStatusAction(PlayerbotAI *botAI) : QueryItemUsageAction(botAI, "accept trade") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        void BeginTrade();
-        bool CheckTrade();
-        int32 CalculateCost(Player* player, bool sell);
+private:
+    void BeginTrade();
+    bool CheckTrade();
+    int32 CalculateCost(Player *player, bool sell);
 };
 
 #endif

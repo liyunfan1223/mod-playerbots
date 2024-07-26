@@ -11,12 +11,12 @@ class PlayerbotAI;
 
 class TankWarlockStrategy : public GenericWarlockStrategy
 {
-    public:
-        TankWarlockStrategy(PlayerbotAI* botAI);
+public:
+    TankWarlockStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "tank"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        NextAction** getDefaultActions() override;
+    std::string const getName() override { return "tank"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    NextAction **getDefaultActions() override;
 };
 
 #endif

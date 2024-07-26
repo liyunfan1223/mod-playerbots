@@ -15,24 +15,23 @@ typedef std::map<std::string, std::string> PlaceholderMap;
 
 class PlaceholderHelper
 {
-    public:
-        static void MapRole(PlaceholderMap& placeholders, Player* bot);
-        static void MapDungeon(
-            PlaceholderMap& placeholders,
-            DungeonSuggestion const* dungeonSuggestion,
-            Player* bot
-        );
+public:
+    static void MapRole(PlaceholderMap &placeholders, Player *bot);
+    static void MapDungeon(
+        PlaceholderMap &placeholders,
+        DungeonSuggestion const *dungeonSuggestion,
+        Player *bot);
 
-    private:
-        struct Insertion
-        {
-            std::ostringstream& out;
-            DungeonSuggestion const* dungeonSuggestion;
-        };
+private:
+    struct Insertion
+    {
+        std::ostringstream &out;
+        DungeonSuggestion const *dungeonSuggestion;
+    };
 
-        static void InsertDungeonName(Insertion& insertion);
-        static void InsertDungeonStrategy(Insertion& insertion);
-        static void InsertDifficulty(Insertion& insertion, Player* bot);
+    static void InsertDungeonName(Insertion &insertion);
+    static void InsertDungeonStrategy(Insertion &insertion);
+    static void InsertDifficulty(Insertion &insertion, Player *bot);
 };
 
 #endif

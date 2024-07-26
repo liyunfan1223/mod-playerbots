@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class ShamanAiObjectContext : public AiObjectContext
 {
-    public:
-        ShamanAiObjectContext(PlayerbotAI* botAI);
+public:
+    ShamanAiObjectContext(PlayerbotAI *botAI);
 };
 
 #endif

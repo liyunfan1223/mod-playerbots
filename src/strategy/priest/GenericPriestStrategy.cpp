@@ -7,12 +7,12 @@
 #include "HealPriestStrategy.h"
 #include "Playerbots.h"
 
-GenericPriestStrategy::GenericPriestStrategy(PlayerbotAI* botAI) : RangedCombatStrategy(botAI)
+GenericPriestStrategy::GenericPriestStrategy(PlayerbotAI *botAI) : RangedCombatStrategy(botAI)
 {
     actionNodeFactories.Add(new GenericPriestStrategyActionNodeFactory());
 }
 
-void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
@@ -43,17 +43,17 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "low mana",
         NextAction::array(0, new NextAction("hymn of hope", ACTION_HIGH), NULL)));
-    
+
     triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
 }
 
-PriestCureStrategy::PriestCureStrategy(PlayerbotAI* botAI) : Strategy(botAI)
+PriestCureStrategy::PriestCureStrategy(PlayerbotAI *botAI) : Strategy(botAI)
 {
     actionNodeFactories.Add(new CurePriestStrategyActionNodeFactory());
 }
 
-void PriestCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PriestCureStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("dispel magic", NextAction::array(0, new NextAction("dispel magic", 41.0f), nullptr)));
     triggers.push_back(new TriggerNode("dispel magic on party", NextAction::array(0, new NextAction("dispel magic on party", 40.0f), nullptr)));
@@ -61,14 +61,14 @@ void PriestCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("party member cure disease", NextAction::array(0, new NextAction("abolish disease on party", 30.0f), nullptr)));
 }
 
-void PriestBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PriestBoostStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("inner focus", NextAction::array(0, new NextAction("inner focus", 42.0f), nullptr)));
     triggers.push_back(new TriggerNode("power infusion", NextAction::array(0, new NextAction("power infusion", 41.0f), nullptr)));
     triggers.push_back(new TriggerNode("boost", NextAction::array(0, new NextAction("shadowfiend", 20.0f), nullptr)));
 }
 
-void PriestCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PriestCcStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("shackle undead", NextAction::array(0, new NextAction("shackle undead", 31.0f), nullptr)));
 }

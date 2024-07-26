@@ -11,16 +11,16 @@ class PlayerbotAI;
 
 class CustomStrategyEditAction : public Action
 {
-    public:
-        CustomStrategyEditAction(PlayerbotAI* botAI) : Action(botAI, "cs") { }
+public:
+    CustomStrategyEditAction(PlayerbotAI *botAI) : Action(botAI, "cs") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        bool PrintHelp();
-        bool PrintActionLine(uint32 idx, std::string const command);
-        bool Print(std::string const name);
-        bool Edit(std::string const name, uint32 idx, std::string const command);
+private:
+    bool PrintHelp();
+    bool PrintActionLine(uint32 idx, std::string const command);
+    bool Print(std::string const name);
+    bool Edit(std::string const name, uint32 idx, std::string const command);
 };
 
 #endif

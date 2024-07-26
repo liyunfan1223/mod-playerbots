@@ -14,15 +14,15 @@
 
 bool TradeStatusAction::Execute(Event event)
 {
-    Player* trader = bot->GetTrader();
-    Player* master = GetMaster();
+    Player *trader = bot->GetTrader();
+    Player *master = GetMaster();
     if (!trader)
         return false;
 
-    PlayerbotAI* traderBotAI = GET_PLAYERBOT_AI(trader);
+    PlayerbotAI *traderBotAI = GET_PLAYERBOT_AI(trader);
     if (trader != master && !traderBotAI)
     {
-		bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader);
+        bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader);
     }
 
     if ((trader != master || !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master)) && !traderBotAI)
@@ -53,7 +53,7 @@ bool TradeStatusAction::Execute(Event event)
             std::map<uint32, uint32> givenItemIds, takenItemIds;
             for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
             {
-                Item* item = trader->GetTradeData()->GetItem((TradeSlots)slot);
+                Item *item = trader->GetTradeData()->GetItem((TradeSlots)slot);
                 if (item)
                     givenItemIds[item->GetTemplate()->ItemId] += item->GetCount();
 
@@ -74,7 +74,7 @@ bool TradeStatusAction::Execute(Event event)
                 uint32 itemId = i->first;
                 uint32 count = i->second;
 
-                CraftData& craftData = AI_VALUE(CraftData&, "craft");
+                CraftData &craftData = AI_VALUE(CraftData &, "craft");
                 if (!craftData.IsEmpty() && craftData.IsRequired(itemId))
                 {
                     craftData.AddObtained(itemId, count);
@@ -83,13 +83,12 @@ bool TradeStatusAction::Execute(Event event)
                 sGuildTaskMgr->CheckItemTask(itemId, count, trader, bot);
             }
 
-
             for (std::map<uint32, uint32>::iterator i = takenItemIds.begin(); i != takenItemIds.end(); ++i)
             {
                 uint32 itemId = i->first;
                 uint32 count = i->second;
 
-                CraftData& craftData = AI_VALUE(CraftData&, "craft");
+                CraftData &craftData = AI_VALUE(CraftData &, "craft");
                 if (!craftData.IsEmpty() && craftData.itemId == itemId)
                 {
                     craftData.Crafted(count);
@@ -139,7 +138,7 @@ void TradeStatusAction::BeginTrade()
 
 bool TradeStatusAction::CheckTrade()
 {
-    Player* trader = bot->GetTrader();
+    Player *trader = bot->GetTrader();
     if (!bot->GetTradeData() || !trader->GetTradeData())
         return false;
 
@@ -148,7 +147,7 @@ bool TradeStatusAction::CheckTrade()
         bool isGivingItem = false;
         for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
         {
-            Item* item = bot->GetTradeData()->GetItem((TradeSlots)slot);
+            Item *item = bot->GetTradeData()->GetItem((TradeSlots)slot);
             if (item)
             {
                 isGivingItem = true;
@@ -159,7 +158,7 @@ bool TradeStatusAction::CheckTrade()
         bool isGettingItem = false;
         for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
         {
-            Item* item = trader->GetTradeData()->GetItem((TradeSlots)slot);
+            Item *item = trader->GetTradeData()->GetItem((TradeSlots)slot);
             if (item)
             {
                 isGettingItem = true;
@@ -196,7 +195,7 @@ bool TradeStatusAction::CheckTrade()
 
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
-        Item* item = bot->GetTradeData()->GetItem((TradeSlots)slot);
+        Item *item = bot->GetTradeData()->GetItem((TradeSlots)slot);
         if (item && !item->GetTemplate()->SellPrice)
         {
             std::ostringstream out;
@@ -206,7 +205,7 @@ bool TradeStatusAction::CheckTrade()
             return false;
         }
 
-        item = trader->GetTradeData()->GetItem((TradeSlots) slot);
+        item = trader->GetTradeData()->GetItem((TradeSlots)slot);
         if (item)
         {
             std::ostringstream out;
@@ -260,18 +259,18 @@ bool TradeStatusAction::CheckTrade()
         sRandomPlayerbotMgr->AddTradeDiscount(bot, trader, delta);
         switch (urand(0, 4))
         {
-            case 0:
-                botAI->TellMaster("A pleasure doing business with you");
-                break;
-            case 1:
-                botAI->TellMaster("Fair trade");
-                break;
-            case 2:
-                botAI->TellMaster("Thanks");
-                break;
-            case 3:
-                botAI->TellMaster("Off with you");
-                break;
+        case 0:
+            botAI->TellMaster("A pleasure doing business with you");
+            break;
+        case 1:
+            botAI->TellMaster("Fair trade");
+            break;
+        case 2:
+            botAI->TellMaster("Thanks");
+            break;
+        case 3:
+            botAI->TellMaster("Off with you");
+            break;
         }
 
         botAI->PlaySound(TEXT_EMOTE_THANK);
@@ -285,28 +284,28 @@ bool TradeStatusAction::CheckTrade()
     return false;
 }
 
-int32 TradeStatusAction::CalculateCost(Player* player, bool sell)
+int32 TradeStatusAction::CalculateCost(Player *player, bool sell)
 {
-    Player* trader = bot->GetTrader();
-    TradeData* data = player->GetTradeData();
+    Player *trader = bot->GetTrader();
+    TradeData *data = player->GetTradeData();
     if (!data)
         return 0;
 
     uint32 sum = 0;
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
-        Item* item = data->GetItem((TradeSlots)slot);
+        Item *item = data->GetItem((TradeSlots)slot);
         if (!item)
             continue;
 
-        ItemTemplate const* proto = item->GetTemplate();
+        ItemTemplate const *proto = item->GetTemplate();
         if (!proto)
             continue;
 
         if (proto->Quality < ITEM_QUALITY_NORMAL)
             return 0;
 
-        CraftData& craftData = AI_VALUE(CraftData&, "craft");
+        CraftData &craftData = AI_VALUE(CraftData &, "craft");
         if (!craftData.IsEmpty())
         {
             if (player == trader && !sell && craftData.IsRequired(proto->ItemId))

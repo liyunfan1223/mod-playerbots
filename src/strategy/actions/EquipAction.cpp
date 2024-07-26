@@ -18,21 +18,21 @@ bool EquipAction::Execute(Event event)
 
 void EquipAction::EquipItems(ItemIds ids)
 {
-    for (ItemIds::iterator i =ids.begin(); i != ids.end(); i++)
+    for (ItemIds::iterator i = ids.begin(); i != ids.end(); i++)
     {
         FindItemByIdVisitor visitor(*i);
         EquipItem(&visitor);
     }
 }
 
-//Return bagslot with smalest bag.
+// Return bagslot with smalest bag.
 uint8 EquipAction::GetSmallestBagSlot()
 {
     int8 curBag = 0;
     uint32 curSlots = 0;
     for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
     {
-        const Bag* const pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
+        const Bag *const pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
         if (pBag)
         {
             if (curBag > 0 && curSlots < pBag->GetBagSize())
@@ -48,15 +48,15 @@ uint8 EquipAction::GetSmallestBagSlot()
     return curBag;
 }
 
-void EquipAction::EquipItem(FindItemVisitor* visitor)
+void EquipAction::EquipItem(FindItemVisitor *visitor)
 {
     IterateItems(visitor);
     std::vector<Item*> items = visitor->GetResult();
-	if (!items.empty())
+    if (!items.empty())
         EquipItem(*items.begin());
 }
 
-void EquipAction::EquipItem(Item* item)
+void EquipAction::EquipItem(Item *item)
 {
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
@@ -71,7 +71,7 @@ void EquipAction::EquipItem(Item* item)
         bool equipedBag = false;
         if (item->GetTemplate()->Class == ITEM_CLASS_CONTAINER)
         {
-            Bag* pBag = (Bag*)&item;
+            Bag *pBag = (Bag *)&item;
             uint8 newBagSlot = GetSmallestBagSlot();
             if (newBagSlot > 0)
             {

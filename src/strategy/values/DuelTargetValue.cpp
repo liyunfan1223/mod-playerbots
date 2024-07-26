@@ -5,7 +5,7 @@
 #include "DuelTargetValue.h"
 #include "Playerbots.h"
 
-Unit* DuelTargetValue::Calculate()
+Unit *DuelTargetValue::Calculate()
 {
     return bot->duel ? bot->duel->Opponent : nullptr;
 }

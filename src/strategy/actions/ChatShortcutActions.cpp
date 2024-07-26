@@ -10,7 +10,7 @@
 
 void ReturnPositionResetAction::ResetReturnPosition()
 {
-    PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
+    PositionMap &posMap = context->GetValue<PositionMap &>("position")->Get();
     PositionInfo pos = posMap["return"];
     pos.Reset();
     posMap["return"] = pos;
@@ -18,7 +18,7 @@ void ReturnPositionResetAction::ResetReturnPosition()
 
 void ReturnPositionResetAction::SetReturnPosition(float x, float y, float z)
 {
-    PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
+    PositionMap &posMap = context->GetValue<PositionMap &>("position")->Get();
     PositionInfo pos = posMap["return"];
     pos.Set(x, y, z, botAI->GetBot()->GetMapId());
     posMap["return"] = pos;
@@ -26,7 +26,7 @@ void ReturnPositionResetAction::SetReturnPosition(float x, float y, float z)
 
 bool FollowChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -35,19 +35,19 @@ bool FollowChatShortcutAction::Execute(Event event)
     botAI->ChangeStrategy("-follow,-passive,-grind", BOT_STATE_COMBAT);
     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
 
-    PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
+    PositionMap &posMap = context->GetValue<PositionMap &>("position")->Get();
     PositionInfo pos = posMap["return"];
     pos.Reset();
     posMap["return"] = pos;
 
     if (bot->IsInCombat())
     {
-        Formation* formation = AI_VALUE(Formation*, "formation");
+        Formation *formation = AI_VALUE(Formation *, "formation");
         std::string const target = formation->GetTargetName();
         bool moved = false;
         if (!target.empty())
         {
-            moved = Follow(AI_VALUE(Unit*, target));
+            moved = Follow(AI_VALUE(Unit *, target));
         }
         else
         {
@@ -87,7 +87,7 @@ bool FollowChatShortcutAction::Execute(Event event)
 
 bool StayChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -103,7 +103,7 @@ bool StayChatShortcutAction::Execute(Event event)
 
 bool FleeChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -125,7 +125,7 @@ bool FleeChatShortcutAction::Execute(Event event)
 
 bool GoawayChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -141,7 +141,7 @@ bool GoawayChatShortcutAction::Execute(Event event)
 
 bool GrindChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -156,7 +156,7 @@ bool GrindChatShortcutAction::Execute(Event event)
 
 bool TankAttackChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -175,7 +175,7 @@ bool TankAttackChatShortcutAction::Execute(Event event)
 
 bool MaxDpsChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -192,7 +192,7 @@ bool MaxDpsChatShortcutAction::Execute(Event event)
 
 bool NaxxChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -206,7 +206,7 @@ bool NaxxChatShortcutAction::Execute(Event event)
 
 bool BwlChatShortcutAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 

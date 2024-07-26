@@ -11,13 +11,13 @@ class PlayerbotAI;
 
 class MaintenanceStrategy : public NonCombatStrategy
 {
-    public:
-        MaintenanceStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    MaintenanceStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-        std::string const getName() override { return "maintenance"; }
-        uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
-        NextAction** getDefaultActions() override;
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "maintenance"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
+    NextAction **getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 #endif

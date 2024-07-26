@@ -5,11 +5,11 @@
 #include "KiteStrategy.h"
 #include "Playerbots.h"
 
-KiteStrategy::KiteStrategy(PlayerbotAI* botAI) : Strategy(botAI)
+KiteStrategy::KiteStrategy(PlayerbotAI *botAI) : Strategy(botAI)
 {
 }
 
-void KiteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void KiteStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("has aggro", NextAction::array(0, new NextAction("runaway", 51.0f), nullptr)));
 }

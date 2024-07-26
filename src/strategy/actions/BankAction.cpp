@@ -14,7 +14,7 @@ bool BankAction::Execute(Event event)
     GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
     for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
     {
-        Unit* npc = botAI->GetUnit(*i);
+        Unit *npc = botAI->GetUnit(*i);
         if (!npc || !npc->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BANKER))
             continue;
 
@@ -25,7 +25,7 @@ bool BankAction::Execute(Event event)
     return false;
 }
 
-bool BankAction::ExecuteBank(std::string const text, Unit* bank)
+bool BankAction::ExecuteBank(std::string const text, Unit *bank)
 {
     if (text.empty() || text == "?")
     {
@@ -39,7 +39,7 @@ bool BankAction::ExecuteBank(std::string const text, Unit* bank)
         std::vector<Item*> found = parseItems(text.substr(1), ITERATE_ITEMS_IN_BANK);
         for (std::vector<Item*>::iterator i = found.begin(); i != found.end(); i++)
         {
-            Item* item = *i;
+            Item *item = *i;
             result &= Withdraw(item->GetTemplate()->ItemId);
         }
     }
@@ -51,7 +51,7 @@ bool BankAction::ExecuteBank(std::string const text, Unit* bank)
 
         for (std::vector<Item*>::iterator i = found.begin(); i != found.end(); i++)
         {
-            Item* item = *i;
+            Item *item = *i;
             if (!item)
                 continue;
 
@@ -64,7 +64,7 @@ bool BankAction::ExecuteBank(std::string const text, Unit* bank)
 
 bool BankAction::Withdraw(uint32 itemid)
 {
-    Item* pItem = FindItemInBank(itemid);
+    Item *pItem = FindItemInBank(itemid);
     if (!pItem)
         return false;
 
@@ -85,7 +85,7 @@ bool BankAction::Withdraw(uint32 itemid)
     return true;
 }
 
-bool BankAction::Deposit(Item* pItem)
+bool BankAction::Deposit(Item *pItem)
 {
     std::ostringstream out;
 
@@ -102,7 +102,7 @@ bool BankAction::Deposit(Item* pItem)
 
     out << "put " << chat->FormatItem(pItem->GetTemplate(), pItem->GetCount()) << " to bank";
     botAI->TellMaster(out.str());
-	return true;
+    return true;
 }
 
 void BankAction::ListItems()
@@ -112,7 +112,7 @@ void BankAction::ListItems()
     std::map<uint32, uint32> items;
     std::map<uint32, bool> soulbound;
     for (uint32 i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
-        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (pItem)
             {
                 items[pItem->GetTemplate()->ItemId] += pItem->GetCount();
@@ -120,10 +120,10 @@ void BankAction::ListItems()
             }
 
     for (uint32 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
-        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Bag *pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (pBag)
                 for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
-                    if (Item* pItem = pBag->GetItemByPos(j))
+                    if (Item *pItem = pBag->GetItemByPos(j))
                         if (pItem)
                         {
                             items[pItem->GetTemplate()->ItemId] += pItem->GetCount();
@@ -133,31 +133,31 @@ void BankAction::ListItems()
     TellItems(items, soulbound);
 }
 
-Item* BankAction::FindItemInBank(uint32 ItemId)
+Item *BankAction::FindItemInBank(uint32 ItemId)
 {
     for (uint8 slot = BANK_SLOT_ITEM_START; slot < BANK_SLOT_ITEM_END; slot++)
     {
-        if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        if (Item *const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
-            ItemTemplate const* const pItemProto = pItem->GetTemplate();
+            ItemTemplate const *const pItemProto = pItem->GetTemplate();
             if (!pItemProto)
                 continue;
 
-            if (pItemProto->ItemId == ItemId)   // have required item
+            if (pItemProto->ItemId == ItemId) // have required item
                 return pItem;
         }
     }
 
     for (uint8 bag = BANK_SLOT_BAG_START; bag < BANK_SLOT_BAG_END; ++bag)
     {
-        Bag const* const pBag = (Bag *) bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
+        Bag const *const pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
         if (pBag)
             for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
             {
-                Item* const pItem = bot->GetItemByPos(bag, slot);
+                Item *const pItem = bot->GetItemByPos(bag, slot);
                 if (pItem)
                 {
-                    ItemTemplate const* const pItemProto = pItem->GetTemplate();
+                    ItemTemplate const *const pItemProto = pItem->GetTemplate();
                     if (!pItemProto)
                         continue;
 

@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class TotemsShamanStrategy : public GenericShamanStrategy
 {
-    public:
-        TotemsShamanStrategy(PlayerbotAI* botAI);
+public:
+    TotemsShamanStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "totems"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "totems"; }
 };
 
 #endif

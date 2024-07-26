@@ -12,14 +12,14 @@ class Unit;
 
 class CurrentTargetValue : public UnitManualSetValue
 {
-	public:
-        CurrentTargetValue(PlayerbotAI* botAI, std::string const name = "current target") : UnitManualSetValue(botAI, nullptr, name) { }
+public:
+    CurrentTargetValue(PlayerbotAI *botAI, std::string const name = "current target") : UnitManualSetValue(botAI, nullptr, name) {}
 
-        Unit* Get() override;
-        void Set(Unit* unit) override;
+    Unit *Get() override;
+    void Set(Unit *unit) override;
 
-    private:
-        ObjectGuid selection;
+private:
+    ObjectGuid selection;
 };
 
 #endif

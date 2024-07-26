@@ -10,17 +10,17 @@
 
 bool MoveToTravelTargetAction::Execute(Event event)
 {
-    TravelTarget* target = AI_VALUE(TravelTarget*, "travel target");
+    TravelTarget *target = AI_VALUE(TravelTarget *, "travel target");
 
     WorldPosition botLocation(bot);
     WorldLocation location = *target->getPosition();
 
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (group && !urand(0, 1) && bot == botAI->GetGroupMaster())
     {
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
-            Player* member = ref->GetSource();
+            Player *member = ref->GetSource();
             if (member == bot)
                 continue;
 
@@ -30,7 +30,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
             if (!member->isMoving())
                 continue;
 
-            PlayerbotAI* memberBotAI = GET_PLAYERBOT_AI(member);
+            PlayerbotAI *memberBotAI = GET_PLAYERBOT_AI(member);
             if (memberBotAI && !memberBotAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))
                 continue;
 
@@ -44,10 +44,10 @@ bool MoveToTravelTargetAction::Execute(Event event)
             if (memberDistance > sPlayerbotAIConfig->reactDistance * 20)
                 continue;
 
-           // float memberAngle = botLocation.getAngleBetween(targetPos, memberPos);
+            // float memberAngle = botLocation.getAngleBetween(targetPos, memberPos);
 
-           // if (botLocation.getMapId() == targetPos.getMapId() && botLocation.getMapId() == memberPos.getMapId() && memberAngle < static_cast<float>(M_PI) / 2) //We are heading that direction anyway.
-           //     continue;
+            // if (botLocation.getMapId() == targetPos.getMapId() && botLocation.getMapId() == memberPos.getMapId() && memberAngle < static_cast<float>(M_PI) / 2) //We are heading that direction anyway.
+            //     continue;
 
             if (!urand(0, 5))
             {
@@ -72,14 +72,14 @@ bool MoveToTravelTargetAction::Execute(Event event)
 
     float maxDistance = target->getDestination()->getRadiusMin();
 
-    //Evenly distribute around the target.
+    // Evenly distribute around the target.
     float angle = 2 * M_PI * urand(0, 100) / 100.0;
 
-    if (target->getMaxTravelTime() > target->getTimeLeft()) //The bot is late. Speed it up.
+    if (target->getMaxTravelTime() > target->getTimeLeft()) // The bot is late. Speed it up.
     {
-        //distance = sPlayerbotAIConfig->fleeDistance;
-        //angle = bot->GetAngle(location.GetPositionX(), location.GetPositionY());
-        //location = botLocation.getLocation();
+        // distance = sPlayerbotAIConfig->fleeDistance;
+        // angle = bot->GetAngle(location.GetPositionX(), location.GetPositionY());
+        // location = botLocation.getLocation();
     }
 
     float x = location.GetPositionX();
@@ -87,7 +87,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
     float z = location.GetPositionZ();
     float mapId = location.GetMapId();
 
-    //Move between 0.5 and 1.0 times the maxDistance.
+    // Move between 0.5 and 1.0 times the maxDistance.
     float mod = frand(50.f, 100.f) / 100.0f;
 
     x += cos(angle) * maxDistance * mod;
@@ -142,4 +142,3 @@ bool MoveToTravelTargetAction::isUseful()
 
     return true;
 }
-

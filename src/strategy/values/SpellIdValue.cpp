@@ -8,11 +8,11 @@
 #include "Vehicle.h"
 #include "World.h"
 
-SpellIdValue::SpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "spell id", 20 * 1000)
+SpellIdValue::SpellIdValue(PlayerbotAI *botAI) : CalculatedValue<uint32>(botAI, "spell id", 20 * 1000)
 {
 }
 
-VehicleSpellIdValue::VehicleSpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "vehicle spell id")
+VehicleSpellIdValue::VehicleSpellIdValue(PlayerbotAI *botAI) : CalculatedValue<uint32>(botAI, "vehicle spell id")
 {
 }
 
@@ -24,7 +24,7 @@ uint32 SpellIdValue::Calculate()
     PlayerbotChatHandler handler(bot);
     uint32 extractedSpellId = handler.extractSpellId(namepart);
     if (extractedSpellId)
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(extractedSpellId))
+        if (SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(extractedSpellId))
             namepart = spellInfo->SpellName[0];
 
     std::wstring wnamepart;
@@ -45,7 +45,7 @@ uint32 SpellIdValue::Calculate()
         if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active)
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo || spellInfo->IsPassive())
             continue;
 
@@ -62,14 +62,14 @@ uint32 SpellIdValue::Calculate()
             }
         }
 
-        char const* spellName = spellInfo->SpellName[loc];
+        char const *spellName = spellInfo->SpellName[loc];
         if (!useByItem && (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart)))
             continue;
 
         spellIds.insert(spellId);
     }
 
-    Pet* pet = bot->GetPet();
+    Pet *pet = bot->GetPet();
     if (spellIds.empty() && pet)
     {
         for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
@@ -78,14 +78,14 @@ uint32 SpellIdValue::Calculate()
                 continue;
 
             uint32 spellId = itr->first;
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo)
                 continue;
 
             if (spellInfo->Effects[0].Effect == SPELL_EFFECT_LEARN_SPELL)
                 continue;
 
-            char const* spellName = spellInfo->SpellName[loc];
+            char const *spellName = spellInfo->SpellName[loc];
             if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart))
                 continue;
 
@@ -93,7 +93,8 @@ uint32 SpellIdValue::Calculate()
         }
     }
 
-    if (spellIds.empty()) return 0;
+    if (spellIds.empty())
+        return 0;
 
     int32 saveMana = (int32)round(AI_VALUE(double, "mana save level"));
     uint32 rank = 1;
@@ -115,7 +116,10 @@ uint32 SpellIdValue::Calculate()
             // For atoi, the input string has to start with a digit, so lets search for the first digit
             size_t i = 0;
             for (; i < spellName.length(); i++)
-            { if (isdigit(spellName[i])) break; }
+            {
+                if (isdigit(spellName[i]))
+                    break;
+            }
 
             // remove the first chars, which aren't digits
             spellName = spellName.substr(i, spellName.length() - i);
@@ -156,21 +160,21 @@ uint32 SpellIdValue::Calculate()
         }
     }
 
-    return saveMana > 1 ? lowestSpellId  : highestSpellId;
+    return saveMana > 1 ? lowestSpellId : highestSpellId;
 }
 
 uint32 VehicleSpellIdValue::Calculate()
 {
-    Vehicle* vehicle = bot->GetVehicle();
+    Vehicle *vehicle = bot->GetVehicle();
     if (!vehicle)
         return 0;
 
     // do not allow if no spells
-    VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
+    VehicleSeatEntry const *seat = vehicle->GetSeatForPassenger(bot);
     if (!seat || !(seat->m_flags & VEHICLE_SEAT_FLAG_CAN_CAST))
         return 0;
 
-    Unit* vehicleBase = vehicle->GetBase();
+    Unit *vehicleBase = vehicle->GetBase();
     if (!vehicleBase->IsAlive())
         return 0;
 
@@ -179,7 +183,7 @@ uint32 VehicleSpellIdValue::Calculate()
     PlayerbotChatHandler handler(bot);
     uint32 extractedSpellId = handler.extractSpellId(namepart);
     if (extractedSpellId)
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(extractedSpellId))
+        if (SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(extractedSpellId))
             namepart = spellInfo->SpellName[0];
 
     std::wstring wnamepart;
@@ -192,18 +196,18 @@ uint32 VehicleSpellIdValue::Calculate()
 
     int loc = bot->GetSession()->GetSessionDbcLocale();
 
-    Creature* creature = vehicleBase->ToCreature();
+    Creature *creature = vehicleBase->ToCreature();
     for (uint32 x = 0; x < MAX_CREATURE_SPELLS; ++x)
     {
         uint32 spellId = creature->m_spells[x];
         if (spellId == 2)
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo || spellInfo->IsPassive())
             continue;
 
-        char const* spellName = spellInfo->SpellName[loc];
+        char const *spellName = spellInfo->SpellName[loc];
         if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart))
             continue;
 

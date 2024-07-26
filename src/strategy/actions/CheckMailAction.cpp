@@ -17,11 +17,11 @@ bool CheckMailAction::Execute(Event event)
     std::vector<uint32> ids;
     for (PlayerMails::const_iterator i = bot->GetMails().begin(); i != bot->GetMails().end(); ++i)
     {
-        Mail* mail = *i;
+        Mail *mail = *i;
         if (!mail || mail->state == MAIL_STATE_DELETED)
             continue;
 
-        Player* owner = ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(mail->sender));
+        Player *owner = ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(mail->sender));
         if (!owner)
             continue;
 
@@ -38,7 +38,7 @@ bool CheckMailAction::Execute(Event event)
     {
         bot->SendMailResult(id, MAIL_DELETED, MAIL_OK);
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+        CharacterDatabasePreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
         stmt->SetData(0, id);
         trans->Append(stmt);
 
@@ -62,7 +62,7 @@ bool CheckMailAction::isUseful()
     return true;
 }
 
-void CheckMailAction::ProcessMail(Mail* mail, Player* owner, CharacterDatabaseTransaction trans)
+void CheckMailAction::ProcessMail(Mail *mail, Player *owner, CharacterDatabaseTransaction trans)
 {
     if (mail->items.empty())
     {

@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class ChatCommandHandlerStrategy : public PassTroughStrategy
 {
-    public:
-        ChatCommandHandlerStrategy(PlayerbotAI* botAI);
+public:
+    ChatCommandHandlerStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "chat"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "chat"; }
 };
 
 #endif

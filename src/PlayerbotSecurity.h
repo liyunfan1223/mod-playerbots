@@ -14,10 +14,10 @@ class Player;
 
 enum PlayerbotSecurityLevel : uint32
 {
-    PLAYERBOT_SECURITY_DENY_ALL     = 0,
-    PLAYERBOT_SECURITY_TALK         = 1,
-    PLAYERBOT_SECURITY_INVITE       = 2,
-    PLAYERBOT_SECURITY_ALLOW_ALL    = 3
+    PLAYERBOT_SECURITY_DENY_ALL = 0,
+    PLAYERBOT_SECURITY_TALK = 1,
+    PLAYERBOT_SECURITY_INVITE = 2,
+    PLAYERBOT_SECURITY_ALLOW_ALL = 3
 };
 
 enum DenyReason
@@ -40,16 +40,16 @@ enum DenyReason
 
 class PlayerbotSecurity
 {
-    public:
-        PlayerbotSecurity(Player* const bot);
+public:
+    PlayerbotSecurity(Player *const bot);
 
-        PlayerbotSecurityLevel LevelFor(Player* from, DenyReason* reason = nullptr, bool ignoreGroup = false);
-        bool CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player* from, bool ignoreGroup = false);
+    PlayerbotSecurityLevel LevelFor(Player *from, DenyReason *reason = nullptr, bool ignoreGroup = false);
+    bool CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player *from, bool ignoreGroup = false);
 
-    private:
-        Player* const bot;
-        uint32 account;
-        std::map<ObjectGuid, std::map<std::string, time_t> > whispers;
+private:
+    Player *const bot;
+    uint32 account;
+    std::map<ObjectGuid, std::map<std::string, time_t>> whispers;
 };
 
 #endif

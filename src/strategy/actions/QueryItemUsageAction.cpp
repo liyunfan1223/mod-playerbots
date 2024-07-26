@@ -16,7 +16,7 @@ bool QueryItemUsageAction::Execute(Event event)
     if (!sPlayerbotAIConfig->sayWhenCollectingItems)
         return false;
 
-    WorldPacket& data = event.getPacket();
+    WorldPacket &data = event.getPacket();
     if (!data.empty())
     {
         data.rpos(0);
@@ -37,10 +37,10 @@ bool QueryItemUsageAction::Execute(Event event)
         uint32 invCount;
         uint8 bagSlot;
 
-        data >> received;                               // 0=looted, 1=from npc
-        data >> created;                                // 0=received, 1=created
-        data >> isShowChatMessage;                      // IsShowChatMessage
-        data >> bagSlot;                                // item slot, but when added to stack: 0xFFFFFFFF
+        data >> received;          // 0=looted, 1=from npc
+        data >> created;           // 0=received, 1=created
+        data >> isShowChatMessage; // IsShowChatMessage
+        data >> bagSlot;           // item slot, but when added to stack: 0xFFFFFFFF
 
         data >> notUsed;
         data >> itemId;
@@ -49,7 +49,7 @@ bool QueryItemUsageAction::Execute(Event event)
         data >> count;
         // data >> invCount; // [-ZERO] count of items in inventory
 
-        ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId);
+        ItemTemplate const *item = sObjectMgr->GetItemTemplate(itemId);
         if (!item)
             return false;
 
@@ -61,7 +61,7 @@ bool QueryItemUsageAction::Execute(Event event)
     ItemIds items = chat->parseItems(text);
     for (uint32 itemId : items)
     {
-        ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId);
+        ItemTemplate const *item = sObjectMgr->GetItemTemplate(itemId);
         if (!item)
             continue;
 
@@ -71,7 +71,7 @@ bool QueryItemUsageAction::Execute(Event event)
     return true;
 }
 
-uint32 QueryItemUsageAction::GetCount(ItemTemplate const* item)
+uint32 QueryItemUsageAction::GetCount(ItemTemplate const *item)
 {
     uint32 total = 0;
 
@@ -87,7 +87,7 @@ uint32 QueryItemUsageAction::GetCount(ItemTemplate const* item)
     return total;
 }
 
-std::string const QueryItemUsageAction::QueryItem(ItemTemplate const* item, uint32 count, uint32 total)
+std::string const QueryItemUsageAction::QueryItem(ItemTemplate const *item, uint32 count, uint32 total)
 {
     std::ostringstream out;
     std::string usage = QueryItemUsage(item);
@@ -106,45 +106,45 @@ std::string const QueryItemUsageAction::QueryItem(ItemTemplate const* item, uint
     return out.str();
 }
 
-std::string const QueryItemUsageAction::QueryItemUsage(ItemTemplate const* item)
+std::string const QueryItemUsageAction::QueryItemUsage(ItemTemplate const *item)
 {
     std::ostringstream out;
     out << item->ItemId;
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
     switch (usage)
     {
-        case ITEM_USAGE_EQUIP:
-            return "Equip";
-        case ITEM_USAGE_REPLACE:
-            return "Equip (replace)";
-        case ITEM_USAGE_BAD_EQUIP:
-            return "Equip (temporary)";
-        case ITEM_USAGE_BROKEN_EQUIP:
-            return "Broken Equip";
-        case ITEM_USAGE_QUEST:
-            return "Quest (other)";
-        case ITEM_USAGE_SKILL:
-            return "Tradeskill";
-        case ITEM_USAGE_USE:
-            return "Use";
-	    case ITEM_USAGE_GUILD_TASK:
-		    return "Guild task";
-	    case ITEM_USAGE_DISENCHANT:
-		    return "Disenchant";
-        case ITEM_USAGE_VENDOR:
-            return "Vendor";
-        case ITEM_USAGE_AH:
-            return "Auctionhouse";
-        case ITEM_USAGE_AMMO:
-            return "Ammunition";
-        default:
-            break;
-	}
+    case ITEM_USAGE_EQUIP:
+        return "Equip";
+    case ITEM_USAGE_REPLACE:
+        return "Equip (replace)";
+    case ITEM_USAGE_BAD_EQUIP:
+        return "Equip (temporary)";
+    case ITEM_USAGE_BROKEN_EQUIP:
+        return "Broken Equip";
+    case ITEM_USAGE_QUEST:
+        return "Quest (other)";
+    case ITEM_USAGE_SKILL:
+        return "Tradeskill";
+    case ITEM_USAGE_USE:
+        return "Use";
+    case ITEM_USAGE_GUILD_TASK:
+        return "Guild task";
+    case ITEM_USAGE_DISENCHANT:
+        return "Disenchant";
+    case ITEM_USAGE_VENDOR:
+        return "Vendor";
+    case ITEM_USAGE_AH:
+        return "Auctionhouse";
+    case ITEM_USAGE_AMMO:
+        return "Ammunition";
+    default:
+        break;
+    }
 
     return "";
 }
 
-std::string const QueryItemUsageAction::QueryItemPrice(ItemTemplate const* item)
+std::string const QueryItemUsageAction::QueryItemPrice(ItemTemplate const *item)
 {
     if (!sRandomPlayerbotMgr->IsRandomBot(bot))
         return "";
@@ -159,7 +159,7 @@ std::string const QueryItemUsageAction::QueryItemPrice(ItemTemplate const* item)
     {
         for (std::vector<Item*>::iterator i = items.begin(); i != items.end(); ++i)
         {
-            Item* sell = *i;
+            Item *sell = *i;
             int32 price = sell->GetCount() * sell->GetTemplate()->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot);
             if (!sellPrice || sellPrice > price)
                 sellPrice = price;
@@ -188,19 +188,19 @@ std::string const QueryItemUsageAction::QueryItemPrice(ItemTemplate const* item)
 
 std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId)
 {
-    Player* bot = botAI->GetBot();
-    QuestStatusMap& questMap = bot->getQuestStatusMap();
+    Player *bot = botAI->GetBot();
+    QuestStatusMap &questMap = bot->getQuestStatusMap();
     for (QuestStatusMap::const_iterator i = questMap.begin(); i != questMap.end(); i++)
     {
-        Quest const* questTemplate = sObjectMgr->GetQuestTemplate(i->first);
-        if (!questTemplate )
+        Quest const *questTemplate = sObjectMgr->GetQuestTemplate(i->first);
+        if (!questTemplate)
             continue;
 
         uint32 questId = questTemplate->GetQuestId();
         QuestStatus status = bot->GetQuestStatus(questId);
         if (status == QUEST_STATUS_INCOMPLETE || (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questId)))
         {
-            QuestStatusData const& questStatus = i->second;
+            QuestStatusData const &questStatus = i->second;
             std::string const usage = QueryQuestItem(itemId, questTemplate, &questStatus);
             if (!usage.empty())
                 return usage;
@@ -210,7 +210,7 @@ std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId)
     return "";
 }
 
-std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId, Quest const* questTemplate, QuestStatusData const* questStatus)
+std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId, Quest const *questTemplate, QuestStatusData const *questStatus)
 {
     for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {

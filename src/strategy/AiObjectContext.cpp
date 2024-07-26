@@ -19,14 +19,14 @@
 #include "raids/naxxramas/RaidNaxxActionContext.h"
 #include "raids/naxxramas/RaidNaxxTriggerContext.h"
 
-AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
+AiObjectContext::AiObjectContext(PlayerbotAI *botAI) : PlayerbotAIAware(botAI)
 {
     strategyContexts.Add(new StrategyContext());
     strategyContexts.Add(new MovementStrategyContext());
     strategyContexts.Add(new AssistStrategyContext());
     strategyContexts.Add(new QuestStrategyContext());
     strategyContexts.Add(new RaidStrategyContext());
-    
+
     actionContexts.Add(new ActionContext());
     actionContexts.Add(new ChatActionContext());
     actionContexts.Add(new WorldPacketActionContext());
@@ -67,7 +67,7 @@ std::vector<std::string> AiObjectContext::Save()
     std::set<std::string> names = valueContexts.GetCreated();
     for (std::set<std::string>::iterator i = names.begin(); i != names.end(); ++i)
     {
-        UntypedValue* value = GetUntypedValue(*i);
+        UntypedValue *value = GetUntypedValue(*i);
         if (!value)
             continue;
 
@@ -98,7 +98,7 @@ void AiObjectContext::Load(std::vector<std::string> data)
         std::string const name = parts[0];
         std::string const text = parts[1];
 
-        UntypedValue* value = GetUntypedValue(name);
+        UntypedValue *value = GetUntypedValue(name);
         if (!value)
             continue;
 
@@ -106,7 +106,7 @@ void AiObjectContext::Load(std::vector<std::string> data)
     }
 }
 
-Strategy* AiObjectContext::GetStrategy(std::string const name)
+Strategy *AiObjectContext::GetStrategy(std::string const name)
 {
     return strategyContexts.GetContextObject(name, botAI);
 }
@@ -116,17 +116,17 @@ std::set<std::string> AiObjectContext::GetSiblingStrategy(std::string const name
     return strategyContexts.GetSiblings(name);
 }
 
-Trigger* AiObjectContext::GetTrigger(std::string const name)
+Trigger *AiObjectContext::GetTrigger(std::string const name)
 {
     return triggerContexts.GetContextObject(name, botAI);
 }
 
-Action* AiObjectContext::GetAction(std::string const name)
+Action *AiObjectContext::GetAction(std::string const name)
 {
     return actionContexts.GetContextObject(name, botAI);
 }
 
-UntypedValue* AiObjectContext::GetUntypedValue(std::string const name)
+UntypedValue *AiObjectContext::GetUntypedValue(std::string const name)
 {
     return valueContexts.GetContextObject(name, botAI);
 }
@@ -152,7 +152,7 @@ std::string const AiObjectContext::FormatValues()
     std::set<std::string> names = valueContexts.GetCreated();
     for (std::set<std::string>::iterator i = names.begin(); i != names.end(); ++i, out << "|")
     {
-        UntypedValue* value = GetUntypedValue(*i);
+        UntypedValue *value = GetUntypedValue(*i);
         if (!value)
             continue;
 
@@ -166,7 +166,7 @@ std::string const AiObjectContext::FormatValues()
     return out.str();
 }
 
-void AiObjectContext::AddShared(NamedObjectContext<UntypedValue>* sharedValues)
+void AiObjectContext::AddShared(NamedObjectContext<UntypedValue> *sharedValues)
 {
     valueContexts.Add(sharedValues);
 }

@@ -21,17 +21,17 @@ bool DestroyItemAction::Execute(Event event)
     return true;
 }
 
-void DestroyItemAction::DestroyItem(FindItemVisitor* visitor)
+void DestroyItemAction::DestroyItem(FindItemVisitor *visitor)
 {
     IterateItems(visitor);
     std::vector<Item*> items = visitor->GetResult();
-	for (Item* item : items)
+    for (Item *item : items)
     {
         std::ostringstream out;
         out << chat->FormatItem(item->GetTemplate()) << " destroyed";
         botAI->TellMaster(out);
 
-        bot->DestroyItem(item->GetBagSlot(),item->GetSlot(), true);
+        bot->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
     }
 }
 
@@ -55,7 +55,7 @@ bool SmartDestroyItemAction::Execute(Event event)
         IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
         items.insert(visitor.GetResult().begin(), visitor.GetResult().end());
 
-        for (auto& item : items)
+        for (auto &item : items)
         {
             FindItemByIdVisitor visitor(item->GetTemplate()->ItemId);
             DestroyItem(&visitor);
@@ -68,7 +68,7 @@ bool SmartDestroyItemAction::Execute(Event event)
         return true;
     }
 
-    std::vector<uint32> bestToDestroy = { ITEM_USAGE_NONE }; //First destroy anything useless.
+    std::vector<uint32> bestToDestroy = {ITEM_USAGE_NONE}; // First destroy anything useless.
 
     if (!AI_VALUE(bool, "can sell") && AI_VALUE(bool, "should get money")) // We need money so quest items are less important since they can't directly be sold.
         bestToDestroy.push_back(ITEM_USAGE_QUEST);
@@ -82,12 +82,12 @@ bool SmartDestroyItemAction::Execute(Event event)
     bestToDestroy.push_back(ITEM_USAGE_SKILL); // Items that might help tradeskill are more important than above but still expenable.
     bestToDestroy.push_back(ITEM_USAGE_USE);   // These are more likely to be usefull 'soon' but still expenable.
 
-    for (auto& usage : bestToDestroy)
+    for (auto &usage : bestToDestroy)
     {
         std::vector<Item*> items = AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(usage));
         std::reverse(items.begin(), items.end());
 
-        for (auto& item : items)
+        for (auto &item : items)
         {
             FindItemByIdVisitor visitor(item->GetTemplate()->ItemId);
             DestroyItem(&visitor);

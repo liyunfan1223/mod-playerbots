@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class RogueAiObjectContext : public AiObjectContext
 {
-    public:
-        RogueAiObjectContext(PlayerbotAI* botAI);
+public:
+    RogueAiObjectContext(PlayerbotAI *botAI);
 };
 
 #endif

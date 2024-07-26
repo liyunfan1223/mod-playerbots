@@ -22,14 +22,14 @@ bool UnequipAction::Execute(Event event)
             uint32 slot = chat->parseSlot(*i);
             if (slot != EQUIPMENT_SLOT_END)
             {
-                if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                if (Item *const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
                     UnequipItem(pItem);
             }
         }
     }
     else
     {
-        for (ItemIds::iterator i =ids.begin(); i != ids.end(); i++)
+        for (ItemIds::iterator i = ids.begin(); i != ids.end(); i++)
         {
             FindItemByIdVisitor visitor(*i);
             UnequipItem(&visitor);
@@ -39,15 +39,15 @@ bool UnequipAction::Execute(Event event)
     return true;
 }
 
-void UnequipAction::UnequipItem(FindItemVisitor* visitor)
+void UnequipAction::UnequipItem(FindItemVisitor *visitor)
 {
     IterateItems(visitor, ITERATE_ALL_ITEMS);
     std::vector<Item*> items = visitor->GetResult();
-	if (!items.empty())
+    if (!items.empty())
         UnequipItem(*items.begin());
 }
 
-void UnequipAction::UnequipItem(Item* item)
+void UnequipAction::UnequipItem(Item *item)
 {
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
@@ -61,4 +61,3 @@ void UnequipAction::UnequipItem(Item* item)
     out << chat->FormatItem(item->GetTemplate()) << " unequipped";
     botAI->TellMaster(out);
 }
-

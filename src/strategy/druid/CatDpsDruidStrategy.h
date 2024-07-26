@@ -11,24 +11,24 @@ class PlayerbotAI;
 
 class CatDpsDruidStrategy : public FeralDruidStrategy
 {
-    public:
-        CatDpsDruidStrategy(PlayerbotAI* botAI);
+public:
+    CatDpsDruidStrategy(PlayerbotAI *botAI);
 
-    public:
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cat"; }
-        NextAction** getDefaultActions() override;
-        uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_MELEE; }
+public:
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "cat"; }
+    NextAction **getDefaultActions() override;
+    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_MELEE; }
 };
 
 class CatAoeDruidStrategy : public CombatStrategy
 {
-    public:
-        CatAoeDruidStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) { }
+public:
+    CatAoeDruidStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI) {}
 
-    public:
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cat aoe"; }
+public:
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "cat aoe"; }
 };
 
 #endif

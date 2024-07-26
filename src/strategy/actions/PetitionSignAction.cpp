@@ -23,7 +23,7 @@ bool PetitionSignAction::Execute(Event event)
         return false;
     }
 
-    Field* fields = result->Fetch();
+    Field *fields = result->Fetch();
     uint32 type = fields[0].Get<uint32>();
 
     bool accept = true;
@@ -63,7 +63,7 @@ bool PetitionSignAction::Execute(Event event)
         */
     }
 
-    Player* _inviter = ObjectAccessor::FindPlayer(inviter);
+    Player *_inviter = ObjectAccessor::FindPlayer(inviter);
     if (!_inviter)
         return false;
 

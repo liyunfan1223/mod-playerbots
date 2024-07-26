@@ -22,17 +22,17 @@ bool XpGainAction::Execute(Event event)
     float groupBonus = 0;
 
     p.rpos(0);
-    p >> guid;      // 8 victim
-    p >> xpgain;    // 1 given experience
-    p >> type;      //1 00-kill_xp type, 01-non_kill_xp type
+    p >> guid;   // 8 victim
+    p >> xpgain; // 1 given experience
+    p >> type;   // 1 00-kill_xp type, 01-non_kill_xp type
 
     if (!type)
     {
-        p >> givenXp;      // 4 experience without rested bonus
-        p >> groupBonus;   // 8 group bonus
+        p >> givenXp;    // 4 experience without rested bonus
+        p >> groupBonus; // 8 group bonus
     }
 
-    Unit* victim = nullptr;
+    Unit *victim = nullptr;
     if (guid)
         victim = botAI->GetUnit(guid);
 
@@ -42,7 +42,7 @@ bool XpGainAction::Execute(Event event)
     return true;
 }
 
-void XpGainAction::GiveXP(uint32 xp, Unit* victim)
+void XpGainAction::GiveXP(uint32 xp, Unit *victim)
 {
     if (xp < 1)
     {
@@ -65,7 +65,7 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
     // XP resting bonus for kill
     uint32 rested_bonus_xp = victim ? bot->GetXPRestBonus(xp) : 0;
 
-    //SendLogXPGain(xp, victim, rested_bonus_xp);
+    // SendLogXPGain(xp, victim, rested_bonus_xp);
 
     uint32 curXP = bot->GetUInt32Value(PLAYER_XP);
     uint32 nextLvlXP = bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);

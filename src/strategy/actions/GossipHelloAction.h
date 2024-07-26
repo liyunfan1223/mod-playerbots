@@ -11,15 +11,15 @@ class PlayerbotAI;
 
 class GossipHelloAction : public Action
 {
-    public:
-        GossipHelloAction(PlayerbotAI* botAI) : Action(botAI, "gossip hello") { }
+public:
+    GossipHelloAction(PlayerbotAI *botAI) : Action(botAI, "gossip hello") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        void TellGossipMenus();
-        bool ProcessGossip(int32 menuToSelect);
-        void TellGossipText(uint32 textId);
+private:
+    void TellGossipMenus();
+    bool ProcessGossip(int32 menuToSelect);
+    void TellGossipText(uint32 textId);
 };
 
 #endif

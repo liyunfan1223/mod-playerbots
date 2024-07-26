@@ -5,7 +5,7 @@
 #include "SelfTargetValue.h"
 #include "Playerbots.h"
 
-Unit* SelfTargetValue::Calculate()
+Unit *SelfTargetValue::Calculate()
 {
     return botAI->GetBot();
 }

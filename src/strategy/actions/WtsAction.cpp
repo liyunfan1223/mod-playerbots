@@ -11,7 +11,7 @@
 
 bool WtsAction::Execute(Event event)
 {
-    Player* owner = event.getOwner();
+    Player *owner = event.getOwner();
     if (!owner)
         return false;
 
@@ -30,7 +30,7 @@ bool WtsAction::Execute(Event event)
     for (ItemIds::iterator i = itemIds.begin(); i != itemIds.end(); i++)
     {
         uint32 itemId = *i;
-        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+        ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
 

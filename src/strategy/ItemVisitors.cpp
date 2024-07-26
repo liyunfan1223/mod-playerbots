@@ -5,7 +5,7 @@
 #include "ItemVisitors.h"
 #include "Playerbots.h"
 
-bool FindUsableItemVisitor::Visit(Item* item)
+bool FindUsableItemVisitor::Visit(Item *item)
 {
     if (bot->CanUseItem(item->GetTemplate()) == EQUIP_ERR_OK)
         return FindItemVisitor::Visit(item);
@@ -13,13 +13,13 @@ bool FindUsableItemVisitor::Visit(Item* item)
     return true;
 }
 
-bool FindPotionVisitor::Accept(ItemTemplate const* proto)
+bool FindPotionVisitor::Accept(ItemTemplate const *proto)
 {
     if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_POTION || proto->SubClass == ITEM_SUBCLASS_FLASK))
     {
         for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
             if (!spellInfo)
                 return false;
 
@@ -34,11 +34,11 @@ bool FindPotionVisitor::Accept(ItemTemplate const* proto)
     return false;
 }
 
-bool FindMountVisitor::Accept(ItemTemplate const* proto)
+bool FindMountVisitor::Accept(ItemTemplate const *proto)
 {
     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
         if (!spellInfo)
             return false;
 
@@ -52,13 +52,13 @@ bool FindMountVisitor::Accept(ItemTemplate const* proto)
     return false;
 }
 
-bool FindPetVisitor::Accept(ItemTemplate const* proto)
+bool FindPetVisitor::Accept(ItemTemplate const *proto)
 {
     if (proto->Class == ITEM_CLASS_MISC)
     {
         for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
             if (!spellInfo)
                 return false;
 
@@ -73,12 +73,12 @@ bool FindPetVisitor::Accept(ItemTemplate const* proto)
     return false;
 }
 
-FindItemUsageVisitor::FindItemUsageVisitor(Player* bot, ItemUsage usage) : FindUsableItemVisitor(bot), usage(usage)
+FindItemUsageVisitor::FindItemUsageVisitor(Player *bot, ItemUsage usage) : FindUsableItemVisitor(bot), usage(usage)
 {
     context = GET_PLAYERBOT_AI(bot)->GetAiObjectContext();
 };
 
-bool FindItemUsageVisitor::Accept(ItemTemplate const* proto)
+bool FindItemUsageVisitor::Accept(ItemTemplate const *proto)
 {
     if (AI_VALUE2(ItemUsage, "item usage", proto->ItemId) == usage)
         return true;
@@ -86,7 +86,7 @@ bool FindItemUsageVisitor::Accept(ItemTemplate const* proto)
     return false;
 }
 
-bool FindUsableNamedItemVisitor::Accept(ItemTemplate const* proto)
+bool FindUsableNamedItemVisitor::Accept(ItemTemplate const *proto)
 {
     return proto && !proto->Name1.empty() && strstri(proto->Name1.c_str(), name.c_str());
 }

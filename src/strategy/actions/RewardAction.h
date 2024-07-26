@@ -12,13 +12,13 @@ class Object;
 
 class RewardAction : public InventoryAction
 {
-    public:
-        RewardAction(PlayerbotAI* botAI) : InventoryAction(botAI, "reward") { }
+public:
+    RewardAction(PlayerbotAI *botAI) : InventoryAction(botAI, "reward") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        bool Reward(uint32 itemId, Object* pNpc);
+private:
+    bool Reward(uint32 itemId, Object *pNpc);
 };
 
 #endif

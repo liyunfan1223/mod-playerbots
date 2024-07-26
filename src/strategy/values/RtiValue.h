@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class RtiValue : public ManualSetValue<std::string>
 {
-	public:
-        RtiValue(PlayerbotAI* botAI);
+public:
+        RtiValue(PlayerbotAI *botAI);
 
         std::string const Save() override;
         bool Load(std::string const text) override;
@@ -20,8 +20,8 @@ class RtiValue : public ManualSetValue<std::string>
 
 class RtiCcValue : public ManualSetValue<std::string>
 {
-	public:
-        RtiCcValue(PlayerbotAI* botAI);
+public:
+        RtiCcValue(PlayerbotAI *botAI);
 
         std::string const Save() override;
         bool Load(std::string const text) override;

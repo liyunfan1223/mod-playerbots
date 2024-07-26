@@ -10,8 +10,8 @@ LastMovement::LastMovement()
     clear();
 }
 
-LastMovement::LastMovement(LastMovement& other) : taxiNodes(other.taxiNodes), taxiMaster(other.taxiMaster), lastFollow(other.lastFollow), lastAreaTrigger(other.lastAreaTrigger),
-lastMoveToX(other.lastMoveToX), lastMoveToY(other.lastMoveToY), lastMoveToZ(other.lastMoveToZ), lastMoveToOri(other.lastMoveToOri), lastFlee(other.lastFlee)
+LastMovement::LastMovement(LastMovement &other) : taxiNodes(other.taxiNodes), taxiMaster(other.taxiMaster), lastFollow(other.lastFollow), lastAreaTrigger(other.lastAreaTrigger),
+                                                  lastMoveToX(other.lastMoveToX), lastMoveToY(other.lastMoveToY), lastMoveToZ(other.lastMoveToZ), lastMoveToOri(other.lastMoveToOri), lastFlee(other.lastFlee)
 {
     lastMoveShort = other.lastMoveShort;
     nextTeleport = other.nextTeleport;
@@ -33,7 +33,7 @@ void LastMovement::clear()
     nextTeleport = 0;
 }
 
-void LastMovement::Set(Unit* follow)
+void LastMovement::Set(Unit *follow)
 {
     Set(0, 0.0f, 0.0f, 0.0f, 0.0f);
     setShort(WorldPosition());
@@ -54,7 +54,8 @@ void LastMovement::Set(uint32 mapId, float x, float y, float z, float ori)
 
 void LastMovement::setShort(WorldPosition point)
 {
-    lastMoveShort = point; lastFollow = nullptr;
+    lastMoveShort = point;
+    lastFollow = nullptr;
 }
 
 void LastMovement::setPath(TravelPath path)

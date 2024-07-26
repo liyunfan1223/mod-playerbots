@@ -14,12 +14,11 @@ class Unit;
 
 class PartyMemberWithoutAuraValue : public PartyMemberValue, public Qualified
 {
-	public:
-        PartyMemberWithoutAuraValue(PlayerbotAI* botAI, std::string const name = "party member without aura", float range = sPlayerbotAIConfig->sightDistance) :
-            PartyMemberValue(botAI, name) { }
+public:
+        PartyMemberWithoutAuraValue(PlayerbotAI *botAI, std::string const name = "party member without aura", float range = sPlayerbotAIConfig->sightDistance) : PartyMemberValue(botAI, name) {}
 
-    protected:
-        Unit* Calculate() override;
+protected:
+        Unit *Calculate() override;
 };
 
 #endif

@@ -12,30 +12,30 @@ class PlayerbotAI;
 
 class GenericWarlockStrategy : public RangedCombatStrategy
 {
-    public:
-        GenericWarlockStrategy(PlayerbotAI* botAI);
+public:
+    GenericWarlockStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "warlock"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        NextAction** getDefaultActions() override;
+    std::string const getName() override { return "warlock"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    NextAction **getDefaultActions() override;
 };
 
 class WarlockBoostStrategy : public Strategy
 {
-    public:
-        WarlockBoostStrategy(PlayerbotAI* botAI) : Strategy(botAI) { };
+public:
+    WarlockBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
-        std::string const getName() override { return "boost"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "boost"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class WarlockCcStrategy : public Strategy
 {
-    public:
-        WarlockCcStrategy(PlayerbotAI* botAI) : Strategy(botAI) { };
+public:
+    WarlockCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
-        std::string const getName() override { return "cc"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "cc"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 #endif

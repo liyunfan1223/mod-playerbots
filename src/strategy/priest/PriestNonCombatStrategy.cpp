@@ -6,12 +6,12 @@
 #include "PriestNonCombatStrategyActionNodeFactory.h"
 #include "Playerbots.h"
 
-PriestNonCombatStrategy::PriestNonCombatStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI)
+PriestNonCombatStrategy::PriestNonCombatStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI)
 {
     actionNodeFactories.Add(new PriestNonCombatStrategyActionNodeFactory());
 }
 
-void PriestNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PriestNonCombatStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
 
@@ -24,43 +24,43 @@ void PriestNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("party member medium health", NextAction::array(0, new NextAction("renew on party", 40.0f), nullptr)));
     // triggers.push_back(new TriggerNode("medium aoe heal", NextAction::array(0, new NextAction("lightwell", 42.f), nullptr)));
     triggers.push_back(new TriggerNode("party member dead", NextAction::array(0, new NextAction("remove shadowform", ACTION_CRITICAL_HEAL + 11), new NextAction("resurrection", ACTION_CRITICAL_HEAL + 10), nullptr)));
-    //triggers.push_back(new TriggerNode("swimming", NextAction::array(0, new NextAction("levitate", 1.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("swimming", NextAction::array(0, new NextAction("levitate", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode(
         "party member critical health",
-		NextAction::array(0,
-            new NextAction("renew on party", ACTION_CRITICAL_HEAL + 3),
-            new NextAction("penance on party", ACTION_CRITICAL_HEAL + 2), 
-            new NextAction("greater heal on party", ACTION_CRITICAL_HEAL + 1),
-            NULL)));
+        NextAction::array(0,
+                          new NextAction("renew on party", ACTION_CRITICAL_HEAL + 3),
+                          new NextAction("penance on party", ACTION_CRITICAL_HEAL + 2),
+                          new NextAction("greater heal on party", ACTION_CRITICAL_HEAL + 1),
+                          NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member low health",
-		NextAction::array(0,
-            new NextAction("renew on party", ACTION_MEDIUM_HEAL + 3),
-            new NextAction("penance on party", ACTION_MEDIUM_HEAL + 2), 
-            new NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 1),
-            NULL)));
+        NextAction::array(0,
+                          new NextAction("renew on party", ACTION_MEDIUM_HEAL + 3),
+                          new NextAction("penance on party", ACTION_MEDIUM_HEAL + 2),
+                          new NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 1),
+                          NULL)));
 
-	triggers.push_back(new TriggerNode(
+    triggers.push_back(new TriggerNode(
         "party member medium health",
-		NextAction::array(0,
-            new NextAction("renew on party", ACTION_LIGHT_HEAL + 9),
-            new NextAction("penance on party", ACTION_LIGHT_HEAL + 8),
-            NULL)));
-    
+        NextAction::array(0,
+                          new NextAction("renew on party", ACTION_LIGHT_HEAL + 9),
+                          new NextAction("penance on party", ACTION_LIGHT_HEAL + 8),
+                          NULL)));
+
     triggers.push_back(new TriggerNode(
         "party member almost full health",
-		NextAction::array(0, 
-            new NextAction("renew on party", ACTION_LIGHT_HEAL + 3),
-            NULL)));
+        NextAction::array(0,
+                          new NextAction("renew on party", ACTION_LIGHT_HEAL + 3),
+                          NULL)));
 
     triggers.push_back(new TriggerNode(
         "medium aoe heal",
         NextAction::array(0, new NextAction("circle of healing", 27.0f), NULL)));
 }
 
-void PriestBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PriestBuffStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
 
@@ -73,7 +73,7 @@ void PriestBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("shadowguard", NextAction::array(0, new NextAction("shadowguard", 10.0f), nullptr)));
 }
 
-void PriestShadowResistanceStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PriestShadowResistanceStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
 

@@ -11,22 +11,22 @@ class PlayerbotAI;
 
 class PassLeadershipToMasterAction : public Action
 {
-    public:
-        PassLeadershipToMasterAction(PlayerbotAI* botAI, std::string const name = "leader", std::string const message = "Passing leader to you!") : Action(botAI, name), message(message) { }
+public:
+    PassLeadershipToMasterAction(PlayerbotAI *botAI, std::string const name = "leader", std::string const message = "Passing leader to you!") : Action(botAI, name), message(message) {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 
-    protected:
-        std::string const message;
+protected:
+    std::string const message;
 };
 
 class GiveLeaderAction : public PassLeadershipToMasterAction
 {
-    public:
-        GiveLeaderAction(PlayerbotAI* botAI, std::string const message = "Lead the way!") : PassLeadershipToMasterAction(botAI, "give leader", message) { }
+public:
+    GiveLeaderAction(PlayerbotAI *botAI, std::string const message = "Lead the way!") : PassLeadershipToMasterAction(botAI, "give leader", message) {}
 
-        bool isUseful() override;
+    bool isUseful() override;
 };
 
 #endif

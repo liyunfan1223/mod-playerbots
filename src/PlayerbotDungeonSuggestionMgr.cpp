@@ -25,7 +25,7 @@ void PlayerbotDungeonSuggestionMgr::LoadDungeonSuggestions()
     {
         do
         {
-            Field* fields = result->Fetch();
+            Field *fields = result->Fetch();
             std::string const name = fields[0].Get<std::string>();
             uint8 const difficulty = fields[1].Get<uint8>();
             uint8 const min_level = fields[2].Get<uint8>();
@@ -34,21 +34,19 @@ void PlayerbotDungeonSuggestionMgr::LoadDungeonSuggestions()
             std::string const strategy = fields[5].Get<std::string>();
 
             DungeonSuggestion const row =
-            {
-                name,
-                static_cast<Difficulty>(difficulty),
-                min_level,
-                max_level,
-                abbrevation,
-                strategy
-            };
+                {
+                    name,
+                    static_cast<Difficulty>(difficulty),
+                    min_level,
+                    max_level,
+                    abbrevation,
+                    strategy};
 
             m_dungeonSuggestions.push_back(row);
             ++count;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     LOG_INFO("server.loading", "{} playerbots dungeon suggestions loaded in {} ms",
-        count, GetMSTimeDiffToNow(oldMSTime));
+             count, GetMSTimeDiffToNow(oldMSTime));
 }

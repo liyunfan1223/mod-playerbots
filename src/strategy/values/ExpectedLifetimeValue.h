@@ -16,22 +16,20 @@ class Unit;
 // [target health] / [expected group single target dps] = [expected lifetime]
 class ExpectedLifetimeValue : public FloatCalculatedValue, public Qualified
 {
-    public:
-        ExpectedLifetimeValue(PlayerbotAI* botAI) :
-            FloatCalculatedValue(botAI, "expected lifetime") { }
+public:
+    ExpectedLifetimeValue(PlayerbotAI *botAI) : FloatCalculatedValue(botAI, "expected lifetime") {}
 
-    public:
-        float Calculate() override;
+public:
+    float Calculate() override;
 };
 
 class ExpectedGroupDpsValue : public FloatCalculatedValue
 {
-    public:
-        ExpectedGroupDpsValue(PlayerbotAI* botAI) :
-            FloatCalculatedValue(botAI, "expected group dps", 20 * 1000) { }
+public:
+    ExpectedGroupDpsValue(PlayerbotAI *botAI) : FloatCalculatedValue(botAI, "expected group dps", 20 * 1000) {}
 
-    public:
-        float Calculate() override;
+public:
+    float Calculate() override;
 };
 
 #endif

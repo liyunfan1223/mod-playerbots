@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class GenericDKStrategy : public MeleeCombatStrategy
 {
-    public:
-        GenericDKStrategy(PlayerbotAI* botAI);
+public:
+    GenericDKStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "DK"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "DK"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 #endif

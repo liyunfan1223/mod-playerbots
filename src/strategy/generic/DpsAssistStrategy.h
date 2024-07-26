@@ -11,22 +11,22 @@ class PlayerbotAI;
 
 class DpsAssistStrategy : public NonCombatStrategy
 {
-    public:
-        DpsAssistStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    DpsAssistStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-        std::string const getName() override { return "dps assist"; }
-		// uint32 GetType() const override { return STRATEGY_TYPE_DPS; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "dps assist"; }
+    // uint32 GetType() const override { return STRATEGY_TYPE_DPS; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class DpsAoeStrategy : public NonCombatStrategy
 {
-    public:
-        DpsAoeStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    DpsAoeStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-        std::string const getName() override { return "dps aoe"; }
-		uint32 GetType() const override { return STRATEGY_TYPE_DPS; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "dps aoe"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_DPS; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 #endif

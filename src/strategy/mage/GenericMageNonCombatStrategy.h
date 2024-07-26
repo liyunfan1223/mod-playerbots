@@ -11,38 +11,38 @@ class PlayerbotAI;
 
 class GenericMageNonCombatStrategy : public NonCombatStrategy
 {
-    public:
-        GenericMageNonCombatStrategy(PlayerbotAI* botAI);
+public:
+    GenericMageNonCombatStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "nc"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "nc"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class MageBuffManaStrategy : public Strategy
 {
-    public:
-        MageBuffManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    MageBuffManaStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "bmana"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "bmana"; }
 };
 
 class MageBuffDpsStrategy : public Strategy
 {
-    public:
-        MageBuffDpsStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    MageBuffDpsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "bdps"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "bdps"; }
 };
 
 class MageBuffStrategy : public Strategy
 {
-    public:
-        MageBuffStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    MageBuffStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "buff"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "buff"; }
 };
 
 #endif

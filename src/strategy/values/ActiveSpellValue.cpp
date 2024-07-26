@@ -7,10 +7,10 @@
 
 uint32 ActiveSpellValue::Calculate()
 {
-    Player* bot = botAI->GetBot();
+    Player *bot = botAI->GetBot();
     for (uint8 type = CURRENT_MELEE_SPELL; type <= CURRENT_CHANNELED_SPELL; ++type)
     {
-        if (Spell* spell = bot->GetCurrentSpell((CurrentSpellTypes)type))
+        if (Spell *spell = bot->GetCurrentSpell((CurrentSpellTypes)type))
         {
             if (spell->m_spellInfo)
             {
@@ -21,4 +21,3 @@ uint32 ActiveSpellValue::Calculate()
 
     return 0;
 }
-

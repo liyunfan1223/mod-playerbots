@@ -12,11 +12,11 @@
 #include "ServerFacade.h"
 
 std::vector<std::string> split(std::string const s, char delim);
-char* strstri(char const* haystack, char const* needle);
+char *strstri(char const *haystack, char const *needle);
 
 bool GoAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -39,9 +39,9 @@ bool GoAction::Execute(Event event)
 
         std::string const destination = param.substr(7);
 
-        TravelTarget* target = context->GetValue<TravelTarget*>("travel target")->Get();
+        TravelTarget *target = context->GetValue<TravelTarget*>("travel target")->Get();
 
-        if (TravelDestination* dest = ChooseTravelTargetAction::FindDestination(bot, destination))
+        if (TravelDestination *dest = ChooseTravelTargetAction::FindDestination(bot, destination))
         {
             std::vector<WorldPosition*> points = dest->nextPoint(const_cast<WorldPosition*>(&botPos), true);
             if (points.empty())
@@ -70,7 +70,7 @@ bool GoAction::Execute(Event event)
     {
         for (ObjectGuid const guid : gos)
         {
-            if (GameObject* go = botAI->GetGameObject(guid))
+            if (GameObject *go = botAI->GetGameObject(guid))
                 if (go->isSpawned())
                 {
                     if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, go), sPlayerbotAIConfig->reactDistance))
@@ -95,7 +95,7 @@ bool GoAction::Execute(Event event)
     units.insert(units.end(), players.begin(), players.end());
     for (ObjectGuid const guid : units)
     {
-        if (Unit* unit = botAI->GetUnit(guid))
+        if (Unit *unit = botAI->GetUnit(guid))
             if (strstri(unit->GetName().c_str(), param.c_str()))
             {
                 std::ostringstream out;
@@ -125,7 +125,7 @@ bool GoAction::Execute(Event event)
             Movement::Vector3 end = path.GetEndPosition();
             Movement::Vector3 aend = path.GetActualEndPosition();
 
-            Movement::PointsArray const& points = path.GetPath();
+            Movement::PointsArray const &points = path.GetPath();
             PathType type = path.GetPathType();
 
             std::ostringstream out;
@@ -143,7 +143,6 @@ bool GoAction::Execute(Event event)
             out << " with offset ";
 
             out << (end - aend).length();
-
 
             for (auto i : points)
             {
@@ -168,7 +167,7 @@ bool GoAction::Execute(Event event)
         float y = atof(coords[1].c_str());
         Zone2MapCoordinates(x, y, bot->GetZoneId());
 
-        Map* map = bot->GetMap();
+        Map *map = bot->GetMap();
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
 
@@ -201,7 +200,7 @@ bool GoAction::Execute(Event event)
         return MoveNear(bot->GetMapId(), x, y, z + 0.5f, sPlayerbotAIConfig->followDistance);
     }
 
-    PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()[param];
+    PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()[param];
     if (pos.isSet())
     {
         if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, pos.x, pos.y), sPlayerbotAIConfig->reactDistance))

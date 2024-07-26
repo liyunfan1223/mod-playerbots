@@ -14,9 +14,9 @@ bool LootStrategyAction::Execute(Event event)
 {
     std::string const strategy = event.getParam();
 
-    LootObjectStack* lootItems = AI_VALUE(LootObjectStack*, "available loot");
-    std::set<uint32>& alwaysLootItems = AI_VALUE(std::set<uint32>&, "always loot list");
-    Value<LootStrategy*>* lootStrategy = context->GetValue<LootStrategy*>("loot strategy");
+    LootObjectStack *lootItems = AI_VALUE(LootObjectStack *, "available loot");
+    std::set<uint32> &alwaysLootItems = AI_VALUE(std::set<uint32> &, "always loot list");
+    Value<LootStrategy*> *lootStrategy = context->GetValue<LootStrategy*>("loot strategy");
 
     if (strategy == "?")
     {
@@ -33,7 +33,7 @@ bool LootStrategyAction::Execute(Event event)
 
             for (uint32 itemId : alwaysLootItems)
             {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
                 if (!proto)
                     continue;
 
@@ -63,7 +63,7 @@ bool LootStrategyAction::Execute(Event event)
         {
             if (query)
             {
-                if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid))
+                if (ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemid))
                 {
                     std::ostringstream out;
                     out << (StoreLootAction::IsLootAllowed(itemid, botAI) ? "|cFF000000Will loot " : "|c00FF0000Won't loot ") << ChatHelper::FormatItem(proto);
@@ -88,4 +88,3 @@ bool LootStrategyAction::Execute(Event event)
 
     return true;
 }
-

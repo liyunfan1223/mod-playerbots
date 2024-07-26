@@ -14,23 +14,23 @@ class PlayerbotAI;
 
 class ChatFilter : public PlayerbotAIAware
 {
-    public:
-        ChatFilter(PlayerbotAI* botAI) : PlayerbotAIAware(botAI) { }
-        virtual ~ChatFilter() { }
+public:
+    ChatFilter(PlayerbotAI *botAI) : PlayerbotAIAware(botAI) {}
+    virtual ~ChatFilter() {}
 
-        virtual std::string const Filter(std::string& message);
+    virtual std::string const Filter(std::string &message);
 };
 
 class CompositeChatFilter : public ChatFilter
 {
-    public:
-        CompositeChatFilter(PlayerbotAI* botAI);
+public:
+    CompositeChatFilter(PlayerbotAI *botAI);
 
-        virtual ~CompositeChatFilter();
-        std::string const Filter(std::string& message) override;
+    virtual ~CompositeChatFilter();
+    std::string const Filter(std::string &message) override;
 
-    private:
-        std::vector<ChatFilter*> filters;
+private:
+    std::vector<ChatFilter *> filters;
 };
 
 #endif

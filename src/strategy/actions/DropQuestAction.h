@@ -13,22 +13,21 @@ class Quest;
 
 class DropQuestAction : public Action
 {
-    public:
-        DropQuestAction(PlayerbotAI* botAI) : Action(botAI, "drop quest") { }
+public:
+    DropQuestAction(PlayerbotAI *botAI) : Action(botAI, "drop quest") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class CleanQuestLogAction : public Action
 {
-    public:
-        CleanQuestLogAction(PlayerbotAI* botAI) : Action(botAI, "clean quest log") { }
+public:
+    CleanQuestLogAction(PlayerbotAI *botAI) : Action(botAI, "clean quest log") {}
 
-        bool Execute(Event event) override;
-        void DropQuestType(uint8& numQuest, uint8 wantNum = 100, bool isGreen = false, bool hasProgress = false, bool isComplete = false);
+    bool Execute(Event event) override;
+    void DropQuestType(uint8 &numQuest, uint8 wantNum = 100, bool isGreen = false, bool hasProgress = false, bool isComplete = false);
 
-        static bool HasProgress(Player* bot, Quest const* quest);
+    static bool HasProgress(Player *bot, Quest const *quest);
 };
-
 
 #endif

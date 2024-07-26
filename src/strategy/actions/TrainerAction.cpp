@@ -8,7 +8,7 @@
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 
-void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, std::ostringstream& msg)
+void TrainerAction::Learn(uint32 cost, TrainerSpell const *tSpell, std::ostringstream &msg)
 {
     if (sPlayerbotAIConfig->autoTrainSpells != "free" && !botAI->HasCheat(BotCheatMask::gold))
     {
@@ -21,7 +21,7 @@ void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, std::ostrings
         bot->ModifyMoney(-int32(cost));
     }
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tSpell->spell);
+    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(tSpell->spell);
     if (!spellInfo)
         return;
 
@@ -42,17 +42,17 @@ void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, std::ostrings
     msg << " - learned";
 }
 
-void TrainerAction::Iterate(Creature* creature, TrainerSpellAction action, SpellIds& spells)
+void TrainerAction::Iterate(Creature *creature, TrainerSpellAction action, SpellIds &spells)
 {
     TellHeader(creature);
 
-    TrainerSpellData const* trainer_spells = creature->GetTrainerSpells();
-    float fDiscountMod =  bot->GetReputationPriceDiscount(creature);
+    TrainerSpellData const *trainer_spells = creature->GetTrainerSpells();
+    float fDiscountMod = bot->GetReputationPriceDiscount(creature);
     uint32 totalCost = 0;
 
-    for (TrainerSpellMap::const_iterator itr =  trainer_spells->spellList.begin(); itr !=  trainer_spells->spellList.end(); ++itr)
+    for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
     {
-        TrainerSpell const* tSpell = &itr->second;
+        TrainerSpell const *tSpell = &itr->second;
         if (!tSpell)
             continue;
 
@@ -61,14 +61,14 @@ void TrainerAction::Iterate(Creature* creature, TrainerSpellAction action, Spell
             continue;
 
         uint32 spellId = tSpell->spell;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
             continue;
 
         if (!spells.empty() && spells.find(tSpell->spell) == spells.end())
             continue;
 
-        uint32 cost = uint32(floor(tSpell->spellCost *  fDiscountMod));
+        uint32 cost = uint32(floor(tSpell->spellCost * fDiscountMod));
         totalCost += cost;
 
         std::ostringstream out;
@@ -87,11 +87,12 @@ bool TrainerAction::Execute(Event event)
 {
     std::string const text = event.getParam();
 
-    Player* master = GetMaster();
+    Player *master = GetMaster();
 
-    Creature* creature = botAI->GetCreature(bot->GetTarget());
+    Creature *creature = botAI->GetCreature(bot->GetTarget());
 
-    if (master) {
+    if (master)
+    {
         creature = master->GetSelectedUnit() ? master->GetSelectedUnit()->ToCreature() : nullptr;
     }
     // if (AI_VALUE(GuidPosition, "rpg target") != bot->GetTarget())
@@ -110,7 +111,7 @@ bool TrainerAction::Execute(Event event)
     }
 
     // check present spell in trainer spell list
-    TrainerSpellData const* cSpells = creature->GetTrainerSpells();
+    TrainerSpellData const *cSpells = creature->GetTrainerSpells();
     if (!cSpells)
     {
         botAI->TellError("No spells can be learned from this trainer");
@@ -122,8 +123,7 @@ bool TrainerAction::Execute(Event event)
     if (spell)
         spells.insert(spell);
 
-    if (text.find("learn") != std::string::npos || sRandomPlayerbotMgr->IsRandomBot(bot) || (sPlayerbotAIConfig->autoTrainSpells != "no" &&
-        (creature->GetCreatureTemplate()->trainer_type != TRAINER_TYPE_TRADESKILLS || !botAI->HasActivePlayerMaster()))) //Todo rewrite to only exclude start primary profession skills and make config dependent.
+    if (text.find("learn") != std::string::npos || sRandomPlayerbotMgr->IsRandomBot(bot) || (sPlayerbotAIConfig->autoTrainSpells != "no" && (creature->GetCreatureTemplate()->trainer_type != TRAINER_TYPE_TRADESKILLS || !botAI->HasActivePlayerMaster()))) // Todo rewrite to only exclude start primary profession skills and make config dependent.
         Iterate(creature, &TrainerAction::Learn, spells);
     else
         Iterate(creature, nullptr, spells);
@@ -131,7 +131,7 @@ bool TrainerAction::Execute(Event event)
     return true;
 }
 
-void TrainerAction::TellHeader(Creature* creature)
+void TrainerAction::TellHeader(Creature *creature)
 {
     std::ostringstream out;
     out << "--- Can learn from " << creature->GetName() << " ---";
@@ -150,7 +150,8 @@ void TrainerAction::TellFooter(uint32 totalCost)
 
 bool MaintenanceAction::Execute(Event event)
 {
-    if (!sPlayerbotAIConfig->maintenanceCommand) {
+    if (!sPlayerbotAIConfig->maintenanceCommand)
+    {
         botAI->TellError("maintenance command is not allowed, please check the configuration.");
         return false;
     }
@@ -168,7 +169,8 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitSkills();
     factory.InitMounts();
     factory.InitGlyphs(true);
-    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
+    {
         factory.ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);
@@ -188,20 +190,21 @@ bool RemoveGlyphAction::Execute(Event event)
 
 bool AutoGearAction::Execute(Event event)
 {
-    if (!sPlayerbotAIConfig->autoGearCommand) {
+    if (!sPlayerbotAIConfig->autoGearCommand)
+    {
         botAI->TellError("autogear command is not allowed, please check the configuration.");
         return false;
     }
     botAI->TellMaster("I'm auto gearing");
-    uint32 gs = sPlayerbotAIConfig->autoGearScoreLimit == 0 ? 0 :
-        PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->autoGearScoreLimit, sPlayerbotAIConfig->autoGearQualityLimit);
+    uint32 gs = sPlayerbotAIConfig->autoGearScoreLimit == 0 ? 0 : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->autoGearScoreLimit, sPlayerbotAIConfig->autoGearQualityLimit);
     PlayerbotFactory factory(bot,
-        bot->GetLevel(),
-        sPlayerbotAIConfig->autoGearQualityLimit,
-        gs);
+                             bot->GetLevel(),
+                             sPlayerbotAIConfig->autoGearQualityLimit,
+                             gs);
     factory.InitEquipment(true);
     factory.InitAmmo();
-    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) {
+    if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
+    {
         factory.ApplyEnchantAndGemsNew();
     }
     bot->DurabilityRepairAll(false, 1.0f, false);

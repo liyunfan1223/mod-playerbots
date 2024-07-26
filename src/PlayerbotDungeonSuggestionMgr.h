@@ -23,20 +23,20 @@ struct DungeonSuggestion
 
 class PlayerbotDungeonSuggestionMgr
 {
-    public:
-        PlayerbotDungeonSuggestionMgr() { };
-         ~PlayerbotDungeonSuggestionMgr() { };
-        static PlayerbotDungeonSuggestionMgr* instance()
-        {
-            static PlayerbotDungeonSuggestionMgr instance;
-            return &instance;
-        }
+public:
+    PlayerbotDungeonSuggestionMgr() {};
+    ~PlayerbotDungeonSuggestionMgr() {};
+    static PlayerbotDungeonSuggestionMgr *instance()
+    {
+        static PlayerbotDungeonSuggestionMgr instance;
+        return &instance;
+    }
 
-        void LoadDungeonSuggestions();
-        std::vector<DungeonSuggestion> const GetDungeonSuggestions();
+    void LoadDungeonSuggestions();
+    std::vector<DungeonSuggestion> const GetDungeonSuggestions();
 
-    private:
-        std::vector<DungeonSuggestion> m_dungeonSuggestions;
+private:
+    std::vector<DungeonSuggestion> m_dungeonSuggestions;
 };
 
 #define sPlayerbotDungeonSuggestionMgr PlayerbotDungeonSuggestionMgr::instance()

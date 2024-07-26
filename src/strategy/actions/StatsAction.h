@@ -11,18 +11,18 @@ class PlayerbotAI;
 
 class StatsAction : public Action
 {
-    public:
-        StatsAction(PlayerbotAI* botAI) : Action(botAI, "stats") { }
+public:
+    StatsAction(PlayerbotAI *botAI) : Action(botAI, "stats") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        void ListBagSlots(std::ostringstream &out);
-        void ListXP(std::ostringstream &out);
-        void ListRepairCost(std::ostringstream &out);
-        void ListGold(std::ostringstream &out);
-        uint32 EstRepair(uint16 pos);
-        double RepairPercent(uint16 pos);
+private:
+    void ListBagSlots(std::ostringstream &out);
+    void ListXP(std::ostringstream &out);
+    void ListRepairCost(std::ostringstream &out);
+    void ListGold(std::ostringstream &out);
+    uint32 EstRepair(uint16 pos);
+    double RepairPercent(uint16 pos);
 };
 
 #endif

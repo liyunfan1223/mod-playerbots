@@ -10,17 +10,17 @@
 #include "ScriptedCreature.h"
 #include "ThreatMgr.h"
 
-Unit* FindTargetStrategy::GetResult()
+Unit *FindTargetStrategy::GetResult()
 {
     return result;
 }
 
-Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
+Unit *TargetValue::FindTarget(FindTargetStrategy *strategy)
 {
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
     for (ObjectGuid const guid : attackers)
     {
-        Unit* unit = botAI->GetUnit(guid);
+        Unit *unit = botAI->GetUnit(guid);
         if (!unit)
             continue;
 
@@ -31,19 +31,18 @@ Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
     return strategy->GetResult();
 }
 
-
-bool FindNonCcTargetStrategy::IsCcTarget(Unit* attacker)
+bool FindNonCcTargetStrategy::IsCcTarget(Unit *attacker)
 {
-    if (Group* group = botAI->GetBot()->GetGroup())
+    if (Group *group = botAI->GetBot()->GetGroup())
     {
-        Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
+        Group::MemberSlotList const &groupSlot = group->GetMemberSlots();
         for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
             Player *member = ObjectAccessor::FindPlayer(itr->guid);
             if (!member || !member->IsAlive())
                 continue;
 
-            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(member))
+            if (PlayerbotAI *botAI = GET_PLAYERBOT_AI(member))
             {
                 if (botAI->GetAiObjectContext()->GetValue<Unit*>("rti cc target")->Get() == attacker)
                     return true;
@@ -67,9 +66,9 @@ bool FindNonCcTargetStrategy::IsCcTarget(Unit* attacker)
     return false;
 }
 
-void FindTargetStrategy::GetPlayerCount(Unit* creature, uint32* tankCount, uint32* dpsCount)
+void FindTargetStrategy::GetPlayerCount(Unit *creature, uint32 *tankCount, uint32 *dpsCount)
 {
-    Player* bot = botAI->GetBot();
+    Player *bot = botAI->GetBot();
     if (tankCountCache.find(creature) != tankCountCache.end())
     {
         *tankCount = tankCountCache[creature];
@@ -81,12 +80,12 @@ void FindTargetStrategy::GetPlayerCount(Unit* creature, uint32* tankCount, uint3
     *dpsCount = 0;
 
     Unit::AttackerSet attackers(creature->getAttackers());
-    for (Unit* attacker : attackers)
+    for (Unit *attacker : attackers)
     {
         if (!attacker || !attacker->IsAlive() || attacker == bot)
             continue;
 
-        Player* player = attacker->ToPlayer();
+        Player *player = attacker->ToPlayer();
         if (!player)
             continue;
 
@@ -100,18 +99,21 @@ void FindTargetStrategy::GetPlayerCount(Unit* creature, uint32* tankCount, uint3
     dpsCountCache[creature] = *dpsCount;
 }
 
-bool FindTargetStrategy::IsHighPriority(Unit* attacker)
+bool FindTargetStrategy::IsHighPriority(Unit *attacker)
 {
-    if (Group* group = botAI->GetBot()->GetGroup())
+    if (Group *group = botAI->GetBot()->GetGroup())
     {
         ObjectGuid guid = group->GetTargetIcon(7);
-        if (guid && attacker->GetGUID() == guid) {
+        if (guid && attacker->GetGUID() == guid)
+        {
             return true;
         }
     }
     GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
-    for (ObjectGuid targetGuid : prioritizedTargets) {
-        if (targetGuid && attacker->GetGUID() == targetGuid) {
+    for (ObjectGuid targetGuid : prioritizedTargets)
+    {
+        if (targetGuid && attacker->GetGUID() == targetGuid)
+        {
             return true;
         }
     }
@@ -120,26 +122,27 @@ bool FindTargetStrategy::IsHighPriority(Unit* attacker)
 
 WorldPosition LastLongMoveValue::Calculate()
 {
-    LastMovement& lastMove = *context->GetValue<LastMovement&>("last movement");
+    LastMovement &lastMove = *context->GetValue<LastMovement &>("last movement");
     if (lastMove.lastPath.empty())
         return WorldPosition();
 
     return lastMove.lastPath.getBack();
 }
 
-
 WorldPosition HomeBindValue::Calculate()
 {
     return WorldPosition(bot->m_homebindMapId, bot->m_homebindX, bot->m_homebindY, bot->m_homebindZ, 0.f);
 }
 
-Unit* FindTargetValue::Calculate()
+Unit *FindTargetValue::Calculate()
 {
-    if (qualifier == "") {
+    if (qualifier == "")
+    {
         return nullptr;
     }
-    Group* group = bot->GetGroup();
-    if (!group) {
+    Group *group = bot->GetGroup();
+    if (!group)
+    {
         return nullptr;
     }
     HostileReference *ref = bot->getHostileRefMgr().getFirst();
@@ -150,7 +153,8 @@ Unit* FindTargetValue::Calculate()
         std::wstring wnamepart;
         Utf8toWStr(unit->GetName(), wnamepart);
         wstrToLower(wnamepart);
-        if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart)) {
+        if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart))
+        {
             return unit;
         }
         ref = ref->next();
@@ -158,16 +162,17 @@ Unit* FindTargetValue::Calculate()
     return nullptr;
 }
 
-void FindBossTargetStrategy::CheckAttacker(Unit* attacker, ThreatMgr* threatManager)
+void FindBossTargetStrategy::CheckAttacker(Unit *attacker, ThreatMgr *threatManager)
 {
-    UnitAI* unitAI = attacker->GetAI();
-    BossAI* bossAI = dynamic_cast<BossAI*>(unitAI);
-    if (bossAI) {
+    UnitAI *unitAI = attacker->GetAI();
+    BossAI *bossAI = dynamic_cast<BossAI*>(unitAI);
+    if (bossAI)
+    {
         result = attacker;
     }
 }
 
-Unit* BossTargetValue::Calculate()
+Unit *BossTargetValue::Calculate()
 {
     FindBossTargetStrategy strategy(botAI);
     return FindTarget(&strategy);

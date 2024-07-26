@@ -11,7 +11,7 @@
 
 std::vector<uint32> PossibleRpgTargetsValue::allowedNpcFlags;
 
-PossibleRpgTargetsValue::PossibleRpgTargetsValue(PlayerbotAI* botAI, float range) : NearestUnitsValue(botAI, "possible rpg targets", range, true)
+PossibleRpgTargetsValue::PossibleRpgTargetsValue(PlayerbotAI *botAI, float range) : NearestUnitsValue(botAI, "possible rpg targets", range, true)
 {
     if (allowedNpcFlags.empty())
     {
@@ -39,14 +39,14 @@ PossibleRpgTargetsValue::PossibleRpgTargetsValue(PlayerbotAI* botAI, float range
     }
 }
 
-void PossibleRpgTargetsValue::FindUnits(std::list<Unit*>& targets)
+void PossibleRpgTargetsValue::FindUnits(std::list<Unit*> &targets)
 {
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitAllObjects(bot, searcher, range);
 }
 
-bool PossibleRpgTargetsValue::AcceptUnit(Unit* unit)
+bool PossibleRpgTargetsValue::AcceptUnit(Unit *unit)
 {
     if (unit->IsHostileTo(bot) || unit->GetTypeId() == TYPEID_PLAYER)
         return false;
@@ -63,7 +63,7 @@ bool PossibleRpgTargetsValue::AcceptUnit(Unit* unit)
             return true;
     }
 
-    TravelTarget* travelTarget = context->GetValue<TravelTarget*>("travel target")->Get();
+    TravelTarget *travelTarget = context->GetValue<TravelTarget*>("travel target")->Get();
     if (travelTarget->getDestination() && travelTarget->getDestination()->getEntry() == unit->GetEntry())
         return true;
 

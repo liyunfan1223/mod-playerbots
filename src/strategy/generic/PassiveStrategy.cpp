@@ -6,8 +6,7 @@
 #include "PassiveMultiplier.h"
 #include "Playerbots.h"
 
-void PassiveStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void PassiveStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     multipliers.push_back(new PassiveMultiplier(botAI));
 }
-

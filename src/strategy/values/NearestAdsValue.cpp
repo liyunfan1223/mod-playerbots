@@ -5,8 +5,8 @@
 #include "NearestAdsValue.h"
 #include "Playerbots.h"
 
-bool NearestAddsValue::AcceptUnit(Unit* unit)
+bool NearestAddsValue::AcceptUnit(Unit *unit)
 {
-    Unit* target = AI_VALUE(Unit*, "current target");
+    Unit *target = AI_VALUE(Unit *, "current target");
     return unit != target;
 }

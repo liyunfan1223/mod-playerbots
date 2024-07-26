@@ -87,17 +87,17 @@
 //     multipliers.push_back(new ConserveManaMultiplier(botAI));
 // }
 
-float HealerAutoSaveManaMultiplier::GetValue(Action* action)
+float HealerAutoSaveManaMultiplier::GetValue(Action *action)
 {
     uint8 mana = bot->GetPowerPct(Powers::POWER_MANA);
     if (mana > sPlayerbotAIConfig->saveManaThreshold)
         return 1.0f;
-    CastHealingSpellAction* healingAction = dynamic_cast<CastHealingSpellAction*>(action);
+    CastHealingSpellAction *healingAction = dynamic_cast<CastHealingSpellAction*>(action);
 
     if (!healingAction)
         return 1.0f;
-    
-    Unit* target = healingAction->GetTarget();
+
+    Unit *target = healingAction->GetTarget();
     if (!target)
         return 1.0f;
     bool isTank = target->ToPlayer() ? botAI->IsTank(target->ToPlayer()) : false;
@@ -105,13 +105,16 @@ float HealerAutoSaveManaMultiplier::GetValue(Action* action)
     HealingManaEfficiency manaEfficiency = healingAction->manaEfficiency;
     uint8 estAmount = healingAction->estAmount;
     uint8 lossAmount = 100 - health;
-    if (isTank) {
+    if (isTank)
+    {
         estAmount /= 1.5; // tanks have more health
         if (health >= sPlayerbotAIConfig->mediumHealth && (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::MEDIUM))
             return 0.0f;
         if (health >= sPlayerbotAIConfig->lowHealth && (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::LOW))
             return 0.0f;
-    } else {
+    }
+    else
+    {
         if (health >= sPlayerbotAIConfig->mediumHealth && (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::MEDIUM))
             return 0.0f;
         if (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::LOW)
@@ -120,7 +123,7 @@ float HealerAutoSaveManaMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
-void HealerAutoSaveManaStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void HealerAutoSaveManaStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     multipliers.push_back(new HealerAutoSaveManaMultiplier(botAI));
 }

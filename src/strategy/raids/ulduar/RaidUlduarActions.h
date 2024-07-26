@@ -13,7 +13,7 @@
 // just for test
 // class TryToGetBossAIAction : public Action
 // {
-// public: 
+// public:
 //     TryToGetBossAIAction(PlayerbotAI* ai) : Action(ai, "try to get boss ai") {}
 
 // public:

@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class MoveToTravelTargetAction : public MovementAction
 {
-    public:
-        MoveToTravelTargetAction(PlayerbotAI* botAI) : MovementAction(botAI, "move to travel target") { }
+public:
+    MoveToTravelTargetAction(PlayerbotAI *botAI) : MovementAction(botAI, "move to travel target") {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 #endif

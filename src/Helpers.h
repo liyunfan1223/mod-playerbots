@@ -17,10 +17,10 @@
 #include <string.h>
 #include <algorithm>
 
-void split(std::vector<std::string>& dest, std::string const str, char const* delim)
+void split(std::vector<std::string> &dest, std::string const str, char const *delim)
 {
-    char* pTempStr = strdup(str.c_str());
-    char* pWord = strtok(pTempStr, delim);
+    char *pTempStr = strdup(str.c_str());
+    char *pWord = strtok(pTempStr, delim);
 
     while (pWord != nullptr)
     {
@@ -31,7 +31,7 @@ void split(std::vector<std::string>& dest, std::string const str, char const* de
     free(pTempStr);
 }
 
-std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems)
+std::vector<std::string> &split(std::string const s, char delim, std::vector<std::string> &elems)
 {
     std::stringstream ss(s);
     std::string item;

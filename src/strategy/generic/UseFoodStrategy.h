@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class UseFoodStrategy : public Strategy
 {
-    public:
-        UseFoodStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    UseFoodStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "food"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "food"; }
 };
 
 #endif

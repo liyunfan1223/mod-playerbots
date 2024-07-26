@@ -9,7 +9,7 @@
 
 std::map<std::string, std::string> CustomStrategy::actionLinesCache;
 
-NextAction* toNextAction(std::string const action)
+NextAction *toNextAction(std::string const action)
 {
     std::vector<std::string> tokens = split(action, '!');
     if (tokens.size() == 2 && !tokens[0].empty())
@@ -21,23 +21,23 @@ NextAction* toNextAction(std::string const action)
     return nullptr;
 }
 
-NextAction** toNextActionArray(std::string const actions)
+NextAction **toNextActionArray(std::string const actions)
 {
     std::vector<std::string> tokens = split(actions, ',');
-    NextAction** res = new NextAction*[tokens.size() + 1];
+    NextAction **res = new NextAction *[tokens.size() + 1];
 
     uint32 index = 0;
     for (std::vector<std::string>::iterator i = tokens.begin(); i != tokens.end(); ++i)
     {
-        if (NextAction* na = toNextAction(*i))
+        if (NextAction *na = toNextAction(*i))
             res[index++] = na;
     }
 
-	res[index++] = nullptr;
+    res[index++] = nullptr;
     return res;
 }
 
-TriggerNode* toTriggerNode(std::string const actionLine)
+TriggerNode *toTriggerNode(std::string const actionLine)
 {
     std::vector<std::string> tokens = split(actionLine, '>');
     if (tokens.size() == 2)
@@ -47,7 +47,7 @@ TriggerNode* toTriggerNode(std::string const actionLine)
     return nullptr;
 }
 
-CustomStrategy::CustomStrategy(PlayerbotAI* botAI) : Strategy(botAI), Qualified()
+CustomStrategy::CustomStrategy(PlayerbotAI *botAI) : Strategy(botAI), Qualified()
 {
 }
 
@@ -81,14 +81,14 @@ void CustomStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 
     for (std::vector<std::string>::iterator i = actionLines.begin(); i != actionLines.end(); ++i)
     {
-        if (TriggerNode* tn = toTriggerNode(*i))
+        if (TriggerNode *tn = toTriggerNode(*i))
             triggers.push_back(tn);
     }
 }
 
 void CustomStrategy::LoadActionLines(uint32 owner)
 {
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
     stmt->SetData(0, owner);
     stmt->SetData(1, qualifier);
     PreparedQueryResult result = PlayerbotsDatabase.Query(stmt);
@@ -96,11 +96,10 @@ void CustomStrategy::LoadActionLines(uint32 owner)
     {
         do
         {
-            Field* fields = result->Fetch();
+            Field *fields = result->Fetch();
             std::string const action = fields[1].Get<std::string>();
             actionLines.push_back(action);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 }
 

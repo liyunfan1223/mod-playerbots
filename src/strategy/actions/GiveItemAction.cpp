@@ -11,15 +11,15 @@ std::vector<std::string> split(std::string const s, char delim);
 
 bool GiveItemAction::Execute(Event event)
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return false;
 
-    Player* receiver = dynamic_cast<Player*>(target);
+    Player *receiver = dynamic_cast<Player*>(target);
     if (!receiver)
         return false;
 
-    PlayerbotAI* receiverAi = GET_PLAYERBOT_AI(receiver);
+    PlayerbotAI *receiverAi = GET_PLAYERBOT_AI(receiver);
     if (!receiverAi)
         return false;
 
@@ -28,7 +28,7 @@ bool GiveItemAction::Execute(Event event)
 
     bool moved = false;
     std::vector<Item*> items = InventoryAction::parseItems(item, ITERATE_ITEMS_IN_BAGS);
-    for (Item* item : items)
+    for (Item *item : items)
     {
         if (receiver->CanUseItem(item->GetTemplate()) != EQUIP_ERR_OK)
             continue;
@@ -57,9 +57,9 @@ bool GiveItemAction::Execute(Event event)
     return true;
 }
 
-Unit* GiveItemAction::GetTarget()
+Unit *GiveItemAction::GetTarget()
 {
-    return AI_VALUE2(Unit*, "party member without item", item);
+    return AI_VALUE2(Unit *, "party member without item", item);
 }
 
 bool GiveItemAction::isUseful()
@@ -67,9 +67,9 @@ bool GiveItemAction::isUseful()
     return GetTarget() && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->lowMana;
 }
 
-Unit* GiveFoodAction::GetTarget()
+Unit *GiveFoodAction::GetTarget()
 {
-    return AI_VALUE(Unit*, "party member without food");
+    return AI_VALUE(Unit *, "party member without food");
 }
 
 bool GiveFoodAction::isUseful()
@@ -77,23 +77,22 @@ bool GiveFoodAction::isUseful()
     if (!GetTarget())
         return false;
 
-    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player*) GetTarget());
+    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
 
     return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
 }
 
-Unit* GiveWaterAction::GetTarget()
+Unit *GiveWaterAction::GetTarget()
 {
-    return AI_VALUE(Unit*, "party member without water");
+    return AI_VALUE(Unit *, "party member without water");
 }
-
 
 bool GiveWaterAction::isUseful()
 {
     if (!GetTarget())
         return false;
 
-    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player*)GetTarget());
+    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
 
     return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
 }

@@ -13,11 +13,11 @@ class Unit;
 
 class EnemyHealerTargetValue : public UnitCalculatedValue, public Qualified
 {
-	public:
-        EnemyHealerTargetValue(PlayerbotAI* botAI) : UnitCalculatedValue(botAI, "enemy healer target") { }
+public:
+    EnemyHealerTargetValue(PlayerbotAI *botAI) : UnitCalculatedValue(botAI, "enemy healer target") {}
 
-    protected:
-        Unit* Calculate() override;
+protected:
+    Unit *Calculate() override;
 };
 
 #endif

@@ -30,7 +30,7 @@ bool RangeAction::Execute(Event event)
         return true;
     }
 
-    float newVal = (float) atof(value.c_str());
+    float newVal = (float)atof(value.c_str());
     context->GetValue<float>("range", qualifier)->Set(newVal);
 
     std::ostringstream out;

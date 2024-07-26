@@ -13,7 +13,7 @@ void LastSpellCast::Set(uint32 newId, ObjectGuid newTarget, time_t newTime)
 {
     id = newId;
     target = newTarget;
-    timer  = newTime;
+    timer = newTime;
 }
 
 void LastSpellCast::Reset()

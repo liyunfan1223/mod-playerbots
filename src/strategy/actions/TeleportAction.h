@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class TeleportAction : public Action
 {
-	public:
-		TeleportAction(PlayerbotAI* botAI) : Action(botAI, "teleport") { }
+public:
+	TeleportAction(PlayerbotAI *botAI) : Action(botAI, "teleport") {}
 
-        bool Execute(Event event) override;
+	bool Execute(Event event) override;
 };
 
 #endif

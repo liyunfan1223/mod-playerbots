@@ -5,7 +5,7 @@
 #include "MasterTargetValue.h"
 #include "Playerbots.h"
 
-Unit* MasterTargetValue::Calculate()
+Unit *MasterTargetValue::Calculate()
 {
     return botAI->GetGroupMaster();
 }

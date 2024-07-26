@@ -12,22 +12,22 @@ class PlayerbotAI;
 
 class DestroyItemAction : public InventoryAction
 {
-    public:
-        DestroyItemAction(PlayerbotAI* botAI, std::string const name = "destroy") : InventoryAction(botAI, name) { }
+public:
+    DestroyItemAction(PlayerbotAI *botAI, std::string const name = "destroy") : InventoryAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    protected:
-        void DestroyItem(FindItemVisitor* visitor);
+protected:
+    void DestroyItem(FindItemVisitor *visitor);
 };
 
 class SmartDestroyItemAction : public DestroyItemAction
 {
-    public:
-        SmartDestroyItemAction(PlayerbotAI* botAI) : DestroyItemAction(botAI, "smart destroy") { }
+public:
+    SmartDestroyItemAction(PlayerbotAI *botAI) : DestroyItemAction(botAI, "smart destroy") {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 #endif

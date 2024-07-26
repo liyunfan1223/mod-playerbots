@@ -35,36 +35,36 @@ enum PerformanceMetric
 
 class PerformanceMonitorOperation
 {
-    public:
-        PerformanceMonitorOperation(PerformanceData* data, std::string const name, PerformanceStack* stack);
-        void finish();
+public:
+    PerformanceMonitorOperation(PerformanceData *data, std::string const name, PerformanceStack *stack);
+    void finish();
 
-    private:
-        PerformanceData* data;
-        std::string const name;
-        PerformanceStack* stack;
-        std::chrono::microseconds started;
+private:
+    PerformanceData *data;
+    std::string const name;
+    PerformanceStack *stack;
+    std::chrono::microseconds started;
 };
 
 class PerformanceMonitor
 {
-    public:
-        PerformanceMonitor() { };
-        virtual ~PerformanceMonitor() { };
-        static PerformanceMonitor* instance()
-        {
-            static PerformanceMonitor instance;
-            return &instance;
-        }
+public:
+    PerformanceMonitor() {};
+    virtual ~PerformanceMonitor() {};
+    static PerformanceMonitor *instance()
+    {
+        static PerformanceMonitor instance;
+        return &instance;
+    }
 
-	public:
-        PerformanceMonitorOperation* start(PerformanceMetric metric, std::string const name, PerformanceStack* stack = nullptr);
-        void PrintStats(bool perTick = false,  bool fullStack = false);
-        void Reset();
+public:
+    PerformanceMonitorOperation *start(PerformanceMetric metric, std::string const name, PerformanceStack *stack = nullptr);
+    void PrintStats(bool perTick = false, bool fullStack = false);
+    void Reset();
 
-	private:
-        std::map<PerformanceMetric, std::map<std::string, PerformanceData*> > data;
-        std::mutex lock;
+private:
+    std::map<PerformanceMetric, std::map<std::string, PerformanceData *>> data;
+    std::mutex lock;
 };
 
 #define sPerformanceMonitor PerformanceMonitor::instance()

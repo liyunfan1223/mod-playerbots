@@ -11,22 +11,22 @@ class PlayerbotAI;
 
 class FrostDKStrategy : public GenericDKStrategy
 {
-    public:
-        FrostDKStrategy(PlayerbotAI* botAI);
+public:
+    FrostDKStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "frost"; }
-        NextAction** getDefaultActions() override;
-	    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "frost"; }
+    NextAction **getDefaultActions() override;
+    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE; }
 };
 
 class FrostDKAoeStrategy : public CombatStrategy
 {
-    public:
-        FrostDKAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) { }
+public:
+    FrostDKAoeStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "frost aoe"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "frost aoe"; }
 };
 
 #endif

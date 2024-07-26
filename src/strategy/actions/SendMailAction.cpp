@@ -14,11 +14,11 @@ bool SendMailAction::Execute(Event event)
     uint32 account = bot->GetSession()->GetAccountId();
     bool randomBot = sPlayerbotAIConfig->IsInRandomAccountList(account);
 
-    GuidVector gos = *context->GetValue<GuidVector >("nearest game objects");
+    GuidVector gos = *context->GetValue<GuidVector>("nearest game objects");
     bool mailboxFound = false;
     for (ObjectGuid const guid : gos)
     {
-        if (GameObject* go = botAI->GetGameObject(guid))
+        if (GameObject *go = botAI->GetGameObject(guid))
             if (go->GetGoType() == GAMEOBJECT_TYPE_MAILBOX)
             {
                 mailboxFound = true;
@@ -28,13 +28,13 @@ bool SendMailAction::Execute(Event event)
 
     std::string const text = event.getParam();
 
-    Player* receiver = GetMaster();
-    Player* tellTo = receiver;
+    Player *receiver = GetMaster();
+    Player *tellTo = receiver;
 
     std::vector<std::string> ss = split(text, ' ');
     if (ss.size() > 1)
     {
-        if (Player* p = ObjectAccessor::FindPlayer(ObjectGuid(uint64(ss[ss.size() - 1].c_str()))))
+        if (Player *p = ObjectAccessor::FindPlayer(ObjectGuid(uint64(ss[ss.size() - 1].c_str()))))
             receiver = p;
     }
 
@@ -54,7 +54,6 @@ bool SendMailAction::Execute(Event event)
         bot->Whisper("There is no mailbox nearby", LANG_UNIVERSAL, tellTo);
         return false;
     }
-
 
     ItemIds ids = chat->parseItems(text);
     if (ids.size() > 1)
@@ -119,7 +118,7 @@ bool SendMailAction::Execute(Event event)
         IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
 
         std::vector<Item*> items = visitor.GetResult();
-        for (Item* item : items)
+        for (Item *item : items)
         {
             if (item->IsSoulBound() || item->IsConjuredConsumable())
             {
@@ -129,7 +128,7 @@ bool SendMailAction::Execute(Event event)
                 continue;
             }
 
-            ItemTemplate const* proto = item->GetTemplate();
+            ItemTemplate const *proto = item->GetTemplate();
             if (!proto)
                 continue;
 

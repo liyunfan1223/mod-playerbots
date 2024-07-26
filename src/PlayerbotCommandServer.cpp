@@ -17,7 +17,7 @@
 using boost::asio::ip::tcp;
 typedef boost::shared_ptr<tcp::socket> socket_ptr;
 
-bool ReadLine(socket_ptr sock, std::string* buffer, std::string* line)
+bool ReadLine(socket_ptr sock, std::string *buffer, std::string *line)
 {
     // Do the real reading from fd until buffer has '\n'.
     std::string::iterator pos;
@@ -52,13 +52,13 @@ void session(socket_ptr sock)
             request = "";
         }
     }
-    catch (std::exception& e)
+    catch (std::exception &e)
     {
         LOG_ERROR("playerbots", "{}", e.what());
     }
 }
 
-void server(Acore::Asio::IoContext& io_service, short port)
+void server(Acore::Asio::IoContext &io_service, short port)
 {
     tcp::acceptor a(io_service, tcp::endpoint(tcp::v4(), port));
     for (;;)
@@ -86,7 +86,7 @@ void Run()
         server(io_service, sPlayerbotAIConfig->commandServerPort);
     }
 
-    catch (std::exception& e)
+    catch (std::exception &e)
     {
         LOG_ERROR("playerbots", "{}", e.what());
     }

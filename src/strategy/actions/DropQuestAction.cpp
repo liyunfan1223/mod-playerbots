@@ -11,7 +11,7 @@ bool DropQuestAction::Execute(Event event)
 {
     std::string const link = event.getParam();
 
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -23,7 +23,7 @@ bool DropQuestAction::Execute(Event event)
     {
         uint32 logQuest = bot->GetQuestSlotQuestId(slot);
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(logQuest);
+        Quest const *quest = sObjectMgr->GetQuestTemplate(logQuest);
         if (!quest)
             continue;
 
@@ -56,7 +56,7 @@ bool CleanQuestLogAction::Execute(Event event)
 
     uint8 totalQuests = 0;
 
-    DropQuestType(totalQuests); //Count the total quests
+    DropQuestType(totalQuests); // Count the total quests
 
     if (MAX_QUEST_LOG_SIZE - totalQuests > 6)
         return true;
@@ -71,17 +71,17 @@ bool CleanQuestLogAction::Execute(Event event)
     if (MAX_QUEST_LOG_SIZE - totalQuests > 4)
         return true;
 
-    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 4, true); //Drop quests without progress.
+    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 4, true); // Drop quests without progress.
 
     if (MAX_QUEST_LOG_SIZE - totalQuests > 2)
         return true;
 
-    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 2, true, true); //Drop quests with progress.
+    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 2, true, true); // Drop quests with progress.
 
     if (MAX_QUEST_LOG_SIZE - totalQuests > 0)
         return true;
 
-    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 1, true, true, true); //Drop completed quests.
+    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 1, true, true, true); // Drop completed quests.
 
     if (MAX_QUEST_LOG_SIZE - totalQuests > 0)
         return true;
@@ -89,7 +89,7 @@ bool CleanQuestLogAction::Execute(Event event)
     return false;
 }
 
-void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isGreen, bool hasProgress, bool isComplete)
+void CleanQuestLogAction::DropQuestType(uint8 &numQuest, uint8 wantNum, bool isGreen, bool hasProgress, bool isComplete)
 {
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
@@ -97,11 +97,11 @@ void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isG
         if (!questId)
             continue;
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
             continue;
 
-        if (quest->GetRequiredClasses() && (quest->GetRewSpellCast() || quest->GetRewSpell())) //Do not drop class specific quests that learn spells.
+        if (quest->GetRequiredClasses() && (quest->GetRewSpellCast() || quest->GetRewSpell())) // Do not drop class specific quests that learn spells.
             continue;
 
         if (quest->GetRequiredClasses() && (quest->GetRewSpellCast() || quest->GetRewSpell())) // Do not drop class specific quests that learn spells.
@@ -132,10 +132,10 @@ void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isG
         if (numQuest <= wantNum && bot->GetQuestStatus(questId) != QUEST_STATUS_FAILED) // Always drop failed quests
             continue;
 
-        //Drop quest.
+        // Drop quest.
         bot->SetQuestSlot(slot, 0);
 
-        //We ignore unequippable quest items in this case, its' still be equipped
+        // We ignore unequippable quest items in this case, its' still be equipped
         bot->TakeQuestSourceItem(questId, false);
 
         bot->SetQuestStatus(questId, QUEST_STATUS_NONE);
@@ -147,7 +147,7 @@ void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isG
     }
 }
 
-bool CleanQuestLogAction::HasProgress(Player* bot, Quest const* quest)
+bool CleanQuestLogAction::HasProgress(Player *bot, Quest const *quest)
 {
     uint32 questId = quest->GetQuestId();
 
@@ -163,7 +163,7 @@ bool CleanQuestLogAction::HasProgress(Player* bot, Quest const* quest)
 
         if (quest->RequiredItemId[i])
         {
-            int required  = quest->RequiredItemCount[i];
+            int required = quest->RequiredItemCount[i];
             int available = questStatus.ItemCount[i];
             if (available > 0 && required > 0)
                 return true;
@@ -171,7 +171,7 @@ bool CleanQuestLogAction::HasProgress(Player* bot, Quest const* quest)
 
         if (quest->RequiredNpcOrGo[i])
         {
-            int required  = quest->RequiredNpcOrGoCount[i];
+            int required = quest->RequiredNpcOrGoCount[i];
             int available = questStatus.CreatureOrGOCount[i];
 
             if (available > 0 && required > 0)

@@ -12,9 +12,11 @@
 
 bool ResetAiAction::Execute(Event event)
 {
-    if (!event.getPacket().empty()) {
+    if (!event.getPacket().empty())
+    {
         WorldPacket packet = event.getPacket();
-        if (packet.GetOpcode() == SMSG_GROUP_LIST) {
+        if (packet.GetOpcode() == SMSG_GROUP_LIST)
+        {
             uint8 groupType;
             Group::MemberSlot slot;
             packet >> groupType;
@@ -34,7 +36,8 @@ bool ResetAiAction::Execute(Event event)
             packet >> guid;
             packet >> counter;
             packet >> membersCount;
-            if (membersCount != 0) {
+            if (membersCount != 0)
+            {
                 return false;
             }
         }

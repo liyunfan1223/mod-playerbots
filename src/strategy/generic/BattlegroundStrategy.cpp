@@ -12,7 +12,7 @@ void BGStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("bg strategy check", relevance), nullptr)));
 }
 
-BGStrategy::BGStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
+BGStrategy::BGStrategy(PlayerbotAI *botAI) : PassTroughStrategy(botAI)
 {
 }
 
@@ -44,12 +44,12 @@ void BattlegroundStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("bg waiting", NextAction::array(0, new NextAction("bg move to start", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("bg active", NextAction::array(0, new NextAction("bg move to objective", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("bg check objective", 10.0f), nullptr)));
-    //triggers.push_back(new TriggerNode("enemy flagcarrier near", NextAction::array(0, new NextAction("attack enemy flag carrier", 80.0f), nullptr)));
-    //triggers.push_back(new TriggerNode("team flagcarrier near", NextAction::array(0, new NextAction("bg protect fc", 40.0f), nullptr)));
-    //triggers.push_back(new TriggerNode("player has flag", NextAction::array(0, new NextAction("bg move to objective", 90.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy flagcarrier near", NextAction::array(0, new NextAction("attack enemy flag carrier", 80.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("team flagcarrier near", NextAction::array(0, new NextAction("bg protect fc", 40.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("player has flag", NextAction::array(0, new NextAction("bg move to objective", 90.0f), nullptr)));
 }
 
-void EyeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void EyeStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("bg active", NextAction::array(0, new NextAction("bg check flag", 70.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("bg use buff", 30.0f), nullptr)));
@@ -59,7 +59,7 @@ void EyeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("player has flag", NextAction::array(0, new NextAction("bg move to objective", 90.0f), nullptr)));
 }
 
-void IsleStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void IsleStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("bg active", NextAction::array(0, new NextAction("bg check flag", 70.0f), nullptr)));
     triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("enter vehicle", 85.0f), nullptr)));
@@ -77,7 +77,7 @@ void IsleStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("in vehicle", NextAction::array(0, new NextAction("glaive throw", 70.0f), nullptr)));
 }
 
-void ArenaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void ArenaStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("no possible targets", NextAction::array(0, new NextAction("arena tactics", 1.0f), nullptr)));
 }

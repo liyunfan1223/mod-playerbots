@@ -18,4 +18,3 @@
 #include "PaladinActions.h"
 #include "WarriorActions.h"
 #include "DruidBearActions.h"
-

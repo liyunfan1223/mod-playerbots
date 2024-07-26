@@ -11,20 +11,20 @@ class PlayerbotAI;
 
 class FleeStrategy : public Strategy
 {
-    public:
-        FleeStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    FleeStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "flee"; };
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "flee"; };
 };
 
 class FleeFromAddsStrategy : public Strategy
 {
-    public:
-        FleeFromAddsStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    FleeFromAddsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "flee from adds"; };
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "flee from adds"; };
 };
 
 #endif

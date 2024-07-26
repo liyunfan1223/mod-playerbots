@@ -10,7 +10,7 @@ bool WorldBuffAction::Execute(Event event)
 {
     std::string const text = event.getParam();
 
-    for (auto& wb : NeedWorldBuffs(bot))
+    for (auto &wb : NeedWorldBuffs(bot))
     {
         bot->AddAura(wb, bot);
     }
@@ -18,17 +18,17 @@ bool WorldBuffAction::Execute(Event event)
     return false;
 }
 
-std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
+std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit *unit)
 {
     std::vector<uint32> retVec;
 
     if (sPlayerbotAIConfig->worldBuffs.empty())
         return std::move(retVec);
 
-    FactionTemplateEntry const* humanFaction = sFactionTemplateStore.LookupEntry(1);
+    FactionTemplateEntry const *humanFaction = sFactionTemplateStore.LookupEntry(1);
     uint32 factionId = (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL) ? 1 : 2;
 
-    for (auto& wb : sPlayerbotAIConfig->worldBuffs)
+    for (auto &wb : sPlayerbotAIConfig->worldBuffs)
     {
         if (wb.factionId != 0 && wb.factionId != factionId)
             continue;
@@ -50,4 +50,3 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
 
     return std::move(retVec);
 }
-

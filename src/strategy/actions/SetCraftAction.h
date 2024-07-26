@@ -14,18 +14,17 @@ struct SkillLineAbilityEntry;
 
 class SetCraftAction : public Action
 {
-    public:
-        SetCraftAction(PlayerbotAI* botAI) : Action(botAI, "craft") { }
+public:
+    SetCraftAction(PlayerbotAI *botAI) : Action(botAI, "craft") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-        static uint32 GetCraftFee(CraftData& craftData);
+    static uint32 GetCraftFee(CraftData &craftData);
 
-    private:
-        void TellCraft();
+private:
+    void TellCraft();
 
-        static std::map<uint32, SkillLineAbilityEntry const*> skillSpells;
-
+    static std::map<uint32, SkillLineAbilityEntry const *> skillSpells;
 };
 
 #endif

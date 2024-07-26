@@ -8,11 +8,11 @@
 
 bool WithinAreaTrigger::IsActive()
 {
-    LastMovement& movement = context->GetValue<LastMovement&>("last area trigger")->Get();
+    LastMovement &movement = context->GetValue<LastMovement &>("last area trigger")->Get();
     if (!movement.lastAreaTrigger)
         return false;
 
-    AreaTrigger const* at = sObjectMgr->GetAreaTrigger(movement.lastAreaTrigger);
+    AreaTrigger const *at = sObjectMgr->GetAreaTrigger(movement.lastAreaTrigger);
     if (!at)
         return false;
 
@@ -22,7 +22,7 @@ bool WithinAreaTrigger::IsActive()
     return IsPointInAreaTriggerZone(at, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 0.5f);
 }
 
-bool WithinAreaTrigger::IsPointInAreaTriggerZone(AreaTrigger const* atEntry, uint32 mapid, float x, float y, float z, float delta)
+bool WithinAreaTrigger::IsPointInAreaTriggerZone(AreaTrigger const *atEntry, uint32 mapid, float x, float y, float z, float delta)
 {
     if (mapid != atEntry->map)
         return false;

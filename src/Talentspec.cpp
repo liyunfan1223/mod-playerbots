@@ -11,14 +11,14 @@ uint32 TalentSpec::TalentListEntry::tabPage() const
     return talentTabInfo->TalentTabID == 41 ? 1 : talentTabInfo->tabpage;
 }
 
-//Checks a talent link on basic validity.
-bool TalentSpec::CheckTalentLink(std::string const link, std::ostringstream* out)
+// Checks a talent link on basic validity.
+bool TalentSpec::CheckTalentLink(std::string const link, std::ostringstream *out)
 {
     std::string const validChar = "-";
     std::string const validNums = "012345";
     uint32 nums = 0;
 
-    for (char const& c : link)
+    for (char const &c : link)
     {
         if (validChar.find(c) == std::string::npos && validNums.find(c) == std::string::npos)
         {
@@ -55,32 +55,32 @@ TalentSpec::TalentSpec(uint32 classMask)
     GetTalents(classMask);
 }
 
-TalentSpec::TalentSpec(TalentSpec* base, std::string const link)
+TalentSpec::TalentSpec(TalentSpec *base, std::string const link)
 {
     talents = base->talents;
     ReadTalents(link);
 }
 
-TalentSpec::TalentSpec(Player* bot)
+TalentSpec::TalentSpec(Player *bot)
 {
     GetTalents(bot->getClassMask());
     ReadTalents(bot);
 }
 
-TalentSpec::TalentSpec(Player* bot, std::string const link)
+TalentSpec::TalentSpec(Player *bot, std::string const link)
 {
     GetTalents(bot->getClassMask());
     ReadTalents(link);
 }
 
-//Check the talentspec for errors.
-bool TalentSpec::CheckTalents(uint32 level, std::ostringstream* out)
+// Check the talentspec for errors.
+bool TalentSpec::CheckTalents(uint32 level, std::ostringstream *out)
 {
-    for (auto& entry : talents)
+    for (auto &entry : talents)
     {
         if (entry.rank > entry.maxRank)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry.talentInfo->RankID[0]);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(entry.talentInfo->RankID[0]);
             *out << "spec is not for this class. " << spellInfo->SpellName[0] << " has " << (entry.rank - entry.maxRank) << " points above max rank.";
             return false;
         }
@@ -90,9 +90,9 @@ bool TalentSpec::CheckTalents(uint32 level, std::ostringstream* out)
             if (sTalentStore.LookupEntry(entry.talentInfo->DependsOn))
             {
                 bool found = false;
-                SpellInfo const* spellInfodep = nullptr;
+                SpellInfo const *spellInfodep = nullptr;
 
-                for (auto& dep : talents)
+                for (auto &dep : talents)
                     if (dep.talentInfo->TalentID == entry.talentInfo->DependsOn)
                     {
                         spellInfodep = sSpellMgr->GetSpellInfo(dep.talentInfo->RankID[0]);
@@ -102,7 +102,7 @@ bool TalentSpec::CheckTalents(uint32 level, std::ostringstream* out)
 
                 if (!found)
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry.talentInfo->RankID[0]);
+                    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(entry.talentInfo->RankID[0]);
                     *out << "spec is invalid. Talent:" << spellInfo->SpellName[0] << " needs: " << spellInfodep->SpellName[0] << " at rank: " << entry.talentInfo->DependsOnRank;
                     return false;
                 }
@@ -115,11 +115,11 @@ bool TalentSpec::CheckTalents(uint32 level, std::ostringstream* out)
         std::vector<TalentListEntry> talentTree = GetTalentTree(i);
         uint32 points = 0;
 
-        for (auto& entry : talentTree)
+        for (auto &entry : talentTree)
         {
             if (entry.rank > 0 && entry.talentInfo->Row * 5 > points)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry.talentInfo->RankID[0]);
+                SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(entry.talentInfo->RankID[0]);
                 *out << "spec is is invalid. Talent " << spellInfo->SpellName[0] << " is selected with only " << points << " in row below it.";
                 return false;
             }
@@ -137,28 +137,29 @@ bool TalentSpec::CheckTalents(uint32 level, std::ostringstream* out)
     return true;
 }
 
-//Set the talents for the bots to the current spec.
-void TalentSpec::ApplyTalents(Player* bot, std::ostringstream* out)
+// Set the talents for the bots to the current spec.
+void TalentSpec::ApplyTalents(Player *bot, std::ostringstream *out)
 {
-    for (auto& entry : talents) {
+    for (auto &entry : talents)
+    {
         if (entry.rank == 0)
             continue;
         bot->LearnTalent(entry.talentInfo->TalentID, entry.rank - 1);
     }
 }
 
-//Returns a base talentlist for a class.
+// Returns a base talentlist for a class.
 void TalentSpec::GetTalents(uint32 classMask)
 {
     TalentListEntry entry;
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
-        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
+        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
         if (!talentInfo)
             continue;
 
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
         if (!talentTabInfo)
             continue;
 
@@ -185,8 +186,8 @@ void TalentSpec::GetTalents(uint32 classMask)
     SortTalents(talents, SORT_BY_DEFAULT);
 }
 
-//Sorts a talent list by page, row, column.
-bool sortTalentMap(TalentSpec::TalentListEntry i, TalentSpec::TalentListEntry j, uint32* tabSort)
+// Sorts a talent list by page, row, column.
+bool sortTalentMap(TalentSpec::TalentListEntry i, TalentSpec::TalentListEntry j, uint32 *tabSort)
 {
     uint32 itab = i.tabPage();
     uint32 jtab = j.tabPage();
@@ -213,36 +214,32 @@ void TalentSpec::SortTalents(uint32 sortBy)
     SortTalents(talents, sortBy);
 }
 
-//Sort the talents.
-void TalentSpec::SortTalents(std::vector<TalentListEntry>& talents, uint32 sortBy)
+// Sort the talents.
+void TalentSpec::SortTalents(std::vector<TalentListEntry> &talents, uint32 sortBy)
 {
     switch (sortBy)
     {
-        case SORT_BY_DEFAULT:
-        {
-            uint32 tabSort[] = { 0, 1, 2 };
-            std::sort(talents.begin(), talents.end(), [&tabSort](TalentSpec::TalentListEntry i, TalentSpec::TalentListEntry j)
-            {
-                return sortTalentMap(i, j, tabSort);
-            });
-            break;
-        }
-        case SORT_BY_POINTS_TREE:
-        {
-            uint32 tabSort[] = { GetTalentPoints(talents, 0) * 100 - urand(0, 99), GetTalentPoints(talents, 1) * 100 - urand(0, 99), GetTalentPoints(talents, 2) * 100 - urand(0, 99) };
-            std::sort(talents.begin(), talents.end(), [&tabSort](TalentSpec::TalentListEntry i, TalentSpec::TalentListEntry j)
-            {
-                return sortTalentMap(i, j, tabSort);
-            });
-            break;
-        }
+    case SORT_BY_DEFAULT:
+    {
+        uint32 tabSort[] = {0, 1, 2};
+        std::sort(talents.begin(), talents.end(), [&tabSort](TalentSpec::TalentListEntry i, TalentSpec::TalentListEntry j)
+                  { return sortTalentMap(i, j, tabSort); });
+        break;
+    }
+    case SORT_BY_POINTS_TREE:
+    {
+        uint32 tabSort[] = {GetTalentPoints(talents, 0) * 100 - urand(0, 99), GetTalentPoints(talents, 1) * 100 - urand(0, 99), GetTalentPoints(talents, 2) * 100 - urand(0, 99)};
+        std::sort(talents.begin(), talents.end(), [&tabSort](TalentSpec::TalentListEntry i, TalentSpec::TalentListEntry j)
+                  { return sortTalentMap(i, j, tabSort); });
+        break;
+    }
     }
 }
 
-//Set the talent ranks to the current rank of the player.
-void TalentSpec::ReadTalents(Player* bot)
+// Set the talent ranks to the current rank of the player.
+void TalentSpec::ReadTalents(Player *bot)
 {
-    for (auto& entry : talents)
+    for (auto &entry : talents)
         for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
         {
             uint32 spellId = entry.talentInfo->RankID[rank];
@@ -257,7 +254,7 @@ void TalentSpec::ReadTalents(Player* bot)
         }
 }
 
-//Set the talent ranks to the ranks of the link.
+// Set the talent ranks to the ranks of the link.
 void TalentSpec::ReadTalents(std::string const link)
 {
     uint32 rank = 0;
@@ -277,7 +274,7 @@ void TalentSpec::ReadTalents(std::string const link)
         tab++;
     }
 
-    for (auto& entry : talents)
+    for (auto &entry : talents)
     {
         if (entry.tabPage() == tab)
         {
@@ -308,12 +305,12 @@ void TalentSpec::ReadTalents(std::string const link)
     }
 }
 
-//Returns only a specific tree from a talent list.
+// Returns only a specific tree from a talent list.
 std::vector<TalentSpec::TalentListEntry> TalentSpec::GetTalentTree(uint32 tabpage)
 {
     std::vector<TalentListEntry> retList;
 
-    for (auto& entry : talents)
+    for (auto &entry : talents)
         if (entry.tabPage() == tabpage)
             retList.push_back(entry);
 
@@ -325,21 +322,21 @@ uint32 TalentSpec::GetTalentPoints(int32 tabpage)
     return GetTalentPoints(talents, tabpage);
 };
 
-//Counts the point in a talent list.
-uint32 TalentSpec::GetTalentPoints(std::vector<TalentListEntry>& talents, int32 tabpage)
+// Counts the point in a talent list.
+uint32 TalentSpec::GetTalentPoints(std::vector<TalentListEntry> &talents, int32 tabpage)
 {
     if (tabpage == -1)
         return points;
 
     uint32 tPoints = 0;
-    for (auto& entry : talents)
+    for (auto &entry : talents)
         if (entry.tabPage() == tabpage)
             tPoints = tPoints + entry.rank;
 
     return tPoints;
 }
 
-//Generates a wow-head link from a talent list.
+// Generates a wow-head link from a talent list.
 std::string const TalentSpec::GetTalentLink()
 {
     std::string link = "";
@@ -351,7 +348,7 @@ std::string const TalentSpec::GetTalentLink()
     {
         points[i] = GetTalentPoints(i);
 
-        for (auto& entry : GetTalentTree(i))
+        for (auto &entry : GetTalentTree(i))
         {
             curPoints += entry.rank;
             treeLink[i] += std::to_string(entry.rank);
@@ -398,12 +395,12 @@ uint32 TalentSpec::highestTree()
     return 0;
 }
 
-std::string const TalentSpec::FormatSpec(Player* bot)
+std::string const TalentSpec::FormatSpec(Player *bot)
 {
     uint8 cls = bot->getClass();
 
     std::ostringstream out;
-    //out << chathelper:: specs[cls][highestTree()] << " (";
+    // out << chathelper:: specs[cls][highestTree()] << " (";
 
     uint32 c0 = GetTalentPoints(0);
     uint32 c1 = GetTalentPoints(1);
@@ -416,7 +413,7 @@ std::string const TalentSpec::FormatSpec(Player* bot)
     return out.str();
 }
 
-//Removes talentpoints to match the level
+// Removes talentpoints to match the level
 void TalentSpec::CropTalents(uint32 level)
 {
     if (points <= LeveltoPoints(level))
@@ -425,7 +422,7 @@ void TalentSpec::CropTalents(uint32 level)
     SortTalents(talents, SORT_BY_POINTS_TREE);
 
     uint32 points = 0;
-    for (auto& entry : talents)
+    for (auto &entry : talents)
     {
         if (points + entry.rank > LeveltoPoints(level))
             entry.rank = std::max(0u, LeveltoPoints(level) - points);
@@ -436,13 +433,13 @@ void TalentSpec::CropTalents(uint32 level)
     SortTalents(talents, SORT_BY_DEFAULT);
 }
 
-//Substracts ranks. Follows the sorting of the newList.
-std::vector<TalentSpec::TalentListEntry> TalentSpec::SubTalentList(std::vector<TalentListEntry>& oldList, std::vector<TalentListEntry>& newList, uint32 reverse = SUBSTRACT_OLD_NEW)
+// Substracts ranks. Follows the sorting of the newList.
+std::vector<TalentSpec::TalentListEntry> TalentSpec::SubTalentList(std::vector<TalentListEntry> &oldList, std::vector<TalentListEntry> &newList, uint32 reverse = SUBSTRACT_OLD_NEW)
 {
     std::vector<TalentSpec::TalentListEntry> deltaList = newList;
 
-    for (auto& newentry : deltaList)
-        for (auto& oldentry : oldList)
+    for (auto &newentry : deltaList)
+        for (auto &oldentry : oldList)
             if (oldentry.entry == newentry.entry)
             {
                 if (reverse == ABSOLUTE_DIST)
@@ -456,48 +453,48 @@ std::vector<TalentSpec::TalentListEntry> TalentSpec::SubTalentList(std::vector<T
     return deltaList;
 }
 
-bool TalentSpec::isEarlierVersionOf(TalentSpec& newSpec)
+bool TalentSpec::isEarlierVersionOf(TalentSpec &newSpec)
 {
-    for (auto& newentry : newSpec.talents)
-        for (auto& oldentry : talents)
+    for (auto &newentry : newSpec.talents)
+        for (auto &oldentry : talents)
             if (oldentry.entry == newentry.entry)
                 if (oldentry.rank > newentry.rank)
                     return false;
     return true;
 }
 
-//Modifies current talents towards new talents up to a maxium of points.
-void TalentSpec::ShiftTalents(TalentSpec* currentSpec, uint32 level)
+// Modifies current talents towards new talents up to a maxium of points.
+void TalentSpec::ShiftTalents(TalentSpec *currentSpec, uint32 level)
 {
     uint32 currentPoints = currentSpec->GetTalentPoints();
-    if (points >= LeveltoPoints(level)) //We have no more points to spend. Better reset and crop
+    if (points >= LeveltoPoints(level)) // We have no more points to spend. Better reset and crop
     {
         CropTalents(level);
         return;
     }
 
-    SortTalents(SORT_BY_POINTS_TREE); //Apply points first to the largest new tree.
+    SortTalents(SORT_BY_POINTS_TREE); // Apply points first to the largest new tree.
 
     std::vector<TalentSpec::TalentListEntry> deltaList = SubTalentList(currentSpec->talents, talents);
 
-    for (auto& entry : deltaList)
+    for (auto &entry : deltaList)
     {
-        if (entry.rank < 0) //We have to remove talents. Might as well reset and crop the new list.
+        if (entry.rank < 0) // We have to remove talents. Might as well reset and crop the new list.
         {
             CropTalents(level);
             return;
         }
     }
 
-    //Start from the current spec.
+    // Start from the current spec.
     talents = currentSpec->talents;
 
-    for (auto& entry : deltaList)
+    for (auto &entry : deltaList)
     {
-        if (entry.rank + points > LeveltoPoints(level)) //Running out of points. Only apply what we have left.
+        if (entry.rank + points > LeveltoPoints(level)) // Running out of points. Only apply what we have left.
             entry.rank = std::max(0, std::abs(int32(LeveltoPoints(level) - points)));
 
-        for (auto& subentry : talents)
+        for (auto &subentry : talents)
             if (entry.entry == subentry.entry)
                 subentry.rank = subentry.rank + entry.rank;
 

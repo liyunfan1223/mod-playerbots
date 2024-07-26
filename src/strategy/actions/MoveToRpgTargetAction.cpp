@@ -12,17 +12,19 @@
 bool MoveToRpgTargetAction::Execute(Event event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
-    Unit* unit = botAI->GetUnit(guidP);
-    if (unit && !unit->IsInWorld()) {
+    Unit *unit = botAI->GetUnit(guidP);
+    if (unit && !unit->IsInWorld())
+    {
         return false;
     }
-    GameObject* go = botAI->GetGameObject(guidP);
-    if (go && !go->IsInWorld()) {
+    GameObject *go = botAI->GetGameObject(guidP);
+    if (go && !go->IsInWorld())
+    {
         return false;
     }
-    Player* player = guidP.GetPlayer();
+    Player *player = guidP.GetPlayer();
 
-    WorldObject* wo = nullptr;
+    WorldObject *wo = nullptr;
     if (unit)
         wo = unit;
     else if (go)
@@ -40,7 +42,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
 
     if (guidP.IsPlayer())
     {
-        Player* player = guidP.GetPlayer();
+        Player *player = guidP.GetPlayer();
 
         if (player && GET_PLAYERBOT_AI(player))
         {
@@ -48,7 +50,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
 
             if (guidPP.IsPlayer())
             {
-                AI_VALUE(GuidSet&,"ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
+                AI_VALUE(GuidSet &, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
 
                 RESET_AI_VALUE(GuidPosition, "rpg target");
                 return false;
@@ -58,7 +60,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
 
     if ((unit && unit->isMoving() && !urand(0, 20)) || !ChooseRpgTargetAction::isFollowValid(bot, wo) || guidP.distance(bot) > sPlayerbotAIConfig->reactDistance * 2 || !urand(0, 50))
     {
-        AI_VALUE(GuidSet&, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
+        AI_VALUE(GuidSet &, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
         RESET_AI_VALUE(GuidPosition, "rpg target");
         return false;
     }
@@ -77,19 +79,19 @@ bool MoveToRpgTargetAction::Execute(Event event)
     if (bot->IsWithinLOS(x, y, z))
     {
         if (!unit || !unit->isMoving())
-            angle = wo->GetAngle(bot) + (M_PI * irand(-25, 25) / 100.0); //Closest 45 degrees towards the target
+            angle = wo->GetAngle(bot) + (M_PI * irand(-25, 25) / 100.0); // Closest 45 degrees towards the target
         else
-            angle = wo->GetOrientation() + (M_PI * irand(-25, 25) / 100.0); //45 degrees infront of target (leading it's movement)
+            angle = wo->GetOrientation() + (M_PI * irand(-25, 25) / 100.0); // 45 degrees infront of target (leading it's movement)
 
         distance = frand(0.5f, 1.f);
     }
     else
-        angle = 2 * M_PI * urand(0, 100) / 100.0; //A circle around the target.
+        angle = 2 * M_PI * urand(0, 100) / 100.0; // A circle around the target.
 
     x += cos(angle) * INTERACTION_DISTANCE * distance;
     y += sin(angle) * INTERACTION_DISTANCE * distance;
 
-    //WaitForReach(distance);
+    // WaitForReach(distance);
 
     bool couldMove = false;
 
@@ -100,7 +102,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
 
     if (!couldMove && WorldPosition(mapId, x, y, z).distance(bot) > INTERACTION_DISTANCE)
     {
-        AI_VALUE(GuidSet&, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
+        AI_VALUE(GuidSet &, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
         RESET_AI_VALUE(GuidPosition, "rpg target");
     }
 
@@ -113,11 +115,11 @@ bool MoveToRpgTargetAction::isUseful()
     if (!guidP)
         return false;
 
-    WorldObject* wo = guidP.GetWorldObject();
+    WorldObject *wo = guidP.GetWorldObject();
     if (!wo)
         return false;
 
-    TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
+    TravelTarget *travelTarget = AI_VALUE(TravelTarget *, "travel target");
     if (travelTarget->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot, *travelTarget->getPosition()))
         return false;
 

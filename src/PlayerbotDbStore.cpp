@@ -7,11 +7,11 @@
 
 #include <iostream>
 
-void PlayerbotDbStore::Load(PlayerbotAI* botAI)
+void PlayerbotDbStore::Load(PlayerbotAI *botAI)
 {
     ObjectGuid::LowType guid = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_DB_STORE);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_DB_STORE);
     stmt->SetData(0, guid);
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
@@ -23,7 +23,7 @@ void PlayerbotDbStore::Load(PlayerbotAI* botAI)
         std::vector<std::string> values;
         do
         {
-            Field* fields = result->Fetch();
+            Field *fields = result->Fetch();
             std::string const key = fields[0].Get<std::string>();
             std::string const value = fields[1].Get<std::string>();
 
@@ -35,14 +35,13 @@ void PlayerbotDbStore::Load(PlayerbotAI* botAI)
                 botAI->ChangeStrategy(value, BOT_STATE_NON_COMBAT);
             else if (key == "dead")
                 botAI->ChangeStrategy(value, BOT_STATE_DEAD);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
 
         botAI->GetAiObjectContext()->Load(values);
     }
 }
 
-void PlayerbotDbStore::Save(PlayerbotAI* botAI)
+void PlayerbotDbStore::Save(PlayerbotAI *botAI)
 {
     ObjectGuid::LowType guid = botAI->GetBot()->GetGUID().GetCounter();
 
@@ -69,18 +68,18 @@ std::string const PlayerbotDbStore::FormatStrategies(std::string const type, std
     return res.substr(0, res.size() - 1);
 }
 
-void PlayerbotDbStore::Reset(PlayerbotAI* botAI)
+void PlayerbotDbStore::Reset(PlayerbotAI *botAI)
 {
     ObjectGuid::LowType guid = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_CUSTOM_STRATEGY);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_CUSTOM_STRATEGY);
     stmt->SetData(0, guid);
     PlayerbotsDatabase.Execute(stmt);
 }
 
 void PlayerbotDbStore::SaveValue(uint32 guid, std::string const key, std::string const value)
 {
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_DB_STORE);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_DB_STORE);
     stmt->SetData(0, guid);
     stmt->SetData(1, key);
     stmt->SetData(2, value);

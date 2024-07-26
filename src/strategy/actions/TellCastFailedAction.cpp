@@ -19,33 +19,33 @@ bool TellCastFailedAction::Execute(Event event)
     if (result == SPELL_CAST_OK)
         return false;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
     std::ostringstream out;
     out << chat->FormatSpell(spellInfo) << ": ";
     switch (result)
     {
-        case SPELL_FAILED_NOT_READY:
-            out << "not ready";
-            break;
-        case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
-            out << "requires spell focus";
-            break;
-        case SPELL_FAILED_REQUIRES_AREA:
-            out << "cannot cast here";
-            break;
-        case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
-            out << "requires item";
-            break;
-        case SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND:
-        case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
-            out << "requires weapon";
-            break;
-        case SPELL_FAILED_PREVENTED_BY_MECHANIC:
-            out << "interrupted";
-            break;
-        default:
-            out << "cannot cast";
+    case SPELL_FAILED_NOT_READY:
+        out << "not ready";
+        break;
+    case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
+        out << "requires spell focus";
+        break;
+    case SPELL_FAILED_REQUIRES_AREA:
+        out << "cannot cast here";
+        break;
+    case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
+        out << "requires item";
+        break;
+    case SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND:
+    case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
+        out << "requires weapon";
+        break;
+    case SPELL_FAILED_PREVENTED_BY_MECHANIC:
+        out << "interrupted";
+        break;
+    default:
+        out << "cannot cast";
     }
 
     if (spellInfo->CalcCastTime() >= 2000)
@@ -61,7 +61,7 @@ bool TellSpellAction::Execute(Event event)
     if (!spellId)
         return false;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
         return false;
 

@@ -21,25 +21,25 @@ bool AttackEnemyPlayerAction::isUseful()
 
 bool AttackEnemyFlagCarrierAction::isUseful()
 {
-    Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
+    Unit *target = context->GetValue<Unit*>("enemy flag carrier")->Get();
     return target && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
 }
 
 bool AttackAnythingAction::isUseful()
 {
-    if (!botAI->AllowActivity(GRIND_ACTIVITY))                                              //Bot not allowed to be active
+    if (!botAI->AllowActivity(GRIND_ACTIVITY)) // Bot not allowed to be active
         return false;
 
     if (!AI_VALUE(bool, "can move around"))
         return false;
 
-    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && 
-        ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
+    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() &&
+        ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) // Bot is traveling
         return false;
     // if (bot->IsInCombat()) {
     //     return false;
     // }
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
 
     if (!target)
         return false;
@@ -56,7 +56,7 @@ bool AttackAnythingAction::isUseful()
 
 bool DropTargetAction::Execute(Event event)
 {
-    Unit* target = context->GetValue<Unit*>("current target")->Get();
+    Unit *target = context->GetValue<Unit*>("current target")->Get();
     if (target && target->isDead())
     {
         ObjectGuid guid = target->GetGUID();
@@ -101,9 +101,9 @@ bool AttackAnythingAction::Execute(Event event)
     bool result = AttackAction::Execute(event);
     if (result)
     {
-        if (Unit* grindTarget = GetTarget())
+        if (Unit *grindTarget = GetTarget())
         {
-            if (char const* grindName = grindTarget->GetName().c_str())
+            if (char const *grindName = grindTarget->GetName().c_str())
             {
                 context->GetValue<ObjectGuid>("pull target")->Set(grindTarget->GetGUID());
                 bot->GetMotionMaster()->Clear();

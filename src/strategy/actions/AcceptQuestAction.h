@@ -13,25 +13,25 @@ class WorldObject;
 
 class AcceptAllQuestsAction : public QuestAction
 {
-    public:
-        AcceptAllQuestsAction(PlayerbotAI* botAI, std::string const name = "accept all quests") : QuestAction(botAI, name) { }
+public:
+    AcceptAllQuestsAction(PlayerbotAI *botAI, std::string const name = "accept all quests") : QuestAction(botAI, name) {}
 
-    protected:
-        void ProcessQuest(Quest const* quest, Object* questGiver) override;
+protected:
+    void ProcessQuest(Quest const *quest, Object *questGiver) override;
 };
 
 class AcceptQuestAction : public AcceptAllQuestsAction
 {
-    public:
-        AcceptQuestAction(PlayerbotAI* botAI) : AcceptAllQuestsAction(botAI, "accept quest") { }
-        bool Execute(Event event) override;
+public:
+    AcceptQuestAction(PlayerbotAI *botAI) : AcceptAllQuestsAction(botAI, "accept quest") {}
+    bool Execute(Event event) override;
 };
 
 class AcceptQuestShareAction : public Action
 {
-    public:
-        AcceptQuestShareAction(PlayerbotAI* botAI) : Action(botAI, "accept quest share") { }
-        bool Execute(Event event) override;
+public:
+    AcceptQuestShareAction(PlayerbotAI *botAI) : Action(botAI, "accept quest share") {}
+    bool Execute(Event event) override;
 };
 
 #endif

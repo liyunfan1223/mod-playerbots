@@ -13,18 +13,18 @@ class PlayerbotAI;
 
 class CustomStrategy : public Strategy, public Qualified
 {
-    public:
-        CustomStrategy(PlayerbotAI* botAI);
+public:
+    CustomStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*> &triggers) override;
-        std::string const getName() override { return std::string("custom::" + qualifier); }
-        void Reset();
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return std::string("custom::" + qualifier); }
+    void Reset();
 
-        static std::map<std::string, std::string> actionLinesCache;
+    static std::map<std::string, std::string> actionLinesCache;
 
-    private:
-        std::vector<std::string> actionLines;
-        void LoadActionLines(uint32 owner);
+private:
+    std::vector<std::string> actionLines;
+    void LoadActionLines(uint32 owner);
 };
 
 #endif

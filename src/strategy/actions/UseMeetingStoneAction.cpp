@@ -12,7 +12,7 @@
 
 bool UseMeetingStoneAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -21,11 +21,11 @@ bool UseMeetingStoneAction::Execute(Event event)
     ObjectGuid guid;
     p >> guid;
 
-	if (master->GetTarget() && master->GetTarget() != bot->GetGUID())
-		return false;
+    if (master->GetTarget() && master->GetTarget() != bot->GetGUID())
+        return false;
 
-	if (!master->GetTarget() && master->GetGroup() != bot->GetGroup())
-		return false;
+    if (!master->GetTarget() && master->GetGroup() != bot->GetGroup())
+        return false;
 
     if (master->IsBeingTeleported())
         return false;
@@ -36,7 +36,7 @@ bool UseMeetingStoneAction::Execute(Event event)
         return false;
     }
 
-    Map* map = master->GetMap();
+    Map *map = master->GetMap();
     if (!map)
         return false;
 
@@ -44,8 +44,8 @@ bool UseMeetingStoneAction::Execute(Event event)
     if (!gameObject)
         return false;
 
-	GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
-	if (!goInfo || goInfo->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
+    GameObjectTemplate const *goInfo = gameObject->GetGOInfo();
+    if (!goInfo || goInfo->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
         return false;
 
     return Teleport(master, bot);
@@ -53,35 +53,37 @@ bool UseMeetingStoneAction::Execute(Event event)
 
 class AnyGameObjectInObjectRangeCheck
 {
-    public:
-        AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) { }
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(GameObject* go)
-        {
-            if (go && i_obj->IsWithinDistInMap(go, i_range) && go->isSpawned() && go->GetGOInfo())
-                return true;
+public:
+    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range) : i_obj(obj), i_range(range) {}
+    WorldObject const &GetFocusObject() const { return *i_obj; }
+    bool operator()(GameObject *go)
+    {
+        if (go && i_obj->IsWithinDistInMap(go, i_range) && go->isSpawned() && go->GetGOInfo())
+            return true;
 
-            return false;
-        }
+        return false;
+    }
 
-    private:
-        WorldObject const* i_obj;
-        float i_range;
+private:
+    WorldObject const *i_obj;
+    float i_range;
 };
 
 bool SummonAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
-    
-    if (Pet* pet = bot->GetPet()) {
+
+    if (Pet *pet = bot->GetPet())
+    {
         pet->SetReactState(REACT_PASSIVE);
         pet->GetCharmInfo()->SetIsCommandFollow(true);
         pet->GetCharmInfo()->IsReturning();
     }
 
-    if (master->GetSession()->GetSecurity() >= SEC_PLAYER) {
+    if (master->GetSession()->GetSecurity() >= SEC_PLAYER)
+    {
         // botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
         SET_AI_VALUE(std::list<FleeInfo>, "recently flee info", {});
         return Teleport(master, bot);
@@ -102,14 +104,14 @@ bool SummonAction::Execute(Event event)
     return false;
 }
 
-bool SummonAction::SummonUsingGos(Player* summoner, Player* player)
+bool SummonAction::SummonUsingGos(Player *summoner, Player *player)
 {
     std::list<GameObject*> targets;
     AnyGameObjectInObjectRangeCheck u_check(summoner, sPlayerbotAIConfig->sightDistance);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(summoner, targets, u_check);
     Cell::VisitAllObjects(summoner, searcher, sPlayerbotAIConfig->sightDistance);
 
-    for (GameObject* go : targets)
+    for (GameObject *go : targets)
     {
         if (go->isSpawned() && go->GetGoType() == GAMEOBJECT_TYPE_MEETINGSTONE)
             return Teleport(summoner, player);
@@ -119,7 +121,7 @@ bool SummonAction::SummonUsingGos(Player* summoner, Player* player)
     return false;
 }
 
-bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player)
+bool SummonAction::SummonUsingNpcs(Player *summoner, Player *player)
 {
     if (!sPlayerbotAIConfig->summonAtInnkeepersEnabled)
         return false;
@@ -129,7 +131,7 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player)
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(summoner, targets, u_check);
     Cell::VisitAllObjects(summoner, searcher, sPlayerbotAIConfig->sightDistance);
 
-    for (Unit* unit : targets)
+    for (Unit *unit : targets)
     {
         if (unit && unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_INNKEEPER))
         {
@@ -146,7 +148,7 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player)
             }
 
             // Trigger cooldown
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(8690);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(8690);
             if (!spellInfo)
                 return false;
 
@@ -161,15 +163,18 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player)
     return false;
 }
 
-bool SummonAction::Teleport(Player* summoner, Player* player)
+bool SummonAction::Teleport(Player *summoner, Player *player)
 {
-    Player* master = GetMaster();
-    if (master->GetMap() && master->GetMap()->IsDungeon()) {
-        InstanceMap* map = master->GetMap()->ToInstanceMap();
-        if (map) {
-            if (map->CannotEnter(player) == Map::CANNOT_ENTER_MAX_PLAYERS) {
+    Player *master = GetMaster();
+    if (master->GetMap() && master->GetMap()->IsDungeon())
+    {
+        InstanceMap *map = master->GetMap()->ToInstanceMap();
+        if (map)
+        {
+            if (map->CannotEnter(player) == Map::CANNOT_ENTER_MAX_PLAYERS)
+            {
                 botAI->TellError("I can not enter this dungeon");
-                    return false;
+                return false;
             }
         }
     }

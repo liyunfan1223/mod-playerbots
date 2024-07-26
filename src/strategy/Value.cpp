@@ -7,19 +7,19 @@
 #include "Playerbots.h"
 #include "Timer.h"
 
-UnitCalculatedValue::UnitCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) : CalculatedValue<Unit*>(botAI, name, checkInterval)
+UnitCalculatedValue::UnitCalculatedValue(PlayerbotAI *botAI, std::string const name, int32 checkInterval) : CalculatedValue<Unit*>(botAI, name, checkInterval)
 {
 }
 
 std::string const UnitCalculatedValue::Format()
 {
-    Unit* unit = Calculate();
+    Unit *unit = Calculate();
     return unit ? unit->GetName() : "<none>";
 }
 
 std::string const UnitManualSetValue::Format()
 {
-    Unit* unit = Get();
+    Unit *unit = Get();
     return unit ? unit->GetName() : "<none>";
 }
 
@@ -44,35 +44,34 @@ std::string const FloatCalculatedValue::Format()
     return out.str();
 }
 
-CDPairCalculatedValue::CDPairCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
-    CalculatedValue<CreatureData const*>(botAI, name, checkInterval)
+CDPairCalculatedValue::CDPairCalculatedValue(PlayerbotAI *botAI, std::string const name, int32 checkInterval) : CalculatedValue<CreatureData const*>(botAI, name, checkInterval)
 {
     // lastCheckTime = getMSTime() - checkInterval / 2;
 }
 
 std::string const CDPairCalculatedValue::Format()
 {
-    CreatureData const* creatureData = Calculate();
+    CreatureData const *creatureData = Calculate();
     if (creatureData)
     {
-        CreatureTemplate const* bmTemplate = sObjectMgr->GetCreatureTemplate(creatureData->id1);
+        CreatureTemplate const *bmTemplate = sObjectMgr->GetCreatureTemplate(creatureData->id1);
         return bmTemplate ? bmTemplate->Name : "<none>";
     }
 
     return "<none>";
 }
 
-CDPairListCalculatedValue::CDPairListCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
-    CalculatedValue<std::vector<CreatureData const*>>(botAI, name, checkInterval)
+CDPairListCalculatedValue::CDPairListCalculatedValue(PlayerbotAI *botAI, std::string const name, int32 checkInterval) : CalculatedValue<std::vector<CreatureData const*>>(botAI, name, checkInterval)
 {
     // lastCheckTime = time(nullptr) - checkInterval / 2;
 }
 
 std::string const CDPairListCalculatedValue::Format()
 {
-    std::ostringstream out; out << "{";
+    std::ostringstream out;
+    out << "{";
     std::vector<CreatureData const*> cdPairs = Calculate();
-    for (CreatureData const* cdPair : cdPairs)
+    for (CreatureData const *cdPair : cdPairs)
     {
         out << cdPair->id1 << ",";
     }
@@ -81,8 +80,7 @@ std::string const CDPairListCalculatedValue::Format()
     return out.str();
 }
 
-ObjectGuidCalculatedValue::ObjectGuidCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
-    CalculatedValue<ObjectGuid>(botAI, name, checkInterval)
+ObjectGuidCalculatedValue::ObjectGuidCalculatedValue(PlayerbotAI *botAI, std::string const name, int32 checkInterval) : CalculatedValue<ObjectGuid>(botAI, name, checkInterval)
 {
     // lastCheckTime = time(nullptr) - checkInterval / 2;
 }
@@ -93,8 +91,7 @@ std::string const ObjectGuidCalculatedValue::Format()
     return guid ? std::to_string(guid.GetRawValue()) : "<none>";
 }
 
-ObjectGuidListCalculatedValue::ObjectGuidListCalculatedValue(PlayerbotAI* botAI, std::string const name, int32 checkInterval) :
-    CalculatedValue<GuidVector>(botAI, name, checkInterval)
+ObjectGuidListCalculatedValue::ObjectGuidListCalculatedValue(PlayerbotAI *botAI, std::string const name, int32 checkInterval) : CalculatedValue<GuidVector>(botAI, name, checkInterval)
 {
 }
 
@@ -114,19 +111,22 @@ std::string const ObjectGuidListCalculatedValue::Format()
     return out.str();
 }
 
-Unit* UnitCalculatedValue::Get()
+Unit *UnitCalculatedValue::Get()
 {
-    if (checkInterval < 2) {
-        PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+    if (checkInterval < 2)
+    {
+        PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
         value = Calculate();
         if (pmo)
             pmo->finish();
-    } else {
+    }
+    else
+    {
         time_t now = getMSTime();
         if (!lastCheckTime || now - lastCheckTime >= checkInterval)
         {
             lastCheckTime = now;
-            PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+            PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
             value = Calculate();
             if (pmo)
                 pmo->finish();
@@ -138,7 +138,7 @@ Unit* UnitCalculatedValue::Get()
     return nullptr;
 }
 
-Unit* UnitManualSetValue::Get()
+Unit *UnitManualSetValue::Get()
 {
     // Prevent crashing by InWorld check
     if (value && value->IsInWorld())

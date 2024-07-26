@@ -12,39 +12,39 @@ class PlayerbotAI;
 
 class GenericMageStrategy : public RangedCombatStrategy
 {
-    public:
-        GenericMageStrategy(PlayerbotAI* botAI);
+public:
+    GenericMageStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "mage"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        uint32 GetType() const override { return RangedCombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
+    std::string const getName() override { return "mage"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    uint32 GetType() const override { return RangedCombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
 };
 
 class MageCureStrategy : public Strategy
 {
-    public:
-        MageCureStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    MageCureStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cure"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "cure"; }
 };
 
 class MageBoostStrategy : public Strategy
 {
-    public:
-        MageBoostStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    MageBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "boost"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "boost"; }
 };
 
 class MageCcStrategy : public Strategy
 {
-    public:
-        MageCcStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    MageCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cc"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "cc"; }
 };
 
 #endif

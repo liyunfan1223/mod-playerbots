@@ -12,15 +12,15 @@ class Unit;
 
 class GrindTargetValue : public TargetValue
 {
-	public:
-        GrindTargetValue(PlayerbotAI* botAI, std::string const name = "grind target") : TargetValue(botAI, name) { }
+public:
+    GrindTargetValue(PlayerbotAI *botAI, std::string const name = "grind target") : TargetValue(botAI, name) {}
 
-        Unit* Calculate() override;
+    Unit *Calculate() override;
 
-    private:
-        uint32 GetTargetingPlayerCount(Unit* unit);
-        Unit* FindTargetForGrinding(uint32 assistCount);
-        bool needForQuest(Unit* target);
+private:
+    uint32 GetTargetingPlayerCount(Unit *unit);
+    Unit *FindTargetForGrinding(uint32 assistCount);
+    bool needForQuest(Unit *target);
 };
 
 #endif

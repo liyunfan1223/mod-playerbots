@@ -13,12 +13,12 @@
 
 bool BuyPetitionAction::Execute(Event event)
 {
-    GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector >("nearest npcs")->Get();
+    GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
     bool vendored = false, result = false;
     for (GuidVector::iterator i = vendors.begin(); i != vendors.end(); ++i)
     {
         ObjectGuid vendorguid = *i;
-        Creature* pCreature = bot->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_PETITIONER);
+        Creature *pCreature = bot->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_PETITIONER);
         if (!pCreature)
             continue;
 
@@ -64,7 +64,7 @@ bool BuyPetitionAction::isUseful()
     return canBuyPetition(bot);
 };
 
-bool BuyPetitionAction::canBuyPetition(Player* bot)
+bool BuyPetitionAction::canBuyPetition(Player *bot)
 {
     if (bot->GetGuildId())
         return false;
@@ -72,8 +72,8 @@ bool BuyPetitionAction::canBuyPetition(Player* bot)
     if (bot->GetGuildIdInvited())
         return false;
 
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    AiObjectContext* context = botAI->GetAiObjectContext();
+    PlayerbotAI *botAI = GET_PLAYERBOT_AI(bot);
+    AiObjectContext *context = botAI->GetAiObjectContext();
 
     if (AI_VALUE2(uint32, "item count", "Hitem:5863:"))
         return false;
@@ -87,7 +87,7 @@ bool BuyPetitionAction::canBuyPetition(Player* bot)
     if (!botAI->HasStrategy("guild", BOT_STATE_NON_COMBAT))
         return false;
 
-    uint32 cost = 1000; //GUILD_CHARTER_COST;
+    uint32 cost = 1000; // GUILD_CHARTER_COST;
 
     if (AI_VALUE2(uint32, "free money for", uint32(NeedMoneyFor::guild)) < cost)
         return false;
@@ -97,15 +97,15 @@ bool BuyPetitionAction::canBuyPetition(Player* bot)
 
 bool PetitionOfferAction::Execute(Event event)
 {
-    uint32 petitionEntry = 5863; //GUILD_CHARTER
+    uint32 petitionEntry = 5863; // GUILD_CHARTER
     std::vector<Item*> petitions = AI_VALUE2(std::vector<Item*>, "inventory items", chat->FormatQItem(5863));
 
-   if (petitions.empty())
+    if (petitions.empty())
         return false;
 
     ObjectGuid guid = event.getObject();
 
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
     {
         if (!guid)
@@ -120,7 +120,7 @@ bool PetitionOfferAction::Execute(Event event)
     if (!guid)
         return false;
 
-    Player* player = ObjectAccessor::FindPlayer(guid);
+    Player *player = ObjectAccessor::FindPlayer(guid);
 
     if (!player)
         return false;
@@ -132,7 +132,7 @@ bool PetitionOfferAction::Execute(Event event)
     data << guid;
 
     QueryResult result = CharacterDatabase.Query("SELECT playerguid FROM petition_sign WHERE player_account = {} AND petitionguid = {}",
-        player->GetSession()->GetAccountId(), petitions.front()->GetGUID().GetCounter());
+                                                 player->GetSession()->GetAccountId(), petitions.front()->GetGUID().GetCounter());
     if (result)
     {
         return false;
@@ -157,10 +157,10 @@ bool PetitionOfferNearbyAction::Execute(Event event)
 {
     uint32 found = 0;
 
-    GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector >("nearest friendly players")->Get();
-    for (auto& i : nearGuids)
+    GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
+    for (auto &i : nearGuids)
     {
-        Player* player = ObjectAccessor::FindPlayer(i);
+        Player *player = ObjectAccessor::FindPlayer(i);
 
         if (!player)
             continue;
@@ -171,7 +171,7 @@ bool PetitionOfferNearbyAction::Execute(Event event)
         if (player->GetGuildIdInvited())
             continue;
 
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+        PlayerbotAI *botAI = GET_PLAYERBOT_AI(player);
 
         if (botAI)
         {
@@ -180,7 +180,7 @@ bool PetitionOfferNearbyAction::Execute(Event event)
                 continue;
 
             */
-            if (botAI->HasActivePlayerMaster()) //Do not invite alts of active players.
+            if (botAI->HasActivePlayerMaster()) // Do not invite alts of active players.
                 continue;
         }
         else
@@ -192,7 +192,7 @@ bool PetitionOfferNearbyAction::Execute(Event event)
         if (sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)
             continue;
 
-        //Parse rpg target to quest action.
+        // Parse rpg target to quest action.
         WorldPacket p(CMSG_QUESTGIVER_ACCEPT_QUEST);
         p << i;
         p.rpos(0);
@@ -211,7 +211,7 @@ bool PetitionOfferNearbyAction::isUseful()
 
 bool PetitionTurnInAction::Execute(Event event)
 {
-    GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector >("nearest npcs")->Get();
+    GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
     bool vendored = false, result = false;
     std::vector<Item*> petitions = AI_VALUE2(std::vector<Item*>, "inventory items", chat->FormatQItem(5863));
 
@@ -221,13 +221,13 @@ bool PetitionTurnInAction::Execute(Event event)
     for (GuidVector::iterator i = vendors.begin(); i != vendors.end(); ++i)
     {
         ObjectGuid vendorguid = *i;
-        Creature* pCreature = bot->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_PETITIONER);
+        Creature *pCreature = bot->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_PETITIONER);
         if (!pCreature)
             continue;
 
         WorldPacket data(CMSG_TURN_IN_PETITION, 8);
 
-        Item* petition = petitions.front();
+        Item *petition = petitions.front();
 
         if (!petition)
             return false;
@@ -238,7 +238,7 @@ bool PetitionTurnInAction::Execute(Event event)
 
         if (bot->GetGuildId())
         {
-            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+            Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 
             uint32 st, cl, br, bc, bg;
             bg = urand(0, 51);
@@ -250,19 +250,19 @@ bool PetitionTurnInAction::Execute(Event event)
 
             guild->HandleSetEmblem(emblemInfo);
 
-            //LANG_GUILD_VETERAN -> can invite
+            // LANG_GUILD_VETERAN -> can invite
             guild->HandleSetRankInfo(2, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK | GR_RIGHT_INVITE);
         }
 
         return true;
     }
 
-    TravelTarget* oldTarget = context->GetValue<TravelTarget*>("travel target")->Get();
+    TravelTarget *oldTarget = context->GetValue<TravelTarget*>("travel target")->Get();
 
-    //Select a new target to travel to.
+    // Select a new target to travel to.
     TravelTarget newTarget = TravelTarget(botAI);
 
-    bool foundTarget = SetNpcFlagTarget(&newTarget, { UNIT_NPC_FLAG_PETITIONER });
+    bool foundTarget = SetNpcFlagTarget(&newTarget, {UNIT_NPC_FLAG_PETITIONER});
 
     if (!foundTarget || !newTarget.isActive())
         return false;
@@ -277,14 +277,14 @@ bool PetitionTurnInAction::Execute(Event event)
 bool PetitionTurnInAction::isUseful()
 {
     bool inCity = false;
-    if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetZoneId()))
+    if (AreaTableEntry const *zone = sAreaTableStore.LookupEntry(bot->GetZoneId()))
     {
         if (zone->flags & AREA_FLAG_CAPITAL)
             inCity = true;
     }
 
     return inCity && !bot->GetGuildId() && AI_VALUE2(uint32, "item count", chat->FormatQItem(5863)) &&
-        AI_VALUE(uint8, "petition signs") >= sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS) && !context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
+           AI_VALUE(uint8, "petition signs") >= sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS) && !context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
 }
 
 bool BuyTabardAction::Execute(Event event)
@@ -293,12 +293,12 @@ bool BuyTabardAction::Execute(Event event)
     if (canBuy && AI_VALUE2(uint32, "item count", chat->FormatQItem(5976)))
         return true;
 
-    TravelTarget* oldTarget = context->GetValue<TravelTarget*>("travel target")->Get();
+    TravelTarget *oldTarget = context->GetValue<TravelTarget*>("travel target")->Get();
 
-    //Select a new target to travel to.
+    // Select a new target to travel to.
     TravelTarget newTarget = TravelTarget(botAI);
 
-    bool foundTarget = SetNpcFlagTarget(&newTarget, { UNIT_NPC_FLAG_TABARDDESIGNER }, "Tabard Vendor", { 5976 });
+    bool foundTarget = SetNpcFlagTarget(&newTarget, {UNIT_NPC_FLAG_TABARDDESIGNER}, "Tabard Vendor", {5976});
 
     if (!foundTarget || !newTarget.isActive())
         return false;
@@ -313,12 +313,12 @@ bool BuyTabardAction::Execute(Event event)
 bool BuyTabardAction::isUseful()
 {
     bool inCity = false;
-    if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetZoneId()))
+    if (AreaTableEntry const *zone = sAreaTableStore.LookupEntry(bot->GetZoneId()))
     {
         if (zone->flags & AREA_FLAG_CAPITAL)
             inCity = true;
     }
 
     return inCity && bot->GetGuildId() && !AI_VALUE2(uint32, "item count", chat->FormatQItem(5976)) &&
-        AI_VALUE2(uint32, "free money for", uint32(NeedMoneyFor::guild)) >= 10000 && !context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
+           AI_VALUE2(uint32, "free money for", uint32(NeedMoneyFor::guild)) >= 10000 && !context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
 }

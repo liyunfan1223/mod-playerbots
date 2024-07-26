@@ -10,18 +10,18 @@
 
 class Queue
 {
-    public:
-        Queue(void) { }
-        ~Queue(void) { }
+public:
+    Queue(void) {}
+    ~Queue(void) {}
 
-	    void Push(ActionBasket *action);
-	    ActionNode* Pop();
-        ActionBasket* Peek();
-	    uint32 Size();
-	    void RemoveExpired();
+    void Push(ActionBasket *action);
+    ActionNode *Pop();
+    ActionBasket *Peek();
+    uint32 Size();
+    void RemoveExpired();
 
-    private:
-	    std::list<ActionBasket*> actions;
+private:
+    std::list<ActionBasket *> actions;
 };
 
 #endif

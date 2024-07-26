@@ -6,14 +6,16 @@
 #include "Playerbots.h"
 
 #ifndef WIN32
-inline int strcmpi(char const* s1, char const* s2)
+inline int strcmpi(char const *s1, char const *s2)
 {
-    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2) {}
+    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2)
+    {
+    }
     return *s1 - *s2;
 }
 #endif
 
-Item* ItemForSpellValue::Calculate()
+Item *ItemForSpellValue::Calculate()
 {
     uint32 spellid = atoi(qualifier.c_str());
     if (!spellid)
@@ -23,8 +25,8 @@ Item* ItemForSpellValue::Calculate()
     if (!spellInfo)
         return nullptr;
 
-    Item* itemForSpell = nullptr;
-    Player* trader = bot->GetTrader();
+    Item *itemForSpell = nullptr;
+    Player *trader = bot->GetTrader();
     if (trader)
     {
         itemForSpell = trader->GetTradeData()->GetItem(TRADE_SLOT_NONTRADED);
@@ -32,7 +34,7 @@ Item* ItemForSpellValue::Calculate()
             return itemForSpell;
     }
 
-    Player* master = botAI->GetMaster();
+    Player *master = botAI->GetMaster();
     if (master)
     {
         trader = master->GetTrader();
@@ -65,7 +67,7 @@ Item* ItemForSpellValue::Calculate()
     if (!strcmpi(spellInfo->SpellName[0], "disenchant"))
         return nullptr;
 
-    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++ )
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
     {
         itemForSpell = GetItemFitsToSpellRequirements(slot, spellInfo);
         if (itemForSpell)
@@ -75,9 +77,9 @@ Item* ItemForSpellValue::Calculate()
     return nullptr;
 }
 
-Item* ItemForSpellValue::GetItemFitsToSpellRequirements(uint8 slot, SpellInfo const *spellInfo)
+Item *ItemForSpellValue::GetItemFitsToSpellRequirements(uint8 slot, SpellInfo const *spellInfo)
 {
-    Item* const itemForSpell = bot->GetItemByPos( INVENTORY_SLOT_BAG_0, slot );
+    Item *const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
     if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
         return nullptr;
 

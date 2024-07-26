@@ -11,38 +11,38 @@ class PlayerbotAI;
 
 class HunterBuffSpeedStrategy : public NonCombatStrategy
 {
-    public:
-        HunterBuffSpeedStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    HunterBuffSpeedStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-        std::string const getName() override { return "bspeed"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "bspeed"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class HunterBuffManaStrategy : public NonCombatStrategy
 {
-    public:
-        HunterBuffManaStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    HunterBuffManaStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-        std::string const getName() override { return "bmana"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "bmana"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class HunterBuffDpsStrategy : public NonCombatStrategy
 {
-	public:
-		HunterBuffDpsStrategy(PlayerbotAI* botAI);
+public:
+    HunterBuffDpsStrategy(PlayerbotAI *botAI);
 
-		std::string const getName() override { return "bdps"; }
-		void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "bdps"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class HunterNatureResistanceStrategy : public NonCombatStrategy
 {
-	public:
-		HunterNatureResistanceStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    HunterNatureResistanceStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-		std::string const getName() override { return "rnature"; }
-		void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "rnature"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 #endif

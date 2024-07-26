@@ -8,7 +8,7 @@
 
 bool HireAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -21,7 +21,7 @@ bool HireAction::Execute(Event event)
     uint32 charCount = 10;
     if (results)
     {
-        Field* fields = results->Fetch();
+        Field *fields = results->Fetch();
         charCount = uint32(fields[0].Get<uint64>());
     }
 

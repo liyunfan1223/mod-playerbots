@@ -11,12 +11,12 @@ class PlayerbotAI;
 
 class GuildStrategy : public NonCombatStrategy
 {
-    public:
-        GuildStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    GuildStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-        std::string const getName() override { return "guild"; }
-        uint32 GetType() const override { return STRATEGY_TYPE_GENERIC; }
-        void InitTriggers(std::vector<TriggerNode*> &triggers) override;
+    std::string const getName() override { return "guild"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_GENERIC; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 #endif

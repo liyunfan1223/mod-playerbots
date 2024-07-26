@@ -20,7 +20,7 @@ bool OutOfReactRangeAction::Execute(Event event)
 
 bool OutOfReactRangeAction::isUseful()
 {
-    bool canFollow = Follow(AI_VALUE(Unit*, "master target"));
+    bool canFollow = Follow(AI_VALUE(Unit *, "master target"));
     if (!canFollow)
     {
         return false;
@@ -28,4 +28,3 @@ bool OutOfReactRangeAction::isUseful()
 
     return true;
 }
-

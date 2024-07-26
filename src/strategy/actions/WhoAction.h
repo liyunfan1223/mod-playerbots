@@ -11,15 +11,15 @@ class PlayerbotAI;
 
 class WhoAction : public InventoryAction
 {
-    public:
-        WhoAction(PlayerbotAI* botAI) : InventoryAction(botAI, "who") { }
+public:
+    WhoAction(PlayerbotAI *botAI) : InventoryAction(botAI, "who") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        std::string const QueryTrade(std::string const text);
-        std::string const QuerySkill(std::string const text);
-        std::string const QuerySpec(std::string const text);
+private:
+    std::string const QueryTrade(std::string const text);
+    std::string const QuerySkill(std::string const text);
+    std::string const QuerySpec(std::string const text);
 };
 
 #endif

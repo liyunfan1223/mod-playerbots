@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class HunterAiObjectContext : public AiObjectContext
 {
-    public:
-        HunterAiObjectContext(PlayerbotAI* botAI);
+public:
+    HunterAiObjectContext(PlayerbotAI *botAI);
 };
 
 #endif

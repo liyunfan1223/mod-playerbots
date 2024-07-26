@@ -59,7 +59,7 @@ bool OutfitAction::Execute(Event event)
 
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
             {
-                Item const* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+                Item const *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
                 if (!pItem)
                     continue;
 
@@ -96,7 +96,7 @@ bool OutfitAction::Execute(Event event)
         bool remove = param.size() > 1 && param.substr(space + 1, 1) == "-";
         for (uint32 itemid : items)
         {
-            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
+            ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemid);
 
             std::ostringstream out;
             out << chat->FormatItem(proto);
@@ -126,7 +126,7 @@ bool OutfitAction::Execute(Event event)
 
 void OutfitAction::Save(std::string const name, ItemIds items)
 {
-    std::vector<std::string>& outfits = AI_VALUE(std::vector<std::string>&, "outfit list");
+    std::vector<std::string> &outfits = AI_VALUE(std::vector<std::string> &, "outfit list");
     for (std::vector<std::string>::iterator i = outfits.begin(); i != outfits.end(); ++i)
     {
         std::string const outfit = *i;
@@ -159,7 +159,7 @@ void OutfitAction::Save(std::string const name, ItemIds items)
 
 void OutfitAction::List()
 {
-    std::vector<std::string>& outfits = AI_VALUE(std::vector<std::string>&, "outfit list");
+    std::vector<std::string> &outfits = AI_VALUE(std::vector<std::string> &, "outfit list");
     for (std::vector<std::string>::iterator i = outfits.begin(); i != outfits.end(); ++i)
     {
         std::string const outfit = *i;
@@ -170,7 +170,7 @@ void OutfitAction::List()
         out << name << ": ";
 
         for (uint32 itemId : items)
-            if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId))
+            if (ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId))
                 out << chat->FormatItem(proto) << " ";
 
         botAI->TellMaster(out);

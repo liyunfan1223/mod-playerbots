@@ -18,7 +18,7 @@ float DistanceValue::Calculate()
         if (loot.IsEmpty())
             return 0.0f;
 
-        WorldObject* obj = loot.GetWorldObject(bot);
+        WorldObject *obj = loot.GetWorldObject(bot);
         if (!obj || !obj->IsInWorld())
             return 0.0f;
 
@@ -28,7 +28,7 @@ float DistanceValue::Calculate()
     if (qualifier.find("position_") == 0)
     {
         std::string const position = qualifier.substr(9);
-        PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()[position];
+        PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()[position];
         if (!pos.isSet())
             return 0.0f;
 
@@ -38,7 +38,7 @@ float DistanceValue::Calculate()
         return sServerFacade->GetDistance2d(botAI->GetBot(), pos.x, pos.y);
     }
 
-    Unit* target = nullptr;
+    Unit *target = nullptr;
     if (qualifier == "rpg target")
     {
         GuidPosition rpgTarget = AI_VALUE(GuidPosition, qualifier);
@@ -46,7 +46,7 @@ float DistanceValue::Calculate()
     }
     else if (qualifier == "travel target")
     {
-        TravelTarget* travelTarget = AI_VALUE(TravelTarget*, qualifier);
+        TravelTarget *travelTarget = AI_VALUE(TravelTarget *, qualifier);
         return travelTarget->distance(botAI->GetBot());
     }
     else if (qualifier == "last long move")
@@ -61,7 +61,7 @@ float DistanceValue::Calculate()
     }
     else if (qualifier == "current target")
     {
-        Unit* target = AI_VALUE(Unit*, qualifier);
+        Unit *target = AI_VALUE(Unit *, qualifier);
         if (!target || !target->IsInWorld())
             return 0.0f;
 
@@ -69,10 +69,10 @@ float DistanceValue::Calculate()
     }
     else
     {
-        target = AI_VALUE(Unit*, qualifier);
+        target = AI_VALUE(Unit *, qualifier);
         if (target && target == GetMaster() && target != bot)
         {
-            Formation* formation = AI_VALUE(Formation*, "formation");
+            Formation *formation = AI_VALUE(Formation *, "formation");
             WorldLocation loc = formation->GetLocation();
             return sServerFacade->GetDistance2d(botAI->GetBot(), loc.GetPositionX(), loc.GetPositionY());
         }
@@ -89,7 +89,7 @@ float DistanceValue::Calculate()
 
 bool InsideTargetValue::Calculate()
 {
-    Unit* target = AI_VALUE(Unit*, qualifier);
+    Unit *target = AI_VALUE(Unit *, qualifier);
     if (!target || !target->IsInWorld() || target == botAI->GetBot())
         return false;
 

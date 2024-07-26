@@ -10,14 +10,14 @@
 
 bool InviteToGroupAction::Execute(Event event)
 {
-    Player* master = event.getOwner();
+    Player *master = event.getOwner();
     if (!master)
         return false;
 
     return Invite(master);
 }
 
-bool InviteToGroupAction::Invite(Player* player)
+bool InviteToGroupAction::Invite(Player *player)
 {
     if (!player || !player->IsInWorld())
         return false;
@@ -37,9 +37,9 @@ bool InviteToGroupAction::Invite(Player* player)
 bool InviteNearbyToGroupAction::Execute(Event event)
 {
     GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
-    for (auto& i : nearGuids)
+    for (auto &i : nearGuids)
     {
-        Player* player = ObjectAccessor::FindPlayer(i);
+        Player *player = ObjectAccessor::FindPlayer(i);
         if (!player)
             continue;
 
@@ -84,7 +84,7 @@ bool InviteNearbyToGroupAction::isUseful()
     if (grouperType == GrouperType::SOLO || grouperType == GrouperType::MEMBER)
         return false;
 
-    if (Group* group = bot->GetGroup())
+    if (Group *group = bot->GetGroup())
     {
         if (group->IsFull())
             return false;
@@ -105,7 +105,7 @@ bool InviteNearbyToGroupAction::isUseful()
 
 std::vector<Player*> InviteGuildToGroupAction::getGuildMembers()
 {
-    Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 
     FindGuildMembers worker;
     guild->BroadcastWorker(worker);
@@ -115,9 +115,9 @@ std::vector<Player*> InviteGuildToGroupAction::getGuildMembers()
 
 bool InviteGuildToGroupAction::Execute(Event event)
 {
-    for (auto& member : getGuildMembers())
+    for (auto &member : getGuildMembers())
     {
-        Player* player = member;
+        Player *player = member;
 
         if (!player)
             continue;
@@ -125,19 +125,19 @@ bool InviteGuildToGroupAction::Execute(Event event)
         if (player->GetGroup())
             continue;
 
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+        PlayerbotAI *botAI = GET_PLAYERBOT_AI(player);
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster()) //Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster()) // Do not invite solo players.
                 continue;
 
-            if (botAI->HasActivePlayerMaster()) //Do not invite alts of active players.
+            if (botAI->HasActivePlayerMaster()) // Do not invite alts of active players.
                 continue;
 
             if (player->GetLevel() > bot->GetLevel() + 5) // Only invite higher levels that need money so they can grind money and help out.
             {
-                AiObjectContext* botContext = botAI->GetAiObjectContext();
+                AiObjectContext *botContext = botAI->GetAiObjectContext();
 
                 if (!botContext->GetValue<bool>("should get money")->Get())
                     continue;

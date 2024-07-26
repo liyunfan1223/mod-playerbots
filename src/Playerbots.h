@@ -17,9 +17,9 @@
 #include "TravelNode.h"
 
 std::vector<std::string> split(std::string const s, char delim);
-void split(std::vector<std::string>& dest, std::string const str, char const* delim);
+void split(std::vector<std::string> &dest, std::string const str, char const *delim);
 #ifndef WIN32
-int strcmpi(char const* s1, char const* s2);
+int strcmpi(char const *s1, char const *s2);
 #endif
 
 #define CAST_ANGLE_IN_FRONT (2.f * static_cast<float>(M_PI) / 3.f)

@@ -7,20 +7,20 @@
 
 class FindCurrentCcTargetStrategy : public FindTargetStrategy
 {
-    public:
-        FindCurrentCcTargetStrategy(PlayerbotAI* botAI, std::string const spell) : FindTargetStrategy(botAI), spell(spell) { }
+public:
+    FindCurrentCcTargetStrategy(PlayerbotAI *botAI, std::string const spell) : FindTargetStrategy(botAI), spell(spell) {}
 
-        void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
-        {
-            if (botAI->HasAura(spell, attacker))
-                result = attacker;
-        }
+    void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override
+    {
+        if (botAI->HasAura(spell, attacker))
+            result = attacker;
+    }
 
-    private:
-        std::string const spell;
+private:
+    std::string const spell;
 };
 
-Unit* CurrentCcTargetValue::Calculate()
+Unit *CurrentCcTargetValue::Calculate()
 {
     FindCurrentCcTargetStrategy strategy(botAI, qualifier);
     return FindTarget(&strategy);

@@ -5,7 +5,7 @@
 #include "UseFoodStrategy.h"
 #include "Playerbots.h"
 
-void UseFoodStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void UseFoodStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     Strategy::InitTriggers(triggers);
 

@@ -8,24 +8,24 @@
 
 class FindLeastHpTargetStrategy : public FindNonCcTargetStrategy
 {
-    public:
-        FindLeastHpTargetStrategy(PlayerbotAI* botAI) : FindNonCcTargetStrategy(botAI), minHealth(0) { }
+public:
+    FindLeastHpTargetStrategy(PlayerbotAI *botAI) : FindNonCcTargetStrategy(botAI), minHealth(0) {}
 
-        void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
-        {
-            Player* bot = botAI->GetBot();
-            if (IsCcTarget(attacker))
-                return;
+    void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override
+    {
+        Player *bot = botAI->GetBot();
+        if (IsCcTarget(attacker))
+            return;
 
-            if (!result || result->GetHealth() > attacker->GetHealth())
-                result = attacker;
-        }
+        if (!result || result->GetHealth() > attacker->GetHealth())
+            result = attacker;
+    }
 
-    protected:
-        float minHealth;
+protected:
+    float minHealth;
 };
 
-Unit* LeastHpTargetValue::Calculate()
+Unit *LeastHpTargetValue::Calculate()
 {
     FindLeastHpTargetStrategy strategy(botAI);
     return FindTarget(&strategy);

@@ -47,19 +47,19 @@ class PlayerbotAI;
 
 class HealerAutoSaveManaMultiplier : public Multiplier
 {
-    public:
-        HealerAutoSaveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "auto save mana") { }
+public:
+    HealerAutoSaveManaMultiplier(PlayerbotAI *botAI) : Multiplier(botAI, "auto save mana") {}
 
-        float GetValue(Action* action) override;
+    float GetValue(Action *action) override;
 };
 
 class HealerAutoSaveManaStrategy : public Strategy
 {
-    public:
-        HealerAutoSaveManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    HealerAutoSaveManaStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
-        std::string const getName() override { return "auto save mana"; }
+    void InitMultipliers(std::vector<Multiplier *> &multipliers) override;
+    std::string const getName() override { return "auto save mana"; }
 };
 
 #endif

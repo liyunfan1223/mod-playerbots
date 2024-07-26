@@ -12,18 +12,18 @@ class PlayerbotAI;
 
 class HelpAction : public Action
 {
-    public:
-        HelpAction(PlayerbotAI* botAI);
+public:
+    HelpAction(PlayerbotAI *botAI);
 
-        virtual ~HelpAction();
-        bool Execute(Event event) override;
+    virtual ~HelpAction();
+    bool Execute(Event event) override;
 
-    private:
-        void TellChatCommands();
-        void TellStrategies();
-        std::string const CombineSupported(std::set<std::string> commands);
+private:
+    void TellChatCommands();
+    void TellStrategies();
+    std::string const CombineSupported(std::set<std::string> commands);
 
-        NamedObjectContext<Action>* chatContext;
+    NamedObjectContext<Action> *chatContext;
 };
 
 #endif

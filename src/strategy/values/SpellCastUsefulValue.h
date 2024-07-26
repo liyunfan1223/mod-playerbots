@@ -12,8 +12,8 @@ class PlayerbotAI;
 
 class SpellCastUsefulValue : public BoolCalculatedValue, public Qualified
 {
-	public:
-        SpellCastUsefulValue(PlayerbotAI* botAI, std::string const name = "spell cast useful") : BoolCalculatedValue(botAI, name) { }
+public:
+        SpellCastUsefulValue(PlayerbotAI *botAI, std::string const name = "spell cast useful") : BoolCalculatedValue(botAI, name) {}
 
         bool Calculate() override;
 };

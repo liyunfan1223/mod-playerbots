@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class SendMailAction : public InventoryAction
 {
-    public:
-        SendMailAction(PlayerbotAI* botAI) : InventoryAction(botAI, "sendmail") { }
+public:
+    SendMailAction(PlayerbotAI *botAI) : InventoryAction(botAI, "sendmail") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

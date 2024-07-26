@@ -11,16 +11,16 @@ class PlayerbotAI;
 
 typedef std::vector<std::string> Outfit;
 
-class OutfitListValue : public ManualSetValue<Outfit&>
+class OutfitListValue : public ManualSetValue<Outfit &>
 {
-	public:
-        OutfitListValue(PlayerbotAI* botAI, std::string const name = "outfit list") : ManualSetValue<Outfit&>(botAI, list, name) { }
+public:
+    OutfitListValue(PlayerbotAI *botAI, std::string const name = "outfit list") : ManualSetValue<Outfit &>(botAI, list, name) {}
 
-        std::string const Save() override;
-        bool Load(std::string const value) override;
+    std::string const Save() override;
+    bool Load(std::string const value) override;
 
-    private:
-        Outfit list;
+private:
+    Outfit list;
 };
 
 #endif

@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class DruidAiObjectContext : public AiObjectContext
 {
-    public:
-        DruidAiObjectContext(PlayerbotAI* botAI);
+public:
+    DruidAiObjectContext(PlayerbotAI *botAI);
 };
 
 #endif

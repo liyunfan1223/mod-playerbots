@@ -14,18 +14,18 @@ bool CheatAction::Execute(Event event)
     std::vector<std::string> splitted = split(param, ',');
     for (std::vector<std::string>::iterator i = splitted.begin(); i != splitted.end(); i++)
     {
-        const char* name = i->c_str();
+        const char *name = i->c_str();
         switch (name[0])
         {
-            case '+':
-                cheatMask |= (uint32)GetCheatMask(name + 1);
-                break;
-            case '-':
-                cheatMask ^= (uint32)GetCheatMask(name + 1);
-                break;
-            case '?':
-                ListCheats();
-                return true;
+        case '+':
+            cheatMask |= (uint32)GetCheatMask(name + 1);
+            break;
+        case '-':
+            cheatMask ^= (uint32)GetCheatMask(name + 1);
+            break;
+        case '?':
+            ListCheats();
+            return true;
         }
     }
 
@@ -36,7 +36,7 @@ bool CheatAction::Execute(Event event)
 
 BotCheatMask CheatAction::GetCheatMask(std::string const cheat)
 {
-    if (cheat=="taxi")
+    if (cheat == "taxi")
         return BotCheatMask::taxi;
 
     if (cheat == "gold")
@@ -58,18 +58,18 @@ std::string const CheatAction::GetCheatName(BotCheatMask cheatMask)
 {
     switch (cheatMask)
     {
-        case BotCheatMask::taxi:
-                return "taxi";
-        case BotCheatMask::gold:
-            return "gold";
-        case BotCheatMask::health:
-            return "health";
-        case BotCheatMask::mana:
-            return "mana";
-        case BotCheatMask::power:
-            return "power";
-        default:
-            return "none";
+    case BotCheatMask::taxi:
+        return "taxi";
+    case BotCheatMask::gold:
+        return "gold";
+    case BotCheatMask::health:
+        return "health";
+    case BotCheatMask::mana:
+        return "mana";
+    case BotCheatMask::power:
+        return "power";
+    default:
+        return "none";
     }
 }
 
@@ -80,9 +80,9 @@ void CheatAction::ListCheats()
     {
         BotCheatMask cheatMask = BotCheatMask(1 << i);
         if ((uint32)cheatMask & (uint32)sPlayerbotAIConfig->botCheatMask)
-           out << "[conf:" << GetCheatName(BotCheatMask(cheatMask)) << "]";
+            out << "[conf:" << GetCheatName(BotCheatMask(cheatMask)) << "]";
         else if (botAI->HasCheat(cheatMask))
-           out << "[" << GetCheatName(BotCheatMask(cheatMask)) << "]";
+            out << "[" << GetCheatName(BotCheatMask(cheatMask)) << "]";
     }
 
     botAI->TellMasterNoFacing(out);

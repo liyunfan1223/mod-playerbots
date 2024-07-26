@@ -5,19 +5,19 @@
 #include "QuestStrategies.h"
 #include "Playerbots.h"
 
-QuestStrategy::QuestStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
+QuestStrategy::QuestStrategy(PlayerbotAI *botAI) : PassTroughStrategy(botAI)
 {
     supported.push_back("accept quest");
 }
 
-void QuestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void QuestStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     PassTroughStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("quest share", NextAction::array(0, new NextAction("accept quest share", relevance), nullptr)));
 }
 
-void DefaultQuestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void DefaultQuestStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     QuestStrategy::InitTriggers(triggers);
 
@@ -26,11 +26,11 @@ void DefaultQuestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("complete quest", NextAction::array(0, new NextAction("talk to quest giver", relevance), nullptr)));
 }
 
-DefaultQuestStrategy::DefaultQuestStrategy(PlayerbotAI* botAI) : QuestStrategy(botAI)
+DefaultQuestStrategy::DefaultQuestStrategy(PlayerbotAI *botAI) : QuestStrategy(botAI)
 {
 }
 
-void AcceptAllQuestsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void AcceptAllQuestsStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     QuestStrategy::InitTriggers(triggers);
 
@@ -39,6 +39,6 @@ void AcceptAllQuestsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("complete quest", NextAction::array(0, new NextAction("talk to quest giver", relevance), new NextAction("accept all quests", relevance), nullptr)));
 }
 
-AcceptAllQuestsStrategy::AcceptAllQuestsStrategy(PlayerbotAI* botAI) : QuestStrategy(botAI)
+AcceptAllQuestsStrategy::AcceptAllQuestsStrategy(PlayerbotAI *botAI) : QuestStrategy(botAI)
 {
 }

@@ -18,11 +18,9 @@ void CombatStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // triggers.push_back(new TriggerNode("combat long stuck", NextAction::array(0, new NextAction("hearthstone", 0.9f), new NextAction("repop", 0.8f), nullptr)));
 }
 
-
-AvoidAoeStrategy::AvoidAoeStrategy(PlayerbotAI* botAI) : Strategy(botAI)
+AvoidAoeStrategy::AvoidAoeStrategy(PlayerbotAI *botAI) : Strategy(botAI)
 {
 }
-
 
 // class AvoidAoeStrategyMultiplier : public Multiplier
 // {
@@ -63,29 +61,28 @@ AvoidAoeStrategy::AvoidAoeStrategy(PlayerbotAI* botAI) : Strategy(botAI)
 //     return 1.0f;
 // }
 
-NextAction** AvoidAoeStrategy::getDefaultActions()
+NextAction **AvoidAoeStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
-		new NextAction("avoid aoe", ACTION_EMERGENCY),
-		nullptr);
+    return NextAction::array(0,
+                             new NextAction("avoid aoe", ACTION_EMERGENCY),
+                             nullptr);
 }
 
-
-void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     // triggers.push_back(new TriggerNode(
     //         "has area debuff",
     //         NextAction::array(0, new NextAction("flee", ACTION_EMERGENCY + 5), NULL)));
 }
 
-void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     // multipliers.push_back(new AvoidAoeStrategyMultiplier(botAI));
 }
 
-NextAction** CombatFormationStrategy::getDefaultActions()
+NextAction **CombatFormationStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
-		new NextAction("combat formation move", ACTION_NORMAL),
-		nullptr);
+    return NextAction::array(0,
+                             new NextAction("combat formation move", ACTION_NORMAL),
+                             nullptr);
 }

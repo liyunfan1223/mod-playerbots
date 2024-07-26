@@ -5,7 +5,7 @@
 #include "PetTargetValue.h"
 #include "Playerbots.h"
 
-Unit* PetTargetValue::Calculate()
+Unit *PetTargetValue::Calculate()
 {
     return botAI->GetBot()->GetPet();
 }

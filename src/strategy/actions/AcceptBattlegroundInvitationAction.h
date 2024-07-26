@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class AcceptBgInvitationAction : public Action
 {
-    public:
-        AcceptBgInvitationAction(PlayerbotAI* botAI) : Action(botAI, "accept bg invitatio") { }
+public:
+    AcceptBgInvitationAction(PlayerbotAI *botAI) : Action(botAI, "accept bg invitatio") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

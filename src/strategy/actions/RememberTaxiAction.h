@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class RememberTaxiAction : public Action
 {
-	public:
-		RememberTaxiAction(PlayerbotAI* botAI) : Action(botAI, "remember taxi") { }
+public:
+	RememberTaxiAction(PlayerbotAI *botAI) : Action(botAI, "remember taxi") {}
 
-        bool Execute(Event event) override;
+	bool Execute(Event event) override;
 };
 
 #endif

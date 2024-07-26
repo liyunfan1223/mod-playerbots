@@ -12,7 +12,7 @@
 
 bool AcceptInvitationAction::Execute(Event event)
 {
-    Group* grp = bot->GetGroupInvite();
+    Group *grp = bot->GetGroupInvite();
     if (!grp)
         return false;
     WorldPacket packet = event.getPacket();
@@ -21,7 +21,7 @@ bool AcceptInvitationAction::Execute(Event event)
     packet >> flag >> name;
 
     // Player* inviter = ObjectAccessor::FindPlayer(grp->GetLeaderGUID());
-    Player* inviter = ObjectAccessor::FindPlayerByName(name, true);
+    Player *inviter = ObjectAccessor::FindPlayerByName(name, true);
     if (!inviter)
         return false;
 
@@ -41,8 +41,8 @@ bool AcceptInvitationAction::Execute(Event event)
 
     if (sRandomPlayerbotMgr->IsRandomBot(bot))
         botAI->SetMaster(inviter);
-    //else
-        //sPlayerbotDbStore->Save(botAI);
+    // else
+    // sPlayerbotDbStore->Save(botAI);
 
     botAI->ResetStrategies();
     botAI->ChangeStrategy("+follow,-lfg,-bg", BOT_STATE_NON_COMBAT);
@@ -50,7 +50,8 @@ bool AcceptInvitationAction::Execute(Event event)
 
     botAI->TellMaster("Hello");
 
-    if (sPlayerbotAIConfig->summonWhenGroup && bot->GetDistance(inviter) > sPlayerbotAIConfig->sightDistance) {
+    if (sPlayerbotAIConfig->summonWhenGroup && bot->GetDistance(inviter) > sPlayerbotAIConfig->sightDistance)
+    {
         Teleport(inviter, bot);
     }
     return true;

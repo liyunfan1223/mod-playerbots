@@ -12,14 +12,14 @@ class PlayerbotAI;
 
 class PossibleRpgTargetsValue : public NearestUnitsValue
 {
-	public:
-        PossibleRpgTargetsValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->rpgDistance);
+public:
+    PossibleRpgTargetsValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->rpgDistance);
 
-        static std::vector<uint32> allowedNpcFlags;
+    static std::vector<uint32> allowedNpcFlags;
 
-    protected:
-        void FindUnits(std::list<Unit*>& targets) override;
-        bool AcceptUnit(Unit* unit) override;
+protected:
+    void FindUnits(std::list<Unit *> &targets) override;
+    bool AcceptUnit(Unit *unit) override;
 };
 
 #endif

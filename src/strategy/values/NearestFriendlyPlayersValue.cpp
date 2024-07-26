@@ -8,14 +8,14 @@
 #include "GridNotifiersImpl.h"
 #include "Playerbots.h"
 
-void NearestFriendlyPlayersValue::FindUnits(std::list<Unit*>& targets)
+void NearestFriendlyPlayersValue::FindUnits(std::list<Unit*> &targets)
 {
     Acore::AnyFriendlyUnitInObjectRangeCheck u_check(bot, bot, range);
     Acore::UnitListSearcher<Acore::AnyFriendlyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitAllObjects(bot, searcher, range);
 }
 
-bool NearestFriendlyPlayersValue::AcceptUnit(Unit* unit)
+bool NearestFriendlyPlayersValue::AcceptUnit(Unit *unit)
 {
     ObjectGuid guid = unit->GetGUID();
     return guid.IsPlayer() && guid != botAI->GetBot()->GetGUID();

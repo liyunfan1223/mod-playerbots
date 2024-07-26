@@ -12,12 +12,12 @@ class Unit;
 
 class WorldBuffAction : public Action
 {
-    public:
-        WorldBuffAction(PlayerbotAI* botAI) : Action(botAI, "world buff") { }
+public:
+    WorldBuffAction(PlayerbotAI *botAI) : Action(botAI, "world buff") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-        static std::vector<uint32> NeedWorldBuffs(Unit* unit);
+    static std::vector<uint32> NeedWorldBuffs(Unit *unit);
 };
 
 #endif

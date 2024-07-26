@@ -14,7 +14,7 @@
 #include <iostream>
 
 template <class T>
-void LoadList(std::string const value, T& list)
+void LoadList(std::string const value, T &list)
 {
     std::vector<std::string> ids = split(value, ',');
     for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++)
@@ -27,7 +27,7 @@ void LoadList(std::string const value, T& list)
 }
 
 template <class T>
-void LoadListString(std::string const value, T& list)
+void LoadListString(std::string const value, T &list)
 {
     std::vector<std::string> strings = split(value, ',');
     for (std::vector<std::string>::iterator i = strings.begin(); i != strings.end(); i++)
@@ -174,7 +174,8 @@ bool PlayerbotAIConfig::Initialize()
 
     for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
     {
-        if (cls == 10) {
+        if (cls == 10)
+        {
             continue;
         }
         for (uint32 spec = 0; spec < MAX_SPECNO; ++spec)
@@ -187,12 +188,15 @@ bool PlayerbotAIConfig::Initialize()
             os << "AiPlayerbot.PremadeSpecGlyph." << cls << "." << spec;
             premadeSpecGlyph[cls][spec] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
             std::vector<std::string> splitSpecGlyph = split(premadeSpecGlyph[cls][spec], ',');
-            for (std::string &split : splitSpecGlyph) {
-                if (split.size() != 0) {
+            for (std::string &split : splitSpecGlyph)
+            {
+                if (split.size() != 0)
+                {
                     parsedSpecGlyph[cls][spec].push_back(atoi(split.c_str()));
                 }
             }
-            for (uint32 level = 0; level < MAX_LEVEL; ++level) {
+            for (uint32 level = 0; level < MAX_LEVEL; ++level)
+            {
                 std::ostringstream os;
                 os << "AiPlayerbot.PremadeSpecLink." << cls << "." << spec << "." << level;
                 premadeSpecLink[cls][spec][level] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
@@ -283,7 +287,7 @@ bool PlayerbotAIConfig::Initialize()
     botRepairWhenSummon = sConfigMgr->GetOption<bool>("AiPlayerbot.BotRepairWhenSummon", true);
     autoInitOnly = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoInitOnly", false);
     autoInitEquipLevelLimitRatio = sConfigMgr->GetOption<float>("AiPlayerbot.AutoInitEquipLevelLimitRatio", 1.0);
-    
+
     maxAddedBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBots", 40);
     maxAddedBotsPerClass = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBotsPerClass", 10);
     addClassCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassCommand", 1);
@@ -339,7 +343,8 @@ bool PlayerbotAIConfig::Initialize()
     selfBotLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.SelfBotLevel", 1);
 
     RandomPlayerbotFactory::CreateRandomBots();
-    if (World::IsStopped()) {
+    if (World::IsStopped())
+    {
         return true;
     }
     PlayerbotFactory::Init();
@@ -397,7 +402,7 @@ bool PlayerbotAIConfig::IsInPvpProhibitedArea(uint32 id)
 std::string const PlayerbotAIConfig::GetTimestampStr()
 {
     time_t t = time(nullptr);
-    tm* aTm = localtime(&t);
+    tm *aTm = localtime(&t);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
     //       DD     day (2 digits 01-31)
@@ -409,7 +414,7 @@ std::string const PlayerbotAIConfig::GetTimestampStr()
     return std::string(buf);
 }
 
-bool PlayerbotAIConfig::openLog(std::string const fileName, char const* mode)
+bool PlayerbotAIConfig::openLog(std::string const fileName, char const *mode)
 {
     if (!hasLog(fileName))
         return false;
@@ -421,10 +426,10 @@ bool PlayerbotAIConfig::openLog(std::string const fileName, char const* mode)
         logFileIt = logFiles.find(fileName);
     }
 
-    FILE* file = logFileIt->second.first;
+    FILE *file = logFileIt->second.first;
     bool fileOpen = logFileIt->second.second;
 
-    if (fileOpen) //close log file
+    if (fileOpen) // close log file
         fclose(file);
 
     std::string m_logsDir = sConfigMgr->GetOption<std::string>("LogsDir", "", false);
@@ -433,7 +438,6 @@ bool PlayerbotAIConfig::openLog(std::string const fileName, char const* mode)
         if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
             m_logsDir.append("/");
     }
-
 
     file = fopen((m_logsDir + fileName).c_str(), mode);
     fileOpen = true;
@@ -444,7 +448,7 @@ bool PlayerbotAIConfig::openLog(std::string const fileName, char const* mode)
     return true;
 }
 
-void PlayerbotAIConfig::log(std::string const fileName, char const* str, ...)
+void PlayerbotAIConfig::log(std::string const fileName, char const *str, ...)
 {
     if (!str)
         return;
@@ -454,7 +458,7 @@ void PlayerbotAIConfig::log(std::string const fileName, char const* str, ...)
     if (!isLogOpen(fileName) && !openLog(fileName, "a"))
         return;
 
-    FILE* file = logFiles.find(fileName)->second.first;
+    FILE *file = logFiles.find(fileName)->second.first;
 
     va_list ap;
     va_start(ap, str);
@@ -477,7 +481,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
     for (auto buff : buffs)
     {
-        worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+        worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
         worldBuffs.push_back(wb);
     }
 
@@ -490,7 +494,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
@@ -504,7 +508,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
@@ -518,7 +522,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
@@ -532,7 +536,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
@@ -541,25 +545,26 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 static std::vector<std::string> split(const std::string &str, const std::string &pattern)
 {
     std::vector<std::string> res;
-    if(str == "")
+    if (str == "")
         return res;
     // Also add separators to string connections to facilitate intercepting the last paragraph.
     std::string strs = str + pattern;
     size_t pos = strs.find(pattern);
 
-    while(pos != strs.npos)
+    while (pos != strs.npos)
     {
         std::string temp = strs.substr(0, pos);
         res.push_back(temp);
         // Remove the split string and split the remaining string
-        strs = strs.substr(pos+1, strs.size());
+        strs = strs.substr(pos + 1, strs.size());
         pos = strs.find(pattern);
     }
 
     return res;
 }
 
-std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32 cls, std::string tab_link) {
+std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32 cls, std::string tab_link)
+{
     // check bad link
     uint32 classMask = 1 << (cls - 1);
     std::vector<std::vector<uint32>> res;
@@ -569,39 +574,43 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
-        if(!talentInfo)
+        if (!talentInfo)
             continue;
 
-        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
-        if(!talentTabInfo)
+        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+        if (!talentTabInfo)
             continue;
 
-        if( (classMask & talentTabInfo->ClassMask) == 0 )
+        if ((classMask & talentTabInfo->ClassMask) == 0)
             continue;
 
         spells[talentTabInfo->tabpage].push_back(talentInfo);
     }
-    for (int tab = 0; tab < 3; tab++) {
-        if (tab_links.size() <= tab) {
+    for (int tab = 0; tab < 3; tab++)
+    {
+        if (tab_links.size() <= tab)
+        {
             break;
         }
-        std::sort(spells[tab].begin(), spells[tab].end(), [&](TalentEntry const* lhs, TalentEntry const* rhs) {
-            return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col;
-        });
-        for (int i = 0; i < tab_links[tab].size(); i++) {
-            if (i >= spells[tab].size()) {
+        std::sort(spells[tab].begin(), spells[tab].end(), [&](TalentEntry const *lhs, TalentEntry const *rhs)
+                  { return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col; });
+        for (int i = 0; i < tab_links[tab].size(); i++)
+        {
+            if (i >= spells[tab].size())
+            {
                 break;
             }
             int lvl = tab_links[tab][i] - '0';
-            if (lvl == 0) continue;
+            if (lvl == 0)
+                continue;
             orders[tab].push_back({(uint32)tab, spells[tab][i]->Row, spells[tab][i]->Col, (uint32)lvl});
         }
     }
     // sort by talent tab size
-    std::sort(orders.begin(), orders.end(), [&](auto &lhs, auto &rhs) {
-        return lhs.size() > rhs.size();
-    });
-    for (auto &order : orders) {
+    std::sort(orders.begin(), orders.end(), [&](auto &lhs, auto &rhs)
+              { return lhs.size() > rhs.size(); });
+    for (auto &order : orders)
+    {
         res.insert(res.end(), order.begin(), order.end());
     }
     return res;

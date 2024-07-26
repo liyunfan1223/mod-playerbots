@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-GreetAction::GreetAction(PlayerbotAI* botAI) : Action(botAI, "greet")
+GreetAction::GreetAction(PlayerbotAI *botAI) : Action(botAI, "greet")
 {
 }
 
@@ -16,7 +16,7 @@ bool GreetAction::Execute(Event event)
     if (!guid || !guid.IsPlayer())
         return false;
 
-    Player* player = dynamic_cast<Player*>(botAI->GetUnit(guid));
+    Player *player = dynamic_cast<Player*>(botAI->GetUnit(guid));
     if (!player)
         return false;
 
@@ -25,11 +25,11 @@ bool GreetAction::Execute(Event event)
 
     ObjectGuid oldSel = bot->GetTarget();
     bot->SetTarget(guid);
-    //bot->HandleEmote(EMOTE_ONESHOT_WAVE);
+    // bot->HandleEmote(EMOTE_ONESHOT_WAVE);
     botAI->PlayEmote(TEXT_EMOTE_HELLO);
     bot->SetTarget(oldSel);
 
-    GuidSet& alreadySeenPlayers = botAI->GetAiObjectContext()->GetValue<GuidSet&>("already seen players")->Get();
+    GuidSet &alreadySeenPlayers = botAI->GetAiObjectContext()->GetValue<GuidSet &>("already seen players")->Get();
     alreadySeenPlayers.insert(guid);
 
     GuidVector nearestPlayers = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();

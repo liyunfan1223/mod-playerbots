@@ -9,23 +9,23 @@
 
 class PlayerbotAIBase
 {
-    public:
-	    PlayerbotAIBase(bool isBotAI);
+public:
+    PlayerbotAIBase(bool isBotAI);
 
-	    bool CanUpdateAI();
-	    void SetNextCheckDelay(uint32 const delay);
-        void IncreaseNextCheckDelay(uint32 delay);
-	    void YieldThread(bool delay = false);
-        virtual void UpdateAI(uint32 elapsed, bool minimal = false);
-        virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false) = 0;
-        bool IsActive();
-        bool IsBotAI() const;
+    bool CanUpdateAI();
+    void SetNextCheckDelay(uint32 const delay);
+    void IncreaseNextCheckDelay(uint32 delay);
+    void YieldThread(bool delay = false);
+    virtual void UpdateAI(uint32 elapsed, bool minimal = false);
+    virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false) = 0;
+    bool IsActive();
+    bool IsBotAI() const;
 
-    protected:
-	    uint32 nextAICheckDelay;
+protected:
+    uint32 nextAICheckDelay;
 
-    private:
-        bool _isBotAI;
+private:
+    bool _isBotAI;
 };
 
 #endif

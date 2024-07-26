@@ -28,23 +28,23 @@ bool DivineSpiritTrigger::IsActive()
 bool PrayerOfFortitudeTrigger::IsActive()
 {
     return BuffOnPartyTrigger::IsActive() &&
-        !botAI->HasAura("prayer of fortitude", GetTarget()) &&
-        botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
-        botAI->GetBuffedCount((Player*)GetTarget(), "prayer of fortitude") < 4 && !botAI->GetBuffedCount((Player*)GetTarget(), "power word: fortitude");
+           !botAI->HasAura("prayer of fortitude", GetTarget()) &&
+           botAI->GetBot()->IsInSameGroupWith((Player *)GetTarget()) &&
+           botAI->GetBuffedCount((Player *)GetTarget(), "prayer of fortitude") < 4 && !botAI->GetBuffedCount((Player *)GetTarget(), "power word: fortitude");
 }
 
 bool PrayerOfSpiritTrigger::IsActive()
 {
     return BuffOnPartyTrigger::IsActive() &&
-        !botAI->HasAura("prayer of spirit", GetTarget()) &&
-        botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
-        //botAI->GetManaPercent() > 50 &&
-        botAI->GetBuffedCount((Player*) GetTarget(), "prayer of spirit") < 4 && !botAI->GetBuffedCount((Player*) GetTarget(), "divine spirit");
+           !botAI->HasAura("prayer of spirit", GetTarget()) &&
+           botAI->GetBot()->IsInSameGroupWith((Player *)GetTarget()) &&
+           // botAI->GetManaPercent() > 50 &&
+           botAI->GetBuffedCount((Player *)GetTarget(), "prayer of spirit") < 4 && !botAI->GetBuffedCount((Player *)GetTarget(), "divine spirit");
 }
 
 bool InnerFireTrigger::IsActive()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     return SpellTrigger::IsActive() && !botAI->HasAura(spell, target);
 }
 
@@ -58,7 +58,7 @@ bool ShadowfiendTrigger::IsActive()
     return BoostTrigger::IsActive() && !bot->HasSpellCooldown(34433);
 }
 
-BindingHealTrigger::BindingHealTrigger(PlayerbotAI* botAI) : PartyMemberLowHealthTrigger(botAI, "binding heal", sPlayerbotAIConfig->lowHealth, 0)
+BindingHealTrigger::BindingHealTrigger(PlayerbotAI *botAI) : PartyMemberLowHealthTrigger(botAI, "binding heal", sPlayerbotAIConfig->lowHealth, 0)
 {
 }
 

@@ -12,20 +12,20 @@ class PlayerbotAI;
 
 class GenericDKNonCombatStrategy : public NonCombatStrategy
 {
-    public:
-        GenericDKNonCombatStrategy(PlayerbotAI* botAI);
+public:
+    GenericDKNonCombatStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "nc"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "nc"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class DKBuffDpsStrategy : public Strategy
 {
-    public:
-        DKBuffDpsStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    DKBuffDpsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "bdps"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "bdps"; }
 };
 
 #endif

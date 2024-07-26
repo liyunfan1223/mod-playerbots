@@ -11,7 +11,7 @@
 bool SkipSpellsListAction::Execute(Event event)
 {
     std::string cmd = event.getParam();
-    std::set<uint32>& skipSpells = AI_VALUE(std::set<uint32>&, "skip spells list");
+    std::set<uint32> &skipSpells = AI_VALUE(std::set<uint32> &, "skip spells list");
 
     SpellIds spellIds = parseIds(cmd);
     if (!spellIds.empty())
@@ -46,7 +46,7 @@ bool SkipSpellsListAction::Execute(Event event)
         bool first = true;
         for (uint32 spellId : skipSpells)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo)
                 continue;
 
@@ -73,7 +73,7 @@ bool SkipSpellsListAction::Execute(Event event)
             return false;
         }
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
             return false;
 

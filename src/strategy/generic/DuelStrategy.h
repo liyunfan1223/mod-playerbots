@@ -11,20 +11,20 @@ class PlayerbotAI;
 
 class DuelStrategy : public PassTroughStrategy
 {
-    public:
-        DuelStrategy(PlayerbotAI* botAI);
+public:
+    DuelStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "duel"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "duel"; }
 };
 
 class StartDuelStrategy : public Strategy
 {
-    public:
-        StartDuelStrategy(PlayerbotAI* botAI);
+public:
+    StartDuelStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "start duel"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "start duel"; }
 };
 
 #endif

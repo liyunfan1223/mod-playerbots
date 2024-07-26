@@ -7,56 +7,56 @@
 
 class TankWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-    public:
-        TankWarriorStrategyActionNodeFactory()
-        {
-            creators["charge"] = &charge;
-            creators["sunder armor"] = &sunder_armor;
-            creators["commanding shout"] = &commanding_shout;
-            // creators["shield slam"] = &shield_slam;
-            creators["devastate"] = &devastate;
-            creators["last stand"] = &last_stand;
-            creators["heroic throw on snare target"] = &heroic_throw_on_snare_target;
-            creators["heroic throw taunt"] = &heroic_throw_taunt;
-            creators["taunt"] = &taunt;
-            creators["taunt spell"] = &taunt;
-        }
+public:
+    TankWarriorStrategyActionNodeFactory()
+    {
+        creators["charge"] = &charge;
+        creators["sunder armor"] = &sunder_armor;
+        creators["commanding shout"] = &commanding_shout;
+        // creators["shield slam"] = &shield_slam;
+        creators["devastate"] = &devastate;
+        creators["last stand"] = &last_stand;
+        creators["heroic throw on snare target"] = &heroic_throw_on_snare_target;
+        creators["heroic throw taunt"] = &heroic_throw_taunt;
+        creators["taunt"] = &taunt;
+        creators["taunt spell"] = &taunt;
+    }
 
-    private:
-        //ACTION_NODE_A(charge, "charge", "intercept with stance");
-        ACTION_NODE_A(charge, "charge", "reach melee");
-        ACTION_NODE_A(sunder_armor, "sunder armor", "melee");
-        ACTION_NODE_A(commanding_shout, "commanding shout", "battle shout");
-        // ACTION_NODE_A(shield_slam, "shield slam", "heroic strike");
-        ACTION_NODE_A(devastate, "devastate", "sunder armor");
-        ACTION_NODE_A(last_stand, "last stand", "intimidating shout");
-        ACTION_NODE_A(heroic_throw_on_snare_target, "heroic throw on snare target", "taunt on snare target");
-        ACTION_NODE_A(heroic_throw_taunt, "heroic throw", "shield slam");
-        static ActionNode* taunt(PlayerbotAI* botAI)
-        {
-            return new ActionNode("taunt",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("heroic throw taunt"), nullptr),
-                /*C*/ nullptr);
-        }
+private:
+    // ACTION_NODE_A(charge, "charge", "intercept with stance");
+    ACTION_NODE_A(charge, "charge", "reach melee");
+    ACTION_NODE_A(sunder_armor, "sunder armor", "melee");
+    ACTION_NODE_A(commanding_shout, "commanding shout", "battle shout");
+    // ACTION_NODE_A(shield_slam, "shield slam", "heroic strike");
+    ACTION_NODE_A(devastate, "devastate", "sunder armor");
+    ACTION_NODE_A(last_stand, "last stand", "intimidating shout");
+    ACTION_NODE_A(heroic_throw_on_snare_target, "heroic throw on snare target", "taunt on snare target");
+    ACTION_NODE_A(heroic_throw_taunt, "heroic throw", "shield slam");
+    static ActionNode *taunt(PlayerbotAI *botAI)
+    {
+        return new ActionNode("taunt",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("heroic throw taunt"), nullptr),
+                              /*C*/ nullptr);
+    }
 };
 
-TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStrategy(botAI)
+TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI *botAI) : GenericWarriorStrategy(botAI)
 {
     actionNodeFactories.Add(new TankWarriorStrategyActionNodeFactory());
 }
 
-NextAction** TankWarriorStrategy::getDefaultActions()
+NextAction **TankWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
-        new NextAction("devastate", ACTION_DEFAULT + 0.3f), 
-        new NextAction("revenge", ACTION_DEFAULT + 0.2f), 
-        new NextAction("demoralizing shout", ACTION_DEFAULT + 0.1f), 
-        new NextAction("melee", ACTION_DEFAULT), 
-        NULL);
+    return NextAction::array(0,
+                             new NextAction("devastate", ACTION_DEFAULT + 0.3f),
+                             new NextAction("revenge", ACTION_DEFAULT + 0.2f),
+                             new NextAction("demoralizing shout", ACTION_DEFAULT + 0.1f),
+                             new NextAction("melee", ACTION_DEFAULT),
+                             NULL);
 }
 
-void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     GenericWarriorStrategy::InitTriggers(triggers);
 

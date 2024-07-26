@@ -12,8 +12,8 @@ class PlayerbotAI;
 
 class HasTotemValue : public BoolCalculatedValue, public Qualified
 {
-	public:
-        HasTotemValue(PlayerbotAI* botAI, std::string const name = "has totem") : BoolCalculatedValue(botAI, name) { }
+public:
+        HasTotemValue(PlayerbotAI *botAI, std::string const name = "has totem") : BoolCalculatedValue(botAI, name) {}
 
         bool Calculate() override;
 };

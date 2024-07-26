@@ -7,7 +7,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-HelpAction::HelpAction(PlayerbotAI* botAI) : Action(botAI, "help")
+HelpAction::HelpAction(PlayerbotAI *botAI) : Action(botAI, "help")
 {
     chatContext = new ChatActionContext();
 }
@@ -45,12 +45,12 @@ std::string const HelpAction::CombineSupported(std::set<std::string> commands)
 {
     std::ostringstream out;
 
-    for (std::set<std::string>::iterator i = commands.begin(); i != commands.end(); )
-	{
+    for (std::set<std::string>::iterator i = commands.begin(); i != commands.end();)
+    {
         out << *i;
-		if (++i != commands.end())
-			out << ", ";
-	}
+        if (++i != commands.end())
+            out << ", ";
+    }
 
     return out.str();
 }

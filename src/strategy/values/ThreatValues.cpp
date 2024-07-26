@@ -11,10 +11,10 @@ uint8 ThreatValue::Calculate()
     if (qualifier == "aoe")
     {
         uint8 maxThreat = 0;
-        GuidVector attackers = context->GetValue<GuidVector >("attackers")->Get();
+        GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
         for (ObjectGuid const guid : attackers)
         {
-            Unit* unit = botAI->GetUnit(guid);
+            Unit *unit = botAI->GetUnit(guid);
             if (!unit || !unit->IsAlive())
                 continue;
 
@@ -26,11 +26,11 @@ uint8 ThreatValue::Calculate()
         return maxThreat;
     }
 
-    Unit* target = AI_VALUE(Unit*, qualifier);
+    Unit *target = AI_VALUE(Unit *, qualifier);
     return Calculate(target);
 }
 
-uint8 ThreatValue::Calculate(Unit* target)
+uint8 ThreatValue::Calculate(Unit *target)
 {
     if (!target)
         return 0;
@@ -38,7 +38,7 @@ uint8 ThreatValue::Calculate(Unit* target)
     if (target->GetGUID().IsPlayer())
         return 0;
 
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (!group)
         return 0;
 
@@ -46,9 +46,9 @@ uint8 ThreatValue::Calculate(Unit* target)
     float maxThreat = -1.0f;
     bool hasTank = false;
 
-    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
     {
-        Player* player = gref->GetSource();
+        Player *player = gref->GetSource();
         if (!player || !player->IsAlive() || player == bot)
             continue;
 
@@ -66,7 +66,7 @@ uint8 ThreatValue::Calculate(Unit* target)
 
     // calculate normal threat for fleeing targets
     bool fleeing = target->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLEEING_MOTION_TYPE ||
-        target->GetMotionMaster()->GetCurrentMovementGeneratorType() == TIMED_FLEEING_MOTION_TYPE;
+                   target->GetMotionMaster()->GetCurrentMovementGeneratorType() == TIMED_FLEEING_MOTION_TYPE;
 
     // return high threat if tank has no threat
     if (target->IsInCombat() && maxThreat <= 0 && botThreat <= 0 && hasTank && !fleeing)

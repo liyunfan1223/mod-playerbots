@@ -11,30 +11,30 @@ class PlayerbotAI;
 
 class DpsHunterStrategy : public GenericHunterStrategy
 {
-    public:
-        DpsHunterStrategy(PlayerbotAI* botAI);
+public:
+    DpsHunterStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "dps"; }
-        NextAction** getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "dps"; }
+    NextAction **getDefaultActions() override;
 };
 
 class DpsAoeHunterStrategy : public CombatStrategy
 {
-    public:
-        DpsAoeHunterStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) { }
+public:
+    DpsAoeHunterStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "aoe"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "aoe"; }
 };
 
 class DpsHunterDebuffStrategy : public CombatStrategy
 {
-    public:
-        DpsHunterDebuffStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) { }
+public:
+    DpsHunterDebuffStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "dps debuff"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "dps debuff"; }
 };
 
 #endif

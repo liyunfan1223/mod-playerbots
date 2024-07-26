@@ -24,31 +24,37 @@ bool MediumManaTrigger::IsActive()
 
 bool NoPetTrigger::IsActive()
 {
-    return (bot->GetMinionGUID().IsEmpty()) && 
-        (!AI_VALUE(Unit*, "pet target")) && 
-        (!bot->GetGuardianPet()) && 
-        (!bot->GetFirstControlled()) && 
-        (!AI_VALUE2(bool, "mounted", "self target"));
+    return (bot->GetMinionGUID().IsEmpty()) &&
+           (!AI_VALUE(Unit *, "pet target")) &&
+           (!bot->GetGuardianPet()) &&
+           (!bot->GetFirstControlled()) &&
+           (!AI_VALUE2(bool, "mounted", "self target"));
 }
 
-bool HasPetTrigger::IsActive() {
-    return (AI_VALUE(Unit*, "pet target")) && !AI_VALUE2(bool, "mounted", "self target");;
-}
-
-bool PetAttackTrigger::IsActive() 
+bool HasPetTrigger::IsActive()
 {
-    Guardian* pet = bot->GetGuardianPet();
-    if (!pet) {
+    return (AI_VALUE(Unit *, "pet target")) && !AI_VALUE2(bool, "mounted", "self target");
+    ;
+}
+
+bool PetAttackTrigger::IsActive()
+{
+    Guardian *pet = bot->GetGuardianPet();
+    if (!pet)
+    {
         return false;
     }
-    Unit* target = AI_VALUE(Unit*, "current target");
-    if (!target) {
+    Unit *target = AI_VALUE(Unit *, "current target");
+    if (!target)
+    {
         return false;
     }
-    if (pet->GetVictim() == target && pet->GetCharmInfo()->IsCommandAttack()) {
+    if (pet->GetVictim() == target && pet->GetCharmInfo()->IsCommandAttack())
+    {
         return false;
     }
-    if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
+    if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat())
+    {
         return false;
     }
     return true;
@@ -76,7 +82,7 @@ bool RageAvailable::IsActive()
 
 bool EnergyAvailable::IsActive()
 {
-	return AI_VALUE2(uint8, "energy", "self target") >= amount;
+    return AI_VALUE2(uint8, "energy", "self target") >= amount;
 }
 
 bool ComboPointsAvailableTrigger::IsActive()
@@ -97,7 +103,7 @@ bool HasAggroTrigger::IsActive()
 bool PanicTrigger::IsActive()
 {
     return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->criticalHealth &&
-		(!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana);
+           (!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana);
 }
 
 bool OutNumberedTrigger::IsActive()
@@ -111,9 +117,9 @@ bool OutNumberedTrigger::IsActive()
     int32 botLevel = bot->GetLevel();
     uint32 friendPower = 200;
     uint32 foePower = 0;
-    for (auto& attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
+    for (auto &attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
     {
-        Creature* creature = botAI->GetCreature(attacker);
+        Creature *creature = botAI->GetCreature(attacker);
         if (!creature)
             continue;
 
@@ -125,9 +131,9 @@ bool OutNumberedTrigger::IsActive()
     if (!foePower)
         return false;
 
-    for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
+    for (auto &helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
     {
-        Unit* player = botAI->GetUnit(helper);
+        Unit *player = botAI->GetUnit(helper);
         if (!player || player == bot)
             continue;
 
@@ -142,33 +148,33 @@ bool OutNumberedTrigger::IsActive()
 
 bool BuffTrigger::IsActive()
 {
-    Unit* target = GetTarget();
-	return SpellTrigger::IsActive() && !botAI->HasAura(spell, target, false, checkIsOwner);
+    Unit *target = GetTarget();
+    return SpellTrigger::IsActive() && !botAI->HasAura(spell, target, false, checkIsOwner);
 }
 
-Value<Unit*>* BuffOnPartyTrigger::GetTargetValue()
+Value<Unit*> *BuffOnPartyTrigger::GetTargetValue()
 {
-	return context->GetValue<Unit*>("party member without aura", spell);
+    return context->GetValue<Unit*>("party member without aura", spell);
 }
 
 bool ProtectPartyMemberTrigger::IsActive()
 {
-    return AI_VALUE(Unit*, "party member to protect");
+    return AI_VALUE(Unit *, "party member to protect");
 }
 
-Value<Unit*>* DebuffOnAttackerTrigger::GetTargetValue()
+Value<Unit*> *DebuffOnAttackerTrigger::GetTargetValue()
 {
-	return context->GetValue<Unit*>("attacker without aura", spell);
+    return context->GetValue<Unit*>("attacker without aura", spell);
 }
 
-Value<Unit*>* DebuffOnMeleeAttackerTrigger::GetTargetValue()
+Value<Unit*> *DebuffOnMeleeAttackerTrigger::GetTargetValue()
 {
-	return context->GetValue<Unit*>("melee attacker without aura", spell);
+    return context->GetValue<Unit*>("melee attacker without aura", spell);
 }
 
 bool NoAttackersTrigger::IsActive()
 {
-    return !AI_VALUE(Unit*, "current target") && AI_VALUE(uint8, "my attacker count") > 0;
+    return !AI_VALUE(Unit *, "current target") && AI_VALUE(uint8, "my attacker count") > 0;
 }
 
 bool InvalidTargetTrigger::IsActive()
@@ -178,7 +184,7 @@ bool InvalidTargetTrigger::IsActive()
 
 bool NoTargetTrigger::IsActive()
 {
-	return !AI_VALUE(Unit*, "current target");
+    return !AI_VALUE(Unit *, "current target");
 }
 
 bool MyAttackerCountTrigger::IsActive()
@@ -188,21 +194,23 @@ bool MyAttackerCountTrigger::IsActive()
 
 bool AoeTrigger::IsActive()
 {
-    Unit* current_target = AI_VALUE(Unit*, "current target");
-	if (!current_target) {
-		return false;
-	}
-	GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
-	int attackers_count = 0;
+    Unit *current_target = AI_VALUE(Unit *, "current target");
+    if (!current_target)
+    {
+        return false;
+    }
+    GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
+    int attackers_count = 0;
     for (ObjectGuid const guid : attackers)
     {
-        Unit* unit = botAI->GetUnit(guid);
+        Unit *unit = botAI->GetUnit(guid);
         if (!unit || !unit->IsAlive())
             continue;
 
-        if (unit->GetExactDist2d(current_target) <= range) {
-			attackers_count++;
-		}
+        if (unit->GetExactDist2d(current_target) <= range)
+        {
+            attackers_count++;
+        }
     }
     return attackers_count >= amount;
 }
@@ -227,21 +235,23 @@ bool NoDrinkTrigger::IsActive()
 
 bool TargetInSightTrigger::IsActive()
 {
-    return AI_VALUE(Unit*, "grind target");
+    return AI_VALUE(Unit *, "grind target");
 }
 
 bool DebuffTrigger::IsActive()
 {
-    Unit* target = GetTarget();
-    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+    Unit *target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld())
+    {
         return false;
     }
-	return BuffTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+    return BuffTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
 }
 
 bool DebuffOnBossTrigger::IsActive()
 {
-    if (!DebuffTrigger::IsActive()) {
+    if (!DebuffTrigger::IsActive())
+    {
         return false;
     }
     Creature *c = GetTarget()->ToCreature();
@@ -250,13 +260,13 @@ bool DebuffOnBossTrigger::IsActive()
 
 bool SpellTrigger::IsActive()
 {
-	return GetTarget();
+    return GetTarget();
 }
 
 bool SpellCanBeCastTrigger::IsActive()
 {
-	Unit* target = GetTarget();
-	return target && botAI->CanCastSpell(spell, target);
+    Unit *target = GetTarget();
+    return target && botAI->CanCastSpell(spell, target);
 }
 
 bool SpellNoCooldownTrigger::IsActive()
@@ -273,11 +283,11 @@ bool SpellCooldownTrigger::IsActive()
     uint32 spellId = AI_VALUE2(uint32, "spell id", name);
     if (!spellId)
         return false;
-    
+
     return bot->HasSpellCooldown(spellId);
 }
 
-RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(getMSTime())
+RandomTrigger::RandomTrigger(PlayerbotAI *botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(getMSTime())
 {
 }
 
@@ -311,8 +321,8 @@ bool TwoTriggers::IsActive()
     if (name1.empty() || name2.empty())
         return false;
 
-    Trigger* trigger1 = botAI->GetAiObjectContext()->GetTrigger(name1);
-    Trigger* trigger2 = botAI->GetAiObjectContext()->GetTrigger(name2);
+    Trigger *trigger1 = botAI->GetAiObjectContext()->GetTrigger(name1);
+    Trigger *trigger2 = botAI->GetAiObjectContext()->GetTrigger(name2);
 
     if (!trigger1 || !trigger2)
         return false;
@@ -329,22 +339,22 @@ std::string const TwoTriggers::getName()
 
 bool BoostTrigger::IsActive()
 {
-	return BuffTrigger::IsActive() && AI_VALUE(uint8, "balance") <= balance;
+    return BuffTrigger::IsActive() && AI_VALUE(uint8, "balance") <= balance;
 }
 
 bool ItemCountTrigger::IsActive()
 {
-	return AI_VALUE2(uint32, "item count", item) < count;
+    return AI_VALUE2(uint32, "item count", item) < count;
 }
 
 bool InterruptSpellTrigger::IsActive()
 {
-	return SpellTrigger::IsActive() && botAI->IsInterruptableSpellCasting(GetTarget(), getName());
+    return SpellTrigger::IsActive() && botAI->IsInterruptableSpellCasting(GetTarget(), getName());
 }
 
 bool DeflectSpellTrigger::IsActive()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return false;
 
@@ -358,7 +368,7 @@ bool DeflectSpellTrigger::IsActive()
     if (!spellid)
         return false;
 
-    SpellInfo const* deflectSpell = sSpellMgr->GetSpellInfo(spellid);
+    SpellInfo const *deflectSpell = sSpellMgr->GetSpellInfo(spellid);
     if (!deflectSpell)
         return false;
 
@@ -373,9 +383,9 @@ bool DeflectSpellTrigger::IsActive()
     SpellSchoolMask deflectSchool = SpellSchoolMask(deflectSpell->Effects[EFFECT_0].MiscValue);
     SpellSchoolMask attackSchool = SPELL_SCHOOL_MASK_NONE;
 
-    if (Spell* spell = target->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+    if (Spell *spell = target->GetCurrentSpell(CURRENT_GENERIC_SPELL))
     {
-        if (SpellInfo const* tarSpellInfo = spell->GetSpellInfo())
+        if (SpellInfo const *tarSpellInfo = spell->GetSpellInfo())
         {
             attackSchool = tarSpellInfo->GetSchoolMask();
             if (deflectSchool == attackSchool)
@@ -392,14 +402,14 @@ bool AttackerCountTrigger::IsActive()
 
 bool HasAuraTrigger::IsActive()
 {
-	return botAI->HasAura(getName(), GetTarget(), false, false, -1, true);
+    return botAI->HasAura(getName(), GetTarget(), false, false, -1, true);
 }
 
 bool HasAuraStackTrigger::IsActive()
 {
-	Aura *aura = botAI->GetAura(getName(), GetTarget(), false, true, stack);
-	// sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "HasAuraStackTrigger::IsActive %s %d", getName(), aura ? aura->GetStackAmount() : -1);
-	return aura;
+    Aura *aura = botAI->GetAura(getName(), GetTarget(), false, true, stack);
+    // sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "HasAuraStackTrigger::IsActive %s %d", getName(), aura ? aura->GetStackAmount() : -1);
+    return aura;
 }
 
 bool TimerTrigger::IsActive()
@@ -423,11 +433,11 @@ bool TankAssistTrigger::IsActive()
     if (!AI_VALUE(uint8, "attacker count"))
         return false;
 
-    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+    Unit *currentTarget = AI_VALUE(Unit *, "current target");
     if (!currentTarget)
         return true;
 
-    Unit* tankTarget = AI_VALUE(Unit*, "tank target");
+    Unit *tankTarget = AI_VALUE(Unit *, "tank target");
     if (!tankTarget || currentTarget == tankTarget)
         return false;
 
@@ -436,13 +446,13 @@ bool TankAssistTrigger::IsActive()
 
 bool IsBehindTargetTrigger::IsActive()
 {
-    Unit* target = AI_VALUE(Unit*, "current target");
+    Unit *target = AI_VALUE(Unit *, "current target");
     return target && AI_VALUE2(bool, "behind", "current target");
 }
 
 bool IsNotBehindTargetTrigger::IsActive()
 {
-    Unit* target = AI_VALUE(Unit*, "current target");
+    Unit *target = AI_VALUE(Unit *, "current target");
     return target && !AI_VALUE2(bool, "behind", "current target");
 }
 
@@ -453,12 +463,12 @@ bool IsNotFacingTargetTrigger::IsActive()
 
 bool HasCcTargetTrigger::IsActive()
 {
-    return AI_VALUE2(Unit*, "cc target", getName()) && !AI_VALUE2(Unit*, "current cc target", getName());
+    return AI_VALUE2(Unit *, "cc target", getName()) && !AI_VALUE2(Unit *, "current cc target", getName());
 }
 
 bool NoMovementTrigger::IsActive()
 {
-	return !AI_VALUE2(bool, "moving", "self target");
+    return !AI_VALUE2(bool, "moving", "self target");
 }
 
 bool NoPossibleTargetsTrigger::IsActive()
@@ -474,24 +484,25 @@ bool PossibleAddsTrigger::IsActive()
 
 bool NotDpsTargetActiveTrigger::IsActive()
 {
-    Unit* target = AI_VALUE(Unit*, "current target");
+    Unit *target = AI_VALUE(Unit *, "current target");
     // do not switch if enemy target
-    if (target && target->IsAlive()) {
+    if (target && target->IsAlive())
+    {
 
-        Unit* enemy = AI_VALUE(Unit*, "enemy player target");
+        Unit *enemy = AI_VALUE(Unit *, "enemy player target");
         if (target == enemy)
             return false;
     }
 
-    Unit* dps = AI_VALUE(Unit*, "dps target");
+    Unit *dps = AI_VALUE(Unit *, "dps target");
     return dps && target != dps;
 }
 
 bool NotDpsAoeTargetActiveTrigger::IsActive()
 {
-    Unit* dps = AI_VALUE(Unit*, "dps aoe target");
-    Unit* target = AI_VALUE(Unit*, "current target");
-    Unit* enemy = AI_VALUE(Unit*, "enemy player target");
+    Unit *dps = AI_VALUE(Unit *, "dps aoe target");
+    Unit *target = AI_VALUE(Unit *, "current target");
+    Unit *enemy = AI_VALUE(Unit *, "enemy player target");
 
     // do not switch if enemy target
     if (target && target == enemy && target->IsAlive())
@@ -513,19 +524,19 @@ bool HasNearestAddsTrigger::IsActive()
 
 bool HasItemForSpellTrigger::IsActive()
 {
-	std::string const spell = getName();
+    std::string const spell = getName();
     uint32 spellId = AI_VALUE2(uint32, "spell id", spell);
-    return spellId && AI_VALUE2(Item*, "item for spell", spellId);
+    return spellId && AI_VALUE2(Item *, "item for spell", spellId);
 }
 
 bool TargetChangedTrigger::IsActive()
 {
-    Unit* oldTarget = context->GetValue<Unit*>("old target")->Get();
-    Unit* target = context->GetValue<Unit*>("current target")->Get();
+    Unit *oldTarget = context->GetValue<Unit*>("old target")->Get();
+    Unit *target = context->GetValue<Unit*>("current target")->Get();
     return target && oldTarget != target;
 }
 
-Value<Unit*>* InterruptEnemyHealerTrigger::GetTargetValue()
+Value<Unit*> *InterruptEnemyHealerTrigger::GetTargetValue()
 {
     return context->GetValue<Unit*>("enemy healer target", spell);
 }
@@ -557,20 +568,20 @@ bool CollisionTrigger::IsActive()
 
 bool GiveItemTrigger::IsActive()
 {
-    return AI_VALUE2(Unit*, "party member without item", item) && AI_VALUE2(uint32, "item count", item);
+    return AI_VALUE2(Unit *, "party member without item", item) && AI_VALUE2(uint32, "item count", item);
 }
 
 bool GiveFoodTrigger::IsActive()
 {
-    return AI_VALUE(Unit*, "party member without food") && AI_VALUE2(uint32, "item count", item);
+    return AI_VALUE(Unit *, "party member without food") && AI_VALUE2(uint32, "item count", item);
 }
 
 bool GiveWaterTrigger::IsActive()
 {
-    return AI_VALUE(Unit*, "party member without water") && AI_VALUE2(uint32, "item count", item);
+    return AI_VALUE(Unit *, "party member without water") && AI_VALUE2(uint32, "item count", item);
 }
 
-Value<Unit*>* SnareTargetTrigger::GetTargetValue()
+Value<Unit*> *SnareTargetTrigger::GetTargetValue()
 {
     return context->GetValue<Unit*>("snare target", spell);
 }
@@ -607,7 +618,7 @@ bool HasAreaDebuffTrigger::IsActive()
     return AI_VALUE2(bool, "has area debuff", "self target");
 }
 
-Value<Unit*>* BuffOnMainTankTrigger::GetTargetValue()
+Value<Unit*> *BuffOnMainTankTrigger::GetTargetValue()
 {
-	return context->GetValue<Unit*>("main tank", spell);
+    return context->GetValue<Unit*>("main tank", spell);
 }

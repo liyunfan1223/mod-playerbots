@@ -5,7 +5,7 @@
 #include "PositionValue.h"
 #include "Playerbots.h"
 
-PositionValue::PositionValue(PlayerbotAI* botAI, std::string const name) : ManualSetValue<PositionMap&>(botAI, positions, name)
+PositionValue::PositionValue(PlayerbotAI *botAI, std::string const name) : ManualSetValue<PositionMap &>(botAI, positions, name)
 {
 }
 

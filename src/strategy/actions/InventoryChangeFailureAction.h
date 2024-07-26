@@ -12,13 +12,13 @@ class PlayerbotAI;
 
 class InventoryChangeFailureAction : public Action
 {
-    public:
-        InventoryChangeFailureAction(PlayerbotAI* botAI) : Action(botAI, "inventory change failure") { }
+public:
+    InventoryChangeFailureAction(PlayerbotAI *botAI) : Action(botAI, "inventory change failure") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        static std::map<InventoryResult, std::string> messages;
+private:
+    static std::map<InventoryResult, std::string> messages;
 };
 
 #endif

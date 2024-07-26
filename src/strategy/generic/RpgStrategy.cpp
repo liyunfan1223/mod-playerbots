@@ -6,7 +6,7 @@
 #include "Playerbots.h"
 #include "RpgSubActions.h"
 
-float RpgActionMultiplier::GetValue(Action* action)
+float RpgActionMultiplier::GetValue(Action *action)
 {
     if (action == nullptr)
         return 1.0f;
@@ -20,22 +20,22 @@ float RpgActionMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
-RpgStrategy::RpgStrategy(PlayerbotAI* botAI) : Strategy(botAI)
+RpgStrategy::RpgStrategy(PlayerbotAI *botAI) : Strategy(botAI)
 {
 }
 
-NextAction** RpgStrategy::getDefaultActions()
+NextAction **RpgStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction("rpg", 1.0f), nullptr);
 }
 
-void RpgStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void RpgStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("no rpg target", NextAction::array(0, new NextAction("choose rpg target", 5.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("move random", 1.10f), NULL)));
     triggers.push_back(new TriggerNode("far from rpg target", NextAction::array(0, new NextAction("move to rpg target", 5.0f), nullptr)));
 
-    //Sub actions
+    // Sub actions
     triggers.push_back(new TriggerNode("rpg", NextAction::array(0, new NextAction("rpg stay", 1.101f), nullptr)));
     triggers.push_back(new TriggerNode("rpg", NextAction::array(0, new NextAction("rpg work", 1.101f), nullptr)));
     triggers.push_back(new TriggerNode("rpg", NextAction::array(0, new NextAction("rpg emote", 1.101f), nullptr)));
@@ -53,13 +53,13 @@ void RpgStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("rpg queue bg", NextAction::array(0, new NextAction("rpg queue bg", 1.085f), nullptr)));
     triggers.push_back(new TriggerNode("rpg buy petition", NextAction::array(0, new NextAction("rpg buy petition", 1.140f), nullptr)));
     triggers.push_back(new TriggerNode("rpg use", NextAction::array(0, new NextAction("rpg use", 1.102f), nullptr)));
-    //triggers.push_back(new TriggerNode("rpg spell", NextAction::array(0, new NextAction("rpg spell", 1.001f), nullptr)));
-    //triggers.push_back(new TriggerNode("rpg craft", NextAction::array(0, new NextAction("rpg craft", 1.001f), nullptr)));
-    // triggers.push_back(new TriggerNode("rpg trade useful", NextAction::array(0, new NextAction("rpg trade useful", 1.030f), nullptr)));
-    // triggers.push_back(new TriggerNode("rpg duel", NextAction::array(0, new NextAction("rpg duel", 1.010f), nullptr)));
+    // triggers.push_back(new TriggerNode("rpg spell", NextAction::array(0, new NextAction("rpg spell", 1.001f), nullptr)));
+    // triggers.push_back(new TriggerNode("rpg craft", NextAction::array(0, new NextAction("rpg craft", 1.001f), nullptr)));
+    //  triggers.push_back(new TriggerNode("rpg trade useful", NextAction::array(0, new NextAction("rpg trade useful", 1.030f), nullptr)));
+    //  triggers.push_back(new TriggerNode("rpg duel", NextAction::array(0, new NextAction("rpg duel", 1.010f), nullptr)));
 }
 
-void RpgStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void RpgStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     multipliers.push_back(new RpgActionMultiplier(botAI));
 }

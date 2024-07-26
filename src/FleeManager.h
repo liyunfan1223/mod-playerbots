@@ -15,40 +15,40 @@ class PlayerbotAI;
 
 class FleePoint
 {
-	public:
-        FleePoint(PlayerbotAI* botAI, float x, float y, float z) : botAI(botAI), sumDistance(0.0f), minDistance(0.0f), x(x), y(y), z(z) { }
+public:
+	FleePoint(PlayerbotAI *botAI, float x, float y, float z) : botAI(botAI), sumDistance(0.0f), minDistance(0.0f), x(x), y(y), z(z) {}
 
-		float x;
-		float y;
-		float z;
+	float x;
+	float y;
+	float z;
 
-		float sumDistance;
-		float minDistance;
+	float sumDistance;
+	float minDistance;
 
-	private:
-		PlayerbotAI* botAI;
+private:
+	PlayerbotAI *botAI;
 };
 
 class FleeManager
 {
-	public:
-        FleeManager(Player* bot, float maxAllowedDistance, float followAngle, bool forceMaxDistance = false, WorldPosition startPosition = WorldPosition());
+public:
+	FleeManager(Player *bot, float maxAllowedDistance, float followAngle, bool forceMaxDistance = false, WorldPosition startPosition = WorldPosition());
 
-		bool CalculateDestination(float* rx, float* ry, float* rz);
-		bool isUseful();
+	bool CalculateDestination(float *rx, float *ry, float *rz);
+	bool isUseful();
 
-	private:
-		void calculatePossibleDestinations(std::vector<FleePoint*> &points);
-		void calculateDistanceToCreatures(FleePoint *point);
-		void cleanup(std::vector<FleePoint*> &points);
-		FleePoint* selectOptimalDestination(std::vector<FleePoint*> &points);
-		bool isBetterThan(FleePoint* point, FleePoint* other);
+private:
+	void calculatePossibleDestinations(std::vector<FleePoint *> &points);
+	void calculateDistanceToCreatures(FleePoint *point);
+	void cleanup(std::vector<FleePoint *> &points);
+	FleePoint *selectOptimalDestination(std::vector<FleePoint *> &points);
+	bool isBetterThan(FleePoint *point, FleePoint *other);
 
-		Player* bot;
-		float maxAllowedDistance;
-		[[maybe_unused]] float followAngle; // unused - whipowill
-		bool forceMaxDistance;
-        WorldPosition startPosition;
+	Player *bot;
+	float maxAllowedDistance;
+	[[maybe_unused]] float followAngle; // unused - whipowill
+	bool forceMaxDistance;
+	WorldPosition startPosition;
 };
 
 #endif

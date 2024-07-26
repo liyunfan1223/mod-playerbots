@@ -7,13 +7,16 @@
 
 bool CastTotemAction::isUseful()
 {
-    if (needLifeTime > 0.1f) {
-        Unit* target = AI_VALUE(Unit*, "current target");
-        if (!target) {
+    if (needLifeTime > 0.1f)
+    {
+        Unit *target = AI_VALUE(Unit *, "current target");
+        if (!target)
+        {
             return false;
         }
         float dps = AI_VALUE(float, "expected group dps");
-        if (target->GetHealth() / dps < needLifeTime) {
+        if (target->GetHealth() / dps < needLifeTime)
+        {
             return false;
         }
     }
@@ -40,7 +43,7 @@ bool CastMagmaTotemAction::isUseful()
     return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
 }
 
-bool CastCleansingTotemAction::isUseful() 
-{ 
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "mana tide totem"); 
+bool CastCleansingTotemAction::isUseful()
+{
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "mana tide totem");
 }

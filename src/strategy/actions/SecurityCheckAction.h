@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class SecurityCheckAction : public Action
 {
-    public:
-        SecurityCheckAction(PlayerbotAI* botAI) : Action(botAI, "security check") { }
+public:
+    SecurityCheckAction(PlayerbotAI *botAI) : Action(botAI, "security check") {}
 
-        bool isUseful() override;
-        bool Execute(Event event) override;
+    bool isUseful() override;
+    bool Execute(Event event) override;
 };
 
 #endif

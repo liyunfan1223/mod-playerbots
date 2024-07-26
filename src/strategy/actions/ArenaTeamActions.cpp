@@ -10,7 +10,7 @@ bool ArenaTeamAcceptAction::Execute(Event event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);
-    Player* inviter = nullptr;
+    Player *inviter = nullptr;
     std::string Invitedname;
     p >> Invitedname;
 
@@ -20,7 +20,7 @@ bool ArenaTeamAcceptAction::Execute(Event event)
     if (!inviter)
         return false;
 
-    ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(bot->GetArenaTeamIdInvited());
+    ArenaTeam *at = sArenaTeamMgr->GetArenaTeamById(bot->GetArenaTeamIdInvited());
     if (!at)
         return false;
 

@@ -9,7 +9,7 @@
 
 bool DebugAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -60,7 +60,7 @@ bool DebugAction::Execute(Event event)
 
         std::string const destination = text.substr(7);
 
-        TravelDestination* dest = ChooseTravelTargetAction::FindDestination(bot, destination);
+        TravelDestination *dest = ChooseTravelTargetAction::FindDestination(bot, destination);
         if (dest)
         {
             std::vector<WorldPosition*> points = dest->nextPoint(&botPos, true);
@@ -71,7 +71,8 @@ bool DebugAction::Execute(Event event)
             std::vector<WorldPosition> beginPath, endPath;
             TravelNodeRoute route = sTravelNodeMap->getRoute(botPos, *points.front(), beginPath, bot);
 
-            std::ostringstream out; out << "Traveling to " << dest->getTitle() << ": ";
+            std::ostringstream out;
+            out << "Traveling to " << dest->getTitle() << ": ";
 
             for (auto node : route.getNodes())
             {
@@ -92,7 +93,7 @@ bool DebugAction::Execute(Event event)
     {
         uint32 questId = stoi(text.substr(6));
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
 
         if (!quest)
         {
@@ -104,7 +105,7 @@ bool DebugAction::Execute(Event event)
 
         out << quest->GetTitle() << ": ";
 
-        QuestContainer* cont = sTravelMgr->quests[questId];
+        QuestContainer *cont = sTravelMgr->quests[questId];
 
         for (auto g : cont->questGivers)
         {
@@ -162,7 +163,7 @@ bool DebugAction::Execute(Event event)
 
         for (auto q : sTravelMgr->quests)
         {
-            Quest const* quest = sObjectMgr->GetQuestTemplate(q.first);
+            Quest const *quest = sObjectMgr->GetQuestTemplate(q.first);
 
             if (!quest)
             {
@@ -190,9 +191,9 @@ bool DebugAction::Execute(Event event)
 
         std::string const name = "USER:" + text.substr(9);
 
-        TravelNode* startNode = sTravelNodeMap->addNode(pos, name, false, false);
+        TravelNode *startNode = sTravelNodeMap->addNode(pos, name, false, false);
 
-        for (auto& endNode : sTravelNodeMap->getNodes(pos, 2000))
+        for (auto &endNode : sTravelNodeMap->getNodes(pos, 2000))
         {
             endNode->setLinked(false);
         }
@@ -207,7 +208,7 @@ bool DebugAction::Execute(Event event)
     {
         WorldPosition pos(bot);
 
-        TravelNode* startNode = sTravelNodeMap->getNode(pos, nullptr, 50);
+        TravelNode *startNode = sTravelNodeMap->getNode(pos, nullptr, 50);
 
         if (!startNode)
             return false;
@@ -228,13 +229,15 @@ bool DebugAction::Execute(Event event)
     }
     else if (text.find("reset node") != std::string::npos)
     {
-        for (auto& node : sTravelNodeMap->getNodes()) node->setLinked(false);
+        for (auto &node : sTravelNodeMap->getNodes())
+            node->setLinked(false);
         return true;
     }
     else if (text.find("reset path") != std::string::npos)
     {
-        for (auto& node : sTravelNodeMap->getNodes())
-            for (auto& path : *node->getLinks()) node->removeLinkTo(path.first, true);
+        for (auto &node : sTravelNodeMap->getNodes())
+            for (auto &path : *node->getLinks())
+                node->removeLinkTo(path.first, true);
         return true;
     }
     else if (text.find("gen node") != std::string::npos)
@@ -263,10 +266,9 @@ bool DebugAction::Execute(Event event)
     else if (text.find("load node") != std::string::npos)
     {
         std::thread t([]
-        {
+                      {
             sTravelNodeMap->removeNodes();
-            sTravelNodeMap->loadNodeStore();
-        });
+            sTravelNodeMap->loadNodeStore(); });
 
         t.detach();
 
@@ -278,11 +280,11 @@ bool DebugAction::Execute(Event event)
 
         std::vector<TravelNode*> nodes = sTravelNodeMap->getNodes(pos, 500);
 
-        for (auto& node : nodes)
+        for (auto &node : nodes)
         {
-            for (auto& l : *node->getLinks())
+            for (auto &l : *node->getLinks())
             {
-                Unit*            start = nullptr;
+                Unit *start = nullptr;
                 GuidVector units;
 
                 uint32 time = 60 * IN_MILLISECONDS;
@@ -291,15 +293,15 @@ bool DebugAction::Execute(Event event)
 
                 for (auto p : ppath)
                 {
-                    Creature* wpCreature = bot->SummonCreature(1, p.getX(), p.getY(), p.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000.0f);
-                    //addAura(246, wpCreature);
+                    Creature *wpCreature = bot->SummonCreature(1, p.getX(), p.getY(), p.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000.0f);
+                    // addAura(246, wpCreature);
                     units.push_back(wpCreature->GetGUID());
 
                     if (!start)
                         start = wpCreature;
                 }
 
-                //FakeSpell(1064, bot, start, units.front(), units, {}, pos, pos);
+                // FakeSpell(1064, bot, start, units.front(), units, {}, pos, pos);
             }
         }
         return true;
@@ -308,11 +310,11 @@ bool DebugAction::Execute(Event event)
     {
         uint32 spellEffect = stoi(text.substr(7));
 
-        Unit* prev = bot;
+        Unit *prev = bot;
 
         for (float i = 0; i < 60; i++)
         {
-            float ang  = i / 60 * static_cast<float>(M_PI) * 4;
+            float ang = i / 60 * static_cast<float>(M_PI) * 4;
             float dist = i / 60 * 30;
 
             WorldPosition botPos(bot);
@@ -322,7 +324,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature* wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
             FakeSpell(spellEffect, wpCreature, wpCreature, prev->GetGUID(), {}, {}, botPos, botPos);
 
@@ -334,11 +336,11 @@ bool DebugAction::Execute(Event event)
     {
         uint32 spellEffect = stoi(text.substr(7));
 
-        Unit* prev = bot;
+        Unit *prev = bot;
 
         for (float i = 0; i < 60; i++)
         {
-            float ang  = i / 60 * static_cast<float>(M_PI) * 4;
+            float ang = i / 60 * static_cast<float>(M_PI) * 4;
             float dist = i / 60 * 30;
 
             WorldPosition botPos(bot);
@@ -348,7 +350,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature* wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
             if (wpCreature)
             {
@@ -364,11 +366,11 @@ bool DebugAction::Execute(Event event)
     {
         uint32 spellEffect = stoi(text.substr(7));
 
-        Unit* prev = bot;
+        Unit *prev = bot;
 
         for (float i = 0; i < 60; i++)
         {
-            float ang  = i / 60 * static_cast<float>(M_PI) * 4;
+            float ang = i / 60 * static_cast<float>(M_PI) * 4;
             float dist = i / 60 * 30;
 
             WorldPosition botPos(bot);
@@ -378,7 +380,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature* wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000.0f + i * 100.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000.0f + i * 100.0f);
             wpCreature->SetObjectScale(0.5f);
 
             if (wpCreature)
@@ -396,7 +398,7 @@ bool DebugAction::Execute(Event event)
 
         for (float i = 0; i < 60; i++)
         {
-            float ang  = i / 60 * static_cast<float>(M_PI) * 4;
+            float ang = i / 60 * static_cast<float>(M_PI) * 4;
             float dist = i / 60 * 30;
 
             WorldPosition botPos(bot);
@@ -405,7 +407,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature* wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
             units.push_back(wpCreature->GetGUID());
         }
@@ -465,15 +467,15 @@ bool DebugAction::Execute(Event event)
         {
             for (int32 dy = 0; dy < 10; dy++)
             {
-                uint32        spellEffect = stoi(text.substr(10));
-                uint32        effect      = dx + dy * 10 + spellEffect * 100;
+                uint32 spellEffect = stoi(text.substr(10));
+                uint32 effect = dx + dy * 10 + spellEffect * 100;
                 WorldPosition botPos(bot);
 
                 botPos.setX(botPos.getX() + (dx - 5) * 5);
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature)
                 {
@@ -481,7 +483,7 @@ bool DebugAction::Execute(Event event)
                     out << "effect ";
                     out << effect;
 
-                    const std::string& Cname = out.str();
+                    const std::string &Cname = out.str();
 
                     wpCreature->Say(Cname.c_str(), LANG_UNIVERSAL, master);
                 }
@@ -495,15 +497,15 @@ bool DebugAction::Execute(Event event)
         {
             for (int32 dy = 0; dy < 10; dy++)
             {
-                uint32        spellEffect = stoi(text.substr(10));
-                uint32        effect      = dx + dy * 10 + spellEffect * 100;
+                uint32 spellEffect = stoi(text.substr(10));
+                uint32 effect = dx + dy * 10 + spellEffect * 100;
                 WorldPosition botPos(bot);
 
                 botPos.setX(botPos.getX() + (dx - 5) * 5);
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature(effect, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(effect, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
             }
         }
         return true;
@@ -514,8 +516,8 @@ bool DebugAction::Execute(Event event)
         {
             for (int32 dy = 0; dy < 10; dy++)
             {
-                uint32        spellEffect = stoi(text.substr(10));
-                uint32        effect      = dx + dy * 10 + spellEffect * 100;
+                uint32 spellEffect = stoi(text.substr(10));
+                uint32 effect = dx + dy * 10 + spellEffect * 100;
                 WorldPosition botPos(bot);
 
                 botPos.setX(botPos.getX() + (dx - 5) * 5);
@@ -534,15 +536,15 @@ bool DebugAction::Execute(Event event)
         {
             for (int32 dy = 0; dy < 10; dy++)
             {
-                uint32        spellEffect = stoi(text.substr(10));
-                uint32        effect      = dx + dy * 10 + spellEffect * 100;
+                uint32 spellEffect = stoi(text.substr(10));
+                uint32 effect = dx + dy * 10 + spellEffect * 100;
                 WorldPosition botPos(bot);
 
                 botPos.setX(botPos.getX() + (dx - 5) * 5);
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature)
                 {
@@ -553,7 +555,7 @@ bool DebugAction::Execute(Event event)
                     // wpCreature->SendMessageToSet(&data, true);
                     datMap.push_back(data);
 
-                    //wpCreature->MonsterMoveWithSpeed(botPos.getX(), botPos.getY() + 80, botPos.getZ(), 8.0f, true, true);
+                    // wpCreature->MonsterMoveWithSpeed(botPos.getX(), botPos.getY() + 80, botPos.getZ(), 8.0f, true, true);
                 }
             }
         }
@@ -580,15 +582,15 @@ bool DebugAction::Execute(Event event)
         {
             for (int32 dy = 0; dy < 10; dy++)
             {
-                uint32        spellEffect = stoi(text.substr(10));
-                uint32        effect      = dx + dy * 10 + spellEffect * 100;
+                uint32 spellEffect = stoi(text.substr(10));
+                uint32 effect = dx + dy * 10 + spellEffect * 100;
                 WorldPosition botPos(bot);
 
                 botPos.setX(botPos.getX() + (dx - 5) * 5);
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature)
                 {
@@ -618,14 +620,14 @@ bool DebugAction::Execute(Event event)
     }
     else if (text.find("cspellmap") != std::string::npos)
     {
-        Creature* wpCreature = nullptr;
-        Creature* lCreature  = nullptr;
+        Creature *wpCreature = nullptr;
+        Creature *lCreature = nullptr;
         for (int32 dx = 0; dx < 10; dx++)
         {
             for (int32 dy = 0; dy < 10; dy++)
             {
-                uint32        spellEffect = stoi(text.substr(10));
-                uint32        effect      = dx + dy * 10 + spellEffect * 100;
+                uint32 spellEffect = stoi(text.substr(10));
+                uint32 effect = dx + dy * 10 + spellEffect * 100;
                 WorldPosition botPos(bot);
 
                 botPos.setX(botPos.getX() + (dx - 5) * 5);
@@ -646,14 +648,14 @@ bool DebugAction::Execute(Event event)
     }
     else if (text.find("aspellmap") != std::string::npos)
     {
-        Creature* wpCreature = nullptr;
+        Creature *wpCreature = nullptr;
 
         for (int32 dx = 0; dx < 10; dx++)
         {
             for (int32 dy = 0; dy < 10; dy++)
             {
-                uint32        spellEffect = stoi(text.substr(10));
-                uint32        effect      = dx + dy * 10 + spellEffect * 100;
+                uint32 spellEffect = stoi(text.substr(10));
+                uint32 effect = dx + dy * 10 + spellEffect * 100;
                 WorldPosition botPos(bot);
 
                 botPos.setX(botPos.getX() + (dx - 5) * 5);
@@ -692,7 +694,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 all_targets.push_back(wpCreature->GetGUID());
             }
@@ -709,12 +711,12 @@ bool DebugAction::Execute(Event event)
                 for (int32 dy = 0; dy < 10; dy++)
                 {
                     uint32 spellEffect = stoi(text.substr(10));
-                    uint32 effect      = dx + dy * 10 + spellEffect * 100;
+                    uint32 effect = dx + dy * 10 + spellEffect * 100;
 
-                    uint32           i = dx + dy * 10;
+                    uint32 i = dx + dy * 10;
                     GuidVector hits, miss;
 
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(effect);
+                    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(effect);
                     if (spellInfo && spellInfo->Speed > 0)
                         for (auto tar : all_targets)
                         {
@@ -734,9 +736,9 @@ bool DebugAction::Execute(Event event)
                             }
                         }
 
-                    Unit* realCaster = botAI->GetUnit(all_targets[i]); // botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
-                    Unit* caster     = botAI->GetUnit(all_targets[i]); // botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
-                    Unit* target     = botAI->GetUnit(all_targets[i + 1]);
+                    Unit *realCaster = botAI->GetUnit(all_targets[i]); // botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
+                    Unit *caster = botAI->GetUnit(all_targets[i]);     // botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
+                    Unit *target = botAI->GetUnit(all_targets[i + 1]);
 
                     if (!realCaster)
                         realCaster = bot;
@@ -768,7 +770,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 all_targets.push_back(wpCreature->GetGUID());
             }
@@ -790,27 +792,27 @@ bool DebugAction::Execute(Event event)
                     uint32 i = dx + dy * 10;
                     GuidVector hits, miss;
 
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(effect);
+                    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(effect);
                     for (auto tar : all_targets)
                     {
                         // hits.push_back(tar);
                         switch (urand(0, 10))
                         {
-                            case 0:
-                                hits.push_back(tar);
-                                break;
-                            case 1:
-                                miss.push_back(tar);
-                                break;
-                            case 2:
-                            case 3:
-                                break;
+                        case 0:
+                            hits.push_back(tar);
+                            break;
+                        case 1:
+                            miss.push_back(tar);
+                            break;
+                        case 2:
+                        case 3:
+                            break;
                         }
                     }
 
-                    Unit* realCaster = botAI->GetUnit(all_targets[i]);//botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
-                    Unit* caster = botAI->GetUnit(all_targets[i]);//botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
-                    Unit* target = botAI->GetUnit(all_targets[i + 1]);
+                    Unit *realCaster = botAI->GetUnit(all_targets[i]); // botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
+                    Unit *caster = botAI->GetUnit(all_targets[i]);     // botAI->GetUnit(all_targets[urand(0, all_targets.size() - 1)]);
+                    Unit *target = botAI->GetUnit(all_targets[i + 1]);
 
                     if (!realCaster)
                         realCaster = bot;
@@ -828,7 +830,7 @@ bool DebugAction::Execute(Event event)
                 }
             }
 
-            return true;
+        return true;
     }
     else if (text.find("soundmap") != std::string::npos)
     {
@@ -844,7 +846,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 wpCreature->PlayDistanceSound(effect);
             }
@@ -886,9 +888,9 @@ bool DebugAction::Execute(Event event)
     return true;
 }
 
-void DebugAction::FakeSpell(uint32 spellId, Unit* truecaster, Unit* caster, ObjectGuid target, GuidVector otherTargets, GuidVector missTargets, WorldPosition source, WorldPosition dest, bool forceDest)
+void DebugAction::FakeSpell(uint32 spellId, Unit *truecaster, Unit *caster, ObjectGuid target, GuidVector otherTargets, GuidVector missTargets, WorldPosition source, WorldPosition dest, bool forceDest)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
     {
         uint32 castFlags = CAST_FLAG_HAS_TRAJECTORY;
 
@@ -897,22 +899,22 @@ void DebugAction::FakeSpell(uint32 spellId, Unit* truecaster, Unit* caster, Obje
 
         WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 2 + 4));
 
-        data << truecaster->GetPackGUID();                      //truecaster
+        data << truecaster->GetPackGUID(); // truecaster
 
         if (caster)
-            data << caster->GetPackGUID();                          //m_caster->GetPackGUID();
+            data << caster->GetPackGUID(); // m_caster->GetPackGUID();
         else
             data << ObjectGuid::Empty;
 
-        data << uint32(spellId);                                // spellId
-        data << uint16(castFlags);                              // cast flags
-        data << uint32(1000.0f);                                   // delay?
+        data << uint32(spellId);   // spellId
+        data << uint16(castFlags); // cast flags
+        data << uint32(1000.0f);   // delay?
 
         SpellCastTargets m_targets;
 
         m_targets.Write(data);
 
-        //projectile info
+        // projectile info
         if (castFlags & CAST_FLAG_PROJECTILE)
         {
             data << uint32(5996);
@@ -952,43 +954,43 @@ void DebugAction::FakeSpell(uint32 spellId, Unit* truecaster, Unit* caster, Obje
         if (!spellInfo->StartRecoveryTime)
             castFlags |= CAST_FLAG_NO_GCD;
 
-        WorldPacket data(SMSG_SPELL_GO, 53);                    // guess size
+        WorldPacket data(SMSG_SPELL_GO, 53); // guess size
 
-        data << truecaster->GetPackGUID();                      //truecaster
+        data << truecaster->GetPackGUID(); // truecaster
 
         if (caster)
-            data << caster->GetPackGUID();                          //m_caster->GetPackGUID();
+            data << caster->GetPackGUID(); // m_caster->GetPackGUID();
         else
             data << ObjectGuid::Empty;
 
-        data << uint32(spellId);                                // spellId
-        data << uint16(castFlags);                              // cast flags
+        data << uint32(spellId);   // spellId
+        data << uint16(castFlags); // cast flags
 
-        //WriteSpellGoTargets
+        // WriteSpellGoTargets
         uint32 hits = otherTargets.size() + (target ? 1 : 0);
 
-        data << uint8(hits);                                      // Hits
+        data << uint8(hits); // Hits
 
         if (target)
             data << target;
 
-        //Hit targets here.
+        // Hit targets here.
         for (auto otherTarget : otherTargets)
             data << otherTarget;
 
-        data << (uint8)missTargets.size();                         //miss
+        data << (uint8)missTargets.size(); // miss
 
         for (auto missTarget : missTargets)
         {
             data << missTarget;
 
-            data << uint8(SPELL_MISS_RESIST);    //Miss condition
-            data << uint8(SPELL_MISS_NONE);    //Miss condition
+            data << uint8(SPELL_MISS_RESIST); // Miss condition
+            data << uint8(SPELL_MISS_NONE);   // Miss condition
         }
 
         m_targets.Write(data);
 
-        //projectile info
+        // projectile info
         if (castFlags & CAST_FLAG_PROJECTILE)
         {
             data << uint32(5996);
@@ -1002,12 +1004,12 @@ void DebugAction::FakeSpell(uint32 spellId, Unit* truecaster, Unit* caster, Obje
     }
 }
 
-void DebugAction::addAura(uint32 spellId, Unit* target)
+void DebugAction::addAura(uint32 spellId, Unit *target)
 {
     if (!target)
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 

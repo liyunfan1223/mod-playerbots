@@ -27,17 +27,16 @@ bool AutoLearnSpellAction::Execute(Event event)
     return true;
 }
 
-
-void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
+void AutoLearnSpellAction::LearnSpells(std::ostringstream *out)
 {
-    if (sPlayerbotAIConfig->autoLearnTrainerSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnTrainerSpells && sRandomPlayerbotMgr->IsRandomBot(bot)) // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnTrainerSpells(out);
 
-    if (sPlayerbotAIConfig->autoLearnQuestSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnQuestSpells && sRandomPlayerbotMgr->IsRandomBot(bot)) // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnQuestSpells(out);
 }
 
-void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
+void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream *out)
 {
     PlayerbotFactory factory(bot, bot->GetLevel());
     factory.InitClassSpells();
@@ -56,9 +55,9 @@ void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
     //     if (co.trainer_type == TRAINER_TYPE_CLASS && co.trainer_class != bot->getClass())
     //         continue;
 
-	// 	uint32 trainerId = co.Entry;
+    //     uint32 trainerId = co.Entry;
 
-	// 	TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
+    //     TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
     //     if (!trainer_spells)
     //         trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
 
@@ -109,14 +108,14 @@ void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
     // }
 }
 
-void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream* out)
+void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream *out)
 {
-    //CreatureTemplate const* co = sCreatureStorage.LookupEntry<CreatureTemplate>(id);
-    ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
+    // CreatureTemplate const* co = sCreatureStorage.LookupEntry<CreatureTemplate>(id);
+    ObjectMgr::QuestMap const &questTemplates = sObjectMgr->GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
         uint32 questId = i->first;
-        Quest const* quest = i->second;
+        Quest const *quest = i->second;
 
         if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
             continue;
@@ -135,7 +134,7 @@ void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream* out)
     }
 }
 
-std::string const FormatSpell(SpellInfo const* sInfo)
+std::string const FormatSpell(SpellInfo const *sInfo)
 {
     std::ostringstream out;
     std::string const rank = sInfo->Rank[0];
@@ -148,9 +147,9 @@ std::string const FormatSpell(SpellInfo const* sInfo)
     return out.str();
 }
 
-void AutoLearnSpellAction::LearnSpell(uint32 spellId, std::ostringstream* out)
+void AutoLearnSpellAction::LearnSpell(uint32 spellId, std::ostringstream *out)
 {
-    SpellInfo const* proto = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const *proto = sSpellMgr->GetSpellInfo(spellId);
     if (!proto)
         return;
 
@@ -181,12 +180,15 @@ void AutoLearnSpellAction::LearnSpell(uint32 spellId, std::ostringstream* out)
     }
 }
 
-bool AutoUpgradeEquipAction::Execute(Event event) {
-    if (!sPlayerbotAIConfig->autoUpgradeEquip || !sRandomPlayerbotMgr->IsRandomBot(bot)) {
+bool AutoUpgradeEquipAction::Execute(Event event)
+{
+    if (!sPlayerbotAIConfig->autoUpgradeEquip || !sRandomPlayerbotMgr->IsRandomBot(bot))
+    {
         return false;
     }
     PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    {
         factory.InitEquipment(true);
     }
     factory.InitAmmo();

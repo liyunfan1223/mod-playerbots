@@ -18,9 +18,9 @@ class WorldObject;
 
 class QuestConfirmAcceptAction : public Action
 {
-    public:
-        QuestConfirmAcceptAction(PlayerbotAI* botAI) : Action(botAI, "quest confirm accept") {}
-        bool Execute(Event event) override;
+public:
+    QuestConfirmAcceptAction(PlayerbotAI *botAI) : Action(botAI, "quest confirm accept") {}
+    bool Execute(Event event) override;
 };
 
 #endif

@@ -12,10 +12,10 @@ class Unit;
 
 class DuelTargetValue : public TargetValue
 {
-	public:
-        DuelTargetValue(PlayerbotAI* botAI, std::string const name = "duel target") : TargetValue(botAI, name) { }
+public:
+        DuelTargetValue(PlayerbotAI *botAI, std::string const name = "duel target") : TargetValue(botAI, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 #endif

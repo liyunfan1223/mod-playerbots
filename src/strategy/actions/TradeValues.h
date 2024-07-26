@@ -11,12 +11,12 @@
 class Item;
 class PlayerbotAI;
 
-class ItemsUsefulToGiveValue : public CalculatedValue<std::vector<Item*>>, public Qualified
+class ItemsUsefulToGiveValue : public CalculatedValue<std::vector<Item *>>, public Qualified
 {
-	public:
-        ItemsUsefulToGiveValue(PlayerbotAI* botAI, std::string const name = "useful to give") : CalculatedValue(botAI, name) { }
+public:
+        ItemsUsefulToGiveValue(PlayerbotAI *botAI, std::string const name = "useful to give") : CalculatedValue(botAI, name) {}
 
-        std::vector<Item*> Calculate();
+        std::vector<Item *> Calculate();
 };
 
 #endif

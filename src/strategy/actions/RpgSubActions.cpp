@@ -62,7 +62,7 @@ bool RpgHelper::InRange()
 
 void RpgHelper::setFacingTo(GuidPosition guidPosition)
 {
-    bot->SetFacingTo(guidPosition.getAngleTo(bot)+ static_cast<float>(M_PI));
+    bot->SetFacingTo(guidPosition.getAngleTo(bot) + static_cast<float>(M_PI));
 }
 
 void RpgHelper::setFacing(GuidPosition guidPosition)
@@ -73,9 +73,9 @@ void RpgHelper::setFacing(GuidPosition guidPosition)
     if (guidPosition.IsPlayer())
         return;
 
-//    Unit* unit = guidPosition.GetUnit();
+    //    Unit* unit = guidPosition.GetUnit();
 
-//    unit->SetFacingTo(unit->GetAngle(bot));
+    //    unit->SetFacingTo(unit->GetAngle(bot));
 }
 
 void RpgHelper::setDelay(bool waitForGroup)
@@ -182,7 +182,7 @@ bool RpgTaxiAction::Execute(Event event)
     std::vector<uint32> nodes;
     for (uint32 i = 0; i < sTaxiPathStore.GetNumRows(); ++i)
     {
-        TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(i);
+        TaxiPathEntry const *entry = sTaxiPathStore.LookupEntry(i);
         if (entry && entry->from == node && (bot->m_taxi.IsTaximaskNodeKnown(entry->to) || bot->isTaxiCheater()))
         {
             nodes.push_back(i);
@@ -199,28 +199,28 @@ bool RpgTaxiAction::Execute(Event event)
     uint32 money = bot->GetMoney();
     bot->SetMoney(money + 100000);
 
-    TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(path);
+    TaxiPathEntry const *entry = sTaxiPathStore.LookupEntry(path);
     if (!entry)
         return false;
 
-    TaxiNodesEntry const* nodeFrom = sTaxiNodesStore.LookupEntry(entry->from);
-    TaxiNodesEntry const* nodeTo = sTaxiNodesStore.LookupEntry(entry->to);
+    TaxiNodesEntry const *nodeFrom = sTaxiNodesStore.LookupEntry(entry->from);
+    TaxiNodesEntry const *nodeTo = sTaxiNodesStore.LookupEntry(entry->to);
 
-    Creature* flightMaster = bot->GetNPCIfCanInteractWith(guidP, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature *flightMaster = bot->GetNPCIfCanInteractWith(guidP, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!flightMaster)
     {
         LOG_ERROR("playerbots", "Bot {} cannot talk to flightmaster ({} location available)", bot->GetName(), nodes.size());
         return false;
     }
 
-    if (!bot->ActivateTaxiPathTo({ entry->from, entry->to }, flightMaster, 0))
+    if (!bot->ActivateTaxiPathTo({entry->from, entry->to}, flightMaster, 0))
     {
         LOG_ERROR("playerbots", "Bot {} cannot fly {} ({} location available)", bot->GetName(), path, nodes.size());
         return false;
     }
 
     LOG_INFO("playerbots", "Bot {} <{}> is flying from {} to {} ({} location available)",
-        bot->GetGUID().ToString().c_str(), bot->GetName(), nodeFrom->name[0], nodeTo->name[0], nodes.size());
+             bot->GetGUID().ToString().c_str(), bot->GetName(), nodeFrom->name[0], nodeTo->name[0], nodes.size());
 
     bot->SetMoney(money);
 
@@ -238,7 +238,7 @@ bool RpgDiscoverAction::Execute(Event event)
     if (!node)
         return false;
 
-    Creature* flightMaster = bot->GetNPCIfCanInteractWith(guidP, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature *flightMaster = bot->GetNPCIfCanInteractWith(guidP, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!flightMaster)
         return false;
 
@@ -307,18 +307,18 @@ bool RpgHealAction::Execute(Event event)
 
     switch (bot->getClass())
     {
-        case CLASS_PRIEST:
-            retVal = botAI->DoSpecificAction("lesser heal on party", Event(), true);
-            break;
-        case CLASS_DRUID:
-            retVal=botAI->DoSpecificAction("healing touch on party", Event(), true);
-            break;
-        case CLASS_PALADIN:
-            retVal=botAI->DoSpecificAction("holy light on party", Event(), true);
-            break;
-        case CLASS_SHAMAN:
-            retVal=botAI->DoSpecificAction("healing wave on party", Event(), true);
-            break;
+    case CLASS_PRIEST:
+        retVal = botAI->DoSpecificAction("lesser heal on party", Event(), true);
+        break;
+    case CLASS_DRUID:
+        retVal = botAI->DoSpecificAction("healing touch on party", Event(), true);
+        break;
+    case CLASS_PALADIN:
+        retVal = botAI->DoSpecificAction("holy light on party", Event(), true);
+        break;
+    case CLASS_SHAMAN:
+        retVal = botAI->DoSpecificAction("healing wave on party", Event(), true);
+        break;
     }
 
     return retVal;
@@ -331,7 +331,7 @@ std::string const RpgHomeBindAction::ActionName()
 
 std::string const RpgQueueBgAction::ActionName()
 {
-    SET_AI_VALUE(uint32, "bg type", (uint32) AI_VALUE(BattlegroundTypeId, "rpg bg type"));
+    SET_AI_VALUE(uint32, "bg type", (uint32)AI_VALUE(BattlegroundTypeId, "rpg bg type"));
     return "free bg join";
 }
 
@@ -372,21 +372,21 @@ Event RpgCraftAction::ActionEvent(Event event)
 
 std::vector<Item*> RpgTradeUsefulAction::CanGiveItems(GuidPosition guidPosition)
 {
-    Player* player = guidPosition.GetPlayer();
+    Player *player = guidPosition.GetPlayer();
 
     std::vector<Item*> giveItems;
 
     if (botAI->HasActivePlayerMaster() || !GET_PLAYERBOT_AI(player))
         return giveItems;
 
-    std::vector<ItemUsage> myUsages = { ITEM_USAGE_NONE , ITEM_USAGE_VENDOR, ITEM_USAGE_AH, ITEM_USAGE_DISENCHANT };
+    std::vector<ItemUsage> myUsages = {ITEM_USAGE_NONE, ITEM_USAGE_VENDOR, ITEM_USAGE_AH, ITEM_USAGE_DISENCHANT};
 
-    for (auto& myUsage : myUsages)
+    for (auto &myUsage : myUsages)
     {
         std::vector<Item*> myItems = AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(myUsage));
         std::reverse(myItems.begin(), myItems.end());
 
-        for (auto& item : myItems)
+        for (auto &item : myItems)
         {
             if (!item->CanBeTraded())
                 continue;
@@ -408,7 +408,7 @@ bool RpgTradeUsefulAction::Execute(Event event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
 
-    Player* player = guidP.GetPlayer();
+    Player *player = guidP.GetPlayer();
 
     if (!player)
         return false;
@@ -418,7 +418,7 @@ bool RpgTradeUsefulAction::Execute(Event event)
     if (items.empty())
         return false;
 
-    Item* item = items.front();
+    Item *item = items.front();
 
     std::ostringstream param;
 
@@ -439,7 +439,7 @@ bool RpgTradeUsefulAction::Execute(Event event)
 
             if (!urand(0, 4) || items.size() < 2)
             {
-                //bot->Say("End trade with" + chat->FormatWorldobject(player), (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
+                // bot->Say("End trade with" + chat->FormatWorldobject(player), (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
                 WorldPacket p;
                 uint32 status = TRADE_STATUS_TRADE_ACCEPT;
                 p << status;
@@ -463,7 +463,7 @@ bool RpgDuelAction::isUseful()
         return false;
 
     // Players can only fight a duel with each other outside (=not inside dungeons and not in capital cities)
-    AreaTableEntry const* casterAreaEntry = sAreaTableStore.LookupEntry(bot->GetAreaId());
+    AreaTableEntry const *casterAreaEntry = sAreaTableStore.LookupEntry(bot->GetAreaId());
     if (casterAreaEntry && !(casterAreaEntry->flags & AREA_FLAG_ALLOW_DUELS))
     {
         // Dueling isn't allowed here
@@ -477,14 +477,13 @@ bool RpgDuelAction::Execute(Event event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
 
-    Player* player = guidP.GetPlayer();
+    Player *player = guidP.GetPlayer();
 
     if (!player)
         return false;
 
     return botAI->DoSpecificAction("cast custom spell", Event("rpg action", chat->FormatWorldobject(player) + " 7266"), true);
 }
-
 
 bool RpgMountAnimAction::isUseful()
 {

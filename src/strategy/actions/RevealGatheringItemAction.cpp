@@ -13,20 +13,20 @@
 
 class AnyGameObjectInObjectRangeCheck
 {
-    public:
-        AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) { }
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(GameObject* go)
-        {
-            if (go && i_obj->IsWithinDistInMap(go, i_range) && go->isSpawned() && go->GetGOInfo())
-                return true;
+public:
+    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range) : i_obj(obj), i_range(range) {}
+    WorldObject const &GetFocusObject() const { return *i_obj; }
+    bool operator()(GameObject *go)
+    {
+        if (go && i_obj->IsWithinDistInMap(go, i_range) && go->isSpawned() && go->GetGOInfo())
+            return true;
 
-            return false;
-        }
+        return false;
+    }
 
-    private:
-        WorldObject const* i_obj;
-        float i_range;
+private:
+    WorldObject const *i_obj;
+    float i_range;
 };
 
 bool RevealGatheringItemAction::Execute(Event event)
@@ -40,12 +40,12 @@ bool RevealGatheringItemAction::Execute(Event event)
     Cell::VisitAllObjects(bot, searcher, sPlayerbotAIConfig->reactDistance);
 
     std::vector<GameObject*> result;
-    for (GameObject* go : targets)
+    for (GameObject *go : targets)
     {
         if (!go || !go->isSpawned() || sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, go), sPlayerbotAIConfig->lootDistance))
             continue;
 
-        if (LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
+        if (LockEntry const *lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
         {
             for (uint8 i = 0; i < 8; ++i)
             {
@@ -69,7 +69,7 @@ bool RevealGatheringItemAction::Execute(Event event)
     if (result.empty())
         return false;
 
-    GameObject* go = result[urand(0, result.size() - 1)];
+    GameObject *go = result[urand(0, result.size() - 1)];
     if (!go)
         return false;
 
@@ -78,14 +78,14 @@ bool RevealGatheringItemAction::Execute(Event event)
 
     switch (go->GetGoType())
     {
-      case GAMEOBJECT_TYPE_CHEST:
-          msg << "Let's look at it.";
-          break;
-      case GAMEOBJECT_TYPE_FISHINGNODE:
-          msg << "Let's fish a bit.";
-          break;
-      default:
-          msg << "Should we go nearer?";
+    case GAMEOBJECT_TYPE_CHEST:
+        msg << "Let's look at it.";
+        break;
+    case GAMEOBJECT_TYPE_FISHINGNODE:
+        msg << "Let's fish a bit.";
+        break;
+    default:
+        msg << "Should we go nearer?";
     }
 
     // everything is fine, do it

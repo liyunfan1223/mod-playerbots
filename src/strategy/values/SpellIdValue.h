@@ -12,16 +12,16 @@ class PlayerbotAI;
 
 class SpellIdValue : public CalculatedValue<uint32>, public Qualified
 {
-	public:
-        SpellIdValue(PlayerbotAI* botAI);
+public:
+        SpellIdValue(PlayerbotAI *botAI);
 
         uint32 Calculate() override;
 };
 
 class VehicleSpellIdValue : public CalculatedValue<uint32>, public Qualified
 {
-    public:
-        VehicleSpellIdValue(PlayerbotAI* botAI);
+public:
+        VehicleSpellIdValue(PlayerbotAI *botAI);
 
         uint32 Calculate() override;
 };

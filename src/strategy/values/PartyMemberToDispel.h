@@ -13,11 +13,11 @@ class Unit;
 
 class PartyMemberToDispel : public PartyMemberValue, public Qualified
 {
-	public:
-        PartyMemberToDispel(PlayerbotAI* botAI, std::string const name = "party member to dispel") : PartyMemberValue(botAI, name, 1000), Qualified() { }
+public:
+    PartyMemberToDispel(PlayerbotAI *botAI, std::string const name = "party member to dispel") : PartyMemberValue(botAI, name, 1000), Qualified() {}
 
-    protected:
-        Unit* Calculate() override;
+protected:
+    Unit *Calculate() override;
 };
 
 #endif

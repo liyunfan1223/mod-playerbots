@@ -11,14 +11,14 @@ class PlayerbotAI;
 
 class PassTroughStrategy : public Strategy
 {
-    public:
-        PassTroughStrategy(PlayerbotAI* botAI, float relevance = 100.0f) : Strategy(botAI), relevance(relevance) { }
+public:
+    PassTroughStrategy(PlayerbotAI *botAI, float relevance = 100.0f) : Strategy(botAI), relevance(relevance) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 
-    protected:
-        std::vector<std::string> supported;
-        float relevance;
+protected:
+    std::vector<std::string> supported;
+    float relevance;
 };
 
 #endif

@@ -10,7 +10,7 @@
 
 bool SwitchToMeleeAction::Execute(Event event)
 {
-    //botAI->TellMasterNoFacing("Switching to melee!");
+    // botAI->TellMasterNoFacing("Switching to melee!");
     return ChangeCombatStrategyAction::Execute(event);
 }
 
@@ -18,10 +18,9 @@ bool SwitchToMeleeAction::isUseful()
 {
     if (bot->getClass() == CLASS_HUNTER)
     {
-        Unit* target = AI_VALUE(Unit*, "current target");
-        time_t lastFlee = AI_VALUE(LastMovement&, "last movement").lastFlee;
-        return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && ((bot->IsInCombat() && target && (target->GetVictim() == bot && (!bot->GetGroup() || lastFlee) &&
-            sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f))) || (!bot->IsInCombat()));
+        Unit *target = AI_VALUE(Unit *, "current target");
+        time_t lastFlee = AI_VALUE(LastMovement &, "last movement").lastFlee;
+        return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && ((bot->IsInCombat() && target && (target->GetVictim() == bot && (!bot->GetGroup() || lastFlee) && sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f))) || (!bot->IsInCombat()));
     }
 
     return botAI->HasStrategy("ranged", BOT_STATE_COMBAT);
@@ -29,7 +28,7 @@ bool SwitchToMeleeAction::isUseful()
 
 bool SwitchToRangedAction::Execute(Event event)
 {
-    //botAI->TellMasterNoFacing("Switching to ranged!");
+    // botAI->TellMasterNoFacing("Switching to ranged!");
     return ChangeCombatStrategyAction::Execute(event);
 }
 
@@ -37,10 +36,9 @@ bool SwitchToRangedAction::isUseful()
 {
     if (bot->getClass() == CLASS_HUNTER)
     {
-        Unit* target = AI_VALUE(Unit*, "current target");
+        Unit *target = AI_VALUE(Unit *, "current target");
         bool hasAmmo = AI_VALUE2(uint32, "item count", "ammo");
-        return botAI->HasStrategy("close", BOT_STATE_COMBAT) && hasAmmo && ((bot->IsInCombat() && target && ((target->GetVictim() != bot || target->GetTarget() != bot->GetGUID()) ||
-            sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f))) || (!bot->IsInCombat()));
+        return botAI->HasStrategy("close", BOT_STATE_COMBAT) && hasAmmo && ((bot->IsInCombat() && target && ((target->GetVictim() != bot || target->GetTarget() != bot->GetGUID()) || sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f))) || (!bot->IsInCombat()));
     }
 
     return botAI->HasStrategy("close", BOT_STATE_COMBAT);

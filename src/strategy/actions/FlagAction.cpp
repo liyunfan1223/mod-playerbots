@@ -58,4 +58,3 @@ bool FlagAction::Execute(Event event)
     botAI->TellMaster(out.str());
     return true;
 }
-

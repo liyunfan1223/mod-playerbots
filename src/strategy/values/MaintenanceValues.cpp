@@ -36,7 +36,7 @@ bool ShouldRepairValue::Calculate()
 
 bool CanRepairValue::Calculate()
 {
-    return AI_VALUE(uint8, "durability") < 100 && AI_VALUE(uint32, "repair cost") < AI_VALUE2(uint32, "free money for", (uint32) NeedMoneyFor::repair);
+    return AI_VALUE(uint8, "durability") < 100 && AI_VALUE(uint32, "repair cost") < AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::repair);
 }
 
 bool ShouldSellValue::Calculate()
@@ -63,4 +63,3 @@ bool CanFightBossValue::Calculate()
 {
     return bot->GetGroup() && bot->GetGroup()->GetMembersCount() > 3 && AI_VALUE2(bool, "group and", "can fight equal") && AI_VALUE2(bool, "group and", "following party") && !AI_VALUE2(bool, "group or", "should sell,can sell");
 }
-

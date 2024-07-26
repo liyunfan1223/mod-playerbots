@@ -11,34 +11,34 @@ class PlayerbotAI;
 
 class CasterDruidStrategy : public GenericDruidStrategy
 {
-    public:
-        CasterDruidStrategy(PlayerbotAI* botAI);
+public:
+    CasterDruidStrategy(PlayerbotAI *botAI);
 
-    public:
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "caster"; }
-        NextAction** getDefaultActions() override;
-        uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
+public:
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "caster"; }
+    NextAction **getDefaultActions() override;
+    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
 };
 
 class CasterDruidAoeStrategy : public CombatStrategy
 {
-    public:
-        CasterDruidAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) { }
+public:
+    CasterDruidAoeStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI) {}
 
-    public:
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "caster aoe"; }
+public:
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "caster aoe"; }
 };
 
 class CasterDruidDebuffStrategy : public CombatStrategy
 {
-    public:
-        CasterDruidDebuffStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) { }
+public:
+    CasterDruidDebuffStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI) {}
 
-    public:
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "caster debuff"; }
+public:
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "caster debuff"; }
 };
 
 #endif

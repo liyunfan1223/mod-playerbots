@@ -9,10 +9,9 @@
 #include "Util.h"
 
 void PlaceholderHelper::MapDungeon(
-    PlaceholderMap& placeholders,
-    DungeonSuggestion const* dungeonSuggestion,
-    Player* bot
-)
+    PlaceholderMap &placeholders,
+    DungeonSuggestion const *dungeonSuggestion,
+    Player *bot)
 {
     std::ostringstream out;
     Insertion insertion = {out, dungeonSuggestion};
@@ -23,25 +22,24 @@ void PlaceholderHelper::MapDungeon(
     placeholders["%dungeon"] = out.str();
 }
 
-
-void PlaceholderHelper::MapRole(PlaceholderMap& placeholders, Player* bot)
+void PlaceholderHelper::MapRole(PlaceholderMap &placeholders, Player *bot)
 {
     BotRoles const role = AiFactory::GetPlayerRoles(bot);
     std::string roleText;
     switch (role)
     {
-        case BOT_ROLE_TANK:
-            roleText = "Tank";
-            break;
-        case BOT_ROLE_HEALER:
-            roleText = "Healer";
-            break;
-        case BOT_ROLE_DPS:
-            roleText = "DPS";
-            break;
-        case BOT_ROLE_NONE:
-        default:
-            return;
+    case BOT_ROLE_TANK:
+        roleText = "Tank";
+        break;
+    case BOT_ROLE_HEALER:
+        roleText = "Healer";
+        break;
+    case BOT_ROLE_DPS:
+        roleText = "DPS";
+        break;
+    case BOT_ROLE_NONE:
+    default:
+        return;
     }
 
     bool const hasRole = !roleText.empty();
@@ -51,7 +49,7 @@ void PlaceholderHelper::MapRole(PlaceholderMap& placeholders, Player* bot)
     }
 }
 
-void PlaceholderHelper::InsertDungeonName(Insertion& insertion)
+void PlaceholderHelper::InsertDungeonName(Insertion &insertion)
 {
     std::string name = insertion.dungeonSuggestion->name;
     bool const hasAbbrevation = !insertion.dungeonSuggestion->abbrevation.empty();
@@ -63,7 +61,7 @@ void PlaceholderHelper::InsertDungeonName(Insertion& insertion)
     insertion.out << "|c00b000b0" << name << "|r";
 }
 
-void PlaceholderHelper::InsertDungeonStrategy(Insertion& insertion)
+void PlaceholderHelper::InsertDungeonStrategy(Insertion &insertion)
 {
     bool const hasStrategy = !insertion.dungeonSuggestion->strategy.empty();
     bool const isRandomlyUsingStrategy = urand(0, 1);
@@ -74,7 +72,7 @@ void PlaceholderHelper::InsertDungeonStrategy(Insertion& insertion)
     }
 }
 
-void PlaceholderHelper::InsertDifficulty(Insertion& insertion, [[maybe_unused]] Player* bot)
+void PlaceholderHelper::InsertDifficulty(Insertion &insertion, [[maybe_unused]] Player *bot)
 {
     bool const hasHeroic = insertion.dungeonSuggestion->difficulty == DUNGEON_DIFFICULTY_HEROIC;
     std::string difficultyText;
@@ -82,8 +80,8 @@ void PlaceholderHelper::InsertDifficulty(Insertion& insertion, [[maybe_unused]] 
     {
         bool const isRandomlyNormal = urand(0, 1);
         bool const isRandomlyHeroic = urand(0, 1);
-        std::vector<std::string> normalAbbrevations = { "Normal", "N" };
-        std::vector<std::string> heroicAbbrevations = { "Heroic", "HC", "H"};
+        std::vector<std::string> normalAbbrevations = {"Normal", "N"};
+        std::vector<std::string> heroicAbbrevations = {"Heroic", "HC", "H"};
         uint32 const randomAbbrevationIndex = urand(0, 1);
         if (isRandomlyNormal)
         {

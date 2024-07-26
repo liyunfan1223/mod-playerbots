@@ -12,10 +12,10 @@ class Unit;
 
 class LineTargetValue : public UnitCalculatedValue
 {
-	public:
-        LineTargetValue(PlayerbotAI* botAI, std::string const name = "line target") : UnitCalculatedValue(botAI, name) { }
+public:
+        LineTargetValue(PlayerbotAI *botAI, std::string const name = "line target") : UnitCalculatedValue(botAI, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 #endif

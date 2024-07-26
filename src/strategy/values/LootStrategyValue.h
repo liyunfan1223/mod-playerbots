@@ -10,20 +10,20 @@
 class LootStrategy;
 class PlayerbotAI;
 
-class LootStrategyValue : public ManualSetValue<LootStrategy*>
+class LootStrategyValue : public ManualSetValue<LootStrategy *>
 {
-	public:
-        LootStrategyValue(PlayerbotAI* botAI, std::string const name = "loot strategy") : ManualSetValue<LootStrategy*>(botAI, normal, name) { }
+public:
+        LootStrategyValue(PlayerbotAI *botAI, std::string const name = "loot strategy") : ManualSetValue<LootStrategy *>(botAI, normal, name) {}
         virtual ~LootStrategyValue();
 
         std::string const Save() override;
         bool Load(std::string const value) override;
 
-        static LootStrategy* normal;
-        static LootStrategy* gray;
-        static LootStrategy* all;
-        static LootStrategy* disenchant;
-        static LootStrategy* instance(std::string const name);
+        static LootStrategy *normal;
+        static LootStrategy *gray;
+        static LootStrategy *all;
+        static LootStrategy *disenchant;
+        static LootStrategy *instance(std::string const name);
 };
 
 #endif

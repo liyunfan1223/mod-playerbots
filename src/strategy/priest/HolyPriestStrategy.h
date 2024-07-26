@@ -12,25 +12,24 @@ class PlayerbotAI;
 
 class HolyPriestStrategy : public HealPriestStrategy
 {
-    public:
-        HolyPriestStrategy(PlayerbotAI* botAI);
+public:
+    HolyPriestStrategy(PlayerbotAI *botAI);
 
-        NextAction** getDefaultActions() override;
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "holy dps"; }
-        uint32 GetType() const override { return STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
+    NextAction **getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "holy dps"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
 };
 
 class HolyHealPriestStrategy : public GenericPriestStrategy
 {
-    public:
-        HolyHealPriestStrategy(PlayerbotAI* botAI);
+public:
+    HolyHealPriestStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        NextAction** getDefaultActions() override;
-        std::string const getName() override { return "holy heal"; }
-		uint32 GetType() const override { return STRATEGY_TYPE_HEAL | STRATEGY_TYPE_RANGED; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    NextAction **getDefaultActions() override;
+    std::string const getName() override { return "holy heal"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_HEAL | STRATEGY_TYPE_RANGED; }
 };
-
 
 #endif

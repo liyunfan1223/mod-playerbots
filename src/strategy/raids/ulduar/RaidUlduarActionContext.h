@@ -11,12 +11,12 @@
 
 class RaidUlduarActionContext : public NamedObjectContext<Action>
 {
-    public:
-        RaidUlduarActionContext() {
+public:
+    RaidUlduarActionContext()
+    {
+    }
 
-        }
-    private:
-
+private:
 };
 
 #endif

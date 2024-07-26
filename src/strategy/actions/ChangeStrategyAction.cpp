@@ -16,16 +16,16 @@ bool ChangeCombatStrategyAction::Execute(Event event)
         std::vector<std::string> splitted = split(text, ',');
         for (std::vector<std::string>::iterator i = splitted.begin(); i != splitted.end(); i++)
         {
-            const char* name = i->c_str();
+            const char *name = i->c_str();
             switch (name[0])
             {
-                case '+':
-                case '-':
-                case '~':
-                    sPlayerbotDbStore->Save(botAI);
-                    break;
-                case '?':
-                    break;
+            case '+':
+            case '-':
+            case '~':
+                sPlayerbotDbStore->Save(botAI);
+                break;
+            case '?':
+                break;
             }
         }
     }
@@ -53,16 +53,16 @@ bool ChangeNonCombatStrategyAction::Execute(Event event)
         std::vector<std::string> splitted = split(text, ',');
         for (std::vector<std::string>::iterator i = splitted.begin(); i != splitted.end(); i++)
         {
-            const char* name = i->c_str();
+            const char *name = i->c_str();
             switch (name[0])
             {
-                case '+':
-                case '-':
-                case '~':
-                    sPlayerbotDbStore->Save(botAI);
-                    break;
-                case '?':
-                    break;
+            case '+':
+            case '-':
+            case '~':
+                sPlayerbotDbStore->Save(botAI);
+                break;
+            case '?':
+                break;
             }
         }
     }

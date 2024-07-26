@@ -9,15 +9,14 @@
 #include "AiObjectContext.h"
 #include "RaidUlduarTriggers.h"
 
-class RaidUlduarTriggerContext : public NamedObjectContext<Trigger> 
+class RaidUlduarTriggerContext : public NamedObjectContext<Trigger>
 {
-    public:
-        RaidUlduarTriggerContext() 
-        {
+public:
+    RaidUlduarTriggerContext()
+    {
+    }
 
-        }
-    private:
-
+private:
 };
 
 #endif

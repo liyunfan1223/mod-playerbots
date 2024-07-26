@@ -11,20 +11,20 @@ class PlayerbotAI;
 
 class GrindingStrategy : public NonCombatStrategy
 {
-    public:
-        GrindingStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) { }
+public:
+    GrindingStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
-        std::string const getName() override { return "grind"; }
-        uint32 GetType() const override { return STRATEGY_TYPE_DPS; }
-        NextAction** getDefaultActions() override;
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "grind"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_DPS; }
+    NextAction **getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class MoveRandomStrategy : public NonCombatStrategy
 {
 public:
-    MoveRandomStrategy(PlayerbotAI* ai) : NonCombatStrategy(botAI) {}
+    MoveRandomStrategy(PlayerbotAI *ai) : NonCombatStrategy(botAI) {}
     std::string const getName() override { return "move random"; }
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 #endif

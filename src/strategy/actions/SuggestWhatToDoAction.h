@@ -11,35 +11,35 @@ class PlayerbotAI;
 
 class SuggestWhatToDoAction : public InventoryAction
 {
-    public:
-        SuggestWhatToDoAction(PlayerbotAI* botAI, std::string const name = "suggest what to do");
+public:
+    SuggestWhatToDoAction(PlayerbotAI *botAI, std::string const name = "suggest what to do");
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 
-    protected:
-        typedef void (SuggestWhatToDoAction::*Suggestion)();
-        std::vector<Suggestion> suggestions;
-        void instance();
-        void specificQuest();
-        void grindReputation();
-        void something();
-        void spam(std::string msg, uint8 flags = 0, bool worldChat = false, bool guild = false);
+protected:
+    typedef void (SuggestWhatToDoAction::*Suggestion)();
+    std::vector<Suggestion> suggestions;
+    void instance();
+    void specificQuest();
+    void grindReputation();
+    void something();
+    void spam(std::string msg, uint8 flags = 0, bool worldChat = false, bool guild = false);
 
-        std::vector<uint32> GetIncompletedQuests();
+    std::vector<uint32> GetIncompletedQuests();
 
-    private:
-        static std::map<std::string, uint8> instances;
-        static std::map<std::string, uint8> factions;
+private:
+    static std::map<std::string, uint8> instances;
+    static std::map<std::string, uint8> factions;
 };
 
 class SuggestTradeAction : public SuggestWhatToDoAction
 {
-    public:
-        SuggestTradeAction(PlayerbotAI* botAI);
+public:
+    SuggestTradeAction(PlayerbotAI *botAI);
 
-        bool Execute(Event event) override;
-        bool isUseful() override { return true; }
+    bool Execute(Event event) override;
+    bool isUseful() override { return true; }
 };
 
 #endif

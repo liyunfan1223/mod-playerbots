@@ -14,14 +14,14 @@ struct Mail;
 
 class CheckMailAction : public Action
 {
-    public:
-        CheckMailAction(PlayerbotAI* botAI) : Action(botAI, "check mail") { }
+public:
+    CheckMailAction(PlayerbotAI *botAI) : Action(botAI, "check mail") {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 
-    private:
-        void ProcessMail(Mail* mail, Player* owner, CharacterDatabaseTransaction trans);
+private:
+    void ProcessMail(Mail *mail, Player *owner, CharacterDatabaseTransaction trans);
 };
 
 #endif

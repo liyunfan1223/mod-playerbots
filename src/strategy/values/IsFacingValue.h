@@ -12,8 +12,8 @@ class PlayerbotAI;
 
 class IsFacingValue : public BoolCalculatedValue, public Qualified
 {
-	public:
-        IsFacingValue(PlayerbotAI* botAI, std::string const name = "is facing") : BoolCalculatedValue(botAI, name) { }
+public:
+        IsFacingValue(PlayerbotAI *botAI, std::string const name = "is facing") : BoolCalculatedValue(botAI, name) {}
 
         bool Calculate() override;
 };

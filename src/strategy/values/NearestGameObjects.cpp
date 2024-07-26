@@ -12,20 +12,20 @@
 
 class AnyGameObjectInObjectRangeCheck
 {
-    public:
-        AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) { }
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(GameObject* u)
-        {
-            if (u && i_obj->IsWithinDistInMap(u, i_range) && u->isSpawned() && u->GetGOInfo())
-                return true;
+public:
+    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range) : i_obj(obj), i_range(range) {}
+    WorldObject const &GetFocusObject() const { return *i_obj; }
+    bool operator()(GameObject *u)
+    {
+        if (u && i_obj->IsWithinDistInMap(u, i_range) && u->isSpawned() && u->GetGOInfo())
+            return true;
 
-            return false;
-        }
+        return false;
+    }
 
-    private:
-        WorldObject const* i_obj;
-        float i_range;
+private:
+    WorldObject const *i_obj;
+    float i_range;
 };
 
 GuidVector NearestGameObjects::Calculate()
@@ -36,7 +36,7 @@ GuidVector NearestGameObjects::Calculate()
     Cell::VisitAllObjects(bot, searcher, range);
 
     GuidVector result;
-    for (GameObject* go : targets)
+    for (GameObject *go : targets)
     {
         // if (ignoreLos || bot->IsWithinLOSInMap(go))
         result.push_back(go->GetGUID());
@@ -53,18 +53,18 @@ GuidVector NearestTrapWithDamageValue::Calculate()
     Cell::VisitAllObjects(bot, searcher, range);
 
     GuidVector result;
-    for (GameObject* go : targets)
+    for (GameObject *go : targets)
     {
         if (go->GetGoType() != GAMEOBJECT_TYPE_TRAP)
         {
             continue;
         }
-        Unit* owner = go->GetOwner();
+        Unit *owner = go->GetOwner();
         if (owner && owner->IsFriendlyTo(bot))
         {
             continue;
         }
-        const GameObjectTemplate* goInfo = go->GetGOInfo();
+        const GameObjectTemplate *goInfo = go->GetGOInfo();
         if (!goInfo)
         {
             continue;
@@ -74,17 +74,23 @@ GuidVector NearestTrapWithDamageValue::Calculate()
         {
             continue;
         }
-        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (spellInfo->IsPositive()) {
+        const SpellInfo *spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (spellInfo->IsPositive())
+        {
             continue;
         }
-        for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA) {
-                if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE) {
+        for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
+        {
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA)
+            {
+                if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
+                {
                     result.push_back(go->GetGUID());
                     break;
                 }
-            } else if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
+            }
+            else if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
+            {
                 result.push_back(go->GetGUID());
                 break;
             }
@@ -92,4 +98,3 @@ GuidVector NearestTrapWithDamageValue::Calculate()
     }
     return result;
 }
-

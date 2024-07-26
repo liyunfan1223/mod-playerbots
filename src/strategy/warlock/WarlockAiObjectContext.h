@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class WarlockAiObjectContext : public AiObjectContext
 {
-    public:
-        WarlockAiObjectContext(PlayerbotAI* botAI);
+public:
+    WarlockAiObjectContext(PlayerbotAI *botAI);
 };
 
 #endif

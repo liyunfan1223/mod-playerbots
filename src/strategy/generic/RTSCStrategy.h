@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class RTSCStrategy : public Strategy
 {
-    public:
-        RTSCStrategy(PlayerbotAI* botAI);
+public:
+    RTSCStrategy(PlayerbotAI *botAI);
 
-        std::string const getName() override { return "RTSC"; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "RTSC"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 #endif

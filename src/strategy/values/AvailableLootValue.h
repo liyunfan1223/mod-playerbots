@@ -10,25 +10,25 @@
 
 class PlayerbotAI;
 
-class AvailableLootValue : public ManualSetValue<LootObjectStack*>
+class AvailableLootValue : public ManualSetValue<LootObjectStack *>
 {
-	public:
-        AvailableLootValue(PlayerbotAI* botAI, std::string const name = "available loot");
-        virtual ~AvailableLootValue();
+public:
+    AvailableLootValue(PlayerbotAI *botAI, std::string const name = "available loot");
+    virtual ~AvailableLootValue();
 };
 
 class LootTargetValue : public ManualSetValue<LootObject>
 {
-    public:
-        LootTargetValue(PlayerbotAI* botAI, std::string const name = "loot target");
+public:
+    LootTargetValue(PlayerbotAI *botAI, std::string const name = "loot target");
 };
 
 class CanLootValue : public BoolCalculatedValue
 {
-    public:
-        CanLootValue(PlayerbotAI* botAI, std::string const name = "can loot") : BoolCalculatedValue(botAI, name) { }
+public:
+    CanLootValue(PlayerbotAI *botAI, std::string const name = "can loot") : BoolCalculatedValue(botAI, name) {}
 
-        bool Calculate() override;
+    bool Calculate() override;
 };
 
 #endif

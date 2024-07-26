@@ -5,18 +5,18 @@
 #include "LineTargetValue.h"
 #include "Playerbots.h"
 
-Unit* LineTargetValue::Calculate()
+Unit *LineTargetValue::Calculate()
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return nullptr;
 
-    Group* group = master->GetGroup();
+    Group *group = master->GetGroup();
     if (!group)
         return nullptr;
 
     Player *prev = master;
-    Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
+    Group::MemberSlotList const &groupSlot = group->GetMemberSlots();
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
     {
         Player *player = ObjectAccessor::FindPlayer(itr->guid);
@@ -31,4 +31,3 @@ Unit* LineTargetValue::Calculate()
 
     return master;
 }
-

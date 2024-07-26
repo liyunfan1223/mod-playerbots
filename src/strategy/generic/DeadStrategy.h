@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class DeadStrategy : public PassTroughStrategy
 {
-    public:
-        DeadStrategy(PlayerbotAI* botAI);
+public:
+    DeadStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "dead"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "dead"; }
 };
 
 #endif

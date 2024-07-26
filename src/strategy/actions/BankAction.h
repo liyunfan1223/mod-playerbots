@@ -12,17 +12,17 @@ class PlayerbotAI;
 
 class BankAction : public InventoryAction
 {
-    public:
-        BankAction(PlayerbotAI* botAI) : InventoryAction(botAI, "bank") { }
+public:
+    BankAction(PlayerbotAI *botAI) : InventoryAction(botAI, "bank") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        bool ExecuteBank(std::string const text, Unit* bank);
-        void ListItems();
-        bool Withdraw(uint32 itemid);
-        bool Deposit(Item* pItem);
-        Item* FindItemInBank(uint32 ItemId);
+private:
+    bool ExecuteBank(std::string const text, Unit *bank);
+    void ListItems();
+    bool Withdraw(uint32 itemid);
+    bool Deposit(Item *pItem);
+    Item *FindItemInBank(uint32 ItemId);
 };
 
 #endif

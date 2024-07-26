@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class RandomBotUpdateAction : public Action
 {
-    public:
-        RandomBotUpdateAction(PlayerbotAI* botAI) : Action(botAI, "random bot update") { }
+public:
+    RandomBotUpdateAction(PlayerbotAI *botAI) : Action(botAI, "random bot update") {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 #endif

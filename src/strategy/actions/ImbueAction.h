@@ -12,33 +12,33 @@ class PlayerbotAI;
 class ImbueWithPoisonAction : public Action
 {
 public:
-    ImbueWithPoisonAction(PlayerbotAI* botAI);
+    ImbueWithPoisonAction(PlayerbotAI *botAI);
 
     bool Execute(Event event) override;
 };
 
 class ImbueWithStoneAction : public Action
 {
-    public:
-        ImbueWithStoneAction(PlayerbotAI* botAI);
+public:
+    ImbueWithStoneAction(PlayerbotAI *botAI);
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class ImbueWithOilAction : public Action
 {
-    public:
-        ImbueWithOilAction(PlayerbotAI* botAI);
+public:
+    ImbueWithOilAction(PlayerbotAI *botAI);
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class TryEmergencyAction : public Action
 {
-    public:
-        TryEmergencyAction(PlayerbotAI* botAI);
+public:
+    TryEmergencyAction(PlayerbotAI *botAI);
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

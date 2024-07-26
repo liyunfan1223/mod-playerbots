@@ -8,63 +8,63 @@
 
 class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-    public:
-        DpsPaladinStrategyActionNodeFactory()
-        {
-            creators["sanctity aura"] = &sanctity_aura;
-            creators["retribution aura"] = &retribution_aura;
-            creators["seal of corruption"] = &seal_of_corruption;
-            creators["seal of vengeance"] = &seal_of_vengeance;
-            creators["seal of command"] = &seal_of_command;
-            creators["blessing of might"] = &blessing_of_might;
-            creators["crusader strike"] = &crusader_strike;
-            creators["repentance"] = &repentance;
-            creators["repentance on enemy healer"] = &repentance_on_enemy_healer;
-            creators["repentance on snare target"] = &repentance_on_snare_target;
-            creators["repentance of shield"] = &repentance_or_shield;
-        }
+public:
+    DpsPaladinStrategyActionNodeFactory()
+    {
+        creators["sanctity aura"] = &sanctity_aura;
+        creators["retribution aura"] = &retribution_aura;
+        creators["seal of corruption"] = &seal_of_corruption;
+        creators["seal of vengeance"] = &seal_of_vengeance;
+        creators["seal of command"] = &seal_of_command;
+        creators["blessing of might"] = &blessing_of_might;
+        creators["crusader strike"] = &crusader_strike;
+        creators["repentance"] = &repentance;
+        creators["repentance on enemy healer"] = &repentance_on_enemy_healer;
+        creators["repentance on snare target"] = &repentance_on_snare_target;
+        creators["repentance of shield"] = &repentance_or_shield;
+    }
 
-    private:
-        static ActionNode* seal_of_corruption([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("seal of corruption",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of vengeance"), nullptr),
-                /*C*/ nullptr);
-        }
+private:
+    static ActionNode *seal_of_corruption([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("seal of corruption",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("seal of vengeance"), nullptr),
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("seal of vengeance",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
-                /*C*/ nullptr);
-        }
+    static ActionNode *seal_of_vengeance([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("seal of vengeance",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* seal_of_command([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("seal of command",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of corruption"), nullptr),
-                /*C*/ nullptr);
-        }
+    static ActionNode *seal_of_command([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("seal of command",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("seal of corruption"), nullptr),
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* blessing_of_might([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("blessing of might",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("blessing of kings"), nullptr),
-                /*C*/ nullptr);
-        }
+    static ActionNode *blessing_of_might([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("blessing of might",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("blessing of kings"), nullptr),
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* crusader_strike([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("crusader strike",
-                /*P*/ nullptr,
-                /*A*/ nullptr,
-                /*C*/ nullptr);
-        }
-        
+    static ActionNode *crusader_strike([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("crusader strike",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+
     ACTION_NODE_A(repentance, "repentance", "hammer of justice");
     ACTION_NODE_A(repentance_on_enemy_healer, "repentance on enemy healer", "hammer of justice on enemy healer");
     ACTION_NODE_A(repentance_on_snare_target, "repentance on snare target", "hammer of justice on snare target");
@@ -73,23 +73,23 @@ class DpsPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
     ACTION_NODE_A(repentance_or_shield, "repentance", "divine shield");
 };
 
-DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)
+DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI *botAI) : GenericPaladinStrategy(botAI)
 {
     actionNodeFactories.Add(new DpsPaladinStrategyActionNodeFactory());
 }
 
-NextAction** DpsPaladinStrategy::getDefaultActions()
+NextAction **DpsPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
-        new NextAction("crusader strike", ACTION_DEFAULT + 0.4f),
-        new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.3f),
-        new NextAction("divine storm", ACTION_DEFAULT + 0.2f),
-        new NextAction("melee consecration", ACTION_DEFAULT + 0.1f),
-        new NextAction("melee", ACTION_DEFAULT), 
-        NULL);
+    return NextAction::array(0,
+                             new NextAction("crusader strike", ACTION_DEFAULT + 0.4f),
+                             new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.3f),
+                             new NextAction("divine storm", ACTION_DEFAULT + 0.2f),
+                             new NextAction("melee consecration", ACTION_DEFAULT + 0.1f),
+                             new NextAction("melee", ACTION_DEFAULT),
+                             NULL);
 }
 
-void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
@@ -106,8 +106,8 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("repentance on enemy healer", NextAction::array(0, new NextAction("repentance on enemy healer", ACTION_INTERRUPT + 2), nullptr)));
     // triggers.push_back(new TriggerNode("repentance on snare target", NextAction::array(0, new NextAction("repentance on snare target", ACTION_INTERRUPT + 2), nullptr)));
     // triggers.push_back(new TriggerNode("repentance", NextAction::array(0, new NextAction("repentance", ACTION_INTERRUPT + 2), nullptr)));
-	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("melee consecration", ACTION_HIGH + 3), nullptr)));
-	triggers.push_back(new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("melee consecration", ACTION_HIGH + 3), nullptr)));
+    triggers.push_back(new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("hammer of wrath", ACTION_HIGH), nullptr)));
     // triggers.push_back(new TriggerNode(
     //     "not facing target",

@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class NoRtiTrigger : public Trigger
 {
-    public:
-        NoRtiTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no rti target") { }
+public:
+    NoRtiTrigger(PlayerbotAI *botAI) : Trigger(botAI, "no rti target") {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 #endif

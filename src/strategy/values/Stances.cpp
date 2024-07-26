@@ -7,9 +7,9 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-Unit* Stance::GetTarget()
+Unit *Stance::GetTarget()
 {
-    Unit* target = AI_VALUE(Unit*, GetTargetName());
+    Unit *target = AI_VALUE(Unit *, GetTargetName());
     if (target)
         return target;
 
@@ -22,7 +22,7 @@ Unit* Stance::GetTarget()
 
 WorldLocation Stance::GetLocation()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return Formation::NullLocation;
 
@@ -31,11 +31,11 @@ WorldLocation Stance::GetLocation()
 
 WorldLocation Stance::GetNearLocation(float angle, float distance)
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
 
     float x = target->GetPositionX() + cos(angle) * distance;
     float y = target->GetPositionY() + sin(angle) * distance;
-        float z = target->GetPositionZ();
+    float z = target->GetPositionZ();
 
     if (bot->IsWithinLOS(x, y, z))
         return WorldLocation(bot->GetMapId(), x, y, z);
@@ -45,7 +45,7 @@ WorldLocation Stance::GetNearLocation(float angle, float distance)
 
 WorldLocation MoveStance::GetLocationInternal()
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     float distance = std::max(sPlayerbotAIConfig->meleeDistance, target->GetCombatReach());
 
     float angle = GetAngle();
@@ -73,117 +73,32 @@ StanceValue::~StanceValue()
 
 class NearStance : public MoveStance
 {
-    public:
-        NearStance(PlayerbotAI* botAI) : MoveStance(botAI, "near") { }
+public:
+    NearStance(PlayerbotAI *botAI) : MoveStance(botAI, "near") {}
 
-        float GetAngle() override
-        {
-            Unit* target = GetTarget();
+    float GetAngle() override
+    {
+        Unit *target = GetTarget();
 
-            if (target->GetVictim() && target->GetVictim()->GetGUID() == bot->GetGUID())
-                return target->GetOrientation();
-
-            if (botAI->HasStrategy("behind", BOT_STATE_COMBAT))
-            {
-                Unit* target = GetTarget();
-                Group* group = bot->GetGroup();
-                uint32 index = 0;
-                uint32 count = 0;
-                if (group)
-                {
-                    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-                    {
-                        Player* member = ref->GetSource();
-                        if (member == bot)
-                            index = count;
-
-                        if (member && !botAI->IsRanged(member) && !botAI->IsTank(member))
-                            count++;
-                    }
-                }
-
-                float angle = target->GetOrientation() + M_PI;
-                if (!count)
-                    return angle;
-
-                float increment = M_PI / 4 / count;
-                return round((angle + index * increment - M_PI / 4) * 10.0f) / 10.0f;
-            }
-
-            float angle = GetFollowAngle() + target->GetOrientation();
-            if (Player* master = GetMaster())
-                angle -= master->GetOrientation();
-
-            return angle;
-        }
-};
-
-class TankStance : public MoveStance
-{
-    public:
-        TankStance(PlayerbotAI* botAI) : MoveStance(botAI, "tank") { }
-
-        float GetAngle() override
-        {
-            Unit* target = GetTarget();
+        if (target->GetVictim() && target->GetVictim()->GetGUID() == bot->GetGUID())
             return target->GetOrientation();
-        }
-};
 
-class TurnBackStance : public MoveStance
-{
-    public:
-        TurnBackStance(PlayerbotAI* botAI) : MoveStance(botAI, "turnback") { }
-
-        float GetAngle() override
+        if (botAI->HasStrategy("behind", BOT_STATE_COMBAT))
         {
-            Unit* target = GetTarget();
-
-            uint32 count = 0;
-            float angle = 0.0f;
-            if (Group* group = bot->GetGroup())
-            {
-                for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-                {
-                    if (Player* member = ref->GetSource())
-                        if (member != bot && botAI->IsRanged(member))
-                        {
-                            angle += target->GetAngle(member);
-                            ++count;
-                        }
-                }
-            }
-
-            if (!count)
-                return target->GetOrientation();
-
-            return std::round((angle / count) * 10.0f) / 10.0f + M_PI;
-        }
-};
-
-class BehindStance : public MoveStance
-{
-    public:
-        BehindStance(PlayerbotAI* botAI) : MoveStance(botAI, "behind") { }
-
-        float GetAngle() override
-        {
-            Unit* target = GetTarget();
-
+            Unit *target = GetTarget();
+            Group *group = bot->GetGroup();
             uint32 index = 0;
             uint32 count = 0;
-            if (Group* group = bot->GetGroup())
+            if (group)
             {
-                for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+                for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
                 {
-                    if (Player* member = ref->GetSource())
-                    {
-                        if (member == bot)
-                            index = count;
+                    Player *member = ref->GetSource();
+                    if (member == bot)
+                        index = count;
 
-                        if (!botAI->IsRanged(member) && !botAI->IsTank(member))
-                            ++count;
-                    }
+                    if (member && !botAI->IsRanged(member) && !botAI->IsTank(member))
+                        count++;
                 }
             }
 
@@ -192,11 +107,96 @@ class BehindStance : public MoveStance
                 return angle;
 
             float increment = M_PI / 4 / count;
-            return std::round((angle + index * increment - M_PI / 4) * 10.0f) / 10.0f;
+            return round((angle + index * increment - M_PI / 4) * 10.0f) / 10.0f;
         }
+
+        float angle = GetFollowAngle() + target->GetOrientation();
+        if (Player *master = GetMaster())
+            angle -= master->GetOrientation();
+
+        return angle;
+    }
 };
 
-StanceValue::StanceValue(PlayerbotAI* botAI) : ManualSetValue<Stance*>(botAI, new NearStance(botAI), "stance")
+class TankStance : public MoveStance
+{
+public:
+    TankStance(PlayerbotAI *botAI) : MoveStance(botAI, "tank") {}
+
+    float GetAngle() override
+    {
+        Unit *target = GetTarget();
+        return target->GetOrientation();
+    }
+};
+
+class TurnBackStance : public MoveStance
+{
+public:
+    TurnBackStance(PlayerbotAI *botAI) : MoveStance(botAI, "turnback") {}
+
+    float GetAngle() override
+    {
+        Unit *target = GetTarget();
+
+        uint32 count = 0;
+        float angle = 0.0f;
+        if (Group *group = bot->GetGroup())
+        {
+            for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+            {
+                if (Player *member = ref->GetSource())
+                    if (member != bot && botAI->IsRanged(member))
+                    {
+                        angle += target->GetAngle(member);
+                        ++count;
+                    }
+            }
+        }
+
+        if (!count)
+            return target->GetOrientation();
+
+        return std::round((angle / count) * 10.0f) / 10.0f + M_PI;
+    }
+};
+
+class BehindStance : public MoveStance
+{
+public:
+    BehindStance(PlayerbotAI *botAI) : MoveStance(botAI, "behind") {}
+
+    float GetAngle() override
+    {
+        Unit *target = GetTarget();
+
+        uint32 index = 0;
+        uint32 count = 0;
+        if (Group *group = bot->GetGroup())
+        {
+            for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+            {
+                if (Player *member = ref->GetSource())
+                {
+                    if (member == bot)
+                        index = count;
+
+                    if (!botAI->IsRanged(member) && !botAI->IsTank(member))
+                        ++count;
+                }
+            }
+        }
+
+        float angle = target->GetOrientation() + M_PI;
+        if (!count)
+            return angle;
+
+        float increment = M_PI / 4 / count;
+        return std::round((angle + index * increment - M_PI / 4) * 10.0f) / 10.0f;
+    }
+};
+
+StanceValue::StanceValue(PlayerbotAI *botAI) : ManualSetValue<Stance*>(botAI, new NearStance(botAI), "stance")
 {
 }
 
@@ -241,7 +241,7 @@ bool SetStanceAction::Execute(Event event)
 {
     std::string const stance = event.getParam();
 
-    StanceValue* value = (StanceValue*)context->GetValue<Stance*>("stance");
+    StanceValue *value = (StanceValue *)context->GetValue<Stance*>("stance");
     if (stance == "?" || stance.empty())
     {
         std::ostringstream str;

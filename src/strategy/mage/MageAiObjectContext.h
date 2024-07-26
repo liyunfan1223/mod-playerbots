@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class MageAiObjectContext : public AiObjectContext
 {
-    public:
-        MageAiObjectContext(PlayerbotAI* botAI);
+public:
+    MageAiObjectContext(PlayerbotAI *botAI);
 };
 
 #endif

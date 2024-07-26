@@ -5,11 +5,13 @@
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 
-void PlayerbotTextMgr::replaceAll(std::string & str, const std::string & from, const std::string & to) {
+void PlayerbotTextMgr::replaceAll(std::string &str, const std::string &from, const std::string &to)
+{
     if (from.empty())
         return;
     size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
         str.replace(start_pos, from.length(), to);
         start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
     }
@@ -25,7 +27,7 @@ void PlayerbotTextMgr::LoadBotTexts()
         do
         {
             std::map<uint32, std::string> text;
-            Field* fields = result->Fetch();
+            Field *fields = result->Fetch();
             std::string name = fields[0].Get<std::string>();
             text[0] = fields[1].Get<std::string>();
             uint32 sayType = fields[2].Get<uint32>();
@@ -36,8 +38,7 @@ void PlayerbotTextMgr::LoadBotTexts()
             }
             botTexts[name].push_back(BotTextEntry(name, text, sayType, replyType));
             ++count;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     LOG_INFO("playerbots", "{} playerbots texts loaded", count);
@@ -52,7 +53,7 @@ void PlayerbotTextMgr::LoadBotTextChance()
         {
             do
             {
-                Field* fields = results->Fetch();
+                Field *fields = results->Fetch();
                 std::string name = fields[0].Get<std::string>();
                 uint32 probability = fields[1].Get<uint32>();
 
@@ -78,7 +79,7 @@ std::string PlayerbotTextMgr::GetBotText(std::string name)
         return "";
     }
 
-    std::vector<BotTextEntry>& list = botTexts[name];
+    std::vector<BotTextEntry> &list = botTexts[name];
     BotTextEntry textEntry = list[urand(0, list.size() - 1)];
     return !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
 }
@@ -110,7 +111,7 @@ std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::
         return "";
     }
 
-    std::vector<BotTextEntry>& list = botTexts["reply"];
+    std::vector<BotTextEntry> &list = botTexts["reply"];
     std::vector<BotTextEntry> proper_list;
     for (auto text : list)
     {
@@ -123,12 +124,11 @@ std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::
 
     BotTextEntry textEntry = proper_list[urand(0, proper_list.size() - 1)];
     std::string botText = !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
-    for (auto & placeholder : placeholders)
+    for (auto &placeholder : placeholders)
         replaceAll(botText, placeholder.first, placeholder.second);
 
     return botText;
 }
-
 
 std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::string name)
 {
@@ -157,7 +157,7 @@ bool PlayerbotTextMgr::GetBotText(std::string name, std::string &text)
     return !text.empty();
 }
 
-bool PlayerbotTextMgr::GetBotText(std::string name, std::string& text, std::map<std::string, std::string> placeholders)
+bool PlayerbotTextMgr::GetBotText(std::string name, std::string &text, std::map<std::string, std::string> placeholders)
 {
     if (!rollTextChance(name))
         return false;
@@ -165,7 +165,6 @@ bool PlayerbotTextMgr::GetBotText(std::string name, std::string& text, std::map<
     text = GetBotText(name, placeholders);
     return !text.empty();
 }
-
 
 void PlayerbotTextMgr::AddLocalePriority(uint32 locale)
 {

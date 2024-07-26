@@ -12,7 +12,7 @@ bool GuildAcceptAction::Execute(Event event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);
-    Player* inviter = nullptr;
+    Player *inviter = nullptr;
     std::string Invitedname;
     p >> Invitedname;
 

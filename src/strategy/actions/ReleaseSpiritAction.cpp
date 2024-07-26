@@ -25,14 +25,14 @@ bool ReleaseSpiritAction::Execute(Event event)
         return false;
     }
 
-    WorldPacket& p = event.getPacket();
+    WorldPacket &p = event.getPacket();
     if (!p.empty() && p.GetOpcode() == CMSG_REPOP_REQUEST)
         botAI->TellMasterNoFacing("Releasing...");
     else
         botAI->TellMasterNoFacing("Meet me at the graveyard");
 
     // Death Count to prevent skeleton piles
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master || (master && GET_PLAYERBOT_AI(master)))
     {
         uint32 dCount = AI_VALUE(uint32, "death count");
@@ -72,14 +72,14 @@ bool ReleaseSpiritAction::Execute(Event event)
     //         bot->GetSession()->HandleGossipHelloOpcode(packet);
     //     }
     // }
-    
+
     return true;
 }
 
 bool AutoReleaseSpiritAction::Execute(Event event)
 {
-    //Death Count to prevent skeleton piles
-    Player* master = GetMaster();
+    // Death Count to prevent skeleton piles
+    Player *master = GetMaster();
     if (!master || (master && GET_PLAYERBOT_AI(master)))
     {
         uint32 dCount = AI_VALUE(uint32, "death count");
@@ -98,7 +98,7 @@ bool AutoReleaseSpiritAction::Execute(Event event)
     {
         GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
         ObjectGuid guid;
-        Unit* unit;
+        Unit *unit;
         for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
         {
             unit = botAI->GetUnit(*i);
@@ -108,12 +108,16 @@ bool AutoReleaseSpiritAction::Execute(Event event)
                 break;
             }
         }
-        if (!guid) {
+        if (!guid)
+        {
             return true;
         }
-        if (bot->GetDistance(unit) >= INTERACTION_DISTANCE) {
+        if (bot->GetDistance(unit) >= INTERACTION_DISTANCE)
+        {
             bot->GetMotionMaster()->MoveChase(unit);
-        } else {
+        }
+        else
+        {
             bg_gossip_time = time(NULL);
             WorldPacket packet(CMSG_GOSSIP_HELLO);
             packet << guid;
@@ -168,7 +172,7 @@ bool RepopAction::Execute(Event event)
 
     int64 deadTime;
 
-    Corpse* corpse = bot->GetCorpse();
+    Corpse *corpse = bot->GetCorpse();
     if (corpse)
         deadTime = time(nullptr) - corpse->GetGhostTime();
     else if (bot->isDead())
@@ -178,7 +182,7 @@ bool RepopAction::Execute(Event event)
 
     uint32 dCount = AI_VALUE(uint32, "death count");
 
-    GraveyardStruct const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 30 * MINUTE);
+    GraveyardStruct const *ClosestGrave = GetGrave(dCount > 10 || deadTime > 30 * MINUTE);
     if (!ClosestGrave)
         return false;
 

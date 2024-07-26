@@ -7,5 +7,5 @@
 
 bool NoRtiTrigger::IsActive()
 {
-    return !AI_VALUE(Unit*, "rti target");
+    return !AI_VALUE(Unit *, "rti target");
 }

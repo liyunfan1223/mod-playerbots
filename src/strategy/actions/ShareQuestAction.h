@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class ShareQuestAction : public Action
 {
-    public:
-        ShareQuestAction(PlayerbotAI* botAI) : Action(botAI, "share quest") { }
+public:
+    ShareQuestAction(PlayerbotAI *botAI) : Action(botAI, "share quest") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

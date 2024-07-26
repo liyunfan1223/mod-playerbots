@@ -7,16 +7,16 @@
 
 class PlayerbotCommandServer
 {
-    public:
-        PlayerbotCommandServer() { }
-        virtual ~PlayerbotCommandServer() { }
-        static PlayerbotCommandServer* instance()
-        {
-            static PlayerbotCommandServer instance;
-            return &instance;
-        }
+public:
+    PlayerbotCommandServer() {}
+    virtual ~PlayerbotCommandServer() {}
+    static PlayerbotCommandServer *instance()
+    {
+        static PlayerbotCommandServer instance;
+        return &instance;
+    }
 
-        void Start();
+    void Start();
 };
 
 #define sPlayerbotCommandServer PlayerbotCommandServer::instance()

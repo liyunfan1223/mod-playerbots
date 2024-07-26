@@ -29,9 +29,9 @@ int32 RtiTargetValue::GetRtiIndex(std::string const rti)
     return index;
 }
 
-Unit* RtiTargetValue::Calculate()
+Unit *RtiTargetValue::Calculate()
 {
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (!group)
         return nullptr;
 
@@ -49,7 +49,7 @@ Unit* RtiTargetValue::Calculate()
         return nullptr;
 
     //////////////////////////////////////////////////////begin: delete below check
-    // Some units that need to be killed in battle are not on the list of attackers, 
+    // Some units that need to be killed in battle are not on the list of attackers,
     // such as the Kor'kron Battle-Mage in Icecrown Citadel.
 
     // GuidVector attackers = context->GetValue<GuidVector >("attackers")->Get();
@@ -58,7 +58,7 @@ Unit* RtiTargetValue::Calculate()
     //
     //////////////////////////////////////////////////////end: delete below check
 
-    Unit* unit = botAI->GetUnit(guid);
+    Unit *unit = botAI->GetUnit(guid);
     if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) || sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, unit), sPlayerbotAIConfig->sightDistance))
         return nullptr;
 

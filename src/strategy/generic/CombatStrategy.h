@@ -11,29 +11,29 @@ class PlayerbotAI;
 
 class CombatStrategy : public Strategy
 {
-    public:
-        CombatStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    CombatStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        uint32 GetType() const override { return STRATEGY_TYPE_COMBAT; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT; }
 };
 
 class AvoidAoeStrategy : public Strategy
 {
 public:
-    explicit AvoidAoeStrategy(PlayerbotAI* ai);
+    explicit AvoidAoeStrategy(PlayerbotAI *ai);
     const std::string getName() override { return "avoid aoe"; }
-    NextAction** getDefaultActions() override;
-    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    NextAction **getDefaultActions() override;
+    void InitMultipliers(std::vector<Multiplier *> &multipliers) override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class CombatFormationStrategy : public Strategy
 {
 public:
-    CombatFormationStrategy(PlayerbotAI* ai): Strategy(ai) {}
+    CombatFormationStrategy(PlayerbotAI *ai) : Strategy(ai) {}
     const std::string getName() override { return "combat formation"; }
-    NextAction** getDefaultActions() override;
+    NextAction **getDefaultActions() override;
 };
 
 #endif

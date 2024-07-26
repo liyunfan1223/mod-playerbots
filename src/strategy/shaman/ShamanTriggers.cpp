@@ -33,15 +33,17 @@ bool ShamanWeaponTrigger::IsActive()
 }
 */
 
-bool MainHandWeaponNoImbueTrigger::IsActive() {
-    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+bool MainHandWeaponNoImbueTrigger::IsActive()
+{
+    Item *const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
     if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
         return false;
     return true;
 }
 
-bool OffHandWeaponNoImbueTrigger::IsActive() {
-    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+bool OffHandWeaponNoImbueTrigger::IsActive()
+{
+    Item *const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
     if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) || itemForSpell->GetTemplate()->InventoryType != INVTYPE_WEAPON)
         return false;
     return true;
@@ -50,7 +52,7 @@ bool OffHandWeaponNoImbueTrigger::IsActive() {
 bool ShockTrigger::IsActive()
 {
     return SpellTrigger::IsActive() && !botAI->HasAura("flame shock", GetTarget(), false, true) &&
-        !botAI->HasAura("frost shock", GetTarget(), false, true);
+           !botAI->HasAura("frost shock", GetTarget(), false, true);
 }
 
 bool TotemTrigger::IsActive()
@@ -86,24 +88,24 @@ bool WaterBreathingOnPartyTrigger::IsActive()
 bool NoFireTotemTrigger::IsActive()
 {
     return !AI_VALUE2(bool, "has totem", "magma totem") &&
-        !AI_VALUE2(bool, "has totem", "flametongue totem") &&
-        !AI_VALUE2(bool, "has totem", "searing totem") &&
-        !AI_VALUE2(bool, "has totem", "fire elemental totem") &&
-        !AI_VALUE2(bool, "has totem", "frost resistance totem") && 
-        !AI_VALUE2(bool, "has totem", "totem of wrath");
+           !AI_VALUE2(bool, "has totem", "flametongue totem") &&
+           !AI_VALUE2(bool, "has totem", "searing totem") &&
+           !AI_VALUE2(bool, "has totem", "fire elemental totem") &&
+           !AI_VALUE2(bool, "has totem", "frost resistance totem") &&
+           !AI_VALUE2(bool, "has totem", "totem of wrath");
 }
 
 bool NoWaterTotemTrigger::IsActive()
 {
     return !AI_VALUE2(bool, "has totem", "fire resistance totem") &&
-        !AI_VALUE2(bool, "has totem", "mana tide totem") &&
-        !AI_VALUE2(bool, "has totem", "cleansing totem") &&
-        !AI_VALUE2(bool, "has totem", "mana spring totem") &&
-        !AI_VALUE2(bool, "has totem", "healing stream totem");
+           !AI_VALUE2(bool, "has totem", "mana tide totem") &&
+           !AI_VALUE2(bool, "has totem", "cleansing totem") &&
+           !AI_VALUE2(bool, "has totem", "mana spring totem") &&
+           !AI_VALUE2(bool, "has totem", "healing stream totem");
 }
 
 bool NoAirTotemTrigger::IsActive()
 {
     return !AI_VALUE2(bool, "has totem", "wrath of air totem") &&
-        !AI_VALUE2(bool, "has totem", "windfury totem");
+           !AI_VALUE2(bool, "has totem", "windfury totem");
 }

@@ -9,8 +9,8 @@
 
 bool InvalidTargetValue::Calculate()
 {
-    Unit* target = AI_VALUE(Unit*, qualifier);
-    Unit* enemy = AI_VALUE(Unit*, "enemy player target");
+    Unit *target = AI_VALUE(Unit *, qualifier);
+    Unit *enemy = AI_VALUE(Unit *, "enemy player target");
     if (target && enemy && target == enemy && target->IsAlive())
         return false;
 
@@ -20,7 +20,7 @@ bool InvalidTargetValue::Calculate()
                target->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) ||
                target->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) ||
                target->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE_2) ||
-               !target->IsVisible() || 
+               !target->IsVisible() ||
                !target->IsAlive() ||
                target->IsPolymorphed() ||
                target->IsCharmed() ||

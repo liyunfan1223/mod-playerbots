@@ -10,15 +10,16 @@
 #include "raids/naxxramas/RaidNaxxTriggers.h"
 #include "raids/blackwinglair/RaidBwlTriggers.h"
 
-class RaidTriggerContext : public NamedObjectContext<Trigger> 
+class RaidTriggerContext : public NamedObjectContext<Trigger>
 {
-    public:
-        RaidTriggerContext() 
-        {
-            creators["bwl suppression device"] = &RaidTriggerContext::bwl_suppression_device;
-        }
-    private:
-        static Trigger* bwl_suppression_device(PlayerbotAI* ai) { return new BwlSuppressionDeviceTrigger(ai); }
+public:
+    RaidTriggerContext()
+    {
+        creators["bwl suppression device"] = &RaidTriggerContext::bwl_suppression_device;
+    }
+
+private:
+    static Trigger *bwl_suppression_device(PlayerbotAI *ai) { return new BwlSuppressionDeviceTrigger(ai); }
 };
 
 #endif

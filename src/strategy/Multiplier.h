@@ -12,11 +12,11 @@ class PlayerbotAI;
 
 class Multiplier : public AiNamedObject
 {
-    public:
-        Multiplier(PlayerbotAI* botAI, std::string const name) : AiNamedObject(botAI, name)  {}
-        virtual ~Multiplier() { }
+public:
+    Multiplier(PlayerbotAI *botAI, std::string const name) : AiNamedObject(botAI, name) {}
+    virtual ~Multiplier() {}
 
-        virtual float GetValue([[maybe_unused]] Action* action) { return 1.0f; }
+    virtual float GetValue([[maybe_unused]] Action *action) { return 1.0f; }
 };
 
 #endif

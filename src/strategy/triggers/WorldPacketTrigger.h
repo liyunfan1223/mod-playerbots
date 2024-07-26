@@ -14,17 +14,17 @@ class WorldPacket;
 
 class WorldPacketTrigger : public Trigger
 {
-    public:
-        WorldPacketTrigger(PlayerbotAI* botAI, std::string const command) : Trigger(botAI, command), triggered(false) { }
+public:
+    WorldPacketTrigger(PlayerbotAI *botAI, std::string const command) : Trigger(botAI, command), triggered(false) {}
 
-        void ExternalEvent(WorldPacket& packet, Player* owner = nullptr) override;
-        Event Check() override;
-        void Reset() override;
+    void ExternalEvent(WorldPacket &packet, Player *owner = nullptr) override;
+    Event Check() override;
+    void Reset() override;
 
-    private:
-        WorldPacket packet;
-        bool triggered;
-        Player* owner;
+private:
+    WorldPacket packet;
+    bool triggered;
+    Player *owner;
 };
 
 #endif

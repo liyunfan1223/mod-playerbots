@@ -9,11 +9,11 @@
 
 bool TellTargetAction::Execute(Event event)
 {
-    Unit* target = context->GetValue<Unit*>("current target")->Get();
+    Unit *target = context->GetValue<Unit*>("current target")->Get();
     if (target)
     {
         std::ostringstream out;
-		out << "Attacking " << target->GetName();
+        out << "Attacking " << target->GetName();
         botAI->TellMaster(out);
 
         context->GetValue<Unit*>("old target")->Set(target);
@@ -29,7 +29,7 @@ bool TellAttackersAction::Execute(Event event)
     GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
     for (ObjectGuid const guid : attackers)
     {
-        Unit* unit = botAI->GetUnit(guid);
+        Unit *unit = botAI->GetUnit(guid);
         if (!unit || !unit->IsAlive())
             continue;
 
@@ -38,14 +38,14 @@ bool TellAttackersAction::Execute(Event event)
 
     botAI->TellMaster("--- Threat ---");
 
-    HostileReference* ref = bot->getHostileRefMgr().getFirst();
+    HostileReference *ref = bot->getHostileRefMgr().getFirst();
     if (!ref)
         return true;
 
-    while( ref )
+    while (ref)
     {
-        ThreatMgr* threatMgr = ref->GetSource();
-        Unit* unit = threatMgr->GetOwner();
+        ThreatMgr *threatMgr = ref->GetSource();
+        Unit *unit = threatMgr->GetOwner();
         float threat = ref->GetThreat();
 
         std::ostringstream out;

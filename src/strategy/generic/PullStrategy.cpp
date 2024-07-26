@@ -8,16 +8,16 @@
 
 class MagePullMultiplier : public PassiveMultiplier
 {
-    public:
-        MagePullMultiplier(PlayerbotAI* botAI, std::string const action) : PassiveMultiplier(botAI), actionName(action) { }
+public:
+    MagePullMultiplier(PlayerbotAI *botAI, std::string const action) : PassiveMultiplier(botAI), actionName(action) {}
 
-        float GetValue(Action* action) override;
+    float GetValue(Action *action) override;
 
-    private:
-        std::string const actionName;
+private:
+    std::string const actionName;
 };
 
-float MagePullMultiplier::GetValue(Action* action)
+float MagePullMultiplier::GetValue(Action *action)
 {
     if (!action)
         return 1.0f;
@@ -29,23 +29,23 @@ float MagePullMultiplier::GetValue(Action* action)
     return PassiveMultiplier::GetValue(action);
 }
 
-NextAction** PullStrategy::getDefaultActions()
+NextAction **PullStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction(action, 105.0f), new NextAction("follow", 104.0f), new NextAction("end pull", 103.0f), nullptr);
 }
 
-void PullStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PullStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 }
 
-void PullStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void PullStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     multipliers.push_back(new MagePullMultiplier(botAI, action));
     CombatStrategy::InitMultipliers(multipliers);
 }
 
-void PossibleAddsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PossibleAddsStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     Strategy::InitTriggers(triggers);
 

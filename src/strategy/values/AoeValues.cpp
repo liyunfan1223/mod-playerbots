@@ -7,9 +7,9 @@
 #include "ServerFacade.h"
 #include "SpellAuraEffects.h"
 
-GuidVector FindMaxDensity(Player* bot)
+GuidVector FindMaxDensity(Player *bot)
 {
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    PlayerbotAI *botAI = GET_PLAYERBOT_AI(bot);
     GuidVector units = *botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets");
 
     std::map<ObjectGuid, GuidVector> groups;
@@ -17,13 +17,13 @@ GuidVector FindMaxDensity(Player* bot)
     ObjectGuid maxGroup;
     for (GuidVector::iterator i = units.begin(); i != units.end(); ++i)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit *unit = botAI->GetUnit(*i);
         if (!unit)
             continue;
 
         for (GuidVector::iterator j = units.begin(); j != units.end(); ++j)
         {
-            Unit* other = botAI->GetUnit(*j);
+            Unit *other = botAI->GetUnit(*j);
             if (!other)
                 continue;
 
@@ -58,7 +58,7 @@ WorldLocation AoePositionValue::Calculate()
     float y2 = 0.f;
     for (GuidVector::iterator i = group.begin(); i != group.end(); ++i)
     {
-        Unit* unit = GET_PLAYERBOT_AI(bot)->GetUnit(*i);
+        Unit *unit = GET_PLAYERBOT_AI(bot)->GetUnit(*i);
         if (!unit)
             continue;
 
@@ -77,7 +77,8 @@ WorldLocation AoePositionValue::Calculate()
 
     float x = (x1 + x2) / 2;
     float y = (y1 + y2) / 2;
-    float z = bot->GetPositionZ() + CONTACT_DISTANCE;;
+    float z = bot->GetPositionZ() + CONTACT_DISTANCE;
+    ;
     bot->UpdateAllowedPositionZ(x, y, z);
     return WorldLocation(bot->GetMapId(), x, y, z, 0);
 }
@@ -91,20 +92,20 @@ bool HasAreaDebuffValue::Calculate()
 {
     for (uint32 auraType = SPELL_AURA_BIND_SIGHT; auraType < TOTAL_AURAS; auraType++)
     {
-        Unit::AuraEffectList const& auras = botAI->GetBot()->GetAuraEffectsByType((AuraType)auraType);
+        Unit::AuraEffectList const &auras = botAI->GetBot()->GetAuraEffectsByType((AuraType)auraType);
 
         if (auras.empty())
             continue;
 
-        for (AuraEffect const* aurEff : auras)
+        for (AuraEffect const *aurEff : auras)
         {
-            SpellInfo const* proto = aurEff->GetSpellInfo();
+            SpellInfo const *proto = aurEff->GetSpellInfo();
 
             if (!proto)
                 continue;
 
             uint32 trigger_spell_id = proto->Effects[aurEff->GetEffIndex()].TriggerSpell;
-            if (trigger_spell_id == 29767) //Overload
+            if (trigger_spell_id == 29767) // Overload
             {
                 return true;
             }
@@ -118,29 +119,32 @@ bool HasAreaDebuffValue::Calculate()
     return false;
 }
 
-Aura* AreaDebuffValue::Calculate()
+Aura *AreaDebuffValue::Calculate()
 {
     // Unit::AuraApplicationMap& map = bot->GetAppliedAuras();
-    Unit::AuraEffectList const& aurasPeriodicDamage = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
-    Unit::AuraEffectList const& aurasPeriodicDamagePercent = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-    Unit::AuraEffectList const& aurasPeriodicTriggerSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-    Unit::AuraEffectList const& aurasPeriodicTriggerWithValueSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
-    Unit::AuraEffectList const& aurasDummy = bot->GetAuraEffectsByType(SPELL_AURA_DUMMY);
-    for (const Unit::AuraEffectList& list : {aurasPeriodicDamage, aurasPeriodicDamagePercent, aurasPeriodicTriggerSpell, aurasPeriodicTriggerWithValueSpell, aurasDummy}) {
+    Unit::AuraEffectList const &aurasPeriodicDamage = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+    Unit::AuraEffectList const &aurasPeriodicDamagePercent = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+    Unit::AuraEffectList const &aurasPeriodicTriggerSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    Unit::AuraEffectList const &aurasPeriodicTriggerWithValueSpell = bot->GetAuraEffectsByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
+    Unit::AuraEffectList const &aurasDummy = bot->GetAuraEffectsByType(SPELL_AURA_DUMMY);
+    for (const Unit::AuraEffectList &list : {aurasPeriodicDamage, aurasPeriodicDamagePercent, aurasPeriodicTriggerSpell, aurasPeriodicTriggerWithValueSpell, aurasDummy})
+    {
         for (auto i = list.begin(); i != list.end(); ++i)
         {
-            AuraEffect* aurEff = *i;
+            AuraEffect *aurEff = *i;
             Aura *aura = aurEff->GetBase();
             AuraObjectType type = aura->GetType();
             bool isPositive = aura->GetSpellInfo()->IsPositive();
-            if (type == DYNOBJ_AURA_TYPE && !isPositive) {
-                DynamicObject* dynOwner = aura->GetDynobjOwner();
-                if (!dynOwner) {
+            if (type == DYNOBJ_AURA_TYPE && !isPositive)
+            {
+                DynamicObject *dynOwner = aura->GetDynobjOwner();
+                if (!dynOwner)
+                {
                     continue;
                 }
                 return aura;
             }
         }
     }
-	return nullptr;
+    return nullptr;
 }

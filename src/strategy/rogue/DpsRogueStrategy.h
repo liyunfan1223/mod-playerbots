@@ -12,60 +12,60 @@ class PlayerbotAI;
 
 class DpsRogueStrategy : public MeleeCombatStrategy
 {
-    public:
-        DpsRogueStrategy(PlayerbotAI* botAI);
+public:
+    DpsRogueStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "dps"; }
-        NextAction** getDefaultActions() override;
-        uint32 GetType() const override { return MeleeCombatStrategy::GetType() | STRATEGY_TYPE_DPS; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "dps"; }
+    NextAction **getDefaultActions() override;
+    uint32 GetType() const override { return MeleeCombatStrategy::GetType() | STRATEGY_TYPE_DPS; }
 };
 
 class StealthedRogueStrategy : public Strategy
 {
-    public:
-        StealthedRogueStrategy(PlayerbotAI* botAI);
+public:
+    StealthedRogueStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "stealthed"; }
-        NextAction** getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "stealthed"; }
+    NextAction **getDefaultActions() override;
 };
 
 class StealthStrategy : public Strategy
 {
-    public:
-        StealthStrategy(PlayerbotAI* botAI) : Strategy(botAI) { };
+public:
+    StealthStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
-        //virtual int GetType() { return STRATEGY_TYPE_NONCOMBAT; }
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "stealth"; }
+    // virtual int GetType() { return STRATEGY_TYPE_NONCOMBAT; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "stealth"; }
 };
 
 class RogueAoeStrategy : public Strategy
 {
-    public:
-        RogueAoeStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    RogueAoeStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "aoe"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "aoe"; }
 };
 
 class RogueBoostStrategy : public Strategy
 {
-    public:
-        RogueBoostStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    RogueBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "boost"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "boost"; }
 };
 
 class RogueCcStrategy : public Strategy
 {
-    public:
-        RogueCcStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    RogueCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cc"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "cc"; }
 };
 
 #endif

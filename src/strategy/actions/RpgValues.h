@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class NextRpgActionValue : public ManualSetValue<std::string>
 {
-	public:
-        NextRpgActionValue(PlayerbotAI* botAI, std::string const defaultValue = "", std::string const name = "next rpg action") : ManualSetValue(botAI, defaultValue, name) { };
+public:
+        NextRpgActionValue(PlayerbotAI *botAI, std::string const defaultValue = "", std::string const name = "next rpg action") : ManualSetValue(botAI, defaultValue, name) {};
 };
 
 #endif

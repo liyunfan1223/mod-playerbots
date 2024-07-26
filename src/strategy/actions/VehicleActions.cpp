@@ -17,7 +17,7 @@ bool EnterVehicleAction::Execute(Event event)
     GuidVector npcs = AI_VALUE(GuidVector, "nearest vehicles");
     for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
     {
-        Unit* vehicleBase = botAI->GetUnit(*i);
+        Unit *vehicleBase = botAI->GetUnit(*i);
         if (!vehicleBase)
             return false;
 
@@ -29,11 +29,11 @@ bool EnterVehicleAction::Execute(Event event)
 
         if (fabs(bot->GetPositionZ() - vehicleBase->GetPositionZ()) < 20.0f)
 
-        //if (sServerFacade->GetDistance2d(bot, vehicle) > 100.0f)
-        //    continue;
+            // if (sServerFacade->GetDistance2d(bot, vehicle) > 100.0f)
+            //     continue;
 
-        if (sServerFacade->GetDistance2d(bot, vehicleBase) > 10.0f)
-            return MoveTo(vehicleBase, INTERACTION_DISTANCE);
+            if (sServerFacade->GetDistance2d(bot, vehicleBase) > 10.0f)
+                return MoveTo(vehicleBase, INTERACTION_DISTANCE);
 
         bot->EnterVehicle(vehicleBase);
 
@@ -46,16 +46,16 @@ bool EnterVehicleAction::Execute(Event event)
         return true;
     }
 
-	return false;
+    return false;
 }
 
 bool LeaveVehicleAction::Execute(Event event)
 {
-    Vehicle* myVehicle = bot->GetVehicle();
+    Vehicle *myVehicle = bot->GetVehicle();
     if (!myVehicle)
         return false;
 
-    VehicleSeatEntry const* seat = myVehicle->GetSeatForPassenger(bot);
+    VehicleSeatEntry const *seat = myVehicle->GetSeatForPassenger(bot);
     if (!seat || !seat->CanEnterOrExit())
         return false;
 

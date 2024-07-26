@@ -12,14 +12,14 @@ class PlayerbotAI;
 
 class LogLevelAction : public Action
 {
-    public:
-        LogLevelAction(PlayerbotAI* botAI) : Action(botAI, "log") { }
+public:
+    LogLevelAction(PlayerbotAI *botAI) : Action(botAI, "log") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    public:
-        static std::string const logLevel2string(LogLevel level);
-        static LogLevel string2logLevel(std::string const level);
+public:
+    static std::string const logLevel2string(LogLevel level);
+    static LogLevel string2logLevel(std::string const level);
 };
 
 #endif

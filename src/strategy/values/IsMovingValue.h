@@ -12,16 +12,16 @@ class PlayerbotAI;
 
 class IsMovingValue : public BoolCalculatedValue, public Qualified
 {
-	public:
-        IsMovingValue(PlayerbotAI* botAI, std::string const name = "is moving") : BoolCalculatedValue(botAI, name) { }
+public:
+        IsMovingValue(PlayerbotAI *botAI, std::string const name = "is moving") : BoolCalculatedValue(botAI, name) {}
 
         bool Calculate() override;
 };
 
 class IsSwimmingValue : public BoolCalculatedValue, public Qualified
 {
-	public:
-        IsSwimmingValue(PlayerbotAI* botAI, std::string const name = "is swimming") : BoolCalculatedValue(botAI, name) { }
+public:
+        IsSwimmingValue(PlayerbotAI *botAI, std::string const name = "is swimming") : BoolCalculatedValue(botAI, name) {}
 
         bool Calculate() override;
 };

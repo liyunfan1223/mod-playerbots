@@ -7,7 +7,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-CastSpellAction::CastSpellAction(PlayerbotAI* botAI, std::string const spell) : Action(botAI, spell), range(botAI->GetRange("spell")), spell(spell)
+CastSpellAction::CastSpellAction(PlayerbotAI *botAI, std::string const spell) : Action(botAI, spell), range(botAI->GetRange("spell")), spell(spell)
 {
 }
 
@@ -15,9 +15,9 @@ bool CastSpellAction::Execute(Event event)
 {
     if (spell == "conjure food" || spell == "conjure water")
     {
-        //uint32 id = AI_VALUE2(uint32, "spell id", spell);
-        //if (!id)
-        //    return false;
+        // uint32 id = AI_VALUE2(uint32, "spell id", spell);
+        // if (!id)
+        //     return false;
 
         uint32 castId = 0;
 
@@ -25,7 +25,7 @@ bool CastSpellAction::Execute(Event event)
         {
             uint32 spellId = itr->first;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo)
                 continue;
 
@@ -43,7 +43,7 @@ bool CastSpellAction::Execute(Event event)
                 continue;
 
             uint32 itemId = spellInfo->Effects[0].ItemType;
-            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+            ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
             if (!proto)
                 continue;
 
@@ -62,10 +62,12 @@ bool CastSpellAction::Execute(Event event)
 
 bool CastSpellAction::isPossible()
 {
-    if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true)) {
-        if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster())) {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
-                bot->GetName());
+    if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))
+    {
+        if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster()))
+        {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}",
+                      bot->GetName());
         }
         return false;
     }
@@ -75,15 +77,16 @@ bool CastSpellAction::isPossible()
 
     if (spell == "mount" && bot->IsInCombat())
     {
-        if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster())) {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
-                bot->GetName());
+        if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster()))
+        {
+            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}",
+                      bot->GetName());
         }
         bot->Dismount();
         return false;
     }
 
-    Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    Spell *currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     return botAI->CanCastSpell(spell, GetTarget());
 }
 
@@ -101,7 +104,7 @@ bool CastSpellAction::isUseful()
         return false;
     }
 
-    Unit* spellTarget = GetTarget();
+    Unit *spellTarget = GetTarget();
     if (!spellTarget)
         return false;
 
@@ -115,7 +118,7 @@ bool CastSpellAction::isUseful()
     return spellTarget && AI_VALUE2(bool, "spell cast useful", spell); // && sServerFacade->GetDistance2d(bot, spellTarget) <= (range + combatReach);
 }
 
-CastMeleeSpellAction::CastMeleeSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
+CastMeleeSpellAction::CastMeleeSpellAction(PlayerbotAI *botAI, std::string const spell) : CastSpellAction(botAI, spell)
 {
     range = ATTACK_DISTANCE;
     // Unit* target = AI_VALUE(Unit*, "current target");
@@ -130,7 +133,7 @@ bool CastAuraSpellAction::isUseful()
     return GetTarget() && (GetTarget() != nullptr) && CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget(), false, isOwner);
 }
 
-CastEnchantItemAction::CastEnchantItemAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
+CastEnchantItemAction::CastEnchantItemAction(PlayerbotAI *botAI, std::string const spell) : CastSpellAction(botAI, spell)
 {
     range = botAI->GetRange("spell");
 }
@@ -138,20 +141,20 @@ CastEnchantItemAction::CastEnchantItemAction(PlayerbotAI* botAI, std::string con
 bool CastEnchantItemAction::isPossible()
 {
     // if (!CastSpellAction::isPossible()) {
-        
+
     //     botAI->TellMasterNoFacing("Impossible: " + spell);
     //     return false;
     // }
 
     uint32 spellId = AI_VALUE2(uint32, "spell id", spell);
-    
+
     // bool ok = AI_VALUE2(Item*, "item for spell", spellId);
     // Item* item = AI_VALUE2(Item*, "item for spell", spellId);
     // botAI->TellMasterNoFacing("spell: " + spell + ", spell id: " + std::to_string(spellId) + " item for spell: " + std::to_string(ok));
-    return spellId && AI_VALUE2(Item*, "item for spell", spellId);
+    return spellId && AI_VALUE2(Item *, "item for spell", spellId);
 }
 
-CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount, HealingManaEfficiency manaEfficiency) 
+CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI *botAI, std::string const spell, uint8 estAmount, HealingManaEfficiency manaEfficiency)
     : CastAuraSpellAction(botAI, spell, true), estAmount(estAmount), manaEfficiency(manaEfficiency)
 {
     range = botAI->GetRange("heal");
@@ -159,51 +162,51 @@ CastHealingSpellAction::CastHealingSpellAction(PlayerbotAI* botAI, std::string c
 
 bool CastHealingSpellAction::isUseful()
 {
-	return CastAuraSpellAction::isUseful();
+    return CastAuraSpellAction::isUseful();
 }
 
 bool CastAoeHealSpellAction::isUseful()
 {
-	return CastSpellAction::isUseful();
+    return CastSpellAction::isUseful();
 }
 
-CastCureSpellAction::CastCureSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
+CastCureSpellAction::CastCureSpellAction(PlayerbotAI *botAI, std::string const spell) : CastSpellAction(botAI, spell)
 {
     range = botAI->GetRange("heal");
 }
 
-Value<Unit*>* CurePartyMemberAction::GetTargetValue()
+Value<Unit*> *CurePartyMemberAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member to dispel", dispelType);
 }
 
-Value<Unit*>* BuffOnPartyAction::GetTargetValue()
+Value<Unit*> *BuffOnPartyAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member without aura", spell);
 }
 
-CastShootAction::CastShootAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shoot")
+CastShootAction::CastShootAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "shoot")
 {
-    if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+    if (Item *const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
     {
         spell = "shoot";
 
         switch (pItem->GetTemplate()->SubClass)
         {
-            case ITEM_SUBCLASS_WEAPON_GUN:
-                spell += " gun";
-                break;
-            case ITEM_SUBCLASS_WEAPON_BOW:
-                spell += " bow";
-                break;
-            case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-                spell += " crossbow";
-                break;
+        case ITEM_SUBCLASS_WEAPON_GUN:
+            spell += " gun";
+            break;
+        case ITEM_SUBCLASS_WEAPON_BOW:
+            spell += " bow";
+            break;
+        case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+            spell += " crossbow";
+            break;
         }
     }
 }
 
-NextAction** CastSpellAction::getPrerequisites()
+NextAction **CastSpellAction::getPrerequisites()
 {
     if (spell == "mount")
         return nullptr;
@@ -216,32 +219,32 @@ NextAction** CastSpellAction::getPrerequisites()
         return NextAction::merge(NextAction::array(0, new NextAction("reach melee"), nullptr), Action::getPrerequisites());
 }
 
-Value<Unit*>* CastDebuffSpellOnAttackerAction::GetTargetValue()
+Value<Unit*> *CastDebuffSpellOnAttackerAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("attacker without aura", spell);
 }
 
-Value<Unit*>* CastDebuffSpellOnMeleeAttackerAction::GetTargetValue()
+Value<Unit*> *CastDebuffSpellOnMeleeAttackerAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("melee attacker without aura", spell);
 }
 
-CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner) : CastAuraSpellAction(botAI, spell, checkIsOwner)
+CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI *botAI, std::string const spell, bool checkIsOwner) : CastAuraSpellAction(botAI, spell, checkIsOwner)
 {
     range = botAI->GetRange("spell");
 }
 
-Value<Unit*>* CastSpellOnEnemyHealerAction::GetTargetValue()
+Value<Unit*> *CastSpellOnEnemyHealerAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("enemy healer target", spell);
 }
 
-Value<Unit*>* CastSnareSpellAction::GetTargetValue()
+Value<Unit*> *CastSnareSpellAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("snare target", spell);
 }
 
-Value<Unit*>* CastCrowdControlSpellAction::GetTargetValue()
+Value<Unit*> *CastCrowdControlSpellAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("cc target", getName());
 }
@@ -288,15 +291,16 @@ bool CastVehicleSpellAction::Execute(Event event)
     return botAI->CastVehicleSpell(spellId, GetTarget());
 }
 
-Value<Unit*>* BuffOnMainTankAction::GetTargetValue()
+Value<Unit*> *BuffOnMainTankAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("main tank", spell);
 }
 
 bool CastDebuffSpellAction::isUseful()
 {
-    Unit* target = GetTarget();
-    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+    Unit *target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld())
+    {
         return false;
     }
     return CastAuraSpellAction::isUseful() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;

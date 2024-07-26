@@ -8,7 +8,7 @@
 uint8 PetitionSignsValue::Calculate()
 {
     if (bot->GetGuildId())
-       return 0;
+        return 0;
 
     std::vector<Item*> petitions = AI_VALUE2(std::vector<Item*>, "inventory items", chat->FormatQItem(5863));
     if (petitions.empty())

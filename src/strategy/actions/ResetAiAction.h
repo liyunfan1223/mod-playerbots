@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class ResetAiAction : public Action
 {
-    public:
-        ResetAiAction(PlayerbotAI* botAI) : Action(botAI, "reset botAI") { }
+public:
+    ResetAiAction(PlayerbotAI *botAI) : Action(botAI, "reset botAI") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

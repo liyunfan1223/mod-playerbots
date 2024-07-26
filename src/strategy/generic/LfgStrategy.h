@@ -9,12 +9,12 @@
 
 class LfgStrategy : public PassTroughStrategy
 {
-    public:
-        LfgStrategy(PlayerbotAI* botAI);
+public:
+    LfgStrategy(PlayerbotAI *botAI);
 
-	    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
-        void InitTriggers(std::vector<TriggerNode*> &triggers) override;
-        std::string const getName() override { return "lfg"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "lfg"; }
 };
 
 #endif

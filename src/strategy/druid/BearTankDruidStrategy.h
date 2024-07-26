@@ -11,13 +11,13 @@ class PlayerbotAI;
 
 class BearTankDruidStrategy : public FeralDruidStrategy
 {
-    public:
-        BearTankDruidStrategy(PlayerbotAI* botAI);
+public:
+    BearTankDruidStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "bear"; }
-        NextAction** getDefaultActions() override;
-		uint32 GetType() const override { return STRATEGY_TYPE_TANK | STRATEGY_TYPE_MELEE; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "bear"; }
+    NextAction **getDefaultActions() override;
+    uint32 GetType() const override { return STRATEGY_TYPE_TANK | STRATEGY_TYPE_MELEE; }
 };
 
 #endif

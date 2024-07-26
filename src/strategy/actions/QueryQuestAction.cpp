@@ -14,7 +14,7 @@ void QueryQuestAction::TellObjective(std::string const name, uint32 available, u
 
 bool QueryQuestAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
+    Player *bot = botAI->GetBot();
     WorldPosition botPos(bot);
     std::string text = event.getParam();
     bool travel = false;
@@ -55,10 +55,8 @@ bool QueryQuestAction::Execute(Event event)
             uint32 limit = 0;
             std::vector<TravelDestination*> allDestinations = sTravelMgr->getQuestTravelDestinations(bot, questId, true, true, -1);
 
-            std::sort(allDestinations.begin(), allDestinations.end(), [botPos](TravelDestination* i, TravelDestination* j)
-            {
-                return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos));
-            });
+            std::sort(allDestinations.begin(), allDestinations.end(), [botPos](TravelDestination *i, TravelDestination *j)
+                      { return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos)); });
 
             for (auto dest : allDestinations)
             {
@@ -69,7 +67,6 @@ bool QueryQuestAction::Execute(Event event)
 
                 uint32 tpoints = dest->getPoints(true).size();
                 uint32 apoints = dest->getPoints().size();
-
 
                 out << round(dest->distanceTo(const_cast<WorldPosition*>(&botPos)));
                 out << " to " << dest->getTitle();
@@ -103,7 +100,7 @@ bool QueryQuestAction::Execute(Event event)
 
 void QueryQuestAction::TellObjectives(uint32 questId)
 {
-    Quest const* questTemplate = sObjectMgr->GetQuestTemplate(questId);
+    Quest const *questTemplate = sObjectMgr->GetQuestTemplate(questId);
     QuestStatusData questStatus = bot->getQuestStatusMap()[questId];
 
     for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
@@ -115,7 +112,7 @@ void QueryQuestAction::TellObjectives(uint32 questId)
         {
             uint32 required = questTemplate->RequiredItemCount[i];
             uint32 available = questStatus.ItemCount[i];
-            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(questTemplate->RequiredItemId[i]);
+            ItemTemplate const *proto = sObjectMgr->GetItemTemplate(questTemplate->RequiredItemId[i]);
             TellObjective(chat->FormatItem(proto), available, required);
         }
 
@@ -126,13 +123,13 @@ void QueryQuestAction::TellObjectives(uint32 questId)
 
             if (questTemplate->RequiredNpcOrGo[i] < 0)
             {
-                if (GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
+                if (GameObjectTemplate const *info = sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
                     TellObjective(info->name, available, required);
             }
             else
             {
 
-                if (CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(questTemplate->RequiredNpcOrGo[i]))
+                if (CreatureTemplate const *info = sObjectMgr->GetCreatureTemplate(questTemplate->RequiredNpcOrGo[i]))
                     TellObjective(info->Name, available, required);
             }
         }

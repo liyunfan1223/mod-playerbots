@@ -9,15 +9,15 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-Unit* FlagCarrierValue::Calculate()
+Unit *FlagCarrierValue::Calculate()
 {
-    Unit* carrier = nullptr;
+    Unit *carrier = nullptr;
 
     if (botAI->GetBot()->InBattleground())
     {
         if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
         {
-            BattlegroundWS *bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            BattlegroundWS *bg = (BattlegroundWS *)botAI->GetBot()->GetBattleground();
 
             if ((!sameTeam && bot->GetTeamId() == TEAM_HORDE || (sameTeam && bot->GetTeamId() == TEAM_ALLIANCE)) && !bg->GetFlagPickerGUID(TEAM_HORDE).IsEmpty())
                 carrier = ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID(TEAM_HORDE));
@@ -38,12 +38,12 @@ Unit* FlagCarrierValue::Calculate()
 
         if (botAI->GetBot()->GetBattlegroundTypeId() == BATTLEGROUND_EY)
         {
-            BattlegroundEY* bg = (BattlegroundEY*)botAI->GetBot()->GetBattleground();
+            BattlegroundEY *bg = (BattlegroundEY *)botAI->GetBot()->GetBattleground();
 
             if (bg->GetFlagPickerGUID().IsEmpty())
                 return nullptr;
 
-            Player* fc = ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID());
+            Player *fc = ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID());
             if (!fc)
                 return nullptr;
 
@@ -91,53 +91,53 @@ std::vector<CreatureData const*> BgMastersValue::Calculate()
     return std::move(bmGuids);
 }
 
-CreatureData const* BgMasterValue::Calculate()
+CreatureData const *BgMasterValue::Calculate()
 {
-    CreatureData const* bmPair = NearestBm(false);
+    CreatureData const *bmPair = NearestBm(false);
     if (!bmPair)
         bmPair = NearestBm(true);
 
     return bmPair;
 }
 
-CreatureData const* BgMasterValue::NearestBm(bool allowDead)
+CreatureData const *BgMasterValue::NearestBm(bool allowDead)
 {
     WorldPosition botPos(bot);
 
     std::vector<CreatureData const*> bmPairs = AI_VALUE2(std::vector<CreatureData const*>, "bg masters", qualifier);
 
     float rDist;
-    CreatureData const* rbmPair = nullptr;
+    CreatureData const *rbmPair = nullptr;
 
-    for (auto& bmPair : bmPairs)
+    for (auto &bmPair : bmPairs)
     {
         if (!bmPair)
             continue;
 
         WorldPosition bmPos(bmPair->mapid, bmPair->posX, bmPair->posY, bmPair->posZ, bmPair->orientation);
 
-        float dist = botPos.distance(bmPos); //This is the aproximate travel distance.
+        float dist = botPos.distance(bmPos); // This is the aproximate travel distance.
 
-        //Did we already find a closer unit that is not dead?
+        // Did we already find a closer unit that is not dead?
         if (rbmPair && rDist <= dist)
             continue;
 
-        CreatureTemplate const* bmTemplate = sObjectMgr->GetCreatureTemplate(bmPair->id1);
+        CreatureTemplate const *bmTemplate = sObjectMgr->GetCreatureTemplate(bmPair->id1);
         if (!bmTemplate)
             continue;
 
-        FactionTemplateEntry const* bmFactionEntry = sFactionTemplateStore.LookupEntry(bmTemplate->faction);
+        FactionTemplateEntry const *bmFactionEntry = sFactionTemplateStore.LookupEntry(bmTemplate->faction);
 
-        //Is the unit hostile?
+        // Is the unit hostile?
         if (Unit::GetFactionReactionTo(bot->GetFactionTemplateEntry(), bmFactionEntry) < REP_NEUTRAL)
             continue;
 
-        AreaTableEntry const* area = bmPos.getArea();
+        AreaTableEntry const *area = bmPos.getArea();
 
         if (!area)
             continue;
 
-        //Is the area hostile?
+        // Is the area hostile?
         if (area->team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
             continue;
         if (area->team == 2 && bot->GetTeamId() == TEAM_HORDE)
@@ -145,12 +145,12 @@ CreatureData const* BgMasterValue::NearestBm(bool allowDead)
 
         if (!allowDead)
         {
-            Unit* unit = botAI->GetUnit(bmPair);
+            Unit *unit = botAI->GetUnit(bmPair);
 
             if (!unit)
                 continue;
 
-            //Is the unit dead?
+            // Is the unit dead?
             if (unit->getDeathState() == DeathState::Dead)
                 continue;
         }
@@ -173,7 +173,7 @@ BattlegroundTypeId RpgBgTypeValue::Calculate()
 
             BattlegroundTypeId bgTypeId = sBattlegroundMgr->BGTemplateId(queueTypeId);
 
-            Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
+            Battleground *bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
             if (!bg)
                 continue;
 
@@ -186,11 +186,11 @@ BattlegroundTypeId RpgBgTypeValue::Calculate()
 
             std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> battleMastersCache = sRandomPlayerbotMgr->getBattleMastersCache();
 
-            for (auto& entry : battleMastersCache[TEAM_NEUTRAL][bgTypeId])
+            for (auto &entry : battleMastersCache[TEAM_NEUTRAL][bgTypeId])
                 if (entry == guidPosition.GetEntry())
                     return bgTypeId;
 
-            for (auto& entry : battleMastersCache[bot->GetTeamId()][bgTypeId])
+            for (auto &entry : battleMastersCache[bot->GetTeamId()][bgTypeId])
                 if (entry == guidPosition.GetEntry())
                     return bgTypeId;
         }

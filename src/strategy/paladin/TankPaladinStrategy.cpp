@@ -7,68 +7,68 @@
 
 class TankPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-    public:
-        TankPaladinStrategyActionNodeFactory()
-        {
-            // creators["seal of vengeance"] = &seal_of_vengeance;
-            creators["seal of corruption"] = &seal_of_corruption;
-            creators["seal of vengeance"] = &seal_of_vengeance;
-            creators["seal of command"] = &seal_of_command;
-            creators["hand of reckoning"] = &hand_of_reckoning;
-            creators["taunt spell"] = &hand_of_reckoning;
-        }
+public:
+    TankPaladinStrategyActionNodeFactory()
+    {
+        // creators["seal of vengeance"] = &seal_of_vengeance;
+        creators["seal of corruption"] = &seal_of_corruption;
+        creators["seal of vengeance"] = &seal_of_vengeance;
+        creators["seal of command"] = &seal_of_command;
+        creators["hand of reckoning"] = &hand_of_reckoning;
+        creators["taunt spell"] = &hand_of_reckoning;
+    }
 
-    private:
-        // static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
-        // {
-        //     return new ActionNode("seal of vengeance",
-        //         /*P*/ nullptr,
-        //         /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
-        //         /*C*/ nullptr);
-        // }
-        static ActionNode* seal_of_command([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("seal of command",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of corruption"), nullptr),
-                /*C*/ nullptr);
-        }
-        static ActionNode* seal_of_corruption([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("seal of corruption",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of vengeance"), nullptr),
-                /*C*/ nullptr);
-        }
+private:
+    // static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
+    // {
+    //     return new ActionNode("seal of vengeance",
+    //         /*P*/ nullptr,
+    //         /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+    //         /*C*/ nullptr);
+    // }
+    static ActionNode *seal_of_command([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("seal of command",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("seal of corruption"), nullptr),
+                              /*C*/ nullptr);
+    }
+    static ActionNode *seal_of_corruption([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("seal of corruption",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("seal of vengeance"), nullptr),
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* seal_of_vengeance([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("seal of vengeance",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
-                /*C*/ nullptr);
-        }
-        ACTION_NODE_A(hand_of_reckoning, "hand of reckoning", "righteous defense");
+    static ActionNode *seal_of_vengeance([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("seal of vengeance",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+                              /*C*/ nullptr);
+    }
+    ACTION_NODE_A(hand_of_reckoning, "hand of reckoning", "righteous defense");
 };
 
-TankPaladinStrategy::TankPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)
+TankPaladinStrategy::TankPaladinStrategy(PlayerbotAI *botAI) : GenericPaladinStrategy(botAI)
 {
     actionNodeFactories.Add(new TankPaladinStrategyActionNodeFactory());
 }
 
-NextAction** TankPaladinStrategy::getDefaultActions()
+NextAction **TankPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0,
-        new NextAction("shield of righteousness", ACTION_DEFAULT + 0.6f),
-        new NextAction("hammer of the righteous", ACTION_DEFAULT + 0.5f),
-        new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.4f),
-        // new NextAction("avenger's shield", ACTION_NORMAL + 3), 
-        // new NextAction("consecration", ACTION_NORMAL + 2),
-        new NextAction("melee", ACTION_DEFAULT), 
-        NULL);
+                             new NextAction("shield of righteousness", ACTION_DEFAULT + 0.6f),
+                             new NextAction("hammer of the righteous", ACTION_DEFAULT + 0.5f),
+                             new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.4f),
+                             // new NextAction("avenger's shield", ACTION_NORMAL + 3),
+                             // new NextAction("consecration", ACTION_NORMAL + 2),
+                             new NextAction("melee", ACTION_DEFAULT),
+                             NULL);
 }
 
-void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
@@ -77,9 +77,9 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("devotion aura", NextAction::array(0, new NextAction("devotion aura", 90.0f), NULL)));
 
     triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("avenger's shield", ACTION_HIGH + 5), nullptr)));
-    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, 
-        new NextAction("melee consecration", ACTION_HIGH + 7), 
-        new NextAction("avenger's shield", ACTION_HIGH + 6), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0,
+                                                                       new NextAction("melee consecration", ACTION_HIGH + 7),
+                                                                       new NextAction("avenger's shield", ACTION_HIGH + 6), nullptr)));
     // triggers.push_back(new TriggerNode("avenger's shield", NextAction::array(0, new NextAction("avenger's shield", ACTION_HIGH + 7), nullptr)));
     triggers.push_back(new TriggerNode("lose aggro", NextAction::array(0, new NextAction("hand of reckoning", ACTION_HIGH + 7), nullptr)));
     // triggers.push_back(new TriggerNode("almost full health", NextAction::array(0, new NextAction("holy shield", ACTION_HIGH + 4), nullptr)));

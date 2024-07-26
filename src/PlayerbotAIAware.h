@@ -9,11 +9,11 @@ class PlayerbotAI;
 
 class PlayerbotAIAware
 {
-    public:
-        PlayerbotAIAware(PlayerbotAI* botAI) : botAI(botAI) { }
+public:
+    PlayerbotAIAware(PlayerbotAI *botAI) : botAI(botAI) {}
 
-    protected:
-        PlayerbotAI* botAI;
+protected:
+    PlayerbotAI *botAI;
 };
 
 #endif

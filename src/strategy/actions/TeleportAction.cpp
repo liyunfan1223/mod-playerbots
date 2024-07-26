@@ -12,7 +12,7 @@ bool TeleportAction::Execute(Event event)
     GuidVector gos = *context->GetValue<GuidVector>("nearest game objects");
     for (ObjectGuid const guid : gos)
     {
-        GameObject* go = botAI->GetGameObject(guid);
+        GameObject *go = botAI->GetGameObject(guid);
         if (!go)
             continue;
 
@@ -21,7 +21,7 @@ bool TeleportAction::Execute(Event event)
             continue;
 
         uint32 spellId = goInfo->spellcaster.spellId;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
             continue;
 
@@ -31,7 +31,7 @@ bool TeleportAction::Execute(Event event)
 
         botAI->ChangeStrategy("-follow,+stay", BOT_STATE_NON_COMBAT);
 
-        Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
+        Spell *spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
         SpellCastTargets targets;
         targets.SetUnitTarget(bot);
         spell->prepare(&targets, nullptr);
@@ -39,7 +39,7 @@ bool TeleportAction::Execute(Event event)
         return true;
     }
 
-    LastMovement& movement = context->GetValue<LastMovement&>("last area trigger")->Get();
+    LastMovement &movement = context->GetValue<LastMovement &>("last area trigger")->Get();
     if (movement.lastAreaTrigger)
     {
         WorldPacket p(CMSG_AREATRIGGER);

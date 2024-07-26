@@ -12,7 +12,7 @@ bool QuestAction::Execute(Event event)
 {
     ObjectGuid guid = event.getObject();
 
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
     {
         if (!guid)
@@ -30,9 +30,9 @@ bool QuestAction::Execute(Event event)
     return ProcessQuests(guid);
 }
 
-bool QuestAction::CompleteQuest(Player* player, uint32 entry)
+bool QuestAction::CompleteQuest(Player *player, uint32 entry)
 {
-    Quest const* pQuest = sObjectMgr->GetQuestTemplate(entry);
+    Quest const *pQuest = sObjectMgr->GetQuestTemplate(entry);
 
     // If player doesn't have the quest
     if (!pQuest || player->GetQuestStatus(entry) == QUEST_STATUS_NONE)
@@ -56,7 +56,7 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
         uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
         if (msg == EQUIP_ERR_OK)
         {
-            Item* item = player->StoreNewItem(dest, id, true);
+            Item *item = player->StoreNewItem(dest, id, true);
             player->SendNewItem(item, count - curItemCount, true, false);
         }
     }
@@ -69,7 +69,7 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
 
         if (creature > 0)
         {
-            if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(creature))
+            if (CreatureTemplate const *cInfo = sObjectMgr->GetCreatureTemplate(creature))
                 for (uint16 z = 0; z < creaturecount; ++z)
                 {
                     player->KilledMonster(cInfo, ObjectGuid::Empty);
@@ -90,7 +90,7 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
         uint32 repValue = pQuest->GetRepObjectiveValue();
         uint32 curRep = player->GetReputationMgr().GetReputation(repFaction);
         if (curRep < repValue)
-            if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
+            if (FactionEntry const *factionEntry = sFactionStore.LookupEntry(repFaction))
             {
                 player->GetReputationMgr().SetReputation(factionEntry, repValue);
             }
@@ -110,18 +110,18 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
 
 bool QuestAction::ProcessQuests(ObjectGuid questGiver)
 {
-    if (GameObject* gameObject = botAI->GetGameObject(questGiver))
+    if (GameObject *gameObject = botAI->GetGameObject(questGiver))
         if (gameObject->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
             return ProcessQuests(gameObject);
 
-    Creature* creature = botAI->GetCreature(questGiver);
+    Creature *creature = botAI->GetCreature(questGiver);
     if (creature)
         return ProcessQuests(creature);
 
     return false;
 }
 
-bool QuestAction::ProcessQuests(WorldObject* questGiver)
+bool QuestAction::ProcessQuests(WorldObject *questGiver)
 {
     ObjectGuid guid = questGiver->GetGUID();
 
@@ -137,12 +137,12 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
     bot->SetTarget(guid);
     bot->PrepareQuestMenu(guid);
 
-    QuestMenu& questMenu = bot->PlayerTalkClass->GetQuestMenu();
+    QuestMenu &questMenu = bot->PlayerTalkClass->GetQuestMenu();
     for (uint32 i = 0; i < questMenu.GetMenuItemCount(); ++i)
     {
-        QuestMenuItem const& menuItem = questMenu.GetItem(i);
+        QuestMenuItem const &menuItem = questMenu.GetItem(i);
         uint32 questID = menuItem.QuestId;
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questID);
+        Quest const *quest = sObjectMgr->GetQuestTemplate(questID);
         if (!quest)
             continue;
 
@@ -152,7 +152,7 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
     return true;
 }
 
-bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
+bool QuestAction::AcceptQuest(Quest const *quest, ObjectGuid questGiver)
 {
     std::ostringstream out;
 
@@ -160,16 +160,16 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
 
     if (bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
         out << "Already completed";
-    else if (! bot->CanTakeQuest(quest, false))
+    else if (!bot->CanTakeQuest(quest, false))
     {
-        if (! bot->SatisfyQuestStatus(quest, false))
+        if (!bot->SatisfyQuestStatus(quest, false))
             out << "Already on";
         else
             out << "Can't take";
     }
-    else if (! bot->SatisfyQuestLog(false))
+    else if (!bot->SatisfyQuestLog(false))
         out << "Quest log is full";
-    else if (! bot->CanAddQuest(quest, false))
+    else if (!bot->CanAddQuest(quest, false))
         out << "Bags are full";
     else
     {
@@ -179,9 +179,9 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
         p.rpos(0);
         bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(p);
 
-        if (bot->GetQuestStatus(questId ) == QUEST_STATUS_NONE && sPlayerbotAIConfig->syncQuestWithPlayer)
+        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && sPlayerbotAIConfig->syncQuestWithPlayer)
         {
-            Object* pObject = ObjectAccessor::GetObjectByTypeMask(*bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+            Object *pObject = ObjectAccessor::GetObjectByTypeMask(*bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
             bot->AddQuest(quest, pObject);
         }
 
@@ -211,12 +211,12 @@ bool QuestObjectiveCompletedAction::Execute(Event event)
     if (entry & 0x80000000)
     {
         entry &= 0x7FFFFFFF;
-        if (GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(entry))
+        if (GameObjectTemplate const *info = sObjectMgr->GetGameObjectTemplate(entry))
             botAI->TellMaster(chat->FormatQuestObjective(info->name, available, required));
     }
     else
     {
-        if (CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(entry))
+        if (CreatureTemplate const *info = sObjectMgr->GetCreatureTemplate(entry))
             botAI->TellMaster(chat->FormatQuestObjective(info->Name, available, required));
     }
 

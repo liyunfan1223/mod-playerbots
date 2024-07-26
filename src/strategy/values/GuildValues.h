@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class PetitionSignsValue : public SingleCalculatedValue<uint8>
 {
-    public:
-        PetitionSignsValue(PlayerbotAI* botAI) : SingleCalculatedValue<uint8>(botAI, "petition signs") { }
+public:
+    PetitionSignsValue(PlayerbotAI *botAI) : SingleCalculatedValue<uint8>(botAI, "petition signs") {}
 
-        uint8 Calculate();
+    uint8 Calculate();
 };
 
 #endif

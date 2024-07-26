@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class GreetAction : public Action
 {
-    public:
-        GreetAction(PlayerbotAI* botAI);
+public:
+    GreetAction(PlayerbotAI *botAI);
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

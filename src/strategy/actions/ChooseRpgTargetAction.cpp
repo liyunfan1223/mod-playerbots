@@ -14,20 +14,20 @@
 
 #include <random>
 
-bool ChooseRpgTargetAction::HasSameTarget(ObjectGuid guid, uint32 max, GuidVector const& nearGuids)
+bool ChooseRpgTargetAction::HasSameTarget(ObjectGuid guid, uint32 max, GuidVector const &nearGuids)
 {
     if (botAI->HasRealPlayerMaster())
         return false;
 
     uint32 num = 0;
 
-    for (auto& i : nearGuids)
+    for (auto &i : nearGuids)
     {
-        Player* player = ObjectAccessor::FindPlayer(i);
+        Player *player = ObjectAccessor::FindPlayer(i);
         if (!player)
             continue;
 
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+        PlayerbotAI *botAI = GET_PLAYERBOT_AI(player);
         if (!botAI)
             continue;
 
@@ -50,16 +50,16 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
     GuidPosition currentRpgTarget = AI_VALUE(GuidPosition, "rpg target");
     SET_AI_VALUE(GuidPosition, "rpg target", guidP);
 
-    Strategy* rpgStrategy = botAI->GetAiObjectContext()->GetStrategy("rpg");
+    Strategy *rpgStrategy = botAI->GetAiObjectContext()->GetStrategy("rpg");
 
     std::vector<TriggerNode*> triggerNodes;
     rpgStrategy->InitTriggers(triggerNodes);
 
     float maxRelevance = 0.0f;
 
-    for (auto& triggerNode : triggerNodes)
+    for (auto &triggerNode : triggerNodes)
     {
-        Trigger* trigger = context->GetTrigger(triggerNode->getName());
+        Trigger *trigger = context->GetTrigger(triggerNode->getName());
         if (trigger)
         {
             triggerNode->setTrigger(trigger);
@@ -79,7 +79,7 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
 
     for (std::vector<TriggerNode*>::iterator i = triggerNodes.begin(); i != triggerNodes.end(); i++)
     {
-        TriggerNode* trigger = *i;
+        TriggerNode *trigger = *i;
         delete trigger;
     }
 
@@ -90,7 +90,7 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
 
 bool ChooseRpgTargetAction::Execute(Event event)
 {
-    TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
+    TravelTarget *travelTarget = AI_VALUE(TravelTarget *, "travel target");
 
     uint32 num = 0;
 
@@ -99,7 +99,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
     GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
     GuidVector possibleObjects = AI_VALUE(GuidVector, "nearest game objects no los");
     GuidVector possiblePlayers = AI_VALUE(GuidVector, "nearest friendly players");
-    GuidSet& ignoreList = AI_VALUE(GuidSet&, "ignore rpg target");
+    GuidSet &ignoreList = AI_VALUE(GuidSet &, "ignore rpg target");
 
     for (auto target : possibleTargets)
         targets[target] = 0.0f;
@@ -117,7 +117,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     if (urand(0, 9))
     {
-       for (auto target : ignoreList)
+        for (auto target : ignoreList)
             targets.erase(target);
     }
 
@@ -125,9 +125,9 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     bool hasGoodRelevance = false;
 
-    for (auto& target : targets)
+    for (auto &target : targets)
     {
-        Unit* unit = ObjectAccessor::GetUnit(*bot, target.first);
+        Unit *unit = ObjectAccessor::GetUnit(*bot, target.first);
         if (!unit)
             continue;
 
@@ -142,13 +142,13 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
         if (guidP.IsGameObject())
         {
-            GameObject* go = guidP.GetGameObject();
+            GameObject *go = guidP.GetGameObject();
             if (!go || !go->isSpawned() || go->GetGoState() != GO_STATE_READY)
                 continue;
         }
         else if (guidP.IsPlayer())
         {
-            Player* player = guidP.GetPlayer();
+            Player *player = guidP.GetPlayer();
             if (!player)
                 continue;
 
@@ -189,7 +189,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
     if (targets.empty())
     {
         LOG_DEBUG("playerbots", "{} can't choose RPG target: all {} are not available", bot->GetName().c_str(), possibleTargets.size());
-        RESET_AI_VALUE(GuidSet&, "ignore rpg target");
+        RESET_AI_VALUE(GuidSet &, "ignore rpg target");
         RESET_AI_VALUE(GuidPosition, "rpg target");
         return false;
     }
@@ -197,9 +197,9 @@ bool ChooseRpgTargetAction::Execute(Event event)
     std::vector<GuidPosition> guidps;
     std::vector<int32> relevances;
 
-    for (auto& target : targets)
+    for (auto &target : targets)
     {
-        Unit* unit = ObjectAccessor::GetUnit(*bot, target.first);
+        Unit *unit = ObjectAccessor::GetUnit(*bot, target.first);
         if (!unit)
             continue;
 
@@ -244,7 +244,7 @@ bool ChooseRpgTargetAction::isUseful()
     if (AI_VALUE(GuidPosition, "rpg target"))
         return false;
 
-    TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
+    TravelTarget *travelTarget = AI_VALUE(TravelTarget *, "travel target");
 
     if (travelTarget->isTraveling() && isFollowValid(bot, *travelTarget->getPosition()))
         return false;
@@ -258,7 +258,7 @@ bool ChooseRpgTargetAction::isUseful()
     return true;
 }
 
-bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldObject* target)
+bool ChooseRpgTargetAction::isFollowValid(Player *bot, WorldObject *target)
 {
     if (!target)
         return false;
@@ -266,12 +266,12 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldObject* target)
     return isFollowValid(bot, WorldPosition(target));
 }
 
-bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
+bool ChooseRpgTargetAction::isFollowValid(Player *bot, WorldPosition pos)
 {
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    Player* master = botAI->GetGroupMaster();
-    Player* realMaster = botAI->GetMaster();
-    AiObjectContext* context = botAI->GetAiObjectContext();
+    PlayerbotAI *botAI = GET_PLAYERBOT_AI(bot);
+    Player *master = botAI->GetGroupMaster();
+    Player *realMaster = botAI->GetMaster();
+    AiObjectContext *context = botAI->GetAiObjectContext();
 
     bool inDungeon = false;
 
@@ -293,12 +293,12 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
     if (sqrt(bot->GetDistance(master)) > sPlayerbotAIConfig->rpgDistance * 2)
         return false;
 
-    Formation* formation = AI_VALUE(Formation*, "formation");
+    Formation *formation = AI_VALUE(Formation *, "formation");
     float distance = master->GetDistance2d(pos.getX(), pos.getY());
 
     if (!botAI->HasActivePlayerMaster() && distance < 50.0f)
     {
-        Player* player = master;
+        Player *player = master;
         if (!master->isMoving() || PAI_VALUE(WorldPosition, "last long move").distance(pos) < sPlayerbotAIConfig->reactDistance)
             return true;
     }
@@ -310,7 +310,7 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
         return true;
 
     if (distance < formation->GetMaxDistance())
-       return true;
+        return true;
 
     return false;
 }

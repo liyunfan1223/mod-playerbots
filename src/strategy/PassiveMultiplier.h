@@ -14,14 +14,14 @@ class PlayerbotAI;
 
 class PassiveMultiplier : public Multiplier
 {
-    public:
-        PassiveMultiplier(PlayerbotAI* botAI);
+public:
+    PassiveMultiplier(PlayerbotAI *botAI);
 
-        float GetValue(Action* action) override;
+    float GetValue(Action *action) override;
 
-    private:
-        static std::vector<std::string> allowedActions;
-        static std::vector<std::string> allowedParts;
+private:
+    static std::vector<std::string> allowedActions;
+    static std::vector<std::string> allowedParts;
 };
 
 #endif

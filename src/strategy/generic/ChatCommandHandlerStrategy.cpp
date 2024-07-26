@@ -7,23 +7,23 @@
 
 class ChatCommandActionNodeFactoryInternal : public NamedObjectFactory<ActionNode>
 {
-    public:
-        ChatCommandActionNodeFactoryInternal()
-        {
-            creators["tank attack chat shortcut"] = &tank_attack_chat_shortcut;
-        }
+public:
+    ChatCommandActionNodeFactoryInternal()
+    {
+        creators["tank attack chat shortcut"] = &tank_attack_chat_shortcut;
+    }
 
-    private:
-        static ActionNode* tank_attack_chat_shortcut(PlayerbotAI* botAI)
-        {
-            return new ActionNode ("tank attack chat shortcut",
-                /*P*/ nullptr,
-                /*A*/ nullptr,
-                /*C*/ NextAction::array(0, new NextAction("attack my target", 100.0f), nullptr));
-        }
+private:
+    static ActionNode *tank_attack_chat_shortcut(PlayerbotAI *botAI)
+    {
+        return new ActionNode("tank attack chat shortcut",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ NextAction::array(0, new NextAction("attack my target", 100.0f), nullptr));
+    }
 };
 
-void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     PassTroughStrategy::InitTriggers(triggers);
 
@@ -64,7 +64,7 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("disperse", NextAction::array(0, new NextAction("disperse set", relevance), NULL)));
 }
 
-ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
+ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI *botAI) : PassTroughStrategy(botAI)
 {
     actionNodeFactories.Add(new ChatCommandActionNodeFactoryInternal());
 

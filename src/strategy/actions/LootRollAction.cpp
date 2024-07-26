@@ -12,15 +12,17 @@
 
 bool LootRollAction::Execute(Event event)
 {
-    Player* bot = QueryItemUsageAction::botAI->GetBot();
+    Player *bot = QueryItemUsageAction::botAI->GetBot();
 
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (!group)
         return false;
 
     std::vector<Roll*> rolls = group->GetRolls();
-    for (Roll* &roll : rolls) {
-        if (roll->playerVote.find(bot->GetGUID())->second != NOT_EMITED_YET) {
+    for (Roll *&roll : rolls)
+    {
+        if (roll->playerVote.find(bot->GetGUID())->second != NOT_EMITED_YET)
+        {
             continue;
         }
         ObjectGuid guid = roll->itemGUID;
@@ -34,38 +36,46 @@ bool LootRollAction::Execute(Event event)
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
         switch (proto->Class)
         {
-            case ITEM_CLASS_WEAPON:
-            case ITEM_CLASS_ARMOR:
-                if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP) {
-                    vote = NEED;
-                }
-                else if (usage != ITEM_USAGE_NONE) {
-                    vote = GREED;
-                }
-                break;
-            default:
-                if (StoreLootAction::IsLootAllowed(itemId, botAI))
-                    vote = NEED;
-                break;
-        }
-        if (sPlayerbotAIConfig->lootRollLevel == 0) {
-            vote = PASS;
-        } else if (sPlayerbotAIConfig->lootRollLevel == 1) {
-            if (vote == NEED) {
+        case ITEM_CLASS_WEAPON:
+        case ITEM_CLASS_ARMOR:
+            if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
+            {
+                vote = NEED;
+            }
+            else if (usage != ITEM_USAGE_NONE)
+            {
                 vote = GREED;
-            } else if (vote == GREED) {
+            }
+            break;
+        default:
+            if (StoreLootAction::IsLootAllowed(itemId, botAI))
+                vote = NEED;
+            break;
+        }
+        if (sPlayerbotAIConfig->lootRollLevel == 0)
+        {
+            vote = PASS;
+        }
+        else if (sPlayerbotAIConfig->lootRollLevel == 1)
+        {
+            if (vote == NEED)
+            {
+                vote = GREED;
+            }
+            else if (vote == GREED)
+            {
                 vote = PASS;
             }
         }
         switch (group->GetLootMethod())
         {
-            case MASTER_LOOT:
-            case FREE_FOR_ALL:
-                group->CountRollVote(bot->GetGUID(), guid, PASS);
-                break;
-            default:
-                group->CountRollVote(bot->GetGUID(), guid, vote);
-                break;
+        case MASTER_LOOT:
+        case FREE_FOR_ALL:
+            group->CountRollVote(bot->GetGUID(), guid, PASS);
+            break;
+        default:
+            group->CountRollVote(bot->GetGUID(), guid, vote);
+            break;
         }
     }
     // WorldPacket p(event.getPacket()); //WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
@@ -74,9 +84,8 @@ bool LootRollAction::Execute(Event event)
     // p >> slot; //number of players invited to roll
     // p >> rollType; //need,greed or pass on roll
 
-
     // std::vector<Roll*> rolls = group->GetRolls();
-    // bot->Say("guid:" + std::to_string(guid.GetCounter()) + 
+    // bot->Say("guid:" + std::to_string(guid.GetCounter()) +
     //     "item entry:" + std::to_string(guid.GetEntry()), LANG_UNIVERSAL);
     // for (std::vector<Roll*>::iterator i = rolls.begin(); i != rolls.end(); ++i)
     // {
@@ -125,7 +134,7 @@ bool LootRollAction::Execute(Event event)
     return true;
 }
 
-RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
+RollVote LootRollAction::CalculateRollVote(ItemTemplate const *proto)
 {
     std::ostringstream out;
     out << proto->ItemId;
@@ -134,21 +143,21 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
     RollVote needVote = PASS;
     switch (usage)
     {
-        case ITEM_USAGE_EQUIP:
-        case ITEM_USAGE_REPLACE:
-        case ITEM_USAGE_GUILD_TASK:
-        case ITEM_USAGE_BAD_EQUIP:
-            needVote = NEED;
-            break;
-        case ITEM_USAGE_SKILL:
-        case ITEM_USAGE_USE:
-        case ITEM_USAGE_DISENCHANT:
-        case ITEM_USAGE_AH:
-        case ITEM_USAGE_VENDOR:
-            needVote = GREED;
-            break;
-        default:
-            break;
+    case ITEM_USAGE_EQUIP:
+    case ITEM_USAGE_REPLACE:
+    case ITEM_USAGE_GUILD_TASK:
+    case ITEM_USAGE_BAD_EQUIP:
+        needVote = NEED;
+        break;
+    case ITEM_USAGE_SKILL:
+    case ITEM_USAGE_USE:
+    case ITEM_USAGE_DISENCHANT:
+    case ITEM_USAGE_AH:
+    case ITEM_USAGE_VENDOR:
+        needVote = GREED;
+        break;
+    default:
+        break;
     }
 
     return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? needVote : PASS;
@@ -161,9 +170,9 @@ bool MasterLootRollAction::isUseful()
 
 bool MasterLootRollAction::Execute(Event event)
 {
-    Player* bot = QueryItemUsageAction::botAI->GetBot();
+    Player *bot = QueryItemUsageAction::botAI->GetBot();
 
-    WorldPacket p(event.getPacket()); //WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
+    WorldPacket p(event.getPacket()); // WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
     ObjectGuid creatureGuid;
     uint32 mapId;
     uint32 itemSlot;
@@ -173,21 +182,21 @@ bool MasterLootRollAction::Execute(Event event)
     uint32 count;
     uint32 timeout;
 
-    p.rpos(0); //reset packet pointer
-    p >> creatureGuid; //creature guid what we're looting
-    p >> mapId; /// 3.3.3 mapid
-    p >> itemSlot; // the itemEntryId for the item that shall be rolled for
-    p >> itemId; // the itemEntryId for the item that shall be rolled for
-    p >> randomSuffix; // randomSuffix
+    p.rpos(0);             // reset packet pointer
+    p >> creatureGuid;     // creature guid what we're looting
+    p >> mapId;            /// 3.3.3 mapid
+    p >> itemSlot;         // the itemEntryId for the item that shall be rolled for
+    p >> itemId;           // the itemEntryId for the item that shall be rolled for
+    p >> randomSuffix;     // randomSuffix
     p >> randomPropertyId; // item random property ID
-    p >> count; // items in stack
-    p >> timeout;  // the countdown time to choose "need" or "greed"
+    p >> count;            // items in stack
+    p >> timeout;          // the countdown time to choose "need" or "greed"
 
-    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+    ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
     if (!proto)
         return false;
 
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (!group)
         return false;
 

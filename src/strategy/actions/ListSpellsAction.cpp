@@ -9,11 +9,12 @@
 std::map<uint32, SkillLineAbilityEntry const*> ListSpellsAction::skillSpells;
 std::set<uint32> ListSpellsAction::vendorItems;
 
-bool CompareSpells(std::pair<uint32, std::string>& s1, std::pair<uint32, std::string>& s2)
+bool CompareSpells(std::pair<uint32, std::string> &s1, std::pair<uint32, std::string> &s2)
 {
-    SpellInfo const* si1 = sSpellMgr->GetSpellInfo(s1.first);
-    SpellInfo const* si2 = sSpellMgr->GetSpellInfo(s2.first);
-    if (!si1 || !si2) {
+    SpellInfo const *si1 = sSpellMgr->GetSpellInfo(s1.first);
+    SpellInfo const *si2 = sSpellMgr->GetSpellInfo(s2.first);
+    if (!si1 || !si2)
+    {
         LOG_ERROR("playerbots", "SpellInfo missing.");
         return false;
     }
@@ -24,7 +25,7 @@ bool CompareSpells(std::pair<uint32, std::string>& s1, std::pair<uint32, std::st
     uint32 skillValue1 = 0, skillValue2 = 0;
     for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
     {
-        if (SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j))
+        if (SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j))
         {
             if (skillLine->Spell == s1.first)
             {
@@ -63,7 +64,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
     {
         for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
         {
-            if (SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j))
+            if (SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j))
                 skillSpells[skillLine->Spell] = skillLine;
         }
     }
@@ -75,14 +76,13 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
         {
             do
             {
-                Field* fields = results->Fetch();
+                Field *fields = results->Fetch();
                 int32 entry = fields[0].Get<int32>();
                 if (entry <= 0)
                     continue;
 
                 vendorItems.insert(entry);
-            }
-            while (results->NextRow());
+            } while (results->NextRow());
         }
     }
 
@@ -106,7 +106,6 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
             filter = ss.size() > 2 ? filter = ss[2] : "";
         }
     }
-
 
     std::string const ignoreList = ",Opening,Closing,Stuck,Remove Insignia,Opening - No Text,Grovel,Duel,Honorless Target,";
     std::string alreadySeenList = ",";
@@ -132,17 +131,17 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
     if (slot != EQUIPMENT_SLOT_END)
         filter = "";
 
-    std::vector<std::pair<uint32, std::string> > spells;
+    std::vector<std::pair<uint32, std::string>> spells;
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active)
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(itr->first);
         if (!spellInfo)
             continue;
 
-        SkillLineAbilityEntry const* skillLine = skillSpells[itr->first];
+        SkillLineAbilityEntry const *skillLine = skillSpells[itr->first];
         if (skill != SKILL_NONE && (!skillLine || skillLine->SkillLine != skill))
             continue;
 
@@ -167,7 +166,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
             uint32 reagentsRequired = spellInfo->ReagentCount[x];
             if (itemid)
             {
-                if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid))
+                if (ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemid))
                 {
                     if (first)
                     {
@@ -208,7 +207,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
             {
                 if (spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM)
                 {
-                    if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
+                    if (ItemTemplate const *proto = sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
                     {
                         if (craftCount)
                             out << "|cffffff00(x" << craftCount << ")|r ";
@@ -275,7 +274,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
 
 bool ListSpellsAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -288,7 +287,7 @@ bool ListSpellsAction::Execute(Event event)
     std::sort(spells.begin(), spells.end(), CompareSpells);
 
     uint32 count = 0;
-    for (std::vector<std::pair<uint32, std::string> >::iterator i = spells.begin(); i != spells.end(); ++i)
+    for (std::vector<std::pair<uint32, std::string>>::iterator i = spells.begin(); i != spells.end(); ++i)
     {
         botAI->TellMasterNoFacing(i->second);
 
@@ -303,4 +302,3 @@ bool ListSpellsAction::Execute(Event event)
 
     return true;
 }
-

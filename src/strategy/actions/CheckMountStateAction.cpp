@@ -12,24 +12,24 @@
 bool CheckMountStateAction::Execute(Event event)
 {
     bool noattackers = AI_VALUE2(bool, "combat", "self target") ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true) : true;
-    bool enemy = AI_VALUE(Unit*, "enemy player target");
+    bool enemy = AI_VALUE(Unit *, "enemy player target");
     // ignore grind target in BG or bots will dismount near any creature (eg: the rams in AV)
-    bool dps = (AI_VALUE(Unit*, "dps target") || (!bot->InBattleground() && AI_VALUE(Unit*, "grind target")));
+    bool dps = (AI_VALUE(Unit *, "dps target") || (!bot->InBattleground() && AI_VALUE(Unit *, "grind target")));
     bool fartarget = (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 40.0f)) ||
-        (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
+                     (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
     bool attackdistance = false;
     bool chasedistance = false;
     float attack_distance = 35.0f;
 
     switch (bot->getClass())
     {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-            attack_distance = 10.0f;
-            break;
-        case CLASS_ROGUE:
-            attack_distance = 40.0f;
-            break;
+    case CLASS_WARRIOR:
+    case CLASS_PALADIN:
+        attack_distance = 10.0f;
+        break;
+    case CLASS_ROGUE:
+        attack_distance = 40.0f;
+        break;
     }
 
     if (enemy)
@@ -41,7 +41,7 @@ bool CheckMountStateAction::Execute(Event event)
         chasedistance = enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 45.0f) && AI_VALUE2(bool, "moving", "enemy player target");
     }
 
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (master != nullptr && !bot->InBattleground())
     {
         if (!bot->GetGroup() || bot->GetGroup()->GetLeaderGUID() != master->GetGUID())
@@ -76,7 +76,7 @@ bool CheckMountStateAction::Execute(Event event)
     {
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
-            BattlegroundWS *bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            BattlegroundWS *bg = (BattlegroundWS *)botAI->GetBot()->GetBattleground();
             if (bot->HasAura(23333) || bot->HasAura(23335))
             {
                 return false;
@@ -146,7 +146,7 @@ bool CheckMountStateAction::isUseful()
     // Only mount if BG starts in less than 30 sec
     if (bot->InBattleground())
     {
-        if (Battleground* bg = bot->GetBattleground())
+        if (Battleground *bg = bot->GetBattleground())
             if (bg->GetStatus() == STATUS_WAIT_JOIN)
             {
                 if (bg->GetStartDelayTime() > BG_START_DELAY_30S)
@@ -168,11 +168,11 @@ bool CheckMountStateAction::Mount()
         // bot->GetMotionMaster()->MoveIdle();
     }
 
-	Player* master = GetMaster();
-	botAI->RemoveShapeshift();
+    Player *master = GetMaster();
+    botAI->RemoveShapeshift();
     botAI->RemoveAura("tree of life");
     int32 masterSpeed = 59;
-    SpellInfo const* masterSpell = nullptr;
+    SpellInfo const *masterSpell = nullptr;
 
     if (master && !master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).empty() && !bot->InBattleground())
     {
@@ -185,7 +185,7 @@ bool CheckMountStateAction::Mount()
         for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
         {
             uint32 spellId = itr->first;
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo || spellInfo->Effects[0].ApplyAuraName != SPELL_AURA_MOUNTED)
                 continue;
 
@@ -206,12 +206,12 @@ bool CheckMountStateAction::Mount()
 
     bool hasSwiftMount = false;
 
-    //std::map<int32, std::vector<uint32> > spells;
+    // std::map<int32, std::vector<uint32> > spells;
     std::map<uint32, std::map<int32, std::vector<uint32>>> allSpells;
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         uint32 spellId = itr->first;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo || spellInfo->Effects[0].ApplyAuraName != SPELL_AURA_MOUNTED)
             continue;
 
@@ -219,11 +219,13 @@ bool CheckMountStateAction::Mount()
             continue;
 
         int32 effect = std::max(spellInfo->Effects[1].BasePoints, spellInfo->Effects[2].BasePoints);
-        //if (effect < masterSpeed)
-            //continue;
+        // if (effect < masterSpeed)
+        // continue;
 
         uint32 index = (spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
-            spellInfo->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ? 1 : 0;
+                        spellInfo->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
+                           ? 1
+                           : 0;
 
         if (index == 0 && std::max(spellInfo->Effects[EFFECT_1].BasePoints, spellInfo->Effects[EFFECT_2].BasePoints) > 59)
             hasSwiftMount = true;
@@ -238,10 +240,12 @@ bool CheckMountStateAction::Mount()
     if (masterSpell)
     {
         masterMountType = (masterSpell->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
-            masterSpell->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ? 1 : 0;
+                           masterSpell->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
+                              ? 1
+                              : 0;
     }
 
-    std::map<int32, std::vector<uint32>>& spells = allSpells[masterMountType];
+    std::map<int32, std::vector<uint32>> &spells = allSpells[masterMountType];
     if (hasSwiftMount)
     {
         for (auto i : spells)
@@ -249,7 +253,7 @@ bool CheckMountStateAction::Mount()
             std::vector<uint32> ids = i.second;
             for (auto itr : ids)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr);
+                SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(itr);
                 if (!spellInfo)
                     continue;
 
@@ -264,7 +268,7 @@ bool CheckMountStateAction::Mount()
 
     for (std::map<int32, std::vector<uint32>>::iterator i = spells.begin(); i != spells.end(); ++i)
     {
-        std::vector<uint32>& ids = i->second;
+        std::vector<uint32> &ids = i->second;
         uint32 index = urand(0, ids.size() - 1);
         if (index >= ids.size())
             continue;

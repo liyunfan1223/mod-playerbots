@@ -15,7 +15,7 @@ bool CastBearFormAction::isUseful()
     return CastBuffSpellAction::isUseful() && !botAI->HasAura("dire bear form", GetTarget());
 }
 
-NextAction** CastDireBearFormAction::getAlternatives()
+NextAction **CastDireBearFormAction::getAlternatives()
 {
     return NextAction::merge(NextAction::array(0, new NextAction("bear form"), nullptr), CastSpellAction::getAlternatives());
 }
@@ -31,7 +31,8 @@ bool CastTravelFormAction::isUseful()
 bool CastCasterFormAction::isUseful()
 {
     return botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form",
-        "flight form", "swift flight form", "moonkin form", nullptr) && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth;
+                               "flight form", "swift flight form", "moonkin form", nullptr) &&
+           AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth;
 }
 
 bool CastCasterFormAction::Execute(Event event)
@@ -40,7 +41,8 @@ bool CastCasterFormAction::Execute(Event event)
     return true;
 }
 
-bool CastTreeFormAction::isUseful() {
-    return GetTarget() && 
-        CastSpellAction::isUseful() && !botAI->HasAura(33891, bot);
+bool CastTreeFormAction::isUseful()
+{
+    return GetTarget() &&
+           CastSpellAction::isUseful() && !botAI->HasAura(33891, bot);
 }

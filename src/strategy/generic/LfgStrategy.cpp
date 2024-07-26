@@ -12,6 +12,6 @@ void LfgStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("unknown dungeon", NextAction::array(0, new NextAction("give leader in dungeon", relevance), nullptr)));
 }
 
-LfgStrategy::LfgStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
+LfgStrategy::LfgStrategy(PlayerbotAI *botAI) : PassTroughStrategy(botAI)
 {
 }

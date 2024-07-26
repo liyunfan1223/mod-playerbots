@@ -5,7 +5,7 @@
 #include "WorldPacketHandlerStrategy.h"
 #include "Playerbots.h"
 
-void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     PassTroughStrategy::InitTriggers(triggers);
 
@@ -33,18 +33,18 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("lfg proposal active", NextAction::array(0, new NextAction("lfg accept", relevance), nullptr)));
     triggers.push_back(new TriggerNode("arena team invite", NextAction::array(0, new NextAction("arena team accept", relevance), nullptr)));
     triggers.push_back(new TriggerNode("quest confirm accept", NextAction::array(0, new NextAction("quest confirm accept", relevance), nullptr)));
-    //triggers.push_back(new TriggerNode("no non bot players around", NextAction::array(0, new NextAction("delay", relevance), nullptr)));
+    // triggers.push_back(new TriggerNode("no non bot players around", NextAction::array(0, new NextAction("delay", relevance), nullptr)));
     triggers.push_back(new TriggerNode("bg status", NextAction::array(0, new NextAction("bg status", relevance), nullptr)));
     triggers.push_back(new TriggerNode("xpgain", NextAction::array(0, new NextAction("xp gain", relevance), nullptr)));
-    triggers.push_back(new TriggerNode("levelup", NextAction::array(0, 
-        new NextAction("auto teleport for level", relevance + 3), 
-        new NextAction("auto talents", relevance + 2), 
-        new NextAction("auto learn spell", relevance + 1), 
-        new NextAction("auto upgrade equip", relevance), 
-        nullptr)));
+    triggers.push_back(new TriggerNode("levelup", NextAction::array(0,
+                                                                    new NextAction("auto teleport for level", relevance + 3),
+                                                                    new NextAction("auto talents", relevance + 2),
+                                                                    new NextAction("auto learn spell", relevance + 1),
+                                                                    new NextAction("auto upgrade equip", relevance),
+                                                                    nullptr)));
     // triggers.push_back(new TriggerNode("group destroyed", NextAction::array(0, new NextAction("reset botAI", relevance), nullptr)));
     triggers.push_back(new TriggerNode("questgiver quest details", NextAction::array(0, new NextAction("turn in query quest", relevance), nullptr)));
-    
+
     triggers.push_back(new TriggerNode("group list", NextAction::array(0, new NextAction("reset botAI", relevance), nullptr)));
     triggers.push_back(new TriggerNode("see spell", NextAction::array(0, new NextAction("see spell", relevance), nullptr)));
     triggers.push_back(new TriggerNode("release spirit", NextAction::array(0, new NextAction("release", relevance), nullptr)));
@@ -52,7 +52,7 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("master loot roll", NextAction::array(0, new NextAction("master loot roll", relevance), nullptr)));
 }
 
-WorldPacketHandlerStrategy::WorldPacketHandlerStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
+WorldPacketHandlerStrategy::WorldPacketHandlerStrategy(PlayerbotAI *botAI) : PassTroughStrategy(botAI)
 {
     supported.push_back("loot roll");
     supported.push_back("check mount state");
@@ -67,7 +67,7 @@ WorldPacketHandlerStrategy::WorldPacketHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("bg status");
 }
 
-void ReadyCheckStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void ReadyCheckStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("ready check", relevance), nullptr)));
 }

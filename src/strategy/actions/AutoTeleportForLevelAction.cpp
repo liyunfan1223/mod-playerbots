@@ -5,11 +5,14 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 
-bool AutoTeleportForLevelAction::Execute(Event event) {
-    if (!sPlayerbotAIConfig->autoTeleportForLevel || !sRandomPlayerbotMgr->IsRandomBot(bot)) {
+bool AutoTeleportForLevelAction::Execute(Event event)
+{
+    if (!sPlayerbotAIConfig->autoTeleportForLevel || !sRandomPlayerbotMgr->IsRandomBot(bot))
+    {
         return false;
     }
-    if (botAI->HasRealPlayerMaster()) {
+    if (botAI->HasRealPlayerMaster())
+    {
         return false;
     }
     sRandomPlayerbotMgr->RandomTeleportForLevel(bot);

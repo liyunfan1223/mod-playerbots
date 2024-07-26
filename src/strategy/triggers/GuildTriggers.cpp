@@ -18,37 +18,37 @@ bool BuyTabardTrigger::IsActive()
 
 bool LeaveLargeGuildTrigger::IsActive()
 {
-	if (!bot->GetGuildId())
-		return false;
+    if (!bot->GetGuildId())
+        return false;
 
-	if (botAI->IsRealPlayer())
-		return false;
+    if (botAI->IsRealPlayer())
+        return false;
 
-	if (botAI->IsAlt())
-		return false;
+    if (botAI->IsAlt())
+        return false;
 
     if (botAI->IsInRealGuild())
         return false;
 
-	GuilderType type = botAI->GetGuilderType();
+    GuilderType type = botAI->GetGuilderType();
 
-	Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 
-	Player* leader = ObjectAccessor::FindPlayer(guild->GetLeaderGUID());
+    Player *leader = ObjectAccessor::FindPlayer(guild->GetLeaderGUID());
 
-	//Only leave the guild if we know the leader is not a real player.
-	if (!leader || !GET_PLAYERBOT_AI(leader) || !GET_PLAYERBOT_AI(leader)->IsRealPlayer())
-		return false;
+    // Only leave the guild if we know the leader is not a real player.
+    if (!leader || !GET_PLAYERBOT_AI(leader) || !GET_PLAYERBOT_AI(leader)->IsRealPlayer())
+        return false;
 
-    PlayerbotAI* leaderBotAI = GET_PLAYERBOT_AI(leader);
+    PlayerbotAI *leaderBotAI = GET_PLAYERBOT_AI(leader);
     if (!leaderBotAI || leaderBotAI->IsRealPlayer())
-		return false;
+        return false;
 
-	if (type == GuilderType::SOLO && guild->GetLeaderGUID() != bot->GetGUID())
-		return true;
+    if (type == GuilderType::SOLO && guild->GetLeaderGUID() != bot->GetGUID())
+        return true;
 
-	uint32 members = guild->GetMemberSize();
-	uint32 maxMembers = uint8(type);
+    uint32 members = guild->GetMemberSize();
+    uint32 maxMembers = uint8(type);
 
-	return members > maxMembers;
+    return members > maxMembers;
 }

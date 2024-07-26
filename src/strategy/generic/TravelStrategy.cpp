@@ -5,11 +5,11 @@
 #include "TravelStrategy.h"
 #include "Playerbots.h"
 
-TravelStrategy::TravelStrategy(PlayerbotAI* botAI) : Strategy(botAI)
+TravelStrategy::TravelStrategy(PlayerbotAI *botAI) : Strategy(botAI)
 {
 }
 
-NextAction** TravelStrategy::getDefaultActions()
+NextAction **TravelStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction("travel", 1.0f), nullptr);
 }

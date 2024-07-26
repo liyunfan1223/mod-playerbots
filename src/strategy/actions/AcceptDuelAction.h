@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class AcceptDuelAction : public Action
 {
-    public:
-        AcceptDuelAction(PlayerbotAI* botAI) : Action(botAI, "accept duel") { }
+public:
+    AcceptDuelAction(PlayerbotAI *botAI) : Action(botAI, "accept duel") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

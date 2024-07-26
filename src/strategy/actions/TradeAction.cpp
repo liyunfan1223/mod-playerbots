@@ -16,16 +16,17 @@ bool TradeAction::Execute(Event event)
     if (!bot->GetTrader())
     {
         GuidVector guids = chat->parseGameobjects(text);
-        Player* player = nullptr;
+        Player *player = nullptr;
 
-        for(auto& guid: guids)
+        for (auto &guid : guids)
             if (guid.IsPlayer())
                 player = ObjectAccessor::FindPlayer(guid);
 
         if (!player && botAI->GetMaster())
             player = botAI->GetMaster();
 
-        if (!player) return false;
+        if (!player)
+            return false;
 
         if (!player->GetTrader())
         {
@@ -55,7 +56,7 @@ bool TradeAction::Execute(Event event)
         return false;
 
     uint32 traded = 0;
-    for (Item* item : found)
+    for (Item *item : found)
     {
         if (!bot->GetTrader() || item->IsInTrade())
             continue;
@@ -68,12 +69,12 @@ bool TradeAction::Execute(Event event)
     return true;
 }
 
-bool TradeAction::TradeItem(Item const* item, int8 slot)
+bool TradeAction::TradeItem(Item const *item, int8 slot)
 {
     int8 tradeSlot = -1;
-    Item* itemPtr = const_cast<Item*>(item);
+    Item *itemPtr = const_cast<Item*>(item);
 
-    TradeData* pTrade = bot->GetTradeData();
+    TradeData *pTrade = bot->GetTradeData();
     if ((slot >= 0 && slot < TRADE_SLOT_COUNT) && pTrade->GetItem(TradeSlots(slot)) == nullptr)
         tradeSlot = slot;
 
@@ -88,7 +89,7 @@ bool TradeAction::TradeItem(Item const* item, int8 slot)
                 tradeSlot = i;
 
                 WorldPacket packet(CMSG_CLEAR_TRADE_ITEM, 1);
-                packet << (uint8) tradeSlot;
+                packet << (uint8)tradeSlot;
                 bot->GetSession()->HandleClearTradeItemOpcode(packet);
                 pTrade->SetItem(TradeSlots(i), nullptr);
                 return true;
@@ -114,4 +115,3 @@ bool TradeAction::TradeItem(Item const* item, int8 slot)
     bot->GetSession()->HandleSetTradeItemOpcode(packet);
     return true;
 }
-

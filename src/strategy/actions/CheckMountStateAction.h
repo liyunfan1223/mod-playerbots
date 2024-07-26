@@ -11,13 +11,13 @@ class PlayerbotAI;
 
 class CheckMountStateAction : public UseItemAction
 {
-    public:
-        CheckMountStateAction(PlayerbotAI* botAI) : UseItemAction(botAI, "check mount state", true) { }
+public:
+    CheckMountStateAction(PlayerbotAI *botAI) : UseItemAction(botAI, "check mount state", true) {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
-        bool isPossible() override { return true; }
-        bool Mount();
+    bool Execute(Event event) override;
+    bool isUseful() override;
+    bool isPossible() override { return true; }
+    bool Mount();
 };
 
 #endif

@@ -11,37 +11,37 @@ class PlayerbotAI;
 
 class GenericShamanStrategy : public CombatStrategy
 {
-    public:
-        GenericShamanStrategy(PlayerbotAI* botAI);
+public:
+    GenericShamanStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class ShamanBuffDpsStrategy : public Strategy
 {
-    public:
-        ShamanBuffDpsStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    ShamanBuffDpsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "bdps"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "bdps"; }
 };
 
 class ShamanBuffManaStrategy : public Strategy
 {
-    public:
-        ShamanBuffManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    ShamanBuffManaStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "bmana"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "bmana"; }
 };
 
 class ShamanCureStrategy : public Strategy
 {
-    public:
-        ShamanCureStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    ShamanCureStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cure"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "cure"; }
 };
 
 #endif

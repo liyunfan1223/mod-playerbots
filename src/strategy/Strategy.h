@@ -13,14 +13,14 @@
 
 enum StrategyType : uint32
 {
-	STRATEGY_TYPE_GENERIC   = 0,
-	STRATEGY_TYPE_COMBAT    = 1,
-	STRATEGY_TYPE_NONCOMBAT = 2,
-	STRATEGY_TYPE_TANK      = 4,
-	STRATEGY_TYPE_DPS       = 8,
-	STRATEGY_TYPE_HEAL      = 16,
-	STRATEGY_TYPE_RANGED    = 32,
-	STRATEGY_TYPE_MELEE     = 64
+    STRATEGY_TYPE_GENERIC = 0,
+    STRATEGY_TYPE_COMBAT = 1,
+    STRATEGY_TYPE_NONCOMBAT = 2,
+    STRATEGY_TYPE_TANK = 4,
+    STRATEGY_TYPE_DPS = 8,
+    STRATEGY_TYPE_HEAL = 16,
+    STRATEGY_TYPE_RANGED = 32,
+    STRATEGY_TYPE_MELEE = 64
 };
 
 // enum ActionPriority
@@ -54,21 +54,21 @@ static float ACTION_EMERGENCY = 90.0f;
 
 class Strategy : public PlayerbotAIAware
 {
-    public:
-        Strategy(PlayerbotAI* botAI);
-        virtual ~Strategy() { }
+public:
+    Strategy(PlayerbotAI *botAI);
+    virtual ~Strategy() {}
 
-        virtual NextAction** getDefaultActions() { return nullptr; }
-        virtual void InitTriggers([[maybe_unused]] std::vector<TriggerNode*> &triggers) { }
-        virtual void InitMultipliers([[maybe_unused]] std::vector<Multiplier*> &multipliers) { }
-        virtual std::string const getName() = 0;
-		virtual uint32 GetType() const { return STRATEGY_TYPE_GENERIC; }
-        virtual ActionNode* GetAction(std::string const name);
-        void Update() { }
-        void Reset() { }
+    virtual NextAction **getDefaultActions() { return nullptr; }
+    virtual void InitTriggers([[maybe_unused]] std::vector<TriggerNode *> &triggers) {}
+    virtual void InitMultipliers([[maybe_unused]] std::vector<Multiplier *> &multipliers) {}
+    virtual std::string const getName() = 0;
+    virtual uint32 GetType() const { return STRATEGY_TYPE_GENERIC; }
+    virtual ActionNode *GetAction(std::string const name);
+    void Update() {}
+    void Reset() {}
 
-    protected:
-        NamedObjectFactoryList<ActionNode> actionNodeFactories;
+protected:
+    NamedObjectFactoryList<ActionNode> actionNodeFactories;
 };
 
 #endif

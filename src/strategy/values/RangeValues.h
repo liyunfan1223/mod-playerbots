@@ -12,8 +12,8 @@ class PlayerbotAI;
 
 class RangeValue : public ManualSetValue<float>, public Qualified
 {
-	public:
-        RangeValue(PlayerbotAI* botAI);
+public:
+        RangeValue(PlayerbotAI *botAI);
 
         std::string const Save() override;
         bool Load(std::string const value) override;

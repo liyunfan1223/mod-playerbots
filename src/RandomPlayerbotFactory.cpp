@@ -26,14 +26,14 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_WARRIOR].push_back(RACE_UNDEAD_PLAYER);
     availableRaces[CLASS_WARRIOR].push_back(RACE_TAUREN);
     availableRaces[CLASS_WARRIOR].push_back(RACE_TROLL);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_WARRIOR].push_back(RACE_DRAENEI);
     }
 
     availableRaces[CLASS_PALADIN].push_back(RACE_HUMAN);
     availableRaces[CLASS_PALADIN].push_back(RACE_DWARF);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_PALADIN].push_back(RACE_DRAENEI);
         availableRaces[CLASS_PALADIN].push_back(RACE_BLOODELF);
@@ -45,7 +45,7 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_ROGUE].push_back(RACE_GNOME);
     availableRaces[CLASS_ROGUE].push_back(RACE_ORC);
     availableRaces[CLASS_ROGUE].push_back(RACE_TROLL);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_ROGUE].push_back(RACE_BLOODELF);
     }
@@ -55,7 +55,7 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_PRIEST].push_back(RACE_NIGHTELF);
     availableRaces[CLASS_PRIEST].push_back(RACE_TROLL);
     availableRaces[CLASS_PRIEST].push_back(RACE_UNDEAD_PLAYER);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_PRIEST].push_back(RACE_DRAENEI);
         availableRaces[CLASS_PRIEST].push_back(RACE_BLOODELF);
@@ -65,7 +65,7 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_MAGE].push_back(RACE_GNOME);
     availableRaces[CLASS_MAGE].push_back(RACE_UNDEAD_PLAYER);
     availableRaces[CLASS_MAGE].push_back(RACE_TROLL);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_MAGE].push_back(RACE_DRAENEI);
         availableRaces[CLASS_MAGE].push_back(RACE_BLOODELF);
@@ -75,7 +75,7 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_WARLOCK].push_back(RACE_GNOME);
     availableRaces[CLASS_WARLOCK].push_back(RACE_UNDEAD_PLAYER);
     availableRaces[CLASS_WARLOCK].push_back(RACE_ORC);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_WARLOCK].push_back(RACE_BLOODELF);
     }
@@ -83,7 +83,7 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_SHAMAN].push_back(RACE_ORC);
     availableRaces[CLASS_SHAMAN].push_back(RACE_TAUREN);
     availableRaces[CLASS_SHAMAN].push_back(RACE_TROLL);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_SHAMAN].push_back(RACE_DRAENEI);
     }
@@ -93,7 +93,7 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     availableRaces[CLASS_HUNTER].push_back(RACE_ORC);
     availableRaces[CLASS_HUNTER].push_back(RACE_TAUREN);
     availableRaces[CLASS_HUNTER].push_back(RACE_TROLL);
-    if(expansion >= EXPANSION_THE_BURNING_CRUSADE)
+    if (expansion >= EXPANSION_THE_BURNING_CRUSADE)
     {
         availableRaces[CLASS_HUNTER].push_back(RACE_DRAENEI);
         availableRaces[CLASS_HUNTER].push_back(RACE_BLOODELF);
@@ -117,16 +117,18 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     }
 }
 
-Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<uint8, std::vector<std::string>> names)
+Player *RandomPlayerbotFactory::CreateRandomBot(WorldSession *session, uint8 cls, std::unordered_map<uint8, std::vector<std::string>> names)
 {
-    LOG_DEBUG("playerbots",  "Creating new random bot for class {}", cls);
+    LOG_DEBUG("playerbots", "Creating new random bot for class {}", cls);
 
     uint8 gender = rand() % 2 ? GENDER_MALE : GENDER_FEMALE;
     uint8 alliance = rand() % 2;
     uint8 race;
-    for (int attempt = 0; attempt < 15; attempt++) {
+    for (int attempt = 0; attempt < 15; attempt++)
+    {
         race = availableRaces[cls][urand(0, availableRaces[cls].size() - 1)];
-        if ((alliance && IsAlliance(race)) || (!alliance && !IsAlliance(race))) {
+        if ((alliance && IsAlliance(race)) || (!alliance && !IsAlliance(race)))
+        {
             break;
         }
     }
@@ -153,33 +155,34 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     //     }
     // }
 
-    if (name.empty()) {
+    if (name.empty())
+    {
         LOG_ERROR("playerbots", "Unable to get random bot name!");
         return nullptr;
     }
     CharacterDatabase.DirectExecute("UPDATE playerbots_names SET in_use=1 WHERE name='{}'", name);
 
     std::vector<uint8> skinColors, facialHairTypes;
-    std::vector<std::pair<uint8,uint8>> faces, hairs;
-    for (CharSectionsEntry const* charSection : sCharSectionsStore)
+    std::vector<std::pair<uint8, uint8>> faces, hairs;
+    for (CharSectionsEntry const *charSection : sCharSectionsStore)
     {
         if (charSection->Race != race || charSection->Gender != gender)
             continue;
 
         switch (charSection->GenType)
         {
-            case SECTION_TYPE_SKIN:
-                skinColors.push_back(charSection->Color);
-                break;
-            case SECTION_TYPE_FACE:
-                faces.push_back(std::pair<uint8, uint8>(charSection->Type, charSection->Color));
-                break;
-            case SECTION_TYPE_FACIAL_HAIR:
-                facialHairTypes.push_back(charSection->Type);
-                break;
-            case SECTION_TYPE_HAIR:
-                hairs.push_back(std::pair<uint8, uint8>(charSection->Type, charSection->Color));
-                break;
+        case SECTION_TYPE_SKIN:
+            skinColors.push_back(charSection->Color);
+            break;
+        case SECTION_TYPE_FACE:
+            faces.push_back(std::pair<uint8, uint8>(charSection->Type, charSection->Color));
+            break;
+        case SECTION_TYPE_FACIAL_HAIR:
+            facialHairTypes.push_back(charSection->Type);
+            break;
+        case SECTION_TYPE_HAIR:
+            hairs.push_back(std::pair<uint8, uint8>(charSection->Type, charSection->Color));
+            break;
         }
     }
 
@@ -187,14 +190,14 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     std::pair<uint8, uint8> face = faces[urand(0, faces.size() - 1)];
     std::pair<uint8, uint8> hair = hairs[urand(0, hairs.size() - 1)];
 
-	bool excludeCheck = (race == RACE_TAUREN) || (race == RACE_DRAENEI) || (gender == GENDER_FEMALE && race != RACE_NIGHTELF && race != RACE_UNDEAD_PLAYER);
-	uint8 facialHair = excludeCheck ? 0 : facialHairTypes[urand(0, facialHairTypes.size() - 1)];
+    bool excludeCheck = (race == RACE_TAUREN) || (race == RACE_DRAENEI) || (gender == GENDER_FEMALE && race != RACE_NIGHTELF && race != RACE_UNDEAD_PLAYER);
+    uint8 facialHair = excludeCheck ? 0 : facialHairTypes[urand(0, facialHairTypes.size() - 1)];
 
     std::unique_ptr<CharacterCreateInfo> characterInfo = std::make_unique<CharacterCreateInfo>(name, race, cls, gender, face.second, face.first, hair.first, hair.second, facialHair);
 
-    Player* player = new Player(session);
+    Player *player = new Player(session);
     player->GetMotionMaster()->Initialize();
-	if (!player->Create(sObjectMgr->GetGenerator<HighGuid::Player>().Generate(), characterInfo.get()))
+    if (!player->Create(sObjectMgr->GetGenerator<HighGuid::Player>().Generate(), characterInfo.get()))
     {
         player->CleanupsBeforeDelete();
         delete player;
@@ -207,9 +210,9 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     player->SetAtLoginFlag(AT_LOGIN_NONE);
 
     if (player->getClass() == CLASS_DEATH_KNIGHT)
-	{
-		player->learnSpell(50977, false);
-	}
+    {
+        player->learnSpell(50977, false);
+    }
     // player->SaveToDB(true, false);
     // player->RewardQuest(const Quest *quest, uint32 reward, Object *questGiver)
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId, name.c_str(), race, cls);
@@ -219,16 +222,18 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
 
 std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
 {
-    std::string botName = "";        
+    std::string botName = "";
     int tries = 10;
-    while(--tries) {
+    while (--tries)
+    {
         QueryResult result = CharacterDatabase.Query("SELECT name FROM playerbots_names "
-                "WHERE in_use = 0 AND gender = {} ORDER BY RAND() LIMIT 1", gender);
+                                                     "WHERE in_use = 0 AND gender = {} ORDER BY RAND() LIMIT 1",
+                                                     gender);
         if (!result)
         {
             break;
         }
-        Field* fields = result->Fetch();
+        Field *fields = result->Fetch();
         std::string ret = fields[0].Get<std::string>();
         if (ObjectMgr::CheckPlayerName(ret) == CHAR_NAME_SUCCESS)
         {
@@ -236,66 +241,61 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         }
     }
 
-    //CONLANG NAME GENERATION
+    // CONLANG NAME GENERATION
     LOG_ERROR("playerbots", "No more names left for random bots. Attempting conlang name generation.");
     const std::string groupCategory = "SCVKRU";
     const std::string groupFormStart[2][4] = {
-  	    {"SV","SV","VK","RV"},
-        {"V" ,"SU","VS","RV"}
-    };
+        {"SV", "SV", "VK", "RV"},
+        {"V", "SU", "VS", "RV"}};
     const std::string groupFormMid[2][6] = {
-  	    {"CV","CVC","CVC","CVK","VC","VK"},
-        {"CV","CVC","CVK","KVC","VC","KV"}
-    };
+        {"CV", "CVC", "CVC", "CVK", "VC", "VK"},
+        {"CV", "CVC", "CVK", "KVC", "VC", "KV"}};
     const std::string groupFormEnd[2][4] = {
-  	    {"CV","VC","VK","CV"},
-        {"RU","UR","VR","V" }
-    };
+        {"CV", "VC", "VK", "CV"},
+        {"RU", "UR", "VR", "V"}};
     const std::string groupLetter[2][6] = {
-    	//S           C                            V               K           R         U
-  	    {"dtspkThfS","bcCdfghjkmnNqqrrlsStTvwxyz","aaeeiouA"     ,"ppttkkbdg","lmmnrr" ,"AEO" },
-  	    {"dtskThfS" ,"bcCdfghjkmmnNqrrlssStTvwyz","aaaeeiiuAAEIO","ppttkbbdg","lmmnrrr","AEOy"}
-    };
+        // S           C                            V               K           R         U
+        {"dtspkThfS", "bcCdfghjkmnNqqrrlsStTvwxyz", "aaeeiouA", "ppttkkbdg", "lmmnrr", "AEO"},
+        {"dtskThfS", "bcCdfghjkmmnNqrrlssStTvwyz", "aaaeeiiuAAEIO", "ppttkbbdg", "lmmnrrr", "AEOy"}};
     const std::string replaceRule[2][17] = {
-  	    {"ST" ,"ka","ko","ku","kr","S" ,"T" ,"C" ,"N" ,"jj","AA","AI" ,"A" ,"E" ,"O" ,"I" ,"aa"},
-	    {"sth","ca","co","cu","cr","sh","th","ch","ng","dg","A" ,"ayu","ai","ei","ou","iu","ae"}
-    };
-    
+        {"ST", "ka", "ko", "ku", "kr", "S", "T", "C", "N", "jj", "AA", "AI", "A", "E", "O", "I", "aa"},
+        {"sth", "ca", "co", "cu", "cr", "sh", "th", "ch", "ng", "dg", "A", "ayu", "ai", "ei", "ou", "iu", "ae"}};
+
     tries = 10;
     while (--tries)
     {
         botName.clear();
-        //Build name from groupForms
-        //Pick random start group
-    	botName = groupFormStart[gender][rand()%4];
-        //Pick up to 2 and then up to 1 additional middle group
-    	for (int i = 0; i < rand()%3 + rand()%2; i++)
+        // Build name from groupForms
+        // Pick random start group
+        botName = groupFormStart[gender][rand() % 4];
+        // Pick up to 2 and then up to 1 additional middle group
+        for (int i = 0; i < rand() % 3 + rand() % 2; i++)
         {
-      	    botName += groupFormMid[gender][rand()%6];
-      	}
-        //Pick up to 1 end group
-      	botName += rand()%2 ? groupFormEnd[gender][rand()%4] : "";
-        //If name is single letter add random end group
-        botName += (botName.size() < 2) ? groupFormEnd[gender][rand()%4] : "";
-        
-        //Replace Catagory value with random Letter from that Catagory's Letter string for a given bot gender
-        for (int i=0; i < botName.size(); i++)
+            botName += groupFormMid[gender][rand() % 6];
+        }
+        // Pick up to 1 end group
+        botName += rand() % 2 ? groupFormEnd[gender][rand() % 4] : "";
+        // If name is single letter add random end group
+        botName += (botName.size() < 2) ? groupFormEnd[gender][rand() % 4] : "";
+
+        // Replace Catagory value with random Letter from that Catagory's Letter string for a given bot gender
+        for (int i = 0; i < botName.size(); i++)
         {
-			botName[i] = groupLetter[gender][groupCategory.find(botName[i])][rand()%groupLetter[gender][groupCategory.find(botName[i])].size()];
-  	    }
-  
-        //Itterate over replace rules
+            botName[i] = groupLetter[gender][groupCategory.find(botName[i])][rand() % groupLetter[gender][groupCategory.find(botName[i])].size()];
+        }
+
+        // Itterate over replace rules
         for (int i = 0; i < 17; i++)
         {
             int j = botName.find(replaceRule[0][i]);
-            while ( j > -1)
+            while (j > -1)
             {
-                botName.replace(j,replaceRule[0][i].size(),replaceRule[1][i]);
+                botName.replace(j, replaceRule[0][i].size(), replaceRule[1][i]);
                 j = botName.find(replaceRule[0][i]);
-            }    
+            }
         }
-  
-        //Capitalize first letter
+
+        // Capitalize first letter
         botName[0] -= 32;
 
         if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS ||
@@ -307,11 +307,13 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         return std::move(botName);
     }
 
-    //TRUE RANDOM NAME GENERATION
+    // TRUE RANDOM NAME GENERATION
     LOG_ERROR("playerbots", "Con​lang name generation failed. True random name fallback.");
     tries = 10;
-    while(--tries) {
-        for (uint8 i = 0; i < 10; i++) {
+    while (--tries)
+    {
+        for (uint8 i = 0; i < 10; i++)
+        {
             botName += (i == 0 ? 'A' : 'a') + rand() % 26;
         }
         if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS ||
@@ -352,7 +354,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         {
             do
             {
-                Field* fields = results->Fetch();
+                Field *fields = results->Fetch();
                 uint32 accId = fields[0].Get<uint32>();
                 LOG_INFO("playerbots", "Deleting account accID: {}({})...", accId, ++deletion_count);
                 AccountMgr::DeleteAccount(accId);
@@ -369,7 +371,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         World::StopNow(SHUTDOWN_EXIT_CODE);
         return;
     }
-    
+
     uint32 totalAccCount = sPlayerbotAIConfig->randomBotAccountCount;
 
     LOG_INFO("playerbots", "Creating random bot accounts...");
@@ -382,7 +384,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         out << sPlayerbotAIConfig->randomBotAccountPrefix << accountNumber;
         std::string const accountName = out.str();
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
+        LoginDatabasePreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
         stmt->SetData(0, accountName);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
         if (result)
@@ -395,7 +397,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         {
             for (int i = 0; i < 10; i++)
             {
-                password += (char) urand('!', 'z');
+                password += (char)urand('!', 'z');
             }
         }
         else
@@ -406,7 +408,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
         LOG_DEBUG("playerbots", "Account {} created for random bots", accountName.c_str());
     }
 
-    if (account_creation) {
+    if (account_creation)
+    {
         /* wait for async accounts create to make character create correctly, same as account delete */
         std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
     }
@@ -415,8 +418,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
     uint32 totalRandomBotChars = 0;
     uint32 totalCharCount = sPlayerbotAIConfig->randomBotAccountCount * 10;
 
-    std::unordered_map<uint8,std::vector<std::string>> names;
-    std::vector<std::pair<Player*, uint32>> playerBots;
+    std::unordered_map<uint8, std::vector<std::string>> names;
+    std::vector<std::pair<Player *, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
     bool bot_creation = false;
     for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
@@ -425,13 +428,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
         out << sPlayerbotAIConfig->randomBotAccountPrefix << accountNumber;
         std::string const accountName = out.str();
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
+        LoginDatabasePreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
         stmt->SetData(0, accountName);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
         if (!result)
             continue;
 
-        Field* fields = result->Fetch();
+        Field *fields = result->Fetch();
         uint32 accountId = fields[0].Get<uint32>();
 
         sPlayerbotAIConfig->randomBotAccounts.push_back(accountId);
@@ -445,7 +448,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1, sPlayerbotAIConfig->randomBotAccountCount);
         RandomPlayerbotFactory factory(accountId);
 
-        WorldSession* session = new WorldSession(accountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0), LOCALE_enUS, 0, false, false, 0, true);
+        WorldSession *session = new WorldSession(accountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0), LOCALE_enUS, 0, false, false, 0, true);
         sessionBots.push_back(session);
 
         for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES - count; ++cls)
@@ -457,32 +460,35 @@ void RandomPlayerbotFactory::CreateRandomBots()
             if (bool const isClassDeathKnight = cls == CLASS_DEATH_KNIGHT;
                 isClassDeathKnight &&
                 sWorld->getIntConfig(CONFIG_EXPANSION) !=
-                EXPANSION_WRATH_OF_THE_LICH_KING)
+                    EXPANSION_WRATH_OF_THE_LICH_KING)
             {
                 continue;
             }
 
             if (cls != 10)
-                if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
+                if (Player *playerBot = factory.CreateRandomBot(session, cls, names))
+                {
                     playerBot->SaveToDB(true, false);
-                    sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(), 
-                        playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->GetLevel());
+                    sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(),
+                                                            playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->GetLevel());
                     playerBot->CleanupsBeforeDelete();
                     delete playerBot;
                 }
         }
     }
 
-    if (bot_creation) {
+    if (bot_creation)
+    {
         LOG_INFO("playerbots", "Waiting for {} characters loading into database...", totalCharCount);
         /* wait for characters load into database, or characters will fail to loggin */
         std::this_thread::sleep_for(10s);
     }
 
-    for (WorldSession* session : sessionBots)
+    for (WorldSession *session : sessionBots)
         delete session;
-    
-    for (uint32 accountId : sPlayerbotAIConfig->randomBotAccounts) {
+
+    for (uint32 accountId : sPlayerbotAIConfig->randomBotAccounts)
+    {
         totalRandomBotChars += AccountMgr::GetCharactersCount(accountId);
     }
 
@@ -493,17 +499,16 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
 {
     std::vector<uint32> randomBots;
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BOT);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BOT);
     stmt->SetData(0, "add");
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
         do
         {
-            Field* fields = result->Fetch();
+            Field *fields = result->Fetch();
             uint32 bot = fields[0].Get<uint32>();
             randomBots.push_back(bot);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     if (sPlayerbotAIConfig->deleteRandomBotGuilds)
@@ -511,7 +516,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         LOG_INFO("playerbots", "Deleting random bot guilds...");
         for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
         {
-            if (Guild* guild = sGuildMgr->GetGuildByLeader(ObjectGuid::Create<HighGuid::Player>(*i)))
+            if (Guild *guild = sGuildMgr->GetGuildByLeader(ObjectGuid::Create<HighGuid::Player>(*i)))
                 guild->Disband();
         }
 
@@ -523,14 +528,14 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
     for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
     {
         ObjectGuid leader = ObjectGuid::Create<HighGuid::Player>(*i);
-        if (Guild* guild = sGuildMgr->GetGuildByLeader(leader))
+        if (Guild *guild = sGuildMgr->GetGuildByLeader(leader))
         {
             ++guildNumber;
             sPlayerbotAIConfig->randomBotGuilds.push_back(guild->GetId());
         }
         else
         {
-            Player* player = ObjectAccessor::FindPlayer(leader);
+            Player *player = ObjectAccessor::FindPlayer(leader);
             if (player && !player->GetGuildId())
                 availableLeaders.push_back(leader);
         }
@@ -553,7 +558,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
 
         uint32 index = urand(0, availableLeaders.size() - 1);
         ObjectGuid leader = availableLeaders[index];
-        Player* player = ObjectAccessor::FindPlayer(leader);
+        Player *player = ObjectAccessor::FindPlayer(leader);
         if (!player)
         {
             LOG_ERROR("playerbots", "ObjectAccessor Cannot find player to set leader for guild {} . Skipped...", guildName.c_str());
@@ -563,7 +568,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         if (player->GetGuildId())
             continue;
 
-        Guild* guild = new Guild();
+        Guild *guild = new Guild();
         if (!guild->Create(player, guildName))
         {
             LOG_ERROR("playerbots", "Error creating guild [ {} ] with leader [ {} ]", guildName.c_str(), player->GetName().c_str());
@@ -600,12 +605,13 @@ std::string const RandomPlayerbotFactory::CreateRandomGuildName()
         return std::move(guildName);
     }
 
-    Field* fields = result->Fetch();
+    Field *fields = result->Fetch();
     uint32 maxId = fields[0].Get<uint32>();
 
     uint32 id = urand(0, maxId);
     result = CharacterDatabase.Query("SELECT n.name FROM playerbots_guild_names n "
-            "LEFT OUTER JOIN guild e ON e.name = n.name WHERE e.guildid IS NULL AND n.name_id >= {} LIMIT 1", id);
+                                     "LEFT OUTER JOIN guild e ON e.name = n.name WHERE e.guildid IS NULL AND n.name_id >= {} LIMIT 1",
+                                     id);
     if (!result)
     {
         LOG_ERROR("playerbots", "No more names left for random guilds");
@@ -622,17 +628,16 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
 {
     std::vector<uint32> randomBots;
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BOT);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BOT);
     stmt->SetData(0, "add");
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
         do
         {
-            Field* fields = result->Fetch();
+            Field *fields = result->Fetch();
             uint32 bot = fields[0].Get<uint32>();
             randomBots.push_back(bot);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     if (sPlayerbotAIConfig->deleteRandomBotArenaTeams)
@@ -642,9 +647,9 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
         {
             ObjectGuid captain = ObjectGuid::Create<HighGuid::Player>(*i);
-            ArenaTeam* arenateam = sArenaTeamMgr->GetArenaTeamByCaptain(captain);
+            ArenaTeam *arenateam = sArenaTeamMgr->GetArenaTeamByCaptain(captain);
             if (arenateam)
-                //sObjectMgr->RemoveArenaTeam(arenateam->GetId());
+                // sObjectMgr->RemoveArenaTeam(arenateam->GetId());
                 arenateam->Disband(nullptr);
         }
 
@@ -656,7 +661,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
     for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
     {
         ObjectGuid captain = ObjectGuid::Create<HighGuid::Player>(*i);
-        ArenaTeam* arenateam = sArenaTeamMgr->GetArenaTeamByCaptain(captain);
+        ArenaTeam *arenateam = sArenaTeamMgr->GetArenaTeamByCaptain(captain);
         if (arenateam)
         {
             ++arenaTeamNumber;
@@ -664,7 +669,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         }
         else
         {
-            Player* player = ObjectAccessor::FindConnectedPlayer(captain);
+            Player *player = ObjectAccessor::FindConnectedPlayer(captain);
 
             if (!arenateam && player && player->GetLevel() >= 70)
                 availableCaptains.push_back(captain);
@@ -685,7 +690,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
 
         uint32 index = urand(0, availableCaptains.size() - 1);
         ObjectGuid captain = availableCaptains[index];
-        Player* player = ObjectAccessor::FindConnectedPlayer(captain);
+        Player *player = ObjectAccessor::FindConnectedPlayer(captain);
         if (!player)
         {
             LOG_ERROR("playerbots", "Cannot find player for captain {}", captain.ToString().c_str());
@@ -705,24 +710,24 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
             return;
         }
 
-        Field* fields = results->Fetch();
+        Field *fields = results->Fetch();
         uint8 slot = fields[0].Get<uint8>();
 
         ArenaType type;
         switch (slot)
         {
-            case 2:
-                type = ARENA_TYPE_2v2;
-                break;
-            case 3:
-                type = ARENA_TYPE_3v3;
-                break;
-            case 5:
-                type = ARENA_TYPE_5v5;
-                break;
+        case 2:
+            type = ARENA_TYPE_2v2;
+            break;
+        case 3:
+            type = ARENA_TYPE_3v3;
+            break;
+        case 5:
+            type = ARENA_TYPE_5v5;
+            break;
         }
 
-        ArenaTeam* arenateam = new ArenaTeam();
+        ArenaTeam *arenateam = new ArenaTeam();
         if (!arenateam->Create(player->GetGUID(), type, arenaTeamName, 0, 0, 0, 0, 0))
         {
             LOG_ERROR("playerbots", "Error creating arena team {}", arenaTeamName.c_str());
@@ -743,10 +748,10 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         arenateam->SetEmblem(backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor);
 
         // set random kills (wip)
-        //arenateam->SetStats(STAT_TYPE_GAMES_WEEK, urand(0, 30));
-        //arenateam->SetStats(STAT_TYPE_WINS_WEEK, urand(0, arenateam->GetStats().games_week));
-        //arenateam->SetStats(STAT_TYPE_GAMES_SEASON, urand(arenateam->GetStats().games_week, arenateam->GetStats().games_week * 5));
-        //arenateam->SetStats(STAT_TYPE_WINS_SEASON, urand(arenateam->GetStats().wins_week, arenateam->GetStats().games
+        // arenateam->SetStats(STAT_TYPE_GAMES_WEEK, urand(0, 30));
+        // arenateam->SetStats(STAT_TYPE_WINS_WEEK, urand(0, arenateam->GetStats().games_week));
+        // arenateam->SetStats(STAT_TYPE_GAMES_SEASON, urand(arenateam->GetStats().games_week, arenateam->GetStats().games_week * 5));
+        // arenateam->SetStats(STAT_TYPE_WINS_SEASON, urand(arenateam->GetStats().wins_week, arenateam->GetStats().games
         arenateam->SaveToDB();
 
         sArenaTeamMgr->AddArenaTeam(arenateam);
@@ -767,12 +772,13 @@ std::string const RandomPlayerbotFactory::CreateRandomArenaTeamName()
         return std::move(arenaTeamName);
     }
 
-    Field* fields = result->Fetch();
+    Field *fields = result->Fetch();
     uint32 maxId = fields[0].Get<uint32>();
 
     uint32 id = urand(0, maxId);
     result = CharacterDatabase.Query("SELECT n.name FROM playerbots_arena_team_names n LEFT OUTER JOIN arena_team e ON e.name = n.name "
-        "WHERE e.arenateamid IS NULL AND n.name_id >= {} LIMIT 1", id);
+                                     "WHERE e.arenateamid IS NULL AND n.name_id >= {} LIMIT 1",
+                                     id);
 
     if (!result)
     {

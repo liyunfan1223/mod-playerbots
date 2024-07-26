@@ -11,8 +11,8 @@ class PlayerbotAI;
 
 class HasAvailableLootValue : public BoolCalculatedValue
 {
-	public:
-        HasAvailableLootValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI) { }
+public:
+        HasAvailableLootValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI) {}
 
         bool Calculate() override;
 };

@@ -6,12 +6,12 @@
 #include "GenericPaladinStrategyActionNodeFactory.h"
 #include "Playerbots.h"
 
-GenericPaladinStrategy::GenericPaladinStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI)
+GenericPaladinStrategy::GenericPaladinStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI)
 {
     actionNodeFactories.Add(new GenericPaladinStrategyActionNodeFactory());
 }
 
-void GenericPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void GenericPaladinStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
@@ -24,10 +24,10 @@ void GenericPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("protect party member", NextAction::array(0, new NextAction("blessing of protection on party", ACTION_EMERGENCY + 2), nullptr)));
     triggers.push_back(new TriggerNode(
         "medium mana",
-		NextAction::array(0, new NextAction("divine plea", ACTION_HIGH), NULL)));
+        NextAction::array(0, new NextAction("divine plea", ACTION_HIGH), NULL)));
 }
 
-void PaladinCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinCureStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("cleanse cure disease", NextAction::array(0, new NextAction("cleanse disease", ACTION_DISPEL + 2), nullptr)));
     triggers.push_back(new TriggerNode("cleanse party member cure disease", NextAction::array(0, new NextAction("cleanse disease on party", ACTION_DISPEL + 1), nullptr)));
@@ -37,13 +37,13 @@ void PaladinCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("cleanse party member cure magic", NextAction::array(0, new NextAction("cleanse magic on party", ACTION_DISPEL + 1), nullptr)));
 }
 
-void PaladinBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinBoostStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("avenging wrath", NextAction::array(0, new NextAction("avenging wrath", ACTION_HIGH + 2), nullptr)));
     // triggers.push_back(new TriggerNode("divine favor", NextAction::array(0, new NextAction("divine favor", ACTION_HIGH + 1), nullptr)));
 }
 
-void PaladinCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinCcStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode("turn undead", NextAction::array(0, new NextAction("turn undead", ACTION_HIGH + 1), nullptr)));
 }

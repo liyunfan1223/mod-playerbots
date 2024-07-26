@@ -10,20 +10,20 @@
 
 bool TravelAction::Execute(Event event)
 {
-    TravelTarget * target = AI_VALUE(TravelTarget *, "travel target");
+    TravelTarget *target = AI_VALUE(TravelTarget *, "travel target");
 
     if (bot->isMoving())
         return false;
 
     target->setStatus(TRAVEL_STATUS_WORK);
 
-    Unit* newTarget = nullptr;
+    Unit *newTarget = nullptr;
     std::list<Unit*> targets;
     Acore::AnyUnitInObjectRangeCheck u_check(bot, sPlayerbotAIConfig->sightDistance * 2);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitAllObjects(bot, searcher, sPlayerbotAIConfig->sightDistance);
 
-    for (Unit* unit : targets)
+    for (Unit *unit : targets)
     {
         newTarget = unit;
         if (!newTarget)
@@ -54,7 +54,7 @@ bool TravelAction::Execute(Event event)
 
 bool TravelAction::isUseful()
 {
-    return false && AI_VALUE(TravelTarget*, "travel target")->isActive() && (!AI_VALUE(GuidPosition, "rpg target") || !AI_VALUE(ObjectGuid, "pull target"));
+    return false && AI_VALUE(TravelTarget *, "travel target")->isActive() && (!AI_VALUE(GuidPosition, "rpg target") || !AI_VALUE(ObjectGuid, "pull target"));
 }
 
 bool MoveToDarkPortalAction::Execute(Event event)
@@ -71,8 +71,8 @@ bool MoveToDarkPortalAction::Execute(Event event)
             {
                 if (bot->GetTeamId() == TEAM_ALLIANCE)
                 {
-                    Quest const* quest = sObjectMgr->GetQuestTemplate(10119);
-                    CreatureData const* creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(16841);
+                    Quest const *quest = sObjectMgr->GetQuestTemplate(10119);
+                    CreatureData const *creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(16841);
                     if (quest && creatureData)
                     {
                         auto creatureBounds = bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
@@ -82,8 +82,8 @@ bool MoveToDarkPortalAction::Execute(Event event)
                 }
                 else
                 {
-                    Quest const* quest = sObjectMgr->GetQuestTemplate(9407);
-                    CreatureData const* creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(19254);
+                    Quest const *quest = sObjectMgr->GetQuestTemplate(9407);
+                    CreatureData const *creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(19254);
                     if (quest && creatureData)
                     {
                         auto creatureBounds = bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);

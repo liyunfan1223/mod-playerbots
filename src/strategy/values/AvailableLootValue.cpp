@@ -7,7 +7,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-AvailableLootValue::AvailableLootValue(PlayerbotAI* botAI, std::string const name) : ManualSetValue<LootObjectStack*>(botAI, nullptr, name)
+AvailableLootValue::AvailableLootValue(PlayerbotAI *botAI, std::string const name) : ManualSetValue<LootObjectStack*>(botAI, nullptr, name)
 {
     value = new LootObjectStack(botAI->GetBot());
 }
@@ -17,7 +17,7 @@ AvailableLootValue::~AvailableLootValue()
     delete value;
 }
 
-LootTargetValue::LootTargetValue(PlayerbotAI* botAI, std::string const name) : ManualSetValue<LootObject>(botAI, LootObject(), name)
+LootTargetValue::LootTargetValue(PlayerbotAI *botAI, std::string const name) : ManualSetValue<LootObject>(botAI, LootObject(), name)
 {
 }
 
@@ -25,5 +25,5 @@ bool CanLootValue::Calculate()
 {
     LootObject loot = AI_VALUE(LootObject, "loot target");
     return !loot.IsEmpty() && loot.GetWorldObject(bot) && loot.IsLootPossible(bot) &&
-        sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"), INTERACTION_DISTANCE);
+           sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"), INTERACTION_DISTANCE);
 }

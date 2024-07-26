@@ -12,18 +12,18 @@ class PlayerbotAI;
 
 class EnterVehicleAction : public MovementAction
 {
-    public:
-        EnterVehicleAction(PlayerbotAI* botAI, std::string const& name = "enter vehicle") : MovementAction(botAI, name) { }
+public:
+    EnterVehicleAction(PlayerbotAI *botAI, std::string const &name = "enter vehicle") : MovementAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class LeaveVehicleAction : public MovementAction
 {
-    public:
-        LeaveVehicleAction(PlayerbotAI* botAI, std::string const& name = "leave vehicle") : MovementAction(botAI, name) { }
+public:
+    LeaveVehicleAction(PlayerbotAI *botAI, std::string const &name = "leave vehicle") : MovementAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

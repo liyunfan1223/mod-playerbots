@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class TellItemCountAction : public InventoryAction
 {
-    public:
-        TellItemCountAction(PlayerbotAI* botAI) : InventoryAction(botAI, "c") { }
+public:
+    TellItemCountAction(PlayerbotAI *botAI) : InventoryAction(botAI, "c") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

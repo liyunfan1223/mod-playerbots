@@ -11,28 +11,28 @@ class PlayerbotAI;
 
 class QuestStrategy : public PassTroughStrategy
 {
-    public:
-        QuestStrategy(PlayerbotAI* botAI);
+public:
+    QuestStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class DefaultQuestStrategy : public QuestStrategy
 {
-    public:
-        DefaultQuestStrategy(PlayerbotAI* botAI);
+public:
+    DefaultQuestStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "quest"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "quest"; }
 };
 
 class AcceptAllQuestsStrategy : public QuestStrategy
 {
-    public:
-        AcceptAllQuestsStrategy(PlayerbotAI* botAI);
+public:
+    AcceptAllQuestsStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "accept all quests"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "accept all quests"; }
 };
 
 #endif

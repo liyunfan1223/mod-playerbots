@@ -11,21 +11,21 @@ class PlayerbotAI;
 
 class ArcaneMageStrategy : public GenericMageStrategy
 {
-    public:
-        ArcaneMageStrategy(PlayerbotAI* botAI);
+public:
+    ArcaneMageStrategy(PlayerbotAI *botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "arcane"; }
-        NextAction** getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "arcane"; }
+    NextAction **getDefaultActions() override;
 };
 
 class ArcaneMageAoeStrategy : public CombatStrategy
 {
 public:
-    ArcaneMageAoeStrategy(PlayerbotAI* ai) : CombatStrategy(ai) {}
+    ArcaneMageAoeStrategy(PlayerbotAI *ai) : CombatStrategy(ai) {}
 
 public:
-    virtual void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    virtual void InitTriggers(std::vector<TriggerNode *> &triggers) override;
     std::string const getName() override { return "arcane aoe"; }
 };
 #endif

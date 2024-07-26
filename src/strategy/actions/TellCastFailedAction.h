@@ -11,18 +11,18 @@ class PlayerbotAI;
 
 class TellSpellAction : public Action
 {
-    public:
-        TellSpellAction(PlayerbotAI* botAI) : Action(botAI, "spell") { }
+public:
+    TellSpellAction(PlayerbotAI *botAI) : Action(botAI, "spell") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class TellCastFailedAction : public Action
 {
-    public:
-        TellCastFailedAction(PlayerbotAI* botAI) : Action(botAI, "tell cast failed") { }
+public:
+    TellCastFailedAction(PlayerbotAI *botAI) : Action(botAI, "tell cast failed") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

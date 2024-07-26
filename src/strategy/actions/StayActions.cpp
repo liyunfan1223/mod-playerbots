@@ -9,10 +9,10 @@
 
 bool StayActionBase::Stay()
 {
-    AI_VALUE(LastMovement&, "last movement").Set(nullptr);
+    AI_VALUE(LastMovement &, "last movement").Set(nullptr);
 
-    //if (!urand(0, 10))
-        //botAI->PlaySound(TEXT_EMOTE_YAWN);
+    // if (!urand(0, 10))
+    // botAI->PlaySound(TEXT_EMOTE_YAWN);
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
         return false;
 

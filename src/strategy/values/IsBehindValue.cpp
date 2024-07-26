@@ -7,10 +7,9 @@
 
 bool IsBehindValue::Calculate()
 {
-    Unit* target = AI_VALUE(Unit*, qualifier);
+    Unit *target = AI_VALUE(Unit *, qualifier);
     if (!target)
         return false;
-
 
     float targetOrientation = target->GetOrientation();
     float orientation = bot->GetOrientation();

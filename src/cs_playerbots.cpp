@@ -26,47 +26,47 @@ using namespace Acore::ChatCommands;
 class playerbots_commandscript : public CommandScript
 {
 public:
-    playerbots_commandscript() : CommandScript("playerbots_commandscript") { }
+    playerbots_commandscript() : CommandScript("playerbots_commandscript") {}
 
     ChatCommandTable GetCommands() const override
     {
         static ChatCommandTable playerbotsDebugCommandTable =
-        {
-            { "bg",             HandleDebugBGCommand,         SEC_GAMEMASTER,     Console::Yes },
-        };
+            {
+                {"bg", HandleDebugBGCommand, SEC_GAMEMASTER, Console::Yes},
+            };
         static ChatCommandTable playerbotsCommandTable =
-        {
-            { "bot",            HandlePlayerbotCommand,       SEC_PLAYER,         Console::No  },
-            { "gtask",          HandleGuildTaskCommand,       SEC_GAMEMASTER,     Console::Yes },
-            { "pmon",           HandlePerfMonCommand,         SEC_GAMEMASTER,     Console::Yes },
-            { "rndbot",         HandleRandomPlayerbotCommand, SEC_GAMEMASTER,     Console::Yes },
-            { "debug",          playerbotsDebugCommandTable },
-        };
+            {
+                {"bot", HandlePlayerbotCommand, SEC_PLAYER, Console::No},
+                {"gtask", HandleGuildTaskCommand, SEC_GAMEMASTER, Console::Yes},
+                {"pmon", HandlePerfMonCommand, SEC_GAMEMASTER, Console::Yes},
+                {"rndbot", HandleRandomPlayerbotCommand, SEC_GAMEMASTER, Console::Yes},
+                {"debug", playerbotsDebugCommandTable},
+            };
 
         static ChatCommandTable commandTable =
-        {
-            { "playerbots",     playerbotsCommandTable },
-        };
+            {
+                {"playerbots", playerbotsCommandTable},
+            };
 
         return commandTable;
     }
 
-    static bool HandlePlayerbotCommand(ChatHandler* handler, char const* args)
+    static bool HandlePlayerbotCommand(ChatHandler *handler, char const *args)
     {
         return PlayerbotMgr::HandlePlayerbotMgrCommand(handler, args);
     }
 
-    static bool HandleRandomPlayerbotCommand(ChatHandler* handler, char const* args)
+    static bool HandleRandomPlayerbotCommand(ChatHandler *handler, char const *args)
     {
         return RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(handler, args);
     }
 
-    static bool HandleGuildTaskCommand(ChatHandler* handler, char const* args)
+    static bool HandleGuildTaskCommand(ChatHandler *handler, char const *args)
     {
         return GuildTaskMgr::HandleConsoleCommand(handler, args);
     }
 
-    static bool HandlePerfMonCommand(ChatHandler* handler, char const* args)
+    static bool HandlePerfMonCommand(ChatHandler *handler, char const *args)
     {
         if (!strcmp(args, "reset"))
         {
@@ -90,7 +90,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugBGCommand(ChatHandler* handler, char const* args)
+    static bool HandleDebugBGCommand(ChatHandler *handler, char const *args)
     {
         return BGTactics::HandleConsoleCommand(handler, args);
     }

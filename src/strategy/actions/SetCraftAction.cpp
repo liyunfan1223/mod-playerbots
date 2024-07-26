@@ -12,13 +12,13 @@ std::map<uint32, SkillLineAbilityEntry const*> SetCraftAction::skillSpells;
 
 bool SetCraftAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
     std::string const link = event.getParam();
 
-    CraftData& data = AI_VALUE(CraftData&, "craft");
+    CraftData &data = AI_VALUE(CraftData &, "craft");
     if (link == "reset")
     {
         data.Reset();
@@ -40,13 +40,13 @@ bool SetCraftAction::Execute(Event event)
     }
 
     uint32 itemId = *itemIds.begin();
-    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+    ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
     if (!proto)
         return false;
 
     if (skillSpells.empty())
     {
-        for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)
+        for (SkillLineAbilityEntry const *skillLine : sSkillLineAbilityStore)
         {
             skillSpells[skillLine->Spell] = skillLine;
         }
@@ -62,11 +62,11 @@ bool SetCraftAction::Execute(Event event)
         if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active)
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
             continue;
 
-        if (SkillLineAbilityEntry const* skillLine = skillSpells[spellId])
+        if (SkillLineAbilityEntry const *skillLine = skillSpells[spellId])
         {
             for (uint8 i = 0; i < 3; ++i)
             {
@@ -106,14 +106,14 @@ bool SetCraftAction::Execute(Event event)
 
 void SetCraftAction::TellCraft()
 {
-    CraftData& data = AI_VALUE(CraftData&, "craft");
+    CraftData &data = AI_VALUE(CraftData &, "craft");
     if (data.IsEmpty())
     {
         botAI->TellMaster("I will not craft anything");
         return;
     }
 
-    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(data.itemId);
+    ItemTemplate const *proto = sObjectMgr->GetItemTemplate(data.itemId);
     if (!proto)
         return;
 
@@ -126,7 +126,7 @@ void SetCraftAction::TellCraft()
         uint32 item = i->first;
         uint32 required = i->second;
 
-        if (ItemTemplate const* reagent = sObjectMgr->GetItemTemplate(item))
+        if (ItemTemplate const *reagent = sObjectMgr->GetItemTemplate(item))
         {
             if (first)
             {
@@ -149,12 +149,12 @@ void SetCraftAction::TellCraft()
     botAI->TellMaster(out.str());
 }
 
-uint32 SetCraftAction::GetCraftFee(CraftData& data)
+uint32 SetCraftAction::GetCraftFee(CraftData &data)
 {
     if (data.IsEmpty())
         return 0;
 
-    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(data.itemId);
+    ItemTemplate const *proto = sObjectMgr->GetItemTemplate(data.itemId);
     if (!proto)
         return 0;
 

@@ -17,7 +17,7 @@ bool MoveStuckTrigger::IsActive()
 
     WorldPosition botPos(bot);
 
-    LogCalculatedValue<WorldPosition>* posVal = dynamic_cast<LogCalculatedValue<WorldPosition>*>(context->GetUntypedValue("current position"));
+    LogCalculatedValue<WorldPosition> *posVal = dynamic_cast<LogCalculatedValue<WorldPosition>*>(context->GetUntypedValue("current position"));
 
     if (posVal->LastChangeDelay() > 5 * MINUTE)
     {
@@ -89,7 +89,7 @@ bool MoveLongStuckTrigger::IsActive()
         return true;
     }
 
-    LogCalculatedValue<WorldPosition>* posVal = dynamic_cast<LogCalculatedValue<WorldPosition>*>(context->GetUntypedValue("current position"));
+    LogCalculatedValue<WorldPosition> *posVal = dynamic_cast<LogCalculatedValue<WorldPosition>*>(context->GetUntypedValue("current position"));
 
     if (posVal->LastChangeDelay() > 10 * MINUTE)
     {
@@ -99,7 +99,7 @@ bool MoveLongStuckTrigger::IsActive()
         return true;
     }
 
-    MemoryCalculatedValue<uint32>* expVal = dynamic_cast<MemoryCalculatedValue<uint32>*>(context->GetUntypedValue("experience"));
+    MemoryCalculatedValue<uint32> *expVal = dynamic_cast<MemoryCalculatedValue<uint32>*>(context->GetUntypedValue("experience"));
 
     if (expVal->LastChangeDelay() < 15 * MINUTE)
         return false;
@@ -141,7 +141,7 @@ bool CombatStuckTrigger::IsActive()
 
     WorldPosition botPos(bot);
 
-    MemoryCalculatedValue<bool>* combatVal = dynamic_cast<MemoryCalculatedValue<bool>*>(context->GetUntypedValue("combat::self target"));
+    MemoryCalculatedValue<bool> *combatVal = dynamic_cast<MemoryCalculatedValue<bool>*>(context->GetUntypedValue("combat::self target"));
 
     if (combatVal->LastChangeDelay() > 5 * MINUTE)
     {
@@ -167,7 +167,7 @@ bool CombatLongStuckTrigger::IsActive()
 
     WorldPosition botPos(bot);
 
-    MemoryCalculatedValue<bool>* combatVal = dynamic_cast<MemoryCalculatedValue<bool>*>(context->GetUntypedValue("combat::self target"));
+    MemoryCalculatedValue<bool> *combatVal = dynamic_cast<MemoryCalculatedValue<bool>*>(context->GetUntypedValue("combat::self target"));
 
     if (combatVal->LastChangeDelay() > 15 * MINUTE)
     {

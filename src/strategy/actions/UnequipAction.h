@@ -13,14 +13,14 @@ class PlayerbotAI;
 
 class UnequipAction : public InventoryAction
 {
-    public:
-        UnequipAction(PlayerbotAI* botAI) : InventoryAction(botAI, "unequip") { }
+public:
+    UnequipAction(PlayerbotAI *botAI) : InventoryAction(botAI, "unequip") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        void UnequipItem(Item* item);
-        void UnequipItem(FindItemVisitor* visitor);
+private:
+    void UnequipItem(Item *item);
+    void UnequipItem(FindItemVisitor *visitor);
 };
 
 #endif

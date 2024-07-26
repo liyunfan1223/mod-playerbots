@@ -12,11 +12,12 @@
 
 bool AttackAction::Execute(Event event)
 {
-    Unit* target = GetTarget();
+    Unit *target = GetTarget();
     if (!target)
         return false;
-    
-    if (!target->IsInWorld()) {
+
+    if (!target->IsInWorld())
+    {
         return false;
     }
     return Attack(target);
@@ -24,7 +25,7 @@ bool AttackAction::Execute(Event event)
 
 bool AttackMyTargetAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
@@ -36,7 +37,7 @@ bool AttackMyTargetAction::Execute(Event event)
 
         return false;
     }
-    
+
     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({guid});
     bool result = Attack(botAI->GetUnit(guid));
     if (result)
@@ -45,7 +46,7 @@ bool AttackMyTargetAction::Execute(Event event)
     return result;
 }
 
-bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
+bool AttackAction::Attack(Unit *target, bool with_pet /*true*/)
 {
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE || bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {
@@ -104,21 +105,23 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     ObjectGuid guid = target->GetGUID();
     bot->SetSelection(target->GetGUID());
 
-    Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
+    Unit *oldTarget = context->GetValue<Unit*>("current target")->Get();
     context->GetValue<Unit*>("old target")->Set(oldTarget);
 
     context->GetValue<Unit*>("current target")->Set(target);
     context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
-    
+
     bool melee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
     bot->Attack(target, melee);
 
-    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target)) {
+    if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
+    {
         sServerFacade->SetFacingTo(bot, target);
     }
     botAI->ChangeEngine(BOT_STATE_COMBAT);
 
-    if (!bot->GetVictim()) {
+    if (!bot->GetVictim())
+    {
         return false;
     }
     /* prevent pet dead immediately in group */
@@ -143,10 +146,10 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
 
 bool AttackDuelOpponentAction::isUseful()
 {
-    return AI_VALUE(Unit*, "duel target");
+    return AI_VALUE(Unit *, "duel target");
 }
 
 bool AttackDuelOpponentAction::Execute(Event event)
 {
-    return Attack(AI_VALUE(Unit*, "duel target"));
+    return Attack(AI_VALUE(Unit *, "duel target"));
 }

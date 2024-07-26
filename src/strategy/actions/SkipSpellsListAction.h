@@ -12,13 +12,13 @@ class PlayerbotAI;
 
 class SkipSpellsListAction : public Action
 {
-    public:
-        SkipSpellsListAction(PlayerbotAI* botAI) : Action(botAI, "ss") { }
+public:
+    SkipSpellsListAction(PlayerbotAI *botAI) : Action(botAI, "ss") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        SpellIds parseIds(std::string const text);
+private:
+    SpellIds parseIds(std::string const text);
 };
 
 #endif

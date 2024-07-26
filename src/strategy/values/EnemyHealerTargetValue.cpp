@@ -6,15 +6,15 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-Unit* EnemyHealerTargetValue::Calculate()
+Unit *EnemyHealerTargetValue::Calculate()
 {
     std::string const spell = qualifier;
 
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
-    Unit* target = botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
+    Unit *target = botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
     for (ObjectGuid const guid : attackers)
     {
-        Unit* unit = botAI->GetUnit(guid);
+        Unit *unit = botAI->GetUnit(guid);
         if (!unit || unit == target)
             continue;
 
@@ -24,7 +24,7 @@ Unit* EnemyHealerTargetValue::Calculate()
         if (!botAI->IsInterruptableSpellCasting(unit, spell))
             continue;
 
-        Spell* spell = unit->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        Spell *spell = unit->GetCurrentSpell(CURRENT_GENERIC_SPELL);
         if (spell && spell->m_spellInfo->IsPositive())
             return unit;
 

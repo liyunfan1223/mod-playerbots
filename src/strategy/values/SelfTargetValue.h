@@ -12,10 +12,10 @@ class Unit;
 
 class SelfTargetValue : public UnitCalculatedValue
 {
-	public:
-        SelfTargetValue(PlayerbotAI* botAI, std::string const name = "self target") : UnitCalculatedValue(botAI, name) { }
+public:
+        SelfTargetValue(PlayerbotAI *botAI, std::string const name = "self target") : UnitCalculatedValue(botAI, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 #endif

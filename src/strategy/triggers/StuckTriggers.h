@@ -9,34 +9,34 @@
 
 class MoveStuckTrigger : public Trigger
 {
-    public:
-        MoveStuckTrigger(PlayerbotAI* botAI) : Trigger(botAI, "move stuck", 5) { }
+public:
+    MoveStuckTrigger(PlayerbotAI *botAI) : Trigger(botAI, "move stuck", 5) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class MoveLongStuckTrigger : public Trigger
 {
-    public:
-        MoveLongStuckTrigger(PlayerbotAI* botAI) : Trigger(botAI, "move long stuck", 5) { }
+public:
+    MoveLongStuckTrigger(PlayerbotAI *botAI) : Trigger(botAI, "move long stuck", 5) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class CombatStuckTrigger : public Trigger
 {
-    public:
-        CombatStuckTrigger(PlayerbotAI* botAI) : Trigger(botAI, "combat stuck", 5) { }
+public:
+    CombatStuckTrigger(PlayerbotAI *botAI) : Trigger(botAI, "combat stuck", 5) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class CombatLongStuckTrigger : public Trigger
 {
-    public:
-        CombatLongStuckTrigger(PlayerbotAI* botAI) : Trigger(botAI, "combat long stuck", 5) { }
+public:
+    CombatLongStuckTrigger(PlayerbotAI *botAI) : Trigger(botAI, "combat long stuck", 5) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 #endif

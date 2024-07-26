@@ -11,40 +11,40 @@ class PlayerbotAI;
 
 class CastComboAction : public CastMeleeSpellAction
 {
-	public:
-	    CastComboAction(PlayerbotAI* botAI, std::string const name) : CastMeleeSpellAction(botAI, name) { }
+public:
+    CastComboAction(PlayerbotAI *botAI, std::string const name) : CastMeleeSpellAction(botAI, name) {}
 
-        bool isUseful() override;
+    bool isUseful() override;
 };
 
 class CastSinisterStrikeAction : public CastComboAction
 {
-	public:
-		CastSinisterStrikeAction(PlayerbotAI* botAI) : CastComboAction(botAI, "sinister strike") { }
+public:
+    CastSinisterStrikeAction(PlayerbotAI *botAI) : CastComboAction(botAI, "sinister strike") {}
 };
 
 class CastMutilateAction : public CastComboAction
 {
-    public:
-        CastMutilateAction(PlayerbotAI* botAI) : CastComboAction(botAI, "mutilate") { }
+public:
+    CastMutilateAction(PlayerbotAI *botAI) : CastComboAction(botAI, "mutilate") {}
 };
 
 class CastRiposteAction : public CastComboAction
 {
-    public:
-        CastRiposteAction(PlayerbotAI* botAI) : CastComboAction(botAI, "riposte") { }
+public:
+    CastRiposteAction(PlayerbotAI *botAI) : CastComboAction(botAI, "riposte") {}
 };
 
 class CastGougeAction : public CastComboAction
 {
-	public:
-		CastGougeAction(PlayerbotAI* botAI) : CastComboAction(botAI, "gouge") { }
+public:
+    CastGougeAction(PlayerbotAI *botAI) : CastComboAction(botAI, "gouge") {}
 };
 
 class CastBackstabAction : public CastComboAction
 {
-    public:
-        CastBackstabAction(PlayerbotAI* botAI) : CastComboAction(botAI, "backstab") { }
+public:
+    CastBackstabAction(PlayerbotAI *botAI) : CastComboAction(botAI, "backstab") {}
 };
 
 #endif

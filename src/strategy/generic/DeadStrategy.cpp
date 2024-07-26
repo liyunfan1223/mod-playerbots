@@ -5,7 +5,7 @@
 #include "DeadStrategy.h"
 #include "Playerbots.h"
 
-void DeadStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void DeadStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     PassTroughStrategy::InitTriggers(triggers);
 
@@ -18,6 +18,6 @@ void DeadStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("location stuck", NextAction::array(0, new NextAction("repop", relevance + 1), nullptr)));
 }
 
-DeadStrategy::DeadStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
+DeadStrategy::DeadStrategy(PlayerbotAI *botAI) : PassTroughStrategy(botAI)
 {
 }

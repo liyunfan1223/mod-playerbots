@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class GoAction : public MovementAction
 {
-	public:
-		GoAction(PlayerbotAI* botAI) : MovementAction(botAI, "Go") { }
+public:
+	GoAction(PlayerbotAI *botAI) : MovementAction(botAI, "Go") {}
 
-		bool Execute(Event event) override;
+	bool Execute(Event event) override;
 };
 
 #endif

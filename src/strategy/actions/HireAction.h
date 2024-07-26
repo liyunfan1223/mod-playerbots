@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class HireAction : public Action
 {
-    public:
-        HireAction(PlayerbotAI* botAI) : Action(botAI, "hire") { }
+public:
+    HireAction(PlayerbotAI *botAI) : Action(botAI, "hire") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

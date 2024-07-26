@@ -12,10 +12,10 @@ class Unit;
 
 class LeastHpTargetValue : public TargetValue
 {
-	public:
-        LeastHpTargetValue(PlayerbotAI* botAI, std::string const name = "least hp target") : TargetValue(botAI, name) { }
+public:
+        LeastHpTargetValue(PlayerbotAI *botAI, std::string const name = "least hp target") : TargetValue(botAI, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 #endif

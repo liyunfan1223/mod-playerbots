@@ -11,26 +11,26 @@ class PlayerbotAI;
 
 class PetitionTurnInTrigger : public Trigger
 {
-    public:
-        PetitionTurnInTrigger(PlayerbotAI* botAI) : Trigger(botAI) { }
+public:
+    PetitionTurnInTrigger(PlayerbotAI *botAI) : Trigger(botAI) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class BuyTabardTrigger : public Trigger
 {
-    public:
-        BuyTabardTrigger(PlayerbotAI* botAI) : Trigger(botAI) { }
+public:
+    BuyTabardTrigger(PlayerbotAI *botAI) : Trigger(botAI) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class LeaveLargeGuildTrigger : public Trigger
 {
-    public:
-        LeaveLargeGuildTrigger(PlayerbotAI* botAI) : Trigger(botAI) { }
+public:
+    LeaveLargeGuildTrigger(PlayerbotAI *botAI) : Trigger(botAI) {}
 
-        bool IsActive();
+    bool IsActive();
 };
 
 #endif

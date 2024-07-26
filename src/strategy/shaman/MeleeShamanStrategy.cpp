@@ -7,63 +7,63 @@
 
 class MeleeShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-    public:
-        MeleeShamanStrategyActionNodeFactory()
-        {
-            creators["stormstrike"] = &stormstrike;
-            creators["lava lash"] = &lava_lash;
-            creators["magma totem"] = &magma_totem;
-        }
+public:
+    MeleeShamanStrategyActionNodeFactory()
+    {
+        creators["stormstrike"] = &stormstrike;
+        creators["lava lash"] = &lava_lash;
+        creators["magma totem"] = &magma_totem;
+    }
 
-    private:
-        static ActionNode* stormstrike([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("stormstrike",
-                /*P*/ nullptr,
-                // /*A*/ NextAction::array(0, new NextAction("lava lash"), nullptr),
-                nullptr,
-                /*C*/ nullptr);
-        }
+private:
+    static ActionNode *stormstrike([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("stormstrike",
+                              /*P*/ nullptr,
+                              // /*A*/ NextAction::array(0, new NextAction("lava lash"), nullptr),
+                              nullptr,
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* lava_lash([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("lava lash",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("melee"), nullptr),
-                /*C*/ nullptr);
-        }
+    static ActionNode *lava_lash([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("lava lash",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("melee"), nullptr),
+                              /*C*/ nullptr);
+    }
 
-        static ActionNode* magma_totem([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("magma totem",
-                /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("searing totem"), NULL),
-                /*C*/ NULL);
-        }
+    static ActionNode *magma_totem([[maybe_unused]] PlayerbotAI *botAI)
+    {
+        return new ActionNode("magma totem",
+                              /*P*/ NULL,
+                              /*A*/ NextAction::array(0, new NextAction("searing totem"), NULL),
+                              /*C*/ NULL);
+    }
 };
 
-MeleeShamanStrategy::MeleeShamanStrategy(PlayerbotAI* botAI) : GenericShamanStrategy(botAI)
+MeleeShamanStrategy::MeleeShamanStrategy(PlayerbotAI *botAI) : GenericShamanStrategy(botAI)
 {
     actionNodeFactories.Add(new MeleeShamanStrategyActionNodeFactory());
 }
 
-NextAction** MeleeShamanStrategy::getDefaultActions()
+NextAction **MeleeShamanStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
-        new NextAction("stormstrike", ACTION_DEFAULT + 0.5f), 
-        new NextAction("earth shock", ACTION_DEFAULT + 0.4f), 
-        new NextAction("feral spirit", ACTION_DEFAULT + 0.3f),
-        new NextAction("fire nova", ACTION_DEFAULT + 0.2f),
-        new NextAction("lava lash", ACTION_DEFAULT + 0.1f), 
-        new NextAction("melee", ACTION_DEFAULT), 
-        NULL);
+    return NextAction::array(0,
+                             new NextAction("stormstrike", ACTION_DEFAULT + 0.5f),
+                             new NextAction("earth shock", ACTION_DEFAULT + 0.4f),
+                             new NextAction("feral spirit", ACTION_DEFAULT + 0.3f),
+                             new NextAction("fire nova", ACTION_DEFAULT + 0.2f),
+                             new NextAction("lava lash", ACTION_DEFAULT + 0.1f),
+                             new NextAction("melee", ACTION_DEFAULT),
+                             NULL);
 }
 
-void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    //triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
     triggers.push_back(new TriggerNode("main hand weapon no imbue", NextAction::array(0, new NextAction("windfury weapon", 22.0f), nullptr)));
     triggers.push_back(new TriggerNode("off hand weapon no imbue", NextAction::array(0, new NextAction("flametongue weapon", 21.0f), nullptr)));
     // triggers.push_back(new TriggerNode("searing totem", NextAction::array(0, new NextAction("reach melee", 22.0f), new NextAction("searing totem", 22.0f), nullptr)));
@@ -78,15 +78,15 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "no fire totem",
-        NextAction::array(0, 
-        new NextAction("reach melee", 23.0f), 
-        new NextAction("magma totem", 22.0f), nullptr)));
+        NextAction::array(0,
+                          new NextAction("reach melee", 23.0f),
+                          new NextAction("magma totem", 22.0f), nullptr)));
 
-    triggers.push_back(new TriggerNode("fire elemental totem", 
-        NextAction::array(0, 
-            new NextAction("reach melee", 33.0f), 
-            new NextAction("fire elemental totem", 32.0f), 
-            nullptr)));
+    triggers.push_back(new TriggerNode("fire elemental totem",
+                                       NextAction::array(0,
+                                                         new NextAction("reach melee", 33.0f),
+                                                         new NextAction("fire elemental totem", 32.0f),
+                                                         nullptr)));
 
     triggers.push_back(new TriggerNode(
         "no air totem",
@@ -97,9 +97,9 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("shamanistic rage", 23.0f), nullptr)));
 }
 
-void MeleeAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void MeleeAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
-    
+
     // triggers.push_back(new TriggerNode("magma totem", NextAction::array(0, new NextAction("magma totem", 26.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("fire nova", 25.0f), nullptr)));
 }

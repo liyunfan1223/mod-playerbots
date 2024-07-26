@@ -22,14 +22,14 @@ bool CastAspectOfTheCheetahAction::isUseful()
     return !botAI->HasAnyAuraOf(GetTarget(), "aspect of the cheetah", "aspect of the pack", nullptr);
 }
 
-Value<Unit*>* CastFreezingTrap::GetTargetValue()
+Value<Unit*> *CastFreezingTrap::GetTargetValue()
 {
     return context->GetValue<Unit*>("cc target", "freezing trap");
 }
 
 bool FeedPetAction::Execute(Event event)
 {
-    if (Pet* pet = bot->GetPet())
+    if (Pet *pet = bot->GetPet())
         if (pet->getPetType() == HUNTER_PET && pet->GetHappinessState() != HAPPY)
             pet->SetPower(POWER_HAPPINESS, pet->GetMaxPower(Powers(POWER_HAPPINESS)));
 
@@ -40,14 +40,15 @@ bool CastAutoShotAction::isUseful()
 {
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))
         return false;
-    
-    if (AI_VALUE(Unit*, "current target") && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)->m_targets.GetUnitTargetGUID() == AI_VALUE(Unit*, "current target")->GetGUID()) {
+
+    if (AI_VALUE(Unit *, "current target") && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)->m_targets.GetUnitTargetGUID() == AI_VALUE(Unit *, "current target")->GetGUID())
+    {
         return false;
     }
     return AI_VALUE(uint32, "active spell") != AI_VALUE2(uint32, "spell id", getName());
 }
 
-Value<Unit*>* CastScareBeastCcAction::GetTargetValue()
+Value<Unit*> *CastScareBeastCcAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("cc target", "scare beast");
 }
@@ -62,7 +63,7 @@ bool CastWingClipAction::isUseful()
     return CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget());
 }
 
-NextAction** CastWingClipAction::getPrerequisites()
+NextAction **CastWingClipAction::getPrerequisites()
 {
     return nullptr;
 }

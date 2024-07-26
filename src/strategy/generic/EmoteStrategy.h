@@ -11,11 +11,11 @@ class PlayerbotAI;
 
 class EmoteStrategy : public Strategy
 {
-    public:
-        EmoteStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    EmoteStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "emote"; }
+    void InitTriggers(std::vector<TriggerNode *> &triggers) override;
+    std::string const getName() override { return "emote"; }
 };
 
 #endif

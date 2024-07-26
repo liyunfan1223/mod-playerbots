@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-void AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
+void AcceptAllQuestsAction::ProcessQuest(Quest const *quest, Object *questGiver)
 {
     AcceptQuest(quest, questGiver->GetGUID());
     bot->PlayDistanceSound(620);
@@ -14,11 +14,11 @@ void AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 
 bool AcceptQuestAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player *master = GetMaster();
     if (!master)
         return false;
 
-    Player* bot = botAI->GetBot();
+    Player *bot = botAI->GetBot();
     ObjectGuid guid;
     uint32 quest = 0;
 
@@ -31,7 +31,7 @@ bool AcceptQuestAction::Execute(Event event)
         GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
         for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
         {
-            Unit* unit = botAI->GetUnit(*i);
+            Unit *unit = botAI->GetUnit(*i);
             if (unit && quest && unit->hasQuest(quest))
             {
                 guid = unit->GetGUID();
@@ -45,7 +45,7 @@ bool AcceptQuestAction::Execute(Event event)
         GuidVector gos = AI_VALUE(GuidVector, "nearest game objects");
         for (GuidVector::iterator i = gos.begin(); i != gos.end(); i++)
         {
-            GameObject* go = botAI->GetGameObject(*i);
+            GameObject *go = botAI->GetGameObject(*i);
             if (go && quest && go->hasQuest(quest))
             {
                 guid = go->GetGUID();
@@ -58,7 +58,7 @@ bool AcceptQuestAction::Execute(Event event)
     }
     else
     {
-        WorldPacket& p = event.getPacket();
+        WorldPacket &p = event.getPacket();
         p.rpos(0);
         p >> guid >> quest;
     }
@@ -66,7 +66,7 @@ bool AcceptQuestAction::Execute(Event event)
     if (!quest || !guid)
         return false;
 
-    Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest);
+    Quest const *qInfo = sObjectMgr->GetQuestTemplate(quest);
     if (!qInfo)
         return false;
 
@@ -75,15 +75,15 @@ bool AcceptQuestAction::Execute(Event event)
 
 bool AcceptQuestShareAction::Execute(Event event)
 {
-    Player* master = GetMaster();
-    Player* bot = botAI->GetBot();
+    Player *master = GetMaster();
+    Player *bot = botAI->GetBot();
 
-    WorldPacket& p = event.getPacket();
+    WorldPacket &p = event.getPacket();
     p.rpos(0);
     uint32 quest;
     p >> quest;
 
-    Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest);
+    Quest const *qInfo = sObjectMgr->GetQuestTemplate(quest);
     if (!qInfo || !bot->GetDivider())
         return false;
 
@@ -112,7 +112,7 @@ bool AcceptQuestShareAction::Execute(Event event)
         bot->SetDivider(ObjectGuid::Empty);
     }
 
-    if (bot->CanAddQuest( qInfo, false))
+    if (bot->CanAddQuest(qInfo, false))
     {
         bot->AddQuest(qInfo, master);
 
@@ -125,7 +125,7 @@ bool AcceptQuestShareAction::Execute(Event event)
 
         if (qInfo->GetSrcSpell() > 0)
         {
-            bot->CastSpell( bot, qInfo->GetSrcSpell(), true);
+            bot->CastSpell(bot, qInfo->GetSrcSpell(), true);
         }
 
         botAI->TellMaster("Quest accepted");

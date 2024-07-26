@@ -40,31 +40,31 @@ bool RtiAction::Execute(Event event)
     return true;
 }
 
-void RtiAction::AppendRti(std::ostringstream& out, std::string const type)
+void RtiAction::AppendRti(std::ostringstream &out, std::string const type)
 {
     out << AI_VALUE(std::string, type);
 
     std::ostringstream n;
     n << type << " target";
 
-    if (Unit* target = AI_VALUE(Unit*, n.str()))
+    if (Unit *target = AI_VALUE(Unit *, n.str()))
         out << " (" << target->GetName() << ")";
 }
 
 bool MarkRtiAction::Execute(Event event)
 {
-    Group* group = bot->GetGroup();
+    Group *group = bot->GetGroup();
     if (!group)
         return false;
 
     if (bot->InBattleground())
         return false;
 
-    Unit* target = nullptr;
+    Unit *target = nullptr;
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
     for (ObjectGuid const guid : attackers)
     {
-        Unit* unit = botAI->GetUnit(guid);
+        Unit *unit = botAI->GetUnit(guid);
         if (!unit)
             continue;
 

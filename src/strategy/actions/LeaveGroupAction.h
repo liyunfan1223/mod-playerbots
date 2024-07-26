@@ -12,37 +12,37 @@ class PlayerbotAI;
 
 class LeaveGroupAction : public Action
 {
-    public:
-        LeaveGroupAction(PlayerbotAI* botAI, std::string const name = "leave") : Action(botAI, name) { }
+public:
+    LeaveGroupAction(PlayerbotAI *botAI, std::string const name = "leave") : Action(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-        virtual bool Leave(Player* player);
+    virtual bool Leave(Player *player);
 };
 
 class PartyCommandAction : public LeaveGroupAction
 {
-    public:
-        PartyCommandAction(PlayerbotAI* botAI) : LeaveGroupAction(botAI, "party command") { }
+public:
+    PartyCommandAction(PlayerbotAI *botAI) : LeaveGroupAction(botAI, "party command") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class UninviteAction : public LeaveGroupAction
 {
-    public:
-        UninviteAction(PlayerbotAI* botAI) : LeaveGroupAction(botAI, "uninvite") { }
+public:
+    UninviteAction(PlayerbotAI *botAI) : LeaveGroupAction(botAI, "uninvite") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class LeaveFarAwayAction : public LeaveGroupAction
 {
-    public:
-        LeaveFarAwayAction(PlayerbotAI* botAI) : LeaveGroupAction(botAI, "leave far away") { }
+public:
+    LeaveFarAwayAction(PlayerbotAI *botAI) : LeaveGroupAction(botAI, "leave far away") {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 #endif

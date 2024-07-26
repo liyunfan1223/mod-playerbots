@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class TankTargetValue : public TargetValue
 {
-	public:
-        TankTargetValue(PlayerbotAI* botAI, std::string const name = "tank target") : TargetValue(botAI, name) { }
+public:
+        TankTargetValue(PlayerbotAI *botAI, std::string const name = "tank target") : TargetValue(botAI, name) {}
 
-        Unit* Calculate() override;
+        Unit *Calculate() override;
 };
 
 #endif

@@ -13,21 +13,21 @@ class Unit;
 
 class PartyMemberToHeal : public PartyMemberValue
 {
-	public:
-        PartyMemberToHeal(PlayerbotAI* botAI, std::string const name = "party member to heal") : PartyMemberValue(botAI, name) { }
+public:
+    PartyMemberToHeal(PlayerbotAI *botAI, std::string const name = "party member to heal") : PartyMemberValue(botAI, name) {}
 
-    protected:
-        Unit* Calculate() override;
-        bool Check(Unit* player) override;
+protected:
+    Unit *Calculate() override;
+    bool Check(Unit *player) override;
 };
 
 class PartyMemberToProtect : public PartyMemberValue
 {
-    public:
-        PartyMemberToProtect(PlayerbotAI* botAI, std::string const name = "party member to protect") : PartyMemberValue(botAI, name) { }
+public:
+    PartyMemberToProtect(PlayerbotAI *botAI, std::string const name = "party member to protect") : PartyMemberValue(botAI, name) {}
 
-    protected:
-        Unit* Calculate() override;
+protected:
+    Unit *Calculate() override;
 };
 
 #endif

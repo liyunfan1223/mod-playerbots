@@ -12,7 +12,7 @@ bool RepairAllAction::Execute(Event event)
     GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
     for (ObjectGuid const guid : npcs)
     {
-        Creature* unit = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_REPAIR);
+        Creature *unit = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_REPAIR);
         if (!unit)
             continue;
 
@@ -28,7 +28,7 @@ bool RepairAllAction::Execute(Event event)
             bot->SetMoney(10000000);
         }
 
-        //Repair weapons first.
+        // Repair weapons first.
         uint32 totalCost = bot->DurabilityRepair(EQUIPMENT_SLOT_MAINHAND, true, discountMod, false);
         totalCost += bot->DurabilityRepair(EQUIPMENT_SLOT_RANGED, true, discountMod, false);
         totalCost += bot->DurabilityRepair(EQUIPMENT_SLOT_OFFHAND, true, discountMod, false);
@@ -46,7 +46,7 @@ bool RepairAllAction::Execute(Event event)
             out << "Repair: " << chat->formatMoney(totalCost) << " (" << unit->GetName() << ")";
             botAI->TellMasterNoFacing(out.str());
 
-           bot->PlayDistanceSound(1116);
+            bot->PlayDistanceSound(1116);
         }
 
         context->GetValue<uint32>("death count")->Set(0);

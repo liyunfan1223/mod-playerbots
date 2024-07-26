@@ -11,10 +11,10 @@ class PlayerbotAI;
 
 class WtsAction : public InventoryAction
 {
-    public:
-        WtsAction(PlayerbotAI* botAI) : InventoryAction(botAI, "wts") { }
+public:
+    WtsAction(PlayerbotAI *botAI) : InventoryAction(botAI, "wts") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

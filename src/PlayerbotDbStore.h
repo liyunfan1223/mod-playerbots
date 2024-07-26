@@ -13,22 +13,22 @@ class PlayerbotAI;
 
 class PlayerbotDbStore
 {
-    public:
-        PlayerbotDbStore() { }
-        virtual ~PlayerbotDbStore() { }
-        static PlayerbotDbStore* instance()
-        {
-            static PlayerbotDbStore instance;
-            return &instance;
-        }
+public:
+    PlayerbotDbStore() {}
+    virtual ~PlayerbotDbStore() {}
+    static PlayerbotDbStore *instance()
+    {
+        static PlayerbotDbStore instance;
+        return &instance;
+    }
 
-        void Save(PlayerbotAI* botAI);
-        void Load(PlayerbotAI* botAI);
-        void Reset(PlayerbotAI* botAI);
+    void Save(PlayerbotAI *botAI);
+    void Load(PlayerbotAI *botAI);
+    void Reset(PlayerbotAI *botAI);
 
-    private:
-        void SaveValue(uint32 guid, std::string const key, std::string const value);
-        std::string const FormatStrategies(std::string const type, std::vector<std::string> strategies);
+private:
+    void SaveValue(uint32 guid, std::string const key, std::string const value);
+    std::string const FormatStrategies(std::string const type, std::vector<std::string> strategies);
 };
 
 #define sPlayerbotDbStore PlayerbotDbStore::instance()

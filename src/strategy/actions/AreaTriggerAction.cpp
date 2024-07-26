@@ -10,7 +10,7 @@
 
 bool ReachAreaTriggerAction::Execute(Event event)
 {
-    if (botAI->IsRealPlayer()) //Do not trigger own area trigger.
+    if (botAI->IsRealPlayer()) // Do not trigger own area trigger.
         return false;
 
     uint32 triggerId;
@@ -18,7 +18,7 @@ bool ReachAreaTriggerAction::Execute(Event event)
     p.rpos(0);
     p >> triggerId;
 
-    AreaTrigger const* at = sObjectMgr->GetAreaTrigger(triggerId);
+    AreaTrigger const *at = sObjectMgr->GetAreaTrigger(triggerId);
     if (!at)
         return false;
 
@@ -44,14 +44,14 @@ bool ReachAreaTriggerAction::Execute(Event event)
     float delay = 1000.0f * distance / bot->GetSpeed(MOVE_RUN) + sPlayerbotAIConfig->reactDelay;
     botAI->TellError("Wait for me");
     botAI->SetNextCheckDelay(delay);
-    context->GetValue<LastMovement&>("last area trigger")->Get().lastAreaTrigger = triggerId;
+    context->GetValue<LastMovement &>("last area trigger")->Get().lastAreaTrigger = triggerId;
 
     return true;
 }
 
 bool AreaTriggerAction::Execute(Event event)
 {
-    LastMovement& movement = context->GetValue<LastMovement&>("last area trigger")->Get();
+    LastMovement &movement = context->GetValue<LastMovement &>("last area trigger")->Get();
 
     uint32 triggerId = movement.lastAreaTrigger;
     movement.lastAreaTrigger = 0;

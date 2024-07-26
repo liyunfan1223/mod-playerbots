@@ -13,7 +13,7 @@ bool SecurityCheckAction::isUseful()
 
 bool SecurityCheckAction::Execute(Event event)
 {
-    if (Group* group = bot->GetGroup())
+    if (Group *group = bot->GetGroup())
     {
         LootMethod method = group->GetLootMethod();
         ItemQualities threshold = group->GetLootThreshold();

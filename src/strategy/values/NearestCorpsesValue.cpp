@@ -10,27 +10,27 @@
 
 class AnyDeadUnitInObjectRangeCheck
 {
-    public:
-        AnyDeadUnitInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) { }
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(Unit* u)
-        {
-            return !u->IsAlive();
-        }
+public:
+    AnyDeadUnitInObjectRangeCheck(WorldObject const *obj, float range) : i_obj(obj), i_range(range) {}
+    WorldObject const &GetFocusObject() const { return *i_obj; }
+    bool operator()(Unit *u)
+    {
+        return !u->IsAlive();
+    }
 
-    private:
-        WorldObject const* i_obj;
-        float i_range;
+private:
+    WorldObject const *i_obj;
+    float i_range;
 };
 
-void NearestCorpsesValue::FindUnits(std::list<Unit*>& targets)
+void NearestCorpsesValue::FindUnits(std::list<Unit*> &targets)
 {
     AnyDeadUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<AnyDeadUnitInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitAllObjects(bot, searcher, range);
 }
 
-bool NearestCorpsesValue::AcceptUnit(Unit* unit)
+bool NearestCorpsesValue::AcceptUnit(Unit *unit)
 {
     return true;
 }

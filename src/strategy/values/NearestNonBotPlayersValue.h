@@ -12,12 +12,12 @@ class PlayerbotAI;
 
 class NearestNonBotPlayersValue : public NearestUnitsValue
 {
-	public:
-        NearestNonBotPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->grindDistance) : NearestUnitsValue(botAI, "nearest non bot players", range, true) { }
+public:
+    NearestNonBotPlayersValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->grindDistance) : NearestUnitsValue(botAI, "nearest non bot players", range, true) {}
 
-    protected:
-        void FindUnits(std::list<Unit*>& targets) override;
-        bool AcceptUnit(Unit* unit) override;
+protected:
+    void FindUnits(std::list<Unit *> &targets) override;
+    bool AcceptUnit(Unit *unit) override;
 };
 
 #endif

@@ -12,13 +12,13 @@
 
 bool FollowAction::Execute(Event event)
 {
-    Formation* formation = AI_VALUE(Formation*, "formation");
+    Formation *formation = AI_VALUE(Formation *, "formation");
     std::string const target = formation->GetTargetName();
 
     bool moved = false;
     if (!target.empty())
     {
-        moved = Follow(AI_VALUE(Unit*, target));
+        moved = Follow(AI_VALUE(Unit *, target));
     }
     else
     {
@@ -29,9 +29,9 @@ bool FollowAction::Execute(Event event)
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
 
-    if (Pet* pet = bot->GetPet())
+    if (Pet *pet = bot->GetPet())
     {
-        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
+        if (CreatureAI *creatureAI = ((Creature *)pet)->AI())
         {
             pet->SetReactState(REACT_PASSIVE);
             pet->GetCharmInfo()->SetIsCommandFollow(true);
@@ -44,28 +44,30 @@ bool FollowAction::Execute(Event event)
             // pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
     }
-    //if (moved)
-        //botAI->SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+    // if (moved)
+    // botAI->SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
 
     return moved;
 }
 
 bool FollowAction::isUseful()
 {
-    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr)
+    {
         return false;
     }
-    Formation* formation = AI_VALUE(Formation*, "formation");
-    if (!formation) {
+    Formation *formation = AI_VALUE(Formation *, "formation");
+    if (!formation)
+    {
         return false;
     }
     std::string const target = formation->GetTargetName();
 
-    Unit* fTarget = nullptr;
+    Unit *fTarget = nullptr;
     if (!target.empty())
-        fTarget = AI_VALUE(Unit*, target);
+        fTarget = AI_VALUE(Unit *, target);
     else
-        fTarget = AI_VALUE(Unit*, "master target");
+        fTarget = AI_VALUE(Unit *, "master target");
 
     if (fTarget)
     {
@@ -96,7 +98,7 @@ bool FollowAction::isUseful()
     return sServerFacade->IsDistanceGreaterThan(distance, formation->GetMaxDistance());
 }
 
-bool FollowAction::CanDeadFollow(Unit* target)
+bool FollowAction::CanDeadFollow(Unit *target)
 {
     // Move to corpse when dead and player is alive or not a ghost.
     if (!bot->IsAlive() && (target->IsAlive() || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
@@ -107,11 +109,11 @@ bool FollowAction::CanDeadFollow(Unit* target)
 
 bool FleeToMasterAction::Execute(Event event)
 {
-    Unit* fTarget = AI_VALUE(Unit*, "master target");
+    Unit *fTarget = AI_VALUE(Unit *, "master target");
     bool canFollow = Follow(fTarget);
     if (!canFollow)
     {
-        //botAI->SetNextCheckDelay(5000);
+        // botAI->SetNextCheckDelay(5000);
         return false;
     }
 
@@ -129,9 +131,8 @@ bool FleeToMasterAction::Execute(Event event)
         if (!urand(0, 10))
             botAI->TellMaster("I heading to your position.");
     }
-    else
-        if (!urand(0,20))
-            botAI->TellMaster("I am traveling to your position.");
+    else if (!urand(0, 20))
+        botAI->TellMaster("I am traveling to your position.");
 
     botAI->SetNextCheckDelay(3000);
 
@@ -146,14 +147,14 @@ bool FleeToMasterAction::isUseful()
     if (botAI->GetGroupMaster() == bot)
         return false;
 
-    Unit* target = AI_VALUE(Unit*, "current target");
+    Unit *target = AI_VALUE(Unit *, "current target");
     if (target && botAI->GetGroupMaster()->GetTarget() == target->GetGUID())
         return false;
 
     if (!botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))
         return false;
 
-    Unit* fTarget = AI_VALUE(Unit*, "master target");
+    Unit *fTarget = AI_VALUE(Unit *, "master target");
 
     if (!CanDeadFollow(fTarget))
         return false;

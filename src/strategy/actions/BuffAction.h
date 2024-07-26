@@ -11,13 +11,13 @@ class PlayerbotAI;
 
 class BuffAction : public InventoryAction
 {
-    public:
-        BuffAction(PlayerbotAI* botAI) : InventoryAction(botAI, "buff") { }
+public:
+    BuffAction(PlayerbotAI *botAI) : InventoryAction(botAI, "buff") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        void TellHeader(uint32 subClass);
+private:
+    void TellHeader(uint32 subClass);
 };
 
 #endif
