@@ -336,11 +336,11 @@ std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count
     char color[32];
     sprintf(color, "%x", ItemQualityColors[proto->Quality]);
 
-    const std::string &name = sObjectMgr->GetItemLocale(proto->ItemId)->Name[sWorld->GetDefaultDbcLocale()];
+    // const std::string &name = sObjectMgr->GetItemLocale(proto->ItemId)->Name[sWorld->GetDefaultDbcLocale()];
 
     std::ostringstream out;
     out << "|c" << color << "|Hitem:" << proto->ItemId
-        << ":0:0:0:0:0:0:0" << "|h[" << name
+        << ":0:0:0:0:0:0:0" << "|h[" << proto->Name1
         << "]|h|r";
 
     if (count > 1)
