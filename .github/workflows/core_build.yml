@@ -50,13 +50,12 @@ jobs:
           path: 'modules/mod-playerbots'
       
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          path: |
-            /var/cache/apt
-            /var/lib/apt
-          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
+          path: ${{ github.workspace }}/var/ccache
+          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ matrix.c_compiler }}:${{ github.sha }}
           restore-keys: |
+            ccache:${{ matrix.os }}:${{ github.ref }}:${{ matrix.c_compiler }}
             ccache:${{ matrix.os }}:${{ github.ref }}
             ccache:${{ matrix.os }}
 
