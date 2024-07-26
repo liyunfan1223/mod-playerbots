@@ -58,8 +58,6 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("attackers", NextAction::array(0, new NextAction("tell attackers", relevance), nullptr)));
     triggers.push_back(new TriggerNode("target", NextAction::array(0, new NextAction("tell target", relevance), nullptr)));
     triggers.push_back(new TriggerNode("ready", NextAction::array(0, new NextAction("ready check", relevance), nullptr)));
-    triggers.push_back(new TriggerNode("naxx", NextAction::array(0, new NextAction("naxx chat shortcut", relevance), NULL)));
-    triggers.push_back(new TriggerNode("bwl", NextAction::array(0, new NextAction("bwl chat shortcut", relevance), NULL)));
     triggers.push_back(new TriggerNode("dps", NextAction::array(0, new NextAction("tell expected dps", relevance), NULL)));
     triggers.push_back(new TriggerNode("disperse", NextAction::array(0, new NextAction("disperse set", relevance), NULL)));
 }
