@@ -57,7 +57,6 @@
 #include "XpGainAction.h"
 #include "VehicleActions.h"
 #include "WorldBuffAction.h"
-#include "RaidNaxxActions.h"
 #include "AutoTeleportForLevelAction.h"
 
 class PlayerbotAI;
