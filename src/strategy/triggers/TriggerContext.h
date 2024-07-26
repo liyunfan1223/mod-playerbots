@@ -16,7 +16,6 @@
 #include "StuckTriggers.h"
 #include "TravelTriggers.h"
 #include "NamedObjectContext.h"
-#include "RaidNaxxTriggers.h"
 
 class PlayerbotAI;
 
