@@ -233,4 +233,3 @@ INSERT INTO `playerbots_speech` VALUES
 (NULL, 'no ammo', 'That\'s it! No <ammo>!', 'say'),
 (NULL, 'no ammo', 'And you have my bow... Oops, no <ammo>!', 'say'),
 (NULL, 'no ammo', 'Need ammo!', 'yell');
-
