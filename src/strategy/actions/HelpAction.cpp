@@ -27,9 +27,9 @@ bool HelpAction::Execute(Event event)
 void HelpAction::TellChatCommands()
 {
     std::ostringstream out;
-    out << "Whisper any of: ";
-    out << CombineSupported(chatContext->supports());
-    out << ", [item], [quest] or [object] link";
+    out << "|cffff00ffGreetings!!! ";
+    out << "|cffff00ffNeed help? type .solo ";
+    out << "|cffff00ffPlease donate, support and becomes powerful! xD ";
     botAI->TellError(out.str());
 }
 
