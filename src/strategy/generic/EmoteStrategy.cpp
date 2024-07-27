@@ -22,7 +22,7 @@ void EmoteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     }
 
     if (sPlayerbotAIConfig->randomBotSuggestDungeons)
-        triggers.push_back(new TriggerNode("random", NextAction::array(0, new NextAction("suggest dungeon", 1.0f), nullptr)));
+        triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("suggest dungeon", 1.0f), nullptr)));
 
     if (sPlayerbotAIConfig->enableGreet)
         triggers.push_back(new TriggerNode("new player nearby", NextAction::array(0, new NextAction("greet", 1.0f), nullptr)));

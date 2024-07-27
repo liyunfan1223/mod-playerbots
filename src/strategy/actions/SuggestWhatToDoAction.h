@@ -20,7 +20,6 @@ class SuggestWhatToDoAction : public InventoryAction
     protected:
         using Suggestion = std::function<void()>;
         std::vector<Suggestion> suggestions;
-        void instance();
         void specificQuest();
         void grindReputation();
         void grindMaterials();

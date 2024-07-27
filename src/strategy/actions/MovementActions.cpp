@@ -1555,7 +1555,7 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
         return false;
     }
     std::ostringstream name;
-    name << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()]; // << "] (aura)";
+    name << spellInfo->SpellName[LOCALE_enUS]; // << "] (aura)";
     if (FleePosition(dynOwner->GetPosition(), radius)) {
         if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
             lastTellTimer = time(NULL);
@@ -1613,7 +1613,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             continue;
         }
         std::ostringstream name;
-        name << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()]; // << "] (object)";
+        name << spellInfo->SpellName[LOCALE_enUS]; // << "] (object)";
         if (FleePosition(go->GetPosition(), radius)) {
             if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
                 lastTellTimer = time(NULL);
@@ -1662,7 +1662,7 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                             break;
                         }
                         std::ostringstream name;
-                        name << triggerSpellInfo->SpellName[sWorld->GetDefaultDbcLocale()]; //<< "] (unit)";
+                        name << triggerSpellInfo->SpellName[LOCALE_enUS]; //<< "] (unit)";
                         if (FleePosition(unit->GetPosition(), radius)) {
                             if (sPlayerbotAIConfig->tellWhenAvoidAoe && lastTellTimer < time(NULL) - 10) {
                                 lastTellTimer = time(NULL);

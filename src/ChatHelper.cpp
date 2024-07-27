@@ -288,7 +288,7 @@ std::string const ChatHelper::FormatQuest(Quest const* quest)
 std::string const ChatHelper::FormatGameobject(GameObject* go)
 {
     std::ostringstream out;
-    out << "|cFFFFFF00|Hfound:" << go->GetGUID().GetRawValue() << ":" << go->GetEntry() << ":" <<  "|h[" << go->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) << "]|h|r";
+    out << "|cFFFFFF00|Hfound:" << go->GetGUID().GetRawValue() << ":" << go->GetEntry() << ":" <<  "|h[" << go->GetNameForLocaleIdx(LOCALE_enUS) << "]|h|r";
     return out.str();
 }
 
@@ -296,7 +296,7 @@ std::string const ChatHelper::FormatWorldobject(WorldObject* wo)
 {
     std::ostringstream out;
     out << "|cFFFFFF00|Hfound:" << wo->GetGUID().GetRawValue() << ":" << wo->GetEntry() << ":" << "|h[";
-    out << (wo->ToGameObject() ? ((GameObject*)wo)->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) : wo->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale())) << "]|h|r";
+    out << (wo->ToGameObject() ? ((GameObject*)wo)->GetNameForLocaleIdx(LOCALE_enUS) : wo->GetNameForLocaleIdx(LOCALE_enUS)) << "]|h|r";
     return out.str();
 }
 
@@ -327,7 +327,7 @@ std::string const ChatHelper::FormatWorldEntry(int32 entry)
 std::string const ChatHelper::FormatSpell(SpellInfo const* spellInfo)
 {
     std::ostringstream out;
-    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h[" << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] << "]|h|r";
+    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h[" << spellInfo->SpellName[LOCALE_enUS] << "]|h|r";
     return out.str();
 }
 
@@ -336,7 +336,7 @@ std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count
     char color[32];
     sprintf(color, "%x", ItemQualityColors[proto->Quality]);
 
-    // const std::string &name = sObjectMgr->GetItemLocale(proto->ItemId)->Name[sWorld->GetDefaultDbcLocale()];
+    // const std::string &name = sObjectMgr->GetItemLocale(proto->ItemId)->Name[LOCALE_enUS];
 
     std::ostringstream out;
     out << "|c" << color << "|Hitem:" << proto->ItemId
