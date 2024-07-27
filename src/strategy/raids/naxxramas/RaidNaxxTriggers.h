@@ -18,10 +18,7 @@ class MutatingInjectionTrigger : public HasAuraTrigger
 class AuraRemovedTrigger : public Trigger
 {
    public:
-    AuraRemovedTrigger(PlayerbotAI *botAI, std::string name) : Trigger(botAI, name, 1)
-    {
-        this->prev_check = false;
-    }
+    AuraRemovedTrigger(PlayerbotAI *botAI, std::string name) : Trigger(botAI, name, 1) { this->prev_check = false; }
     virtual bool IsActive() override;
 
    protected:
@@ -39,9 +36,7 @@ template <class T>
 class BossEventTrigger : public Trigger
 {
    public:
-    BossEventTrigger(PlayerbotAI *ai, uint32 boss_entry, uint32 event_id,
-                     std::string name = "boss event")
-        : Trigger(ai, name, 1)
+    BossEventTrigger(PlayerbotAI *ai, uint32 boss_entry, uint32 event_id, std::string name = "boss event") : Trigger(ai, name, 1)
     {
         this->boss_entry = boss_entry;
         this->event_id = event_id;
@@ -57,9 +52,7 @@ template <class T>
 class BossPhaseTrigger : public Trigger
 {
    public:
-    BossPhaseTrigger(PlayerbotAI *ai, std::string boss_name, uint32 phase_mask,
-                     std::string name = "boss event")
-        : Trigger(ai, name, 1)
+    BossPhaseTrigger(PlayerbotAI *ai, std::string boss_name, uint32 phase_mask, std::string name = "boss event") : Trigger(ai, name, 1)
     {
         this->boss_name = boss_name;
         this->phase_mask = phase_mask;
@@ -74,9 +67,7 @@ class BossPhaseTrigger : public Trigger
 class GrobbulusCloudTrigger : public BossEventTrigger<Grobbulus::boss_grobbulus::boss_grobbulusAI>
 {
    public:
-    GrobbulusCloudTrigger(PlayerbotAI *ai) : BossEventTrigger(ai, 15931, 2, "grobbulus cloud event")
-    {
-    }
+    GrobbulusCloudTrigger(PlayerbotAI *ai) : BossEventTrigger(ai, 15931, 2, "grobbulus cloud event") {}
     virtual bool IsActive();
 };
 
@@ -107,10 +98,7 @@ class RazuviousTankTrigger : public Trigger
 class RazuviousNontankTrigger : public Trigger
 {
    public:
-    RazuviousNontankTrigger(PlayerbotAI *ai)
-        : Trigger(ai, "instructor razuvious non-tank"), helper(ai)
-    {
-    }
+    RazuviousNontankTrigger(PlayerbotAI *ai) : Trigger(ai, "instructor razuvious non-tank"), helper(ai) {}
     bool IsActive() override;
 
    private:
@@ -130,10 +118,7 @@ class KelthuzadTrigger : public Trigger
 class AnubrekhanTrigger : public BossPhaseTrigger<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI>
 {
    public:
-    AnubrekhanTrigger(PlayerbotAI *ai)
-        : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger")
-    {
-    }
+    AnubrekhanTrigger(PlayerbotAI *ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
 };
 
 class ThaddiusPhasePetTrigger : public Trigger
@@ -153,18 +138,14 @@ class ThaddiusPhasePetLoseAggroTrigger : public ThaddiusPhasePetTrigger
     virtual bool IsActive()
     {
         Unit *target = AI_VALUE(Unit *, "current target");
-        return ThaddiusPhasePetTrigger::IsActive() && botAI->IsTank(bot) && target &&
-               target->GetVictim() != bot;
+        return ThaddiusPhasePetTrigger::IsActive() && botAI->IsTank(bot) && target && target->GetVictim() != bot;
     }
 };
 
 class ThaddiusPhaseTransitionTrigger : public Trigger
 {
    public:
-    ThaddiusPhaseTransitionTrigger(PlayerbotAI *ai)
-        : Trigger(ai, "thaddius phase transition"), helper(ai)
-    {
-    }
+    ThaddiusPhaseTransitionTrigger(PlayerbotAI *ai) : Trigger(ai, "thaddius phase transition"), helper(ai) {}
     bool IsActive() override;
 
    private:
@@ -174,10 +155,7 @@ class ThaddiusPhaseTransitionTrigger : public Trigger
 class ThaddiusPhaseThaddiusTrigger : public Trigger
 {
    public:
-    ThaddiusPhaseThaddiusTrigger(PlayerbotAI *ai)
-        : Trigger(ai, "thaddius phase thaddius"), helper(ai)
-    {
-    }
+    ThaddiusPhaseThaddiusTrigger(PlayerbotAI *ai) : Trigger(ai, "thaddius phase thaddius"), helper(ai) {}
     bool IsActive() override;
 
    private:
@@ -187,9 +165,7 @@ class ThaddiusPhaseThaddiusTrigger : public Trigger
 class HorsemanAttractorsTrigger : public Trigger
 {
    public:
-    HorsemanAttractorsTrigger(PlayerbotAI *ai) : Trigger(ai, "fourhorsemen attractors"), helper(ai)
-    {
-    }
+    HorsemanAttractorsTrigger(PlayerbotAI *ai) : Trigger(ai, "fourhorsemen attractors"), helper(ai) {}
     bool IsActive() override;
 
    private:
@@ -199,10 +175,7 @@ class HorsemanAttractorsTrigger : public Trigger
 class HorsemanExceptAttractorsTrigger : public Trigger
 {
    public:
-    HorsemanExceptAttractorsTrigger(PlayerbotAI *ai)
-        : Trigger(ai, "fourhorsemen except attractors"), helper(ai)
-    {
-    }
+    HorsemanExceptAttractorsTrigger(PlayerbotAI *ai) : Trigger(ai, "fourhorsemen except attractors"), helper(ai) {}
     bool IsActive() override;
 
    private:
@@ -263,10 +236,7 @@ class GluthTrigger : public Trigger
 class GluthMainTankMortalWoundTrigger : public Trigger
 {
    public:
-    GluthMainTankMortalWoundTrigger(PlayerbotAI *ai)
-        : Trigger(ai, "gluth main tank mortal wound trigger"), helper(ai)
-    {
-    }
+    GluthMainTankMortalWoundTrigger(PlayerbotAI *ai) : Trigger(ai, "gluth main tank mortal wound trigger"), helper(ai) {}
     bool IsActive() override;
 
    private:

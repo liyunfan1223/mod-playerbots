@@ -30,7 +30,4 @@ std::vector<std::string> Qualified::getMultiQualifiers(std::string const qualifi
     return {std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{}};
 }
 
-int32 Qualified::getMultiQualifier(std::string const qualifier1, uint32 pos)
-{
-    return std::stoi(getMultiQualifiers(qualifier1)[pos]);
-}
+int32 Qualified::getMultiQualifier(std::string const qualifier1, uint32 pos) { return std::stoi(getMultiQualifiers(qualifier1)[pos]); }

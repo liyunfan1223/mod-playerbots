@@ -29,10 +29,7 @@ class UnitPosition
 class FormationUnit
 {
    public:
-    FormationUnit(uint32 groupIndex, bool master)
-        : groupIndex(groupIndex), master(master), position(0, 0)
-    {
-    }
+    FormationUnit(uint32 groupIndex, bool master) : groupIndex(groupIndex), master(master), position(0, 0) {}
     FormationUnit(FormationUnit const &other) : position(other.position.x, other.position.y)
     {
         groupIndex = other.groupIndex;
@@ -70,10 +67,7 @@ class FormationSlot
     virtual ~FormationSlot();
 
     void AddLast(FormationUnit *unit) { units.push_back(unit); }
-    void InsertAtCenter(FormationUnit *unit)
-    {
-        units.insert(units.begin() + (units.size() + 1) / 2, unit);
-    }
+    void InsertAtCenter(FormationUnit *unit) { units.insert(units.begin() + (units.size() + 1) / 2, unit); }
     void PlaceUnits(UnitPlacer *placer);
     void Move(float dx, float dy);
     uint32 Size() const { return units.size(); }
@@ -108,10 +102,7 @@ class SingleLineUnitPlacer
 class ArrowFormation : public MoveAheadFormation
 {
    public:
-    ArrowFormation(PlayerbotAI *botAI)
-        : MoveAheadFormation(botAI, "arrow"), built(false), masterUnit(nullptr), botUnit(nullptr)
-    {
-    }
+    ArrowFormation(PlayerbotAI *botAI) : MoveAheadFormation(botAI, "arrow"), built(false), masterUnit(nullptr), botUnit(nullptr) {}
 
     WorldLocation GetLocationInternal() override;
 

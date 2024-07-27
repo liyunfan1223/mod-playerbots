@@ -118,12 +118,10 @@ bool EquipUpgradesAction::Execute(Event event)
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
 
     ItemIds items;
-    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end();
-         ++i)
+    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
     {
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", i->first);
-        if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE ||
-            usage == ITEM_USAGE_BAD_EQUIP)
+        if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
             // LOG_INFO("playerbots", "Bot {} <{}> auto equips item {} ({})",
             // bot->GetGUID().ToString().c_str(), bot->GetName().c_str(), i->first, usage == 1 ? "no
@@ -143,12 +141,10 @@ bool EquipUpgradeAction::Execute(Event event)
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
 
     ItemIds items;
-    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end();
-         ++i)
+    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
     {
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", i->first);
-        if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE ||
-            usage == ITEM_USAGE_BAD_EQUIP)
+        if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
             items.insert(i->first);
         }

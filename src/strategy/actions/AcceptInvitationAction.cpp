@@ -53,8 +53,7 @@ bool AcceptInvitationAction::Execute(Event event)
 
     botAI->TellMaster("Hello");
 
-    if (sPlayerbotAIConfig->summonWhenGroup &&
-        bot->GetDistance(inviter) > sPlayerbotAIConfig->sightDistance)
+    if (sPlayerbotAIConfig->summonWhenGroup && bot->GetDistance(inviter) > sPlayerbotAIConfig->sightDistance)
     {
         Teleport(inviter, bot);
     }

@@ -69,8 +69,7 @@ void CustomStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
             for (std::vector<std::string>::iterator i = tokens.begin(); i != tokens.end(); ++i)
             {
                 std::string const line = *i;
-                for (std::sregex_iterator j = std::sregex_iterator(line.begin(), line.end(), tpl);
-                     j != std::sregex_iterator(); ++j)
+                for (std::sregex_iterator j = std::sregex_iterator(line.begin(), line.end(), tpl); j != std::sregex_iterator(); ++j)
                 {
                     std::smatch match = *j;
                     std::string const actionLine = match[1].str();
@@ -90,8 +89,7 @@ void CustomStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 
 void CustomStrategy::LoadActionLines(uint32 owner)
 {
-    PlayerbotsDatabasePreparedStatement *stmt =
-        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
     stmt->SetData(0, owner);
     stmt->SetData(1, qualifier);
     PreparedQueryResult result = PlayerbotsDatabase.Query(stmt);

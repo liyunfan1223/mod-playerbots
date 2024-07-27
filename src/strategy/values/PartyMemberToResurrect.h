@@ -15,10 +15,7 @@ class Unit;
 class PartyMemberToResurrect : public PartyMemberValue
 {
    public:
-    PartyMemberToResurrect(PlayerbotAI *botAI, std::string const name = "party member to resurrect")
-        : PartyMemberValue(botAI, name)
-    {
-    }
+    PartyMemberToResurrect(PlayerbotAI *botAI, std::string const name = "party member to resurrect") : PartyMemberValue(botAI, name) {}
 
    protected:
     Unit *Calculate() override;

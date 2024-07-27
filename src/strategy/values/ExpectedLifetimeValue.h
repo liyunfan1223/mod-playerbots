@@ -28,10 +28,7 @@ class ExpectedLifetimeValue : public FloatCalculatedValue, public Qualified
 class ExpectedGroupDpsValue : public FloatCalculatedValue
 {
    public:
-    ExpectedGroupDpsValue(PlayerbotAI *botAI)
-        : FloatCalculatedValue(botAI, "expected group dps", 20 * 1000)
-    {
-    }
+    ExpectedGroupDpsValue(PlayerbotAI *botAI) : FloatCalculatedValue(botAI, "expected group dps", 20 * 1000) {}
 
    public:
     float Calculate() override;

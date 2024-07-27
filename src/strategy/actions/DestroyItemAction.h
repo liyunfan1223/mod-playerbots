@@ -15,10 +15,7 @@ class PlayerbotAI;
 class DestroyItemAction : public InventoryAction
 {
    public:
-    DestroyItemAction(PlayerbotAI *botAI, std::string const name = "destroy")
-        : InventoryAction(botAI, name)
-    {
-    }
+    DestroyItemAction(PlayerbotAI *botAI, std::string const name = "destroy") : InventoryAction(botAI, name) {}
 
     bool Execute(Event event) override;
 

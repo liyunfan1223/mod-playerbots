@@ -13,16 +13,9 @@
 
 WorldLocation Formation::NullLocation = WorldLocation();
 
-bool IsSameLocation(WorldLocation const &a, WorldLocation const &b)
-{
-    return a.GetPositionX() == b.GetPositionX() && a.GetPositionY() == b.GetPositionY() &&
-           a.GetPositionZ() == b.GetPositionZ() && a.GetMapId() == b.GetMapId();
-}
+bool IsSameLocation(WorldLocation const &a, WorldLocation const &b) { return a.GetPositionX() == b.GetPositionX() && a.GetPositionY() == b.GetPositionY() && a.GetPositionZ() == b.GetPositionZ() && a.GetMapId() == b.GetMapId(); }
 
-bool Formation::IsNullLocation(WorldLocation const &loc)
-{
-    return IsSameLocation(loc, Formation::NullLocation);
-}
+bool Formation::IsNullLocation(WorldLocation const &loc) { return IsSameLocation(loc, Formation::NullLocation); }
 
 WorldLocation MoveAheadFormation::GetLocation()
 {
@@ -294,17 +287,14 @@ class ShieldFormation : public MoveFormation
 
         if (botAI->IsTank(bot) && !botAI->IsTank(master))
         {
-            float diff =
-                tanks.size() % 2 == 0 ? -sPlayerbotAIConfig->tooCloseDistance / 2.0f : 0.0f;
-            return MoveLine(tanks, diff, x + cos(orientation) * range, y + sin(orientation) * range,
-                            z, orientation, range);
+            float diff = tanks.size() % 2 == 0 ? -sPlayerbotAIConfig->tooCloseDistance / 2.0f : 0.0f;
+            return MoveLine(tanks, diff, x + cos(orientation) * range, y + sin(orientation) * range, z, orientation, range);
         }
 
         if (!botAI->IsTank(bot) && botAI->IsTank(master))
         {
             float diff = dps.size() % 2 == 0 ? -sPlayerbotAIConfig->tooCloseDistance / 2.0f : 0.0f;
-            return MoveLine(dps, diff, x - cos(orientation) * range, y - sin(orientation) * range,
-                            z, orientation, range);
+            return MoveLine(dps, diff, x - cos(orientation) * range, y - sin(orientation) * range, z, orientation, range);
         }
 
         return Formation::NullLocation;
@@ -383,8 +373,7 @@ float Formation::GetFollowAngle()
         masterBotMgr = GET_PLAYERBOT_MGR(master);
     if (!group && master && !GET_PLAYERBOT_AI(master) && masterBotMgr)
     {
-        for (PlayerBotMap::const_iterator i = masterBotMgr->GetPlayerBotsBegin();
-             i != masterBotMgr->GetPlayerBotsEnd(); ++i)
+        for (PlayerBotMap::const_iterator i = masterBotMgr->GetPlayerBotsBegin(); i != masterBotMgr->GetPlayerBotsEnd(); ++i)
         {
             if (i->second == bot)
                 index = total;
@@ -449,10 +438,7 @@ float Formation::GetFollowAngle()
     return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
 
-FormationValue::FormationValue(PlayerbotAI *botAI)
-    : ManualSetValue<Formation *>(botAI, new NearFormation(botAI), "formation")
-{
-}
+FormationValue::FormationValue(PlayerbotAI *botAI) : ManualSetValue<Formation *>(botAI, new NearFormation(botAI), "formation") {}
 
 FormationValue::~FormationValue()
 {
@@ -575,8 +561,7 @@ bool SetFormationAction::Execute(Event event)
     return true;
 }
 
-WorldLocation MoveFormation::MoveLine(std::vector<Player *> line, float diff, float cx, float cy,
-                                      float cz, float orientation, float range)
+WorldLocation MoveFormation::MoveLine(std::vector<Player *> line, float diff, float cx, float cy, float cz, float orientation, float range)
 {
     if (line.size() < 5)
     {
@@ -605,8 +590,7 @@ WorldLocation MoveFormation::MoveLine(std::vector<Player *> line, float diff, fl
     return Formation::NullLocation;
 }
 
-WorldLocation MoveFormation::MoveSingleLine(std::vector<Player *> line, float diff, float cx,
-                                            float cy, float cz, float orientation, float range)
+WorldLocation MoveFormation::MoveSingleLine(std::vector<Player *> line, float diff, float cx, float cy, float cz, float orientation, float range)
 {
     float count = line.size();
     float angle = orientation - M_PI / 2.0f;

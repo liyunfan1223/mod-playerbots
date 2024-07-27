@@ -11,8 +11,7 @@
 #include "Playerbots.h"
 #include "Util.h"
 
-void PlaceholderHelper::MapDungeon(PlaceholderMap &placeholders,
-                                   DungeonSuggestion const *dungeonSuggestion, Player *bot)
+void PlaceholderHelper::MapDungeon(PlaceholderMap &placeholders, DungeonSuggestion const *dungeonSuggestion, Player *bot)
 {
     std::ostringstream out;
     Insertion insertion = {out, dungeonSuggestion};

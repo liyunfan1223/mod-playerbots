@@ -20,13 +20,11 @@ std::vector<Item *> ItemsUsefulToGiveValue::Calculate()
     if (botAI->HasActivePlayerMaster() || !GET_PLAYERBOT_AI(player))
         return giveItems;
 
-    std::vector<ItemUsage> myUsages = {ITEM_USAGE_NONE, ITEM_USAGE_VENDOR, ITEM_USAGE_AH,
-                                       ITEM_USAGE_DISENCHANT};
+    std::vector<ItemUsage> myUsages = {ITEM_USAGE_NONE, ITEM_USAGE_VENDOR, ITEM_USAGE_AH, ITEM_USAGE_DISENCHANT};
 
     for (auto &myUsage : myUsages)
     {
-        std::vector<Item *> myItems =
-            AI_VALUE2(std::vector<Item *>, "inventory items", "usage " + std::to_string(myUsage));
+        std::vector<Item *> myItems = AI_VALUE2(std::vector<Item *>, "inventory items", "usage " + std::to_string(myUsage));
         std::reverse(myItems.begin(), myItems.end());
 
         for (auto &item : myItems)

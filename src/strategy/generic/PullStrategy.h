@@ -14,10 +14,7 @@ class PlayerbotAI;
 class PullStrategy : public CombatStrategy
 {
    public:
-    PullStrategy(PlayerbotAI *botAI, std::string const action)
-        : CombatStrategy(botAI), action(action)
-    {
-    }
+    PullStrategy(PlayerbotAI *botAI, std::string const action) : CombatStrategy(botAI), action(action) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
     void InitMultipliers(std::vector<Multiplier *> &multipliers) override;

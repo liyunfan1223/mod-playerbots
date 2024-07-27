@@ -85,10 +85,7 @@ float LoathebGenericMultiplier::GetValue(Action *action)
         return 1.0f;
     }
     context->GetValue<bool>("neglect threat")->Set(true);
-    if (botAI->GetState() == BOT_STATE_COMBAT &&
-        (dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) ||
-         dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) ||
-         dynamic_cast<FleeAction *>(action)))
+    if (botAI->GetState() == BOT_STATE_COMBAT && (dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) || dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) || dynamic_cast<FleeAction *>(action)))
     {
         return 0.0f;
     }
@@ -111,11 +108,8 @@ float ThaddiusGenericMultiplier::GetValue(Action *action)
         return 1.0f;
     }
     // pet phase
-    if (helper.IsPhasePet() &&
-        (dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) ||
-         dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) ||
-         dynamic_cast<ReachPartyMemberToHealAction *>(action) ||
-         dynamic_cast<BuffOnMainTankAction *>(action)))
+    if (helper.IsPhasePet() && (dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) || dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) || dynamic_cast<ReachPartyMemberToHealAction *>(action) ||
+                                dynamic_cast<BuffOnMainTankAction *>(action)))
     {
         return 0.0f;
     }
@@ -123,12 +117,9 @@ float ThaddiusGenericMultiplier::GetValue(Action *action)
     Unit *target = AI_VALUE(Unit *, "current target");
     Unit *feugen = AI_VALUE2(Unit *, "find target", "feugen");
     Unit *stalagg = AI_VALUE2(Unit *, "find target", "stalagg");
-    if (helper.IsPhasePet() && target && feugen && stalagg && target->GetHealthPct() <= 40 &&
-        (feugen->GetHealthPct() >= target->GetHealthPct() + 3 ||
-         stalagg->GetHealthPct() >= target->GetHealthPct() + 3))
+    if (helper.IsPhasePet() && target && feugen && stalagg && target->GetHealthPct() <= 40 && (feugen->GetHealthPct() >= target->GetHealthPct() + 3 || stalagg->GetHealthPct() >= target->GetHealthPct() + 3))
     {
-        if (dynamic_cast<CastSpellAction *>(action) &&
-            !dynamic_cast<CastHealingSpellAction *>(action))
+        if (dynamic_cast<CastSpellAction *>(action) && !dynamic_cast<CastHealingSpellAction *>(action))
         {
             return 0.0f;
         }
@@ -169,11 +160,8 @@ float InstructorRazuviousGenericMultiplier::GetValue(Action *action)
         return 1.0f;
     }
     context->GetValue<bool>("neglect threat")->Set(true);
-    if (botAI->GetState() == BOT_STATE_COMBAT &&
-        (dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) ||
-         dynamic_cast<CastTauntAction *>(action) || dynamic_cast<CastDarkCommandAction *>(action) ||
-         dynamic_cast<CastHandOfReckoningAction *>(action) ||
-         dynamic_cast<CastGrowlAction *>(action)))
+    if (botAI->GetState() == BOT_STATE_COMBAT && (dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) || dynamic_cast<CastTauntAction *>(action) || dynamic_cast<CastDarkCommandAction *>(action) ||
+                                                  dynamic_cast<CastHandOfReckoningAction *>(action) || dynamic_cast<CastGrowlAction *>(action)))
     {
         return 0.0f;
     }
@@ -186,19 +174,13 @@ float KelthuzadGenericMultiplier::GetValue(Action *action)
     {
         return 1.0f;
     }
-    if ((dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) ||
-         dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) ||
-         dynamic_cast<FollowAction *>(action) || dynamic_cast<FleeAction *>(action)))
+    if ((dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) || dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) || dynamic_cast<FollowAction *>(action) || dynamic_cast<FleeAction *>(action)))
     {
         return 0.0f;
     }
     if (helper.IsPhaseOne())
     {
-        if (dynamic_cast<CastTotemAction *>(action) ||
-            dynamic_cast<CastShadowfiendAction *>(action) ||
-            dynamic_cast<CastRaiseDeadAction *>(action) ||
-            dynamic_cast<CastFeignDeathAction *>(action) ||
-            dynamic_cast<CastInvisibilityAction *>(action) ||
+        if (dynamic_cast<CastTotemAction *>(action) || dynamic_cast<CastShadowfiendAction *>(action) || dynamic_cast<CastRaiseDeadAction *>(action) || dynamic_cast<CastFeignDeathAction *>(action) || dynamic_cast<CastInvisibilityAction *>(action) ||
             dynamic_cast<CastVanishAction *>(action) || dynamic_cast<PetAttackAction *>(action))
         {
             return 0.0f;
@@ -206,8 +188,7 @@ float KelthuzadGenericMultiplier::GetValue(Action *action)
     }
     if (helper.IsPhaseTwo())
     {
-        if (dynamic_cast<CastBlizzardAction *>(action) ||
-            dynamic_cast<CastFrostNovaAction *>(action))
+        if (dynamic_cast<CastBlizzardAction *>(action) || dynamic_cast<CastFrostNovaAction *>(action))
         {
             return 0.0f;
         }
@@ -285,10 +266,7 @@ float GluthGenericMultiplier::GetValue(Action *action)
     {
         return 1.0f;
     }
-    if ((dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) ||
-         dynamic_cast<FleeAction *>(action) ||
-         dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) ||
-         dynamic_cast<CastStarfallAction *>(action)))
+    if ((dynamic_cast<DpsAssistAction *>(action) || dynamic_cast<TankAssistAction *>(action) || dynamic_cast<FleeAction *>(action) || dynamic_cast<CastDebuffSpellOnAttackerAction *>(action) || dynamic_cast<CastStarfallAction *>(action)))
     {
         return 0.0f;
     }
@@ -298,10 +276,7 @@ float GluthGenericMultiplier::GetValue(Action *action)
         Aura *aura = botAI->GetAura("mortal wound", bot, false, true);
         if (aura && aura->GetStackAmount() >= 5)
         {
-            if (dynamic_cast<CastTauntAction *>(action) ||
-                dynamic_cast<CastDarkCommandAction *>(action) ||
-                dynamic_cast<CastHandOfReckoningAction *>(action) ||
-                dynamic_cast<CastGrowlAction *>(action))
+            if (dynamic_cast<CastTauntAction *>(action) || dynamic_cast<CastDarkCommandAction *>(action) || dynamic_cast<CastHandOfReckoningAction *>(action) || dynamic_cast<CastGrowlAction *>(action))
             {
                 return 0.0f;
             }

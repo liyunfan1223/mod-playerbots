@@ -8,9 +8,7 @@
 
 #include "Playerbots.h"
 
-RangeValue::RangeValue(PlayerbotAI *botAI) : ManualSetValue<float>(botAI, 0.f, "range"), Qualified()
-{
-}
+RangeValue::RangeValue(PlayerbotAI *botAI) : ManualSetValue<float>(botAI, 0.f, "range"), Qualified() {}
 
 std::string const RangeValue::Save()
 {

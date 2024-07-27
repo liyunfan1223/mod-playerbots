@@ -305,13 +305,11 @@ class AiNamedObject : public AiObject
         bool isUseful() override { return useful; }                         \
     }
 
-#define HEAL_PARTY_ACTION(clazz, spell, estAmount, manaEfficiency)                                 \
-    class clazz : public HealPartyMemberAction                                                     \
-    {                                                                                              \
-       public:                                                                                     \
-        clazz(PlayerbotAI *botAI) : HealPartyMemberAction(botAI, spell, estAmount, manaEfficiency) \
-        {                                                                                          \
-        }                                                                                          \
+#define HEAL_PARTY_ACTION(clazz, spell, estAmount, manaEfficiency)                                    \
+    class clazz : public HealPartyMemberAction                                                        \
+    {                                                                                                 \
+       public:                                                                                        \
+        clazz(PlayerbotAI *botAI) : HealPartyMemberAction(botAI, spell, estAmount, manaEfficiency) {} \
     }
 
 #define AOE_HEAL_ACTION(clazz, spell, estAmount, manaEfficiency)            \
@@ -490,28 +488,15 @@ class AiNamedObject : public AiObject
 //
 
 // node_name , action, prerequisite
-#define ACTION_NODE_P(name, spell, pre)                                                        \
-    static ActionNode *name(PlayerbotAI *botAI)                                                \
-    {                                                                                          \
-        return new ActionNode(spell, /*P*/ NextAction::array(0, new NextAction(pre), nullptr), \
-                              /*A*/ nullptr, /*C*/ nullptr);                                   \
-    }
+#define ACTION_NODE_P(name, spell, pre) \
+    static ActionNode *name(PlayerbotAI *botAI) { return new ActionNode(spell, /*P*/ NextAction::array(0, new NextAction(pre), nullptr), /*A*/ nullptr, /*C*/ nullptr); }
 
 // node_name , action, alternative
-#define ACTION_NODE_A(name, spell, alt)                                                 \
-    static ActionNode *name(PlayerbotAI *botAI)                                         \
-    {                                                                                   \
-        return new ActionNode(spell, /*P*/ nullptr,                                     \
-                              /*A*/ NextAction::array(0, new NextAction(alt), nullptr), \
-                              /*C*/ nullptr);                                           \
-    }
+#define ACTION_NODE_A(name, spell, alt) \
+    static ActionNode *name(PlayerbotAI *botAI) { return new ActionNode(spell, /*P*/ nullptr, /*A*/ NextAction::array(0, new NextAction(alt), nullptr), /*C*/ nullptr); }
 
 // node_name , action, continuer
-#define ACTION_NODE_C(name, spell, con)                                                  \
-    static ActionNode *name(PlayerbotAI *botAI)                                          \
-    {                                                                                    \
-        return new ActionNode(spell, /*P*/ nullptr, /*A*/ nullptr,                       \
-                              /*C*/ NextAction::array(0, new NextAction(con), nullptr)); \
-    }
+#define ACTION_NODE_C(name, spell, con) \
+    static ActionNode *name(PlayerbotAI *botAI) { return new ActionNode(spell, /*P*/ nullptr, /*A*/ nullptr, /*C*/ NextAction::array(0, new NextAction(con), nullptr)); }
 
 #endif

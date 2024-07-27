@@ -25,9 +25,7 @@ class FindBuffVisitor : public IterateItemsVisitor
         if (proto->Class != ITEM_CLASS_CONSUMABLE)
             return true;
 
-        if (proto->SubClass != ITEM_SUBCLASS_ELIXIR && proto->SubClass != ITEM_SUBCLASS_FLASK &&
-            proto->SubClass != ITEM_SUBCLASS_SCROLL && proto->SubClass != ITEM_SUBCLASS_FOOD &&
-            proto->SubClass != ITEM_SUBCLASS_CONSUMABLE_OTHER &&
+        if (proto->SubClass != ITEM_SUBCLASS_ELIXIR && proto->SubClass != ITEM_SUBCLASS_FLASK && proto->SubClass != ITEM_SUBCLASS_SCROLL && proto->SubClass != ITEM_SUBCLASS_FOOD && proto->SubClass != ITEM_SUBCLASS_CONSUMABLE_OTHER &&
             proto->SubClass != ITEM_SUBCLASS_ITEM_ENHANCEMENT)
             return true;
 
@@ -40,10 +38,8 @@ class FindBuffVisitor : public IterateItemsVisitor
             if (bot->HasAura(spellId))
                 return true;
 
-            Item *itemForSpell = *GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<Item *>(
-                "item for spell", spellId);
-            if (itemForSpell && itemForSpell->IsInWorld() &&
-                itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+            Item *itemForSpell = *GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<Item *>("item for spell", spellId);
+            if (itemForSpell && itemForSpell->IsInWorld() && itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
                 return true;
 
             if (items.find(proto->SubClass) == items.end())
@@ -92,8 +88,7 @@ bool BuffAction::Execute(Event event)
     IterateItems(&visitor);
 
     uint32 oldSubClass = -1;
-    for (std::map<uint32, std::vector<Item *>>::iterator i = visitor.items.begin();
-         i != visitor.items.end(); ++i)
+    for (std::map<uint32, std::vector<Item *>>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
     {
         std::vector<Item *> items = i->second;
 

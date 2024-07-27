@@ -16,10 +16,7 @@ enum ChatMsg : uint32;
 class ChatValue : public ManualSetValue<ChatMsg>
 {
    public:
-    ChatValue(PlayerbotAI *botAI, std::string const name = "chat")
-        : ManualSetValue<ChatMsg>(botAI, CHAT_MSG_WHISPER, name)
-    {
-    }
+    ChatValue(PlayerbotAI *botAI, std::string const name = "chat") : ManualSetValue<ChatMsg>(botAI, CHAT_MSG_WHISPER, name) {}
 };
 
 #endif

@@ -30,12 +30,10 @@ bool GreetAction::Execute(Event event)
     botAI->PlayEmote(TEXT_EMOTE_HELLO);
     bot->SetTarget(oldSel);
 
-    GuidSet &alreadySeenPlayers =
-        botAI->GetAiObjectContext()->GetValue<GuidSet &>("already seen players")->Get();
+    GuidSet &alreadySeenPlayers = botAI->GetAiObjectContext()->GetValue<GuidSet &>("already seen players")->Get();
     alreadySeenPlayers.insert(guid);
 
-    GuidVector nearestPlayers =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
+    GuidVector nearestPlayers = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
     for (ObjectGuid const guid : nearestPlayers)
     {
         alreadySeenPlayers.insert(guid);

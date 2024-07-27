@@ -37,8 +37,7 @@ class PlayerbotHolder : public PlayerbotAIBase
     PlayerBotMap::const_iterator GetPlayerBotsBegin() const { return playerBots.begin(); }
     PlayerBotMap::const_iterator GetPlayerBotsEnd() const { return playerBots.end(); }
 
-    void UpdateAIInternal([[maybe_unused]] uint32 elapsed,
-                          [[maybe_unused]] bool minimal = false) override {};
+    void UpdateAIInternal([[maybe_unused]] uint32 elapsed, [[maybe_unused]] bool minimal = false) override {};
     void UpdateSessions();
     void HandleBotPackets(WorldSession *session);
 
@@ -46,9 +45,7 @@ class PlayerbotHolder : public PlayerbotAIBase
     void OnBotLogin(Player *const bot);
 
     std::vector<std::string> HandlePlayerbotCommand(char const *args, Player *master = nullptr);
-    std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid,
-                                        ObjectGuid masterguid, bool admin, uint32 masterAccountId,
-                                        uint32 masterGuildId);
+    std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin, uint32 masterAccountId, uint32 masterGuildId);
     uint32 GetAccountId(std::string const name);
     uint32 GetAccountId(ObjectGuid guid);
     std::string const ListBots(Player *master);

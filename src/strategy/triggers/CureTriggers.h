@@ -15,10 +15,7 @@ class Unit;
 class NeedCureTrigger : public SpellTrigger
 {
    public:
-    NeedCureTrigger(PlayerbotAI *botAI, std::string const spell, uint32 dispelType)
-        : SpellTrigger(botAI, spell, 1 * 1000), dispelType(dispelType)
-    {
-    }
+    NeedCureTrigger(PlayerbotAI *botAI, std::string const spell, uint32 dispelType) : SpellTrigger(botAI, spell, 1 * 1000), dispelType(dispelType) {}
 
     std::string const GetTargetName() override { return "self target"; }
     bool IsActive() override;
@@ -30,10 +27,7 @@ class NeedCureTrigger : public SpellTrigger
 class TargetAuraDispelTrigger : public NeedCureTrigger
 {
    public:
-    TargetAuraDispelTrigger(PlayerbotAI *botAI, std::string const spell, uint32 dispelType)
-        : NeedCureTrigger(botAI, spell, dispelType)
-    {
-    }
+    TargetAuraDispelTrigger(PlayerbotAI *botAI, std::string const spell, uint32 dispelType) : NeedCureTrigger(botAI, spell, dispelType) {}
 
     std::string const GetTargetName() override { return "current target"; }
 };
@@ -41,10 +35,7 @@ class TargetAuraDispelTrigger : public NeedCureTrigger
 class PartyMemberNeedCureTrigger : public NeedCureTrigger
 {
    public:
-    PartyMemberNeedCureTrigger(PlayerbotAI *botAI, std::string const spell, uint32 dispelType)
-        : NeedCureTrigger(botAI, spell, dispelType)
-    {
-    }
+    PartyMemberNeedCureTrigger(PlayerbotAI *botAI, std::string const spell, uint32 dispelType) : NeedCureTrigger(botAI, spell, dispelType) {}
 
     Value<Unit *> *GetTargetValue() override;
 };

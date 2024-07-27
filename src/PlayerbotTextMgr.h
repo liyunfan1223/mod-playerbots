@@ -17,11 +17,7 @@
 
 struct BotTextEntry
 {
-    BotTextEntry(std::string name, std::map<uint32, std::string> text, uint32 say_type,
-                 uint32 reply_type)
-        : m_name(name), m_text(text), m_sayType(say_type), m_replyType(reply_type)
-    {
-    }
+    BotTextEntry(std::string name, std::map<uint32, std::string> text, uint32 say_type, uint32 reply_type) : m_name(name), m_text(text), m_sayType(say_type), m_replyType(reply_type) {}
     std::string m_name;
     std::map<uint32, std::string> m_text;
     uint32 m_sayType;
@@ -30,27 +26,14 @@ struct BotTextEntry
 
 struct ChatReplyData
 {
-    ChatReplyData(uint32 guid, uint32 type, std::string chat)
-        : m_type(type), m_guid(guid), m_chat(chat)
-    {
-    }
+    ChatReplyData(uint32 guid, uint32 type, std::string chat) : m_type(type), m_guid(guid), m_chat(chat) {}
     uint32 m_type, m_guid = 0;
     std::string m_chat = "";
 };
 
 struct ChatQueuedReply
 {
-    ChatQueuedReply(uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName,
-                    std::string name, time_t time)
-        : m_type(type),
-          m_guid1(guid1),
-          m_guid2(guid2),
-          m_msg(msg),
-          m_chanName(chanName),
-          m_name(name),
-          m_time(time)
-    {
-    }
+    ChatQueuedReply(uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName, std::string name, time_t time) : m_type(type), m_guid1(guid1), m_guid2(guid2), m_msg(msg), m_chanName(chanName), m_name(name), m_time(time) {}
     uint32 m_type;
     uint32 m_guid1;
     uint32 m_guid2;
@@ -90,12 +73,10 @@ class PlayerbotTextMgr
 
     std::string GetBotText(std::string name, std::map<std::string, std::string> placeholders);
     std::string GetBotText(std::string name);
-    std::string GetBotText(ChatReplyType replyType,
-                           std::map<std::string, std::string> placeholders);
+    std::string GetBotText(ChatReplyType replyType, std::map<std::string, std::string> placeholders);
     std::string GetBotText(ChatReplyType replyType, std::string name);
     bool GetBotText(std::string name, std::string &text);
-    bool GetBotText(std::string name, std::string &text,
-                    std::map<std::string, std::string> placeholders);
+    bool GetBotText(std::string name, std::string &text, std::map<std::string, std::string> placeholders);
     void LoadBotTexts();
     void LoadBotTextChance();
     static void replaceAll(std::string &str, const std::string &from, const std::string &to);

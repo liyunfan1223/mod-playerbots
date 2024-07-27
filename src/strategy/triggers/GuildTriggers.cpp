@@ -9,16 +9,9 @@
 #include "GuildMgr.h"
 #include "Playerbots.h"
 
-bool PetitionTurnInTrigger::IsActive()
-{
-    return !bot->GetGuildId() && AI_VALUE2(uint32, "item count", chat->FormatQItem(5863)) &&
-           AI_VALUE(uint8, "petition signs") >= sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS);
-}
+bool PetitionTurnInTrigger::IsActive() { return !bot->GetGuildId() && AI_VALUE2(uint32, "item count", chat->FormatQItem(5863)) && AI_VALUE(uint8, "petition signs") >= sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS); }
 
-bool BuyTabardTrigger::IsActive()
-{
-    return bot->GetGuildId() && !AI_VALUE2(uint32, "item count", chat->FormatQItem(5976));
-}
+bool BuyTabardTrigger::IsActive() { return bot->GetGuildId() && !AI_VALUE2(uint32, "item count", chat->FormatQItem(5976)); }
 
 bool LeaveLargeGuildTrigger::IsActive()
 {

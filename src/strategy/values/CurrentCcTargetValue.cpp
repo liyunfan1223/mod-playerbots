@@ -11,10 +11,7 @@
 class FindCurrentCcTargetStrategy : public FindTargetStrategy
 {
    public:
-    FindCurrentCcTargetStrategy(PlayerbotAI *botAI, std::string const spell)
-        : FindTargetStrategy(botAI), spell(spell)
-    {
-    }
+    FindCurrentCcTargetStrategy(PlayerbotAI *botAI, std::string const spell) : FindTargetStrategy(botAI), spell(spell) {}
 
     void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override
     {

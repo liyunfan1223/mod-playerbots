@@ -35,10 +35,7 @@ class PlayerbotsDatabaseScript : public DatabaseScript
     bool OnDatabasesLoading() override
     {
         DatabaseLoader playerbotLoader("server.playerbots");
-        playerbotLoader.SetUpdateFlags(
-            sConfigMgr->GetOption<bool>("Playerbots.Updates.EnableDatabases", true)
-                ? DatabaseLoader::DATABASE_PLAYERBOTS
-                : 0);
+        playerbotLoader.SetUpdateFlags(sConfigMgr->GetOption<bool>("Playerbots.Updates.EnableDatabases", true) ? DatabaseLoader::DATABASE_PLAYERBOTS : 0);
         playerbotLoader.AddDatabase(PlayerbotsDatabase, "Playerbots");
 
         return playerbotLoader.Load();
@@ -48,13 +45,9 @@ class PlayerbotsDatabaseScript : public DatabaseScript
 
     void OnDatabasesClosing() override { PlayerbotsDatabase.Close(); }
 
-    void OnDatabaseWarnAboutSyncQueries(bool apply) override
-    {
-        PlayerbotsDatabase.WarnAboutSyncQueries(apply);
-    }
+    void OnDatabaseWarnAboutSyncQueries(bool apply) override { PlayerbotsDatabase.WarnAboutSyncQueries(apply); }
 
-    void OnDatabaseSelectIndexLogout(Player *player, uint32 &statementIndex,
-                                     uint32 &statementParam) override
+    void OnDatabaseSelectIndexLogout(Player *player, uint32 &statementIndex, uint32 &statementParam) override
     {
         statementIndex = CHAR_UPD_CHAR_ONLINE;
         statementParam = player->GetGUID().GetCounter();
@@ -62,8 +55,7 @@ class PlayerbotsDatabaseScript : public DatabaseScript
 
     void OnDatabaseGetDBRevision(std::string &revision) override
     {
-        if (QueryResult resultPlayerbot = PlayerbotsDatabase.Query(
-                "SELECT date FROM version_db_playerbots ORDER BY date DESC LIMIT 1"))
+        if (QueryResult resultPlayerbot = PlayerbotsDatabase.Query("SELECT date FROM version_db_playerbots ORDER BY date DESC LIMIT 1"))
         {
             Field *fields = resultPlayerbot->Fetch();
             revision = fields[0].Get<std::string>();
@@ -117,8 +109,7 @@ class PlayerbotsPlayerScript : public PlayerScript
         }
     }
 
-    bool CanPlayerUseChat(Player *player, uint32 type, uint32 /*lang*/, std::string &msg,
-                          Player *receiver) override
+    bool CanPlayerUseChat(Player *player, uint32 type, uint32 /*lang*/, std::string &msg, Player *receiver) override
     {
         if (type == CHAT_MSG_WHISPER)
         {
@@ -133,8 +124,7 @@ class PlayerbotsPlayerScript : public PlayerScript
         return true;
     }
 
-    void OnChat(Player *player, uint32 type, uint32 /*lang*/, std::string &msg,
-                Group *group) override
+    void OnChat(Player *player, uint32 type, uint32 /*lang*/, std::string &msg, Group *group) override
     {
         for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -154,8 +144,7 @@ class PlayerbotsPlayerScript : public PlayerScript
         {
             if (PlayerbotMgr *playerbotMgr = GET_PLAYERBOT_MGR(player))
             {
-                for (PlayerBotMap::const_iterator it = playerbotMgr->GetPlayerBotsBegin();
-                     it != playerbotMgr->GetPlayerBotsEnd(); ++it)
+                for (PlayerBotMap::const_iterator it = playerbotMgr->GetPlayerBotsBegin(); it != playerbotMgr->GetPlayerBotsEnd(); ++it)
                 {
                     if (Player *const bot = it->second)
                     {
@@ -169,8 +158,7 @@ class PlayerbotsPlayerScript : public PlayerScript
         }
     }
 
-    void OnChat(Player *player, uint32 type, uint32 /*lang*/, std::string &msg,
-                Channel *channel) override
+    void OnChat(Player *player, uint32 type, uint32 /*lang*/, std::string &msg, Channel *channel) override
     {
         if (PlayerbotMgr *playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
@@ -183,8 +171,7 @@ class PlayerbotsPlayerScript : public PlayerScript
         sRandomPlayerbotMgr->HandleCommand(type, msg, player);
     }
 
-    bool OnBeforeCriteriaProgress(Player *player,
-                                  AchievementCriteriaEntry const * /*criteria*/) override
+    bool OnBeforeCriteriaProgress(Player *player, AchievementCriteriaEntry const * /*criteria*/) override
     {
         if (sRandomPlayerbotMgr->IsRandomBot(player))
         {
@@ -249,8 +236,7 @@ class PlayerbotsWorldScript : public WorldScript
 
         sPlayerbotAIConfig->Initialize();
 
-        LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms",
-                 GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms", GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 };

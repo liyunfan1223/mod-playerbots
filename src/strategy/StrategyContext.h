@@ -139,16 +139,10 @@ class StrategyContext : public NamedObjectContext<Strategy>
     static Strategy *passive(PlayerbotAI *botAI) { return new PassiveStrategy(botAI); }
     // static Strategy* conserve_mana(PlayerbotAI* botAI) { return new ConserveManaStrategy(botAI);
     // }
-    static Strategy *auto_save_mana(PlayerbotAI *botAI)
-    {
-        return new HealerAutoSaveManaStrategy(botAI);
-    }
+    static Strategy *auto_save_mana(PlayerbotAI *botAI) { return new HealerAutoSaveManaStrategy(botAI); }
     static Strategy *food(PlayerbotAI *botAI) { return new UseFoodStrategy(botAI); }
     static Strategy *chat(PlayerbotAI *botAI) { return new ChatCommandHandlerStrategy(botAI); }
-    static Strategy *world_packet(PlayerbotAI *botAI)
-    {
-        return new WorldPacketHandlerStrategy(botAI);
-    }
+    static Strategy *world_packet(PlayerbotAI *botAI) { return new WorldPacketHandlerStrategy(botAI); }
     static Strategy *ready_check(PlayerbotAI *botAI) { return new ReadyCheckStrategy(botAI); }
     static Strategy *pvp(PlayerbotAI *botAI) { return new AttackEnemyPlayersStrategy(botAI); }
     static Strategy *_return(PlayerbotAI *botAI) { return new ReturnStrategy(botAI); }
@@ -234,10 +228,7 @@ class QuestStrategyContext : public NamedObjectContext<Strategy>
 
    private:
     static Strategy *quest(PlayerbotAI *botAI) { return new DefaultQuestStrategy(botAI); }
-    static Strategy *accept_all_quests(PlayerbotAI *botAI)
-    {
-        return new AcceptAllQuestsStrategy(botAI);
-    }
+    static Strategy *accept_all_quests(PlayerbotAI *botAI) { return new AcceptAllQuestsStrategy(botAI); }
 };
 
 #endif

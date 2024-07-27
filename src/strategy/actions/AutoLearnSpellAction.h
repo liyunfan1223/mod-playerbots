@@ -14,10 +14,7 @@ class PlayerbotAI;
 class AutoLearnSpellAction : public Action
 {
    public:
-    AutoLearnSpellAction(PlayerbotAI *botAI, std::string const name = "auto learn spell")
-        : Action(botAI, name)
-    {
-    }
+    AutoLearnSpellAction(PlayerbotAI *botAI, std::string const name = "auto learn spell") : Action(botAI, name) {}
 
     bool Execute(Event event);
 
@@ -31,10 +28,7 @@ class AutoLearnSpellAction : public Action
 class AutoUpgradeEquipAction : public Action
 {
    public:
-    AutoUpgradeEquipAction(PlayerbotAI *botAI, std::string const name = "auto upgrade equip")
-        : Action(botAI, name)
-    {
-    }
+    AutoUpgradeEquipAction(PlayerbotAI *botAI, std::string const name = "auto upgrade equip") : Action(botAI, name) {}
 
     bool Execute(Event event);
 };

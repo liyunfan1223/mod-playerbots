@@ -23,10 +23,7 @@ class AddLootAction : public Action
 class AddAllLootAction : public Action
 {
    public:
-    AddAllLootAction(PlayerbotAI *botAI, std::string const name = "add all loot")
-        : Action(botAI, name)
-    {
-    }
+    AddAllLootAction(PlayerbotAI *botAI, std::string const name = "add all loot") : Action(botAI, name) {}
     bool Execute(Event event) override;
     bool isUseful() override;
 

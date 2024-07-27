@@ -25,10 +25,7 @@ class AttackAction : public MovementAction
 class AttackMyTargetAction : public AttackAction
 {
    public:
-    AttackMyTargetAction(PlayerbotAI *botAI, std::string const name = "attack my target")
-        : AttackAction(botAI, name)
-    {
-    }
+    AttackMyTargetAction(PlayerbotAI *botAI, std::string const name = "attack my target") : AttackAction(botAI, name) {}
 
     bool Execute(Event event) override;
 };
@@ -36,10 +33,7 @@ class AttackMyTargetAction : public AttackAction
 class AttackDuelOpponentAction : public AttackAction
 {
    public:
-    AttackDuelOpponentAction(PlayerbotAI *botAI, std::string const name = "attack duel opponent")
-        : AttackAction(botAI, name)
-    {
-    }
+    AttackDuelOpponentAction(PlayerbotAI *botAI, std::string const name = "attack duel opponent") : AttackAction(botAI, name) {}
 
    public:
     bool Execute(Event event) override;

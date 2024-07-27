@@ -44,11 +44,7 @@ void LootTargetList::shrink(time_t fromTime)
     }
 }
 
-LootObject::LootObject(Player *bot, ObjectGuid guid)
-    : guid(), skillId(SKILL_NONE), reqSkillValue(0), reqItem(0)
-{
-    Refresh(bot, guid);
-}
+LootObject::LootObject(Player *bot, ObjectGuid guid) : guid(), skillId(SKILL_NONE), reqSkillValue(0), reqItem(0) { Refresh(bot, guid); }
 
 void LootObject::Refresh(Player *bot, ObjectGuid lootGUID)
 {
@@ -72,9 +68,7 @@ void LootObject::Refresh(Player *bot, ObjectGuid lootGUID)
         {
             skillId = creature->GetCreatureTemplate()->GetRequiredLootSkill();
             uint32 targetLevel = creature->GetLevel();
-            reqSkillValue = targetLevel < 10   ? 1
-                            : targetLevel < 20 ? (targetLevel - 10) * 10
-                                               : targetLevel * 5;
+            reqSkillValue = targetLevel < 10 ? 1 : targetLevel < 20 ? (targetLevel - 10) * 10 : targetLevel * 5;
             if (botAI->HasSkill((SkillType)skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
                 guid = lootGUID;
         }
@@ -87,8 +81,7 @@ void LootObject::Refresh(Player *bot, ObjectGuid lootGUID)
     {
         bool isQuestItemOnly = false;
 
-        GameObjectQuestItemList const *items =
-            sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
+        GameObjectQuestItemList const *items = sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
         for (int i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
         {
             if (!items || i >= items->size())
@@ -162,8 +155,7 @@ bool LootObject::IsNeededForQuest(Player *bot, uint32 itemId)
 
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
-            if (!qInfo->RequiredItemCount[i] ||
-                (qInfo->RequiredItemCount[i] - qData.ItemCount[i]) <= 0)
+            if (!qInfo->RequiredItemCount[i] || (qInfo->RequiredItemCount[i] - qData.ItemCount[i]) <= 0)
                 continue;
 
             if (qInfo->RequiredItemId[i] != itemId)

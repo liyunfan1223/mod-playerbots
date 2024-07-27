@@ -46,28 +46,19 @@ class CastHealingTouchAction : public CastHealingSpellAction
 class CastRejuvenationOnPartyAction : public HealPartyMemberAction
 {
    public:
-    CastRejuvenationOnPartyAction(PlayerbotAI *botAI)
-        : HealPartyMemberAction(botAI, "rejuvenation", 15.0f, HealingManaEfficiency::VERY_HIGH)
-    {
-    }
+    CastRejuvenationOnPartyAction(PlayerbotAI *botAI) : HealPartyMemberAction(botAI, "rejuvenation", 15.0f, HealingManaEfficiency::VERY_HIGH) {}
 };
 
 class CastRegrowthOnPartyAction : public HealPartyMemberAction
 {
    public:
-    CastRegrowthOnPartyAction(PlayerbotAI *botAI)
-        : HealPartyMemberAction(botAI, "regrowth", 35.0f, HealingManaEfficiency::HIGH)
-    {
-    }
+    CastRegrowthOnPartyAction(PlayerbotAI *botAI) : HealPartyMemberAction(botAI, "regrowth", 35.0f, HealingManaEfficiency::HIGH) {}
 };
 
 class CastHealingTouchOnPartyAction : public HealPartyMemberAction
 {
    public:
-    CastHealingTouchOnPartyAction(PlayerbotAI *botAI)
-        : HealPartyMemberAction(botAI, "healing touch", 50.0f, HealingManaEfficiency::LOW)
-    {
-    }
+    CastHealingTouchOnPartyAction(PlayerbotAI *botAI) : HealPartyMemberAction(botAI, "healing touch", 50.0f, HealingManaEfficiency::LOW) {}
 };
 
 class CastReviveAction : public ResurrectPartyMemberAction
@@ -96,28 +87,19 @@ class CastMarkOfTheWildAction : public CastBuffSpellAction
 class CastMarkOfTheWildOnPartyAction : public BuffOnPartyAction
 {
    public:
-    CastMarkOfTheWildOnPartyAction(PlayerbotAI *botAI)
-        : BuffOnPartyAction(botAI, "mark of the wild")
-    {
-    }
+    CastMarkOfTheWildOnPartyAction(PlayerbotAI *botAI) : BuffOnPartyAction(botAI, "mark of the wild") {}
 };
 
 class CastSurvivalInstinctsAction : public CastBuffSpellAction
 {
    public:
-    CastSurvivalInstinctsAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "survival instincts")
-    {
-    }
+    CastSurvivalInstinctsAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "survival instincts") {}
 };
 
 class CastFrenziedRegenerationAction : public CastBuffSpellAction
 {
    public:
-    CastFrenziedRegenerationAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "frenzied regeneration")
-    {
-    }
+    CastFrenziedRegenerationAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "frenzied regeneration") {}
 };
 
 class CastThornsAction : public CastBuffSpellAction
@@ -172,9 +154,7 @@ class CastMoonfireAction : public CastDebuffSpellAction
 class CastInsectSwarmAction : public CastDebuffSpellAction
 {
    public:
-    CastInsectSwarmAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "insect swarm", true)
-    {
-    }
+    CastInsectSwarmAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "insect swarm", true) {}
 };
 
 class CastStarfireAction : public CastSpellAction
@@ -192,10 +172,7 @@ class CastEntanglingRootsAction : public CastSpellAction
 class CastEntanglingRootsCcAction : public CastSpellAction
 {
    public:
-    CastEntanglingRootsCcAction(PlayerbotAI *botAI)
-        : CastSpellAction(botAI, "entangling roots on cc")
-    {
-    }
+    CastEntanglingRootsCcAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "entangling roots on cc") {}
     Value<Unit *> *GetTargetValue() override;
     bool Execute(Event event) override;
 };
@@ -229,10 +206,7 @@ class CastCurePoisonAction : public CastCureSpellAction
 class CastCurePoisonOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastCurePoisonOnPartyAction(PlayerbotAI *botAI)
-        : CurePartyMemberAction(botAI, "cure poison", DISPEL_POISON)
-    {
-    }
+    CastCurePoisonOnPartyAction(PlayerbotAI *botAI) : CurePartyMemberAction(botAI, "cure poison", DISPEL_POISON) {}
 };
 
 class CastAbolishPoisonAction : public CastCureSpellAction
@@ -245,10 +219,7 @@ class CastAbolishPoisonAction : public CastCureSpellAction
 class CastAbolishPoisonOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastAbolishPoisonOnPartyAction(PlayerbotAI *botAI)
-        : CurePartyMemberAction(botAI, "abolish poison", DISPEL_POISON)
-    {
-    }
+    CastAbolishPoisonOnPartyAction(PlayerbotAI *botAI) : CurePartyMemberAction(botAI, "abolish poison", DISPEL_POISON) {}
 
     NextAction **getAlternatives() override;
 };
@@ -270,72 +241,49 @@ class CastInnervateAction : public CastSpellAction
 class CastTranquilityAction : public CastAoeHealSpellAction
 {
    public:
-    CastTranquilityAction(PlayerbotAI *botAI)
-        : CastAoeHealSpellAction(botAI, "tranquility", 15.0f, HealingManaEfficiency::MEDIUM)
-    {
-    }
+    CastTranquilityAction(PlayerbotAI *botAI) : CastAoeHealSpellAction(botAI, "tranquility", 15.0f, HealingManaEfficiency::MEDIUM) {}
 };
 
 class CastNaturesSwiftnessAction : public CastBuffSpellAction
 {
    public:
-    CastNaturesSwiftnessAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "nature's swiftness")
-    {
-    }
+    CastNaturesSwiftnessAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "nature's swiftness") {}
 };
 
 class CastWildGrowthOnPartyAction : public HealPartyMemberAction
 {
    public:
-    CastWildGrowthOnPartyAction(PlayerbotAI *ai)
-        : HealPartyMemberAction(ai, "wild growth", 15.0f, HealingManaEfficiency::VERY_HIGH)
-    {
-    }
+    CastWildGrowthOnPartyAction(PlayerbotAI *ai) : HealPartyMemberAction(ai, "wild growth", 15.0f, HealingManaEfficiency::VERY_HIGH) {}
 };
 
 class CastPartySwiftmendAction : public HealPartyMemberAction
 {
    public:
-    CastPartySwiftmendAction(PlayerbotAI *ai)
-        : HealPartyMemberAction(ai, "swiftmend", 15.0f, HealingManaEfficiency::MEDIUM)
-    {
-    }
+    CastPartySwiftmendAction(PlayerbotAI *ai) : HealPartyMemberAction(ai, "swiftmend", 15.0f, HealingManaEfficiency::MEDIUM) {}
 };
 
 class CastPartyNourishAction : public HealPartyMemberAction
 {
    public:
-    CastPartyNourishAction(PlayerbotAI *ai)
-        : HealPartyMemberAction(ai, "nourish", 25.0f, HealingManaEfficiency::LOW)
-    {
-    }
+    CastPartyNourishAction(PlayerbotAI *ai) : HealPartyMemberAction(ai, "nourish", 25.0f, HealingManaEfficiency::LOW) {}
 };
 
 class CastDruidRemoveCurseOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastDruidRemoveCurseOnPartyAction(PlayerbotAI *ai)
-        : CurePartyMemberAction(ai, "remove curse", DISPEL_CURSE)
-    {
-    }
+    CastDruidRemoveCurseOnPartyAction(PlayerbotAI *ai) : CurePartyMemberAction(ai, "remove curse", DISPEL_CURSE) {}
 };
 
 class CastInsectSwarmOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
    public:
-    CastInsectSwarmOnAttackerAction(PlayerbotAI *ai)
-        : CastDebuffSpellOnAttackerAction(ai, "insect swarm")
-    {
-    }
+    CastInsectSwarmOnAttackerAction(PlayerbotAI *ai) : CastDebuffSpellOnAttackerAction(ai, "insect swarm") {}
 };
 
 class CastMoonfireOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
    public:
-    CastMoonfireOnAttackerAction(PlayerbotAI *ai) : CastDebuffSpellOnAttackerAction(ai, "moonfire")
-    {
-    }
+    CastMoonfireOnAttackerAction(PlayerbotAI *ai) : CastDebuffSpellOnAttackerAction(ai, "moonfire") {}
 };
 
 class CastEnrageAction : public CastBuffSpellAction

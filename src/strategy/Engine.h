@@ -79,26 +79,18 @@ class Engine : public PlayerbotAIAware
     std::string const GetLastAction() { return lastAction; }
 
     virtual bool DoNextAction(Unit *, uint32 depth = 0, bool minimal = false);
-    ActionResult ExecuteAction(std::string const name, Event event = Event(),
-                               std::string const qualifier = "");
+    ActionResult ExecuteAction(std::string const name, Event event = Event(), std::string const qualifier = "");
 
-    void AddActionExecutionListener(ActionExecutionListener *listener)
-    {
-        actionExecutionListeners.Add(listener);
-    }
+    void AddActionExecutionListener(ActionExecutionListener *listener) { actionExecutionListeners.Add(listener); }
 
-    void removeActionExecutionListener(ActionExecutionListener *listener)
-    {
-        actionExecutionListeners.Remove(listener);
-    }
+    void removeActionExecutionListener(ActionExecutionListener *listener) { actionExecutionListeners.Remove(listener); }
 
     virtual ~Engine(void);
 
     bool testMode;
 
    private:
-    bool MultiplyAndPush(NextAction **actions, float forceRelevance, bool skipPrerequisites,
-                         Event event, const char *pushType);
+    bool MultiplyAndPush(NextAction **actions, float forceRelevance, bool skipPrerequisites, Event event, const char *pushType);
     void Reset();
     void ProcessTriggers(bool minimal);
     void PushDefaultActions();

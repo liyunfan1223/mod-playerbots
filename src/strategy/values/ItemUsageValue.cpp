@@ -40,8 +40,7 @@ ItemUsage ItemUsageValue::Calculate()
         {
             bool lowBagSpace = AI_VALUE(uint8, "bag space") > 50;
 
-            if (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_MISC ||
-                proto->Class == ITEM_CLASS_REAGENT)
+            if (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_MISC || proto->Class == ITEM_CLASS_REAGENT)
                 needItem = IsItemNeededForUsefullSpell(proto, lowBagSpace);
             else if (proto->Class == ITEM_CLASS_RECIPE)
             {
@@ -91,20 +90,16 @@ ItemUsage ItemUsageValue::Calculate()
     if (equip != ITEM_USAGE_NONE)
         return equip;
 
-    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) &&
-        proto->Bonding != BIND_WHEN_PICKED_UP && botAI->HasSkill(SKILL_ENCHANTING) &&
-        proto->Quality >= ITEM_QUALITY_UNCOMMON)
+    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && proto->Bonding != BIND_WHEN_PICKED_UP && botAI->HasSkill(SKILL_ENCHANTING) && proto->Quality >= ITEM_QUALITY_UNCOMMON)
         return ITEM_USAGE_DISENCHANT;
 
     // While sync is on, do not loot quest items that are also Useful for master. Master
-    if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer ||
-        !IsItemUsefulForQuest(botAI->GetMaster(), proto))
+    if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer || !IsItemUsefulForQuest(botAI->GetMaster(), proto))
         if (IsItemUsefulForQuest(bot, proto))
             return ITEM_USAGE_QUEST;
 
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
-        if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE ||
-            bot->getClass() == CLASS_WARRIOR)
+        if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
         {
             if (Item *const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
             {
@@ -197,11 +192,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const *itemProto)
     if (itemScore)
         shouldEquip = true;
 
-    if (itemProto->Class == ITEM_CLASS_WEAPON &&
-        !sRandomItemMgr->CanEquipWeapon(bot->getClass(), itemProto))
+    if (itemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), itemProto))
         shouldEquip = false;
-    if (itemProto->Class == ITEM_CLASS_ARMOR &&
-        !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), itemProto))
+    if (itemProto->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), itemProto))
         shouldEquip = false;
 
     Item *oldItem = bot->GetItemByPos(dest);
@@ -242,12 +235,10 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const *itemProto)
     }
 
     bool existingShouldEquip = true;
-    if (oldItemProto->Class == ITEM_CLASS_WEAPON &&
-        !sRandomItemMgr->CanEquipWeapon(bot->getClass(), oldItemProto))
+    if (oldItemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), oldItemProto))
         existingShouldEquip = false;
 
-    if (oldItemProto->Class == ITEM_CLASS_ARMOR &&
-        !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), oldItemProto))
+    if (oldItemProto->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), oldItemProto))
         existingShouldEquip = false;
 
     // uint32 oldItemPower = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
@@ -264,13 +255,10 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const *itemProto)
     //     isBetter = true;
 
     Item *item = CurrentItem(itemProto);
-    bool itemIsBroken = item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 &&
-                        item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
-    bool oldItemIsBroken = oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 &&
-                           oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+    bool itemIsBroken = item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+    bool oldItemIsBroken = oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
 
-    if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquip || !existingShouldEquip) &&
-        isBetter)
+    if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquip || !existingShouldEquip) && isBetter)
     {
         switch (itemProto->Class)
         {
@@ -341,8 +329,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player *player, ItemTemplate const *pr
             if (quest->RequiredItemId[i] != proto->ItemId)
                 continue;
 
-            if (GET_PLAYERBOT_AI(player) &&
-                AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+            if (GET_PLAYERBOT_AI(player) && AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
                 continue;
 
             return true;
@@ -394,49 +381,32 @@ bool ItemUsageValue::IsItemUsefulForSkill(ItemTemplate const *proto)
         case ITEM_CLASS_REAGENT:
         case ITEM_CLASS_GEM:
         {
-            if (botAI->HasSkill(SKILL_TAILORING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_TAILORING))
+            if (botAI->HasSkill(SKILL_TAILORING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_TAILORING))
                 return true;
-            if (botAI->HasSkill(SKILL_LEATHERWORKING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_LEATHERWORKING))
+            if (botAI->HasSkill(SKILL_LEATHERWORKING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_LEATHERWORKING))
                 return true;
-            if (botAI->HasSkill(SKILL_ENGINEERING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_ENGINEERING))
+            if (botAI->HasSkill(SKILL_ENGINEERING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_ENGINEERING))
                 return true;
-            if (botAI->HasSkill(SKILL_BLACKSMITHING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_BLACKSMITHING))
+            if (botAI->HasSkill(SKILL_BLACKSMITHING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_BLACKSMITHING))
                 return true;
-            if (botAI->HasSkill(SKILL_ALCHEMY) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_ALCHEMY))
+            if (botAI->HasSkill(SKILL_ALCHEMY) && RandomItemMgr::IsUsedBySkill(proto, SKILL_ALCHEMY))
                 return true;
-            if (botAI->HasSkill(SKILL_ENCHANTING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_ENCHANTING))
+            if (botAI->HasSkill(SKILL_ENCHANTING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_ENCHANTING))
                 return true;
-            if (botAI->HasSkill(SKILL_FISHING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_FISHING))
+            if (botAI->HasSkill(SKILL_FISHING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_FISHING))
                 return true;
-            if (botAI->HasSkill(SKILL_FIRST_AID) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_FIRST_AID))
+            if (botAI->HasSkill(SKILL_FIRST_AID) && RandomItemMgr::IsUsedBySkill(proto, SKILL_FIRST_AID))
                 return true;
-            if (botAI->HasSkill(SKILL_COOKING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_COOKING))
+            if (botAI->HasSkill(SKILL_COOKING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_COOKING))
                 return true;
-            if (botAI->HasSkill(SKILL_JEWELCRAFTING) &&
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_JEWELCRAFTING))
+            if (botAI->HasSkill(SKILL_JEWELCRAFTING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_JEWELCRAFTING))
                 return true;
             if (botAI->HasSkill(SKILL_MINING) &&
-                (RandomItemMgr::IsUsedBySkill(proto, SKILL_MINING) ||
-                 RandomItemMgr::IsUsedBySkill(proto, SKILL_BLACKSMITHING) ||
-                 RandomItemMgr::IsUsedBySkill(proto, SKILL_JEWELCRAFTING) ||
-                 RandomItemMgr::IsUsedBySkill(proto, SKILL_ENGINEERING)))
+                (RandomItemMgr::IsUsedBySkill(proto, SKILL_MINING) || RandomItemMgr::IsUsedBySkill(proto, SKILL_BLACKSMITHING) || RandomItemMgr::IsUsedBySkill(proto, SKILL_JEWELCRAFTING) || RandomItemMgr::IsUsedBySkill(proto, SKILL_ENGINEERING)))
                 return true;
-            if (botAI->HasSkill(SKILL_SKINNING) &&
-                (RandomItemMgr::IsUsedBySkill(proto, SKILL_SKINNING) ||
-                 RandomItemMgr::IsUsedBySkill(proto, SKILL_LEATHERWORKING)))
+            if (botAI->HasSkill(SKILL_SKINNING) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_SKINNING) || RandomItemMgr::IsUsedBySkill(proto, SKILL_LEATHERWORKING)))
                 return true;
-            if (botAI->HasSkill(SKILL_HERBALISM) &&
-                (RandomItemMgr::IsUsedBySkill(proto, SKILL_HERBALISM) ||
-                 RandomItemMgr::IsUsedBySkill(proto, SKILL_ALCHEMY)))
+            if (botAI->HasSkill(SKILL_HERBALISM) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_HERBALISM) || RandomItemMgr::IsUsedBySkill(proto, SKILL_ALCHEMY)))
                 return true;
 
             return false;
@@ -492,9 +462,7 @@ bool ItemUsageValue::IsItemNeededForUsefullSpell(ItemTemplate const *proto, bool
         {
             ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", newItemId);
 
-            if (usage != ITEM_USAGE_REPLACE && usage != ITEM_USAGE_EQUIP &&
-                usage != ITEM_USAGE_AMMO && usage != ITEM_USAGE_QUEST &&
-                usage != ITEM_USAGE_SKILL && usage != ITEM_USAGE_USE)
+            if (usage != ITEM_USAGE_REPLACE && usage != ITEM_USAGE_EQUIP && usage != ITEM_USAGE_AMMO && usage != ITEM_USAGE_QUEST && usage != ITEM_USAGE_SKILL && usage != ITEM_USAGE_USE)
                 continue;
 
             return true;
@@ -513,10 +481,8 @@ bool ItemUsageValue::HasItemsNeededForSpell(uint32 spellId, ItemTemplate const *
     for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
         if (spellInfo->ReagentCount[i] > 0 && spellInfo->Reagent[i])
         {
-            if (proto && proto->ItemId == spellInfo->Reagent[i] &&
-                spellInfo->ReagentCount[i] ==
-                    1)  // If we only need 1 item then current item does not need to be checked
-                        // since we are looting/buying or already have it.
+            if (proto && proto->ItemId == spellInfo->Reagent[i] && spellInfo->ReagentCount[i] == 1)  // If we only need 1 item then current item does not need to be checked
+                                                                                                     // since we are looting/buying or already have it.
                 continue;
 
             ItemTemplate const *reqProto = sObjectMgr->GetItemTemplate(spellInfo->Reagent[i]);
@@ -533,12 +499,10 @@ bool ItemUsageValue::HasItemsNeededForSpell(uint32 spellId, ItemTemplate const *
 Item *ItemUsageValue::CurrentItem(ItemTemplate const *proto)
 {
     Item *bestItem = nullptr;
-    std::vector<Item *> found =
-        AI_VALUE2(std::vector<Item *>, "inventory items", chat->FormatItem(proto));
+    std::vector<Item *> found = AI_VALUE2(std::vector<Item *>, "inventory items", chat->FormatItem(proto));
     for (auto item : found)
     {
-        if (bestItem && item->GetUInt32Value(ITEM_FIELD_DURABILITY) <
-                            bestItem->GetUInt32Value(ITEM_FIELD_DURABILITY))
+        if (bestItem && item->GetUInt32Value(ITEM_FIELD_DURABILITY) < bestItem->GetUInt32Value(ITEM_FIELD_DURABILITY))
             continue;
 
         if (bestItem && item->GetCount() < bestItem->GetCount())
@@ -554,8 +518,7 @@ float ItemUsageValue::CurrentStacks(ItemTemplate const *proto)
 {
     uint32 maxStack = proto->GetMaxStackSize();
 
-    std::vector<Item *> found =
-        AI_VALUE2(std::vector<Item *>, "inventory items", chat->FormatItem(proto));
+    std::vector<Item *> found = AI_VALUE2(std::vector<Item *>, "inventory items", chat->FormatItem(proto));
 
     float itemCount = 0;
 
@@ -623,8 +586,7 @@ std::vector<uint32> ItemUsageValue::SpellsUsingItem(uint32 itemId, Player *bot)
     return retSpells;
 }
 
-inline int32 SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLevel,
-                             uint32 YellowLevel)
+inline int32 SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLevel, uint32 YellowLevel)
 {
     if (SkillValue >= GrayLevel)
         return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREY) * 10;
@@ -642,8 +604,7 @@ bool ItemUsageValue::SpellGivesSkillUp(uint32 spellId, Player *bot)
 {
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
 
-    for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second;
-         ++_spell_idx)
+    for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
         SkillLineAbilityEntry const *skill = _spell_idx->second;
         if (skill->SkillLine)
@@ -652,10 +613,7 @@ bool ItemUsageValue::SpellGivesSkillUp(uint32 spellId, Player *bot)
 
             uint32 craft_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
 
-            if (SkillGainChance(
-                    SkillValue, skill->TrivialSkillLineRankHigh,
-                    (skill->TrivialSkillLineRankHigh + skill->TrivialSkillLineRankLow) / 2,
-                    skill->TrivialSkillLineRankLow) > 0)
+            if (SkillGainChance(SkillValue, skill->TrivialSkillLineRankHigh, (skill->TrivialSkillLineRankHigh + skill->TrivialSkillLineRankLow) / 2, skill->TrivialSkillLineRankLow) > 0)
                 return true;
         }
     }

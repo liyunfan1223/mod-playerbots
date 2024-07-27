@@ -47,71 +47,35 @@ bool MainHandWeaponNoImbueTrigger::IsActive()
 bool OffHandWeaponNoImbueTrigger::IsActive()
 {
     Item *const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) ||
-        itemForSpell->GetTemplate()->InventoryType != INVTYPE_WEAPON)
+    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) || itemForSpell->GetTemplate()->InventoryType != INVTYPE_WEAPON)
         return false;
     return true;
 }
 
-bool ShockTrigger::IsActive()
-{
-    return SpellTrigger::IsActive() && !botAI->HasAura("flame shock", GetTarget(), false, true) &&
-           !botAI->HasAura("frost shock", GetTarget(), false, true);
-}
+bool ShockTrigger::IsActive() { return SpellTrigger::IsActive() && !botAI->HasAura("flame shock", GetTarget(), false, true) && !botAI->HasAura("frost shock", GetTarget(), false, true); }
 
-bool TotemTrigger::IsActive()
-{
-    return AI_VALUE(uint8, "attacker count") >= attackerCount &&
-           !AI_VALUE2(bool, "has totem", name) && !botAI->HasAura(name, bot);
-}
+bool TotemTrigger::IsActive() { return AI_VALUE(uint8, "attacker count") >= attackerCount && !AI_VALUE2(bool, "has totem", name) && !botAI->HasAura(name, bot); }
 
-bool ManaSpringTotemTrigger::IsActive()
-{
-    return AI_VALUE(uint8, "attacker count") >= attackerCount &&
-           !AI_VALUE2(bool, "has totem", "mana tide totem") && !AI_VALUE2(bool, "has totem", name);
-}
+bool ManaSpringTotemTrigger::IsActive() { return AI_VALUE(uint8, "attacker count") >= attackerCount && !AI_VALUE2(bool, "has totem", "mana tide totem") && !AI_VALUE2(bool, "has totem", name); }
 
-bool WaterWalkingTrigger::IsActive()
-{
-    return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target");
-}
+bool WaterWalkingTrigger::IsActive() { return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); }
 
-bool WaterBreathingTrigger::IsActive()
-{
-    return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target");
-}
+bool WaterBreathingTrigger::IsActive() { return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); }
 
-bool WaterWalkingOnPartyTrigger::IsActive()
-{
-    return BuffOnPartyTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target");
-}
+bool WaterWalkingOnPartyTrigger::IsActive() { return BuffOnPartyTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); }
 
-bool WaterBreathingOnPartyTrigger::IsActive()
-{
-    return BuffOnPartyTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target");
-}
+bool WaterBreathingOnPartyTrigger::IsActive() { return BuffOnPartyTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); }
 
 bool NoFireTotemTrigger::IsActive()
 {
-    return !AI_VALUE2(bool, "has totem", "magma totem") &&
-           !AI_VALUE2(bool, "has totem", "flametongue totem") &&
-           !AI_VALUE2(bool, "has totem", "searing totem") &&
-           !AI_VALUE2(bool, "has totem", "fire elemental totem") &&
-           !AI_VALUE2(bool, "has totem", "frost resistance totem") &&
-           !AI_VALUE2(bool, "has totem", "totem of wrath");
+    return !AI_VALUE2(bool, "has totem", "magma totem") && !AI_VALUE2(bool, "has totem", "flametongue totem") && !AI_VALUE2(bool, "has totem", "searing totem") && !AI_VALUE2(bool, "has totem", "fire elemental totem") &&
+           !AI_VALUE2(bool, "has totem", "frost resistance totem") && !AI_VALUE2(bool, "has totem", "totem of wrath");
 }
 
 bool NoWaterTotemTrigger::IsActive()
 {
-    return !AI_VALUE2(bool, "has totem", "fire resistance totem") &&
-           !AI_VALUE2(bool, "has totem", "mana tide totem") &&
-           !AI_VALUE2(bool, "has totem", "cleansing totem") &&
-           !AI_VALUE2(bool, "has totem", "mana spring totem") &&
+    return !AI_VALUE2(bool, "has totem", "fire resistance totem") && !AI_VALUE2(bool, "has totem", "mana tide totem") && !AI_VALUE2(bool, "has totem", "cleansing totem") && !AI_VALUE2(bool, "has totem", "mana spring totem") &&
            !AI_VALUE2(bool, "has totem", "healing stream totem");
 }
 
-bool NoAirTotemTrigger::IsActive()
-{
-    return !AI_VALUE2(bool, "has totem", "wrath of air totem") &&
-           !AI_VALUE2(bool, "has totem", "windfury totem");
-}
+bool NoAirTotemTrigger::IsActive() { return !AI_VALUE2(bool, "has totem", "wrath of air totem") && !AI_VALUE2(bool, "has totem", "windfury totem"); }

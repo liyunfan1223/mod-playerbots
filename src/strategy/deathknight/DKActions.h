@@ -51,10 +51,7 @@ END_SPELL_ACTION()
 class CastUnholyMeleeSpellAction : public CastMeleeSpellAction
 {
    public:
-    CastUnholyMeleeSpellAction(PlayerbotAI *botAI, std::string const spell)
-        : CastMeleeSpellAction(botAI, spell)
-    {
-    }
+    CastUnholyMeleeSpellAction(PlayerbotAI *botAI, std::string const spell) : CastMeleeSpellAction(botAI, spell) {}
 
     NextAction **getPrerequisites() override;
 };
@@ -63,10 +60,7 @@ class CastUnholyMeleeSpellAction : public CastMeleeSpellAction
 class CastFrostMeleeSpellAction : public CastMeleeSpellAction
 {
    public:
-    CastFrostMeleeSpellAction(PlayerbotAI *botAI, std::string const spell)
-        : CastMeleeSpellAction(botAI, spell)
-    {
-    }
+    CastFrostMeleeSpellAction(PlayerbotAI *botAI, std::string const spell) : CastMeleeSpellAction(botAI, spell) {}
 
     NextAction **getPrerequisites() override;
 };
@@ -75,10 +69,7 @@ class CastFrostMeleeSpellAction : public CastMeleeSpellAction
 class CastBloodMeleeSpellAction : public CastMeleeSpellAction
 {
    public:
-    CastBloodMeleeSpellAction(PlayerbotAI *botAI, std::string const spell)
-        : CastMeleeSpellAction(botAI, spell)
-    {
-    }
+    CastBloodMeleeSpellAction(PlayerbotAI *botAI, std::string const spell) : CastMeleeSpellAction(botAI, spell) {}
 
     NextAction **getPrerequisites() override;
 };
@@ -123,10 +114,7 @@ class CastIcyTouchAction : public CastSpellAction
 class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
    public:
-    CastIcyTouchOnAttackerAction(PlayerbotAI *botAI)
-        : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true, .0f)
-    {
-    }
+    CastIcyTouchOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true, .0f) {}
 };
 
 // debuff ps
@@ -142,10 +130,7 @@ class CastPlagueStrikeAction : public CastSpellAction
 class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
    public:
-    CastPlagueStrikeOnAttackerAction(PlayerbotAI *botAI)
-        : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true, .0f)
-    {
-    }
+    CastPlagueStrikeOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true, .0f) {}
 };
 
 // debuff
@@ -155,10 +140,7 @@ END_SPELL_ACTION()
 class CastMarkOfBloodOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
    public:
-    CastMarkOfBloodOnAttackerAction(PlayerbotAI *botAI)
-        : CastDebuffSpellOnAttackerAction(botAI, "mark of blood", true)
-    {
-    }
+    CastMarkOfBloodOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnAttackerAction(botAI, "mark of blood", true) {}
 };
 
 class CastUnholyBlightAction : public CastBuffSpellAction
@@ -264,10 +246,7 @@ class CastHornOfWinterAction : public CastSpellAction
 class CastImprovedIcyTalonsAction : public CastBuffSpellAction
 {
    public:
-    CastImprovedIcyTalonsAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "improved icy talons")
-    {
-    }
+    CastImprovedIcyTalonsAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "improved icy talons") {}
 };
 
 class CastBoneShieldAction : public CastBuffSpellAction
@@ -285,27 +264,19 @@ class CastDeathPactAction : public CastBuffSpellAction
 class CastDeathRuneMasteryAction : public CastBuffSpellAction
 {
    public:
-    CastDeathRuneMasteryAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "death rune mastery")
-    {
-    }
+    CastDeathRuneMasteryAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "death rune mastery") {}
 };
 
 class CastDancingRuneWeaponAction : public CastSpellAction
 {
    public:
-    CastDancingRuneWeaponAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "dancing rune weapon")
-    {
-    }
+    CastDancingRuneWeaponAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "dancing rune weapon") {}
 };
 
 class CastEmpowerRuneWeaponAction : public CastBuffSpellAction
 {
    public:
-    CastEmpowerRuneWeaponAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "empower rune weapon")
-    {
-    }
+    CastEmpowerRuneWeaponAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "empower rune weapon") {}
 };
 
 class CastArmyOfTheDeadAction : public CastBuffSpellAction
@@ -330,18 +301,13 @@ class CastKillingMachineAction : public CastBuffSpellAction
 class CastIceboundFortitudeAction : public CastBuffSpellAction
 {
    public:
-    CastIceboundFortitudeAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "icebound fortitude")
-    {
-    }
+    CastIceboundFortitudeAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "icebound fortitude") {}
 };
 
 class CastUnbreakableArmorAction : public CastBuffSpellAction
 {
    public:
-    CastUnbreakableArmorAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "unbreakable armor")
-    {
-    }
+    CastUnbreakableArmorAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "unbreakable armor") {}
 };
 
 class CastVampiricBloodAction : public CastBuffSpellAction
@@ -365,10 +331,7 @@ class CastStrangulateAction : public CastMeleeSpellAction
 class CastMindFreezeOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
 {
    public:
-    CastMindFreezeOnEnemyHealerAction(PlayerbotAI *botAI)
-        : CastSpellOnEnemyHealerAction(botAI, "mind freeze")
-    {
-    }
+    CastMindFreezeOnEnemyHealerAction(PlayerbotAI *botAI) : CastSpellOnEnemyHealerAction(botAI, "mind freeze") {}
 };
 
 class CastRuneTapAction : public CastMeleeSpellAction

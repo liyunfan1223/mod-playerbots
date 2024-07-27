@@ -15,10 +15,7 @@ class PlayerbotAI;
 class NewPlayerNearbyValue : public CalculatedValue<ObjectGuid>
 {
    public:
-    NewPlayerNearbyValue(PlayerbotAI *botAI)
-        : CalculatedValue<ObjectGuid>(botAI, "new player nearby")
-    {
-    }
+    NewPlayerNearbyValue(PlayerbotAI *botAI) : CalculatedValue<ObjectGuid>(botAI, "new player nearby") {}
 
     ObjectGuid Calculate() override;
 };
@@ -26,10 +23,7 @@ class NewPlayerNearbyValue : public CalculatedValue<ObjectGuid>
 class AlreadySeenPlayersValue : public ManualSetValue<GuidSet &>
 {
    public:
-    AlreadySeenPlayersValue(PlayerbotAI *botAI)
-        : ManualSetValue<GuidSet &>(botAI, data, "already seen players")
-    {
-    }
+    AlreadySeenPlayersValue(PlayerbotAI *botAI) : ManualSetValue<GuidSet &>(botAI, data, "already seen players") {}
 
     GuidSet data;
 };

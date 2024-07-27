@@ -41,8 +41,7 @@ bool LootRollAction::Execute(Event event)
         {
             case ITEM_CLASS_WEAPON:
             case ITEM_CLASS_ARMOR:
-                if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE ||
-                    usage == ITEM_USAGE_BAD_EQUIP)
+                if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
                 {
                     vote = NEED;
                 }

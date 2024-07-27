@@ -12,10 +12,7 @@
 class MagePullMultiplier : public PassiveMultiplier
 {
    public:
-    MagePullMultiplier(PlayerbotAI *botAI, std::string const action)
-        : PassiveMultiplier(botAI), actionName(action)
-    {
-    }
+    MagePullMultiplier(PlayerbotAI *botAI, std::string const action) : PassiveMultiplier(botAI), actionName(action) {}
 
     float GetValue(Action *action) override;
 
@@ -35,16 +32,9 @@ float MagePullMultiplier::GetValue(Action *action)
     return PassiveMultiplier::GetValue(action);
 }
 
-NextAction **PullStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction(action, 105.0f), new NextAction("follow", 104.0f),
-                             new NextAction("end pull", 103.0f), nullptr);
-}
+NextAction **PullStrategy::getDefaultActions() { return NextAction::array(0, new NextAction(action, 105.0f), new NextAction("follow", 104.0f), new NextAction("end pull", 103.0f), nullptr); }
 
-void PullStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
-{
-    CombatStrategy::InitTriggers(triggers);
-}
+void PullStrategy::InitTriggers(std::vector<TriggerNode *> &triggers) { CombatStrategy::InitTriggers(triggers); }
 
 void PullStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers)
 {
@@ -56,6 +46,5 @@ void PossibleAddsStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     Strategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-        "possible adds", NextAction::array(0, new NextAction("flee with pet", 60), nullptr)));
+    triggers.push_back(new TriggerNode("possible adds", NextAction::array(0, new NextAction("flee with pet", 60), nullptr)));
 }

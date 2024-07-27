@@ -43,10 +43,8 @@ int strcmpi(char const *s1, char const *s2);
 #define RESET_AI_VALUE(type, name) context->GetValue<type>(name)->Reset()
 #define RESET_AI_VALUE2(type, name, param) context->GetValue<type>(name, param)->Reset()
 
-#define PAI_VALUE(type, name) \
-    sPlayerbotsMgr->GetPlayerbotAI(player)->GetAiObjectContext()->GetValue<type>(name)->Get()
-#define PAI_VALUE2(type, name, param) \
-    sPlayerbotsMgr->GetPlayerbotAI(player)->GetAiObjectContext()->GetValue<type>(name, param)->Get()
+#define PAI_VALUE(type, name) sPlayerbotsMgr->GetPlayerbotAI(player)->GetAiObjectContext()->GetValue<type>(name)->Get()
+#define PAI_VALUE2(type, name, param) sPlayerbotsMgr->GetPlayerbotAI(player)->GetAiObjectContext()->GetValue<type>(name, param)->Get()
 #define GAI_VALUE(type, name) sSharedValueContext->getGlobalValue<type>(name)->Get()
 #define GAI_VALUE2(type, name, param) sSharedValueContext->getGlobalValue<type>(name, param)->Get()
 

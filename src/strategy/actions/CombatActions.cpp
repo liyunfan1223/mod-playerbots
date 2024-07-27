@@ -24,11 +24,7 @@ bool SwitchToMeleeAction::isUseful()
         Unit *target = AI_VALUE(Unit *, "current target");
         time_t lastFlee = AI_VALUE(LastMovement &, "last movement").lastFlee;
         return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) &&
-               ((bot->IsInCombat() && target &&
-                 (target->GetVictim() == bot && (!bot->GetGroup() || lastFlee) &&
-                  sServerFacade->IsDistanceLessOrEqualThan(
-                      AI_VALUE2(float, "distance", "current target"), 8.0f))) ||
-                (!bot->IsInCombat()));
+               ((bot->IsInCombat() && target && (target->GetVictim() == bot && (!bot->GetGroup() || lastFlee) && sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f))) || (!bot->IsInCombat()));
     }
 
     return botAI->HasStrategy("ranged", BOT_STATE_COMBAT);
@@ -47,11 +43,7 @@ bool SwitchToRangedAction::isUseful()
         Unit *target = AI_VALUE(Unit *, "current target");
         bool hasAmmo = AI_VALUE2(uint32, "item count", "ammo");
         return botAI->HasStrategy("close", BOT_STATE_COMBAT) && hasAmmo &&
-               ((bot->IsInCombat() && target &&
-                 ((target->GetVictim() != bot || target->GetTarget() != bot->GetGUID()) ||
-                  sServerFacade->IsDistanceGreaterThan(
-                      AI_VALUE2(float, "distance", "current target"), 8.0f))) ||
-                (!bot->IsInCombat()));
+               ((bot->IsInCombat() && target && ((target->GetVictim() != bot || target->GetTarget() != bot->GetGUID()) || sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f))) || (!bot->IsInCombat()));
     }
 
     return botAI->HasStrategy("close", BOT_STATE_COMBAT);

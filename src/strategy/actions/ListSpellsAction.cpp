@@ -110,8 +110,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
         }
     }
 
-    std::string const ignoreList =
-        ",Opening,Closing,Stuck,Remove Insignia,Opening - No Text,Grovel,Duel,Honorless Target,";
+    std::string const ignoreList = ",Opening,Closing,Stuck,Remove Insignia,Opening - No Text,Grovel,Duel,Honorless Target,";
     std::string alreadySeenList = ",";
 
     uint32 minLevel = 0;
@@ -136,8 +135,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
         filter = "";
 
     std::vector<std::pair<uint32, std::string>> spells;
-    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end();
-         ++itr)
+    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active)
             continue;
@@ -151,8 +149,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
             continue;
 
         std::string const comp = spellInfo->SpellName[0];
-        if (!(ignoreList.find(comp) == std::string::npos &&
-              alreadySeenList.find(comp) == std::string::npos))
+        if (!(ignoreList.find(comp) == std::string::npos && alreadySeenList.find(comp) == std::string::npos))
             continue;
 
         if (!filter.empty() && !strstri(spellInfo->SpellName[0], filter.c_str()))
@@ -213,24 +210,20 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
             {
                 if (spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM)
                 {
-                    if (ItemTemplate const *proto =
-                            sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
+                    if (ItemTemplate const *proto = sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
                     {
                         if (craftCount)
                             out << "|cffffff00(x" << craftCount << ")|r ";
 
                         out << chat->FormatItem(proto);
 
-                        if ((minLevel || maxLevel) &&
-                            (!proto->RequiredLevel || proto->RequiredLevel < minLevel ||
-                             proto->RequiredLevel > maxLevel))
+                        if ((minLevel || maxLevel) && (!proto->RequiredLevel || proto->RequiredLevel < minLevel || proto->RequiredLevel > maxLevel))
                         {
                             filtered = true;
                             break;
                         }
 
-                        if (slot != EQUIPMENT_SLOT_END &&
-                            bot->FindEquipSlot(proto, slot, true) != slot)
+                        if (slot != EQUIPMENT_SLOT_END && bot->FindEquipSlot(proto, slot, true) != slot)
                         {
                             filtered = true;
                             break;
@@ -254,8 +247,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
         if (skillLine && skillLine->SkillLine)
         {
             uint32 GrayLevel = skillLine->TrivialSkillLineRankHigh;
-            uint32 GreenLevel =
-                (skillLine->TrivialSkillLineRankHigh + skillLine->MinSkillLineRank) / 2;
+            uint32 GreenLevel = (skillLine->TrivialSkillLineRankHigh + skillLine->MinSkillLineRank) / 2;
             uint32 YellowLevel = skillLine->MinSkillLineRank;
             uint32 SkillValue = bot->GetSkillValue(skillLine->SkillLine);
 
@@ -298,8 +290,7 @@ bool ListSpellsAction::Execute(Event event)
     std::sort(spells.begin(), spells.end(), CompareSpells);
 
     uint32 count = 0;
-    for (std::vector<std::pair<uint32, std::string>>::iterator i = spells.begin();
-         i != spells.end(); ++i)
+    for (std::vector<std::pair<uint32, std::string>>::iterator i = spells.begin(); i != spells.end(); ++i)
     {
         botAI->TellMasterNoFacing(i->second);
 

@@ -53,8 +53,7 @@ void TrainerAction::Iterate(Creature *creature, TrainerSpellAction action, Spell
     float fDiscountMod = bot->GetReputationPriceDiscount(creature);
     uint32 totalCost = 0;
 
-    for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin();
-         itr != trainer_spells->spellList.end(); ++itr)
+    for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
     {
         TrainerSpell const *tSpell = &itr->second;
         if (!tSpell)
@@ -128,10 +127,8 @@ bool TrainerAction::Execute(Event event)
         spells.insert(spell);
 
     if (text.find("learn") != std::string::npos || sRandomPlayerbotMgr->IsRandomBot(bot) ||
-        (sPlayerbotAIConfig->autoTrainSpells != "no" &&
-         (creature->GetCreatureTemplate()->trainer_type != TRAINER_TYPE_TRADESKILLS ||
-          !botAI->HasActivePlayerMaster())))  // Todo rewrite to only exclude start primary
-                                              // profession skills and make config dependent.
+        (sPlayerbotAIConfig->autoTrainSpells != "no" && (creature->GetCreatureTemplate()->trainer_type != TRAINER_TYPE_TRADESKILLS || !botAI->HasActivePlayerMaster())))  // Todo rewrite to only exclude start primary
+                                                                                                                                                                          // profession skills and make config dependent.
         Iterate(creature, &TrainerAction::Learn, spells);
     else
         Iterate(creature, nullptr, spells);
@@ -204,11 +201,7 @@ bool AutoGearAction::Execute(Event event)
         return false;
     }
     botAI->TellMaster("I'm auto gearing");
-    uint32 gs =
-        sPlayerbotAIConfig->autoGearScoreLimit == 0
-            ? 0
-            : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->autoGearScoreLimit,
-                                                   sPlayerbotAIConfig->autoGearQualityLimit);
+    uint32 gs = sPlayerbotAIConfig->autoGearScoreLimit == 0 ? 0 : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->autoGearScoreLimit, sPlayerbotAIConfig->autoGearQualityLimit);
     PlayerbotFactory factory(bot, bot->GetLevel(), sPlayerbotAIConfig->autoGearQualityLimit, gs);
     factory.InitEquipment(true);
     factory.InitAmmo();

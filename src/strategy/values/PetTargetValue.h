@@ -15,10 +15,7 @@ class Unit;
 class PetTargetValue : public UnitCalculatedValue
 {
    public:
-    PetTargetValue(PlayerbotAI *botAI, std::string const name = "pet target")
-        : UnitCalculatedValue(botAI, name)
-    {
-    }
+    PetTargetValue(PlayerbotAI *botAI, std::string const name = "pet target") : UnitCalculatedValue(botAI, name) {}
 
     Unit *Calculate() override;
 };

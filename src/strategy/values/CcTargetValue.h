@@ -16,10 +16,7 @@ class Unit;
 class CcTargetValue : public TargetValue, public Qualified
 {
    public:
-    CcTargetValue(PlayerbotAI *botAI, std::string const name = "cc target")
-        : TargetValue(botAI, name)
-    {
-    }
+    CcTargetValue(PlayerbotAI *botAI, std::string const name = "cc target") : TargetValue(botAI, name) {}
 
     Unit *Calculate() override;
 };

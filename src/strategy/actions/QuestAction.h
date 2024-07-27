@@ -35,9 +35,7 @@ class QuestAction : public Action
 class QuestObjectiveCompletedAction : public Action
 {
    public:
-    QuestObjectiveCompletedAction(PlayerbotAI *botAI) : Action(botAI, "quest objective completed")
-    {
-    }
+    QuestObjectiveCompletedAction(PlayerbotAI *botAI) : Action(botAI, "quest objective completed") {}
 
     bool Execute(Event event) override;
 };

@@ -40,10 +40,7 @@ std::vector<ReadyChecker *> ReadyChecker::checkers;
 class HealthChecker : public ReadyChecker
 {
    public:
-    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override
-    {
-        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->almostFullHealth;
-    }
+    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->almostFullHealth; }
 
     std::string const getName() override { return "HP"; }
 };
@@ -51,11 +48,7 @@ class HealthChecker : public ReadyChecker
 class ManaChecker : public ReadyChecker
 {
    public:
-    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override
-    {
-        return !AI_VALUE2(bool, "has mana", "self target") ||
-               AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth;
-    }
+    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override { return !AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth; }
 
     std::string const getName() override { return "MP"; }
 };
@@ -121,10 +114,7 @@ class ItemCountChecker : public ReadyChecker
    public:
     ItemCountChecker(std::string const item, std::string const name) : item(item), name(name) {}
 
-    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override
-    {
-        return AI_VALUE2(uint32, "item count", item) > 0;
-    }
+    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override { return AI_VALUE2(uint32, "item count", item) > 0; }
 
     std::string const getName() override { return name; }
 
@@ -136,15 +126,9 @@ class ItemCountChecker : public ReadyChecker
 class ManaPotionChecker : public ItemCountChecker
 {
    public:
-    ManaPotionChecker(std::string const item, std::string const name) : ItemCountChecker(item, name)
-    {
-    }
+    ManaPotionChecker(std::string const item, std::string const name) : ItemCountChecker(item, name) {}
 
-    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override
-    {
-        return !AI_VALUE2(bool, "has mana", "self target") ||
-               ItemCountChecker::Check(botAI, context);
-    }
+    bool Check(PlayerbotAI *botAI, AiObjectContext *context) override { return !AI_VALUE2(bool, "has mana", "self target") || ItemCountChecker::Check(botAI, context); }
 };
 
 bool ReadyCheckAction::Execute(Event event)
@@ -178,8 +162,7 @@ bool ReadyCheckAction::ReadyCheck()
     }
 
     bool result = true;
-    for (std::vector<ReadyChecker *>::iterator i = ReadyChecker::checkers.begin();
-         i != ReadyChecker::checkers.end(); ++i)
+    for (std::vector<ReadyChecker *>::iterator i = ReadyChecker::checkers.begin(); i != ReadyChecker::checkers.end(); ++i)
     {
         ReadyChecker *checker = *i;
         bool ok = checker->Check(botAI, context);

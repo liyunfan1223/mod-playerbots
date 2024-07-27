@@ -74,16 +74,9 @@ bool GuidManageAction::Execute(Event event)
 
 bool GuidManageAction::PlayerIsValid(Player *member) { return !member->GetGuildId(); }
 
-uint8 GuidManageAction::GetRankId(Player *member)
-{
-    return sGuildMgr->GetGuildById(member->GetGuildId())->GetMember(member->GetGUID())->GetRankId();
-}
+uint8 GuidManageAction::GetRankId(Player *member) { return sGuildMgr->GetGuildById(member->GetGuildId())->GetMember(member->GetGUID())->GetRankId(); }
 
-bool GuildInviteAction::isUseful()
-{
-    return bot->GetGuildId() &&
-           sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_INVITE);
-}
+bool GuildInviteAction::isUseful() { return bot->GetGuildId() && sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_INVITE); }
 
 void GuildInviteAction::SendPacket(WorldPacket packet)
 {
@@ -93,11 +86,7 @@ void GuildInviteAction::SendPacket(WorldPacket packet)
 
 bool GuildInviteAction::PlayerIsValid(Player *member) { return !member->GetGuildId(); }
 
-bool GuildPromoteAction::isUseful()
-{
-    return bot->GetGuildId() &&
-           sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_PROMOTE);
-}
+bool GuildPromoteAction::isUseful() { return bot->GetGuildId() && sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_PROMOTE); }
 
 void GuildPromoteAction::SendPacket(WorldPacket packet)
 {
@@ -105,16 +94,9 @@ void GuildPromoteAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildPromoteOpcode(data);
 }
 
-bool GuildPromoteAction::PlayerIsValid(Player *member)
-{
-    return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member) - 1;
-}
+bool GuildPromoteAction::PlayerIsValid(Player *member) { return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member) - 1; }
 
-bool GuildDemoteAction::isUseful()
-{
-    return bot->GetGuildId() &&
-           sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_DEMOTE);
-}
+bool GuildDemoteAction::isUseful() { return bot->GetGuildId() && sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_DEMOTE); }
 
 void GuildDemoteAction::SendPacket(WorldPacket packet)
 {
@@ -122,16 +104,9 @@ void GuildDemoteAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildDemoteOpcode(data);
 }
 
-bool GuildDemoteAction::PlayerIsValid(Player *member)
-{
-    return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member);
-}
+bool GuildDemoteAction::PlayerIsValid(Player *member) { return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member); }
 
-bool GuildRemoveAction::isUseful()
-{
-    return bot->GetGuildId() &&
-           sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_REMOVE);
-}
+bool GuildRemoveAction::isUseful() { return bot->GetGuildId() && sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_REMOVE); }
 
 void GuildRemoveAction::SendPacket(WorldPacket packet)
 {
@@ -139,10 +114,7 @@ void GuildRemoveAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildRemoveOpcode(data);
 }
 
-bool GuildRemoveAction::PlayerIsValid(Player *member)
-{
-    return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member);
-};
+bool GuildRemoveAction::PlayerIsValid(Player *member) { return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member); };
 
 bool GuildManageNearbyAction::Execute(Event event)
 {
@@ -151,8 +123,7 @@ bool GuildManageNearbyAction::Execute(Event event)
     Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
     Guild::Member *botMember = guild->GetMember(bot->GetGUID());
 
-    GuidVector nearGuids =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
+    GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
     for (auto &guid : nearGuids)
     {
         Player *player = ObjectAccessor::FindPlayer(guid);
@@ -165,8 +136,7 @@ bool GuildManageNearbyAction::Execute(Event event)
             Guild::Member *member = guild->GetMember(player->GetGUID());
             uint32 dCount = AI_VALUE(uint32, "death count");
 
-            if ((dCount < 2 || !urand(0, 10)) &&
-                guild->GetRankRights(botMember->GetRankId() & GR_RIGHT_PROMOTE))
+            if ((dCount < 2 || !urand(0, 10)) && guild->GetRankRights(botMember->GetRankId() & GR_RIGHT_PROMOTE))
             {
                 if (!urand(0, 10))
                 {
@@ -176,8 +146,7 @@ bool GuildManageNearbyAction::Execute(Event event)
                 }
             }
 
-            if ((dCount > 3 || !urand(0, 10)) &&
-                guild->GetRankRights(botMember->GetRankId() & GR_RIGHT_DEMOTE))
+            if ((dCount > 3 || !urand(0, 10)) && guild->GetRankRights(botMember->GetRankId() & GR_RIGHT_DEMOTE))
             {
                 if (!urand(0, 10))
                 {
@@ -200,8 +169,7 @@ bool GuildManageNearbyAction::Execute(Event event)
 
         if (botAI)
         {
-            if (botAI->GetGuilderType() == GuilderType::SOLO &&
-                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
+            if (botAI->GetGuilderType() == GuilderType::SOLO && !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
             if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
@@ -231,15 +199,13 @@ bool GuildManageNearbyAction::isUseful()
     Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
     Guild::Member *botMember = guild->GetMember(bot->GetGUID());
 
-    return guild->GetRankRights(botMember->GetRankId()) &
-           (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
+    return guild->GetRankRights(botMember->GetRankId()) & (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
 }
 
 bool GuildLeaveAction::Execute(Event event)
 {
     Player *owner = event.getOwner();
-    if (owner &&
-        !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, owner, true))
+    if (owner && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, owner, true))
     {
         botAI->TellError("Sorry, I am happy in my guild :)");
         return false;

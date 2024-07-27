@@ -62,16 +62,7 @@ struct StatWeight
 
 struct ItemInfoEntry
 {
-    ItemInfoEntry()
-        : minLevel(0),
-          source(0),
-          sourceId(0),
-          team(0),
-          repRank(0),
-          repFaction(0),
-          quality(0),
-          slot(0),
-          itemId(0)
+    ItemInfoEntry() : minLevel(0), source(0), sourceId(0), team(0), repRank(0), repFaction(0), quality(0), slot(0), itemId(0)
     {
         for (uint8 i = 1; i <= MAX_STAT_SCALES; ++i)
         {
@@ -117,18 +108,8 @@ class BotEquipKey
 {
    public:
     BotEquipKey() : level(0), clazz(0), slot(0), quality(0), key(GetKey()) {}
-    BotEquipKey(uint32 level, uint8 clazz, uint8 slot, uint32 quality)
-        : level(level), clazz(clazz), slot(slot), quality(quality), key(GetKey())
-    {
-    }
-    BotEquipKey(BotEquipKey const &other)
-        : level(other.level),
-          clazz(other.clazz),
-          slot(other.slot),
-          quality(other.quality),
-          key(GetKey())
-    {
-    }
+    BotEquipKey(uint32 level, uint8 clazz, uint8 slot, uint32 quality) : level(level), clazz(clazz), slot(slot), quality(quality), key(GetKey()) {}
+    BotEquipKey(BotEquipKey const &other) : level(other.level), clazz(other.clazz), slot(other.slot), quality(other.quality), key(GetKey()) {}
 
     bool operator<(BotEquipKey const &other) const { return other.key < this->key; }
 
@@ -162,14 +143,12 @@ class RandomItemMgr
     RandomItemList Query(uint32 level, RandomItemType type, RandomItemPredicate *predicate);
     RandomItemList Query(uint32 level, uint8 clazz, uint8 slot, uint32 quality);
     uint32 GetUpgrade(Player *player, std::string spec, uint8 slot, uint32 quality, uint32 itemId);
-    std::vector<uint32> GetUpgradeList(Player *player, std::string spec, uint8 slot, uint32 quality,
-                                       uint32 itemId, uint32 amount = 1);
+    std::vector<uint32> GetUpgradeList(Player *player, std::string spec, uint8 slot, uint32 quality, uint32 itemId, uint32 amount = 1);
     bool HasStatWeight(uint32 itemId);
     uint32 GetMinLevelFromCache(uint32 itemId);
     uint32 GetStatWeight(Player *player, uint32 itemId);
     uint32 GetLiveStatWeight(Player *player, uint32 itemId);
-    uint32 GetRandomItem(uint32 level, RandomItemType type,
-                         RandomItemPredicate *predicate = nullptr);
+    uint32 GetRandomItem(uint32 level, RandomItemType type, RandomItemPredicate *predicate = nullptr);
     uint32 GetAmmo(uint32 level, uint32 subClass);
     uint32 GetRandomPotion(uint32 level, uint32 effect);
     uint32 GetRandomFood(uint32 level, uint32 category);

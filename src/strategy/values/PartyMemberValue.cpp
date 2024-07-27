@@ -9,8 +9,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-Unit *PartyMemberValue::FindPartyMember(std::vector<Player *> *party,
-                                        FindPlayerPredicate &predicate)
+Unit *PartyMemberValue::FindPartyMember(std::vector<Player *> *party, FindPlayerPredicate &predicate)
 {
     for (Player *player : *party)
     {
@@ -107,17 +106,14 @@ bool PartyMemberValue::Check(Unit *player)
 {
     // return player && player != bot && player->GetMapId() == bot->GetMapId() &&
     // bot->IsWithinDistInMap(player, sPlayerbotAIConfig->sightDistance, false);
-    return player && player->GetMapId() == bot->GetMapId() &&
-           bot->GetDistance(player) < sPlayerbotAIConfig->spellDistance * 2 &&
-           bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+    return player && player->GetMapId() == bot->GetMapId() && bot->GetDistance(player) < sPlayerbotAIConfig->spellDistance * 2 && bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 
 bool PartyMemberValue::IsTargetOfSpellCast(Player *target, SpellEntryPredicate &predicate)
 {
     // GuidVector nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
     ObjectGuid targetGuid = target ? target->GetGUID() : bot->GetGUID();
-    ObjectGuid corpseGuid =
-        target && target->GetCorpse() ? target->GetCorpse()->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid corpseGuid = target && target->GetCorpse() ? target->GetCorpse()->GetGUID() : ObjectGuid::Empty;
 
     Group *group = bot->GetGroup();
     if (!group)

@@ -20,16 +20,14 @@ float CastTimeMultiplier::GetValue(Action *action)
     if (!action->GetTarget() || action->GetTarget() != AI_VALUE(Unit *, "current target"))
         return 1.0f;
 
-    if (/*targetHealth < sPlayerbotAIConfig->criticalHealth && */ dynamic_cast<CastSpellAction *>(
-        action))
+    if (/*targetHealth < sPlayerbotAIConfig->criticalHealth && */ dynamic_cast<CastSpellAction *>(action))
     {
         uint32 spellId = AI_VALUE2(uint32, "spell id", name);
         SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
             return 1.0f;
 
-        if ((spellInfo->Targets & TARGET_FLAG_DEST_LOCATION) != 0 ||
-            (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION) != 0)
+        if ((spellInfo->Targets & TARGET_FLAG_DEST_LOCATION) != 0 || (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION) != 0)
             return 1.0f;
 
         uint32 castTime = spellInfo->CalcCastTime(bot);
@@ -67,7 +65,4 @@ float CastTimeMultiplier::GetValue(Action *action)
     return 1.0f;
 }
 
-void CastTimeStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers)
-{
-    multipliers.push_back(new CastTimeMultiplier(botAI));
-}
+void CastTimeStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers) { multipliers.push_back(new CastTimeMultiplier(botAI)); }

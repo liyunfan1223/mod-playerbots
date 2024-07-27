@@ -36,8 +36,7 @@ bool CustomStrategyEditAction::PrintHelp()
 
     uint32 owner = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement *stmt =
-        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER);
     stmt->SetData(0, owner);
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
@@ -61,8 +60,7 @@ bool CustomStrategyEditAction::Print(std::string const name)
 
     uint32 owner = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement *stmt =
-        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
     stmt->SetData(0, owner);
     stmt->SetData(1, name);
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
@@ -84,8 +82,7 @@ bool CustomStrategyEditAction::Edit(std::string const name, uint32 idx, std::str
 {
     uint32 owner = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(
-        PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME_AND_IDX);
+    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME_AND_IDX);
     stmt->SetData(0, owner);
     stmt->SetData(1, name);
     stmt->SetData(2, idx);

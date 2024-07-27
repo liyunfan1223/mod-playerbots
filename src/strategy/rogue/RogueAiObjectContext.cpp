@@ -73,15 +73,11 @@ class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
         creators["no stealth"] = &RogueTriggerFactoryInternal::no_stealth;
         creators["stealth"] = &RogueTriggerFactoryInternal::stealth;
         creators["sprint"] = &RogueTriggerFactoryInternal::sprint;
-        creators["main hand weapon no enchant"] =
-            &RogueTriggerFactoryInternal::main_hand_weapon_no_enchant;
-        creators["off hand weapon no enchant"] =
-            &RogueTriggerFactoryInternal::off_hand_weapon_no_enchant;
-        creators["tricks of the trade on main tank"] =
-            &RogueTriggerFactoryInternal::tricks_of_the_trade_on_main_tank;
+        creators["main hand weapon no enchant"] = &RogueTriggerFactoryInternal::main_hand_weapon_no_enchant;
+        creators["off hand weapon no enchant"] = &RogueTriggerFactoryInternal::off_hand_weapon_no_enchant;
+        creators["tricks of the trade on main tank"] = &RogueTriggerFactoryInternal::tricks_of_the_trade_on_main_tank;
         creators["adrenaline rush"] = &RogueTriggerFactoryInternal::adrenaline_rush;
-        creators["target with combo points almost dead"] =
-            &RogueTriggerFactoryInternal::target_with_combo_points_almost_dead;
+        creators["target with combo points almost dead"] = &RogueTriggerFactoryInternal::target_with_combo_points_almost_dead;
     }
 
    private:
@@ -89,37 +85,19 @@ class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
     static Trigger *kick(PlayerbotAI *botAI) { return new KickInterruptSpellTrigger(botAI); }
     static Trigger *rupture(PlayerbotAI *botAI) { return new RuptureTrigger(botAI); }
     static Trigger *slice_and_dice(PlayerbotAI *botAI) { return new SliceAndDiceTrigger(botAI); }
-    static Trigger *hunger_for_blood(PlayerbotAI *botAI)
-    {
-        return new HungerForBloodTrigger(botAI);
-    }
+    static Trigger *hunger_for_blood(PlayerbotAI *botAI) { return new HungerForBloodTrigger(botAI); }
     static Trigger *expose_armor(PlayerbotAI *botAI) { return new ExposeArmorTrigger(botAI); }
-    static Trigger *kick_on_enemy_healer(PlayerbotAI *botAI)
-    {
-        return new KickInterruptEnemyHealerSpellTrigger(botAI);
-    }
+    static Trigger *kick_on_enemy_healer(PlayerbotAI *botAI) { return new KickInterruptEnemyHealerSpellTrigger(botAI); }
     static Trigger *unstealth(PlayerbotAI *botAI) { return new UnstealthTrigger(botAI); }
     static Trigger *sap(PlayerbotAI *botAI) { return new SapTrigger(botAI); }
     static Trigger *in_stealth(PlayerbotAI *botAI) { return new InStealthTrigger(botAI); }
     static Trigger *no_stealth(PlayerbotAI *botAI) { return new NoStealthTrigger(botAI); }
     static Trigger *stealth(PlayerbotAI *botAI) { return new StealthTrigger(botAI); }
     static Trigger *sprint(PlayerbotAI *botAI) { return new SprintTrigger(botAI); }
-    static Trigger *main_hand_weapon_no_enchant(PlayerbotAI *ai)
-    {
-        return new MainHandWeaponNoEnchantTrigger(ai);
-    }
-    static Trigger *off_hand_weapon_no_enchant(PlayerbotAI *ai)
-    {
-        return new OffHandWeaponNoEnchantTrigger(ai);
-    }
-    static Trigger *tricks_of_the_trade_on_main_tank(PlayerbotAI *ai)
-    {
-        return new TricksOfTheTradeOnMainTankTrigger(ai);
-    }
-    static Trigger *target_with_combo_points_almost_dead(PlayerbotAI *ai)
-    {
-        return new TargetWithComboPointsLowerHealTrigger(ai, 3, 3.0f);
-    }
+    static Trigger *main_hand_weapon_no_enchant(PlayerbotAI *ai) { return new MainHandWeaponNoEnchantTrigger(ai); }
+    static Trigger *off_hand_weapon_no_enchant(PlayerbotAI *ai) { return new OffHandWeaponNoEnchantTrigger(ai); }
+    static Trigger *tricks_of_the_trade_on_main_tank(PlayerbotAI *ai) { return new TricksOfTheTradeOnMainTankTrigger(ai); }
+    static Trigger *target_with_combo_points_almost_dead(PlayerbotAI *ai) { return new TargetWithComboPointsLowerHealTrigger(ai, 3, 3.0f); }
 };
 
 class RogueAiObjectContextInternal : public NamedObjectContext<Action>
@@ -155,38 +133,25 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
         creators["sap"] = &RogueAiObjectContextInternal::sap;
         creators["check stealth"] = &RogueAiObjectContextInternal::check_stealth;
         creators["envenom"] = &RogueAiObjectContextInternal::envenom;
-        creators["tricks of the trade on main tank"] =
-            &RogueAiObjectContextInternal::tricks_of_the_trade_on_main_tank;
-        creators["use instant poison on main hand"] =
-            &RogueAiObjectContextInternal::use_instant_poison;
-        creators["use deadly poison on off hand"] =
-            &RogueAiObjectContextInternal::use_deadly_poison;
-        creators["use instant poison on off hand"] =
-            &RogueAiObjectContextInternal::use_instant_poison_off_hand;
+        creators["tricks of the trade on main tank"] = &RogueAiObjectContextInternal::tricks_of_the_trade_on_main_tank;
+        creators["use instant poison on main hand"] = &RogueAiObjectContextInternal::use_instant_poison;
+        creators["use deadly poison on off hand"] = &RogueAiObjectContextInternal::use_deadly_poison;
+        creators["use instant poison on off hand"] = &RogueAiObjectContextInternal::use_instant_poison_off_hand;
         creators["fan of knives"] = &RogueAiObjectContextInternal::fan_of_knives;
         creators["killing spree"] = &RogueAiObjectContextInternal::killing_spree;
     }
 
    private:
-    static Action *adrenaline_rush(PlayerbotAI *botAI)
-    {
-        return new CastAdrenalineRushAction(botAI);
-    }
+    static Action *adrenaline_rush(PlayerbotAI *botAI) { return new CastAdrenalineRushAction(botAI); }
     static Action *blade_flurry(PlayerbotAI *botAI) { return new CastBladeFlurryAction(botAI); }
     static Action *riposte(PlayerbotAI *botAI) { return new CastRiposteAction(botAI); }
     static Action *mutilate(PlayerbotAI *botAI) { return new CastMutilateAction(botAI); }
-    static Action *sinister_strike(PlayerbotAI *botAI)
-    {
-        return new CastSinisterStrikeAction(botAI);
-    }
+    static Action *sinister_strike(PlayerbotAI *botAI) { return new CastSinisterStrikeAction(botAI); }
     static Action *gouge(PlayerbotAI *botAI) { return new CastGougeAction(botAI); }
     static Action *kidney_shot(PlayerbotAI *botAI) { return new CastKidneyShotAction(botAI); }
     static Action *rupture(PlayerbotAI *botAI) { return new CastRuptureAction(botAI); }
     static Action *slice_and_dice(PlayerbotAI *botAI) { return new CastSliceAndDiceAction(botAI); }
-    static Action *hunger_for_blood(PlayerbotAI *botAI)
-    {
-        return new CastHungerForBloodAction(botAI);
-    }
+    static Action *hunger_for_blood(PlayerbotAI *botAI) { return new CastHungerForBloodAction(botAI); }
     static Action *eviscerate(PlayerbotAI *botAI) { return new CastEviscerateAction(botAI); }
     static Action *vanish(PlayerbotAI *botAI) { return new CastVanishAction(botAI); }
     static Action *evasion(PlayerbotAI *botAI) { return new CastEvasionAction(botAI); }
@@ -194,10 +159,7 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
     static Action *feint(PlayerbotAI *botAI) { return new CastFeintAction(botAI); }
     static Action *backstab(PlayerbotAI *botAI) { return new CastBackstabAction(botAI); }
     static Action *expose_armor(PlayerbotAI *botAI) { return new CastExposeArmorAction(botAI); }
-    static Action *kick_on_enemy_healer(PlayerbotAI *botAI)
-    {
-        return new CastKickOnEnemyHealerAction(botAI);
-    }
+    static Action *kick_on_enemy_healer(PlayerbotAI *botAI) { return new CastKickOnEnemyHealerAction(botAI); }
     static Action *ambush(PlayerbotAI *botAI) { return new CastAmbushAction(botAI); }
     static Action *stealth(PlayerbotAI *botAI) { return new CastStealthAction(botAI); }
     static Action *sprint(PlayerbotAI *botAI) { return new CastSprintAction(botAI); }
@@ -208,16 +170,10 @@ class RogueAiObjectContextInternal : public NamedObjectContext<Action>
     static Action *sap(PlayerbotAI *botAI) { return new CastSapAction(botAI); }
     static Action *unstealth(PlayerbotAI *botAI) { return new UnstealthAction(botAI); }
     static Action *envenom(PlayerbotAI *ai) { return new EnvenomAction(ai); }
-    static Action *tricks_of_the_trade_on_main_tank(PlayerbotAI *ai)
-    {
-        return new CastTricksOfTheTradeOnMainTankAction(ai);
-    }
+    static Action *tricks_of_the_trade_on_main_tank(PlayerbotAI *ai) { return new CastTricksOfTheTradeOnMainTankAction(ai); }
     static Action *use_instant_poison(PlayerbotAI *ai) { return new UseInstantPoisonAction(ai); }
     static Action *use_deadly_poison(PlayerbotAI *ai) { return new UseDeadlyPoisonAction(ai); }
-    static Action *use_instant_poison_off_hand(PlayerbotAI *ai)
-    {
-        return new UseInstantPoisonOffHandAction(ai);
-    }
+    static Action *use_instant_poison_off_hand(PlayerbotAI *ai) { return new UseInstantPoisonOffHandAction(ai); }
     static Action *fan_of_knives(PlayerbotAI *ai) { return new FanOfKnivesAction(ai); }
     static Action *killing_spree(PlayerbotAI *ai) { return new CastKillingSpreeAction(ai); }
 };

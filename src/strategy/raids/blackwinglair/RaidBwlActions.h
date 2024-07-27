@@ -11,10 +11,7 @@
 class BwlOnyxiaScaleCloakAuraCheckAction : public Action
 {
    public:
-    BwlOnyxiaScaleCloakAuraCheckAction(PlayerbotAI *botAI)
-        : Action(botAI, "bwl onyxia scale cloak aura check")
-    {
-    }
+    BwlOnyxiaScaleCloakAuraCheckAction(PlayerbotAI *botAI) : Action(botAI, "bwl onyxia scale cloak aura check") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -22,10 +19,7 @@ class BwlOnyxiaScaleCloakAuraCheckAction : public Action
 class BwlTurnOffSuppressionDeviceAction : public Action
 {
    public:
-    BwlTurnOffSuppressionDeviceAction(PlayerbotAI *botAI)
-        : Action(botAI, "bwl turn off suppression device")
-    {
-    }
+    BwlTurnOffSuppressionDeviceAction(PlayerbotAI *botAI) : Action(botAI, "bwl turn off suppression device") {}
     bool Execute(Event event) override;
 };
 

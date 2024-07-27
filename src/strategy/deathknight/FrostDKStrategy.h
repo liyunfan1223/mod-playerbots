@@ -19,10 +19,7 @@ class FrostDKStrategy : public GenericDKStrategy
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
     std::string const getName() override { return "frost"; }
     NextAction **getDefaultActions() override;
-    uint32 GetType() const override
-    {
-        return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE;
-    }
+    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE; }
 };
 
 class FrostDKAoeStrategy : public CombatStrategy

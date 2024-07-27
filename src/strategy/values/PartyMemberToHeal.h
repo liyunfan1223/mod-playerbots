@@ -16,10 +16,7 @@ class Unit;
 class PartyMemberToHeal : public PartyMemberValue
 {
    public:
-    PartyMemberToHeal(PlayerbotAI *botAI, std::string const name = "party member to heal")
-        : PartyMemberValue(botAI, name)
-    {
-    }
+    PartyMemberToHeal(PlayerbotAI *botAI, std::string const name = "party member to heal") : PartyMemberValue(botAI, name) {}
 
    protected:
     Unit *Calculate() override;
@@ -29,10 +26,7 @@ class PartyMemberToHeal : public PartyMemberValue
 class PartyMemberToProtect : public PartyMemberValue
 {
    public:
-    PartyMemberToProtect(PlayerbotAI *botAI, std::string const name = "party member to protect")
-        : PartyMemberValue(botAI, name)
-    {
-    }
+    PartyMemberToProtect(PlayerbotAI *botAI, std::string const name = "party member to protect") : PartyMemberValue(botAI, name) {}
 
    protected:
     Unit *Calculate() override;

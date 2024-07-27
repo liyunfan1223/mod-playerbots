@@ -37,13 +37,9 @@ class BGJoinAction : public Action
 class FreeBGJoinAction : public BGJoinAction
 {
    public:
-    FreeBGJoinAction(PlayerbotAI *botAI, std::string const name = "free bg join")
-        : BGJoinAction(botAI, name)
-    {
-    }
+    FreeBGJoinAction(PlayerbotAI *botAI, std::string const name = "free bg join") : BGJoinAction(botAI, name) {}
 
-    bool shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
-                      BattlegroundBracketId bracketId) override;
+    bool shouldJoinBg(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId) override;
 };
 
 class BGLeaveAction : public Action
@@ -66,10 +62,7 @@ class BGStatusAction : public Action
 class BGStatusCheckAction : public Action
 {
    public:
-    BGStatusCheckAction(PlayerbotAI *botAI, std::string const name = "bg status check")
-        : Action(botAI, name)
-    {
-    }
+    BGStatusCheckAction(PlayerbotAI *botAI, std::string const name = "bg status check") : Action(botAI, name) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -78,10 +71,7 @@ class BGStatusCheckAction : public Action
 class BGStrategyCheckAction : public Action
 {
    public:
-    BGStrategyCheckAction(PlayerbotAI *botAI, std::string const name = "bg strategy check")
-        : Action(botAI, name)
-    {
-    }
+    BGStrategyCheckAction(PlayerbotAI *botAI, std::string const name = "bg strategy check") : Action(botAI, name) {}
 
     bool Execute(Event event) override;
 };

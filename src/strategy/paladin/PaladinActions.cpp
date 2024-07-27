@@ -89,10 +89,7 @@ inline std::string const GetActualBlessingOfWisdom(Unit *target)
     return "blessing of wisdom";
 }
 
-Value<Unit *> *CastBlessingOnPartyAction::GetTargetValue()
-{
-    return context->GetValue<Unit *>("party member without aura", name);
-}
+Value<Unit *> *CastBlessingOnPartyAction::GetTargetValue() { return context->GetValue<Unit *>("party member without aura", name); }
 
 bool CastBlessingOfMightAction::Execute(Event event)
 {
@@ -103,11 +100,7 @@ bool CastBlessingOfMightAction::Execute(Event event)
     return botAI->CastSpell(GetActualBlessingOfMight(target), target);
 }
 
-Value<Unit *> *CastBlessingOfMightOnPartyAction::GetTargetValue()
-{
-    return context->GetValue<Unit *>("party member without aura",
-                                     "blessing of might,blessing of wisdom");
-}
+Value<Unit *> *CastBlessingOfMightOnPartyAction::GetTargetValue() { return context->GetValue<Unit *>("party member without aura", "blessing of might,blessing of wisdom"); }
 
 bool CastBlessingOfMightOnPartyAction::Execute(Event event)
 {
@@ -127,11 +120,7 @@ bool CastBlessingOfWisdomAction::Execute(Event event)
     return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
 }
 
-Value<Unit *> *CastBlessingOfWisdomOnPartyAction::GetTargetValue()
-{
-    return context->GetValue<Unit *>("party member without aura",
-                                     "blessing of might,blessing of wisdom");
-}
+Value<Unit *> *CastBlessingOfWisdomOnPartyAction::GetTargetValue() { return context->GetValue<Unit *>("party member without aura", "blessing of might,blessing of wisdom"); }
 
 bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
 {
@@ -144,10 +133,7 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
 
 bool CastSealSpellAction::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }
 
-Value<Unit *> *CastTurnUndeadAction::GetTargetValue()
-{
-    return context->GetValue<Unit *>("cc target", getName());
-}
+Value<Unit *> *CastTurnUndeadAction::GetTargetValue() { return context->GetValue<Unit *>("cc target", getName()); }
 
 Unit *CastRighteousDefenseAction::GetTarget()
 {
@@ -163,16 +149,11 @@ bool CastMeleeConsecrationAction::isUseful()
 {
     Unit *target = GetTarget();
     // float dis = distance + CONTACT_DISTANCE;
-    return target && bot->IsWithinMeleeRange(
-                         target);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
-                                   // "distance", GetTargetName()), distance);
+    return target && bot->IsWithinMeleeRange(target);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
+                                                       // "distance", GetTargetName()), distance);
 }
 
-bool CastDivineSacrificeAction::isUseful()
-{
-    return GetTarget() && (GetTarget() != nullptr) && CastSpellAction::isUseful() &&
-           !botAI->HasAura("divine guardian", GetTarget(), false, false, -1, true);
-}
+bool CastDivineSacrificeAction::isUseful() { return GetTarget() && (GetTarget() != nullptr) && CastSpellAction::isUseful() && !botAI->HasAura("divine guardian", GetTarget(), false, false, -1, true); }
 
 bool CastCancelDivineSacrificeAction::Execute(Event event)
 {
@@ -180,7 +161,4 @@ bool CastCancelDivineSacrificeAction::Execute(Event event)
     return true;
 }
 
-bool CastCancelDivineSacrificeAction::isUseful()
-{
-    return botAI->HasAura("divine sacrifice", GetTarget(), false, true, -1, true);
-}
+bool CastCancelDivineSacrificeAction::isUseful() { return botAI->HasAura("divine sacrifice", GetTarget(), false, true, -1, true); }

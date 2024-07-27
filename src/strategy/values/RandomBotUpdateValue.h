@@ -14,10 +14,7 @@ class PlayerbotAI;
 class RandomBotUpdateValue : public ManualSetValue<bool>
 {
    public:
-    RandomBotUpdateValue(PlayerbotAI *botAI, std::string const name = "random bot update")
-        : ManualSetValue<bool>(botAI, false, name)
-    {
-    }
+    RandomBotUpdateValue(PlayerbotAI *botAI, std::string const name = "random bot update") : ManualSetValue<bool>(botAI, false, name) {}
 };
 
 #endif

@@ -19,10 +19,7 @@ DEFLECT_TRIGGER(FrostWardTrigger, "frost ward");
 class ArcaneIntellectOnPartyTrigger : public BuffOnPartyTrigger
 {
    public:
-    ArcaneIntellectOnPartyTrigger(PlayerbotAI *botAI)
-        : BuffOnPartyTrigger(botAI, "arcane intellect", 2 * 2000)
-    {
-    }
+    ArcaneIntellectOnPartyTrigger(PlayerbotAI *botAI) : BuffOnPartyTrigger(botAI, "arcane intellect", 2 * 2000) {}
 
     bool IsActive() override;
 };
@@ -80,18 +77,14 @@ class ArcaneBlastTrigger : public BuffTrigger
 class FingersOfFrostSingleTrigger : public HasAuraStackTrigger
 {
    public:
-    FingersOfFrostSingleTrigger(PlayerbotAI *ai) : HasAuraStackTrigger(ai, "fingers of frost", 1, 1)
-    {
-    }
+    FingersOfFrostSingleTrigger(PlayerbotAI *ai) : HasAuraStackTrigger(ai, "fingers of frost", 1, 1) {}
     bool IsActive() override;
 };
 
 class FingersOfFrostDoubleTrigger : public HasAuraStackTrigger
 {
    public:
-    FingersOfFrostDoubleTrigger(PlayerbotAI *ai) : HasAuraStackTrigger(ai, "fingers of frost", 2, 1)
-    {
-    }
+    FingersOfFrostDoubleTrigger(PlayerbotAI *ai) : HasAuraStackTrigger(ai, "fingers of frost", 2, 1) {}
     // bool IsActive() override;
 };
 
@@ -104,10 +97,7 @@ class BrainFreezeTrigger : public HasAuraTrigger
 class CounterspellInterruptSpellTrigger : public InterruptSpellTrigger
 {
    public:
-    CounterspellInterruptSpellTrigger(PlayerbotAI *botAI)
-        : InterruptSpellTrigger(botAI, "counterspell")
-    {
-    }
+    CounterspellInterruptSpellTrigger(PlayerbotAI *botAI) : InterruptSpellTrigger(botAI, "counterspell") {}
 };
 
 class CombustionTrigger : public BoostTrigger
@@ -149,28 +139,19 @@ class RemoveCurseTrigger : public NeedCureTrigger
 class PartyMemberRemoveCurseTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    PartyMemberRemoveCurseTrigger(PlayerbotAI *botAI)
-        : PartyMemberNeedCureTrigger(botAI, "remove curse", DISPEL_CURSE)
-    {
-    }
+    PartyMemberRemoveCurseTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "remove curse", DISPEL_CURSE) {}
 };
 
 class SpellstealTrigger : public TargetAuraDispelTrigger
 {
    public:
-    SpellstealTrigger(PlayerbotAI *botAI)
-        : TargetAuraDispelTrigger(botAI, "spellsteal", DISPEL_MAGIC)
-    {
-    }
+    SpellstealTrigger(PlayerbotAI *botAI) : TargetAuraDispelTrigger(botAI, "spellsteal", DISPEL_MAGIC) {}
 };
 
 class CounterspellEnemyHealerTrigger : public InterruptEnemyHealerTrigger
 {
    public:
-    CounterspellEnemyHealerTrigger(PlayerbotAI *botAI)
-        : InterruptEnemyHealerTrigger(botAI, "counterspell")
-    {
-    }
+    CounterspellEnemyHealerTrigger(PlayerbotAI *botAI) : InterruptEnemyHealerTrigger(botAI, "counterspell") {}
 };
 
 class ArcanePowerTrigger : public BuffTrigger
@@ -188,9 +169,7 @@ class PresenceOfMindTrigger : public BuffTrigger
 class ArcaneBlastStackTrigger : public HasAuraStackTrigger
 {
    public:
-    ArcaneBlastStackTrigger(PlayerbotAI *botAI) : HasAuraStackTrigger(botAI, "arcane blast", 3, 1)
-    {
-    }
+    ArcaneBlastStackTrigger(PlayerbotAI *botAI) : HasAuraStackTrigger(botAI, "arcane blast", 3, 1) {}
 };
 
 class MirrorImageTrigger : public BoostTrigger

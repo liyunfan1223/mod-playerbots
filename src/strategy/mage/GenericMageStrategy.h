@@ -19,10 +19,7 @@ class GenericMageStrategy : public RangedCombatStrategy
 
     std::string const getName() override { return "mage"; }
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
-    uint32 GetType() const override
-    {
-        return RangedCombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS;
-    }
+    uint32 GetType() const override { return RangedCombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
 };
 
 class MageCureStrategy : public Strategy

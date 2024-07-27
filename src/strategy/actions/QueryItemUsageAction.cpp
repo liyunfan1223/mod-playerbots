@@ -90,8 +90,7 @@ uint32 QueryItemUsageAction::GetCount(ItemTemplate const *item)
     return total;
 }
 
-std::string const QueryItemUsageAction::QueryItem(ItemTemplate const *item, uint32 count,
-                                                  uint32 total)
+std::string const QueryItemUsageAction::QueryItem(ItemTemplate const *item, uint32 count, uint32 total)
 {
     std::ostringstream out;
     std::string usage = QueryItemUsage(item);
@@ -164,8 +163,7 @@ std::string const QueryItemUsageAction::QueryItemPrice(ItemTemplate const *item)
         for (std::vector<Item *>::iterator i = items.begin(); i != items.end(); ++i)
         {
             Item *sell = *i;
-            int32 price = sell->GetCount() * sell->GetTemplate()->SellPrice *
-                          sRandomPlayerbotMgr->GetSellMultiplier(bot);
+            int32 price = sell->GetCount() * sell->GetTemplate()->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot);
             if (!sellPrice || sellPrice > price)
                 sellPrice = price;
         }
@@ -203,8 +201,7 @@ std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId)
 
         uint32 questId = questTemplate->GetQuestId();
         QuestStatus status = bot->GetQuestStatus(questId);
-        if (status == QUEST_STATUS_INCOMPLETE ||
-            (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questId)))
+        if (status == QUEST_STATUS_INCOMPLETE || (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questId)))
         {
             QuestStatusData const &questStatus = i->second;
             std::string const usage = QueryQuestItem(itemId, questTemplate, &questStatus);
@@ -216,8 +213,7 @@ std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId)
     return "";
 }
 
-std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId, Quest const *questTemplate,
-                                                       QuestStatusData const *questStatus)
+std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId, Quest const *questTemplate, QuestStatusData const *questStatus)
 {
     for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {

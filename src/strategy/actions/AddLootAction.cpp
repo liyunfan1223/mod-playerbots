@@ -28,10 +28,12 @@ bool AddAllLootAction::Execute(Event event)
     bool added = false;
 
     GuidVector gos = context->GetValue<GuidVector>("nearest game objects")->Get();
-    for (GuidVector::iterator i = gos.begin(); i != gos.end(); i++) added |= AddLoot(*i);
+    for (GuidVector::iterator i = gos.begin(); i != gos.end(); i++)
+        added |= AddLoot(*i);
 
     GuidVector corpses = context->GetValue<GuidVector>("nearest corpses")->Get();
-    for (GuidVector::iterator i = corpses.begin(); i != corpses.end(); i++) added |= AddLoot(*i);
+    for (GuidVector::iterator i = corpses.begin(); i != corpses.end(); i++)
+        added |= AddLoot(*i);
 
     return added;
 }
@@ -40,10 +42,7 @@ bool AddLootAction::isUseful() { return true; }
 
 bool AddAllLootAction::isUseful() { return true; }
 
-bool AddAllLootAction::AddLoot(ObjectGuid guid)
-{
-    return AI_VALUE(LootObjectStack *, "available loot")->Add(guid);
-}
+bool AddAllLootAction::AddLoot(ObjectGuid guid) { return AI_VALUE(LootObjectStack *, "available loot")->Add(guid); }
 
 bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 {
@@ -62,14 +61,11 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
     if (!loot.IsLootPossible(bot))
         return false;
 
-    if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, wo),
-                                             INTERACTION_DISTANCE))
+    if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, wo), INTERACTION_DISTANCE))
     {
         std::list<Unit *> targets;
-        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(bot, bot,
-                                                           sPlayerbotAIConfig->lootDistance);
-        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(bot, targets,
-                                                                                     u_check);
+        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(bot, bot, sPlayerbotAIConfig->lootDistance);
+        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
         Cell::VisitAllObjects(bot, searcher, sPlayerbotAIConfig->lootDistance * 1.5f);
         if (!targets.empty())
         {

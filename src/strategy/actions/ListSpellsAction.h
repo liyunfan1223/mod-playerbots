@@ -14,10 +14,7 @@ class PlayerbotAI;
 class ListSpellsAction : public InventoryAction
 {
    public:
-    ListSpellsAction(PlayerbotAI *botAI, std::string const name = "spells")
-        : InventoryAction(botAI, name)
-    {
-    }
+    ListSpellsAction(PlayerbotAI *botAI, std::string const name = "spells") : InventoryAction(botAI, name) {}
 
     bool Execute(Event event) override;
     virtual std::vector<std::pair<uint32, std::string>> GetSpellList(std::string filter = "");

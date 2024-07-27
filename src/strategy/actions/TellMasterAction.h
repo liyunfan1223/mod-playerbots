@@ -14,10 +14,7 @@ class PlayerbotAI;
 class TellMasterAction : public Action
 {
    public:
-    TellMasterAction(PlayerbotAI *botAI, std::string const text)
-        : Action(botAI, "tell master"), text(text)
-    {
-    }
+    TellMasterAction(PlayerbotAI *botAI, std::string const text) : Action(botAI, "tell master"), text(text) {}
 
     bool Execute(Event event) override;
 

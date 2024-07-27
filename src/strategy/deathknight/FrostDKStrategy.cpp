@@ -73,44 +73,25 @@ class FrostDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
     }
 };
 
-FrostDKStrategy::FrostDKStrategy(PlayerbotAI *botAI) : GenericDKStrategy(botAI)
-{
-    actionNodeFactories.Add(new FrostDKStrategyActionNodeFactory());
-}
+FrostDKStrategy::FrostDKStrategy(PlayerbotAI *botAI) : GenericDKStrategy(botAI) { actionNodeFactories.Add(new FrostDKStrategyActionNodeFactory()); }
 
 NextAction **FrostDKStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("obliterate", ACTION_DEFAULT + 0.5f),
-                             new NextAction("frost strike", ACTION_DEFAULT + 0.4f),
+    return NextAction::array(0, new NextAction("obliterate", ACTION_DEFAULT + 0.5f), new NextAction("frost strike", ACTION_DEFAULT + 0.4f),
                              // new NextAction("death strike", ACTION_NORMAL + 3),
-                             new NextAction("empower rune weapon", ACTION_DEFAULT + 0.2f),
-                             new NextAction("horn of winter", ACTION_DEFAULT + 0.1f),
-                             new NextAction("melee", ACTION_DEFAULT), NULL);
+                             new NextAction("empower rune weapon", ACTION_DEFAULT + 0.2f), new NextAction("horn of winter", ACTION_DEFAULT + 0.1f), new NextAction("melee", ACTION_DEFAULT), NULL);
 }
 
 void FrostDKStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
-    triggers.push_back(new TriggerNode(
-        "army of the dead",
-        NextAction::array(0, new NextAction("army of the dead", ACTION_HIGH + 6), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "unbreakable armor",
-        NextAction::array(0, new NextAction("unbreakable armor", ACTION_NORMAL + 4), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "high blood rune",
-        NextAction::array(0, new NextAction("blood strike", ACTION_NORMAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "freezing fog",
-        NextAction::array(0, new NextAction("howling blast", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("army of the dead", NextAction::array(0, new NextAction("army of the dead", ACTION_HIGH + 6), nullptr)));
+    triggers.push_back(new TriggerNode("unbreakable armor", NextAction::array(0, new NextAction("unbreakable armor", ACTION_NORMAL + 4), nullptr)));
+    triggers.push_back(new TriggerNode("high blood rune", NextAction::array(0, new NextAction("blood strike", ACTION_NORMAL + 1), nullptr)));
+    triggers.push_back(new TriggerNode("freezing fog", NextAction::array(0, new NextAction("howling blast", ACTION_HIGH + 1), nullptr)));
 
     // triggers.push_back(new TriggerNode("empower rune weapon", NextAction::array(0, new
     // NextAction("empower rune weapon", ACTION_NORMAL + 4), nullptr)));
 }
 
-void FrostDKAoeStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
-{
-    triggers.push_back(new TriggerNode(
-        "medium aoe",
-        NextAction::array(0, new NextAction("howling blast", ACTION_HIGH + 4), nullptr)));
-}
+void FrostDKAoeStrategy::InitTriggers(std::vector<TriggerNode *> &triggers) { triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("howling blast", ACTION_HIGH + 4), nullptr))); }

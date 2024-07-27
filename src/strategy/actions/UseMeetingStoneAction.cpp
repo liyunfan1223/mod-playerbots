@@ -57,10 +57,7 @@ bool UseMeetingStoneAction::Execute(Event event)
 class AnyGameObjectInObjectRangeCheck
 {
    public:
-    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range)
-        : i_obj(obj), i_range(range)
-    {
-    }
+    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range) : i_obj(obj), i_range(range) {}
     WorldObject const &GetFocusObject() const { return *i_obj; }
     bool operator()(GameObject *go)
     {
@@ -114,8 +111,7 @@ bool SummonAction::SummonUsingGos(Player *summoner, Player *player)
 {
     std::list<GameObject *> targets;
     AnyGameObjectInObjectRangeCheck u_check(summoner, sPlayerbotAIConfig->sightDistance);
-    Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(summoner, targets,
-                                                                            u_check);
+    Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(summoner, targets, u_check);
     Cell::VisitAllObjects(summoner, searcher, sPlayerbotAIConfig->sightDistance);
 
     for (GameObject *go : targets)
@@ -124,8 +120,7 @@ bool SummonAction::SummonUsingGos(Player *summoner, Player *player)
             return Teleport(summoner, player);
     }
 
-    botAI->TellError(summoner == bot ? "There is no meeting stone nearby"
-                                     : "There is no meeting stone near you");
+    botAI->TellError(summoner == bot ? "There is no meeting stone nearby" : "There is no meeting stone near you");
     return false;
 }
 
@@ -145,15 +140,13 @@ bool SummonAction::SummonUsingNpcs(Player *summoner, Player *player)
         {
             if (!player->HasItemCount(6948, 1, false))
             {
-                botAI->TellError(player == bot ? "I have no hearthstone"
-                                               : "You have no hearthstone");
+                botAI->TellError(player == bot ? "I have no hearthstone" : "You have no hearthstone");
                 return false;
             }
 
             if (player->HasSpellCooldown(8690))
             {
-                botAI->TellError(player == bot ? "My hearthstone is not ready"
-                                               : "Your hearthstone is not ready");
+                botAI->TellError(player == bot ? "My hearthstone is not ready" : "Your hearthstone is not ready");
                 return false;
             }
 
@@ -169,8 +162,7 @@ bool SummonAction::SummonUsingNpcs(Player *summoner, Player *player)
         }
     }
 
-    botAI->TellError(summoner == bot ? "There are no innkeepers nearby"
-                                     : "There are no innkeepers near you");
+    botAI->TellError(summoner == bot ? "There are no innkeepers nearby" : "There are no innkeepers near you");
     return false;
 }
 
@@ -217,17 +209,13 @@ bool SummonAction::Teleport(Player *summoner, Player *player)
                     return false;
                 }
 
-                if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) &&
-                    !sPlayerbotAIConfig->allowSummonWhenBotIsDead)
+                if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) && !sPlayerbotAIConfig->allowSummonWhenBotIsDead)
                 {
-                    botAI->TellError(
-                        "You cannot summon me while I'm dead, you need to release my spirit first");
+                    botAI->TellError("You cannot summon me while I'm dead, you need to release my spirit first");
                     return false;
                 }
 
-                bool revive =
-                    sPlayerbotAIConfig->reviveBotWhenSummoned == 2 ||
-                    (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat());
+                bool revive = sPlayerbotAIConfig->reviveBotWhenSummoned == 2 || (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat());
                 if (bot->isDead() && revive)
                 {
                     bot->ResurrectPlayer(1.0f, false);

@@ -189,10 +189,7 @@ class ChatActionContext : public NamedObjectContext<Action>
     static Action *formation(PlayerbotAI *botAI) { return new SetFormationAction(botAI); }
     static Action *stance(PlayerbotAI *botAI) { return new SetStanceAction(botAI); }
     static Action *tell_attackers(PlayerbotAI *botAI) { return new TellAttackersAction(botAI); }
-    static Action *max_dps_chat_shortcut(PlayerbotAI *botAI)
-    {
-        return new MaxDpsChatShortcutAction(botAI);
-    }
+    static Action *max_dps_chat_shortcut(PlayerbotAI *botAI) { return new MaxDpsChatShortcutAction(botAI); }
     static Action *save_mana(PlayerbotAI *botAI) { return new SaveManaAction(botAI); }
     static Action *who(PlayerbotAI *botAI) { return new WhoAction(botAI); }
     static Action *summon(PlayerbotAI *botAI) { return new SummonAction(botAI); }
@@ -202,38 +199,14 @@ class ChatActionContext : public NamedObjectContext<Action>
     static Action *rti(PlayerbotAI *botAI) { return new RtiAction(botAI); }
     static Action *invite(PlayerbotAI *botAI) { return new InviteToGroupAction(botAI); }
     static Action *spell(PlayerbotAI *botAI) { return new TellSpellAction(botAI); }
-    static Action *cast_custom_spell(PlayerbotAI *botAI)
-    {
-        return new CastCustomSpellAction(botAI);
-    }
-    static Action *cast_custom_nc_spell(PlayerbotAI *botAI)
-    {
-        return new CastCustomNcSpellAction(botAI);
-    }
-    static Action *tank_attack_chat_shortcut(PlayerbotAI *botAI)
-    {
-        return new TankAttackChatShortcutAction(botAI);
-    }
-    static Action *grind_chat_shortcut(PlayerbotAI *botAI)
-    {
-        return new GrindChatShortcutAction(botAI);
-    }
-    static Action *flee_chat_shortcut(PlayerbotAI *botAI)
-    {
-        return new FleeChatShortcutAction(botAI);
-    }
-    static Action *runaway_chat_shortcut(PlayerbotAI *botAI)
-    {
-        return new GoawayChatShortcutAction(botAI);
-    }
-    static Action *stay_chat_shortcut(PlayerbotAI *botAI)
-    {
-        return new StayChatShortcutAction(botAI);
-    }
-    static Action *follow_chat_shortcut(PlayerbotAI *botAI)
-    {
-        return new FollowChatShortcutAction(botAI);
-    }
+    static Action *cast_custom_spell(PlayerbotAI *botAI) { return new CastCustomSpellAction(botAI); }
+    static Action *cast_custom_nc_spell(PlayerbotAI *botAI) { return new CastCustomNcSpellAction(botAI); }
+    static Action *tank_attack_chat_shortcut(PlayerbotAI *botAI) { return new TankAttackChatShortcutAction(botAI); }
+    static Action *grind_chat_shortcut(PlayerbotAI *botAI) { return new GrindChatShortcutAction(botAI); }
+    static Action *flee_chat_shortcut(PlayerbotAI *botAI) { return new FleeChatShortcutAction(botAI); }
+    static Action *runaway_chat_shortcut(PlayerbotAI *botAI) { return new GoawayChatShortcutAction(botAI); }
+    static Action *stay_chat_shortcut(PlayerbotAI *botAI) { return new StayChatShortcutAction(botAI); }
+    static Action *follow_chat_shortcut(PlayerbotAI *botAI) { return new FollowChatShortcutAction(botAI); }
     static Action *gb(PlayerbotAI *botAI) { return new GuildBankAction(botAI); }
     static Action *bank(PlayerbotAI *botAI) { return new BankAction(botAI); }
     static Action *help(PlayerbotAI *botAI) { return new HelpAction(botAI); }

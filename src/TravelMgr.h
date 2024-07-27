@@ -86,10 +86,7 @@ class WorldPosition : public WorldLocation
     WorldPosition(WorldLocation const &loc) : WorldLocation(loc) {}
     WorldPosition(WorldPosition const &pos) : WorldLocation(pos), visitors(pos.visitors) {}
     WorldPosition(std::string const str);
-    WorldPosition(uint32 mapid, float x, float y, float z = 0.f, float orientation = 0.f)
-        : WorldLocation(mapid, x, y, z, orientation)
-    {
-    }
+    WorldPosition(uint32 mapid, float x, float y, float z = 0.f, float orientation = 0.f) : WorldLocation(mapid, x, y, z, orientation) {}
     WorldPosition(uint32 mapId, const Position &pos);
     WorldPosition(WorldObject const *wo);
     WorldPosition(std::vector<WorldPosition *> list, WorldPositionConst conType);
@@ -130,8 +127,7 @@ class WorldPosition : public WorldLocation
 
     std::string const to_string();
 
-    void printWKT(std::vector<WorldPosition> points, std::ostringstream &out, uint32 dim = 0,
-                  bool loop = false);
+    void printWKT(std::vector<WorldPosition> points, std::ostringstream &out, uint32 dim = 0, bool loop = false);
     void printWKT(std::ostringstream &out) { printWKT({*this}, out); }
 
     uint32 getVisitors() { return visitors; }
@@ -154,10 +150,7 @@ class WorldPosition : public WorldLocation
     template <class T>
     std::pair<T, WorldPosition> closest(std::vector<std::pair<T, WorldPosition>> list)
     {
-        return *std::min_element(
-            list.begin(), list.end(),
-            [this](std::pair<T, WorldPosition> i, std::pair<T, WorldPosition> j)
-            { return this->distance(i.second) < this->distance(j.second); });
+        return *std::min_element(list.begin(), list.end(), [this](std::pair<T, WorldPosition> i, std::pair<T, WorldPosition> j) { return this->distance(i.second) < this->distance(j.second); });
     }
 
     template <class T>
@@ -169,58 +162,34 @@ class WorldPosition : public WorldLocation
     // Returns the closest point from the list.
     WorldPosition *closest(std::vector<WorldPosition *> list)
     {
-        return *std::min_element(list.begin(), list.end(),
-                                 [this](WorldPosition *i, WorldPosition *j)
-                                 { return this->distance(i) < this->distance(j); });
+        return *std::min_element(list.begin(), list.end(), [this](WorldPosition *i, WorldPosition *j) { return this->distance(i) < this->distance(j); });
     }
 
     WorldPosition closest(std::vector<WorldPosition> list)
     {
-        return *std::min_element(list.begin(), list.end(), [this](WorldPosition i, WorldPosition j)
-                                 { return this->distance(i) < this->distance(j); });
+        return *std::min_element(list.begin(), list.end(), [this](WorldPosition i, WorldPosition j) { return this->distance(i) < this->distance(j); });
     }
 
     // Quick square distance in 2d plane.
-    float sqDistance2d(WorldPosition center)
-    {
-        return (getX() - center.getX()) * (getX() - center.getX()) +
-               (getY() - center.getY()) * (getY() - center.getY());
-    }
+    float sqDistance2d(WorldPosition center) { return (getX() - center.getX()) * (getX() - center.getX()) + (getY() - center.getY()) * (getY() - center.getY()); }
 
     // Quick square distance calculation without map check. Used for getting the minimum distant
     // points.
-    float sqDistance(WorldPosition center)
-    {
-        return (getX() - center.getX()) * (getX() - center.getX()) +
-               (getY() - center.getY()) * (getY() - center.getY()) +
-               (getZ() - center.getZ()) * (getZ() - center.getZ());
-    }
+    float sqDistance(WorldPosition center) { return (getX() - center.getX()) * (getX() - center.getX()) + (getY() - center.getY()) * (getY() - center.getY()) + (getZ() - center.getZ()) * (getZ() - center.getZ()); }
 
-    float sqDistance2d(WorldPosition *center)
-    {
-        return (getX() - center->getX()) * (getX() - center->getX()) +
-               (getY() - center->getY()) * (getY() - center->getY());
-    }
+    float sqDistance2d(WorldPosition *center) { return (getX() - center->getX()) * (getX() - center->getX()) + (getY() - center->getY()) * (getY() - center->getY()); }
 
-    float sqDistance(WorldPosition *center)
-    {
-        return (getX() - center->getX()) * (getX() - center->getX()) +
-               (getY() - center->getY()) * (getY() - center->getY()) +
-               (getZ() - center->getZ()) * (getZ() - center->getZ());
-    }
+    float sqDistance(WorldPosition *center) { return (getX() - center->getX()) * (getX() - center->getX()) + (getY() - center->getY()) * (getY() - center->getY()) + (getZ() - center->getZ()) * (getZ() - center->getZ()); }
 
     // Returns the closest point of the list. Fast but only works for the same map.
     WorldPosition *closestSq(std::vector<WorldPosition *> list)
     {
-        return *std::min_element(list.begin(), list.end(),
-                                 [this](WorldPosition *i, WorldPosition *j)
-                                 { return this->sqDistance(i) < this->sqDistance(j); });
+        return *std::min_element(list.begin(), list.end(), [this](WorldPosition *i, WorldPosition *j) { return this->sqDistance(i) < this->sqDistance(j); });
     }
 
     WorldPosition closestSq(std::vector<WorldPosition> list)
     {
-        return *std::min_element(list.begin(), list.end(), [this](WorldPosition i, WorldPosition j)
-                                 { return this->sqDistance(i) < this->sqDistance(j); });
+        return *std::min_element(list.begin(), list.end(), [this](WorldPosition i, WorldPosition j) { return this->sqDistance(i) < this->sqDistance(j); });
     }
 
     float getAngleTo(WorldPosition endPos)
@@ -229,21 +198,12 @@ class WorldPosition : public WorldLocation
         return (ang >= 0) ? ang : 2 * static_cast<float>(M_PI) + ang;
     }
 
-    float getAngleBetween(WorldPosition dir1, WorldPosition dir2)
-    {
-        return abs(getAngleTo(dir1) - getAngleTo(dir2));
-    }
+    float getAngleBetween(WorldPosition dir1, WorldPosition dir2) { return abs(getAngleTo(dir1) - getAngleTo(dir2)); }
 
-    WorldPosition lastInRange(std::vector<WorldPosition> list, float minDist = -1.f,
-                              float maxDist = -1.f);
-    WorldPosition firstOutRange(std::vector<WorldPosition> list, float minDist = -1.f,
-                                float maxDist = -1.f);
+    WorldPosition lastInRange(std::vector<WorldPosition> list, float minDist = -1.f, float maxDist = -1.f);
+    WorldPosition firstOutRange(std::vector<WorldPosition> list, float minDist = -1.f, float maxDist = -1.f);
 
-    float mSign(WorldPosition *p1, WorldPosition *p2)
-    {
-        return (getX() - p2->getX()) * (p1->getY() - p2->getY()) -
-               (p1->getX() - p2->getX()) * (getY() - p2->getY());
-    }
+    float mSign(WorldPosition *p1, WorldPosition *p2) { return (getX() - p2->getX()) * (p1->getY() - p2->getY()) - (p1->getX() - p2->getX()) * (getY() - p2->getY()); }
 
     bool isInside(WorldPosition *p1, WorldPosition *p2, WorldPosition *p3);
 
@@ -263,21 +223,14 @@ class WorldPosition : public WorldLocation
     std::vector<WorldPosition> fromCellCoord(CellCoord cellCoord);
     std::vector<WorldPosition> gridFromCellCoord(CellCoord cellCoord);
 
-    mGridCoord getmGridCoord()
-    {
-        return std::make_pair((int32)(CENTER_GRID_ID - getX() / SIZE_OF_GRIDS),
-                              (int32)(CENTER_GRID_ID - getY() / SIZE_OF_GRIDS));
-    }
+    mGridCoord getmGridCoord() { return std::make_pair((int32)(CENTER_GRID_ID - getX() / SIZE_OF_GRIDS), (int32)(CENTER_GRID_ID - getY() / SIZE_OF_GRIDS)); }
 
     std::vector<mGridCoord> getmGridCoords(WorldPosition secondPos);
     std::vector<WorldPosition> frommGridCoord(mGridCoord GridCoord);
 
     void loadMapAndVMap(uint32 mapId, uint8 x, uint8 y);
 
-    void loadMapAndVMap()
-    {
-        loadMapAndVMap(getMapId(), getmGridCoord().first, getmGridCoord().second);
-    }
+    void loadMapAndVMap() { loadMapAndVMap(getMapId(), getmGridCoord().first, getmGridCoord().second); }
 
     void loadMapAndVMaps(WorldPosition secondPos);
 
@@ -295,30 +248,15 @@ class WorldPosition : public WorldLocation
 
     // Pathfinding
     std::vector<WorldPosition> getPathStepFrom(WorldPosition startPos, Unit *bot);
-    std::vector<WorldPosition> getPathFromPath(std::vector<WorldPosition> startPath, Unit *bot,
-                                               uint8 maxAttempt = 40);
+    std::vector<WorldPosition> getPathFromPath(std::vector<WorldPosition> startPath, Unit *bot, uint8 maxAttempt = 40);
 
-    std::vector<WorldPosition> getPathFrom(WorldPosition startPos, Unit *bot)
-    {
-        return getPathFromPath({startPos}, bot);
-    }
+    std::vector<WorldPosition> getPathFrom(WorldPosition startPos, Unit *bot) { return getPathFromPath({startPos}, bot); }
 
-    std::vector<WorldPosition> getPathTo(WorldPosition endPos, Unit *bot)
-    {
-        return endPos.getPathFrom(*this, bot);
-    }
+    std::vector<WorldPosition> getPathTo(WorldPosition endPos, Unit *bot) { return endPos.getPathFrom(*this, bot); }
 
-    bool isPathTo(std::vector<WorldPosition> path,
-                  float maxDistance = sPlayerbotAIConfig->targetPosRecalcDistance)
-    {
-        return !path.empty() && distance(path.back()) < maxDistance;
-    };
-    bool cropPathTo(std::vector<WorldPosition> &path,
-                    float maxDistance = sPlayerbotAIConfig->targetPosRecalcDistance);
-    bool canPathTo(WorldPosition endPos, Unit *bot)
-    {
-        return endPos.isPathTo(getPathTo(endPos, bot));
-    }
+    bool isPathTo(std::vector<WorldPosition> path, float maxDistance = sPlayerbotAIConfig->targetPosRecalcDistance) { return !path.empty() && distance(path.back()) < maxDistance; };
+    bool cropPathTo(std::vector<WorldPosition> &path, float maxDistance = sPlayerbotAIConfig->targetPosRecalcDistance);
+    bool canPathTo(WorldPosition endPos, Unit *bot) { return endPos.isPathTo(getPathTo(endPos, bot)); }
 
     float getPathLength(std::vector<WorldPosition> points)
     {
@@ -381,8 +319,7 @@ inline ByteBuffer &operator>>(ByteBuffer &b, [[maybe_unused]] WorldPosition &g)
 class FindPointCreatureData
 {
    public:
-    FindPointCreatureData(WorldPosition point1 = WorldPosition(), float radius1 = 0,
-                          uint32 entry1 = 0)
+    FindPointCreatureData(WorldPosition point1 = WorldPosition(), float radius1 = 0, uint32 entry1 = 0)
     {
         point = point1;
         radius = radius1;
@@ -404,8 +341,7 @@ class FindPointCreatureData
 class FindPointGameObjectData
 {
    public:
-    FindPointGameObjectData(WorldPosition point1 = WorldPosition(), float radius1 = 0,
-                            uint32 entry1 = 0)
+    FindPointGameObjectData(WorldPosition point1 = WorldPosition(), float radius1 = 0, uint32 entry1 = 0)
     {
         point = point1;
         radius = radius1;
@@ -457,7 +393,8 @@ template <class T>
 std::vector<std::pair<T, WorldPosition>> GetPosList(std::vector<T> oList)
 {
     std::vector<std::pair<T, WorldPosition>> retList;
-    for (auto &obj : oList) retList.push_back(std::make_pair(obj, WorldPosition(obj)));
+    for (auto &obj : oList)
+        retList.push_back(std::make_pair(obj, WorldPosition(obj)));
 
     return std::move(retList);
 };
@@ -466,7 +403,8 @@ template <class T>
 std::vector<std::pair<T, WorldPosition>> GetPosVector(std::vector<T> oList)
 {
     std::vector<std::pair<T, WorldPosition>> retList;
-    for (auto &obj : oList) retList.push_back(make_pair(obj, WorldPosition(obj)));
+    for (auto &obj : oList)
+        retList.push_back(make_pair(obj, WorldPosition(obj)));
 
     return std::move(retList);
 };
@@ -474,10 +412,7 @@ std::vector<std::pair<T, WorldPosition>> GetPosVector(std::vector<T> oList)
 class mapTransfer
 {
    public:
-    mapTransfer(WorldPosition pointFrom1, WorldPosition pointTo1, float portalLength1 = 0.1f)
-        : pointFrom(pointFrom1), pointTo(pointTo1), portalLength(portalLength1)
-    {
-    }
+    mapTransfer(WorldPosition pointFrom1, WorldPosition pointTo1, float portalLength1 = 0.1f) : pointFrom(pointFrom1), pointTo(pointTo1), portalLength(portalLength1) {}
 
     bool isFrom(WorldPosition point) { return point.getMapId() == pointFrom.getMapId(); }
 
@@ -489,21 +424,11 @@ class mapTransfer
 
     bool isUseful(WorldPosition point) { return isFrom(point) || isTo(point); }
 
-    float distance(WorldPosition point)
-    {
-        return isUseful(point)
-                   ? (isFrom(point) ? point.distance(pointFrom) : point.distance(pointTo))
-                   : 200000;
-    }
+    float distance(WorldPosition point) { return isUseful(point) ? (isFrom(point) ? point.distance(pointFrom) : point.distance(pointTo)) : 200000; }
 
     bool isUseful(WorldPosition start, WorldPosition end) { return isFrom(start) && isTo(end); }
 
-    float distance(WorldPosition start, WorldPosition end)
-    {
-        return (isUseful(start, end)
-                    ? (start.distance(pointFrom) + portalLength + pointTo.distance(end))
-                    : 200000);
-    }
+    float distance(WorldPosition start, WorldPosition end) { return (isUseful(start, end) ? (start.distance(pointFrom) + portalLength + pointTo.distance(end)) : 200000); }
 
     float fDist(WorldPosition start, WorldPosition end);
 
@@ -566,14 +491,8 @@ class TravelDestination
 
     float distanceTo(WorldPosition *pos) { return nearestPoint(pos)->distance(pos); }
     bool onMap(WorldPosition *pos) { return nearestPoint(pos)->getMapId() == pos->getMapId(); }
-    virtual bool isIn(WorldPosition *pos, float radius = 0.f)
-    {
-        return onMap(pos) && distanceTo(pos) <= (radius ? radius : radiusMin);
-    }
-    virtual bool isOut(WorldPosition *pos, float radius = 0.f)
-    {
-        return !onMap(pos) || distanceTo(pos) > (radius ? radius : radiusMax);
-    }
+    virtual bool isIn(WorldPosition *pos, float radius = 0.f) { return onMap(pos) && distanceTo(pos) <= (radius ? radius : radiusMin); }
+    virtual bool isOut(WorldPosition *pos, float radius = 0.f) { return !onMap(pos) || distanceTo(pos) > (radius ? radius : radiusMax); }
     float getRadiusMin() { return radiusMin; }
 
     std::vector<WorldPosition *> touchingPoints(WorldPosition *pos);
@@ -596,10 +515,7 @@ class TravelDestination
 class NullTravelDestination : public TravelDestination
 {
    public:
-    NullTravelDestination(uint32 cooldownDelay1 = 5 * 60 * 1000) : TravelDestination()
-    {
-        cooldownDelay = cooldownDelay1;
-    };
+    NullTravelDestination(uint32 cooldownDelay1 = 5 * 60 * 1000) : TravelDestination() { cooldownDelay = cooldownDelay1; };
 
     Quest const *GetQuestTemplate() override { return nullptr; }
 
@@ -608,14 +524,8 @@ class NullTravelDestination : public TravelDestination
     std::string const getName() override { return "NullTravelDestination"; }
     std::string const getTitle() override { return "no destination"; }
 
-    bool isIn([[maybe_unused]] WorldPosition *pos, [[maybe_unused]] float radius = 0.f) override
-    {
-        return true;
-    }
-    bool isOut([[maybe_unused]] WorldPosition *pos, [[maybe_unused]] float radius = 0.f) override
-    {
-        return false;
-    }
+    bool isIn([[maybe_unused]] WorldPosition *pos, [[maybe_unused]] float radius = 0.f) override { return true; }
+    bool isOut([[maybe_unused]] WorldPosition *pos, [[maybe_unused]] float radius = 0.f) override { return false; }
 };
 
 // A travel target specifically related to a quest.
@@ -641,9 +551,7 @@ class QuestTravelDestination : public TravelDestination
 class QuestRelationTravelDestination : public QuestTravelDestination
 {
    public:
-    QuestRelationTravelDestination(uint32 quest_id1, uint32 entry1, uint32 relation1,
-                                   float radiusMin1, float radiusMax1)
-        : QuestTravelDestination(quest_id1, radiusMin1, radiusMax1)
+    QuestRelationTravelDestination(uint32 quest_id1, uint32 entry1, uint32 relation1, float radiusMin1, float radiusMax1) : QuestTravelDestination(quest_id1, radiusMin1, radiusMax1)
     {
         entry = entry1;
         relation = relation1;
@@ -664,9 +572,7 @@ class QuestRelationTravelDestination : public QuestTravelDestination
 class QuestObjectiveTravelDestination : public QuestTravelDestination
 {
    public:
-    QuestObjectiveTravelDestination(uint32 quest_id1, uint32 entry1, uint32 objective1,
-                                    float radiusMin1, float radiusMax1, uint32 itemId1 = 0)
-        : QuestTravelDestination(quest_id1, radiusMin1, radiusMax1)
+    QuestObjectiveTravelDestination(uint32 quest_id1, uint32 entry1, uint32 objective1, float radiusMin1, float radiusMax1, uint32 itemId1 = 0) : QuestTravelDestination(quest_id1, radiusMin1, radiusMax1)
     {
         objective = objective1;
         entry = entry1;
@@ -693,11 +599,7 @@ class QuestObjectiveTravelDestination : public QuestTravelDestination
 class RpgTravelDestination : public TravelDestination
 {
    public:
-    RpgTravelDestination(uint32 entry1, float radiusMin1, float radiusMax1)
-        : TravelDestination(radiusMin1, radiusMax1)
-    {
-        entry = entry1;
-    }
+    RpgTravelDestination(uint32 entry1, float radiusMin1, float radiusMax1) : TravelDestination(radiusMin1, radiusMax1) { entry = entry1; }
 
     bool isActive(Player *bot) override;
     virtual CreatureTemplate const *GetCreatureTemplate();
@@ -713,11 +615,7 @@ class RpgTravelDestination : public TravelDestination
 class ExploreTravelDestination : public TravelDestination
 {
    public:
-    ExploreTravelDestination(uint32 areaId1, float radiusMin1, float radiusMax1)
-        : TravelDestination(radiusMin1, radiusMax1)
-    {
-        areaId = areaId1;
-    }
+    ExploreTravelDestination(uint32 areaId1, float radiusMin1, float radiusMax1) : TravelDestination(radiusMin1, radiusMax1) { areaId = areaId1; }
 
     bool isActive(Player *bot) override;
     std::string const getName() override { return "ExploreTravelDestination"; }
@@ -735,11 +633,7 @@ class ExploreTravelDestination : public TravelDestination
 class GrindTravelDestination : public TravelDestination
 {
    public:
-    GrindTravelDestination(int32 entry1, float radiusMin1, float radiusMax1)
-        : TravelDestination(radiusMin1, radiusMax1)
-    {
-        entry = entry1;
-    }
+    GrindTravelDestination(int32 entry1, float radiusMin1, float radiusMax1) : TravelDestination(radiusMin1, radiusMax1) { entry = entry1; }
 
     bool isActive(Player *bot) override;
     virtual CreatureTemplate const *GetCreatureTemplate();
@@ -755,8 +649,7 @@ class GrindTravelDestination : public TravelDestination
 class BossTravelDestination : public TravelDestination
 {
    public:
-    BossTravelDestination(int32 entry1, float radiusMin1, float radiusMax1)
-        : TravelDestination(radiusMin1, radiusMax1)
+    BossTravelDestination(int32 entry1, float radiusMin1, float radiusMax1) : TravelDestination(radiusMin1, radiusMax1)
     {
         entry = entry1;
         cooldownDelay = 1000;
@@ -782,18 +675,12 @@ class BossTravelDestination : public TravelDestination
 class TravelTarget : AiObject
 {
    public:
-    TravelTarget(PlayerbotAI *botAI)
-        : AiObject(botAI), m_status(TRAVEL_STATUS_NONE), startTime(getMSTime()) {};
-    TravelTarget(PlayerbotAI *botAI, TravelDestination *tDestination1, WorldPosition *wPosition1)
-        : AiObject(botAI), m_status(TRAVEL_STATUS_NONE), startTime(getMSTime())
-    {
-        setTarget(tDestination1, wPosition1);
-    }
+    TravelTarget(PlayerbotAI *botAI) : AiObject(botAI), m_status(TRAVEL_STATUS_NONE), startTime(getMSTime()) {};
+    TravelTarget(PlayerbotAI *botAI, TravelDestination *tDestination1, WorldPosition *wPosition1) : AiObject(botAI), m_status(TRAVEL_STATUS_NONE), startTime(getMSTime()) { setTarget(tDestination1, wPosition1); }
 
     ~TravelTarget();
 
-    void setTarget(TravelDestination *tDestination1, WorldPosition *wPosition1,
-                   bool groupCopy1 = false);
+    void setTarget(TravelDestination *tDestination1, WorldPosition *wPosition1, bool groupCopy1 = false);
     void setStatus(TravelStatus status);
     void setExpireIn(uint32 expireMs) { statusTime = getExpiredTime() + expireMs; }
 
@@ -908,37 +795,20 @@ class TravelMgr
         }
     }
 
-    std::vector<WorldPosition *> getNextPoint(WorldPosition *center,
-                                              std::vector<WorldPosition *> points,
-                                              uint32 amount = 1);
-    std::vector<WorldPosition> getNextPoint(WorldPosition center, std::vector<WorldPosition> points,
-                                            uint32 amount = 1);
+    std::vector<WorldPosition *> getNextPoint(WorldPosition *center, std::vector<WorldPosition *> points, uint32 amount = 1);
+    std::vector<WorldPosition> getNextPoint(WorldPosition center, std::vector<WorldPosition> points, uint32 amount = 1);
     QuestStatusData *getQuestStatus(Player *bot, uint32 questId);
     bool getObjectiveStatus(Player *bot, Quest const *pQuest, uint32 objective);
     uint32 getDialogStatus(Player *pPlayer, int32 questgiver, Quest const *pQuest);
-    std::vector<TravelDestination *> getQuestTravelDestinations(Player *bot, int32 questId = -1,
-                                                                bool ignoreFull = false,
-                                                                bool ignoreInactive = false,
-                                                                float maxDistance = 5000,
-                                                                bool ignoreObjectives = false);
-    std::vector<TravelDestination *> getRpgTravelDestinations(Player *bot, bool ignoreFull = false,
-                                                              bool ignoreInactive = false,
-                                                              float maxDistance = 5000);
-    std::vector<TravelDestination *> getExploreTravelDestinations(Player *bot,
-                                                                  bool ignoreFull = false,
-                                                                  bool ignoreInactive = false);
-    std::vector<TravelDestination *> getGrindTravelDestinations(Player *bot,
-                                                                bool ignoreFull = false,
-                                                                bool ignoreInactive = false,
-                                                                float maxDistance = 5000);
-    std::vector<TravelDestination *> getBossTravelDestinations(Player *bot, bool ignoreFull = false,
-                                                               bool ignoreInactive = false,
-                                                               float maxDistance = 25000);
+    std::vector<TravelDestination *> getQuestTravelDestinations(Player *bot, int32 questId = -1, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000, bool ignoreObjectives = false);
+    std::vector<TravelDestination *> getRpgTravelDestinations(Player *bot, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000);
+    std::vector<TravelDestination *> getExploreTravelDestinations(Player *bot, bool ignoreFull = false, bool ignoreInactive = false);
+    std::vector<TravelDestination *> getGrindTravelDestinations(Player *bot, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000);
+    std::vector<TravelDestination *> getBossTravelDestinations(Player *bot, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 25000);
 
     void setNullTravelTarget(Player *player);
 
-    void addMapTransfer(WorldPosition start, WorldPosition end, float portalDistance = 0.1f,
-                        bool makeShortcuts = true);
+    void addMapTransfer(WorldPosition start, WorldPosition end, float portalDistance = 0.1f, bool makeShortcuts = true);
     void loadMapTransfers();
     float mapTransDistance(WorldPosition start, WorldPosition end);
     float fastMapTransDistance(WorldPosition start, WorldPosition end);
@@ -946,34 +816,19 @@ class TravelMgr
     NullTravelDestination *nullTravelDestination = new NullTravelDestination();
     WorldPosition *nullWorldPosition = new WorldPosition();
 
-    void addBadVmap(uint32 mapId, uint8 x, uint8 y)
-    {
-        badVmap.push_back(std::make_tuple(mapId, x, y));
-    }
+    void addBadVmap(uint32 mapId, uint8 x, uint8 y) { badVmap.push_back(std::make_tuple(mapId, x, y)); }
 
-    void addBadMmap(uint32 mapId, uint8 x, uint8 y)
-    {
-        badMmap.push_back(std::make_tuple(mapId, x, y));
-    }
+    void addBadMmap(uint32 mapId, uint8 x, uint8 y) { badMmap.push_back(std::make_tuple(mapId, x, y)); }
 
-    bool isBadVmap(uint32 mapId, uint8 x, uint8 y)
-    {
-        return std::find(badVmap.begin(), badVmap.end(), std::make_tuple(mapId, x, y)) !=
-               badVmap.end();
-    }
+    bool isBadVmap(uint32 mapId, uint8 x, uint8 y) { return std::find(badVmap.begin(), badVmap.end(), std::make_tuple(mapId, x, y)) != badVmap.end(); }
 
-    bool isBadMmap(uint32 mapId, uint8 x, uint8 y)
-    {
-        return std::find(badMmap.begin(), badMmap.end(), std::make_tuple(mapId, x, y)) !=
-               badMmap.end();
-    }
+    bool isBadMmap(uint32 mapId, uint8 x, uint8 y) { return std::find(badMmap.begin(), badMmap.end(), std::make_tuple(mapId, x, y)) != badMmap.end(); }
 
     void printGrid(uint32 mapId, int x, int y, std::string const type);
     void printObj(WorldObject *obj, std::string const type);
 
     // protected:
-    void logQuestError(uint32 errorNr, Quest *quest, uint32 objective = 0, uint32 unitId = 0,
-                       uint32 itemId = 0);
+    void logQuestError(uint32 errorNr, Quest *quest, uint32 objective = 0, uint32 unitId = 0, uint32 itemId = 0);
 
     std::vector<uint32> avoidLoaded;
 
@@ -987,9 +842,7 @@ class TravelMgr
 
     std::vector<std::tuple<uint32, uint8, uint8>> badVmap, badMmap;
 
-    std::unordered_map<std::pair<uint32, uint32>, std::vector<mapTransfer>,
-                       boost::hash<std::pair<uint32, uint32>>>
-        mapTransfersMap;
+    std::unordered_map<std::pair<uint32, uint32>, std::vector<mapTransfer>, boost::hash<std::pair<uint32, uint32>>> mapTransfersMap;
 };
 
 #define sTravelMgr TravelMgr::instance()

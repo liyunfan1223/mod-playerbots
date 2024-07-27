@@ -33,14 +33,12 @@ bool TellLosAction::Execute(Event event)
 
     if (param.empty() || param == "gos" || param == "game objects")
     {
-        ListGameObjects("--- Game objects ---",
-                        *context->GetValue<GuidVector>("nearest game objects"));
+        ListGameObjects("--- Game objects ---", *context->GetValue<GuidVector>("nearest game objects"));
     }
 
     if (param.empty() || param == "players")
     {
-        ListUnits("--- Friendly players ---",
-                  *context->GetValue<GuidVector>("nearest friendly players"));
+        ListUnits("--- Friendly players ---", *context->GetValue<GuidVector>("nearest friendly players"));
     }
 
     if (param.empty() || param == "triggers")
@@ -97,20 +95,12 @@ bool TellAuraAction::Execute(Event event)
         const SpellInfo *spellInfo = aura->GetSpellInfo();
         int32 spellId = aura->GetSpellInfo()->Id;
         bool isPositive = aura->GetSpellInfo()->IsPositive();
-        sLog->outMessage(
-            "playerbot", LOG_LEVEL_DEBUG,
-            "Info of Aura - name: " + auraName + " caster: " + caster_name +
-                " type: " + std::to_string(type) + " owner: " + owner_name +
-                " distance: " + std::to_string(distance) + " isArea: " + std::to_string(is_area) +
-                " duration: " + std::to_string(duration) + " spellId: " + std::to_string(spellId) +
-                " isPositive: " + std::to_string(isPositive));
+        sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,
+                         "Info of Aura - name: " + auraName + " caster: " + caster_name + " type: " + std::to_string(type) + " owner: " + owner_name + " distance: " + std::to_string(distance) + " isArea: " + std::to_string(is_area) +
+                             " duration: " + std::to_string(duration) + " spellId: " + std::to_string(spellId) + " isPositive: " + std::to_string(isPositive));
 
-        botAI->TellMaster(
-            "Info of Aura - name: " + auraName + " caster: " + caster_name +
-            " type: " + std::to_string(type) + " owner: " + owner_name +
-            " distance: " + std::to_string(distance) + " isArea: " + std::to_string(is_area) +
-            " duration: " + std::to_string(duration) + " spellId: " + std::to_string(spellId) +
-            " isPositive: " + std::to_string(isPositive));
+        botAI->TellMaster("Info of Aura - name: " + auraName + " caster: " + caster_name + " type: " + std::to_string(type) + " owner: " + owner_name + " distance: " + std::to_string(distance) + " isArea: " + std::to_string(is_area) +
+                          " duration: " + std::to_string(duration) + " spellId: " + std::to_string(spellId) + " isPositive: " + std::to_string(isPositive));
 
         if (type == DYNOBJ_AURA_TYPE)
         {
@@ -118,16 +108,10 @@ bool TellAuraAction::Execute(Event event)
             float radius = dyn_owner->GetRadius();
             int32 spellId = dyn_owner->GetSpellId();
             int32 duration = dyn_owner->GetDuration();
-            sLog->outMessage(
-                "playerbot", LOG_LEVEL_DEBUG,
-                std::string("Info of DynamicObject -") + " name: " + dyn_owner->GetName() +
-                    " radius: " + std::to_string(radius) + " spell id: " + std::to_string(spellId) +
-                    " duration: " + std::to_string(duration));
+            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,
+                             std::string("Info of DynamicObject -") + " name: " + dyn_owner->GetName() + " radius: " + std::to_string(radius) + " spell id: " + std::to_string(spellId) + " duration: " + std::to_string(duration));
 
-            botAI->TellMaster(
-                std::string("Info of DynamicObject -") + " name: " + dyn_owner->GetName() +
-                " radius: " + std::to_string(radius) + " spell id: " + std::to_string(spellId) +
-                " duration: " + std::to_string(duration));
+            botAI->TellMaster(std::string("Info of DynamicObject -") + " name: " + dyn_owner->GetName() + " radius: " + std::to_string(radius) + " spell id: " + std::to_string(spellId) + " duration: " + std::to_string(duration));
         }
     }
     return true;

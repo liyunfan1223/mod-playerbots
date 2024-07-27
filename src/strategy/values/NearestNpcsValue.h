@@ -15,10 +15,7 @@ class PlayerbotAI;
 class NearestNpcsValue : public NearestUnitsValue
 {
    public:
-    NearestNpcsValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance)
-        : NearestUnitsValue(botAI, "nearest npcs", range)
-    {
-    }
+    NearestNpcsValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest npcs", range) {}
 
    protected:
     void FindUnits(std::list<Unit *> &targets) override;
@@ -28,10 +25,7 @@ class NearestNpcsValue : public NearestUnitsValue
 class NearestVehiclesValue : public NearestUnitsValue
 {
    public:
-    NearestVehiclesValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance)
-        : NearestUnitsValue(botAI, "nearest vehicles", range)
-    {
-    }
+    NearestVehiclesValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest vehicles", range) {}
 
    protected:
     void FindUnits(std::list<Unit *> &targets) override;
@@ -41,10 +35,7 @@ class NearestVehiclesValue : public NearestUnitsValue
 class NearestTriggersValue : public NearestUnitsValue
 {
    public:
-    NearestTriggersValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance)
-        : NearestUnitsValue(botAI, "nearest triggers", range)
-    {
-    }
+    NearestTriggersValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest triggers", range) {}
 
    protected:
     void FindUnits(std::list<Unit *> &targets) override;
@@ -54,10 +45,7 @@ class NearestTriggersValue : public NearestUnitsValue
 class NearestTotemsValue : public NearestUnitsValue
 {
    public:
-    NearestTotemsValue(PlayerbotAI *botAI, float range = 30.0f)
-        : NearestUnitsValue(botAI, "nearest totems", range, true)
-    {
-    }
+    NearestTotemsValue(PlayerbotAI *botAI, float range = 30.0f) : NearestUnitsValue(botAI, "nearest totems", range, true) {}
 
    protected:
     void FindUnits(std::list<Unit *> &targets) override;

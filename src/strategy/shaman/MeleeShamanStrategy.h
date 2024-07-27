@@ -19,10 +19,7 @@ class MeleeShamanStrategy : public GenericShamanStrategy
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
     NextAction **getDefaultActions() override;
     std::string const getName() override { return "melee"; }
-    uint32 GetType() const override
-    {
-        return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE;
-    }
+    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE; }
 };
 
 class MeleeAoeShamanStrategy : public CombatStrategy

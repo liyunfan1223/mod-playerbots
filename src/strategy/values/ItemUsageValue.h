@@ -37,10 +37,7 @@ enum ItemUsage : uint32
 class ItemUsageValue : public CalculatedValue<ItemUsage>, public Qualified
 {
    public:
-    ItemUsageValue(PlayerbotAI *botAI, std::string const name = "item usage")
-        : CalculatedValue<ItemUsage>(botAI, name)
-    {
-    }
+    ItemUsageValue(PlayerbotAI *botAI, std::string const name = "item usage") : CalculatedValue<ItemUsage>(botAI, name) {}
 
     ItemUsage Calculate() override;
 

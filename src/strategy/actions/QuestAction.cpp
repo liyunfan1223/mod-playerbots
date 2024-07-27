@@ -129,8 +129,7 @@ bool QuestAction::ProcessQuests(WorldObject *questGiver)
 {
     ObjectGuid guid = questGiver->GetGUID();
 
-    if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE &&
-        !sPlayerbotAIConfig->syncQuestWithPlayer)
+    if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE && !sPlayerbotAIConfig->syncQuestWithPlayer)
     {
         botAI->TellError("Cannot talk to quest giver");
         return false;
@@ -184,16 +183,13 @@ bool QuestAction::AcceptQuest(Quest const *quest, ObjectGuid questGiver)
         p.rpos(0);
         bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(p);
 
-        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE &&
-            sPlayerbotAIConfig->syncQuestWithPlayer)
+        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && sPlayerbotAIConfig->syncQuestWithPlayer)
         {
-            Object *pObject = ObjectAccessor::GetObjectByTypeMask(
-                *bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+            Object *pObject = ObjectAccessor::GetObjectByTypeMask(*bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
             bot->AddQuest(quest, pObject);
         }
 
-        if (bot->GetQuestStatus(questId) != QUEST_STATUS_NONE &&
-            bot->GetQuestStatus(questId) != QUEST_STATUS_REWARDED)
+        if (bot->GetQuestStatus(questId) != QUEST_STATUS_NONE && bot->GetQuestStatus(questId) != QUEST_STATUS_REWARDED)
         {
             out << "Accepted " << chat->FormatQuest(quest);
             botAI->TellMaster(out);

@@ -69,8 +69,7 @@ bool PositionAction::Execute(Event event)
     std::vector<std::string> coords = split(action, ',');
     if (coords.size() == 3)
     {
-        pos.Set(atoi(coords[0].c_str()), atoi(coords[1].c_str()), atoi(coords[2].c_str()),
-                botAI->GetBot()->GetMapId());
+        pos.Set(atoi(coords[0].c_str()), atoi(coords[1].c_str()), atoi(coords[2].c_str()), botAI->GetBot()->GetMapId());
         posMap[name] = pos;
 
         std::ostringstream out;
@@ -81,8 +80,7 @@ bool PositionAction::Execute(Event event)
 
     if (action == "set")
     {
-        pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
-                botAI->GetBot()->GetMapId());
+        pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), botAI->GetBot()->GetMapId());
         posMap[name] = pos;
 
         std::ostringstream out;
@@ -123,8 +121,7 @@ bool MoveToPositionAction::isUseful()
 {
     PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()[qualifier];
     float distance = AI_VALUE2(float, "distance", std::string("position_") + qualifier);
-    return pos.isSet() && distance > sPlayerbotAIConfig->followDistance &&
-           distance < sPlayerbotAIConfig->reactDistance;
+    return pos.isSet() && distance > sPlayerbotAIConfig->followDistance && distance < sPlayerbotAIConfig->reactDistance;
 }
 
 bool SetReturnPositionAction::Execute(Event event)
@@ -161,6 +158,5 @@ bool SetReturnPositionAction::isUseful()
 bool ReturnAction::isUseful()
 {
     PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()[qualifier];
-    return pos.isSet() &&
-           AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig->followDistance;
+    return pos.isSet() && AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig->followDistance;
 }

@@ -15,10 +15,7 @@ class PlayerbotAI;
 class IsMovingValue : public BoolCalculatedValue, public Qualified
 {
    public:
-    IsMovingValue(PlayerbotAI *botAI, std::string const name = "is moving")
-        : BoolCalculatedValue(botAI, name)
-    {
-    }
+    IsMovingValue(PlayerbotAI *botAI, std::string const name = "is moving") : BoolCalculatedValue(botAI, name) {}
 
     bool Calculate() override;
 };
@@ -26,10 +23,7 @@ class IsMovingValue : public BoolCalculatedValue, public Qualified
 class IsSwimmingValue : public BoolCalculatedValue, public Qualified
 {
    public:
-    IsSwimmingValue(PlayerbotAI *botAI, std::string const name = "is swimming")
-        : BoolCalculatedValue(botAI, name)
-    {
-    }
+    IsSwimmingValue(PlayerbotAI *botAI, std::string const name = "is swimming") : BoolCalculatedValue(botAI, name) {}
 
     bool Calculate() override;
 };

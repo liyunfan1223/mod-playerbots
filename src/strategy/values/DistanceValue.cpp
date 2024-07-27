@@ -77,8 +77,7 @@ float DistanceValue::Calculate()
         {
             Formation *formation = AI_VALUE(Formation *, "formation");
             WorldLocation loc = formation->GetLocation();
-            return sServerFacade->GetDistance2d(botAI->GetBot(), loc.GetPositionX(),
-                                                loc.GetPositionY());
+            return sServerFacade->GetDistance2d(botAI->GetBot(), loc.GetPositionX(), loc.GetPositionY());
         }
     }
 
@@ -97,7 +96,6 @@ bool InsideTargetValue::Calculate()
     if (!target || !target->IsInWorld() || target == botAI->GetBot())
         return false;
 
-    float dist = sServerFacade->GetDistance2d(botAI->GetBot(), target->GetPositionX(),
-                                              target->GetPositionY());
+    float dist = sServerFacade->GetDistance2d(botAI->GetBot(), target->GetPositionX(), target->GetPositionY());
     return sServerFacade->IsDistanceLessThan(dist, target->GetCombatReach());
 }

@@ -25,8 +25,7 @@ void PlayerbotTextMgr::LoadBotTexts()
     LOG_INFO("playerbots", "Loading playerbots texts...");
 
     uint32 count = 0;
-    if (PreparedQueryResult result =
-            PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_TEXT)))
+    if (PreparedQueryResult result = PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_TEXT)))
     {
         do
         {
@@ -52,8 +51,7 @@ void PlayerbotTextMgr::LoadBotTextChance()
 {
     if (botTextChance.empty())
     {
-        QueryResult results =
-            PlayerbotsDatabase.Query("SELECT name, probability FROM ai_playerbot_texts_chance");
+        QueryResult results = PlayerbotsDatabase.Query("SELECT name, probability FROM ai_playerbot_texts_chance");
         if (results)
         {
             do
@@ -86,19 +84,16 @@ std::string PlayerbotTextMgr::GetBotText(std::string name)
 
     std::vector<BotTextEntry> &list = botTexts[name];
     BotTextEntry textEntry = list[urand(0, list.size() - 1)];
-    return !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()]
-                                                          : textEntry.m_text[0];
+    return !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
 }
 
-std::string PlayerbotTextMgr::GetBotText(std::string name,
-                                         std::map<std::string, std::string> placeholders)
+std::string PlayerbotTextMgr::GetBotText(std::string name, std::map<std::string, std::string> placeholders)
 {
     std::string botText = GetBotText(name);
     if (botText.empty())
         return "";
 
-    for (std::map<std::string, std::string>::iterator i = placeholders.begin();
-         i != placeholders.end(); ++i)
+    for (std::map<std::string, std::string>::iterator i = placeholders.begin(); i != placeholders.end(); ++i)
         replaceAll(botText, i->first, i->second);
 
     return botText;
@@ -106,8 +101,7 @@ std::string PlayerbotTextMgr::GetBotText(std::string name,
 
 // chat replies
 
-std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType,
-                                         std::map<std::string, std::string> placeholders)
+std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::string, std::string> placeholders)
 {
     if (botTexts.empty())
     {
@@ -132,9 +126,7 @@ std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType,
         return "";
 
     BotTextEntry textEntry = proper_list[urand(0, proper_list.size() - 1)];
-    std::string botText = !textEntry.m_text[GetLocalePriority()].empty()
-                              ? textEntry.m_text[GetLocalePriority()]
-                              : textEntry.m_text[0];
+    std::string botText = !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
     for (auto &placeholder : placeholders)
         replaceAll(botText, placeholder.first, placeholder.second);
 
@@ -168,8 +160,7 @@ bool PlayerbotTextMgr::GetBotText(std::string name, std::string &text)
     return !text.empty();
 }
 
-bool PlayerbotTextMgr::GetBotText(std::string name, std::string &text,
-                                  std::map<std::string, std::string> placeholders)
+bool PlayerbotTextMgr::GetBotText(std::string name, std::string &text, std::map<std::string, std::string> placeholders)
 {
     if (!rollTextChance(name))
         return false;

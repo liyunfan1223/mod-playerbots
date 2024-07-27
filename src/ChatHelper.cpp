@@ -284,8 +284,7 @@ ItemIds ChatHelper::parseItems(std::string const text)
 std::string const ChatHelper::FormatQuest(Quest const *quest)
 {
     std::ostringstream out;
-    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h["
-        << quest->GetTitle() << "]|h|r";
+    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << quest->GetTitle() << "]|h|r";
     return out.str();
 }
 
@@ -302,10 +301,7 @@ std::string const ChatHelper::FormatWorldobject(WorldObject *wo)
     std::ostringstream out;
     out << "|cFFFFFF00|Hfound:" << wo->GetGUID().GetRawValue() << ":" << wo->GetEntry() << ":"
         << "|h[";
-    out << (wo->ToGameObject()
-                ? ((GameObject *)wo)->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale())
-                : wo->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()))
-        << "]|h|r";
+    out << (wo->ToGameObject() ? ((GameObject *)wo)->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) : wo->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale())) << "]|h|r";
     return out.str();
 }
 
@@ -336,8 +332,7 @@ std::string const ChatHelper::FormatWorldEntry(int32 entry)
 std::string const ChatHelper::FormatSpell(SpellInfo const *spellInfo)
 {
     std::ostringstream out;
-    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h["
-        << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] << "]|h|r";
+    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h[" << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] << "]|h|r";
     return out.str();
 }
 
@@ -350,8 +345,7 @@ std::string const ChatHelper::FormatItem(ItemTemplate const *proto, uint32 count
     // sObjectMgr->GetItemLocale(proto->ItemId)->Name[sWorld->GetDefaultDbcLocale()];
 
     std::ostringstream out;
-    out << "|c" << color << "|Hitem:" << proto->ItemId << ":0:0:0:0:0:0:0" << "|h[" << proto->Name1
-        << "]|h|r";
+    out << "|c" << color << "|Hitem:" << proto->ItemId << ":0:0:0:0:0:0:0" << "|h[" << proto->Name1 << "]|h|r";
 
     if (count > 1)
         out << "x" << count;
@@ -438,9 +432,8 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
         if (endPos == std::string::npos)  // break if error
             break;
 
-        std::string const entryC =
-            text.substr(pos, endPos - pos);   // get std::string const within window i.e entry
-        uint32 entry = atol(entryC.c_str());  // convert ascii to float
+        std::string const entryC = text.substr(pos, endPos - pos);  // get std::string const within window i.e entry
+        uint32 entry = atol(entryC.c_str());                        // convert ascii to float
 
         ObjectGuid lootCurrent = ObjectGuid(guid);
 
@@ -451,12 +444,10 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
     return gos;
 }
 
-std::string const ChatHelper::FormatQuestObjective(std::string const name, uint32 available,
-                                                   uint32 required)
+std::string const ChatHelper::FormatQuestObjective(std::string const name, uint32 available, uint32 required)
 {
     std::ostringstream out;
-    out << "|cFFFFFFFF" << name << (available >= required ? "|c0000FF00: " : "|c00FF0000: ")
-        << available << "/" << required << "|r";
+    out << "|cFFFFFFFF" << name << (available >= required ? "|c0000FF00: " : "|c00FF0000: ") << available << "/" << required << "|r";
 
     return out.str();
 }
@@ -512,12 +503,8 @@ uint32 ChatHelper::parseSlot(std::string const text)
 
 bool ChatHelper::parseable(std::string const text)
 {
-    return text.find("|H") != std::string::npos || text == "questitem" || text == "ammo" ||
-           substrContainsInMap<uint32>(text, consumableSubClasses) ||
-           substrContainsInMap<uint32>(text, tradeSubClasses) ||
-           substrContainsInMap<uint32>(text, itemQualities) ||
-           substrContainsInMap<uint32>(text, slots) || substrContainsInMap<ChatMsg>(text, chats) ||
-           substrContainsInMap<uint32>(text, skills) || parseMoney(text) > 0;
+    return text.find("|H") != std::string::npos || text == "questitem" || text == "ammo" || substrContainsInMap<uint32>(text, consumableSubClasses) || substrContainsInMap<uint32>(text, tradeSubClasses) ||
+           substrContainsInMap<uint32>(text, itemQualities) || substrContainsInMap<uint32>(text, slots) || substrContainsInMap<ChatMsg>(text, chats) || substrContainsInMap<uint32>(text, skills) || parseMoney(text) > 0;
 }
 
 std::string const ChatHelper::FormatClass(Player *player, int8 spec)
@@ -563,10 +550,7 @@ std::string const ChatHelper::FormatSkill(uint32 skill)
     return "";
 }
 
-std::string const ChatHelper::FormatBoolean(bool flag)
-{
-    return flag ? "|cff00ff00ON|r" : "|cffffff00OFF|r";
-}
+std::string const ChatHelper::FormatBoolean(bool flag) { return flag ? "|cff00ff00ON|r" : "|cffffff00OFF|r"; }
 
 void ChatHelper::eraseAllSubStr(std::string &mainStr, std::string const toErase)
 {

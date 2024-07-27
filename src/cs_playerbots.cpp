@@ -48,20 +48,11 @@ class playerbots_commandscript : public CommandScript
         return commandTable;
     }
 
-    static bool HandlePlayerbotCommand(ChatHandler *handler, char const *args)
-    {
-        return PlayerbotMgr::HandlePlayerbotMgrCommand(handler, args);
-    }
+    static bool HandlePlayerbotCommand(ChatHandler *handler, char const *args) { return PlayerbotMgr::HandlePlayerbotMgrCommand(handler, args); }
 
-    static bool HandleRandomPlayerbotCommand(ChatHandler *handler, char const *args)
-    {
-        return RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(handler, args);
-    }
+    static bool HandleRandomPlayerbotCommand(ChatHandler *handler, char const *args) { return RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(handler, args); }
 
-    static bool HandleGuildTaskCommand(ChatHandler *handler, char const *args)
-    {
-        return GuildTaskMgr::HandleConsoleCommand(handler, args);
-    }
+    static bool HandleGuildTaskCommand(ChatHandler *handler, char const *args) { return GuildTaskMgr::HandleConsoleCommand(handler, args); }
 
     static bool HandlePerfMonCommand(ChatHandler *handler, char const *args)
     {
@@ -87,10 +78,7 @@ class playerbots_commandscript : public CommandScript
         return true;
     }
 
-    static bool HandleDebugBGCommand(ChatHandler *handler, char const *args)
-    {
-        return BGTactics::HandleConsoleCommand(handler, args);
-    }
+    static bool HandleDebugBGCommand(ChatHandler *handler, char const *args) { return BGTactics::HandleConsoleCommand(handler, args); }
 };
 
 void AddSC_playerbots_commandscript() { new playerbots_commandscript(); }

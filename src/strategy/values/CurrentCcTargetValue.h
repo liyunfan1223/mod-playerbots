@@ -16,10 +16,7 @@ class Unit;
 class CurrentCcTargetValue : public TargetValue, public Qualified
 {
    public:
-    CurrentCcTargetValue(PlayerbotAI *botAI, std::string const name = "current cc target")
-        : TargetValue(botAI, name)
-    {
-    }
+    CurrentCcTargetValue(PlayerbotAI *botAI, std::string const name = "current cc target") : TargetValue(botAI, name) {}
 
     Unit *Calculate() override;
 };

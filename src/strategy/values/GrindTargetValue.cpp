@@ -60,8 +60,7 @@ Unit *GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
             continue;
 
         auto &rep = bot->ToPlayer()->GetReputationMgr();
-        if (unit->ToCreature() && !unit->ToCreature()->GetCreatureTemplate()->lootid &&
-            bot->GetReactionTo(unit) >= REP_NEUTRAL)
+        if (unit->ToCreature() && !unit->ToCreature()->GetCreatureTemplate()->lootid && bot->GetReactionTo(unit) >= REP_NEUTRAL)
         {
             continue;
         }
@@ -85,8 +84,7 @@ Unit *GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         // if (!bot->InBattleground() && master && master->GetDistance(unit) >=
         // sPlayerbotAIConfig->grindDistance && !sRandomPlayerbotMgr->IsRandomBot(bot)) continue;
 
-        if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 &&
-            !unit->GetGUID().IsPlayer())
+        if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
             continue;
 
         // if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
@@ -104,8 +102,7 @@ Unit *GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
 
         if (Creature *creature = unit->ToCreature())
             if (CreatureTemplate const *CreatureTemplate = creature->GetCreatureTemplate())
-                if (CreatureTemplate->rank > CREATURE_ELITE_NORMAL &&
-                    !AI_VALUE(bool, "can fight elite"))
+                if (CreatureTemplate->rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight elite"))
                     continue;
 
         if (!bot->IsWithinLOSInMap(unit))
@@ -133,8 +130,7 @@ Unit *GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         else
         {
             float newdistance = bot->GetDistance(unit);
-            if (!result || (newdistance < distance && urand(0, abs(distance - newdistance)) >
-                                                          sPlayerbotAIConfig->sightDistance * 0.1))
+            if (!result || (newdistance < distance && urand(0, abs(distance - newdistance)) > sPlayerbotAIConfig->sightDistance * 0.1))
             {
                 distance = newdistance;
                 result = unit;
@@ -185,8 +181,7 @@ bool GrindTargetValue::needForQuest(Unit *target)
                     int required = questTemplate->RequiredNpcOrGoCount[j];
                     int available = questStatus->CreatureOrGOCount[j];
 
-                    if (required && available < required &&
-                        (target->GetEntry() == entry || justCheck))
+                    if (required && available < required && (target->GetEntry() == entry || justCheck))
                         return true;
                 }
 
@@ -207,8 +202,7 @@ bool GrindTargetValue::needForQuest(Unit *target)
 
             if (!justCheck)
             {
-                if (CreatureTemplate const *data =
-                        sObjectMgr->GetCreatureTemplate(target->GetEntry()))
+                if (CreatureTemplate const *data = sObjectMgr->GetCreatureTemplate(target->GetEntry()))
                 {
                     if (uint32 lootId = data->lootid)
                     {
@@ -238,8 +232,7 @@ uint32 GrindTargetValue::GetTargetingPlayerCount(Unit *unit)
             continue;
 
         PlayerbotAI *botAI = GET_PLAYERBOT_AI(member);
-        if ((botAI && *botAI->GetAiObjectContext()->GetValue<Unit *>("current target") == unit) ||
-            (!botAI && member->GetTarget() == unit->GetGUID()))
+        if ((botAI && *botAI->GetAiObjectContext()->GetValue<Unit *>("current target") == unit) || (!botAI && member->GetTarget() == unit->GetGUID()))
             ++count;
     }
 

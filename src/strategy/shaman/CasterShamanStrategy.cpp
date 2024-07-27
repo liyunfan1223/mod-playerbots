@@ -34,16 +34,9 @@ class CasterShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNo
     }
 };
 
-CasterShamanStrategy::CasterShamanStrategy(PlayerbotAI *botAI) : GenericShamanStrategy(botAI)
-{
-    actionNodeFactories.Add(new CasterShamanStrategyActionNodeFactory());
-}
+CasterShamanStrategy::CasterShamanStrategy(PlayerbotAI *botAI) : GenericShamanStrategy(botAI) { actionNodeFactories.Add(new CasterShamanStrategyActionNodeFactory()); }
 
-NextAction **CasterShamanStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("lava burst", ACTION_DEFAULT + 0.2f),
-                             new NextAction("lightning bolt", ACTION_DEFAULT), NULL);
-}
+NextAction **CasterShamanStrategy::getDefaultActions() { return NextAction::array(0, new NextAction("lava burst", ACTION_DEFAULT + 0.2f), new NextAction("lightning bolt", ACTION_DEFAULT), NULL); }
 
 void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
@@ -53,35 +46,19 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
     // NextAction("reach spell", ACTION_NORMAL + 9), nullptr))); triggers.push_back(new
     // TriggerNode("shaman weapon", NextAction::array(0, new NextAction("flametongue
     // weapon", 23.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "main hand weapon no imbue",
-        NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
+    triggers.push_back(new TriggerNode("main hand weapon no imbue", NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
     // triggers.push_back(new TriggerNode("searing totem", NextAction::array(0, new
     // NextAction("searing totem", 19.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "flame shock", NextAction::array(0, new NextAction("flame shock", 20.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("elemental mastery",
-                        NextAction::array(0, new NextAction("elemental mastery", 27.0f), nullptr)));
+    triggers.push_back(new TriggerNode("flame shock", NextAction::array(0, new NextAction("flame shock", 20.0f), nullptr)));
+    triggers.push_back(new TriggerNode("elemental mastery", NextAction::array(0, new NextAction("elemental mastery", 27.0f), nullptr)));
     // triggers.push_back(new TriggerNode("frost shock snare", NextAction::array(0, new
     // NextAction("frost shock", 21.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "no fire totem", NextAction::array(0, new NextAction("totem of wrath", 15.0f), NULL)));
+    triggers.push_back(new TriggerNode("no fire totem", NextAction::array(0, new NextAction("totem of wrath", 15.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "enemy is close",
-        NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "medium mana",
-        NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
 
-    triggers.push_back(
-        new TriggerNode("enemy too close for spell",
-                        NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
 }
 
-void CasterAoeShamanStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
-{
-    triggers.push_back(new TriggerNode(
-        "light aoe", NextAction::array(0, new NextAction("chain lightning", 25.0f), nullptr)));
-}
+void CasterAoeShamanStrategy::InitTriggers(std::vector<TriggerNode *> &triggers) { triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("chain lightning", 25.0f), nullptr))); }

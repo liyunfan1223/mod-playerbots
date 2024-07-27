@@ -11,10 +11,7 @@
 class PlayerWithoutItemPredicate : public FindPlayerPredicate, public PlayerbotAIAware
 {
    public:
-    PlayerWithoutItemPredicate(PlayerbotAI *botAI, std::string const item)
-        : PlayerbotAIAware(botAI), FindPlayerPredicate(), item(item)
-    {
-    }
+    PlayerWithoutItemPredicate(PlayerbotAI *botAI, std::string const item) : PlayerbotAIAware(botAI), FindPlayerPredicate(), item(item) {}
 
     bool Check(Unit *unit) override
     {
@@ -25,8 +22,7 @@ class PlayerWithoutItemPredicate : public FindPlayerPredicate, public PlayerbotA
         if (!member)
             return false;
 
-        if (!(member->IsInSameGroupWith(botAI->GetBot()) ||
-              member->IsInSameRaidWith(botAI->GetBot())))
+        if (!(member->IsInSameGroupWith(botAI->GetBot()) || member->IsInSameRaidWith(botAI->GetBot())))
             return false;
 
         PlayerbotAI *memberbotAI = GET_PLAYERBOT_AI(member);
@@ -48,18 +44,12 @@ Unit *PartyMemberWithoutItemValue::Calculate()
     return unit;
 }
 
-FindPlayerPredicate *PartyMemberWithoutItemValue::CreatePredicate()
-{
-    return new PlayerWithoutItemPredicate(botAI, qualifier);
-}
+FindPlayerPredicate *PartyMemberWithoutItemValue::CreatePredicate() { return new PlayerWithoutItemPredicate(botAI, qualifier); }
 
 class PlayerWithoutFoodPredicate : public PlayerWithoutItemPredicate
 {
    public:
-    PlayerWithoutFoodPredicate(PlayerbotAI *botAI)
-        : PlayerWithoutItemPredicate(botAI, "conjured food")
-    {
-    }
+    PlayerWithoutFoodPredicate(PlayerbotAI *botAI) : PlayerWithoutItemPredicate(botAI, "conjured food") {}
 
     bool Check(Unit *unit) override
     {
@@ -77,10 +67,7 @@ class PlayerWithoutFoodPredicate : public PlayerWithoutItemPredicate
 class PlayerWithoutWaterPredicate : public PlayerWithoutItemPredicate
 {
    public:
-    PlayerWithoutWaterPredicate(PlayerbotAI *botAI)
-        : PlayerWithoutItemPredicate(botAI, "conjured water")
-    {
-    }
+    PlayerWithoutWaterPredicate(PlayerbotAI *botAI) : PlayerWithoutItemPredicate(botAI, "conjured water") {}
 
     bool Check(Unit *unit) override
     {
@@ -92,17 +79,10 @@ class PlayerWithoutWaterPredicate : public PlayerWithoutItemPredicate
             return false;
 
         uint8 cls = member->getClass();
-        return cls == CLASS_DRUID || cls == CLASS_HUNTER || cls == CLASS_PALADIN ||
-               cls == CLASS_PRIEST || cls == CLASS_SHAMAN || cls == CLASS_WARLOCK;
+        return cls == CLASS_DRUID || cls == CLASS_HUNTER || cls == CLASS_PALADIN || cls == CLASS_PRIEST || cls == CLASS_SHAMAN || cls == CLASS_WARLOCK;
     }
 };
 
-FindPlayerPredicate *PartyMemberWithoutFoodValue::CreatePredicate()
-{
-    return new PlayerWithoutFoodPredicate(botAI);
-}
+FindPlayerPredicate *PartyMemberWithoutFoodValue::CreatePredicate() { return new PlayerWithoutFoodPredicate(botAI); }
 
-FindPlayerPredicate *PartyMemberWithoutWaterValue::CreatePredicate()
-{
-    return new PlayerWithoutWaterPredicate(botAI);
-}
+FindPlayerPredicate *PartyMemberWithoutWaterValue::CreatePredicate() { return new PlayerWithoutWaterPredicate(botAI); }

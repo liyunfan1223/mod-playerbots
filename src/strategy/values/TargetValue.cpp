@@ -44,12 +44,10 @@ bool FindNonCcTargetStrategy::IsCcTarget(Unit *attacker)
 
             if (PlayerbotAI *botAI = GET_PLAYERBOT_AI(member))
             {
-                if (botAI->GetAiObjectContext()->GetValue<Unit *>("rti cc target")->Get() ==
-                    attacker)
+                if (botAI->GetAiObjectContext()->GetValue<Unit *>("rti cc target")->Get() == attacker)
                     return true;
 
-                std::string const rti =
-                    botAI->GetAiObjectContext()->GetValue<std::string>("rti cc")->Get();
+                std::string const rti = botAI->GetAiObjectContext()->GetValue<std::string>("rti cc")->Get();
                 int32 index = RtiTargetValue::GetRtiIndex(rti);
                 if (index != -1)
                 {
@@ -111,8 +109,7 @@ bool FindTargetStrategy::IsHighPriority(Unit *attacker)
             return true;
         }
     }
-    GuidVector prioritizedTargets =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+    GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
     for (ObjectGuid targetGuid : prioritizedTargets)
     {
         if (targetGuid && attacker->GetGUID() == targetGuid)
@@ -132,11 +129,7 @@ WorldPosition LastLongMoveValue::Calculate()
     return lastMove.lastPath.getBack();
 }
 
-WorldPosition HomeBindValue::Calculate()
-{
-    return WorldPosition(bot->m_homebindMapId, bot->m_homebindX, bot->m_homebindY, bot->m_homebindZ,
-                         0.f);
-}
+WorldPosition HomeBindValue::Calculate() { return WorldPosition(bot->m_homebindMapId, bot->m_homebindX, bot->m_homebindY, bot->m_homebindZ, 0.f); }
 
 Unit *FindTargetValue::Calculate()
 {
@@ -157,8 +150,7 @@ Unit *FindTargetValue::Calculate()
         std::wstring wnamepart;
         Utf8toWStr(unit->GetName(), wnamepart);
         wstrToLower(wnamepart);
-        if (!qualifier.empty() && qualifier.length() == wnamepart.length() &&
-            Utf8FitTo(qualifier, wnamepart))
+        if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart))
         {
             return unit;
         }

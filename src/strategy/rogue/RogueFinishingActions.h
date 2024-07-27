@@ -26,10 +26,7 @@ class CastSliceAndDiceAction : public CastMeleeSpellAction
 class CastExposeArmorAction : public CastDebuffSpellAction
 {
    public:
-    CastExposeArmorAction(PlayerbotAI *botAI)
-        : CastDebuffSpellAction(botAI, "expose armor", false, 25.0f)
-    {
-    }
+    CastExposeArmorAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "expose armor", false, 25.0f) {}
 };
 
 class CastRuptureAction : public CastDebuffSpellAction

@@ -17,10 +17,7 @@ class WorldPosition;
 class SeeSpellAction : public MovementAction
 {
    public:
-    SeeSpellAction(PlayerbotAI *botAI, std::string const name = "see spell")
-        : MovementAction(botAI, name)
-    {
-    }
+    SeeSpellAction(PlayerbotAI *botAI, std::string const name = "see spell") : MovementAction(botAI, name) {}
 
     bool Execute(Event event) override;
 
@@ -31,8 +28,7 @@ class SeeSpellAction : public MovementAction
     void SetFormationOffset(WorldPosition &spellPosition);
 
    private:
-    Creature *CreateWps(Player *wpOwner, float x, float y, float z, float o, uint32 entry,
-                        Creature *lastWp, bool important = false);
+    Creature *CreateWps(Player *wpOwner, float x, float y, float z, float o, uint32 entry, Creature *lastWp, bool important = false);
 };
 
 #endif

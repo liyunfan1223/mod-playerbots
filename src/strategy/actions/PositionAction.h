@@ -22,11 +22,7 @@ class PositionAction : public Action
 class MoveToPositionAction : public MovementAction
 {
    public:
-    MoveToPositionAction(PlayerbotAI *botAI, std::string const name, std::string const qualifier,
-                         bool idle = false)
-        : MovementAction(botAI, name), qualifier(qualifier), idle(idle)
-    {
-    }
+    MoveToPositionAction(PlayerbotAI *botAI, std::string const name, std::string const qualifier, bool idle = false) : MovementAction(botAI, name), qualifier(qualifier), idle(idle) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;

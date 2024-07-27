@@ -19,8 +19,7 @@ class PlaceholderHelper
 {
    public:
     static void MapRole(PlaceholderMap &placeholders, Player *bot);
-    static void MapDungeon(PlaceholderMap &placeholders, DungeonSuggestion const *dungeonSuggestion,
-                           Player *bot);
+    static void MapDungeon(PlaceholderMap &placeholders, DungeonSuggestion const *dungeonSuggestion, Player *bot);
 
    private:
     struct Insertion

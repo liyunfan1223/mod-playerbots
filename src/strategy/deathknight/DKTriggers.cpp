@@ -15,8 +15,7 @@
 bool DKPresenceTrigger::IsActive()
 {
     Unit *target = GetTarget();
-    return !botAI->HasAura("blood presence", target) &&
-           !botAI->HasAura("unholy presence", target) && !botAI->HasAura("frost presence", target);
+    return !botAI->HasAura("blood presence", target) && !botAI->HasAura("unholy presence", target) && !botAI->HasAura("frost presence", target);
 }
 
 bool PestilenceGlyphTrigger::IsActive()
@@ -31,8 +30,7 @@ bool PestilenceGlyphTrigger::IsActive()
     }
     Aura *blood_plague = botAI->GetAura("blood plague", GetTarget(), true, true);
     Aura *frost_fever = botAI->GetAura("frost fever", GetTarget(), true, true);
-    if ((blood_plague && blood_plague->GetDuration() <= 3000) ||
-        (frost_fever && frost_fever->GetDuration() <= 3000))
+    if ((blood_plague && blood_plague->GetDuration() <= 3000) || (frost_fever && frost_fever->GetDuration() <= 3000))
     {
         return true;
     }
@@ -47,10 +45,7 @@ bool HighBloodRuneTrigger::IsActive()
     return !bot->GetRuneCooldown(0) && !bot->GetRuneCooldown(1);
 }
 
-bool DesolationTrigger::IsActive()
-{
-    return bot->HasAura(66817) && !botAI->HasAura("desolation", GetTarget(), false, true, -1, true);
-}
+bool DesolationTrigger::IsActive() { return bot->HasAura(66817) && !botAI->HasAura("desolation", GetTarget(), false, true, -1, true); }
 
 bool DeathAndDecayCooldownTrigger::IsActive()
 {

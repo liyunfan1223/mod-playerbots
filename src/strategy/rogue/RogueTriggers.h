@@ -53,10 +53,7 @@ class ExposeArmorTrigger : public DebuffTrigger
 class KickInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
 {
    public:
-    KickInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI)
-        : InterruptEnemyHealerTrigger(botAI, "kick")
-    {
-    }
+    KickInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI) : InterruptEnemyHealerTrigger(botAI, "kick") {}
 };
 
 class InStealthTrigger : public HasAuraTrigger
@@ -121,20 +118,13 @@ class OffHandWeaponNoEnchantTrigger : public BuffTrigger
 class TricksOfTheTradeOnMainTankTrigger : public BuffOnMainTankTrigger
 {
    public:
-    TricksOfTheTradeOnMainTankTrigger(PlayerbotAI *ai)
-        : BuffOnMainTankTrigger(ai, "tricks of the trade", true)
-    {
-    }
+    TricksOfTheTradeOnMainTankTrigger(PlayerbotAI *ai) : BuffOnMainTankTrigger(ai, "tricks of the trade", true) {}
 };
 
 class TargetWithComboPointsLowerHealTrigger : public ComboPointsAvailableTrigger
 {
    public:
-    TargetWithComboPointsLowerHealTrigger(PlayerbotAI *ai, int32 combo_point = 5,
-                                          float lifeTime = 8.0f)
-        : ComboPointsAvailableTrigger(ai, combo_point), lifeTime(lifeTime)
-    {
-    }
+    TargetWithComboPointsLowerHealTrigger(PlayerbotAI *ai, int32 combo_point = 5, float lifeTime = 8.0f) : ComboPointsAvailableTrigger(ai, combo_point), lifeTime(lifeTime) {}
     bool IsActive() override;
 
    private:

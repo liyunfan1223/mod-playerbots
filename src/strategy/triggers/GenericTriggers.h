@@ -18,10 +18,7 @@ class Unit;
 class StatAvailable : public Trigger
 {
    public:
-    StatAvailable(PlayerbotAI *botAI, int32 amount, std::string const name = "stat available")
-        : Trigger(botAI, name), amount(amount)
-    {
-    }
+    StatAvailable(PlayerbotAI *botAI, int32 amount, std::string const name = "stat available") : Trigger(botAI, name), amount(amount) {}
 
    protected:
     int32 amount;
@@ -54,9 +51,7 @@ class AlmostFullManaTrigger : public Trigger
 class RageAvailable : public StatAvailable
 {
    public:
-    RageAvailable(PlayerbotAI *botAI, int32 amount) : StatAvailable(botAI, amount, "rage available")
-    {
-    }
+    RageAvailable(PlayerbotAI *botAI, int32 amount) : StatAvailable(botAI, amount, "rage available") {}
 
     bool IsActive() override;
 };
@@ -82,10 +77,7 @@ class HighRageAvailableTrigger : public RageAvailable
 class EnergyAvailable : public StatAvailable
 {
    public:
-    EnergyAvailable(PlayerbotAI *botAI, int32 amount)
-        : StatAvailable(botAI, amount, "energy available")
-    {
-    }
+    EnergyAvailable(PlayerbotAI *botAI, int32 amount) : StatAvailable(botAI, amount, "energy available") {}
 
     bool IsActive() override;
 };
@@ -111,10 +103,7 @@ class HighEnergyAvailableTrigger : public EnergyAvailable
 class ComboPointsAvailableTrigger : public StatAvailable
 {
    public:
-    ComboPointsAvailableTrigger(PlayerbotAI *botAI, int32 amount = 5)
-        : StatAvailable(botAI, amount, "combo points available")
-    {
-    }
+    ComboPointsAvailableTrigger(PlayerbotAI *botAI, int32 amount = 5) : StatAvailable(botAI, amount, "combo points available") {}
 
     bool IsActive() override;
 };
@@ -138,10 +127,7 @@ class HasAggroTrigger : public Trigger
 class SpellTrigger : public Trigger
 {
    public:
-    SpellTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1)
-        : Trigger(botAI, spell, checkInterval), spell(spell)
-    {
-    }
+    SpellTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1) : Trigger(botAI, spell, checkInterval), spell(spell) {}
 
     std::string const GetTargetName() override { return "current target"; }
     std::string const getName() override { return spell; }
@@ -154,9 +140,7 @@ class SpellTrigger : public Trigger
 class SpellCanBeCastTrigger : public SpellTrigger
 {
    public:
-    SpellCanBeCastTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell)
-    {
-    }
+    SpellCanBeCastTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
 
     bool IsActive() override;
 };
@@ -164,9 +148,7 @@ class SpellCanBeCastTrigger : public SpellTrigger
 class SpellNoCooldownTrigger : public SpellTrigger
 {
    public:
-    SpellNoCooldownTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell)
-    {
-    }
+    SpellNoCooldownTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
 
     bool IsActive() override;
 };
@@ -174,9 +156,7 @@ class SpellNoCooldownTrigger : public SpellTrigger
 class SpellCooldownTrigger : public SpellTrigger
 {
    public:
-    SpellCooldownTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell)
-    {
-    }
+    SpellCooldownTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
 
     std::string const GetTargetName() override { return "self target"; }
     bool IsActive() override;
@@ -186,9 +166,7 @@ class SpellCooldownTrigger : public SpellTrigger
 class InterruptSpellTrigger : public SpellTrigger
 {
    public:
-    InterruptSpellTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell)
-    {
-    }
+    InterruptSpellTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
 
     bool IsActive() override;
 };
@@ -204,11 +182,7 @@ class DeflectSpellTrigger : public SpellTrigger
 class AttackerCountTrigger : public Trigger
 {
    public:
-    AttackerCountTrigger(PlayerbotAI *botAI, int32 amount,
-                         float distance = sPlayerbotAIConfig->sightDistance)
-        : Trigger(botAI), amount(amount), distance(distance)
-    {
-    }
+    AttackerCountTrigger(PlayerbotAI *botAI, int32 amount, float distance = sPlayerbotAIConfig->sightDistance) : Trigger(botAI), amount(amount), distance(distance) {}
 
     bool IsActive() override;
     std::string const getName() override { return "attacker count"; }
@@ -227,9 +201,7 @@ class HasAttackersTrigger : public AttackerCountTrigger
 class MyAttackerCountTrigger : public AttackerCountTrigger
 {
    public:
-    MyAttackerCountTrigger(PlayerbotAI *botAI, int32 amount) : AttackerCountTrigger(botAI, amount)
-    {
-    }
+    MyAttackerCountTrigger(PlayerbotAI *botAI, int32 amount) : AttackerCountTrigger(botAI, amount) {}
 
     bool IsActive() override;
     std::string const getName() override { return "my attacker count"; }
@@ -244,10 +216,7 @@ class MediumThreatTrigger : public MyAttackerCountTrigger
 class AoeTrigger : public AttackerCountTrigger
 {
    public:
-    AoeTrigger(PlayerbotAI *botAI, int32 amount = 3, float range = 15.0f)
-        : AttackerCountTrigger(botAI, amount), range(range)
-    {
-    }
+    AoeTrigger(PlayerbotAI *botAI, int32 amount = 3, float range = 15.0f) : AttackerCountTrigger(botAI, amount), range(range) {}
 
     bool IsActive() override;
     std::string const getName() override { return "aoe"; }
@@ -293,12 +262,7 @@ class HighAoeTrigger : public AoeTrigger
 class BuffTrigger : public SpellTrigger
 {
    public:
-    BuffTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1,
-                bool checkIsOwner = false)
-        : SpellTrigger(botAI, spell, checkInterval)
-    {
-        this->checkIsOwner = checkIsOwner;
-    }
+    BuffTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : SpellTrigger(botAI, spell, checkInterval) { this->checkIsOwner = checkIsOwner; }
 
    public:
     std::string const GetTargetName() override { return "self target"; }
@@ -311,10 +275,7 @@ class BuffTrigger : public SpellTrigger
 class BuffOnPartyTrigger : public BuffTrigger
 {
    public:
-    BuffOnPartyTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1)
-        : BuffTrigger(botAI, spell, checkInterval)
-    {
-    }
+    BuffOnPartyTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1) : BuffTrigger(botAI, spell, checkInterval) {}
 
     Value<Unit *> *GetTargetValue() override;
     std::string const getName() override { return spell + " on party"; }
@@ -364,11 +325,7 @@ class TargetInSightTrigger : public Trigger
 class DebuffTrigger : public BuffTrigger
 {
    public:
-    DebuffTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1,
-                  bool checkIsOwner = false, float needLifeTime = 8.0f)
-        : BuffTrigger(botAI, spell, checkInterval, checkIsOwner), needLifeTime(needLifeTime)
-    {
-    }
+    DebuffTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false, float needLifeTime = 8.0f) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner), needLifeTime(needLifeTime) {}
 
     std::string const GetTargetName() override { return "current target"; }
     bool IsActive() override;
@@ -380,22 +337,14 @@ class DebuffTrigger : public BuffTrigger
 class DebuffOnBossTrigger : public DebuffTrigger
 {
    public:
-    DebuffOnBossTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1,
-                        bool checkIsOwner = false)
-        : DebuffTrigger(botAI, spell, checkInterval, checkIsOwner)
-    {
-    }
+    DebuffOnBossTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : DebuffTrigger(botAI, spell, checkInterval, checkIsOwner) {}
     bool IsActive() override;
 };
 
 class DebuffOnAttackerTrigger : public DebuffTrigger
 {
    public:
-    DebuffOnAttackerTrigger(PlayerbotAI *botAI, std::string const spell, bool checkIsOwner = true,
-                            float needLifeTime = 8.0f)
-        : DebuffTrigger(botAI, spell, 1, checkIsOwner, needLifeTime)
-    {
-    }
+    DebuffOnAttackerTrigger(PlayerbotAI *botAI, std::string const spell, bool checkIsOwner = true, float needLifeTime = 8.0f) : DebuffTrigger(botAI, spell, 1, checkIsOwner, needLifeTime) {}
 
     Value<Unit *> *GetTargetValue() override;
     std::string const getName() override { return spell + " on attacker"; }
@@ -404,11 +353,7 @@ class DebuffOnAttackerTrigger : public DebuffTrigger
 class DebuffOnMeleeAttackerTrigger : public DebuffTrigger
 {
    public:
-    DebuffOnMeleeAttackerTrigger(PlayerbotAI *botAI, std::string const spell,
-                                 bool checkIsOwner = true, float needLifeTime = 8.0f)
-        : DebuffTrigger(botAI, spell, 1, checkIsOwner, needLifeTime)
-    {
-    }
+    DebuffOnMeleeAttackerTrigger(PlayerbotAI *botAI, std::string const spell, bool checkIsOwner = true, float needLifeTime = 8.0f) : DebuffTrigger(botAI, spell, 1, checkIsOwner, needLifeTime) {}
 
     Value<Unit *> *GetTargetValue() override;
     std::string const getName() override { return spell + " on attacker"; }
@@ -417,10 +362,7 @@ class DebuffOnMeleeAttackerTrigger : public DebuffTrigger
 class BoostTrigger : public BuffTrigger
 {
    public:
-    BoostTrigger(PlayerbotAI *botAI, std::string const spell, float balance = 50.f)
-        : BuffTrigger(botAI, spell, 1), balance(balance)
-    {
-    }
+    BoostTrigger(PlayerbotAI *botAI, std::string const spell, float balance = 50.f) : BuffTrigger(botAI, spell, 1), balance(balance) {}
 
     bool IsActive() override;
 
@@ -461,8 +403,7 @@ class AndTrigger : public Trigger
 class TwoTriggers : public Trigger
 {
    public:
-    explicit TwoTriggers(PlayerbotAI *botAI, std::string name1 = "", std::string name2 = "")
-        : Trigger(botAI)
+    explicit TwoTriggers(PlayerbotAI *botAI, std::string name1 = "", std::string name2 = "") : Trigger(botAI)
     {
         this->name1 = std::move(name1);
         this->name2 = std::move(name2);
@@ -535,11 +476,7 @@ class PetAttackTrigger : public Trigger
 class ItemCountTrigger : public Trigger
 {
    public:
-    ItemCountTrigger(PlayerbotAI *botAI, std::string const item, int32 count,
-                     int32 interval = 30 * 1000)
-        : Trigger(botAI, item, interval), item(item), count(count)
-    {
-    }
+    ItemCountTrigger(PlayerbotAI *botAI, std::string const item, int32 count, int32 interval = 30 * 1000) : Trigger(botAI, item, interval), item(item), count(count) {}
 
     bool IsActive() override;
     std::string const getName() override { return "item count"; }
@@ -552,20 +489,13 @@ class ItemCountTrigger : public Trigger
 class AmmoCountTrigger : public ItemCountTrigger
 {
    public:
-    AmmoCountTrigger(PlayerbotAI *botAI, std::string const item, uint32 count = 1,
-                     int32 interval = 30 * 1000)
-        : ItemCountTrigger(botAI, item, count, interval)
-    {
-    }
+    AmmoCountTrigger(PlayerbotAI *botAI, std::string const item, uint32 count = 1, int32 interval = 30 * 1000) : ItemCountTrigger(botAI, item, count, interval) {}
 };
 
 class HasAuraTrigger : public Trigger
 {
    public:
-    HasAuraTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1)
-        : Trigger(botAI, spell, checkInterval)
-    {
-    }
+    HasAuraTrigger(PlayerbotAI *botAI, std::string const spell, int32 checkInterval = 1) : Trigger(botAI, spell, checkInterval) {}
 
     std::string const GetTargetName() override { return "self target"; }
     bool IsActive() override;
@@ -574,10 +504,7 @@ class HasAuraTrigger : public Trigger
 class HasAuraStackTrigger : public Trigger
 {
    public:
-    HasAuraStackTrigger(PlayerbotAI *ai, std::string spell, int stack, int checkInterval = 1)
-        : Trigger(ai, spell, checkInterval), stack(stack)
-    {
-    }
+    HasAuraStackTrigger(PlayerbotAI *ai, std::string spell, int stack, int checkInterval = 1) : Trigger(ai, spell, checkInterval), stack(stack) {}
 
     std::string const GetTargetName() { return "self target"; }
     virtual bool IsActive();
@@ -673,9 +600,7 @@ class NotDpsTargetActiveTrigger : public Trigger
 class NotDpsAoeTargetActiveTrigger : public Trigger
 {
    public:
-    NotDpsAoeTargetActiveTrigger(PlayerbotAI *botAI) : Trigger(botAI, "not dps aoe target active")
-    {
-    }
+    NotDpsAoeTargetActiveTrigger(PlayerbotAI *botAI) : Trigger(botAI, "not dps aoe target active") {}
 
     bool IsActive() override;
 };
@@ -723,10 +648,7 @@ class TargetChangedTrigger : public Trigger
 class InterruptEnemyHealerTrigger : public SpellTrigger
 {
    public:
-    InterruptEnemyHealerTrigger(PlayerbotAI *botAI, std::string const spell)
-        : SpellTrigger(botAI, spell)
-    {
-    }
+    InterruptEnemyHealerTrigger(PlayerbotAI *botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
 
     Value<Unit *> *GetTargetValue() override;
     std::string const getName() override { return spell + " on enemy healer"; }
@@ -735,10 +657,7 @@ class InterruptEnemyHealerTrigger : public SpellTrigger
 class RandomBotUpdateTrigger : public RandomTrigger
 {
    public:
-    RandomBotUpdateTrigger(PlayerbotAI *botAI)
-        : RandomTrigger(botAI, "random bot update", 30 * 1000)
-    {
-    }
+    RandomBotUpdateTrigger(PlayerbotAI *botAI) : RandomTrigger(botAI, "random bot update", 30 * 1000) {}
 
     bool IsActive() override;
 };
@@ -746,10 +665,7 @@ class RandomBotUpdateTrigger : public RandomTrigger
 class NoNonBotPlayersAroundTrigger : public Trigger
 {
    public:
-    NoNonBotPlayersAroundTrigger(PlayerbotAI *botAI)
-        : Trigger(botAI, "no non bot players around", 10 * 1000)
-    {
-    }
+    NoNonBotPlayersAroundTrigger(PlayerbotAI *botAI) : Trigger(botAI, "no non bot players around", 10 * 1000) {}
 
     bool IsActive() override;
 };
@@ -773,10 +689,7 @@ class CollisionTrigger : public Trigger
 class StayTimeTrigger : public Trigger
 {
    public:
-    StayTimeTrigger(PlayerbotAI *botAI, uint32 delay, std::string const name)
-        : Trigger(botAI, name, 5 * 1000), delay(delay)
-    {
-    }
+    StayTimeTrigger(PlayerbotAI *botAI, uint32 delay, std::string const name) : Trigger(botAI, name, 5 * 1000), delay(delay) {}
 
     bool IsActive() override;
 
@@ -793,19 +706,13 @@ class SitTrigger : public StayTimeTrigger
 class ReturnTrigger : public StayTimeTrigger
 {
    public:
-    ReturnTrigger(PlayerbotAI *botAI)
-        : StayTimeTrigger(botAI, sPlayerbotAIConfig->returnDelay, "return")
-    {
-    }
+    ReturnTrigger(PlayerbotAI *botAI) : StayTimeTrigger(botAI, sPlayerbotAIConfig->returnDelay, "return") {}
 };
 
 class GiveItemTrigger : public Trigger
 {
    public:
-    GiveItemTrigger(PlayerbotAI *botAI, std::string const name, std::string const item)
-        : Trigger(botAI, name, 2 * 1000), item(item)
-    {
-    }
+    GiveItemTrigger(PlayerbotAI *botAI, std::string const name, std::string const item) : Trigger(botAI, name, 2 * 1000), item(item) {}
 
     bool IsActive() override;
 
@@ -872,11 +779,7 @@ class HasAreaDebuffTrigger : public Trigger
 class BuffOnMainTankTrigger : public BuffTrigger
 {
    public:
-    BuffOnMainTankTrigger(PlayerbotAI *botAI, std::string spell, bool checkIsOwner = false,
-                          int checkInterval = 1)
-        : BuffTrigger(botAI, spell, checkInterval, checkIsOwner)
-    {
-    }
+    BuffOnMainTankTrigger(PlayerbotAI *botAI, std::string spell, bool checkIsOwner = false, int checkInterval = 1) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner) {}
 
    public:
     virtual Value<Unit *> *GetTargetValue();

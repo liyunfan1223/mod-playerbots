@@ -8,7 +8,4 @@
 
 #include "Playerbots.h"
 
-Value<Unit *> *CastSapAction::GetTargetValue()
-{
-    return context->GetValue<Unit *>("cc target", getName());
-}
+Value<Unit *> *CastSapAction::GetTargetValue() { return context->GetValue<Unit *>("cc target", getName()); }

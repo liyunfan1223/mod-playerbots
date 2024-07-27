@@ -61,9 +61,7 @@ typedef std::unordered_map<ItemUsage, std::vector<uint32>> itemUsageMap;
 class EntryLootUsageValue : public CalculatedValue<itemUsageMap>, public Qualified
 {
    public:
-    EntryLootUsageValue(PlayerbotAI *botAI) : CalculatedValue(botAI, "entry loot usage", 2 * 1000)
-    {
-    }
+    EntryLootUsageValue(PlayerbotAI *botAI) : CalculatedValue(botAI, "entry loot usage", 2 * 1000) {}
 
     itemUsageMap Calculate() override;
 };

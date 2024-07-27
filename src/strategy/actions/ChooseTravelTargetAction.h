@@ -19,10 +19,7 @@ struct QuestStatusData;
 class ChooseTravelTargetAction : public MovementAction
 {
    public:
-    ChooseTravelTargetAction(PlayerbotAI *botAI, std::string const name = "choose travel target")
-        : MovementAction(botAI, name)
-    {
-    }
+    ChooseTravelTargetAction(PlayerbotAI *botAI, std::string const name = "choose travel target") : MovementAction(botAI, name) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -34,8 +31,7 @@ class ChooseTravelTargetAction : public MovementAction
     void setNewTarget(TravelTarget *newTarget, TravelTarget *oldTarget);
     void ReportTravelTarget(TravelTarget *newTarget, TravelTarget *oldTarget);
 
-    bool getBestDestination(std::vector<TravelDestination *> *activeDestinations,
-                            std::vector<WorldPosition *> *activePoints);
+    bool getBestDestination(std::vector<TravelDestination *> *activeDestinations, std::vector<WorldPosition *> *activePoints);
 
     bool SetGroupTarget(TravelTarget *target);
     bool SetCurrentTarget(TravelTarget *target, TravelTarget *oldTarget);
@@ -45,14 +41,12 @@ class ChooseTravelTargetAction : public MovementAction
     bool SetGrindTarget(TravelTarget *target);
     bool SetBossTarget(TravelTarget *target);
     bool SetExploreTarget(TravelTarget *target);
-    bool SetNpcFlagTarget(TravelTarget *target, std::vector<NPCFlags> flags,
-                          std::string const name = "", std::vector<uint32> items = {});
+    bool SetNpcFlagTarget(TravelTarget *target, std::vector<NPCFlags> flags, std::string const name = "", std::vector<uint32> items = {});
     bool SetNullTarget(TravelTarget *target);
 
    private:
     virtual bool needForQuest(Unit *target);
-    virtual bool needItemForQuest(uint32 itemId, Quest const *questTemplate,
-                                  QuestStatusData const *questStatus);
+    virtual bool needItemForQuest(uint32 itemId, Quest const *questTemplate, QuestStatusData const *questStatus);
 };
 
 #endif

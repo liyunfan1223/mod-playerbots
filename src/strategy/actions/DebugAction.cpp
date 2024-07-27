@@ -29,12 +29,10 @@ bool DebugAction::Execute(Event event)
 
             uint32 areaId = 0;
             uint32 zoneId = 0;
-            sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, zoneId, areaId, pos.getMapId(), pos.getX(),
-                                      pos.getY(), pos.getZ());
+            sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, zoneId, areaId, pos.getMapId(), pos.getX(), pos.getY(), pos.getZ());
 
             std::ostringstream out;
-            out << zoneId << "," << areaId << ","
-                << (pos.getAreaName().empty() ? "none" : pos.getAreaName()) << ",";
+            out << zoneId << "," << areaId << "," << (pos.getAreaName().empty() ? "none" : pos.getAreaName()) << ",";
 
             pos.printWKT(out);
 
@@ -74,8 +72,7 @@ bool DebugAction::Execute(Event event)
                 return false;
 
             std::vector<WorldPosition> beginPath, endPath;
-            TravelNodeRoute route =
-                sTravelNodeMap->getRoute(botPos, *points.front(), beginPath, bot);
+            TravelNodeRoute route = sTravelNodeMap->getRoute(botPos, *points.front(), beginPath, bot);
 
             std::ostringstream out;
             out << "Traveling to " << dest->getTitle() << ": ";
@@ -177,8 +174,7 @@ bool DebugAction::Execute(Event event)
                 continue;
             }
 
-            if (q.second->questGivers.empty() || q.second->questTakers.empty() ||
-                q.second->questObjectives.empty())
+            if (q.second->questGivers.empty() || q.second->questTakers.empty() || q.second->questObjectives.empty())
                 out << quest->GetTitle() << " ";
 
             if (q.second->questGivers.empty())
@@ -236,13 +232,15 @@ bool DebugAction::Execute(Event event)
     }
     else if (text.find("reset node") != std::string::npos)
     {
-        for (auto &node : sTravelNodeMap->getNodes()) node->setLinked(false);
+        for (auto &node : sTravelNodeMap->getNodes())
+            node->setLinked(false);
         return true;
     }
     else if (text.find("reset path") != std::string::npos)
     {
         for (auto &node : sTravelNodeMap->getNodes())
-            for (auto &path : *node->getLinks()) node->removeLinkTo(path.first, true);
+            for (auto &path : *node->getLinks())
+                node->removeLinkTo(path.first, true);
         return true;
     }
     else if (text.find("gen node") != std::string::npos)
@@ -299,8 +297,7 @@ bool DebugAction::Execute(Event event)
 
                 for (auto p : ppath)
                 {
-                    Creature *wpCreature = bot->SummonCreature(1, p.getX(), p.getY(), p.getZ(), 0,
-                                                               TEMPSUMMON_TIMED_DESPAWN, 20000.0f);
+                    Creature *wpCreature = bot->SummonCreature(1, p.getX(), p.getY(), p.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000.0f);
                     // addAura(246, wpCreature);
                     units.push_back(wpCreature->GetGUID());
 
@@ -331,9 +328,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature *wpCreature =
-                bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                    TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
             FakeSpell(spellEffect, wpCreature, wpCreature, prev->GetGUID(), {}, {}, botPos, botPos);
 
@@ -359,9 +354,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature *wpCreature =
-                bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                    TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
             if (wpCreature)
             {
@@ -391,9 +384,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature *wpCreature =
-                bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                    TEMPSUMMON_TIMED_DESPAWN, 5000.0f + i * 100.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000.0f + i * 100.0f);
             wpCreature->SetObjectScale(0.5f);
 
             if (wpCreature)
@@ -420,9 +411,7 @@ bool DebugAction::Execute(Event event)
             botPos.setY(botPos.getY() + sin(ang) * dist);
             botPos.setZ(botPos.getHeight() + 2);
 
-            Creature *wpCreature =
-                bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                    TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+            Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
             units.push_back(wpCreature->GetGUID());
         }
@@ -490,9 +479,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature *wpCreature = bot->SummonCreature(
-                    (dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(),
-                    botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature)
                 {
@@ -522,9 +509,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature *wpCreature =
-                    bot->SummonCreature(effect, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                        TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(effect, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
             }
         }
         return true;
@@ -563,9 +548,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature *wpCreature =
-                    bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                        TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature)
                 {
@@ -612,9 +595,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature *wpCreature = bot->SummonCreature(
-                    (dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(),
-                    botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature)
                 {
@@ -658,9 +639,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2,
-                                                 botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                                 TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature && lCreature)
                 {
@@ -688,8 +667,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(),
-                                                 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 if (wpCreature)
                 {
@@ -721,9 +699,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature *wpCreature =
-                    bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                        TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 all_targets.push_back(wpCreature->GetGUID());
             }
@@ -765,12 +741,10 @@ bool DebugAction::Execute(Event event)
                             }
                         }
 
-                    Unit *realCaster =
-                        botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
-                                                         // all_targets.size() - 1)]);
-                    Unit *caster =
-                        botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
-                                                         // all_targets.size() - 1)]);
+                    Unit *realCaster = botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
+                                                                        // all_targets.size() - 1)]);
+                    Unit *caster = botAI->GetUnit(all_targets[i]);      // botAI->GetUnit(all_targets[urand(0,
+                                                                        // all_targets.size() - 1)]);
                     Unit *target = botAI->GetUnit(all_targets[i + 1]);
 
                     if (!realCaster)
@@ -782,8 +756,7 @@ bool DebugAction::Execute(Event event)
                     if (!target)
                         target = master;
 
-                    FakeSpell(effect, realCaster, caster, target->GetGUID(), hits, miss,
-                              WorldPosition(caster), WorldPosition(target));
+                    FakeSpell(effect, realCaster, caster, target->GetGUID(), hits, miss, WorldPosition(caster), WorldPosition(target));
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(20));
                 }
@@ -804,9 +777,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature *wpCreature =
-                    bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
-                                        TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature(2334, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 all_targets.push_back(wpCreature->GetGUID());
             }
@@ -846,12 +817,10 @@ bool DebugAction::Execute(Event event)
                         }
                     }
 
-                    Unit *realCaster =
-                        botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
-                                                         // all_targets.size() - 1)]);
-                    Unit *caster =
-                        botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
-                                                         // all_targets.size() - 1)]);
+                    Unit *realCaster = botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
+                                                                        // all_targets.size() - 1)]);
+                    Unit *caster = botAI->GetUnit(all_targets[i]);      // botAI->GetUnit(all_targets[urand(0,
+                                                                        // all_targets.size() - 1)]);
                     Unit *target = botAI->GetUnit(all_targets[i + 1]);
 
                     if (!realCaster)
@@ -864,8 +833,7 @@ bool DebugAction::Execute(Event event)
                         target = master;
 
                     master->SendPlaySpellVisual(caster->GetGUID(), 5036);
-                    FakeSpell(effect, realCaster, caster, target->GetGUID(), hits, miss,
-                              WorldPosition(caster), WorldPosition(target));
+                    FakeSpell(effect, realCaster, caster, target->GetGUID(), hits, miss, WorldPosition(caster), WorldPosition(target));
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(20));
                 }
@@ -887,9 +855,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature *wpCreature = bot->SummonCreature(
-                    (dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(),
-                    botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
+                Creature *wpCreature = bot->SummonCreature((dy == 0 && (dx == 0 || dx == 2)) ? 6 : 2, botPos.getX(), botPos.getY(), botPos.getZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
 
                 wpCreature->PlayDistanceSound(effect);
             }
@@ -931,16 +897,13 @@ bool DebugAction::Execute(Event event)
     return true;
 }
 
-void DebugAction::FakeSpell(uint32 spellId, Unit *truecaster, Unit *caster, ObjectGuid target,
-                            GuidVector otherTargets, GuidVector missTargets, WorldPosition source,
-                            WorldPosition dest, bool forceDest)
+void DebugAction::FakeSpell(uint32 spellId, Unit *truecaster, Unit *caster, ObjectGuid target, GuidVector otherTargets, GuidVector missTargets, WorldPosition source, WorldPosition dest, bool forceDest)
 {
     SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
     {
         uint32 castFlags = CAST_FLAG_HAS_TRAJECTORY;
 
-        if (spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) ||
-            spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
+        if (spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
             castFlags |= CAST_FLAG_PROJECTILE;
 
         WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 2 + 4));
@@ -983,14 +946,12 @@ void DebugAction::FakeSpell(uint32 spellId, Unit *truecaster, Unit *caster, Obje
             m_targets.SetSrc(source.getX(), source.getY(), source.getZ());
 
         if (!forceDest && target)
-            if (!spellInfo || !(spellInfo->Targets & TARGET_FLAG_DEST_LOCATION &&
-                                spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION))
+            if (!spellInfo || !(spellInfo->Targets & TARGET_FLAG_DEST_LOCATION && spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION))
                 m_targets.SetUnitTarget(botAI->GetUnit(target));
 
         uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
-        if (spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) ||
-            spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
+        if (spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
             castFlags |= CAST_FLAG_PROJECTILE;  // arrows/bullets visual
 
         if (spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
@@ -1023,7 +984,8 @@ void DebugAction::FakeSpell(uint32 spellId, Unit *truecaster, Unit *caster, Obje
             data << target;
 
         // Hit targets here.
-        for (auto otherTarget : otherTargets) data << otherTarget;
+        for (auto otherTarget : otherTargets)
+            data << otherTarget;
 
         data << (uint8)missTargets.size();  // miss
 
@@ -1060,8 +1022,7 @@ void DebugAction::addAura(uint32 spellId, Unit *target)
     if (!spellInfo)
         return;
 
-    if (!target->IsAlive() && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) &&
-        !spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
+    if (!target->IsAlive() && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
         return;
 
     target->AddAura(spellInfo, MAX_EFFECT_MASK, target);

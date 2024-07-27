@@ -22,22 +22,15 @@ Unit *FlagCarrierValue::Calculate()
         {
             BattlegroundWS *bg = (BattlegroundWS *)botAI->GetBot()->GetBattleground();
 
-            if ((!sameTeam && bot->GetTeamId() == TEAM_HORDE ||
-                 (sameTeam && bot->GetTeamId() == TEAM_ALLIANCE)) &&
-                !bg->GetFlagPickerGUID(TEAM_HORDE).IsEmpty())
-                carrier =
-                    ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID(TEAM_HORDE));
+            if ((!sameTeam && bot->GetTeamId() == TEAM_HORDE || (sameTeam && bot->GetTeamId() == TEAM_ALLIANCE)) && !bg->GetFlagPickerGUID(TEAM_HORDE).IsEmpty())
+                carrier = ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID(TEAM_HORDE));
 
-            if ((!sameTeam && bot->GetTeamId() == TEAM_ALLIANCE ||
-                 (sameTeam && bot->GetTeamId() == TEAM_HORDE)) &&
-                !bg->GetFlagPickerGUID(TEAM_ALLIANCE).IsEmpty())
-                carrier =
-                    ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID(TEAM_ALLIANCE));
+            if ((!sameTeam && bot->GetTeamId() == TEAM_ALLIANCE || (sameTeam && bot->GetTeamId() == TEAM_HORDE)) && !bg->GetFlagPickerGUID(TEAM_ALLIANCE).IsEmpty())
+                carrier = ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID(TEAM_ALLIANCE));
 
             if (carrier)
             {
-                if (ignoreRange ||
-                    bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig->sightDistance))
+                if (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig->sightDistance))
                 {
                     return carrier;
                 }
@@ -65,8 +58,7 @@ Unit *FlagCarrierValue::Calculate()
 
             if (carrier)
             {
-                if (ignoreRange ||
-                    bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig->sightDistance))
+                if (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig->sightDistance))
                 {
                     return carrier;
                 }
@@ -84,14 +76,10 @@ std::vector<CreatureData const *> BgMastersValue::Calculate()
     BattlegroundTypeId bgTypeId = (BattlegroundTypeId)stoi(qualifier);
 
     std::vector<uint32> entries;
-    std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> battleMastersCache =
-        sRandomPlayerbotMgr->getBattleMastersCache();
-    entries.insert(entries.end(), battleMastersCache[TEAM_NEUTRAL][bgTypeId].begin(),
-                   battleMastersCache[TEAM_NEUTRAL][bgTypeId].end());
-    entries.insert(entries.end(), battleMastersCache[TEAM_ALLIANCE][bgTypeId].begin(),
-                   battleMastersCache[TEAM_ALLIANCE][bgTypeId].end());
-    entries.insert(entries.end(), battleMastersCache[TEAM_HORDE][bgTypeId].begin(),
-                   battleMastersCache[TEAM_HORDE][bgTypeId].end());
+    std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> battleMastersCache = sRandomPlayerbotMgr->getBattleMastersCache();
+    entries.insert(entries.end(), battleMastersCache[TEAM_NEUTRAL][bgTypeId].begin(), battleMastersCache[TEAM_NEUTRAL][bgTypeId].end());
+    entries.insert(entries.end(), battleMastersCache[TEAM_ALLIANCE][bgTypeId].begin(), battleMastersCache[TEAM_ALLIANCE][bgTypeId].end());
+    entries.insert(entries.end(), battleMastersCache[TEAM_HORDE][bgTypeId].begin(), battleMastersCache[TEAM_HORDE][bgTypeId].end());
 
     std::vector<CreatureData const *> bmGuids;
 
@@ -119,8 +107,7 @@ CreatureData const *BgMasterValue::NearestBm(bool allowDead)
 {
     WorldPosition botPos(bot);
 
-    std::vector<CreatureData const *> bmPairs =
-        AI_VALUE2(std::vector<CreatureData const *>, "bg masters", qualifier);
+    std::vector<CreatureData const *> bmPairs = AI_VALUE2(std::vector<CreatureData const *>, "bg masters", qualifier);
 
     float rDist;
     CreatureData const *rbmPair = nullptr;
@@ -130,8 +117,7 @@ CreatureData const *BgMasterValue::NearestBm(bool allowDead)
         if (!bmPair)
             continue;
 
-        WorldPosition bmPos(bmPair->mapid, bmPair->posX, bmPair->posY, bmPair->posZ,
-                            bmPair->orientation);
+        WorldPosition bmPos(bmPair->mapid, bmPair->posX, bmPair->posY, bmPair->posZ, bmPair->orientation);
 
         float dist = botPos.distance(bmPos);  // This is the aproximate travel distance.
 
@@ -143,12 +129,10 @@ CreatureData const *BgMasterValue::NearestBm(bool allowDead)
         if (!bmTemplate)
             continue;
 
-        FactionTemplateEntry const *bmFactionEntry =
-            sFactionTemplateStore.LookupEntry(bmTemplate->faction);
+        FactionTemplateEntry const *bmFactionEntry = sFactionTemplateStore.LookupEntry(bmTemplate->faction);
 
         // Is the unit hostile?
-        if (Unit::GetFactionReactionTo(bot->GetFactionTemplateEntry(), bmFactionEntry) <
-            REP_NEUTRAL)
+        if (Unit::GetFactionReactionTo(bot->GetFactionTemplateEntry(), bmFactionEntry) < REP_NEUTRAL)
             continue;
 
         AreaTableEntry const *area = bmPos.getArea();
@@ -203,8 +187,7 @@ BattlegroundTypeId RpgBgTypeValue::Calculate()
             if (bot->InBattlegroundQueueForBattlegroundQueueType(queueTypeId))
                 continue;
 
-            std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> battleMastersCache =
-                sRandomPlayerbotMgr->getBattleMastersCache();
+            std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> battleMastersCache = sRandomPlayerbotMgr->getBattleMastersCache();
 
             for (auto &entry : battleMastersCache[TEAM_NEUTRAL][bgTypeId])
                 if (entry == guidPosition.GetEntry())

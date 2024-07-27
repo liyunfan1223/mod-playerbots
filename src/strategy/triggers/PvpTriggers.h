@@ -109,10 +109,7 @@ class InsideBGTrigger : public Trigger
 class PlayerIsInBattlegroundWithoutFlag : public Trigger
 {
    public:
-    PlayerIsInBattlegroundWithoutFlag(PlayerbotAI *botAI)
-        : Trigger(botAI, "in Battleground without flag")
-    {
-    }
+    PlayerIsInBattlegroundWithoutFlag(PlayerbotAI *botAI) : Trigger(botAI, "in Battleground without flag") {}
 
     bool IsActive() override;
 };

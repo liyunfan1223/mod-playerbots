@@ -20,7 +20,4 @@ Unit *CurrentTargetValue::Get()
     return unit;
 }
 
-void CurrentTargetValue::Set(Unit *target)
-{
-    selection = target ? target->GetGUID() : ObjectGuid::Empty;
-}
+void CurrentTargetValue::Set(Unit *target) { selection = target ? target->GetGUID() : ObjectGuid::Empty; }

@@ -17,10 +17,7 @@
 class AnyGameObjectInObjectRangeCheck
 {
    public:
-    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range)
-        : i_obj(obj), i_range(range)
-    {
-    }
+    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range) : i_obj(obj), i_range(range) {}
     WorldObject const &GetFocusObject() const { return *i_obj; }
     bool operator()(GameObject *go)
     {
@@ -48,9 +45,7 @@ bool RevealGatheringItemAction::Execute(Event event)
     std::vector<GameObject *> result;
     for (GameObject *go : targets)
     {
-        if (!go || !go->isSpawned() ||
-            sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, go),
-                                                     sPlayerbotAIConfig->lootDistance))
+        if (!go || !go->isSpawned() || sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, go), sPlayerbotAIConfig->lootDistance))
             continue;
 
         if (LockEntry const *lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
@@ -61,9 +56,7 @@ bool RevealGatheringItemAction::Execute(Event event)
                 {
                     uint32 skillId = SkillByLockType(LockType(lockInfo->Index[i]));
                     uint32 reqSkillValue = std::max(2u, lockInfo->Skill[i]);
-                    if ((skillId == SKILL_MINING || skillId == SKILL_HERBALISM) &&
-                        botAI->HasSkill((SkillType)skillId) &&
-                        uint32(bot->GetSkillValue(skillId)) >= reqSkillValue)
+                    if ((skillId == SKILL_MINING || skillId == SKILL_HERBALISM) && botAI->HasSkill((SkillType)skillId) && uint32(bot->GetSkillValue(skillId)) >= reqSkillValue)
                     {
                         result.push_back(go);
                         break;

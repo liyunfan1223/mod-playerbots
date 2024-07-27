@@ -131,10 +131,7 @@ class EnvenomAction : public CastMeleeSpellAction
 class CastTricksOfTheTradeOnMainTankAction : public BuffOnMainTankAction
 {
    public:
-    CastTricksOfTheTradeOnMainTankAction(PlayerbotAI *ai)
-        : BuffOnMainTankAction(ai, "tricks of the trade", true)
-    {
-    }
+    CastTricksOfTheTradeOnMainTankAction(PlayerbotAI *ai) : BuffOnMainTankAction(ai, "tricks of the trade", true) {}
     virtual bool isUseful() override;
 };
 

@@ -35,8 +35,7 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const *quest, Object *questGiver
 
     if (sPlayerbotAIConfig->syncQuestWithPlayer)
     {
-        if (master && master->GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE &&
-            (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED))
+        if (master && master->GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE && (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED))
         {
             CompleteQuest(bot, quest->GetQuestId());
             status = bot->GetQuestStatus(quest->GetQuestId());
@@ -65,8 +64,7 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const *quest, Object *questGiver
     botAI->TellMaster(out);
 }
 
-void TalkToQuestGiverAction::TurnInQuest(Quest const *quest, Object *questGiver,
-                                         std::ostringstream &out)
+void TalkToQuestGiverAction::TurnInQuest(Quest const *quest, Object *questGiver, std::ostringstream &out)
 {
     uint32 questID = quest->GetQuestId();
 
@@ -85,8 +83,7 @@ void TalkToQuestGiverAction::TurnInQuest(Quest const *quest, Object *questGiver,
     }
 }
 
-void TalkToQuestGiverAction::RewardNoItem(Quest const *quest, Object *questGiver,
-                                          std::ostringstream &out)
+void TalkToQuestGiverAction::RewardNoItem(Quest const *quest, Object *questGiver, std::ostringstream &out)
 {
     if (bot->CanRewardQuest(quest, false))
     {
@@ -99,8 +96,7 @@ void TalkToQuestGiverAction::RewardNoItem(Quest const *quest, Object *questGiver
     }
 }
 
-void TalkToQuestGiverAction::RewardSingleItem(Quest const *quest, Object *questGiver,
-                                              std::ostringstream &out)
+void TalkToQuestGiverAction::RewardSingleItem(Quest const *quest, Object *questGiver, std::ostringstream &out)
 {
     int index = 0;
     ItemTemplate const *item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[index]);
@@ -146,8 +142,7 @@ ItemIds TalkToQuestGiverAction::BestRewards(Quest const *quest)
     }
 }
 
-void TalkToQuestGiverAction::RewardMultipleItem(Quest const *quest, Object *questGiver,
-                                                std::ostringstream &out)
+void TalkToQuestGiverAction::RewardMultipleItem(Quest const *quest, Object *questGiver, std::ostringstream &out)
 {
     std::set<uint32> bestIds;
 
@@ -158,8 +153,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const *quest, Object *ques
         bestIds = BestRewards(quest);
         if (!bestIds.empty())
         {
-            ItemTemplate const *item =
-                sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
+            ItemTemplate const *item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
             bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
             out << "Rewarded " << ChatHelper::FormatItem(item);
         }
@@ -185,8 +179,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const *quest, Object *ques
         else
         {
             // Pick the first item
-            ItemTemplate const *item =
-                sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
+            ItemTemplate const *item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
             bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
 
             out << "Rewarded " << ChatHelper::FormatItem(item);
@@ -194,8 +187,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const *quest, Object *ques
     }
 }
 
-void TalkToQuestGiverAction::AskToSelectReward(Quest const *quest, std::ostringstream &out,
-                                               bool forEquip)
+void TalkToQuestGiverAction::AskToSelectReward(Quest const *quest, std::ostringstream &out, bool forEquip)
 {
     std::ostringstream msg;
     msg << "Choose reward: ";
@@ -222,8 +214,7 @@ bool TurnInQueryQuestAction::Execute(Event event)
     uint32 questId;
     ObjectGuid unk1;
     pakcet >> guid >> questId;
-    Object *object = ObjectAccessor::GetObjectByTypeMask(
-        *bot, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+    Object *object = ObjectAccessor::GetObjectByTypeMask(*bot, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
     if (!object || (!object->hasQuest(questId) && !object->hasInvolvedQuest(questId)))
     {
         return false;

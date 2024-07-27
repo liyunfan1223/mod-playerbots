@@ -40,8 +40,7 @@ bool ExternalEventHelper::ParseChatCommand(std::string const command, Player *ow
     return true;
 }
 
-void ExternalEventHelper::HandlePacket(std::map<uint16, std::string> &handlers,
-                                       WorldPacket const &packet, Player *owner)
+void ExternalEventHelper::HandlePacket(std::map<uint16, std::string> &handlers, WorldPacket const &packet, Player *owner)
 {
     uint16 opcode = packet.GetOpcode();
     std::string const name = handlers[opcode];
@@ -56,8 +55,7 @@ void ExternalEventHelper::HandlePacket(std::map<uint16, std::string> &handlers,
     trigger->ExternalEvent(p, owner);
 }
 
-bool ExternalEventHelper::HandleCommand(std::string const name, std::string const param,
-                                        Player *owner)
+bool ExternalEventHelper::HandleCommand(std::string const name, std::string const param, Player *owner)
 {
     Trigger *trigger = aiObjectContext->GetTrigger(name);
     if (!trigger)

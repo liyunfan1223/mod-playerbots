@@ -16,10 +16,7 @@ class WorldObject;
 class CastCustomSpellAction : public InventoryAction
 {
    public:
-    CastCustomSpellAction(PlayerbotAI *botAI, std::string const name = "cast custom spell")
-        : InventoryAction(botAI, name)
-    {
-    }
+    CastCustomSpellAction(PlayerbotAI *botAI, std::string const name = "cast custom spell") : InventoryAction(botAI, name) {}
 
     bool Execute(Event event) override;
     virtual std::string const castString(WorldObject *target) { return "cast"; }
@@ -31,10 +28,7 @@ class CastCustomSpellAction : public InventoryAction
 class CastCustomNcSpellAction : public CastCustomSpellAction
 {
    public:
-    CastCustomNcSpellAction(PlayerbotAI *botAI, std::string const name = "cast custom nc spell")
-        : CastCustomSpellAction(botAI, name)
-    {
-    }
+    CastCustomNcSpellAction(PlayerbotAI *botAI, std::string const name = "cast custom nc spell") : CastCustomSpellAction(botAI, name) {}
 
     bool isUseful() override;
     std::string const castString(WorldObject *target) override;
@@ -43,10 +37,7 @@ class CastCustomNcSpellAction : public CastCustomSpellAction
 class CastRandomSpellAction : public ListSpellsAction
 {
    public:
-    CastRandomSpellAction(PlayerbotAI *botAI, std::string const name = "cast random spell")
-        : ListSpellsAction(botAI, name)
-    {
-    }
+    CastRandomSpellAction(PlayerbotAI *botAI, std::string const name = "cast random spell") : ListSpellsAction(botAI, name) {}
 
     bool isUseful() override { return false; }
     virtual bool AcceptSpell(SpellInfo const *spellInfo);
@@ -61,10 +52,7 @@ class CastRandomSpellAction : public ListSpellsAction
 class CraftRandomItemAction : public CastRandomSpellAction
 {
    public:
-    CraftRandomItemAction(PlayerbotAI *botAI) : CastRandomSpellAction(botAI, "craft random item")
-    {
-        MultiCast = true;
-    }
+    CraftRandomItemAction(PlayerbotAI *botAI) : CastRandomSpellAction(botAI, "craft random item") { MultiCast = true; }
 
     bool AcceptSpell(SpellInfo const *spellInfo) override;
     uint32 GetSpellPriority(SpellInfo const *spellInfo) override;
@@ -73,10 +61,7 @@ class CraftRandomItemAction : public CastRandomSpellAction
 class DisEnchantRandomItemAction : public CastCustomSpellAction
 {
    public:
-    DisEnchantRandomItemAction(PlayerbotAI *botAI)
-        : CastCustomSpellAction(botAI, "disenchant random item")
-    {
-    }
+    DisEnchantRandomItemAction(PlayerbotAI *botAI) : CastCustomSpellAction(botAI, "disenchant random item") {}
 
     bool isUseful() override;
     bool Execute(Event event) override;
@@ -85,10 +70,7 @@ class DisEnchantRandomItemAction : public CastCustomSpellAction
 class EnchantRandomItemAction : public CastRandomSpellAction
 {
    public:
-    EnchantRandomItemAction(PlayerbotAI *botAI)
-        : CastRandomSpellAction(botAI, "enchant random item")
-    {
-    }
+    EnchantRandomItemAction(PlayerbotAI *botAI) : CastRandomSpellAction(botAI, "enchant random item") {}
 
     bool isUseful() override;
     bool AcceptSpell(SpellInfo const *spellInfo) override;

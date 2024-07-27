@@ -18,13 +18,10 @@ class Unit;
 class AttackersValue : public ObjectGuidListCalculatedValue
 {
    public:
-    AttackersValue(PlayerbotAI *botAI) : ObjectGuidListCalculatedValue(botAI, "attackers", 1 * 1000)
-    {
-    }
+    AttackersValue(PlayerbotAI *botAI) : ObjectGuidListCalculatedValue(botAI, "attackers", 1 * 1000) {}
 
     GuidVector Calculate();
-    static bool IsPossibleTarget(Unit *attacker, Player *bot,
-                                 float range = sPlayerbotAIConfig->sightDistance);
+    static bool IsPossibleTarget(Unit *attacker, Player *bot, float range = sPlayerbotAIConfig->sightDistance);
     static bool IsValidTarget(Unit *attacker, Player *bot);
 
    private:
@@ -37,10 +34,7 @@ class AttackersValue : public ObjectGuidListCalculatedValue
 class PossibleAddsValue : public BoolCalculatedValue
 {
    public:
-    PossibleAddsValue(PlayerbotAI *botAI, std::string const name = "possible adds")
-        : BoolCalculatedValue(botAI, name)
-    {
-    }
+    PossibleAddsValue(PlayerbotAI *botAI, std::string const name = "possible adds") : BoolCalculatedValue(botAI, name) {}
 
     bool Calculate() override;
 };
@@ -48,10 +42,7 @@ class PossibleAddsValue : public BoolCalculatedValue
 class PrioritizedTargetsValue : public ManualSetValue<GuidVector>
 {
    public:
-    PrioritizedTargetsValue(PlayerbotAI *botAI, std::string const name = "prioritized targets")
-        : ManualSetValue(botAI, GuidVector(), name)
-    {
-    }
+    PrioritizedTargetsValue(PlayerbotAI *botAI, std::string const name = "prioritized targets") : ManualSetValue(botAI, GuidVector(), name) {}
 };
 
 #endif

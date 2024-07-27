@@ -98,10 +98,7 @@ class GenericDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNo
     }
 };
 
-GenericDruidStrategy::GenericDruidStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI)
-{
-    actionNodeFactories.Add(new GenericDruidStrategyActionNodeFactory());
-}
+GenericDruidStrategy::GenericDruidStrategy(PlayerbotAI *botAI) : CombatStrategy(botAI) { actionNodeFactories.Add(new GenericDruidStrategyActionNodeFactory()); }
 
 void GenericDruidStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
@@ -119,37 +116,21 @@ void GenericDruidStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
     // dead", NextAction::array(0, new NextAction("rebirth", ACTION_HIGH + 1), nullptr)));
     // triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new
     // NextAction("innervate", ACTION_EMERGENCY + 5), nullptr)));
-    triggers.push_back(
-        new TriggerNode("combat party member dead",
-                        NextAction::array(0, new NextAction("rebirth", ACTION_HIGH + 9), NULL)));
+    triggers.push_back(new TriggerNode("combat party member dead", NextAction::array(0, new NextAction("rebirth", ACTION_HIGH + 9), NULL)));
 }
 
 void DruidCureStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     // triggers.push_back(new TriggerNode("cure poison", NextAction::array(0, new
     // NextAction("abolish poison", ACTION_DISPEL + 2), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "party member cure poison",
-        NextAction::array(0, new NextAction("abolish poison on party", ACTION_DISPEL + 1),
-                          nullptr)));
+    triggers.push_back(new TriggerNode("party member cure poison", NextAction::array(0, new NextAction("abolish poison on party", ACTION_DISPEL + 1), nullptr)));
 }
 
-void DruidBoostStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
-{
-    triggers.push_back(new TriggerNode(
-        "nature's swiftness",
-        NextAction::array(0, new NextAction("nature's swiftness", ACTION_HIGH + 9), nullptr)));
-}
+void DruidBoostStrategy::InitTriggers(std::vector<TriggerNode *> &triggers) { triggers.push_back(new TriggerNode("nature's swiftness", NextAction::array(0, new NextAction("nature's swiftness", ACTION_HIGH + 9), nullptr))); }
 
 void DruidCcStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
-    triggers.push_back(new TriggerNode(
-        "entangling roots",
-        NextAction::array(0, new NextAction("entangling roots on cc", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "entangling roots kite",
-        NextAction::array(0, new NextAction("entangling roots", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "hibernate",
-        NextAction::array(0, new NextAction("hibernate on cc", ACTION_HIGH + 3), nullptr)));
+    triggers.push_back(new TriggerNode("entangling roots", NextAction::array(0, new NextAction("entangling roots on cc", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("entangling roots kite", NextAction::array(0, new NextAction("entangling roots", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("hibernate", NextAction::array(0, new NextAction("hibernate on cc", ACTION_HIGH + 3), nullptr)));
 }

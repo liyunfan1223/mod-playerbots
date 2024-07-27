@@ -114,18 +114,13 @@ class CastConeOfColdAction : public CastSpellAction
 class CastArcaneIntellectAction : public CastBuffSpellAction
 {
    public:
-    CastArcaneIntellectAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "arcane intellect")
-    {
-    }
+    CastArcaneIntellectAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "arcane intellect") {}
 };
 
 class CastArcaneIntellectOnPartyAction : public BuffOnPartyAction
 {
    public:
-    CastArcaneIntellectOnPartyAction(PlayerbotAI *botAI)
-        : BuffOnPartyAction(botAI, "arcane intellect")
-    {
-    }
+    CastArcaneIntellectOnPartyAction(PlayerbotAI *botAI) : BuffOnPartyAction(botAI, "arcane intellect") {}
 };
 
 class CastRemoveCurseAction : public CastCureSpellAction
@@ -137,10 +132,7 @@ class CastRemoveCurseAction : public CastCureSpellAction
 class CastRemoveLesserCurseAction : public CastCureSpellAction
 {
    public:
-    CastRemoveLesserCurseAction(PlayerbotAI *botAI)
-        : CastCureSpellAction(botAI, "remove lesser curse")
-    {
-    }
+    CastRemoveLesserCurseAction(PlayerbotAI *botAI) : CastCureSpellAction(botAI, "remove lesser curse") {}
 };
 
 class CastIcyVeinsAction : public CastBuffSpellAction
@@ -164,10 +156,7 @@ class CastIceBarrierAction : public CastBuffSpellAction
 class CastSummonWaterElementalAction : public CastBuffSpellAction
 {
    public:
-    CastSummonWaterElementalAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "summon water elemental")
-    {
-    }
+    CastSummonWaterElementalAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "summon water elemental") {}
 };
 
 class CastCombustionAction : public CastBuffSpellAction
@@ -182,19 +171,13 @@ END_SPELL_ACTION()
 class CastRemoveCurseOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastRemoveCurseOnPartyAction(PlayerbotAI *botAI)
-        : CurePartyMemberAction(botAI, "remove curse", DISPEL_CURSE)
-    {
-    }
+    CastRemoveCurseOnPartyAction(PlayerbotAI *botAI) : CurePartyMemberAction(botAI, "remove curse", DISPEL_CURSE) {}
 };
 
 class CastRemoveLesserCurseOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastRemoveLesserCurseOnPartyAction(PlayerbotAI *botAI)
-        : CurePartyMemberAction(botAI, "remove lesser curse", DISPEL_CURSE)
-    {
-    }
+    CastRemoveLesserCurseOnPartyAction(PlayerbotAI *botAI) : CurePartyMemberAction(botAI, "remove lesser curse", DISPEL_CURSE) {}
 };
 
 class CastConjureFoodAction : public CastBuffSpellAction
@@ -288,10 +271,7 @@ class CastEvocationAction : public CastSpellAction
 class CastCounterspellOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
 {
    public:
-    CastCounterspellOnEnemyHealerAction(PlayerbotAI *botAI)
-        : CastSpellOnEnemyHealerAction(botAI, "counterspell")
-    {
-    }
+    CastCounterspellOnEnemyHealerAction(PlayerbotAI *botAI) : CastSpellOnEnemyHealerAction(botAI, "counterspell") {}
 };
 
 class CastArcanePowerAction : public CastBuffSpellAction

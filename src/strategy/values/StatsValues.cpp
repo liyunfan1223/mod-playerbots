@@ -44,8 +44,7 @@ bool PetIsDeadValue::Calculate()
     if (!bot->GetPet())
     {
         uint32 ownerid = bot->GetGUID().GetCounter();
-        QueryResult result =
-            CharacterDatabase.Query("SELECT id FROM character_pet WHERE owner = {}", ownerid);
+        QueryResult result = CharacterDatabase.Query("SELECT id FROM character_pet WHERE owner = {}", ownerid);
         if (!result)
             return false;
 
@@ -58,10 +57,7 @@ bool PetIsDeadValue::Calculate()
     return bot->GetPet() && bot->GetPet()->getDeathState() != DeathState::Alive;
 }
 
-bool PetIsHappyValue::Calculate()
-{
-    return !bot->GetPet() || bot->GetPet()->GetHappinessState() == HAPPY;
-}
+bool PetIsHappyValue::Calculate() { return !bot->GetPet() || bot->GetPet()->GetHappinessState() == HAPPY; }
 
 Unit *RageValue::GetTarget()
 {
@@ -105,8 +101,7 @@ uint8 ManaValue::Calculate()
     if (!target)
         return 100;
 
-    return (static_cast<float>(target->GetPower(POWER_MANA)) / target->GetMaxPower(POWER_MANA)) *
-           100;
+    return (static_cast<float>(target->GetPower(POWER_MANA)) / target->GetMaxPower(POWER_MANA)) * 100;
 }
 
 Unit *HasManaValue::GetTarget()
@@ -180,9 +175,7 @@ bool IsInCombatValue::Calculate()
                 if (!member || member == bot)
                     continue;
 
-                if (member->IsInCombat() && sServerFacade->IsDistanceLessOrEqualThan(
-                                                sServerFacade->GetDistance2d(member, bot),
-                                                sPlayerbotAIConfig->reactDistance))
+                if (member->IsInCombat() && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(member, bot), sPlayerbotAIConfig->reactDistance))
                     return true;
             }
         }
@@ -209,8 +202,7 @@ uint8 BagSpaceValue::Calculate()
         if (pBag)
         {
             ItemTemplate const *pBagProto = pBag->GetTemplate();
-            if (pBagProto->Class == ITEM_CLASS_CONTAINER &&
-                pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
+            if (pBagProto->Class == ITEM_CLASS_CONTAINER && pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
             {
                 total += pBag->GetBagSize();
                 totalfree += pBag->GetFreeSlots();

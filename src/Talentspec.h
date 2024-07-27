@@ -69,9 +69,7 @@ class TalentSpec
     void ReadTalents(std::string const link);
 
     std::vector<TalentListEntry> GetTalentTree(uint32 tabpage);
-    std::vector<TalentListEntry> SubTalentList(std::vector<TalentListEntry> &oldList,
-                                               std::vector<TalentListEntry> &newList,
-                                               uint32 reverse);
+    std::vector<TalentListEntry> SubTalentList(std::vector<TalentListEntry> &oldList, std::vector<TalentListEntry> &newList, uint32 reverse);
 };
 
 class TalentPath

@@ -17,11 +17,7 @@ class WorldPacket;
 class GuidManageAction : public Action
 {
    public:
-    GuidManageAction(PlayerbotAI *botAI, std::string const name = "guild manage",
-                     uint16 opcode = CMSG_GUILD_INVITE)
-        : Action(botAI, name), opcode(opcode)
-    {
-    }
+    GuidManageAction(PlayerbotAI *botAI, std::string const name = "guild manage", uint16 opcode = CMSG_GUILD_INVITE) : Action(botAI, name), opcode(opcode) {}
 
     bool Execute(Event event) override;
     bool isUseful() override { return false; }
@@ -38,11 +34,7 @@ class GuidManageAction : public Action
 class GuildInviteAction : public GuidManageAction
 {
    public:
-    GuildInviteAction(PlayerbotAI *botAI, std::string const name = "guild invite",
-                      uint16 opcode = CMSG_GUILD_INVITE)
-        : GuidManageAction(botAI, name, opcode)
-    {
-    }
+    GuildInviteAction(PlayerbotAI *botAI, std::string const name = "guild invite", uint16 opcode = CMSG_GUILD_INVITE) : GuidManageAction(botAI, name, opcode) {}
 
     bool isUseful() override;
 
@@ -54,11 +46,7 @@ class GuildInviteAction : public GuidManageAction
 class GuildPromoteAction : public GuidManageAction
 {
    public:
-    GuildPromoteAction(PlayerbotAI *botAI, std::string const name = "guild promote",
-                       uint16 opcode = CMSG_GUILD_PROMOTE)
-        : GuidManageAction(botAI, name, opcode)
-    {
-    }
+    GuildPromoteAction(PlayerbotAI *botAI, std::string const name = "guild promote", uint16 opcode = CMSG_GUILD_PROMOTE) : GuidManageAction(botAI, name, opcode) {}
 
     bool isUseful() override;
 
@@ -70,11 +58,7 @@ class GuildPromoteAction : public GuidManageAction
 class GuildDemoteAction : public GuidManageAction
 {
    public:
-    GuildDemoteAction(PlayerbotAI *botAI, std::string const name = "guild demote",
-                      uint16 opcode = CMSG_GUILD_DEMOTE)
-        : GuidManageAction(botAI, name, opcode)
-    {
-    }
+    GuildDemoteAction(PlayerbotAI *botAI, std::string const name = "guild demote", uint16 opcode = CMSG_GUILD_DEMOTE) : GuidManageAction(botAI, name, opcode) {}
 
     bool isUseful() override;
 
@@ -86,11 +70,7 @@ class GuildDemoteAction : public GuidManageAction
 class GuildRemoveAction : public GuidManageAction
 {
    public:
-    GuildRemoveAction(PlayerbotAI *botAI, std::string const name = "guild remove",
-                      uint16 opcode = CMSG_GUILD_REMOVE)
-        : GuidManageAction(botAI, name, opcode)
-    {
-    }
+    GuildRemoveAction(PlayerbotAI *botAI, std::string const name = "guild remove", uint16 opcode = CMSG_GUILD_REMOVE) : GuidManageAction(botAI, name, opcode) {}
 
     bool isUseful() override;
 

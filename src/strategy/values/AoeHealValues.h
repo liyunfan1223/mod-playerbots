@@ -15,10 +15,7 @@ class PlayerbotAI;
 class AoeHealValue : public Uint8CalculatedValue, public Qualified
 {
    public:
-    AoeHealValue(PlayerbotAI *botAI, std::string const name = "aoe heal")
-        : Uint8CalculatedValue(botAI, name)
-    {
-    }
+    AoeHealValue(PlayerbotAI *botAI, std::string const name = "aoe heal") : Uint8CalculatedValue(botAI, name) {}
 
     uint8 Calculate() override;
 };

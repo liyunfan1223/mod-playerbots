@@ -28,11 +28,7 @@ class SpellEntryPredicate
 class PartyMemberValue : public UnitCalculatedValue
 {
    public:
-    PartyMemberValue(PlayerbotAI *botAI, std::string const name = "party member",
-                     int checkInterval = 1)
-        : UnitCalculatedValue(botAI, name, checkInterval)
-    {
-    }
+    PartyMemberValue(PlayerbotAI *botAI, std::string const name = "party member", int checkInterval = 1) : UnitCalculatedValue(botAI, name, checkInterval) {}
 
     bool IsTargetOfSpellCast(Player *target, SpellEntryPredicate &predicate);
 
@@ -45,10 +41,7 @@ class PartyMemberValue : public UnitCalculatedValue
 class PartyMemberMainTankValue : public PartyMemberValue
 {
    public:
-    PartyMemberMainTankValue(PlayerbotAI *botAI)
-        : PartyMemberValue(botAI, "main tank member", 2 * 1000)
-    {
-    }
+    PartyMemberMainTankValue(PlayerbotAI *botAI) : PartyMemberValue(botAI, "main tank member", 2 * 1000) {}
     virtual Unit *Calculate();
 };
 

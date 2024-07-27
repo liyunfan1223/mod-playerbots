@@ -16,10 +16,7 @@ class PlayerbotAI;
 class ItemsUsefulToGiveValue : public CalculatedValue<std::vector<Item *>>, public Qualified
 {
    public:
-    ItemsUsefulToGiveValue(PlayerbotAI *botAI, std::string const name = "useful to give")
-        : CalculatedValue(botAI, name)
-    {
-    }
+    ItemsUsefulToGiveValue(PlayerbotAI *botAI, std::string const name = "useful to give") : CalculatedValue(botAI, name) {}
 
     std::vector<Item *> Calculate();
 };

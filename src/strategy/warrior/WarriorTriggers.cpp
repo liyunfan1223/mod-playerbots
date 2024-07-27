@@ -8,8 +8,4 @@
 
 #include "Playerbots.h"
 
-bool BloodrageBuffTrigger::IsActive()
-{
-    return AI_VALUE2(uint8, "health", "self target") >= sPlayerbotAIConfig->mediumHealth &&
-           AI_VALUE2(uint8, "rage", "self target") < 20;
-}
+bool BloodrageBuffTrigger::IsActive() { return AI_VALUE2(uint8, "health", "self target") >= sPlayerbotAIConfig->mediumHealth && AI_VALUE2(uint8, "rage", "self target") < 20; }

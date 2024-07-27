@@ -92,8 +92,7 @@ class TakeMailProcessor : public MailProcessor
         if (mail->money)
         {
             std::ostringstream out;
-            out << mail->subject << ", |cffffff00" << ChatHelper::formatMoney(mail->money)
-                << "|cff00ff00 processed";
+            out << mail->subject << ", |cffffff00" << ChatHelper::formatMoney(mail->money) << "|cff00ff00 processed";
             botAI->TellMaster(out.str());
 
             WorldPacket packet;
@@ -119,8 +118,7 @@ class TakeMailProcessor : public MailProcessor
                 Item *item = bot->GetMItem(*i);
 
                 std::ostringstream out;
-                out << mail->subject << ", " << ChatHelper::FormatItem(item->GetTemplate())
-                    << "|cff00ff00 processed";
+                out << mail->subject << ", " << ChatHelper::FormatItem(item->GetTemplate()) << "|cff00ff00 processed";
 
                 bot->GetSession()->HandleMailTakeItem(packet);
                 botAI->TellMaster(out.str());
@@ -148,8 +146,7 @@ class TakeMailProcessor : public MailProcessor
             if (Bag const *pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
             {
                 ItemTemplate const *pBagProto = pBag->GetTemplate();
-                if (pBagProto->Class == ITEM_CLASS_CONTAINER &&
-                    pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
+                if (pBagProto->Class == ITEM_CLASS_CONTAINER && pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
                     totalfree += pBag->GetFreeSlots();
             }
         }
@@ -199,7 +196,8 @@ std::map<uint32, Mail *> filterList(std::vector<Mail *> src, std::string const f
     if (filter.empty() || filter == "*")
     {
         uint32 idx = 0;
-        for (std::vector<Mail *>::iterator i = src.begin(); i != src.end(); ++i) result[idx++] = *i;
+        for (std::vector<Mail *>::iterator i = src.begin(); i != src.end(); ++i)
+            result[idx++] = *i;
 
         return result;
     }
@@ -228,7 +226,8 @@ std::map<uint32, Mail *> filterList(std::vector<Mail *> src, std::string const f
         if (to > src.size() - 1)
             to = src.size() - 1;
 
-        for (uint32 i = from; i <= to; ++i) result[i] = src[i];
+        for (uint32 i = from; i <= to; ++i)
+            result[i] = src[i];
 
         return result;
     }
@@ -297,8 +296,7 @@ bool MailAction::Execute(Event event)
 
     std::vector<Mail *> mailList;
     time_t cur_time = time(nullptr);
-    for (PlayerMails::const_iterator itr = bot->GetMails().begin(); itr != bot->GetMails().end();
-         ++itr)
+    for (PlayerMails::const_iterator itr = bot->GetMails().begin(); itr != bot->GetMails().end(); ++itr)
     {
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
             continue;

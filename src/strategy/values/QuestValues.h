@@ -50,10 +50,7 @@ typedef std::unordered_map<uint32, std::vector<GuidPosition>> questGiverMap;
 class EntryQuestRelationMapValue : public SingleCalculatedValue<entryQuestRelationMap>
 {
    public:
-    EntryQuestRelationMapValue(PlayerbotAI *botAI)
-        : SingleCalculatedValue(botAI, "entry quest relation map")
-    {
-    }
+    EntryQuestRelationMapValue(PlayerbotAI *botAI) : SingleCalculatedValue(botAI, "entry quest relation map") {}
 
     entryQuestRelationMap Calculate() override;
 };
@@ -118,10 +115,7 @@ class ActiveQuestTakersValue : public CalculatedValue<std::vector<GuidPosition>>
 class ActiveQuestObjectivesValue : public CalculatedValue<std::vector<GuidPosition>>
 {
    public:
-    ActiveQuestObjectivesValue(PlayerbotAI *botAI)
-        : CalculatedValue(botAI, "active quest objectives", 5)
-    {
-    }
+    ActiveQuestObjectivesValue(PlayerbotAI *botAI) : CalculatedValue(botAI, "active quest objectives", 5) {}
 
     std::vector<GuidPosition> Calculate() override;
 };
@@ -130,10 +124,7 @@ class ActiveQuestObjectivesValue : public CalculatedValue<std::vector<GuidPositi
 class FreeQuestLogSlotValue : public Uint8CalculatedValue
 {
    public:
-    FreeQuestLogSlotValue(PlayerbotAI *botAI)
-        : Uint8CalculatedValue(botAI, "free quest log slots", 2)
-    {
-    }
+    FreeQuestLogSlotValue(PlayerbotAI *botAI) : Uint8CalculatedValue(botAI, "free quest log slots", 2) {}
 
     uint8 Calculate() override;
 };
@@ -142,10 +133,7 @@ class FreeQuestLogSlotValue : public Uint8CalculatedValue
 class DialogStatusValue : public Uint32CalculatedValue, public Qualified
 {
    public:
-    DialogStatusValue(PlayerbotAI *botAI, std::string const name = "dialog status")
-        : Uint32CalculatedValue(botAI, name, 2)
-    {
-    }
+    DialogStatusValue(PlayerbotAI *botAI, std::string const name = "dialog status") : Uint32CalculatedValue(botAI, name, 2) {}
 
     static uint32 getDialogStatus(Player *bot, int32 questgiver, uint32 questId = 0);
 
@@ -174,10 +162,7 @@ class CanAcceptQuestValue : public BoolCalculatedValue, public Qualified
 class CanAcceptQuestLowLevelValue : public BoolCalculatedValue, public Qualified
 {
    public:
-    CanAcceptQuestLowLevelValue(PlayerbotAI *botAI)
-        : BoolCalculatedValue(botAI, "can accept quest low level npc")
-    {
-    }
+    CanAcceptQuestLowLevelValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can accept quest low level npc") {}
 
     bool Calculate() override;
 };

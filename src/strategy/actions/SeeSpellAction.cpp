@@ -13,8 +13,7 @@
 #include "RTSCValues.h"
 #include "RtscAction.h"
 
-Creature *SeeSpellAction::CreateWps(Player *wpOwner, float x, float y, float z, float o,
-                                    uint32 entry, Creature *lastWp, bool important)
+Creature *SeeSpellAction::CreateWps(Player *wpOwner, float x, float y, float z, float o, uint32 entry, Creature *lastWp, bool important)
 {
     float dist = wpOwner->GetDistance(x, y, z);
     float delay = 1000.0f * dist / wpOwner->GetSpeed(MOVE_RUN) + sPlayerbotAIConfig->reactDelay;
@@ -22,8 +21,7 @@ Creature *SeeSpellAction::CreateWps(Player *wpOwner, float x, float y, float z, 
     if (!important)
         delay *= 0.25;
 
-    Creature *wpCreature =
-        wpOwner->SummonCreature(entry, x, y, z - 1, o, TEMPSUMMON_TIMED_DESPAWN, delay);
+    Creature *wpCreature = wpOwner->SummonCreature(entry, x, y, z - 1, o, TEMPSUMMON_TIMED_DESPAWN, delay);
     if (!important)
         wpCreature->SetObjectScale(0.2f);
 
@@ -96,9 +94,7 @@ bool SeeSpellAction::Execute(Event event)
 
         SET_AI_VALUE2(WorldPosition, "RTSC saved location", locationName, spellPosition);
 
-        Creature *wpCreature = bot->SummonCreature(
-            15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(),
-            spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
+        Creature *wpCreature = bot->SummonCreature(15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
         wpCreature->SetObjectScale(0.5f);
         RESET_AI_VALUE(std::string, "RTSC next spell action");
 
@@ -126,11 +122,9 @@ bool SeeSpellAction::MoveToSpell(WorldPosition &spellPosition, bool inFormation)
         SetFormationOffset(spellPosition);
 
     if (bot->IsWithinLOS(spellPosition.getX(), spellPosition.getY(), spellPosition.getZ()))
-        return MoveNear(spellPosition.getMapId(), spellPosition.getX(), spellPosition.getY(),
-                        spellPosition.getZ(), 0);
+        return MoveNear(spellPosition.getMapId(), spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), 0);
 
-    return MoveTo(spellPosition.getMapId(), spellPosition.getX(), spellPosition.getY(),
-                  spellPosition.getZ(), false, false);
+    return MoveTo(spellPosition.getMapId(), spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), false, false);
 }
 
 void SeeSpellAction::SetFormationOffset(WorldPosition &spellPosition)

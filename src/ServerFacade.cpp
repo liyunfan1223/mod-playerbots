@@ -36,15 +36,9 @@ bool ServerFacade::IsDistanceGreaterThan(float dist1, float dist2)
     return dist1 > dist2;
 }
 
-bool ServerFacade::IsDistanceGreaterOrEqualThan(float dist1, float dist2)
-{
-    return !IsDistanceLessThan(dist1, dist2);
-}
+bool ServerFacade::IsDistanceGreaterOrEqualThan(float dist1, float dist2) { return !IsDistanceLessThan(dist1, dist2); }
 
-bool ServerFacade::IsDistanceLessOrEqualThan(float dist1, float dist2)
-{
-    return !IsDistanceGreaterThan(dist1, dist2);
-}
+bool ServerFacade::IsDistanceLessOrEqualThan(float dist1, float dist2) { return !IsDistanceGreaterThan(dist1, dist2); }
 
 void ServerFacade::SetFacingTo(Player *bot, WorldObject *wo, bool force)
 {

@@ -40,8 +40,7 @@ bool GossipHelloAction::Execute(Event event)
         return false;
     }
 
-    GossipMenuItemsMapBounds pMenuItemBounds =
-        sObjectMgr->GetGossipMenuItemsMapBounds(pCreature->GetCreatureTemplate()->GossipMenuId);
+    GossipMenuItemsMapBounds pMenuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(pCreature->GetCreatureTemplate()->GossipMenuId);
     if (pMenuItemBounds.first == pMenuItemBounds.second)
         return false;
 
@@ -103,8 +102,7 @@ void GossipHelloAction::TellGossipMenus()
     if (!bot->PlayerTalkClass)
         return;
 
-    Creature *pCreature =
-        bot->GetNPCIfCanInteractWith(GetMaster()->GetTarget(), UNIT_NPC_FLAG_NONE);
+    Creature *pCreature = bot->GetNPCIfCanInteractWith(GetMaster()->GetTarget(), UNIT_NPC_FLAG_NONE);
     GossipMenu &menu = bot->PlayerTalkClass->GetGossipMenu();
     if (pCreature)
     {

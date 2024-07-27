@@ -14,10 +14,7 @@ class PlayerbotAI;
 class LfgJoinAction : public InventoryAction
 {
    public:
-    LfgJoinAction(PlayerbotAI *botAI, std::string const name = "lfg join")
-        : InventoryAction(botAI, name)
-    {
-    }
+    LfgJoinAction(PlayerbotAI *botAI, std::string const name = "lfg join") : InventoryAction(botAI, name) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;

@@ -14,8 +14,7 @@
 bool CastStealthAction::isPossible()
 {
     // do not use with WSG flag or EYE flag
-    return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) &&
-           !botAI->HasAura(34976, bot);
+    return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) && !botAI->HasAura(34976, bot);
 }
 
 bool UnstealthAction::Execute(Event event)
@@ -43,19 +42,14 @@ bool CheckStealthAction::Execute(Event event)
 bool CastVanishAction::isUseful()
 {
     // do not use with WSG flag or EYE flag
-    return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) &&
-           !botAI->HasAura(34976, bot);
+    return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) && !botAI->HasAura(34976, bot);
 }
 
-bool CastTricksOfTheTradeOnMainTankAction::isUseful()
-{
-    return CastSpellAction::isUseful() && AI_VALUE2(float, "distance", GetTargetName()) < 20.0f;
-}
+bool CastTricksOfTheTradeOnMainTankAction::isUseful() { return CastSpellAction::isUseful() && AI_VALUE2(float, "distance", GetTargetName()) < 20.0f; }
 
 bool UseDeadlyPoisonAction::Execute(Event event)
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V",
-                                               " IV", " III",  " II",  ""};
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item *> items;
     std::string poison_name;
     for (std::string &suffix : poison_suffixs)
@@ -78,8 +72,7 @@ bool UseDeadlyPoisonAction::Execute(Event event)
 
 bool UseDeadlyPoisonAction::isPossible()
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V",
-                                               " IV", " III",  " II",  ""};
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item *> items;
     std::string poison_name;
     for (std::string &suffix : poison_suffixs)
@@ -96,8 +89,7 @@ bool UseDeadlyPoisonAction::isPossible()
 
 bool UseInstantPoisonAction::Execute(Event event)
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V",
-                                               " IV", " III",  " II",  ""};
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item *> items;
     std::string poison_name;
     for (std::string &suffix : poison_suffixs)
@@ -119,8 +111,7 @@ bool UseInstantPoisonAction::Execute(Event event)
 
 bool UseInstantPoisonAction::isPossible()
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V",
-                                               " IV", " III",  " II",  ""};
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item *> items;
     std::string poison_name;
     for (std::string &suffix : poison_suffixs)
@@ -137,8 +128,7 @@ bool UseInstantPoisonAction::isPossible()
 
 bool UseInstantPoisonOffHandAction::Execute(Event event)
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V",
-                                               " IV", " III",  " II",  ""};
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item *> items;
     std::string poison_name;
     for (std::string &suffix : poison_suffixs)
@@ -160,8 +150,7 @@ bool UseInstantPoisonOffHandAction::Execute(Event event)
 
 bool UseInstantPoisonOffHandAction::isPossible()
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V",
-                                               " IV", " III",  " II",  ""};
+    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item *> items;
     std::string poison_name;
     for (std::string &suffix : poison_suffixs)

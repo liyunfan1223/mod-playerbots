@@ -28,10 +28,7 @@ class NormalLootStrategy : public LootStrategy
 class GrayLootStrategy : public NormalLootStrategy
 {
    public:
-    bool CanLoot(ItemTemplate const *proto, AiObjectContext *context) override
-    {
-        return NormalLootStrategy::CanLoot(proto, context) || proto->Quality == ITEM_QUALITY_POOR;
-    }
+    bool CanLoot(ItemTemplate const *proto, AiObjectContext *context) override { return NormalLootStrategy::CanLoot(proto, context) || proto->Quality == ITEM_QUALITY_POOR; }
 
     std::string const GetName() override { return "gray"; }
 };
@@ -41,9 +38,7 @@ class DisenchantLootStrategy : public NormalLootStrategy
    public:
     bool CanLoot(ItemTemplate const *proto, AiObjectContext *context) override
     {
-        return NormalLootStrategy::CanLoot(proto, context) ||
-               (proto->Quality >= ITEM_QUALITY_UNCOMMON && proto->Bonding != BIND_WHEN_PICKED_UP &&
-                (proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON));
+        return NormalLootStrategy::CanLoot(proto, context) || (proto->Quality >= ITEM_QUALITY_UNCOMMON && proto->Bonding != BIND_WHEN_PICKED_UP && (proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON));
     }
 
     std::string const GetName() override { return "disenchant"; }

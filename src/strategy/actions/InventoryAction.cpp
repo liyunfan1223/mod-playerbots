@@ -107,10 +107,7 @@ bool compare_items(ItemTemplate const *proto1, ItemTemplate const *proto2)
     return false;
 }
 
-bool compare_items_by_level(Item const *item1, Item const *item2)
-{
-    return compare_items(item1->GetTemplate(), item2->GetTemplate());
-}
+bool compare_items_by_level(Item const *item1, Item const *item2) { return compare_items(item1->GetTemplate(), item2->GetTemplate()); }
 
 void InventoryAction::TellItems(std::map<uint32, uint32> itemMap, std::map<uint32, bool> soulbound)
 {
@@ -188,8 +185,7 @@ std::vector<Item *> InventoryAction::parseItems(std::string const text, IterateI
     std::set<Item *> found;
     size_t pos = text.find(" ");
 
-    int count =
-        pos != std::string::npos ? atoi(text.substr(pos + 1).c_str()) : TRADE_SLOT_TRADED_COUNT;
+    int count = pos != std::string::npos ? atoi(text.substr(pos + 1).c_str()) : TRADE_SLOT_TRADED_COUNT;
     if (count < 1)
         count = 1;
     else if (count > TRADE_SLOT_TRADED_COUNT)
@@ -338,7 +334,8 @@ std::vector<Item *> InventoryAction::parseItems(std::string const text, IterateI
     }
 
     std::vector<Item *> result;
-    for (std::set<Item *>::iterator i = found.begin(); i != found.end(); ++i) result.push_back(*i);
+    for (std::set<Item *>::iterator i = found.begin(); i != found.end(); ++i)
+        result.push_back(*i);
 
     std::sort(result.begin(), result.end(), compare_items_by_level);
 

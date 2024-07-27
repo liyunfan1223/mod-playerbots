@@ -24,8 +24,7 @@ bool BGJoinAction::Execute(Event event)
         if (bgList.empty())
             return false;
 
-        BattlegroundQueueTypeId queueTypeId =
-            (BattlegroundQueueTypeId)bgList[urand(0, bgList.size() - 1)];
+        BattlegroundQueueTypeId queueTypeId = (BattlegroundQueueTypeId)bgList[urand(0, bgList.size() - 1)];
         BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(queueTypeId);
         BattlegroundBracketId bracketId;
         bool isArena = false;
@@ -92,8 +91,7 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
     GuidVector members;
 
     // search for arena team members and make them online
-    for (ArenaTeam::MemberList::iterator itr = arenateam->GetMembers().begin();
-         itr != arenateam->GetMembers().end(); ++itr)
+    for (ArenaTeam::MemberList::iterator itr = arenateam->GetMembers().begin(); itr != arenateam->GetMembers().end(); ++itr)
     {
         bool offline = false;
         Player *member = ObjectAccessor::FindConnectedPlayer(itr->Guid);
@@ -137,8 +135,7 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
 
     if (!members.size() || (int)members.size() < (int)(arenateam->GetType() - 1))
     {
-        LOG_INFO("playerbots", "Team #{} <{}> has not enough members for match", arenateam->GetId(),
-                 arenateam->GetName().c_str());
+        LOG_INFO("playerbots", "Team #{} <{}> has not enough members for match", arenateam->GetId(), arenateam->GetName().c_str());
         return false;
     }
 
@@ -151,15 +148,13 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
 
     if (!group->Create(bot))
     {
-        LOG_INFO("playerbots", "Team #{} <{}>: Can't create group for arena queue",
-                 arenateam->GetId(), arenateam->GetName());
+        LOG_INFO("playerbots", "Team #{} <{}>: Can't create group for arena queue", arenateam->GetId(), arenateam->GetName());
         return false;
     }
     else
         sGroupMgr->AddGroup(group);
 
-    LOG_INFO("playerbots", "Bot {} <{}>: Leader of <{}>", bot->GetGUID().ToString().c_str(),
-             bot->GetName(), arenateam->GetName());
+    LOG_INFO("playerbots", "Bot {} <{}>: Leader of <{}>", bot->GetGUID().ToString().c_str(), bot->GetName(), arenateam->GetName());
 
     for (auto i = begin(members); i != end(members); ++i)
     {
@@ -187,25 +182,21 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
             continue;
 
         memberBotAI->Reset();
-        member->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(),
-                           bot->GetPositionZ(), 0);
+        member->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 0);
 
-        LOG_INFO("playerbots", "Bot {} <{}>: Member of <{}>", member->GetGUID().ToString().c_str(),
-                 member->GetName().c_str(), arenateam->GetName().c_str());
+        LOG_INFO("playerbots", "Bot {} <{}>: Member of <{}>", member->GetGUID().ToString().c_str(), member->GetName().c_str(), arenateam->GetName().c_str());
 
         count++;
     }
 
     if (group && group->GetMembersCount() >= (uint32)arenateam->GetType())
     {
-        LOG_INFO("playerbots", "Team #{} <{}> Group is ready for match", arenateam->GetId(),
-                 arenateam->GetName().c_str());
+        LOG_INFO("playerbots", "Team #{} <{}> Group is ready for match", arenateam->GetId(), arenateam->GetName().c_str());
         return true;
     }
     else
     {
-        LOG_INFO("playerbots", "Team #{} <{}> Group is not ready for match (not enough members)",
-                 arenateam->GetId(), arenateam->GetName().c_str());
+        LOG_INFO("playerbots", "Team #{} <{}> Group is not ready for match (not enough members)", arenateam->GetId(), arenateam->GetName().c_str());
         group->Disband();
     }
 
@@ -240,8 +231,7 @@ bool BGJoinAction::canJoinBg(BattlegroundQueueTypeId queueTypeId, BattlegroundBr
     return true;
 }
 
-bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
-                                BattlegroundBracketId bracketId)
+bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId)
 {
     // check if bot should join (queue has real players)
     BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(queueTypeId);
@@ -251,20 +241,14 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
 
     bool isArena = false;
     bool isRated = false;
-    bool noLag = sWorldUpdateTime.GetAverageUpdateTime() <
-                 (sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty
-                                                            : sPlayerbotAIConfig->diffWithPlayer) *
-                     1.1;
+    bool noLag = sWorldUpdateTime.GetAverageUpdateTime() < (sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer) * 1.1;
 
     ArenaType type = ArenaType(BattlegroundMgr::BGArenaType(queueTypeId));
     if (type != ARENA_TYPE_NONE)
         isArena = true;
 
-    bool hasPlayers = (sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE] +
-                       sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE]) > 0;
-    bool hasBots = (sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] +
-                    sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE]) >=
-                   bg->GetMinPlayersPerTeam();
+    bool hasPlayers = (sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE]) > 0;
+    bool hasBots = (sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE]) >= bg->GetMinPlayersPerTeam();
 
     if (!sPlayerbotAIConfig->randomBotAutoJoinBG && !hasPlayers)
         return false;
@@ -281,10 +265,8 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
     uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
     uint32 TeamSize = bg->GetMaxPlayersPerTeam();
 
-    uint32 ACount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] +
-                    sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
-    uint32 HCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] +
-                    sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
+    uint32 ACount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
+    uint32 HCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
 
     uint32 BgCount = ACount + HCount;
     uint32 SCount = 0;
@@ -303,19 +285,11 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
         isArena = true;
         BracketSize = (uint32)(type * 2);
         TeamSize = type;
-        ACount =
-            sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId]
-                                          [isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_ALLIANCE];
-        HCount = sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId]
-                                               [isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_HORDE];
-        BgCount = sRandomPlayerbotMgr
-                      ->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE] +
-                  sRandomPlayerbotMgr
-                      ->BgPlayers[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE];
-        SCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] +
-                 sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
-        RCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] +
-                 sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
+        ACount = sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_ALLIANCE];
+        HCount = sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_HORDE];
+        BgCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE];
+        SCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
+        RCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
     }
 
     // do not try if not a captain of arena team
@@ -348,9 +322,7 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
     if (bot->GetGroup() && !bot->GetGroup()->IsLeader(bot->GetGUID()))
         return false;
 
-    bool needBots =
-        sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId]
-                                     [isArena ? isRated ? TEAM_HORDE : TEAM_ALLIANCE : teamId];
+    bool needBots = sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId][isArena ? isRated ? TEAM_HORDE : TEAM_ALLIANCE : teamId];
 
     // add more bots if players are not invited or 1st BG instance is full
     if (needBots /* || (hasPlayers && BgCount > BracketSize && (BgCount % BracketSize) != 0)*/)
@@ -362,20 +334,17 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
         return false;
     }
 
-    if (!isArena && ((ACount >= TeamSize && teamId == TEAM_ALLIANCE) ||
-                     (HCount >= TeamSize && teamId == TEAM_HORDE)))
+    if (!isArena && ((ACount >= TeamSize && teamId == TEAM_ALLIANCE) || (HCount >= TeamSize && teamId == TEAM_HORDE)))
     {
         return false;
     }
 
-    if (isArena && (((ACount >= TeamSize && HCount > 0) && teamId == TEAM_ALLIANCE) ||
-                    ((HCount >= TeamSize && ACount > 0) && teamId == TEAM_HORDE)))
+    if (isArena && (((ACount >= TeamSize && HCount > 0) && teamId == TEAM_ALLIANCE) || ((HCount >= TeamSize && ACount > 0) && teamId == TEAM_HORDE)))
     {
         return false;
     }
 
-    if (isArena && (((ACount > TeamSize && HCount == 0) && teamId == TEAM_HORDE) ||
-                    ((HCount > TeamSize && ACount == 0) && teamId == TEAM_ALLIANCE)))
+    if (isArena && (((ACount > TeamSize && HCount == 0) && teamId == TEAM_HORDE) || ((HCount > TeamSize && ACount == 0) && teamId == TEAM_ALLIANCE)))
     {
         return false;
     }
@@ -511,8 +480,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     if (!unit && isArena)
     {
         botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
-        LOG_DEBUG("playerbots", "Bot {} could not find Battlemaster to join",
-                  bot->GetGUID().ToString().c_str());
+        LOG_DEBUG("playerbots", "Bot {} could not find Battlemaster to join", bot->GetGUID().ToString().c_str());
         return false;
     }
 
@@ -580,9 +548,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
         }
     }
 
-    LOG_INFO("playerbots", "Bot {} {}:{} <{}> queued {} {}", bot->GetGUID().ToString().c_str(),
-             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(),
-             _bgType.c_str(),
+    LOG_INFO("playerbots", "Bot {} {}:{} <{}> queued {} {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), _bgType.c_str(),
              isRated   ? "Rated Arena"
              : isArena ? "Arena"
                        : "");
@@ -591,25 +557,19 @@ bool BGJoinAction::JoinQueue(uint32 type)
     {
         if (isRated)
         {
-            sRandomPlayerbotMgr
-                ->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE] += TeamSize;
-            sRandomPlayerbotMgr
-                ->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][teamId] +=
-                TeamSize;
+            sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE] += TeamSize;
+            sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][teamId] += TeamSize;
         }
         else
         {
-            sRandomPlayerbotMgr
-                ->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE]++;
-            sRandomPlayerbotMgr
-                ->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][teamId]++;
+            sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE]++;
+            sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][teamId]++;
         }
     }
     else if (!joinAsGroup)
         sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][teamId]++;
     else
-        sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][teamId] +=
-            bot->GetGroup()->GetMembersCount();
+        sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][teamId] += bot->GetGroup()->GetMembersCount();
 
     botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
 
@@ -629,8 +589,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     return true;
 }
 
-bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
-                                    BattlegroundBracketId bracketId)
+bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId)
 {
     BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(queueTypeId);
     Battleground *bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
@@ -647,10 +606,8 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
     uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
     uint32 TeamSize = bg->GetMaxPlayersPerTeam();
 
-    uint32 ACount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] +
-                    sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
-    uint32 HCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] +
-                    sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
+    uint32 ACount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
+    uint32 HCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
 
     uint32 BgCount = ACount + HCount;
     uint32 SCount, RCount = 0;
@@ -668,19 +625,11 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
         isArena = true;
         BracketSize = (uint32)(type * 2);
         TeamSize = type;
-        ACount =
-            sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId]
-                                          [isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_ALLIANCE];
-        HCount = sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId]
-                                               [isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_HORDE];
-        BgCount = sRandomPlayerbotMgr
-                      ->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE] +
-                  sRandomPlayerbotMgr
-                      ->BgPlayers[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE];
-        SCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] +
-                 sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
-        RCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] +
-                 sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
+        ACount = sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_ALLIANCE];
+        HCount = sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][TEAM_HORDE];
+        BgCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE];
+        SCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_ALLIANCE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_ALLIANCE];
+        RCount = sRandomPlayerbotMgr->BgBots[queueTypeId][bracketId][TEAM_HORDE] + sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][TEAM_HORDE];
     }
 
     // do not try if not a captain of arena team
@@ -714,9 +663,7 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
     if (bot->GetGroup() && !bot->GetGroup()->IsLeader(bot->GetGUID()))
         return false;
 
-    bool needBots =
-        sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId]
-                                     [isArena ? isRated ? TEAM_HORDE : TEAM_ALLIANCE : teamId];
+    bool needBots = sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId][isArena ? isRated ? TEAM_HORDE : TEAM_ALLIANCE : teamId];
 
     // add more bots if players are not invited or 1st BG instance is full
     if (needBots /* || (hasPlayers && BgCount > BracketSize && (BgCount % BracketSize) != 0)*/)
@@ -728,20 +675,17 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId,
         return false;
     }
 
-    if (!isArena && ((ACount >= TeamSize && teamId == TEAM_ALLIANCE) ||
-                     (HCount >= TeamSize && teamId == TEAM_HORDE)))
+    if (!isArena && ((ACount >= TeamSize && teamId == TEAM_ALLIANCE) || (HCount >= TeamSize && teamId == TEAM_HORDE)))
     {
         return false;
     }
 
-    if (isArena && (((ACount >= TeamSize && HCount > 0) && teamId == TEAM_ALLIANCE) ||
-                    ((HCount >= TeamSize && ACount > 0) && teamId == TEAM_HORDE)))
+    if (isArena && (((ACount >= TeamSize && HCount > 0) && teamId == TEAM_ALLIANCE) || ((HCount >= TeamSize && ACount > 0) && teamId == TEAM_HORDE)))
     {
         return false;
     }
 
-    if (isArena && (((ACount > TeamSize && HCount == 0) && teamId == TEAM_HORDE) ||
-                    ((HCount > TeamSize && ACount == 0) && teamId == TEAM_ALLIANCE)))
+    if (isArena && (((ACount > TeamSize && HCount == 0) && teamId == TEAM_HORDE) || ((HCount > TeamSize && ACount == 0) && teamId == TEAM_ALLIANCE)))
     {
         return false;
     }
@@ -778,9 +722,7 @@ bool BGLeaveAction::Execute(Event event)
 
     if (bot->InBattleground())
     {
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {}", bot->GetGUID().ToString().c_str(),
-                 bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                 isArena ? "Arena" : "BG");
+        LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG");
 
         WorldPacket leave(CMSG_LEAVE_BATTLEFIELD);
         leave << uint8(0) << uint8(0) << uint32(0) << uint16(0);
@@ -801,9 +743,7 @@ bool BGLeaveAction::Execute(Event event)
     if (!queueType)
         return false;
 
-    LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {} queue", bot->GetGUID().ToString().c_str(),
-             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(),
-             isArena ? "Arena" : "BG");
+    LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {} queue", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), isArena ? "Arena" : "BG");
 
     WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
     packet << type << unk2 << (uint32)_bgTypeId << unk << uint8(0);
@@ -947,16 +887,13 @@ bool BGStatusAction::Execute(Event event)
 
     if (Time1 == TIME_TO_AUTOREMOVE)  // Battleground is over, bot needs to leave
     {
-        LOG_INFO("playerbots", "Bot {} <{}> ({} {}): Received BG status TIME_REMOVE for {} {}",
-                 bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(),
-                 bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", isArena ? "Arena" : "BG", _bgType);
+        LOG_INFO("playerbots", "Bot {} <{}> ({} {}): Received BG status TIME_REMOVE for {} {}", bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", isArena ? "Arena" : "BG", _bgType);
 
         if (Battleground *bg = bot->GetBattleground())
         {
             if (isArena)
             {
-                sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId]
-                                              [isRated ? TEAM_HORDE : TEAM_ALLIANCE][teamId]--;
+                sRandomPlayerbotMgr->ArenaBots[queueTypeId][bracketId][isRated ? TEAM_HORDE : TEAM_ALLIANCE][teamId]--;
                 teamId = isRated ? TEAM_HORDE : TEAM_ALLIANCE;
             }
 
@@ -981,9 +918,7 @@ bool BGStatusAction::Execute(Event event)
         botAI->ChangeStrategy("-arena", BOT_STATE_COMBAT);
         botAI->ChangeStrategy("-arena", BOT_STATE_NON_COMBAT);
 
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {} - {}",
-                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-                 bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
+        LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {} - {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
 
         WorldPacket packet(CMSG_LEAVE_BATTLEFIELD);
         packet << uint8(0);
@@ -1005,10 +940,8 @@ bool BGStatusAction::Execute(Event event)
 
     if (statusid == STATUS_WAIT_QUEUE)  // bot is in queue
     {
-        LOG_INFO("playerbots",
-                 "Bot {} {}:{} <{}>: Received BG status WAIT_QUEUE (wait time: {}) for {} {}",
-                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-                 bot->GetLevel(), bot->GetName(), Time2, isArena ? "Arena" : "BG", _bgType);
+        LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Received BG status WAIT_QUEUE (wait time: {}) for {} {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), Time2,
+                 isArena ? "Arena" : "BG", _bgType);
         // temp fix for crash
         // return true;
 
@@ -1020,9 +953,7 @@ bool BGStatusAction::Execute(Event event)
             {
                 // BattlegroundMgr::GetBattleground() does not return battleground if
                 // bgTypeId==BATTLEGROUND_AA
-                Battleground *bg = sBattlegroundMgr->GetBattleground(
-                    ginfo.IsInvitedToBGInstanceGUID,
-                    _bgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : _bgTypeId);
+                Battleground *bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, _bgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : _bgTypeId);
                 if (bg)
                 {
                     if (isArena)
@@ -1030,18 +961,13 @@ bool BGStatusAction::Execute(Event event)
                         _bgTypeId = bg->GetBgTypeID();
                     }
 
-                    LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Force join {} {}",
-                             bot->GetGUID().ToString().c_str(),
-                             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
-                             bot->GetName(), isArena ? "Arena" : "BG", _bgType);
+                    LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Force join {} {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
                     WorldPacket emptyPacket;
                     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
                     action = 0x1;
 
                     // bg started so players should get invites by now
-                    sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId]
-                                                 [isArena ? TeamId(isRated) : bot->GetTeamId()] =
-                        false;
+                    sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId][isArena ? TeamId(isRated) : bot->GetTeamId()] = false;
 
                     WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
                     packet << type << unk2 << (uint32)_bgTypeId << unk << action;
@@ -1057,8 +983,7 @@ bool BGStatusAction::Execute(Event event)
                     }
                     context->GetValue<uint32>("bg role")->Set(urand(0, 9));
                     PositionMap &posMap = context->GetValue<PositionMap &>("position")->Get();
-                    PositionInfo pos =
-                        context->GetValue<PositionMap &>("position")->Get()["bg objective"];
+                    PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()["bg objective"];
                     pos.Reset();
                     posMap["bg objective"] = pos;
 
@@ -1081,18 +1006,14 @@ bool BGStatusAction::Execute(Event event)
         if (Time2 > timer && isArena)  // disabled for BG
             leaveQ = true;
 
-        if (leaveQ && ((bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID())) ||
-                       !(bot->GetGroup() || botAI->GetMaster())))
+        if (leaveQ && ((bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID())) || !(bot->GetGroup() || botAI->GetMaster())))
         {
             TeamId teamId = bot->GetTeamId();
             bool realPlayers = sRandomPlayerbotMgr->BgPlayers[queueTypeId][bracketId][teamId];
             if (realPlayers)
                 return false;
 
-            LOG_INFO("playerbots", "Bot {} {}:{} <{}> waited too long and leaves queue ({} {}).",
-                     bot->GetGUID().ToString().c_str(),
-                     bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                     isArena ? "Arena" : "BG", _bgType);
+            LOG_INFO("playerbots", "Bot {} {}:{} <{}> waited too long and leaves queue ({} {}).", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
 
             WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
             action = 0;
@@ -1111,17 +1032,13 @@ bool BGStatusAction::Execute(Event event)
 
     if (statusid == STATUS_IN_PROGRESS)  // placeholder for Leave BG if it takes too long
     {
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Received BG status IN_PROGRESS for {} {}",
-                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-                 bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
+        LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Received BG status IN_PROGRESS for {} {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
         return false;
     }
 
     if (statusid == STATUS_WAIT_JOIN)  // bot may join
     {
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Received BG status WAIT_JOIN for {} {}",
-                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-                 bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
+        LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Received BG status WAIT_JOIN for {} {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
 
         if (isArena)
         {
@@ -1131,10 +1048,7 @@ bool BGStatusAction::Execute(Event event)
             GroupQueueInfo ginfo;
             if (!bgQueue.GetPlayerGroupInfoData(bot->GetGUID(), &ginfo))
             {
-                LOG_ERROR("playerbots", "Bot {} {}:{} <{}>: Missing QueueInfo for {} {}",
-                          bot->GetGUID().ToString().c_str(),
-                          bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
-                          bot->GetName(), isArena ? "Arena" : "BG", _bgType);
+                LOG_ERROR("playerbots", "Bot {} {}:{} <{}>: Missing QueueInfo for {} {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
                 return false;
             }
 
@@ -1142,15 +1056,10 @@ bool BGStatusAction::Execute(Event event)
             {
                 // BattlegroundMgr::GetBattleground() does not return battleground if
                 // bgTypeId==BATTLEGROUND_AA
-                Battleground *bg = sBattlegroundMgr->GetBattleground(
-                    ginfo.IsInvitedToBGInstanceGUID,
-                    _bgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : _bgTypeId);
+                Battleground *bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, _bgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : _bgTypeId);
                 if (!bg)
                 {
-                    LOG_ERROR("playerbots", "Bot {} {}:{} <{}>: Missing QueueInfo for {} {}",
-                              bot->GetGUID().ToString().c_str(),
-                              bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
-                              bot->GetName(), isArena ? "Arena" : "BG", _bgType);
+                    LOG_ERROR("playerbots", "Bot {} {}:{} <{}>: Missing QueueInfo for {} {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
                     return false;
                 }
 
@@ -1158,9 +1067,7 @@ bool BGStatusAction::Execute(Event event)
             }
         }
 
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}> joined {} - {}",
-                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-                 bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
+        LOG_INFO("playerbots", "Bot {} {}:{} <{}> joined {} - {}", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
 
         WorldPacket emptyPacket;
         bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
@@ -1168,9 +1075,7 @@ bool BGStatusAction::Execute(Event event)
         action = 0x1;
 
         // bg started so players should get invites by now
-        sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId]
-                                     [isArena ? isRated ? TEAM_HORDE : TEAM_ALLIANCE : teamId] =
-            false;
+        sRandomPlayerbotMgr->NeedBots[queueTypeId][bracketId][isArena ? isRated ? TEAM_HORDE : TEAM_ALLIANCE : teamId] = false;
 
         WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
         packet << type << unk2 << (uint32)_bgTypeId << unk << action;
@@ -1206,9 +1111,7 @@ bool BGStatusCheckAction::Execute(Event event)
     WorldPacket packet(CMSG_BATTLEFIELD_STATUS);
     bot->GetSession()->HandleBattlefieldStatusOpcode(packet);
 
-    LOG_INFO("playerbots", "Bot {} <{}> ({} {}) : Checking BG invite status",
-             bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(),
-             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H");
+    LOG_INFO("playerbots", "Bot {} <{}> ({} {}) : Checking BG invite status", bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H");
 
     return true;
 }

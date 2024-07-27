@@ -18,9 +18,7 @@ bool TaxiAction::Execute(Event event)
 
     WorldPacket &p = event.getPacket();
     std::string const param = event.getParam();
-    if ((!p.empty() &&
-         (p.GetOpcode() == CMSG_TAXICLEARALLNODES || p.GetOpcode() == CMSG_TAXICLEARNODE)) ||
-        param == "clear")
+    if ((!p.empty() && (p.GetOpcode() == CMSG_TAXICLEARALLNODES || p.GetOpcode() == CMSG_TAXICLEARNODE)) || param == "clear")
     {
         movement.taxiNodes.clear();
         movement.Set(nullptr);
@@ -35,9 +33,7 @@ bool TaxiAction::Execute(Event event)
         if (!npc)
             continue;
 
-        uint32 curloc =
-            sObjectMgr->GetNearestTaxiNode(npc->GetPositionX(), npc->GetPositionY(),
-                                           npc->GetPositionZ(), npc->GetMapId(), bot->GetTeamId());
+        uint32 curloc = sObjectMgr->GetNearestTaxiNode(npc->GetPositionX(), npc->GetPositionY(), npc->GetPositionZ(), npc->GetMapId(), bot->GetTeamId());
 
         std::vector<uint32> nodes;
         for (uint32 i = 0; i < sTaxiPathStore.GetNumRows(); ++i)

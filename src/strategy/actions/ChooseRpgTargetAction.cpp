@@ -67,8 +67,7 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
         {
             triggerNode->setTrigger(trigger);
 
-            if (triggerNode->getFirstRelevance() < maxRelevance ||
-                triggerNode->getFirstRelevance() > 2.0f)
+            if (triggerNode->getFirstRelevance() < maxRelevance || triggerNode->getFirstRelevance() > 2.0f)
                 continue;
 
             trigger = triggerNode->getTrigger();
@@ -81,8 +80,7 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
 
     SET_AI_VALUE(GuidPosition, "rpg target", currentRpgTarget);
 
-    for (std::vector<TriggerNode *>::iterator i = triggerNodes.begin(); i != triggerNodes.end();
-         i++)
+    for (std::vector<TriggerNode *>::iterator i = triggerNodes.begin(); i != triggerNodes.end(); i++)
     {
         TriggerNode *trigger = *i;
         delete trigger;
@@ -106,11 +104,14 @@ bool ChooseRpgTargetAction::Execute(Event event)
     GuidVector possiblePlayers = AI_VALUE(GuidVector, "nearest friendly players");
     GuidSet &ignoreList = AI_VALUE(GuidSet &, "ignore rpg target");
 
-    for (auto target : possibleTargets) targets[target] = 0.0f;
+    for (auto target : possibleTargets)
+        targets[target] = 0.0f;
 
-    for (auto target : possibleObjects) targets[target] = 0.0f;
+    for (auto target : possibleObjects)
+        targets[target] = 0.0f;
 
-    for (auto target : possiblePlayers) targets[target] = 0.0f;
+    for (auto target : possiblePlayers)
+        targets[target] = 0.0f;
 
     if (targets.empty())
     {
@@ -119,7 +120,8 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     if (urand(0, 9))
     {
-        for (auto target : ignoreList) targets.erase(target);
+        for (auto target : ignoreList)
+            targets.erase(target);
     }
 
     SET_AI_VALUE(std::string, "next rpg action", this->getName());
@@ -189,8 +191,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     if (targets.empty())
     {
-        LOG_DEBUG("playerbots", "{} can't choose RPG target: all {} are not available",
-                  bot->GetName().c_str(), possibleTargets.size());
+        LOG_DEBUG("playerbots", "{} can't choose RPG target: all {} are not available", bot->GetName().c_str(), possibleTargets.size());
         RESET_AI_VALUE(GuidSet &, "ignore rpg target");
         RESET_AI_VALUE(GuidPosition, "rpg target");
         return false;
@@ -214,8 +215,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
     }
 
     std::mt19937 gen(time(0));
-    sTravelMgr->weighted_shuffle(guidps.begin(), guidps.end(), relevances.begin(), relevances.end(),
-                                 gen);
+    sTravelMgr->weighted_shuffle(guidps.begin(), guidps.end(), relevances.begin(), relevances.end(), gen);
 
     GuidPosition guidP(guidps.front());
     if (!guidP)
@@ -280,12 +280,10 @@ bool ChooseRpgTargetAction::isFollowValid(Player *bot, WorldPosition pos)
 
     if (botAI->HasActivePlayerMaster())
     {
-        if (realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() &&
-            bot->GetMapId() == realMaster->GetMapId())
+        if (realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() && bot->GetMapId() == realMaster->GetMapId())
             inDungeon = true;
 
-        if (realMaster && realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() &&
-            (realMaster->GetMapId() != pos.getMapId()))
+        if (realMaster && realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() && (realMaster->GetMapId() != pos.getMapId()))
             return false;
     }
 
@@ -304,13 +302,11 @@ bool ChooseRpgTargetAction::isFollowValid(Player *bot, WorldPosition pos)
     if (!botAI->HasActivePlayerMaster() && distance < 50.0f)
     {
         Player *player = master;
-        if (!master->isMoving() || PAI_VALUE(WorldPosition, "last long move").distance(pos) <
-                                       sPlayerbotAIConfig->reactDistance)
+        if (!master->isMoving() || PAI_VALUE(WorldPosition, "last long move").distance(pos) < sPlayerbotAIConfig->reactDistance)
             return true;
     }
 
-    if ((inDungeon || !master->HasPlayerFlag(PLAYER_FLAGS_RESTING)) && realMaster == master &&
-        distance > 5.0f)
+    if ((inDungeon || !master->HasPlayerFlag(PLAYER_FLAGS_RESTING)) && realMaster == master && distance > 5.0f)
         return false;
 
     if (!master->isMoving() && distance < 25.0f)

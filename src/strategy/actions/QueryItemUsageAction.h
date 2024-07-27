@@ -18,10 +18,7 @@ struct QuestStatusData;
 class QueryItemUsageAction : public InventoryAction
 {
    public:
-    QueryItemUsageAction(PlayerbotAI *botAI, std::string const name = "query item usage")
-        : InventoryAction(botAI, name)
-    {
-    }
+    QueryItemUsageAction(PlayerbotAI *botAI, std::string const name = "query item usage") : InventoryAction(botAI, name) {}
 
     bool Execute(Event event) override;
 
@@ -30,8 +27,7 @@ class QueryItemUsageAction : public InventoryAction
     std::string const QueryItem(ItemTemplate const *item, uint32 count, uint32 total);
     std::string const QueryItemUsage(ItemTemplate const *item);
     std::string const QueryItemPrice(ItemTemplate const *item);
-    std::string const QueryQuestItem(uint32 itemId, Quest const *questTemplate,
-                                     QuestStatusData const *questStatus);
+    std::string const QueryQuestItem(uint32 itemId, Quest const *questTemplate, QuestStatusData const *questStatus);
     std::string const QueryQuestItem(uint32 itemId);
 
    private:

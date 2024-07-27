@@ -16,16 +16,9 @@ bool NoRpgTargetTrigger::IsActive() { return !AI_VALUE(GuidPosition, "rpg target
 
 bool HasRpgTargetTrigger::IsActive() { return !NoRpgTargetTrigger::IsActive(); }
 
-bool FarFromRpgTargetTrigger::IsActive()
-{
-    return !NoRpgTargetTrigger::IsActive() &&
-           AI_VALUE2(float, "distance", "rpg target") > INTERACTION_DISTANCE;
-}
+bool FarFromRpgTargetTrigger::IsActive() { return !NoRpgTargetTrigger::IsActive() && AI_VALUE2(float, "distance", "rpg target") > INTERACTION_DISTANCE; }
 
-bool NearRpgTargetTrigger::IsActive()
-{
-    return !NoRpgTargetTrigger::IsActive() && !FarFromRpgTargetTrigger::IsActive();
-}
+bool NearRpgTargetTrigger::IsActive() { return !NoRpgTargetTrigger::IsActive() && !FarFromRpgTargetTrigger::IsActive(); }
 
 GuidPosition RpgTrigger::getGuidP() { return AI_VALUE(GuidPosition, "rpg target"); }
 
@@ -33,9 +26,7 @@ bool RpgTrigger::IsActive() { return true; }
 
 Event RpgTrigger::Check()
 {
-    if (!NoRpgTargetTrigger::IsActive() &&
-            (AI_VALUE(std::string, "next rpg action") == "choose rpg target") ||
-        !FarFromRpgTargetTrigger::IsActive())
+    if (!NoRpgTargetTrigger::IsActive() && (AI_VALUE(std::string, "next rpg action") == "choose rpg target") || !FarFromRpgTargetTrigger::IsActive())
         return Trigger::Check();
 
     return Event();
@@ -48,8 +39,7 @@ bool RpgTaxiTrigger::IsActive()
     if (!guidP.HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
         return false;
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(),
-                                                 guidP.getMapId(), bot->GetTeamId());
+    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
 
     if (!node)
         return false;
@@ -70,8 +60,7 @@ bool RpgDiscoverTrigger::IsActive()
     if (bot->isTaxiCheater())
         return false;
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(),
-                                                 guidP.getMapId(), bot->GetTeamId());
+    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
 
     if (bot->m_taxi.IsTaximaskNodeKnown(node))
         return false;
@@ -178,8 +167,7 @@ bool RpgTrainTrigger::IsTrainerOf(CreatureTemplate const *cInfo, Player *pPlayer
             if (cInfo->trainer_race && pPlayer->getRace() != cInfo->trainer_race)
             {
                 // Allowed to train if exalted
-                if (FactionTemplateEntry const *faction_template =
-                        sFactionTemplateStore.LookupEntry(cInfo->faction))
+                if (FactionTemplateEntry const *faction_template = sFactionTemplateStore.LookupEntry(cInfo->faction))
                 {
                     if (pPlayer->GetReputationRank(faction_template->faction) == REP_EXALTED)
                         return true;
@@ -226,8 +214,7 @@ bool RpgTrainTrigger::IsActive()
     if (cSpells)
         trainer_spells.insert(cSpells->spellList.begin(), cSpells->spellList.end());
 
-    for (TrainerSpellMap::const_iterator itr = trainer_spells.begin(); itr != trainer_spells.end();
-         ++itr)
+    for (TrainerSpellMap::const_iterator itr = trainer_spells.begin(); itr != trainer_spells.end(); ++itr)
     {
         TrainerSpell const *tSpell = &itr->second;
 
@@ -454,8 +441,7 @@ bool RpgDuelTrigger::IsActive()
         return false;
 
     // caster or target already have requested duel
-    if (bot->duel || player->duel || !player->GetSocial() ||
-        player->GetSocial()->HasIgnore(bot->GetGUID()))
+    if (bot->duel || player->duel || !player->GetSocial() || player->GetSocial()->HasIgnore(bot->GetGUID()))
         return false;
 
     AreaTableEntry const *targetAreaEntry = sAreaTableStore.LookupEntry(player->GetAreaId());

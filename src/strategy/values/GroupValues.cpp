@@ -48,8 +48,7 @@ bool IsNearLeaderValue::Calculate()
     if (groupMaster == bot)
         return true;
 
-    return sServerFacade->GetDistance2d(bot, botAI->GetGroupMaster()) <
-           sPlayerbotAIConfig->sightDistance;
+    return sServerFacade->GetDistance2d(bot, botAI->GetGroupMaster()) < sPlayerbotAIConfig->sightDistance;
 }
 
 bool BoolANDValue::Calculate()
@@ -148,8 +147,7 @@ bool GroupReadyValue::Calculate()
         {
             PlayerbotAI *memberAi = GET_PLAYERBOT_AI(member);
 
-            bool isFollowing =
-                memberAi ? memberAi->HasStrategy("follow", BOT_STATE_NON_COMBAT) : true;
+            bool isFollowing = memberAi ? memberAi->HasStrategy("follow", BOT_STATE_NON_COMBAT) : true;
 
             if (!member->IsAlive() && isFollowing)
                 return false;
@@ -157,9 +155,7 @@ bool GroupReadyValue::Calculate()
 
         // We only wait for members that are in range otherwise we might be waiting for bots stuck
         // in dead loops forever.
-        if (botAI->GetGroupMaster() &&
-            sServerFacade->GetDistance2d(member, botAI->GetGroupMaster()) >
-                sPlayerbotAIConfig->sightDistance)
+        if (botAI->GetGroupMaster() && sServerFacade->GetDistance2d(member, botAI->GetGroupMaster()) > sPlayerbotAIConfig->sightDistance)
             continue;
 
         if (member->GetHealthPct() < sPlayerbotAIConfig->almostFullHealth)
@@ -168,9 +164,7 @@ bool GroupReadyValue::Calculate()
         if (!member->GetPower(POWER_MANA))
             continue;
 
-        float mana =
-            (static_cast<float>(member->GetPower(POWER_MANA)) / member->GetMaxPower(POWER_MANA)) *
-            100;
+        float mana = (static_cast<float>(member->GetPower(POWER_MANA)) / member->GetMaxPower(POWER_MANA)) * 100;
 
         if (mana < sPlayerbotAIConfig->mediumMana)
             return false;

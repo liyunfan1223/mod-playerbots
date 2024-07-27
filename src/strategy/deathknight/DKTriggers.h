@@ -18,9 +18,7 @@ BUFF_TRIGGER(ImprovedIcyTalonsTrigger, "improved icy talons");
 class PlagueStrikeDebuffTrigger : public DebuffTrigger
 {
    public:
-    PlagueStrikeDebuffTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "blood plague", true, .0f)
-    {
-    }
+    PlagueStrikeDebuffTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "blood plague", true, .0f) {}
 };
 
 // DEBUFF_CHECKISOWNER_TRIGGER(IcyTouchDebuffTrigger, "frost fever");
@@ -34,19 +32,13 @@ BUFF_TRIGGER(UnbreakableArmorTrigger, "unbreakable armor");
 class PlagueStrikeDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
    public:
-    PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI *botAI)
-        : DebuffOnMeleeAttackerTrigger(botAI, "blood plague", true, .0f)
-    {
-    }
+    PlagueStrikeDebuffOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnMeleeAttackerTrigger(botAI, "blood plague", true, .0f) {}
 };
 
 class IcyTouchDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
    public:
-    IcyTouchDebuffOnAttackerTrigger(PlayerbotAI *botAI)
-        : DebuffOnMeleeAttackerTrigger(botAI, "frost fever", true, .0f)
-    {
-    }
+    IcyTouchDebuffOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnMeleeAttackerTrigger(botAI, "frost fever", true, .0f) {}
 };
 
 class DKPresenceTrigger : public BuffTrigger
@@ -103,19 +95,13 @@ class HowlingBlastTrigger : public DebuffTrigger
 class MindFreezeInterruptSpellTrigger : public InterruptSpellTrigger
 {
    public:
-    MindFreezeInterruptSpellTrigger(PlayerbotAI *botAI)
-        : InterruptSpellTrigger(botAI, "mind freeze")
-    {
-    }
+    MindFreezeInterruptSpellTrigger(PlayerbotAI *botAI) : InterruptSpellTrigger(botAI, "mind freeze") {}
 };
 
 class StrangulateInterruptSpellTrigger : public InterruptSpellTrigger
 {
    public:
-    StrangulateInterruptSpellTrigger(PlayerbotAI *botAI)
-        : InterruptSpellTrigger(botAI, "strangulate")
-    {
-    }
+    StrangulateInterruptSpellTrigger(PlayerbotAI *botAI) : InterruptSpellTrigger(botAI, "strangulate") {}
 };
 
 class KillingMachineTrigger : public BoostTrigger
@@ -127,10 +113,7 @@ class KillingMachineTrigger : public BoostTrigger
 class MindFreezeOnEnemyHealerTrigger : public InterruptEnemyHealerTrigger
 {
    public:
-    MindFreezeOnEnemyHealerTrigger(PlayerbotAI *botAI)
-        : InterruptEnemyHealerTrigger(botAI, "mind freeze")
-    {
-    }
+    MindFreezeOnEnemyHealerTrigger(PlayerbotAI *botAI) : InterruptEnemyHealerTrigger(botAI, "mind freeze") {}
 };
 
 class ChainsOfIceSnareTrigger : public SnareTargetTrigger
@@ -142,10 +125,7 @@ class ChainsOfIceSnareTrigger : public SnareTargetTrigger
 class StrangulateOnEnemyHealerTrigger : public InterruptEnemyHealerTrigger
 {
    public:
-    StrangulateOnEnemyHealerTrigger(PlayerbotAI *botAI)
-        : InterruptEnemyHealerTrigger(botAI, "strangulate")
-    {
-    }
+    StrangulateOnEnemyHealerTrigger(PlayerbotAI *botAI) : InterruptEnemyHealerTrigger(botAI, "strangulate") {}
 };
 
 class HighBloodRuneTrigger : public Trigger
@@ -171,10 +151,7 @@ class DesolationTrigger : public BuffTrigger
 class DeathAndDecayCooldownTrigger : public SpellCooldownTrigger
 {
    public:
-    DeathAndDecayCooldownTrigger(PlayerbotAI *botAI)
-        : SpellCooldownTrigger(botAI, "death and decay")
-    {
-    }
+    DeathAndDecayCooldownTrigger(PlayerbotAI *botAI) : SpellCooldownTrigger(botAI, "death and decay") {}
     bool IsActive() override;
 };
 

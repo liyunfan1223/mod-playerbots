@@ -24,8 +24,7 @@ bool HasAggroValue::Calculate()
         return true;
     }
     bool isMT = botAI->IsMainTank(bot);
-    if (victim && (victim->GetGUID() == bot->GetGUID() ||
-                   (!isMT && victim->ToPlayer() && botAI->IsTank(victim->ToPlayer()))))
+    if (victim && (victim->GetGUID() == bot->GetGUID() || (!isMT && victim->ToPlayer() && botAI->IsTank(victim->ToPlayer()))))
     {
         return true;
     }

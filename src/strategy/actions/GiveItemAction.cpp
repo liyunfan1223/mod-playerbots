@@ -46,15 +46,13 @@ bool GiveItemAction::Execute(Event event)
             moved = true;
 
             std::ostringstream out;
-            out << "Got " << chat->FormatItem(item->GetTemplate(), item->GetCount()) << " from "
-                << bot->GetName();
+            out << "Got " << chat->FormatItem(item->GetTemplate(), item->GetCount()) << " from " << bot->GetName();
             receiverAi->TellMasterNoFacing(out.str());
         }
         else
         {
             std::ostringstream out;
-            out << "Cannot get " << chat->FormatItem(item->GetTemplate(), item->GetCount())
-                << " from " << bot->GetName() << "- my bags are full";
+            out << "Cannot get " << chat->FormatItem(item->GetTemplate(), item->GetCount()) << " from " << bot->GetName() << "- my bags are full";
             receiverAi->TellError(out.str());
         }
     }
@@ -64,10 +62,7 @@ bool GiveItemAction::Execute(Event event)
 
 Unit *GiveItemAction::GetTarget() { return AI_VALUE2(Unit *, "party member without item", item); }
 
-bool GiveItemAction::isUseful()
-{
-    return GetTarget() && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->lowMana;
-}
+bool GiveItemAction::isUseful() { return GetTarget() && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->lowMana; }
 
 Unit *GiveFoodAction::GetTarget() { return AI_VALUE(Unit *, "party member without food"); }
 
@@ -76,8 +71,7 @@ bool GiveFoodAction::isUseful()
     if (!GetTarget())
         return false;
 
-    bool isRandomBot =
-        GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
+    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
 
     return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
 }
@@ -89,8 +83,7 @@ bool GiveWaterAction::isUseful()
     if (!GetTarget())
         return false;
 
-    bool isRandomBot =
-        GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
+    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
 
     return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
 }

@@ -64,10 +64,7 @@ class CraftData
 class CraftValue : public ManualSetValue<CraftData &>
 {
    public:
-    CraftValue(PlayerbotAI *botAI, std::string const name = "craft")
-        : ManualSetValue<CraftData &>(botAI, data, name)
-    {
-    }
+    CraftValue(PlayerbotAI *botAI, std::string const name = "craft") : ManualSetValue<CraftData &>(botAI, data, name) {}
 
    private:
     CraftData data;

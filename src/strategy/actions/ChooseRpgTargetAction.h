@@ -19,10 +19,7 @@ class WorldPosition;
 class ChooseRpgTargetAction : public Action
 {
    public:
-    ChooseRpgTargetAction(PlayerbotAI *botAI, std::string const name = "choose rpg target")
-        : Action(botAI, name)
-    {
-    }
+    ChooseRpgTargetAction(PlayerbotAI *botAI, std::string const name = "choose rpg target") : Action(botAI, name) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;

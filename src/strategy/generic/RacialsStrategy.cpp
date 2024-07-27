@@ -16,18 +16,16 @@ class RacialsStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
    private:
     static ActionNode *lifeblood(PlayerbotAI *botAI)
     {
-        return new ActionNode(
-            "lifeblood",
-            /*P*/ nullptr,
-            /*A*/ NextAction::array(0, new NextAction("gift of the naaru"), nullptr),
-            /*C*/ nullptr);
+        return new ActionNode("lifeblood",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("gift of the naaru"), nullptr),
+                              /*C*/ nullptr);
     }
 };
 
 void RacialsStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
-    triggers.push_back(new TriggerNode(
-        "low health", NextAction::array(0, new NextAction("lifeblood", 71.0f), nullptr)));
+    triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("lifeblood", 71.0f), nullptr)));
     // triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("war
     // stomp", 71.0f), nullptr)));
     /*triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("war
@@ -37,7 +35,4 @@ void RacialsStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
     NextAction::array(0, new NextAction("mana tap", ACTION_EMERGENCY + 6), nullptr)));*/
 }
 
-RacialsStrategy::RacialsStrategy(PlayerbotAI *botAI) : Strategy(botAI)
-{
-    actionNodeFactories.Add(new RacialsStrategyActionNodeFactory());
-}
+RacialsStrategy::RacialsStrategy(PlayerbotAI *botAI) : Strategy(botAI) { actionNodeFactories.Add(new RacialsStrategyActionNodeFactory()); }

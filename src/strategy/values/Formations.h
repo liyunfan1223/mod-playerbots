@@ -42,10 +42,8 @@ class MoveFormation : public Formation
     MoveFormation(PlayerbotAI *botAI, std::string const name) : Formation(botAI, name) {}
 
    protected:
-    WorldLocation MoveLine(std::vector<Player *> line, float diff, float cx, float cy, float cz,
-                           float orientation, float range);
-    WorldLocation MoveSingleLine(std::vector<Player *> line, float diff, float cx, float cy,
-                                 float cz, float orientation, float range);
+    WorldLocation MoveLine(std::vector<Player *> line, float diff, float cx, float cy, float cz, float orientation, float range);
+    WorldLocation MoveSingleLine(std::vector<Player *> line, float diff, float cx, float cy, float cz, float orientation, float range);
 };
 
 class MoveAheadFormation : public MoveFormation

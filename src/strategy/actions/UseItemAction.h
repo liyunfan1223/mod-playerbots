@@ -17,10 +17,7 @@ class Unit;
 class UseItemAction : public Action
 {
    public:
-    UseItemAction(PlayerbotAI *botAI, std::string const name = "use", bool selfOnly = false)
-        : Action(botAI, name), selfOnly(selfOnly)
-    {
-    }
+    UseItemAction(PlayerbotAI *botAI, std::string const name = "use", bool selfOnly = false) : Action(botAI, name), selfOnly(selfOnly) {}
 
     bool Execute(Event event) override;
     bool isPossible() override;
@@ -41,10 +38,7 @@ class UseItemAction : public Action
 class UseSpellItemAction : public UseItemAction
 {
    public:
-    UseSpellItemAction(PlayerbotAI *botAI, std::string const name, bool selfOnly = false)
-        : UseItemAction(botAI, name, selfOnly)
-    {
-    }
+    UseSpellItemAction(PlayerbotAI *botAI, std::string const name, bool selfOnly = false) : UseItemAction(botAI, name, selfOnly) {}
 
     bool isUseful() override;
 };

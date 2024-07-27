@@ -9,10 +9,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool CastRemoveShadowformAction::isUseful()
-{
-    return botAI->HasAura("shadowform", AI_VALUE(Unit *, "self target"));
-}
+bool CastRemoveShadowformAction::isUseful() { return botAI->HasAura("shadowform", AI_VALUE(Unit *, "self target")); }
 
 bool CastRemoveShadowformAction::isPossible() { return true; }
 

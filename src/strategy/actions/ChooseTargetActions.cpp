@@ -25,10 +25,7 @@ bool AttackEnemyPlayerAction::isUseful()
 bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit *target = context->GetValue<Unit *>("enemy flag carrier")->Get();
-    return target &&
-           sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target),
-                                                    75.0f) &&
-           (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
+    return target && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
 }
 
 bool AttackAnythingAction::isUseful()
@@ -39,11 +36,8 @@ bool AttackAnythingAction::isUseful()
     if (!AI_VALUE(bool, "can move around"))
         return false;
 
-    if (context->GetValue<TravelTarget *>("travel target")->Get()->isTraveling() &&
-        ChooseRpgTargetAction::isFollowValid(bot,
-                                             *context->GetValue<TravelTarget *>("travel target")
-                                                  ->Get()
-                                                  ->getPosition()))  // Bot is traveling
+    if (context->GetValue<TravelTarget *>("travel target")->Get()->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot,
+                                                                                                                         *context->GetValue<TravelTarget *>("travel target")->Get()->getPosition()))  // Bot is traveling
         return false;
     // if (bot->IsInCombat()) {
     //     return false;

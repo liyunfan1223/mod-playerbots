@@ -9,15 +9,9 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-bool NoTravelTargetTrigger::IsActive()
-{
-    return !context->GetValue<TravelTarget*>("travel target")->Get()->isActive();
-}
+bool NoTravelTargetTrigger::IsActive() { return !context->GetValue<TravelTarget*>("travel target")->Get()->isActive(); }
 
-bool FarFromTravelTargetTrigger::IsActive()
-{
-    return context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
-}
+bool FarFromTravelTargetTrigger::IsActive() { return context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling(); }
 
 bool NearDarkPortalTrigger::IsActive() { return bot->GetAreaId() == 72; }
 

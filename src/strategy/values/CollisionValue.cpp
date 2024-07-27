@@ -29,8 +29,7 @@ bool CollisionValue::Calculate()
         if (bot == target)
             continue;
 
-        float dist =
-            sServerFacade->GetDistance2d(bot, target->GetPositionX(), target->GetPositionY());
+        float dist = sServerFacade->GetDistance2d(bot, target->GetPositionX(), target->GetPositionY());
         if (sServerFacade->IsDistanceLessThan(dist, target->GetCombatReach()))
             return true;
     }

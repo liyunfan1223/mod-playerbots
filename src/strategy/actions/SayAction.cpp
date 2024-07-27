@@ -87,9 +87,7 @@ bool SayAction::Execute(Event event)
         {
             PlayerbotAI *memberAi = GET_PLAYERBOT_AI(member);
             if (memberAi)
-                memberAi->GetAiObjectContext()
-                    ->GetValue<time_t>("last said", qualifier)
-                    ->Set(nextTime + (20 * ++index) + urand(1, 15));
+                memberAi->GetAiObjectContext()->GetValue<time_t>("last said", qualifier)->Set(nextTime + (20 * ++index) + urand(1, 15));
         }
     }
 
@@ -114,8 +112,7 @@ bool SayAction::isUseful()
     return (time(nullptr) - lastSaid) > 30;
 }
 
-void ChatReplyAction::ChatReplyDo(Player *bot, uint32 type, uint32 guid1, uint32 guid2,
-                                  std::string msg, std::string chanName, std::string name)
+void ChatReplyAction::ChatReplyDo(Player *bot, uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName, std::string name)
 {
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND;  // default not understand
     std::string respondsText = "";
@@ -393,16 +390,13 @@ void ChatReplyAction::ChatReplyDo(Player *bot, uint32 type, uint32 guid1, uint32
                         switch (rnd)
                         {
                             case 0:
-                                msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] +
-                                      " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " +
-                                      word[verb_pos + 4] + " " + word[verb_pos + 4];
+                                msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 4];
                                 break;
                             case 1:
                                 msg = "ya %s but thats in the past";
                                 break;
                             case 2:
-                                msg = "nah, but " + word[verb_pos + 1] + " will " +
-                                      word[verb_pos + 3] + " again though %s";
+                                msg = "nah, but " + word[verb_pos + 1] + " will " + word[verb_pos + 3] + " again though %s";
                                 break;
                             case 3:
                                 msg = "afraid that was before i was around or paying attention";
@@ -421,17 +415,13 @@ void ChatReplyAction::ChatReplyDo(Player *bot, uint32 type, uint32 guid1, uint32
                         switch (rnd)
                         {
                             case 0:
-                                msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] +
-                                      " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " +
-                                      word[verb_pos + 4] + " " + word[verb_pos + 5];
+                                msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 5];
                                 break;
                             case 1:
                                 msg = "ya %s thats true";
                                 break;
                             case 2:
-                                msg = "maybe " + word[verb_pos + 1] + " " + word[verb_pos] + " " +
-                                      word[verb_pos + 2] + " " + word[verb_pos + 3] + " " +
-                                      word[verb_pos + 4] + " " + word[verb_pos + 5];
+                                msg = "maybe " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 5];
                                 break;
                             case 3:
                                 msg = "dunno %s";
@@ -507,15 +497,13 @@ void ChatReplyAction::ChatReplyDo(Player *bot, uint32 type, uint32 guid1, uint32
                 switch (rnd)
                 {
                     case 0:
-                        msg = "yeah %s, the key word being " + word[verb_pos] + " " +
-                              word[verb_pos + 1];
+                        msg = "yeah %s, the key word being " + word[verb_pos] + " " + word[verb_pos + 1];
                         break;
                     case 1:
                         msg = "ya %s but thats in the past";
                         break;
                     case 2:
-                        msg =
-                            word[verb_pos - 1] + " will " + word[verb_pos + 1] + " again though %s";
+                        msg = word[verb_pos - 1] + " will " + word[verb_pos + 1] + " again though %s";
                         break;
                 }
                 msg = std::regex_replace(msg, std::regex("%s"), name);
@@ -559,8 +547,7 @@ void ChatReplyAction::ChatReplyDo(Player *bot, uint32 type, uint32 guid1, uint32
                         msg = "%s, what will happen %s?";
                         break;
                     case 2:
-                        msg = "are you saying " + word[verb_pos - 1] + " will " +
-                              word[verb_pos + 1] + " " + word[verb_pos + 2] + " %s?";
+                        msg = "are you saying " + word[verb_pos - 1] + " will " + word[verb_pos + 1] + " " + word[verb_pos + 2] + " %s?";
                         break;
                 }
                 msg = std::regex_replace(msg, std::regex("%s"), name);
@@ -660,9 +647,6 @@ void ChatReplyAction::ChatReplyDo(Player *bot, uint32 type, uint32 guid1, uint32
                 guild->BroadcastToGuild(bot->GetSession(), false, respondsText, LANG_UNIVERSAL);
             }
         }
-        GET_PLAYERBOT_AI(bot)
-            ->GetAiObjectContext()
-            ->GetValue<time_t>("last said", "chat")
-            ->Set(time(nullptr) + urand(5, 25));
+        GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(nullptr) + urand(5, 25));
     }
 }

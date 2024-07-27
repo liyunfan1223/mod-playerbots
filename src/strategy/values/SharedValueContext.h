@@ -34,19 +34,10 @@ class SharedValueContext : public NamedObjectContext<UntypedValue>
     static UntypedValue *bg_masters(PlayerbotAI *botAI) { return new BgMastersValue(botAI); }
     static UntypedValue *drop_map(PlayerbotAI *botAI) { return new DropMapValue(botAI); }
     static UntypedValue *item_drop_list(PlayerbotAI *botAI) { return new ItemDropListValue(botAI); }
-    static UntypedValue *entry_loot_list(PlayerbotAI *botAI)
-    {
-        return new EntryLootListValue(botAI);
-    }
+    static UntypedValue *entry_loot_list(PlayerbotAI *botAI) { return new EntryLootListValue(botAI); }
 
-    static UntypedValue *entry_quest_relation(PlayerbotAI *botAI)
-    {
-        return new EntryQuestRelationMapValue(botAI);
-    }
-    static UntypedValue *quest_guidp_map(PlayerbotAI *botAI)
-    {
-        return new QuestGuidpMapValue(botAI);
-    }
+    static UntypedValue *entry_quest_relation(PlayerbotAI *botAI) { return new EntryQuestRelationMapValue(botAI); }
+    static UntypedValue *quest_guidp_map(PlayerbotAI *botAI) { return new QuestGuidpMapValue(botAI); }
     static UntypedValue *quest_givers(PlayerbotAI *botAI) { return new QuestGiversValue(botAI); }
 
     // Global acess functions

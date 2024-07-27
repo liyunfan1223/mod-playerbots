@@ -43,10 +43,7 @@ class SellGrayItemsVisitor : public SellItemsVisitor
 class SellVendorItemsVisitor : public SellItemsVisitor
 {
    public:
-    SellVendorItemsVisitor(SellAction *action, AiObjectContext *con) : SellItemsVisitor(action)
-    {
-        context = con;
-    }
+    SellVendorItemsVisitor(SellAction *action, AiObjectContext *con) : SellItemsVisitor(action) { context = con; }
 
     AiObjectContext *context;
 

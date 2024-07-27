@@ -21,14 +21,8 @@ class Trigger : public AiNamedObject
     virtual ~Trigger() {}
 
     virtual Event Check();
-    virtual void ExternalEvent([[maybe_unused]] std::string const param,
-                               [[maybe_unused]] Player *owner = nullptr)
-    {
-    }
-    virtual void ExternalEvent([[maybe_unused]] WorldPacket &packet,
-                               [[maybe_unused]] Player *owner = nullptr)
-    {
-    }
+    virtual void ExternalEvent([[maybe_unused]] std::string const param, [[maybe_unused]] Player *owner = nullptr) {}
+    virtual void ExternalEvent([[maybe_unused]] WorldPacket &packet, [[maybe_unused]] Player *owner = nullptr) {}
     virtual bool IsActive() { return false; }
     virtual NextAction **getHandlers() { return nullptr; }
     void Update() {}
@@ -47,10 +41,7 @@ class Trigger : public AiNamedObject
 class TriggerNode
 {
    public:
-    TriggerNode(std::string const name, NextAction **handlers = nullptr)
-        : trigger(nullptr), handlers(handlers), name(name)
-    {
-    }  // reorder args - whipowill
+    TriggerNode(std::string const name, NextAction **handlers = nullptr) : trigger(nullptr), handlers(handlers), name(name) {}  // reorder args - whipowill
 
     virtual ~TriggerNode() { NextAction::destroy(handlers); }
 
@@ -58,10 +49,7 @@ class TriggerNode
     void setTrigger(Trigger *trigger) { this->trigger = trigger; }
     std::string const getName() { return name; }
 
-    NextAction **getHandlers()
-    {
-        return NextAction::merge(NextAction::clone(handlers), trigger->getHandlers());
-    }
+    NextAction **getHandlers() { return NextAction::merge(NextAction::clone(handlers), trigger->getHandlers()); }
 
     float getFirstRelevance() { return handlers[0] ? handlers[0]->getRelevance() : -1; }
 

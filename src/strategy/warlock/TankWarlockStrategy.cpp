@@ -30,20 +30,18 @@ class GenericWarlockStrategyActionNodeFactory : public NamedObjectFactory<Action
 
     static ActionNode *summon_felguard([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode(
-            "summon felguard",
-            /*P*/ nullptr,
-            /*A*/ NextAction::array(0, new NextAction("summon succubus"), nullptr),
-            /*C*/ nullptr);
+        return new ActionNode("summon felguard",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("summon succubus"), nullptr),
+                              /*C*/ nullptr);
     }
 
     static ActionNode *summon_succubus([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode(
-            "summon succubus",
-            /*P*/ nullptr,
-            /*A*/ NextAction::array(0, new NextAction("summon voidwalker"), nullptr),
-            /*C*/ nullptr);
+        return new ActionNode("summon succubus",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("summon voidwalker"), nullptr),
+                              /*C*/ nullptr);
     }
 
     static ActionNode *summon_felhunter([[maybe_unused]] PlayerbotAI *botAI)
@@ -55,17 +53,8 @@ class GenericWarlockStrategyActionNodeFactory : public NamedObjectFactory<Action
     }
 };
 
-TankWarlockStrategy::TankWarlockStrategy(PlayerbotAI *botAI) : GenericWarlockStrategy(botAI)
-{
-    actionNodeFactories.Add(new GenericWarlockStrategyActionNodeFactory());
-}
+TankWarlockStrategy::TankWarlockStrategy(PlayerbotAI *botAI) : GenericWarlockStrategy(botAI) { actionNodeFactories.Add(new GenericWarlockStrategyActionNodeFactory()); }
 
-NextAction **TankWarlockStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("shoot", ACTION_DEFAULT), nullptr);
-}
+NextAction **TankWarlockStrategy::getDefaultActions() { return NextAction::array(0, new NextAction("shoot", ACTION_DEFAULT), nullptr); }
 
-void TankWarlockStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
-{
-    GenericWarlockStrategy::InitTriggers(triggers);
-}
+void TankWarlockStrategy::InitTriggers(std::vector<TriggerNode *> &triggers) { GenericWarlockStrategy::InitTriggers(triggers); }

@@ -9,21 +9,14 @@
 #include "MageActions.h"
 #include "Playerbots.h"
 
-bool ArcaneIntellectOnPartyTrigger::IsActive()
-{
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("arcane brilliance", GetTarget());
-}
+bool ArcaneIntellectOnPartyTrigger::IsActive() { return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("arcane brilliance", GetTarget()); }
 
-bool ArcaneIntellectTrigger::IsActive()
-{
-    return BuffTrigger::IsActive() && !botAI->HasAura("arcane brilliance", GetTarget());
-}
+bool ArcaneIntellectTrigger::IsActive() { return BuffTrigger::IsActive() && !botAI->HasAura("arcane brilliance", GetTarget()); }
 
 bool MageArmorTrigger::IsActive()
 {
     Unit *target = GetTarget();
-    return !botAI->HasAura("ice armor", target) && !botAI->HasAura("frost armor", target) &&
-           !botAI->HasAura("molten armor", target) && !botAI->HasAura("mage armor", target);
+    return !botAI->HasAura("ice armor", target) && !botAI->HasAura("frost armor", target) && !botAI->HasAura("molten armor", target) && !botAI->HasAura("mage armor", target);
 }
 
 bool FingersOfFrostSingleTrigger::IsActive()

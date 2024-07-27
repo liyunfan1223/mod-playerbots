@@ -31,8 +31,7 @@ class FindMaxThreatGapTargetStrategy : public FindTargetStrategy
             return;
         }
         Unit *victim = attacker->GetVictim();
-        if (!result ||
-            CalcThreatGap(attacker, threatMgr) > CalcThreatGap(result, &result->GetThreatMgr()))
+        if (!result || CalcThreatGap(attacker, threatMgr) > CalcThreatGap(result, &result->GetThreatMgr()))
             result = attacker;
     }
     float CalcThreatGap(Unit *attacker, ThreatMgr *threatMgr)
@@ -49,10 +48,7 @@ class FindMaxThreatGapTargetStrategy : public FindTargetStrategy
 class CasterFindTargetSmartStrategy : public FindTargetStrategy
 {
    public:
-    CasterFindTargetSmartStrategy(PlayerbotAI *botAI, float dps)
-        : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
-    {
-    }
+    CasterFindTargetSmartStrategy(PlayerbotAI *botAI, float dps) : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000) {}
 
     void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override
     {
@@ -99,8 +95,7 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
             return new_time < old_time;
         }
         // dont switch targets when all of them with low health
-        Unit *currentTarget =
-            botAI->GetAiObjectContext()->GetValue<Unit *>("current target")->Get();
+        Unit *currentTarget = botAI->GetAiObjectContext()->GetValue<Unit *>("current target")->Get();
         if (currentTarget == new_unit)
         {
             return true;
@@ -115,8 +110,7 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
     {
         float time = unit->GetHealth() / dps_;
         float dis = unit->GetDistance(botAI->GetBot());
-        float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance
-                                                             : sPlayerbotAIConfig->meleeDistance;
+        float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance : sPlayerbotAIConfig->meleeDistance;
         attackRange += 5.0f;
         int level = dis < attackRange ? 10 : 0;
         if (time >= 3 && time <= 20)
@@ -139,10 +133,7 @@ class CasterFindTargetSmartStrategy : public FindTargetStrategy
 class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
 {
    public:
-    NonCasterFindTargetSmartStrategy(PlayerbotAI *botAI, float dps)
-        : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
-    {
-    }
+    NonCasterFindTargetSmartStrategy(PlayerbotAI *botAI, float dps) : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000) {}
 
     void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override
     {
@@ -196,8 +187,7 @@ class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
     {
         float time = unit->GetHealth() / dps_;
         float dis = unit->GetDistance(botAI->GetBot());
-        float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance
-                                                             : sPlayerbotAIConfig->meleeDistance;
+        float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance : sPlayerbotAIConfig->meleeDistance;
         attackRange += 5.0f;
         int level = dis < attackRange ? 10 : 0;
         return level;
@@ -212,10 +202,7 @@ class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
 class ComboFindTargetSmartStrategy : public FindTargetStrategy
 {
    public:
-    ComboFindTargetSmartStrategy(PlayerbotAI *botAI, float dps)
-        : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
-    {
-    }
+    ComboFindTargetSmartStrategy(PlayerbotAI *botAI, float dps) : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000) {}
 
     void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override
     {
@@ -275,8 +262,7 @@ class ComboFindTargetSmartStrategy : public FindTargetStrategy
     {
         float time = unit->GetHealth() / dps_;
         float dis = unit->GetDistance(botAI->GetBot());
-        float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance
-                                                             : sPlayerbotAIConfig->meleeDistance;
+        float attackRange = botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance : sPlayerbotAIConfig->meleeDistance;
         attackRange += 5.0f;
         int level = dis < attackRange ? 10 : 0;
         return level;

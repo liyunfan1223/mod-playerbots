@@ -26,10 +26,7 @@ class BuyPetitionAction : public InventoryAction
 class PetitionOfferAction : public Action
 {
    public:
-    PetitionOfferAction(PlayerbotAI *botAI, std::string const name = "petition offer")
-        : Action(botAI, name)
-    {
-    }
+    PetitionOfferAction(PlayerbotAI *botAI, std::string const name = "petition offer") : Action(botAI, name) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -38,10 +35,7 @@ class PetitionOfferAction : public Action
 class PetitionOfferNearbyAction : public PetitionOfferAction
 {
    public:
-    PetitionOfferNearbyAction(PlayerbotAI *botAI)
-        : PetitionOfferAction(botAI, "petition offer nearby")
-    {
-    }
+    PetitionOfferNearbyAction(PlayerbotAI *botAI) : PetitionOfferAction(botAI, "petition offer nearby") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;

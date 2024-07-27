@@ -21,6 +21,5 @@ void NearestNonBotPlayersValue::FindUnits(std::list<Unit *> &targets)
 bool NearestNonBotPlayersValue::AcceptUnit(Unit *unit)
 {
     ObjectGuid guid = unit->GetGUID();
-    return guid.IsPlayer() && !GET_PLAYERBOT_AI(((Player *)unit)) &&
-           (!((Player *)unit)->IsGameMaster() || ((Player *)unit)->isGMVisible());
+    return guid.IsPlayer() && !GET_PLAYERBOT_AI(((Player *)unit)) && (!((Player *)unit)->IsGameMaster() || ((Player *)unit)->isGMVisible());
 }

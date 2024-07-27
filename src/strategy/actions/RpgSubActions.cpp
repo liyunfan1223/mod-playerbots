@@ -52,16 +52,9 @@ GuidPosition RpgHelper::guidP() { return AI_VALUE(GuidPosition, "rpg target"); }
 
 ObjectGuid RpgHelper::guid() { return (ObjectGuid)guidP(); }
 
-bool RpgHelper::InRange()
-{
-    return guidP() ? (guidP().sqDistance2d(bot) < INTERACTION_DISTANCE * INTERACTION_DISTANCE)
-                   : false;
-}
+bool RpgHelper::InRange() { return guidP() ? (guidP().sqDistance2d(bot) < INTERACTION_DISTANCE * INTERACTION_DISTANCE) : false; }
 
-void RpgHelper::setFacingTo(GuidPosition guidPosition)
-{
-    bot->SetFacingTo(guidPosition.getAngleTo(bot) + static_cast<float>(M_PI));
-}
+void RpgHelper::setFacingTo(GuidPosition guidPosition) { bot->SetFacingTo(guidPosition.getAngleTo(bot) + static_cast<float>(M_PI)); }
 
 void RpgHelper::setFacing(GuidPosition guidPosition)
 {
@@ -78,8 +71,7 @@ void RpgHelper::setFacing(GuidPosition guidPosition)
 
 void RpgHelper::setDelay(bool waitForGroup)
 {
-    if (!botAI->HasRealPlayerMaster() ||
-        (waitForGroup && botAI->GetGroupMaster() == bot && bot->GetGroup()))
+    if (!botAI->HasRealPlayerMaster() || (waitForGroup && botAI->GetGroupMaster() == bot && bot->GetGroup()))
         botAI->SetNextCheckDelay(sPlayerbotAIConfig->rpgDelay);
     else
         botAI->SetNextCheckDelay(sPlayerbotAIConfig->rpgDelay / 5);
@@ -152,15 +144,13 @@ bool RpgTaxiAction::Execute(Event event)
     WorldPacket emptyPacket;
     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(),
-                                                 guidP.getMapId(), bot->GetTeamId());
+    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
 
     std::vector<uint32> nodes;
     for (uint32 i = 0; i < sTaxiPathStore.GetNumRows(); ++i)
     {
         TaxiPathEntry const *entry = sTaxiPathStore.LookupEntry(i);
-        if (entry && entry->from == node &&
-            (bot->m_taxi.IsTaximaskNodeKnown(entry->to) || bot->isTaxiCheater()))
+        if (entry && entry->from == node && (bot->m_taxi.IsTaximaskNodeKnown(entry->to) || bot->isTaxiCheater()))
         {
             nodes.push_back(i);
         }
@@ -186,21 +176,17 @@ bool RpgTaxiAction::Execute(Event event)
     Creature *flightMaster = bot->GetNPCIfCanInteractWith(guidP, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!flightMaster)
     {
-        LOG_ERROR("playerbots", "Bot {} cannot talk to flightmaster ({} location available)",
-                  bot->GetName(), nodes.size());
+        LOG_ERROR("playerbots", "Bot {} cannot talk to flightmaster ({} location available)", bot->GetName(), nodes.size());
         return false;
     }
 
     if (!bot->ActivateTaxiPathTo({entry->from, entry->to}, flightMaster, 0))
     {
-        LOG_ERROR("playerbots", "Bot {} cannot fly {} ({} location available)", bot->GetName(),
-                  path, nodes.size());
+        LOG_ERROR("playerbots", "Bot {} cannot fly {} ({} location available)", bot->GetName(), path, nodes.size());
         return false;
     }
 
-    LOG_INFO("playerbots", "Bot {} <{}> is flying from {} to {} ({} location available)",
-             bot->GetGUID().ToString().c_str(), bot->GetName(), nodeFrom->name[0], nodeTo->name[0],
-             nodes.size());
+    LOG_INFO("playerbots", "Bot {} <{}> is flying from {} to {} ({} location available)", bot->GetGUID().ToString().c_str(), bot->GetName(), nodeFrom->name[0], nodeTo->name[0], nodes.size());
 
     bot->SetMoney(money);
 
@@ -213,8 +199,7 @@ bool RpgDiscoverAction::Execute(Event event)
 {
     GuidPosition guidP = rpg->guidP();
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(),
-                                                 guidP.getMapId(), bot->GetTeamId());
+    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
 
     if (!node)
         return false;
@@ -293,24 +278,15 @@ std::string const RpgBuyPetitionAction::ActionName() { return "buy petition"; }
 
 std::string const RpgUseAction::ActionName() { return "use"; }
 
-Event RpgUseAction::ActionEvent(Event event)
-{
-    return Event("rpg action", chat->FormatWorldobject(rpg->guidP().GetWorldObject()));
-}
+Event RpgUseAction::ActionEvent(Event event) { return Event("rpg action", chat->FormatWorldobject(rpg->guidP().GetWorldObject())); }
 
 std::string const RpgSpellAction::ActionName() { return "cast random spell"; }
 
-Event RpgSpellAction::ActionEvent(Event event)
-{
-    return Event("rpg action", chat->FormatWorldobject(rpg->guidP().GetWorldObject()));
-}
+Event RpgSpellAction::ActionEvent(Event event) { return Event("rpg action", chat->FormatWorldobject(rpg->guidP().GetWorldObject())); }
 
 std::string const RpgCraftAction::ActionName() { return "craft random item"; }
 
-Event RpgCraftAction::ActionEvent(Event event)
-{
-    return Event("rpg action", chat->FormatWorldobject(rpg->guidP().GetWorldObject()));
-}
+Event RpgCraftAction::ActionEvent(Event event) { return Event("rpg action", chat->FormatWorldobject(rpg->guidP().GetWorldObject())); }
 
 std::vector<Item *> RpgTradeUsefulAction::CanGiveItems(GuidPosition guidPosition)
 {
@@ -321,13 +297,11 @@ std::vector<Item *> RpgTradeUsefulAction::CanGiveItems(GuidPosition guidPosition
     if (botAI->HasActivePlayerMaster() || !GET_PLAYERBOT_AI(player))
         return giveItems;
 
-    std::vector<ItemUsage> myUsages = {ITEM_USAGE_NONE, ITEM_USAGE_VENDOR, ITEM_USAGE_AH,
-                                       ITEM_USAGE_DISENCHANT};
+    std::vector<ItemUsage> myUsages = {ITEM_USAGE_NONE, ITEM_USAGE_VENDOR, ITEM_USAGE_AH, ITEM_USAGE_DISENCHANT};
 
     for (auto &myUsage : myUsages)
     {
-        std::vector<Item *> myItems =
-            AI_VALUE2(std::vector<Item *>, "inventory items", "usage " + std::to_string(myUsage));
+        std::vector<Item *> myItems = AI_VALUE2(std::vector<Item *>, "inventory items", "usage " + std::to_string(myUsage));
         std::reverse(myItems.begin(), myItems.end());
 
         for (auto &item : myItems)
@@ -370,24 +344,16 @@ bool RpgTradeUsefulAction::Execute(Event event)
     param << " ";
     param << chat->FormatItem(item->GetTemplate());
 
-    bool hasTraded =
-        botAI->DoSpecificAction("trade", Event("rpg action", param.str().c_str()), true);
+    bool hasTraded = botAI->DoSpecificAction("trade", Event("rpg action", param.str().c_str()), true);
 
     if (hasTraded || bot->GetTradeData())
     {
         if (bot->GetTradeData() && bot->GetTradeData()->HasItem(item->GetGUID()))
         {
             if (bot->GetGroup() && bot->GetGroup()->IsMember(guidP) && botAI->HasRealPlayerMaster())
-                botAI->TellMasterNoFacing(
-                    "You can use this " + chat->FormatItem(item->GetTemplate()) +
-                    " better than me, " +
-                    guidP.GetPlayer()->GetName() /*chat->FormatWorldobject(guidP.GetPlayer())*/ +
-                    ".");
+                botAI->TellMasterNoFacing("You can use this " + chat->FormatItem(item->GetTemplate()) + " better than me, " + guidP.GetPlayer()->GetName() /*chat->FormatWorldobject(guidP.GetPlayer())*/ + ".");
             else
-                bot->Say("You can use this " + chat->FormatItem(item->GetTemplate()) +
-                             " better than me, " +
-                             player->GetName() /*chat->FormatWorldobject(player)*/ + ".",
-                         (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
+                bot->Say("You can use this " + chat->FormatItem(item->GetTemplate()) + " better than me, " + player->GetName() /*chat->FormatWorldobject(player)*/ + ".", (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
 
             if (!urand(0, 4) || items.size() < 2)
             {
@@ -400,8 +366,7 @@ bool RpgTradeUsefulAction::Execute(Event event)
             }
         }
         else
-            bot->Say("Start trade with" + chat->FormatWorldobject(player),
-                     (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
+            bot->Say("Start trade with" + chat->FormatWorldobject(player), (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
 
         botAI->SetNextCheckDelay(sPlayerbotAIConfig->rpgDelay);
         return true;
@@ -437,14 +402,10 @@ bool RpgDuelAction::Execute(Event event)
     if (!player)
         return false;
 
-    return botAI->DoSpecificAction(
-        "cast custom spell", Event("rpg action", chat->FormatWorldobject(player) + " 7266"), true);
+    return botAI->DoSpecificAction("cast custom spell", Event("rpg action", chat->FormatWorldobject(player) + " 7266"), true);
 }
 
-bool RpgMountAnimAction::isUseful()
-{
-    return AI_VALUE2(bool, "mounted", "self target") && !AI_VALUE2(bool, "moving", "self target");
-}
+bool RpgMountAnimAction::isUseful() { return AI_VALUE2(bool, "mounted", "self target") && !AI_VALUE2(bool, "moving", "self target"); }
 
 bool RpgMountAnimAction::Execute(Event event)
 {

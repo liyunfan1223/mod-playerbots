@@ -22,20 +22,18 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
    private:
     static ActionNode *arcane_blast([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode(
-            "arcane blast",
-            /*P*/ nullptr,
-            /*A*/ NextAction::array(0, new NextAction("arcane missiles"), nullptr),
-            /*C*/ nullptr);
+        return new ActionNode("arcane blast",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("arcane missiles"), nullptr),
+                              /*C*/ nullptr);
     }
 
     static ActionNode *arcane_barrage([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode(
-            "arcane barrage",
-            /*P*/ nullptr,
-            /*A*/ NextAction::array(0, new NextAction("arcane missiles"), nullptr),
-            /*C*/ nullptr);
+        return new ActionNode("arcane barrage",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("arcane missiles"), nullptr),
+                              /*C*/ nullptr);
     }
 
     static ActionNode *arcane_missiles([[maybe_unused]] PlayerbotAI *botAI)
@@ -55,24 +53,15 @@ class ArcaneMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
     // }
 };
 
-ArcaneMageStrategy::ArcaneMageStrategy(PlayerbotAI *botAI) : GenericMageStrategy(botAI)
-{
-    actionNodeFactories.Add(new ArcaneMageStrategyActionNodeFactory());
-}
+ArcaneMageStrategy::ArcaneMageStrategy(PlayerbotAI *botAI) : GenericMageStrategy(botAI) { actionNodeFactories.Add(new ArcaneMageStrategyActionNodeFactory()); }
 
-NextAction **ArcaneMageStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("arcane blast", ACTION_DEFAULT + 0.1f),
-                             new NextAction("shoot", ACTION_DEFAULT), NULL);
-}
+NextAction **ArcaneMageStrategy::getDefaultActions() { return NextAction::array(0, new NextAction("arcane blast", ACTION_DEFAULT + 0.1f), new NextAction("shoot", ACTION_DEFAULT), NULL); }
 
 void ArcaneMageStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     GenericMageStrategy::InitTriggers(triggers);
 
-    triggers.push_back(
-        new TriggerNode("arcane blast stack",
-                        NextAction::array(0, new NextAction("arcane missiles", 15.0f), NULL)));
+    triggers.push_back(new TriggerNode("arcane blast stack", NextAction::array(0, new NextAction("arcane missiles", 15.0f), NULL)));
 }
 
 void ArcaneMageAoeStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
@@ -81,6 +70,5 @@ void ArcaneMageAoeStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
     //     "high aoe",
     //     NextAction::array(0, new NextAction("arcane explosion", 39.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "medium aoe", NextAction::array(0, new NextAction("blizzard", 40.0f), NULL)));
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("blizzard", 40.0f), NULL)));
 }

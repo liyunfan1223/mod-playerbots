@@ -31,9 +31,7 @@ class AutoShotTrigger : public Trigger
 class HunterAspectOfTheMonkeyTrigger : public BuffTrigger
 {
    public:
-    HunterAspectOfTheMonkeyTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "aspect of the monkey")
-    {
-    }
+    HunterAspectOfTheMonkeyTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "aspect of the monkey") {}
 };
 
 class HunterAspectOfTheHawkTrigger : public BuffTrigger
@@ -83,9 +81,7 @@ class BlackArrowTrigger : public DebuffTrigger
 class HuntersMarkTrigger : public DebuffTrigger
 {
    public:
-    HuntersMarkTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "hunter's mark", 1, false, 25.0f)
-    {
-    }
+    HuntersMarkTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "hunter's mark", 1, false, 25.0f) {}
 };
 
 class FreezingTrapTrigger : public HasCcTargetTrigger
@@ -109,10 +105,7 @@ class TrueshotAuraTrigger : public BuffTrigger
 class SerpentStingOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
    public:
-    SerpentStingOnAttackerTrigger(PlayerbotAI *botAI)
-        : DebuffOnAttackerTrigger(botAI, "serpent sting", true)
-    {
-    }
+    SerpentStingOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnAttackerTrigger(botAI, "serpent sting", true) {}
 };
 
 BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
@@ -171,18 +164,13 @@ class SwitchToMeleeTrigger : public Trigger
 class MisdirectionOnMainTankTrigger : public BuffOnMainTankTrigger
 {
    public:
-    MisdirectionOnMainTankTrigger(PlayerbotAI *ai) : BuffOnMainTankTrigger(ai, "misdirection", true)
-    {
-    }
+    MisdirectionOnMainTankTrigger(PlayerbotAI *ai) : BuffOnMainTankTrigger(ai, "misdirection", true) {}
 };
 
 class TargetRemoveEnrageTrigger : public TargetAuraDispelTrigger
 {
    public:
-    TargetRemoveEnrageTrigger(PlayerbotAI *ai)
-        : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_ENRAGE)
-    {
-    }
+    TargetRemoveEnrageTrigger(PlayerbotAI *ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_ENRAGE) {}
     bool IsActive() override;
 };
 #endif

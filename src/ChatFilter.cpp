@@ -68,8 +68,7 @@ class LevelChatFilter : public ChatFilter
 
         if (message.find("-") != std::string::npos)
         {
-            uint32 fromLevel =
-                atoi(message.substr(message.find("@") + 1, message.find("-")).c_str());
+            uint32 fromLevel = atoi(message.substr(message.find("@") + 1, message.find("-")).c_str());
             uint32 toLevel = atoi(message.substr(message.find("-") + 1, message.find(" ")).c_str());
 
             if (bot->GetLevel() >= fromLevel && bot->GetLevel() <= toLevel)
@@ -216,8 +215,7 @@ class ClassChatFilter : public ChatFilter
 
         bool found = false;
         bool isClass = false;
-        for (std::map<std::string, uint8>::iterator i = classNames.begin(); i != classNames.end();
-             i++)
+        for (std::map<std::string, uint8>::iterator i = classNames.begin(); i != classNames.end(); i++)
         {
             bool isClass = message.find(i->first) == 0;
             if (isClass && bot->getClass() != i->second)

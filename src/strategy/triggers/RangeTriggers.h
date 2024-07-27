@@ -15,9 +15,7 @@ class PlayerbotAI;
 class EnemyTooCloseForSpellTrigger : public Trigger
 {
    public:
-    EnemyTooCloseForSpellTrigger(PlayerbotAI *botAI) : Trigger(botAI, "enemy too close for spell")
-    {
-    }
+    EnemyTooCloseForSpellTrigger(PlayerbotAI *botAI) : Trigger(botAI, "enemy too close for spell") {}
 
     bool IsActive() override;
 };
@@ -25,9 +23,7 @@ class EnemyTooCloseForSpellTrigger : public Trigger
 class EnemyTooCloseForShootTrigger : public Trigger
 {
    public:
-    EnemyTooCloseForShootTrigger(PlayerbotAI *botAI) : Trigger(botAI, "enemy too close for shoot")
-    {
-    }
+    EnemyTooCloseForShootTrigger(PlayerbotAI *botAI) : Trigger(botAI, "enemy too close for shoot") {}
 
     bool IsActive() override;
 };
@@ -35,10 +31,7 @@ class EnemyTooCloseForShootTrigger : public Trigger
 class EnemyTooCloseForAutoShotTrigger : public Trigger
 {
    public:
-    EnemyTooCloseForAutoShotTrigger(PlayerbotAI *botAI)
-        : Trigger(botAI, "enemy too close for auto shot")
-    {
-    }
+    EnemyTooCloseForAutoShotTrigger(PlayerbotAI *botAI) : Trigger(botAI, "enemy too close for auto shot") {}
 
     bool IsActive() override;
 };
@@ -46,10 +39,7 @@ class EnemyTooCloseForAutoShotTrigger : public Trigger
 class EnemyTooCloseForMeleeTrigger : public Trigger
 {
    public:
-    EnemyTooCloseForMeleeTrigger(PlayerbotAI *botAI)
-        : Trigger(botAI, "enemy too close for melee", 5)
-    {
-    }
+    EnemyTooCloseForMeleeTrigger(PlayerbotAI *botAI) : Trigger(botAI, "enemy too close for melee", 5) {}
 
     bool IsActive() override;
 };
@@ -73,10 +63,7 @@ class EnemyWithinMeleeTrigger : public Trigger
 class OutOfRangeTrigger : public Trigger
 {
    public:
-    OutOfRangeTrigger(PlayerbotAI *botAI, std::string const name, float distance)
-        : Trigger(botAI, name), distance(distance)
-    {
-    }
+    OutOfRangeTrigger(PlayerbotAI *botAI, std::string const name, float distance) : Trigger(botAI, name), distance(distance) {}
 
     bool IsActive() override;
     std::string const GetTargetName() override { return "current target"; }
@@ -88,10 +75,7 @@ class OutOfRangeTrigger : public Trigger
 class EnemyOutOfMeleeTrigger : public OutOfRangeTrigger
 {
    public:
-    EnemyOutOfMeleeTrigger(PlayerbotAI *botAI)
-        : OutOfRangeTrigger(botAI, "enemy out of melee range", sPlayerbotAIConfig->meleeDistance)
-    {
-    }
+    EnemyOutOfMeleeTrigger(PlayerbotAI *botAI) : OutOfRangeTrigger(botAI, "enemy out of melee range", sPlayerbotAIConfig->meleeDistance) {}
 
     // bool IsActive() override;
 };
@@ -114,11 +98,7 @@ class PartyMemberToHealOutOfSpellRangeTrigger : public OutOfRangeTrigger
 class FarFromMasterTrigger : public Trigger
 {
    public:
-    FarFromMasterTrigger(PlayerbotAI *botAI, std::string const name = "far from master",
-                         float distance = 12.0f, int32 checkInterval = 50)
-        : Trigger(botAI, name, checkInterval), distance(distance)
-    {
-    }
+    FarFromMasterTrigger(PlayerbotAI *botAI, std::string const name = "far from master", float distance = 12.0f, int32 checkInterval = 50) : Trigger(botAI, name, checkInterval), distance(distance) {}
 
     bool IsActive() override;
 
@@ -129,10 +109,7 @@ class FarFromMasterTrigger : public Trigger
 class OutOfReactRangeTrigger : public FarFromMasterTrigger
 {
    public:
-    OutOfReactRangeTrigger(PlayerbotAI *botAI)
-        : FarFromMasterTrigger(botAI, "out of react range", 50.0f, 5)
-    {
-    }
+    OutOfReactRangeTrigger(PlayerbotAI *botAI) : FarFromMasterTrigger(botAI, "out of react range", 50.0f, 5) {}
 };
 
 #endif

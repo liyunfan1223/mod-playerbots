@@ -15,9 +15,7 @@ class PlayerbotAI;
 class InviteToGroupAction : public Action
 {
    public:
-    InviteToGroupAction(PlayerbotAI *botAI, std::string const name = "invite") : Action(botAI, name)
-    {
-    }
+    InviteToGroupAction(PlayerbotAI *botAI, std::string const name = "invite") : Action(botAI, name) {}
 
     bool Execute(Event event) override;
 
@@ -27,10 +25,7 @@ class InviteToGroupAction : public Action
 class InviteNearbyToGroupAction : public InviteToGroupAction
 {
    public:
-    InviteNearbyToGroupAction(PlayerbotAI *botAI, std::string const name = "invite nearby")
-        : InviteToGroupAction(botAI, name)
-    {
-    }
+    InviteNearbyToGroupAction(PlayerbotAI *botAI, std::string const name = "invite nearby") : InviteToGroupAction(botAI, name) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -53,10 +48,7 @@ class FindGuildMembers
 class InviteGuildToGroupAction : public InviteNearbyToGroupAction
 {
    public:
-    InviteGuildToGroupAction(PlayerbotAI *botAI, std::string const name = "invite guild")
-        : InviteNearbyToGroupAction(botAI, name)
-    {
-    }
+    InviteGuildToGroupAction(PlayerbotAI *botAI, std::string const name = "invite guild") : InviteNearbyToGroupAction(botAI, name) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;

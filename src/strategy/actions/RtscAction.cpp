@@ -80,9 +80,7 @@ bool RTSCAction::Execute(Event event)
         WorldPosition spellPosition(bot);
         SET_AI_VALUE2(WorldPosition, "RTSC saved location", locationName, spellPosition);
 
-        Creature *wpCreature = bot->SummonCreature(
-            15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(),
-            spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
+        Creature *wpCreature = bot->SummonCreature(15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
         wpCreature->SetObjectScale(0.5f);
 
         return true;
@@ -110,9 +108,7 @@ bool RTSCAction::Execute(Event event)
 
         if (spellPosition)
         {
-            Creature *wpCreature = bot->SummonCreature(
-                15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(),
-                spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
+            Creature *wpCreature = bot->SummonCreature(15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
             wpCreature->SetObjectScale(0.5f);
         }
 

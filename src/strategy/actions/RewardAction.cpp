@@ -56,13 +56,11 @@ bool RewardAction::Reward(uint32 itemId, Object *questGiver)
         QuestStatus status = bot->GetQuestStatus(questID);
 
         // if quest is complete, turn it in
-        if (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questID) &&
-            pQuest->GetRewChoiceItemsCount() > 1 && bot->CanRewardQuest(pQuest, false))
+        if (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questID) && pQuest->GetRewChoiceItemsCount() > 1 && bot->CanRewardQuest(pQuest, false))
         {
             for (uint8 rewardIdx = 0; rewardIdx < pQuest->GetRewChoiceItemsCount(); ++rewardIdx)
             {
-                ItemTemplate const *pRewardItem =
-                    sObjectMgr->GetItemTemplate(pQuest->RewardChoiceItemId[rewardIdx]);
+                ItemTemplate const *pRewardItem = sObjectMgr->GetItemTemplate(pQuest->RewardChoiceItemId[rewardIdx]);
                 if (itemId == pRewardItem->ItemId)
                 {
                     bot->RewardQuest(pQuest, rewardIdx, questGiver, false);

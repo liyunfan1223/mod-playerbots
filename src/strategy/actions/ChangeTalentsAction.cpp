@@ -36,8 +36,7 @@ bool ChangeTalentsAction::Execute(Event event)
             }
             else if (param.find("switch 2") != std::string::npos)
             {
-                if (bot->GetSpecsCount() == 1 &&
-                    bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
+                if (bot->GetSpecsCount() == 1 && bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
                 {
                     bot->CastSpell(bot, 63680, true, nullptr, nullptr, bot->GetGUID());
                     bot->CastSpell(bot, 63624, true, nullptr, nullptr, bot->GetGUID());
@@ -107,8 +106,7 @@ std::string ChangeTalentsAction::SpecList()
         }
         specFound++;
         std::ostringstream out;
-        std::vector<std::vector<uint32>> parsed =
-            sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][80];
+        std::vector<std::vector<uint32>> parsed = sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][80];
         std::unordered_map<int, int> tabCount;
         tabCount[0] = tabCount[1] = tabCount[2] = 0;
         for (auto &item : parsed)
@@ -150,8 +148,7 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 {
     int cls = bot->getClass();
     std::ostringstream out;
-    std::vector<std::vector<uint32>> parsedSpecLink =
-        PlayerbotAIConfig::ParseTempTalentsOrder(cls, param);
+    std::vector<std::vector<uint32>> parsedSpecLink = PlayerbotAIConfig::ParseTempTalentsOrder(cls, param);
     if (parsedSpecLink.size() == 0)
     {
         out << "Invalid link " << param;

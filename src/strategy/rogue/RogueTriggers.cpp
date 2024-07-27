@@ -22,11 +22,7 @@ bool UnstealthTrigger::IsActive()
 
     return botAI->HasAura("stealth", bot) && !AI_VALUE(uint8, "attacker count") &&
            (AI_VALUE2(bool, "moving", "self target") &&
-            ((botAI->GetMaster() &&
-              sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"),
-                                                   10.0f) &&
-              AI_VALUE2(bool, "moving", "master target")) ||
-             !AI_VALUE(uint8, "attacker count")));
+            ((botAI->GetMaster() && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"), 10.0f) && AI_VALUE2(bool, "moving", "master target")) || !AI_VALUE(uint8, "attacker count")));
 }
 
 bool StealthTrigger::IsActive()
@@ -65,10 +61,7 @@ bool StealthTrigger::IsActive()
     return target && sServerFacade->GetDistance2d(bot, target) < distance;
 }
 
-bool SapTrigger::IsPossible()
-{
-    return bot->GetLevel() > 10 && bot->HasSpell(6770) && !bot->IsInCombat();
-}
+bool SapTrigger::IsPossible() { return bot->GetLevel() > 10 && bot->HasSpell(6770) && !bot->IsInCombat(); }
 
 bool SprintTrigger::IsPossible() { return bot->HasSpell(2983); }
 
@@ -102,22 +95,11 @@ bool SprintTrigger::IsActive()
     if ((dps && dps->IsInCombat()) || enemyPlayer)
         distance -= 10;
 
-    return AI_VALUE2(bool, "moving", "self target") &&
-           (AI_VALUE2(bool, "moving", "dps target") ||
-            AI_VALUE2(bool, "moving", "enemy player target")) &&
-           targeted &&
-           (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"),
-                                                 distance) ||
-            sServerFacade->IsDistanceGreaterThan(
-                AI_VALUE2(float, "distance", "enemy player target"), distance));
+    return AI_VALUE2(bool, "moving", "self target") && (AI_VALUE2(bool, "moving", "dps target") || AI_VALUE2(bool, "moving", "enemy player target")) && targeted &&
+           (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), distance) || sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), distance));
 }
 
-bool ExposeArmorTrigger::IsActive()
-{
-    return DebuffTrigger::IsActive() &&
-           !botAI->HasAura("sunder armor", bot, false, false, -1, true) &&
-           AI_VALUE2(uint8, "combo", "current target") <= 3;
-}
+bool ExposeArmorTrigger::IsActive() { return DebuffTrigger::IsActive() && !botAI->HasAura("sunder armor", bot, false, false, -1, true) && AI_VALUE2(uint8, "combo", "current target") <= 3; }
 
 bool MainHandWeaponNoEnchantTrigger::IsActive()
 {
@@ -142,6 +124,5 @@ bool TargetWithComboPointsLowerHealTrigger::IsActive()
     {
         return false;
     }
-    return ComboPointsAvailableTrigger::IsActive() &&
-           (target->GetHealth() / AI_VALUE(float, "expected group dps")) <= lifeTime;
+    return ComboPointsAvailableTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) <= lifeTime;
 }

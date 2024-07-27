@@ -56,13 +56,9 @@ class PlayerbotAIConfig
 
     bool enabled;
     bool allowGuildBots, allowPlayerBots;
-    uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime,
-        expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay, errorDelay, rpgDelay,
-        sitDelay, returnDelay, lootDelay;
-    float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance,
-        fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance,
-        contactDistance, aoeRadius, rpgDistance, targetPosRecalcDistance, farDistance, healDistance,
-        aggroDistance;
+    uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime, expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay, errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
+    float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance, fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance, aoeRadius, rpgDistance, targetPosRecalcDistance,
+        farDistance, healDistance, aggroDistance;
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
     uint32 lowMana, mediumMana;
     bool autoSaveMana;
@@ -87,8 +83,7 @@ class PlayerbotAIConfig
     float randomBotMaxLevelChance;
     float randomBotRpgChance;
     uint32 minRandomBots, maxRandomBots;
-    uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval,
-        randomBotCountChangeMaxInterval;
+    uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval, randomBotCountChangeMaxInterval;
     uint32 minRandomBotInWorldTime, maxRandomBotInWorldTime;
     uint32 minRandomBotRandomizeTime, maxRandomBotRandomizeTime;
     uint32 minRandomBotChangeStrategyTime, maxRandomBotChangeStrategyTime;
@@ -233,11 +228,7 @@ class PlayerbotAIConfig
     int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
 
     std::string const GetTimestampStr();
-    bool hasLog(std::string const fileName)
-    {
-        return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) !=
-               allowedLogFiles.end();
-    };
+    bool hasLog(std::string const fileName) { return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) != allowedLogFiles.end(); };
     bool openLog(std::string const fileName, char const *mode = "a");
     bool isLogOpen(std::string const fileName)
     {
@@ -247,8 +238,7 @@ class PlayerbotAIConfig
     void log(std::string const fileName, const char *str, ...);
 
     void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
-    static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls,
-                                                                  std::string temp_talents_order);
+    static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

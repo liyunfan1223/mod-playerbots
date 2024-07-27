@@ -20,10 +20,7 @@ class CasterDruidStrategy : public GenericDruidStrategy
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
     std::string const getName() override { return "caster"; }
     NextAction **getDefaultActions() override;
-    uint32 GetType() const override
-    {
-        return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED;
-    }
+    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
 };
 
 class CasterDruidAoeStrategy : public CombatStrategy

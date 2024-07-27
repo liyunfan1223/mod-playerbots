@@ -17,10 +17,7 @@ class SpellInfo;
 class ItemForSpellValue : public CalculatedValue<Item *>, public Qualified
 {
    public:
-    ItemForSpellValue(PlayerbotAI *botAI, std::string const name = "item for spell")
-        : CalculatedValue<Item *>(botAI, name, 1)
-    {
-    }
+    ItemForSpellValue(PlayerbotAI *botAI, std::string const name = "item for spell") : CalculatedValue<Item *>(botAI, name, 1) {}
 
     Item *Calculate() override;
 

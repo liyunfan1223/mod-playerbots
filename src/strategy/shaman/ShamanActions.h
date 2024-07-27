@@ -15,19 +15,13 @@ class PlayerbotAI;
 class CastLesserHealingWaveAction : public CastHealingSpellAction
 {
    public:
-    CastLesserHealingWaveAction(PlayerbotAI* botAI)
-        : CastHealingSpellAction(botAI, "lesser healing wave")
-    {
-    }
+    CastLesserHealingWaveAction(PlayerbotAI* botAI) : CastHealingSpellAction(botAI, "lesser healing wave") {}
 };
 
 class CastLesserHealingWaveOnPartyAction : public HealPartyMemberAction
 {
    public:
-    CastLesserHealingWaveOnPartyAction(PlayerbotAI* botAI)
-        : HealPartyMemberAction(botAI, "lesser healing wave", 25.0f, HealingManaEfficiency::LOW)
-    {
-    }
+    CastLesserHealingWaveOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "lesser healing wave", 25.0f, HealingManaEfficiency::LOW) {}
 };
 
 class CastHealingWaveAction : public CastHealingSpellAction
@@ -39,19 +33,13 @@ class CastHealingWaveAction : public CastHealingSpellAction
 class CastHealingWaveOnPartyAction : public HealPartyMemberAction
 {
    public:
-    CastHealingWaveOnPartyAction(PlayerbotAI* botAI)
-        : HealPartyMemberAction(botAI, "healing wave", 50.0f, HealingManaEfficiency::MEDIUM)
-    {
-    }
+    CastHealingWaveOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "healing wave", 50.0f, HealingManaEfficiency::MEDIUM) {}
 };
 
 class CastChainHealAction : public CastAoeHealSpellAction
 {
    public:
-    CastChainHealAction(PlayerbotAI* botAI)
-        : CastAoeHealSpellAction(botAI, "chain heal", 15.0f, HealingManaEfficiency::HIGH)
-    {
-    }
+    CastChainHealAction(PlayerbotAI* botAI) : CastAoeHealSpellAction(botAI, "chain heal", 15.0f, HealingManaEfficiency::HIGH) {}
 };
 
 class CastRiptideAction : public CastHealingSpellAction
@@ -63,10 +51,7 @@ class CastRiptideAction : public CastHealingSpellAction
 class CastRiptideOnPartyAction : public HealPartyMemberAction
 {
    public:
-    CastRiptideOnPartyAction(PlayerbotAI* botAI)
-        : HealPartyMemberAction(botAI, "riptide", 15.0f, HealingManaEfficiency::VERY_HIGH)
-    {
-    }
+    CastRiptideOnPartyAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "riptide", 15.0f, HealingManaEfficiency::VERY_HIGH) {}
 };
 
 class CastEarthShieldAction : public CastBuffSpellAction
@@ -90,60 +75,43 @@ class CastWaterShieldAction : public CastBuffSpellAction
 class CastLightningShieldAction : public CastBuffSpellAction
 {
    public:
-    CastLightningShieldAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "lightning shield")
-    {
-    }
+    CastLightningShieldAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "lightning shield") {}
 };
 
 class CastEarthlivingWeaponAction : public CastEnchantItemAction
 {
    public:
-    CastEarthlivingWeaponAction(PlayerbotAI* botAI)
-        : CastEnchantItemAction(botAI, "earthliving weapon")
-    {
-    }
+    CastEarthlivingWeaponAction(PlayerbotAI* botAI) : CastEnchantItemAction(botAI, "earthliving weapon") {}
 };
 
 class CastRockbiterWeaponAction : public CastEnchantItemAction
 {
    public:
-    CastRockbiterWeaponAction(PlayerbotAI* botAI) : CastEnchantItemAction(botAI, "rockbiter weapon")
-    {
-    }
+    CastRockbiterWeaponAction(PlayerbotAI* botAI) : CastEnchantItemAction(botAI, "rockbiter weapon") {}
 };
 
 class CastFlametongueWeaponAction : public CastEnchantItemAction
 {
    public:
-    CastFlametongueWeaponAction(PlayerbotAI* botAI)
-        : CastEnchantItemAction(botAI, "flametongue weapon")
-    {
-    }
+    CastFlametongueWeaponAction(PlayerbotAI* botAI) : CastEnchantItemAction(botAI, "flametongue weapon") {}
 };
 
 class CastFrostbrandWeaponAction : public CastEnchantItemAction
 {
    public:
-    CastFrostbrandWeaponAction(PlayerbotAI* botAI)
-        : CastEnchantItemAction(botAI, "frostbrand weapon")
-    {
-    }
+    CastFrostbrandWeaponAction(PlayerbotAI* botAI) : CastEnchantItemAction(botAI, "frostbrand weapon") {}
 };
 
 class CastWindfuryWeaponAction : public CastEnchantItemAction
 {
    public:
-    CastWindfuryWeaponAction(PlayerbotAI* botAI) : CastEnchantItemAction(botAI, "windfury weapon")
-    {
-    }
+    CastWindfuryWeaponAction(PlayerbotAI* botAI) : CastEnchantItemAction(botAI, "windfury weapon") {}
 };
 
 class CastTotemAction : public CastBuffSpellAction
 {
    public:
-    CastTotemAction(PlayerbotAI* botAI, std::string const spell, std::string const buffName = "",
-                    float needLifeTime = 8.0f)
-        : CastBuffSpellAction(botAI, spell), needLifeTime(needLifeTime)
+    CastTotemAction(PlayerbotAI* botAI, std::string const spell, std::string const buffName = "", float needLifeTime = 8.0f) : CastBuffSpellAction(botAI, spell), needLifeTime(needLifeTime)
     {
         if (buffName == "")
         {
@@ -177,19 +145,13 @@ class CastEarthbindTotemAction : public CastTotemAction
 class CastStrengthOfEarthTotemAction : public CastTotemAction
 {
    public:
-    CastStrengthOfEarthTotemAction(PlayerbotAI* botAI)
-        : CastTotemAction(botAI, "strength of earth totem", "strength of earth", 20.0f)
-    {
-    }
+    CastStrengthOfEarthTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "strength of earth totem", "strength of earth", 20.0f) {}
 };
 
 class CastManaSpringTotemAction : public CastTotemAction
 {
    public:
-    CastManaSpringTotemAction(PlayerbotAI* botAI)
-        : CastTotemAction(botAI, "mana spring totem", "mana spring", 0.0f)
-    {
-    }
+    CastManaSpringTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "mana spring totem", "mana spring", 0.0f) {}
 
     bool isUseful() override;
 };
@@ -205,10 +167,7 @@ class CastManaTideTotemAction : public CastTotemAction
 class CastHealingStreamTotemAction : public CastTotemAction
 {
    public:
-    CastHealingStreamTotemAction(PlayerbotAI* botAI)
-        : CastTotemAction(botAI, "healing stream totem")
-    {
-    }
+    CastHealingStreamTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "healing stream totem") {}
 };
 
 class CastCleansingTotemAction : public CastTotemAction
@@ -221,10 +180,7 @@ class CastCleansingTotemAction : public CastTotemAction
 class CastFlametongueTotemAction : public CastTotemAction
 {
    public:
-    CastFlametongueTotemAction(PlayerbotAI* botAI)
-        : CastTotemAction(botAI, "flametongue totem", "", 20.0f)
-    {
-    }
+    CastFlametongueTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "flametongue totem", "", 20.0f) {}
 
     bool isUseful() override;
 };
@@ -244,9 +200,7 @@ class CastGraceOfAirTotemAction : public CastTotemAction
 class CastSearingTotemAction : public CastTotemAction
 {
    public:
-    CastSearingTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "searing totem", "", 0.0f)
-    {
-    }
+    CastSearingTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "searing totem", "", 0.0f) {}
 
     std::string const GetTargetName() override { return "self target"; }
     bool isUseful() override;
@@ -276,10 +230,7 @@ class CastWindShearAction : public CastSpellAction
 class CastAncestralSpiritAction : public ResurrectPartyMemberAction
 {
    public:
-    CastAncestralSpiritAction(PlayerbotAI* botAI)
-        : ResurrectPartyMemberAction(botAI, "ancestral spirit")
-    {
-    }
+    CastAncestralSpiritAction(PlayerbotAI* botAI) : ResurrectPartyMemberAction(botAI, "ancestral spirit") {}
 };
 
 class CastPurgeAction : public CastSpellAction
@@ -315,10 +266,7 @@ class CastWaterWalkingAction : public CastBuffSpellAction
 class CastWaterBreathingOnPartyAction : public BuffOnPartyAction
 {
    public:
-    CastWaterBreathingOnPartyAction(PlayerbotAI* botAI)
-        : BuffOnPartyAction(botAI, "water breathing")
-    {
-    }
+    CastWaterBreathingOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "water breathing") {}
 };
 
 class CastWaterWalkingOnPartyAction : public BuffOnPartyAction
@@ -336,10 +284,7 @@ class CastCleanseSpiritAction : public CastCureSpellAction
 class CastCleanseSpiritPoisonOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastCleanseSpiritPoisonOnPartyAction(PlayerbotAI* botAI)
-        : CurePartyMemberAction(botAI, "cleanse spirit", DISPEL_POISON)
-    {
-    }
+    CastCleanseSpiritPoisonOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cleanse spirit", DISPEL_POISON) {}
 
     std::string const getName() override { return "cleanse spirit poison on party"; }
 };
@@ -347,10 +292,7 @@ class CastCleanseSpiritPoisonOnPartyAction : public CurePartyMemberAction
 class CastCleanseSpiritCurseOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastCleanseSpiritCurseOnPartyAction(PlayerbotAI* botAI)
-        : CurePartyMemberAction(botAI, "cleanse spirit", DISPEL_CURSE)
-    {
-    }
+    CastCleanseSpiritCurseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cleanse spirit", DISPEL_CURSE) {}
 
     std::string const getName() override { return "cleanse spirit curse on party"; }
 };
@@ -358,10 +300,7 @@ class CastCleanseSpiritCurseOnPartyAction : public CurePartyMemberAction
 class CastCleanseSpiritDiseaseOnPartyAction : public CurePartyMemberAction
 {
    public:
-    CastCleanseSpiritDiseaseOnPartyAction(PlayerbotAI* botAI)
-        : CurePartyMemberAction(botAI, "cleanse spirit", DISPEL_DISEASE)
-    {
-    }
+    CastCleanseSpiritDiseaseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cleanse spirit", DISPEL_DISEASE) {}
 
     std::string const getName() override { return "cleanse spirit disease on party"; }
 };
@@ -418,18 +357,13 @@ class CastBloodlustAction : public CastBuffSpellAction
 class CastElementalMasteryAction : public CastBuffSpellAction
 {
    public:
-    CastElementalMasteryAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "elemental mastery")
-    {
-    }
+    CastElementalMasteryAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "elemental mastery") {}
 };
 
 class CastWindShearOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
 {
    public:
-    CastWindShearOnEnemyHealerAction(PlayerbotAI* botAI)
-        : CastSpellOnEnemyHealerAction(botAI, "wind shear")
-    {
-    }
+    CastWindShearOnEnemyHealerAction(PlayerbotAI* botAI) : CastSpellOnEnemyHealerAction(botAI, "wind shear") {}
 };
 
 CURE_ACTION(CastCurePoisonActionSham, "cure disease");
@@ -447,10 +381,7 @@ class CastLavaBurstAction : public CastSpellAction
 class CastEarthShieldOnMainTankAction : public BuffOnMainTankAction
 {
    public:
-    CastEarthShieldOnMainTankAction(PlayerbotAI* ai)
-        : BuffOnMainTankAction(ai, "earth shield", false)
-    {
-    }
+    CastEarthShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "earth shield", false) {}
 };
 
 class CastTotemOfWrathAction : public CastTotemAction
@@ -464,10 +395,7 @@ class CastTotemOfWrathAction : public CastTotemAction
 class CastFireElementalTotemAction : public CastTotemAction
 {
    public:
-    CastFireElementalTotemAction(PlayerbotAI* ai)
-        : CastTotemAction(ai, "fire elemental totem", "", 0.0f)
-    {
-    }
+    CastFireElementalTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "fire elemental totem", "", 0.0f) {}
     virtual std::string const GetTargetName() override { return "self target"; }
     virtual bool isUseful() override { return CastTotemAction::isUseful(); }
 };
@@ -475,10 +403,7 @@ class CastFireElementalTotemAction : public CastTotemAction
 class CastWrathOfAirTotemAction : public CastTotemAction
 {
    public:
-    CastWrathOfAirTotemAction(PlayerbotAI* ai)
-        : CastTotemAction(ai, "wrath of air totem", "wrath of air totem")
-    {
-    }
+    CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem", "wrath of air totem") {}
 };
 
 class CastShamanisticRageAction : public CastBuffSpellAction

@@ -15,10 +15,7 @@ class Unit;
 class SelfTargetValue : public UnitCalculatedValue
 {
    public:
-    SelfTargetValue(PlayerbotAI *botAI, std::string const name = "self target")
-        : UnitCalculatedValue(botAI, name)
-    {
-    }
+    SelfTargetValue(PlayerbotAI *botAI, std::string const name = "self target") : UnitCalculatedValue(botAI, name) {}
 
     Unit *Calculate() override;
 };

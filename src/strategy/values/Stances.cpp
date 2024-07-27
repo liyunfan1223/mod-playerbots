@@ -193,10 +193,7 @@ class BehindStance : public MoveStance
     }
 };
 
-StanceValue::StanceValue(PlayerbotAI *botAI)
-    : ManualSetValue<Stance *>(botAI, new NearStance(botAI), "stance")
-{
-}
+StanceValue::StanceValue(PlayerbotAI *botAI) : ManualSetValue<Stance *>(botAI, new NearStance(botAI), "stance") {}
 
 std::string const StanceValue::Save() { return value ? value->getName() : "?"; }
 

@@ -24,8 +24,7 @@ bool MutatingInjectionRemovedTrigger::IsActive()
     {
         return false;
     }
-    return HasNoAuraTrigger::IsActive() && botAI->GetState() == BOT_STATE_COMBAT &&
-           botAI->IsRanged(bot);
+    return HasNoAuraTrigger::IsActive() && botAI->GetState() == BOT_STATE_COMBAT && botAI->IsRanged(bot);
 }
 
 template <class T>

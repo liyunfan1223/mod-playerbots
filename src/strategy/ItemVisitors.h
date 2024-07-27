@@ -70,10 +70,7 @@ class FindUsableItemVisitor : public FindItemVisitor
 class FindItemsByQualityVisitor : public IterateItemsVisitor
 {
    public:
-    FindItemsByQualityVisitor(uint32 quality, uint32 count)
-        : IterateItemsVisitor(), quality(quality), count(count)
-    {
-    }
+    FindItemsByQualityVisitor(uint32 quality, uint32 count) : IterateItemsVisitor(), quality(quality), count(count) {}
 
     bool Visit(Item *item) override
     {
@@ -98,10 +95,7 @@ class FindItemsByQualityVisitor : public IterateItemsVisitor
 class FindItemsToTradeByQualityVisitor : public FindItemsByQualityVisitor
 {
    public:
-    FindItemsToTradeByQualityVisitor(uint32 quality, uint32 count)
-        : FindItemsByQualityVisitor(quality, count)
-    {
-    }
+    FindItemsToTradeByQualityVisitor(uint32 quality, uint32 count) : FindItemsByQualityVisitor(quality, count) {}
 
     bool Visit(Item *item) override
     {
@@ -115,18 +109,14 @@ class FindItemsToTradeByQualityVisitor : public FindItemsByQualityVisitor
 class FindItemsToTradeByClassVisitor : public IterateItemsVisitor
 {
    public:
-    FindItemsToTradeByClassVisitor(uint32 itemClass, uint32 itemSubClass, uint32 count)
-        : IterateItemsVisitor(), itemClass(itemClass), itemSubClass(itemSubClass), count(count)
-    {
-    }  // reorder args - whipowill
+    FindItemsToTradeByClassVisitor(uint32 itemClass, uint32 itemSubClass, uint32 count) : IterateItemsVisitor(), itemClass(itemClass), itemSubClass(itemSubClass), count(count) {}  // reorder args - whipowill
 
     bool Visit(Item *item) override
     {
         if (item->IsSoulBound())
             return true;
 
-        if (item->GetTemplate()->Class != itemClass ||
-            item->GetTemplate()->SubClass != itemSubClass)
+        if (item->GetTemplate()->Class != itemClass || item->GetTemplate()->SubClass != itemSubClass)
             return true;
 
         if (result.size() >= (size_t)count)
@@ -186,15 +176,9 @@ class QueryNamedItemCountVisitor : public QueryItemCountVisitor
 class FindNamedItemVisitor : public FindItemVisitor
 {
    public:
-    FindNamedItemVisitor([[maybe_unused]] Player *bot, std::string const name)
-        : FindItemVisitor(), name(name)
-    {
-    }
+    FindNamedItemVisitor([[maybe_unused]] Player *bot, std::string const name) : FindItemVisitor(), name(name) {}
 
-    bool Accept(ItemTemplate const *proto) override
-    {
-        return proto && proto->Name1.c_str() && strstri(proto->Name1.c_str(), name.c_str());
-    }
+    bool Accept(ItemTemplate const *proto) override { return proto && proto->Name1.c_str() && strstri(proto->Name1.c_str(), name.c_str()); }
 
    private:
     std::string const name;
@@ -248,7 +232,8 @@ class ItemCountByQuality : public IterateItemsVisitor
    public:
     ItemCountByQuality() : IterateItemsVisitor()
     {
-        for (uint32 i = 0; i < MAX_ITEM_QUALITY; ++i) count[i] = 0;
+        for (uint32 i = 0; i < MAX_ITEM_QUALITY; ++i)
+            count[i] = 0;
     }
 
     bool Visit(Item *item) override
@@ -264,9 +249,7 @@ class ItemCountByQuality : public IterateItemsVisitor
 class FindPotionVisitor : public FindUsableItemVisitor
 {
    public:
-    FindPotionVisitor(Player *bot, uint32 effectId) : FindUsableItemVisitor(bot), effectId(effectId)
-    {
-    }
+    FindPotionVisitor(Player *bot, uint32 effectId) : FindUsableItemVisitor(bot), effectId(effectId) {}
 
     bool Accept(ItemTemplate const *proto) override;
 
@@ -277,18 +260,11 @@ class FindPotionVisitor : public FindUsableItemVisitor
 class FindFoodVisitor : public FindUsableItemVisitor
 {
    public:
-    FindFoodVisitor(Player *bot, uint32 spellCategory, bool conjured = false)
-        : FindUsableItemVisitor(bot), spellCategory(spellCategory), conjured(conjured)
-    {
-    }
+    FindFoodVisitor(Player *bot, uint32 spellCategory, bool conjured = false) : FindUsableItemVisitor(bot), spellCategory(spellCategory), conjured(conjured) {}
 
     bool Accept(ItemTemplate const *proto) override
     {
-        return proto->Class == ITEM_CLASS_CONSUMABLE &&
-               (proto->SubClass == ITEM_SUBCLASS_CONSUMABLE ||
-                proto->SubClass == ITEM_SUBCLASS_FOOD) &&
-               proto->Spells[0].SpellCategory == spellCategory &&
-               (!conjured || proto->IsConjuredConsumable());
+        return proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_CONSUMABLE || proto->SubClass == ITEM_SUBCLASS_FOOD) && proto->Spells[0].SpellCategory == spellCategory && (!conjured || proto->IsConjuredConsumable());
     }
 
    private:
@@ -318,10 +294,7 @@ class FindPetVisitor : public FindUsableItemVisitor
 class FindAmmoVisitor : public FindUsableItemVisitor
 {
    public:
-    FindAmmoVisitor(Player *bot, uint32 weaponType)
-        : FindUsableItemVisitor(bot), weaponType(weaponType)
-    {
-    }
+    FindAmmoVisitor(Player *bot, uint32 weaponType) : FindUsableItemVisitor(bot), weaponType(weaponType) {}
 
     bool Accept(ItemTemplate const *proto) override
     {
@@ -371,8 +344,7 @@ class FindQuestItemVisitor : public FindUsableItemVisitor
 class FindRecipeVisitor : public FindUsableItemVisitor
 {
    public:
-    FindRecipeVisitor(Player *bot, SkillType skill = SKILL_NONE)
-        : FindUsableItemVisitor(bot), skill(skill) {};
+    FindRecipeVisitor(Player *bot, SkillType skill = SKILL_NONE) : FindUsableItemVisitor(bot), skill(skill) {};
 
     bool Accept(ItemTemplate const *proto) override
     {
@@ -426,10 +398,7 @@ class FindItemUsageVisitor : public FindUsableItemVisitor
 class FindUsableNamedItemVisitor : public FindUsableItemVisitor
 {
    public:
-    FindUsableNamedItemVisitor(Player *bot, std::string name)
-        : FindUsableItemVisitor(bot), name(name)
-    {
-    }
+    FindUsableNamedItemVisitor(Player *bot, std::string name) : FindUsableItemVisitor(bot), name(name) {}
 
     bool Accept(ItemTemplate const *proto) override;
 

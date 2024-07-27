@@ -13,8 +13,7 @@
 #include "Queue.h"
 #include "Strategy.h"
 
-Engine::Engine(PlayerbotAI *botAI, AiObjectContext *factory)
-    : PlayerbotAIAware(botAI), aiObjectContext(factory)
+Engine::Engine(PlayerbotAI *botAI, AiObjectContext *factory) : PlayerbotAIAware(botAI), aiObjectContext(factory)
 {
     lastRelevance = 0.0f;
     testMode = false;
@@ -23,8 +22,7 @@ Engine::Engine(PlayerbotAI *botAI, AiObjectContext *factory)
 bool ActionExecutionListeners::Before(Action *action, Event event)
 {
     bool result = true;
-    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end();
-         i++)
+    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end(); i++)
     {
         result &= (*i)->Before(action, event);
     }
@@ -34,8 +32,7 @@ bool ActionExecutionListeners::Before(Action *action, Event event)
 
 void ActionExecutionListeners::After(Action *action, bool executed, Event event)
 {
-    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end();
-         i++)
+    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end(); i++)
     {
         (*i)->After(action, executed, event);
     }
@@ -44,8 +41,7 @@ void ActionExecutionListeners::After(Action *action, bool executed, Event event)
 bool ActionExecutionListeners::OverrideResult(Action *action, bool executed, Event event)
 {
     bool result = executed;
-    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end();
-         i++)
+    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end(); i++)
     {
         result = (*i)->OverrideResult(action, result, event);
     }
@@ -56,8 +52,7 @@ bool ActionExecutionListeners::OverrideResult(Action *action, bool executed, Eve
 bool ActionExecutionListeners::AllowExecution(Action *action, Event event)
 {
     bool result = true;
-    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end();
-         i++)
+    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end(); i++)
     {
         result &= (*i)->AllowExecution(action, event);
     }
@@ -67,8 +62,7 @@ bool ActionExecutionListeners::AllowExecution(Action *action, Event event)
 
 ActionExecutionListeners::~ActionExecutionListeners()
 {
-    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end();
-         i++)
+    for (std::list<ActionExecutionListener *>::iterator i = listeners.begin(); i != listeners.end(); i++)
     {
         delete *i;
     }
@@ -125,8 +119,7 @@ void Engine::Init()
 {
     Reset();
 
-    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end();
-         i++)
+    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
         Strategy *strategy = i->second;
         strategy->InitMultipliers(multipliers);
@@ -187,8 +180,7 @@ bool Engine::DoNextAction(Unit *unit, uint32 depth, bool minimal)
             }
             else if (action->isUseful())
             {
-                for (std::vector<Multiplier *>::iterator i = multipliers.begin();
-                     i != multipliers.end(); i++)
+                for (std::vector<Multiplier *>::iterator i = multipliers.begin(); i != multipliers.end(); i++)
                 {
                     Multiplier *multiplier = *i;
                     relevance *= multiplier->GetValue(action);
@@ -196,8 +188,7 @@ bool Engine::DoNextAction(Unit *unit, uint32 depth, bool minimal)
 
                     if (!relevance)
                     {
-                        LogAction("Multiplier %s made action %s useless",
-                                  multiplier->getName().c_str(), action->getName().c_str());
+                        LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(), action->getName().c_str());
                         break;
                     }
                 }
@@ -208,16 +199,14 @@ bool Engine::DoNextAction(Unit *unit, uint32 depth, bool minimal)
                     {
                         LogAction("A:%s - PREREQ", action->getName().c_str());
 
-                        if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.02, false,
-                                            event, "prereq"))
+                        if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.02, false, event, "prereq"))
                         {
                             PushAgain(actionNode, relevance + 0.01, event);
                             continue;
                         }
                     }
 
-                    PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(
-                        PERF_MON_ACTION, action->getName(), &aiObjectContext->performanceStack);
+                    PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(PERF_MON_ACTION, action->getName(), &aiObjectContext->performanceStack);
                     actionExecuted = ListenAndExecute(action, event);
                     if (pmo)
                         pmo->finish();
@@ -225,8 +214,7 @@ bool Engine::DoNextAction(Unit *unit, uint32 depth, bool minimal)
                     if (actionExecuted)
                     {
                         LogAction("A:%s - OK", action->getName().c_str());
-                        MultiplyAndPush(actionNode->getContinuers(), relevance, false, event,
-                                        "cont");
+                        MultiplyAndPush(actionNode->getContinuers(), relevance, false, event, "cont");
                         lastRelevance = relevance;
                         delete actionNode;
                         break;
@@ -234,8 +222,7 @@ bool Engine::DoNextAction(Unit *unit, uint32 depth, bool minimal)
                     else
                     {
                         LogAction("A:%s - FAILED", action->getName().c_str());
-                        MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false,
-                                        event, "alt");
+                        MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                     }
                 }
                 else
@@ -255,8 +242,7 @@ bool Engine::DoNextAction(Unit *unit, uint32 depth, bool minimal)
                         botAI->TellMasterNoFacing(out);
                     }
                     LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
-                    MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event,
-                                    "alt");
+                    MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                 }
             }
             else
@@ -322,8 +308,7 @@ bool Engine::DoNextAction(Unit *unit, uint32 depth, bool minimal)
 
 ActionNode *Engine::CreateActionNode(std::string const name)
 {
-    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end();
-         i++)
+    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
         if (ActionNode *node = i->second->GetAction(name))
             return node;
@@ -335,8 +320,7 @@ ActionNode *Engine::CreateActionNode(std::string const name)
                           /*C*/ nullptr);
 }
 
-bool Engine::MultiplyAndPush(NextAction **actions, float forceRelevance, bool skipPrerequisites,
-                             Event event, char const *pushType)
+bool Engine::MultiplyAndPush(NextAction **actions, float forceRelevance, bool skipPrerequisites, Event event, char const *pushType)
 {
     bool pushed = false;
     if (actions)
@@ -480,10 +464,7 @@ void Engine::toggleStrategy(std::string const name)
         addStrategy(name);
 }
 
-bool Engine::HasStrategy(std::string const name)
-{
-    return strategies.find(name) != strategies.end();
-}
+bool Engine::HasStrategy(std::string const name) { return strategies.find(name) != strategies.end(); }
 
 void Engine::ProcessTriggers(bool minimal)
 {
@@ -509,8 +490,7 @@ void Engine::ProcessTriggers(bool minimal)
             if (minimal && node->getFirstRelevance() < 100)
                 continue;
 
-            PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(
-                PERF_MON_TRIGGER, trigger->getName(), &aiObjectContext->performanceStack);
+            PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(PERF_MON_TRIGGER, trigger->getName(), &aiObjectContext->performanceStack);
             Event event = trigger->Check();
             if (pmo)
                 pmo->finish();
@@ -544,8 +524,7 @@ void Engine::ProcessTriggers(bool minimal)
 
 void Engine::PushDefaultActions()
 {
-    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end();
-         i++)
+    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
         Strategy *strategy = i->second;
         Event emptyEvent;
@@ -560,8 +539,7 @@ std::string const Engine::ListStrategies()
     if (strategies.empty())
         return std::move(s);
 
-    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end();
-         i++)
+    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
         s.append(i->first);
         s.append(", ");
@@ -573,8 +551,7 @@ std::string const Engine::ListStrategies()
 std::vector<std::string> Engine::GetStrategies()
 {
     std::vector<std::string> result;
-    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end();
-         i++)
+    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
         result.push_back(i->first);
     }
@@ -593,8 +570,7 @@ void Engine::PushAgain(ActionNode *actionNode, float relevance, Event event)
 
 bool Engine::ContainsStrategy(StrategyType type)
 {
-    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end();
-         i++)
+    for (std::map<std::string, Strategy *>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
         if (i->second->GetType() & type)
             return true;
@@ -620,8 +596,7 @@ bool Engine::ListenAndExecute(Action *action, Event event)
 
     if (actionExecutionListeners.Before(action, event))
     {
-        actionExecuted =
-            actionExecutionListeners.AllowExecution(action, event) ? action->Execute(event) : true;
+        actionExecuted = actionExecutionListeners.AllowExecution(action, event) ? action->Execute(event) : true;
     }
 
     if (botAI->HasStrategy("debug", BOT_STATE_NON_COMBAT))
@@ -651,8 +626,7 @@ bool Engine::ListenAndExecute(Action *action, Event event)
 void Engine::LogAction(char const *format, ...)
 {
     Player *bot = botAI->GetBot();
-    if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()) &&
-        !testMode)
+    if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()) && !testMode)
         return;
 
     char buf[1024];

@@ -38,8 +38,7 @@ enum PerformanceMetric
 class PerformanceMonitorOperation
 {
    public:
-    PerformanceMonitorOperation(PerformanceData *data, std::string const name,
-                                PerformanceStack *stack);
+    PerformanceMonitorOperation(PerformanceData *data, std::string const name, PerformanceStack *stack);
     void finish();
 
    private:
@@ -61,8 +60,7 @@ class PerformanceMonitor
     }
 
    public:
-    PerformanceMonitorOperation *start(PerformanceMetric metric, std::string const name,
-                                       PerformanceStack *stack = nullptr);
+    PerformanceMonitorOperation *start(PerformanceMetric metric, std::string const name, PerformanceStack *stack = nullptr);
     void PrintStats(bool perTick = false, bool fullStack = false);
     void Reset();
 

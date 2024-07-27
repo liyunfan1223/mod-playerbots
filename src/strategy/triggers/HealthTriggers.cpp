@@ -8,10 +8,7 @@
 
 #include "Playerbots.h"
 
-bool HealthInRangeTrigger::IsActive()
-{
-    return ValueInRangeTrigger::IsActive() && !AI_VALUE2(bool, "dead", GetTargetName());
-}
+bool HealthInRangeTrigger::IsActive() { return ValueInRangeTrigger::IsActive() && !AI_VALUE2(bool, "dead", GetTargetName()); }
 
 float HealthInRangeTrigger::GetValue() { return AI_VALUE2(uint8, "health", GetTargetName()); }
 
@@ -26,6 +23,5 @@ bool AoeHealTrigger::IsActive() { return AI_VALUE2(uint8, "aoe heal", type) >= c
 bool AoeInGroupTrigger::IsActive()
 {
     Group *group = bot->GetGroup();
-    return group && group->GetMembersCount() >= 5 &&
-           AI_VALUE2(uint8, "aoe heal", type) >= (group->GetMembersCount() * ratio);
+    return group && group->GetMembersCount() >= 5 && AI_VALUE2(uint8, "aoe heal", type) >= (group->GetMembersCount() * ratio);
 }

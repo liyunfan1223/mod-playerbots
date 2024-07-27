@@ -32,14 +32,10 @@ class BgRoleValue : public ManualSetValue<uint32>
     BgRoleValue(PlayerbotAI *botAI) : ManualSetValue<uint32>(botAI, 0, "bg role") {}
 };
 
-class BgMastersValue : public SingleCalculatedValue<std::vector<CreatureData const *>>,
-                       public Qualified
+class BgMastersValue : public SingleCalculatedValue<std::vector<CreatureData const *>>, public Qualified
 {
    public:
-    BgMastersValue(PlayerbotAI *botAI)
-        : SingleCalculatedValue<std::vector<CreatureData const *>>(botAI, "bg masters")
-    {
-    }
+    BgMastersValue(PlayerbotAI *botAI) : SingleCalculatedValue<std::vector<CreatureData const *>>(botAI, "bg masters") {}
 
     std::vector<CreatureData const *> Calculate() override;
 };
@@ -64,10 +60,7 @@ class RpgBgTypeValue : public CalculatedValue<BattlegroundTypeId>
 class FlagCarrierValue : public UnitCalculatedValue
 {
    public:
-    FlagCarrierValue(PlayerbotAI *botAI, bool sameTeam = false, bool ignoreRange = false)
-        : UnitCalculatedValue(botAI), sameTeam(sameTeam), ignoreRange(ignoreRange)
-    {
-    }
+    FlagCarrierValue(PlayerbotAI *botAI, bool sameTeam = false, bool ignoreRange = false) : UnitCalculatedValue(botAI), sameTeam(sameTeam), ignoreRange(ignoreRange) {}
 
     Unit *Calculate() override;
 

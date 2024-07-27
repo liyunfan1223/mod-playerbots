@@ -13,13 +13,10 @@ uint8 PetitionSignsValue::Calculate()
     if (bot->GetGuildId())
         return 0;
 
-    std::vector<Item*> petitions =
-        AI_VALUE2(std::vector<Item*>, "inventory items", chat->FormatQItem(5863));
+    std::vector<Item*> petitions = AI_VALUE2(std::vector<Item*>, "inventory items", chat->FormatQItem(5863));
     if (petitions.empty())
         return 0;
 
-    QueryResult result =
-        CharacterDatabase.Query("SELECT playerguid FROM petition_sign WHERE petitionguid = {}",
-                                petitions.front()->GetGUID().GetCounter());
+    QueryResult result = CharacterDatabase.Query("SELECT playerguid FROM petition_sign WHERE petitionguid = {}", petitions.front()->GetGUID().GetCounter());
     return result ? (uint8)result->GetRowCount() : 0;
 }

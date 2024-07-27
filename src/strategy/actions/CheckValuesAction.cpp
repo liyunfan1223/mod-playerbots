@@ -19,8 +19,7 @@ bool CheckValuesAction::Execute(Event event)
         botAI->Ping(bot->GetPositionX(), bot->GetPositionY());
     }
 
-    if (botAI->HasStrategy("map", BOT_STATE_NON_COMBAT) ||
-        botAI->HasStrategy("map full", BOT_STATE_NON_COMBAT))
+    if (botAI->HasStrategy("map", BOT_STATE_NON_COMBAT) || botAI->HasStrategy("map full", BOT_STATE_NON_COMBAT))
     {
         sTravelNodeMap->manageNodes(bot, botAI->HasStrategy("map full", BOT_STATE_NON_COMBAT));
     }

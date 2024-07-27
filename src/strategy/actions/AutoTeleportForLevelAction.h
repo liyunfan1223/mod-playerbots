@@ -14,11 +14,7 @@ class PlayerbotAI;
 class AutoTeleportForLevelAction : public Action
 {
    public:
-    AutoTeleportForLevelAction(PlayerbotAI *botAI,
-                               std::string const name = "auto teleport for level")
-        : Action(botAI, name)
-    {
-    }
+    AutoTeleportForLevelAction(PlayerbotAI *botAI, std::string const name = "auto teleport for level") : Action(botAI, name) {}
 
     bool Execute(Event event);
 };

@@ -16,10 +16,7 @@ class WorldObject;
 class AcceptAllQuestsAction : public QuestAction
 {
    public:
-    AcceptAllQuestsAction(PlayerbotAI *botAI, std::string const name = "accept all quests")
-        : QuestAction(botAI, name)
-    {
-    }
+    AcceptAllQuestsAction(PlayerbotAI *botAI, std::string const name = "accept all quests") : QuestAction(botAI, name) {}
 
    protected:
     void ProcessQuest(Quest const *quest, Object *questGiver) override;

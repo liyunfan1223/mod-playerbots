@@ -15,9 +15,7 @@ class IsTargetOfResurrectSpell : public SpellEntryPredicate
     {
         for (uint8 i = 0; i < 3; ++i)
         {
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_RESURRECT ||
-                spellInfo->Effects[i].Effect == SPELL_EFFECT_RESURRECT_NEW ||
-                spellInfo->Effects[i].Effect == SPELL_EFFECT_SELF_RESURRECT)
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_RESURRECT || spellInfo->Effects[i].Effect == SPELL_EFFECT_RESURRECT_NEW || spellInfo->Effects[i].Effect == SPELL_EFFECT_SELF_RESURRECT)
                 return true;
         }
 
@@ -33,9 +31,7 @@ class FindDeadPlayer : public FindPlayerPredicate
     bool Check(Unit *unit) override
     {
         Player *player = unit->ToPlayer();
-        return player && !player->isResurrectRequested() &&
-               player->getDeathState() == DeathState::Corpse &&
-               !value->IsTargetOfSpellCast(player, predicate);
+        return player && !player->isResurrectRequested() && player->getDeathState() == DeathState::Corpse && !value->IsTargetOfSpellCast(player, predicate);
     }
 
    private:

@@ -15,10 +15,7 @@ class PlayerbotAI;
 class CastFeralChargeCatAction : public CastReachTargetSpellAction
 {
    public:
-    CastFeralChargeCatAction(PlayerbotAI *botAI)
-        : CastReachTargetSpellAction(botAI, "feral charge - cat", 1.5f)
-    {
-    }
+    CastFeralChargeCatAction(PlayerbotAI *botAI) : CastReachTargetSpellAction(botAI, "feral charge - cat", 1.5f) {}
 };
 
 class CastCowerAction : public CastBuffSpellAction

@@ -17,10 +17,7 @@ class PlayerbotAI;
 class MarkOfTheWildOnPartyTrigger : public BuffOnPartyTrigger
 {
    public:
-    MarkOfTheWildOnPartyTrigger(PlayerbotAI *botAI)
-        : BuffOnPartyTrigger(botAI, "mark of the wild", 2 * 2000)
-    {
-    }
+    MarkOfTheWildOnPartyTrigger(PlayerbotAI *botAI) : BuffOnPartyTrigger(botAI, "mark of the wild", 2 * 2000) {}
 
     bool IsActive() override;
 };
@@ -44,10 +41,7 @@ class ThornsOnPartyTrigger : public BuffOnPartyTrigger
 class ThornsOnMainTankTrigger : public BuffOnMainTankTrigger
 {
    public:
-    ThornsOnMainTankTrigger(PlayerbotAI *botAI)
-        : BuffOnMainTankTrigger(botAI, "thorns", false, 2 * 2000)
-    {
-    }
+    ThornsOnMainTankTrigger(PlayerbotAI *botAI) : BuffOnMainTankTrigger(botAI, "thorns", false, 2 * 2000) {}
 };
 
 class ThornsTrigger : public BuffTrigger
@@ -143,10 +137,7 @@ class CurePoisonTrigger : public NeedCureTrigger
 class PartyMemberCurePoisonTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    PartyMemberCurePoisonTrigger(PlayerbotAI *botAI)
-        : PartyMemberNeedCureTrigger(botAI, "cure poison", DISPEL_POISON)
-    {
-    }
+    PartyMemberCurePoisonTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "cure poison", DISPEL_POISON) {}
 };
 
 class BearFormTrigger : public BuffTrigger
@@ -188,10 +179,7 @@ class EclipseLunarTrigger : public HasAuraTrigger
 class BashInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
 {
    public:
-    BashInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI)
-        : InterruptEnemyHealerTrigger(botAI, "bash")
-    {
-    }
+    BashInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI) : InterruptEnemyHealerTrigger(botAI, "bash") {}
 };
 
 class NaturesSwiftnessTrigger : public BuffTrigger
@@ -203,10 +191,7 @@ class NaturesSwiftnessTrigger : public BuffTrigger
 class DruidPartyMemberRemoveCurseTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    DruidPartyMemberRemoveCurseTrigger(PlayerbotAI *ai)
-        : PartyMemberNeedCureTrigger(ai, "druid remove curse", DISPEL_CURSE)
-    {
-    }
+    DruidPartyMemberRemoveCurseTrigger(PlayerbotAI *ai) : PartyMemberNeedCureTrigger(ai, "druid remove curse", DISPEL_CURSE) {}
 };
 
 class EclipseSolarCooldownTrigger : public SpellCooldownTrigger

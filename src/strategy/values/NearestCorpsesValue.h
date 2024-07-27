@@ -15,10 +15,7 @@ class PlayerbotAI;
 class NearestCorpsesValue : public NearestUnitsValue
 {
    public:
-    NearestCorpsesValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance)
-        : NearestUnitsValue(botAI, "nearest corpses", range)
-    {
-    }
+    NearestCorpsesValue(PlayerbotAI *botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest corpses", range) {}
 
    protected:
     void FindUnits(std::list<Unit *> &targets) override;

@@ -18,10 +18,8 @@ class Unit;
 class NextAction
 {
    public:
-    NextAction(std::string const name, float relevance = 0.0f)
-        : relevance(relevance), name(name) {}  // name after relevance - whipowill
-    NextAction(NextAction const &o)
-        : relevance(o.relevance), name(o.name) {}  // name after relevance - whipowill
+    NextAction(std::string const name, float relevance = 0.0f) : relevance(relevance), name(name) {}  // name after relevance - whipowill
+    NextAction(NextAction const &o) : relevance(o.relevance), name(o.name) {}                         // name after relevance - whipowill
 
     std::string const getName() { return name; }
     float getRelevance() { return relevance; }
@@ -47,10 +45,7 @@ class Action : public AiNamedObject
         Aoe = 2
     };
 
-    Action(PlayerbotAI *botAI, std::string const name = "action")
-        : AiNamedObject(botAI, name), verbose(false)
-    {
-    }  // verbose after ainamedobject - whipowill
+    Action(PlayerbotAI *botAI, std::string const name = "action") : AiNamedObject(botAI, name), verbose(false) {}  // verbose after ainamedobject - whipowill
     virtual ~Action(void) {}
 
     virtual bool Execute([[maybe_unused]] Event event) { return true; }
@@ -77,13 +72,8 @@ class Action : public AiNamedObject
 class ActionNode
 {
    public:
-    ActionNode(std::string const name, NextAction **prerequisites = nullptr,
-               NextAction **alternatives = nullptr, NextAction **continuers = nullptr)
-        : name(name),
-          action(nullptr),
-          continuers(continuers),
-          alternatives(alternatives),
-          prerequisites(prerequisites)
+    ActionNode(std::string const name, NextAction **prerequisites = nullptr, NextAction **alternatives = nullptr, NextAction **continuers = nullptr)
+        : name(name), action(nullptr), continuers(continuers), alternatives(alternatives), prerequisites(prerequisites)
     {
     }  // reorder arguments - whipowill
 
@@ -98,18 +88,9 @@ class ActionNode
     void setAction(Action *action) { this->action = action; }
     std::string const getName() { return name; }
 
-    NextAction **getContinuers()
-    {
-        return NextAction::merge(NextAction::clone(continuers), action->getContinuers());
-    }
-    NextAction **getAlternatives()
-    {
-        return NextAction::merge(NextAction::clone(alternatives), action->getAlternatives());
-    }
-    NextAction **getPrerequisites()
-    {
-        return NextAction::merge(NextAction::clone(prerequisites), action->getPrerequisites());
-    }
+    NextAction **getContinuers() { return NextAction::merge(NextAction::clone(continuers), action->getContinuers()); }
+    NextAction **getAlternatives() { return NextAction::merge(NextAction::clone(alternatives), action->getAlternatives()); }
+    NextAction **getPrerequisites() { return NextAction::merge(NextAction::clone(prerequisites), action->getPrerequisites()); }
 
    private:
     std::string const name;

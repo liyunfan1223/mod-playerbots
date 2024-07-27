@@ -91,12 +91,11 @@ class GenericPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionN
     }
     static ActionNode *power_word_shield_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode(
-            "power word: shield on party",
-            /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
-            // /*A*/ NextAction::array(0, new NextAction("renew on party", 50.0f), NULL),
-            /*A*/ NULL,
-            /*C*/ NULL);
+        return new ActionNode("power word: shield on party",
+                              /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
+                              // /*A*/ NextAction::array(0, new NextAction("renew on party", 50.0f), NULL),
+                              /*A*/ NULL,
+                              /*C*/ NULL);
     }
     static ActionNode *renew(PlayerbotAI *ai)
     {
@@ -135,11 +134,10 @@ class GenericPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionN
     }
     static ActionNode *heal_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode(
-            "heal on party",
-            /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
-            /*A*/ NextAction::array(0, new NextAction("lesser heal on party"), NULL),
-            /*C*/ NULL);
+        return new ActionNode("heal on party",
+                              /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
+                              /*A*/ NextAction::array(0, new NextAction("lesser heal on party"), NULL),
+                              /*C*/ NULL);
     }
     static ActionNode *lesser_heal(PlayerbotAI *ai)
     {
@@ -164,11 +162,10 @@ class GenericPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionN
     }
     static ActionNode *flash_heal_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode(
-            "flash heal on party",
-            /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
-            /*A*/ NextAction::array(0, new NextAction("greater heal on party"), NULL),
-            /*C*/ NULL);
+        return new ActionNode("flash heal on party",
+                              /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
+                              /*A*/ NextAction::array(0, new NextAction("greater heal on party"), NULL),
+                              /*C*/ NULL);
     }
     static ActionNode *psychic_scream(PlayerbotAI *ai)
     {

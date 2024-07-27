@@ -37,8 +37,7 @@ float PassiveMultiplier::GetValue(Action *action)
 
     std::string const name = action->getName();
 
-    for (std::vector<std::string>::iterator i = allowedActions.begin(); i != allowedActions.end();
-         i++)
+    for (std::vector<std::string>::iterator i = allowedActions.begin(); i != allowedActions.end(); i++)
     {
         if (name == *i)
             return 1.0f;

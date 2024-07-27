@@ -21,10 +21,8 @@ class DebugAction : public Action
 
     bool Execute(Event event) override;
 
-    void FakeSpell(uint32 spellId, Unit *truecaster, Unit *caster,
-                   ObjectGuid target = ObjectGuid::Empty, GuidVector otherTargets = {},
-                   GuidVector missTargets = {}, WorldPosition source = WorldPosition(),
-                   WorldPosition dest = WorldPosition(), bool forceDest = false);
+    void FakeSpell(uint32 spellId, Unit *truecaster, Unit *caster, ObjectGuid target = ObjectGuid::Empty, GuidVector otherTargets = {}, GuidVector missTargets = {}, WorldPosition source = WorldPosition(), WorldPosition dest = WorldPosition(),
+                   bool forceDest = false);
     void addAura(uint32 spellId, Unit *target);
 };
 

@@ -10,10 +10,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-void QueryQuestAction::TellObjective(std::string const name, uint32 available, uint32 required)
-{
-    botAI->TellMaster(chat->FormatQuestObjective(name, available, required));
-}
+void QueryQuestAction::TellObjective(std::string const name, uint32 available, uint32 required) { botAI->TellMaster(chat->FormatQuestObjective(name, available, required)); }
 
 bool QueryQuestAction::Execute(Event event)
 {
@@ -56,15 +53,9 @@ bool QueryQuestAction::Execute(Event event)
         if (travel)
         {
             uint32 limit = 0;
-            std::vector<TravelDestination *> allDestinations =
-                sTravelMgr->getQuestTravelDestinations(bot, questId, true, true, -1);
+            std::vector<TravelDestination *> allDestinations = sTravelMgr->getQuestTravelDestinations(bot, questId, true, true, -1);
 
-            std::sort(allDestinations.begin(), allDestinations.end(),
-                      [botPos](TravelDestination *i, TravelDestination *j)
-                      {
-                          return i->distanceTo(const_cast<WorldPosition *>(&botPos)) <
-                                 j->distanceTo(const_cast<WorldPosition *>(&botPos));
-                      });
+            std::sort(allDestinations.begin(), allDestinations.end(), [botPos](TravelDestination *i, TravelDestination *j) { return i->distanceTo(const_cast<WorldPosition *>(&botPos)) < j->distanceTo(const_cast<WorldPosition *>(&botPos)); });
 
             for (auto dest : allDestinations)
             {
@@ -120,8 +111,7 @@ void QueryQuestAction::TellObjectives(uint32 questId)
         {
             uint32 required = questTemplate->RequiredItemCount[i];
             uint32 available = questStatus.ItemCount[i];
-            ItemTemplate const *proto =
-                sObjectMgr->GetItemTemplate(questTemplate->RequiredItemId[i]);
+            ItemTemplate const *proto = sObjectMgr->GetItemTemplate(questTemplate->RequiredItemId[i]);
             TellObjective(chat->FormatItem(proto), available, required);
         }
 
@@ -132,14 +122,12 @@ void QueryQuestAction::TellObjectives(uint32 questId)
 
             if (questTemplate->RequiredNpcOrGo[i] < 0)
             {
-                if (GameObjectTemplate const *info =
-                        sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
+                if (GameObjectTemplate const *info = sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
                     TellObjective(info->name, available, required);
             }
             else
             {
-                if (CreatureTemplate const *info =
-                        sObjectMgr->GetCreatureTemplate(questTemplate->RequiredNpcOrGo[i]))
+                if (CreatureTemplate const *info = sObjectMgr->GetCreatureTemplate(questTemplate->RequiredNpcOrGo[i]))
                     TellObjective(info->Name, available, required);
             }
         }

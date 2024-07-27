@@ -46,8 +46,7 @@ entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
             // Loot objective
             if (quest->RequiredItemId[objective])
             {
-                for (auto &entry : GAI_VALUE2(std::vector<int32>, "item drop list",
-                                              quest->RequiredItemId[objective]))
+                for (auto &entry : GAI_VALUE2(std::vector<int32>, "item drop list", quest->RequiredItemId[objective]))
                     rMap[entry][questId] |= relationFlag;
             }
         }
@@ -57,10 +56,7 @@ entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
 }
 
 // Get all the objective entries for a specific quest.
-void FindQuestObjectData::GetObjectiveEntries()
-{
-    relationMap = GAI_VALUE(entryQuestRelationMap, "entry quest relation");
-}
+void FindQuestObjectData::GetObjectiveEntries() { relationMap = GAI_VALUE(entryQuestRelationMap, "entry quest relation"); }
 
 // Data worker. Checks for a specific creature what quest they are needed for and puts them in the
 // proper place in the quest map.
@@ -94,8 +90,10 @@ void FindQuestObjectData::operator()(GameObjectData const &goData)
 questGuidpMap QuestGuidpMapValue::Calculate()
 {
     FindQuestObjectData worker;
-    for (auto const &itr : sObjectMgr->GetAllCreatureData()) worker(itr.second);
-    for (auto const &itr : sObjectMgr->GetAllGOData()) worker(itr.second);
+    for (auto const &itr : sObjectMgr->GetAllCreatureData())
+        worker(itr.second);
+    for (auto const &itr : sObjectMgr->GetAllGOData())
+        worker(itr.second);
 
     return worker.GetResult();
 }
@@ -126,8 +124,7 @@ questGiverMap QuestGiversValue::Calculate()
                 {
                     Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
 
-                    if (quest &&
-                        (level < quest->GetMinLevel() || (int)level > quest->GetQuestLevel() + 10))
+                    if (quest && (level < quest->GetMinLevel() || (int)level > quest->GetQuestLevel() + 10))
                         continue;
                 }
 
@@ -168,9 +165,7 @@ std::vector<GuidPosition> ActiveQuestGiversValue::Calculate()
 
             if (creatureTemplate)
             {
-                if (bot->GetFactionReactionTo(bot->GetFactionTemplateEntry(),
-                                              sFactionTemplateStore.LookupEntry(
-                                                  creatureTemplate->faction)) < REP_FRIENDLY)
+                if (bot->GetFactionReactionTo(bot->GetFactionTemplateEntry(), sFactionTemplateStore.LookupEntry(creatureTemplate->faction)) < REP_FRIENDLY)
                     continue;
             }
 
@@ -204,8 +199,7 @@ std::vector<GuidPosition> ActiveQuestTakersValue::Calculate()
         }
 
         QuestStatus status = questStatus.second.Status;
-        if ((status != QUEST_STATUS_COMPLETE || bot->GetQuestRewardStatus(questId)) &&
-            (!quest->IsAutoComplete() || !bot->CanTakeQuest(quest, false)))
+        if ((status != QUEST_STATUS_COMPLETE || bot->GetQuestRewardStatus(questId)) && (!quest->IsAutoComplete() || !bot->CanTakeQuest(quest, false)))
             continue;
 
         auto q = questMap.find(questId);
@@ -224,9 +218,7 @@ std::vector<GuidPosition> ActiveQuestTakersValue::Calculate()
             {
                 if (CreatureTemplate const *info = sObjectMgr->GetCreatureTemplate(entry.first))
                 {
-                    if (bot->GetFactionReactionTo(
-                            bot->GetFactionTemplateEntry(),
-                            sFactionTemplateStore.LookupEntry(info->faction)) < REP_FRIENDLY)
+                    if (bot->GetFactionReactionTo(bot->GetFactionTemplateEntry(), sFactionTemplateStore.LookupEntry(info->faction)) < REP_FRIENDLY)
                         continue;
                 }
             }
@@ -366,8 +358,7 @@ uint32 DialogStatusValue::getDialogStatus(Player *bot, int32 questgiver, uint32 
 
         QuestStatus status = bot->GetQuestStatus(itr->second);
 
-        if ((status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(itr->second)) ||
-            (pQuest->IsAutoComplete() && bot->CanTakeQuest(pQuest, false)))
+        if ((status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(itr->second)) || (pQuest->IsAutoComplete() && bot->CanTakeQuest(pQuest, false)))
         {
             if (pQuest->IsAutoComplete() && pQuest->IsRepeatable())
             {
@@ -413,14 +404,11 @@ uint32 DialogStatusValue::getDialogStatus(Player *bot, int32 questgiver, uint32 
                 if (bot->SatisfyQuestLevel(pQuest, false))
                 {
                     int32 lowLevelDiff = sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF);
-                    if (pQuest->IsAutoComplete() ||
-                        (pQuest->IsRepeatable() &&
-                         bot->getQuestStatusMap()[itr->second].Status == QUEST_STATUS_REWARDED))
+                    if (pQuest->IsAutoComplete() || (pQuest->IsRepeatable() && bot->getQuestStatusMap()[itr->second].Status == QUEST_STATUS_REWARDED))
                     {
                         dialogStatusNew = DIALOG_STATUS_REWARD_REP;
                     }
-                    else if (lowLevelDiff < 0 ||
-                             bot->GetLevel() <= bot->GetQuestLevel(pQuest) + uint32(lowLevelDiff))
+                    else if (lowLevelDiff < 0 || bot->GetLevel() <= bot->GetQuestLevel(pQuest) + uint32(lowLevelDiff))
                     {
                         dialogStatusNew = DIALOG_STATUS_AVAILABLE;
                     }
@@ -447,16 +435,9 @@ uint32 DialogStatusValue::getDialogStatus(Player *bot, int32 questgiver, uint32 
 
 uint32 DialogStatusValue::Calculate() { return getDialogStatus(bot, stoi(getQualifier())); }
 
-uint32 DialogStatusQuestValue::Calculate()
-{
-    return getDialogStatus(bot, getMultiQualifier(getQualifier(), 0),
-                           getMultiQualifier(getQualifier(), 1));
-}
+uint32 DialogStatusQuestValue::Calculate() { return getDialogStatus(bot, getMultiQualifier(getQualifier(), 0), getMultiQualifier(getQualifier(), 1)); }
 
-bool CanAcceptQuestValue::Calculate()
-{
-    return AI_VALUE2(uint32, "dialog status", getQualifier()) == DIALOG_STATUS_AVAILABLE;
-};
+bool CanAcceptQuestValue::Calculate() { return AI_VALUE2(uint32, "dialog status", getQualifier()) == DIALOG_STATUS_AVAILABLE; };
 
 bool CanAcceptQuestLowLevelValue::Calculate()
 {
@@ -467,6 +448,5 @@ bool CanAcceptQuestLowLevelValue::Calculate()
 bool CanTurnInQuestValue::Calculate()
 {
     uint32 dialogStatus = AI_VALUE2(uint32, "dialog status", getQualifier());
-    return dialogStatus == DIALOG_STATUS_REWARD2 || dialogStatus == DIALOG_STATUS_REWARD ||
-           dialogStatus == DIALOG_STATUS_REWARD_REP;
+    return dialogStatus == DIALOG_STATUS_REWARD2 || dialogStatus == DIALOG_STATUS_REWARD || dialogStatus == DIALOG_STATUS_REWARD_REP;
 };

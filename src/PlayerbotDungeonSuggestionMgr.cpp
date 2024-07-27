@@ -8,10 +8,7 @@
 
 #include "Playerbots.h"
 
-std::vector<DungeonSuggestion> const PlayerbotDungeonSuggestionMgr::GetDungeonSuggestions()
-{
-    return m_dungeonSuggestions;
-}
+std::vector<DungeonSuggestion> const PlayerbotDungeonSuggestionMgr::GetDungeonSuggestions() { return m_dungeonSuggestions; }
 
 void PlayerbotDungeonSuggestionMgr::LoadDungeonSuggestions()
 {
@@ -36,15 +33,12 @@ void PlayerbotDungeonSuggestionMgr::LoadDungeonSuggestions()
             std::string const abbrevation = fields[4].Get<std::string>();
             std::string const strategy = fields[5].Get<std::string>();
 
-            DungeonSuggestion const row = {name,        static_cast<Difficulty>(difficulty),
-                                           min_level,   max_level,
-                                           abbrevation, strategy};
+            DungeonSuggestion const row = {name, static_cast<Difficulty>(difficulty), min_level, max_level, abbrevation, strategy};
 
             m_dungeonSuggestions.push_back(row);
             ++count;
         } while (result->NextRow());
     }
 
-    LOG_INFO("server.loading", "{} playerbots dungeon suggestions loaded in {} ms", count,
-             GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", "{} playerbots dungeon suggestions loaded in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

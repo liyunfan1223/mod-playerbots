@@ -266,8 +266,7 @@ std::string AiFactory::GetPlayerSpecName(Player *player)
     return specName;
 }
 
-void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const facade,
-                                           Engine *engine)
+void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const facade, Engine *engine)
 {
     uint8 tab = GetPlayerSpecTab(player);
 
@@ -468,15 +467,13 @@ void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const fa
             engine->addStrategy("arena");
         }
 
-        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "cast time",
-                              "dps assist", nullptr);
+        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "cast time", "dps assist", nullptr);
         engine->removeStrategy("custom::say");
         engine->removeStrategy("flee");
         engine->removeStrategy("threat");
         engine->addStrategy("boost");
 
-        if ((player->getClass() == CLASS_DRUID && tab == 2) ||
-            (player->getClass() == CLASS_SHAMAN && tab == 2))
+        if ((player->getClass() == CLASS_DRUID && tab == 2) || (player->getClass() == CLASS_SHAMAN && tab == 2))
             engine->addStrategies("caster", "caster aoe", nullptr);
 
         if (player->getClass() == CLASS_DRUID && tab == 1)
@@ -487,16 +484,14 @@ void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const fa
     }
 }
 
-Engine *AiFactory::createCombatEngine(Player *player, PlayerbotAI *const facade,
-                                      AiObjectContext *aiObjectContext)
+Engine *AiFactory::createCombatEngine(Player *player, PlayerbotAI *const facade, AiObjectContext *aiObjectContext)
 {
     Engine *engine = new Engine(facade, aiObjectContext);
     AddDefaultCombatStrategies(player, facade, engine);
     return engine;
 }
 
-void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const facade,
-                                              Engine *nonCombatEngine)
+void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const facade, Engine *nonCombatEngine)
 {
     uint8 tab = GetPlayerSpecTab(player);
 
@@ -593,8 +588,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
 
     if (!player->InBattleground())
     {
-        nonCombatEngine->addStrategies("nc", "food", "chat", "follow", "default", "quest", "loot",
-                                       "gather", "duel", "buff", "mount", nullptr);
+        nonCombatEngine->addStrategies("nc", "food", "chat", "follow", "default", "quest", "loot", "gather", "duel", "buff", "mount", nullptr);
     }
     if (sPlayerbotAIConfig->autoSaveMana)
     {
@@ -666,8 +660,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
                         // if (masterBotAI)
                         //     nonCombatEngine->addStrategy("maintenance");
 
-                        nonCombatEngine->ChangeStrategy(
-                            sPlayerbotAIConfig->randomBotNonCombatStrategies);
+                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig->randomBotNonCombatStrategies);
                     }
                     else
                     {
@@ -687,8 +680,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
     // Battleground switch
     if (player->InBattleground() && player->GetBattleground())
     {
-        nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp",
-                                       "dps assist", "attack tagged", nullptr);
+        nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp", "dps assist", "attack tagged", nullptr);
         nonCombatEngine->removeStrategy("custom::say");
         nonCombatEngine->removeStrategy("travel");
         nonCombatEngine->removeStrategy("rpg");
@@ -698,8 +690,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
         if (bgType == BATTLEGROUND_RB)
             bgType = player->GetBattleground()->GetBgTypeID(true);
 
-        if ((bgType <= BATTLEGROUND_EY || bgType == BATTLEGROUND_IC) &&
-            !player->InArena())  // do not add for not supported bg or arena
+        if ((bgType <= BATTLEGROUND_EY || bgType == BATTLEGROUND_IC) && !player->InArena())  // do not add for not supported bg or arena
             nonCombatEngine->addStrategy("battleground");
 
         if (bgType == BATTLEGROUND_WS)
@@ -725,8 +716,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
     }
 }
 
-Engine *AiFactory::createNonCombatEngine(Player *player, PlayerbotAI *const facade,
-                                         AiObjectContext *aiObjectContext)
+Engine *AiFactory::createNonCombatEngine(Player *player, PlayerbotAI *const facade, AiObjectContext *aiObjectContext)
 {
     Engine *nonCombatEngine = new Engine(facade, aiObjectContext);
 
@@ -734,8 +724,7 @@ Engine *AiFactory::createNonCombatEngine(Player *player, PlayerbotAI *const faca
     return nonCombatEngine;
 }
 
-void AiFactory::AddDefaultDeadStrategies(Player *player, PlayerbotAI *const facade,
-                                         Engine *deadEngine)
+void AiFactory::AddDefaultDeadStrategies(Player *player, PlayerbotAI *const facade, Engine *deadEngine)
 {
     (void)facade;  // unused and remove warning
     deadEngine->addStrategies("dead", "stay", "chat", "default", "follow", nullptr);
@@ -746,8 +735,7 @@ void AiFactory::AddDefaultDeadStrategies(Player *player, PlayerbotAI *const faca
     }
 }
 
-Engine *AiFactory::createDeadEngine(Player *player, PlayerbotAI *const facade,
-                                    AiObjectContext *AiObjectContext)
+Engine *AiFactory::createDeadEngine(Player *player, PlayerbotAI *const facade, AiObjectContext *AiObjectContext)
 {
     Engine *deadEngine = new Engine(facade, AiObjectContext);
     AddDefaultDeadStrategies(player, facade, deadEngine);

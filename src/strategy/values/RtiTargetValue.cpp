@@ -62,9 +62,7 @@ Unit *RtiTargetValue::Calculate()
     //////////////////////////////////////////////////////end: delete below check
 
     Unit *unit = botAI->GetUnit(guid);
-    if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) ||
-        sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, unit),
-                                             sPlayerbotAIConfig->sightDistance))
+    if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) || sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, unit), sPlayerbotAIConfig->sightDistance))
         return nullptr;
 
     return unit;

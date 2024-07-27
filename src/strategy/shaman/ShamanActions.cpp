@@ -23,32 +23,15 @@ bool CastTotemAction::isUseful()
             return false;
         }
     }
-    return CastBuffSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name) &&
-           !botAI->HasAura(buff, bot);
+    return CastBuffSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name) && !botAI->HasAura(buff, bot);
 }
 
-bool CastManaSpringTotemAction::isUseful()
-{
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "healing stream totem");
-}
+bool CastManaSpringTotemAction::isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "healing stream totem"); }
 
-bool CastFlametongueTotemAction::isUseful()
-{
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "magma totem") &&
-           !botAI->HasAura("totem of wrath", bot);
-}
+bool CastFlametongueTotemAction::isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "magma totem") && !botAI->HasAura("totem of wrath", bot); }
 
-bool CastSearingTotemAction::isUseful()
-{
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "flametongue totem");
-}
+bool CastSearingTotemAction::isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "flametongue totem"); }
 
-bool CastMagmaTotemAction::isUseful()
-{
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
-}
+bool CastMagmaTotemAction::isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name); }
 
-bool CastCleansingTotemAction::isUseful()
-{
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "mana tide totem");
-}
+bool CastCleansingTotemAction::isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "mana tide totem"); }

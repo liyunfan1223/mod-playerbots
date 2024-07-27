@@ -11,22 +11,14 @@
 
 void CombatStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
-    triggers.push_back(
-        new TriggerNode("enemy out of spell",
-                        NextAction::array(0, new NextAction("reach spell", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "invalid target", NextAction::array(0, new NextAction("drop target", 100), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "mounted", NextAction::array(0, new NextAction("check mount state", 54), nullptr)));
+    triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("invalid target", NextAction::array(0, new NextAction("drop target", 100), nullptr)));
+    triggers.push_back(new TriggerNode("mounted", NextAction::array(0, new NextAction("check mount state", 54), nullptr)));
     // triggers.push_back(new TriggerNode("out of react range", NextAction::array(0, new
     // NextAction("flee to master", 55), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "combat stuck", NextAction::array(0, new NextAction("reset", 1.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "not facing target",
-        NextAction::array(0, new NextAction("set facing", ACTION_MOVE + 7), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "pet attack", NextAction::array(0, new NextAction("pet attack", ACTION_NORMAL), nullptr)));
+    triggers.push_back(new TriggerNode("combat stuck", NextAction::array(0, new NextAction("reset", 1.0f), nullptr)));
+    triggers.push_back(new TriggerNode("not facing target", NextAction::array(0, new NextAction("set facing", ACTION_MOVE + 7), nullptr)));
+    triggers.push_back(new TriggerNode("pet attack", NextAction::array(0, new NextAction("pet attack", ACTION_NORMAL), nullptr)));
     // triggers.push_back(new TriggerNode("combat long stuck", NextAction::array(0, new
     // NextAction("hearthstone", 0.9f), new NextAction("repop", 0.8f), nullptr)));
 }
@@ -73,10 +65,7 @@ AvoidAoeStrategy::AvoidAoeStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 //     return 1.0f;
 // }
 
-NextAction **AvoidAoeStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("avoid aoe", ACTION_EMERGENCY), nullptr);
-}
+NextAction **AvoidAoeStrategy::getDefaultActions() { return NextAction::array(0, new NextAction("avoid aoe", ACTION_EMERGENCY), nullptr); }
 
 void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
@@ -90,7 +79,4 @@ void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers)
     // multipliers.push_back(new AvoidAoeStrategyMultiplier(botAI));
 }
 
-NextAction **CombatFormationStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("combat formation move", ACTION_NORMAL), nullptr);
-}
+NextAction **CombatFormationStrategy::getDefaultActions() { return NextAction::array(0, new NextAction("combat formation move", ACTION_NORMAL), nullptr); }

@@ -23,8 +23,7 @@ class TrainerAction : public Action
     bool Execute(Event event) override;
 
    private:
-    typedef void (TrainerAction::*TrainerSpellAction)(uint32, TrainerSpell const *,
-                                                      std::ostringstream &msg);
+    typedef void (TrainerAction::*TrainerSpellAction)(uint32, TrainerSpell const *, std::ostringstream &msg);
     void Iterate(Creature *creature, TrainerSpellAction action, SpellIds &spells);
     void Learn(uint32 cost, TrainerSpell const *tSpell, std::ostringstream &msg);
     void TellHeader(Creature *creature);

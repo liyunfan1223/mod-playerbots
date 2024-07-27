@@ -32,20 +32,14 @@ class SpellstoneTrigger : public BuffTrigger
 class CurseOfAgonyTrigger : public DebuffTrigger
 {
    public:
-    CurseOfAgonyTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "curse of agony", 1, true, 20.0f)
-    {
-    }
+    CurseOfAgonyTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "curse of agony", 1, true, 20.0f) {}
 };
 
 class CorruptionTrigger : public DebuffTrigger
 {
    public:
     CorruptionTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "corruption", 1, true) {}
-    bool IsActive() override
-    {
-        return DebuffTrigger::IsActive() &&
-               !botAI->HasAura("seed of corruption", GetTarget(), false, true);
-    }
+    bool IsActive() override { return DebuffTrigger::IsActive() && !botAI->HasAura("seed of corruption", GetTarget(), false, true); }
 };
 
 DEBUFF_CHECKISOWNER_TRIGGER(SiphonLifeTrigger, "siphon life");
@@ -53,32 +47,20 @@ DEBUFF_CHECKISOWNER_TRIGGER(SiphonLifeTrigger, "siphon life");
 class CorruptionOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
    public:
-    CorruptionOnAttackerTrigger(PlayerbotAI *botAI)
-        : DebuffOnAttackerTrigger(botAI, "corruption", true)
-    {
-    }
-    bool IsActive() override
-    {
-        return DebuffOnAttackerTrigger::IsActive() &&
-               !botAI->HasAura("seed of corruption", GetTarget(), false, true);
-    }
+    CorruptionOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnAttackerTrigger(botAI, "corruption", true) {}
+    bool IsActive() override { return DebuffOnAttackerTrigger::IsActive() && !botAI->HasAura("seed of corruption", GetTarget(), false, true); }
 };
 
 class CastCurseOfAgonyOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
    public:
-    CastCurseOfAgonyOnAttackerTrigger(PlayerbotAI *botAI)
-        : DebuffOnAttackerTrigger(botAI, "curse of agony", true, 20.0f)
-    {
-    }
+    CastCurseOfAgonyOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnAttackerTrigger(botAI, "curse of agony", true, 20.0f) {}
 };
 
 class SiphonLifeOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
    public:
-    SiphonLifeOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnAttackerTrigger(botAI, "siphon life")
-    {
-    }
+    SiphonLifeOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnAttackerTrigger(botAI, "siphon life") {}
 };
 
 DEBUFF_CHECKISOWNER_TRIGGER(ImmolateTrigger, "immolate");
@@ -111,10 +93,7 @@ class BanishTrigger : public HasCcTargetTrigger
 class WarlockConjuredItemTrigger : public ItemCountTrigger
 {
    public:
-    WarlockConjuredItemTrigger(PlayerbotAI *botAI, std::string const item)
-        : ItemCountTrigger(botAI, item, 1)
-    {
-    }
+    WarlockConjuredItemTrigger(PlayerbotAI *botAI, std::string const item) : ItemCountTrigger(botAI, item, 1) {}
 
     bool IsActive() override;
 };
@@ -152,19 +131,14 @@ class AmplifyCurseTrigger : public BuffTrigger
 class UnstableAfflictionTrigger : public DebuffTrigger  // SpellTrigger
 {
    public:
-    UnstableAfflictionTrigger(PlayerbotAI *ai) : DebuffTrigger(ai, "unstable affliction", 1, true)
-    {
-    }
+    UnstableAfflictionTrigger(PlayerbotAI *ai) : DebuffTrigger(ai, "unstable affliction", 1, true) {}
     bool IsActive() override;
 };
 
 class UnstableAfflictionOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
    public:
-    UnstableAfflictionOnAttackerTrigger(PlayerbotAI *ai)
-        : DebuffOnAttackerTrigger(ai, "unstable affliction", true)
-    {
-    }
+    UnstableAfflictionOnAttackerTrigger(PlayerbotAI *ai) : DebuffOnAttackerTrigger(ai, "unstable affliction", true) {}
     bool IsActive() override;
 };
 

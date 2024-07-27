@@ -33,10 +33,7 @@ class FindCorpseAction : public MovementAction
 class SpiritHealerAction : public MovementAction
 {
    public:
-    SpiritHealerAction(PlayerbotAI *botAI, std::string const name = "spirit healer")
-        : MovementAction(botAI, name)
-    {
-    }
+    SpiritHealerAction(PlayerbotAI *botAI, std::string const name = "spirit healer") : MovementAction(botAI, name) {}
 
     GraveyardStruct const *GetGrave(bool startZone);
     bool Execute(Event event) override;

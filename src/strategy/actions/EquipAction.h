@@ -17,9 +17,7 @@ class PlayerbotAI;
 class EquipAction : public InventoryAction
 {
    public:
-    EquipAction(PlayerbotAI *botAI, std::string const name = "equip") : InventoryAction(botAI, name)
-    {
-    }
+    EquipAction(PlayerbotAI *botAI, std::string const name = "equip") : InventoryAction(botAI, name) {}
 
     bool Execute(Event event) override;
     void EquipItems(ItemIds ids);
@@ -33,10 +31,7 @@ class EquipAction : public InventoryAction
 class EquipUpgradesAction : public EquipAction
 {
    public:
-    EquipUpgradesAction(PlayerbotAI *botAI, std::string const name = "equip upgrades")
-        : EquipAction(botAI, name)
-    {
-    }
+    EquipUpgradesAction(PlayerbotAI *botAI, std::string const name = "equip upgrades") : EquipAction(botAI, name) {}
 
     bool Execute(Event event) override;
 };
@@ -44,10 +39,7 @@ class EquipUpgradesAction : public EquipAction
 class EquipUpgradeAction : public EquipAction
 {
    public:
-    EquipUpgradeAction(PlayerbotAI *botAI, std::string const name = "equip upgrade")
-        : EquipAction(botAI, name)
-    {
-    }
+    EquipUpgradeAction(PlayerbotAI *botAI, std::string const name = "equip upgrade") : EquipAction(botAI, name) {}
 
     bool Execute(Event event) override;
 };

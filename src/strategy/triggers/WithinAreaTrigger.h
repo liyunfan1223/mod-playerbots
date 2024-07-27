@@ -21,8 +21,7 @@ class WithinAreaTrigger : public Trigger
     bool IsActive() override;
 
    private:
-    bool IsPointInAreaTriggerZone(AreaTrigger const *atEntry, uint32 mapid, float x, float y,
-                                  float z, float delta);
+    bool IsPointInAreaTriggerZone(AreaTrigger const *atEntry, uint32 mapid, float x, float y, float z, float delta);
 };
 
 #endif

@@ -15,10 +15,7 @@ class Unit;
 class CurrentTargetValue : public UnitManualSetValue
 {
    public:
-    CurrentTargetValue(PlayerbotAI *botAI, std::string const name = "current target")
-        : UnitManualSetValue(botAI, nullptr, name)
-    {
-    }
+    CurrentTargetValue(PlayerbotAI *botAI, std::string const name = "current target") : UnitManualSetValue(botAI, nullptr, name) {}
 
     Unit *Get() override;
     void Set(Unit *unit) override;

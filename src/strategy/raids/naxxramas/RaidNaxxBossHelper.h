@@ -134,15 +134,8 @@ class SapphironBossHelper : public GenericBossHelper<Sapphiron::boss_sapphiron::
     }
     bool IsPhaseGround() { return _target->GetReactState() == REACT_AGGRESSIVE; }
     bool IsPhaseFlight() { return !IsPhaseGround(); }
-    bool JustLanded()
-    {
-        return (_event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_START) - _timer) >=
-               EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
-    }
-    bool WaitForExplosion()
-    {
-        return _event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_SPELL_EXPLOSION);
-    }
+    bool JustLanded() { return (_event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_START) - _timer) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED; }
+    bool WaitForExplosion() { return _event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_SPELL_EXPLOSION); }
     bool FindPosToAvoidChill(std::vector<float> &dest)
     {
         Aura *aura = botAI->GetAura("chill", bot);
@@ -198,8 +191,7 @@ class SapphironBossHelper : public GenericBossHelper<Sapphiron::boss_sapphiron::
         {
             angle = bot->GetAngle(dyn_obj) - M_PI + (rand_norm() - 0.5) * M_PI / 2;
         }
-        dest = {bot->GetPositionX() + cos(angle) * 5.0f, bot->GetPositionY() + sin(angle) * 5.0f,
-                bot->GetPositionZ()};
+        dest = {bot->GetPositionX() + cos(angle) * 5.0f, bot->GetPositionY() + sin(angle) * 5.0f, bot->GetPositionZ()};
         return true;
     }
 
@@ -238,13 +230,11 @@ class LoathebBossHelper : public GenericBossHelper<Loatheb::boss_loatheb::boss_l
     LoathebBossHelper(PlayerbotAI *botAI) : GenericBossHelper(botAI, "loatheb") {}
 };
 
-class FourhorsemanBossHelper
-    : public GenericBossHelper<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI>
+class FourhorsemanBossHelper : public GenericBossHelper<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI>
 {
    public:
     const float posZ = 241.27f;
-    const std::pair<float, float> attractPos[2] = {
-        {2502.03f, -2910.90f}, {2484.61f, -2947.07f}};  // left (sir zeliek), right (lady blaumeux)
+    const std::pair<float, float> attractPos[2] = {{2502.03f, -2910.90f}, {2484.61f, -2947.07f}};  // left (sir zeliek), right (lady blaumeux)
     FourhorsemanBossHelper(PlayerbotAI *botAI) : GenericBossHelper(botAI, "sir zeliek") {}
     bool UpdateBossAI() override
     {
@@ -262,8 +252,7 @@ class FourhorsemanBossHelper
         {
             return true;
         }
-        ladyAI =
-            dynamic_cast<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI *>(lady->GetAI());
+        ladyAI = dynamic_cast<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI *>(lady->GetAI());
         if (!ladyAI)
         {
             return true;
@@ -294,9 +283,7 @@ class FourhorsemanBossHelper
         Difficulty diff = bot->GetRaidDifficulty();
         if (diff == RAID_DIFFICULTY_25MAN_NORMAL)
         {
-            return botAI->IsRangedDpsAssistantOfIndex(bot, 0) ||
-                   botAI->IsHealAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 1) ||
-                   botAI->IsHealAssistantOfIndex(bot, 2);
+            return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 1) || botAI->IsHealAssistantOfIndex(bot, 2);
         }
         return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0);
     }
@@ -311,8 +298,7 @@ class FourhorsemanBossHelper
         {
             // Interval: 24s - 15s - 15s - ...
             posToGo = !(_timer <= 9000 || ((_timer - 9000) / 67500) % 2 == 0);
-            if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) ||
-                (raid25 && botAI->IsHealAssistantOfIndex(bot, 1)))
+            if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) || (raid25 && botAI->IsHealAssistantOfIndex(bot, 1)))
             {
                 posToGo = 1 - posToGo;
             }
@@ -396,8 +382,7 @@ class ThaddiusBossHelper : public GenericBossHelper<Thaddius::boss_thaddius::bos
         {
             unit = feugen;
         }
-        if (stalagg && stalagg->IsAlive() &&
-            (!feugen || bot->GetDistance(stalagg) < bot->GetDistance(feugen)))
+        if (stalagg && stalagg->IsAlive() && (!feugen || bot->GetDistance(stalagg) < bot->GetDistance(feugen)))
         {
             unit = stalagg;
         }

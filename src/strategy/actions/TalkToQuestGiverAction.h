@@ -16,10 +16,7 @@ class WorldObject;
 class TalkToQuestGiverAction : public QuestAction
 {
    public:
-    TalkToQuestGiverAction(PlayerbotAI *botAI, std::string name = "talk to quest giver")
-        : QuestAction(botAI, name)
-    {
-    }
+    TalkToQuestGiverAction(PlayerbotAI *botAI, std::string name = "talk to quest giver") : QuestAction(botAI, name) {}
 
    protected:
     void ProcessQuest(Quest const *quest, Object *questGiver) override;
@@ -36,10 +33,7 @@ class TalkToQuestGiverAction : public QuestAction
 class TurnInQueryQuestAction : public TalkToQuestGiverAction
 {
    public:
-    TurnInQueryQuestAction(PlayerbotAI *botAI)
-        : TalkToQuestGiverAction(botAI, "turn in query quest")
-    {
-    }
+    TurnInQueryQuestAction(PlayerbotAI *botAI) : TalkToQuestGiverAction(botAI, "turn in query quest") {}
     bool Execute(Event event) override;
 };
 #endif

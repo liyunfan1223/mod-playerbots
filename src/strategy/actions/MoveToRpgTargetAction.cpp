@@ -53,8 +53,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
 
             if (guidPP.IsPlayer())
             {
-                AI_VALUE(GuidSet &, "ignore rpg target")
-                    .insert(AI_VALUE(GuidPosition, "rpg target"));
+                AI_VALUE(GuidSet &, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
 
                 RESET_AI_VALUE(GuidPosition, "rpg target");
                 return false;
@@ -62,9 +61,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
         }
     }
 
-    if ((unit && unit->isMoving() && !urand(0, 20)) ||
-        !ChooseRpgTargetAction::isFollowValid(bot, wo) ||
-        guidP.distance(bot) > sPlayerbotAIConfig->reactDistance * 2 || !urand(0, 50))
+    if ((unit && unit->isMoving() && !urand(0, 20)) || !ChooseRpgTargetAction::isFollowValid(bot, wo) || guidP.distance(bot) > sPlayerbotAIConfig->reactDistance * 2 || !urand(0, 50))
     {
         AI_VALUE(GuidSet &, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
         RESET_AI_VALUE(GuidPosition, "rpg target");
@@ -85,12 +82,9 @@ bool MoveToRpgTargetAction::Execute(Event event)
     if (bot->IsWithinLOS(x, y, z))
     {
         if (!unit || !unit->isMoving())
-            angle = wo->GetAngle(bot) +
-                    (M_PI * irand(-25, 25) / 100.0);  // Closest 45 degrees towards the target
+            angle = wo->GetAngle(bot) + (M_PI * irand(-25, 25) / 100.0);  // Closest 45 degrees towards the target
         else
-            angle = wo->GetOrientation() +
-                    (M_PI * irand(-25, 25) /
-                     100.0);  // 45 degrees infront of target (leading it's movement)
+            angle = wo->GetOrientation() + (M_PI * irand(-25, 25) / 100.0);  // 45 degrees infront of target (leading it's movement)
 
         distance = frand(0.5f, 1.f);
     }
@@ -129,8 +123,7 @@ bool MoveToRpgTargetAction::isUseful()
         return false;
 
     TravelTarget *travelTarget = AI_VALUE(TravelTarget *, "travel target");
-    if (travelTarget->isTraveling() &&
-        ChooseRpgTargetAction::isFollowValid(bot, *travelTarget->getPosition()))
+    if (travelTarget->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot, *travelTarget->getPosition()))
         return false;
 
     if (guidP.distance(bot) < INTERACTION_DISTANCE)

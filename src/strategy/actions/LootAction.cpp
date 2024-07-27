@@ -22,8 +22,7 @@ bool LootAction::Execute(Event event)
         return false;
 
     LootObject prevLoot = AI_VALUE(LootObject, "loot target");
-    LootObject const &lootObject =
-        AI_VALUE(LootObjectStack *, "available loot")->GetLoot(sPlayerbotAIConfig->lootDistance);
+    LootObject const &lootObject = AI_VALUE(LootObjectStack *, "available loot")->GetLoot(sPlayerbotAIConfig->lootDistance);
 
     if (!prevLoot.IsEmpty() && prevLoot.guid != lootObject.guid)
     {
@@ -36,11 +35,7 @@ bool LootAction::Execute(Event event)
     return true;
 }
 
-bool LootAction::isUseful()
-{
-    return sPlayerbotAIConfig->freeMethodLoot || !bot->GetGroup() ||
-           bot->GetGroup()->GetLootMethod() != FREE_FOR_ALL;
-}
+bool LootAction::isUseful() { return sPlayerbotAIConfig->freeMethodLoot || !bot->GetGroup() || bot->GetGroup()->GetLootMethod() != FREE_FOR_ALL; }
 
 enum ProfessionSpells
 {
@@ -104,15 +99,13 @@ bool OpenLootAction::DoLoot(LootObject &lootObject)
         switch (skill)
         {
             case SKILL_ENGINEERING:
-                return botAI->HasSkill(SKILL_ENGINEERING) ? botAI->CastSpell(ENGINEERING, creature)
-                                                          : false;
+                return botAI->HasSkill(SKILL_ENGINEERING) ? botAI->CastSpell(ENGINEERING, creature) : false;
             case SKILL_HERBALISM:
                 return botAI->HasSkill(SKILL_HERBALISM) ? botAI->CastSpell(32605, creature) : false;
             case SKILL_MINING:
                 return botAI->HasSkill(SKILL_MINING) ? botAI->CastSpell(32606, creature) : false;
             default:
-                return botAI->HasSkill(SKILL_SKINNING) ? botAI->CastSpell(SKINNING, creature)
-                                                       : false;
+                return botAI->HasSkill(SKILL_SKINNING) ? botAI->CastSpell(SKINNING, creature) : false;
         }
     }
 
@@ -147,8 +140,7 @@ uint32 OpenLootAction::GetOpeningSpell(LootObject &lootObject)
 
 uint32 OpenLootAction::GetOpeningSpell(LootObject &lootObject, GameObject *go)
 {
-    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end();
-         ++itr)
+    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         uint32 spellId = itr->first;
 
@@ -186,8 +178,7 @@ bool OpenLootAction::CanOpenLock(LootObject &lootObject, SpellInfo const *spellI
 {
     for (uint8 effIndex = 0; effIndex <= EFFECT_2; effIndex++)
     {
-        if (spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_OPEN_LOCK &&
-            spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_SKINNING)
+        if (spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_OPEN_LOCK && spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_SKINNING)
             return false;
 
         uint32 lockId = go->GetGOInfo()->GetLockId();
@@ -409,8 +400,7 @@ bool StoreLootAction::Execute(Event event)
         Player *master = botAI->GetMaster();
         if (sRandomPlayerbotMgr->IsRandomBot(bot) && master)
         {
-            uint32 price =
-                itemcount * proto->BuyPrice * sRandomPlayerbotMgr->GetBuyMultiplier(bot) + gold;
+            uint32 price = itemcount * proto->BuyPrice * sRandomPlayerbotMgr->GetBuyMultiplier(bot) + gold;
             if (price)
                 sRandomPlayerbotMgr->AddTradeDiscount(bot, master, price);
 
@@ -424,12 +414,10 @@ bool StoreLootAction::Execute(Event event)
         packet << itemindex;
         bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
 
-        if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) &&
-            botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
+        if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
-        if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) &&
-            botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
+        if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
         // std::ostringstream out;

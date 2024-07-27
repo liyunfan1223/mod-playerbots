@@ -95,8 +95,7 @@ bool CleanQuestLogAction::Execute(Event event)
     return false;
 }
 
-void CleanQuestLogAction::DropQuestType(uint8 &numQuest, uint8 wantNum, bool isGreen,
-                                        bool hasProgress, bool isComplete)
+void CleanQuestLogAction::DropQuestType(uint8 &numQuest, uint8 wantNum, bool isGreen, bool hasProgress, bool isComplete)
 {
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
@@ -108,22 +107,17 @@ void CleanQuestLogAction::DropQuestType(uint8 &numQuest, uint8 wantNum, bool isG
         if (!quest)
             continue;
 
-        if (quest->GetRequiredClasses() &&
-            (quest->GetRewSpellCast() ||
-             quest->GetRewSpell()))  // Do not drop class specific quests that learn spells.
+        if (quest->GetRequiredClasses() && (quest->GetRewSpellCast() || quest->GetRewSpell()))  // Do not drop class specific quests that learn spells.
             continue;
 
-        if (quest->GetRequiredClasses() &&
-            (quest->GetRewSpellCast() ||
-             quest->GetRewSpell()))  // Do not drop class specific quests that learn spells.
+        if (quest->GetRequiredClasses() && (quest->GetRewSpellCast() || quest->GetRewSpell()))  // Do not drop class specific quests that learn spells.
             continue;
 
         if (wantNum == 100)
             numQuest++;
 
         int32 lowLevelDiff = sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF);
-        if (lowLevelDiff < 0 || bot->GetLevel() <= bot->GetQuestLevel(quest) +
-                                                       uint32(lowLevelDiff))  // Quest is not gray
+        if (lowLevelDiff < 0 || bot->GetLevel() <= bot->GetQuestLevel(quest) + uint32(lowLevelDiff))  // Quest is not gray
         {
             if (bot->GetLevel() + 5 > bot->GetQuestLevel(quest))  // Quest is not red
                 if (!isGreen)
@@ -141,8 +135,7 @@ void CleanQuestLogAction::DropQuestType(uint8 &numQuest, uint8 wantNum, bool isG
         if (bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE && !isComplete)
             continue;
 
-        if (numQuest <= wantNum &&
-            bot->GetQuestStatus(questId) != QUEST_STATUS_FAILED)  // Always drop failed quests
+        if (numQuest <= wantNum && bot->GetQuestStatus(questId) != QUEST_STATUS_FAILED)  // Always drop failed quests
             continue;
 
         // Drop quest.

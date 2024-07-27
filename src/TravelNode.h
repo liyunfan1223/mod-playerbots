@@ -80,17 +80,8 @@ class TravelNodePath
     // false);
 
     // Constructor
-    TravelNodePath(float distance = 0.1f, float extraCost = 0,
-                   uint8 pathType = (uint8)TravelNodePathType::walk, uint32 pathObject = 0,
-                   bool calculated = false, std::vector<uint8> maxLevelCreature = {0, 0, 0},
-                   float swimDistance = 0)
-        : extraCost(extraCost),
-          calculated(calculated),
-          distance(distance),
-          maxLevelCreature(maxLevelCreature),
-          swimDistance(swimDistance),
-          pathType(TravelNodePathType(pathType)),
-          pathObject(pathObject)  // reorder args - whipowill
+    TravelNodePath(float distance = 0.1f, float extraCost = 0, uint8 pathType = (uint8)TravelNodePathType::walk, uint32 pathObject = 0, bool calculated = false, std::vector<uint8> maxLevelCreature = {0, 0, 0}, float swimDistance = 0)
+        : extraCost(extraCost), calculated(calculated), distance(distance), maxLevelCreature(maxLevelCreature), swimDistance(swimDistance), pathType(TravelNodePathType(pathType)), pathObject(pathObject)  // reorder args - whipowill
     {
         if (pathType != (uint8)TravelNodePathType::walk)
             complete = true;
@@ -197,8 +188,7 @@ class TravelNode
     // Constructors
     TravelNode() {};
 
-    TravelNode(WorldPosition point1, std::string const nodeName1 = "Travel Node",
-               bool important1 = false)
+    TravelNode(WorldPosition point1, std::string const nodeName1 = "Travel Node", bool important1 = false)
     {
         nodeName = nodeName1;
         point = point1;
@@ -271,8 +261,7 @@ class TravelNode
     float fDist(TravelNode *node) { return point.fDist(node->getPosition()); }
     float fDist(WorldPosition pos) { return point.fDist(pos); }
 
-    TravelNodePath *setPathTo(TravelNode *node, TravelNodePath path = TravelNodePath(),
-                              bool isLink = true)
+    TravelNodePath *setPathTo(TravelNode *node, TravelNodePath path = TravelNodePath(), bool isLink = true)
     {
         if (this != node)
         {
@@ -288,10 +277,7 @@ class TravelNode
 
     bool hasPathTo(TravelNode *node) { return paths.find(node) != paths.end(); }
     TravelNodePath *getPathTo(TravelNode *node) { return &paths[node]; }
-    bool hasCompletePathTo(TravelNode *node)
-    {
-        return hasPathTo(node) && getPathTo(node)->getComplete();
-    }
+    bool hasCompletePathTo(TravelNode *node) { return hasPathTo(node) && getPathTo(node)->getComplete(); }
     TravelNodePath *buildPath(TravelNode *endNode, Unit *bot, bool postProcess = false);
 
     void setLinkTo(TravelNode *node, float distance = 0.1f)
@@ -318,14 +304,14 @@ class TravelNode
     bool cropUselessLinks();
 
     // Returns all nodes that can be reached from this node.
-    std::vector<TravelNode *> getNodeMap(bool importantOnly = false,
-                                         std::vector<TravelNode *> ignoreNodes = {});
+    std::vector<TravelNode *> getNodeMap(bool importantOnly = false, std::vector<TravelNode *> ignoreNodes = {});
 
     // Checks if it is even possible to route to this node.
     bool hasRouteTo(TravelNode *node)
     {
         if (routes.empty())
-            for (auto mNode : getNodeMap()) routes[mNode] = true;
+            for (auto mNode : getNodeMap())
+                routes[mNode] = true;
 
         return routes.find(node) != routes.end();
     };
@@ -369,8 +355,7 @@ class PortalNode : public TravelNode
         point = *baseNode->getPosition();
         paths.clear();
         links.clear();
-        TravelNodePath path(0.1f, 0.1f, (uint8)TravelNodePathType::teleportSpell, portalSpell,
-                            true);
+        TravelNodePath path(0.1f, 0.1f, (uint8)TravelNodePathType::teleportSpell, portalSpell, true);
         setPathTo(endNode, path);
     };
 };
@@ -400,16 +385,10 @@ class TravelPath
    public:
     TravelPath() {};
     TravelPath(std::vector<PathNodePoint> fullPath1) { fullPath = fullPath1; }
-    TravelPath(std::vector<WorldPosition> path, PathNodeType type = NODE_PATH, uint32 entry = 0)
-    {
-        addPath(path, type, entry);
-    }
+    TravelPath(std::vector<WorldPosition> path, PathNodeType type = NODE_PATH, uint32 entry = 0) { addPath(path, type, entry); }
 
     void addPoint(PathNodePoint point) { fullPath.push_back(point); }
-    void addPoint(WorldPosition point, PathNodeType type = NODE_PATH, uint32 entry = 0)
-    {
-        fullPath.push_back(PathNodePoint{point, type, entry});
-    }
+    void addPoint(WorldPosition point, PathNodeType type = NODE_PATH, uint32 entry = 0) { fullPath.push_back(PathNodePoint{point, type, entry}); }
     void addPath(std::vector<WorldPosition> path, PathNodeType type = NODE_PATH, uint32 entry = 0)
     {
         for (auto &p : path)
@@ -417,10 +396,7 @@ class TravelPath
             fullPath.push_back(PathNodePoint{p, type, entry});
         };
     }
-    void addPath(std::vector<PathNodePoint> newPath)
-    {
-        fullPath.insert(fullPath.end(), newPath.begin(), newPath.end());
-    }
+    void addPath(std::vector<PathNodePoint> newPath) { fullPath.insert(fullPath.end(), newPath.begin(), newPath.end()); }
     void clear() { fullPath.clear(); }
 
     bool empty() { return fullPath.empty(); }
@@ -431,17 +407,14 @@ class TravelPath
     std::vector<WorldPosition> getPointPath()
     {
         std::vector<WorldPosition> retVec;
-        for (auto const &p : fullPath) retVec.push_back(p.point);
+        for (auto const &p : fullPath)
+            retVec.push_back(p.point);
         return retVec;
     };
 
     bool makeShortCut(WorldPosition startPos, float maxDist);
-    bool shouldMoveToNextPoint(WorldPosition startPos, std::vector<PathNodePoint>::iterator beg,
-                               std::vector<PathNodePoint>::iterator ed,
-                               std::vector<PathNodePoint>::iterator p, float &moveDist,
-                               float maxDist);
-    WorldPosition getNextPoint(WorldPosition startPos, float maxDist, TravelNodePathType &pathType,
-                               uint32 &entry);
+    bool shouldMoveToNextPoint(WorldPosition startPos, std::vector<PathNodePoint>::iterator beg, std::vector<PathNodePoint>::iterator ed, std::vector<PathNodePoint>::iterator p, float &moveDist, float maxDist);
+    WorldPosition getNextPoint(WorldPosition startPos, float maxDist, TravelNodePathType &pathType, uint32 &entry);
 
     std::ostringstream const print();
 
@@ -454,10 +427,7 @@ class TravelNodeRoute
 {
    public:
     TravelNodeRoute() {}
-    TravelNodeRoute(std::vector<TravelNode *> nodes1)
-    {
-        nodes = nodes1; /*currentNode = route.begin();*/
-    }
+    TravelNodeRoute(std::vector<TravelNode *> nodes1) { nodes = nodes1; /*currentNode = route.begin();*/ }
 
     bool isEmpty() { return nodes.empty(); }
 
@@ -466,16 +436,12 @@ class TravelNodeRoute
 
     std::vector<TravelNode *> getNodes() { return nodes; }
 
-    TravelPath buildPath(std::vector<WorldPosition> pathToStart = {},
-                         std::vector<WorldPosition> pathToEnd = {}, Unit *bot = nullptr);
+    TravelPath buildPath(std::vector<WorldPosition> pathToStart = {}, std::vector<WorldPosition> pathToEnd = {}, Unit *bot = nullptr);
 
     std::ostringstream const print();
 
    private:
-    std::vector<TravelNode *>::iterator findNode(TravelNode *node)
-    {
-        return std::find(nodes.begin(), nodes.end(), node);
-    }
+    std::vector<TravelNode *>::iterator findNode(TravelNode *node) { return std::find(nodes.begin(), nodes.end(), node); }
     std::vector<TravelNode *> nodes;
 };
 
@@ -505,15 +471,14 @@ class TravelNodeMap
         return &instance;
     }
 
-    TravelNode *addNode(WorldPosition pos, std::string const preferedName = "Travel Node",
-                        bool isImportant = false, bool checkDuplicate = true,
-                        bool transport = false, uint32 transportId = 0);
+    TravelNode *addNode(WorldPosition pos, std::string const preferedName = "Travel Node", bool isImportant = false, bool checkDuplicate = true, bool transport = false, uint32 transportId = 0);
     void removeNode(TravelNode *node);
     bool removeNodes()
     {
         if (m_nMapMtx.try_lock_for(std::chrono::seconds(10)))
         {
-            for (auto &node : m_nodes) removeNode(node);
+            for (auto &node : m_nodes)
+                removeNode(node);
 
             m_nMapMtx.unlock();
             return true;
@@ -533,16 +498,14 @@ class TravelNodeMap
     {
         for (auto &node : m_nodes)
         {
-            if (node->getName() == sameNode->getName() &&
-                node->getPosition() == sameNode->getPosition())
+            if (node->getName() == sameNode->getName() && node->getPosition() == sameNode->getPosition())
                 return node;
         }
 
         return nullptr;
     }
 
-    TravelNode *getNode(WorldPosition pos, std::vector<WorldPosition> &ppath, Unit *bot = nullptr,
-                        float range = -1);
+    TravelNode *getNode(WorldPosition pos, std::vector<WorldPosition> &ppath, Unit *bot = nullptr, float range = -1);
     TravelNode *getNode(WorldPosition pos, Unit *bot = nullptr, float range = -1)
     {
         std::vector<WorldPosition> ppath;
@@ -563,12 +526,10 @@ class TravelNodeMap
     TravelNodeRoute getRoute(TravelNode *start, TravelNode *goal, Player *bot = nullptr);
 
     // Find the best node between two positions
-    TravelNodeRoute getRoute(WorldPosition startPos, WorldPosition endPos,
-                             std::vector<WorldPosition> &startPath, Player *bot = nullptr);
+    TravelNodeRoute getRoute(WorldPosition startPos, WorldPosition endPos, std::vector<WorldPosition> &startPath, Player *bot = nullptr);
 
     // Find the full path between those locations
-    static TravelPath getFullPath(WorldPosition startPos, WorldPosition endPos,
-                                  Player *bot = nullptr);
+    static TravelPath getFullPath(WorldPosition startPos, WorldPosition endPos, Player *bot = nullptr);
 
     // Manage/update nodes
     void manageNodes(Unit *bot, bool mapFull = false);

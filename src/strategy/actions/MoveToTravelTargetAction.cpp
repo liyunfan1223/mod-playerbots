@@ -142,8 +142,7 @@ bool MoveToTravelTargetAction::isUseful()
     if (loot.IsLootPossible(bot))
         return false;
 
-    if (!ChooseRpgTargetAction::isFollowValid(
-            bot, *context->GetValue<TravelTarget *>("travel target")->Get()->getPosition()))
+    if (!ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget *>("travel target")->Get()->getPosition()))
         return false;
 
     return true;

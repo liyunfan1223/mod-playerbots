@@ -29,9 +29,7 @@ enum class NeedMoneyFor : uint32
 class MaxGearRepairCostValue : public Uint32CalculatedValue
 {
    public:
-    MaxGearRepairCostValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "max repair cost", 60)
-    {
-    }
+    MaxGearRepairCostValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "max repair cost", 60) {}
 
     uint32 Calculate() override;
 };
@@ -55,9 +53,7 @@ class TrainCostValue : public Uint32CalculatedValue
 class MoneyNeededForValue : public Uint32CalculatedValue, public Qualified
 {
    public:
-    MoneyNeededForValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "money needed for", 60)
-    {
-    }
+    MoneyNeededForValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "money needed for", 60) {}
 
     uint32 Calculate() override;
 };
@@ -65,17 +61,12 @@ class MoneyNeededForValue : public Uint32CalculatedValue, public Qualified
 class TotalMoneyNeededForValue : public Uint32CalculatedValue, public Qualified
 {
    public:
-    TotalMoneyNeededForValue(PlayerbotAI *botAI)
-        : Uint32CalculatedValue(botAI, "total money needed for", 60)
-    {
-    }
+    TotalMoneyNeededForValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "total money needed for", 60) {}
 
     uint32 Calculate() override;
 
    private:
-    std::vector<NeedMoneyFor> saveMoneyFor = {NeedMoneyFor::guild, NeedMoneyFor::repair,
-                                              NeedMoneyFor::ammo, NeedMoneyFor::spells,
-                                              NeedMoneyFor::travel};
+    std::vector<NeedMoneyFor> saveMoneyFor = {NeedMoneyFor::guild, NeedMoneyFor::repair, NeedMoneyFor::ammo, NeedMoneyFor::spells, NeedMoneyFor::travel};
 };
 
 class FreeMoneyForValue : public Uint32CalculatedValue, public Qualified

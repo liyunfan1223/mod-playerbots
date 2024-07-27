@@ -14,17 +14,11 @@
 
 bool CheckMountStateAction::Execute(Event event)
 {
-    bool noattackers = AI_VALUE2(bool, "combat", "self target")
-                           ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true)
-                           : true;
+    bool noattackers = AI_VALUE2(bool, "combat", "self target") ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true) : true;
     bool enemy = AI_VALUE(Unit *, "enemy player target");
     // ignore grind target in BG or bots will dismount near any creature (eg: the rams in AV)
-    bool dps = (AI_VALUE(Unit *, "dps target") ||
-                (!bot->InBattleground() && AI_VALUE(Unit *, "grind target")));
-    bool fartarget = (enemy && sServerFacade->IsDistanceGreaterThan(
-                                   AI_VALUE2(float, "distance", "enemy player target"), 40.0f)) ||
-                     (dps && sServerFacade->IsDistanceGreaterThan(
-                                 AI_VALUE2(float, "distance", "dps target"), 50.0f));
+    bool dps = (AI_VALUE(Unit *, "dps target") || (!bot->InBattleground() && AI_VALUE(Unit *, "grind target")));
+    bool fartarget = (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 40.0f)) || (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
     bool attackdistance = false;
     bool chasedistance = false;
     float attack_distance = 35.0f;
@@ -45,13 +39,8 @@ bool CheckMountStateAction::Execute(Event event)
 
     if (dps || enemy)
     {
-        attackdistance =
-            (enemy || dps) && sServerFacade->IsDistanceLessThan(
-                                  AI_VALUE2(float, "distance", "current target"), attack_distance);
-        chasedistance = enemy &&
-                        sServerFacade->IsDistanceGreaterThan(
-                            AI_VALUE2(float, "distance", "enemy player target"), 45.0f) &&
-                        AI_VALUE2(bool, "moving", "enemy player target");
+        attackdistance = (enemy || dps) && sServerFacade->IsDistanceLessThan(AI_VALUE2(float, "distance", "current target"), attack_distance);
+        chasedistance = enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 45.0f) && AI_VALUE2(bool, "moving", "enemy player target");
     }
 
     Player *master = GetMaster();
@@ -88,8 +77,7 @@ bool CheckMountStateAction::Execute(Event event)
         return false;
     }
 
-    if (bot->InBattleground() && !attackdistance && (noattackers || fartarget) &&
-        !bot->IsInCombat() && !bot->IsMounted())
+    if (bot->InBattleground() && !attackdistance && (noattackers || fartarget) && !bot->IsInCombat() && !bot->IsMounted())
     {
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
@@ -120,8 +108,7 @@ bool CheckMountStateAction::Execute(Event event)
     // if (!bot->IsMounted() && !attackdistance && (fartarget || chasedistance))
     //     return Mount();
 
-    if (!bot->IsFlying() && attackdistance && bot->IsMounted() &&
-        (enemy || dps || (!noattackers && bot->IsInCombat())))
+    if (!bot->IsFlying() && attackdistance && bot->IsMounted() && (enemy || dps || (!noattackers && bot->IsInCombat())))
     {
         WorldPacket emptyPacket;
         bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
@@ -194,30 +181,25 @@ bool CheckMountStateAction::Mount()
     int32 masterSpeed = 59;
     SpellInfo const *masterSpell = nullptr;
 
-    if (master && !master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).empty() &&
-        !bot->InBattleground())
+    if (master && !master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).empty() && !bot->InBattleground())
     {
         masterSpell = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetSpellInfo();
-        masterSpeed =
-            std::max(masterSpell->Effects[1].BasePoints, masterSpell->Effects[2].BasePoints);
+        masterSpeed = std::max(masterSpell->Effects[1].BasePoints, masterSpell->Effects[2].BasePoints);
     }
     else
     {
         masterSpeed = 59;
-        for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin();
-             itr != bot->GetSpellMap().end(); ++itr)
+        for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
         {
             uint32 spellId = itr->first;
             SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo || spellInfo->Effects[0].ApplyAuraName != SPELL_AURA_MOUNTED)
                 continue;
 
-            if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active ||
-                spellInfo->IsPassive())
+            if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active || spellInfo->IsPassive())
                 continue;
 
-            int32 effect =
-                std::max(spellInfo->Effects[1].BasePoints, spellInfo->Effects[2].BasePoints);
+            int32 effect = std::max(spellInfo->Effects[1].BasePoints, spellInfo->Effects[2].BasePoints);
             if (effect > masterSpeed)
                 masterSpeed = effect;
         }
@@ -233,34 +215,26 @@ bool CheckMountStateAction::Mount()
 
     // std::map<int32, std::vector<uint32> > spells;
     std::map<uint32, std::map<int32, std::vector<uint32>>> allSpells;
-    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end();
-         ++itr)
+    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         uint32 spellId = itr->first;
         SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo || spellInfo->Effects[0].ApplyAuraName != SPELL_AURA_MOUNTED)
             continue;
 
-        if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active ||
-            spellInfo->IsPassive())
+        if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active || spellInfo->IsPassive())
             continue;
 
         int32 effect = std::max(spellInfo->Effects[1].BasePoints, spellInfo->Effects[2].BasePoints);
         // if (effect < masterSpeed)
         // continue;
 
-        uint32 index =
-            (spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
-             spellInfo->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
-                ? 1
-                : 0;
+        uint32 index = (spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED || spellInfo->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ? 1 : 0;
 
-        if (index == 0 && std::max(spellInfo->Effects[EFFECT_1].BasePoints,
-                                   spellInfo->Effects[EFFECT_2].BasePoints) > 59)
+        if (index == 0 && std::max(spellInfo->Effects[EFFECT_1].BasePoints, spellInfo->Effects[EFFECT_2].BasePoints) > 59)
             hasSwiftMount = true;
 
-        if (index == 1 && std::max(spellInfo->Effects[EFFECT_1].BasePoints,
-                                   spellInfo->Effects[EFFECT_2].BasePoints) > 149)
+        if (index == 1 && std::max(spellInfo->Effects[EFFECT_1].BasePoints, spellInfo->Effects[EFFECT_2].BasePoints) > 149)
             hasSwiftMount = true;
 
         allSpells[index][effect].push_back(spellId);
@@ -269,12 +243,7 @@ bool CheckMountStateAction::Mount()
     int32 masterMountType = 0;
     if (masterSpell)
     {
-        masterMountType =
-            (masterSpell->Effects[1].ApplyAuraName ==
-                 SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
-             masterSpell->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
-                ? 1
-                : 0;
+        masterMountType = (masterSpell->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED || masterSpell->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ? 1 : 0;
     }
 
     std::map<int32, std::vector<uint32>> &spells = allSpells[masterMountType];
@@ -289,14 +258,10 @@ bool CheckMountStateAction::Mount()
                 if (!spellInfo)
                     continue;
 
-                if (masterMountType == 0 && masterSpeed > 59 &&
-                    std::max(spellInfo->Effects[EFFECT_1].BasePoints,
-                             spellInfo->Effects[EFFECT_2].BasePoints) < 99)
+                if (masterMountType == 0 && masterSpeed > 59 && std::max(spellInfo->Effects[EFFECT_1].BasePoints, spellInfo->Effects[EFFECT_2].BasePoints) < 99)
                     spells[59].clear();
 
-                if (masterMountType == 1 && masterSpeed > 149 &&
-                    std::max(spellInfo->Effects[EFFECT_1].BasePoints,
-                             spellInfo->Effects[EFFECT_2].BasePoints) < 279)
+                if (masterMountType == 1 && masterSpeed > 149 && std::max(spellInfo->Effects[EFFECT_1].BasePoints, spellInfo->Effects[EFFECT_2].BasePoints) < 279)
                     spells[149].clear();
             }
         }

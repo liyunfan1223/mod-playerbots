@@ -16,9 +16,7 @@ class IsTargetOfHealingSpell : public SpellEntryPredicate
     {
         for (uint8 i = 0; i < 3; ++i)
         {
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL ||
-                spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
-                spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MECHANICAL)
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL || spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH || spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MECHANICAL)
                 return true;
         }
 
@@ -26,10 +24,7 @@ class IsTargetOfHealingSpell : public SpellEntryPredicate
     }
 };
 
-inline bool compareByHealth(Unit const *u1, Unit const *u2)
-{
-    return u1->GetHealthPct() < u2->GetHealthPct();
-}
+inline bool compareByHealth(Unit const *u1, Unit const *u2) { return u1->GetHealthPct() < u2->GetHealthPct(); }
 
 Unit *PartyMemberToHeal::Calculate()
 {
@@ -48,8 +43,7 @@ Unit *PartyMemberToHeal::Calculate()
         if (player && Check(player) && player->IsAlive())
         {
             uint8 health = player->GetHealthPct();
-            if (isRaid || health < sPlayerbotAIConfig->mediumHealth ||
-                !IsTargetOfSpellCast(player, predicate))
+            if (isRaid || health < sPlayerbotAIConfig->mediumHealth || !IsTargetOfSpellCast(player, predicate))
             {
                 if (player->GetDistance2d(bot) > sPlayerbotAIConfig->healDistance)
                 {
@@ -87,9 +81,7 @@ bool PartyMemberToHeal::Check(Unit *player)
     // player->IsInWorld() &&
     //     sServerFacade->GetDistance2d(bot, player) < (player->IsPlayer() &&
     //     botAI->IsTank((Player*)player) ? 50.0f : 40.0f);
-    return player->GetMapId() == bot->GetMapId() && !player->IsCharmed() &&
-           bot->GetDistance2d(player) < sPlayerbotAIConfig->healDistance * 2 &&
-           bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+    return player->GetMapId() == bot->GetMapId() && !player->IsCharmed() && bot->GetDistance2d(player) < sPlayerbotAIConfig->healDistance * 2 && bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 
 Unit *PartyMemberToProtect::Calculate()

@@ -10,10 +10,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-HelpAction::HelpAction(PlayerbotAI *botAI) : Action(botAI, "help")
-{
-    chatContext = new ChatActionContext();
-}
+HelpAction::HelpAction(PlayerbotAI *botAI) : Action(botAI, "help") { chatContext = new ChatActionContext(); }
 
 HelpAction::~HelpAction() { delete chatContext; }
 

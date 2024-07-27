@@ -23,8 +23,7 @@ class InventoryAction : public Action
     void IterateItems(IterateItemsVisitor *visitor, IterateItemsMask mask = ITERATE_ITEMS_IN_BAGS);
     void TellItems(std::map<uint32, uint32> items, std::map<uint32, bool> soulbound);
     void TellItem(ItemTemplate const *proto, uint32 count, bool soulbound);
-    std::vector<Item *> parseItems(std::string const text,
-                                   IterateItemsMask mask = ITERATE_ALL_ITEMS);
+    std::vector<Item *> parseItems(std::string const text, IterateItemsMask mask = ITERATE_ALL_ITEMS);
     uint32 GetItemCount(FindItemVisitor *visitor, IterateItemsMask mask = ITERATE_ITEMS_IN_BAGS);
     std::string const parseOutfitName(std::string const outfit);
     ItemIds parseOutfitItems(std::string const outfit);

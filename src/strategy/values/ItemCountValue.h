@@ -27,23 +27,15 @@ class InventoryItemValueBase : public InventoryAction
 class ItemCountValue : public Uint32CalculatedValue, public Qualified, InventoryItemValueBase
 {
    public:
-    ItemCountValue(PlayerbotAI *botAI, std::string const name = "inventory items")
-        : Uint32CalculatedValue(botAI, name), InventoryItemValueBase(botAI)
-    {
-    }
+    ItemCountValue(PlayerbotAI *botAI, std::string const name = "inventory items") : Uint32CalculatedValue(botAI, name), InventoryItemValueBase(botAI) {}
 
     uint32 Calculate() override;
 };
 
-class InventoryItemValue : public CalculatedValue<std::vector<Item *>>,
-                           public Qualified,
-                           InventoryItemValueBase
+class InventoryItemValue : public CalculatedValue<std::vector<Item *>>, public Qualified, InventoryItemValueBase
 {
    public:
-    InventoryItemValue(PlayerbotAI *botAI)
-        : CalculatedValue<std::vector<Item *>>(botAI), InventoryItemValueBase(botAI)
-    {
-    }
+    InventoryItemValue(PlayerbotAI *botAI) : CalculatedValue<std::vector<Item *>>(botAI), InventoryItemValueBase(botAI) {}
 
     std::vector<Item *> Calculate() override;
 };

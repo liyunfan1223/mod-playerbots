@@ -20,8 +20,7 @@ typedef void (*BattleBotWaypointFunc)();
 
 struct BattleBotWaypoint
 {
-    BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc func)
-        : x(x_), y(y_), z(z_), pFunc(func) {};
+    BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc func) : x(x_), y(y_), z(z_), pFunc(func) {};
 
     float x = 0.0f;
     float y = 0.0f;
@@ -42,10 +41,7 @@ class BGTactics : public MovementAction
    public:
     static bool HandleConsoleCommand(ChatHandler *handler, char const *args);
 
-    BGTactics(PlayerbotAI *botAI, std::string const name = "bg tactics")
-        : MovementAction(botAI, name)
-    {
-    }
+    BGTactics(PlayerbotAI *botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) {}
 
     bool Execute(Event event) override;
 
@@ -55,8 +51,7 @@ class BGTactics : public MovementAction
     bool selectObjective(bool reset = false);
     bool moveToObjective();
     bool selectObjectiveWp(std::vector<BattleBotPath *> const &vPaths);
-    bool moveToObjectiveWp(BattleBotPath *const &currentPath, uint32 currentPoint,
-                           bool reverse = false);
+    bool moveToObjectiveWp(BattleBotPath *const &currentPath, uint32 currentPoint, bool reverse = false);
     bool startNewPathBegin(std::vector<BattleBotPath *> const &vPaths);
     bool startNewPathFree(std::vector<BattleBotPath *> const &vPaths);
     bool resetObjective();
@@ -73,10 +68,7 @@ class BGTactics : public MovementAction
 class ArenaTactics : public MovementAction
 {
    public:
-    ArenaTactics(PlayerbotAI *botAI, std::string const name = "arena tactics")
-        : MovementAction(botAI, name)
-    {
-    }
+    ArenaTactics(PlayerbotAI *botAI, std::string const name = "arena tactics") : MovementAction(botAI, name) {}
 
     bool Execute(Event event) override;
 

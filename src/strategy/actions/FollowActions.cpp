@@ -105,8 +105,7 @@ bool FollowAction::isUseful()
 bool FollowAction::CanDeadFollow(Unit *target)
 {
     // Move to corpse when dead and player is alive or not a ghost.
-    if (!bot->IsAlive() &&
-        (target->IsAlive() || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
+    if (!bot->IsAlive() && (target->IsAlive() || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
         return false;
 
     return true;

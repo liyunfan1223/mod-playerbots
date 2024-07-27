@@ -11,17 +11,11 @@
 
 bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 10; }
 
-Value<Unit *> *CastBanishAction::GetTargetValue()
-{
-    return context->GetValue<Unit *>("cc target", "banish");
-}
+Value<Unit *> *CastBanishAction::GetTargetValue() { return context->GetValue<Unit *>("cc target", "banish"); }
 
 bool CastBanishAction::Execute(Event event) { return botAI->CastSpell("banish", GetTarget()); }
 
-Value<Unit *> *CastFearOnCcAction::GetTargetValue()
-{
-    return context->GetValue<Unit *>("cc target", "fear");
-}
+Value<Unit *> *CastFearOnCcAction::GetTargetValue() { return context->GetValue<Unit *>("cc target", "fear"); }
 
 bool CastFearOnCcAction::Execute(Event event) { return botAI->CastSpell("fear", GetTarget()); }
 
@@ -29,7 +23,4 @@ bool CastFearOnCcAction::isPossible() { return botAI->CanCastSpell("fear", GetTa
 
 bool CastFearOnCcAction::isUseful() { return true; }
 
-bool CastLifeTapAction::isUseful()
-{
-    return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->lowHealth;
-}
+bool CastLifeTapAction::isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->lowHealth; }

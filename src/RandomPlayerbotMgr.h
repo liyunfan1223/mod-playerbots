@@ -17,17 +17,8 @@ class CachedEvent
 {
    public:
     CachedEvent() : value(0), lastChangeTime(0), validIn(0), data("") {}
-    CachedEvent(const CachedEvent &other)
-        : value(other.value),
-          lastChangeTime(other.lastChangeTime),
-          validIn(other.validIn),
-          data(other.data)
-    {
-    }
-    CachedEvent(uint32 value, uint32 lastChangeTime, uint32 validIn, std::string const data = "")
-        : value(value), lastChangeTime(lastChangeTime), validIn(validIn), data(data)
-    {
-    }
+    CachedEvent(const CachedEvent &other) : value(other.value), lastChangeTime(other.lastChangeTime), validIn(other.validIn), data(other.data) {}
+    CachedEvent(uint32 value, uint32 lastChangeTime, uint32 validIn, std::string const data = "") : value(value), lastChangeTime(lastChangeTime), validIn(validIn), data(data) {}
 
     bool IsEmpty() { return !lastChangeTime; }
 
@@ -90,8 +81,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
     void IncreaseLevel(Player *bot);
     void ScheduleTeleport(uint32 bot, uint32 time = 0);
     void ScheduleChangeStrategy(uint32 bot, uint32 time = 0);
-    void HandleCommand(uint32 type, std::string const text, Player *fromPlayer,
-                       std::string channelName = "");
+    void HandleCommand(uint32 type, std::string const text, Player *fromPlayer, std::string channelName = "");
     std::string const HandleRemoteCommand(std::string const request);
     void OnPlayerLogout(Player *player);
     void OnPlayerLogin(Player *player);
@@ -135,10 +125,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
     void CheckLfgQueue();
     void CheckPlayers();
 
-    std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> getBattleMastersCache()
-    {
-        return BattleMastersCache;
-    }
+    std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> getBattleMastersCache() { return BattleMastersCache; }
 
     float getActivityMod() { return activityMod; }
     float getActivityPercentage() { return activityMod * 100.0f; }
@@ -153,8 +140,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
     float activityMod = 0.25;
     uint32 GetEventValue(uint32 bot, std::string const event);
     std::string const GetEventData(uint32 bot, std::string const event);
-    uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn,
-                         std::string const data = "");
+    uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn, std::string const data = "");
     void GetBots();
     std::vector<uint32> GetBgBots(uint32 bracket);
     time_t BgCheckTimer;

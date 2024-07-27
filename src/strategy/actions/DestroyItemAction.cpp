@@ -70,9 +70,8 @@ bool SmartDestroyItemAction::Execute(Event event)
 
     std::vector<uint32> bestToDestroy = {ITEM_USAGE_NONE};  // First destroy anything useless.
 
-    if (!AI_VALUE(bool, "can sell") &&
-        AI_VALUE(bool, "should get money"))  // We need money so quest items are less important
-                                             // since they can't directly be sold.
+    if (!AI_VALUE(bool, "can sell") && AI_VALUE(bool, "should get money"))  // We need money so quest items are less important
+                                                                            // since they can't directly be sold.
         bestToDestroy.push_back(ITEM_USAGE_QUEST);
     else  // We don't need money so destroy the cheapest stuff.
     {
@@ -83,13 +82,11 @@ bool SmartDestroyItemAction::Execute(Event event)
     // If we still need room
     bestToDestroy.push_back(ITEM_USAGE_SKILL);  // Items that might help tradeskill are more
                                                 // important than above but still expenable.
-    bestToDestroy.push_back(
-        ITEM_USAGE_USE);  // These are more likely to be usefull 'soon' but still expenable.
+    bestToDestroy.push_back(ITEM_USAGE_USE);    // These are more likely to be usefull 'soon' but still expenable.
 
     for (auto &usage : bestToDestroy)
     {
-        std::vector<Item *> items =
-            AI_VALUE2(std::vector<Item *>, "inventory items", "usage " + std::to_string(usage));
+        std::vector<Item *> items = AI_VALUE2(std::vector<Item *>, "inventory items", "usage " + std::to_string(usage));
         std::reverse(items.begin(), items.end());
 
         for (auto &item : items)

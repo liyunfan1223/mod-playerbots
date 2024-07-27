@@ -41,16 +41,14 @@ bool ArenaTeamAcceptAction::Execute(Event event)
         WorldPacket data(CMSG_ARENA_TEAM_ACCEPT);
         bot->GetSession()->HandleArenaTeamAcceptOpcode(data);
         bot->Say("Thanks for the invite!", LANG_UNIVERSAL);
-        LOG_INFO("playerbots", "Bot {} <{}> accepts Arena Team invite",
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+        LOG_INFO("playerbots", "Bot {} <{}> accepts Arena Team invite", bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
         return true;
     }
     else
     {
         WorldPacket data(CMSG_ARENA_TEAM_DECLINE);
         bot->GetSession()->HandleArenaTeamDeclineOpcode(data);
-        LOG_INFO("playerbots", "Bot {} <{}> declines Arena Team invite",
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+        LOG_INFO("playerbots", "Bot {} <{}> declines Arena Team invite", bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
         return false;
     }
 

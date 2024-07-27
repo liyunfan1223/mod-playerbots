@@ -10,10 +10,8 @@
 
 ObjectGuid NewPlayerNearbyValue::Calculate()
 {
-    GuidVector players =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
-    GuidSet &alreadySeenPlayers =
-        botAI->GetAiObjectContext()->GetValue<GuidSet &>("already seen players")->Get();
+    GuidVector players = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
+    GuidSet &alreadySeenPlayers = botAI->GetAiObjectContext()->GetValue<GuidSet &>("already seen players")->Get();
     for (ObjectGuid const guid : players)
     {
         if (alreadySeenPlayers.find(guid) == alreadySeenPlayers.end())

@@ -46,8 +46,7 @@ bool GoAction::Execute(Event event)
 
         if (TravelDestination *dest = ChooseTravelTargetAction::FindDestination(bot, destination))
         {
-            std::vector<WorldPosition *> points =
-                dest->nextPoint(const_cast<WorldPosition *>(&botPos), true);
+            std::vector<WorldPosition *> points = dest->nextPoint(const_cast<WorldPosition *>(&botPos), true);
             if (points.empty())
                 return false;
 
@@ -77,8 +76,7 @@ bool GoAction::Execute(Event event)
             if (GameObject *go = botAI->GetGameObject(guid))
                 if (go->isSpawned())
                 {
-                    if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, go),
-                                                             sPlayerbotAIConfig->reactDistance))
+                    if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, go), sPlayerbotAIConfig->reactDistance))
                     {
                         botAI->TellError("It is too far away");
                         return false;
@@ -87,8 +85,7 @@ bool GoAction::Execute(Event event)
                     std::ostringstream out;
                     out << "Moving to " << ChatHelper::FormatGameobject(go);
                     botAI->TellMasterNoFacing(out.str());
-                    return MoveNear(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(),
-                                    go->GetPositionZ() + 0.5f, sPlayerbotAIConfig->followDistance);
+                    return MoveNear(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 0.5f, sPlayerbotAIConfig->followDistance);
                 }
         }
         return false;
@@ -107,8 +104,7 @@ bool GoAction::Execute(Event event)
                 std::ostringstream out;
                 out << "Moving to " << unit->GetName();
                 botAI->TellMasterNoFacing(out.str());
-                return MoveNear(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(),
-                                unit->GetPositionZ() + 0.5f, sPlayerbotAIConfig->followDistance);
+                return MoveNear(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 0.5f, sPlayerbotAIConfig->followDistance);
             }
     }
 
@@ -178,8 +174,7 @@ bool GoAction::Execute(Event event)
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
 
-        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, x, y),
-                                                 sPlayerbotAIConfig->reactDistance))
+        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, x, y), sPlayerbotAIConfig->reactDistance))
         {
             botAI->TellMaster("It is too far away");
             return false;
@@ -211,8 +206,7 @@ bool GoAction::Execute(Event event)
     PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()[param];
     if (pos.isSet())
     {
-        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, pos.x, pos.y),
-                                                 sPlayerbotAIConfig->reactDistance))
+        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, pos.x, pos.y), sPlayerbotAIConfig->reactDistance))
         {
             botAI->TellError("It is too far away");
             return false;
@@ -221,11 +215,9 @@ bool GoAction::Execute(Event event)
         std::ostringstream out;
         out << "Moving to position " << param;
         botAI->TellMasterNoFacing(out.str());
-        return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z + 0.5f,
-                        sPlayerbotAIConfig->followDistance);
+        return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z + 0.5f, sPlayerbotAIConfig->followDistance);
     }
 
-    botAI->TellMaster(
-        "Whisper 'go x,y', 'go [game object]', 'go unit' or 'go position' and I will go there");
+    botAI->TellMaster("Whisper 'go x,y', 'go [game object]', 'go unit' or 'go position' and I will go there");
     return false;
 }

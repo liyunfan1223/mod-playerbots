@@ -25,8 +25,7 @@ bool InviteToGroupAction::Invite(Player *player)
     if (!player || !player->IsInWorld())
         return false;
 
-    if (!GET_PLAYERBOT_AI(player) &&
-        !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, true, player))
+    if (!GET_PLAYERBOT_AI(player) && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, true, player))
         return false;
 
     WorldPacket p;
@@ -40,8 +39,7 @@ bool InviteToGroupAction::Invite(Player *player)
 
 bool InviteNearbyToGroupAction::Execute(Event event)
 {
-    GuidVector nearGuids =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
+    GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
     for (auto &i : nearGuids)
     {
         Player *player = ObjectAccessor::FindPlayer(i);
@@ -53,8 +51,7 @@ bool InviteNearbyToGroupAction::Execute(Event event)
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO &&
-                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
             if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
@@ -135,16 +132,14 @@ bool InviteGuildToGroupAction::Execute(Event event)
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO &&
-                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
             if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
 
-            if (player->GetLevel() >
-                bot->GetLevel() + 5)  // Only invite higher levels that need money so they can grind
-                                      // money and help out.
+            if (player->GetLevel() > bot->GetLevel() + 5)  // Only invite higher levels that need money so they can grind
+                                                           // money and help out.
             {
                 AiObjectContext *botContext = botAI->GetAiObjectContext();
 
@@ -170,7 +165,4 @@ bool InviteGuildToGroupAction::Execute(Event event)
     return false;
 }
 
-bool InviteGuildToGroupAction::isUseful()
-{
-    return bot->GetGuildId() && InviteNearbyToGroupAction::isUseful();
-};
+bool InviteGuildToGroupAction::isUseful() { return bot->GetGuildId() && InviteNearbyToGroupAction::isUseful(); };

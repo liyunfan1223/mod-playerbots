@@ -13,10 +13,7 @@
 class FindTargetForCcStrategy : public FindTargetStrategy
 {
    public:
-    FindTargetForCcStrategy(PlayerbotAI *botAI, std::string const spell)
-        : FindTargetStrategy(botAI), spell(spell), maxDistance(0.f)
-    {
-    }
+    FindTargetForCcStrategy(PlayerbotAI *botAI, std::string const spell) : FindTargetStrategy(botAI), spell(spell), maxDistance(0.f) {}
 
    public:
     void CheckAttacker(Unit *creature, ThreatMgr *threatMgr) override
@@ -45,11 +42,8 @@ class FindTargetForCcStrategy : public FindTargetStrategy
 
         if (*botAI->GetAiObjectContext()->GetValue<uint8>("aoe count") > 2)
         {
-            WorldLocation aoe =
-                *botAI->GetAiObjectContext()->GetValue<WorldLocation>("aoe position");
-            if (sServerFacade->IsDistanceLessOrEqualThan(
-                    sServerFacade->GetDistance2d(creature, aoe.GetPositionX(), aoe.GetPositionY()),
-                    sPlayerbotAIConfig->aoeRadius))
+            WorldLocation aoe = *botAI->GetAiObjectContext()->GetValue<WorldLocation>("aoe position");
+            if (sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(creature, aoe.GetPositionX(), aoe.GetPositionY()), sPlayerbotAIConfig->aoeRadius))
                 return;
         }
 

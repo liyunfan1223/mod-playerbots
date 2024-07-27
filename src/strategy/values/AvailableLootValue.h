@@ -28,10 +28,7 @@ class LootTargetValue : public ManualSetValue<LootObject>
 class CanLootValue : public BoolCalculatedValue
 {
    public:
-    CanLootValue(PlayerbotAI *botAI, std::string const name = "can loot")
-        : BoolCalculatedValue(botAI, name)
-    {
-    }
+    CanLootValue(PlayerbotAI *botAI, std::string const name = "can loot") : BoolCalculatedValue(botAI, name) {}
 
     bool Calculate() override;
 };

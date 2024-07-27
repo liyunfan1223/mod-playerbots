@@ -10,9 +10,4 @@
 
 bool LfgProposalActiveTrigger::IsActive() { return AI_VALUE(uint32, "lfg proposal"); }
 
-bool UnknownDungeonTrigger::IsActive()
-{
-    return botAI->HasActivePlayerMaster() && botAI->GetMaster() &&
-           botAI->GetMaster()->IsInWorld() && botAI->GetMaster()->GetMap()->IsDungeon() &&
-           bot->GetMapId() == botAI->GetMaster()->GetMapId();
-}
+bool UnknownDungeonTrigger::IsActive() { return botAI->HasActivePlayerMaster() && botAI->GetMaster() && botAI->GetMaster()->IsInWorld() && botAI->GetMaster()->GetMap()->IsDungeon() && bot->GetMapId() == botAI->GetMaster()->GetMapId(); }

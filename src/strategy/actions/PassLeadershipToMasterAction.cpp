@@ -12,8 +12,7 @@
 bool PassLeadershipToMasterAction::Execute(Event event)
 {
     if (Player *master = GetMaster())
-        if (master && master != bot && bot->GetGroup() &&
-            bot->GetGroup()->IsMember(master->GetGUID()))
+        if (master && master != bot && bot->GetGroup() && bot->GetGroup()->IsMember(master->GetGUID()))
         {
             WorldPacket p(SMSG_GROUP_SET_LEADER, 8);
             p << master->GetGUID();
@@ -34,13 +33,6 @@ bool PassLeadershipToMasterAction::Execute(Event event)
     return false;
 }
 
-bool PassLeadershipToMasterAction::isUseful()
-{
-    return botAI->IsAlt() && bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID());
-}
+bool PassLeadershipToMasterAction::isUseful() { return botAI->IsAlt() && bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID()); }
 
-bool GiveLeaderAction::isUseful()
-{
-    return botAI->HasActivePlayerMaster() && bot->GetGroup() &&
-           bot->GetGroup()->IsLeader(bot->GetGUID());
-}
+bool GiveLeaderAction::isUseful() { return botAI->HasActivePlayerMaster() && bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID()); }

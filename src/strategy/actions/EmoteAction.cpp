@@ -89,8 +89,7 @@ void EmoteActionBase::InitEmotes()
 
 bool EmoteActionBase::Emote(Unit *target, uint32 type, bool textEmote)
 {
-    if (target &&
-        !bot->HasInArc(static_cast<float>(M_PI), target, sPlayerbotAIConfig->sightDistance))
+    if (target && !bot->HasInArc(static_cast<float>(M_PI), target, sPlayerbotAIConfig->sightDistance))
         bot->SetFacingToObject(target);
 
     ObjectGuid oldSelection = bot->GetTarget();
@@ -102,8 +101,7 @@ bool EmoteActionBase::Emote(Unit *target, uint32 type, bool textEmote)
         if (player)
         {
             PlayerbotAI *playerBotAI = GET_PLAYERBOT_AI(player);
-            if (playerBotAI &&
-                !player->HasInArc(static_cast<float>(M_PI), bot, sPlayerbotAIConfig->sightDistance))
+            if (playerBotAI && !player->HasInArc(static_cast<float>(M_PI), bot, sPlayerbotAIConfig->sightDistance))
             {
                 player->SetFacingToObject(bot);
             }
@@ -620,8 +618,7 @@ bool EmoteActionBase::ReceiveEmote(Player *source, uint32 emote, bool verbal)
             break;
     }
 
-    if (source && !bot->isMoving() &&
-        !bot->HasInArc(static_cast<float>(M_PI), source, sPlayerbotAIConfig->farDistance))
+    if (source && !bot->isMoving() && !bot->HasInArc(static_cast<float>(M_PI), source, sPlayerbotAIConfig->farDistance))
         sServerFacade->SetFacingTo(bot, source);
 
     if (verbal)
@@ -671,15 +668,10 @@ bool EmoteAction::Execute(Event event)
             p >> nam;
 
         pSource = ObjectAccessor::FindPlayer(source);
-        if (pSource && (pSource->GetGUID() != bot->GetGUID()) &&
-            ((urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f)) ||
-             (namlen > 1 && strstri(bot->GetName().c_str(), nam.c_str()))))
+        if (pSource && (pSource->GetGUID() != bot->GetGUID()) && ((urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f)) || (namlen > 1 && strstri(bot->GetName().c_str(), nam.c_str()))))
         {
-            LOG_INFO("playerbots",
-                     "Bot {} {}:{} <{}> received SMSG_TEXT_EMOTE {} from player {} <{}>",
-                     bot->GetGUID().ToString().c_str(),
-                     bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                     text_emote, pSource->GetGUID().ToString().c_str(), pSource->GetName());
+            LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_TEXT_EMOTE {} from player {} <{}>", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), text_emote,
+                     pSource->GetGUID().ToString().c_str(), pSource->GetName());
 
             emote = text_emote;
         }
@@ -694,19 +686,12 @@ bool EmoteAction::Execute(Event event)
         p >> emoteId >> source;
 
         pSource = ObjectAccessor::FindPlayer(source);
-        if (pSource && pSource != bot &&
-            sServerFacade->GetDistance2d(bot, pSource) < sPlayerbotAIConfig->farDistance &&
-            emoteId != EMOTE_ONESHOT_NONE)
+        if (pSource && pSource != bot && sServerFacade->GetDistance2d(bot, pSource) < sPlayerbotAIConfig->farDistance && emoteId != EMOTE_ONESHOT_NONE)
         {
-            if ((pSource->GetGUID() != bot->GetGUID()) &&
-                (pSource->GetTarget() == bot->GetGUID() ||
-                 (urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f))))
+            if ((pSource->GetGUID() != bot->GetGUID()) && (pSource->GetTarget() == bot->GetGUID() || (urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f))))
             {
-                LOG_INFO(
-                    "playerbots", "Bot {} {}:{} <{}> received SMSG_EMOTE {} from player {} <{}>",
-                    bot->GetGUID().ToString().c_str(),
-                    bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                    emoteId, pSource->GetGUID().ToString().c_str(), pSource->GetName());
+                LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_EMOTE {} from player {} <{}>", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), emoteId,
+                         pSource->GetGUID().ToString().c_str(), pSource->GetName());
 
                 std::vector<uint32> types;
                 for (int32 i = sEmotesTextStore.GetNumRows(); i >= 0; --i)
@@ -743,9 +728,7 @@ bool EmoteAction::Execute(Event event)
     if ((!isReact && param.empty()) || emote)
     {
         time_t lastEmote = AI_VALUE2(time_t, "last emote", qualifier);
-        botAI->GetAiObjectContext()
-            ->GetValue<time_t>("last emote", qualifier)
-            ->Set(time(nullptr) + urand(1000, sPlayerbotAIConfig->repeatDelay) / 1000);
+        botAI->GetAiObjectContext()->GetValue<time_t>("last emote", qualifier)->Set(time(nullptr) + urand(1000, sPlayerbotAIConfig->repeatDelay) / 1000);
         param = qualifier;
     }
 
@@ -761,8 +744,7 @@ bool EmoteAction::Execute(Event event)
     {
         WorldPacket data(SMSG_TEXT_EMOTE);
         data << textEmotes[param];
-        data << GetNumberOfEmoteVariants((TextEmotes)textEmotes[param], bot->getRace(),
-                                         bot->getGender());
+        data << GetNumberOfEmoteVariants((TextEmotes)textEmotes[param], bot->getRace(), bot->getGender());
         data << ((bot->GetTarget() && urand(0, 1)) ? bot->GetTarget() : ObjectGuid::Empty);
         bot->GetSession()->HandleTextEmoteOpcode(data);
         return true;
@@ -771,8 +753,7 @@ bool EmoteAction::Execute(Event event)
     if (param.empty() || emotes.find(param) == emotes.end())
     {
         uint32 index = rand() % emotes.size();
-        for (std::map<std::string, uint32>::iterator i = emotes.begin(); i != emotes.end() && index;
-             ++i, --index)
+        for (std::map<std::string, uint32>::iterator i = emotes.begin(); i != emotes.end() && index; ++i, --index)
             emote = i->second;
     }
     else
@@ -814,9 +795,7 @@ bool TalkAction::Execute(Event event)
     {
         if (Player *player = dynamic_cast<Player *>(target))
             if (PlayerbotAI *playerBotAI = GET_PLAYERBOT_AI(player))
-                playerBotAI->GetAiObjectContext()
-                    ->GetValue<ObjectGuid>("talk target")
-                    ->Set(bot->GetGUID());
+                playerBotAI->GetAiObjectContext()->GetValue<ObjectGuid>("talk target")->Set(bot->GetGUID());
 
         context->GetValue<ObjectGuid>("talk target")->Set(target->GetGUID());
         return Emote(target, GetRandomEmote(target, true), true);
@@ -849,8 +828,7 @@ uint32 TalkAction::GetRandomEmote(Unit *unit, bool textEmote)
             types.push_back(TEXT_EMOTE_TALKEX);
             types.push_back(TEXT_EMOTE_TALKQ);
 
-            if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) ||
-                         unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
+            if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) || unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
             {
                 types.push_back(TEXT_EMOTE_SALUTE);
             }
@@ -876,8 +854,7 @@ uint32 TalkAction::GetRandomEmote(Unit *unit, bool textEmote)
         types.push_back(EMOTE_ONESHOT_EXCLAMATION);
         types.push_back(EMOTE_ONESHOT_QUESTION);
 
-        if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) ||
-                     unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
+        if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) || unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
         {
             types.push_back(EMOTE_ONESHOT_SALUTE);
         }

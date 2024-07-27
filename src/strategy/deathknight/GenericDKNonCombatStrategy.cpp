@@ -35,24 +35,16 @@ class GenericDKNonCombatStrategyActionNodeFactory : public NamedObjectFactory<Ac
     }
 };
 
-GenericDKNonCombatStrategy::GenericDKNonCombatStrategy(PlayerbotAI *botAI)
-    : NonCombatStrategy(botAI)
-{
-    actionNodeFactories.Add(new GenericDKNonCombatStrategyActionNodeFactory());
-}
+GenericDKNonCombatStrategy::GenericDKNonCombatStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) { actionNodeFactories.Add(new GenericDKNonCombatStrategyActionNodeFactory()); }
 
 void GenericDKNonCombatStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-        "no pet", NextAction::array(0, new NextAction("raise dead", ACTION_NORMAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "horn of winter", NextAction::array(0, new NextAction("horn of winter", 21.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "bone shield", NextAction::array(0, new NextAction("bone shield", 21.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "has pet", NextAction::array(0, new NextAction("toggle pet spell", 11.0f), NULL)));
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("raise dead", ACTION_NORMAL + 1), nullptr)));
+    triggers.push_back(new TriggerNode("horn of winter", NextAction::array(0, new NextAction("horn of winter", 21.0f), nullptr)));
+    triggers.push_back(new TriggerNode("bone shield", NextAction::array(0, new NextAction("bone shield", 21.0f), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 11.0f), NULL)));
 }
 
 void DKBuffDpsStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)

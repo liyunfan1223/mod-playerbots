@@ -45,10 +45,7 @@ class FindNonCcTargetStrategy : public FindTargetStrategy
 class TargetValue : public UnitCalculatedValue
 {
    public:
-    TargetValue(PlayerbotAI *botAI, std::string const name = "target", int checkInterval = 1)
-        : UnitCalculatedValue(botAI, name, checkInterval)
-    {
-    }
+    TargetValue(PlayerbotAI *botAI, std::string const name = "target", int checkInterval = 1) : UnitCalculatedValue(botAI, name, checkInterval) {}
 
    protected:
     Unit *FindTarget(FindTargetStrategy *strategy);
@@ -57,19 +54,13 @@ class TargetValue : public UnitCalculatedValue
 class RpgTargetValue : public ManualSetValue<GuidPosition>
 {
    public:
-    RpgTargetValue(PlayerbotAI *botAI, std::string const name = "rpg target")
-        : ManualSetValue<GuidPosition>(botAI, GuidPosition(), name)
-    {
-    }
+    RpgTargetValue(PlayerbotAI *botAI, std::string const name = "rpg target") : ManualSetValue<GuidPosition>(botAI, GuidPosition(), name) {}
 };
 
 class TravelTargetValue : public ManualSetValue<TravelTarget *>
 {
    public:
-    TravelTargetValue(PlayerbotAI *botAI, std::string const name = "travel target")
-        : ManualSetValue<TravelTarget *>(botAI, new TravelTarget(botAI), name)
-    {
-    }
+    TravelTargetValue(PlayerbotAI *botAI, std::string const name = "travel target") : ManualSetValue<TravelTarget *>(botAI, new TravelTarget(botAI), name) {}
 
     virtual ~TravelTargetValue() { delete value; }
 };
@@ -77,10 +68,7 @@ class TravelTargetValue : public ManualSetValue<TravelTarget *>
 class LastLongMoveValue : public CalculatedValue<WorldPosition>
 {
    public:
-    LastLongMoveValue(PlayerbotAI *botAI)
-        : CalculatedValue<WorldPosition>(botAI, "last long move", 30 * 1000)
-    {
-    }
+    LastLongMoveValue(PlayerbotAI *botAI) : CalculatedValue<WorldPosition>(botAI, "last long move", 30 * 1000) {}
 
     WorldPosition Calculate() override;
 };
@@ -88,10 +76,7 @@ class LastLongMoveValue : public CalculatedValue<WorldPosition>
 class HomeBindValue : public CalculatedValue<WorldPosition>
 {
    public:
-    HomeBindValue(PlayerbotAI *botAI)
-        : CalculatedValue<WorldPosition>(botAI, "home bind", 30 * 1000)
-    {
-    }
+    HomeBindValue(PlayerbotAI *botAI) : CalculatedValue<WorldPosition>(botAI, "home bind", 30 * 1000) {}
 
     WorldPosition Calculate() override;
 };
@@ -99,10 +84,7 @@ class HomeBindValue : public CalculatedValue<WorldPosition>
 class IgnoreRpgTargetValue : public ManualSetValue<GuidSet &>
 {
    public:
-    IgnoreRpgTargetValue(PlayerbotAI *botAI)
-        : ManualSetValue<GuidSet &>(botAI, data, "ignore rpg targets")
-    {
-    }
+    IgnoreRpgTargetValue(PlayerbotAI *botAI) : ManualSetValue<GuidSet &>(botAI, data, "ignore rpg targets") {}
 
    private:
     GuidSet data;
@@ -111,19 +93,13 @@ class IgnoreRpgTargetValue : public ManualSetValue<GuidSet &>
 class TalkTargetValue : public ManualSetValue<ObjectGuid>
 {
    public:
-    TalkTargetValue(PlayerbotAI *botAI, std::string const name = "talk target")
-        : ManualSetValue<ObjectGuid>(botAI, ObjectGuid::Empty, name)
-    {
-    }
+    TalkTargetValue(PlayerbotAI *botAI, std::string const name = "talk target") : ManualSetValue<ObjectGuid>(botAI, ObjectGuid::Empty, name) {}
 };
 
 class PullTargetValue : public ManualSetValue<ObjectGuid>
 {
    public:
-    PullTargetValue(PlayerbotAI *botAI, std::string const name = "pull target")
-        : ManualSetValue<ObjectGuid>(botAI, ObjectGuid::Empty, name)
-    {
-    }
+    PullTargetValue(PlayerbotAI *botAI, std::string const name = "pull target") : ManualSetValue<ObjectGuid>(botAI, ObjectGuid::Empty, name) {}
 };
 
 class FindTargetValue : public UnitCalculatedValue, public Qualified

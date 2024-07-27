@@ -82,44 +82,31 @@ END_SPELL_ACTION()
 class CastAspectOfTheHawkAction : public CastBuffSpellAction
 {
    public:
-    CastAspectOfTheHawkAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the hawk")
-    {
-    }
+    CastAspectOfTheHawkAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the hawk") {}
 };
 
 class CastAspectOfTheMonkeyAction : public CastBuffSpellAction
 {
    public:
-    CastAspectOfTheMonkeyAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "aspect of the monkey")
-    {
-    }
+    CastAspectOfTheMonkeyAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the monkey") {}
 };
 
 class CastAspectOfTheDragonhawkAction : public CastBuffSpellAction
 {
    public:
-    CastAspectOfTheDragonhawkAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "aspect of the dragonhawk")
-    {
-    }
+    CastAspectOfTheDragonhawkAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the dragonhawk") {}
 };
 
 class CastAspectOfTheWildAction : public CastBuffSpellAction
 {
    public:
-    CastAspectOfTheWildAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the wild")
-    {
-    }
+    CastAspectOfTheWildAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the wild") {}
 };
 
 class CastAspectOfTheCheetahAction : public CastBuffSpellAction
 {
    public:
-    CastAspectOfTheCheetahAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "aspect of the cheetah")
-    {
-    }
+    CastAspectOfTheCheetahAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the cheetah") {}
 
     bool isUseful() override;
 };
@@ -127,18 +114,13 @@ class CastAspectOfTheCheetahAction : public CastBuffSpellAction
 class CastAspectOfThePackAction : public CastBuffSpellAction
 {
    public:
-    CastAspectOfThePackAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the pack")
-    {
-    }
+    CastAspectOfThePackAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the pack") {}
 };
 
 class CastAspectOfTheViperAction : public CastBuffSpellAction
 {
    public:
-    CastAspectOfTheViperAction(PlayerbotAI *botAI)
-        : CastBuffSpellAction(botAI, "aspect of the viper")
-    {
-    }
+    CastAspectOfTheViperAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the viper") {}
 };
 
 class CastCallPetAction : public CastBuffSpellAction
@@ -223,10 +205,7 @@ class CastMongooseBiteAction : public CastSpellAction
 class CastSerpentStingOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
    public:
-    CastSerpentStingOnAttackerAction(PlayerbotAI *botAI)
-        : CastDebuffSpellOnAttackerAction(botAI, "serpent sting", true)
-    {
-    }
+    CastSerpentStingOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnAttackerAction(botAI, "serpent sting", true) {}
 };
 
 class FeedPetAction : public Action
@@ -262,9 +241,6 @@ class CastScareBeastCcAction : public CastSpellAction
 class CastMisdirectionOnMainTankAction : public BuffOnMainTankAction
 {
    public:
-    CastMisdirectionOnMainTankAction(PlayerbotAI *ai)
-        : BuffOnMainTankAction(ai, "misdirection", true)
-    {
-    }
+    CastMisdirectionOnMainTankAction(PlayerbotAI *ai) : BuffOnMainTankAction(ai, "misdirection", true) {}
 };
 #endif

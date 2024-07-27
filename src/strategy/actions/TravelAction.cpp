@@ -55,37 +55,27 @@ bool TravelAction::Execute(Event event)
     return true;
 }
 
-bool TravelAction::isUseful()
-{
-    return false && AI_VALUE(TravelTarget *, "travel target")->isActive() &&
-           (!AI_VALUE(GuidPosition, "rpg target") || !AI_VALUE(ObjectGuid, "pull target"));
-}
+bool TravelAction::isUseful() { return false && AI_VALUE(TravelTarget *, "travel target")->isActive() && (!AI_VALUE(GuidPosition, "rpg target") || !AI_VALUE(ObjectGuid, "pull target")); }
 
 bool MoveToDarkPortalAction::Execute(Event event)
 {
     if (bot->GetGroup())
-        if (bot->GetGroup()->GetLeaderGUID() != bot->GetGUID() &&
-            !GET_PLAYERBOT_AI(GET_PLAYERBOT_AI(bot)->GetGroupMaster()))
+        if (bot->GetGroup()->GetLeaderGUID() != bot->GetGUID() && !GET_PLAYERBOT_AI(GET_PLAYERBOT_AI(bot)->GetGroupMaster()))
             return false;
 
     if (bot->GetLevel() > 57)
     {
-        if ((bot->GetTeamId() == TEAM_ALLIANCE &&
-             bot->GetQuestStatus(10119) == QUEST_STATUS_NONE) ||
-            (bot->GetTeamId() == TEAM_HORDE && bot->GetQuestStatus(9407) == QUEST_STATUS_NONE))
+        if ((bot->GetTeamId() == TEAM_ALLIANCE && bot->GetQuestStatus(10119) == QUEST_STATUS_NONE) || (bot->GetTeamId() == TEAM_HORDE && bot->GetQuestStatus(9407) == QUEST_STATUS_NONE))
         {
             if (!bot->IsInCombat())
             {
                 if (bot->GetTeamId() == TEAM_ALLIANCE)
                 {
                     Quest const *quest = sObjectMgr->GetQuestTemplate(10119);
-                    CreatureData const *creatureData =
-                        sRandomPlayerbotMgr->GetCreatureDataByEntry(16841);
+                    CreatureData const *creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(16841);
                     if (quest && creatureData)
                     {
-                        auto creatureBounds =
-                            bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(
-                                creatureData->spawnId);
+                        auto creatureBounds = bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
                         if (creatureBounds.first != creatureBounds.second)
                             bot->AddQuest(quest, creatureBounds.first->second);
                     }
@@ -93,13 +83,10 @@ bool MoveToDarkPortalAction::Execute(Event event)
                 else
                 {
                     Quest const *quest = sObjectMgr->GetQuestTemplate(9407);
-                    CreatureData const *creatureData =
-                        sRandomPlayerbotMgr->GetCreatureDataByEntry(19254);
+                    CreatureData const *creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(19254);
                     if (quest && creatureData)
                     {
-                        auto creatureBounds =
-                            bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(
-                                creatureData->spawnId);
+                        auto creatureBounds = bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
                         if (creatureBounds.first != creatureBounds.second)
                             bot->AddQuest(quest, creatureBounds.first->second);
                     }
@@ -124,8 +111,7 @@ bool DarkPortalAzerothAction::Execute(Event event)
         WorldPacket packet(CMSG_AREATRIGGER);
         packet << 4354;
 
-        return GET_PLAYERBOT_AI(bot)->DoSpecificAction("reach area trigger",
-                                                       Event("travel action", packet));
+        return GET_PLAYERBOT_AI(bot)->DoSpecificAction("reach area trigger", Event("travel action", packet));
     }
 
     return false;

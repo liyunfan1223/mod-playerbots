@@ -89,8 +89,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
         creators["cold snap"] = &MageTriggerFactoryInternal::cold_snap;
         creators["ice barrier"] = &MageTriggerFactoryInternal::ice_barrier;
         creators["arcane intellect"] = &MageTriggerFactoryInternal::arcane_intellect;
-        creators["arcane intellect on party"] =
-            &MageTriggerFactoryInternal::arcane_intellect_on_party;
+        creators["arcane intellect on party"] = &MageTriggerFactoryInternal::arcane_intellect_on_party;
         creators["mage armor"] = &MageTriggerFactoryInternal::mage_armor;
         creators["remove curse"] = &MageTriggerFactoryInternal::remove_curse;
         creators["remove curse on party"] = &MageTriggerFactoryInternal::remove_curse_on_party;
@@ -101,8 +100,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
         creators["living bomb"] = &MageTriggerFactoryInternal::living_bomb;
         creators["missile barrage"] = &MageTriggerFactoryInternal::missile_barrage;
         creators["arcane blast"] = &MageTriggerFactoryInternal::arcane_blast;
-        creators["counterspell on enemy healer"] =
-            &MageTriggerFactoryInternal::counterspell_enemy_healer;
+        creators["counterspell on enemy healer"] = &MageTriggerFactoryInternal::counterspell_enemy_healer;
         creators["arcane power"] = &MageTriggerFactoryInternal::arcane_power;
         creators["presence of mind"] = &MageTriggerFactoryInternal::presence_of_mind;
         creators["fire ward"] = &MageTriggerFactoryInternal::fire_ward;
@@ -114,10 +112,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
     }
 
    private:
-    static Trigger *presence_of_mind(PlayerbotAI *botAI)
-    {
-        return new PresenceOfMindTrigger(botAI);
-    }
+    static Trigger *presence_of_mind(PlayerbotAI *botAI) { return new PresenceOfMindTrigger(botAI); }
     static Trigger *frost_ward(PlayerbotAI *botAI) { return new FrostWardTrigger(botAI); }
     static Trigger *fire_ward(PlayerbotAI *botAI) { return new FireWardTrigger(botAI); }
     static Trigger *arcane_power(PlayerbotAI *botAI) { return new ArcanePowerTrigger(botAI); }
@@ -125,58 +120,28 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
     static Trigger *fireball(PlayerbotAI *botAI) { return new FireballTrigger(botAI); }
     static Trigger *pyroblast(PlayerbotAI *botAI) { return new PyroblastTrigger(botAI); }
     static Trigger *combustion(PlayerbotAI *botAI) { return new CombustionTrigger(botAI); }
-    static Trigger *fingers_of_frost_single(PlayerbotAI *botAI)
-    {
-        return new FingersOfFrostSingleTrigger(botAI);
-    }
-    static Trigger *fingers_of_frost_double(PlayerbotAI *botAI)
-    {
-        return new FingersOfFrostDoubleTrigger(botAI);
-    }
+    static Trigger *fingers_of_frost_single(PlayerbotAI *botAI) { return new FingersOfFrostSingleTrigger(botAI); }
+    static Trigger *fingers_of_frost_double(PlayerbotAI *botAI) { return new FingersOfFrostDoubleTrigger(botAI); }
     static Trigger *brain_freeze(PlayerbotAI *botAI) { return new BrainFreezeTrigger(botAI); }
     static Trigger *icy_veins(PlayerbotAI *botAI) { return new IcyVeinsTrigger(botAI); }
     static Trigger *cold_snap(PlayerbotAI *botAI) { return new ColdSnapTrigger(botAI); }
     static Trigger *ice_barrier(PlayerbotAI *botAI) { return new IceBarrierTrigger(botAI); }
-    static Trigger *arcane_intellect(PlayerbotAI *botAI)
-    {
-        return new ArcaneIntellectTrigger(botAI);
-    }
-    static Trigger *arcane_intellect_on_party(PlayerbotAI *botAI)
-    {
-        return new ArcaneIntellectOnPartyTrigger(botAI);
-    }
+    static Trigger *arcane_intellect(PlayerbotAI *botAI) { return new ArcaneIntellectTrigger(botAI); }
+    static Trigger *arcane_intellect_on_party(PlayerbotAI *botAI) { return new ArcaneIntellectOnPartyTrigger(botAI); }
     static Trigger *mage_armor(PlayerbotAI *botAI) { return new MageArmorTrigger(botAI); }
     static Trigger *remove_curse(PlayerbotAI *botAI) { return new RemoveCurseTrigger(botAI); }
-    static Trigger *remove_curse_on_party(PlayerbotAI *botAI)
-    {
-        return new PartyMemberRemoveCurseTrigger(botAI);
-    }
-    static Trigger *counterspell(PlayerbotAI *botAI)
-    {
-        return new CounterspellInterruptSpellTrigger(botAI);
-    }
+    static Trigger *remove_curse_on_party(PlayerbotAI *botAI) { return new PartyMemberRemoveCurseTrigger(botAI); }
+    static Trigger *counterspell(PlayerbotAI *botAI) { return new CounterspellInterruptSpellTrigger(botAI); }
     static Trigger *polymorph(PlayerbotAI *botAI) { return new PolymorphTrigger(botAI); }
     static Trigger *spellsteal(PlayerbotAI *botAI) { return new SpellstealTrigger(botAI); }
     static Trigger *living_bomb(PlayerbotAI *botAI) { return new LivingBombTrigger(botAI); }
     static Trigger *missile_barrage(PlayerbotAI *botAI) { return new MissileBarrageTrigger(botAI); }
     static Trigger *arcane_blast(PlayerbotAI *botAI) { return new ArcaneBlastTrigger(botAI); }
-    static Trigger *counterspell_enemy_healer(PlayerbotAI *botAI)
-    {
-        return new CounterspellEnemyHealerTrigger(botAI);
-    }
-    static Trigger *arcane_blast_stack(PlayerbotAI *botAI)
-    {
-        return new ArcaneBlastStackTrigger(botAI);
-    }
+    static Trigger *counterspell_enemy_healer(PlayerbotAI *botAI) { return new CounterspellEnemyHealerTrigger(botAI); }
+    static Trigger *arcane_blast_stack(PlayerbotAI *botAI) { return new ArcaneBlastStackTrigger(botAI); }
     static Trigger *mirror_image(PlayerbotAI *botAI) { return new MirrorImageTrigger(botAI); }
-    static Trigger *frost_nova_on_target(PlayerbotAI *botAI)
-    {
-        return new FrostNovaOnTargetTrigger(botAI);
-    }
-    static Trigger *frostbite_on_target(PlayerbotAI *botAI)
-    {
-        return new FrostbiteOnTargetTrigger(botAI);
-    }
+    static Trigger *frost_nova_on_target(PlayerbotAI *botAI) { return new FrostNovaOnTargetTrigger(botAI); }
+    static Trigger *frostbite_on_target(PlayerbotAI *botAI) { return new FrostbiteOnTargetTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
@@ -194,8 +159,7 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
         creators["cone of cold"] = &MageAiObjectContextInternal::cone_of_cold;
         creators["frost nova"] = &MageAiObjectContextInternal::frost_nova;
         creators["arcane intellect"] = &MageAiObjectContextInternal::arcane_intellect;
-        creators["arcane intellect on party"] =
-            &MageAiObjectContextInternal::arcane_intellect_on_party;
+        creators["arcane intellect on party"] = &MageAiObjectContextInternal::arcane_intellect_on_party;
         creators["conjure water"] = &MageAiObjectContextInternal::conjure_water;
         creators["conjure food"] = &MageAiObjectContextInternal::conjure_food;
         creators["molten armor"] = &MageAiObjectContextInternal::molten_armor;
@@ -211,8 +175,7 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
         creators["remove curse"] = &MageAiObjectContextInternal::remove_curse;
         creators["remove curse on party"] = &MageAiObjectContextInternal::remove_curse_on_party;
         creators["remove lesser curse"] = &MageAiObjectContextInternal::remove_lesser_curse;
-        creators["remove lesser curse on party"] =
-            &MageAiObjectContextInternal::remove_lesser_curse_on_party;
+        creators["remove lesser curse on party"] = &MageAiObjectContextInternal::remove_lesser_curse_on_party;
         creators["icy veins"] = &MageAiObjectContextInternal::icy_veins;
         creators["cold snap"] = &MageAiObjectContextInternal::cold_snap;
         creators["ice barrier"] = &MageAiObjectContextInternal::ice_barrier;
@@ -229,25 +192,18 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
         creators["arcane blast"] = &MageAiObjectContextInternal::arcane_blast;
         creators["arcane barrage"] = &MageAiObjectContextInternal::arcane_barrage;
         creators["arcane missiles"] = &MageAiObjectContextInternal::arcane_missiles;
-        creators["counterspell on enemy healer"] =
-            &MageAiObjectContextInternal::counterspell_on_enemy_healer;
+        creators["counterspell on enemy healer"] = &MageAiObjectContextInternal::counterspell_on_enemy_healer;
         creators["fire ward"] = &MageAiObjectContextInternal::fire_ward;
         creators["frost ward"] = &MageAiObjectContextInternal::frost_ward;
         creators["mirror image"] = &MageAiObjectContextInternal::mirror_image;
     }
 
    private:
-    static Action *presence_of_mind(PlayerbotAI *botAI)
-    {
-        return new CastPresenceOfMindAction(botAI);
-    }
+    static Action *presence_of_mind(PlayerbotAI *botAI) { return new CastPresenceOfMindAction(botAI); }
     static Action *frost_ward(PlayerbotAI *botAI) { return new CastFrostWardAction(botAI); }
     static Action *fire_ward(PlayerbotAI *botAI) { return new CastFireWardAction(botAI); }
     static Action *arcane_power(PlayerbotAI *botAI) { return new CastArcanePowerAction(botAI); }
-    static Action *arcane_missiles(PlayerbotAI *botAI)
-    {
-        return new CastArcaneMissilesAction(botAI);
-    }
+    static Action *arcane_missiles(PlayerbotAI *botAI) { return new CastArcaneMissilesAction(botAI); }
     static Action *arcane_barrage(PlayerbotAI *botAI) { return new CastArcaneBarrageAction(botAI); }
     static Action *arcane_blast(PlayerbotAI *botAI) { return new CastArcaneBlastAction(botAI); }
     static Action *frostbolt(PlayerbotAI *botAI) { return new CastFrostboltAction(botAI); }
@@ -257,14 +213,8 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
     static Action *blizzard(PlayerbotAI *botAI) { return new CastBlizzardAction(botAI); }
     static Action *cone_of_cold(PlayerbotAI *botAI) { return new CastConeOfColdAction(botAI); }
     static Action *frost_nova(PlayerbotAI *botAI) { return new CastFrostNovaAction(botAI); }
-    static Action *arcane_intellect(PlayerbotAI *botAI)
-    {
-        return new CastArcaneIntellectAction(botAI);
-    }
-    static Action *arcane_intellect_on_party(PlayerbotAI *botAI)
-    {
-        return new CastArcaneIntellectOnPartyAction(botAI);
-    }
+    static Action *arcane_intellect(PlayerbotAI *botAI) { return new CastArcaneIntellectAction(botAI); }
+    static Action *arcane_intellect_on_party(PlayerbotAI *botAI) { return new CastArcaneIntellectOnPartyAction(botAI); }
     static Action *conjure_water(PlayerbotAI *botAI) { return new CastConjureWaterAction(botAI); }
     static Action *conjure_food(PlayerbotAI *botAI) { return new CastConjureFoodAction(botAI); }
     static Action *molten_armor(PlayerbotAI *botAI) { return new CastMoltenArmorAction(botAI); }
@@ -278,25 +228,13 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
     static Action *scorch(PlayerbotAI *botAI) { return new CastScorchAction(botAI); }
     static Action *counterspell(PlayerbotAI *botAI) { return new CastCounterspellAction(botAI); }
     static Action *remove_curse(PlayerbotAI *botAI) { return new CastRemoveCurseAction(botAI); }
-    static Action *remove_curse_on_party(PlayerbotAI *botAI)
-    {
-        return new CastRemoveCurseOnPartyAction(botAI);
-    }
-    static Action *remove_lesser_curse(PlayerbotAI *botAI)
-    {
-        return new CastRemoveLesserCurseAction(botAI);
-    }
-    static Action *remove_lesser_curse_on_party(PlayerbotAI *botAI)
-    {
-        return new CastRemoveLesserCurseOnPartyAction(botAI);
-    }
+    static Action *remove_curse_on_party(PlayerbotAI *botAI) { return new CastRemoveCurseOnPartyAction(botAI); }
+    static Action *remove_lesser_curse(PlayerbotAI *botAI) { return new CastRemoveLesserCurseAction(botAI); }
+    static Action *remove_lesser_curse_on_party(PlayerbotAI *botAI) { return new CastRemoveLesserCurseOnPartyAction(botAI); }
     static Action *icy_veins(PlayerbotAI *botAI) { return new CastIcyVeinsAction(botAI); }
     static Action *cold_snap(PlayerbotAI *botAI) { return new CastColdSnapAction(botAI); }
     static Action *ice_barrier(PlayerbotAI *botAI) { return new CastIceBarrierAction(botAI); }
-    static Action *summon_water_elemental(PlayerbotAI *botAI)
-    {
-        return new CastSummonWaterElementalAction(botAI);
-    }
+    static Action *summon_water_elemental(PlayerbotAI *botAI) { return new CastSummonWaterElementalAction(botAI); }
     static Action *combustion(PlayerbotAI *botAI) { return new CastCombustionAction(botAI); }
     static Action *ice_block(PlayerbotAI *botAI) { return new CastIceBlockAction(botAI); }
     static Action *polymorph(PlayerbotAI *botAI) { return new CastPolymorphAction(botAI); }
@@ -306,10 +244,7 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
     static Action *blast_wave(PlayerbotAI *botAI) { return new CastBlastWaveAction(botAI); }
     static Action *invisibility(PlayerbotAI *botAI) { return new CastInvisibilityAction(botAI); }
     static Action *evocation(PlayerbotAI *botAI) { return new CastEvocationAction(botAI); }
-    static Action *counterspell_on_enemy_healer(PlayerbotAI *botAI)
-    {
-        return new CastCounterspellOnEnemyHealerAction(botAI);
-    }
+    static Action *counterspell_on_enemy_healer(PlayerbotAI *botAI) { return new CastCounterspellOnEnemyHealerAction(botAI); }
     static Action *mirror_image(PlayerbotAI *botAI) { return new CastMirrorImageAction(botAI); }
 };
 

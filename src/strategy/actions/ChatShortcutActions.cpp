@@ -58,8 +58,7 @@ bool FollowChatShortcutAction::Execute(Event event)
             if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
                 return false;
 
-            moved =
-                MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
+            moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
         }
 
         if (moved)
@@ -118,8 +117,7 @@ bool FleeChatShortcutAction::Execute(Event event)
 
     ResetReturnPosition();
 
-    if (bot->GetMapId() != master->GetMapId() ||
-        bot->GetDistance(master) > sPlayerbotAIConfig->sightDistance)
+    if (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig->sightDistance)
     {
         botAI->TellError("I will not flee with you - too far away");
         return true;

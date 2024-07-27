@@ -21,8 +21,7 @@ bool RpgAction::Execute(Event event)
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
     if (!guidP && botAI->GetMaster())
     {
-        if (WorldObject *target =
-                ObjectAccessor::GetWorldObject(*bot, botAI->GetMaster()->GetTarget()))
+        if (WorldObject *target = ObjectAccessor::GetWorldObject(*bot, botAI->GetMaster()->GetTarget()))
         {
             guidP = GuidPosition(target);
             if (guidP)
@@ -94,13 +93,11 @@ bool RpgAction::SetNextRpgAction()
         return false;
 
     std::mt19937 gen(time(0));
-    sTravelMgr->weighted_shuffle(actions.begin(), actions.end(), relevances.begin(),
-                                 relevances.end(), gen);
+    sTravelMgr->weighted_shuffle(actions.begin(), actions.end(), relevances.begin(), relevances.end(), gen);
 
     Action *action = actions.front();
 
-    for (std::vector<TriggerNode *>::iterator i = triggerNodes.begin(); i != triggerNodes.end();
-         i++)
+    for (std::vector<TriggerNode *>::iterator i = triggerNodes.begin(); i != triggerNodes.end(); i++)
     {
         TriggerNode *trigger = *i;
         delete trigger;

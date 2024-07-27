@@ -15,10 +15,7 @@ class PlayerbotAI;
 class ChangeTalentsAction : public Action
 {
    public:
-    ChangeTalentsAction(PlayerbotAI *botAI, std::string const name = "talents")
-        : Action(botAI, name)
-    {
-    }
+    ChangeTalentsAction(PlayerbotAI *botAI, std::string const name = "talents") : Action(botAI, name) {}
 
     bool Execute(Event event);
     // bool AutoSelectTalents(std::ostringstream* out);

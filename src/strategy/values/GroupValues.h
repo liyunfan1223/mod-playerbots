@@ -12,10 +12,7 @@ class PlayerbotAI;
 class GroupMembersValue : public ObjectGuidListCalculatedValue
 {
    public:
-    GroupMembersValue(PlayerbotAI *botAI)
-        : ObjectGuidListCalculatedValue(botAI, "group members", 2 * 1000)
-    {
-    }
+    GroupMembersValue(PlayerbotAI *botAI) : ObjectGuidListCalculatedValue(botAI, "group members", 2 * 1000) {}
 
     GuidVector Calculate() override;
 };

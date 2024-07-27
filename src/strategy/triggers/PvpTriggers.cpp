@@ -21,12 +21,10 @@ bool PlayerHasNoFlag::IsActive()
         if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
         {
             BattlegroundWS *bg = (BattlegroundWS *)botAI->GetBot()->GetBattleground();
-            if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) ==
-                  BG_WS_FLAG_STATE_ON_PLAYER))
+            if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
                 return true;
 
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
             {
                 return false;
             }
@@ -82,9 +80,7 @@ bool BgInviteActiveTrigger::IsActive()
         {
             if (ginfo.IsInvitedToBGInstanceGUID && ginfo.RemoveInviteTime)
             {
-                LOG_INFO("playerbots", "Bot {} <{}> ({} {}) : Invited to BG but not in BG",
-                         bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(),
-                         bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H");
+                LOG_INFO("playerbots", "Bot {} <{}> ({} {}) : Invited to BG but not in BG", bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H");
                 return true;
             }
         }
@@ -102,12 +98,10 @@ bool PlayerIsInBattlegroundWithoutFlag::IsActive()
         if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
         {
             BattlegroundWS *bg = (BattlegroundWS *)botAI->GetBot()->GetBattleground();
-            if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) ==
-                  BG_WS_FLAG_STATE_ON_PLAYER))
+            if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
                 return true;
 
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE))
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE))
             {
                 return false;
             }
@@ -126,8 +120,7 @@ bool PlayerHasFlag::IsActive()
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
             BattlegroundWS *bg = (BattlegroundWS *)botAI->GetBot()->GetBattleground();
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
             {
                 return true;
             }
@@ -153,14 +146,12 @@ bool TeamHasFlag::IsActive()
         {
             BattlegroundWS *bg = (BattlegroundWS *)botAI->GetBot()->GetBattleground();
 
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
             {
                 return false;
             }
 
-            if (bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) ==
-                BG_WS_FLAG_STATE_ON_PLAYER)
+            if (bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER)
                 return true;
         }
 
@@ -199,15 +190,13 @@ bool EnemyTeamHasFlag::IsActive()
 bool EnemyFlagCarrierNear::IsActive()
 {
     Unit *carrier = AI_VALUE(Unit *, "enemy flag carrier");
-    return carrier && sServerFacade->IsDistanceLessOrEqualThan(
-                          sServerFacade->GetDistance2d(bot, carrier), 200.f);
+    return carrier && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, carrier), 200.f);
 }
 
 bool TeamFlagCarrierNear::IsActive()
 {
     Unit *carrier = AI_VALUE(Unit *, "team flag carrier");
-    return carrier && sServerFacade->IsDistanceLessOrEqualThan(
-                          sServerFacade->GetDistance2d(bot, carrier), 200.f);
+    return carrier && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, carrier), 200.f);
 }
 
 bool PlayerWantsInBattlegroundTrigger::IsActive()

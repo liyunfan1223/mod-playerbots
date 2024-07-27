@@ -37,10 +37,7 @@ float ThreatMultiplier::GetValue(Action *action)
     return 1.0f;
 }
 
-void ThreatStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers)
-{
-    multipliers.push_back(new ThreatMultiplier(botAI));
-}
+void ThreatStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers) { multipliers.push_back(new ThreatMultiplier(botAI)); }
 
 float FocusMultiplier::GetValue(Action *action)
 {
@@ -48,8 +45,7 @@ float FocusMultiplier::GetValue(Action *action)
     {
         return 1.0f;
     }
-    if (action->getThreatType() == Action::ActionThreatType::Aoe &&
-        !dynamic_cast<CastHealingSpellAction *>(action))
+    if (action->getThreatType() == Action::ActionThreatType::Aoe && !dynamic_cast<CastHealingSpellAction *>(action))
     {
         return 0.0f;
     }
@@ -60,7 +56,4 @@ float FocusMultiplier::GetValue(Action *action)
     return 1.0f;
 }
 
-void FocusStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers)
-{
-    multipliers.push_back(new FocusMultiplier(botAI));
-}
+void FocusStrategy::InitMultipliers(std::vector<Multiplier *> &multipliers) { multipliers.push_back(new FocusMultiplier(botAI)); }

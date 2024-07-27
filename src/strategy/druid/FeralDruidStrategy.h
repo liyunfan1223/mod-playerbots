@@ -51,11 +51,10 @@ class ShapeshiftDruidStrategyActionNodeFactory : public NamedObjectFactory<Actio
 
     static ActionNode *regrowth_on_party(PlayerbotAI *botAI)
     {
-        return new ActionNode(
-            "regrowth on party",
-            /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
-            /*A*/ NextAction::array(0, new NextAction("healing touch on party"), nullptr),
-            /*C*/ NextAction::array(0, new NextAction("melee", 10.0f), nullptr));
+        return new ActionNode("regrowth on party",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ NextAction::array(0, new NextAction("healing touch on party"), nullptr),
+                              /*C*/ NextAction::array(0, new NextAction("melee", 10.0f), nullptr));
     }
 
     static ActionNode *rejuvenation_on_party(PlayerbotAI *botAI)

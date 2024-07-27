@@ -15,10 +15,7 @@ class PlayerbotAI;
 class CollisionValue : public BoolCalculatedValue, public Qualified
 {
    public:
-    CollisionValue(PlayerbotAI *botAI, std::string const name = "collision")
-        : BoolCalculatedValue(botAI, name), Qualified()
-    {
-    }
+    CollisionValue(PlayerbotAI *botAI, std::string const name = "collision") : BoolCalculatedValue(botAI, name), Qualified() {}
 
     bool Calculate() override;
 };

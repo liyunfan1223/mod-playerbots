@@ -109,37 +109,19 @@ void AiObjectContext::Load(std::vector<std::string> data)
     }
 }
 
-Strategy *AiObjectContext::GetStrategy(std::string const name)
-{
-    return strategyContexts.GetContextObject(name, botAI);
-}
+Strategy *AiObjectContext::GetStrategy(std::string const name) { return strategyContexts.GetContextObject(name, botAI); }
 
-std::set<std::string> AiObjectContext::GetSiblingStrategy(std::string const name)
-{
-    return strategyContexts.GetSiblings(name);
-}
+std::set<std::string> AiObjectContext::GetSiblingStrategy(std::string const name) { return strategyContexts.GetSiblings(name); }
 
-Trigger *AiObjectContext::GetTrigger(std::string const name)
-{
-    return triggerContexts.GetContextObject(name, botAI);
-}
+Trigger *AiObjectContext::GetTrigger(std::string const name) { return triggerContexts.GetContextObject(name, botAI); }
 
-Action *AiObjectContext::GetAction(std::string const name)
-{
-    return actionContexts.GetContextObject(name, botAI);
-}
+Action *AiObjectContext::GetAction(std::string const name) { return actionContexts.GetContextObject(name, botAI); }
 
-UntypedValue *AiObjectContext::GetUntypedValue(std::string const name)
-{
-    return valueContexts.GetContextObject(name, botAI);
-}
+UntypedValue *AiObjectContext::GetUntypedValue(std::string const name) { return valueContexts.GetContextObject(name, botAI); }
 
 std::set<std::string> AiObjectContext::GetValues() { return valueContexts.GetCreated(); }
 
-std::set<std::string> AiObjectContext::GetSupportedStrategies()
-{
-    return strategyContexts.supports();
-}
+std::set<std::string> AiObjectContext::GetSupportedStrategies() { return strategyContexts.supports(); }
 
 std::set<std::string> AiObjectContext::GetSupportedActions() { return actionContexts.supports(); }
 
@@ -163,7 +145,4 @@ std::string const AiObjectContext::FormatValues()
     return out.str();
 }
 
-void AiObjectContext::AddShared(NamedObjectContext<UntypedValue> *sharedValues)
-{
-    valueContexts.Add(sharedValues);
-}
+void AiObjectContext::AddShared(NamedObjectContext<UntypedValue> *sharedValues) { valueContexts.Add(sharedValues); }

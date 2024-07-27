@@ -54,8 +54,7 @@ bool BuyAction::Execute(Event event)
             m_items_sorted.erase(std::remove_if(m_items_sorted.begin(), m_items_sorted.end(),
                                                 [](VendorItem *i)
                                                 {
-                                                    ItemTemplate const *proto =
-                                                        sObjectMgr->GetItemTemplate(i->item);
+                                                    ItemTemplate const *proto = sObjectMgr->GetItemTemplate(i->item);
                                                     return !proto;
                                                 }),
                                  m_items_sorted.end());
@@ -63,12 +62,7 @@ bool BuyAction::Execute(Event event)
             if (m_items_sorted.empty())
                 continue;
 
-            std::sort(m_items_sorted.begin(), m_items_sorted.end(),
-                      [](VendorItem *i, VendorItem *j)
-                      {
-                          return sObjectMgr->GetItemTemplate(i->item)->ItemLevel >
-                                 sObjectMgr->GetItemTemplate(j->item)->ItemLevel;
-                      });
+            std::sort(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem *i, VendorItem *j) { return sObjectMgr->GetItemTemplate(i->item)->ItemLevel > sObjectMgr->GetItemTemplate(j->item)->ItemLevel; });
 
             for (auto &tItem : m_items_sorted)
             {
@@ -115,8 +109,7 @@ bool BuyAction::Execute(Event event)
                     if (!BuyItem(tItems, vendorguid, proto))
                         break;
 
-                    if (usage == ITEM_USAGE_REPLACE ||
-                        usage == ITEM_USAGE_EQUIP)  // Equip upgrades and stop buying this time.
+                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP)  // Equip upgrades and stop buying this time.
                     {
                         botAI->DoSpecificAction("equip upgrades");
                         break;
@@ -157,8 +150,7 @@ bool BuyAction::Execute(Event event)
     return true;
 }
 
-bool BuyAction::BuyItem(VendorItemData const *tItems, ObjectGuid vendorguid,
-                        ItemTemplate const *proto)
+bool BuyAction::BuyItem(VendorItemData const *tItems, ObjectGuid vendorguid, ItemTemplate const *proto)
 {
     uint32 oldCount = AI_VALUE2(uint32, "item count", proto->Name1);
 

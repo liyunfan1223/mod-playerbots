@@ -74,9 +74,7 @@ class NamedObjectFactory
     std::set<std::string> supports()
     {
         std::set<std::string> keys;
-        for (typename std::unordered_map<std::string, ActionCreator>::iterator it =
-                 creators.begin();
-             it != creators.end(); it++)
+        for (typename std::unordered_map<std::string, ActionCreator>::iterator it = creators.begin(); it != creators.end(); it++)
             keys.insert(it->first);
 
         return keys;
@@ -87,10 +85,7 @@ template <class T>
 class NamedObjectContext : public NamedObjectFactory<T>
 {
    public:
-    NamedObjectContext(bool shared = false, bool supportsSiblings = false)
-        : NamedObjectFactory<T>(), shared(shared), supportsSiblings(supportsSiblings)
-    {
-    }
+    NamedObjectContext(bool shared = false, bool supportsSiblings = false) : NamedObjectFactory<T>(), shared(shared), supportsSiblings(supportsSiblings) {}
 
     virtual ~NamedObjectContext() { Clear(); }
 
@@ -104,8 +99,7 @@ class NamedObjectContext : public NamedObjectFactory<T>
 
     void Clear()
     {
-        for (typename std::unordered_map<std::string, T *>::iterator i = created.begin();
-             i != created.end(); i++)
+        for (typename std::unordered_map<std::string, T *>::iterator i = created.begin(); i != created.end(); i++)
         {
             if (i->second)
                 delete i->second;
@@ -116,8 +110,7 @@ class NamedObjectContext : public NamedObjectFactory<T>
 
     void Update()
     {
-        for (typename std::unordered_map<std::string, T *>::iterator i = created.begin();
-             i != created.end(); i++)
+        for (typename std::unordered_map<std::string, T *>::iterator i = created.begin(); i != created.end(); i++)
         {
             if (i->second)
                 i->second->Update();
@@ -126,8 +119,7 @@ class NamedObjectContext : public NamedObjectFactory<T>
 
     void Reset()
     {
-        for (typename std::unordered_map<std::string, T *>::iterator i = created.begin();
-             i != created.end(); i++)
+        for (typename std::unordered_map<std::string, T *>::iterator i = created.begin(); i != created.end(); i++)
         {
             if (i->second)
                 i->second->Reset();
@@ -140,8 +132,7 @@ class NamedObjectContext : public NamedObjectFactory<T>
     std::set<std::string> GetCreated()
     {
         std::set<std::string> keys;
-        for (typename std::unordered_map<std::string, T *>::iterator it = created.begin();
-             it != created.end(); it++)
+        for (typename std::unordered_map<std::string, T *>::iterator it = created.begin(); it != created.end(); it++)
             keys.insert(it->first);
 
         return keys;
@@ -159,8 +150,7 @@ class NamedObjectContextList
    public:
     virtual ~NamedObjectContextList()
     {
-        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin();
-             i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             NamedObjectContext<T> *context = *i;
             if (!context->IsShared())
@@ -172,8 +162,7 @@ class NamedObjectContextList
 
     T *GetContextObject(std::string const name, PlayerbotAI *botAI)
     {
-        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin();
-             i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             if (T *object = (*i)->create(name, botAI))
                 return object;
@@ -184,8 +173,7 @@ class NamedObjectContextList
 
     void Update()
     {
-        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin();
-             i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             if (!(*i)->IsShared())
                 (*i)->Update();
@@ -194,8 +182,7 @@ class NamedObjectContextList
 
     void Reset()
     {
-        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin();
-             i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             (*i)->Reset();
         }
@@ -203,8 +190,7 @@ class NamedObjectContextList
 
     std::set<std::string> GetSiblings(std::string const name)
     {
-        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin();
-             i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             if (!(*i)->IsSupportsSiblings())
                 continue;
@@ -224,8 +210,7 @@ class NamedObjectContextList
     std::set<std::string> supports()
     {
         std::set<std::string> result;
-        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin();
-             i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             std::set<std::string> supported = (*i)->supports();
 
@@ -239,13 +224,11 @@ class NamedObjectContextList
     std::set<std::string> GetCreated()
     {
         std::set<std::string> result;
-        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin();
-             i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T> *>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             std::set<std::string> createdKeys = (*i)->GetCreated();
 
-            for (std::set<std::string>::iterator j = createdKeys.begin(); j != createdKeys.end();
-                 j++)
+            for (std::set<std::string>::iterator j = createdKeys.begin(); j != createdKeys.end(); j++)
                 result.insert(*j);
         }
 
@@ -262,8 +245,7 @@ class NamedObjectFactoryList
    public:
     virtual ~NamedObjectFactoryList()
     {
-        for (typename std::list<NamedObjectFactory<T> *>::iterator i = factories.begin();
-             i != factories.end(); i++)
+        for (typename std::list<NamedObjectFactory<T> *>::iterator i = factories.begin(); i != factories.end(); i++)
             delete *i;
     }
 
@@ -271,8 +253,7 @@ class NamedObjectFactoryList
 
     T *GetContextObject(std::string const &name, PlayerbotAI *botAI)
     {
-        for (typename std::list<NamedObjectFactory<T> *>::iterator i = factories.begin();
-             i != factories.end(); i++)
+        for (typename std::list<NamedObjectFactory<T> *>::iterator i = factories.begin(); i != factories.end(); i++)
         {
             if (T *object = (*i)->create(name, botAI))
                 return object;

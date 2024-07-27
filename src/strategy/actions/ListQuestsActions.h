@@ -34,8 +34,7 @@ class ListQuestsAction : public Action
     bool Execute(Event event) override;
 
    private:
-    void ListQuests(QuestListFilter filter,
-                    QuestTravelDetail travelDetail = QUEST_TRAVEL_DETAIL_NONE);
+    void ListQuests(QuestListFilter filter, QuestTravelDetail travelDetail = QUEST_TRAVEL_DETAIL_NONE);
     uint32 ListQuests(bool completed, bool silent, QuestTravelDetail travelDetail);
 };
 

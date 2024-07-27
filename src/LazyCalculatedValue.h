@@ -14,10 +14,7 @@ class LazyCalculatedValue
     typedef TValue (TOwner::*Calculator)();
 
    public:
-    LazyCalculatedValue(TOwner *owner, Calculator calculator) : calculator(calculator), owner(owner)
-    {
-        Reset();
-    }
+    LazyCalculatedValue(TOwner *owner, Calculator calculator) : calculator(calculator), owner(owner) { Reset(); }
 
    public:
     TValue GetValue()

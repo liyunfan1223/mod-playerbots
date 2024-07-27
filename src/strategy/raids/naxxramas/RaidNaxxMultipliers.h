@@ -57,10 +57,7 @@ class SapphironGenericMultiplier : public Multiplier
 class InstructorRazuviousGenericMultiplier : public Multiplier
 {
    public:
-    InstructorRazuviousGenericMultiplier(PlayerbotAI *ai)
-        : Multiplier(ai, "instructor razuvious generic"), helper(ai)
-    {
-    }
+    InstructorRazuviousGenericMultiplier(PlayerbotAI *ai) : Multiplier(ai, "instructor razuvious generic"), helper(ai) {}
     virtual float GetValue(Action *action);
 
    private:

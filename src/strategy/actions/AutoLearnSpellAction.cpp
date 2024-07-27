@@ -32,14 +32,10 @@ bool AutoLearnSpellAction::Execute(Event event)
 
 void AutoLearnSpellAction::LearnSpells(std::ostringstream *out)
 {
-    if (sPlayerbotAIConfig->autoLearnTrainerSpells &&
-        sRandomPlayerbotMgr->IsRandomBot(
-            bot))  // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnTrainerSpells && sRandomPlayerbotMgr->IsRandomBot(bot))  // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnTrainerSpells(out);
 
-    if (sPlayerbotAIConfig->autoLearnQuestSpells &&
-        sRandomPlayerbotMgr->IsRandomBot(
-            bot))  // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnQuestSpells && sRandomPlayerbotMgr->IsRandomBot(bot))  // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnQuestSpells(out);
 }
 
@@ -123,8 +119,7 @@ void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream *out)
 {
     // CreatureTemplate const* co = sCreatureStorage.LookupEntry<CreatureTemplate>(id);
     ObjectMgr::QuestMap const &questTemplates = sObjectMgr->GetQuestTemplates();
-    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end();
-         ++i)
+    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
         uint32 questId = i->first;
         Quest const *quest = i->second;
@@ -132,8 +127,7 @@ void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream *out)
         if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
             continue;
 
-        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() ||
-            !bot->SatisfyQuestRace(quest, false))
+        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() || !bot->SatisfyQuestRace(quest, false))
             continue;
 
         if (quest->GetRewSpellCast() > 0)
@@ -153,11 +147,9 @@ std::string const FormatSpell(SpellInfo const *sInfo)
     std::string const rank = sInfo->Rank[0];
 
     if (rank.empty())
-        out << "|cffffffff|Hspell:" << sInfo->Id << "|h[" << sInfo->SpellName[LOCALE_enUS]
-            << "]|h|r";
+        out << "|cffffffff|Hspell:" << sInfo->Id << "|h[" << sInfo->SpellName[LOCALE_enUS] << "]|h|r";
     else
-        out << "|cffffffff|Hspell:" << sInfo->Id << "|h[" << sInfo->SpellName[LOCALE_enUS] << " "
-            << rank << "]|h|r";
+        out << "|cffffffff|Hspell:" << sInfo->Id << "|h[" << sInfo->SpellName[LOCALE_enUS] << " " << rank << "]|h|r";
 
     return out.str();
 }
@@ -202,8 +194,7 @@ bool AutoUpgradeEquipAction::Execute(Event event)
         return false;
     }
     PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
-    if (!sPlayerbotAIConfig->equipmentPersistence ||
-        bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         factory.InitEquipment(true);
     }

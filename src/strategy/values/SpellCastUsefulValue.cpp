@@ -19,12 +19,10 @@ bool SpellCastUsefulValue::Calculate()
     if (!spellInfo)
         return true;  // there can be known alternatives
 
-    if ((spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE) != 0 ||
-        (spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING) != 0)
+    if ((spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE) != 0 || (spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING) != 0)
     {
         if (Spell *spell = bot->GetCurrentSpell(CURRENT_MELEE_SPELL))
-            if (spell->m_spellInfo->Id == spellid && spell->IsNextMeleeSwingSpell() &&
-                bot->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+            if (spell->m_spellInfo->Id == spellid && spell->IsNextMeleeSwingSpell() && bot->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                 return false;
     }
     else
@@ -35,16 +33,13 @@ bool SpellCastUsefulValue::Calculate()
         //         return false;
     }
 
-    if (spellInfo->IsAutoRepeatRangedSpell() && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) &&
-        bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)->m_spellInfo->Id == spellid)
+    if (spellInfo->IsAutoRepeatRangedSpell() && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)->m_spellInfo->Id == spellid)
     {
         return false;
     }
 
     // TODO: workaround
-    if (qualifier == "windfury weapon" || qualifier == "flametongue weapon" ||
-        qualifier == "frostbrand weapon" || qualifier == "rockbiter weapon" ||
-        qualifier == "earthliving weapon" || qualifier == "spellstone")
+    if (qualifier == "windfury weapon" || qualifier == "flametongue weapon" || qualifier == "frostbrand weapon" || qualifier == "rockbiter weapon" || qualifier == "earthliving weapon" || qualifier == "spellstone")
     {
         if (Item *item = AI_VALUE2(Item *, "item for spell", spellid))
             if (item->IsInWorld() && item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
@@ -67,8 +62,7 @@ bool SpellCastUsefulValue::Calculate()
             continue;
 
         wstrToLower(wnamepart);
-        if (!spellName.empty() && spellName.length() == wnamepart.length() &&
-            Utf8FitTo(spellName, wnamepart))
+        if (!spellName.empty() && spellName.length() == wnamepart.length() && Utf8FitTo(spellName, wnamepart))
             return false;
     }
 

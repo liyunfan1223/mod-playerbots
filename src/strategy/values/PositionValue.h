@@ -16,10 +16,7 @@ class PositionInfo
 {
    public:
     PositionInfo() : valueSet(false), x(0), y(0), z(0), mapId(0) {}
-    PositionInfo(PositionInfo const &other)
-        : valueSet(other.valueSet), x(other.x), y(other.y), z(other.z), mapId(other.mapId)
-    {
-    }
+    PositionInfo(PositionInfo const &other) : valueSet(other.valueSet), x(other.x), y(other.y), z(other.z), mapId(other.mapId) {}
 
     void Set(float newX, float newY, float newZ, uint32 newMapId)
     {
@@ -58,18 +55,13 @@ class PositionValue : public ManualSetValue<PositionMap &>
 class CurrentPositionValue : public LogCalculatedValue<WorldPosition>
 {
    public:
-    CurrentPositionValue(PlayerbotAI *botAI, std::string const name = "current position",
-                         uint32 checkInterval = 1)
-        : LogCalculatedValue<WorldPosition>(botAI, name, checkInterval)
+    CurrentPositionValue(PlayerbotAI *botAI, std::string const name = "current position", uint32 checkInterval = 1) : LogCalculatedValue<WorldPosition>(botAI, name, checkInterval)
     {
         minChangeInterval = 60;
         logLength = 30;
     };
 
-    bool EqualToLast(WorldPosition value) override
-    {
-        return value.fDist(lastValue) < sPlayerbotAIConfig->tooCloseDistance;
-    }
+    bool EqualToLast(WorldPosition value) override { return value.fDist(lastValue) < sPlayerbotAIConfig->tooCloseDistance; }
 
     WorldPosition Calculate() override;
 };

@@ -18,10 +18,7 @@ enum RollVote : uint8;
 class LootRollAction : public QueryItemUsageAction
 {
    public:
-    LootRollAction(PlayerbotAI *botAI, std::string const name = "loot roll")
-        : QueryItemUsageAction(botAI, name)
-    {
-    }
+    LootRollAction(PlayerbotAI *botAI, std::string const name = "loot roll") : QueryItemUsageAction(botAI, name) {}
 
     bool Execute(Event event) override;
 

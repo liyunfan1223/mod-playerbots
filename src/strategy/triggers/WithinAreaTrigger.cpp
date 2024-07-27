@@ -22,12 +22,10 @@ bool WithinAreaTrigger::IsActive()
     if (!sObjectMgr->GetAreaTriggerTeleport(movement.lastAreaTrigger))
         return false;
 
-    return IsPointInAreaTriggerZone(at, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(),
-                                    bot->GetPositionZ(), 0.5f);
+    return IsPointInAreaTriggerZone(at, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 0.5f);
 }
 
-bool WithinAreaTrigger::IsPointInAreaTriggerZone(AreaTrigger const *atEntry, uint32 mapid, float x,
-                                                 float y, float z, float delta)
+bool WithinAreaTrigger::IsPointInAreaTriggerZone(AreaTrigger const *atEntry, uint32 mapid, float x, float y, float z, float delta)
 {
     if (mapid != atEntry->map)
         return false;
@@ -35,8 +33,7 @@ bool WithinAreaTrigger::IsPointInAreaTriggerZone(AreaTrigger const *atEntry, uin
     if (atEntry->radius > 0)
     {
         // if we have radius check it
-        float dist2 = (x - atEntry->x) * (x - atEntry->x) + (y - atEntry->y) * (y - atEntry->y) +
-                      (z - atEntry->z) * (z - atEntry->z);
+        float dist2 = (x - atEntry->x) * (x - atEntry->x) + (y - atEntry->y) * (y - atEntry->y) + (z - atEntry->z) * (z - atEntry->z);
         if (dist2 > (atEntry->radius + delta) * (atEntry->radius + delta))
             return false;
     }
@@ -63,8 +60,7 @@ bool WithinAreaTrigger::IsPointInAreaTriggerZone(AreaTrigger const *atEntry, uin
         float dz = z - atEntry->z;
         float dx = rotPlayerX - atEntry->x;
         float dy = rotPlayerY - atEntry->y;
-        if ((fabs(dx) > atEntry->x / 2 + delta) || (fabs(dy) > atEntry->y / 2 + delta) ||
-            (fabs(dz) > atEntry->z / 2 + delta))
+        if ((fabs(dx) > atEntry->x / 2 + delta) || (fabs(dy) > atEntry->y / 2 + delta) || (fabs(dz) > atEntry->z / 2 + delta))
         {
             return false;
         }

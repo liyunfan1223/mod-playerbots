@@ -29,10 +29,7 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit *unit)
         return std::move(retVec);
 
     FactionTemplateEntry const *humanFaction = sFactionTemplateStore.LookupEntry(1);
-    uint32 factionId =
-        (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL)
-            ? 1
-            : 2;
+    uint32 factionId = (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL) ? 1 : 2;
 
     for (auto &wb : sPlayerbotAIConfig->worldBuffs)
     {

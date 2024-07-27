@@ -44,10 +44,7 @@ class OffHandWeaponNoImbueTrigger : public BuffTrigger
 class TotemTrigger : public Trigger
 {
    public:
-    TotemTrigger(PlayerbotAI *botAI, std::string const spell, uint32 attackerCount = 0)
-        : Trigger(botAI, spell), attackerCount(attackerCount)
-    {
-    }
+    TotemTrigger(PlayerbotAI *botAI, std::string const spell, uint32 attackerCount = 0) : Trigger(botAI, spell), attackerCount(attackerCount) {}
 
     bool IsActive() override;
 
@@ -84,9 +81,7 @@ class FlametongueTotemTrigger : public TotemTrigger
 class StrengthOfEarthTotemTrigger : public TotemTrigger
 {
    public:
-    StrengthOfEarthTotemTrigger(PlayerbotAI *botAI) : TotemTrigger(botAI, "strength of earth totem")
-    {
-    }
+    StrengthOfEarthTotemTrigger(PlayerbotAI *botAI) : TotemTrigger(botAI, "strength of earth totem") {}
 };
 
 class FireElementalTotemTrigger : public BoostTrigger
@@ -110,9 +105,7 @@ class SearingTotemTrigger : public TotemTrigger
 class WindShearInterruptSpellTrigger : public InterruptSpellTrigger
 {
    public:
-    WindShearInterruptSpellTrigger(PlayerbotAI *botAI) : InterruptSpellTrigger(botAI, "wind shear")
-    {
-    }
+    WindShearInterruptSpellTrigger(PlayerbotAI *botAI) : InterruptSpellTrigger(botAI, "wind shear") {}
 };
 
 class WaterShieldTrigger : public BuffTrigger
@@ -152,10 +145,7 @@ class WaterBreathingTrigger : public BuffTrigger
 class WaterWalkingOnPartyTrigger : public BuffOnPartyTrigger
 {
    public:
-    WaterWalkingOnPartyTrigger(PlayerbotAI *botAI)
-        : BuffOnPartyTrigger(botAI, "water walking on party", 2 * 2000)
-    {
-    }
+    WaterWalkingOnPartyTrigger(PlayerbotAI *botAI) : BuffOnPartyTrigger(botAI, "water walking on party", 2 * 2000) {}
 
     bool IsActive() override;
 };
@@ -163,10 +153,7 @@ class WaterWalkingOnPartyTrigger : public BuffOnPartyTrigger
 class WaterBreathingOnPartyTrigger : public BuffOnPartyTrigger
 {
    public:
-    WaterBreathingOnPartyTrigger(PlayerbotAI *botAI)
-        : BuffOnPartyTrigger(botAI, "water breathing on party", 2 * 2000)
-    {
-    }
+    WaterBreathingOnPartyTrigger(PlayerbotAI *botAI) : BuffOnPartyTrigger(botAI, "water breathing on party", 2 * 2000) {}
 
     bool IsActive() override;
 };
@@ -174,55 +161,37 @@ class WaterBreathingOnPartyTrigger : public BuffOnPartyTrigger
 class CleanseSpiritPoisonTrigger : public NeedCureTrigger
 {
    public:
-    CleanseSpiritPoisonTrigger(PlayerbotAI *botAI)
-        : NeedCureTrigger(botAI, "cleanse spirit", DISPEL_POISON)
-    {
-    }
+    CleanseSpiritPoisonTrigger(PlayerbotAI *botAI) : NeedCureTrigger(botAI, "cleanse spirit", DISPEL_POISON) {}
 };
 
 class PartyMemberCleanseSpiritPoisonTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    PartyMemberCleanseSpiritPoisonTrigger(PlayerbotAI *botAI)
-        : PartyMemberNeedCureTrigger(botAI, "cleanse spirit", DISPEL_POISON)
-    {
-    }
+    PartyMemberCleanseSpiritPoisonTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "cleanse spirit", DISPEL_POISON) {}
 };
 
 class CleanseSpiritCurseTrigger : public NeedCureTrigger
 {
    public:
-    CleanseSpiritCurseTrigger(PlayerbotAI *botAI)
-        : NeedCureTrigger(botAI, "cleanse spirit", DISPEL_CURSE)
-    {
-    }
+    CleanseSpiritCurseTrigger(PlayerbotAI *botAI) : NeedCureTrigger(botAI, "cleanse spirit", DISPEL_CURSE) {}
 };
 
 class PartyMemberCleanseSpiritCurseTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    PartyMemberCleanseSpiritCurseTrigger(PlayerbotAI *botAI)
-        : PartyMemberNeedCureTrigger(botAI, "cleanse spirit", DISPEL_CURSE)
-    {
-    }
+    PartyMemberCleanseSpiritCurseTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "cleanse spirit", DISPEL_CURSE) {}
 };
 
 class CleanseSpiritDiseaseTrigger : public NeedCureTrigger
 {
    public:
-    CleanseSpiritDiseaseTrigger(PlayerbotAI *botAI)
-        : NeedCureTrigger(botAI, "cleanse spirit", DISPEL_DISEASE)
-    {
-    }
+    CleanseSpiritDiseaseTrigger(PlayerbotAI *botAI) : NeedCureTrigger(botAI, "cleanse spirit", DISPEL_DISEASE) {}
 };
 
 class PartyMemberCleanseSpiritDiseaseTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    PartyMemberCleanseSpiritDiseaseTrigger(PlayerbotAI *botAI)
-        : PartyMemberNeedCureTrigger(botAI, "cleanse spirit", DISPEL_DISEASE)
-    {
-    }
+    PartyMemberCleanseSpiritDiseaseTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "cleanse spirit", DISPEL_DISEASE) {}
 };
 
 class ShockTrigger : public DebuffTrigger
@@ -260,18 +229,13 @@ class ElementalMasteryTrigger : public BoostTrigger
 class MaelstromWeaponTrigger : public HasAuraStackTrigger
 {
    public:
-    MaelstromWeaponTrigger(PlayerbotAI *botAI) : HasAuraStackTrigger(botAI, "maelstrom weapon", 5)
-    {
-    }
+    MaelstromWeaponTrigger(PlayerbotAI *botAI) : HasAuraStackTrigger(botAI, "maelstrom weapon", 5) {}
 };
 
 class WindShearInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
 {
    public:
-    WindShearInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI)
-        : InterruptEnemyHealerTrigger(botAI, "wind shear")
-    {
-    }
+    WindShearInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI) : InterruptEnemyHealerTrigger(botAI, "wind shear") {}
 };
 
 class CurePoisonTrigger : public NeedCureTrigger
@@ -283,27 +247,19 @@ class CurePoisonTrigger : public NeedCureTrigger
 class PartyMemberCurePoisonTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    PartyMemberCurePoisonTrigger(PlayerbotAI *botAI)
-        : PartyMemberNeedCureTrigger(botAI, "cure poison", DISPEL_POISON)
-    {
-    }
+    PartyMemberCurePoisonTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "cure poison", DISPEL_POISON) {}
 };
 
 class CureDiseaseTrigger : public NeedCureTrigger
 {
    public:
-    CureDiseaseTrigger(PlayerbotAI *botAI) : NeedCureTrigger(botAI, "cure disease", DISPEL_DISEASE)
-    {
-    }
+    CureDiseaseTrigger(PlayerbotAI *botAI) : NeedCureTrigger(botAI, "cure disease", DISPEL_DISEASE) {}
 };
 
 class PartyMemberCureDiseaseTrigger : public PartyMemberNeedCureTrigger
 {
    public:
-    PartyMemberCureDiseaseTrigger(PlayerbotAI *botAI)
-        : PartyMemberNeedCureTrigger(botAI, "cure disease", DISPEL_DISEASE)
-    {
-    }
+    PartyMemberCureDiseaseTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "cure disease", DISPEL_DISEASE) {}
 };
 
 class NoFireTotemTrigger : public Trigger
@@ -323,10 +279,7 @@ class NoWaterTotemTrigger : public Trigger
 class EarthShieldOnMainTankTrigger : public BuffOnMainTankTrigger
 {
    public:
-    EarthShieldOnMainTankTrigger(PlayerbotAI *botAI)
-        : BuffOnMainTankTrigger(botAI, "earth shield", false)
-    {
-    }
+    EarthShieldOnMainTankTrigger(PlayerbotAI *botAI) : BuffOnMainTankTrigger(botAI, "earth shield", false) {}
 };
 
 class FlameShockTrigger : public DebuffTrigger

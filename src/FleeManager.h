@@ -18,10 +18,7 @@ class PlayerbotAI;
 class FleePoint
 {
    public:
-    FleePoint(PlayerbotAI *botAI, float x, float y, float z)
-        : botAI(botAI), sumDistance(0.0f), minDistance(0.0f), x(x), y(y), z(z)
-    {
-    }
+    FleePoint(PlayerbotAI *botAI, float x, float y, float z) : botAI(botAI), sumDistance(0.0f), minDistance(0.0f), x(x), y(y), z(z) {}
 
     float x;
     float y;
@@ -37,8 +34,7 @@ class FleePoint
 class FleeManager
 {
    public:
-    FleeManager(Player *bot, float maxAllowedDistance, float followAngle,
-                bool forceMaxDistance = false, WorldPosition startPosition = WorldPosition());
+    FleeManager(Player *bot, float maxAllowedDistance, float followAngle, bool forceMaxDistance = false, WorldPosition startPosition = WorldPosition());
 
     bool CalculateDestination(float *rx, float *ry, float *rz);
     bool isUseful();

@@ -55,15 +55,9 @@ bool UseItemAction::UseGameObject(ObjectGuid guid)
 
 bool UseItemAction::UseItemAuto(Item *item) { return UseItem(item, ObjectGuid::Empty, nullptr); }
 
-bool UseItemAction::UseItemOnGameObject(Item *item, ObjectGuid go)
-{
-    return UseItem(item, go, nullptr);
-}
+bool UseItemAction::UseItemOnGameObject(Item *item, ObjectGuid go) { return UseItem(item, go, nullptr); }
 
-bool UseItemAction::UseItemOnItem(Item *item, Item *itemTarget)
-{
-    return UseItem(item, ObjectGuid::Empty, itemTarget);
-}
+bool UseItemAction::UseItemOnItem(Item *item, Item *itemTarget) { return UseItem(item, ObjectGuid::Empty, itemTarget); }
 
 bool UseItemAction::UseItem(Item *item, ObjectGuid goGuid, Item *itemTarget, Unit *unitTarget)
 {
@@ -146,8 +140,7 @@ bool UseItemAction::UseItem(Item *item, ObjectGuid goGuid, Item *itemTarget, Uni
     }
 
     Player *master = GetMaster();
-    if (!targetSelected && item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && master &&
-        botAI->HasActivePlayerMaster() && !selfOnly)
+    if (!targetSelected && item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && master && botAI->HasActivePlayerMaster() && !selfOnly)
     {
         if (ObjectGuid masterSelection = master->GetTarget())
         {
@@ -222,8 +215,7 @@ bool UseItemAction::UseItem(Item *item, ObjectGuid goGuid, Item *itemTarget, Uni
                     return false;
 
                 targetFlag = TARGET_FLAG_TRADE_ITEM;
-                packet << targetFlag << (uint8)1
-                       << ObjectGuid((uint64)TRADE_SLOT_NONTRADED).WriteAsPacked();
+                packet << targetFlag << (uint8)1 << ObjectGuid((uint64)TRADE_SLOT_NONTRADED).WriteAsPacked();
                 targetSelected = true;
                 out << " on traded item";
             }
@@ -254,9 +246,7 @@ bool UseItemAction::UseItem(Item *item, ObjectGuid goGuid, Item *itemTarget, Uni
     ItemTemplate const *proto = item->GetTemplate();
     bool isDrink = proto->Spells[0].SpellCategory == 59;
     bool isFood = proto->Spells[0].SpellCategory == 11;
-    if (proto->Class == ITEM_CLASS_CONSUMABLE &&
-        (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
-        (isFood || isDrink))
+    if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) && (isFood || isDrink))
     {
         if (bot->IsInCombat())
             return false;
@@ -322,12 +312,10 @@ bool UseItemAction::SocketItem(Item *item, Item *gem, bool replace)
     *packet << item->GetGUID();
 
     bool fits = false;
-    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT;
-         enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
     {
         uint8 SocketColor = item->GetTemplate()->Socket[enchant_slot - SOCK_ENCHANTMENT_SLOT].Color;
-        GemPropertiesEntry const *gemProperty =
-            sGemPropertiesStore.LookupEntry(gem->GetTemplate()->GemProperties);
+        GemPropertiesEntry const *gemProperty = sGemPropertiesStore.LookupEntry(gem->GetTemplate()->GemProperties);
         if (gemProperty && (gemProperty->color & SocketColor))
         {
             if (fits)
@@ -344,8 +332,7 @@ bool UseItemAction::SocketItem(Item *item, Item *gem, bool replace)
                 continue;
             }
 
-            SpellItemEnchantmentEntry const *enchantEntry =
-                sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+            SpellItemEnchantmentEntry const *enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
             if (!enchantEntry || !enchantEntry->GemID)
             {
                 *packet << gem->GetGUID();
@@ -377,10 +364,7 @@ bool UseItemAction::SocketItem(Item *item, Item *gem, bool replace)
     return fits;
 }
 
-bool UseItemAction::isPossible()
-{
-    return getName() == "use" || AI_VALUE2(uint32, "item count", getName()) > 0;
-}
+bool UseItemAction::isPossible() { return getName() == "use" || AI_VALUE2(uint32, "item count", getName()) > 0; }
 
 bool UseSpellItemAction::isUseful() { return AI_VALUE2(bool, "spell cast useful", getName()); }
 
@@ -410,10 +394,7 @@ bool UseHearthStone::Execute(Event event)
 
 bool UseHearthStone::isUseful() { return !bot->InBattleground(); }
 
-bool UseRandomRecipe::isUseful()
-{
-    return !bot->IsInCombat() && !botAI->HasActivePlayerMaster() && !bot->InBattleground();
-}
+bool UseRandomRecipe::isUseful() { return !bot->IsInCombat() && !botAI->HasActivePlayerMaster() && !bot->InBattleground(); }
 
 bool UseRandomRecipe::isPossible() { return AI_VALUE2(uint32, "item count", "recipe") > 0; }
 
@@ -439,11 +420,7 @@ bool UseRandomRecipe::Execute(Event event)
     return used;
 }
 
-bool UseRandomQuestItem::isUseful()
-{
-    return !botAI->HasActivePlayerMaster() && !bot->InBattleground() &&
-           !bot->HasUnitState(UNIT_STATE_IN_FLIGHT);
-}
+bool UseRandomQuestItem::isUseful() { return !botAI->HasActivePlayerMaster() && !bot->InBattleground() && !bot->HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
 bool UseRandomQuestItem::isPossible() { return AI_VALUE2(uint32, "item count", "quest") > 0; }
 

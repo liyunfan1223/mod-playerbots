@@ -15,10 +15,7 @@ class PlayerbotAI;
 class ReachTargetAction : public MovementAction
 {
    public:
-    ReachTargetAction(PlayerbotAI *botAI, std::string const name, float distance)
-        : MovementAction(botAI, name), distance(distance)
-    {
-    }
+    ReachTargetAction(PlayerbotAI *botAI, std::string const name, float distance) : MovementAction(botAI, name), distance(distance) {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -31,10 +28,7 @@ class ReachTargetAction : public MovementAction
 class CastReachTargetSpellAction : public CastSpellAction
 {
    public:
-    CastReachTargetSpellAction(PlayerbotAI *botAI, std::string const spell, float distance)
-        : CastSpellAction(botAI, spell), distance(distance)
-    {
-    }
+    CastReachTargetSpellAction(PlayerbotAI *botAI, std::string const spell, float distance) : CastSpellAction(botAI, spell), distance(distance) {}
 
     bool isUseful() override;
 
@@ -45,10 +39,7 @@ class CastReachTargetSpellAction : public CastSpellAction
 class ReachMeleeAction : public ReachTargetAction
 {
    public:
-    ReachMeleeAction(PlayerbotAI *botAI)
-        : ReachTargetAction(botAI, "reach melee", sPlayerbotAIConfig->meleeDistance)
-    {
-    }
+    ReachMeleeAction(PlayerbotAI *botAI) : ReachTargetAction(botAI, "reach melee", sPlayerbotAIConfig->meleeDistance) {}
 };
 
 class ReachSpellAction : public ReachTargetAction

@@ -16,10 +16,7 @@ class Unit;
 class AttackerWithoutAuraTargetValue : public UnitCalculatedValue, public Qualified
 {
    public:
-    AttackerWithoutAuraTargetValue(PlayerbotAI *botAI, std::string range = "spell")
-        : UnitCalculatedValue(botAI, "attacker without aura"), range(range)
-    {
-    }
+    AttackerWithoutAuraTargetValue(PlayerbotAI *botAI, std::string range = "spell") : UnitCalculatedValue(botAI, "attacker without aura"), range(range) {}
 
    protected:
     Unit *Calculate() override;
@@ -29,10 +26,7 @@ class AttackerWithoutAuraTargetValue : public UnitCalculatedValue, public Qualif
 class MeleeAttackerWithoutAuraTargetValue : public AttackerWithoutAuraTargetValue
 {
    public:
-    MeleeAttackerWithoutAuraTargetValue(PlayerbotAI *botAI)
-        : AttackerWithoutAuraTargetValue(botAI, "melee")
-    {
-    }
+    MeleeAttackerWithoutAuraTargetValue(PlayerbotAI *botAI) : AttackerWithoutAuraTargetValue(botAI, "melee") {}
 };
 
 #endif

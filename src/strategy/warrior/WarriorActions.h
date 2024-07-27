@@ -26,11 +26,7 @@ DEBUFF_ACTION_R(CastDemoralizingShoutAction, "demoralizing shout", 8.0f);  // lo
 class CastDemoralizingShoutWithoutLifeTimeCheckAction : public CastDebuffSpellAction
 {
    public:
-    CastDemoralizingShoutWithoutLifeTimeCheckAction(PlayerbotAI *botAI)
-        : CastDebuffSpellAction(botAI, "demoralizing shout", false, 0.0f)
-    {
-        range = 8.0f;
-    }
+    CastDemoralizingShoutWithoutLifeTimeCheckAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "demoralizing shout", false, 0.0f) { range = 8.0f; }
 };
 
 MELEE_ACTION(CastChallengingShoutAction, "challenging shout");
@@ -47,10 +43,7 @@ DEBUFF_CHECKISOWNER_ACTION(CastRendAction, "rend");
 class CastRendOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
    public:
-    CastRendOnAttackerAction(PlayerbotAI *botAI)
-        : CastDebuffSpellOnMeleeAttackerAction(botAI, "rend")
-    {
-    }
+    CastRendOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "rend") {}
 };
 
 MELEE_ACTION(CastThunderClapAction, "thunder clap");
@@ -103,9 +96,7 @@ MELEE_ACTION(CastShieldBashAction, "shield bash");
 ENEMY_HEALER_ACTION(CastShieldBashOnEnemyHealerAction, "shield bash");
 MELEE_ACTION(CastRevengeAction, "revenge");
 BUFF_ACTION(CastShieldBlockAction, "shield block");
-DEBUFF_ACTION_U(CastDisarmAction, "disarm",
-                GetTarget() && GetTarget()->IsPlayer() ? !botAI->IsRanged((Player *)GetTarget())
-                                                       : CastDebuffSpellAction::isUseful());
+DEBUFF_ACTION_U(CastDisarmAction, "disarm", GetTarget() && GetTarget()->IsPlayer() ? !botAI->IsRanged((Player *)GetTarget()) : CastDebuffSpellAction::isUseful());
 DEBUFF_ENEMY_ACTION(CastDisarmOnAttackerAction, "disarm");
 BUFF_ACTION(CastShieldWallAction, "shield wall");
 // protection 2.4.3
@@ -125,10 +116,7 @@ SNARE_ACTION(CastShockwaveSnareAction, "shockwave");
 class CastSunderArmorAction : public CastDebuffSpellAction
 {
    public:
-    CastSunderArmorAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "sunder armor")
-    {
-        range = ATTACK_DISTANCE;
-    }
+    CastSunderArmorAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "sunder armor") { range = ATTACK_DISTANCE; }
 
     bool isUseful() override;
 };

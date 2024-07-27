@@ -16,8 +16,7 @@ PlayerbotSecurity::PlayerbotSecurity(Player *const bot) : bot(bot)
         account = sCharacterCache->GetCharacterAccountIdByGuid(bot->GetGUID());
 }
 
-PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player *from, DenyReason *reason,
-                                                   bool ignoreGroup)
+PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player *from, DenyReason *reason, bool ignoreGroup)
 {
     if (from->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         return PLAYERBOT_SECURITY_ALLOW_ALL;
@@ -75,8 +74,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player *from, DenyReason *rea
             return PLAYERBOT_SECURITY_TALK;
         }
 
-        if (sPlayerbotAIConfig->groupInvitationPermission <= 1 &&
-            (int32)bot->GetLevel() - (int8)from->GetLevel() > 5)
+        if (sPlayerbotAIConfig->groupInvitationPermission <= 1 && (int32)bot->GetLevel() - (int8)from->GetLevel() > 5)
         {
             if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
             {
@@ -91,10 +89,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player *from, DenyReason *rea
         int32 fromGS = (int32)botAI->GetEquipGearScore(from, false, false);
         if (sPlayerbotAIConfig->gearscorecheck)
         {
-            if (botGS && bot->GetLevel() > 15 && botGS > fromGS &&
-                static_cast<float>(100 * (botGS - fromGS) / botGS) >=
-                    static_cast<float>(12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) /
-                                       from->GetLevel()))
+            if (botGS && bot->GetLevel() > 15 && botGS > fromGS && static_cast<float>(100 * (botGS - fromGS) / botGS) >= static_cast<float>(12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel()))
             {
                 if (reason)
                     *reason = PLAYERBOT_DENY_GEARSCORE;
@@ -181,8 +176,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player *from, DenyReason *rea
     return PLAYERBOT_SECURITY_ALLOW_ALL;
 }
 
-bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player *from,
-                                      bool ignoreGroup)
+bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player *from, bool ignoreGroup)
 {
     DenyReason reason = PLAYERBOT_DENY_NONE;
     PlayerbotSecurityLevel realLevel = LevelFor(from, &reason, ignoreGroup);
@@ -195,8 +189,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
 
     PlayerbotAI *botAI = GET_PLAYERBOT_AI(bot);
     Player *master = botAI->GetMaster();
-    if (master && botAI && botAI->IsOpposing(master) &&
-        master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+    if (master && botAI && botAI->IsOpposing(master) && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
         return false;
 
     std::ostringstream out;
@@ -212,8 +205,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                     out << "I'll do it later";
                     break;
                 case PLAYERBOT_DENY_LOW_LEVEL:
-                    out << "You are too low level: |cffff0000" << (uint32)from->GetLevel()
-                        << "|cffffffff/|cff00ff00" << (uint32)bot->GetLevel();
+                    out << "You are too low level: |cffff0000" << (uint32)from->GetLevel() << "|cffffffff/|cff00ff00" << (uint32)bot->GetLevel();
                     break;
                 case PLAYERBOT_DENY_GEARSCORE:
                 {
@@ -221,9 +213,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                     int fromGS = (int)botAI->GetEquipGearScore(from, false, false);
                     int diff = (100 * (botGS - fromGS) / botGS);
                     int req = 12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel();
-                    out << "Your gearscore is too low: |cffff0000" << fromGS
-                        << "|cffffffff/|cff00ff00" << botGS << " |cffff0000" << diff
-                        << "%|cffffffff/|cff00ff00" << req << "%";
+                    out << "Your gearscore is too low: |cffff0000" << fromGS << "|cffffffff/|cff00ff00" << botGS << " |cffff0000" << diff << "%|cffffffff/|cff00ff00" << req << "%";
                 }
                 break;
                 case PLAYERBOT_DENY_NOT_YOURS:
@@ -260,8 +250,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                 case PLAYERBOT_DENY_NOT_LEADER:
                     if (botAI->GetGroupMaster())
                     {
-                        out << "I am in a group with " << botAI->GetGroupMaster()->GetName()
-                            << ". You can ask him for invite.";
+                        out << "I am in a group with " << botAI->GetGroupMaster()->GetName() << ". You can ask him for invite.";
                     }
                     else
                     {
