@@ -123,6 +123,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["talk"] = &ActionContext::talk;
             creators["suggest what to do"] = &ActionContext::suggest_what_to_do;
             creators["suggest trade"] = &ActionContext::suggest_trade;
+            creators["suggest dungeon"] = &ActionContext::suggest_dungeon;
             creators["return"] = &ActionContext::_return;
             creators["move to loot"] = &ActionContext::move_to_loot;
             creators["open loot"] = &ActionContext::open_loot;
@@ -280,6 +281,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* talk(PlayerbotAI* botAI) { return new TalkAction(botAI); }
         static Action* suggest_what_to_do(PlayerbotAI* botAI) { return new SuggestWhatToDoAction(botAI); }
         static Action* suggest_trade(PlayerbotAI* botAI) { return new SuggestTradeAction(botAI); }
+        static Action* suggest_dungeon(PlayerbotAI* botAI) { return new SuggestDungeonAction(botAI); }
         static Action* attack_anything(PlayerbotAI* botAI) { return new AttackAnythingAction(botAI); }
         static Action* attack_least_hp_target(PlayerbotAI* botAI) { return new AttackLeastHpTargetAction(botAI); }
         static Action* attack_enemy_player(PlayerbotAI* botAI) { return new AttackEnemyPlayerAction(botAI); }

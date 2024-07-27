@@ -30,7 +30,6 @@ class SuggestWhatToDoAction : public InventoryAction
         std::vector<uint32> GetIncompletedQuests();
 
     private:
-        static std::map<std::string, uint8> instances;
         static std::map<std::string, uint8> factions;
         const int32_t _dbc_locale;
 };
@@ -42,6 +41,17 @@ class SuggestTradeAction : public SuggestWhatToDoAction
 
         bool Execute(Event event) override;
         bool isUseful() override { return true; }
+};
+
+class SuggestDungeonAction : public SuggestWhatToDoAction
+{
+    public:
+        SuggestDungeonAction(PlayerbotAI* botAI);
+
+        bool Execute(Event event) override;
+        bool isUseful() override { return true; }
+    private:
+        static std::map<std::string, uint8> instances;
 };
 
 #endif
