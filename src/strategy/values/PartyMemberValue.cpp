@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PartyMemberValue.h"
+
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -42,7 +45,9 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
                 nearestGroupPlayers.push_front(ref->GetSource()->GetGUID());
             }
         }
-    } else {
+    }
+    else
+    {
         std::vector<Player*> vec;
         vec.push_back(bot);
         Unit* target = FindPartyMember(&vec, predicate);
@@ -52,9 +57,11 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
     }
 
     // if (!ignoreOutOfGroup && !nearestPlayers.empty() && nearestPlayers.size() < 100)
-    //     nearestGroupPlayers.insert(nearestGroupPlayers.end(), nearestPlayers.begin(), nearestPlayers.end());
+    //     nearestGroupPlayers.insert(nearestGroupPlayers.end(), nearestPlayers.begin(),
+    //     nearestPlayers.end());
 
-    // nearestPlayers.insert(nearestP   layers.end(), nearestGroupPlayers.begin(), nearestGroupPlayers.end());
+    // nearestPlayers.insert(nearestP   layers.end(), nearestGroupPlayers.begin(),
+    // nearestGroupPlayers.end());
 
     std::vector<Player*> healers;
     std::vector<Player*> tanks;
@@ -97,23 +104,25 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
 
 bool PartyMemberValue::Check(Unit* player)
 {
-    // return player && player != bot && player->GetMapId() == bot->GetMapId() && bot->IsWithinDistInMap(player, sPlayerbotAIConfig->sightDistance, false);
+    // return player && player != bot && player->GetMapId() == bot->GetMapId() &&
+    // bot->IsWithinDistInMap(player, sPlayerbotAIConfig->sightDistance, false);
     return player && player->GetMapId() == bot->GetMapId() &&
-        bot->GetDistance(player) < sPlayerbotAIConfig->spellDistance * 2 &&
-        bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+           bot->GetDistance(player) < sPlayerbotAIConfig->spellDistance * 2 &&
+           bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 
-bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &predicate)
+bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate& predicate)
 {
     // GuidVector nearestPlayers = AI_VALUE(GuidVector, "nearest friendly players");
     ObjectGuid targetGuid = target ? target->GetGUID() : bot->GetGUID();
     ObjectGuid corpseGuid = target && target->GetCorpse() ? target->GetCorpse()->GetGUID() : ObjectGuid::Empty;
 
     Group* group = bot->GetGroup();
-    if (!group) {
+    if (!group)
+    {
         return false;
     }
-    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
     {
         Player* player = gref->GetSource();
         if (!player || player == bot)
@@ -148,7 +157,8 @@ public:
     virtual bool Check(Unit* unit)
     {
         Player* player = unit->ToPlayer();
-        if (!player) {
+        if (!player)
+        {
             return false;
         }
         return botAI->IsMainTank(player);

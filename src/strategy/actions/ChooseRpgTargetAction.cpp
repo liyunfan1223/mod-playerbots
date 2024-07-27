@@ -1,18 +1,21 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "ChooseRpgTargetAction.h"
+
+#include <random>
+
 #include "BattlegroundMgr.h"
 #include "BudgetValues.h"
 #include "ChatHelper.h"
 #include "Event.h"
 #include "Formations.h"
 #include "GuildCreateActions.h"
-#include "PossibleRpgTargetsValue.h"
 #include "Playerbots.h"
-
-#include <random>
+#include "PossibleRpgTargetsValue.h"
 
 bool ChooseRpgTargetAction::HasSameTarget(ObjectGuid guid, uint32 max, GuidVector const& nearGuids)
 {
@@ -101,14 +104,11 @@ bool ChooseRpgTargetAction::Execute(Event event)
     GuidVector possiblePlayers = AI_VALUE(GuidVector, "nearest friendly players");
     GuidSet& ignoreList = AI_VALUE(GuidSet&, "ignore rpg target");
 
-    for (auto target : possibleTargets)
-        targets[target] = 0.0f;
+    for (auto target : possibleTargets) targets[target] = 0.0f;
 
-    for (auto target : possibleObjects)
-        targets[target] = 0.0f;
+    for (auto target : possibleObjects) targets[target] = 0.0f;
 
-    for (auto target : possiblePlayers)
-        targets[target] = 0.0f;
+    for (auto target : possiblePlayers) targets[target] = 0.0f;
 
     if (targets.empty())
     {
@@ -117,8 +117,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     if (urand(0, 9))
     {
-       for (auto target : ignoreList)
-            targets.erase(target);
+        for (auto target : ignoreList) targets.erase(target);
     }
 
     SET_AI_VALUE(std::string, "next rpg action", this->getName());
@@ -188,7 +187,8 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     if (targets.empty())
     {
-        LOG_DEBUG("playerbots", "{} can't choose RPG target: all {} are not available", bot->GetName().c_str(), possibleTargets.size());
+        LOG_DEBUG("playerbots", "{} can't choose RPG target: all {} are not available", bot->GetName().c_str(),
+                  possibleTargets.size());
         RESET_AI_VALUE(GuidSet&, "ignore rpg target");
         RESET_AI_VALUE(GuidPosition, "rpg target");
         return false;
@@ -280,7 +280,8 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
         if (realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() && bot->GetMapId() == realMaster->GetMapId())
             inDungeon = true;
 
-        if (realMaster && realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() && (realMaster->GetMapId() != pos.getMapId()))
+        if (realMaster && realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() &&
+            (realMaster->GetMapId() != pos.getMapId()))
             return false;
     }
 
@@ -299,7 +300,8 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
     if (!botAI->HasActivePlayerMaster() && distance < 50.0f)
     {
         Player* player = master;
-        if (!master->isMoving() || PAI_VALUE(WorldPosition, "last long move").distance(pos) < sPlayerbotAIConfig->reactDistance)
+        if (!master->isMoving() ||
+            PAI_VALUE(WorldPosition, "last long move").distance(pos) < sPlayerbotAIConfig->reactDistance)
             return true;
     }
 
@@ -310,7 +312,7 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
         return true;
 
     if (distance < formation->GetMaxDistance())
-       return true;
+        return true;
 
     return false;
 }

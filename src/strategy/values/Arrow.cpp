@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "Arrow.h"
+
 #include "Map.h"
 #include "Playerbots.h"
 
@@ -20,7 +23,8 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float offset = 0.f;
 
     Player* master = botAI->GetMaster();
-    if (!master) {
+    if (!master)
+    {
         return Formation::NullLocation;
     }
     float orientation = master->GetOrientation();
@@ -44,7 +48,7 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float x = master->GetPositionX() - masterUnit->GetX() + botUnit->GetX();
     float y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
     float z = master->GetPositionZ();
-    
+
     float ground = master->GetMapHeight(x, y, z + 30.0f);
     if (ground <= INVALID_HEIGHT)
         return Formation::NullLocation;
@@ -125,7 +129,7 @@ void FormationSlot::PlaceUnits(UnitPlacer* placer)
     }
 }
 
-UnitPosition MultiLineUnitPlacer::Place(FormationUnit *unit, uint32 index, uint32 count)
+UnitPosition MultiLineUnitPlacer::Place(FormationUnit* unit, uint32 index, uint32 count)
 {
     SingleLineUnitPlacer placer(orientation);
     if (count <= 6)
@@ -139,7 +143,7 @@ UnitPosition MultiLineUnitPlacer::Place(FormationUnit *unit, uint32 index, uint3
     return placer.Place(unit, indexInLine, lineSize);
 }
 
-UnitPosition SingleLineUnitPlacer::Place(FormationUnit *unit, uint32 index, uint32 count)
+UnitPosition SingleLineUnitPlacer::Place(FormationUnit* unit, uint32 index, uint32 count)
 {
     float angle = orientation - M_PI / 2.0f;
     float x = cos(angle) * sPlayerbotAIConfig->followDistance * ((float)index - (float)count / 2);

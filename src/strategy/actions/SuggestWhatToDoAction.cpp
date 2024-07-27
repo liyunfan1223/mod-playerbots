@@ -1,16 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "SuggestWhatToDoAction.h"
-#include "ChannelMgr.h"
-#include "Event.h"
-#include "ItemVisitors.h"
+
 #include "AiFactory.h"
+#include "ChannelMgr.h"
 #include "ChatHelper.h"
-#include "Playerbots.h"
-#include "PlayerbotTextMgr.h"
+#include "Event.h"
 #include "GuildMgr.h"
+#include "ItemVisitors.h"
+#include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 
 std::map<std::string, uint8> SuggestWhatToDoAction::instances;
 std::map<std::string, uint8> SuggestWhatToDoAction::factions;
@@ -86,18 +89,20 @@ void SuggestWhatToDoAction::instance()
     }
 
     std::vector<std::string> allowedInstances;
-    for (auto & instance : instances)
+    for (auto& instance : instances)
     {
-        if (bot->GetLevel() >= instance.second) allowedInstances.push_back(instance.first);
+        if (bot->GetLevel() >= instance.second)
+            allowedInstances.push_back(instance.first);
     }
 
-    if (allowedInstances.empty()) return;
+    if (allowedInstances.empty())
+        return;
 
     std::map<std::string, std::string> placeholders;
     placeholders["%role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
 
     std::ostringstream itemout;
-    //itemout << "|c00b000b0" << allowedInstances[urand(0, allowedInstances.size() - 1)] << "|r";
+    // itemout << "|c00b000b0" << allowedInstances[urand(0, allowedInstances.size() - 1)] << "|r";
     itemout << allowedInstances[urand(0, allowedInstances.size() - 1)];
     placeholders["%instance"] = itemout.str();
 
@@ -203,7 +208,7 @@ void SuggestWhatToDoAction::grindReputation()
     placeholders["%rndK"] = rnd.str();
 
     std::ostringstream itemout;
-//    itemout << "|c004040b0" << allowedFactions[urand(0, allowedFactions.size() - 1)] << "|r";
+    //    itemout << "|c004040b0" << allowedFactions[urand(0, allowedFactions.size() - 1)] << "|r";
     itemout << allowedFactions[urand(0, allowedFactions.size() - 1)];
     placeholders["%faction"] = itemout.str();
 
@@ -220,7 +225,7 @@ void SuggestWhatToDoAction::something()
         return;
 
     std::ostringstream out;
-//    out << "|cffb04040" << entry->area_name[0] << "|r";
+    //    out << "|cffb04040" << entry->area_name[0] << "|r";
     out << entry->area_name[0];
     placeholders["%zone"] = out.str();
 
@@ -237,17 +242,16 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
     if (!cMgr)
         return;
 
-
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
-        if (!channel) continue;
+        if (!channel)
+            continue;
 
         for (AreaTableEntry const* current_zone : sAreaTableStore)
         {
-           if (!current_zone)
-               continue;
-
+            if (!current_zone)
+                continue;
 
             // combine full channel name
             char channelName[100];
@@ -272,7 +276,7 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
                 continue;
 
             // skip local defense
-            //if (chn->GetFlags() == 0x18)
+            // if (chn->GetFlags() == 0x18)
             //    continue;
 
             // no filter, pick several options
@@ -308,38 +312,37 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
 
 class FindTradeItemsVisitor : public IterateItemsVisitor
 {
-    public:
-        FindTradeItemsVisitor(uint32 quality) : quality(quality), IterateItemsVisitor() { }
+public:
+    FindTradeItemsVisitor(uint32 quality) : quality(quality), IterateItemsVisitor() {}
 
-        bool Visit(Item* item) override
-        {
-            ItemTemplate const* proto = item->GetTemplate();
-            if (proto->Quality != quality)
-                return true;
-
-            if (proto->Class == ITEM_CLASS_TRADE_GOODS && proto->Bonding == NO_BIND)
-            {
-                if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 && item->GetCount() == item->GetMaxStackCount())
-                    stacks.push_back(proto->ItemId);
-
-                items.push_back(proto->ItemId);
-                count[proto->ItemId] += item->GetCount();
-            }
-
+    bool Visit(Item* item) override
+    {
+        ItemTemplate const* proto = item->GetTemplate();
+        if (proto->Quality != quality)
             return true;
+
+        if (proto->Class == ITEM_CLASS_TRADE_GOODS && proto->Bonding == NO_BIND)
+        {
+            if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 &&
+                item->GetCount() == item->GetMaxStackCount())
+                stacks.push_back(proto->ItemId);
+
+            items.push_back(proto->ItemId);
+            count[proto->ItemId] += item->GetCount();
         }
 
-        std::map<uint32, uint32> count;
-        std::vector<uint32> stacks;
-        std::vector<uint32> items;
+        return true;
+    }
 
-    private:
-        uint32 quality;
+    std::map<uint32, uint32> count;
+    std::vector<uint32> stacks;
+    std::vector<uint32> items;
+
+private:
+    uint32 quality;
 };
 
-SuggestTradeAction::SuggestTradeAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest trade")
-{
-}
+SuggestTradeAction::SuggestTradeAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest trade") {}
 
 bool SuggestTradeAction::Execute(Event event)
 {

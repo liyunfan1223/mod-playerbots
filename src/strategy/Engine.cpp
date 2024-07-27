@@ -1,13 +1,16 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "Engine.h"
+
 #include "Action.h"
 #include "Event.h"
-#include "Queue.h"
 #include "PerformanceMonitor.h"
 #include "Playerbots.h"
+#include "Queue.h"
 #include "Strategy.h"
 
 Engine::Engine(PlayerbotAI* botAI, AiObjectContext* factory) : PlayerbotAIAware(botAI), aiObjectContext(factory)
@@ -71,7 +74,8 @@ Engine::~Engine(void)
 {
     Reset();
 
-    // for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
+    // for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i !=
+    // strategies.end(); i++)
     // {
     //     Strategy* strategy = i->second;
     //     if (strategy) {
@@ -125,12 +129,12 @@ void Engine::Init()
         MultiplyAndPush(strategy->getDefaultActions(), 0.0f, false, emptyEvent, "default");
     }
 
-	if (testMode)
-	{
+    if (testMode)
+    {
         FILE* file = fopen("test.log", "w");
         fprintf(file, "\n");
         fclose(file);
-	}
+    }
 }
 
 bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
@@ -147,7 +151,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     // aiObjectContext->Update();
     ProcessTriggers(minimal);
     PushDefaultActions();
-    
+
     uint32 iterations = 0;
     uint32 iterationsPerTick = queue.Size() * (minimal ? 2 : sPlayerbotAIConfig->iterationsPerTick);
     do
@@ -156,7 +160,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
         if (basket)
         {
-            float relevance = basket->getRelevance(); // just for reference
+            float relevance = basket->getRelevance();  // just for reference
             bool skipPrerequisites = basket->isSkipPrerequisites();
 
             if (minimal && (relevance < 100))
@@ -176,7 +180,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
             }
             else if (action->isUseful())
             {
-                for (std::vector<Multiplier*>::iterator i = multipliers.begin(); i!= multipliers.end(); i++)
+                for (std::vector<Multiplier*>::iterator i = multipliers.begin(); i != multipliers.end(); i++)
                 {
                     Multiplier* multiplier = *i;
                     relevance *= multiplier->GetValue(action);
@@ -184,7 +188,8 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
                     if (!relevance)
                     {
-                        LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(), action->getName().c_str());
+                        LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(),
+                                  action->getName().c_str());
                         break;
                     }
                 }
@@ -202,7 +207,8 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
                         }
                     }
 
-                    PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_ACTION, action->getName(), &aiObjectContext->performanceStack);
+                    PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_ACTION, action->getName(),
+                                                                                  &aiObjectContext->performanceStack);
                     actionExecuted = ListenAndExecute(action, event);
                     if (pmo)
                         pmo->finish();
@@ -263,8 +269,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
             delete actionNode;
         }
-    }
-    while (basket && ++iterations <= iterationsPerTick);
+    } while (basket && ++iterations <= iterationsPerTick);
 
     // if (!basket)
     // {
@@ -311,13 +316,14 @@ ActionNode* Engine::CreateActionNode(std::string const name)
             return node;
     }
 
-    return new ActionNode (name,
-        /*P*/ nullptr,
-        /*A*/ nullptr,
-        /*C*/ nullptr);
+    return new ActionNode(name,
+                          /*P*/ nullptr,
+                          /*A*/ nullptr,
+                          /*C*/ nullptr);
 }
 
-bool Engine::MultiplyAndPush(NextAction** actions, float forceRelevance, bool skipPrerequisites, Event event, char const* pushType)
+bool Engine::MultiplyAndPush(NextAction** actions, float forceRelevance, bool skipPrerequisites, Event event,
+                             char const* pushType)
 {
     bool pushed = false;
     if (actions)
@@ -360,7 +366,7 @@ bool Engine::MultiplyAndPush(NextAction** actions, float forceRelevance, bool sk
 
 ActionResult Engine::ExecuteAction(std::string const name, Event event, std::string const qualifier)
 {
-	bool result = false;
+    bool result = false;
 
     ActionNode* actionNode = CreateActionNode(name);
     if (!actionNode)
@@ -398,7 +404,7 @@ ActionResult Engine::ExecuteAction(std::string const name, Event event, std::str
 
     delete actionNode;
 
-	return result ? ACTION_RESULT_OK : ACTION_RESULT_FAILED;
+    return result ? ACTION_RESULT_OK : ACTION_RESULT_FAILED;
 }
 
 void Engine::addStrategy(std::string const name)
@@ -408,8 +414,7 @@ void Engine::addStrategy(std::string const name)
     if (Strategy* strategy = aiObjectContext->GetStrategy(name))
     {
         std::set<std::string> siblings = aiObjectContext->GetSiblingStrategy(name);
-        for (std::set<std::string>::iterator i = siblings.begin(); i != siblings.end(); i++)
-            removeStrategy(*i);
+        for (std::set<std::string>::iterator i = siblings.begin(); i != siblings.end(); i++) removeStrategy(*i);
 
         LogAction("S:+%s", strategy->getName().c_str());
         strategies[strategy->getName()] = strategy;
@@ -420,21 +425,20 @@ void Engine::addStrategy(std::string const name)
 
 void Engine::addStrategies(std::string first, ...)
 {
-	addStrategy(first);
+    addStrategy(first);
 
-	va_list vl;
-	va_start(vl, first);
+    va_list vl;
+    va_start(vl, first);
 
-	const char* cur;
-	do
-	{
-		cur = va_arg(vl, const char*);
-		if (cur)
-			addStrategy(cur);
-	}
-	while (cur);
+    const char* cur;
+    do
+    {
+        cur = va_arg(vl, const char*);
+        if (cur)
+            addStrategy(cur);
+    } while (cur);
 
-	va_end(vl);
+    va_end(vl);
 }
 
 bool Engine::removeStrategy(std::string const name)
@@ -462,10 +466,7 @@ void Engine::toggleStrategy(std::string const name)
         addStrategy(name);
 }
 
-bool Engine::HasStrategy(std::string const name)
-{
-    return strategies.find(name) != strategies.end();
-}
+bool Engine::HasStrategy(std::string const name) { return strategies.find(name) != strategies.end(); }
 
 void Engine::ProcessTriggers(bool minimal)
 {
@@ -491,7 +492,8 @@ void Engine::ProcessTriggers(bool minimal)
             if (minimal && node->getFirstRelevance() < 100)
                 continue;
 
-            PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_TRIGGER, trigger->getName(), &aiObjectContext->performanceStack);
+            PerformanceMonitorOperation* pmo =
+                sPerformanceMonitor->start(PERF_MON_TRIGGER, trigger->getName(), &aiObjectContext->performanceStack);
             Event event = trigger->Check();
             if (pmo)
                 pmo->finish();
@@ -571,12 +573,12 @@ void Engine::PushAgain(ActionNode* actionNode, float relevance, Event event)
 
 bool Engine::ContainsStrategy(StrategyType type)
 {
-	for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
-	{
-		if (i->second->GetType() & type)
-			return true;
-	}
-	return false;
+    for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
+    {
+        if (i->second->GetType() & type)
+            return true;
+    }
+    return false;
 }
 
 Action* Engine::InitializeAction(ActionNode* actionNode)
@@ -655,7 +657,7 @@ void Engine::LogAction(char const* format, ...)
     }
     else
     {
-        LOG_DEBUG("playerbots",  "{} {}", bot->GetName().c_str(), buf);
+        LOG_DEBUG("playerbots", "{} {}", bot->GetName().c_str(), buf);
     }
 }
 
@@ -668,13 +670,13 @@ void Engine::ChangeStrategy(std::string const names)
         switch (name[0])
         {
             case '+':
-                addStrategy(name+1);
+                addStrategy(name + 1);
                 break;
             case '-':
-                removeStrategy(name+1);
+                removeStrategy(name + 1);
                 break;
             case '~':
-                toggleStrategy(name+1);
+                toggleStrategy(name + 1);
                 break;
             case '?':
                 botAI->TellMaster(ListStrategies());
@@ -693,5 +695,5 @@ void Engine::LogValues()
         return;
 
     std::string const text = botAI->GetAiObjectContext()->FormatValues();
-    LOG_DEBUG("playerbots",  "Values for {}: {}", bot->GetName().c_str(), text.c_str());
+    LOG_DEBUG("playerbots", "Values for {}: {}", bot->GetName().c_str(), text.c_str());
 }
