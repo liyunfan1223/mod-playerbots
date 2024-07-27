@@ -228,11 +228,10 @@ public:
         creators["heroism"] = &ShamanAiObjectContextInternal::heroism;
         creators["bloodlust"] = &ShamanAiObjectContextInternal::bloodlust;
         creators["elemental mastery"] = &ShamanAiObjectContextInternal::elemental_mastery;
-        // creators["cure disease"] = &ShamanAiObjectContextInternal::cure_disease;
-        // creators["cure disease on party"] =
-        // &ShamanAiObjectContextInternal::cure_disease_on_party; creators["cure poison"] =
-        // &ShamanAiObjectContextInternal::cure_poison; creators["cure poison on party"] =
-        // &ShamanAiObjectContextInternal::cure_poison_on_party;
+        creators["cure disease"] = &ShamanAiObjectContextInternal::cure_disease;
+        creators["cure disease on party"] = &ShamanAiObjectContextInternal::cure_disease_on_party;
+        creators["cure poison"] = &ShamanAiObjectContextInternal::cure_poison;
+        creators["cure poison on party"] = &ShamanAiObjectContextInternal::cure_poison_on_party;
         creators["lava burst"] = &ShamanAiObjectContextInternal::lava_burst;
         creators["earth shield on main tank"] = &ShamanAiObjectContextInternal::earth_shield_on_main_tank;
         creators["fire elemental totem"] = &ShamanAiObjectContextInternal::fire_elemental_totem;
@@ -308,11 +307,10 @@ private:
     {
         return new CastWindShearOnEnemyHealerAction(botAI);
     }
-    // static Action* cure_poison(PlayerbotAI* botAI) { return new CastCurePoisonAction(botAI); }
-    // static Action* cure_poison_on_party(PlayerbotAI* botAI) { return new
-    // CastCurePoisonOnPartyAction(botAI); } static Action* cure_disease(PlayerbotAI* botAI) {
-    // return new CastCureDiseaseAction(botAI); } static Action* cure_disease_on_party(PlayerbotAI*
-    // botAI) { return new CastCureDiseaseOnPartyAction(botAI); }
+    static Action* cure_poison(PlayerbotAI* botAI) { return new CastCurePoisonActionSham(botAI); }
+    static Action* cure_poison_on_party(PlayerbotAI* botAI) { return new CastCurePoisonOnPartyActionSham(botAI); }
+    static Action* cure_disease(PlayerbotAI* botAI) { return new CastCureDiseaseActionSham(botAI); }
+    static Action* cure_disease_on_party(PlayerbotAI* botAI) { return new CastCureDiseaseOnPartyActionSham(botAI); }
     static Action* lava_burst(PlayerbotAI* ai) { return new CastLavaBurstAction(ai); }
     static Action* earth_shield_on_main_tank(PlayerbotAI* ai) { return new CastEarthShieldOnMainTankAction(ai); }
     static Action* totem_of_wrath(PlayerbotAI* ai) { return new CastTotemOfWrathAction(ai); }
