@@ -13,28 +13,28 @@ class Unit;
 class CastSapAction : public CastMeleeSpellAction
 {
 public:
-	CastSapAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "sap") {}
+    CastSapAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "sap") {}
 
-	Value<Unit *> *GetTargetValue() override;
-	bool isUseful() override { return true; }
+    Value<Unit *> *GetTargetValue() override;
+    bool isUseful() override { return true; }
 };
 
 class CastGarroteAction : public CastDebuffSpellAction
 {
 public:
-	CastGarroteAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "garrote", true, 8.0f) {}
+    CastGarroteAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "garrote", true, 8.0f) {}
 };
 
 class CastCheapShotAction : public CastMeleeSpellAction
 {
 public:
-	CastCheapShotAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "cheap shot") {}
+    CastCheapShotAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "cheap shot") {}
 };
 
 class CastAmbushAction : public CastMeleeSpellAction
 {
 public:
-	CastAmbushAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "ambush") {}
+    CastAmbushAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "ambush") {}
 };
 
 #endif
