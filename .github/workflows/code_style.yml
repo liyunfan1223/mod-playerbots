@@ -14,8 +14,8 @@ jobs:
       - name: Checkout Playerbot Module
         uses: actions/checkout@v4
       - name: Clang-format check
-        uses: DoozyX/clang-format-lint-action@v0.14
+        uses: DoozyX/clang-format-lint-action@v0.17
         with:
           source: '.'
           extensions: 'h,cpp'
-          clangFormatVersion: 14
+          clangFormatVersion: 17
