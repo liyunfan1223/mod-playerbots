@@ -480,6 +480,6 @@ bool SuggestTradeAction::Execute(Event event)
     placeholders["%item"] = chat->FormatItem(proto, count);
     placeholders["%gold"] = chat->formatMoney(price);
 
-    spam(BOT_TEXT2("suggest_sell", placeholders), urand(0, 1) ? 0x3C : 0, urand(0, 1), urand(0, 5));
+    spam(BOT_TEXT2("suggest_sell", placeholders), urand(0, 1) ? eTalkType::Trade : 0, urand(0, 1), urand(0, 5));
     return true;
 }
