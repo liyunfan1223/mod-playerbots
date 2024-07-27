@@ -1,14 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "SetCraftAction.h"
-#include "Event.h"
-#include "CraftValue.h"
+
 #include "ChatHelper.h"
+#include "CraftValue.h"
+#include "Event.h"
 #include "Playerbots.h"
 
-std::map<uint32, SkillLineAbilityEntry const*> SetCraftAction::skillSpells;
+std::map<uint32, SkillLineAbilityEntry const *> SetCraftAction::skillSpells;
 
 bool SetCraftAction::Execute(Event event)
 {
@@ -55,7 +58,8 @@ bool SetCraftAction::Execute(Event event)
     data.required.clear();
     data.obtained.clear();
 
-    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
+    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end();
+         ++itr)
     {
         uint32 spellId = itr->first;
 
@@ -70,7 +74,8 @@ bool SetCraftAction::Execute(Event event)
         {
             for (uint8 i = 0; i < 3; ++i)
             {
-                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM && itemId == spellInfo->Effects[i].ItemType)
+                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM &&
+                    itemId == spellInfo->Effects[i].ItemType)
                 {
                     for (uint32 x = 0; x < MAX_SPELL_REAGENTS; ++x)
                     {
@@ -121,7 +126,8 @@ void SetCraftAction::TellCraft()
     out << "I will craft " << chat->FormatItem(proto) << " using reagents: ";
 
     bool first = true;
-    for (std::map<uint32, uint32>::iterator i = data.required.begin(); i != data.required.end(); ++i)
+    for (std::map<uint32, uint32>::iterator i = data.required.begin(); i != data.required.end();
+         ++i)
     {
         uint32 item = i->first;
         uint32 required = i->second;

@@ -1,17 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_RANDOMITEMMGR_H
 #define _PLAYERBOT_RANDOMITEMMGR_H
 
-#include "AiFactory.h"
-#include "Common.h"
-#include "ItemTemplate.h"
-
 #include <map>
 #include <set>
 #include <vector>
+
+#include "AiFactory.h"
+#include "Common.h"
+#include "ItemTemplate.h"
 
 class ChatHandler;
 
@@ -60,7 +62,16 @@ struct StatWeight
 
 struct ItemInfoEntry
 {
-    ItemInfoEntry() : minLevel(0), source(0), sourceId(0), team(0), repRank(0), repFaction(0), quality(0), slot(0), itemId(0)
+    ItemInfoEntry()
+        : minLevel(0),
+          source(0),
+          sourceId(0),
+          team(0),
+          repRank(0),
+          repFaction(0),
+          quality(0),
+          slot(0),
+          itemId(0)
     {
         for (uint8 i = 1; i <= MAX_STAT_SCALES; ++i)
         {
@@ -93,7 +104,7 @@ struct WeightScale
 
 class RandomItemPredicate
 {
-public:
+   public:
     virtual ~RandomItemPredicate() {};
 
     virtual bool Apply(ItemTemplate const *proto) = 0;
@@ -104,15 +115,22 @@ typedef std::map<RandomItemType, RandomItemList> RandomItemCache;
 
 class BotEquipKey
 {
-public:
+   public:
     BotEquipKey() : level(0), clazz(0), slot(0), quality(0), key(GetKey()) {}
-    BotEquipKey(uint32 level, uint8 clazz, uint8 slot, uint32 quality) : level(level), clazz(clazz), slot(slot), quality(quality), key(GetKey()) {}
-    BotEquipKey(BotEquipKey const &other) : level(other.level), clazz(other.clazz), slot(other.slot), quality(other.quality), key(GetKey()) {}
-
-    bool operator<(BotEquipKey const &other) const
+    BotEquipKey(uint32 level, uint8 clazz, uint8 slot, uint32 quality)
+        : level(level), clazz(clazz), slot(slot), quality(quality), key(GetKey())
     {
-        return other.key < this->key;
     }
+    BotEquipKey(BotEquipKey const &other)
+        : level(other.level),
+          clazz(other.clazz),
+          slot(other.slot),
+          quality(other.quality),
+          key(GetKey())
+    {
+    }
+
+    bool operator<(BotEquipKey const &other) const { return other.key < this->key; }
 
     uint32 level;
     uint8 clazz;
@@ -120,7 +138,7 @@ public:
     uint32 quality;
     uint64 key;
 
-private:
+   private:
     uint64 GetKey();
 };
 
@@ -128,7 +146,7 @@ typedef std::map<BotEquipKey, RandomItemList> BotEquipCache;
 
 class RandomItemMgr
 {
-public:
+   public:
     RandomItemMgr();
     virtual ~RandomItemMgr();
     static RandomItemMgr *instance()
@@ -137,19 +155,21 @@ public:
         return &instance;
     }
 
-public:
+   public:
     void Init();
     void InitAfterAhBot();
     static bool HandleConsoleCommand(ChatHandler *handler, char const *args);
     RandomItemList Query(uint32 level, RandomItemType type, RandomItemPredicate *predicate);
     RandomItemList Query(uint32 level, uint8 clazz, uint8 slot, uint32 quality);
     uint32 GetUpgrade(Player *player, std::string spec, uint8 slot, uint32 quality, uint32 itemId);
-    std::vector<uint32> GetUpgradeList(Player *player, std::string spec, uint8 slot, uint32 quality, uint32 itemId, uint32 amount = 1);
+    std::vector<uint32> GetUpgradeList(Player *player, std::string spec, uint8 slot, uint32 quality,
+                                       uint32 itemId, uint32 amount = 1);
     bool HasStatWeight(uint32 itemId);
     uint32 GetMinLevelFromCache(uint32 itemId);
     uint32 GetStatWeight(Player *player, uint32 itemId);
     uint32 GetLiveStatWeight(Player *player, uint32 itemId);
-    uint32 GetRandomItem(uint32 level, RandomItemType type, RandomItemPredicate *predicate = nullptr);
+    uint32 GetRandomItem(uint32 level, RandomItemType type,
+                         RandomItemPredicate *predicate = nullptr);
     uint32 GetAmmo(uint32 level, uint32 subClass);
     uint32 GetRandomPotion(uint32 level, uint32 effect);
     uint32 GetRandomFood(uint32 level, uint32 category);
@@ -168,7 +188,7 @@ public:
     bool IsTestItem(uint32 itemId) { return itemForTest.find(itemId) != itemForTest.end(); }
     std::vector<uint32> GetCachedEquipments(uint32 requiredLevel, uint32 inventoryType);
 
-private:
+   private:
     void BuildRandomItemCache();
     void BuildEquipCache();
     void BuildEquipCacheNew();
@@ -183,7 +203,7 @@ private:
     void AddItemStats(uint32 mod, uint8 &sp, uint8 &ap, uint8 &tank);
     bool CheckItemStats(uint8 clazz, uint8 sp, uint8 ap, uint8 tank);
 
-private:
+   private:
     std::map<uint32, RandomItemCache> randomItemCache;
     std::map<RandomItemType, RandomItemPredicate *> predicates;
     BotEquipCache equipCache;

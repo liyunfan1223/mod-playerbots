@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PVPTRIGGERS_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class EnemyPlayerNear : public Trigger
 {
-public:
+   public:
     EnemyPlayerNear(PlayerbotAI *botAI) : Trigger(botAI, "enemy player near", 3) {}
 
     bool IsActive() override;
@@ -19,7 +21,7 @@ public:
 
 class PlayerHasNoFlag : public Trigger
 {
-public:
+   public:
     PlayerHasNoFlag(PlayerbotAI *botAI) : Trigger(botAI, "player has no flag") {}
 
     bool IsActive() override;
@@ -27,7 +29,7 @@ public:
 
 class PlayerHasFlag : public Trigger
 {
-public:
+   public:
     PlayerHasFlag(PlayerbotAI *botAI) : Trigger(botAI, "player has flag") {}
 
     bool IsActive() override;
@@ -35,7 +37,7 @@ public:
 
 class EnemyFlagCarrierNear : public Trigger
 {
-public:
+   public:
     EnemyFlagCarrierNear(PlayerbotAI *botAI) : Trigger(botAI, "enemy flagcarrier near") {}
 
     bool IsActive() override;
@@ -43,7 +45,7 @@ public:
 
 class TeamFlagCarrierNear : public Trigger
 {
-public:
+   public:
     TeamFlagCarrierNear(PlayerbotAI *botAI) : Trigger(botAI, "team flagcarrier near") {}
 
     bool IsActive() override;
@@ -51,7 +53,7 @@ public:
 
 class TeamHasFlag : public Trigger
 {
-public:
+   public:
     TeamHasFlag(PlayerbotAI *botAI) : Trigger(botAI, "team has flag") {}
 
     bool IsActive() override;
@@ -59,7 +61,7 @@ public:
 
 class EnemyTeamHasFlag : public Trigger
 {
-public:
+   public:
     EnemyTeamHasFlag(PlayerbotAI *botAI) : Trigger(botAI, "enemy team has flag") {}
 
     bool IsActive() override;
@@ -67,7 +69,7 @@ public:
 
 class PlayerIsInBattleground : public Trigger
 {
-public:
+   public:
     PlayerIsInBattleground(PlayerbotAI *botAI) : Trigger(botAI, "in Battleground") {}
 
     bool IsActive() override;
@@ -75,7 +77,7 @@ public:
 
 class BgWaitingTrigger : public Trigger
 {
-public:
+   public:
     BgWaitingTrigger(PlayerbotAI *botAI) : Trigger(botAI, "bg waiting", 30) {}
 
     bool IsActive() override;
@@ -83,7 +85,7 @@ public:
 
 class BgActiveTrigger : public Trigger
 {
-public:
+   public:
     BgActiveTrigger(PlayerbotAI *botAI) : Trigger(botAI, "bg active", 1) {}
 
     bool IsActive() override;
@@ -91,7 +93,7 @@ public:
 
 class BgInviteActiveTrigger : public Trigger
 {
-public:
+   public:
     BgInviteActiveTrigger(PlayerbotAI *botAI) : Trigger(botAI, "bg invite active", 10) {}
 
     bool IsActive() override;
@@ -99,22 +101,25 @@ public:
 
 class InsideBGTrigger : public Trigger
 {
-public:
+   public:
     InsideBGTrigger(PlayerbotAI *botAI) : Trigger(botAI, "inside bg", 1) {}
 
     bool IsActive() override;
 };
 class PlayerIsInBattlegroundWithoutFlag : public Trigger
 {
-public:
-    PlayerIsInBattlegroundWithoutFlag(PlayerbotAI *botAI) : Trigger(botAI, "in Battleground without flag") {}
+   public:
+    PlayerIsInBattlegroundWithoutFlag(PlayerbotAI *botAI)
+        : Trigger(botAI, "in Battleground without flag")
+    {
+    }
 
     bool IsActive() override;
 };
 
 class PlayerWantsInBattlegroundTrigger : public Trigger
 {
-public:
+   public:
     PlayerWantsInBattlegroundTrigger(PlayerbotAI *botAI) : Trigger(botAI, "wants in bg") {}
 
     bool IsActive() override;
@@ -122,7 +127,7 @@ public:
 
 class VehicleNearTrigger : public Trigger
 {
-public:
+   public:
     VehicleNearTrigger(PlayerbotAI *botAI) : Trigger(botAI, "vehicle near", 10) {}
 
     bool IsActive() override;
@@ -130,7 +135,7 @@ public:
 
 class InVehicleTrigger : public Trigger
 {
-public:
+   public:
     InVehicleTrigger(PlayerbotAI *botAI) : Trigger(botAI, "in vehicle") {}
 
     bool IsActive() override;

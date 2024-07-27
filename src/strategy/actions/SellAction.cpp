@@ -1,16 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "SellAction.h"
+
 #include "Event.h"
-#include "ItemVisitors.h"
 #include "ItemUsageValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 
 class SellItemsVisitor : public IterateItemsVisitor
 {
-public:
+   public:
     SellItemsVisitor(SellAction *action) : IterateItemsVisitor(), action(action) {}
 
     bool Visit(Item *item) override
@@ -19,13 +22,13 @@ public:
         return true;
     }
 
-private:
+   private:
     SellAction *action;
 };
 
 class SellGrayItemsVisitor : public SellItemsVisitor
 {
-public:
+   public:
     SellGrayItemsVisitor(SellAction *action) : SellItemsVisitor(action) {}
 
     bool Visit(Item *item) override
@@ -39,7 +42,7 @@ public:
 
 class SellVendorItemsVisitor : public SellItemsVisitor
 {
-public:
+   public:
     SellVendorItemsVisitor(SellAction *action, AiObjectContext *con) : SellItemsVisitor(action)
     {
         context = con;
@@ -76,7 +79,7 @@ bool SellAction::Execute(Event event)
 
     if (text != "")
     {
-        std::vector<Item*> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
+        std::vector<Item *> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
         for (Item *item : items)
         {
             Sell(item);
@@ -91,7 +94,7 @@ bool SellAction::Execute(Event event)
 void SellAction::Sell(FindItemVisitor *visitor)
 {
     IterateItems(visitor);
-    std::vector<Item*> items = visitor->GetResult();
+    std::vector<Item *> items = visitor->GetResult();
     for (Item *item : items)
     {
         Sell(item);

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_ITEMUSAGEVALUE_H
@@ -34,12 +36,15 @@ enum ItemUsage : uint32
 
 class ItemUsageValue : public CalculatedValue<ItemUsage>, public Qualified
 {
-public:
-    ItemUsageValue(PlayerbotAI *botAI, std::string const name = "item usage") : CalculatedValue<ItemUsage>(botAI, name) {}
+   public:
+    ItemUsageValue(PlayerbotAI *botAI, std::string const name = "item usage")
+        : CalculatedValue<ItemUsage>(botAI, name)
+    {
+    }
 
     ItemUsage Calculate() override;
 
-private:
+   private:
     ItemUsage QueryItemUsageForEquip(ItemTemplate const *proto);
     uint32 GetSmallestBagSize();
     bool IsItemUsefulForQuest(Player *player, ItemTemplate const *proto);
@@ -51,7 +56,7 @@ private:
     float CurrentStacks(ItemTemplate const *proto);
     float BetterStacks(ItemTemplate const *proto, std::string const usageType = "");
 
-public:
+   public:
     static std::vector<uint32> SpellsUsingItem(uint32 itemId, Player *bot);
     static bool SpellGivesSkillUp(uint32 spellId, Player *bot);
 

@@ -1,17 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "LootObjectStack.h"
+
 #include "LootMgr.h"
 #include "Playerbots.h"
 #include "Unit.h"
 
 #define MAX_LOOT_OBJECT_COUNT 10
 
-LootTarget::LootTarget(ObjectGuid guid) : guid(guid), asOfTime(time(nullptr))
-{
-}
+LootTarget::LootTarget(ObjectGuid guid) : guid(guid), asOfTime(time(nullptr)) {}
 
 LootTarget::LootTarget(LootTarget const &other)
 {
@@ -30,10 +31,7 @@ LootTarget &LootTarget::operator=(LootTarget const &other)
     return *this;
 }
 
-bool LootTarget::operator<(LootTarget const &other) const
-{
-    return guid < other.guid;
-}
+bool LootTarget::operator<(LootTarget const &other) const { return guid < other.guid; }
 
 void LootTargetList::shrink(time_t fromTime)
 {
@@ -46,7 +44,8 @@ void LootTargetList::shrink(time_t fromTime)
     }
 }
 
-LootObject::LootObject(Player *bot, ObjectGuid guid) : guid(), skillId(SKILL_NONE), reqSkillValue(0), reqItem(0)
+LootObject::LootObject(Player *bot, ObjectGuid guid)
+    : guid(), skillId(SKILL_NONE), reqSkillValue(0), reqItem(0)
 {
     Refresh(bot, guid);
 }
@@ -73,8 +72,9 @@ void LootObject::Refresh(Player *bot, ObjectGuid lootGUID)
         {
             skillId = creature->GetCreatureTemplate()->GetRequiredLootSkill();
             uint32 targetLevel = creature->GetLevel();
-            reqSkillValue = targetLevel < 10 ? 1 : targetLevel < 20 ? (targetLevel - 10) * 10
-                                                                    : targetLevel * 5;
+            reqSkillValue = targetLevel < 10   ? 1
+                            : targetLevel < 20 ? (targetLevel - 10) * 10
+                                               : targetLevel * 5;
             if (botAI->HasSkill((SkillType)skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
                 guid = lootGUID;
         }
@@ -85,10 +85,10 @@ void LootObject::Refresh(Player *bot, ObjectGuid lootGUID)
     GameObject *go = botAI->GetGameObject(lootGUID);
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
-
         bool isQuestItemOnly = false;
 
-        GameObjectQuestItemList const *items = sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
+        GameObjectQuestItemList const *items =
+            sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
         for (int i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
         {
             if (!items || i >= items->size())
@@ -117,28 +117,28 @@ void LootObject::Refresh(Player *bot, ObjectGuid lootGUID)
         {
             switch (lockInfo->Type[i])
             {
-            case LOCK_KEY_ITEM:
-                if (lockInfo->Index[i] > 0)
-                {
-                    reqItem = lockInfo->Index[i];
+                case LOCK_KEY_ITEM:
+                    if (lockInfo->Index[i] > 0)
+                    {
+                        reqItem = lockInfo->Index[i];
+                        guid = lootGUID;
+                    }
+                    break;
+                case LOCK_KEY_SKILL:
+                    if (goId == 13891 || goId == 19535)  // Serpentbloom
+                    {
+                        this->guid = guid;
+                    }
+                    else if (SkillByLockType(LockType(lockInfo->Index[i])) > 0)
+                    {
+                        skillId = SkillByLockType(LockType(lockInfo->Index[i]));
+                        reqSkillValue = std::max((uint32)1, lockInfo->Skill[i]);
+                        guid = lootGUID;
+                    }
+                    break;
+                case LOCK_KEY_NONE:
                     guid = lootGUID;
-                }
-                break;
-            case LOCK_KEY_SKILL:
-                if (goId == 13891 || goId == 19535) // Serpentbloom
-                {
-                    this->guid = guid;
-                }
-                else if (SkillByLockType(LockType(lockInfo->Index[i])) > 0)
-                {
-                    skillId = SkillByLockType(LockType(lockInfo->Index[i]));
-                    reqSkillValue = std::max((uint32)1, lockInfo->Skill[i]);
-                    guid = lootGUID;
-                }
-                break;
-            case LOCK_KEY_NONE:
-                guid = lootGUID;
-                break;
+                    break;
             }
         }
     }
@@ -162,7 +162,8 @@ bool LootObject::IsNeededForQuest(Player *bot, uint32 itemId)
 
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
-            if (!qInfo->RequiredItemCount[i] || (qInfo->RequiredItemCount[i] - qData.ItemCount[i]) <= 0)
+            if (!qInfo->RequiredItemCount[i] ||
+                (qInfo->RequiredItemCount[i] - qData.ItemCount[i]) <= 0)
                 continue;
 
             if (qInfo->RequiredItemId[i] != itemId)
@@ -276,10 +277,7 @@ void LootObjectStack::Remove(ObjectGuid guid)
         availableLoot.erase(i);
 }
 
-void LootObjectStack::Clear()
-{
-    availableLoot.clear();
-}
+void LootObjectStack::Clear() { availableLoot.clear(); }
 
 bool LootObjectStack::CanLoot(float maxDistance)
 {

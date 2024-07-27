@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_AUTOLEARNSPELLACTION_H
@@ -11,12 +13,15 @@ class PlayerbotAI;
 
 class AutoLearnSpellAction : public Action
 {
-public:
-    AutoLearnSpellAction(PlayerbotAI *botAI, std::string const name = "auto learn spell") : Action(botAI, name) {}
+   public:
+    AutoLearnSpellAction(PlayerbotAI *botAI, std::string const name = "auto learn spell")
+        : Action(botAI, name)
+    {
+    }
 
     bool Execute(Event event);
 
-private:
+   private:
     void LearnSpells(std::ostringstream *out);
     void LearnTrainerSpells(std::ostringstream *out);
     void LearnQuestSpells(std::ostringstream *out);
@@ -25,8 +30,11 @@ private:
 
 class AutoUpgradeEquipAction : public Action
 {
-public:
-    AutoUpgradeEquipAction(PlayerbotAI *botAI, std::string const name = "auto upgrade equip") : Action(botAI, name) {}
+   public:
+    AutoUpgradeEquipAction(PlayerbotAI *botAI, std::string const name = "auto upgrade equip")
+        : Action(botAI, name)
+    {
+    }
 
     bool Execute(Event event);
 };

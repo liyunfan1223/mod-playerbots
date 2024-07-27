@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICHUNTERSTRATEGY_H
@@ -12,17 +14,20 @@ class PlayerbotAI;
 
 class GenericHunterStrategy : public CombatStrategy
 {
-public:
+   public:
     GenericHunterStrategy(PlayerbotAI *botAI);
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
     std::string const getName() override { return "hunter"; }
-    uint32 GetType() const override { return CombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
+    uint32 GetType() const override
+    {
+        return CombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS;
+    }
 };
 
 class HunterBoostStrategy : public Strategy
 {
-public:
+   public:
     HunterBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     std::string const getName() override { return "boost"; }
@@ -32,7 +37,7 @@ public:
 
 class HunterCcStrategy : public Strategy
 {
-public:
+   public:
     HunterCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

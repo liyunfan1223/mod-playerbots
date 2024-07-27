@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "LfgActions.h"
+
 #include "AiFactory.h"
 #include "ItemVisitors.h"
 #include "LFGMgr.h"
@@ -10,10 +13,7 @@
 
 using namespace lfg;
 
-bool LfgJoinAction::Execute(Event event)
-{
-    return JoinLFG();
-}
+bool LfgJoinAction::Execute(Event event) { return JoinLFG(); }
 
 uint32 LfgJoinAction::GetRoles()
 {
@@ -30,48 +30,48 @@ uint32 LfgJoinAction::GetRoles()
     uint8 spec = AiFactory::GetPlayerSpecTab(bot);
     switch (bot->getClass())
     {
-    case CLASS_DRUID:
-        if (spec == 2)
-            return PLAYER_ROLE_HEALER;
-        else if (spec == 1)
-            return (PLAYER_ROLE_TANK | PLAYER_ROLE_DAMAGE);
-        else
+        case CLASS_DRUID:
+            if (spec == 2)
+                return PLAYER_ROLE_HEALER;
+            else if (spec == 1)
+                return (PLAYER_ROLE_TANK | PLAYER_ROLE_DAMAGE);
+            else
+                return PLAYER_ROLE_DAMAGE;
+            break;
+        case CLASS_PALADIN:
+            if (spec == 1)
+                return PLAYER_ROLE_TANK;
+            else if (!spec)
+                return PLAYER_ROLE_HEALER;
+            else
+                return PLAYER_ROLE_DAMAGE;
+            break;
+        case CLASS_PRIEST:
+            if (spec != 2)
+                return PLAYER_ROLE_HEALER;
+            else
+                return PLAYER_ROLE_DAMAGE;
+            break;
+        case CLASS_SHAMAN:
+            if (spec == 2)
+                return PLAYER_ROLE_HEALER;
+            else
+                return PLAYER_ROLE_DAMAGE;
+            break;
+        case CLASS_WARRIOR:
+            if (spec == 2)
+                return PLAYER_ROLE_TANK;
+            else
+                return PLAYER_ROLE_DAMAGE;
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if (spec == 0)
+                return PLAYER_ROLE_TANK;
+            else
+                return PLAYER_ROLE_DAMAGE;
+            break;
+        default:
             return PLAYER_ROLE_DAMAGE;
-        break;
-    case CLASS_PALADIN:
-        if (spec == 1)
-            return PLAYER_ROLE_TANK;
-        else if (!spec)
-            return PLAYER_ROLE_HEALER;
-        else
-            return PLAYER_ROLE_DAMAGE;
-        break;
-    case CLASS_PRIEST:
-        if (spec != 2)
-            return PLAYER_ROLE_HEALER;
-        else
-            return PLAYER_ROLE_DAMAGE;
-        break;
-    case CLASS_SHAMAN:
-        if (spec == 2)
-            return PLAYER_ROLE_HEALER;
-        else
-            return PLAYER_ROLE_DAMAGE;
-        break;
-    case CLASS_WARRIOR:
-        if (spec == 2)
-            return PLAYER_ROLE_TANK;
-        else
-            return PLAYER_ROLE_DAMAGE;
-        break;
-    case CLASS_DEATH_KNIGHT:
-        if (spec == 0)
-            return PLAYER_ROLE_TANK;
-        else
-            return PLAYER_ROLE_DAMAGE;
-        break;
-    default:
-        return PLAYER_ROLE_DAMAGE;
     }
 
     return PLAYER_ROLE_DAMAGE;
@@ -87,8 +87,13 @@ bool LfgJoinAction::JoinLFG()
     ItemCountByQuality visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
     bool random = urand(0, 100) < 20;
-    bool heroic = urand(0, 100) < 50 && (visitor.count[ITEM_QUALITY_EPIC] >= 3 || visitor.count[ITEM_QUALITY_RARE] >= 10) && bot->GetLevel() >= 70;
-    bool rbotAId = !heroic && (urand(0, 100) < 50 && visitor.count[ITEM_QUALITY_EPIC] >= 5 && (bot->GetLevel() == 60 || bot->GetLevel() == 70 || bot->GetLevel() == 80));
+    bool heroic =
+        urand(0, 100) < 50 &&
+        (visitor.count[ITEM_QUALITY_EPIC] >= 3 || visitor.count[ITEM_QUALITY_RARE] >= 10) &&
+        bot->GetLevel() >= 70;
+    bool rbotAId =
+        !heroic && (urand(0, 100) < 50 && visitor.count[ITEM_QUALITY_EPIC] >= 5 &&
+                    (bot->GetLevel() == 60 || bot->GetLevel() == 70 || bot->GetLevel() == 80));
 
     LfgDungeonSet list;
     std::vector<uint32> selected;
@@ -100,7 +105,9 @@ bool LfgJoinAction::JoinLFG()
     for (std::vector<uint32>::iterator i = dungeons.begin(); i != dungeons.end(); ++i)
     {
         LFGDungeonEntry const *dungeon = sLFGDungeonStore.LookupEntry(*i);
-        if (!dungeon || (dungeon->TypeID != LFG_TYPE_RANDOM && dungeon->TypeID != LFG_TYPE_DUNGEON && dungeon->TypeID != LFG_TYPE_HEROIC && dungeon->TypeID != LFG_TYPE_RAID))
+        if (!dungeon ||
+            (dungeon->TypeID != LFG_TYPE_RANDOM && dungeon->TypeID != LFG_TYPE_DUNGEON &&
+             dungeon->TypeID != LFG_TYPE_HEROIC && dungeon->TypeID != LFG_TYPE_RAID))
             continue;
 
         const auto &botLevel = bot->GetLevel();
@@ -137,7 +144,8 @@ bool LfgJoinAction::JoinLFG()
 
     LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, Dungeon as {} ({})",
              bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
-             bot->GetLevel(), bot->GetName().c_str(), _roles, many ? "several dungeons" : dungeon->Name[0]);
+             bot->GetLevel(), bot->GetName().c_str(), _roles,
+             many ? "several dungeons" : dungeon->Name[0]);
 
     // Set RbotAId Browser comment
     std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot, false, false));
@@ -160,7 +168,8 @@ bool LfgRoleCheckAction::Execute(Event event)
         sLFGMgr->UpdateRoleCheck(group->GetGUID(), bot->GetGUID(), newRoles);
 
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: LFG roles checked",
-                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
+                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
+                 bot->GetLevel(), bot->GetName().c_str());
 
         return true;
     }
@@ -183,13 +192,16 @@ bool LfgAcceptAction::Execute(Event event)
         if (bot->IsInCombat() || bot->isDead())
         {
             LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
-                     bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), id);
+                     bot->GetGUID().ToString().c_str(),
+                     bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
+                     bot->GetName().c_str(), id);
             sLFGMgr->UpdateProposal(id, bot->GetGUID(), false);
             return true;
         }
 
         LOG_INFO("playerbots", "Bot {} {}:{} <{}> accepts LFG proposal {}",
-                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), id);
+                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
+                 bot->GetLevel(), bot->GetName().c_str(), id);
 
         botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
 
@@ -234,10 +246,7 @@ bool LfgLeaveAction::Execute(Event event)
     return true;
 }
 
-bool LfgLeaveAction::isUseful()
-{
-    return true;
-}
+bool LfgLeaveAction::isUseful() { return true; }
 
 bool LfgTeleportAction::Execute(Event event)
 {
@@ -268,7 +277,8 @@ bool LfgJoinAction::isUseful()
     if (bot->GetLevel() < 15)
         return false;
 
-    if ((botAI->GetMaster() && !GET_PLAYERBOT_AI(botAI->GetMaster())) || bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() != bot->GetGUID())
+    if ((botAI->GetMaster() && !GET_PLAYERBOT_AI(botAI->GetMaster())) ||
+        bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() != bot->GetGUID())
     {
         // botAI->ChangeStrategy("-lfg", BOT_STATE_NON_COMBAT);
         return false;

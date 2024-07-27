@@ -1,11 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "InventoryAction.h"
+
 #include "Event.h"
-#include "ItemVisitors.h"
 #include "ItemCountValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 
 void InventoryAction::IterateItems(IterateItemsVisitor *visitor, IterateItemsMask mask)
@@ -111,7 +114,7 @@ bool compare_items_by_level(Item const *item1, Item const *item2)
 
 void InventoryAction::TellItems(std::map<uint32, uint32> itemMap, std::map<uint32, bool> soulbound)
 {
-    std::vector<ItemTemplate const*> items;
+    std::vector<ItemTemplate const *> items;
     for (std::map<uint32, uint32>::iterator i = itemMap.begin(); i != itemMap.end(); i++)
     {
         items.push_back(sObjectMgr->GetItemTemplate(i->first));
@@ -127,42 +130,42 @@ void InventoryAction::TellItems(std::map<uint32, uint32> itemMap, std::map<uint3
             oldClass = proto->Class;
             switch (proto->Class)
             {
-            case ITEM_CLASS_CONSUMABLE:
-                botAI->TellMaster("--- consumable ---");
-                break;
-            case ITEM_CLASS_CONTAINER:
-                botAI->TellMaster("--- container ---");
-                break;
-            case ITEM_CLASS_WEAPON:
-                botAI->TellMaster("--- weapon ---");
-                break;
-            case ITEM_CLASS_ARMOR:
-                botAI->TellMaster("--- armor ---");
-                break;
-            case ITEM_CLASS_REAGENT:
-                botAI->TellMaster("--- reagent ---");
-                break;
-            case ITEM_CLASS_PROJECTILE:
-                botAI->TellMaster("--- projectile ---");
-                break;
-            case ITEM_CLASS_TRADE_GOODS:
-                botAI->TellMaster("--- trade goods ---");
-                break;
-            case ITEM_CLASS_RECIPE:
-                botAI->TellMaster("--- recipe ---");
-                break;
-            case ITEM_CLASS_QUIVER:
-                botAI->TellMaster("--- quiver ---");
-                break;
-            case ITEM_CLASS_QUEST:
-                botAI->TellMaster("--- quest items ---");
-                break;
-            case ITEM_CLASS_KEY:
-                botAI->TellMaster("--- keys ---");
-                break;
-            case ITEM_CLASS_MISC:
-                botAI->TellMaster("--- other ---");
-                break;
+                case ITEM_CLASS_CONSUMABLE:
+                    botAI->TellMaster("--- consumable ---");
+                    break;
+                case ITEM_CLASS_CONTAINER:
+                    botAI->TellMaster("--- container ---");
+                    break;
+                case ITEM_CLASS_WEAPON:
+                    botAI->TellMaster("--- weapon ---");
+                    break;
+                case ITEM_CLASS_ARMOR:
+                    botAI->TellMaster("--- armor ---");
+                    break;
+                case ITEM_CLASS_REAGENT:
+                    botAI->TellMaster("--- reagent ---");
+                    break;
+                case ITEM_CLASS_PROJECTILE:
+                    botAI->TellMaster("--- projectile ---");
+                    break;
+                case ITEM_CLASS_TRADE_GOODS:
+                    botAI->TellMaster("--- trade goods ---");
+                    break;
+                case ITEM_CLASS_RECIPE:
+                    botAI->TellMaster("--- recipe ---");
+                    break;
+                case ITEM_CLASS_QUIVER:
+                    botAI->TellMaster("--- quiver ---");
+                    break;
+                case ITEM_CLASS_QUEST:
+                    botAI->TellMaster("--- quest items ---");
+                    break;
+                case ITEM_CLASS_KEY:
+                    botAI->TellMaster("--- keys ---");
+                    break;
+                case ITEM_CLASS_MISC:
+                    botAI->TellMaster("--- other ---");
+                    break;
             }
         }
 
@@ -180,12 +183,13 @@ void InventoryAction::TellItem(ItemTemplate const *proto, uint32 count, bool sou
     botAI->TellMaster(out.str());
 }
 
-std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateItemsMask mask)
+std::vector<Item *> InventoryAction::parseItems(std::string const text, IterateItemsMask mask)
 {
-    std::set<Item*> found;
+    std::set<Item *> found;
     size_t pos = text.find(" ");
 
-    int count = pos != std::string::npos ? atoi(text.substr(pos + 1).c_str()) : TRADE_SLOT_TRADED_COUNT;
+    int count =
+        pos != std::string::npos ? atoi(text.substr(pos + 1).c_str()) : TRADE_SLOT_TRADED_COUNT;
     if (count < 1)
         count = 1;
     else if (count > TRADE_SLOT_TRADED_COUNT)
@@ -201,8 +205,8 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
             found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
         }
 
-        std::vector<Item*> result;
-        for (std::set<Item*>::iterator i = found.begin(); i != found.end(); ++i)
+        std::vector<Item *> result;
+        for (std::set<Item *>::iterator i = found.begin(); i != found.end(); ++i)
             result.push_back(*i);
 
         std::sort(result.begin(), result.end(), compare_items_by_level);
@@ -333,9 +337,8 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
-    std::vector<Item*> result;
-    for (std::set<Item*>::iterator i = found.begin(); i != found.end(); ++i)
-        result.push_back(*i);
+    std::vector<Item *> result;
+    for (std::set<Item *>::iterator i = found.begin(); i != found.end(); ++i) result.push_back(*i);
 
     std::sort(result.begin(), result.end(), compare_items_by_level);
 
@@ -347,7 +350,7 @@ uint32 InventoryAction::GetItemCount(FindItemVisitor *visitor, IterateItemsMask 
     IterateItems(visitor, mask);
     uint32 count = 0;
 
-    std::vector<Item*> &items = visitor->GetResult();
+    std::vector<Item *> &items = visitor->GetResult();
     for (Item *item : items)
     {
         count += item->GetCount();

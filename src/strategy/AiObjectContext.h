@@ -1,9 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_AIOBJECTCONTEXT_H
 #define _PLAYERBOT_AIOBJECTCONTEXT_H
+
+#include <sstream>
+#include <string>
 
 #include "Common.h"
 #include "NamedObjectContext.h"
@@ -12,14 +17,11 @@
 #include "Trigger.h"
 #include "Value.h"
 
-#include <sstream>
-#include <string>
-
 class PlayerbotAI;
 
 class AiObjectContext : public PlayerbotAIAware
 {
-public:
+   public:
     AiObjectContext(PlayerbotAI *botAI);
     virtual ~AiObjectContext() {}
 
@@ -63,7 +65,7 @@ public:
 
     std::vector<std::string> performanceStack;
 
-protected:
+   protected:
     NamedObjectContextList<Strategy> strategyContexts;
     NamedObjectContextList<Action> actionContexts;
     NamedObjectContextList<Trigger> triggerContexts;

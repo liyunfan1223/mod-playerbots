@@ -1,10 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "LootValues.h"
-#include "SharedValueContext.h"
+
 #include "Playerbots.h"
+#include "SharedValueContext.h"
 
 LootTemplateAccess const *DropMapValue::GetLootTemplate(ObjectGuid guid, LootType type)
 {
@@ -52,7 +55,7 @@ LootTemplateAccess const *DropMapValue::GetLootTemplate(ObjectGuid guid, LootTyp
         }
     }
 
-    LootTemplateAccess const *lTemplateA = reinterpret_cast<LootTemplateAccess const*>(lTemplate);
+    LootTemplateAccess const *lTemplateA = reinterpret_cast<LootTemplateAccess const *>(lTemplate);
 
     return lTemplateA;
 }
@@ -65,11 +68,13 @@ DropMap *DropMapValue::Calculate()
 
     if (CreatureTemplateContainer const *creatures = sObjectMgr->GetCreatureTemplates())
     {
-        for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
+        for (CreatureTemplateContainer::const_iterator itr = creatures->begin();
+             itr != creatures->end(); ++itr)
         {
             sEntry = itr->first;
 
-            if (LootTemplateAccess const *lTemplateA = GetLootTemplate(ObjectGuid::Create<HighGuid::Unit>(sEntry, uint32(1)), LOOT_CORPSE))
+            if (LootTemplateAccess const *lTemplateA = GetLootTemplate(
+                    ObjectGuid::Create<HighGuid::Unit>(sEntry, uint32(1)), LOOT_CORPSE))
                 for (auto const &lItem : lTemplateA->Entries)
                     dropMap->insert(std::make_pair(lItem->itemid, sEntry));
         }
@@ -81,7 +86,8 @@ DropMap *DropMapValue::Calculate()
         {
             sEntry = itr.first;
 
-            if (LootTemplateAccess const *lTemplateA = GetLootTemplate(ObjectGuid::Create<HighGuid::GameObject>(sEntry, uint32(1)), LOOT_CORPSE))
+            if (LootTemplateAccess const *lTemplateA = GetLootTemplate(
+                    ObjectGuid::Create<HighGuid::GameObject>(sEntry, uint32(1)), LOOT_CORPSE))
                 for (auto const &lItem : lTemplateA->Entries)
                     dropMap->insert(std::make_pair(lItem->itemid, -sEntry));
         }
@@ -101,8 +107,7 @@ std::vector<int32> ItemDropListValue::Calculate()
 
     auto range = dropMap->equal_range(itemId);
 
-    for (auto itr = range.first; itr != range.second; ++itr)
-        entries.push_back(itr->second);
+    for (auto itr = range.first; itr != range.second; ++itr) entries.push_back(itr->second);
 
     return entries;
 }
@@ -117,13 +122,14 @@ std::vector<uint32> EntryLootListValue::Calculate()
     LootTemplateAccess const *lTemplateA;
 
     if (entry > 0)
-        lTemplateA = DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::Unit>(entry, uint32(1)), LOOT_CORPSE);
+        lTemplateA = DropMapValue::GetLootTemplate(
+            ObjectGuid::Create<HighGuid::Unit>(entry, uint32(1)), LOOT_CORPSE);
     else
-        lTemplateA = DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::GameObject>(entry, uint32(1)), LOOT_CORPSE);
+        lTemplateA = DropMapValue::GetLootTemplate(
+            ObjectGuid::Create<HighGuid::GameObject>(entry, uint32(1)), LOOT_CORPSE);
 
     if (lTemplateA)
-        for (auto const &lItem : lTemplateA->Entries)
-            items.push_back(lItem->itemid);
+        for (auto const &lItem : lTemplateA->Entries) items.push_back(lItem->itemid);
 
     return items;
 }

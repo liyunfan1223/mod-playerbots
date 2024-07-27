@@ -1,31 +1,37 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "CcTargetValue.h"
+
 #include "Action.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
 class FindTargetForCcStrategy : public FindTargetStrategy
 {
-public:
-    FindTargetForCcStrategy(PlayerbotAI *botAI, std::string const spell) : FindTargetStrategy(botAI), spell(spell), maxDistance(0.f) {}
+   public:
+    FindTargetForCcStrategy(PlayerbotAI *botAI, std::string const spell)
+        : FindTargetStrategy(botAI), spell(spell), maxDistance(0.f)
+    {
+    }
 
-public:
+   public:
     void CheckAttacker(Unit *creature, ThreatMgr *threatMgr) override
     {
         Player *bot = botAI->GetBot();
         if (!botAI->CanCastSpell(spell, creature))
             return;
 
-        if (*botAI->GetAiObjectContext()->GetValue<Unit*>("rti cc target") == creature)
+        if (*botAI->GetAiObjectContext()->GetValue<Unit *>("rti cc target") == creature)
         {
             result = creature;
             return;
         }
 
-        if (*botAI->GetAiObjectContext()->GetValue<Unit*>("current target") == creature)
+        if (*botAI->GetAiObjectContext()->GetValue<Unit *>("current target") == creature)
             return;
 
         uint8 health = static_cast<uint8>(creature->GetHealthPct());
@@ -39,8 +45,11 @@ public:
 
         if (*botAI->GetAiObjectContext()->GetValue<uint8>("aoe count") > 2)
         {
-            WorldLocation aoe = *botAI->GetAiObjectContext()->GetValue<WorldLocation>("aoe position");
-            if (sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(creature, aoe.GetPositionX(), aoe.GetPositionY()), sPlayerbotAIConfig->aoeRadius))
+            WorldLocation aoe =
+                *botAI->GetAiObjectContext()->GetValue<WorldLocation>("aoe position");
+            if (sServerFacade->IsDistanceLessOrEqualThan(
+                    sServerFacade->GetDistance2d(creature, aoe.GetPositionX(), aoe.GetPositionY()),
+                    sPlayerbotAIConfig->aoeRadius))
                 return;
         }
 
@@ -75,7 +84,7 @@ public:
         }
     }
 
-private:
+   private:
     std::string const spell;
     float maxDistance;
 };

@@ -1,18 +1,24 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PartyMemberWithoutAuraValue.h"
+
 #include "Playerbots.h"
 
 extern std::vector<std::string> split(std::string const s, char delim);
 
 class PlayerWithoutAuraPredicate : public FindPlayerPredicate, public PlayerbotAIAware
 {
-public:
-    PlayerWithoutAuraPredicate(PlayerbotAI *botAI, std::string const aura) : PlayerbotAIAware(botAI), FindPlayerPredicate(), auras(split(aura, ',')) {}
+   public:
+    PlayerWithoutAuraPredicate(PlayerbotAI *botAI, std::string const aura)
+        : PlayerbotAIAware(botAI), FindPlayerPredicate(), auras(split(aura, ','))
+    {
+    }
 
-public:
+   public:
     bool Check(Unit *unit) override
     {
         if (!unit->IsAlive())
@@ -27,7 +33,7 @@ public:
         return true;
     }
 
-private:
+   private:
     std::vector<std::string> auras;
 };
 

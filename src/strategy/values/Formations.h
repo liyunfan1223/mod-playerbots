@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_FORMATIONS_H
@@ -15,7 +17,7 @@ class PlayerbotAI;
 
 class Formation : public AiNamedObject
 {
-public:
+   public:
     Formation(PlayerbotAI *botAI, std::string const name) : AiNamedObject(botAI, name) {}
     virtual ~Formation() = default;
     virtual std::string const GetTargetName() { return ""; }
@@ -24,29 +26,31 @@ public:
     static WorldLocation NullLocation;
     static bool IsNullLocation(WorldLocation const &loc);
 
-protected:
+   protected:
     float GetFollowAngle();
 };
 
 class FollowFormation : public Formation
 {
-public:
+   public:
     FollowFormation(PlayerbotAI *botAI, std::string const name) : Formation(botAI, name) {}
 };
 
 class MoveFormation : public Formation
 {
-public:
+   public:
     MoveFormation(PlayerbotAI *botAI, std::string const name) : Formation(botAI, name) {}
 
-protected:
-    WorldLocation MoveLine(std::vector<Player *> line, float diff, float cx, float cy, float cz, float orientation, float range);
-    WorldLocation MoveSingleLine(std::vector<Player *> line, float diff, float cx, float cy, float cz, float orientation, float range);
+   protected:
+    WorldLocation MoveLine(std::vector<Player *> line, float diff, float cx, float cy, float cz,
+                           float orientation, float range);
+    WorldLocation MoveSingleLine(std::vector<Player *> line, float diff, float cx, float cy,
+                                 float cz, float orientation, float range);
 };
 
 class MoveAheadFormation : public MoveFormation
 {
-public:
+   public:
     MoveAheadFormation(PlayerbotAI *botAI, std::string const name) : MoveFormation(botAI, name) {}
 
     WorldLocation GetLocation() override;
@@ -55,7 +59,7 @@ public:
 
 class FormationValue : public ManualSetValue<Formation *>
 {
-public:
+   public:
     FormationValue(PlayerbotAI *botAI);
     ~FormationValue();
 
@@ -65,7 +69,7 @@ public:
 
 class SetFormationAction : public Action
 {
-public:
+   public:
     SetFormationAction(PlayerbotAI *botAI) : Action(botAI, "set formation") {}
 
     bool Execute(Event event) override;

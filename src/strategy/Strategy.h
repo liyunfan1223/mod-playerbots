@@ -1,15 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_STRATEGY_H
 #define _PLAYERBOT_STRATEGY_H
 
 #include "Action.h"
-#include "NamedObjectContext.h"
 #include "Multiplier.h"
-#include "Trigger.h"
+#include "NamedObjectContext.h"
 #include "PlayerbotAIAware.h"
+#include "Trigger.h"
 
 enum StrategyType : uint32
 {
@@ -54,7 +56,7 @@ static float ACTION_EMERGENCY = 90.0f;
 
 class Strategy : public PlayerbotAIAware
 {
-public:
+   public:
     Strategy(PlayerbotAI *botAI);
     virtual ~Strategy() {}
 
@@ -67,7 +69,7 @@ public:
     void Update() {}
     void Reset() {}
 
-protected:
+   protected:
     NamedObjectFactoryList<ActionNode> actionNodeFactories;
 };
 

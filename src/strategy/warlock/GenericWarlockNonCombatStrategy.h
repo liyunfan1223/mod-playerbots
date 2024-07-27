@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICWARLOCKNONCOMBATSTRATEGY_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class GenericWarlockNonCombatStrategy : public NonCombatStrategy
 {
-public:
+   public:
     GenericWarlockNonCombatStrategy(PlayerbotAI *botAI);
 
     std::string const getName() override { return "nc"; }
@@ -20,7 +22,7 @@ public:
 
 class WarlockPetStrategy : public Strategy
 {
-public:
+   public:
     WarlockPetStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     std::string const getName() override { return "pet"; }
@@ -29,31 +31,31 @@ public:
 
 class SummonImpStrategy : public NonCombatStrategy
 {
-public:
+   public:
     SummonImpStrategy(PlayerbotAI *ai);
     virtual std::string const getName() override { return "bhealth"; }
 
-public:
+   public:
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class SummonFelguardStrategy : public NonCombatStrategy
 {
-public:
+   public:
     SummonFelguardStrategy(PlayerbotAI *ai);
     virtual std::string const getName() override { return "bdps"; }
 
-public:
+   public:
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 
 class SummonFelhunterStrategy : public NonCombatStrategy
 {
-public:
+   public:
     SummonFelhunterStrategy(PlayerbotAI *ai);
     virtual std::string const getName() override { return "bmana"; }
 
-public:
+   public:
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
 };
 

@@ -1,21 +1,24 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "AiObjectContext.h"
-#include "StrategyContext.h"
+
 #include "ActionContext.h"
 #include "ChatActionContext.h"
-#include "WorldPacketActionContext.h"
 #include "ChatTriggerContext.h"
-#include "TriggerContext.h"
-#include "SharedValueContext.h"
-#include "WorldPacketTriggerContext.h"
-#include "ValueContext.h"
 #include "Playerbots.h"
-#include "raids/RaidTriggerContext.h"
+#include "SharedValueContext.h"
+#include "StrategyContext.h"
+#include "TriggerContext.h"
+#include "ValueContext.h"
+#include "WorldPacketActionContext.h"
+#include "WorldPacketTriggerContext.h"
 #include "raids/RaidActionContext.h"
 #include "raids/RaidStrategyContext.h"
+#include "raids/RaidTriggerContext.h"
 #include "raids/naxxramas/RaidNaxxActionContext.h"
 #include "raids/naxxramas/RaidNaxxTriggerContext.h"
 
@@ -131,20 +134,14 @@ UntypedValue *AiObjectContext::GetUntypedValue(std::string const name)
     return valueContexts.GetContextObject(name, botAI);
 }
 
-std::set<std::string> AiObjectContext::GetValues()
-{
-    return valueContexts.GetCreated();
-}
+std::set<std::string> AiObjectContext::GetValues() { return valueContexts.GetCreated(); }
 
 std::set<std::string> AiObjectContext::GetSupportedStrategies()
 {
     return strategyContexts.supports();
 }
 
-std::set<std::string> AiObjectContext::GetSupportedActions()
-{
-    return actionContexts.supports();
-}
+std::set<std::string> AiObjectContext::GetSupportedActions() { return actionContexts.supports(); }
 
 std::string const AiObjectContext::FormatValues()
 {

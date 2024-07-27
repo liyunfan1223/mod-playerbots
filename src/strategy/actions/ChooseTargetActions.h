@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_CHOOSETARGETACTIONS_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class DpsAoeAction : public AttackAction
 {
-public:
+   public:
     DpsAoeAction(PlayerbotAI *botAI) : AttackAction(botAI, "dps aoe") {}
 
     std::string const GetTargetName() override { return "dps aoe target"; }
@@ -19,7 +21,7 @@ public:
 
 class DpsAssistAction : public AttackAction
 {
-public:
+   public:
     DpsAssistAction(PlayerbotAI *botAI) : AttackAction(botAI, "dps assist") {}
 
     std::string const GetTargetName() override { return "dps target"; }
@@ -28,7 +30,7 @@ public:
 
 class TankAssistAction : public AttackAction
 {
-public:
+   public:
     TankAssistAction(PlayerbotAI *botAI) : AttackAction(botAI, "tank assist") {}
 
     std::string const GetTargetName() override { return "tank target"; }
@@ -36,7 +38,7 @@ public:
 
 class AttackAnythingAction : public AttackAction
 {
-public:
+   public:
     AttackAnythingAction(PlayerbotAI *botAI) : AttackAction(botAI, "attack anything") {}
 
     std::string const GetTargetName() override { return "grind target"; }
@@ -47,7 +49,7 @@ public:
 
 class AttackLeastHpTargetAction : public AttackAction
 {
-public:
+   public:
     AttackLeastHpTargetAction(PlayerbotAI *botAI) : AttackAction(botAI, "attack least hp target") {}
 
     std::string const GetTargetName() override { return "least hp target"; }
@@ -55,7 +57,7 @@ public:
 
 class AttackEnemyPlayerAction : public AttackAction
 {
-public:
+   public:
     AttackEnemyPlayerAction(PlayerbotAI *botAI) : AttackAction(botAI, "attack enemy player") {}
 
     std::string const GetTargetName() override { return "enemy player target"; }
@@ -64,7 +66,7 @@ public:
 
 class AttackRtiTargetAction : public AttackAction
 {
-public:
+   public:
     AttackRtiTargetAction(PlayerbotAI *botAI) : AttackAction(botAI, "attack rti target") {}
 
     std::string const GetTargetName() override { return "rti target"; }
@@ -72,8 +74,11 @@ public:
 
 class AttackEnemyFlagCarrierAction : public AttackAction
 {
-public:
-    AttackEnemyFlagCarrierAction(PlayerbotAI *botAI) : AttackAction(botAI, "attack enemy flag carrier") {}
+   public:
+    AttackEnemyFlagCarrierAction(PlayerbotAI *botAI)
+        : AttackAction(botAI, "attack enemy flag carrier")
+    {
+    }
 
     std::string const GetTargetName() override { return "enemy flag carrier"; }
     bool isUseful() override;
@@ -81,7 +86,7 @@ public:
 
 class DropTargetAction : public Action
 {
-public:
+   public:
     DropTargetAction(PlayerbotAI *botAI) : Action(botAI, "drop target") {}
 
     bool Execute(Event event) override;

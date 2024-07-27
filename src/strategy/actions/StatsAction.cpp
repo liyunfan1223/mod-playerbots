@@ -1,10 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "StatsAction.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
 #include "Playerbots.h"
 
 bool StatsAction::Execute(Event event)
@@ -29,10 +32,7 @@ bool StatsAction::Execute(Event event)
     return true;
 }
 
-void StatsAction::ListGold(std::ostringstream &out)
-{
-    out << chat->formatMoney(bot->GetMoney());
-}
+void StatsAction::ListGold(std::ostringstream &out) { out << chat->formatMoney(bot->GetMoney()); }
 
 void StatsAction::ListBagSlots(std::ostringstream &out)
 {
@@ -55,7 +55,8 @@ void StatsAction::ListBagSlots(std::ostringstream &out)
         if (Bag const *pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
         {
             ItemTemplate const *pBagProto = pBag->GetTemplate();
-            if (pBagProto->Class == ITEM_CLASS_CONTAINER && pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
+            if (pBagProto->Class == ITEM_CLASS_CONTAINER &&
+                pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
             {
                 total += pBag->GetBagSize();
                 totalfree += pBag->GetFreeSlots();
@@ -117,7 +118,8 @@ void StatsAction::ListRepairCost(std::ostringstream &out)
     if (repairPercent < 25)
         color = "ffff0000";
 
-    out << "|c" << color << (uint32)ceil(repairPercent) << "% (" << chat->formatMoney(totalCost) << ")|cffffffff Dur";
+    out << "|c" << color << (uint32)ceil(repairPercent) << "% (" << chat->formatMoney(totalCost)
+        << ")|cffffffff Dur";
 }
 
 uint32 StatsAction::EstRepair(uint16 pos)
@@ -139,7 +141,8 @@ uint32 StatsAction::EstRepair(uint16 pos)
     {
         ItemTemplate const *ditemProto = item->GetTemplate();
 
-        DurabilityCostsEntry const *dcost = sDurabilityCostsStore.LookupEntry(ditemProto->ItemLevel);
+        DurabilityCostsEntry const *dcost =
+            sDurabilityCostsStore.LookupEntry(ditemProto->ItemLevel);
         if (!dcost)
         {
             LOG_ERROR("playerbots", "RepairDurability: Wrong item lvl {}", ditemProto->ItemLevel);
@@ -147,17 +150,20 @@ uint32 StatsAction::EstRepair(uint16 pos)
         }
 
         uint32 dQualitymodEntryId = (ditemProto->Quality + 1) * 2;
-        DurabilityQualityEntry const *dQualitymodEntry = sDurabilityQualityStore.LookupEntry(dQualitymodEntryId);
+        DurabilityQualityEntry const *dQualitymodEntry =
+            sDurabilityQualityStore.LookupEntry(dQualitymodEntryId);
         if (!dQualitymodEntry)
         {
-            LOG_ERROR("playerbots", "RepairDurability: Wrong dQualityModEntry {}", dQualitymodEntryId);
+            LOG_ERROR("playerbots", "RepairDurability: Wrong dQualityModEntry {}",
+                      dQualitymodEntryId);
             return TotalCost;
         }
 
-        uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class, ditemProto->SubClass)];
+        uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(
+            ditemProto->Class, ditemProto->SubClass)];
         uint32 costs = uint32(LostDurability * dmultiplier * double(dQualitymodEntry->quality_mod));
 
-        if (!costs) // fix for ITEM_QUALITY_ARTIFACT
+        if (!costs)  // fix for ITEM_QUALITY_ARTIFACT
             costs = 1;
 
         TotalCost = costs;

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PALADINBUFFSTRATEGIES_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class PaladinBuffManaStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffManaStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -20,7 +22,7 @@ public:
 
 class PaladinBuffHealthStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffHealthStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -29,7 +31,7 @@ public:
 
 class PaladinBuffDpsStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffDpsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -38,7 +40,7 @@ public:
 
 class PaladinBuffArmorStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffArmorStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -47,7 +49,7 @@ public:
 
 class PaladinBuffAoeStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffAoeStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -56,7 +58,7 @@ public:
 
 class PaladinBuffCastStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffCastStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -65,7 +67,7 @@ public:
 
 class PaladinBuffThreatStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffThreatStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -74,7 +76,7 @@ public:
 
 class PaladinBuffStatsStrategy : public Strategy
 {
-public:
+   public:
     PaladinBuffStatsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -83,7 +85,7 @@ public:
 
 class PaladinShadowResistanceStrategy : public Strategy
 {
-public:
+   public:
     PaladinShadowResistanceStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -92,7 +94,7 @@ public:
 
 class PaladinFrostResistanceStrategy : public Strategy
 {
-public:
+   public:
     PaladinFrostResistanceStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -101,7 +103,7 @@ public:
 
 class PaladinFireResistanceStrategy : public Strategy
 {
-public:
+   public:
     PaladinFireResistanceStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

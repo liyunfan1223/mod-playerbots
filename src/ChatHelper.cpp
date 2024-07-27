@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "ChatHelper.h"
+
 #include "AiFactory.h"
 #include "Playerbots.h"
 #include "SpellInfo.h"
@@ -281,22 +284,28 @@ ItemIds ChatHelper::parseItems(std::string const text)
 std::string const ChatHelper::FormatQuest(Quest const *quest)
 {
     std::ostringstream out;
-    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << quest->GetTitle() << "]|h|r";
+    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h["
+        << quest->GetTitle() << "]|h|r";
     return out.str();
 }
 
 std::string const ChatHelper::FormatGameobject(GameObject *go)
 {
     std::ostringstream out;
-    out << "|cFFFFFF00|Hfound:" << go->GetGUID().GetRawValue() << ":" << go->GetEntry() << ":" << "|h[" << go->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) << "]|h|r";
+    out << "|cFFFFFF00|Hfound:" << go->GetGUID().GetRawValue() << ":" << go->GetEntry() << ":"
+        << "|h[" << go->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) << "]|h|r";
     return out.str();
 }
 
 std::string const ChatHelper::FormatWorldobject(WorldObject *wo)
 {
     std::ostringstream out;
-    out << "|cFFFFFF00|Hfound:" << wo->GetGUID().GetRawValue() << ":" << wo->GetEntry() << ":" << "|h[";
-    out << (wo->ToGameObject() ? ((GameObject *)wo)->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) : wo->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale())) << "]|h|r";
+    out << "|cFFFFFF00|Hfound:" << wo->GetGUID().GetRawValue() << ":" << wo->GetEntry() << ":"
+        << "|h[";
+    out << (wo->ToGameObject()
+                ? ((GameObject *)wo)->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale())
+                : wo->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()))
+        << "]|h|r";
     return out.str();
 }
 
@@ -327,7 +336,8 @@ std::string const ChatHelper::FormatWorldEntry(int32 entry)
 std::string const ChatHelper::FormatSpell(SpellInfo const *spellInfo)
 {
     std::ostringstream out;
-    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h[" << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] << "]|h|r";
+    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h["
+        << spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] << "]|h|r";
     return out.str();
 }
 
@@ -336,11 +346,11 @@ std::string const ChatHelper::FormatItem(ItemTemplate const *proto, uint32 count
     char color[32];
     sprintf(color, "%x", ItemQualityColors[proto->Quality]);
 
-    // const std::string &name = sObjectMgr->GetItemLocale(proto->ItemId)->Name[sWorld->GetDefaultDbcLocale()];
+    // const std::string &name =
+    // sObjectMgr->GetItemLocale(proto->ItemId)->Name[sWorld->GetDefaultDbcLocale()];
 
     std::ostringstream out;
-    out << "|c" << color << "|Hitem:" << proto->ItemId
-        << ":0:0:0:0:0:0:0" << "|h[" << proto->Name1
+    out << "|c" << color << "|Hitem:" << proto->ItemId << ":0:0:0:0:0:0:0" << "|h[" << proto->Name1
         << "]|h|r";
 
     if (count > 1)
@@ -377,16 +387,16 @@ std::string const ChatHelper::FormatChat(ChatMsg chat)
 {
     switch (chat)
     {
-    case CHAT_MSG_GUILD:
-        return "guild";
-    case CHAT_MSG_PARTY:
-        return "party";
-    case CHAT_MSG_WHISPER:
-        return "whisper";
-    case CHAT_MSG_RAID:
-        return "raid";
-    default:
-        break;
+        case CHAT_MSG_GUILD:
+            return "guild";
+        case CHAT_MSG_PARTY:
+            return "party";
+        case CHAT_MSG_WHISPER:
+            return "whisper";
+        case CHAT_MSG_RAID:
+            return "raid";
+        default:
+            break;
     }
 
     return "unknown";
@@ -409,13 +419,13 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
     while (true)
     {
         // extract GO guid
-        auto i = text.find("Hfound:", pos); // base H = 11
-        if (i == std::string::npos)         // break if error
+        auto i = text.find("Hfound:", pos);  // base H = 11
+        if (i == std::string::npos)          // break if error
             break;
 
-        pos = i + 7;                       // start of window in text 11 + 7 = 18
-        auto endPos = text.find(':', pos); // end of window in text 22
-        if (endPos == std::string::npos)   // break if error
+        pos = i + 7;                        // start of window in text 11 + 7 = 18
+        auto endPos = text.find(':', pos);  // end of window in text 22
+        if (endPos == std::string::npos)    // break if error
             break;
 
         std::istringstream stream(text.substr(pos, endPos - pos));
@@ -424,12 +434,13 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
 
         // extract GO entry
         pos = endPos + 1;
-        endPos = text.find(':', pos);    // end of window in text
-        if (endPos == std::string::npos) // break if error
+        endPos = text.find(':', pos);     // end of window in text
+        if (endPos == std::string::npos)  // break if error
             break;
 
-        std::string const entryC = text.substr(pos, endPos - pos); // get std::string const within window i.e entry
-        uint32 entry = atol(entryC.c_str());                       // convert ascii to float
+        std::string const entryC =
+            text.substr(pos, endPos - pos);   // get std::string const within window i.e entry
+        uint32 entry = atol(entryC.c_str());  // convert ascii to float
 
         ObjectGuid lootCurrent = ObjectGuid(guid);
 
@@ -440,7 +451,8 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
     return gos;
 }
 
-std::string const ChatHelper::FormatQuestObjective(std::string const name, uint32 available, uint32 required)
+std::string const ChatHelper::FormatQuestObjective(std::string const name, uint32 available,
+                                                   uint32 required)
 {
     std::ostringstream out;
     out << "|cFFFFFFFF" << name << (available >= required ? "|c0000FF00: " : "|c00FF0000: ")
@@ -500,9 +512,12 @@ uint32 ChatHelper::parseSlot(std::string const text)
 
 bool ChatHelper::parseable(std::string const text)
 {
-    return text.find("|H") != std::string::npos || text == "questitem" || text == "ammo" || substrContainsInMap<uint32>(text, consumableSubClasses) ||
-           substrContainsInMap<uint32>(text, tradeSubClasses) || substrContainsInMap<uint32>(text, itemQualities) || substrContainsInMap<uint32>(text, slots) ||
-           substrContainsInMap<ChatMsg>(text, chats) || substrContainsInMap<uint32>(text, skills) || parseMoney(text) > 0;
+    return text.find("|H") != std::string::npos || text == "questitem" || text == "ammo" ||
+           substrContainsInMap<uint32>(text, consumableSubClasses) ||
+           substrContainsInMap<uint32>(text, tradeSubClasses) ||
+           substrContainsInMap<uint32>(text, itemQualities) ||
+           substrContainsInMap<uint32>(text, slots) || substrContainsInMap<ChatMsg>(text, chats) ||
+           substrContainsInMap<uint32>(text, skills) || parseMoney(text) > 0;
 }
 
 std::string const ChatHelper::FormatClass(Player *player, int8 spec)
@@ -525,15 +540,9 @@ std::string const ChatHelper::FormatClass(Player *player, int8 spec)
     return out.str();
 }
 
-std::string const ChatHelper::FormatClass(uint8 cls)
-{
-    return classes[cls];
-}
+std::string const ChatHelper::FormatClass(uint8 cls) { return classes[cls]; }
 
-std::string const ChatHelper::FormatRace(uint8 race)
-{
-    return races[race];
-}
+std::string const ChatHelper::FormatRace(uint8 race) { return races[race]; }
 
 uint32 ChatHelper::parseSkill(std::string const text)
 {

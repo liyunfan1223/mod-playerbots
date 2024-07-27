@@ -1,14 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "FollowActions.h"
+
+#include <cstddef>
+
 #include "Event.h"
 #include "Formations.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
-#include <cstddef>
 
 bool FollowAction::Execute(Event event)
 {
@@ -101,7 +105,8 @@ bool FollowAction::isUseful()
 bool FollowAction::CanDeadFollow(Unit *target)
 {
     // Move to corpse when dead and player is alive or not a ghost.
-    if (!bot->IsAlive() && (target->IsAlive() || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
+    if (!bot->IsAlive() &&
+        (target->IsAlive() || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
         return false;
 
     return true;

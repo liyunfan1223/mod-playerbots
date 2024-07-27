@@ -1,9 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_VALUE_H
 #define _PLAYERBOT_VALUE_H
+
+#include <time.h>
 
 #include "AiObject.h"
 #include "ObjectGuid.h"
@@ -11,26 +15,24 @@
 #include "Timer.h"
 #include "Unit.h"
 
-#include <time.h>
-
 class PlayerbotAI;
 class Unit;
 
 class FleeInfo
 {
-public:
+   public:
     Position fromPos;
     float radius;
     float angle;
     uint32 timestamp;
-    int GetAngleRangeIndex() { return (angle + 2 * M_PI) / (M_PI / 2); } // [0, 7)
+    int GetAngleRangeIndex() { return (angle + 2 * M_PI) / (M_PI / 2); }  // [0, 7)
 };
 
 struct CreatureData;
 
 class UntypedValue : public AiNamedObject
 {
-public:
+   public:
     UntypedValue(PlayerbotAI *botAI, std::string const name) : AiNamedObject(botAI, name) {}
     virtual ~UntypedValue() {}
     virtual void Update() {}
@@ -43,7 +45,7 @@ public:
 template <class T>
 class Value
 {
-public:
+   public:
     virtual ~Value() {}
     virtual T Get() = 0;
     virtual T LazyGet() = 0;
@@ -56,9 +58,16 @@ public:
 template <class T>
 class CalculatedValue : public UntypedValue, public Value<T>
 {
-public:
-    CalculatedValue(PlayerbotAI *botAI, std::string const name = "value", uint32 checkInterval = 1) : UntypedValue(botAI, name),
-                                                                                                      checkInterval(checkInterval == 1 ? 1 : (checkInterval < 100 ? checkInterval * 1000 : checkInterval)) /*turn s -> ms?*/, lastCheckTime(0) {}
+   public:
+    CalculatedValue(PlayerbotAI *botAI, std::string const name = "value", uint32 checkInterval = 1)
+        : UntypedValue(botAI, name),
+          checkInterval(
+              checkInterval == 1
+                  ? 1
+                  : (checkInterval < 100 ? checkInterval * 1000 : checkInterval)) /*turn s -> ms?*/,
+          lastCheckTime(0)
+    {
+    }
 
     virtual ~CalculatedValue() {}
 
@@ -66,7 +75,8 @@ public:
     {
         if (checkInterval < 2)
         {
-            // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+            // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE,
+            // this->getName(), this->context ? &this->context->performanceStack : nullptr);
             value = Calculate();
             // if (pmo)
             //     pmo->finish();
@@ -77,7 +87,8 @@ public:
             if (!lastCheckTime || now - lastCheckTime >= checkInterval)
             {
                 lastCheckTime = now;
-                // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+                // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE,
+                // this->getName(), this->context ? &this->context->performanceStack : nullptr);
                 value = Calculate();
                 // if (pmo)
                 //     pmo->finish();
@@ -97,7 +108,8 @@ public:
     {
         if (checkInterval < 2)
         {
-            // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+            // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE,
+            // this->getName(), this->context ? &this->context->performanceStack : nullptr);
             value = Calculate();
             // if (pmo)
             //     pmo->finish();
@@ -108,7 +120,8 @@ public:
             if (!lastCheckTime || now - lastCheckTime >= checkInterval)
             {
                 lastCheckTime = now;
-                // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+                // PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_VALUE,
+                // this->getName(), this->context ? &this->context->performanceStack : nullptr);
                 value = Calculate();
                 // if (pmo)
                 //     pmo->finish();
@@ -120,7 +133,7 @@ public:
     void Update() override {}
     void Reset() override { lastCheckTime = 0; }
 
-protected:
+   protected:
     virtual T Calculate() = 0;
 
     uint32 checkInterval;
@@ -131,8 +144,9 @@ protected:
 template <class T>
 class SingleCalculatedValue : public CalculatedValue<T>
 {
-public:
-    SingleCalculatedValue(PlayerbotAI *botAI, std::string const name = "value") : CalculatedValue<T>(botAI, name)
+   public:
+    SingleCalculatedValue(PlayerbotAI *botAI, std::string const name = "value")
+        : CalculatedValue<T>(botAI, name)
     {
         this->Reset();
     }
@@ -144,7 +158,9 @@ public:
         {
             this->lastCheckTime = now;
 
-            PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(PERF_MON_VALUE, this->getName(), this->context ? &this->context->performanceStack : nullptr);
+            PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(
+                PERF_MON_VALUE, this->getName(),
+                this->context ? &this->context->performanceStack : nullptr);
             this->value = this->Calculate();
             if (pmo)
                 pmo->finish();
@@ -157,8 +173,10 @@ public:
 template <class T>
 class MemoryCalculatedValue : public CalculatedValue<T>
 {
-public:
-    MemoryCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int32 checkInterval = 1) : CalculatedValue<T>(botAI, name, checkInterval)
+   public:
+    MemoryCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                          int32 checkInterval = 1)
+        : CalculatedValue<T>(botAI, name, checkInterval)
     {
         lastChangeTime = time(0);
     }
@@ -192,10 +210,7 @@ public:
         return this->value;
     }
 
-    T LazyGet() override
-    {
-        return this->value;
-    }
+    T LazyGet() override { return this->value; }
 
     time_t LastChangeOn()
     {
@@ -212,7 +227,7 @@ public:
         lastChangeTime = time(0);
     }
 
-protected:
+   protected:
     T lastValue;
     uint32 minChangeInterval = 0;
     time_t lastChangeTime;
@@ -221,8 +236,12 @@ protected:
 template <class T>
 class LogCalculatedValue : public MemoryCalculatedValue<T>
 {
-public:
-    LogCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int32 checkInterval = 1) : MemoryCalculatedValue<T>(botAI, name, checkInterval) {}
+   public:
+    LogCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                       int32 checkInterval = 1)
+        : MemoryCalculatedValue<T>(botAI, name, checkInterval)
+    {
+    }
 
     bool UpdateChange() override
     {
@@ -244,50 +263,63 @@ public:
         valueLog.clear();
     }
 
-protected:
+   protected:
     std::list<std::pair<T, time_t>> valueLog;
     uint8 logLength = 10;
 };
 
 class Uint8CalculatedValue : public CalculatedValue<uint8>
 {
-public:
-    Uint8CalculatedValue(PlayerbotAI *botAI, std::string const name = "value", uint32 checkInterval = 1) : CalculatedValue<uint8>(botAI, name, checkInterval) {}
+   public:
+    Uint8CalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                         uint32 checkInterval = 1)
+        : CalculatedValue<uint8>(botAI, name, checkInterval)
+    {
+    }
 
     std::string const Format() override;
 };
 
 class Uint32CalculatedValue : public CalculatedValue<uint32>
 {
-public:
-    Uint32CalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int checkInterval = 1) : CalculatedValue<uint32>(botAI, name, checkInterval) {}
+   public:
+    Uint32CalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                          int checkInterval = 1)
+        : CalculatedValue<uint32>(botAI, name, checkInterval)
+    {
+    }
 
     std::string const Format() override;
 };
 
 class FloatCalculatedValue : public CalculatedValue<float>
 {
-public:
-    FloatCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int checkInterval = 1) : CalculatedValue<float>(botAI, name, checkInterval) {}
+   public:
+    FloatCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                         int checkInterval = 1)
+        : CalculatedValue<float>(botAI, name, checkInterval)
+    {
+    }
 
     std::string const Format() override;
 };
 
 class BoolCalculatedValue : public CalculatedValue<bool>
 {
-public:
-    BoolCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int checkInterval = 1) : CalculatedValue<bool>(botAI, name, checkInterval) {}
-
-    std::string const Format() override
+   public:
+    BoolCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int checkInterval = 1)
+        : CalculatedValue<bool>(botAI, name, checkInterval)
     {
-        return Calculate() ? "true" : "false";
     }
+
+    std::string const Format() override { return Calculate() ? "true" : "false"; }
 };
 
 class UnitCalculatedValue : public CalculatedValue<Unit *>
 {
-public:
-    UnitCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int32 checkInterval = 1);
+   public:
+    UnitCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                        int32 checkInterval = 1);
 
     std::string const Format() override;
     Unit *Get() override;
@@ -295,32 +327,36 @@ public:
 
 class CDPairCalculatedValue : public CalculatedValue<CreatureData const *>
 {
-public:
-    CDPairCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int32 checkInterval = 1);
+   public:
+    CDPairCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                          int32 checkInterval = 1);
 
     std::string const Format() override;
 };
 
 class CDPairListCalculatedValue : public CalculatedValue<std::vector<CreatureData const *>>
 {
-public:
-    CDPairListCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int32 checkInterval = 1);
+   public:
+    CDPairListCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                              int32 checkInterval = 1);
 
     std::string const Format() override;
 };
 
 class ObjectGuidCalculatedValue : public CalculatedValue<ObjectGuid>
 {
-public:
-    ObjectGuidCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int32 checkInterval = 1);
+   public:
+    ObjectGuidCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                              int32 checkInterval = 1);
 
     std::string const Format() override;
 };
 
 class ObjectGuidListCalculatedValue : public CalculatedValue<GuidVector>
 {
-public:
-    ObjectGuidListCalculatedValue(PlayerbotAI *botAI, std::string const name = "value", int32 checkInterval = 1);
+   public:
+    ObjectGuidListCalculatedValue(PlayerbotAI *botAI, std::string const name = "value",
+                                  int32 checkInterval = 1);
 
     std::string const Format() override;
 };
@@ -328,8 +364,11 @@ public:
 template <class T>
 class ManualSetValue : public UntypedValue, public Value<T>
 {
-public:
-    ManualSetValue(PlayerbotAI *botAI, T defaultValue, std::string const name = "value") : UntypedValue(botAI, name), value(defaultValue), defaultValue(defaultValue) {}
+   public:
+    ManualSetValue(PlayerbotAI *botAI, T defaultValue, std::string const name = "value")
+        : UntypedValue(botAI, name), value(defaultValue), defaultValue(defaultValue)
+    {
+    }
 
     virtual ~ManualSetValue() {}
 
@@ -338,20 +377,20 @@ public:
     T &RefGet() override { return value; }
     void Set(T val) override { value = val; }
     void Update() override {}
-    void Reset() override
-    {
-        value = defaultValue;
-    }
+    void Reset() override { value = defaultValue; }
 
-protected:
+   protected:
     T value;
     T defaultValue;
 };
 
 class UnitManualSetValue : public ManualSetValue<Unit *>
 {
-public:
-    UnitManualSetValue(PlayerbotAI *botAI, Unit *defaultValue, std::string const name = "value") : ManualSetValue<Unit *>(botAI, defaultValue, name) {}
+   public:
+    UnitManualSetValue(PlayerbotAI *botAI, Unit *defaultValue, std::string const name = "value")
+        : ManualSetValue<Unit *>(botAI, defaultValue, name)
+    {
+    }
 
     std::string const Format() override;
     Unit *Get() override;
@@ -359,26 +398,42 @@ public:
 
 class DisperseDistanceValue : public ManualSetValue<float>
 {
-public:
-    DisperseDistanceValue(PlayerbotAI *botAI, float defaultValue = -1.0f, std::string const name = "disperse distance") : ManualSetValue<float>(botAI, defaultValue, name) {}
+   public:
+    DisperseDistanceValue(PlayerbotAI *botAI, float defaultValue = -1.0f,
+                          std::string const name = "disperse distance")
+        : ManualSetValue<float>(botAI, defaultValue, name)
+    {
+    }
 };
 
 class LastFleeAngleValue : public ManualSetValue<float>
 {
-public:
-    LastFleeAngleValue(PlayerbotAI *botAI, float defaultValue = 0.0f, std::string const name = "last flee angle") : ManualSetValue<float>(botAI, defaultValue, name) {}
+   public:
+    LastFleeAngleValue(PlayerbotAI *botAI, float defaultValue = 0.0f,
+                       std::string const name = "last flee angle")
+        : ManualSetValue<float>(botAI, defaultValue, name)
+    {
+    }
 };
 
 class LastFleeTimestampValue : public ManualSetValue<uint32>
 {
-public:
-    LastFleeTimestampValue(PlayerbotAI *botAI, uint32 defaultValue = 0, std::string const name = "last flee timestamp") : ManualSetValue<uint32>(botAI, defaultValue, name) {}
+   public:
+    LastFleeTimestampValue(PlayerbotAI *botAI, uint32 defaultValue = 0,
+                           std::string const name = "last flee timestamp")
+        : ManualSetValue<uint32>(botAI, defaultValue, name)
+    {
+    }
 };
 
 class RecentlyFleeInfo : public ManualSetValue<std::list<FleeInfo>>
 {
-public:
-    RecentlyFleeInfo(PlayerbotAI *botAI, std::list<FleeInfo> defaultValue = {}, std::string const name = "recently flee info") : ManualSetValue<std::list<FleeInfo>>(botAI, defaultValue, name) {}
+   public:
+    RecentlyFleeInfo(PlayerbotAI *botAI, std::list<FleeInfo> defaultValue = {},
+                     std::string const name = "recently flee info")
+        : ManualSetValue<std::list<FleeInfo>>(botAI, defaultValue, name)
+    {
+    }
 };
 
 #endif

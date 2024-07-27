@@ -1,14 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "CasterDruidStrategy.h"
+
 #include "AiObjectContext.h"
 #include "FeralDruidStrategy.h"
 
 class CasterDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     CasterDruidStrategyActionNodeFactory()
     {
         creators["faerie fire"] = &faerie_fire;
@@ -23,7 +26,7 @@ public:
         creators["moonkin form"] = &moonkin_form;
     }
 
-private:
+   private:
     static ActionNode *faerie_fire([[maybe_unused]] PlayerbotAI *botAI)
     {
         return new ActionNode("faerie fire",
@@ -34,10 +37,11 @@ private:
 
     static ActionNode *hibernate([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode("hibernate",
-                              /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
-                              /*A*/ NextAction::array(0, new NextAction("entangling roots"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "hibernate",
+            /*P*/ NextAction::array(0, new NextAction("moonkin form"), nullptr),
+            /*A*/ NextAction::array(0, new NextAction("entangling roots"), nullptr),
+            /*C*/ nullptr);
     }
 
     static ActionNode *entangling_roots([[maybe_unused]] PlayerbotAI *botAI)
@@ -113,45 +117,60 @@ CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI *botAI) : GenericDruidStrat
 
 NextAction **CasterDruidStrategy::getDefaultActions()
 {
-    return NextAction::array(0,
-                             new NextAction("starfall", ACTION_DEFAULT + 0.2f),
+    return NextAction::array(0, new NextAction("starfall", ACTION_DEFAULT + 0.2f),
                              new NextAction("wrath", ACTION_DEFAULT + 0.1f),
                              // new NextAction("starfire", ACTION_NORMAL),
                              nullptr);
 }
 
-void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     GenericDruidStrategy::InitTriggers(triggers);
 
-    // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_MOVE), nullptr)));
-    triggers.push_back(new TriggerNode("insect swarm", NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), nullptr)));
-    triggers.push_back(new TriggerNode("moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
-    triggers.push_back(new TriggerNode("eclipse (solar)", NextAction::array(0, new NextAction("wrath", ACTION_NORMAL + 6), nullptr)));
-    triggers.push_back(new TriggerNode("eclipse (lunar) cooldown", NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("eclipse (lunar)", NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 6), nullptr)));
-    triggers.push_back(new TriggerNode("eclipse (solar) cooldown", NextAction::array(0, new NextAction("wrath", ACTION_NORMAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
-    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 9), NULL)));
-    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new
+    // NextAction("reach spell", ACTION_MOVE), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "insect swarm",
+        NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
+    triggers.push_back(
+        new TriggerNode("eclipse (solar)",
+                        NextAction::array(0, new NextAction("wrath", ACTION_NORMAL + 6), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "eclipse (lunar) cooldown",
+        NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "eclipse (lunar)",
+        NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 6), nullptr)));
+    triggers.push_back(
+        new TriggerNode("eclipse (solar) cooldown",
+                        NextAction::array(0, new NextAction("wrath", ACTION_NORMAL + 2), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "moonfire", NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 9), NULL)));
+    triggers.push_back(
+        new TriggerNode("enemy too close for spell",
+                        NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
     triggers.push_back(new TriggerNode(
         "party member remove curse",
         NextAction::array(0, new NextAction("remove curse on party", ACTION_DISPEL + 7), NULL)));
 }
 
-void CasterDruidAoeStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void CasterDruidAoeStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
-    triggers.push_back(new TriggerNode("high aoe", NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "high aoe", NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
         "light aoe",
-        NextAction::array(0,
-                          new NextAction("starfall", ACTION_NORMAL + 5),
+        NextAction::array(0, new NextAction("starfall", ACTION_NORMAL + 5),
                           new NextAction("insect swarm on attacker", ACTION_NORMAL + 3),
-                          new NextAction("moonfire on attacker", ACTION_NORMAL + 3),
-                          NULL)));
+                          new NextAction("moonfire on attacker", ACTION_NORMAL + 3), NULL)));
 }
 
-void CasterDruidDebuffStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void CasterDruidDebuffStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
-    triggers.push_back(new TriggerNode("faerie fire", NextAction::array(0, new NextAction("faerie fire", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "faerie fire", NextAction::array(0, new NextAction("faerie fire", ACTION_HIGH), nullptr)));
 }

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_SERVERFACADE_H
@@ -13,7 +15,7 @@ class WorldObject;
 
 class ServerFacade
 {
-public:
+   public:
     ServerFacade() {};
     virtual ~ServerFacade() {};
     static ServerFacade *instance()
@@ -22,7 +24,7 @@ public:
         return &instance;
     }
 
-public:
+   public:
     float GetDistance2d(Unit *unit, WorldObject *wo);
     float GetDistance2d(Unit *unit, float x, float y);
     bool IsDistanceLessThan(float dist1, float dist2);

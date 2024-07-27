@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "MoveToTravelTargetAction.h"
+
 #include "ChooseRpgTargetAction.h"
 #include "LootObjectStack.h"
 #include "PathGenerator.h"
@@ -46,7 +49,9 @@ bool MoveToTravelTargetAction::Execute(Event event)
 
             // float memberAngle = botLocation.getAngleBetween(targetPos, memberPos);
 
-            // if (botLocation.getMapId() == targetPos.getMapId() && botLocation.getMapId() == memberPos.getMapId() && memberAngle < static_cast<float>(M_PI) / 2) //We are heading that direction anyway.
+            // if (botLocation.getMapId() == targetPos.getMapId() && botLocation.getMapId() ==
+            // memberPos.getMapId() && memberAngle < static_cast<float>(M_PI) / 2) //We are heading
+            // that direction anyway.
             //     continue;
 
             if (!urand(0, 5))
@@ -75,7 +80,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
     // Evenly distribute around the target.
     float angle = 2 * M_PI * urand(0, 100) / 100.0;
 
-    if (target->getMaxTravelTime() > target->getTimeLeft()) // The bot is late. Speed it up.
+    if (target->getMaxTravelTime() > target->getTimeLeft())  // The bot is late. Speed it up.
     {
         // distance = sPlayerbotAIConfig->fleeDistance;
         // angle = bot->GetAngle(location.GetPositionX(), location.GetPositionY());
@@ -118,7 +123,7 @@ bool MoveToTravelTargetAction::isUseful()
     if (!botAI->AllowActivity(TRAVEL_ACTIVITY))
         return false;
 
-    if (!context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
+    if (!context->GetValue<TravelTarget *>("travel target")->Get()->isTraveling())
         return false;
 
     if (bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
@@ -137,7 +142,8 @@ bool MoveToTravelTargetAction::isUseful()
     if (loot.IsLootPossible(bot))
         return false;
 
-    if (!ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))
+    if (!ChooseRpgTargetAction::isFollowValid(
+            bot, *context->GetValue<TravelTarget *>("travel target")->Get()->getPosition()))
         return false;
 
     return true;

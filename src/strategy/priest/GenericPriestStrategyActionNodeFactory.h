@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICPRIESTSTRATEGYACTIONNODEFACTORY_H
@@ -10,7 +12,7 @@
 
 class GenericPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     GenericPriestStrategyActionNodeFactory()
     {
         creators["inner fire"] = &inner_fire;
@@ -36,7 +38,7 @@ public:
         creators["shadowfiend"] = &shadowfiend;
     }
 
-private:
+   private:
     static ActionNode *inner_fire(PlayerbotAI *ai)
     {
         return new ActionNode("inner fire",
@@ -89,11 +91,12 @@ private:
     }
     static ActionNode *power_word_shield_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode("power word: shield on party",
-                              /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
-                              // /*A*/ NextAction::array(0, new NextAction("renew on party", 50.0f), NULL),
-                              /*A*/ NULL,
-                              /*C*/ NULL);
+        return new ActionNode(
+            "power word: shield on party",
+            /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
+            // /*A*/ NextAction::array(0, new NextAction("renew on party", 50.0f), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
     }
     static ActionNode *renew(PlayerbotAI *ai)
     {
@@ -132,10 +135,11 @@ private:
     }
     static ActionNode *heal_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode("heal on party",
-                              /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
-                              /*A*/ NextAction::array(0, new NextAction("lesser heal on party"), NULL),
-                              /*C*/ NULL);
+        return new ActionNode(
+            "heal on party",
+            /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("lesser heal on party"), NULL),
+            /*C*/ NULL);
     }
     static ActionNode *lesser_heal(PlayerbotAI *ai)
     {
@@ -160,10 +164,11 @@ private:
     }
     static ActionNode *flash_heal_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode("flash heal on party",
-                              /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
-                              /*A*/ NextAction::array(0, new NextAction("greater heal on party"), NULL),
-                              /*C*/ NULL);
+        return new ActionNode(
+            "flash heal on party",
+            /*P*/ NextAction::array(0, new NextAction("remove shadowform"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("greater heal on party"), NULL),
+            /*C*/ NULL);
     }
     static ActionNode *psychic_scream(PlayerbotAI *ai)
     {
@@ -191,14 +196,14 @@ private:
 
 class CurePriestStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     CurePriestStrategyActionNodeFactory()
     {
         creators["abolish disease"] = &abolish_disease;
         creators["abolish disease on party"] = &abolish_disease_on_party;
     }
 
-private:
+   private:
     ACTION_NODE_A(abolish_disease, "abolish disease", "cure disease");
     ACTION_NODE_A(abolish_disease_on_party, "abolish disease on party", "cure disease on party");
 };

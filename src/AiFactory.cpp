@@ -1,51 +1,54 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "AiFactory.h"
+
 #include "BattlegroundMgr.h"
+#include "DKAiObjectContext.h"
+#include "DruidAiObjectContext.h"
+#include "Engine.h"
+#include "Group.h"
+#include "HunterAiObjectContext.h"
 #include "Item.h"
+#include "MageAiObjectContext.h"
+#include "PaladinAiObjectContext.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
-#include "Engine.h"
-#include "Group.h"
-#include "DKAiObjectContext.h"
 #include "PriestAiObjectContext.h"
-#include "MageAiObjectContext.h"
+#include "RogueAiObjectContext.h"
+#include "ShamanAiObjectContext.h"
 #include "SharedDefines.h"
 #include "WarlockAiObjectContext.h"
 #include "WarriorAiObjectContext.h"
-#include "ShamanAiObjectContext.h"
-#include "PaladinAiObjectContext.h"
-#include "DruidAiObjectContext.h"
-#include "HunterAiObjectContext.h"
-#include "RogueAiObjectContext.h"
 
 AiObjectContext *AiFactory::createAiObjectContext(Player *player, PlayerbotAI *botAI)
 {
     switch (player->getClass())
     {
-    case CLASS_PRIEST:
-        return new PriestAiObjectContext(botAI);
-    case CLASS_MAGE:
-        return new MageAiObjectContext(botAI);
-    case CLASS_WARLOCK:
-        return new WarlockAiObjectContext(botAI);
-    case CLASS_WARRIOR:
-        return new WarriorAiObjectContext(botAI);
-    case CLASS_SHAMAN:
-        return new ShamanAiObjectContext(botAI);
-    case CLASS_PALADIN:
-        return new PaladinAiObjectContext(botAI);
-    case CLASS_DRUID:
-        return new DruidAiObjectContext(botAI);
-    case CLASS_HUNTER:
-        return new HunterAiObjectContext(botAI);
-    case CLASS_ROGUE:
-        return new RogueAiObjectContext(botAI);
-    case CLASS_DEATH_KNIGHT:
-        return new DKAiObjectContext(botAI);
+        case CLASS_PRIEST:
+            return new PriestAiObjectContext(botAI);
+        case CLASS_MAGE:
+            return new MageAiObjectContext(botAI);
+        case CLASS_WARLOCK:
+            return new WarlockAiObjectContext(botAI);
+        case CLASS_WARRIOR:
+            return new WarriorAiObjectContext(botAI);
+        case CLASS_SHAMAN:
+            return new ShamanAiObjectContext(botAI);
+        case CLASS_PALADIN:
+            return new PaladinAiObjectContext(botAI);
+        case CLASS_DRUID:
+            return new DruidAiObjectContext(botAI);
+        case CLASS_HUNTER:
+            return new HunterAiObjectContext(botAI);
+        case CLASS_ROGUE:
+            return new RogueAiObjectContext(botAI);
+        case CLASS_DEATH_KNIGHT:
+            return new DKAiObjectContext(botAI);
     }
 
     return new AiObjectContext(botAI);
@@ -76,15 +79,15 @@ uint8 AiFactory::GetPlayerSpecTab(Player *bot)
 
         switch (bot->getClass())
         {
-        case CLASS_MAGE:
-            tab = 1;
-            break;
-        case CLASS_PALADIN:
-            tab = 2;
-            break;
-        case CLASS_PRIEST:
-            tab = 1;
-            break;
+            case CLASS_MAGE:
+                tab = 1;
+                break;
+            case CLASS_PALADIN:
+                tab = 2;
+                break;
+            case CLASS_PRIEST:
+                tab = 1;
+                break;
         }
 
         return tab;
@@ -127,43 +130,43 @@ BotRoles AiFactory::GetPlayerRoles(Player *player)
 
     switch (player->getClass())
     {
-    case CLASS_PRIEST:
-        if (tab == 2)
+        case CLASS_PRIEST:
+            if (tab == 2)
+                role = BOT_ROLE_DPS;
+            else
+                role = BOT_ROLE_HEALER;
+            break;
+        case CLASS_SHAMAN:
+            if (tab == 2)
+                role = BOT_ROLE_HEALER;
+            else
+                role = BOT_ROLE_DPS;
+            break;
+        case CLASS_WARRIOR:
+            if (tab == 2)
+                role = BOT_ROLE_TANK;
+            else
+                role = BOT_ROLE_DPS;
+            break;
+        case CLASS_PALADIN:
+            if (tab == 0)
+                role = BOT_ROLE_HEALER;
+            else if (tab == 1)
+                role = BOT_ROLE_TANK;
+            else if (tab == 2)
+                role = BOT_ROLE_DPS;
+            break;
+        case CLASS_DRUID:
+            if (tab == 0)
+                role = BOT_ROLE_DPS;
+            else if (tab == 1)
+                role = (BotRoles)(BOT_ROLE_TANK | BOT_ROLE_DPS);
+            else if (tab == 2)
+                role = BOT_ROLE_HEALER;
+            break;
+        default:
             role = BOT_ROLE_DPS;
-        else
-            role = BOT_ROLE_HEALER;
-        break;
-    case CLASS_SHAMAN:
-        if (tab == 2)
-            role = BOT_ROLE_HEALER;
-        else
-            role = BOT_ROLE_DPS;
-        break;
-    case CLASS_WARRIOR:
-        if (tab == 2)
-            role = BOT_ROLE_TANK;
-        else
-            role = BOT_ROLE_DPS;
-        break;
-    case CLASS_PALADIN:
-        if (tab == 0)
-            role = BOT_ROLE_HEALER;
-        else if (tab == 1)
-            role = BOT_ROLE_TANK;
-        else if (tab == 2)
-            role = BOT_ROLE_DPS;
-        break;
-    case CLASS_DRUID:
-        if (tab == 0)
-            role = BOT_ROLE_DPS;
-        else if (tab == 1)
-            role = (BotRoles)(BOT_ROLE_TANK | BOT_ROLE_DPS);
-        else if (tab == 2)
-            role = BOT_ROLE_HEALER;
-        break;
-    default:
-        role = BOT_ROLE_DPS;
-        break;
+            break;
     }
 
     return role;
@@ -175,95 +178,96 @@ std::string AiFactory::GetPlayerSpecName(Player *player)
     int tab = GetPlayerSpecTab(player);
     switch (player->getClass())
     {
-    case CLASS_PRIEST:
-        if (tab == 2)
-            specName = "shadow";
-        else if (tab == 1)
-            specName = "holy";
-        else
-            specName = "disc";
-        ;
-        break;
-    case CLASS_SHAMAN:
-        if (tab == 2)
-            specName = "resto";
-        else if (tab == 1)
-            specName = "enhance";
-        else
-            specName = "elem";
-        break;
-    case CLASS_WARRIOR:
-        if (tab == 2)
-            specName = "prot";
-        else if (tab == 1)
-            specName = "fury";
-        else
-            specName = "arms";
-        break;
-    case CLASS_PALADIN:
-        if (tab == 0)
-            specName = "holy";
-        else if (tab == 1)
-            specName = "prot";
-        else if (tab == 2)
-            specName = "retrib";
-        break;
-    case CLASS_DRUID:
-        if (tab == 0)
-            specName = "balance";
-        else if (tab == 1)
-            specName = "feraldps";
-        else if (tab == 2)
-            specName = "resto";
-        break;
-    case CLASS_ROGUE:
-        if (tab == 0)
-            specName = "assas";
-        else if (tab == 1)
-            specName = "combat";
-        else if (tab == 2)
-            specName = "subtle";
-        break;
-    case CLASS_HUNTER:
-        if (tab == 0)
-            specName = "beast";
-        else if (tab == 1)
-            specName = "marks";
-        else if (tab == 2)
-            specName = "surv";
-        break;
-    case CLASS_DEATH_KNIGHT:
-        if (tab == 0)
-            specName = "blooddps";
-        else if (tab == 1)
-            specName = "frostdps";
-        else if (tab == 2)
-            specName = "unholydps";
-        break;
-    case CLASS_MAGE:
-        if (tab == 0)
-            specName = "arcane";
-        else if (tab == 1)
-            specName = "fire";
-        else if (tab == 2)
-            specName = "frost";
-        break;
-    case CLASS_WARLOCK:
-        if (tab == 0)
-            specName = "afflic";
-        else if (tab == 1)
-            specName = "demo";
-        else if (tab == 2)
-            specName = "destro";
-        break;
-    default:
-        break;
+        case CLASS_PRIEST:
+            if (tab == 2)
+                specName = "shadow";
+            else if (tab == 1)
+                specName = "holy";
+            else
+                specName = "disc";
+            ;
+            break;
+        case CLASS_SHAMAN:
+            if (tab == 2)
+                specName = "resto";
+            else if (tab == 1)
+                specName = "enhance";
+            else
+                specName = "elem";
+            break;
+        case CLASS_WARRIOR:
+            if (tab == 2)
+                specName = "prot";
+            else if (tab == 1)
+                specName = "fury";
+            else
+                specName = "arms";
+            break;
+        case CLASS_PALADIN:
+            if (tab == 0)
+                specName = "holy";
+            else if (tab == 1)
+                specName = "prot";
+            else if (tab == 2)
+                specName = "retrib";
+            break;
+        case CLASS_DRUID:
+            if (tab == 0)
+                specName = "balance";
+            else if (tab == 1)
+                specName = "feraldps";
+            else if (tab == 2)
+                specName = "resto";
+            break;
+        case CLASS_ROGUE:
+            if (tab == 0)
+                specName = "assas";
+            else if (tab == 1)
+                specName = "combat";
+            else if (tab == 2)
+                specName = "subtle";
+            break;
+        case CLASS_HUNTER:
+            if (tab == 0)
+                specName = "beast";
+            else if (tab == 1)
+                specName = "marks";
+            else if (tab == 2)
+                specName = "surv";
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if (tab == 0)
+                specName = "blooddps";
+            else if (tab == 1)
+                specName = "frostdps";
+            else if (tab == 2)
+                specName = "unholydps";
+            break;
+        case CLASS_MAGE:
+            if (tab == 0)
+                specName = "arcane";
+            else if (tab == 1)
+                specName = "fire";
+            else if (tab == 2)
+                specName = "frost";
+            break;
+        case CLASS_WARLOCK:
+            if (tab == 0)
+                specName = "afflic";
+            else if (tab == 1)
+                specName = "demo";
+            else if (tab == 2)
+                specName = "destro";
+            break;
+        default:
+            break;
     }
 
     return specName;
 }
 
-void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const facade, Engine *engine)
+void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const facade,
+                                           Engine *engine)
 {
     uint8 tab = GetPlayerSpecTab(player);
 
@@ -282,105 +286,105 @@ void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const fa
     engine->addStrategy("combat formation");
     switch (player->getClass())
     {
-    case CLASS_PRIEST:
-        if (tab == 2)
-        {
-            engine->addStrategies("dps", "shadow debuff", "shadow aoe", nullptr);
-        }
-        else if (tab == PRIEST_TAB_DISIPLINE)
-        {
-            engine->addStrategies("heal", nullptr);
-        }
-        else
-        {
-            engine->addStrategies("holy heal", nullptr);
-        }
-
-        engine->addStrategies("dps assist", "cure", nullptr);
-        break;
-    case CLASS_MAGE:
-        if (tab == 0)
-            engine->addStrategies("arcane", "arcane aoe", nullptr);
-        else if (tab == 1)
-            engine->addStrategies("fire", "fire aoe", nullptr);
-        else
-            engine->addStrategies("frost", "frost aoe", nullptr);
-
-        engine->addStrategies("dps", "dps assist", "cure", nullptr);
-        break;
-    case CLASS_WARRIOR:
-        if (tab == 2)
-            engine->addStrategies("tank", "tank assist", "aoe", "mark rti", nullptr);
-        else if (player->GetLevel() < 36 || tab == 0)
-            engine->addStrategies("arms", "aoe", "dps assist", /*"behind",*/ nullptr);
-        else
-            engine->addStrategies("fury", "aoe", "dps assist", /*"behind",*/ nullptr);
-        break;
-    case CLASS_SHAMAN:
-        if (tab == 0)
-            engine->addStrategies("caster", "caster aoe", "bmana", nullptr);
-        else if (tab == 2)
-            engine->addStrategies("heal", "bmana", nullptr);
-        else
-            engine->addStrategies("melee", "melee aoe", "bdps", nullptr);
-
-        engine->addStrategies("dps assist", "cure", "totems", nullptr);
-        break;
-    case CLASS_PALADIN:
-        if (tab == 1)
-            engine->addStrategies("tank", "tank assist", "bthreat", "barmor", "cure", nullptr);
-        else if (tab == 0)
-            engine->addStrategies("heal", "dps assist", "cure", "bcast", nullptr);
-        else
-            engine->addStrategies("dps", "dps assist", "cure", "baoe", nullptr);
-
-        break;
-    case CLASS_DRUID:
-        if (tab == 0)
-        {
-            engine->addStrategies("caster", "cure", "caster aoe", "dps assist", nullptr);
-            engine->addStrategy("caster debuff");
-        }
-        else if (tab == 2)
-            engine->addStrategies("heal", "cure", "dps assist", nullptr);
-        else
-        {
-            if (player->GetLevel() >= 20 && !player->HasAura(16931) /*thick hide*/)
+        case CLASS_PRIEST:
+            if (tab == 2)
             {
-                engine->addStrategies("cat", "dps assist", nullptr);
+                engine->addStrategies("dps", "shadow debuff", "shadow aoe", nullptr);
+            }
+            else if (tab == PRIEST_TAB_DISIPLINE)
+            {
+                engine->addStrategies("heal", nullptr);
             }
             else
             {
-                engine->addStrategies("bear", "tank assist", nullptr);
+                engine->addStrategies("holy heal", nullptr);
             }
-        }
-        break;
-    case CLASS_HUNTER:
-        engine->addStrategies("dps", "aoe", "bdps", "dps assist", nullptr);
-        engine->addStrategy("dps debuff");
-        break;
-    case CLASS_ROGUE:
-        if (tab == ROGUE_TAB_ASSASSINATION)
-        {
-            engine->addStrategies("melee", "dps assist", "aoe", /*"behind",*/ nullptr);
-        }
-        else
-        {
-            engine->addStrategies("dps", "dps assist", "aoe", /*"behind",*/ nullptr);
-        }
-        break;
-    case CLASS_WARLOCK:
-        engine->addStrategies("dps assist", "dps", "dps debuff", "aoe", nullptr);
-        break;
-    case CLASS_DEATH_KNIGHT:
-        if (tab == 0)
-            engine->addStrategies("blood", "tank assist", nullptr);
-        else if (tab == 1)
-            engine->addStrategies("frost", "frost aoe", "dps assist", nullptr);
-        else
-            engine->addStrategies("unholy", "unholy aoe", "dps assist", nullptr);
 
-        break;
+            engine->addStrategies("dps assist", "cure", nullptr);
+            break;
+        case CLASS_MAGE:
+            if (tab == 0)
+                engine->addStrategies("arcane", "arcane aoe", nullptr);
+            else if (tab == 1)
+                engine->addStrategies("fire", "fire aoe", nullptr);
+            else
+                engine->addStrategies("frost", "frost aoe", nullptr);
+
+            engine->addStrategies("dps", "dps assist", "cure", nullptr);
+            break;
+        case CLASS_WARRIOR:
+            if (tab == 2)
+                engine->addStrategies("tank", "tank assist", "aoe", "mark rti", nullptr);
+            else if (player->GetLevel() < 36 || tab == 0)
+                engine->addStrategies("arms", "aoe", "dps assist", /*"behind",*/ nullptr);
+            else
+                engine->addStrategies("fury", "aoe", "dps assist", /*"behind",*/ nullptr);
+            break;
+        case CLASS_SHAMAN:
+            if (tab == 0)
+                engine->addStrategies("caster", "caster aoe", "bmana", nullptr);
+            else if (tab == 2)
+                engine->addStrategies("heal", "bmana", nullptr);
+            else
+                engine->addStrategies("melee", "melee aoe", "bdps", nullptr);
+
+            engine->addStrategies("dps assist", "cure", "totems", nullptr);
+            break;
+        case CLASS_PALADIN:
+            if (tab == 1)
+                engine->addStrategies("tank", "tank assist", "bthreat", "barmor", "cure", nullptr);
+            else if (tab == 0)
+                engine->addStrategies("heal", "dps assist", "cure", "bcast", nullptr);
+            else
+                engine->addStrategies("dps", "dps assist", "cure", "baoe", nullptr);
+
+            break;
+        case CLASS_DRUID:
+            if (tab == 0)
+            {
+                engine->addStrategies("caster", "cure", "caster aoe", "dps assist", nullptr);
+                engine->addStrategy("caster debuff");
+            }
+            else if (tab == 2)
+                engine->addStrategies("heal", "cure", "dps assist", nullptr);
+            else
+            {
+                if (player->GetLevel() >= 20 && !player->HasAura(16931) /*thick hide*/)
+                {
+                    engine->addStrategies("cat", "dps assist", nullptr);
+                }
+                else
+                {
+                    engine->addStrategies("bear", "tank assist", nullptr);
+                }
+            }
+            break;
+        case CLASS_HUNTER:
+            engine->addStrategies("dps", "aoe", "bdps", "dps assist", nullptr);
+            engine->addStrategy("dps debuff");
+            break;
+        case CLASS_ROGUE:
+            if (tab == ROGUE_TAB_ASSASSINATION)
+            {
+                engine->addStrategies("melee", "dps assist", "aoe", /*"behind",*/ nullptr);
+            }
+            else
+            {
+                engine->addStrategies("dps", "dps assist", "aoe", /*"behind",*/ nullptr);
+            }
+            break;
+        case CLASS_WARLOCK:
+            engine->addStrategies("dps assist", "dps", "dps debuff", "aoe", nullptr);
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if (tab == 0)
+                engine->addStrategies("blood", "tank assist", nullptr);
+            else if (tab == 1)
+                engine->addStrategies("frost", "frost aoe", "dps assist", nullptr);
+            else
+                engine->addStrategies("unholy", "unholy aoe", "dps assist", nullptr);
+
+            break;
     }
 
     if (facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player))
@@ -394,41 +398,41 @@ void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const fa
             // engine-
             switch (player->getClass())
             {
-            case CLASS_PRIEST:
-            {
-                if (tab != PRIEST_TAB_SHADOW)
+                case CLASS_PRIEST:
                 {
-                    engine->addStrategies("holy dps", "shadow debuff", "shadow aoe", nullptr);
+                    if (tab != PRIEST_TAB_SHADOW)
+                    {
+                        engine->addStrategies("holy dps", "shadow debuff", "shadow aoe", nullptr);
+                    }
+                    break;
                 }
-                break;
-            }
-            case CLASS_DRUID:
-            {
-                if (tab == DRUID_TAB_RESTORATION)
+                case CLASS_DRUID:
                 {
-                    engine->addStrategies("caster", "caster aoe", nullptr);
-                    engine->addStrategy("caster debuff");
+                    if (tab == DRUID_TAB_RESTORATION)
+                    {
+                        engine->addStrategies("caster", "caster aoe", nullptr);
+                        engine->addStrategy("caster debuff");
+                    }
+                    break;
                 }
-                break;
-            }
-            case CLASS_SHAMAN:
-            {
-                if (tab == SHAMAN_TAB_RESTORATION)
+                case CLASS_SHAMAN:
                 {
-                    engine->addStrategies("caster", "caster aoe", "bmana", nullptr);
+                    if (tab == SHAMAN_TAB_RESTORATION)
+                    {
+                        engine->addStrategies("caster", "caster aoe", "bmana", nullptr);
+                    }
+                    break;
                 }
-                break;
-            }
-            case CLASS_PALADIN:
-            {
-                if (tab == PALADIN_TAB_HOLY)
+                case CLASS_PALADIN:
                 {
-                    engine->addStrategies("dps", "dps assist", "baoe", nullptr);
+                    if (tab == PALADIN_TAB_HOLY)
+                    {
+                        engine->addStrategies("dps", "dps assist", "baoe", nullptr);
+                    }
+                    break;
                 }
-                break;
-            }
-            default:
-                break;
+                default:
+                    break;
             }
         }
     }
@@ -464,13 +468,15 @@ void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const fa
             engine->addStrategy("arena");
         }
 
-        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "cast time", "dps assist", nullptr);
+        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "cast time",
+                              "dps assist", nullptr);
         engine->removeStrategy("custom::say");
         engine->removeStrategy("flee");
         engine->removeStrategy("threat");
         engine->addStrategy("boost");
 
-        if ((player->getClass() == CLASS_DRUID && tab == 2) || (player->getClass() == CLASS_SHAMAN && tab == 2))
+        if ((player->getClass() == CLASS_DRUID && tab == 2) ||
+            (player->getClass() == CLASS_SHAMAN && tab == 2))
             engine->addStrategies("caster", "caster aoe", nullptr);
 
         if (player->getClass() == CLASS_DRUID && tab == 1)
@@ -481,112 +487,114 @@ void AiFactory::AddDefaultCombatStrategies(Player *player, PlayerbotAI *const fa
     }
 }
 
-Engine *AiFactory::createCombatEngine(Player *player, PlayerbotAI *const facade, AiObjectContext *aiObjectContext)
+Engine *AiFactory::createCombatEngine(Player *player, PlayerbotAI *const facade,
+                                      AiObjectContext *aiObjectContext)
 {
     Engine *engine = new Engine(facade, aiObjectContext);
     AddDefaultCombatStrategies(player, facade, engine);
     return engine;
 }
 
-void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const facade, Engine *nonCombatEngine)
+void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const facade,
+                                              Engine *nonCombatEngine)
 {
     uint8 tab = GetPlayerSpecTab(player);
 
     switch (player->getClass())
     {
-    case CLASS_PRIEST:
-        nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
-        break;
-    case CLASS_PALADIN:
-        if (tab == 1)
-        {
-            nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", nullptr);
-            if (player->GetLevel() >= 20)
-            {
-                nonCombatEngine->addStrategy("bstats");
-            }
-            else
-            {
-                nonCombatEngine->addStrategy("bdps");
-            }
-        }
-        else if (tab == 0)
-            nonCombatEngine->addStrategies("dps assist", "bmana", "bcast", nullptr);
-        else
-            nonCombatEngine->addStrategies("dps assist", "bdps", "baoe", nullptr);
-
-        nonCombatEngine->addStrategies("cure", nullptr);
-        break;
-    case CLASS_HUNTER:
-        nonCombatEngine->addStrategies("bdps", "dps assist", "pet", nullptr);
-        break;
-    case CLASS_SHAMAN:
-        if (tab == 0 || tab == 2)
-            nonCombatEngine->addStrategy("bmana");
-        else
-            nonCombatEngine->addStrategy("bdps");
-
-        nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
-        break;
-    case CLASS_MAGE:
-        if (tab == MAGE_TAB_ARCANE || tab == MAGE_TAB_FIRE)
-            nonCombatEngine->addStrategy("bdps");
-        else
-            nonCombatEngine->addStrategy("bmana");
-
-        nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
-        break;
-    case CLASS_DRUID:
-        if (tab == 1)
-        {
-            if (player->GetLevel() >= 20 && !player->HasAura(16931) /*thick hide*/)
-            {
-                nonCombatEngine->addStrategy("dps assist");
-            }
-            else
-            {
-                nonCombatEngine->addStrategy("tank assist");
-            }
-        }
-        else
+        case CLASS_PRIEST:
             nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
-        break;
-    case CLASS_WARRIOR:
-        if (tab == 2)
-            nonCombatEngine->addStrategy("tank assist");
-        else
+            break;
+        case CLASS_PALADIN:
+            if (tab == 1)
+            {
+                nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", nullptr);
+                if (player->GetLevel() >= 20)
+                {
+                    nonCombatEngine->addStrategy("bstats");
+                }
+                else
+                {
+                    nonCombatEngine->addStrategy("bdps");
+                }
+            }
+            else if (tab == 0)
+                nonCombatEngine->addStrategies("dps assist", "bmana", "bcast", nullptr);
+            else
+                nonCombatEngine->addStrategies("dps assist", "bdps", "baoe", nullptr);
+
+            nonCombatEngine->addStrategies("cure", nullptr);
+            break;
+        case CLASS_HUNTER:
+            nonCombatEngine->addStrategies("bdps", "dps assist", "pet", nullptr);
+            break;
+        case CLASS_SHAMAN:
+            if (tab == 0 || tab == 2)
+                nonCombatEngine->addStrategy("bmana");
+            else
+                nonCombatEngine->addStrategy("bdps");
+
+            nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
+            break;
+        case CLASS_MAGE:
+            if (tab == MAGE_TAB_ARCANE || tab == MAGE_TAB_FIRE)
+                nonCombatEngine->addStrategy("bdps");
+            else
+                nonCombatEngine->addStrategy("bmana");
+
+            nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
+            break;
+        case CLASS_DRUID:
+            if (tab == 1)
+            {
+                if (player->GetLevel() >= 20 && !player->HasAura(16931) /*thick hide*/)
+                {
+                    nonCombatEngine->addStrategy("dps assist");
+                }
+                else
+                {
+                    nonCombatEngine->addStrategy("tank assist");
+                }
+            }
+            else
+                nonCombatEngine->addStrategies("dps assist", "cure", nullptr);
+            break;
+        case CLASS_WARRIOR:
+            if (tab == 2)
+                nonCombatEngine->addStrategy("tank assist");
+            else
+                nonCombatEngine->addStrategy("dps assist");
+            break;
+        case CLASS_WARLOCK:
+            if (tab == WARLOCK_TAB_AFFLICATION)
+            {
+                nonCombatEngine->addStrategies("bmana", nullptr);
+            }
+            else if (tab == WARLOCK_TAB_DEMONOLOGY)
+            {
+                nonCombatEngine->addStrategies("bdps", nullptr);
+            }
+            else if (tab == WARLOCK_TAB_DESTRUCTION)
+            {
+                nonCombatEngine->addStrategies("bhealth", nullptr);
+            }
+            nonCombatEngine->addStrategies("dps assist", nullptr);
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if (tab == 0)
+                nonCombatEngine->addStrategy("tank assist");
+            else
+                nonCombatEngine->addStrategy("dps assist");
+            break;
+        default:
             nonCombatEngine->addStrategy("dps assist");
-        break;
-    case CLASS_WARLOCK:
-        if (tab == WARLOCK_TAB_AFFLICATION)
-        {
-            nonCombatEngine->addStrategies("bmana", nullptr);
-        }
-        else if (tab == WARLOCK_TAB_DEMONOLOGY)
-        {
-            nonCombatEngine->addStrategies("bdps", nullptr);
-        }
-        else if (tab == WARLOCK_TAB_DESTRUCTION)
-        {
-            nonCombatEngine->addStrategies("bhealth", nullptr);
-        }
-        nonCombatEngine->addStrategies("dps assist", nullptr);
-        break;
-    case CLASS_DEATH_KNIGHT:
-        if (tab == 0)
-            nonCombatEngine->addStrategy("tank assist");
-        else
-            nonCombatEngine->addStrategy("dps assist");
-        break;
-    default:
-        nonCombatEngine->addStrategy("dps assist");
-        break;
+            break;
     }
 
     if (!player->InBattleground())
     {
-        nonCombatEngine->addStrategies("nc", "food", "chat", "follow",
-                                       "default", "quest", "loot", "gather", "duel", "buff", "mount", nullptr);
+        nonCombatEngine->addStrategies("nc", "food", "chat", "follow", "default", "quest", "loot",
+                                       "gather", "duel", "buff", "mount", nullptr);
     }
     if (sPlayerbotAIConfig->autoSaveMana)
     {
@@ -658,7 +666,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
                         // if (masterBotAI)
                         //     nonCombatEngine->addStrategy("maintenance");
 
-                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig->randomBotNonCombatStrategies);
+                        nonCombatEngine->ChangeStrategy(
+                            sPlayerbotAIConfig->randomBotNonCombatStrategies);
                     }
                     else
                     {
@@ -678,7 +687,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
     // Battleground switch
     if (player->InBattleground() && player->GetBattleground())
     {
-        nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp", "dps assist", "attack tagged", nullptr);
+        nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp",
+                                       "dps assist", "attack tagged", nullptr);
         nonCombatEngine->removeStrategy("custom::say");
         nonCombatEngine->removeStrategy("travel");
         nonCombatEngine->removeStrategy("rpg");
@@ -688,7 +698,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
         if (bgType == BATTLEGROUND_RB)
             bgType = player->GetBattleground()->GetBgTypeID(true);
 
-        if ((bgType <= BATTLEGROUND_EY || bgType == BATTLEGROUND_IC) && !player->InArena()) // do not add for not supported bg or arena
+        if ((bgType <= BATTLEGROUND_EY || bgType == BATTLEGROUND_IC) &&
+            !player->InArena())  // do not add for not supported bg or arena
             nonCombatEngine->addStrategy("battleground");
 
         if (bgType == BATTLEGROUND_WS)
@@ -714,7 +725,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player *player, PlayerbotAI *const
     }
 }
 
-Engine *AiFactory::createNonCombatEngine(Player *player, PlayerbotAI *const facade, AiObjectContext *aiObjectContext)
+Engine *AiFactory::createNonCombatEngine(Player *player, PlayerbotAI *const facade,
+                                         AiObjectContext *aiObjectContext)
 {
     Engine *nonCombatEngine = new Engine(facade, aiObjectContext);
 
@@ -722,9 +734,10 @@ Engine *AiFactory::createNonCombatEngine(Player *player, PlayerbotAI *const faca
     return nonCombatEngine;
 }
 
-void AiFactory::AddDefaultDeadStrategies(Player *player, PlayerbotAI *const facade, Engine *deadEngine)
+void AiFactory::AddDefaultDeadStrategies(Player *player, PlayerbotAI *const facade,
+                                         Engine *deadEngine)
 {
-    (void)facade; // unused and remove warning
+    (void)facade;  // unused and remove warning
     deadEngine->addStrategies("dead", "stay", "chat", "default", "follow", nullptr);
 
     if (sRandomPlayerbotMgr->IsRandomBot(player) && !player->GetGroup())
@@ -733,7 +746,8 @@ void AiFactory::AddDefaultDeadStrategies(Player *player, PlayerbotAI *const faca
     }
 }
 
-Engine *AiFactory::createDeadEngine(Player *player, PlayerbotAI *const facade, AiObjectContext *AiObjectContext)
+Engine *AiFactory::createDeadEngine(Player *player, PlayerbotAI *const facade,
+                                    AiObjectContext *AiObjectContext)
 {
     Engine *deadEngine = new Engine(facade, AiObjectContext);
     AddDefaultDeadStrategies(player, facade, deadEngine);

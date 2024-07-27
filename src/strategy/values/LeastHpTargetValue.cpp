@@ -1,14 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "LeastHpTargetValue.h"
+
 #include "AttackersValue.h"
 #include "Playerbots.h"
 
 class FindLeastHpTargetStrategy : public FindNonCcTargetStrategy
 {
-public:
+   public:
     FindLeastHpTargetStrategy(PlayerbotAI *botAI) : FindNonCcTargetStrategy(botAI), minHealth(0) {}
 
     void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override
@@ -21,7 +24,7 @@ public:
             result = attacker;
     }
 
-protected:
+   protected:
     float minHealth;
 };
 

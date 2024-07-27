@@ -1,14 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "DistanceValue.h"
+
 #include "Formations.h"
-#include "PositionValue.h"
-#include "Stances.h"
 #include "LootObjectStack.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 #include "ServerFacade.h"
+#include "Stances.h"
 
 float DistanceValue::Calculate()
 {
@@ -74,7 +77,8 @@ float DistanceValue::Calculate()
         {
             Formation *formation = AI_VALUE(Formation *, "formation");
             WorldLocation loc = formation->GetLocation();
-            return sServerFacade->GetDistance2d(botAI->GetBot(), loc.GetPositionX(), loc.GetPositionY());
+            return sServerFacade->GetDistance2d(botAI->GetBot(), loc.GetPositionX(),
+                                                loc.GetPositionY());
         }
     }
 
@@ -93,6 +97,7 @@ bool InsideTargetValue::Calculate()
     if (!target || !target->IsInWorld() || target == botAI->GetBot())
         return false;
 
-    float dist = sServerFacade->GetDistance2d(botAI->GetBot(), target->GetPositionX(), target->GetPositionY());
+    float dist = sServerFacade->GetDistance2d(botAI->GetBot(), target->GetPositionX(),
+                                              target->GetPositionY());
     return sServerFacade->IsDistanceLessThan(dist, target->GetCombatReach());
 }

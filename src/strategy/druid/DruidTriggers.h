@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_DRUIDTRIGGERS_H
@@ -7,22 +9,25 @@
 
 #include "CureTriggers.h"
 #include "GenericTriggers.h"
-#include "SharedDefines.h"
 #include "Player.h"
+#include "SharedDefines.h"
 
 class PlayerbotAI;
 
 class MarkOfTheWildOnPartyTrigger : public BuffOnPartyTrigger
 {
-public:
-    MarkOfTheWildOnPartyTrigger(PlayerbotAI *botAI) : BuffOnPartyTrigger(botAI, "mark of the wild", 2 * 2000) {}
+   public:
+    MarkOfTheWildOnPartyTrigger(PlayerbotAI *botAI)
+        : BuffOnPartyTrigger(botAI, "mark of the wild", 2 * 2000)
+    {
+    }
 
     bool IsActive() override;
 };
 
 class MarkOfTheWildTrigger : public BuffTrigger
 {
-public:
+   public:
     MarkOfTheWildTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "mark of the wild", 2 * 2000) {}
 
     bool IsActive() override;
@@ -30,7 +35,7 @@ public:
 
 class ThornsOnPartyTrigger : public BuffOnPartyTrigger
 {
-public:
+   public:
     ThornsOnPartyTrigger(PlayerbotAI *botAI) : BuffOnPartyTrigger(botAI, "thorns", 2 * 2000) {}
 
     bool IsActive() override;
@@ -38,13 +43,16 @@ public:
 
 class ThornsOnMainTankTrigger : public BuffOnMainTankTrigger
 {
-public:
-    ThornsOnMainTankTrigger(PlayerbotAI *botAI) : BuffOnMainTankTrigger(botAI, "thorns", false, 2 * 2000) {}
+   public:
+    ThornsOnMainTankTrigger(PlayerbotAI *botAI)
+        : BuffOnMainTankTrigger(botAI, "thorns", false, 2 * 2000)
+    {
+    }
 };
 
 class ThornsTrigger : public BuffTrigger
 {
-public:
+   public:
     ThornsTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "thorns", 2 * 2000) {}
 
     bool IsActive() override;
@@ -52,25 +60,25 @@ public:
 
 class OmenOfClarityTrigger : public BuffTrigger
 {
-public:
+   public:
     OmenOfClarityTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "omen of clarity") {}
 };
 
 class RakeTrigger : public DebuffTrigger
 {
-public:
+   public:
     RakeTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "rake", 1, true) {}
 };
 
 class InsectSwarmTrigger : public DebuffTrigger
 {
-public:
+   public:
     InsectSwarmTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "insect swarm", 1, true) {}
 };
 
 class MoonfireTrigger : public DebuffTrigger
 {
-public:
+   public:
     MoonfireTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "moonfire", 1, true) {}
 
     bool IsActive() override;
@@ -78,43 +86,43 @@ public:
 
 class FaerieFireTrigger : public DebuffTrigger
 {
-public:
+   public:
     FaerieFireTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "faerie fire", 1, false, 25.0f) {}
 };
 
 class FaerieFireFeralTrigger : public DebuffTrigger
 {
-public:
+   public:
     FaerieFireFeralTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "faerie fire (feral)") {}
 };
 
 class BashInterruptSpellTrigger : public InterruptSpellTrigger
 {
-public:
+   public:
     BashInterruptSpellTrigger(PlayerbotAI *botAI) : InterruptSpellTrigger(botAI, "bash") {}
 };
 
 class TigersFuryTrigger : public BoostTrigger
 {
-public:
+   public:
     TigersFuryTrigger(PlayerbotAI *botAI) : BoostTrigger(botAI, "tiger's fury") {}
 };
 
 class NaturesGraspTrigger : public BoostTrigger
 {
-public:
+   public:
     NaturesGraspTrigger(PlayerbotAI *botAI) : BoostTrigger(botAI, "nature's grasp") {}
 };
 
 class EntanglingRootsTrigger : public HasCcTargetTrigger
 {
-public:
+   public:
     EntanglingRootsTrigger(PlayerbotAI *botAI) : HasCcTargetTrigger(botAI, "entangling roots") {}
 };
 
 class EntanglingRootsKiteTrigger : public DebuffTrigger
 {
-public:
+   public:
     EntanglingRootsKiteTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "entangling roots") {}
 
     bool IsActive() override;
@@ -122,25 +130,28 @@ public:
 
 class HibernateTrigger : public HasCcTargetTrigger
 {
-public:
+   public:
     HibernateTrigger(PlayerbotAI *botAI) : HasCcTargetTrigger(botAI, "hibernate") {}
 };
 
 class CurePoisonTrigger : public NeedCureTrigger
 {
-public:
+   public:
     CurePoisonTrigger(PlayerbotAI *botAI) : NeedCureTrigger(botAI, "cure poison", DISPEL_POISON) {}
 };
 
 class PartyMemberCurePoisonTrigger : public PartyMemberNeedCureTrigger
 {
-public:
-    PartyMemberCurePoisonTrigger(PlayerbotAI *botAI) : PartyMemberNeedCureTrigger(botAI, "cure poison", DISPEL_POISON) {}
+   public:
+    PartyMemberCurePoisonTrigger(PlayerbotAI *botAI)
+        : PartyMemberNeedCureTrigger(botAI, "cure poison", DISPEL_POISON)
+    {
+    }
 };
 
 class BearFormTrigger : public BuffTrigger
 {
-public:
+   public:
     BearFormTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "bear form") {}
 
     bool IsActive() override;
@@ -148,7 +159,7 @@ public:
 
 class TreeFormTrigger : public BuffTrigger
 {
-public:
+   public:
     TreeFormTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "tree of life") {}
 
     bool IsActive() override;
@@ -156,7 +167,7 @@ public:
 
 class CatFormTrigger : public BuffTrigger
 {
-public:
+   public:
     CatFormTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "cat form") {}
 
     bool IsActive() override;
@@ -164,52 +175,52 @@ public:
 
 class EclipseSolarTrigger : public HasAuraTrigger
 {
-public:
+   public:
     EclipseSolarTrigger(PlayerbotAI *botAI) : HasAuraTrigger(botAI, "eclipse (solar)") {}
 };
 
 class EclipseLunarTrigger : public HasAuraTrigger
 {
-public:
+   public:
     EclipseLunarTrigger(PlayerbotAI *botAI) : HasAuraTrigger(botAI, "eclipse (lunar)") {}
 };
 
 class BashInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
 {
-public:
-    BashInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI) : InterruptEnemyHealerTrigger(botAI, "bash") {}
+   public:
+    BashInterruptEnemyHealerSpellTrigger(PlayerbotAI *botAI)
+        : InterruptEnemyHealerTrigger(botAI, "bash")
+    {
+    }
 };
 
 class NaturesSwiftnessTrigger : public BuffTrigger
 {
-public:
+   public:
     NaturesSwiftnessTrigger(PlayerbotAI *botAI) : BuffTrigger(botAI, "nature's swiftness") {}
 };
 
 class DruidPartyMemberRemoveCurseTrigger : public PartyMemberNeedCureTrigger
 {
-public:
-    DruidPartyMemberRemoveCurseTrigger(PlayerbotAI *ai) : PartyMemberNeedCureTrigger(ai, "druid remove curse", DISPEL_CURSE) {}
+   public:
+    DruidPartyMemberRemoveCurseTrigger(PlayerbotAI *ai)
+        : PartyMemberNeedCureTrigger(ai, "druid remove curse", DISPEL_CURSE)
+    {
+    }
 };
 
 class EclipseSolarCooldownTrigger : public SpellCooldownTrigger
 {
-public:
+   public:
     EclipseSolarCooldownTrigger(PlayerbotAI *ai) : SpellCooldownTrigger(ai, "eclipse (solar)") {}
-    bool IsActive() override
-    {
-        return bot->HasSpellCooldown(48517);
-    }
+    bool IsActive() override { return bot->HasSpellCooldown(48517); }
 };
 
 class EclipseLunarCooldownTrigger : public SpellCooldownTrigger
 {
-public:
+   public:
     EclipseLunarCooldownTrigger(PlayerbotAI *ai) : SpellCooldownTrigger(ai, "eclipse (lunar)") {}
-    bool IsActive() override
-    {
-        return bot->HasSpellCooldown(48518);
-    }
+    bool IsActive() override { return bot->HasSpellCooldown(48518); }
 };
 
 #endif

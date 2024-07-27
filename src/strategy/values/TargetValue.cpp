@@ -1,19 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "TargetValue.h"
+
 #include "LastMovementValue.h"
 #include "ObjectGuid.h"
-#include "RtiTargetValue.h"
 #include "Playerbots.h"
+#include "RtiTargetValue.h"
 #include "ScriptedCreature.h"
 #include "ThreatMgr.h"
 
-Unit *FindTargetStrategy::GetResult()
-{
-    return result;
-}
+Unit *FindTargetStrategy::GetResult() { return result; }
 
 Unit *TargetValue::FindTarget(FindTargetStrategy *strategy)
 {
@@ -44,10 +44,12 @@ bool FindNonCcTargetStrategy::IsCcTarget(Unit *attacker)
 
             if (PlayerbotAI *botAI = GET_PLAYERBOT_AI(member))
             {
-                if (botAI->GetAiObjectContext()->GetValue<Unit*>("rti cc target")->Get() == attacker)
+                if (botAI->GetAiObjectContext()->GetValue<Unit *>("rti cc target")->Get() ==
+                    attacker)
                     return true;
 
-                std::string const rti = botAI->GetAiObjectContext()->GetValue<std::string>("rti cc")->Get();
+                std::string const rti =
+                    botAI->GetAiObjectContext()->GetValue<std::string>("rti cc")->Get();
                 int32 index = RtiTargetValue::GetRtiIndex(rti);
                 if (index != -1)
                 {
@@ -109,7 +111,8 @@ bool FindTargetStrategy::IsHighPriority(Unit *attacker)
             return true;
         }
     }
-    GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
+    GuidVector prioritizedTargets =
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
     for (ObjectGuid targetGuid : prioritizedTargets)
     {
         if (targetGuid && attacker->GetGUID() == targetGuid)
@@ -131,7 +134,8 @@ WorldPosition LastLongMoveValue::Calculate()
 
 WorldPosition HomeBindValue::Calculate()
 {
-    return WorldPosition(bot->m_homebindMapId, bot->m_homebindX, bot->m_homebindY, bot->m_homebindZ, 0.f);
+    return WorldPosition(bot->m_homebindMapId, bot->m_homebindX, bot->m_homebindY, bot->m_homebindZ,
+                         0.f);
 }
 
 Unit *FindTargetValue::Calculate()
@@ -153,7 +157,8 @@ Unit *FindTargetValue::Calculate()
         std::wstring wnamepart;
         Utf8toWStr(unit->GetName(), wnamepart);
         wstrToLower(wnamepart);
-        if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart))
+        if (!qualifier.empty() && qualifier.length() == wnamepart.length() &&
+            Utf8FitTo(qualifier, wnamepart))
         {
             return unit;
         }
@@ -165,7 +170,7 @@ Unit *FindTargetValue::Calculate()
 void FindBossTargetStrategy::CheckAttacker(Unit *attacker, ThreatMgr *threatManager)
 {
     UnitAI *unitAI = attacker->GetAI();
-    BossAI *bossAI = dynamic_cast<BossAI*>(unitAI);
+    BossAI *bossAI = dynamic_cast<BossAI *>(unitAI);
     if (bossAI)
     {
         result = attacker;

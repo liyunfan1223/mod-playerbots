@@ -1,12 +1,13 @@
 
+#include "RaidNaxxActions.h"
+
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
-#include "RaidNaxxActions.h"
+#include "RaidNaxxBossHelper.h"
 #include "RaidNaxxStrategy.h"
 #include "ScriptedCreature.h"
 #include "SharedDefines.h"
-#include "RaidNaxxBossHelper.h"
 
 bool GrobbulusGoBehindAction::Execute(Event event)
 {
@@ -49,7 +50,7 @@ uint32 GrobbulusRotateAction::GetCurrWaypoint()
     {
         return false;
     }
-    auto *boss_ai = dynamic_cast<Grobbulus::boss_grobbulus::boss_grobbulusAI*>(boss->GetAI());
+    auto *boss_ai = dynamic_cast<Grobbulus::boss_grobbulus::boss_grobbulusAI *>(boss->GetAI());
     EventMap *eventMap = &boss_ai->events;
     const uint32 event_time = eventMap->GetNextEventTime(2);
     return (event_time / 15000) % intervals;
@@ -62,13 +63,14 @@ bool HeiganDanceAction::CalculateSafe()
     {
         return false;
     }
-    auto *boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(boss->GetAI());
+    auto *boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI *>(boss->GetAI());
     EventMap *eventMap = &boss_ai->events;
     uint32 curr_phase = boss_ai->currentPhase;
     uint32 curr_erupt = eventMap->GetNextEventTime(3);
     uint32 curr_dance = eventMap->GetNextEventTime(4);
     uint32 curr_timer = eventMap->GetTimer();
-    if ((curr_phase == 0 && curr_dance - curr_timer >= 85000) || (curr_phase == 1 && curr_dance - curr_timer >= 40000))
+    if ((curr_phase == 0 && curr_dance - curr_timer >= 85000) ||
+        (curr_phase == 1 && curr_dance - curr_timer >= 40000))
     {
         ResetSafe();
     }
@@ -89,7 +91,8 @@ bool HeiganDanceMeleeAction::Execute(Event event)
         return false;
     }
     assert(curr_safe >= 0 && curr_safe <= 3);
-    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), botAI->IsMainTank(bot) ? 0 : 0);
+    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second,
+                      bot->GetPositionZ(), botAI->IsMainTank(bot) ? 0 : 0);
 }
 
 bool HeiganDanceRangedAction::Execute(Event event)
@@ -100,7 +103,8 @@ bool HeiganDanceRangedAction::Execute(Event event)
         return MoveTo(bot->GetMapId(), platform.first, platform.second, 276.54f);
     }
     botAI->InterruptSpell();
-    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), 0);
+    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second,
+                      bot->GetPositionZ(), 0);
 }
 
 bool ThaddiusAttackNearestPetAction::isUseful()
@@ -145,10 +149,7 @@ bool ThaddiusAttackNearestPetAction::Execute(Event event)
     return false;
 }
 
-bool ThaddiusMoveToPlatformAction::isUseful()
-{
-    return true;
-}
+bool ThaddiusMoveToPlatformAction::isUseful() { return true; }
 
 bool ThaddiusMoveToPlatformAction::Execute(Event event)
 {
@@ -165,21 +166,24 @@ bool ThaddiusMoveToPlatformAction::Execute(Event event)
         {3512.19f, -2928.58f},
     };
     float high_z = 312.00f, low_z = 304.02f;
-    bool is_left = bot->GetDistance2d(position[0].first, position[0].second) < bot->GetDistance2d(position[1].first, position[1].second);
+    bool is_left = bot->GetDistance2d(position[0].first, position[0].second) <
+                   bot->GetDistance2d(position[1].first, position[1].second);
     if (bot->GetPositionZ() >= (high_z - 3.0f))
     {
         if (is_left)
         {
             if (!MoveTo(bot->GetMapId(), position[0].first, position[0].second, high_z))
             {
-                bot->TeleportTo(bot->GetMapId(), position[2].first, position[2].second, low_z, bot->GetOrientation());
+                bot->TeleportTo(bot->GetMapId(), position[2].first, position[2].second, low_z,
+                                bot->GetOrientation());
             }
         }
         else
         {
             if (!MoveTo(bot->GetMapId(), position[1].first, position[1].second, high_z))
             {
-                bot->TeleportTo(bot->GetMapId(), position[3].first, position[3].second, low_z, bot->GetOrientation());
+                bot->TeleportTo(bot->GetMapId(), position[3].first, position[3].second, low_z,
+                                bot->GetOrientation());
             }
         }
     }
@@ -401,7 +405,7 @@ bool HorsemanAttractAlternativelyAction::Execute(Event event)
         return true;
     }
     Unit *attackTarget = helper.CurrentAttackTarget();
-    if (context->GetValue<Unit*>("current target")->Get() != attackTarget)
+    if (context->GetValue<Unit *>("current target")->Get() != attackTarget)
     {
         return Attack(attackTarget);
     }
@@ -419,7 +423,7 @@ bool HorsemanAttactInOrderAction::Execute(Event event)
     Unit *baron = AI_VALUE2(Unit *, "find target", "baron rivendare");
     Unit *lady = AI_VALUE2(Unit *, "find target", "lady blaumeux");
     Unit *sir = AI_VALUE2(Unit *, "find target", "sir zeliek");
-    std::vector<Unit*> attack_order;
+    std::vector<Unit *> attack_order;
     if (botAI->IsAssistTank(bot))
     {
         attack_order = {baron, thane, lady, sir};
@@ -438,7 +442,8 @@ bool HorsemanAttactInOrderAction::Execute(Event event)
     }
     if (target)
     {
-        if (context->GetValue<Unit*>("current target")->Get() == target && botAI->GetState() == BOT_STATE_COMBAT)
+        if (context->GetValue<Unit *>("current target")->Get() == target &&
+            botAI->GetState() == BOT_STATE_COMBAT)
         {
             return false;
         }
@@ -461,7 +466,8 @@ bool SapphironGroundPositionAction::Execute(Event event)
     {
         if (AI_VALUE2(bool, "has aggro", "current target"))
         {
-            return MoveTo(NAXX_MAP_ID, helper.mainTankPos.first, helper.mainTankPos.second, helper.GENERIC_HEIGHT);
+            return MoveTo(NAXX_MAP_ID, helper.mainTankPos.first, helper.mainTankPos.second,
+                          helper.GENERIC_HEIGHT);
         }
         return false;
     }
@@ -484,7 +490,8 @@ bool SapphironGroundPositionAction::Execute(Event event)
         {
             distance = 5.0f;
         }
-        return MoveTo(NAXX_MAP_ID, helper.center.first + cos(angle) * distance, helper.center.second + sin(angle) * distance, helper.GENERIC_HEIGHT);
+        return MoveTo(NAXX_MAP_ID, helper.center.first + cos(angle) * distance,
+                      helper.center.second + sin(angle) * distance, helper.GENERIC_HEIGHT);
     }
     else
     {
@@ -546,7 +553,9 @@ bool SapphironFlightPositionAction::MoveToNearestIcebolt()
         if (boss)
         {
             float angle = boss->GetAngle(playerWithIcebolt);
-            return MoveTo(NAXX_MAP_ID, playerWithIcebolt->GetPositionX() + cos(angle) * 3.0f, playerWithIcebolt->GetPositionY() + sin(angle) * 3.0f, helper.GENERIC_HEIGHT);
+            return MoveTo(NAXX_MAP_ID, playerWithIcebolt->GetPositionX() + cos(angle) * 3.0f,
+                          playerWithIcebolt->GetPositionY() + sin(angle) * 3.0f,
+                          helper.GENERIC_HEIGHT);
         }
     }
     return false;
@@ -560,7 +569,8 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
     }
     GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
     Unit *target = nullptr;
-    Unit *target_soldier = nullptr, *target_weaver = nullptr, *target_abomination = nullptr, *target_kelthuzad = nullptr, *target_guardian = nullptr;
+    Unit *target_soldier = nullptr, *target_weaver = nullptr, *target_abomination = nullptr,
+         *target_kelthuzad = nullptr, *target_guardian = nullptr;
     for (auto i = attackers.begin(); i != attackers.end(); ++i)
     {
         Unit *unit = botAI->GetUnit(*i);
@@ -575,14 +585,17 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
             }
             else if (unit->GetVictim() && target_guardian->GetVictim() &&
                      unit->GetVictim()->ToPlayer() && target_guardian->GetVictim()->ToPlayer() &&
-                     !botAI->IsAssistTank(unit->GetVictim()->ToPlayer()) && botAI->IsAssistTank(target_guardian->GetVictim()->ToPlayer()))
+                     !botAI->IsAssistTank(unit->GetVictim()->ToPlayer()) &&
+                     botAI->IsAssistTank(target_guardian->GetVictim()->ToPlayer()))
             {
                 target_guardian = unit;
             }
             else if (unit->GetVictim() && target_guardian->GetVictim() &&
                      unit->GetVictim()->ToPlayer() && target_guardian->GetVictim()->ToPlayer() &&
-                     !botAI->IsAssistTank(unit->GetVictim()->ToPlayer()) && !botAI->IsAssistTank(target_guardian->GetVictim()->ToPlayer()) &&
-                     target_guardian->GetDistance2d(helper.center.first, helper.center.second) > bot->GetDistance2d(unit))
+                     !botAI->IsAssistTank(unit->GetVictim()->ToPlayer()) &&
+                     !botAI->IsAssistTank(target_guardian->GetVictim()->ToPlayer()) &&
+                     target_guardian->GetDistance2d(helper.center.first, helper.center.second) >
+                         bot->GetDistance2d(unit))
             {
                 target_guardian = unit;
             }
@@ -599,7 +612,8 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
         if (botAI->EqualLowercaseName(unit->GetName(), "unstoppable abomination"))
         {
             if (target_abomination == nullptr ||
-                target_abomination->GetDistance2d(helper.center.first, helper.center.second) > unit->GetDistance2d(helper.center.first, helper.center.second))
+                target_abomination->GetDistance2d(helper.center.first, helper.center.second) >
+                    unit->GetDistance2d(helper.center.first, helper.center.second))
             {
                 target_abomination = unit;
             }
@@ -607,7 +621,8 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
         if (botAI->EqualLowercaseName(unit->GetName(), "soldier of the frozen wastes"))
         {
             if (target_soldier == nullptr ||
-                target_soldier->GetDistance2d(helper.center.first, helper.center.second) > unit->GetDistance2d(helper.center.first, helper.center.second))
+                target_soldier->GetDistance2d(helper.center.first, helper.center.second) >
+                    unit->GetDistance2d(helper.center.first, helper.center.second))
             {
                 target_soldier = unit;
             }
@@ -615,7 +630,8 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
         if (botAI->EqualLowercaseName(unit->GetName(), "soul weaver"))
         {
             if (target_weaver == nullptr ||
-                target_weaver->GetDistance2d(helper.center.first, helper.center.second) > unit->GetDistance2d(helper.center.first, helper.center.second))
+                target_weaver->GetDistance2d(helper.center.first, helper.center.second) >
+                    unit->GetDistance2d(helper.center.first, helper.center.second))
             {
                 target_weaver = unit;
             }
@@ -625,7 +641,7 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
             target_kelthuzad = unit;
         }
     }
-    std::vector<Unit*> targets;
+    std::vector<Unit *> targets;
     if (botAI->IsRanged(bot))
     {
         if (botAI->GetRangedDpsIndex(bot) <= 1)
@@ -653,7 +669,7 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
             break;
         }
     }
-    if (context->GetValue<Unit*>("current target")->Get() == target)
+    if (context->GetValue<Unit *>("current target")->Get() == target)
     {
         return false;
     }
@@ -674,7 +690,8 @@ bool KelthuzadPositionAction::Execute(Event event)
     {
         if (AI_VALUE(Unit *, "current target") == nullptr)
         {
-            return MoveInside(NAXX_MAP_ID, helper.center.first, helper.center.second, bot->GetPositionZ(), 3.0f);
+            return MoveInside(NAXX_MAP_ID, helper.center.first, helper.center.second,
+                              bot->GetPositionZ(), 3.0f);
         }
     }
     else if (helper.IsPhaseTwo())
@@ -687,7 +704,8 @@ bool KelthuzadPositionAction::Execute(Event event)
             {
                 if (AI_VALUE2(bool, "has aggro", "current target"))
                 {
-                    return MoveTo(NAXX_MAP_ID, helper.tank_pos.first, helper.tank_pos.second, bot->GetPositionZ());
+                    return MoveTo(NAXX_MAP_ID, helper.tank_pos.first, helper.tank_pos.second,
+                                  bot->GetPositionZ());
                 }
                 else
                 {
@@ -719,7 +737,8 @@ bool KelthuzadPositionAction::Execute(Event event)
                     botAI->EqualLowercaseName(cur_tar->GetName(), "guardian of icecrown") &&
                     botAI->IsAssistTank(cur_tar->GetVictim()->ToPlayer()))
                 {
-                    return MoveTo(NAXX_MAP_ID, helper.assist_tank_pos.first, helper.assist_tank_pos.second, bot->GetPositionZ());
+                    return MoveTo(NAXX_MAP_ID, helper.assist_tank_pos.first,
+                                  helper.assist_tank_pos.second, bot->GetPositionZ());
                 }
                 else
                 {
@@ -752,7 +771,7 @@ bool AnubrekhanChooseTargetAction::Execute(Event event)
     GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
     Unit *target = nullptr;
     Unit *target_boss = nullptr;
-    std::vector<Unit*> target_guards;
+    std::vector<Unit *> target_guards;
     for (ObjectGuid const guid : attackers)
     {
         Unit *unit = botAI->GetUnit(guid);
@@ -783,7 +802,9 @@ bool AnubrekhanChooseTargetAction::Execute(Event event)
             {
                 for (Unit *t : target_guards)
                 {
-                    if (target == nullptr || (target->GetVictim() && target->GetVictim()->ToPlayer() && botAI->IsTank(target->GetVictim()->ToPlayer())))
+                    if (target == nullptr ||
+                        (target->GetVictim() && target->GetVictim()->ToPlayer() &&
+                         botAI->IsTank(target->GetVictim()->ToPlayer())))
                     {
                         target = t;
                     }
@@ -801,7 +822,7 @@ bool AnubrekhanChooseTargetAction::Execute(Event event)
             }
         }
     }
-    if (context->GetValue<Unit*>("current target")->Get() == target)
+    if (context->GetValue<Unit *>("current target")->Get() == target)
     {
         return false;
     }
@@ -815,7 +836,7 @@ bool AnubrekhanPositionAction::Execute(Event event)
     {
         return false;
     }
-    auto *boss_ai = dynamic_cast<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI*>(boss->GetAI());
+    auto *boss_ai = dynamic_cast<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI *>(boss->GetAI());
     if (!boss_ai)
     {
         return false;
@@ -823,7 +844,8 @@ bool AnubrekhanPositionAction::Execute(Event event)
     EventMap *eventMap = &boss_ai->events;
     uint32 locust = eventMap->GetNextEventTime(2);
     uint32 timer = eventMap->GetTimer();
-    bool inPhase = botAI->HasAura("locust swarm", boss) || boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    bool inPhase =
+        botAI->HasAura("locust swarm", boss) || boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (inPhase || (locust && locust - timer <= 8000))
     {
         if (botAI->IsMainTank(bot))
@@ -838,7 +860,8 @@ bool AnubrekhanPositionAction::Execute(Event event)
             {
                 next_point = nearest;
             }
-            return MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ());
+            return MoveTo(bot->GetMapId(), waypoints[next_point].first,
+                          waypoints[next_point].second, bot->GetPositionZ());
         }
         else
         {
@@ -857,7 +880,7 @@ bool GluthChooseTargetAction::Execute(Event event)
     GuidVector attackers = context->GetValue<GuidVector>("possible targets")->Get();
     Unit *target = nullptr;
     Unit *target_boss = nullptr;
-    std::vector<Unit*> target_zombies;
+    std::vector<Unit *> target_zombies;
     for (GuidVector::iterator i = attackers.begin(); i != attackers.end(); ++i)
     {
         Unit *unit = botAI->GetUnit(*i);
@@ -884,7 +907,8 @@ bool GluthChooseTargetAction::Execute(Event event)
     {
         for (Unit *t : target_zombies)
         {
-            if (t->GetHealthPct() > helper.decimatedZombiePct && t->GetVictim() != bot && t->GetDistance2d(bot) <= 10.0f)
+            if (t->GetHealthPct() > helper.decimatedZombiePct && t->GetVictim() != bot &&
+                t->GetDistance2d(bot) <= 10.0f)
             {
                 if (!target || t->GetDistance2d(bot) < target->GetDistance2d(bot))
                 {
@@ -893,12 +917,14 @@ bool GluthChooseTargetAction::Execute(Event event)
             }
         }
     }
-    else if (botAI->GetClassIndex(bot, CLASS_HUNTER) == 0 || botAI->GetClassIndex(bot, CLASS_HUNTER) == 1)
+    else if (botAI->GetClassIndex(bot, CLASS_HUNTER) == 0 ||
+             botAI->GetClassIndex(bot, CLASS_HUNTER) == 1)
     {
         // prevent zombie go straight to gluth
         for (Unit *t : target_zombies)
         {
-            if (t->GetHealthPct() > helper.decimatedZombiePct && t->GetVictim() == target_boss && t->GetDistance2d(bot) <= sPlayerbotAIConfig->spellDistance)
+            if (t->GetHealthPct() > helper.decimatedZombiePct && t->GetVictim() == target_boss &&
+                t->GetDistance2d(bot) <= sPlayerbotAIConfig->spellDistance)
             {
                 if (!target || t->GetDistance2d(bot) < target->GetDistance2d(bot))
                 {
@@ -930,7 +956,7 @@ bool GluthChooseTargetAction::Execute(Event event)
             target = target_boss;
         }
     }
-    if (!target || context->GetValue<Unit*>("current target")->Get() == target)
+    if (!target || context->GetValue<Unit *>("current target")->Get() == target)
     {
         return false;
     }
@@ -953,11 +979,13 @@ bool GluthPositionAction::Execute(Event event)
         {
             if (raid25)
             {
-                return MoveTo(NAXX_MAP_ID, helper.mainTankPos25.first, helper.mainTankPos25.second, bot->GetPositionZ());
+                return MoveTo(NAXX_MAP_ID, helper.mainTankPos25.first, helper.mainTankPos25.second,
+                              bot->GetPositionZ());
             }
             else
             {
-                return MoveTo(NAXX_MAP_ID, helper.mainTankPos10.first, helper.mainTankPos10.second, bot->GetPositionZ());
+                return MoveTo(NAXX_MAP_ID, helper.mainTankPos10.first, helper.mainTankPos10.second,
+                              bot->GetPositionZ());
             }
         }
     }
@@ -965,7 +993,8 @@ bool GluthPositionAction::Execute(Event event)
     {
         if (helper.BeforeDecimate())
         {
-            return MoveTo(bot->GetMapId(), helper.beforeDecimatePos.first, helper.beforeDecimatePos.second, bot->GetPositionZ());
+            return MoveTo(bot->GetMapId(), helper.beforeDecimatePos.first,
+                          helper.beforeDecimatePos.second, bot->GetPositionZ());
         }
         else
         {
@@ -973,7 +1002,8 @@ bool GluthPositionAction::Execute(Event event)
             {
                 uint32 nearest = FindNearestWaypoint();
                 uint32 next_point = (nearest + 1) % intervals;
-                return MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ());
+                return MoveTo(bot->GetMapId(), waypoints[next_point].first,
+                              waypoints[next_point].second, bot->GetPositionZ());
             }
         }
     }
@@ -983,18 +1013,22 @@ bool GluthPositionAction::Execute(Event event)
         {
             if (botAI->GetClassIndex(bot, CLASS_HUNTER) == 0)
             {
-                return MoveInside(NAXX_MAP_ID, helper.leftSlowDownPos.first, helper.leftSlowDownPos.second, bot->GetPositionZ(), 0.0f);
+                return MoveInside(NAXX_MAP_ID, helper.leftSlowDownPos.first,
+                                  helper.leftSlowDownPos.second, bot->GetPositionZ(), 0.0f);
             }
             if (botAI->GetClassIndex(bot, CLASS_HUNTER) == 1)
             {
-                return MoveInside(NAXX_MAP_ID, helper.rightSlowDownPos.first, helper.rightSlowDownPos.second, bot->GetPositionZ(), 0.0f);
+                return MoveInside(NAXX_MAP_ID, helper.rightSlowDownPos.first,
+                                  helper.rightSlowDownPos.second, bot->GetPositionZ(), 0.0f);
             }
         }
-        return MoveInside(NAXX_MAP_ID, helper.rangedPos.first, helper.rangedPos.second, bot->GetPositionZ(), 3.0f);
+        return MoveInside(NAXX_MAP_ID, helper.rangedPos.first, helper.rangedPos.second,
+                          bot->GetPositionZ(), 3.0f);
     }
     else if (botAI->IsHeal(bot))
     {
-        return MoveInside(NAXX_MAP_ID, helper.healPos.first, helper.healPos.second, bot->GetPositionZ(), 0.0f);
+        return MoveInside(NAXX_MAP_ID, helper.healPos.first, helper.healPos.second,
+                          bot->GetPositionZ(), 0.0f);
     }
     return false;
 }
@@ -1016,11 +1050,11 @@ bool GluthSlowdownAction::Execute(Event event)
     }
     switch (bot->getClass())
     {
-    case CLASS_HUNTER:
-        return botAI->CastSpell("frost trap", bot);
-        break;
-    default:
-        break;
+        case CLASS_HUNTER:
+            return botAI->CastSpell("frost trap", bot);
+            break;
+        default:
+            break;
     }
     return false;
 }
@@ -1035,12 +1069,14 @@ bool LoathebPositionAction::Execute(Event event)
     {
         if (AI_VALUE2(bool, "has aggro", "boss target"))
         {
-            return MoveTo(533, helper.mainTankPos.first, helper.mainTankPos.second, bot->GetPositionZ());
+            return MoveTo(533, helper.mainTankPos.first, helper.mainTankPos.second,
+                          bot->GetPositionZ());
         }
     }
     else if (botAI->IsRanged(bot))
     {
-        return MoveInside(533, helper.rangePos.first, helper.rangePos.second, bot->GetPositionZ(), 1.0f);
+        return MoveInside(533, helper.rangePos.first, helper.rangePos.second, bot->GetPositionZ(),
+                          1.0f);
     }
     return false;
 }
@@ -1081,7 +1117,7 @@ bool LoathebChooseTargetAction::Execute(Event event)
     {
         target = target_boss;
     }
-    if (!target || context->GetValue<Unit*>("current target")->Get() == target)
+    if (!target || context->GetValue<Unit *>("current target")->Get() == target)
     {
         return false;
     }

@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "CheatAction.h"
+
 #include "Playerbots.h"
 
 bool CheatAction::Execute(Event event)
@@ -17,15 +20,15 @@ bool CheatAction::Execute(Event event)
         const char *name = i->c_str();
         switch (name[0])
         {
-        case '+':
-            cheatMask |= (uint32)GetCheatMask(name + 1);
-            break;
-        case '-':
-            cheatMask ^= (uint32)GetCheatMask(name + 1);
-            break;
-        case '?':
-            ListCheats();
-            return true;
+            case '+':
+                cheatMask |= (uint32)GetCheatMask(name + 1);
+                break;
+            case '-':
+                cheatMask ^= (uint32)GetCheatMask(name + 1);
+                break;
+            case '?':
+                ListCheats();
+                return true;
         }
     }
 
@@ -58,18 +61,18 @@ std::string const CheatAction::GetCheatName(BotCheatMask cheatMask)
 {
     switch (cheatMask)
     {
-    case BotCheatMask::taxi:
-        return "taxi";
-    case BotCheatMask::gold:
-        return "gold";
-    case BotCheatMask::health:
-        return "health";
-    case BotCheatMask::mana:
-        return "mana";
-    case BotCheatMask::power:
-        return "power";
-    default:
-        return "none";
+        case BotCheatMask::taxi:
+            return "taxi";
+        case BotCheatMask::gold:
+            return "gold";
+        case BotCheatMask::health:
+            return "health";
+        case BotCheatMask::mana:
+            return "mana";
+        case BotCheatMask::power:
+            return "power";
+        default:
+            return "none";
     }
 }
 

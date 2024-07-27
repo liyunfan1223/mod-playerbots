@@ -1,16 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_CHATHELPER_H
 #define _PLAYERBOT_CHATHELPER_H
 
+#include <map>
+
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "PlayerbotAIAware.h"
 #include "SharedDefines.h"
-
-#include <map>
 
 class GameObject;
 class Quest;
@@ -26,7 +28,7 @@ typedef std::set<uint32> SpellIds;
 
 class ChatHelper : public PlayerbotAIAware
 {
-public:
+   public:
     ChatHelper(PlayerbotAI *botAI);
 
     static std::string const formatMoney(uint32 copper);
@@ -34,13 +36,15 @@ public:
     static ItemIds parseItems(std::string const text);
     uint32 parseSpell(std::string const text);
     static std::string const FormatQuest(Quest const *quest);
-    static std::string const FormatItem(ItemTemplate const *proto, uint32 count = 0, uint32 total = 0);
+    static std::string const FormatItem(ItemTemplate const *proto, uint32 count = 0,
+                                        uint32 total = 0);
     static std::string const FormatQItem(uint32 itemId);
     static std::string const FormatSpell(SpellInfo const *spellInfo);
     static std::string const FormatGameobject(GameObject *go);
     static std::string const FormatWorldobject(WorldObject *wo);
     static std::string const FormatWorldEntry(int32 entry);
-    static std::string const FormatQuestObjective(std::string const name, uint32 available, uint32 required);
+    static std::string const FormatQuestObjective(std::string const name, uint32 available,
+                                                  uint32 required);
     static GuidVector parseGameobjects(std::string const text);
 
     static ChatMsg parseChat(std::string const text);
@@ -61,7 +65,7 @@ public:
 
     void eraseAllSubStr(std::string &mainStr, std::string const toErase);
 
-private:
+   private:
     static std::map<std::string, uint32> consumableSubClasses;
     static std::map<std::string, uint32> tradeSubClasses;
     static std::map<std::string, uint32> itemQualities;

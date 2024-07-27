@@ -1,10 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "QuestAction.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
 #include "Playerbots.h"
 #include "ReputationMgr.h"
 
@@ -61,7 +64,8 @@ bool QuestAction::CompleteQuest(Player *player, uint32 entry)
         }
     }
 
-    // All creature/GO slain/casted (not required, but otherwise it will display "Creature slain 0/10")
+    // All creature/GO slain/casted (not required, but otherwise it will display "Creature slain
+    // 0/10")
     for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
     {
         int32 creature = pQuest->RequiredNpcOrGo[i];
@@ -125,7 +129,8 @@ bool QuestAction::ProcessQuests(WorldObject *questGiver)
 {
     ObjectGuid guid = questGiver->GetGUID();
 
-    if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE && !sPlayerbotAIConfig->syncQuestWithPlayer)
+    if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE &&
+        !sPlayerbotAIConfig->syncQuestWithPlayer)
     {
         botAI->TellError("Cannot talk to quest giver");
         return false;
@@ -179,13 +184,16 @@ bool QuestAction::AcceptQuest(Quest const *quest, ObjectGuid questGiver)
         p.rpos(0);
         bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(p);
 
-        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && sPlayerbotAIConfig->syncQuestWithPlayer)
+        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE &&
+            sPlayerbotAIConfig->syncQuestWithPlayer)
         {
-            Object *pObject = ObjectAccessor::GetObjectByTypeMask(*bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+            Object *pObject = ObjectAccessor::GetObjectByTypeMask(
+                *bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
             bot->AddQuest(quest, pObject);
         }
 
-        if (bot->GetQuestStatus(questId) != QUEST_STATUS_NONE && bot->GetQuestStatus(questId) != QUEST_STATUS_REWARDED)
+        if (bot->GetQuestStatus(questId) != QUEST_STATUS_NONE &&
+            bot->GetQuestStatus(questId) != QUEST_STATUS_REWARDED)
         {
             out << "Accepted " << chat->FormatQuest(quest);
             botAI->TellMaster(out);

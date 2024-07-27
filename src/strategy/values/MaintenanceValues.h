@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_MAINTANCEVALUE_H
@@ -11,23 +13,28 @@ class PlayerbotAI;
 
 class CanMoveAroundValue : public BoolCalculatedValue
 {
-public:
-    CanMoveAroundValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can move around", 2 * 2000) {}
+   public:
+    CanMoveAroundValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can move around", 2 * 2000)
+    {
+    }
 
     bool Calculate() override;
 };
 
 class ShouldHomeBindValue : public BoolCalculatedValue
 {
-public:
-    ShouldHomeBindValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "should home bind", 2 * 2000) {}
+   public:
+    ShouldHomeBindValue(PlayerbotAI *botAI)
+        : BoolCalculatedValue(botAI, "should home bind", 2 * 2000)
+    {
+    }
 
     bool Calculate() override;
 };
 
 class ShouldRepairValue : public BoolCalculatedValue
 {
-public:
+   public:
     ShouldRepairValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "should repair", 2 * 2000) {}
 
     bool Calculate() override;
@@ -35,7 +42,7 @@ public:
 
 class CanRepairValue : public BoolCalculatedValue
 {
-public:
+   public:
     CanRepairValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can repair", 2 * 2000) {}
 
     bool Calculate() override;
@@ -43,7 +50,7 @@ public:
 
 class ShouldSellValue : public BoolCalculatedValue
 {
-public:
+   public:
     ShouldSellValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "should sell", 2 * 2000) {}
 
     bool Calculate() override;
@@ -51,7 +58,7 @@ public:
 
 class CanSellValue : public BoolCalculatedValue
 {
-public:
+   public:
     CanSellValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can sell", 2 * 2000) {}
 
     bool Calculate() override;
@@ -59,15 +66,17 @@ public:
 
 class CanFightEqualValue : public BoolCalculatedValue
 {
-public:
-    CanFightEqualValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can fight equal", 2 * 2000) {}
+   public:
+    CanFightEqualValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can fight equal", 2 * 2000)
+    {
+    }
 
     bool Calculate() override;
 };
 
 class CanFightEliteValue : public BoolCalculatedValue
 {
-public:
+   public:
     CanFightEliteValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can fight elite") {}
 
     bool Calculate() override;
@@ -75,7 +84,7 @@ public:
 
 class CanFightBossValue : public BoolCalculatedValue
 {
-public:
+   public:
     CanFightBossValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can fight boss") {}
 
     bool Calculate() override;

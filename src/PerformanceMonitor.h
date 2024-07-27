@@ -1,17 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PERFORMANCEMONITOR_H
 #define _PLAYERBOT_PERFORMANCEMONITOR_H
-
-#include "Common.h"
 
 #include <chrono>
 #include <ctime>
 #include <map>
 #include <mutex>
 #include <vector>
+
+#include "Common.h"
 
 typedef std::vector<std::string> PerformanceStack;
 
@@ -35,11 +37,12 @@ enum PerformanceMetric
 
 class PerformanceMonitorOperation
 {
-public:
-    PerformanceMonitorOperation(PerformanceData *data, std::string const name, PerformanceStack *stack);
+   public:
+    PerformanceMonitorOperation(PerformanceData *data, std::string const name,
+                                PerformanceStack *stack);
     void finish();
 
-private:
+   private:
     PerformanceData *data;
     std::string const name;
     PerformanceStack *stack;
@@ -48,7 +51,7 @@ private:
 
 class PerformanceMonitor
 {
-public:
+   public:
     PerformanceMonitor() {};
     virtual ~PerformanceMonitor() {};
     static PerformanceMonitor *instance()
@@ -57,12 +60,13 @@ public:
         return &instance;
     }
 
-public:
-    PerformanceMonitorOperation *start(PerformanceMetric metric, std::string const name, PerformanceStack *stack = nullptr);
+   public:
+    PerformanceMonitorOperation *start(PerformanceMetric metric, std::string const name,
+                                       PerformanceStack *stack = nullptr);
     void PrintStats(bool perTick = false, bool fullStack = false);
     void Reset();
 
-private:
+   private:
     std::map<PerformanceMetric, std::map<std::string, PerformanceData *>> data;
     std::mutex lock;
 };

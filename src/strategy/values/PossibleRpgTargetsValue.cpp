@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PossibleRpgTargetsValue.h"
+
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -11,7 +14,8 @@
 
 std::vector<uint32> PossibleRpgTargetsValue::allowedNpcFlags;
 
-PossibleRpgTargetsValue::PossibleRpgTargetsValue(PlayerbotAI *botAI, float range) : NearestUnitsValue(botAI, "possible rpg targets", range, true)
+PossibleRpgTargetsValue::PossibleRpgTargetsValue(PlayerbotAI *botAI, float range)
+    : NearestUnitsValue(botAI, "possible rpg targets", range, true)
 {
     if (allowedNpcFlags.empty())
     {
@@ -39,7 +43,7 @@ PossibleRpgTargetsValue::PossibleRpgTargetsValue(PlayerbotAI *botAI, float range
     }
 }
 
-void PossibleRpgTargetsValue::FindUnits(std::list<Unit*> &targets)
+void PossibleRpgTargetsValue::FindUnits(std::list<Unit *> &targets)
 {
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
@@ -63,8 +67,9 @@ bool PossibleRpgTargetsValue::AcceptUnit(Unit *unit)
             return true;
     }
 
-    TravelTarget *travelTarget = context->GetValue<TravelTarget*>("travel target")->Get();
-    if (travelTarget->getDestination() && travelTarget->getDestination()->getEntry() == unit->GetEntry())
+    TravelTarget *travelTarget = context->GetValue<TravelTarget *>("travel target")->Get();
+    if (travelTarget->getDestination() &&
+        travelTarget->getDestination()->getEntry() == unit->GetEntry())
         return true;
 
     if (urand(1, 100) < 25 && unit->IsFriendlyTo(bot))

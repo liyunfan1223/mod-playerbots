@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PLAYERBOTFACTORY_H
@@ -103,7 +105,7 @@ enum PriorizedConsumables
 
 class PlayerbotFactory
 {
-public:
+   public:
     PlayerbotFactory(Player *bot, uint32 level, uint32 itemQuality = 0, uint32 gearScoreLimit = 0);
 
     static ObjectGuid GetRandomBot();
@@ -117,10 +119,13 @@ public:
     static uint32 tradeSkills[];
     static float CalculateItemScore(uint32 item_id, Player *bot);
     static float CalculateEnchantScore(uint32 enchant_id, Player *bot);
-    static float CalculateSpellScore(uint32 spell_id, Player *bot, uint32 trigger = ITEM_SPELLTRIGGER_ON_EQUIP);
+    static float CalculateSpellScore(uint32 spell_id, Player *bot,
+                                     uint32 trigger = ITEM_SPELLTRIGGER_ON_EQUIP);
     void InitTalentsTree(bool incremental = false, bool use_template = true, bool reset = false);
     static void InitTalentsBySpecNo(Player *bot, int specNo, bool reset);
-    static void InitTalentsByParsedSpecLink(Player *bot, std::vector<std::vector<uint32>> parsedSpecLink, bool reset);
+    static void InitTalentsByParsedSpecLink(Player *bot,
+                                            std::vector<std::vector<uint32>> parsedSpecLink,
+                                            bool reset);
     void InitAvailableSpells();
     void InitClassSpells();
     void InitEquipment(bool incremental);
@@ -138,7 +143,7 @@ public:
     void InitInstanceQuests();
     void UnbindInstance();
 
-private:
+   private:
     void Prepare();
     // void InitSecondEquipmentSet();
     // void InitEquipmentNew(bool incremental);
@@ -186,7 +191,10 @@ private:
     void IterateItemsInBags(IterateItemsVisitor *visitor);
     void IterateItemsInEquip(IterateItemsVisitor *visitor);
     void IterateItemsInBank(IterateItemsVisitor *visitor);
-    EnchantContainer::const_iterator GetEnchantContainerBegin() { return m_EnchantContainer.begin(); }
+    EnchantContainer::const_iterator GetEnchantContainerBegin()
+    {
+        return m_EnchantContainer.begin();
+    }
     EnchantContainer::const_iterator GetEnchantContainerEnd() { return m_EnchantContainer.end(); }
     uint32 level;
     uint32 itemQuality;
@@ -196,7 +204,7 @@ private:
     static std::vector<uint32> enchantSpellIdCache;
     static std::vector<uint32> enchantGemIdCache;
 
-protected:
+   protected:
     EnchantContainer m_EnchantContainer;
     Player *bot;
     PlayerbotAI *botAI;

@@ -1,11 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PositionAction.h"
+
 #include "Event.h"
-#include "PositionValue.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 
 void TellPosition(PlayerbotAI *botAI, std::string const name, PositionInfo pos)
 {
@@ -66,7 +69,8 @@ bool PositionAction::Execute(Event event)
     std::vector<std::string> coords = split(action, ',');
     if (coords.size() == 3)
     {
-        pos.Set(atoi(coords[0].c_str()), atoi(coords[1].c_str()), atoi(coords[2].c_str()), botAI->GetBot()->GetMapId());
+        pos.Set(atoi(coords[0].c_str()), atoi(coords[1].c_str()), atoi(coords[2].c_str()),
+                botAI->GetBot()->GetMapId());
         posMap[name] = pos;
 
         std::ostringstream out;
@@ -77,7 +81,8 @@ bool PositionAction::Execute(Event event)
 
     if (action == "set")
     {
-        pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), botAI->GetBot()->GetMapId());
+        pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
+                botAI->GetBot()->GetMapId());
         posMap[name] = pos;
 
         std::ostringstream out;
@@ -118,7 +123,8 @@ bool MoveToPositionAction::isUseful()
 {
     PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()[qualifier];
     float distance = AI_VALUE2(float, "distance", std::string("position_") + qualifier);
-    return pos.isSet() && distance > sPlayerbotAIConfig->followDistance && distance < sPlayerbotAIConfig->reactDistance;
+    return pos.isSet() && distance > sPlayerbotAIConfig->followDistance &&
+           distance < sPlayerbotAIConfig->reactDistance;
 }
 
 bool SetReturnPositionAction::Execute(Event event)
@@ -155,5 +161,6 @@ bool SetReturnPositionAction::isUseful()
 bool ReturnAction::isUseful()
 {
     PositionInfo pos = context->GetValue<PositionMap &>("position")->Get()[qualifier];
-    return pos.isSet() && AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig->followDistance;
+    return pos.isSet() &&
+           AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig->followDistance;
 }

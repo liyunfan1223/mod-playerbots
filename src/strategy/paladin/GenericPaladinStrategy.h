@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICPALADINSTRATEGY_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class GenericPaladinStrategy : public CombatStrategy
 {
-public:
+   public:
     GenericPaladinStrategy(PlayerbotAI *botAI);
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -20,7 +22,7 @@ public:
 
 class PaladinCureStrategy : public Strategy
 {
-public:
+   public:
     PaladinCureStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -29,7 +31,7 @@ public:
 
 class PaladinBoostStrategy : public Strategy
 {
-public:
+   public:
     PaladinBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -38,7 +40,7 @@ public:
 
 class PaladinCcStrategy : public Strategy
 {
-public:
+   public:
     PaladinCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

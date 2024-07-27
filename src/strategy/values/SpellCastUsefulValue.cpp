@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "SpellCastUsefulValue.h"
+
 #include "LastSpellCastValue.h"
 #include "Playerbots.h"
 
@@ -10,16 +13,18 @@ bool SpellCastUsefulValue::Calculate()
 {
     uint32 spellid = AI_VALUE2(uint32, "spell id", qualifier);
     if (!spellid)
-        return true; // there can be known alternatives
+        return true;  // there can be known alternatives
 
     SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellid);
     if (!spellInfo)
-        return true; // there can be known alternatives
+        return true;  // there can be known alternatives
 
-    if ((spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE) != 0 || (spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING) != 0)
+    if ((spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE) != 0 ||
+        (spellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING) != 0)
     {
         if (Spell *spell = bot->GetCurrentSpell(CURRENT_MELEE_SPELL))
-            if (spell->m_spellInfo->Id == spellid && spell->IsNextMeleeSwingSpell() && bot->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+            if (spell->m_spellInfo->Id == spellid && spell->IsNextMeleeSwingSpell() &&
+                bot->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                 return false;
     }
     else
@@ -30,14 +35,16 @@ bool SpellCastUsefulValue::Calculate()
         //         return false;
     }
 
-    if (spellInfo->IsAutoRepeatRangedSpell() && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)->m_spellInfo->Id == spellid)
+    if (spellInfo->IsAutoRepeatRangedSpell() && bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) &&
+        bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)->m_spellInfo->Id == spellid)
     {
         return false;
     }
 
     // TODO: workaround
-    if (qualifier == "windfury weapon" || qualifier == "flametongue weapon" || qualifier == "frostbrand weapon" ||
-        qualifier == "rockbiter weapon" || qualifier == "earthliving weapon" || qualifier == "spellstone")
+    if (qualifier == "windfury weapon" || qualifier == "flametongue weapon" ||
+        qualifier == "frostbrand weapon" || qualifier == "rockbiter weapon" ||
+        qualifier == "earthliving weapon" || qualifier == "spellstone")
     {
         if (Item *item = AI_VALUE2(Item *, "item for spell", spellid))
             if (item->IsInWorld() && item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
@@ -60,7 +67,8 @@ bool SpellCastUsefulValue::Calculate()
             continue;
 
         wstrToLower(wnamepart);
-        if (!spellName.empty() && spellName.length() == wnamepart.length() && Utf8FitTo(spellName, wnamepart))
+        if (!spellName.empty() && spellName.length() == wnamepart.length() &&
+            Utf8FitTo(spellName, wnamepart))
             return false;
     }
 

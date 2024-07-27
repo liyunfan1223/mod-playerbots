@@ -1,14 +1,16 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_EMOTEACTION_H
 #define _PLAYERBOT_EMOTEACTION_H
 
+#include <map>
+
 #include "Action.h"
 #include "NamedObjectContext.h"
-
-#include <map>
 
 class Player;
 class PlayerbotAI;
@@ -18,12 +20,12 @@ enum TextEmotes : uint32;
 
 class EmoteActionBase : public Action
 {
-public:
+   public:
     EmoteActionBase(PlayerbotAI *botAI, std::string const name);
 
     static uint32 GetNumberOfEmoteVariants(TextEmotes emote, uint8 race, uint8 gender);
 
-protected:
+   protected:
     bool Emote(Unit *target, uint32 type, bool textEmote = false);
     bool ReceiveEmote(Player *source, uint32 emote, bool verbal = false);
     Unit *GetTarget();
@@ -34,7 +36,7 @@ protected:
 
 class EmoteAction : public EmoteActionBase, public Qualified
 {
-public:
+   public:
     EmoteAction(PlayerbotAI *botAI);
 
     bool Execute(Event event) override;
@@ -43,7 +45,7 @@ public:
 
 class TalkAction : public EmoteActionBase
 {
-public:
+   public:
     TalkAction(PlayerbotAI *botAI) : EmoteActionBase(botAI, "talk") {}
 
     bool Execute(Event event) override;

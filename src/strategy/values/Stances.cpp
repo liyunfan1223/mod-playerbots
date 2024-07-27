@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "Stances.h"
+
 #include "Arrow.h"
 #include "Event.h"
 #include "Playerbots.h"
@@ -52,15 +55,9 @@ WorldLocation MoveStance::GetLocationInternal()
     return GetNearLocation(angle, distance);
 }
 
-std::string const Stance::GetTargetName()
-{
-    return "current target";
-}
+std::string const Stance::GetTargetName() { return "current target"; }
 
-float Stance::GetMaxDistance()
-{
-    return sPlayerbotAIConfig->contactDistance;
-}
+float Stance::GetMaxDistance() { return sPlayerbotAIConfig->contactDistance; }
 
 StanceValue::~StanceValue()
 {
@@ -73,7 +70,7 @@ StanceValue::~StanceValue()
 
 class NearStance : public MoveStance
 {
-public:
+   public:
     NearStance(PlayerbotAI *botAI) : MoveStance(botAI, "near") {}
 
     float GetAngle() override
@@ -120,7 +117,7 @@ public:
 
 class TankStance : public MoveStance
 {
-public:
+   public:
     TankStance(PlayerbotAI *botAI) : MoveStance(botAI, "tank") {}
 
     float GetAngle() override
@@ -132,7 +129,7 @@ public:
 
 class TurnBackStance : public MoveStance
 {
-public:
+   public:
     TurnBackStance(PlayerbotAI *botAI) : MoveStance(botAI, "turnback") {}
 
     float GetAngle() override
@@ -163,7 +160,7 @@ public:
 
 class BehindStance : public MoveStance
 {
-public:
+   public:
     BehindStance(PlayerbotAI *botAI) : MoveStance(botAI, "behind") {}
 
     float GetAngle() override
@@ -196,14 +193,12 @@ public:
     }
 };
 
-StanceValue::StanceValue(PlayerbotAI *botAI) : ManualSetValue<Stance*>(botAI, new NearStance(botAI), "stance")
+StanceValue::StanceValue(PlayerbotAI *botAI)
+    : ManualSetValue<Stance *>(botAI, new NearStance(botAI), "stance")
 {
 }
 
-std::string const StanceValue::Save()
-{
-    return value ? value->getName() : "?";
-}
+std::string const StanceValue::Save() { return value ? value->getName() : "?"; }
 
 bool StanceValue::Load(std::string const name)
 {
@@ -241,7 +236,7 @@ bool SetStanceAction::Execute(Event event)
 {
     std::string const stance = event.getParam();
 
-    StanceValue *value = (StanceValue *)context->GetValue<Stance*>("stance");
+    StanceValue *value = (StanceValue *)context->GetValue<Stance *>("stance");
     if (stance == "?" || stance.empty())
     {
         std::ostringstream str;

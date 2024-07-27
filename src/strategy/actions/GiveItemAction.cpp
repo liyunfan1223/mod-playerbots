@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "GiveItemAction.h"
+
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "Playerbots.h"
@@ -15,7 +18,7 @@ bool GiveItemAction::Execute(Event event)
     if (!target)
         return false;
 
-    Player *receiver = dynamic_cast<Player*>(target);
+    Player *receiver = dynamic_cast<Player *>(target);
     if (!receiver)
         return false;
 
@@ -27,7 +30,7 @@ bool GiveItemAction::Execute(Event event)
         return true;
 
     bool moved = false;
-    std::vector<Item*> items = InventoryAction::parseItems(item, ITERATE_ITEMS_IN_BAGS);
+    std::vector<Item *> items = InventoryAction::parseItems(item, ITERATE_ITEMS_IN_BAGS);
     for (Item *item : items)
     {
         if (receiver->CanUseItem(item->GetTemplate()) != EQUIP_ERR_OK)
@@ -43,13 +46,15 @@ bool GiveItemAction::Execute(Event event)
             moved = true;
 
             std::ostringstream out;
-            out << "Got " << chat->FormatItem(item->GetTemplate(), item->GetCount()) << " from " << bot->GetName();
+            out << "Got " << chat->FormatItem(item->GetTemplate(), item->GetCount()) << " from "
+                << bot->GetName();
             receiverAi->TellMasterNoFacing(out.str());
         }
         else
         {
             std::ostringstream out;
-            out << "Cannot get " << chat->FormatItem(item->GetTemplate(), item->GetCount()) << " from " << bot->GetName() << "- my bags are full";
+            out << "Cannot get " << chat->FormatItem(item->GetTemplate(), item->GetCount())
+                << " from " << bot->GetName() << "- my bags are full";
             receiverAi->TellError(out.str());
         }
     }
@@ -57,42 +62,35 @@ bool GiveItemAction::Execute(Event event)
     return true;
 }
 
-Unit *GiveItemAction::GetTarget()
-{
-    return AI_VALUE2(Unit *, "party member without item", item);
-}
+Unit *GiveItemAction::GetTarget() { return AI_VALUE2(Unit *, "party member without item", item); }
 
 bool GiveItemAction::isUseful()
 {
     return GetTarget() && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->lowMana;
 }
 
-Unit *GiveFoodAction::GetTarget()
-{
-    return AI_VALUE(Unit *, "party member without food");
-}
+Unit *GiveFoodAction::GetTarget() { return AI_VALUE(Unit *, "party member without food"); }
 
 bool GiveFoodAction::isUseful()
 {
     if (!GetTarget())
         return false;
 
-    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
+    bool isRandomBot =
+        GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
 
     return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
 }
 
-Unit *GiveWaterAction::GetTarget()
-{
-    return AI_VALUE(Unit *, "party member without water");
-}
+Unit *GiveWaterAction::GetTarget() { return AI_VALUE(Unit *, "party member without water"); }
 
 bool GiveWaterAction::isUseful()
 {
     if (!GetTarget())
         return false;
 
-    bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
+    bool isRandomBot =
+        GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player *)GetTarget());
 
     return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
 }

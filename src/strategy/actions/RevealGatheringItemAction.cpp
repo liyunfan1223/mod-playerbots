@@ -1,11 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "RevealGatheringItemAction.h"
-#include "Event.h"
+
 #include "CellImpl.h"
 #include "ChatHelper.h"
+#include "Event.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Playerbots.h"
@@ -13,8 +16,11 @@
 
 class AnyGameObjectInObjectRangeCheck
 {
-public:
-    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range) : i_obj(obj), i_range(range) {}
+   public:
+    AnyGameObjectInObjectRangeCheck(WorldObject const *obj, float range)
+        : i_obj(obj), i_range(range)
+    {
+    }
     WorldObject const &GetFocusObject() const { return *i_obj; }
     bool operator()(GameObject *go)
     {
@@ -24,7 +30,7 @@ public:
         return false;
     }
 
-private:
+   private:
     WorldObject const *i_obj;
     float i_range;
 };
@@ -34,15 +40,17 @@ bool RevealGatheringItemAction::Execute(Event event)
     if (!bot->GetGroup())
         return false;
 
-    std::list<GameObject*> targets;
+    std::list<GameObject *> targets;
     AnyGameObjectInObjectRangeCheck u_check(bot, sPlayerbotAIConfig->grindDistance);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitAllObjects(bot, searcher, sPlayerbotAIConfig->reactDistance);
 
-    std::vector<GameObject*> result;
+    std::vector<GameObject *> result;
     for (GameObject *go : targets)
     {
-        if (!go || !go->isSpawned() || sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, go), sPlayerbotAIConfig->lootDistance))
+        if (!go || !go->isSpawned() ||
+            sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, go),
+                                                     sPlayerbotAIConfig->lootDistance))
             continue;
 
         if (LockEntry const *lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
@@ -53,7 +61,9 @@ bool RevealGatheringItemAction::Execute(Event event)
                 {
                     uint32 skillId = SkillByLockType(LockType(lockInfo->Index[i]));
                     uint32 reqSkillValue = std::max(2u, lockInfo->Skill[i]);
-                    if ((skillId == SKILL_MINING || skillId == SKILL_HERBALISM) && botAI->HasSkill((SkillType)skillId) && uint32(bot->GetSkillValue(skillId)) >= reqSkillValue)
+                    if ((skillId == SKILL_MINING || skillId == SKILL_HERBALISM) &&
+                        botAI->HasSkill((SkillType)skillId) &&
+                        uint32(bot->GetSkillValue(skillId)) >= reqSkillValue)
                     {
                         result.push_back(go);
                         break;
@@ -78,14 +88,14 @@ bool RevealGatheringItemAction::Execute(Event event)
 
     switch (go->GetGoType())
     {
-    case GAMEOBJECT_TYPE_CHEST:
-        msg << "Let's look at it.";
-        break;
-    case GAMEOBJECT_TYPE_FISHINGNODE:
-        msg << "Let's fish a bit.";
-        break;
-    default:
-        msg << "Should we go nearer?";
+        case GAMEOBJECT_TYPE_CHEST:
+            msg << "Let's look at it.";
+            break;
+        case GAMEOBJECT_TYPE_FISHINGNODE:
+            msg << "Let's fish a bit.";
+            break;
+        default:
+            msg << "Should we go nearer?";
     }
 
     // everything is fine, do it

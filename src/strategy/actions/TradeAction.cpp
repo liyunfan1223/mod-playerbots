@@ -1,12 +1,15 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "TradeAction.h"
-#include "Event.h"
-#include "ItemVisitors.h"
-#include "ItemCountValue.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
+#include "ItemCountValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 
 bool TradeAction::Execute(Event event)
@@ -30,7 +33,6 @@ bool TradeAction::Execute(Event event)
 
         if (!player->GetTrader())
         {
-
             WorldPacket packet(CMSG_INITIATE_TRADE);
             packet << player->GetGUID();
             bot->GetSession()->HandleInitiateTradeOpcode(packet);
@@ -51,7 +53,7 @@ bool TradeAction::Execute(Event event)
     size_t pos = text.rfind(" ");
     int count = pos != std::string::npos ? atoi(text.substr(pos + 1).c_str()) : 1;
 
-    std::vector<Item*> found = parseItems(text);
+    std::vector<Item *> found = parseItems(text);
     if (found.empty())
         return false;
 
@@ -72,7 +74,7 @@ bool TradeAction::Execute(Event event)
 bool TradeAction::TradeItem(Item const *item, int8 slot)
 {
     int8 tradeSlot = -1;
-    Item *itemPtr = const_cast<Item*>(item);
+    Item *itemPtr = const_cast<Item *>(item);
 
     TradeData *pTrade = bot->GetTradeData();
     if ((slot >= 0 && slot < TRADE_SLOT_COUNT) && pTrade->GetItem(TradeSlots(slot)) == nullptr)

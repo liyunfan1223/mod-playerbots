@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "ReleaseSpiritAction.h"
+
 #include "Event.h"
 #include "GameGraveyard.h"
 #include "ObjectDefines.h"
@@ -39,14 +42,17 @@ bool ReleaseSpiritAction::Execute(Event event)
         context->GetValue<uint32>("death count")->Set(dCount + 1);
     }
 
-    LOG_INFO("playerbots", "Bot {} {}:{} <{}> released", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
+    LOG_INFO("playerbots", "Bot {} {}:{} <{}> released", bot->GetGUID().ToString().c_str(),
+             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
+             bot->GetName().c_str());
 
     WorldPacket packet(CMSG_REPOP_REQUEST);
     packet << uint8(0);
     bot->GetSession()->HandleRepopRequestOpcode(packet);
 
     // // add waiting for ress aura
-    // if (bot->InBattleground() && !botAI->HasAura(SPELL_WAITING_FOR_RESURRECT, bot) && !bot->IsAlive())
+    // if (bot->InBattleground() && !botAI->HasAura(SPELL_WAITING_FOR_RESURRECT, bot) &&
+    // !bot->IsAlive())
     // {
     //     // cast Waiting for Resurrect
     //     GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
@@ -86,15 +92,20 @@ bool AutoReleaseSpiritAction::Execute(Event event)
         context->GetValue<uint32>("death count")->Set(dCount + 1);
     }
 
-    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> auto released", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
+    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> auto released", bot->GetGUID().ToString().c_str(),
+              bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
+              bot->GetName().c_str());
 
     WorldPacket packet(CMSG_REPOP_REQUEST);
     packet << uint8(0);
     bot->GetSession()->HandleRepopRequestOpcode(packet);
 
-    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> releases spirit", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
+    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> releases spirit", bot->GetGUID().ToString().c_str(),
+              bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
+              bot->GetName().c_str());
 
-    if (bot->InBattleground() && (time(NULL) - bg_gossip_time >= 15 || !bot->HasAura(SPELL_WAITING_FOR_RESURRECT)))
+    if (bot->InBattleground() &&
+        (time(NULL) - bg_gossip_time >= 15 || !bot->HasAura(SPELL_WAITING_FOR_RESURRECT)))
     {
         GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
         ObjectGuid guid;
@@ -154,13 +165,15 @@ bool AutoReleaseSpiritAction::isUseful()
     if (!botAI->HasActivePlayerMaster())
         return true;
 
-    if (botAI->HasActivePlayerMaster() && botAI->GetGroupMaster()->GetMapId() == bot->GetMapId() && bot->GetMap() && (bot->GetMap()->IsRaid() || bot->GetMap()->IsDungeon()))
+    if (botAI->HasActivePlayerMaster() && botAI->GetGroupMaster()->GetMapId() == bot->GetMapId() &&
+        bot->GetMap() && (bot->GetMap()->IsRaid() || bot->GetMap()->IsDungeon()))
         return false;
 
     if (botAI->GetGroupMaster()->isDead())
         return true;
 
-    if (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig->sightDistance))
+    if (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"),
+                                             sPlayerbotAIConfig->sightDistance))
         return true;
 
     return false;
@@ -168,7 +181,9 @@ bool AutoReleaseSpiritAction::isUseful()
 
 bool RepopAction::Execute(Event event)
 {
-    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> repops at graveyard", bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
+    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> repops at graveyard",
+              bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
+              bot->GetLevel(), bot->GetName().c_str());
 
     int64 deadTime;
 

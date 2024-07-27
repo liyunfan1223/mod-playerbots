@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_ACTIONCONTEXT_H
@@ -8,21 +10,23 @@
 #include "AddLootAction.h"
 #include "AttackAction.h"
 #include "AutoLearnSpellAction.h"
-#include "BattleGroundTactics.h"
+#include "AutoTeleportForLevelAction.h"
 #include "BattleGroundJoinAction.h"
+#include "BattleGroundTactics.h"
 #include "BuyAction.h"
 #include "CastCustomSpellAction.h"
 #include "ChangeStrategyAction.h"
 #include "ChangeTalentsAction.h"
 #include "CheckMailAction.h"
 #include "CheckValuesAction.h"
+#include "ChooseRpgTargetAction.h"
 #include "ChooseTargetActions.h"
 #include "ChooseTravelTargetAction.h"
-#include "ChooseRpgTargetAction.h"
 #include "CombatActions.h"
 #include "DelayAction.h"
 #include "DestroyItemAction.h"
 #include "EmoteAction.h"
+#include "FollowActions.h"
 #include "GenericActions.h"
 #include "GenericSpellActions.h"
 #include "GiveItemAction.h"
@@ -33,14 +37,14 @@
 #include "ImbueAction.h"
 #include "InviteToGroupAction.h"
 #include "LeaveGroupAction.h"
-#include "FollowActions.h"
 #include "LootAction.h"
-#include "MovementActions.h"
 #include "MoveToRpgTargetAction.h"
 #include "MoveToTravelTargetAction.h"
+#include "MovementActions.h"
 #include "NonCombatActions.h"
 #include "OutfitAction.h"
 #include "PositionAction.h"
+#include "RaidNaxxActions.h"
 #include "RandomBotUpdateAction.h"
 #include "ReachTargetActions.h"
 #include "ReleaseSpiritAction.h"
@@ -54,17 +58,15 @@
 #include "StayActions.h"
 #include "SuggestWhatToDoAction.h"
 #include "TravelAction.h"
-#include "XpGainAction.h"
 #include "VehicleActions.h"
 #include "WorldBuffAction.h"
-#include "RaidNaxxActions.h"
-#include "AutoTeleportForLevelAction.h"
+#include "XpGainAction.h"
 
 class PlayerbotAI;
 
 class ActionContext : public NamedObjectContext<Action>
 {
-public:
+   public:
     ActionContext()
     {
         creators["mark rti"] = &ActionContext::mark_rti;
@@ -85,7 +87,8 @@ public:
         creators["reach spell"] = &ActionContext::ReachSpell;
         creators["reach melee"] = &ActionContext::ReachMelee;
         creators["reach party member to heal"] = &ActionContext::reach_party_member_to_heal;
-        creators["reach party member to resurrect"] = &ActionContext::reach_party_member_to_resurrect;
+        creators["reach party member to resurrect"] =
+            &ActionContext::reach_party_member_to_resurrect;
         creators["flee"] = &ActionContext::flee;
         creators["flee with pet"] = &ActionContext::flee_with_pet;
         creators["avoid aoe"] = &ActionContext::avoid_aoe;
@@ -232,26 +235,47 @@ public:
         creators["pet attack"] = &ActionContext::pet_attack;
     }
 
-private:
+   private:
     static Action *give_water(PlayerbotAI *botAI) { return new GiveWaterAction(botAI); }
     static Action *give_food(PlayerbotAI *botAI) { return new GiveFoodAction(botAI); }
     static Action *ra(PlayerbotAI *botAI) { return new RemoveAuraAction(botAI); }
     static Action *mark_rti(PlayerbotAI *botAI) { return new MarkRtiAction(botAI); }
-    static Action *set_return_position(PlayerbotAI *botAI) { return new SetReturnPositionAction(botAI); }
+    static Action *set_return_position(PlayerbotAI *botAI)
+    {
+        return new SetReturnPositionAction(botAI);
+    }
     static Action *rpg(PlayerbotAI *botAI) { return new RpgAction(botAI); }
     static Action *crpg(PlayerbotAI *botAI) { return new CRpgAction(botAI); }
-    static Action *choose_rpg_target(PlayerbotAI *botAI) { return new ChooseRpgTargetAction(botAI); }
-    static Action *move_to_rpg_target(PlayerbotAI *botAI) { return new MoveToRpgTargetAction(botAI); }
+    static Action *choose_rpg_target(PlayerbotAI *botAI)
+    {
+        return new ChooseRpgTargetAction(botAI);
+    }
+    static Action *move_to_rpg_target(PlayerbotAI *botAI)
+    {
+        return new MoveToRpgTargetAction(botAI);
+    }
     static Action *travel(PlayerbotAI *botAI) { return new TravelAction(botAI); }
-    static Action *choose_travel_target(PlayerbotAI *botAI) { return new ChooseTravelTargetAction(botAI); }
-    static Action *move_to_travel_target(PlayerbotAI *botAI) { return new MoveToTravelTargetAction(botAI); }
-    static Action *move_out_of_collision(PlayerbotAI *botAI) { return new MoveOutOfCollisionAction(botAI); }
+    static Action *choose_travel_target(PlayerbotAI *botAI)
+    {
+        return new ChooseTravelTargetAction(botAI);
+    }
+    static Action *move_to_travel_target(PlayerbotAI *botAI)
+    {
+        return new MoveToTravelTargetAction(botAI);
+    }
+    static Action *move_out_of_collision(PlayerbotAI *botAI)
+    {
+        return new MoveOutOfCollisionAction(botAI);
+    }
     static Action *move_random(PlayerbotAI *botAI) { return new MoveRandomAction(botAI); }
     static Action *check_values(PlayerbotAI *botAI) { return new CheckValuesAction(botAI); }
     static Action *greet(PlayerbotAI *botAI) { return new GreetAction(botAI); }
     static Action *check_mail(PlayerbotAI *botAI) { return new CheckMailAction(botAI); }
     static Action *drop_target(PlayerbotAI *botAI) { return new DropTargetAction(botAI); }
-    static Action *attack_duel_opponent(PlayerbotAI *botAI) { return new AttackDuelOpponentAction(botAI); }
+    static Action *attack_duel_opponent(PlayerbotAI *botAI)
+    {
+        return new AttackDuelOpponentAction(botAI);
+    }
     static Action *guard(PlayerbotAI *botAI) { return new GuardAction(botAI); }
     static Action *open_loot(PlayerbotAI *botAI) { return new OpenLootAction(botAI); }
     static Action *move_to_loot(PlayerbotAI *botAI) { return new MoveToLootAction(botAI); }
@@ -262,52 +286,94 @@ private:
     static Action *switch_to_ranged(PlayerbotAI *botAI) { return new SwitchToRangedAction(botAI); }
     static Action *ReachSpell(PlayerbotAI *botAI) { return new ReachSpellAction(botAI); }
     static Action *ReachMelee(PlayerbotAI *botAI) { return new ReachMeleeAction(botAI); }
-    static Action *reach_party_member_to_heal(PlayerbotAI *botAI) { return new ReachPartyMemberToHealAction(botAI); }
-    static Action *reach_party_member_to_resurrect(PlayerbotAI *botAI) { return new ReachPartyMemberToResurrectAction(botAI); }
+    static Action *reach_party_member_to_heal(PlayerbotAI *botAI)
+    {
+        return new ReachPartyMemberToHealAction(botAI);
+    }
+    static Action *reach_party_member_to_resurrect(PlayerbotAI *botAI)
+    {
+        return new ReachPartyMemberToResurrectAction(botAI);
+    }
     static Action *flee(PlayerbotAI *botAI) { return new FleeAction(botAI); }
     static Action *flee_with_pet(PlayerbotAI *botAI) { return new FleeWithPetAction(botAI); }
     static Action *avoid_aoe(PlayerbotAI *botAI) { return new AvoidAoeAction(botAI); }
-    static Action *combat_formation_move(PlayerbotAI *botAI) { return new CombatFormationMoveAction(botAI); }
+    static Action *combat_formation_move(PlayerbotAI *botAI)
+    {
+        return new CombatFormationMoveAction(botAI);
+    }
     static Action *disperse_set(PlayerbotAI *botAI) { return new DisperseSetAction(botAI); }
-    static Action *gift_of_the_naaru(PlayerbotAI *botAI) { return new CastGiftOfTheNaaruAction(botAI); }
+    static Action *gift_of_the_naaru(PlayerbotAI *botAI)
+    {
+        return new CastGiftOfTheNaaruAction(botAI);
+    }
     static Action *lifeblood(PlayerbotAI *botAI) { return new CastLifeBloodAction(botAI); }
     static Action *arcane_torrent(PlayerbotAI *botAI) { return new CastArcaneTorrentAction(botAI); }
     static Action *mana_tap(PlayerbotAI *botAI) { return new CastManaTapAction(botAI); }
-    static Action *end_pull(PlayerbotAI *botAI) { return new ChangeCombatStrategyAction(botAI, "-pull"); }
+    static Action *end_pull(PlayerbotAI *botAI)
+    {
+        return new ChangeCombatStrategyAction(botAI, "-pull");
+    }
 
     static Action *emote(PlayerbotAI *botAI) { return new EmoteAction(botAI); }
     static Action *talk(PlayerbotAI *botAI) { return new TalkAction(botAI); }
-    static Action *suggest_what_to_do(PlayerbotAI *botAI) { return new SuggestWhatToDoAction(botAI); }
+    static Action *suggest_what_to_do(PlayerbotAI *botAI)
+    {
+        return new SuggestWhatToDoAction(botAI);
+    }
     static Action *suggest_trade(PlayerbotAI *botAI) { return new SuggestTradeAction(botAI); }
     static Action *attack_anything(PlayerbotAI *botAI) { return new AttackAnythingAction(botAI); }
-    static Action *attack_least_hp_target(PlayerbotAI *botAI) { return new AttackLeastHpTargetAction(botAI); }
-    static Action *attack_enemy_player(PlayerbotAI *botAI) { return new AttackEnemyPlayerAction(botAI); }
+    static Action *attack_least_hp_target(PlayerbotAI *botAI)
+    {
+        return new AttackLeastHpTargetAction(botAI);
+    }
+    static Action *attack_enemy_player(PlayerbotAI *botAI)
+    {
+        return new AttackEnemyPlayerAction(botAI);
+    }
     static Action *stay(PlayerbotAI *botAI) { return new StayAction(botAI); }
     static Action *sit(PlayerbotAI *botAI) { return new SitAction(botAI); }
     static Action *runaway(PlayerbotAI *botAI) { return new RunAwayAction(botAI); }
     static Action *follow(PlayerbotAI *botAI) { return new FollowAction(botAI); }
     static Action *flee_to_master(PlayerbotAI *botAI) { return new FleeToMasterAction(botAI); }
-    static Action *add_gathering_loot(PlayerbotAI *botAI) { return new AddGatheringLootAction(botAI); }
+    static Action *add_gathering_loot(PlayerbotAI *botAI)
+    {
+        return new AddGatheringLootAction(botAI);
+    }
     static Action *add_loot(PlayerbotAI *botAI) { return new AddLootAction(botAI); }
     static Action *add_all_loot(PlayerbotAI *botAI) { return new AddAllLootAction(botAI); }
     static Action *loot(PlayerbotAI *botAI) { return new LootAction(botAI); }
     static Action *release_loot(PlayerbotAI *botAI) { return new ReleaseLootAction(botAI); }
     static Action *dps_assist(PlayerbotAI *botAI) { return new DpsAssistAction(botAI); }
     static Action *dps_aoe(PlayerbotAI *botAI) { return new DpsAoeAction(botAI); }
-    static Action *attack_rti_target(PlayerbotAI *botAI) { return new AttackRtiTargetAction(botAI); }
+    static Action *attack_rti_target(PlayerbotAI *botAI)
+    {
+        return new AttackRtiTargetAction(botAI);
+    }
     static Action *tank_assist(PlayerbotAI *botAI) { return new TankAssistAction(botAI); }
     static Action *drink(PlayerbotAI *botAI) { return new DrinkAction(botAI); }
     static Action *food(PlayerbotAI *botAI) { return new EatAction(botAI); }
     static Action *mana_potion(PlayerbotAI *botAI) { return new UseManaPotion(botAI); }
     static Action *healing_potion(PlayerbotAI *botAI) { return new UseHealingPotion(botAI); }
-    static Action *healthstone(PlayerbotAI *botAI) { return new UseItemAction(botAI, "healthstone"); }
-    static Action *move_out_of_enemy_contact(PlayerbotAI *botAI) { return new MoveOutOfEnemyContactAction(botAI); }
+    static Action *healthstone(PlayerbotAI *botAI)
+    {
+        return new UseItemAction(botAI, "healthstone");
+    }
+    static Action *move_out_of_enemy_contact(PlayerbotAI *botAI)
+    {
+        return new MoveOutOfEnemyContactAction(botAI);
+    }
     static Action *set_facing(PlayerbotAI *botAI) { return new SetFacingTargetAction(botAI); }
     static Action *set_behind(PlayerbotAI *botAI) { return new SetBehindTargetAction(botAI); }
     static Action *say(PlayerbotAI *botAI) { return new SayAction(botAI); }
-    static Action *reveal_gathering_item(PlayerbotAI *botAI) { return new RevealGatheringItemAction(botAI); }
+    static Action *reveal_gathering_item(PlayerbotAI *botAI)
+    {
+        return new RevealGatheringItemAction(botAI);
+    }
     static Action *outfit(PlayerbotAI *botAI) { return new OutfitAction(botAI); }
-    static Action *random_bot_update(PlayerbotAI *botAI) { return new RandomBotUpdateAction(botAI); }
+    static Action *random_bot_update(PlayerbotAI *botAI)
+    {
+        return new RandomBotUpdateAction(botAI);
+    }
     static Action *delay(PlayerbotAI *botAI) { return new DelayAction(botAI); }
 
     static Action *apply_poison(PlayerbotAI *botAI) { return new ImbueWithPoisonAction(botAI); }
@@ -318,43 +384,100 @@ private:
     static Action *war_stomp(PlayerbotAI *botAI) { return new CastWarStompAction(botAI); }
     static Action *auto_talents(PlayerbotAI *botAI) { return new AutoSetTalentsAction(botAI); }
     static Action *auto_learn_spell(PlayerbotAI *botAI) { return new AutoLearnSpellAction(botAI); }
-    static Action *auto_teleport_for_level(PlayerbotAI *botAI) { return new AutoTeleportForLevelAction(botAI); }
-    static Action *auto_upgrade_equip(PlayerbotAI *botAI) { return new AutoUpgradeEquipAction(botAI); }
+    static Action *auto_teleport_for_level(PlayerbotAI *botAI)
+    {
+        return new AutoTeleportForLevelAction(botAI);
+    }
+    static Action *auto_upgrade_equip(PlayerbotAI *botAI)
+    {
+        return new AutoUpgradeEquipAction(botAI);
+    }
     static Action *xp_gain(PlayerbotAI *botAI) { return new XpGainAction(botAI); }
-    static Action *invite_nearby(PlayerbotAI *botAI) { return new InviteNearbyToGroupAction(botAI); }
+    static Action *invite_nearby(PlayerbotAI *botAI)
+    {
+        return new InviteNearbyToGroupAction(botAI);
+    }
     static Action *invite_guild(PlayerbotAI *botAI) { return new InviteGuildToGroupAction(botAI); }
     static Action *leave_far_away(PlayerbotAI *botAI) { return new LeaveFarAwayAction(botAI); }
-    static Action *move_to_dark_portal(PlayerbotAI *botAI) { return new MoveToDarkPortalAction(botAI); }
-    static Action *use_dark_portal_azeroth(PlayerbotAI *botAI) { return new DarkPortalAzerothAction(botAI); }
-    static Action *move_from_dark_portal(PlayerbotAI *botAI) { return new MoveFromDarkPortalAction(botAI); }
+    static Action *move_to_dark_portal(PlayerbotAI *botAI)
+    {
+        return new MoveToDarkPortalAction(botAI);
+    }
+    static Action *use_dark_portal_azeroth(PlayerbotAI *botAI)
+    {
+        return new DarkPortalAzerothAction(botAI);
+    }
+    static Action *move_from_dark_portal(PlayerbotAI *botAI)
+    {
+        return new MoveFromDarkPortalAction(botAI);
+    }
     static Action *world_buff(PlayerbotAI *botAI) { return new WorldBuffAction(botAI); }
     static Action *hearthstone(PlayerbotAI *botAI) { return new UseHearthStone(botAI); }
-    static Action *cast_random_spell(PlayerbotAI *botAI) { return new CastRandomSpellAction(botAI); }
+    static Action *cast_random_spell(PlayerbotAI *botAI)
+    {
+        return new CastRandomSpellAction(botAI);
+    }
     static Action *free_bg_join(PlayerbotAI *botAI) { return new FreeBGJoinAction(botAI); }
 
     static Action *use_random_recipe(PlayerbotAI *botAI) { return new UseRandomRecipe(botAI); }
-    static Action *use_random_quest_item(PlayerbotAI *botAI) { return new UseRandomQuestItem(botAI); }
-    static Action *craft_random_item(PlayerbotAI *botAI) { return new CraftRandomItemAction(botAI); }
-    static Action *smart_destroy_item(PlayerbotAI *botAI) { return new SmartDestroyItemAction(botAI); }
-    static Action *disenchant_random_item(PlayerbotAI *botAI) { return new DisEnchantRandomItemAction(botAI); }
-    static Action *enchant_random_item(PlayerbotAI *botAI) { return new EnchantRandomItemAction(botAI); }
+    static Action *use_random_quest_item(PlayerbotAI *botAI)
+    {
+        return new UseRandomQuestItem(botAI);
+    }
+    static Action *craft_random_item(PlayerbotAI *botAI)
+    {
+        return new CraftRandomItemAction(botAI);
+    }
+    static Action *smart_destroy_item(PlayerbotAI *botAI)
+    {
+        return new SmartDestroyItemAction(botAI);
+    }
+    static Action *disenchant_random_item(PlayerbotAI *botAI)
+    {
+        return new DisEnchantRandomItemAction(botAI);
+    }
+    static Action *enchant_random_item(PlayerbotAI *botAI)
+    {
+        return new EnchantRandomItemAction(botAI);
+    }
     static Action *reset_instances(PlayerbotAI *botAI) { return new ResetInstancesAction(botAI); }
     static Action *buy_petition(PlayerbotAI *botAI) { return new BuyPetitionAction(botAI); }
     static Action *offer_petition(PlayerbotAI *botAI) { return new PetitionOfferAction(botAI); }
-    static Action *offer_petition_nearby(PlayerbotAI *botAI) { return new PetitionOfferNearbyAction(botAI); }
+    static Action *offer_petition_nearby(PlayerbotAI *botAI)
+    {
+        return new PetitionOfferNearbyAction(botAI);
+    }
     static Action *turn_in_petition(PlayerbotAI *botAI) { return new PetitionTurnInAction(botAI); }
     static Action *buy_tabard(PlayerbotAI *botAI) { return new BuyTabardAction(botAI); }
-    static Action *guild_manage_nearby(PlayerbotAI *botAI) { return new GuildManageNearbyAction(botAI); }
+    static Action *guild_manage_nearby(PlayerbotAI *botAI)
+    {
+        return new GuildManageNearbyAction(botAI);
+    }
 
     // BG Tactics
     static Action *bg_tactics(PlayerbotAI *botAI) { return new BGTactics(botAI); }
-    static Action *bg_move_to_start(PlayerbotAI *botAI) { return new BGTactics(botAI, "move to start"); }
-    static Action *bg_move_to_objective(PlayerbotAI *botAI) { return new BGTactics(botAI, "move to objective"); }
-    static Action *bg_select_objective(PlayerbotAI *botAI) { return new BGTactics(botAI, "select objective"); }
-    static Action *bg_check_objective(PlayerbotAI *botAI) { return new BGTactics(botAI, "check objective"); }
+    static Action *bg_move_to_start(PlayerbotAI *botAI)
+    {
+        return new BGTactics(botAI, "move to start");
+    }
+    static Action *bg_move_to_objective(PlayerbotAI *botAI)
+    {
+        return new BGTactics(botAI, "move to objective");
+    }
+    static Action *bg_select_objective(PlayerbotAI *botAI)
+    {
+        return new BGTactics(botAI, "select objective");
+    }
+    static Action *bg_check_objective(PlayerbotAI *botAI)
+    {
+        return new BGTactics(botAI, "check objective");
+    }
     static Action *bg_attack_fc(PlayerbotAI *botAI) { return new BGTactics(botAI, "attack fc"); }
     static Action *bg_protect_fc(PlayerbotAI *botAI) { return new BGTactics(botAI, "protect fc"); }
-    static Action *attack_enemy_fc(PlayerbotAI *botAI) { return new AttackEnemyFlagCarrierAction(botAI); }
+    static Action *attack_enemy_fc(PlayerbotAI *botAI)
+    {
+        return new AttackEnemyFlagCarrierAction(botAI);
+    }
     static Action *bg_use_buff(PlayerbotAI *botAI) { return new BGTactics(botAI, "use buff"); }
     static Action *bg_check_flag(PlayerbotAI *botAI) { return new BGTactics(botAI, "check flag"); }
 
@@ -367,7 +490,10 @@ private:
     static Action *steam_rush(PlayerbotAI *botAI) { return new CastSteamRushAction(botAI); }
     static Action *napalm(PlayerbotAI *botAI) { return new CastNapalmAction(botAI); }
     static Action *fire_cannon(PlayerbotAI *botAI) { return new CastFireCannonAction(botAI); }
-    static Action *incendiary_rocket(PlayerbotAI *botAI) { return new CastIncendiaryRocketAction(botAI); }
+    static Action *incendiary_rocket(PlayerbotAI *botAI)
+    {
+        return new CastIncendiaryRocketAction(botAI);
+    }
     static Action *rocket_blast(PlayerbotAI *botAI) { return new CastRocketBlastAction(botAI); }
     static Action *glaive_throw(PlayerbotAI *botAI) { return new CastGlaiveThrowAction(botAI); }
     static Action *blade_salvo(PlayerbotAI *botAI) { return new CastBladeSalvoAction(botAI); }
@@ -396,7 +522,10 @@ private:
     static Action *rpg_duel(PlayerbotAI *botAI) { return new RpgDuelAction(botAI); }
     static Action *rpg_mount_anim(PlayerbotAI *botAI) { return new RpgMountAnimAction(botAI); }
 
-    static Action *toggle_pet_spell(PlayerbotAI *ai) { return new TogglePetSpellAutoCastAction(ai); }
+    static Action *toggle_pet_spell(PlayerbotAI *ai)
+    {
+        return new TogglePetSpellAutoCastAction(ai);
+    }
     static Action *pet_attack(PlayerbotAI *ai) { return new PetAttackAction(ai); }
 };
 

@@ -1,14 +1,16 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PLAYERBOTSECURITY_H
 #define _PLAYERBOT_PLAYERBOTSECURITY_H
 
+#include <map>
+
 #include "Common.h"
 #include "ObjectGuid.h"
-
-#include <map>
 
 class Player;
 
@@ -40,13 +42,15 @@ enum DenyReason
 
 class PlayerbotSecurity
 {
-public:
+   public:
     PlayerbotSecurity(Player *const bot);
 
-    PlayerbotSecurityLevel LevelFor(Player *from, DenyReason *reason = nullptr, bool ignoreGroup = false);
-    bool CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player *from, bool ignoreGroup = false);
+    PlayerbotSecurityLevel LevelFor(Player *from, DenyReason *reason = nullptr,
+                                    bool ignoreGroup = false);
+    bool CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player *from,
+                       bool ignoreGroup = false);
 
-private:
+   private:
     Player *const bot;
     uint32 account;
     std::map<ObjectGuid, std::map<std::string, time_t>> whispers;

@@ -1,6 +1,8 @@
 #ifndef _PLAYERBOT_RAIDULDUARBOSSHELPER_H
 #define _PLAYERBOT_RAIDULDUARBOSSHELPER_H
 
+#include <string>
+
 #include "AiObject.h"
 #include "AiObjectContext.h"
 #include "EventMap.h"
@@ -9,18 +11,16 @@
 #include "Player.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
-#include "ScriptedCreature.h"
 #include "RaidUlduarScripts.h"
+#include "ScriptedCreature.h"
 #include "SharedDefines.h"
-
-#include <string>
 
 const uint32 ULDUAR_MAP_ID = 603;
 
 template <class BossAiType>
 class GenericBossHelper : public AiObject
 {
-public:
+   public:
     GenericBossHelper(PlayerbotAI *botAI, std::string name) : AiObject(botAI), _name(name) {}
     virtual bool UpdateBossAI()
     {
@@ -71,7 +71,7 @@ public:
         _timer = 0;
     }
 
-protected:
+   protected:
     std::string _name;
     Unit *_unit = nullptr;
     Creature *_target = nullptr;

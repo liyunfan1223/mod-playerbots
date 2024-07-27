@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_ROGUEOPENINGACTIONS_H
@@ -12,7 +14,7 @@ class Unit;
 
 class CastSapAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastSapAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "sap") {}
 
     Value<Unit *> *GetTargetValue() override;
@@ -21,19 +23,19 @@ public:
 
 class CastGarroteAction : public CastDebuffSpellAction
 {
-public:
+   public:
     CastGarroteAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "garrote", true, 8.0f) {}
 };
 
 class CastCheapShotAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastCheapShotAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "cheap shot") {}
 };
 
 class CastAmbushAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastAmbushAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "ambush") {}
 };
 

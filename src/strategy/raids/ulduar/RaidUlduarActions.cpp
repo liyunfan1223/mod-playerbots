@@ -1,12 +1,13 @@
 
+#include "RaidUlduarActions.h"
+
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
-#include "RaidUlduarActions.h"
+#include "RaidUlduarBossHelper.h"
 #include "RaidUlduarStrategy.h"
 #include "ScriptedCreature.h"
 #include "SharedDefines.h"
-#include "RaidUlduarBossHelper.h"
 
 uint32 RotateAroundTheCenterPointAction::FindNearestWaypoint()
 {

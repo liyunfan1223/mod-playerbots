@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_DEBUGSTRATEGY_H
@@ -9,7 +11,7 @@
 
 class DebugStrategy : public Strategy
 {
-public:
+   public:
     DebugStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
@@ -18,7 +20,7 @@ public:
 
 class DebugMoveStrategy : public Strategy
 {
-public:
+   public:
     DebugMoveStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
@@ -27,7 +29,7 @@ public:
 
 class DebugRpgStrategy : public Strategy
 {
-public:
+   public:
     DebugRpgStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
@@ -36,7 +38,7 @@ public:
 
 class DebugSpellStrategy : public Strategy
 {
-public:
+   public:
     DebugSpellStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }

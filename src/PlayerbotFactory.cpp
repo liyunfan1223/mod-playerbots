@@ -1,64 +1,61 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PlayerbotFactory.h"
+
+#include <random>
+#include <utility>
+
 #include "AccountMgr.h"
 #include "AiFactory.h"
 #include "ArenaTeamMgr.h"
 #include "DBCStores.h"
 #include "DBCStructure.h"
 #include "GuildMgr.h"
+#include "InventoryAction.h"
 #include "Item.h"
 #include "ItemTemplate.h"
+#include "ItemVisitors.h"
 #include "Log.h"
 #include "LogCommon.h"
 #include "LootMgr.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
+#include "PerformanceMonitor.h"
 #include "PetDefines.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
-#include "Playerbots.h"
-#include "PerformanceMonitor.h"
 #include "PlayerbotDbStore.h"
+#include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
-#include "ItemVisitors.h"
-#include "InventoryAction.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
-#include <random>
-#include <utility>
 
 #define PLAYER_SKILL_INDEX(x) (PLAYER_SKILL_INFO_1_1 + ((x) * 3))
-#define ITEM_SUBCLASS_MASK_SINGLE_HAND (                                 \
-    (1 << ITEM_SUBCLASS_WEAPON_AXE) | (1 << ITEM_SUBCLASS_WEAPON_MACE) | \
-    (1 << ITEM_SUBCLASS_WEAPON_SWORD) | (1 << ITEM_SUBCLASS_WEAPON_DAGGER) | (1 << ITEM_SUBCLASS_WEAPON_FIST))
+#define ITEM_SUBCLASS_MASK_SINGLE_HAND                                        \
+    ((1 << ITEM_SUBCLASS_WEAPON_AXE) | (1 << ITEM_SUBCLASS_WEAPON_MACE) |     \
+     (1 << ITEM_SUBCLASS_WEAPON_SWORD) | (1 << ITEM_SUBCLASS_WEAPON_DAGGER) | \
+     (1 << ITEM_SUBCLASS_WEAPON_FIST))
 
-uint32 PlayerbotFactory::tradeSkills[] =
-    {
-        SKILL_ALCHEMY,
-        SKILL_ENCHANTING,
-        SKILL_SKINNING,
-        SKILL_TAILORING,
-        SKILL_LEATHERWORKING,
-        SKILL_ENGINEERING,
-        SKILL_HERBALISM,
-        SKILL_MINING,
-        SKILL_BLACKSMITHING,
-        SKILL_COOKING,
-        SKILL_FIRST_AID,
-        SKILL_FISHING,
-        SKILL_JEWELCRAFTING};
+uint32 PlayerbotFactory::tradeSkills[] = {
+    SKILL_ALCHEMY,        SKILL_ENCHANTING,  SKILL_SKINNING,  SKILL_TAILORING,
+    SKILL_LEATHERWORKING, SKILL_ENGINEERING, SKILL_HERBALISM, SKILL_MINING,
+    SKILL_BLACKSMITHING,  SKILL_COOKING,     SKILL_FIRST_AID, SKILL_FISHING,
+    SKILL_JEWELCRAFTING};
 
 std::list<uint32> PlayerbotFactory::classQuestIds;
 std::list<uint32> PlayerbotFactory::specialQuestIds;
 std::vector<uint32> PlayerbotFactory::enchantSpellIdCache;
 std::vector<uint32> PlayerbotFactory::enchantGemIdCache;
 
-PlayerbotFactory::PlayerbotFactory(Player *bot, uint32 level, uint32 itemQuality, uint32 gearScoreLimit) : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), bot(bot)
+PlayerbotFactory::PlayerbotFactory(Player *bot, uint32 level, uint32 itemQuality,
+                                   uint32 gearScoreLimit)
+    : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), bot(bot)
 {
     botAI = GET_PLAYERBOT_AI(bot);
 }
@@ -68,7 +65,8 @@ void PlayerbotFactory::Init()
     if (sPlayerbotAIConfig->randomBotPreQuests)
     {
         ObjectMgr::QuestMap const &questTemplates = sObjectMgr->GetQuestTemplates();
-        for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+        for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin();
+             i != questTemplates.end(); ++i)
         {
             uint32 questId = i->first;
             Quest const *quest = i->second;
@@ -82,7 +80,8 @@ void PlayerbotFactory::Init()
         }
     }
 
-    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotQuestIds.begin(); i != sPlayerbotAIConfig->randomBotQuestIds.end(); ++i)
+    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotQuestIds.begin();
+         i != sPlayerbotAIConfig->randomBotQuestIds.end(); ++i)
     {
         uint32 questId = *i;
         AddPrevQuests(questId, specialQuestIds);
@@ -96,7 +95,8 @@ void PlayerbotFactory::Init()
         if (!spellInfo)
             continue;
 
-        if (id == 47181 || id == 50358 || id == 47242 || id == 52639 || id == 47147 || id == 7218) // Test Enchant
+        if (id == 47181 || id == 50358 || id == 47242 || id == 52639 || id == 47147 ||
+            id == 7218)  // Test Enchant
             continue;
 
         if (strstr(spellInfo->SpellName[0], "Test"))
@@ -113,8 +113,10 @@ void PlayerbotFactory::Init()
             if (!enchant_id)
                 continue;
 
-            SpellItemEnchantmentEntry const *enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-            if (!enchant || (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT))
+            SpellItemEnchantmentEntry const *enchant =
+                sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+            if (!enchant ||
+                (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT))
                 continue;
 
             // SpellInfo const* enchantSpell = sSpellMgr->GetSpellInfo(enchant->spellid[0]);
@@ -126,7 +128,8 @@ void PlayerbotFactory::Init()
         }
     }
     LOG_INFO("playerbots", "Loading {} enchantment spells", enchantSpellIdCache.size());
-    for (auto iter = sSpellItemEnchantmentStore.begin(); iter != sSpellItemEnchantmentStore.end(); iter++)
+    for (auto iter = sSpellItemEnchantmentStore.begin(); iter != sSpellItemEnchantmentStore.end();
+         iter++)
     {
         uint32 gemId = iter->GemID;
         if (gemId == 0)
@@ -134,7 +137,7 @@ void PlayerbotFactory::Init()
             continue;
         }
         if (gemId == 49110)
-        { // unique gem
+        {  // unique gem
             continue;
         }
         ItemTemplate const *proto = sObjectMgr->GetItemTemplate(gemId);
@@ -152,7 +155,11 @@ void PlayerbotFactory::Prepare()
 {
     if (!itemQuality)
     {
-        uint32 gs = sPlayerbotAIConfig->randomGearScoreLimit == 0 ? 0 : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->randomGearScoreLimit, sPlayerbotAIConfig->randomGearQualityLimit);
+        uint32 gs =
+            sPlayerbotAIConfig->randomGearScoreLimit == 0
+                ? 0
+                : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->randomGearScoreLimit,
+                                                       sPlayerbotAIConfig->randomGearQualityLimit);
         itemQuality = sPlayerbotAIConfig->randomGearQualityLimit;
         gearScoreLimit = gs;
     }
@@ -184,11 +191,15 @@ void PlayerbotFactory::Randomize(bool incremental)
     // {
     //     return;
     // }
-    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"), bot->GetName().c_str(), level, bot->getClass());
-    // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
+    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...",
+             (incremental ? "Incremental" : "Full"), bot->GetName().c_str(), level,
+             bot->getClass());
+    // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" :
+    // "full"));
     Prepare();
     LOG_DEBUG("playerbots", "Resetting player...");
-    PerformanceMonitorOperation *pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
+    PerformanceMonitorOperation *pmo =
+        sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
     bot->resetTalents(true);
     // bot->SaveToDB(false, false);
     ClearSkills();
@@ -199,7 +210,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         ResetQuests();
     }
-    if (!sPlayerbotAIConfig->equipmentPersistence || level < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!sPlayerbotAIConfig->equipmentPersistence ||
+        level < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         ClearAllItems();
     }
@@ -247,7 +259,8 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
     LOG_DEBUG("playerbots", "Initializing talents...");
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!sPlayerbotAIConfig->equipmentPersistence ||
+        bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitTalentsTree();
     }
@@ -256,7 +269,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         sPlayerbotDbStore->Reset(botAI);
         // botAI->DoSpecificAction("auto talents");
-        botAI->ResetStrategies(false); // fix wrong stored strategy
+        botAI->ResetStrategies(false);  // fix wrong stored strategy
     }
     if (pmo)
         pmo->finish();
@@ -282,7 +295,8 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
     LOG_DEBUG("playerbots", "Initializing equipmemt...");
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!sPlayerbotAIConfig->equipmentPersistence ||
+        bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitEquipment(incremental);
     }
@@ -412,7 +426,8 @@ void PlayerbotFactory::Randomize(bool incremental)
 void PlayerbotFactory::Refresh()
 {
     // Prepare();
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!sPlayerbotAIConfig->equipmentPersistence ||
+        bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitEquipment(true);
     }
@@ -445,146 +460,146 @@ void PlayerbotFactory::AddConsumables()
 {
     switch (bot->getClass())
     {
-    case CLASS_PRIEST:
-    case CLASS_MAGE:
-    case CLASS_WARLOCK:
-    {
-        if (level >= 5 && level < 20)
+        case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
         {
-            StoreItem(CONSUM_ID_MINOR_WIZARD_OIL, 5);
-        }
+            if (level >= 5 && level < 20)
+            {
+                StoreItem(CONSUM_ID_MINOR_WIZARD_OIL, 5);
+            }
 
-        if (level >= 20 && level < 40)
-        {
-            StoreItem(CONSUM_ID_MINOR_MANA_OIL, 5);
-            StoreItem(CONSUM_ID_MINOR_WIZARD_OIL, 5);
-        }
+            if (level >= 20 && level < 40)
+            {
+                StoreItem(CONSUM_ID_MINOR_MANA_OIL, 5);
+                StoreItem(CONSUM_ID_MINOR_WIZARD_OIL, 5);
+            }
 
-        if (level >= 40 && level < 45)
-        {
-            StoreItem(CONSUM_ID_MINOR_MANA_OIL, 5);
-            StoreItem(CONSUM_ID_WIZARD_OIL, 5);
-        }
+            if (level >= 40 && level < 45)
+            {
+                StoreItem(CONSUM_ID_MINOR_MANA_OIL, 5);
+                StoreItem(CONSUM_ID_WIZARD_OIL, 5);
+            }
 
-        if (level >= 45 && level < 52)
-        {
-            StoreItem(CONSUM_ID_BRILLIANT_MANA_OIL, 5);
-            StoreItem(CONSUM_ID_BRILLIANT_WIZARD_OIL, 5);
-        }
-        if (level >= 52 && level < 58)
-        {
-            StoreItem(CONSUM_ID_SUPERIOR_MANA_OIL, 5);
-            StoreItem(CONSUM_ID_BRILLIANT_WIZARD_OIL, 5);
-        }
+            if (level >= 45 && level < 52)
+            {
+                StoreItem(CONSUM_ID_BRILLIANT_MANA_OIL, 5);
+                StoreItem(CONSUM_ID_BRILLIANT_WIZARD_OIL, 5);
+            }
+            if (level >= 52 && level < 58)
+            {
+                StoreItem(CONSUM_ID_SUPERIOR_MANA_OIL, 5);
+                StoreItem(CONSUM_ID_BRILLIANT_WIZARD_OIL, 5);
+            }
 
-        if (level >= 58)
-        {
-            StoreItem(CONSUM_ID_SUPERIOR_MANA_OIL, 5);
-            StoreItem(CONSUM_ID_SUPERIOR_WIZARD_OIL, 5);
+            if (level >= 58)
+            {
+                StoreItem(CONSUM_ID_SUPERIOR_MANA_OIL, 5);
+                StoreItem(CONSUM_ID_SUPERIOR_WIZARD_OIL, 5);
+            }
+            break;
         }
-        break;
-    }
-    case CLASS_PALADIN:
-    case CLASS_WARRIOR:
-    case CLASS_HUNTER:
-    {
-        if (level >= 1 && level < 5)
+        case CLASS_PALADIN:
+        case CLASS_WARRIOR:
+        case CLASS_HUNTER:
         {
-            StoreItem(CONSUM_ID_ROUGH_SHARPENING_STONE, 5);
-            StoreItem(CONSUM_ID_ROUGH_WEIGHTSTONE, 5);
-        }
+            if (level >= 1 && level < 5)
+            {
+                StoreItem(CONSUM_ID_ROUGH_SHARPENING_STONE, 5);
+                StoreItem(CONSUM_ID_ROUGH_WEIGHTSTONE, 5);
+            }
 
-        if (level >= 5 && level < 15)
-        {
-            StoreItem(CONSUM_ID_COARSE_WEIGHTSTONE, 5);
-            StoreItem(CONSUM_ID_COARSE_SHARPENING_STONE, 5);
-        }
+            if (level >= 5 && level < 15)
+            {
+                StoreItem(CONSUM_ID_COARSE_WEIGHTSTONE, 5);
+                StoreItem(CONSUM_ID_COARSE_SHARPENING_STONE, 5);
+            }
 
-        if (level >= 15 && level < 25)
-        {
-            StoreItem(CONSUM_ID_HEAVY_WEIGHTSTONE, 5);
-            StoreItem(CONSUM_ID_HEAVY_SHARPENING_STONE, 5);
-        }
+            if (level >= 15 && level < 25)
+            {
+                StoreItem(CONSUM_ID_HEAVY_WEIGHTSTONE, 5);
+                StoreItem(CONSUM_ID_HEAVY_SHARPENING_STONE, 5);
+            }
 
-        if (level >= 25 && level < 35)
-        {
-            StoreItem(CONSUM_ID_SOL_SHARPENING_STONE, 5);
-            StoreItem(CONSUM_ID_SOLID_WEIGHTSTONE, 5);
-        }
+            if (level >= 25 && level < 35)
+            {
+                StoreItem(CONSUM_ID_SOL_SHARPENING_STONE, 5);
+                StoreItem(CONSUM_ID_SOLID_WEIGHTSTONE, 5);
+            }
 
-        if (level >= 35 && level < 50)
-        {
-            StoreItem(CONSUM_ID_DENSE_WEIGHTSTONE, 5);
-            StoreItem(CONSUM_ID_DENSE_SHARPENING_STONE, 5);
-        }
+            if (level >= 35 && level < 50)
+            {
+                StoreItem(CONSUM_ID_DENSE_WEIGHTSTONE, 5);
+                StoreItem(CONSUM_ID_DENSE_SHARPENING_STONE, 5);
+            }
 
-        if (level >= 50 && level < 60)
-        {
-            StoreItem(CONSUM_ID_FEL_SHARPENING_STONE, 5);
-            StoreItem(CONSUM_ID_FEL_WEIGHTSTONE, 5);
-        }
+            if (level >= 50 && level < 60)
+            {
+                StoreItem(CONSUM_ID_FEL_SHARPENING_STONE, 5);
+                StoreItem(CONSUM_ID_FEL_WEIGHTSTONE, 5);
+            }
 
-        if (level >= 60)
-        {
-            StoreItem(CONSUM_ID_ADAMANTITE_WEIGHTSTONE, 5);
-            StoreItem(CONSUM_ID_ADAMANTITE_SHARPENING_STONE, 5);
+            if (level >= 60)
+            {
+                StoreItem(CONSUM_ID_ADAMANTITE_WEIGHTSTONE, 5);
+                StoreItem(CONSUM_ID_ADAMANTITE_SHARPENING_STONE, 5);
+            }
+            break;
         }
-        break;
-    }
-    case CLASS_ROGUE:
-    {
-        if (level >= 20 && level < 28)
+        case CLASS_ROGUE:
         {
-            StoreItem(CONSUM_ID_INSTANT_POISON, 5);
-        }
+            if (level >= 20 && level < 28)
+            {
+                StoreItem(CONSUM_ID_INSTANT_POISON, 5);
+            }
 
-        if (level >= 28 && level < 30)
-        {
-            StoreItem(CONSUM_ID_INSTANT_POISON_II, 5);
-        }
+            if (level >= 28 && level < 30)
+            {
+                StoreItem(CONSUM_ID_INSTANT_POISON_II, 5);
+            }
 
-        if (level >= 30 && level < 36)
-        {
-            StoreItem(CONSUM_ID_DEADLY_POISON, 5);
-            StoreItem(CONSUM_ID_INSTANT_POISON_II, 5);
-        }
+            if (level >= 30 && level < 36)
+            {
+                StoreItem(CONSUM_ID_DEADLY_POISON, 5);
+                StoreItem(CONSUM_ID_INSTANT_POISON_II, 5);
+            }
 
-        if (level >= 36 && level < 44)
-        {
-            StoreItem(CONSUM_ID_DEADLY_POISON_II, 5);
-            StoreItem(CONSUM_ID_INSTANT_POISON_III, 5);
-        }
+            if (level >= 36 && level < 44)
+            {
+                StoreItem(CONSUM_ID_DEADLY_POISON_II, 5);
+                StoreItem(CONSUM_ID_INSTANT_POISON_III, 5);
+            }
 
-        if (level >= 44 && level < 52)
-        {
-            StoreItem(CONSUM_ID_DEADLY_POISON_III, 5);
-            StoreItem(CONSUM_ID_INSTANT_POISON_IV, 5);
-        }
-        if (level >= 52 && level < 60)
-        {
-            StoreItem(CONSUM_ID_DEADLY_POISON_IV, 5);
-            StoreItem(CONSUM_ID_INSTANT_POISON_V, 5);
-        }
+            if (level >= 44 && level < 52)
+            {
+                StoreItem(CONSUM_ID_DEADLY_POISON_III, 5);
+                StoreItem(CONSUM_ID_INSTANT_POISON_IV, 5);
+            }
+            if (level >= 52 && level < 60)
+            {
+                StoreItem(CONSUM_ID_DEADLY_POISON_IV, 5);
+                StoreItem(CONSUM_ID_INSTANT_POISON_V, 5);
+            }
 
-        if (level >= 60 && level < 62)
-        {
-            StoreItem(CONSUM_ID_DEADLY_POISON_V, 5);
-            StoreItem(CONSUM_ID_INSTANT_POISON_VI, 5);
-        }
+            if (level >= 60 && level < 62)
+            {
+                StoreItem(CONSUM_ID_DEADLY_POISON_V, 5);
+                StoreItem(CONSUM_ID_INSTANT_POISON_VI, 5);
+            }
 
-        if (level >= 62 && level < 68)
-        {
-            StoreItem(CONSUM_ID_DEADLY_POISON_VI, 5);
-            StoreItem(CONSUM_ID_INSTANT_POISON_VI, 5);
-        }
+            if (level >= 62 && level < 68)
+            {
+                StoreItem(CONSUM_ID_DEADLY_POISON_VI, 5);
+                StoreItem(CONSUM_ID_INSTANT_POISON_VI, 5);
+            }
 
-        if (level >= 68)
-        {
-            StoreItem(CONSUM_ID_DEADLY_POISON_VII, 5);
-            StoreItem(CONSUM_ID_INSTANT_POISON_VII, 5);
+            if (level >= 68)
+            {
+                StoreItem(CONSUM_ID_DEADLY_POISON_VII, 5);
+                StoreItem(CONSUM_ID_INSTANT_POISON_VII, 5);
+            }
+            break;
         }
-        break;
-    }
     }
 }
 
@@ -599,17 +614,19 @@ void PlayerbotFactory::InitPetTalents()
     CreatureTemplate const *ci = pet->GetCreatureTemplate();
     if (!ci)
     {
-        // LOG_INFO("playerbots", "{} init pet talents failed with no creature template", bot->GetName().c_str());
+        // LOG_INFO("playerbots", "{} init pet talents failed with no creature template",
+        // bot->GetName().c_str());
         return;
     }
     CreatureFamilyEntry const *pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
     if (!pet_family || pet_family->petTalentType < 0)
     {
-        // LOG_INFO("playerbots", "{} init pet talents failed with petTalentType < 0({})", bot->GetName().c_str(), pet_family->petTalentType);
+        // LOG_INFO("playerbots", "{} init pet talents failed with petTalentType < 0({})",
+        // bot->GetName().c_str(), pet_family->petTalentType);
         return;
     }
     // pet->resetTalents();
-    std::unordered_map<uint32, std::vector<TalentEntry const*>> spells;
+    std::unordered_map<uint32, std::vector<TalentEntry const *>> spells;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -628,23 +645,30 @@ void PlayerbotFactory::InitPetTalents()
     uint32 curTalentPoints = pet->GetFreeTalentPoints();
     uint32 maxTalentPoints = pet->GetMaxTalentPointsForLevel(pet->GetLevel());
     int row = 0;
-    // LOG_INFO("playerbots", "{} learning, max talent points: {}, cur: {}", bot->GetName().c_str(), maxTalentPoints, curTalentPoints);
+    // LOG_INFO("playerbots", "{} learning, max talent points: {}, cur: {}", bot->GetName().c_str(),
+    // maxTalentPoints, curTalentPoints);
     for (auto i = spells.begin(); i != spells.end(); ++i, ++row)
     {
-        std::vector<TalentEntry const*> &spells_row = i->second;
+        std::vector<TalentEntry const *> &spells_row = i->second;
         if (spells_row.empty())
         {
-            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(), i->first);
+            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(),
+                     i->first);
             continue;
         }
         int attemptCount = 0;
         // keep learning for the last row
-        while (!spells_row.empty() && ((((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * (row + 1)) || (row == 5)) && attemptCount++ < 10 && pet->GetFreeTalentPoints())
+        while (!spells_row.empty() &&
+               ((((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * (row + 1)) ||
+                (row == 5)) &&
+               attemptCount++ < 10 && pet->GetFreeTalentPoints())
         {
             int index = urand(0, spells_row.size() - 1);
             TalentEntry const *talentInfo = spells_row[index];
             int maxRank = 0;
-            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints()); ++rank)
+            for (int rank = 0;
+                 rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints());
+                 ++rank)
             {
                 uint32 spellId = talentInfo->RankID[rank];
                 if (!spellId)
@@ -652,10 +676,13 @@ void PlayerbotFactory::InitPetTalents()
 
                 maxRank = rank;
             }
-            // LOG_INFO("playerbots", "{} learn pet talent {}({})", bot->GetName().c_str(), talentInfo->TalentID, maxRank);
+            // LOG_INFO("playerbots", "{} learn pet talent {}({})", bot->GetName().c_str(),
+            // talentInfo->TalentID, maxRank);
             if (talentInfo->DependsOn)
             {
-                bot->LearnPetTalent(pet->GetGUID(), talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                bot->LearnPetTalent(
+                    pet->GetGUID(), talentInfo->DependsOn,
+                    std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
             }
             bot->LearnPetTalent(pet->GetGUID(), talentInfo->TalentID, maxRank);
             spells_row.erase(spells_row.begin() + index);
@@ -679,7 +706,8 @@ void PlayerbotFactory::InitPet()
         std::vector<uint32> ids;
 
         CreatureTemplateContainer const *creatures = sObjectMgr->GetCreatureTemplates();
-        for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
+        for (CreatureTemplateContainer::const_iterator itr = creatures->begin();
+             itr != creatures->end(); ++itr)
         {
             if (!itr->second.IsTameable(bot->CanTameExoticPets()))
                 continue;
@@ -692,7 +720,8 @@ void PlayerbotFactory::InitPet()
 
         if (ids.empty())
         {
-            LOG_ERROR("playerbots", "No pets available for bot {} ({} level)", bot->GetName().c_str(), bot->GetLevel());
+            LOG_ERROR("playerbots", "No pets available for bot {} ({} level)",
+                      bot->GetName().c_str(), bot->GetLevel());
             return;
         }
 
@@ -759,7 +788,8 @@ void PlayerbotFactory::InitPet()
         return;
     }
 
-    // LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.", pet->m_spells.size(), pet->GetPetAutoSpellSize());
+    // LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.",
+    // pet->m_spells.size(), pet->GetPetAutoSpellSize());
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
     {
         if (itr->second.state == PETSPELL_REMOVED)
@@ -787,7 +817,8 @@ void PlayerbotFactory::ClearSkills()
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(1), 0);
     // unlearn default race/class skills
     PlayerInfo const *info = sObjectMgr->GetPlayerInfo(bot->getRace(), bot->getClass());
-    for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
+    for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin();
+         itr != info->skills.end(); ++itr)
     {
         uint32 skillId = itr->SkillId;
         if (!bot->HasSkill(skillId))
@@ -799,7 +830,9 @@ void PlayerbotFactory::ClearSkills()
 void PlayerbotFactory::ClearEverything()
 {
     bot->SaveToDB(false, false);
-    bot->GiveLevel(bot->getClass() == CLASS_DEATH_KNIGHT ? sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL) : sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL));
+    bot->GiveLevel(bot->getClass() == CLASS_DEATH_KNIGHT
+                       ? sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)
+                       : sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL));
     bot->SetUInt32Value(PLAYER_XP, 0);
     LOG_INFO("playerbots", "Resetting player...");
     bot->resetTalents(true);
@@ -816,7 +849,8 @@ void PlayerbotFactory::ClearEverything()
 void PlayerbotFactory::ClearSpells()
 {
     std::list<uint32> spells;
-    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
+    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end();
+         ++itr)
     {
         uint32 spellId = itr->first;
         const SpellInfo *spellInfo = sSpellMgr->GetSpellInfo(spellId);
@@ -837,7 +871,8 @@ void PlayerbotFactory::ClearSpells()
 void PlayerbotFactory::ResetQuests()
 {
     ObjectMgr::QuestMap const &questTemplates = sObjectMgr->GetQuestTemplates();
-    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end();
+         ++i)
     {
         Quest const *quest = i->second;
 
@@ -859,15 +894,14 @@ void PlayerbotFactory::ResetQuests()
         // bot->getQuestStatusMap()[entry].m_status = QUEST_STATUS_NONE;
     }
     // bot->UpdateForQuestWorldObjects();
-    CharacterDatabase.Execute("DELETE FROM character_queststatus WHERE guid = {}", bot->GetGUID().GetCounter());
+    CharacterDatabase.Execute("DELETE FROM character_queststatus WHERE guid = {}",
+                              bot->GetGUID().GetCounter());
 }
 
-void PlayerbotFactory::InitSpells()
-{
-    InitAvailableSpells();
-}
+void PlayerbotFactory::InitSpells() { InitAvailableSpells(); }
 
-void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_template /*true*/, bool reset /*false*/)
+void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_template /*true*/,
+                                       bool reset /*false*/)
 {
     uint32 specTab;
     uint8 cls = bot->getClass();
@@ -911,7 +945,7 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player *bot, int specNo, bool reset)
     uint32 cls = bot->getClass();
     int startLevel = bot->GetLevel();
     uint32 classMask = bot->getClassMask();
-    std::unordered_map<uint32, std::vector<TalentEntry const*>> spells_row;
+    std::unordered_map<uint32, std::vector<TalentEntry const *>> spells_row;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -927,7 +961,8 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player *bot, int specNo, bool reset)
 
         spells_row[talentInfo->Row].push_back(talentInfo);
     }
-    while (startLevel > 1 && startLevel < 80 && sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][startLevel].size() == 0)
+    while (startLevel > 1 && startLevel < 80 &&
+           sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][startLevel].size() == 0)
     {
         startLevel--;
     }
@@ -942,7 +977,7 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player *bot, int specNo, bool reset)
             uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
             uint32 talentID = -1;
 
-            std::vector<TalentEntry const*> &spells = spells_row[row];
+            std::vector<TalentEntry const *> &spells = spells_row[row];
             if (spells.size() <= 0)
             {
                 return;
@@ -953,14 +988,17 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player *bot, int specNo, bool reset)
                 {
                     continue;
                 }
-                TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+                TalentTabEntry const *talentTabInfo =
+                    sTalentTabStore.LookupEntry(talentInfo->TalentTab);
                 if (talentTabInfo->tabpage != tab)
                 {
                     continue;
                 }
                 if (talentInfo->DependsOn)
                 {
-                    bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                    bot->LearnTalent(
+                        talentInfo->DependsOn,
+                        std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
                 }
                 talentID = talentInfo->TalentID;
             }
@@ -978,14 +1016,16 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player *bot, int specNo, bool reset)
     bot->SendTalentsInfoData(false);
 }
 
-void PlayerbotFactory::InitTalentsByParsedSpecLink(Player *bot, std::vector<std::vector<uint32>> parsedSpecLink, bool reset)
+void PlayerbotFactory::InitTalentsByParsedSpecLink(Player *bot,
+                                                   std::vector<std::vector<uint32>> parsedSpecLink,
+                                                   bool reset)
 {
     if (reset)
     {
         bot->resetTalents(true);
     }
     uint32 classMask = bot->getClassMask();
-    std::unordered_map<uint32, std::vector<TalentEntry const*>> spells_row;
+    std::unordered_map<uint32, std::vector<TalentEntry const *>> spells_row;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -1006,7 +1046,7 @@ void PlayerbotFactory::InitTalentsByParsedSpecLink(Player *bot, std::vector<std:
         uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
         uint32 talentID = -1;
 
-        std::vector<TalentEntry const*> &spells = spells_row[row];
+        std::vector<TalentEntry const *> &spells = spells_row[row];
         if (spells.size() <= 0)
         {
             return;
@@ -1017,14 +1057,16 @@ void PlayerbotFactory::InitTalentsByParsedSpecLink(Player *bot, std::vector<std:
             {
                 continue;
             }
-            TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+            TalentTabEntry const *talentTabInfo =
+                sTalentTabStore.LookupEntry(talentInfo->TalentTab);
             if (talentTabInfo->tabpage != tab)
             {
                 continue;
             }
             if (talentInfo->DependsOn)
             {
-                bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank,
+                                                                 bot->GetFreeTalentPoints() - 1));
             }
             talentID = talentInfo->TalentID;
         }
@@ -1039,7 +1081,7 @@ void PlayerbotFactory::InitTalentsByParsedSpecLink(Player *bot, std::vector<std:
 
 class DestroyItemsVisitor : public IterateItemsVisitor
 {
-public:
+   public:
     DestroyItemsVisitor(Player *bot) : IterateItemsVisitor(), bot(bot) {}
 
     bool Visit(Item *item) override
@@ -1055,7 +1097,7 @@ public:
         return true;
     }
 
-private:
+   private:
     bool CanKeep(uint32 id)
     {
         if (keep.find(id) != keep.end())
@@ -1100,10 +1142,12 @@ bool PlayerbotFactory::CanEquipArmor(ItemTemplate const *proto)
     //     if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
     //         continue;
 
-    //     if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
+    //     if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class !=
+    //     ITEM_CLASS_WEAPON)
     //         continue;
 
-    //     if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_PALADIN && proto->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
+    //     if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_PALADIN && proto->SubClass
+    //     != ITEM_SUBCLASS_ARMOR_SHIELD)
     //         continue;
     // }
 
@@ -1126,26 +1170,26 @@ bool PlayerbotFactory::CheckItemStats(uint8 sp, uint8 ap, uint8 tank)
 {
     switch (bot->getClass())
     {
-    case CLASS_PRIEST:
-    case CLASS_MAGE:
-    case CLASS_WARLOCK:
-        if (!sp || ap > sp || tank > sp)
-            return false;
-        break;
-    case CLASS_PALADIN:
-    case CLASS_WARRIOR:
-        if ((!ap && !tank) || sp > ap || sp > tank)
-            return false;
-        break;
-    case CLASS_HUNTER:
-    case CLASS_ROGUE:
-        if (!ap || sp > ap || sp > tank)
-            return false;
-        break;
-    case CLASS_DEATH_KNIGHT:
-        if ((!ap && !tank) || sp > ap || sp > tank)
-            return false;
-        break;
+        case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+            if (!sp || ap > sp || tank > sp)
+                return false;
+            break;
+        case CLASS_PALADIN:
+        case CLASS_WARRIOR:
+            if ((!ap && !tank) || sp > ap || sp > tank)
+                return false;
+            break;
+        case CLASS_HUNTER:
+        case CLASS_ROGUE:
+            if (!ap || sp > ap || sp > tank)
+                return false;
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if ((!ap && !tank) || sp > ap || sp > tank)
+                return false;
+            break;
     }
 
     return sp || ap || tank;
@@ -1155,33 +1199,33 @@ void PlayerbotFactory::AddItemStats(uint32 mod, uint8 &sp, uint8 &ap, uint8 &tan
 {
     switch (mod)
     {
-    case ITEM_MOD_HEALTH:
-    case ITEM_MOD_STAMINA:
-    case ITEM_MOD_MANA:
-    case ITEM_MOD_INTELLECT:
-    case ITEM_MOD_SPIRIT:
-        ++sp;
-        break;
+        case ITEM_MOD_HEALTH:
+        case ITEM_MOD_STAMINA:
+        case ITEM_MOD_MANA:
+        case ITEM_MOD_INTELLECT:
+        case ITEM_MOD_SPIRIT:
+            ++sp;
+            break;
     }
 
     switch (mod)
     {
-    case ITEM_MOD_AGILITY:
-    case ITEM_MOD_STRENGTH:
-    case ITEM_MOD_HEALTH:
-    case ITEM_MOD_STAMINA:
-        ++tank;
-        break;
+        case ITEM_MOD_AGILITY:
+        case ITEM_MOD_STRENGTH:
+        case ITEM_MOD_HEALTH:
+        case ITEM_MOD_STAMINA:
+            ++tank;
+            break;
     }
 
     switch (mod)
     {
-    case ITEM_MOD_HEALTH:
-    case ITEM_MOD_STAMINA:
-    case ITEM_MOD_AGILITY:
-    case ITEM_MOD_STRENGTH:
-        ++ap;
-        break;
+        case ITEM_MOD_HEALTH:
+        case ITEM_MOD_STAMINA:
+        case ITEM_MOD_AGILITY:
+        case ITEM_MOD_STRENGTH:
+            ++ap;
+            break;
     }
 }
 
@@ -1189,92 +1233,92 @@ bool PlayerbotFactory::CanEquipWeapon(ItemTemplate const *proto)
 {
     switch (bot->getClass())
     {
-    case CLASS_PRIEST:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE)
-            return false;
-        break;
-    case CLASS_MAGE:
-    case CLASS_WARLOCK:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-            return false;
-        break;
-    case CLASS_WARRIOR:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-            return false;
-        break;
-    case CLASS_PALADIN:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-            return false;
-        break;
-    case CLASS_DEATH_KNIGHT:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-            return false;
-        break;
-    case CLASS_SHAMAN:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
-            return false;
-        break;
-    case CLASS_DRUID:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
-            return false;
-        break;
-    case CLASS_HUNTER:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW)
-            return false;
-        break;
-    case CLASS_ROGUE:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
-            proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-            return false;
-        break;
+        case CLASS_PRIEST:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE)
+                return false;
+            break;
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+                return false;
+            break;
+        case CLASS_WARRIOR:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
+                return false;
+            break;
+        case CLASS_PALADIN:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+                return false;
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+                return false;
+            break;
+        case CLASS_SHAMAN:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
+                return false;
+            break;
+        case CLASS_DRUID:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
+                return false;
+            break;
+        case CLASS_HUNTER:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW)
+                return false;
+            break;
+        case CLASS_ROGUE:
+            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
+                return false;
+            break;
     }
 
     return true;
@@ -1301,21 +1345,21 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const *proto, uint32 desiredQua
     uint32 level = bot->GetLevel();
     uint32 delta = 2;
     if (level < 15)
-        delta = std::min(level, 15u); // urand(7, 15);
+        delta = std::min(level, 15u);  // urand(7, 15);
     // else if (proto->Class == ITEM_CLASS_WEAPON || proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
     //     delta = urand(2, 3);
     // else if (!(level % 10) || (level % 10) == 9)
     //     delta = 2;
     else if (level < 40)
-        delta = 10; // urand(5, 10);
+        delta = 10;  // urand(5, 10);
     else if (level < 60)
-        delta = 6; // urand(3, 7);
+        delta = 6;  // urand(3, 7);
     else if (level < 70)
-        delta = 9; // urand(2, 5);
+        delta = 9;  // urand(2, 5);
     else if (level < 80)
-        delta = 9; // urand(2, 4);
+        delta = 9;  // urand(2, 4);
     else if (level == 80)
-        delta = 9; // urand(2, 4);
+        delta = 9;  // urand(2, 4);
 
     if (desiredQuality > ITEM_QUALITY_NORMAL &&
         (requiredLevel > level || requiredLevel < level - delta))
@@ -1343,7 +1387,8 @@ void Shuffle(std::vector<uint32> &items)
 //     if (incremental)
 //     {
 //         DestroyItemsVisitor visitor(bot);
-//         IterateItems(&visitor, (IterateItemsMask)(ITERATE_ITEMS_IN_BAGS | ITERATE_ITEMS_IN_BANK));
+//         IterateItems(&visitor, (IterateItemsMask)(ITERATE_ITEMS_IN_BAGS |
+//         ITERATE_ITEMS_IN_BANK));
 //     }
 //     else
 //     {
@@ -1366,7 +1411,8 @@ void Shuffle(std::vector<uint32> &items)
 //         bool noItem = false;
 //         uint32 quality = urand(ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_EPIC);
 //         uint32 attempts = 10;
-//         if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && quality > ITEM_QUALITY_NORMAL) {
+//         if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && quality >
+//         ITEM_QUALITY_NORMAL) {
 //             quality--;
 //         }
 //         // current item;
@@ -1389,8 +1435,8 @@ void Shuffle(std::vector<uint32> &items)
 //         {
 //             if (isUpgrade)
 //             {
-//                 std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot, 0, itemInSlot);
-//                 if (!ids.empty())
+//                 std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot, 0,
+//                 itemInSlot); if (!ids.empty())
 //                     Shuffle(ids);
 
 //                 for (uint32 index = 0; index < ids.size(); ++index)
@@ -1419,8 +1465,10 @@ void Shuffle(std::vector<uint32> &items)
 //                         bot->AutoUnequipOffhandIfNeed();
 //                         newItem->SetOwnerGUID(bot->GetGUID());
 //                         EnchantItem(newItem);
-//                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}, Old item: {}",
-//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->GetLevel(), bot->GetName(), newItemId, slot, itemInSlot);
+//                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}, Old item:
+//                         {}",
+//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" :
+//                             "H", bot->GetLevel(), bot->GetName(), newItemId, slot, itemInSlot);
 //                         found = true;
 //                         break;
 //                     }
@@ -1428,8 +1476,8 @@ void Shuffle(std::vector<uint32> &items)
 //             }
 //             else
 //             {
-//                 std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot, quality, itemInSlot);
-//                 if (!ids.empty())
+//                 std::vector<uint32> ids = sRandomItemMgr->GetUpgradeList(bot, specName, slot,
+//                 quality, itemInSlot); if (!ids.empty())
 //                     Shuffle(ids);
 
 //                 for (uint32 index = 0; index < ids.size(); ++index)
@@ -1447,7 +1495,8 @@ void Shuffle(std::vector<uint32> &items)
 //                         EnchantItem(newItem);
 //                         found = true;
 //                         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Equip: {}, slot: {}",
-//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->GetLevel(), bot->GetName(), newItemId, slot);
+//                             bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" :
+//                             "H", bot->GetLevel(), bot->GetName(), newItemId, slot);
 //                         break;
 //                     }
 //                 }
@@ -1457,7 +1506,8 @@ void Shuffle(std::vector<uint32> &items)
 //         if (!found)
 //         {
 //             LOG_INFO("playerbots", "Bot {} {}:{} <{}>: no item for slot {}",
-//                 bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H", bot->GetLevel(), bot->GetName(), slot);
+//                 bot->GetGUID().ToString().c_str(), IsAlliance(bot->getRace()) ? "A" : "H",
+//                 bot->GetLevel(), bot->GetName(), slot);
 //             continue;
 //         }
 //     }
@@ -1501,53 +1551,68 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             continue;
 
         uint32 desiredQuality = itemQuality;
-        if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
+        if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance &&
+            desiredQuality > ITEM_QUALITY_NORMAL)
         {
             desiredQuality--;
         }
         do
         {
             ItemTemplateContainer const *itemTemplate = sObjectMgr->GetItemTemplateStore();
-            for (uint32 requiredLevel = bot->GetLevel(); requiredLevel > std::max((int32)bot->GetLevel() - delta, 0); requiredLevel--)
+            for (uint32 requiredLevel = bot->GetLevel();
+                 requiredLevel > std::max((int32)bot->GetLevel() - delta, 0); requiredLevel--)
             {
-                for (InventoryType inventoryType : GetPossibleInventoryTypeListBySlot((EquipmentSlots)slot))
+                for (InventoryType inventoryType :
+                     GetPossibleInventoryTypeListBySlot((EquipmentSlots)slot))
                 {
-                    for (uint32 itemId : sRandomItemMgr->GetCachedEquipments(requiredLevel, inventoryType))
+                    for (uint32 itemId :
+                         sRandomItemMgr->GetCachedEquipments(requiredLevel, inventoryType))
                     {
                         if (itemId == 46978)
-                        { // shaman earth ring totem
+                        {  // shaman earth ring totem
                             continue;
                         }
 
                         // disable next expansion gear
-                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 60 && itemId >= 23728)
+                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 60 &&
+                            itemId >= 23728)
                             continue;
 
-                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 70 && itemId >= 35570 && itemId != 36737 && itemId != 37739 && itemId != 37740) // transition point from TBC -> WOTLK isn't as clear, and there are other wearable TBC items above 35570 but nothing of significance
+                        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 70 &&
+                            itemId >= 35570 && itemId != 36737 && itemId != 37739 &&
+                            itemId != 37740)  // transition point from TBC -> WOTLK isn't as clear,
+                                              // and there are other wearable TBC items above 35570
+                                              // but nothing of significance
                             continue;
 
                         ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
 
-                        if (gearScoreLimit != 0 && CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit)
+                        if (gearScoreLimit != 0 &&
+                            CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit)
                         {
                             continue;
                         }
-                        if (proto->Class != ITEM_CLASS_WEAPON &&
-                            proto->Class != ITEM_CLASS_ARMOR)
+                        if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
                             continue;
 
                         if (!CanEquipItem(proto, desiredQuality))
                             continue;
 
-                        if (proto->Class == ITEM_CLASS_ARMOR && (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS || slot == EQUIPMENT_SLOT_CHEST || slot == EQUIPMENT_SLOT_WAIST || slot == EQUIPMENT_SLOT_LEGS || slot == EQUIPMENT_SLOT_FEET || slot == EQUIPMENT_SLOT_WRISTS || slot == EQUIPMENT_SLOT_HANDS) && !CanEquipArmor(proto))
+                        if (proto->Class == ITEM_CLASS_ARMOR &&
+                            (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS ||
+                             slot == EQUIPMENT_SLOT_CHEST || slot == EQUIPMENT_SLOT_WAIST ||
+                             slot == EQUIPMENT_SLOT_LEGS || slot == EQUIPMENT_SLOT_FEET ||
+                             slot == EQUIPMENT_SLOT_WRISTS || slot == EQUIPMENT_SLOT_HANDS) &&
+                            !CanEquipArmor(proto))
                             continue;
 
                         if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
                             continue;
 
-                        if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
+                        if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE &&
+                            proto->Class != ITEM_CLASS_WEAPON)
                             continue;
 
                         uint16 dest = 0;
@@ -1660,10 +1725,12 @@ bool PlayerbotFactory::IsDesiredReplacement(Item *item)
 inline Item *StoreNewItemInInventorySlot(Player *player, uint32 newItemId, uint32 count)
 {
     ItemPosCountVec vDest;
-    InventoryResult msg = player->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, vDest, newItemId, count);
+    InventoryResult msg =
+        player->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, vDest, newItemId, count);
     if (msg == EQUIP_ERR_OK)
     {
-        if (Item *newItem = player->StoreNewItem(vDest, newItemId, true, Item::GenerateItemRandomPropertyId(newItemId)))
+        if (Item *newItem = player->StoreNewItem(vDest, newItemId, true,
+                                                 Item::GenerateItemRandomPropertyId(newItemId)))
         {
             return newItem;
         }
@@ -1674,13 +1741,15 @@ inline Item *StoreNewItemInInventorySlot(Player *player, uint32 newItemId, uint3
 
 // void PlayerbotFactory::InitSecondEquipmentSet()
 // {
-//     if (bot->getClass() == CLASS_MAGE || bot->getClass() == CLASS_WARLOCK || bot->getClass() == CLASS_PRIEST)
+//     if (bot->getClass() == CLASS_MAGE || bot->getClass() == CLASS_WARLOCK || bot->getClass() ==
+//     CLASS_PRIEST)
 //         return;
 
 //     std::map<uint32, std::vector<uint32>> items;
 
 //     uint32 desiredQuality = itemQuality;
-//     while (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
+//     while (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality >
+//     ITEM_QUALITY_NORMAL)
 //     {
 //         desiredQuality--;
 //     }
@@ -1707,8 +1776,8 @@ inline Item *StoreNewItemInInventorySlot(Player *player, uint32 newItemId, uint3
 //                         continue;
 //                 }
 
-//                 Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-//                 if (existingItem)
+//                 Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0,
+//                 EQUIPMENT_SLOT_MAINHAND); if (existingItem)
 //                 {
 //                     switch (existingItem->GetTemplate()->SubClass)
 //                     {
@@ -1717,19 +1786,24 @@ inline Item *StoreNewItemInInventorySlot(Player *player, uint32 newItemId, uint3
 //                         case ITEM_SUBCLASS_WEAPON_FIST:
 //                         case ITEM_SUBCLASS_WEAPON_MACE:
 //                         case ITEM_SUBCLASS_WEAPON_SWORD:
-//                             if (proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE || proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER || proto->SubClass == ITEM_SUBCLASS_WEAPON_FIST ||
-//                                 proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD)
-//                                 continue;
+//                             if (proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE || proto->SubClass ==
+//                             ITEM_SUBCLASS_WEAPON_DAGGER || proto->SubClass ==
+//                             ITEM_SUBCLASS_WEAPON_FIST ||
+//                                 proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || proto->SubClass
+//                                 == ITEM_SUBCLASS_WEAPON_SWORD) continue;
 //                             break;
 //                         default:
-//                             if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
-//                                 proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-//                                 continue;
+//                             if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE && proto->SubClass !=
+//                             ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass !=
+//                             ITEM_SUBCLASS_WEAPON_FIST &&
+//                                 proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass
+//                                 != ITEM_SUBCLASS_WEAPON_SWORD) continue;
 //                             break;
 //                     }
 //                 }
 //             }
-//             else if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+//             else if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass ==
+//             ITEM_SUBCLASS_ARMOR_SHIELD)
 //             {
 //                 //if (!CanEquipArmor(proto))
 //                 //    continue;
@@ -1740,7 +1814,8 @@ inline Item *StoreNewItemInInventorySlot(Player *player, uint32 newItemId, uint3
 //                         continue;
 //                 }
 
-//                 if (Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+//                 if (Item* existingItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0,
+//                 EQUIPMENT_SLOT_OFFHAND))
 //                     if (existingItem->GetTemplate()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
 //                         continue;
 //             }
@@ -1749,15 +1824,17 @@ inline Item *StoreNewItemInInventorySlot(Player *player, uint32 newItemId, uint3
 
 //             items[proto->Class].push_back(itr.first);
 //         }
-//     } while (items[ITEM_CLASS_ARMOR].empty() && items[ITEM_CLASS_WEAPON].empty() && desiredQuality-- > ITEM_QUALITY_NORMAL);
+//     } while (items[ITEM_CLASS_ARMOR].empty() && items[ITEM_CLASS_WEAPON].empty() &&
+//     desiredQuality-- > ITEM_QUALITY_NORMAL);
 
-//     for (std::map<uint32, std::vector<uint32>>::iterator i = items.begin(); i != items.end(); ++i)
+//     for (std::map<uint32, std::vector<uint32>>::iterator i = items.begin(); i != items.end();
+//     ++i)
 //     {
 //         std::vector<uint32>& ids = i->second;
 //         if (ids.empty())
 //         {
-//             LOG_DEBUG("playerbots",   "{}: no items to make second equipment set for slot {}", bot->GetName().c_str(), i->first);
-//             continue;
+//             LOG_DEBUG("playerbots",   "{}: no items to make second equipment set for slot {}",
+//             bot->GetName().c_str(), i->first); continue;
 //         }
 
 //         for (uint32 attempts = 0; attempts < 15; attempts++)
@@ -1847,7 +1924,8 @@ void PlayerbotFactory::EnchantItem(Item *item)
             if (!enchant_id)
                 continue;
 
-            SpellItemEnchantmentEntry const *enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+            SpellItemEnchantmentEntry const *enchant =
+                sSpellItemEnchantmentStore.LookupEntry(enchant_id);
             if (!enchant || enchant->slot != PERM_ENCHANTMENT_SLOT)
                 continue;
 
@@ -1869,7 +1947,8 @@ void PlayerbotFactory::EnchantItem(Item *item)
             if (!CheckItemStats(sp, ap, tank))
                 continue;
 
-            if (enchant->EnchantmentCondition && !bot->EnchantmentFitsRequirements(enchant->EnchantmentCondition, -1))
+            if (enchant->EnchantmentCondition &&
+                !bot->EnchantmentFitsRequirements(enchant->EnchantmentCondition, -1))
                 continue;
 
             if (!item->IsFitToSpellRequirements(spellInfo))
@@ -1881,7 +1960,8 @@ void PlayerbotFactory::EnchantItem(Item *item)
 
     if (ids.empty())
     {
-        LOG_DEBUG("playerbots", "{}: no enchantments found for item {}", bot->GetName().c_str(), item->GetTemplate()->ItemId);
+        LOG_DEBUG("playerbots", "{}: no enchantments found for item {}", bot->GetName().c_str(),
+                  item->GetTemplate()->ItemId);
         return;
     }
 
@@ -1923,48 +2003,48 @@ void PlayerbotFactory::InitTradeSkills()
 
         switch (bot->getClass())
         {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-        case CLASS_DEATH_KNIGHT:
-            firstSkills.push_back(SKILL_MINING);
-            secondSkills.push_back(SKILL_BLACKSMITHING);
-            secondSkills.push_back(SKILL_ENGINEERING);
-            secondSkills.push_back(SKILL_JEWELCRAFTING);
-            break;
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-        case CLASS_HUNTER:
-        case CLASS_ROGUE:
-            firstSkills.push_back(SKILL_SKINNING);
-            secondSkills.push_back(SKILL_LEATHERWORKING);
-            break;
-        default:
-            firstSkills.push_back(SKILL_TAILORING);
-            secondSkills.push_back(SKILL_ENCHANTING);
+            case CLASS_WARRIOR:
+            case CLASS_PALADIN:
+            case CLASS_DEATH_KNIGHT:
+                firstSkills.push_back(SKILL_MINING);
+                secondSkills.push_back(SKILL_BLACKSMITHING);
+                secondSkills.push_back(SKILL_ENGINEERING);
+                secondSkills.push_back(SKILL_JEWELCRAFTING);
+                break;
+            case CLASS_SHAMAN:
+            case CLASS_DRUID:
+            case CLASS_HUNTER:
+            case CLASS_ROGUE:
+                firstSkills.push_back(SKILL_SKINNING);
+                secondSkills.push_back(SKILL_LEATHERWORKING);
+                break;
+            default:
+                firstSkills.push_back(SKILL_TAILORING);
+                secondSkills.push_back(SKILL_ENCHANTING);
         }
 
         switch (urand(0, 6))
         {
-        case 0:
-            firstSkill = SKILL_HERBALISM;
-            secondSkill = SKILL_ALCHEMY;
-            break;
-        case 1:
-            firstSkill = SKILL_HERBALISM;
-            secondSkill = SKILL_MINING;
-            break;
-        case 2:
-            firstSkill = SKILL_MINING;
-            secondSkill = SKILL_SKINNING;
-            break;
-        case 3:
-            firstSkill = SKILL_HERBALISM;
-            secondSkill = SKILL_SKINNING;
-            break;
-        default:
-            firstSkill = firstSkills[urand(0, firstSkills.size() - 1)];
-            secondSkill = secondSkills[urand(0, secondSkills.size() - 1)];
-            break;
+            case 0:
+                firstSkill = SKILL_HERBALISM;
+                secondSkill = SKILL_ALCHEMY;
+                break;
+            case 1:
+                firstSkill = SKILL_HERBALISM;
+                secondSkill = SKILL_MINING;
+                break;
+            case 2:
+                firstSkill = SKILL_MINING;
+                secondSkill = SKILL_SKINNING;
+                break;
+            case 3:
+                firstSkill = SKILL_HERBALISM;
+                secondSkill = SKILL_SKINNING;
+                break;
+            default:
+                firstSkill = firstSkills[urand(0, firstSkills.size() - 1)];
+                secondSkill = secondSkills[urand(0, secondSkills.size() - 1)];
+                break;
         }
 
         sRandomPlayerbotMgr->SetValue(bot, "firstSkill", firstSkill);
@@ -2011,110 +2091,110 @@ void PlayerbotFactory::InitSkills()
     SetRandomSkill(SKILL_DEFENSE);
     switch (bot->getClass())
     {
-    case CLASS_DRUID:
-        SetRandomSkill(SKILL_MACES);
-        SetRandomSkill(SKILL_STAVES);
-        SetRandomSkill(SKILL_2H_MACES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_POLEARMS);
-        SetRandomSkill(SKILL_FIST_WEAPONS);
-        break;
-    case CLASS_WARRIOR:
-        SetRandomSkill(SKILL_SWORDS);
-        SetRandomSkill(SKILL_AXES);
-        SetRandomSkill(SKILL_BOWS);
-        SetRandomSkill(SKILL_GUNS);
-        SetRandomSkill(SKILL_MACES);
-        SetRandomSkill(SKILL_2H_SWORDS);
-        SetRandomSkill(SKILL_STAVES);
-        SetRandomSkill(SKILL_2H_MACES);
-        SetRandomSkill(SKILL_2H_AXES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_CROSSBOWS);
-        SetRandomSkill(SKILL_POLEARMS);
-        SetRandomSkill(SKILL_FIST_WEAPONS);
-        SetRandomSkill(SKILL_THROWN);
-        bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
-        bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
-        break;
-    case CLASS_PALADIN:
-        SetRandomSkill(SKILL_SWORDS);
-        SetRandomSkill(SKILL_AXES);
-        SetRandomSkill(SKILL_MACES);
-        SetRandomSkill(SKILL_2H_SWORDS);
-        SetRandomSkill(SKILL_2H_MACES);
-        SetRandomSkill(SKILL_2H_AXES);
-        SetRandomSkill(SKILL_POLEARMS);
-        bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
-        break;
-    case CLASS_PRIEST:
-        SetRandomSkill(SKILL_MACES);
-        SetRandomSkill(SKILL_STAVES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_WANDS);
-        break;
-    case CLASS_SHAMAN:
-        SetRandomSkill(SKILL_AXES);
-        SetRandomSkill(SKILL_MACES);
-        SetRandomSkill(SKILL_STAVES);
-        SetRandomSkill(SKILL_2H_MACES);
-        SetRandomSkill(SKILL_2H_AXES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_FIST_WEAPONS);
-        bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
-        break;
-    case CLASS_MAGE:
-        SetRandomSkill(SKILL_SWORDS);
-        SetRandomSkill(SKILL_STAVES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_WANDS);
-        break;
-    case CLASS_WARLOCK:
-        SetRandomSkill(SKILL_SWORDS);
-        SetRandomSkill(SKILL_STAVES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_WANDS);
-        break;
-    case CLASS_HUNTER:
-        SetRandomSkill(SKILL_SWORDS);
-        SetRandomSkill(SKILL_AXES);
-        SetRandomSkill(SKILL_BOWS);
-        SetRandomSkill(SKILL_GUNS);
-        SetRandomSkill(SKILL_2H_SWORDS);
-        SetRandomSkill(SKILL_STAVES);
-        SetRandomSkill(SKILL_2H_AXES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_CROSSBOWS);
-        SetRandomSkill(SKILL_POLEARMS);
-        SetRandomSkill(SKILL_FIST_WEAPONS);
-        SetRandomSkill(SKILL_THROWN);
-        bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
-        bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
-        break;
-    case CLASS_ROGUE:
-        SetRandomSkill(SKILL_SWORDS);
-        SetRandomSkill(SKILL_AXES);
-        SetRandomSkill(SKILL_BOWS);
-        SetRandomSkill(SKILL_GUNS);
-        SetRandomSkill(SKILL_MACES);
-        SetRandomSkill(SKILL_DAGGERS);
-        SetRandomSkill(SKILL_CROSSBOWS);
-        SetRandomSkill(SKILL_FIST_WEAPONS);
-        SetRandomSkill(SKILL_THROWN);
-        bot->SetSkill(SKILL_DUAL_WIELD, 0, 1, 1);
-        break;
-    case CLASS_DEATH_KNIGHT:
-        SetRandomSkill(SKILL_SWORDS);
-        SetRandomSkill(SKILL_AXES);
-        SetRandomSkill(SKILL_MACES);
-        SetRandomSkill(SKILL_2H_SWORDS);
-        SetRandomSkill(SKILL_2H_MACES);
-        SetRandomSkill(SKILL_2H_AXES);
-        SetRandomSkill(SKILL_POLEARMS);
-        bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
-        break;
-    default:
-        break;
+        case CLASS_DRUID:
+            SetRandomSkill(SKILL_MACES);
+            SetRandomSkill(SKILL_STAVES);
+            SetRandomSkill(SKILL_2H_MACES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_POLEARMS);
+            SetRandomSkill(SKILL_FIST_WEAPONS);
+            break;
+        case CLASS_WARRIOR:
+            SetRandomSkill(SKILL_SWORDS);
+            SetRandomSkill(SKILL_AXES);
+            SetRandomSkill(SKILL_BOWS);
+            SetRandomSkill(SKILL_GUNS);
+            SetRandomSkill(SKILL_MACES);
+            SetRandomSkill(SKILL_2H_SWORDS);
+            SetRandomSkill(SKILL_STAVES);
+            SetRandomSkill(SKILL_2H_MACES);
+            SetRandomSkill(SKILL_2H_AXES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_CROSSBOWS);
+            SetRandomSkill(SKILL_POLEARMS);
+            SetRandomSkill(SKILL_FIST_WEAPONS);
+            SetRandomSkill(SKILL_THROWN);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
+            bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+            break;
+        case CLASS_PALADIN:
+            SetRandomSkill(SKILL_SWORDS);
+            SetRandomSkill(SKILL_AXES);
+            SetRandomSkill(SKILL_MACES);
+            SetRandomSkill(SKILL_2H_SWORDS);
+            SetRandomSkill(SKILL_2H_MACES);
+            SetRandomSkill(SKILL_2H_AXES);
+            SetRandomSkill(SKILL_POLEARMS);
+            bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+            break;
+        case CLASS_PRIEST:
+            SetRandomSkill(SKILL_MACES);
+            SetRandomSkill(SKILL_STAVES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_WANDS);
+            break;
+        case CLASS_SHAMAN:
+            SetRandomSkill(SKILL_AXES);
+            SetRandomSkill(SKILL_MACES);
+            SetRandomSkill(SKILL_STAVES);
+            SetRandomSkill(SKILL_2H_MACES);
+            SetRandomSkill(SKILL_2H_AXES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_FIST_WEAPONS);
+            bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+            break;
+        case CLASS_MAGE:
+            SetRandomSkill(SKILL_SWORDS);
+            SetRandomSkill(SKILL_STAVES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_WANDS);
+            break;
+        case CLASS_WARLOCK:
+            SetRandomSkill(SKILL_SWORDS);
+            SetRandomSkill(SKILL_STAVES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_WANDS);
+            break;
+        case CLASS_HUNTER:
+            SetRandomSkill(SKILL_SWORDS);
+            SetRandomSkill(SKILL_AXES);
+            SetRandomSkill(SKILL_BOWS);
+            SetRandomSkill(SKILL_GUNS);
+            SetRandomSkill(SKILL_2H_SWORDS);
+            SetRandomSkill(SKILL_STAVES);
+            SetRandomSkill(SKILL_2H_AXES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_CROSSBOWS);
+            SetRandomSkill(SKILL_POLEARMS);
+            SetRandomSkill(SKILL_FIST_WEAPONS);
+            SetRandomSkill(SKILL_THROWN);
+            bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
+            break;
+        case CLASS_ROGUE:
+            SetRandomSkill(SKILL_SWORDS);
+            SetRandomSkill(SKILL_AXES);
+            SetRandomSkill(SKILL_BOWS);
+            SetRandomSkill(SKILL_GUNS);
+            SetRandomSkill(SKILL_MACES);
+            SetRandomSkill(SKILL_DAGGERS);
+            SetRandomSkill(SKILL_CROSSBOWS);
+            SetRandomSkill(SKILL_FIST_WEAPONS);
+            SetRandomSkill(SKILL_THROWN);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, 1, 1);
+            break;
+        case CLASS_DEATH_KNIGHT:
+            SetRandomSkill(SKILL_SWORDS);
+            SetRandomSkill(SKILL_AXES);
+            SetRandomSkill(SKILL_MACES);
+            SetRandomSkill(SKILL_2H_SWORDS);
+            SetRandomSkill(SKILL_2H_MACES);
+            SetRandomSkill(SKILL_2H_AXES);
+            SetRandomSkill(SKILL_POLEARMS);
+            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
+            break;
+        default:
+            break;
     }
 
     // switch (bot->getClass())
@@ -2158,11 +2238,14 @@ void PlayerbotFactory::InitAvailableSpells()
 
     if (trainerIdCache.empty())
     {
-        CreatureTemplateContainer const *creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
-        for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin(); i != creatureTemplateContainer->end(); ++i)
+        CreatureTemplateContainer const *creatureTemplateContainer =
+            sObjectMgr->GetCreatureTemplates();
+        for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin();
+             i != creatureTemplateContainer->end(); ++i)
         {
             CreatureTemplate const &co = i->second;
-            if (co.trainer_type != TRAINER_TYPE_TRADESKILLS && co.trainer_type != TRAINER_TYPE_CLASS)
+            if (co.trainer_type != TRAINER_TYPE_TRADESKILLS &&
+                co.trainer_type != TRAINER_TYPE_CLASS)
                 continue;
 
             if (co.trainer_type == TRAINER_TYPE_CLASS && co.trainer_class != bot->getClass())
@@ -2181,7 +2264,8 @@ void PlayerbotFactory::InitAvailableSpells()
         if (!trainer_spells)
             continue;
 
-        for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
+        for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin();
+             itr != trainer_spells->spellList.end(); ++itr)
         {
             TrainerSpell const *tSpell = &itr->second;
 
@@ -2199,7 +2283,8 @@ void PlayerbotFactory::InitAvailableSpells()
             bool learn = true;
             for (uint8 j = 0; j < 3; ++j)
             {
-                if (!tSpell->learnedSpell[j] && !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[j]))
+                if (!tSpell->learnedSpell[j] &&
+                    !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[j]))
                     continue;
 
                 if (spellInfo->Effects[j].Effect == SPELL_EFFECT_PROFICIENCY ||
@@ -2232,112 +2317,113 @@ void PlayerbotFactory::InitClassSpells()
     int32_t level = bot->GetLevel();
     switch (bot->getClass())
     {
-    case CLASS_WARRIOR:
-        bot->learnSpell(78, true);
-        bot->learnSpell(2457, true);
-        if (level >= 10)
-        {
-            bot->learnSpell(71, false);   // Defensive Stance
-            bot->learnSpell(355, false);  // Taunt
-            bot->learnSpell(7386, false); // Sunder Armor
-        }
-        if (level >= 30)
-        {
-            bot->learnSpell(2458, false); // Berserker Stance
-        }
-        break;
-    case CLASS_PALADIN:
-        bot->learnSpell(21084, true);
-        bot->learnSpell(635, true);
-        if (level >= 12)
-        {
-            bot->learnSpell(7328, false); // Redemption
-        }
-        break;
-    case CLASS_ROGUE:
-        bot->learnSpell(1752, true);
-        bot->learnSpell(2098, true);
-        break;
-    case CLASS_DEATH_KNIGHT:
-        bot->learnSpell(45477, true);
-        bot->learnSpell(47541, true);
-        bot->learnSpell(45462, true);
-        bot->learnSpell(45902, true);
-        // to leave DK starting area
-        bot->learnSpell(50977, false);
-        break;
-    case CLASS_HUNTER:
-        bot->learnSpell(2973, true);
-        bot->learnSpell(75, true);
-        if (level >= 10)
-        {
-            bot->learnSpell(883, false);  // call pet
-            bot->learnSpell(1515, false); // tame pet
-            bot->learnSpell(6991, false); // feed pet
-            bot->learnSpell(982, false);  // revive pet
-            bot->learnSpell(2641, false); // dismiss pet
-        }
-        break;
-    case CLASS_PRIEST:
-        bot->learnSpell(585, true);
-        bot->learnSpell(2050, true);
-        break;
-    case CLASS_MAGE:
-        bot->learnSpell(133, true);
-        bot->learnSpell(168, true);
-        break;
-    case CLASS_WARLOCK:
-        bot->learnSpell(687, true);
-        bot->learnSpell(686, true);
-        bot->learnSpell(688, true); // summon imp
-        if (level >= 10)
-        {
-            bot->learnSpell(697, false); // summon voidwalker
-        }
-        if (level >= 20)
-        {
-            bot->learnSpell(712, false); // summon succubus
-        }
-        if (level >= 30)
-        {
-            bot->learnSpell(691, false); // summon felhunter
-        }
-        break;
-    case CLASS_DRUID:
-        bot->learnSpell(5176, true);
-        bot->learnSpell(5185, true);
-        if (level >= 10)
-        {
-            bot->learnSpell(5487, false); // bear form
-            bot->learnSpell(6795, false); // Growl
-            bot->learnSpell(6807, false); // Maul
-        }
-        break;
-    case CLASS_SHAMAN:
-        bot->learnSpell(403, true);
-        bot->learnSpell(331, true);
-        // bot->learnSpell(66747, true); // Totem of the Earthen Ring
-        if (level >= 4)
-        {
-            bot->learnSpell(8071, false); // stoneskin totem
-        }
-        if (level >= 10)
-        {
-            bot->learnSpell(3599, false); // searing totem
-        }
-        if (level >= 20)
-        {
-            bot->learnSpell(5394, false); // healing stream totem
-        }
-        break;
-    default:
-        break;
+        case CLASS_WARRIOR:
+            bot->learnSpell(78, true);
+            bot->learnSpell(2457, true);
+            if (level >= 10)
+            {
+                bot->learnSpell(71, false);    // Defensive Stance
+                bot->learnSpell(355, false);   // Taunt
+                bot->learnSpell(7386, false);  // Sunder Armor
+            }
+            if (level >= 30)
+            {
+                bot->learnSpell(2458, false);  // Berserker Stance
+            }
+            break;
+        case CLASS_PALADIN:
+            bot->learnSpell(21084, true);
+            bot->learnSpell(635, true);
+            if (level >= 12)
+            {
+                bot->learnSpell(7328, false);  // Redemption
+            }
+            break;
+        case CLASS_ROGUE:
+            bot->learnSpell(1752, true);
+            bot->learnSpell(2098, true);
+            break;
+        case CLASS_DEATH_KNIGHT:
+            bot->learnSpell(45477, true);
+            bot->learnSpell(47541, true);
+            bot->learnSpell(45462, true);
+            bot->learnSpell(45902, true);
+            // to leave DK starting area
+            bot->learnSpell(50977, false);
+            break;
+        case CLASS_HUNTER:
+            bot->learnSpell(2973, true);
+            bot->learnSpell(75, true);
+            if (level >= 10)
+            {
+                bot->learnSpell(883, false);   // call pet
+                bot->learnSpell(1515, false);  // tame pet
+                bot->learnSpell(6991, false);  // feed pet
+                bot->learnSpell(982, false);   // revive pet
+                bot->learnSpell(2641, false);  // dismiss pet
+            }
+            break;
+        case CLASS_PRIEST:
+            bot->learnSpell(585, true);
+            bot->learnSpell(2050, true);
+            break;
+        case CLASS_MAGE:
+            bot->learnSpell(133, true);
+            bot->learnSpell(168, true);
+            break;
+        case CLASS_WARLOCK:
+            bot->learnSpell(687, true);
+            bot->learnSpell(686, true);
+            bot->learnSpell(688, true);  // summon imp
+            if (level >= 10)
+            {
+                bot->learnSpell(697, false);  // summon voidwalker
+            }
+            if (level >= 20)
+            {
+                bot->learnSpell(712, false);  // summon succubus
+            }
+            if (level >= 30)
+            {
+                bot->learnSpell(691, false);  // summon felhunter
+            }
+            break;
+        case CLASS_DRUID:
+            bot->learnSpell(5176, true);
+            bot->learnSpell(5185, true);
+            if (level >= 10)
+            {
+                bot->learnSpell(5487, false);  // bear form
+                bot->learnSpell(6795, false);  // Growl
+                bot->learnSpell(6807, false);  // Maul
+            }
+            break;
+        case CLASS_SHAMAN:
+            bot->learnSpell(403, true);
+            bot->learnSpell(331, true);
+            // bot->learnSpell(66747, true); // Totem of the Earthen Ring
+            if (level >= 4)
+            {
+                bot->learnSpell(8071, false);  // stoneskin totem
+            }
+            if (level >= 10)
+            {
+                bot->learnSpell(3599, false);  // searing totem
+            }
+            if (level >= 20)
+            {
+                bot->learnSpell(5394, false);  // healing stream totem
+            }
+            break;
+        default:
+            break;
     }
 }
 
 void PlayerbotFactory::InitSpecialSpells()
 {
-    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotSpellIds.begin(); i != sPlayerbotAIConfig->randomBotSpellIds.end(); ++i)
+    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotSpellIds.begin();
+         i != sPlayerbotAIConfig->randomBotSpellIds.end(); ++i)
     {
         uint32 spellId = *i;
         bot->learnSpell(spellId);
@@ -2352,7 +2438,7 @@ void PlayerbotFactory::InitSpecialSpells()
 void PlayerbotFactory::InitTalents(uint32 specNo)
 {
     uint32 classMask = bot->getClassMask();
-    std::unordered_map<uint32, std::vector<TalentEntry const*>> spells;
+    std::unordered_map<uint32, std::vector<TalentEntry const *>> spells;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -2372,19 +2458,22 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
     uint32 freePoints = bot->GetFreeTalentPoints();
     for (auto i = spells.begin(); i != spells.end(); ++i)
     {
-        std::vector<TalentEntry const*> &spells_row = i->second;
+        std::vector<TalentEntry const *> &spells_row = i->second;
         if (spells_row.empty())
         {
-            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(), i->first);
+            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(),
+                     i->first);
             continue;
         }
         int attemptCount = 0;
-        while (!spells_row.empty() && (int)freePoints - (int)bot->GetFreeTalentPoints() < 5 && attemptCount++ < 3 && bot->GetFreeTalentPoints())
+        while (!spells_row.empty() && (int)freePoints - (int)bot->GetFreeTalentPoints() < 5 &&
+               attemptCount++ < 3 && bot->GetFreeTalentPoints())
         {
             int index = urand(0, spells_row.size() - 1);
             TalentEntry const *talentInfo = spells_row[index];
             int maxRank = 0;
-            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, bot->GetFreeTalentPoints()); ++rank)
+            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, bot->GetFreeTalentPoints());
+                 ++rank)
             {
                 uint32 spellId = talentInfo->RankID[rank];
                 if (!spellId)
@@ -2394,7 +2483,8 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
             }
             if (talentInfo->DependsOn)
             {
-                bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank,
+                                                                 bot->GetFreeTalentPoints() - 1));
             }
             bot->LearnTalent(talentInfo->TalentID, maxRank);
             spells_row.erase(spells_row.begin() + index);
@@ -2413,7 +2503,7 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
     int startLevel = bot->GetLevel();
     uint32 specIndex = sPlayerbotAIConfig->randomClassSpecIndex[cls][specTab];
     uint32 classMask = bot->getClassMask();
-    std::unordered_map<uint32, std::vector<TalentEntry const*>> spells_row;
+    std::unordered_map<uint32, std::vector<TalentEntry const *>> spells_row;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
@@ -2429,7 +2519,8 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
 
         spells_row[talentInfo->Row].push_back(talentInfo);
     }
-    while (startLevel > 1 && startLevel < 80 && sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specIndex][startLevel].size() == 0)
+    while (startLevel > 1 && startLevel < 80 &&
+           sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specIndex][startLevel].size() == 0)
     {
         startLevel--;
     }
@@ -2439,12 +2530,13 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
         {
             continue;
         }
-        for (std::vector<uint32> &p : sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specIndex][level])
+        for (std::vector<uint32> &p :
+             sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specIndex][level])
         {
             uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
             uint32 talentID = 0;
             uint32 learnLevel = 0;
-            std::vector<TalentEntry const*> &spells = spells_row[row];
+            std::vector<TalentEntry const *> &spells = spells_row[row];
             if (spells.size() <= 0)
             {
                 return;
@@ -2455,21 +2547,25 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
                 {
                     continue;
                 }
-                TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+                TalentTabEntry const *talentTabInfo =
+                    sTalentTabStore.LookupEntry(talentInfo->TalentTab);
                 if (talentTabInfo->tabpage != tab)
                 {
                     continue;
                 }
                 if (talentInfo->DependsOn)
                 {
-                    bot->LearnTalent(talentInfo->DependsOn, std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                    bot->LearnTalent(
+                        talentInfo->DependsOn,
+                        std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
                 }
                 talentID = talentInfo->TalentID;
 
                 uint32 currentTalentRank = 0;
                 for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
                 {
-                    if (talentInfo->RankID[rank] && bot->HasTalent(talentInfo->RankID[rank], bot->GetActiveSpec()))
+                    if (talentInfo->RankID[rank] &&
+                        bot->HasTalent(talentInfo->RankID[rank], bot->GetActiveSpec()))
                     {
                         currentTalentRank = rank + 1;
                         break;
@@ -2493,13 +2589,15 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
 ObjectGuid PlayerbotFactory::GetRandomBot()
 {
     GuidVector guids;
-    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin(); i != sPlayerbotAIConfig->randomBotAccounts.end(); i++)
+    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin();
+         i != sPlayerbotAIConfig->randomBotAccounts.end(); i++)
     {
         uint32 accountId = *i;
         if (!AccountMgr::GetCharactersCount(accountId))
             continue;
 
-        CharacterDatabasePreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
+        CharacterDatabasePreparedStatement *stmt =
+            CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
         stmt->SetData(0, accountId);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
@@ -2524,7 +2622,8 @@ ObjectGuid PlayerbotFactory::GetRandomBot()
 void PlayerbotFactory::AddPrevQuests(uint32 questId, std::list<uint32> &questIds)
 {
     Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
-    for (Quest::PrevQuests::const_iterator iter = quest->prevQuests.begin(); iter != quest->prevQuests.end(); ++iter)
+    for (Quest::PrevQuests::const_iterator iter = quest->prevQuests.begin();
+         iter != quest->prevQuests.end(); ++iter)
     {
         uint32 prevId = abs(*iter);
         AddPrevQuests(prevId, questIds);
@@ -2541,14 +2640,17 @@ void PlayerbotFactory::InitQuests(std::list<uint32> &questMap)
         uint32 questId = *i;
         Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
 
-        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() || !bot->SatisfyQuestRace(quest, false))
+        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() ||
+            !bot->SatisfyQuestRace(quest, false))
             continue;
 
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
         bot->RewardQuest(quest, 0, bot, false);
 
-        LOG_INFO("playerbots", "Bot {} ({} level) rewarded quest {}: {} (MinLevel={}, QuestLevel={})",
-                 bot->GetName().c_str(), bot->GetLevel(), questId, quest->GetTitle().c_str(), quest->GetMinLevel(), quest->GetQuestLevel());
+        LOG_INFO("playerbots",
+                 "Bot {} ({} level) rewarded quest {}: {} (MinLevel={}, QuestLevel={})",
+                 bot->GetName().c_str(), bot->GetLevel(), questId, quest->GetTitle().c_str(),
+                 quest->GetMinLevel(), quest->GetQuestLevel());
 
         if (!(count++ % 10))
             ClearInventory();
@@ -2587,7 +2689,8 @@ void PlayerbotFactory::ClearAllItems()
 
 void PlayerbotFactory::InitAmmo()
 {
-    if (bot->getClass() != CLASS_HUNTER && bot->getClass() != CLASS_ROGUE && bot->getClass() != CLASS_WARRIOR)
+    if (bot->getClass() != CLASS_HUNTER && bot->getClass() != CLASS_ROGUE &&
+        bot->getClass() != CLASS_WARRIOR)
         return;
 
     Item *const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
@@ -2597,15 +2700,15 @@ void PlayerbotFactory::InitAmmo()
     uint32 subClass = 0;
     switch (pItem->GetTemplate()->SubClass)
     {
-    case ITEM_SUBCLASS_WEAPON_GUN:
-        subClass = ITEM_SUBCLASS_BULLET;
-        break;
-    case ITEM_SUBCLASS_WEAPON_BOW:
-    case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-        subClass = ITEM_SUBCLASS_ARROW;
-        break;
-    default:
-        break;
+        case ITEM_SUBCLASS_WEAPON_GUN:
+            subClass = ITEM_SUBCLASS_BULLET;
+            break;
+        case ITEM_SUBCLASS_WEAPON_BOW:
+        case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+            subClass = ITEM_SUBCLASS_ARROW;
+            break;
+        default:
+            break;
     }
 
     if (!subClass)
@@ -2645,60 +2748,60 @@ void PlayerbotFactory::InitMounts()
 
     switch (bot->getRace())
     {
-    case RACE_HUMAN:
-        slow = {470, 6648, 458, 472};
-        fast = {23228, 23227, 23229};
-        break;
-    case RACE_ORC:
-        slow = {6654, 6653, 580};
-        fast = {23250, 23252, 23251};
-        break;
-    case RACE_DWARF:
-        slow = {6899, 6777, 6898};
-        fast = {23238, 23239, 23240};
-        break;
-    case RACE_NIGHTELF:
-        slow = {10789, 8394, 10793};
-        fast = {24252, 63637, 22723};
-        break;
-    case RACE_UNDEAD_PLAYER:
-        slow = {17463, 17464, 17462};
-        fast = {17465, 23246, 66846};
-        break;
-    case RACE_TAUREN:
-        slow = {18990, 18989, 64657};
-        fast = {23249, 23248, 23247};
-        break;
-    case RACE_GNOME:
-        slow = {10969, 17453, 10873, 17454};
-        fast = {23225, 23223, 23222};
-        break;
-    case RACE_TROLL:
-        slow = {10796, 10799, 8395, 472};
-        fast = {23241, 23242, 23243};
-        break;
-    case RACE_DRAENEI:
-        slow = {34406, 35711, 35710};
-        fast = {35713, 35712, 35714};
-        break;
-    case RACE_BLOODELF:
-        slow = {33660, 35020, 35022, 35018};
-        fast = {35025, 35025, 35027};
-        break;
+        case RACE_HUMAN:
+            slow = {470, 6648, 458, 472};
+            fast = {23228, 23227, 23229};
+            break;
+        case RACE_ORC:
+            slow = {6654, 6653, 580};
+            fast = {23250, 23252, 23251};
+            break;
+        case RACE_DWARF:
+            slow = {6899, 6777, 6898};
+            fast = {23238, 23239, 23240};
+            break;
+        case RACE_NIGHTELF:
+            slow = {10789, 8394, 10793};
+            fast = {24252, 63637, 22723};
+            break;
+        case RACE_UNDEAD_PLAYER:
+            slow = {17463, 17464, 17462};
+            fast = {17465, 23246, 66846};
+            break;
+        case RACE_TAUREN:
+            slow = {18990, 18989, 64657};
+            fast = {23249, 23248, 23247};
+            break;
+        case RACE_GNOME:
+            slow = {10969, 17453, 10873, 17454};
+            fast = {23225, 23223, 23222};
+            break;
+        case RACE_TROLL:
+            slow = {10796, 10799, 8395, 472};
+            fast = {23241, 23242, 23243};
+            break;
+        case RACE_DRAENEI:
+            slow = {34406, 35711, 35710};
+            fast = {35713, 35712, 35714};
+            break;
+        case RACE_BLOODELF:
+            slow = {33660, 35020, 35022, 35018};
+            fast = {35025, 35025, 35027};
+            break;
     }
 
     switch (bot->GetTeamId())
     {
-    case TEAM_ALLIANCE:
-        fslow = {32235, 32239, 32240};
-        ffast = {32242, 32289, 32290, 32292};
-        break;
-    case TEAM_HORDE:
-        fslow = {32244, 32245, 32243};
-        ffast = {32295, 32297, 32246, 32296};
-        break;
-    default:
-        break;
+        case TEAM_ALLIANCE:
+            fslow = {32235, 32239, 32240};
+            ffast = {32242, 32289, 32290, 32292};
+            break;
+        case TEAM_HORDE:
+            fslow = {32244, 32245, 32243};
+            ffast = {32295, 32297, 32246, 32296};
+            break;
+        default:
+            break;
     }
 
     mounts[bot->getRace()][0] = slow;
@@ -2734,7 +2837,9 @@ void PlayerbotFactory::InitMounts()
         if (spell)
         {
             bot->learnSpell(spell);
-            LOG_DEBUG("playerbots", "Bot {} ({}) learned {} mount {}", bot->GetGUID().ToString().c_str(), bot->GetLevel(), type == 0 ? "slow" : (type == 1 ? "fast" : "flying"), spell);
+            LOG_DEBUG("playerbots", "Bot {} ({}) learned {} mount {}",
+                      bot->GetGUID().ToString().c_str(), bot->GetLevel(),
+                      type == 0 ? "slow" : (type == 1 ? "fast" : "flying"), spell);
         }
     }
 }
@@ -2746,15 +2851,19 @@ void PlayerbotFactory::UnbindInstance()
 
     for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
     {
-        std::vector<InstanceSave*> toUnbind;
-        BoundInstancesMap const &m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(guid, Difficulty(d));
-        for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
+        std::vector<InstanceSave *> toUnbind;
+        BoundInstancesMap const &m_boundInstances =
+            sInstanceSaveMgr->PlayerGetBoundInstances(guid, Difficulty(d));
+        for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin();
+             itr != m_boundInstances.end(); ++itr)
         {
             InstanceSave *instanceSave = itr->second.save;
             toUnbind.push_back(instanceSave);
         }
-        for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
-            sInstanceSaveMgr->PlayerUnbindInstance(guid, (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);
+        for (std::vector<InstanceSave *>::const_iterator itr = toUnbind.begin();
+             itr != toUnbind.end(); ++itr)
+            sInstanceSaveMgr->PlayerUnbindInstance(guid, (*itr)->GetMapId(),
+                                                   (*itr)->GetDifficulty(), true, p);
     }
 }
 
@@ -2772,7 +2881,8 @@ void PlayerbotFactory::InitPotions()
         uint32 itemId = sRandomItemMgr->GetRandomPotion(level, effect);
         if (!itemId)
         {
-            // LOG_INFO("playerbots", "No potions (type {}) available for bot {} ({} level)", effect, bot->GetName().c_str(), bot->GetLevel());
+            // LOG_INFO("playerbots", "No potions (type {}) available for bot {} ({} level)",
+            // effect, bot->GetName().c_str(), bot->GetLevel());
             continue;
         }
 
@@ -2794,15 +2904,15 @@ void PlayerbotFactory::InitFood()
     }
     std::unordered_map<uint32, std::vector<uint32>> items;
     ItemTemplateContainer const *itemTemplateContainer = sObjectMgr->GetItemTemplateStore();
-    for (ItemTemplateContainer::const_iterator i = itemTemplateContainer->begin(); i != itemTemplateContainer->end(); ++i)
+    for (ItemTemplateContainer::const_iterator i = itemTemplateContainer->begin();
+         i != itemTemplateContainer->end(); ++i)
     {
         uint32 itemId = i->first;
         ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
 
-        if (proto->Class != ITEM_CLASS_CONSUMABLE ||
-            proto->SubClass != ITEM_SUBCLASS_FOOD ||
+        if (proto->Class != ITEM_CLASS_CONSUMABLE || proto->SubClass != ITEM_SUBCLASS_FOOD ||
             (proto->Spells[0].SpellCategory != 11 && proto->Spells[0].SpellCategory != 59) ||
             proto->Bonding != NO_BIND)
             continue;
@@ -2834,8 +2944,9 @@ void PlayerbotFactory::InitFood()
             uint32 itemId = ids[index];
             ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
             // beer / wine ...
-            if (proto->Spells[0].SpellId == 11007 || proto->Spells[0].SpellId == 11008 || proto->Spells[0].SpellId == 11009 ||
-                proto->Spells[0].SpellId == 11629 || proto->Spells[0].SpellId == 50986)
+            if (proto->Spells[0].SpellId == 11007 || proto->Spells[0].SpellId == 11008 ||
+                proto->Spells[0].SpellId == 11009 || proto->Spells[0].SpellId == 11629 ||
+                proto->Spells[0].SpellId == 50986)
             {
                 tries++;
                 if (tries > 5)
@@ -2856,101 +2967,103 @@ void PlayerbotFactory::InitReagents()
     std::vector<std::pair<uint32, uint32>> items;
     switch (bot->getClass())
     {
-    case CLASS_ROGUE:
-    {
-        std::vector<int> instant_poison_ids = {43231, 43230, 21927, 8928, 8927, 8926, 6950, 6949, 6947};
-        std::vector<int> deadly_poison_ids = {43233, 43232, 22054, 22053, 20844, 8985, 8984, 2893, 2892};
-        for (int &itemId : deadly_poison_ids)
+        case CLASS_ROGUE:
         {
-            ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
-            if (proto->RequiredLevel > bot->GetLevel())
-                continue;
-            items.push_back({itemId, 20}); // deadly poison
+            std::vector<int> instant_poison_ids = {43231, 43230, 21927, 8928, 8927,
+                                                   8926,  6950,  6949,  6947};
+            std::vector<int> deadly_poison_ids = {43233, 43232, 22054, 22053, 20844,
+                                                  8985,  8984,  2893,  2892};
+            for (int &itemId : deadly_poison_ids)
+            {
+                ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > bot->GetLevel())
+                    continue;
+                items.push_back({itemId, 20});  // deadly poison
+                break;
+            }
+            for (int &itemId : instant_poison_ids)
+            {
+                ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > bot->GetLevel())
+                    continue;
+                items.push_back({itemId, 20});  // instant poison
+                break;
+            }
+        }
+        break;
+        case CLASS_SHAMAN:
+            // items.push_back({46978, 1}); // Totem
+            items.push_back({5175, 1});  // Earth Totem
+            items.push_back({5176, 1});  // Flame Totem
+            items.push_back({5177, 1});  // Water Totem
+            items.push_back({5178, 1});  // Air Totem
+            if (bot->GetLevel() >= 30)
+                items.push_back({17030, 40});  // Ankh
             break;
-        }
-        for (int &itemId : instant_poison_ids)
-        {
-            ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
-            if (proto->RequiredLevel > bot->GetLevel())
-                continue;
-            items.push_back({itemId, 20}); // instant poison
+        case CLASS_WARLOCK:
+            items.push_back({6265, 10});  // shard
             break;
-        }
-    }
-    break;
-    case CLASS_SHAMAN:
-        // items.push_back({46978, 1}); // Totem
-        items.push_back({5175, 1}); // Earth Totem
-        items.push_back({5176, 1}); // Flame Totem
-        items.push_back({5177, 1}); // Water Totem
-        items.push_back({5178, 1}); // Air Totem
-        if (bot->GetLevel() >= 30)
-            items.push_back({17030, 40}); // Ankh
-        break;
-    case CLASS_WARLOCK:
-        items.push_back({6265, 10}); // shard
-        break;
-    case CLASS_PRIEST:
-        if (level >= 48 && level < 60)
-        {
-            items.push_back({17028, 40}); // Wild Berries
-        }
-        else if (level >= 60 && level < 80)
-        {
-            items.push_back({17029, 40}); // Wild Berries
-        }
-        else if (level >= 80)
-        {
-            items.push_back({44615, 40}); // Wild Berries
-        }
-        break;
-    case CLASS_MAGE:
-        items.push_back({17020, 40}); // Arcane Powder
-        items.push_back({17031, 40}); // portal
-        items.push_back({17032, 40}); // portal
-        break;
-    case CLASS_DRUID:
-        if (level >= 20 && level < 30)
-        {
-            items.push_back({17034, 40});
-        }
-        if (level >= 30 && level < 40)
-        {
-            items.push_back({17035, 40});
-        }
-        if (level >= 40 && level < 50)
-        {
-            items.push_back({17036, 40});
-        }
-        if (level >= 50 && level < 60)
-        {
-            items.push_back({17037, 40});
-            items.push_back({17021, 40});
-        }
-        if (level >= 60 && level < 70)
-        {
-            items.push_back({17038, 40});
-            items.push_back({17026, 40});
-        }
-        if (level >= 70 && level < 80)
-        {
-            items.push_back({22147, 40});
-            items.push_back({22148, 40});
-        }
-        if (level >= 80)
-        {
-            items.push_back({44614, 40});
-            items.push_back({44605, 40});
-        }
-        break;
-    case CLASS_PALADIN:
-        items.push_back({21177, 100});
-        break;
-    case CLASS_DEATH_KNIGHT:
-        items.push_back({37201, 40});
-        break;
-    default:
-        break;
+        case CLASS_PRIEST:
+            if (level >= 48 && level < 60)
+            {
+                items.push_back({17028, 40});  // Wild Berries
+            }
+            else if (level >= 60 && level < 80)
+            {
+                items.push_back({17029, 40});  // Wild Berries
+            }
+            else if (level >= 80)
+            {
+                items.push_back({44615, 40});  // Wild Berries
+            }
+            break;
+        case CLASS_MAGE:
+            items.push_back({17020, 40});  // Arcane Powder
+            items.push_back({17031, 40});  // portal
+            items.push_back({17032, 40});  // portal
+            break;
+        case CLASS_DRUID:
+            if (level >= 20 && level < 30)
+            {
+                items.push_back({17034, 40});
+            }
+            if (level >= 30 && level < 40)
+            {
+                items.push_back({17035, 40});
+            }
+            if (level >= 40 && level < 50)
+            {
+                items.push_back({17036, 40});
+            }
+            if (level >= 50 && level < 60)
+            {
+                items.push_back({17037, 40});
+                items.push_back({17021, 40});
+            }
+            if (level >= 60 && level < 70)
+            {
+                items.push_back({17038, 40});
+                items.push_back({17026, 40});
+            }
+            if (level >= 70 && level < 80)
+            {
+                items.push_back({22147, 40});
+                items.push_back({22148, 40});
+            }
+            if (level >= 80)
+            {
+                items.push_back({44614, 40});
+                items.push_back({44605, 40});
+            }
+            break;
+        case CLASS_PALADIN:
+            items.push_back({21177, 100});
+            break;
+        case CLASS_DEATH_KNIGHT:
+            items.push_back({37201, 40});
+            break;
+        default:
+            break;
     }
     for (std::pair item : items)
     {
@@ -2994,7 +3107,8 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     uint8 tab = AiFactory::GetPlayerSpecTab(bot);
     std::list<uint32> glyphs;
     ItemTemplateContainer const *itemTemplates = sObjectMgr->GetItemTemplateStore();
-    for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
+    for (ItemTemplateContainer::const_iterator i = itemTemplates->begin();
+         i != itemTemplates->end(); ++i)
     {
         uint32 itemId = i->first;
         ItemTemplate const *proto = &i->second;
@@ -3004,7 +3118,8 @@ void PlayerbotFactory::InitGlyphs(bool increment)
         if (proto->Class != ITEM_CLASS_GLYPH)
             continue;
 
-        if ((proto->AllowableClass & bot->getClassMask()) == 0 || (proto->AllowableRace & bot->getRaceMask()) == 0)
+        if ((proto->AllowableClass & bot->getClassMask()) == 0 ||
+            (proto->AllowableRace & bot->getRaceMask()) == 0)
             continue;
 
         for (uint32 spell = 0; spell < MAX_ITEM_PROTO_SPELLS; spell++)
@@ -3037,14 +3152,16 @@ void PlayerbotFactory::InitGlyphs(bool increment)
         // GlyphSlotEntry const *gs = sGlyphSlotStore.LookupEntry(slot);
         // if (!gs)
         //     continue;
-        if (sPlayerbotAIConfig->parsedSpecGlyph[cls][tab].size() > slotIndex && sPlayerbotAIConfig->parsedSpecGlyph[cls][tab][slotIndex] != 0)
+        if (sPlayerbotAIConfig->parsedSpecGlyph[cls][tab].size() > slotIndex &&
+            sPlayerbotAIConfig->parsedSpecGlyph[cls][tab][slotIndex] != 0)
         {
             uint32 itemId = sPlayerbotAIConfig->parsedSpecGlyph[cls][tab][slotIndex];
             ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
             if (proto->Class != ITEM_CLASS_GLYPH)
                 continue;
 
-            if ((proto->AllowableClass & bot->getClassMask()) == 0 || (proto->AllowableRace & bot->getRaceMask()) == 0)
+            if ((proto->AllowableClass & bot->getClassMask()) == 0 ||
+                (proto->AllowableRace & bot->getRaceMask()) == 0)
                 continue;
 
             if (proto->RequiredLevel > bot->GetLevel())
@@ -3115,10 +3232,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     bot->SendTalentsInfoData(false);
 }
 
-void PlayerbotFactory::CancelAuras()
-{
-    bot->RemoveAllAuras();
-}
+void PlayerbotFactory::CancelAuras() { bot->RemoveAllAuras(); }
 
 void PlayerbotFactory::InitInventory()
 {
@@ -3131,27 +3245,27 @@ void PlayerbotFactory::InitInventorySkill()
 {
     if (bot->HasSkill(SKILL_MINING))
     {
-        StoreItem(2901, 1); // Mining Pick
+        StoreItem(2901, 1);  // Mining Pick
     }
 
     if (bot->HasSkill(SKILL_BLACKSMITHING) || bot->HasSkill(SKILL_ENGINEERING))
     {
-        StoreItem(5956, 1); // Blacksmith Hammer
+        StoreItem(5956, 1);  // Blacksmith Hammer
     }
 
     if (bot->HasSkill(SKILL_ENGINEERING))
     {
-        StoreItem(6219, 1); // Arclight Spanner
+        StoreItem(6219, 1);  // Arclight Spanner
     }
 
     if (bot->HasSkill(SKILL_ENCHANTING))
     {
-        StoreItem(16207, 1); // Runed Arcanite Rod
+        StoreItem(16207, 1);  // Runed Arcanite Rod
     }
 
     if (bot->HasSkill(SKILL_SKINNING))
     {
-        StoreItem(7005, 1); // Skinning Knife
+        StoreItem(7005, 1);  // Skinning Knife
     }
 }
 
@@ -3159,7 +3273,8 @@ Item *PlayerbotFactory::StoreItem(uint32 itemId, uint32 count)
 {
     ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
     ItemPosCountVec sDest;
-    InventoryResult msg = bot->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, itemId, count);
+    InventoryResult msg =
+        bot->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, itemId, count);
     if (msg != EQUIP_ERR_OK)
         return nullptr;
 
@@ -3171,7 +3286,8 @@ void PlayerbotFactory::InitInventoryTrade()
     uint32 itemId = sRandomItemMgr->GetRandomTrade(level);
     if (!itemId)
     {
-        LOG_ERROR("playerbots", "No trade items available for bot {} ({} level)", bot->GetName().c_str(), bot->GetLevel());
+        LOG_ERROR("playerbots", "No trade items available for bot {} ({} level)",
+                  bot->GetName().c_str(), bot->GetLevel());
         return;
     }
 
@@ -3182,20 +3298,19 @@ void PlayerbotFactory::InitInventoryTrade()
     uint32 count = 1, stacks = 1;
     switch (proto->Quality)
     {
-    case ITEM_QUALITY_NORMAL:
-        count = proto->GetMaxStackSize();
-        stacks = urand(1, 3);
-        break;
-    case ITEM_QUALITY_UNCOMMON:
-        stacks = 1;
-        int maxStackSize = proto->GetMaxStackSize() / 2;
-        uint32 max = std::max(1, maxStackSize);
-        count = urand(1, max);
-        break;
+        case ITEM_QUALITY_NORMAL:
+            count = proto->GetMaxStackSize();
+            stacks = urand(1, 3);
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            stacks = 1;
+            int maxStackSize = proto->GetMaxStackSize() / 2;
+            uint32 max = std::max(1, maxStackSize);
+            count = urand(1, max);
+            break;
     }
 
-    for (uint32 i = 0; i < stacks; i++)
-        StoreItem(itemId, count);
+    for (uint32 i = 0; i < stacks; i++) StoreItem(itemId, count);
 }
 
 void PlayerbotFactory::InitInventoryEquip()
@@ -3203,7 +3318,8 @@ void PlayerbotFactory::InitInventoryEquip()
     std::vector<uint32> ids;
 
     uint32 desiredQuality = itemQuality;
-    if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
+    if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance &&
+        desiredQuality > ITEM_QUALITY_NORMAL)
     {
         desiredQuality--;
     }
@@ -3215,7 +3331,8 @@ void PlayerbotFactory::InitInventoryEquip()
         if (!proto)
             continue;
 
-        if ((proto->Class != ITEM_CLASS_ARMOR && proto->Class != ITEM_CLASS_WEAPON) || (proto->Bonding == BIND_WHEN_PICKED_UP || proto->Bonding == BIND_WHEN_USE))
+        if ((proto->Class != ITEM_CLASS_ARMOR && proto->Class != ITEM_CLASS_WEAPON) ||
+            (proto->Bonding == BIND_WHEN_PICKED_UP || proto->Bonding == BIND_WHEN_USE))
             continue;
 
         if (proto->Class == ITEM_CLASS_ARMOR && !CanEquipArmor(proto))
@@ -3259,7 +3376,8 @@ void PlayerbotFactory::InitGuild()
         RandomPlayerbotFactory::CreateRandomGuilds();
 
     std::vector<uint32> guilds;
-    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotGuilds.begin(); i != sPlayerbotAIConfig->randomBotGuilds.end(); ++i)
+    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotGuilds.begin();
+         i != sPlayerbotAIConfig->randomBotGuilds.end(); ++i)
         guilds.push_back(*i);
 
     if (guilds.empty())
@@ -3311,48 +3429,48 @@ void PlayerbotFactory::InitImmersive()
     {
         switch (bot->getClass())
         {
-        case CLASS_DRUID:
-        case CLASS_SHAMAN:
-            percentMap[STAT_STRENGTH] = 10;
-            percentMap[STAT_INTELLECT] = 10;
-            percentMap[STAT_SPIRIT] = 20;
-            percentMap[STAT_AGILITY] = 30;
-            percentMap[STAT_STAMINA] = 30;
-            break;
-        case CLASS_PALADIN:
-            percentMap[STAT_STRENGTH] = 10;
-            percentMap[STAT_INTELLECT] = 10;
-            percentMap[STAT_SPIRIT] = 20;
-            percentMap[STAT_AGILITY] = 50;
-            percentMap[STAT_STAMINA] = 10;
-            break;
-        case CLASS_WARRIOR:
-            percentMap[STAT_STRENGTH] = 10;
-            percentMap[STAT_SPIRIT] = 20;
-            percentMap[STAT_AGILITY] = 50;
-            percentMap[STAT_STAMINA] = 20;
-            break;
-        case CLASS_ROGUE:
-        case CLASS_HUNTER:
-            percentMap[STAT_SPIRIT] = 40;
-            percentMap[STAT_AGILITY] = 50;
-            percentMap[STAT_STAMINA] = 10;
-            break;
-        case CLASS_MAGE:
-            percentMap[STAT_INTELLECT] = 50;
-            percentMap[STAT_SPIRIT] = 40;
-            percentMap[STAT_STAMINA] = 10;
-            break;
-        case CLASS_PRIEST:
-            percentMap[STAT_INTELLECT] = 50;
-            percentMap[STAT_SPIRIT] = 40;
-            percentMap[STAT_STAMINA] = 10;
-            break;
-        case CLASS_WARLOCK:
-            percentMap[STAT_INTELLECT] = 50;
-            percentMap[STAT_SPIRIT] = 10;
-            percentMap[STAT_STAMINA] = 40;
-            break;
+            case CLASS_DRUID:
+            case CLASS_SHAMAN:
+                percentMap[STAT_STRENGTH] = 10;
+                percentMap[STAT_INTELLECT] = 10;
+                percentMap[STAT_SPIRIT] = 20;
+                percentMap[STAT_AGILITY] = 30;
+                percentMap[STAT_STAMINA] = 30;
+                break;
+            case CLASS_PALADIN:
+                percentMap[STAT_STRENGTH] = 10;
+                percentMap[STAT_INTELLECT] = 10;
+                percentMap[STAT_SPIRIT] = 20;
+                percentMap[STAT_AGILITY] = 50;
+                percentMap[STAT_STAMINA] = 10;
+                break;
+            case CLASS_WARRIOR:
+                percentMap[STAT_STRENGTH] = 10;
+                percentMap[STAT_SPIRIT] = 20;
+                percentMap[STAT_AGILITY] = 50;
+                percentMap[STAT_STAMINA] = 20;
+                break;
+            case CLASS_ROGUE:
+            case CLASS_HUNTER:
+                percentMap[STAT_SPIRIT] = 40;
+                percentMap[STAT_AGILITY] = 50;
+                percentMap[STAT_STAMINA] = 10;
+                break;
+            case CLASS_MAGE:
+                percentMap[STAT_INTELLECT] = 50;
+                percentMap[STAT_SPIRIT] = 40;
+                percentMap[STAT_STAMINA] = 10;
+                break;
+            case CLASS_PRIEST:
+                percentMap[STAT_INTELLECT] = 50;
+                percentMap[STAT_SPIRIT] = 40;
+                percentMap[STAT_STAMINA] = 10;
+                break;
+            case CLASS_WARLOCK:
+                percentMap[STAT_INTELLECT] = 50;
+                percentMap[STAT_SPIRIT] = 10;
+                percentMap[STAT_STAMINA] = 40;
+                break;
         }
 
         for (uint8 i = 0; i < 5; i++)
@@ -3387,7 +3505,8 @@ void PlayerbotFactory::InitArenaTeam()
         RandomPlayerbotFactory::CreateRandomArenaTeams();
 
     std::vector<uint32> arenateams;
-    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotArenaTeams.begin(); i != sPlayerbotAIConfig->randomBotArenaTeams.end(); ++i)
+    for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotArenaTeams.begin();
+         i != sPlayerbotAIConfig->randomBotArenaTeams.end(); ++i)
         arenateams.push_back(*i);
 
     if (arenateams.empty())
@@ -3410,10 +3529,12 @@ void PlayerbotFactory::InitArenaTeam()
         ObjectGuid capt = arenateam->GetCaptain();
         Player *botcaptain = ObjectAccessor::FindPlayer(capt);
 
-        if ((bot && bot->GetArenaTeamId(arenateam->GetSlot())) || sCharacterCache->GetCharacterArenaTeamIdByGuid(bot->GetGUID(), arenateam->GetSlot()) != 0)
+        if ((bot && bot->GetArenaTeamId(arenateam->GetSlot())) ||
+            sCharacterCache->GetCharacterArenaTeamIdByGuid(bot->GetGUID(), arenateam->GetSlot()) !=
+                0)
             return;
 
-        if (botcaptain && botcaptain->GetTeamId() == bot->GetTeamId()) // need?
+        if (botcaptain && botcaptain->GetTeamId() == bot->GetTeamId())  // need?
         {
             arenateam->AddMember(bot->GetGUID());
             arenateam->SaveToDB();
@@ -3429,65 +3550,67 @@ void PlayerbotFactory::ApplyEnchantTemplate()
 
     switch (bot->getClass())
     {
-    case CLASS_WARRIOR:
-        if (tab == 2)
-            ApplyEnchantTemplate(12);
-        else if (tab == 1)
-            ApplyEnchantTemplate(11);
-        else
-            ApplyEnchantTemplate(10);
-        break;
-    case CLASS_DRUID:
-        if (tab == 2)
-            ApplyEnchantTemplate(112);
-        else if (tab == 0)
-            ApplyEnchantTemplate(110);
-        else
-            ApplyEnchantTemplate(111);
-        break;
-    case CLASS_SHAMAN:
-        if (tab == 0)
-            ApplyEnchantTemplate(70);
-        else if (tab == 2)
-            ApplyEnchantTemplate(71);
-        else
-            ApplyEnchantTemplate(72);
-        break;
-    case CLASS_PALADIN:
-        if (tab == 0)
-            ApplyEnchantTemplate(20);
-        else if (tab == 2)
-            ApplyEnchantTemplate(22);
-        else if (tab == 1)
-            ApplyEnchantTemplate(21);
-        break;
-    case CLASS_HUNTER:
-        ApplyEnchantTemplate(30);
-        break;
-    case CLASS_ROGUE:
-        ApplyEnchantTemplate(40);
-        break;
-    case CLASS_MAGE:
-        ApplyEnchantTemplate(80);
-        break;
-    case CLASS_WARLOCK:
-        ApplyEnchantTemplate(90);
-        break;
-    case CLASS_PRIEST:
-        ApplyEnchantTemplate(50);
-        break;
+        case CLASS_WARRIOR:
+            if (tab == 2)
+                ApplyEnchantTemplate(12);
+            else if (tab == 1)
+                ApplyEnchantTemplate(11);
+            else
+                ApplyEnchantTemplate(10);
+            break;
+        case CLASS_DRUID:
+            if (tab == 2)
+                ApplyEnchantTemplate(112);
+            else if (tab == 0)
+                ApplyEnchantTemplate(110);
+            else
+                ApplyEnchantTemplate(111);
+            break;
+        case CLASS_SHAMAN:
+            if (tab == 0)
+                ApplyEnchantTemplate(70);
+            else if (tab == 2)
+                ApplyEnchantTemplate(71);
+            else
+                ApplyEnchantTemplate(72);
+            break;
+        case CLASS_PALADIN:
+            if (tab == 0)
+                ApplyEnchantTemplate(20);
+            else if (tab == 2)
+                ApplyEnchantTemplate(22);
+            else if (tab == 1)
+                ApplyEnchantTemplate(21);
+            break;
+        case CLASS_HUNTER:
+            ApplyEnchantTemplate(30);
+            break;
+        case CLASS_ROGUE:
+            ApplyEnchantTemplate(40);
+            break;
+        case CLASS_MAGE:
+            ApplyEnchantTemplate(80);
+            break;
+        case CLASS_WARLOCK:
+            ApplyEnchantTemplate(90);
+            break;
+        case CLASS_PRIEST:
+            ApplyEnchantTemplate(50);
+            break;
     }
 }
 
 void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
 {
-    for (EnchantContainer::const_iterator itr = GetEnchantContainerBegin(); itr != GetEnchantContainerEnd(); ++itr)
+    for (EnchantContainer::const_iterator itr = GetEnchantContainerBegin();
+         itr != GetEnchantContainerEnd(); ++itr)
         if ((*itr).ClassId == bot->getClass() && (*itr).SpecId == spec)
         {
             uint32 spellid = (*itr).SpellId;
             uint32 slot = (*itr).SlotId;
             Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-            if (!pItem || !pItem->IsInWorld() || !pItem->GetOwner() || !pItem->GetOwner()->IsInWorld() || !pItem->GetOwner()->GetSession())
+            if (!pItem || !pItem->IsInWorld() || !pItem->GetOwner() ||
+                !pItem->GetOwner()->IsInWorld() || !pItem->GetOwner()->GetSession())
                 return;
 
             SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellid);
@@ -3497,13 +3620,17 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
             uint32 enchantid = spellInfo->Effects[0].MiscValue;
             if (!enchantid)
             {
-                // LOG_ERROR("playerbots", "{}: Invalid enchantid ", enchantid, " report to devs", bot->GetName().c_str());
+                // LOG_ERROR("playerbots", "{}: Invalid enchantid ", enchantid, " report to devs",
+                // bot->GetName().c_str());
                 return;
             }
 
-            if (!((1 << pItem->GetTemplate()->SubClass) & spellInfo->EquippedItemSubClassMask) && !((1 << pItem->GetTemplate()->InventoryType) & spellInfo->EquippedItemInventoryTypeMask))
+            if (!((1 << pItem->GetTemplate()->SubClass) & spellInfo->EquippedItemSubClassMask) &&
+                !((1 << pItem->GetTemplate()->InventoryType) &
+                  spellInfo->EquippedItemInventoryTypeMask))
             {
-                // LOG_ERROR("playerbots", "{}: items could not be enchanted, wrong item type equipped", bot->GetName().c_str());
+                // LOG_ERROR("playerbots", "{}: items could not be enchanted, wrong item type
+                // equipped", bot->GetName().c_str());
                 return;
             }
 
@@ -3517,7 +3644,7 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
 
 void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
 {
-    int32 bestGemEnchantId[4] = {-1, -1, -1, -1}; // 1, 2, 4, 8 color
+    int32 bestGemEnchantId[4] = {-1, -1, -1, -1};  // 1, 2, 4, 8 color
     float bestGemScore[4] = {0, 0, 0, 0};
     for (const uint32 &enchantGem : enchantGemIdCache)
     {
@@ -3525,7 +3652,8 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         if (!gemTemplate)
             continue;
 
-        const GemPropertiesEntry *gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
+        const GemPropertiesEntry *gemProperties =
+            sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
         if (!gemProperties)
             continue;
 
@@ -3540,12 +3668,15 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         if (!enchant_id)
             continue;
 
-        SpellItemEnchantmentEntry const *enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-        if (!enchant || (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT))
+        SpellItemEnchantmentEntry const *enchant =
+            sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        if (!enchant ||
+            (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT))
         {
             continue;
         }
-        if (enchant->requiredSkill && bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue)
+        if (enchant->requiredSkill &&
+            bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue)
         {
             continue;
         }
@@ -3607,10 +3738,12 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             }
 
             // disable next expansion enchantments
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 60 && enchantSpell >= 25072)
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 60 &&
+                enchantSpell >= 25072)
                 continue;
 
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 && enchantSpell > 48557)
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 &&
+                enchantSpell > 48557)
                 continue;
 
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
@@ -3622,12 +3755,15 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 if (!enchant_id)
                     continue;
 
-                SpellItemEnchantmentEntry const *enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-                if (!enchant || (enchant->slot != PERM_ENCHANTMENT_SLOT && enchant->slot != TEMP_ENCHANTMENT_SLOT))
+                SpellItemEnchantmentEntry const *enchant =
+                    sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                if (!enchant || (enchant->slot != PERM_ENCHANTMENT_SLOT &&
+                                 enchant->slot != TEMP_ENCHANTMENT_SLOT))
                 {
                     continue;
                 }
-                if (enchant->requiredSkill && bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue)
+                if (enchant->requiredSkill &&
+                    bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue)
                 {
                     continue;
                 }
@@ -3655,22 +3791,23 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         if (!item->HasSocket())
             continue;
 
-        for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + 3; ++enchant_slot)
+        for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + 3;
+             ++enchant_slot)
         {
-
-            uint8 socketColor = item->GetTemplate()->Socket[enchant_slot - SOCK_ENCHANTMENT_SLOT].Color;
+            uint8 socketColor =
+                item->GetTemplate()->Socket[enchant_slot - SOCK_ENCHANTMENT_SLOT].Color;
             if (!socketColor)
             {
                 continue;
             }
             int32 gemId;
-            if (1 == socketColor) // meta
+            if (1 == socketColor)  // meta
                 gemId = bestGemEnchantId[0];
-            else if (2 == socketColor) // red
+            else if (2 == socketColor)  // red
                 gemId = bestGemEnchantId[1];
-            else if (4 == socketColor) // yellow
+            else if (4 == socketColor)  // yellow
                 gemId = bestGemEnchantId[2];
-            else if (8 == socketColor) // blue
+            else if (8 == socketColor)  // blue
                 gemId = bestGemEnchantId[3];
             else
                 continue;
@@ -3686,67 +3823,67 @@ std::vector<InventoryType> PlayerbotFactory::GetPossibleInventoryTypeListBySlot(
     std::vector<InventoryType> ret;
     switch (slot)
     {
-    case EQUIPMENT_SLOT_HEAD:
-        ret.push_back(INVTYPE_HEAD);
-        break;
-    case EQUIPMENT_SLOT_NECK:
-        ret.push_back(INVTYPE_NECK);
-        break;
-    case EQUIPMENT_SLOT_SHOULDERS:
-        ret.push_back(INVTYPE_SHOULDERS);
-        break;
-    case EQUIPMENT_SLOT_BODY:
-        ret.push_back(INVTYPE_BODY);
-        break;
-    case EQUIPMENT_SLOT_CHEST:
-        ret.push_back(INVTYPE_CHEST);
-        ret.push_back(INVTYPE_ROBE);
-        break;
-    case EQUIPMENT_SLOT_WAIST:
-        ret.push_back(INVTYPE_WAIST);
-        break;
-    case EQUIPMENT_SLOT_LEGS:
-        ret.push_back(INVTYPE_LEGS);
-        break;
-    case EQUIPMENT_SLOT_FEET:
-        ret.push_back(INVTYPE_FEET);
-        break;
-    case EQUIPMENT_SLOT_WRISTS:
-        ret.push_back(INVTYPE_WRISTS);
-        break;
-    case EQUIPMENT_SLOT_HANDS:
-        ret.push_back(INVTYPE_HANDS);
-        break;
-    case EQUIPMENT_SLOT_FINGER1:
-    case EQUIPMENT_SLOT_FINGER2:
-        ret.push_back(INVTYPE_FINGER);
-        break;
-    case EQUIPMENT_SLOT_TRINKET1:
-    case EQUIPMENT_SLOT_TRINKET2:
-        ret.push_back(INVTYPE_TRINKET);
-        break;
-    case EQUIPMENT_SLOT_BACK:
-        ret.push_back(INVTYPE_CLOAK);
-        break;
-    case EQUIPMENT_SLOT_MAINHAND:
-        ret.push_back(INVTYPE_WEAPON);
-        ret.push_back(INVTYPE_2HWEAPON);
-        ret.push_back(INVTYPE_WEAPONMAINHAND);
-        break;
-    case EQUIPMENT_SLOT_OFFHAND:
-        ret.push_back(INVTYPE_WEAPON);
-        ret.push_back(INVTYPE_2HWEAPON);
-        ret.push_back(INVTYPE_WEAPONOFFHAND);
-        ret.push_back(INVTYPE_SHIELD);
-        ret.push_back(INVTYPE_HOLDABLE);
-        break;
-    case EQUIPMENT_SLOT_RANGED:
-        ret.push_back(INVTYPE_RANGED);
-        ret.push_back(INVTYPE_RANGEDRIGHT);
-        ret.push_back(INVTYPE_RELIC);
-        break;
-    default:
-        break;
+        case EQUIPMENT_SLOT_HEAD:
+            ret.push_back(INVTYPE_HEAD);
+            break;
+        case EQUIPMENT_SLOT_NECK:
+            ret.push_back(INVTYPE_NECK);
+            break;
+        case EQUIPMENT_SLOT_SHOULDERS:
+            ret.push_back(INVTYPE_SHOULDERS);
+            break;
+        case EQUIPMENT_SLOT_BODY:
+            ret.push_back(INVTYPE_BODY);
+            break;
+        case EQUIPMENT_SLOT_CHEST:
+            ret.push_back(INVTYPE_CHEST);
+            ret.push_back(INVTYPE_ROBE);
+            break;
+        case EQUIPMENT_SLOT_WAIST:
+            ret.push_back(INVTYPE_WAIST);
+            break;
+        case EQUIPMENT_SLOT_LEGS:
+            ret.push_back(INVTYPE_LEGS);
+            break;
+        case EQUIPMENT_SLOT_FEET:
+            ret.push_back(INVTYPE_FEET);
+            break;
+        case EQUIPMENT_SLOT_WRISTS:
+            ret.push_back(INVTYPE_WRISTS);
+            break;
+        case EQUIPMENT_SLOT_HANDS:
+            ret.push_back(INVTYPE_HANDS);
+            break;
+        case EQUIPMENT_SLOT_FINGER1:
+        case EQUIPMENT_SLOT_FINGER2:
+            ret.push_back(INVTYPE_FINGER);
+            break;
+        case EQUIPMENT_SLOT_TRINKET1:
+        case EQUIPMENT_SLOT_TRINKET2:
+            ret.push_back(INVTYPE_TRINKET);
+            break;
+        case EQUIPMENT_SLOT_BACK:
+            ret.push_back(INVTYPE_CLOAK);
+            break;
+        case EQUIPMENT_SLOT_MAINHAND:
+            ret.push_back(INVTYPE_WEAPON);
+            ret.push_back(INVTYPE_2HWEAPON);
+            ret.push_back(INVTYPE_WEAPONMAINHAND);
+            break;
+        case EQUIPMENT_SLOT_OFFHAND:
+            ret.push_back(INVTYPE_WEAPON);
+            ret.push_back(INVTYPE_2HWEAPON);
+            ret.push_back(INVTYPE_WEAPONOFFHAND);
+            ret.push_back(INVTYPE_SHIELD);
+            ret.push_back(INVTYPE_HOLDABLE);
+            break;
+        case EQUIPMENT_SLOT_RANGED:
+            ret.push_back(INVTYPE_RANGED);
+            ret.push_back(INVTYPE_RANGEDRIGHT);
+            ret.push_back(INVTYPE_RELIC);
+            break;
+        default:
+            break;
     }
     return ret;
 }
@@ -3755,7 +3892,8 @@ void PlayerbotFactory::LoadEnchantContainer()
 {
     m_EnchantContainer.clear();
 
-    PlayerbotsDatabasePreparedStatement *stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_ENCHANTS);
+    PlayerbotsDatabasePreparedStatement *stmt =
+        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_ENCHANTS);
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
         do
@@ -3790,11 +3928,13 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
     float score = 0;
     if (proto->IsRangedWeapon())
     {
-        rangeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * 1000 / proto->Delay;
+        rangeDps =
+            (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * 1000 / proto->Delay;
     }
     else if (proto->IsWeapon())
     {
-        meleeDps = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * 1000 / proto->Delay;
+        meleeDps =
+            (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) / 2 * 1000 / proto->Delay;
     }
     armor += proto->Armor;
     block += proto->Block;
@@ -3804,57 +3944,57 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
         const int32 &value = stat.ItemStatValue;
         switch (stat.ItemStatType)
         {
-        case ITEM_MOD_AGILITY:
-            agility += value;
-            break;
-        case ITEM_MOD_STRENGTH:
-            strength += value;
-            break;
-        case ITEM_MOD_INTELLECT:
-            intellect += value;
-            break;
-        case ITEM_MOD_SPIRIT:
-            spirit += value;
-            break;
-        case ITEM_MOD_STAMINA:
-            stamina += value;
-            break;
-        case ITEM_MOD_DEFENSE_SKILL_RATING:
-            defense += value;
-            break;
-        case ITEM_MOD_PARRY_RATING:
-            parry += value;
-            break;
-        case ITEM_MOD_BLOCK_RATING:
-        case ITEM_MOD_BLOCK_VALUE:
-            block += value;
-            break;
-        case ITEM_MOD_RESILIENCE_RATING:
-            resilience += value;
-            break;
-        case ITEM_MOD_HIT_RATING:
-            hit += value;
-            break;
-        case ITEM_MOD_CRIT_RATING:
-            crit += value;
-            break;
-        case ITEM_MOD_HASTE_RATING:
-            haste += value;
-            break;
-        case ITEM_MOD_EXPERTISE_RATING:
-            expertise += value;
-            break;
-        case ITEM_MOD_ATTACK_POWER:
-            attack_power += value;
-            break;
-        case ITEM_MOD_SPELL_POWER:
-            spell_power += value;
-            break;
-        case ITEM_MOD_MANA_REGENERATION:
-            mana_regeneration += value;
-            break;
-        default:
-            break;
+            case ITEM_MOD_AGILITY:
+                agility += value;
+                break;
+            case ITEM_MOD_STRENGTH:
+                strength += value;
+                break;
+            case ITEM_MOD_INTELLECT:
+                intellect += value;
+                break;
+            case ITEM_MOD_SPIRIT:
+                spirit += value;
+                break;
+            case ITEM_MOD_STAMINA:
+                stamina += value;
+                break;
+            case ITEM_MOD_DEFENSE_SKILL_RATING:
+                defense += value;
+                break;
+            case ITEM_MOD_PARRY_RATING:
+                parry += value;
+                break;
+            case ITEM_MOD_BLOCK_RATING:
+            case ITEM_MOD_BLOCK_VALUE:
+                block += value;
+                break;
+            case ITEM_MOD_RESILIENCE_RATING:
+                resilience += value;
+                break;
+            case ITEM_MOD_HIT_RATING:
+                hit += value;
+                break;
+            case ITEM_MOD_CRIT_RATING:
+                crit += value;
+                break;
+            case ITEM_MOD_HASTE_RATING:
+                haste += value;
+                break;
+            case ITEM_MOD_EXPERTISE_RATING:
+                expertise += value;
+                break;
+            case ITEM_MOD_ATTACK_POWER:
+                attack_power += value;
+                break;
+            case ITEM_MOD_SPELL_POWER:
+                spell_power += value;
+                break;
+            case ITEM_MOD_MANA_REGENERATION:
+                mana_regeneration += value;
+                break;
+            default:
+                break;
         }
     }
     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
@@ -3866,8 +4006,8 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
         // // spell category check?
         // for (uint8 i = 0; i < 3; i++)
         // {
-        //     float multiplier = proto->Spells[j].SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP ? 1.0f : 0.2f;
-        //     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA)
+        //     float multiplier = proto->Spells[j].SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP ? 1.0f
+        //     : 0.2f; if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA)
         //     {
         //         switch (spellInfo->Effects[i].ApplyAuraName)
         //         {
@@ -3883,7 +4023,8 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
         //                 break;
         //             case SPELL_AURA_MOD_RATING:
         //             {
-        //                 for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING; ++rating)
+        //                 for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING;
+        //                 ++rating)
         //                 {
         //                     if (spellInfo->Effects[j].MiscValue & (1 << rating))
         //                     {
@@ -3891,17 +4032,17 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
         //                         switch (rating)
         //                         {
         //                             case CR_DEFENSE_SKILL:
-        //                                 defense += (spellInfo->Effects[i].BasePoints + 1) * multiplier;
-        //                                 break;
+        //                                 defense += (spellInfo->Effects[i].BasePoints + 1) *
+        //                                 multiplier; break;
         //                             case CR_DODGE:
-        //                                 dodge += (spellInfo->Effects[i].BasePoints + 1) * multiplier;
-        //                                 break;
+        //                                 dodge += (spellInfo->Effects[i].BasePoints + 1) *
+        //                                 multiplier; break;
         //                             case CR_PARRY:
-        //                                 parry += (spellInfo->Effects[i].BasePoints + 1) * multiplier;
-        //                                 break;
+        //                                 parry += (spellInfo->Effects[i].BasePoints + 1) *
+        //                                 multiplier; break;
         //                             case CR_BLOCK:
-        //                                 block += (spellInfo->Effects[i].BasePoints + 1) * multiplier;
-        //                                 break;
+        //                                 block += (spellInfo->Effects[i].BasePoints + 1) *
+        //                                 multiplier; break;
         //                             case CR_HIT_MELEE:
         //                                 // if ()
         //                                 break;
@@ -3951,23 +4092,27 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
         //             {
         //                 multiplier = 0.2f;
         //                 if (spellInfo->Effects[i].TriggerSpell) {
-        //                     SpellInfo const* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
-        //                     if (!triggerSpellInfo)
+        //                     SpellInfo const* triggerSpellInfo =
+        //                     sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell); if
+        //                     (!triggerSpellInfo)
         //                         continue;
         //                     for (uint8 k = 0; k < 3; i++)
         //                     {
-        //                         if (triggerSpellInfo->Effects[k].Effect == SPELL_EFFECT_APPLY_AURA)
+        //                         if (triggerSpellInfo->Effects[k].Effect ==
+        //                         SPELL_EFFECT_APPLY_AURA)
         //                         {
         //                             switch (triggerSpellInfo->Effects[k].ApplyAuraName)
         //                             {
         //                                 case SPELL_AURA_MOD_DAMAGE_DONE:
         //                                 // case SPELL_AURA_MOD_HEALING_DONE: duplicated
-        //                                     spell_power += (spellInfo->Effects[k].BasePoints + 1) * multiplier;
-        //                                     break;
+        //                                     spell_power += (spellInfo->Effects[k].BasePoints + 1)
+        //                                     * multiplier; break;
         //                                 case SPELL_AURA_MOD_ATTACK_POWER:
-        //                                     attack_power += (spellInfo->Effects[k].BasePoints + 1) * multiplier;
+        //                                     attack_power += (spellInfo->Effects[k].BasePoints +
+        //                                     1) * multiplier;
         //                                 case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
-        //                                     block += (spellInfo->Effects[k].BasePoints + 1) * multiplier;
+        //                                     block += (spellInfo->Effects[k].BasePoints + 1) *
+        //                                     multiplier;
         //                                 default:
         //                                     break;
         //                             }
@@ -3983,66 +4128,77 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
     }
     // Basic score
     score += (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
-              resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
-              spell_penetration + armor + rangeDps + meleeDps) *
+              resilience + hit + crit + haste + expertise + attack_power + mana_regeneration +
+              spell_power + armor_penetration + spell_penetration + armor + rangeDps + meleeDps) *
              0.001;
     // todo: remove duplicate code
     if (cls == CLASS_HUNTER)
     {
         // AGILITY only
-        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2 + crit * 2 + haste * 2 + intellect;
+        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2 +
+                 crit * 2 + haste * 2 + intellect;
     }
-    else if (cls == CLASS_WARLOCK ||
-             cls == CLASS_MAGE ||
-             (cls == CLASS_PRIEST && tab == 2) || // shadow
-             (cls == CLASS_SHAMAN && tab == 0) || // element
-             (cls == CLASS_DRUID && tab == 0)     // balance
+    else if (cls == CLASS_WARLOCK || cls == CLASS_MAGE ||
+             (cls == CLASS_PRIEST && tab == 2) ||  // shadow
+             (cls == CLASS_SHAMAN && tab == 0) ||  // element
+             (cls == CLASS_DRUID && tab == 0)      // balance
     )
     {
         // SPELL DPS
-        score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration + hit * 1 + crit * 0.7 + haste * 1 + rangeDps;
+        score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration + hit * 1 +
+                 crit * 0.7 + haste * 1 + rangeDps;
     }
-    else if ((cls == CLASS_PALADIN && tab == 0) || // holy
-             (cls == CLASS_PRIEST && tab != 2) ||  // discipline / holy
-             (cls == CLASS_SHAMAN && tab == 2) ||  // heal
+    else if ((cls == CLASS_PALADIN && tab == 0) ||  // holy
+             (cls == CLASS_PRIEST && tab != 2) ||   // discipline / holy
+             (cls == CLASS_SHAMAN && tab == 2) ||   // heal
              (cls == CLASS_DRUID && tab == 2))
     {
         // HEALER
-        score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1 + rangeDps;
+        score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 +
+                 crit * 0.5 + haste * 1 + rangeDps;
     }
     else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot)))
     {
         // AGILITY mainly (STRENGTH also)
-        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 +
+                 hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     }
-    else if ((cls == CLASS_PALADIN && tab == 2) ||   // retribution
-             (cls == CLASS_WARRIOR && tab != 2) ||   // arm / fury
-             (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
+    else if ((cls == CLASS_PALADIN && tab == 2) ||    // retribution
+             (cls == CLASS_WARRIOR && tab != 2) ||    // arm / fury
+             (cls == CLASS_DEATH_KNIGHT && tab != 0)  // ice / unholy
     )
     {
         // STRENGTH mainly (AGILITY also)
-        score += strength * 2 + agility + attack_power + armor_penetration + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+        score += strength * 2 + agility + attack_power + armor_penetration + meleeDps * 5 +
+                 hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
     }
     else if ((cls == CLASS_SHAMAN && tab == 1))
-    { // enhancement
+    {  // enhancement
         // STRENGTH mainly (AGILITY, INTELLECT also)
-        score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+        score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 +
+                 armor_penetration * 0.5 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 +
+                 expertise * 2;
     }
-    else if ((cls == CLASS_WARRIOR && tab == 2) ||
-             (cls == CLASS_PALADIN && tab == 1))
+    else if ((cls == CLASS_WARRIOR && tab == 2) || (cls == CLASS_PALADIN && tab == 1))
     {
         // TANK WITH SHIELD
-        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3 + hit * 0.5 + crit * 0.2 + haste * 0.5 + expertise * 3;
+        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 2.5 + parry * 2 +
+                 dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3 + hit * 0.5 +
+                 crit * 0.2 + haste * 0.5 + expertise * 3;
     }
     else if (cls == CLASS_DEATH_KNIGHT && tab == 0)
     {
         // BLOOD DK TANK
-        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 + hit * 0.5 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
+        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 3.5 + parry * 2 +
+                 dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 + hit * 0.5 + crit * 0.5 +
+                 haste * 0.5 + expertise * 3.5;
     }
     else
     {
         // BEAR DRUID TANK
-        score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + meleeDps * 2 + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5 + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
+        score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 +
+                 meleeDps * 2 + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5 +
+                 hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
     // penalty for different type armor
     if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass >= ITEM_SUBCLASS_ARMOR_CLOTH &&
@@ -4062,10 +4218,10 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
             score *= 0.5;
         }
         // spec without double hand
-        // enhancement, rogue, ice dk, unholy dk, shield tank, fury warrior without titan's grip but with duel wield
+        // enhancement, rogue, ice dk, unholy dk, shield tank, fury warrior without titan's grip but
+        // with duel wield
         if (isDoubleHand &&
-            ((cls == CLASS_SHAMAN && tab == 1 && bot->CanDualWield()) ||
-             (cls == CLASS_ROGUE) ||
+            ((cls == CLASS_SHAMAN && tab == 1 && bot->CanDualWield()) || (cls == CLASS_ROGUE) ||
              (cls == CLASS_DEATH_KNIGHT && tab != 0) ||
              (cls == CLASS_WARRIOR && tab == 1 && !bot->CanTitanGrip() && bot->CanDualWield()) ||
              IsShieldTank(bot)))
@@ -4077,8 +4233,7 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
         if (isDoubleHand &&
             ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !bot->CanDualWield()) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) ||
-             (cls == CLASS_DRUID && tab == 1) ||
-             (cls == CLASS_PALADIN && tab == 2) ||
+             (cls == CLASS_DRUID && tab == 1) || (cls == CLASS_PALADIN && tab == 2) ||
              (cls == CLASS_DEATH_KNIGHT && tab == 0) ||
              (cls == CLASS_SHAMAN && tab == 1 && !bot->CanDualWield())))
         {
@@ -4097,7 +4252,8 @@ float PlayerbotFactory::CalculateItemScore(uint32 item_id, Player *bot)
         {
             score *= 0.1;
         }
-        if (cls == CLASS_ROGUE && tab == ROGUE_TAB_ASSASSINATION && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
+        if (cls == CLASS_ROGUE && tab == ROGUE_TAB_ASSASSINATION &&
+            proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
         {
             score *= 0.1;
         }
@@ -4130,378 +4286,401 @@ float PlayerbotFactory::CalculateEnchantScore(uint32 enchant_id, Player *bot)
 
         switch (enchant_display_type)
         {
-        case ITEM_ENCHANTMENT_TYPE_NONE:
-            break;
-        case ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL:
-        {
-            if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 28093)
-            { // mongoose
-                agility += 40;
-            }
-            else if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 20007)
-            { // crusader
-                strength += 30;
-            }
-            else if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 59620)
-            { // Berserk
-                attack_power += 120;
-            }
-            else if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 64440)
-            { // Blade Warding
-                parry += 50;
-            }
-            break;
-        }
-            // processed in Player::CastItemCombatSpell
-        case ITEM_ENCHANTMENT_TYPE_DAMAGE:
-            // if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
-            //     dps += float(enchant_amount);
-            // }
-            // if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
-            //     HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, float(enchant_amount), apply);
-            // else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
-            //     HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, float(enchant_amount), apply);
-            // else if (item->GetSlot() == EQUIPMENT_SLOT_RANGED)
-            //     HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
-            break;
-        case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
-        {
-            int allStatsAmount = 0;
-            switch (enchant_spell_id)
+            case ITEM_ENCHANTMENT_TYPE_NONE:
+                break;
+            case ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL:
             {
-            case 13624:
-                allStatsAmount = 1;
-                break;
-            case 13625:
-                allStatsAmount = 2;
-                break;
-            case 13824:
-                allStatsAmount = 3;
-                break;
-            case 19988:
-            case 44627:
-            case 56527:
-                allStatsAmount = 4;
-                break;
-            case 27959:
-            case 56529:
-                allStatsAmount = 6;
-                break;
-            case 44624:
-                allStatsAmount = 8;
-                break;
-            case 60694:
-            case 68251:
-                allStatsAmount = 10;
-                break;
-            default:
+                if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 28093)
+                {  // mongoose
+                    agility += 40;
+                }
+                else if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 20007)
+                {  // crusader
+                    strength += 30;
+                }
+                else if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 59620)
+                {  // Berserk
+                    attack_power += 120;
+                }
+                else if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 64440)
+                {  // Blade Warding
+                    parry += 50;
+                }
                 break;
             }
-            if (allStatsAmount != 0)
+                // processed in Player::CastItemCombatSpell
+            case ITEM_ENCHANTMENT_TYPE_DAMAGE:
+                // if (botAI->IsRanged(bot) && !botAI->IsCaster(bot)) {
+                //     dps += float(enchant_amount);
+                // }
+                // if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
+                //     HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE,
+                //     float(enchant_amount), apply);
+                // else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
+                //     HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE,
+                //     float(enchant_amount), apply);
+                // else if (item->GetSlot() == EQUIPMENT_SLOT_RANGED)
+                //     HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_VALUE,
+                //     float(enchant_amount), apply);
+                break;
+            case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
             {
-                agility += allStatsAmount;
-                strength += allStatsAmount;
-                intellect += allStatsAmount;
-                spirit += allStatsAmount;
-                stamina += allStatsAmount;
-            }
-            if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 64571)
-            { // Blood Draining
-                stamina += 80;
-            }
-            // if (enchant_spell_id)
-            // {
-            //     if (apply)
-            //     {
-            //         int32 basepoints = 0;
-            //         // Random Property Exist - try found basepoints for spell (basepoints depends from item suffix factor)
-            //         if (item->GetItemRandomPropertyId())
-            //         {
-            //             ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
-            //             if (item_rand)
-            //             {
-            //                 // Search enchant_amount
-            //                 for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
-            //                 {
-            //                     if (item_rand->Enchantment[k] == enchant_id)
-            //                     {
-            //                         basepoints = int32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
-            //                         break;
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //         // Cast custom spell vs all equal basepoints got from enchant_amount
-            //         if (basepoints)
-            //             CastCustomSpell(this, enchant_spell_id, &basepoints, &basepoints, &basepoints, true, item);
-            //         else
-            //             CastSpell(this, enchant_spell_id, true, item);
-            //     }
-            //     else
-            //         RemoveAurasDueToItemSpell(enchant_spell_id, item->GetGUID());
-            // }
-            break;
-        }
-        case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
-            // if (!enchant_amount)
-            // {
-            //     ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
-            //     if (item_rand)
-            //     {
-            //         for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
-            //         {
-            //             if (item_rand->Enchantment[k] == enchant_id)
-            //             {
-            //                 enchant_amount = uint32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
-            //                 break;
-            //             }
-            //         }
-            //     }
-            // }
-
-            // HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + enchant_spell_id), TOTAL_VALUE, float(enchant_amount), apply);
-            break;
-        case ITEM_ENCHANTMENT_TYPE_STAT:
-        {
-            if (!enchant_amount)
-            {
-                // ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
-                // if (item_rand_suffix)
+                int allStatsAmount = 0;
+                switch (enchant_spell_id)
+                {
+                    case 13624:
+                        allStatsAmount = 1;
+                        break;
+                    case 13625:
+                        allStatsAmount = 2;
+                        break;
+                    case 13824:
+                        allStatsAmount = 3;
+                        break;
+                    case 19988:
+                    case 44627:
+                    case 56527:
+                        allStatsAmount = 4;
+                        break;
+                    case 27959:
+                    case 56529:
+                        allStatsAmount = 6;
+                        break;
+                    case 44624:
+                        allStatsAmount = 8;
+                        break;
+                    case 60694:
+                    case 68251:
+                        allStatsAmount = 10;
+                        break;
+                    default:
+                        break;
+                }
+                if (allStatsAmount != 0)
+                {
+                    agility += allStatsAmount;
+                    strength += allStatsAmount;
+                    intellect += allStatsAmount;
+                    spirit += allStatsAmount;
+                    stamina += allStatsAmount;
+                }
+                if (PlayerbotAI::IsMelee(bot) && enchant_spell_id == 64571)
+                {  // Blood Draining
+                    stamina += 80;
+                }
+                // if (enchant_spell_id)
                 // {
-                //     for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+                //     if (apply)
                 //     {
-                //         if (item_rand_suffix->Enchantment[k] == enchant_id)
+                //         int32 basepoints = 0;
+                //         // Random Property Exist - try found basepoints for spell (basepoints
+                //         depends from item suffix factor) if (item->GetItemRandomPropertyId())
                 //         {
-                //             enchant_amount = uint32((item_rand_suffix->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
-                //             break;
+                //             ItemRandomSuffixEntry const* item_rand =
+                //             sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
+                //             if (item_rand)
+                //             {
+                //                 // Search enchant_amount
+                //                 for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+                //                 {
+                //                     if (item_rand->Enchantment[k] == enchant_id)
+                //                     {
+                //                         basepoints = int32((item_rand->AllocationPct[k] *
+                //                         item->GetItemSuffixFactor()) / 10000); break;
+                //                     }
+                //                 }
+                //             }
                 //         }
+                //         // Cast custom spell vs all equal basepoints got from enchant_amount
+                //         if (basepoints)
+                //             CastCustomSpell(this, enchant_spell_id, &basepoints, &basepoints,
+                //             &basepoints, true, item);
+                //         else
+                //             CastSpell(this, enchant_spell_id, true, item);
+                //     }
+                //     else
+                //         RemoveAurasDueToItemSpell(enchant_spell_id, item->GetGUID());
+                // }
+                break;
+            }
+            case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
+                // if (!enchant_amount)
+                // {
+                //     ItemRandomSuffixEntry const* item_rand =
+                //     sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
+                //     if (item_rand)
+                //     {
+                //         for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+                //         {
+                //             if (item_rand->Enchantment[k] == enchant_id)
+                //             {
+                //                 enchant_amount = uint32((item_rand->AllocationPct[k] *
+                //                 item->GetItemSuffixFactor()) / 10000); break;
+                //             }
+                //         }
+                //     }
+                // }
+
+                // HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + enchant_spell_id),
+                // TOTAL_VALUE, float(enchant_amount), apply);
+                break;
+            case ITEM_ENCHANTMENT_TYPE_STAT:
+            {
+                if (!enchant_amount)
+                {
+                    // ItemRandomSuffixEntry const* item_rand_suffix =
+                    // sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
+                    // if (item_rand_suffix)
+                    // {
+                    //     for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+                    //     {
+                    //         if (item_rand_suffix->Enchantment[k] == enchant_id)
+                    //         {
+                    //             enchant_amount = uint32((item_rand_suffix->AllocationPct[k] *
+                    //             item->GetItemSuffixFactor()) / 10000); break;
+                    //         }
+                    //     }
+                    // }
+                    break;
+                }
+                switch (enchant_spell_id)
+                {
+                    case ITEM_MOD_MANA:
+                        break;
+                    case ITEM_MOD_HEALTH:
+                        break;
+                    case ITEM_MOD_AGILITY:
+                        agility += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_STRENGTH:
+                        strength += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_INTELLECT:
+                        intellect += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_SPIRIT:
+                        spirit += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_STAMINA:
+                        stamina += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_DEFENSE_SKILL_RATING:
+                        defense += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_DODGE_RATING:
+                        dodge += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_PARRY_RATING:
+                        parry += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_BLOCK_RATING:
+                        block += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_HIT_MELEE_RATING:
+                        if (PlayerbotAI::IsMelee(bot))
+                        {
+                            hit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HIT_RANGED_RATING:
+                        if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
+                        {
+                            hit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HIT_SPELL_RATING:
+                        if (PlayerbotAI::IsCaster(bot))
+                        {
+                            hit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_CRIT_MELEE_RATING:
+                        if (PlayerbotAI::IsMelee(bot))
+                        {
+                            crit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_CRIT_RANGED_RATING:
+                        if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
+                        {
+                            crit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_CRIT_SPELL_RATING:
+                        if (PlayerbotAI::IsCaster(bot))
+                        {
+                            crit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HASTE_RANGED_RATING:
+                        if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
+                        {
+                            crit += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HASTE_SPELL_RATING:
+                        if (PlayerbotAI::IsCaster(bot))
+                        {
+                            haste += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_HIT_RATING:
+                        hit += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_CRIT_RATING:
+                        crit += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_RESILIENCE_RATING:
+                        resilience += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_HASTE_RATING:
+                        haste += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_EXPERTISE_RATING:
+                        expertise += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_ATTACK_POWER:
+                        attack_power += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_RANGED_ATTACK_POWER:
+                        if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
+                        {
+                            attack_power += float(enchant_amount);
+                        }
+                        break;
+                    case ITEM_MOD_MANA_REGENERATION:
+                        mana_regeneration += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_ARMOR_PENETRATION_RATING:
+                        armor_penetration += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_SPELL_POWER:
+                        spell_power += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_HEALTH_REGEN:
+                        // no calculation
+                        break;
+                    case ITEM_MOD_SPELL_PENETRATION:
+                        spell_penetration += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_BLOCK_VALUE:
+                        block += float(enchant_amount);
+                        break;
+                    case ITEM_MOD_SPELL_HEALING_DONE:  // deprecated
+                    case ITEM_MOD_SPELL_DAMAGE_DONE:   // deprecated
+                    default:
+                        break;
+                }
+                break;
+            }
+            case ITEM_ENCHANTMENT_TYPE_TOTEM:  // Shaman Rockbiter Weapon
+            {
+                // if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY))
+                // {
+                //     float addValue = 0.0f;
+                //     if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
+                //     {
+                //         addValue = float(enchant_amount * item->GetTemplate()->Delay / 1000.0f);
+                //         HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, addValue,
+                //         apply);
+                //     }
+                //     else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
+                //     {
+                //         addValue = float(enchant_amount * item->GetTemplate()->Delay / 1000.0f);
+                //         HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, addValue,
+                //         apply);
                 //     }
                 // }
                 break;
             }
-            switch (enchant_spell_id)
-            {
-            case ITEM_MOD_MANA:
+            case ITEM_ENCHANTMENT_TYPE_USE_SPELL:
+                // processed in Player::CastItemUseSpell
                 break;
-            case ITEM_MOD_HEALTH:
+            case ITEM_ENCHANTMENT_TYPE_PRISMATIC_SOCKET:
+                // nothing do..
                 break;
-            case ITEM_MOD_AGILITY:
-                agility += float(enchant_amount);
-                break;
-            case ITEM_MOD_STRENGTH:
-                strength += float(enchant_amount);
-                break;
-            case ITEM_MOD_INTELLECT:
-                intellect += float(enchant_amount);
-                break;
-            case ITEM_MOD_SPIRIT:
-                spirit += float(enchant_amount);
-                break;
-            case ITEM_MOD_STAMINA:
-                stamina += float(enchant_amount);
-                break;
-            case ITEM_MOD_DEFENSE_SKILL_RATING:
-                defense += float(enchant_amount);
-                break;
-            case ITEM_MOD_DODGE_RATING:
-                dodge += float(enchant_amount);
-                break;
-            case ITEM_MOD_PARRY_RATING:
-                parry += float(enchant_amount);
-                break;
-            case ITEM_MOD_BLOCK_RATING:
-                block += float(enchant_amount);
-                break;
-            case ITEM_MOD_HIT_MELEE_RATING:
-                if (PlayerbotAI::IsMelee(bot))
-                {
-                    hit += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_HIT_RANGED_RATING:
-                if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
-                {
-                    hit += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_HIT_SPELL_RATING:
-                if (PlayerbotAI::IsCaster(bot))
-                {
-                    hit += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_CRIT_MELEE_RATING:
-                if (PlayerbotAI::IsMelee(bot))
-                {
-                    crit += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_CRIT_RANGED_RATING:
-                if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
-                {
-                    crit += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_CRIT_SPELL_RATING:
-                if (PlayerbotAI::IsCaster(bot))
-                {
-                    crit += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_HASTE_RANGED_RATING:
-                if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
-                {
-                    crit += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_HASTE_SPELL_RATING:
-                if (PlayerbotAI::IsCaster(bot))
-                {
-                    haste += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_HIT_RATING:
-                hit += float(enchant_amount);
-                break;
-            case ITEM_MOD_CRIT_RATING:
-                crit += float(enchant_amount);
-                break;
-            case ITEM_MOD_RESILIENCE_RATING:
-                resilience += float(enchant_amount);
-                break;
-            case ITEM_MOD_HASTE_RATING:
-                haste += float(enchant_amount);
-                break;
-            case ITEM_MOD_EXPERTISE_RATING:
-                expertise += float(enchant_amount);
-                break;
-            case ITEM_MOD_ATTACK_POWER:
-                attack_power += float(enchant_amount);
-                break;
-            case ITEM_MOD_RANGED_ATTACK_POWER:
-                if (PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsCaster(bot))
-                {
-                    attack_power += float(enchant_amount);
-                }
-                break;
-            case ITEM_MOD_MANA_REGENERATION:
-                mana_regeneration += float(enchant_amount);
-                break;
-            case ITEM_MOD_ARMOR_PENETRATION_RATING:
-                armor_penetration += float(enchant_amount);
-                break;
-            case ITEM_MOD_SPELL_POWER:
-                spell_power += float(enchant_amount);
-                break;
-            case ITEM_MOD_HEALTH_REGEN:
-                // no calculation
-                break;
-            case ITEM_MOD_SPELL_PENETRATION:
-                spell_penetration += float(enchant_amount);
-                break;
-            case ITEM_MOD_BLOCK_VALUE:
-                block += float(enchant_amount);
-                break;
-            case ITEM_MOD_SPELL_HEALING_DONE: // deprecated
-            case ITEM_MOD_SPELL_DAMAGE_DONE:  // deprecated
             default:
+                // LOG_ERROR("entities.player", "Unknown item enchantment (id = {}) display type:
+                // {}", enchant_id, enchant_display_type);
                 break;
-            }
-            break;
-        }
-        case ITEM_ENCHANTMENT_TYPE_TOTEM: // Shaman Rockbiter Weapon
-        {
-            // if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY))
-            // {
-            //     float addValue = 0.0f;
-            //     if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
-            //     {
-            //         addValue = float(enchant_amount * item->GetTemplate()->Delay / 1000.0f);
-            //         HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, addValue, apply);
-            //     }
-            //     else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
-            //     {
-            //         addValue = float(enchant_amount * item->GetTemplate()->Delay / 1000.0f);
-            //         HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, addValue, apply);
-            //     }
-            // }
-            break;
-        }
-        case ITEM_ENCHANTMENT_TYPE_USE_SPELL:
-            // processed in Player::CastItemUseSpell
-            break;
-        case ITEM_ENCHANTMENT_TYPE_PRISMATIC_SOCKET:
-            // nothing do..
-            break;
-        default:
-            // LOG_ERROR("entities.player", "Unknown item enchantment (id = {}) display type: {}", enchant_id, enchant_display_type);
-            break;
         } /*switch (enchant_display_type)*/
     }
     int tab = AiFactory::GetPlayerSpecTab(bot);
     uint8 cls = bot->getClass();
     // Basic score
-    float score = (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
-                   resilience + hit + crit + haste + expertise + attack_power + mana_regeneration + spell_power + armor_penetration +
-                   spell_penetration + armor + dps) *
-                  0.001;
+    float score =
+        (agility + strength + intellect + spirit + stamina + defense + dodge + parry + block +
+         resilience + hit + crit + haste + expertise + attack_power + mana_regeneration +
+         spell_power + armor_penetration + spell_penetration + armor + dps) *
+        0.001;
     // todo: remove duplicate code
     if (cls == CLASS_HUNTER)
     {
         // AGILITY only
-        score += agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2 + crit * 2 + haste * 2.5 + intellect;
+        score += agility * 2.5 + attack_power + armor_penetration * 2 + dps * 5 + hit * 2 +
+                 crit * 2 + haste * 2.5 + intellect;
     }
-    else if (cls == CLASS_WARLOCK ||
-             cls == CLASS_MAGE ||
-             (cls == CLASS_PRIEST && tab == 2) || // shadow
-             (cls == CLASS_SHAMAN && tab == 0) || // element
-             (cls == CLASS_DRUID && tab == 0)     // balance
+    else if (cls == CLASS_WARLOCK || cls == CLASS_MAGE ||
+             (cls == CLASS_PRIEST && tab == 2) ||  // shadow
+             (cls == CLASS_SHAMAN && tab == 0) ||  // element
+             (cls == CLASS_DRUID && tab == 0)      // balance
     )
     {
         // SPELL DPS
-        score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration + hit * 1 + crit * 0.7 + haste * 1;
+        score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration + hit * 1 +
+                 crit * 0.7 + haste * 1;
     }
-    else if ((cls == CLASS_PALADIN && tab == 0) || // holy
-             (cls == CLASS_PRIEST && tab != 2) ||  // discipline / holy
-             (cls == CLASS_SHAMAN && tab == 2) ||  // heal
+    else if ((cls == CLASS_PALADIN && tab == 0) ||  // holy
+             (cls == CLASS_PRIEST && tab != 2) ||   // discipline / holy
+             (cls == CLASS_SHAMAN && tab == 2) ||   // heal
              (cls == CLASS_DRUID && tab == 2))
     {
         // HEALER
-        score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1;
+        score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 +
+                 crit * 0.5 + haste * 1;
     }
     else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot)))
     {
         // AGILITY mainly (STRENGTH also)
-        score += agility * 2 + strength + attack_power + armor_penetration * 1 + dps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+        score += agility * 2 + strength + attack_power + armor_penetration * 1 + dps * 5 +
+                 hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     }
-    else if ((cls == CLASS_PALADIN && tab == 2) ||   // retribution
-             (cls == CLASS_WARRIOR && tab != 2) ||   // arm / fury
-             (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
+    else if ((cls == CLASS_PALADIN && tab == 2) ||    // retribution
+             (cls == CLASS_WARRIOR && tab != 2) ||    // arm / fury
+             (cls == CLASS_DEATH_KNIGHT && tab != 0)  // ice / unholy
     )
     {
         // STRENGTH mainly (AGILITY also)
-        score += strength * 2 + agility + attack_power + armor_penetration + dps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+        score += strength * 2 + agility + attack_power + armor_penetration + dps * 5 + hit * 1.5 +
+                 crit * 1.5 + haste * 1.5 + expertise * 2;
     }
     else if ((cls == CLASS_SHAMAN && tab == 1))
-    { // enhancement
+    {  // enhancement
         // STRENGTH mainly (AGILITY, INTELLECT also)
-        score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + dps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+        score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 +
+                 armor_penetration * 0.5 + dps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 +
+                 expertise * 2;
     }
-    else if ((cls == CLASS_WARRIOR && tab == 2) ||
-             (cls == CLASS_PALADIN && tab == 1))
+    else if ((cls == CLASS_WARRIOR && tab == 2) || (cls == CLASS_PALADIN && tab == 1))
     {
         // TANK WITH SHIELD
-        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3 + hit * 0.5 + crit * 0.2 + haste * 0.5 + expertise * 3;
+        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 2.5 + parry * 2 +
+                 dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3 + hit * 0.5 +
+                 crit * 0.2 + haste * 0.5 + expertise * 3;
     }
     else if (cls == CLASS_DEATH_KNIGHT && tab == 0)
     {
         // BLOOD DK TANK
-        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 + hit * 0.5 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
+        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 3.5 + parry * 2 +
+                 dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 + hit * 0.5 + crit * 0.5 +
+                 haste * 0.5 + expertise * 3.5;
     }
     else
     {
         // BEAR DRUID TANK
-        score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + dps * 2 + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5 + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
+        score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 +
+                 dps * 2 + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5 + hit * 1 +
+                 crit * 1 + haste * 0.5 + expertise * 3;
     }
     return score;
 }
@@ -4530,224 +4709,227 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player *bot, uint32
             int32 val = spellInfo->Effects[i].BasePoints + 1;
             switch (spellInfo->Effects[i].ApplyAuraName)
             {
-            case SPELL_AURA_MOD_DAMAGE_DONE:
-                // case SPELL_AURA_MOD_HEALING_DONE: duplicated
-                spell_power += val * multiplier;
-                break;
-            case SPELL_AURA_MOD_ATTACK_POWER:
-                attack_power += val * multiplier;
-                break;
-            case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
-                block += val * multiplier;
-                break;
-            case SPELL_AURA_MOD_RATING:
-            {
-                for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING; ++rating)
+                case SPELL_AURA_MOD_DAMAGE_DONE:
+                    // case SPELL_AURA_MOD_HEALING_DONE: duplicated
+                    spell_power += val * multiplier;
+                    break;
+                case SPELL_AURA_MOD_ATTACK_POWER:
+                    attack_power += val * multiplier;
+                    break;
+                case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
+                    block += val * multiplier;
+                    break;
+                case SPELL_AURA_MOD_RATING:
                 {
-                    if (spellInfo->Effects[i].MiscValue & (1 << rating))
+                    for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING; ++rating)
                     {
-                        switch (rating)
+                        if (spellInfo->Effects[i].MiscValue & (1 << rating))
                         {
-                        case CR_DEFENSE_SKILL:
-                            defense += val * multiplier;
-                            break;
-                        case CR_DODGE:
-                            dodge += val * multiplier;
-                            break;
-                        case CR_PARRY:
-                            parry += val * multiplier;
-                            break;
-                        case CR_BLOCK:
-                            block += val * multiplier;
-                            break;
-                        case CR_HIT_MELEE:
-                            if (isMelee)
+                            switch (rating)
                             {
-                                hit += val * multiplier;
+                                case CR_DEFENSE_SKILL:
+                                    defense += val * multiplier;
+                                    break;
+                                case CR_DODGE:
+                                    dodge += val * multiplier;
+                                    break;
+                                case CR_PARRY:
+                                    parry += val * multiplier;
+                                    break;
+                                case CR_BLOCK:
+                                    block += val * multiplier;
+                                    break;
+                                case CR_HIT_MELEE:
+                                    if (isMelee)
+                                    {
+                                        hit += val * multiplier;
+                                    }
+                                    break;
+                                case CR_HIT_RANGED:
+                                    if (isRanged && !isCaster)
+                                    {
+                                        hit += val * multiplier;
+                                    }
+                                    break;
+                                case CR_HIT_SPELL:
+                                    if (isCaster)
+                                    {
+                                        hit += val * multiplier;
+                                    }
+                                    break;
+                                case CR_CRIT_MELEE:
+                                    if (isMelee)
+                                    {
+                                        crit += val * multiplier;
+                                    }
+                                    break;
+                                case CR_CRIT_RANGED:
+                                    if (isRanged && !isCaster)
+                                    {
+                                        crit += val * multiplier;
+                                    }
+                                    break;
+                                case CR_CRIT_SPELL:
+                                    if (isCaster)
+                                    {
+                                        crit += val * multiplier;
+                                    }
+                                    break;
+                                case CR_HASTE_MELEE:
+                                    if (isMelee)
+                                    {
+                                        haste += val * multiplier;
+                                    }
+                                    break;
+                                case CR_HASTE_RANGED:
+                                    if (isRanged && !isCaster)
+                                    {
+                                        haste += val * multiplier;
+                                    }
+                                    break;
+                                case CR_HASTE_SPELL:
+                                    if (isCaster)
+                                    {
+                                        haste += val * multiplier;
+                                    }
+                                    break;
+                                case CR_EXPERTISE:
+                                    expertise += val * multiplier;
+                                    break;
+                                case CR_ARMOR_PENETRATION:
+                                    armor_penetration += val * multiplier;
+                                    break;
+                                default:
+                                    break;
                             }
-                            break;
-                        case CR_HIT_RANGED:
-                            if (isRanged && !isCaster)
+                        }
+                        break;
+                    }
+                }
+                case SPELL_AURA_PROC_TRIGGER_SPELL:
+                {
+                    multiplier = 0.2f;
+                    if (spellInfo->Effects[i].TriggerSpell)
+                    {
+                        SpellInfo const *triggerSpellInfo =
+                            sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
+                        if (!triggerSpellInfo)
+                            continue;
+                        for (uint8 k = 0; k < MAX_SPELL_EFFECTS; k++)
+                        {
+                            if (triggerSpellInfo->Effects[k].Effect == SPELL_EFFECT_APPLY_AURA)
                             {
-                                hit += val * multiplier;
+                                switch (triggerSpellInfo->Effects[k].ApplyAuraName)
+                                {
+                                    case SPELL_AURA_MOD_DAMAGE_DONE:
+                                        // case SPELL_AURA_MOD_HEALING_DONE: duplicated
+                                        spell_power += val * multiplier;
+                                        break;
+                                    case SPELL_AURA_MOD_ATTACK_POWER:
+                                        attack_power += val * multiplier;
+                                        break;
+                                    case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
+                                        block += val * multiplier;
+                                        break;
+                                    case SPELL_AURA_MOD_RATING:
+                                    {
+                                        for (uint32 rating = CR_WEAPON_SKILL;
+                                             rating < MAX_COMBAT_RATING; ++rating)
+                                        {
+                                            if (triggerSpellInfo->Effects[k].MiscValue &
+                                                (1 << rating))
+                                            {
+                                                switch (rating)
+                                                {
+                                                    case CR_DEFENSE_SKILL:
+                                                        defense += val * multiplier;
+                                                        break;
+                                                    case CR_DODGE:
+                                                        dodge += val * multiplier;
+                                                        break;
+                                                    case CR_PARRY:
+                                                        parry += val * multiplier;
+                                                        break;
+                                                    case CR_BLOCK:
+                                                        block += val * multiplier;
+                                                        break;
+                                                    case CR_HIT_MELEE:
+                                                        if (isMelee)
+                                                        {
+                                                            hit += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_HIT_RANGED:
+                                                        if (isRanged && !isCaster)
+                                                        {
+                                                            hit += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_HIT_SPELL:
+                                                        if (isCaster)
+                                                        {
+                                                            hit += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_CRIT_MELEE:
+                                                        if (isMelee)
+                                                        {
+                                                            crit += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_CRIT_RANGED:
+                                                        if (isRanged && !isCaster)
+                                                        {
+                                                            crit += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_CRIT_SPELL:
+                                                        if (isCaster)
+                                                        {
+                                                            crit += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_HASTE_MELEE:
+                                                        if (isMelee)
+                                                        {
+                                                            haste += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_HASTE_RANGED:
+                                                        if (isRanged && !isCaster)
+                                                        {
+                                                            haste += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_HASTE_SPELL:
+                                                        if (isCaster)
+                                                        {
+                                                            haste += val * multiplier;
+                                                        }
+                                                        break;
+                                                    case CR_EXPERTISE:
+                                                        expertise += val * multiplier;
+                                                        break;
+                                                    case CR_ARMOR_PENETRATION:
+                                                        armor_penetration += val * multiplier;
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    default:
+                                        break;
+                                }
                             }
-                            break;
-                        case CR_HIT_SPELL:
-                            if (isCaster)
-                            {
-                                hit += val * multiplier;
-                            }
-                            break;
-                        case CR_CRIT_MELEE:
-                            if (isMelee)
-                            {
-                                crit += val * multiplier;
-                            }
-                            break;
-                        case CR_CRIT_RANGED:
-                            if (isRanged && !isCaster)
-                            {
-                                crit += val * multiplier;
-                            }
-                            break;
-                        case CR_CRIT_SPELL:
-                            if (isCaster)
-                            {
-                                crit += val * multiplier;
-                            }
-                            break;
-                        case CR_HASTE_MELEE:
-                            if (isMelee)
-                            {
-                                haste += val * multiplier;
-                            }
-                            break;
-                        case CR_HASTE_RANGED:
-                            if (isRanged && !isCaster)
-                            {
-                                haste += val * multiplier;
-                            }
-                            break;
-                        case CR_HASTE_SPELL:
-                            if (isCaster)
-                            {
-                                haste += val * multiplier;
-                            }
-                            break;
-                        case CR_EXPERTISE:
-                            expertise += val * multiplier;
-                            break;
-                        case CR_ARMOR_PENETRATION:
-                            armor_penetration += val * multiplier;
-                            break;
-                        default:
-                            break;
                         }
                     }
                     break;
                 }
-            }
-            case SPELL_AURA_PROC_TRIGGER_SPELL:
-            {
-                multiplier = 0.2f;
-                if (spellInfo->Effects[i].TriggerSpell)
-                {
-                    SpellInfo const *triggerSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
-                    if (!triggerSpellInfo)
-                        continue;
-                    for (uint8 k = 0; k < MAX_SPELL_EFFECTS; k++)
-                    {
-                        if (triggerSpellInfo->Effects[k].Effect == SPELL_EFFECT_APPLY_AURA)
-                        {
-                            switch (triggerSpellInfo->Effects[k].ApplyAuraName)
-                            {
-                            case SPELL_AURA_MOD_DAMAGE_DONE:
-                                // case SPELL_AURA_MOD_HEALING_DONE: duplicated
-                                spell_power += val * multiplier;
-                                break;
-                            case SPELL_AURA_MOD_ATTACK_POWER:
-                                attack_power += val * multiplier;
-                                break;
-                            case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
-                                block += val * multiplier;
-                                break;
-                            case SPELL_AURA_MOD_RATING:
-                            {
-                                for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING; ++rating)
-                                {
-                                    if (triggerSpellInfo->Effects[k].MiscValue & (1 << rating))
-                                    {
-                                        switch (rating)
-                                        {
-                                        case CR_DEFENSE_SKILL:
-                                            defense += val * multiplier;
-                                            break;
-                                        case CR_DODGE:
-                                            dodge += val * multiplier;
-                                            break;
-                                        case CR_PARRY:
-                                            parry += val * multiplier;
-                                            break;
-                                        case CR_BLOCK:
-                                            block += val * multiplier;
-                                            break;
-                                        case CR_HIT_MELEE:
-                                            if (isMelee)
-                                            {
-                                                hit += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_HIT_RANGED:
-                                            if (isRanged && !isCaster)
-                                            {
-                                                hit += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_HIT_SPELL:
-                                            if (isCaster)
-                                            {
-                                                hit += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_CRIT_MELEE:
-                                            if (isMelee)
-                                            {
-                                                crit += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_CRIT_RANGED:
-                                            if (isRanged && !isCaster)
-                                            {
-                                                crit += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_CRIT_SPELL:
-                                            if (isCaster)
-                                            {
-                                                crit += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_HASTE_MELEE:
-                                            if (isMelee)
-                                            {
-                                                haste += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_HASTE_RANGED:
-                                            if (isRanged && !isCaster)
-                                            {
-                                                haste += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_HASTE_SPELL:
-                                            if (isCaster)
-                                            {
-                                                haste += val * multiplier;
-                                            }
-                                            break;
-                                        case CR_EXPERTISE:
-                                            expertise += val * multiplier;
-                                            break;
-                                        case CR_ARMOR_PENETRATION:
-                                            armor_penetration += val * multiplier;
-                                            break;
-                                        default:
-                                            break;
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                            default:
-                                break;
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-            default:
-                break;
+                default:
+                    break;
             }
         }
     }
@@ -4756,59 +4938,70 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player *bot, uint32
     if (cls == CLASS_HUNTER)
     {
         // AGILITY only
-        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2 + crit * 2 + haste * 2.5 + intellect;
+        score += agility * 2.5 + attack_power + armor_penetration * 2 + rangeDps * 5 + hit * 2 +
+                 crit * 2 + haste * 2.5 + intellect;
     }
-    else if (cls == CLASS_WARLOCK ||
-             cls == CLASS_MAGE ||
-             (cls == CLASS_PRIEST && tab == 2) || // shadow
-             (cls == CLASS_SHAMAN && tab == 0) || // element
-             (cls == CLASS_DRUID && tab == 0)     // balance
+    else if (cls == CLASS_WARLOCK || cls == CLASS_MAGE ||
+             (cls == CLASS_PRIEST && tab == 2) ||  // shadow
+             (cls == CLASS_SHAMAN && tab == 0) ||  // element
+             (cls == CLASS_DRUID && tab == 0)      // balance
     )
     {
         // SPELL DPS
-        score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration + hit * 1 + crit * 0.7 + haste * 1 + rangeDps;
+        score += intellect * 0.5 + spirit * 0.5 + spell_power + spell_penetration + hit * 1 +
+                 crit * 0.7 + haste * 1 + rangeDps;
     }
-    else if ((cls == CLASS_PALADIN && tab == 0) || // holy
-             (cls == CLASS_PRIEST && tab != 2) ||  // discipline / holy
-             (cls == CLASS_SHAMAN && tab == 2) ||  // heal
+    else if ((cls == CLASS_PALADIN && tab == 0) ||  // holy
+             (cls == CLASS_PRIEST && tab != 2) ||   // discipline / holy
+             (cls == CLASS_SHAMAN && tab == 2) ||   // heal
              (cls == CLASS_DRUID && tab == 2))
     {
         // HEALER
-        score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 + crit * 0.5 + haste * 1 + rangeDps;
+        score += intellect * 0.5 + spirit * 0.5 + spell_power + mana_regeneration * 0.5 +
+                 crit * 0.5 + haste * 1 + rangeDps;
     }
     else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == 2 && !PlayerbotAI::IsTank(bot)))
     {
         // AGILITY mainly (STRENGTH also)
-        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
+        score += agility * 2 + strength + attack_power + armor_penetration * 1 + meleeDps * 5 +
+                 hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2.5;
     }
-    else if ((cls == CLASS_PALADIN && tab == 2) ||   // retribution
-             (cls == CLASS_WARRIOR && tab != 2) ||   // arm / fury
-             (cls == CLASS_DEATH_KNIGHT && tab != 0) // ice / unholy
+    else if ((cls == CLASS_PALADIN && tab == 2) ||    // retribution
+             (cls == CLASS_WARRIOR && tab != 2) ||    // arm / fury
+             (cls == CLASS_DEATH_KNIGHT && tab != 0)  // ice / unholy
     )
     {
         // STRENGTH mainly (AGILITY also)
-        score += strength * 2 + agility + attack_power + armor_penetration + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+        score += strength * 2 + agility + attack_power + armor_penetration + meleeDps * 5 +
+                 hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
     }
     else if ((cls == CLASS_SHAMAN && tab == 1))
-    { // enhancement
+    {  // enhancement
         // STRENGTH mainly (AGILITY, INTELLECT also)
-        score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 + armor_penetration * 0.5 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 + expertise * 2;
+        score += strength * 1 + agility * 1.5 + intellect * 1.5 + attack_power + spell_power * 1.5 +
+                 armor_penetration * 0.5 + meleeDps * 5 + hit * 1.5 + crit * 1.5 + haste * 1.5 +
+                 expertise * 2;
     }
-    else if ((cls == CLASS_WARRIOR && tab == 2) ||
-             (cls == CLASS_PALADIN && tab == 1))
+    else if ((cls == CLASS_WARRIOR && tab == 2) || (cls == CLASS_PALADIN && tab == 1))
     {
         // TANK WITH SHIELD
-        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 2.5 + parry * 2 + dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3 + hit * 0.5 + crit * 0.2 + haste * 0.5 + expertise * 3;
+        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 2.5 + parry * 2 +
+                 dodge * 2 + resilience * 2 + block * 2 + armor * 0.3 + stamina * 3 + hit * 0.5 +
+                 crit * 0.2 + haste * 0.5 + expertise * 3;
     }
     else if (cls == CLASS_DEATH_KNIGHT && tab == 0)
     {
         // BLOOD DK TANK
-        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 3.5 + parry * 2 + dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 + hit * 0.5 + crit * 0.5 + haste * 0.5 + expertise * 3.5;
+        score += strength * 1 + agility * 2 + attack_power * 0.2 + defense * 3.5 + parry * 2 +
+                 dodge * 2 + resilience * 2 + armor * 0.3 + stamina * 2.5 + hit * 0.5 + crit * 0.5 +
+                 haste * 0.5 + expertise * 3.5;
     }
     else
     {
         // BEAR DRUID TANK
-        score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 + meleeDps * 2 + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5 + hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
+        score += agility * 1.5 + strength * 1 + attack_power * 0.5 + armor_penetration * 0.5 +
+                 meleeDps * 2 + defense * 0.25 + dodge * 0.25 + armor * 0.3 + stamina * 1.5 +
+                 hit * 1 + crit * 1 + haste * 0.5 + expertise * 3;
     }
     return score;
 }
@@ -4816,7 +5009,8 @@ float PlayerbotFactory::CalculateSpellScore(uint32 spell_id, Player *bot, uint32
 bool PlayerbotFactory::IsShieldTank(Player *bot)
 {
     int tab = AiFactory::GetPlayerSpecTab(bot);
-    return (bot->getClass() == CLASS_WARRIOR && tab == 2) || (bot->getClass() == CLASS_PALADIN && tab == 1);
+    return (bot->getClass() == CLASS_WARRIOR && tab == 2) ||
+           (bot->getClass() == CLASS_PALADIN && tab == 1);
 }
 
 bool PlayerbotFactory::NotSameArmorType(uint32 item_subclass_armor, Player *bot)

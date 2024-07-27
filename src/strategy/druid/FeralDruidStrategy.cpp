@@ -1,13 +1,16 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "FeralDruidStrategy.h"
+
 #include "Playerbots.h"
 
 class FeralDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     FeralDruidStrategyActionNodeFactory()
     {
         creators["survival instincts"] = &survival_instincts;
@@ -20,7 +23,7 @@ public:
         creators["prowl"] = &prowl;
     }
 
-private:
+   private:
     static ActionNode *survival_instincts([[maybe_unused]] PlayerbotAI *botAI)
     {
         return new ActionNode("survival instincts",
@@ -92,15 +95,27 @@ FeralDruidStrategy::FeralDruidStrategy(PlayerbotAI *botAI) : GenericDruidStrateg
     actionNodeFactories.Add(new ShapeshiftDruidStrategyActionNodeFactory());
 }
 
-void FeralDruidStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void FeralDruidStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     GenericDruidStrategy::InitTriggers(triggers);
 
-    // triggers.push_back(new TriggerNode("not facing target", NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), nullptr)));
-    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
-    // triggers.push_back(new TriggerNode("enemy too close for melee", NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), nullptr)));
-    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("survival instincts", ACTION_EMERGENCY + 1), nullptr)));
-    triggers.push_back(new TriggerNode("omen of clarity", NextAction::array(0, new NextAction("omen of clarity", ACTION_HIGH + 9), nullptr)));
-    triggers.push_back(new TriggerNode("player has flag", NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
-    triggers.push_back(new TriggerNode("enemy flagcarrier near", NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
+    // triggers.push_back(new TriggerNode("not facing target", NextAction::array(0, new
+    // NextAction("set facing", ACTION_NORMAL + 7), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "enemy out of melee",
+        NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy too close for melee", NextAction::array(0, new
+    // NextAction("move out of enemy contact", ACTION_NORMAL + 8), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "critical health",
+        NextAction::array(0, new NextAction("survival instincts", ACTION_EMERGENCY + 1), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "omen of clarity",
+        NextAction::array(0, new NextAction("omen of clarity", ACTION_HIGH + 9), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "player has flag",
+        NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "enemy flagcarrier near",
+        NextAction::array(0, new NextAction("dash", ACTION_EMERGENCY + 2), nullptr)));
 }

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_LOOTACTION_H
@@ -15,7 +17,7 @@ class SpellInfo;
 
 class LootAction : public MovementAction
 {
-public:
+   public:
     LootAction(PlayerbotAI *botAI) : MovementAction(botAI, "loot") {}
 
     bool Execute(Event event) override;
@@ -24,12 +26,12 @@ public:
 
 class OpenLootAction : public MovementAction
 {
-public:
+   public:
     OpenLootAction(PlayerbotAI *botAI) : MovementAction(botAI, "open loot") {}
 
     bool Execute(Event event) override;
 
-private:
+   private:
     bool DoLoot(LootObject &lootObject);
     uint32 GetOpeningSpell(LootObject &lootObject);
     uint32 GetOpeningSpell(LootObject &lootObject, GameObject *go);
@@ -39,7 +41,7 @@ private:
 
 class StoreLootAction : public InventoryAction
 {
-public:
+   public:
     StoreLootAction(PlayerbotAI *botAI) : InventoryAction(botAI, "store loot") {}
 
     bool Execute(Event event) override;
@@ -48,7 +50,7 @@ public:
 
 class ReleaseLootAction : public InventoryAction
 {
-public:
+   public:
     ReleaseLootAction(PlayerbotAI *botAI) : InventoryAction(botAI, "release loot") {}
 
     bool Execute(Event event) override;

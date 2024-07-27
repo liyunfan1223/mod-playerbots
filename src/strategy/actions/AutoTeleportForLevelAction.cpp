@@ -1,8 +1,9 @@
 #include "AutoTeleportForLevelAction.h"
+
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
-#include "RandomPlayerbotMgr.h"
 #include "Playerbots.h"
+#include "RandomPlayerbotMgr.h"
 #include "SharedDefines.h"
 
 bool AutoTeleportForLevelAction::Execute(Event event)

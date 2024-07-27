@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PVPVALUES_H
@@ -14,33 +16,37 @@ class Unit;
 
 class BgTypeValue : public ManualSetValue<uint32>
 {
-public:
+   public:
     BgTypeValue(PlayerbotAI *botAI) : ManualSetValue<uint32>(botAI, 0, "bg type") {}
 };
 
 class ArenaTypeValue : public ManualSetValue<uint32>
 {
-public:
+   public:
     ArenaTypeValue(PlayerbotAI *botAI) : ManualSetValue<uint32>(botAI, 0, "arena type") {}
 };
 
 class BgRoleValue : public ManualSetValue<uint32>
 {
-public:
+   public:
     BgRoleValue(PlayerbotAI *botAI) : ManualSetValue<uint32>(botAI, 0, "bg role") {}
 };
 
-class BgMastersValue : public SingleCalculatedValue<std::vector<CreatureData const *>>, public Qualified
+class BgMastersValue : public SingleCalculatedValue<std::vector<CreatureData const *>>,
+                       public Qualified
 {
-public:
-    BgMastersValue(PlayerbotAI *botAI) : SingleCalculatedValue<std::vector<CreatureData const *>>(botAI, "bg masters") {}
+   public:
+    BgMastersValue(PlayerbotAI *botAI)
+        : SingleCalculatedValue<std::vector<CreatureData const *>>(botAI, "bg masters")
+    {
+    }
 
     std::vector<CreatureData const *> Calculate() override;
 };
 
 class BgMasterValue : public CDPairCalculatedValue, public Qualified
 {
-public:
+   public:
     BgMasterValue(PlayerbotAI *botAI) : CDPairCalculatedValue(botAI, "bg master", 60) {}
 
     CreatureData const *Calculate() override;
@@ -49,7 +55,7 @@ public:
 
 class RpgBgTypeValue : public CalculatedValue<BattlegroundTypeId>
 {
-public:
+   public:
     RpgBgTypeValue(PlayerbotAI *botAI) : CalculatedValue(botAI, "rpg bg type") {}
 
     BattlegroundTypeId Calculate() override;
@@ -57,12 +63,15 @@ public:
 
 class FlagCarrierValue : public UnitCalculatedValue
 {
-public:
-    FlagCarrierValue(PlayerbotAI *botAI, bool sameTeam = false, bool ignoreRange = false) : UnitCalculatedValue(botAI), sameTeam(sameTeam), ignoreRange(ignoreRange) {}
+   public:
+    FlagCarrierValue(PlayerbotAI *botAI, bool sameTeam = false, bool ignoreRange = false)
+        : UnitCalculatedValue(botAI), sameTeam(sameTeam), ignoreRange(ignoreRange)
+    {
+    }
 
     Unit *Calculate() override;
 
-private:
+   private:
     bool sameTeam;
     bool ignoreRange;
 };

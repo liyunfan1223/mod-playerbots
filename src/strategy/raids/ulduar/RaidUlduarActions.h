@@ -2,13 +2,13 @@
 #define _PLAYERBOT_RAIDULDUARACTIONS_H
 
 #include "Action.h"
-#include "MovementActions.h"
 #include "AttackAction.h"
 #include "GenericActions.h"
+#include "MovementActions.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
-#include "RaidUlduarScripts.h"
 #include "RaidUlduarBossHelper.h"
+#include "RaidUlduarScripts.h"
 
 // just for test
 // class TryToGetBossAIAction : public Action

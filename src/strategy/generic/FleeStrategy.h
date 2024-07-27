@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_FLEESTRATEGY_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class FleeStrategy : public Strategy
 {
-public:
+   public:
     FleeStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -20,7 +22,7 @@ public:
 
 class FleeFromAddsStrategy : public Strategy
 {
-public:
+   public:
     FleeFromAddsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

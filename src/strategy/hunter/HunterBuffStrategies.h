@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_HUNTERBUFFSTRATEGIES_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class HunterBuffSpeedStrategy : public NonCombatStrategy
 {
-public:
+   public:
     HunterBuffSpeedStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
     std::string const getName() override { return "bspeed"; }
@@ -20,7 +22,7 @@ public:
 
 class HunterBuffManaStrategy : public NonCombatStrategy
 {
-public:
+   public:
     HunterBuffManaStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
     std::string const getName() override { return "bmana"; }
@@ -29,7 +31,7 @@ public:
 
 class HunterBuffDpsStrategy : public NonCombatStrategy
 {
-public:
+   public:
     HunterBuffDpsStrategy(PlayerbotAI *botAI);
 
     std::string const getName() override { return "bdps"; }
@@ -38,7 +40,7 @@ public:
 
 class HunterNatureResistanceStrategy : public NonCombatStrategy
 {
-public:
+   public:
     HunterNatureResistanceStrategy(PlayerbotAI *botAI) : NonCombatStrategy(botAI) {}
 
     std::string const getName() override { return "rnature"; }

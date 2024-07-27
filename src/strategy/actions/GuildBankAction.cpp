@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "GuildBankAction.h"
+
 #include "GuildMgr.h"
 #include "Playerbots.h"
 
@@ -36,11 +39,11 @@ bool GuildBankAction::Execute(std::string const text, GameObject *bank)
 {
     bool result = true;
 
-    std::vector<Item*> found = parseItems(text);
+    std::vector<Item *> found = parseItems(text);
     if (found.empty())
         return false;
 
-    for (std::vector<Item*>::iterator i = found.begin(); i != found.end(); i++)
+    for (std::vector<Item *>::iterator i = found.begin(); i != found.end(); i++)
     {
         Item *item = *i;
         if (item)
@@ -62,7 +65,8 @@ bool GuildBankAction::MoveFromCharToBank(Item *item, GameObject *bank)
 
     // check source pos rights (item moved to bank)
     if (!guild->MemberHasTabRights(bot->GetGUID(), 0, GUILD_BANK_RIGHT_DEPOSIT_ITEM))
-        out << "I can't put " << chat->FormatItem(item->GetTemplate()) << " to guild bank. I have no rights to put items in the first guild bank tab";
+        out << "I can't put " << chat->FormatItem(item->GetTemplate())
+            << " to guild bank. I have no rights to put items in the first guild bank tab";
     else
     {
         out << chat->FormatItem(item->GetTemplate()) << " put to guild bank";

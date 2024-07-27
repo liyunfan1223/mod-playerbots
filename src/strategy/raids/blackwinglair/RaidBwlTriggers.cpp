@@ -1,4 +1,5 @@
 #include "RaidBwlTriggers.h"
+
 #include "SharedDefines.h"
 
 bool BwlSuppressionDeviceTrigger::IsActive()
@@ -11,7 +12,8 @@ bool BwlSuppressionDeviceTrigger::IsActive()
         {
             continue;
         }
-        if (go->GetEntry() != 179784 || go->GetDistance(bot) >= 15.0f || go->GetGoState() != GO_STATE_READY)
+        if (go->GetEntry() != 179784 || go->GetDistance(bot) >= 15.0f ||
+            go->GetGoState() != GO_STATE_READY)
         {
             continue;
         }

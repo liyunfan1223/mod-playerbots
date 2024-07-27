@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_ADDLOOTACTION_H
@@ -12,7 +14,7 @@ class PlayerbotAI;
 
 class AddLootAction : public Action
 {
-public:
+   public:
     AddLootAction(PlayerbotAI *botAI) : Action(botAI, "add loot") {}
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -20,21 +22,24 @@ public:
 
 class AddAllLootAction : public Action
 {
-public:
-    AddAllLootAction(PlayerbotAI *botAI, std::string const name = "add all loot") : Action(botAI, name) {}
+   public:
+    AddAllLootAction(PlayerbotAI *botAI, std::string const name = "add all loot")
+        : Action(botAI, name)
+    {
+    }
     bool Execute(Event event) override;
     bool isUseful() override;
 
-protected:
+   protected:
     virtual bool AddLoot(ObjectGuid guid);
 };
 
 class AddGatheringLootAction : public AddAllLootAction
 {
-public:
+   public:
     AddGatheringLootAction(PlayerbotAI *botAI) : AddAllLootAction(botAI, "add gathering loot") {}
 
-protected:
+   protected:
     bool AddLoot(ObjectGuid guid) override;
 };
 

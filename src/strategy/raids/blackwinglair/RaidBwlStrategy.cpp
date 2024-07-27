@@ -1,7 +1,8 @@
 #include "RaidBwlStrategy.h"
+
 #include "Strategy.h"
 
-void RaidBwlStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void RaidBwlStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "often",
@@ -9,5 +10,6 @@ void RaidBwlStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "bwl suppression device",
-        NextAction::array(0, new NextAction("bwl turn off suppression device", ACTION_RAID), NULL)));
+        NextAction::array(0, new NextAction("bwl turn off suppression device", ACTION_RAID),
+                          NULL)));
 }

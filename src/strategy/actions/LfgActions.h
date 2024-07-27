@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_LFGACTIONS_H
@@ -11,20 +13,23 @@ class PlayerbotAI;
 
 class LfgJoinAction : public InventoryAction
 {
-public:
-    LfgJoinAction(PlayerbotAI *botAI, std::string const name = "lfg join") : InventoryAction(botAI, name) {}
+   public:
+    LfgJoinAction(PlayerbotAI *botAI, std::string const name = "lfg join")
+        : InventoryAction(botAI, name)
+    {
+    }
 
     bool Execute(Event event) override;
     bool isUseful() override;
 
-protected:
+   protected:
     bool JoinLFG();
     uint32 GetRoles();
 };
 
 class LfgAcceptAction : public LfgJoinAction
 {
-public:
+   public:
     LfgAcceptAction(PlayerbotAI *botAI) : LfgJoinAction(botAI, "lfg accept") {}
 
     bool Execute(Event event) override;
@@ -33,7 +38,7 @@ public:
 
 class LfgRoleCheckAction : public LfgJoinAction
 {
-public:
+   public:
     LfgRoleCheckAction(PlayerbotAI *botAI) : LfgJoinAction(botAI, "lfg role check") {}
 
     bool Execute(Event event) override;
@@ -42,7 +47,7 @@ public:
 
 class LfgLeaveAction : public Action
 {
-public:
+   public:
     LfgLeaveAction(PlayerbotAI *botAI) : Action(botAI, "lfg leave") {}
 
     bool Execute(Event event) override;
@@ -51,7 +56,7 @@ public:
 
 class LfgTeleportAction : public Action
 {
-public:
+   public:
     LfgTeleportAction(PlayerbotAI *botAI) : Action(botAI, "lfg teleport") {}
 
     bool Execute(Event event) override;

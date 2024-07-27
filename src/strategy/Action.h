@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_ACTION_H
@@ -15,9 +17,11 @@ class Unit;
 
 class NextAction
 {
-public:
-    NextAction(std::string const name, float relevance = 0.0f) : relevance(relevance), name(name) {} // name after relevance - whipowill
-    NextAction(NextAction const &o) : relevance(o.relevance), name(o.name) {}                        // name after relevance - whipowill
+   public:
+    NextAction(std::string const name, float relevance = 0.0f)
+        : relevance(relevance), name(name) {}  // name after relevance - whipowill
+    NextAction(NextAction const &o)
+        : relevance(o.relevance), name(o.name) {}  // name after relevance - whipowill
 
     std::string const getName() { return name; }
     float getRelevance() { return relevance; }
@@ -28,14 +32,14 @@ public:
     static NextAction **array(uint32 nil, ...);
     static void destroy(NextAction **actions);
 
-private:
+   private:
     float relevance;
     std::string const name;
 };
 
 class Action : public AiNamedObject
 {
-public:
+   public:
     enum class ActionThreatType
     {
         None = 0,
@@ -43,7 +47,10 @@ public:
         Aoe = 2
     };
 
-    Action(PlayerbotAI *botAI, std::string const name = "action") : AiNamedObject(botAI, name), verbose(false) {} // verbose after ainamedobject - whipowill
+    Action(PlayerbotAI *botAI, std::string const name = "action")
+        : AiNamedObject(botAI, name), verbose(false)
+    {
+    }  // verbose after ainamedobject - whipowill
     virtual ~Action(void) {}
 
     virtual bool Execute([[maybe_unused]] Event event) { return true; }
@@ -62,15 +69,23 @@ public:
     void setRelevance(uint32 relevance1) { relevance = relevance1; };
     virtual float getRelevance() { return relevance; }
 
-protected:
+   protected:
     bool verbose;
     float relevance = 0;
 };
 
 class ActionNode
 {
-public:
-    ActionNode(std::string const name, NextAction **prerequisites = nullptr, NextAction **alternatives = nullptr, NextAction **continuers = nullptr) : name(name), action(nullptr), continuers(continuers), alternatives(alternatives), prerequisites(prerequisites) {} // reorder arguments - whipowill
+   public:
+    ActionNode(std::string const name, NextAction **prerequisites = nullptr,
+               NextAction **alternatives = nullptr, NextAction **continuers = nullptr)
+        : name(name),
+          action(nullptr),
+          continuers(continuers),
+          alternatives(alternatives),
+          prerequisites(prerequisites)
+    {
+    }  // reorder arguments - whipowill
 
     virtual ~ActionNode()
     {
@@ -83,11 +98,20 @@ public:
     void setAction(Action *action) { this->action = action; }
     std::string const getName() { return name; }
 
-    NextAction **getContinuers() { return NextAction::merge(NextAction::clone(continuers), action->getContinuers()); }
-    NextAction **getAlternatives() { return NextAction::merge(NextAction::clone(alternatives), action->getAlternatives()); }
-    NextAction **getPrerequisites() { return NextAction::merge(NextAction::clone(prerequisites), action->getPrerequisites()); }
+    NextAction **getContinuers()
+    {
+        return NextAction::merge(NextAction::clone(continuers), action->getContinuers());
+    }
+    NextAction **getAlternatives()
+    {
+        return NextAction::merge(NextAction::clone(alternatives), action->getAlternatives());
+    }
+    NextAction **getPrerequisites()
+    {
+        return NextAction::merge(NextAction::clone(prerequisites), action->getPrerequisites());
+    }
 
-private:
+   private:
     std::string const name;
     Action *action;
     NextAction **continuers;
@@ -97,7 +121,7 @@ private:
 
 class ActionBasket
 {
-public:
+   public:
     ActionBasket(ActionNode *action, float relevance, bool skipPrerequisites, Event event);
 
     virtual ~ActionBasket(void) {}
@@ -110,7 +134,7 @@ public:
     void setRelevance(float relevance) { this->relevance = relevance; }
     bool isExpired(uint32 msecs);
 
-private:
+   private:
     ActionNode *action;
     float relevance;
     bool skipPrerequisites;

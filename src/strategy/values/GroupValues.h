@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "NamedObjectContext.h"
@@ -9,15 +11,18 @@ class PlayerbotAI;
 
 class GroupMembersValue : public ObjectGuidListCalculatedValue
 {
-public:
-    GroupMembersValue(PlayerbotAI *botAI) : ObjectGuidListCalculatedValue(botAI, "group members", 2 * 1000) {}
+   public:
+    GroupMembersValue(PlayerbotAI *botAI)
+        : ObjectGuidListCalculatedValue(botAI, "group members", 2 * 1000)
+    {
+    }
 
     GuidVector Calculate() override;
 };
 
 class IsFollowingPartyValue : public BoolCalculatedValue
 {
-public:
+   public:
     IsFollowingPartyValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "following party") {}
 
     bool Calculate() override;
@@ -25,7 +30,7 @@ public:
 
 class IsNearLeaderValue : public BoolCalculatedValue
 {
-public:
+   public:
     IsNearLeaderValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "near leader") {}
 
     bool Calculate() override;
@@ -33,7 +38,7 @@ public:
 
 class BoolANDValue : public BoolCalculatedValue, public Qualified
 {
-public:
+   public:
     BoolANDValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "bool and") {}
 
     bool Calculate() override;
@@ -41,7 +46,7 @@ public:
 
 class GroupBoolCountValue : public Uint32CalculatedValue, public Qualified
 {
-public:
+   public:
     GroupBoolCountValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "group count") {}
 
     uint32 Calculate() override;
@@ -49,7 +54,7 @@ public:
 
 class GroupBoolANDValue : public BoolCalculatedValue, public Qualified
 {
-public:
+   public:
     GroupBoolANDValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "group bool and") {}
 
     bool Calculate() override;
@@ -57,7 +62,7 @@ public:
 
 class GroupBoolORValue : public BoolCalculatedValue, public Qualified
 {
-public:
+   public:
     GroupBoolORValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "group bool or") {}
 
     bool Calculate() override;
@@ -65,7 +70,7 @@ public:
 
 class GroupReadyValue : public BoolCalculatedValue, public Qualified
 {
-public:
+   public:
     GroupReadyValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "group ready", 2 * 2000) {}
 
     bool Calculate() override;

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_MAILACTION_H
@@ -14,25 +16,25 @@ struct Mail;
 
 class MailProcessor
 {
-public:
+   public:
     virtual bool Before([[maybe_unused]] PlayerbotAI *botAI) { return true; }
     virtual bool Process(uint32 index, Mail *mail, PlayerbotAI *botAI) = 0;
     virtual bool After([[maybe_unused]] PlayerbotAI *botAI) { return true; }
 
     static ObjectGuid FindMailbox(PlayerbotAI *botAI);
 
-protected:
+   protected:
     void RemoveMail(Player *bot, uint32 id, ObjectGuid mailbox);
 };
 
 class MailAction : public InventoryAction
 {
-public:
+   public:
     MailAction(PlayerbotAI *botAI) : InventoryAction(botAI, "mail") {}
 
     bool Execute(Event event) override;
 
-private:
+   private:
     static std::map<std::string, MailProcessor *> processors;
 };
 

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_SNARETARGETVALUE_H
@@ -13,10 +15,10 @@ class Unit;
 
 class SnareTargetValue : public UnitCalculatedValue, public Qualified
 {
-public:
+   public:
     SnareTargetValue(PlayerbotAI *botAI) : UnitCalculatedValue(botAI, "snare target", 1) {}
 
-protected:
+   protected:
     Unit *Calculate() override;
 };
 

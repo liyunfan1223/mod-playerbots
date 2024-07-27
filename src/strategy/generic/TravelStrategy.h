@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_TRAVELSTRATEGY_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class TravelStrategy : public Strategy
 {
-public:
+   public:
     TravelStrategy(PlayerbotAI *botAI);
 
     std::string const getName() override { return "travel"; }
@@ -22,7 +24,7 @@ public:
 
 class ExploreStrategy : public Strategy
 {
-public:
+   public:
     ExploreStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
     std::string const getName() override { return "explore"; }
@@ -30,7 +32,7 @@ public:
 
 class MapStrategy : public Strategy
 {
-public:
+   public:
     MapStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
     std::string const getName() override { return "map"; }
@@ -38,7 +40,7 @@ public:
 
 class MapFullStrategy : public Strategy
 {
-public:
+   public:
     MapFullStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
     std::string const getName() override { return "map full"; }

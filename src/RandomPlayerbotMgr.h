@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_RANDOMPLAYERBOTMGR_H
@@ -13,14 +15,23 @@ class WorldLocation;
 
 class CachedEvent
 {
-public:
+   public:
     CachedEvent() : value(0), lastChangeTime(0), validIn(0), data("") {}
-    CachedEvent(const CachedEvent &other) : value(other.value), lastChangeTime(other.lastChangeTime), validIn(other.validIn), data(other.data) {}
-    CachedEvent(uint32 value, uint32 lastChangeTime, uint32 validIn, std::string const data = "") : value(value), lastChangeTime(lastChangeTime), validIn(validIn), data(data) {}
+    CachedEvent(const CachedEvent &other)
+        : value(other.value),
+          lastChangeTime(other.lastChangeTime),
+          validIn(other.validIn),
+          data(other.data)
+    {
+    }
+    CachedEvent(uint32 value, uint32 lastChangeTime, uint32 validIn, std::string const data = "")
+        : value(value), lastChangeTime(lastChangeTime), validIn(validIn), data(data)
+    {
+    }
 
     bool IsEmpty() { return !lastChangeTime; }
 
-public:
+   public:
     uint32 value;
     uint32 lastChangeTime;
     uint32 validIn;
@@ -32,7 +43,7 @@ public:
 class botPIDImpl;
 class botPID
 {
-public:
+   public:
     // Kp -  proportional gain
     // Ki -  Integral gain
     // Kd -  derivative gain
@@ -46,13 +57,13 @@ public:
     double calculate(double setpoint, double pv);
     ~botPID();
 
-private:
+   private:
     botPIDImpl *pimpl;
 };
 
 class RandomPlayerbotMgr : public PlayerbotHolder
 {
-public:
+   public:
     RandomPlayerbotMgr();
     virtual ~RandomPlayerbotMgr();
     static RandomPlayerbotMgr *instance()
@@ -64,10 +75,10 @@ public:
     void LogPlayerLocation();
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
 
-private:
+   private:
     void ScaleBotActivity();
 
-public:
+   public:
     uint32 activeBots = 0;
     static bool HandlePlayerbotConsoleCommand(ChatHandler *handler, char const *args);
     bool IsRandomBot(Player *bot);
@@ -79,7 +90,8 @@ public:
     void IncreaseLevel(Player *bot);
     void ScheduleTeleport(uint32 bot, uint32 time = 0);
     void ScheduleChangeStrategy(uint32 bot, uint32 time = 0);
-    void HandleCommand(uint32 type, std::string const text, Player *fromPlayer, std::string channelName = "");
+    void HandleCommand(uint32 type, std::string const text, Player *fromPlayer,
+                       std::string channelName = "");
     std::string const HandleRemoteCommand(std::string const request);
     void OnPlayerLogout(Player *player);
     void OnPlayerLogin(Player *player);
@@ -123,22 +135,26 @@ public:
     void CheckLfgQueue();
     void CheckPlayers();
 
-    std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> getBattleMastersCache() { return BattleMastersCache; }
+    std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> getBattleMastersCache()
+    {
+        return BattleMastersCache;
+    }
 
     float getActivityMod() { return activityMod; }
     float getActivityPercentage() { return activityMod * 100.0f; }
     void setActivityPercentage(float percentage) { activityMod = percentage / 100.0f; }
 
-protected:
+   protected:
     void OnBotLoginInternal(Player *const bot) override;
 
-private:
+   private:
     // pid values are set in constructor
     botPID pid = botPID(1, 50, -50, 0, 0, 0);
     float activityMod = 0.25;
     uint32 GetEventValue(uint32 bot, std::string const event);
     std::string const GetEventData(uint32 bot, std::string const event);
-    uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn, std::string const data = "");
+    uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn,
+                         std::string const data = "");
     void GetBots();
     std::vector<uint32> GetBgBots(uint32 bracket);
     time_t BgCheckTimer;

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PRIESTACTIONS_H
@@ -22,7 +24,9 @@ CURE_ACTION(CastDispelMagicAction, "dispel magic");
 CURE_PARTY_ACTION(CastDispelMagicOnPartyAction, "dispel magic", DISPEL_MAGIC);
 SPELL_ACTION(CastDispelMagicOnTargetAction, "dispel magic");
 CC_ACTION(CastShackleUndeadAction, "shackle undead");
-SPELL_ACTION_U(CastManaBurnAction, "mana burn", AI_VALUE2(uint8, "mana", "self target") < 50 && AI_VALUE2(uint8, "mana", "current target") >= 20);
+SPELL_ACTION_U(CastManaBurnAction, "mana burn",
+               AI_VALUE2(uint8, "mana", "self target") < 50 &&
+                   AI_VALUE2(uint8, "mana", "current target") >= 20);
 BUFF_ACTION(CastLevitateAction, "levitate");
 BUFF_ACTION(CastDivineSpiritAction, "divine spirit");
 BUFF_PARTY_ACTION(CastDivineSpiritOnPartyAction, "divine spirit");
@@ -46,13 +50,17 @@ HEAL_ACTION(CastFlashHealAction, "flash heal");
 HEAL_ACTION(CastRenewAction, "renew");
 HEAL_PARTY_ACTION(CastLesserHealOnPartyAction, "lesser heal", 50.0f, HealingManaEfficiency::MEDIUM);
 HEAL_PARTY_ACTION(CastHealOnPartyAction, "heal", 50.0f, HealingManaEfficiency::MEDIUM);
-HEAL_PARTY_ACTION(CastGreaterHealOnPartyAction, "greater heal", 50.0f, HealingManaEfficiency::MEDIUM);
-HEAL_PARTY_ACTION(CastPowerWordShieldOnPartyAction, "power word: shield", 15.0f, HealingManaEfficiency::VERY_HIGH);
+HEAL_PARTY_ACTION(CastGreaterHealOnPartyAction, "greater heal", 50.0f,
+                  HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastPowerWordShieldOnPartyAction, "power word: shield", 15.0f,
+                  HealingManaEfficiency::VERY_HIGH);
 HEAL_PARTY_ACTION(CastFlashHealOnPartyAction, "flash heal", 15.0f, HealingManaEfficiency::LOW);
 HEAL_PARTY_ACTION(CastRenewOnPartyAction, "renew", 15.0f, HealingManaEfficiency::VERY_HIGH);
-HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending", 15.0f, HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending", 15.0f,
+                  HealingManaEfficiency::MEDIUM);
 HEAL_PARTY_ACTION(CastBindingHealAction, "binding heal", 15.0f, HealingManaEfficiency::MEDIUM);
-HEAL_PARTY_ACTION(CastPrayerOfHealingAction, "prayer of healing", 15.0f, HealingManaEfficiency::MEDIUM);
+HEAL_PARTY_ACTION(CastPrayerOfHealingAction, "prayer of healing", 15.0f,
+                  HealingManaEfficiency::MEDIUM);
 AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing", 15.0f, HealingManaEfficiency::HIGH);
 AOE_HEAL_ACTION(CastLightwellAction, "lightwell", 15.0f, HealingManaEfficiency::MEDIUM);
 
@@ -99,7 +107,10 @@ BUFF_ACTION(CastShadowguardAction, "shadowguard");
 HEAL_ACTION(CastDesperatePrayerAction, "desperate prayer");
 BUFF_ACTION(CastFearWardAction, "fear ward");
 BUFF_PARTY_ACTION(CastFearWardOnPartyAction, "fear ward");
-SPELL_ACTION_U(CastStarshardsAction, "starshards", (AI_VALUE2(uint8, "mana", "self target") > 50 && AI_VALUE(Unit *, "current target") && AI_VALUE2(float, "distance", "current target") > 15.0f));
+SPELL_ACTION_U(CastStarshardsAction, "starshards",
+               (AI_VALUE2(uint8, "mana", "self target") > 50 &&
+                AI_VALUE(Unit *, "current target") &&
+                AI_VALUE2(float, "distance", "current target") > 15.0f));
 BUFF_ACTION(CastElunesGraceAction, "elune's grace");
 BUFF_ACTION(CastFeedbackAction, "feedback");
 BUFF_ACTION(CastSymbolOfHopeAction, "symbol of hope");
@@ -108,7 +119,7 @@ SNARE_ACTION(CastChastiseAction, "chastise");
 
 class CastRemoveShadowformAction : public Action
 {
-public:
+   public:
     CastRemoveShadowformAction(PlayerbotAI *botAI) : Action(botAI, "remove shadowform") {}
 
     bool isUseful() override;
@@ -118,49 +129,55 @@ public:
 
 class CastDispersionAction : public CastSpellAction
 {
-public:
+   public:
     CastDispersionAction(PlayerbotAI *ai) : CastSpellAction(ai, "dispersion") {}
     virtual std::string const GetTargetName() { return "self target"; }
 };
 
 class CastPenanceOnPartyAction : public HealPartyMemberAction
 {
-public:
-    CastPenanceOnPartyAction(PlayerbotAI *ai) : HealPartyMemberAction(ai, "penance", 25.0f, HealingManaEfficiency::HIGH) {}
+   public:
+    CastPenanceOnPartyAction(PlayerbotAI *ai)
+        : HealPartyMemberAction(ai, "penance", 25.0f, HealingManaEfficiency::HIGH)
+    {
+    }
 };
 
 class CastHymnOfHopeAction : public CastSpellAction
 {
-public:
+   public:
     CastHymnOfHopeAction(PlayerbotAI *ai) : CastSpellAction(ai, "hymn of hope") {}
     virtual std::string const GetTargetName() { return "self target"; }
 };
 
 class CastDivineHymnAction : public CastSpellAction
 {
-public:
+   public:
     CastDivineHymnAction(PlayerbotAI *ai) : CastSpellAction(ai, "divine hymn") {}
     virtual std::string const GetTargetName() { return "self target"; }
 };
 
 class CastShadowfiendAction : public CastSpellAction
 {
-public:
+   public:
     CastShadowfiendAction(PlayerbotAI *ai) : CastSpellAction(ai, "shadowfiend") {}
     virtual std::string const GetTargetName() { return "current target"; }
 };
 
 class CastPowerWordShieldOnAlmostFullHealthBelow : public HealPartyMemberAction
 {
-public:
-    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI *ai) : HealPartyMemberAction(ai, "power word: shield", 15.0f, HealingManaEfficiency::HIGH) {}
+   public:
+    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI *ai)
+        : HealPartyMemberAction(ai, "power word: shield", 15.0f, HealingManaEfficiency::HIGH)
+    {
+    }
     bool isUseful() override;
     Unit *GetTarget() override;
 };
 
 class CastMindSearAction : public CastSpellAction
 {
-public:
+   public:
     CastMindSearAction(PlayerbotAI *ai) : CastSpellAction(ai, "mind sear") {}
     ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };

@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "CollisionValue.h"
+
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -15,7 +18,7 @@ bool CollisionValue::Calculate()
     if (!target)
         return false;
 
-    std::list<Unit*> targets;
+    std::list<Unit *> targets;
     float range = sPlayerbotAIConfig->contactDistance;
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
@@ -26,7 +29,8 @@ bool CollisionValue::Calculate()
         if (bot == target)
             continue;
 
-        float dist = sServerFacade->GetDistance2d(bot, target->GetPositionX(), target->GetPositionY());
+        float dist =
+            sServerFacade->GetDistance2d(bot, target->GetPositionX(), target->GetPositionY());
         if (sServerFacade->IsDistanceLessThan(dist, target->GetCombatReach()))
             return true;
     }

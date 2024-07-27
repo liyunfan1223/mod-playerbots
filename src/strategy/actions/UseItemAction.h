@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_USEITEMACTION_H
@@ -14,13 +16,16 @@ class Unit;
 
 class UseItemAction : public Action
 {
-public:
-    UseItemAction(PlayerbotAI *botAI, std::string const name = "use", bool selfOnly = false) : Action(botAI, name), selfOnly(selfOnly) {}
+   public:
+    UseItemAction(PlayerbotAI *botAI, std::string const name = "use", bool selfOnly = false)
+        : Action(botAI, name), selfOnly(selfOnly)
+    {
+    }
 
     bool Execute(Event event) override;
     bool isPossible() override;
 
-protected:
+   protected:
     bool UseItemAuto(Item *item);
     bool UseItemOnGameObject(Item *item, ObjectGuid go);
     bool UseItemOnItem(Item *item, Item *itemTarget);
@@ -29,21 +34,24 @@ protected:
     void TellConsumableUse(Item *item, std::string const action, float percent);
     bool SocketItem(Item *item, Item *gem, bool replace = false);
 
-private:
+   private:
     bool selfOnly;
 };
 
 class UseSpellItemAction : public UseItemAction
 {
-public:
-    UseSpellItemAction(PlayerbotAI *botAI, std::string const name, bool selfOnly = false) : UseItemAction(botAI, name, selfOnly) {}
+   public:
+    UseSpellItemAction(PlayerbotAI *botAI, std::string const name, bool selfOnly = false)
+        : UseItemAction(botAI, name, selfOnly)
+    {
+    }
 
     bool isUseful() override;
 };
 
 class UseHealingPotion : public UseItemAction
 {
-public:
+   public:
     UseHealingPotion(PlayerbotAI *botAI) : UseItemAction(botAI, "healing potion") {}
 
     bool isUseful() override;
@@ -51,7 +59,7 @@ public:
 
 class UseManaPotion : public UseItemAction
 {
-public:
+   public:
     UseManaPotion(PlayerbotAI *botAI) : UseItemAction(botAI, "mana potion") {}
 
     bool isUseful() override;
@@ -59,7 +67,7 @@ public:
 
 class UseHearthStone : public UseItemAction
 {
-public:
+   public:
     UseHearthStone(PlayerbotAI *botAI) : UseItemAction(botAI, "hearthstone", true) {}
 
     bool isUseful() override;
@@ -68,7 +76,7 @@ public:
 
 class UseRandomRecipe : public UseItemAction
 {
-public:
+   public:
     UseRandomRecipe(PlayerbotAI *botAI) : UseItemAction(botAI, "random recipe", true) {}
 
     bool isUseful() override;
@@ -78,7 +86,7 @@ public:
 
 class UseRandomQuestItem : public UseItemAction
 {
-public:
+   public:
     UseRandomQuestItem(PlayerbotAI *botAI) : UseItemAction(botAI, "random quest item", true) {}
 
     bool isUseful() override;

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_HUNTERACTIONS_H
@@ -16,13 +18,13 @@ class Unit;
 
 class CastHuntersMarkAction : public CastDebuffSpellAction
 {
-public:
+   public:
     CastHuntersMarkAction(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "hunter's mark") {}
     bool isUseful() override;
 };
 class CastAutoShotAction : public CastSpellAction
 {
-public:
+   public:
     CastAutoShotAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "auto shot") {}
     ActionThreatType getThreatType() override { return ActionThreatType::None; }
     bool isUseful() override;
@@ -42,7 +44,7 @@ END_SPELL_ACTION()
 
 class CastConcussiveShotAction : public CastSnareSpellAction
 {
-public:
+   public:
     CastConcussiveShotAction(PlayerbotAI *botAI) : CastSnareSpellAction(botAI, "concussive shot") {}
 };
 
@@ -79,57 +81,75 @@ END_SPELL_ACTION()
 
 class CastAspectOfTheHawkAction : public CastBuffSpellAction
 {
-public:
-    CastAspectOfTheHawkAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the hawk") {}
+   public:
+    CastAspectOfTheHawkAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the hawk")
+    {
+    }
 };
 
 class CastAspectOfTheMonkeyAction : public CastBuffSpellAction
 {
-public:
-    CastAspectOfTheMonkeyAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the monkey") {}
+   public:
+    CastAspectOfTheMonkeyAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "aspect of the monkey")
+    {
+    }
 };
 
 class CastAspectOfTheDragonhawkAction : public CastBuffSpellAction
 {
-public:
-    CastAspectOfTheDragonhawkAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the dragonhawk") {}
+   public:
+    CastAspectOfTheDragonhawkAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "aspect of the dragonhawk")
+    {
+    }
 };
 
 class CastAspectOfTheWildAction : public CastBuffSpellAction
 {
-public:
-    CastAspectOfTheWildAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the wild") {}
+   public:
+    CastAspectOfTheWildAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the wild")
+    {
+    }
 };
 
 class CastAspectOfTheCheetahAction : public CastBuffSpellAction
 {
-public:
-    CastAspectOfTheCheetahAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the cheetah") {}
+   public:
+    CastAspectOfTheCheetahAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "aspect of the cheetah")
+    {
+    }
 
     bool isUseful() override;
 };
 
 class CastAspectOfThePackAction : public CastBuffSpellAction
 {
-public:
-    CastAspectOfThePackAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the pack") {}
+   public:
+    CastAspectOfThePackAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the pack")
+    {
+    }
 };
 
 class CastAspectOfTheViperAction : public CastBuffSpellAction
 {
-public:
-    CastAspectOfTheViperAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aspect of the viper") {}
+   public:
+    CastAspectOfTheViperAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "aspect of the viper")
+    {
+    }
 };
 
 class CastCallPetAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastCallPetAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "call pet") {}
 };
 
 class CastMendPetAction : public CastAuraSpellAction
 {
-public:
+   public:
     CastMendPetAction(PlayerbotAI *botAI) : CastAuraSpellAction(botAI, "mend pet") {}
 
     std::string const GetTargetName() override { return "pet target"; }
@@ -137,43 +157,43 @@ public:
 
 class CastRevivePetAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastRevivePetAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "revive pet") {}
 };
 
 class CastTrueshotAuraAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastTrueshotAuraAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "trueshot aura") {}
 };
 
 class CastFeignDeathAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastFeignDeathAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "feign death") {}
 };
 
 class CastRapidFireAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastRapidFireAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "rapid fire") {}
 };
 
 class CastReadinessAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastReadinessAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "readiness") {}
 };
 
 class CastBlackArrow : public CastDebuffSpellAction
 {
-public:
+   public:
     CastBlackArrow(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "black arrow", true) {}
 };
 
 class CastFreezingTrap : public CastDebuffSpellAction
 {
-public:
+   public:
     CastFreezingTrap(PlayerbotAI *botAI) : CastDebuffSpellAction(botAI, "freezing trap") {}
 
     Value<Unit *> *GetTargetValue() override;
@@ -181,7 +201,7 @@ public:
 
 class CastWingClipAction : public CastSpellAction
 {
-public:
+   public:
     CastWingClipAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "wing clip") {}
 
     bool isUseful() override;
@@ -190,25 +210,28 @@ public:
 
 class CastRaptorStrikeAction : public CastSpellAction
 {
-public:
+   public:
     CastRaptorStrikeAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "raptor strike") {}
 };
 
 class CastMongooseBiteAction : public CastSpellAction
 {
-public:
+   public:
     CastMongooseBiteAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "mongoose bite") {}
 };
 
 class CastSerpentStingOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
-public:
-    CastSerpentStingOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnAttackerAction(botAI, "serpent sting", true) {}
+   public:
+    CastSerpentStingOnAttackerAction(PlayerbotAI *botAI)
+        : CastDebuffSpellOnAttackerAction(botAI, "serpent sting", true)
+    {
+    }
 };
 
 class FeedPetAction : public Action
 {
-public:
+   public:
     FeedPetAction(PlayerbotAI *botAI) : Action(botAI, "feed pet") {}
 
     bool Execute(Event event) override;
@@ -216,20 +239,20 @@ public:
 
 class CastBestialWrathAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastBestialWrathAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "bestial wrath") {}
     std::string const GetTargetName() override { return "pet target"; }
 };
 
 class CastScareBeastAction : public CastSpellAction
 {
-public:
+   public:
     CastScareBeastAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "scare beast") {}
 };
 
 class CastScareBeastCcAction : public CastSpellAction
 {
-public:
+   public:
     CastScareBeastCcAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "scare beast on cc") {}
 
     Value<Unit *> *GetTargetValue() override;
@@ -238,7 +261,10 @@ public:
 
 class CastMisdirectionOnMainTankAction : public BuffOnMainTankAction
 {
-public:
-    CastMisdirectionOnMainTankAction(PlayerbotAI *ai) : BuffOnMainTankAction(ai, "misdirection", true) {}
+   public:
+    CastMisdirectionOnMainTankAction(PlayerbotAI *ai)
+        : BuffOnMainTankAction(ai, "misdirection", true)
+    {
+    }
 };
 #endif

@@ -1,18 +1,23 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "SpellIdValue.h"
+
 #include "ChatHelper.h"
 #include "Playerbots.h"
 #include "Vehicle.h"
 #include "World.h"
 
-SpellIdValue::SpellIdValue(PlayerbotAI *botAI) : CalculatedValue<uint32>(botAI, "spell id", 20 * 1000)
+SpellIdValue::SpellIdValue(PlayerbotAI *botAI)
+    : CalculatedValue<uint32>(botAI, "spell id", 20 * 1000)
 {
 }
 
-VehicleSpellIdValue::VehicleSpellIdValue(PlayerbotAI *botAI) : CalculatedValue<uint32>(botAI, "vehicle spell id")
+VehicleSpellIdValue::VehicleSpellIdValue(PlayerbotAI *botAI)
+    : CalculatedValue<uint32>(botAI, "vehicle spell id")
 {
 }
 
@@ -38,7 +43,8 @@ uint32 SpellIdValue::Calculate()
     LocaleConstant loc = LOCALE_enUS;
 
     std::set<uint32> spellIds;
-    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
+    for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end();
+         ++itr)
     {
         uint32 spellId = itr->first;
 
@@ -55,7 +61,8 @@ uint32 SpellIdValue::Calculate()
         bool useByItem = false;
         for (uint8 i = 0; i < 3; ++i)
         {
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM && itemIds.find(spellInfo->Effects[i].ItemType) != itemIds.end())
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM &&
+                itemIds.find(spellInfo->Effects[i].ItemType) != itemIds.end())
             {
                 useByItem = true;
                 break;
@@ -63,7 +70,8 @@ uint32 SpellIdValue::Calculate()
         }
 
         char const *spellName = spellInfo->SpellName[loc];
-        if (!useByItem && (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart)))
+        if (!useByItem && (tolower(spellName[0]) != firstSymbol ||
+                           strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart)))
             continue;
 
         spellIds.insert(spellId);
@@ -72,7 +80,8 @@ uint32 SpellIdValue::Calculate()
     Pet *pet = bot->GetPet();
     if (spellIds.empty() && pet)
     {
-        for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
+        for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end();
+             ++itr)
         {
             if (itr->second.state == PETSPELL_REMOVED)
                 continue;
@@ -86,7 +95,8 @@ uint32 SpellIdValue::Calculate()
                 continue;
 
             char const *spellName = spellInfo->SpellName[loc];
-            if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart))
+            if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength ||
+                !Utf8FitTo(spellName, wnamepart))
                 continue;
 
             spellIds.insert(spellId);
@@ -113,7 +123,8 @@ uint32 SpellIdValue::Calculate()
 
             std::string spellName = pSpellInfo->Rank[0];
 
-            // For atoi, the input string has to start with a digit, so lets search for the first digit
+            // For atoi, the input string has to start with a digit, so lets search for the first
+            // digit
             size_t i = 0;
             for (; i < spellName.length(); i++)
             {
@@ -208,7 +219,8 @@ uint32 VehicleSpellIdValue::Calculate()
             continue;
 
         char const *spellName = spellInfo->SpellName[loc];
-        if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart))
+        if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength ||
+            !Utf8FitTo(spellName, wnamepart))
             continue;
 
         return spellId;

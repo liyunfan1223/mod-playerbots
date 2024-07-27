@@ -1,15 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PLAYERBOTMGR_H
 #define _PLAYERBOT_PLAYERBOTMGR_H
 
 #include "Common.h"
-#include "QueryHolder.h"
-#include "QueryResult.h"
 #include "Player.h"
 #include "PlayerbotAIBase.h"
+#include "QueryHolder.h"
+#include "QueryResult.h"
 
 class ChatHandler;
 class PlayerbotAI;
@@ -21,7 +23,7 @@ typedef std::map<std::string, std::set<std::string>> PlayerBotErrorMap;
 
 class PlayerbotHolder : public PlayerbotAIBase
 {
-public:
+   public:
     PlayerbotHolder();
     virtual ~PlayerbotHolder() {};
 
@@ -35,7 +37,8 @@ public:
     PlayerBotMap::const_iterator GetPlayerBotsBegin() const { return playerBots.begin(); }
     PlayerBotMap::const_iterator GetPlayerBotsEnd() const { return playerBots.end(); }
 
-    void UpdateAIInternal([[maybe_unused]] uint32 elapsed, [[maybe_unused]] bool minimal = false) override {};
+    void UpdateAIInternal([[maybe_unused]] uint32 elapsed,
+                          [[maybe_unused]] bool minimal = false) override {};
     void UpdateSessions();
     void HandleBotPackets(WorldSession *session);
 
@@ -43,7 +46,9 @@ public:
     void OnBotLogin(Player *const bot);
 
     std::vector<std::string> HandlePlayerbotCommand(char const *args, Player *master = nullptr);
-    std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin, uint32 masterAccountId, uint32 masterGuildId);
+    std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid,
+                                        ObjectGuid masterguid, bool admin, uint32 masterAccountId,
+                                        uint32 masterGuildId);
     uint32 GetAccountId(std::string const name);
     uint32 GetAccountId(ObjectGuid guid);
     std::string const ListBots(Player *master);
@@ -51,7 +56,7 @@ public:
     uint32 GetPlayerbotsCount() { return playerBots.size(); }
     uint32 GetPlayerbotsCountByClass(uint32 cls);
 
-protected:
+   protected:
     virtual void OnBotLoginInternal(Player *const bot) = 0;
 
     PlayerBotMap playerBots;
@@ -59,7 +64,7 @@ protected:
 
 class PlayerbotMgr : public PlayerbotHolder
 {
-public:
+   public:
     PlayerbotMgr(Player *const master);
     virtual ~PlayerbotMgr();
 
@@ -77,11 +82,11 @@ public:
 
     void SaveToDB();
 
-protected:
+   protected:
     void OnBotLoginInternal(Player *const bot) override;
     void CheckTellErrors(uint32 elapsed);
 
-private:
+   private:
     Player *const master;
     PlayerBotErrorMap errors;
     time_t lastErrorTell;
@@ -89,7 +94,7 @@ private:
 
 class PlayerbotsMgr
 {
-public:
+   public:
     PlayerbotsMgr() {}
     ~PlayerbotsMgr() {}
 
@@ -105,7 +110,7 @@ public:
     PlayerbotAI *GetPlayerbotAI(Player *player);
     PlayerbotMgr *GetPlayerbotMgr(Player *player);
 
-private:
+   private:
     std::unordered_map<ObjectGuid, PlayerbotAIBase *> _playerbotsAIMap;
     std::unordered_map<ObjectGuid, PlayerbotAIBase *> _playerbotsMgrMap;
 };

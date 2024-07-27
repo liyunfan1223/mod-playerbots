@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "TravelTriggers.h"
+
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -16,10 +19,7 @@ bool FarFromTravelTargetTrigger::IsActive()
     return context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
 }
 
-bool NearDarkPortalTrigger::IsActive()
-{
-    return bot->GetAreaId() == 72;
-}
+bool NearDarkPortalTrigger::IsActive() { return bot->GetAreaId() == 72; }
 
 bool AtDarkPortalAzerothTrigger::IsActive()
 {

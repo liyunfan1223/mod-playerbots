@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "Formations.h"
+
 #include "Arrow.h"
 #include "Event.h"
 #include "Playerbots.h"
@@ -12,7 +15,8 @@ WorldLocation Formation::NullLocation = WorldLocation();
 
 bool IsSameLocation(WorldLocation const &a, WorldLocation const &b)
 {
-    return a.GetPositionX() == b.GetPositionX() && a.GetPositionY() == b.GetPositionY() && a.GetPositionZ() == b.GetPositionZ() && a.GetMapId() == b.GetMapId();
+    return a.GetPositionX() == b.GetPositionX() && a.GetPositionY() == b.GetPositionY() &&
+           a.GetPositionZ() == b.GetPositionZ() && a.GetMapId() == b.GetMapId();
 }
 
 bool Formation::IsNullLocation(WorldLocation const &loc)
@@ -58,7 +62,7 @@ WorldLocation MoveAheadFormation::GetLocation()
 
 class MeleeFormation : public FollowFormation
 {
-public:
+   public:
     MeleeFormation(PlayerbotAI *botAI) : FollowFormation(botAI, "melee") {}
 
     std::string const GetTargetName() override { return "master target"; }
@@ -66,7 +70,7 @@ public:
 
 class QueueFormation : public FollowFormation
 {
-public:
+   public:
     QueueFormation(PlayerbotAI *botAI) : FollowFormation(botAI, "queue") {}
 
     std::string const GetTargetName() override { return "line target"; }
@@ -74,7 +78,7 @@ public:
 
 class NearFormation : public MoveAheadFormation
 {
-public:
+   public:
     NearFormation(PlayerbotAI *botAI) : MoveAheadFormation(botAI, "near") {}
 
     WorldLocation GetLocationInternal() override
@@ -103,7 +107,7 @@ public:
 
 class ChaosFormation : public MoveAheadFormation
 {
-public:
+   public:
     ChaosFormation(PlayerbotAI *botAI) : MoveAheadFormation(botAI, "chaos"), lastChangeTime(0) {}
 
     WorldLocation GetLocationInternal() override
@@ -138,7 +142,7 @@ public:
 
     float GetMaxDistance() override { return sPlayerbotAIConfig->followDistance + dr; }
 
-private:
+   private:
     time_t lastChangeTime;
     float dx = 0.f;
     float dy = 0.f;
@@ -147,7 +151,7 @@ private:
 
 class CircleFormation : public MoveFormation
 {
-public:
+   public:
     CircleFormation(PlayerbotAI *botAI) : MoveFormation(botAI, "circle") {}
 
     WorldLocation GetLocation() override
@@ -164,20 +168,20 @@ public:
 
         switch (bot->getClass())
         {
-        case CLASS_HUNTER:
-        case CLASS_MAGE:
-        case CLASS_PRIEST:
-        case CLASS_WARLOCK:
-            range = botAI->GetRange("flee");
-            break;
-        case CLASS_DRUID:
-            if (!botAI->IsTank(bot))
+            case CLASS_HUNTER:
+            case CLASS_MAGE:
+            case CLASS_PRIEST:
+            case CLASS_WARLOCK:
                 range = botAI->GetRange("flee");
-            break;
-        case CLASS_SHAMAN:
-            if (botAI->IsHeal(bot))
-                range = botAI->GetRange("flee");
-            break;
+                break;
+            case CLASS_DRUID:
+                if (!botAI->IsTank(bot))
+                    range = botAI->GetRange("flee");
+                break;
+            case CLASS_SHAMAN:
+                if (botAI->IsHeal(bot))
+                    range = botAI->GetRange("flee");
+                break;
         }
 
         float angle = GetFollowAngle();
@@ -197,7 +201,7 @@ public:
 
 class LineFormation : public MoveAheadFormation
 {
-public:
+   public:
     LineFormation(PlayerbotAI *botAI) : MoveAheadFormation(botAI, "line") {}
 
     WorldLocation GetLocationInternal() override
@@ -217,7 +221,7 @@ public:
         float z = master->GetPositionZ();
         float orientation = master->GetOrientation();
 
-        std::vector<Player*> players;
+        std::vector<Player *> players;
         GroupReference *gref = group->GetFirstMember();
         while (gref)
         {
@@ -236,7 +240,7 @@ public:
 
 class ShieldFormation : public MoveFormation
 {
-public:
+   public:
     ShieldFormation(PlayerbotAI *botAI) : MoveFormation(botAI, "shield") {}
 
     WorldLocation GetLocation() override
@@ -256,8 +260,8 @@ public:
         float z = master->GetPositionZ();
         float orientation = master->GetOrientation();
 
-        std::vector<Player*> tanks;
-        std::vector<Player*> dps;
+        std::vector<Player *> tanks;
+        std::vector<Player *> dps;
         GroupReference *gref = group->GetFirstMember();
         while (gref)
         {
@@ -290,14 +294,17 @@ public:
 
         if (botAI->IsTank(bot) && !botAI->IsTank(master))
         {
-            float diff = tanks.size() % 2 == 0 ? -sPlayerbotAIConfig->tooCloseDistance / 2.0f : 0.0f;
-            return MoveLine(tanks, diff, x + cos(orientation) * range, y + sin(orientation) * range, z, orientation, range);
+            float diff =
+                tanks.size() % 2 == 0 ? -sPlayerbotAIConfig->tooCloseDistance / 2.0f : 0.0f;
+            return MoveLine(tanks, diff, x + cos(orientation) * range, y + sin(orientation) * range,
+                            z, orientation, range);
         }
 
         if (!botAI->IsTank(bot) && botAI->IsTank(master))
         {
             float diff = dps.size() % 2 == 0 ? -sPlayerbotAIConfig->tooCloseDistance / 2.0f : 0.0f;
-            return MoveLine(dps, diff, x - cos(orientation) * range, y - sin(orientation) * range, z, orientation, range);
+            return MoveLine(dps, diff, x - cos(orientation) * range, y - sin(orientation) * range,
+                            z, orientation, range);
         }
 
         return Formation::NullLocation;
@@ -306,7 +313,7 @@ public:
 
 class FarFormation : public FollowFormation
 {
-public:
+   public:
     FarFormation(PlayerbotAI *botAI) : FollowFormation(botAI, "far") {}
 
     WorldLocation GetLocation() override
@@ -376,7 +383,8 @@ float Formation::GetFollowAngle()
         masterBotMgr = GET_PLAYERBOT_MGR(master);
     if (!group && master && !GET_PLAYERBOT_AI(master) && masterBotMgr)
     {
-        for (PlayerBotMap::const_iterator i = masterBotMgr->GetPlayerBotsBegin(); i != masterBotMgr->GetPlayerBotsEnd(); ++i)
+        for (PlayerBotMap::const_iterator i = masterBotMgr->GetPlayerBotsBegin();
+             i != masterBotMgr->GetPlayerBotsEnd(); ++i)
         {
             if (i->second == bot)
                 index = total;
@@ -386,7 +394,7 @@ float Formation::GetFollowAngle()
     }
     else if (group)
     {
-        std::vector<Player*> roster;
+        std::vector<Player *> roster;
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             if (Player *member = ref->GetSource())
@@ -441,7 +449,8 @@ float Formation::GetFollowAngle()
     return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
 
-FormationValue::FormationValue(PlayerbotAI *botAI) : ManualSetValue<Formation*>(botAI, new NearFormation(botAI), "formation")
+FormationValue::FormationValue(PlayerbotAI *botAI)
+    : ManualSetValue<Formation *>(botAI, new NearFormation(botAI), "formation")
 {
 }
 
@@ -454,10 +463,7 @@ FormationValue::~FormationValue()
     }
 }
 
-std::string const FormationValue::Save()
-{
-    return value ? value->getName() : "?";
-}
+std::string const FormationValue::Save() { return value ? value->getName() : "?"; }
 
 bool FormationValue::Load(std::string const formation)
 {
@@ -534,7 +540,7 @@ bool SetFormationAction::Execute(Event event)
 {
     std::string const formation = event.getParam();
 
-    FormationValue *value = (FormationValue *)context->GetValue<Formation*>("formation");
+    FormationValue *value = (FormationValue *)context->GetValue<Formation *>("formation");
     if (formation == "?" || formation.empty())
     {
         std::ostringstream str;
@@ -557,7 +563,9 @@ bool SetFormationAction::Execute(Event event)
         std::ostringstream str;
         str << "Invalid formation: |cffff0000" << formation;
         botAI->TellMaster(str);
-        botAI->TellMaster("Please set to any of:|cffffffff near (default), queue, chaos, circle, line, shield, arrow, melee, far");
+        botAI->TellMaster(
+            "Please set to any of:|cffffffff near (default), queue, chaos, circle, line, shield, "
+            "arrow, melee, far");
         return false;
     }
 
@@ -567,7 +575,8 @@ bool SetFormationAction::Execute(Event event)
     return true;
 }
 
-WorldLocation MoveFormation::MoveLine(std::vector<Player*> line, float diff, float cx, float cy, float cz, float orientation, float range)
+WorldLocation MoveFormation::MoveLine(std::vector<Player *> line, float diff, float cx, float cy,
+                                      float cz, float orientation, float range)
 {
     if (line.size() < 5)
     {
@@ -581,7 +590,7 @@ WorldLocation MoveFormation::MoveLine(std::vector<Player*> line, float diff, flo
         float x = cx + cos(orientation) * radius;
         float y = cy + sin(orientation) * radius;
 
-        std::vector<Player*> singleLine;
+        std::vector<Player *> singleLine;
         for (uint32 j = 0; j < 5 && !line.empty(); j++)
         {
             singleLine.push_back(line[line.size() - 1]);
@@ -596,7 +605,8 @@ WorldLocation MoveFormation::MoveLine(std::vector<Player*> line, float diff, flo
     return Formation::NullLocation;
 }
 
-WorldLocation MoveFormation::MoveSingleLine(std::vector<Player*> line, float diff, float cx, float cy, float cz, float orientation, float range)
+WorldLocation MoveFormation::MoveSingleLine(std::vector<Player *> line, float diff, float cx,
+                                            float cy, float cz, float orientation, float range)
 {
     float count = line.size();
     float angle = orientation - M_PI / 2.0f;

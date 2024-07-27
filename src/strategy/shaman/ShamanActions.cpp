@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "ShamanActions.h"
+
 #include "Playerbots.h"
 
 bool CastTotemAction::isUseful()
@@ -20,7 +23,8 @@ bool CastTotemAction::isUseful()
             return false;
         }
     }
-    return CastBuffSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name) && !botAI->HasAura(buff, bot);
+    return CastBuffSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name) &&
+           !botAI->HasAura(buff, bot);
 }
 
 bool CastManaSpringTotemAction::isUseful()
@@ -30,7 +34,8 @@ bool CastManaSpringTotemAction::isUseful()
 
 bool CastFlametongueTotemAction::isUseful()
 {
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "magma totem") && !botAI->HasAura("totem of wrath", bot);
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "magma totem") &&
+           !botAI->HasAura("totem of wrath", bot);
 }
 
 bool CastSearingTotemAction::isUseful()

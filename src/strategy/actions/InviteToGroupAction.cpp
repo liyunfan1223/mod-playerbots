@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "InviteToGroupAction.h"
+
 #include "Event.h"
 #include "GuildMgr.h"
 #include "Playerbots.h"
@@ -22,7 +25,8 @@ bool InviteToGroupAction::Invite(Player *player)
     if (!player || !player->IsInWorld())
         return false;
 
-    if (!GET_PLAYERBOT_AI(player) && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, true, player))
+    if (!GET_PLAYERBOT_AI(player) &&
+        !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, true, player))
         return false;
 
     WorldPacket p;
@@ -36,7 +40,8 @@ bool InviteToGroupAction::Invite(Player *player)
 
 bool InviteNearbyToGroupAction::Execute(Event event)
 {
-    GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
+    GuidVector nearGuids =
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
     for (auto &i : nearGuids)
     {
         Player *player = ObjectAccessor::FindPlayer(i);
@@ -48,10 +53,11 @@ bool InviteNearbyToGroupAction::Execute(Event event)
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster()) // Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO &&
+                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
-            if (botAI->HasActivePlayerMaster()) // Do not invite alts of active players.
+            if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
         }
         else
@@ -97,13 +103,13 @@ bool InviteNearbyToGroupAction::isUseful()
             return false;
     }
 
-    if (botAI->HasActivePlayerMaster()) // Alts do not invite randomly
+    if (botAI->HasActivePlayerMaster())  // Alts do not invite randomly
         return false;
 
     return true;
 }
 
-std::vector<Player*> InviteGuildToGroupAction::getGuildMembers()
+std::vector<Player *> InviteGuildToGroupAction::getGuildMembers()
 {
     Guild *guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 
@@ -129,13 +135,16 @@ bool InviteGuildToGroupAction::Execute(Event event)
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster()) // Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO &&
+                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
-            if (botAI->HasActivePlayerMaster()) // Do not invite alts of active players.
+            if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
 
-            if (player->GetLevel() > bot->GetLevel() + 5) // Only invite higher levels that need money so they can grind money and help out.
+            if (player->GetLevel() >
+                bot->GetLevel() + 5)  // Only invite higher levels that need money so they can grind
+                                      // money and help out.
             {
                 AiObjectContext *botContext = botAI->GetAiObjectContext();
 

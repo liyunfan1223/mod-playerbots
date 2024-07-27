@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "AreaTriggerAction.h"
+
 #include "Event.h"
 #include "LastMovementValue.h"
 #include "Playerbots.h"
@@ -10,7 +13,7 @@
 
 bool ReachAreaTriggerAction::Execute(Event event)
 {
-    if (botAI->IsRealPlayer()) // Do not trigger own area trigger.
+    if (botAI->IsRealPlayer())  // Do not trigger own area trigger.
         return false;
 
     uint32 triggerId;
@@ -32,7 +35,8 @@ bool ReachAreaTriggerAction::Execute(Event event)
         return true;
     }
 
-    if (bot->GetMapId() != at->map || sqrt(bot->GetDistance(at->x, at->y, at->z)) > sPlayerbotAIConfig->sightDistance)
+    if (bot->GetMapId() != at->map ||
+        sqrt(bot->GetDistance(at->x, at->y, at->z)) > sPlayerbotAIConfig->sightDistance)
     {
         botAI->TellError("I won't follow: too far away");
         return true;

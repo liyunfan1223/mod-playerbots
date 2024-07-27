@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_COMBATSTRATEGY_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class CombatStrategy : public Strategy
 {
-public:
+   public:
     CombatStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -20,7 +22,7 @@ public:
 
 class AvoidAoeStrategy : public Strategy
 {
-public:
+   public:
     explicit AvoidAoeStrategy(PlayerbotAI *ai);
     const std::string getName() override { return "avoid aoe"; }
     NextAction **getDefaultActions() override;
@@ -30,7 +32,7 @@ public:
 
 class CombatFormationStrategy : public Strategy
 {
-public:
+   public:
     CombatFormationStrategy(PlayerbotAI *ai) : Strategy(ai) {}
     const std::string getName() override { return "combat formation"; }
     NextAction **getDefaultActions() override;

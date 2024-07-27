@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "ChangeTalentsAction.h"
+
 #include "AiFactory.h"
 #include "ChatHelper.h"
 #include "Event.h"
@@ -33,7 +36,8 @@ bool ChangeTalentsAction::Execute(Event event)
             }
             else if (param.find("switch 2") != std::string::npos)
             {
-                if (bot->GetSpecsCount() == 1 && bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
+                if (bot->GetSpecsCount() == 1 &&
+                    bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
                 {
                     bot->CastSpell(bot, 63680, true, nullptr, nullptr, bot->GetGUID());
                     bot->CastSpell(bot, 63624, true, nullptr, nullptr, bot->GetGUID());
@@ -103,7 +107,8 @@ std::string ChangeTalentsAction::SpecList()
         }
         specFound++;
         std::ostringstream out;
-        std::vector<std::vector<uint32>> parsed = sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][80];
+        std::vector<std::vector<uint32>> parsed =
+            sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][80];
         std::unordered_map<int, int> tabCount;
         tabCount[0] = tabCount[1] = tabCount[2] = 0;
         for (auto &item : parsed)
@@ -145,7 +150,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 {
     int cls = bot->getClass();
     std::ostringstream out;
-    std::vector<std::vector<uint32>> parsedSpecLink = PlayerbotAIConfig::ParseTempTalentsOrder(cls, param);
+    std::vector<std::vector<uint32>> parsedSpecLink =
+        PlayerbotAIConfig::ParseTempTalentsOrder(cls, param);
     if (parsedSpecLink.size() == 0)
     {
         out << "Invalid link " << param;
@@ -201,7 +207,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //     return nullptr;
 // }
 
-// void ChangeTalentsAction::listPremadePaths(std::vector<TalentPath*> paths, std::ostringstream* out)
+// void ChangeTalentsAction::listPremadePaths(std::vector<TalentPath*> paths, std::ostringstream*
+// out)
 // {
 //     if (paths.size() == 0)
 //     {
@@ -219,7 +226,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //     *out << ".";
 // }
 
-// TalentPath* ChangeTalentsAction::PickPremadePath(std::vector<TalentPath*> paths, bool useProbability)
+// TalentPath* ChangeTalentsAction::PickPremadePath(std::vector<TalentPath*> paths, bool
+// useProbability)
 // {
 //     uint32 totProbability = 0;
 //     uint32 curProbability = 0;
@@ -265,7 +273,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //         newSpec.ApplyTalents(bot, out);
 //         if (newSpec.GetTalentPoints() > 0)
 //         {
-//             *out << "Upgrading spec " << "|h|cffffffff" << getPremadePath(specId)->name << "" << newSpec.FormatSpec(bot);
+//             *out << "Upgrading spec " << "|h|cffffffff" << getPremadePath(specId)->name << "" <<
+//             newSpec.FormatSpec(bot);
 //         }
 //     }
 //     else if (!specLink.empty())
@@ -276,7 +285,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //         if (newSpec.GetTalentPoints() > 0)
 //         {
 //             *out << "Upgrading saved spec "
-//                  << "|h|cffffffff" << chat->FormatClass(bot, newSpec.highestTree()) << " (" << newSpec.FormatSpec(bot) << ")";
+//                  << "|h|cffffffff" << chat->FormatClass(bot, newSpec.highestTree()) << " (" <<
+//                  newSpec.FormatSpec(bot) << ")";
 //         }
 //     }
 
@@ -300,7 +310,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //             specId = -1;
 //             // specLink = "";
 //         }
-//         else if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/ && !sRandomPlayerbotMgr->IsRandomBot(bot))
+//         else if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/ &&
+//         !sRandomPlayerbotMgr->IsRandomBot(bot))
 //         {
 //             *out << "Found multiple specs: ";
 //             listPremadePaths(paths, out);
@@ -316,7 +327,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //             if (paths.size() > 1)
 //                 *out << "Found " << paths.size() << " possible specs to choose from. ";
 
-//             *out << "Apply spec " << "|h|cffffffff" << getPremadePath(specId)->name << " " << newSpec.FormatSpec(bot);
+//             *out << "Apply spec " << "|h|cffffffff" << getPremadePath(specId)->name << " " <<
+//             newSpec.FormatSpec(bot);
 //         }
 //     }
 

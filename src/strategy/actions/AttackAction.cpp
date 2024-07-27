@@ -1,13 +1,16 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "AttackAction.h"
+
+#include "CreatureAI.h"
 #include "Event.h"
 #include "LootObjectStack.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
-#include "CreatureAI.h"
 #include "Unit.h"
 
 bool AttackAction::Execute(Event event)
@@ -48,7 +51,8 @@ bool AttackMyTargetAction::Execute(Event event)
 
 bool AttackAction::Attack(Unit *target, bool with_pet /*true*/)
 {
-    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE || bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
+    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE ||
+        bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {
         if (verbose)
             botAI->TellError("I cannot attack in flight");
@@ -105,11 +109,11 @@ bool AttackAction::Attack(Unit *target, bool with_pet /*true*/)
     ObjectGuid guid = target->GetGUID();
     bot->SetSelection(target->GetGUID());
 
-    Unit *oldTarget = context->GetValue<Unit*>("current target")->Get();
-    context->GetValue<Unit*>("old target")->Set(oldTarget);
+    Unit *oldTarget = context->GetValue<Unit *>("current target")->Get();
+    context->GetValue<Unit *>("old target")->Set(oldTarget);
 
-    context->GetValue<Unit*>("current target")->Set(target);
-    context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
+    context->GetValue<Unit *>("current target")->Set(target);
+    context->GetValue<LootObjectStack *>("available loot")->Get()->Add(guid);
 
     bool melee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
     bot->Attack(target, melee);
@@ -144,10 +148,7 @@ bool AttackAction::Attack(Unit *target, bool with_pet /*true*/)
     return true;
 }
 
-bool AttackDuelOpponentAction::isUseful()
-{
-    return AI_VALUE(Unit *, "duel target");
-}
+bool AttackDuelOpponentAction::isUseful() { return AI_VALUE(Unit *, "duel target"); }
 
 bool AttackDuelOpponentAction::Execute(Event event)
 {

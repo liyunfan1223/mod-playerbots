@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "UseItemAction.h"
+
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemUsageValue.h"
@@ -14,7 +17,7 @@ bool UseItemAction::Execute(Event event)
     if (name.empty())
         name = getName();
 
-    std::vector<Item*> items = AI_VALUE2(std::vector<Item*>, "inventory items", name);
+    std::vector<Item *> items = AI_VALUE2(std::vector<Item *>, "inventory items", name);
     GuidVector gos = chat->parseGameobjects(name);
 
     if (gos.empty())
@@ -50,10 +53,7 @@ bool UseItemAction::UseGameObject(ObjectGuid guid)
     return true;
 }
 
-bool UseItemAction::UseItemAuto(Item *item)
-{
-    return UseItem(item, ObjectGuid::Empty, nullptr);
-}
+bool UseItemAction::UseItemAuto(Item *item) { return UseItem(item, ObjectGuid::Empty, nullptr); }
 
 bool UseItemAction::UseItemOnGameObject(Item *item, ObjectGuid go)
 {
@@ -146,7 +146,8 @@ bool UseItemAction::UseItem(Item *item, ObjectGuid goGuid, Item *itemTarget, Uni
     }
 
     Player *master = GetMaster();
-    if (!targetSelected && item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && master && botAI->HasActivePlayerMaster() && !selfOnly)
+    if (!targetSelected && item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && master &&
+        botAI->HasActivePlayerMaster() && !selfOnly)
     {
         if (ObjectGuid masterSelection = master->GetTarget())
         {
@@ -221,7 +222,8 @@ bool UseItemAction::UseItem(Item *item, ObjectGuid goGuid, Item *itemTarget, Uni
                     return false;
 
                 targetFlag = TARGET_FLAG_TRADE_ITEM;
-                packet << targetFlag << (uint8)1 << ObjectGuid((uint64)TRADE_SLOT_NONTRADED).WriteAsPacked();
+                packet << targetFlag << (uint8)1
+                       << ObjectGuid((uint64)TRADE_SLOT_NONTRADED).WriteAsPacked();
                 targetSelected = true;
                 out << " on traded item";
             }
@@ -252,7 +254,9 @@ bool UseItemAction::UseItem(Item *item, ObjectGuid goGuid, Item *itemTarget, Uni
     ItemTemplate const *proto = item->GetTemplate();
     bool isDrink = proto->Spells[0].SpellCategory == 59;
     bool isFood = proto->Spells[0].SpellCategory == 11;
-    if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) && (isFood || isDrink))
+    if (proto->Class == ITEM_CLASS_CONSUMABLE &&
+        (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
+        (isFood || isDrink))
     {
         if (bot->IsInCombat())
             return false;
@@ -318,10 +322,12 @@ bool UseItemAction::SocketItem(Item *item, Item *gem, bool replace)
     *packet << item->GetGUID();
 
     bool fits = false;
-    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT;
+         enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
     {
         uint8 SocketColor = item->GetTemplate()->Socket[enchant_slot - SOCK_ENCHANTMENT_SLOT].Color;
-        GemPropertiesEntry const *gemProperty = sGemPropertiesStore.LookupEntry(gem->GetTemplate()->GemProperties);
+        GemPropertiesEntry const *gemProperty =
+            sGemPropertiesStore.LookupEntry(gem->GetTemplate()->GemProperties);
         if (gemProperty && (gemProperty->color & SocketColor))
         {
             if (fits)
@@ -338,7 +344,8 @@ bool UseItemAction::SocketItem(Item *item, Item *gem, bool replace)
                 continue;
             }
 
-            SpellItemEnchantmentEntry const *enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+            SpellItemEnchantmentEntry const *enchantEntry =
+                sSpellItemEnchantmentStore.LookupEntry(enchant_id);
             if (!enchantEntry || !enchantEntry->GemID)
             {
                 *packet << gem->GetGUID();
@@ -375,20 +382,11 @@ bool UseItemAction::isPossible()
     return getName() == "use" || AI_VALUE2(uint32, "item count", getName()) > 0;
 }
 
-bool UseSpellItemAction::isUseful()
-{
-    return AI_VALUE2(bool, "spell cast useful", getName());
-}
+bool UseSpellItemAction::isUseful() { return AI_VALUE2(bool, "spell cast useful", getName()); }
 
-bool UseHealingPotion::isUseful()
-{
-    return AI_VALUE2(bool, "combat", "self target");
-}
+bool UseHealingPotion::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }
 
-bool UseManaPotion::isUseful()
-{
-    return AI_VALUE2(bool, "combat", "self target");
-}
+bool UseManaPotion::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }
 
 bool UseHearthStone::Execute(Event event)
 {
@@ -410,24 +408,18 @@ bool UseHearthStone::Execute(Event event)
     return used;
 }
 
-bool UseHearthStone::isUseful()
-{
-    return !bot->InBattleground();
-}
+bool UseHearthStone::isUseful() { return !bot->InBattleground(); }
 
 bool UseRandomRecipe::isUseful()
 {
     return !bot->IsInCombat() && !botAI->HasActivePlayerMaster() && !bot->InBattleground();
 }
 
-bool UseRandomRecipe::isPossible()
-{
-    return AI_VALUE2(uint32, "item count", "recipe") > 0;
-}
+bool UseRandomRecipe::isPossible() { return AI_VALUE2(uint32, "item count", "recipe") > 0; }
 
 bool UseRandomRecipe::Execute(Event event)
 {
-    std::vector<Item*> recipes = AI_VALUE2(std::vector<Item*>, "inventory items", "recipe");
+    std::vector<Item *> recipes = AI_VALUE2(std::vector<Item *>, "inventory items", "recipe");
 
     std::string recipeName = "";
 
@@ -449,20 +441,18 @@ bool UseRandomRecipe::Execute(Event event)
 
 bool UseRandomQuestItem::isUseful()
 {
-    return !botAI->HasActivePlayerMaster() && !bot->InBattleground() && !bot->HasUnitState(UNIT_STATE_IN_FLIGHT);
+    return !botAI->HasActivePlayerMaster() && !bot->InBattleground() &&
+           !bot->HasUnitState(UNIT_STATE_IN_FLIGHT);
 }
 
-bool UseRandomQuestItem::isPossible()
-{
-    return AI_VALUE2(uint32, "item count", "quest") > 0;
-}
+bool UseRandomQuestItem::isPossible() { return AI_VALUE2(uint32, "item count", "quest") > 0; }
 
 bool UseRandomQuestItem::Execute(Event event)
 {
     Unit *unitTarget = nullptr;
     ObjectGuid goTarget;
 
-    std::vector<Item*> questItems = AI_VALUE2(std::vector<Item*>, "inventory items", "quest");
+    std::vector<Item *> questItems = AI_VALUE2(std::vector<Item *>, "inventory items", "quest");
 
     Item *item = nullptr;
     uint32 delay = 0;

@@ -1,17 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_ENGINE_H
 #define _PLAYERBOT_ENGINE_H
 
+#include <map>
+
 #include "Multiplier.h"
-#include "Queue.h"
 #include "PlayerbotAIAware.h"
+#include "Queue.h"
 #include "Strategy.h"
 #include "Trigger.h"
-
-#include <map>
 
 class Action;
 class ActionNode;
@@ -31,7 +33,7 @@ enum ActionResult
 
 class ActionExecutionListener
 {
-public:
+   public:
     virtual ~ActionExecutionListener() {};
 
     virtual bool Before(Action *action, Event event) = 0;
@@ -42,7 +44,7 @@ public:
 
 class ActionExecutionListeners : public ActionExecutionListener
 {
-public:
+   public:
     virtual ~ActionExecutionListeners();
 
     bool Before(Action *action, Event event) override;
@@ -50,23 +52,17 @@ public:
     void After(Action *action, bool executed, Event event) override;
     bool OverrideResult(Action *action, bool executed, Event event) override;
 
-    void Add(ActionExecutionListener *listener)
-    {
-        listeners.push_back(listener);
-    }
+    void Add(ActionExecutionListener *listener) { listeners.push_back(listener); }
 
-    void Remove(ActionExecutionListener *listener)
-    {
-        listeners.remove(listener);
-    }
+    void Remove(ActionExecutionListener *listener) { listeners.remove(listener); }
 
-private:
+   private:
     std::list<ActionExecutionListener *> listeners;
 };
 
 class Engine : public PlayerbotAIAware
 {
-public:
+   public:
     Engine(PlayerbotAI *botAI, AiObjectContext *factory);
 
     void Init();
@@ -83,7 +79,8 @@ public:
     std::string const GetLastAction() { return lastAction; }
 
     virtual bool DoNextAction(Unit *, uint32 depth = 0, bool minimal = false);
-    ActionResult ExecuteAction(std::string const name, Event event = Event(), std::string const qualifier = "");
+    ActionResult ExecuteAction(std::string const name, Event event = Event(),
+                               std::string const qualifier = "");
 
     void AddActionExecutionListener(ActionExecutionListener *listener)
     {
@@ -99,8 +96,9 @@ public:
 
     bool testMode;
 
-private:
-    bool MultiplyAndPush(NextAction **actions, float forceRelevance, bool skipPrerequisites, Event event, const char *pushType);
+   private:
+    bool MultiplyAndPush(NextAction **actions, float forceRelevance, bool skipPrerequisites,
+                         Event event, const char *pushType);
     void Reset();
     void ProcessTriggers(bool minimal);
     void PushDefaultActions();
@@ -114,7 +112,7 @@ private:
 
     ActionExecutionListeners actionExecutionListeners;
 
-protected:
+   protected:
     Queue queue;
     std::vector<TriggerNode *> triggers;
     std::vector<Multiplier *> multipliers;

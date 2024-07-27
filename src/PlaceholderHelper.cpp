@@ -1,17 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PlaceholderHelper.h"
+
 #include "AiFactory.h"
-#include "Playerbots.h"
 #include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 #include "Util.h"
 
-void PlaceholderHelper::MapDungeon(
-    PlaceholderMap &placeholders,
-    DungeonSuggestion const *dungeonSuggestion,
-    Player *bot)
+void PlaceholderHelper::MapDungeon(PlaceholderMap &placeholders,
+                                   DungeonSuggestion const *dungeonSuggestion, Player *bot)
 {
     std::ostringstream out;
     Insertion insertion = {out, dungeonSuggestion};
@@ -28,18 +29,18 @@ void PlaceholderHelper::MapRole(PlaceholderMap &placeholders, Player *bot)
     std::string roleText;
     switch (role)
     {
-    case BOT_ROLE_TANK:
-        roleText = "Tank";
-        break;
-    case BOT_ROLE_HEALER:
-        roleText = "Healer";
-        break;
-    case BOT_ROLE_DPS:
-        roleText = "DPS";
-        break;
-    case BOT_ROLE_NONE:
-    default:
-        return;
+        case BOT_ROLE_TANK:
+            roleText = "Tank";
+            break;
+        case BOT_ROLE_HEALER:
+            roleText = "Healer";
+            break;
+        case BOT_ROLE_DPS:
+            roleText = "DPS";
+            break;
+        case BOT_ROLE_NONE:
+        default:
+            return;
     }
 
     bool const hasRole = !roleText.empty();

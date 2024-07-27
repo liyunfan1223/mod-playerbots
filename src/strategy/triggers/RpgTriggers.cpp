@@ -1,27 +1,25 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "RpgTriggers.h"
+
 #include "BudgetValues.h"
 #include "GuildCreateActions.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SocialMgr.h"
 
-bool NoRpgTargetTrigger::IsActive()
-{
-    return !AI_VALUE(GuidPosition, "rpg target");
-}
+bool NoRpgTargetTrigger::IsActive() { return !AI_VALUE(GuidPosition, "rpg target"); }
 
-bool HasRpgTargetTrigger::IsActive()
-{
-    return !NoRpgTargetTrigger::IsActive();
-}
+bool HasRpgTargetTrigger::IsActive() { return !NoRpgTargetTrigger::IsActive(); }
 
 bool FarFromRpgTargetTrigger::IsActive()
 {
-    return !NoRpgTargetTrigger::IsActive() && AI_VALUE2(float, "distance", "rpg target") > INTERACTION_DISTANCE;
+    return !NoRpgTargetTrigger::IsActive() &&
+           AI_VALUE2(float, "distance", "rpg target") > INTERACTION_DISTANCE;
 }
 
 bool NearRpgTargetTrigger::IsActive()
@@ -29,19 +27,15 @@ bool NearRpgTargetTrigger::IsActive()
     return !NoRpgTargetTrigger::IsActive() && !FarFromRpgTargetTrigger::IsActive();
 }
 
-GuidPosition RpgTrigger::getGuidP()
-{
-    return AI_VALUE(GuidPosition, "rpg target");
-}
+GuidPosition RpgTrigger::getGuidP() { return AI_VALUE(GuidPosition, "rpg target"); }
 
-bool RpgTrigger::IsActive()
-{
-    return true;
-}
+bool RpgTrigger::IsActive() { return true; }
 
 Event RpgTrigger::Check()
 {
-    if (!NoRpgTargetTrigger::IsActive() && (AI_VALUE(std::string, "next rpg action") == "choose rpg target") || !FarFromRpgTargetTrigger::IsActive())
+    if (!NoRpgTargetTrigger::IsActive() &&
+            (AI_VALUE(std::string, "next rpg action") == "choose rpg target") ||
+        !FarFromRpgTargetTrigger::IsActive())
         return Trigger::Check();
 
     return Event();
@@ -54,7 +48,8 @@ bool RpgTaxiTrigger::IsActive()
     if (!guidP.HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
         return false;
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
+    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(),
+                                                 guidP.getMapId(), bot->GetTeamId());
 
     if (!node)
         return false;
@@ -75,7 +70,8 @@ bool RpgDiscoverTrigger::IsActive()
     if (bot->isTaxiCheater())
         return false;
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
+    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(),
+                                                 guidP.getMapId(), bot->GetTeamId());
 
     if (bot->m_taxi.IsTaximaskNodeKnown(node))
         return false;
@@ -127,7 +123,7 @@ bool RpgBuyTrigger::IsActive()
     if (AI_VALUE(uint8, "durability") > 50)
         return false;
 
-    if (!AI_VALUE(bool, "can sell")) // Need better condition.
+    if (!AI_VALUE(bool, "can sell"))  // Need better condition.
         return false;
 
     return true;
@@ -166,38 +162,39 @@ bool RpgTrainTrigger::IsTrainerOf(CreatureTemplate const *cInfo, Player *pPlayer
 {
     switch (cInfo->trainer_type)
     {
-    case TRAINER_TYPE_CLASS:
-        if (pPlayer->getClass() != cInfo->trainer_class)
-        {
-            return false;
-        }
-        break;
-    case TRAINER_TYPE_PETS:
-        if (pPlayer->getClass() != CLASS_HUNTER)
-        {
-            return false;
-        }
-        break;
-    case TRAINER_TYPE_MOUNTS:
-        if (cInfo->trainer_race && pPlayer->getRace() != cInfo->trainer_race)
-        {
-            // Allowed to train if exalted
-            if (FactionTemplateEntry const *faction_template = sFactionTemplateStore.LookupEntry(cInfo->faction))
+        case TRAINER_TYPE_CLASS:
+            if (pPlayer->getClass() != cInfo->trainer_class)
             {
-                if (pPlayer->GetReputationRank(faction_template->faction) == REP_EXALTED)
-                    return true;
+                return false;
             }
-            return false;
-        }
-        break;
-    case TRAINER_TYPE_TRADESKILLS:
-        if (cInfo->trainer_spell && !pPlayer->HasSpell(cInfo->trainer_spell))
-        {
-            return false;
-        }
-        break;
-    default:
-        return false; // checked and error output at creature_template loading
+            break;
+        case TRAINER_TYPE_PETS:
+            if (pPlayer->getClass() != CLASS_HUNTER)
+            {
+                return false;
+            }
+            break;
+        case TRAINER_TYPE_MOUNTS:
+            if (cInfo->trainer_race && pPlayer->getRace() != cInfo->trainer_race)
+            {
+                // Allowed to train if exalted
+                if (FactionTemplateEntry const *faction_template =
+                        sFactionTemplateStore.LookupEntry(cInfo->faction))
+                {
+                    if (pPlayer->GetReputationRank(faction_template->faction) == REP_EXALTED)
+                        return true;
+                }
+                return false;
+            }
+            break;
+        case TRAINER_TYPE_TRADESKILLS:
+            if (cInfo->trainer_spell && !pPlayer->HasSpell(cInfo->trainer_spell))
+            {
+                return false;
+            }
+            break;
+        default:
+            return false;  // checked and error output at creature_template loading
     }
 
     return true;
@@ -229,7 +226,8 @@ bool RpgTrainTrigger::IsActive()
     if (cSpells)
         trainer_spells.insert(cSpells->spellList.begin(), cSpells->spellList.end());
 
-    for (TrainerSpellMap::const_iterator itr = trainer_spells.begin(); itr != trainer_spells.end(); ++itr)
+    for (TrainerSpellMap::const_iterator itr = trainer_spells.begin(); itr != trainer_spells.end();
+         ++itr)
     {
         TrainerSpell const *tSpell = &itr->second;
 
@@ -292,7 +290,7 @@ bool RpgHomeBindTrigger::IsActive()
 bool RpgQueueBGTrigger::IsActive()
 {
     // skip bots not in continents
-    if (!WorldPosition(bot).isOverworld()) // bg, raid, dungeon
+    if (!WorldPosition(bot).isOverworld())  // bg, raid, dungeon
         return false;
 
     GuidPosition guidP(getGuidP());
@@ -330,24 +328,24 @@ bool RpgUseTrigger::IsActive()
 
     switch (goInfo->type)
     {
-    case GAMEOBJECT_TYPE_BINDER:
-    case GAMEOBJECT_TYPE_GENERIC:
-    case GAMEOBJECT_TYPE_TEXT:
-    case GAMEOBJECT_TYPE_GOOBER:
-    case GAMEOBJECT_TYPE_TRANSPORT:
-    case GAMEOBJECT_TYPE_AREADAMAGE:
-    case GAMEOBJECT_TYPE_CAMERA:
-    case GAMEOBJECT_TYPE_MAP_OBJECT:
-    case GAMEOBJECT_TYPE_MO_TRANSPORT:
-    case GAMEOBJECT_TYPE_DUEL_ARBITER:
-    case GAMEOBJECT_TYPE_FISHINGNODE:
-    case GAMEOBJECT_TYPE_GUARDPOST:
-    case GAMEOBJECT_TYPE_SPELLCASTER:
-    case GAMEOBJECT_TYPE_FISHINGHOLE:
-    case GAMEOBJECT_TYPE_AURA_GENERATOR:
-        return false;
-    default:
-        break;
+        case GAMEOBJECT_TYPE_BINDER:
+        case GAMEOBJECT_TYPE_GENERIC:
+        case GAMEOBJECT_TYPE_TEXT:
+        case GAMEOBJECT_TYPE_GOOBER:
+        case GAMEOBJECT_TYPE_TRANSPORT:
+        case GAMEOBJECT_TYPE_AREADAMAGE:
+        case GAMEOBJECT_TYPE_CAMERA:
+        case GAMEOBJECT_TYPE_MAP_OBJECT:
+        case GAMEOBJECT_TYPE_MO_TRANSPORT:
+        case GAMEOBJECT_TYPE_DUEL_ARBITER:
+        case GAMEOBJECT_TYPE_FISHINGNODE:
+        case GAMEOBJECT_TYPE_GUARDPOST:
+        case GAMEOBJECT_TYPE_SPELLCASTER:
+        case GAMEOBJECT_TYPE_FISHINGHOLE:
+        case GAMEOBJECT_TYPE_AURA_GENERATOR:
+            return false;
+        default:
+            break;
     }
 
     return true;
@@ -413,7 +411,7 @@ bool RpgTradeUsefulTrigger::IsActive()
     if (bot->GetTrader() && bot->GetTrader() != player)
         return false;
 
-    if (AI_VALUE(std::vector<Item*>, "items useful to give").empty())
+    if (AI_VALUE(std::vector<Item *>, "items useful to give").empty())
         return false;
 
     return true;
@@ -456,7 +454,8 @@ bool RpgDuelTrigger::IsActive()
         return false;
 
     // caster or target already have requested duel
-    if (bot->duel || player->duel || !player->GetSocial() || player->GetSocial()->HasIgnore(bot->GetGUID()))
+    if (bot->duel || player->duel || !player->GetSocial() ||
+        player->GetSocial()->HasIgnore(bot->GetGUID()))
         return false;
 
     AreaTableEntry const *targetAreaEntry = sAreaTableStore.LookupEntry(player->GetAreaId());

@@ -1,17 +1,18 @@
 
 #include "AssassinationRogueStrategy.h"
+
 #include "Playerbots.h"
 
 class AssassinationRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     AssassinationRogueStrategyActionNodeFactory()
     {
         creators["mutilate"] = &mutilate;
         creators["envenom"] = &envenom;
     }
 
-private:
+   private:
     static ActionNode *mutilate(PlayerbotAI *ai)
     {
         return new ActionNode("mutilate",
@@ -35,24 +36,21 @@ AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI *ai) : MeleeC
 
 NextAction **AssassinationRogueStrategy::getDefaultActions()
 {
-    return NextAction::array(0,
-                             new NextAction("melee", ACTION_DEFAULT),
-                             NULL);
+    return NextAction::array(0, new NextAction("melee", ACTION_DEFAULT), NULL);
 }
 
-void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     MeleeCombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-        "high energy available",
-        NextAction::array(0,
-                          new NextAction("garrote", ACTION_HIGH + 7),
-                          new NextAction("ambush", ACTION_HIGH + 6), nullptr)));
+    triggers.push_back(
+        new TriggerNode("high energy available",
+                        NextAction::array(0, new NextAction("garrote", ACTION_HIGH + 7),
+                                          new NextAction("ambush", ACTION_HIGH + 6), nullptr)));
 
-    triggers.push_back(new TriggerNode(
-        "high energy available",
-        NextAction::array(0, new NextAction("mutilate", ACTION_NORMAL + 3), NULL)));
+    triggers.push_back(
+        new TriggerNode("high energy available",
+                        NextAction::array(0, new NextAction("mutilate", ACTION_NORMAL + 3), NULL)));
 
     triggers.push_back(new TriggerNode(
         "hunger for blood",
@@ -62,25 +60,23 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*> &trigger
         "slice and dice",
         NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 5), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "combo points 3 available",
-        NextAction::array(0, new NextAction("envenom", ACTION_HIGH + 4), NULL)));
+    triggers.push_back(
+        new TriggerNode("combo points 3 available",
+                        NextAction::array(0, new NextAction("envenom", ACTION_HIGH + 4), NULL)));
 
     triggers.push_back(new TriggerNode(
         "expose armor",
         NextAction::array(0, new NextAction("expose armor", ACTION_HIGH + 3), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "medium threat",
-        NextAction::array(0, new NextAction("vanish", ACTION_HIGH), NULL)));
+        "medium threat", NextAction::array(0, new NextAction("vanish", ACTION_HIGH), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "low health",
-        NextAction::array(0, new NextAction("evasion", ACTION_EMERGENCY), new NextAction("feint", ACTION_EMERGENCY), NULL)));
+        "low health", NextAction::array(0, new NextAction("evasion", ACTION_EMERGENCY),
+                                        new NextAction("feint", ACTION_EMERGENCY), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "kick",
-        NextAction::array(0, new NextAction("kick", ACTION_INTERRUPT + 2), NULL)));
+        "kick", NextAction::array(0, new NextAction("kick", ACTION_INTERRUPT + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "kick on enemy healer",
@@ -92,13 +88,12 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*> &trigger
 
     triggers.push_back(new TriggerNode(
         "tricks of the trade on main tank",
-        NextAction::array(0, new NextAction("tricks of the trade on main tank", ACTION_HIGH + 7), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "enemy out of melee",
-        NextAction::array(0,
-                          new NextAction("stealth", ACTION_NORMAL + 9),
-                          new NextAction("sprint", ACTION_NORMAL + 8),
-                          new NextAction("reach melee", ACTION_NORMAL + 7),
+        NextAction::array(0, new NextAction("tricks of the trade on main tank", ACTION_HIGH + 7),
                           NULL)));
+
+    triggers.push_back(
+        new TriggerNode("enemy out of melee",
+                        NextAction::array(0, new NextAction("stealth", ACTION_NORMAL + 9),
+                                          new NextAction("sprint", ACTION_NORMAL + 8),
+                                          new NextAction("reach melee", ACTION_NORMAL + 7), NULL)));
 }

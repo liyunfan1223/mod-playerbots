@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_BUDGETVALUES_H
@@ -26,15 +28,17 @@ enum class NeedMoneyFor : uint32
 
 class MaxGearRepairCostValue : public Uint32CalculatedValue
 {
-public:
-    MaxGearRepairCostValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "max repair cost", 60) {}
+   public:
+    MaxGearRepairCostValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "max repair cost", 60)
+    {
+    }
 
     uint32 Calculate() override;
 };
 
 class RepairCostValue : public Uint32CalculatedValue
 {
-public:
+   public:
     RepairCostValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "repair cost", 60) {}
 
     uint32 Calculate() override;
@@ -42,7 +46,7 @@ public:
 
 class TrainCostValue : public Uint32CalculatedValue
 {
-public:
+   public:
     TrainCostValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "train cost", 60) {}
 
     uint32 Calculate() override;
@@ -50,26 +54,33 @@ public:
 
 class MoneyNeededForValue : public Uint32CalculatedValue, public Qualified
 {
-public:
-    MoneyNeededForValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "money needed for", 60) {}
+   public:
+    MoneyNeededForValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "money needed for", 60)
+    {
+    }
 
     uint32 Calculate() override;
 };
 
 class TotalMoneyNeededForValue : public Uint32CalculatedValue, public Qualified
 {
-public:
-    TotalMoneyNeededForValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "total money needed for", 60) {}
+   public:
+    TotalMoneyNeededForValue(PlayerbotAI *botAI)
+        : Uint32CalculatedValue(botAI, "total money needed for", 60)
+    {
+    }
 
     uint32 Calculate() override;
 
-private:
-    std::vector<NeedMoneyFor> saveMoneyFor = {NeedMoneyFor::guild, NeedMoneyFor::repair, NeedMoneyFor::ammo, NeedMoneyFor::spells, NeedMoneyFor::travel};
+   private:
+    std::vector<NeedMoneyFor> saveMoneyFor = {NeedMoneyFor::guild, NeedMoneyFor::repair,
+                                              NeedMoneyFor::ammo, NeedMoneyFor::spells,
+                                              NeedMoneyFor::travel};
 };
 
 class FreeMoneyForValue : public Uint32CalculatedValue, public Qualified
 {
-public:
+   public:
     FreeMoneyForValue(PlayerbotAI *botAI) : Uint32CalculatedValue(botAI, "free money for") {}
 
     uint32 Calculate() override;
@@ -77,7 +88,7 @@ public:
 
 class ShouldGetMoneyValue : public BoolCalculatedValue
 {
-public:
+   public:
     ShouldGetMoneyValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "should get money", 2) {}
 
     bool Calculate() override;

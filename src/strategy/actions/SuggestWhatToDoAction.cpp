@@ -1,21 +1,25 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "SuggestWhatToDoAction.h"
-#include "ChannelMgr.h"
-#include "Event.h"
-#include "ItemVisitors.h"
+
 #include "AiFactory.h"
+#include "ChannelMgr.h"
 #include "ChatHelper.h"
-#include "Playerbots.h"
-#include "PlayerbotTextMgr.h"
+#include "Event.h"
 #include "GuildMgr.h"
+#include "ItemVisitors.h"
+#include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 
 std::map<std::string, uint8> SuggestWhatToDoAction::instances;
 std::map<std::string, uint8> SuggestWhatToDoAction::factions;
 
-SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI *botAI, std::string const name) : InventoryAction(botAI, name)
+SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI *botAI, std::string const name)
+    : InventoryAction(botAI, name)
 {
     suggestions.push_back(&SuggestWhatToDoAction::specificQuest);
     suggestions.push_back(&SuggestWhatToDoAction::grindReputation);
@@ -32,7 +36,9 @@ bool SuggestWhatToDoAction::Execute(Event event)
 
     std::string const qualifier = "suggest what to do";
     time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
-    botAI->GetAiObjectContext()->GetValue<time_t>("last said", qualifier)->Set(time(nullptr) + urand(1, 60));
+    botAI->GetAiObjectContext()
+        ->GetValue<time_t>("last said", qualifier)
+        ->Set(time(nullptr) + urand(1, 60));
 
     return true;
 }
@@ -103,7 +109,8 @@ void SuggestWhatToDoAction::instance()
     itemout << allowedInstances[urand(0, allowedInstances.size() - 1)];
     placeholders["%instance"] = itemout.str();
 
-    spam(BOT_TEXT2("suggest_instance", placeholders), urand(0, 1) ? 0x50 : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_instance", placeholders), urand(0, 1) ? 0x50 : 0, urand(0, 2),
+         urand(0, 2));
 }
 
 std::vector<uint32> SuggestWhatToDoAction::GetIncompletedQuests()
@@ -138,7 +145,8 @@ void SuggestWhatToDoAction::specificQuest()
     placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
     placeholders["%quest"] = chat->FormatQuest(quest);
 
-    spam(BOT_TEXT2("suggest_quest", placeholders), urand(0, 1) ? 0x18 : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_quest", placeholders), urand(0, 1) ? 0x18 : 0, urand(0, 2),
+         urand(0, 2));
 }
 
 void SuggestWhatToDoAction::grindReputation()
@@ -226,7 +234,8 @@ void SuggestWhatToDoAction::something()
     out << entry->area_name[0];
     placeholders["%zone"] = out.str();
 
-    spam(BOT_TEXT2("suggest_something", placeholders), urand(0, 1) ? 0x18 : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_something", placeholders), urand(0, 1) ? 0x18 : 0, urand(0, 2),
+         urand(0, 2));
 }
 
 void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, bool guild)
@@ -309,7 +318,7 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
 
 class FindTradeItemsVisitor : public IterateItemsVisitor
 {
-public:
+   public:
     FindTradeItemsVisitor(uint32 quality) : quality(quality), IterateItemsVisitor() {}
 
     bool Visit(Item *item) override
@@ -320,7 +329,8 @@ public:
 
         if (proto->Class == ITEM_CLASS_TRADE_GOODS && proto->Bonding == NO_BIND)
         {
-            if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 && item->GetCount() == item->GetMaxStackCount())
+            if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 &&
+                item->GetCount() == item->GetMaxStackCount())
                 stacks.push_back(proto->ItemId);
 
             items.push_back(proto->ItemId);
@@ -334,11 +344,12 @@ public:
     std::vector<uint32> stacks;
     std::vector<uint32> items;
 
-private:
+   private:
     uint32 quality;
 };
 
-SuggestTradeAction::SuggestTradeAction(PlayerbotAI *botAI) : SuggestWhatToDoAction(botAI, "suggest trade")
+SuggestTradeAction::SuggestTradeAction(PlayerbotAI *botAI)
+    : SuggestWhatToDoAction(botAI, "suggest trade")
 {
 }
 

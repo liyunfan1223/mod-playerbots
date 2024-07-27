@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "MoveToRpgTargetAction.h"
+
 #include "ChatHelper.h"
 #include "ChooseRpgTargetAction.h"
 #include "Event.h"
@@ -50,7 +53,8 @@ bool MoveToRpgTargetAction::Execute(Event event)
 
             if (guidPP.IsPlayer())
             {
-                AI_VALUE(GuidSet &, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
+                AI_VALUE(GuidSet &, "ignore rpg target")
+                    .insert(AI_VALUE(GuidPosition, "rpg target"));
 
                 RESET_AI_VALUE(GuidPosition, "rpg target");
                 return false;
@@ -58,7 +62,9 @@ bool MoveToRpgTargetAction::Execute(Event event)
         }
     }
 
-    if ((unit && unit->isMoving() && !urand(0, 20)) || !ChooseRpgTargetAction::isFollowValid(bot, wo) || guidP.distance(bot) > sPlayerbotAIConfig->reactDistance * 2 || !urand(0, 50))
+    if ((unit && unit->isMoving() && !urand(0, 20)) ||
+        !ChooseRpgTargetAction::isFollowValid(bot, wo) ||
+        guidP.distance(bot) > sPlayerbotAIConfig->reactDistance * 2 || !urand(0, 50))
     {
         AI_VALUE(GuidSet &, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
         RESET_AI_VALUE(GuidPosition, "rpg target");
@@ -79,14 +85,17 @@ bool MoveToRpgTargetAction::Execute(Event event)
     if (bot->IsWithinLOS(x, y, z))
     {
         if (!unit || !unit->isMoving())
-            angle = wo->GetAngle(bot) + (M_PI * irand(-25, 25) / 100.0); // Closest 45 degrees towards the target
+            angle = wo->GetAngle(bot) +
+                    (M_PI * irand(-25, 25) / 100.0);  // Closest 45 degrees towards the target
         else
-            angle = wo->GetOrientation() + (M_PI * irand(-25, 25) / 100.0); // 45 degrees infront of target (leading it's movement)
+            angle = wo->GetOrientation() +
+                    (M_PI * irand(-25, 25) /
+                     100.0);  // 45 degrees infront of target (leading it's movement)
 
         distance = frand(0.5f, 1.f);
     }
     else
-        angle = 2 * M_PI * urand(0, 100) / 100.0; // A circle around the target.
+        angle = 2 * M_PI * urand(0, 100) / 100.0;  // A circle around the target.
 
     x += cos(angle) * INTERACTION_DISTANCE * distance;
     y += sin(angle) * INTERACTION_DISTANCE * distance;
@@ -120,7 +129,8 @@ bool MoveToRpgTargetAction::isUseful()
         return false;
 
     TravelTarget *travelTarget = AI_VALUE(TravelTarget *, "travel target");
-    if (travelTarget->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot, *travelTarget->getPosition()))
+    if (travelTarget->isTraveling() &&
+        ChooseRpgTargetAction::isFollowValid(bot, *travelTarget->getPosition()))
         return false;
 
     if (guidP.distance(bot) < INTERACTION_DISTANCE)

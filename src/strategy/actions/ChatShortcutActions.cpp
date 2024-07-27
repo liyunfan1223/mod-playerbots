@@ -1,12 +1,15 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "ChatShortcutActions.h"
+
 #include "Event.h"
 #include "Formations.h"
-#include "PositionValue.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 
 void ReturnPositionResetAction::ResetReturnPosition()
 {
@@ -55,7 +58,8 @@ bool FollowChatShortcutAction::Execute(Event event)
             if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
                 return false;
 
-            moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
+            moved =
+                MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
         }
 
         if (moved)
@@ -66,7 +70,8 @@ bool FollowChatShortcutAction::Execute(Event event)
     }
 
     /* Default mechanics takes care of this now.
-    if (bot->GetMapId() != master->GetMapId() || (master && bot->GetDistance(master) > sPlayerbotAIConfig->sightDistance))
+    if (bot->GetMapId() != master->GetMapId() || (master && bot->GetDistance(master) >
+    sPlayerbotAIConfig->sightDistance))
     {
         if (bot->isDead())
         {
@@ -76,8 +81,8 @@ bool FollowChatShortcutAction::Execute(Event event)
         else
             botAI->TellMaster("You are too far away from me! I will there soon.");
 
-        bot->TeleportTo(master->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), master->GetOrientation());
-        return true;
+        bot->TeleportTo(master->GetMapId(), master->GetPositionX(), master->GetPositionY(),
+    master->GetPositionZ(), master->GetOrientation()); return true;
     }
     */
 
@@ -113,7 +118,8 @@ bool FleeChatShortcutAction::Execute(Event event)
 
     ResetReturnPosition();
 
-    if (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig->sightDistance)
+    if (bot->GetMapId() != master->GetMapId() ||
+        bot->GetDistance(master) > sPlayerbotAIConfig->sightDistance)
     {
         botAI->TellError("I will not flee with you - too far away");
         return true;

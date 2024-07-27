@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_CHANGETALENTSACTION_H
@@ -12,13 +14,16 @@ class PlayerbotAI;
 
 class ChangeTalentsAction : public Action
 {
-public:
-    ChangeTalentsAction(PlayerbotAI *botAI, std::string const name = "talents") : Action(botAI, name) {}
+   public:
+    ChangeTalentsAction(PlayerbotAI *botAI, std::string const name = "talents")
+        : Action(botAI, name)
+    {
+    }
 
     bool Execute(Event event);
     // bool AutoSelectTalents(std::ostringstream* out);
 
-private:
+   private:
     // std::vector<TalentPath*> getPremadePaths(std::string const findName);
     // std::vector<TalentPath*> getPremadePaths(TalentSpec* oldSpec);
     // TalentPath* getPremadePath(uint32 id);
@@ -33,7 +38,7 @@ private:
 
 class AutoSetTalentsAction : public ChangeTalentsAction
 {
-public:
+   public:
     AutoSetTalentsAction(PlayerbotAI *botAI) : ChangeTalentsAction(botAI, "auto talents") {}
 
     bool Execute(Event event) override;

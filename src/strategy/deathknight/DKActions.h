@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_DKACTIONS_H
@@ -12,25 +14,25 @@ class PlayerbotAI;
 
 class CastBloodPresenceAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastBloodPresenceAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "blood presence") {}
 };
 
 class CastFrostPresenceAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastFrostPresenceAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "frost presence") {}
 };
 
 class CastUnholyPresenceAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastUnholyPresenceAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "unholy presence") {}
 };
 
 class CastDeathchillAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastDeathchillAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "deathchill") {}
 
     NextAction **getPrerequisites() override;
@@ -38,7 +40,7 @@ public:
 
 class CastDarkCommandAction : public CastSpellAction
 {
-public:
+   public:
     CastDarkCommandAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "dark command") {}
 };
 
@@ -48,8 +50,11 @@ END_SPELL_ACTION()
 // Unholy presence
 class CastUnholyMeleeSpellAction : public CastMeleeSpellAction
 {
-public:
-    CastUnholyMeleeSpellAction(PlayerbotAI *botAI, std::string const spell) : CastMeleeSpellAction(botAI, spell) {}
+   public:
+    CastUnholyMeleeSpellAction(PlayerbotAI *botAI, std::string const spell)
+        : CastMeleeSpellAction(botAI, spell)
+    {
+    }
 
     NextAction **getPrerequisites() override;
 };
@@ -57,8 +62,11 @@ public:
 // Frost presence
 class CastFrostMeleeSpellAction : public CastMeleeSpellAction
 {
-public:
-    CastFrostMeleeSpellAction(PlayerbotAI *botAI, std::string const spell) : CastMeleeSpellAction(botAI, spell) {}
+   public:
+    CastFrostMeleeSpellAction(PlayerbotAI *botAI, std::string const spell)
+        : CastMeleeSpellAction(botAI, spell)
+    {
+    }
 
     NextAction **getPrerequisites() override;
 };
@@ -66,15 +74,18 @@ public:
 // Blood presence
 class CastBloodMeleeSpellAction : public CastMeleeSpellAction
 {
-public:
-    CastBloodMeleeSpellAction(PlayerbotAI *botAI, std::string const spell) : CastMeleeSpellAction(botAI, spell) {}
+   public:
+    CastBloodMeleeSpellAction(PlayerbotAI *botAI, std::string const spell)
+        : CastMeleeSpellAction(botAI, spell)
+    {
+    }
 
     NextAction **getPrerequisites() override;
 };
 
 class CastRuneStrikeAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastRuneStrikeAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "rune strike") {}
 };
 
@@ -84,7 +95,7 @@ public:
 
 class CastPestilenceAction : public CastSpellAction
 {
-public:
+   public:
     CastPestilenceAction(PlayerbotAI *ai) : CastSpellAction(ai, "pestilence") {}
     ActionThreatType getThreatType() override { return ActionThreatType::None; }
 };
@@ -95,7 +106,7 @@ public:
 
 class CastHowlingBlastAction : public CastSpellAction
 {
-public:
+   public:
     CastHowlingBlastAction(PlayerbotAI *ai) : CastSpellAction(ai, "howling blast") {}
 };
 
@@ -105,21 +116,24 @@ public:
 
 class CastIcyTouchAction : public CastSpellAction
 {
-public:
+   public:
     CastIcyTouchAction(PlayerbotAI *ai) : CastSpellAction(ai, "icy touch") {}
 };
 
 class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
-public:
-    CastIcyTouchOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true, .0f) {}
+   public:
+    CastIcyTouchOnAttackerAction(PlayerbotAI *botAI)
+        : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true, .0f)
+    {
+    }
 };
 
 // debuff ps
 
 class CastPlagueStrikeAction : public CastSpellAction
 {
-public:
+   public:
     CastPlagueStrikeAction(PlayerbotAI *ai) : CastSpellAction(ai, "plague strike") {}
 };
 // BEGIN_DEBUFF_ACTION(CastPlagueStrikeAction, "plague strike")
@@ -127,8 +141,11 @@ public:
 
 class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
-public:
-    CastPlagueStrikeOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true, .0f) {}
+   public:
+    CastPlagueStrikeOnAttackerAction(PlayerbotAI *botAI)
+        : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true, .0f)
+    {
+    }
 };
 
 // debuff
@@ -137,25 +154,28 @@ END_SPELL_ACTION()
 
 class CastMarkOfBloodOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
-public:
-    CastMarkOfBloodOnAttackerAction(PlayerbotAI *botAI) : CastDebuffSpellOnAttackerAction(botAI, "mark of blood", true) {}
+   public:
+    CastMarkOfBloodOnAttackerAction(PlayerbotAI *botAI)
+        : CastDebuffSpellOnAttackerAction(botAI, "mark of blood", true)
+    {
+    }
 };
 
 class CastUnholyBlightAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastUnholyBlightAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "unholy blight") {}
 };
 
 class CastSummonGargoyleAction : public CastSpellAction
 {
-public:
+   public:
     CastSummonGargoyleAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "summon gargoyle") {}
 };
 
 class CastGhoulFrenzyAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastGhoulFrenzyAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "ghoul frenzy") {}
     std::string const GetTargetName() override { return "pet target"; }
 };
@@ -171,176 +191,195 @@ END_SPELL_ACTION()
 
 class CastChainsOfIceAction : public CastSpellAction
 {
-public:
+   public:
     CastChainsOfIceAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "chains of ice") {}
 };
 
 class CastHungeringColdAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastHungeringColdAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "hungering cold") {}
 };
 
 class CastHeartStrikeAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastHeartStrikeAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "heart strike") {}
 };
 
 class CastBloodStrikeAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastBloodStrikeAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "blood strike") {}
 };
 
 class CastFrostStrikeAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastFrostStrikeAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "frost strike") {}
 };
 
 class CastObliterateAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastObliterateAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "obliterate") {}
 };
 
 class CastDeathStrikeAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastDeathStrikeAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "death strike") {}
 };
 
 class CastScourgeStrikeAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastScourgeStrikeAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "scourge strike") {}
 };
 
 class CastDeathCoilAction : public CastSpellAction
 {
-public:
+   public:
     CastDeathCoilAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "death coil") {}
 };
 
 class CastBloodBoilAction : public CastSpellAction
 {
-public:
+   public:
     CastBloodBoilAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "blood boil") {}
 };
 
 class CastDeathAndDecayAction : public CastSpellAction
 {
-public:
+   public:
     CastDeathAndDecayAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "death and decay") {}
 };
 
 class CastHornOfWinterAction : public CastSpellAction
 {
-public:
+   public:
     CastHornOfWinterAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "horn of winter") {}
 };
 
 class CastImprovedIcyTalonsAction : public CastBuffSpellAction
 {
-public:
-    CastImprovedIcyTalonsAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "improved icy talons") {}
+   public:
+    CastImprovedIcyTalonsAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "improved icy talons")
+    {
+    }
 };
 
 class CastBoneShieldAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastBoneShieldAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "bone shield") {}
 };
 
 class CastDeathPactAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastDeathPactAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "death pact") {}
 };
 
 class CastDeathRuneMasteryAction : public CastBuffSpellAction
 {
-public:
-    CastDeathRuneMasteryAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "death rune mastery") {}
+   public:
+    CastDeathRuneMasteryAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "death rune mastery")
+    {
+    }
 };
 
 class CastDancingRuneWeaponAction : public CastSpellAction
 {
-public:
-    CastDancingRuneWeaponAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "dancing rune weapon") {}
+   public:
+    CastDancingRuneWeaponAction(PlayerbotAI *botAI) : CastSpellAction(botAI, "dancing rune weapon")
+    {
+    }
 };
 
 class CastEmpowerRuneWeaponAction : public CastBuffSpellAction
 {
-public:
-    CastEmpowerRuneWeaponAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "empower rune weapon") {}
+   public:
+    CastEmpowerRuneWeaponAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "empower rune weapon")
+    {
+    }
 };
 
 class CastArmyOfTheDeadAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastArmyOfTheDeadAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "army of the dead") {}
 };
 
 class CastRaiseDeadAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastRaiseDeadAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "raise dead") {}
     virtual bool Execute(Event event) override;
 };
 
 class CastKillingMachineAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastKillingMachineAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "killing machine") {}
 };
 
 class CastIceboundFortitudeAction : public CastBuffSpellAction
 {
-public:
-    CastIceboundFortitudeAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "icebound fortitude") {}
+   public:
+    CastIceboundFortitudeAction(PlayerbotAI *botAI)
+        : CastBuffSpellAction(botAI, "icebound fortitude")
+    {
+    }
 };
 
 class CastUnbreakableArmorAction : public CastBuffSpellAction
 {
-public:
-    CastUnbreakableArmorAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "unbreakable armor") {}
+   public:
+    CastUnbreakableArmorAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "unbreakable armor")
+    {
+    }
 };
 
 class CastVampiricBloodAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastVampiricBloodAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "vampiric blood") {}
 };
 
 class CastMindFreezeAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastMindFreezeAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "mind freeze") {}
 };
 
 class CastStrangulateAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastStrangulateAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "strangulate") {}
 };
 
 class CastMindFreezeOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
 {
-public:
-    CastMindFreezeOnEnemyHealerAction(PlayerbotAI *botAI) : CastSpellOnEnemyHealerAction(botAI, "mind freeze") {}
+   public:
+    CastMindFreezeOnEnemyHealerAction(PlayerbotAI *botAI)
+        : CastSpellOnEnemyHealerAction(botAI, "mind freeze")
+    {
+    }
 };
 
 class CastRuneTapAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastRuneTapAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "rune tap") {}
 };
 
 class CastBloodTapAction : public CastMeleeSpellAction
 {
-public:
+   public:
     CastBloodTapAction(PlayerbotAI *botAI) : CastMeleeSpellAction(botAI, "blood tap") {}
 };
 

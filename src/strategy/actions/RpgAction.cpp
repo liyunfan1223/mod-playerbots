@@ -1,8 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "RpgAction.h"
+
+#include <random>
+
 #include "BattlegroundMgr.h"
 #include "ChatHelper.h"
 #include "EmoteAction.h"
@@ -11,14 +16,13 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-#include <random>
-
 bool RpgAction::Execute(Event event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
     if (!guidP && botAI->GetMaster())
     {
-        if (WorldObject *target = ObjectAccessor::GetWorldObject(*bot, botAI->GetMaster()->GetTarget()))
+        if (WorldObject *target =
+                ObjectAccessor::GetWorldObject(*bot, botAI->GetMaster()->GetTarget()))
         {
             guidP = GuidPosition(target);
             if (guidP)
@@ -38,18 +42,15 @@ bool RpgAction::Execute(Event event)
     return true;
 }
 
-bool RpgAction::isUseful()
-{
-    return AI_VALUE(GuidPosition, "rpg target");
-}
+bool RpgAction::isUseful() { return AI_VALUE(GuidPosition, "rpg target"); }
 
 bool RpgAction::SetNextRpgAction()
 {
     Strategy *rpgStrategy = botAI->GetAiObjectContext()->GetStrategy("rpg");
 
-    std::vector<Action*> actions;
+    std::vector<Action *> actions;
     std::vector<uint32> relevances;
-    std::vector<TriggerNode*> triggerNodes;
+    std::vector<TriggerNode *> triggerNodes;
     rpgStrategy->InitTriggers(triggerNodes);
 
     for (auto &triggerNode : triggerNodes)
@@ -93,11 +94,13 @@ bool RpgAction::SetNextRpgAction()
         return false;
 
     std::mt19937 gen(time(0));
-    sTravelMgr->weighted_shuffle(actions.begin(), actions.end(), relevances.begin(), relevances.end(), gen);
+    sTravelMgr->weighted_shuffle(actions.begin(), actions.end(), relevances.begin(),
+                                 relevances.end(), gen);
 
     Action *action = actions.front();
 
-    for (std::vector<TriggerNode*>::iterator i = triggerNodes.begin(); i != triggerNodes.end(); i++)
+    for (std::vector<TriggerNode *>::iterator i = triggerNodes.begin(); i != triggerNodes.end();
+         i++)
     {
         TriggerNode *trigger = *i;
         delete trigger;

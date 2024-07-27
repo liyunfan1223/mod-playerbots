@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICPALADINSTRATEGYACTIONNODEFACTORY_H
@@ -12,7 +14,7 @@ class PlayerbotAI;
 
 class GenericPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     GenericPaladinStrategyActionNodeFactory()
     {
         // creators["seal of light"] = &seal_of_light;
@@ -46,7 +48,7 @@ public:
         creators["divine sacrifice"] = &divine_sacrifice;
     }
 
-private:
+   private:
     static ActionNode *blessing_of_sanctuary(PlayerbotAI *ai)
     {
         return new ActionNode("blessing of sanctuary",
@@ -93,15 +95,17 @@ private:
     {
         return new ActionNode("lay on hands",
                               /*P*/ nullptr,
-                              /*A*/ nullptr, // NextAction::array(0, new NextAction("divine shield"), new NextAction("flash of light"), NULL),
+                              /*A*/ nullptr,  // NextAction::array(0, new NextAction("divine
+                                              // shield"), new NextAction("flash of light"), NULL),
                               /*C*/ nullptr);
     }
     static ActionNode *lay_on_hands_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode("lay on hands on party",
-                              /*P*/ nullptr,
-                              /*A*/ nullptr, // NextAction::array(0, new NextAction("flash of light"), NULL),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "lay on hands on party",
+            /*P*/ nullptr,
+            /*A*/ nullptr,  // NextAction::array(0, new NextAction("flash of light"), NULL),
+            /*C*/ nullptr);
     }
     // static ActionNode* seal_of_light(PlayerbotAI* ai)
     // {
@@ -133,17 +137,19 @@ private:
     }
     static ActionNode *cleanse_poison_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode("cleanse poison on party",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("purify poison on party"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "cleanse poison on party",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("purify poison on party"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *cleanse_disease_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode("cleanse disease on party",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("purify disease on party"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "cleanse disease on party",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("purify disease on party"), nullptr),
+            /*C*/ nullptr);
     }
     // static ActionNode* seal_of_wisdom(PlayerbotAI* ai)
     // {
@@ -154,45 +160,51 @@ private:
     // }
     static ActionNode *seal_of_justice(PlayerbotAI *ai)
     {
-        return new ActionNode("seal of justice",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "seal of justice",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *hand_of_reckoning(PlayerbotAI *ai)
     {
-        return new ActionNode("hand of reckoning",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("righteous defense"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "hand of reckoning",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("righteous defense"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *righteous_defense(PlayerbotAI *ai)
     {
-        return new ActionNode("righteous defense",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("avenger's shield"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "righteous defense",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("avenger's shield"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *avengers_shield(PlayerbotAI *ai)
     {
-        return new ActionNode("avenger's shield",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("judgement of wisdom"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "avenger's shield",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("judgement of wisdom"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *divine_sacrifice(PlayerbotAI *ai)
     {
-        return new ActionNode("divine sacrifice",
-                              /*P*/ nullptr,
-                              /*A*/ nullptr,
-                              /*C*/ NextAction::array(0, new NextAction("cancel divine sacrifice"), nullptr));
+        return new ActionNode(
+            "divine sacrifice",
+            /*P*/ nullptr,
+            /*A*/ nullptr,
+            /*C*/ NextAction::array(0, new NextAction("cancel divine sacrifice"), nullptr));
     }
     static ActionNode *judgement_of_wisdom(PlayerbotAI *ai)
     {
-        return new ActionNode("judgement of wisdom",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("judgement of light"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "judgement of wisdom",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("judgement of light"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *judgement(PlayerbotAI *ai)
     {
@@ -203,10 +215,11 @@ private:
     }
     static ActionNode *divine_shield(PlayerbotAI *ai)
     {
-        return new ActionNode("divine shield",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("divine protection"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "divine shield",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("divine protection"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *flash_of_light(PlayerbotAI *ai)
     {
@@ -217,10 +230,11 @@ private:
     }
     static ActionNode *flash_of_light_on_party(PlayerbotAI *ai)
     {
-        return new ActionNode("flash of light on party",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("holy light on party"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "flash of light on party",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("holy light on party"), nullptr),
+            /*C*/ nullptr);
     }
     static ActionNode *holy_wrath(PlayerbotAI *ai)
     {
@@ -238,10 +252,11 @@ private:
     }
     static ActionNode *seal_of_command(PlayerbotAI *ai)
     {
-        return new ActionNode("seal of command",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "seal of command",
+            /*P*/ nullptr,
+            /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+            /*C*/ nullptr);
     }
 };
 

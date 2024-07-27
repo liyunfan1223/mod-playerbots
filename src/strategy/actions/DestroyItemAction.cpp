@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "DestroyItemAction.h"
+
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "Playerbots.h"
@@ -24,7 +27,7 @@ bool DestroyItemAction::Execute(Event event)
 void DestroyItemAction::DestroyItem(FindItemVisitor *visitor)
 {
     IterateItems(visitor);
-    std::vector<Item*> items = visitor->GetResult();
+    std::vector<Item *> items = visitor->GetResult();
     for (Item *item : items)
     {
         std::ostringstream out;
@@ -35,10 +38,7 @@ void DestroyItemAction::DestroyItem(FindItemVisitor *visitor)
     }
 }
 
-bool SmartDestroyItemAction::isUseful()
-{
-    return !botAI->HasActivePlayerMaster();
-}
+bool SmartDestroyItemAction::isUseful() { return !botAI->HasActivePlayerMaster(); }
 
 bool SmartDestroyItemAction::Execute(Event event)
 {
@@ -50,7 +50,7 @@ bool SmartDestroyItemAction::Execute(Event event)
     // only destoy grey items if with real player/guild
     if (botAI->HasRealPlayerMaster() && botAI->IsInRealGuild())
     {
-        std::set<Item*> items;
+        std::set<Item *> items;
         FindItemsToTradeByQualityVisitor visitor(ITEM_QUALITY_POOR, 5);
         IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
         items.insert(visitor.GetResult().begin(), visitor.GetResult().end());
@@ -68,23 +68,28 @@ bool SmartDestroyItemAction::Execute(Event event)
         return true;
     }
 
-    std::vector<uint32> bestToDestroy = {ITEM_USAGE_NONE}; // First destroy anything useless.
+    std::vector<uint32> bestToDestroy = {ITEM_USAGE_NONE};  // First destroy anything useless.
 
-    if (!AI_VALUE(bool, "can sell") && AI_VALUE(bool, "should get money")) // We need money so quest items are less important since they can't directly be sold.
+    if (!AI_VALUE(bool, "can sell") &&
+        AI_VALUE(bool, "should get money"))  // We need money so quest items are less important
+                                             // since they can't directly be sold.
         bestToDestroy.push_back(ITEM_USAGE_QUEST);
-    else // We don't need money so destroy the cheapest stuff.
+    else  // We don't need money so destroy the cheapest stuff.
     {
         bestToDestroy.push_back(ITEM_USAGE_VENDOR);
         bestToDestroy.push_back(ITEM_USAGE_AH);
     }
 
     // If we still need room
-    bestToDestroy.push_back(ITEM_USAGE_SKILL); // Items that might help tradeskill are more important than above but still expenable.
-    bestToDestroy.push_back(ITEM_USAGE_USE);   // These are more likely to be usefull 'soon' but still expenable.
+    bestToDestroy.push_back(ITEM_USAGE_SKILL);  // Items that might help tradeskill are more
+                                                // important than above but still expenable.
+    bestToDestroy.push_back(
+        ITEM_USAGE_USE);  // These are more likely to be usefull 'soon' but still expenable.
 
     for (auto &usage : bestToDestroy)
     {
-        std::vector<Item*> items = AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(usage));
+        std::vector<Item *> items =
+            AI_VALUE2(std::vector<Item *>, "inventory items", "usage " + std::to_string(usage));
         std::reverse(items.begin(), items.end());
 
         for (auto &item : items)

@@ -1,16 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_PLAYERbotAICONFIG_H
 #define _PLAYERBOT_PLAYERbotAICONFIG_H
 
+#include <mutex>
+
 #include "Common.h"
 #include "DBCEnums.h"
 #include "SharedDefines.h"
 #include "Talentspec.h"
-
-#include <mutex>
 
 enum class BotCheatMask : uint32
 {
@@ -37,7 +39,7 @@ enum class HealingManaEfficiency : uint8
 
 class PlayerbotAIConfig
 {
-public:
+   public:
     PlayerbotAIConfig() {};
     static PlayerbotAIConfig *instance()
     {
@@ -55,11 +57,12 @@ public:
     bool enabled;
     bool allowGuildBots, allowPlayerBots;
     uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime,
-        expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay,
-        errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
+        expireActionTime, dispelAuraDuration, passiveDelay, repeatDelay, errorDelay, rpgDelay,
+        sitDelay, returnDelay, lootDelay;
     float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance,
-        fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance,
-        aoeRadius, rpgDistance, targetPosRecalcDistance, farDistance, healDistance, aggroDistance;
+        fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance,
+        contactDistance, aoeRadius, rpgDistance, targetPosRecalcDistance, farDistance, healDistance,
+        aggroDistance;
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
     uint32 lowMana, mediumMana;
     bool autoSaveMana;
@@ -84,7 +87,8 @@ public:
     float randomBotMaxLevelChance;
     float randomBotRpgChance;
     uint32 minRandomBots, maxRandomBots;
-    uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval, randomBotCountChangeMaxInterval;
+    uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval,
+        randomBotCountChangeMaxInterval;
     uint32 minRandomBotInWorldTime, maxRandomBotInWorldTime;
     uint32 minRandomBotRandomizeTime, maxRandomBotRandomizeTime;
     uint32 minRandomBotChangeStrategyTime, maxRandomBotChangeStrategyTime;
@@ -205,7 +209,7 @@ public:
     bool randomBotSayWithoutMaster;
     bool sayWhenCollectingItems;
     bool randomBotGroupNearby;
-    uint32 tweakValue; // Debugging config
+    uint32 tweakValue;  // Debugging config
 
     uint32 randomBotArenaTeamCount;
     bool deleteRandomBotArenaTeams;
@@ -229,7 +233,11 @@ public:
     int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
 
     std::string const GetTimestampStr();
-    bool hasLog(std::string const fileName) { return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) != allowedLogFiles.end(); };
+    bool hasLog(std::string const fileName)
+    {
+        return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) !=
+               allowedLogFiles.end();
+    };
     bool openLog(std::string const fileName, char const *mode = "a");
     bool isLogOpen(std::string const fileName)
     {
@@ -239,7 +247,8 @@ public:
     void log(std::string const fileName, const char *str, ...);
 
     void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
-    static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
+    static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls,
+                                                                  std::string temp_talents_order);
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

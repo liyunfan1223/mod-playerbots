@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICWARRIORSTRATEGY_H
@@ -12,7 +14,7 @@ class PlayerbotAI;
 // Stance requirements
 class WarriorStanceRequirementActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     WarriorStanceRequirementActionNodeFactory()
     {
         // battle only
@@ -39,7 +41,7 @@ public:
         creators["intervene"] = &intervene;
     }
 
-private:
+   private:
     ACTION_NODE_P(charge, "charge", "battle stance");
     ACTION_NODE_P(mocking_blow, "mocking blow", "battle stance");
     ACTION_NODE_P(overpower, "overpower", "battle stance");
@@ -60,7 +62,7 @@ private:
 
 class GenericWarriorStrategy : public CombatStrategy
 {
-public:
+   public:
     GenericWarriorStrategy(PlayerbotAI *botAI);
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -69,7 +71,7 @@ public:
 
 class WarrirorAoeStrategy : public CombatStrategy
 {
-public:
+   public:
     WarrirorAoeStrategy(PlayerbotAI *botAI);
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

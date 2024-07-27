@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_DPSROGUESTRATEGY_H
@@ -12,7 +14,7 @@ class PlayerbotAI;
 
 class DpsRogueStrategy : public MeleeCombatStrategy
 {
-public:
+   public:
     DpsRogueStrategy(PlayerbotAI *botAI);
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -23,7 +25,7 @@ public:
 
 class StealthedRogueStrategy : public Strategy
 {
-public:
+   public:
     StealthedRogueStrategy(PlayerbotAI *botAI);
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -33,7 +35,7 @@ public:
 
 class StealthStrategy : public Strategy
 {
-public:
+   public:
     StealthStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
     // virtual int GetType() { return STRATEGY_TYPE_NONCOMBAT; }
@@ -43,7 +45,7 @@ public:
 
 class RogueAoeStrategy : public Strategy
 {
-public:
+   public:
     RogueAoeStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -52,7 +54,7 @@ public:
 
 class RogueBoostStrategy : public Strategy
 {
-public:
+   public:
     RogueBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -61,7 +63,7 @@ public:
 
 class RogueCcStrategy : public Strategy
 {
-public:
+   public:
     RogueCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

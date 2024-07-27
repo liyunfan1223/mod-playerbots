@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "BankAction.h"
+
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "Playerbots.h"
@@ -36,8 +39,8 @@ bool BankAction::ExecuteBank(std::string const text, Unit *bank)
     bool result = false;
     if (text[0] == '-')
     {
-        std::vector<Item*> found = parseItems(text.substr(1), ITERATE_ITEMS_IN_BANK);
-        for (std::vector<Item*>::iterator i = found.begin(); i != found.end(); i++)
+        std::vector<Item *> found = parseItems(text.substr(1), ITERATE_ITEMS_IN_BANK);
+        for (std::vector<Item *>::iterator i = found.begin(); i != found.end(); i++)
         {
             Item *item = *i;
             result &= Withdraw(item->GetTemplate()->ItemId);
@@ -45,11 +48,11 @@ bool BankAction::ExecuteBank(std::string const text, Unit *bank)
     }
     else
     {
-        std::vector<Item*> found = parseItems(text, ITERATE_ITEMS_IN_BAGS);
+        std::vector<Item *> found = parseItems(text, ITERATE_ITEMS_IN_BAGS);
         if (found.empty())
             return false;
 
-        for (std::vector<Item*>::iterator i = found.begin(); i != found.end(); i++)
+        for (std::vector<Item *>::iterator i = found.begin(); i != found.end(); i++)
         {
             Item *item = *i;
             if (!item)
@@ -143,7 +146,7 @@ Item *BankAction::FindItemInBank(uint32 ItemId)
             if (!pItemProto)
                 continue;
 
-            if (pItemProto->ItemId == ItemId) // have required item
+            if (pItemProto->ItemId == ItemId)  // have required item
                 return pItem;
         }
     }

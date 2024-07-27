@@ -1,5 +1,6 @@
+#include "RaidUlduarTriggers.h"
+
 #include "EventMap.h"
 #include "Playerbots.h"
-#include "RaidUlduarTriggers.h"
 #include "ScriptedCreature.h"
 #include "Trigger.h"

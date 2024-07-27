@@ -1,10 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "GossipHelloAction.h"
-#include "GossipDef.h"
+
 #include "Event.h"
+#include "GossipDef.h"
 #include "Playerbots.h"
 
 bool GossipHelloAction::Execute(Event event)
@@ -30,11 +33,15 @@ bool GossipHelloAction::Execute(Event event)
     Creature *pCreature = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
     if (!pCreature)
     {
-        LOG_DEBUG("playerbots", "[PlayerbotMgr]: HandleMasterIncomingPacket - Received  CMSG_GOSSIP_HELLO {} not found or you can't interact with him.", guid.ToString().c_str());
+        LOG_DEBUG("playerbots",
+                  "[PlayerbotMgr]: HandleMasterIncomingPacket - Received  CMSG_GOSSIP_HELLO {} not "
+                  "found or you can't interact with him.",
+                  guid.ToString().c_str());
         return false;
     }
 
-    GossipMenuItemsMapBounds pMenuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(pCreature->GetCreatureTemplate()->GossipMenuId);
+    GossipMenuItemsMapBounds pMenuItemBounds =
+        sObjectMgr->GetGossipMenuItemsMapBounds(pCreature->GetCreatureTemplate()->GossipMenuId);
     if (pMenuItemBounds.first == pMenuItemBounds.second)
         return false;
 
@@ -96,7 +103,8 @@ void GossipHelloAction::TellGossipMenus()
     if (!bot->PlayerTalkClass)
         return;
 
-    Creature *pCreature = bot->GetNPCIfCanInteractWith(GetMaster()->GetTarget(), UNIT_NPC_FLAG_NONE);
+    Creature *pCreature =
+        bot->GetNPCIfCanInteractWith(GetMaster()->GetTarget(), UNIT_NPC_FLAG_NONE);
     GossipMenu &menu = bot->PlayerTalkClass->GetGossipMenu();
     if (pCreature)
     {

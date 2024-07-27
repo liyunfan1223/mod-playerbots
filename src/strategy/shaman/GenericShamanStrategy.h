@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICSHAMANSTRATEGY_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class GenericShamanStrategy : public CombatStrategy
 {
-public:
+   public:
     GenericShamanStrategy(PlayerbotAI *botAI);
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -19,7 +21,7 @@ public:
 
 class ShamanBuffDpsStrategy : public Strategy
 {
-public:
+   public:
     ShamanBuffDpsStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -28,7 +30,7 @@ public:
 
 class ShamanBuffManaStrategy : public Strategy
 {
-public:
+   public:
     ShamanBuffManaStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -37,7 +39,7 @@ public:
 
 class ShamanCureStrategy : public Strategy
 {
-public:
+   public:
     ShamanCureStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

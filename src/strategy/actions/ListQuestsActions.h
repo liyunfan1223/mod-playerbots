@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_LISTQUESTSACTIONS_H
@@ -26,13 +28,14 @@ enum QuestTravelDetail
 
 class ListQuestsAction : public Action
 {
-public:
+   public:
     ListQuestsAction(PlayerbotAI *botAI) : Action(botAI, "quests") {}
 
     bool Execute(Event event) override;
 
-private:
-    void ListQuests(QuestListFilter filter, QuestTravelDetail travelDetail = QUEST_TRAVEL_DETAIL_NONE);
+   private:
+    void ListQuests(QuestListFilter filter,
+                    QuestTravelDetail travelDetail = QUEST_TRAVEL_DETAIL_NONE);
     uint32 ListQuests(bool completed, bool silent, QuestTravelDetail travelDetail);
 };
 

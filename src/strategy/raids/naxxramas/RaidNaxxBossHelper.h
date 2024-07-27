@@ -1,6 +1,8 @@
 #ifndef _PLAYERBOT_RAIDNAXXBOSSHELPER_H
 #define _PLAYERBOT_RAIDNAXXBOSSHELPER_H
 
+#include <string>
+
 #include "AiObject.h"
 #include "AiObjectContext.h"
 #include "EventMap.h"
@@ -10,18 +12,16 @@
 #include "Player.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
-#include "ScriptedCreature.h"
 #include "RaidNaxxScripts.h"
+#include "ScriptedCreature.h"
 #include "SharedDefines.h"
-
-#include <string>
 
 const uint32 NAXX_MAP_ID = 533;
 
 template <class BossAiType>
 class GenericBossHelper : public AiObject
 {
-public:
+   public:
     GenericBossHelper(PlayerbotAI *botAI, std::string name) : AiObject(botAI), _name(name) {}
     virtual bool UpdateBossAI()
     {
@@ -72,7 +72,7 @@ public:
         _timer = 0;
     }
 
-protected:
+   protected:
     std::string _name;
     Unit *_unit = nullptr;
     Creature *_target = nullptr;
@@ -83,19 +83,13 @@ protected:
 
 class KelthuzadBossHelper : public GenericBossHelper<Kelthuzad::boss_kelthuzad::boss_kelthuzadAI>
 {
-public:
+   public:
     KelthuzadBossHelper(PlayerbotAI *botAI) : GenericBossHelper(botAI, "kel'thuzad") {}
     const std::pair<float, float> center = {3716.19f, -5106.58f};
     const std::pair<float, float> tank_pos = {3709.19f, -5104.86f};
     const std::pair<float, float> assist_tank_pos = {3746.05f, -5112.74f};
-    bool IsPhaseOne()
-    {
-        return _event_map->GetNextEventTime(Kelthuzad::EVENT_PHASE_2) != 0;
-    }
-    bool IsPhaseTwo()
-    {
-        return !IsPhaseOne();
-    }
+    bool IsPhaseOne() { return _event_map->GetNextEventTime(Kelthuzad::EVENT_PHASE_2) != 0; }
+    bool IsPhaseTwo() { return !IsPhaseOne(); }
     Unit *GetAnyShadowFissure()
     {
         Unit *shadow_fissure = nullptr;
@@ -116,13 +110,13 @@ public:
 
 class RazuviousBossHelper : public GenericBossHelper<Razuvious::boss_razuvious::boss_razuviousAI>
 {
-public:
+   public:
     RazuviousBossHelper(PlayerbotAI *botAI) : GenericBossHelper(botAI, "instructor razuvious") {}
 };
 
 class SapphironBossHelper : public GenericBossHelper<Sapphiron::boss_sapphiron::boss_sapphironAI>
 {
-public:
+   public:
     const std::pair<float, float> mainTankPos = {3512.07f, -5274.06f};
     const std::pair<float, float> center = {3517.31f, -5253.74f};
     const float GENERIC_HEIGHT = 137.29f;
@@ -138,17 +132,12 @@ public:
             lastEventGround = nextEventGround;
         return true;
     }
-    bool IsPhaseGround()
-    {
-        return _target->GetReactState() == REACT_AGGRESSIVE;
-    }
-    bool IsPhaseFlight()
-    {
-        return !IsPhaseGround();
-    }
+    bool IsPhaseGround() { return _target->GetReactState() == REACT_AGGRESSIVE; }
+    bool IsPhaseFlight() { return !IsPhaseGround(); }
     bool JustLanded()
     {
-        return (_event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_START) - _timer) >= EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
+        return (_event_map->GetNextEventTime(Sapphiron::EVENT_FLIGHT_START) - _timer) >=
+               EVENT_FLIGHT_INTERVAL - POSITION_TIME_AFTER_LANDED;
     }
     bool WaitForExplosion()
     {
@@ -209,11 +198,12 @@ public:
         {
             angle = bot->GetAngle(dyn_obj) - M_PI + (rand_norm() - 0.5) * M_PI / 2;
         }
-        dest = {bot->GetPositionX() + cos(angle) * 5.0f, bot->GetPositionY() + sin(angle) * 5.0f, bot->GetPositionZ()};
+        dest = {bot->GetPositionX() + cos(angle) * 5.0f, bot->GetPositionY() + sin(angle) * 5.0f,
+                bot->GetPositionZ()};
         return true;
     }
 
-private:
+   private:
     const uint32 POSITION_TIME_AFTER_LANDED = 5000;
     const uint32 EVENT_FLIGHT_INTERVAL = 45000;
     uint32 lastEventGround = 0;
@@ -221,7 +211,7 @@ private:
 
 class GluthBossHelper : public GenericBossHelper<Gluth::boss_gluth::boss_gluthAI>
 {
-public:
+   public:
     const std::pair<float, float> mainTankPos25 = {3331.48f, -3109.06f};
     const std::pair<float, float> mainTankPos10 = {3278.29f, -3162.06f};
     const std::pair<float, float> beforeDecimatePos = {3267.34f, -3175.68f};
@@ -237,25 +227,24 @@ public:
         uint32 decimate = _event_map->GetNextEventTime(Gluth::EVENT_DECIMATE);
         return decimate && decimate - _timer <= 3000;
     }
-    bool JustStartCombat()
-    {
-        return _timer < 10000;
-    }
+    bool JustStartCombat() { return _timer < 10000; }
 };
 
 class LoathebBossHelper : public GenericBossHelper<Loatheb::boss_loatheb::boss_loathebAI>
 {
-public:
+   public:
     const std::pair<float, float> mainTankPos = {2877.57f, -3967.00f};
     const std::pair<float, float> rangePos = {2896.96f, -3980.61f};
     LoathebBossHelper(PlayerbotAI *botAI) : GenericBossHelper(botAI, "loatheb") {}
 };
 
-class FourhorsemanBossHelper : public GenericBossHelper<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI>
+class FourhorsemanBossHelper
+    : public GenericBossHelper<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI>
 {
-public:
+   public:
     const float posZ = 241.27f;
-    const std::pair<float, float> attractPos[2] = {{2502.03f, -2910.90f}, {2484.61f, -2947.07f}}; // left (sir zeliek), right (lady blaumeux)
+    const std::pair<float, float> attractPos[2] = {
+        {2502.03f, -2910.90f}, {2484.61f, -2947.07f}};  // left (sir zeliek), right (lady blaumeux)
     FourhorsemanBossHelper(PlayerbotAI *botAI) : GenericBossHelper(botAI, "sir zeliek") {}
     bool UpdateBossAI() override
     {
@@ -273,7 +262,8 @@ public:
         {
             return true;
         }
-        ladyAI = dynamic_cast<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI *>(lady->GetAI());
+        ladyAI =
+            dynamic_cast<FourHorsemen::boss_four_horsemen::boss_four_horsemenAI *>(lady->GetAI());
         if (!ladyAI)
         {
             return true;
@@ -304,8 +294,9 @@ public:
         Difficulty diff = bot->GetRaidDifficulty();
         if (diff == RAID_DIFFICULTY_25MAN_NORMAL)
         {
-            return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0) ||
-                   botAI->IsHealAssistantOfIndex(bot, 1) || botAI->IsHealAssistantOfIndex(bot, 2);
+            return botAI->IsRangedDpsAssistantOfIndex(bot, 0) ||
+                   botAI->IsHealAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 1) ||
+                   botAI->IsHealAssistantOfIndex(bot, 2);
         }
         return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0);
     }
@@ -320,7 +311,8 @@ public:
         {
             // Interval: 24s - 15s - 15s - ...
             posToGo = !(_timer <= 9000 || ((_timer - 9000) / 67500) % 2 == 0);
-            if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) || (raid25 && botAI->IsHealAssistantOfIndex(bot, 1)))
+            if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) ||
+                (raid25 && botAI->IsHealAssistantOfIndex(bot, 1)))
             {
                 posToGo = 1 - posToGo;
             }
@@ -359,7 +351,7 @@ public:
         return lady;
     }
 
-protected:
+   protected:
     Unit *sir = nullptr;
     Unit *lady = nullptr;
     FourHorsemen::boss_four_horsemen::boss_four_horsemenAI *ladyAI = nullptr;
@@ -370,7 +362,7 @@ protected:
 };
 class ThaddiusBossHelper : public GenericBossHelper<Thaddius::boss_thaddius::boss_thaddiusAI>
 {
-public:
+   public:
     const std::pair<float, float> tankPosFeugen = {3522.94f, -3002.60f};
     const std::pair<float, float> tankPosStalagg = {3436.14f, -2919.98f};
     const std::pair<float, float> rangedPosFeugen = {3500.45f, -2997.92f};
@@ -387,10 +379,7 @@ public:
         stalagg = AI_VALUE2(Unit *, "find target", "stalagg");
         return true;
     }
-    bool IsPhasePet()
-    {
-        return (feugen && feugen->IsAlive()) || (stalagg && stalagg->IsAlive());
-    }
+    bool IsPhasePet() { return (feugen && feugen->IsAlive()) || (stalagg && stalagg->IsAlive()); }
     bool IsPhaseTransition()
     {
         if (IsPhasePet())
@@ -399,10 +388,7 @@ public:
         }
         return _unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
     }
-    bool IsPhaseThaddius()
-    {
-        return !IsPhasePet() && !IsPhaseTransition();
-    }
+    bool IsPhaseThaddius() { return !IsPhasePet() && !IsPhaseTransition(); }
     Unit *GetNearestPet()
     {
         Unit *unit = nullptr;
@@ -410,7 +396,8 @@ public:
         {
             unit = feugen;
         }
-        if (stalagg && stalagg->IsAlive() && (!feugen || bot->GetDistance(stalagg) < bot->GetDistance(feugen)))
+        if (stalagg && stalagg->IsAlive() &&
+            (!feugen || bot->GetDistance(stalagg) < bot->GetDistance(feugen)))
         {
             unit = stalagg;
         }
@@ -433,7 +420,7 @@ public:
         return rangedPosStalagg;
     }
 
-protected:
+   protected:
     Unit *feugen = nullptr;
     Unit *stalagg = nullptr;
 };

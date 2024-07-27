@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PassiveMultiplier.h"
+
 #include "Action.h"
 #include "AiObjectContext.h"
 
@@ -34,7 +37,8 @@ float PassiveMultiplier::GetValue(Action *action)
 
     std::string const name = action->getName();
 
-    for (std::vector<std::string>::iterator i = allowedActions.begin(); i != allowedActions.end(); i++)
+    for (std::vector<std::string>::iterator i = allowedActions.begin(); i != allowedActions.end();
+         i++)
     {
         if (name == *i)
             return 1.0f;

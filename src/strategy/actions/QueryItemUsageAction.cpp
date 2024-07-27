@@ -1,11 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "QueryItemUsageAction.h"
+
+#include "ChatHelper.h"
 #include "Event.h"
 #include "ItemUsageValue.h"
-#include "ChatHelper.h"
 #include "Playerbots.h"
 
 bool QueryItemUsageAction::Execute(Event event)
@@ -37,10 +40,10 @@ bool QueryItemUsageAction::Execute(Event event)
         uint32 invCount;
         uint8 bagSlot;
 
-        data >> received;          // 0=looted, 1=from npc
-        data >> created;           // 0=received, 1=created
-        data >> isShowChatMessage; // IsShowChatMessage
-        data >> bagSlot;           // item slot, but when added to stack: 0xFFFFFFFF
+        data >> received;           // 0=looted, 1=from npc
+        data >> created;            // 0=received, 1=created
+        data >> isShowChatMessage;  // IsShowChatMessage
+        data >> bagSlot;            // item slot, but when added to stack: 0xFFFFFFFF
 
         data >> notUsed;
         data >> itemId;
@@ -75,10 +78,10 @@ uint32 QueryItemUsageAction::GetCount(ItemTemplate const *item)
 {
     uint32 total = 0;
 
-    std::vector<Item*> items = InventoryAction::parseItems(item->Name1);
+    std::vector<Item *> items = InventoryAction::parseItems(item->Name1);
     if (!items.empty())
     {
-        for (std::vector<Item*>::iterator i = items.begin(); i != items.end(); ++i)
+        for (std::vector<Item *>::iterator i = items.begin(); i != items.end(); ++i)
         {
             total += (*i)->GetCount();
         }
@@ -87,7 +90,8 @@ uint32 QueryItemUsageAction::GetCount(ItemTemplate const *item)
     return total;
 }
 
-std::string const QueryItemUsageAction::QueryItem(ItemTemplate const *item, uint32 count, uint32 total)
+std::string const QueryItemUsageAction::QueryItem(ItemTemplate const *item, uint32 count,
+                                                  uint32 total)
 {
     std::ostringstream out;
     std::string usage = QueryItemUsage(item);
@@ -113,32 +117,32 @@ std::string const QueryItemUsageAction::QueryItemUsage(ItemTemplate const *item)
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
     switch (usage)
     {
-    case ITEM_USAGE_EQUIP:
-        return "Equip";
-    case ITEM_USAGE_REPLACE:
-        return "Equip (replace)";
-    case ITEM_USAGE_BAD_EQUIP:
-        return "Equip (temporary)";
-    case ITEM_USAGE_BROKEN_EQUIP:
-        return "Broken Equip";
-    case ITEM_USAGE_QUEST:
-        return "Quest (other)";
-    case ITEM_USAGE_SKILL:
-        return "Tradeskill";
-    case ITEM_USAGE_USE:
-        return "Use";
-    case ITEM_USAGE_GUILD_TASK:
-        return "Guild task";
-    case ITEM_USAGE_DISENCHANT:
-        return "Disenchant";
-    case ITEM_USAGE_VENDOR:
-        return "Vendor";
-    case ITEM_USAGE_AH:
-        return "Auctionhouse";
-    case ITEM_USAGE_AMMO:
-        return "Ammunition";
-    default:
-        break;
+        case ITEM_USAGE_EQUIP:
+            return "Equip";
+        case ITEM_USAGE_REPLACE:
+            return "Equip (replace)";
+        case ITEM_USAGE_BAD_EQUIP:
+            return "Equip (temporary)";
+        case ITEM_USAGE_BROKEN_EQUIP:
+            return "Broken Equip";
+        case ITEM_USAGE_QUEST:
+            return "Quest (other)";
+        case ITEM_USAGE_SKILL:
+            return "Tradeskill";
+        case ITEM_USAGE_USE:
+            return "Use";
+        case ITEM_USAGE_GUILD_TASK:
+            return "Guild task";
+        case ITEM_USAGE_DISENCHANT:
+            return "Disenchant";
+        case ITEM_USAGE_VENDOR:
+            return "Vendor";
+        case ITEM_USAGE_AH:
+            return "Auctionhouse";
+        case ITEM_USAGE_AMMO:
+            return "Ammunition";
+        default:
+            break;
     }
 
     return "";
@@ -153,14 +157,15 @@ std::string const QueryItemUsageAction::QueryItemPrice(ItemTemplate const *item)
         return "";
 
     std::ostringstream msg;
-    std::vector<Item*> items = InventoryAction::parseItems(item->Name1);
+    std::vector<Item *> items = InventoryAction::parseItems(item->Name1);
     int32 sellPrice = 0;
     if (!items.empty())
     {
-        for (std::vector<Item*>::iterator i = items.begin(); i != items.end(); ++i)
+        for (std::vector<Item *>::iterator i = items.begin(); i != items.end(); ++i)
         {
             Item *sell = *i;
-            int32 price = sell->GetCount() * sell->GetTemplate()->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot);
+            int32 price = sell->GetCount() * sell->GetTemplate()->SellPrice *
+                          sRandomPlayerbotMgr->GetSellMultiplier(bot);
             if (!sellPrice || sellPrice > price)
                 sellPrice = price;
         }
@@ -198,7 +203,8 @@ std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId)
 
         uint32 questId = questTemplate->GetQuestId();
         QuestStatus status = bot->GetQuestStatus(questId);
-        if (status == QUEST_STATUS_INCOMPLETE || (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questId)))
+        if (status == QUEST_STATUS_INCOMPLETE ||
+            (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questId)))
         {
             QuestStatusData const &questStatus = i->second;
             std::string const usage = QueryQuestItem(itemId, questTemplate, &questStatus);
@@ -210,7 +216,8 @@ std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId)
     return "";
 }
 
-std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId, Quest const *questTemplate, QuestStatusData const *questStatus)
+std::string const QueryItemUsageAction::QueryQuestItem(uint32 itemId, Quest const *questTemplate,
+                                                       QuestStatusData const *questStatus)
 {
     for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {

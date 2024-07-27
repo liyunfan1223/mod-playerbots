@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "ChatFilter.h"
+
 #include "Group.h"
 #include "Playerbots.h"
 #include "RtiTargetValue.h"
@@ -17,7 +20,7 @@ std::string const ChatFilter::Filter(std::string &message)
 
 class StrategyChatFilter : public ChatFilter
 {
-public:
+   public:
     StrategyChatFilter(PlayerbotAI *botAI) : ChatFilter(botAI) {}
 
     std::string const Filter(std::string &message) override
@@ -53,7 +56,7 @@ public:
 
 class LevelChatFilter : public ChatFilter
 {
-public:
+   public:
     LevelChatFilter(PlayerbotAI *botAI) : ChatFilter(botAI) {}
 
     std::string const Filter(std::string &message) override
@@ -65,7 +68,8 @@ public:
 
         if (message.find("-") != std::string::npos)
         {
-            uint32 fromLevel = atoi(message.substr(message.find("@") + 1, message.find("-")).c_str());
+            uint32 fromLevel =
+                atoi(message.substr(message.find("@") + 1, message.find("-")).c_str());
             uint32 toLevel = atoi(message.substr(message.find("-") + 1, message.find(" ")).c_str());
 
             if (bot->GetLevel() >= fromLevel && bot->GetLevel() <= toLevel)
@@ -84,7 +88,7 @@ public:
 
 class CombatTypeChatFilter : public ChatFilter
 {
-public:
+   public:
     CombatTypeChatFilter(PlayerbotAI *botAI) : ChatFilter(botAI) {}
 
     std::string const Filter(std::string &message) override
@@ -99,32 +103,32 @@ public:
 
         switch (bot->getClass())
         {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-        case CLASS_ROGUE:
-        case CLASS_DEATH_KNIGHT:
-            if (ranged)
-                return "";
-            break;
-        case CLASS_HUNTER:
-        case CLASS_PRIEST:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-            if (melee)
-                return "";
-            break;
-        case CLASS_DRUID:
-            if (ranged && botAI->IsTank(bot))
-                return "";
-            if (melee && !botAI->IsTank(bot))
-                return "";
-            break;
-        case CLASS_SHAMAN:
-            if (melee && botAI->IsHeal(bot))
-                return "";
-            if (ranged && !botAI->IsHeal(bot))
-                return "";
-            break;
+            case CLASS_WARRIOR:
+            case CLASS_PALADIN:
+            case CLASS_ROGUE:
+            case CLASS_DEATH_KNIGHT:
+                if (ranged)
+                    return "";
+                break;
+            case CLASS_HUNTER:
+            case CLASS_PRIEST:
+            case CLASS_MAGE:
+            case CLASS_WARLOCK:
+                if (melee)
+                    return "";
+                break;
+            case CLASS_DRUID:
+                if (ranged && botAI->IsTank(bot))
+                    return "";
+                if (melee && !botAI->IsTank(bot))
+                    return "";
+                break;
+            case CLASS_SHAMAN:
+                if (melee && botAI->IsHeal(bot))
+                    return "";
+                if (ranged && !botAI->IsHeal(bot))
+                    return "";
+                break;
         }
 
         return ChatFilter::Filter(message);
@@ -133,7 +137,7 @@ public:
 
 class RtiChatFilter : public ChatFilter
 {
-public:
+   public:
     RtiChatFilter(PlayerbotAI *botAI) : ChatFilter(botAI)
     {
         rtis.push_back("@star");
@@ -167,7 +171,7 @@ public:
             if (bot->GetGUID() == rtiTarget)
                 return ChatFilter::Filter(message);
 
-            Unit *target = *botAI->GetAiObjectContext()->GetValue<Unit*>("current target");
+            Unit *target = *botAI->GetAiObjectContext()->GetValue<Unit *>("current target");
             if (!target)
                 return "";
 
@@ -185,13 +189,13 @@ public:
         return message;
     }
 
-private:
+   private:
     std::vector<std::string> rtis;
 };
 
 class ClassChatFilter : public ChatFilter
 {
-public:
+   public:
     ClassChatFilter(PlayerbotAI *botAI) : ChatFilter(botAI)
     {
         classNames["@death_knight"] = CLASS_DEATH_KNIGHT;
@@ -212,7 +216,8 @@ public:
 
         bool found = false;
         bool isClass = false;
-        for (std::map<std::string, uint8>::iterator i = classNames.begin(); i != classNames.end(); i++)
+        for (std::map<std::string, uint8>::iterator i = classNames.begin(); i != classNames.end();
+             i++)
         {
             bool isClass = message.find(i->first) == 0;
             if (isClass && bot->getClass() != i->second)
@@ -229,13 +234,13 @@ public:
         return message;
     }
 
-private:
+   private:
     std::map<std::string, uint8> classNames;
 };
 
 class SubGroupChatFilter : public ChatFilter
 {
-public:
+   public:
     SubGroupChatFilter(PlayerbotAI *botAI) : ChatFilter(botAI) {}
 
     std::string const Filter(std::string &message) override
@@ -277,7 +282,7 @@ CompositeChatFilter::CompositeChatFilter(PlayerbotAI *botAI) : ChatFilter(botAI)
 
 CompositeChatFilter::~CompositeChatFilter()
 {
-    for (std::vector<ChatFilter*>::iterator i = filters.begin(); i != filters.end(); i++)
+    for (std::vector<ChatFilter *>::iterator i = filters.begin(); i != filters.end(); i++)
         delete (*i);
 }
 
@@ -285,7 +290,7 @@ std::string const CompositeChatFilter::Filter(std::string &message)
 {
     for (uint32 j = 0; j < filters.size(); ++j)
     {
-        for (std::vector<ChatFilter*>::iterator i = filters.begin(); i != filters.end(); i++)
+        for (std::vector<ChatFilter *>::iterator i = filters.begin(); i != filters.end(); i++)
         {
             message = (*i)->Filter(message);
             if (message.empty())

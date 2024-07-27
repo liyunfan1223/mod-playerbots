@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_IMBUEACTION_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class ImbueWithPoisonAction : public Action
 {
-public:
+   public:
     ImbueWithPoisonAction(PlayerbotAI *botAI);
 
     bool Execute(Event event) override;
@@ -19,7 +21,7 @@ public:
 
 class ImbueWithStoneAction : public Action
 {
-public:
+   public:
     ImbueWithStoneAction(PlayerbotAI *botAI);
 
     bool Execute(Event event) override;
@@ -27,7 +29,7 @@ public:
 
 class ImbueWithOilAction : public Action
 {
-public:
+   public:
     ImbueWithOilAction(PlayerbotAI *botAI);
 
     bool Execute(Event event) override;
@@ -35,7 +37,7 @@ public:
 
 class TryEmergencyAction : public Action
 {
-public:
+   public:
     TryEmergencyAction(PlayerbotAI *botAI);
 
     bool Execute(Event event) override;

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICMAGESTRATEGY_H
@@ -12,17 +14,20 @@ class PlayerbotAI;
 
 class GenericMageStrategy : public RangedCombatStrategy
 {
-public:
+   public:
     GenericMageStrategy(PlayerbotAI *botAI);
 
     std::string const getName() override { return "mage"; }
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
-    uint32 GetType() const override { return RangedCombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
+    uint32 GetType() const override
+    {
+        return RangedCombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS;
+    }
 };
 
 class MageCureStrategy : public Strategy
 {
-public:
+   public:
     MageCureStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -31,7 +36,7 @@ public:
 
 class MageBoostStrategy : public Strategy
 {
-public:
+   public:
     MageBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;
@@ -40,7 +45,7 @@ public:
 
 class MageCcStrategy : public Strategy
 {
-public:
+   public:
     MageCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode *> &triggers) override;

@@ -1,19 +1,23 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "PartyMemberToHeal.h"
+
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
 class IsTargetOfHealingSpell : public SpellEntryPredicate
 {
-public:
+   public:
     bool Check(SpellInfo const *spellInfo) override
     {
         for (uint8 i = 0; i < 3; ++i)
         {
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL || spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL ||
+                spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
                 spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MECHANICAL)
                 return true;
         }
@@ -29,7 +33,6 @@ inline bool compareByHealth(Unit const *u1, Unit const *u2)
 
 Unit *PartyMemberToHeal::Calculate()
 {
-
     IsTargetOfHealingSpell predicate;
 
     Group *group = bot->GetGroup();
@@ -45,7 +48,8 @@ Unit *PartyMemberToHeal::Calculate()
         if (player && Check(player) && player->IsAlive())
         {
             uint8 health = player->GetHealthPct();
-            if (isRaid || health < sPlayerbotAIConfig->mediumHealth || !IsTargetOfSpellCast(player, predicate))
+            if (isRaid || health < sPlayerbotAIConfig->mediumHealth ||
+                !IsTargetOfSpellCast(player, predicate))
             {
                 if (player->GetDistance2d(bot) > sPlayerbotAIConfig->healDistance)
                 {
@@ -79,8 +83,10 @@ Unit *PartyMemberToHeal::Calculate()
 
 bool PartyMemberToHeal::Check(Unit *player)
 {
-    // return player && player != bot && player->GetMapId() == bot->GetMapId() && player->IsInWorld() &&
-    //     sServerFacade->GetDistance2d(bot, player) < (player->IsPlayer() && botAI->IsTank((Player*)player) ? 50.0f : 40.0f);
+    // return player && player != bot && player->GetMapId() == bot->GetMapId() &&
+    // player->IsInWorld() &&
+    //     sServerFacade->GetDistance2d(bot, player) < (player->IsPlayer() &&
+    //     botAI->IsTank((Player*)player) ? 50.0f : 40.0f);
     return player->GetMapId() == bot->GetMapId() && !player->IsCharmed() &&
            bot->GetDistance2d(player) < sPlayerbotAIConfig->healDistance * 2 &&
            bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
@@ -93,7 +99,7 @@ Unit *PartyMemberToProtect::Calculate()
     if (!group)
         return nullptr;
 
-    std::vector<Unit*> needProtect;
+    std::vector<Unit *> needProtect;
 
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
     for (GuidVector::iterator i = attackers.begin(); i != attackers.end(); ++i)

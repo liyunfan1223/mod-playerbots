@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "AttackerCountValues.h"
+
 #include "Playerbots.h"
 #include "SharedDefines.h"
 
-uint8 MyAttackerCountValue::Calculate()
-{
-    return bot->getAttackers().size();
-}
+uint8 MyAttackerCountValue::Calculate() { return bot->getAttackers().size(); }
 
 bool HasAggroValue::Calculate()
 {
@@ -24,7 +24,8 @@ bool HasAggroValue::Calculate()
         return true;
     }
     bool isMT = botAI->IsMainTank(bot);
-    if (victim && (victim->GetGUID() == bot->GetGUID() || (!isMT && victim->ToPlayer() && botAI->IsTank(victim->ToPlayer()))))
+    if (victim && (victim->GetGUID() == bot->GetGUID() ||
+                   (!isMT && victim->ToPlayer() && botAI->IsTank(victim->ToPlayer()))))
     {
         return true;
     }
@@ -53,8 +54,7 @@ uint8 AttackerCountValue::Calculate()
 
 uint8 BalancePercentValue::Calculate()
 {
-    float playerLevel = 0,
-          attackerLevel = 0;
+    float playerLevel = 0, attackerLevel = 0;
 
     if (Group *group = bot->GetGroup())
     {
@@ -80,18 +80,18 @@ uint8 BalancePercentValue::Calculate()
 
         switch (creature->GetCreatureTemplate()->rank)
         {
-        case CREATURE_ELITE_RARE:
-            level *= 2;
-            break;
-        case CREATURE_ELITE_ELITE:
-            level *= 3;
-            break;
-        case CREATURE_ELITE_RAREELITE:
-            level *= 3;
-            break;
-        case CREATURE_ELITE_WORLDBOSS:
-            level *= 50;
-            break;
+            case CREATURE_ELITE_RARE:
+                level *= 2;
+                break;
+            case CREATURE_ELITE_ELITE:
+                level *= 3;
+                break;
+            case CREATURE_ELITE_RAREELITE:
+                level *= 3;
+                break;
+            case CREATURE_ELITE_WORLDBOSS:
+                level *= 50;
+                break;
         }
 
         attackerLevel += level;
@@ -107,23 +107,23 @@ uint8 BalancePercentValue::Calculate()
 Unit *AttackerCountValue::GetTarget()
 {
     AiObjectContext *ctx = AiObject::context;
-    return ctx->GetValue<Unit*>(qualifier)->Get();
+    return ctx->GetValue<Unit *>(qualifier)->Get();
 }
 
 Unit *MyAttackerCountValue::GetTarget()
 {
     AiObjectContext *ctx = AiObject::context;
-    return ctx->GetValue<Unit*>(qualifier)->Get();
+    return ctx->GetValue<Unit *>(qualifier)->Get();
 }
 
 Unit *HasAggroValue::GetTarget()
 {
     AiObjectContext *ctx = AiObject::context;
-    return ctx->GetValue<Unit*>(qualifier)->Get();
+    return ctx->GetValue<Unit *>(qualifier)->Get();
 }
 
 Unit *BalancePercentValue::GetTarget()
 {
     AiObjectContext *ctx = AiObject::context;
-    return ctx->GetValue<Unit*>(qualifier)->Get();
+    return ctx->GetValue<Unit *>(qualifier)->Get();
 }

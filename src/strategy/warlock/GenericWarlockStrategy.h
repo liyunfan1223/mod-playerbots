@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_GENERICWARLOCKSTRATEGY_H
@@ -12,7 +14,7 @@ class PlayerbotAI;
 
 class GenericWarlockStrategy : public RangedCombatStrategy
 {
-public:
+   public:
     GenericWarlockStrategy(PlayerbotAI *botAI);
 
     std::string const getName() override { return "warlock"; }
@@ -22,7 +24,7 @@ public:
 
 class WarlockBoostStrategy : public Strategy
 {
-public:
+   public:
     WarlockBoostStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
     std::string const getName() override { return "boost"; }
@@ -31,7 +33,7 @@ public:
 
 class WarlockCcStrategy : public Strategy
 {
-public:
+   public:
     WarlockCcStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
     std::string const getName() override { return "cc"; }

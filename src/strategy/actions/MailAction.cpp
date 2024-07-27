@@ -1,18 +1,21 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "MailAction.h"
-#include "Mail.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
+#include "Mail.h"
 #include "Playerbots.h"
 
-std::map<std::string, MailProcessor*> MailAction::processors;
+std::map<std::string, MailProcessor *> MailAction::processors;
 
 class TellMailProcessor : public MailProcessor
 {
-public:
+   public:
     bool Before(PlayerbotAI *botAI) override
     {
         botAI->TellMaster("=== Mailbox ===");
@@ -69,13 +72,13 @@ public:
 
     static TellMailProcessor instance;
 
-private:
+   private:
     std::list<std::string> tells;
 };
 
 class TakeMailProcessor : public MailProcessor
 {
-public:
+   public:
     bool Process(uint32 index, Mail *mail, PlayerbotAI *botAI) override
     {
         Player *bot = botAI->GetBot();
@@ -89,7 +92,8 @@ public:
         if (mail->money)
         {
             std::ostringstream out;
-            out << mail->subject << ", |cffffff00" << ChatHelper::formatMoney(mail->money) << "|cff00ff00 processed";
+            out << mail->subject << ", |cffffff00" << ChatHelper::formatMoney(mail->money)
+                << "|cff00ff00 processed";
             botAI->TellMaster(out.str());
 
             WorldPacket packet;
@@ -115,7 +119,8 @@ public:
                 Item *item = bot->GetMItem(*i);
 
                 std::ostringstream out;
-                out << mail->subject << ", " << ChatHelper::FormatItem(item->GetTemplate()) << "|cff00ff00 processed";
+                out << mail->subject << ", " << ChatHelper::FormatItem(item->GetTemplate())
+                    << "|cff00ff00 processed";
 
                 bot->GetSession()->HandleMailTakeItem(packet);
                 botAI->TellMaster(out.str());
@@ -129,7 +134,7 @@ public:
 
     static TakeMailProcessor instance;
 
-private:
+   private:
     bool CheckBagSpace(Player *bot)
     {
         uint32 totalused = 0, total = 16;
@@ -143,7 +148,8 @@ private:
             if (Bag const *pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
             {
                 ItemTemplate const *pBagProto = pBag->GetTemplate();
-                if (pBagProto->Class == ITEM_CLASS_CONTAINER && pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
+                if (pBagProto->Class == ITEM_CLASS_CONTAINER &&
+                    pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
                     totalfree += pBag->GetFreeSlots();
             }
         }
@@ -154,7 +160,7 @@ private:
 
 class DeleteMailProcessor : public MailProcessor
 {
-public:
+   public:
     bool Process(uint32 index, Mail *mail, PlayerbotAI *botAI) override
     {
         std::ostringstream out;
@@ -169,7 +175,7 @@ public:
 
 class ReadMailProcessor : public MailProcessor
 {
-public:
+   public:
     bool Process(uint32 index, Mail *mail, PlayerbotAI *botAI) override
     {
         std::ostringstream out, body;
@@ -187,14 +193,13 @@ TakeMailProcessor TakeMailProcessor::instance;
 DeleteMailProcessor DeleteMailProcessor::instance;
 ReadMailProcessor ReadMailProcessor::instance;
 
-std::map<uint32, Mail*> filterList(std::vector<Mail*> src, std::string const filter)
+std::map<uint32, Mail *> filterList(std::vector<Mail *> src, std::string const filter)
 {
-    std::map<uint32, Mail*> result;
+    std::map<uint32, Mail *> result;
     if (filter.empty() || filter == "*")
     {
         uint32 idx = 0;
-        for (std::vector<Mail*>::iterator i = src.begin(); i != src.end(); ++i)
-            result[idx++] = *i;
+        for (std::vector<Mail *>::iterator i = src.begin(); i != src.end(); ++i) result[idx++] = *i;
 
         return result;
     }
@@ -223,8 +228,7 @@ std::map<uint32, Mail*> filterList(std::vector<Mail*> src, std::string const fil
         if (to > src.size() - 1)
             to = src.size() - 1;
 
-        for (uint32 i = from; i <= to; ++i)
-            result[i] = src[i];
+        for (uint32 i = from; i <= to; ++i) result[i] = src[i];
 
         return result;
     }
@@ -269,7 +273,9 @@ bool MailAction::Execute(Event event)
     std::string const text = event.getParam();
     if (text.empty())
     {
-        botAI->TellMaster("whisper 'mail ?' to query mailbox, 'mail take/delete/read filter' to take/delete/read mails by filter");
+        botAI->TellMaster(
+            "whisper 'mail ?' to query mailbox, 'mail take/delete/read filter' to take/delete/read "
+            "mails by filter");
         return false;
     }
 
@@ -289,9 +295,10 @@ bool MailAction::Execute(Event event)
     if (!processor->Before(botAI))
         return false;
 
-    std::vector<Mail*> mailList;
+    std::vector<Mail *> mailList;
     time_t cur_time = time(nullptr);
-    for (PlayerMails::const_iterator itr = bot->GetMails().begin(); itr != bot->GetMails().end(); ++itr)
+    for (PlayerMails::const_iterator itr = bot->GetMails().begin(); itr != bot->GetMails().end();
+         ++itr)
     {
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
             continue;
@@ -300,8 +307,8 @@ bool MailAction::Execute(Event event)
         mailList.push_back(mail);
     }
 
-    std::map<uint32, Mail*> filtered = filterList(mailList, filter);
-    for (std::map<uint32, Mail*>::iterator i = filtered.begin(); i != filtered.end(); ++i)
+    std::map<uint32, Mail *> filtered = filterList(mailList, filter);
+    for (std::map<uint32, Mail *>::iterator i = filtered.begin(); i != filtered.end(); ++i)
     {
         if (!processor->Process(i->first, i->second, botAI))
             break;
@@ -315,7 +322,7 @@ void MailProcessor::RemoveMail(Player *bot, uint32 id, ObjectGuid mailbox)
     WorldPacket packet;
     packet << mailbox;
     packet << id;
-    packet << (uint32)0; // mailTemplateId
+    packet << (uint32)0;  // mailTemplateId
     bot->GetSession()->HandleMailDelete(packet);
 }
 

@@ -1,16 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "TradeStatusAction.h"
-#include "SetCraftAction.h"
-#include "Event.h"
-#include "ItemVisitors.h"
+
 #include "CraftValue.h"
-#include "ItemUsageValue.h"
+#include "Event.h"
 #include "GuildTaskMgr.h"
-#include "Playerbots.h"
+#include "ItemUsageValue.h"
+#include "ItemVisitors.h"
 #include "PlayerbotSecurity.h"
+#include "Playerbots.h"
+#include "SetCraftAction.h"
 
 bool TradeStatusAction::Execute(Event event)
 {
@@ -25,7 +28,9 @@ bool TradeStatusAction::Execute(Event event)
         bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader);
     }
 
-    if ((trader != master || !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master)) && !traderBotAI)
+    if ((trader != master ||
+         !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master)) &&
+        !traderBotAI)
     {
         WorldPacket p;
         uint32 status = 0;
@@ -69,7 +74,8 @@ bool TradeStatusAction::Execute(Event event)
                 return false;
             }
 
-            for (std::map<uint32, uint32>::iterator i = givenItemIds.begin(); i != givenItemIds.end(); ++i)
+            for (std::map<uint32, uint32>::iterator i = givenItemIds.begin();
+                 i != givenItemIds.end(); ++i)
             {
                 uint32 itemId = i->first;
                 uint32 count = i->second;
@@ -83,7 +89,8 @@ bool TradeStatusAction::Execute(Event event)
                 sGuildTaskMgr->CheckItemTask(itemId, count, trader, bot);
             }
 
-            for (std::map<uint32, uint32>::iterator i = takenItemIds.begin(); i != takenItemIds.end(); ++i)
+            for (std::map<uint32, uint32>::iterator i = takenItemIds.begin();
+                 i != takenItemIds.end(); ++i)
             {
                 uint32 itemId = i->first;
                 uint32 count = i->second;
@@ -168,10 +175,12 @@ bool TradeStatusAction::CheckTrade()
 
         if (isGettingItem)
         {
-            if (bot->GetGroup() && bot->GetGroup()->IsMember(bot->GetTrader()->GetGUID()) && botAI->HasRealPlayerMaster())
+            if (bot->GetGroup() && bot->GetGroup()->IsMember(bot->GetTrader()->GetGUID()) &&
+                botAI->HasRealPlayerMaster())
                 botAI->TellMasterNoFacing("Thank you " + chat->FormatWorldobject(bot->GetTrader()));
             else
-                bot->Say("Thank you " + chat->FormatWorldobject(bot->GetTrader()), (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
+                bot->Say("Thank you " + chat->FormatWorldobject(bot->GetTrader()),
+                         (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
         }
         return isGettingItem;
     }
@@ -233,7 +242,8 @@ bool TradeStatusAction::CheckTrade()
 
     int32 discount = (int32)sRandomPlayerbotMgr->GetTradeDiscount(bot, trader);
     int32 delta = playerMoney - botMoney;
-    int32 moneyDelta = (int32)trader->GetTradeData()->GetMoney() - (int32)bot->GetTradeData()->GetMoney();
+    int32 moneyDelta =
+        (int32)trader->GetTradeData()->GetMoney() - (int32)bot->GetTradeData()->GetMoney();
     bool success = false;
     if (delta < 0)
     {
@@ -259,18 +269,18 @@ bool TradeStatusAction::CheckTrade()
         sRandomPlayerbotMgr->AddTradeDiscount(bot, trader, delta);
         switch (urand(0, 4))
         {
-        case 0:
-            botAI->TellMaster("A pleasure doing business with you");
-            break;
-        case 1:
-            botAI->TellMaster("Fair trade");
-            break;
-        case 2:
-            botAI->TellMaster("Thanks");
-            break;
-        case 3:
-            botAI->TellMaster("Off with you");
-            break;
+            case 0:
+                botAI->TellMaster("A pleasure doing business with you");
+                break;
+            case 1:
+                botAI->TellMaster("Fair trade");
+                break;
+            case 2:
+                botAI->TellMaster("Thanks");
+                break;
+            case 3:
+                botAI->TellMaster("Off with you");
+                break;
         }
 
         botAI->PlaySound(TEXT_EMOTE_THANK);
@@ -313,7 +323,8 @@ int32 TradeStatusAction::CalculateCost(Player *player, bool sell)
                 continue;
             }
 
-            if (player == bot && sell && craftData.itemId == proto->ItemId && craftData.IsFulfilled())
+            if (player == bot && sell && craftData.itemId == proto->ItemId &&
+                craftData.IsFulfilled())
             {
                 sum += item->GetCount() * SetCraftAction::GetCraftFee(craftData);
                 continue;
@@ -322,7 +333,8 @@ int32 TradeStatusAction::CalculateCost(Player *player, bool sell)
 
         if (sell)
         {
-            sum += item->GetCount() * proto->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot);
+            sum +=
+                item->GetCount() * proto->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot);
         }
         else
         {

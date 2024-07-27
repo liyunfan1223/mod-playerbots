@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_CHATTRIGGERCONTEXT_H
@@ -12,7 +14,7 @@ class PlayerbotAI;
 
 class ChatTriggerContext : public NamedObjectContext<Trigger>
 {
-public:
+   public:
     ChatTriggerContext()
     {
         creators["quests"] = &ChatTriggerContext::quests;
@@ -122,7 +124,7 @@ public:
         creators["disperse"] = &ChatTriggerContext::disperse;
     }
 
-private:
+   private:
     static Trigger *ra(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "ra"); }
     static Trigger *range(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "range"); }
     static Trigger *flag(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "flag"); }
@@ -135,16 +137,31 @@ private:
     static Trigger *go(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "go"); }
     static Trigger *outfit(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "outfit"); }
     static Trigger *mail(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "mail"); }
-    static Trigger *sendmail(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "sendmail"); }
-    static Trigger *formation(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "formation"); }
+    static Trigger *sendmail(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "sendmail");
+    }
+    static Trigger *formation(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "formation");
+    }
     static Trigger *stance(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "stance"); }
-    static Trigger *attackers(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "attackers"); }
+    static Trigger *attackers(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "attackers");
+    }
     static Trigger *target(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "target"); }
     static Trigger *max_dps(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "max dps"); }
-    static Trigger *save_mana(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "save mana"); }
+    static Trigger *save_mana(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "save mana");
+    }
     static Trigger *who(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "who"); }
     static Trigger *summon(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "summon"); }
-    static Trigger *position(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "position"); }
+    static Trigger *position(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "position");
+    }
     static Trigger *runaway(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "runaway"); }
     static Trigger *warning(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "warning"); }
     static Trigger *revive(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "revive"); }
@@ -155,7 +172,10 @@ private:
     static Trigger *talk(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "talk"); }
     static Trigger *flee(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "flee"); }
     static Trigger *grind(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "grind"); }
-    static Trigger *tank_attack(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "tank attack"); }
+    static Trigger *tank_attack(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "tank attack");
+    }
     static Trigger *stay(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "stay"); }
     static Trigger *follow(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "follow"); }
     static Trigger *gb(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "gb"); }
@@ -169,10 +189,22 @@ private:
     static Trigger *chat(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "chat"); }
     static Trigger *attack(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "attack"); }
     static Trigger *trainer(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "trainer"); }
-    static Trigger *maintenance(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "maintenance"); }
-    static Trigger *remove_glyph(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "remove glyph"); }
-    static Trigger *autogear(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "autogear"); }
-    static Trigger *equip_upgrade(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "equip upgrade"); }
+    static Trigger *maintenance(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "maintenance");
+    }
+    static Trigger *remove_glyph(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "remove glyph");
+    }
+    static Trigger *autogear(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "autogear");
+    }
+    static Trigger *equip_upgrade(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "equip upgrade");
+    }
     static Trigger *co(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "co"); }
     static Trigger *nc(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "nc"); }
     static Trigger *dead(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "de"); }
@@ -189,7 +221,10 @@ private:
     static Trigger *use(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "use"); }
     static Trigger *repair(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "repair"); }
     static Trigger *taxi(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "taxi"); }
-    static Trigger *teleport(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "teleport"); }
+    static Trigger *teleport(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "teleport");
+    }
     static Trigger *q(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "q"); }
     static Trigger *ll(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "ll"); }
     static Trigger *ss(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "ss"); }
@@ -198,22 +233,49 @@ private:
     static Trigger *quests(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "quests"); }
     static Trigger *stats(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "stats"); }
     static Trigger *leave(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "leave"); }
-    static Trigger *reputation(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "reputation"); }
+    static Trigger *reputation(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "reputation");
+    }
     static Trigger *log(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "log"); }
     static Trigger *los(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "los"); }
     static Trigger *aura(PlayerbotAI *ai) { return new ChatCommandTrigger(ai, "aura"); }
-    static Trigger *loot_all(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "add all loot"); }
+    static Trigger *loot_all(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "add all loot");
+    }
     static Trigger *release(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "release"); }
-    static Trigger *reset_ai(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "reset botAI"); }
+    static Trigger *reset_ai(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "reset botAI");
+    }
     static Trigger *spell(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "spell"); }
-    static Trigger *ready_check(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "ready check"); }
-    static Trigger *give_leader(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "give leader"); }
+    static Trigger *ready_check(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "ready check");
+    }
+    static Trigger *give_leader(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "give leader");
+    }
     static Trigger *cheat(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "cheat"); }
     static Trigger *ginvite(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "ginvite"); }
-    static Trigger *guild_promote(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "guild promote"); }
-    static Trigger *guild_demote(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "guild demote"); }
-    static Trigger *guild_remove(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "guild remove"); }
-    static Trigger *guild_leave(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "guild leave"); }
+    static Trigger *guild_promote(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "guild promote");
+    }
+    static Trigger *guild_demote(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "guild demote");
+    }
+    static Trigger *guild_remove(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "guild remove");
+    }
+    static Trigger *guild_leave(PlayerbotAI *botAI)
+    {
+        return new ChatCommandTrigger(botAI, "guild leave");
+    }
     static Trigger *rtsc(PlayerbotAI *botAI) { return new ChatCommandTrigger(botAI, "rtsc"); }
     static Trigger *drink(PlayerbotAI *ai) { return new ChatCommandTrigger(ai, "drink"); }
     static Trigger *naxx(PlayerbotAI *ai) { return new ChatCommandTrigger(ai, "naxx"); }

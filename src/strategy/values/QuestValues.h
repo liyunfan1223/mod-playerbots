@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_QUESTVALUES_H
@@ -47,8 +49,11 @@ typedef std::unordered_map<uint32, std::vector<GuidPosition>> questGiverMap;
 // Returns the quest relation Flags for all entries and quests
 class EntryQuestRelationMapValue : public SingleCalculatedValue<entryQuestRelationMap>
 {
-public:
-    EntryQuestRelationMapValue(PlayerbotAI *botAI) : SingleCalculatedValue(botAI, "entry quest relation map") {}
+   public:
+    EntryQuestRelationMapValue(PlayerbotAI *botAI)
+        : SingleCalculatedValue(botAI, "entry quest relation map")
+    {
+    }
 
     entryQuestRelationMap Calculate() override;
 };
@@ -56,7 +61,7 @@ public:
 // Generic quest object finder
 class FindQuestObjectData
 {
-public:
+   public:
     FindQuestObjectData() { GetObjectiveEntries(); }
 
     void GetObjectiveEntries();
@@ -64,7 +69,7 @@ public:
     void operator()(GameObjectData const &gameobjectData);
     questGuidpMap GetResult() const { return data; };
 
-private:
+   private:
     std::unordered_map<int32, std::vector<std::pair<uint32, QuestRelationFlag>>> entryMap;
     std::unordered_map<uint32, std::vector<std::pair<uint32, QuestRelationFlag>>> itemMap;
 
@@ -76,7 +81,7 @@ private:
 // All objects to start, do or finish a quest.
 class QuestGuidpMapValue : public SingleCalculatedValue<questGuidpMap>
 {
-public:
+   public:
     QuestGuidpMapValue(PlayerbotAI *botAI) : SingleCalculatedValue(botAI, "quest guidp map") {}
 
     questGuidpMap Calculate() override;
@@ -85,7 +90,7 @@ public:
 // All questgivers and their quests that are Useful for a specific level
 class QuestGiversValue : public SingleCalculatedValue<questGiverMap>, public Qualified
 {
-public:
+   public:
     QuestGiversValue(PlayerbotAI *botAI) : SingleCalculatedValue(botAI, "quest givers") {}
 
     questGiverMap Calculate() override;
@@ -94,7 +99,7 @@ public:
 // All questgivers that have a quest for the bot.
 class ActiveQuestGiversValue : public CalculatedValue<std::vector<GuidPosition>>
 {
-public:
+   public:
     ActiveQuestGiversValue(PlayerbotAI *botAI) : CalculatedValue(botAI, "active quest givers", 5) {}
 
     std::vector<GuidPosition> Calculate() override;
@@ -103,7 +108,7 @@ public:
 // All quest takers that the bot has a quest for.
 class ActiveQuestTakersValue : public CalculatedValue<std::vector<GuidPosition>>
 {
-public:
+   public:
     ActiveQuestTakersValue(PlayerbotAI *botAI) : CalculatedValue(botAI, "active quest takers", 5) {}
 
     std::vector<GuidPosition> Calculate() override;
@@ -112,8 +117,11 @@ public:
 // All objectives that the bot still has to complete.
 class ActiveQuestObjectivesValue : public CalculatedValue<std::vector<GuidPosition>>
 {
-public:
-    ActiveQuestObjectivesValue(PlayerbotAI *botAI) : CalculatedValue(botAI, "active quest objectives", 5) {}
+   public:
+    ActiveQuestObjectivesValue(PlayerbotAI *botAI)
+        : CalculatedValue(botAI, "active quest objectives", 5)
+    {
+    }
 
     std::vector<GuidPosition> Calculate() override;
 };
@@ -121,8 +129,11 @@ public:
 // Free quest log slots
 class FreeQuestLogSlotValue : public Uint8CalculatedValue
 {
-public:
-    FreeQuestLogSlotValue(PlayerbotAI *botAI) : Uint8CalculatedValue(botAI, "free quest log slots", 2) {}
+   public:
+    FreeQuestLogSlotValue(PlayerbotAI *botAI)
+        : Uint8CalculatedValue(botAI, "free quest log slots", 2)
+    {
+    }
 
     uint8 Calculate() override;
 };
@@ -130,8 +141,11 @@ public:
 // Dialog status npc
 class DialogStatusValue : public Uint32CalculatedValue, public Qualified
 {
-public:
-    DialogStatusValue(PlayerbotAI *botAI, std::string const name = "dialog status") : Uint32CalculatedValue(botAI, name, 2) {}
+   public:
+    DialogStatusValue(PlayerbotAI *botAI, std::string const name = "dialog status")
+        : Uint32CalculatedValue(botAI, name, 2)
+    {
+    }
 
     static uint32 getDialogStatus(Player *bot, int32 questgiver, uint32 questId = 0);
 
@@ -141,7 +155,7 @@ public:
 // Dialog status npc quest
 class DialogStatusQuestValue : public DialogStatusValue
 {
-public:
+   public:
     DialogStatusQuestValue(PlayerbotAI *botAI) : DialogStatusValue(botAI, "dialog status quest") {}
 
     uint32 Calculate() override;
@@ -150,7 +164,7 @@ public:
 // Can accept quest from npc
 class CanAcceptQuestValue : public BoolCalculatedValue, public Qualified
 {
-public:
+   public:
     CanAcceptQuestValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can accept quest npc") {}
 
     bool Calculate() override;
@@ -159,8 +173,11 @@ public:
 // Can accept low level quest from npc
 class CanAcceptQuestLowLevelValue : public BoolCalculatedValue, public Qualified
 {
-public:
-    CanAcceptQuestLowLevelValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can accept quest low level npc") {}
+   public:
+    CanAcceptQuestLowLevelValue(PlayerbotAI *botAI)
+        : BoolCalculatedValue(botAI, "can accept quest low level npc")
+    {
+    }
 
     bool Calculate() override;
 };
@@ -168,7 +185,7 @@ public:
 // Can hand in quest to npc
 class CanTurnInQuestValue : public BoolCalculatedValue, public Qualified
 {
-public:
+   public:
     CanTurnInQuestValue(PlayerbotAI *botAI) : BoolCalculatedValue(botAI, "can turn in quest npc") {}
 
     bool Calculate() override;

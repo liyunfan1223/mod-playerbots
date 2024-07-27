@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_NONCOMBATSTRATEGY_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class NonCombatStrategy : public Strategy
 {
-public:
+   public:
     NonCombatStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
@@ -20,7 +22,7 @@ public:
 
 class CollisionStrategy : public Strategy
 {
-public:
+   public:
     CollisionStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
@@ -30,7 +32,7 @@ public:
 
 class MountStrategy : public Strategy
 {
-public:
+   public:
     MountStrategy(PlayerbotAI *botAI) : Strategy(botAI) {};
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
@@ -40,7 +42,7 @@ public:
 
 class AttackTaggedStrategy : public Strategy
 {
-public:
+   public:
     AttackTaggedStrategy(PlayerbotAI *botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }

@@ -1,11 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "OutfitAction.h"
+
 #include "Event.h"
-#include "Playerbots.h"
 #include "ItemVisitors.h"
+#include "Playerbots.h"
 
 bool OutfitAction::Execute(Event event)
 {
@@ -183,7 +186,8 @@ void OutfitAction::Update(std::string const name)
     IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
 
     ItemIds items;
-    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
+    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end();
+         ++i)
         items.insert(i->first);
 
     Save(name, items);

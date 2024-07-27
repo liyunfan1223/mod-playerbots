@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "LogLevelAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -30,20 +33,20 @@ std::string const LogLevelAction::logLevel2string(LogLevel level)
 {
     switch (level)
     {
-    case LOG_LEVEL_DISABLED:
-        return "disabled";
-    case LOG_LEVEL_FATAL:
-        return "fatal";
-    case LOG_LEVEL_ERROR:
-        return "error";
-    case LOG_LEVEL_WARN:
-        return "warn";
-    case LOG_LEVEL_INFO:
-        return "info";
-    case LOG_LEVEL_DEBUG:
-        return "debug";
-    default:
-        return "trace";
+        case LOG_LEVEL_DISABLED:
+            return "disabled";
+        case LOG_LEVEL_FATAL:
+            return "fatal";
+        case LOG_LEVEL_ERROR:
+            return "error";
+        case LOG_LEVEL_WARN:
+            return "warn";
+        case LOG_LEVEL_INFO:
+            return "info";
+        case LOG_LEVEL_DEBUG:
+            return "debug";
+        default:
+            return "trace";
     }
 }
 

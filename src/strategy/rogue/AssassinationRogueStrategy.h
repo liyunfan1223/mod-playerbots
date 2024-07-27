@@ -6,10 +6,10 @@
 
 class AssassinationRogueStrategy : public MeleeCombatStrategy
 {
-public:
+   public:
     AssassinationRogueStrategy(PlayerbotAI *ai);
 
-public:
+   public:
     virtual void InitTriggers(std::vector<TriggerNode *> &triggers) override;
     virtual std::string const getName() override { return "melee"; }
     virtual NextAction **getDefaultActions() override;

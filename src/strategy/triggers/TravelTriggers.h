@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_TRAVELTRIGGERS_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class NoTravelTargetTrigger : public Trigger
 {
-public:
+   public:
     NoTravelTargetTrigger(PlayerbotAI *botAI) : Trigger(botAI, "no travel target") {}
 
     bool IsActive() override;
@@ -19,7 +21,7 @@ public:
 
 class FarFromTravelTargetTrigger : public Trigger
 {
-public:
+   public:
     FarFromTravelTargetTrigger(PlayerbotAI *botAI) : Trigger(botAI, "far from travel target") {}
 
     bool IsActive() override;
@@ -27,7 +29,7 @@ public:
 
 class NearDarkPortalTrigger : public Trigger
 {
-public:
+   public:
     NearDarkPortalTrigger(PlayerbotAI *botAI) : Trigger(botAI, "near dark portal", 10) {}
 
     virtual bool IsActive();
@@ -35,7 +37,7 @@ public:
 
 class AtDarkPortalAzerothTrigger : public Trigger
 {
-public:
+   public:
     AtDarkPortalAzerothTrigger(PlayerbotAI *botAI) : Trigger(botAI, "at dark portal azeroth", 10) {}
 
     bool IsActive() override;
@@ -43,7 +45,7 @@ public:
 
 class AtDarkPortalOutlandTrigger : public Trigger
 {
-public:
+   public:
     AtDarkPortalOutlandTrigger(PlayerbotAI *botAI) : Trigger(botAI, "at dark portal outland", 10) {}
 
     bool IsActive() override;

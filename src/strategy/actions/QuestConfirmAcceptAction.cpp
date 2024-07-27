@@ -1,4 +1,5 @@
 #include "QuestConfirmAcceptAction.h"
+
 #include "WorldPacket.h"
 
 bool QuestConfirmAcceptAction::Execute(Event event)

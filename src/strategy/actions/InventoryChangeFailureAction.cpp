@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "InventoryChangeFailureAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -26,13 +29,16 @@ bool InventoryChangeFailureAction::Execute(Event event)
         messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE] = "No equipment slot available";
         messages[EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM] = "I will never be able to use this";
         messages[EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM2] = "I will never be able to use this";
-        messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE2] = messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE];
-        messages[EQUIP_ERR_CANT_EQUIP_WITH_TWOHANDED] = "Cannot equip with two-handed weapon equipped";
+        messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE2] =
+            messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE];
+        messages[EQUIP_ERR_CANT_EQUIP_WITH_TWOHANDED] =
+            "Cannot equip with two-handed weapon equipped";
         messages[EQUIP_ERR_CANT_DUAL_WIELD] = "I cannot dual-wield";
         messages[EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG] = "This item cannot go in this bag";
         messages[EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG2] = "This item cannot go in this bag";
         messages[EQUIP_ERR_CANT_CARRY_MORE_OF_THIS] = "I can't carry anymore of those";
-        messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE3] = messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE];
+        messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE3] =
+            messages[EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE];
         messages[EQUIP_ERR_ITEM_CANT_STACK] = "Item cannot stack";
         messages[EQUIP_ERR_ITEM_CANT_BE_EQUIPPED] = "Item cannot be equipped";
         messages[EQUIP_ERR_ITEMS_CANT_BE_SWAPPED] = "Cannot swap these items";
@@ -58,7 +64,8 @@ bool InventoryChangeFailureAction::Execute(Event event)
         messages[EQUIP_ERR_CAN_EQUIP_ONLY1_BOLT] = "Only bolts are allowed";
         messages[EQUIP_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH] = "Ammo poach is allowed";
         messages[EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED] = "Item can't be wrapped";
-        messages[EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED] = messages[EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED];
+        messages[EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED] =
+            messages[EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED];
         messages[EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED] = messages[EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED];
         messages[EQUIP_ERR_BOUND_CANT_BE_WRAPPED] = messages[EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED];
         messages[EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED] = messages[EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED];

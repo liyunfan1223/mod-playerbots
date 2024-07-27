@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_DRUIDSHAPESHIFTACTIONS_H
@@ -11,7 +13,7 @@ class PlayerbotAI;
 
 class CastBearFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastBearFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "bear form") {}
 
     bool isPossible() override;
@@ -20,7 +22,7 @@ public:
 
 class CastDireBearFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastDireBearFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "dire bear form") {}
 
     NextAction **getAlternatives() override;
@@ -28,32 +30,32 @@ public:
 
 class CastCatFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastCatFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "cat form") {}
 };
 
 class CastTreeFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastTreeFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "tree of life") {}
     bool isUseful() override;
 };
 
 class CastMoonkinFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastMoonkinFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "moonkin form") {}
 };
 
 class CastAquaticFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastAquaticFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "aquatic form") {}
 };
 
 class CastTravelFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastTravelFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "travel form") {}
 
     bool isUseful() override;
@@ -61,7 +63,7 @@ public:
 
 class CastCasterFormAction : public CastBuffSpellAction
 {
-public:
+   public:
     CastCasterFormAction(PlayerbotAI *botAI) : CastBuffSpellAction(botAI, "caster form") {}
 
     bool isUseful() override;

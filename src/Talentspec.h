@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_TALENTSPEC_H
@@ -21,7 +23,7 @@ struct TalentTabEntry;
 // unused currently
 class TalentSpec
 {
-public:
+   public:
     struct TalentListEntry
     {
         uint32 entry;
@@ -56,7 +58,7 @@ public:
     uint32 highestTree();
     std::string const FormatSpec(Player *bot);
 
-protected:
+   protected:
     uint32 LeveltoPoints(uint32 level) const;
     uint32 PointstoLevel(uint32 points) const;
     void GetTalents(uint32 classMask);
@@ -67,12 +69,14 @@ protected:
     void ReadTalents(std::string const link);
 
     std::vector<TalentListEntry> GetTalentTree(uint32 tabpage);
-    std::vector<TalentListEntry> SubTalentList(std::vector<TalentListEntry> &oldList, std::vector<TalentListEntry> &newList, uint32 reverse);
+    std::vector<TalentListEntry> SubTalentList(std::vector<TalentListEntry> &oldList,
+                                               std::vector<TalentListEntry> &newList,
+                                               uint32 reverse);
 };
 
 class TalentPath
 {
-public:
+   public:
     TalentPath(uint32 pathId, std::string const pathName, uint32 pathProbability)
     {
         id = pathId;
@@ -88,7 +92,7 @@ public:
 
 class ClassSpecs
 {
-public:
+   public:
     ClassSpecs() {};
     ClassSpecs(uint32 specsClassMask)
     {

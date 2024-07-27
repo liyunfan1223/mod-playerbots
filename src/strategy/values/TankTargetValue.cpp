@@ -1,15 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
+
+#include "TankTargetValue.h"
 
 #include "AttackersValue.h"
 #include "PlayerbotAIConfig.h"
-#include "TankTargetValue.h"
 #include "Playerbots.h"
 
 class FindTargetForTankStrategy : public FindNonCcTargetStrategy
 {
-public:
+   public:
     FindTargetForTankStrategy(PlayerbotAI *botAI) : FindNonCcTargetStrategy(botAI), minThreat(0) {}
 
     void CheckAttacker(Unit *creature, ThreatMgr *threatMgr) override
@@ -42,13 +45,13 @@ public:
         }
     }
 
-protected:
+   protected:
     float minThreat;
 };
 
 class FindTankTargetSmartStrategy : public FindTargetStrategy
 {
-public:
+   public:
     FindTankTargetSmartStrategy(PlayerbotAI *botAI) : FindTargetStrategy(botAI) {}
 
     void CheckAttacker(Unit *attacker, ThreatMgr *threatMgr) override

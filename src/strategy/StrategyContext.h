@@ -1,17 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_STRATEGYCONTEXT_H
 #define _PLAYERBOT_STRATEGYCONTEXT_H
 
-#include "CustomStrategy.h"
-#include "NamedObjectContext.h"
 #include "AttackEnemyPlayersStrategy.h"
 #include "BattlegroundStrategy.h"
 #include "CastTimeStrategy.h"
 #include "ChatCommandHandlerStrategy.h"
 #include "ConserveManaStrategy.h"
+#include "CustomStrategy.h"
 #include "DeadStrategy.h"
 #include "DebugStrategy.h"
 #include "DpsAssistStrategy.h"
@@ -29,15 +30,16 @@
 #include "MaintenanceStrategy.h"
 #include "MarkRtiStrategy.h"
 #include "MeleeCombatStrategy.h"
+#include "NamedObjectContext.h"
 #include "NonCombatStrategy.h"
-#include "QuestStrategies.h"
 #include "PassiveStrategy.h"
 #include "PullStrategy.h"
+#include "QuestStrategies.h"
+#include "RTSCStrategy.h"
 #include "RacialsStrategy.h"
 #include "RangedCombatStrategy.h"
 #include "ReturnStrategy.h"
 #include "RpgStrategy.h"
-#include "RTSCStrategy.h"
 #include "RunawayStrategy.h"
 #include "StayStrategy.h"
 #include "TankAssistStrategy.h"
@@ -50,7 +52,7 @@
 
 class StrategyContext : public NamedObjectContext<Strategy>
 {
-public:
+   public:
     StrategyContext()
     {
         creators["racials"] = &StrategyContext::racials;
@@ -115,7 +117,7 @@ public:
         creators["combat formation"] = &StrategyContext::combat_formation;
     }
 
-private:
+   private:
     static Strategy *behind(PlayerbotAI *botAI) { return new SetBehindCombatStrategy(botAI); }
     static Strategy *ranged(PlayerbotAI *botAI) { return new RangedCombatStrategy(botAI); }
     static Strategy *close(PlayerbotAI *botAI) { return new MeleeCombatStrategy(botAI); }
@@ -135,11 +137,18 @@ private:
     static Strategy *gather(PlayerbotAI *botAI) { return new GatherStrategy(botAI); }
     static Strategy *emote(PlayerbotAI *botAI) { return new EmoteStrategy(botAI); }
     static Strategy *passive(PlayerbotAI *botAI) { return new PassiveStrategy(botAI); }
-    // static Strategy* conserve_mana(PlayerbotAI* botAI) { return new ConserveManaStrategy(botAI); }
-    static Strategy *auto_save_mana(PlayerbotAI *botAI) { return new HealerAutoSaveManaStrategy(botAI); }
+    // static Strategy* conserve_mana(PlayerbotAI* botAI) { return new ConserveManaStrategy(botAI);
+    // }
+    static Strategy *auto_save_mana(PlayerbotAI *botAI)
+    {
+        return new HealerAutoSaveManaStrategy(botAI);
+    }
     static Strategy *food(PlayerbotAI *botAI) { return new UseFoodStrategy(botAI); }
     static Strategy *chat(PlayerbotAI *botAI) { return new ChatCommandHandlerStrategy(botAI); }
-    static Strategy *world_packet(PlayerbotAI *botAI) { return new WorldPacketHandlerStrategy(botAI); }
+    static Strategy *world_packet(PlayerbotAI *botAI)
+    {
+        return new WorldPacketHandlerStrategy(botAI);
+    }
     static Strategy *ready_check(PlayerbotAI *botAI) { return new ReadyCheckStrategy(botAI); }
     static Strategy *pvp(PlayerbotAI *botAI) { return new AttackEnemyPlayersStrategy(botAI); }
     static Strategy *_return(PlayerbotAI *botAI) { return new ReturnStrategy(botAI); }
@@ -180,7 +189,7 @@ private:
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>
 {
-public:
+   public:
     MovementStrategyContext() : NamedObjectContext<Strategy>(false, true)
     {
         creators["follow"] = &MovementStrategyContext::follow_master;
@@ -190,7 +199,7 @@ public:
         creators["guard"] = &MovementStrategyContext::guard;
     }
 
-private:
+   private:
     static Strategy *guard(PlayerbotAI *botAI) { return new GuardStrategy(botAI); }
     static Strategy *follow_master(PlayerbotAI *botAI) { return new FollowMasterStrategy(botAI); }
     static Strategy *stay(PlayerbotAI *botAI) { return new StayStrategy(botAI); }
@@ -200,7 +209,7 @@ private:
 
 class AssistStrategyContext : public NamedObjectContext<Strategy>
 {
-public:
+   public:
     AssistStrategyContext() : NamedObjectContext<Strategy>(false, true)
     {
         creators["dps assist"] = &AssistStrategyContext::dps_assist;
@@ -208,7 +217,7 @@ public:
         creators["tank assist"] = &AssistStrategyContext::tank_assist;
     }
 
-private:
+   private:
     static Strategy *dps_assist(PlayerbotAI *botAI) { return new DpsAssistStrategy(botAI); }
     static Strategy *dps_aoe(PlayerbotAI *botAI) { return new DpsAoeStrategy(botAI); }
     static Strategy *tank_assist(PlayerbotAI *botAI) { return new TankAssistStrategy(botAI); }
@@ -216,16 +225,19 @@ private:
 
 class QuestStrategyContext : public NamedObjectContext<Strategy>
 {
-public:
+   public:
     QuestStrategyContext() : NamedObjectContext<Strategy>(false, true)
     {
         creators["quest"] = &QuestStrategyContext::quest;
         creators["accept all quests"] = &QuestStrategyContext::accept_all_quests;
     }
 
-private:
+   private:
     static Strategy *quest(PlayerbotAI *botAI) { return new DefaultQuestStrategy(botAI); }
-    static Strategy *accept_all_quests(PlayerbotAI *botAI) { return new AcceptAllQuestsStrategy(botAI); }
+    static Strategy *accept_all_quests(PlayerbotAI *botAI)
+    {
+        return new AcceptAllQuestsStrategy(botAI);
+    }
 };
 
 #endif

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #ifndef _PLAYERBOT_WARRIORTRIGGERS_H
@@ -21,7 +23,7 @@ DEBUFF_TRIGGER(MortalStrikeDebuffTrigger, "mortal strike");
 
 class RendDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
-public:
+   public:
     RendDebuffOnAttackerTrigger(PlayerbotAI *botAI) : DebuffOnMeleeAttackerTrigger(botAI, "rend") {}
 };
 
@@ -58,7 +60,7 @@ HAS_AURA_TRIGGER(TasteForBloodTrigger, "taste for blood");
 
 class RendDebuffTrigger : public DebuffTrigger
 {
-public:
+   public:
     RendDebuffTrigger(PlayerbotAI *botAI) : DebuffTrigger(botAI, "rend", 1, true) {}
 };
 

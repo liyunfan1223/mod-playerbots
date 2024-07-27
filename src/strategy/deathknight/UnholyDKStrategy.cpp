@@ -3,11 +3,12 @@
  */
 
 #include "UnholyDKStrategy.h"
+
 #include "Playerbots.h"
 
 class UnholyDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-public:
+   public:
     UnholyDKStrategyActionNodeFactory()
     {
         // Unholy
@@ -30,36 +31,40 @@ public:
         creators["icy touch"] = &icy_touch;
     }
 
-private:
+   private:
     static ActionNode *death_strike([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode("death strike",
-                              /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
-                              /*A*/ nullptr,
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "death strike",
+            /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
+            /*A*/ nullptr,
+            /*C*/ nullptr);
     }
 
     static ActionNode *corpse_explosion([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode("corpse explosion",
-                              /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
-                              /*A*/ nullptr,
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "corpse explosion",
+            /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
+            /*A*/ nullptr,
+            /*C*/ nullptr);
     }
 
     static ActionNode *scourge_strike([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode("scourge strike",
-                              /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
-                              /*A*/ nullptr,
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "scourge strike",
+            /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
+            /*A*/ nullptr,
+            /*C*/ nullptr);
     }
     static ActionNode *icy_touch([[maybe_unused]] PlayerbotAI *botAI)
     {
-        return new ActionNode("icy touch",
-                              /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
-                              /*A*/ nullptr,
-                              /*C*/ nullptr);
+        return new ActionNode(
+            "icy touch",
+            /*P*/ NextAction::array(0, new NextAction("unholy presence"), nullptr),
+            /*A*/ nullptr,
+            /*C*/ nullptr);
     }
 };
 
@@ -70,37 +75,45 @@ UnholyDKStrategy::UnholyDKStrategy(PlayerbotAI *botAI) : GenericDKStrategy(botAI
 
 NextAction **UnholyDKStrategy::getDefaultActions()
 {
-    return NextAction::array(0,
-                             new NextAction("death and decay", ACTION_DEFAULT + 1.0f),
+    return NextAction::array(0, new NextAction("death and decay", ACTION_DEFAULT + 1.0f),
                              new NextAction("scourge strike", ACTION_DEFAULT + 0.8f),
                              new NextAction("horn of winter", ACTION_DEFAULT + 0.6f),
                              new NextAction("summon gargoyle", ACTION_DEFAULT + 0.4f),
                              new NextAction("death coil", ACTION_DEFAULT + 0.2f),
-                             new NextAction("melee", ACTION_DEFAULT),
-                             nullptr);
+                             new NextAction("melee", ACTION_DEFAULT), nullptr);
 }
 
-void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
 
-    // triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction(, ACTION_NORMAL + 2), nullptr)));
-    triggers.push_back(new TriggerNode("army of the dead", NextAction::array(0, new NextAction("army of the dead", ACTION_HIGH + 6), nullptr)));
-    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("death pact", ACTION_HIGH + 5), nullptr)));
-    triggers.push_back(new TriggerNode("no desolation", NextAction::array(0, new NextAction("blood strike", ACTION_HIGH + 4), nullptr)));
-    triggers.push_back(new TriggerNode("death and decay cooldown",
-                                       NextAction::array(0,
-                                                         new NextAction("ghoul frenzy", ACTION_DEFAULT + 5.0f),
-                                                         new NextAction("scourge strike", ACTION_DEFAULT + 4.0f),
-                                                         new NextAction("blood boil", ACTION_NORMAL + 3.0f),
-                                                         new NextAction("icy touch", ACTION_NORMAL + 2.0f),
-                                                         new NextAction("plague strike", ACTION_NORMAL + 1.0f),
-                                                         nullptr)));
+    // triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction(,
+    // ACTION_NORMAL + 2), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "army of the dead",
+        NextAction::array(0, new NextAction("army of the dead", ACTION_HIGH + 6), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "critical health",
+        NextAction::array(0, new NextAction("death pact", ACTION_HIGH + 5), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "no desolation",
+        NextAction::array(0, new NextAction("blood strike", ACTION_HIGH + 4), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "death and decay cooldown",
+        NextAction::array(0, new NextAction("ghoul frenzy", ACTION_DEFAULT + 5.0f),
+                          new NextAction("scourge strike", ACTION_DEFAULT + 4.0f),
+                          new NextAction("blood boil", ACTION_NORMAL + 3.0f),
+                          new NextAction("icy touch", ACTION_NORMAL + 2.0f),
+                          new NextAction("plague strike", ACTION_NORMAL + 1.0f), nullptr)));
 }
 
-void UnholyDKAoeStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void UnholyDKAoeStrategy::InitTriggers(std::vector<TriggerNode *> &triggers)
 {
-    triggers.push_back(new TriggerNode("loot available", NextAction::array(0, new NextAction("corpse explosion", ACTION_NORMAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("death and decay", ACTION_NORMAL + 3),
-                                                                       new NextAction("corpse explosion", ACTION_NORMAL + 3), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "loot available",
+        NextAction::array(0, new NextAction("corpse explosion", ACTION_NORMAL + 1), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "medium aoe",
+        NextAction::array(0, new NextAction("death and decay", ACTION_NORMAL + 3),
+                          new NextAction("corpse explosion", ACTION_NORMAL + 3), nullptr)));
 }

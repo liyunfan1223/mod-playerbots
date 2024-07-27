@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may
+ * redistribute it and/or modify it under version 2 of the License, or (at your option), any later
+ * version.
  */
 
 #include "SaveManaAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -23,18 +26,18 @@ bool SaveManaAction::Execute(Event event)
     {
         switch (bot->getClass())
         {
-        case CLASS_HUNTER:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            value = 5.0;
-            break;
-        case CLASS_MAGE:
-        case CLASS_PRIEST:
-        case CLASS_WARLOCK:
-            value = 2.0;
-            break;
-        default:
-            value = 3.0;
+            case CLASS_HUNTER:
+            case CLASS_SHAMAN:
+            case CLASS_DRUID:
+                value = 5.0;
+                break;
+            case CLASS_MAGE:
+            case CLASS_PRIEST:
+            case CLASS_WARLOCK:
+                value = 2.0;
+                break;
+            default:
+                value = 3.0;
         }
     }
     else if (text.empty())

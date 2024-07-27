@@ -1,6 +1,7 @@
+#include "RaidNaxxTriggers.h"
+
 #include "EventMap.h"
 #include "Playerbots.h"
-#include "RaidNaxxTriggers.h"
 #include "ScriptedCreature.h"
 #include "Trigger.h"
 
@@ -23,7 +24,8 @@ bool MutatingInjectionRemovedTrigger::IsActive()
     {
         return false;
     }
-    return HasNoAuraTrigger::IsActive() && botAI->GetState() == BOT_STATE_COMBAT && botAI->IsRanged(bot);
+    return HasNoAuraTrigger::IsActive() && botAI->GetState() == BOT_STATE_COMBAT &&
+           botAI->IsRanged(bot);
 }
 
 template <class T>
@@ -34,7 +36,7 @@ bool BossEventTrigger<T>::IsActive()
     {
         return false;
     }
-    T *ai = dynamic_cast<T*>(boss->GetAI());
+    T *ai = dynamic_cast<T *>(boss->GetAI());
     EventMap *eventMap = &ai->events;
     if (!eventMap)
     {
@@ -61,10 +63,11 @@ bool BossPhaseTrigger<T>::IsActive()
     {
         return true;
     }
-    T *boss_ai = dynamic_cast<T*>(boss->GetAI());
+    T *boss_ai = dynamic_cast<T *>(boss->GetAI());
     EventMap *eventMap = &boss_ai->events;
     uint8 phase_mask = eventMap->GetPhaseMask();
-    // bot->Yell("phase mask detected: " + to_string(phase_mask) + " compare with " + to_string(this->phase_mask), LANG_UNIVERSAL);
+    // bot->Yell("phase mask detected: " + to_string(phase_mask) + " compare with " +
+    // to_string(this->phase_mask), LANG_UNIVERSAL);
     return phase_mask == this->phase_mask;
 }
 
@@ -79,13 +82,13 @@ bool GrobbulusCloudTrigger::IsActive()
     {
         return false;
     }
-    // bot->Yell("has aggro on " + boss->GetName() + " : " + to_string(AI_VALUE2(bool, "has aggro", "boss target")), LANG_UNIVERSAL);
+    // bot->Yell("has aggro on " + boss->GetName() + " : " + to_string(AI_VALUE2(bool, "has aggro",
+    // "boss target")), LANG_UNIVERSAL);
     return AI_VALUE2(bool, "has aggro", "boss target");
 }
 
 bool HeiganMeleeTrigger::IsActive()
 {
-
     Unit *heigan = AI_VALUE2(Unit *, "find target", "heigan the unclean");
     if (!heigan)
     {
@@ -172,13 +175,11 @@ bool SapphironFlightTrigger::IsActive()
 
 // bool SapphironGroundChillTrigger::IsActive()
 // {
-//     return BossPhaseTrigger::IsActive() && !botAI->IsMainTank(bot) && botAI->HasAura("chill", bot);
+//     return BossPhaseTrigger::IsActive() && !botAI->IsMainTank(bot) && botAI->HasAura("chill",
+//     bot);
 // }
 
-bool GluthTrigger::IsActive()
-{
-    return helper.UpdateBossAI();
-}
+bool GluthTrigger::IsActive() { return helper.UpdateBossAI(); }
 
 bool GluthMainTankMortalWoundTrigger::IsActive()
 {
@@ -203,15 +204,9 @@ bool GluthMainTankMortalWoundTrigger::IsActive()
     return true;
 }
 
-bool KelthuzadTrigger::IsActive()
-{
-    return helper.UpdateBossAI();
-}
+bool KelthuzadTrigger::IsActive() { return helper.UpdateBossAI(); }
 
-bool LoathebTrigger::IsActive()
-{
-    return helper.UpdateBossAI();
-}
+bool LoathebTrigger::IsActive() { return helper.UpdateBossAI(); }
 
 bool ThaddiusPhasePetTrigger::IsActive()
 {
