@@ -768,8 +768,9 @@ bool DebugAction::Execute(Event event)
                     Unit *realCaster =
                         botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
                                                          // all_targets.size() - 1)]);
-                    Unit *caster = botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
-                                                                    // all_targets.size() - 1)]);
+                    Unit *caster =
+                        botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
+                                                         // all_targets.size() - 1)]);
                     Unit *target = botAI->GetUnit(all_targets[i + 1]);
 
                     if (!realCaster)
@@ -848,8 +849,9 @@ bool DebugAction::Execute(Event event)
                     Unit *realCaster =
                         botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
                                                          // all_targets.size() - 1)]);
-                    Unit *caster = botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
-                                                                    // all_targets.size() - 1)]);
+                    Unit *caster =
+                        botAI->GetUnit(all_targets[i]);  // botAI->GetUnit(all_targets[urand(0,
+                                                         // all_targets.size() - 1)]);
                     Unit *target = botAI->GetUnit(all_targets[i + 1]);
 
                     if (!realCaster)

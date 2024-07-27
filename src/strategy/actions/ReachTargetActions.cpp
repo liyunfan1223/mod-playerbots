@@ -26,8 +26,9 @@ bool ReachTargetAction::isUseful()
     Unit *target = GetTarget();
     // float dis = distance + CONTACT_DISTANCE;
     return target &&
-           !bot->IsWithinCombatRange(target, distance);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
-                                                         // "distance", GetTargetName()), distance);
+           !bot->IsWithinCombatRange(
+               target, distance);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
+                                   // "distance", GetTargetName()), distance);
 }
 
 std::string const ReachTargetAction::GetTargetName() { return "current target"; }

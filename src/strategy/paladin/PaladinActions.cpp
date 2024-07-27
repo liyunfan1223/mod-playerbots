@@ -163,8 +163,9 @@ bool CastMeleeConsecrationAction::isUseful()
 {
     Unit *target = GetTarget();
     // float dis = distance + CONTACT_DISTANCE;
-    return target && bot->IsWithinMeleeRange(target);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
-                                                       // "distance", GetTargetName()), distance);
+    return target && bot->IsWithinMeleeRange(
+                         target);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
+                                   // "distance", GetTargetName()), distance);
 }
 
 bool CastDivineSacrificeAction::isUseful()

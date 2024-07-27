@@ -155,9 +155,9 @@ bool OutOfRangeTrigger::IsActive()
     Unit *target = AI_VALUE(Unit *, GetTargetName());
     // increase contact distance to prevent calculation error
     float dis = distance + CONTACT_DISTANCE;
-    return target &&
-           !bot->IsWithinCombatRange(target, dis);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
-                                                    // "distance", GetTargetName()), distance);
+    return target && !bot->IsWithinCombatRange(
+                         target, dis);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
+                                        // "distance", GetTargetName()), distance);
 }
 
 EnemyOutOfSpellRangeTrigger::EnemyOutOfSpellRangeTrigger(PlayerbotAI *botAI)

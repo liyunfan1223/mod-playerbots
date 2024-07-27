@@ -1565,7 +1565,7 @@ static std::pair<uint32, uint32> AV_HordeDefendObjectives[] = {
     {BG_AV_NODES_TOWER_POINT, BG_AV_OBJECT_FLAG_H_TOWER_POINT},
     {BG_AV_NODES_ICEBLOOD_TOWER, BG_AV_OBJECT_FLAG_H_ICEBLOOD_TOWER},
     //{ BG_AV_NODES_ICEBLOOD_GRAVE, BG_AV_OBJECT_FLAG_H_ICEBLOOD_GRAVE},//defending this makes it
-    //more likely for game to end due to loss of supplies
+    // more likely for game to end due to loss of supplies
 };
 
 static std::pair<uint32, uint32> AV_AllianceAttackObjectives[] = {
@@ -1588,7 +1588,7 @@ static std::pair<uint32, uint32> AV_AllianceDefendObjectives[] = {
     {BG_AV_NODES_ICEWING_BUNKER, BG_AV_OBJECT_FLAG_A_ICEWING_BUNKER},
     {BG_AV_NODES_STONEHEART_BUNKER, BG_AV_OBJECT_FLAG_A_STONEHEART_BUNKER},
     //{ BG_AV_NODES_STONEHEART_GRAVE, BG_AV_OBJECT_FLAG_A_STONEHEART_GRAVE },//defending this makes
-    //it more likely for game to end due to loss of supplies
+    // it more likely for game to end due to loss of supplies
 };
 
 static uint32 AB_AttackObjectives[] = {
