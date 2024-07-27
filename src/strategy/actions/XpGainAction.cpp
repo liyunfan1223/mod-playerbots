@@ -6,6 +6,7 @@
 #include "Event.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "GuildMgr.h"
 
 bool XpGainAction::Execute(Event event)
 {
@@ -30,6 +31,25 @@ bool XpGainAction::Execute(Event event)
     {
         p >> givenXp;      // 4 experience without rested bonus
         p >> groupBonus;   // 8 group bonus
+    }
+
+    if (sPlayerbotAIConfig->randomBotTalk && bot->GetGuildId() && urand(0, 10))
+    {
+        Creature* creature = botAI->GetCreature(guid);
+        if (creature && (creature->isElite() || creature->isWorldBoss() || creature->GetLevel() > 61 || creature->GetLevel() > bot->GetLevel() + 4))
+        {
+            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+            if (guild)
+            {
+                std::map<std::string, std::string> placeholders;
+                placeholders["%name"] = creature->GetName();
+
+                if (urand(0, 3))
+                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Wow I just killed %name!", placeholders), LANG_UNIVERSAL);
+                else
+                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Awesome that %name went down quickly!", placeholders), LANG_UNIVERSAL);
+            }
+        }
     }
 
     Unit* victim = nullptr;

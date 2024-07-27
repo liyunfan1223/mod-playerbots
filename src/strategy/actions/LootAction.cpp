@@ -12,6 +12,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "GuildMgr.h"
 
 bool LootAction::Execute(Event event)
 {
@@ -415,6 +416,22 @@ bool StoreLootAction::Execute(Event event)
 
         if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
+
+        if (sPlayerbotAIConfig->randomBotTalk && bot->GetGuildId() && urand(0, 10) && proto->Quality >= ITEM_QUALITY_RARE)
+        {
+            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+
+            if (guild)
+            {
+                std::map<std::string, std::string> placeholders;
+                placeholders["%name"] = chat->FormatItem(proto);
+
+                if (urand(0, 3))
+                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Yay I looted %name!", placeholders), LANG_UNIVERSAL);
+                else
+                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Guess who got a %name? Me!", placeholders), LANG_UNIVERSAL);
+            }
+        }
 
         // std::ostringstream out;
         // out << "Looting " << chat->FormatItem(proto);

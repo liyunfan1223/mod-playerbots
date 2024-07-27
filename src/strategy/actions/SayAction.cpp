@@ -130,26 +130,26 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
     // if we're just commanding bots around, don't respond...
     // first one is for exact word matches
     if (noReplyMsgs.find(msg) != noReplyMsgs.end()) {
-        std::ostringstream out;
+        /*std::ostringstream out;
         out << "DEBUG ChatReplyDo decided to ignore exact blocklist match" << msg;
-        bot->Say(out.str(), LANG_UNIVERSAL);
+        bot->Say(out.str(), LANG_UNIVERSAL);*/
         return;
     }
 
     // second one is for partial matches like + or - where we change strats
     if (std::any_of(noReplyMsgParts.begin(), noReplyMsgParts.end(), [&msg](const std::string& part) { return msg.find(part) != std::string::npos; })) {
-        std::ostringstream out;
+        /*std::ostringstream out;
         out << "DEBUG ChatReplyDo decided to ignore partial blocklist match" << msg;
-        bot->Say(out.str(), LANG_UNIVERSAL);
+        bot->Say(out.str(), LANG_UNIVERSAL);*/
         return;
     }
 
     if (std::any_of(noReplyMsgStarts.begin(), noReplyMsgStarts.end(), [&msg](const std::string& start) {
         return msg.find(start) == 0;  // Check if the start matches the beginning of msg
         })) {
-        std::ostringstream out;
+        /*std::ostringstream out;
         out << "DEBUG ChatReplyDo decided to ignore start blocklist match" << msg;
-        bot->Say(out.str(), LANG_UNIVERSAL);
+        bot->Say(out.str(), LANG_UNIVERSAL);*/
         return;
     }
 
