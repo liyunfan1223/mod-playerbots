@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    name: "Run Clang Format"
+    name: "clang-format"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Playerbot Module
@@ -19,3 +19,4 @@ jobs:
           source: '.'
           extensions: 'h,cpp'
           clangFormatVersion: 17
+          inplace: True
