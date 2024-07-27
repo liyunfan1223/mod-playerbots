@@ -349,6 +349,8 @@ SuggestDungeonAction::SuggestDungeonAction(PlayerbotAI* botAI) : SuggestWhatToDo
 
 bool SuggestDungeonAction::Execute(Event event)
 {
+    // TODO: use sPlayerbotDungeonSuggestionMgr
+
     if (instances.empty())
     {
         instances["Ragefire Chasm"] = 15;

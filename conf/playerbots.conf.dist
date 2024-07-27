@@ -1238,6 +1238,19 @@ AiPlayerbot.CommandPrefix = ""
 # Separator for bot chat commands
 AiPlayerbot.CommandSeparator = "\\\\"
 
+# Enable playerbot talk (say / yell / general chatting / lfg)
+AiPlayerbot.RandomBotTalk = 0
+
+# Enable playerbot emote
+AiPlayerbot.RandomBotEmote = 0
+
+# Enable dungeon suggestions for random bots
+AiPlayerbot.RandomBotSuggestDungeons = 1
+
+# Bots greet to the players
+AiPlayerbot.EnableGreet = 0
+
+
 #
 #
 #
@@ -1276,9 +1289,6 @@ AiPlayerbot.RandomBotLoginAtStartup = 1
 # Guild Task system
 AiPlayerbot.EnableGuildTasks = 0
 
-# Enable dungeon suggestions for random bots
-AiPlayerbot.RandomBotSuggestDungeons = 1
-
 # Enable dungeon suggestions in lower case randomly
 AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
 
@@ -1296,9 +1306,6 @@ AiPlayerbot.RandombotsWalkingRPG = 0
 
 # Set randombots movement speed to walking only inside buildings
 AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
-
-# Bots greet to the players
-AiPlayerbot.EnableGreet = 0
 
 # Specify percent of active bots
 # The default is 10. With 10% of all bots going active or inactive each minute.
