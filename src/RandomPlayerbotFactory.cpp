@@ -618,7 +618,7 @@ std::string const RandomPlayerbotFactory::CreateRandomGuildName()
     return std::move(guildName);
 }
 
-void RandomPlayerbotFactory::CreateRandomArenaTeams()
+void RandomPlayerbotFactory::CreateRandomArenaTeams(ArenaType type, uint32 count)
 {
     std::vector<uint32> randomBots;
 
@@ -635,28 +635,12 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         while (result->NextRow());
     }
 
-    if (sPlayerbotAIConfig->deleteRandomBotArenaTeams)
-    {
-        LOG_INFO("playerbots", "Deleting random bot arena teams...");
-
-        for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
-        {
-            ObjectGuid captain = ObjectGuid::Create<HighGuid::Player>(*i);
-            ArenaTeam* arenateam = sArenaTeamMgr->GetArenaTeamByCaptain(captain);
-            if (arenateam)
-                //sObjectMgr->RemoveArenaTeam(arenateam->GetId());
-                arenateam->Disband(nullptr);
-        }
-
-        LOG_INFO("playerbots", "Random bot arena teams deleted");
-    }
-
     uint32 arenaTeamNumber = 0;
     GuidVector availableCaptains;
     for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
     {
         ObjectGuid captain = ObjectGuid::Create<HighGuid::Player>(*i);
-        ArenaTeam* arenateam = sArenaTeamMgr->GetArenaTeamByCaptain(captain);
+        ArenaTeam* arenateam = sArenaTeamMgr->GetArenaTeamByCaptain(captain, type);
         if (arenateam)
         {
             ++arenaTeamNumber;
@@ -671,7 +655,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         }
     }
 
-    for (; arenaTeamNumber < sPlayerbotAIConfig->randomBotArenaTeamCount; ++arenaTeamNumber)
+    for (; arenaTeamNumber < count; ++arenaTeamNumber)
     {
         std::string const arenaTeamName = CreateRandomArenaTeamName();
         if (arenaTeamName.empty())
@@ -698,29 +682,17 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
             continue;
         }
 
-        QueryResult results = CharacterDatabase.Query("SELECT `type` FROM playerbots_arena_team_names WHERE name = '{}'", arenaTeamName.c_str());
-        if (!results)
-        {
-            LOG_ERROR("playerbots", "No valid types for arena teams");
-            return;
-        }
+        // Below query no longer required as now user has control over the number of each type of arena team they want to create.
+        // Keeping commented for potential future reference.
+        // QueryResult results = CharacterDatabase.Query("SELECT `type` FROM playerbots_arena_team_names WHERE name = '{}'", arenaTeamName.c_str());
+        // if (!results)
+        // {
+        //     LOG_ERROR("playerbots", "No valid types for arena teams");
+        //     return;
+        // }
 
-        Field* fields = results->Fetch();
-        uint8 slot = fields[0].Get<uint8>();
-
-        ArenaType type;
-        switch (slot)
-        {
-            case 2:
-                type = ARENA_TYPE_2v2;
-                break;
-            case 3:
-                type = ARENA_TYPE_3v3;
-                break;
-            case 5:
-                type = ARENA_TYPE_5v5;
-                break;
-        }
+        // Field* fields = results->Fetch();
+        // uint8 slot = fields[0].Get<uint8>();
 
         ArenaTeam* arenateam = new ArenaTeam();
         if (!arenateam->Create(player->GetGUID(), type, arenaTeamName, 0, 0, 0, 0, 0))
@@ -732,7 +704,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         arenateam->SetCaptain(player->GetGUID());
 
         // set random rating
-        arenateam->SetRatingForAll(urand(1500, 2700));
+        arenateam->SetRatingForAll(urand(sPlayerbotAIConfig->randomBotArenaTeamMinRating, sPlayerbotAIConfig->randomBotArenaTeamMaxRating));
 
         // set random emblem
         uint32 backgroundColor = urand(0xFF000000, 0xFFFFFFFF);
