@@ -526,7 +526,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     // join standard channels
     AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(bot->GetAreaId());
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
-    std::string current_zone_name = current_zone ? current_zone->area_name[0] : "";
+    std::string current_zone_name = current_zone ? current_zone->area_name[sWorld->GetDefaultDbcLocale()] : "";
 
     if (current_zone && cMgr)
     {

@@ -423,13 +423,14 @@ bool StoreLootAction::Execute(Event event)
 
             if (guild)
             {
-                std::map<std::string, std::string> placeholders;
-                placeholders["%name"] = chat->FormatItem(proto);
+                std::string toSay = "";
 
                 if (urand(0, 3))
-                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Yay I looted %name!", placeholders), LANG_UNIVERSAL);
+                    toSay = "Yay I looted " + chat->FormatItem(proto) + " !";
                 else
-                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Guess who got a %name? Me!", placeholders), LANG_UNIVERSAL);
+                    toSay = "Guess who got a " + chat->FormatItem(proto) + " ? Me !";
+
+                guild->BroadcastToGuild(bot->GetSession(), false, toSay, LANG_UNIVERSAL);
             }
         }
 

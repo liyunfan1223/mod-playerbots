@@ -41,13 +41,14 @@ void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
         Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
         if (guild)
         {
-            std::map<std::string, std::string> placeholders;
-            placeholders["%level"] = std::to_string(bot->GetLevel());
+            std::string toSay = "";
 
             if (urand(0, 3))
-                guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Ding!", placeholders), LANG_UNIVERSAL);
+                toSay = "Ding !";
             else
-                guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Yay level %level!", placeholders), LANG_UNIVERSAL);
+                toSay = "Yay level " + std::to_string(bot->GetLevel()) + " !";
+
+            guild->BroadcastToGuild(bot->GetSession(), false, toSay, LANG_UNIVERSAL);
         }
     }
 }
