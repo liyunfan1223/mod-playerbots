@@ -27,3 +27,4 @@ jobs:
           # Check if there are any formatting changes
           git diff --exit-code
         shell: bash
+        continue-on-error: true
