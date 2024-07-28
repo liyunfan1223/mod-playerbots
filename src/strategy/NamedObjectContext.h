@@ -183,8 +183,7 @@ public:
         }
     }
 
-    void Reset()
-    {
+    void Reset() {
         for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             (*i)->Reset();
