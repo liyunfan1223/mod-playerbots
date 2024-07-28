@@ -1501,7 +1501,6 @@ void RandomPlayerbotMgr::Randomize(Player* bot)
     else {
         RandomizeFirst(bot);
     }
-    RandomTeleportForLevel(bot);
 }
 
 void RandomPlayerbotMgr::IncreaseLevel(Player* bot)
@@ -1590,6 +1589,8 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 
 	if (pmo)
         pmo->finish();
+
+    RandomTeleportForLevel(bot);
 }
 
 void RandomPlayerbotMgr::RandomizeMin(Player* bot)
