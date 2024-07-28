@@ -10,6 +10,16 @@
 #include "GuildMgr.h"
 #include <regex>
 
+static const std::unordered_set<std::string> noReplyMsgs = {
+  "join", "leave", "follow", "attack", "pull", "flee", "reset", "reset ai",
+  "all ?", "talents", "talents list", "talents auto", "talk", "stay", "stats",
+  "who", "items", "leave", "join", "repair", "summon", "nc ?", "co ?", "de ?",
+  "dead ?", "follow", "los", "guard", "do accept invitation", "stats", "react ?",
+  "reset strats", "home",
+};
+static const std::unordered_set<std::string> noReplyMsgParts = { "+", "-","@" , "follow target", "focus heal", "cast ", "accept [", "e [", "destroy [", "go zone" };
+static const std::unordered_set<std::string> noReplyMsgStarts = { "e ", "accept ", "cast ", "destroy " };
+
 SayAction::SayAction(PlayerbotAI* botAI) : Action(botAI, "say"), Qualified()
 {
 }
@@ -105,6 +115,9 @@ bool SayAction::isUseful()
     if (!botAI->AllowActivity())
         return false;
 
+    if (botAI->HasStrategy("silent", BotState::BOT_STATE_NON_COMBAT))
+        return false;
+
     time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
     return (time(nullptr) - lastSaid) > 30;
 }
@@ -113,6 +126,35 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
 {
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
     std::string respondsText = "";
+
+    // if we're just commanding bots around, don't respond...
+    // first one is for exact word matches
+    if (noReplyMsgs.find(msg) != noReplyMsgs.end()) {
+        /*std::ostringstream out;
+        out << "DEBUG ChatReplyDo decided to ignore exact blocklist match" << msg;
+        bot->Say(out.str(), LANG_UNIVERSAL);*/
+        return;
+    }
+
+    // second one is for partial matches like + or - where we change strats
+    if (std::any_of(noReplyMsgParts.begin(), noReplyMsgParts.end(), [&msg](const std::string& part) { return msg.find(part) != std::string::npos; })) {
+        /*std::ostringstream out;
+        out << "DEBUG ChatReplyDo decided to ignore partial blocklist match" << msg;
+        bot->Say(out.str(), LANG_UNIVERSAL);*/
+        return;
+    }
+
+    if (std::any_of(noReplyMsgStarts.begin(), noReplyMsgStarts.end(), [&msg](const std::string& start) {
+        return msg.find(start) == 0;  // Check if the start matches the beginning of msg
+        })) {
+        /*std::ostringstream out;
+        out << "DEBUG ChatReplyDo decided to ignore start blocklist match" << msg;
+        bot->Say(out.str(), LANG_UNIVERSAL);*/
+        return;
+    }
+
+    ObjectGuid receiver = sCharacterCache->GetCharacterGuidByName(name);
+    Player* plr = ObjectAccessor::FindPlayer(receiver);
 
     // Chat Logic
     int32 verb_pos = -1;
@@ -149,18 +191,16 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
     // Responds
     for (uint32 i = 0; i < 8; i++)
     {
-//        // blame gm with chat tag
-//        if (Player* plr = sObjectMgr->GetPlayer(ObjectGuid(HIGHGUID_PLAYER, guid1)))
-//        {
-//            if (plr->isGMChat())
-//            {
-//                replyType = REPLY_ADMIN_ABUSE;
-//                found = true;
-//                break;
-//            }
-//        }
-//
-        if (word[i] == "hi" || word[i] == "hey" || word[i] == "hello" || word[i] == "wazzup")
+        // blame gm with chat tag
+        if (plr && plr->isGMChat())
+        {
+            replyType = REPLY_ADMIN_ABUSE;
+            found = true;
+            break;
+        }
+
+        if (word[i] == "hi" || word[i] == "hey" || word[i] == "hello" || word[i] == "wazzup"
+            || word[i] == "salut" || word[i] == "plop" || word[i] == "yo")
         {
             replyType = REPLY_HELLO;
             found = true;
@@ -169,22 +209,25 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
 
         if (verb_type < 4)
         {
-            if (word[i] == "am" || word[i] == "are" || word[i] == "is")
+            if (word[i] == "am" || word[i] == "are" || word[i] == "is" || word[i] == "suis" || word[i] == "as" || word[i] == "est"
+            || word[i] == "dois" || word[i] == "doit")
             {
                 verb_pos = i;
                 verb_type = 2; // present
+                if (verb_pos == 0)
+                    is_quest = 1;
             }
-            else if (word[i] == "will")
+            else if (word[i] == "will" || word[i] == "vais" || word[i] == "sera")
             {
                 verb_pos = i;
                 verb_type = 3; // future
             }
-            else if (word[i] == "was" || word[i] == "were")
+            else if (word[i] == "was" || word[i] == "were" || word[i] == "été" || word[i] == "ai" || word[i] == "eu" || word[i] == "étions" || word[i] == "etion" )
             {
                 verb_pos = i;
                 verb_type = 1; // past
             }
-            else if (word[i] == "shut" || word[i] == "noob")
+            else if (word[i] == "shut" || word[i] == "noob" || word[i] == "tg")
             {
                 if (msg.find(bot->GetName()) == std::string::npos)
                 {
@@ -600,22 +643,20 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         {
             if (type == CHAT_MSG_WHISPER)
             {
-                ObjectGuid receiver = sCharacterCache->GetCharacterGuidByName(name);
-                if (!receiver || !receiver.IsPlayer() || !ObjectAccessor::FindPlayer(receiver))
+                if (plr)
                 {
-                    return;
-                }
-                if (bot->GetTeamId() == TEAM_ALLIANCE)
-                {
-                    bot->Whisper(c, LANG_COMMON, ObjectAccessor::FindPlayer(receiver));
-                }
-                else
-                {
-                    bot->Whisper(c, LANG_ORCISH, ObjectAccessor::FindPlayer(receiver));
+                    if (bot->GetTeamId() == TEAM_ALLIANCE)
+                    {
+                        bot->Whisper(c, LANG_COMMON, plr);
+                    }
+                    else
+                    {
+                        bot->Whisper(c, LANG_ORCISH, plr);
+                    }
                 }
             }
 
-            if (type == CHAT_MSG_SAY)
+            else if (type == CHAT_MSG_SAY)
             {
                 if (bot->GetTeamId() == TEAM_ALLIANCE)
                     bot->Say(respondsText, LANG_COMMON);
@@ -623,7 +664,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
                     bot->Say(respondsText, LANG_ORCISH);
             }
 
-            if (type == CHAT_MSG_YELL)
+            else if (type == CHAT_MSG_YELL)
             {
                 if (bot->GetTeamId() == TEAM_ALLIANCE)
                     bot->Yell(respondsText, LANG_COMMON);
@@ -631,7 +672,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
                     bot->Yell(respondsText, LANG_ORCISH);
             }
 
-            if (type == CHAT_MSG_GUILD)
+            else if (type == CHAT_MSG_GUILD)
             {
                 if (!bot->GetGuildId())
                     return;

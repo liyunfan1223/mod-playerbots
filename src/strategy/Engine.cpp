@@ -172,6 +172,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
             if (!action)
             {
+                //LOG_ERROR("playerbots", "Action: {} - is UNKNOWN - c:{} l:{}", actionNode->getName().c_str(), botAI->GetBot()->getClass(), botAI->GetBot()->GetLevel());
                 LogAction("A:%s - UNKNOWN", actionNode->getName().c_str());
             }
             else if (action->isUseful())

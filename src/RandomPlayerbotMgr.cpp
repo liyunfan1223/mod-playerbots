@@ -1228,8 +1228,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         if (bot->GetLevel() <= 18 && (loc.GetMapId() != pInfo->mapId || dis > 10000.0f)) {
             continue;
         }
-        LocaleConstant locale = sWorld->GetDefaultDbcLocale();
-        
+
+        const LocaleConstant& locale = sWorld->GetDefaultDbcLocale();
         LOG_INFO("playerbots", "Random teleporting bot {} (level {}) to Map: {} ({}) Zone: {} ({}) Area: {} ({}) {},{},{} ({}/{} locations)",
             bot->GetName().c_str(), bot->GetLevel(), 
             map->GetId(), map->GetMapName(), 

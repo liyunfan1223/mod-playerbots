@@ -6,6 +6,7 @@
 #include "Event.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
+#include "GuildMgr.h"
 
 bool AutoLearnSpellAction::Execute(Event event)
 {
@@ -27,7 +28,6 @@ bool AutoLearnSpellAction::Execute(Event event)
     return true;
 }
 
-
 void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
 {
     if (sPlayerbotAIConfig->autoLearnTrainerSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
@@ -35,6 +35,21 @@ void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
 
     if (sPlayerbotAIConfig->autoLearnQuestSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnQuestSpells(out);
+
+    if (sPlayerbotAIConfig->randomBotTalk)
+    {
+        Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+        if (guild)
+        {
+            std::map<std::string, std::string> placeholders;
+            placeholders["%level"] = std::to_string(bot->GetLevel());
+
+            if (urand(0, 3))
+                guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Ding!", placeholders), LANG_UNIVERSAL);
+            else
+                guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Yay level %level!", placeholders), LANG_UNIVERSAL);
+        }
+    }
 }
 
 void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
