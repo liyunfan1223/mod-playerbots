@@ -1,0 +1,12 @@
+BasedOnStyle: google
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 120
+UseTab: Never
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBraces: Allman
+AccessModifierOffset: -4
+DerivePointerAlignment: false
+PointerAlignment: Left
