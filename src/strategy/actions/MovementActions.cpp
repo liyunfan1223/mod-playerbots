@@ -849,6 +849,21 @@ void MovementAction::UpdateMovementState()
 
     if (bot->IsFlying())
         bot->UpdateSpeed(MOVE_FLIGHT, true);
+
+    Transport* newTransport = bot->GetMap()->GetTransportForPos(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot);
+    if (newTransport != bot->GetTransport())
+    {
+        LOG_DEBUG("playerbots", "Bot {} is on a transport", IsMovingAllowed());
+
+        if (bot->GetTransport())
+            bot->GetTransport()->RemovePassenger(bot, true);
+
+        if (newTransport)
+            newTransport->AddPassenger(bot, true);
+
+        bot->StopMovingOnCurrentPos();
+    }
+
     // Temporary speed increase in group
     //if (botAI->HasRealPlayerMaster())
         //bot->SetSpeedRate(MOVE_RUN, 1.1f);
