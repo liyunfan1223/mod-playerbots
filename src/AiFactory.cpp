@@ -425,8 +425,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 }
                 case CLASS_PALADIN:
                 {
-                    if (tab == PALADIN_TAB_HOLY)
-                    {
+                    if (tab == PALADIN_TAB_HOLY) {
                         engine->addStrategies("dps", "dps assist", "baoe", nullptr);
                     }
                     break;

@@ -20,3 +20,4 @@ jobs:
           extensions: 'h,cpp'
           clangFormatVersion: 14
           inplace: True
+        continue-on-error: True
