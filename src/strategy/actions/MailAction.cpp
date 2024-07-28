@@ -64,7 +64,8 @@ public:
 
     bool After(PlayerbotAI* botAI) override
     {
-        for (std::list<std::string>::iterator i = tells.begin(); i != tells.end(); ++i) botAI->TellMaster(*i);
+        for (std::list<std::string>::iterator i = tells.begin(); i != tells.end(); ++i)
+            botAI->TellMaster(*i);
 
         return true;
     }
@@ -195,7 +196,8 @@ std::map<uint32, Mail*> filterList(std::vector<Mail*> src, std::string const fil
     if (filter.empty() || filter == "*")
     {
         uint32 idx = 0;
-        for (std::vector<Mail*>::iterator i = src.begin(); i != src.end(); ++i) result[idx++] = *i;
+        for (std::vector<Mail*>::iterator i = src.begin(); i != src.end(); ++i)
+            result[idx++] = *i;
 
         return result;
     }
@@ -224,7 +226,8 @@ std::map<uint32, Mail*> filterList(std::vector<Mail*> src, std::string const fil
         if (to > src.size() - 1)
             to = src.size() - 1;
 
-        for (uint32 i = from; i <= to; ++i) result[i] = src[i];
+        for (uint32 i = from; i <= to; ++i)
+            result[i] = src[i];
 
         return result;
     }

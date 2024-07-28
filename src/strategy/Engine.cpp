@@ -414,7 +414,8 @@ void Engine::addStrategy(std::string const name)
     if (Strategy* strategy = aiObjectContext->GetStrategy(name))
     {
         std::set<std::string> siblings = aiObjectContext->GetSiblingStrategy(name);
-        for (std::set<std::string>::iterator i = siblings.begin(); i != siblings.end(); i++) removeStrategy(*i);
+        for (std::set<std::string>::iterator i = siblings.begin(); i != siblings.end(); i++)
+            removeStrategy(*i);
 
         LogAction("S:+%s", strategy->getName().c_str());
         strategies[strategy->getName()] = strategy;

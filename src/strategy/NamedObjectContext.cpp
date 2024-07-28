@@ -18,7 +18,8 @@ void Qualified::Qualify(int qual)
 std::string const Qualified::MultiQualify(std::vector<std::string> qualifiers)
 {
     std::ostringstream out;
-    for (auto& qualifier : qualifiers) out << qualifier << (&qualifier != &qualifiers.back() ? " " : "");
+    for (auto& qualifier : qualifiers)
+        out << qualifier << (&qualifier != &qualifiers.back() ? " " : "");
 
     return out.str();
 }

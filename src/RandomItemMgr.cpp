@@ -926,7 +926,8 @@ void RandomItemMgr::BuildItemInfoCache()
             uint32 sEntry = itr->first;
             if (LootTemplateAccess const* lTemplateA =
                     DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::Unit>(sEntry, uint32(1)), LOOT_CORPSE))
-                for (auto const& lItem : lTemplateA->Entries) dropMap->insert(std::make_pair(lItem->itemid, sEntry));
+                for (auto const& lItem : lTemplateA->Entries)
+                    dropMap->insert(std::make_pair(lItem->itemid, sEntry));
         }
     }
 
@@ -937,7 +938,8 @@ void RandomItemMgr::BuildItemInfoCache()
             uint32 sEntry = itr.first;
             if (LootTemplateAccess const* lTemplateA = DropMapValue::GetLootTemplate(
                     ObjectGuid::Create<HighGuid::GameObject>(sEntry, uint32(1)), LOOT_CORPSE))
-                for (auto const& lItem : lTemplateA->Entries) dropMap->insert(std::make_pair(lItem->itemid, sEntry));
+                for (auto const& lItem : lTemplateA->Entries)
+                    dropMap->insert(std::make_pair(lItem->itemid, sEntry));
         }
     }
 

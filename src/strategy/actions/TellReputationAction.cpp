@@ -68,7 +68,8 @@ bool TellReputationAction::Execute(Event event)
     out << "|cffffffff";
 
     int32 base = ReputationMgr::Reputation_Cap + 1;
-    for (int32 i = MAX_REPUTATION_RANK - 1; i >= rank; --i) base -= ReputationMgr::PointsInRank[i];
+    for (int32 i = MAX_REPUTATION_RANK - 1; i >= rank; --i)
+        base -= ReputationMgr::PointsInRank[i];
 
     out << " (" << (reputation - base) << "/" << ReputationMgr::PointsInRank[rank] << ")";
     botAI->TellMaster(out);

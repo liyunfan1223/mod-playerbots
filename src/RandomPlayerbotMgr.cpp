@@ -1198,7 +1198,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     }
 
     std::vector<WorldPosition> tlocs;
-    for (auto& loc : locs) tlocs.push_back(WorldPosition(loc));
+    for (auto& loc : locs)
+        tlocs.push_back(WorldPosition(loc));
     // Do not teleport to maps disabled in config
     tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(),
                                [bot](WorldPosition l)

@@ -324,7 +324,8 @@ public:
     bool hasRouteTo(TravelNode* node)
     {
         if (routes.empty())
-            for (auto mNode : getNodeMap()) routes[mNode] = true;
+            for (auto mNode : getNodeMap())
+                routes[mNode] = true;
 
         return routes.find(node) != routes.end();
     };
@@ -429,7 +430,8 @@ public:
     std::vector<WorldPosition> getPointPath()
     {
         std::vector<WorldPosition> retVec;
-        for (auto const& p : fullPath) retVec.push_back(p.point);
+        for (auto const& p : fullPath)
+            retVec.push_back(p.point);
         return retVec;
     };
 
@@ -505,7 +507,8 @@ public:
     {
         if (m_nMapMtx.try_lock_for(std::chrono::seconds(10)))
         {
-            for (auto& node : m_nodes) removeNode(node);
+            for (auto& node : m_nodes)
+                removeNode(node);
 
             m_nMapMtx.unlock();
             return true;

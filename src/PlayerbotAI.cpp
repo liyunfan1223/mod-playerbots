@@ -101,7 +101,8 @@ PlayerbotAI::PlayerbotAI()
       master(nullptr),
       currentState(BOT_STATE_NON_COMBAT)
 {
-    for (uint8 i = 0; i < BOT_STATE_MAX; i++) engines[i] = nullptr;
+    for (uint8 i = 0; i < BOT_STATE_MAX; i++)
+        engines[i] = nullptr;
 
     for (uint8 i = 0; i < MAX_ACTIVITY_TYPE; i++)
     {
@@ -1402,7 +1403,8 @@ bool PlayerbotAI::HasStrategy(std::string const name, BotState type) { return en
 
 void PlayerbotAI::ResetStrategies(bool load)
 {
-    for (uint8 i = 0; i < BOT_STATE_MAX; i++) engines[i]->removeAllStrategies();
+    for (uint8 i = 0; i < BOT_STATE_MAX; i++)
+        engines[i]->removeAllStrategies();
 
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);

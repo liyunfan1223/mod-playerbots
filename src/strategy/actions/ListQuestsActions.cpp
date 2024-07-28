@@ -120,9 +120,11 @@ uint32 ListQuestsAction::ListQuests(bool completed, bool silent, QuestTravelDeta
             uint32 tpoints = 0;
             uint32 apoints = 0;
 
-            for (auto dest : allDestinations) tpoints += dest->getPoints(true).size();
+            for (auto dest : allDestinations)
+                tpoints += dest->getPoints(true).size();
 
-            for (auto dest : availDestinations) apoints += dest->getPoints().size();
+            for (auto dest : availDestinations)
+                apoints += dest->getPoints().size();
 
             std::ostringstream out;
             out << desAvail << "/" << desTot << " destinations " << apoints << "/" << tpoints << " points. ";

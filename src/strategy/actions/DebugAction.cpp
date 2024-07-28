@@ -233,13 +233,15 @@ bool DebugAction::Execute(Event event)
     }
     else if (text.find("reset node") != std::string::npos)
     {
-        for (auto& node : sTravelNodeMap->getNodes()) node->setLinked(false);
+        for (auto& node : sTravelNodeMap->getNodes())
+            node->setLinked(false);
         return true;
     }
     else if (text.find("reset path") != std::string::npos)
     {
         for (auto& node : sTravelNodeMap->getNodes())
-            for (auto& path : *node->getLinks()) node->removeLinkTo(path.first, true);
+            for (auto& path : *node->getLinks())
+                node->removeLinkTo(path.first, true);
         return true;
     }
     else if (text.find("gen node") != std::string::npos)
@@ -1006,7 +1008,8 @@ void DebugAction::FakeSpell(uint32 spellId, Unit* truecaster, Unit* caster, Obje
             data << target;
 
         // Hit targets here.
-        for (auto otherTarget : otherTargets) data << otherTarget;
+        for (auto otherTarget : otherTargets)
+            data << otherTarget;
 
         data << (uint8)missTargets.size();  // miss
 

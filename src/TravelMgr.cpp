@@ -669,7 +669,8 @@ void WorldPosition::loadMapAndVMaps(WorldPosition secondPos)
 std::vector<WorldPosition> WorldPosition::fromPointsArray(std::vector<G3D::Vector3> path)
 {
     std::vector<WorldPosition> retVec;
-    for (auto p : path) retVec.push_back(WorldPosition(getMapId(), p.x, p.y, p.z, getO()));
+    for (auto p : path)
+        retVec.push_back(WorldPosition(getMapId(), p.x, p.y, p.z, getO()));
 
     return retVec;
 }
@@ -823,7 +824,8 @@ void FindPointGameObjectData::operator()(GameObjectData const& gameobjectData)
 std::vector<CreatureData const*> WorldPosition::getCreaturesNear(float radius, uint32 entry)
 {
     FindPointCreatureData worker(*this, radius, entry);
-    for (auto const& itr : sObjectMgr->GetAllCreatureData()) worker(itr.second);
+    for (auto const& itr : sObjectMgr->GetAllCreatureData())
+        worker(itr.second);
 
     return worker.GetResult();
 }
@@ -831,7 +833,8 @@ std::vector<CreatureData const*> WorldPosition::getCreaturesNear(float radius, u
 std::vector<GameObjectData const*> WorldPosition::getGameObjectsNear(float radius, uint32 entry)
 {
     FindPointGameObjectData worker(*this, radius, entry);
-    for (auto const& itr : sObjectMgr->GetAllGOData()) worker(itr.second);
+    for (auto const& itr : sObjectMgr->GetAllGOData())
+        worker(itr.second);
 
     return worker.GetResult();
 }
@@ -1788,7 +1791,8 @@ void TravelMgr::LoadQuestTravelTable()
     std::vector<uint32> questIds;
     std::unordered_map<uint32, uint32> entryCount;
 
-    for (auto& quest : questMap) questIds.push_back(quest.first);
+    for (auto& quest : questMap)
+        questIds.push_back(quest.first);
 
     sort(questIds.begin(), questIds.end());
 
@@ -1997,7 +2001,8 @@ void TravelMgr::LoadQuestTravelTable()
             {
                 quests.insert(std::make_pair(questId, container));
 
-                for (auto loc : container->questGivers) questGivers.push_back(loc);
+                for (auto loc : container->questGivers)
+                    questGivers.push_back(loc);
             }
         }
     }
@@ -3472,7 +3477,8 @@ void TravelMgr::LoadQuestTravelTable()
 
             std::vector<std::string> actionKeys;
 
-            for (auto& action : actions) actionKeys.push_back(action.first);
+            for (auto& action : actions)
+                actionKeys.push_back(action.first);
 
             std::sort(actionKeys.begin(), actionKeys.end(),
                       [](std::string const i, std::string const j)

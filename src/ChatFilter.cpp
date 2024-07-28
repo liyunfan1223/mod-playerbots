@@ -280,7 +280,8 @@ CompositeChatFilter::CompositeChatFilter(PlayerbotAI* botAI) : ChatFilter(botAI)
 
 CompositeChatFilter::~CompositeChatFilter()
 {
-    for (std::vector<ChatFilter*>::iterator i = filters.begin(); i != filters.end(); i++) delete (*i);
+    for (std::vector<ChatFilter*>::iterator i = filters.begin(); i != filters.end(); i++)
+        delete (*i);
 }
 
 std::string const CompositeChatFilter::Filter(std::string& message)

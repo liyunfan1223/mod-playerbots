@@ -15,7 +15,8 @@ std::vector<Item*> InventoryItemValueBase::Find(std::string const qualifier)
     Player* bot = InventoryAction::botAI->GetBot();
 
     std::vector<Item*> items = InventoryAction::parseItems(qualifier);
-    for (Item* item : items) result.push_back(item);
+    for (Item* item : items)
+        result.push_back(item);
 
     return result;
 }

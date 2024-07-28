@@ -205,7 +205,8 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
         }
 
         std::vector<Item*> result;
-        for (std::set<Item*>::iterator i = found.begin(); i != found.end(); ++i) result.push_back(*i);
+        for (std::set<Item*>::iterator i = found.begin(); i != found.end(); ++i)
+            result.push_back(*i);
 
         std::sort(result.begin(), result.end(), compare_items_by_level);
 
@@ -336,7 +337,8 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
     }
 
     std::vector<Item*> result;
-    for (std::set<Item*>::iterator i = found.begin(); i != found.end(); ++i) result.push_back(*i);
+    for (std::set<Item*>::iterator i = found.begin(); i != found.end(); ++i)
+        result.push_back(*i);
 
     std::sort(result.begin(), result.end(), compare_items_by_level);
 

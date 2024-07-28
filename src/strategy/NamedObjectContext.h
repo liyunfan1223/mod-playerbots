@@ -218,7 +218,8 @@ public:
         {
             std::set<std::string> supported = (*i)->supports();
 
-            for (std::set<std::string>::iterator j = supported.begin(); j != supported.end(); j++) result.insert(*j);
+            for (std::set<std::string>::iterator j = supported.begin(); j != supported.end(); j++)
+                result.insert(*j);
         }
 
         return result;

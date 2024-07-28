@@ -104,11 +104,14 @@ bool ChooseRpgTargetAction::Execute(Event event)
     GuidVector possiblePlayers = AI_VALUE(GuidVector, "nearest friendly players");
     GuidSet& ignoreList = AI_VALUE(GuidSet&, "ignore rpg target");
 
-    for (auto target : possibleTargets) targets[target] = 0.0f;
+    for (auto target : possibleTargets)
+        targets[target] = 0.0f;
 
-    for (auto target : possibleObjects) targets[target] = 0.0f;
+    for (auto target : possibleObjects)
+        targets[target] = 0.0f;
 
-    for (auto target : possiblePlayers) targets[target] = 0.0f;
+    for (auto target : possiblePlayers)
+        targets[target] = 0.0f;
 
     if (targets.empty())
     {
@@ -117,7 +120,8 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     if (urand(0, 9))
     {
-        for (auto target : ignoreList) targets.erase(target);
+        for (auto target : ignoreList)
+            targets.erase(target);
     }
 
     SET_AI_VALUE(std::string, "next rpg action", this->getName());

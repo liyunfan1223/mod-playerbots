@@ -48,7 +48,8 @@ GuidVector AttackersValue::Calculate()
         }
     }
 
-    for (Unit* unit : targets) result.push_back(unit->GetGUID());
+    for (Unit* unit : targets)
+        result.push_back(unit->GetGUID());
 
     if (bot->duel && bot->duel->Opponent)
         result.push_back(bot->duel->Opponent->GetGUID());

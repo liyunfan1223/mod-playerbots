@@ -501,7 +501,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
         std::this_thread::sleep_for(10s);
     }
 
-    for (WorldSession* session : sessionBots) delete session;
+    for (WorldSession* session : sessionBots)
+        delete session;
 
     for (uint32 accountId : sPlayerbotAIConfig->randomBotAccounts)
     {

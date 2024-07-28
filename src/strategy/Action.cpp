@@ -15,7 +15,8 @@ uint32 NextAction::size(NextAction** actions)
         return 0;
 
     uint32 size = 0;
-    for (size = 0; actions[size];) ++size;
+    for (size = 0; actions[size];)
+        ++size;
 
     return size;
 }
@@ -28,7 +29,8 @@ NextAction** NextAction::clone(NextAction** actions)
     uint32 size = NextAction::size(actions);
 
     NextAction** res = new NextAction*[size + 1];
-    for (uint32 i = 0; i < size; i++) res[i] = new NextAction(*actions[i]);
+    for (uint32 i = 0; i < size; i++)
+        res[i] = new NextAction(*actions[i]);
 
     res[size] = nullptr;
 
@@ -42,9 +44,11 @@ NextAction** NextAction::merge(NextAction** left, NextAction** right)
 
     NextAction** res = new NextAction*[leftSize + rightSize + 1];
 
-    for (uint32 i = 0; i < leftSize; i++) res[i] = new NextAction(*left[i]);
+    for (uint32 i = 0; i < leftSize; i++)
+        res[i] = new NextAction(*left[i]);
 
-    for (uint32 i = 0; i < rightSize; i++) res[leftSize + i] = new NextAction(*right[i]);
+    for (uint32 i = 0; i < rightSize; i++)
+        res[leftSize + i] = new NextAction(*right[i]);
 
     res[leftSize + rightSize] = nullptr;
 
@@ -71,7 +75,8 @@ NextAction** NextAction::array(uint32 nil, ...)
 
     NextAction** res = new NextAction*[size];
     va_start(vl, nil);
-    for (uint32 i = 0; i < size; i++) res[i] = va_arg(vl, NextAction*);
+    for (uint32 i = 0; i < size; i++)
+        res[i] = va_arg(vl, NextAction*);
     va_end(vl);
 
     return res;
@@ -82,7 +87,8 @@ void NextAction::destroy(NextAction** actions)
     if (!actions)
         return;
 
-    for (uint32 i = 0; actions[i]; i++) delete actions[i];
+    for (uint32 i = 0; actions[i]; i++)
+        delete actions[i];
 
     delete[] actions;
 }

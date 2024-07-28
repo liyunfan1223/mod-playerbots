@@ -238,7 +238,8 @@ class ItemCountByQuality : public IterateItemsVisitor
 public:
     ItemCountByQuality() : IterateItemsVisitor()
     {
-        for (uint32 i = 0; i < MAX_ITEM_QUALITY; ++i) count[i] = 0;
+        for (uint32 i = 0; i < MAX_ITEM_QUALITY; ++i)
+            count[i] = 0;
     }
 
     bool Visit(Item* item) override

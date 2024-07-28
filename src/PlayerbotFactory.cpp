@@ -3229,7 +3229,8 @@ void PlayerbotFactory::InitInventoryTrade()
             break;
     }
 
-    for (uint32 i = 0; i < stacks; i++) StoreItem(itemId, count);
+    for (uint32 i = 0; i < stacks; i++)
+        StoreItem(itemId, count);
 }
 
 void PlayerbotFactory::InitInventoryEquip()

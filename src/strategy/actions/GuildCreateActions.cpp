@@ -48,7 +48,8 @@ bool BuyPetitionAction::Execute(Event event)
         data << uint32(0);
         data << uint32(0);
 
-        for (uint8 i = 0; i < 10; ++i) data << std::string("");
+        for (uint8 i = 0; i < 10; ++i)
+            data << std::string("");
 
         data << uint32(0);  // index
         data << uint32(0);

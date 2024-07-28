@@ -93,8 +93,10 @@ void FindQuestObjectData::operator()(GameObjectData const& goData)
 questGuidpMap QuestGuidpMapValue::Calculate()
 {
     FindQuestObjectData worker;
-    for (auto const& itr : sObjectMgr->GetAllCreatureData()) worker(itr.second);
-    for (auto const& itr : sObjectMgr->GetAllGOData()) worker(itr.second);
+    for (auto const& itr : sObjectMgr->GetAllCreatureData())
+        worker(itr.second);
+    for (auto const& itr : sObjectMgr->GetAllGOData())
+        worker(itr.second);
 
     return worker.GetResult();
 }

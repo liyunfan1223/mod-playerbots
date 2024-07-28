@@ -1030,9 +1030,9 @@ TravelPath TravelNodeRoute::buildPath(std::vector<WorldPosition> pathToStart, st
                     path.pop_back();
 
                 if (path.size() > 1 && prevNode->isPortal() &&
-                    nodePath->getPathType() != TravelNodePathType::portal)  // Do not move to the area trigger
-                                                                            // if we don't plan to take the
-                                                                            // portal.
+                    nodePath->getPathType() != TravelNodePathType::portal)  // Do not move to the area
+                                                                            // trigger if we don't plan to
+                                                                            // take the portal.
                     path.erase(path.begin());
 
                 if (path.size() > 1 && prevNode->isTransport() &&
@@ -2097,7 +2097,8 @@ void TravelNodeMap::generateTaxiPaths()
 
         std::vector<WorldPosition> ppath;
 
-        for (auto& n : nodes) ppath.push_back(WorldPosition(n->mapid, n->x, n->y, n->z, 0.0));
+        for (auto& n : nodes)
+            ppath.push_back(WorldPosition(n->mapid, n->x, n->y, n->z, 0.0));
 
         float totalTime = startPos.getPathLength(ppath) / (450 * 8.0f);
 
@@ -2131,7 +2132,8 @@ void TravelNodeMap::removeLowNodes()
             goodNodes.insert(goodNodes.end(), nodes.begin(), nodes.end());
     }
 
-    for (auto& node : remNodes) sTravelNodeMap->removeNode(node);
+    for (auto& node : remNodes)
+        sTravelNodeMap->removeNode(node);
 }
 
 void TravelNodeMap::removeUselessPaths()
