@@ -350,7 +350,7 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
 
         std::string const command = holder.GetCommand();
         Player* owner = holder.GetOwner();
-        if (owner == master && !helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
+        if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
         {
              // To prevent spam caused by WIM
             if (!(command.rfind("WIM", 0) == 0) &&
@@ -625,10 +625,15 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
         return;
     }
 
-    if (!IsAllowedCommand(filtered) && !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer))
+    if (!IsAllowedCommand(filtered) && 
+        (master != fromPlayer || !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer)))
         return;
 
-    if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos && filtered.find("award") == std::string::npos)
+    if (!IsAllowedCommand(filtered) && master != fromPlayer)
+        return;
+
+    if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos &&
+        filtered.find("award") == std::string::npos)
     {
         ChatCommandHolder cmd("warning", fromPlayer, type);
         chatCommands.push(cmd);

@@ -62,32 +62,12 @@ jobs:
       - name: Install Requirements
         run: sudo apt-get update && sudo apt-get install ccache git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev mysql-server libboost-all-dev
 
-      - name: setup ccache
-        shell: bash
-        env:
-          CCACHE_DIR: $GITHUB_WORKSPACE/var/ccache
-        run: |
-          cat <<EOF >> $GITHUB_ENV
-          CCACHE_DIR=${{ env.CCACHE_DIR }}
-          CCACHE_MAXSIZE=1000MB
-          CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
-          CCACHE_CPP2=true
-          CCACHE_COMPRESS=1
-          CCACHE_COMPRESSLEVEL=9
-          CCACHE_COMPILERCHECK=content
-          CCACHE_LOGFILE=$CCACHE_DIR/cache.debug
-          CC=${{ inputs.CC }}
-          CXX=${{ inputs.CXX }}
-          EOF
-
       - name: Configure CMake
         run: >
           cmake -B ${{ steps.strings.outputs.build-output-dir }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
-          -DCMAKE_C_COMPILER_LAUNCHER="ccache"
           -S ${{ github.workspace }}
 
       - name: Build
