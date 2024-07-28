@@ -50,18 +50,17 @@ jobs:
           path: 'modules/mod-playerbots'
       
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          path: |
-            /var/cache/apt
-            /var/lib/apt
-          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
+          path: ${{ github.workspace }}/var/ccache
+          key: ccache:${{ matrix.os }}:${{ matrix.c_compiler }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:${{ matrix.os }}:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.c_compiler }}:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.c_compiler }}
             ccache:${{ matrix.os }}
 
       - name: Install Requirements
-        run: sudo apt-get update && sudo apt-get install git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev mysql-server libboost-all-dev
+        run: sudo apt-get update && sudo apt-get install ccache git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev mysql-server libboost-all-dev
 
       - name: Configure CMake
         run: >

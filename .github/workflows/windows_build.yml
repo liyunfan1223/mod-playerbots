@@ -26,14 +26,8 @@ jobs:
         with:
           repository: 'liyunfan1223/mod-playerbots'
           path: 'modules/mod-playerbots'
-      - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: C:\ProgramData\chocolatey\cache
-          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:${{ github.ref }}
-            ccache:${{ matrix.os }}
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.13
       - name: Configure OS
         shell: bash
         env:
