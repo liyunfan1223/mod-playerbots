@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    name: "clang-format"
+    name: "clang-format-trial-run"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Playerbot Module
@@ -27,4 +27,3 @@ jobs:
           # Check if there are any formatting changes
           git diff --exit-code
         shell: bash
-        continue-on-error: true
