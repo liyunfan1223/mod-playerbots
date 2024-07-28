@@ -16,10 +16,10 @@ void EmoteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     if (sPlayerbotAIConfig->randomBotTalk)
     {
-        triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("suggest what to do", 35.0f),
-            new NextAction("suggest dungeon", 50.0f),
-            new NextAction("suggest trade", 65.0f),
-            new NextAction("talk", 10.0f),
+        triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("suggest what to do", 10.0f),
+            new NextAction("suggest dungeon", 3.0f),
+            new NextAction("suggest trade", 3.0f),
+            new NextAction("talk", 1.0f),
             nullptr)));
     }
 
