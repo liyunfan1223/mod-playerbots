@@ -853,7 +853,7 @@ void MovementAction::UpdateMovementState()
     Transport* newTransport = bot->GetMap()->GetTransportForPos(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot);
     if (newTransport != bot->GetTransport())
     {
-        LOG_DEBUG("playerbots", "Bot {} is on a transport", IsMovingAllowed());
+        LOG_DEBUG("playerbots", "Bot {} is on a transport", bot->GetName());
 
         if (bot->GetTransport())
             bot->GetTransport()->RemovePassenger(bot, true);
