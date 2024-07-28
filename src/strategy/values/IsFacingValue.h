@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_ISFACINGVALUE_H
@@ -12,10 +13,10 @@ class PlayerbotAI;
 
 class IsFacingValue : public BoolCalculatedValue, public Qualified
 {
-	public:
-        IsFacingValue(PlayerbotAI* botAI, std::string const name = "is facing") : BoolCalculatedValue(botAI, name) { }
+public:
+    IsFacingValue(PlayerbotAI* botAI, std::string const name = "is facing") : BoolCalculatedValue(botAI, name) {}
 
-        bool Calculate() override;
+    bool Calculate() override;
 };
 
 #endif

@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ListSpellsAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -13,7 +15,8 @@ bool CompareSpells(std::pair<uint32, std::string>& s1, std::pair<uint32, std::st
 {
     SpellInfo const* si1 = sSpellMgr->GetSpellInfo(s1.first);
     SpellInfo const* si2 = sSpellMgr->GetSpellInfo(s2.first);
-    if (!si1 || !si2) {
+    if (!si1 || !si2)
+    {
         LOG_ERROR("playerbots", "SpellInfo missing.");
         return false;
     }
@@ -81,8 +84,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
                     continue;
 
                 vendorItems.insert(entry);
-            }
-            while (results->NextRow());
+            } while (results->NextRow());
         }
     }
 
@@ -107,8 +109,8 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
         }
     }
 
-
-    std::string const ignoreList = ",Opening,Closing,Stuck,Remove Insignia,Opening - No Text,Grovel,Duel,Honorless Target,";
+    std::string const ignoreList =
+        ",Opening,Closing,Stuck,Remove Insignia,Opening - No Text,Grovel,Duel,Honorless Target,";
     std::string alreadySeenList = ",";
 
     uint32 minLevel = 0;
@@ -132,7 +134,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
     if (slot != EQUIPMENT_SLOT_END)
         filter = "";
 
-    std::vector<std::pair<uint32, std::string> > spells;
+    std::vector<std::pair<uint32, std::string>> spells;
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active)
@@ -215,7 +217,8 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
 
                         out << chat->FormatItem(proto);
 
-                        if ((minLevel || maxLevel) && (!proto->RequiredLevel || proto->RequiredLevel < minLevel || proto->RequiredLevel > maxLevel))
+                        if ((minLevel || maxLevel) && (!proto->RequiredLevel || proto->RequiredLevel < minLevel ||
+                                                       proto->RequiredLevel > maxLevel))
                         {
                             filtered = true;
                             break;
@@ -288,7 +291,7 @@ bool ListSpellsAction::Execute(Event event)
     std::sort(spells.begin(), spells.end(), CompareSpells);
 
     uint32 count = 0;
-    for (std::vector<std::pair<uint32, std::string> >::iterator i = spells.begin(); i != spells.end(); ++i)
+    for (std::vector<std::pair<uint32, std::string>>::iterator i = spells.begin(); i != spells.end(); ++i)
     {
         botAI->TellMasterNoFacing(i->second);
 
@@ -303,4 +306,3 @@ bool ListSpellsAction::Execute(Event event)
 
     return true;
 }
-

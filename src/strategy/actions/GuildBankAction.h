@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_GUILDBANKACTION_H
@@ -13,14 +14,14 @@ class PlayerbotAI;
 
 class GuildBankAction : public InventoryAction
 {
-    public:
-        GuildBankAction(PlayerbotAI* botAI) : InventoryAction(botAI, "guild bank") { }
+public:
+    GuildBankAction(PlayerbotAI* botAI) : InventoryAction(botAI, "guild bank") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        bool Execute(std::string const text, GameObject* bank);
-        bool MoveFromCharToBank(Item* item, GameObject* bank);
+private:
+    bool Execute(std::string const text, GameObject* bank);
+    bool MoveFromCharToBank(Item* item, GameObject* bank);
 };
 
 #endif

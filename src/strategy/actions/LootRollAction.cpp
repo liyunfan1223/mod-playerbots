@@ -1,14 +1,16 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "LootRollAction.h"
+
 #include "Event.h"
 #include "Group.h"
 #include "ItemUsageValue.h"
+#include "LootAction.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
-#include "LootAction.h"
 
 bool LootRollAction::Execute(Event event)
 {
@@ -19,8 +21,10 @@ bool LootRollAction::Execute(Event event)
         return false;
 
     std::vector<Roll*> rolls = group->GetRolls();
-    for (Roll* &roll : rolls) {
-        if (roll->playerVote.find(bot->GetGUID())->second != NOT_EMITED_YET) {
+    for (Roll*& roll : rolls)
+    {
+        if (roll->playerVote.find(bot->GetGUID())->second != NOT_EMITED_YET)
+        {
             continue;
         }
         ObjectGuid guid = roll->itemGUID;
@@ -28,7 +32,7 @@ bool LootRollAction::Execute(Event event)
         uint32 itemId = roll->itemid;
 
         RollVote vote = PASS;
-        ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
@@ -36,10 +40,12 @@ bool LootRollAction::Execute(Event event)
         {
             case ITEM_CLASS_WEAPON:
             case ITEM_CLASS_ARMOR:
-                if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP) {
+                if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
+                {
                     vote = NEED;
                 }
-                else if (usage != ITEM_USAGE_NONE) {
+                else if (usage != ITEM_USAGE_NONE)
+                {
                     vote = GREED;
                 }
                 break;
@@ -48,12 +54,18 @@ bool LootRollAction::Execute(Event event)
                     vote = NEED;
                 break;
         }
-        if (sPlayerbotAIConfig->lootRollLevel == 0) {
+        if (sPlayerbotAIConfig->lootRollLevel == 0)
+        {
             vote = PASS;
-        } else if (sPlayerbotAIConfig->lootRollLevel == 1) {
-            if (vote == NEED) {
+        }
+        else if (sPlayerbotAIConfig->lootRollLevel == 1)
+        {
+            if (vote == NEED)
+            {
                 vote = GREED;
-            } else if (vote == GREED) {
+            }
+            else if (vote == GREED)
+            {
                 vote = PASS;
             }
         }
@@ -74,9 +86,8 @@ bool LootRollAction::Execute(Event event)
     // p >> slot; //number of players invited to roll
     // p >> rollType; //need,greed or pass on roll
 
-
     // std::vector<Roll*> rolls = group->GetRolls();
-    // bot->Say("guid:" + std::to_string(guid.GetCounter()) + 
+    // bot->Say("guid:" + std::to_string(guid.GetCounter()) +
     //     "item entry:" + std::to_string(guid.GetEntry()), LANG_UNIVERSAL);
     // for (std::vector<Roll*>::iterator i = rolls.begin(); i != rolls.end(); ++i)
     // {
@@ -154,16 +165,13 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
     return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? needVote : PASS;
 }
 
-bool MasterLootRollAction::isUseful()
-{
-    return !botAI->HasActivePlayerMaster();
-};
+bool MasterLootRollAction::isUseful() { return !botAI->HasActivePlayerMaster(); };
 
 bool MasterLootRollAction::Execute(Event event)
 {
     Player* bot = QueryItemUsageAction::botAI->GetBot();
 
-    WorldPacket p(event.getPacket()); //WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
+    WorldPacket p(event.getPacket());  // WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
     ObjectGuid creatureGuid;
     uint32 mapId;
     uint32 itemSlot;
@@ -173,15 +181,15 @@ bool MasterLootRollAction::Execute(Event event)
     uint32 count;
     uint32 timeout;
 
-    p.rpos(0); //reset packet pointer
-    p >> creatureGuid; //creature guid what we're looting
-    p >> mapId; /// 3.3.3 mapid
-    p >> itemSlot; // the itemEntryId for the item that shall be rolled for
-    p >> itemId; // the itemEntryId for the item that shall be rolled for
-    p >> randomSuffix; // randomSuffix
-    p >> randomPropertyId; // item random property ID
-    p >> count; // items in stack
-    p >> timeout;  // the countdown time to choose "need" or "greed"
+    p.rpos(0);              // reset packet pointer
+    p >> creatureGuid;      // creature guid what we're looting
+    p >> mapId;             /// 3.3.3 mapid
+    p >> itemSlot;          // the itemEntryId for the item that shall be rolled for
+    p >> itemId;            // the itemEntryId for the item that shall be rolled for
+    p >> randomSuffix;      // randomSuffix
+    p >> randomPropertyId;  // item random property ID
+    p >> count;             // items in stack
+    p >> timeout;           // the countdown time to choose "need" or "greed"
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
     if (!proto)

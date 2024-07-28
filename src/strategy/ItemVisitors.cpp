@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ItemVisitors.h"
+
 #include "Playerbots.h"
 
 bool FindUsableItemVisitor::Visit(Item* item)
@@ -15,7 +17,8 @@ bool FindUsableItemVisitor::Visit(Item* item)
 
 bool FindPotionVisitor::Accept(ItemTemplate const* proto)
 {
-    if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_POTION || proto->SubClass == ITEM_SUBCLASS_FLASK))
+    if (proto->Class == ITEM_CLASS_CONSUMABLE &&
+        (proto->SubClass == ITEM_SUBCLASS_POTION || proto->SubClass == ITEM_SUBCLASS_FLASK))
     {
         for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
         {

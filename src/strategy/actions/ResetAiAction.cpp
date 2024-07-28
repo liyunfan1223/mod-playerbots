@@ -1,20 +1,24 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ResetAiAction.h"
+
 #include "Event.h"
-#include "ObjectGuid.h"
-#include "Playerbots.h"
-#include "PlayerbotDbStore.h"
-#include "WorldPacket.h"
 #include "Group.h"
+#include "ObjectGuid.h"
+#include "PlayerbotDbStore.h"
+#include "Playerbots.h"
+#include "WorldPacket.h"
 
 bool ResetAiAction::Execute(Event event)
 {
-    if (!event.getPacket().empty()) {
+    if (!event.getPacket().empty())
+    {
         WorldPacket packet = event.getPacket();
-        if (packet.GetOpcode() == SMSG_GROUP_LIST) {
+        if (packet.GetOpcode() == SMSG_GROUP_LIST)
+        {
             uint8 groupType;
             Group::MemberSlot slot;
             packet >> groupType;
@@ -34,7 +38,8 @@ bool ResetAiAction::Execute(Event event)
             packet >> guid;
             packet >> counter;
             packet >> membersCount;
-            if (membersCount != 0) {
+            if (membersCount != 0)
+            {
                 return false;
             }
         }

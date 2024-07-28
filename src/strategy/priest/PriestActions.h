@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_PRIESTACTIONS_H
@@ -22,7 +23,8 @@ CURE_ACTION(CastDispelMagicAction, "dispel magic");
 CURE_PARTY_ACTION(CastDispelMagicOnPartyAction, "dispel magic", DISPEL_MAGIC);
 SPELL_ACTION(CastDispelMagicOnTargetAction, "dispel magic");
 CC_ACTION(CastShackleUndeadAction, "shackle undead");
-SPELL_ACTION_U(CastManaBurnAction, "mana burn", AI_VALUE2(uint8, "mana", "self target") < 50 && AI_VALUE2(uint8, "mana", "current target") >= 20);
+SPELL_ACTION_U(CastManaBurnAction, "mana burn",
+               AI_VALUE2(uint8, "mana", "self target") < 50 && AI_VALUE2(uint8, "mana", "current target") >= 20);
 BUFF_ACTION(CastLevitateAction, "levitate");
 BUFF_ACTION(CastDivineSpiritAction, "divine spirit");
 BUFF_PARTY_ACTION(CastDivineSpiritOnPartyAction, "divine spirit");
@@ -99,7 +101,9 @@ BUFF_ACTION(CastShadowguardAction, "shadowguard");
 HEAL_ACTION(CastDesperatePrayerAction, "desperate prayer");
 BUFF_ACTION(CastFearWardAction, "fear ward");
 BUFF_PARTY_ACTION(CastFearWardOnPartyAction, "fear ward");
-SPELL_ACTION_U(CastStarshardsAction, "starshards", (AI_VALUE2(uint8, "mana", "self target") > 50 && AI_VALUE(Unit*, "current target") && AI_VALUE2(float, "distance", "current target") > 15.0f));
+SPELL_ACTION_U(CastStarshardsAction, "starshards",
+               (AI_VALUE2(uint8, "mana", "self target") > 50 && AI_VALUE(Unit*, "current target") &&
+                AI_VALUE2(float, "distance", "current target") > 15.0f));
 BUFF_ACTION(CastElunesGraceAction, "elune's grace");
 BUFF_ACTION(CastFeedbackAction, "feedback");
 BUFF_ACTION(CastSymbolOfHopeAction, "symbol of hope");
@@ -108,12 +112,12 @@ SNARE_ACTION(CastChastiseAction, "chastise");
 
 class CastRemoveShadowformAction : public Action
 {
-    public:
-        CastRemoveShadowformAction(PlayerbotAI* botAI) : Action(botAI, "remove shadowform") { }
+public:
+    CastRemoveShadowformAction(PlayerbotAI* botAI) : Action(botAI, "remove shadowform") {}
 
-        bool isUseful() override;
-        bool isPossible() override;
-        bool Execute(Event event) override;
+    bool isUseful() override;
+    bool isPossible() override;
+    bool Execute(Event event) override;
 };
 
 class CastDispersionAction : public CastSpellAction
@@ -126,7 +130,9 @@ public:
 class CastPenanceOnPartyAction : public HealPartyMemberAction
 {
 public:
-    CastPenanceOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "penance", 25.0f, HealingManaEfficiency::HIGH) {}
+    CastPenanceOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "penance", 25.0f, HealingManaEfficiency::HIGH)
+    {
+    }
 };
 
 class CastHymnOfHopeAction : public CastSpellAction
@@ -150,17 +156,21 @@ public:
     virtual std::string const GetTargetName() { return "current target"; }
 };
 
-class CastPowerWordShieldOnAlmostFullHealthBelow : public HealPartyMemberAction {
+class CastPowerWordShieldOnAlmostFullHealthBelow : public HealPartyMemberAction
+{
 public:
-    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI* ai) : HealPartyMemberAction(ai, "power word: shield", 15.0f, HealingManaEfficiency::HIGH) {}
+    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI* ai)
+        : HealPartyMemberAction(ai, "power word: shield", 15.0f, HealingManaEfficiency::HIGH)
+    {
+    }
     bool isUseful() override;
     Unit* GetTarget() override;
 };
 
 class CastMindSearAction : public CastSpellAction
 {
-    public:
-        CastMindSearAction(PlayerbotAI* ai) : CastSpellAction(ai, "mind sear") {}
-        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+public:
+    CastMindSearAction(PlayerbotAI* ai) : CastSpellAction(ai, "mind sear") {}
+    ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 #endif

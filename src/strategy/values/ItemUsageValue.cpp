@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ItemUsageValue.h"
+
 #include "AiFactory.h"
 #include "ChatHelper.h"
 #include "GuildTaskMgr.h"
@@ -37,7 +39,8 @@ ItemUsage ItemUsageValue::Calculate()
         {
             bool lowBagSpace = AI_VALUE(uint8, "bag space") > 50;
 
-            if (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_MISC || proto->Class == ITEM_CLASS_REAGENT)
+            if (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_MISC ||
+                proto->Class == ITEM_CLASS_REAGENT)
                 needItem = IsItemNeededForUsefullSpell(proto, lowBagSpace);
             else if (proto->Class == ITEM_CLASS_RECIPE)
             {
@@ -52,9 +55,9 @@ ItemUsage ItemUsageValue::Calculate()
         {
             float stacks = CurrentStacks(proto);
             if (stacks < 1)
-                return ITEM_USAGE_SKILL; //Buy more.
+                return ITEM_USAGE_SKILL;  // Buy more.
             if (stacks < 2)
-                return ITEM_USAGE_KEEP; //Keep current amount.
+                return ITEM_USAGE_KEEP;  // Keep current amount.
         }
     }
 
@@ -73,13 +76,13 @@ ItemUsage ItemUsageValue::Calculate()
                 stacks += CurrentStacks(proto);
 
                 if (stacks < 2)
-                    return ITEM_USAGE_USE; // Buy some to get to 2 stacks
-                else if (stacks < 3)       // Keep the item if less than 3 stacks
+                    return ITEM_USAGE_USE;  // Buy some to get to 2 stacks
+                else if (stacks < 3)        // Keep the item if less than 3 stacks
                     return ITEM_USAGE_KEEP;
             }
         }
     }
-    
+
     if (bot->GetGuildId() && sGuildTaskMgr->IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
@@ -87,12 +90,14 @@ ItemUsage ItemUsageValue::Calculate()
     if (equip != ITEM_USAGE_NONE)
         return equip;
 
-    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && proto->Bonding != BIND_WHEN_PICKED_UP &&
-            botAI->HasSkill(SKILL_ENCHANTING) && proto->Quality >= ITEM_QUALITY_UNCOMMON)
+    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) &&
+        proto->Bonding != BIND_WHEN_PICKED_UP && botAI->HasSkill(SKILL_ENCHANTING) &&
+        proto->Quality >= ITEM_QUALITY_UNCOMMON)
         return ITEM_USAGE_DISENCHANT;
 
-    //While sync is on, do not loot quest items that are also Useful for master. Master
-    if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer || !IsItemUsefulForQuest(botAI->GetMaster(), proto))
+    // While sync is on, do not loot quest items that are also Useful for master. Master
+    if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer ||
+        !IsItemUsefulForQuest(botAI->GetMaster(), proto))
         if (IsItemUsefulForQuest(bot, proto))
             return ITEM_USAGE_QUEST;
 
@@ -118,20 +123,20 @@ ItemUsage ItemUsageValue::Calculate()
                     float ammo = BetterStacks(proto, "ammo");
                     float needAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2;
 
-                    if (ammo < needAmmo) //We already have enough of the current ammo.
+                    if (ammo < needAmmo)  // We already have enough of the current ammo.
                     {
                         ammo += CurrentStacks(proto);
 
-                        if (ammo < needAmmo)         //Buy ammo to get to the proper supply
+                        if (ammo < needAmmo)  // Buy ammo to get to the proper supply
                             return ITEM_USAGE_AMMO;
                         else if (ammo < needAmmo + 1)
-                            return ITEM_USAGE_KEEP; // Keep the ammo until we have too much.
+                            return ITEM_USAGE_KEEP;  // Keep the ammo until we have too much.
                     }
                 }
             }
         }
 
-    //Need to add something like free bagspace or item value.
+    // Need to add something like free bagspace or item value.
     if (proto->SellPrice > 0)
     {
         if (proto->Quality > ITEM_QUALITY_NORMAL)
@@ -164,7 +169,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     pItem->RemoveFromUpdateQueueOf(bot);
     delete pItem;
 
-    if (result != EQUIP_ERR_OK )
+    if (result != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
 
     if (itemProto->Class == ITEM_CLASS_QUIVER)
@@ -174,7 +179,8 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     if (itemProto->Class == ITEM_CLASS_CONTAINER)
     {
         if (itemProto->SubClass != ITEM_SUBCLASS_CONTAINER)
-            return ITEM_USAGE_NONE; //Todo add logic for non-bag containers. We want to look at professions/class and only replace if non-bag is larger than bag.
+            return ITEM_USAGE_NONE;  // Todo add logic for non-bag containers. We want to look at professions/class and
+                                     // only replace if non-bag is larger than bag.
 
         if (GetSmallestBagSize() >= itemProto->ContainerSlots)
             return ITEM_USAGE_NONE;
@@ -190,16 +196,19 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
 
     if (itemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), itemProto))
         shouldEquip = false;
-    if (itemProto->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), itemProto))
+    if (itemProto->Class == ITEM_CLASS_ARMOR &&
+        !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), itemProto))
         shouldEquip = false;
 
     Item* oldItem = bot->GetItemByPos(dest);
 
-    //No item equiped
-    if (!oldItem) {
+    // No item equiped
+    if (!oldItem)
+    {
         if (shouldEquip)
             return ITEM_USAGE_EQUIP;
-        else {
+        else
+        {
             return ITEM_USAGE_BAD_EQUIP;
         }
     }
@@ -216,10 +225,14 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     }
 
     // Bigger quiver
-    if (itemProto->Class == ITEM_CLASS_QUIVER) {
-        if (!oldItem || oldItemProto->ContainerSlots < itemProto->ContainerSlots) {
+    if (itemProto->Class == ITEM_CLASS_QUIVER)
+    {
+        if (!oldItem || oldItemProto->ContainerSlots < itemProto->ContainerSlots)
+        {
             return ITEM_USAGE_EQUIP;
-        } else {
+        }
+        else
+        {
             return ITEM_USAGE_NONE;
         }
     }
@@ -228,41 +241,45 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     if (oldItemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), oldItemProto))
         existingShouldEquip = false;
 
-    if (oldItemProto->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), oldItemProto))
+    if (oldItemProto->Class == ITEM_CLASS_ARMOR &&
+        !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), oldItemProto))
         existingShouldEquip = false;
 
     // uint32 oldItemPower = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
     // uint32 newItemPower = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
 
-    //Compare items based on item level, quality or itemId.
+    // Compare items based on item level, quality or itemId.
     bool isBetter = false;
     if (itemScore > oldScore)
         isBetter = true;
     // else if (newItemPower == oldScore && itemProto->Quality > oldItemProto->Quality)
     //     isBetter = true;
-    // else if (newItemPower == oldScore && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId > oldItemProto->ItemId)
+    // else if (newItemPower == oldScore && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId >
+    // oldItemProto->ItemId)
     //     isBetter = true;
 
     Item* item = CurrentItem(itemProto);
-    bool itemIsBroken = item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
-    bool oldItemIsBroken = oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+    bool itemIsBroken =
+        item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+    bool oldItemIsBroken =
+        oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
 
     if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquip || !existingShouldEquip) && isBetter)
     {
         switch (itemProto->Class)
         {
             case ITEM_CLASS_ARMOR:
-            if (oldItemProto->SubClass <= itemProto->SubClass)
-            {
-                if (itemIsBroken && !oldItemIsBroken)
-                    return ITEM_USAGE_BROKEN_EQUIP;
-                else if (shouldEquip)
-                    return ITEM_USAGE_REPLACE;
-                else
-                    return ITEM_USAGE_BAD_EQUIP;
+                if (oldItemProto->SubClass <= itemProto->SubClass)
+                {
+                    if (itemIsBroken && !oldItemIsBroken)
+                        return ITEM_USAGE_BROKEN_EQUIP;
+                    else if (shouldEquip)
+                        return ITEM_USAGE_REPLACE;
+                    else
+                        return ITEM_USAGE_BAD_EQUIP;
 
-                break;
-            }
+                    break;
+                }
             default:
             {
                 if (itemIsBroken && !oldItemIsBroken)
@@ -282,7 +299,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     return ITEM_USAGE_NONE;
 }
 
-//Return smaltest bag size equipped
+// Return smaltest bag size equipped
 uint32 ItemUsageValue::GetSmallestBagSize()
 {
     int8 curSlot = 0;
@@ -318,7 +335,8 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
             if (quest->RequiredItemId[i] != proto->ItemId)
                 continue;
 
-            if (GET_PLAYERBOT_AI(player) && AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+            if (GET_PLAYERBOT_AI(player) &&
+                AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
                 continue;
 
             return true;
@@ -332,29 +350,29 @@ bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
 {
     switch (proto->ItemId)
     {
-        case 2901: //Mining pick
+        case 2901:  // Mining pick
             return botAI->HasSkill(SKILL_MINING);
-        case 5956: //Blacksmith Hammer
+        case 5956:  // Blacksmith Hammer
             return botAI->HasSkill(SKILL_BLACKSMITHING) || botAI->HasSkill(SKILL_ENGINEERING);
-        case 6219: //Arclight Spanner
+        case 6219:  // Arclight Spanner
             return botAI->HasSkill(SKILL_ENGINEERING);
-        case 6218: // Runed copper rod
+        case 6218:  // Runed copper rod
             return botAI->HasSkill(SKILL_ENCHANTING);
-        case 6339: // Runed silver rod
+        case 6339:  // Runed silver rod
             return botAI->HasSkill(SKILL_ENCHANTING);
-        case 11130: // Runed golden rod
+        case 11130:  // Runed golden rod
             return botAI->HasSkill(SKILL_ENCHANTING);
-        case 11145: // Runed truesilver rod
+        case 11145:  // Runed truesilver rod
             return botAI->HasSkill(SKILL_ENCHANTING);
-        case 16207: //Runed Arcanite Rod
+        case 16207:  // Runed Arcanite Rod
             return botAI->HasSkill(SKILL_ENCHANTING);
-        case 7005: //Skinning Knife
+        case 7005:  // Skinning Knife
             return botAI->HasSkill(SKILL_SKINNING);
-        case 4471: //Flint and Tinder
+        case 4471:  // Flint and Tinder
             return botAI->HasSkill(SKILL_COOKING);
-        case 4470: //Simple Wood
+        case 4470:  // Simple Wood
             return botAI->HasSkill(SKILL_COOKING);
-        case 6256: //Fishing Rod
+        case 6256:  // Fishing Rod
             return botAI->HasSkill(SKILL_FISHING);
     }
 
@@ -390,12 +408,16 @@ bool ItemUsageValue::IsItemUsefulForSkill(ItemTemplate const* proto)
                 return true;
             if (botAI->HasSkill(SKILL_JEWELCRAFTING) && RandomItemMgr::IsUsedBySkill(proto, SKILL_JEWELCRAFTING))
                 return true;
-            if (botAI->HasSkill(SKILL_MINING) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_MINING) || RandomItemMgr::IsUsedBySkill(proto, SKILL_BLACKSMITHING) ||
-                RandomItemMgr::IsUsedBySkill(proto, SKILL_JEWELCRAFTING) || RandomItemMgr::IsUsedBySkill(proto, SKILL_ENGINEERING)))
+            if (botAI->HasSkill(SKILL_MINING) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_MINING) ||
+                                                  RandomItemMgr::IsUsedBySkill(proto, SKILL_BLACKSMITHING) ||
+                                                  RandomItemMgr::IsUsedBySkill(proto, SKILL_JEWELCRAFTING) ||
+                                                  RandomItemMgr::IsUsedBySkill(proto, SKILL_ENGINEERING)))
                 return true;
-            if (botAI->HasSkill(SKILL_SKINNING) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_SKINNING) || RandomItemMgr::IsUsedBySkill(proto, SKILL_LEATHERWORKING)))
+            if (botAI->HasSkill(SKILL_SKINNING) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_SKINNING) ||
+                                                    RandomItemMgr::IsUsedBySkill(proto, SKILL_LEATHERWORKING)))
                 return true;
-            if (botAI->HasSkill(SKILL_HERBALISM) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_HERBALISM) || RandomItemMgr::IsUsedBySkill(proto, SKILL_ALCHEMY)))
+            if (botAI->HasSkill(SKILL_HERBALISM) && (RandomItemMgr::IsUsedBySkill(proto, SKILL_HERBALISM) ||
+                                                     RandomItemMgr::IsUsedBySkill(proto, SKILL_ALCHEMY)))
                 return true;
 
             return false;
@@ -451,7 +473,8 @@ bool ItemUsageValue::IsItemNeededForUsefullSpell(ItemTemplate const* proto, bool
         {
             ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", newItemId);
 
-            if (usage != ITEM_USAGE_REPLACE && usage != ITEM_USAGE_EQUIP && usage != ITEM_USAGE_AMMO && usage != ITEM_USAGE_QUEST && usage != ITEM_USAGE_SKILL && usage != ITEM_USAGE_USE)
+            if (usage != ITEM_USAGE_REPLACE && usage != ITEM_USAGE_EQUIP && usage != ITEM_USAGE_AMMO &&
+                usage != ITEM_USAGE_QUEST && usage != ITEM_USAGE_SKILL && usage != ITEM_USAGE_USE)
                 continue;
 
             return true;
@@ -470,7 +493,9 @@ bool ItemUsageValue::HasItemsNeededForSpell(uint32 spellId, ItemTemplate const* 
     for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
         if (spellInfo->ReagentCount[i] > 0 && spellInfo->Reagent[i])
         {
-            if (proto && proto->ItemId == spellInfo->Reagent[i] && spellInfo->ReagentCount[i] == 1) //If we only need 1 item then current item does not need to be checked since we are looting/buying or already have it.
+            if (proto && proto->ItemId == spellInfo->Reagent[i] &&
+                spellInfo->ReagentCount[i] == 1)  // If we only need 1 item then current item does not need to be
+                                                  // checked since we are looting/buying or already have it.
                 continue;
 
             ItemTemplate const* reqProto = sObjectMgr->GetItemTemplate(spellInfo->Reagent[i]);
@@ -601,7 +626,9 @@ bool ItemUsageValue::SpellGivesSkillUp(uint32 spellId, Player* bot)
 
             uint32 craft_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
 
-            if (SkillGainChance(SkillValue, skill->TrivialSkillLineRankHigh, (skill->TrivialSkillLineRankHigh + skill->TrivialSkillLineRankLow) / 2, skill->TrivialSkillLineRankLow) > 0)
+            if (SkillGainChance(SkillValue, skill->TrivialSkillLineRankHigh,
+                                (skill->TrivialSkillLineRankHigh + skill->TrivialSkillLineRankLow) / 2,
+                                skill->TrivialSkillLineRankLow) > 0)
                 return true;
         }
     }

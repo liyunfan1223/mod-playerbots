@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "AcceptQuestAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -112,7 +114,7 @@ bool AcceptQuestShareAction::Execute(Event event)
         bot->SetDivider(ObjectGuid::Empty);
     }
 
-    if (bot->CanAddQuest( qInfo, false))
+    if (bot->CanAddQuest(qInfo, false))
     {
         bot->AddQuest(qInfo, master);
 
@@ -125,7 +127,7 @@ bool AcceptQuestShareAction::Execute(Event event)
 
         if (qInfo->GetSrcSpell() > 0)
         {
-            bot->CastSpell( bot, qInfo->GetSrcSpell(), true);
+            bot->CastSpell(bot, qInfo->GetSrcSpell(), true);
         }
 
         botAI->TellMaster("Quest accepted");

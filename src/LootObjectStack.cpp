@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "LootObjectStack.h"
+
 #include "LootMgr.h"
 #include "Playerbots.h"
 #include "Unit.h"
 
 #define MAX_LOOT_OBJECT_COUNT 10
 
-LootTarget::LootTarget(ObjectGuid guid) : guid(guid), asOfTime(time(nullptr))
-{
-}
+LootTarget::LootTarget(ObjectGuid guid) : guid(guid), asOfTime(time(nullptr)) {}
 
 LootTarget::LootTarget(LootTarget const& other)
 {
@@ -30,19 +30,16 @@ LootTarget& LootTarget::operator=(LootTarget const& other)
     return *this;
 }
 
-bool LootTarget::operator<(LootTarget const& other) const
-{
-    return guid < other.guid;
-}
+bool LootTarget::operator<(LootTarget const& other) const { return guid < other.guid; }
 
 void LootTargetList::shrink(time_t fromTime)
 {
-    for (std::set<LootTarget>::iterator i = begin(); i != end(); )
+    for (std::set<LootTarget>::iterator i = begin(); i != end();)
     {
         if (i->asOfTime <= fromTime)
             erase(i++);
-		else
-			++i;
+        else
+            ++i;
     }
 }
 
@@ -59,7 +56,8 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     guid.Clear();
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (!botAI) {
+    if (!botAI)
+    {
         return;
     }
     Creature* creature = botAI->GetCreature(lootGUID);
@@ -73,7 +71,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
             skillId = creature->GetCreatureTemplate()->GetRequiredLootSkill();
             uint32 targetLevel = creature->GetLevel();
             reqSkillValue = targetLevel < 10 ? 1 : targetLevel < 20 ? (targetLevel - 10) * 10 : targetLevel * 5;
-            if (botAI->HasSkill((SkillType) skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
+            if (botAI->HasSkill((SkillType)skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
                 guid = lootGUID;
         }
 
@@ -83,7 +81,6 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     GameObject* go = botAI->GetGameObject(lootGUID);
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
-
         bool isQuestItemOnly = false;
 
         GameObjectQuestItemList const* items = sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
@@ -123,21 +120,21 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
                     }
                     break;
                 case LOCK_KEY_SKILL:
-                    if (goId == 13891 || goId == 19535) // Serpentbloom
+                    if (goId == 13891 || goId == 19535)  // Serpentbloom
                     {
                         this->guid = guid;
                     }
                     else if (SkillByLockType(LockType(lockInfo->Index[i])) > 0)
                     {
                         skillId = SkillByLockType(LockType(lockInfo->Index[i]));
-                        reqSkillValue = std::max((uint32) 1, lockInfo->Skill[i]);
+                        reqSkillValue = std::max((uint32)1, lockInfo->Skill[i]);
                         guid = lootGUID;
                     }
                     break;
                 case LOCK_KEY_NONE:
                     guid = lootGUID;
                     break;
-                }
+            }
         }
     }
 }
@@ -178,7 +175,8 @@ WorldObject* LootObject::GetWorldObject(Player* bot)
     Refresh(bot, guid);
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (!botAI) {
+    if (!botAI)
+    {
         return nullptr;
     }
     Creature* creature = botAI->GetCreature(guid);
@@ -206,7 +204,8 @@ bool LootObject::IsLootPossible(Player* bot)
         return false;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (!botAI) {
+    if (!botAI)
+    {
         return false;
     }
     if (reqItem && !bot->HasItemCount(reqItem, 1))
@@ -214,7 +213,7 @@ bool LootObject::IsLootPossible(Player* bot)
 
     if (abs(GetWorldObject(bot)->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE)
         return false;
-    
+
     Creature* creature = botAI->GetCreature(guid);
     if (creature && creature->getDeathState() == DeathState::Corpse)
     {
@@ -249,11 +248,13 @@ bool LootObject::IsLootPossible(Player* bot)
 
 bool LootObjectStack::Add(ObjectGuid guid)
 {
-    if (availableLoot.size() >= MAX_LOOT_OBJECT_COUNT) {
+    if (availableLoot.size() >= MAX_LOOT_OBJECT_COUNT)
+    {
         availableLoot.shrink(time(nullptr) - 30);
     }
 
-    if (availableLoot.size() >= MAX_LOOT_OBJECT_COUNT) {
+    if (availableLoot.size() >= MAX_LOOT_OBJECT_COUNT)
+    {
         availableLoot.clear();
     }
 
@@ -270,10 +271,7 @@ void LootObjectStack::Remove(ObjectGuid guid)
         availableLoot.erase(i);
 }
 
-void LootObjectStack::Clear()
-{
-    availableLoot.clear();
-}
+void LootObjectStack::Clear() { availableLoot.clear(); }
 
 bool LootObjectStack::CanLoot(float maxDistance)
 {
@@ -299,7 +297,7 @@ std::vector<LootObject> LootObjectStack::OrderByDistance(float maxDistance)
         LootObject lootObject(bot, guid);
         if (!lootObject.IsLootPossible(bot))
             continue;
-        
+
         float distance = bot->GetDistance(lootObject.GetWorldObject(bot));
         if (!maxDistance || distance <= maxDistance)
             sortedMap[distance] = lootObject;
@@ -311,4 +309,3 @@ std::vector<LootObject> LootObjectStack::OrderByDistance(float maxDistance)
 
     return result;
 }
-

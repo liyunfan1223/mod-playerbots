@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "HireAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -43,7 +45,8 @@ bool HireAction::Execute(Event event)
     if (discount < moneyReq)
     {
         std::ostringstream out;
-        out << "You cannot hire me - I barely know you. Make sure you have at least " << chat->formatMoney(moneyReq) << " as a trade discount";
+        out << "You cannot hire me - I barely know you. Make sure you have at least " << chat->formatMoney(moneyReq)
+            << " as a trade discount";
         botAI->TellMaster(out.str());
         return false;
     }
@@ -52,7 +55,8 @@ bool HireAction::Execute(Event event)
 
     bot->SetMoney(moneyReq);
     sRandomPlayerbotMgr->Remove(bot);
-    CharacterDatabase.Execute("UPDATE characters SET account = {} WHERE guid = {}", account, bot->GetGUID().GetCounter());
+    CharacterDatabase.Execute("UPDATE characters SET account = {} WHERE guid = {}", account,
+                              bot->GetGUID().GetCounter());
 
     return true;
 }

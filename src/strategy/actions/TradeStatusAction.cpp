@@ -1,16 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TradeStatusAction.h"
-#include "SetCraftAction.h"
-#include "Event.h"
-#include "ItemVisitors.h"
+
 #include "CraftValue.h"
-#include "ItemUsageValue.h"
+#include "Event.h"
 #include "GuildTaskMgr.h"
-#include "Playerbots.h"
+#include "ItemUsageValue.h"
+#include "ItemVisitors.h"
 #include "PlayerbotSecurity.h"
+#include "Playerbots.h"
+#include "SetCraftAction.h"
 
 bool TradeStatusAction::Execute(Event event)
 {
@@ -22,10 +24,11 @@ bool TradeStatusAction::Execute(Event event)
     PlayerbotAI* traderBotAI = GET_PLAYERBOT_AI(trader);
     if (trader != master && !traderBotAI)
     {
-		bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader);
+        bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader);
     }
 
-    if ((trader != master || !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master)) && !traderBotAI)
+    if ((trader != master || !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master)) &&
+        !traderBotAI)
     {
         WorldPacket p;
         uint32 status = 0;
@@ -82,7 +85,6 @@ bool TradeStatusAction::Execute(Event event)
 
                 sGuildTaskMgr->CheckItemTask(itemId, count, trader, bot);
             }
-
 
             for (std::map<uint32, uint32>::iterator i = takenItemIds.begin(); i != takenItemIds.end(); ++i)
             {
@@ -169,10 +171,12 @@ bool TradeStatusAction::CheckTrade()
 
         if (isGettingItem)
         {
-            if (bot->GetGroup() && bot->GetGroup()->IsMember(bot->GetTrader()->GetGUID()) && botAI->HasRealPlayerMaster())
+            if (bot->GetGroup() && bot->GetGroup()->IsMember(bot->GetTrader()->GetGUID()) &&
+                botAI->HasRealPlayerMaster())
                 botAI->TellMasterNoFacing("Thank you " + chat->FormatWorldobject(bot->GetTrader()));
             else
-                bot->Say("Thank you " + chat->FormatWorldobject(bot->GetTrader()), (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
+                bot->Say("Thank you " + chat->FormatWorldobject(bot->GetTrader()),
+                         (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
         }
         return isGettingItem;
     }
@@ -206,7 +210,7 @@ bool TradeStatusAction::CheckTrade()
             return false;
         }
 
-        item = trader->GetTradeData()->GetItem((TradeSlots) slot);
+        item = trader->GetTradeData()->GetItem((TradeSlots)slot);
         if (item)
         {
             std::ostringstream out;

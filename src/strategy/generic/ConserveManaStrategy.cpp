@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ConserveManaStrategy.h"
+
 #include "GenericSpellActions.h"
 #include "LastSpellCastValue.h"
 #include "PlayerbotAIConfig.h"
@@ -96,7 +98,7 @@ float HealerAutoSaveManaMultiplier::GetValue(Action* action)
 
     if (!healingAction)
         return 1.0f;
-    
+
     Unit* target = healingAction->GetTarget();
     if (!target)
         return 1.0f;
@@ -105,14 +107,20 @@ float HealerAutoSaveManaMultiplier::GetValue(Action* action)
     HealingManaEfficiency manaEfficiency = healingAction->manaEfficiency;
     uint8 estAmount = healingAction->estAmount;
     uint8 lossAmount = 100 - health;
-    if (isTank) {
-        estAmount /= 1.5; // tanks have more health
-        if (health >= sPlayerbotAIConfig->mediumHealth && (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::MEDIUM))
+    if (isTank)
+    {
+        estAmount /= 1.5;  // tanks have more health
+        if (health >= sPlayerbotAIConfig->mediumHealth &&
+            (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::MEDIUM))
             return 0.0f;
-        if (health >= sPlayerbotAIConfig->lowHealth && (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::LOW))
+        if (health >= sPlayerbotAIConfig->lowHealth &&
+            (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::LOW))
             return 0.0f;
-    } else {
-        if (health >= sPlayerbotAIConfig->mediumHealth && (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::MEDIUM))
+    }
+    else
+    {
+        if (health >= sPlayerbotAIConfig->mediumHealth &&
+            (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::MEDIUM))
             return 0.0f;
         if (lossAmount < estAmount || manaEfficiency <= HealingManaEfficiency::LOW)
             return 0.0f;

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_GENERICPALADINSTRATEGY_H
@@ -11,38 +12,38 @@ class PlayerbotAI;
 
 class GenericPaladinStrategy : public CombatStrategy
 {
-    public:
-        GenericPaladinStrategy(PlayerbotAI* botAI);
+public:
+    GenericPaladinStrategy(PlayerbotAI* botAI);
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "paladin"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "paladin"; }
 };
 
 class PaladinCureStrategy : public Strategy
 {
-    public:
-        PaladinCureStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    PaladinCureStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cure"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "cure"; }
 };
 
 class PaladinBoostStrategy : public Strategy
 {
-    public:
-        PaladinBoostStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    PaladinBoostStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "boost"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "boost"; }
 };
 
 class PaladinCcStrategy : public Strategy
 {
-    public:
-        PaladinCcStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    PaladinCcStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "cc"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "cc"; }
 };
 
 #endif

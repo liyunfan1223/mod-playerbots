@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "WorldBuffAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -26,7 +28,8 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
         return std::move(retVec);
 
     FactionTemplateEntry const* humanFaction = sFactionTemplateStore.LookupEntry(1);
-    uint32 factionId = (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL) ? 1 : 2;
+    uint32 factionId =
+        (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL) ? 1 : 2;
 
     for (auto& wb : sPlayerbotAIConfig->worldBuffs)
     {
@@ -50,4 +53,3 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
 
     return std::move(retVec);
 }
-

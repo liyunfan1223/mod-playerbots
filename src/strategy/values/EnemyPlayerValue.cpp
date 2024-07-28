@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "EnemyPlayerValue.h"
+
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -10,9 +12,12 @@ bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
 {
     bool inCannon = botAI->IsInVehicle(false, true);
     Player* enemy = dynamic_cast<Player*>(unit);
-    if (enemy && botAI->IsOpposing(enemy) && enemy->IsPvP() && !sPlayerbotAIConfig->IsPvpProhibited(enemy->GetZoneId(), enemy->GetAreaId()) &&
-        !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NON_ATTACKABLE_2) && ((inCannon || !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))) &&
-        /*!enemy->HasStealthAura() && !enemy->HasInvisibilityAura()*/ enemy->CanSeeOrDetect(bot) && !(enemy->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION)))
+    if (enemy && botAI->IsOpposing(enemy) && enemy->IsPvP() &&
+        !sPlayerbotAIConfig->IsPvpProhibited(enemy->GetZoneId(), enemy->GetAreaId()) &&
+        !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NON_ATTACKABLE_2) &&
+        ((inCannon || !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))) &&
+        /*!enemy->HasStealthAura() && !enemy->HasInvisibilityAura()*/ enemy->CanSeeOrDetect(bot) &&
+        !(enemy->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION)))
         return true;
 
     return false;
@@ -31,7 +36,8 @@ Unit* EnemyPlayerValue::Calculate()
         ThreatMgr* threatMgr = pReference->GetSource();
         if (Unit* pTarget = threatMgr->GetOwner())
         {
-            if (pTarget != pVictim && pTarget->IsPlayer() && pTarget->CanSeeOrDetect(bot) && bot->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
+            if (pTarget != pVictim && pTarget->IsPlayer() && pTarget->CanSeeOrDetect(bot) &&
+                bot->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
             {
                 if (bot->GetTeamId() == TEAM_HORDE)
                 {
@@ -53,10 +59,9 @@ Unit* EnemyPlayerValue::Calculate()
 
     if (!targets.empty())
     {
-        std::sort(targets.begin(), targets.end(), [&](Unit const* pUnit1, Unit const* pUnit2)
-        {
-            return bot->GetDistance(pUnit1) < bot->GetDistance(pUnit2);
-        });
+        std::sort(targets.begin(), targets.end(),
+                  [&](Unit const* pUnit1, Unit const* pUnit2)
+                  { return bot->GetDistance(pUnit1) < bot->GetDistance(pUnit2); });
 
         return *targets.begin();
     }
@@ -94,7 +99,8 @@ Unit* EnemyPlayerValue::Calculate()
         if (!bot->IsWithinDist(pTarget, aggroDistance))
             continue;
 
-        if (bot->IsWithinLOSInMap(pTarget) && (inCannon || (fabs(bot->GetPositionZ() - pTarget->GetPositionZ()) < 30.0f)))
+        if (bot->IsWithinLOSInMap(pTarget) &&
+            (inCannon || (fabs(bot->GetPositionZ() - pTarget->GetPositionZ()) < 30.0f)))
             return pTarget;
     }
 
@@ -113,8 +119,8 @@ Unit* EnemyPlayerValue::Calculate()
                     continue;
 
                 if (Unit* pAttacker = pMember->getAttackerForHelper())
-                    if (pAttacker->IsPlayer() && bot->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) && bot->IsWithinLOSInMap(pAttacker) && pAttacker != pVictim
-                        && pAttacker->CanSeeOrDetect(bot))
+                    if (pAttacker->IsPlayer() && bot->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) &&
+                        bot->IsWithinLOSInMap(pAttacker) && pAttacker != pVictim && pAttacker->CanSeeOrDetect(bot))
                         return pAttacker;
             }
         }

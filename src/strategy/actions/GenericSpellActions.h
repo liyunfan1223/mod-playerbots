@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_GENERICSPELLACTIONS_H
@@ -16,341 +17,363 @@ class WorldObject;
 
 class CastSpellAction : public Action
 {
-    public:
-        CastSpellAction(PlayerbotAI* botAI, std::string const spell);
+public:
+    CastSpellAction(PlayerbotAI* botAI, std::string const spell);
 
-        std::string const GetTargetName() override { return "current target"; };
-        bool Execute(Event event) override;
-        bool isPossible() override;
-		bool isUseful() override;
-        ActionThreatType getThreatType() override { return ActionThreatType::Single; }
+    std::string const GetTargetName() override { return "current target"; };
+    bool Execute(Event event) override;
+    bool isPossible() override;
+    bool isUseful() override;
+    ActionThreatType getThreatType() override { return ActionThreatType::Single; }
 
-        NextAction** getPrerequisites() override;
+    NextAction** getPrerequisites() override;
 
-    protected:
-        std::string spell;
-		float range;
+protected:
+    std::string spell;
+    float range;
 };
 
 class CastAuraSpellAction : public CastSpellAction
 {
-	public:
-		CastAuraSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false) : CastSpellAction(botAI, spell) { this->isOwner = isOwner; }
+public:
+    CastAuraSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false)
+        : CastSpellAction(botAI, spell)
+    {
+        this->isOwner = isOwner;
+    }
 
-		bool isUseful() override;
+    bool isUseful() override;
 
-    protected:
-        bool isOwner;
+protected:
+    bool isOwner;
 };
 
 class CastMeleeSpellAction : public CastSpellAction
 {
-    public:
-        CastMeleeSpellAction(PlayerbotAI* botAI, std::string const spell);
+public:
+    CastMeleeSpellAction(PlayerbotAI* botAI, std::string const spell);
 };
 
 class CastDebuffSpellAction : public CastAuraSpellAction
 {
-    public:
-        CastDebuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false, float needLifeTime = 8.0f) : CastAuraSpellAction(botAI, spell, isOwner), needLifeTime(needLifeTime) { }
-        bool isUseful() override;
-    private:
-        float needLifeTime;
+public:
+    CastDebuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false, float needLifeTime = 8.0f)
+        : CastAuraSpellAction(botAI, spell, isOwner), needLifeTime(needLifeTime)
+    {
+    }
+    bool isUseful() override;
+
+private:
+    float needLifeTime;
 };
 
 class CastDebuffSpellOnAttackerAction : public CastDebuffSpellAction
 {
-    public:
-        CastDebuffSpellOnAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true, float needLifeTime = 8.0f) : CastDebuffSpellAction(botAI, spell, isOwner, needLifeTime) { }
+public:
+    CastDebuffSpellOnAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true,
+                                    float needLifeTime = 8.0f)
+        : CastDebuffSpellAction(botAI, spell, isOwner, needLifeTime)
+    {
+    }
 
-        Value<Unit*>* GetTargetValue() override;
-        std::string const getName() override { return spell + " on attacker"; }
-        // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+    Value<Unit*>* GetTargetValue() override;
+    std::string const getName() override { return spell + " on attacker"; }
+    // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastDebuffSpellOnMeleeAttackerAction : public CastDebuffSpellAction
 {
-    public:
-        CastDebuffSpellOnMeleeAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true, float needLifeTime = 8.0f) : CastDebuffSpellAction(botAI, spell, isOwner, needLifeTime) { }
+public:
+    CastDebuffSpellOnMeleeAttackerAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = true,
+                                         float needLifeTime = 8.0f)
+        : CastDebuffSpellAction(botAI, spell, isOwner, needLifeTime)
+    {
+    }
 
-        Value<Unit*>* GetTargetValue() override;
-        std::string const getName() override { return spell + " on attacker"; }
-        // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+    Value<Unit*>* GetTargetValue() override;
+    std::string const getName() override { return spell + " on attacker"; }
+    // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastBuffSpellAction : public CastAuraSpellAction
 {
-	public:
-		CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = false);
+public:
+    CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = false);
 
-        std::string const GetTargetName() override { return "self target"; }
+    std::string const GetTargetName() override { return "self target"; }
 };
 
 class CastEnchantItemAction : public CastSpellAction
 {
-	public:
-	    CastEnchantItemAction(PlayerbotAI* botAI, std::string const spell);
+public:
+    CastEnchantItemAction(PlayerbotAI* botAI, std::string const spell);
 
-        bool isPossible() override;
-        std::string const GetTargetName() override { return "self target"; }
+    bool isPossible() override;
+    std::string const GetTargetName() override { return "self target"; }
 };
 
 class CastHealingSpellAction : public CastAuraSpellAction
 {
-    public:
-        CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f, HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM);
+public:
+    CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f,
+                           HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM);
 
-        std::string const GetTargetName() override { return "self target"; }
-        bool isUseful() override;
-        ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
-        // Yunfan: Mana efficiency tell the bot how to save mana. The higher the better.
-        HealingManaEfficiency manaEfficiency;
-        uint8 estAmount;
+    std::string const GetTargetName() override { return "self target"; }
+    bool isUseful() override;
+    ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+    // Yunfan: Mana efficiency tell the bot how to save mana. The higher the better.
+    HealingManaEfficiency manaEfficiency;
+    uint8 estAmount;
 
     // protected:
 };
 
 class CastAoeHealSpellAction : public CastHealingSpellAction
 {
-    public:
-    	CastAoeHealSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f, HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM) 
-            : CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency) { }
+public:
+    CastAoeHealSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f,
+                           HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM)
+        : CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency)
+    {
+    }
 
-		std::string const GetTargetName() override { return "party member to heal"; }
-        bool isUseful() override;
+    std::string const GetTargetName() override { return "party member to heal"; }
+    bool isUseful() override;
 };
 
 class CastCureSpellAction : public CastSpellAction
 {
-	public:
-		CastCureSpellAction(PlayerbotAI* botAI, std::string const spell);
+public:
+    CastCureSpellAction(PlayerbotAI* botAI, std::string const spell);
 
-		std::string const GetTargetName() override { return "self target"; }
+    std::string const GetTargetName() override { return "self target"; }
 };
 
 class PartyMemberActionNameSupport
 {
-	public:
-		PartyMemberActionNameSupport(std::string const spell)
-		{
-			name = std::string(spell + " on party");
-		}
+public:
+    PartyMemberActionNameSupport(std::string const spell) { name = std::string(spell + " on party"); }
 
-        std::string const getName() { return name; }
+    std::string const getName() { return name; }
 
-	private:
-		std::string name;
+private:
+    std::string name;
 };
 
 class HealPartyMemberAction : public CastHealingSpellAction, public PartyMemberActionNameSupport
 {
-    public:
-        HealPartyMemberAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f, HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM) :
-			CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency), PartyMemberActionNameSupport(spell) { }
+public:
+    HealPartyMemberAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f,
+                          HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM)
+        : CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency), PartyMemberActionNameSupport(spell)
+    {
+    }
 
-		std::string const GetTargetName() override { return "party member to heal"; }
-		std::string const getName() override { return PartyMemberActionNameSupport::getName(); }
+    std::string const GetTargetName() override { return "party member to heal"; }
+    std::string const getName() override { return PartyMemberActionNameSupport::getName(); }
 };
 
 class ResurrectPartyMemberAction : public CastSpellAction
 {
-	public:
-		ResurrectPartyMemberAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) {
-        }
+public:
+    ResurrectPartyMemberAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) {}
 
-		std::string const GetTargetName() override { return "party member to resurrect"; }
-        NextAction** getPrerequisites() override
-		{
-            return NextAction::merge( NextAction::array(0, new NextAction("reach party member to resurrect"), NULL), Action::getPrerequisites());
-		}
+    std::string const GetTargetName() override { return "party member to resurrect"; }
+    NextAction** getPrerequisites() override
+    {
+        return NextAction::merge(NextAction::array(0, new NextAction("reach party member to resurrect"), NULL),
+                                 Action::getPrerequisites());
+    }
 };
 
 class CurePartyMemberAction : public CastSpellAction, public PartyMemberActionNameSupport
 {
-    public:
-        CurePartyMemberAction(PlayerbotAI* botAI, std::string const spell, uint32 dispelType) :
-            CastSpellAction(botAI, spell), PartyMemberActionNameSupport(spell), dispelType(dispelType) { }
+public:
+    CurePartyMemberAction(PlayerbotAI* botAI, std::string const spell, uint32 dispelType)
+        : CastSpellAction(botAI, spell), PartyMemberActionNameSupport(spell), dispelType(dispelType)
+    {
+    }
 
-		Value<Unit*>* GetTargetValue() override;
-		std::string const getName() override { return PartyMemberActionNameSupport::getName(); }
+    Value<Unit*>* GetTargetValue() override;
+    std::string const getName() override { return PartyMemberActionNameSupport::getName(); }
 
-    protected:
-        uint32 dispelType;
+protected:
+    uint32 dispelType;
 };
 
 class BuffOnPartyAction : public CastBuffSpellAction, public PartyMemberActionNameSupport
 {
-    public:
-        BuffOnPartyAction(PlayerbotAI* botAI, std::string const spell) :
-			CastBuffSpellAction(botAI, spell), PartyMemberActionNameSupport(spell) { }
+public:
+    BuffOnPartyAction(PlayerbotAI* botAI, std::string const spell)
+        : CastBuffSpellAction(botAI, spell), PartyMemberActionNameSupport(spell)
+    {
+    }
 
-		Value<Unit*>* GetTargetValue() override;
-		std::string const getName() override { return PartyMemberActionNameSupport::getName(); }
+    Value<Unit*>* GetTargetValue() override;
+    std::string const getName() override { return PartyMemberActionNameSupport::getName(); }
 };
 
 class CastShootAction : public CastSpellAction
 {
-    public:
-        CastShootAction(PlayerbotAI* botAI);
+public:
+    CastShootAction(PlayerbotAI* botAI);
 
-        ActionThreatType getThreatType() override { return ActionThreatType::None; }
+    ActionThreatType getThreatType() override { return ActionThreatType::None; }
 };
 
 class CastLifeBloodAction : public CastHealingSpellAction
 {
-	public:
-		CastLifeBloodAction(PlayerbotAI* botAI) : CastHealingSpellAction(botAI, "lifeblood") { }
+public:
+    CastLifeBloodAction(PlayerbotAI* botAI) : CastHealingSpellAction(botAI, "lifeblood") {}
 };
 
 class CastGiftOfTheNaaruAction : public CastHealingSpellAction
 {
-	public:
-		CastGiftOfTheNaaruAction(PlayerbotAI* botAI) : CastHealingSpellAction(botAI, "gift of the naaru") { }
+public:
+    CastGiftOfTheNaaruAction(PlayerbotAI* botAI) : CastHealingSpellAction(botAI, "gift of the naaru") {}
 };
 
 class CastArcaneTorrentAction : public CastBuffSpellAction
 {
-    public:
-        CastArcaneTorrentAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane torrent") { }
+public:
+    CastArcaneTorrentAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane torrent") {}
 };
 
 class CastManaTapAction : public CastBuffSpellAction
 {
-    public:
-        CastManaTapAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mana tap") { }
+public:
+    CastManaTapAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mana tap") {}
 };
 
 class CastWarStompAction : public CastSpellAction
 {
-    public:
-        CastWarStompAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "war stomp") { }
+public:
+    CastWarStompAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "war stomp") {}
 };
 
 class CastSpellOnEnemyHealerAction : public CastSpellAction
 {
-    public:
-        CastSpellOnEnemyHealerAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) { }
+public:
+    CastSpellOnEnemyHealerAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) {}
 
-        Value<Unit*>* GetTargetValue() override;
-        std::string const getName() override { return spell + " on enemy healer"; }
+    Value<Unit*>* GetTargetValue() override;
+    std::string const getName() override { return spell + " on enemy healer"; }
 };
 
 class CastSnareSpellAction : public CastDebuffSpellAction
 {
-    public:
-        CastSnareSpellAction(PlayerbotAI* botAI, std::string const spell) : CastDebuffSpellAction(botAI, spell) { }
+public:
+    CastSnareSpellAction(PlayerbotAI* botAI, std::string const spell) : CastDebuffSpellAction(botAI, spell) {}
 
-        Value<Unit*>* GetTargetValue() override;
-        std::string const getName() override { return spell + " on snare target"; }
-        ActionThreatType getThreatType() override { return ActionThreatType::None; }
+    Value<Unit*>* GetTargetValue() override;
+    std::string const getName() override { return spell + " on snare target"; }
+    ActionThreatType getThreatType() override { return ActionThreatType::None; }
 };
 
 class CastCrowdControlSpellAction : public CastBuffSpellAction
 {
-    public:
-        CastCrowdControlSpellAction(PlayerbotAI* botAI, std::string const spell) : CastBuffSpellAction(botAI, spell) { }
+public:
+    CastCrowdControlSpellAction(PlayerbotAI* botAI, std::string const spell) : CastBuffSpellAction(botAI, spell) {}
 
-        Value<Unit*>* GetTargetValue() override;
-        bool Execute(Event event) override;
-        bool isPossible() override;
-        bool isUseful() override;
-        ActionThreatType getThreatType() override { return ActionThreatType::None; }
+    Value<Unit*>* GetTargetValue() override;
+    bool Execute(Event event) override;
+    bool isPossible() override;
+    bool isUseful() override;
+    ActionThreatType getThreatType() override { return ActionThreatType::None; }
 };
 
 class CastProtectSpellAction : public CastSpellAction
 {
-    public:
-        CastProtectSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) { }
+public:
+    CastProtectSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) {}
 
-        std::string const GetTargetName() override;
-        bool isUseful() override;
-        ActionThreatType getThreatType() override { return ActionThreatType::None; }
+    std::string const GetTargetName() override;
+    bool isUseful() override;
+    ActionThreatType getThreatType() override { return ActionThreatType::None; }
 };
 
 class CastVehicleSpellAction : public CastSpellAction
 {
-    public:
-        CastVehicleSpellAction(PlayerbotAI* botAI, std::string const& spell) : CastSpellAction(botAI, spell)
-        {
-            range = 120.0f;
-        }
+public:
+    CastVehicleSpellAction(PlayerbotAI* botAI, std::string const& spell) : CastSpellAction(botAI, spell)
+    {
+        range = 120.0f;
+    }
 
-        std::string const GetTargetName() override { return "current target"; }
-        bool Execute(Event event) override;
-        bool isUseful() override;
-        bool isPossible() override;
-        ActionThreatType getThreatType() override { return ActionThreatType::None; }
+    std::string const GetTargetName() override { return "current target"; }
+    bool Execute(Event event) override;
+    bool isUseful() override;
+    bool isPossible() override;
+    ActionThreatType getThreatType() override { return ActionThreatType::None; }
 
-    protected:
-        WorldObject* spellTarget;
+protected:
+    WorldObject* spellTarget;
 };
 
 class CastHurlBoulderAction : public CastVehicleSpellAction
 {
-    public:
-        CastHurlBoulderAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "hurl boulder") { }
+public:
+    CastHurlBoulderAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "hurl boulder") {}
 };
 
 class CastSteamRushAction : public CastVehicleSpellAction
 {
-    public:
-        CastSteamRushAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "steam rush") { }
+public:
+    CastSteamRushAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "steam rush") {}
 };
 
 class CastRamAction : public CastVehicleSpellAction
 {
-    public:
-        CastRamAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "ram") { }
+public:
+    CastRamAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "ram") {}
 };
 
 class CastNapalmAction : public CastVehicleSpellAction
 {
-    public:
-        CastNapalmAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "napalm") { }
+public:
+    CastNapalmAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "napalm") {}
 };
 
 class CastFireCannonAction : public CastVehicleSpellAction
 {
-    public:
-        CastFireCannonAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "fire cannon") { }
+public:
+    CastFireCannonAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "fire cannon") {}
 };
 
 class CastSteamBlastAction : public CastVehicleSpellAction
 {
-    public:
-        CastSteamBlastAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "steam blast") { }
+public:
+    CastSteamBlastAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "steam blast") {}
 };
 
 class CastIncendiaryRocketAction : public CastVehicleSpellAction
 {
-    public:
-        CastIncendiaryRocketAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "incendiary rocket") { }
+public:
+    CastIncendiaryRocketAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "incendiary rocket") {}
 };
 
 class CastRocketBlastAction : public CastVehicleSpellAction
 {
-    public:
-        CastRocketBlastAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "rocket blast") { }
+public:
+    CastRocketBlastAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "rocket blast") {}
 };
 
 class CastGlaiveThrowAction : public CastVehicleSpellAction
 {
-    public:
-        CastGlaiveThrowAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "glaive throw") { }
+public:
+    CastGlaiveThrowAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "glaive throw") {}
 };
 
 class CastBladeSalvoAction : public CastVehicleSpellAction
 {
-    public:
-        CastBladeSalvoAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "blade salvo") { }
+public:
+    CastBladeSalvoAction(PlayerbotAI* botAI) : CastVehicleSpellAction(botAI, "blade salvo") {}
 };
 
-class MainTankActionNameSupport {
+class MainTankActionNameSupport
+{
 public:
-    MainTankActionNameSupport(std::string spell)
-    {
-        name = std::string(spell) + " on main tank";
-    }
+    MainTankActionNameSupport(std::string spell) { name = std::string(spell) + " on main tank"; }
 
     virtual std::string const getName() { return name; }
 
@@ -361,8 +384,11 @@ private:
 class BuffOnMainTankAction : public CastBuffSpellAction, public MainTankActionNameSupport
 {
 public:
-    BuffOnMainTankAction(PlayerbotAI* ai, std::string spell, bool checkIsOwner = false) :
-        CastBuffSpellAction(ai, spell, checkIsOwner), MainTankActionNameSupport(spell) {}
+    BuffOnMainTankAction(PlayerbotAI* ai, std::string spell, bool checkIsOwner = false)
+        : CastBuffSpellAction(ai, spell, checkIsOwner), MainTankActionNameSupport(spell)
+    {
+    }
+
 public:
     virtual Value<Unit*>* GetTargetValue();
     virtual std::string const getName() { return MainTankActionNameSupport::getName(); }

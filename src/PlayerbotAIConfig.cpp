@@ -1,17 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotAIConfig.h"
+
+#include <iostream>
+
 #include "Config.h"
-#include "Playerbots.h"
+#include "PlayerbotDungeonSuggestionMgr.h"
 #include "PlayerbotFactory.h"
+#include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
 #include "Talentspec.h"
-#include "PlayerbotDungeonSuggestionMgr.h"
-
-#include <iostream>
 
 template <class T>
 void LoadList(std::string const value, T& list)
@@ -110,40 +112,59 @@ bool PlayerbotAIConfig::Initialize()
     randomBotMapsAsString = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotMaps", "0,1,530,571");
     LoadList<std::vector<uint32>>(randomBotMapsAsString, randomBotMaps);
     probTeleToBankers = sConfigMgr->GetOption<float>("AiPlayerbot.ProbTeleToBankers", 0.25f);
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestItems", "6948,5175,5176,5177,5178,16309,12382,13704,11000"), randomBotQuestItems);
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotSpellIds", "54197"), randomBotSpellIds);
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedZoneIds", "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395"), pvpProhibitedZoneIds);
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedAreaIds", "976,35"), pvpProhibitedAreaIds);
+    LoadList<std::vector<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestItems",
+                                           "6948,5175,5176,5177,5178,16309,12382,13704,11000"),
+        randomBotQuestItems);
+    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotSpellIds", "54197"),
+                                  randomBotSpellIds);
+    LoadList<std::vector<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedZoneIds",
+                                           "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,"
+                                           "3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395"),
+        pvpProhibitedZoneIds);
+    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedAreaIds", "976,35"),
+                                  pvpProhibitedAreaIds);
 
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761"), randomBotQuestIds);
+    LoadList<std::vector<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761"),
+        randomBotQuestIds);
 
     botAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.BotAutologin", false);
     randomBotAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotAutologin", true);
     minRandomBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBots", 50);
     maxRandomBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBots", 200);
     randomBotUpdateInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotUpdateInterval", MINUTE);
-    randomBotCountChangeMinInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotCountChangeMinInterval", 30 * MINUTE);
-    randomBotCountChangeMaxInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotCountChangeMaxInterval", 2 * HOUR);
+    randomBotCountChangeMinInterval =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotCountChangeMinInterval", 30 * MINUTE);
+    randomBotCountChangeMaxInterval =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotCountChangeMaxInterval", 2 * HOUR);
     minRandomBotInWorldTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotInWorldTime", 2 * HOUR);
     maxRandomBotInWorldTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotInWorldTime", 12 * HOUR);
     minRandomBotRandomizeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotRandomizeTime", 2 * HOUR);
     maxRandomBotRandomizeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotRandomizeTime", 14 * 24 * HOUR);
-    minRandomBotChangeStrategyTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotChangeStrategyTime", 30 * MINUTE);
-    maxRandomBotChangeStrategyTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotChangeStrategyTime", 2 * HOUR);
+    minRandomBotChangeStrategyTime =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotChangeStrategyTime", 30 * MINUTE);
+    maxRandomBotChangeStrategyTime =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotChangeStrategyTime", 2 * HOUR);
     minRandomBotReviveTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotReviveTime", MINUTE);
     maxRandomBotReviveTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotReviveTime", 5 * MINUTE);
     minRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotTeleportInterval", 1 * HOUR);
     maxRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotTeleportInterval", 5 * HOUR);
-    randomBotInWorldWithRotationDisabled = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotInWorldWithRotationDisabled", 1 * YEAR);
+    randomBotInWorldWithRotationDisabled =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotInWorldWithRotationDisabled", 1 * YEAR);
     randomBotTeleportDistance = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotTeleportDistance", 100);
     randomBotsPerInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotsPerInterval", MINUTE);
-    minRandomBotsPriceChangeInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotsPriceChangeInterval", 2 * HOUR);
-    maxRandomBotsPriceChangeInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotsPriceChangeInterval", 48 * HOUR);
+    minRandomBotsPriceChangeInterval =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotsPriceChangeInterval", 2 * HOUR);
+    maxRandomBotsPriceChangeInterval =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotsPriceChangeInterval", 48 * HOUR);
     randomBotJoinLfg = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotJoinLfg", true);
     randomBotTalk = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotTalk", false);
     randomBotEmote = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotEmote", false);
     randomBotSuggestDungeons = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotSuggestDungeons", true);
-    suggestDungeonsInLowerCaseRandomly = sConfigMgr->GetOption<bool>("AiPlayerbot.SuggestDungeonsInLowerCaseRandomly", false);
+    suggestDungeonsInLowerCaseRandomly =
+        sConfigMgr->GetOption<bool>("AiPlayerbot.SuggestDungeonsInLowerCaseRandomly", false);
     randomBotJoinBG = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotJoinBG", true);
     randomBotAutoJoinBG = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotAutoJoinBG", false);
     logInGroupOnly = sConfigMgr->GetOption<bool>("AiPlayerbot.LogInGroupOnly", true);
@@ -176,7 +197,8 @@ bool PlayerbotAIConfig::Initialize()
 
     for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
     {
-        if (cls == 10) {
+        if (cls == 10)
+        {
             continue;
         }
         for (uint32 spec = 0; spec < MAX_SPECNO; ++spec)
@@ -189,12 +211,15 @@ bool PlayerbotAIConfig::Initialize()
             os << "AiPlayerbot.PremadeSpecGlyph." << cls << "." << spec;
             premadeSpecGlyph[cls][spec] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
             std::vector<std::string> splitSpecGlyph = split(premadeSpecGlyph[cls][spec], ',');
-            for (std::string &split : splitSpecGlyph) {
-                if (split.size() != 0) {
+            for (std::string& split : splitSpecGlyph)
+            {
+                if (split.size() != 0)
+                {
                     parsedSpecGlyph[cls][spec].push_back(atoi(split.c_str()));
                 }
             }
-            for (uint32 level = 0; level < MAX_LEVEL; ++level) {
+            for (uint32 level = 0; level < MAX_LEVEL; ++level)
+            {
                 std::ostringstream os;
                 os << "AiPlayerbot.PremadeSpecLink." << cls << "." << spec << "." << level;
                 premadeSpecLink[cls][spec][level] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
@@ -214,7 +239,8 @@ bool PlayerbotAIConfig::Initialize()
     }
 
     botCheats.clear();
-    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi"), botCheats);
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi"),
+                                             botCheats);
 
     botCheatMask = 0;
 
@@ -229,7 +255,8 @@ bool PlayerbotAIConfig::Initialize()
     if (std::find(botCheats.begin(), botCheats.end(), "power") != botCheats.end())
         botCheatMask |= (uint32)BotCheatMask::power;
 
-    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""), allowedLogFiles);
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""),
+                                             allowedLogFiles);
 
     worldBuffs.clear();
 
@@ -257,7 +284,8 @@ bool PlayerbotAIConfig::Initialize()
     minGuildTaskChangeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinGuildTaskChangeTime", 3 * 24 * 3600);
     maxGuildTaskChangeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskChangeTime", 4 * 24 * 3600);
     minGuildTaskAdvertisementTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinGuildTaskAdvertisementTime", 300);
-    maxGuildTaskAdvertisementTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskAdvertisementTime", 12 * 3600);
+    maxGuildTaskAdvertisementTime =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskAdvertisementTime", 12 * 3600);
     minGuildTaskRewardTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinGuildTaskRewardTime", 300);
     maxGuildTaskRewardTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskRewardTime", 3600);
     guildTaskAdvertCleanupTime = sConfigMgr->GetOption<int32>("AiPlayerbot.GuildTaskAdvertCleanupTime", 300);
@@ -285,7 +313,7 @@ bool PlayerbotAIConfig::Initialize()
     botRepairWhenSummon = sConfigMgr->GetOption<bool>("AiPlayerbot.BotRepairWhenSummon", true);
     autoInitOnly = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoInitOnly", false);
     autoInitEquipLevelLimitRatio = sConfigMgr->GetOption<float>("AiPlayerbot.AutoInitEquipLevelLimitRatio", 1.0);
-    
+
     maxAddedBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBots", 40);
     maxAddedBotsPerClass = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBotsPerClass", 10);
     addClassCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassCommand", 1);
@@ -341,7 +369,8 @@ bool PlayerbotAIConfig::Initialize()
     selfBotLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.SelfBotLevel", 1);
 
     RandomPlayerbotFactory::CreateRandomBots();
-    if (World::IsStopped()) {
+    if (World::IsStopped())
+    {
         return true;
     }
     PlayerbotFactory::Init();
@@ -407,7 +436,8 @@ std::string const PlayerbotAIConfig::GetTimestampStr()
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
     char buf[20];
-    snprintf(buf, 20, "%04d-%02d-%02d %02d-%02d-%02d", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
+    snprintf(buf, 20, "%04d-%02d-%02d %02d-%02d-%02d", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday, aTm->tm_hour,
+             aTm->tm_min, aTm->tm_sec);
     return std::string(buf);
 }
 
@@ -426,7 +456,7 @@ bool PlayerbotAIConfig::openLog(std::string const fileName, char const* mode)
     FILE* file = logFileIt->second.first;
     bool fileOpen = logFileIt->second.second;
 
-    if (fileOpen) //close log file
+    if (fileOpen)  // close log file
         fclose(file);
 
     std::string m_logsDir = sConfigMgr->GetOption<std::string>("LogsDir", "", false);
@@ -435,7 +465,6 @@ bool PlayerbotAIConfig::openLog(std::string const fileName, char const* mode)
         if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
             m_logsDir.append("/");
     }
-
 
     file = fopen((m_logsDir + fileName).c_str(), mode);
     fileOpen = true;
@@ -479,7 +508,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
     for (auto buff : buffs)
     {
-        worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+        worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
         worldBuffs.push_back(wb);
     }
 
@@ -492,7 +521,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
@@ -506,7 +535,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
@@ -520,7 +549,7 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
@@ -534,34 +563,35 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = {buff, factionId1, classId1, minLevel1, maxLevel1};
             worldBuffs.push_back(wb);
         }
     }
 }
 
-static std::vector<std::string> split(const std::string &str, const std::string &pattern)
+static std::vector<std::string> split(const std::string& str, const std::string& pattern)
 {
     std::vector<std::string> res;
-    if(str == "")
+    if (str == "")
         return res;
     // Also add separators to string connections to facilitate intercepting the last paragraph.
     std::string strs = str + pattern;
     size_t pos = strs.find(pattern);
 
-    while(pos != strs.npos)
+    while (pos != strs.npos)
     {
         std::string temp = strs.substr(0, pos);
         res.push_back(temp);
         // Remove the split string and split the remaining string
-        strs = strs.substr(pos+1, strs.size());
+        strs = strs.substr(pos + 1, strs.size());
         pos = strs.find(pattern);
     }
 
     return res;
 }
 
-std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32 cls, std::string tab_link) {
+std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32 cls, std::string tab_link)
+{
     // check bad link
     uint32 classMask = 1 << (cls - 1);
     std::vector<std::vector<uint32>> res;
@@ -570,40 +600,44 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
     std::vector<std::vector<std::vector<uint32>>> orders(3);
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
-        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
-        if(!talentInfo)
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
+        if (!talentInfo)
             continue;
 
-        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
-        if(!talentTabInfo)
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+        if (!talentTabInfo)
             continue;
 
-        if( (classMask & talentTabInfo->ClassMask) == 0 )
+        if ((classMask & talentTabInfo->ClassMask) == 0)
             continue;
 
         spells[talentTabInfo->tabpage].push_back(talentInfo);
     }
-    for (int tab = 0; tab < 3; tab++) {
-        if (tab_links.size() <= tab) {
+    for (int tab = 0; tab < 3; tab++)
+    {
+        if (tab_links.size() <= tab)
+        {
             break;
         }
-        std::sort(spells[tab].begin(), spells[tab].end(), [&](TalentEntry const* lhs, TalentEntry const* rhs) {
-            return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col;
-        });
-        for (int i = 0; i < tab_links[tab].size(); i++) {
-            if (i >= spells[tab].size()) {
+        std::sort(spells[tab].begin(), spells[tab].end(),
+                  [&](TalentEntry const* lhs, TalentEntry const* rhs)
+                  { return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col; });
+        for (int i = 0; i < tab_links[tab].size(); i++)
+        {
+            if (i >= spells[tab].size())
+            {
                 break;
             }
             int lvl = tab_links[tab][i] - '0';
-            if (lvl == 0) continue;
+            if (lvl == 0)
+                continue;
             orders[tab].push_back({(uint32)tab, spells[tab][i]->Row, spells[tab][i]->Col, (uint32)lvl});
         }
     }
     // sort by talent tab size
-    std::sort(orders.begin(), orders.end(), [&](auto &lhs, auto &rhs) {
-        return lhs.size() > rhs.size();
-    });
-    for (auto &order : orders) {
+    std::sort(orders.begin(), orders.end(), [&](auto& lhs, auto& rhs) { return lhs.size() > rhs.size(); });
+    for (auto& order : orders)
+    {
         res.insert(res.end(), order.begin(), order.end());
     }
     return res;

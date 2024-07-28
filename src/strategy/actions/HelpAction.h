@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_HELPACTION_H
@@ -12,18 +13,18 @@ class PlayerbotAI;
 
 class HelpAction : public Action
 {
-    public:
-        HelpAction(PlayerbotAI* botAI);
+public:
+    HelpAction(PlayerbotAI* botAI);
 
-        virtual ~HelpAction();
-        bool Execute(Event event) override;
+    virtual ~HelpAction();
+    bool Execute(Event event) override;
 
-    private:
-        void TellChatCommands();
-        void TellStrategies();
-        std::string const CombineSupported(std::set<std::string> commands);
+private:
+    void TellChatCommands();
+    void TellStrategies();
+    std::string const CombineSupported(std::set<std::string> commands);
 
-        NamedObjectContext<Action>* chatContext;
+    NamedObjectContext<Action>* chatContext;
 };
 
 #endif

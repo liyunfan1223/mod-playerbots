@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "LootStrategyAction.h"
+
 #include "ChatHelper.h"
 #include "Event.h"
 #include "LootAction.h"
@@ -66,7 +68,9 @@ bool LootStrategyAction::Execute(Event event)
                 if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid))
                 {
                     std::ostringstream out;
-                    out << (StoreLootAction::IsLootAllowed(itemid, botAI) ? "|cFF000000Will loot " : "|c00FF0000Won't loot ") << ChatHelper::FormatItem(proto);
+                    out << (StoreLootAction::IsLootAllowed(itemid, botAI) ? "|cFF000000Will loot "
+                                                                          : "|c00FF0000Won't loot ")
+                        << ChatHelper::FormatItem(proto);
                     botAI->TellMaster(out.str());
                 }
             }
@@ -88,4 +92,3 @@ bool LootStrategyAction::Execute(Event event)
 
     return true;
 }
-

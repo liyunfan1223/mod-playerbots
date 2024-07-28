@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_BATTLEGROUNDTACTICSACTION_H
@@ -14,11 +15,11 @@ struct Position;
 
 #define SPELL_CAPTURE_BANNER 21651
 
-typedef void(*BattleBotWaypointFunc)();
+typedef void (*BattleBotWaypointFunc)();
 
 struct BattleBotWaypoint
 {
-    BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc func) : x(x_), y(y_), z(z_), pFunc(func) { };
+    BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc func) : x(x_), y(y_), z(z_), pFunc(func){};
 
     float x = 0.0f;
     float y = 0.0f;
@@ -36,42 +37,42 @@ extern std::vector<BattleBotPath*> const vPaths_IC;
 
 class BGTactics : public MovementAction
 {
-    public:
-        static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
+public:
+    static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
 
-        BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) { }
+    BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        static std::string const HandleConsoleCommandPrivate(WorldSession* session, char const* args);
-        bool moveToStart(bool force = false);
-        bool selectObjective(bool reset = false);
-        bool moveToObjective();
-        bool selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths);
-        bool moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 currentPoint, bool reverse = false);
-        bool startNewPathBegin(std::vector<BattleBotPath*> const& vPaths);
-        bool startNewPathFree(std::vector<BattleBotPath*> const& vPaths);
-        bool resetObjective();
-        bool wsgPaths();
-        bool atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<uint32> const& vFlagIds);
-        bool flagTaken();
-        bool teamFlagTaken();
-        bool protectFC();
-        bool useBuff();
-        uint32 getDefendersCount(Position point, float range, bool combat = true);
-        bool IsLockedInsideKeep();
+private:
+    static std::string const HandleConsoleCommandPrivate(WorldSession* session, char const* args);
+    bool moveToStart(bool force = false);
+    bool selectObjective(bool reset = false);
+    bool moveToObjective();
+    bool selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths);
+    bool moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 currentPoint, bool reverse = false);
+    bool startNewPathBegin(std::vector<BattleBotPath*> const& vPaths);
+    bool startNewPathFree(std::vector<BattleBotPath*> const& vPaths);
+    bool resetObjective();
+    bool wsgPaths();
+    bool atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<uint32> const& vFlagIds);
+    bool flagTaken();
+    bool teamFlagTaken();
+    bool protectFC();
+    bool useBuff();
+    uint32 getDefendersCount(Position point, float range, bool combat = true);
+    bool IsLockedInsideKeep();
 };
 
 class ArenaTactics : public MovementAction
 {
-    public:
-        ArenaTactics(PlayerbotAI* botAI, std::string const name = "arena tactics") : MovementAction(botAI, name) { }
+public:
+    ArenaTactics(PlayerbotAI* botAI, std::string const name = "arena tactics") : MovementAction(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        bool moveToCenter(Battleground *bg);
+private:
+    bool moveToCenter(Battleground* bg);
 };
 
 #endif

@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TravelAction.h"
+
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -10,7 +12,7 @@
 
 bool TravelAction::Execute(Event event)
 {
-    TravelTarget * target = AI_VALUE(TravelTarget *, "travel target");
+    TravelTarget* target = AI_VALUE(TravelTarget*, "travel target");
 
     if (bot->isMoving())
         return false;
@@ -54,18 +56,21 @@ bool TravelAction::Execute(Event event)
 
 bool TravelAction::isUseful()
 {
-    return false && AI_VALUE(TravelTarget*, "travel target")->isActive() && (!AI_VALUE(GuidPosition, "rpg target") || !AI_VALUE(ObjectGuid, "pull target"));
+    return false && AI_VALUE(TravelTarget*, "travel target")->isActive() &&
+           (!AI_VALUE(GuidPosition, "rpg target") || !AI_VALUE(ObjectGuid, "pull target"));
 }
 
 bool MoveToDarkPortalAction::Execute(Event event)
 {
     if (bot->GetGroup())
-        if (bot->GetGroup()->GetLeaderGUID() != bot->GetGUID() && !GET_PLAYERBOT_AI(GET_PLAYERBOT_AI(bot)->GetGroupMaster()))
+        if (bot->GetGroup()->GetLeaderGUID() != bot->GetGUID() &&
+            !GET_PLAYERBOT_AI(GET_PLAYERBOT_AI(bot)->GetGroupMaster()))
             return false;
 
     if (bot->GetLevel() > 57)
     {
-        if ((bot->GetTeamId() == TEAM_ALLIANCE && bot->GetQuestStatus(10119) == QUEST_STATUS_NONE) || (bot->GetTeamId() == TEAM_HORDE && bot->GetQuestStatus(9407) == QUEST_STATUS_NONE))
+        if ((bot->GetTeamId() == TEAM_ALLIANCE && bot->GetQuestStatus(10119) == QUEST_STATUS_NONE) ||
+            (bot->GetTeamId() == TEAM_HORDE && bot->GetQuestStatus(9407) == QUEST_STATUS_NONE))
         {
             if (!bot->IsInCombat())
             {
@@ -75,7 +80,8 @@ bool MoveToDarkPortalAction::Execute(Event event)
                     CreatureData const* creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(16841);
                     if (quest && creatureData)
                     {
-                        auto creatureBounds = bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
+                        auto creatureBounds =
+                            bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
                         if (creatureBounds.first != creatureBounds.second)
                             bot->AddQuest(quest, creatureBounds.first->second);
                     }
@@ -86,7 +92,8 @@ bool MoveToDarkPortalAction::Execute(Event event)
                     CreatureData const* creatureData = sRandomPlayerbotMgr->GetCreatureDataByEntry(19254);
                     if (quest && creatureData)
                     {
-                        auto creatureBounds = bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
+                        auto creatureBounds =
+                            bot->GetMap()->GetCreatureBySpawnIdStore().equal_range(creatureData->spawnId);
                         if (creatureBounds.first != creatureBounds.second)
                             bot->AddQuest(quest, creatureBounds.first->second);
                     }
@@ -102,10 +109,7 @@ bool MoveToDarkPortalAction::Execute(Event event)
     return false;
 }
 
-bool MoveToDarkPortalAction::isUseful()
-{
-    return bot->GetLevel() > 54;
-}
+bool MoveToDarkPortalAction::isUseful() { return bot->GetLevel() > 54; }
 
 bool DarkPortalAzerothAction::Execute(Event event)
 {
@@ -120,10 +124,7 @@ bool DarkPortalAzerothAction::Execute(Event event)
     return false;
 }
 
-bool DarkPortalAzerothAction::isUseful()
-{
-    return bot->GetLevel() > 57;
-}
+bool DarkPortalAzerothAction::isUseful() { return bot->GetLevel() > 57; }
 
 bool MoveFromDarkPortalAction::Execute(Event event)
 {
