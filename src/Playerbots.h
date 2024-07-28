@@ -14,6 +14,7 @@
 #include "RandomPlayerbotMgr.h"
 #include "SharedValueContext.h"
 #include "Spell.h"
+#include "SpellMgr.h"
 #include "TravelNode.h"
 
 std::vector<std::string> split(std::string const s, char delim);
