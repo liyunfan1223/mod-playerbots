@@ -7,6 +7,36 @@
 
 #include "PlayerbotMgr.h"
 
+struct BattlegroundInfo {
+    std::vector<int> bgInstances;
+    std::vector<int> ratedArenaInstances;
+    std::vector<int> skirmishArenaInstances;
+    int bgInstanceCount = 0;
+    int ratedArenaInstanceCount = 0;
+    int skirmishArenaInstanceCount = 0;
+    int minLevel = 0;
+    int maxLevel = 0;
+    int activeRatedArenaQueue = 0; // 0 = Inactive, 1 = Active
+    int activeSkirmishArenaQueue = 0; // 0 = Inactive, 1 = Active
+    int activeBgQueue = 0; // 0 = Inactive, 1 = Active
+
+    // Bots (Arena)
+    int ratedArenaBotCount = 0;
+    int skirmishArenaBotCount = 0;
+
+    // Bots (Battleground)
+    int bgHordeBotCount = 0;
+    int bgAllianceBotCount = 0;
+
+    // Players (Arena)
+    int ratedArenaPlayerCount = 0;
+    int skirmishArenaPlayerCount = 0;
+
+    // Players (Battleground)
+    int bgHordePlayerCount = 0;
+    int bgAlliancePlayerCount = 0;
+};
+
 class ChatHandler;
 class PerformanceMonitorOperation;
 class WorldLocation;
@@ -111,17 +141,14 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         ObjectGuid const GetBattleMasterGUID(Player* bot, BattlegroundTypeId bgTypeId);
         CreatureData const* GetCreatureDataByEntry(uint32 entry);
         void LoadBattleMastersCache();
-        std::map<uint32, std::map<uint32, std::map<TeamId, bool>>> NeedBots;
-        std::map<uint32, std::map<uint32, std::map<TeamId, uint32>>> BgBots;
+        std::map<int32_t, std::map<int32_t, BattlegroundInfo>> BattlegroundData;
         std::map<uint32, std::map<uint32, std::map<TeamId, uint32>>> VisualBots;
-        std::map<uint32, std::map<uint32, std::map<TeamId, uint32>>> BgPlayers;
-        std::map<uint32, std::map<uint32, std::map<TeamId, std::map<TeamId, uint32>>>> ArenaBots;
-        std::map<uint32, std::map<uint32, std::map<uint32, uint32>>> Rating;
         std::map<uint32, std::map<uint32, std::map<uint32, uint32>>> Supporters;
         std::map<TeamId, std::vector<uint32>> LfgDungeons;
         void CheckBgQueue();
         void CheckLfgQueue();
         void CheckPlayers();
+        void LogBattlegroundInfo();
 
         std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> getBattleMastersCache() { return BattleMastersCache; }
 
