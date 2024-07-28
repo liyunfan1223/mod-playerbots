@@ -9,7 +9,7 @@ void EmoteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     if (sPlayerbotAIConfig->randomBotEmote)
     {
-        triggers.push_back(new TriggerNode("seldom", NextAction::array(0, new NextAction("emote", 1.0f), nullptr)));
+        triggers.push_back(new TriggerNode("seldom", NextAction::array(0, new NextAction("emote", 10.0f), nullptr)));
         triggers.push_back(new TriggerNode("receive text emote", NextAction::array(0, new NextAction("emote", 10.0f), nullptr)));
         triggers.push_back(new TriggerNode("receive emote", NextAction::array(0, new NextAction("emote", 10.0f), nullptr)));
     }

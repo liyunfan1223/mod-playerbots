@@ -93,7 +93,7 @@ void SuggestWhatToDoAction::specificQuest()
     placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
     placeholders["%quest"] = chat->FormatQuest(quest);
 
-    spam(BOT_TEXT2("suggest_quest", placeholders), urand(0, 1) ? eTalkType::General : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_quest", placeholders), urand(0, 1) ? eTalkType::General : eTalkType::LookingForGroup, urand(0, 2), urand(0, 2));
 }
 
 void SuggestWhatToDoAction::grindMaterials()
@@ -225,7 +225,7 @@ void SuggestWhatToDoAction::something()
     out << entry->area_name[_dbc_locale];
     placeholders["%zone"] = out.str();
 
-    spam(BOT_TEXT2("suggest_something", placeholders), urand(0, 1) ? eTalkType::General : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_something", placeholders), eTalkType::General, !urand(0, 2), !urand(0, 3));
 }
 
 void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, bool guild)
@@ -413,7 +413,7 @@ bool SuggestDungeonAction::Execute(Event event)
     itemout << allowedInstances[urand(0, allowedInstances.size() - 1)];
     placeholders["%instance"] = itemout.str();
 
-    spam(BOT_TEXT2("suggest_instance", placeholders), urand(0, 1) ? eTalkType::LookingForGroup : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_instance", placeholders), urand(0, 1) ? eTalkType::LookingForGroup : eTalkType::General, urand(0, 2), urand(0, 2));
     return true;
 }
 
@@ -480,6 +480,7 @@ bool SuggestTradeAction::Execute(Event event)
     placeholders["%item"] = chat->FormatItem(proto, count);
     placeholders["%gold"] = chat->formatMoney(price);
 
-    spam(BOT_TEXT2("suggest_sell", placeholders), urand(0, 1) ? eTalkType::Trade : 0, urand(0, 1), urand(0, 5));
+
+    spam(BOT_TEXT2("suggest_sell", placeholders), urand(0, 1) ? eTalkType::Trade : eTalkType::General, !urand(0, 2), urand(0, 5));
     return true;
 }
