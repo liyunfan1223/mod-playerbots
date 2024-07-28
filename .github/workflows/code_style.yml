@@ -1,0 +1,23 @@
+name: Codestyle
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  lint:
+    name: "clang-format"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Playerbot Module
+        uses: actions/checkout@v4
+      - name: Clang-format check
+        uses: DoozyX/clang-format-lint-action@v0.14
+        with:
+          source: '.'
+          extensions: 'h,cpp'
+          clangFormatVersion: 14
+          inplace: True
+        continue-on-error: true
