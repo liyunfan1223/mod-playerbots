@@ -243,8 +243,6 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
     /*AreaTableEntry const* area = sAreaTableStore.LookupEntry(bot->GetMap()->GetAreaId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
     if (!area) return;*/
 
-    std::string areaname = zone->area_name[_dbc_locale];
-
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
@@ -260,7 +258,7 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         }
         else
         {
-            snprintf(channelName, 100, channel->pattern[_dbc_locale], areaname);
+            snprintf(channelName, 100, channel->pattern[_dbc_locale], zone->area_name[_dbc_locale]);
             chn = cMgr->GetChannel(channelName, bot);
         }
         if (!chn)
