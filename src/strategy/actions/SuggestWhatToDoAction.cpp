@@ -306,13 +306,13 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
             if (Channel* worldChannel = cMgr->GetChannel("World", bot))
                 worldChannel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
         }
+    }
 
-        if (guild && bot->GetGuildId())
-        {
-            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-            if (guild)
-                guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
-        }
+    if (sPlayerbotAIConfig->randomBotGuildTalk && guild && bot->GetGuildId())
+    {
+        Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+        if (guild)
+            guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
     }
 }
 
@@ -354,6 +354,8 @@ SuggestDungeonAction::SuggestDungeonAction(PlayerbotAI* botAI) : SuggestWhatToDo
 bool SuggestDungeonAction::Execute(Event event)
 {
     // TODO: use sPlayerbotDungeonSuggestionMgr
+
+    if (!sPlayerbotAIConfig->randomBotSuggestDungeons || bot->GetGroup()) return false;
 
     if (instances.empty())
     {

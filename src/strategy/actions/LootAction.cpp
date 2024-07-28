@@ -417,7 +417,7 @@ bool StoreLootAction::Execute(Event event)
         if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
-        if (sPlayerbotAIConfig->randomBotTalk && bot->GetGuildId() && urand(0, 10) && proto->Quality >= ITEM_QUALITY_RARE)
+        if (sPlayerbotAIConfig->randomBotGuildTalk && bot->GetGuildId() && urand(0, 10) && proto->Quality >= ITEM_QUALITY_RARE)
         {
             Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 

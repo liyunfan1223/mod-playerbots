@@ -33,7 +33,7 @@ bool XpGainAction::Execute(Event event)
         p >> groupBonus;   // 8 group bonus
     }
 
-    if (sPlayerbotAIConfig->randomBotTalk && bot->GetGuildId() && urand(0, 10))
+    if (sPlayerbotAIConfig->randomBotGuildTalk && bot->GetGuildId() && urand(0, 10))
     {
         Creature* creature = botAI->GetCreature(guid);
         if (creature && (creature->isElite() || creature->isWorldBoss() || creature->GetLevel() > 61 || creature->GetLevel() > bot->GetLevel() + 4))

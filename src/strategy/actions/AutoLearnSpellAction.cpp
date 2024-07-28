@@ -36,7 +36,7 @@ void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
     if (sPlayerbotAIConfig->autoLearnQuestSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnQuestSpells(out);
 
-    if (sPlayerbotAIConfig->randomBotTalk)
+    if (sPlayerbotAIConfig->randomBotGuildTalk)
     {
         Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
         if (guild)
