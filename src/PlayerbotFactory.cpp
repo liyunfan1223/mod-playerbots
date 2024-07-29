@@ -136,6 +136,9 @@ void PlayerbotFactory::Init()
             continue;
         }
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
+        if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE) { // unique gem
+            continue;
+        }
         if (!proto || !sGemPropertiesStore.LookupEntry(proto->GemProperties)) {
             continue;
         }
@@ -2571,7 +2574,7 @@ void PlayerbotFactory::InitMounts()
             break;
         case RACE_NIGHTELF:
             slow = { 10789, 8394, 10793 };
-            fast = { 24252, 63637, 22723 };
+            fast = { 23219, 23220, 63637 };
             break;
         case RACE_UNDEAD_PLAYER:
             slow = { 17463, 17464, 17462 };
@@ -2858,7 +2861,29 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     if (!increment) {
         for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
         {
-            bot->SetGlyph(slotIndex, 0, true);
+            uint32 glyph = bot->GetGlyph(slotIndex);
+            if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
+            {
+                bot->RemoveAurasDueToSpell(glyphEntry->SpellId);
+
+                // Removed any triggered auras
+                Unit::AuraMap& ownedAuras = bot->GetOwnedAuras();
+                for (Unit::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
+                {
+                    Aura* aura = iter->second;
+                    if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+                    {
+                        if (triggeredByAuraSpellInfo->Id == glyphEntry->SpellId)
+                        {
+                            bot->RemoveOwnedAura(iter);
+                            continue;
+                        }
+                    }
+                    ++iter;
+                }
+
+                bot->SetGlyph(slotIndex, 0, true);
+            }
         }
     }
 
@@ -2957,6 +2982,8 @@ void PlayerbotFactory::InitGlyphs(bool increment)
             if (!glyph) {
                 continue;
             }
+            GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph);
+            bot->CastSpell(bot, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
             bot->SetGlyph(realSlot, glyph, true);
             chosen.insert(glyph);
         } else {
@@ -2990,7 +3017,9 @@ void PlayerbotFactory::InitGlyphs(bool increment)
                     continue;
 
                 chosen.insert(id);
-
+                GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(id);
+                bot->CastSpell(bot, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
+            
                 bot->SetGlyph(realSlot, id, true);
                 found = true;
                 break;

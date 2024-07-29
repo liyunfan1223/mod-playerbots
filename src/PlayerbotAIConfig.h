@@ -95,7 +95,10 @@ class PlayerbotAIConfig
         uint32 randomBotsPerInterval;
         uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
         bool randomBotJoinLfg;
+        bool randomBotTalk;
+        bool randomBotEmote;
         bool randomBotSuggestDungeons;
+        bool randomBotGuildTalk;
         bool suggestDungeonsInLowerCaseRandomly;
         bool randomBotJoinBG;
         bool randomBotAutoJoinBG;

@@ -96,7 +96,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
 
             if (IsNeededForQuest(bot, itemId))
             {
-                this->guid = guid;
+                this->guid = lootGUID;
                 return;
             }
             isQuestItemOnly |= itemId > 0;

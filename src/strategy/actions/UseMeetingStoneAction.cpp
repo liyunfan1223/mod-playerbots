@@ -164,15 +164,15 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player)
 bool SummonAction::Teleport(Player* summoner, Player* player)
 {
     Player* master = GetMaster();
-    if (master->GetMap() && master->GetMap()->IsDungeon()) {
-        InstanceMap* map = master->GetMap()->ToInstanceMap();
-        if (map) {
-            if (map->CannotEnter(player) == Map::CANNOT_ENTER_MAX_PLAYERS) {
-                botAI->TellError("I can not enter this dungeon");
-                    return false;
-            }
-        }
-    }
+    // if (master->GetMap() && master->GetMap()->IsDungeon()) {
+    //     InstanceMap* map = master->GetMap()->ToInstanceMap();
+    //     if (map) {
+    //         if (map->CannotEnter(player, true) == Map::CANNOT_ENTER_MAX_PLAYERS) {
+    //             botAI->TellError("I can not enter this dungeon");
+    //                 return false;
+    //         }
+    //     }
+    // }
     if (!summoner->IsBeingTeleported() && !player->IsBeingTeleported())
     {
         float followAngle = GetFollowAngle();
@@ -206,7 +206,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                     return false;
                 }
 
-                bool revive = sPlayerbotAIConfig->reviveBotWhenSummoned == 2 || (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat());
+                bool revive = sPlayerbotAIConfig->reviveBotWhenSummoned == 2 || (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat() && master->IsAlive());
                 if (bot->isDead() && revive)
                 {
                     bot->ResurrectPlayer(1.0f, false);

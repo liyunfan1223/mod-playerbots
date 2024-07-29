@@ -190,7 +190,7 @@ uint32 VehicleSpellIdValue::Calculate()
     char firstSymbol = tolower(namepart[0]);
     int spellLength = wnamepart.length();
 
-    int loc = bot->GetSession()->GetSessionDbcLocale();
+    const int loc = LocaleConstant::LOCALE_enUS;
 
     Creature* creature = vehicleBase->ToCreature();
     for (uint32 x = 0; x < MAX_CREATURE_SPELLS; ++x)
