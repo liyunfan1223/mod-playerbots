@@ -60,7 +60,7 @@ class BGTactics : public MovementAction
         bool teamFlagTaken();
         bool protectFC();
         bool useBuff();
-        uint32 getDefendersCount(Position point, float range, bool combat = true);
+        uint32 getPlayersInArea(TeamId teamId, Position point, float range, bool combat = true);
         bool IsLockedInsideKeep();
 };
 

@@ -3233,7 +3233,7 @@ bool BGTactics::selectObjective(bool reset)
                         if (enemyCaptain->getDeathState() != DeathState::Dead)
                         {
                             BgObjective = enemyCaptain;
-                            uint32 attackCount = getDefendersCount(AV_STONEHEARTH_WAITING_HORDE, 10.0f, false) + getDefendersCount(AV_STONEHEARTH_ATTACKING_HORDE, 10.0f, false);
+                            uint32 attackCount = getPlayersInArea(bot->GetTeamId(), AV_STONEHEARTH_WAITING_HORDE, 10.0f, false) + getPlayersInArea(bot->GetTeamId(), AV_STONEHEARTH_ATTACKING_HORDE, 10.0f, false);
                             // prepare to attack Captain
                             if (attackCount < 15 && !enemyCaptain->IsInCombat())
                             {
@@ -3398,7 +3398,7 @@ bool BGTactics::selectObjective(bool reset)
                         if (enemyCaptain->getDeathState() != DeathState::Dead)
                         {
                             BgObjective = enemyCaptain;
-                            uint32 attackCount = getDefendersCount(AV_ICEBLOOD_GARRISON_WAITING_ALLIANCE, 10.0f, false) + getDefendersCount(AV_ICEBLOOD_GARRISON_ATTACKING_ALLIANCE, 10.0f, false);
+                            uint32 attackCount = getPlayersInArea(bot->GetTeamId(), AV_ICEBLOOD_GARRISON_WAITING_ALLIANCE, 10.0f, false) + getPlayersInArea(bot->GetTeamId(), AV_ICEBLOOD_GARRISON_ATTACKING_ALLIANCE, 10.0f, false);
                             // prepare to attack Captain
                             if (attackCount < 15 && !enemyCaptain->IsInCombat())
                             {
@@ -3753,62 +3753,67 @@ bool BGTactics::selectObjective(bool reset)
             BattlegroundEY* eyeOfTheStormBG = (BattlegroundEY*)bg;
             TeamId botTeam = bot->GetTeamId();
 
-            if (bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)) //has flag
+            if (bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL))//has flag
             {
-                //try to deliver flag
                 BgObjective = nullptr;
                 uint32 areaTrigger = 0;
-                float closestDist = FLT_MAX;
-                // previous method just went to first objective owned (going though list same order regardless of team) which made both teams more likely to go go to horde side of map (seemed to boost alliance)
+                uint8 closestObjectiveOwnership = 0;//(2 == owned 1 == neutral 0 == enemy)
+                float closestObjectiveDist = FLT_MAX;
+                // find the closest objective, prioritising friendly objectives over neutral over enemy
                 for (const auto& objective : EY_AttackObjectives)
                 {
-                    if (eyeOfTheStormBG->GetCapturePointInfo(std::get<0>(objective))._ownerTeamId == botTeam)
+                    if (GameObject* go = bg->GetBGObject(std::get<1>(objective)))
                     {
-                        if (GameObject* go = bg->GetBGObject(std::get<1>(objective)))
+                        TeamId pointOwner = eyeOfTheStormBG->GetCapturePointInfo(std::get<0>(objective))._ownerTeamId;
+                        uint8 ownership = pointOwner == bot->GetTeamId() ? 2 : pointOwner == TEAM_NEUTRAL ? 1 : 0;
+                        if (closestObjectiveOwnership > ownership)
+                            continue;
+                        float dist = sqrt(bot->GetDistance(go));
+                        if (closestObjectiveOwnership < ownership || (closestObjectiveDist > dist && (closestObjectiveDist - dist > 1 || urand(0, 1))))//if distance difference is minor (as it will be when they first pick flag up from middle) add some randomness so its not going to same point every time
                         {
-                            float dist = sqrt(bot->GetDistance(go));
-                            if (closestDist > dist && (closestDist - dist > 1 || urand(0, 1)))//if distance difference is minor (as it will be when they first pick flag up from middle) add some randomness so its not going to same point every time
-                            {
-                                closestDist = dist;
-                                BgObjective = go;
-                                areaTrigger = std::get<2>(objective);
-                            }
+                            closestObjectiveOwnership = ownership;
+                            closestObjectiveDist = dist;
+                            BgObjective = go;
+                            areaTrigger = std::get<2>(objective);
                         }
                     }
                 }
 
                 if (BgObjective)
                 {
-                    //deliver flag to owned base
                     pos.Set(BgObjective->GetPositionX(), BgObjective->GetPositionY(), BgObjective->GetPositionZ(), bg->GetMapId());
-                }
-                else if (botTeam == TEAM_HORDE)
-                {
-                    //TODO - just make them go for base on their side its better than cowering in corner
-                    areaTrigger = 0;
-                    pos.Set(EY_FLAG_RETURN_POS_RETREAT_HORDE.GetPositionX(), EY_FLAG_RETURN_POS_RETREAT_HORDE.GetPositionY(), EY_FLAG_RETURN_POS_RETREAT_HORDE.GetPositionZ(), bg->GetMapId());
                 }
                 else
                 {
-                    //TODO - just make them go for base on their side its better than cowering in corner
+                    //old fallback method that has them cowering in corner, shouldn't happen anymore
                     areaTrigger = 0;
-                    pos.Set(EY_FLAG_RETURN_POS_RETREAT_ALLIANCE.GetPositionX(), EY_FLAG_RETURN_POS_RETREAT_ALLIANCE.GetPositionY(), EY_FLAG_RETURN_POS_RETREAT_ALLIANCE.GetPositionZ(), bg->GetMapId());
+                    Position const retreatPos = botTeam == TEAM_HORDE ? EY_FLAG_RETURN_POS_RETREAT_HORDE : EY_FLAG_RETURN_POS_RETREAT_ALLIANCE;
+                    pos.Set(retreatPos.GetPositionX(), retreatPos.GetPositionY(), retreatPos.GetPositionZ(), bg->GetMapId());
                 }
 
                 if (areaTrigger && bot->IsWithinDist3d(pos.x, pos.y, pos.z, INTERACTION_DISTANCE))
                 {
-                    WorldPacket data(CMSG_AREATRIGGER);
-                    data << uint32(areaTrigger);
-                    bot->GetSession()->HandleAreaTriggerOpcode(data);
-                    pos.Reset();
-                    posMap["bg objective"] = pos;
+                    if (closestObjectiveOwnership == 2)//means we own the objective, so capture flag at point
+                    {
+                        WorldPacket data(CMSG_AREATRIGGER);
+                        data << uint32(areaTrigger);
+                        bot->GetSession()->HandleAreaTriggerOpcode(data);
+                        pos.Reset();
+                        posMap["bg objective"] = pos;
+                    }
+                    else//wait until point is yours
+                    {
+                        botAI->SetNextCheckDelay(500);
+                    }
                 }
                 else if (!MoveTo(bot->GetMapId(), pos.x, pos.y, pos.z))
+                {
                     posMap["bg objective"] = pos;
+                }
 
                 return true;
             }
-            else //not flag carrier
+            else//does not have flag
             {
                 uint32 role = context->GetValue<uint32>("bg role")->Get();
 
@@ -3831,47 +3836,49 @@ bool BGTactics::selectObjective(bool reset)
                     attackObjectivesBack[0] = EY_AttackObjectives[0];
                     attackObjectivesBack[1] = EY_AttackObjectives[1];
                 }
-                if (role == 1) //Harass left back
+                if (role == 0) //Harass left back
                 {
                     BgObjective = bg->GetBGObject(std::get<1>(attackObjectivesBack[0]));
                 }
-                else if (role == 2) //Harass right back
+                else if (role == 1) //Harass right back
                 {
                     BgObjective = bg->GetBGObject(std::get<1>(attackObjectivesBack[1]));
                 }
-                else if (role < 8) //Attack and Defend
+                else if (role < 8) //2,3,4,5,6,7 - Attack and Defend
                 {
                     while (BgObjective == nullptr)
                     {
-                        if (eyeOfTheStormBG->GetCapturePointInfo(std::get<0>(attackObjectivesFront[0]))._ownerTeamId != botTeam ||
-                            eyeOfTheStormBG->GetCapturePointInfo(std::get<0>(attackObjectivesFront[1]))._ownerTeamId != botTeam)
+                        bool front0Owned = eyeOfTheStormBG->GetCapturePointInfo(std::get<0>(attackObjectivesFront[0]))._ownerTeamId == botTeam;
+                        bool front1Owned = eyeOfTheStormBG->GetCapturePointInfo(std::get<0>(attackObjectivesFront[1]))._ownerTeamId == botTeam;
+
+                        if (!front0Owned || !front1Owned)
                         {
                             // Capture front objectives before attacking back objectives
                             // LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Get Front Objectives",
                             // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
-                            if (role < 6)
+                            if (role < (front1Owned ? 7 : front0Owned ? 3 : 5))//if we own one put most on the point we dont have, otherwise split evenly
                             {
                                 BgObjective = bg->GetBGObject(std::get<1>(attackObjectivesFront[0]));
                             }
-                            else if (role < 8)
+                            else
                             {
                                 BgObjective = bg->GetBGObject(std::get<1>(attackObjectivesFront[1]));
                             }
                         }
                         else
                         {
-                            // Now capture all objectives with priority on back
+                            // Now capture all objectives
                             // LOG_INFO("playerbots", "Bot {} {}:{} <{}>: Get All Objectives",
                             // bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
-                            if (role < 4)
+                            if (role < 4)//2,3 - Defend
                             {
                                 BgObjective = bg->GetBGObject(std::get<1>(attackObjectivesFront[0]));
                             }
-                            else if (role < 5)
+                            else if (role < 6)//4,5 - Defend
                             {
                                 BgObjective = bg->GetBGObject(std::get<1>(attackObjectivesFront[1]));
                             }
-                            else if (role < 8)
+                            else//6,7 - Attack (along with 0,1)
                             {
                                 if (eyeOfTheStormBG->GetCapturePointInfo(std::get<0>(attackObjectivesBack[0]))._ownerTeamId != botTeam)
                                 {
@@ -3894,7 +3901,7 @@ bool BGTactics::selectObjective(bool reset)
                         }
                     }
                 }
-                else if (role < 10)
+                else//8,9 - flag cap
                 {
                     //Get the flag or defend flag carrier
                     Unit* teamFC = AI_VALUE(Unit*, "team flag carrier");
@@ -3989,8 +3996,8 @@ bool BGTactics::selectObjective(bool reset)
                     // mount defensive cannons
                     if (role > 10) // disabled
                     {
-                        uint32 firstTower = getDefendersCount(IC_CANNON_POS_HORDE1, 10.0f);
-                        uint32 secondTower = getDefendersCount(IC_CANNON_POS_HORDE2, 10.0f);
+                        uint32 firstTower = getPlayersInArea(bot->GetTeamId(), IC_CANNON_POS_HORDE1, 10.0f);
+                        uint32 secondTower = getPlayersInArea(bot->GetTeamId(), IC_CANNON_POS_HORDE2, 10.0f);
 
                         if (firstTower < 2)
                         {
@@ -4178,8 +4185,8 @@ bool BGTactics::selectObjective(bool reset)
                     // mount defensive cannons
                     if (role > 10) // disabled
                     {
-                        uint32 firstTower = getDefendersCount(IC_CANNON_POS_ALLIANCE1, 10.0f);
-                        uint32 secondTower = getDefendersCount(IC_CANNON_POS_ALLIANCE2, 10.0f);
+                        uint32 firstTower = getPlayersInArea(bot->GetTeamId(), IC_CANNON_POS_ALLIANCE1, 10.0f);
+                        uint32 secondTower = getPlayersInArea(bot->GetTeamId(), IC_CANNON_POS_ALLIANCE2, 10.0f);
 
                         if (firstTower < 3)
                         {
@@ -4455,7 +4462,7 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
 
     if (bgType == BATTLEGROUND_IC)
         botDistanceLimit = 80.0f;
-    else if (bgType == BATTLEGROUND_AB)
+    else if (bgType == BATTLEGROUND_AB || bgType == BATTLEGROUND_EY)
     {
         botDistanceScoreSubtract = 2.0f;
         botDistanceScoreMultiply = 4.0f;
@@ -4537,7 +4544,7 @@ bool BGTactics::resetObjective()
         return false;
 
     // sometimes change role - should do so less often on larger BG's otherwise bots will spend too much time running around map instead of doing something useful
-    uint32 rollChangeOdds = BATTLEGROUND_AV == bg->GetBgTypeID() ? 63 : 5;
+    uint32 rollChangeOdds = BATTLEGROUND_AV == bg->GetBgTypeID() ? 63 : BATTLEGROUND_EY == bg->GetBgTypeID() ? 31 : 5;
     if (!urand(0, rollChangeOdds) && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)))
         context->GetValue<uint32>("bg role")->Set(urand(0, 9));
 
@@ -4557,8 +4564,7 @@ bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 curr
     uint32 const lastPointInPath = reverse ? 0 : ((*currentPath).size() - 1);
 
     if ((currentPoint == lastPointInPath) ||
-        (bot->IsInCombat() && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL))) || !bot->IsAlive())
-    {
+        (bot->IsInCombat() && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL))) || !bot->IsAlive()) {
         // Path is over.
         //std::ostringstream out;
         //out << "Reached path end!";
@@ -4993,7 +4999,7 @@ bool BGTactics::useBuff()
     return false;
 }
 
-uint32 BGTactics::getDefendersCount(Position point, float range, bool combat)
+uint32 BGTactics::getPlayersInArea(TeamId teamId, Position point, float range, bool combat)
 {
     uint32 defCount = 0;
 
@@ -5010,7 +5016,7 @@ uint32 BGTactics::getDefendersCount(Position point, float range, bool combat)
         if (!player)
             continue;
 
-        if (player->IsAlive() && player->GetTeamId() == bot->GetTeamId())
+        if (player->IsAlive() && (teamId == TEAM_NEUTRAL || teamId == player->GetTeamId()))
         {
             if (!combat && player->IsInCombat())
                 continue;
