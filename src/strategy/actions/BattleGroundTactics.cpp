@@ -5210,7 +5210,9 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
                     MoveTo(bg->GetMapId(), 6239.89f + frand(-1, +1), 261.11f + frand(-1, +1), 0.89f, false, true);
                 else
                     MoveTo(bg->GetMapId(), 6235.60f + frand(-1, +1), 258.27f + frand(-1, +1), 0.89f, false, true);
-            } else {
+            }
+            else
+            {
                 if (Preference == 3)
                     MoveTo(bg->GetMapId(), 6265.72f + frand(-1, +1), 271.92f + frand(-1, +1), 3.65f, false, true);
                 else if (Preference == 6)
@@ -5228,7 +5230,9 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
                     MoveTo(bg->GetMapId(), 1266.85f + frand(-1, +1), 1663.52f + frand(-1, +1), 34.04f, false, true);
                 else
                     MoveTo(bg->GetMapId(), 1274.07f + frand(-1, +1), 1656.36f + frand(-1, +1), 34.58f, false, true);
-            } else {
+            }
+            else
+            {
                 if (Preference == 3)
                     MoveTo(bg->GetMapId(), 1261.93f + frand(-1, +1), 1669.27f + frand(-1, +1), 34.25f, false, true);
                 else if (Preference == 6)
@@ -5246,7 +5250,9 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
                     MoveTo(bg->GetMapId(), 4056.99f + frand(-1, +1), 2919.75f + frand(-1, +1), 13.51f, false, true);
                 else
                     MoveTo(bg->GetMapId(), 4056.27f + frand(-1, +1), 2905.33f + frand(-1, +1), 12.90f, false, true);
-            } else {
+            }
+            else
+            {
                 if (Preference == 3)
                     MoveTo(bg->GetMapId(), 4043.66f + frand(-1, +1), 2927.93f + frand(-1, +1), 13.17f, false, true);
                 else if (Preference == 6)

@@ -250,10 +250,10 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
         TeamSize = (uint32)type;
 
         // Check if bots should join Rated Arena (Only captains can queue)
-        int ratedArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaBotCount;
-        int ratedArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaPlayerCount;
-        int ratedArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaInstanceCount;
-        int activeRatedArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeRatedArenaQueue;
+        uint32 ratedArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaBotCount;
+        uint32 ratedArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaPlayerCount;
+        uint32 ratedArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaInstanceCount;
+        uint32 activeRatedArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeRatedArenaQueue;
 
         bool isRated = (ratedArenaBotCount + ratedArenaPlayerCount) < (BracketSize * (activeRatedArenaQueue + ratedArenaInstanceCount));
 
@@ -269,11 +269,11 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
 
         // Check if bots should join Skirmish Arena
         // We have extra bots queue because same faction can vs each other but can't be in the same group.
-        int skirmishArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaBotCount;
-        int skirmishArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaPlayerCount;
-        int skirmishArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaInstanceCount;
-        int activeSkirmishArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeSkirmishArenaQueue;
-        int maxRequiredSkirmishBots = BracketSize * (activeSkirmishArenaQueue + skirmishArenaInstanceCount);
+        uint32 skirmishArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaBotCount;
+        uint32 skirmishArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaPlayerCount;
+        uint32 skirmishArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaInstanceCount;
+        uint32 activeSkirmishArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeSkirmishArenaQueue;
+        uint32 maxRequiredSkirmishBots = BracketSize * (activeSkirmishArenaQueue + skirmishArenaInstanceCount);
         if (maxRequiredSkirmishBots != 0)
             maxRequiredSkirmishBots = maxRequiredSkirmishBots + TeamSize;
 
@@ -286,18 +286,20 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
     }
 
     // Check if bots should join Battleground
-    int bgAllianceBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAllianceBotCount;
-    int bgAlliancePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAlliancePlayerCount;
-    int bgHordeBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordeBotCount;
-    int bgHordePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
-    int activeBgQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeBgQueue;
-    int bgInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
+    uint32 bgAllianceBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAllianceBotCount;
+    uint32 bgAlliancePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAlliancePlayerCount;
+    uint32 bgHordeBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordeBotCount;
+    uint32 bgHordePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
+    uint32 activeBgQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeBgQueue;
+    uint32 bgInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
 
     if(teamId == TEAM_ALLIANCE)
     {
         if((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
             return true;
-    } else {
+    }
+    else
+    {
         if((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
             return true;
     }
@@ -578,10 +580,10 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
         TeamSize = (uint32)type;
 
         // Check if bots should join Rated Arena (Only captains can queue)
-        int ratedArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaBotCount;
-        int ratedArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaPlayerCount;
-        int ratedArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaInstanceCount;
-        int activeRatedArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeRatedArenaQueue;
+        uint32 ratedArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaBotCount;
+        uint32 ratedArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaPlayerCount;
+        uint32 ratedArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaInstanceCount;
+        uint32 activeRatedArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeRatedArenaQueue;
 
         bool isRated = (ratedArenaBotCount + ratedArenaPlayerCount) < (BracketSize * (activeRatedArenaQueue + ratedArenaInstanceCount));
 
@@ -597,11 +599,11 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
 
         // Check if bots should join Skirmish Arena
         // We have extra bots queue because same faction can vs each other but can't be in the same group.
-        int skirmishArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaBotCount;
-        int skirmishArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaPlayerCount;
-        int skirmishArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaInstanceCount;
-        int activeSkirmishArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeSkirmishArenaQueue;
-        int maxRequiredSkirmishBots = BracketSize * (activeSkirmishArenaQueue + skirmishArenaInstanceCount);
+        uint32 skirmishArenaBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaBotCount;
+        uint32 skirmishArenaPlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaPlayerCount;
+        uint32 skirmishArenaInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].skirmishArenaInstanceCount;
+        uint32 activeSkirmishArenaQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeSkirmishArenaQueue;
+        uint32 maxRequiredSkirmishBots = BracketSize * (activeSkirmishArenaQueue + skirmishArenaInstanceCount);
         if (maxRequiredSkirmishBots != 0)
             maxRequiredSkirmishBots = maxRequiredSkirmishBots + TeamSize;
 
@@ -614,18 +616,20 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
     }
 
     // Check if bots should join Battleground
-    int bgAllianceBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAllianceBotCount;
-    int bgAlliancePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAlliancePlayerCount;
-    int bgHordeBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordeBotCount;
-    int bgHordePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
-    int activeBgQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeBgQueue;
-    int bgInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
+    uint32 bgAllianceBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAllianceBotCount;
+    uint32 bgAlliancePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgAlliancePlayerCount;
+    uint32 bgHordeBotCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordeBotCount;
+    uint32 bgHordePlayerCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
+    uint32 activeBgQueue = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].activeBgQueue;
+    uint32 bgInstanceCount = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
 
     if(teamId == TEAM_ALLIANCE)
     {
         if((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
             return true;
-    } else {
+    }
+    else
+    {
         if((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
             return true;
     }

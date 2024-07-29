@@ -3278,7 +3278,8 @@ void PlayerbotFactory::InitArenaTeam()
         {
             LOG_INFO("playerbots", "Deleting random bot arena teams...");
 
-            for (auto it = sArenaTeamMgr->GetArenaTeams().begin(); it != sArenaTeamMgr->GetArenaTeams().end(); ++it) {
+            for (auto it = sArenaTeamMgr->GetArenaTeams().begin(); it != sArenaTeamMgr->GetArenaTeams().end(); ++it)
+            {
                 ArenaTeam* arenateam = it->second;
                 if (arenateam->GetCaptain() && arenateam->GetCaptain().IsPlayer())
                 {
@@ -3338,7 +3339,8 @@ void PlayerbotFactory::InitArenaTeam()
                     continue;
 
                 ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
-                if (team){
+                if (team)
+                {
                     if (sCharacterCache->GetCharacterArenaTeamIdByGuid(bot->GetGUID(), team->GetSlot()) != 0)
                     {
                         return;

@@ -8,33 +8,33 @@
 #include "PlayerbotMgr.h"
 
 struct BattlegroundInfo {
-    std::vector<int> bgInstances;
-    std::vector<int> ratedArenaInstances;
-    std::vector<int> skirmishArenaInstances;
-    int bgInstanceCount = 0;
-    int ratedArenaInstanceCount = 0;
-    int skirmishArenaInstanceCount = 0;
-    int minLevel = 0;
-    int maxLevel = 0;
-    int activeRatedArenaQueue = 0; // 0 = Inactive, 1 = Active
-    int activeSkirmishArenaQueue = 0; // 0 = Inactive, 1 = Active
-    int activeBgQueue = 0; // 0 = Inactive, 1 = Active
+    std::vector<uint32> bgInstances;
+    std::vector<uint32> ratedArenaInstances;
+    std::vector<uint32> skirmishArenaInstances;
+    uint32 bgInstanceCount = 0;
+    uint32 ratedArenaInstanceCount = 0;
+    uint32 skirmishArenaInstanceCount = 0;
+    uint32 minLevel = 0;
+    uint32 maxLevel = 0;
+    uint32 activeRatedArenaQueue = 0; // 0 = Inactive, 1 = Active
+    uint32 activeSkirmishArenaQueue = 0; // 0 = Inactive, 1 = Active
+    uint32 activeBgQueue = 0; // 0 = Inactive, 1 = Active
 
     // Bots (Arena)
-    int ratedArenaBotCount = 0;
-    int skirmishArenaBotCount = 0;
+    uint32 ratedArenaBotCount = 0;
+    uint32 skirmishArenaBotCount = 0;
 
     // Bots (Battleground)
-    int bgHordeBotCount = 0;
-    int bgAllianceBotCount = 0;
+    uint32 bgHordeBotCount = 0;
+    uint32 bgAllianceBotCount = 0;
 
     // Players (Arena)
-    int ratedArenaPlayerCount = 0;
-    int skirmishArenaPlayerCount = 0;
+    uint32 ratedArenaPlayerCount = 0;
+    uint32 skirmishArenaPlayerCount = 0;
 
     // Players (Battleground)
-    int bgHordePlayerCount = 0;
-    int bgAlliancePlayerCount = 0;
+    uint32 bgHordePlayerCount = 0;
+    uint32 bgAlliancePlayerCount = 0;
 };
 
 class ChatHandler;
@@ -141,7 +141,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         ObjectGuid const GetBattleMasterGUID(Player* bot, BattlegroundTypeId bgTypeId);
         CreatureData const* GetCreatureDataByEntry(uint32 entry);
         void LoadBattleMastersCache();
-        std::map<int32_t, std::map<int32_t, BattlegroundInfo>> BattlegroundData;
+        std::map<uint32, std::map<uint32, BattlegroundInfo>> BattlegroundData;
         std::map<uint32, std::map<uint32, std::map<TeamId, uint32>>> VisualBots;
         std::map<uint32, std::map<uint32, std::map<uint32, uint32>>> Supporters;
         std::map<TeamId, std::vector<uint32>> LfgDungeons;

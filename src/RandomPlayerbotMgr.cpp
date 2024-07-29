@@ -751,7 +751,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
 
             if(bot->InBattleground())
             {
-                std::vector<int>* instanceIds = nullptr;
+                std::vector<uint32>* instanceIds = nullptr;
                 uint32 instanceId = bot->GetBattleground()->GetInstanceID();
                 bool isArena = false;
                 bool isRated = false;
@@ -843,14 +843,16 @@ void RandomPlayerbotMgr::CheckBgQueue()
 
 void RandomPlayerbotMgr::LogBattlegroundInfo()
 {
-    for (const auto& queueTypePair : BattlegroundData) {
+    for (const auto& queueTypePair : BattlegroundData)
+    {
         uint8 queueType = queueTypePair.first;
 
         BattlegroundQueueTypeId queueTypeId = BattlegroundQueueTypeId(queueType);
 
         if (uint8 type = BattlegroundMgr::BGArenaType(queueTypeId))
         {
-            for (const auto& bracketIdPair : queueTypePair.second) {
+            for (const auto& bracketIdPair : queueTypePair.second)
+            {
                 auto& bgInfo = bracketIdPair.second;
 
                 LOG_INFO("playerbots", "ARENA:{} {}: Player (Skirmish:{}, Rated:{}) Bots (Skirmish:{}, Rated:{}) Total (Skirmish:{} Rated:{}), Instances (Skirmish:{} Rated:{})",
@@ -892,7 +894,8 @@ void RandomPlayerbotMgr::LogBattlegroundInfo()
                 break;
         }
 
-        for (const auto& bracketIdPair : queueTypePair.second) {
+        for (const auto& bracketIdPair : queueTypePair.second)
+        {
             auto& bgInfo = bracketIdPair.second;
 
             LOG_INFO("playerbots", "BG:{} {}: Player ({}:{}) Bot ({}:{}) Total (A:{} H:{}), Instances {}",
@@ -902,7 +905,7 @@ void RandomPlayerbotMgr::LogBattlegroundInfo()
                 bgInfo.bgInstanceCount);
         }
     }
-    LOG_INFO("playerbots", "====== BATTLEGROUND/ARENA Check Finished =======");
+    LOG_INFO("playerbots", "BG Queue check finished");
 }
 
 void RandomPlayerbotMgr::CheckLfgQueue()
