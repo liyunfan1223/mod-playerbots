@@ -80,11 +80,11 @@ AiPlayerbot.Enabled = 1
 AiPlayerbot.RandomBotAutologin = 1
 
 # Random bot account
-AiPlayerbot.RandomBotAccountCount = 200
+AiPlayerbot.RandomBotAccountCount = 60
 
 # Random bot count
-AiPlayerbot.MinRandomBots = 50
-AiPlayerbot.MaxRandomBots = 50
+AiPlayerbot.MinRandomBots = 70
+AiPlayerbot.MaxRandomBots = 70
 
 # Delete all random bot accounts (reset randombots)
 AiPlayerbot.DeleteRandomBotAccounts = 0
@@ -438,7 +438,7 @@ AiPlayerbot.OpenGoSpell = 6477
 AiPlayerbot.RandomBotRandomPassword = 0
 
 # Accounts to create for random bots
-AiPlayerbot.RandomBotAccountPrefix = "rndbot"
+AiPlayerbot.RandomBotAccountPrefix = "SLX"
 
 # Enable/Disable rotation of bots (randomly select a bot from the bots pool to go online and rotate them periodically)
 # Need to reset rndbot after changing the setting (.playerbot rndbot reset)
@@ -507,7 +507,7 @@ AiPlayerbot.DowngradeMaxLevelBot = 0
 
 # Equips quality limitation for random bots (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
 # default: 3 (rare)
-AiPlayerbot.RandomGearQualityLimit = 3
+AiPlayerbot.RandomGearQualityLimit = 4
 
 # Equips gear score limitation for random bots (0 = no limit)
 # default: 0 (no limit)
