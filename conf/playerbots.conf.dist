@@ -1239,10 +1239,10 @@ AiPlayerbot.CommandPrefix = ""
 AiPlayerbot.CommandSeparator = "\\\\"
 
 # Enable playerbot talk (say / yell / general chatting / lfg)
-AiPlayerbot.RandomBotTalk = 0
+AiPlayerbot.RandomBotTalk = 1
 
 # Enable playerbot emote
-AiPlayerbot.RandomBotEmote = 0
+AiPlayerbot.RandomBotEmote = 1
 
 # Enable dungeon suggestions for random bots
 AiPlayerbot.RandomBotSuggestDungeons = 1
