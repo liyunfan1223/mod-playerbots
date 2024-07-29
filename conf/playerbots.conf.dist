@@ -654,8 +654,33 @@ AiPlayerbot.RandomBotJoinBG = 1
 # Enable Auto join BG - bots randomly join WSG and 2v2 Arena if server is not lagging
 AiPlayerbot.RandomBotAutoJoinBG = 0
 
+# Required for RandomBotAutoJoinBG
+# Currently you can select 1 bracket (level range) for bots to auto join.
+# Brackets for warsong 0:10-19, 1:20-29, 2:30-39, 3:40-49 etc. Default: 7 (level 80)
+# Brackets for rated arena: 0:10-14, 1:15-19 etc. Default: 14 (80-84)
+# For lower level ranges to work in Rated Arena, custom code changes need to be made.
+# Count = amount of games Bots auto fill. (Count 1 for WSG = 20 bots).
+AiPlayerbot.RandomBotAutoJoinWarsongBracket = 7
+AiPlayerbot.RandomBotAutoJoinArenaBracket = 14
+AiPlayerbot.RandomBotAutoJoinBGWarsongCount = 0
+AiPlayerbot.RandomBotAutoJoinBGRatedArena2v2Count = 0
+AiPlayerbot.RandomBotAutoJoinBGRatedArena3v3Count = 0
+AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count = 0
+
 # Random bot arena team count
-AiPlayerbot.RandomBotArenaTeamCount = 20
+# Teams are created when bots are initialized on server restart.
+# You may need to first delete all arena teams, then reinitialize bots.
+# Warning: Reinitializing bots completely resets them (command in game: .playerbots rndbot init)
+# Bots only join one arena team to avoid queueing issues. Take that into account when increasing count.
+# Default: 2v2: 10 (20 Bots), 3v3: 10 (30 bots), 5v5: 5 (25 bots).
+AiPlayerbot.RandomBotArenaTeam2v2Count = 10
+AiPlayerbot.RandomBotArenaTeam3v3Count = 10
+AiPlayerbot.RandomBotArenaTeam5v5Count = 5
+
+# Arena rating is randomized on team creation.
+# Default: Max: 2000, Min: 1000.
+AiPlayerbot.RandomBotArenaTeamMaxRating = 2000
+AiPlayerbot.RandomBotArenaTeamMinRating = 1000
 
 # Delete all random bot arena teams
 AiPlayerbot.DeleteRandomBotArenaTeams = 0

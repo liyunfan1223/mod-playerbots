@@ -5,6 +5,7 @@
 #include "PlayerbotFactory.h"
 #include "AccountMgr.h"
 #include "AiFactory.h"
+#include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "DBCStores.h"
 #include "DBCStructure.h"
@@ -366,14 +367,14 @@ void PlayerbotFactory::Randomize(bool incremental)
     //if (pmo)
     //    pmo->finish();
 
-    // if (bot->GetLevel() >= 70)
-    // {
-    //     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Arenas");
-    //     LOG_INFO("playerbots", "Initializing arena teams...");
-    //     InitArenaTeam();
-    //     if (pmo)
-    //         pmo->finish();
-    // }
+    if (bot->GetLevel() >= 70)
+    {
+        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Arenas");
+        LOG_INFO("playerbots", "Initializing arena teams...");
+        InitArenaTeam();
+        if (pmo)
+            pmo->finish();
+    }
 
     if (!incremental) {
         bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
@@ -3297,8 +3298,40 @@ void PlayerbotFactory::InitArenaTeam()
     if (!sPlayerbotAIConfig->IsInRandomAccountList(bot->GetSession()->GetAccountId()))
         return;
 
+    // Currently the teams are only remade after a server restart and if deleteRandomBotArenaTeams = 1
+    // This is because randomBotArenaTeams is only empty on server restart.
+    // A manual reinitalization (.playerbots rndbot init) is also required after the teams have been deleted.
     if (sPlayerbotAIConfig->randomBotArenaTeams.empty())
-        RandomPlayerbotFactory::CreateRandomArenaTeams();
+    {
+        if (sPlayerbotAIConfig->deleteRandomBotArenaTeams)
+        {
+            LOG_INFO("playerbots", "Deleting random bot arena teams...");
+
+            for (auto it = sArenaTeamMgr->GetArenaTeams().begin(); it != sArenaTeamMgr->GetArenaTeams().end(); ++it)
+            {
+                ArenaTeam* arenateam = it->second;
+                if (arenateam->GetCaptain() && arenateam->GetCaptain().IsPlayer())
+                {
+                    Player* bot = ObjectAccessor::FindPlayer(arenateam->GetCaptain());
+                    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+                    if (!botAI || botAI->IsRealPlayer())
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        arenateam->Disband(nullptr);
+                    }
+                }
+            }
+
+            LOG_INFO("playerbots", "Random bot arena teams deleted");
+        }
+
+        RandomPlayerbotFactory::CreateRandomArenaTeams(ARENA_TYPE_2v2, sPlayerbotAIConfig->randomBotArenaTeam2v2Count);
+        RandomPlayerbotFactory::CreateRandomArenaTeams(ARENA_TYPE_3v3, sPlayerbotAIConfig->randomBotArenaTeam3v3Count);
+        RandomPlayerbotFactory::CreateRandomArenaTeams(ARENA_TYPE_5v5, sPlayerbotAIConfig->randomBotArenaTeam5v5Count);
+    }
 
     std::vector<uint32> arenateams;
     for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotArenaTeams.begin(); i != sPlayerbotAIConfig->randomBotArenaTeams.end(); ++i)
@@ -3310,28 +3343,48 @@ void PlayerbotFactory::InitArenaTeam()
         return;
     }
 
-    int index = urand(0, arenateams.size() - 1);
-    uint32 arenateamID = arenateams[index];
-    ArenaTeam* arenateam = sArenaTeamMgr->GetArenaTeamById(arenateamID);
-    if (!arenateam)
+    while (!arenateams.empty())
     {
-        LOG_ERROR("playerbots", "Invalid arena team {}", arenateamID);
-        return;
-    }
-
-    if (arenateam->GetMembersSize() < ((uint32)arenateam->GetType() * 2) && bot->GetLevel() >= 70)
-    {
-        ObjectGuid capt = arenateam->GetCaptain();
-        Player* botcaptain = ObjectAccessor::FindPlayer(capt);
-
-        if ((bot && bot->GetArenaTeamId(arenateam->GetSlot())) || sCharacterCache->GetCharacterArenaTeamIdByGuid(bot->GetGUID(), arenateam->GetSlot()) != 0)
-            return;
-
-        if (botcaptain && botcaptain->GetTeamId() == bot->GetTeamId()) //need?
+        int index = urand(0, arenateams.size() - 1);
+        uint32 arenateamID = arenateams[index];
+        ArenaTeam *arenateam = sArenaTeamMgr->GetArenaTeamById(arenateamID);
+        if (!arenateam)
         {
-            arenateam->AddMember(bot->GetGUID());
-            arenateam->SaveToDB();
+            LOG_ERROR("playerbots", "Invalid arena team {}", arenateamID);
+            arenateams.erase(arenateams.begin() + index);
+            continue;
         }
+
+        if (arenateam->GetMembersSize() < ((uint32)arenateam->GetType()) && bot->GetLevel() >= 70)
+        {
+            ObjectGuid capt = arenateam->GetCaptain();
+            Player* botcaptain = ObjectAccessor::FindPlayer(capt);
+
+            // To avoid bots removing each other from groups when queueing, force them to only be in one team
+            for (uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
+            {
+                uint32 arenaTeamId = bot->GetArenaTeamId(arena_slot);
+                if (!arenaTeamId)
+                    continue;
+
+                ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
+                if (team)
+                {
+                    if (sCharacterCache->GetCharacterArenaTeamIdByGuid(bot->GetGUID(), team->GetSlot()) != 0)
+                    {
+                        return;
+                    }
+                    return;
+                }
+            }
+
+            if (botcaptain && botcaptain->GetTeamId() == bot->GetTeamId()) // need?
+            {
+                arenateam->AddMember(bot->GetGUID());
+                arenateam->SaveToDB();
+            }
+        }
+        arenateams.erase(arenateams.begin() + index);
     }
 
     bot->SaveToDB(false, false);

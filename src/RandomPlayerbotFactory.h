@@ -10,9 +10,12 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include "DBCEnums.h"
 
 class Player;
 class WorldSession;
+
+enum ArenaType : uint8;
 
 class RandomPlayerbotFactory
 {
@@ -23,7 +26,7 @@ class RandomPlayerbotFactory
         Player* CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<uint8, std::vector<std::string>> names);
         static void CreateRandomBots();
         static void CreateRandomGuilds();
-        static void CreateRandomArenaTeams();
+        static void CreateRandomArenaTeams(ArenaType slot, uint32 count);
         static std::string const CreateRandomGuildName();
 
 	private:

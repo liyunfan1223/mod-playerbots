@@ -125,7 +125,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
                 case LOCK_KEY_SKILL:
                     if (goId == 13891 || goId == 19535) // Serpentbloom
                     {
-                        this->guid = guid;
+                        this->guid = lootGUID;
                     }
                     else if (SkillByLockType(LockType(lockInfo->Index[i])) > 0)
                     {
