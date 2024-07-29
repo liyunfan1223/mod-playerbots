@@ -14,6 +14,8 @@
 #include "PriestAiObjectContext.h"
 #include "MageAiObjectContext.h"
 #include "SharedDefines.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "WarlockAiObjectContext.h"
 #include "WarriorAiObjectContext.h"
 #include "ShamanAiObjectContext.h"
@@ -109,9 +111,15 @@ std::map<uint8, uint32> AiFactory::GetPlayerSpecTabs(Player* bot)
             continue;
 
         uint32 const* talentTabIds = GetTalentTabPages(bot->getClass());
-        if (talentInfo->TalentTab == talentTabIds[0]) tabs[0]++;
-        if (talentInfo->TalentTab == talentTabIds[1]) tabs[1]++;
-        if (talentInfo->TalentTab == talentTabIds[2]) tabs[2]++;
+
+        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        int rank = spellInfo ? spellInfo->GetRank() : 1;
+        if (talentInfo->TalentTab == talentTabIds[0])
+            tabs[0] += rank;
+        if (talentInfo->TalentTab == talentTabIds[1])
+            tabs[1] += rank;
+        if (talentInfo->TalentTab == talentTabIds[2])
+            tabs[2] += rank;
     }
     return tabs;
 }
