@@ -2386,11 +2386,11 @@ static std::pair<uint32, uint32> AV_AllianceDefendObjectives[] =
 static uint32 AB_AttackObjectives[] =
 {
     // Attack
-    { BG_AB_NODE_STABLES },
-    { BG_AB_NODE_BLACKSMITH },
-    { BG_AB_NODE_FARM },
-    { BG_AB_NODE_LUMBER_MILL },
-    { BG_AB_NODE_GOLD_MINE }
+    BG_AB_NODE_STABLES,
+    BG_AB_NODE_BLACKSMITH,
+    BG_AB_NODE_FARM,
+    BG_AB_NODE_LUMBER_MILL,
+    BG_AB_NODE_GOLD_MINE
 };
 
 static std::tuple<uint32, uint32, uint32> EY_AttackObjectives[] =

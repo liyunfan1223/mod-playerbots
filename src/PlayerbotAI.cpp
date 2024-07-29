@@ -191,7 +191,7 @@ PlayerbotAI::~PlayerbotAI()
         delete aiObjectContext;
 
     if (bot)
-        sPlayerbotsMgr->RemovePlayerBotData(bot->GetGUID());
+        sPlayerbotsMgr->RemovePlayerBotData(bot->GetGUID(), true);
 }
 
 void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
@@ -625,10 +625,15 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
         return;
     }
 
-    if (!IsAllowedCommand(filtered) && !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer))
+    if (!IsAllowedCommand(filtered) && 
+        (master != fromPlayer || !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer)))
         return;
 
-    if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos && filtered.find("award") == std::string::npos)
+    if (!IsAllowedCommand(filtered) && master != fromPlayer)
+        return;
+
+    if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos &&
+        filtered.find("award") == std::string::npos)
     {
         ChatCommandHolder cmd("warning", fromPlayer, type);
         chatCommands.push(cmd);

@@ -85,7 +85,8 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
 
     uint32 botAccountId = holder.GetAccountId();
 
-    WorldSession* botSession = new WorldSession(botAccountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0), LOCALE_enUS, 0, false, false, 0, true);
+    // At login DBC locale should be what the server is set to use by default (as spells etc are hardcoded to ENUS this allows channels to work as intended)
+    WorldSession* botSession = new WorldSession(botAccountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0), sWorld->GetDefaultDbcLocale(), 0, false, false, 0, true);
 
     botSession->HandlePlayerLoginFromDB(holder); // will delete lqh
 
@@ -525,7 +526,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     // join standard channels
     AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(bot->GetAreaId());
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
-    std::string current_zone_name = current_zone ? current_zone->area_name[0] : "";
+    std::string current_zone_name = current_zone ? current_zone->area_name[sWorld->GetDefaultDbcLocale()] : "";
 
     if (current_zone && cMgr)
     {
@@ -544,13 +545,13 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
             Channel* new_channel = nullptr;
             if (isLfg)
             {
-                std::string lfgChannelName = channel->pattern[0];
+                std::string lfgChannelName = channel->pattern[sWorld->GetDefaultDbcLocale()];
                 new_channel = cMgr->GetJoinChannel("LookingForGroup", channel->ChannelID);
             }
             else
             {
                 char new_channel_name_buf[100];
-                snprintf(new_channel_name_buf, 100, channel->pattern[0], current_zone_name.c_str());
+                snprintf(new_channel_name_buf, 100, channel->pattern[sWorld->GetDefaultDbcLocale()], current_zone_name.c_str());
                 new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
             }
             if (new_channel && new_channel->GetName().length() > 0)
@@ -736,7 +737,7 @@ bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* a
 
     for (std::vector<std::string>::iterator i = messages.begin(); i != messages.end(); ++i)
     {
-        handler->PSendSysMessage("%s", i->c_str());
+        handler->PSendSysMessage("{}", i->c_str());
     }
 
     return true;
@@ -748,8 +749,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!*args)
     {
-        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
-        messages.push_back("       addclass CLASSNAME");
+        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME\n");
+        messages.push_back("usage: addclass CLASSNAME");
         return messages;
     }
 
@@ -842,7 +843,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         if (GET_PLAYERBOT_AI(master))
         {
             messages.push_back("Disable player botAI");
-            DisablePlayerBot(master->GetGUID());
+            delete GET_PLAYERBOT_AI(master);
         }
         else if (sPlayerbotAIConfig->selfBotLevel == 0)
             messages.push_back("Self-bot is disabled");
@@ -851,7 +852,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         else
         {
             messages.push_back("Enable player botAI");
-            OnBotLogin(master);
+            sPlayerbotsMgr->AddPlayerbotData(master, true);
+            GET_PLAYERBOT_AI(master)->SetMaster(master);
         }
 
         return messages;
@@ -938,20 +940,22 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
                 race_limit = "2, 5, 6, 8, 10";
                 break;
         }
+        uint32 maxAccountId = sPlayerbotAIConfig->randomBotAccounts.back();
         // find a bot fit conditions and not in any guild
         QueryResult results = CharacterDatabase.Query("SELECT guid FROM characters "
             "WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) AND guid NOT IN ( SELECT guid FROM guild_member ) "
-            "ORDER BY account DESC LIMIT 1", claz, race_limit);
+            "AND account <= {} "
+            "ORDER BY account DESC LIMIT 1", claz, race_limit, maxAccountId);
         if (results)
         {
             Field* fields = results->Fetch();
             ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
             AddPlayerBot(guid, master->GetSession()->GetAccountId());
 
-            messages.push_back("addclass " + std::string(charname) + " ok");
+            messages.push_back("Add class " + std::string(charname));
             return messages;
         }
-        messages.push_back("addclass failed.");
+        messages.push_back("Add class failed.");
         return messages;
     }
 
@@ -1214,7 +1218,7 @@ PlayerbotMgr::PlayerbotMgr(Player* const master) : PlayerbotHolder(),  master(ma
 PlayerbotMgr::~PlayerbotMgr()
 {
     if (master)
-        sPlayerbotsMgr->RemovePlayerBotData(master->GetGUID());
+        sPlayerbotsMgr->RemovePlayerBotData(master->GetGUID(), false);
 }
 
 void PlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
@@ -1427,31 +1431,45 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
         return;
     }
     // If the guid already exists in the map, remove it
-    std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMap.find(player->GetGUID());
-    if (itr != _playerbotsMap.end())
-    {
-        _playerbotsMap.erase(itr);
-    }
+    
     if (!isBotAI)
     {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
+        if (itr != _playerbotsMgrMap.end())
+        {
+            _playerbotsMgrMap.erase(itr);
+        }
         PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);
-        ASSERT(_playerbotsMap.emplace(player->GetGUID(), playerbotMgr).second);
+        ASSERT(_playerbotsMgrMap.emplace(player->GetGUID(), playerbotMgr).second);
 
         playerbotMgr->OnPlayerLogin(player);
     }
     else
     {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
+        if (itr != _playerbotsAIMap.end())
+        {
+            _playerbotsAIMap.erase(itr);
+        }
         PlayerbotAI* botAI = new PlayerbotAI(player);
-        ASSERT(_playerbotsMap.emplace(player->GetGUID(), botAI).second);
+        ASSERT(_playerbotsAIMap.emplace(player->GetGUID(), botAI).second);
     }
 }
 
-void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid)
+void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 {
-    std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMap.find(guid);
-    if (itr != _playerbotsMap.end())
-    {
-        _playerbotsMap.erase(itr);
+    if (is_AI) {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(guid);
+        if (itr != _playerbotsAIMap.end())
+        {
+            _playerbotsAIMap.erase(itr);
+        }
+    } else {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(guid);
+        if (itr != _playerbotsMgrMap.end())
+        {
+            _playerbotsMgrMap.erase(itr);
+        }
     }
 }
 
@@ -1464,8 +1482,8 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
     //     return nullptr;
     // }
-    auto itr = _playerbotsMap.find(player->GetGUID());
-    if (itr != _playerbotsMap.end())
+    auto itr = _playerbotsAIMap.find(player->GetGUID());
+    if (itr != _playerbotsAIMap.end())
     {
         if (itr->second->IsBotAI())
             return reinterpret_cast<PlayerbotAI*>(itr->second);
@@ -1480,8 +1498,8 @@ PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
     {
         return nullptr;
     }
-    auto itr = _playerbotsMap.find(player->GetGUID());
-    if (itr != _playerbotsMap.end())
+    auto itr = _playerbotsMgrMap.find(player->GetGUID());
+    if (itr != _playerbotsMgrMap.end())
     {
         if (!itr->second->IsBotAI())
             return reinterpret_cast<PlayerbotMgr*>(itr->second);

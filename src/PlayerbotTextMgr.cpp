@@ -28,12 +28,13 @@ void PlayerbotTextMgr::LoadBotTexts()
             Field* fields = result->Fetch();
             std::string name = fields[0].Get<std::string>();
             text[0] = fields[1].Get<std::string>();
-            uint32 sayType = fields[2].Get<uint32>();
-            uint32 replyType = fields[3].Get<uint32>();
+            uint8 sayType = fields[2].Get<uint8>();
+            uint8 replyType = fields[3].Get<uint8>();
             for (uint8 i = 1; i < MAX_LOCALES; ++i)
             {
                 text[i] = fields[i + 3].Get<std::string>();
             }
+
             botTexts[name].push_back(BotTextEntry(name, text, sayType, replyType));
             ++count;
         }
@@ -191,6 +192,7 @@ uint32 PlayerbotTextMgr::GetLocalePriority()
         if (botTextLocalePriority[i] > topLocale)
             topLocale = i;
     }
+
     return topLocale;
 }
 

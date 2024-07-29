@@ -6,6 +6,7 @@
 #include "Event.h"
 #include "ChatHelper.h"
 #include "Playerbots.h"
+#include "World.h"
 
 bool TellLosAction::Execute(Event event)
 {
@@ -52,7 +53,7 @@ void TellLosAction::ListUnits(std::string const title, GuidVector units)
     for (ObjectGuid const guid : units)
     {
         if (Unit* unit = botAI->GetUnit(guid)) {
-            botAI->TellMaster(unit->GetName());
+            botAI->TellMaster(unit->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()));
         }
     }
 
