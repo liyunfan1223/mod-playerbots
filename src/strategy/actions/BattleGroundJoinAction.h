@@ -14,6 +14,7 @@ struct CreatureData;
 
 enum ArenaType : uint8;
 enum BattlegroundQueueTypeId : uint8;
+enum BattlegroundBracketId : uint8;
 
 class BGJoinAction : public Action
 {

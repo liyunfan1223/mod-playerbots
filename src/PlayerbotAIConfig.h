@@ -102,6 +102,12 @@ class PlayerbotAIConfig
         bool suggestDungeonsInLowerCaseRandomly;
         bool randomBotJoinBG;
         bool randomBotAutoJoinBG;
+        uint32 randomBotAutoJoinWarsongBracket;
+        uint32 randomBotAutoJoinArenaBracket;
+        uint32 randomBotAutoJoinBGWarsongCount;
+        uint32 randomBotAutoJoinBGRatedArena2v2Count;
+        uint32 randomBotAutoJoinBGRatedArena3v3Count;
+        uint32 randomBotAutoJoinBGRatedArena5v5Count;
         bool randomBotLoginAtStartup;
         uint32 randomBotTeleLowerLevel, randomBotTeleHigherLevel;
         bool logInGroupOnly, logValuesPerTick;
@@ -212,6 +218,11 @@ class PlayerbotAIConfig
         uint32 tweakValue; //Debugging config
 
         uint32 randomBotArenaTeamCount;
+        uint32 randomBotArenaTeamMaxRating;
+        uint32 randomBotArenaTeamMinRating;
+        uint32 randomBotArenaTeam2v2Count;
+        uint32 randomBotArenaTeam3v3Count;
+        uint32 randomBotArenaTeam5v5Count;
         bool deleteRandomBotArenaTeams;
         std::vector<uint32> randomBotArenaTeams;
 

@@ -5177,23 +5177,89 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
     {
         return true;
     }
-    uint32 Preference = context->GetValue<uint32>("bg role")->Get();
+    uint32 Preference = 6;
+
+    switch (bot->getClass())
+    {
+        case CLASS_PRIEST:
+        case CLASS_SHAMAN:
+        case CLASS_DRUID:
+            Preference = 3;
+            break;
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_ROGUE:
+        case CLASS_DEATH_KNIGHT:
+            Preference = 6;
+            break;
+        case CLASS_HUNTER:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+            Preference = 9;
+            break;
+    }
+
     switch (bg->GetBgTypeID())
     {
         case BATTLEGROUND_BE:
-            if (Preference > 10)
-                MoveTo(bg->GetMapId(), 6185.0f + frand(-2, +2), 236.0f + frand(-2, +2), 6.0f, false, true);
+            if (bg->GetTeamStartPosition(bot->GetBgTeamId())->GetPositionY() < 240)
+            {
+                if (Preference == 3)
+                    MoveTo(bg->GetMapId(), 6226.65f + frand(-1, +1), 264.36f + frand(-1, +1), 1.31f, false, true);
+                else if (Preference == 6)
+                    MoveTo(bg->GetMapId(), 6239.89f + frand(-1, +1), 261.11f + frand(-1, +1), 0.89f, false, true);
+                else
+                    MoveTo(bg->GetMapId(), 6235.60f + frand(-1, +1), 258.27f + frand(-1, +1), 0.89f, false, true);
+            }
             else
-                MoveTo(bg->GetMapId(), 6240.0f + frand(-2, +2), 262.0f + frand(-2, +2), 2.0f, false, true);
+            {
+                if (Preference == 3)
+                    MoveTo(bg->GetMapId(), 6265.72f + frand(-1, +1), 271.92f + frand(-1, +1), 3.65f, false, true);
+                else if (Preference == 6)
+                    MoveTo(bg->GetMapId(), 6239.89f + frand(-1, +1), 261.11f + frand(-1, +1), 0.89f, false, true);
+                else
+                    MoveTo(bg->GetMapId(), 6250.50f + frand(-1, +1), 266.66f + frand(-1, +1), 2.63f, false, true);
+            }
             break;
         case BATTLEGROUND_RL:
-            if (Preference < 5)
-                MoveTo(bg->GetMapId(), 1320.0f + frand(-2, +2), 1672.0f + frand(-2, +2), 38.0f, false, true);
+            if (bg->GetTeamStartPosition(bot->GetBgTeamId())->GetPositionY() < 1600)
+            {
+                if (Preference == 3)
+                    MoveTo(bg->GetMapId(), 1262.14f + frand(-1, +1), 1657.63f + frand(-1, +1), 33.76f, false, true);
+                else if (Preference == 6)
+                    MoveTo(bg->GetMapId(), 1266.85f + frand(-1, +1), 1663.52f + frand(-1, +1), 34.04f, false, true);
+                else
+                    MoveTo(bg->GetMapId(), 1274.07f + frand(-1, +1), 1656.36f + frand(-1, +1), 34.58f, false, true);
+            }
             else
-                MoveTo(bg->GetMapId(), 1273.0f + frand(-2, +2), 1666.0f + frand(-2, +2), 36.0f, false, true);
+            {
+                if (Preference == 3)
+                    MoveTo(bg->GetMapId(), 1261.93f + frand(-1, +1), 1669.27f + frand(-1, +1), 34.25f, false, true);
+                else if (Preference == 6)
+                    MoveTo(bg->GetMapId(), 1266.85f + frand(-1, +1), 1663.52f + frand(-1, +1), 34.04f, false, true);
+                else
+                    MoveTo(bg->GetMapId(), 1266.37f + frand(-1, +1), 1672.40f + frand(-1, +1), 34.21f, false, true);
+            }
             break;
         case BATTLEGROUND_NA:
-            MoveTo(bg->GetMapId(), 4055.0f + frand(-5, +5), 2921.0f + frand(-5, +5), 15.1f, false, true);
+            if (bg->GetTeamStartPosition(bot->GetBgTeamId())->GetPositionY() < 2870)
+            {
+                if (Preference == 3)
+                    MoveTo(bg->GetMapId(), 4068.85f + frand(-1, +1), 2911.98f + frand(-1, +1), 12.99f, false, true);
+                else if (Preference == 6)
+                    MoveTo(bg->GetMapId(), 4056.99f + frand(-1, +1), 2919.75f + frand(-1, +1), 13.51f, false, true);
+                else
+                    MoveTo(bg->GetMapId(), 4056.27f + frand(-1, +1), 2905.33f + frand(-1, +1), 12.90f, false, true);
+            }
+            else
+            {
+                if (Preference == 3)
+                    MoveTo(bg->GetMapId(), 4043.66f + frand(-1, +1), 2927.93f + frand(-1, +1), 13.17f, false, true);
+                else if (Preference == 6)
+                    MoveTo(bg->GetMapId(), 4056.99f + frand(-1, +1), 2919.75f + frand(-1, +1), 13.51f, false, true);
+                else
+                    MoveTo(bg->GetMapId(), 4054.80f + frand(-1, +1), 2934.28f + frand(-1, +1), 13.72f, false, true);
+            }
             break;
         case BATTLEGROUND_DS:
             if (!MoveTo(bg->GetMapId(), 1291.58f + frand(-5, +5), 790.87f + frand(-5, +5), 7.8f, false, true)) {
@@ -5210,9 +5276,6 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
         default:
             break;
     }
-
-    if (urand(0, 100) > 70)
-        context->GetValue<uint32>("bg role")->Set(urand(0, 9));
 
     return true;
 }
