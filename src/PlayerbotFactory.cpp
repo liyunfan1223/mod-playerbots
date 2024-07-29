@@ -359,13 +359,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     InitGlyphs();
     // bot->SaveToDB(false, false);
     
-    // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
-    // LOG_INFO("playerbots", "Initializing guilds...");
-    // bot->SaveToDB(false, false);
-    // InitGuild();
-    // bot->SaveToDB(false, false);
-    //if (pmo)
-    //    pmo->finish();
+    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
+    LOG_INFO("playerbots", "Initializing guilds xD...");
+    bot->SaveToDB(false, false); // decrypted wuz here! - save madafuk! (hopefully avoids dupes)
+    InitGuild();
+    if (pmo)
+        pmo->finish();
 
     if (bot->GetLevel() >= 70)
     {
