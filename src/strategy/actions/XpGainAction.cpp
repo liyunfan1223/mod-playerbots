@@ -33,7 +33,7 @@ bool XpGainAction::Execute(Event event)
         p >> groupBonus;   // 8 group bonus
     }
 
-    if (sPlayerbotAIConfig->randomBotTalk && bot->GetGuildId() && urand(0, 10))
+    if (sPlayerbotAIConfig->randomBotGuildTalk && bot->GetGuildId() && urand(0, 10))
     {
         Creature* creature = botAI->GetCreature(guid);
         if (creature && (creature->isElite() || creature->isWorldBoss() || creature->GetLevel() > 61 || creature->GetLevel() > bot->GetLevel() + 4))
@@ -41,13 +41,14 @@ bool XpGainAction::Execute(Event event)
             Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
             if (guild)
             {
-                std::map<std::string, std::string> placeholders;
-                placeholders["%name"] = creature->GetName();
+                std::string toSay = "";
 
                 if (urand(0, 3))
-                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Wow I just killed %name!", placeholders), LANG_UNIVERSAL);
+                    toSay = "Wow I just killed " + creature->GetName() + " !";
                 else
-                    guild->BroadcastToGuild(bot->GetSession(), false, BOT_TEXT2("Awesome that %name went down quickly!", placeholders), LANG_UNIVERSAL);
+                    toSay = "Awesome that " + creature->GetName() + " went down quickly !";
+
+                guild->BroadcastToGuild(bot->GetSession(), false, toSay, LANG_UNIVERSAL);
             }
         }
     }

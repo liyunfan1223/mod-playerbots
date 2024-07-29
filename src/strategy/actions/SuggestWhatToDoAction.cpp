@@ -18,11 +18,11 @@
 
 enum eTalkType
 {
-    General             = ChannelFlags::CHANNEL_FLAG_GENERAL  | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
-    Trade               = ChannelFlags::CHANNEL_FLAG_CITY     | ChannelFlags::CHANNEL_FLAG_GENERAL  | ChannelFlags::CHANNEL_FLAG_NOT_LFG | ChannelFlags::CHANNEL_FLAG_TRADE,
-    LocalDefence        = ChannelFlags::CHANNEL_FLAG_GENERAL  | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
-    GuildRecruitment    = ChannelFlags::CHANNEL_FLAG_CITY     | ChannelFlags::CHANNEL_FLAG_GENERAL  | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
-    LookingForGroup     = ChannelFlags::CHANNEL_FLAG_LFG      | ChannelFlags::CHANNEL_FLAG_GENERAL
+    /*0x18*/ General = ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
+    /*0x3C*/ Trade = ChannelFlags::CHANNEL_FLAG_CITY | ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG | ChannelFlags::CHANNEL_FLAG_TRADE,
+    /*0x18*/ LocalDefence = ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
+    /*x038*/ GuildRecruitment = ChannelFlags::CHANNEL_FLAG_CITY | ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
+    /*0x50*/ LookingForGroup = ChannelFlags::CHANNEL_FLAG_LFG | ChannelFlags::CHANNEL_FLAG_GENERAL
 };
 
 std::map<std::string, uint8> SuggestDungeonAction::instances;
@@ -93,7 +93,7 @@ void SuggestWhatToDoAction::specificQuest()
     placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
     placeholders["%quest"] = chat->FormatQuest(quest);
 
-    spam(BOT_TEXT2("suggest_quest", placeholders), urand(0, 1) ? eTalkType::General : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_quest", placeholders), urand(0, 1) ? eTalkType::General : 0, !urand(0, 2), !urand(0, 3));
 }
 
 void SuggestWhatToDoAction::grindMaterials()
@@ -225,7 +225,7 @@ void SuggestWhatToDoAction::something()
     out << entry->area_name[_dbc_locale];
     placeholders["%zone"] = out.str();
 
-    spam(BOT_TEXT2("suggest_something", placeholders), urand(0, 1) ? eTalkType::General : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_something", placeholders), urand(0, 1) ? eTalkType::General : 0, !urand(0, 2), !urand(0, 3));
 }
 
 void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, bool guild)
@@ -238,30 +238,32 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
     if (!cMgr)
         return;
 
+    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetMap()->GetZoneId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
+    if (!zone) return;
+    /*AreaTableEntry const* area = sAreaTableStore.LookupEntry(bot->GetMap()->GetAreaId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
+    if (!area) return;*/
+
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
         if (!channel) continue;
 
-        AreaTableEntry const* current_zone = GetAreaEntryByAreaID(bot->GetAreaId());
-        if (!current_zone)
-            continue;
-
         // combine full channel name
         char channelName[100];
         Channel* chn = nullptr;
-        if ((channel->flags & CHANNEL_DBC_FLAG_LFG) != 0)
+        if (channel->ChannelID == 24 || (channel->flags & CHANNEL_DBC_FLAG_LFG) != 0)
         {
             std::string chanName = channel->pattern[_dbc_locale];
             chn = cMgr->GetChannel(chanName, bot);
         }
         else
         {
-            snprintf(channelName, 100, channel->pattern[_dbc_locale], current_zone->area_name[_dbc_locale]);
+            snprintf(channelName, 100, channel->pattern[_dbc_locale], zone->area_name[_dbc_locale]);
             chn = cMgr->GetChannel(channelName, bot);
         }
         if (!chn)
             continue;
+
         // skip world chat here
         if (chn->GetName() == "World")
             continue;
@@ -269,8 +271,8 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         if (flags != 0 && chn->GetFlags() != flags)
             continue;
 
-        // skip local defense
-        if (chn->GetChannelId() == 22)
+        // skip local defense and universal defense
+        if (chn->GetChannelId() == 22 || chn->GetChannelId() == 23)
             continue;
 
         // no filter, pick several options
@@ -302,13 +304,13 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
             if (Channel* worldChannel = cMgr->GetChannel("World", bot))
                 worldChannel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
         }
+    }
 
-        if (guild && bot->GetGuildId())
-        {
-            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-            if (guild)
-                guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
-        }
+    if (sPlayerbotAIConfig->randomBotGuildTalk && guild && bot->GetGuildId())
+    {
+        Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+        if (guild)
+            guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
     }
 }
 
@@ -350,6 +352,8 @@ SuggestDungeonAction::SuggestDungeonAction(PlayerbotAI* botAI) : SuggestWhatToDo
 bool SuggestDungeonAction::Execute(Event event)
 {
     // TODO: use sPlayerbotDungeonSuggestionMgr
+
+    if (!sPlayerbotAIConfig->randomBotSuggestDungeons || bot->GetGroup()) return false;
 
     if (instances.empty())
     {
@@ -413,7 +417,7 @@ bool SuggestDungeonAction::Execute(Event event)
     itemout << allowedInstances[urand(0, allowedInstances.size() - 1)];
     placeholders["%instance"] = itemout.str();
 
-    spam(BOT_TEXT2("suggest_instance", placeholders), urand(0, 1) ? eTalkType::LookingForGroup : 0, urand(0, 2), urand(0, 2));
+    spam(BOT_TEXT2("suggest_instance", placeholders), urand(0, 1) ? eTalkType::LookingForGroup : 0, !urand(0, 2), !urand(0, 3));
     return true;
 }
 
@@ -423,9 +427,6 @@ SuggestTradeAction::SuggestTradeAction(PlayerbotAI* botAI) : SuggestWhatToDoActi
 
 bool SuggestTradeAction::Execute(Event event)
 {
-    if (!sRandomPlayerbotMgr->IsRandomBot(bot) || bot->GetGroup() || bot->GetInstanceId())
-        return false;
-
     uint32 quality = urand(0, 100);
     if (quality > 95)
         quality = ITEM_QUALITY_LEGENDARY;
@@ -480,6 +481,7 @@ bool SuggestTradeAction::Execute(Event event)
     placeholders["%item"] = chat->FormatItem(proto, count);
     placeholders["%gold"] = chat->formatMoney(price);
 
-    spam(BOT_TEXT2("suggest_sell", placeholders), urand(0, 1) ? eTalkType::Trade : 0, urand(0, 1), urand(0, 5));
+
+    spam(BOT_TEXT2("suggest_sell", placeholders), urand(0, 1) ? eTalkType::Trade : 0, !urand(0, 2), urand(0, 5));
     return true;
 }

@@ -375,7 +375,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     LOG_INFO("playerbots", "Creating random bot accounts...");
 
     std::vector<std::future<void>> account_creations;
-    bool account_creation = false;
+    int account_creation = 0;
     for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
     {
         std::ostringstream out;
@@ -389,7 +389,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         {
             continue;
         }
-        account_creation = true;
+        account_creation++;
         std::string password = "";
         if (sPlayerbotAIConfig->randomBotRandomPassword)
         {
@@ -408,6 +408,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     if (account_creation) {
         /* wait for async accounts create to make character create correctly, same as account delete */
+        LOG_INFO("playerbots", "Waiting for {} accounts loading into database...", account_creation);
         std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
     }
 
@@ -418,7 +419,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     std::unordered_map<uint8,std::vector<std::string>> names;
     std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
-    bool bot_creation = false;
+    int bot_creation = 0;
     for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
     {
         std::ostringstream out;
@@ -441,7 +442,6 @@ void RandomPlayerbotFactory::CreateRandomBots()
         {
             continue;
         }
-        bot_creation = true;
         LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1, sPlayerbotAIConfig->randomBotAccountCount);
         RandomPlayerbotFactory factory(accountId);
 
@@ -462,19 +462,23 @@ void RandomPlayerbotFactory::CreateRandomBots()
                 continue;
             }
 
-            if (cls != 10)
+            if (cls != 10) {
                 if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
                     playerBot->SaveToDB(true, false);
                     sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(), 
                         playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->GetLevel());
                     playerBot->CleanupsBeforeDelete();
                     delete playerBot;
+                    bot_creation++;
+                } else {
+                    LOG_ERROR("playerbots", "Fail to create character for account {}", accountId);
                 }
+            }
         }
     }
 
     if (bot_creation) {
-        LOG_INFO("playerbots", "Waiting for {} characters loading into database...", totalCharCount);
+        LOG_INFO("playerbots", "Waiting for {} characters loading into database...", bot_creation);
         /* wait for characters load into database, or characters will fail to loggin */
         std::this_thread::sleep_for(10s);
     }

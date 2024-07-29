@@ -98,6 +98,7 @@ class PlayerbotAIConfig
         bool randomBotTalk;
         bool randomBotEmote;
         bool randomBotSuggestDungeons;
+        bool randomBotGuildTalk;
         bool suggestDungeonsInLowerCaseRandomly;
         bool randomBotJoinBG;
         bool randomBotAutoJoinBG;

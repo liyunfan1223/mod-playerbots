@@ -674,7 +674,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
 
             else if (type == CHAT_MSG_GUILD)
             {
-                if (!bot->GetGuildId())
+                if (!bot->GetGuildId() || !sPlayerbotAIConfig->randomBotGuildTalk)
                     return;
 
                 Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
