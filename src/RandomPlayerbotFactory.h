@@ -23,7 +23,6 @@ class RandomPlayerbotFactory
         RandomPlayerbotFactory(uint32 accountId);
 		virtual ~RandomPlayerbotFactory() { }
 
-        //Player* CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<uint8, std::vector<std::string>> names);
         Player* CreateRandomBot(WorldSession* session, uint8 cls);
         static void CreateRandomBots();
         static void CreateRandomGuilds();
