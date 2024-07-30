@@ -99,12 +99,12 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
             {
                 if (urand(1, 100) > 50) //50% Focus on active quests for money.
                 {
-                    foundTarget = SetQuestTarget(newTarget, false, true, true);           //Turn in quests for money.
+                    foundTarget = SetQuestTarget(newTarget, true, false, true, true);           //Turn in quests for money.
                 }
 
                 if (!foundTarget)
                 {
-                    foundTarget = SetQuestTarget(newTarget, true, false, false);      //Find new (low) level quests
+                    foundTarget = SetQuestTarget(newTarget, false, true, false, false);      //Find new (low) level quests
                 }
             }
             else
@@ -140,7 +140,7 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
     //Do quests (start, do, end)
     if (!foundTarget && urand(1, 100) > 5)                                 //95% chance
     {
-        foundTarget = SetQuestTarget(newTarget, true, true, true);    //Do any nearby           
+        foundTarget = SetQuestTarget(newTarget, false, true, true, true);    //Do any nearby           
     }
 
     //Explore a nearby unexplored area.
