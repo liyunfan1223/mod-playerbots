@@ -834,9 +834,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             float vcos, vsin, horizontalSpeed, verticalSpeed = 0.f;
 
             p >> guid.ReadAsPacked() >> counter >> vcos >> vsin >> horizontalSpeed >> verticalSpeed;
-            // if (horizontalSpeed <= 0.1f) {
-            //     horizontalSpeed = 0.11f;
-            // }
+            if (horizontalSpeed <= 0.1f) {
+                horizontalSpeed = 0.11f;
+            }
             verticalSpeed = -verticalSpeed;
 
             // stop casting
@@ -846,9 +846,23 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             bot->StopMoving();
             bot->GetMotionMaster()->Clear();
 
+
+            float moveTimeHalf = verticalSpeed / Movement::gravity;
+            float dist = 2 * moveTimeHalf * horizontalSpeed;
+            Position dest = bot->GetPosition();
+
+            bot->MovePositionToFirstCollision(dest, dist, bot->GetRelativeAngle(bot->GetPositionX() + vcos, bot->GetPositionY() + vsin));
+            float x, y, z;
+            x = dest.GetPositionX();
+            y = dest.GetPositionY();
+            z = dest.GetPositionZ();
+            // char speak[1024];
+            // sprintf(speak, "SMSG_MOVE_KNOCK_BACK: %.2f %.2f, horizontalSpeed: %.2f, verticalSpeed: %.2f, tX: %.2f, tY: %.2f, tZ: %.2f, relativeAngle: %.2f, orientation: %.2f",
+            //     vcos, vsin, horizontalSpeed, verticalSpeed, x, y, z, bot->GetRelativeAngle(vcos, vsin), bot->GetOrientation());
+            // bot->Say(speak, LANG_UNIVERSAL);
+            // bot->GetClosePoint(x, y, z, bot->GetObjectSize(), dist, bot->GetAngle(vcos, vsin));
             Unit* currentTarget = GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
-            bot->GetMotionMaster()->MoveKnockbackFromForPlayer(bot->GetPositionX() + vcos, bot->GetPositionY() + vsin, horizontalSpeed, verticalSpeed);
-            
+            bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, currentTarget);
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FORWARD);
             // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
