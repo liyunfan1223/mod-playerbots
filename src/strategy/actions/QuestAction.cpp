@@ -135,6 +135,7 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
     player->CompleteQuest(entry);
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
+        LOG_INFO("playerbots", "Quest [ {} ] completed", pQuest->GetTitle());
         bot->Say("Quest [ " + ChatHelper::FormatQuest(pQuest) + " ] completed", LANG_UNIVERSAL);
     }
 
@@ -250,6 +251,7 @@ bool QuestUpdateCompleteAction::Execute(Event event)
     {
         if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
         {
+            LOG_INFO("playerbots", "Quest [ {} ] completed", qInfo->GetTitle());
             bot->Say("Quest [ " + ChatHelper::FormatQuest(qInfo) + " ] completed", LANG_UNIVERSAL);
         }
         botAI->TellMasterNoFacing("Quest completed " + ChatHelper::FormatQuest(qInfo));

@@ -44,6 +44,13 @@ bool DropQuestAction::Execute(Event event)
     bot->RemoveRewardedQuest(entry);
     bot->RemoveActiveQuest(entry, false);
 
+    if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+    {
+        const Quest* pQuest = sObjectMgr->GetQuestTemplate(entry);
+        LOG_INFO("playerbots", "Quest [ {} ] dropped", pQuest->GetTitle());
+        bot->Say("Quest [ " + ChatHelper::FormatQuest(pQuest) + " ] dropped", LANG_UNIVERSAL);
+    }
+
     botAI->TellMaster("Quest removed");
     return true;
 }
