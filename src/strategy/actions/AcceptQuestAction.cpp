@@ -6,54 +6,62 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-void AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
+bool AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 {
-    AcceptQuest(quest, questGiver->GetGUID());
+    if (!AcceptQuest(quest, questGiver->GetGUID())) return false;
+
+    auto text_quest = ChatHelper::FormatQuest(quest);
     bot->PlayDistanceSound(620);
+
+    if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+    {
+        bot->Say("Quest [ " + text_quest + " ] accepted", LANG_UNIVERSAL);
+    }
+
+    return true;
 }
 
 bool AcceptQuestAction::Execute(Event event)
 {
-    Player* master = GetMaster();
-    if (!master)
+    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    if (!requester)
         return false;
 
     Player* bot = botAI->GetBot();
-    ObjectGuid guid;
+    uint64_t guid;
     uint32 quest = 0;
 
     std::string const text = event.getParam();
-    PlayerbotChatHandler ch(master);
+    PlayerbotChatHandler ch(requester);
     quest = ch.extractQuestId(text);
+
+    bool hasAccept = false;
 
     if (event.getPacket().empty())
     {
         GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
-        for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
+        for (auto i = npcs.begin(); i != npcs.end(); i++)
         {
             Unit* unit = botAI->GetUnit(*i);
             if (unit && quest && unit->hasQuest(quest))
             {
-                guid = unit->GetGUID();
+                guid = unit->GetGUID().GetRawValue();
                 break;
             }
-
-            if (unit && text == "*" && bot->GetDistance(unit) <= INTERACTION_DISTANCE)
-                QuestAction::ProcessQuests(unit);
+            if (unit && text == "*" && sqrt(bot->GetDistance(unit)) <= INTERACTION_DISTANCE)
+                hasAccept |= QuestAction::ProcessQuests(unit);
         }
-
-        GuidVector gos = AI_VALUE(GuidVector, "nearest game objects");
-        for (GuidVector::iterator i = gos.begin(); i != gos.end(); i++)
+        GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
+        for (auto i = gos.begin(); i != gos.end(); i++)
         {
             GameObject* go = botAI->GetGameObject(*i);
             if (go && quest && go->hasQuest(quest))
             {
-                guid = go->GetGUID();
+                guid = go->GetGUID().GetRawValue();
                 break;
             }
-
-            if (go && text == "*" && bot->GetDistance(go) <= INTERACTION_DISTANCE)
-                QuestAction::ProcessQuests(go);
+            if (go && text == "*" && sqrt(bot->GetDistance(go)) <= INTERACTION_DISTANCE)
+                hasAccept |= QuestAction::ProcessQuests(go);
         }
     }
     else
@@ -70,7 +78,17 @@ bool AcceptQuestAction::Execute(Event event)
     if (!qInfo)
         return false;
 
-    return AcceptQuest(qInfo, guid);
+    hasAccept |= AcceptQuest(qInfo, ObjectGuid(guid));
+
+    if (hasAccept)
+    {
+        std::stringstream ss;
+        ss << "AcceptQuestAction {" << qInfo->GetTitle() << "} - {" << std::to_string(qInfo->GetQuestId()) << "}";
+        LOG_INFO("playerbots", "{}", ss.str().c_str());
+        botAI->TellMaster(ss.str());
+    }
+
+    return hasAccept;
 }
 
 bool AcceptQuestShareAction::Execute(Event event)
@@ -112,7 +130,7 @@ bool AcceptQuestShareAction::Execute(Event event)
         bot->SetDivider(ObjectGuid::Empty);
     }
 
-    if (bot->CanAddQuest( qInfo, false))
+    if (bot->CanAddQuest(qInfo, false))
     {
         bot->AddQuest(qInfo, master);
 
@@ -125,10 +143,48 @@ bool AcceptQuestShareAction::Execute(Event event)
 
         if (qInfo->GetSrcSpell() > 0)
         {
-            bot->CastSpell( bot, qInfo->GetSrcSpell(), true);
+            bot->CastSpell(bot, qInfo->GetSrcSpell(), true);
         }
 
         botAI->TellMaster("Quest accepted");
+        return true;
+    }
+
+    return false;
+}
+
+bool ConfirmQuestAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+
+    WorldPacket& p = event.getPacket();
+    p.rpos(0);
+    uint32 quest;
+    p >> quest;
+    Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest);
+
+    quest = qInfo->GetQuestId();
+    if (!bot->CanTakeQuest(qInfo, false))
+    {
+        // can't take quest
+        botAI->TellError("quest_cant_take");
+        return false;
+    }
+
+    if (bot->CanAddQuest(qInfo, false))
+    {
+        bot->AddQuest(qInfo, requester);
+
+        if (bot->CanCompleteQuest(quest))
+            bot->CompleteQuest(quest);
+
+        if (qInfo->GetSrcSpell() > 0)
+        {
+            bot->CastSpell(bot, qInfo->GetSrcSpell(), true);
+        }
+
+        botAI->TellMaster("quest_accept");
         return true;
     }
 

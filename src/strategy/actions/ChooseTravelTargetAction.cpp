@@ -9,16 +9,24 @@
 
 bool ChooseTravelTargetAction::Execute(Event event)
 {
+    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+
     //Get the current travel target. This target is no longer active.
     TravelTarget* oldTarget = context->GetValue<TravelTarget*>("travel target")->Get();
 
-    //Select a new target to travel to.
+    //Select a new target to travel to. 
     TravelTarget newTarget = TravelTarget(botAI);
-    getNewTarget(&newTarget, oldTarget);
+
+    if (!oldTarget) return false;
+
+    if (!oldTarget->isForced() || oldTarget->getStatus() == TravelStatus::TRAVEL_STATUS_EXPIRED)
+        getNewTarget(&newTarget, oldTarget);
+    else
+        newTarget.copyTarget(oldTarget);
 
     //If the new target is not active we failed.
-    if (!newTarget.isActive())
-       return false;
+    if (!newTarget.isActive() && !newTarget.isForced())
+        return false;
 
     setNewTarget(&newTarget, oldTarget);
 
@@ -36,6 +44,11 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
 
     foundTarget = SetGroupTarget(newTarget);                                 //Join groups members
 
+    //Do quests (start, do, end)
+    if (!foundTarget && urand(1, 100) > 5)                                 //95% chance
+    {
+        foundTarget = SetQuestTarget(newTarget, false);    //Do any nearby           
+    }
     //Enpty bags/repair
     if (!foundTarget && urand(1, 100) > 10)                               //90% chance
         if (AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader") || AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader"))
@@ -53,9 +66,11 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
 
             if (!foundTarget)
                 foundTarget = SetQuestTarget(newTarget);                     //Do low level quests
-        } else if (urand(1, 100) > 50) {
+        }
+        else if (urand(1, 100) > 50) {
             foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
-        } else {
+        }
+        else {
             foundTarget = SetNewQuestTarget(newTarget);                      //Find a low level quest to do
         }
     }
@@ -703,7 +718,7 @@ bool ChooseTravelTargetAction::SetNullTarget(TravelTarget* target)
 std::vector<std::string> split(std::string const s, char delim);
 char* strstri(char const* haystack, char const* needle);
 
-TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, std::string const name)
+TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, std::string const name, bool zones, bool npcs, bool quests, bool mobs, bool bosses)
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
 
@@ -711,32 +726,54 @@ TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, std::s
 
     std::vector<TravelDestination*> dests;
 
-    //Zones
-    for (auto& d : sTravelMgr->getExploreTravelDestinations(bot, true, true))
+    //Quests
+    if (quests)
     {
-        if (strstri(d->getTitle().c_str(), name.c_str()))
-            dests.push_back(d);
+        for (auto& d : sTravelMgr->getQuestTravelDestinations(bot, 0, true, true))
+        {
+            if (strstri(d->getTitle().c_str(), name.c_str()))
+                dests.push_back(d);
+        }
+    }
+
+    //Zones
+    if (zones)
+    {
+        for (auto& d : sTravelMgr->getExploreTravelDestinations(bot, true, true))
+        {
+            if (strstri(d->getTitle().c_str(), name.c_str()))
+                dests.push_back(d);
+        }
     }
 
     //Npcs
-    for (auto& d : sTravelMgr->getRpgTravelDestinations(bot, true, true))
+    if (npcs)
     {
-        if (strstri(d->getTitle().c_str(), name.c_str()))
-            dests.push_back(d);
+        for (auto& d : sTravelMgr->getRpgTravelDestinations(bot, true, true))
+        {
+            if (strstri(d->getTitle().c_str(), name.c_str()))
+                dests.push_back(d);
+        }
     }
 
     //Mobs
-    for (auto& d : sTravelMgr->getGrindTravelDestinations(bot, true, true))
+    if (mobs)
     {
-        if (strstri(d->getTitle().c_str(), name.c_str()))
-            dests.push_back(d);
+        for (auto& d : sTravelMgr->getGrindTravelDestinations(bot, true, true, 5000.0f))
+        {
+            if (strstri(d->getTitle().c_str(), name.c_str()))
+                dests.push_back(d);
+        }
     }
 
     //Bosses
-    for (auto& d : sTravelMgr->getBossTravelDestinations(bot, true, true))
+    if (bosses)
     {
-        if (strstri(d->getTitle().c_str(), name.c_str()))
-            dests.push_back(d);
+        for (auto& d : sTravelMgr->getBossTravelDestinations(bot, true, true))
+        {
+            if (strstri(d->getTitle().c_str(), name.c_str()))
+                dests.push_back(d);
+        }
     }
 
     WorldPosition botPos(bot);
@@ -745,9 +782,9 @@ TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, std::s
         return nullptr;
 
     TravelDestination* dest = *std::min_element(dests.begin(), dests.end(), [botPos](TravelDestination* i, TravelDestination* j)
-    {
-        return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos));
-    });
+        {
+            return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos));
+        });
 
     return dest;
 };

@@ -114,6 +114,16 @@ void WorldPosition::set(const WorldLocation& pos)
     WorldRelocate(pos);
 }
 
+void WorldPosition::set(const WorldPosition& pos)
+{
+    WorldRelocate(pos.m_mapId, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
+}
+
+void WorldPosition::set(const WorldObject* pos)
+{
+    WorldRelocate(pos->GetMapId(), pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation());
+}
+
 void WorldPosition::setMapId(uint32 id)
 {
     m_mapId = id;
@@ -1061,30 +1071,59 @@ std::string const QuestTravelDestination::getTitle()
 
 bool QuestRelationTravelDestination::isActive(Player* bot)
 {
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    AiObjectContext* context = botAI->GetAiObjectContext();
+
+    if (botAI && !botAI->HasStrategy("rpg quest", BOT_STATE_NON_COMBAT))
+        return false;
+
     if (relation == 0)
     {
-        if (questTemplate->GetQuestLevel() >= bot->GetLevel() + 5)
+        if ((int32)questTemplate->GetQuestLevel() >= (int32)bot->GetLevel() + (int32)5)
             return false;
 
-        //if (questTemplate->XPValue(bot) == 0)
-        //    return false;
+        // skip for now this quest
+        if (getPoints().front()->GetMapId() != bot->GetMapId())
+            return false;
 
         if (!bot->GetMap()->GetEntry()->IsWorldMap() || !bot->CanTakeQuest(questTemplate, false))
             return false;
-
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        AiObjectContext* context = botAI->GetAiObjectContext();
 
         uint32 dialogStatus = sTravelMgr->getDialogStatus(bot, entry, questTemplate);
 
         if (AI_VALUE(bool, "can fight equal"))
         {
-            if (dialogStatus != DIALOG_STATUS_AVAILABLE)
+            if (AI_VALUE(uint8, "free quest log slots") < 5)
                 return false;
+
+            if (!AI_VALUE2(bool, "group or", "following party,near leader,can accept quest npc::" + std::to_string(entry))) //Noone has yellow exclamation mark.
+                if (!AI_VALUE2(bool, "group or", "following party,near leader,can accept quest low level npc::" + std::to_string(entry) + "need quest objective::" + std::to_string(questId))) //Noone can do this quest for a usefull reward.
+                    return false;
+
+            // higher chance bot will do rewarding quest (better gear etc)
+            if (dialogStatus != DIALOG_STATUS_AVAILABLE)
+            {
+                if (dialogStatus != DIALOG_STATUS_LOW_LEVEL_AVAILABLE)
+                {
+                    bool hasGoodReward = false;
+                    for (uint8 i = 0; i < questTemplate->GetRewChoiceItemsCount(); ++i)
+                    {
+                        ItemUsage usage = AI_VALUE2_LAZY(ItemUsage, "item usage", questTemplate->RewardChoiceItemId[i]);
+                        if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE)
+                        {
+                            hasGoodReward = true;
+                            break;
+                        }
+                    }
+                }
+            }
         }
         else
         {
-            if (dialogStatus != DIALOG_STATUS_LOW_LEVEL_AVAILABLE)
+            if (!AI_VALUE2(bool, "group or", "following party,near leader,can accept quest low level npc::" + std::to_string(entry))) //Noone can pick up this quest for money.
+                return false;
+
+            if (AI_VALUE(uint8, "free quest log slots") < 10)
                 return false;
         }
 
@@ -1094,25 +1133,14 @@ bool QuestRelationTravelDestination::isActive(Player* bot)
     }
     else
     {
-        if (!bot->IsActiveQuest(questId))
+        if (!AI_VALUE2(bool, "group or", "following party,near leader,can turn in quest npc::" + std::to_string(entry)))
             return false;
 
-        if (!bot->CanRewardQuest(questTemplate, false))
-            return false;
-
-        uint32 dialogStatus = sTravelMgr->getDialogStatus(bot, entry, questTemplate);
-
-        if (dialogStatus != DIALOG_STATUS_REWARD2 && dialogStatus != DIALOG_STATUS_REWARD && dialogStatus != DIALOG_STATUS_REWARD_REP)
-            return false;
-
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        AiObjectContext* context = botAI->GetAiObjectContext();
-
-        // Do not try to hand-in dungeon/elite quests in instances without a group.
+        //Do not try to hand-in dungeon/elite quests in instances without a group.
         if ((questTemplate->GetType() == QUEST_TYPE_ELITE || questTemplate->GetType() == QUEST_TYPE_DUNGEON) && !AI_VALUE(bool, "can fight boss"))
         {
             WorldPosition pos(bot);
-            if (!this->nearestPoint(const_cast<WorldPosition*>(&pos))->isOverworld())
+            if (!this->nearestPoint(&pos)->isOverworld())
                 return false;
         }
     }
@@ -4006,7 +4034,45 @@ std::vector<TravelDestination*> TravelMgr::getQuestTravelDestinations(Player* bo
 
     std::vector<TravelDestination*> retTravelLocations;
 
-    if (questId == -1)
+    if (!questId)
+    {
+        for (auto& dest : questGivers)
+        {
+            if (!ignoreInactive && !dest->isActive(bot))
+                continue;
+
+            if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
+                continue;
+
+            retTravelLocations.push_back(dest);
+        }
+        for (auto& quest : quests)
+        {
+            for (auto& dest : quest.second->questTakers)
+            {
+                if (!ignoreInactive && !dest->isActive(bot))
+                    continue;
+
+                if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
+                    continue;
+
+                retTravelLocations.push_back(dest);
+            }
+
+            if (!ignoreObjectives)
+                for (auto& dest : quest.second->questObjectives)
+                {
+                    if (!ignoreInactive && !dest->isActive(bot))
+                        continue;
+
+                    if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
+                        continue;
+
+                    retTravelLocations.push_back(dest);
+                }
+        }
+    }
+    else if (questId == -1)
     {
         for (auto& dest : questGivers)
         {

@@ -101,10 +101,8 @@ void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isG
         if (!quest)
             continue;
 
-        if (quest->GetRequiredClasses() && (quest->GetRewSpellCast() || quest->GetRewSpell())) //Do not drop class specific quests that learn spells.
-            continue;
-
-        if (quest->GetRequiredClasses() && (quest->GetRewSpellCast() || quest->GetRewSpell())) // Do not drop class specific quests that learn spells.
+        // Do not drop class quest, may be not rewarding gold but important spells
+        if (quest->GetRequiredClasses())
             continue;
 
         if (wantNum == 100)

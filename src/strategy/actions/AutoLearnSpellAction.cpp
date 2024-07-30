@@ -30,10 +30,10 @@ bool AutoLearnSpellAction::Execute(Event event)
 
 void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
 {
-    if (sPlayerbotAIConfig->autoLearnTrainerSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnTrainerSpells)
         LearnTrainerSpells(out);
 
-    if (sPlayerbotAIConfig->autoLearnQuestSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnQuestSpells)
         LearnQuestSpells(out);
 
     if (sPlayerbotAIConfig->randomBotGuildTalk)

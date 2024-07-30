@@ -558,7 +558,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         nonCombatEngine->addStrategies("nc", "food", "chat", "follow",
             "default", "quest", "loot", "gather", "duel", "buff", "mount", "emote", nullptr);
     }
-    if (sPlayerbotAIConfig->autoSaveMana) {
+    if (sPlayerbotAIConfig->autoSaveMana){
         nonCombatEngine->addStrategy("auto save mana");
     }
     if ((sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
@@ -588,7 +588,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             {
                 // nonCombatEngine->addStrategy("travel");
                 nonCombatEngine->addStrategy("rpg");
-            } else {
+            }
+            else
+            {
                 nonCombatEngine->addStrategy("move random");
             }
 

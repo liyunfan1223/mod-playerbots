@@ -17,7 +17,7 @@ class AcceptAllQuestsAction : public QuestAction
         AcceptAllQuestsAction(PlayerbotAI* botAI, std::string const name = "accept all quests") : QuestAction(botAI, name) { }
 
     protected:
-        void ProcessQuest(Quest const* quest, Object* questGiver) override;
+        bool ProcessQuest(Quest const* quest, Object* questGiver) override;
 };
 
 class AcceptQuestAction : public AcceptAllQuestsAction
@@ -32,6 +32,12 @@ class AcceptQuestShareAction : public Action
     public:
         AcceptQuestShareAction(PlayerbotAI* botAI) : Action(botAI, "accept quest share") { }
         bool Execute(Event event) override;
+};
+
+class ConfirmQuestAction : public Action {
+public:
+    ConfirmQuestAction(PlayerbotAI* ai) : Action(ai, "confirm quest") {}
+    bool Execute(Event event);
 };
 
 #endif

@@ -95,6 +95,8 @@ class WorldPosition : public WorldLocation
 
         //Setters
         void set(const WorldLocation& pos);
+        void set(const WorldObject* wo);
+        void set(const WorldPosition& pos);
         void setMapId(uint32 id);
         void setX(float x);
         void setY(float y);
@@ -406,7 +408,6 @@ class GuidPosition : public ObjectGuid, public WorldPosition
         GuidPosition(WorldObject* wo);
         GuidPosition(CreatureData const& creData);
         GuidPosition(GameObjectData const& goData);
-
         CreatureTemplate const* GetCreatureTemplate();
         GameObjectTemplate const* GetGameObjectTemplate();
 

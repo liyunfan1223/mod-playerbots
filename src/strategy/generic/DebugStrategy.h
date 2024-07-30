@@ -43,4 +43,13 @@ class DebugSpellStrategy : public Strategy
         std::string const getName() override { return "debug spell"; }
 };
 
+class DebugQuestStrategy : public Strategy
+{
+public:
+    DebugQuestStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+
+    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT | STRATEGY_TYPE_COMBAT; }
+    std::string const getName() override { return "debug quest"; }
+};
+
 #endif

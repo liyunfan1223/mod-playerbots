@@ -28,6 +28,8 @@ class ChooseRpgTargetAction : public Action
     private:
         float getMaxRelevance(GuidPosition guidP);
         bool  HasSameTarget(ObjectGuid guid, uint32 max, GuidVector const& nearGuids);
+
+        std::unordered_map <ObjectGuid, std::string> rgpActionReason;
 };
 
 class ClearRpgTargetAction : public ChooseRpgTargetAction

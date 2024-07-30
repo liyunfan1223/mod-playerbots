@@ -7,27 +7,48 @@
 #include "ChatHelper.h"
 #include "Playerbots.h"
 #include "ReputationMgr.h"
+#include "ServerFacade.h"
 
 bool QuestAction::Execute(Event event)
 {
     ObjectGuid guid = event.getObject();
 
     Player* master = GetMaster();
-    if (!master)
-    {
-        if (!guid)
-            guid = bot->GetTarget();
-    }
-    else
-    {
-        if (!guid)
-            guid = master->GetTarget();
-    }
 
     if (!guid)
-        return false;
+    {
+        if (!master)
+        {
+            guid = bot->GetTarget();
+        }
+        else
+        {
+            guid = master->GetTarget();
+        }
+    }
 
-    return ProcessQuests(guid);
+    if (guid)
+    {
+        return ProcessQuests(guid);
+    }
+
+    bool result = false;
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
+    for (const auto npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && bot->GetDistance(unit) <= INTERACTION_DISTANCE)
+            result |= ProcessQuests(unit);
+    }
+    std::list<ObjectGuid> gos = AI_VALUE(std::list<ObjectGuid>, "nearest game objects");
+    for (const auto go : gos)
+    {
+        GameObject* gameobj = botAI->GetGameObject(go);
+        if (gameobj && bot->GetDistance(gameobj) <= INTERACTION_DISTANCE)
+            result |= ProcessQuests(gameobj);
+    }
+
+    return result;
 }
 
 bool QuestAction::CompleteQuest(Player* player, uint32 entry)
@@ -67,7 +88,15 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
         int32 creature = pQuest->RequiredNpcOrGo[i];
         uint32 creaturecount = pQuest->RequiredNpcOrGoCount[i];
 
-        if (creature > 0)
+        // TODO check if we need a REQSPELL condition, this methods and sql entry dosent seem implemented ?
+        /*if (uint32 spell_id = pQuest->GetReqSpell[i])
+        {
+            for (uint16 z = 0; z < creaturecount; ++z)
+            {
+                player->CastedCreatureOrGO(creature, ObjectGuid(), spell_id);
+            }
+        }*/
+        /*else*/ if (creature > 0)
         {
             if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(creature))
                 for (uint16 z = 0; z < creaturecount; ++z)
@@ -127,6 +156,8 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
 
     if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE && !sPlayerbotAIConfig->syncQuestWithPlayer)
     {
+        //if (botAI->HasStrategy("debug", BotState::BOT_STATE_COMBAT) || botAI->HasStrategy("debug", BotState::BOT_STATE_NON_COMBAT))
+
         botAI->TellError("Cannot talk to quest giver");
         return false;
     }
@@ -160,16 +191,16 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
 
     if (bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
         out << "Already completed";
-    else if (! bot->CanTakeQuest(quest, false))
+    else if (!bot->CanTakeQuest(quest, false))
     {
-        if (! bot->SatisfyQuestStatus(quest, false))
+        if (!bot->SatisfyQuestStatus(quest, false))
             out << "Already on";
         else
             out << "Can't take";
     }
-    else if (! bot->SatisfyQuestLog(false))
+    else if (!bot->SatisfyQuestLog(false))
         out << "Quest log is full";
-    else if (! bot->CanAddQuest(quest, false))
+    else if (!bot->CanAddQuest(quest, false))
         out << "Bags are full";
     else
     {
@@ -179,7 +210,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
         p.rpos(0);
         bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(p);
 
-        if (bot->GetQuestStatus(questId ) == QUEST_STATUS_NONE && sPlayerbotAIConfig->syncQuestWithPlayer)
+        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && sPlayerbotAIConfig->syncQuestWithPlayer)
         {
             Object* pObject = ObjectAccessor::GetObjectByTypeMask(*bot, questGiver, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
             bot->AddQuest(quest, pObject);
@@ -196,10 +227,11 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
 
     out << " " << chat->FormatQuest(quest);
     botAI->TellMaster(out);
+
     return false;
 }
 
-bool QuestObjectiveCompletedAction::Execute(Event event)
+bool QuestUpdateCompleteAction::Execute(Event event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);
@@ -208,17 +240,84 @@ bool QuestObjectiveCompletedAction::Execute(Event event)
     ObjectGuid guid;
     p >> questId >> entry >> available >> required >> guid;
 
-    if (entry & 0x80000000)
+    Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
+    if (qInfo)
     {
-        entry &= 0x7FFFFFFF;
-        if (GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(entry))
-            botAI->TellMaster(chat->FormatQuestObjective(info->name, available, required));
-    }
-    else
-    {
-        if (CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(entry))
-            botAI->TellMaster(chat->FormatQuestObjective(info->Name, available, required));
+        if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+        {
+            bot->Say("Quest [ " + ChatHelper::FormatQuest(qInfo) + " ] completed", LANG_UNIVERSAL);
+        }
+        botAI->TellMasterNoFacing("Quest completed " + ChatHelper::FormatQuest(qInfo));
     }
 
     return true;
+}
+
+/*
+* For creature or gameobject
+*/
+bool QuestUpdateAddKillAction::Execute(Event event)
+{
+    WorldPacket p(event.getPacket());
+    p.rpos(0);
+
+    uint32 entry, questId, available, required;
+    ObjectGuid guid;
+    p >> questId >> entry >> available >> required >> guid;
+
+    std::stringstream ss;
+    ss << "Update progression kill questid {" << std::to_string(questId) << "} {" << std::to_string(available) << "} / {" << std::to_string(required) << "}";
+    botAI->TellMasterNoFacing(ss.str());
+    return false;
+}
+
+bool QuestUpdateAddItemAction::Execute(Event event)
+{
+    WorldPacket p(event.getPacket());
+    p.rpos(0);
+
+    uint32 itemId, count;
+    p >> itemId >> count;
+
+    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    auto const* itemPrototype = sObjectMgr->GetItemTemplate(itemId);
+
+    std::stringstream ss;
+    ss << "Update progression itemid {" << std::to_string(itemId) << "} count: {" << std::to_string(count) << "}";
+    botAI->TellMasterNoFacing(ss.str());
+
+    return false;
+}
+
+bool QuestUpdateFailedAction::Execute(Event event)
+{
+    //opcode SMSG_QUESTUPDATE_FAILED is never sent...(yet?)
+    return false;
+}
+
+bool QuestUpdateFailedTimerAction::Execute(Event event)
+{
+    WorldPacket p(event.getPacket());
+    p.rpos(0);
+
+    uint32 questId;
+    p >> questId;
+
+    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+
+    Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
+
+    if (qInfo)
+    {
+        botAI->TellMaster("Failed timer for " + botAI->GetChatHelper()->FormatQuest(qInfo) +", abandoning");
+    }
+    else
+    {
+        botAI->TellMaster("Failed timer for " + std::to_string(questId));
+    }
+
+    //drop quest
+    bot->AbandonQuest(questId);
+
+    return false;
 }

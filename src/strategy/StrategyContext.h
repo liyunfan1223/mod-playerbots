@@ -106,6 +106,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
             creators["debug move"] = &StrategyContext::debug_move;
             creators["debug rpg"] = &StrategyContext::debug_rpg;
             creators["debug spell"] = &StrategyContext::debug_spell;
+            creators["debug quest"] = &StrategyContext::debug_quest;
             creators["maintenance"] = &StrategyContext::maintenance;
             creators["group"] = &StrategyContext::group;
             creators["guild"] = &StrategyContext::guild;
@@ -169,6 +170,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
         static Strategy* debug_move(PlayerbotAI* botAI) { return new DebugMoveStrategy(botAI); }
         static Strategy* debug_rpg(PlayerbotAI* botAI) { return new DebugRpgStrategy(botAI); }
         static Strategy* debug_spell(PlayerbotAI* botAI) { return new DebugSpellStrategy(botAI); }
+        static Strategy* debug_quest(PlayerbotAI* botAI) { return new DebugQuestStrategy(botAI); }
         static Strategy* maintenance(PlayerbotAI* botAI) { return new MaintenanceStrategy(botAI); }
         static Strategy* group(PlayerbotAI* botAI) { return new GroupStrategy(botAI); }
         static Strategy* guild (PlayerbotAI* botAI) { return new GuildStrategy(botAI); }
@@ -227,7 +229,5 @@ class QuestStrategyContext : public NamedObjectContext<Strategy>
         static Strategy* quest(PlayerbotAI* botAI) { return new DefaultQuestStrategy(botAI); }
         static Strategy* accept_all_quests(PlayerbotAI* botAI) { return new AcceptAllQuestsStrategy(botAI); }
 };
-
-
 
 #endif
