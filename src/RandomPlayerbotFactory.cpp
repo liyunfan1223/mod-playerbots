@@ -117,7 +117,6 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     }
 }
 
-//Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<uint8, std::vector<std::string>> names)
 Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls)
 {
     LOG_DEBUG("playerbots",  "Creating new random bot for class {}", cls);
@@ -131,28 +130,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
             break;
         }
     }
-    std::string name;
-    // int tries = 10;
-    // while (tries--) {
-    //     std::string cur_name;
-    //     if (names.empty())
-    name = CreateRandomBotName(gender);
-    //     else
-    //     {
-    //         if (names[gender].empty())
-    //             return nullptr;
-
-    //         uint32 i = urand(0, names[gender].size() - 1);
-    //         cur_name = names[gender][i];
-    //         std::swap(names[gender][i], names[gender].back());
-    //         names[gender].pop_back();
-    //     }
-    //     if (ObjectMgr::CheckPlayerName(name) != CHAR_NAME_SUCCESS)
-    //     {
-    //         name.clear();
-    //         continue;
-    //     }
-    // }
+    std::string name = CreateRandomBotName(gender);
 
     if (name.empty()) {
         LOG_ERROR("playerbots", "Unable to get random bot name!");
@@ -417,7 +395,6 @@ void RandomPlayerbotFactory::CreateRandomBots()
     uint32 totalRandomBotChars = 0;
     uint32 totalCharCount = sPlayerbotAIConfig->randomBotAccountCount * 10;
 
-    //std::unordered_map<uint8,std::vector<std::string>> names;
     std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
     int bot_creation = 0;
@@ -464,7 +441,6 @@ void RandomPlayerbotFactory::CreateRandomBots()
             }
 
             if (cls != 10) {
-                //if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
                 if (Player* playerBot = factory.CreateRandomBot(session, cls)) {
                     playerBot->SaveToDB(true, false);
                     sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(), 
