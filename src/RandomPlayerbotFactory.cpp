@@ -117,7 +117,8 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     }
 }
 
-Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<uint8, std::vector<std::string>> names)
+//Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<uint8, std::vector<std::string>> names)
+Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls)
 {
     LOG_DEBUG("playerbots",  "Creating new random bot for class {}", cls);
 
@@ -416,7 +417,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     uint32 totalRandomBotChars = 0;
     uint32 totalCharCount = sPlayerbotAIConfig->randomBotAccountCount * 10;
 
-    std::unordered_map<uint8,std::vector<std::string>> names;
+    //std::unordered_map<uint8,std::vector<std::string>> names;
     std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
     int bot_creation = 0;
@@ -463,7 +464,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
             }
 
             if (cls != 10) {
-                if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
+                //if (Player* playerBot = factory.CreateRandomBot(session, cls, names)) {
+                if (Player* playerBot = factory.CreateRandomBot(session, cls)) {
                     playerBot->SaveToDB(true, false);
                     sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(), 
                         playerBot->getGender(), playerBot->getRace(), playerBot->getClass(), playerBot->GetLevel());
