@@ -47,8 +47,9 @@ bool DropQuestAction::Execute(Event event)
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
         const Quest* pQuest = sObjectMgr->GetQuestTemplate(entry);
-        LOG_INFO("playerbots", "Quest [ {} ] dropped", pQuest->GetTitle());
-        bot->Say("Quest [ " + ChatHelper::FormatQuest(pQuest) + " ] dropped", LANG_UNIVERSAL);
+        const std::string text_quest = ChatHelper::FormatQuest(pQuest);
+        LOG_INFO("playerbots", "Quest [ {} ] removed", pQuest->GetTitle());
+        bot->Say("Quest [ " + text_quest + " ] removed", LANG_UNIVERSAL);
     }
 
     botAI->TellMaster("Quest removed");
@@ -57,7 +58,8 @@ bool DropQuestAction::Execute(Event event)
 
 bool CleanQuestLogAction::Execute(Event event)
 {
-    std::string const link = event.getParam();
+    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    std::string link = event.getParam();
     if (botAI->HasActivePlayerMaster())
         return false;
 
@@ -66,13 +68,16 @@ bool CleanQuestLogAction::Execute(Event event)
     DropQuestType(totalQuests); //Count the total quests
 
     if (MAX_QUEST_LOG_SIZE - totalQuests > 6)
-        return true;
-
-    if (AI_VALUE(bool, "can fight equal")) // Only drop gray quests when able to fight proper lvl quests.
     {
-        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6);                    // Drop gray/red quests.
-        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6, false, true);       // Drop gray/red quests with progress.
-        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6, false, true, true); // Drop gray/red completed quests.
+        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE, true, true); //Drop failed quests
+        return true;
+    }
+
+    if (AI_VALUE(bool, "can fight equal")) //Only drop gray quests when able to fight proper lvl quests.
+    {
+        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6); //Drop gray/red quests.
+        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6, false, true); //Drop gray/red quests with progress.
+        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6, false, true, true); //Drop gray/red completed quests.
     }
 
     if (MAX_QUEST_LOG_SIZE - totalQuests > 4)
@@ -128,13 +133,13 @@ void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isG
                 continue;
         }
 
-        if (HasProgress(bot, quest) && !hasProgress)
+        if (HasProgress(bot, quest) && !hasProgress && bot->GetQuestStatus(questId) != QUEST_STATUS_FAILED)
             continue;
 
         if (bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE && !isComplete)
             continue;
 
-        if (numQuest <= wantNum && bot->GetQuestStatus(questId) != QUEST_STATUS_FAILED) // Always drop failed quests
+        if (numQuest <= wantNum && bot->GetQuestStatus(questId) != QUEST_STATUS_FAILED)
             continue;
 
         //Drop quest.

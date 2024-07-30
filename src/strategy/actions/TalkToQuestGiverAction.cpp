@@ -49,7 +49,7 @@ bool TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
         out << "|cffff0000Incompleted|r";
         break;
     case QUEST_STATUS_NONE:
-        AcceptQuest(quest, questGiver->GetGUID());
+        //AcceptQuest(quest, questGiver->GetGUID());
         out << "|cff00ff00Available|r";
         break;
     case QUEST_STATUS_FAILED:
@@ -81,6 +81,14 @@ bool TalkToQuestGiverAction::TurnInQuest(Quest const* quest, Object* questGiver,
     else
     {
         RewardMultipleItem(quest, questGiver, out);
+    }
+
+    if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+    {
+        const Quest* pQuest = sObjectMgr->GetQuestTemplate(questID);
+        const std::string text_quest = ChatHelper::FormatQuest(pQuest);
+        LOG_INFO("playerbots", "Quest [ {} ] completed", pQuest->GetTitle());
+        bot->Say("Quest [ " + text_quest + " ] completed", LANG_UNIVERSAL);
     }
 
     return true;
@@ -257,6 +265,7 @@ bool TurnInQueryQuestAction::Execute(Event event)
         out << "|cffff0000Incompleted|r";
         break;
     case QUEST_STATUS_NONE:
+        //AcceptQuest(quest, object->GetGUID());
         out << "|cff00ff00Available|r";
         break;
     case QUEST_STATUS_FAILED:

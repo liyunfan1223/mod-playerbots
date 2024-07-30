@@ -30,10 +30,9 @@ class ChooseTravelTargetAction : public MovementAction
         void ReportTravelTarget(TravelTarget* newTarget, TravelTarget* oldTarget);
 
         bool getBestDestination(std::vector<TravelDestination*>* activeDestinations, std::vector<WorldPosition*>* activePoints);
-
         bool SetGroupTarget(TravelTarget* target);
         bool SetCurrentTarget(TravelTarget* target, TravelTarget* oldTarget);
-        bool SetQuestTarget(TravelTarget* target, bool onlyCompleted = false);
+        bool SetQuestTarget(TravelTarget* target, bool onlyCompleted = false, bool newQuests = true, bool activeQuests = true, bool completedQuests = true);
         bool SetNewQuestTarget(TravelTarget* target);
         bool SetRpgTarget(TravelTarget* target);
         bool SetGrindTarget(TravelTarget* target);
