@@ -21,6 +21,7 @@ class MovementAction : public Action
         MovementAction(PlayerbotAI* botAI, std::string const name);
 
     protected:
+        void JumpTo(uint32 mapId, float x, float y, float z);
         bool MoveNear(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->contactDistance);
         bool MoveToLOS(WorldObject* target, bool ranged = false);
         bool MoveTo(uint32 mapId, float x, float y, float z, bool idle = false, bool react = false, bool normal_only = false);

@@ -54,12 +54,13 @@ class BGTactics : public MovementAction
         bool startNewPathFree(std::vector<BattleBotPath*> const& vPaths);
         bool resetObjective();
         bool wsgPaths();
+        bool eyJumpDown();
         bool atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<uint32> const& vFlagIds);
         bool flagTaken();
         bool teamFlagTaken();
         bool protectFC();
         bool useBuff();
-        uint32 getDefendersCount(Position point, float range, bool combat = true);
+        uint32 getPlayersInArea(TeamId teamId, Position point, float range, bool combat = true);
         bool IsLockedInsideKeep();
 };
 
