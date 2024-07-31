@@ -281,8 +281,6 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         }
         else
         {
-            if (!bot->IsInChannel(chn))
-                chn->JoinChannel(bot, "");
             chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
         }
 
@@ -291,9 +289,6 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
             std::string randomName = channelNames[urand(0, channelNames.size() - 1)];
             if (Channel* chn = cMgr->GetChannel(randomName, bot))
             {
-                if (!bot->IsInChannel(chn))
-                    chn->JoinChannel(bot, "");
-
                 chn->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
             }
         }
@@ -305,11 +300,9 @@ void SuggestWhatToDoAction::spam(std::string msg, uint8 flags, bool worldChat, b
         }
     }
 
-    if (sPlayerbotAIConfig->randomBotGuildTalk && guild && bot->GetGuildId())
+    if (sPlayerbotAIConfig->randomBotGuildTalk)
     {
-        Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-        if (guild)
-            guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
+        botAI->SayToGuild(msg);
     }
 }
 

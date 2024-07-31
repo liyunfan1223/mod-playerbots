@@ -38,18 +38,9 @@ void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
 
     if (sPlayerbotAIConfig->randomBotGuildTalk)
     {
-        Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-        if (guild)
-        {
-            std::string toSay = "";
-
-            if (urand(0, 3))
-                toSay = "Ding !";
-            else
-                toSay = "Yay level " + std::to_string(bot->GetLevel()) + " !";
-
-            guild->BroadcastToGuild(bot->GetSession(), false, toSay, LANG_UNIVERSAL);
-        }
+        std::map<std::string, std::string> args;
+        args["%my_level"] = std::to_string(bot->GetLevel());
+        botAI->SayToGuild(BOT_TEXT2("broadcast_levelup_generic", args));
     }
 }
 

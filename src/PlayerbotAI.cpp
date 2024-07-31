@@ -340,6 +340,29 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_TOTAL, "PlayerbotAI::UpdateAIInternal " + mapString);
     ExternalEventHelper helper(aiObjectContext);
 
+    // chat replies
+    std::list<ChatQueuedReply> delayedResponses;
+    while (!chatReplies.empty())
+    {
+        ChatQueuedReply holder = chatReplies.front();
+        time_t checkTime = holder.m_time;
+        if (checkTime && time(0) < checkTime)
+        {
+            delayedResponses.push_back(holder);
+            chatReplies.pop();
+            continue;
+        }
+
+        ChatReplyAction::ChatReplyDo(bot, holder.m_type, holder.m_guid1, holder.m_guid2, holder.m_msg, holder.m_chanName, holder.m_name);
+        chatReplies.pop();
+    }
+
+    for (std::list<ChatQueuedReply>::iterator i = delayedResponses.begin(); i != delayedResponses.end(); ++i)
+    {
+        chatReplies.push(*i);
+    }
+
+    HandleCommands();
 
     // logout if logout timer is ready or if instant logout is possible
     if (bot->GetSession()->isLogingOut())
@@ -389,6 +412,207 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
 
 	if (pmo)
         pmo->finish();
+}
+
+void PlayerbotAI::HandleCommands()
+{
+    ExternalEventHelper helper(aiObjectContext);
+    std::list<ChatCommandHolder> delayed;
+    while (!chatCommands.empty())
+    {
+        ChatCommandHolder holder = chatCommands.front();
+        time_t checkTime = holder.GetTime();
+        if (checkTime && time(0) < checkTime)
+        {
+            delayed.push_back(holder);
+            chatCommands.pop();
+            continue;
+        }
+
+        std::string command = holder.GetCommand();
+        Player* owner = holder.GetOwner();
+        if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
+        {
+            //ostringstream out; out << "Unknown command " << command;
+            //TellPlayer(out);
+            //helper.ParseChatCommand("help");
+        }
+
+        chatCommands.pop();
+    }
+
+    for (std::list<ChatCommandHolder>::iterator i = delayed.begin(); i != delayed.end(); ++i)
+    {
+        chatCommands.push(*i);
+    }
+}
+
+std::map<std::string, ChatMsg> chatMap;
+void PlayerbotAI::HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang)
+{
+    std::string filtered = text;
+
+    if (!IsAllowedCommand(filtered) && !GetSecurity()->CheckLevelFor(PlayerbotSecurityLevel::PLAYERBOT_SECURITY_INVITE, type != CHAT_MSG_WHISPER, &fromPlayer))
+        return;
+
+    if (type == CHAT_MSG_ADDON)
+        return;
+
+    if (filtered.find("BOT\t") == 0) //Mangosbot has BOT prefix so we remove that.
+        filtered = filtered.substr(4);
+    else if (lang == LANG_ADDON) //Other addon messages should not command bots.
+        return;
+
+    if (type == CHAT_MSG_SYSTEM)
+        return;
+
+    if (filtered.find(sPlayerbotAIConfig->commandSeparator) != std::string::npos)
+    {
+        std::vector<std::string> commands;
+        split(commands, filtered, sPlayerbotAIConfig->commandSeparator.c_str());
+        for (std::vector<std::string>::iterator i = commands.begin(); i != commands.end(); ++i)
+        {
+            HandleCommand(type, *i, fromPlayer);
+        }
+        return;
+    }
+
+    if (!sPlayerbotAIConfig->commandPrefix.empty())
+    {
+        if (filtered.find(sPlayerbotAIConfig->commandPrefix) != 0)
+            return;
+
+        filtered = filtered.substr(sPlayerbotAIConfig->commandPrefix.size());
+    }
+
+    if (chatMap.empty())
+    {
+        chatMap["#w "] = CHAT_MSG_WHISPER;
+        chatMap["#p "] = CHAT_MSG_PARTY;
+        chatMap["#r "] = CHAT_MSG_RAID;
+        chatMap["#a "] = CHAT_MSG_ADDON;
+        chatMap["#g "] = CHAT_MSG_GUILD;
+    }
+    currentChat = std::pair<ChatMsg, time_t>(CHAT_MSG_WHISPER, 0);
+    for (std::map<std::string, ChatMsg>::iterator i = chatMap.begin(); i != chatMap.end(); ++i)
+    {
+        if (filtered.find(i->first) == 0)
+        {
+            filtered = filtered.substr(3);
+            currentChat = std::pair<ChatMsg, time_t>(i->second, time(0) + 2);
+            break;
+        }
+    }
+
+    filtered = chatFilter.Filter(trim((std::string&)filtered));
+    if (filtered.empty())
+        return;
+
+    if (filtered.substr(0, 6) == "debug ")
+    {
+        std::string response = HandleRemoteCommand(filtered.substr(6));
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_ADDON, response.c_str(), LANG_ADDON,
+            CHAT_TAG_NONE, bot->GetGUID(), bot->GetName());
+        sServerFacade->SendPacket(&fromPlayer, &data);
+        return;
+    }
+
+    if (!IsAllowedCommand(filtered) && !GetSecurity()->CheckLevelFor(PlayerbotSecurityLevel::PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, &fromPlayer))
+        return;
+
+    if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos && filtered.find("award") == std::string::npos)
+    {
+        ChatCommandHolder cmd("warning", &fromPlayer, type);
+        chatCommands.push(cmd);
+        return;
+    }
+
+    if ((filtered.size() > 2 && filtered.substr(0, 2) == "d ") || (filtered.size() > 3 && filtered.substr(0, 3) == "do "))
+    {
+        Event event("do", "", &fromPlayer);
+        std::string action = filtered.substr(filtered.find(" ") + 1);
+        DoSpecificAction(action, event);
+    }
+
+    if (ChatHelper::parseValue("command", filtered).substr(0, 3) == "do ")
+    {
+        Event event("do", "", &fromPlayer);
+        std::string action = ChatHelper::parseValue("command", filtered);
+        action = action.substr(3);
+        DoSpecificAction(action, event);
+    }
+    else if (type != CHAT_MSG_WHISPER && filtered.size() > 6 && filtered.substr(0, 6) == "queue ")
+    {
+        std::string remaining = filtered.substr(filtered.find(" ") + 1);
+        int index = 1;
+        Group* group = bot->GetGroup();
+        if (group)
+        {
+            for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+            {
+                if (ref->GetSource() == master)
+                    continue;
+
+                if (ref->GetSource() == bot)
+                    break;
+
+                index++;
+            }
+        }
+        ChatCommandHolder cmd(remaining, &fromPlayer, type, time(0) + index);
+        chatCommands.push(cmd);
+    }
+    else if (filtered == "reset")
+    {
+        Reset(true);
+    }
+
+    // TODO: missing implementation to port
+    /*else if (filtered == "logout")
+    {
+        if (!(bot->IsStunnedByLogout() || bot->GetSession()->isLogingOut()))
+        {
+            if (type == CHAT_MSG_WHISPER)
+                TellPlayer(&fromPlayer, BOT_TEXT("logout_start"));
+
+            if (master && master->GetPlayerbotMgr())
+                SetShouldLogOut(true);
+        }
+    }
+    else if (filtered == "logout cancel")
+    {
+        if (bot->IsStunnedByLogout() || bot->GetSession()->isLogingOut())
+        {
+            if (type == CHAT_MSG_WHISPER)
+                TellPlayer(&fromPlayer, BOT_TEXT("logout_cancel"));
+
+            WorldPacket p;
+            bot->GetSession()->HandleLogoutCancelOpcode(p);
+            SetShouldLogOut(false);
+        }
+    }
+    else if ((filtered.size() > 5) && (filtered.substr(0, 5) == "wait ") && (filtered.find("wait for attack") == std::string::npos))
+    {
+        std::string remaining = filtered.substr(filtered.find(" ") + 1);
+        uint32 delay = atof(remaining.c_str()) * IN_MILLISECONDS;
+        if (delay > 20000)
+        {
+            bot->TellMaster(&fromPlayer, "Max wait time is 20 seconds!");
+            return;
+        }
+
+        IncreaseAIInternalUpdateDelay(delay);
+        isWaiting = true;
+        TellPlayer(&fromPlayer, "Waiting for " + remaining + " seconds!");
+        return;
+    }*/
+
+    else
+    {
+        ChatCommandHolder cmd(filtered, &fromPlayer, type);
+        chatCommands.push(cmd);
+    }
 }
 
 void PlayerbotAI::HandleTeleportAck()
@@ -483,8 +707,6 @@ void PlayerbotAI::Reset(bool full)
         }
     }
 }
-
-std::map<std::string, ChatMsg> chatMap;
 
 bool PlayerbotAI::IsAllowedCommand(std::string const text)
 {
@@ -718,6 +940,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                 p >> guid1 >> unused;
                 if (guid1.IsEmpty() || p.size() > p.DEFAULT_SIZE)
                     return;
+
                 switch (msgtype)
                 {
                     case CHAT_MSG_CHANNEL:
@@ -730,43 +953,66 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     case CHAT_MSG_GUILD:
                         p >> guid2;
                         p >> textLen >> message >> chatTag;
-
-                        if (guid1 != bot->GetGUID()) // do not reply to self
-                        {
-                            // try to always reply to real player
-                            time_t lastChat = GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Get();
-                            bool isPaused = time(0) < lastChat;
-                            bool shouldReply = false;
-                            bool isRandomBot = false;
-                            sCharacterCache->GetCharacterNameByGuid(guid1, name);
-                            uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid1);
-                            isRandomBot = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
-                            bool isMentioned = message.find(bot->GetName()) != std::string::npos;
-
-                            // random bot speaks, chat CD
-                            if (isRandomBot && isPaused)
-                                return;
-                            // BG: react only if mentioned or if not channel and real player spoke
-                            if (bot->InBattleground() && bot->GetBattleground() && !(isMentioned || (msgtype != CHAT_MSG_CHANNEL && !isRandomBot)))
-                                return;
-
-                            // Reduce chat spam
-                            if (HasRealPlayerMaster())
-                                return;
-
-                            if (isRandomBot && urand(0, 20))
-                                return;
-
-                            if (!message.empty() && ((isRandomBot && !isPaused && (!urand(0, 20) || (!urand(0, 10) && message.find(bot->GetName()) != std::string::npos))) || (!isRandomBot && (isMentioned || !urand(0, 4)))))
-                            {
-                                QueueChatResponse(msgtype, guid1, ObjectGuid(), message, chanName, name);
-                                GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
-                                return;
-                            }
-                        }
                         break;
                     default:
                         break;
+                }
+
+                // do not reply to self but always try to reply to real player
+                if (guid1 != bot->GetGUID())
+                {
+                    time_t lastChat = GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Get();
+                    bool isPaused = time(0) < lastChat;
+                    bool shouldReply = false;
+                    bool isFromFreeBot = false;
+                    uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid1);
+                    isFromFreeBot = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
+                    bool isMentioned = message.find(bot->GetName()) != std::string::npos;
+
+                    ChatChannelSource chatChannelSource = GetChatChannelSource(bot, msgtype, chanName);
+
+                    // random bot speaks, chat CD
+                    if (isFromFreeBot && isPaused)
+                        return;
+
+                    // BG: react only if mentioned or if not channel and real player spoke
+                    if (bot->InBattleground() && !(isMentioned || (msgtype != CHAT_MSG_CHANNEL && !isFromFreeBot)))
+                        return;
+
+                    if (HasRealPlayerMaster() && guid1 != GetMaster()->GetGUID())
+                        return;
+                    if (lang == LANG_ADDON)
+                        return;
+
+                    // several talk config option later
+                    /*
+
+                        TODO:
+                        toxic link
+                        legendary grind / thunderfury etc
+
+                    */
+                    if (isFromFreeBot && urand(0, 20))
+                        return;
+
+                    //if (msgtype == CHAT_MSG_GUILD && (!sPlayerbotAIConfig->guildRepliesRate || urand(1, 100) >= sPlayerbotAIConfig->guildRepliesRate))
+                        //return;
+
+                    if (!isFromFreeBot)
+                    {
+                        if (!isMentioned && urand(0, 4))
+                            return;
+                    }
+                    else
+                    {
+                        if (urand(0, 20 + 10 * isMentioned))
+                            return;
+                    }
+
+                    QueueChatResponse(msgtype, guid1, ObjectGuid(), message, chanName, name);
+                    GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
+
+                    return;
                 }
             }
 
@@ -1844,17 +2090,12 @@ WorldObject* PlayerbotAI::GetWorldObject(ObjectGuid guid)
 
 const AreaTableEntry* PlayerbotAI::GetCurrentArea()
 {
-    if (const auto map = bot->GetMap())
-        return sAreaTableStore.LookupEntry(bot->GetMap()->GetAreaId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
-    return nullptr;
+    return sAreaTableStore.LookupEntry(bot->GetMap()->GetAreaId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
 }
 
 const AreaTableEntry* PlayerbotAI::GetCurrentZone()
 {
-    if (const auto map = bot->GetMap())
-        return GetAreaEntryByAreaID(map->GetZoneId(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
-
-    return nullptr;
+    return sAreaTableStore.LookupEntry(bot->GetMap()->GetZoneId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
 }
 
 std::string PlayerbotAI::GetLocalizedAreaName(const AreaTableEntry* entry)
@@ -1909,6 +2150,7 @@ bool PlayerbotAI::SayToGuild(const std::string& msg)
 
     return false;
 }
+
 bool PlayerbotAI::SayToWorld(const std::string& msg)
 {
     if (msg.empty())
@@ -1918,9 +2160,7 @@ bool PlayerbotAI::SayToWorld(const std::string& msg)
 
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
     if (!cMgr)
-    {
         return false;
-    }
 
     //no zone
     if (Channel* worldChannel = cMgr->GetChannel("World", bot))
@@ -1931,24 +2171,35 @@ bool PlayerbotAI::SayToWorld(const std::string& msg)
 
     return false;
 }
+
 bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chanId)
 {
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
     if (!cMgr || msg.empty())
         return false;
 
-    AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(bot->GetMap()->GetZoneId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
-    if (!current_zone)
+    AreaTableEntry const* current_zone = GetCurrentZone();
+    AreaTableEntry const* current_area = GetCurrentArea();
+    if (!current_zone || !current_area)
         return false;
+
+    const auto current_str_zone = GetLocalizedAreaName(current_zone);
+    const auto current_str_area = GetLocalizedAreaName(current_area);
 
     for (auto const& [key, channel] : cMgr->GetChannels())
     {
         //check for current zone
         if (channel && channel->GetChannelId() == chanId)
         {
-            const auto does_contains = channel->GetName().find(GetLocalizedAreaName(current_zone)) != std::string::npos;
-            if ((chanId != ChatChannelId::LOOKING_FOR_GROUP && chanId != ChatChannelId::WORLD_DEFENSE) && !does_contains)
-                return false;
+            const auto does_contains = channel->GetName().find(current_str_zone) != std::string::npos || channel->GetName().find(current_str_area) != std::string::npos;
+            if (chanId != ChatChannelId::LOOKING_FOR_GROUP && chanId != ChatChannelId::WORLD_DEFENSE && !does_contains)
+            {
+                continue;
+            }
+            else if (chanId == ChatChannelId::LOOKING_FOR_GROUP || chanId == ChatChannelId::WORLD_DEFENSE)
+            {
+                // check if capitals then return false if not
+            }
 
             channel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
             return true;
@@ -1957,6 +2208,7 @@ bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chan
 
     return false;
 }
+
 bool PlayerbotAI::SayToParty(const std::string& msg)
 {
     if (!bot->GetGroup())
@@ -1972,6 +2224,7 @@ bool PlayerbotAI::SayToParty(const std::string& msg)
 
     return true;
 }
+
 bool PlayerbotAI::SayToRaid(const std::string& msg)
 {
     if (!bot->GetGroup() || bot->GetGroup()->isRaidGroup())
@@ -1987,6 +2240,7 @@ bool PlayerbotAI::SayToRaid(const std::string& msg)
 
     return true;
 }
+
 bool PlayerbotAI::Yell(const std::string& msg)
 {
     if (bot->GetTeamId() == TeamId::TEAM_ALLIANCE)
@@ -2000,6 +2254,7 @@ bool PlayerbotAI::Yell(const std::string& msg)
 
     return true;
 }
+
 bool PlayerbotAI::Say(const std::string& msg)
 {
     if (bot->GetTeamId() == TeamId::TEAM_ALLIANCE)
@@ -2013,6 +2268,7 @@ bool PlayerbotAI::Say(const std::string& msg)
 
     return true;
 }
+
 bool PlayerbotAI::Whisper(const std::string& msg, const std::string& receiverName)
 {
     const auto receiver = ObjectAccessor::FindPlayerByName(receiverName);
@@ -4894,39 +5150,43 @@ ChatChannelSource PlayerbotAI::GetChatChannelSource(Player* bot, uint32 type, st
         {
             ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
             if (!cMgr)
+            {
                 return ChatChannelSource::SRC_UNDEFINED;
+            }
 
             const Channel* channel = cMgr->GetChannel(channelName, bot);
             if (channel)
             {
                 switch (channel->GetChannelId())
                 {
-                case ChatChannelId::GENERAL:
-                {
-                    return ChatChannelSource::SRC_GENERAL;
-                }
-                case ChatChannelId::TRADE:
-                {
-                    return ChatChannelSource::SRC_TRADE;
-                }
-                case ChatChannelId::LOCAL_DEFENSE:
-                {
-                    return ChatChannelSource::SRC_LOCAL_DEFENSE;
-                }
-                case ChatChannelId::WORLD_DEFENSE:
-                {
-                    return ChatChannelSource::SRC_WORLD_DEFENSE;
-                }
-                case ChatChannelId::LOOKING_FOR_GROUP:
-                {
-                    return ChatChannelSource::SRC_LOOKING_FOR_GROUP;
-                }
-                case ChatChannelId::GUILD_RECRUITMENT:
-                {
-                    return ChatChannelSource::SRC_GUILD_RECRUITMENT;
-                }
-                default:
-                    return ChatChannelSource::SRC_UNDEFINED;
+                    case ChatChannelId::GENERAL:
+                    {
+                        return ChatChannelSource::SRC_GENERAL;
+                    }
+                    case ChatChannelId::TRADE:
+                    {
+                        return ChatChannelSource::SRC_TRADE;
+                    }
+                    case ChatChannelId::LOCAL_DEFENSE:
+                    {
+                        return ChatChannelSource::SRC_LOCAL_DEFENSE;
+                    }
+                    case ChatChannelId::WORLD_DEFENSE:
+                    {
+                        return ChatChannelSource::SRC_WORLD_DEFENSE;
+                    }
+                    case ChatChannelId::LOOKING_FOR_GROUP:
+                    {
+                        return ChatChannelSource::SRC_LOOKING_FOR_GROUP;
+                    }
+                    case ChatChannelId::GUILD_RECRUITMENT:
+                    {
+                        return ChatChannelSource::SRC_GUILD_RECRUITMENT;
+                    }
+                    default:
+                    {
+                        return ChatChannelSource::SRC_UNDEFINED;
+                    }
                 }
             }
         }
@@ -4968,11 +5228,14 @@ ChatChannelSource PlayerbotAI::GetChatChannelSource(Player* bot, uint32 type, st
                 return ChatChannelSource::SRC_TEXT_EMOTE;
             }
             default:
+            {
                 return ChatChannelSource::SRC_UNDEFINED;
+            }
         }
     }
     return ChatChannelSource::SRC_UNDEFINED;
 }
+
 std::vector<const Quest*> PlayerbotAI::GetAllCurrentQuests()
 {
     std::vector<const Quest*> result;

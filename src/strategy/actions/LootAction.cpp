@@ -417,21 +417,11 @@ bool StoreLootAction::Execute(Event event)
         if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
-        if (sPlayerbotAIConfig->randomBotGuildTalk && bot->GetGuildId() && urand(0, 10) && proto->Quality >= ITEM_QUALITY_RARE)
+        if (sPlayerbotAIConfig->randomBotGuildTalk && urand(0, 10) && proto->Quality >= ITEM_QUALITY_RARE)
         {
-            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-
-            if (guild)
-            {
-                std::string toSay = "";
-
-                if (urand(0, 3))
-                    toSay = "Yay I looted " + chat->FormatItem(proto) + " !";
-                else
-                    toSay = "Guess who got a " + chat->FormatItem(proto) + " ? Me !";
-
-                guild->BroadcastToGuild(bot->GetSession(), false, toSay, LANG_UNIVERSAL);
-            }
+            std::map<std::string, std::string> args;
+            args["%item"] = chat->FormatItem(proto);
+            botAI->SayToGuild(BOT_TEXT2("loot_command", args));
         }
 
         // std::ostringstream out;

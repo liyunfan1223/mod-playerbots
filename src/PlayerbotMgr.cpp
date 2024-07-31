@@ -526,10 +526,10 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     // join standard channels
     AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(bot->GetAreaId());
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
-    std::string current_zone_name = current_zone ? current_zone->area_name[sWorld->GetDefaultDbcLocale()] : "";
 
     if (current_zone && cMgr)
     {
+        const auto current_str_zone = botAI->GetLocalizedAreaName(current_zone);
         for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
         {
             ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
@@ -551,11 +551,9 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
             else
             {
                 char new_channel_name_buf[100];
-                snprintf(new_channel_name_buf, 100, channel->pattern[sWorld->GetDefaultDbcLocale()], current_zone_name.c_str());
+                snprintf(new_channel_name_buf, 100, channel->pattern[sWorld->GetDefaultDbcLocale()], current_str_zone.c_str());
                 new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
             }
-            if (new_channel && new_channel->GetName().length() > 0)
-                new_channel->JoinChannel(bot, "");
         }
     }
 }

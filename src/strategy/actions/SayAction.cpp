@@ -153,11 +153,10 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         return;
     }
 
-    /*ChatChannelSource chatChannelSource = GET_PLAYERBOT_AI(bot)->GetChatChannelSource(bot, type, chanName);
-    
+    ChatChannelSource chatChannelSource = GET_PLAYERBOT_AI(bot)->GetChatChannelSource(bot, type, chanName);
     if ( (msg.starts_with("LFG") || msg.starts_with("LFM")) && HandleLFGQuestsReply(bot, chatChannelSource, msg, name))
     {
-
+        return;
     }
 
     if (msg.starts_with("WTB") && HandleWTBItemsReply(bot, chatChannelSource, msg, name))
@@ -180,8 +179,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         return;
     }
 
-
-    SendGeneralResponse(bot, chatChannelSource, GenerateReplyMessage(bot, msg, guid1, name), name);*/
+    SendGeneralResponse(bot, chatChannelSource, GenerateReplyMessage(bot, msg, guid1, name), name);
 }
 
 bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
@@ -196,12 +194,12 @@ bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chat
     {
         case ChatChannelSource::SRC_WORLD:
         {
-            //GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
+            GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
             break;
         }
         case ChatChannelSource::SRC_GENERAL:
         {
-            //GET_PLAYERBOT_AI(bot)->SayToGeneral(responseMessage);
+            GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::GENERAL);
             break;
         }
     }
@@ -265,13 +263,13 @@ bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatCh
                 //may reply to the same channel or whisper
                 if (urand(0, 1))
                 {
-                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_channel", placeholders);
-                    //GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
+                    std::string responseMessage = BOT_TEXT2("response_lfg_quests_channel", placeholders);
+                    GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
                 }
                 else
                 {
-                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
-                    //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                    std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
+                    GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
                 }
                 break;
             }
@@ -280,13 +278,13 @@ bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatCh
                 //may reply to the same channel or whisper
                 if (urand(0, 1))
                 {
-                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_channel", placeholders);
-                    //GET_PLAYERBOT_AI(bot)->SayToGeneral(responseMessage);
+                    std::string responseMessage = BOT_TEXT2("response_lfg_quests_channel", placeholders);
+                    GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::GENERAL);
                 }
                 else
                 {
-                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
-                    //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                    std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
+                    GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
                 }
                 break;
             }
@@ -294,8 +292,8 @@ bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatCh
             {
                 //do not reply to the chat
                 //may whisper
-                //std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
-                //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
+                GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
                 break;
             }
         }
@@ -310,70 +308,70 @@ bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatCha
     // send responds
     switch (chatChannelSource)
     {
-    case ChatChannelSource::SRC_WORLD:
-    {
-        //may reply to the same channel or whisper
-        //GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
-        break;
-    }
-    case ChatChannelSource::SRC_GENERAL:
-    {
-        //may reply to the same channel or whisper
-        //GET_PLAYERBOT_AI(bot)->SayToGeneral(responseMessage);
-        //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
-        break;
-    }
-    case ChatChannelSource::SRC_TRADE:
-    {
-        //do not reply to the chat
-        //may whisper
-        break;
-    }
-    case ChatChannelSource::SRC_LOCAL_DEFENSE:
-    {
-        //may reply to the same channel or whisper
-        //GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::LOCAL_DEFENSE);
-        break;
-    }
-    case ChatChannelSource::SRC_WORLD_DEFENSE:
-    {
-        //may whisper
-        break;
-    }
-    case ChatChannelSource::SRC_LOOKING_FOR_GROUP:
-    {
-        //do not reply to the chat
-        //may whisper
-        break;
-    }
-    case ChatChannelSource::SRC_GUILD_RECRUITMENT:
-    {
-        //do not reply to the chat
-        //may whisper
-        break;
-    }
-    case ChatChannelSource::SRC_WHISPER:
-    {
-        //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
-        break;
-    }
-    case ChatChannelSource::SRC_SAY:
-    {
-        //GET_PLAYERBOT_AI(bot)->Say(responseMessage);
-        break;
-    }
-    case ChatChannelSource::SRC_YELL:
-    {
-        //GET_PLAYERBOT_AI(bot)->Yell(responseMessage);
-        break;
-    }
-    case ChatChannelSource::SRC_GUILD:
-    {
-        //GET_PLAYERBOT_AI(bot)->SayToGuild(responseMessage);
-        break;
-    }
-    default:
-        break;
+        case ChatChannelSource::SRC_WORLD:
+        {
+            //may reply to the same channel or whisper
+            GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
+            break;
+        }
+        case ChatChannelSource::SRC_GENERAL:
+        {
+            //may reply to the same channel or whisper
+            GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::GENERAL);
+            GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+            break;
+        }
+        case ChatChannelSource::SRC_TRADE:
+        {
+            //do not reply to the chat
+            //may whisper
+            break;
+        }
+        case ChatChannelSource::SRC_LOCAL_DEFENSE:
+        {
+            //may reply to the same channel or whisper
+            GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::LOCAL_DEFENSE);
+            break;
+        }
+        case ChatChannelSource::SRC_WORLD_DEFENSE:
+        {
+            //may whisper
+            break;
+        }
+        case ChatChannelSource::SRC_LOOKING_FOR_GROUP:
+        {
+            //do not reply to the chat
+            //may whisper
+            break;
+        }
+        case ChatChannelSource::SRC_GUILD_RECRUITMENT:
+        {
+            //do not reply to the chat
+            //may whisper
+            break;
+        }
+        case ChatChannelSource::SRC_WHISPER:
+        {
+            GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+            break;
+        }
+        case ChatChannelSource::SRC_SAY:
+        {
+            GET_PLAYERBOT_AI(bot)->Say(responseMessage);
+            break;
+        }
+        case ChatChannelSource::SRC_YELL:
+        {
+            GET_PLAYERBOT_AI(bot)->Yell(responseMessage);
+            break;
+        }
+        case ChatChannelSource::SRC_GUILD:
+        {
+            GET_PLAYERBOT_AI(bot)->SayToGuild(responseMessage);
+            break;
+        }
+        default:
+            break;
     }
     GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
 

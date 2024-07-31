@@ -219,6 +219,26 @@ std::string const ChatHelper::formatMoney(uint32 copper)
     return out.str();
 }
 
+std::string ChatHelper::parseValue(const std::string& type, const std::string& text)
+{
+    std::string retString;
+
+    std::string pattern = "Hvalue:" + type + ":";
+
+    int pos = text.find(pattern, 0);
+    if (pos == -1)
+        return retString;
+
+    pos += pattern.size();
+
+    int endPos = text.find('|', pos);
+    if (endPos == -1)
+        return retString;
+
+    retString = text.substr(pos, endPos - pos);
+    return retString;
+}
+
 uint32 ChatHelper::parseMoney(std::string const text)
 {
     // if user specified money in ##g##s##c format

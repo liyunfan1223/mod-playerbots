@@ -41,14 +41,9 @@ bool XpGainAction::Execute(Event event)
             Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
             if (guild)
             {
-                std::string toSay = "";
-
-                if (urand(0, 3))
-                    toSay = "Wow I just killed " + creature->GetName() + " !";
-                else
-                    toSay = "Awesome that " + creature->GetName() + " went down quickly !";
-
-                guild->BroadcastToGuild(bot->GetSession(), false, toSay, LANG_UNIVERSAL);
+                std::map<std::string, std::string> args;
+                args["%victim_name"] = creature->GetName();
+                botAI->SayToGuild(BOT_TEXT2("broadcast_killed_rare", args));
             }
         }
     }
