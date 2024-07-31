@@ -22,8 +22,15 @@ bool InviteToGroupAction::Invite(Player* player)
     if (!player || !player->IsInWorld())
         return false;
 
+    if (bot == player)
+        return false;
+
     if (!GET_PLAYERBOT_AI(player) && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, true, player))
         return false;
+
+    if (Group* group = player->GetGroup())
+        if (!group->isRaidGroup() && group->GetMembersCount() > 4)
+            group->ConvertToRaid();
 
     WorldPacket p;
     uint32 roles_mask = 0;
@@ -44,6 +51,9 @@ bool InviteNearbyToGroupAction::Execute(Event event)
             continue;
 
         if (player->GetGroup())
+            continue;
+
+        if (player == bot)
             continue;
 
         if (botAI)
@@ -165,3 +175,18 @@ bool InviteGuildToGroupAction::isUseful()
 {
     return bot->GetGuildId() && InviteNearbyToGroupAction::isUseful();
 };
+
+bool JoinGroupAction::Execute(Event event)
+{
+    Player* master = event.getOwner();
+    Group* group = master->GetGroup();
+
+    if (group && (group->IsFull() || bot->GetGroup() == group))
+        return false;
+
+    if (bot->GetGroup())
+        if (!botAI->DoSpecificAction("leave", event, true))
+            return false;
+
+    return Invite(bot);
+}

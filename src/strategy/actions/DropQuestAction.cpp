@@ -48,7 +48,7 @@ bool DropQuestAction::Execute(Event event)
     {
         const Quest* pQuest = sObjectMgr->GetQuestTemplate(entry);
         const std::string text_quest = ChatHelper::FormatQuest(pQuest);
-        LOG_INFO("playerbots", "Quest [ {} ] removed", pQuest->GetTitle());
+        LOG_INFO("playerbots", "{} => Quest [ {} ] removed", bot->GetName(), pQuest->GetTitle());
         bot->Say("Quest [ " + text_quest + " ] removed", LANG_UNIVERSAL);
     }
 
@@ -103,7 +103,19 @@ bool CleanQuestLogAction::Execute(Event event)
 
 void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isGreen, bool hasProgress, bool isComplete)
 {
+    std::vector<uint8> slots;
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+        slots.push_back(slot);
+
+    if (wantNum < 100)
+    {
+        std::random_device rd;
+        std::mt19937 g(rd());
+
+        std::shuffle(slots.begin(), slots.end(), g);
+    }
+
+    for (uint8 slot : slots)
     {
         uint32 questId = bot->GetQuestSlotQuestId(slot);
         if (!questId)
@@ -153,6 +165,12 @@ void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isG
 
         numQuest--;
 
+        if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+        {
+            const std::string text_quest = ChatHelper::FormatQuest(quest);
+            LOG_INFO("playerbots", "{} => Quest [ {} ] removed", bot->GetName(), quest->GetTitle());
+            bot->Say("Quest [ " + text_quest + " ] removed", LANG_UNIVERSAL);
+        }
         botAI->TellMaster("Quest removed" + chat->FormatQuest(quest));
     }
 }

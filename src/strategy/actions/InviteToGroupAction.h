@@ -20,6 +20,14 @@ class InviteToGroupAction : public Action
         virtual bool Invite(Player* player);
 };
 
+class JoinGroupAction : public InviteToGroupAction
+{
+public:
+    JoinGroupAction(PlayerbotAI* ai, std::string name = "join") : InviteToGroupAction(ai, name) {}
+    bool Execute(Event event) override;
+    bool isUseful() override { return !bot->IsBeingTeleported(); }
+};
+
 class InviteNearbyToGroupAction : public InviteToGroupAction
 {
     public:

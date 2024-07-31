@@ -433,6 +433,11 @@ class PlayerbotAI : public PlayerbotAIBase
         bool AllowActive(ActivityType activityType);
         bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
 
+        //Check if player is safe to use.
+        bool IsSafe(Player* player);
+        bool IsSafe(WorldObject* obj);
+
+
         bool HasCheat(BotCheatMask mask) { return ((uint32)mask & (uint32)cheatMask) != 0 || ((uint32)mask & (uint32)sPlayerbotAIConfig->botCheatMask) != 0; }
         BotCheatMask GetCheat() { return cheatMask; }
         void SetCheat(BotCheatMask mask) { cheatMask = mask; }

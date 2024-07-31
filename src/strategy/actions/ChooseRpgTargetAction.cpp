@@ -129,11 +129,18 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
 bool ChooseRpgTargetAction::Execute(Event event)
 {
     TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
-
-    uint32 num = 0;
+    Player* master = botAI->GetMaster();
+    GuidPosition masterRpgTarget;
+    if (master && master != bot && GET_PLAYERBOT_AI(master) && master->GetMapId() == bot->GetMapId() && !master->IsBeingTeleported())
+    {
+        Player* player = botAI->GetMaster();
+        GuidPosition masterRpgTarget = PAI_VALUE(GuidPosition, "rpg target");
+    }
+    else
+        master = nullptr;
 
     std::unordered_map<ObjectGuid, uint32> targets;
-
+    uint32 num = 0;
     GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
     GuidVector possibleObjects = AI_VALUE(GuidVector, "nearest game objects no los");
     GuidVector possiblePlayers = AI_VALUE(GuidVector, "nearest friendly players");
@@ -216,10 +223,15 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
     for (auto it = begin(targets); it != end(targets);)
     {
-        if (it->second == 0 || (hasGoodRelevance && it->second <= 1.0))
-        {
+        //Remove empty targets.
+        if (it->second == 0)
             it = targets.erase(it);
-        }
+        //Remove useless targets if there's any good ones
+        else if (hasGoodRelevance && it->second <= 1.0)
+            it = targets.erase(it);
+        //Remove useless targets if it's not masters target.
+        else if (!hasGoodRelevance && master && (!masterRpgTarget || it->first != masterRpgTarget))
+            it = targets.erase(it);
         else
             ++it;
     }

@@ -15,7 +15,7 @@ bool AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
-        LOG_INFO("playerbots", "Quest [ {} ] accepted", quest->GetTitle());
+        LOG_INFO("playerbots", "{} => Quest [ {} ] accepted", bot->GetName(), quest->GetTitle());
         bot->Say("Quest [ " + text_quest + " ] accepted", LANG_UNIVERSAL);
     }
 

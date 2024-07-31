@@ -8,6 +8,7 @@
 #include "AddLootAction.h"
 #include "AttackAction.h"
 #include "AutoLearnSpellAction.h"
+#include "ShareQuestAction.h"
 #include "BattleGroundTactics.h"
 #include "BattleGroundJoinAction.h"
 #include "BuyAction.h"
@@ -152,6 +153,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["war stomp"] = &ActionContext::war_stomp;
             creators["auto talents"] = &ActionContext::auto_talents;
             creators["auto learn spell"] = &ActionContext::auto_learn_spell;
+            creators["auto share quest"] = &ActionContext::auto_share_quest;
             creators["auto teleport for level"] = &ActionContext::auto_teleport_for_level;
             creators["auto upgrade equip"] = &ActionContext::auto_upgrade_equip;
             creators["xp gain"] = &ActionContext::xp_gain;
@@ -321,6 +323,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* war_stomp(PlayerbotAI* botAI) { return new CastWarStompAction(botAI); }
         static Action* auto_talents(PlayerbotAI* botAI) { return new AutoSetTalentsAction(botAI); }
         static Action* auto_learn_spell(PlayerbotAI* botAI) { return new AutoLearnSpellAction(botAI); }
+        static Action* auto_share_quest(PlayerbotAI* ai) { return new AutoShareQuestAction(ai); }
         static Action* auto_teleport_for_level(PlayerbotAI* botAI) { return new AutoTeleportForLevelAction(botAI); }
         static Action* auto_upgrade_equip(PlayerbotAI* botAI) { return new AutoUpgradeEquipAction(botAI); }
         static Action* xp_gain(PlayerbotAI* botAI) { return new XpGainAction(botAI); }

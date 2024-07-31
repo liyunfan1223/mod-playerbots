@@ -44,11 +44,11 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
     foundTarget = SetGroupTarget(newTarget);                                 //Join groups members
 
     //Empty bags/repair
-    if (!foundTarget && urand(1, 100) > 10)                                  //90% chance
+    if (!foundTarget && urand(1, 100) > 10 && bot->GetLevel() > 5)           //90% chance
     {
-        if (AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader") ||
-            AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader") ||
-            (AI_VALUE2(bool, "group or", "should sell,can ah sell,following party,near leader") && bot->GetLevel() > 5))
+        if  (AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader") ||
+             AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader")
+            )
         {
             foundTarget = SetRpgTarget(newTarget);                           //Go to town to sell items or repair
         }
@@ -132,11 +132,13 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
 
     //Dungeon in group.
     if (!foundTarget && urand(1, 100) > 50)                                 //50% chance
+    {
         if (AI_VALUE(bool, "can fight boss"))
         {
             foundTarget = SetBossTarget( newTarget);                         //Go fight a (dungeon boss)
         }
-
+    }
+    
     //Do quests (start, do, end)
     if (!foundTarget && urand(1, 100) > 5)                                 //95% chance
     {

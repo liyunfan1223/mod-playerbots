@@ -1096,27 +1096,10 @@ bool QuestRelationTravelDestination::isActive(Player* bot)
             if (AI_VALUE(uint8, "free quest log slots") < 5)
                 return false;
 
-            if (!AI_VALUE2(bool, "group or", "following party,near leader,can accept quest npc::" + std::to_string(entry))) //Noone has yellow exclamation mark.
+            //None has yellow exclamation mark.
+            if (!AI_VALUE2(bool, "group or", "following party,near leader,can accept quest npc::" + std::to_string(entry)))
                 if (!AI_VALUE2(bool, "group or", "following party,near leader,can accept quest low level npc::" + std::to_string(entry) + "need quest objective::" + std::to_string(questId))) //Noone can do this quest for a usefull reward.
                     return false;
-
-            // higher chance bot will do rewarding quest (better gear etc)
-            if (dialogStatus != DIALOG_STATUS_AVAILABLE)
-            {
-                if (dialogStatus != DIALOG_STATUS_LOW_LEVEL_AVAILABLE)
-                {
-                    bool hasGoodReward = false;
-                    for (uint8 i = 0; i < questTemplate->GetRewChoiceItemsCount(); ++i)
-                    {
-                        ItemUsage usage = AI_VALUE2_LAZY(ItemUsage, "item usage", questTemplate->RewardChoiceItemId[i]);
-                        if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE)
-                        {
-                            hasGoodReward = true;
-                            break;
-                        }
-                    }
-                }
-            }
         }
         else
         {
@@ -1275,7 +1258,8 @@ std::string const RpgTravelDestination::getTitle()
 {
     std::ostringstream out;
 
-    out << "rpg npc ";
+    if(entry > 0)
+        out << "rpg npc ";
 
     out << " " << ChatHelper::FormatWorldEntry(entry);
 

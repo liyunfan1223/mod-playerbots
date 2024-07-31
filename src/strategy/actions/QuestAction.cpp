@@ -135,7 +135,7 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
     const std::string text_quest = ChatHelper::FormatQuest(pQuest);
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
-        LOG_INFO("playerbots", "Quest [ {} ] completed", pQuest->GetTitle());
+        LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), pQuest->GetTitle());
         bot->Say("Quest [ " + text_quest + " ] completed", LANG_UNIVERSAL);
     }
     botAI->TellMasterNoFacing("Quest completed " + text_quest);
@@ -244,6 +244,9 @@ bool QuestUpdateCompleteAction::Execute(Event event)
     WorldPacket p(event.getPacket());
     p.rpos(0);
 
+    if (p.empty())
+        return false;
+
     uint32 entry, questId, available, required;
     ObjectGuid guid;
     p >> questId >> entry >> available >> required >> guid;
@@ -254,7 +257,7 @@ bool QuestUpdateCompleteAction::Execute(Event event)
         const std::string text_quest = ChatHelper::FormatQuest(qInfo);
         if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
         {
-            LOG_INFO("playerbots", "Quest [ {} ] completed", qInfo->GetTitle());
+            LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
             bot->Say("Quest [ " + text_quest + " ] completed", LANG_UNIVERSAL);
         }
         botAI->TellMasterNoFacing("Quest completed " + text_quest);
