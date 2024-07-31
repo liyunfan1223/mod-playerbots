@@ -244,12 +244,11 @@ bool QuestUpdateCompleteAction::Execute(Event event)
     WorldPacket p(event.getPacket());
     p.rpos(0);
 
-    if (p.empty())
-        return false;
+    uint32 questId = 0;
+    p >> questId;
 
-    uint32 entry, questId, available, required;
-    ObjectGuid guid;
-    p >> questId >> entry >> available >> required >> guid;
+    p.print_storage();
+    LOG_INFO("playerbots", "Packet: empty{} questId{}", p.empty(), questId);
 
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
     if (qInfo)
@@ -275,8 +274,7 @@ bool QuestUpdateAddKillAction::Execute(Event event)
     p.rpos(0);
 
     uint32 entry, questId, available, required;
-    ObjectGuid guid;
-    p >> questId >> entry >> available >> required >> guid;
+    p >> questId >> entry >> available >> required;
 
     std::stringstream ss;
     ss << "Update progression kill questid {" << std::to_string(questId) << "} {" << std::to_string(available) << "} / {" << std::to_string(required) << "}";

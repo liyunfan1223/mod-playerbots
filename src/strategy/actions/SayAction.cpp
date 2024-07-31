@@ -9,6 +9,7 @@
 #include "ChannelMgr.h"
 #include "GuildMgr.h"
 #include <regex>
+#include <string>
 
 static const std::unordered_set<std::string> noReplyMsgs = {
   "join", "leave", "follow", "attack", "pull", "flee", "reset", "reset ai",
@@ -54,10 +55,9 @@ bool SayAction::Execute(Event event)
 
     if (bot->GetMap())
     {
-        if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(bot->GetAreaId()))
-            placeholders["<subzone>"] = area->area_name[0];
+        if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetMap()->GetZoneId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ())))
+            placeholders["<subzone>"] = zone->area_name[sWorld->GetDefaultDbcLocale()];
     }
-
 
     // set delay before next say
     time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
@@ -153,15 +153,245 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         return;
     }
 
-    ObjectGuid receiver = sCharacterCache->GetCharacterGuidByName(name);
-    Player* plr = ObjectAccessor::FindPlayer(receiver);
+    /*ChatChannelSource chatChannelSource = GET_PLAYERBOT_AI(bot)->GetChatChannelSource(bot, type, chanName);
+    
+    if ( (msg.starts_with("LFG") || msg.starts_with("LFM")) && HandleLFGQuestsReply(bot, chatChannelSource, msg, name))
+    {
+
+    }
+
+    if (msg.starts_with("WTB") && HandleWTBItemsReply(bot, chatChannelSource, msg, name))
+    {
+        return;
+    }
+
+    //toxic links
+    if (msg.starts_with("gnomes")
+        && (GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg).size() > 0 || GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllQuestIds(msg).size() > 0))
+    {
+        HandleToxicLinksReply(bot, chatChannelSource, msg, name);
+        return;
+    }
+
+    //thunderfury
+    if (GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg).count(19019))
+    {
+        HandleThunderfuryReply(bot, chatChannelSource, msg, name);
+        return;
+    }
+
+
+    SendGeneralResponse(bot, chatChannelSource, GenerateReplyMessage(bot, msg, guid1, name), name);*/
+}
+
+bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+{
+    std::map<std::string, std::string> placeholders;
+    const auto thunderfury = sObjectMgr->GetItemTemplate(19019);
+    placeholders["%thunderfury_link"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatItem(thunderfury);
+
+    std::string responseMessage = BOT_TEXT2("thunderfury_spam", placeholders);
+
+    switch (chatChannelSource)
+    {
+        case ChatChannelSource::SRC_WORLD:
+        {
+            //GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
+            break;
+        }
+        case ChatChannelSource::SRC_GENERAL:
+        {
+            //GET_PLAYERBOT_AI(bot)->SayToGeneral(responseMessage);
+            break;
+        }
+    }
+
+    GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
+    return true;
+}
+
+bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+{
+    GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 60));
+    return true;
+}
+bool ChatReplyAction::HandleWTBItemsReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+{
+    GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 60));
+    return true;
+}
+bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+{
+    auto messageQuestIds = GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllQuestIds(msg);
+
+    if (messageQuestIds.empty())
+    {
+        return false;
+    }
+
+    auto botQuestIds = GET_PLAYERBOT_AI(bot)->GetAllCurrentQuestIds();
+    std::set<uint32> matchingQuestIds;
+    for (auto botQuestId : botQuestIds)
+    {
+        if (messageQuestIds.count(botQuestId) != 0)
+        {
+            matchingQuestIds.insert(botQuestId);
+        }
+    }
+
+    if (!matchingQuestIds.empty())
+    {
+        std::map<std::string, std::string> placeholders;
+        placeholders["%other_name"] = name;
+        AreaTableEntry const* current_area = GET_PLAYERBOT_AI(bot)->GetCurrentArea();
+        AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
+        placeholders["%area_name"] = current_area ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_area) : BOT_TEXT1("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_zone) : BOT_TEXT1("string_unknown_area");
+        placeholders["%my_class"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->getClass());
+        placeholders["%my_race"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatRace(bot->getRace());
+        placeholders["%my_level"] = std::to_string(bot->GetLevel());
+        placeholders["%my_role"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot, bot->GetActiveSpec());
+        placeholders["%quest_links"] = "";
+        for (auto matchingQuestId : matchingQuestIds)
+        {
+            Quest const* quest = sObjectMgr->GetQuestTemplate(matchingQuestId);
+            placeholders["%quest_links"] += GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatQuest(quest);
+        }
+
+        switch (chatChannelSource)
+        {
+            case ChatChannelSource::SRC_WORLD:
+            {
+                //may reply to the same channel or whisper
+                if (urand(0, 1))
+                {
+                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_channel", placeholders);
+                    //GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
+                }
+                else
+                {
+                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
+                    //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                }
+                break;
+            }
+            case ChatChannelSource::SRC_GENERAL:
+            {
+                //may reply to the same channel or whisper
+                if (urand(0, 1))
+                {
+                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_channel", placeholders);
+                    //GET_PLAYERBOT_AI(bot)->SayToGeneral(responseMessage);
+                }
+                else
+                {
+                    //std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
+                    //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                }
+                break;
+            }
+            case ChatChannelSource::SRC_LOOKING_FOR_GROUP:
+            {
+                //do not reply to the chat
+                //may whisper
+                //std::string responseMessage = BOT_TEXT2("response_lfg_quests_whisper", placeholders);
+                //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                break;
+            }
+        }
+        GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
+    }
+
+    return true;
+}
+
+bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatChannelSource, std::string responseMessage, std::string name)
+{
+    // send responds
+    switch (chatChannelSource)
+    {
+    case ChatChannelSource::SRC_WORLD:
+    {
+        //may reply to the same channel or whisper
+        //GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
+        break;
+    }
+    case ChatChannelSource::SRC_GENERAL:
+    {
+        //may reply to the same channel or whisper
+        //GET_PLAYERBOT_AI(bot)->SayToGeneral(responseMessage);
+        //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+        break;
+    }
+    case ChatChannelSource::SRC_TRADE:
+    {
+        //do not reply to the chat
+        //may whisper
+        break;
+    }
+    case ChatChannelSource::SRC_LOCAL_DEFENSE:
+    {
+        //may reply to the same channel or whisper
+        //GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::LOCAL_DEFENSE);
+        break;
+    }
+    case ChatChannelSource::SRC_WORLD_DEFENSE:
+    {
+        //may whisper
+        break;
+    }
+    case ChatChannelSource::SRC_LOOKING_FOR_GROUP:
+    {
+        //do not reply to the chat
+        //may whisper
+        break;
+    }
+    case ChatChannelSource::SRC_GUILD_RECRUITMENT:
+    {
+        //do not reply to the chat
+        //may whisper
+        break;
+    }
+    case ChatChannelSource::SRC_WHISPER:
+    {
+        //GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+        break;
+    }
+    case ChatChannelSource::SRC_SAY:
+    {
+        //GET_PLAYERBOT_AI(bot)->Say(responseMessage);
+        break;
+    }
+    case ChatChannelSource::SRC_YELL:
+    {
+        //GET_PLAYERBOT_AI(bot)->Yell(responseMessage);
+        break;
+    }
+    case ChatChannelSource::SRC_GUILD:
+    {
+        //GET_PLAYERBOT_AI(bot)->SayToGuild(responseMessage);
+        break;
+    }
+    default:
+        break;
+    }
+    GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
+
+    return true;
+}
+
+std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string incomingMessage, uint32 guid1, std::string name)
+{
+    ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
+
+    std::string respondsText = "";
 
     // Chat Logic
     int32 verb_pos = -1;
     int32 verb_type = -1;
     int32 is_quest = 0;
     bool found = false;
-    std::stringstream text(msg);
+    std::stringstream text(incomingMessage);
     std::string segment;
     std::vector<std::string> word;
     while (std::getline(text, segment, ' '))
@@ -175,7 +405,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
             word.push_back("");
     }
 
-    if (msg.find("?") != std::string::npos)
+    if (incomingMessage.find("?") != std::string::npos)
         is_quest = 1;
     if (word[0].find("what") != std::string::npos)
         is_quest = 2;
@@ -192,15 +422,17 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
     for (uint32 i = 0; i < 8; i++)
     {
         // blame gm with chat tag
-        if (plr && plr->isGMChat())
+        if (Player* plr = ObjectAccessor::FindPlayer(ObjectGuid(HighGuid::Player, guid1)))
         {
-            replyType = REPLY_ADMIN_ABUSE;
-            found = true;
-            break;
+            if (plr->isGMChat())
+            {
+                replyType = REPLY_ADMIN_ABUSE;
+                found = true;
+                break;
+            }
         }
 
-        if (word[i] == "hi" || word[i] == "hey" || word[i] == "hello" || word[i] == "wazzup"
-            || word[i] == "salut" || word[i] == "plop" || word[i] == "yo")
+        if (word[i] == "hi" || word[i] == "hey" || word[i] == "hello" || word[i] == "wazzup")
         {
             replyType = REPLY_HELLO;
             found = true;
@@ -209,27 +441,26 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
 
         if (verb_type < 4)
         {
-            if (word[i] == "am" || word[i] == "are" || word[i] == "is" || word[i] == "suis" || word[i] == "as" || word[i] == "est"
-            || word[i] == "dois" || word[i] == "doit")
+            if (word[i] == "am" || word[i] == "are" || word[i] == "is")
             {
                 verb_pos = i;
                 verb_type = 2; // present
                 if (verb_pos == 0)
                     is_quest = 1;
             }
-            else if (word[i] == "will" || word[i] == "vais" || word[i] == "sera")
+            else if (word[i] == "will")
             {
                 verb_pos = i;
                 verb_type = 3; // future
             }
-            else if (word[i] == "was" || word[i] == "were" || word[i] == "été" || word[i] == "ai" || word[i] == "eu" || word[i] == "étions" || word[i] == "etion" )
+            else if (word[i] == "was" || word[i] == "were")
             {
                 verb_pos = i;
                 verb_type = 1; // past
             }
-            else if (word[i] == "shut" || word[i] == "noob" || word[i] == "tg")
+            else if (word[i] == "shut" || word[i] == "noob")
             {
-                if (msg.find(bot->GetName()) == std::string::npos)
+                if (incomingMessage.find(bot->GetName()) == std::string::npos)
                 {
                     continue; // not react
                     uint32 rnd = urand(0, 2);
@@ -259,292 +490,188 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
     {
         switch (is_quest)
         {
+        case 2:
+        {
+            uint32 rnd = urand(0, 3);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "i dont know what";
+                break;
+            case 1:
+                msg = "i dont know %s";
+                break;
             case 2:
+                msg = "who cares";
+                break;
+            case 3:
+                msg = "afraid that was before i was around or paying attention";
+                break;
+            }
+
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
+        case 3:
+        {
+            uint32 rnd = urand(0, 4);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "nobody";
+                break;
+            case 1:
+                msg = "we all do";
+                break;
+            case 2:
+                msg = "perhaps its you, %s";
+                break;
+            case 3:
+                msg = "dunno %s";
+                break;
+            case 4:
+                msg = "is it me?";
+                break;
+            }
+
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
+        case 4:
+        {
+            uint32 rnd = urand(0, 6);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "soon perhaps %s";
+                break;
+            case 1:
+                msg = "probably later";
+                break;
+            case 2:
+                msg = "never";
+                break;
+            case 3:
+                msg = "what do i look like, a psychic?";
+                break;
+            case 4:
+                msg = "a few minutes, maybe an hour ... years?";
+                break;
+            case 5:
+                msg = "when? good question %s";
+                break;
+            case 6:
+                msg = "dunno %s";
+                break;
+            }
+
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
+        case 5:
+        {
+            uint32 rnd = urand(0, 6);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "really want me to answer that?";
+                break;
+            case 1:
+                msg = "on the map?";
+                break;
+            case 2:
+                msg = "who cares";
+                break;
+            case 3:
+                msg = "afk?";
+                break;
+            case 4:
+                msg = "none of your buisiness where";
+                break;
+            case 5:
+                msg = "yeah, where?";
+                break;
+            case 6:
+                msg = "dunno %s";
+                break;
+            }
+
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
+        case 6:
+        {
+            uint32 rnd = urand(0, 6);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "dunno %s";
+                break;
+            case 1:
+                msg = "why? just because %s";
+                break;
+            case 2:
+                msg = "why is the sky blue?";
+                break;
+            case 3:
+                msg = "dont ask me %s, im just a bot";
+                break;
+            case 4:
+                msg = "your asking the wrong person";
+                break;
+            case 5:
+                msg = "who knows?";
+                break;
+            case 6:
+                msg = "dunno %s";
+                break;
+            }
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
+        default:
+        {
+            switch (verb_type)
+            {
+            case 1:
             {
                 uint32 rnd = urand(0, 3);
                 std::string msg = "";
 
                 switch (rnd)
                 {
-                    case 0:
-                        msg = "i dont know what";
-                        break;
-                    case 1:
-                        msg = "i dont know %s";
-                        break;
-                    case 2:
-                        msg = "who cares";
-                        break;
-                    case 3:
-                        msg = "afraid that was before i was around or paying attention";
-                        break;
-                }
-
-                msg = std::regex_replace(msg, std::regex("%s"), name);
-                respondsText = msg;
-                found = true;
-                break;
-            }
-            case 3:
-            {
-                uint32 rnd = urand(0, 4);
-                std::string msg = "";
-
-                switch (rnd)
-                {
-                    case 0:
-                        msg = "nobody";
-                        break;
-                    case 1:
-                        msg = "we all do";
-                        break;
-                    case 2:
-                        msg = "perhaps its you, %s";
-                        break;
-                    case 3:
-                        msg = "dunno %s";
-                        break;
-                    case 4:
-                        msg = "is it me?";
-                        break;
-                }
-
-                msg = std::regex_replace(msg, std::regex("%s"), name);
-                respondsText = msg;
-                found = true;
-                break;
-            }
-            case 4:
-            {
-                uint32 rnd = urand(0, 6);
-                std::string msg = "";
-
-                switch (rnd)
-                {
-                    case 0:
-                        msg = "soon perhaps %s";
-                        break;
-                    case 1:
-                        msg = "probably later";
-                        break;
-                    case 2:
-                        msg = "never";
-                        break;
-                    case 3:
-                        msg = "what do i look like, a psychic?";
-                        break;
-                    case 4:
-                        msg = "a few minutes, maybe an hour ... years?";
-                        break;
-                    case 5:
-                        msg = "when? good question %s";
-                        break;
-                    case 6:
-                        msg = "dunno %s";
-                        break;
-                }
-
-                msg = std::regex_replace(msg, std::regex("%s"), name);
-                respondsText = msg;
-                found = true;
-                break;
-            }
-            case 5:
-            {
-                uint32 rnd = urand(0, 6);
-                std::string msg = "";
-
-                switch (rnd)
-                {
-                    case 0:
-                        msg = "really want me to answer that?";
-                        break;
-                    case 1:
-                        msg = "on the map?";
-                        break;
-                    case 2:
-                        msg = "who cares";
-                        break;
-                    case 3:
-                        msg = "afk?";
-                        break;
-                    case 4:
-                        msg = "none of your buisiness where";
-                        break;
-                    case 5:
-                        msg = "yeah, where?";
-                        break;
-                    case 6:
-                        msg = "dunno %s";
-                        break;
-                }
-
-                msg = std::regex_replace(msg, std::regex("%s"), name);
-                respondsText = msg;
-                found = true;
-                break;
-            }
-            case 6:
-            {
-                uint32 rnd = urand(0, 6);
-                std::string msg = "";
-
-                switch (rnd)
-                {
-                    case 0:
-                        msg = "dunno %s";
-                        break;
-                    case 1:
-                        msg = "why? just because %s";
-                        break;
-                    case 2:
-                        msg = "why is the sky blue?";
-                        break;
-                    case 3:
-                        msg = "dont ask me %s, im just a bot";
-                        break;
-                    case 4:
-                        msg = "your asking the wrong person";
-                        break;
-                    case 5:
-                        msg = "who knows?";
-                        break;
-                    case 6:
-                        msg = "dunno %s";
-                        break;
-                }
-                msg = std::regex_replace(msg, std::regex("%s"), name);
-                respondsText = msg;
-                found = true;
-                break;
-            }
-            default:
-            {
-                switch (verb_type)
-                {
-                    case 1:
-                    {
-                        uint32 rnd = urand(0, 3);
-                        std::string msg = "";
-
-                        switch (rnd)
-                        {
-                            case 0:
-                                msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 4];
-                                break;
-                            case 1:
-                                msg = "ya %s but thats in the past";
-                                break;
-                            case 2:
-                                msg = "nah, but " + word[verb_pos + 1] + " will " + word[verb_pos + 3] + " again though %s";
-                                break;
-                            case 3:
-                                msg = "afraid that was before i was around or paying attention";
-                                break;
-                        }
-                        msg = std::regex_replace(msg, std::regex("%s"), name);
-                        respondsText = msg;
-                        found = true;
-                        break;
-                    }
-                    case 2:
-                    {
-                        uint32 rnd = urand(0, 6);
-                        std::string msg = "";
-
-                        switch (rnd)
-                        {
-                            case 0:
-                                msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 5];
-                                break;
-                            case 1:
-                                msg = "ya %s thats true";
-                                break;
-                            case 2:
-                                msg = "maybe " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 5];
-                                break;
-                            case 3:
-                                msg = "dunno %s";
-                                break;
-                            case 4:
-                                msg = "i dont think so %s";
-                                break;
-                            case 5:
-                                msg = "yes";
-                                break;
-                            case 6:
-                                msg = "no";
-                                break;
-                        }
-                        msg = std::regex_replace(msg, std::regex("%s"), name);
-                        respondsText = msg;
-                        found = true;
-                        break;
-                    }
-                    case 3:
-                    {
-                        uint32 rnd = urand(0, 8);
-                        std::string msg = "";
-
-                        switch (rnd)
-                        {
-                            case 0:
-                                msg = "dunno %s";
-                                break;
-                            case 1:
-                                msg = "beats me %s";
-                                break;
-                            case 2:
-                                msg = "how should i know %s";
-                                break;
-                            case 3:
-                                msg = "dont ask me %s, im just a bot";
-                                break;
-                            case 4:
-                                msg = "your asking the wrong person";
-                                break;
-                            case 5:
-                                msg = "what do i look like, a psychic?";
-                                break;
-                            case 6:
-                                msg = "sure %s";
-                                break;
-                            case 7:
-                                msg = "i dont think so %s";
-                                break;
-                            case 8:
-                                msg = "maybe";
-                                break;
-                        }
-                        msg = std::regex_replace(msg, std::regex("%s"), name);
-                        respondsText = msg;
-                        found = true;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    else if (!found)
-    {
-        switch (verb_type)
-        {
-            case 1:
-            {
-                uint32 rnd = urand(0, 2);
-                std::string msg = "";
-
-                switch (rnd)
-                {
-                    case 0:
-                        msg = "yeah %s, the key word being " + word[verb_pos] + " " + word[verb_pos + 1];
-                        break;
-                    case 1:
-                        msg = "ya %s but thats in the past";
-                        break;
-                    case 2:
-                        msg = word[verb_pos - 1] + " will " + word[verb_pos + 1] + " again though %s";
-                        break;
+                case 0:
+                    msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 4];
+                    break;
+                case 1:
+                    msg = "ya %s but thats in the past";
+                    break;
+                case 2:
+                    msg = "nah, but " + word[verb_pos + 1] + " will " + word[verb_pos + 3] + " again though %s";
+                    break;
+                case 3:
+                    msg = "afraid that was before i was around or paying attention";
+                    break;
                 }
                 msg = std::regex_replace(msg, std::regex("%s"), name);
                 respondsText = msg;
@@ -553,20 +680,32 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
             }
             case 2:
             {
-                uint32 rnd = urand(0, 2);
+                uint32 rnd = urand(0, 6);
                 std::string msg = "";
 
                 switch (rnd)
                 {
-                    case 0:
-                        msg = "%s, what do you mean " + word[verb_pos + 1] + "?";
-                        break;
-                    case 1:
-                        msg = "%s, what is a " + word[verb_pos + 1] + "?";
-                        break;
-                    case 2:
-                        msg = "yeah i know " + word[verb_pos - 1] + " is a " + word[verb_pos + 1];
-                        break;
+                case 0:
+                    msg = "its true, " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 5];
+                    break;
+                case 1:
+                    msg = "ya %s thats true";
+                    break;
+                case 2:
+                    msg = "maybe " + word[verb_pos + 1] + " " + word[verb_pos] + " " + word[verb_pos + 2] + " " + word[verb_pos + 3] + " " + word[verb_pos + 4] + " " + word[verb_pos + 5];
+                    break;
+                case 3:
+                    msg = "dunno %s";
+                    break;
+                case 4:
+                    msg = "i dont think so %s";
+                    break;
+                case 5:
+                    msg = "yes";
+                    break;
+                case 6:
+                    msg = "no";
+                    break;
                 }
                 msg = std::regex_replace(msg, std::regex("%s"), name);
                 respondsText = msg;
@@ -575,33 +714,125 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
             }
             case 3:
             {
-                uint32 rnd = urand(0, 1);
+                uint32 rnd = urand(0, 8);
                 std::string msg = "";
 
                 switch (rnd)
                 {
-                    case 0:
-                        msg = "are you sure thats going to happen %s?";
-                        break;
-                    case 1:
-                        msg = "%s, what will happen %s?";
-                        break;
-                    case 2:
-                        msg = "are you saying " + word[verb_pos - 1] + " will " + word[verb_pos + 1] + " " + word[verb_pos + 2] + " %s?";
-                        break;
+                case 0:
+                    msg = "dunno %s";
+                    break;
+                case 1:
+                    msg = "beats me %s";
+                    break;
+                case 2:
+                    msg = "how should i know %s";
+                    break;
+                case 3:
+                    msg = "dont ask me %s, im just a bot";
+                    break;
+                case 4:
+                    msg = "your asking the wrong person";
+                    break;
+                case 5:
+                    msg = "what do i look like, a psychic?";
+                    break;
+                case 6:
+                    msg = "sure %s";
+                    break;
+                case 7:
+                    msg = "i dont think so %s";
+                    break;
+                case 8:
+                    msg = "maybe";
+                    break;
                 }
                 msg = std::regex_replace(msg, std::regex("%s"), name);
                 respondsText = msg;
                 found = true;
                 break;
             }
+            }
+        }
+        }
+    }
+    else if (!found)
+    {
+        switch (verb_type)
+        {
+        case 1:
+        {
+            uint32 rnd = urand(0, 2);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "yeah %s, the key word being " + word[verb_pos] + " " + word[verb_pos + 1];
+                break;
+            case 1:
+                msg = "ya %s but thats in the past";
+                break;
+            case 2:
+                msg = word[verb_pos - 1] + " will " + word[verb_pos + 1] + " again though %s";
+                break;
+            }
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
+        case 2:
+        {
+            uint32 rnd = urand(0, 2);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "%s, what do you mean " + word[verb_pos + 1] + "?";
+                break;
+            case 1:
+                msg = "%s, what is a " + word[verb_pos + 1] + "?";
+                break;
+            case 2:
+                msg = "yeah i know " + word[verb_pos ? verb_pos - 1 : verb_pos + 1] + " is a " + word[verb_pos + 1];
+                break;
+            }
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
+        case 3:
+        {
+            uint32 rnd = urand(0, 1);
+            std::string msg = "";
+
+            switch (rnd)
+            {
+            case 0:
+                msg = "are you sure thats going to happen %s?";
+                break;
+            case 1:
+                msg = "%s, what will happen %s?";
+                break;
+            case 2:
+                msg = "are you saying " + word[verb_pos - 1] + " will " + word[verb_pos + 1] + " " + word[verb_pos + 2] + " %s?";
+                break;
+            }
+            msg = std::regex_replace(msg, std::regex("%s"), name);
+            respondsText = msg;
+            found = true;
+            break;
+        }
         }
     }
 
     if (!found)
     {
         // Name Responds
-        if (msg.find(bot->GetName()) != std::string::npos)
+        if (incomingMessage.find(bot->GetName()) != std::string::npos)
         {
             replyType = REPLY_NAME;
             found = true;
@@ -613,77 +844,16 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         }
     }
 
-    // send responds
-    //
-    if (found)
+    // load text if needed
+    if (respondsText.empty())
     {
-        // load text if needed
-        if (respondsText.empty())
-        {
-            respondsText = BOT_TEXT2(replyType, name);
-        }
-        const char* c = respondsText.c_str();
-        if (strlen(c) > 255)
-            return;
-
-        if (chanName == "World")
-        {
-            if (ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId()))
-            {
-                std::string worldChan = "World";
-                if (Channel* chn = cMgr->GetJoinChannel(worldChan.c_str(), 0)) {
-                    if (bot->GetTeamId() == TEAM_ALLIANCE)
-                        chn->Say(bot->GetGUID(), c, LANG_COMMON);
-                    else
-                        chn->Say(bot->GetGUID(), c, LANG_ORCISH);
-                }
-            }
-        }
-        else
-        {
-            if (type == CHAT_MSG_WHISPER)
-            {
-                if (plr)
-                {
-                    if (bot->GetTeamId() == TEAM_ALLIANCE)
-                    {
-                        bot->Whisper(c, LANG_COMMON, plr);
-                    }
-                    else
-                    {
-                        bot->Whisper(c, LANG_ORCISH, plr);
-                    }
-                }
-            }
-
-            else if (type == CHAT_MSG_SAY)
-            {
-                if (bot->GetTeamId() == TEAM_ALLIANCE)
-                    bot->Say(respondsText, LANG_COMMON);
-                else
-                    bot->Say(respondsText, LANG_ORCISH);
-            }
-
-            else if (type == CHAT_MSG_YELL)
-            {
-                if (bot->GetTeamId() == TEAM_ALLIANCE)
-                    bot->Yell(respondsText, LANG_COMMON);
-                else
-                    bot->Yell(respondsText, LANG_ORCISH);
-            }
-
-            else if (type == CHAT_MSG_GUILD)
-            {
-                if (!bot->GetGuildId() || !sPlayerbotAIConfig->randomBotGuildTalk)
-                    return;
-
-                Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-                if (!guild)
-                    return;
-
-                guild->BroadcastToGuild(bot->GetSession(), false, respondsText, LANG_UNIVERSAL);
-            }
-        }
-        GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(nullptr) + urand(5, 25));
+        respondsText = BOT_TEXT2(replyType, name);
     }
+
+    if (respondsText.size() > 255)
+    {
+        respondsText.resize(255);
+    }
+
+    return respondsText;
 }

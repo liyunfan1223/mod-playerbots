@@ -106,6 +106,38 @@ class MinValueCalculator
 		float minValue;
 };
 
+enum ChatChannelSource
+{
+    SRC_GUILD,
+    SRC_WORLD,
+    SRC_GENERAL,
+    SRC_TRADE,
+    SRC_LOOKING_FOR_GROUP,
+    SRC_LOCAL_DEFENSE,
+    SRC_WORLD_DEFENSE,
+    SRC_GUILD_RECRUITMENT,
+
+    SRC_SAY,
+    SRC_WHISPER,
+    SRC_EMOTE,
+    SRC_TEXT_EMOTE,
+    SRC_YELL,
+
+    SRC_PARTY,
+    SRC_RAID,
+
+    SRC_UNDEFINED
+};
+enum ChatChannelId
+{
+    GENERAL = 1,
+    TRADE = 2,
+    LOCAL_DEFENSE = 22,
+    WORLD_DEFENSE = 23,
+    LOOKING_FOR_GROUP = 26,
+    GUILD_RECRUITMENT = 25,
+};
+
 enum RoguePoisonDisplayId
 {
     DEADLY_POISON_DISPLAYID      = 13707,
@@ -356,11 +388,25 @@ class PlayerbotAI : public PlayerbotAIBase
         GameObject* GetGameObject(ObjectGuid guid);
         // static GameObject* GetGameObject(GameObjectData const* gameObjectData);
         WorldObject* GetWorldObject(ObjectGuid guid);
+        std::vector<Player*> GetPlayersInGroup();
+        const AreaTableEntry* GetCurrentArea();
+        const AreaTableEntry* GetCurrentZone();
+        std::string GetLocalizedAreaName(const AreaTableEntry* entry);
+
         bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
         bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
         bool TellMasterNoFacing(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
         bool TellMasterNoFacing(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
         bool TellError(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
+        bool SayToGuild(const std::string& msg);
+        bool SayToWorld(const std::string& msg);
+        bool SayToChannel(const std::string& msg, const ChatChannelId& chanId);
+        bool SayToParty(const std::string& msg);
+        bool SayToRaid(const std::string& msg);
+        bool Yell(const std::string& msg);
+        bool Say(const std::string& msg);
+        bool Whisper(const std::string& msg, const std::string& receiverName);
+
         void SpellInterrupted(uint32 spellid);
         int32 CalculateGlobalCooldown(uint32 spellid);
         void InterruptSpell();
@@ -436,7 +482,7 @@ class PlayerbotAI : public PlayerbotAIBase
         //Check if player is safe to use.
         bool IsSafe(Player* player);
         bool IsSafe(WorldObject* obj);
-
+        ChatChannelSource GetChatChannelSource(Player* bot, uint32 type, std::string channelName);
 
         bool HasCheat(BotCheatMask mask) { return ((uint32)mask & (uint32)cheatMask) != 0 || ((uint32)mask & (uint32)sPlayerbotAIConfig->botCheatMask) != 0; }
         BotCheatMask GetCheat() { return cheatMask; }
@@ -459,6 +505,11 @@ class PlayerbotAI : public PlayerbotAIBase
         bool EqualLowercaseName(std::string s1, std::string s2);
         InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
         uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
+
+        std::vector<const Quest*> GetAllCurrentQuests();
+        std::vector<const Quest*> GetCurrentIncompleteQuests();
+        std::set<uint32> GetAllCurrentQuestIds();
+        std::set<uint32> GetCurrentIncompleteQuestIds();
     private:
         static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore, bool mixed = false);
         bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

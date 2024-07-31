@@ -10,6 +10,7 @@
 class Player;
 class Unit;
 class WorldObject;
+class WorldPacket;
 
 class ServerFacade
 {
@@ -33,6 +34,8 @@ class ServerFacade
         void SetFacingTo(Player* bot, WorldObject* wo, bool force = false);
 
         Unit* GetChaseTarget(Unit* target);
+
+        void SendPacket(Player *player, WorldPacket* packet);
 };
 
 #define sServerFacade ServerFacade::instance()

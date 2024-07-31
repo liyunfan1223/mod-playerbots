@@ -216,13 +216,12 @@ void SuggestWhatToDoAction::something()
     std::map<std::string, std::string> placeholders;
     placeholders["%role"] = chat->FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
 
-    AreaTableEntry const* entry = sAreaTableStore.LookupEntry(bot->GetAreaId());
-    if (!entry)
-        return;
+    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetMap()->GetZoneId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
+    if (!zone) return;
 
     std::ostringstream out;
 //    out << "|cffb04040" << entry->area_name[0] << "|r";
-    out << entry->area_name[_dbc_locale];
+    out << zone->area_name[_dbc_locale];
     placeholders["%zone"] = out.str();
 
     spam(BOT_TEXT2("suggest_something", placeholders), urand(0, 1) ? eTalkType::General : 0, !urand(0, 2), !urand(0, 3));

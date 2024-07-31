@@ -61,6 +61,9 @@ class ChatHelper : public PlayerbotAIAware
 
         void eraseAllSubStr(std::string& mainStr, std::string const toErase);
 
+        static std::set<uint32> ExtractAllQuestIds(const std::string& text);
+        static std::set<uint32> ExtractAllItemIds(const std::string& text);
+
     private:
         static std::map<std::string, uint32> consumableSubClasses;
         static std::map<std::string, uint32> tradeSubClasses;

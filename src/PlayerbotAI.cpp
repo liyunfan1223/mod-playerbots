@@ -38,6 +38,7 @@
 #include "Vehicle.h"
 #include "GuildMgr.h"
 #include "SayAction.h"
+#include "ChannelMgr.h"
 #include <cmath>
 #include <sstream>
 #include <string>
@@ -336,66 +337,9 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
         return;
 
     std::string const mapString = WorldPosition(bot).isOverworld() ? std::to_string(bot->GetMapId()) : "I";
-
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_TOTAL, "PlayerbotAI::UpdateAIInternal " + mapString);
     ExternalEventHelper helper(aiObjectContext);
 
-    std::vector<ChatCommandHolder> delayed;
-    while (!chatCommands.empty())
-    {
-        ChatCommandHolder holder = chatCommands.front();
-        time_t checkTime = holder.GetTime();
-        if (checkTime && time(nullptr) < checkTime)
-        {
-            delayed.push_back(holder);
-            chatCommands.pop();
-            continue;
-        }
-
-        std::string const command = holder.GetCommand();
-        Player* owner = holder.GetOwner();
-        if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
-        {
-             // To prevent spam caused by WIM
-            if (!(command.rfind("WIM", 0) == 0) &&
-                !(command.rfind("QHpr", 0) == 0)
-                )
-            {
-                std::ostringstream out;
-                out << "Unknown command " << command;
-                TellMaster(out);
-                helper.ParseChatCommand("help");
-            }
-        }
-
-        chatCommands.pop();
-    }
-
-    for (std::vector<ChatCommandHolder>::iterator i = delayed.begin(); i != delayed.end(); ++i)
-    {
-        chatCommands.push(*i);
-    }
-
-        // chat replies
-    std::list<ChatQueuedReply> delayedResponses;
-    while (!chatReplies.empty())
-    {
-        ChatQueuedReply holder = chatReplies.front();
-        time_t checkTime = holder.m_time;
-        if (checkTime && time(0) < checkTime)
-        {
-            delayedResponses.push_back(holder);
-            chatReplies.pop();
-            continue;
-        }
-        ChatReplyAction::ChatReplyDo(bot, holder.m_type, holder.m_guid1, holder.m_guid2, holder.m_msg, holder.m_chanName, holder.m_name);
-        chatReplies.pop();
-    }
-
-    for (std::list<ChatQueuedReply>::iterator i = delayedResponses.begin(); i != delayedResponses.end(); ++i)
-    {
-        chatReplies.push(*i);
-    }
 
     // logout if logout timer is ready or if instant logout is possible
     if (bot->GetSession()->isLogingOut())
@@ -1896,6 +1840,197 @@ WorldObject* PlayerbotAI::GetWorldObject(ObjectGuid guid)
         return nullptr;
 
     return ObjectAccessor::GetWorldObject(*bot, guid);
+}
+
+const AreaTableEntry* PlayerbotAI::GetCurrentArea()
+{
+    if (const auto map = bot->GetMap())
+        return sAreaTableStore.LookupEntry(bot->GetMap()->GetAreaId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
+    return nullptr;
+}
+
+const AreaTableEntry* PlayerbotAI::GetCurrentZone()
+{
+    if (const auto map = bot->GetMap())
+        return GetAreaEntryByAreaID(map->GetZoneId(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
+
+    return nullptr;
+}
+
+std::string PlayerbotAI::GetLocalizedAreaName(const AreaTableEntry* entry)
+{
+    if (entry)
+        return entry->area_name[sWorld->GetDefaultDbcLocale()];
+    
+    return "";
+}
+
+std::vector<Player*> PlayerbotAI::GetPlayersInGroup()
+{
+    std::vector<Player*> members;
+
+    Group* group = bot->GetGroup();
+
+    if (!group)
+        return members;
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+
+        if (GET_PLAYERBOT_AI(member) && !GET_PLAYERBOT_AI(member)->IsRealPlayer())
+            continue;
+
+        members.push_back(ref->GetSource());
+    }
+
+    return members;
+}
+
+bool PlayerbotAI::SayToGuild(const std::string& msg)
+{
+    if (msg.empty())
+    {
+        return false;
+    }
+
+    if (bot->GetGuildId())
+    {
+        if (Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId()))
+        {
+            if (!guild->HasRankRight(bot, GR_RIGHT_GCHATSPEAK))
+            {
+                return false;
+            }
+            guild->BroadcastToGuild(bot->GetSession(), false, msg.c_str(), LANG_UNIVERSAL);
+            return true;
+        }
+    }
+
+    return false;
+}
+bool PlayerbotAI::SayToWorld(const std::string& msg)
+{
+    if (msg.empty())
+    {
+        return false;
+    }
+
+    ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+    if (!cMgr)
+    {
+        return false;
+    }
+
+    //no zone
+    if (Channel* worldChannel = cMgr->GetChannel("World", bot))
+    {
+        worldChannel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+        return true;
+    }
+
+    return false;
+}
+bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chanId)
+{
+    ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+    if (!cMgr || msg.empty())
+        return false;
+
+    AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(bot->GetMap()->GetZoneId(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
+    if (!current_zone)
+        return false;
+
+    for (auto const& [key, channel] : cMgr->GetChannels())
+    {
+        //check for current zone
+        if (channel && channel->GetChannelId() == chanId)
+        {
+            const auto does_contains = channel->GetName().find(GetLocalizedAreaName(current_zone)) != std::string::npos;
+            if ((chanId != ChatChannelId::LOOKING_FOR_GROUP && chanId != ChatChannelId::WORLD_DEFENSE) && !does_contains)
+                return false;
+
+            channel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+            return true;
+        }
+    }
+
+    return false;
+}
+bool PlayerbotAI::SayToParty(const std::string& msg)
+{
+    if (!bot->GetGroup())
+        return false;
+
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_PARTY, msg.c_str(), LANG_UNIVERSAL, CHAT_TAG_NONE, bot->GetGUID(), bot->GetName());
+
+    for (auto reciever : GetPlayersInGroup())
+    {
+        sServerFacade->SendPacket(reciever, &data);
+    }
+
+    return true;
+}
+bool PlayerbotAI::SayToRaid(const std::string& msg)
+{
+    if (!bot->GetGroup() || bot->GetGroup()->isRaidGroup())
+        return false;
+
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, msg.c_str(), LANG_UNIVERSAL, CHAT_TAG_NONE, bot->GetGUID(), bot->GetName());
+
+    for (auto reciever : GetPlayersInGroup())
+    {
+        sServerFacade->SendPacket(reciever, &data);
+    }
+
+    return true;
+}
+bool PlayerbotAI::Yell(const std::string& msg)
+{
+    if (bot->GetTeamId() == TeamId::TEAM_ALLIANCE)
+    {
+        bot->Yell(msg, LANG_COMMON);
+    }
+    else
+    {
+        bot->Yell(msg, LANG_ORCISH);
+    }
+
+    return true;
+}
+bool PlayerbotAI::Say(const std::string& msg)
+{
+    if (bot->GetTeamId() == TeamId::TEAM_ALLIANCE)
+    {
+        bot->Say(msg, LANG_COMMON);
+    }
+    else
+    {
+        bot->Say(msg, LANG_ORCISH);
+    }
+
+    return true;
+}
+bool PlayerbotAI::Whisper(const std::string& msg, const std::string& receiverName)
+{
+    const auto receiver = ObjectAccessor::FindPlayerByName(receiverName);
+    if (!receiver)
+    {
+        return false;
+    }
+
+    if (bot->GetTeamId() == TeamId::TEAM_ALLIANCE)
+    {
+        bot->Whisper(msg, LANG_COMMON, receiver);
+    }
+    else
+    {
+        bot->Whisper(msg, LANG_ORCISH, receiver);
+    }
+
+    return true;
 }
 
 bool PlayerbotAI::TellMasterNoFacing(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel)
@@ -4748,4 +4883,172 @@ bool PlayerbotAI::IsSafe(Player* player)
 bool PlayerbotAI::IsSafe(WorldObject* obj)
 {
     return obj && obj->GetMapId() == bot->GetMapId() && obj->GetInstanceId() == bot->GetInstanceId() && (!obj->IsPlayer() || !((Player*)obj)->IsBeingTeleported());
+}
+ChatChannelSource PlayerbotAI::GetChatChannelSource(Player* bot, uint32 type, std::string channelName)
+{
+    if (type == CHAT_MSG_CHANNEL)
+    {
+        if (channelName == "World")
+            return ChatChannelSource::SRC_WORLD;
+        else
+        {
+            ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+            if (!cMgr)
+                return ChatChannelSource::SRC_UNDEFINED;
+
+            const Channel* channel = cMgr->GetChannel(channelName, bot);
+            if (channel)
+            {
+                switch (channel->GetChannelId())
+                {
+                case ChatChannelId::GENERAL:
+                {
+                    return ChatChannelSource::SRC_GENERAL;
+                }
+                case ChatChannelId::TRADE:
+                {
+                    return ChatChannelSource::SRC_TRADE;
+                }
+                case ChatChannelId::LOCAL_DEFENSE:
+                {
+                    return ChatChannelSource::SRC_LOCAL_DEFENSE;
+                }
+                case ChatChannelId::WORLD_DEFENSE:
+                {
+                    return ChatChannelSource::SRC_WORLD_DEFENSE;
+                }
+                case ChatChannelId::LOOKING_FOR_GROUP:
+                {
+                    return ChatChannelSource::SRC_LOOKING_FOR_GROUP;
+                }
+                case ChatChannelId::GUILD_RECRUITMENT:
+                {
+                    return ChatChannelSource::SRC_GUILD_RECRUITMENT;
+                }
+                default:
+                    return ChatChannelSource::SRC_UNDEFINED;
+                }
+            }
+        }
+    }
+    else
+    {
+        switch (type)
+        {
+            case CHAT_MSG_WHISPER:
+            {
+                return ChatChannelSource::SRC_WHISPER;
+            }
+            case CHAT_MSG_SAY:
+            {
+                return ChatChannelSource::SRC_SAY;
+            }
+            case CHAT_MSG_YELL:
+            {
+                return ChatChannelSource::SRC_YELL;
+            }
+            case CHAT_MSG_GUILD:
+            {
+                return ChatChannelSource::SRC_GUILD;
+            }
+            case CHAT_MSG_PARTY:
+            {
+                return ChatChannelSource::SRC_PARTY;
+            }
+            case CHAT_MSG_RAID:
+            {
+                return ChatChannelSource::SRC_RAID;
+            }
+            case CHAT_MSG_EMOTE:
+            {
+                return ChatChannelSource::SRC_EMOTE;
+            }
+            case CHAT_MSG_TEXT_EMOTE:
+            {
+                return ChatChannelSource::SRC_TEXT_EMOTE;
+            }
+            default:
+                return ChatChannelSource::SRC_UNDEFINED;
+        }
+    }
+    return ChatChannelSource::SRC_UNDEFINED;
+}
+std::vector<const Quest*> PlayerbotAI::GetAllCurrentQuests()
+{
+    std::vector<const Quest*> result;
+
+    for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+        {
+            continue;
+        }
+
+        result.push_back(sObjectMgr->GetQuestTemplate(questId));
+    }
+
+    return result;
+}
+
+std::vector<const Quest*> PlayerbotAI::GetCurrentIncompleteQuests()
+{
+    std::vector<const Quest*> result;
+
+    for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+        {
+            continue;
+        }
+
+        QuestStatus status = bot->GetQuestStatus(questId);
+        if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_NONE)
+        {
+            result.push_back(sObjectMgr->GetQuestTemplate(questId));
+        }
+    }
+
+    return result;
+}
+
+std::set<uint32> PlayerbotAI::GetAllCurrentQuestIds()
+{
+    std::set<uint32> result;
+
+    for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+        {
+            continue;
+        }
+
+        result.insert(questId);
+    }
+
+    return result;
+}
+
+std::set<uint32> PlayerbotAI::GetCurrentIncompleteQuestIds()
+{
+    std::set<uint32> result;
+
+    for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+        {
+            continue;
+        }
+
+        QuestStatus status = bot->GetQuestStatus(questId);
+        if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_NONE)
+        {
+            result.insert(questId);
+        }
+    }
+
+    return result;
 }
