@@ -834,9 +834,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             float vcos, vsin, horizontalSpeed, verticalSpeed = 0.f;
 
             p >> guid.ReadAsPacked() >> counter >> vcos >> vsin >> horizontalSpeed >> verticalSpeed;
-            // if (horizontalSpeed <= 0.1f) {
-            //     horizontalSpeed = 0.11f;
-            // }
+            if (horizontalSpeed <= 0.1f) {
+                horizontalSpeed = 0.11f;
+            }
             verticalSpeed = -verticalSpeed;
 
             // stop casting
