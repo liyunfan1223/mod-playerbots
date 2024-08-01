@@ -458,9 +458,6 @@ AiPlayerbot.SyncLevelWithPlayers = 0
 # Mark many quests <= Bot level as complete (slows down bot creation)
 AiPlayerbot.PreQuests = 0
 
-# Bots without a master will say their lines
-AiPlayerbot.RandomBotSayWithoutMaster = 0
-
 # Enable LFG for random bots
 AiPlayerbot.RandomBotJoinLfg = 1
 
@@ -1263,24 +1260,104 @@ AiPlayerbot.CommandPrefix = ""
 # Separator for bot chat commands
 AiPlayerbot.CommandSeparator = "\\\\"
 
-# Enable playerbot to talk in guild
-AiPlayerbot.RandomBotGuildTalk = 1
-
 # Enable playerbot talk (say / yell / general chatting / lfg)
 AiPlayerbot.RandomBotTalk = 0
-
 # Enable playerbot emote
 AiPlayerbot.RandomBotEmote = 0
-
 # Enable dungeon suggestions for random bots
 AiPlayerbot.RandomBotSuggestDungeons = 1
-
 # Bots greet to the players
 AiPlayerbot.EnableGreet = 0
-
+# Chance to reply to toxic links with toxic links (0-100)
+AiPlayerbot.ToxicLinksRepliesChance = 30
+# Chance to reply to thunderfury with thunderfury (0-100)
+AiPlayerbot.ThunderfuryRepliesChance = 40
+# Bots will chat in guild about certain events (int) (0-100)
+AiPlayerbot.GuildRepliesRate = 100         # Reply someone saying something.
+# Bots will chat in guild about certain events
+AIPlayerbot.GuildFeedback = 1
+# Bots without a master will say their lines
+AiPlayerbot.RandomBotSayWithoutMaster = 0
 
 #
 #
+#
+####################################################################################################
+
+####################################################################################################
+#
+# Broadcast rates
+#
+# 1 - to enable broadcasts globally, 0 - to disable (default 1)
+# AiPlayerbot.EnableBroadcasts = 1
+#
+# all broadcast chances should be in range 0-30000
+#
+# value of 0 will disable this particular broadcast
+# setting value to 30000 does not guarantee the broadcast, as there are some internal randoms as well
+#
+# setting channel broadcast chance to 0, will re-route most broadcasts to other available channels
+# setting all channel broadcasts to 0 will disable most broadcasts
+# AiPlayerbot.BroadcastToGuildGlobalChance = 30000
+# AiPlayerbot.BroadcastToWorldGlobalChance = 30000
+# AiPlayerbot.BroadcastToGeneralGlobalChance = 30000
+# AiPlayerbot.BroadcastToTradeGlobalChance = 30000
+# AiPlayerbot.BroadcastToLFGGlobalChance = 30000
+# AiPlayerbot.BroadcastToLocalDefenseGlobalChance = 30000
+# AiPlayerbot.BroadcastToWorldDefenseGlobalChance = 30000
+# AiPlayerbot.BroadcastToGuildRecruitmentGlobalChance = 30000
+#
+# individual settings
+# setting one of these to 0 will disable the particular broadcast
+# AiPlayerbot.BroadcastChanceLootingItemPoor = 30
+# AiPlayerbot.BroadcastChanceLootingItemNormal = 150
+# AiPlayerbot.BroadcastChanceLootingItemUncommon = 10000
+# AiPlayerbot.BroadcastChanceLootingItemRare = 20000
+# AiPlayerbot.BroadcastChanceLootingItemEpic = 30000
+# AiPlayerbot.BroadcastChanceLootingItemLegendary = 30000
+# AiPlayerbot.BroadcastChanceLootingItemArtifact = 30000
+#
+# AiPlayerbot.BroadcastChanceQuestAccepted = 6000
+# AiPlayerbot.BroadcastChanceQuestUpdateObjectiveCompleted = 300
+# AiPlayerbot.BroadcastChanceQuestUpdateObjectiveProgress = 300
+# AiPlayerbot.BroadcastChanceQuestUpdateFailedTimer = 300
+# AiPlayerbot.BroadcastChanceQuestUpdateComplete = 1000
+# AiPlayerbot.BroadcastChanceQuestTurnedIn = 10000
+#
+# AiPlayerbot.BroadcastChanceKillNormal = 30
+# AiPlayerbot.BroadcastChanceKillElite = 300
+# AiPlayerbot.BroadcastChanceKillRareelite = 3000
+# AiPlayerbot.BroadcastChanceKillWorldboss = 20000
+# AiPlayerbot.BroadcastChanceKillRare = 10000
+# AiPlayerbot.BroadcastChanceKillUnknown = 100
+# AiPlayerbot.BroadcastChanceKillPet = 10
+# AiPlayerbot.BroadcastChanceKillPlayer = 30
+#
+# AiPlayerbot.BroadcastChanceLevelupGeneric = 20000
+# AiPlayerbot.BroadcastChanceLevelupTenX = 30000
+# AiPlayerbot.BroadcastChanceLevelupMaxLevel = 30000
+#
+# AiPlayerbot.BroadcastChanceSuggestInstance = 5000
+# AiPlayerbot.BroadcastChanceSuggestQuest = 10000
+# AiPlayerbot.BroadcastChanceSuggestGrindMaterials = 5000
+# AiPlayerbot.BroadcastChanceSuggestGrindReputation = 5000
+# AiPlayerbot.BroadcastChanceSuggestSell = 300
+# AiPlayerbot.BroadcastChanceSuggestSomething = 30000
+#
+# Very rude speeches
+# AiPlayerbot.BroadcastChanceSuggestSomethingToxic = 0
+#
+# Specifically for "<word> [item link]"
+# AiPlayerbot.BroadcastChanceSuggestToxicLinks = 0
+#
+# prefix is used as a word in "<word> [item link]"
+# AiPlayerbot.ToxicLinksPrefix = gnomes
+#
+# chance to suggest thunderfury
+# AiPlayerbot.BroadcastChanceSuggestThunderfury = 1
+#
+# does not depend on global chance
+# AiPlayerbot.BroadcastChanceGuildManagement = 30000
 #
 ####################################################################################################
 

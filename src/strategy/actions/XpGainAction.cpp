@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
-#include "GuildMgr.h"
+#include "BroadcastHelper.h"
 
 bool XpGainAction::Execute(Event event)
 {
@@ -33,19 +33,10 @@ bool XpGainAction::Execute(Event event)
         p >> groupBonus;   // 8 group bonus
     }
 
-    if (sPlayerbotAIConfig->randomBotGuildTalk && bot->GetGuildId() && urand(0, 10))
+    Creature* creature = botAI->GetCreature(guid);
+    if (creature && !creature->GetMap()->IsDungeon())
     {
-        Creature* creature = botAI->GetCreature(guid);
-        if (creature && (creature->isElite() || creature->isWorldBoss() || creature->GetLevel() > 61 || creature->GetLevel() > bot->GetLevel() + 4))
-        {
-            Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
-            if (guild)
-            {
-                std::map<std::string, std::string> args;
-                args["%victim_name"] = creature->GetName();
-                botAI->SayToGuild(BOT_TEXT2("broadcast_killed_rare", args));
-            }
-        }
+        BroadcastHelper::BroadcastKill(botAI, bot, creature);
     }
 
     Unit* victim = nullptr;

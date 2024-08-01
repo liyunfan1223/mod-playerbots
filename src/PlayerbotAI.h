@@ -364,7 +364,7 @@ class PlayerbotAI : public PlayerbotAIBase
 
         std::string const HandleRemoteCommand(std::string const command);
         void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
-        void QueueChatResponse(uint8 msgtype, ObjectGuid guid1, ObjectGuid guid2, std::string message, std::string chanName, std::string name);
+        void QueueChatResponse(uint8& msgtype, ObjectGuid& guid1, ObjectGuid guid2, std::string& message, std::string& chanName, std::string& name);
 	    void HandleBotOutgoingPacket(WorldPacket const& packet);
         void HandleMasterIncomingPacket(WorldPacket const& packet);
         void HandleMasterOutgoingPacket(WorldPacket const& packet);
@@ -525,6 +525,11 @@ class PlayerbotAI : public PlayerbotAIBase
         bool EqualLowercaseName(std::string s1, std::string s2);
         InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
         uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
+        std::vector<Item*> GetInventoryAndEquippedItems();
+        std::vector<Item*> GetInventoryItems();
+        uint32 GetInventoryItemsCountWithId(uint32 itemId);
+        bool HasItemInInventory(uint32 itemId);
+        std::vector<std::pair<const Quest*, uint32>> GetCurrentQuestsRequiringItemId(uint32 itemId);
 
         std::vector<const Quest*> GetAllCurrentQuests();
         std::vector<const Quest*> GetCurrentIncompleteQuests();

@@ -122,7 +122,7 @@ bool SayAction::isUseful()
     return (time(nullptr) - lastSaid) > 30;
 }
 
-void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName, std::string name)
+void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint32& guid2, std::string& msg, std::string& chanName, std::string& name)
 {
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
     std::string respondsText = "";
@@ -165,7 +165,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
     }
 
     //toxic links
-    if (msg.starts_with("gnomes")
+    if (msg.starts_with(sPlayerbotAIConfig->toxicLinksPrefix)
         && (GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg).size() > 0 || GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllQuestIds(msg).size() > 0))
     {
         HandleToxicLinksReply(bot, chatChannelSource, msg, name);
@@ -179,10 +179,11 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32
         return;
     }
 
-    SendGeneralResponse(bot, chatChannelSource, GenerateReplyMessage(bot, msg, guid1, name), name);
+    auto messageRepy = GenerateReplyMessage(bot, msg, guid1, name);
+    SendGeneralResponse(bot, chatChannelSource, messageRepy, name);
 }
 
-bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
 {
     std::map<std::string, std::string> placeholders;
     const auto thunderfury = sObjectMgr->GetItemTemplate(19019);
@@ -208,17 +209,164 @@ bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chat
     return true;
 }
 
-bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
 {
+    //quests
+    std::vector<uint32> incompleteQuests;
+    for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+            continue;
+
+        QuestStatus status = bot->GetQuestStatus(questId);
+        if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_NONE)
+            incompleteQuests.push_back(questId);
+    }
+
+    //items
+    std::vector<Item*> botItems = GET_PLAYERBOT_AI(bot)->GetInventoryAndEquippedItems();
+
+    std::map<std::string, std::string> placeholders;
+    placeholders["%random_inventory_item_link"] = botItems.size() > 0 ? GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatItem(botItems[rand() % botItems.size()]->GetTemplate()) : BOT_TEXT1("string_empty_link");
+    placeholders["%prefix"] = sPlayerbotAIConfig->toxicLinksPrefix;
+
+    if (incompleteQuests.size() > 0)
+    {
+        Quest const* quest = sObjectMgr->GetQuestTemplate(incompleteQuests[rand() % incompleteQuests.size()]);
+        placeholders["%random_taken_quest_or_item_link"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatQuest(quest);
+    }
+    else
+    {
+        placeholders["%random_taken_quest_or_item_link"] = placeholders["%random_inventory_item_link"];
+    }
+
+    placeholders["%my_role"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->getClass());
+    AreaTableEntry const* current_area = GET_PLAYERBOT_AI(bot)->GetCurrentArea();
+    AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
+    placeholders["%area_name"] = current_area ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_area) : BOT_TEXT1("string_unknown_area");
+    placeholders["%zone_name"] = current_zone ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_zone) : BOT_TEXT1("string_unknown_area");
+    placeholders["%my_class"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->getClass());
+    placeholders["%my_race"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatRace(bot->getRace());
+    placeholders["%my_level"] = std::to_string(bot->GetLevel());
+
+    switch (chatChannelSource)
+    {
+        case ChatChannelSource::SRC_WORLD:
+        {
+            GET_PLAYERBOT_AI(bot)->SayToWorld(BOT_TEXT2("suggest_toxic_links", placeholders));
+            break;
+        }
+        case ChatChannelSource::SRC_GENERAL:
+        {
+            GET_PLAYERBOT_AI(bot)->SayToChannel(BOT_TEXT2("suggest_toxic_links", placeholders), ChatChannelId::GENERAL);
+            break;
+        }
+        case ChatChannelSource::SRC_GUILD:
+        {
+            GET_PLAYERBOT_AI(bot)->SayToGuild(BOT_TEXT2("suggest_toxic_links", placeholders));
+            break;
+        }
+    }
+
     GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 60));
+
     return true;
 }
-bool ChatReplyAction::HandleWTBItemsReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+bool ChatReplyAction::HandleWTBItemsReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
 {
-    GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 60));
+    auto messageItemIds = GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg);
+
+    if (messageItemIds.empty())
+    {
+        return false;
+    }
+
+    std::set<uint32> matchingItemIds;
+
+    for (auto messageItemId : messageItemIds)
+    {
+        if (GET_PLAYERBOT_AI(bot)->HasItemInInventory(messageItemId))
+        {
+            matchingItemIds.insert(messageItemId);
+        }
+    }
+
+    if (!matchingItemIds.empty())
+    {
+        std::map<std::string, std::string> placeholders;
+        placeholders["%other_name"] = name;
+        AreaTableEntry const* current_area = GET_PLAYERBOT_AI(bot)->GetCurrentArea();
+        AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
+        placeholders["%area_name"] = current_area ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_area) : BOT_TEXT1("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_zone) : BOT_TEXT1("string_unknown_area");
+        placeholders["%my_class"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->getClass());
+        placeholders["%my_race"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatRace(bot->getRace());
+        placeholders["%my_level"] = std::to_string(bot->GetLevel());
+        placeholders["%my_role"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->GetSpec());
+        placeholders["%formatted_item_links"] = "";
+
+        for (auto matchingItemId : matchingItemIds)
+        {
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(matchingItemId);
+            placeholders["%formatted_item_links"] += GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatItem(proto, GET_PLAYERBOT_AI(bot)->GetInventoryItemsCountWithId(matchingItemId));
+            placeholders["%formatted_item_links"] += " ";
+        }
+
+        switch (chatChannelSource)
+        {
+            case ChatChannelSource::SRC_WORLD:
+            {
+                //may reply to the same channel or whisper
+                if (urand(0, 1))
+                {
+                    std::string responseMessage = BOT_TEXT2("response_wtb_items_channel", placeholders);
+                    GET_PLAYERBOT_AI(bot)->SayToWorld(responseMessage);
+                }
+                else
+                {
+                    std::string responseMessage = BOT_TEXT2("response_wtb_items_whisper", placeholders);
+                    GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                }
+                break;
+            }
+            case ChatChannelSource::SRC_GENERAL:
+            {
+                //may reply to the same channel or whisper
+                if (urand(0, 1))
+                {
+                    std::string responseMessage = BOT_TEXT2("response_wtb_items_channel", placeholders);
+                    GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::GENERAL);
+                }
+                else
+                {
+                    std::string responseMessage = BOT_TEXT2("response_wtb_items_whisper", placeholders);
+                    GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                }
+                break;
+            }
+            case ChatChannelSource::SRC_TRADE:
+            {
+                //may reply to the same channel or whisper
+                if (urand(0, 1))
+                {
+                    std::string responseMessage = BOT_TEXT2("response_wtb_items_channel", placeholders);
+                    GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::TRADE);
+                }
+                else
+                {
+                    std::string responseMessage = BOT_TEXT2("response_wtb_items_whisper", placeholders);
+                    GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+                }
+                break;
+            }
+        }
+        GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 60));
+    }
+
     return true;
 }
-bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatChannelSource, std::string msg, std::string name)
+bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
 {
     auto messageQuestIds = GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllQuestIds(msg);
 
@@ -303,7 +451,7 @@ bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatCh
     return true;
 }
 
-bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatChannelSource, std::string responseMessage, std::string name)
+bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatChannelSource, std::string& responseMessage, std::string& name)
 {
     // send responds
     switch (chatChannelSource)
@@ -341,13 +489,11 @@ bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatCha
         case ChatChannelSource::SRC_LOOKING_FOR_GROUP:
         {
             //do not reply to the chat
-            //may whisper
             break;
         }
         case ChatChannelSource::SRC_GUILD_RECRUITMENT:
         {
             //do not reply to the chat
-            //may whisper
             break;
         }
         case ChatChannelSource::SRC_WHISPER:
@@ -378,7 +524,7 @@ bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatCha
     return true;
 }
 
-std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string incomingMessage, uint32 guid1, std::string name)
+std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string& incomingMessage, uint32& guid1, std::string& name)
 {
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
 

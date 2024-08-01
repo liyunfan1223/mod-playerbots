@@ -10,6 +10,7 @@
 #include "Playerbots.h"
 #include "QuestDef.h"
 #include "WorldPacket.h"
+#include "BroadcastHelper.h"
 
 bool TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver)
 {
@@ -96,14 +97,19 @@ bool TalkToQuestGiverAction::TurnInQuest(Quest const* quest, Object* questGiver,
 
 void TalkToQuestGiverAction::RewardNoItem(Quest const* quest, Object* questGiver, std::ostringstream& out)
 {
+    std::map<std::string, std::string> args;
+    args["%quest"] = chat->FormatQuest(quest);
+    
     if (bot->CanRewardQuest(quest, false))
     {
+        out << BOT_TEXT2("quest_status_completed", args);
+        BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
+
         bot->RewardQuest(quest, 0, questGiver, false);
-        out << "Completed";
     }
     else
     {
-        out << "|cffff0000Unable to turn in|r";
+        out << BOT_TEXT2("quest_status_unable_to_complete", args);
     }
 }
 
@@ -111,15 +117,19 @@ void TalkToQuestGiverAction::RewardSingleItem(Quest const* quest, Object* questG
 {
     int index = 0;
     ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[index]);
+    std::map<std::string, std::string> args;
+    args["%quest"] = chat->FormatQuest(quest);
+    args["%item"] = chat->FormatItem(item);
+
     if (bot->CanRewardQuest(quest, index, false))
     {
+        out << BOT_TEXT2("quest_status_complete_single_reward", args);
+        BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
         bot->RewardQuest(quest, index, questGiver, true);
-
-        out << "Rewarded " << chat->FormatItem(item);
     }
     else
     {
-        out << "|cffff0000Unable to turn in:|r, reward: " << chat->FormatItem(item);
+        out << BOT_TEXT2("quest_status_unable_to_complete", args);
     }
 }
 

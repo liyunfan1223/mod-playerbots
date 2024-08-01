@@ -344,11 +344,11 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
     std::list<ChatQueuedReply> delayedResponses;
     while (!chatReplies.empty())
     {
-        ChatQueuedReply holder = chatReplies.front();
+        ChatQueuedReply& holder = chatReplies.front();
         time_t checkTime = holder.m_time;
         if (checkTime && time(0) < checkTime)
         {
-            delayedResponses.push_back(holder);
+            delayedResponses.push_back(std::move(holder));
             chatReplies.pop();
             continue;
         }
@@ -420,11 +420,11 @@ void PlayerbotAI::HandleCommands()
     std::list<ChatCommandHolder> delayed;
     while (!chatCommands.empty())
     {
-        ChatCommandHolder holder = chatCommands.front();
+        ChatCommandHolder& holder = chatCommands.front();
         time_t checkTime = holder.GetTime();
         if (checkTime && time(0) < checkTime)
         {
-            delayed.push_back(holder);
+            delayed.push_back(std::move(holder));
             chatCommands.pop();
             continue;
         }
@@ -940,6 +940,11 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                 p >> guid1 >> unused;
                 if (guid1.IsEmpty() || p.size() > p.DEFAULT_SIZE)
                     return;
+                if (p.GetOpcode() == SMSG_GM_MESSAGECHAT)
+                {
+                    p >> textLen;
+                    p >> name;
+                }
 
                 switch (msgtype)
                 {
@@ -965,6 +970,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     bool isPaused = time(0) < lastChat;
                     bool shouldReply = false;
                     bool isFromFreeBot = false;
+                    if (!sCharacterCache->GetCharacterNameByGuid(guid1, name)) {/*sould return or ?*/}
                     uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid1);
                     isFromFreeBot = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
                     bool isMentioned = message.find(bot->GetName()) != std::string::npos;
@@ -984,34 +990,43 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     if (lang == LANG_ADDON)
                         return;
 
-                    // several talk config option later
-                    /*
-
-                        TODO:
-                        toxic link
-                        legendary grind / thunderfury etc
-
-                    */
-                    if (isFromFreeBot && urand(0, 20))
-                        return;
-
-                    //if (msgtype == CHAT_MSG_GUILD && (!sPlayerbotAIConfig->guildRepliesRate || urand(1, 100) >= sPlayerbotAIConfig->guildRepliesRate))
-                        //return;
-
-                    if (!isFromFreeBot)
+                    if (message.starts_with(sPlayerbotAIConfig->toxicLinksPrefix)
+                    && (GetChatHelper()->ExtractAllItemIds(message).size() > 0 || GetChatHelper()->ExtractAllQuestIds(message).size() > 0)
+                    && sPlayerbotAIConfig->toxicLinksRepliesChance)
                     {
-                        if (!isMentioned && urand(0, 4))
+                        if (urand(0, 50) > 0 || urand(1, 100) > sPlayerbotAIConfig->toxicLinksRepliesChance)
+                        {
                             return;
+                        }
+                    }
+                    else if ((GetChatHelper()->ExtractAllItemIds(message).count(19019) && sPlayerbotAIConfig->thunderfuryRepliesChance))
+                    {
+                        if (urand(0, 60) > 0 || urand(1, 100) > sPlayerbotAIConfig->thunderfuryRepliesChance)
+                        {
+                            return;
+                        }
                     }
                     else
                     {
-                        if (urand(0, 20 + 10 * isMentioned))
+                        if (isFromFreeBot && urand(0, 20))
                             return;
-                    }
 
+                        //if (msgtype == CHAT_MSG_GUILD && (!sPlayerbotAIConfig->guildRepliesRate || urand(1, 100) >= sPlayerbotAIConfig->guildRepliesRate))
+                            //return;
+
+                        if (!isFromFreeBot)
+                        {
+                            if (!isMentioned && urand(0, 4))
+                                return;
+                        }
+                        else
+                        {
+                            if (urand(0, 20 + 10 * isMentioned))
+                                return;
+                        }
+                    }
                     QueueChatResponse(msgtype, guid1, ObjectGuid(), message, chanName, name);
                     GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
-
                     return;
                 }
             }
@@ -4653,6 +4668,209 @@ Item* PlayerbotAI::FindOilFor(Item* weapon) const
     return oil;
 }
 
+std::vector<Item*> PlayerbotAI::GetInventoryAndEquippedItems()
+{
+    std::vector<Item*> items;
+
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    items.push_back(pItem);
+                }
+            }
+        }
+    }
+
+    for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            items.push_back(pItem);
+        }
+    }
+
+    for (int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            items.push_back(pItem);
+        }
+    }
+
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        {
+            items.push_back(pItem);
+        }
+    }
+
+    return items;
+}
+
+std::vector<Item*> PlayerbotAI::GetInventoryItems()
+{
+    std::vector<Item*> items;
+
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    items.push_back(pItem);
+                }
+            }
+        }
+    }
+
+    for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            items.push_back(pItem);
+        }
+    }
+
+    for (int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            items.push_back(pItem);
+        }
+    }
+
+    return items;
+}
+
+uint32 PlayerbotAI::GetInventoryItemsCountWithId(uint32 itemId)
+{
+    uint32 count = 0;
+
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    if (pItem->GetTemplate()->ItemId == itemId)
+                    {
+                        count += pItem->GetCount();
+                    }
+                }
+            }
+        }
+    }
+
+    for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetTemplate()->ItemId == itemId)
+            {
+                count += pItem->GetCount();
+            }
+        }
+    }
+
+    for (int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetTemplate()->ItemId == itemId)
+            {
+                count += pItem->GetCount();
+            }
+        }
+    }
+
+    return count;
+}
+
+bool PlayerbotAI::HasItemInInventory(uint32 itemId)
+{
+
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    if (pItem->GetTemplate()->ItemId == itemId)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetTemplate()->ItemId == itemId)
+            {
+                return true;
+            }
+        }
+    }
+
+    for (int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetTemplate()->ItemId == itemId)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+std::vector<std::pair<const Quest*, uint32>> PlayerbotAI::GetCurrentQuestsRequiringItemId(uint32 itemId)
+{
+    std::vector<std::pair<const Quest*, uint32>> result;
+
+    if (!itemId)
+    {
+        return result;
+    }
+
+    for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+            continue;
+
+        QuestStatus status = bot->GetQuestStatus(questId);
+        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        for (uint8 i = 0; i < std::size(quest->RequiredItemId); ++i)
+        {
+            if (quest->RequiredItemId[i] == itemId)
+            {
+                result.push_back(std::pair(quest, quest->RequiredItemId[i]));
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
 //  on self
 void PlayerbotAI::ImbueItem(Item* item)
 {
@@ -4807,9 +5025,9 @@ bool PlayerbotAI::IsInRealGuild()
     return !(sPlayerbotAIConfig->IsInRandomAccountList(leaderAccount));
 }
 
-void PlayerbotAI::QueueChatResponse(uint8 msgtype, ObjectGuid guid1, ObjectGuid guid2, std::string message, std::string chanName, std::string name)
+void PlayerbotAI::QueueChatResponse(uint8& msgtype, ObjectGuid& guid1, ObjectGuid guid2, std::string& message, std::string& chanName, std::string& name)
 {
-    chatReplies.push(ChatQueuedReply(msgtype, guid1.GetCounter(), guid2.GetCounter(), message, chanName, name, time(nullptr) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15)));
+    chatReplies.push({ msgtype, guid1.GetCounter(), guid2.GetCounter(), message, chanName, name, time(nullptr) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15) });
 }
 
 bool PlayerbotAI::EqualLowercaseName(std::string s1, std::string s2)

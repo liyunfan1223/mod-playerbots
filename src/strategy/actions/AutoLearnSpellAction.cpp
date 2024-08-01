@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
-#include "GuildMgr.h"
+#include "BroadcastHelper.h"
 
 bool AutoLearnSpellAction::Execute(Event event)
 {
@@ -30,18 +30,12 @@ bool AutoLearnSpellAction::Execute(Event event)
 
 void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
 {
+    BroadcastHelper::BroadcastLevelup(botAI, bot);
     if (sPlayerbotAIConfig->autoLearnTrainerSpells)
         LearnTrainerSpells(out);
 
     if (sPlayerbotAIConfig->autoLearnQuestSpells)
         LearnQuestSpells(out);
-
-    if (sPlayerbotAIConfig->randomBotGuildTalk)
-    {
-        std::map<std::string, std::string> args;
-        args["%my_level"] = std::to_string(bot->GetLevel());
-        botAI->SayToGuild(BOT_TEXT2("broadcast_levelup_generic", args));
-    }
 }
 
 void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)

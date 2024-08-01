@@ -24,8 +24,10 @@ class SuggestWhatToDoAction : public InventoryAction
         void grindReputation();
         void grindMaterials();
         void something();
-        void spam(std::string msg, uint8 flags = 0, bool worldChat = false, bool guild = false);
-
+        void toxicLinks();
+        void somethingToxic();
+        void thunderfury();
+ 
         std::vector<uint32> GetIncompletedQuests();
 
     private:

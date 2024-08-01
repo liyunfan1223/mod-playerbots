@@ -7,6 +7,7 @@
 #include "GuildPackets.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "BroadcastHelper.h"
 
 Player* GuidManageAction::GetPlayer(Event event)
 {
@@ -167,6 +168,7 @@ bool GuildManageNearbyAction::Execute(Event event)
             {
                 if (!urand(0, 10))
                 {
+                    BroadcastHelper::BroadcastGuildMemberPromotion(botAI, bot, player);
                     botAI->DoSpecificAction("guild promote", Event("guild management", guid), true);
 
                     continue;

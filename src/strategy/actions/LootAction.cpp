@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "GuildMgr.h"
+#include "BroadcastHelper.h"
 
 bool LootAction::Execute(Event event)
 {
@@ -417,19 +418,7 @@ bool StoreLootAction::Execute(Event event)
         if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
-        if (sPlayerbotAIConfig->randomBotGuildTalk && urand(0, 10) && proto->Quality >= ITEM_QUALITY_RARE)
-        {
-            std::map<std::string, std::string> args;
-            args["%item"] = chat->FormatItem(proto);
-            botAI->SayToGuild(BOT_TEXT2("loot_command", args));
-        }
-
-        // std::ostringstream out;
-        // out << "Looting " << chat->FormatItem(proto);
-        // botAI->TellMasterNoFacing(out.str());
-
-        //ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", proto->ItemId);
-        //LOG_ERROR("playerbots", "Bot {} is looting {} {} for usage {}.", bot->GetName().c_str(), itemcount, proto->Name1.c_str(), usage);
+        BroadcastHelper::BroadcastLootingItem(botAI, bot, proto);
     }
 
     AI_VALUE(LootObjectStack*, "available loot")->Remove(guid);

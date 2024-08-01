@@ -95,11 +95,78 @@ class PlayerbotAIConfig
         uint32 randomBotsPerInterval;
         uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
         bool randomBotJoinLfg;
+        
+        // chat
         bool randomBotTalk;
         bool randomBotEmote;
         bool randomBotSuggestDungeons;
-        bool randomBotGuildTalk;
+        bool enableBroadcasts;
+        bool enableGreet;
+        bool randomBotSayWithoutMaster;
+
+        uint32 broadcastChanceMaxValue;
+
+        uint32 broadcastToGuildGlobalChance;
+        uint32 broadcastToWorldGlobalChance;
+        uint32 broadcastToGeneralGlobalChance;
+        uint32 broadcastToTradeGlobalChance;
+        uint32 broadcastToLFGGlobalChance;
+        uint32 broadcastToLocalDefenseGlobalChance;
+        uint32 broadcastToWorldDefenseGlobalChance;
+        uint32 broadcastToGuildRecruitmentGlobalChance;
+
+        uint32 broadcastChanceLootingItemPoor;
+        uint32 broadcastChanceLootingItemNormal;
+        uint32 broadcastChanceLootingItemUncommon;
+        uint32 broadcastChanceLootingItemRare;
+        uint32 broadcastChanceLootingItemEpic;
+        uint32 broadcastChanceLootingItemLegendary;
+        uint32 broadcastChanceLootingItemArtifact;
+
+        uint32 broadcastChanceQuestAccepted;
+        uint32 broadcastChanceQuestUpdateObjectiveCompleted;
+        uint32 broadcastChanceQuestUpdateObjectiveProgress;
+        uint32 broadcastChanceQuestUpdateFailedTimer;
+        uint32 broadcastChanceQuestUpdateComplete;
+        uint32 broadcastChanceQuestTurnedIn;
+
+        uint32 broadcastChanceKillNormal;
+        uint32 broadcastChanceKillElite;
+        uint32 broadcastChanceKillRareelite;
+        uint32 broadcastChanceKillWorldboss;
+        uint32 broadcastChanceKillRare;
+        uint32 broadcastChanceKillUnknown;
+        uint32 broadcastChanceKillPet;
+        uint32 broadcastChanceKillPlayer;
+
+        uint32 broadcastChanceLevelupGeneric;
+        uint32 broadcastChanceLevelupTenX;
+        uint32 broadcastChanceLevelupMaxLevel;
+
+        uint32 broadcastChanceSuggestInstance;
+        uint32 broadcastChanceSuggestQuest;
+        uint32 broadcastChanceSuggestGrindMaterials;
+        uint32 broadcastChanceSuggestGrindReputation;
+        uint32 broadcastChanceSuggestSell;
+        uint32 broadcastChanceSuggestSomething;
+
+        uint32 broadcastChanceSuggestSomethingToxic;
+
+        uint32 broadcastChanceSuggestToxicLinks;
+        std::string toxicLinksPrefix;
+        uint32 toxicLinksRepliesChance;
+
+        uint32 broadcastChanceSuggestThunderfury;
+        uint32 thunderfuryRepliesChance;
+
+        uint32 broadcastChanceGuildManagement;
+
+        uint32 guildRepliesRate;
+
         bool suggestDungeonsInLowerCaseRandomly;
+
+        // --
+
         bool randomBotJoinBG;
         bool randomBotAutoJoinBG;
         uint32 randomBotAutoJoinWarsongBracket;
@@ -181,8 +248,6 @@ class PlayerbotAIConfig
 
         uint32 commandServerPort;
         bool perfMonEnabled;
-
-        bool enableGreet;
         bool summonWhenGroup;
         bool randomBotShowHelmet;
         bool randomBotShowCloak;
@@ -212,8 +277,6 @@ class PlayerbotAIConfig
         bool freeFood;
         bool autoLearnQuestSpells;
         bool autoTeleportForLevel;
-        bool randomBotSayWithoutMaster;
-        bool sayWhenCollectingItems;
         bool randomBotGroupNearby;
         uint32 tweakValue; //Debugging config
 
