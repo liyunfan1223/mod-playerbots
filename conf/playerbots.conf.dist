@@ -1273,7 +1273,7 @@ AiPlayerbot.ToxicLinksRepliesChance = 30
 # Chance to reply to thunderfury with thunderfury (0-100)
 AiPlayerbot.ThunderfuryRepliesChance = 40
 # Bots will chat in guild about certain events (int) (0-100)
-AiPlayerbot.GuildRepliesRate = 100         # Reply someone saying something.
+AiPlayerbot.GuildRepliesRate = 100
 # Bots will chat in guild about certain events
 AIPlayerbot.GuildFeedback = 1
 # Bots without a master will say their lines

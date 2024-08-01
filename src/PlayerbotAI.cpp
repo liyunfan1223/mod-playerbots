@@ -345,7 +345,7 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
     while (!chatReplies.empty())
     {
         ChatQueuedReply& holder = chatReplies.front();
-        time_t checkTime = holder.m_time;
+        time_t& checkTime = holder.m_time;
         if (checkTime && time(0) < checkTime)
         {
             delayedResponses.push_back(std::move(holder));
@@ -940,6 +940,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                 p >> guid1 >> unused;
                 if (guid1.IsEmpty() || p.size() > p.DEFAULT_SIZE)
                     return;
+
                 if (p.GetOpcode() == SMSG_GM_MESSAGECHAT)
                 {
                     p >> textLen;
@@ -960,7 +961,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                         p >> textLen >> message >> chatTag;
                         break;
                     default:
-                        break;
+                        return;
                 }
 
                 // do not reply to self but always try to reply to real player
@@ -970,7 +971,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     bool isPaused = time(0) < lastChat;
                     bool shouldReply = false;
                     bool isFromFreeBot = false;
-                    if (!sCharacterCache->GetCharacterNameByGuid(guid1, name)) {/*sould return or ?*/}
+                    sCharacterCache->GetCharacterNameByGuid(guid1, name);
                     uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid1);
                     isFromFreeBot = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
                     bool isMentioned = message.find(bot->GetName()) != std::string::npos;
@@ -2194,19 +2195,16 @@ bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chan
         return false;
 
     AreaTableEntry const* current_zone = GetCurrentZone();
-    AreaTableEntry const* current_area = GetCurrentArea();
-    if (!current_zone || !current_area)
+    if (!current_zone)
         return false;
 
     const auto current_str_zone = GetLocalizedAreaName(current_zone);
-    const auto current_str_area = GetLocalizedAreaName(current_area);
-
     for (auto const& [key, channel] : cMgr->GetChannels())
     {
         //check for current zone
         if (channel && channel->GetChannelId() == chanId)
         {
-            const auto does_contains = channel->GetName().find(current_str_zone) != std::string::npos || channel->GetName().find(current_str_area) != std::string::npos;
+            const auto does_contains = channel->GetName().find(current_str_zone) != std::string::npos;
             if (chanId != ChatChannelId::LOOKING_FOR_GROUP && chanId != ChatChannelId::WORLD_DEFENSE && !does_contains)
             {
                 continue;

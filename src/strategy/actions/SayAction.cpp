@@ -2,6 +2,7 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
+#include "AiFactory.h"
 #include "SayAction.h"
 #include "Event.h"
 #include "Playerbots.h"
@@ -241,7 +242,7 @@ bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatC
         placeholders["%random_taken_quest_or_item_link"] = placeholders["%random_inventory_item_link"];
     }
 
-    placeholders["%my_role"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->getClass());
+    placeholders["%my_role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
     AreaTableEntry const* current_area = GET_PLAYERBOT_AI(bot)->GetCurrentArea();
     AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
     placeholders["%area_name"] = current_area ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_area) : BOT_TEXT1("string_unknown_area");
@@ -303,7 +304,7 @@ bool ChatReplyAction::HandleWTBItemsReply(Player* bot, ChatChannelSource chatCha
         placeholders["%my_class"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
-        placeholders["%my_role"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->GetSpec());
+        placeholders["%my_role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
         placeholders["%formatted_item_links"] = "";
 
         for (auto matchingItemId : matchingItemIds)
@@ -396,7 +397,7 @@ bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatCh
         placeholders["%my_class"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
-        placeholders["%my_role"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatClass(bot, bot->GetActiveSpec());
+        placeholders["%my_role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
         placeholders["%quest_links"] = "";
         for (auto matchingQuestId : matchingQuestIds)
         {
