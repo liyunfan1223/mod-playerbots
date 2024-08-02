@@ -42,6 +42,7 @@
 #include "NonCombatActions.h"
 #include "OutfitAction.h"
 #include "PositionAction.h"
+#include "DropQuestAction.h"
 #include "RandomBotUpdateAction.h"
 #include "ReachTargetActions.h"
 #include "ReleaseSpiritAction.h"
@@ -180,6 +181,7 @@ class ActionContext : public NamedObjectContext<Action>
             creators["turn in petition"] = &ActionContext::turn_in_petition;
             creators["buy tabard"] = &ActionContext::buy_tabard;
             creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
+            creators["clean quest log"] = &ActionContext::clean_quest_log;
 
             // BG Tactics
             creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -351,6 +353,7 @@ class ActionContext : public NamedObjectContext<Action>
         static Action* turn_in_petition(PlayerbotAI* botAI) { return new PetitionTurnInAction(botAI); }
         static Action* buy_tabard(PlayerbotAI* botAI) { return new BuyTabardAction(botAI); }
         static Action* guild_manage_nearby(PlayerbotAI* botAI) { return new GuildManageNearbyAction(botAI); }
+        static Action* clean_quest_log(PlayerbotAI* botAI) { return new CleanQuestLogAction(botAI); }
 
         // BG Tactics
         static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }
