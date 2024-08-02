@@ -4410,11 +4410,11 @@ bool BGTactics::moveToObjective()
         //std::ostringstream out; out << "Moving to objective " << pos.x << ", " << pos.y << ", Distance: " << sServerFacade->GetDistance2d(bot, pos.x, pos.y);
         //bot->Say(out.str(), LANG_UNIVERSAL);
 
-        // more precise position for wsg and AV (flags in AV towers require precision)
-        if (bgType == BATTLEGROUND_WS || bgType == BATTLEGROUND_AV)
+        // more precise position for wsg
+        if (bgType == BATTLEGROUND_WS)
             return MoveTo(bot->GetMapId(), pos.x, pos.y, pos.z);
         else
-            return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z, 3.0f);
+            return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z, 1.5f);//note - don't make distance too large or horde bots may struggle to get flags in alliance AV towers (because they'll be targetting a spot in midair)
     }
     return false;
 }
@@ -4774,9 +4774,9 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
         if (!bot->CanUseBattlegroundObject(go) && bgType != BATTLEGROUND_WS)
             continue;
 
-        if (flagRange)
-            if (!bot->IsWithinDistInMap(go, flagRange))
-                continue;
+        float const dist = sqrt(bot->GetDistance(go));
+        if (flagRange && dist > flagRange)
+            continue;
 
         bool atBase = bgType == BATTLEGROUND_WS ? go->GetEntry() == vFlagsWS[bot->GetTeamId()] : bgType == BATTLEGROUND_EY ? go->GetEntry() == vFlagsEY[0] : false;
 
@@ -4789,6 +4789,13 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             case BATTLEGROUND_AB:
             case BATTLEGROUND_IC:
             {
+                if (dist == 0.0f)
+                {
+                    // this is to prevent bots capping while standing INSIDE the flag pole (which can be thick enough to hide player entirely)
+                    // note that dist is taking into account size of object and bot (it's the space between outside of both) so moveDist needs to as well
+                    float const moveDist = bot->GetObjectSize() + go->GetObjectSize() + 0.1f;
+                    return MoveTo(bot->GetMapId(), go->GetPositionX() + (urand(0, 1) ? -moveDist : moveDist), go->GetPositionY() + (urand(0, 1) ? -moveDist : moveDist), go->GetPositionZ());
+                }
                 if (bot->IsMounted())
                     bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
@@ -4820,7 +4827,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             }
             case BATTLEGROUND_WS:
             {
-                if (bot->IsWithinDistInMap(go, INTERACTION_DISTANCE))
+                if (dist < INTERACTION_DISTANCE)
                 {
                     if (atBase)
                     {
@@ -4868,7 +4875,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             }
             case BATTLEGROUND_EY:
             {
-                if (bot->IsWithinDistInMap(go, INTERACTION_DISTANCE))
+                if (dist < INTERACTION_DISTANCE)
                 {
                     if (bot->IsMounted())
                         bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
