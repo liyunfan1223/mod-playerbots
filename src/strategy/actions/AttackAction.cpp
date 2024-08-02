@@ -95,11 +95,11 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
         return false;
     }
 
-    if (bot->IsMounted() && bot->IsWithinLOSInMap(target))
-    {
-        WorldPacket emptyPacket;
-        bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
-    }
+    // if (bot->IsMounted() && bot->IsWithinLOSInMap(target))
+    // {
+    //     WorldPacket emptyPacket;
+    //     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+    // }
 
     ObjectGuid guid = target->GetGUID();
     bot->SetSelection(target->GetGUID());
