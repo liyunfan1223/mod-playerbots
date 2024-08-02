@@ -4827,7 +4827,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             }
             case BATTLEGROUND_WS:
             {
-                if (bot->IsWithinDistInMap(go, INTERACTION_DISTANCE))
+                if (dist < INTERACTION_DISTANCE)
                 {
                     if (atBase)
                     {
@@ -4875,7 +4875,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             }
             case BATTLEGROUND_EY:
             {
-                if (bot->IsWithinDistInMap(go, INTERACTION_DISTANCE))
+                if (dist < INTERACTION_DISTANCE)
                 {
                     if (bot->IsMounted())
                         bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
