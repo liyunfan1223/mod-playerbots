@@ -340,10 +340,10 @@ class ChatCommandHolder
         ChatCommandHolder(std::string const command, Player* owner = nullptr, uint32 type = CHAT_MSG_WHISPER, time_t time = 0) : command(command), owner(owner), type(type), time(time) { }
         ChatCommandHolder(ChatCommandHolder const& other) : command(other.command), owner(other.owner), type(other.type), time(other.time) { }
 
-        std::string const GetCommand() { return command; }
+        const std::string& GetCommand() { return command; }
         Player* GetOwner() { return owner; }
-        uint32 GetType() { return type; }
-        time_t GetTime() { return time; }
+        uint32& GetType() { return type; }
+        time_t& GetTime() { return time; }
 
     private:
         std::string const command;
@@ -364,7 +364,7 @@ class PlayerbotAI : public PlayerbotAIBase
 
         std::string const HandleRemoteCommand(std::string const command);
         void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
-        void QueueChatResponse(uint8& msgtype, ObjectGuid& guid1, ObjectGuid guid2, std::string& message, std::string& chanName, std::string& name);
+        void QueueChatResponse(const ChatQueuedReply reply);
 	    void HandleBotOutgoingPacket(WorldPacket const& packet);
         void HandleMasterIncomingPacket(WorldPacket const& packet);
         void HandleMasterOutgoingPacket(WorldPacket const& packet);
@@ -551,8 +551,8 @@ class PlayerbotAI : public PlayerbotAIBase
         Engine* engines[BOT_STATE_MAX];
         BotState currentState;
         ChatHelper chatHelper;
-        std::queue<ChatCommandHolder> chatCommands;
-        std::queue<ChatQueuedReply> chatReplies;
+        std::list<ChatCommandHolder> chatCommands;
+        std::list<ChatQueuedReply> chatReplies;
         PacketHandlingHelper botOutgoingPacketHandlers;
         PacketHandlingHelper masterIncomingPacketHandlers;
         PacketHandlingHelper masterOutgoingPacketHandlers;

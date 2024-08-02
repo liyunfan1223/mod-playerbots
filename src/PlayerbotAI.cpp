@@ -341,25 +341,17 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
     ExternalEventHelper helper(aiObjectContext);
 
     // chat replies
-    std::list<ChatQueuedReply> delayedResponses;
-    while (!chatReplies.empty())
+    for (auto it = chatReplies.begin(); it != chatReplies.end(); )
     {
-        ChatQueuedReply& holder = chatReplies.front();
-        time_t& checkTime = holder.m_time;
+        time_t checkTime = it->m_time;
         if (checkTime && time(0) < checkTime)
         {
-            delayedResponses.push_back(std::move(holder));
-            chatReplies.pop();
+            ++it;
             continue;
         }
 
-        ChatReplyAction::ChatReplyDo(bot, holder.m_type, holder.m_guid1, holder.m_guid2, holder.m_msg, holder.m_chanName, holder.m_name);
-        chatReplies.pop();
-    }
-
-    for (std::list<ChatQueuedReply>::iterator i = delayedResponses.begin(); i != delayedResponses.end(); ++i)
-    {
-        chatReplies.push(*i);
+        ChatReplyAction::ChatReplyDo(bot, it->m_type, it->m_guid1, it->m_guid2, it->m_msg, it->m_chanName, it->m_name);
+        it = chatReplies.erase(it);
     }
 
     HandleCommands();
@@ -417,33 +409,24 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
 void PlayerbotAI::HandleCommands()
 {
     ExternalEventHelper helper(aiObjectContext);
-    std::list<ChatCommandHolder> delayed;
-    while (!chatCommands.empty())
+    for (auto it = chatCommands.begin(); it != chatCommands.end(); )
     {
-        ChatCommandHolder& holder = chatCommands.front();
-        time_t checkTime = holder.GetTime();
+        time_t& checkTime = it->GetTime();
         if (checkTime && time(0) < checkTime)
         {
-            delayed.push_back(std::move(holder));
-            chatCommands.pop();
+            ++it;
             continue;
         }
 
-        std::string command = holder.GetCommand();
-        Player* owner = holder.GetOwner();
-        if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
+        const std::string& command = it->GetCommand();
+        Player* owner = it->GetOwner();
+        if (!helper.ParseChatCommand(command, owner) && it->GetType() == CHAT_MSG_WHISPER)
         {
             //ostringstream out; out << "Unknown command " << command;
             //TellPlayer(out);
             //helper.ParseChatCommand("help");
         }
-
-        chatCommands.pop();
-    }
-
-    for (std::list<ChatCommandHolder>::iterator i = delayed.begin(); i != delayed.end(); ++i)
-    {
-        chatCommands.push(*i);
+        it = chatCommands.erase(it);
     }
 }
 
@@ -523,8 +506,7 @@ void PlayerbotAI::HandleCommand(uint32 type, const std::string& text, Player& fr
 
     if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos && filtered.find("award") == std::string::npos)
     {
-        ChatCommandHolder cmd("warning", &fromPlayer, type);
-        chatCommands.push(cmd);
+        chatCommands.push_back(ChatCommandHolder("warning", &fromPlayer, type));
         return;
     }
 
@@ -560,8 +542,8 @@ void PlayerbotAI::HandleCommand(uint32 type, const std::string& text, Player& fr
                 index++;
             }
         }
-        ChatCommandHolder cmd(remaining, &fromPlayer, type, time(0) + index);
-        chatCommands.push(cmd);
+
+        chatCommands.push_back(ChatCommandHolder(remaining, &fromPlayer, type, time(0) + index));
     }
     else if (filtered == "reset")
     {
@@ -610,8 +592,7 @@ void PlayerbotAI::HandleCommand(uint32 type, const std::string& text, Player& fr
 
     else
     {
-        ChatCommandHolder cmd(filtered, &fromPlayer, type);
-        chatCommands.push(cmd);
+        chatCommands.push_back(ChatCommandHolder(filtered, &fromPlayer, type));
     }
 }
 
@@ -805,8 +786,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
     if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos &&
         filtered.find("award") == std::string::npos)
     {
-        ChatCommandHolder cmd("warning", fromPlayer, type);
-        chatCommands.push(cmd);
+        chatCommands.push_back(ChatCommandHolder("warning", fromPlayer, type));
         return;
     }
 
@@ -834,8 +814,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
             }
         }
 
-        ChatCommandHolder cmd(remaining, fromPlayer, type, time(nullptr) + index);
-        chatCommands.push(cmd);
+        chatCommands.push_back(ChatCommandHolder(remaining, fromPlayer, type, time(nullptr) + index));
     }
     else if (filtered == "reset")
     {
@@ -868,8 +847,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
     }
     else
     {
-        ChatCommandHolder cmd(filtered, fromPlayer, type);
-        chatCommands.push(cmd);
+        chatCommands.push_back(ChatCommandHolder(filtered, fromPlayer, type));
     }
 }
 
@@ -935,7 +913,10 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                 uint8 msgtype, chatTag;
                 uint32 lang, textLen, nameLen, unused;
                 ObjectGuid guid1, guid2;
-                std::string name, chanName, message;
+                std::string name = "";
+                std::string chanName = "";
+                std::string message = "";
+
                 p >> msgtype >> lang;
                 p >> guid1 >> unused;
                 if (guid1.IsEmpty() || p.size() > p.DEFAULT_SIZE)
@@ -1026,7 +1007,8 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                                 return;
                         }
                     }
-                    QueueChatResponse(msgtype, guid1, ObjectGuid(), message, chanName, name);
+
+                    QueueChatResponse(std::move(ChatQueuedReply{msgtype, guid1.GetCounter(), guid2.GetCounter(), message, chanName, name, time(nullptr) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15)}));
                     GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
                     return;
                 }
@@ -5023,9 +5005,9 @@ bool PlayerbotAI::IsInRealGuild()
     return !(sPlayerbotAIConfig->IsInRandomAccountList(leaderAccount));
 }
 
-void PlayerbotAI::QueueChatResponse(uint8& msgtype, ObjectGuid& guid1, ObjectGuid guid2, std::string& message, std::string& chanName, std::string& name)
+void PlayerbotAI::QueueChatResponse(const ChatQueuedReply chatReply)
 {
-    chatReplies.push({ msgtype, guid1.GetCounter(), guid2.GetCounter(), message, chanName, name, time(nullptr) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15) });
+    chatReplies.push_back(std::move(chatReply));
 }
 
 bool PlayerbotAI::EqualLowercaseName(std::string s1, std::string s2)
