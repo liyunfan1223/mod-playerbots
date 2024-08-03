@@ -857,9 +857,16 @@ void MovementAction::UpdateMovementState()
         bot->SetSwim(false);
     }
 
-    if (bot->IsFlying())
-        bot->UpdateSpeed(MOVE_FLIGHT, true);
+    bool onGround = bot->GetPositionZ() < bot->GetMapWaterOrGroundLevel(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()) + 1.0f;
 
+    if (!bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) && bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !onGround)
+    {
+        bot->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+    }
+    if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) && (!bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || onGround))
+    {
+        bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+    }
     Transport* newTransport = bot->GetMap()->GetTransportForPos(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot);
     if (newTransport != bot->GetTransport())
     {
@@ -874,10 +881,13 @@ void MovementAction::UpdateMovementState()
         bot->StopMovingOnCurrentPos();
     }
 
+    bot->SendMovementFlagUpdate();
     // Temporary speed increase in group
-    //if (botAI->HasRealPlayerMaster())
-        //bot->SetSpeedRate(MOVE_RUN, 1.1f);
-
+    // if (botAI->HasRealPlayerMaster()) {
+    //     bot->SetSpeedRate(MOVE_RUN, 1.1f);
+    // } else {
+    //     bot->SetSpeedRate(MOVE_RUN, 1.0f);
+    // }
     // check if target is not reachable (from Vmangos)
     // if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE && bot->CanNotReachTarget() && !bot->InBattleground())
     // {
@@ -1146,7 +1156,18 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
 
 float MovementAction::MoveDelay(float distance)
 {
-    return distance / bot->GetSpeed(MOVE_RUN);
+    float speed;
+    if (bot->isSwimming()) {
+        speed = bot->GetSpeed(MOVE_SWIM);
+    } else if (bot->IsFlying()) {
+        speed = bot->GetSpeed(MOVE_FLIGHT);
+    } else {
+        speed = bot->GetSpeed(MOVE_RUN);
+    }
+    float delay = distance / speed - sPlayerbotAIConfig->reactDistance;
+    if (delay < 0)
+        delay = 0;
+    return delay;
 }
 
 void MovementAction::WaitForReach(float distance)
