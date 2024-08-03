@@ -5,6 +5,7 @@
 #include "CheckMountStateAction.h"
 #include "BattlegroundWS.h"
 #include "Event.h"
+#include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SpellAuraEffects.h"
@@ -20,18 +21,11 @@ bool CheckMountStateAction::Execute(Event event)
     bool attackdistance = false;
     bool chasedistance = false;
     float attack_distance = 35.0f;
-
-    switch (bot->getClass())
-    {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-            attack_distance = 10.0f;
-            break;
-        case CLASS_ROGUE:
-            attack_distance = 40.0f;
-            break;
+    if (PlayerbotAI::IsMelee(bot)) {
+        attack_distance = 10.0f;
+    } else {
+        attack_distance = 40.0f;
     }
-
     if (enemy)
         attack_distance /= 2;
 
@@ -41,6 +35,12 @@ bool CheckMountStateAction::Execute(Event event)
         chasedistance = enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 45.0f) && AI_VALUE2(bool, "moving", "enemy player target");
     }
 
+    if (bot->IsMounted() && attackdistance) {
+        WorldPacket emptyPacket;
+        bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+        return true;
+    }
+
     Player* master = GetMaster();
     if (master != nullptr && !bot->InBattleground())
     {
@@ -48,7 +48,7 @@ bool CheckMountStateAction::Execute(Event event)
             return false;
 
         // bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
-        if (master->IsMounted() && !bot->IsMounted() && noattackers)
+        if (master->IsMounted() && !bot->IsMounted() && noattackers && !attackdistance && !bot->IsInCombat() && botAI->GetState() != BOT_STATE_COMBAT)
         {
             return Mount();
         }
@@ -70,6 +70,13 @@ bool CheckMountStateAction::Execute(Event event)
         // }
 
         return false;
+    }
+
+    // For random bots
+    if (!bot->InBattleground() && !master) {
+        if (!bot->IsMounted() && noattackers && !attackdistance && !bot->IsInCombat()) {
+            return Mount();
+        }
     }
 
     if (bot->InBattleground() && !attackdistance && (noattackers || fartarget) && !bot->IsInCombat() && !bot->IsMounted())
@@ -269,8 +276,8 @@ bool CheckMountStateAction::Mount()
         if (index >= ids.size())
             continue;
 
-        botAI->CastSpell(ids[index], bot);
-        return true;
+        
+        return botAI->CastSpell(ids[index], bot);;
     }
 
     std::vector<Item*> items = AI_VALUE2(std::vector<Item*>, "inventory items", "mount");

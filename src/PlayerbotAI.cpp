@@ -650,6 +650,7 @@ void PlayerbotAI::Reset(bool full)
     }
 
     currentEngine = engines[BOT_STATE_NON_COMBAT];
+    currentState = BOT_STATE_NON_COMBAT;
     nextAICheckDelay = 0;
     whispers.clear();
 
@@ -1038,23 +1039,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             bot->StopMoving();
             bot->GetMotionMaster()->Clear();
 
-
-            float moveTimeHalf = verticalSpeed / Movement::gravity;
-            float dist = 2 * moveTimeHalf * horizontalSpeed;
-            Position dest = bot->GetPosition();
-
-            bot->MovePositionToFirstCollision(dest, dist, bot->GetRelativeAngle(bot->GetPositionX() + vcos, bot->GetPositionY() + vsin));
-            float x, y, z;
-            x = dest.GetPositionX();
-            y = dest.GetPositionY();
-            z = dest.GetPositionZ();
-            // char speak[1024];
-            // sprintf(speak, "SMSG_MOVE_KNOCK_BACK: %.2f %.2f, horizontalSpeed: %.2f, verticalSpeed: %.2f, tX: %.2f, tY: %.2f, tZ: %.2f, relativeAngle: %.2f, orientation: %.2f",
-            //     vcos, vsin, horizontalSpeed, verticalSpeed, x, y, z, bot->GetRelativeAngle(vcos, vsin), bot->GetOrientation());
-            // bot->Say(speak, LANG_UNIVERSAL);
-            // bot->GetClosePoint(x, y, z, bot->GetObjectSize(), dist, bot->GetAngle(vcos, vsin));
             Unit* currentTarget = GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
-            bot->GetMotionMaster()->MoveJump(x, y, z, horizontalSpeed, verticalSpeed, 0, currentTarget);
+            bot->GetMotionMaster()->MoveKnockbackFromForPlayer(bot->GetPositionX() + vcos, bot->GetPositionY() + vsin, horizontalSpeed, verticalSpeed);
+            
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FORWARD);
             // bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_PENDING_STOP);
@@ -1371,18 +1358,25 @@ void PlayerbotAI::DoNextAction(bool min)
         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_WALKING);
     else if ((nextAICheckDelay < 1000) && bot->IsSitState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
-
-    if (bot->IsFlying() && !!bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY))
+    
+    bool hasMountAura = bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED) || bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
+    if (hasMountAura && !bot->IsMounted())
     {
-        if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING))
-            bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
-
-        if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
-            bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
-
-        if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
-            bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+        bot->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED);
+        bot->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
     }
+
+    // if (bot->IsFlying() && !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY))
+    // {
+    //     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING))
+    //         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
+
+    //     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
+    //         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
+
+    //     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
+    //         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+    // }
 
 /*
     // land after kncokback/jump
