@@ -68,7 +68,7 @@ void MovementAction::JumpTo(uint32 mapId, float x, float y, float z)
     botAI->SetNextCheckDelay(1000);
     mm.Clear();
     mm.MoveJump(x, y, z, speed, speed, 1);
-    AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
+    AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000);
 }
 
 bool MovementAction::MoveNear(uint32 mapId, float x, float y, float z, float distance)
@@ -167,6 +167,14 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     {
         return false;
     }
+    if (IsDuplicateMove(mapId, x, y, z))
+    {
+        return false;
+    }
+    if (IsWaitingForLastMove())
+    {
+        return false;
+    }
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling!, flag:" + std::to_string(bot->m_movementInfo.GetMovementFlags()), LANG_UNIVERSAL);
     //     return false;
@@ -177,8 +185,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    bool generatePath = !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->IsFlying() &&
-                        !bot->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !bot->IsInWater();
+    // !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
+
+    bool generatePath = !bot->IsFlying() && !bot->isSwimming();
     bool disableMoveSplinePath = sPlayerbotAIConfig->disableMoveSplinePath >= 2 ||
                                  (sPlayerbotAIConfig->disableMoveSplinePath == 1 && bot->InBattleground());
     if (disableMoveSplinePath || !generatePath)
@@ -186,8 +195,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         float distance = bot->GetExactDist(x, y, z);
         if (distance > sPlayerbotAIConfig->contactDistance)
         {
-            WaitForReach(distance);
-
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
 
@@ -199,7 +206,8 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             MotionMaster& mm = *bot->GetMotionMaster();
             mm.Clear();
             mm.MovePoint(mapId, x, y, z, generatePath);
-            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
+            float delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, 1000.0f * MoveDelay(distance));
+            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
             return true;
         }
     }
@@ -215,8 +223,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         float distance = bot->GetExactDist(x, y, modifiedZ);
         if (distance > sPlayerbotAIConfig->contactDistance)
         {
-            WaitForReach(distance);
-
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
 
@@ -229,7 +235,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
             mm.Clear();
             mm.MoveSplinePath(&path);
-            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation());
+            // mm.MoveSplinePath(&path);
+            float delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, 1000.0f * MoveDelay(distance));
+            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
             return true;
         }
     }
@@ -847,6 +855,29 @@ bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
     return IsMovingAllowed();
 }
 
+bool MovementAction::IsDuplicateMove(uint32 mapId, float x, float y, float z)
+{
+    LastMovement& lastMove = *context->GetValue<LastMovement&>("last movement");
+
+    // heuristic 5s
+    if (lastMove.msTime + sPlayerbotAIConfig->maxWaitForMove < getMSTime() ||
+        lastMove.lastMoveShort.GetExactDist(x, y, z) > 0.01f)
+        return false;
+
+    return true;
+}
+
+bool MovementAction::IsWaitingForLastMove()
+{
+    LastMovement& lastMove = *context->GetValue<LastMovement&>("last movement");
+
+    // heuristic 5s
+    if (lastMove.lastdelayTime + lastMove.msTime > getMSTime())
+        return true;
+
+    return false;
+}
+
 bool MovementAction::IsMovingAllowed()
 {
     // do not allow if not vehicle driver
@@ -878,7 +909,7 @@ void MovementAction::UpdateMovementState()
     {
         bot->SetSwim(true);
     }
-    else
+    else if (!bot->Unit::IsInWater())
     {
         bot->SetSwim(false);
     }

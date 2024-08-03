@@ -39,6 +39,8 @@ protected:
     void WaitForReach(float distance);
     bool IsMovingAllowed(Unit* target);
     bool IsMovingAllowed(uint32 mapId, float x, float y, float z);
+    bool IsDuplicateMove(uint32 mapId, float x, float y, float z);
+    bool IsWaitingForLastMove();
     bool IsMovingAllowed();
     bool Flee(Unit* target);
     void ClearIdleState();

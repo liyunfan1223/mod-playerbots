@@ -1441,7 +1441,7 @@ bool PlayerbotAI::IsCaster(Player* player) { return IsRanged(player) && player->
 
 bool PlayerbotAI::IsCombo(Player* player)
 {
-    int tab = AiFactory::GetPlayerSpecTab(player);
+    // int tab = AiFactory::GetPlayerSpecTab(player);
     return player->getClass() == CLASS_ROGUE ||
            (player->getClass() == CLASS_DRUID && player->HasAura(768));  // cat druid
 }
@@ -2634,8 +2634,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         return true;
     }
 
-    aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
-    aiObjectContext->GetValue<time_t>("stay time")->Set(0);
+    // aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
+    // aiObjectContext->GetValue<time_t>("stay time")->Set(0);
 
     if (bot->IsFlying() || bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {
@@ -2820,8 +2820,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         return true;
     }
 
-    aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
-    aiObjectContext->GetValue<time_t>("stay time")->Set(0);
+    // aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
+    // aiObjectContext->GetValue<time_t>("stay time")->Set(0);
 
     MotionMaster& mm = *bot->GetMotionMaster();
 

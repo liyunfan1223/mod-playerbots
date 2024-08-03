@@ -19,9 +19,9 @@ bool CheckMountStateAction::Execute(Event event)
     bool enemy = AI_VALUE(Unit*, "enemy player target");
     // ignore grind target in BG or bots will dismount near any creature (eg: the rams in AV)
     bool dps = AI_VALUE(Unit*, "dps target");
-    bool fartarget =
-        (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 40.0f)) ||
-        (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
+    // bool fartarget = (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player
+    // target"), 40.0f)) ||
+    //     (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
     bool attackdistance = false;
     // bool chasedistance = false;
     float attack_distance = 35.0f;
@@ -33,6 +33,9 @@ bool CheckMountStateAction::Execute(Event event)
     {
         attack_distance = 30.0f;
     }
+
+    // if (enemy)
+    //     attack_distance /= 2;
 
     if (dps || enemy)
     {
@@ -91,8 +94,7 @@ bool CheckMountStateAction::Execute(Event event)
         }
     }
 
-    if (bot->InBattleground() && !attackdistance && (noattackers || fartarget) && !bot->IsInCombat() &&
-        !bot->IsMounted())
+    if (bot->InBattleground() && !attackdistance && noattackers && !bot->IsInCombat() && !bot->IsMounted())
     {
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
