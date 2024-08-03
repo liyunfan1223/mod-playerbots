@@ -18,12 +18,11 @@ bool CheckMountStateAction::Execute(Event event)
         AI_VALUE2(bool, "combat", "self target") ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true) : true;
     bool enemy = AI_VALUE(Unit*, "enemy player target");
     // ignore grind target in BG or bots will dismount near any creature (eg: the rams in AV)
-    bool dps = (AI_VALUE(Unit*, "dps target") || (!bot->InBattleground() && AI_VALUE(Unit*, "grind target")));
-    bool fartarget =
-        (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 40.0f)) ||
+    bool dps = AI_VALUE(Unit*, "dps target");
+    bool fartarget = (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 40.0f)) ||
         (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
     bool attackdistance = false;
-    bool chasedistance = false;
+    // bool chasedistance = false;
     float attack_distance = 35.0f;
     if (PlayerbotAI::IsMelee(bot))
     {
@@ -38,11 +37,9 @@ bool CheckMountStateAction::Execute(Event event)
 
     if (dps || enemy)
     {
-        attackdistance = (enemy || dps) && sServerFacade->IsDistanceLessThan(
-                                               AI_VALUE2(float, "distance", "current target"), attack_distance);
-        chasedistance =
-            enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 45.0f) &&
-            AI_VALUE2(bool, "moving", "enemy player target");
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+        attackdistance = (enemy || dps) && currentTarget && sServerFacade->IsDistanceLessThan(AI_VALUE2(float, "distance", "current target"), attack_distance);
+        // chasedistance = enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 45.0f) && AI_VALUE2(bool, "moving", "enemy player target");
     }
 
     if (bot->IsMounted() && attackdistance)
