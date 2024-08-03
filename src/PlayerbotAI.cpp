@@ -497,6 +497,7 @@ void PlayerbotAI::Reset(bool full)
     }
 
     currentEngine = engines[BOT_STATE_NON_COMBAT];
+    currentState = BOT_STATE_NON_COMBAT;
     nextAICheckDelay = 0;
     whispers.clear();
 
@@ -1165,18 +1166,25 @@ void PlayerbotAI::DoNextAction(bool min)
         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_WALKING);
     else if ((nextAICheckDelay < 1000) && bot->IsSitState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
-
-    if (bot->IsFlying() && !!bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY))
+    
+    bool hasMountAura = bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED) || bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
+    if (hasMountAura && !bot->IsMounted())
     {
-        if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING))
-            bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
-
-        if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
-            bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
-
-        if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
-            bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+        bot->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED);
+        bot->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
     }
+
+    // if (bot->IsFlying() && !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !bot->HasAuraType(SPELL_AURA_FLY))
+    // {
+    //     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING))
+    //         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
+
+    //     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
+    //         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
+
+    //     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
+    //         bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+    // }
 
 /*
     // land after kncokback/jump
