@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "AcceptDuelAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -16,7 +18,8 @@ bool AcceptDuelAction::Execute(Event event)
     p >> playerGuid;
 
     // do not auto duel with low hp
-    if ((!botAI->HasRealPlayerMaster() || (botAI->GetMaster() && botAI->GetMaster()->GetGUID() != playerGuid)) && AI_VALUE2(uint8, "health", "self target") < 90)
+    if ((!botAI->HasRealPlayerMaster() || (botAI->GetMaster() && botAI->GetMaster()->GetGUID() != playerGuid)) &&
+        AI_VALUE2(uint8, "health", "self target") < 90)
     {
         WorldPacket packet(CMSG_DUEL_CANCELLED, 8);
         packet << flagGuid;

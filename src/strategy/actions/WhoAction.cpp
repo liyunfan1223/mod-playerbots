@@ -1,17 +1,21 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "WhoAction.h"
+
+#include "AiFactory.h"
 #include "Event.h"
 #include "ItemVisitors.h"
-#include "AiFactory.h"
 #include "Playerbots.h"
 
 #ifndef WIN32
 inline int strcmpi(char const* s1, char const* s2)
 {
-    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2) {}
+    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2)
+    {
+    }
     return *s1 - *s2;
 }
 #endif
@@ -58,7 +62,7 @@ bool WhoAction::Execute(Event event)
         return false;
 
     // ignore random bot chat filter
-	bot->Whisper(tell, LANG_UNIVERSAL, owner);
+    bot->Whisper(tell, LANG_UNIVERSAL, owner);
     return true;
 }
 
@@ -69,11 +73,13 @@ std::string const WhoAction::QueryTrade(std::string const text)
     std::vector<Item*> items = InventoryAction::parseItems(text);
     for (Item* sell : items)
     {
-        int32 sellPrice = sell->GetTemplate()->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot) * sell->GetCount();
+        int32 sellPrice =
+            sell->GetTemplate()->SellPrice * sRandomPlayerbotMgr->GetSellMultiplier(bot) * sell->GetCount();
         if (!sellPrice)
             continue;
 
-        out << "Selling " << chat->FormatItem(sell->GetTemplate(), sell->GetCount()) << " for " << chat->formatMoney(sellPrice);
+        out << "Selling " << chat->FormatItem(sell->GetTemplate(), sell->GetCount()) << " for "
+            << chat->formatMoney(sellPrice);
         return out.str();
     }
 
@@ -94,9 +100,10 @@ std::string const WhoAction::QuerySkill(std::string const text)
     ObjectGuid guid = bot->GetGUID();
 
     std::string const data = "0";
-    out << "|cFFFFFF00|Htrade:" << spellId << ":" << value << ":" << maxSkill << ":" << std::hex << std::uppercase << guid.GetRawValue()
-            << std::nouppercase << std::dec << ":" << data << "|h[" << skillName << "]|h|r" << " |h|cff00ff00" << value << "|h|cffffffff/"
-            << "|h|cff00ff00" << maxSkill << "|h|cffffffff ";
+    out << "|cFFFFFF00|Htrade:" << spellId << ":" << value << ":" << maxSkill << ":" << std::hex << std::uppercase
+        << guid.GetRawValue() << std::nouppercase << std::dec << ":" << data << "|h[" << skillName << "]|h|r"
+        << " |h|cff00ff00" << value << "|h|cffffffff/"
+        << "|h|cff00ff00" << maxSkill << "|h|cffffffff ";
 
     return out.str();
 }
@@ -107,7 +114,8 @@ std::string const WhoAction::QuerySpec(std::string const text)
 
     uint8 spec = AiFactory::GetPlayerSpecTab(bot);
 
-    out << "|h|cffffffff" << chat->FormatRace(bot->getRace()) << " [" << (bot->getGender() == GENDER_MALE ? "M" : "F") << "] " << chat->FormatClass(bot, spec);
+    out << "|h|cffffffff" << chat->FormatRace(bot->getRace()) << " [" << (bot->getGender() == GENDER_MALE ? "M" : "F")
+        << "] " << chat->FormatClass(bot, spec);
     out << " (|h|cff00ff00" << (uint32)bot->GetLevel() << "|h|cffffffff lvl), ";
     out << "|h|cff00ff00" << botAI->GetEquipGearScore(bot, false, false) << "|h|cffffffff GS (";
 

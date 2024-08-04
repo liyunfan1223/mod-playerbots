@@ -1,11 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PositionValue.h"
+
 #include "Playerbots.h"
 
-PositionValue::PositionValue(PlayerbotAI* botAI, std::string const name) : ManualSetValue<PositionMap&>(botAI, positions, name)
+PositionValue::PositionValue(PlayerbotAI* botAI, std::string const name)
+    : ManualSetValue<PositionMap&>(botAI, positions, name)
 {
 }
 
@@ -59,7 +62,4 @@ bool PositionValue::Load(std::string const text)
     return true;
 }
 
-WorldPosition CurrentPositionValue::Calculate()
-{
-    return WorldPosition(bot);
-}
+WorldPosition CurrentPositionValue::Calculate() { return WorldPosition(bot); }

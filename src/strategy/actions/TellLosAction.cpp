@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TellLosAction.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
 #include "Playerbots.h"
 #include "World.h"
 
@@ -52,11 +54,11 @@ void TellLosAction::ListUnits(std::string const title, GuidVector units)
 
     for (ObjectGuid const guid : units)
     {
-        if (Unit* unit = botAI->GetUnit(guid)) {
+        if (Unit* unit = botAI->GetUnit(guid))
+        {
             botAI->TellMaster(unit->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()));
         }
     }
-
 }
 void TellLosAction::ListGameObjects(std::string const title, GuidVector gos)
 {
@@ -74,15 +76,15 @@ bool TellAuraAction::Execute(Event event)
     botAI->TellMaster("--- Auras ---");
     sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "--- Auras ---");
     Unit::AuraApplicationMap& map = bot->GetAppliedAuras();
-	for (Unit::AuraApplicationMap::iterator i = map.begin(); i != map.end(); ++i)
-	{
-		Aura * aura  = i->second->GetBase();
-		if (!aura)
-			continue;
-		const std::string auraName = aura->GetSpellInfo()->SpellName[0];
+    for (Unit::AuraApplicationMap::iterator i = map.begin(); i != map.end(); ++i)
+    {
+        Aura* aura = i->second->GetBase();
+        if (!aura)
+            continue;
+        const std::string auraName = aura->GetSpellInfo()->SpellName[0];
         sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "Info of Aura - name: " + auraName);
-		AuraObjectType type = aura->GetType();
-		WorldObject* owner = aura->GetOwner();
+        AuraObjectType type = aura->GetType();
+        WorldObject* owner = aura->GetOwner();
         std::string owner_name = owner ? owner->GetName() : "unknown";
         float distance = bot->GetDistance2d(owner);
         Unit* caster = aura->GetCaster();
@@ -92,50 +94,39 @@ bool TellAuraAction::Execute(Event event)
         const SpellInfo* spellInfo = aura->GetSpellInfo();
         int32 spellId = aura->GetSpellInfo()->Id;
         bool isPositive = aura->GetSpellInfo()->IsPositive();
-        sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "Info of Aura - name: " + auraName +
-                       " caster: " + caster_name + 
-                       " type: " + std::to_string(type) + 
-                       " owner: " + owner_name + 
-                       " distance: " + std::to_string(distance) +
-                       " isArea: " + std::to_string(is_area) +
-                       " duration: " + std::to_string(duration) +
-                       " spellId: " + std::to_string(spellId) +
-                       " isPositive: " + std::to_string(isPositive));
+        sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,
+                         "Info of Aura - name: " + auraName + " caster: " + caster_name + " type: " +
+                             std::to_string(type) + " owner: " + owner_name + " distance: " + std::to_string(distance) +
+                             " isArea: " + std::to_string(is_area) + " duration: " + std::to_string(duration) +
+                             " spellId: " + std::to_string(spellId) + " isPositive: " + std::to_string(isPositive));
 
-		botAI->TellMaster("Info of Aura - name: " + auraName +
-                       " caster: " + caster_name + 
-                       " type: " + std::to_string(type) + 
-                       " owner: " + owner_name + 
-                       " distance: " + std::to_string(distance) +
-                       " isArea: " + std::to_string(is_area) +
-                       " duration: " + std::to_string(duration) +
-                       " spellId: " + std::to_string(spellId) +
-                       " isPositive: " + std::to_string(isPositive));
+        botAI->TellMaster("Info of Aura - name: " + auraName + " caster: " + caster_name + " type: " +
+                          std::to_string(type) + " owner: " + owner_name + " distance: " + std::to_string(distance) +
+                          " isArea: " + std::to_string(is_area) + " duration: " + std::to_string(duration) +
+                          " spellId: " + std::to_string(spellId) + " isPositive: " + std::to_string(isPositive));
 
-        if (type == DYNOBJ_AURA_TYPE) {
+        if (type == DYNOBJ_AURA_TYPE)
+        {
             DynamicObject* dyn_owner = aura->GetDynobjOwner();
             float radius = dyn_owner->GetRadius();
             int32 spellId = dyn_owner->GetSpellId();
             int32 duration = dyn_owner->GetDuration();
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, std::string("Info of DynamicObject -") +
-                           " name: " + dyn_owner->GetName() + 
-                           " radius: " + std::to_string(radius) +
-                           " spell id: " + std::to_string(spellId) +
-                           " duration: " + std::to_string(duration));
+            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,
+                             std::string("Info of DynamicObject -") + " name: " + dyn_owner->GetName() +
+                                 " radius: " + std::to_string(radius) + " spell id: " + std::to_string(spellId) +
+                                 " duration: " + std::to_string(duration));
 
-            botAI->TellMaster(std::string("Info of DynamicObject -") +
-                           " name: " + dyn_owner->GetName() + 
-                           " radius: " + std::to_string(radius) +
-                           " spell id: " + std::to_string(spellId) +
-                           " duration: " + std::to_string(duration));
+            botAI->TellMaster(std::string("Info of DynamicObject -") + " name: " + dyn_owner->GetName() +
+                              " radius: " + std::to_string(radius) + " spell id: " + std::to_string(spellId) +
+                              " duration: " + std::to_string(duration));
         }
-	}
-	return true;
+    }
+    return true;
 }
 
 bool TellExpectedDpsAction::Execute(Event event)
 {
     float dps = AI_VALUE(float, "expected group dps");
     botAI->TellMaster("Expected Group DPS: " + std::to_string(dps));
-	return true;
+    return true;
 }

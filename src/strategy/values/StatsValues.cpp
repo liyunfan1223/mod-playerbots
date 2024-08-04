@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "StatsValues.h"
+
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -18,7 +20,7 @@ uint8 HealthValue::Calculate()
     if (!target)
         return 100;
 
-    return (static_cast<float> (target->GetHealth()) / target->GetMaxHealth()) * 100;
+    return (static_cast<float>(target->GetHealth()) / target->GetMaxHealth()) * 100;
 }
 
 Unit* IsDeadValue::GetTarget()
@@ -54,10 +56,7 @@ bool PetIsDeadValue::Calculate()
     return bot->GetPet() && bot->GetPet()->getDeathState() != DeathState::Alive;
 }
 
-bool PetIsHappyValue::Calculate()
-{
-    return !bot->GetPet() || bot->GetPet()->GetHappinessState() == HAPPY;
-}
+bool PetIsHappyValue::Calculate() { return !bot->GetPet() || bot->GetPet()->GetHappinessState() == HAPPY; }
 
 Unit* RageValue::GetTarget()
 {
@@ -86,7 +85,7 @@ uint8 EnergyValue::Calculate()
     if (!target)
         return 0;
 
-    return (static_cast<float> (target->GetPower(POWER_ENERGY)));
+    return (static_cast<float>(target->GetPower(POWER_ENERGY)));
 }
 
 Unit* ManaValue::GetTarget()
@@ -101,7 +100,7 @@ uint8 ManaValue::Calculate()
     if (!target)
         return 100;
 
-    return (static_cast<float> (target->GetPower(POWER_MANA)) / target->GetMaxPower(POWER_MANA)) * 100;
+    return (static_cast<float>(target->GetPower(POWER_MANA)) / target->GetMaxPower(POWER_MANA)) * 100;
 }
 
 Unit* HasManaValue::GetTarget()
@@ -128,8 +127,8 @@ Unit* ComboPointsValue::GetTarget()
 uint8 ComboPointsValue::Calculate()
 {
     Unit* target = GetTarget();
-	if (!target || target->GetGUID() != bot->GetComboTargetGUID())
-		return 0;
+    if (!target || target->GetGUID() != bot->GetComboTargetGUID())
+        return 0;
 
     return bot->GetComboPoints();
 }
@@ -171,11 +170,13 @@ bool IsInCombatValue::Calculate()
             Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
             for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
             {
-                Player *member = ObjectAccessor::FindPlayer(itr->guid);
+                Player* member = ObjectAccessor::FindPlayer(itr->guid);
                 if (!member || member == bot)
                     continue;
 
-                if (member->IsInCombat() && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(member, bot), sPlayerbotAIConfig->reactDistance))
+                if (member->IsInCombat() &&
+                    sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(member, bot),
+                                                             sPlayerbotAIConfig->reactDistance))
                     return true;
             }
         }
@@ -184,10 +185,7 @@ bool IsInCombatValue::Calculate()
     return false;
 }
 
-bool IsInCombatValue::EqualToLast(bool value)
-{
-    return value == lastValue;
-}
+bool IsInCombatValue::EqualToLast(bool value) { return value == lastValue; }
 
 uint8 BagSpaceValue::Calculate()
 {
@@ -212,10 +210,9 @@ uint8 BagSpaceValue::Calculate()
                 totalused += pBag->GetBagSize() - pBag->GetFreeSlots();
             }
         }
-
     }
 
-    return (static_cast<float> (totalused) / total) * 100;
+    return (static_cast<float>(totalused) / total) * 100;
 }
 
 uint8 DurabilityValue::Calculate()
@@ -244,7 +241,7 @@ uint8 DurabilityValue::Calculate()
     if (total == 0)
         return 0;
 
-    return (static_cast<float> (total) / totalMax) * 100;
+    return (static_cast<float>(total) / totalMax) * 100;
 }
 
 Unit* SpeedValue::GetTarget()
@@ -259,20 +256,11 @@ uint8 SpeedValue::Calculate()
     if (!target)
         return 100;
 
-    return (uint8) (100.0f * target->GetSpeedRate(MOVE_RUN));
+    return (uint8)(100.0f * target->GetSpeedRate(MOVE_RUN));
 }
 
-bool IsInGroupValue::Calculate()
-{
-    return bot->GetGroup();
-}
+bool IsInGroupValue::Calculate() { return bot->GetGroup(); }
 
-bool ExperienceValue::EqualToLast(uint32 value)
-{
-    return value != lastValue;
-}
+bool ExperienceValue::EqualToLast(uint32 value) { return value != lastValue; }
 
-uint32 ExperienceValue::Calculate()
-{
-    return bot->GetUInt32Value(PLAYER_XP);
-}
+uint32 ExperienceValue::Calculate() { return bot->GetUInt32Value(PLAYER_XP); }

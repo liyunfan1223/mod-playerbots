@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "StayActions.h"
+
 #include "Event.h"
 #include "LastMovementValue.h"
 #include "Playerbots.h"
@@ -11,8 +13,8 @@ bool StayActionBase::Stay()
 {
     AI_VALUE(LastMovement&, "last movement").Set(nullptr);
 
-    //if (!urand(0, 10))
-        //botAI->PlaySound(TEXT_EMOTE_YAWN);
+    // if (!urand(0, 10))
+    // botAI->PlaySound(TEXT_EMOTE_YAWN);
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
         return false;
 
@@ -36,10 +38,7 @@ bool StayActionBase::Stay()
     return true;
 }
 
-bool StayAction::Execute(Event event)
-{
-    return Stay();
-}
+bool StayAction::Execute(Event event) { return Stay(); }
 
 bool StayAction::isUseful()
 {
@@ -56,7 +55,4 @@ bool SitAction::Execute(Event event)
     return true;
 }
 
-bool SitAction::isUseful()
-{
-    return !AI_VALUE2(bool, "moving", "self target");
-}
+bool SitAction::isUseful() { return !AI_VALUE2(bool, "moving", "self target"); }

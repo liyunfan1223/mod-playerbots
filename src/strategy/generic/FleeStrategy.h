@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_FLEESTRATEGY_H
@@ -11,20 +12,20 @@ class PlayerbotAI;
 
 class FleeStrategy : public Strategy
 {
-    public:
-        FleeStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    FleeStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "flee"; };
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "flee"; };
 };
 
 class FleeFromAddsStrategy : public Strategy
 {
-    public:
-        FleeFromAddsStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    FleeFromAddsStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-        std::string const getName() override { return "flee from adds"; };
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "flee from adds"; };
 };
 
 #endif

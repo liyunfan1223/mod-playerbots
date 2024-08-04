@@ -1,11 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ExternalEventHelper.h"
-#include "Trigger.h"
+
 #include "ChatHelper.h"
 #include "Playerbots.h"
+#include "Trigger.h"
 
 bool ExternalEventHelper::ParseChatCommand(std::string const command, Player* owner)
 {
@@ -37,7 +39,8 @@ bool ExternalEventHelper::ParseChatCommand(std::string const command, Player* ow
     return true;
 }
 
-void ExternalEventHelper::HandlePacket(std::map<uint16, std::string>& handlers, WorldPacket const& packet, Player* owner)
+void ExternalEventHelper::HandlePacket(std::map<uint16, std::string>& handlers, WorldPacket const& packet,
+                                       Player* owner)
 {
     uint16 opcode = packet.GetOpcode();
     std::string const name = handlers[opcode];

@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "RewardAction.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
 #include "Playerbots.h"
 
 bool RewardAction::Execute(Event event)
@@ -53,16 +55,17 @@ bool RewardAction::Reward(uint32 itemId, Object* questGiver)
         QuestStatus status = bot->GetQuestStatus(questID);
 
         // if quest is complete, turn it in
-        if (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questID) && pQuest->GetRewChoiceItemsCount() > 1 && bot->CanRewardQuest(pQuest, false))
+        if (status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questID) &&
+            pQuest->GetRewChoiceItemsCount() > 1 && bot->CanRewardQuest(pQuest, false))
         {
-            for (uint8 rewardIdx=0; rewardIdx < pQuest->GetRewChoiceItemsCount(); ++rewardIdx)
+            for (uint8 rewardIdx = 0; rewardIdx < pQuest->GetRewChoiceItemsCount(); ++rewardIdx)
             {
                 ItemTemplate const* pRewardItem = sObjectMgr->GetItemTemplate(pQuest->RewardChoiceItemId[rewardIdx]);
                 if (itemId == pRewardItem->ItemId)
                 {
                     bot->RewardQuest(pQuest, rewardIdx, questGiver, false);
 
-                    std::string const questTitle  = pQuest->GetTitle();
+                    std::string const questTitle = pQuest->GetTitle();
                     std::string const itemName = pRewardItem->Name1;
 
                     std::ostringstream out;

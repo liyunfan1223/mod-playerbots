@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TeleportAction.h"
+
 #include "Event.h"
 #include "LastMovementValue.h"
 #include "Playerbots.h"
@@ -16,7 +18,7 @@ bool TeleportAction::Execute(Event event)
         if (!go)
             continue;
 
-        GameObjectTemplate const *goInfo = go->GetGOInfo();
+        GameObjectTemplate const* goInfo = go->GetGOInfo();
         if (goInfo->type != GAMEOBJECT_TYPE_SPELLCASTER)
             continue;
 

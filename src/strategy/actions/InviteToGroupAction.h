@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_INVITETOGROUPACTION_H
@@ -12,53 +13,53 @@ class PlayerbotAI;
 
 class InviteToGroupAction : public Action
 {
-    public:
-        InviteToGroupAction(PlayerbotAI* botAI, std::string const name = "invite") : Action(botAI, name) { }
+public:
+    InviteToGroupAction(PlayerbotAI* botAI, std::string const name = "invite") : Action(botAI, name) {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-        virtual bool Invite(Player* player);
+    virtual bool Invite(Player* player);
 };
 
 class InviteNearbyToGroupAction : public InviteToGroupAction
 {
-    public:
-        InviteNearbyToGroupAction(PlayerbotAI* botAI, std::string const name = "invite nearby") : InviteToGroupAction(botAI, name) { }
+public:
+    InviteNearbyToGroupAction(PlayerbotAI* botAI, std::string const name = "invite nearby")
+        : InviteToGroupAction(botAI, name)
+    {
+    }
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
-//Generic guid member finder
+// Generic guid member finder
 class FindGuildMembers
 {
-    public:
-        FindGuildMembers() { };
+public:
+    FindGuildMembers(){};
 
-        void operator()(Player* player)
-        {
-            data.push_back(player);
-        };
+    void operator()(Player* player) { data.push_back(player); };
 
-        std::vector<Player*> const GetResult()
-        {
-            return data;
-        };
+    std::vector<Player*> const GetResult() { return data; };
 
-    private:
-        std::vector<Player*> data;
+private:
+    std::vector<Player*> data;
 };
 
 class InviteGuildToGroupAction : public InviteNearbyToGroupAction
 {
-    public:
-        InviteGuildToGroupAction(PlayerbotAI* botAI, std::string const name = "invite guild") : InviteNearbyToGroupAction(botAI, name) { }
+public:
+    InviteGuildToGroupAction(PlayerbotAI* botAI, std::string const name = "invite guild")
+        : InviteNearbyToGroupAction(botAI, name)
+    {
+    }
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 
-    private:
-        std::vector<Player*> getGuildMembers();
+private:
+    std::vector<Player*> getGuildMembers();
 };
 
 #endif

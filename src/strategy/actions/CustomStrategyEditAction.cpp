@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "CustomStrategyEditAction.h"
+
 #include "CustomStrategy.h"
 #include "Event.h"
 #include "Playerbots.h"
@@ -33,7 +35,8 @@ bool CustomStrategyEditAction::PrintHelp()
 
     uint32 owner = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER);
+    PlayerbotsDatabasePreparedStatement* stmt =
+        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER);
     stmt->SetData(0, owner);
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
@@ -42,8 +45,7 @@ bool CustomStrategyEditAction::PrintHelp()
             Field* fields = result->Fetch();
             std::string const name = fields[0].Get<std::string>();
             botAI->TellMaster(name);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     botAI->TellMaster("Usage: cs <name> <idx> <command>");
@@ -58,7 +60,8 @@ bool CustomStrategyEditAction::Print(std::string const name)
 
     uint32 owner = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
+    PlayerbotsDatabasePreparedStatement* stmt =
+        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
     stmt->SetData(0, owner);
     stmt->SetData(1, name);
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
@@ -70,8 +73,7 @@ bool CustomStrategyEditAction::Print(std::string const name)
             std::string const action = fields[1].Get<std::string>();
 
             PrintActionLine(idx, action);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     return true;
@@ -81,7 +83,8 @@ bool CustomStrategyEditAction::Edit(std::string const name, uint32 idx, std::str
 {
     uint32 owner = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME_AND_IDX);
+    PlayerbotsDatabasePreparedStatement* stmt =
+        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME_AND_IDX);
     stmt->SetData(0, owner);
     stmt->SetData(1, name);
     stmt->SetData(2, idx);

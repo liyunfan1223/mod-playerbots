@@ -1,26 +1,25 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "HolyPriestStrategy.h"
+
 #include "Playerbots.h"
 
 class HolyPriestStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-    public:
-        HolyPriestStrategyActionNodeFactory()
-        {
-            creators["smite"] = &smite;
-        }
+public:
+    HolyPriestStrategyActionNodeFactory() { creators["smite"] = &smite; }
 
-    private:
-        static ActionNode* smite([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode ("smite",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
-                /*C*/ nullptr);
-        }
+private:
+    static ActionNode* smite([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("smite",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
+                              /*C*/ nullptr);
+    }
 };
 
 HolyPriestStrategy::HolyPriestStrategy(PlayerbotAI* botAI) : HealPriestStrategy(botAI)
@@ -30,17 +29,23 @@ HolyPriestStrategy::HolyPriestStrategy(PlayerbotAI* botAI) : HealPriestStrategy(
 
 NextAction** HolyPriestStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("smite", ACTION_DEFAULT + 0.2f), new NextAction("mana burn", ACTION_DEFAULT + 0.1f), new NextAction("starshards", ACTION_DEFAULT), nullptr);
+    return NextAction::array(0, new NextAction("smite", ACTION_DEFAULT + 0.2f),
+                             new NextAction("mana burn", ACTION_DEFAULT + 0.1f),
+                             new NextAction("starshards", ACTION_DEFAULT), nullptr);
 }
 
 void HolyPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     HealPriestStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("holy fire", NextAction::array(0, new NextAction("holy fire", ACTION_NORMAL + 9), nullptr)));
-    triggers.push_back(new TriggerNode("shadowfiend", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("mana burn", ACTION_HIGH), nullptr)));
+    triggers.push_back(
+        new TriggerNode("holy fire", NextAction::array(0, new NextAction("holy fire", ACTION_NORMAL + 9), nullptr)));
+    triggers.push_back(
+        new TriggerNode("shadowfiend", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
+    triggers.push_back(
+        new TriggerNode("medium mana", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
+    triggers.push_back(
+        new TriggerNode("low mana", NextAction::array(0, new NextAction("mana burn", ACTION_HIGH), nullptr)));
 }
 
 HolyHealPriestStrategy::HolyHealPriestStrategy(PlayerbotAI* botAI) : GenericPriestStrategy(botAI)
@@ -57,51 +62,43 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPriestStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-		"group heal occasion",
-        NextAction::array(0, 
-            new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8),
-            NULL)));
+    triggers.push_back(
+        new TriggerNode("group heal occasion",
+                        NextAction::array(0, new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), NULL)));
 
     triggers.push_back(new TriggerNode(
         "medium group heal occasion",
-        NextAction::array(0,
-            new NextAction("divine hymn", ACTION_CRITICAL_HEAL + 6), 
-            new NextAction("prayer of healing on party", ACTION_CRITICAL_HEAL + 5),
-            nullptr)));
+        NextAction::array(0, new NextAction("divine hymn", ACTION_CRITICAL_HEAL + 6),
+                          new NextAction("prayer of healing on party", ACTION_CRITICAL_HEAL + 5), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "party member critical health",
-		NextAction::array(0,
-            new NextAction("power word: shield on party", ACTION_CRITICAL_HEAL + 5),
-            new NextAction("flash heal on party", ACTION_CRITICAL_HEAL + 3),
-            new NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 2),
-            NULL)));
+        NextAction::array(0, new NextAction("power word: shield on party", ACTION_CRITICAL_HEAL + 5),
+                          new NextAction("flash heal on party", ACTION_CRITICAL_HEAL + 3),
+                          new NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 2), NULL)));
+
+    triggers.push_back(
+        new TriggerNode("party member low health",
+                        NextAction::array(0, new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 4),
+                                          new NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 3),
+                                          new NextAction("prayer of mending on party", ACTION_MEDIUM_HEAL + 2),
+                                          new NextAction("flash heal on party", ACTION_MEDIUM_HEAL + 1), NULL)));
+
+    triggers.push_back(
+        new TriggerNode("party member medium health",
+                        NextAction::array(0, new NextAction("circle of healing", ACTION_LIGHT_HEAL + 7),
+                                          new NextAction("prayer of mending on party", ACTION_LIGHT_HEAL + 6),
+                                          new NextAction("flash heal on party", ACTION_LIGHT_HEAL + 5),
+                                          // new NextAction("renew on party", ACTION_LIGHT_HEAL + 8),
+                                          NULL)));
+
+    triggers.push_back(
+        new TriggerNode("party member almost full health",
+                        NextAction::array(0, new NextAction("renew on party", ACTION_LIGHT_HEAL + 2),
+                                          // new NextAction("flash heal on party", ACTION_LIGHT_HEAL + 1),
+                                          NULL)));
 
     triggers.push_back(new TriggerNode(
-        "party member low health",
-		NextAction::array(0,
-            new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 4),
-            new NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 3),
-            new NextAction("prayer of mending on party", ACTION_MEDIUM_HEAL + 2),
-            new NextAction("flash heal on party", ACTION_MEDIUM_HEAL + 1),
-            NULL)));
-
-	triggers.push_back(new TriggerNode(
-        "party member medium health",
-		NextAction::array(0,
-            new NextAction("circle of healing", ACTION_LIGHT_HEAL + 7),
-            new NextAction("prayer of mending on party", ACTION_LIGHT_HEAL + 6),
-            new NextAction("flash heal on party", ACTION_LIGHT_HEAL + 5),
-            // new NextAction("renew on party", ACTION_LIGHT_HEAL + 8),
-            NULL)));
-    
-    triggers.push_back(new TriggerNode(
-        "party member almost full health",
-		NextAction::array(0, 
-            new NextAction("renew on party", ACTION_LIGHT_HEAL + 2),
-            // new NextAction("flash heal on party", ACTION_LIGHT_HEAL + 1),
-            NULL)));
-
-    triggers.push_back(new TriggerNode("party member to heal out of spell range", NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 10), nullptr)));
+        "party member to heal out of spell range",
+        NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 10), nullptr)));
 }

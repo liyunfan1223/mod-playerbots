@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "CastCustomSpellAction.h"
+
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemUsageValue.h"
@@ -56,10 +58,10 @@ bool CastCustomSpellAction::Execute(Event event)
         if (master && master->GetTarget())
             target = botAI->GetUnit(master->GetTarget());
 
-     if (!target)
+    if (!target)
         target = bot;
 
-    if (!master) // Use self as master for permissions.
+    if (!master)  // Use self as master for permissions.
         master = bot;
 
     Item* itemTarget = nullptr;
@@ -136,7 +138,7 @@ bool CastCustomSpellAction::Execute(Event event)
             std::ostringstream cmd;
             cmd << castString(target) << " " << text << " " << (castCount - 1);
             botAI->HandleCommand(CHAT_MSG_WHISPER, cmd.str(), master);
-            msg << "|cffffff00(x" << (castCount-1) << " left)|r";
+            msg << "|cffffff00(x" << (castCount - 1) << " left)|r";
         }
 
         botAI->TellMasterNoFacing(msg.str());
@@ -150,10 +152,7 @@ bool CastCustomSpellAction::Execute(Event event)
     return result;
 }
 
-bool CastCustomNcSpellAction::isUseful()
-{
-    return !bot->IsInCombat();
-}
+bool CastCustomNcSpellAction::isUseful() { return !bot->IsInCombat(); }
 
 std::string const CastCustomNcSpellAction::castString(WorldObject* target)
 {
@@ -162,7 +161,8 @@ std::string const CastCustomNcSpellAction::castString(WorldObject* target)
 
 bool CastRandomSpellAction::AcceptSpell(SpellInfo const* spellInfo)
 {
-    bool isTradeSkill = spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_CREATE_ITEM && spellInfo->ReagentCount[EFFECT_0] > 0 && spellInfo->SchoolMask == 1;
+    bool isTradeSkill = spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_CREATE_ITEM &&
+                        spellInfo->ReagentCount[EFFECT_0] > 0 && spellInfo->SchoolMask == 1;
     return !isTradeSkill && spellInfo->GetRecoveryTime() < MINUTE * IN_MILLISECONDS;
 }
 
@@ -220,7 +220,8 @@ bool CastRandomSpellAction::Execute(Event event)
 
             if (target && botAI->CanCastSpell(spellId, target, true))
                 spellList.push_back(std::make_pair(spellId, std::make_pair(spellPriority, target)));
-            if (got && botAI->CanCastSpell(spellId, got->GetPositionX(), got->GetPositionY(), got->GetPositionZ(), true))
+            if (got &&
+                botAI->CanCastSpell(spellId, got->GetPositionX(), got->GetPositionY(), got->GetPositionZ(), true))
                 spellList.push_back(std::make_pair(spellId, std::make_pair(spellPriority, got)));
             if (botAI->CanCastSpell(spellId, bot, true))
                 spellList.push_back(std::make_pair(spellId, std::make_pair(spellPriority, bot)));
@@ -232,10 +233,9 @@ bool CastRandomSpellAction::Execute(Event event)
 
     bool isCast = false;
 
-    std::sort(spellList.begin(), spellList.end(), [](std::pair<uint32, std::pair<uint32, WorldObject*>> i, std::pair<uint32, std::pair<uint32, WorldObject*>> j)
-    {
-        return i.first > j.first;
-    });
+    std::sort(spellList.begin(), spellList.end(),
+              [](std::pair<uint32, std::pair<uint32, WorldObject*>> i,
+                 std::pair<uint32, std::pair<uint32, WorldObject*>> j) { return i.first > j.first; });
 
     uint32 rndBound = spellList.size() / 4;
 
@@ -270,7 +270,8 @@ bool CastRandomSpellAction::Execute(Event event)
 
 bool CraftRandomItemAction::AcceptSpell(SpellInfo const* spellInfo)
 {
-    return spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_CREATE_ITEM && spellInfo->ReagentCount[EFFECT_0] > 0 && spellInfo->SchoolMask == 0;
+    return spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_CREATE_ITEM && spellInfo->ReagentCount[EFFECT_0] > 0 &&
+           spellInfo->SchoolMask == 0;
 }
 
 uint32 CraftRandomItemAction::GetSpellPriority(SpellInfo const* spellInfo)
@@ -282,7 +283,8 @@ uint32 CraftRandomItemAction::GetSpellPriority(SpellInfo const* spellInfo)
         {
             ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", newItemId);
 
-            if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_AMMO || usage == ITEM_USAGE_QUEST || usage == ITEM_USAGE_SKILL || usage == ITEM_USAGE_USE)
+            if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_AMMO ||
+                usage == ITEM_USAGE_QUEST || usage == ITEM_USAGE_SKILL || usage == ITEM_USAGE_USE)
                 return 10;
         }
 
@@ -295,7 +297,6 @@ uint32 CraftRandomItemAction::GetSpellPriority(SpellInfo const* spellInfo)
 
 bool CastRandomSpellAction::castSpell(uint32 spellId, WorldObject* wo)
 {
-
     if (wo->GetGUID().IsUnit())
         return botAI->CastSpell(spellId, (Unit*)(wo));
     else
@@ -304,16 +305,19 @@ bool CastRandomSpellAction::castSpell(uint32 spellId, WorldObject* wo)
 
 bool DisEnchantRandomItemAction::Execute(Event event)
 {
-    std::vector<Item*> items = AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(ITEM_USAGE_DISENCHANT));
+    std::vector<Item*> items =
+        AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(ITEM_USAGE_DISENCHANT));
     std::reverse(items.begin(), items.end());
 
-    for (auto& item: items)
+    for (auto& item : items)
     {
         // don't touch rare+ items if with real player/guild
-        if ((botAI->HasRealPlayerMaster() || botAI->IsInRealGuild()) && item->GetTemplate()->Quality > ITEM_QUALITY_UNCOMMON)
+        if ((botAI->HasRealPlayerMaster() || botAI->IsInRealGuild()) &&
+            item->GetTemplate()->Quality > ITEM_QUALITY_UNCOMMON)
             return false;
 
-        if(CastCustomSpellAction::Execute(Event("disenchant random item", "13262 "+ chat->FormatQItem(item->GetEntry()))))
+        if (CastCustomSpellAction::Execute(
+                Event("disenchant random item", "13262 " + chat->FormatQItem(item->GetEntry()))))
             return true;
     }
 
@@ -322,13 +326,11 @@ bool DisEnchantRandomItemAction::Execute(Event event)
 
 bool DisEnchantRandomItemAction::isUseful()
 {
-    return botAI->HasSkill(SKILL_ENCHANTING) && !bot->IsInCombat() && AI_VALUE2(uint32, "item count", "usage " + std::to_string(ITEM_USAGE_DISENCHANT)) > 0;
+    return botAI->HasSkill(SKILL_ENCHANTING) && !bot->IsInCombat() &&
+           AI_VALUE2(uint32, "item count", "usage " + std::to_string(ITEM_USAGE_DISENCHANT)) > 0;
 }
 
-bool EnchantRandomItemAction::isUseful()
-{
-    return botAI->HasSkill(SKILL_ENCHANTING) && !bot->IsInCombat();
-}
+bool EnchantRandomItemAction::isUseful() { return botAI->HasSkill(SKILL_ENCHANTING) && !bot->IsInCombat(); }
 
 bool EnchantRandomItemAction::AcceptSpell(SpellInfo const* spellInfo)
 {

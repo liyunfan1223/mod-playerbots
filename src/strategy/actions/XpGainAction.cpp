@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "XpGainAction.h"
+
 #include "Event.h"
+#include "GuildMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
-#include "GuildMgr.h"
 
 bool XpGainAction::Execute(Event event)
 {
@@ -15,28 +17,29 @@ bool XpGainAction::Execute(Event event)
     if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->playerbotsXPrate == 1)
         return true;
 
-    WorldPacket p(event.getPacket()); // (8+4+1+4+8)
+    WorldPacket p(event.getPacket());  // (8+4+1+4+8)
     ObjectGuid guid;
     uint32 xpgain;
-    uint8 type = 0; // 00-kill_xp type, 01-non_kill_xp type
+    uint8 type = 0;  // 00-kill_xp type, 01-non_kill_xp type
     uint32 givenXp = 0;
     float groupBonus = 0;
 
     p.rpos(0);
-    p >> guid;      // 8 victim
-    p >> xpgain;    // 1 given experience
-    p >> type;      //1 00-kill_xp type, 01-non_kill_xp type
+    p >> guid;    // 8 victim
+    p >> xpgain;  // 1 given experience
+    p >> type;    // 1 00-kill_xp type, 01-non_kill_xp type
 
     if (!type)
     {
-        p >> givenXp;      // 4 experience without rested bonus
-        p >> groupBonus;   // 8 group bonus
+        p >> givenXp;     // 4 experience without rested bonus
+        p >> groupBonus;  // 8 group bonus
     }
 
     if (sPlayerbotAIConfig->randomBotGuildTalk && bot->GetGuildId() && urand(0, 10))
     {
         Creature* creature = botAI->GetCreature(guid);
-        if (creature && (creature->isElite() || creature->isWorldBoss() || creature->GetLevel() > 61 || creature->GetLevel() > bot->GetLevel() + 4))
+        if (creature && (creature->isElite() || creature->isWorldBoss() || creature->GetLevel() > 61 ||
+                         creature->GetLevel() > bot->GetLevel() + 4))
         {
             Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
             if (guild)
@@ -86,7 +89,7 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
     // XP resting bonus for kill
     uint32 rested_bonus_xp = victim ? bot->GetXPRestBonus(xp) : 0;
 
-    //SendLogXPGain(xp, victim, rested_bonus_xp);
+    // SendLogXPGain(xp, victim, rested_bonus_xp);
 
     uint32 curXP = bot->GetUInt32Value(PLAYER_XP);
     uint32 nextLvlXP = bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);

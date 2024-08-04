@@ -1,11 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotDbStore.h"
-#include "Playerbots.h"
 
 #include <iostream>
+
+#include "Playerbots.h"
 
 void PlayerbotDbStore::Load(PlayerbotAI* botAI)
 {
@@ -35,8 +37,7 @@ void PlayerbotDbStore::Load(PlayerbotAI* botAI)
                 botAI->ChangeStrategy(value, BOT_STATE_NON_COMBAT);
             else if (key == "dead")
                 botAI->ChangeStrategy(value, BOT_STATE_DEAD);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
 
         botAI->GetAiObjectContext()->Load(values);
     }

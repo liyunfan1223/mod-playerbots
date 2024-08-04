@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "AcceptResurrectAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -18,8 +20,8 @@ bool AcceptResurrectAction::Execute(Event event)
 
     WorldPacket packet(CMSG_RESURRECT_RESPONSE, 8 + 1);
     packet << guid;
-    packet << uint8(1);                        // accept
-    bot->GetSession()->HandleResurrectResponseOpcode(packet);   // queue the packet to get around race condition
+    packet << uint8(1);                                        // accept
+    bot->GetSession()->HandleResurrectResponseOpcode(packet);  // queue the packet to get around race condition
 
     botAI->ChangeEngine(BOT_STATE_NON_COMBAT);
 

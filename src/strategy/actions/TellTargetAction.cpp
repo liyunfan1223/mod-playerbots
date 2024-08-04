@@ -1,11 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TellTargetAction.h"
-#include "ThreatMgr.h"
+
 #include "Event.h"
 #include "Playerbots.h"
+#include "ThreatMgr.h"
 
 bool TellTargetAction::Execute(Event event)
 {
@@ -13,7 +15,7 @@ bool TellTargetAction::Execute(Event event)
     if (target)
     {
         std::ostringstream out;
-		out << "Attacking " << target->GetName();
+        out << "Attacking " << target->GetName();
         botAI->TellMaster(out);
 
         context->GetValue<Unit*>("old target")->Set(target);
@@ -42,7 +44,7 @@ bool TellAttackersAction::Execute(Event event)
     if (!ref)
         return true;
 
-    while( ref )
+    while (ref)
     {
         ThreatMgr* threatMgr = ref->GetSource();
         Unit* unit = threatMgr->GetOwner();

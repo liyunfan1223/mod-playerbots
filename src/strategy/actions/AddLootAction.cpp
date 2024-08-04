@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "AddLootAction.h"
+
 #include "CellImpl.h"
 #include "Event.h"
 #include "GridNotifiers.h"
@@ -35,20 +37,11 @@ bool AddAllLootAction::Execute(Event event)
     return added;
 }
 
-bool AddLootAction::isUseful()
-{
-    return true;
-}
+bool AddLootAction::isUseful() { return true; }
 
-bool AddAllLootAction::isUseful()
-{
-    return true;
-}
+bool AddAllLootAction::isUseful() { return true; }
 
-bool AddAllLootAction::AddLoot(ObjectGuid guid)
-{
-    return AI_VALUE(LootObjectStack*, "available loot")->Add(guid);
-}
+bool AddAllLootAction::AddLoot(ObjectGuid guid) { return AI_VALUE(LootObjectStack*, "available loot")->Add(guid); }
 
 bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 {

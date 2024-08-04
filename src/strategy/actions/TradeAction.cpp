@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TradeAction.h"
-#include "Event.h"
-#include "ItemVisitors.h"
-#include "ItemCountValue.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
+#include "ItemCountValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 
 bool TradeAction::Execute(Event event)
@@ -18,18 +20,18 @@ bool TradeAction::Execute(Event event)
         GuidVector guids = chat->parseGameobjects(text);
         Player* player = nullptr;
 
-        for(auto& guid: guids)
+        for (auto& guid : guids)
             if (guid.IsPlayer())
                 player = ObjectAccessor::FindPlayer(guid);
 
         if (!player && botAI->GetMaster())
             player = botAI->GetMaster();
 
-        if (!player) return false;
+        if (!player)
+            return false;
 
         if (!player->GetTrader())
         {
-
             WorldPacket packet(CMSG_INITIATE_TRADE);
             packet << player->GetGUID();
             bot->GetSession()->HandleInitiateTradeOpcode(packet);
@@ -88,7 +90,7 @@ bool TradeAction::TradeItem(Item const* item, int8 slot)
                 tradeSlot = i;
 
                 WorldPacket packet(CMSG_CLEAR_TRADE_ITEM, 1);
-                packet << (uint8) tradeSlot;
+                packet << (uint8)tradeSlot;
                 bot->GetSession()->HandleClearTradeItemOpcode(packet);
                 pTrade->SetItem(TradeSlots(i), nullptr);
                 return true;
@@ -114,4 +116,3 @@ bool TradeAction::TradeItem(Item const* item, int8 slot)
     bot->GetSession()->HandleSetTradeItemOpcode(packet);
     return true;
 }
-

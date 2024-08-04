@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_NEARESTNPCSVALUE_H
@@ -12,42 +13,54 @@ class PlayerbotAI;
 
 class NearestNpcsValue : public NearestUnitsValue
 {
-	public:
-        NearestNpcsValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest npcs", range) { }
+public:
+    NearestNpcsValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance)
+        : NearestUnitsValue(botAI, "nearest npcs", range)
+    {
+    }
 
-    protected:
-        void FindUnits(std::list<Unit*>& targets) override;
-        bool AcceptUnit(Unit* unit) override;
+protected:
+    void FindUnits(std::list<Unit*>& targets) override;
+    bool AcceptUnit(Unit* unit) override;
 };
 
 class NearestVehiclesValue : public NearestUnitsValue
 {
-    public:
-        NearestVehiclesValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest vehicles", range) { }
+public:
+    NearestVehiclesValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance)
+        : NearestUnitsValue(botAI, "nearest vehicles", range)
+    {
+    }
 
-    protected:
-        void FindUnits(std::list<Unit*>& targets) override;
-        bool AcceptUnit(Unit* unit) override;
+protected:
+    void FindUnits(std::list<Unit*>& targets) override;
+    bool AcceptUnit(Unit* unit) override;
 };
 
 class NearestTriggersValue : public NearestUnitsValue
 {
-	public:
-        NearestTriggersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance) : NearestUnitsValue(botAI, "nearest triggers", range) { }
+public:
+    NearestTriggersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance)
+        : NearestUnitsValue(botAI, "nearest triggers", range)
+    {
+    }
 
-    protected:
-        void FindUnits(std::list<Unit*>& targets) override;
-        bool AcceptUnit(Unit* unit) override;
+protected:
+    void FindUnits(std::list<Unit*>& targets) override;
+    bool AcceptUnit(Unit* unit) override;
 };
 
 class NearestTotemsValue : public NearestUnitsValue
 {
-	public:
-        NearestTotemsValue(PlayerbotAI* botAI, float range = 30.0f) : NearestUnitsValue(botAI, "nearest totems", range, true) { }
+public:
+    NearestTotemsValue(PlayerbotAI* botAI, float range = 30.0f)
+        : NearestUnitsValue(botAI, "nearest totems", range, true)
+    {
+    }
 
-    protected:
-        void FindUnits(std::list<Unit*>& targets) override;
-        bool AcceptUnit(Unit* unit) override;
+protected:
+    void FindUnits(std::list<Unit*>& targets) override;
+    bool AcceptUnit(Unit* unit) override;
 };
 
 #endif

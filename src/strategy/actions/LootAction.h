@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_LOOTACTION_H
@@ -15,43 +16,43 @@ class SpellInfo;
 
 class LootAction : public MovementAction
 {
-    public:
-        LootAction(PlayerbotAI* botAI) : MovementAction(botAI, "loot") { }
+public:
+    LootAction(PlayerbotAI* botAI) : MovementAction(botAI, "loot") {}
 
-        bool Execute(Event event) override;
-        bool isUseful() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class OpenLootAction : public MovementAction
 {
-    public:
-        OpenLootAction(PlayerbotAI* botAI) : MovementAction(botAI, "open loot") { }
+public:
+    OpenLootAction(PlayerbotAI* botAI) : MovementAction(botAI, "open loot") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 
-    private:
-        bool DoLoot(LootObject& lootObject);
-        uint32 GetOpeningSpell(LootObject& lootObject);
-        uint32 GetOpeningSpell(LootObject& lootObject, GameObject* go);
-        bool CanOpenLock(LootObject& lootObject, SpellInfo const* spellInfo, GameObject* go);
-        bool CanOpenLock(uint32 skillId, uint32 reqSkillValue);
+private:
+    bool DoLoot(LootObject& lootObject);
+    uint32 GetOpeningSpell(LootObject& lootObject);
+    uint32 GetOpeningSpell(LootObject& lootObject, GameObject* go);
+    bool CanOpenLock(LootObject& lootObject, SpellInfo const* spellInfo, GameObject* go);
+    bool CanOpenLock(uint32 skillId, uint32 reqSkillValue);
 };
 
 class StoreLootAction : public InventoryAction
 {
-    public:
-        StoreLootAction(PlayerbotAI* botAI) : InventoryAction(botAI, "store loot") { }
+public:
+    StoreLootAction(PlayerbotAI* botAI) : InventoryAction(botAI, "store loot") {}
 
-        bool Execute(Event event) override;
-        static bool IsLootAllowed(uint32 itemid, PlayerbotAI* botAI);
+    bool Execute(Event event) override;
+    static bool IsLootAllowed(uint32 itemid, PlayerbotAI* botAI);
 };
 
 class ReleaseLootAction : public InventoryAction
 {
-    public:
-        ReleaseLootAction(PlayerbotAI* botAI) : InventoryAction(botAI, "release loot") { }
+public:
+    ReleaseLootAction(PlayerbotAI* botAI) : InventoryAction(botAI, "release loot") {}
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

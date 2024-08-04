@@ -1,14 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "SecurityCheckAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
 bool SecurityCheckAction::isUseful()
 {
-    return sRandomPlayerbotMgr->IsRandomBot(bot) && botAI->GetMaster() && botAI->GetMaster()->GetSession()->GetSecurity() < SEC_GAMEMASTER && !GET_PLAYERBOT_AI(botAI->GetMaster());
+    return sRandomPlayerbotMgr->IsRandomBot(bot) && botAI->GetMaster() &&
+           botAI->GetMaster()->GetSession()->GetSecurity() < SEC_GAMEMASTER && !GET_PLAYERBOT_AI(botAI->GetMaster());
 }
 
 bool SecurityCheckAction::Execute(Event event)
@@ -19,7 +22,8 @@ bool SecurityCheckAction::Execute(Event event)
         ItemQualities threshold = group->GetLootThreshold();
         if (method == MASTER_LOOT || method == FREE_FOR_ALL || threshold > ITEM_QUALITY_UNCOMMON)
         {
-            if ((botAI->GetGroupMaster()->GetSession()->GetSecurity() == SEC_PLAYER) && (!bot->GetGuildId() || bot->GetGuildId() != botAI->GetGroupMaster()->GetGuildId()))
+            if ((botAI->GetGroupMaster()->GetSession()->GetSecurity() == SEC_PLAYER) &&
+                (!bot->GetGuildId() || bot->GetGuildId() != botAI->GetGroupMaster()->GetGuildId()))
             {
                 botAI->TellError("I will play with this loot type only if I'm in your guild :/");
                 botAI->ChangeStrategy("+passive,+stay", BOT_STATE_NON_COMBAT);

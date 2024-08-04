@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "EmoteAction.h"
+
 #include "Event.h"
+#include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
-#include "PlayerbotTextMgr.h"
 
 std::map<std::string, uint32> EmoteActionBase::emotes;
 std::map<std::string, uint32> EmoteActionBase::textEmotes;
@@ -18,9 +20,7 @@ EmoteActionBase::EmoteActionBase(PlayerbotAI* botAI, std::string const name) : A
         InitEmotes();
 }
 
-EmoteAction::EmoteAction(PlayerbotAI* botAI) : EmoteActionBase(botAI, "emote"), Qualified()
-{
-}
+EmoteAction::EmoteAction(PlayerbotAI* botAI) : EmoteActionBase(botAI, "emote"), Qualified() {}
 
 void EmoteActionBase::InitEmotes()
 {
@@ -67,10 +67,10 @@ void EmoteActionBase::InitEmotes()
     textEmotes["congratulate"] = TEXT_EMOTE_CONGRATULATE;
     textEmotes["hello"] = TEXT_EMOTE_HELLO;
     textEmotes["no"] = TEXT_EMOTE_NO;
-    textEmotes["nod"] = TEXT_EMOTE_NOD; // yes
+    textEmotes["nod"] = TEXT_EMOTE_NOD;  // yes
     textEmotes["sigh"] = TEXT_EMOTE_SIGH;
     textEmotes["thank"] = TEXT_EMOTE_THANK;
-    textEmotes["welcome"] = TEXT_EMOTE_WELCOME; // you are welcome
+    textEmotes["welcome"] = TEXT_EMOTE_WELCOME;  // you are welcome
     textEmotes["whistle"] = TEXT_EMOTE_WHISTLE;
     textEmotes["yawn"] = TEXT_EMOTE_YAWN;
     textEmotes["oom"] = 323;
@@ -196,7 +196,7 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_BLUSH:
         case TEXT_EMOTE_SMILE:
         case TEXT_EMOTE_LOVE:
-            //case TEXT_EMOTE_HOLDHAND:
+            // case TEXT_EMOTE_HOLDHAND:
             emoteText = "Awwwww...";
             emoteId = EMOTE_ONESHOT_SHY;
             textEmote = TEXT_EMOTE_SHY;
@@ -207,13 +207,13 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
             textEmote = TEXT_EMOTE_APPLAUD;
             break;
         case TEXT_EMOTE_ANGRY:
-            //case TEXT_EMOTE_FACEPALM:
+            // case TEXT_EMOTE_FACEPALM:
         case TEXT_EMOTE_GLARE:
         case TEXT_EMOTE_BLAME:
-            //case TEXT_EMOTE_FAIL:
-            //case TEXT_EMOTE_REGRET:
-            //case TEXT_EMOTE_SCOLD:
-            //case TEXT_EMOTE_CROSSARMS:
+            // case TEXT_EMOTE_FAIL:
+            // case TEXT_EMOTE_REGRET:
+            // case TEXT_EMOTE_SCOLD:
+            // case TEXT_EMOTE_CROSSARMS:
             emoteText = "Did I do thaaaaat?";
             emoteId = EMOTE_ONESHOT_QUESTION;
             textEmote = TEXT_EMOTE_SHRUG;
@@ -247,7 +247,7 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_CLAP:
         case TEXT_EMOTE_CONGRATULATE:
         case TEXT_EMOTE_HAPPY:
-            //case TEXT_EMOTE_GOLFCLAP:
+            // case TEXT_EMOTE_GOLFCLAP:
             emoteId = EMOTE_ONESHOT_BOW;
             textEmote = TEXT_EMOTE_BOW;
             emoteText = "Thank you.. Thank you.. I'm here all week.";
@@ -262,8 +262,8 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_BITE:
         case TEXT_EMOTE_POKE:
         case TEXT_EMOTE_SCRATCH:
-            //case TEXT_EMOTE_PINCH:
-            //case TEXT_EMOTE_PUNCH:
+            // case TEXT_EMOTE_PINCH:
+            // case TEXT_EMOTE_PUNCH:
             emoteId = EMOTE_ONESHOT_ROAR;
             textEmote = TEXT_EMOTE_ROAR;
             emoteYell = "OUCH! Dammit, that hurt!";
@@ -300,9 +300,9 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_PRAISE:
         case TEXT_EMOTE_SCARED:
         case TEXT_EMOTE_COMMEND:
-            //case TEXT_EMOTE_AWE:
-            //case TEXT_EMOTE_JEALOUS:
-            //case TEXT_EMOTE_PROUD:
+            // case TEXT_EMOTE_AWE:
+            // case TEXT_EMOTE_JEALOUS:
+            // case TEXT_EMOTE_PROUD:
             emoteId = EMOTE_ONESHOT_FLEX;
             textEmote = TEXT_EMOTE_FLEX;
             emoteText = "Yes, Yes. I know I'm amazing..";
@@ -310,8 +310,8 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_BLEED:
         case TEXT_EMOTE_MOURN:
         case TEXT_EMOTE_FLOP:
-            //case TEXT_EMOTE_FAINT:
-            //case TEXT_EMOTE_PULSE:
+            // case TEXT_EMOTE_FAINT:
+            // case TEXT_EMOTE_PULSE:
             emoteId = EMOTE_ONESHOT_KNEEL;
             textEmote = TEXT_EMOTE_KNEEL;
             emoteText = "MEDIC! Stat!";
@@ -338,7 +338,7 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_GUFFAW:
         case TEXT_EMOTE_ROFL:
         case TEXT_EMOTE_SNICKER:
-            //case TEXT_EMOTE_SNORT:
+            // case TEXT_EMOTE_SNORT:
             emoteId = EMOTE_ONESHOT_LAUGH;
             textEmote = TEXT_EMOTE_LAUGH;
             emoteText = "Wait... what are we laughing at again?";
@@ -368,8 +368,8 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_SPIT:
         case TEXT_EMOTE_LICK:
         case TEXT_EMOTE_BREATH:
-            //case TEXT_EMOTE_SNEEZE:
-            //case TEXT_EMOTE_SWEAT:
+            // case TEXT_EMOTE_SNEEZE:
+            // case TEXT_EMOTE_SWEAT:
             emoteId = EMOTE_ONESHOT_POINT;
             textEmote = TEXT_EMOTE_POINT;
             emoteText = "Ewww! Keep your nasty germs over there!";
@@ -420,7 +420,7 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_SHIMMY:
         case TEXT_EMOTE_SMIRK:
         case TEXT_EMOTE_WINK:
-            //case TEXT_EMOTE_CHARM:
+            // case TEXT_EMOTE_CHARM:
             emoteId = EMOTE_ONESHOT_NO;
             textEmote = TEXT_EMOTE_NO;
             emoteText = "Keep it in your pants, boss..";
@@ -447,7 +447,7 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_RASP:
             emoteId = EMOTE_ONESHOT_RUDE;
             textEmote = TEXT_EMOTE_RASP;
-            emoteText = "Right back at you, bub!"; // , LANG_UNIVERSAL;
+            emoteText = "Right back at you, bub!";  // , LANG_UNIVERSAL;
             break;
         case TEXT_EMOTE_ROAR:
         case TEXT_EMOTE_THREATEN:
@@ -456,17 +456,17 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_TAUNT:
         case TEXT_EMOTE_PITY:
         case TEXT_EMOTE_GROWL:
-            //case TEXT_EMOTE_TRAIN:
-            //case TEXT_EMOTE_INCOMING:
-            //case TEXT_EMOTE_CHARGE:
-            //case TEXT_EMOTE_FLEE:
-            //case TEXT_EMOTE_ATTACKMYTARGET:
+            // case TEXT_EMOTE_TRAIN:
+            // case TEXT_EMOTE_INCOMING:
+            // case TEXT_EMOTE_CHARGE:
+            // case TEXT_EMOTE_FLEE:
+            // case TEXT_EMOTE_ATTACKMYTARGET:
         case TEXT_EMOTE_OPENFIRE:
         case TEXT_EMOTE_ENCOURAGE:
         case TEXT_EMOTE_ENEMY:
-            //case TEXT_EMOTE_CHALLENGE:
-            //case TEXT_EMOTE_REVENGE:
-            //case TEXT_EMOTE_SHAKEFIST:
+            // case TEXT_EMOTE_CHALLENGE:
+            // case TEXT_EMOTE_REVENGE:
+            // case TEXT_EMOTE_SHAKEFIST:
             emoteId = EMOTE_ONESHOT_ROAR;
             textEmote = TEXT_EMOTE_ROAR;
             emoteYell = "RAWR!";
@@ -493,8 +493,8 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_VICTORY:
         case TEXT_EMOTE_CHEER:
         case TEXT_EMOTE_TOAST:
-            //case TEXT_EMOTE_HIGHFIVE:
-            //case TEXT_EMOTE_DING:
+            // case TEXT_EMOTE_HIGHFIVE:
+            // case TEXT_EMOTE_DING:
             emoteId = EMOTE_ONESHOT_CHEER;
             textEmote = TEXT_EMOTE_CHEER;
             emoteText = "Yay!";
@@ -502,9 +502,9 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
         case TEXT_EMOTE_COLD:
         case TEXT_EMOTE_SHIVER:
         case TEXT_EMOTE_THIRSTY:
-            //case TEXT_EMOTE_OOM:
-            //case TEXT_EMOTE_HEALME:
-            //case TEXT_EMOTE_POUT:
+            // case TEXT_EMOTE_OOM:
+            // case TEXT_EMOTE_HEALME:
+            // case TEXT_EMOTE_POUT:
             emoteId = EMOTE_ONESHOT_QUESTION;
             textEmote = TEXT_EMOTE_PUZZLE;
             emoteText = "And what exactly am I supposed to do about that?";
@@ -542,7 +542,7 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
             emoteText = "Shoo yourself!";
             break;
         case TEXT_EMOTE_SLAP:
-            //case TEXT_EMOTE_SMACK:
+            // case TEXT_EMOTE_SMACK:
             emoteId = EMOTE_ONESHOT_CRY;
             textEmote = TEXT_EMOTE_CRY;
             emoteText = "What did I do to deserve that?";
@@ -562,18 +562,18 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
             textEmote = TEXT_EMOTE_SIGH;
             emoteText = "Har Har.. very funny..";
             break;
-            //case TEXT_EMOTE_HELPME:
-            //    bot->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-            //    bot->Yell("Quick! Someone HELP!", LANG_UNIVERSAL);
-            //    break;
+            // case TEXT_EMOTE_HELPME:
+            //     bot->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+            //     bot->Yell("Quick! Someone HELP!", LANG_UNIVERSAL);
+            //     break;
         case TEXT_EMOTE_GOODLUCK:
-            //case TEXT_EMOTE_LUCK:
+            // case TEXT_EMOTE_LUCK:
             emoteId = EMOTE_ONESHOT_TALK;
             textEmote = TEXT_EMOTE_THANK;
             emoteText = "Thanks... I'll need it..";
             break;
         case TEXT_EMOTE_BRANDISH:
-            //case TEXT_EMOTE_MERCY:
+            // case TEXT_EMOTE_MERCY:
             emoteId = EMOTE_ONESHOT_BEG;
             textEmote = TEXT_EMOTE_BEG;
             emoteText = "Please don't kill me!";
@@ -612,9 +612,9 @@ bool EmoteActionBase::ReceiveEmote(Player* source, uint32 emote, bool verbal)
             bot->Yell("You think that's going to help you?!", LANG_UNIVERSAL);
             break;*/
         default:
-            //return false;
-            //bot->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
-            //bot->Say("Mmmmmkaaaaaay...", LANG_UNIVERSAL);
+            // return false;
+            // bot->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+            // bot->Say("Mmmmmkaaaaaay...", LANG_UNIVERSAL);
             break;
     }
 
@@ -668,8 +668,9 @@ bool EmoteAction::Execute(Event event)
             p >> nam;
 
         pSource = ObjectAccessor::FindPlayer(source);
-        if (pSource && (pSource->GetGUID() != bot->GetGUID()) && ((urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f)) ||
-            (namlen > 1 && strstri(bot->GetName().c_str(), nam.c_str()))))
+        if (pSource && (pSource->GetGUID() != bot->GetGUID()) &&
+            ((urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f)) ||
+             (namlen > 1 && strstri(bot->GetName().c_str(), nam.c_str()))))
         {
             /*LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_TEXT_EMOTE {} from player {} <{}>",
                 bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
@@ -688,14 +689,16 @@ bool EmoteAction::Execute(Event event)
         p >> emoteId >> source;
 
         pSource = ObjectAccessor::FindPlayer(source);
-        if (pSource && pSource != bot && sServerFacade->GetDistance2d(bot, pSource) < sPlayerbotAIConfig->farDistance && emoteId != EMOTE_ONESHOT_NONE)
+        if (pSource && pSource != bot && sServerFacade->GetDistance2d(bot, pSource) < sPlayerbotAIConfig->farDistance &&
+            emoteId != EMOTE_ONESHOT_NONE)
         {
-            if ((pSource->GetGUID() != bot->GetGUID()) && (pSource->GetTarget() == bot->GetGUID() ||
-                (urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f))))
+            if ((pSource->GetGUID() != bot->GetGUID()) &&
+                (pSource->GetTarget() == bot->GetGUID() ||
+                 (urand(0, 1) && bot->HasInArc(static_cast<float>(M_PI), pSource, 10.0f))))
             {
                 /*LOG_INFO("playerbots", "Bot {} {}:{} <{}> received SMSG_EMOTE {} from player {} <{}>",
-                    bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                    emoteId, pSource->GetGUID().ToString().c_str(), pSource->GetName());*/
+                    bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
+                   bot->GetName(), emoteId, pSource->GetGUID().ToString().c_str(), pSource->GetName());*/
 
                 std::vector<uint32> types;
                 for (int32 i = sEmotesTextStore.GetNumRows(); i >= 0; --i)
@@ -732,7 +735,9 @@ bool EmoteAction::Execute(Event event)
     if ((!isReact && param.empty()) || emote)
     {
         time_t lastEmote = AI_VALUE2(time_t, "last emote", qualifier);
-        botAI->GetAiObjectContext()->GetValue<time_t>("last emote", qualifier)->Set(time(nullptr) + urand(1000, sPlayerbotAIConfig->repeatDelay) / 1000);
+        botAI->GetAiObjectContext()
+            ->GetValue<time_t>("last emote", qualifier)
+            ->Set(time(nullptr) + urand(1000, sPlayerbotAIConfig->repeatDelay) / 1000);
         param = qualifier;
     }
 
@@ -832,7 +837,8 @@ uint32 TalkAction::GetRandomEmote(Unit* unit, bool textEmote)
             types.push_back(TEXT_EMOTE_TALKEX);
             types.push_back(TEXT_EMOTE_TALKQ);
 
-            if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) || unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
+            if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) ||
+                         unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
             {
                 types.push_back(TEXT_EMOTE_SALUTE);
             }
@@ -858,7 +864,8 @@ uint32 TalkAction::GetRandomEmote(Unit* unit, bool textEmote)
         types.push_back(EMOTE_ONESHOT_EXCLAMATION);
         types.push_back(EMOTE_ONESHOT_QUESTION);
 
-        if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) || unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
+        if (unit && (unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) ||
+                     unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER)))
         {
             types.push_back(EMOTE_ONESHOT_SALUTE);
         }
@@ -1272,24 +1279,24 @@ uint32 EmoteActionBase::GetNumberOfEmoteVariants(TextEmotes emote, uint8 Race, u
     {
         switch (Race)
         {
-        case RACE_HUMAN:
-        case RACE_DWARF:
-        case RACE_NIGHTELF:
-        case RACE_GNOME:
-        case RACE_ORC:
-        case RACE_TAUREN:
-        case RACE_TROLL:
-        {
-            if (Gender == GENDER_MALE)
+            case RACE_HUMAN:
+            case RACE_DWARF:
+            case RACE_NIGHTELF:
+            case RACE_GNOME:
+            case RACE_ORC:
+            case RACE_TAUREN:
+            case RACE_TROLL:
+            {
+                if (Gender == GENDER_MALE)
+                    return 3;
                 return 3;
-            return 3;
-        }
-        case RACE_UNDEAD_PLAYER:
-        {
-            if (Gender == GENDER_MALE)
-                return 2;
-            return 3;
-        }
+            }
+            case RACE_UNDEAD_PLAYER:
+            {
+                if (Gender == GENDER_MALE)
+                    return 2;
+                return 3;
+            }
         }
     }
     else if (emote == TEXT_EMOTE_CONGRATULATE)

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_WARRIORTRIGGERS_H
@@ -19,10 +20,10 @@ DEBUFF_TRIGGER(SunderArmorDebuffTrigger, "sunder armor");
 DEBUFF_TRIGGER(MortalStrikeDebuffTrigger, "mortal strike");
 // DEBUFF_ENEMY_TRIGGER(RendDebuffOnAttackerTrigger, "rend");
 
-class RendDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger 
+class RendDebuffOnAttackerTrigger : public DebuffOnMeleeAttackerTrigger
 {
-    public:
-        RendDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "rend") {}
+public:
+    RendDebuffOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnMeleeAttackerTrigger(botAI, "rend") {}
 };
 
 CAN_CAST_TRIGGER(RevengeAvailableTrigger, "revenge");
@@ -58,8 +59,8 @@ HAS_AURA_TRIGGER(TasteForBloodTrigger, "taste for blood");
 
 class RendDebuffTrigger : public DebuffTrigger
 {
-    public:
-        RendDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rend", 1, true) { }
+public:
+    RendDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rend", 1, true) {}
 };
 
 // class SlamTrigger : public HasAuraTrigger

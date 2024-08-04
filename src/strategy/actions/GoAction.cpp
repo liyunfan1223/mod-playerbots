@@ -1,14 +1,16 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "GoAction.h"
+
 #include "ChooseTravelTargetAction.h"
 #include "Event.h"
 #include "Formations.h"
 #include "PathGenerator.h"
-#include "PositionValue.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 #include "ServerFacade.h"
 
 std::vector<std::string> split(std::string const s, char delim);
@@ -73,7 +75,8 @@ bool GoAction::Execute(Event event)
             if (GameObject* go = botAI->GetGameObject(guid))
                 if (go->isSpawned())
                 {
-                    if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, go), sPlayerbotAIConfig->reactDistance))
+                    if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, go),
+                                                             sPlayerbotAIConfig->reactDistance))
                     {
                         botAI->TellError("It is too far away");
                         return false;
@@ -82,7 +85,8 @@ bool GoAction::Execute(Event event)
                     std::ostringstream out;
                     out << "Moving to " << ChatHelper::FormatGameobject(go);
                     botAI->TellMasterNoFacing(out.str());
-                    return MoveNear(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 0.5f, sPlayerbotAIConfig->followDistance);
+                    return MoveNear(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 0.5f,
+                                    sPlayerbotAIConfig->followDistance);
                 }
         }
         return false;
@@ -101,7 +105,8 @@ bool GoAction::Execute(Event event)
                 std::ostringstream out;
                 out << "Moving to " << unit->GetName();
                 botAI->TellMasterNoFacing(out.str());
-                return MoveNear(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 0.5f, sPlayerbotAIConfig->followDistance);
+                return MoveNear(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(),
+                                unit->GetPositionZ() + 0.5f, sPlayerbotAIConfig->followDistance);
             }
     }
 
@@ -144,7 +149,6 @@ bool GoAction::Execute(Event event)
 
             out << (end - aend).length();
 
-
             for (auto i : points)
             {
                 CreateWp(bot, i.x, i.y, i.z, 0.f, 11144);
@@ -172,7 +176,8 @@ bool GoAction::Execute(Event event)
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
 
-        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, x, y), sPlayerbotAIConfig->reactDistance))
+        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, x, y),
+                                                 sPlayerbotAIConfig->reactDistance))
         {
             botAI->TellMaster("It is too far away");
             return false;
@@ -204,7 +209,8 @@ bool GoAction::Execute(Event event)
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()[param];
     if (pos.isSet())
     {
-        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, pos.x, pos.y), sPlayerbotAIConfig->reactDistance))
+        if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, pos.x, pos.y),
+                                                 sPlayerbotAIConfig->reactDistance))
         {
             botAI->TellError("It is too far away");
             return false;

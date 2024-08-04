@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ItemCountValue.h"
+
 #include "Playerbots.h"
 
 std::vector<Item*> InventoryItemValueBase::Find(std::string const qualifier)
@@ -30,7 +32,4 @@ uint32 ItemCountValue::Calculate()
     return count;
 }
 
-std::vector<Item*> InventoryItemValue::Calculate()
-{
-    return Find(qualifier);
-}
+std::vector<Item*> InventoryItemValue::Calculate() { return Find(qualifier); }

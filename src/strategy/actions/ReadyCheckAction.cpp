@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ReadyCheckAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -24,125 +26,126 @@ std::string const formatPercent(std::string const name, uint8 value, float perce
 
 class ReadyChecker
 {
-    public:
-        virtual bool Check(PlayerbotAI* botAI, AiObjectContext* context) = 0;
-        virtual std::string const getName() = 0;
-        virtual bool PrintAlways() { return true; }
+public:
+    virtual bool Check(PlayerbotAI* botAI, AiObjectContext* context) = 0;
+    virtual std::string const getName() = 0;
+    virtual bool PrintAlways() { return true; }
 
-        static std::vector<ReadyChecker*> checkers;
+    static std::vector<ReadyChecker*> checkers;
 };
 
 std::vector<ReadyChecker*> ReadyChecker::checkers;
 
 class HealthChecker : public ReadyChecker
 {
-    public:
-        bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
-        {
-            return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->almostFullHealth;
-        }
+public:
+    bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+    {
+        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->almostFullHealth;
+    }
 
-        std::string const getName() override { return "HP"; }
+    std::string const getName() override { return "HP"; }
 };
 
 class ManaChecker : public ReadyChecker
 {
-    public:
-        bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
-        {
-            return !AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth;
-        }
+public:
+    bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+    {
+        return !AI_VALUE2(bool, "has mana", "self target") ||
+               AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth;
+    }
 
-        std::string const getName() override { return "MP"; }
+    std::string const getName() override { return "MP"; }
 };
 
 class DistanceChecker : public ReadyChecker
 {
-    public:
-        bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+public:
+    bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+    {
+        Player* bot = botAI->GetBot();
+        if (Player* master = botAI->GetMaster())
         {
-            Player* bot = botAI->GetBot();
-            if (Player* master = botAI->GetMaster())
+            bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig->sightDistance;
+            if (!distance)
             {
-                bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig->sightDistance;
-                if (!distance)
-                {
-                    return false;
-                }
+                return false;
             }
-
-            return true;
         }
 
-        bool PrintAlways() override { return false; }
-        std::string const getName() override { return "Far away"; }
+        return true;
+    }
+
+    bool PrintAlways() override { return false; }
+    std::string const getName() override { return "Far away"; }
 };
 
 class HunterChecker : public ReadyChecker
 {
-    public:
-        bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+public:
+    bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+    {
+        Player* bot = botAI->GetBot();
+        if (bot->getClass() == CLASS_HUNTER)
         {
-            Player* bot = botAI->GetBot();
-            if (bot->getClass() == CLASS_HUNTER)
+            if (!bot->GetUInt32Value(PLAYER_AMMO_ID))
             {
-                if (!bot->GetUInt32Value(PLAYER_AMMO_ID))
-                {
-                    botAI->TellError("Out of ammo!");
-                    return false;
-                }
-
-                if (!bot->GetPet())
-                {
-                    botAI->TellError("No pet!");
-                    return false;
-                }
-
-                if (bot->GetPet()->GetHappinessState() == UNHAPPY)
-                {
-                    botAI->TellError("Pet is unhappy!");
-                    return false;
-                }
+                botAI->TellError("Out of ammo!");
+                return false;
             }
 
-            return true;
+            if (!bot->GetPet())
+            {
+                botAI->TellError("No pet!");
+                return false;
+            }
+
+            if (bot->GetPet()->GetHappinessState() == UNHAPPY)
+            {
+                botAI->TellError("Pet is unhappy!");
+                return false;
+            }
         }
 
-        bool PrintAlways() override { return false; }
-        std::string const getName() override { return "Far away"; }
+        return true;
+    }
+
+    bool PrintAlways() override { return false; }
+    std::string const getName() override { return "Far away"; }
 };
 
 class ItemCountChecker : public ReadyChecker
 {
-    public:
-        ItemCountChecker(std::string const item, std::string const name) : item(item), name(name) { }
+public:
+    ItemCountChecker(std::string const item, std::string const name) : item(item), name(name) {}
 
-        bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
-        {
-            return AI_VALUE2(uint32, "item count", item) > 0;
-        }
+    bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+    {
+        return AI_VALUE2(uint32, "item count", item) > 0;
+    }
 
-        std::string const getName() override { return name; }
+    std::string const getName() override { return name; }
 
-    private:
-        std::string const item;
-        std::string const name;
+private:
+    std::string const item;
+    std::string const name;
 };
 
 class ManaPotionChecker : public ItemCountChecker
 {
-    public:
-        ManaPotionChecker(std::string const item, std::string const name) : ItemCountChecker(item, name) { }
+public:
+    ManaPotionChecker(std::string const item, std::string const name) : ItemCountChecker(item, name) {}
 
-        bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
-        {
-            return !AI_VALUE2(bool, "has mana", "self target") || ItemCountChecker::Check(botAI, context);
-        }
+    bool Check(PlayerbotAI* botAI, AiObjectContext* context) override
+    {
+        return !AI_VALUE2(bool, "has mana", "self target") || ItemCountChecker::Check(botAI, context);
+    }
 };
 
 bool ReadyCheckAction::Execute(Event event)
 {
-    WorldPacket &p = event.getPacket();
+    WorldPacket& p = event.getPacket();
     ObjectGuid player;
     p.rpos(0);
     if (!p.empty())
@@ -152,7 +155,7 @@ bool ReadyCheckAction::Execute(Event event)
             return false;
     }
 
-	return ReadyCheck();
+    return ReadyCheck();
 }
 
 bool ReadyCheckAction::ReadyCheck()
@@ -171,7 +174,8 @@ bool ReadyCheckAction::ReadyCheck()
     }
 
     bool result = true;
-    for (std::vector<ReadyChecker*>::iterator i = ReadyChecker::checkers.begin(); i != ReadyChecker::checkers.end(); ++i)
+    for (std::vector<ReadyChecker*>::iterator i = ReadyChecker::checkers.begin(); i != ReadyChecker::checkers.end();
+         ++i)
     {
         ReadyChecker* checker = *i;
         bool ok = checker->Check(botAI, context);
@@ -210,7 +214,4 @@ bool ReadyCheckAction::ReadyCheck()
     return true;
 }
 
-bool FinishReadyCheckAction::Execute(Event event)
-{
-    return ReadyCheck();
-}
+bool FinishReadyCheckAction::Execute(Event event) { return ReadyCheck(); }

@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "NearestNpcsValue.h"
+
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -16,10 +18,7 @@ void NearestNpcsValue::FindUnits(std::list<Unit*>& targets)
     Cell::VisitAllObjects(bot, searcher, range);
 }
 
-bool NearestNpcsValue::AcceptUnit(Unit* unit)
-{
-    return !unit->IsHostileTo(bot) && !unit->IsPlayer();
-}
+bool NearestNpcsValue::AcceptUnit(Unit* unit) { return !unit->IsHostileTo(bot) && !unit->IsPlayer(); }
 
 void NearestVehiclesValue::FindUnits(std::list<Unit*>& targets)
 {
@@ -47,10 +46,7 @@ void NearestTriggersValue::FindUnits(std::list<Unit*>& targets)
     Cell::VisitAllObjects(bot, searcher, range);
 }
 
-bool NearestTriggersValue::AcceptUnit(Unit* unit)
-{
-    return !unit->IsPlayer();
-}
+bool NearestTriggersValue::AcceptUnit(Unit* unit) { return !unit->IsPlayer(); }
 
 void NearestTotemsValue::FindUnits(std::list<Unit*>& targets)
 {
@@ -59,7 +55,4 @@ void NearestTotemsValue::FindUnits(std::list<Unit*>& targets)
     Cell::VisitAllObjects(bot, searcher, range);
 }
 
-bool NearestTotemsValue::AcceptUnit(Unit* unit)
-{
-    return unit->IsTotem();
-}
+bool NearestTotemsValue::AcceptUnit(Unit* unit) { return unit->IsTotem(); }
