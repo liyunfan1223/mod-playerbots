@@ -15,327 +15,320 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cs_playerbots.h"
+#include "Playerbots.h"
+
 #include "Channel.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "GuildTaskMgr.h"
 #include "Metric.h"
-#include "Playerbots.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
+#include "cs_playerbots.h"
 
 class PlayerbotsDatabaseScript : public DatabaseScript
 {
-    public:
-        PlayerbotsDatabaseScript() : DatabaseScript("PlayerbotsDatabaseScript") { }
+public:
+    PlayerbotsDatabaseScript() : DatabaseScript("PlayerbotsDatabaseScript") {}
 
-        bool OnDatabasesLoading() override
+    bool OnDatabasesLoading() override
+    {
+        DatabaseLoader playerbotLoader("server.playerbots");
+        playerbotLoader.SetUpdateFlags(sConfigMgr->GetOption<bool>("Playerbots.Updates.EnableDatabases", true)
+                                           ? DatabaseLoader::DATABASE_PLAYERBOTS
+                                           : 0);
+        playerbotLoader.AddDatabase(PlayerbotsDatabase, "Playerbots");
+
+        return playerbotLoader.Load();
+    }
+
+    void OnDatabasesKeepAlive() override { PlayerbotsDatabase.KeepAlive(); }
+
+    void OnDatabasesClosing() override { PlayerbotsDatabase.Close(); }
+
+    void OnDatabaseWarnAboutSyncQueries(bool apply) override { PlayerbotsDatabase.WarnAboutSyncQueries(apply); }
+
+    void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam) override
+    {
+        statementIndex = CHAR_UPD_CHAR_ONLINE;
+        statementParam = player->GetGUID().GetCounter();
+    }
+
+    void OnDatabaseGetDBRevision(std::string& revision) override
+    {
+        if (QueryResult resultPlayerbot =
+                PlayerbotsDatabase.Query("SELECT date FROM version_db_playerbots ORDER BY date DESC LIMIT 1"))
         {
-            DatabaseLoader playerbotLoader("server.playerbots");
-            playerbotLoader.SetUpdateFlags(sConfigMgr->GetOption<bool>("Playerbots.Updates.EnableDatabases", true) ? DatabaseLoader::DATABASE_PLAYERBOTS : 0);
-            playerbotLoader.AddDatabase(PlayerbotsDatabase, "Playerbots");
-
-            return playerbotLoader.Load();
+            Field* fields = resultPlayerbot->Fetch();
+            revision = fields[0].Get<std::string>();
         }
 
-        void OnDatabasesKeepAlive() override
+        if (revision.empty())
         {
-            PlayerbotsDatabase.KeepAlive();
+            revision = "Unknown Playerbots Database Revision";
         }
-
-        void OnDatabasesClosing() override
-        {
-            PlayerbotsDatabase.Close();
-        }
-
-        void OnDatabaseWarnAboutSyncQueries(bool apply) override
-        {
-            PlayerbotsDatabase.WarnAboutSyncQueries(apply);
-        }
-
-        void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam) override
-        {
-            statementIndex = CHAR_UPD_CHAR_ONLINE;
-            statementParam = player->GetGUID().GetCounter();
-        }
-
-        void OnDatabaseGetDBRevision(std::string& revision) override
-        {
-            if (QueryResult resultPlayerbot = PlayerbotsDatabase.Query("SELECT date FROM version_db_playerbots ORDER BY date DESC LIMIT 1"))
-            {
-                Field* fields = resultPlayerbot->Fetch();
-                revision = fields[0].Get<std::string>();
-            }
-
-            if (revision.empty())
-            {
-                revision = "Unknown Playerbots Database Revision";
-            }
-        }
+    }
 };
 
 class PlayerbotsMetricScript : public MetricScript
 {
-    public:
-        PlayerbotsMetricScript() : MetricScript("PlayerbotsMetricScript") { }
+public:
+    PlayerbotsMetricScript() : MetricScript("PlayerbotsMetricScript") {}
 
-        void OnMetricLogging() override
+    void OnMetricLogging() override
+    {
+        if (sMetric->IsEnabled())
         {
-            if (sMetric->IsEnabled())
-            {
-                sMetric->LogValue("db_queue_playerbots", uint64(PlayerbotsDatabase.QueueSize()), {});
-            }
+            sMetric->LogValue("db_queue_playerbots", uint64(PlayerbotsDatabase.QueueSize()), {});
         }
+    }
 };
 
 class PlayerbotsPlayerScript : public PlayerScript
 {
-    public:
-        PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript") { }
+public:
+    PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript") {}
 
-        void OnLogin(Player* player) override
+    void OnLogin(Player* player) override
+    {
+        if (!player->GetSession()->IsBot())
         {
-            if (!player->GetSession()->IsBot())
+            sPlayerbotsMgr->AddPlayerbotData(player, false);
+            sRandomPlayerbotMgr->OnPlayerLogin(player);
+        }
+    }
+
+    void OnAfterUpdate(Player* player, uint32 diff) override
+    {
+        if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
+        {
+            botAI->UpdateAI(diff);
+        }
+
+        if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+        {
+            playerbotMgr->UpdateAI(diff);
+        }
+    }
+
+    bool CanPlayerUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
+    {
+        if (type == CHAT_MSG_WHISPER)
+        {
+            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
             {
-                sPlayerbotsMgr->AddPlayerbotData(player, false);
-                sRandomPlayerbotMgr->OnPlayerLogin(player);
+                botAI->HandleCommand(type, msg, player);
+
+                return false;
             }
         }
 
-        void OnAfterUpdate(Player* player, uint32 diff) override
-        {
-            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
-            {
-                botAI->UpdateAI(diff);
-            }
+        return true;
+    }
 
-            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
-            {
-                playerbotMgr->UpdateAI(diff);
-            }
-        }
-
-        bool CanPlayerUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
+    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            if (type == CHAT_MSG_WHISPER)
+            if (Player* member = itr->GetSource())
             {
-                if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
+                if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(member))
                 {
                     botAI->HandleCommand(type, msg, player);
-
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
-        {
-            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-            {
-                if (Player* member = itr->GetSource())
-                {
-                    if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(member))
-                    {
-                        botAI->HandleCommand(type, msg, player);
-                    }
                 }
             }
         }
+    }
 
-        void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg) override
+    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg) override
+    {
+        if (type == CHAT_MSG_GUILD)
         {
-            if (type == CHAT_MSG_GUILD)
+            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
             {
-                if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+                for (PlayerBotMap::const_iterator it = playerbotMgr->GetPlayerBotsBegin();
+                     it != playerbotMgr->GetPlayerBotsEnd(); ++it)
                 {
-                    for (PlayerBotMap::const_iterator it = playerbotMgr->GetPlayerBotsBegin(); it != playerbotMgr->GetPlayerBotsEnd(); ++it)
+                    if (Player* const bot = it->second)
                     {
-                        if (Player* const bot = it->second)
+                        if (bot->GetGuildId() == player->GetGuildId())
                         {
-                            if (bot->GetGuildId() == player->GetGuildId())
-                            {
-                                GET_PLAYERBOT_AI(bot)->HandleCommand(type, msg, player);
-                            }
+                            GET_PLAYERBOT_AI(bot)->HandleCommand(type, msg, player);
                         }
                     }
                 }
             }
         }
+    }
 
-        void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Channel* channel) override
+    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Channel* channel) override
+    {
+        if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
-            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+            if (channel->GetFlags() & 0x18)
             {
-                if (channel->GetFlags() & 0x18)
-                {
-                    playerbotMgr->HandleCommand(type, msg);
-                }
+                playerbotMgr->HandleCommand(type, msg);
             }
-
-            sRandomPlayerbotMgr->HandleCommand(type, msg, player);
         }
 
-        bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* /*criteria*/) override
-        {
-            if (sRandomPlayerbotMgr->IsRandomBot(player))
-            {
-                return false;
-            }
-            return true;
-        }
+        sRandomPlayerbotMgr->HandleCommand(type, msg, player);
+    }
 
-        bool OnBeforeAchiComplete(Player* player, AchievementEntry const* /*achievement*/) override
+    bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* /*criteria*/) override
+    {
+        if (sRandomPlayerbotMgr->IsRandomBot(player))
         {
-            if (sRandomPlayerbotMgr->IsRandomBot(player))
-            {
-                return false;
-            }
-            return true;
+            return false;
         }
+        return true;
+    }
+
+    bool OnBeforeAchiComplete(Player* player, AchievementEntry const* /*achievement*/) override
+    {
+        if (sRandomPlayerbotMgr->IsRandomBot(player))
+        {
+            return false;
+        }
+        return true;
+    }
 };
 
 class PlayerbotsMiscScript : public MiscScript
 {
-    public:
-        PlayerbotsMiscScript() : MiscScript("PlayerbotsMiscScript", {MISCHOOK_ON_DESTRUCT_PLAYER}) { }
+public:
+    PlayerbotsMiscScript() : MiscScript("PlayerbotsMiscScript", {MISCHOOK_ON_DESTRUCT_PLAYER}) {}
 
-        void OnDestructPlayer(Player* player) override
+    void OnDestructPlayer(Player* player) override
+    {
+        if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
         {
-            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
-            {
-                delete botAI;
-            }
-
-            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
-            {
-                delete playerbotMgr;
-            }
+            delete botAI;
         }
+
+        if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+        {
+            delete playerbotMgr;
+        }
+    }
 };
 
 class PlayerbotsServerScript : public ServerScript
 {
-    public:
-        PlayerbotsServerScript() : ServerScript("PlayerbotsServerScript") { }
+public:
+    PlayerbotsServerScript() : ServerScript("PlayerbotsServerScript") {}
 
-        void OnPacketReceived(WorldSession* session, WorldPacket const& packet) override
-        {
-            if (Player* player = session->GetPlayer())
-                if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
-                    playerbotMgr->HandleMasterIncomingPacket(packet);
-        }
+    void OnPacketReceived(WorldSession* session, WorldPacket const& packet) override
+    {
+        if (Player* player = session->GetPlayer())
+            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+                playerbotMgr->HandleMasterIncomingPacket(packet);
+    }
 };
 
 class PlayerbotsWorldScript : public WorldScript
 {
-    public:
-        PlayerbotsWorldScript() : WorldScript("PlayerbotsWorldScript") { }
+public:
+    PlayerbotsWorldScript() : WorldScript("PlayerbotsWorldScript") {}
 
-        void OnBeforeWorldInitialized() override
-        {
-            uint32 oldMSTime = getMSTime();
+    void OnBeforeWorldInitialized() override
+    {
+        uint32 oldMSTime = getMSTime();
 
-            LOG_INFO("server.loading", " ");
-            LOG_INFO("server.loading", "Load Playerbots Config...");
+        LOG_INFO("server.loading", " ");
+        LOG_INFO("server.loading", "Load Playerbots Config...");
 
-            sPlayerbotAIConfig->Initialize();
+        sPlayerbotAIConfig->Initialize();
 
-            LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms", GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server.loading", " ");
-        }
+        LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms", GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", " ");
+    }
 };
 
 class PlayerbotsScript : public PlayerbotScript
 {
-    public:
-        PlayerbotsScript() : PlayerbotScript("PlayerbotsScript") { }
+public:
+    PlayerbotsScript() : PlayerbotScript("PlayerbotsScript") {}
 
-        bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override
+    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override
+    {
+        bool nonBotFound = false;
+        for (ObjectGuid const& guid : guidsList.guids)
         {
-            bool nonBotFound = false;
-            for (ObjectGuid const& guid : guidsList.guids)
+            Player* player = ObjectAccessor::FindPlayer(guid);
+            if (guid.IsGroup() || (player && !GET_PLAYERBOT_AI(player)))
             {
-                Player* player = ObjectAccessor::FindPlayer(guid);
-                if (guid.IsGroup() || (player && !GET_PLAYERBOT_AI(player)))
-                {
-                    nonBotFound = true;
-                    break;
-                }
+                nonBotFound = true;
+                break;
             }
-
-            return nonBotFound;
         }
 
-        void OnPlayerbotCheckKillTask(Player* player, Unit* victim) override
+        return nonBotFound;
+    }
+
+    void OnPlayerbotCheckKillTask(Player* player, Unit* victim) override
+    {
+        if (player)
+            sGuildTaskMgr->CheckKillTask(player, victim);
+    }
+
+    void OnPlayerbotCheckPetitionAccount(Player* player, bool& found) override
+    {
+        if (found && GET_PLAYERBOT_AI(player))
+            found = false;
+    }
+
+    bool OnPlayerbotCheckUpdatesToSend(Player* player) override
+    {
+        if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
+            return botAI->IsRealPlayer();
+
+        return true;
+    }
+
+    void OnPlayerbotPacketSent(Player* player, WorldPacket const* packet) override
+    {
+        if (!player)
+            return;
+
+        if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
         {
-            if (player)
-                sGuildTaskMgr->CheckKillTask(player, victim);
+            botAI->HandleBotOutgoingPacket(*packet);
         }
-
-        void OnPlayerbotCheckPetitionAccount(Player* player, bool& found) override
+        if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
-            if (found && GET_PLAYERBOT_AI(player))
-                found = false;
+            playerbotMgr->HandleMasterOutgoingPacket(*packet);
         }
+    }
 
-        bool OnPlayerbotCheckUpdatesToSend(Player* player) override
-        {
-            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
-                return botAI->IsRealPlayer();
+    void OnPlayerbotUpdate(uint32 diff) override
+    {
+        sRandomPlayerbotMgr->UpdateAI(diff);
+        sRandomPlayerbotMgr->UpdateSessions();
+    }
 
-            return true;
-        }
-
-        void OnPlayerbotPacketSent(Player* player, WorldPacket const* packet) override
-        {
-            if (!player)
-                return;
-
-            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
-            {
-                botAI->HandleBotOutgoingPacket(*packet);
-            }
+    void OnPlayerbotUpdateSessions(Player* player) override
+    {
+        if (player)
             if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+                playerbotMgr->UpdateSessions();
+    }
+
+    void OnPlayerbotLogout(Player* player) override
+    {
+        if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+        {
+            PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+            if (!botAI || botAI->IsRealPlayer())
             {
-                playerbotMgr->HandleMasterOutgoingPacket(*packet);
+                playerbotMgr->LogoutAllBots();
             }
         }
 
-        void OnPlayerbotUpdate(uint32 diff) override
-        {
-            sRandomPlayerbotMgr->UpdateAI(diff);
-            sRandomPlayerbotMgr->UpdateSessions();
-        }
+        sRandomPlayerbotMgr->OnPlayerLogout(player);
+    }
 
-        void OnPlayerbotUpdateSessions(Player* player) override
-        {
-            if (player)
-                if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
-                    playerbotMgr->UpdateSessions();
-        }
-
-        void OnPlayerbotLogout(Player* player) override
-        {
-            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
-            {
-                PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
-                if (!botAI || botAI->IsRealPlayer())
-                {
-                    playerbotMgr->LogoutAllBots();
-                }
-            }
-
-            sRandomPlayerbotMgr->OnPlayerLogout(player);
-        }
-
-        void OnPlayerbotLogoutBots() override
-        {
-            sRandomPlayerbotMgr->LogoutAllBots();
-        }
+    void OnPlayerbotLogoutBots() override { sRandomPlayerbotMgr->LogoutAllBots(); }
 };
 
 void AddPlayerbotsScripts()

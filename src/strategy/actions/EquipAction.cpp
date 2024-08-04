@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "EquipAction.h"
+
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "ItemUsageValue.h"
@@ -18,14 +20,14 @@ bool EquipAction::Execute(Event event)
 
 void EquipAction::EquipItems(ItemIds ids)
 {
-    for (ItemIds::iterator i =ids.begin(); i != ids.end(); i++)
+    for (ItemIds::iterator i = ids.begin(); i != ids.end(); i++)
     {
         FindItemByIdVisitor visitor(*i);
         EquipItem(&visitor);
     }
 }
 
-//Return bagslot with smalest bag.
+// Return bagslot with smalest bag.
 uint8 EquipAction::GetSmallestBagSlot()
 {
     int8 curBag = 0;
@@ -52,7 +54,7 @@ void EquipAction::EquipItem(FindItemVisitor* visitor)
 {
     IterateItems(visitor);
     std::vector<Item*> items = visitor->GetResult();
-	if (!items.empty())
+    if (!items.empty())
         EquipItem(*items.begin());
 }
 
@@ -120,7 +122,9 @@ bool EquipUpgradesAction::Execute(Event event)
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", i->first);
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
-            // LOG_INFO("playerbots", "Bot {} <{}> auto equips item {} ({})", bot->GetGUID().ToString().c_str(), bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ? "wrong item but empty slot" : "");
+            // LOG_INFO("playerbots", "Bot {} <{}> auto equips item {} ({})", bot->GetGUID().ToString().c_str(),
+            // bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ?
+            // "wrong item but empty slot" : "");
             items.insert(i->first);
         }
     }

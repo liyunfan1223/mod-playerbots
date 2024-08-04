@@ -1,11 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "AttackEnemyPlayersStrategy.h"
+
 #include "Playerbots.h"
 
 void AttackEnemyPlayersStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("enemy player near", NextAction::array(0, new NextAction("attack enemy player", 55.0f), nullptr)));
+    triggers.push_back(new TriggerNode("enemy player near",
+                                       NextAction::array(0, new NextAction("attack enemy player", 55.0f), nullptr)));
 }

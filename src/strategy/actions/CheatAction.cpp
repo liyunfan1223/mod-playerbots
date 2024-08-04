@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "CheatAction.h"
+
 #include "Playerbots.h"
 
 bool CheatAction::Execute(Event event)
@@ -36,7 +38,7 @@ bool CheatAction::Execute(Event event)
 
 BotCheatMask CheatAction::GetCheatMask(std::string const cheat)
 {
-    if (cheat=="taxi")
+    if (cheat == "taxi")
         return BotCheatMask::taxi;
 
     if (cheat == "gold")
@@ -59,7 +61,7 @@ std::string const CheatAction::GetCheatName(BotCheatMask cheatMask)
     switch (cheatMask)
     {
         case BotCheatMask::taxi:
-                return "taxi";
+            return "taxi";
         case BotCheatMask::gold:
             return "gold";
         case BotCheatMask::health:
@@ -80,9 +82,9 @@ void CheatAction::ListCheats()
     {
         BotCheatMask cheatMask = BotCheatMask(1 << i);
         if ((uint32)cheatMask & (uint32)sPlayerbotAIConfig->botCheatMask)
-           out << "[conf:" << GetCheatName(BotCheatMask(cheatMask)) << "]";
+            out << "[conf:" << GetCheatName(BotCheatMask(cheatMask)) << "]";
         else if (botAI->HasCheat(cheatMask))
-           out << "[" << GetCheatName(BotCheatMask(cheatMask)) << "]";
+            out << "[" << GetCheatName(BotCheatMask(cheatMask)) << "]";
     }
 
     botAI->TellMasterNoFacing(out);

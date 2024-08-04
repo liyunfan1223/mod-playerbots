@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ImbueAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
-ImbueWithPoisonAction::ImbueWithPoisonAction(PlayerbotAI* botAI) : Action(botAI, "apply poison")
-{
-}
+ImbueWithPoisonAction::ImbueWithPoisonAction(PlayerbotAI* botAI) : Action(botAI, "apply poison") {}
 
 bool ImbueWithPoisonAction::Execute(Event event)
 {
@@ -65,9 +65,7 @@ bool ImbueWithPoisonAction::Execute(Event event)
 }
 
 // Search and apply stone to weapons
-ImbueWithStoneAction::ImbueWithStoneAction(PlayerbotAI* botAI) : Action(botAI, "apply stone")
-{
-}
+ImbueWithStoneAction::ImbueWithStoneAction(PlayerbotAI* botAI) : Action(botAI, "apply stone") {}
 
 bool ImbueWithStoneAction::Execute(Event event)
 {
@@ -112,9 +110,7 @@ bool ImbueWithStoneAction::Execute(Event event)
 }
 
 // Search and apply oil to weapons
-ImbueWithOilAction::ImbueWithOilAction(PlayerbotAI* botAI) : Action(botAI, "apply oil")
-{
-}
+ImbueWithOilAction::ImbueWithOilAction(PlayerbotAI* botAI) : Action(botAI, "apply oil") {}
 
 bool ImbueWithOilAction::Execute(Event event)
 {
@@ -145,16 +141,29 @@ bool ImbueWithOilAction::Execute(Event event)
     return true;
 }
 
-static const uint32 uPriorizedHealingItemIds[19] =
-{
-    HEALTHSTONE_DISPLAYID, FEL_REGENERATION_POTION, SUPER_HEALING_POTION, CRYSTAL_HEALING_POTION, MAJOR_DREAMLESS_SLEEP_POTION, VOLATILE_HEALING_POTION,
-    MAJOR_HEALING_POTION, WHIPPER_ROOT_TUBER, NIGHT_DRAGON_BREATH, LIMITED_INVULNERABILITY_POTION, GREATER_DREAMLESS_SLEEP_POTION,
-    SUPERIOR_HEALING_POTION, CRYSTAL_RESTORE, DREAMLESS_SLEEP_POTION, GREATER_HEALING_POTION, HEALING_POTION, LESSER_HEALING_POTION, DISCOLORED_HEALING_POTION, MINOR_HEALING_POTION,
+static const uint32 uPriorizedHealingItemIds[19] = {
+    HEALTHSTONE_DISPLAYID,
+    FEL_REGENERATION_POTION,
+    SUPER_HEALING_POTION,
+    CRYSTAL_HEALING_POTION,
+    MAJOR_DREAMLESS_SLEEP_POTION,
+    VOLATILE_HEALING_POTION,
+    MAJOR_HEALING_POTION,
+    WHIPPER_ROOT_TUBER,
+    NIGHT_DRAGON_BREATH,
+    LIMITED_INVULNERABILITY_POTION,
+    GREATER_DREAMLESS_SLEEP_POTION,
+    SUPERIOR_HEALING_POTION,
+    CRYSTAL_RESTORE,
+    DREAMLESS_SLEEP_POTION,
+    GREATER_HEALING_POTION,
+    HEALING_POTION,
+    LESSER_HEALING_POTION,
+    DISCOLORED_HEALING_POTION,
+    MINOR_HEALING_POTION,
 };
 
-TryEmergencyAction::TryEmergencyAction(PlayerbotAI* botAI) : Action(botAI, "try emergency")
-{
-}
+TryEmergencyAction::TryEmergencyAction(PlayerbotAI* botAI) : Action(botAI, "try emergency") {}
 
 bool TryEmergencyAction::Execute(Event event)
 {
@@ -163,7 +172,7 @@ bool TryEmergencyAction::Execute(Event event)
         return false;
 
     // If bot does not have aggro: use bandage instead of potion/stone/crystal
-    if ((!AI_VALUE(uint8, "my attacker count")) && !bot->HasAura(11196)) // Recently bandaged
+    if ((!AI_VALUE(uint8, "my attacker count")) && !bot->HasAura(11196))  // Recently bandaged
     {
         if (Item* bandage = botAI->FindBandage())
         {
@@ -183,4 +192,3 @@ bool TryEmergencyAction::Execute(Event event)
 
     return true;
 }
-

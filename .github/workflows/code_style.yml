@@ -1,0 +1,30 @@
+name: Codestyle
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  lint:
+    name: "clang-format-always-success"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Playerbot Module
+        uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get install clang-format -y
+
+      - name: Run clang-format
+        run: |
+          # Find all C/C++ source files
+          FILES=$(find . -name "*.h" -o -name "*.cpp" -o -name "*.c" -o -name "*.hpp")
+          
+          # Run clang-format in dry-run mode to check for formatting issues
+          clang-format -i $FILES
+          
+          # Check if there are any formatting changes
+          git diff --exit-code
+        shell: bash
+        continue-on-error: true

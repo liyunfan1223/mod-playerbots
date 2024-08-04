@@ -1,18 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotCommandServer.h"
-#include "IoContext.h"
-#include "Playerbots.h"
 
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/smart_ptr.hpp>
+#include <boost/thread/thread.hpp>
 #include <cstdlib>
 #include <iostream>
 
-#include <boost/bind.hpp>
-#include <boost/smart_ptr.hpp>
-#include <boost/asio.hpp>
-#include <boost/thread/thread.hpp>
+#include "IoContext.h"
+#include "Playerbots.h"
 
 using boost::asio::ip::tcp;
 typedef boost::shared_ptr<tcp::socket> socket_ptr;
@@ -29,7 +30,7 @@ bool ReadLine(socket_ptr sock, std::string* buffer, std::string* line)
         if (n == -1 || error == boost::asio::error::eof)
             return false;
         else if (error)
-            throw boost::system::system_error(error); // Some other error.
+            throw boost::system::system_error(error);  // Some other error.
 
         buf[n] = 0;
         *buffer += buf;

@@ -1,23 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "RpgTriggers.h"
+
 #include "BudgetValues.h"
 #include "GuildCreateActions.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SocialMgr.h"
 
-bool NoRpgTargetTrigger::IsActive()
-{
-    return !AI_VALUE(GuidPosition, "rpg target");
-}
+bool NoRpgTargetTrigger::IsActive() { return !AI_VALUE(GuidPosition, "rpg target"); }
 
-bool HasRpgTargetTrigger::IsActive()
-{
-    return !NoRpgTargetTrigger::IsActive();
-}
+bool HasRpgTargetTrigger::IsActive() { return !NoRpgTargetTrigger::IsActive(); }
 
 bool FarFromRpgTargetTrigger::IsActive()
 {
@@ -29,19 +25,14 @@ bool NearRpgTargetTrigger::IsActive()
     return !NoRpgTargetTrigger::IsActive() && !FarFromRpgTargetTrigger::IsActive();
 }
 
-GuidPosition RpgTrigger::getGuidP()
-{
-    return AI_VALUE(GuidPosition, "rpg target");
-}
+GuidPosition RpgTrigger::getGuidP() { return AI_VALUE(GuidPosition, "rpg target"); }
 
-bool RpgTrigger::IsActive()
-{
-    return true;
-}
+bool RpgTrigger::IsActive() { return true; }
 
 Event RpgTrigger::Check()
 {
-    if (!NoRpgTargetTrigger::IsActive() && (AI_VALUE(std::string, "next rpg action") == "choose rpg target") || !FarFromRpgTargetTrigger::IsActive())
+    if (!NoRpgTargetTrigger::IsActive() && (AI_VALUE(std::string, "next rpg action") == "choose rpg target") ||
+        !FarFromRpgTargetTrigger::IsActive())
         return Trigger::Check();
 
     return Event();
@@ -54,7 +45,8 @@ bool RpgTaxiTrigger::IsActive()
     if (!guidP.HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
         return false;
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
+    uint32 node =
+        sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
 
     if (!node)
         return false;
@@ -75,7 +67,8 @@ bool RpgDiscoverTrigger::IsActive()
     if (bot->isTaxiCheater())
         return false;
 
-    uint32 node = sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
+    uint32 node =
+        sObjectMgr->GetNearestTaxiNode(guidP.getX(), guidP.getY(), guidP.getZ(), guidP.getMapId(), bot->GetTeamId());
 
     if (bot->m_taxi.IsTaximaskNodeKnown(node))
         return false;
@@ -127,7 +120,7 @@ bool RpgBuyTrigger::IsActive()
     if (AI_VALUE(uint8, "durability") > 50)
         return false;
 
-    if (!AI_VALUE(bool, "can sell")) //Need better condition.
+    if (!AI_VALUE(bool, "can sell"))  // Need better condition.
         return false;
 
     return true;
@@ -197,7 +190,7 @@ bool RpgTrainTrigger::IsTrainerOf(CreatureTemplate const* cInfo, Player* pPlayer
             }
             break;
         default:
-            return false;                                   // checked and error output at creature_template loading
+            return false;  // checked and error output at creature_template loading
     }
 
     return true;
@@ -292,7 +285,7 @@ bool RpgHomeBindTrigger::IsActive()
 bool RpgQueueBGTrigger::IsActive()
 {
     // skip bots not in continents
-    if (!WorldPosition(bot).isOverworld()) // bg, raid, dungeon
+    if (!WorldPosition(bot).isOverworld())  // bg, raid, dungeon
         return false;
 
     GuidPosition guidP(getGuidP());
@@ -390,7 +383,7 @@ bool RpgTradeUsefulTrigger::IsActive()
     if (!player)
         return false;
 
-    //More code/botAI-value here to see if bot is friendly enough.
+    // More code/botAI-value here to see if bot is friendly enough.
     bool isFriend = false;
     if (player->GetGuildId() != bot->GetGuildId())
         isFriend = true;
@@ -438,7 +431,6 @@ bool RpgDuelTrigger::IsActive()
     // do not auto duel with low hp
     if (AI_VALUE2(uint8, "health", "self target") < 90)
         return false;
-
 
     GuidPosition guidP(getGuidP());
 

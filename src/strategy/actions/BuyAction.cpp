@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "BuyAction.h"
+
 #include "BudgetValues.h"
 #include "Event.h"
-#include "ItemVisitors.h"
 #include "ItemCountValue.h"
 #include "ItemUsageValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 
 bool BuyAction::Execute(Event event)
@@ -48,20 +50,26 @@ bool BuyAction::Execute(Event event)
 
             VendorItemList m_items_sorted = tItems->m_items;
 
-            m_items_sorted.erase(std::remove_if(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem* i)
-            {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(i->item);
-                return !proto;
-            }), m_items_sorted.end());
+            m_items_sorted.erase(std::remove_if(m_items_sorted.begin(), m_items_sorted.end(),
+                                                [](VendorItem* i)
+                                                {
+                                                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(i->item);
+                                                    return !proto;
+                                                }),
+                                 m_items_sorted.end());
 
             if (m_items_sorted.empty())
                 continue;
 
-            std::sort(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem* i, VendorItem* j) { return sObjectMgr->GetItemTemplate(i->item)->ItemLevel > sObjectMgr->GetItemTemplate(j->item)->ItemLevel; });
+            std::sort(m_items_sorted.begin(), m_items_sorted.end(),
+                      [](VendorItem* i, VendorItem* j) {
+                          return sObjectMgr->GetItemTemplate(i->item)->ItemLevel >
+                                 sObjectMgr->GetItemTemplate(j->item)->ItemLevel;
+                      });
 
             for (auto& tItem : m_items_sorted)
             {
-                for (uint32 i = 0; i < 10; i++) // Buy 10 times or until no longer usefull/possible
+                for (uint32 i = 0; i < 10; i++)  // Buy 10 times or until no longer usefull/possible
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
                     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
@@ -104,7 +112,8 @@ bool BuyAction::Execute(Event event)
                     if (!BuyItem(tItems, vendorguid, proto))
                         break;
 
-                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP) // Equip upgrades and stop buying this time.
+                    if (usage == ITEM_USAGE_REPLACE ||
+                        usage == ITEM_USAGE_EQUIP)  // Equip upgrades and stop buying this time.
                     {
                         botAI->DoSpecificAction("equip upgrades");
                         break;
@@ -120,7 +129,7 @@ bool BuyAction::Execute(Event event)
             for (ItemIds::iterator i = itemIds.begin(); i != itemIds.end(); i++)
             {
                 uint32 itemId = *i;
-                ItemTemplate const* proto  = sObjectMgr->GetItemTemplate(itemId);
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                 if (!proto)
                     continue;
 
@@ -170,7 +179,10 @@ bool BuyAction::BuyItem(VendorItemData const* tItems, ObjectGuid vendorguid, Ite
                 bot->SetMoney(botMoney);
             }
 
-            if (oldCount < AI_VALUE2(uint32, "item count", proto->Name1)) // BuyItem Always returns false (unless unique) so we have to check the item counts.
+            if (oldCount <
+                AI_VALUE2(
+                    uint32, "item count",
+                    proto->Name1))  // BuyItem Always returns false (unless unique) so we have to check the item counts.
             {
                 std::ostringstream out;
                 out << "Buying " << ChatHelper::FormatItem(proto);

@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "AutoLearnSpellAction.h"
+
 #include "Event.h"
+#include "GuildMgr.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
-#include "GuildMgr.h"
 
 bool AutoLearnSpellAction::Execute(Event event)
 {
@@ -30,10 +32,12 @@ bool AutoLearnSpellAction::Execute(Event event)
 
 void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
 {
-    if (sPlayerbotAIConfig->autoLearnTrainerSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnTrainerSpells &&
+        sRandomPlayerbotMgr->IsRandomBot(bot))  // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnTrainerSpells(out);
 
-    if (sPlayerbotAIConfig->autoLearnQuestSpells && sRandomPlayerbotMgr->IsRandomBot(bot))// || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
+    if (sPlayerbotAIConfig->autoLearnQuestSpells &&
+        sRandomPlayerbotMgr->IsRandomBot(bot))  // || (!botAI->GetMaster() && sRandomPlayerbotMgr->IsRandomBot(bot)))
         LearnQuestSpells(out);
 
     if (sPlayerbotAIConfig->randomBotGuildTalk)
@@ -63,7 +67,8 @@ void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
     // bot->LearnDefaultSkills();
 
     // CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
-    // for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin(); i != creatureTemplateContainer->end(); ++i)
+    // for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin(); i !=
+    // creatureTemplateContainer->end(); ++i)
     // {
     //     CreatureTemplate const& co = i->second;
     //     if (co.trainer_type != TRAINER_TYPE_TRADESKILLS && co.trainer_type != TRAINER_TYPE_CLASS)
@@ -72,16 +77,17 @@ void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
     //     if (co.trainer_type == TRAINER_TYPE_CLASS && co.trainer_class != bot->getClass())
     //         continue;
 
-	// 	uint32 trainerId = co.Entry;
+    // 	uint32 trainerId = co.Entry;
 
-	// 	TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
+    // 	TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
     //     if (!trainer_spells)
     //         trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
 
     //     if (!trainer_spells)
     //         continue;
 
-    //     for (TrainerSpellMap::const_iterator itr =  trainer_spells->spellList.begin(); itr !=  trainer_spells->spellList.end(); ++itr)
+    //     for (TrainerSpellMap::const_iterator itr =  trainer_spells->spellList.begin(); itr !=
+    //     trainer_spells->spellList.end(); ++itr)
     //     {
     //         TrainerSpell const* tSpell = &itr->second;
 
@@ -127,7 +133,7 @@ void AutoLearnSpellAction::LearnTrainerSpells(std::ostringstream* out)
 
 void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream* out)
 {
-    //CreatureTemplate const* co = sCreatureStorage.LookupEntry<CreatureTemplate>(id);
+    // CreatureTemplate const* co = sCreatureStorage.LookupEntry<CreatureTemplate>(id);
     ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
@@ -137,7 +143,8 @@ void AutoLearnSpellAction::LearnQuestSpells(std::ostringstream* out)
         if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
             continue;
 
-        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() || !bot->SatisfyQuestRace(quest, false))
+        if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() ||
+            !bot->SatisfyQuestRace(quest, false))
             continue;
 
         if (quest->GetRewSpellCast() > 0)
@@ -197,12 +204,15 @@ void AutoLearnSpellAction::LearnSpell(uint32 spellId, std::ostringstream* out)
     }
 }
 
-bool AutoUpgradeEquipAction::Execute(Event event) {
-    if (!sPlayerbotAIConfig->autoUpgradeEquip || !sRandomPlayerbotMgr->IsRandomBot(bot)) {
+bool AutoUpgradeEquipAction::Execute(Event event)
+{
+    if (!sPlayerbotAIConfig->autoUpgradeEquip || !sRandomPlayerbotMgr->IsRandomBot(bot))
+    {
         return false;
     }
     PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    {
         factory.InitEquipment(true);
     }
     factory.InitAmmo();

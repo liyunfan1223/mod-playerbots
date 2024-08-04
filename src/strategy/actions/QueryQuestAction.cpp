@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "QueryQuestAction.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
 #include "Playerbots.h"
 
 void QueryQuestAction::TellObjective(std::string const name, uint32 available, uint32 required)
@@ -53,12 +55,14 @@ bool QueryQuestAction::Execute(Event event)
         if (travel)
         {
             uint32 limit = 0;
-            std::vector<TravelDestination*> allDestinations = sTravelMgr->getQuestTravelDestinations(bot, questId, true, true, -1);
+            std::vector<TravelDestination*> allDestinations =
+                sTravelMgr->getQuestTravelDestinations(bot, questId, true, true, -1);
 
-            std::sort(allDestinations.begin(), allDestinations.end(), [botPos](TravelDestination* i, TravelDestination* j)
-            {
-                return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos));
-            });
+            std::sort(allDestinations.begin(), allDestinations.end(),
+                      [botPos](TravelDestination* i, TravelDestination* j) {
+                          return i->distanceTo(const_cast<WorldPosition*>(&botPos)) <
+                                 j->distanceTo(const_cast<WorldPosition*>(&botPos));
+                      });
 
             for (auto dest : allDestinations)
             {
@@ -69,7 +73,6 @@ bool QueryQuestAction::Execute(Event event)
 
                 uint32 tpoints = dest->getPoints(true).size();
                 uint32 apoints = dest->getPoints().size();
-
 
                 out << round(dest->distanceTo(const_cast<WorldPosition*>(&botPos)));
                 out << " to " << dest->getTitle();
@@ -126,12 +129,12 @@ void QueryQuestAction::TellObjectives(uint32 questId)
 
             if (questTemplate->RequiredNpcOrGo[i] < 0)
             {
-                if (GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
+                if (GameObjectTemplate const* info =
+                        sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
                     TellObjective(info->name, available, required);
             }
             else
             {
-
                 if (CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(questTemplate->RequiredNpcOrGo[i]))
                     TellObjective(info->Name, available, required);
             }

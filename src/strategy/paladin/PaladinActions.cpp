@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PaladinActions.h"
+
 #include "AiFactory.h"
 #include "Event.h"
 #include "PlayerbotAI.h"
@@ -13,7 +15,8 @@
 
 inline std::string const GetActualBlessingOfMight(Unit* target)
 {
-    if (!target->ToPlayer()) {
+    if (!target->ToPlayer())
+    {
         return "blessing of might";
     }
     int tab = AiFactory::GetPlayerSpecTab(target->ToPlayer());
@@ -25,17 +28,20 @@ inline std::string const GetActualBlessingOfMight(Unit* target)
             return "blessing of wisdom";
             break;
         case CLASS_SHAMAN:
-            if (tab == SHAMAN_TAB_ELEMENTAL || tab == SHAMAN_TAB_RESTORATION) {
+            if (tab == SHAMAN_TAB_ELEMENTAL || tab == SHAMAN_TAB_RESTORATION)
+            {
                 return "blessing of wisdom";
             }
             break;
         case CLASS_DRUID:
-            if (tab == DRUID_TAB_RESTORATION || tab == DRUID_TAB_BALANCE) {
+            if (tab == DRUID_TAB_RESTORATION || tab == DRUID_TAB_BALANCE)
+            {
                 return "blessing of wisdom";
             }
             break;
         case CLASS_PALADIN:
-            if (tab == PALADIN_TAB_HOLY) {
+            if (tab == PALADIN_TAB_HOLY)
+            {
                 return "blessing of wisdom";
             }
             break;
@@ -46,7 +52,8 @@ inline std::string const GetActualBlessingOfMight(Unit* target)
 
 inline std::string const GetActualBlessingOfWisdom(Unit* target)
 {
-    if (!target->ToPlayer()) {
+    if (!target->ToPlayer())
+    {
         return "blessing of might";
     }
     int tab = AiFactory::GetPlayerSpecTab(target->ToPlayer());
@@ -59,17 +66,20 @@ inline std::string const GetActualBlessingOfWisdom(Unit* target)
             return "blessing of might";
             break;
         case CLASS_SHAMAN:
-            if (tab == SHAMAN_TAB_ENHANCEMENT) {
+            if (tab == SHAMAN_TAB_ENHANCEMENT)
+            {
                 return "blessing of might";
             }
             break;
         case CLASS_DRUID:
-            if (tab == DRUID_TAB_FERAL) {
+            if (tab == DRUID_TAB_FERAL)
+            {
                 return "blessing of might";
             }
             break;
         case CLASS_PALADIN:
-            if (tab == PALADIN_TAB_PROTECTION || tab == PALADIN_TAB_RETRIBUTION) {
+            if (tab == PALADIN_TAB_PROTECTION || tab == PALADIN_TAB_RETRIBUTION)
+            {
                 return "blessing of might";
             }
             break;
@@ -96,7 +106,6 @@ Value<Unit*>* CastBlessingOfMightOnPartyAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom");
 }
-
 
 bool CastBlessingOfMightOnPartyAction::Execute(Event event)
 {
@@ -130,20 +139,15 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
     return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
 }
 
-bool CastSealSpellAction::isUseful()
-{
-    return AI_VALUE2(bool, "combat", "self target");
-}
+bool CastSealSpellAction::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }
 
-Value<Unit*>* CastTurnUndeadAction::GetTargetValue()
-{
-    return context->GetValue<Unit*>("cc target", getName());
-}
+Value<Unit*>* CastTurnUndeadAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
 
 Unit* CastRighteousDefenseAction::GetTarget()
 {
     Unit* current_target = AI_VALUE(Unit*, "current target");
-    if (!current_target) {
+    if (!current_target)
+    {
         return NULL;
     }
     return current_target->GetVictim();
@@ -153,12 +157,14 @@ bool CastMeleeConsecrationAction::isUseful()
 {
     Unit* target = GetTarget();
     // float dis = distance + CONTACT_DISTANCE;
-    return target && bot->IsWithinMeleeRange(target); // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", GetTargetName()), distance);
+    return target && bot->IsWithinMeleeRange(target);  // sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float,
+                                                       // "distance", GetTargetName()), distance);
 }
 
 bool CastDivineSacrificeAction::isUseful()
 {
-    return GetTarget() && (GetTarget() != nullptr) && CastSpellAction::isUseful() && !botAI->HasAura("divine guardian", GetTarget(), false, false, -1, true);
+    return GetTarget() && (GetTarget() != nullptr) && CastSpellAction::isUseful() &&
+           !botAI->HasAura("divine guardian", GetTarget(), false, false, -1, true);
 }
 
 bool CastCancelDivineSacrificeAction::Execute(Event event)

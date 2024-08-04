@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "GrindTargetValue.h"
+
 #include "Playerbots.h"
 #include "ReputationMgr.h"
 #include "SharedDefines.h"
@@ -52,61 +54,66 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
     for (ObjectGuid const guid : targets)
     {
         Unit* unit = botAI->GetUnit(guid);
-        
+
         if (!unit)
             continue;
-        
-        auto &rep = bot->ToPlayer()->GetReputationMgr();
-        if (unit->ToCreature() && !unit->ToCreature()->GetCreatureTemplate()->lootid && bot->GetReactionTo(unit) >= REP_NEUTRAL) {
+
+        auto& rep = bot->ToPlayer()->GetReputationMgr();
+        if (unit->ToCreature() && !unit->ToCreature()->GetCreatureTemplate()->lootid &&
+            bot->GetReactionTo(unit) >= REP_NEUTRAL)
+        {
             continue;
         }
 
-        if (!bot->IsHostileTo(unit) && unit->GetNpcFlags() != UNIT_NPC_FLAG_NONE) {
+        if (!bot->IsHostileTo(unit) && unit->GetNpcFlags() != UNIT_NPC_FLAG_NONE)
+        {
             continue;
         }
-        
-        if (!bot->isHonorOrXPTarget(unit)) {
+
+        if (!bot->isHonorOrXPTarget(unit))
+        {
             continue;
         }
-        
+
         if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > INTERACTION_DISTANCE)
             continue;
 
         if (!bot->InBattleground() && GetTargetingPlayerCount(unit) > assistCount)
             continue;
 
-		//if (!bot->InBattleground() && master && master->GetDistance(unit) >= sPlayerbotAIConfig->grindDistance && !sRandomPlayerbotMgr->IsRandomBot(bot))
-            //continue;
+        // if (!bot->InBattleground() && master && master->GetDistance(unit) >= sPlayerbotAIConfig->grindDistance &&
+        // !sRandomPlayerbotMgr->IsRandomBot(bot)) continue;
 
-		if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
-		    continue;
+        if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
+            continue;
 
         // if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
         //     needForQuestMap[unit->GetEntry()] = needForQuest(unit);
 
         // if (!needForQuestMap[unit->GetEntry()])
         //     if ((urand(0, 100) < 75 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() &&
-        //         context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() != "GrindTravelDestination")))
-        //         continue;
+        //         context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() !=
+        //         "GrindTravelDestination"))) continue;
 
-        //if (bot->InBattleground() && bot->GetDistance(unit) > 40.0f)
-            //continue;
+        // if (bot->InBattleground() && bot->GetDistance(unit) > 40.0f)
+        // continue;
 
-		if (Creature* creature = unit->ToCreature())
+        if (Creature* creature = unit->ToCreature())
             if (CreatureTemplate const* CreatureTemplate = creature->GetCreatureTemplate())
-		        if (CreatureTemplate->rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight elite"))
-		            continue;
-        
-        if (!bot->IsWithinLOSInMap(unit)) {
+                if (CreatureTemplate->rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight elite"))
+                    continue;
+
+        if (!bot->IsWithinLOSInMap(unit))
+        {
             continue;
         }
-        
+
         if (group)
         {
             Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
             for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
             {
-                Player *member = ObjectAccessor::FindPlayer(itr->guid);
+                Player* member = ObjectAccessor::FindPlayer(itr->guid);
                 if (!member || !member->IsAlive())
                     continue;
 
@@ -121,7 +128,8 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         else
         {
             float newdistance = bot->GetDistance(unit);
-            if (!result || (newdistance < distance && urand(0, abs(distance - newdistance)) > sPlayerbotAIConfig->sightDistance * 0.1))
+            if (!result || (newdistance < distance &&
+                            urand(0, abs(distance - newdistance)) > sPlayerbotAIConfig->sightDistance * 0.1))
             {
                 distance = newdistance;
                 result = unit;
@@ -160,7 +168,7 @@ bool GrindTargetValue::needForQuest(Unit* target)
         {
             QuestStatusData* questStatus = sTravelMgr->getQuestStatus(bot, questId);
 
-            if (questTemplate->GetQuestLevel() > bot->GetLevel()+5)
+            if (questTemplate->GetQuestLevel() > bot->GetLevel() + 5)
                 continue;
 
             for (int j = 0; j < QUEST_OBJECTIVES_COUNT; j++)
@@ -218,7 +226,7 @@ uint32 GrindTargetValue::GetTargetingPlayerCount(Unit* unit)
     Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
     {
-        Player *member = ObjectAccessor::FindPlayer(itr->guid);
+        Player* member = ObjectAccessor::FindPlayer(itr->guid);
         if (!member || !member->IsAlive() || member == bot)
             continue;
 

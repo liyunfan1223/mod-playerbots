@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "NonCombatActions.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -17,7 +19,6 @@ bool DrinkAction::Execute(Event event)
 
     if (sPlayerbotAIConfig->freeFood)
     {
-        
         // if (bot->IsNonMeleeSpellCast(true))
         //     return false;
 
@@ -33,7 +34,7 @@ bool DrinkAction::Execute(Event event)
         bot->SetStandState(UNIT_STAND_STATE_SIT);
         botAI->InterruptSpell();
 
-        //float hp = bot->GetHealthPercent();
+        // float hp = bot->GetHealthPercent();
         float mp = bot->GetPowerPct(POWER_MANA);
         float p = mp;
         float delay;
@@ -44,7 +45,7 @@ bool DrinkAction::Execute(Event event)
             delay = 20000.0f * (100 - p) / 100.0f;
 
         botAI->SetNextCheckDelay(delay);
-        
+
         bot->AddAura(24707, bot);
         return true;
         // return botAI->CastSpell(24707, bot);
@@ -53,10 +54,7 @@ bool DrinkAction::Execute(Event event)
     return UseItemAction::Execute(event);
 }
 
-bool DrinkAction::isUseful()
-{
-    return UseItemAction::isUseful() && AI_VALUE2(uint8, "mana", "self target") < 85;
-}
+bool DrinkAction::isUseful() { return UseItemAction::isUseful() && AI_VALUE2(uint8, "mana", "self target") < 85; }
 
 bool DrinkAction::isPossible()
 {
@@ -87,7 +85,7 @@ bool EatAction::Execute(Event event)
         botAI->InterruptSpell();
 
         float hp = bot->GetHealthPct();
-        //float mp = bot->HasMana() ? bot->GetPowerPercent() : 0.f;
+        // float mp = bot->HasMana() ? bot->GetPowerPercent() : 0.f;
         float p = hp;
         float delay;
 
@@ -97,7 +95,7 @@ bool EatAction::Execute(Event event)
             delay = 20000.0f * (100 - p) / 100.0f;
 
         botAI->SetNextCheckDelay(delay);
-        
+
         bot->AddAura(24707, bot);
         return true;
     }
@@ -105,10 +103,7 @@ bool EatAction::Execute(Event event)
     return UseItemAction::Execute(event);
 }
 
-bool EatAction::isUseful()
-{ 
-    return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < 85;
-}
+bool EatAction::isUseful() { return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < 85; }
 
 bool EatAction::isPossible()
 {

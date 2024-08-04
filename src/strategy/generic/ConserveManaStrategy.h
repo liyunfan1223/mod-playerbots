@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_CONSERVEMANASTRATEGY_H
@@ -47,19 +48,19 @@ class PlayerbotAI;
 
 class HealerAutoSaveManaMultiplier : public Multiplier
 {
-    public:
-        HealerAutoSaveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "auto save mana") { }
+public:
+    HealerAutoSaveManaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "auto save mana") {}
 
-        float GetValue(Action* action) override;
+    float GetValue(Action* action) override;
 };
 
 class HealerAutoSaveManaStrategy : public Strategy
 {
-    public:
-        HealerAutoSaveManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    HealerAutoSaveManaStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
-        std::string const getName() override { return "auto save mana"; }
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
+    std::string const getName() override { return "auto save mana"; }
 };
 
 #endif

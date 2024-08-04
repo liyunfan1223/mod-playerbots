@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "StatsAction.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
 #include "Playerbots.h"
 
 bool StatsAction::Execute(Event event)
@@ -29,12 +31,9 @@ bool StatsAction::Execute(Event event)
     return true;
 }
 
-void StatsAction::ListGold(std::ostringstream &out)
-{
-    out << chat->formatMoney(bot->GetMoney());
-}
+void StatsAction::ListGold(std::ostringstream& out) { out << chat->formatMoney(bot->GetMoney()); }
 
-void StatsAction::ListBagSlots(std::ostringstream &out)
+void StatsAction::ListBagSlots(std::ostringstream& out)
 {
     uint32 totalused = 0, total = 16;
 
@@ -61,15 +60,14 @@ void StatsAction::ListBagSlots(std::ostringstream &out)
                 totalfree += pBag->GetFreeSlots();
             }
         }
-
     }
 
-	std::string color = "ff00ff00";
-	if (totalfree < total / 2)
-		color = "ffffff00";
+    std::string color = "ff00ff00";
+    if (totalfree < total / 2)
+        color = "ffffff00";
 
-	if (totalfree < total / 4)
-		color = "ffff0000";
+    if (totalfree < total / 4)
+        color = "ffff0000";
 
     out << "|h|c" << color << totalfree << "/" << total << "|h|cffffffff Bag";
 }
@@ -99,7 +97,7 @@ void StatsAction::ListRepairCost(std::ostringstream& out)
 
     for (uint32 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
-        uint16 pos = ( (INVENTORY_SLOT_BAG_0 << 8) | i );
+        uint16 pos = ((INVENTORY_SLOT_BAG_0 << 8) | i);
         totalCost += EstRepair(pos);
         double repair = RepairPercent(pos);
         if (repair < 100)
@@ -136,7 +134,7 @@ uint32 StatsAction::EstRepair(uint16 pos)
     uint32 curDurability = item->GetUInt32Value(ITEM_FIELD_DURABILITY);
 
     uint32 LostDurability = maxDurability - curDurability;
-    if (LostDurability>0)
+    if (LostDurability > 0)
     {
         ItemTemplate const* ditemProto = item->GetTemplate();
 
@@ -147,7 +145,7 @@ uint32 StatsAction::EstRepair(uint16 pos)
             return TotalCost;
         }
 
-        uint32 dQualitymodEntryId = (ditemProto->Quality+1) * 2;
+        uint32 dQualitymodEntryId = (ditemProto->Quality + 1) * 2;
         DurabilityQualityEntry const* dQualitymodEntry = sDurabilityQualityStore.LookupEntry(dQualitymodEntryId);
         if (!dQualitymodEntry)
         {
@@ -155,10 +153,11 @@ uint32 StatsAction::EstRepair(uint16 pos)
             return TotalCost;
         }
 
-        uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class,ditemProto->SubClass)];
-        uint32 costs = uint32(LostDurability*dmultiplier*double(dQualitymodEntry->quality_mod));
+        uint32 dmultiplier =
+            dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class, ditemProto->SubClass)];
+        uint32 costs = uint32(LostDurability * dmultiplier * double(dQualitymodEntry->quality_mod));
 
-        if (!costs)                                   //fix for ITEM_QUALITY_ARTIFACT
+        if (!costs)  // fix for ITEM_QUALITY_ARTIFACT
             costs = 1;
 
         TotalCost = costs;

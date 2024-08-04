@@ -1,18 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PvpTriggers.h"
-#include "BattlegroundMgr.h"
+
 #include "BattlegroundEY.h"
+#include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-bool EnemyPlayerNear::IsActive()
-{
-    return AI_VALUE(Unit*, "enemy player target");
-}
+bool EnemyPlayerNear::IsActive() { return AI_VALUE(Unit*, "enemy player target"); }
 
 bool PlayerHasNoFlag::IsActive()
 {
@@ -20,11 +19,12 @@ bool PlayerHasNoFlag::IsActive()
     {
         if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
         {
-            BattlegroundWS *bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
             if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
                 return true;
 
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
+                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
             {
                 return false;
             }
@@ -36,10 +36,7 @@ bool PlayerHasNoFlag::IsActive()
     return false;
 }
 
-bool PlayerIsInBattleground::IsActive()
-{
-    return botAI->GetBot()->InBattleground();
-}
+bool PlayerIsInBattleground::IsActive() { return botAI->GetBot()->InBattleground(); }
 
 bool BgWaitingTrigger::IsActive()
 {
@@ -84,7 +81,8 @@ bool BgInviteActiveTrigger::IsActive()
             if (ginfo.IsInvitedToBGInstanceGUID && ginfo.RemoveInviteTime)
             {
                 LOG_INFO("playerbots", "Bot {} <{}> ({} {}) : Invited to BG but not in BG",
-                    bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H");
+                         bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(),
+                         bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H");
                 return true;
             }
         }
@@ -93,10 +91,7 @@ bool BgInviteActiveTrigger::IsActive()
     return false;
 }
 
-bool InsideBGTrigger::IsActive()
-{
-    return bot->InBattleground() && bot->GetBattleground();
-}
+bool InsideBGTrigger::IsActive() { return bot->InBattleground() && bot->GetBattleground(); }
 
 bool PlayerIsInBattlegroundWithoutFlag::IsActive()
 {
@@ -104,11 +99,12 @@ bool PlayerIsInBattlegroundWithoutFlag::IsActive()
     {
         if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
         {
-            BattlegroundWS *bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
             if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
                 return true;
 
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE))
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
+                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE))
             {
                 return false;
             }
@@ -126,8 +122,9 @@ bool PlayerHasFlag::IsActive()
     {
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
-            BattlegroundWS *bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
+                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
             {
                 return true;
             }
@@ -135,7 +132,7 @@ bool PlayerHasFlag::IsActive()
 
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_EY)
         {
-            BattlegroundEY* bg = (BattlegroundEY*) botAI->GetBot()->GetBattleground();
+            BattlegroundEY* bg = (BattlegroundEY*)botAI->GetBot()->GetBattleground();
             return bot->GetGUID() == bg->GetFlagPickerGUID();
         }
 
@@ -151,9 +148,10 @@ bool TeamHasFlag::IsActive()
     {
         if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
         {
-            BattlegroundWS *bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
 
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
+                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
             {
                 return false;
             }
@@ -174,7 +172,7 @@ bool EnemyTeamHasFlag::IsActive()
     {
         if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
         {
-            BattlegroundWS *bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
 
             if (bot->GetTeamId() == TEAM_HORDE)
             {
@@ -229,8 +227,4 @@ bool VehicleNearTrigger::IsActive()
     return npcs.size();
 }
 
-bool InVehicleTrigger::IsActive()
-{
-    return botAI->IsInVehicle();
-}
-
+bool InVehicleTrigger::IsActive() { return botAI->IsInVehicle(); }
