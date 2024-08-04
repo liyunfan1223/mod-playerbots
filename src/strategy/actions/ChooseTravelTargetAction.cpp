@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ChooseTravelTargetAction.h"
+
 #include "ChatHelper.h"
 #include "LootObjectStack.h"
 #include "Playerbots.h"
@@ -29,19 +31,18 @@ bool ChooseTravelTargetAction::Execute(Event event)
         return false;
 
     setNewTarget(&newTarget, oldTarget);
-
     return true;
 }
 
-//Select a new travel target.
-//Currently this selectes mostly based on priority (current quest > new quest).
-//This works fine because destinations can be full (max 15 bots per quest giver, max 1 bot per quest mob).
+// Select a new travel target.
+// Currently this selectes mostly based on priority (current quest > new quest).
+// This works fine because destinations can be full (max 15 bots per quest giver, max 1 bot per quest mob).
 //
-//Eventually we want to rewrite this to be more intelligent.
+// Eventually we want to rewrite this to be more intelligent.
 void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget)
 {
-    bool foundTarget = false;
-    foundTarget = SetGroupTarget(newTarget);                                 //Join groups members
+    // Join groups members
+    bool foundTarget = foundTarget = SetGroupTarget(newTarget);
 
     //Empty bags/repair
     if (!foundTarget && urand(1, 100) > 10 && bot->GetLevel() > 5)           //90% chance
@@ -95,34 +96,40 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
 
         if (!foundTarget)
         {
-            if (urand(1, 100) > 50) //50% Focus on active quests for money.
+            // 50% Focus on active quests for money.
+            if (urand(1, 100) > 50)
             {
-                if (urand(1, 100) > 50) //50% Focus on active quests for money.
+                // 50% Focus on active quests for money.
+                if (urand(1, 100) > 50)
                 {
-                    foundTarget = SetQuestTarget(newTarget, true, false, true, true);           //Turn in quests for money.
+                    // Turn in quests for money.
+                    foundTarget = SetQuestTarget(newTarget, true, false, true, true);
                 }
 
                 if (!foundTarget)
                 {
-                    foundTarget = SetQuestTarget(newTarget, false, true, false, false);      //Find new (low) level quests
+                    // Find new (low) level quests
+                    foundTarget = SetQuestTarget(newTarget, false, true, false, false);
                 }
             }
             else
             {
-                foundTarget = SetGrindTarget(newTarget);                               //Go grind mobs for money    
+                // Go grind mobs for money
+                foundTarget = SetGrindTarget(newTarget);
             }
         }
     }
 
 
-    //Continue current target.
-    if (!foundTarget && urand(1, 100) > 10)                               //90% chance 
+    //Continue current target. 90% chance
+    if (!foundTarget && urand(1, 100) > 10)
     {
-        foundTarget = SetCurrentTarget(newTarget, oldTarget);             //Extend current target.
+        // Extend current target.
+        foundTarget = SetCurrentTarget(newTarget, oldTarget);
     }
 
-    //Get mail
-    //if (!foundTarget && urand(1, 100) > 70)                                  //30% chance
+    //Get mail 30% chance
+    //if (!foundTarget && urand(1, 100) > 70)
     //{
     //    if (AI_VALUE(bool, "can get mail"))
     //    {
@@ -130,19 +137,21 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
     //    }
     //}
 
-    //Dungeon in group.
-    if (!foundTarget && urand(1, 100) > 50)                                 //50% chance
+    //Dungeon in group. 50% chance
+    if (!foundTarget && urand(1, 100) > 50)
     {
         if (AI_VALUE(bool, "can fight boss"))
         {
-            foundTarget = SetBossTarget( newTarget);                         //Go fight a (dungeon boss)
+            // Go fight a (dungeon boss)
+            foundTarget = SetBossTarget(newTarget);
         }
     }
     
-    //Do quests (start, do, end)
-    if (!foundTarget && urand(1, 100) > 5)                                 //95% chance
+    //Do quests (start, do, end) 95% chance
+    if (!foundTarget && urand(1, 100) > 5)
     {
-        foundTarget = SetQuestTarget(newTarget, false, true, true, true);    //Do any nearby           
+        // Do any nearby
+        foundTarget = SetQuestTarget(newTarget, false, true, true, true);
     }
 
     //Explore a nearby unexplored area.
@@ -151,8 +160,8 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
         foundTarget = SetExploreTarget(newTarget);
     }
 
-    //Just hang with an npc
-    if (!foundTarget && urand(1, 100) > 50)                                 //50% chance
+    //Just hang with an npc 50% chance
+    if (!foundTarget && urand(1, 100) > 50)
     {
         foundTarget = SetRpgTarget(newTarget);
         if (foundTarget)
@@ -164,17 +173,18 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
         foundTarget = SetGrindTarget(newTarget);
     }
 
+    // Idle a bit.
     if (!foundTarget)
-        SetNullTarget(newTarget);                                           //Idle a bit.
+        SetNullTarget(newTarget);
 }
 
 void ChooseTravelTargetAction::setNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget)
 {
-    //Tell the master where we are going.
+    // Tell the master where we are going.
     if (!bot->GetGroup() || (botAI->GetGroupMaster() == bot))
         ReportTravelTarget(newTarget, oldTarget);
 
-    //If we are heading to a creature/npc clear it from the ignore list.
+    // If we are heading to a creature/npc clear it from the ignore list.
     if (oldTarget && oldTarget == newTarget && newTarget->getEntry())
     {
         GuidSet& ignoreList = context->GetValue<GuidSet&>("ignore rpg target")->Get();
@@ -190,22 +200,23 @@ void ChooseTravelTargetAction::setNewTarget(TravelTarget* newTarget, TravelTarge
         context->GetValue<GuidSet&>("ignore rpg target")->Set(ignoreList);
     }
 
-    //Actually apply the new target to the travel target used by the bot.
+    // Actually apply the new target to the travel target used by the bot.
     oldTarget->copyTarget(newTarget);
 
-    //If we are idling but have a master. Idle only 10 seconds.
-    if (botAI->GetMaster() && oldTarget->isActive() && oldTarget->getDestination()->getName() == "NullTravelDestination")
+    // If we are idling but have a master. Idle only 10 seconds.
+    if (botAI->GetMaster() && oldTarget->isActive() &&
+        oldTarget->getDestination()->getName() == "NullTravelDestination")
         oldTarget->setExpireIn(10 * IN_MILLISECONDS);
-    else if (oldTarget->isForced()) // Make sure travel goes into cooldown after getting to the destination.
+    else if (oldTarget->isForced())  // Make sure travel goes into cooldown after getting to the destination.
         oldTarget->setExpireIn(HOUR * IN_MILLISECONDS);
 
-    //Clear rpg and pull/grind target. We want to travel, not hang around some more.
+    // Clear rpg and pull/grind target. We want to travel, not hang around some more.
     RESET_AI_VALUE(GuidPosition, "rpg target");
     RESET_AI_VALUE(ObjectGuid, "pull target");
 }
 
-//Tell the master what travel target we are moving towards.
-//This should at some point be rewritten to be denser or perhaps logic moved to ->getTitle()
+// Tell the master what travel target we are moving towards.
+// This should at some point be rewritten to be denser or perhaps logic moved to ->getTitle()
 void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, TravelTarget* oldTarget)
 {
     TravelDestination* destination = newTarget->getDestination();
@@ -216,7 +227,8 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
     if (newTarget->isForced())
         out << "(Forced) ";
 
-    if (destination->getName() == "QuestRelationTravelDestination" || destination->getName() == "QuestObjectiveTravelDestination")
+    if (destination->getName() == "QuestRelationTravelDestination" ||
+        destination->getName() == "QuestObjectiveTravelDestination")
     {
         QuestTravelDestination* QuestDestination = (QuestTravelDestination*)destination;
         Quest const* quest = QuestDestination->GetQuestTemplate();
@@ -262,7 +274,7 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
 
         out << round(newTarget->getDestination()->distanceTo(&botLocation)) << "y";
 
-       out << " for ";
+        out << " for ";
 
         if (AI_VALUE2(bool, "group or", "should sell,can sell"))
             out << "selling items";
@@ -347,20 +359,22 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
     }
 }
 
-bool ChooseTravelTargetAction::getBestDestination(std::vector<TravelDestination*>* activeDestinations, std::vector<WorldPosition*>* activePoints)
+bool ChooseTravelTargetAction::getBestDestination(std::vector<TravelDestination*>* activeDestinations,
+                                                  std::vector<WorldPosition*>* activePoints)
 {
-    if (activeDestinations->empty() || activePoints->empty()) //No targets or no points.
+    if (activeDestinations->empty() || activePoints->empty())  // No targets or no points.
         return false;
 
     WorldPosition botLocation(bot);
-    std::vector<WorldPosition*> availablePoints = sTravelMgr->getNextPoint(&botLocation, *activePoints); //Pick a good point.
+    std::vector<WorldPosition*> availablePoints =
+        sTravelMgr->getNextPoint(&botLocation, *activePoints);  // Pick a good point.
 
-    if (availablePoints.empty()) //No points available.
+    if (availablePoints.empty())  // No points available.
         return false;
 
     TravelDestination* targetDestination;
 
-    for (auto activeTarget : *activeDestinations) //Pick the destination that has this point.
+    for (auto activeTarget : *activeDestinations)  // Pick the destination that has this point.
         if (activeTarget->distanceTo(availablePoints.front()) == 0)
             targetDestination = activeTarget;
 
@@ -402,7 +416,7 @@ bool ChooseTravelTargetAction::SetGroupTarget(TravelTarget* target)
         }
     }
 
-    //Find targets of the group.
+    // Find targets of the group.
     for (auto& member : groupPlayers)
     {
         Player* player = ObjectAccessor::FindPlayer(member);
@@ -424,7 +438,8 @@ bool ChooseTravelTargetAction::SetGroupTarget(TravelTarget* target)
         if (!groupTarget->isActive())
             continue;
 
-        if (!groupTarget->getDestination()->isActive(bot) || groupTarget->getDestination()->getName() == "RpgTravelDestination")
+        if (!groupTarget->getDestination()->isActive(bot) ||
+            groupTarget->getDestination()->getName() == "RpgTravelDestination")
             continue;
 
         activeDestinations.push_back(groupTarget->getDestination());
@@ -446,10 +461,10 @@ bool ChooseTravelTargetAction::SetCurrentTarget(TravelTarget* target, TravelTarg
     if (oldTarget->isMaxRetry(false))
         return false;
 
-    if (!oldDestination) //Does this target have a destination?
+    if (!oldDestination)  // Does this target have a destination?
         return false;
 
-    if (!oldDestination->isActive(bot)) //Is the destination still valid?
+    if (!oldDestination->isActive(bot))  // Is the destination still valid?
         return false;
 
     WorldPosition botLocation(bot);
@@ -473,7 +488,8 @@ bool ChooseTravelTargetAction::SetQuestTarget(TravelTarget* target, bool onlyCom
 
     if (newQuests)
     {
-        activeDestinations = sTravelMgr->getQuestTravelDestinations(bot, -1, true, false, 400 + bot->GetLevel() * 10); //Prefer new quests near the player at lower levels.
+        // Prefer new quests near the player at lower levels.
+        activeDestinations = sTravelMgr->getQuestTravelDestinations(bot, -1, true, false, 400 + bot->GetLevel() * 10);
     }
     if (activeQuests || completedQuests)
     {
@@ -530,12 +546,13 @@ bool ChooseTravelTargetAction::SetNewQuestTarget(TravelTarget* target)
 
     WorldPosition botLocation(bot);
 
-    //Find quest givers.
-    std::vector<TravelDestination*> TravelDestinations = sTravelMgr->getQuestTravelDestinations(bot, -1, botAI->HasRealPlayerMaster());
+    // Find quest givers.
+    std::vector<TravelDestination*> TravelDestinations =
+        sTravelMgr->getQuestTravelDestinations(bot, -1, botAI->HasRealPlayerMaster());
 
     activeDestinations.insert(activeDestinations.end(), TravelDestinations.begin(), TravelDestinations.end());
 
-    //Pick one good point per destination.
+    // Pick one good point per destination.
     for (auto& activeTarget : activeDestinations)
     {
         std::vector<WorldPosition*> points = activeTarget->nextPoint(&botLocation);
@@ -558,12 +575,13 @@ bool ChooseTravelTargetAction::SetRpgTarget(TravelTarget* target)
 
     WorldPosition botLocation(bot);
 
-    //Find rpg npcs
-    std::vector<TravelDestination*> TravelDestinations = sTravelMgr->getRpgTravelDestinations(bot, botAI->HasRealPlayerMaster());
+    // Find rpg npcs
+    std::vector<TravelDestination*> TravelDestinations =
+        sTravelMgr->getRpgTravelDestinations(bot, botAI->HasRealPlayerMaster());
 
     activeDestinations.insert(activeDestinations.end(), TravelDestinations.begin(), TravelDestinations.end());
 
-    //Pick one good point per destination.
+    // Pick one good point per destination.
     for (auto& activeTarget : activeDestinations)
     {
         std::vector<WorldPosition*> points = activeTarget->nextPoint(&botLocation);
@@ -586,12 +604,13 @@ bool ChooseTravelTargetAction::SetGrindTarget(TravelTarget* target)
 
     WorldPosition botLocation(bot);
 
-    //Find grind mobs.
-    std::vector<TravelDestination*> TravelDestinations = sTravelMgr->getGrindTravelDestinations(bot, botAI->HasRealPlayerMaster());
+    // Find grind mobs.
+    std::vector<TravelDestination*> TravelDestinations =
+        sTravelMgr->getGrindTravelDestinations(bot, botAI->HasRealPlayerMaster());
 
     activeDestinations.insert(activeDestinations.end(), TravelDestinations.begin(), TravelDestinations.end());
 
-    //Pick one good point per destination.
+    // Pick one good point per destination.
     for (auto& activeTarget : activeDestinations)
     {
         std::vector<WorldPosition*> points = activeTarget->nextPoint(&botLocation);
@@ -614,12 +633,13 @@ bool ChooseTravelTargetAction::SetBossTarget(TravelTarget* target)
 
     WorldPosition botLocation(bot);
 
-    //Find boss mobs.
-    std::vector<TravelDestination*> TravelDestinations = sTravelMgr->getBossTravelDestinations(bot, botAI->HasRealPlayerMaster());
+    // Find boss mobs.
+    std::vector<TravelDestination*> TravelDestinations =
+        sTravelMgr->getBossTravelDestinations(bot, botAI->HasRealPlayerMaster());
 
     activeDestinations.insert(activeDestinations.end(), TravelDestinations.begin(), TravelDestinations.end());
 
-    //Pick one good point per destination.
+    // Pick one good point per destination.
     for (auto& activeTarget : activeDestinations)
     {
         std::vector<WorldPosition*> points = activeTarget->nextPoint(&botLocation);
@@ -642,7 +662,7 @@ bool ChooseTravelTargetAction::SetExploreTarget(TravelTarget* target)
 
     WorldPosition botLocation(bot);
 
-    //Find quest givers.
+    // Find quest givers.
     std::vector<TravelDestination*> TravelDestinations = sTravelMgr->getExploreTravelDestinations(bot, true, true);
 
     activeDestinations.insert(activeDestinations.end(), TravelDestinations.begin(), TravelDestinations.end());
@@ -684,7 +704,8 @@ bool ChooseTravelTargetAction::SetExploreTarget(TravelTarget* target)
 
 char* strstri(char const* haystack, char const* needle);
 
-bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, std::vector<NPCFlags> flags, std::string const name, std::vector<uint32> items)
+bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, std::vector<NPCFlags> flags,
+                                                std::string const name, std::vector<uint32> items)
 {
     WorldPosition botPos(bot);
 
@@ -710,7 +731,8 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, std::vecto
         if (!foundFlag)
             continue;
 
-        if (!name.empty() && !strstri(cInfo->Name.c_str(), name.c_str()) && !strstri(cInfo->SubName.c_str(), name.c_str()))
+        if (!name.empty() && !strstri(cInfo->Name.c_str(), name.c_str()) &&
+            !strstri(cInfo->SubName.c_str(), name.c_str()))
             continue;
 
         if (!items.empty())
@@ -747,10 +769,11 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, std::vecto
 
     if (!dests.empty())
     {
-        TravelDestination* dest = *std::min_element(dests.begin(), dests.end(), [botPos](TravelDestination* i, TravelDestination* j)
-        {
-            return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos));
-        });
+        TravelDestination* dest = *std::min_element(dests.begin(), dests.end(),
+                                                    [botPos](TravelDestination* i, TravelDestination* j) {
+                                                        return i->distanceTo(const_cast<WorldPosition*>(&botPos)) <
+                                                               j->distanceTo(const_cast<WorldPosition*>(&botPos));
+                                                    });
 
         std::vector<WorldPosition*> points = dest->nextPoint(const_cast<WorldPosition*>(&botPos), true);
         if (points.empty())
@@ -765,7 +788,8 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, std::vecto
     return false;
 }
 
-std::vector<TravelDestination*> TravelMgr::getBossTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive, float maxDistance)
+std::vector<TravelDestination*> TravelMgr::getBossTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive,
+                                                                     float maxDistance)
 {
     WorldPosition botLocation(bot);
 
@@ -861,12 +885,11 @@ TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, std::s
     if (dests.empty())
         return nullptr;
 
-    TravelDestination* dest = *std::min_element(dests.begin(), dests.end(), [botPos](TravelDestination* i, TravelDestination* j)
-        {
-            return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos));
-        });
-
-    return dest;
+    return *std::min_element(dests.begin(), dests.end(),
+    [botPos](TravelDestination* i, TravelDestination* j)
+    {
+        return i->distanceTo(const_cast<WorldPosition*>(&botPos)) < j->distanceTo(const_cast<WorldPosition*>(&botPos));
+    });
 };
 
 bool ChooseTravelTargetAction::isUseful()
@@ -874,7 +897,8 @@ bool ChooseTravelTargetAction::isUseful()
     if (!botAI->AllowActivity(TRAVEL_ACTIVITY))
         return false;
 
-    return !context->GetValue<TravelTarget*>("travel target")->Get()->isActive() && !context->GetValue<LootObject>("loot target")->Get().IsLootPossible(bot) && !bot->IsInCombat();
+    return !context->GetValue<TravelTarget*>("travel target")->Get()->isActive() &&
+           !context->GetValue<LootObject>("loot target")->Get().IsLootPossible(bot) && !bot->IsInCombat();
 }
 
 bool ChooseTravelTargetAction::needForQuest(Unit* target)
@@ -918,7 +942,7 @@ bool ChooseTravelTargetAction::needForQuest(Unit* target)
                     int required = questTemplate->RequiredNpcOrGoCount[j];
                     int available = questStatus.CreatureOrGOCount[j];
 
-                    if(required && available < required && (target->GetEntry() == entry || justCheck))
+                    if (required && available < required && (target->GetEntry() == entry || justCheck))
                         return true;
                 }
 
@@ -949,12 +973,12 @@ bool ChooseTravelTargetAction::needForQuest(Unit* target)
                 }
             }
         }
-
     }
     return false;
 }
 
-bool ChooseTravelTargetAction::needItemForQuest(uint32 itemId, const Quest* questTemplate, const QuestStatusData* questStatus)
+bool ChooseTravelTargetAction::needItemForQuest(uint32 itemId, const Quest* questTemplate,
+                                                const QuestStatusData* questStatus)
 {
     for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {

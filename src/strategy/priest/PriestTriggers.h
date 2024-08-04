@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_PRIESTTRIGGERS_H
@@ -43,58 +44,60 @@ BOOST_TRIGGER_A(ShadowfiendTrigger, "shadowfiend");
 
 class PowerWordFortitudeOnPartyTrigger : public BuffOnPartyTrigger
 {
-    public:
-        PowerWordFortitudeOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "power word: fortitude", 4 * 2000) { }
+public:
+    PowerWordFortitudeOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "power word: fortitude", 4 * 2000)
+    {
+    }
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class PowerWordFortitudeTrigger : public BuffTrigger
 {
-    public:
-        PowerWordFortitudeTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "power word: fortitude", 4 * 2000) { }
+public:
+    PowerWordFortitudeTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "power word: fortitude", 4 * 2000) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class DivineSpiritOnPartyTrigger : public BuffOnPartyTrigger
 {
-    public:
-        DivineSpiritOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "divine spirit", 4 * 2000) { }
+public:
+    DivineSpiritOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "divine spirit", 4 * 2000) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class DivineSpiritTrigger : public BuffTrigger
 {
-    public:
-        DivineSpiritTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "divine spirit", 4 * 2000) { }
+public:
+    DivineSpiritTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "divine spirit", 4 * 2000) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class PrayerOfFortitudeTrigger : public BuffOnPartyTrigger
 {
-    public:
-        PrayerOfFortitudeTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "prayer of fortitude", 3 * 2000) { }
+public:
+    PrayerOfFortitudeTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "prayer of fortitude", 3 * 2000) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class PrayerOfSpiritTrigger : public BuffOnPartyTrigger
 {
-    public:
-        PrayerOfSpiritTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "prayer of spirit", 2 * 2000) { }
+public:
+    PrayerOfSpiritTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "prayer of spirit", 2 * 2000) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class BindingHealTrigger : public PartyMemberLowHealthTrigger
 {
-    public:
-        BindingHealTrigger(PlayerbotAI* botAI);
+public:
+    BindingHealTrigger(PlayerbotAI* botAI);
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 #endif

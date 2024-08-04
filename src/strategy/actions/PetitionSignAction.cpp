@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PetitionSignAction.h"
+
 #include "ArenaTeam.h"
 #include "Event.h"
 #include "Playerbots.h"
@@ -17,7 +19,8 @@ bool PetitionSignAction::Execute(Event event)
     bool isArena = false;
     p >> petitionGuid >> inviter;
 
-    QueryResult result = CharacterDatabase.Query("SELECT `type` FROM `petition` WHERE `petitionguid` = {}", petitionGuid.GetCounter());
+    QueryResult result =
+        CharacterDatabase.Query("SELECT `type` FROM `petition` WHERE `petitionguid` = {}", petitionGuid.GetCounter());
     if (!result)
     {
         return false;
@@ -54,8 +57,8 @@ bool PetitionSignAction::Execute(Event event)
         }
 
         // check for same acc id
-        /*if (QueryResult* result = CharacterDatabase.Query("SELECT playerguid FROM petition_sign WHERE player_account = {} AND petitionguid = {}'",
-            bot->GetSession()->GetAccountId(), petitionGuid.GetCounter()))
+        /*if (QueryResult* result = CharacterDatabase.Query("SELECT playerguid FROM petition_sign WHERE player_account =
+        {} AND petitionguid = {}'", bot->GetSession()->GetAccountId(), petitionGuid.GetCounter()))
         {
             botAI->TellError("Sorry, I already signed this pettition");
             accept = false;
@@ -75,7 +78,8 @@ bool PetitionSignAction::Execute(Event event)
         WorldPacket data(MSG_PETITION_DECLINE);
         data << petitionGuid;
         bot->GetSession()->HandlePetitionDeclineOpcode(data);
-        LOG_INFO("playerbots", "Bot {} <{}> declines {} invite", bot->GetGUID().ToString().c_str(), bot->GetName().c_str(), isArena ? "Arena" : "Guild");
+        LOG_INFO("playerbots", "Bot {} <{}> declines {} invite", bot->GetGUID().ToString().c_str(),
+                 bot->GetName().c_str(), isArena ? "Arena" : "Guild");
         return false;
     }
 
@@ -85,7 +89,8 @@ bool PetitionSignAction::Execute(Event event)
         data << petitionGuid << unk;
         bot->GetSession()->HandlePetitionSignOpcode(data);
         bot->Say("Thanks for the invite!", LANG_UNIVERSAL);
-        LOG_INFO("playerbots", "Bot {} <{}> accepts {} invite", bot->GetGUID().ToString().c_str(), bot->GetName().c_str(), isArena ? "Arena" : "Guild");
+        LOG_INFO("playerbots", "Bot {} <{}> accepts {} invite", bot->GetGUID().ToString().c_str(),
+                 bot->GetName().c_str(), isArena ? "Arena" : "Guild");
         return true;
     }
 

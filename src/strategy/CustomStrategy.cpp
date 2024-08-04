@@ -1,11 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "CustomStrategy.h"
-#include "Playerbots.h"
 
 #include <regex>
+
+#include "Playerbots.h"
 
 std::map<std::string, std::string> CustomStrategy::actionLinesCache;
 
@@ -33,7 +35,7 @@ NextAction** toNextActionArray(std::string const actions)
             res[index++] = na;
     }
 
-	res[index++] = nullptr;
+    res[index++] = nullptr;
     return res;
 }
 
@@ -47,11 +49,9 @@ TriggerNode* toTriggerNode(std::string const actionLine)
     return nullptr;
 }
 
-CustomStrategy::CustomStrategy(PlayerbotAI* botAI) : Strategy(botAI), Qualified()
-{
-}
+CustomStrategy::CustomStrategy(PlayerbotAI* botAI) : Strategy(botAI), Qualified() {}
 
-void CustomStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void CustomStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     if (actionLines.empty())
     {
@@ -68,7 +68,8 @@ void CustomStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
             for (std::vector<std::string>::iterator i = tokens.begin(); i != tokens.end(); ++i)
             {
                 std::string const line = *i;
-                for (std::sregex_iterator j = std::sregex_iterator(line.begin(), line.end(), tpl); j != std::sregex_iterator(); ++j)
+                for (std::sregex_iterator j = std::sregex_iterator(line.begin(), line.end(), tpl);
+                     j != std::sregex_iterator(); ++j)
                 {
                     std::smatch match = *j;
                     std::string const actionLine = match[1].str();
@@ -88,7 +89,8 @@ void CustomStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 
 void CustomStrategy::LoadActionLines(uint32 owner)
 {
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
+    PlayerbotsDatabasePreparedStatement* stmt =
+        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME);
     stmt->SetData(0, owner);
     stmt->SetData(1, qualifier);
     PreparedQueryResult result = PlayerbotsDatabase.Query(stmt);
@@ -99,8 +101,7 @@ void CustomStrategy::LoadActionLines(uint32 owner)
             Field* fields = result->Fetch();
             std::string const action = fields[1].Get<std::string>();
             actionLines.push_back(action);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 }
 

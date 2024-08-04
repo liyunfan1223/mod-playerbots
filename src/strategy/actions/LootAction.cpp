@@ -1,14 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "LootAction.h"
+
 #include "ChatHelper.h"
 #include "Event.h"
-#include "ItemUsageValue.h"
-#include "LootStrategyValue.h"
-#include "LootObjectStack.h"
+#include "GuildMgr.h"
 #include "GuildTaskMgr.h"
+#include "ItemUsageValue.h"
+#include "LootObjectStack.h"
+#include "LootStrategyValue.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
@@ -21,7 +24,8 @@ bool LootAction::Execute(Event event)
         return false;
 
     LootObject prevLoot = AI_VALUE(LootObject, "loot target");
-    LootObject const& lootObject = AI_VALUE(LootObjectStack*, "available loot")->GetLoot(sPlayerbotAIConfig->lootDistance);
+    LootObject const& lootObject =
+        AI_VALUE(LootObjectStack*, "available loot")->GetLoot(sPlayerbotAIConfig->lootDistance);
 
     if (!prevLoot.IsEmpty() && prevLoot.guid != lootObject.guid)
     {
@@ -34,25 +38,26 @@ bool LootAction::Execute(Event event)
     return true;
 }
 
-bool LootAction::isUseful() {
+bool LootAction::isUseful()
+{
     return sPlayerbotAIConfig->freeMethodLoot || !bot->GetGroup() || bot->GetGroup()->GetLootMethod() != FREE_FOR_ALL;
 }
 
 enum ProfessionSpells
 {
-    ALCHEMY                      = 2259,
-    BLACKSMITHING                = 2018,
-    COOKING                      = 2550,
-    ENCHANTING                   = 7411,
-    ENGINEERING                  = 49383,
-    FIRST_AID                    = 3273,
-    FISHING                      = 7620,
-    HERB_GATHERING               = 2366,
-    INSCRIPTION                  = 45357,
-    JEWELCRAFTING                = 25229,
-    MINING                       = 2575,
-    SKINNING                     = 8613,
-    TAILORING                    = 3908
+    ALCHEMY = 2259,
+    BLACKSMITHING = 2018,
+    COOKING = 2550,
+    ENCHANTING = 7411,
+    ENGINEERING = 49383,
+    FIRST_AID = 3273,
+    FISHING = 7620,
+    HERB_GATHERING = 2366,
+    INSCRIPTION = 45357,
+    JEWELCRAFTING = 25229,
+    MINING = 2575,
+    SKINNING = 8613,
+    TAILORING = 3908
 };
 
 bool OpenLootAction::Execute(Event event)
@@ -86,7 +91,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
         return true;
     }
 
-    if (bot->isMoving()) 
+    if (bot->isMoving())
     {
         bot->StopMoving();
     }
@@ -126,7 +131,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;
-    
+
     return botAI->CastSpell(spellId, bot);
 }
 
@@ -145,15 +150,15 @@ uint32 OpenLootAction::GetOpeningSpell(LootObject& lootObject, GameObject* go)
     {
         uint32 spellId = itr->first;
 
-		if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active)
-			continue;
+        if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active)
+            continue;
 
-		if (spellId == MINING || spellId == HERB_GATHERING)
-			continue;
+        if (spellId == MINING || spellId == HERB_GATHERING)
+            continue;
 
-		SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-		if (!spellInfo)
-			continue;
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo)
+            continue;
 
         if (CanOpenLock(lootObject, spellInfo, go))
             return spellId;
@@ -179,7 +184,8 @@ bool OpenLootAction::CanOpenLock(LootObject& lootObject, SpellInfo const* spellI
 {
     for (uint8 effIndex = 0; effIndex <= EFFECT_2; effIndex++)
     {
-        if (spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_OPEN_LOCK && spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_SKINNING)
+        if (spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_OPEN_LOCK &&
+            spellInfo->Effects[effIndex].Effect != SPELL_EFFECT_SKINNING)
             return false;
 
         uint32 lockId = go->GetGOInfo()->GetLockId();
@@ -190,11 +196,11 @@ bool OpenLootAction::CanOpenLock(LootObject& lootObject, SpellInfo const* spellI
         if (!lockInfo)
             return false;
 
-        bool reqKey = false;                                    // some locks not have reqs
+        bool reqKey = false;  // some locks not have reqs
 
         for (uint8 j = 0; j < 8; ++j)
         {
-            switch(lockInfo->Type[j])
+            switch (lockInfo->Type[j])
             {
                 /*
                 case LOCK_KEY_ITEM:
@@ -309,7 +315,8 @@ uint32 stackCount = urand(1, proto->GetMaxStackSize());
     item->SaveToDB();
     auctionEntry->SaveToDB();
 
-    LOG_ERROR("playerbots", "AhBot {} added {} of {} to auction {} for {}..{}", bot->GetName().c_str(), stackCount, proto->Name1.c_str(), 1, bidPrice, buyoutPrice);
+    LOG_ERROR("playerbots", "AhBot {} added {} of {} to auction {} for {}..{}", bot->GetName().c_str(), stackCount,
+proto->Name1.c_str(), 1, bidPrice, buyoutPrice);
 
     if (oldItem->GetCount() > stackCount)
         oldItem->SetCount(oldItem->GetCount() - stackCount);
@@ -322,20 +329,20 @@ uint32 stackCount = urand(1, proto->GetMaxStackSize());
 
 bool StoreLootAction::Execute(Event event)
 {
-    WorldPacket p(event.getPacket()); // (8+1+4+1+1+4+4+4+4+4+1)
+    WorldPacket p(event.getPacket());  // (8+1+4+1+1+4+4+4+4+4+1)
     ObjectGuid guid;
     uint8 loot_type;
     uint32 gold = 0;
     uint8 items = 0;
 
     p.rpos(0);
-    p >> guid;      // 8 corpse guid
-    p >> loot_type; // 1 loot type
+    p >> guid;       // 8 corpse guid
+    p >> loot_type;  // 1 loot type
 
     if (p.size() > 10)
     {
-        p >> gold;      // 4 money on corpse
-        p >> items;     // 1 number of items on corpse
+        p >> gold;   // 4 money on corpse
+        p >> items;  // 1 number of items on corpse
     }
 
     bot->SetLootGUID(guid);
@@ -362,8 +369,8 @@ bool StoreLootAction::Execute(Event event)
         p.read_skip<uint32>();  // randomPropertyId
         p >> lootslot_type;     // 0 = can get, 1 = look only, 2 = master get
 
-		if (lootslot_type != LOOT_SLOT_TYPE_ALLOW_LOOT && lootslot_type != LOOT_SLOT_TYPE_OWNER)
-			continue;
+        if (lootslot_type != LOOT_SLOT_TYPE_ALLOW_LOOT && lootslot_type != LOOT_SLOT_TYPE_OWNER)
+            continue;
 
         if (loot_type != LOOT_SKINNING && !IsLootAllowed(itemid, botAI))
             continue;
@@ -474,14 +481,14 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
         }
     }
 
-    //if (proto->Bonding == BIND_QUEST_ITEM ||  //Still testing if it works ok without these lines.
-    //    proto->Bonding == BIND_QUEST_ITEM1 || //Eventually this has to be removed.
-    //    proto->Class == ITEM_CLASS_QUEST)
+    // if (proto->Bonding == BIND_QUEST_ITEM ||  //Still testing if it works ok without these lines.
+    //     proto->Bonding == BIND_QUEST_ITEM1 || //Eventually this has to be removed.
+    //     proto->Class == ITEM_CLASS_QUEST)
     //{
 
     bool canLoot = lootStrategy->CanLoot(proto, context);
-    //if (canLoot && proto->Bonding == BIND_WHEN_PICKED_UP && botAI->HasActivePlayerMaster())
-        //canLoot = sPlayerbotAIConfig->IsInRandomAccountList(botAI->GetBot()->GetSession()->GetAccountId());
+    // if (canLoot && proto->Bonding == BIND_WHEN_PICKED_UP && botAI->HasActivePlayerMaster())
+    // canLoot = sPlayerbotAIConfig->IsInRandomAccountList(botAI->GetBot()->GetSession()->GetAccountId());
 
     return canLoot;
 }

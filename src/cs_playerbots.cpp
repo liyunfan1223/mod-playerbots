@@ -13,39 +13,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattleGroundTactics.h"
 #include "Chat.h"
 #include "GuildTaskMgr.h"
 #include "PerformanceMonitor.h"
 #include "PlayerbotMgr.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
-#include "BattleGroundTactics.h"
 
 using namespace Acore::ChatCommands;
 
 class playerbots_commandscript : public CommandScript
 {
 public:
-    playerbots_commandscript() : CommandScript("playerbots_commandscript") { }
+    playerbots_commandscript() : CommandScript("playerbots_commandscript") {}
 
     ChatCommandTable GetCommands() const override
     {
-        static ChatCommandTable playerbotsDebugCommandTable =
-        {
-            { "bg",             HandleDebugBGCommand,         SEC_GAMEMASTER,     Console::Yes },
+        static ChatCommandTable playerbotsDebugCommandTable = {
+            {"bg", HandleDebugBGCommand, SEC_GAMEMASTER, Console::Yes},
         };
-        static ChatCommandTable playerbotsCommandTable =
-        {
-            { "bot",            HandlePlayerbotCommand,       SEC_PLAYER,         Console::No  },
-            { "gtask",          HandleGuildTaskCommand,       SEC_GAMEMASTER,     Console::Yes },
-            { "pmon",           HandlePerfMonCommand,         SEC_GAMEMASTER,     Console::Yes },
-            { "rndbot",         HandleRandomPlayerbotCommand, SEC_GAMEMASTER,     Console::Yes },
-            { "debug",          playerbotsDebugCommandTable },
+        static ChatCommandTable playerbotsCommandTable = {
+            {"bot", HandlePlayerbotCommand, SEC_PLAYER, Console::No},
+            {"gtask", HandleGuildTaskCommand, SEC_GAMEMASTER, Console::Yes},
+            {"pmon", HandlePerfMonCommand, SEC_GAMEMASTER, Console::Yes},
+            {"rndbot", HandleRandomPlayerbotCommand, SEC_GAMEMASTER, Console::Yes},
+            {"debug", playerbotsDebugCommandTable},
         };
 
-        static ChatCommandTable commandTable =
-        {
-            { "playerbots",     playerbotsCommandTable },
+        static ChatCommandTable commandTable = {
+            {"playerbots", playerbotsCommandTable},
         };
 
         return commandTable;
@@ -96,7 +93,4 @@ public:
     }
 };
 
-void AddSC_playerbots_commandscript()
-{
-    new playerbots_commandscript();
-}
+void AddSC_playerbots_commandscript() { new playerbots_commandscript(); }

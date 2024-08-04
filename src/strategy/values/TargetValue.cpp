@@ -1,19 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TargetValue.h"
+
 #include "LastMovementValue.h"
 #include "ObjectGuid.h"
-#include "RtiTargetValue.h"
 #include "Playerbots.h"
+#include "RtiTargetValue.h"
 #include "ScriptedCreature.h"
 #include "ThreatMgr.h"
 
-Unit* FindTargetStrategy::GetResult()
-{
-    return result;
-}
+Unit* FindTargetStrategy::GetResult() { return result; }
 
 Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
 {
@@ -24,13 +23,12 @@ Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
         if (!unit)
             continue;
 
-        ThreatMgr &ThreatMgr = unit->GetThreatMgr();
+        ThreatMgr& ThreatMgr = unit->GetThreatMgr();
         strategy->CheckAttacker(unit, &ThreatMgr);
     }
 
     return strategy->GetResult();
 }
-
 
 bool FindNonCcTargetStrategy::IsCcTarget(Unit* attacker)
 {
@@ -39,7 +37,7 @@ bool FindNonCcTargetStrategy::IsCcTarget(Unit* attacker)
         Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
         for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
-            Player *member = ObjectAccessor::FindPlayer(itr->guid);
+            Player* member = ObjectAccessor::FindPlayer(itr->guid);
             if (!member || !member->IsAlive())
                 continue;
 
@@ -105,13 +103,16 @@ bool FindTargetStrategy::IsHighPriority(Unit* attacker)
     if (Group* group = botAI->GetBot()->GetGroup())
     {
         ObjectGuid guid = group->GetTargetIcon(7);
-        if (guid && attacker->GetGUID() == guid) {
+        if (guid && attacker->GetGUID() == guid)
+        {
             return true;
         }
     }
     GuidVector prioritizedTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Get();
-    for (ObjectGuid targetGuid : prioritizedTargets) {
-        if (targetGuid && attacker->GetGUID() == targetGuid) {
+    for (ObjectGuid targetGuid : prioritizedTargets)
+    {
+        if (targetGuid && attacker->GetGUID() == targetGuid)
+        {
             return true;
         }
     }
@@ -127,7 +128,6 @@ WorldPosition LastLongMoveValue::Calculate()
     return lastMove.lastPath.getBack();
 }
 
-
 WorldPosition HomeBindValue::Calculate()
 {
     return WorldPosition(bot->m_homebindMapId, bot->m_homebindX, bot->m_homebindY, bot->m_homebindZ, 0.f);
@@ -135,22 +135,25 @@ WorldPosition HomeBindValue::Calculate()
 
 Unit* FindTargetValue::Calculate()
 {
-    if (qualifier == "") {
+    if (qualifier == "")
+    {
         return nullptr;
     }
     Group* group = bot->GetGroup();
-    if (!group) {
+    if (!group)
+    {
         return nullptr;
     }
-    HostileReference *ref = bot->getHostileRefMgr().getFirst();
+    HostileReference* ref = bot->getHostileRefMgr().getFirst();
     while (ref)
     {
-        ThreatMgr *threatManager = ref->GetSource();
-        Unit *unit = threatManager->GetOwner();
+        ThreatMgr* threatManager = ref->GetSource();
+        Unit* unit = threatManager->GetOwner();
         std::wstring wnamepart;
         Utf8toWStr(unit->GetName(), wnamepart);
         wstrToLower(wnamepart);
-        if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart)) {
+        if (!qualifier.empty() && qualifier.length() == wnamepart.length() && Utf8FitTo(qualifier, wnamepart))
+        {
             return unit;
         }
         ref = ref->next();
@@ -162,7 +165,8 @@ void FindBossTargetStrategy::CheckAttacker(Unit* attacker, ThreatMgr* threatMana
 {
     UnitAI* unitAI = attacker->GetAI();
     BossAI* bossAI = dynamic_cast<BossAI*>(unitAI);
-    if (bossAI) {
+    if (bossAI)
+    {
         result = attacker;
     }
 }

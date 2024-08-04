@@ -1,14 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ItemForSpellValue.h"
+
 #include "Playerbots.h"
 
 #ifndef WIN32
 inline int strcmpi(char const* s1, char const* s2)
 {
-    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2) {}
+    for (; *s1 && *s2 && (toupper(*s1) == toupper(*s2)); ++s1, ++s2)
+    {
+    }
     return *s1 - *s2;
 }
 #endif
@@ -19,7 +23,7 @@ Item* ItemForSpellValue::Calculate()
     if (!spellid)
         return nullptr;
 
-    SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(spellid);
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
     if (!spellInfo)
         return nullptr;
 
@@ -45,7 +49,9 @@ Item* ItemForSpellValue::Calculate()
     }
 
     // Workaround as some spells have no item mask (e.g. shaman weapon enhancements)
-    if (!strcmpi(spellInfo->SpellName[0], "rockbiter weapon") || !strcmpi(spellInfo->SpellName[0], "flametongue weapon") || !strcmpi(spellInfo->SpellName[0], "earthliving weapon") ||
+    if (!strcmpi(spellInfo->SpellName[0], "rockbiter weapon") ||
+        !strcmpi(spellInfo->SpellName[0], "flametongue weapon") ||
+        !strcmpi(spellInfo->SpellName[0], "earthliving weapon") ||
         !strcmpi(spellInfo->SpellName[0], "frostbrand weapon") || !strcmpi(spellInfo->SpellName[0], "windfury weapon"))
     {
         itemForSpell = GetItemFitsToSpellRequirements(EQUIPMENT_SLOT_MAINHAND, spellInfo);
@@ -65,7 +71,7 @@ Item* ItemForSpellValue::Calculate()
     if (!strcmpi(spellInfo->SpellName[0], "disenchant"))
         return nullptr;
 
-    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++ )
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
     {
         itemForSpell = GetItemFitsToSpellRequirements(slot, spellInfo);
         if (itemForSpell)
@@ -75,9 +81,9 @@ Item* ItemForSpellValue::Calculate()
     return nullptr;
 }
 
-Item* ItemForSpellValue::GetItemFitsToSpellRequirements(uint8 slot, SpellInfo const *spellInfo)
+Item* ItemForSpellValue::GetItemFitsToSpellRequirements(uint8 slot, SpellInfo const* spellInfo)
 {
-    Item* const itemForSpell = bot->GetItemByPos( INVENTORY_SLOT_BAG_0, slot );
+    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
     if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
         return nullptr;
 

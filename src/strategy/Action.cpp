@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "Action.h"
+
 #include "Playerbots.h"
 #include "Timer.h"
 
@@ -66,8 +68,7 @@ NextAction** NextAction::array(uint32 nil, ...)
     {
         cur = va_arg(vl, NextAction*);
         ++size;
-    }
-    while (cur);
+    } while (cur);
 
     va_end(vl);
 
@@ -85,28 +86,19 @@ void NextAction::destroy(NextAction** actions)
     if (!actions)
         return;
 
-    for (uint32 i=0; actions[i]; i++)
+    for (uint32 i = 0; actions[i]; i++)
         delete actions[i];
 
     delete[] actions;
 }
 
-Value<Unit*>* Action::GetTargetValue()
-{
-    return context->GetValue<Unit*>(GetTargetName());
-}
+Value<Unit*>* Action::GetTargetValue() { return context->GetValue<Unit*>(GetTargetName()); }
 
-Unit* Action::GetTarget()
-{
-    return GetTargetValue()->Get();
-}
+Unit* Action::GetTarget() { return GetTargetValue()->Get(); }
 
-ActionBasket::ActionBasket(ActionNode* action, float relevance, bool skipPrerequisites, Event event) :
-    action(action), relevance(relevance), skipPrerequisites(skipPrerequisites), event(event), created(getMSTime())
+ActionBasket::ActionBasket(ActionNode* action, float relevance, bool skipPrerequisites, Event event)
+    : action(action), relevance(relevance), skipPrerequisites(skipPrerequisites), event(event), created(getMSTime())
 {
 }
 
-bool ActionBasket::isExpired(uint32 msecs)
-{
-    return getMSTime() - created >= msecs;
-}
+bool ActionBasket::isExpired(uint32 msecs) { return getMSTime() - created >= msecs; }

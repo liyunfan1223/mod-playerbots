@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "MoveToTravelTargetAction.h"
+
 #include "ChooseRpgTargetAction.h"
 #include "LootObjectStack.h"
 #include "PathGenerator.h"
@@ -44,10 +46,11 @@ bool MoveToTravelTargetAction::Execute(Event event)
             if (memberDistance > sPlayerbotAIConfig->reactDistance * 20)
                 continue;
 
-           // float memberAngle = botLocation.getAngleBetween(targetPos, memberPos);
+            // float memberAngle = botLocation.getAngleBetween(targetPos, memberPos);
 
-           // if (botLocation.getMapId() == targetPos.getMapId() && botLocation.getMapId() == memberPos.getMapId() && memberAngle < static_cast<float>(M_PI) / 2) //We are heading that direction anyway.
-           //     continue;
+            // if (botLocation.getMapId() == targetPos.getMapId() && botLocation.getMapId() == memberPos.getMapId() &&
+            // memberAngle < static_cast<float>(M_PI) / 2) //We are heading that direction anyway.
+            //     continue;
 
             if (!urand(0, 5))
             {
@@ -72,14 +75,14 @@ bool MoveToTravelTargetAction::Execute(Event event)
 
     float maxDistance = target->getDestination()->getRadiusMin();
 
-    //Evenly distribute around the target.
+    // Evenly distribute around the target.
     float angle = 2 * M_PI * urand(0, 100) / 100.0;
 
-    if (target->getMaxTravelTime() > target->getTimeLeft()) //The bot is late. Speed it up.
+    if (target->getMaxTravelTime() > target->getTimeLeft())  // The bot is late. Speed it up.
     {
-        //distance = sPlayerbotAIConfig->fleeDistance;
-        //angle = bot->GetAngle(location.GetPositionX(), location.GetPositionY());
-        //location = botLocation.getLocation();
+        // distance = sPlayerbotAIConfig->fleeDistance;
+        // angle = bot->GetAngle(location.GetPositionX(), location.GetPositionY());
+        // location = botLocation.getLocation();
     }
 
     float x = location.GetPositionX();
@@ -87,7 +90,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
     float z = location.GetPositionZ();
     float mapId = location.GetMapId();
 
-    //Move between 0.5 and 1.0 times the maxDistance.
+    // Move between 0.5 and 1.0 times the maxDistance.
     float mod = frand(50.f, 100.f) / 100.0f;
 
     x += cos(angle) * maxDistance * mod;
@@ -137,9 +140,9 @@ bool MoveToTravelTargetAction::isUseful()
     if (loot.IsLootPossible(bot))
         return false;
 
-    if (!ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))
+    if (!ChooseRpgTargetAction::isFollowValid(bot,
+                                              *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))
         return false;
 
     return true;
 }
-

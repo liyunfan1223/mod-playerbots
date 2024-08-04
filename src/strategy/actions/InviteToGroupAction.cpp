@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "InviteToGroupAction.h"
+
 #include "Event.h"
 #include "GuildMgr.h"
 #include "Playerbots.h"
@@ -59,10 +61,11 @@ bool InviteNearbyToGroupAction::Execute(Event event)
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster()) // Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO &&
+                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
-            if (botAI->HasActivePlayerMaster()) // Do not invite alts of active players.
+            if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
         }
         else
@@ -128,7 +131,7 @@ bool InviteNearbyToGroupAction::isUseful()
             return false;
     }
 
-    if (botAI->HasActivePlayerMaster()) // Alts do not invite randomly
+    if (botAI->HasActivePlayerMaster())  // Alts do not invite randomly
         return false;
 
     return true;
@@ -162,13 +165,15 @@ bool InviteGuildToGroupAction::Execute(Event event)
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster()) //Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO &&
+                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
-            if (botAI->HasActivePlayerMaster()) //Do not invite alts of active players.
+            if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
 
-            if (player->GetLevel() > bot->GetLevel() + 5) // Only invite higher levels that need money so they can grind money and help out.
+            if (player->GetLevel() >
+                bot->GetLevel() + 5)  // Only invite higher levels that need money so they can grind money and help out.
             {
                 AiObjectContext* botContext = botAI->GetAiObjectContext();
 

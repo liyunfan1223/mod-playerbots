@@ -1,60 +1,59 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "SellAction.h"
+
 #include "Event.h"
-#include "ItemVisitors.h"
 #include "ItemUsageValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 
 class SellItemsVisitor : public IterateItemsVisitor
 {
-    public:
-        SellItemsVisitor(SellAction* action) : IterateItemsVisitor(), action(action) { }
+public:
+    SellItemsVisitor(SellAction* action) : IterateItemsVisitor(), action(action) {}
 
-        bool Visit(Item* item) override
-        {
-            action->Sell(item);
-            return true;
-        }
+    bool Visit(Item* item) override
+    {
+        action->Sell(item);
+        return true;
+    }
 
-    private:
-        SellAction* action;
+private:
+    SellAction* action;
 };
 
 class SellGrayItemsVisitor : public SellItemsVisitor
 {
-    public:
-        SellGrayItemsVisitor(SellAction* action) : SellItemsVisitor(action) { }
+public:
+    SellGrayItemsVisitor(SellAction* action) : SellItemsVisitor(action) {}
 
-        bool Visit(Item* item) override
-        {
-            if (item->GetTemplate()->Quality != ITEM_QUALITY_POOR)
-                return true;
+    bool Visit(Item* item) override
+    {
+        if (item->GetTemplate()->Quality != ITEM_QUALITY_POOR)
+            return true;
 
-            return SellItemsVisitor::Visit(item);
-        }
+        return SellItemsVisitor::Visit(item);
+    }
 };
 
 class SellVendorItemsVisitor : public SellItemsVisitor
 {
-    public:
-        SellVendorItemsVisitor(SellAction* action, AiObjectContext* con) : SellItemsVisitor(action)
-        {
-            context = con;
-        }
+public:
+    SellVendorItemsVisitor(SellAction* action, AiObjectContext* con) : SellItemsVisitor(action) { context = con; }
 
-        AiObjectContext* context;
+    AiObjectContext* context;
 
-        bool Visit(Item* item) override
-        {
-            ItemUsage usage = context->GetValue<ItemUsage>("item usage", item->GetEntry())->Get();
-            if (usage != ITEM_USAGE_VENDOR && usage != ITEM_USAGE_AH)
-                return true;
+    bool Visit(Item* item) override
+    {
+        ItemUsage usage = context->GetValue<ItemUsage>("item usage", item->GetEntry())->Get();
+        if (usage != ITEM_USAGE_VENDOR && usage != ITEM_USAGE_AH)
+            return true;
 
-            return SellItemsVisitor::Visit(item);
-        }
+        return SellItemsVisitor::Visit(item);
+    }
 };
 
 bool SellAction::Execute(Event event)
@@ -76,8 +75,8 @@ bool SellAction::Execute(Event event)
 
     if (text != "")
     {
-        std::vector<Item *> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
-        for (Item *item : items)
+        std::vector<Item*> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
+        for (Item* item : items)
         {
             Sell(item);
         }
@@ -106,7 +105,7 @@ void SellAction::Sell(Item* item)
 
     for (ObjectGuid const vendorguid : vendors)
     {
-        Creature* pCreature = bot->GetNPCIfCanInteractWith(vendorguid,UNIT_NPC_FLAG_VENDOR);
+        Creature* pCreature = bot->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
         if (!pCreature)
             continue;
 

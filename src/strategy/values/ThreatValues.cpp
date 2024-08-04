@@ -1,17 +1,19 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ThreatValues.h"
-#include "ThreatMgr.h"
+
 #include "Playerbots.h"
+#include "ThreatMgr.h"
 
 uint8 ThreatValue::Calculate()
 {
     if (qualifier == "aoe")
     {
         uint8 maxThreat = 0;
-        GuidVector attackers = context->GetValue<GuidVector >("attackers")->Get();
+        GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
         for (ObjectGuid const guid : attackers)
         {
             Unit* unit = botAI->GetUnit(guid);
@@ -66,7 +68,7 @@ uint8 ThreatValue::Calculate(Unit* target)
 
     // calculate normal threat for fleeing targets
     bool fleeing = target->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLEEING_MOTION_TYPE ||
-        target->GetMotionMaster()->GetCurrentMovementGeneratorType() == TIMED_FLEEING_MOTION_TYPE;
+                   target->GetMotionMaster()->GetCurrentMovementGeneratorType() == TIMED_FLEEING_MOTION_TYPE;
 
     // return high threat if tank has no threat
     if (target->IsInCombat() && maxThreat <= 0 && botThreat <= 0 && hasTank && !fleeing)

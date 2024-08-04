@@ -1,6 +1,9 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
+
+#include <functional>
 
 #include "SuggestWhatToDoAction.h"
 #include "ServerFacade.h"
@@ -13,15 +16,25 @@
 #include "PlayerbotTextMgr.h"
 #include "Config.h"
 #include "BroadcastHelper.h"
-
-#include <functional>
+#include "AiFactory.h"
+#include "ChannelMgr.h"
+#include "ChatHelper.h"
+#include "Config.h"
+#include "Event.h"
+#include "GuildMgr.h"
+#include "ItemVisitors.h"
+#include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
+#include "ServerFacade.h"
 
 enum eTalkType
 {
     /*0x18*/ General = ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
-    /*0x3C*/ Trade = ChannelFlags::CHANNEL_FLAG_CITY | ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG | ChannelFlags::CHANNEL_FLAG_TRADE,
+    /*0x3C*/ Trade = ChannelFlags::CHANNEL_FLAG_CITY | ChannelFlags::CHANNEL_FLAG_GENERAL |
+                     ChannelFlags::CHANNEL_FLAG_NOT_LFG | ChannelFlags::CHANNEL_FLAG_TRADE,
     /*0x18*/ LocalDefence = ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
-    /*x038*/ GuildRecruitment = ChannelFlags::CHANNEL_FLAG_CITY | ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
+    /*x038*/ GuildRecruitment =
+        ChannelFlags::CHANNEL_FLAG_CITY | ChannelFlags::CHANNEL_FLAG_GENERAL | ChannelFlags::CHANNEL_FLAG_NOT_LFG,
     /*0x50*/ LookingForGroup = ChannelFlags::CHANNEL_FLAG_LFG | ChannelFlags::CHANNEL_FLAG_GENERAL
 };
 
@@ -29,8 +42,7 @@ std::map<std::string, uint8> SuggestDungeonAction::instances;
 std::map<std::string, uint8> SuggestWhatToDoAction::factions;
 
 SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* botAI, std::string const name)
-    : InventoryAction{ botAI, name }
-    , _dbc_locale{ sWorld->GetDefaultDbcLocale() }
+    : InventoryAction{botAI, name}, _dbc_locale{sWorld->GetDefaultDbcLocale()}
 {
     suggestions.push_back(std::bind(&SuggestWhatToDoAction::specificQuest, this));
     suggestions.push_back(std::bind(&SuggestWhatToDoAction::grindReputation, this));
@@ -95,8 +107,8 @@ void SuggestWhatToDoAction::grindMaterials()
     /*if (bot->GetLevel() <= 5)
         return;
 
-    auto result = CharacterDatabase.Query("SELECT distinct category, multiplier FROM ahbot_category where category not in ('other', 'quest', 'trade', 'reagent') and multiplier > 3 order by multiplier desc limit 10");
-    if (!result)
+    auto result = CharacterDatabase.Query("SELECT distinct category, multiplier FROM ahbot_category where category not
+    in ('other', 'quest', 'trade', 'reagent') and multiplier > 3 order by multiplier desc limit 10"); if (!result)
         return;
 
     std::map<std::string, double> categories;
@@ -127,8 +139,8 @@ void SuggestWhatToDoAction::grindMaterials()
                     placeholders["%role"] = chat->formatClass(bot, AiFactory::GetPlayerSpecTab(bot));
                     placeholders["%category"] = item;
 
-                    spam(BOT_TEXT2("suggest_trade", placeholders), urand(0, 1) ? 0x3C : 0x18, !urand(0, 2), !urand(0, 3));
-                    return;
+                    spam(BOT_TEXT2("suggest_trade", placeholders), urand(0, 1) ? 0x3C : 0x18, !urand(0, 2), !urand(0,
+    3)); return;
                 }
             }
         }
@@ -213,44 +225,44 @@ void SuggestWhatToDoAction::thunderfury()
 
 class FindTradeItemsVisitor : public IterateItemsVisitor
 {
-    public:
-        FindTradeItemsVisitor(uint32 quality) : quality(quality), IterateItemsVisitor() { }
+public:
+    FindTradeItemsVisitor(uint32 quality) : quality(quality), IterateItemsVisitor() {}
 
-        bool Visit(Item* item) override
-        {
-            ItemTemplate const* proto = item->GetTemplate();
-            if (proto->Quality != quality)
-                return true;
-
-            if (proto->Class == ITEM_CLASS_TRADE_GOODS && proto->Bonding == NO_BIND)
-            {
-                if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 && item->GetCount() == item->GetMaxStackCount())
-                    stacks.push_back(proto->ItemId);
-
-                items.push_back(proto->ItemId);
-                count[proto->ItemId] += item->GetCount();
-            }
-
+    bool Visit(Item* item) override
+    {
+        ItemTemplate const* proto = item->GetTemplate();
+        if (proto->Quality != quality)
             return true;
+
+        if (proto->Class == ITEM_CLASS_TRADE_GOODS && proto->Bonding == NO_BIND)
+        {
+            if (proto->Quality == ITEM_QUALITY_NORMAL && item->GetCount() > 1 &&
+                item->GetCount() == item->GetMaxStackCount())
+                stacks.push_back(proto->ItemId);
+
+            items.push_back(proto->ItemId);
+            count[proto->ItemId] += item->GetCount();
         }
 
-        std::map<uint32, uint32> count;
-        std::vector<uint32> stacks;
-        std::vector<uint32> items;
+        return true;
+    }
 
-    private:
-        uint32 quality;
+    std::map<uint32, uint32> count;
+    std::vector<uint32> stacks;
+    std::vector<uint32> items;
+
+private:
+    uint32 quality;
 };
 
-SuggestDungeonAction::SuggestDungeonAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest dungeon")
-{
-}
+SuggestDungeonAction::SuggestDungeonAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest dungeon") {}
 
 bool SuggestDungeonAction::Execute(Event event)
 {
     // TODO: use sPlayerbotDungeonSuggestionMgr
 
-    if (!sPlayerbotAIConfig->randomBotSuggestDungeons || bot->GetGroup()) return false;
+    if (!sPlayerbotAIConfig->randomBotSuggestDungeons || bot->GetGroup())
+        return false;
 
     if (instances.empty())
     {
@@ -310,9 +322,7 @@ bool SuggestDungeonAction::Execute(Event event)
     return true;
 }
 
-SuggestTradeAction::SuggestTradeAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest trade")
-{
-}
+SuggestTradeAction::SuggestTradeAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest trade") {}
 
 bool SuggestTradeAction::Execute(Event event)
 {

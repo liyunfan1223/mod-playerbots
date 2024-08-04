@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "VehicleActions.h"
+
 #include "ItemVisitors.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
@@ -29,11 +31,11 @@ bool EnterVehicleAction::Execute(Event event)
 
         if (fabs(bot->GetPositionZ() - vehicleBase->GetPositionZ()) < 20.0f)
 
-        //if (sServerFacade->GetDistance2d(bot, vehicle) > 100.0f)
-        //    continue;
+            // if (sServerFacade->GetDistance2d(bot, vehicle) > 100.0f)
+            //     continue;
 
-        if (sServerFacade->GetDistance2d(bot, vehicleBase) > 10.0f)
-            return MoveTo(vehicleBase, INTERACTION_DISTANCE);
+            if (sServerFacade->GetDistance2d(bot, vehicleBase) > 10.0f)
+                return MoveTo(vehicleBase, INTERACTION_DISTANCE);
 
         bot->EnterVehicle(vehicleBase);
 
@@ -46,7 +48,7 @@ bool EnterVehicleAction::Execute(Event event)
         return true;
     }
 
-	return false;
+    return false;
 }
 
 bool LeaveVehicleAction::Execute(Event event)

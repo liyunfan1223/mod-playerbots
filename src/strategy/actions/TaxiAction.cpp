@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TaxiAction.h"
+
 #include "Event.h"
 #include "LastMovementValue.h"
 #include "Playerbots.h"
@@ -15,7 +17,8 @@ bool TaxiAction::Execute(Event event)
 
     WorldPacket& p = event.getPacket();
     std::string const param = event.getParam();
-	if ((!p.empty() && (p.GetOpcode() == CMSG_TAXICLEARALLNODES || p.GetOpcode() == CMSG_TAXICLEARNODE)) || param == "clear")
+    if ((!p.empty() && (p.GetOpcode() == CMSG_TAXICLEARALLNODES || p.GetOpcode() == CMSG_TAXICLEARNODE)) ||
+        param == "clear")
     {
         movement.taxiNodes.clear();
         movement.Set(nullptr);
@@ -30,7 +33,8 @@ bool TaxiAction::Execute(Event event)
         if (!npc)
             continue;
 
-        uint32 curloc = sObjectMgr->GetNearestTaxiNode(npc->GetPositionX(), npc->GetPositionY(), npc->GetPositionZ(), npc->GetMapId(), bot->GetTeamId());
+        uint32 curloc = sObjectMgr->GetNearestTaxiNode(npc->GetPositionX(), npc->GetPositionY(), npc->GetPositionZ(),
+                                                       npc->GetMapId(), bot->GetTeamId());
 
         std::vector<uint32> nodes;
         for (uint32 i = 0; i < sTaxiPathStore.GetNumRows(); ++i)
@@ -75,7 +79,7 @@ bool TaxiAction::Execute(Event event)
             if (!entry)
                 return false;
 
-            return bot->ActivateTaxiPathTo({ entry->from, entry->to }, npc, 0);
+            return bot->ActivateTaxiPathTo({entry->from, entry->to}, npc, 0);
         }
 
         if (!movement.taxiNodes.empty() && !bot->ActivateTaxiPathTo(movement.taxiNodes, npc))

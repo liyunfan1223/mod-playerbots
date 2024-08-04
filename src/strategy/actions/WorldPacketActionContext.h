@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_WORLDPACKETACTIONCONTEXT_H
@@ -21,15 +22,17 @@
 #include "LfgActions.h"
 #include "LootAction.h"
 #include "LootRollAction.h"
-#include "QuestAction.h"
+#include "NamedObjectContext.h"
 #include "PassLeadershipToMasterAction.h"
 #include "PetitionSignAction.h"
+#include "QuestAction.h"
+#include "QuestConfirmAcceptAction.h"
 #include "ReadyCheckAction.h"
 #include "RememberTaxiAction.h"
 #include "ReviveFromCorpseAction.h"
 #include "RewardAction.h"
-#include "SeeSpellAction.h"
 #include "SecurityCheckAction.h"
+#include "SeeSpellAction.h"
 #include "TalkToQuestGiverAction.h"
 #include "TellCastFailedAction.h"
 #include "TellMasterAction.h"
@@ -143,7 +146,6 @@ private:
     static Action* accept_quest_share(PlayerbotAI* botAI) { return new AcceptQuestShareAction(botAI); }
     //static Action* turn_in_query_quest(PlayerbotAI* botAI) { return new TurnInQueryQuestAction(botAI); }
     //static Action* quest_confirm_accept(PlayerbotAI* botAI) { return new QuestConfirmAcceptAction(botAI); }
-
 
     static Action* loot_roll(PlayerbotAI* botAI) { return new LootRollAction(botAI); }
     static Action* master_loot_roll(PlayerbotAI* botAI) { return new MasterLootRollAction(botAI); }

@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "GuildManagementActions.h"
+
 #include "GuildMgr.h"
 #include "GuildPackets.h"
 #include "Playerbots.h"
@@ -39,9 +41,9 @@ Player* GuidManageAction::GetPlayer(Event event)
 
     Player* master = GetMaster();
     if (!master)
-          guid = bot->GetTarget();
+        guid = bot->GetTarget();
     else
-            guid = master->GetTarget();
+        guid = master->GetTarget();
 
     player = ObjectAccessor::FindPlayer(guid);
 
@@ -51,7 +53,7 @@ Player* GuidManageAction::GetPlayer(Event event)
     player = event.getOwner();
 
     if (player)
-       return player;
+        return player;
 
     return nullptr;
 }
@@ -70,10 +72,7 @@ bool GuidManageAction::Execute(Event event)
     return true;
 }
 
-bool GuidManageAction::PlayerIsValid(Player* member)
-{
-    return !member->GetGuildId();
-}
+bool GuidManageAction::PlayerIsValid(Player* member) { return !member->GetGuildId(); }
 
 uint8 GuidManageAction::GetRankId(Player* member)
 {
@@ -91,10 +90,7 @@ void GuildInviteAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildInviteOpcode(data);
 }
 
-bool GuildInviteAction::PlayerIsValid(Player* member)
-{
-    return !member->GetGuildId();
-}
+bool GuildInviteAction::PlayerIsValid(Player* member) { return !member->GetGuildId(); }
 
 bool GuildPromoteAction::isUseful()
 {
@@ -162,8 +158,8 @@ bool GuildManageNearbyAction::Execute(Event event)
         if (player->isDND())
             continue;
 
-
-        if (player->GetGuildId() && player->GetGuildId() == bot->GetGuildId()) //Promote or demote nearby members based on chance.
+        // Promote or demote nearby members based on chance.
+        if (player->GetGuildId() && player->GetGuildId() == bot->GetGuildId())
         {
             Guild::Member* member = guild->GetMember(player->GetGUID());
             uint32 dCount = AI_VALUE(uint32, "death count");
@@ -324,7 +320,4 @@ bool GuildLeaveAction::Execute(Event event)
     return true;
 }
 
-bool GuildLeaveAction::isUseful()
-{
-    return bot->GetGuildId();
-}
+bool GuildLeaveAction::isUseful() { return bot->GetGuildId(); }

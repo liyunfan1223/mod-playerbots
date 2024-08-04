@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotSecurity.h"
+
 #include "LFGMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
@@ -19,7 +21,8 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         return PLAYERBOT_SECURITY_ALLOW_ALL;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (!botAI) {
+    if (!botAI)
+    {
         return PLAYERBOT_SECURITY_DENY_ALL;
     }
     if (botAI->IsOpposing(from))
@@ -62,7 +65,8 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             }
         }
 
-        if (sPlayerbotAIConfig->groupInvitationPermission <= 0) {
+        if (sPlayerbotAIConfig->groupInvitationPermission <= 0)
+        {
             if (reason)
                 *reason = PLAYERBOT_DENY_NONE;
 
@@ -85,9 +89,11 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         if (sPlayerbotAIConfig->gearscorecheck)
         {
             if (botGS && bot->GetLevel() > 15 && botGS > fromGS &&
-                static_cast<float>(100 * (botGS - fromGS) / botGS) >= static_cast<float>(12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel()))
+                static_cast<float>(100 * (botGS - fromGS) / botGS) >=
+                    static_cast<float>(12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel()))
             {
-                if (reason) *reason = PLAYERBOT_DENY_GEARSCORE;
+                if (reason)
+                    *reason = PLAYERBOT_DENY_GEARSCORE;
                 return PLAYERBOT_SECURITY_TALK;
             }
         }
@@ -195,37 +201,39 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
         case PLAYERBOT_SECURITY_TALK:
             switch (reason)
             {
-            case PLAYERBOT_DENY_NONE:
-                out << "I'll do it later";
-                break;
-            case PLAYERBOT_DENY_LOW_LEVEL:
-                out << "You are too low level: |cffff0000" << (uint32)from->GetLevel() << "|cffffffff/|cff00ff00" << (uint32)bot->GetLevel();
-                break;
-            case PLAYERBOT_DENY_GEARSCORE:
+                case PLAYERBOT_DENY_NONE:
+                    out << "I'll do it later";
+                    break;
+                case PLAYERBOT_DENY_LOW_LEVEL:
+                    out << "You are too low level: |cffff0000" << (uint32)from->GetLevel() << "|cffffffff/|cff00ff00"
+                        << (uint32)bot->GetLevel();
+                    break;
+                case PLAYERBOT_DENY_GEARSCORE:
                 {
                     int botGS = (int)botAI->GetEquipGearScore(bot, false, false);
                     int fromGS = (int)botAI->GetEquipGearScore(from, false, false);
                     int diff = (100 * (botGS - fromGS) / botGS);
                     int req = 12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel();
-                    out << "Your gearscore is too low: |cffff0000" << fromGS << "|cffffffff/|cff00ff00" << botGS << " |cffff0000" << diff << "%|cffffffff/|cff00ff00" << req << "%";
+                    out << "Your gearscore is too low: |cffff0000" << fromGS << "|cffffffff/|cff00ff00" << botGS
+                        << " |cffff0000" << diff << "%|cffffffff/|cff00ff00" << req << "%";
                 }
                 break;
-            case PLAYERBOT_DENY_NOT_YOURS:
-                out << "I have a master already";
-                break;
-            case PLAYERBOT_DENY_IS_BOT:
-                out << "You are a bot";
-                break;
-            case PLAYERBOT_DENY_OPPOSING:
-                out << "You are the enemy";
-                break;
-            case PLAYERBOT_DENY_DEAD:
-                out << "I'm dead. Will do it later";
-                break;
-            case PLAYERBOT_DENY_INVITE:
-                out << "Invite me to your group first";
-                break;
-            case PLAYERBOT_DENY_FAR:
+                case PLAYERBOT_DENY_NOT_YOURS:
+                    out << "I have a master already";
+                    break;
+                case PLAYERBOT_DENY_IS_BOT:
+                    out << "You are a bot";
+                    break;
+                case PLAYERBOT_DENY_OPPOSING:
+                    out << "You are the enemy";
+                    break;
+                case PLAYERBOT_DENY_DEAD:
+                    out << "I'm dead. Will do it later";
+                    break;
+                case PLAYERBOT_DENY_INVITE:
+                    out << "Invite me to your group first";
+                    break;
+                case PLAYERBOT_DENY_FAR:
                 {
                     out << "You must be closer to invite me to your group. I am in ";
 
@@ -235,31 +243,32 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                     }
                 }
                 break;
-            case PLAYERBOT_DENY_FULL_GROUP:
-                out << "I am in a full group. Will do it later";
-                break;
-            case PLAYERBOT_DENY_IS_LEADER:
-                out << "I am currently leading a group. I can invite you if you want.";
-                break;
-            case PLAYERBOT_DENY_NOT_LEADER:
-                if (botAI->GetGroupMaster())
-                {
-                    out << "I am in a group with " << botAI->GetGroupMaster()->GetName() << ". You can ask him for invite.";
-                }
-                else
-                {
-                    out << "I am in a group with someone else. You can ask him for invite.";
-                }
-                break;
-            case PLAYERBOT_DENY_BG:
-                out << "I am in a queue for BG. Will do it later";
-                break;
-            case PLAYERBOT_DENY_LFG:
-                out << "I am in a queue for dungeon. Will do it later";
-                break;
-            default:
-                out << "I can't do that";
-                break;
+                case PLAYERBOT_DENY_FULL_GROUP:
+                    out << "I am in a full group. Will do it later";
+                    break;
+                case PLAYERBOT_DENY_IS_LEADER:
+                    out << "I am currently leading a group. I can invite you if you want.";
+                    break;
+                case PLAYERBOT_DENY_NOT_LEADER:
+                    if (botAI->GetGroupMaster())
+                    {
+                        out << "I am in a group with " << botAI->GetGroupMaster()->GetName()
+                            << ". You can ask him for invite.";
+                    }
+                    else
+                    {
+                        out << "I am in a group with someone else. You can ask him for invite.";
+                    }
+                    break;
+                case PLAYERBOT_DENY_BG:
+                    out << "I am in a queue for BG. Will do it later";
+                    break;
+                case PLAYERBOT_DENY_LFG:
+                    out << "I am in a queue for dungeon. Will do it later";
+                    break;
+                default:
+                    out << "I can't do that";
+                    break;
             }
             break;
         case PLAYERBOT_SECURITY_INVITE:

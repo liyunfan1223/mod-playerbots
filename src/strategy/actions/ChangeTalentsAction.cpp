@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ChangeTalentsAction.h"
+
 #include "AiFactory.h"
 #include "ChatHelper.h"
 #include "Event.h"
@@ -17,16 +19,22 @@ bool ChangeTalentsAction::Execute(Event event)
     std::ostringstream out;
 
     TalentSpec botSpec(bot);
-    
+
     if (!param.empty())
     {
-        if (param.find("help") != std::string::npos) {
+        if (param.find("help") != std::string::npos)
+        {
             out << TalentsHelp();
-        } else if (param.find("switch") != std::string::npos) {
-            if (param.find("switch 1") != std::string::npos) {
+        }
+        else if (param.find("switch") != std::string::npos)
+        {
+            if (param.find("switch 1") != std::string::npos)
+            {
                 bot->ActivateSpec(0);
                 out << "Active first talent";
-            } else if (param.find("switch 2") != std::string::npos) {
+            }
+            else if (param.find("switch 2") != std::string::npos)
+            {
                 if (bot->GetSpecsCount() == 1 && bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
                 {
                     bot->CastSpell(bot, 63680, true, nullptr, nullptr, bot->GetGUID());
@@ -35,28 +43,39 @@ bool ChangeTalentsAction::Execute(Event event)
                 bot->ActivateSpec(1);
                 out << "Active second talent";
             }
-        } else if (param.find("autopick") != std::string::npos) {
+        }
+        else if (param.find("autopick") != std::string::npos)
+        {
             PlayerbotFactory factory(bot, bot->GetLevel());
             factory.InitTalentsTree(true);
             out << "Auto pick talents";
-        } else if (param.find("spec list") != std::string::npos) {
+        }
+        else if (param.find("spec list") != std::string::npos)
+        {
             out << SpecList();
-        } else if (param.find("spec ") != std::string::npos) {
+        }
+        else if (param.find("spec ") != std::string::npos)
+        {
             param = param.substr(5);
             out << SpecPick(param);
             botAI->ResetStrategies();
-        } else if (param.find("apply ") != std::string::npos) {
+        }
+        else if (param.find("apply ") != std::string::npos)
+        {
             param = param.substr(6);
             out << SpecApply(param);
             botAI->ResetStrategies();
-        } else {
+        }
+        else
+        {
             out << "Unknown command.";
         }
     }
     else
     {
         uint32 tab = AiFactory::GetPlayerSpecTab(bot);
-        out << "My current talent spec is: " << "|h|cffffffff";
+        out << "My current talent spec is: "
+            << "|h|cffffffff";
         out << chat->FormatClass(bot, tab) << "\n";
         out << TalentsHelp();
     }
@@ -70,7 +89,7 @@ std::string ChangeTalentsAction::TalentsHelp()
 {
     std::ostringstream out;
     out << "Talents usage: talents switch <1/2>, talents autopick, talents spec list, "
-            "talents spec <specName>, talents apply <link>.";
+           "talents spec <specName>, talents apply <link>.";
     return out.str();
 }
 
@@ -79,8 +98,10 @@ std::string ChangeTalentsAction::SpecList()
     int cls = bot->getClass();
     int specFound = 0;
     std::ostringstream out;
-    for (int specNo = 0; specNo < MAX_SPECNO; ++specNo) {
-        if (sPlayerbotAIConfig->premadeSpecName[cls][specNo].size() == 0) {
+    for (int specNo = 0; specNo < MAX_SPECNO; ++specNo)
+    {
+        if (sPlayerbotAIConfig->premadeSpecName[cls][specNo].size() == 0)
+        {
             break;
         }
         specFound++;
@@ -88,7 +109,8 @@ std::string ChangeTalentsAction::SpecList()
         std::vector<std::vector<uint32>> parsed = sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specNo][80];
         std::unordered_map<int, int> tabCount;
         tabCount[0] = tabCount[1] = tabCount[2] = 0;
-        for (auto &item : parsed) {
+        for (auto& item : parsed)
+        {
             tabCount[item[0]] += item[3];
         }
         out << specFound << ". " << sPlayerbotAIConfig->premadeSpecName[cls][specNo] << " (";
@@ -103,11 +125,14 @@ std::string ChangeTalentsAction::SpecPick(std::string param)
 {
     int cls = bot->getClass();
     int specFound = 0;
-    for (int specNo = 0; specNo < MAX_SPECNO; ++specNo) {
-        if (sPlayerbotAIConfig->premadeSpecName[cls][specNo].size() == 0) {
+    for (int specNo = 0; specNo < MAX_SPECNO; ++specNo)
+    {
+        if (sPlayerbotAIConfig->premadeSpecName[cls][specNo].size() == 0)
+        {
             break;
         }
-        if (sPlayerbotAIConfig->premadeSpecName[cls][specNo] == param) {
+        if (sPlayerbotAIConfig->premadeSpecName[cls][specNo] == param)
+        {
             PlayerbotFactory::InitTalentsBySpecNo(bot, specNo, true);
             std::ostringstream out;
             out << "Picking " << sPlayerbotAIConfig->premadeSpecName[cls][specNo];
@@ -119,13 +144,13 @@ std::string ChangeTalentsAction::SpecPick(std::string param)
     return out.str();
 }
 
-
 std::string ChangeTalentsAction::SpecApply(std::string param)
 {
     int cls = bot->getClass();
     std::ostringstream out;
     std::vector<std::vector<uint32>> parsedSpecLink = PlayerbotAIConfig::ParseTempTalentsOrder(cls, param);
-    if (parsedSpecLink.size() == 0) {
+    if (parsedSpecLink.size() == 0)
+    {
         out << "Invalid link " << param;
         return out.str();
     }
@@ -243,7 +268,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //         newSpec.ApplyTalents(bot, out);
 //         if (newSpec.GetTalentPoints() > 0)
 //         {
-//             *out << "Upgrading spec " << "|h|cffffffff" << getPremadePath(specId)->name << "" << newSpec.FormatSpec(bot);
+//             *out << "Upgrading spec " << "|h|cffffffff" << getPremadePath(specId)->name << "" <<
+//             newSpec.FormatSpec(bot);
 //         }
 //     }
 //     else if (!specLink.empty())
@@ -254,7 +280,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //         if (newSpec.GetTalentPoints() > 0)
 //         {
 //             *out << "Upgrading saved spec "
-//                  << "|h|cffffffff" << chat->FormatClass(bot, newSpec.highestTree()) << " (" << newSpec.FormatSpec(bot) << ")";
+//                  << "|h|cffffffff" << chat->FormatClass(bot, newSpec.highestTree()) << " (" <<
+//                  newSpec.FormatSpec(bot) << ")";
 //         }
 //     }
 
@@ -278,7 +305,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //             specId = -1;
 //             // specLink = "";
 //         }
-//         else if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/ && !sRandomPlayerbotMgr->IsRandomBot(bot))
+//         else if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/ &&
+//         !sRandomPlayerbotMgr->IsRandomBot(bot))
 //         {
 //             *out << "Found multiple specs: ";
 //             listPremadePaths(paths, out);
@@ -294,7 +322,8 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //             if (paths.size() > 1)
 //                 *out << "Found " << paths.size() << " possible specs to choose from. ";
 
-//             *out << "Apply spec " << "|h|cffffffff" << getPremadePath(specId)->name << " " << newSpec.FormatSpec(bot);
+//             *out << "Apply spec " << "|h|cffffffff" << getPremadePath(specId)->name << " " <<
+//             newSpec.FormatSpec(bot);
 //         }
 //     }
 

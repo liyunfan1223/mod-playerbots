@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "LeaveGroupAction.h"
+
 #include "Event.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
@@ -66,7 +68,8 @@ bool UninviteAction::Execute(Event event)
 
 bool LeaveGroupAction::Leave(Player* player)
 {
-    if (player && !GET_PLAYERBOT_AI(player) && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, player))
+    if (player && !GET_PLAYERBOT_AI(player) &&
+        !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, player))
         return false;
 
     bool aiMaster = GET_PLAYERBOT_AI(botAI->GetMaster()) != nullptr;
@@ -126,7 +129,8 @@ bool LeaveFarAwayAction::isUseful()
     if (trueMaster && !GET_PLAYERBOT_AI(trueMaster))
         return false;
 
-    if (botAI->IsAlt() && (!masterBotAI || masterBotAI->IsRealPlayer())) // Don't leave group when alt grouped with player master.
+    if (botAI->IsAlt() &&
+        (!masterBotAI || masterBotAI->IsRealPlayer()))  // Don't leave group when alt grouped with player master.
         return false;
 
     if (botAI->GetGrouperType() == GrouperType::SOLO)
@@ -152,9 +156,10 @@ bool LeaveFarAwayAction::isUseful()
     if (abs(int32(master->GetLevel() - bot->GetLevel())) > 4)
         return true;
 
-    if (bot->GetMapId() != master->GetMapId() || bot->GetDistance2d(master) >= 2 * sPlayerbotAIConfig->rpgDistance) {
+    if (bot->GetMapId() != master->GetMapId() || bot->GetDistance2d(master) >= 2 * sPlayerbotAIConfig->rpgDistance)
+    {
         return true;
     }
-    
+
     return false;
 }

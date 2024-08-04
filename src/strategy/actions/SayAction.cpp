@@ -1,30 +1,60 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "AiFactory.h"
 #include "SayAction.h"
-#include "Event.h"
-#include "Playerbots.h"
-#include "PlayerbotTextMgr.h"
-#include "ChannelMgr.h"
-#include "GuildMgr.h"
+
 #include <regex>
 #include <string>
 
-static const std::unordered_set<std::string> noReplyMsgs = {
-  "join", "leave", "follow", "attack", "pull", "flee", "reset", "reset ai",
-  "all ?", "talents", "talents list", "talents auto", "talk", "stay", "stats",
-  "who", "items", "leave", "join", "repair", "summon", "nc ?", "co ?", "de ?",
-  "dead ?", "follow", "los", "guard", "do accept invitation", "stats", "react ?",
-  "reset strats", "home",
-};
-static const std::unordered_set<std::string> noReplyMsgParts = { "+", "-","@" , "follow target", "focus heal", "cast ", "accept [", "e [", "destroy [", "go zone" };
-static const std::unordered_set<std::string> noReplyMsgStarts = { "e ", "accept ", "cast ", "destroy " };
+#include "ChannelMgr.h"
+#include "Event.h"
+#include "GuildMgr.h"
+#include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 
-SayAction::SayAction(PlayerbotAI* botAI) : Action(botAI, "say"), Qualified()
-{
-}
+static const std::unordered_set<std::string> noReplyMsgs = {
+    "join",
+    "leave",
+    "follow",
+    "attack",
+    "pull",
+    "flee",
+    "reset",
+    "reset ai",
+    "all ?",
+    "talents",
+    "talents list",
+    "talents auto",
+    "talk",
+    "stay",
+    "stats",
+    "who",
+    "items",
+    "leave",
+    "join",
+    "repair",
+    "summon",
+    "nc ?",
+    "co ?",
+    "de ?",
+    "dead ?",
+    "follow",
+    "los",
+    "guard",
+    "do accept invitation",
+    "stats",
+    "react ?",
+    "reset strats",
+    "home",
+};
+static const std::unordered_set<std::string> noReplyMsgParts = {
+    "+", "-", "@", "follow target", "focus heal", "cast ", "accept [", "e [", "destroy [", "go zone"};
+static const std::unordered_set<std::string> noReplyMsgStarts = {"e ", "accept ", "cast ", "destroy "};
+
+SayAction::SayAction(PlayerbotAI* botAI) : Action(botAI, "say"), Qualified() {}
 
 bool SayAction::Execute(Event event)
 {
@@ -35,7 +65,8 @@ bool SayAction::Execute(Event event)
         target = AI_VALUE(Unit*, "current target");
 
     // set replace strings
-    if (target) placeholders["<target>"] = target->GetName();
+    if (target)
+        placeholders["<target>"] = target->GetName();
     placeholders["<randomfaction>"] = IsAlliance(bot->getRace()) ? "Alliance" : "Horde";
     if (qualifier == "low ammo" || qualifier == "no ammo")
     {
@@ -73,7 +104,8 @@ bool SayAction::Execute(Event event)
         {
             Player* member = ref->GetSource();
             PlayerbotAI* memberAi = GET_PLAYERBOT_AI(member);
-            if (memberAi) members.push_back(member);
+            if (memberAi)
+                members.push_back(member);
         }
 
         uint32 count = members.size();
@@ -91,11 +123,13 @@ bool SayAction::Execute(Event event)
         }
 
         int index = 0;
-        for (auto & member : members)
+        for (auto& member : members)
         {
             PlayerbotAI* memberAi = GET_PLAYERBOT_AI(member);
             if (memberAi)
-                memberAi->GetAiObjectContext()->GetValue<time_t>("last said", qualifier)->Set(nextTime + (20 * ++index) + urand(1, 15));
+                memberAi->GetAiObjectContext()
+                    ->GetValue<time_t>("last said", qualifier)
+                    ->Set(nextTime + (20 * ++index) + urand(1, 15));
         }
     }
 
@@ -125,12 +159,13 @@ bool SayAction::isUseful()
 
 void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint32& guid2, std::string& msg, std::string& chanName, std::string& name)
 {
-    ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
+    ChatReplyType replyType = REPLY_NOT_UNDERSTAND;  // default not understand
     std::string respondsText = "";
 
     // if we're just commanding bots around, don't respond...
     // first one is for exact word matches
-    if (noReplyMsgs.find(msg) != noReplyMsgs.end()) {
+    if (noReplyMsgs.find(msg) != noReplyMsgs.end())
+    {
         /*std::ostringstream out;
         out << "DEBUG ChatReplyDo decided to ignore exact blocklist match" << msg;
         bot->Say(out.str(), LANG_UNIVERSAL);*/
@@ -138,16 +173,21 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint
     }
 
     // second one is for partial matches like + or - where we change strats
-    if (std::any_of(noReplyMsgParts.begin(), noReplyMsgParts.end(), [&msg](const std::string& part) { return msg.find(part) != std::string::npos; })) {
+    if (std::any_of(noReplyMsgParts.begin(), noReplyMsgParts.end(),
+                    [&msg](const std::string& part) { return msg.find(part) != std::string::npos; }))
+    {
         /*std::ostringstream out;
         out << "DEBUG ChatReplyDo decided to ignore partial blocklist match" << msg;
         bot->Say(out.str(), LANG_UNIVERSAL);*/
         return;
     }
 
-    if (std::any_of(noReplyMsgStarts.begin(), noReplyMsgStarts.end(), [&msg](const std::string& start) {
-        return msg.find(start) == 0;  // Check if the start matches the beginning of msg
-        })) {
+    if (std::any_of(noReplyMsgStarts.begin(), noReplyMsgStarts.end(),
+                    [&msg](const std::string& start)
+                    {
+                        return msg.find(start) == 0;  // Check if the start matches the beginning of msg
+                    }))
+    {
         /*std::ostringstream out;
         out << "DEBUG ChatReplyDo decided to ignore start blocklist match" << msg;
         bot->Say(out.str(), LANG_UNIVERSAL);*/
@@ -589,25 +629,25 @@ std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string& inco
             if (word[i] == "am" || word[i] == "are" || word[i] == "is")
             {
                 verb_pos = i;
-                verb_type = 2; // present
+                verb_type = 2;  // present
                 if (verb_pos == 0)
                     is_quest = 1;
             }
             else if (word[i] == "will")
             {
                 verb_pos = i;
-                verb_type = 3; // future
+                verb_type = 3;  // future
             }
             else if (word[i] == "was" || word[i] == "were")
             {
                 verb_pos = i;
-                verb_type = 1; // past
+                verb_type = 1;  // past
             }
             else if (word[i] == "shut" || word[i] == "noob")
             {
                 if (incomingMessage.find(bot->GetName()) == std::string::npos)
                 {
-                    continue; // not react
+                    continue;  // not react
                     uint32 rnd = urand(0, 2);
                     std::string msg = "";
                     if (rnd == 0)
@@ -982,7 +1022,7 @@ std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string& inco
             replyType = REPLY_NAME;
             found = true;
         }
-        else // Does not understand
+        else  // Does not understand
         {
             replyType = REPLY_NOT_UNDERSTAND;
             found = true;

@@ -1,6 +1,9 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
+
+#include <random>
 
 #include "ChooseRpgTargetAction.h"
 #include "BattlegroundMgr.h"
@@ -9,13 +12,11 @@
 #include "Event.h"
 #include "Formations.h"
 #include "GuildCreateActions.h"
-#include "PossibleRpgTargetsValue.h"
 #include "Playerbots.h"
 #include "RpgSubActions.h"
 #include "Util.h"
 #include "ServerFacade.h"
-
-#include <random>
+#include "PossibleRpgTargetsValue.h"
 
 bool ChooseRpgTargetAction::HasSameTarget(ObjectGuid guid, uint32 max, GuidVector const& nearGuids)
 {
@@ -333,7 +334,8 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
         if (realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() && bot->GetMapId() == realMaster->GetMapId())
             inDungeon = true;
 
-        if (realMaster && realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() && (realMaster->GetMapId() != pos.getMapId()))
+        if (realMaster && realMaster->IsInWorld() && realMaster->GetMap()->IsDungeon() &&
+            (realMaster->GetMapId() != pos.getMapId()))
             return false;
     }
 
@@ -352,7 +354,8 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
     if (!botAI->HasActivePlayerMaster() && distance < 50.0f)
     {
         Player* player = master;
-        if (!master->isMoving() || PAI_VALUE(WorldPosition, "last long move").distance(pos) < sPlayerbotAIConfig->reactDistance)
+        if (!master->isMoving() ||
+            PAI_VALUE(WorldPosition, "last long move").distance(pos) < sPlayerbotAIConfig->reactDistance)
             return true;
     }
 

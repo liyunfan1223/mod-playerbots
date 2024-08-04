@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "BankAction.h"
+
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "Playerbots.h"
@@ -102,7 +104,7 @@ bool BankAction::Deposit(Item* pItem)
 
     out << "put " << chat->FormatItem(pItem->GetTemplate(), pItem->GetCount()) << " to bank";
     botAI->TellMaster(out.str());
-	return true;
+    return true;
 }
 
 void BankAction::ListItems()
@@ -143,14 +145,14 @@ Item* BankAction::FindItemInBank(uint32 ItemId)
             if (!pItemProto)
                 continue;
 
-            if (pItemProto->ItemId == ItemId)   // have required item
+            if (pItemProto->ItemId == ItemId)  // have required item
                 return pItem;
         }
     }
 
     for (uint8 bag = BANK_SLOT_BAG_START; bag < BANK_SLOT_BAG_END; ++bag)
     {
-        Bag const* const pBag = (Bag *) bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
+        Bag const* const pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
         if (pBag)
             for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
             {

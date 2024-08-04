@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_IMBUEACTION_H
@@ -19,26 +20,26 @@ public:
 
 class ImbueWithStoneAction : public Action
 {
-    public:
-        ImbueWithStoneAction(PlayerbotAI* botAI);
+public:
+    ImbueWithStoneAction(PlayerbotAI* botAI);
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class ImbueWithOilAction : public Action
 {
-    public:
-        ImbueWithOilAction(PlayerbotAI* botAI);
+public:
+    ImbueWithOilAction(PlayerbotAI* botAI);
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 class TryEmergencyAction : public Action
 {
-    public:
-        TryEmergencyAction(PlayerbotAI* botAI);
+public:
+    TryEmergencyAction(PlayerbotAI* botAI);
 
-        bool Execute(Event event) override;
+    bool Execute(Event event) override;
 };
 
 #endif

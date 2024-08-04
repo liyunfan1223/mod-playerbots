@@ -1,11 +1,13 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "InventoryAction.h"
+
 #include "Event.h"
-#include "ItemVisitors.h"
 #include "ItemCountValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 
 void InventoryAction::IterateItems(IterateItemsVisitor* visitor, IterateItemsMask mask)
@@ -23,18 +25,18 @@ void InventoryAction::IterateItems(IterateItemsVisitor* visitor, IterateItemsMas
 void InventoryAction::IterateItemsInBags(IterateItemsVisitor* visitor)
 {
     for (uint32 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
-        if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (!visitor->Visit(pItem))
                 return;
 
     for (uint32 i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
-        if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (!visitor->Visit(pItem))
                 return;
 
     for (uint32 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
-        if (Bag *pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            for(uint32 j = 0; j < pBag->GetBagSize(); ++j)
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
                 if (Item* pItem = pBag->GetItemByPos(j))
                     if (!visitor->Visit(pItem))
                         return;
@@ -58,7 +60,7 @@ void InventoryAction::IterateItemsInBank(IterateItemsVisitor* visitor)
     for (uint8 slot = BANK_SLOT_ITEM_START; slot < BANK_SLOT_ITEM_END; slot++)
     {
         Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-        if(!pItem)
+        if (!pItem)
             continue;
 
         if (!visitor->Visit(pItem))
@@ -75,7 +77,7 @@ void InventoryAction::IterateItemsInBank(IterateItemsVisitor* visitor)
                 {
                     if (Item* pItem = pBag->GetItemByPos(j))
                     {
-                        if(!pItem)
+                        if (!pItem)
                             continue;
 
                         if (!visitor->Visit(pItem))
@@ -223,7 +225,8 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
         IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
 
-        if (found.empty()) {
+        if (found.empty())
+        {
             FindFoodVisitor visitor(bot, 11);
             IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
             found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
@@ -354,7 +357,6 @@ uint32 InventoryAction::GetItemCount(FindItemVisitor* visitor, IterateItemsMask 
 
     return count;
 }
-
 
 ItemIds InventoryAction::FindOutfitItems(std::string const name)
 {
