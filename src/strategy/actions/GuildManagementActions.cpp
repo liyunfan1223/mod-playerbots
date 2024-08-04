@@ -216,7 +216,7 @@ bool GuildManageNearbyAction::Execute(Event event)
 
         if (sPlayerbotAIConfig->inviteChat && (sRandomPlayerbotMgr->IsRandomBot(bot) || !botAI->HasActivePlayerMaster()))
         {
-            std::map<std::string, std::string> placeholders;
+            /* std::map<std::string, std::string> placeholders;
             placeholders["%name"] = player->GetName();
             placeholders["%members"] = std::to_string(guild->GetMemberSize());
             placeholders["%guildname"] = guild->GetName();
@@ -281,7 +281,7 @@ bool GuildManageNearbyAction::Execute(Event event)
                     bot->GetGroup()->BroadcastPacket(&data, true);
                 }
                 else
-                    bot->Say(line, (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
+                    bot->Say(line, (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));*/
         }
 
         if (botAI->DoSpecificAction("guild invite", Event("guild management", guid), true))
