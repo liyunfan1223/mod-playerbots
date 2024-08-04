@@ -387,7 +387,7 @@ public:
 	void HandleBotOutgoingPacket(WorldPacket const& packet);
     void HandleMasterIncomingPacket(WorldPacket const& packet);
     void HandleMasterOutgoingPacket(WorldPacket const& packet);
-	void HandleTeleportAck();
+    void HandleTeleportAck();
     void ChangeEngine(BotState type);
     void DoNextAction(bool minimal = false);
     virtual bool DoSpecificAction(std::string const name, Event event = Event(), bool silent = false, std::string const qualifier = "");
@@ -567,7 +567,7 @@ private:
     void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
 
 protected:
-	Player* bot;
+    Player* bot;
 	Player* master;
 	uint32 accountId;
     AiObjectContext* aiObjectContext;
