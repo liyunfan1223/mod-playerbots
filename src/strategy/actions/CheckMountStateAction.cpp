@@ -24,22 +24,16 @@ bool CheckMountStateAction::Execute(Event event)
     bool attackdistance = false;
     // bool chasedistance = false;
     float attack_distance = 35.0f;
-    if (PlayerbotAI::IsMelee(bot))
-    {
-        attack_distance = 10.0f;
+    if (PlayerbotAI::IsMelee(bot)) {
+        attack_distance = 5.0f;
+    } else {
+        attack_distance = 30.0f;
     }
-    else
-    {
-        attack_distance = 40.0f;
-    }
-    if (enemy)
-        attack_distance /= 2;
 
     if (dps || enemy)
     {
         Unit* currentTarget = AI_VALUE(Unit*, "current target");
         attackdistance = (enemy || dps) && currentTarget && sServerFacade->IsDistanceLessThan(AI_VALUE2(float, "distance", "current target"), attack_distance);
-        // chasedistance = enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player target"), 45.0f) && AI_VALUE2(bool, "moving", "enemy player target");
     }
 
     if (bot->IsMounted() && attackdistance)
