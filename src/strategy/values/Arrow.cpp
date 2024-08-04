@@ -48,7 +48,8 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
     float z = master->GetPositionZ();
 
-    if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), x, y, z))
+    if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
+                                                           master->GetPositionZ(), x, y, z))
         return Formation::NullLocation;
     // master->UpdateGroundPositionZ(x, y, z);
     return WorldLocation(master->GetMapId(), x, y, z);

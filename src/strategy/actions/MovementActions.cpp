@@ -789,9 +789,9 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
 
     float dx = cos(angle) * needToGo + bx;
     float dy = sin(angle) * needToGo + by;
-    float dz; // = std::max(bz, tz); // calc accurate z position to avoid stuck
+    float dz;  // = std::max(bz, tz); // calc accurate z position to avoid stuck
 
-    if (target->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD)) // target is moving forward, predict the position
+    if (target->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD))  // target is moving forward, predict the position
     {
         float timeToGo = MoveDelay(abs(needToGo));
         float targetMoveDist = timeToGo * target->GetSpeed(MOVE_RUN);
@@ -799,8 +799,9 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
         dx += targetMoveDist * cos(target->GetOrientation());
         dy += targetMoveDist * sin(target->GetOrientation());
     }
- 
-    if (distanceToTarget > CONTACT_DISTANCE) {
+
+    if (distanceToTarget > CONTACT_DISTANCE)
+    {
         dz = bz + (tz - bz) * (needToGo / distanceToTarget);
     }
     else
@@ -808,7 +809,8 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
         dz = tz;
     }
 
-    if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), dx, dy, dz))
+    if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                        bot->GetPositionZ(), dx, dy, dz))
         return false;
 
     return MoveTo(target->GetMapId(), dx, dy, dz);
