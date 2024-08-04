@@ -128,6 +128,15 @@ AiPlayerbot.AllowPlayerBots = 0
 # Allow/deny bots from your guild
 AiPlayerbot.AllowGuildBots = 1
 
+# Randombots will invite nearby bots to guilds
+AiPlayerbot.RandomBotGuildNearby = 0
+
+# Randombots will invite players to groups/raids/guilds.
+AiPlayerbot.RandomBotInvitePlayer = 0
+
+# Bots will chat in say/guild when they invite other bots to groups/raids/guilds
+AiPlayerbot.InviteChat = 0
+
 # Bots will be summoned to player when accept group invitation
 AiPlayerbot.SummonWhenGroup = 1
 

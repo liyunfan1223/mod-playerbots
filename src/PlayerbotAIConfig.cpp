@@ -105,6 +105,9 @@ bool PlayerbotAIConfig::Initialize()
     iterationsPerTick = sConfigMgr->GetOption<int32>("AiPlayerbot.IterationsPerTick", 100);
 
     allowGuildBots = sConfigMgr->GetOption<bool>("AiPlayerbot.AllowGuildBots", true);
+    randomBotGuildNearby = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotGuildNearby", false);
+    randomBotInvitePlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotInvitePlayer", false);
+    inviteChat = sConfigMgr->GetOption<bool>("AiPlayerbot.InviteChat", false);
     allowPlayerBots = sConfigMgr->GetOption<bool>("AiPlayerbot.AllowPlayerBots", false);
 
     randomBotMapsAsString = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotMaps", "0,1,530,571");

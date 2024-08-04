@@ -42,7 +42,7 @@ SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* botAI, std::string con
 
 bool SuggestWhatToDoAction::isUseful()
 {
-    if (!sRandomPlayerbotMgr->IsRandomBot(bot) || bot->GetGroup() || bot->GetInstanceId())
+    if (!sRandomPlayerbotMgr->IsRandomBot(bot) || bot->GetGroup() || bot->GetInstanceId() || bot->GetBattleground())
         return false;
 
     std::string qualifier = "suggest what to do";

@@ -272,7 +272,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (!player->InBattleground())
     {
-        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", "emote", nullptr);
+        engine->addStrategies("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
     }
     if (sPlayerbotAIConfig->autoSaveMana) 
     {

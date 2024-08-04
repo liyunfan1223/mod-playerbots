@@ -60,7 +60,7 @@ bool CleanQuestLogAction::Execute(Event event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     std::string link = event.getParam();
-    if (botAI->HasActivePlayerMaster())
+    if (botAI->HasActivePlayerMaster() || !sRandomPlayerbotMgr->IsRandomBot(bot))
         return false;
 
     uint8 totalQuests = 0;

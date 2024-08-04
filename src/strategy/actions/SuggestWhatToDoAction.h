@@ -41,7 +41,6 @@ class SuggestTradeAction : public SuggestWhatToDoAction
         SuggestTradeAction(PlayerbotAI* botAI);
 
         bool Execute(Event event) override;
-        bool isUseful() override { return true; }
 };
 
 class SuggestDungeonAction : public SuggestWhatToDoAction
@@ -50,7 +49,6 @@ class SuggestDungeonAction : public SuggestWhatToDoAction
         SuggestDungeonAction(PlayerbotAI* botAI);
 
         bool Execute(Event event) override;
-        bool isUseful() override { return true; }
     private:
         static std::map<std::string, uint8> instances;
 };
