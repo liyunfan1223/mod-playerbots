@@ -34,15 +34,15 @@ public:
             {"bg", HandleDebugBGCommand, SEC_GAMEMASTER, Console::Yes},
         };
         static ChatCommandTable playerbotsCommandTable = {
-            {"bot", HandlePlayerbotCommand, SEC_PLAYER, Console::No},
+            {"bohol", HandlePlayerbotCommand, SEC_PLAYER, Console::No},
             {"gtask", HandleGuildTaskCommand, SEC_GAMEMASTER, Console::Yes},
             {"pmon", HandlePerfMonCommand, SEC_GAMEMASTER, Console::Yes},
-            {"rndbot", HandleRandomPlayerbotCommand, SEC_GAMEMASTER, Console::Yes},
+            {"arise", HandleRandomPlayerbotCommand, SEC_GAMEMASTER, Console::Yes},
             {"debug", playerbotsDebugCommandTable},
         };
 
         static ChatCommandTable commandTable = {
-            {"playerbots", playerbotsCommandTable},
+            {"solo", playerbotsCommandTable},
         };
 
         return commandTable;
