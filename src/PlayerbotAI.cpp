@@ -1379,7 +1379,7 @@ bool PlayerbotAI::ContainsStrategy(StrategyType type)
 {
     for (uint8 i = 0; i < BOT_STATE_MAX; i++)
     {
-        if (engines[i]->ContainsStrategy(type))
+        if (engines[i]->HasStrategyType(type))
             return true;
     }
 
