@@ -12,6 +12,7 @@
 
 #include "Event.h"
 #include "FleeManager.h"
+#include "G3D/Vector3.h"
 #include "GameObject.h"
 #include "Geometry.h"
 #include "LastMovementValue.h"
@@ -160,7 +161,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
     return false;
 }
 
-bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only)
+bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only, bool exact_waypoint)
 {
     UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z))
@@ -190,7 +191,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     bool generatePath = !bot->IsFlying() && !bot->isSwimming();
     bool disableMoveSplinePath = sPlayerbotAIConfig->disableMoveSplinePath >= 2 ||
                                  (sPlayerbotAIConfig->disableMoveSplinePath == 1 && bot->InBattleground());
-    if (disableMoveSplinePath || !generatePath)
+    if (exact_waypoint || disableMoveSplinePath || !generatePath)
     {
         float distance = bot->GetExactDist(x, y, z);
         if (distance > sPlayerbotAIConfig->contactDistance)
@@ -785,28 +786,34 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     float ty = target->GetPositionY();
     float tz = target->GetPositionZ();
     float combatDistance = bot->GetCombatReach() + target->GetCombatReach();
-    float distanceToTarget = bot->GetExactDist(target) - combatDistance;
-    float angle = bot->GetAngle(target);
-    float needToGo = distanceToTarget - distance;
+    distance += combatDistance;
 
-    float maxDistance = sPlayerbotAIConfig->spellDistance;
-    if (needToGo > 0 && needToGo > maxDistance)
-        needToGo = maxDistance;
-    else if (needToGo < 0 && needToGo < -maxDistance)
-        needToGo = -maxDistance;
+    if (target->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD))  // target is moving forward, predict the position
+    {
+        float needToGo = bot->GetExactDist(target) - distance;
+        float timeToGo = MoveDelay(abs(needToGo)) + sPlayerbotAIConfig->reactDelay;
+        float targetMoveDist = timeToGo * target->GetSpeed(MOVE_RUN);
+        targetMoveDist = std::min(5.0f, targetMoveDist);
+        tx += targetMoveDist * cos(target->GetOrientation());
+        ty += targetMoveDist * sin(target->GetOrientation());
+        if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),
+            tx, ty, tz))
+        {
+            // disable prediction if position is invalid
+            tx = target->GetPositionX();
+            ty = target->GetPositionY();
+            tz = target->GetPositionZ();
+        }
+    }
 
-    float dx = cos(angle) * needToGo + bx;
-    float dy = sin(angle) * needToGo + by;
-    float dz;  // = std::max(bz, tz); // calc accurate z position to avoid stuck
-    if (distanceToTarget > CONTACT_DISTANCE)
-    {
-        dz = bz + (tz - bz) * (needToGo / distanceToTarget);
-    }
-    else
-    {
-        dz = tz;
-    }
-    return MoveTo(target->GetMapId(), dx, dy, dz);
+    PathGenerator path(bot);
+    path.CalculatePath(tx, ty, tz, false);
+    PathType type = path.GetPathType();
+    if (type != PATHFIND_NORMAL && type != PATHFIND_INCOMPLETE)
+        return false;
+    path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), distance);
+    G3D::Vector3 endPos = path.GetPath().back();
+    return MoveTo(target->GetMapId(), endPos.x, endPos.y, endPos.z);
 }
 
 float MovementAction::GetFollowAngle()
@@ -1560,13 +1567,14 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
     gen.CalculatePath(x, y, tempZ);
     Movement::PointsArray result = gen.GetPath();
     float min_length = gen.getPathLength();
-    if ((gen.GetPathType() & PATHFIND_NORMAL) && abs(tempZ - z) < 0.5f)
+    int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE;
+    if ((gen.GetPathType() & typeOk) && abs(tempZ - z) < 0.5f)
     {
         modified_z = tempZ;
         return result;
     }
     // Start searching
-    if (gen.GetPathType() & PATHFIND_NORMAL)
+    if (gen.GetPathType() & typeOk)
     {
         modified_z = tempZ;
         found = true;
@@ -1581,7 +1589,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
-        if ((gen.GetPathType() & PATHFIND_NORMAL) && gen.getPathLength() < min_length)
+        if ((gen.GetPathType() & typeOk) && gen.getPathLength() < min_length)
         {
             found = true;
             min_length = gen.getPathLength();
@@ -1598,7 +1606,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
         }
         PathGenerator gen(bot);
         gen.CalculatePath(x, y, tempZ);
-        if ((gen.GetPathType() & PATHFIND_NORMAL) && gen.getPathLength() < min_length)
+        if ((gen.GetPathType() & typeOk) && gen.getPathLength() < min_length)
         {
             found = true;
             min_length = gen.getPathLength();
