@@ -1,9 +1,9 @@
 name: macos-build
 on:
   push:
-    branches: [ "master" ]
+    branches: [never-match-this-branch]
   pull_request:
-    branches: [ "master" ]
+    branches: [never-match-this-branch]
 
 # concurrency:
 #   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -20,17 +20,17 @@ jobs:
     name: ${{ matrix.os }}
     steps:
       - name: Checkout AzerothCore
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: 'liyunfan1223/azerothcore-wotlk'
           ref: 'Playerbot'
       - name: Checkout Playerbot Module
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: 'liyunfan1223/mod-playerbots'
           path: 'modules/mod-playerbots'
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/Library/Caches/ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}

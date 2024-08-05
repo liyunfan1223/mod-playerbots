@@ -12,11 +12,11 @@ Unit* PartyMemberValue::FindPartyMember(std::vector<Player*>* party, FindPlayerP
 {
     for (Player* player : *party)
     {
-        if (Check(player) && predicate.Check(player))
+        if (predicate.Check(player) && Check(player))
             return player;
 
         if (Pet* pet = player->GetPet())
-            if (Check(pet) && predicate.Check(pet))
+            if (predicate.Check(pet) && Check(pet))
                 return pet;
     }
 

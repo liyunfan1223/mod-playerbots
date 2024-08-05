@@ -6,6 +6,7 @@
 #include "LastMovementValue.h"
 
 #include "Playerbots.h"
+#include "Timer.h"
 
 LastMovement::LastMovement() { clear(); }
 
@@ -38,17 +39,19 @@ void LastMovement::clear()
     lastAreaTrigger = 0;
     lastFlee = 0;
     nextTeleport = 0;
+    msTime = 0;
+    lastdelayTime = 0;
 }
 
 void LastMovement::Set(Unit* follow)
 {
-    Set(0, 0.0f, 0.0f, 0.0f, 0.0f);
+    Set(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     setShort(WorldPosition());
     setPath(TravelPath());
     lastFollow = follow;
 }
 
-void LastMovement::Set(uint32 mapId, float x, float y, float z, float ori)
+void LastMovement::Set(uint32 mapId, float x, float y, float z, float ori, float delayTime)
 {
     lastMoveToMapId = mapId;
     lastMoveToX = x;
@@ -57,6 +60,8 @@ void LastMovement::Set(uint32 mapId, float x, float y, float z, float ori)
     lastMoveToOri = ori;
     lastFollow = nullptr;
     lastMoveShort = WorldPosition(mapId, x, y, z, ori);
+    msTime = getMSTime();
+    lastdelayTime = delayTime;
 }
 
 void LastMovement::setShort(WorldPosition point)

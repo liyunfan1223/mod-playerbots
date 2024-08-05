@@ -94,15 +94,21 @@ bool MoveToRpgTargetAction::Execute(Event event)
 
     x += cos(angle) * INTERACTION_DISTANCE * distance;
     y += sin(angle) * INTERACTION_DISTANCE * distance;
-
+    if (!wo->GetMap()->CheckCollisionAndGetValidCoords(wo, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ(),
+                                                       x, y, z))
+    {
+        x = wo->GetPositionX();
+        y = wo->GetPositionY();
+        z = wo->GetPositionZ();
+    }
     // WaitForReach(distance);
 
     bool couldMove = false;
 
-    if (bot->IsWithinLOS(x, y, z))
-        couldMove = MoveNear(mapId, x, y, z, 0);
-    else
-        couldMove = MoveTo(mapId, x, y, z);
+    // if (bot->IsWithinLOS(x, y, z))
+    //     couldMove = MoveNear(mapId, x, y, z, 0);
+    // else
+    couldMove = MoveTo(mapId, x, y, z, false, false, false, true);
 
     if (!couldMove && WorldPosition(mapId, x, y, z).distance(bot) > INTERACTION_DISTANCE)
     {

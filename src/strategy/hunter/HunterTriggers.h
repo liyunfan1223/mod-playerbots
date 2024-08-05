@@ -170,6 +170,11 @@ class TargetRemoveEnrageTrigger : public TargetAuraDispelTrigger
 {
 public:
     TargetRemoveEnrageTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_ENRAGE) {}
-    bool IsActive() override;
+};
+
+class TargetRemoveMagicTrigger : public TargetAuraDispelTrigger
+{
+public:
+    TargetRemoveMagicTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_MAGIC) {}
 };
 #endif

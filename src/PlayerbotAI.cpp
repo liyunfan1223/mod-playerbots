@@ -30,6 +30,7 @@
 #include "ObjectGuid.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
+#include "PlayerbotAIConfig.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotMgr.h"
 #include "Playerbots.h"
@@ -334,10 +335,11 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     UpdateAIInternal(elapsed, min);
     inCombat = bot->IsInCombat();
     // test fix lags because of BG
+    bool inBG = bot->InBattleground() || bot->InArena();
     if (bot && !inCombat)
         min = true;
 
-    if (HasRealPlayerMaster())
+    if (HasRealPlayerMaster() || (sPlayerbotAIConfig->fastReactInBG && inBG))
         min = false;
 
     YieldThread(min);
@@ -1377,7 +1379,7 @@ bool PlayerbotAI::ContainsStrategy(StrategyType type)
 {
     for (uint8 i = 0; i < BOT_STATE_MAX; i++)
     {
-        if (engines[i]->ContainsStrategy(type))
+        if (engines[i]->HasStrategyType(type))
             return true;
     }
 
@@ -1441,7 +1443,7 @@ bool PlayerbotAI::IsCaster(Player* player) { return IsRanged(player) && player->
 
 bool PlayerbotAI::IsCombo(Player* player)
 {
-    int tab = AiFactory::GetPlayerSpecTab(player);
+    // int tab = AiFactory::GetPlayerSpecTab(player);
     return player->getClass() == CLASS_ROGUE ||
            (player->getClass() == CLASS_DRUID && player->HasAura(768));  // cat druid
 }
@@ -2634,8 +2636,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         return true;
     }
 
-    aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
-    aiObjectContext->GetValue<time_t>("stay time")->Set(0);
+    // aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
+    // aiObjectContext->GetValue<time_t>("stay time")->Set(0);
 
     if (bot->IsFlying() || bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {
@@ -2820,8 +2822,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         return true;
     }
 
-    aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
-    aiObjectContext->GetValue<time_t>("stay time")->Set(0);
+    // aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
+    // aiObjectContext->GetValue<time_t>("stay time")->Set(0);
 
     MotionMaster& mm = *bot->GetMotionMaster();
 
@@ -3283,28 +3285,29 @@ bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
         return false;
     }
     bool isFriend = bot->IsFriendlyTo(target);
-    for (uint32 type = SPELL_AURA_NONE; type < TOTAL_AURAS; ++type)
+    Unit::VisibleAuraMap const* visibleAuras = target->GetVisibleAuras();
+    for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
     {
-        Unit::AuraEffectList const& auras = target->GetAuraEffectsByType((AuraType)type);
-        for (AuraEffect const* aurEff : auras)
-        {
-            Aura const* aura = aurEff->GetBase();
-            SpellInfo const* spellInfo = aura->GetSpellInfo();
+        Aura* aura = itr->second->GetBase();
 
-            bool isPositiveSpell = spellInfo->IsPositive();
-            if (isPositiveSpell && isFriend)
-                continue;
+        if (aura->IsPassive())
+            continue;
 
-            if (!isPositiveSpell && !isFriend)
-                continue;
+        if (sPlayerbotAIConfig->dispelAuraDuration && aura->GetDuration() &&
+            aura->GetDuration() < (int32)sPlayerbotAIConfig->dispelAuraDuration)
+            continue;
 
-            if (sPlayerbotAIConfig->dispelAuraDuration && aura->GetDuration() &&
-                aura->GetDuration() < (int32)sPlayerbotAIConfig->dispelAuraDuration)
-                continue;
+        SpellInfo const* spellInfo = aura->GetSpellInfo();
 
-            if (canDispel(spellInfo, dispelType))
-                return true;
-        }
+        bool isPositiveSpell = spellInfo->IsPositive();
+        if (isPositiveSpell && isFriend)
+            continue;
+
+        if (!isPositiveSpell && !isFriend)
+            continue;
+
+        if (canDispel(spellInfo, dispelType))
+            return true;
     }
     return false;
 }
