@@ -86,6 +86,7 @@ Engine::~Engine(void)
 
 void Engine::Reset()
 {
+    strategyTypeMask = 0;
     ActionNode* action = nullptr;
     do
     {
@@ -120,6 +121,7 @@ void Engine::Init()
     for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
         Strategy* strategy = i->second;
+        strategyTypeMask |= strategy->GetType();
         strategy->InitMultipliers(multipliers);
         strategy->InitTriggers(triggers);
 

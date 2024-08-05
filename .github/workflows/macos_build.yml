@@ -1,9 +1,9 @@
 name: macos-build
 on:
   push:
-    branches: [ "master" ]
+    branches: [never-match-this-branch]
   pull_request:
-    branches: [ "master" ]
+    branches: [never-match-this-branch]
 
 # concurrency:
 #   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
