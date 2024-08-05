@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "UseMeetingStoneAction.h"
-#include "Event.h"
+
 #include "CellImpl.h"
+#include "Event.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "PlayerbotAIConfig.h"
@@ -21,11 +23,11 @@ bool UseMeetingStoneAction::Execute(Event event)
     ObjectGuid guid;
     p >> guid;
 
-	if (master->GetTarget() && master->GetTarget() != bot->GetGUID())
-		return false;
+    if (master->GetTarget() && master->GetTarget() != bot->GetGUID())
+        return false;
 
-	if (!master->GetTarget() && master->GetGroup() != bot->GetGroup())
-		return false;
+    if (!master->GetTarget() && master->GetGroup() != bot->GetGroup())
+        return false;
 
     if (master->IsBeingTeleported())
         return false;
@@ -40,12 +42,12 @@ bool UseMeetingStoneAction::Execute(Event event)
     if (!map)
         return false;
 
-    GameObject *gameObject = map->GetGameObject(guid);
+    GameObject* gameObject = map->GetGameObject(guid);
     if (!gameObject)
         return false;
 
-	GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
-	if (!goInfo || goInfo->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
+    GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
+    if (!goInfo || goInfo->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
         return false;
 
     return Teleport(master, bot);
@@ -53,20 +55,20 @@ bool UseMeetingStoneAction::Execute(Event event)
 
 class AnyGameObjectInObjectRangeCheck
 {
-    public:
-        AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) { }
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(GameObject* go)
-        {
-            if (go && i_obj->IsWithinDistInMap(go, i_range) && go->isSpawned() && go->GetGOInfo())
-                return true;
+public:
+    AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) {}
+    WorldObject const& GetFocusObject() const { return *i_obj; }
+    bool operator()(GameObject* go)
+    {
+        if (go && i_obj->IsWithinDistInMap(go, i_range) && go->isSpawned() && go->GetGOInfo())
+            return true;
 
-            return false;
-        }
+        return false;
+    }
 
-    private:
-        WorldObject const* i_obj;
-        float i_range;
+private:
+    WorldObject const* i_obj;
+    float i_range;
 };
 
 bool SummonAction::Execute(Event event)
@@ -74,14 +76,16 @@ bool SummonAction::Execute(Event event)
     Player* master = GetMaster();
     if (!master)
         return false;
-    
-    if (Pet* pet = bot->GetPet()) {
+
+    if (Pet* pet = bot->GetPet())
+    {
         pet->SetReactState(REACT_PASSIVE);
         pet->GetCharmInfo()->SetIsCommandFollow(true);
         pet->GetCharmInfo()->IsReturning();
     }
 
-    if (master->GetSession()->GetSecurity() >= SEC_PLAYER) {
+    if (master->GetSession()->GetSecurity() >= SEC_PLAYER)
+    {
         // botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
         SET_AI_VALUE(std::list<FleeInfo>, "recently flee info", {});
         return Teleport(master, bot);
@@ -185,7 +189,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
             if (summoner->IsWithinLOS(x, y, z))
             {
-                if (sPlayerbotAIConfig->botRepairWhenSummon) // .conf option to repair bot gear when summoned 0 = off, 1 = on
+                if (sPlayerbotAIConfig
+                        ->botRepairWhenSummon)  // .conf option to repair bot gear when summoned 0 = off, 1 = on
                     bot->DurabilityRepairAll(false, 1.0f, false);
 
                 if (master->IsInCombat() && !sPlayerbotAIConfig->allowSummonInCombat)
@@ -200,13 +205,16 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                     return false;
                 }
 
-                if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) && !sPlayerbotAIConfig->allowSummonWhenBotIsDead)
+                if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) &&
+                    !sPlayerbotAIConfig->allowSummonWhenBotIsDead)
                 {
                     botAI->TellError("You cannot summon me while I'm dead, you need to release my spirit first");
                     return false;
                 }
 
-                bool revive = sPlayerbotAIConfig->reviveBotWhenSummoned == 2 || (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat() && master->IsAlive());
+                bool revive =
+                    sPlayerbotAIConfig->reviveBotWhenSummoned == 2 ||
+                    (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat() && master->IsAlive());
                 if (bot->isDead() && revive)
                 {
                     bot->ResurrectPlayer(1.0f, false);

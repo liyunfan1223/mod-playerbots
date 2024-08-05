@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_DEBUGSTRATEGY_H
@@ -9,38 +10,38 @@
 
 class DebugStrategy : public Strategy
 {
-    public:
-        DebugStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    DebugStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
-        std::string const getName() override { return "debug"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
+    std::string const getName() override { return "debug"; }
 };
 
 class DebugMoveStrategy : public Strategy
 {
-    public:
-        DebugMoveStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    DebugMoveStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
-        std::string const getName() override { return "debug move"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
+    std::string const getName() override { return "debug move"; }
 };
 
 class DebugRpgStrategy : public Strategy
 {
-    public:
-        DebugRpgStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    DebugRpgStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
-        std::string const getName() override { return "debug rpg"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
+    std::string const getName() override { return "debug rpg"; }
 };
 
 class DebugSpellStrategy : public Strategy
 {
-    public:
-        DebugSpellStrategy(PlayerbotAI* botAI) : Strategy(botAI) { }
+public:
+    DebugSpellStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-        uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
-        std::string const getName() override { return "debug spell"; }
+    uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
+    std::string const getName() override { return "debug spell"; }
 };
 
 #endif

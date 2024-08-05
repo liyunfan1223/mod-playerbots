@@ -1,18 +1,17 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PlaceholderHelper.h"
+
 #include "AiFactory.h"
-#include "Playerbots.h"
 #include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 #include "Util.h"
 
-void PlaceholderHelper::MapDungeon(
-    PlaceholderMap& placeholders,
-    DungeonSuggestion const* dungeonSuggestion,
-    Player* bot
-)
+void PlaceholderHelper::MapDungeon(PlaceholderMap& placeholders, DungeonSuggestion const* dungeonSuggestion,
+                                   Player* bot)
 {
     std::ostringstream out;
     Insertion insertion = {out, dungeonSuggestion};
@@ -22,7 +21,6 @@ void PlaceholderHelper::MapDungeon(
 
     placeholders["%dungeon"] = out.str();
 }
-
 
 void PlaceholderHelper::MapRole(PlaceholderMap& placeholders, Player* bot)
 {
@@ -82,8 +80,8 @@ void PlaceholderHelper::InsertDifficulty(Insertion& insertion, [[maybe_unused]] 
     {
         bool const isRandomlyNormal = urand(0, 1);
         bool const isRandomlyHeroic = urand(0, 1);
-        std::vector<std::string> normalAbbrevations = { "Normal", "N" };
-        std::vector<std::string> heroicAbbrevations = { "Heroic", "HC", "H"};
+        std::vector<std::string> normalAbbrevations = {"Normal", "N"};
+        std::vector<std::string> heroicAbbrevations = {"Heroic", "HC", "H"};
         uint32 const randomAbbrevationIndex = urand(0, 1);
         if (isRandomlyNormal)
         {

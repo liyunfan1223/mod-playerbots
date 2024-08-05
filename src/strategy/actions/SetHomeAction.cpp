@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "SetHomeAction.h"
+
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -13,7 +15,8 @@ bool SetHomeAction::Execute(Event event)
     ObjectGuid selection = bot->GetTarget();
     bool isRpgAction = AI_VALUE(GuidPosition, "rpg target") == selection;
 
-    if (!isRpgAction) {
+    if (!isRpgAction)
+    {
         if (master)
             selection = master->GetTarget();
         else

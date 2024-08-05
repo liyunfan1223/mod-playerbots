@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "TalkToQuestGiverAction.h"
-#include "Event.h"
+
 #include "ChatHelper.h"
+#include "Event.h"
 #include "ItemUsageValue.h"
 #include "Object.h"
 #include "Playerbots.h"
@@ -32,7 +34,8 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
 
     if (sPlayerbotAIConfig->syncQuestWithPlayer)
     {
-        if (master && master->GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE && (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED))
+        if (master && master->GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE &&
+            (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED))
         {
             CompleteQuest(bot, quest->GetQuestId());
             status = bot->GetQuestStatus(quest->GetQuestId());
@@ -116,7 +119,7 @@ ItemIds TalkToQuestGiverAction::BestRewards(Quest const* quest)
     if (quest->GetRewChoiceItemsCount() == 0)
         return returnIds;
     else if (quest->GetRewChoiceItemsCount() == 1)
-        return { 0 };
+        return {0};
     else
     {
         for (uint8 i = 0; i < quest->GetRewChoiceItemsCount(); ++i)
@@ -146,7 +149,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
     std::ostringstream outid;
     if (!botAI->IsAlt() || sPlayerbotAIConfig->autoPickReward == "yes")
     {
-        //Pick the first item of the best rewards.
+        // Pick the first item of the best rewards.
         bestIds = BestRewards(quest);
         if (!bestIds.empty())
         {
@@ -159,7 +162,6 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
             out << "Unable to find suitable reward. Asking for help....";
             AskToSelectReward(quest, out, true);
         }
-
     }
     else if (sPlayerbotAIConfig->autoPickReward == "no")
     {
@@ -168,7 +170,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
     }
     else
     {
-        //Try to pick the usable item. If multiple list usable rewards.
+        // Try to pick the usable item. If multiple list usable rewards.
         bestIds = BestRewards(quest);
         if (!bestIds.empty())
         {
@@ -176,7 +178,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
         }
         else
         {
-            //Pick the first item
+            // Pick the first item
             ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
             bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
 
@@ -212,7 +214,8 @@ bool TurnInQueryQuestAction::Execute(Event event)
     uint32 questId;
     ObjectGuid unk1;
     pakcet >> guid >> questId;
-    Object* object = ObjectAccessor::GetObjectByTypeMask(*bot, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+    Object* object =
+        ObjectAccessor::GetObjectByTypeMask(*bot, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
     if (!object || (!object->hasQuest(questId) && !object->hasInvolvedQuest(questId)))
     {
         return false;

@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "BudgetValues.h"
+
 #include "Playerbots.h"
 
 uint32 MaxGearRepairCostValue::Calculate()
@@ -22,7 +24,7 @@ uint32 MaxGearRepairCostValue::Calculate()
 
         uint32 curDurability = item->GetUInt32Value(ITEM_FIELD_DURABILITY);
 
-        if (i >= EQUIPMENT_SLOT_END && curDurability >= maxDurability) //Only count items equiped or already damanged.
+        if (i >= EQUIPMENT_SLOT_END && curDurability >= maxDurability)  // Only count items equiped or already damanged.
             continue;
 
         ItemTemplate const* ditemProto = item->GetTemplate();
@@ -36,10 +38,10 @@ uint32 MaxGearRepairCostValue::Calculate()
         if (!dQualitymodEntry)
             continue;
 
-        uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class, ditemProto->SubClass)];
+        uint32 dmultiplier =
+            dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class, ditemProto->SubClass)];
 
         uint32 costs = uint32(maxDurability * dmultiplier * double(dQualitymodEntry->quality_mod));
-
 
         TotalCost += costs;
     }
@@ -80,7 +82,8 @@ uint32 RepairCostValue::Calculate()
         if (!dQualitymodEntry)
             continue;
 
-        uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class, ditemProto->SubClass)];
+        uint32 dmultiplier =
+            dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class, ditemProto->SubClass)];
         uint32 costs = uint32(LostDurability * dmultiplier * double(dQualitymodEntry->quality_mod));
 
         TotalCost += costs;
@@ -109,7 +112,8 @@ uint32 TrainCostValue::Calculate()
             if (!trainer_spells)
                 continue;
 
-            for (TrainerSpellMap::const_iterator iter = trainer_spells->spellList.begin(); iter != trainer_spells->spellList.end(); ++iter)
+            for (TrainerSpellMap::const_iterator iter = trainer_spells->spellList.begin();
+                 iter != trainer_spells->spellList.end(); ++iter)
             {
                 TrainerSpell const* tSpell = &iter->second;
                 if (!tSpell)
@@ -136,14 +140,14 @@ uint32 TrainCostValue::Calculate()
 
 uint32 MoneyNeededForValue::Calculate()
 {
-	NeedMoneyFor needMoneyFor = NeedMoneyFor(stoi(getQualifier()));
+    NeedMoneyFor needMoneyFor = NeedMoneyFor(stoi(getQualifier()));
 
-	PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-	AiObjectContext* context = botAI->GetAiObjectContext();
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    AiObjectContext* context = botAI->GetAiObjectContext();
 
-	uint32 moneyWanted = 0;
+    uint32 moneyWanted = 0;
 
-	uint32 level = bot->GetLevel();
+    uint32 level = bot->GetLevel();
 
     switch (needMoneyFor)
     {
@@ -154,37 +158,49 @@ uint32 MoneyNeededForValue::Calculate()
             moneyWanted = AI_VALUE(uint32, "max repair cost");
             break;
         case NeedMoneyFor::ammo:
-            moneyWanted = (bot->getClass() == CLASS_HUNTER) ? (level * level * level) / 10 : 0; //Or level^3 (1s @ lvl10, 30s @ lvl30, 2g @ lvl60, 5g @ lvl80): Todo replace (should be best ammo buyable x 8 stacks cost)
+            moneyWanted = (bot->getClass() == CLASS_HUNTER)
+                              ? (level * level * level) / 10
+                              : 0;  // Or level^3 (1s @ lvl10, 30s @ lvl30, 2g @ lvl60, 5g @ lvl80): Todo replace
+                                    // (should be best ammo buyable x 8 stacks cost)
             break;
         case NeedMoneyFor::spells:
             moneyWanted = AI_VALUE(uint32, "train cost");
             break;
         case NeedMoneyFor::travel:
-            moneyWanted = bot->isTaxiCheater() ? 0 : 1500; //15s for traveling half a continent. Todo: Add better calculation (Should be ???)
+            moneyWanted =
+                bot->isTaxiCheater()
+                    ? 0
+                    : 1500;  // 15s for traveling half a continent. Todo: Add better calculation (Should be ???)
             break;
         case NeedMoneyFor::gear:
-            moneyWanted = level * level * level; //Or level^3 (10s @ lvl10, 3g @ lvl30, 20g @ lvl60, 50g @ lvl80): Todo replace (Should be ~total cost of all >green gear equiped)
+            moneyWanted = level * level * level;  // Or level^3 (10s @ lvl10, 3g @ lvl30, 20g @ lvl60, 50g @ lvl80):
+                                                  // Todo replace (Should be ~total cost of all >green gear equiped)
             break;
         case NeedMoneyFor::consumables:
-            moneyWanted = (level * level * level) / 10; //Or level^3 (1s @ lvl10, 30s @ lvl30, 2g @ lvl60, 5g @ lvl80): Todo replace (Should be best food/drink x 2 stacks cost)
+            moneyWanted =
+                (level * level * level) / 10;  // Or level^3 (1s @ lvl10, 30s @ lvl30, 2g @ lvl60, 5g @ lvl80): Todo
+                                               // replace (Should be best food/drink x 2 stacks cost)
             break;
         case NeedMoneyFor::guild:
             if (botAI->HasStrategy("guild", BOT_STATE_NON_COMBAT))
             {
                 if (bot->GetGuildId())
-                    moneyWanted = AI_VALUE2(uint32, "item count", chat->FormatQItem(5976)) ? 0 : 10000; //1g (tabard)
+                    moneyWanted = AI_VALUE2(uint32, "item count", chat->FormatQItem(5976)) ? 0 : 10000;  // 1g (tabard)
                 else
-                    moneyWanted = AI_VALUE2(uint32, "item count", chat->FormatQItem(5863)) ? 0 : 10000; //10s (guild charter)
+                    moneyWanted =
+                        AI_VALUE2(uint32, "item count", chat->FormatQItem(5863)) ? 0 : 10000;  // 10s (guild charter)
             }
             break;
         case NeedMoneyFor::tradeskill:
-            moneyWanted = (level * level * level); //Or level^3 (10s @ lvl10, 3g @ lvl30, 20g @ lvl60, 50g @ lvl80): Todo replace (Should be buyable reagents that combined allow crafting of usefull items)
+            moneyWanted = (level * level *
+                           level);  // Or level^3 (10s @ lvl10, 3g @ lvl30, 20g @ lvl60, 50g @ lvl80): Todo replace
+                                    // (Should be buyable reagents that combined allow crafting of usefull items)
             break;
         default:
             break;
     }
 
-	return moneyWanted;
+    return moneyWanted;
 };
 
 uint32 TotalMoneyNeededForValue::Calculate()
@@ -217,7 +233,8 @@ uint32 FreeMoneyForValue::Calculate()
     if (botAI->HasActivePlayerMaster())
         return money;
 
-    uint32 savedMoney = AI_VALUE2(uint32, "total money needed for", getQualifier()) - AI_VALUE2(uint32, "money needed for", getQualifier());
+    uint32 savedMoney = AI_VALUE2(uint32, "total money needed for", getQualifier()) -
+                        AI_VALUE2(uint32, "money needed for", getQualifier());
 
     if (savedMoney > money)
         return 0;
@@ -225,7 +242,4 @@ uint32 FreeMoneyForValue::Calculate()
     return money - savedMoney;
 };
 
-bool ShouldGetMoneyValue::Calculate()
-{
-    return !AI_VALUE2(uint32, "free money for", (uint32) NeedMoneyFor::anything);
-};
+bool ShouldGetMoneyValue::Calculate() { return !AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::anything); };

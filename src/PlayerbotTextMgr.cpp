@@ -1,17 +1,21 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotTextMgr.h"
+
 #include "Playerbots.h"
 
-void PlayerbotTextMgr::replaceAll(std::string & str, const std::string & from, const std::string & to) {
+void PlayerbotTextMgr::replaceAll(std::string& str, const std::string& from, const std::string& to)
+{
     if (from.empty())
         return;
     size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
         str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+        start_pos += to.length();  // In case 'to' contains 'from', like replacing 'x' with 'yx'
     }
 }
 
@@ -20,7 +24,8 @@ void PlayerbotTextMgr::LoadBotTexts()
     LOG_INFO("playerbots", "Loading playerbots texts...");
 
     uint32 count = 0;
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_TEXT)))
+    if (PreparedQueryResult result =
+            PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_TEXT)))
     {
         do
         {
@@ -37,8 +42,7 @@ void PlayerbotTextMgr::LoadBotTexts()
 
             botTexts[name].push_back(BotTextEntry(name, text, sayType, replyType));
             ++count;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     LOG_INFO("playerbots", "{} playerbots texts loaded", count);
@@ -123,13 +127,13 @@ std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::
         return "";
 
     BotTextEntry textEntry = proper_list[urand(0, proper_list.size() - 1)];
-    std::string botText = !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
-    for (auto & placeholder : placeholders)
+    std::string botText =
+        !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
+    for (auto& placeholder : placeholders)
         replaceAll(botText, placeholder.first, placeholder.second);
 
     return botText;
 }
-
 
 std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::string name)
 {
@@ -149,7 +153,7 @@ bool PlayerbotTextMgr::rollTextChance(std::string name)
     return urand(0, 100) < botTextChance[name];
 }
 
-bool PlayerbotTextMgr::GetBotText(std::string name, std::string &text)
+bool PlayerbotTextMgr::GetBotText(std::string name, std::string& text)
 {
     if (!rollTextChance(name))
         return false;
@@ -166,7 +170,6 @@ bool PlayerbotTextMgr::GetBotText(std::string name, std::string& text, std::map<
     text = GetBotText(name, placeholders);
     return !text.empty();
 }
-
 
 void PlayerbotTextMgr::AddLocalePriority(uint32 locale)
 {

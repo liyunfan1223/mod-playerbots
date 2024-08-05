@@ -1,18 +1,21 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ThreatStrategy.h"
+
 #include "GenericSpellActions.h"
 #include "Map.h"
 #include "Playerbots.h"
 
 float ThreatMultiplier::GetValue(Action* action)
 {
-    if (AI_VALUE(bool, "neglect threat")) {
+    if (AI_VALUE(bool, "neglect threat"))
+    {
         return 1.0f;
     }
-    
+
     if (!action || action->getThreatType() == Action::ActionThreatType::None)
         return 1.0f;
 
@@ -40,13 +43,16 @@ void ThreatStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 
 float FocusMultiplier::GetValue(Action* action)
 {
-    if (!action) {
+    if (!action)
+    {
         return 1.0f;
     }
-    if (action->getThreatType() == Action::ActionThreatType::Aoe && !dynamic_cast<CastHealingSpellAction*>(action)) {
+    if (action->getThreatType() == Action::ActionThreatType::Aoe && !dynamic_cast<CastHealingSpellAction*>(action))
+    {
         return 0.0f;
     }
-    if (dynamic_cast<CastDebuffSpellOnAttackerAction*>(action)) {
+    if (dynamic_cast<CastDebuffSpellOnAttackerAction*>(action))
+    {
         return 0.0f;
     }
     return 1.0f;

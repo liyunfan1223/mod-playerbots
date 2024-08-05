@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_ROGUETRIGGERS_H
@@ -11,121 +12,125 @@ class PlayerbotAI;
 
 class KickInterruptSpellTrigger : public InterruptSpellTrigger
 {
-    public:
-        KickInterruptSpellTrigger(PlayerbotAI* botAI) : InterruptSpellTrigger(botAI, "kick") { }
+public:
+    KickInterruptSpellTrigger(PlayerbotAI* botAI) : InterruptSpellTrigger(botAI, "kick") {}
 };
 
 class SliceAndDiceTrigger : public BuffTrigger
 {
-    public:
-        SliceAndDiceTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "slice and dice") { }
+public:
+    SliceAndDiceTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "slice and dice") {}
 };
 
 class HungerForBloodTrigger : public BuffTrigger
 {
-    public:
-        HungerForBloodTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "hunger for blood") { }
+public:
+    HungerForBloodTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "hunger for blood") {}
 };
 
 class AdrenalineRushTrigger : public BoostTrigger
 {
-    public:
-        AdrenalineRushTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "adrenaline rush") { }
+public:
+    AdrenalineRushTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "adrenaline rush") {}
 
-        // bool isPossible();
+    // bool isPossible();
 };
 
 class RuptureTrigger : public DebuffTrigger
 {
-    public:
-        RuptureTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rupture", 1, true) { }
+public:
+    RuptureTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rupture", 1, true) {}
 };
 
 class ExposeArmorTrigger : public DebuffTrigger
 {
-    public:
-        ExposeArmorTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "expose armor") { }
-        virtual bool IsActive() override;
+public:
+    ExposeArmorTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "expose armor") {}
+    virtual bool IsActive() override;
 };
 
 class KickInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
 {
-    public:
-        KickInterruptEnemyHealerSpellTrigger(PlayerbotAI* botAI) : InterruptEnemyHealerTrigger(botAI, "kick") { }
+public:
+    KickInterruptEnemyHealerSpellTrigger(PlayerbotAI* botAI) : InterruptEnemyHealerTrigger(botAI, "kick") {}
 };
 
 class InStealthTrigger : public HasAuraTrigger
 {
-    public:
-        InStealthTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "stealth") { }
+public:
+    InStealthTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "stealth") {}
 };
 
 class NoStealthTrigger : public HasNoAuraTrigger
 {
-    public:
-        NoStealthTrigger(PlayerbotAI* botAI) : HasNoAuraTrigger(botAI, "stealth") { }
+public:
+    NoStealthTrigger(PlayerbotAI* botAI) : HasNoAuraTrigger(botAI, "stealth") {}
 };
 
 class UnstealthTrigger : public BuffTrigger
 {
-    public:
-        UnstealthTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "stealth", 3) { }
+public:
+    UnstealthTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "stealth", 3) {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class StealthTrigger : public Trigger
 {
-    public:
-        StealthTrigger(PlayerbotAI* botAI) : Trigger(botAI, "stealth") { }
+public:
+    StealthTrigger(PlayerbotAI* botAI) : Trigger(botAI, "stealth") {}
 
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class SapTrigger : public HasCcTargetTrigger
 {
-    public:
-        SapTrigger(PlayerbotAI* botAI) : HasCcTargetTrigger(botAI, "sap") { }
+public:
+    SapTrigger(PlayerbotAI* botAI) : HasCcTargetTrigger(botAI, "sap") {}
 
-        bool IsPossible();
+    bool IsPossible();
 };
 
 class SprintTrigger : public BuffTrigger
 {
-    public:
-        SprintTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "sprint", 3) { }
+public:
+    SprintTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "sprint", 3) {}
 
-        bool IsPossible();
-        bool IsActive() override;
+    bool IsPossible();
+    bool IsActive() override;
 };
 
 class MainHandWeaponNoEnchantTrigger : public BuffTrigger
 {
-    public:
-        MainHandWeaponNoEnchantTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "main hand", 1) {}
-        virtual bool IsActive();
+public:
+    MainHandWeaponNoEnchantTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "main hand", 1) {}
+    virtual bool IsActive();
 };
 
 class OffHandWeaponNoEnchantTrigger : public BuffTrigger
 {
-    public:
-        OffHandWeaponNoEnchantTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "off hand", 1) {}
-        virtual bool IsActive();
+public:
+    OffHandWeaponNoEnchantTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "off hand", 1) {}
+    virtual bool IsActive();
 };
 
 class TricksOfTheTradeOnMainTankTrigger : public BuffOnMainTankTrigger
 {
-    public:
-        TricksOfTheTradeOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "tricks of the trade", true) {}
+public:
+    TricksOfTheTradeOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "tricks of the trade", true) {}
 };
 
 class TargetWithComboPointsLowerHealTrigger : public ComboPointsAvailableTrigger
 {
-    public:
-        TargetWithComboPointsLowerHealTrigger(PlayerbotAI* ai, int32 combo_point = 5, float lifeTime = 8.0f) : ComboPointsAvailableTrigger(ai, combo_point), lifeTime(lifeTime) {}
-        bool IsActive() override;
-    private:
-        float lifeTime;
+public:
+    TargetWithComboPointsLowerHealTrigger(PlayerbotAI* ai, int32 combo_point = 5, float lifeTime = 8.0f)
+        : ComboPointsAvailableTrigger(ai, combo_point), lifeTime(lifeTime)
+    {
+    }
+    bool IsActive() override;
+
+private:
+    float lifeTime;
 };
 
 #endif

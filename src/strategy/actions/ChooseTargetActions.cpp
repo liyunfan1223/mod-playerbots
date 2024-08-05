@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
 #include "ChooseTargetActions.h"
+
 #include "ChooseRpgTargetAction.h"
 #include "Event.h"
 #include "LootObjectStack.h"
-#include "PossibleRpgTargetsValue.h"
 #include "Playerbots.h"
+#include "PossibleRpgTargetsValue.h"
 #include "ServerFacade.h"
 
 bool AttackEnemyPlayerAction::isUseful()
@@ -22,19 +24,21 @@ bool AttackEnemyPlayerAction::isUseful()
 bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
-    return target && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
+    return target && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) &&
+           (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
 }
 
 bool AttackAnythingAction::isUseful()
 {
-    if (!botAI->AllowActivity(GRIND_ACTIVITY))                                              //Bot not allowed to be active
+    if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot not allowed to be active
         return false;
 
     if (!AI_VALUE(bool, "can move around"))
         return false;
 
-    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && 
-        ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
+    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() &&
+        ChooseRpgTargetAction::isFollowValid(
+            bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))  // Bot is traveling
         return false;
     // if (bot->IsInCombat()) {
     //     return false;
@@ -45,10 +49,11 @@ bool AttackAnythingAction::isUseful()
         return false;
 
     std::string const name = std::string(target->GetName());
-    if (!name.empty() && name.find("Dummy") != std::string::npos) // Target is not a targetdummy
+    if (!name.empty() && name.find("Dummy") != std::string::npos)  // Target is not a targetdummy
         return false;
 
-    // if (!ChooseRpgTargetAction::isFollowValid(bot, target))                               //Do not grind mobs far away from master.
+    // if (!ChooseRpgTargetAction::isFollowValid(bot, target))                               //Do not grind mobs far
+    // away from master.
     //     return false;
 
     return true;
@@ -115,10 +120,7 @@ bool AttackAnythingAction::Execute(Event event)
     return result;
 }
 
-bool AttackAnythingAction::isPossible()
-{
-    return AttackAction::isPossible() && GetTarget();
-}
+bool AttackAnythingAction::isPossible() { return AttackAction::isPossible() && GetTarget(); }
 
 bool DpsAssistAction::isUseful()
 {
