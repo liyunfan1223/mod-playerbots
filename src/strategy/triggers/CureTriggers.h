@@ -46,6 +46,7 @@ public:
     }
 
     Value<Unit*>* GetTargetValue() override;
+    bool IsActive() override;
 };
 
 class NeedWorldBuffTrigger : public Trigger

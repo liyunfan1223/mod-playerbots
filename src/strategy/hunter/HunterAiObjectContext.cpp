@@ -85,7 +85,8 @@ public:
         creators["switch to melee"] = &HunterTriggerFactoryInternal::switch_to_melee;
         creators["switch to ranged"] = &HunterTriggerFactoryInternal::switch_to_ranged;
         creators["misdirection on main tank"] = &HunterTriggerFactoryInternal::misdirection_on_main_tank;
-        creators["tranquilizing shot"] = &HunterTriggerFactoryInternal::remove_enrage;
+        creators["tranquilizing shot enrage"] = &HunterTriggerFactoryInternal::remove_enrage;
+        creators["tranquilizing shot magic"] = &HunterTriggerFactoryInternal::remove_magic;
     }
 
 private:
@@ -118,6 +119,7 @@ private:
     static Trigger* switch_to_ranged(PlayerbotAI* botAI) { return new SwitchToRangedTrigger(botAI); }
     static Trigger* misdirection_on_main_tank(PlayerbotAI* ai) { return new MisdirectionOnMainTankTrigger(ai); }
     static Trigger* remove_enrage(PlayerbotAI* ai) { return new TargetRemoveEnrageTrigger(ai); }
+    static Trigger* remove_magic(PlayerbotAI* ai) { return new TargetRemoveMagicTrigger(ai); }
 };
 
 class HunterAiObjectContextInternal : public NamedObjectContext<Action>

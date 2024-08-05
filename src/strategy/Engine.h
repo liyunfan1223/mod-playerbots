@@ -83,7 +83,7 @@ public:
     void AddActionExecutionListener(ActionExecutionListener* listener) { actionExecutionListeners.Add(listener); }
 
     void removeActionExecutionListener(ActionExecutionListener* listener) { actionExecutionListeners.Remove(listener); }
-
+    bool HasStrategyType(StrategyType type) { return strategyTypeMask & type; }
     virtual ~Engine(void);
 
     bool testMode;
@@ -112,6 +112,7 @@ protected:
     std::map<std::string, Strategy*> strategies;
     float lastRelevance;
     std::string lastAction;
+    uint32 strategyTypeMask;
 };
 
 #endif
