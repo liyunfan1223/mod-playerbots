@@ -161,7 +161,8 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
     return false;
 }
 
-bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only, bool exact_waypoint)
+bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only,
+                            bool exact_waypoint)
 {
     UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z))
@@ -796,8 +797,8 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
         targetMoveDist = std::min(5.0f, targetMoveDist);
         tx += targetMoveDist * cos(target->GetOrientation());
         ty += targetMoveDist * sin(target->GetOrientation());
-        if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),
-            tx, ty, tz))
+        if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(),
+                                                               target->GetPositionZ(), tx, ty, tz))
         {
             // disable prediction if position is invalid
             tx = target->GetPositionX();
