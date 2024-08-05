@@ -35,7 +35,7 @@ public:
     void clear();
 
     void Set(Unit* follow);
-    void Set(uint32 mapId, float x, float y, float z, float ori);
+    void Set(uint32 mapId, float x, float y, float z, float ori, float delayTime);
 
     void setShort(WorldPosition point);
     void setPath(TravelPath path);
@@ -50,7 +50,9 @@ public:
     float lastMoveToY;
     float lastMoveToZ;
     float lastMoveToOri;
+    float lastdelayTime;
     WorldPosition lastMoveShort;
+    uint32 msTime;
     TravelPath lastPath;
     time_t nextTeleport;
     std::future<TravelPath> future;
