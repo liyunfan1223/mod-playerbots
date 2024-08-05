@@ -2325,12 +2325,15 @@ bool MoveRandomAction::Execute(Event event)
         float angle = (float)rand_norm() * static_cast<float>(M_PI);
         x += urand(0, distance) * cos(angle);
         y += urand(0, distance) * sin(angle);
-        bot->UpdateGroundPositionZ(x, y, z);
-
+        if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                            bot->GetPositionZ(), x, y, z))
+        {
+            continue;
+        }
         if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
             continue;
 
-        bool moved = MoveTo(bot->GetMapId(), x, y, z);
+        bool moved = MoveTo(bot->GetMapId(), x, y, z, false, false, false, true);
         if (moved)
             return true;
     }
