@@ -30,6 +30,7 @@
 #include "ObjectGuid.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
+#include "PlayerbotAIConfig.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotMgr.h"
 #include "Playerbots.h"
@@ -334,10 +335,11 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     UpdateAIInternal(elapsed, min);
     inCombat = bot->IsInCombat();
     // test fix lags because of BG
+    bool inBG = bot->InBattleground() || bot->InArena();
     if (bot && !inCombat)
         min = true;
 
-    if (HasRealPlayerMaster())
+    if (HasRealPlayerMaster() || (sPlayerbotAIConfig->fastReactInBG && inBG))
         min = false;
 
     YieldThread(min);
