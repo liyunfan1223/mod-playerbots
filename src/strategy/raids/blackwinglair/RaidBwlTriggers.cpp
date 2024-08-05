@@ -1,16 +1,8 @@
-#include "RaidBwlActions.h"
+#include "RaidBwlTriggers.h"
 
-#include "Playerbots.h"
+#include "SharedDefines.h"
 
-bool BwlOnyxiaScaleCloakAuraCheckAction::Execute(Event event)
-{
-    bot->AddAura(22683, bot);
-    return true;
-}
-
-bool BwlOnyxiaScaleCloakAuraCheckAction::isUseful() { return !bot->HasAura(22683); }
-
-bool BwlTurnOffSuppressionDeviceAction::Execute(Event event)
+bool BwlSuppressionDeviceTrigger::IsActive()
 {
     GuidVector gos = AI_VALUE(GuidVector, "nearest game objects");
     for (GuidVector::iterator i = gos.begin(); i != gos.end(); i++)
@@ -24,7 +16,7 @@ bool BwlTurnOffSuppressionDeviceAction::Execute(Event event)
         {
             continue;
         }
-        go->SetGoState(GO_STATE_ACTIVE);
+        return true;
     }
-    return true;
+    return false;
 }
