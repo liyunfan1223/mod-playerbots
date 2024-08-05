@@ -239,7 +239,7 @@ private:
     }
     static Trigger* medium_group_heal_occasion(PlayerbotAI* ai)
     {
-        return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.4);
+        return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.6);
     }
     static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
     static Trigger* swimming(PlayerbotAI* botAI) { return new IsSwimmingTrigger(botAI); }
