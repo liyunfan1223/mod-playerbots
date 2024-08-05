@@ -183,6 +183,25 @@ public:
         creators["petition signed"] = &TriggerContext::petition_signed;
         creators["buy tabard"] = &TriggerContext::buy_tabard;
         creators["leave large guild"] = &TriggerContext::leave_large_guild;
+
+        creators["rpg"] = &TriggerContext::rpg;
+        creators["rpg taxi"] = &TriggerContext::rpg_taxi;
+        creators["rpg discover"] = &TriggerContext::rpg_discover;
+        creators["rpg start quest"] = &TriggerContext::rpg_start_quest;
+        creators["rpg end quest"] = &TriggerContext::rpg_end_quest;
+        creators["rpg buy"] = &TriggerContext::rpg_buy;
+        creators["rpg sell"] = &TriggerContext::rpg_sell;
+        creators["rpg repair"] = &TriggerContext::rpg_repair;
+        creators["rpg train"] = &TriggerContext::rpg_train;
+        creators["rpg heal"] = &TriggerContext::rpg_heal;
+        creators["rpg home bind"] = &TriggerContext::rpg_home_bind;
+        creators["rpg queue bg"] = &TriggerContext::rpg_queue_bg;
+        creators["rpg buy petition"] = &TriggerContext::rpg_buy_petition;
+        creators["rpg use"] = &TriggerContext::rpg_use;
+        creators["rpg spell"] = &TriggerContext::rpg_spell;
+        creators["rpg craft"] = &TriggerContext::rpg_craft;
+        creators["rpg trade useful"] = &TriggerContext::rpg_trade_useful;
+        creators["rpg duel"] = &TriggerContext::rpg_duel;
     }
 
 private:
