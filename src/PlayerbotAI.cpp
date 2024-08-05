@@ -3285,28 +3285,29 @@ bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
         return false;
     }
     bool isFriend = bot->IsFriendlyTo(target);
-    for (uint32 type = SPELL_AURA_NONE; type < TOTAL_AURAS; ++type)
+    Unit::VisibleAuraMap const* visibleAuras = target->GetVisibleAuras();
+    for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
     {
-        Unit::AuraEffectList const& auras = target->GetAuraEffectsByType((AuraType)type);
-        for (AuraEffect const* aurEff : auras)
-        {
-            Aura const* aura = aurEff->GetBase();
-            SpellInfo const* spellInfo = aura->GetSpellInfo();
+        Aura* aura = itr->second->GetBase();
 
-            bool isPositiveSpell = spellInfo->IsPositive();
-            if (isPositiveSpell && isFriend)
-                continue;
+        if (aura->IsPassive())
+            continue;
 
-            if (!isPositiveSpell && !isFriend)
-                continue;
+        if (sPlayerbotAIConfig->dispelAuraDuration && aura->GetDuration() &&
+            aura->GetDuration() < (int32)sPlayerbotAIConfig->dispelAuraDuration)
+            continue;
 
-            if (sPlayerbotAIConfig->dispelAuraDuration && aura->GetDuration() &&
-                aura->GetDuration() < (int32)sPlayerbotAIConfig->dispelAuraDuration)
-                continue;
+        SpellInfo const* spellInfo = aura->GetSpellInfo();
 
-            if (canDispel(spellInfo, dispelType))
-                return true;
-        }
+        bool isPositiveSpell = spellInfo->IsPositive();
+        if (isPositiveSpell && isFriend)
+            continue;
+
+        if (!isPositiveSpell && !isFriend)
+            continue;
+
+        if (canDispel(spellInfo, dispelType))
+            return true;
     }
     return false;
 }
