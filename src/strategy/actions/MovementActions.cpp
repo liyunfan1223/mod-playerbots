@@ -178,27 +178,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         return false;
     }
 
-    if (Vehicle* vehicle = bot->GetVehicle())
-    {
-        VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
-        Unit* vehicleBase = vehicle->GetBase();
-        if (!vehicleBase || !seat || !seat->CanControl()) // is passenger and cant move anyway
-            return false;
-
-        float distance = vehicleBase->GetExactDist(x, y, z);
-        if (distance <= sPlayerbotAIConfig->contactDistance)
-            return false;
-
-        MotionMaster& mm = *vehicleBase->GetMotionMaster(); // need to move vehicle, not bot
-        mm.Clear();
-        mm.MovePoint(mapId, x, y, z, generatePath);
-
-        float delay = 1000.0f * (distance / vehicleBase->GetSpeed(MOVE_RUN)) - sPlayerbotAIConfig->reactDelay;
-        delay = std::max(.0f, delay);
-        delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
-        AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
-        return true;
-    }
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling!, flag:" + std::to_string(bot->m_movementInfo.GetMovementFlags()), LANG_UNIVERSAL);
     //     return false;
@@ -212,7 +191,28 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     bool generatePath = !bot->IsFlying() && !bot->isSwimming();
     bool disableMoveSplinePath = sPlayerbotAIConfig->disableMoveSplinePath >= 2 ||
                                  (sPlayerbotAIConfig->disableMoveSplinePath == 1 && bot->InBattleground());
-    if (exact_waypoint || disableMoveSplinePath || !generatePath)
+    if (Vehicle* vehicle = bot->GetVehicle())
+    {
+        VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
+        Unit* vehicleBase = vehicle->GetBase();
+        if (!vehicleBase || !seat || !seat->CanControl())  // is passenger and cant move anyway
+            return false;
+
+        float distance = vehicleBase->GetExactDist(x, y, z);  // use vehicle distance, not bot
+        if (distance > sPlayerbotAIConfig->contactDistance)
+        {
+            MotionMaster& mm = *vehicleBase->GetMotionMaster();  // need to move vehicle, not bot
+            mm.Clear();
+            mm.MovePoint(mapId, x, y, z, generatePath);
+            float delay = 1000.0f * (distance / vehicleBase->GetSpeed(MOVE_RUN)) - sPlayerbotAIConfig->reactDelay;
+            delay = std::max(.0f, delay);
+            delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
+            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
+            // TODO: is botAI->SetNextCheckDelay() meant to go here or is setting "last movement" value enough? (same question goes for below)
+            return true;
+        }
+    }
+    else if (exact_waypoint || disableMoveSplinePath || !generatePath)
     {
         float distance = bot->GetExactDist(x, y, z);
         if (distance > sPlayerbotAIConfig->contactDistance)
