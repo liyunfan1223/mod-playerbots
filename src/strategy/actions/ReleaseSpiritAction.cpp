@@ -119,7 +119,11 @@ bool AutoReleaseSpiritAction::Execute(Event event)
         }
         if (bot->GetDistance(unit) >= INTERACTION_DISTANCE)
         {
-            bot->GetMotionMaster()->MoveChase(unit);
+            // bot needs to actually click spirit-healer in BG to get res timer going
+            // and in IOC it's not within clicking range when they res in own base
+            MotionMaster& mm = *bot->GetMotionMaster();
+            mm.Clear();
+            mm.MovePoint(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), true);
         }
         else
         {

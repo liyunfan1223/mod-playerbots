@@ -177,6 +177,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     {
         return false;
     }
+
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling!, flag:" + std::to_string(bot->m_movementInfo.GetMovementFlags()), LANG_UNIVERSAL);
     //     return false;
@@ -187,12 +188,31 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling", LANG_UNIVERSAL);
     // }
-    // !bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) &&
-
     bool generatePath = !bot->IsFlying() && !bot->isSwimming();
     bool disableMoveSplinePath = sPlayerbotAIConfig->disableMoveSplinePath >= 2 ||
                                  (sPlayerbotAIConfig->disableMoveSplinePath == 1 && bot->InBattleground());
-    if (exact_waypoint || disableMoveSplinePath || !generatePath)
+    if (Vehicle* vehicle = bot->GetVehicle())
+    {
+        VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
+        Unit* vehicleBase = vehicle->GetBase();
+        if (!vehicleBase || !seat || !seat->CanControl())  // is passenger and cant move anyway
+            return false;
+
+        float distance = vehicleBase->GetExactDist(x, y, z);  // use vehicle distance, not bot
+        if (distance > sPlayerbotAIConfig->contactDistance)
+        {
+            MotionMaster& mm = *vehicleBase->GetMotionMaster();  // need to move vehicle, not bot
+            mm.Clear();
+            mm.MovePoint(mapId, x, y, z, generatePath);
+            float delay = 1000.0f * (distance / vehicleBase->GetSpeed(MOVE_RUN)) - sPlayerbotAIConfig->reactDelay;
+            delay = std::max(.0f, delay);
+            delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
+            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
+            // TODO: is botAI->SetNextCheckDelay() meant to go here or is setting "last movement" value enough? (same question goes for below)
+            return true;
+        }
+    }
+    else if (exact_waypoint || disableMoveSplinePath || !generatePath)
     {
         float distance = bot->GetExactDist(x, y, z);
         if (distance > sPlayerbotAIConfig->contactDistance)
@@ -208,7 +228,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             MotionMaster& mm = *bot->GetMotionMaster();
             mm.Clear();
             mm.MovePoint(mapId, x, y, z, generatePath);
-            float delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, 1000.0f * MoveDelay(distance));
+            float delay = 1000.0f * MoveDelay(distance) - sPlayerbotAIConfig->reactDelay;
+            delay = std::max(.0f, delay);
+            delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
             return true;
         }
@@ -238,7 +260,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             mm.Clear();
             mm.MoveSplinePath(&path);
             // mm.MoveSplinePath(&path);
-            float delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, 1000.0f * MoveDelay(distance));
+            float delay = 1000.0f * MoveDelay(distance) - sPlayerbotAIConfig->reactDelay;
+            delay = std::max(.0f, delay);
+            delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
             return true;
         }
@@ -792,7 +816,7 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     if (target->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD))  // target is moving forward, predict the position
     {
         float needToGo = bot->GetExactDist(target) - distance;
-        float timeToGo = MoveDelay(abs(needToGo)) + sPlayerbotAIConfig->reactDelay;
+        float timeToGo = MoveDelay(abs(needToGo)) + sPlayerbotAIConfig->reactDelay / 1000.0f;
         float targetMoveDist = timeToGo * target->GetSpeed(MOVE_RUN);
         targetMoveDist = std::min(5.0f, targetMoveDist);
         tx += targetMoveDist * cos(target->GetOrientation());
@@ -806,7 +830,10 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
             tz = target->GetPositionZ();
         }
     }
-
+    if (bot->GetExactDist(tx, ty, tz) <= distance)
+    {
+        return false;
+    }
     PathGenerator path(bot);
     path.CalculatePath(tx, ty, tz, false);
     PathType type = path.GetPathType();
@@ -1249,9 +1276,7 @@ float MovementAction::MoveDelay(float distance)
     {
         speed = bot->GetSpeed(MOVE_RUN);
     }
-    float delay = distance / speed - sPlayerbotAIConfig->reactDistance;
-    if (delay < 0)
-        delay = 0;
+    float delay = distance / speed;
     return delay;
 }
 
