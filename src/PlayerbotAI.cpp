@@ -4388,14 +4388,14 @@ Item* PlayerbotAI::FindStoneFor(Item* weapon) const
     return stone;
 }
 
-static const uint32 uPriorizedWizardOilIds[5] = {MINOR_WIZARD_OIL, LESSER_WIZARD_OIL, BRILLIANT_WIZARD_OIL, WIZARD_OIL,
-                                                 SUPERIOR_WIZARD_OIL};
+static const std::vector<WizardOilDisplayId> uPriorizedWizardOilIds =
+{
+    MINOR_WIZARD_OIL, LESSER_WIZARD_OIL, BRILLIANT_WIZARD_OIL, WIZARD_OIL, SUPERIOR_WIZARD_OIL
+};
 
-static const uint32 uPriorizedManaOilIds[4] = {
-    MINOR_MANA_OIL,
-    LESSER_MANA_OIL,
-    BRILLIANT_MANA_OIL,
-    SUPERIOR_MANA_OIL,
+static const std::vector<ManaOilDisplayId> uPriorizedManaOilIds =
+{
+   MINOR_MANA_OIL, LESSER_MANA_OIL, BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL,
 };
 
 Item* PlayerbotAI::FindOilFor(Item* weapon) const
@@ -4405,25 +4405,22 @@ Item* PlayerbotAI::FindOilFor(Item* weapon) const
     if (pProto && (pProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || pProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF ||
                    pProto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER))
     {
-        for (uint8 i = 0; i < std::size(uPriorizedWizardOilIds); ++i)
+        for (const auto& id : uPriorizedWizardOilIds)
         {
-            oil = FindConsumable(uPriorizedWizardOilIds[i]);
+            oil = FindConsumable(uPriorizedWizardOilIds[id]);
             if (!oil)
-                oil = FindConsumable(uPriorizedManaOilIds[i]);
-
+                oil = FindConsumable(uPriorizedManaOilIds[id]);
             if (oil)
                 return oil;
         }
     }
-    else if (pProto &&
-             (pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2))
+    else if (pProto && (pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2))
     {
-        for (uint8 i = 0; i < std::size(uPriorizedManaOilIds); ++i)
+        for (const auto& id : uPriorizedManaOilIds)
         {
-            oil = FindConsumable(uPriorizedManaOilIds[i]);
+            oil = FindConsumable(uPriorizedManaOilIds[id]);
             if (!oil)
-                oil = FindConsumable(uPriorizedWizardOilIds[i]);
-
+                oil = FindConsumable(uPriorizedWizardOilIds[id]);
             if (oil)
                 return oil;
         }
