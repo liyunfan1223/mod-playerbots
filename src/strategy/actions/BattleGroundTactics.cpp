@@ -2053,13 +2053,13 @@ bool BGTactics::wsgPaths()
                 return true;
             }
 
-            if (bot->GetPositionX() > 1071.f)  // move the ramp up a piece
+            if (bot->GetPositionX() > 1059.f)  // move the ramp up a piece
             {
-                MoveTo(bg->GetMapId(), 1070.089478f, 1538.054443f, 332.460388f);
+                MoveTo(bg->GetMapId(), 1057.551f, 1546.271f, 326.864f);
                 return true;
             }
 
-            if (bot->GetPositionX() > 1050.2f)  // move the ramp up a piece
+            if (bot->GetPositionX() > 1051.2f)  // move the ramp up a piece
             {
                 MoveTo(bg->GetMapId(), 1050.089478f, 1538.054443f, 332.460388f);
                 return true;
