@@ -22,6 +22,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
+#include "PvpTriggers.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
 
@@ -1771,7 +1772,10 @@ std::string const BGTactics::HandleConsoleCommandPrivate(WorldSession* session, 
         Creature* wpCreature = player->SummonCreature(15631, c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), 0,
                                                       TEMPSUMMON_TIMED_DESPAWN, 15000u);
         wpCreature->SetOwnerGUID(player->GetGUID());
-        return fmt::format("Showing location of Creature {}", num);
+        float distance = player->GetDistance(c);
+        float exactDistance = player->GetExactDist(c);
+        return fmt::format("Showing Creature {} location={:.3f},{:.3f},{:.3f} distance={} exactDistance={}",
+            num, c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), distance, exactDistance);
     }
 
     if (!strncmp(cmd, "showobject=", 11))
@@ -1787,7 +1791,10 @@ std::string const BGTactics::HandleConsoleCommandPrivate(WorldSession* session, 
         Creature* wpCreature = player->SummonCreature(15631, o->GetPositionX(), o->GetPositionY(), o->GetPositionZ(), 0,
                                                       TEMPSUMMON_TIMED_DESPAWN, 15000u);
         wpCreature->SetOwnerGUID(player->GetGUID());
-        return fmt::format("Showing location of GameObject {}", num);
+        float distance = player->GetDistance(o);
+        float exactDistance = player->GetExactDist(o);
+        return fmt::format("Showing GameObject {} location={:.3f},{:.3f},{:.3f} distance={} exactDistance={}",
+            num, o->GetPositionX(), o->GetPositionY(), o->GetPositionZ(), distance, exactDistance);
     }
 
     return "usage: showpath(=[num]) / showcreature=[num] / showobject=[num]";
@@ -2053,13 +2060,13 @@ bool BGTactics::wsgPaths()
                 return true;
             }
 
-            if (bot->GetPositionX() > 1071.f)  // move the ramp up a piece
+            if (bot->GetPositionX() > 1059.f)  // move the ramp up a piece
             {
-                MoveTo(bg->GetMapId(), 1070.089478f, 1538.054443f, 332.460388f);
+                MoveTo(bg->GetMapId(), 1057.551f, 1546.271f, 326.864f);
                 return true;
             }
 
-            if (bot->GetPositionX() > 1050.2f)  // move the ramp up a piece
+            if (bot->GetPositionX() > 1051.2f)  // move the ramp up a piece
             {
                 MoveTo(bg->GetMapId(), 1050.089478f, 1538.054443f, 332.460388f);
                 return true;
@@ -2266,8 +2273,7 @@ bool BGTactics::Execute(Event event)
 
         // NOTE: can't use IsInCombat() when in vehicle as player is stuck in combat forever while in vehicle (ac bug?)
         bool inCombat = bot->GetVehicle() ? (bool)AI_VALUE(Unit*, "enemy player target") : bot->IsInCombat();
-        if (inCombat && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) ||
-                          bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)))
+        if (inCombat && !PlayerHasFlag::IsCapturingFlag(bot))
         {
             // bot->GetMotionMaster()->MovementExpired();
             return false;
@@ -3886,10 +3892,7 @@ bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 curr
 
     // NOTE: can't use IsInCombat() when in vehicle as player is stuck in combat forever while in vehicle (ac bug?)
     bool inCombat = bot->GetVehicle() ? (bool)AI_VALUE(Unit*, "enemy player target") : bot->IsInCombat();
-    if ((currentPoint == lastPointInPath) ||
-        (inCombat && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) ||
-                       bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL))) ||
-        !bot->IsAlive())
+    if (currentPoint == lastPointInPath || (inCombat && !PlayerHasFlag::IsCapturingFlag(bot)) || !bot->IsAlive())
     {
         // Path is over.
         // std::ostringstream out;
