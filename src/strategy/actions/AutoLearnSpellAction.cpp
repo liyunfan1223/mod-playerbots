@@ -210,7 +210,7 @@ bool AutoUpgradeEquipAction::Execute(Event event)
     {
         return false;
     }
-    PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
+    PlayerbotFactory factory(bot, bot->GetLevel());
     if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         factory.InitEquipment(true);
