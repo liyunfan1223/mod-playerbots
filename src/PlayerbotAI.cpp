@@ -4407,9 +4407,9 @@ Item* PlayerbotAI::FindOilFor(Item* weapon) const
     {
         for (const auto& id : uPriorizedWizardOilIds)
         {
-            oil = FindConsumable(uPriorizedWizardOilIds[id]);
+            oil = FindConsumable(id);
             if (!oil)
-                oil = FindConsumable(uPriorizedManaOilIds[id]);
+                oil = FindConsumable(id);
             if (oil)
                 return oil;
         }
@@ -4418,9 +4418,9 @@ Item* PlayerbotAI::FindOilFor(Item* weapon) const
     {
         for (const auto& id : uPriorizedManaOilIds)
         {
-            oil = FindConsumable(uPriorizedManaOilIds[id]);
+            oil = FindConsumable(id);
             if (!oil)
-                oil = FindConsumable(uPriorizedWizardOilIds[id]);
+                oil = FindConsumable(id);
             if (oil)
                 return oil;
         }
