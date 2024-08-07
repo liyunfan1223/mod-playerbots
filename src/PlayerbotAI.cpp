@@ -655,11 +655,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
     }
 
     if (!IsAllowedCommand(filtered) &&
-        (master != fromPlayer ||
-         !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer)))
-        return;
-
-    if (!IsAllowedCommand(filtered) && master != fromPlayer)
+        (!GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer)))
         return;
 
     if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos &&
