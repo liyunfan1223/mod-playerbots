@@ -10,8 +10,10 @@
 #include "GuildTaskMgr.h"
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
+#include "PlayerbotMgr.h"
 #include "PlayerbotSecurity.h"
 #include "Playerbots.h"
+#include "RandomPlayerbotMgr.h"
 #include "SetCraftAction.h"
 
 bool TradeStatusAction::Execute(Event event)
@@ -180,8 +182,12 @@ bool TradeStatusAction::CheckTrade()
         }
         return isGettingItem;
     }
-
-    if (!sRandomPlayerbotMgr->IsRandomBot(bot))
+    if (!bot->GetSession())
+    {
+        return false;
+    }
+    uint32 accountId = bot->GetSession()->GetAccountId();
+    if (!sPlayerbotAIConfig->IsInRandomAccountList(accountId))
     {
         int32 botItemsMoney = CalculateCost(bot, true);
         int32 botMoney = bot->GetTradeData()->GetMoney() + botItemsMoney;
