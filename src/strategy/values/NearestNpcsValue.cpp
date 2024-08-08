@@ -32,7 +32,7 @@ bool NearestVehiclesValue::AcceptUnit(Unit* unit)
     if (!unit || !unit->IsVehicle() || !unit->IsAlive())
         return false;
 
-    Vehicle* veh = unit->GetVehicle();
+    Vehicle* veh = unit->GetVehicleKit();
     if (!veh || !veh->GetAvailableSeatCount())
         return false;
 

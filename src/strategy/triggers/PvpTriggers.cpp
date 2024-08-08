@@ -118,21 +118,52 @@ bool PlayerIsInBattlegroundWithoutFlag::IsActive()
 
 bool PlayerHasFlag::IsActive()
 {
+    return IsCapturingFlag(bot);
+}
+
+bool PlayerHasFlag::IsCapturingFlag(Player* bot)
+{
     if (bot->InBattleground())
     {
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
-            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            BattlegroundWS* bg = (BattlegroundWS*)bot->GetBattleground();
+            // bot is horde and has ally flag
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE))
             {
-                return true;
+                if (bg->GetFlagPickerGUID(TEAM_HORDE))  // enemy has flag too
+                {
+                    if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_H_FLAG))
+                    {
+                        // only indicate capturing if signicant distance from own flag
+                        // (otherwise allow bot to defend itself)
+                        return bot->GetDistance(go) > 36.0f;
+                    }
+                }
+                return true;  // enemy doesnt have flag so we can cap immediately
             }
+            // bot is ally and has horde flag
+            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
+            {
+                if (bg->GetFlagPickerGUID(TEAM_ALLIANCE))  // enemy has flag too
+                {
+                    if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_A_FLAG))
+                    {
+                        // only indicate capturing if signicant distance from own flag
+                        // (otherwise allow bot to defend itself)
+                        return bot->GetDistance(go) > 36.0f;
+                    }
+                }
+                return true;  // enemy doesnt have flag so we can cap immediately
+            }
+            return false;  // bot doesn't have flag
         }
 
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_EY)
         {
-            BattlegroundEY* bg = (BattlegroundEY*)botAI->GetBot()->GetBattleground();
+            // TODO we should probably add similiar logic as WSG to allow combat
+            // when bot has flag but no bases are available to take it to
+            BattlegroundEY* bg = (BattlegroundEY*)bot->GetBattleground();
             return bot->GetGUID() == bg->GetFlagPickerGUID();
         }
 
