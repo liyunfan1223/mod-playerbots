@@ -11,11 +11,11 @@
 #include "Playerbots.h"
 #include "PossibleRpgTargetsValue.h"
 #include "ServerFacade.h"
+#include "PvpTriggers.h"
 
 bool AttackEnemyPlayerAction::isUseful()
 {
-    // if carry flag, do not start fight
-    if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
+    if (PlayerHasFlag::IsCapturingFlag(bot))
         return false;
 
     return !sPlayerbotAIConfig->IsPvpProhibited(bot->GetZoneId(), bot->GetAreaId());
@@ -25,7 +25,7 @@ bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
     return target && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, target), 75.0f) &&
-           (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
+           PlayerHasFlag::IsCapturingFlag(bot);
 }
 
 bool AttackAnythingAction::isUseful()
@@ -124,8 +124,7 @@ bool AttackAnythingAction::isPossible() { return AttackAction::isPossible() && G
 
 bool DpsAssistAction::isUseful()
 {
-    // if carry flag, do not start fight
-    if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
+    if (PlayerHasFlag::IsCapturingFlag(bot))
         return false;
 
     return true;

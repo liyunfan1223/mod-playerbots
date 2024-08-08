@@ -26,12 +26,15 @@ public:
     bool IsActive() override;
 };
 
+// NOTE this trigger is only active when bot is actively returning flag
+// (not when hiding in base because enemy has flag too)
 class PlayerHasFlag : public Trigger
 {
 public:
     PlayerHasFlag(PlayerbotAI* botAI) : Trigger(botAI, "player has flag") {}
 
     bool IsActive() override;
+    static bool IsCapturingFlag(Player* bot);
 };
 
 class EnemyFlagCarrierNear : public Trigger

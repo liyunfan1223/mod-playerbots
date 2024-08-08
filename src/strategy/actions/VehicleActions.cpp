@@ -44,13 +44,12 @@ bool EnterVehicleAction::Execute(Event event)
         if (vehicleBase->GetVehicleKit()->IsVehicleInUse())
             continue;
 
-        // if (fabs(bot->GetPositionZ() - vehicleBase->GetPositionZ()) < 20.0f)
+        float dist = sServerFacade->GetDistance2d(bot, vehicleBase);
+        if (dist > 40.0f)
+            continue;
 
-        // if (sServerFacade->GetDistance2d(bot, vehicle) > 100.0f)
-        //    continue;
-
-        if (sServerFacade->GetDistance2d(bot, vehicleBase) > INTERACTION_DISTANCE)
-            return MoveTo(vehicleBase, INTERACTION_DISTANCE - 1.0f);
+        if (dist > INTERACTION_DISTANCE)
+            return MoveTo(vehicleBase);
 
         bot->EnterVehicle(vehicleBase);
 

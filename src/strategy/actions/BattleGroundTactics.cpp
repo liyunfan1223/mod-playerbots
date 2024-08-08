@@ -22,6 +22,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
+#include "PvpTriggers.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
 
@@ -1771,7 +1772,10 @@ std::string const BGTactics::HandleConsoleCommandPrivate(WorldSession* session, 
         Creature* wpCreature = player->SummonCreature(15631, c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), 0,
                                                       TEMPSUMMON_TIMED_DESPAWN, 15000u);
         wpCreature->SetOwnerGUID(player->GetGUID());
-        return fmt::format("Showing location of Creature {}", num);
+        float distance = player->GetDistance(c);
+        float exactDistance = player->GetExactDist(c);
+        return fmt::format("Showing Creature {} location={:.3f},{:.3f},{:.3f} distance={} exactDistance={}",
+            num, c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), distance, exactDistance);
     }
 
     if (!strncmp(cmd, "showobject=", 11))
@@ -1787,7 +1791,10 @@ std::string const BGTactics::HandleConsoleCommandPrivate(WorldSession* session, 
         Creature* wpCreature = player->SummonCreature(15631, o->GetPositionX(), o->GetPositionY(), o->GetPositionZ(), 0,
                                                       TEMPSUMMON_TIMED_DESPAWN, 15000u);
         wpCreature->SetOwnerGUID(player->GetGUID());
-        return fmt::format("Showing location of GameObject {}", num);
+        float distance = player->GetDistance(o);
+        float exactDistance = player->GetExactDist(o);
+        return fmt::format("Showing GameObject {} location={:.3f},{:.3f},{:.3f} distance={} exactDistance={}",
+            num, o->GetPositionX(), o->GetPositionY(), o->GetPositionZ(), distance, exactDistance);
     }
 
     return "usage: showpath(=[num]) / showcreature=[num] / showobject=[num]";
@@ -2053,13 +2060,13 @@ bool BGTactics::wsgPaths()
                 return true;
             }
 
-            if (bot->GetPositionX() > 1071.f)  // move the ramp up a piece
+            if (bot->GetPositionX() > 1059.f)  // move the ramp up a piece
             {
-                MoveTo(bg->GetMapId(), 1070.089478f, 1538.054443f, 332.460388f);
+                MoveTo(bg->GetMapId(), 1057.551f, 1546.271f, 326.864f);
                 return true;
             }
 
-            if (bot->GetPositionX() > 1050.2f)  // move the ramp up a piece
+            if (bot->GetPositionX() > 1051.2f)  // move the ramp up a piece
             {
                 MoveTo(bg->GetMapId(), 1050.089478f, 1538.054443f, 332.460388f);
                 return true;
@@ -2266,8 +2273,7 @@ bool BGTactics::Execute(Event event)
 
         // NOTE: can't use IsInCombat() when in vehicle as player is stuck in combat forever while in vehicle (ac bug?)
         bool inCombat = bot->GetVehicle() ? (bool)AI_VALUE(Unit*, "enemy player target") : bot->IsInCombat();
-        if (inCombat && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) ||
-                          bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)))
+        if (inCombat && !PlayerHasFlag::IsCapturingFlag(bot))
         {
             // bot->GetMotionMaster()->MovementExpired();
             return false;
@@ -2611,8 +2617,8 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     if (GameObject* pGO = bg->GetBGObject(AV_HordeAttackObjectives[0].second))
                     {
-                        float const distance = sqrt(bot->GetDistance(pGO));
-                        if (distance < 20.0f)
+                        float const distance = bot->GetDistance(pGO);
+                        if (distance < 400.0f)
                             BgObjective = pGO;
                     }
                 }
@@ -2632,7 +2638,7 @@ bool BGTactics::selectObjective(bool reset)
                         {
                             if (GameObject* pGO = bg->GetBGObject(objective.second))
                             {
-                                float const distance = sqrt(bot->GetDistance(pGO));
+                                float const distance = bot->GetDistance(pGO);
                                 if (attackObjectiveDistance > distance)
                                 {
                                     BgObjective = pGO;
@@ -2802,8 +2808,8 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     if (GameObject* pGO = bg->GetBGObject(AV_AllianceAttackObjectives[0].second))
                     {
-                        float const distance = sqrt(bot->GetDistance(pGO));
-                        if (distance < 20.0f)
+                        float const distance = bot->GetDistance(pGO);
+                        if (distance < 400.0f)
                             BgObjective = pGO;
                     }
                 }
@@ -2823,7 +2829,7 @@ bool BGTactics::selectObjective(bool reset)
                         {
                             if (GameObject* pGO = bg->GetBGObject(objective.second))
                             {
-                                float const distance = sqrt(bot->GetDistance(pGO));
+                                float const distance = bot->GetDistance(pGO);
                                 if (attackObjectiveDistance > distance)
                                 {
                                     BgObjective = pGO;
@@ -3016,7 +3022,7 @@ bool BGTactics::selectObjective(bool reset)
                             {
                                 if (GameObject* pGO = bg->GetBGObject(objective * BG_AB_OBJECTS_PER_NODE))
                                 {
-                                    float const distance = sqrt(bot->GetDistance(pGO));
+                                    float const distance = bot->GetDistance(pGO);
                                     if (attackObjectiveDistance > distance)
                                     {
                                         // do not pick if already in list
@@ -3065,7 +3071,7 @@ bool BGTactics::selectObjective(bool reset)
                         {
                             if (GameObject* pGO = bg->GetBGObject(objective * BG_AB_OBJECTS_PER_NODE))
                             {
-                                float const distance = sqrt(bot->GetDistance(pGO));
+                                float const distance = bot->GetDistance(pGO);
                                 if (attackObjectiveDistance > distance)
                                 {
                                     // do not pick if already in list
@@ -3127,14 +3133,15 @@ bool BGTactics::selectObjective(bool reset)
                         uint8 ownership = pointOwner == bot->GetTeamId() ? 2 : pointOwner == TEAM_NEUTRAL ? 1 : 0;
                         if (closestObjectiveOwnership > ownership)
                             continue;
-                        float dist = sqrt(bot->GetDistance(go));
+                        float dist = bot->GetDistance(go);
+
+                        // select objective when ownership is better
+                        // or distance difference is significantly better
+                        // or distance difference is insignificantly better and coinflip
+                        // the reason it doesn't just check if distance is better is to avoid bot going to same point every time
                         if (closestObjectiveOwnership < ownership ||
-                            (closestObjectiveDist > dist &&
-                             (closestObjectiveDist - dist > 1 ||
-                              urand(
-                                  0,
-                                  1))))  // if distance difference is minor (as it will be when they first pick flag up
-                                         // from middle) add some randomness so its not going to same point every time
+                            closestObjectiveDist - 30 > dist ||
+                            (closestObjectiveDist > dist && urand(0, 1)))
                         {
                             closestObjectiveOwnership = ownership;
                             closestObjectiveDist = dist;
@@ -3391,10 +3398,9 @@ bool BGTactics::selectObjective(bool reset)
                         }
                         else  // target gate directly at range if other vehicle
                         {
-                            // take a siege position
-                            if (sqrt(bot->GetDistance(IC_GATE_ATTACK_POS_HORDE)) <
-                                5.0f)  // just make bot stay where it is (stops them shifting around to the random
-                                       // spots)
+                            // just make bot stay where it is if already close
+                            // (stops them shifting around between the random spots)
+                            if (bot->GetDistance(IC_GATE_ATTACK_POS_HORDE) < 8.0f)  
                                 pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
                             else
                                 pos.Set(IC_GATE_ATTACK_POS_HORDE.GetPositionX() + frand(-5.0f, +5.0f),
@@ -3480,10 +3486,10 @@ bool BGTactics::selectObjective(bool reset)
                     }
                 }
                 if (!BgObjective)  // guard vehicles as they seige
-
                 {
-                    if (sqrt(bot->GetDistance(IC_GATE_ATTACK_POS_HORDE)) <
-                        5.0f)  // just make bot stay where it is (stops them shifting around to the random spots)
+                    // just make bot stay where it is if already close
+                    // (stops them shifting around between the random spots)
+                    if (bot->GetDistance(IC_GATE_ATTACK_POS_HORDE) < 8.0f)
                         pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
                     else
                         pos.Set(IC_GATE_ATTACK_POS_HORDE.GetPositionX() + frand(-5.0f, +5.0f),
@@ -3544,10 +3550,9 @@ bool BGTactics::selectObjective(bool reset)
                         }
                         else  // target gate directly at range if other vehicle
                         {
-                            // take a siege position
-                            if (sqrt(bot->GetDistance(IC_GATE_ATTACK_POS_ALLIANCE)) <
-                                5.0f)  // just make bot stay where it is (stops them shifting around to the random
-                                       // spots)
+                            // just make bot stay where it is if already close
+                            // (stops them shifting around between the random spots)
+                            if (bot->GetDistance(IC_GATE_ATTACK_POS_ALLIANCE) < 8.0f)
                                 pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
                             else
                                 pos.Set(IC_GATE_ATTACK_POS_ALLIANCE.GetPositionX() + frand(-5.0f, +5.0f),
@@ -3634,8 +3639,9 @@ bool BGTactics::selectObjective(bool reset)
                 }
                 if (!BgObjective)  // guard vehicles as they seige
                 {
-                    if (sqrt(bot->GetDistance(IC_GATE_ATTACK_POS_ALLIANCE)) <
-                        5.0f)  // just make bot stay where it is (stops them shifting around to the random spots)
+                    // just make bot stay where it is if already close
+                    // (stops them shifting around between the random spots)
+                    if (bot->GetDistance(IC_GATE_ATTACK_POS_ALLIANCE) < 8.0f)
                         pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
                     else
                         pos.Set(IC_GATE_ATTACK_POS_ALLIANCE.GetPositionX() + frand(-5.0f, +5.0f),
@@ -3694,7 +3700,7 @@ bool BGTactics::moveToObjective()
         }
 
         // don't try to move if already close
-        if (sqrt(bot->GetDistance(pos.x, pos.y, pos.z)) < 2.0f)
+        if (bot->GetDistance(pos.x, pos.y, pos.z) < 4.0f)
         {
             resetObjective();
 
@@ -3708,9 +3714,8 @@ bool BGTactics::moveToObjective()
         if (bgType == BATTLEGROUND_WS)
             return MoveTo(bot->GetMapId(), pos.x, pos.y, pos.z);
         else
-            return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z,
-                            1.5f);  // note - don't make distance too large or horde bots may struggle to get flags in
-                                    // alliance AV towers (because they'll be targetting a spot in midair)
+            // dont increase from 1.5 will cause bugs with horde capping AV towers
+            return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z, 1.5f);  
     }
     return false;
 }
@@ -3739,7 +3744,7 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
         // get bots out of cave when they respawn there (otherwise path selection happens while they're deep within cave
         // and the results arent good)
         Position const caveSpawn = bot->GetTeamId() == TEAM_ALLIANCE ? AV_CAVE_SPAWN_ALLIANCE : AV_CAVE_SPAWN_HORDE;
-        if (sqrt(bot->GetDistance(caveSpawn)) < 4.0f)
+        if (bot->GetDistance(caveSpawn) < 16.0f)
         {
             return moveToStart(true);
         }
@@ -3787,6 +3792,12 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
             std::find(vPaths_HordeMine.begin(), vPaths_HordeMine.end(), path) != vPaths_HordeMine.end())
             continue;
 
+        // TODO need to remove sqrt from these two and distToBot but it totally throws path scoring out of
+        // whack if you do that without changing how its implemented (I'm amazed it works as well as it does
+        // using sqrt'ed distances)
+        // In a reworked version maybe compare the differences of path distances to point (ie: against best path)
+        // or maybe ratio's (where if a path end is twice the difference in distance from destination we basically
+        // use that to multiply the total score?
         BattleBotWaypoint& startPoint = ((*path)[0]);
         float const startPointDistToDestination =
             sqrt(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(startPoint.x, startPoint.y, startPoint.z));
@@ -3886,10 +3897,7 @@ bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 curr
 
     // NOTE: can't use IsInCombat() when in vehicle as player is stuck in combat forever while in vehicle (ac bug?)
     bool inCombat = bot->GetVehicle() ? (bool)AI_VALUE(Unit*, "enemy player target") : bot->IsInCombat();
-    if ((currentPoint == lastPointInPath) ||
-        (inCombat && !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) ||
-                       bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL))) ||
-        !bot->IsAlive())
+    if (currentPoint == lastPointInPath || (inCombat && !PlayerHasFlag::IsCapturingFlag(bot)) || !bot->IsAlive())
     {
         // Path is over.
         // std::ostringstream out;
@@ -3955,6 +3963,7 @@ bool BGTactics::startNewPathBegin(std::vector<BattleBotPath*> const& vPaths)
             std::find(vPaths_HordeMine.begin(), vPaths_HordeMine.end(), pPath) != vPaths_HordeMine.end())
             continue;
 
+        // TODO remove sqrt
         BattleBotWaypoint* pStart = &((*pPath)[0]);
         if (sqrt(bot->GetDistance(pStart->x, pStart->y, pStart->z)) < INTERACTION_DISTANCE)
             availablePaths.emplace_back(AvailablePath(pPath, false));
@@ -3964,6 +3973,7 @@ bool BGTactics::startNewPathBegin(std::vector<BattleBotPath*> const& vPaths)
             vPaths_NoReverseAllowed.end())
             continue;
 
+        // TODO remove sqrt
         BattleBotWaypoint* pEnd = &((*pPath)[(*pPath).size() - 1]);
         if (sqrt(bot->GetDistance(pEnd->x, pEnd->y, pEnd->z)) < INTERACTION_DISTANCE)
             availablePaths.emplace_back(AvailablePath(pPath, true));
@@ -4013,6 +4023,7 @@ bool BGTactics::startNewPathFree(std::vector<BattleBotPath*> const& vPaths)
         for (uint32 i = 0; i < pPath->size(); i++)
         {
             BattleBotWaypoint& waypoint = ((*pPath)[i]);
+            // TODO remove sqrt
             float const distanceToPoint = sqrt(bot->GetDistance(waypoint.x, waypoint.y, waypoint.z));
             if (distanceToPoint < closestDistance)
             {
@@ -4045,7 +4056,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
 
     GuidVector closeObjects;
     GuidVector closePlayers;
-    float flagRange;
+    float flagRange = 0.0f;
 
     switch (bgType)
     {
@@ -4107,7 +4118,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
         if (!bot->CanUseBattlegroundObject(go) && bgType != BATTLEGROUND_WS)
             continue;
 
-        float const dist = sqrt(bot->GetDistance(go));
+        float const dist = bot->GetDistance(go);
         if (flagRange && dist > flagRange)
             continue;
 
@@ -4419,7 +4430,7 @@ bool BGTactics::IsLockedInsideKeep()
     // ALLIANCE
     if (bot->GetTeamId() == TEAM_ALLIANCE)
     {
-        if (GameObject* go = bg->GetBGObject(BG_IC_GO_DOODAD_PORTCULLISACTIVE01))
+        if (GameObject* go = bg->GetBGObject(BG_IC_GO_DOODAD_PORTCULLISACTIVE02))
         {
             if (go->isSpawned())
             {

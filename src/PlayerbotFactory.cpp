@@ -55,6 +55,15 @@ PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality
     : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), bot(bot)
 {
     botAI = GET_PLAYERBOT_AI(bot);
+    if (!this->itemQuality)
+    {
+        uint32 gs = sPlayerbotAIConfig->randomGearScoreLimit == 0
+                        ? 0
+                        : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->randomGearScoreLimit,
+                                                               sPlayerbotAIConfig->randomGearQualityLimit);
+        this->itemQuality = sPlayerbotAIConfig->randomGearQualityLimit;
+        this->gearScoreLimit = gs;
+    }
 }
 
 void PlayerbotFactory::Init()
@@ -149,16 +158,6 @@ void PlayerbotFactory::Init()
 
 void PlayerbotFactory::Prepare()
 {
-    if (!itemQuality)
-    {
-        uint32 gs = sPlayerbotAIConfig->randomGearScoreLimit == 0
-                        ? 0
-                        : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->randomGearScoreLimit,
-                                                               sPlayerbotAIConfig->randomGearQualityLimit);
-        itemQuality = sPlayerbotAIConfig->randomGearQualityLimit;
-        gearScoreLimit = gs;
-    }
-
     if (bot->isDead())
         bot->ResurrectPlayer(1.0f, false);
 
