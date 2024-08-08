@@ -57,12 +57,12 @@ public:
     StatsCollector(StatsCollector& stats) = default;
     void Reset();
     void CollectItemStats(ItemTemplate const* proto);
-    void CollectSpellStats(uint32 spellId, uint32 trigger = ITEM_SPELLTRIGGER_ON_EQUIP);
-    void CollectSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier = 1.0f);
+    void CollectSpellStats(uint32 spellId, bool isTrigger = false);
+    void CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier = 1.0f);
     void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant);
 
 public:
-    uint32 stats[STATS_TYPE_MAX];
+    int32 stats[STATS_TYPE_MAX];
 
 private:
     void CollectByItemStatType(uint32 itemStatType, int32 val);

@@ -5,8 +5,11 @@
 #include "DBCStores.h"
 #include "ItemTemplate.h"
 #include "ObjectMgr.h"
+#include "SharedDefines.h"
+#include "SpellAuraDefines.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "UpdateFields.h"
 
 StatsCollector::StatsCollector(CollectorType type) : type_(type) { Reset(); }
 
@@ -40,7 +43,7 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     }
     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
     {
-        CollectSpellStats(proto->Spells[j].SpellId, proto->Spells[j].SpellTrigger);
+        CollectSpellStats(proto->Spells[j].SpellId, proto->Spells[j].SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP);
     }
 
     if (proto->socketBonus)
@@ -50,7 +53,7 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     }
 }
 
-void StatsCollector::CollectSpellStats(uint32 spellId, uint32 trigger)
+void StatsCollector::CollectSpellStats(uint32 spellId, bool isTrigger)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
@@ -59,20 +62,30 @@ void StatsCollector::CollectSpellStats(uint32 spellId, uint32 trigger)
 
     if (CollectSpecialCaseSpellStats(spellId))
         return;
+    
+    float multiplier = isTrigger ? 0.25f : 1.0f;
 
+    if (spellInfo->StackAmount)
+        multiplier *= spellInfo->StackAmount;
+    // spellInfo->ProcFlags
+    // const SpellProcEntry* procEntry = sSpellMgr->GetSpellProcEntry(spellId);
+    // spellInfo->SpellFamilyFlags
+    // spellInfo->ProcFlags
+    // procEntry->SpellTypeMask
     for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
     {
-        float multiplier = trigger == ITEM_SPELLTRIGGER_ON_EQUIP ? 1.0f : 0.2f;
-        CollectSpellEffectStats(spellInfo->Effects[i], multiplier);
+        if (spellInfo->IsPositive())
+            CollectPositiveSpellEffectStats(spellInfo->Effects[i], multiplier);
     }
 }
 
-void StatsCollector::CollectSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier)
+void StatsCollector::CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier)
 {
     if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
         return;
-
-    int32 val = effectInfo.BasePoints + 1;
+    
+    int32 val = effectInfo.CalcValue();
+    
     switch (effectInfo.ApplyAuraName)
     {
         case SPELL_AURA_MOD_DAMAGE_DONE:
@@ -85,6 +98,45 @@ void StatsCollector::CollectSpellEffectStats(const SpellEffectInfo& effectInfo, 
         case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
             stats[STATS_TYPE_BLOCK_VALUE] += val * multiplier;
             break;
+        case SPELL_AURA_MOD_STAT:
+        {
+            uint32 statType = effectInfo.MiscValue;
+            switch (statType)
+            {
+                case STAT_STRENGTH:
+                    stats[STATS_TYPE_STRENGTH] += val * multiplier;
+                    break;
+                case STAT_AGILITY:
+                    stats[STATS_TYPE_AGILITY] += val * multiplier;
+                    break;
+                case STAT_STAMINA:
+                    stats[STATS_TYPE_STAMINA] += val * multiplier;
+                    break;
+                case STAT_INTELLECT:
+                    stats[STATS_TYPE_INTELLECT] += val * multiplier;
+                    break;
+                case STAT_SPIRIT:
+                    stats[STATS_TYPE_SPIRIT] += val * multiplier;
+                    break;
+                case -1: // Stat all
+                    stats[STATS_TYPE_STRENGTH] += val * multiplier;
+                    stats[STATS_TYPE_AGILITY] += val * multiplier;
+                    stats[STATS_TYPE_STAMINA] += val * multiplier;
+                    stats[STATS_TYPE_INTELLECT] += val * multiplier;
+                    stats[STATS_TYPE_SPIRIT] += val * multiplier;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        case SPELL_AURA_MOD_RESISTANCE:
+        {
+            uint32 statType = effectInfo.MiscValue;
+            if (statType & SPELL_SCHOOL_MASK_NORMAL) // physical
+                stats[STATS_TYPE_ARMOR] += val * multiplier;
+            break;
+        }
         case SPELL_AURA_MOD_RATING:
         {
             for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING; ++rating)
@@ -156,17 +208,12 @@ void StatsCollector::CollectSpellEffectStats(const SpellEffectInfo& effectInfo, 
         }
         case SPELL_AURA_PROC_TRIGGER_SPELL:
         {
-            multiplier = 0.2f;
-            if (effectInfo.TriggerSpell)
-            {
-                SpellInfo const* triggerSpellInfo = sSpellMgr->GetSpellInfo(effectInfo.TriggerSpell);
-                if (!triggerSpellInfo)
-                    return;
-                for (uint8 k = 0; k < MAX_SPELL_EFFECTS; k++)
-                {
-                    CollectSpellEffectStats(triggerSpellInfo->Effects[k], multiplier);
-                }
-            }
+            CollectSpellStats(effectInfo.TriggerSpell, true);
+            break;
+        }
+        case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+        {
+            CollectSpellStats(effectInfo.TriggerSpell, true);
             break;
         }
         default:
@@ -187,6 +234,16 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
 
         switch (enchant_display_type)
         {
+            case ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL:
+            {
+                CollectSpellStats(enchant_spell_id, true);
+                break;
+            }
+            case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
+            {
+                CollectSpellStats(enchant_spell_id, false);
+                break;
+            }
             case ITEM_ENCHANTMENT_TYPE_STAT:
             {
                 if (!enchant_amount)
@@ -202,37 +259,59 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
     }
 }
 
-/// @todo Special case for trinket
-bool StatsCollector::CollectSpecialCaseSpellStats(uint32 spellId) { return false; }
+/// @todo Special case for some spell that hard to calculate, like trinket, libram, etc.
+bool StatsCollector::CollectSpecialCaseSpellStats(uint32 spellId) {
+    // trinket
+    switch (spellId)
+    {
+        case 71519: // Deathbringer's Will
+            stats[STATS_TYPE_ATTACK_POWER] += 400;
+            return true;
+        case 71562: // Deathbringer's Will
+            stats[STATS_TYPE_ATTACK_POWER] += 450;
+            return true;
+        default:
+            break;
+    }
+    // switch (spellId)
+    // {
+    //     case 50457: // Idol of the Lunar Eclipse
+    //         stats[STATS_TYPE_CRIT] += 150;
+    //         return true;
+    //     default:
+    //         break;
+    // }
+    return false;
+}
 
 bool StatsCollector::CollectSpecialEnchantSpellStats(uint32 enchantSpellId)
 {
     switch (enchantSpellId)
     {
-        case 28093:  // mongoose
-            if (type_ == CollectorType::MELEE)
-            {
-                stats[STATS_TYPE_AGILITY] += 40;
-            }
-            return true;
-        case 20007:  // crusader
-            if (type_ == CollectorType::MELEE)
-            {
-                stats[STATS_TYPE_STRENGTH] += 30;
-            }
-            return true;
-        case 59620:  // Berserk
-            if (type_ == CollectorType::MELEE)
-            {
-                stats[STATS_TYPE_ATTACK_POWER] += 120;
-            }
-            return true;
-        case 64440:  // Blade Warding
-            if (type_ == CollectorType::MELEE)
-            {
-                stats[STATS_TYPE_PARRY] += 50;
-            }
-            return true;
+        // case 28093:  // mongoose
+        //     if (type_ == CollectorType::MELEE)
+        //     {
+        //         stats[STATS_TYPE_AGILITY] += 40;
+        //     }
+        //     return true;
+        // case 20007:  // crusader
+        //     if (type_ == CollectorType::MELEE)
+        //     {
+        //         stats[STATS_TYPE_STRENGTH] += 30;
+        //     }
+        //     return true;
+        // case 59620:  // Berserk
+        //     if (type_ == CollectorType::MELEE)
+        //     {
+        //         stats[STATS_TYPE_ATTACK_POWER] += 120;
+        //     }
+        //     return true;
+        // case 64440:  // Blade Warding
+        //     if (type_ == CollectorType::MELEE)
+        //     {
+        //         stats[STATS_TYPE_PARRY] += 50;
+        //     }
+        //     return true;
         case 64571:
             if (type_ == CollectorType::MELEE)
             {

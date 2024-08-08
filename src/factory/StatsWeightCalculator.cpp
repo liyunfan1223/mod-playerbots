@@ -189,7 +189,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.0f;
         stats_weights_[STATS_TYPE_STRENGTH] += 1.0f;
-        stats_weights_[STATS_TYPE_STAMINA] += 3.0f;
+        stats_weights_[STATS_TYPE_STAMINA] += 3.5f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 0.2f;
         stats_weights_[STATS_TYPE_DEFENSE] += 2.5f;
         stats_weights_[STATS_TYPE_PARRY] += 2.0f;
@@ -208,7 +208,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.0f;
         stats_weights_[STATS_TYPE_STRENGTH] += 1.0f;
-        stats_weights_[STATS_TYPE_STAMINA] += 2.5f;
+        stats_weights_[STATS_TYPE_STAMINA] += 3.5f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 0.2f;
         stats_weights_[STATS_TYPE_DEFENSE] += 3.5f;
         stats_weights_[STATS_TYPE_PARRY] += 2.0f;
@@ -224,19 +224,19 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     else
     {
         // BEAR DRUID TANK
-        stats_weights_[STATS_TYPE_AGILITY] += 1.5f;
-        stats_weights_[STATS_TYPE_STRENGTH] += 1.0f;
-        stats_weights_[STATS_TYPE_STAMINA] += 1.5f;
-        stats_weights_[STATS_TYPE_ATTACK_POWER] += 0.2f;
-        stats_weights_[STATS_TYPE_DEFENSE] += 2.0f;
-        stats_weights_[STATS_TYPE_DODGE] += 2.0f;
-        stats_weights_[STATS_TYPE_RESILIENCE] += 2.0f;
-        stats_weights_[STATS_TYPE_ARMOR] += 0.3f;
-        stats_weights_[STATS_TYPE_HIT] += 2.0f;
-        stats_weights_[STATS_TYPE_CRIT] += 0.5f;
-        stats_weights_[STATS_TYPE_HASTE] += 0.5f;
-        stats_weights_[STATS_TYPE_EXPERTISE] += 3.0f;
-        stats_weights_[STATS_TYPE_MELEE_DPS] += 2.0f;
+        stats_weights_[STATS_TYPE_AGILITY] += 2.2f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 2.4f;
+        stats_weights_[STATS_TYPE_STAMINA] += 4.0f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_DEFENSE] += 0.3f;
+        stats_weights_[STATS_TYPE_DODGE] += 0.7f;
+        stats_weights_[STATS_TYPE_RESILIENCE] += 1.0f;
+        stats_weights_[STATS_TYPE_ARMOR] += 0.15f;
+        stats_weights_[STATS_TYPE_HIT] += 3.0f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.3f;
+        stats_weights_[STATS_TYPE_HASTE] += 2.3f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 3.7f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 3.0f;
     }
 }
 
