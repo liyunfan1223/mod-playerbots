@@ -206,6 +206,18 @@ void StatsCollector::CollectPositiveSpellEffectStats(const SpellEffectInfo& effe
                 break;
             }
         }
+        case SPELL_AURA_MOD_POWER_REGEN:
+        {
+            uint32 powerType = effectInfo.MiscValue;
+            switch (powerType)
+            {
+                case POWER_MANA:
+                    stats[STATS_TYPE_MANA_REGENERATION] += val * multiplier;
+                default:
+                    break;
+            }
+            break;
+        }
         case SPELL_AURA_PROC_TRIGGER_SPELL:
         {
             CollectSpellStats(effectInfo.TriggerSpell, true);
@@ -374,6 +386,7 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
         case ITEM_MOD_MANA:
             break;
         case ITEM_MOD_HEALTH:
+            stats[STATS_TYPE_AGILITY] += val / 12;
             break;
         case ITEM_MOD_AGILITY:
             stats[STATS_TYPE_AGILITY] += val;
