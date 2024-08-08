@@ -7,6 +7,7 @@
 
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "Vehicle.h"
 
 bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
 {
@@ -25,7 +26,19 @@ bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
 
 Unit* EnemyPlayerValue::Calculate()
 {
-    bool inCannon = botAI->IsInVehicle(false, true);
+    bool controllingCannon = false;
+    bool controllingVehicle = false;
+    if (Vehicle* vehicle = bot->GetVehicle())
+    {
+        VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
+        if (!seat || !seat->CanControl())  // not in control of vehicle so cant attack anyone
+            return nullptr;
+        VehicleEntry const* vi = vehicle->GetVehicleInfo();
+        if (vi && vi->m_flags & VEHICLE_FLAG_FIXED_POSITION)
+            controllingCannon = true;
+        else
+            controllingVehicle = true;
+    }
 
     // 1. Check units we are currently in combat with.
     std::vector<Unit*> targets;
@@ -95,12 +108,15 @@ Unit* EnemyPlayerValue::Calculate()
         }
 
         // Aggro weak enemies from further away.
-        uint32 const aggroDistance = (inCannon || bot->GetHealth() > pTarget->GetHealth()) ? maxAggroDistance : 20.0f;
+        // If controlling mobile vehicle only agro close enemies (otherwise will never reach objective)
+        uint32 const aggroDistance = controllingVehicle                                               ? 5.0f
+                                     : (controllingCannon || bot->GetHealth() > pTarget->GetHealth()) ? maxAggroDistance
+                                                                                                      : 20.0f;
         if (!bot->IsWithinDist(pTarget, aggroDistance))
             continue;
 
         if (bot->IsWithinLOSInMap(pTarget) &&
-            (inCannon || (fabs(bot->GetPositionZ() - pTarget->GetPositionZ()) < 30.0f)))
+            (controllingCannon || (fabs(bot->GetPositionZ() - pTarget->GetPositionZ()) < 30.0f)))
             return pTarget;
     }
 

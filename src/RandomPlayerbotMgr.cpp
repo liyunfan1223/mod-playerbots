@@ -1815,8 +1815,7 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
     bot->DurabilityRepairAll(false, 1.0f, false);
     bot->SetFullHealth();
     bot->SetPvP(true);
-
-    PlayerbotFactory factory(bot, bot->GetLevel(), ITEM_QUALITY_RARE);
+    PlayerbotFactory factory(bot, bot->GetLevel());
     factory.Refresh();
 
     if (bot->GetMaxPower(POWER_MANA) > 0)
