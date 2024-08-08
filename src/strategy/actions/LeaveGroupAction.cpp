@@ -98,13 +98,14 @@ bool LeaveGroupAction::Leave(Player* player)
     return true;
 }
 
-bool LeaveFarAwayAction::Execute(Event event) { return Leave(nullptr); }
+bool LeaveFarAwayAction::Execute(Event event)
+{
+    // allow bot to leave party when they want
+    return Leave(botAI->GetGroupMaster());
+}
 
 bool LeaveFarAwayAction::isUseful()
 {
-    if (!sPlayerbotAIConfig->randomBotGroupNearby)
-        return false;
-
     if (bot->InBattleground())
         return false;
 

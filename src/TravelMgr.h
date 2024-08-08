@@ -97,8 +97,10 @@ public:
     WorldPosition(uint32 mapid, CellCoord cell);
     WorldPosition(uint32 mapid, mGridCoord grid);
 
-    // Setters
+    //Setters
     void set(const WorldLocation& pos);
+    void set(const WorldObject* wo);
+    void set(const WorldPosition& pos);
     void setMapId(uint32 id);
     void setX(float x);
     void setY(float y);
@@ -404,11 +406,10 @@ private:
 class GuidPosition : public ObjectGuid, public WorldPosition
 {
 public:
-    GuidPosition() : ObjectGuid(), WorldPosition(), loadedFromDB(false) {}
+    GuidPosition() : ObjectGuid(), WorldPosition(), loadedFromDB(false) { }
     GuidPosition(WorldObject* wo);
     GuidPosition(CreatureData const& creData);
     GuidPosition(GameObjectData const& goData);
-
     CreatureTemplate const* GetCreatureTemplate();
     GameObjectTemplate const* GetGameObjectTemplate();
 

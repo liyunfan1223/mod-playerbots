@@ -15,11 +15,11 @@ class WorldObject;
 class TalkToQuestGiverAction : public QuestAction
 {
 public:
-    TalkToQuestGiverAction(PlayerbotAI* botAI, std::string name = "talk to quest giver") : QuestAction(botAI, name) {}
+    TalkToQuestGiverAction(PlayerbotAI* botAI, std::string name = "talk to quest giver") : QuestAction(botAI, name) { }
 
 protected:
-    void ProcessQuest(Quest const* quest, Object* questGiver) override;
-    void TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out);
+    bool ProcessQuest(Quest const* quest, Object* questGiver) override;
+    bool TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out);
 
 private:
     void RewardNoItem(Quest const* quest, Object* questGiver, std::ostringstream& out);

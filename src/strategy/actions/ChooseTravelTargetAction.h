@@ -26,26 +26,23 @@ public:
     bool Execute(Event event) override;
     bool isUseful() override;
 
-    static TravelDestination* FindDestination(Player* bot, std::string const name);
+    static TravelDestination* FindDestination(Player* bot, std::string const name, bool zones = true, bool npcs = true, bool quests = true, bool mobs = true, bool bosses = true);
 
 protected:
     void getNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget);
     void setNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget);
     void ReportTravelTarget(TravelTarget* newTarget, TravelTarget* oldTarget);
 
-    bool getBestDestination(std::vector<TravelDestination*>* activeDestinations,
-                            std::vector<WorldPosition*>* activePoints);
-
+    bool getBestDestination(std::vector<TravelDestination*>* activeDestinations, std::vector<WorldPosition*>* activePoints);
     bool SetGroupTarget(TravelTarget* target);
     bool SetCurrentTarget(TravelTarget* target, TravelTarget* oldTarget);
-    bool SetQuestTarget(TravelTarget* target, bool onlyCompleted = false);
+    bool SetQuestTarget(TravelTarget* target, bool onlyCompleted = false, bool newQuests = true, bool activeQuests = true, bool completedQuests = true);
     bool SetNewQuestTarget(TravelTarget* target);
     bool SetRpgTarget(TravelTarget* target);
     bool SetGrindTarget(TravelTarget* target);
     bool SetBossTarget(TravelTarget* target);
     bool SetExploreTarget(TravelTarget* target);
-    bool SetNpcFlagTarget(TravelTarget* target, std::vector<NPCFlags> flags, std::string const name = "",
-                          std::vector<uint32> items = {});
+    bool SetNpcFlagTarget(TravelTarget* target, std::vector<NPCFlags> flags, std::string const name = "", std::vector<uint32> items = { });
     bool SetNullTarget(TravelTarget* target);
 
 private:

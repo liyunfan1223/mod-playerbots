@@ -68,3 +68,8 @@ Unit* ServerFacade::GetChaseTarget(Unit* target)
 
     return nullptr;
 }
+
+void ServerFacade::SendPacket(Player *player, WorldPacket *packet)
+{
+    return player->GetSession()->SendPacket(packet);
+}

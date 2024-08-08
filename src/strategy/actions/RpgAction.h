@@ -15,16 +15,13 @@ class Unit;
 class RpgAction : public MovementAction
 {
 public:
-    RpgAction(PlayerbotAI* botAI, std::string const name = "rpg") : MovementAction(botAI, name) {}
-
+    RpgAction(PlayerbotAI* botAI, std::string const name = "rpg") : MovementAction(botAI, name) { }
     bool Execute(Event event) override;
     bool isUseful() override;
 
 protected:
     virtual bool SetNextRpgAction();
-
     typedef void (RpgAction::*RpgElement)(ObjectGuid guid);
-
     bool AddIgnore(ObjectGuid guid);
     bool RemIgnore(ObjectGuid guid);
     bool HasIgnore(ObjectGuid guid);
@@ -33,8 +30,7 @@ protected:
 class CRpgAction : public RpgAction
 {
 public:
-    CRpgAction(PlayerbotAI* botAI) : RpgAction(botAI, "crpg") {}
-
+    CRpgAction(PlayerbotAI* botAI) : RpgAction(botAI, "crpg") { }
     bool isUseful() override;
 };
 

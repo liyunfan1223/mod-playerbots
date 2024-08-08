@@ -14,13 +14,30 @@ void Qualified::Qualify(int qual)
     qualifier = out.str();
 }
 
-std::string const Qualified::MultiQualify(std::vector<std::string> qualifiers)
+std::string const Qualified::MultiQualify(std::vector<std::string> qualifiers, const std::string& separator, const std::string_view brackets)
 {
-    std::ostringstream out;
-    for (auto& qualifier : qualifiers)
-        out << qualifier << (&qualifier != &qualifiers.back() ? " " : "");
+    std::stringstream out;
+    for (uint8 i = 0; i < qualifiers.size(); i++)
+    {
+        const std::string& qualifier = qualifiers[i];
+        if (i == qualifiers.size() - 1)
+        {
+            out << qualifier;
+        }
+        else
+        {
+            out << qualifier << separator;
+        }
+    }
 
-    return out.str();
+    if (brackets.empty())
+    {
+        return out.str();
+    }
+    else
+    {
+        return brackets[0] + out.str() + brackets[1];
+    }
 }
 
 std::vector<std::string> Qualified::getMultiQualifiers(std::string const qualifier1)

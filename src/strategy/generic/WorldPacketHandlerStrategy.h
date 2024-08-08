@@ -22,7 +22,7 @@ public:
 class ReadyCheckStrategy : public PassTroughStrategy
 {
 public:
-    ReadyCheckStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI) {}
+    ReadyCheckStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI) { }
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "ready check"; }

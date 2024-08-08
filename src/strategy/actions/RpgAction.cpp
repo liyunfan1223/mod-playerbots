@@ -14,6 +14,7 @@
 #include "Formations.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "RpgSubActions.h"
 
 bool RpgAction::Execute(Event event)
 {
@@ -44,65 +45,109 @@ bool RpgAction::isUseful() { return AI_VALUE(GuidPosition, "rpg target"); }
 
 bool RpgAction::SetNextRpgAction()
 {
-    Strategy* rpgStrategy = botAI->GetAiObjectContext()->GetStrategy("rpg");
-
+    Strategy* rpgStrategy;
     std::vector<Action*> actions;
     std::vector<uint32> relevances;
     std::vector<TriggerNode*> triggerNodes;
-    rpgStrategy->InitTriggers(triggerNodes);
 
-    for (auto& triggerNode : triggerNodes)
+
+    for (auto& strategy : botAI->GetAiObjectContext()->GetSupportedStrategies())
     {
-        Trigger* trigger = context->GetTrigger(triggerNode->getName());
-        if (trigger)
+        if (strategy.find("rpg") == std::string::npos)
+            continue;
+
+        rpgStrategy = botAI->GetAiObjectContext()->GetStrategy(strategy);
+
+        rpgStrategy->InitTriggers(triggerNodes);
+
+        for (auto& triggerNode : triggerNodes)
         {
-            triggerNode->setTrigger(trigger);
+            Trigger* trigger = context->GetTrigger(triggerNode->getName());
 
-            NextAction** nextActions = triggerNode->getHandlers();
-
-            trigger = triggerNode->getTrigger();
-
-            bool isChecked = false;
-            for (int32 i = 0; i < NextAction::size(nextActions); i++)
+            if (trigger)
             {
-                NextAction* nextAction = nextActions[i];
 
-                if (nextAction->getRelevance() > 2.0f)
-                    continue;
+                triggerNode->setTrigger(trigger);
 
-                if (!isChecked && !trigger->IsActive())
-                    break;
+                NextAction** nextActions = triggerNode->getHandlers();
 
-                isChecked = true;
+                Trigger* trigger = triggerNode->getTrigger();
 
-                Action* action = botAI->GetAiObjectContext()->GetAction(nextAction->getName());
+                bool isChecked = false;
 
-                if (!action->isPossible() || !action->isUseful())
-                    continue;
+                for (int32 i = 0; i < NextAction::size(nextActions); i++)
+                {
+                    NextAction* nextAction = nextActions[i];
 
-                actions.push_back(action);
-                relevances.push_back((nextAction->getRelevance() - 1) * 1000);
+                    if (nextAction->getRelevance() > 2.0f)
+                        continue;
+
+                    if (!isChecked && !trigger->IsActive())
+                        break;
+
+                    isChecked = true;
+
+                    Action* action = botAI->GetAiObjectContext()->GetAction(nextAction->getName());
+                    if (!dynamic_cast<RpgEnabled*>(action) || !action->isPossible() || !action->isUseful())
+                        continue;
+
+                    actions.push_back(action);
+                    relevances.push_back((nextAction->getRelevance() - 1) * 1000);
+                }
+                NextAction::destroy(nextActions);
             }
-
-            NextAction::destroy(nextActions);
         }
+
+        for (const auto i : triggerNodes)
+        {
+            delete i;
+        }
+        triggerNodes.clear();
     }
 
     if (actions.empty())
         return false;
 
+    if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_NON_COMBAT))
+    {
+        std::vector<std::pair<Action*, uint32>> sortedActions;
+
+        for (int i = 0; i < actions.size(); i++)
+            sortedActions.push_back(std::make_pair(actions[i], relevances[i]));
+
+        std::sort(sortedActions.begin(), sortedActions.end(), [](std::pair<Action*, uint32>i, std::pair<Action*, uint32> j) {return i.second > j.second; });
+
+        std::stringstream ss;
+        ss << "------" << chat->FormatWorldobject(AI_VALUE(GuidPosition, "rpg target").GetWorldObject()) << "------";
+        bot->Say(ss.str(), LANG_UNIVERSAL);
+        botAI->TellMasterNoFacing(ss.str());
+
+        for (auto action : sortedActions)
+        {
+            std::ostringstream out;
+
+            out << " " << action.first->getName() << " " << action.second;
+
+            botAI->TellMasterNoFacing(out);
+        }
+    }
+
     std::mt19937 gen(time(0));
+
     sTravelMgr->weighted_shuffle(actions.begin(), actions.end(), relevances.begin(), relevances.end(), gen);
 
     Action* action = actions.front();
 
-    for (std::vector<TriggerNode*>::iterator i = triggerNodes.begin(); i != triggerNodes.end(); i++)
+    if ((botAI->HasStrategy("debug", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_NON_COMBAT)))
     {
-        TriggerNode* trigger = *i;
-        delete trigger;
-    }
+        std::ostringstream out;
+        out << "do: ";
+        out << chat->FormatWorldobject(AI_VALUE(GuidPosition, "rpg target").GetWorldObject());
 
-    triggerNodes.clear();
+        out << " " << action->getName();
+
+        botAI->TellMasterNoFacing(out);
+    }
 
     SET_AI_VALUE(std::string, "next rpg action", action->getName());
 

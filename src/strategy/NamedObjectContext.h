@@ -29,7 +29,7 @@ public:
 
     std::string const getQualifier() { return qualifier; }
 
-    static std::string const MultiQualify(std::vector<std::string> qualifiers);
+    static std::string const MultiQualify(std::vector<std::string> qualifiers, const std::string& separator, const std::string_view brackets = "{}");
     static std::vector<std::string> getMultiQualifiers(std::string const qualifier1);
     static int32 getMultiQualifier(std::string const qualifier1, uint32 pos);
 
