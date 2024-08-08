@@ -18,8 +18,6 @@ bool ChangeTalentsAction::Execute(Event event)
 
     std::ostringstream out;
 
-    TalentSpec botSpec(bot);
-
     if (!param.empty())
     {
         if (param.find("help") != std::string::npos)
