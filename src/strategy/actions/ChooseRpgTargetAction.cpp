@@ -294,7 +294,7 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
     if (!botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))
         return true;
 
-    if (sqrt(bot->GetDistance(master)) > sPlayerbotAIConfig->rpgDistance * 2)
+    if (bot->GetDistance(master) > sPlayerbotAIConfig->rpgDistance * 2)
         return false;
 
     Formation* formation = AI_VALUE(Formation*, "formation");
