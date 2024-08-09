@@ -125,7 +125,7 @@ bool AutoReleaseSpiritAction::Execute(Event event)
             mm.Clear();
             mm.MovePoint(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), true);
         }
-        else
+        else if (!botAI->IsRealPlayer()) // below doesnt work properly on realplayer, but its also not needed
         {
             bg_gossip_time = time(NULL);
             WorldPacket packet(CMSG_GOSSIP_HELLO);
@@ -133,7 +133,7 @@ bool AutoReleaseSpiritAction::Execute(Event event)
             bot->GetSession()->HandleGossipHelloOpcode(packet);
         }
     }
-
+    botAI->SetNextCheckDelay(1000);
     return true;
 }
 
