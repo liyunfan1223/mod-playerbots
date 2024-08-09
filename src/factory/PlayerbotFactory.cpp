@@ -3721,6 +3721,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             {
                 continue;
             }
+            
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && bot->getClass() != CLASS_DEATH_KNIGHT)
+                continue;
 
             uint32 requiredLevel = spellInfo->BaseLevel;
             if (requiredLevel > bot->GetLevel())
