@@ -29,9 +29,11 @@ enum StatsType : uint8
     STATS_TYPE_BLOCK_RATING,
     STATS_TYPE_RESILIENCE,
     STATS_TYPE_HEALTH_REGENERATION,
-    // Stats for spell damage and heal
+    // Stats for spell damage
     STATS_TYPE_SPELL_POWER,
     STATS_TYPE_SPELL_PENETRATION,
+    // Stats for heal
+    STATS_TYPE_HEAL_POWER,
     STATS_TYPE_MANA_REGENERATION,
     // Stats for physical damage and melee
     STATS_TYPE_ATTACK_POWER,
@@ -40,14 +42,16 @@ enum StatsType : uint8
     // Stats for weapon dps
     STATS_TYPE_MELEE_DPS,
     STATS_TYPE_RANGED_DPS,
-    STATS_TYPE_MAX = 24
+    STATS_TYPE_MAX = 25
 };
 
-enum class CollectorType
+enum CollectorType : uint8
 {
-    MELEE,
-    RANGED,
-    SPELL
+    MELEE       = 1,
+    RANGED      = 2,
+    SPELL_DMG   = 4,
+    SPELL_HEAL  = 8,
+    SPELL = SPELL_DMG | SPELL_HEAL
 };
 
 class StatsCollector
@@ -57,17 +61,20 @@ public:
     StatsCollector(StatsCollector& stats) = default;
     void Reset();
     void CollectItemStats(ItemTemplate const* proto);
-    void CollectSpellStats(uint32 spellId, bool isTrigger = false);
-    void CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier = 1.0f);
+    void CollectSpellStats(uint32 spellId, bool isTriggered = false);
+    void CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier = 1.0f, bool canNextTrigger = true);
     void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant);
 
 public:
     int32 stats[STATS_TYPE_MAX];
 
 private:
+    bool CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags);
     void CollectByItemStatType(uint32 itemStatType, int32 val);
     bool CollectSpecialCaseSpellStats(uint32 spellId);
     bool CollectSpecialEnchantSpellStats(uint32 enchantSpellId);
+
+    void HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger);
 
 private:
     CollectorType type_;

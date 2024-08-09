@@ -53,7 +53,7 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     }
 }
 
-void StatsCollector::CollectSpellStats(uint32 spellId, bool isTrigger)
+void StatsCollector::CollectSpellStats(uint32 spellId, bool isTriggered)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
@@ -62,172 +62,50 @@ void StatsCollector::CollectSpellStats(uint32 spellId, bool isTrigger)
 
     if (CollectSpecialCaseSpellStats(spellId))
         return;
-    
-    float multiplier = isTrigger ? 0.25f : 1.0f;
 
+    /// @todo Not all triggered spell need this penalty
+    float multiplier = isTriggered ? 0.25f : 1.0f;
+
+    bool canNextTrigger = true;
+
+    uint32 procFlags;
+    const SpellProcEventEntry* eventEntry = sSpellMgr->GetSpellProcEvent(spellInfo->Id);
+    if (eventEntry && eventEntry->procFlags)
+        procFlags = eventEntry->procFlags;
+    else
+        procFlags = spellInfo->ProcFlags;
+
+    if (procFlags && !CanBeTriggeredByType(spellInfo, procFlags))
+        canNextTrigger = false;
+    
+    // if (!eventEntry || eventEntry->cooldown == 0)
+    // {
+
+    // }
+    // if (spellInfo->ProcChance == 100)
+    
     if (spellInfo->StackAmount)
         multiplier *= spellInfo->StackAmount;
-    // spellInfo->ProcFlags
-    // const SpellProcEntry* procEntry = sSpellMgr->GetSpellProcEntry(spellId);
-    // spellInfo->SpellFamilyFlags
-    // spellInfo->ProcFlags
-    // procEntry->SpellTypeMask
+
     for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
     {
         if (spellInfo->IsPositive())
-            CollectPositiveSpellEffectStats(spellInfo->Effects[i], multiplier);
+            CollectPositiveSpellEffectStats(spellInfo->Effects[i], multiplier, canNextTrigger);
     }
 }
 
-void StatsCollector::CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier)
+void StatsCollector::CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger)
 {
-    if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
-        return;
-    
-    int32 val = effectInfo.CalcValue();
-    
-    switch (effectInfo.ApplyAuraName)
+
+    switch (effectInfo.Effect)
     {
-        case SPELL_AURA_MOD_DAMAGE_DONE:
-            // case SPELL_AURA_MOD_HEALING_DONE is duplicated
-            stats[STATS_TYPE_SPELL_POWER] += val * multiplier;
+        case SPELL_EFFECT_APPLY_AURA:
+            HandleApplyAura(effectInfo, multiplier, canNextTrigger);
             break;
-        case SPELL_AURA_MOD_ATTACK_POWER:
-            stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
-            break;
-        case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
-            stats[STATS_TYPE_BLOCK_VALUE] += val * multiplier;
-            break;
-        case SPELL_AURA_MOD_STAT:
-        {
-            uint32 statType = effectInfo.MiscValue;
-            switch (statType)
-            {
-                case STAT_STRENGTH:
-                    stats[STATS_TYPE_STRENGTH] += val * multiplier;
-                    break;
-                case STAT_AGILITY:
-                    stats[STATS_TYPE_AGILITY] += val * multiplier;
-                    break;
-                case STAT_STAMINA:
-                    stats[STATS_TYPE_STAMINA] += val * multiplier;
-                    break;
-                case STAT_INTELLECT:
-                    stats[STATS_TYPE_INTELLECT] += val * multiplier;
-                    break;
-                case STAT_SPIRIT:
-                    stats[STATS_TYPE_SPIRIT] += val * multiplier;
-                    break;
-                case -1: // Stat all
-                    stats[STATS_TYPE_STRENGTH] += val * multiplier;
-                    stats[STATS_TYPE_AGILITY] += val * multiplier;
-                    stats[STATS_TYPE_STAMINA] += val * multiplier;
-                    stats[STATS_TYPE_INTELLECT] += val * multiplier;
-                    stats[STATS_TYPE_SPIRIT] += val * multiplier;
-                    break;
-                default:
-                    break;
-            }
-            break;
-        }
-        case SPELL_AURA_MOD_RESISTANCE:
-        {
-            uint32 statType = effectInfo.MiscValue;
-            if (statType & SPELL_SCHOOL_MASK_NORMAL) // physical
-                stats[STATS_TYPE_ARMOR] += val * multiplier;
-            break;
-        }
-        case SPELL_AURA_MOD_RATING:
-        {
-            for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING; ++rating)
-            {
-                if (effectInfo.MiscValue & (1 << rating))
-                {
-                    switch (rating)
-                    {
-                        case CR_DEFENSE_SKILL:
-                            stats[STATS_TYPE_DEFENSE] += val * multiplier;
-                            break;
-                        case CR_DODGE:
-                            stats[STATS_TYPE_DODGE] += val * multiplier;
-                            break;
-                        case CR_PARRY:
-                            stats[STATS_TYPE_PARRY] += val * multiplier;
-                            break;
-                        case CR_BLOCK:
-                            stats[STATS_TYPE_BLOCK_RATING] += val * multiplier;
-                            break;
-                        case CR_HIT_MELEE:
-                            if (type_ == CollectorType::MELEE)
-                                stats[STATS_TYPE_HIT] += val * multiplier;
-                            break;
-                        case CR_HIT_RANGED:
-                            if (type_ == CollectorType::RANGED)
-                                stats[STATS_TYPE_HIT] += val * multiplier;
-                            break;
-                        case CR_HIT_SPELL:
-                            if (type_ == CollectorType::SPELL)
-                                stats[STATS_TYPE_HIT] += val * multiplier;
-                            break;
-                        case CR_CRIT_MELEE:
-                            if (type_ == CollectorType::MELEE)
-                                stats[STATS_TYPE_CRIT] += val * multiplier;
-                            break;
-                        case CR_CRIT_RANGED:
-                            if (type_ == CollectorType::RANGED)
-                                stats[STATS_TYPE_CRIT] += val * multiplier;
-                            break;
-                        case CR_CRIT_SPELL:
-                            if (type_ == CollectorType::SPELL)
-                                stats[STATS_TYPE_CRIT] += val * multiplier;
-                            break;
-                        case CR_HASTE_MELEE:
-                            if (type_ == CollectorType::MELEE)
-                                stats[STATS_TYPE_HASTE] += val * multiplier;
-                            break;
-                        case CR_HASTE_RANGED:
-                            if (type_ == CollectorType::RANGED)
-                                stats[STATS_TYPE_HASTE] += val * multiplier;
-                            break;
-                        case CR_HASTE_SPELL:
-                            if (type_ == CollectorType::SPELL)
-                                stats[STATS_TYPE_HASTE] += val * multiplier;
-                            break;
-                        case CR_EXPERTISE:
-                            stats[STATS_TYPE_EXPERTISE] += val * multiplier;
-                            break;
-                        case CR_ARMOR_PENETRATION:
-                            stats[STATS_TYPE_ARMOR_PENETRATION] += val * multiplier;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                break;
-            }
-        }
-        case SPELL_AURA_MOD_POWER_REGEN:
-        {
-            uint32 powerType = effectInfo.MiscValue;
-            switch (powerType)
-            {
-                case POWER_MANA:
-                    stats[STATS_TYPE_MANA_REGENERATION] += val * multiplier;
-                default:
-                    break;
-            }
-            break;
-        }
-        case SPELL_AURA_PROC_TRIGGER_SPELL:
-        {
-            CollectSpellStats(effectInfo.TriggerSpell, true);
-            break;
-        }
-        case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
-        {
-            CollectSpellStats(effectInfo.TriggerSpell, true);
-            break;
-        }
+        // case SPELL_EFFECT_HEAL:
+        //     int32 val = effectInfo.CalcValue();
+        //     stats[STATS_TYPE_HEAL_POWER] += (float)val / 5 * multiplier;
+        //     break;
         default:
             break;
     }
@@ -271,16 +149,16 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
     }
 }
 
-/// @todo Special case for some spell that hard to calculate, like trinket, libram, etc.
+/// @todo Special case for some spell that hard to calculate, like trinket, relic, etc.
 bool StatsCollector::CollectSpecialCaseSpellStats(uint32 spellId) {
     // trinket
     switch (spellId)
     {
         case 71519: // Deathbringer's Will
-            stats[STATS_TYPE_ATTACK_POWER] += 400;
+            stats[STATS_TYPE_ATTACK_POWER] += 350;
             return true;
-        case 71562: // Deathbringer's Will
-            stats[STATS_TYPE_ATTACK_POWER] += 450;
+        case 71562: // Deathbringer's Will (heroic)
+            stats[STATS_TYPE_ATTACK_POWER] += 400;
             return true;
         default:
             break;
@@ -324,7 +202,20 @@ bool StatsCollector::CollectSpecialEnchantSpellStats(uint32 enchantSpellId)
         //         stats[STATS_TYPE_PARRY] += 50;
         //     }
         //     return true;
-        case 64571:
+        case 53365: // Rune of the Fallen Crusader
+            if (type_ == CollectorType::MELEE)
+            {
+                stats[STATS_TYPE_STRENGTH] += 60;
+            }
+            return true;
+        case 62157: // Rune of the Stoneskin Gargoyle
+            if (type_ == CollectorType::MELEE)
+            {
+                stats[STATS_TYPE_DEFENSE] += 25;
+                stats[STATS_TYPE_STAMINA] += 40;
+            }
+            return true;
+        case 64571: // Blood draining
             if (type_ == CollectorType::MELEE)
             {
                 stats[STATS_TYPE_STAMINA] += 50;
@@ -333,49 +224,105 @@ bool StatsCollector::CollectSpecialEnchantSpellStats(uint32 enchantSpellId)
         default:
             break;
     }
-    {
-        int allStatsAmount = 0;
-        switch (enchantSpellId)
-        {
-            case 13624:
-                allStatsAmount = 1;
-                break;
-            case 13625:
-                allStatsAmount = 2;
-                break;
-            case 13824:
-                allStatsAmount = 3;
-                break;
-            case 19988:
-            case 44627:
-            case 56527:
-                allStatsAmount = 4;
-                break;
-            case 27959:
-            case 56529:
-                allStatsAmount = 6;
-                break;
-            case 44624:
-                allStatsAmount = 8;
-                break;
-            case 60694:
-            case 68251:
-                allStatsAmount = 10;
-                break;
-            default:
-                break;
-        }
-        if (allStatsAmount != 0)
-        {
-            stats[STATS_TYPE_AGILITY] += allStatsAmount;
-            stats[STATS_TYPE_STRENGTH] += allStatsAmount;
-            stats[STATS_TYPE_INTELLECT] += allStatsAmount;
-            stats[STATS_TYPE_SPIRIT] += allStatsAmount;
-            stats[STATS_TYPE_STAMINA] += allStatsAmount;
-            return true;
-        }
-    }
+    // {
+    //     int allStatsAmount = 0;
+    //     switch (enchantSpellId)
+    //     {
+    //         case 13624:
+    //             allStatsAmount = 1;
+    //             break;
+    //         case 13625:
+    //             allStatsAmount = 2;
+    //             break;
+    //         case 13824:
+    //             allStatsAmount = 3;
+    //             break;
+    //         case 19988:
+    //         case 44627:
+    //         case 56527:
+    //             allStatsAmount = 4;
+    //             break;
+    //         case 27959:
+    //         case 56529:
+    //             allStatsAmount = 6;
+    //             break;
+    //         case 44624:
+    //             allStatsAmount = 8;
+    //             break;
+    //         case 60694:
+    //         case 68251:
+    //             allStatsAmount = 10;
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    //     if (allStatsAmount != 0)
+    //     {
+    //         stats[STATS_TYPE_AGILITY] += allStatsAmount;
+    //         stats[STATS_TYPE_STRENGTH] += allStatsAmount;
+    //         stats[STATS_TYPE_INTELLECT] += allStatsAmount;
+    //         stats[STATS_TYPE_SPIRIT] += allStatsAmount;
+    //         stats[STATS_TYPE_STAMINA] += allStatsAmount;
+    //         return true;
+    //     }
+    // }
 
+    return false;
+}
+
+bool StatsCollector::CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags)
+{
+    const SpellProcEventEntry* eventEntry = sSpellMgr->GetSpellProcEvent(spellInfo->Id);
+    uint32 spellFamilyName = eventEntry ? eventEntry->spellFamilyName : 0;
+
+    if (spellFamilyName != 0)
+        /// @todo Check specific trigger spell by spellFamilyMask
+        return true;
+
+    uint32 triggerMask = TAKEN_HIT_PROC_FLAG_MASK; // Generic trigger mask
+    switch (type_) {
+        case CollectorType::MELEE:
+        {
+            triggerMask |= MELEE_PROC_FLAG_MASK;
+            triggerMask |= SPELL_PROC_FLAG_MASK;
+            triggerMask |= PERIODIC_PROC_FLAG_MASK;
+            if (procFlags & triggerMask)
+                return true;
+            break;
+        }
+        case CollectorType::RANGED:
+        {
+            triggerMask |= RANGED_PROC_FLAG_MASK;
+            triggerMask |= SPELL_PROC_FLAG_MASK;
+            triggerMask |= PERIODIC_PROC_FLAG_MASK;
+            if (procFlags & triggerMask)
+                return true;
+            break;
+        }
+        case CollectorType::SPELL_DMG:
+        {
+            triggerMask |= SPELL_PROC_FLAG_MASK;
+            // Healing spell cannot trigger
+            triggerMask &= ~PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS;
+            triggerMask &= ~PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS;
+            if (procFlags & triggerMask)
+                return true;
+            break;
+        }
+        case CollectorType::SPELL_HEAL:
+        {
+            triggerMask |= SPELL_PROC_FLAG_MASK;
+            // Dmg spell should not trigger
+            triggerMask &= ~PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG;
+            triggerMask &= ~PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
+            triggerMask &= ~PROC_FLAG_DONE_PERIODIC; // spellFamilyName = 0 and PROC_FLAG_DONE_PERIODIC -> it is a dmg spell
+            if (procFlags & triggerMask)
+                return true;
+            break;
+        }
+        default:
+            break;
+    }
     return false;
 }
 
@@ -481,6 +428,7 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
             break;
         case ITEM_MOD_SPELL_POWER:
             stats[STATS_TYPE_SPELL_POWER] += val;
+            stats[STATS_TYPE_HEAL_POWER] += val;
             break;
         case ITEM_MOD_HEALTH_REGEN:
             stats[STATS_TYPE_HEALTH_REGENERATION] += val;
@@ -493,6 +441,174 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
             break;
         case ITEM_MOD_SPELL_HEALING_DONE:  // deprecated
         case ITEM_MOD_SPELL_DAMAGE_DONE:   // deprecated
+        default:
+            break;
+    }
+}
+
+void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger)
+{
+    if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
+        return;
+    
+    int32 val = effectInfo.CalcValue();
+    
+    switch (effectInfo.ApplyAuraName)
+    {
+        case SPELL_AURA_MOD_DAMAGE_DONE:
+        {
+            int32 schoolType = effectInfo.MiscValue;
+            if (schoolType & SPELL_SCHOOL_MASK_NORMAL)
+                stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
+            if ((schoolType & SPELL_SCHOOL_MASK_MAGIC) == SPELL_SCHOOL_MASK_MAGIC)
+                stats[STATS_TYPE_SPELL_POWER] += val * multiplier;
+            break;
+        }
+        case SPELL_AURA_MOD_HEALING_DONE:
+            stats[STATS_TYPE_HEAL_POWER] += val * multiplier;
+            break;
+        case SPELL_AURA_MOD_ATTACK_POWER:
+            stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
+            break;
+        case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
+            if (type_ == CollectorType::RANGED)
+                stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
+            break;
+        case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
+            stats[STATS_TYPE_BLOCK_VALUE] += val * multiplier;
+            break;
+        case SPELL_AURA_MOD_STAT:
+        {
+            int32 statType = effectInfo.MiscValue;
+            switch (statType)
+            {
+                case STAT_STRENGTH:
+                    stats[STATS_TYPE_STRENGTH] += val * multiplier;
+                    break;
+                case STAT_AGILITY:
+                    stats[STATS_TYPE_AGILITY] += val * multiplier;
+                    break;
+                case STAT_STAMINA:
+                    stats[STATS_TYPE_STAMINA] += val * multiplier;
+                    break;
+                case STAT_INTELLECT:
+                    stats[STATS_TYPE_INTELLECT] += val * multiplier;
+                    break;
+                case STAT_SPIRIT:
+                    stats[STATS_TYPE_SPIRIT] += val * multiplier;
+                    break;
+                case -1: // Stat all
+                    stats[STATS_TYPE_STRENGTH] += val * multiplier;
+                    stats[STATS_TYPE_AGILITY] += val * multiplier;
+                    stats[STATS_TYPE_STAMINA] += val * multiplier;
+                    stats[STATS_TYPE_INTELLECT] += val * multiplier;
+                    stats[STATS_TYPE_SPIRIT] += val * multiplier;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        case SPELL_AURA_MOD_RESISTANCE:
+        {
+            int32 statType = effectInfo.MiscValue;
+            if (statType & SPELL_SCHOOL_MASK_NORMAL) // physical
+                stats[STATS_TYPE_ARMOR] += val * multiplier;
+            break;
+        }
+        case SPELL_AURA_MOD_RATING:
+        {
+            for (uint32 rating = CR_WEAPON_SKILL; rating < MAX_COMBAT_RATING; ++rating)
+            {
+                if (effectInfo.MiscValue & (1 << rating))
+                {
+                    switch (rating)
+                    {
+                        case CR_DEFENSE_SKILL:
+                            stats[STATS_TYPE_DEFENSE] += val * multiplier;
+                            break;
+                        case CR_DODGE:
+                            stats[STATS_TYPE_DODGE] += val * multiplier;
+                            break;
+                        case CR_PARRY:
+                            stats[STATS_TYPE_PARRY] += val * multiplier;
+                            break;
+                        case CR_BLOCK:
+                            stats[STATS_TYPE_BLOCK_RATING] += val * multiplier;
+                            break;
+                        case CR_HIT_MELEE:
+                            if (type_ == CollectorType::MELEE)
+                                stats[STATS_TYPE_HIT] += val * multiplier;
+                            break;
+                        case CR_HIT_RANGED:
+                            if (type_ == CollectorType::RANGED)
+                                stats[STATS_TYPE_HIT] += val * multiplier;
+                            break;
+                        case CR_HIT_SPELL:
+                            if (type_ == CollectorType::SPELL)
+                                stats[STATS_TYPE_HIT] += val * multiplier;
+                            break;
+                        case CR_CRIT_MELEE:
+                            if (type_ == CollectorType::MELEE)
+                                stats[STATS_TYPE_CRIT] += val * multiplier;
+                            break;
+                        case CR_CRIT_RANGED:
+                            if (type_ == CollectorType::RANGED)
+                                stats[STATS_TYPE_CRIT] += val * multiplier;
+                            break;
+                        case CR_CRIT_SPELL:
+                            if (type_ == CollectorType::SPELL)
+                                stats[STATS_TYPE_CRIT] += val * multiplier;
+                            break;
+                        case CR_HASTE_MELEE:
+                            if (type_ == CollectorType::MELEE)
+                                stats[STATS_TYPE_HASTE] += val * multiplier;
+                            break;
+                        case CR_HASTE_RANGED:
+                            if (type_ == CollectorType::RANGED)
+                                stats[STATS_TYPE_HASTE] += val * multiplier;
+                            break;
+                        case CR_HASTE_SPELL:
+                            if (type_ == CollectorType::SPELL)
+                                stats[STATS_TYPE_HASTE] += val * multiplier;
+                            break;
+                        case CR_EXPERTISE:
+                            stats[STATS_TYPE_EXPERTISE] += val * multiplier;
+                            break;
+                        case CR_ARMOR_PENETRATION:
+                            stats[STATS_TYPE_ARMOR_PENETRATION] += val * multiplier;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                break;
+            }
+        }
+        case SPELL_AURA_MOD_POWER_REGEN:
+        {
+            int32 powerType = effectInfo.MiscValue;
+            switch (powerType)
+            {
+                case POWER_MANA:
+                    stats[STATS_TYPE_MANA_REGENERATION] += val * multiplier;
+                default:
+                    break;
+            }
+            break;
+        }
+        case SPELL_AURA_PROC_TRIGGER_SPELL:
+        {
+            if (canNextTrigger)
+                CollectSpellStats(effectInfo.TriggerSpell, true);
+            break;
+        }
+        case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+        {
+            if (canNextTrigger)
+                CollectSpellStats(effectInfo.TriggerSpell, true);
+            break;
+        }
         default:
             break;
     }

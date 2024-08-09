@@ -17,8 +17,10 @@
 
 StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
 {
-    if (PlayerbotAI::IsCaster(player))
-        type_ = CollectorType::SPELL;
+    if (PlayerbotAI::IsHeal(player))
+        type_ = CollectorType::SPELL_HEAL;
+    else if (PlayerbotAI::IsCaster(player))
+        type_ = CollectorType::SPELL_DMG;
     else if (PlayerbotAI::IsMelee(player))
         type_ = CollectorType::MELEE;
     else
@@ -179,7 +181,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     {
         stats_weights_[STATS_TYPE_INTELLECT] += 0.5f;
         stats_weights_[STATS_TYPE_SPIRIT] += 0.5f;
-        stats_weights_[STATS_TYPE_SPELL_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_HEAL_POWER] += 1.0f;
         stats_weights_[STATS_TYPE_MANA_REGENERATION] += 0.5f;
         stats_weights_[STATS_TYPE_CRIT] += 0.5f;
         stats_weights_[STATS_TYPE_HASTE] += 1.0f;
