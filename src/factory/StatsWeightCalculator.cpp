@@ -179,11 +179,11 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
              (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_RESTORATION) ||  // heal
              (cls == CLASS_DRUID && tab == DRUID_TAB_RESTORATION))
     {
-        stats_weights_[STATS_TYPE_INTELLECT] += 0.5f;
-        stats_weights_[STATS_TYPE_SPIRIT] += 0.5f;
+        stats_weights_[STATS_TYPE_INTELLECT] += 0.8f;
+        stats_weights_[STATS_TYPE_SPIRIT] += 0.8f;
         stats_weights_[STATS_TYPE_HEAL_POWER] += 1.0f;
-        stats_weights_[STATS_TYPE_MANA_REGENERATION] += 0.5f;
-        stats_weights_[STATS_TYPE_CRIT] += 0.5f;
+        stats_weights_[STATS_TYPE_MANA_REGENERATION] += 1.5f;
+        stats_weights_[STATS_TYPE_CRIT] += 0.7f;
         stats_weights_[STATS_TYPE_HASTE] += 1.0f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 1.0f;
     }
@@ -446,23 +446,23 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
         {
             float defense_current, defense_overflow;
             defense_current = player->GetRatingBonusValue(CR_DEFENSE_SKILL);
-            defense_overflow = EXPERTISE_OVERFLOW;
+            defense_overflow = DEFENSE_OVERFLOW;
             if (defense_current >= defense_overflow)
-                stats_weights_[STATS_TYPE_EXPERTISE] /= 2;
+                stats_weights_[STATS_TYPE_DEFENSE] /= 2;
             else if (defense_current >= defense_overflow * 0.8)
-                stats_weights_[STATS_TYPE_EXPERTISE] /= 1.5;
+                stats_weights_[STATS_TYPE_DEFENSE] /= 1.5;
         }
     }
 
     {
         if (type_ == CollectorType::MELEE || type_ == CollectorType::RANGED)
         {
-            float armor_pnetration_current, armor_pnetration_overflow;
-            armor_pnetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
-            armor_pnetration_overflow = EXPERTISE_OVERFLOW;
-            if (armor_pnetration_current >= armor_pnetration_overflow)
+            float armor_penetration_current, armor_penetration_overflow;
+            armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
+            armor_penetration_overflow = ARMOR_PENETRATION_OVERFLOW;
+            if (armor_penetration_current >= armor_penetration_overflow)
                 stats_weights_[STATS_TYPE_ARMOR_PENETRATION] = 0.0f;
-            if (armor_pnetration_current >= armor_pnetration_overflow * 0.8)
+            if (armor_penetration_current >= armor_penetration_overflow * 0.8)
                 stats_weights_[STATS_TYPE_ARMOR_PENETRATION] /= 1.5;
         }
     }

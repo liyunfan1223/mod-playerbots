@@ -61,8 +61,7 @@ public:
     StatsCollector(StatsCollector& stats) = default;
     void Reset();
     void CollectItemStats(ItemTemplate const* proto);
-    void CollectSpellStats(uint32 spellId, bool isTriggered = false);
-    void CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier = 1.0f, bool canNextTrigger = true);
+    void CollectSpellStats(uint32 spellId, float multiplier = 1.0f, int32 spellCooldown = -1);
     void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant);
 
 public:
@@ -71,11 +70,12 @@ public:
 private:
     bool CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags);
     void CollectByItemStatType(uint32 itemStatType, int32 val);
-    bool CollectSpecialCaseSpellStats(uint32 spellId);
-    bool CollectSpecialEnchantSpellStats(uint32 enchantSpellId);
+    bool SpecialSpellFilter(uint32 spellId);
+    bool SpecialEnchantFilter(uint32 enchantSpellId);
 
-    void HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger);
-
+    void HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger, uint32 triggerCooldown);
+    int32 AverageValue(const SpellEffectInfo& effectInfo);
+    
 private:
     CollectorType type_;
 };

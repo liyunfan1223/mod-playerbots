@@ -43,7 +43,7 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     }
     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
     {
-        CollectSpellStats(proto->Spells[j].SpellId, proto->Spells[j].SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP);
+        CollectSpellStats(proto->Spells[j].SpellId, 1.0f, proto->Spells[j].SpellCooldown);
     }
 
     if (proto->socketBonus)
@@ -53,23 +53,23 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     }
 }
 
-void StatsCollector::CollectSpellStats(uint32 spellId, bool isTriggered)
+void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 spellCooldown)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
     if (!spellInfo)
         return;
 
-    if (CollectSpecialCaseSpellStats(spellId))
+    if (SpecialSpellFilter(spellId))
         return;
 
-    /// @todo Not all triggered spell need this penalty
-    float multiplier = isTriggered ? 0.25f : 1.0f;
+    const SpellProcEventEntry* eventEntry = sSpellMgr->GetSpellProcEvent(spellInfo->Id);
+
+    uint32 triggerCooldown = eventEntry ? eventEntry->cooldown : 0;
 
     bool canNextTrigger = true;
 
     uint32 procFlags;
-    const SpellProcEventEntry* eventEntry = sSpellMgr->GetSpellProcEvent(spellInfo->Id);
     if (eventEntry && eventEntry->procFlags)
         procFlags = eventEntry->procFlags;
     else
@@ -77,37 +77,55 @@ void StatsCollector::CollectSpellStats(uint32 spellId, bool isTriggered)
 
     if (procFlags && !CanBeTriggeredByType(spellInfo, procFlags))
         canNextTrigger = false;
-    
-    // if (!eventEntry || eventEntry->cooldown == 0)
-    // {
-
-    // }
-    // if (spellInfo->ProcChance == 100)
-    
     if (spellInfo->StackAmount)
-        multiplier *= spellInfo->StackAmount;
+    {
+        multiplier *= 0.2f + spellInfo->StackAmount * 0.8;
+    }
 
     for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
     {
-        if (spellInfo->IsPositive())
-            CollectPositiveSpellEffectStats(spellInfo->Effects[i], multiplier, canNextTrigger);
-    }
-}
+        const SpellEffectInfo& effectInfo = spellInfo->Effects[i];
+        switch (effectInfo.Effect)
+        {
+            case SPELL_EFFECT_APPLY_AURA:
+            {
+                /// @todo Handle negative spell
+                if (!spellInfo->IsPositive())
+                    break;
 
-void StatsCollector::CollectPositiveSpellEffectStats(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger)
-{
+                float coverage;
+                if (spellCooldown <= 2000 || spellInfo->GetDuration() == -1)
+                    coverage = 1.0f;
+                else
+                    coverage = std::min(1.0f, (float)spellInfo->GetDuration() / (spellInfo->GetDuration() + spellCooldown));
 
-    switch (effectInfo.Effect)
-    {
-        case SPELL_EFFECT_APPLY_AURA:
-            HandleApplyAura(effectInfo, multiplier, canNextTrigger);
-            break;
-        // case SPELL_EFFECT_HEAL:
-        //     int32 val = effectInfo.CalcValue();
-        //     stats[STATS_TYPE_HEAL_POWER] += (float)val / 5 * multiplier;
-        //     break;
-        default:
-            break;
+                multiplier *= coverage;
+                HandleApplyAura(effectInfo, multiplier, canNextTrigger, triggerCooldown);
+                break;
+            }
+            case SPELL_EFFECT_HEAL:
+            {
+                if (!spellCooldown)
+                    break;
+                float normalizedCd = std::max(spellCooldown, 5000);
+                int32 val = AverageValue(effectInfo);
+                stats[STATS_TYPE_HEAL_POWER] += (float)val / (normalizedCd / 1000) * multiplier;
+                break;
+            }
+            case SPELL_EFFECT_ENERGIZE:
+            {
+                if (!spellCooldown)
+                    break;
+                if (effectInfo.MiscValue != POWER_MANA)
+                    break;
+                float normalizedCd = std::max(spellCooldown, 5000);
+                int32 val = AverageValue(effectInfo);
+                stats[STATS_TYPE_MANA_REGENERATION] += (float)val / (normalizedCd / 1000 / 5) * multiplier;
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
@@ -119,7 +137,7 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
         uint32 enchant_amount = enchant->amount[s];
         uint32 enchant_spell_id = enchant->spellid[s];
 
-        if (CollectSpecialEnchantSpellStats(enchant_spell_id))
+        if (SpecialEnchantFilter(enchant_spell_id))
             continue;
 
         switch (enchant_display_type)
@@ -150,16 +168,27 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
 }
 
 /// @todo Special case for some spell that hard to calculate, like trinket, relic, etc.
-bool StatsCollector::CollectSpecialCaseSpellStats(uint32 spellId) {
+bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
     // trinket
     switch (spellId)
     {
+        case 67702: // Death's Verdict
+            stats[STATS_TYPE_ATTACK_POWER] += 225;
+            return true;
+        case 67771: // Death's Verdict (heroic)
+            stats[STATS_TYPE_ATTACK_POWER] += 260;
+            return true;
         case 71519: // Deathbringer's Will
             stats[STATS_TYPE_ATTACK_POWER] += 350;
             return true;
         case 71562: // Deathbringer's Will (heroic)
             stats[STATS_TYPE_ATTACK_POWER] += 400;
             return true;
+        case 71602: // Dislodged Foreign Object
+            /// @todo The item can be triggered by heal spell, which mismatch with it's description
+            /// Noticing that heroic item can not be triggered, probably a bug to report to AC
+            if (type_ == CollectorType::SPELL_HEAL)
+                return true;
         default:
             break;
     }
@@ -174,34 +203,10 @@ bool StatsCollector::CollectSpecialCaseSpellStats(uint32 spellId) {
     return false;
 }
 
-bool StatsCollector::CollectSpecialEnchantSpellStats(uint32 enchantSpellId)
+bool StatsCollector::SpecialEnchantFilter(uint32 enchantSpellId)
 {
     switch (enchantSpellId)
     {
-        // case 28093:  // mongoose
-        //     if (type_ == CollectorType::MELEE)
-        //     {
-        //         stats[STATS_TYPE_AGILITY] += 40;
-        //     }
-        //     return true;
-        // case 20007:  // crusader
-        //     if (type_ == CollectorType::MELEE)
-        //     {
-        //         stats[STATS_TYPE_STRENGTH] += 30;
-        //     }
-        //     return true;
-        // case 59620:  // Berserk
-        //     if (type_ == CollectorType::MELEE)
-        //     {
-        //         stats[STATS_TYPE_ATTACK_POWER] += 120;
-        //     }
-        //     return true;
-        // case 64440:  // Blade Warding
-        //     if (type_ == CollectorType::MELEE)
-        //     {
-        //         stats[STATS_TYPE_PARRY] += 50;
-        //     }
-        //     return true;
         case 53365: // Rune of the Fallen Crusader
             if (type_ == CollectorType::MELEE)
             {
@@ -212,7 +217,7 @@ bool StatsCollector::CollectSpecialEnchantSpellStats(uint32 enchantSpellId)
             if (type_ == CollectorType::MELEE)
             {
                 stats[STATS_TYPE_DEFENSE] += 25;
-                stats[STATS_TYPE_STAMINA] += 40;
+                stats[STATS_TYPE_STAMINA] += 50;
             }
             return true;
         case 64571: // Blood draining
@@ -224,49 +229,6 @@ bool StatsCollector::CollectSpecialEnchantSpellStats(uint32 enchantSpellId)
         default:
             break;
     }
-    // {
-    //     int allStatsAmount = 0;
-    //     switch (enchantSpellId)
-    //     {
-    //         case 13624:
-    //             allStatsAmount = 1;
-    //             break;
-    //         case 13625:
-    //             allStatsAmount = 2;
-    //             break;
-    //         case 13824:
-    //             allStatsAmount = 3;
-    //             break;
-    //         case 19988:
-    //         case 44627:
-    //         case 56527:
-    //             allStatsAmount = 4;
-    //             break;
-    //         case 27959:
-    //         case 56529:
-    //             allStatsAmount = 6;
-    //             break;
-    //         case 44624:
-    //             allStatsAmount = 8;
-    //             break;
-    //         case 60694:
-    //         case 68251:
-    //             allStatsAmount = 10;
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    //     if (allStatsAmount != 0)
-    //     {
-    //         stats[STATS_TYPE_AGILITY] += allStatsAmount;
-    //         stats[STATS_TYPE_STRENGTH] += allStatsAmount;
-    //         stats[STATS_TYPE_INTELLECT] += allStatsAmount;
-    //         stats[STATS_TYPE_SPIRIT] += allStatsAmount;
-    //         stats[STATS_TYPE_STAMINA] += allStatsAmount;
-    //         return true;
-    //     }
-    // }
-
     return false;
 }
 
@@ -331,9 +293,10 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
     switch (itemStatType)
     {
         case ITEM_MOD_MANA:
+            stats[STATS_TYPE_MANA_REGENERATION] += val / 10;
             break;
         case ITEM_MOD_HEALTH:
-            stats[STATS_TYPE_AGILITY] += val / 12;
+            stats[STATS_TYPE_STAMINA] += val / 12;
             break;
         case ITEM_MOD_AGILITY:
             stats[STATS_TYPE_AGILITY] += val;
@@ -446,12 +409,12 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
     }
 }
 
-void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger)
+void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger, uint32 triggerCooldown)
 {
     if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
         return;
     
-    int32 val = effectInfo.CalcValue();
+    int32 val = AverageValue(effectInfo);
     
     switch (effectInfo.ApplyAuraName)
     {
@@ -600,16 +563,37 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
         case SPELL_AURA_PROC_TRIGGER_SPELL:
         {
             if (canNextTrigger)
-                CollectSpellStats(effectInfo.TriggerSpell, true);
+                CollectSpellStats(effectInfo.TriggerSpell, multiplier, triggerCooldown);
             break;
         }
         case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
         {
             if (canNextTrigger)
-                CollectSpellStats(effectInfo.TriggerSpell, true);
+                CollectSpellStats(effectInfo.TriggerSpell, multiplier, triggerCooldown);
             break;
         }
         default:
             break;
     }
+}
+
+int32 StatsCollector::AverageValue(const SpellEffectInfo& effectInfo)
+{
+    float basePointsPerLevel = effectInfo.RealPointsPerLevel;
+    int32 basePoints = effectInfo.BasePoints;
+    int32 randomPoints = int32(effectInfo.DieSides);
+
+    switch (randomPoints)
+    {
+        case 0:
+            break;
+        case 1:
+            basePoints += 1;
+            break;
+        default:
+            int32 randvalue = (1 + randomPoints) / 2;
+            basePoints += randvalue;
+            break;
+    }
+    return basePoints;
 }

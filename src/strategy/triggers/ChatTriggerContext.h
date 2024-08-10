@@ -121,6 +121,7 @@ public:
         creators["bwl"] = &ChatTriggerContext::bwl;
         creators["dps"] = &ChatTriggerContext::dps;
         creators["disperse"] = &ChatTriggerContext::disperse;
+        creators["calc"] = &ChatTriggerContext::calc;
     }
 
 private:
@@ -221,6 +222,7 @@ private:
     static Trigger* bwl(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "bwl"); }
     static Trigger* dps(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "dps"); }
     static Trigger* disperse(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "disperse"); }
+    static Trigger* calc(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "calc"); }
 };
 
 #endif

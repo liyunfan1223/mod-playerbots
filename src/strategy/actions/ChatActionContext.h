@@ -172,6 +172,7 @@ public:
         creators["naxx chat shortcut"] = &ChatActionContext::naxx_chat_shortcut;
         creators["bwl chat shortcut"] = &ChatActionContext::bwl_chat_shortcut;
         creators["tell expected dps"] = &ChatActionContext::tell_expected_dps;
+        creators["calc"] = &ChatActionContext::calc;
     }
 
 private:
@@ -268,6 +269,7 @@ private:
     static Action* naxx_chat_shortcut(PlayerbotAI* ai) { return new NaxxChatShortcutAction(ai); }
     static Action* bwl_chat_shortcut(PlayerbotAI* ai) { return new BwlChatShortcutAction(ai); }
     static Action* tell_expected_dps(PlayerbotAI* ai) { return new TellExpectedDpsAction(ai); }
+    static Action* calc(PlayerbotAI* ai) { return new TellCalculateItemAction(ai); }
 };
 
 #endif
