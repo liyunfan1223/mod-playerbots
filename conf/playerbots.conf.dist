@@ -1275,6 +1275,9 @@ AiPlayerbot.RandomBotTalk = 0
 # Enable playerbot emote
 AiPlayerbot.RandomBotEmote = 0
 
+#Enable playerbot emote in battleground
+AiPlayerbot.RandomBotEmoteBattleground = 1
+
 # Enable dungeon suggestions for random bots
 AiPlayerbot.RandomBotSuggestDungeons = 1
 

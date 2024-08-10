@@ -687,11 +687,13 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     if (player->InBattleground() && player->GetBattleground())
     {
         nonCombatEngine->addStrategies("nc", "chat", "default", "buff", "food", "mount", "pvp", "dps assist",
-                                       "attack tagged", "emote", nullptr);
+                                       "attack tagged", nullptr);
         nonCombatEngine->removeStrategy("custom::say");
         nonCombatEngine->removeStrategy("travel");
         nonCombatEngine->removeStrategy("rpg");
         nonCombatEngine->removeStrategy("grind");
+        if (sPlayerbotAIConfig->randomBotEmoteBattleground)
+            nonCombatEngine->addStrategy("emote");
 
         BattlegroundTypeId bgType = player->GetBattlegroundTypeId();
         if (bgType == BATTLEGROUND_RB)

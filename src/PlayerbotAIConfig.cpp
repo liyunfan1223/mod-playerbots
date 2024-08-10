@@ -162,6 +162,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotJoinLfg = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotJoinLfg", true);
     randomBotTalk = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotTalk", false);
     randomBotEmote = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotEmote", false);
+    randomBotEmoteBattleground = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotEmoteBattleground", true);
     randomBotSuggestDungeons = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotSuggestDungeons", true);
     randomBotGuildTalk = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotGuildTalk", false);
     suggestDungeonsInLowerCaseRandomly =

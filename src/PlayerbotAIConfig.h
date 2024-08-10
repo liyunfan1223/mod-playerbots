@@ -97,6 +97,7 @@ public:
     bool randomBotJoinLfg;
     bool randomBotTalk;
     bool randomBotEmote;
+    bool randomBotEmoteBattleground;
     bool randomBotSuggestDungeons;
     bool randomBotGuildTalk;
     bool suggestDungeonsInLowerCaseRandomly;
