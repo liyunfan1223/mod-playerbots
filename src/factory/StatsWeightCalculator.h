@@ -52,7 +52,8 @@ private:
     int tab;
     bool enable_overflow_penalty_;
     bool enable_item_set_bonus_;
-
+    bool enable_quality_blend_;
+    
     float weight_;
     float stats_weights_[STATS_TYPE_MAX];
 };

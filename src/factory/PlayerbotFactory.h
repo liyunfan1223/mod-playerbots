@@ -158,6 +158,7 @@ private:
     void ResetQuests();
     void InitPotions();
 
+    std::vector<uint32> GetCurrentGemsCount();
     bool CanEquipArmor(ItemTemplate const* proto);
     bool CanEquipWeapon(ItemTemplate const* proto);
     void EnchantItem(Item* item);

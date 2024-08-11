@@ -43,7 +43,26 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     }
     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
     {
-        CollectSpellStats(proto->Spells[j].SpellId, 1.0f, proto->Spells[j].SpellCooldown);
+        switch (proto->Spells[j].SpellTrigger)
+        {
+            case ITEM_SPELLTRIGGER_ON_USE:
+                CollectSpellStats(proto->Spells[j].SpellId, 1.0f, proto->Spells[j].SpellCooldown);
+                break;
+            case ITEM_SPELLTRIGGER_ON_EQUIP:
+                CollectSpellStats(proto->Spells[j].SpellId, 1.0f, 0);
+                break;
+            case ITEM_SPELLTRIGGER_CHANCE_ON_HIT:
+                if (type_ == CollectorType::MELEE)
+                {
+                    if (proto->Spells[j].SpellPPMRate > 0.01f)
+                        CollectSpellStats(proto->Spells[j].SpellId, 1.0f, 60000 / proto->Spells[j].SpellPPMRate);
+                    else
+                        CollectSpellStats(proto->Spells[j].SpellId, 1.0f, 60000 / 1.8f); // Default PPM = 1.8
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     if (proto->socketBonus)
@@ -79,7 +98,13 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 s
         canNextTrigger = false;
     if (spellInfo->StackAmount)
     {
-        multiplier *= 0.2f + spellInfo->StackAmount * 0.8;
+        // Heuristic multiplier for stackAmount since high stackAmount may not be available
+        if (spellInfo->StackAmount <= 10)
+            multiplier *= spellInfo->StackAmount * 0.6;
+        else if (spellInfo->StackAmount <= 20)
+            multiplier *= 6 + (spellInfo->StackAmount - 10) * 0.4;
+        else
+            multiplier *= 10;
     }
 
     for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
@@ -105,22 +130,45 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 s
             }
             case SPELL_EFFECT_HEAL:
             {
+                /// @todo Handle spell without cooldown
                 if (!spellCooldown)
                     break;
-                float normalizedCd = std::max(spellCooldown, 5000);
+                float normalizedCd = std::max((float)spellCooldown / 1000, 5.0f);
                 int32 val = AverageValue(effectInfo);
-                stats[STATS_TYPE_HEAL_POWER] += (float)val / (normalizedCd / 1000) * multiplier;
+                float transfer_multiplier = 1;
+                stats[STATS_TYPE_HEAL_POWER] += (float)val / normalizedCd * multiplier * transfer_multiplier;
                 break;
             }
             case SPELL_EFFECT_ENERGIZE:
             {
+                /// @todo Handle spell without cooldown
                 if (!spellCooldown)
                     break;
                 if (effectInfo.MiscValue != POWER_MANA)
                     break;
-                float normalizedCd = std::max(spellCooldown, 5000);
+                float normalizedCd = std::max((float)spellCooldown / 1000, 5.0f);
                 int32 val = AverageValue(effectInfo);
-                stats[STATS_TYPE_MANA_REGENERATION] += (float)val / (normalizedCd / 1000 / 5) * multiplier;
+                float transfer_multiplier = 0.2;
+                stats[STATS_TYPE_MANA_REGENERATION] += (float)val / normalizedCd * multiplier * transfer_multiplier;
+                break;
+            }
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            {
+                /// @todo Handle spell without cooldown
+                if (!spellCooldown)
+                    break;
+                float normalizedCd = std::max((float)spellCooldown / 1000, 5.0f);
+                int32 val = AverageValue(effectInfo);
+                if (type_ == CollectorType::MELEE || type_ == CollectorType::RANGED)
+                {
+                    float transfer_multiplier = 1;
+                    stats[STATS_TYPE_ATTACK_POWER] += (float)val / normalizedCd * multiplier * transfer_multiplier;
+                }
+                else if (type_ == CollectorType::SPELL_DMG)
+                {
+                    float transfer_multiplier = 0.5;
+                    stats[STATS_TYPE_SPELL_POWER] += (float)val / normalizedCd * multiplier * transfer_multiplier;
+                }
                 break;
             }
             default:
@@ -144,12 +192,13 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
         {
             case ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL:
             {
-                CollectSpellStats(enchant_spell_id, true);
+                if (type_ == CollectorType::MELEE)
+                    CollectSpellStats(enchant_spell_id, 0.25f);
                 break;
             }
             case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
             {
-                CollectSpellStats(enchant_spell_id, false);
+                CollectSpellStats(enchant_spell_id, 1.0f);
                 break;
             }
             case ITEM_ENCHANTMENT_TYPE_STAT:
@@ -207,10 +256,16 @@ bool StatsCollector::SpecialEnchantFilter(uint32 enchantSpellId)
 {
     switch (enchantSpellId)
     {
+        case 64440:
+            if (type_ == CollectorType::MELEE)
+            {
+                stats[STATS_TYPE_PARRY] += 50;
+            }
+            return true;
         case 53365: // Rune of the Fallen Crusader
             if (type_ == CollectorType::MELEE)
             {
-                stats[STATS_TYPE_STRENGTH] += 60;
+                stats[STATS_TYPE_STRENGTH] += 75;
             }
             return true;
         case 62157: // Rune of the Stoneskin Gargoyle
@@ -296,7 +351,7 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
             stats[STATS_TYPE_MANA_REGENERATION] += val / 10;
             break;
         case ITEM_MOD_HEALTH:
-            stats[STATS_TYPE_STAMINA] += val / 12;
+            stats[STATS_TYPE_STAMINA] += val / 15;
             break;
         case ITEM_MOD_AGILITY:
             stats[STATS_TYPE_AGILITY] += val;
@@ -545,7 +600,6 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
                             break;
                     }
                 }
-                break;
             }
         }
         case SPELL_AURA_MOD_POWER_REGEN:

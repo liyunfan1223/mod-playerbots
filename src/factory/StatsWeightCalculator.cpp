@@ -32,6 +32,7 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
 
     enable_overflow_penalty_ = true;
     enable_item_set_bonus_ = true;
+    enable_quality_blend_ = true;
 }
 
 void StatsWeightCalculator::Reset()
@@ -68,8 +69,9 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId)
     
     CalculateSocketBonus(player_, proto);
 
-    // Blend with item quality and level
-    weight_ *= (proto->Quality + 1) * proto->ItemLevel;
+    // if (enable_quality_blend_)
+    //     // Blend with item quality and level
+    //     weight_ *= (proto->Quality + 1) * proto->ItemLevel;
     
     return weight_;
 }
@@ -109,42 +111,111 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     stats_weights_[STATS_TYPE_STAMINA] += 0.01f;
     stats_weights_[STATS_TYPE_ARMOR] += 0.001f;
 
-    if (cls == CLASS_HUNTER)
+    if (cls == CLASS_HUNTER && (tab == HUNTER_TAB_BEASTMASTER || tab == HUNTER_TAB_SURVIVAL))
     {
-        stats_weights_[STATS_TYPE_AGILITY] += 2.5f;
+        stats_weights_[STATS_TYPE_AGILITY] += 2.4f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
-        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 2.5f;
-        stats_weights_[STATS_TYPE_HIT] += 2.0f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 1.3f;
+        stats_weights_[STATS_TYPE_HIT] += 1.6f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.5f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.4f;
+        stats_weights_[STATS_TYPE_RANGED_DPS] += 5.0f;
+    } 
+    else if (cls == CLASS_HUNTER && tab == HUNTER_TAB_MARKSMANSHIP)
+    {
+        stats_weights_[STATS_TYPE_AGILITY] += 2.2f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 2.2f;
+        stats_weights_[STATS_TYPE_HIT] += 2.1f;
         stats_weights_[STATS_TYPE_CRIT] += 2.0f;
-        stats_weights_[STATS_TYPE_HASTE] += 2.0f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.8f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 5.0f;
     }
-    else if (cls == CLASS_ROGUE || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL && !PlayerbotAI::IsTank(player)))
+    else if ((cls == CLASS_ROGUE && tab == ROGUE_TAB_COMBAT) || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL && !PlayerbotAI::IsTank(player)))
     {
-        stats_weights_[STATS_TYPE_AGILITY] += 2.0f;
-        stats_weights_[STATS_TYPE_STRENGTH] += 1.0f;
+        stats_weights_[STATS_TYPE_AGILITY] += 1.8f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 1.1f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
-        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 1.5f;
-        stats_weights_[STATS_TYPE_HIT] += 1.5f;
-        stats_weights_[STATS_TYPE_CRIT] += 1.5f;
-        stats_weights_[STATS_TYPE_HASTE] += 1.5f;
-        stats_weights_[STATS_TYPE_EXPERTISE] += 2.5f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 1.2f;
+        stats_weights_[STATS_TYPE_HIT] += 2.0f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.6f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.4f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
-    }
-    else if ((cls == CLASS_PALADIN && tab == 2) ||    // retribution
-             (cls == CLASS_WARRIOR && tab != 2) ||    // arm / fury
-             (cls == CLASS_DEATH_KNIGHT && tab != 0)  // ice / unholy
-    )
+    } 
+    else if (cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY))
     {
-        stats_weights_[STATS_TYPE_AGILITY] += 1.0f;
-        stats_weights_[STATS_TYPE_STRENGTH] += 2.0f;
+        stats_weights_[STATS_TYPE_AGILITY] += 1.7f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 1.1f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
-        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 2.0f;
-        stats_weights_[STATS_TYPE_HIT] += 1.5f;
-        stats_weights_[STATS_TYPE_CRIT] += 1.5f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 1.0f;
+        stats_weights_[STATS_TYPE_HIT] += 1.6f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.3f;
         stats_weights_[STATS_TYPE_HASTE] += 1.5f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
+    }
+    else if (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY)       //  fury
+    {
+        stats_weights_[STATS_TYPE_AGILITY] += 1.8f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 2.6f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 2.1f;
+        stats_weights_[STATS_TYPE_HIT] += 2.3f;
+        stats_weights_[STATS_TYPE_CRIT] += 2.2f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.8f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 2.5f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
+    }
+    else if (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS)       // arm 
+    {
+        stats_weights_[STATS_TYPE_AGILITY] += 1.6f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 2.3f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 1.7f;
+        stats_weights_[STATS_TYPE_HIT] += 2.0f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.9f;
+        stats_weights_[STATS_TYPE_HASTE] += 0.8f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 1.4f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
+    }
+    else if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_FROST) // frost dk
+    {
+        stats_weights_[STATS_TYPE_AGILITY] += 1.8f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 2.6f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 2.1f;
+        stats_weights_[STATS_TYPE_HIT] += 2.3f;
+        stats_weights_[STATS_TYPE_CRIT] += 2.2f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.8f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 2.5f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
+    }
+    else if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_UNHOLY)
+    {
+        stats_weights_[STATS_TYPE_AGILITY] += 0.5f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 2.5f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 1.0f;
+        stats_weights_[STATS_TYPE_HIT] += 1.8f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.0f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.7f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 1.0f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
+    }
+    else if (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION)    // retribution
+    {
+        stats_weights_[STATS_TYPE_AGILITY] += 1.1f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 2.5f;
+        stats_weights_[STATS_TYPE_INTELLECT] += 0.15f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_SPELL_POWER] += 0.3f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 0.8f;
+        stats_weights_[STATS_TYPE_HIT] += 1.9f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.2f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.3f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
     }
     else if ((cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT))  // enhancement
     {
@@ -158,7 +229,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 1.4f;
         stats_weights_[STATS_TYPE_HASTE] += 1.8f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
-        stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 5.2f;
     }
     else if (cls == CLASS_WARLOCK || cls == CLASS_MAGE ||
              (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW) ||     // shadow
@@ -166,11 +237,11 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
              (cls == CLASS_DRUID && tab == DRUID_TAB_BALANCE))        // balance
     {
         stats_weights_[STATS_TYPE_INTELLECT] += 0.5f;
-        stats_weights_[STATS_TYPE_SPIRIT] += 0.5f;
+        stats_weights_[STATS_TYPE_SPIRIT] += 0.4f;
         stats_weights_[STATS_TYPE_SPELL_POWER] += 1.0f;
         stats_weights_[STATS_TYPE_SPELL_PENETRATION] += 1.0f;
-        stats_weights_[STATS_TYPE_HIT] += 1.0f;
-        stats_weights_[STATS_TYPE_CRIT] += 1.0f;
+        stats_weights_[STATS_TYPE_HIT] += 1.1f;
+        stats_weights_[STATS_TYPE_CRIT] += 0.8f;
         stats_weights_[STATS_TYPE_HASTE] += 1.0f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 1.0f;
     }
@@ -182,12 +253,12 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_INTELLECT] += 0.8f;
         stats_weights_[STATS_TYPE_SPIRIT] += 0.8f;
         stats_weights_[STATS_TYPE_HEAL_POWER] += 1.0f;
-        stats_weights_[STATS_TYPE_MANA_REGENERATION] += 1.5f;
+        stats_weights_[STATS_TYPE_MANA_REGENERATION] += 1.2f;
         stats_weights_[STATS_TYPE_CRIT] += 0.7f;
         stats_weights_[STATS_TYPE_HASTE] += 1.0f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 1.0f;
     }
-    else if ((cls == CLASS_WARRIOR && tab == 2) || (cls == CLASS_PALADIN && tab == 1))
+    else if ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) || (cls == CLASS_PALADIN && tab == PALADIN_TAB_PROTECTION))
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.0f;
         stats_weights_[STATS_TYPE_STRENGTH] += 1.0f;
@@ -199,14 +270,14 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_RESILIENCE] += 2.0f;
         stats_weights_[STATS_TYPE_BLOCK_RATING] += 1.0f;
         stats_weights_[STATS_TYPE_BLOCK_VALUE] += 0.5f;
-        stats_weights_[STATS_TYPE_ARMOR] += 0.3f;
+        stats_weights_[STATS_TYPE_ARMOR] += 0.15f;
         stats_weights_[STATS_TYPE_HIT] += 2.0f;
         stats_weights_[STATS_TYPE_CRIT] += 0.2f;
         stats_weights_[STATS_TYPE_HASTE] += 0.5f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 3.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 2.0f;
     }
-    else if (cls == CLASS_DEATH_KNIGHT && tab == 0)
+    else if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_BLOOD)
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.0f;
         stats_weights_[STATS_TYPE_STRENGTH] += 1.0f;
@@ -216,7 +287,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_PARRY] += 2.0f;
         stats_weights_[STATS_TYPE_DODGE] += 2.0f;
         stats_weights_[STATS_TYPE_RESILIENCE] += 2.0f;
-        stats_weights_[STATS_TYPE_ARMOR] += 0.3f;
+        stats_weights_[STATS_TYPE_ARMOR] += 0.15f;
         stats_weights_[STATS_TYPE_HIT] += 2.0f;
         stats_weights_[STATS_TYPE_CRIT] += 0.5f;
         stats_weights_[STATS_TYPE_HASTE] += 0.5f;
@@ -249,7 +320,7 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
     if (cls == CLASS_HUNTER)
     {
         if (player->HasAura(34484))
-            stats_weights_[STATS_TYPE_INTELLECT] += 1.0f;
+            stats_weights_[STATS_TYPE_INTELLECT] += 1.1f;
     }
     else if (cls == CLASS_WARRIOR)
     {
@@ -259,7 +330,7 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
     else if (cls == CLASS_SHAMAN)
     {
         if (player->HasAura(51885))
-            stats_weights_[STATS_TYPE_INTELLECT] += 1.0f;
+            stats_weights_[STATS_TYPE_INTELLECT] += 1.1f;
     }
 }
 
@@ -348,7 +419,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         // enhancement, rogue, ice dk, unholy dk, shield tank, fury warrior without titan's grip but with duel wield
         if (isDoubleHand &&
             ((cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && player_->CanDualWield()) ||
-             (cls == CLASS_ROGUE) || (cls == CLASS_DEATH_KNIGHT && tab != DEATHKNIGT_TAB_BLOOD) ||
+             (cls == CLASS_ROGUE) || (cls == CLASS_DEATH_KNIGHT && tab != DEATHKNIGHT_TAB_BLOOD) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanTitanGrip() && player_->CanDualWield()) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) ||
              (cls == CLASS_PALADIN && tab == PALADIN_TAB_PROTECTION)))
@@ -361,7 +432,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
             ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanDualWield()) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL) ||
              (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION) ||
-             (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGT_TAB_BLOOD) ||
+             (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_BLOOD) ||
              (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && !player_->CanDualWield())))
         {
             weight_ *= 10;

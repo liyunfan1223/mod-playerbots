@@ -2291,6 +2291,7 @@ void PlayerbotFactory::InitClassSpells()
             bot->learnSpell(45462, true);
             bot->learnSpell(45902, true);
             // to leave DK starting area
+            bot->learnSpell(53428, false);
             bot->learnSpell(50977, false);
             break;
         case CLASS_HUNTER:
@@ -2818,6 +2819,52 @@ void PlayerbotFactory::InitPotions()
         if (Item* newItem = StoreNewItemInInventorySlot(bot, itemId, urand(maxCount / 2, maxCount)))
             newItem->AddToUpdateQueueOf(bot);
     }
+}
+
+std::vector<uint32> PlayerbotFactory::GetCurrentGemsCount()
+{
+    std::vector<uint32> curcount(4);
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        Item* pItem2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        if (pItem2 && !pItem2->IsBroken() && pItem2->HasSocket())
+        {
+            for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot <= PRISMATIC_ENCHANTMENT_SLOT; ++enchant_slot)
+            {
+                if (enchant_slot == BONUS_ENCHANTMENT_SLOT)
+                    continue;
+
+                uint32 enchant_id = pItem2->GetEnchantmentId(EnchantmentSlot(enchant_slot));
+                if (!enchant_id)
+                    continue;
+
+                SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                if (!enchantEntry)
+                    continue;
+
+                uint32 gemid = enchantEntry->GemID;
+                if (!gemid)
+                    continue;
+
+                ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(gemid);
+                if (!gemProto)
+                    continue;
+
+                GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(gemProto->GemProperties);
+                if (!gemProperty)
+                    continue;
+
+                uint8 GemColor = gemProperty->color;
+
+                for (uint8 b = 0, tmpcolormask = 1; b < 4; b++, tmpcolormask <<= 1)
+                {
+                    if (tmpcolormask & GemColor)
+                        ++curcount[b];
+                }
+            }
+        }
+    }
+    return curcount;
 }
 
 void PlayerbotFactory::InitFood()
@@ -3641,6 +3688,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
 {
     int32 bestGemEnchantId[4] = {-1, -1, -1, -1};  // 1, 2, 4, 8 color
     float bestGemScore[4] = {0, 0, 0, 0};
+    std::vector<uint32> curCount = GetCurrentGemsCount();
+    int requiredActive = bot->GetLevel() <= 70 ? 2 : 1;
+    std::vector<uint32> availableGems;
     for (const uint32& enchantGem : enchantGemIdCache)
     {
         ItemTemplate const* gemTemplate = sObjectMgr->GetItemTemplate(enchantGem);
@@ -3676,28 +3726,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         {
             continue;
         }
-        StatsWeightCalculator calculator(bot);
-        float score = calculator.CalculateEnchant(enchant_id);
-        if ((gemProperties->color & 1) && score >= bestGemScore[0])
-        {
-            bestGemScore[0] = score;
-            bestGemEnchantId[0] = enchant_id;
-        }
-        if ((gemProperties->color & 2) && score >= bestGemScore[1])
-        {
-            bestGemScore[1] = score;
-            bestGemEnchantId[1] = enchant_id;
-        }
-        if ((gemProperties->color & 4) && score >= bestGemScore[2])
-        {
-            bestGemScore[2] = score;
-            bestGemEnchantId[2] = enchant_id;
-        }
-        if ((gemProperties->color & 8) && score >= bestGemScore[3])
-        {
-            bestGemScore[3] = score;
-            bestGemEnchantId[3] = enchant_id;
-        }
+        availableGems.push_back(enchantGem);
     }
 
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -3721,9 +3750,6 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             {
                 continue;
             }
-            
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && bot->getClass() != CLASS_DEATH_KNIGHT)
-                continue;
 
             uint32 requiredLevel = spellInfo->BaseLevel;
             if (requiredLevel > bot->GetLevel())
@@ -3752,11 +3778,10 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 {
                     continue;
                 }
-                if (enchant->requiredSkill && bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue)
+                if (enchant->requiredSkill && (!bot->HasSkill(enchant->requiredSkill) || (bot->GetSkillValue(enchant->requiredSkill) < enchant->requiredSkillValue)))
                 {
                     continue;
                 }
-
                 if (enchant->requiredLevel > bot->GetLevel())
                 {
                     continue;
@@ -3787,20 +3812,52 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             {
                 continue;
             }
-            int32 gemId;
-            if (1 == socketColor)  // meta
-                gemId = bestGemEnchantId[0];
-            else if (2 == socketColor)  // red
-                gemId = bestGemEnchantId[1];
-            else if (4 == socketColor)  // yellow
-                gemId = bestGemEnchantId[2];
-            else if (8 == socketColor)  // blue
-                gemId = bestGemEnchantId[3];
-            else
+            int32 enchantIdChosen = -1;
+            int32 colorChosen;
+            float bestGemScore = -1;
+            for (uint32 &enchantGem : availableGems)
+            {
+                ItemTemplate const* gemTemplate = sObjectMgr->GetItemTemplate(enchantGem);
+                if (!gemTemplate)
+                    continue;
+
+                const GemPropertiesEntry* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
+                if (!gemProperties)
+                    continue;
+
+                if ((socketColor & gemProperties->color) == 0)
+                    continue;
+
+                uint32 enchant_id = gemProperties->spellitemenchantement;
+                if (!enchant_id)
+                    continue;
+
+                SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                StatsWeightCalculator calculator(bot);
+                float score = calculator.CalculateEnchant(enchant_id);
+                if (curCount[0] != 0)
+                    // Ensure meta gem activation
+                    for (int i = 1; i < curCount.size(); i++)
+                    {
+                        if (curCount[i] < requiredActive && (gemProperties->color & (1 << i)))
+                        {
+                            score *= 2;
+                            break;
+                        }
+                    }
+                if (score > bestGemScore)
+                {
+                    enchantIdChosen = enchant_id;
+                    colorChosen = gemProperties->color;
+                    bestGemScore = score;
+                }
+            }
+            if (enchantIdChosen == -1)
                 continue;
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), false);
-            item->SetEnchantment(EnchantmentSlot(enchant_slot), gemId, 0, 0, bot->GetGUID());
+            item->SetEnchantment(EnchantmentSlot(enchant_slot), enchantIdChosen, 0, 0, bot->GetGUID());
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), true);
+            curCount = GetCurrentGemsCount();
         }
     }
 }
