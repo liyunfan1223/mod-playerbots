@@ -90,7 +90,7 @@ public:
         float z = master->GetPositionZ();
 
         if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                               master->GetPositionZ(), x, y, z))
+                                                               master->GetPositionZ(), x, y, z, false))
             return Formation::NullLocation;
         return WorldLocation(master->GetMapId(), x, y, z);
     }
@@ -135,7 +135,7 @@ public:
             float y = master->GetPositionY() + sin(angle) * range + dy;
             float z = master->GetPositionZ();
             if (!master->GetMap()->CheckCollisionAndGetValidCoords(
-                    master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), x, y, z))
+                    master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), x, y, z, false))
                 return Formation::NullLocation;
             // bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
             // bot->GetPositionZ(), x, y, z);
@@ -146,7 +146,7 @@ public:
         float y = master->GetPositionY() + sin(angle) * range + dy;
         float z = master->GetPositionZ();
         if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                               master->GetPositionZ(), x, y, z))
+                                                               master->GetPositionZ(), x, y, z, false))
             return Formation::NullLocation;
         return WorldLocation(master->GetMapId(), x, y, z);
     }
@@ -200,7 +200,7 @@ public:
         float y = target->GetPositionY() + sin(angle) * range;
         float z = target->GetPositionZ();
         if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                               master->GetPositionZ(), x, y, z))
+                                                               master->GetPositionZ(), x, y, z, false))
             return Formation::NullLocation;
 
         return WorldLocation(bot->GetMapId(), x, y, z);
@@ -363,7 +363,7 @@ public:
             if (minDist)
             {
                 if (!master->GetMap()->CheckCollisionAndGetValidCoords(
-                        master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), x, y, z))
+                        master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), x, y, z, false))
                     return Formation::NullLocation;
                 return WorldLocation(bot->GetMapId(), minX, minY, z);
             }
@@ -372,7 +372,7 @@ public:
         }
 
         if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                               master->GetPositionZ(), x, y, z))
+                                                               master->GetPositionZ(), x, y, z, false))
             return Formation::NullLocation;
         return WorldLocation(bot->GetMapId(), x, y, z);
     }
@@ -635,7 +635,7 @@ WorldLocation MoveFormation::MoveSingleLine(std::vector<Player*> line, float dif
 
             Player* master = botAI->GetMaster();
             if (!master->GetMap()->CheckCollisionAndGetValidCoords(
-                    master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), lx, ly, lz))
+                    master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), lx, ly, lz, false))
                 return Formation::NullLocation;
 
             return WorldLocation(bot->GetMapId(), lx, ly, lz);

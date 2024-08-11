@@ -820,22 +820,28 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
         tx += targetMoveDist * cos(target->GetOrientation());
         ty += targetMoveDist * sin(target->GetOrientation());
         if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(),
-                                                               target->GetPositionZ(), tx, ty, tz))
+                                                               target->GetPositionZ(), tx, ty, tz, false))
         {
             // disable prediction if position is invalid
             tx = target->GetPositionX();
             ty = target->GetPositionY();
             tz = target->GetPositionZ();
         }
+        // Prediction may cause this, which makes ShortenPathUntilDist fail
+        if (bot->GetExactDist(tx, ty, tz) <= distance)
+        {
+            tx = target->GetPositionX();
+            ty = target->GetPositionY();
+            tz = target->GetPositionZ();
+        }
     }
     if (bot->GetExactDist(tx, ty, tz) <= distance)
-    {
         return false;
-    }
     PathGenerator path(bot);
     path.CalculatePath(tx, ty, tz, false);
     PathType type = path.GetPathType();
-    if (type != PATHFIND_NORMAL && type != PATHFIND_INCOMPLETE)
+    int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE;
+    if (!(type & typeOk))
         return false;
     path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), distance);
     G3D::Vector3 endPos = path.GetPath().back();
@@ -881,7 +887,7 @@ bool MovementAction::IsMovingAllowed(Unit* target)
 
 bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
 {
-    // removed sqrt as means distance limit was effectively 22500 (ReactDistance²)
+    // removed sqrt as means distance limit was effectively 22500 (ReactDistanceï¿½)
     // leaving it commented incase we find ReactDistance limit causes problems
     // float distance = sqrt(bot->GetDistance(x, y, z));
     float distance = bot->GetDistance(x, y, z);
@@ -2352,7 +2358,7 @@ bool MoveRandomAction::Execute(Event event)
         x += urand(0, distance) * cos(angle);
         y += urand(0, distance) * sin(angle);
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
-                                                            bot->GetPositionZ(), x, y, z))
+                                                            bot->GetPositionZ(), x, y, z, false))
         {
             continue;
         }
