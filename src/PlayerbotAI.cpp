@@ -2952,7 +2952,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, float x, float y, float z, uint8 
 
     if (!itemTarget)
     {
-        if (sqrt(bot->GetDistance(x, y, z)) > sPlayerbotAIConfig->sightDistance)
+        if (bot->GetDistance(x, y, z) > sPlayerbotAIConfig->sightDistance)
             return false;
     }
 
@@ -3482,21 +3482,9 @@ bool PlayerbotAI::CastVehicleSpell(uint32 spellId, Unit* target)
 
         targets.SetDst(dest);
         targets.SetSpeed(30.0f);
-        float distanceToDest = sqrt(vehicleBase->GetPosition().GetExactDist(dest));
-        float elev = 0.01f;
-        if (distanceToDest < 25.0f)
-            elev = 0.04f;
-        else if (distanceToDest < 55.0f)
-            elev = 0.22f;
-        else if (distanceToDest < 85.0f)
-            elev = 0.42f;
-        else if (distanceToDest < 95.0f)
-            elev = 0.70f;
-        else if (distanceToDest < 110.0f)
-            elev = 0.88f;
-        else
-            elev = 1.0f;
-
+        float dist = vehicleBase->GetPosition().GetExactDist(dest);
+        // very much an approximation of the real projectile arc
+        float elev = dist >= 110.0f ? 1.0f : pow(((dist + 10.0f) / 120.0f), 2.0f);
         targets.SetElevation(elev);
     }
 

@@ -66,7 +66,6 @@ void MovementAction::JumpTo(uint32 mapId, float x, float y, float z)
     float botZ = bot->GetPositionZ();
     float speed = bot->GetSpeed(MOVE_RUN);
     MotionMaster& mm = *bot->GetMotionMaster();
-    botAI->SetNextCheckDelay(1000);
     mm.Clear();
     mm.MoveJump(x, y, z, speed, speed, 1);
     AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000);
@@ -141,7 +140,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
             if (botAI->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
                 CreateWp(bot, point.x, point.y, point.z, 0.0, 2334);
 
-            float distPoint = sqrt(target->GetDistance(point.x, point.y, point.z));
+            float distPoint = target->GetDistance(point.x, point.y, point.z);
             if (distPoint < dist && target->IsWithinLOS(point.x, point.y, point.z + bot->GetCollisionHeight()))
             {
                 dist = distPoint;
@@ -208,7 +207,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             delay = std::max(.0f, delay);
             delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
-            // TODO: is botAI->SetNextCheckDelay() meant to go here or is setting "last movement" value enough? (same question goes for below)
             return true;
         }
     }
@@ -883,7 +881,10 @@ bool MovementAction::IsMovingAllowed(Unit* target)
 
 bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
 {
-    float distance = sqrt(bot->GetDistance(x, y, z));
+    // removed sqrt as means distance limit was effectively 22500 (ReactDistance²)
+    // leaving it commented incase we find ReactDistance limit causes problems
+    // float distance = sqrt(bot->GetDistance(x, y, z));
+    float distance = bot->GetDistance(x, y, z);
     if (!bot->InBattleground() && distance > sPlayerbotAIConfig->reactDistance)
         return false;
 
