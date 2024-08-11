@@ -102,10 +102,11 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 s
         if (spellInfo->StackAmount <= 10)
             multiplier *= spellInfo->StackAmount * 0.6;
         else if (spellInfo->StackAmount <= 20)
-            multiplier *= 6 + (spellInfo->StackAmount - 10) * 0.2;
+            multiplier *= 6 + (spellInfo->StackAmount - 10) * 0.4;
         else
-            multiplier *= 8;
+            multiplier *= 10;
     }
+    
     for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
     {
         const SpellEffectInfo& effectInfo = spellInfo->Effects[i];
@@ -220,6 +221,11 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
     // trinket
     switch (spellId)
     {
+        case 39942: // Darkmoon Card: Wrath
+            if (type_ != CollectorType::SPELL_HEAL)
+                stats[STATS_TYPE_CRIT] += 50;
+            return true;
+            break;
         case 67702: // Death's Verdict
             stats[STATS_TYPE_ATTACK_POWER] += 225;
             return true;
@@ -483,6 +489,9 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
         }
         case SPELL_AURA_MOD_HEALING_DONE:
             stats[STATS_TYPE_HEAL_POWER] += val * multiplier;
+            break;
+        case SPELL_AURA_MOD_INCREASE_HEALTH:
+            stats[STATS_TYPE_STAMINA] += val * multiplier / 15;
             break;
         case SPELL_AURA_MOD_ATTACK_POWER:
             stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
