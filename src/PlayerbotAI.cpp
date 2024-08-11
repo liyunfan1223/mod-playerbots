@@ -1677,7 +1677,7 @@ bool PlayerbotAI::IsTank(Player* player)
     switch (player->getClass())
     {
         case CLASS_DEATH_KNIGHT:
-            if (tab == DEATHKNIGT_TAB_BLOOD)
+            if (tab == DEATHKNIGHT_TAB_BLOOD)
             {
                 return true;
             }
@@ -1781,7 +1781,7 @@ bool PlayerbotAI::IsDps(Player* player)
             }
             break;
         case CLASS_DEATH_KNIGHT:
-            if (tab != DEATHKNIGT_TAB_BLOOD)
+            if (tab != DEATHKNIGHT_TAB_BLOOD)
             {
                 return true;
             }

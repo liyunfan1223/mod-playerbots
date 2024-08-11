@@ -116,9 +116,7 @@ public:
     void InitSkills();
 
     static uint32 tradeSkills[];
-    static float CalculateItemScore(uint32 item_id, Player* bot);
     static float CalculateEnchantScore(uint32 enchant_id, Player* bot);
-    static float CalculateSpellScore(uint32 spell_id, Player* bot, uint32 trigger = ITEM_SPELLTRIGGER_ON_EQUIP);
     void InitTalentsTree(bool incremental = false, bool use_template = true, bool reset = false);
     static void InitTalentsBySpecNo(Player* bot, int specNo, bool reset);
     static void InitTalentsByParsedSpecLink(Player* bot, std::vector<std::vector<uint32>> parsedSpecLink, bool reset);
@@ -160,6 +158,7 @@ private:
     void ResetQuests();
     void InitPotions();
 
+    std::vector<uint32> GetCurrentGemsCount();
     bool CanEquipArmor(ItemTemplate const* proto);
     bool CanEquipWeapon(ItemTemplate const* proto);
     void EnchantItem(Item* item);
@@ -181,8 +180,6 @@ private:
     void ApplyEnchantTemplate();
     void ApplyEnchantTemplate(uint8 spec);
     std::vector<InventoryType> GetPossibleInventoryTypeListBySlot(EquipmentSlots slot);
-    static bool IsShieldTank(Player* bot);
-    static bool NotSameArmorType(uint32 item_subclass_armor, Player* bot);
     void IterateItems(IterateItemsVisitor* visitor, IterateItemsMask mask = ITERATE_ITEMS_IN_BAGS);
     void IterateItemsInBags(IterateItemsVisitor* visitor);
     void IterateItemsInEquip(IterateItemsVisitor* visitor);
