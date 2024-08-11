@@ -66,7 +66,6 @@ void MovementAction::JumpTo(uint32 mapId, float x, float y, float z)
     float botZ = bot->GetPositionZ();
     float speed = bot->GetSpeed(MOVE_RUN);
     MotionMaster& mm = *bot->GetMotionMaster();
-    botAI->SetNextCheckDelay(1000);
     mm.Clear();
     mm.MoveJump(x, y, z, speed, speed, 1);
     AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000);
@@ -141,7 +140,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
             if (botAI->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
                 CreateWp(bot, point.x, point.y, point.z, 0.0, 2334);
 
-            float distPoint = sqrt(target->GetDistance(point.x, point.y, point.z));
+            float distPoint = target->GetDistance(point.x, point.y, point.z);
             if (distPoint < dist && target->IsWithinLOS(point.x, point.y, point.z + bot->GetCollisionHeight()))
             {
                 dist = distPoint;
@@ -177,6 +176,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     {
         return false;
     }
+
     // if (bot->Unit::IsFalling()) {
     //     bot->Say("I'm falling!, flag:" + std::to_string(bot->m_movementInfo.GetMovementFlags()), LANG_UNIVERSAL);
     //     return false;
@@ -190,7 +190,27 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     bool generatePath = !bot->IsFlying() && !bot->isSwimming();
     bool disableMoveSplinePath = sPlayerbotAIConfig->disableMoveSplinePath >= 2 ||
                                  (sPlayerbotAIConfig->disableMoveSplinePath == 1 && bot->InBattleground());
-    if (exact_waypoint || disableMoveSplinePath || !generatePath)
+    if (Vehicle* vehicle = bot->GetVehicle())
+    {
+        VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
+        Unit* vehicleBase = vehicle->GetBase();
+        if (!vehicleBase || !seat || !seat->CanControl())  // is passenger and cant move anyway
+            return false;
+
+        float distance = vehicleBase->GetExactDist(x, y, z);  // use vehicle distance, not bot
+        if (distance > sPlayerbotAIConfig->contactDistance)
+        {
+            MotionMaster& mm = *vehicleBase->GetMotionMaster();  // need to move vehicle, not bot
+            mm.Clear();
+            mm.MovePoint(mapId, x, y, z, generatePath);
+            float delay = 1000.0f * (distance / vehicleBase->GetSpeed(MOVE_RUN)) - sPlayerbotAIConfig->reactDelay;
+            delay = std::max(.0f, delay);
+            delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
+            AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay);
+            return true;
+        }
+    }
+    else if (exact_waypoint || disableMoveSplinePath || !generatePath)
     {
         float distance = bot->GetExactDist(x, y, z);
         if (distance > sPlayerbotAIConfig->contactDistance)
@@ -861,7 +881,10 @@ bool MovementAction::IsMovingAllowed(Unit* target)
 
 bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
 {
-    float distance = sqrt(bot->GetDistance(x, y, z));
+    // removed sqrt as means distance limit was effectively 22500 (ReactDistance²)
+    // leaving it commented incase we find ReactDistance limit causes problems
+    // float distance = sqrt(bot->GetDistance(x, y, z));
+    float distance = bot->GetDistance(x, y, z);
     if (!bot->InBattleground() && distance > sPlayerbotAIConfig->reactDistance)
         return false;
 

@@ -99,8 +99,9 @@ void IsleStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("in vehicle", NextAction::array(0, new NextAction("incendiary rocket", 70.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("in vehicle", NextAction::array(0, new NextAction("rocket blast", 70.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("in vehicle", NextAction::array(0, new NextAction("blade salvo", 71.0f), nullptr)));
+    // this is bugged: it doesn't work, and stops glaive throw working (which is needed to take down gate)
+    // triggers.push_back(
+    //    new TriggerNode("in vehicle", NextAction::array(0, new NextAction("blade salvo", 71.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("in vehicle", NextAction::array(0, new NextAction("glaive throw", 70.0f), nullptr)));
 }
