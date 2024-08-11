@@ -98,15 +98,14 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 s
         canNextTrigger = false;
     if (spellInfo->StackAmount)
     {
-        // Heuristic multiplier for stackAmount since high stackAmount may not be available
+        // Heuristic multiplier for spell with stackAmount since high stackAmount may not be available
         if (spellInfo->StackAmount <= 10)
             multiplier *= spellInfo->StackAmount * 0.6;
         else if (spellInfo->StackAmount <= 20)
-            multiplier *= 6 + (spellInfo->StackAmount - 10) * 0.4;
+            multiplier *= 6 + (spellInfo->StackAmount - 10) * 0.2;
         else
-            multiplier *= 10;
+            multiplier *= 8;
     }
-
     for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
     {
         const SpellEffectInfo& effectInfo = spellInfo->Effects[i];
