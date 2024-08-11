@@ -221,7 +221,7 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
     // trinket
     switch (spellId)
     {
-        case 39942: // Darkmoon Card: Wrath
+        case 39442: // Darkmoon Card: Wrath
             if (type_ != CollectorType::SPELL_HEAL)
                 stats[STATS_TYPE_CRIT] += 50;
             return true;
