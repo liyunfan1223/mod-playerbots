@@ -69,9 +69,9 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId)
     
     CalculateSocketBonus(player_, proto);
 
-    // if (enable_quality_blend_)
-    //     // Blend with item quality and level
-    //     weight_ *= (proto->Quality + 1) * proto->ItemLevel;
+    if (enable_quality_blend_)
+        // Blend with item quality and level
+        weight_ *= (proto->Quality + 1) * proto->ItemLevel;
     
     return weight_;
 }
