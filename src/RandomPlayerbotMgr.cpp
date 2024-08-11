@@ -1215,9 +1215,6 @@ void RandomPlayerbotMgr::Revive(Player* player)
 
 void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth)
 {
-    if (bot->IsBeingTeleported())
-        return;
-
     if (bot->InBattleground())
         return;
 
