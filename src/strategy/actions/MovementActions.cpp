@@ -827,15 +827,21 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
             ty = target->GetPositionY();
             tz = target->GetPositionZ();
         }
+        // Prediction may cause this, which makes ShortenPathUntilDist fail
+        if (bot->GetExactDist(tx, ty, tz) <= distance)
+        {
+            tx = target->GetPositionX();
+            ty = target->GetPositionY();
+            tz = target->GetPositionZ();
+        }
     }
     if (bot->GetExactDist(tx, ty, tz) <= distance)
-    {
         return false;
-    }
     PathGenerator path(bot);
     path.CalculatePath(tx, ty, tz, false);
     PathType type = path.GetPathType();
-    if (type != PATHFIND_NORMAL && type != PATHFIND_INCOMPLETE)
+    int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE;
+    if (!(type & typeOk))
         return false;
     path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), distance);
     G3D::Vector3 endPos = path.GetPath().back();
@@ -881,7 +887,7 @@ bool MovementAction::IsMovingAllowed(Unit* target)
 
 bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
 {
-    // removed sqrt as means distance limit was effectively 22500 (ReactDistance²)
+    // removed sqrt as means distance limit was effectively 22500 (ReactDistanceï¿½)
     // leaving it commented incase we find ReactDistance limit causes problems
     // float distance = sqrt(bot->GetDistance(x, y, z));
     float distance = bot->GetDistance(x, y, z);
@@ -2351,10 +2357,15 @@ bool MoveRandomAction::Execute(Event event)
         float angle = (float)rand_norm() * static_cast<float>(M_PI);
         x += urand(0, distance) * cos(angle);
         y += urand(0, distance) * sin(angle);
+        float ox = x;
+        float oy = y;
+        float oz = z;
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
                                                             bot->GetPositionZ(), x, y, z))
         {
-            continue;
+            x = ox;
+            y = oy;
+            z = oz;
         }
         if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
             continue;
