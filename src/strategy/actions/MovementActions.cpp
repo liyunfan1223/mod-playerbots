@@ -820,7 +820,7 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
         tx += targetMoveDist * cos(target->GetOrientation());
         ty += targetMoveDist * sin(target->GetOrientation());
         if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(),
-                                                               target->GetPositionZ(), tx, ty, tz, false))
+                                                               target->GetPositionZ(), tx, ty, tz))
         {
             // disable prediction if position is invalid
             tx = target->GetPositionX();
@@ -2357,10 +2357,15 @@ bool MoveRandomAction::Execute(Event event)
         float angle = (float)rand_norm() * static_cast<float>(M_PI);
         x += urand(0, distance) * cos(angle);
         y += urand(0, distance) * sin(angle);
+        float ox = x;
+        float oy = y;
+        float oz = z;
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
-                                                            bot->GetPositionZ(), x, y, z, false))
+                                                            bot->GetPositionZ(), x, y, z))
         {
-            continue;
+            x = ox;
+            y = oy;
+            z = oz;
         }
         if (map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))
             continue;

@@ -95,7 +95,7 @@ bool MoveToRpgTargetAction::Execute(Event event)
     x += cos(angle) * INTERACTION_DISTANCE * distance;
     y += sin(angle) * INTERACTION_DISTANCE * distance;
     if (!wo->GetMap()->CheckCollisionAndGetValidCoords(wo, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ(),
-                                                       x, y, z, false))
+                                                       x, y, z))
     {
         x = wo->GetPositionX();
         y = wo->GetPositionY();
