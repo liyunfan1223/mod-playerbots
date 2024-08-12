@@ -37,4 +37,13 @@ public:
 
     virtual bool Execute(Event event);
 };
+
+class TellCalculateItemAction : public Action
+{
+public:
+    TellCalculateItemAction(PlayerbotAI* ai) : Action(ai, "calculate item") {}
+
+    virtual bool Execute(Event event);
+};
+
 #endif
