@@ -4,10 +4,16 @@
  */
 
 #include "TellLosAction.h"
+#include <istream>
+#include <sstream>
 
 #include "ChatHelper.h"
+#include "DBCStores.h"
 #include "Event.h"
+#include "ItemTemplate.h"
+#include "ObjectMgr.h"
 #include "Playerbots.h"
+#include "StatsWeightCalculator.h"
 #include "World.h"
 
 bool TellLosAction::Execute(Event event)
@@ -128,5 +134,23 @@ bool TellExpectedDpsAction::Execute(Event event)
 {
     float dps = AI_VALUE(float, "expected group dps");
     botAI->TellMaster("Expected Group DPS: " + std::to_string(dps));
+    return true;
+}
+
+bool TellCalculateItemAction::Execute(Event event)
+{
+    std::string const text = event.getParam();
+    ItemIds ids = chat->parseItems(text);
+    StatsWeightCalculator calculator(bot);
+    for (const uint32 &id : ids)
+    {
+        const ItemTemplate* proto = sObjectMgr->GetItemTemplate(id);
+        if (!proto)
+            continue;
+        float score = calculator.CalculateItem(id);
+        std::ostringstream out;
+        out << "Calculated score of " << chat->FormatItem(proto) << " : " << score;
+        botAI->TellMasterNoFacing(out.str());
+    }
     return true;
 }

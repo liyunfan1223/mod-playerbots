@@ -655,11 +655,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
     }
 
     if (!IsAllowedCommand(filtered) &&
-        (master != fromPlayer ||
-         !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer)))
-        return;
-
-    if (!IsAllowedCommand(filtered) && master != fromPlayer)
+        (!GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer)))
         return;
 
     if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != std::string::npos &&
@@ -1681,7 +1677,7 @@ bool PlayerbotAI::IsTank(Player* player)
     switch (player->getClass())
     {
         case CLASS_DEATH_KNIGHT:
-            if (tab == DEATHKNIGT_TAB_BLOOD)
+            if (tab == DEATHKNIGHT_TAB_BLOOD)
             {
                 return true;
             }
@@ -1785,7 +1781,7 @@ bool PlayerbotAI::IsDps(Player* player)
             }
             break;
         case CLASS_DEATH_KNIGHT:
-            if (tab != DEATHKNIGT_TAB_BLOOD)
+            if (tab != DEATHKNIGHT_TAB_BLOOD)
             {
                 return true;
             }

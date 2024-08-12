@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "ServerFacade.h"
+#include "StatsWeightCalculator.h"
 
 ItemUsage ItemUsageValue::Calculate()
 {
@@ -190,7 +191,8 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
 
     bool shouldEquip = false;
     // uint32 statWeight = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
-    float itemScore = PlayerbotFactory::CalculateItemScore(itemProto->ItemId, bot);
+    StatsWeightCalculator calculator(bot);
+    float itemScore = calculator.CalculateItem(itemProto->ItemId);
     if (itemScore)
         shouldEquip = true;
 
@@ -214,7 +216,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     }
 
     ItemTemplate const* oldItemProto = oldItem->GetTemplate();
-    float oldScore = PlayerbotFactory::CalculateItemScore(oldItemProto->ItemId, bot);
+    float oldScore = calculator.CalculateItem(oldItemProto->ItemId);
     if (oldItem)
     {
         // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);

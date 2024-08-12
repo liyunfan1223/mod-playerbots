@@ -55,14 +55,16 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         // }
 
         Group* group = from->GetGroup();
-        if (group)
+        if (group && group == bot->GetGroup() && !ignoreGroup && botAI->GetMaster() == from)
         {
-            for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
-            {
-                Player* player = gref->GetSource();
-                if (player == bot && !ignoreGroup)
-                    return PLAYERBOT_SECURITY_ALLOW_ALL;
-            }
+            return PLAYERBOT_SECURITY_ALLOW_ALL;
+        }
+
+        if (group && group == bot->GetGroup() && !ignoreGroup && botAI->GetMaster() != from)
+        {
+            if (reason)
+                *reason = PLAYERBOT_DENY_NOT_YOURS;
+            return PLAYERBOT_SECURITY_TALK;
         }
 
         if (sPlayerbotAIConfig->groupInvitationPermission <= 0)
@@ -137,13 +139,6 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             return PLAYERBOT_SECURITY_INVITE;
         }
 
-        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
-        {
-            Player* player = gref->GetSource();
-            if (player == from)
-                return PLAYERBOT_SECURITY_ALLOW_ALL;
-        }
-
         if (group->IsFull())
         {
             if (reason)
@@ -169,11 +164,17 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 
         if (reason)
             *reason = PLAYERBOT_DENY_INVITE;
-
+        
         return PLAYERBOT_SECURITY_INVITE;
     }
 
-    return PLAYERBOT_SECURITY_ALLOW_ALL;
+    if (botAI->GetMaster() == from)
+        return PLAYERBOT_SECURITY_ALLOW_ALL;
+
+    if (reason)
+        *reason = PLAYERBOT_DENY_NOT_YOURS;
+
+    return PLAYERBOT_SECURITY_INVITE;
 }
 
 bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player* from, bool ignoreGroup)
