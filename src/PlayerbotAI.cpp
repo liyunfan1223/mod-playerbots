@@ -4372,43 +4372,50 @@ Item* PlayerbotAI::FindStoneFor(Item* weapon) const
     return stone;
 }
 
-static const uint32 uPriorizedWizardOilIds[5] = {MINOR_WIZARD_OIL, LESSER_WIZARD_OIL, BRILLIANT_WIZARD_OIL, WIZARD_OIL,
-                                                 SUPERIOR_WIZARD_OIL};
-
-static const uint32 uPriorizedManaOilIds[4] = {
-    MINOR_MANA_OIL,
-    LESSER_MANA_OIL,
-    BRILLIANT_MANA_OIL,
-    SUPERIOR_MANA_OIL,
-};
-
 Item* PlayerbotAI::FindOilFor(Item* weapon) const
 {
-    Item* oil = nullptr;
-    ItemTemplate const* pProto = weapon->GetTemplate();
-    if (pProto && (pProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || pProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF ||
-                   pProto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER))
-    {
-        for (uint8 i = 0; i < std::size(uPriorizedWizardOilIds); ++i)
-        {
-            oil = FindConsumable(uPriorizedWizardOilIds[i]);
-            if (!oil)
-                oil = FindConsumable(uPriorizedManaOilIds[i]);
+    if (!weapon)
+        return nullptr;
 
-            if (oil)
+    const ItemTemplate* item_template = weapon->GetTemplate();
+    if (!item_template)
+        return nullptr;
+
+    // static const will only get created once whatever the call amout
+    static const std::vector<uint32_t> uPriorizedWizardOilIds =
+    {
+        MINOR_WIZARD_OIL, MINOR_MANA_OIL,
+        LESSER_WIZARD_OIL, LESSER_MANA_OIL,
+        BRILLIANT_WIZARD_OIL, BRILLIANT_MANA_OIL,
+        WIZARD_OIL, SUPERIOR_MANA_OIL, SUPERIOR_WIZARD_OIL
+    };
+
+    // static const will only get created once whatever the call amout
+    static const std::vector<uint32_t> uPriorizedManaOilIds =
+    {
+        MINOR_MANA_OIL, MINOR_WIZARD_OIL,
+        LESSER_MANA_OIL, LESSER_WIZARD_OIL,
+        BRILLIANT_MANA_OIL, BRILLIANT_WIZARD_OIL,
+        SUPERIOR_MANA_OIL, WIZARD_OIL, SUPERIOR_WIZARD_OIL
+    };
+
+    Item* oil = nullptr;
+    if  (item_template->SubClass == ITEM_SUBCLASS_WEAPON_SWORD  ||
+        item_template->SubClass == ITEM_SUBCLASS_WEAPON_STAFF   ||
+        item_template->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+    {
+        for (const auto& id : uPriorizedWizardOilIds)
+        {
+            if (oil = FindConsumable(id))
                 return oil;
         }
     }
-    else if (pProto &&
-             (pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2))
+    else if (item_template->SubClass == ITEM_SUBCLASS_WEAPON_MACE ||
+            item_template->SubClass == ITEM_SUBCLASS_WEAPON_MACE2)
     {
-        for (uint8 i = 0; i < std::size(uPriorizedManaOilIds); ++i)
+        for (const auto& id : uPriorizedManaOilIds)
         {
-            oil = FindConsumable(uPriorizedManaOilIds[i]);
-            if (!oil)
-                oil = FindConsumable(uPriorizedWizardOilIds[i]);
-
-            if (oil)
+            if (oil = FindConsumable(id))
                 return oil;
         }
     }
