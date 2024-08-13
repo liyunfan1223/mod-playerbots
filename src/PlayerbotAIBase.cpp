@@ -11,6 +11,11 @@ PlayerbotAIBase::PlayerbotAIBase(bool isBotAI) : nextAICheckDelay(0), _isBotAI(i
 
 void PlayerbotAIBase::UpdateAI(uint32 elapsed, bool minimal)
 {
+    if (totalPmo)
+        totalPmo->finish();
+
+    totalPmo = sPerformanceMonitor->start(PERF_MON_TOTAL, "PlayerbotAIBase::FullTick");
+
     if (nextAICheckDelay > elapsed)
         nextAICheckDelay -= elapsed;
     else

@@ -24,6 +24,7 @@ public:
 
 protected:
     uint32 nextAICheckDelay;
+    class PerformanceMonitorOperation* totalPmo = nullptr;
 
 private:
     bool _isBotAI;
