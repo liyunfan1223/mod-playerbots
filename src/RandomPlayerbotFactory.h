@@ -21,6 +21,31 @@ enum ArenaType : uint8;
 class RandomPlayerbotFactory
 {
 public:
+    enum class NameRaceAndGender : uint8
+    {
+        // Generic is the category used for human & undead
+        GenericMale = 0,
+        GenericFemale,
+        GnomeMale,
+        GnomeFemale,
+        DwarfMale,
+        DwarfFemale,
+        NightelfMale,
+        NightelfFemale,
+        DraeneiMale,
+        DraeneiFemale,
+        OrcMale,
+        OrcFemale,
+        TrollMale,
+        TrollFemale,
+        TaurenMale,
+        TaurenFemale,
+        BloodelfMale,
+        BloodelfFemale
+    };
+
+    static constexpr NameRaceAndGender CombineRaceAndGender(uint8 gender, uint8 race);
+
     RandomPlayerbotFactory(uint32 accountId);
     virtual ~RandomPlayerbotFactory() {}
 
@@ -31,7 +56,7 @@ public:
     static std::string const CreateRandomGuildName();
 
 private:
-    std::string const CreateRandomBotName(uint8 gender);
+    std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
     static std::string const CreateRandomArenaTeamName();
 
     uint32 accountId;
