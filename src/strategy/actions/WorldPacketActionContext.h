@@ -78,6 +78,7 @@ public:
         creators["quest update failed"] = &WorldPacketActionContext::quest_update_failed;
         creators["quest update failed timer"] = &WorldPacketActionContext::quest_update_failed_timer;
         creators["quest update complete"] = &WorldPacketActionContext::quest_update_complete;
+        creators["turn in query quest"] = &WorldPacketActionContext::turn_in_query_quest;
 
         creators["party command"] = &WorldPacketActionContext::party_command;
         creators["tell cast failed"] = &WorldPacketActionContext::tell_cast_failed;
@@ -144,7 +145,7 @@ private:
     static Action* confirm_quest(PlayerbotAI* ai) { return new ConfirmQuestAction(ai); }
     static Action* accept_all_quests(PlayerbotAI* botAI) { return new AcceptAllQuestsAction(botAI); }
     static Action* accept_quest_share(PlayerbotAI* botAI) { return new AcceptQuestShareAction(botAI); }
-    //static Action* turn_in_query_quest(PlayerbotAI* botAI) { return new TurnInQueryQuestAction(botAI); }
+    static Action* turn_in_query_quest(PlayerbotAI* botAI) { return new TurnInQueryQuestAction(botAI); }
     //static Action* quest_confirm_accept(PlayerbotAI* botAI) { return new QuestConfirmAcceptAction(botAI); }
 
     static Action* loot_roll(PlayerbotAI* botAI) { return new LootRollAction(botAI); }
