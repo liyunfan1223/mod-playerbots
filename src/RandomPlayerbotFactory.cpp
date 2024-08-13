@@ -16,6 +16,37 @@
 
 std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
 
+constexpr RandomPlayerbotFactory::NameRaceAndGender RandomPlayerbotFactory::CombineRaceAndGender(uint8 gender,
+                                                                                                 uint8 race)
+{
+    switch (race)
+    {
+        case RACE_HUMAN:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::GenericMale) + gender);
+        case RACE_ORC:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::OrcMale) + gender);
+        case RACE_DWARF:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::DwarfMale) + gender);
+        case RACE_NIGHTELF:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::NightelfMale) + gender);
+        case RACE_UNDEAD_PLAYER:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::GenericMale) + gender);
+        case RACE_TAUREN:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::TaurenMale) + gender);
+        case RACE_GNOME:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::GnomeMale) + gender);
+        case RACE_TROLL:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::TrollMale) + gender);
+        case RACE_DRAENEI:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::DraeneiMale) + gender);
+        case RACE_BLOODELF:
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::BloodelfMale) + gender);
+        default:
+            LOG_ERROR("playerbots", "The race with ID %d does not have a naming category", race);
+            return static_cast<NameRaceAndGender>(static_cast<uint8>(NameRaceAndGender::GenericMale) + gender);
+    }
+}
+
 RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(accountId)
 {
     uint32 const expansion = sWorld->getIntConfig(CONFIG_EXPANSION);
@@ -124,17 +155,20 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     LOG_DEBUG("playerbots", "Creating new random bot for class {}", cls);
 
     uint8 gender = rand() % 2 ? GENDER_MALE : GENDER_FEMALE;
-    uint8 alliance = rand() % 2;
-    uint8 race;
-    for (int attempt = 0; attempt < 15; attempt++)
+    bool alliance = rand() % 2 ? true : false;
+    std::vector<uint8> raceOptions;
+    for (const auto& race : availableRaces[cls])
     {
-        race = availableRaces[cls][urand(0, availableRaces[cls].size() - 1)];
-        if ((alliance && IsAlliance(race)) || (!alliance && !IsAlliance(race)))
+        if (alliance == IsAlliance(race))
         {
-            break;
+            raceOptions.push_back(race);
         }
     }
-    std::string name = CreateRandomBotName(gender);
+    uint8 race = raceOptions[urand(0, raceOptions.size() - 1)];
+
+    const auto raceAndGender = CombineRaceAndGender(gender, race);
+
+    std::string name = CreateRandomBotName(raceAndGender);
 
     if (name.empty())
     {
@@ -205,7 +239,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     return player;
 }
 
-std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
+std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender raceAndGender)
 {
     std::string botName = "";
     int tries = 10;
@@ -214,14 +248,14 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         QueryResult result = CharacterDatabase.Query(
             "SELECT name FROM playerbots_names "
             "WHERE in_use = 0 AND gender = {} ORDER BY RAND() LIMIT 1",
-            gender);
+            static_cast<uint8>(raceAndGender));
         if (!result)
         {
             break;
         }
         Field* fields = result->Fetch();
         std::string ret = fields[0].Get<std::string>();
-        if (ObjectMgr::CheckPlayerName(ret) == CHAR_NAME_SUCCESS)
+        if (ObjectMgr::CheckPlayerName(ret) == CHAR_NAME_SUCCESS)  // Checks for reservation & profanity, too
         {
             return ret;
         }
@@ -241,6 +275,8 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
     const std::string replaceRule[2][17] = {
         {"ST", "ka", "ko", "ku", "kr", "S", "T", "C", "N", "jj", "AA", "AI", "A", "E", "O", "I", "aa"},
         {"sth", "ca", "co", "cu", "cr", "sh", "th", "ch", "ng", "dg", "A", "ayu", "ai", "ei", "ou", "iu", "ae"}};
+
+    const auto gender = static_cast<uint8>(raceAndGender) % 2;
 
     tries = 10;
     while (--tries)
@@ -280,8 +316,7 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         // Capitalize first letter
         botName[0] -= 32;
 
-        if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS ||
-            (sObjectMgr->IsReservedName(botName) || sObjectMgr->IsProfanityName(botName)))
+        if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS) // Checks for reservation & profanity, too
         {
             botName.clear();
             continue;
@@ -298,8 +333,7 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
         {
             botName += (i == 0 ? 'A' : 'a') + rand() % 26;
         }
-        if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS ||
-            (sObjectMgr->IsReservedName(botName) || sObjectMgr->IsProfanityName(botName)))
+        if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS)  // Checks for reservation & profanity, too
         {
             botName.clear();
             continue;
