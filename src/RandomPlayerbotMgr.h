@@ -204,7 +204,6 @@ private:
     std::list<uint32> currentBots;
     uint32 bgBotsCount;
     uint32 playersLevel;
-    PerformanceMonitorOperation* totalPmo;
 };
 
 #define sRandomPlayerbotMgr RandomPlayerbotMgr::instance()
