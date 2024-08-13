@@ -83,6 +83,16 @@ public:
             return true;
         }
 
+        if (!strcmp(args, "toggle"))
+        {
+            sPlayerbotAIConfig->perfMonEnabled = !sPlayerbotAIConfig->perfMonEnabled;
+            if (sPlayerbotAIConfig->perfMonEnabled)
+                LOG_INFO("playerbots", "Performance monitor enabled");
+            else
+                LOG_INFO("playerbots", "Performance monitor disabled");
+            return true;
+        }
+
         sPerformanceMonitor->PrintStats();
         return true;
     }

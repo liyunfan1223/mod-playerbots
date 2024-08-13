@@ -4758,40 +4758,50 @@ Item* PlayerbotAI::FindStoneFor(Item* weapon) const
     return stone;
 }
 
-static const std::vector<WizardOilDisplayId> uPriorizedWizardOilIds =
-{
-    MINOR_WIZARD_OIL, LESSER_WIZARD_OIL, BRILLIANT_WIZARD_OIL, WIZARD_OIL, SUPERIOR_WIZARD_OIL
-};
-
-static const std::vector<ManaOilDisplayId> uPriorizedManaOilIds =
-{
-   MINOR_MANA_OIL, LESSER_MANA_OIL, BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL,
-};
-
 Item* PlayerbotAI::FindOilFor(Item* weapon) const
 {
+    if (!weapon)
+        return nullptr;
+
+    const ItemTemplate* item_template = weapon->GetTemplate();
+    if (!item_template)
+        return nullptr;
+
+    // static const will only get created once whatever the call amout
+    static const std::vector<uint32_t> uPriorizedWizardOilIds =
+    {
+        MINOR_WIZARD_OIL, MINOR_MANA_OIL,
+        LESSER_WIZARD_OIL, LESSER_MANA_OIL,
+        BRILLIANT_WIZARD_OIL, BRILLIANT_MANA_OIL,
+        WIZARD_OIL, SUPERIOR_MANA_OIL, SUPERIOR_WIZARD_OIL
+    };
+
+    // static const will only get created once whatever the call amout
+    static const std::vector<uint32_t> uPriorizedManaOilIds =
+    {
+        MINOR_MANA_OIL, MINOR_WIZARD_OIL,
+        LESSER_MANA_OIL, LESSER_WIZARD_OIL,
+        BRILLIANT_MANA_OIL, BRILLIANT_WIZARD_OIL,
+        SUPERIOR_MANA_OIL, WIZARD_OIL, SUPERIOR_WIZARD_OIL
+    };
+
     Item* oil = nullptr;
-    ItemTemplate const* pProto = weapon->GetTemplate();
-    if (pProto && (pProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || pProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF ||
-                   pProto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER))
+    if  (item_template->SubClass == ITEM_SUBCLASS_WEAPON_SWORD  ||
+        item_template->SubClass == ITEM_SUBCLASS_WEAPON_STAFF   ||
+        item_template->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
     {
         for (const auto& id : uPriorizedWizardOilIds)
         {
-            oil = FindConsumable(uPriorizedWizardOilIds[id]);
-            if (!oil)
-                oil = FindConsumable(uPriorizedManaOilIds[id]);
-            if (oil)
+            if (oil = FindConsumable(id))
                 return oil;
         }
     }
-    else if (pProto && (pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2))
+    else if (item_template->SubClass == ITEM_SUBCLASS_WEAPON_MACE ||
+            item_template->SubClass == ITEM_SUBCLASS_WEAPON_MACE2)
     {
         for (const auto& id : uPriorizedManaOilIds)
         {
-            oil = FindConsumable(uPriorizedManaOilIds[id]);
-            if (!oil)
-                oil = FindConsumable(uPriorizedWizardOilIds[id]);
-            if (oil)
+            if (oil = FindConsumable(id))
                 return oil;
         }
     }
@@ -5493,6 +5503,7 @@ uint8 PlayerbotAI::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool sw
     // no free position
     return NULL_SLOT;
 }
+
 bool PlayerbotAI::IsSafe(Player* player)
 {
     return player && player->GetMapId() == bot->GetMapId() && player->GetInstanceId() == bot->GetInstanceId() && !player->IsBeingTeleported();
@@ -5676,3 +5687,4 @@ std::set<uint32> PlayerbotAI::GetCurrentIncompleteQuestIds()
 
     return result;
 }
+

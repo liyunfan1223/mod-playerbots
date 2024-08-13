@@ -78,13 +78,13 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
             switch (i->first)
             {
                 case PERF_MON_TRIGGER:
-                    key = "T";
+                    key = "Trigger";
                     break;
                 case PERF_MON_VALUE:
-                    key = "V";
+                    key = "Value";
                     break;
                 case PERF_MON_ACTION:
-                    key = "A";
+                    key = "Action";
                     break;
                 case PERF_MON_RNDBOT:
                     key = "RndBot";
@@ -152,8 +152,8 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
     }
     else
     {
-        float fullTickCount = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->count;
-        float fullTickTotalTime = data[PERF_MON_TOTAL]["RandomPlayerbotMgr::FullTick"]->totalTime;
+        float fullTickCount = data[PERF_MON_TOTAL]["PlayerbotAIBase::FullTick"]->count;
+        float fullTickTotalTime = data[PERF_MON_TOTAL]["PlayerbotAIBase::FullTick"]->totalTime;
 
         LOG_INFO(
             "playerbots",
@@ -173,13 +173,13 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
             switch (i->first)
             {
                 case PERF_MON_TRIGGER:
-                    key = "T";
+                    key = "Trigger";
                     break;
                 case PERF_MON_VALUE:
-                    key = "V";
+                    key = "Value";
                     break;
                 case PERF_MON_ACTION:
-                    key = "A";
+                    key = "Action";
                     break;
                 case PERF_MON_RNDBOT:
                     key = "RndBot";
@@ -231,7 +231,7 @@ void PerformanceMonitor::PrintStats(bool perTick, bool fullStack)
                              time, minTime, maxTime, avg, amount, key.c_str(), disName.c_str());
                 }
             }
-            if (PERF_MON_TOTAL != i->first)
+            if (i->first != PERF_MON_TOTAL)
             {
                 float tPerc = (float)typeTotalTime / (float)fullTickTotalTime * 100.0f;
                 float tTime = (float)typeTotalTime / fullTickCount / 1000.0f;
@@ -278,7 +278,7 @@ void PerformanceMonitorOperation::finish()
     std::chrono::microseconds finished =
         (std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()))
             .time_since_epoch();
-    uint64_t elapsed = (finished - started).count();
+    uint64 elapsed = (finished - started).count();
 
     std::lock_guard<std::mutex> guard(data->lock);
     if (elapsed > 0)
