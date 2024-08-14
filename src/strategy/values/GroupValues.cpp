@@ -4,7 +4,7 @@
  */
 
 #include "GroupValues.h"
-
+#include "Helpers.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -52,7 +52,7 @@ bool IsNearLeaderValue::Calculate()
 
 bool BoolANDValue::Calculate()
 {
-    std::vector<std::string> values = split(getQualifier(), ',');
+    std::vector<std::string> values = split(getQualifier(), ",");
 
     for (auto value : values)
     {

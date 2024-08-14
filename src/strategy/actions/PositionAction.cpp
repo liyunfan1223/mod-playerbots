@@ -4,7 +4,7 @@
  */
 
 #include "PositionAction.h"
-
+#include "Helpers.h"
 #include "Event.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
@@ -65,7 +65,7 @@ bool PositionAction::Execute(Event event)
         return true;
     }
 
-    std::vector<std::string> coords = split(action, ',');
+    std::vector<std::string> coords = split(action, ",");
     if (coords.size() == 3)
     {
         pos.Set(atoi(coords[0].c_str()), atoi(coords[1].c_str()), atoi(coords[2].c_str()), botAI->GetBot()->GetMapId());

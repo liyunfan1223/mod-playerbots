@@ -4,7 +4,7 @@
  */
 
 #include "QuestValues.h"
-
+#include "Helpers.h"
 #include "MapMgr.h"
 #include "Playerbots.h"
 #include "SharedValueContext.h"
@@ -104,11 +104,14 @@ questGuidpMap QuestGuidpMapValue::Calculate()
 questGiverMap QuestGiversValue::Calculate()
 {
     uint32 level = 0;
-    std::string const q = getQualifier();
+    std::string_view q = getQualifier();
     bool hasQualifier = !q.empty();
 
     if (hasQualifier)
-        level = stoi(q);
+    {
+        auto op_level = convert_numeric<uint32>(q);
+        level = op_level.value();
+    }
 
     questGuidpMap questMap = GAI_VALUE(questGuidpMap, "quest guidp map");
 
@@ -442,7 +445,11 @@ uint32 DialogStatusValue::getDialogStatus(Player* bot, int32 questgiver, uint32 
     return dialogStatus;
 }
 
-uint32 DialogStatusValue::Calculate() { return getDialogStatus(bot, stoi(getQualifier())); }
+uint32 DialogStatusValue::Calculate()
+{
+    auto value = convert_numeric<uint32>(getQualifier());
+    return getDialogStatus(bot, value.value());
+}
 
 uint32 DialogStatusQuestValue::Calculate()
 {

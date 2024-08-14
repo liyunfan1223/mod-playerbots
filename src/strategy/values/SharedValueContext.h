@@ -48,7 +48,7 @@ public:
     }
 
     template <class T>
-    Value<T>* getGlobalValue(std::string const name)
+    Value<T>* getGlobalValue(std::string_view name)
     {
         NamedObjectContextList<UntypedValue> valueContexts;
         valueContexts.Add(this);
@@ -59,13 +59,15 @@ public:
     }
 
     template <class T>
-    Value<T>* getGlobalValue(std::string const name, std::string const param)
+    Value<T>* getGlobalValue(std::string_view name, std::string_view param)
     {
-        return getGlobalValue<T>((std::string(name) + "::" + param));
+        std::stringstream ss;
+        ss << name << "::" << param;
+        return getGlobalValue<T>(ss.str());
     }
 
     template <class T>
-    Value<T>* getGlobalValue(std::string const name, uint32 param)
+    Value<T>* getGlobalValue(std::string_view name, uint32 param)
     {
         std::ostringstream out;
         out << param;

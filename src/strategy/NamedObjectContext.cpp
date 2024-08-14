@@ -7,14 +7,14 @@
 
 #include "Playerbots.h"
 
-void Qualified::Qualify(int qual)
+void Qualified::Qualify(const int& qual)
 {
     std::ostringstream out;
     out << qual;
     qualifier = out.str();
 }
 
-std::string const Qualified::MultiQualify(std::vector<std::string> qualifiers, const std::string& separator, const std::string_view brackets)
+std::string const Qualified::MultiQualify(const std::vector<std::string>& qualifiers, std::string_view separator, std::string_view brackets)
 {
     std::stringstream out;
     for (uint8 i = 0; i < qualifiers.size(); i++)
@@ -40,13 +40,13 @@ std::string const Qualified::MultiQualify(std::vector<std::string> qualifiers, c
     }
 }
 
-std::vector<std::string> Qualified::getMultiQualifiers(std::string const qualifier1)
+std::vector<std::string> Qualified::getMultiQualifiers(std::string_view qualifier1)
 {
-    std::istringstream iss(qualifier1);
+    std::istringstream iss(qualifier1.data());
     return {std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{}};
 }
 
-int32 Qualified::getMultiQualifier(std::string const qualifier1, uint32 pos)
+int32 Qualified::getMultiQualifier(std::string_view qualifier1, const uint32& pos)
 {
     return std::stoi(getMultiQualifiers(qualifier1)[pos]);
 }

@@ -381,8 +381,8 @@ public:
     void UpdateAI(uint32 elapsed, bool minimal = false) override;
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
 
-    std::string const HandleRemoteCommand(std::string const command);
-    void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
+    std::string const HandleRemoteCommand(std::string_view command);
+    void HandleCommand(const uint32& type, const std::string& text, Player* fromPlayer);
     void QueueChatResponse(const ChatQueuedReply reply);
 	void HandleBotOutgoingPacket(WorldPacket const& packet);
     void HandleMasterIncomingPacket(WorldPacket const& packet);
@@ -394,8 +394,8 @@ public:
     void ChangeStrategy(std::string const name, BotState type);
     void ClearStrategies(BotState type);
     std::vector<std::string> GetStrategies(BotState type);
-    bool ContainsStrategy(StrategyType type);
-    bool HasStrategy(std::string const name, BotState type);
+    bool ContainsStrategy(const StrategyType& type);
+    bool HasStrategy(std::string_view name, const BotState& type);
     BotState GetState() { return currentState; };
     void ResetStrategies(bool load = false);
     void ReInitCurrentEngine();
@@ -564,7 +564,7 @@ private:
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
 
     void HandleCommands();
-    void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
+    void HandleCommand(const uint32& type, std::string_view text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
 
 protected:
     Player* bot;

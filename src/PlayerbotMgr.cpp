@@ -10,6 +10,7 @@
 #include <istream>
 #include <string>
 
+#include "Helpers.h"
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
 #include "CharacterPackets.h"
@@ -1108,7 +1109,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         }
     }
 
-    std::vector<std::string> chars = split(charnameStr, ',');
+    std::vector<std::string> chars = split(charnameStr, ",");
     for (std::vector<std::string>::iterator i = chars.begin(); i != chars.end(); i++)
     {
         std::string const s = *i;

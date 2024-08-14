@@ -6,7 +6,7 @@
 #include "PlayerbotAIConfig.h"
 
 #include <iostream>
-
+#include "Helpers.h"
 #include "Config.h"
 #include "PlayerbotDungeonSuggestionMgr.h"
 #include "PlayerbotFactory.h"
@@ -18,7 +18,7 @@
 template <class T>
 void LoadList(std::string const value, T& list)
 {
-    std::vector<std::string> ids = split(value, ',');
+    std::vector<std::string> ids = split(value, ",");
     for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++)
     {
         uint32 id = atoi((*i).c_str());
@@ -31,7 +31,7 @@ void LoadList(std::string const value, T& list)
 template <class T>
 void LoadListString(std::string const value, T& list)
 {
-    std::vector<std::string> strings = split(value, ',');
+    std::vector<std::string> strings = split(value, ",");
     for (std::vector<std::string>::iterator i = strings.begin(); i != strings.end(); i++)
     {
         std::string const string = *i;
@@ -311,7 +311,7 @@ bool PlayerbotAIConfig::Initialize()
             os.clear();
             os << "AiPlayerbot.PremadeSpecGlyph." << cls << "." << spec;
             premadeSpecGlyph[cls][spec] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
-            std::vector<std::string> splitSpecGlyph = split(premadeSpecGlyph[cls][spec], ',');
+            std::vector<std::string> splitSpecGlyph = split(premadeSpecGlyph[cls][spec], ",");
             for (std::string& split : splitSpecGlyph)
             {
                 if (split.size() != 0)
@@ -670,27 +670,6 @@ void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 
             worldBuffs.push_back(wb);
         }
     }
-}
-
-static std::vector<std::string> split(const std::string& str, const std::string& pattern)
-{
-    std::vector<std::string> res;
-    if (str == "")
-        return res;
-    // Also add separators to string connections to facilitate intercepting the last paragraph.
-    std::string strs = str + pattern;
-    size_t pos = strs.find(pattern);
-
-    while (pos != strs.npos)
-    {
-        std::string temp = strs.substr(0, pos);
-        res.push_back(temp);
-        // Remove the split string and split the remaining string
-        strs = strs.substr(pos + 1, strs.size());
-        pos = strs.find(pattern);
-    }
-
-    return res;
 }
 
 std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32 cls, std::string tab_link)

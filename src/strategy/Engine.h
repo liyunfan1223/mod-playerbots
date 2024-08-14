@@ -65,10 +65,10 @@ public:
     Engine(PlayerbotAI* botAI, AiObjectContext* factory);
 
     void Init();
-    void addStrategy(std::string const name);
+    void addStrategy(std::string_view name);
     void addStrategies(std::string first, ...);
-    bool removeStrategy(std::string const name);
-    bool HasStrategy(std::string const name);
+    bool removeStrategy(std::string_view name);
+    bool HasStrategy(std::string_view name);
     void removeAllStrategies();
     void toggleStrategy(std::string const name);
     std::string const ListStrategies();

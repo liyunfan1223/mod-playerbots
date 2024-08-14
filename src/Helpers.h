@@ -8,7 +8,9 @@
 
 #include <stdio.h>
 #include <string.h>
-
+#include <charconv>
+#include <optional>
+#include <string_view>
 #include <algorithm>
 #include <cctype>
 #include <functional>
@@ -16,40 +18,69 @@
 #include <map>
 #include <sstream>
 #include <vector>
+#include <type_traits>
+#include <iomanip>
+#include <ranges>
 
 #include "Common.h"
 
-void split(std::vector<std::string>& dest, std::string const str, char const* delim)
+// c++ 20 split
+inline std::vector<std::string> split(std::string_view s, std::string_view delim)
 {
-    char* pTempStr = strdup(str.c_str());
-    char* pWord = strtok(pTempStr, delim);
-
-    while (pWord != nullptr)
+    std::vector<std::string> substrings;
+    if (delim.size() == 0ul)
     {
-        dest.push_back(pWord);
-        pWord = strtok(nullptr, delim);
+        substrings.emplace_back(s);
+        return substrings;
     }
 
-    free(pTempStr);
+    auto start_pos = s.find_first_not_of(delim);
+    auto end_pos = start_pos;
+    auto max_length = s.length();
+
+    while (start_pos < max_length)
+    {
+        end_pos = std::min(max_length, s.find_first_of(delim, start_pos));
+
+        if (end_pos != start_pos)
+        {
+            substrings.emplace_back(&s[start_pos], end_pos - start_pos);
+            start_pos = s.find_first_not_of(delim, end_pos);
+        }
+    }
+
+    return substrings;
 }
 
-std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems)
+inline void split(std::vector<std::string>& dest, std::string const str, char const* delim)
 {
-    std::stringstream ss(s);
-    std::string item;
+    dest = split(str, delim);
+}
 
-    while (getline(ss, item, delim))
-    {
-        elems.push_back(item);
-    }
-
+inline std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems)
+{
+    elems = split(s, &delim);
     return elems;
 }
 
-std::vector<std::string> split(std::string const s, char delim)
+inline std::vector<std::string> split(std::string const s, char delim)
 {
     std::vector<std::string> elems;
     return split(s, delim, elems);
+}
+
+// c++ 20 generic converter + concept
+template<typename T>
+concept is_numeric = std::is_arithmetic_v<T>;
+
+template<is_numeric T>
+inline std::optional<T> convert_numeric(std::string_view input)
+{
+    T out;
+    const std::from_chars_result result = std::from_chars(input.data(), input.data() + input.size(), out);
+    if(result.ec == std::errc{})
+        return out;
+    return {};
 }
 
 #endif

@@ -3,8 +3,10 @@
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
-#include "LootValues.h"
+#include <string_view>
 
+#include "LootValues.h"
+#include "Helpers.h"
 #include "Playerbots.h"
 #include "SharedValueContext.h"
 
@@ -97,13 +99,14 @@ DropMap* DropMapValue::Calculate()
 // What items does this entry have in its loot list?
 std::vector<int32> ItemDropListValue::Calculate()
 {
-    uint32 itemId = stoi(getQualifier());
+    auto itemId = convert_numeric<uint32>(getQualifier());
+    if (!itemId.has_value()) return {};
 
     DropMap* dropMap = GAI_VALUE(DropMap*, "drop map");
 
     std::vector<int32> entries;
 
-    auto range = dropMap->equal_range(itemId);
+    auto range = dropMap->equal_range(itemId.value());
 
     for (auto itr = range.first; itr != range.second; ++itr)
         entries.push_back(itr->second);
@@ -114,17 +117,18 @@ std::vector<int32> ItemDropListValue::Calculate()
 // What items does this entry have in its loot list?
 std::vector<uint32> EntryLootListValue::Calculate()
 {
-    int32 entry = stoi(getQualifier());
+    auto entry = convert_numeric<int32>(getQualifier());
+    if (!entry.has_value()) return {};
 
     std::vector<uint32> items;
 
     LootTemplateAccess const* lTemplateA;
 
     if (entry > 0)
-        lTemplateA = DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::Unit>(entry, uint32(1)), LOOT_CORPSE);
+        lTemplateA = DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::Unit>(entry.value(), uint32(1)), LOOT_CORPSE);
     else
         lTemplateA =
-            DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::GameObject>(entry, uint32(1)), LOOT_CORPSE);
+            DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::GameObject>(entry.value(), uint32(1)), LOOT_CORPSE);
 
     if (lTemplateA)
         for (auto const& lItem : lTemplateA->Entries)

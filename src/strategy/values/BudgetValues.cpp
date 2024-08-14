@@ -4,7 +4,7 @@
  */
 
 #include "BudgetValues.h"
-
+#include "Helpers.h"
 #include "Playerbots.h"
 
 uint32 MaxGearRepairCostValue::Calculate()
@@ -140,7 +140,10 @@ uint32 TrainCostValue::Calculate()
 
 uint32 MoneyNeededForValue::Calculate()
 {
-    NeedMoneyFor needMoneyFor = NeedMoneyFor(stoi(getQualifier()));
+    const auto money = convert_numeric<uint32>(getQualifier());
+    if (!money.has_value()) return 0;
+
+    NeedMoneyFor needMoneyFor = NeedMoneyFor(money.value());
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     AiObjectContext* context = botAI->GetAiObjectContext();
@@ -205,7 +208,10 @@ uint32 MoneyNeededForValue::Calculate()
 
 uint32 TotalMoneyNeededForValue::Calculate()
 {
-    NeedMoneyFor needMoneyFor = NeedMoneyFor(stoi(getQualifier()));
+    const auto money = convert_numeric<uint32>(getQualifier());
+    if (!money.has_value()) return 0;
+
+    NeedMoneyFor needMoneyFor = NeedMoneyFor(money.value());
 
     uint32 moneyWanted = AI_VALUE2(uint32, "money needed for", (uint32)needMoneyFor);
 

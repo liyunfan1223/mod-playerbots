@@ -24,26 +24,28 @@ public:
     AiObjectContext(PlayerbotAI* botAI);
     virtual ~AiObjectContext() {}
 
-    virtual Strategy* GetStrategy(std::string const name);
-    virtual std::set<std::string> GetSiblingStrategy(std::string const name);
-    virtual Trigger* GetTrigger(std::string const name);
-    virtual Action* GetAction(std::string const name);
-    virtual UntypedValue* GetUntypedValue(std::string const name);
+    virtual Strategy* GetStrategy(std::string_view name);
+    virtual std::set<std::string> GetSiblingStrategy(std::string_view name);
+    virtual Trigger* GetTrigger(std::string_view name);
+    virtual Action* GetAction(std::string_view name);
+    virtual UntypedValue* GetUntypedValue(std::string_view name);
 
     template <class T>
-    Value<T>* GetValue(std::string const name)
+    Value<T>* GetValue(std::string_view name)
     {
         return dynamic_cast<Value<T>*>(GetUntypedValue(name));
     }
 
     template <class T>
-    Value<T>* GetValue(std::string const name, std::string const param)
+    Value<T>* GetValue(std::string_view name, std::string_view param)
     {
-        return GetValue<T>((std::string(name) + "::" + param));
+        std::stringstream ss;
+        ss << name << "::" << param;
+        return GetValue<T>(ss.str());
     }
 
     template <class T>
-    Value<T>* GetValue(std::string const name, int32 param)
+    Value<T>* GetValue(std::string_view name, int32 param)
     {
         std::ostringstream out;
         out << param;

@@ -4,10 +4,10 @@
  */
 
 #include "CustomStrategy.h"
+#include "Helpers.h"
+#include "Playerbots.h"
 
 #include <regex>
-
-#include "Playerbots.h"
 
 std::map<std::string, std::string> CustomStrategy::actionLinesCache;
 
@@ -25,7 +25,7 @@ NextAction* toNextAction(std::string const action)
 
 NextAction** toNextActionArray(std::string const actions)
 {
-    std::vector<std::string> tokens = split(actions, ',');
+    std::vector<std::string> tokens = split(actions, ",");
     NextAction** res = new NextAction*[tokens.size() + 1];
 
     uint32 index = 0;

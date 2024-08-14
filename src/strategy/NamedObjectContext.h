@@ -20,18 +20,18 @@ class Qualified
 {
 public:
     Qualified(){};
-    Qualified(std::string const qualifier) : qualifier(qualifier) {}
-    Qualified(int32 qualifier1) { Qualify(qualifier1); }
+    Qualified(std::string_view qualifier) : qualifier(qualifier) {}
+    Qualified(const int32& qualifier1) { Qualify(qualifier1); }
 
-    virtual void Qualify(int qual);
+    virtual void Qualify(const int& qual);
 
-    virtual void Qualify(std::string const qual) { qualifier = qual; }
+    virtual void Qualify(std::string_view qual) { qualifier = qual; }
 
-    std::string const getQualifier() { return qualifier; }
+    std::string_view getQualifier() { return qualifier; }
 
-    static std::string const MultiQualify(std::vector<std::string> qualifiers, const std::string& separator, const std::string_view brackets = "{}");
-    static std::vector<std::string> getMultiQualifiers(std::string const qualifier1);
-    static int32 getMultiQualifier(std::string const qualifier1, uint32 pos);
+    static const std::string MultiQualify(const std::vector<std::string>& qualifiers, std::string_view separator, std::string_view brackets = "{}");
+    static std::vector<std::string> getMultiQualifiers(std::string_view qualifier1);
+    static int32 getMultiQualifier(std::string_view qualifier1, const uint32& pos);
 
 protected:
     std::string qualifier;
@@ -45,20 +45,22 @@ protected:
     std::unordered_map<std::string, ActionCreator> creators;
 
 public:
-    T* create(std::string name, PlayerbotAI* botAI)
+    T* create(std::string_view name, PlayerbotAI* botAI)
     {
+        std::string _name(name);
         size_t found = name.find("::");
         std::string qualifier;
+
         if (found != std::string::npos)
         {
             qualifier = name.substr(found + 2);
-            name = name.substr(0, found);
+            _name = name.substr(0, found);
         }
 
-        if (creators.find(name) == creators.end())
+        if (creators.find(_name) == creators.end())
             return nullptr;
 
-        ActionCreator creator = creators[name];
+        ActionCreator creator = creators[_name];
         if (!creator)
             return nullptr;
 
@@ -92,12 +94,12 @@ public:
 
     virtual ~NamedObjectContext() { Clear(); }
 
-    T* create(std::string const name, PlayerbotAI* botAI)
+    T* create(std::string_view name, PlayerbotAI* botAI)
     {
-        if (created.find(name) == created.end())
-            return created[name] = NamedObjectFactory<T>::create(name, botAI);
+        if (created.find(name.data()) == created.end())
+            return created[name.data()] = NamedObjectFactory<T>::create(name, botAI);
 
-        return created[name];
+        return created[name.data()];
     }
 
     void Clear()
@@ -163,7 +165,7 @@ public:
 
     void Add(NamedObjectContext<T>* context) { contexts.push_back(context); }
 
-    T* GetContextObject(std::string const name, PlayerbotAI* botAI)
+    T* GetContextObject(std::string_view name, PlayerbotAI* botAI)
     {
         for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
@@ -191,7 +193,7 @@ public:
         }
     }
 
-    std::set<std::string> GetSiblings(std::string const name)
+    std::set<std::string> GetSiblings(std::string_view name)
     {
         for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
@@ -199,7 +201,7 @@ public:
                 continue;
 
             std::set<std::string> supported = (*i)->supports();
-            std::set<std::string>::iterator found = supported.find(name);
+            std::set<std::string>::iterator found = supported.find(name.data());
             if (found == supported.end())
                 continue;
 

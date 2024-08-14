@@ -4,7 +4,7 @@
  */
 
 #include "MailAction.h"
-
+#include "Helpers.h"
 #include "ChatHelper.h"
 #include "Event.h"
 #include "Mail.h"
@@ -231,7 +231,7 @@ std::map<uint32, Mail*> filterList(std::vector<Mail*> src, std::string const fil
         return result;
     }
 
-    std::vector<std::string> ss = split(filter, ',');
+    std::vector<std::string> ss = split(filter, ",");
     for (std::vector<std::string>::iterator i = ss.begin(); i != ss.end(); ++i)
     {
         uint32 idx = atoi(i->c_str()) - 1;

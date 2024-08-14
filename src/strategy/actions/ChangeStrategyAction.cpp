@@ -4,7 +4,7 @@
  */
 
 #include "ChangeStrategyAction.h"
-
+#include "Helpers.h"
 #include "Event.h"
 #include "PlayerbotDbStore.h"
 #include "Playerbots.h"
@@ -15,7 +15,7 @@ bool ChangeCombatStrategyAction::Execute(Event event)
     botAI->ChangeStrategy(text.empty() ? getName() : text, BOT_STATE_COMBAT);
     if (event.GetSource() == "co")
     {
-        std::vector<std::string> splitted = split(text, ',');
+        std::vector<std::string> splitted = split(text, ",");
         for (std::vector<std::string>::iterator i = splitted.begin(); i != splitted.end(); i++)
         {
             const char* name = i->c_str();
@@ -53,7 +53,7 @@ bool ChangeNonCombatStrategyAction::Execute(Event event)
     botAI->ChangeStrategy(text, BOT_STATE_NON_COMBAT);
     if (event.GetSource() == "nc")
     {
-        std::vector<std::string> splitted = split(text, ',');
+        std::vector<std::string> splitted = split(text, ",");
         for (std::vector<std::string>::iterator i = splitted.begin(); i != splitted.end(); i++)
         {
             const char* name = i->c_str();

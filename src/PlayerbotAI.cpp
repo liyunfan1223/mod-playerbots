@@ -456,9 +456,9 @@ void PlayerbotAI::HandleCommands()
 }
 
 std::map<std::string, ChatMsg> chatMap;
-void PlayerbotAI::HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang)
+void PlayerbotAI::HandleCommand(const uint32& type, std::string_view text, Player& fromPlayer, const uint32 lang)
 {
-    std::string filtered = text;
+    std::string filtered(text);
 
     if (!IsAllowedCommand(filtered) && !GetSecurity()->CheckLevelFor(PlayerbotSecurityLevel::PLAYERBOT_SECURITY_INVITE, type != CHAT_MSG_WHISPER, &fromPlayer))
         return;
@@ -743,7 +743,7 @@ bool PlayerbotAI::IsAllowedCommand(std::string const text)
     return false;
 }
 
-void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fromPlayer)
+void PlayerbotAI::HandleCommand(const uint32& type, const std::string& text, Player* fromPlayer)
 {
     if (!GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, type != CHAT_MSG_WHISPER, fromPlayer))
         return;
@@ -1562,7 +1562,7 @@ bool PlayerbotAI::PlayEmote(uint32 emote)
     return false;
 }
 
-bool PlayerbotAI::ContainsStrategy(StrategyType type)
+bool PlayerbotAI::ContainsStrategy(const StrategyType& type)
 {
     for (uint8 i = 0; i < BOT_STATE_MAX; i++)
     {
@@ -1573,7 +1573,10 @@ bool PlayerbotAI::ContainsStrategy(StrategyType type)
     return false;
 }
 
-bool PlayerbotAI::HasStrategy(std::string const name, BotState type) { return engines[type]->HasStrategy(name); }
+bool PlayerbotAI::HasStrategy(std::string_view name, const BotState& type)
+{
+    return engines[type]->HasStrategy(name);
+}
 
 void PlayerbotAI::ResetStrategies(bool load)
 {
@@ -4358,7 +4361,7 @@ void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uin
     }
 }
 
-std::string const PlayerbotAI::HandleRemoteCommand(std::string const command)
+std::string const PlayerbotAI::HandleRemoteCommand(std::string_view command)
 {
     if (command == "state")
     {
