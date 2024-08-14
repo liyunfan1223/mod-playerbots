@@ -8,10 +8,9 @@
 
 #include "AddLootAction.h"
 #include "AttackAction.h"
-#include "AutoLearnSpellAction.h"
 #include "ShareQuestAction.h"
 #include "BattleGroundTactics.h"
-#include "AutoTeleportForLevelAction.h"
+#include "AutoMaintenanceOnLevelupAction.h"
 #include "BattleGroundJoinAction.h"
 #include "BattleGroundTactics.h"
 #include "BuyAction.h"
