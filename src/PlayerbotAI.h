@@ -554,6 +554,7 @@ public:
     uint32 GetInventoryItemsCountWithId(uint32 itemId);
     bool HasItemInInventory(uint32 itemId);
     std::vector<std::pair<const Quest*, uint32>> GetCurrentQuestsRequiringItemId(uint32 itemId);
+    uint32 GetReactDelay();
 
     std::vector<const Quest*> GetAllCurrentQuests();
     std::vector<const Quest*> GetCurrentIncompleteQuests();

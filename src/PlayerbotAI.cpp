@@ -342,16 +342,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 
     bool min = minimal;
     UpdateAIInternal(elapsed, min);
-    inCombat = bot->IsInCombat();
-    // test fix lags because of BG
-    bool inBG = bot->InBattleground() || bot->InArena();
-    if (bot && !inCombat)
-        min = true;
-
-    if (HasRealPlayerMaster() || (sPlayerbotAIConfig->fastReactInBG && inBG))
-        min = false;
-
-    YieldThread(min);
+    YieldThread(GetReactDelay());
 }
 
 void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal)
@@ -940,6 +931,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             
             if (!AllowActivity())
                 return;
+            
             WorldPacket p(packet);
             if (!p.empty() && (p.GetOpcode() == SMSG_MESSAGECHAT || p.GetOpcode() == SMSG_GM_MESSAGECHAT))
             {
@@ -1583,6 +1575,9 @@ void PlayerbotAI::ResetStrategies(bool load)
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
+
+    for (uint8 i = 0; i < BOT_STATE_MAX; i++)
+        engines[i]->Init();
 
     // if (load)
     //     sPlayerbotDbStore->Load(this);
@@ -2748,7 +2743,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     }
 
     uint32 CastingTime = !spellInfo->IsChanneled() ? spellInfo->CalcCastTime(bot) : spellInfo->GetDuration();
-    if (CastingTime && bot->isMoving())
+    bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
+    if ((CastingTime || interruptOnMove) && bot->isMoving())
     {
         if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
         {
@@ -4795,7 +4791,8 @@ Item* PlayerbotAI::FindOilFor(Item* weapon) const
     {
         for (const auto& id : uPriorizedWizardOilIds)
         {
-            if (oil = FindConsumable(id))
+            oil = FindConsumable(id);
+            if (oil)
                 return oil;
         }
     }
@@ -4804,7 +4801,8 @@ Item* PlayerbotAI::FindOilFor(Item* weapon) const
     {
         for (const auto& id : uPriorizedManaOilIds)
         {
-            if (oil = FindConsumable(id))
+            oil = FindConsumable(id);
+            if (oil)
                 return oil;
         }
     }
@@ -5689,5 +5687,58 @@ std::set<uint32> PlayerbotAI::GetCurrentIncompleteQuestIds()
     }
 
     return result;
+}
+
+uint32 PlayerbotAI::GetReactDelay()
+{
+    uint32 base = sPlayerbotAIConfig->reactDelay;
+    // old calculate method
+    if (!sPlayerbotAIConfig->dynamicReactDelay)
+    {
+        inCombat = bot->IsInCombat();
+        bool min = false;
+        // test fix lags because of BG
+        bool inBG = bot->InBattleground() || bot->InArena();
+        if (bot && !inCombat)
+            min = true;
+
+        if (HasRealPlayerMaster() || (sPlayerbotAIConfig->fastReactInBG && inBG))
+            min = false;
+        if (min)
+            return base * 10;
+
+        return base;
+    }
+
+    float multiplier = 1.0f;
+
+    if (HasRealPlayerMaster())
+    {
+        multiplier = 1.0f;
+        return base * multiplier;
+    }
+
+    bool inBg = bot->InBattleground() || bot->InArena();
+    if (inBg)
+    {
+        multiplier = sPlayerbotAIConfig->fastReactInBG ? 1.0f : 10.0f;
+        return base * multiplier;
+    }
+
+    if (bot->IsInCombat() || currentState == BOT_STATE_COMBAT)
+    {
+        multiplier = 5.0f;
+        return base * multiplier;
+    }
+
+    bool isResting = bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    if (!isResting)
+    {
+        multiplier = urand(5, 20);
+        return base * multiplier;
+    }
+
+    multiplier = urand(20, 200);
+    return base * multiplier;
 }
 

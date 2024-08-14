@@ -29,6 +29,7 @@
 #include "LFGMgr.h"
 #include "MapMgr.h"
 #include "PerformanceMonitor.h"
+#include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotCommandServer.h"
 #include "PlayerbotFactory.h"
@@ -2333,6 +2334,11 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 taxi = 0;
     uint32 moving = 0;
     uint32 mounted = 0;
+    uint32 inBg = 0;
+    uint32 rest = 0;
+    uint32 engine_noncombat = 0;
+    uint32 engine_combat = 0;
+    uint32 engine_dead = 0;
     uint32 stateCount[MAX_TRAVEL_STATE + 1] = {0};
     std::vector<std::pair<Quest const*, int32>> questCount;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
@@ -2369,7 +2375,33 @@ void RandomPlayerbotMgr::PrintStats()
             // if (!GetEventValue(botId, "dead"))
             //++revive;
         }
-
+        if (bot->IsInCombat())
+        {
+            ++combat;
+        }
+        if (bot->isMoving())
+        {
+            ++moving;
+        }
+        if (bot->IsMounted())
+        {
+            ++mounted;
+        }
+        if (bot->InBattleground() || bot->InArena())
+        {
+            ++inBg;
+        }
+        if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+        {
+            ++rest;
+        }
+        if (botAI->GetState() == BOT_STATE_NON_COMBAT)
+            ++engine_noncombat;
+        else if (botAI->GetState() == BOT_STATE_COMBAT)
+            ++engine_combat;
+        else
+            ++engine_dead;
+        
         uint8 spec = AiFactory::GetPlayerSpecTab(bot);
         switch (bot->getClass())
         {
@@ -2490,7 +2522,14 @@ void RandomPlayerbotMgr::PrintStats()
     LOG_INFO("playerbots", "    On taxi: {}", taxi);
     LOG_INFO("playerbots", "    On mount: {}", mounted);
     LOG_INFO("playerbots", "    In combat: {}", combat);
+    LOG_INFO("playerbots", "    In BG: {}", inBg);
+    LOG_INFO("playerbots", "    In Rest: {}", rest);
     LOG_INFO("playerbots", "    Dead: {}", dead);
+
+    LOG_INFO("playerbots", "Bots engine:", dead);
+    LOG_INFO("playerbots", "    Non-combat: {}", engine_noncombat);
+    LOG_INFO("playerbots", "    Combat: {}", engine_combat);
+    LOG_INFO("playerbots", "    Dead: {}", engine_dead);
 
     LOG_INFO("playerbots", "Bots questing:");
     LOG_INFO("playerbots", "    Picking quests: {}",
@@ -2746,3 +2785,4 @@ ObjectGuid const RandomPlayerbotMgr::GetBattleMasterGUID(Player* bot, Battlegrou
 
     return battleMasterGUID;
 }
+

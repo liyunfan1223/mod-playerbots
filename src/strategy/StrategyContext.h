@@ -60,7 +60,7 @@ public:
         creators["emote"] = &StrategyContext::emote;
         creators["passive"] = &StrategyContext::passive;
         // creators["conserve mana"] = &StrategyContext::conserve_mana;
-        creators["auto save mana"] = &StrategyContext::auto_save_mana;
+        creators["smana"] = &StrategyContext::auto_save_mana;
         creators["food"] = &StrategyContext::food;
         creators["chat"] = &StrategyContext::chat;
         creators["default"] = &StrategyContext::world_packet;
@@ -112,9 +112,9 @@ public:
         creators["group"] = &StrategyContext::group;
         creators["guild"] = &StrategyContext::guild;
         creators["grind"] = &StrategyContext::grind;
-        creators["avoid aoe"] = &StrategyContext::avoid_aoe;
+        creators["aaoe"] = &StrategyContext::avoid_aoe;
         creators["move random"] = &StrategyContext::move_random;
-        creators["combat formation"] = &StrategyContext::combat_formation;
+        creators["formation"] = &StrategyContext::combat_formation;
     }
 
 private:
