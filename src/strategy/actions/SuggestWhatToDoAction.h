@@ -25,8 +25,10 @@ protected:
     void grindReputation();
     void grindMaterials();
     void something();
-    void spam(std::string msg, uint8 flags = 0, bool worldChat = false, bool guild = false);
-
+    void toxicLinks();
+    void somethingToxic();
+    void thunderfury();
+ 
     std::vector<uint32> GetIncompletedQuests();
 
 private:
@@ -38,9 +40,7 @@ class SuggestTradeAction : public SuggestWhatToDoAction
 {
 public:
     SuggestTradeAction(PlayerbotAI* botAI);
-
     bool Execute(Event event) override;
-    bool isUseful() override { return true; }
 };
 
 class SuggestDungeonAction : public SuggestWhatToDoAction
@@ -49,8 +49,6 @@ public:
     SuggestDungeonAction(PlayerbotAI* botAI);
 
     bool Execute(Event event) override;
-    bool isUseful() override { return true; }
-
 private:
     static std::map<std::string, uint8> instances;
 };

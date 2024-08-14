@@ -438,13 +438,10 @@ bool UseRandomQuestItem::Execute(Event event)
     ObjectGuid goTarget;
 
     std::vector<Item*> questItems = AI_VALUE2(std::vector<Item*>, "inventory items", "quest");
-
-    Item* item = nullptr;
-    uint32 delay = 0;
-
     if (questItems.empty())
         return false;
 
+    Item* item = nullptr;
     for (uint8 i = 0; i < 5; i++)
     {
         auto itr = questItems.begin();
@@ -452,7 +449,6 @@ bool UseRandomQuestItem::Execute(Event event)
         Item* questItem = *itr;
 
         ItemTemplate const* proto = questItem->GetTemplate();
-
         if (proto->StartQuest)
         {
             Quest const* qInfo = sObjectMgr->GetQuestTemplate(proto->StartQuest);
@@ -463,61 +459,14 @@ bool UseRandomQuestItem::Execute(Event event)
             }
         }
 
-        uint32 spellId = proto->Spells[0].SpellId;
-        if (spellId)
-        {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-
-            GuidVector npcs = AI_VALUE(GuidVector, ("nearest npcs"));
-            for (auto& npc : npcs)
-            {
-                Unit* unit = botAI->GetUnit(npc);
-                if (botAI->CanCastSpell(spellId, unit, false))
-                {
-                    item = questItem;
-                    unitTarget = unit;
-                    break;
-                }
-            }
-
-            GuidVector gos = AI_VALUE(GuidVector, ("nearest game objects"));
-            for (auto& go : gos)
-            {
-                GameObject* gameObject = botAI->GetGameObject(go);
-                GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
-                if (!goInfo->GetLockId())
-                    continue;
-
-                LockEntry const* lock = sLockStore.LookupEntry(goInfo->GetLockId());
-                for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
-                {
-                    if (!lock->Type[i])
-                        continue;
-                    if (lock->Type[i] != LOCK_KEY_ITEM)
-                        continue;
-
-                    if (lock->Index[i] == proto->ItemId)
-                    {
-                        item = questItem;
-                        goTarget = go;
-                        unitTarget = nullptr;
-                        break;
-                    }
-                }
-            }
-        }
     }
 
     if (!item)
         return false;
 
-    if (!goTarget && !unitTarget)
-        return false;
-
     bool used = UseItem(item, goTarget, nullptr, unitTarget);
-
     if (used)
-        botAI->SetNextCheckDelay(delay);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
 
     return used;
 }

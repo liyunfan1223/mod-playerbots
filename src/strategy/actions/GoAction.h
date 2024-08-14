@@ -9,6 +9,8 @@
 #include "MovementActions.h"
 
 class PlayerbotAI;
+class TravelDestination;
+class WorldPosition;
 
 class GoAction : public MovementAction
 {

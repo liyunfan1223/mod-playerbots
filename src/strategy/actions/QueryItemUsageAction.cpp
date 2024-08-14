@@ -12,64 +12,6 @@
 
 bool QueryItemUsageAction::Execute(Event event)
 {
-    if (!GetMaster() && !sPlayerbotAIConfig->randomBotSayWithoutMaster)
-        return false;
-
-    if (!sPlayerbotAIConfig->sayWhenCollectingItems)
-        return false;
-
-    WorldPacket& data = event.getPacket();
-    if (!data.empty())
-    {
-        data.rpos(0);
-
-        ObjectGuid guid;
-        data >> guid;
-        if (guid != bot->GetGUID())
-            return false;
-
-        uint32 received;
-        uint32 created;
-        uint32 isShowChatMessage;
-        uint32 notUsed;
-        uint32 itemId;
-        uint32 suffixFactor;
-        uint32 itemRandomPropertyId;
-        uint32 count;
-        uint32 invCount;
-        uint8 bagSlot;
-
-        data >> received;           // 0=looted, 1=from npc
-        data >> created;            // 0=received, 1=created
-        data >> isShowChatMessage;  // IsShowChatMessage
-        data >> bagSlot;            // item slot, but when added to stack: 0xFFFFFFFF
-
-        data >> notUsed;
-        data >> itemId;
-        data >> suffixFactor;
-        data >> itemRandomPropertyId;
-        data >> count;
-        // data >> invCount; // [-ZERO] count of items in inventory
-
-        ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId);
-        if (!item)
-            return false;
-
-        bot->Say(QueryItem(item, count, GetCount(item)), LANG_UNIVERSAL);
-        return true;
-    }
-
-    std::string const text = event.getParam();
-    ItemIds items = chat->parseItems(text);
-    for (uint32 itemId : items)
-    {
-        ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId);
-        if (!item)
-            continue;
-
-        botAI->TellMaster(QueryItem(item, 0, GetCount(item)));
-    }
-
     return true;
 }
 

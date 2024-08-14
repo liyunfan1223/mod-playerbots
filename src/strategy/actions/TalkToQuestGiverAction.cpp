@@ -12,9 +12,11 @@
 #include "Playerbots.h"
 #include "QuestDef.h"
 #include "WorldPacket.h"
+#include "BroadcastHelper.h"
 
-void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver)
+bool TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver)
 {
+    bool isCompleted = false;
     std::ostringstream out;
     out << "Quest ";
 
@@ -28,7 +30,7 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
         {
             QuestStatus masterStatus = master->GetQuestStatus(quest->GetQuestId());
             if (masterStatus == QUEST_STATUS_INCOMPLETE || masterStatus == QUEST_STATUS_FAILED)
-                CompleteQuest(master, quest->GetQuestId());
+                isCompleted |= CompleteQuest(master, quest->GetQuestId());
         }
     }
 
@@ -37,39 +39,42 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
         if (master && master->GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE &&
             (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED))
         {
-            CompleteQuest(bot, quest->GetQuestId());
+            isCompleted |= CompleteQuest(bot, quest->GetQuestId());
             status = bot->GetQuestStatus(quest->GetQuestId());
         }
     }
 
     switch (status)
     {
-        case QUEST_STATUS_COMPLETE:
-            TurnInQuest(quest, questGiver, out);
-            break;
-        case QUEST_STATUS_INCOMPLETE:
-            out << "|cffff0000Incompleted|r";
-            break;
-        case QUEST_STATUS_NONE:
-            out << "|cff00ff00Available|r";
-            break;
-        case QUEST_STATUS_FAILED:
-            out << "|cffff0000Failed|r";
-            break;
-        default:
-            break;
+    case QUEST_STATUS_COMPLETE:
+        isCompleted |= TurnInQuest(quest, questGiver, out);
+        break;
+    case QUEST_STATUS_INCOMPLETE:
+        out << "|cffff0000Incompleted|r";
+        break;
+    case QUEST_STATUS_NONE:
+        AcceptQuest(quest, questGiver->GetGUID());
+        out << "|cff00ff00Available|r";
+        break;
+    case QUEST_STATUS_FAILED:
+        out << "|cffff0000Failed|r";
+        break;
+    default:
+        break;
     }
 
     out << ": " << chat->FormatQuest(quest);
     botAI->TellMaster(out);
+
+    return isCompleted;
 }
 
-void TalkToQuestGiverAction::TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out)
+bool TalkToQuestGiverAction::TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out)
 {
     uint32 questID = quest->GetQuestId();
 
     if (bot->GetQuestRewardStatus(questID))
-        return;
+        return false;
 
     bot->PlayDistanceSound(621);
 
@@ -81,18 +86,33 @@ void TalkToQuestGiverAction::TurnInQuest(Quest const* quest, Object* questGiver,
     {
         RewardMultipleItem(quest, questGiver, out);
     }
+
+    if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+    {
+        const Quest* pQuest = sObjectMgr->GetQuestTemplate(questID);
+        const std::string text_quest = ChatHelper::FormatQuest(pQuest);
+        LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), pQuest->GetTitle());
+        bot->Say("Quest [ " + text_quest + " ] completed", LANG_UNIVERSAL);
+    }
+
+    return true;
 }
 
 void TalkToQuestGiverAction::RewardNoItem(Quest const* quest, Object* questGiver, std::ostringstream& out)
 {
+    std::map<std::string, std::string> args;
+    args["%quest"] = chat->FormatQuest(quest);
+    
     if (bot->CanRewardQuest(quest, false))
     {
+        out << BOT_TEXT2("quest_status_completed", args);
+        BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
+
         bot->RewardQuest(quest, 0, questGiver, false);
-        out << "Completed";
     }
     else
     {
-        out << "|cffff0000Unable to turn in|r";
+        out << BOT_TEXT2("quest_status_unable_to_complete", args);
     }
 }
 
@@ -100,15 +120,19 @@ void TalkToQuestGiverAction::RewardSingleItem(Quest const* quest, Object* questG
 {
     int index = 0;
     ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[index]);
+    std::map<std::string, std::string> args;
+    args["%quest"] = chat->FormatQuest(quest);
+    args["%item"] = chat->FormatItem(item);
+
     if (bot->CanRewardQuest(quest, index, false))
     {
+        out << BOT_TEXT2("quest_status_complete_single_reward", args);
+        BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
         bot->RewardQuest(quest, index, questGiver, true);
-
-        out << "Rewarded " << chat->FormatItem(item);
     }
     else
     {
-        out << "|cffff0000Unable to turn in:|r, reward: " << chat->FormatItem(item);
+        out << BOT_TEXT2("quest_status_unable_to_complete", args);
     }
 }
 
@@ -247,23 +271,24 @@ bool TurnInQueryQuestAction::Execute(Event event)
     out << "Quest ";
     switch (status)
     {
-        case QUEST_STATUS_COMPLETE:
-            TurnInQuest(quest, object, out);
-            break;
-        case QUEST_STATUS_INCOMPLETE:
-            out << "|cffff0000Incompleted|r";
-            break;
-        case QUEST_STATUS_NONE:
-            out << "|cff00ff00Available|r";
-            break;
-        case QUEST_STATUS_FAILED:
-            out << "|cffff0000Failed|r";
-            break;
-        case QUEST_STATUS_REWARDED:
-            out << "|cffff0000Rewarded|r";
-            break;
-        default:
-            break;
+    case QUEST_STATUS_COMPLETE:
+        TurnInQuest(quest, object, out);
+        break;
+    case QUEST_STATUS_INCOMPLETE:
+        out << "|cffff0000Incompleted|r";
+        break;
+    case QUEST_STATUS_NONE:
+        AcceptQuest(quest, object->GetGUID());
+        out << "|cff00ff00Available|r";
+        break;
+    case QUEST_STATUS_FAILED:
+        out << "|cffff0000Failed|r";
+        break;
+    case QUEST_STATUS_REWARDED:
+        out << "|cffff0000Rewarded|r";
+        break;
+    default:
+        break;
     }
 
     out << ": " << chat->FormatQuest(quest);

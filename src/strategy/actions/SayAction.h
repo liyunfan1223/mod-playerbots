@@ -7,10 +7,10 @@
 #define _PLAYERBOT_SAYACTION_H
 
 #include "Action.h"
+#include "PlayerbotAI.h"
 #include "NamedObjectContext.h"
 
 class PlayerbotAI;
-
 class SayAction : public Action, public Qualified
 {
 public:
@@ -31,7 +31,13 @@ public:
     ChatReplyAction(PlayerbotAI* ai) : Action(ai, "chat message") {}
     virtual bool Execute(Event event) { return true; }
     bool isUseful() { return true; }
-    static void ChatReplyDo(Player* bot, uint32 type, uint32 guid1, uint32 guid2, std::string msg, std::string chanName,
-                            std::string name);
+
+    static void ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint32& guid2, std::string& msg, std::string& chanName, std::string& name);
+    static bool HandleThunderfuryReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name);
+    static bool HandleToxicLinksReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name);
+    static bool HandleWTBItemsReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name);
+    static bool HandleLFGQuestsReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name);
+    static bool SendGeneralResponse(Player* bot, ChatChannelSource chatChannelSource, std::string& responseMessage, std::string& name);
+    static std::string GenerateReplyMessage(Player* bot, std::string& incomingMessage, uint32& guid1, std::string& name);
 };
 #endif

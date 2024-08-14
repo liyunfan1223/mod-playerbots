@@ -9,6 +9,8 @@
 #include "AddLootAction.h"
 #include "AttackAction.h"
 #include "AutoLearnSpellAction.h"
+#include "ShareQuestAction.h"
+#include "BattleGroundTactics.h"
 #include "AutoTeleportForLevelAction.h"
 #include "BattleGroundJoinAction.h"
 #include "BattleGroundTactics.h"
@@ -43,6 +45,7 @@
 #include "NonCombatActions.h"
 #include "OutfitAction.h"
 #include "PositionAction.h"
+#include "DropQuestAction.h"
 #include "RaidNaxxActions.h"
 #include "RandomBotUpdateAction.h"
 #include "ReachTargetActions.h"
@@ -153,6 +156,7 @@ public:
         creators["war stomp"] = &ActionContext::war_stomp;
         creators["auto talents"] = &ActionContext::auto_talents;
         creators["auto learn spell"] = &ActionContext::auto_learn_spell;
+        creators["auto share quest"] = &ActionContext::auto_share_quest;
         creators["auto teleport for level"] = &ActionContext::auto_teleport_for_level;
         creators["auto upgrade equip"] = &ActionContext::auto_upgrade_equip;
         creators["xp gain"] = &ActionContext::xp_gain;
@@ -179,6 +183,7 @@ public:
         creators["turn in petition"] = &ActionContext::turn_in_petition;
         creators["buy tabard"] = &ActionContext::buy_tabard;
         creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
+        creators["clean quest log"] = &ActionContext::clean_quest_log;
 
         // BG Tactics
         creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -206,7 +211,7 @@ public:
         creators["blade salvo"] = &ActionContext::blade_salvo;
         creators["glaive throw"] = &ActionContext::glaive_throw;
 
-        // Rpg
+        //Rpg
         creators["rpg stay"] = &ActionContext::rpg_stay;
         creators["rpg work"] = &ActionContext::rpg_work;
         creators["rpg emote"] = &ActionContext::rpg_emote;
@@ -231,7 +236,7 @@ public:
         creators["rpg mount anim"] = &ActionContext::rpg_mount_anim;
 
         creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
-        creators["pet attack"] = &ActionContext::pet_attack;
+        creators["pet attack"] = &ActionContext::pet_attack; 
     }
 
 private:
@@ -265,10 +270,7 @@ private:
     static Action* ReachSpell(PlayerbotAI* botAI) { return new ReachSpellAction(botAI); }
     static Action* ReachMelee(PlayerbotAI* botAI) { return new ReachMeleeAction(botAI); }
     static Action* reach_party_member_to_heal(PlayerbotAI* botAI) { return new ReachPartyMemberToHealAction(botAI); }
-    static Action* reach_party_member_to_resurrect(PlayerbotAI* botAI)
-    {
-        return new ReachPartyMemberToResurrectAction(botAI);
-    }
+    static Action* reach_party_member_to_resurrect(PlayerbotAI* botAI) { return new ReachPartyMemberToResurrectAction(botAI); }
     static Action* flee(PlayerbotAI* botAI) { return new FleeAction(botAI); }
     static Action* flee_with_pet(PlayerbotAI* botAI) { return new FleeWithPetAction(botAI); }
     static Action* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeAction(botAI); }
@@ -324,6 +326,7 @@ private:
     static Action* war_stomp(PlayerbotAI* botAI) { return new CastWarStompAction(botAI); }
     static Action* auto_talents(PlayerbotAI* botAI) { return new AutoSetTalentsAction(botAI); }
     static Action* auto_learn_spell(PlayerbotAI* botAI) { return new AutoLearnSpellAction(botAI); }
+    static Action* auto_share_quest(PlayerbotAI* ai) { return new AutoShareQuestAction(ai); }
     static Action* auto_teleport_for_level(PlayerbotAI* botAI) { return new AutoTeleportForLevelAction(botAI); }
     static Action* auto_upgrade_equip(PlayerbotAI* botAI) { return new AutoUpgradeEquipAction(botAI); }
     static Action* xp_gain(PlayerbotAI* botAI) { return new XpGainAction(botAI); }
@@ -351,6 +354,7 @@ private:
     static Action* turn_in_petition(PlayerbotAI* botAI) { return new PetitionTurnInAction(botAI); }
     static Action* buy_tabard(PlayerbotAI* botAI) { return new BuyTabardAction(botAI); }
     static Action* guild_manage_nearby(PlayerbotAI* botAI) { return new GuildManageNearbyAction(botAI); }
+    static Action* clean_quest_log(PlayerbotAI* botAI) { return new CleanQuestLogAction(botAI); }
 
     // BG Tactics
     static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }

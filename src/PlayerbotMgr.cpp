@@ -26,9 +26,10 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
+#include "ChannelMgr.h"
+#include "BroadcastHelper.h"
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
-
 class PlayerbotLoginQueryHolder : public LoginQueryHolder
 {
 private:
@@ -562,10 +563,12 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         pkt << "";  // Pass
         bot->GetSession()->HandleJoinChannel(pkt);
     }
+
     // join standard channels
-    AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(bot->GetAreaId());
+    uint8 locale = BroadcastHelper::GetLocale();
+    AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
-    std::string current_zone_name = current_zone ? current_zone->area_name[sWorld->GetDefaultDbcLocale()] : "";
+    std::string current_zone_name = current_zone ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_zone) : "";
 
     if (current_zone && cMgr)
     {
@@ -575,27 +578,40 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
             if (!channel)
                 continue;
 
-            bool isLfg = (channel->flags & CHANNEL_DBC_FLAG_LFG) != 0;
-
-            // skip non built-in channels or global channel without zone name in pattern
-            if (!isLfg && (!channel || (channel->flags & 4) == 4))
-                continue;
-
-            //  new channel
             Channel* new_channel = nullptr;
-            if (isLfg)
+            switch (channel->ChannelID)
             {
-                std::string lfgChannelName = channel->pattern[sWorld->GetDefaultDbcLocale()];
-                new_channel = cMgr->GetJoinChannel("LookingForGroup", channel->ChannelID);
+                case ChatChannelId::GENERAL:
+                case ChatChannelId::LOCAL_DEFENSE:
+                {
+                    char new_channel_name_buf[100];
+                    snprintf(new_channel_name_buf, 100, channel->pattern[locale], current_zone_name.c_str());
+                    new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+                    break;
+                }
+                case ChatChannelId::TRADE:
+                case ChatChannelId::GUILD_RECRUITMENT:
+                {
+                    char new_channel_name_buf[100];
+                    //3459 is ID for a zone named "City" (only exists for the sake of using its name)
+                    //Currently in magons TBC, if you switch zones, then you join "Trade - <zone>" and "GuildRecruitment - <zone>"
+                    //which is a core bug, should be "Trade - City" and "GuildRecruitment - City" in both 1.12 and TBC
+                    //but if you (actual player) logout in a city and log back in - you join "City" versions
+                    snprintf(new_channel_name_buf, 100, channel->pattern[locale], GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(GetAreaEntryByAreaID(3459)).c_str());
+                    new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+                    break;
+                }
+                case ChatChannelId::LOOKING_FOR_GROUP:
+                case ChatChannelId::WORLD_DEFENSE:
+                {
+                    new_channel = cMgr->GetJoinChannel(channel->pattern[locale], channel->ChannelID);
+                    break;
+                }
+                default:
+                    break;
             }
-            else
-            {
-                char new_channel_name_buf[100];
-                snprintf(new_channel_name_buf, 100, channel->pattern[sWorld->GetDefaultDbcLocale()],
-                         current_zone_name.c_str());
-                new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
-            }
-            if (new_channel && new_channel->GetName().length() > 0)
+
+            if (new_channel)
                 new_channel->JoinChannel(bot, "");
         }
     }

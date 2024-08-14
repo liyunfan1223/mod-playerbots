@@ -16,8 +16,10 @@ void QueryQuestAction::TellObjective(std::string const name, uint32 available, u
 
 bool QueryQuestAction::Execute(Event event)
 {
+    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     Player* bot = botAI->GetBot();
     WorldPosition botPos(bot);
+    WorldPosition* ptr_botpos = &botPos;
     std::string text = event.getParam();
     bool travel = false;
 
@@ -30,7 +32,22 @@ bool QueryQuestAction::Execute(Event event)
     PlayerbotChatHandler ch(bot);
     uint32 questId = ch.extractQuestId(text);
     if (!questId)
-        return false;
+    {
+        for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+        {
+            uint32 logQuest = bot->GetQuestSlotQuestId(slot);
+
+            Quest const* quest = sObjectMgr->GetQuestTemplate(logQuest);
+            if (!quest)
+                continue;
+
+            if (text.find(quest->GetTitle()) != std::string::npos)
+            {
+                questId = quest->GetQuestId();
+                break;
+            }
+        }
+    }
 
     for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
@@ -58,12 +75,7 @@ bool QueryQuestAction::Execute(Event event)
             std::vector<TravelDestination*> allDestinations =
                 sTravelMgr->getQuestTravelDestinations(bot, questId, true, true, -1);
 
-            std::sort(allDestinations.begin(), allDestinations.end(),
-                      [botPos](TravelDestination* i, TravelDestination* j) {
-                          return i->distanceTo(const_cast<WorldPosition*>(&botPos)) <
-                                 j->distanceTo(const_cast<WorldPosition*>(&botPos));
-                      });
-
+            std::sort(allDestinations.begin(), allDestinations.end(), [ptr_botpos](TravelDestination* i, TravelDestination* j) {return i->distanceTo(ptr_botpos) < j->distanceTo(ptr_botpos); });
             for (auto dest : allDestinations)
             {
                 if (limit > 50)
@@ -74,7 +86,7 @@ bool QueryQuestAction::Execute(Event event)
                 uint32 tpoints = dest->getPoints(true).size();
                 uint32 apoints = dest->getPoints().size();
 
-                out << round(dest->distanceTo(const_cast<WorldPosition*>(&botPos)));
+                out << round(dest->distanceTo(&botPos));
                 out << " to " << dest->getTitle();
                 out << " " << apoints;
 
@@ -85,12 +97,6 @@ bool QueryQuestAction::Execute(Event event)
 
                 if (!dest->isActive(bot))
                     out << " not active";
-
-                if (dest->isFull(bot))
-                    out << " crowded";
-
-                if (dest->isFull(bot))
-                    out << " crowded";
 
                 botAI->TellMaster(out);
 

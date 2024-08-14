@@ -11,6 +11,7 @@
 class Player;
 class Unit;
 class WorldObject;
+class WorldPacket;
 
 class ServerFacade
 {
@@ -32,8 +33,9 @@ public:
     bool IsDistanceLessOrEqualThan(float dist1, float dist2);
 
     void SetFacingTo(Player* bot, WorldObject* wo, bool force = false);
-
     Unit* GetChaseTarget(Unit* target);
+
+    void SendPacket(Player *player, WorldPacket* packet);
 };
 
 #define sServerFacade ServerFacade::instance()

@@ -107,6 +107,7 @@ public:
         creators["debug move"] = &StrategyContext::debug_move;
         creators["debug rpg"] = &StrategyContext::debug_rpg;
         creators["debug spell"] = &StrategyContext::debug_spell;
+        creators["debug quest"] = &StrategyContext::debug_quest;
         creators["maintenance"] = &StrategyContext::maintenance;
         creators["group"] = &StrategyContext::group;
         creators["guild"] = &StrategyContext::guild;
@@ -170,9 +171,10 @@ private:
     static Strategy* debug_move(PlayerbotAI* botAI) { return new DebugMoveStrategy(botAI); }
     static Strategy* debug_rpg(PlayerbotAI* botAI) { return new DebugRpgStrategy(botAI); }
     static Strategy* debug_spell(PlayerbotAI* botAI) { return new DebugSpellStrategy(botAI); }
+    static Strategy* debug_quest(PlayerbotAI* botAI) { return new DebugQuestStrategy(botAI); }
     static Strategy* maintenance(PlayerbotAI* botAI) { return new MaintenanceStrategy(botAI); }
     static Strategy* group(PlayerbotAI* botAI) { return new GroupStrategy(botAI); }
-    static Strategy* guild(PlayerbotAI* botAI) { return new GuildStrategy(botAI); }
+    static Strategy* guild (PlayerbotAI* botAI) { return new GuildStrategy(botAI); }
     static Strategy* grind(PlayerbotAI* botAI) { return new GrindingStrategy(botAI); }
     static Strategy* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeStrategy(botAI); }
     static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }

@@ -8,6 +8,7 @@
 #include "Playerbots.h"
 #include "ReputationMgr.h"
 #include "SharedDefines.h"
+#include "ServerFacade.h"
 
 Unit* GrindTargetValue::Calculate()
 {
@@ -32,6 +33,9 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
     Group* group = bot->GetGroup();
     Player* master = GetMaster();
 
+    if (master && (master == bot || master->GetMapId() != bot->GetMapId() || master->IsBeingTeleported() || !GET_PLAYERBOT_AI(master)))
+        master = nullptr;
+
     GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
     for (ObjectGuid const guid : attackers)
     {
@@ -48,8 +52,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
 
     float distance = 0;
     Unit* result = nullptr;
-
-    // std::unordered_map<uint32, bool> needForQuestMap;
+    std::unordered_map<uint32, bool> needForQuestMap;
 
     for (ObjectGuid const guid : targets)
     {
@@ -84,19 +87,30 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         // if (!bot->InBattleground() && master && master->GetDistance(unit) >= sPlayerbotAIConfig->grindDistance &&
         // !sRandomPlayerbotMgr->IsRandomBot(bot)) continue;
 
-        if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
+        // Bots in bot-groups no have a more limited range to look for grind target
+        if (!bot->InBattleground() && master && botAI->HasStrategy("follow", BotState::BOT_STATE_NON_COMBAT)
+            && sServerFacade->GetDistance2d(master, unit) > sPlayerbotAIConfig->lootDistance)
+        {
+            if (botAI->HasStrategy("debug grind", BotState::BOT_STATE_NON_COMBAT))
+                botAI->TellMaster(chat->FormatWorldobject(unit) + " ignored (far from master).");
             continue;
+        }
 
-        // if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
-        //     needForQuestMap[unit->GetEntry()] = needForQuest(unit);
+		if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
+		    continue;
 
-        // if (!needForQuestMap[unit->GetEntry()])
-        //     if ((urand(0, 100) < 75 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() &&
-        //         context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() !=
-        //         "GrindTravelDestination"))) continue;
+        if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
+            needForQuestMap[unit->GetEntry()] = needForQuest(unit);
 
-        // if (bot->InBattleground() && bot->GetDistance(unit) > 40.0f)
-        // continue;
+        if (!needForQuestMap[unit->GetEntry()])
+        {
+            Creature* creature = dynamic_cast<Creature*>(unit);
+            if ((urand(0, 100) < 60 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() &&
+                context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() != "GrindTravelDestination")))
+            {
+                continue;
+            }
+        }
 
         if (Creature* creature = unit->ToCreature())
             if (CreatureTemplate const* CreatureTemplate = creature->GetCreatureTemplate())

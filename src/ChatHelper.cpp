@@ -9,6 +9,8 @@
 #include "Playerbots.h"
 #include "SpellInfo.h"
 
+#include <regex>
+
 std::map<std::string, uint32> ChatHelper::consumableSubClasses;
 std::map<std::string, uint32> ChatHelper::tradeSubClasses;
 std::map<std::string, uint32> ChatHelper::itemQualities;
@@ -217,6 +219,26 @@ std::string const ChatHelper::formatMoney(uint32 copper)
     }
 
     return out.str();
+}
+
+std::string ChatHelper::parseValue(const std::string& type, const std::string& text)
+{
+    std::string retString;
+
+    std::string pattern = "Hvalue:" + type + ":";
+
+    int pos = text.find(pattern, 0);
+    if (pos == -1)
+        return retString;
+
+    pos += pattern.size();
+
+    int endPos = text.find('|', pos);
+    if (endPos == -1)
+        return retString;
+
+    retString = text.substr(pos, endPos - pos);
+    return retString;
 }
 
 uint32 ChatHelper::parseMoney(std::string const text)
@@ -569,4 +591,36 @@ void ChatHelper::eraseAllSubStr(std::string& mainStr, std::string const toErase)
         // If found then erase it from std::string
         mainStr.erase(pos, toErase.length());
     }
+}
+
+std::set<uint32> ChatHelper::ExtractAllQuestIds(const std::string& text)
+{
+    std::set<uint32> ids;
+
+    std::regex rgx("Hquest:[0-9]+");
+    auto begin = std::sregex_iterator(text.begin(), text.end(), rgx);
+    auto end = std::sregex_iterator();
+    for (std::sregex_iterator i = begin; i != end; ++i)
+    {
+        std::smatch match = *i;
+        ids.insert(std::stoi(match.str().erase(0, 7)));
+    }
+
+    return ids;
+}
+
+std::set<uint32> ChatHelper::ExtractAllItemIds(const std::string& text)
+{
+    std::set<uint32> ids;
+
+    std::regex rgx("Hitem:[0-9]+");
+    auto begin = std::sregex_iterator(text.begin(), text.end(), rgx);
+    auto end = std::sregex_iterator();
+    for (std::sregex_iterator i = begin; i != end; ++i)
+    {
+        std::smatch match = *i;
+        ids.insert(std::stoi(match.str().erase(0, 6)));
+    }
+
+    return ids;
 }
