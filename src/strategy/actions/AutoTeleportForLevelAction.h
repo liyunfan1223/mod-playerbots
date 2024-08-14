@@ -10,15 +10,26 @@
 
 class PlayerbotAI;
 
-class AutoTeleportForLevelAction : public Action
+class AutoMaintenanceOnLevelupAction : public Action
 {
 public:
-    AutoTeleportForLevelAction(PlayerbotAI* botAI, std::string const name = "auto teleport for level")
+    AutoMaintenanceOnLevelupAction(PlayerbotAI* botAI, std::string const name = "auto maintenance on levelup")
         : Action(botAI, name)
     {
     }
 
     bool Execute(Event event);
+
+protected:
+    void AutoTeleportForLevel();
+    void AutoPickTalents();
+    void AutoLearnSpell();
+    void AutoUpgradeEquip();
+    void LearnSpells(std::ostringstream* out);
+    void LearnTrainerSpells(std::ostringstream* out);
+    void LearnQuestSpells(std::ostringstream* out);
+    void LearnSpell(uint32 spellId, std::ostringstream* out);
+    std::string const FormatSpell(SpellInfo const* sInfo);
 };
 
 #endif
