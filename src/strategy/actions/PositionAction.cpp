@@ -49,7 +49,7 @@ bool PositionAction::Execute(Event event)
         return true;
     }
 
-    std::vector<std::string> params = split(param, ' ');
+    std::vector<std::string> params = split(param, " ");
     if (params.size() != 2)
     {
         botAI->TellMaster("Whisper position <name> ?/set/reset");

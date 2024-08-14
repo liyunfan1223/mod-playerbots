@@ -6,6 +6,7 @@
 #include "FlagAction.h"
 
 #include "Event.h"
+#include "Helpers.h"
 #include "Playerbots.h"
 
 bool FlagAction::TellUsage()
@@ -17,7 +18,7 @@ bool FlagAction::TellUsage()
 bool FlagAction::Execute(Event event)
 {
     std::string const cmd = event.getParam();
-    std::vector<std::string> ss = split(cmd, ' ');
+    std::vector<std::string> ss = split(cmd, " ");
     if (ss.size() != 2)
         return TellUsage();
 

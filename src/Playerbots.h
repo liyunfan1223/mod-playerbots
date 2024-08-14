@@ -18,8 +18,6 @@
 #include "SpellMgr.h"
 #include "TravelNode.h"
 
-std::vector<std::string> split(std::string const s, char delim);
-void split(std::vector<std::string>& dest, std::string const str, char const* delim);
 #ifndef WIN32
 int strcmpi(char const* s1, char const* s2);
 #endif

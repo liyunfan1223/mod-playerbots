@@ -4,7 +4,7 @@
  */
 
 #include "ListSpellsAction.h"
-
+#include "Helpers.h"
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -117,7 +117,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
     uint32 maxLevel = 0;
     if (filter.find("-") != std::string::npos)
     {
-        std::vector<std::string> ff = split(filter, '-');
+        std::vector<std::string> ff = split(filter, "-");
         minLevel = atoi(ff[0].c_str());
         maxLevel = atoi(ff[1].c_str());
         filter = "";

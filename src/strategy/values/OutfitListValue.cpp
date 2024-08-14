@@ -4,7 +4,7 @@
  */
 
 #include "OutfitListValue.h"
-
+#include "Helpers.h"
 #include "Playerbots.h"
 
 std::string const OutfitListValue::Save()
@@ -28,7 +28,7 @@ bool OutfitListValue::Load(std::string const text)
 {
     value.clear();
 
-    std::vector<std::string> ss = split(text, '^');
+    std::vector<std::string> ss = split(text, "^");
     for (std::vector<std::string>::iterator i = ss.begin(); i != ss.end(); ++i)
     {
         value.push_back(*i);

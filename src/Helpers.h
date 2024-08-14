@@ -52,18 +52,18 @@ inline std::vector<std::string> split(std::string_view s, std::string_view delim
     return substrings;
 }
 
-inline void split(std::vector<std::string>& dest, std::string const str, char const* delim)
+inline void split(std::vector<std::string>& dest, const std::string& str, char const* delim)
 {
     dest = split(str, delim);
 }
 
-inline std::vector<std::string>& split(std::string const s, char delim, std::vector<std::string>& elems)
+inline std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string>& elems)
 {
     elems = split(s, &delim);
     return elems;
 }
 
-inline std::vector<std::string> split(std::string const s, char delim)
+inline std::vector<std::string> split(const std::string& s, char delim)
 {
     std::vector<std::string> elems;
     return split(s, delim, elems);

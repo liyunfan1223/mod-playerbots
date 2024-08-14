@@ -756,8 +756,7 @@ void PlayerbotAI::HandleCommand(const uint32& type, const std::string& text, Pla
 
     if (text.find(sPlayerbotAIConfig->commandSeparator) != std::string::npos)
     {
-        std::vector<std::string> commands;
-        split(commands, text, sPlayerbotAIConfig->commandSeparator.c_str());
+        std::vector<std::string> commands = split(text, sPlayerbotAIConfig->commandSeparator.c_str());
         for (std::vector<std::string>::iterator i = commands.begin(); i != commands.end(); ++i)
         {
             HandleCommand(type, *i, fromPlayer);

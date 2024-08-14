@@ -38,10 +38,10 @@ bool PositionValue::Load(std::string const text)
 {
     value.clear();
 
-    std::vector<std::string> ss = split(text, '^');
+    std::vector<std::string> ss = split(text, "^");
     for (std::vector<std::string>::iterator i = ss.begin(); i != ss.end(); ++i)
     {
-        std::vector<std::string> s1 = split(*i, '=');
+        std::vector<std::string> s1 = split(*i, "=");
         if (s1.size() != 2)
             continue;
 

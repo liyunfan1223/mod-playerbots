@@ -7,6 +7,7 @@
 
 #include "ChatHelper.h"
 #include "Event.h"
+#include "Helpers.h"
 #include "ItemVisitors.h"
 #include "Mail.h"
 #include "Playerbots.h"
@@ -33,7 +34,7 @@ bool SendMailAction::Execute(Event event)
     Player* receiver = GetMaster();
     Player* tellTo = receiver;
 
-    std::vector<std::string> ss = split(text, ' ');
+    std::vector<std::string> ss = split(text, " ");
     if (ss.size() > 1)
     {
         if (Player* p = ObjectAccessor::FindPlayer(ObjectGuid(uint64(ss[ss.size() - 1].c_str()))))

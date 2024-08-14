@@ -4,7 +4,7 @@
  */
 
 #include "PartyMemberWithoutAuraValue.h"
-
+#include "Helpers.h"
 #include "Playerbots.h"
 
 extern std::vector<std::string> split(std::string const s, char delim);
@@ -13,7 +13,7 @@ class PlayerWithoutAuraPredicate : public FindPlayerPredicate, public PlayerbotA
 {
 public:
     PlayerWithoutAuraPredicate(PlayerbotAI* botAI, std::string const aura)
-        : PlayerbotAIAware(botAI), FindPlayerPredicate(), auras(split(aura, ','))
+        : PlayerbotAIAware(botAI), FindPlayerPredicate(), auras(split(aura, ","))
     {
     }
 

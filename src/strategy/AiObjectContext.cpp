@@ -8,6 +8,7 @@
 #include "ActionContext.h"
 #include "ChatActionContext.h"
 #include "ChatTriggerContext.h"
+#include "Helpers.h"
 #include "Playerbots.h"
 #include "SharedValueContext.h"
 #include "StrategyContext.h"
@@ -93,7 +94,7 @@ void AiObjectContext::Load(std::vector<std::string> data)
     for (std::vector<std::string>::iterator i = data.begin(); i != data.end(); ++i)
     {
         std::string const row = *i;
-        std::vector<std::string> parts = split(row, '>');
+        std::vector<std::string> parts = split(row, ">");
         if (parts.size() != 2)
             continue;
 

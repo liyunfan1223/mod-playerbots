@@ -13,7 +13,7 @@ std::map<std::string, std::string> CustomStrategy::actionLinesCache;
 
 NextAction* toNextAction(std::string const action)
 {
-    std::vector<std::string> tokens = split(action, '!');
+    std::vector<std::string> tokens = split(action, "!");
     if (tokens.size() == 2 && !tokens[0].empty())
         return new NextAction(tokens[0], atof(tokens[1].c_str()));
     else if (tokens.size() == 1 && !tokens[0].empty())
@@ -41,7 +41,7 @@ NextAction** toNextActionArray(std::string const actions)
 
 TriggerNode* toTriggerNode(std::string const actionLine)
 {
-    std::vector<std::string> tokens = split(actionLine, '>');
+    std::vector<std::string> tokens = split(actionLine, ">");
     if (tokens.size() == 2)
         return new TriggerNode(tokens[0], toNextActionArray(tokens[1]));
 
@@ -63,7 +63,7 @@ void CustomStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         }
         else
         {
-            std::vector<std::string> tokens = split(actionLinesCache[qualifier], '\n');
+            std::vector<std::string> tokens = split(actionLinesCache[qualifier], "\n");
             std::regex tpl("\\(nullptr,\\s*'.+',\\s*'(.+)'\\)(,|;)");
             for (std::vector<std::string>::iterator i = tokens.begin(); i != tokens.end(); ++i)
             {
