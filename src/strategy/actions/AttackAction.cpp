@@ -112,8 +112,9 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     bot->SetSelection(target->GetGUID());
 
     Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
+    bool melee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
 
-    if (oldTarget == target && botAI->GetState() == BOT_STATE_COMBAT && bot->GetVictim() == target)
+    if (oldTarget == target && botAI->GetState() == BOT_STATE_COMBAT && bot->GetVictim() == target && (bot->HasUnitState(UNIT_STATE_MELEE_ATTACKING) == melee))
         return false;
 
     context->GetValue<Unit*>("old target")->Set(oldTarget);
@@ -129,7 +130,6 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
         bot->StopMoving();
     }
 
-    bool melee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
 
     if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
     {
