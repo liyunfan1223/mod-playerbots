@@ -4,6 +4,7 @@
  */
 
 #include "BattleGroundTactics.h"
+#include "BattleGroundJoinAction.h"
 
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
@@ -2167,7 +2168,7 @@ bool BGTactics::Execute(Event event)
     }
 
     if (bg->GetStatus() == STATUS_WAIT_LEAVE)
-        return false;
+        return BGStatusAction::LeaveBG(botAI);
 
     if (bg->isArena())
     {
@@ -4537,20 +4538,22 @@ bool ArenaTactics::Execute(Event event)
         return false;
     }
 
-    if (bot->GetBattleground()->GetStatus() != STATUS_IN_PROGRESS)
+    Battleground* bg = bot->GetBattleground();
+    if (!bg)
+        return false;
+
+    if (bg->GetStatus() == STATUS_WAIT_LEAVE)
+        return BGStatusAction::LeaveBG(botAI);
+
+    if (bg->GetStatus() != STATUS_IN_PROGRESS)
         return false;
 
     if (bot->isDead())
-    {
         return false;
-    }
 
     if (bot->isMoving())
         return false;
 
-    Battleground* bg = bot->GetBattleground();
-    if (!bg)
-        return false;
 
     // startup phase
     if (bg->GetStartDelayTime() > 0)

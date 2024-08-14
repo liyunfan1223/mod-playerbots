@@ -57,6 +57,7 @@ public:
 
     bool Execute(Event event) override;
     bool isUseful() override;
+    static bool LeaveBG(PlayerbotAI* botAI);
 };
 
 class BGStatusCheckAction : public Action

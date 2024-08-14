@@ -674,6 +674,10 @@ bool BGLeaveAction::Execute(Event event)
 
     // botAI->ChangeStrategy("-bg", BOT_STATE_NON_COMBAT);
 
+    if (BGStatusAction::LeaveBG(botAI))
+        return true;
+
+    // leave queue if not in BG
     BattlegroundQueueTypeId queueTypeId = bot->GetBattlegroundQueueTypeId(0);
     BattlegroundTypeId _bgTypeId = BattlegroundMgr::BGTemplateId(queueTypeId);
     uint8 type = false;
@@ -687,27 +691,6 @@ bool BGLeaveAction::Execute(Event event)
     {
         isArena = true;
         type = arenaType;
-    }
-
-    if (bot->InBattleground())
-    {
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {}", bot->GetGUID().ToString().c_str(),
-                 bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                 isArena ? "Arena" : "BG");
-
-        WorldPacket leave(CMSG_LEAVE_BATTLEFIELD);
-        leave << uint8(0) << uint8(0) << uint32(0) << uint16(0);
-        bot->GetSession()->HandleBattlefieldLeaveOpcode(leave);
-
-        if (IsRandomBot)
-            botAI->SetMaster(nullptr);
-
-        botAI->ResetStrategies(!IsRandomBot);
-        botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
-        botAI->GetAiObjectContext()->GetValue<uint32>("bg role")->Set(0);
-        botAI->GetAiObjectContext()->GetValue<uint32>("arena type")->Set(0);
-
-        return true;
     }
 
     uint32 queueType = AI_VALUE(uint32, "bg type");
@@ -730,6 +713,54 @@ bool BGLeaveAction::Execute(Event event)
     botAI->GetAiObjectContext()->GetValue<uint32>("bg role")->Set(0);
     botAI->GetAiObjectContext()->GetValue<uint32>("arena type")->Set(0);
 
+    return true;
+}
+
+bool BGStatusAction::LeaveBG(PlayerbotAI* botAI)
+{
+    Player* bot = botAI->GetBot();
+    Battleground* bg = bot->GetBattleground();
+    if (!bg)
+        return false;
+    bool isArena = bg->isArena();
+    bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot);
+
+    if (isRandomBot)
+        botAI->SetMaster(nullptr);
+
+    botAI->ChangeStrategy("-warsong", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("-warsong", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-arathi", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("-arathi", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-eye", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("-eye", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-isle", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("-isle", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-Battleground", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("-Battleground", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-arena", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("-arena", BOT_STATE_NON_COMBAT);
+
+    LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {}", bot->GetGUID().ToString().c_str(),
+             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
+             isArena ? "Arena" : "BG");
+
+    WorldPacket packet(CMSG_LEAVE_BATTLEFIELD);
+    packet << uint8(0);
+    packet << uint8(0);  // BattlegroundTypeId-1 ?
+    packet << uint32(0);
+    packet << uint16(0);
+
+    bot->GetSession()->HandleBattlefieldLeaveOpcode(packet);
+
+    botAI->ResetStrategies(!isRandomBot);
+    botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
+    botAI->GetAiObjectContext()->GetValue<uint32>("bg role")->Set(0);
+    botAI->GetAiObjectContext()->GetValue<uint32>("arena type")->Set(0);
+    PositionMap& posMap = botAI->GetAiObjectContext()->GetValue<PositionMap&>("position")->Get();
+    PositionInfo pos = botAI->GetAiObjectContext()->GetValue<PositionMap&>("position")->Get()["bg objective"];
+    pos.Reset();
+    posMap["bg objective"] = pos;
     return true;
 }
 
@@ -860,47 +891,12 @@ bool BGStatusAction::Execute(Event event)
 
     if (Time1 == TIME_TO_AUTOREMOVE)  // Battleground is over, bot needs to leave
     {
-        LOG_INFO("playerbots", "Bot {} <{}> ({} {}): Received BG status TIME_REMOVE for {} {}",
+        LOG_INFO("playerbots", "Bot {} <{}> ({} {}): Received BG status TIME_TO_AUTOREMOVE for {} {}",
                  bot->GetGUID().ToString().c_str(), bot->GetName(), bot->GetLevel(),
                  bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", isArena ? "Arena" : "BG", _bgType);
 
-        // remove warsong strategy
-        if (IsRandomBot)
-            botAI->SetMaster(nullptr);
-
-        botAI->ChangeStrategy("-warsong", BOT_STATE_COMBAT);
-        botAI->ChangeStrategy("-warsong", BOT_STATE_NON_COMBAT);
-        botAI->ChangeStrategy("-arathi", BOT_STATE_COMBAT);
-        botAI->ChangeStrategy("-arathi", BOT_STATE_NON_COMBAT);
-        botAI->ChangeStrategy("-eye", BOT_STATE_COMBAT);
-        botAI->ChangeStrategy("-eye", BOT_STATE_NON_COMBAT);
-        botAI->ChangeStrategy("-isle", BOT_STATE_COMBAT);
-        botAI->ChangeStrategy("-isle", BOT_STATE_NON_COMBAT);
-        botAI->ChangeStrategy("-Battleground", BOT_STATE_COMBAT);
-        botAI->ChangeStrategy("-Battleground", BOT_STATE_NON_COMBAT);
-        botAI->ChangeStrategy("-arena", BOT_STATE_COMBAT);
-        botAI->ChangeStrategy("-arena", BOT_STATE_NON_COMBAT);
-
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}> leaves {} - {}", bot->GetGUID().ToString().c_str(),
-                 bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(),
-                 isArena ? "Arena" : "BG", _bgType);
-
-        WorldPacket packet(CMSG_LEAVE_BATTLEFIELD);
-        packet << uint8(0);
-        packet << uint8(0);  // BattlegroundTypeId-1 ?
-        packet << uint32(0);
-        packet << uint16(0);
-
-        bot->GetSession()->HandleBattlefieldLeaveOpcode(packet);
-
-        botAI->ResetStrategies(!IsRandomBot);
-        botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
-        botAI->GetAiObjectContext()->GetValue<uint32>("bg role")->Set(0);
-        botAI->GetAiObjectContext()->GetValue<uint32>("arena type")->Set(0);
-        PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
-        PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
-        pos.Reset();
-        posMap["bg objective"] = pos;
+        if (LeaveBG(botAI))
+            return true;
     }
 
     if (statusid == STATUS_WAIT_QUEUE)  // bot is in queue
