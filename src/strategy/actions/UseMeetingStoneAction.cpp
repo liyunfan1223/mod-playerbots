@@ -87,7 +87,7 @@ bool SummonAction::Execute(Event event)
     if (master->GetSession()->GetSecurity() >= SEC_PLAYER)
     {
         // botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
-        SET_AI_VALUE(std::list<FleeInfo>, "recently flee info", {});
+        AI_VALUE(std::list<FleeInfo>&, "recently flee info").clear();
         return Teleport(master, bot);
     }
 
@@ -215,10 +215,12 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                 bool revive =
                     sPlayerbotAIConfig->reviveBotWhenSummoned == 2 ||
                     (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat() && master->IsAlive());
+
                 if (bot->isDead() && revive)
                 {
                     bot->ResurrectPlayer(1.0f, false);
                     botAI->TellMasterNoFacing("I live, again!");
+                    botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
                 }
 
                 player->GetMotionMaster()->Clear();
