@@ -32,8 +32,11 @@ public:
 BEGIN_RANGED_SPELL_ACTION(CastArcaneShotAction, "arcane shot")
 END_SPELL_ACTION()
 
-BEGIN_RANGED_SPELL_ACTION(CastExplosiveShotAction, "explosive shot")
-END_SPELL_ACTION()
+class CastExplosiveShotAction : public CastDebuffSpellAction
+{
+public:
+    CastExplosiveShotAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "explosive shot", true, 0.0f) {}
+};
 
 BEGIN_RANGED_SPELL_ACTION(CastAimedShotAction, "aimed shot")
 END_SPELL_ACTION()
@@ -158,6 +161,12 @@ class CastRapidFireAction : public CastBuffSpellAction
 {
 public:
     CastRapidFireAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "rapid fire") {}
+};
+
+class CastDeterrenceAction : public CastBuffSpellAction
+{
+public:
+    CastDeterrenceAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "deterrence") {}
 };
 
 class CastReadinessAction : public CastBuffSpellAction

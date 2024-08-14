@@ -149,6 +149,7 @@ public:
         creators["freezing trap"] = &HunterAiObjectContextInternal::freezing_trap;
         creators["rapid fire"] = &HunterAiObjectContextInternal::rapid_fire;
         creators["boost"] = &HunterAiObjectContextInternal::rapid_fire;
+        creators["deterrence"] = &HunterAiObjectContextInternal::deterrence;
         creators["readiness"] = &HunterAiObjectContextInternal::readiness;
         creators["aspect of the hawk"] = &HunterAiObjectContextInternal::aspect_of_the_hawk;
         creators["aspect of the monkey"] = &HunterAiObjectContextInternal::aspect_of_the_monkey;
@@ -200,6 +201,7 @@ private:
     static Action* black_arrow(PlayerbotAI* botAI) { return new CastBlackArrow(botAI); }
     static Action* freezing_trap(PlayerbotAI* botAI) { return new CastFreezingTrap(botAI); }
     static Action* rapid_fire(PlayerbotAI* botAI) { return new CastRapidFireAction(botAI); }
+    static Action* deterrence(PlayerbotAI* botAI) { return new CastDeterrenceAction(botAI); }
     static Action* readiness(PlayerbotAI* botAI) { return new CastReadinessAction(botAI); }
     static Action* aspect_of_the_hawk(PlayerbotAI* botAI) { return new CastAspectOfTheHawkAction(botAI); }
     static Action* aspect_of_the_monkey(PlayerbotAI* botAI) { return new CastAspectOfTheMonkeyAction(botAI); }

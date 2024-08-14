@@ -108,8 +108,11 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("medium threat", NextAction::array(0, new NextAction("vanish", ACTION_HIGH), nullptr)));
 
     triggers.push_back(
-        new TriggerNode("low health", NextAction::array(0, new NextAction("evasion", ACTION_EMERGENCY),
-                                                        new NextAction("feint", ACTION_EMERGENCY), nullptr)));
+        new TriggerNode("low health", NextAction::array(0, new NextAction("evasion", ACTION_HIGH + 9),
+                                                        new NextAction("feint", ACTION_HIGH + 8), nullptr)));
+
+    triggers.push_back(
+        new TriggerNode("critical health", NextAction::array(0, new NextAction("cloak of shadows", ACTION_HIGH + 7), nullptr)));
 
     triggers.push_back(
         new TriggerNode("kick", NextAction::array(0, new NextAction("kick", ACTION_INTERRUPT + 2), nullptr)));
@@ -124,6 +127,9 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(
         new TriggerNode("light aoe", NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 3), nullptr)));
+
+    triggers.push_back(
+        new TriggerNode("blade flurry", NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 2), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "enemy out of melee",

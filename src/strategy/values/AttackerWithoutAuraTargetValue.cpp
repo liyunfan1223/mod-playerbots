@@ -19,7 +19,7 @@ Unit* AttackerWithoutAuraTargetValue::Calculate()
         if (!unit || !unit->IsAlive())
             continue;
 
-        if (bot->GetDistance(unit) > botAI->GetRange(range))
+        if (!bot->IsWithinCombatRange(unit, botAI->GetRange(range)))
             continue;
 
         if (unit->GetHealth() < max_health)

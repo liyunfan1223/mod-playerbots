@@ -66,8 +66,11 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         new TriggerNode("medium threat", NextAction::array(0, new NextAction("vanish", ACTION_HIGH), NULL)));
 
     triggers.push_back(
-        new TriggerNode("low health", NextAction::array(0, new NextAction("evasion", ACTION_EMERGENCY),
-                                                        new NextAction("feint", ACTION_EMERGENCY), NULL)));
+        new TriggerNode("low health", NextAction::array(0, new NextAction("evasion", ACTION_HIGH + 9),
+                                                        new NextAction("feint", ACTION_HIGH + 8), nullptr)));
+
+    triggers.push_back(
+        new TriggerNode("critical health", NextAction::array(0, new NextAction("cloak of shadows", ACTION_HIGH + 7), nullptr)));
 
     triggers.push_back(
         new TriggerNode("kick", NextAction::array(0, new NextAction("kick", ACTION_INTERRUPT + 2), NULL)));

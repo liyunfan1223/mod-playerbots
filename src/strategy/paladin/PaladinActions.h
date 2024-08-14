@@ -44,13 +44,6 @@ SPELL_ACTION(CastHolyShockAction, "holy shock");
 // consecration
 MELEE_ACTION(CastConsecrationAction, "consecration");
 
-class CastMeleeConsecrationAction : public CastSpellAction
-{
-public:
-    CastMeleeConsecrationAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "consecration") {}
-    bool isUseful() override;
-};
-
 // repentance
 SNARE_ACTION(CastRepentanceSnareAction, "repentance");
 DEBUFF_ACTION(CastRepentanceAction, "repentance");
@@ -67,10 +60,10 @@ BUFF_ACTION(CastDivineFavorAction, "divine favor");
 // fury
 BUFF_ACTION(CastRighteousFuryAction, "righteous fury");
 
-class CastDivineStormAction : public CastBuffSpellAction
+class CastDivineStormAction : public CastMeleeSpellAction
 {
 public:
-    CastDivineStormAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "divine storm") {}
+    CastDivineStormAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "divine storm") {}
 };
 
 class CastCrusaderStrikeAction : public CastMeleeSpellAction

@@ -308,7 +308,23 @@ std::string const TwoTriggers::getName()
     return name;
 }
 
-bool BoostTrigger::IsActive() { return BuffTrigger::IsActive() && AI_VALUE(uint8, "balance") <= balance; }
+bool BoostTrigger::IsActive()
+{
+    if (!BuffTrigger::IsActive())
+        return false;
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && target->ToPlayer())
+        return true;
+    return AI_VALUE(uint8, "balance") <= balance;
+}
+
+bool GenericBoostTrigger::IsActive() 
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && target->ToPlayer())
+        return true;
+    return AI_VALUE(uint8, "balance") <= balance;
+}
 
 bool ItemCountTrigger::IsActive() { return AI_VALUE2(uint32, "item count", item) < count; }
 

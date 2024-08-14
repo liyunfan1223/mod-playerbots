@@ -405,14 +405,15 @@ public:
     }
 };
 
-class RecentlyFleeInfo : public ManualSetValue<std::list<FleeInfo>>
+class RecentlyFleeInfo : public ManualSetValue<std::list<FleeInfo>&>
 {
 public:
-    RecentlyFleeInfo(PlayerbotAI* botAI, std::list<FleeInfo> defaultValue = {},
-                     std::string const name = "recently flee info")
-        : ManualSetValue<std::list<FleeInfo>>(botAI, defaultValue, name)
+    RecentlyFleeInfo(PlayerbotAI* botAI, std::string const name = "recently flee info")
+        : ManualSetValue<std::list<FleeInfo>&>(botAI, data, name)
     {
     }
+private:
+    std::list<FleeInfo> data = {};
 };
 
 #endif

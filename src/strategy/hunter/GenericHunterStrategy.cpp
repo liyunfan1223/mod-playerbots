@@ -97,6 +97,9 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("misdirection on main tank",
                         NextAction::array(0, new NextAction("misdirection on main tank", ACTION_HIGH + 7), NULL)));
+    triggers.push_back(
+        new TriggerNode("low health", NextAction::array(0, new NextAction("deterrence", ACTION_HIGH + 5), nullptr)));
+    
     triggers.push_back(new TriggerNode("tranquilizing shot enrage",
                                        NextAction::array(0, new NextAction("tranquilizing shot", 61.0f), NULL)));
     triggers.push_back(new TriggerNode("tranquilizing shot magic",

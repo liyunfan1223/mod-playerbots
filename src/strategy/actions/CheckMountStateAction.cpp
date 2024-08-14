@@ -8,6 +8,7 @@
 #include "BattlegroundWS.h"
 #include "Event.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SpellAuraEffects.h"
@@ -17,35 +18,46 @@ bool CheckMountStateAction::Execute(Event event)
     bool noattackers =
         AI_VALUE2(bool, "combat", "self target") ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true) : true;
     bool enemy = AI_VALUE(Unit*, "enemy player target");
-    // ignore grind target in BG or bots will dismount near any creature (eg: the rams in AV)
     bool dps = AI_VALUE(Unit*, "dps target");
-    // bool fartarget = (enemy && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "enemy player
-    // target"), 40.0f)) ||
-    //     (dps && sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "dps target"), 50.0f));
-    bool attackdistance = false;
+    bool shouldDismount = false;
+    bool shouldMount = false;
     // bool chasedistance = false;
-    float attack_distance = 35.0f;
+    float attack_distance;
+    float mount_distance;
     if (PlayerbotAI::IsMelee(bot))
     {
-        attack_distance = 5.0f;
+        attack_distance = sPlayerbotAIConfig->meleeDistance + 2.0f;
+        mount_distance = sPlayerbotAIConfig->meleeDistance + 10.0f;
     }
     else
     {
-        attack_distance = 30.0f;
+        attack_distance = sPlayerbotAIConfig->spellDistance + 2.0f;
+        mount_distance = sPlayerbotAIConfig->spellDistance + 10.0f;
     }
 
-    // if (enemy)
-    //     attack_distance /= 2;
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
 
-    if (dps || enemy)
+    if (currentTarget)
     {
-        Unit* currentTarget = AI_VALUE(Unit*, "current target");
-        attackdistance =
-            (enemy || dps) && currentTarget &&
-            sServerFacade->IsDistanceLessThan(AI_VALUE2(float, "distance", "current target"), attack_distance);
+        float combatReach = bot->GetCombatReach() + currentTarget->GetCombatReach();
+        attack_distance += combatReach;
+        float disToTarget = bot->GetExactDist(currentTarget);
+        shouldDismount = disToTarget <= attack_distance;
     }
+    else
+        shouldDismount = false;
 
-    if (bot->IsMounted() && attackdistance)
+    if (currentTarget)
+    {
+        float combatReach = bot->GetCombatReach() + currentTarget->GetCombatReach();
+        mount_distance += combatReach;
+        float disToTarget = bot->GetExactDist(currentTarget);
+        shouldMount = disToTarget > mount_distance;
+    }
+    else
+        shouldMount = true;
+    
+    if (bot->IsMounted() && shouldDismount)
     {
         WorldPacket emptyPacket;
         bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
@@ -59,7 +71,7 @@ bool CheckMountStateAction::Execute(Event event)
             return false;
 
         // bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
-        if (master->IsMounted() && !bot->IsMounted() && noattackers && !attackdistance && !bot->IsInCombat() &&
+        if (master->IsMounted() && !bot->IsMounted() && noattackers && shouldMount && !bot->IsInCombat() &&
             botAI->GetState() != BOT_STATE_COMBAT)
         {
             return Mount();
@@ -71,16 +83,6 @@ bool CheckMountStateAction::Execute(Event event)
             bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
             return true;
         }
-        // if (!bot->IsMounted() && (chasedistance || (farFromMaster && botAI->HasStrategy("follow",
-        // BOT_STATE_NON_COMBAT))) && !bot->IsInCombat() && !dps)
-        //     return Mount();
-
-        // if (!bot->IsFlying() && ((!farFromMaster && !master->IsMounted()) || attackdistance) && bot->IsMounted())
-        // {
-        //     WorldPacket emptyPacket;
-        //     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
-        //     return true;
-        // }
 
         return false;
     }
@@ -88,13 +90,13 @@ bool CheckMountStateAction::Execute(Event event)
     // For random bots
     if (!bot->InBattleground() && !master)
     {
-        if (!bot->IsMounted() && noattackers && !attackdistance && !bot->IsInCombat())
+        if (!bot->IsMounted() && noattackers && shouldMount && !bot->IsInCombat())
         {
             return Mount();
         }
     }
 
-    if (bot->InBattleground() && !attackdistance && noattackers && !bot->IsInCombat() && !bot->IsMounted())
+    if (bot->InBattleground() && shouldMount && noattackers && !bot->IsInCombat() && !bot->IsMounted())
     {
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
@@ -108,24 +110,7 @@ bool CheckMountStateAction::Execute(Event event)
         return Mount();
     }
 
-    // if (!bot->InBattleground())
-    // {
-    //     if (AI_VALUE(GuidPosition, "rpg target"))
-    //     {
-    //         if (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "rpg target"),
-    //         sPlayerbotAIConfig->farDistance) && noattackers && !dps && !enemy)
-    //             return Mount();
-    //     }
-
-    //     if (((!AI_VALUE(GuidVector, "possible rpg targets").empty()) && noattackers && !dps && !enemy) && urand(0,
-    //     100) > 50)
-    //         return Mount();
-    // }
-
-    // if (!bot->IsMounted() && !attackdistance && (fartarget || chasedistance))
-    //     return Mount();
-
-    if (!bot->IsFlying() && attackdistance && bot->IsMounted() && (enemy || dps || (!noattackers && bot->IsInCombat())))
+    if (!bot->IsFlying() && shouldDismount && bot->IsMounted() && (enemy || dps || (!noattackers && bot->IsInCombat())))
     {
         WorldPacket emptyPacket;
         bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);

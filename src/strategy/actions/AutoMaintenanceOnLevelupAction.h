@@ -3,33 +3,33 @@
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
-#ifndef _PLAYERBOT_AUTOLEARNSPELLACTION_H
-#define _PLAYERBOT_AUTOLEARNSPELLACTION_H
+#ifndef _PLAYERBOT_AUTOTELEPORTFORLEVELACTION_H
+#define _PLAYERBOT_AUTOTELEPORTFORLEVELACTION_H
 
 #include "Action.h"
 
 class PlayerbotAI;
 
-class AutoLearnSpellAction : public Action
+class AutoMaintenanceOnLevelupAction : public Action
 {
 public:
-    AutoLearnSpellAction(PlayerbotAI* botAI, std::string const name = "auto learn spell") : Action(botAI, name) {}
+    AutoMaintenanceOnLevelupAction(PlayerbotAI* botAI, std::string const name = "auto maintenance on levelup")
+        : Action(botAI, name)
+    {
+    }
 
     bool Execute(Event event);
 
-private:
+protected:
+    void AutoTeleportForLevel();
+    void AutoPickTalents();
+    void AutoLearnSpell();
+    void AutoUpgradeEquip();
     void LearnSpells(std::ostringstream* out);
     void LearnTrainerSpells(std::ostringstream* out);
     void LearnQuestSpells(std::ostringstream* out);
     void LearnSpell(uint32 spellId, std::ostringstream* out);
-};
-
-class AutoUpgradeEquipAction : public Action
-{
-public:
-    AutoUpgradeEquipAction(PlayerbotAI* botAI, std::string const name = "auto upgrade equip") : Action(botAI, name) {}
-
-    bool Execute(Event event);
+    std::string const FormatSpell(SpellInfo const* sInfo);
 };
 
 #endif

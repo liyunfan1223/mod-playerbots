@@ -9,6 +9,8 @@
 
 #include "Event.h"
 #include "Formations.h"
+#include "LastMovementValue.h"
+#include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
@@ -28,25 +30,15 @@ bool FollowAction::Execute(Event event)
         WorldLocation loc = formation->GetLocation();
         if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
             return false;
-
+        
+        MovementPriority priority = botAI->GetState() == BOT_STATE_COMBAT ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_NORMAL;
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), false, false, false,
-                       true);
+                       true, priority);
     }
 
     if (Pet* pet = bot->GetPet())
     {
-        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
-        {
-            pet->SetReactState(REACT_PASSIVE);
-            pet->GetCharmInfo()->SetIsCommandFollow(true);
-            pet->GetCharmInfo()->IsReturning();
-            pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
-            // pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-            // pet->GetCharmInfo()->SetIsFollowing(true);
-            // pet->AttackStop();
-            // pet->GetCharmInfo()->IsReturning();
-            // pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
-        }
+        botAI->PetFollow();
     }
     // if (moved)
     // botAI->SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);

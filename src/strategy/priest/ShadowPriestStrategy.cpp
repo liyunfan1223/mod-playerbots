@@ -29,8 +29,10 @@ void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // ACTION_MOVE + 9), nullptr)));
     triggers.push_back(
         new TriggerNode("shadowform", NextAction::array(0, new NextAction("shadowform", ACTION_HIGH), nullptr)));
-    // triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("dispersion", ACTION_EMERGENCY
-    // + 5), nullptr)));
+    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("dispersion", ACTION_HIGH
+        + 5), nullptr)));
+    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("dispersion", ACTION_HIGH
+        + 5), nullptr)));
     triggers.push_back(
         new TriggerNode("vampiric embrace", NextAction::array(0, new NextAction("vampiric embrace", 16.0f), nullptr)));
     triggers.push_back(

@@ -13,6 +13,15 @@
 class PlayerbotAI;
 class Unit;
 
+// High priority movement can override the previous low priority one
+enum class MovementPriority
+{
+    MOVEMENT_IDLE,
+    MOVEMENT_NORMAL,
+    MOVEMENT_COMBAT,
+    MOVEMENT_FORCED
+};
+
 class LastMovement
 {
 public:
@@ -28,14 +37,14 @@ public:
         lastMoveShort = other.lastMoveShort;
         lastPath = other.lastPath;
         nextTeleport = other.nextTeleport;
-
+        priority = other.priority;
         return *this;
     };
 
     void clear();
 
     void Set(Unit* follow);
-    void Set(uint32 mapId, float x, float y, float z, float ori, float delayTime);
+    void Set(uint32 mapId, float x, float y, float z, float ori, float delayTime, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
 
     void setShort(WorldPosition point);
     void setPath(TravelPath path);
@@ -53,6 +62,7 @@ public:
     float lastdelayTime;
     WorldPosition lastMoveShort;
     uint32 msTime;
+    MovementPriority priority;
     TravelPath lastPath;
     time_t nextTeleport;
     std::future<TravelPath> future;

@@ -232,7 +232,6 @@ public:
         creators["concentration aura"] = &PaladinAiObjectContextInternal::concentration_aura;
         creators["holy wrath"] = &PaladinAiObjectContextInternal::holy_wrath;
         creators["consecration"] = &PaladinAiObjectContextInternal::consecration;
-        creators["melee consecration"] = &PaladinAiObjectContextInternal::melee_consecration;
         creators["cleanse disease"] = &PaladinAiObjectContextInternal::cleanse_disease;
         creators["cleanse poison"] = &PaladinAiObjectContextInternal::cleanse_poison;
         creators["cleanse magic"] = &PaladinAiObjectContextInternal::cleanse_magic;
@@ -331,7 +330,6 @@ private:
     static Action* concentration_aura(PlayerbotAI* botAI) { return new CastConcentrationAuraAction(botAI); }
     static Action* holy_wrath(PlayerbotAI* botAI) { return new CastHolyWrathAction(botAI); }
     static Action* consecration(PlayerbotAI* botAI) { return new CastConsecrationAction(botAI); }
-    static Action* melee_consecration(PlayerbotAI* botAI) { return new CastMeleeConsecrationAction(botAI); }
     static Action* cleanse_poison(PlayerbotAI* botAI) { return new CastCleansePoisonAction(botAI); }
     static Action* cleanse_disease(PlayerbotAI* botAI) { return new CastCleanseDiseaseAction(botAI); }
     static Action* cleanse_magic(PlayerbotAI* botAI) { return new CastCleanseMagicAction(botAI); }

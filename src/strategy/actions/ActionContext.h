@@ -8,10 +8,9 @@
 
 #include "AddLootAction.h"
 #include "AttackAction.h"
-#include "AutoLearnSpellAction.h"
 #include "ShareQuestAction.h"
 #include "BattleGroundTactics.h"
-#include "AutoTeleportForLevelAction.h"
+#include "AutoMaintenanceOnLevelupAction.h"
 #include "BattleGroundJoinAction.h"
 #include "BattleGroundTactics.h"
 #include "BuyAction.h"
@@ -92,7 +91,7 @@ public:
         creators["reach party member to resurrect"] = &ActionContext::reach_party_member_to_resurrect;
         creators["flee"] = &ActionContext::flee;
         creators["flee with pet"] = &ActionContext::flee_with_pet;
-        creators["avoid aoe"] = &ActionContext::avoid_aoe;
+        creators["aaoe"] = &ActionContext::avoid_aoe;
         creators["combat formation move"] = &ActionContext::combat_formation_move;
         creators["disperse set"] = &ActionContext::disperse_set;
         creators["gift of the naaru"] = &ActionContext::gift_of_the_naaru;
@@ -154,11 +153,12 @@ public:
         creators["give water"] = &ActionContext::give_water;
         creators["mount"] = &ActionContext::mount;
         creators["war stomp"] = &ActionContext::war_stomp;
+        creators["blood fury"] = &ActionContext::blood_fury;
+        creators["berserking"] = &ActionContext::berserking;
+        creators["use trinket"] = &ActionContext::use_trinket;
         creators["auto talents"] = &ActionContext::auto_talents;
-        creators["auto learn spell"] = &ActionContext::auto_learn_spell;
         creators["auto share quest"] = &ActionContext::auto_share_quest;
-        creators["auto teleport for level"] = &ActionContext::auto_teleport_for_level;
-        creators["auto upgrade equip"] = &ActionContext::auto_upgrade_equip;
+        creators["auto maintenance on levelup"] = &ActionContext::auto_maintenance_on_levelup;
         creators["xp gain"] = &ActionContext::xp_gain;
         creators["invite nearby"] = &ActionContext::invite_nearby;
         creators["invite guild"] = &ActionContext::invite_guild;
@@ -324,11 +324,12 @@ private:
     static Action* try_emergency(PlayerbotAI* botAI) { return new TryEmergencyAction(botAI); }
     static Action* mount(PlayerbotAI* botAI) { return new CastSpellAction(botAI, "mount"); }
     static Action* war_stomp(PlayerbotAI* botAI) { return new CastWarStompAction(botAI); }
+    static Action* blood_fury(PlayerbotAI* botAI) { return new CastBloodFuryAction(botAI); }
+    static Action* berserking(PlayerbotAI* botAI) { return new CastBerserkingAction(botAI); }
+    static Action* use_trinket(PlayerbotAI* botAI) { return new UseTrinketAction(botAI); }
     static Action* auto_talents(PlayerbotAI* botAI) { return new AutoSetTalentsAction(botAI); }
-    static Action* auto_learn_spell(PlayerbotAI* botAI) { return new AutoLearnSpellAction(botAI); }
     static Action* auto_share_quest(PlayerbotAI* ai) { return new AutoShareQuestAction(ai); }
-    static Action* auto_teleport_for_level(PlayerbotAI* botAI) { return new AutoTeleportForLevelAction(botAI); }
-    static Action* auto_upgrade_equip(PlayerbotAI* botAI) { return new AutoUpgradeEquipAction(botAI); }
+    static Action* auto_maintenance_on_levelup(PlayerbotAI* botAI) { return new AutoMaintenanceOnLevelupAction(botAI); }
     static Action* xp_gain(PlayerbotAI* botAI) { return new XpGainAction(botAI); }
     static Action* invite_nearby(PlayerbotAI* botAI) { return new InviteNearbyToGroupAction(botAI); }
     static Action* invite_guild(PlayerbotAI* botAI) { return new InviteGuildToGroupAction(botAI); }

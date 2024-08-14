@@ -7,9 +7,12 @@
 
 #include "CreatureAI.h"
 #include "Event.h"
+#include "LastMovementValue.h"
 #include "LootObjectStack.h"
+#include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "SharedDefines.h"
 #include "Unit.h"
 
 bool AttackAction::Execute(Event event)
@@ -109,24 +112,32 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     bot->SetSelection(target->GetGUID());
 
     Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
+
+    if (oldTarget == target && botAI->GetState() == BOT_STATE_COMBAT && bot->GetVictim() == target)
+        return false;
+
     context->GetValue<Unit*>("old target")->Set(oldTarget);
 
     context->GetValue<Unit*>("current target")->Set(target);
     context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
 
+    LastMovement& lastMovement = AI_VALUE(LastMovement&, "last movement");
+    if (lastMovement.priority < MovementPriority::MOVEMENT_COMBAT && bot->isMoving())
+    {
+        AI_VALUE(LastMovement&, "last movement").clear();
+        bot->GetMotionMaster()->Clear(false);
+        bot->StopMoving();
+    }
+
     bool melee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
-    bot->Attack(target, melee);
 
     if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
     {
         sServerFacade->SetFacingTo(bot, target);
     }
     botAI->ChangeEngine(BOT_STATE_COMBAT);
-
-    if (!bot->GetVictim())
-    {
-        return false;
-    }
+    
+    bot->Attack(target, melee);
     /* prevent pet dead immediately in group */
     // if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
     //     with_pet = false;

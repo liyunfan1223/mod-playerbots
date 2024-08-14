@@ -6,6 +6,7 @@
 #include "ShamanActions.h"
 
 #include "Playerbots.h"
+#include "Totem.h"
 
 bool CastTotemAction::isUseful()
 {
@@ -41,7 +42,24 @@ bool CastSearingTotemAction::isUseful()
     return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "flametongue totem");
 }
 
-bool CastMagmaTotemAction::isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name); }
+bool CastMagmaTotemAction::isUseful() {
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target || !bot->IsWithinMeleeRange(target))
+        return false;
+
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name); 
+}
+
+bool CastFireNovaAction::isUseful() {
+    Creature* fireTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[1]);
+    if (!fireTotem)
+        return false;
+    
+    if (bot->GetDistance(fireTotem) > 8.0f)
+        return false;
+    
+    return CastMeleeSpellAction::isUseful(); 
+}
 
 bool CastCleansingTotemAction::isUseful()
 {

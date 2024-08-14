@@ -70,7 +70,7 @@ AvoidAoeStrategy::AvoidAoeStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
 NextAction** AvoidAoeStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("avoid aoe", ACTION_EMERGENCY), nullptr);
+    return NextAction::array(0, new NextAction("aaoe", ACTION_EMERGENCY), nullptr);
 }
 
 void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

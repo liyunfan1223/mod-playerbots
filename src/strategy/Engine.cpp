@@ -409,26 +409,26 @@ ActionResult Engine::ExecuteAction(std::string const name, Event event, std::str
     return result ? ACTION_RESULT_OK : ACTION_RESULT_FAILED;
 }
 
-void Engine::addStrategy(std::string const name)
+void Engine::addStrategy(std::string const name, bool init)
 {
-    removeStrategy(name);
+    removeStrategy(name, init);
 
     if (Strategy* strategy = aiObjectContext->GetStrategy(name))
     {
         std::set<std::string> siblings = aiObjectContext->GetSiblingStrategy(name);
         for (std::set<std::string>::iterator i = siblings.begin(); i != siblings.end(); i++)
-            removeStrategy(*i);
+            removeStrategy(*i, init);
 
         LogAction("S:+%s", strategy->getName().c_str());
         strategies[strategy->getName()] = strategy;
     }
-
-    Init();
+    if (init)
+        Init();
 }
 
 void Engine::addStrategies(std::string first, ...)
 {
-    addStrategy(first);
+    addStrategy(first, false);
 
     va_list vl;
     va_start(vl, first);
@@ -438,13 +438,34 @@ void Engine::addStrategies(std::string first, ...)
     {
         cur = va_arg(vl, const char*);
         if (cur)
-            addStrategy(cur);
+            addStrategy(cur, false);
+    } while (cur);
+
+    Init();
+
+    va_end(vl);
+}
+
+void Engine::addStrategiesNoInit(std::string first, ...)
+{
+    addStrategy(first, false);
+
+    va_list vl;
+    va_start(vl, first);
+
+    const char* cur;
+    do
+    {
+        cur = va_arg(vl, const char*);
+        if (cur)
+            addStrategy(cur, false);
     } while (cur);
 
     va_end(vl);
 }
 
-bool Engine::removeStrategy(std::string const name)
+
+bool Engine::removeStrategy(std::string const name, bool init)
 {
     std::map<std::string, Strategy*>::iterator i = strategies.find(name);
     if (i == strategies.end())
@@ -452,7 +473,8 @@ bool Engine::removeStrategy(std::string const name)
 
     LogAction("S:-%s", name.c_str());
     strategies.erase(i);
-    Init();
+    if (init)
+        Init();
 
     return true;
 }

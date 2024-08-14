@@ -231,10 +231,11 @@ public:
     bool isUseful() override;
 };
 
-class CastFireNovaAction : public CastSpellAction
+class CastFireNovaAction : public CastMeleeSpellAction
 {
 public:
-    CastFireNovaAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "fire nova") {}
+    CastFireNovaAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "fire nova") {}
+    bool isUseful() override;
 };
 
 class CastWindShearAction : public CastSpellAction

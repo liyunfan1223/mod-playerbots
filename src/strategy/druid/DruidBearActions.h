@@ -43,10 +43,10 @@ public:
     CastSwipeAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "swipe") {}
 };
 
-class CastDemoralizingRoarAction : public CastDebuffSpellAction
+class CastDemoralizingRoarAction : public CastMeleeDebuffSpellAction
 {
 public:
-    CastDemoralizingRoarAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "demoralizing roar") {}
+    CastDemoralizingRoarAction(PlayerbotAI* botAI) : CastMeleeDebuffSpellAction(botAI, "demoralizing roar") {}
 };
 
 class CastMangleBearAction : public CastMeleeSpellAction

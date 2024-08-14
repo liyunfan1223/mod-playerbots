@@ -20,14 +20,21 @@ BUFF_ACTION(CastBerserkerStanceAction, "berserker stance");
 // shouts
 BUFF_ACTION(CastBattleShoutAction, "battle shout");
 MELEE_ACTION_U(CastBattleShoutTauntAction, "battle shout", CastSpellAction::isUseful());  // useful to rebuff
-DEBUFF_ACTION_R(CastDemoralizingShoutAction, "demoralizing shout", 8.0f);                 // low range debuff
-class CastDemoralizingShoutWithoutLifeTimeCheckAction : public CastDebuffSpellAction
+// DEBUFF_ACTION_R(CastDemoralizingShoutAction, "demoralizing shout", 8.0f);                 // low range debuff
+
+class CastDemoralizingShoutAction : public CastMeleeDebuffSpellAction
+{
+public:
+    CastDemoralizingShoutAction(PlayerbotAI* botAI)
+        : CastMeleeDebuffSpellAction(botAI, "demoralizing shout") {}
+};
+
+class CastDemoralizingShoutWithoutLifeTimeCheckAction : public CastMeleeDebuffSpellAction
 {
 public:
     CastDemoralizingShoutWithoutLifeTimeCheckAction(PlayerbotAI* botAI)
-        : CastDebuffSpellAction(botAI, "demoralizing shout", false, 0.0f)
+        : CastMeleeDebuffSpellAction(botAI, "demoralizing shout", false, 0.0f)
     {
-        range = 8.0f;
     }
 };
 
@@ -63,7 +70,7 @@ DEBUFF_ACTION(CastShatteringThrowAction, "shattering throw");
 MELEE_ACTION(CastMortalStrikeAction, "mortal strike");
 BUFF_ACTION(CastSweepingStrikesAction, "sweeping strikes");
 // arms talents 3.3.5
-BUFF_ACTION(CastBladestormAction, "bladestorm");
+MELEE_ACTION(CastBladestormAction, "bladestorm");
 
 // fury
 MELEE_ACTION(CastCleaveAction, "cleave");
