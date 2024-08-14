@@ -171,7 +171,7 @@ bool ConfirmQuestAction::Execute(Event event)
     if (!bot->CanTakeQuest(qInfo, false))
     {
         // can't take quest
-        botAI->TellError("quest_cant_take");
+        // botAI->TellError("quest_cant_take");
         return false;
     }
 
@@ -187,7 +187,7 @@ bool ConfirmQuestAction::Execute(Event event)
             bot->CastSpell(bot, qInfo->GetSrcSpell(), true);
         }
 
-        botAI->TellMaster("quest_accept");
+        // botAI->TellMaster("quest_accept");
         return true;
     }
 
