@@ -419,10 +419,10 @@ bool StoreLootAction::Execute(Event event)
         packet << itemindex;
         bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
 
-        if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
+        if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT) && sPlayerbotAIConfig->randomBotEmote)
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
-        if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
+        if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT) && sPlayerbotAIConfig->randomBotEmote)
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
 
         BroadcastHelper::BroadcastLootingItem(botAI, bot, proto);

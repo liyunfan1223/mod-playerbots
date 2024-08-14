@@ -11,6 +11,7 @@ void EmoteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     if (sPlayerbotAIConfig->randomBotEmote)
     {
+        triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("talk", 1.0f), nullptr)));
         triggers.push_back(new TriggerNode("seldom", NextAction::array(0, new NextAction("emote", 1.0f), nullptr)));
         triggers.push_back(
             new TriggerNode("receive text emote", NextAction::array(0, new NextAction("emote", 10.0f), nullptr)));
@@ -23,7 +24,7 @@ void EmoteStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         triggers.push_back(new TriggerNode(
             "often",
             NextAction::array(0, new NextAction("suggest what to do", 10.0f), new NextAction("suggest dungeon", 3.0f),
-                              new NextAction("suggest trade", 3.0f), new NextAction("talk", 1.0f), nullptr)));
+                              new NextAction("suggest trade", 3.0f), nullptr)));
     }
 
     if (sPlayerbotAIConfig->enableGreet)
