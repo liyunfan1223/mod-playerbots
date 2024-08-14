@@ -66,8 +66,13 @@ uint8 BalancePercentValue::Calculate()
 
             playerLevel += player->GetLevel();
         }
+        uint32 memberCount = group->GetMembersCount();
+        playerLevel /= memberCount;
+        if (memberCount <= 10)
+            playerLevel *= memberCount;
+        else
+            playerLevel *= 10;
     }
-
     GuidVector v = context->GetValue<GuidVector>("attackers")->Get();
     for (ObjectGuid const guid : v)
     {
@@ -89,7 +94,7 @@ uint8 BalancePercentValue::Calculate()
                 level *= 3;
                 break;
             case CREATURE_ELITE_WORLDBOSS:
-                level *= 50;
+                level *= 30;
                 break;
         }
 

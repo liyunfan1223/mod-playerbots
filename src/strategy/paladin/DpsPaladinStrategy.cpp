@@ -85,7 +85,7 @@ NextAction** DpsPaladinStrategy::getDefaultActions()
     return NextAction::array(0, new NextAction("crusader strike", ACTION_DEFAULT + 0.4f),
                              new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.3f),
                              new NextAction("divine storm", ACTION_DEFAULT + 0.2f),
-                             new NextAction("melee consecration", ACTION_DEFAULT + 0.1f),
+                             new NextAction("consecration", ACTION_DEFAULT + 0.1f),
                              new NextAction("melee", ACTION_DEFAULT), NULL);
 }
 
@@ -112,7 +112,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("repentance", NextAction::array(0, new NextAction("repentance",
     // ACTION_INTERRUPT + 2), nullptr)));
     triggers.push_back(new TriggerNode(
-        "medium aoe", NextAction::array(0, new NextAction("melee consecration", ACTION_HIGH + 3), nullptr)));
+        "medium aoe", NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(
         new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("target critical health",

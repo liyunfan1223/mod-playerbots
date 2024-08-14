@@ -53,6 +53,8 @@ public:
         creators["party member medium health"] = &TriggerContext::PartyMemberMediumHealth;
         creators["party member almost full health"] = &TriggerContext::PartyMemberAlmostFullHealth;
 
+        creators["generic boost"] = &TriggerContext::generic_boost;
+
         creators["protect party member"] = &TriggerContext::protect_party_member;
 
         creators["light rage available"] = &TriggerContext::LightRageAvailable;
@@ -318,6 +320,7 @@ private:
     {
         return new PartyMemberAlmostFullHealthTrigger(botAI);
     }
+    static Trigger* generic_boost(PlayerbotAI* botAI) { return new GenericBoostTrigger(botAI); }
     static Trigger* PartyMemberCriticalHealth(PlayerbotAI* botAI)
     {
         return new PartyMemberCriticalHealthTrigger(botAI);

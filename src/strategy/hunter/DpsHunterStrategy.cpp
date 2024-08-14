@@ -10,7 +10,11 @@
 class DpsHunterStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    DpsHunterStrategyActionNodeFactory() { creators["aimed shot"] = &aimed_shot; }
+    DpsHunterStrategyActionNodeFactory()
+    {
+        creators["aimed shot"] = &aimed_shot; 
+        creators["steady shot"] = &steady_shot;
+    }
 
 private:
     static ActionNode* aimed_shot([[maybe_unused]] PlayerbotAI* botAI)
@@ -18,6 +22,13 @@ private:
         return new ActionNode("aimed shot",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("multi-shot"), nullptr),
+                              /*C*/ nullptr);
+    }
+    static ActionNode* steady_shot([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("steady shot",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("arcane shot"), nullptr),
                               /*C*/ nullptr);
     }
 };
@@ -32,7 +43,7 @@ NextAction** DpsHunterStrategy::getDefaultActions()
     return NextAction::array(
         0, new NextAction("kill shot", ACTION_DEFAULT + 0.6f), new NextAction("chimera shot", ACTION_DEFAULT + 0.5f),
         new NextAction("explosive shot", ACTION_DEFAULT + 0.4f), new NextAction("aimed shot", ACTION_DEFAULT + 0.3f),
-        new NextAction("arcane shot", ACTION_DEFAULT + 0.2f), new NextAction("steady shot", ACTION_DEFAULT + 0.1f),
+        /*new NextAction("arcane shot", ACTION_DEFAULT + 0.2f),*/ new NextAction("steady shot", ACTION_DEFAULT + 0.1f),
         new NextAction("auto shot", ACTION_DEFAULT), nullptr);
     // return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new
     // NextAction("auto attack", 9.0f), nullptr);

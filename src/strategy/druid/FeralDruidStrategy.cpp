@@ -27,7 +27,7 @@ private:
     {
         return new ActionNode("survival instincts",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("barskin"), nullptr),
+                              /*A*/ NextAction::array(0, new NextAction("barkskin"), nullptr),
                               /*C*/ nullptr);
     }
 

@@ -409,6 +409,21 @@ protected:
     float balance;
 };
 
+class GenericBoostTrigger : public Trigger
+{
+public:
+    GenericBoostTrigger(PlayerbotAI* botAI, float balance = 50.f)
+        : Trigger(botAI, "generic boost", 1), balance(balance)
+    {
+    }
+
+    bool IsActive() override;
+
+protected:
+    float balance;
+};
+
+
 class RandomTrigger : public Trigger
 {
 public:
