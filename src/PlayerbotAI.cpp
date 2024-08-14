@@ -5742,3 +5742,28 @@ uint32 PlayerbotAI::GetReactDelay()
     return base * multiplier;
 }
 
+void PlayerbotAI::PetFollow()
+{
+    Pet* pet = bot->GetPet();
+    if (!pet)
+        return;
+    pet->AttackStop();
+    pet->InterruptNonMeleeSpells(false);
+    pet->ClearInPetCombat();
+    pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
+    if (pet->ToPet())
+        pet->ToPet()->ClearCastWhenWillAvailable();
+    CharmInfo* charmInfo = pet->GetCharmInfo();
+    if (!charmInfo)
+        return;
+    charmInfo->SetCommandState(COMMAND_FOLLOW);
+
+    charmInfo->SetIsCommandAttack(false);
+    charmInfo->SetIsAtStay(false);
+    charmInfo->SetIsReturning(true);
+    charmInfo->SetIsCommandFollow(true);
+    charmInfo->SetIsFollowing(false);
+    charmInfo->RemoveStayPosition();
+    charmInfo->SetForcedSpell(0);
+    charmInfo->SetForcedTargetGUID();
+}

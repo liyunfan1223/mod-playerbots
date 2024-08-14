@@ -79,9 +79,7 @@ bool SummonAction::Execute(Event event)
 
     if (Pet* pet = bot->GetPet())
     {
-        pet->SetReactState(REACT_PASSIVE);
-        pet->GetCharmInfo()->SetIsCommandFollow(true);
-        pet->GetCharmInfo()->IsReturning();
+        botAI->PetFollow();
     }
 
     if (master->GetSession()->GetSecurity() >= SEC_PLAYER)

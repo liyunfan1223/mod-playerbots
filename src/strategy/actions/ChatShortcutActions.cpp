@@ -62,6 +62,11 @@ bool FollowChatShortcutAction::Execute(Event event)
                         true, priority);
         }
 
+        if (Pet* pet = bot->GetPet())
+        {
+            botAI->PetFollow();
+        }
+
         if (moved)
         {
             botAI->TellMaster("Following");
