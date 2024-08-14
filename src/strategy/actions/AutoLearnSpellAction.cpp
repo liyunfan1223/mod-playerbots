@@ -34,10 +34,12 @@ bool AutoLearnSpellAction::Execute(Event event)
 void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
 {
     BroadcastHelper::BroadcastLevelup(botAI, bot);
-    if (sPlayerbotAIConfig->autoLearnTrainerSpells)
+    if (sPlayerbotAIConfig->autoLearnTrainerSpells &&
+        sRandomPlayerbotMgr->IsRandomBot(bot))
         LearnTrainerSpells(out);
 
-    if (sPlayerbotAIConfig->autoLearnQuestSpells)
+    if (sPlayerbotAIConfig->autoLearnTrainerSpells &&
+        sRandomPlayerbotMgr->IsRandomBot(bot))
         LearnQuestSpells(out);
 }
 
