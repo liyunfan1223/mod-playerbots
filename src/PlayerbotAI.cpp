@@ -18,6 +18,7 @@
 #include "ExternalEventHelper.h"
 #include "GuildMgr.h"
 #include "GuildTaskMgr.h"
+#include "Helpers.h"
 #include "LFGMgr.h"
 #include "LastMovementValue.h"
 #include "LastSpellCastValue.h"
@@ -476,8 +477,7 @@ void PlayerbotAI::HandleCommand(const uint32& type, std::string_view text, Playe
 
     if (filtered.find(sPlayerbotAIConfig->commandSeparator) != std::string::npos)
     {
-        std::vector<std::string> commands;
-        split(commands, filtered, sPlayerbotAIConfig->commandSeparator.c_str());
+        std::vector<std::string> commands = split(filtered, sPlayerbotAIConfig->commandSeparator.c_str());
         for (std::vector<std::string>::iterator i = commands.begin(); i != commands.end(); ++i)
         {
             HandleCommand(type, *i, fromPlayer);
@@ -3725,7 +3725,7 @@ bool PlayerbotAI::canDispel(SpellInfo const* spellInfo, uint32 dispelType)
                                         strcmpi((const char*)spellInfo->SpellName[0], "ice armor"));
 }
 
-bool IsAlliance(uint8 race)
+bool IsAlliance(const uint8& race)
 {
     return race == RACE_HUMAN || race == RACE_DWARF || race == RACE_NIGHTELF || race == RACE_GNOME ||
            race == RACE_DRAENEI;
@@ -4059,7 +4059,7 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
 
 bool PlayerbotAI::IsOpposing(Player* player) { return IsOpposing(player->getRace(), bot->getRace()); }
 
-bool PlayerbotAI::IsOpposing(uint8 race1, uint8 race2)
+bool PlayerbotAI::IsOpposing(const uint8& race1, const uint8& race2)
 {
     return (IsAlliance(race1) && !IsAlliance(race2)) || (!IsAlliance(race1) && IsAlliance(race2));
 }
@@ -5177,7 +5177,7 @@ void PlayerbotAI::QueueChatResponse(const ChatQueuedReply chatReply)
     chatReplies.push_back(std::move(chatReply));
 }
 
-bool PlayerbotAI::EqualLowercaseName(std::string s1, std::string s2)
+bool PlayerbotAI::EqualLowercaseName(std::string_view s1, std::string_view s2)
 {
     if (s1.length() != s2.length())
     {
@@ -5193,7 +5193,7 @@ bool PlayerbotAI::EqualLowercaseName(std::string s1, std::string s2)
     return true;
 }
 
-InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading) const
+InventoryResult PlayerbotAI::CanEquipItem(const uint8& slot, uint16& dest, Item* pItem, bool swap, bool not_loading) const
 {
     dest = 0;
     if (pItem)
@@ -5344,7 +5344,7 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
     return !swap ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED;
 }
 
-uint8 PlayerbotAI::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const
+uint8 PlayerbotAI::FindEquipSlot(ItemTemplate const* proto, const uint32& slot, bool swap) const
 {
     uint8 slots[4];
     slots[0] = NULL_SLOT;

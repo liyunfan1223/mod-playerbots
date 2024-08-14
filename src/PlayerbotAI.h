@@ -74,7 +74,7 @@ enum BotState
     BOT_STATE_MAX
 };
 
-bool IsAlliance(uint8 race);
+bool IsAlliance(const uint8& race);
 
 class PlayerbotChatHandler : protected ChatHandler
 {
@@ -536,7 +536,7 @@ public:
     AiObjectContext* GetAiObjectContext() { return aiObjectContext; }
     ChatHelper* GetChatHelper() { return &chatHelper; }
     bool IsOpposing(Player* player);
-    static bool IsOpposing(uint8 race1, uint8 race2);
+    static bool IsOpposing(const uint8& race1, const uint8& race2);
     PlayerbotSecurity* GetSecurity() { return &security; }
 
     Position GetJumpDestination() { return jumpDestination; }
@@ -546,9 +546,9 @@ public:
     bool CanMove();
     bool IsInRealGuild();
     static std::vector<std::string> dispel_whitelist;
-    bool EqualLowercaseName(std::string s1, std::string s2);
-    InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
-    uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
+    bool EqualLowercaseName(std::string_view s1, std::string_view s2);
+    InventoryResult CanEquipItem(const uint8& slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
+    uint8 FindEquipSlot(ItemTemplate const* proto, const uint32& slot, bool swap) const;
     std::vector<Item*> GetInventoryAndEquippedItems();
     std::vector<Item*> GetInventoryItems();
     uint32 GetInventoryItemsCountWithId(uint32 itemId);

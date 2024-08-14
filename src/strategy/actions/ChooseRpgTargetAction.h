@@ -28,7 +28,7 @@ public:
 
 private:
     float getMaxRelevance(GuidPosition guidP);
-    bool  HasSameTarget(ObjectGuid guid, uint32 max, GuidVector const& nearGuids);
+    bool  HasSameTarget(const ObjectGuid& guid, const uint32& max, GuidVector const& nearGuids);
 
     std::unordered_map <ObjectGuid, std::string> rgpActionReason;
 };
