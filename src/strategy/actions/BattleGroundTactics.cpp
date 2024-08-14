@@ -4089,13 +4089,17 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
     {
         for (auto& guid : closePlayers)
         {
-            Unit* pFriend = botAI->GetUnit(guid);
-            if (pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
-                pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_CAPTURE_BANNER)
+            if (Unit* pFriend = botAI->GetUnit(guid))
             {
-                resetObjective();
-                startNewPathBegin(vPaths);
-                return false;
+                if (Spell* spell = pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                {
+                    if (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER)
+                    {
+                        resetObjective();
+                        startNewPathBegin(vPaths);
+                        return false;
+                    }
+                }
             }
         }
     }
