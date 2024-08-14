@@ -31,8 +31,9 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // NextAction("inner focus", 42.0f), nullptr))); triggers.push_back(new TriggerNode("medium mana",
     // NextAction::array(0, new NextAction("symbol of hope", ACTION_EMERGENCY), nullptr))); triggers.push_back(new
     // TriggerNode("low mana", NextAction::array(0, new NextAction("consume magic", 10.0f), nullptr)));
-    // triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("desperate prayer",
-    // ACTION_EMERGENCY), nullptr))); triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new
+    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("desperate prayer",
+        ACTION_HIGH + 5), nullptr))); 
+    // triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new
     // NextAction("elune's grace", ACTION_EMERGENCY), nullptr))); triggers.push_back(new TriggerNode("chastise",
     // NextAction::array(0, new NextAction("chastise", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode(

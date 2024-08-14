@@ -143,7 +143,10 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
         if (!spellInfo)
             continue;
-
+        
+        if (spellInfo->IsPassive())
+            continue;
+        
         SkillLineAbilityEntry const* skillLine = skillSpells[itr->first];
         if (skill != SKILL_NONE && (!skillLine || skillLine->SkillLine != skill))
             continue;

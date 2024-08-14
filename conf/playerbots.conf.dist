@@ -271,6 +271,9 @@ AiPlayerbot.DispelAuraDuration = 700
 # Delay between two bot actions
 AiPlayerbot.ReactDelay = 100
 
+# Dynamically adjust react delay for bots in different status to reduce server lags
+AiPlayerbot.DynamicReactDelay = 1
+
 # Inactivity delay
 AiPlayerbot.PassiveDelay = 10000
 

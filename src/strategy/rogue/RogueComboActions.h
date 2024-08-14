@@ -18,34 +18,34 @@ public:
     bool isUseful() override;
 };
 
-class CastSinisterStrikeAction : public CastComboAction
+class CastSinisterStrikeAction : public CastSpellAction
 {
 public:
-    CastSinisterStrikeAction(PlayerbotAI* botAI) : CastComboAction(botAI, "sinister strike") {}
+    CastSinisterStrikeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "sinister strike") {}
 };
 
-class CastMutilateAction : public CastComboAction
+class CastMutilateAction : public CastSpellAction
 {
 public:
-    CastMutilateAction(PlayerbotAI* botAI) : CastComboAction(botAI, "mutilate") {}
+    CastMutilateAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "mutilate") {}
 };
 
-class CastRiposteAction : public CastComboAction
+class CastRiposteAction : public CastSpellAction
 {
 public:
-    CastRiposteAction(PlayerbotAI* botAI) : CastComboAction(botAI, "riposte") {}
+    CastRiposteAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "riposte") {}
 };
 
-class CastGougeAction : public CastComboAction
+class CastGougeAction : public CastSpellAction
 {
 public:
-    CastGougeAction(PlayerbotAI* botAI) : CastComboAction(botAI, "gouge") {}
+    CastGougeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "gouge") {}
 };
 
-class CastBackstabAction : public CastComboAction
+class CastBackstabAction : public CastSpellAction
 {
 public:
-    CastBackstabAction(PlayerbotAI* botAI) : CastComboAction(botAI, "backstab") {}
+    CastBackstabAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "backstab") {}
 };
 
 #endif

@@ -234,10 +234,10 @@ public:
     NextAction** getAlternatives() override;
 };
 
-class CastBarskinAction : public CastBuffSpellAction
+class CastBarkskinAction : public CastBuffSpellAction
 {
 public:
-    CastBarskinAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "barskin") {}
+    CastBarkskinAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "barkskin") {}
 };
 
 class CastInnervateAction : public CastSpellAction

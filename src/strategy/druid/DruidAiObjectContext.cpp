@@ -198,7 +198,7 @@ public:
         creators["healing touch on party"] = &DruidAiObjectContextInternal::healing_touch_on_party;
         creators["rebirth"] = &DruidAiObjectContextInternal::rebirth;
         creators["revive"] = &DruidAiObjectContextInternal::revive;
-        creators["barskin"] = &DruidAiObjectContextInternal::barskin;
+        creators["barkskin"] = &DruidAiObjectContextInternal::barkskin;
         creators["lacerate"] = &DruidAiObjectContextInternal::lacerate;
         creators["hurricane"] = &DruidAiObjectContextInternal::hurricane;
         creators["innervate"] = &DruidAiObjectContextInternal::innervate;
@@ -281,7 +281,7 @@ private:
     static Action* healing_touch_on_party(PlayerbotAI* botAI) { return new CastHealingTouchOnPartyAction(botAI); }
     static Action* rebirth(PlayerbotAI* botAI) { return new CastRebirthAction(botAI); }
     static Action* revive(PlayerbotAI* botAI) { return new CastReviveAction(botAI); }
-    static Action* barskin(PlayerbotAI* botAI) { return new CastBarskinAction(botAI); }
+    static Action* barkskin(PlayerbotAI* botAI) { return new CastBarkskinAction(botAI); }
     static Action* lacerate(PlayerbotAI* botAI) { return new CastLacerateAction(botAI); }
     static Action* hurricane(PlayerbotAI* botAI) { return new CastHurricaneAction(botAI); }
     static Action* innervate(PlayerbotAI* botAI) { return new CastInnervateAction(botAI); }

@@ -23,7 +23,7 @@ CURE_TRIGGER(CureDiseaseTrigger, "cure disease", DISPEL_DISEASE);
 CURE_PARTY_TRIGGER(PartyMemberCureDiseaseTrigger, "cure disease", DISPEL_DISEASE);
 BUFF_TRIGGER_A(InnerFireTrigger, "inner fire");
 BUFF_TRIGGER_A(ShadowformTrigger, "shadowform");
-BUFF_TRIGGER(PowerInfusionTrigger, "power infusion");
+BOOST_TRIGGER(PowerInfusionTrigger, "power infusion");
 BUFF_TRIGGER(InnerFocusTrigger, "inner focus");
 BUFF_TRIGGER(ShadowProtectionTrigger, "shadow protection");
 BUFF_PARTY_TRIGGER(ShadowProtectionOnPartyTrigger, "shadow protection");

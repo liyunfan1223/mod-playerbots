@@ -41,6 +41,8 @@ Unit* PartyMemberToHeal::Calculate()
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
     {
         Player* player = gref->GetSource();
+        if (player->IsGameMaster())
+            continue;
         if (player && player->IsAlive())
         {
             uint8 health = player->GetHealthPct();

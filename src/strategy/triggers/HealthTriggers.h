@@ -48,7 +48,7 @@ class LowHealthTrigger : public HealthInRangeTrigger
 {
 public:
     LowHealthTrigger(PlayerbotAI* botAI, std::string const name = "low health",
-                     float value = sPlayerbotAIConfig->lowHealth, float minValue = sPlayerbotAIConfig->criticalHealth)
+                     float value = sPlayerbotAIConfig->lowHealth, float minValue = 0)
         : HealthInRangeTrigger(botAI, name, value, minValue)
     {
     }
@@ -69,7 +69,7 @@ class MediumHealthTrigger : public LowHealthTrigger
 {
 public:
     MediumHealthTrigger(PlayerbotAI* botAI)
-        : LowHealthTrigger(botAI, "medium health", sPlayerbotAIConfig->mediumHealth, sPlayerbotAIConfig->lowHealth)
+        : LowHealthTrigger(botAI, "medium health", sPlayerbotAIConfig->mediumHealth, 0)
     {
     }
 };
@@ -89,7 +89,7 @@ class PartyMemberLowHealthTrigger : public HealthInRangeTrigger
 public:
     PartyMemberLowHealthTrigger(PlayerbotAI* botAI, std::string const name = "party member low health",
                                 float value = sPlayerbotAIConfig->lowHealth,
-                                float minValue = sPlayerbotAIConfig->criticalHealth)
+                                float minValue = 0)
         : HealthInRangeTrigger(botAI, name, value, minValue)
     {
     }
@@ -111,7 +111,7 @@ class PartyMemberMediumHealthTrigger : public PartyMemberLowHealthTrigger
 public:
     PartyMemberMediumHealthTrigger(PlayerbotAI* botAI)
         : PartyMemberLowHealthTrigger(botAI, "party member medium health", sPlayerbotAIConfig->mediumHealth,
-                                      sPlayerbotAIConfig->lowHealth)
+                                      0)
     {
     }
 };
@@ -121,7 +121,7 @@ class PartyMemberAlmostFullHealthTrigger : public PartyMemberLowHealthTrigger
 public:
     PartyMemberAlmostFullHealthTrigger(PlayerbotAI* botAI)
         : PartyMemberLowHealthTrigger(botAI, "party member almost full health", sPlayerbotAIConfig->almostFullHealth,
-                                      sPlayerbotAIConfig->mediumHealth)
+                                      0)
     {
     }
 };

@@ -49,10 +49,10 @@ void PlayerbotAIBase::IncreaseNextCheckDelay(uint32 delay)
 
 bool PlayerbotAIBase::CanUpdateAI() { return nextAICheckDelay == 0; }
 
-void PlayerbotAIBase::YieldThread(bool delay)
+void PlayerbotAIBase::YieldThread(uint32 delay)
 {
-    if (nextAICheckDelay < sPlayerbotAIConfig->reactDelay)
-        nextAICheckDelay = delay ? sPlayerbotAIConfig->reactDelay * 10 : sPlayerbotAIConfig->reactDelay;
+    if (nextAICheckDelay < delay)
+        nextAICheckDelay = delay;
 }
 
 bool PlayerbotAIBase::IsActive() { return nextAICheckDelay < sPlayerbotAIConfig->maxWaitForMove; }

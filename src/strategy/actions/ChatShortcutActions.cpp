@@ -32,7 +32,7 @@ bool FollowChatShortcutAction::Execute(Event event)
     if (!master)
         return false;
 
-    botAI->Reset();
+    // botAI->Reset();
     botAI->ChangeStrategy("+follow,-passive,-grind", BOT_STATE_NON_COMBAT);
     botAI->ChangeStrategy("-follow,-passive,-grind", BOT_STATE_COMBAT);
     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
@@ -57,7 +57,14 @@ bool FollowChatShortcutAction::Execute(Event event)
             if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
                 return false;
 
-            moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
+            MovementPriority priority = botAI->GetState() == BOT_STATE_COMBAT ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_NORMAL;
+            moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), false, false, false,
+                        true, priority);
+        }
+
+        if (Pet* pet = bot->GetPet())
+        {
+            botAI->PetFollow();
         }
 
         if (moved)

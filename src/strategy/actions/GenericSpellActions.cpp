@@ -6,8 +6,13 @@
 #include "GenericSpellActions.h"
 
 #include "Event.h"
+#include "ItemTemplate.h"
+#include "ObjectDefines.h"
+#include "Opcodes.h"
+#include "Player.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "WorldPacket.h"
 
 CastSpellAction::CastSpellAction(PlayerbotAI* botAI, std::string const spell)
     : Action(botAI, spell), range(botAI->GetRange("spell")), spell(spell)
@@ -124,11 +129,35 @@ bool CastSpellAction::isUseful()
 CastMeleeSpellAction::CastMeleeSpellAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell)
 {
     range = ATTACK_DISTANCE;
-    // Unit* target = AI_VALUE(Unit*, "current target");
-    // if (target)
-    //     range = bot->GetMeleeRange(target);
+}
 
-    // range = target->GetCombinedCombatReach();
+bool CastMeleeSpellAction::isUseful()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    if (!bot->IsWithinMeleeRange(target))
+        return false;
+
+    return CastSpellAction::isUseful();
+}
+
+CastMeleeDebuffSpellAction::CastMeleeDebuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner, float needLifeTime) : CastDebuffSpellAction(botAI, spell, isOwner, needLifeTime)
+{
+    range = ATTACK_DISTANCE;
+}
+
+bool CastMeleeDebuffSpellAction::isUseful()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    if (!bot->IsWithinMeleeRange(target))
+        return false;
+
+    return CastDebuffSpellAction::isUseful();
 }
 
 bool CastAuraSpellAction::isUseful()
@@ -209,17 +238,7 @@ CastShootAction::CastShootAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "s
 
 NextAction** CastSpellAction::getPrerequisites()
 {
-    if (spell == "mount")
-        return nullptr;
-
-    if (range > botAI->GetRange("spell"))
-        return nullptr;
-    else if (range > ATTACK_DISTANCE)
-        return NextAction::merge(NextAction::array(0, new NextAction("reach spell"), nullptr),
-                                 Action::getPrerequisites());
-    else
-        return NextAction::merge(NextAction::array(0, new NextAction("reach melee"), nullptr),
-                                 Action::getPrerequisites());
+    return nullptr;
 }
 
 Value<Unit*>* CastDebuffSpellOnAttackerAction::GetTargetValue()
@@ -269,6 +288,70 @@ bool CastVehicleSpellAction::Execute(Event event)
 {
     uint32 spellId = AI_VALUE2(uint32, "vehicle spell id", spell);
     return botAI->CastVehicleSpell(spellId, GetTarget());
+}
+
+bool UseTrinketAction::Execute(Event event)
+{
+    Item* trinket1 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1);
+    
+    if (trinket1 && UseTrinket(trinket1))
+        return true;
+
+    Item* trinket2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2);
+    
+    if (trinket2 && UseTrinket(trinket2))
+        return true;
+    
+    return false;
+}
+
+bool UseTrinketAction::UseTrinket(Item* item)
+{
+    if (bot->CanUseItem(item) != EQUIP_ERR_OK)
+        return false;
+
+    if (bot->IsNonMeleeSpellCast(true))
+        return false;
+
+    uint8 bagIndex = item->GetBagSlot();
+    uint8 slot = item->GetSlot();
+    uint8 spell_index = 0;
+    uint8 cast_count = 1;
+    ObjectGuid item_guid = item->GetGUID();
+    uint32 glyphIndex = 0;
+    uint8 castFlags = 0;
+    uint32 targetFlag = TARGET_FLAG_NONE;
+    uint32 spellId = 0;
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (item->GetTemplate()->Spells[i].SpellId > 0 && item->GetTemplate()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+        {
+            spellId = item->GetTemplate()->Spells[i].SpellId;
+            if (!botAI->CanCastSpell(spellId, bot, false))
+            {
+                return false;
+            }
+            break;
+        }
+    }
+    if (!spellId)
+        return false;
+    WorldPacket packet(CMSG_USE_ITEM);
+    packet << bagIndex << slot << cast_count << spellId << item_guid << glyphIndex << castFlags;
+
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target)
+    {
+        targetFlag = TARGET_FLAG_UNIT;
+        packet << targetFlag << target->GetGUID().WriteAsPacked();
+    }
+    else 
+    {
+        targetFlag = TARGET_FLAG_NONE;
+        packet << targetFlag << bot->GetPackGUID();
+    }
+    bot->GetSession()->HandleUseItemOpcode(packet);
+    return true;
 }
 
 Value<Unit*>* BuffOnMainTankAction::GetTargetValue() { return context->GetValue<Unit*>("main tank", spell); }

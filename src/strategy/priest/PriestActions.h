@@ -173,4 +173,11 @@ public:
     CastMindSearAction(PlayerbotAI* ai) : CastSpellAction(ai, "mind sear") {}
     ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
+
+class CastGuardianSpiritOnPartyAction : public HealPartyMemberAction
+{
+public:
+    CastGuardianSpiritOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "guardian spirit", 40.0f, HealingManaEfficiency::MEDIUM) {}
+};
+
 #endif

@@ -7,6 +7,7 @@
 #define _PLAYERBOT_PLAYERBOTAIBASE_H
 
 #include "Define.h"
+#include "PlayerbotAIConfig.h"
 
 class PlayerbotAIBase
 {
@@ -16,7 +17,7 @@ public:
     bool CanUpdateAI();
     void SetNextCheckDelay(uint32 const delay);
     void IncreaseNextCheckDelay(uint32 delay);
-    void YieldThread(bool delay = false);
+    void YieldThread(uint32 delay = sPlayerbotAIConfig->reactDelay);
     virtual void UpdateAI(uint32 elapsed, bool minimal = false);
     virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false) = 0;
     bool IsActive();

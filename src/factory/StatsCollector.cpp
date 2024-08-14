@@ -225,7 +225,10 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
             if (type_ != CollectorType::SPELL_HEAL)
                 stats[STATS_TYPE_CRIT] += 50;
             return true;
-            break;
+        case 59620:
+            if (type_ == CollectorType::MELEE)
+                stats[STATS_TYPE_ATTACK_POWER] += 120;
+            return true;
         case 67702: // Death's Verdict
             stats[STATS_TYPE_ATTACK_POWER] += 225;
             return true;
@@ -493,6 +496,13 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
         case SPELL_AURA_MOD_INCREASE_HEALTH:
             stats[STATS_TYPE_STAMINA] += val * multiplier / 15;
             break;
+        case SPELL_AURA_SCHOOL_ABSORB:
+        {
+            int32 schoolType = effectInfo.MiscValue;
+            if (schoolType & SPELL_SCHOOL_MASK_NORMAL)
+                stats[STATS_TYPE_STAMINA] += val * multiplier / 15;
+            break;
+        }
         case SPELL_AURA_MOD_ATTACK_POWER:
             stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
             break;

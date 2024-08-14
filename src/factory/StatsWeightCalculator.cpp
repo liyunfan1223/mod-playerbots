@@ -9,6 +9,7 @@
 
 #include "AiFactory.h"
 #include "DBCStores.h"
+#include "ItemTemplate.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAI.h"
 #include "SharedDefines.h"
@@ -231,7 +232,8 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 5.2f;
     }
-    else if (cls == CLASS_WARLOCK || cls == CLASS_MAGE ||
+    else if (cls == CLASS_WARLOCK || 
+             cls == CLASS_MAGE ||
              (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW) ||     // shadow
              (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ELEMENTAL) ||  // element
              (cls == CLASS_DRUID && tab == DRUID_TAB_BALANCE))        // balance
@@ -453,6 +455,16 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         if (cls == CLASS_ROGUE && tab == ROGUE_TAB_ASSASSINATION && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
         {
             weight_ *= 0.1;
+        }
+        if (cls == CLASS_ROGUE && player_->HasAura(13964) 
+            && (proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE))
+        {
+            weight_ *= 1.1;
+        }
+        if (cls == CLASS_WARRIOR && player_->HasAura(12785) 
+            && (proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2))
+        {
+            weight_ *= 1.1;
         }
     }
 }

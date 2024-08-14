@@ -234,6 +234,7 @@ public:
         creators["hymn of hope"] = &PriestAiObjectContextInternal::hymn_of_hope;
         creators["divine hymn"] = &PriestAiObjectContextInternal::divine_hymn;
         creators["mind sear"] = &PriestAiObjectContextInternal::mind_sear;
+        creators["guardian spirit on party"] = &PriestAiObjectContextInternal::guardian_spirit_on_party;
     }
 
 private:
@@ -339,6 +340,7 @@ private:
     static Action* hymn_of_hope(PlayerbotAI* ai) { return new CastHymnOfHopeAction(ai); }
     static Action* divine_hymn(PlayerbotAI* ai) { return new CastDivineHymnAction(ai); }
     static Action* mind_sear(PlayerbotAI* ai) { return new CastMindSearAction(ai); }
+    static Action* guardian_spirit_on_party(PlayerbotAI* ai) { return new CastGuardianSpiritOnPartyAction(ai); }
 };
 
 PriestAiObjectContext::PriestAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
