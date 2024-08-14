@@ -38,7 +38,7 @@ void AutoLearnSpellAction::LearnSpells(std::ostringstream* out)
         sRandomPlayerbotMgr->IsRandomBot(bot))
         LearnTrainerSpells(out);
 
-    if (sPlayerbotAIConfig->autoLearnTrainerSpells &&
+    if (sPlayerbotAIConfig->autoLearnQuestSpells &&
         sRandomPlayerbotMgr->IsRandomBot(bot))
         LearnQuestSpells(out);
 }
