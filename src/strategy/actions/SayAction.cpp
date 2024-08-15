@@ -12,6 +12,7 @@
 #include "ChannelMgr.h"
 #include "Event.h"
 #include "GuildMgr.h"
+#include "Helpers.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 
@@ -565,7 +566,8 @@ bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatCha
     return true;
 }
 
-std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string& incomingMessage, uint32& guid1, std::string& name)
+std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string_view incomingMessage, uint32& guid1,
+                                                  std::string& name)
 {
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND; // default not understand
 
@@ -576,14 +578,8 @@ std::string ChatReplyAction::GenerateReplyMessage(Player* bot, std::string& inco
     int32 verb_type = -1;
     int32 is_quest = 0;
     bool found = false;
-    std::stringstream text(incomingMessage);
-    std::string segment;
-    std::vector<std::string> word;
-    while (std::getline(text, segment, ' '))
-    {
-        word.push_back(segment);
-    }
 
+    std::vector<std::string> word = split(incomingMessage, " ");
     for (uint32 i = 0; i < 15; i++)
     {
         if (word.size() < i)
