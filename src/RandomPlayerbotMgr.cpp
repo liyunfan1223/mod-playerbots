@@ -578,18 +578,10 @@ void RandomPlayerbotMgr::CheckBgQueue()
     if (!BgCheckTimer)
         BgCheckTimer = time(nullptr);
 
-    uint32 count = 0;
-    uint32 visual_count = 0;
-
-    uint32 check_time = count > 0 ? 120 : 30;
-    if (time(nullptr) < (BgCheckTimer + check_time))
-    {
+    if (time(nullptr) < BgCheckTimer + 30)
         return;
-    }
-    else
-    {
-        BgCheckTimer = time(nullptr);
-    }
+
+    BgCheckTimer = time(nullptr);
 
     LOG_INFO("playerbots", "Checking BG Queue...");
 
@@ -600,7 +592,8 @@ void RandomPlayerbotMgr::CheckBgQueue()
         if (!player->InBattlegroundQueue())
             continue;
 
-        if (player->InBattleground() && player->GetBattleground()->GetStatus() == STATUS_WAIT_LEAVE)
+        Battleground* bg = player->GetBattleground();
+        if (bg && bg->GetStatus() == STATUS_WAIT_LEAVE)
             continue;
 
         TeamId teamId = player->GetTeamId();
@@ -611,7 +604,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
                 continue;
 
             BattlegroundTypeId bgTypeId = sBattlegroundMgr->BGTemplateId(queueTypeId);
-            Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
+            bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
             uint32 mapId = bg->GetMapId();
             PvPDifficultyEntry const* pvpDiff = GetBattlegroundBracketByLevel(mapId, player->GetLevel());
             if (!pvpDiff)
@@ -690,7 +683,8 @@ void RandomPlayerbotMgr::CheckBgQueue()
         if (!IsRandomBot(bot))
             continue;
 
-        if (bot->InBattleground() && bot->GetBattleground()->GetStatus() == STATUS_WAIT_LEAVE)
+        Battleground* bg = bot->GetBattleground();
+        if (bg && bg->GetStatus() == STATUS_WAIT_LEAVE)
             continue;
 
         TeamId teamId = bot->GetTeamId();
@@ -702,7 +696,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
                 continue;
 
             BattlegroundTypeId bgTypeId = sBattlegroundMgr->BGTemplateId(queueTypeId);
-            Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
+            bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
             uint32 mapId = bg->GetMapId();
             PvPDifficultyEntry const* pvpDiff = GetBattlegroundBracketByLevel(mapId, bot->GetLevel());
             if (!pvpDiff)
