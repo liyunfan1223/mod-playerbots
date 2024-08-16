@@ -18,7 +18,7 @@ class DebugAction : public Action
 public:
     DebugAction(PlayerbotAI* botAI) : Action(botAI, "Debug") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
     void FakeSpell(uint32 spellId, Unit* truecaster, Unit* caster, ObjectGuid target = ObjectGuid::Empty,
                    GuidVector otherTargets = {}, GuidVector missTargets = {}, WorldPosition source = WorldPosition(),

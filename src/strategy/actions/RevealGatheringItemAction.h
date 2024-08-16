@@ -15,7 +15,7 @@ class RevealGatheringItemAction : public Action
 public:
     RevealGatheringItemAction(PlayerbotAI* botAI) : Action(botAI, "reveal gathering item") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

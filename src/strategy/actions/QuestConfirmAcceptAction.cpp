@@ -2,7 +2,7 @@
 
 #include "WorldPacket.h"
 
-bool QuestConfirmAcceptAction::Execute(Event event)
+bool QuestConfirmAcceptAction::Execute(Event& event)
 {
     WorldPacket packet(event.getPacket());
     uint32 questId;

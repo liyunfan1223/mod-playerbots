@@ -15,7 +15,7 @@ class TellTargetAction : public Action
 public:
     TellTargetAction(PlayerbotAI* botAI) : Action(botAI, "tell target") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class TellAttackersAction : public Action
@@ -23,7 +23,7 @@ class TellAttackersAction : public Action
 public:
     TellAttackersAction(PlayerbotAI* botAI) : Action(botAI, "tell attackers") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

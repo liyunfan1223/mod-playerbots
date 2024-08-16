@@ -9,7 +9,7 @@
 #include "LootObjectStack.h"
 #include "Playerbots.h"
 
-bool ChooseTravelTargetAction::Execute(Event event)
+bool ChooseTravelTargetAction::Execute(Event& event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
 

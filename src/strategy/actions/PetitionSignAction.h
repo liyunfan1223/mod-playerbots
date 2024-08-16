@@ -15,7 +15,7 @@ class PetitionSignAction : public Action
 public:
     PetitionSignAction(PlayerbotAI* botAI) : Action(botAI, "petition sign") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

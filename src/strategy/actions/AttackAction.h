@@ -15,7 +15,7 @@ class AttackAction : public MovementAction
 public:
     AttackAction(PlayerbotAI* botAI, std::string const name) : MovementAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     bool Attack(Unit* target, bool with_pet = true);
@@ -26,7 +26,7 @@ class AttackMyTargetAction : public AttackAction
 public:
     AttackMyTargetAction(PlayerbotAI* botAI, std::string const name = "attack my target") : AttackAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class AttackDuelOpponentAction : public AttackAction
@@ -38,7 +38,7 @@ public:
     }
 
 public:
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 

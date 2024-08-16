@@ -15,7 +15,7 @@ class LfgJoinAction : public InventoryAction
 public:
     LfgJoinAction(PlayerbotAI* botAI, std::string const name = "lfg join") : InventoryAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
 protected:
@@ -28,7 +28,7 @@ class LfgAcceptAction : public LfgJoinAction
 public:
     LfgAcceptAction(PlayerbotAI* botAI) : LfgJoinAction(botAI, "lfg accept") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override { return true; }
 };
 
@@ -37,7 +37,7 @@ class LfgRoleCheckAction : public LfgJoinAction
 public:
     LfgRoleCheckAction(PlayerbotAI* botAI) : LfgJoinAction(botAI, "lfg role check") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override { return true; }
 };
 
@@ -46,7 +46,7 @@ class LfgLeaveAction : public Action
 public:
     LfgLeaveAction(PlayerbotAI* botAI) : Action(botAI, "lfg leave") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -55,7 +55,7 @@ class LfgTeleportAction : public Action
 public:
     LfgTeleportAction(PlayerbotAI* botAI) : Action(botAI, "lfg teleport") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

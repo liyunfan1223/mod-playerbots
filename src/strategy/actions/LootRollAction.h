@@ -19,7 +19,7 @@ class LootRollAction : public QueryItemUsageAction
 public:
     LootRollAction(PlayerbotAI* botAI, std::string const name = "loot roll") : QueryItemUsageAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     RollVote CalculateRollVote(ItemTemplate const* proto);
@@ -31,7 +31,7 @@ public:
     MasterLootRollAction(PlayerbotAI* botAI) : LootRollAction(botAI, "master loot roll") {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

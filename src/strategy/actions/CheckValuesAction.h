@@ -15,7 +15,7 @@ class CheckValuesAction : public Action
 public:
     CheckValuesAction(PlayerbotAI* botAI);
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

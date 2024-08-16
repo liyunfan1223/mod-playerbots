@@ -16,7 +16,7 @@ class RpgAction : public MovementAction
 {
 public:
     RpgAction(PlayerbotAI* botAI, std::string const name = "rpg") : MovementAction(botAI, name) { }
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
 protected:

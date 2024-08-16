@@ -10,7 +10,7 @@
 
 RemoveAuraAction::RemoveAuraAction(PlayerbotAI* botAI) : Action(botAI, "ra") {}
 
-bool RemoveAuraAction::Execute(Event event)
+bool RemoveAuraAction::Execute(Event& event)
 {
     botAI->RemoveAura(event.getParam());
     return true;

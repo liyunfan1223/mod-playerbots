@@ -9,7 +9,7 @@
 #include "LastMovementValue.h"
 #include "Playerbots.h"
 
-bool TaxiAction::Execute(Event event)
+bool TaxiAction::Execute(Event& event)
 {
     botAI->RemoveShapeshift();
 

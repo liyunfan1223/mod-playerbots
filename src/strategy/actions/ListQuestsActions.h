@@ -30,7 +30,7 @@ class ListQuestsAction : public Action
 public:
     ListQuestsAction(PlayerbotAI* botAI) : Action(botAI, "quests") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void ListQuests(QuestListFilter filter, QuestTravelDetail travelDetail = QUEST_TRAVEL_DETAIL_NONE);

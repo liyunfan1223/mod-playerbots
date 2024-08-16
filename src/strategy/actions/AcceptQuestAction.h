@@ -27,20 +27,20 @@ class AcceptQuestAction : public AcceptAllQuestsAction
 {
 public:
     AcceptQuestAction(PlayerbotAI* botAI) : AcceptAllQuestsAction(botAI, "accept quest") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class AcceptQuestShareAction : public Action
 {
 public:
     AcceptQuestShareAction(PlayerbotAI* botAI) : Action(botAI, "accept quest share") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class ConfirmQuestAction : public Action {
 public:
     ConfirmQuestAction(PlayerbotAI* ai) : Action(ai, "confirm quest") {}
-    bool Execute(Event event);
+    bool Execute(Event& event);
 };
 
 #endif

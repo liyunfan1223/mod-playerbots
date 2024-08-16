@@ -15,7 +15,7 @@ class SwitchToMeleeAction : public ChangeCombatStrategyAction
 public:
     SwitchToMeleeAction(PlayerbotAI* botAI) : ChangeCombatStrategyAction(botAI, "-ranged,+close") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -24,7 +24,7 @@ class SwitchToRangedAction : public ChangeCombatStrategyAction
 public:
     SwitchToRangedAction(PlayerbotAI* botAI) : ChangeCombatStrategyAction(botAI, "-close,+ranged") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 

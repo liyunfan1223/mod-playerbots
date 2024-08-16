@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool DrinkAction::Execute(Event event)
+bool DrinkAction::Execute(Event& event)
 {
     if (bot->IsInCombat())
         return false;
@@ -61,7 +61,7 @@ bool DrinkAction::isPossible()
     return !bot->IsInCombat() && (sPlayerbotAIConfig->freeFood || UseItemAction::isPossible());
 }
 
-bool EatAction::Execute(Event event)
+bool EatAction::Execute(Event& event)
 {
     if (bot->IsInCombat())
         return false;

@@ -15,7 +15,7 @@ class SetHomeAction : public MovementAction
 public:
     SetHomeAction(PlayerbotAI* botAI) : MovementAction(botAI, "home") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

@@ -18,7 +18,7 @@ class SeeSpellAction : public MovementAction
 public:
     SeeSpellAction(PlayerbotAI* botAI, std::string const name = "see spell") : MovementAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
     bool SelectSpell(WorldPosition& spellPosition);
     bool MoveSpell(WorldPosition& spellPosition);

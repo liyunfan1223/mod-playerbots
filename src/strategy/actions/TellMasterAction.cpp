@@ -8,13 +8,13 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool TellMasterAction::Execute(Event event)
+bool TellMasterAction::Execute(Event& event)
 {
     botAI->TellMaster(text);
     return true;
 }
 
-bool OutOfReactRangeAction::Execute(Event event)
+bool OutOfReactRangeAction::Execute(Event& event)
 {
     botAI->TellMaster("Wait for me!");
     return true;

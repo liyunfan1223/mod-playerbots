@@ -228,7 +228,7 @@ bool StanceValue::Load(std::string const name)
     return true;
 }
 
-bool SetStanceAction::Execute(Event event)
+bool SetStanceAction::Execute(Event& event)
 {
     std::string const stance = event.getParam();
 

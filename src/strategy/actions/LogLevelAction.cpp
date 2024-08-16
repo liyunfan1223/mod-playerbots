@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool LogLevelAction::Execute(Event event)
+bool LogLevelAction::Execute(Event& event)
 {
     std::string const param = event.getParam();
     Value<LogLevel>* value = botAI->GetAiObjectContext()->GetValue<LogLevel>("log level");

@@ -16,7 +16,7 @@
 #include "StatsWeightCalculator.h"
 #include "World.h"
 
-bool TellLosAction::Execute(Event event)
+bool TellLosAction::Execute(Event& event)
 {
     std::string const param = event.getParam();
 
@@ -77,7 +77,7 @@ void TellLosAction::ListGameObjects(std::string const title, GuidVector gos)
     }
 }
 
-bool TellAuraAction::Execute(Event event)
+bool TellAuraAction::Execute(Event& event)
 {
     botAI->TellMaster("--- Auras ---");
     sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "--- Auras ---");
@@ -130,14 +130,14 @@ bool TellAuraAction::Execute(Event event)
     return true;
 }
 
-bool TellExpectedDpsAction::Execute(Event event)
+bool TellExpectedDpsAction::Execute(Event& event)
 {
     float dps = AI_VALUE(float, "expected group dps");
     botAI->TellMaster("Expected Group DPS: " + std::to_string(dps));
     return true;
 }
 
-bool TellCalculateItemAction::Execute(Event event)
+bool TellCalculateItemAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     ItemIds ids = chat->parseItems(text);

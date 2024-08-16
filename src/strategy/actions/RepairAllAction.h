@@ -15,7 +15,7 @@ class RepairAllAction : public Action
 public:
     RepairAllAction(PlayerbotAI* botAI) : Action(botAI, "repair") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

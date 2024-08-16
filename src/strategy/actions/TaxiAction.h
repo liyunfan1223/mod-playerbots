@@ -15,7 +15,7 @@ class TaxiAction : public Action
 public:
     TaxiAction(PlayerbotAI* botAI) : Action(botAI, "taxi") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

@@ -9,7 +9,7 @@
 #include "LastMovementValue.h"
 #include "Playerbots.h"
 
-bool TeleportAction::Execute(Event event)
+bool TeleportAction::Execute(Event& event)
 {
     GuidVector gos = *context->GetValue<GuidVector>("nearest game objects");
     for (ObjectGuid const guid : gos)

@@ -9,7 +9,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool RewardAction::Execute(Event event)
+bool RewardAction::Execute(Event& event)
 {
     std::string const link = event.getParam();
 

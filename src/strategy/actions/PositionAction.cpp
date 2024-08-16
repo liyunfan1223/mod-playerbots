@@ -27,7 +27,7 @@ void TellPosition(PlayerbotAI* botAI, std::string const name, PositionInfo pos)
     botAI->TellMaster(out);
 }
 
-bool PositionAction::Execute(Event event)
+bool PositionAction::Execute(Event& event)
 {
     std::string const param = event.getParam();
     if (param.empty())
@@ -102,7 +102,7 @@ bool PositionAction::Execute(Event event)
     return false;
 }
 
-bool MoveToPositionAction::Execute(Event event)
+bool MoveToPositionAction::Execute(Event& event)
 {
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()[qualifier];
     if (!pos.isSet())
@@ -123,7 +123,7 @@ bool MoveToPositionAction::isUseful()
     return pos.isSet() && distance > sPlayerbotAIConfig->followDistance && distance < sPlayerbotAIConfig->reactDistance;
 }
 
-bool SetReturnPositionAction::Execute(Event event)
+bool SetReturnPositionAction::Execute(Event& event)
 {
     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
     PositionInfo returnPos = posMap["return"];

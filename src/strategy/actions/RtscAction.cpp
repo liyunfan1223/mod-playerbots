@@ -8,7 +8,7 @@
 #include "Playerbots.h"
 #include "RTSCValues.h"
 
-bool RTSCAction::Execute(Event event)
+bool RTSCAction::Execute(Event& event)
 {
     std::string const command = event.getParam();
 

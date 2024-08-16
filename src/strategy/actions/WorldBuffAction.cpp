@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool WorldBuffAction::Execute(Event event)
+bool WorldBuffAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
 

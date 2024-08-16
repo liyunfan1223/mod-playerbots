@@ -17,7 +17,7 @@ public:
     HelpAction(PlayerbotAI* botAI);
 
     virtual ~HelpAction();
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void TellChatCommands();

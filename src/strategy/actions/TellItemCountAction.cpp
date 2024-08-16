@@ -9,7 +9,7 @@
 #include "ItemCountValue.h"
 #include "Playerbots.h"
 
-bool TellItemCountAction::Execute(Event event)
+bool TellItemCountAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     std::vector<Item*> found = parseItems(text);

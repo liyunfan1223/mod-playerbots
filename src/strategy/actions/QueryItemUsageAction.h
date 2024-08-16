@@ -21,7 +21,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     uint32 GetCount(ItemTemplate const* item);

@@ -49,7 +49,7 @@ public:
         : AiNamedObject(botAI, name), verbose(false) {}  // verbose after ainamedobject - whipowill
     virtual ~Action(void) {}
 
-    virtual bool Execute([[maybe_unused]] Event event) { return true; }
+    virtual bool Execute([[maybe_unused]] Event& event) { return true; }
     virtual bool isPossible() { return true; }
     virtual bool isUseful() { return true; }
     virtual NextAction** getPrerequisites() { return nullptr; }

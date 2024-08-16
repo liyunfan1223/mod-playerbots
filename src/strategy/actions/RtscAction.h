@@ -17,7 +17,7 @@ class RTSCAction : public SeeSpellAction
 public:
     RTSCAction(PlayerbotAI* botAI) : SeeSpellAction(botAI, "rtsc") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

@@ -21,7 +21,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isPossible() override;
 
 protected:
@@ -70,7 +70,7 @@ public:
     UseHearthStone(PlayerbotAI* botAI) : UseItemAction(botAI, "hearthstone", true) {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class UseRandomRecipe : public UseItemAction
@@ -80,7 +80,7 @@ public:
 
     bool isUseful() override;
     bool isPossible() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class UseRandomQuestItem : public UseItemAction
@@ -90,7 +90,7 @@ public:
 
     bool isUseful() override;
     bool isPossible() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

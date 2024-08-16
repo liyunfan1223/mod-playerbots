@@ -248,7 +248,7 @@ std::map<uint32, Mail*> filterList(std::vector<Mail*> src, std::string_view filt
     return result;
 }
 
-bool MailAction::Execute(Event event)
+bool MailAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     if (!master)

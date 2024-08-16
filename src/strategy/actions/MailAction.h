@@ -31,7 +31,7 @@ class MailAction : public InventoryAction
 public:
     MailAction(PlayerbotAI* botAI) : InventoryAction(botAI, "mail") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     static std::map<std::string, MailProcessor*> processors;

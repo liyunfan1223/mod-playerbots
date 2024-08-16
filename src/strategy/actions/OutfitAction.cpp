@@ -9,7 +9,7 @@
 #include "ItemVisitors.h"
 #include "Playerbots.h"
 
-bool OutfitAction::Execute(Event event)
+bool OutfitAction::Execute(Event& event)
 {
     std::string const param = event.getParam();
 

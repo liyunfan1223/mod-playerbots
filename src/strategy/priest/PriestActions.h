@@ -117,7 +117,7 @@ public:
 
     bool isUseful() override;
     bool isPossible() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastDispersionAction : public CastSpellAction

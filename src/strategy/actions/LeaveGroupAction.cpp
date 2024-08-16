@@ -9,13 +9,13 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
-bool LeaveGroupAction::Execute(Event event)
+bool LeaveGroupAction::Execute(Event& event)
 {
     Player* master = event.getOwner();
     return Leave(master);
 }
 
-bool PartyCommandAction::Execute(Event event)
+bool PartyCommandAction::Execute(Event& event)
 {
     WorldPacket& p = event.getPacket();
     p.rpos(0);
@@ -34,7 +34,7 @@ bool PartyCommandAction::Execute(Event event)
     return false;
 }
 
-bool UninviteAction::Execute(Event event)
+bool UninviteAction::Execute(Event& event)
 {
     WorldPacket& p = event.getPacket();
     if (p.GetOpcode() == CMSG_GROUP_UNINVITE)
@@ -98,7 +98,7 @@ bool LeaveGroupAction::Leave(Player* player)
     return true;
 }
 
-bool LeaveFarAwayAction::Execute(Event event)
+bool LeaveFarAwayAction::Execute(Event& event)
 {
     // allow bot to leave party when they want
     return Leave(botAI->GetGroupMaster());

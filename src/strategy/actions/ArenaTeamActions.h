@@ -15,7 +15,7 @@ class ArenaTeamAcceptAction : public Action
 public:
     ArenaTeamAcceptAction(PlayerbotAI* botAI) : Action(botAI, "arena team accept") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

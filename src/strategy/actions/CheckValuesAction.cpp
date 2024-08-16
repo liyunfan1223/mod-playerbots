@@ -11,7 +11,7 @@
 
 CheckValuesAction::CheckValuesAction(PlayerbotAI* botAI) : Action(botAI, "check values") {}
 
-bool CheckValuesAction::Execute(Event event)
+bool CheckValuesAction::Execute(Event& event)
 {
     if (botAI->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
     {

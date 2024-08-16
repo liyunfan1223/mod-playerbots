@@ -15,7 +15,7 @@ class FlagAction : public Action
 public:
     FlagAction(PlayerbotAI* botAI) : Action(botAI, "flag") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     bool TellUsage();

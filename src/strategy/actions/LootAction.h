@@ -19,7 +19,7 @@ class LootAction : public MovementAction
 public:
     LootAction(PlayerbotAI* botAI) : MovementAction(botAI, "loot") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -28,7 +28,7 @@ class OpenLootAction : public MovementAction
 public:
     OpenLootAction(PlayerbotAI* botAI) : MovementAction(botAI, "open loot") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     bool DoLoot(LootObject& lootObject);
@@ -43,7 +43,7 @@ class StoreLootAction : public InventoryAction
 public:
     StoreLootAction(PlayerbotAI* botAI) : InventoryAction(botAI, "store loot") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     static bool IsLootAllowed(uint32 itemid, PlayerbotAI* botAI);
 };
 
@@ -52,7 +52,7 @@ class ReleaseLootAction : public InventoryAction
 public:
     ReleaseLootAction(PlayerbotAI* botAI) : InventoryAction(botAI, "release loot") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

@@ -15,7 +15,7 @@ class GreetAction : public Action
 public:
     GreetAction(PlayerbotAI* botAI);
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

@@ -13,7 +13,7 @@ HelpAction::HelpAction(PlayerbotAI* botAI) : Action(botAI, "help") { chatContext
 
 HelpAction::~HelpAction() { delete chatContext; }
 
-bool HelpAction::Execute(Event event)
+bool HelpAction::Execute(Event& event)
 {
     TellChatCommands();
     TellStrategies();

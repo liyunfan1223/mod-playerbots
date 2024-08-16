@@ -35,7 +35,7 @@ NextAction** CastBloodMeleeSpellAction::getPrerequisites()
                              CastMeleeSpellAction::getPrerequisites());
 }
 
-bool CastRaiseDeadAction::Execute(Event event)
+bool CastRaiseDeadAction::Execute(Event& event)
 {
     bool result = CastBuffSpellAction::Execute(event);
     if (!result)

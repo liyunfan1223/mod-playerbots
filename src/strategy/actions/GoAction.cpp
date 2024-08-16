@@ -16,7 +16,7 @@
 std::vector<std::string> split(std::string const s, char delim);
 char* strstri(char const* haystack, char const* needle);
 
-bool GoAction::Execute(Event event)
+bool GoAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     if (!master)

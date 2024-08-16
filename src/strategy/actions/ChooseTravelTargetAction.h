@@ -23,7 +23,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
     static TravelDestination* FindDestination(Player* bot, std::string const name, bool zones = true, bool npcs = true, bool quests = true, bool mobs = true, bool bosses = true);

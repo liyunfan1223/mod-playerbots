@@ -23,14 +23,14 @@ class TogglePetSpellAutoCastAction : public Action
 {
 public:
     TogglePetSpellAutoCastAction(PlayerbotAI* ai) : Action(ai, "toggle pet spell") {}
-    virtual bool Execute(Event event) override;
+    virtual bool Execute(Event& event) override;
 };
 
 class PetAttackAction : public Action
 {
 public:
     PetAttackAction(PlayerbotAI* ai) : Action(ai, "pet attack") {}
-    virtual bool Execute(Event event) override;
+    virtual bool Execute(Event& event) override;
 };
 
 #endif

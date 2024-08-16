@@ -21,7 +21,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override { return false; }
 
 protected:
@@ -98,7 +98,7 @@ class GuildManageNearbyAction : public Action
 public:
     GuildManageNearbyAction(PlayerbotAI* botAI) : Action(botAI, "guild manage nearby") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -107,7 +107,7 @@ class GuildLeaveAction : public Action
 public:
     GuildLeaveAction(PlayerbotAI* botAI) : Action(botAI, "guild leave") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 

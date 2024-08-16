@@ -57,7 +57,7 @@ static const std::unordered_set<std::string> noReplyMsgStarts = {"e ", "accept "
 
 SayAction::SayAction(PlayerbotAI* botAI) : Action(botAI, "say"), Qualified() {}
 
-bool SayAction::Execute(Event event)
+bool SayAction::Execute(Event& event)
 {
     std::string text = "";
     std::map<std::string, std::string> placeholders;

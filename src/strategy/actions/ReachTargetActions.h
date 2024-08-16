@@ -19,7 +19,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
     std::string const GetTargetName() override;
 

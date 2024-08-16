@@ -20,7 +20,7 @@ class ChooseRpgTargetAction : public Action
 public:
     ChooseRpgTargetAction(PlayerbotAI* botAI, std::string const name = "choose rpg target") : Action(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
     static bool isFollowValid(Player* bot, WorldObject* target);
@@ -38,7 +38,7 @@ class ClearRpgTargetAction : public ChooseRpgTargetAction
 public:
     ClearRpgTargetAction(PlayerbotAI* botAI) : ChooseRpgTargetAction(botAI, "clear rpg target") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 

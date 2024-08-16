@@ -9,7 +9,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool CustomStrategyEditAction::Execute(Event event)
+bool CustomStrategyEditAction::Execute(Event& event)
 {
     std::string text = event.getParam();
     size_t pos = text.find(" ");

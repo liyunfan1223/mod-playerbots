@@ -279,7 +279,7 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
     return spells;
 }
 
-bool ListSpellsAction::Execute(Event event)
+bool ListSpellsAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     if (!master)

@@ -25,7 +25,7 @@ public:
     bool isUseful() override;
     bool canJoinBg(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId);
     virtual bool shouldJoinBg(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId);
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     virtual bool gatherArenaTeam(ArenaType type);
 
 protected:
@@ -47,7 +47,7 @@ class BGLeaveAction : public Action
 public:
     BGLeaveAction(PlayerbotAI* botAI, std::string const name = "bg leave") : Action(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class BGStatusAction : public Action
@@ -55,7 +55,7 @@ class BGStatusAction : public Action
 public:
     BGStatusAction(PlayerbotAI* botAI) : Action(botAI, "bg status") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -64,7 +64,7 @@ class BGStatusCheckAction : public Action
 public:
     BGStatusCheckAction(PlayerbotAI* botAI, std::string const name = "bg status check") : Action(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -73,6 +73,6 @@ class BGStrategyCheckAction : public Action
 public:
     BGStrategyCheckAction(PlayerbotAI* botAI, std::string const name = "bg strategy check") : Action(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 #endif

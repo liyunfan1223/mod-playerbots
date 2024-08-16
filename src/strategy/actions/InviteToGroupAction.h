@@ -16,7 +16,7 @@ class InviteToGroupAction : public Action
 public:
     InviteToGroupAction(PlayerbotAI* botAI, std::string const name = "invite") : Action(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
     virtual bool Invite(Player* player);
 };
@@ -25,7 +25,7 @@ class JoinGroupAction : public InviteToGroupAction
 {
 public:
     JoinGroupAction(PlayerbotAI* ai, std::string name = "join") : InviteToGroupAction(ai, name) {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override { return !bot->IsBeingTeleported(); }
 };
 
@@ -37,7 +37,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -63,7 +63,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
 private:

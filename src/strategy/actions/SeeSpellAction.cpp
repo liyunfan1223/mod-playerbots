@@ -28,7 +28,7 @@ Creature* SeeSpellAction::CreateWps(Player* wpOwner, float x, float y, float z, 
     return wpCreature;
 }
 
-bool SeeSpellAction::Execute(Event event)
+bool SeeSpellAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());  //
     uint32 spellId;

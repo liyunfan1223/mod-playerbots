@@ -15,7 +15,7 @@ class LootStrategyAction : public Action
 public:
     LootStrategyAction(PlayerbotAI* botAI) : Action(botAI, "ll") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

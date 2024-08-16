@@ -16,7 +16,7 @@ class XpGainAction : public Action
 public:
     XpGainAction(PlayerbotAI* botAI) : Action(botAI, "xp gain") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void GiveXP(uint32 xp, Unit* victim);

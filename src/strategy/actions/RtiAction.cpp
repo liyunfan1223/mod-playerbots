@@ -9,7 +9,7 @@
 #include "Playerbots.h"
 #include "RtiTargetValue.h"
 
-bool RtiAction::Execute(Event event)
+bool RtiAction::Execute(Event& event)
 {
     std::string text = event.getParam();
     std::string type = "rti";
@@ -55,7 +55,7 @@ void RtiAction::AppendRti(std::ostringstream& out, std::string const type)
         out << " (" << target->GetName() << ")";
 }
 
-bool MarkRtiAction::Execute(Event event)
+bool MarkRtiAction::Execute(Event& event)
 {
     Group* group = bot->GetGroup();
     if (!group)

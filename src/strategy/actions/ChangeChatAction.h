@@ -15,7 +15,7 @@ class ChangeChatAction : public Action
 public:
     ChangeChatAction(PlayerbotAI* botAI) : Action(botAI, "chat") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

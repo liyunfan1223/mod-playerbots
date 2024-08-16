@@ -297,7 +297,7 @@ class CastRaiseDeadAction : public CastBuffSpellAction
 {
 public:
     CastRaiseDeadAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "raise dead") {}
-    virtual bool Execute(Event event) override;
+    virtual bool Execute(Event& event) override;
 };
 
 class CastKillingMachineAction : public CastBuffSpellAction

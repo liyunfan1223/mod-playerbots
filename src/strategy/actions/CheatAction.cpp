@@ -7,7 +7,7 @@
 #include "Helpers.h"
 #include "Playerbots.h"
 
-bool CheatAction::Execute(Event event)
+bool CheatAction::Execute(Event& event)
 {
     std::string const param = event.getParam();
 

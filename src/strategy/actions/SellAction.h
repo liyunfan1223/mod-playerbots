@@ -17,7 +17,7 @@ class SellAction : public InventoryAction
 public:
     SellAction(PlayerbotAI* botAI, std::string const name = "sell") : InventoryAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     void Sell(FindItemVisitor* visitor);
     void Sell(Item* item);
 };

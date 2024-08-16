@@ -19,7 +19,7 @@ class TrainerAction : public Action
 public:
     TrainerAction(PlayerbotAI* botAI) : Action(botAI, "trainer") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     typedef void (TrainerAction::*TrainerSpellAction)(uint32, TrainerSpell const*, std::ostringstream& msg);
@@ -33,21 +33,21 @@ class MaintenanceAction : public Action
 {
 public:
     MaintenanceAction(PlayerbotAI* botAI) : Action(botAI, "maintenance") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RemoveGlyphAction : public Action
 {
 public:
     RemoveGlyphAction(PlayerbotAI* botAI) : Action(botAI, "remove glyph") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class AutoGearAction : public Action
 {
 public:
     AutoGearAction(PlayerbotAI* botAI) : Action(botAI, "autogear") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

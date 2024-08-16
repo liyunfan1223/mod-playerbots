@@ -39,7 +39,7 @@ bool CastCasterFormAction::isUseful()
            AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->mediumHealth;
 }
 
-bool CastCasterFormAction::Execute(Event event)
+bool CastCasterFormAction::Execute(Event& event)
 {
     botAI->RemoveShapeshift();
     return true;

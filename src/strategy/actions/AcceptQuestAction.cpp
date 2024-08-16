@@ -24,7 +24,7 @@ bool AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
     return true;
 }
 
-bool AcceptQuestAction::Execute(Event event)
+bool AcceptQuestAction::Execute(Event& event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     if (!requester)
@@ -94,7 +94,7 @@ bool AcceptQuestAction::Execute(Event event)
     return hasAccept;
 }
 
-bool AcceptQuestShareAction::Execute(Event event)
+bool AcceptQuestShareAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     Player* bot = botAI->GetBot();
@@ -156,7 +156,7 @@ bool AcceptQuestShareAction::Execute(Event event)
     return false;
 }
 
-bool ConfirmQuestAction::Execute(Event event)
+bool ConfirmQuestAction::Execute(Event& event)
 {
     Player* bot = botAI->GetBot();
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();

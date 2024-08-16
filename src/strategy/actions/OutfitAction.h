@@ -16,7 +16,7 @@ class OutfitAction : public EquipAction
 public:
     OutfitAction(PlayerbotAI* botAI) : EquipAction(botAI, "outfit") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void List();

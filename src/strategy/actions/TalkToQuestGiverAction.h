@@ -33,6 +33,6 @@ class TurnInQueryQuestAction : public TalkToQuestGiverAction
 {
 public:
     TurnInQueryQuestAction(PlayerbotAI* botAI) : TalkToQuestGiverAction(botAI, "turn in query quest") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 #endif

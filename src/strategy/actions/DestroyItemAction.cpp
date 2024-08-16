@@ -9,7 +9,7 @@
 #include "ItemCountValue.h"
 #include "Playerbots.h"
 
-bool DestroyItemAction::Execute(Event event)
+bool DestroyItemAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     ItemIds ids = chat->parseItems(text);
@@ -39,7 +39,7 @@ void DestroyItemAction::DestroyItem(FindItemVisitor* visitor)
 
 bool SmartDestroyItemAction::isUseful() { return !botAI->HasActivePlayerMaster(); }
 
-bool SmartDestroyItemAction::Execute(Event event)
+bool SmartDestroyItemAction::Execute(Event& event)
 {
     uint8 bagSpace = AI_VALUE(uint8, "bag space");
 

@@ -113,7 +113,7 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
     return floor((maxRelevance - 1.0) * 1000.0f);
 }
 
-bool ChooseRpgTargetAction::Execute(Event event)
+bool ChooseRpgTargetAction::Execute(Event& event)
 {
     TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
     Player* master = botAI->GetMaster();

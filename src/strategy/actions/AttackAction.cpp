@@ -15,7 +15,7 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 
-bool AttackAction::Execute(Event event)
+bool AttackAction::Execute(Event& event)
 {
     Unit* target = GetTarget();
     if (!target)
@@ -28,7 +28,7 @@ bool AttackAction::Execute(Event event)
     return Attack(target);
 }
 
-bool AttackMyTargetAction::Execute(Event event)
+bool AttackMyTargetAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     if (!master)
@@ -160,4 +160,4 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
 
 bool AttackDuelOpponentAction::isUseful() { return AI_VALUE(Unit*, "duel target"); }
 
-bool AttackDuelOpponentAction::Execute(Event event) { return Attack(AI_VALUE(Unit*, "duel target")); }
+bool AttackDuelOpponentAction::Execute(Event& event) { return Attack(AI_VALUE(Unit*, "duel target")); }

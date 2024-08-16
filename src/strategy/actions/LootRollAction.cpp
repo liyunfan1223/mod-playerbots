@@ -12,7 +12,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
-bool LootRollAction::Execute(Event event)
+bool LootRollAction::Execute(Event& event)
 {
     Player* bot = QueryItemUsageAction::botAI->GetBot();
 
@@ -167,7 +167,7 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
 
 bool MasterLootRollAction::isUseful() { return !botAI->HasActivePlayerMaster(); };
 
-bool MasterLootRollAction::Execute(Event event)
+bool MasterLootRollAction::Execute(Event& event)
 {
     Player* bot = QueryItemUsageAction::botAI->GetBot();
 

@@ -15,7 +15,7 @@ class TellReputationAction : public Action
 public:
     TellReputationAction(PlayerbotAI* botAI) : Action(botAI, "reputation") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

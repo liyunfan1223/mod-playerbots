@@ -18,7 +18,7 @@
 #include "GuildMgr.h"
 #include "BroadcastHelper.h"
 
-bool LootAction::Execute(Event event)
+bool LootAction::Execute(Event& event)
 {
     if (!AI_VALUE(bool, "has available loot"))
         return false;
@@ -60,7 +60,7 @@ enum ProfessionSpells
     TAILORING = 3908
 };
 
-bool OpenLootAction::Execute(Event event)
+bool OpenLootAction::Execute(Event& event)
 {
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
     bool result = DoLoot(lootObject);
@@ -327,7 +327,7 @@ proto->Name1.c_str(), 1, bidPrice, buyoutPrice);
 }
 */
 
-bool StoreLootAction::Execute(Event event)
+bool StoreLootAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());  // (8+1+4+1+1+4+4+4+4+4+1)
     ObjectGuid guid;
@@ -493,7 +493,7 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
     return canLoot;
 }
 
-bool ReleaseLootAction::Execute(Event event)
+bool ReleaseLootAction::Execute(Event& event)
 {
     GuidVector gos = context->GetValue<GuidVector>("nearest game objects")->Get();
     for (ObjectGuid const guid : gos)

@@ -12,7 +12,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
-bool UseMeetingStoneAction::Execute(Event event)
+bool UseMeetingStoneAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     if (!master)
@@ -71,7 +71,7 @@ private:
     float i_range;
 };
 
-bool SummonAction::Execute(Event event)
+bool SummonAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     if (!master)

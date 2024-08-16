@@ -17,7 +17,7 @@ class ReviveFromCorpseAction : public MovementAction
 public:
     ReviveFromCorpseAction(PlayerbotAI* botAI) : MovementAction(botAI, "revive from corpse") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class FindCorpseAction : public MovementAction
@@ -25,7 +25,7 @@ class FindCorpseAction : public MovementAction
 public:
     FindCorpseAction(PlayerbotAI* botAI) : MovementAction(botAI, "find corpse") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -35,7 +35,7 @@ public:
     SpiritHealerAction(PlayerbotAI* botAI, std::string const name = "spirit healer") : MovementAction(botAI, name) {}
 
     GraveyardStruct const* GetGrave(bool startZone);
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 

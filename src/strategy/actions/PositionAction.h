@@ -15,7 +15,7 @@ class PositionAction : public Action
 public:
     PositionAction(PlayerbotAI* botAI) : Action(botAI, "position") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class MoveToPositionAction : public MovementAction
@@ -26,7 +26,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
 protected:
@@ -45,7 +45,7 @@ class SetReturnPositionAction : public Action
 public:
     SetReturnPositionAction(PlayerbotAI* botAI) : Action(botAI, "set return position") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 

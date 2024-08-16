@@ -9,7 +9,7 @@
 #include "MapMgr.h"
 #include "Playerbots.h"
 
-bool DebugAction::Execute(Event event)
+bool DebugAction::Execute(Event& event)
 {
     Player* master = GetMaster();
     if (!master)

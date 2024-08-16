@@ -22,7 +22,7 @@ class BuyAction : public InventoryAction
 public:
     BuyAction(PlayerbotAI* botAI) : InventoryAction(botAI, "buy") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     bool BuyItem(VendorItemData const* tItems, ObjectGuid vendorguid, ItemTemplate const* proto);

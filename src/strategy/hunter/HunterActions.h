@@ -223,7 +223,7 @@ class FeedPetAction : public Action
 public:
     FeedPetAction(PlayerbotAI* botAI) : Action(botAI, "feed pet") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastBestialWrathAction : public CastBuffSpellAction
@@ -245,7 +245,7 @@ public:
     CastScareBeastCcAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "scare beast on cc") {}
 
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastMisdirectionOnMainTankAction : public BuffOnMainTankAction

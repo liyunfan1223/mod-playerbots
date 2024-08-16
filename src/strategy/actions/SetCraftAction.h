@@ -18,7 +18,7 @@ class SetCraftAction : public Action
 public:
     SetCraftAction(PlayerbotAI* botAI) : Action(botAI, "craft") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
     static uint32 GetCraftFee(CraftData& craftData);
 

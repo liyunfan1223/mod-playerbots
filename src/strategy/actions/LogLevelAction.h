@@ -16,7 +16,7 @@ class LogLevelAction : public Action
 public:
     LogLevelAction(PlayerbotAI* botAI) : Action(botAI, "log") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 public:
     static std::string const logLevel2string(LogLevel level);

@@ -182,7 +182,7 @@ class CastEntanglingRootsCcAction : public CastSpellAction
 public:
     CastEntanglingRootsCcAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "entangling roots on cc") {}
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastHibernateAction : public CastSpellAction
@@ -196,7 +196,7 @@ class CastHibernateCcAction : public CastSpellAction
 public:
     CastHibernateCcAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "hibernate on cc") {}
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastNaturesGraspAction : public CastBuffSpellAction

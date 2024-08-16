@@ -8,7 +8,7 @@
 #include "SharedDefines.h"
 #include "BroadcastHelper.h"
 
-bool AutoMaintenanceOnLevelupAction::Execute(Event event)
+bool AutoMaintenanceOnLevelupAction::Execute(Event& event)
 {
     AutoPickTalents();
     AutoLearnSpell();

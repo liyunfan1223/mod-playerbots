@@ -15,7 +15,7 @@ class StatsAction : public Action
 public:
     StatsAction(PlayerbotAI* botAI) : Action(botAI, "stats") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void ListBagSlots(std::ostringstream& out);

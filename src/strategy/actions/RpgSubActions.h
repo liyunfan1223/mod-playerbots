@@ -52,7 +52,7 @@ public:
     // Short range can we do the action now?
     bool isUseful() override;
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     virtual std::string const ActionName();
@@ -65,7 +65,7 @@ public:
     RpgStayAction(PlayerbotAI* botAI, std::string const name = "rpg stay") : RpgSubAction(botAI, name) {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgWorkAction : public RpgSubAction
@@ -74,7 +74,7 @@ public:
     RpgWorkAction(PlayerbotAI* botAI, std::string const name = "rpg work") : RpgSubAction(botAI, name) {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgEmoteAction : public RpgSubAction
@@ -83,7 +83,7 @@ public:
     RpgEmoteAction(PlayerbotAI* botAI, std::string const name = "rpg emote") : RpgSubAction(botAI, name) {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgCancelAction : public RpgSubAction
@@ -91,7 +91,7 @@ class RpgCancelAction : public RpgSubAction
 public:
     RpgCancelAction(PlayerbotAI* botAI, std::string const name = "rpg cancel") : RpgSubAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgTaxiAction : public RpgSubAction
@@ -100,7 +100,7 @@ public:
     RpgTaxiAction(PlayerbotAI* botAI, std::string const name = "rpg taxi") : RpgSubAction(botAI, name) {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgDiscoverAction : public RpgTaxiAction
@@ -108,7 +108,7 @@ class RpgDiscoverAction : public RpgTaxiAction
 public:
     RpgDiscoverAction(PlayerbotAI* botAI, std::string const name = "rpg discover") : RpgTaxiAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgStartQuestAction : public RpgSubAction
@@ -174,7 +174,7 @@ class RpgHealAction : public RpgSubAction
 public:
     RpgHealAction(PlayerbotAI* botAI, std::string const name = "rpg heal") : RpgSubAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgHomeBindAction : public RpgSubAction
@@ -241,7 +241,7 @@ public:
 
     std::vector<Item*> CanGiveItems(GuidPosition guidPosition);
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgDuelAction : public RpgSubAction
@@ -250,7 +250,7 @@ public:
     RpgDuelAction(PlayerbotAI* botAI, std::string const name = "rpg duel") : RpgSubAction(botAI, name) {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class RpgMountAnimAction : public RpgSubAction
@@ -259,7 +259,7 @@ public:
     RpgMountAnimAction(PlayerbotAI* botAI, std::string const name = "rpg mount anim") : RpgSubAction(botAI, name) {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

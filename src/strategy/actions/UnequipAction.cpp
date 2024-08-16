@@ -11,7 +11,7 @@
 
 std::vector<std::string> split(std::string const s, char delim);
 
-bool UnequipAction::Execute(Event event)
+bool UnequipAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
 

@@ -12,7 +12,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-bool ReleaseSpiritAction::Execute(Event event)
+bool ReleaseSpiritAction::Execute(Event& event)
 {
     if (bot->IsAlive())
     {
@@ -79,7 +79,7 @@ bool ReleaseSpiritAction::Execute(Event event)
     return true;
 }
 
-bool AutoReleaseSpiritAction::Execute(Event event)
+bool AutoReleaseSpiritAction::Execute(Event& event)
 {
     // Death Count to prevent skeleton piles
     Player* master = GetMaster();
@@ -177,7 +177,7 @@ bool AutoReleaseSpiritAction::isUseful()
     return false;
 }
 
-bool RepopAction::Execute(Event event)
+bool RepopAction::Execute(Event& event)
 {
     LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> repops at graveyard", bot->GetGUID().ToString().c_str(),
               bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());

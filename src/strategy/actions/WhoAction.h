@@ -15,7 +15,7 @@ class WhoAction : public InventoryAction
 public:
     WhoAction(PlayerbotAI* botAI) : InventoryAction(botAI, "who") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     std::string const QueryTrade(std::string const text);

@@ -15,7 +15,7 @@ class RangeAction : public Action
 public:
     RangeAction(PlayerbotAI* botAI) : Action(botAI, "range") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void PrintRange(std::string const type);

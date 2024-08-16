@@ -15,7 +15,7 @@ class CustomStrategyEditAction : public Action
 public:
     CustomStrategyEditAction(PlayerbotAI* botAI) : Action(botAI, "cs") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     bool PrintHelp();

@@ -42,7 +42,7 @@ public:
 
     BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     static std::string const HandleConsoleCommandPrivate(WorldSession* session, char const* args);
@@ -70,7 +70,7 @@ class ArenaTactics : public MovementAction
 public:
     ArenaTactics(PlayerbotAI* botAI, std::string const name = "arena tactics") : MovementAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     bool moveToCenter(Battleground* bg);

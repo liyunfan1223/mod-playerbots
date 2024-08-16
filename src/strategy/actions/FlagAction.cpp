@@ -15,7 +15,7 @@ bool FlagAction::TellUsage()
     return false;
 }
 
-bool FlagAction::Execute(Event event)
+bool FlagAction::Execute(Event& event)
 {
     std::string const cmd = event.getParam();
     std::vector<std::string> ss = split(cmd, " ");

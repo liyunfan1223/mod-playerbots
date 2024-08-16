@@ -14,7 +14,7 @@ class CheatAction : public Action
 public:
     CheatAction(PlayerbotAI* botAI) : Action(botAI, "cheat") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     static BotCheatMask GetCheatMask(std::string const cheat);

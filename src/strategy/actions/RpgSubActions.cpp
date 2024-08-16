@@ -86,7 +86,7 @@ bool RpgSubAction::isPossible() { return rpg->guidP() && rpg->guidP().GetWorldOb
 
 bool RpgSubAction::isUseful() { return rpg->InRange(); }
 
-bool RpgSubAction::Execute(Event event)
+bool RpgSubAction::Execute(Event& event)
 {
     bool doAction = botAI->DoSpecificAction(ActionName(), ActionEvent(event), true);
     rpg->AfterExecute(doAction, true);
@@ -99,7 +99,7 @@ Event RpgSubAction::ActionEvent(Event event) { return event; }
 
 bool RpgStayAction::isUseful() { return rpg->InRange() && !botAI->HasRealPlayerMaster(); }
 
-bool RpgStayAction::Execute(Event event)
+bool RpgStayAction::Execute(Event& event)
 {
     bot->PlayerTalkClass->SendCloseGossip();
 
@@ -109,7 +109,7 @@ bool RpgStayAction::Execute(Event event)
 
 bool RpgWorkAction::isUseful() { return rpg->InRange() && !botAI->HasRealPlayerMaster(); }
 
-bool RpgWorkAction::Execute(Event event)
+bool RpgWorkAction::Execute(Event& event)
 {
     bot->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
     rpg->AfterExecute();
@@ -118,7 +118,7 @@ bool RpgWorkAction::Execute(Event event)
 
 bool RpgEmoteAction::isUseful() { return rpg->InRange() && !botAI->HasRealPlayerMaster(); }
 
-bool RpgEmoteAction::Execute(Event event)
+bool RpgEmoteAction::Execute(Event& event)
 {
     uint32 type = TalkAction::GetRandomEmote(rpg->guidP().GetUnit());
 
@@ -133,7 +133,7 @@ bool RpgEmoteAction::Execute(Event event)
     return true;
 }
 
-bool RpgCancelAction::Execute(Event event)
+bool RpgCancelAction::Execute(Event& event)
 {
     RESET_AI_VALUE(GuidPosition, "rpg target");
     rpg->OnExecute("");
@@ -142,7 +142,7 @@ bool RpgCancelAction::Execute(Event event)
 
 bool RpgTaxiAction::isUseful() { return rpg->InRange() && !botAI->HasRealPlayerMaster(); }
 
-bool RpgTaxiAction::Execute(Event event)
+bool RpgTaxiAction::Execute(Event& event)
 {
     GuidPosition guidP = rpg->guidP();
 
@@ -203,7 +203,7 @@ bool RpgTaxiAction::Execute(Event event)
     return true;
 }
 
-bool RpgDiscoverAction::Execute(Event event)
+bool RpgDiscoverAction::Execute(Event& event)
 {
     GuidPosition guidP = rpg->guidP();
 
@@ -252,7 +252,7 @@ std::string const RpgRepairAction::ActionName() { return "repair"; }
 
 std::string const RpgTrainAction::ActionName() { return "trainer"; }
 
-bool RpgHealAction::Execute(Event event)
+bool RpgHealAction::Execute(Event& event)
 {
     bool retVal = false;
 
@@ -341,7 +341,7 @@ std::vector<Item*> RpgTradeUsefulAction::CanGiveItems(GuidPosition guidPosition)
     return giveItems;
 }
 
-bool RpgTradeUsefulAction::Execute(Event event)
+bool RpgTradeUsefulAction::Execute(Event& event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
 
@@ -416,7 +416,7 @@ bool RpgDuelAction::isUseful()
     return true;
 }
 
-bool RpgDuelAction::Execute(Event event)
+bool RpgDuelAction::Execute(Event& event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
 
@@ -434,7 +434,7 @@ bool RpgMountAnimAction::isUseful()
     return AI_VALUE2(bool, "mounted", "self target") && !AI_VALUE2(bool, "moving", "self target");
 }
 
-bool RpgMountAnimAction::Execute(Event event)
+bool RpgMountAnimAction::Execute(Event& event)
 {
     WorldPacket p;
     bot->GetSession()->HandleMountSpecialAnimOpcode(p);

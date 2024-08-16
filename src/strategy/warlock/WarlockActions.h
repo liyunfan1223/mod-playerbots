@@ -148,7 +148,7 @@ public:
     CastBanishAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "banish on cc") {}
 
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastSeedOfCorruptionAction : public CastDebuffSpellAction
@@ -225,7 +225,7 @@ public:
     CastFearOnCcAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "fear on cc") {}
 
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isPossible() override;
     bool isUseful() override;
 };

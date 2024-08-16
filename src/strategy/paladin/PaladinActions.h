@@ -85,7 +85,7 @@ class CastBlessingOfMightAction : public CastBuffSpellAction
 public:
     CastBlessingOfMightAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "blessing of might") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastBlessingOnPartyAction : public BuffOnPartyAction
@@ -108,7 +108,7 @@ public:
 
     std::string const getName() override { return "blessing of might on party"; }
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastBlessingOfWisdomAction : public CastBuffSpellAction
@@ -116,7 +116,7 @@ class CastBlessingOfWisdomAction : public CastBuffSpellAction
 public:
     CastBlessingOfWisdomAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "blessing of wisdom") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastBlessingOfWisdomOnPartyAction : public BuffOnPartyAction
@@ -126,7 +126,7 @@ public:
 
     std::string const getName() override { return "blessing of wisdom on party"; }
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastBlessingOfKingsAction : public CastBuffSpellAction
@@ -421,7 +421,7 @@ class CastCancelDivineSacrificeAction : public Action
 {
 public:
     CastCancelDivineSacrificeAction(PlayerbotAI* botAI) : Action(botAI, "cancel divine sacrifice") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 #endif

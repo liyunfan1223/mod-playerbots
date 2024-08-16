@@ -576,7 +576,7 @@ bool FormationValue::Load(std::string const formation)
     return true;
 }
 
-bool SetFormationAction::Execute(Event event)
+bool SetFormationAction::Execute(Event& event)
 {
     std::string const formation = event.getParam();
 

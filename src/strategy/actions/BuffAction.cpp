@@ -81,7 +81,7 @@ void BuffAction::TellHeader(uint32 subClass)
     }
 }
 
-bool BuffAction::Execute(Event event)
+bool BuffAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
 

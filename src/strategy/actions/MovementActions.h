@@ -77,7 +77,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
 private:
@@ -89,7 +89,7 @@ class FleeWithPetAction : public MovementAction
 public:
     FleeWithPetAction(PlayerbotAI* botAI) : MovementAction(botAI, "flee with pet") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class AvoidAoeAction : public MovementAction
@@ -101,7 +101,7 @@ public:
     }
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     bool AvoidAuraWithDynamicObj();
@@ -121,7 +121,7 @@ public:
     }
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     Position AverageGroupPos(float dis = sPlayerbotAIConfig->sightDistance);
@@ -135,7 +135,7 @@ class DisperseSetAction : public Action
 public:
     DisperseSetAction(PlayerbotAI* botAI, std::string const name = "disperse set") : Action(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     float DEFAULT_DISPERSE_DISTANCE_RANGED = 5.0f;
     float DEFAULT_DISPERSE_DISTANCE_MELEE = 2.0f;
 };
@@ -145,7 +145,7 @@ class RunAwayAction : public MovementAction
 public:
     RunAwayAction(PlayerbotAI* botAI) : MovementAction(botAI, "runaway") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class MoveToLootAction : public MovementAction
@@ -153,7 +153,7 @@ class MoveToLootAction : public MovementAction
 public:
     MoveToLootAction(PlayerbotAI* botAI) : MovementAction(botAI, "move to loot") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class MoveOutOfEnemyContactAction : public MovementAction
@@ -161,7 +161,7 @@ class MoveOutOfEnemyContactAction : public MovementAction
 public:
     MoveOutOfEnemyContactAction(PlayerbotAI* botAI) : MovementAction(botAI, "move out of enemy contact") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -170,7 +170,7 @@ class SetFacingTargetAction : public Action
 public:
     SetFacingTargetAction(PlayerbotAI* botAI) : Action(botAI, "set facing") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
     bool isPossible() override;
 };
@@ -180,7 +180,7 @@ class SetBehindTargetAction : public MovementAction
 public:
     SetBehindTargetAction(PlayerbotAI* botAI) : MovementAction(botAI, "set behind") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
     bool isPossible() override;
 };
@@ -190,7 +190,7 @@ class MoveOutOfCollisionAction : public MovementAction
 public:
     MoveOutOfCollisionAction(PlayerbotAI* botAI) : MovementAction(botAI, "move out of collision") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -199,7 +199,7 @@ class MoveRandomAction : public MovementAction
 public:
     MoveRandomAction(PlayerbotAI* botAI) : MovementAction(botAI, "move random") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -212,7 +212,7 @@ public:
         this->y = y;
         this->distance = distance;
     }
-    virtual bool Execute(Event event);
+    virtual bool Execute(Event& event);
 
 protected:
     float x, y, distance;
@@ -238,7 +238,7 @@ public:
             waypoints.push_back(std::make_pair(center_x + cos(angle) * radius, center_y + sin(angle) * radius));
         }
     }
-    virtual bool Execute(Event event);
+    virtual bool Execute(Event& event);
 
 protected:
     virtual uint32 GetCurrWaypoint() { return 0; }

@@ -16,7 +16,7 @@ class TradeStatusAction : public QueryItemUsageAction
 public:
     TradeStatusAction(PlayerbotAI* botAI) : QueryItemUsageAction(botAI, "accept trade") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void BeginTrade();

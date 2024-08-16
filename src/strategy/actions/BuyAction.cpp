@@ -12,7 +12,7 @@
 #include "ItemVisitors.h"
 #include "Playerbots.h"
 
-bool BuyAction::Execute(Event event)
+bool BuyAction::Execute(Event& event)
 {
     bool buyUseful = false;
     ItemIds itemIds;

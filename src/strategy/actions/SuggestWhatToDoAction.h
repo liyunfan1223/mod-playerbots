@@ -15,7 +15,7 @@ class SuggestWhatToDoAction : public InventoryAction
 public:
     SuggestWhatToDoAction(PlayerbotAI* botAI, std::string const name = "suggest what to do");
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 
 protected:
@@ -40,7 +40,7 @@ class SuggestTradeAction : public SuggestWhatToDoAction
 {
 public:
     SuggestTradeAction(PlayerbotAI* botAI);
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class SuggestDungeonAction : public SuggestWhatToDoAction
@@ -48,7 +48,7 @@ class SuggestDungeonAction : public SuggestWhatToDoAction
 public:
     SuggestDungeonAction(PlayerbotAI* botAI);
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 private:
     static std::map<std::string, uint8> instances;
 };

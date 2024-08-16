@@ -56,7 +56,7 @@ public:
     }
 };
 
-bool SellAction::Execute(Event event)
+bool SellAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     if (text == "gray" || text == "*")

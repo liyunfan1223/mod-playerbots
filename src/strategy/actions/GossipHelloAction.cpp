@@ -9,7 +9,7 @@
 #include "GossipDef.h"
 #include "Playerbots.h"
 
-bool GossipHelloAction::Execute(Event event)
+bool GossipHelloAction::Execute(Event& event)
 {
     ObjectGuid guid;
 

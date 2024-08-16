@@ -12,7 +12,7 @@
 #include "Playerbots.h"
 #include "WorldPacket.h"
 
-bool ResetAiAction::Execute(Event event)
+bool ResetAiAction::Execute(Event& event)
 {
     if (!event.getPacket().empty())
     {

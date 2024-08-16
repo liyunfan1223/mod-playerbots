@@ -9,7 +9,7 @@
 #include "PlayerbotDbStore.h"
 #include "Playerbots.h"
 
-bool ChangeCombatStrategyAction::Execute(Event event)
+bool ChangeCombatStrategyAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     botAI->ChangeStrategy(text.empty() ? getName() : text, BOT_STATE_COMBAT);
@@ -35,7 +35,7 @@ bool ChangeCombatStrategyAction::Execute(Event event)
     return true;
 }
 
-bool ChangeNonCombatStrategyAction::Execute(Event event)
+bool ChangeNonCombatStrategyAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
 
@@ -73,7 +73,7 @@ bool ChangeNonCombatStrategyAction::Execute(Event event)
     return true;
 }
 
-bool ChangeDeadStrategyAction::Execute(Event event)
+bool ChangeDeadStrategyAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     botAI->ChangeStrategy(text, BOT_STATE_DEAD);

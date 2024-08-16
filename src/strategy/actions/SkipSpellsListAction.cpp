@@ -10,7 +10,7 @@
 #include "Playerbots.h"
 #include "SkipSpellsListValue.h"
 
-bool SkipSpellsListAction::Execute(Event event)
+bool SkipSpellsListAction::Execute(Event& event)
 {
     std::string cmd = event.getParam();
     std::set<uint32>& skipSpells = AI_VALUE(std::set<uint32>&, "skip spells list");

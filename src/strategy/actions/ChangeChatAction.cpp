@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool ChangeChatAction::Execute(Event event)
+bool ChangeChatAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     ChatMsg parsed = chat->parseChat(text);

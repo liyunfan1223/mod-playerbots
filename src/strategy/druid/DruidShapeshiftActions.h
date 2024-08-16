@@ -67,7 +67,7 @@ public:
 
     bool isUseful() override;
     bool isPossible() override { return true; }
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

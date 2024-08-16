@@ -11,7 +11,7 @@
 #include "ItemVisitors.h"
 #include "Playerbots.h"
 
-bool TradeAction::Execute(Event event)
+bool TradeAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
 

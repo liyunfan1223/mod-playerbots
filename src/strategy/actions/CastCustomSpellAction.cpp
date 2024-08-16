@@ -30,7 +30,7 @@ static inline void ltrim(std::string& s)
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
 }
 
-bool CastCustomSpellAction::Execute(Event event)
+bool CastCustomSpellAction::Execute(Event& event)
 {
     // only allow proper vehicle seats
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))
@@ -166,7 +166,7 @@ bool CastRandomSpellAction::AcceptSpell(SpellInfo const* spellInfo)
     return !isTradeSkill && spellInfo->GetRecoveryTime() < MINUTE * IN_MILLISECONDS;
 }
 
-bool CastRandomSpellAction::Execute(Event event)
+bool CastRandomSpellAction::Execute(Event& event)
 {
     std::vector<std::pair<uint32, std::string>> spellMap = GetSpellList();
     Player* master = GetMaster();
@@ -303,7 +303,7 @@ bool CastRandomSpellAction::castSpell(uint32 spellId, WorldObject* wo)
         return botAI->CastSpell(spellId, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ());
 }
 
-bool DisEnchantRandomItemAction::Execute(Event event)
+bool DisEnchantRandomItemAction::Execute(Event& event)
 {
     std::vector<Item*> items =
         AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(ITEM_USAGE_DISENCHANT));
@@ -316,8 +316,8 @@ bool DisEnchantRandomItemAction::Execute(Event event)
             item->GetTemplate()->Quality > ITEM_QUALITY_UNCOMMON)
             return false;
 
-        if (CastCustomSpellAction::Execute(
-                Event("disenchant random item", "13262 " + chat->FormatQItem(item->GetEntry()))))
+        Event e("disenchant random item", "13262 " + chat->FormatQItem(item->GetEntry()));
+        if (CastCustomSpellAction::Execute(e))
             return true;
     }
 

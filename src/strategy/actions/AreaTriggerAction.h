@@ -15,7 +15,7 @@ class ReachAreaTriggerAction : public MovementAction
 public:
     ReachAreaTriggerAction(PlayerbotAI* botAI) : MovementAction(botAI, "reach area trigger") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class AreaTriggerAction : public MovementAction
@@ -23,7 +23,7 @@ class AreaTriggerAction : public MovementAction
 public:
     AreaTriggerAction(PlayerbotAI* botAI) : MovementAction(botAI, "area trigger") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

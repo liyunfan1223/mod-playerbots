@@ -12,7 +12,7 @@
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 
-bool ChangeTalentsAction::Execute(Event event)
+bool ChangeTalentsAction::Execute(Event& event)
 {
     std::string param = event.getParam();
 
@@ -352,7 +352,7 @@ std::string ChangeTalentsAction::SpecApply(std::string param)
 //     return nullptr;
 // }
 
-bool AutoSetTalentsAction::Execute(Event event)
+bool AutoSetTalentsAction::Execute(Event& event)
 {
     std::ostringstream out;
 

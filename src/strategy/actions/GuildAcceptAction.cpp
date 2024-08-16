@@ -10,7 +10,7 @@
 #include "PlayerbotSecurity.h"
 #include "Playerbots.h"
 
-bool GuildAcceptAction::Execute(Event event)
+bool GuildAcceptAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);

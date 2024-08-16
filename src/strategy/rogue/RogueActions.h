@@ -53,7 +53,7 @@ class UnstealthAction : public Action
 public:
     UnstealthAction(PlayerbotAI* botAI) : Action(botAI, "unstealth") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CheckStealthAction : public Action
@@ -62,7 +62,7 @@ public:
     CheckStealthAction(PlayerbotAI* botAI) : Action(botAI, "check stealth") {}
 
     bool isPossible() override { return true; }
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class CastKickAction : public CastSpellAction
@@ -144,7 +144,7 @@ class UseDeadlyPoisonAction : public UseItemAction
 {
 public:
     UseDeadlyPoisonAction(PlayerbotAI* ai) : UseItemAction(ai, "Deadly Poison") {}
-    virtual bool Execute(Event event) override;
+    virtual bool Execute(Event& event) override;
     virtual bool isPossible() override;
 };
 
@@ -152,7 +152,7 @@ class UseInstantPoisonAction : public UseItemAction
 {
 public:
     UseInstantPoisonAction(PlayerbotAI* ai) : UseItemAction(ai, "Instant Poison") {}
-    virtual bool Execute(Event event) override;
+    virtual bool Execute(Event& event) override;
     virtual bool isPossible() override;
 };
 
@@ -160,7 +160,7 @@ class UseInstantPoisonOffHandAction : public UseItemAction
 {
 public:
     UseInstantPoisonOffHandAction(PlayerbotAI* ai) : UseItemAction(ai, "Instant Poison Off Hand") {}
-    virtual bool Execute(Event event) override;
+    virtual bool Execute(Event& event) override;
     virtual bool isPossible() override;
 };
 

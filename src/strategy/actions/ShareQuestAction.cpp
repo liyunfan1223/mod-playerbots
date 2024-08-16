@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool ShareQuestAction::Execute(Event event)
+bool ShareQuestAction::Execute(Event& event)
 {
     std::string const link = event.getParam();
     if (!GetMaster())
@@ -40,7 +40,7 @@ bool ShareQuestAction::Execute(Event event)
     return false;
 }
 
-bool AutoShareQuestAction::Execute(Event event)
+bool AutoShareQuestAction::Execute(Event& event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     bool shared = false;

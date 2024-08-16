@@ -10,7 +10,7 @@
 #include "Playerbots.h"
 #include "Transport.h"
 
-bool ReachAreaTriggerAction::Execute(Event event)
+bool ReachAreaTriggerAction::Execute(Event& event)
 {
     if (botAI->IsRealPlayer())  // Do not trigger own area trigger.
         return false;
@@ -51,7 +51,7 @@ bool ReachAreaTriggerAction::Execute(Event event)
     return true;
 }
 
-bool AreaTriggerAction::Execute(Event event)
+bool AreaTriggerAction::Execute(Event& event)
 {
     LastMovement& movement = context->GetValue<LastMovement&>("last area trigger")->Get();
 

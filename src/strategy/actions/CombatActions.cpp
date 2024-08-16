@@ -10,7 +10,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-bool SwitchToMeleeAction::Execute(Event event)
+bool SwitchToMeleeAction::Execute(Event& event)
 {
     // botAI->TellMasterNoFacing("Switching to melee!");
     return ChangeCombatStrategyAction::Execute(event);
@@ -32,7 +32,7 @@ bool SwitchToMeleeAction::isUseful()
     return botAI->HasStrategy("ranged", BOT_STATE_COMBAT);
 }
 
-bool SwitchToRangedAction::Execute(Event event)
+bool SwitchToRangedAction::Execute(Event& event)
 {
     // botAI->TellMasterNoFacing("Switching to ranged!");
     return ChangeCombatStrategyAction::Execute(event);

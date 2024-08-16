@@ -15,7 +15,7 @@ class ReadyCheckAction : public InventoryAction
 public:
     ReadyCheckAction(PlayerbotAI* botAI, std::string const name = "ready check") : InventoryAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     bool ReadyCheck();
@@ -26,7 +26,7 @@ class FinishReadyCheckAction : public ReadyCheckAction
 public:
     FinishReadyCheckAction(PlayerbotAI* botAI) : ReadyCheckAction(botAI, "finish ready check") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

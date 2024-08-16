@@ -13,7 +13,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-bool AddLootAction::Execute(Event event)
+bool AddLootAction::Execute(Event& event)
 {
     ObjectGuid guid = event.getObject();
     if (!guid)
@@ -22,7 +22,7 @@ bool AddLootAction::Execute(Event event)
     return AI_VALUE(LootObjectStack*, "available loot")->Add(guid);
 }
 
-bool AddAllLootAction::Execute(Event event)
+bool AddAllLootAction::Execute(Event& event)
 {
     bool added = false;
 

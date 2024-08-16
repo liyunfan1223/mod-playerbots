@@ -10,7 +10,7 @@
 #include "ItemUsageValue.h"
 #include "Playerbots.h"
 
-bool EquipAction::Execute(Event event)
+bool EquipAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     ItemIds ids = chat->parseItems(text);
@@ -97,7 +97,7 @@ void EquipAction::EquipItem(Item* item)
     botAI->TellMaster(out);
 }
 
-bool EquipUpgradesAction::Execute(Event event)
+bool EquipUpgradesAction::Execute(Event& event)
 {
     if (!sPlayerbotAIConfig->autoEquipUpgradeLoot && !sRandomPlayerbotMgr->IsRandomBot(bot))
         return false;
@@ -133,7 +133,7 @@ bool EquipUpgradesAction::Execute(Event event)
     return true;
 }
 
-bool EquipUpgradeAction::Execute(Event event)
+bool EquipUpgradeAction::Execute(Event& event)
 {
     ListItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);

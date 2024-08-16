@@ -15,7 +15,7 @@ class AcceptResurrectAction : public Action
 public:
     AcceptResurrectAction(PlayerbotAI* botAI) : Action(botAI, "accept resurrect") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

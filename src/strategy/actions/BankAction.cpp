@@ -9,7 +9,7 @@
 #include "ItemCountValue.h"
 #include "Playerbots.h"
 
-bool BankAction::Execute(Event event)
+bool BankAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
 

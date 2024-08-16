@@ -17,7 +17,7 @@ class InventoryItemValueBase : public InventoryAction
 public:
     InventoryItemValueBase(PlayerbotAI* botAI) : InventoryAction(botAI, "empty") {}
 
-    bool Execute(Event event) override { return false; }
+    bool Execute(Event& event) override { return false; }
 
 protected:
     std::vector<Item*> Find(std::string const qualifier);

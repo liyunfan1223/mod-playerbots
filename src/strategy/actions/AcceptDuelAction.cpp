@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool AcceptDuelAction::Execute(Event event)
+bool AcceptDuelAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
 

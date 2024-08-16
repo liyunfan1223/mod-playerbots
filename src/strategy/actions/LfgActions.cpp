@@ -12,7 +12,7 @@
 
 using namespace lfg;
 
-bool LfgJoinAction::Execute(Event event) { return JoinLFG(); }
+bool LfgJoinAction::Execute(Event& event) { return JoinLFG(); }
 
 uint32 LfgJoinAction::GetRoles()
 {
@@ -149,7 +149,7 @@ bool LfgJoinAction::JoinLFG()
     return true;
 }
 
-bool LfgRoleCheckAction::Execute(Event event)
+bool LfgRoleCheckAction::Execute(Event& event)
 {
     if (Group* group = bot->GetGroup())
     {
@@ -171,7 +171,7 @@ bool LfgRoleCheckAction::Execute(Event event)
     return false;
 }
 
-bool LfgAcceptAction::Execute(Event event)
+bool LfgAcceptAction::Execute(Event& event)
 {
     LfgState status = sLFGMgr->GetState(bot->GetGUID());
     if (status != LFG_STATE_PROPOSAL)
@@ -224,7 +224,7 @@ bool LfgAcceptAction::Execute(Event event)
     return true;
 }
 
-bool LfgLeaveAction::Execute(Event event)
+bool LfgLeaveAction::Execute(Event& event)
 {
     // Don't leave if lfg strategy enabled
     // if (botAI->HasStrategy("lfg", BOT_STATE_NON_COMBAT))
@@ -240,7 +240,7 @@ bool LfgLeaveAction::Execute(Event event)
 
 bool LfgLeaveAction::isUseful() { return true; }
 
-bool LfgTeleportAction::Execute(Event event)
+bool LfgTeleportAction::Execute(Event& event)
 {
     bool out = false;
 

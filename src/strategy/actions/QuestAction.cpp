@@ -12,7 +12,7 @@
 #include "ServerFacade.h"
 #include "BroadcastHelper.h"
 
-bool QuestAction::Execute(Event event)
+bool QuestAction::Execute(Event& event)
 {
     ObjectGuid guid = event.getObject();
 
@@ -244,7 +244,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
     return false;
 }
 
-bool QuestUpdateCompleteAction::Execute(Event event)
+bool QuestUpdateCompleteAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);
@@ -277,7 +277,7 @@ bool QuestUpdateCompleteAction::Execute(Event event)
 /*
 * For creature or gameobject
 */
-bool QuestUpdateAddKillAction::Execute(Event event)
+bool QuestUpdateAddKillAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);
@@ -320,7 +320,7 @@ bool QuestUpdateAddKillAction::Execute(Event event)
     return false;
 }
 
-bool QuestUpdateAddItemAction::Execute(Event event)
+bool QuestUpdateAddItemAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);
@@ -356,13 +356,13 @@ bool QuestUpdateAddItemAction::Execute(Event event)
     return false;
 }
 
-bool QuestUpdateFailedAction::Execute(Event event)
+bool QuestUpdateFailedAction::Execute(Event& event)
 {
     //opcode SMSG_QUESTUPDATE_FAILED is never sent...(yet?)
     return false;
 }
 
-bool QuestUpdateFailedTimerAction::Execute(Event event)
+bool QuestUpdateFailedTimerAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);

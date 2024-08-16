@@ -9,7 +9,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool DropQuestAction::Execute(Event event)
+bool DropQuestAction::Execute(Event& event)
 {
     std::string const link = event.getParam();
 
@@ -58,7 +58,7 @@ bool DropQuestAction::Execute(Event event)
     return true;
 }
 
-bool CleanQuestLogAction::Execute(Event event)
+bool CleanQuestLogAction::Execute(Event& event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     std::string link = event.getParam();

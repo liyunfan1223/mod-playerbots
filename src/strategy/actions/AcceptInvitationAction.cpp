@@ -12,7 +12,7 @@
 #include "Playerbots.h"
 #include "WorldPacket.h"
 
-bool AcceptInvitationAction::Execute(Event event)
+bool AcceptInvitationAction::Execute(Event& event)
 {
     Group* grp = bot->GetGroupInvite();
     if (!grp)

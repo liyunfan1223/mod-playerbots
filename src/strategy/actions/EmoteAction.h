@@ -38,7 +38,7 @@ class EmoteAction : public EmoteActionBase, public Qualified
 public:
     EmoteAction(PlayerbotAI* botAI);
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
 };
 
@@ -47,7 +47,7 @@ class TalkAction : public EmoteActionBase
 public:
     TalkAction(PlayerbotAI* botAI) : EmoteActionBase(botAI, "talk") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     static uint32 GetRandomEmote(Unit* unit, bool textEmote = false);
 };
 

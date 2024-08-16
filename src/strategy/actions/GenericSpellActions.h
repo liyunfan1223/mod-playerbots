@@ -22,7 +22,7 @@ public:
     CastSpellAction(PlayerbotAI* botAI, std::string const spell);
 
     std::string const GetTargetName() override { return "current target"; };
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isPossible() override;
     bool isUseful() override;
     ActionThreatType getThreatType() override { return ActionThreatType::Single; }
@@ -276,7 +276,7 @@ class UseTrinketAction : public Action
 {
 public:
     UseTrinketAction(PlayerbotAI* botAI) : Action(botAI, "use trinket") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 protected:
     bool UseTrinket(Item* trinket);
 };
@@ -306,7 +306,7 @@ public:
     CastCrowdControlSpellAction(PlayerbotAI* botAI, std::string const spell) : CastBuffSpellAction(botAI, spell) {}
 
     Value<Unit*>* GetTargetValue() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isPossible() override;
     bool isUseful() override;
     ActionThreatType getThreatType() override { return ActionThreatType::None; }
@@ -331,7 +331,7 @@ public:
     }
 
     std::string const GetTargetName() override { return "current target"; }
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
     bool isPossible() override;
     ActionThreatType getThreatType() override { return ActionThreatType::None; }

@@ -20,7 +20,7 @@ public:
     {
     }
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     virtual std::string const castString(WorldObject* target) { return "cast"; }
 
 protected:
@@ -51,7 +51,7 @@ public:
     virtual bool AcceptSpell(SpellInfo const* spellInfo);
     virtual uint32 GetSpellPriority(SpellInfo const* spellInfo) { return 1; }
     virtual bool castSpell(uint32 spellId, WorldObject* wo);
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 protected:
     bool MultiCast = false;
@@ -72,7 +72,7 @@ public:
     DisEnchantRandomItemAction(PlayerbotAI* botAI) : CastCustomSpellAction(botAI, "disenchant random item") {}
 
     bool isUseful() override;
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class EnchantRandomItemAction : public CastRandomSpellAction

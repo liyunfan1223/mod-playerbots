@@ -12,11 +12,11 @@ bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "s
 
 Value<Unit*>* CastBanishAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", "banish"); }
 
-bool CastBanishAction::Execute(Event event) { return botAI->CastSpell("banish", GetTarget()); }
+bool CastBanishAction::Execute(Event& event) { return botAI->CastSpell("banish", GetTarget()); }
 
 Value<Unit*>* CastFearOnCcAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", "fear"); }
 
-bool CastFearOnCcAction::Execute(Event event) { return botAI->CastSpell("fear", GetTarget()); }
+bool CastFearOnCcAction::Execute(Event& event) { return botAI->CastSpell("fear", GetTarget()); }
 
 bool CastFearOnCcAction::isPossible() { return botAI->CanCastSpell("fear", GetTarget()); }
 

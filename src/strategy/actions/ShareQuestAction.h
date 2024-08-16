@@ -14,14 +14,14 @@ class ShareQuestAction : public Action
 {
 public:
     ShareQuestAction(PlayerbotAI* botAI, std::string name = "share quest") : Action(botAI, name) { }
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class AutoShareQuestAction : public ShareQuestAction
 {
 public:
     AutoShareQuestAction(PlayerbotAI* ai) : ShareQuestAction(botAI, "auto share quest") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
     bool isUseful() override;
 };

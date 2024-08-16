@@ -16,7 +16,7 @@ class ChangeTalentsAction : public Action
 public:
     ChangeTalentsAction(PlayerbotAI* botAI, std::string const name = "talents") : Action(botAI, name) {}
 
-    bool Execute(Event event);
+    bool Execute(Event& event);
     // bool AutoSelectTalents(std::ostringstream* out);
 
 private:
@@ -37,7 +37,7 @@ class AutoSetTalentsAction : public ChangeTalentsAction
 public:
     AutoSetTalentsAction(PlayerbotAI* botAI) : ChangeTalentsAction(botAI, "auto talents") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

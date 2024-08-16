@@ -14,7 +14,7 @@ void QueryQuestAction::TellObjective(std::string const name, uint32 available, u
     botAI->TellMaster(chat->FormatQuestObjective(name, available, required));
 }
 
-bool QueryQuestAction::Execute(Event event)
+bool QueryQuestAction::Execute(Event& event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     Player* bot = botAI->GetBot();

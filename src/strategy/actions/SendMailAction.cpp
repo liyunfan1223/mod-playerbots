@@ -12,7 +12,7 @@
 #include "Mail.h"
 #include "Playerbots.h"
 
-bool SendMailAction::Execute(Event event)
+bool SendMailAction::Execute(Event& event)
 {
     uint32 account = bot->GetSession()->GetAccountId();
     bool randomBot = sPlayerbotAIConfig->IsInRandomAccountList(account);

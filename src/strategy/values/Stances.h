@@ -52,7 +52,7 @@ class SetStanceAction : public Action
 public:
     SetStanceAction(PlayerbotAI* botAI) : Action(botAI, "set Stance") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

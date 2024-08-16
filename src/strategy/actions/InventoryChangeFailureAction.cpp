@@ -10,7 +10,7 @@
 
 std::map<InventoryResult, std::string> InventoryChangeFailureAction::messages;
 
-bool InventoryChangeFailureAction::Execute(Event event)
+bool InventoryChangeFailureAction::Execute(Event& event)
 {
     if (!botAI->GetMaster())
         return false;

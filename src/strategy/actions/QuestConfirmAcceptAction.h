@@ -21,7 +21,7 @@ class QuestConfirmAcceptAction : public Action
 {
 public:
     QuestConfirmAcceptAction(PlayerbotAI* botAI) : Action(botAI, "quest confirm accept") {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

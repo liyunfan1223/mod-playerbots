@@ -41,7 +41,7 @@ public:
     AttackAnythingAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack anything") {}
 
     std::string const GetTargetName() override { return "grind target"; }
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
     bool isUseful() override;
     bool isPossible() override;
 };
@@ -85,7 +85,7 @@ class DropTargetAction : public Action
 public:
     DropTargetAction(PlayerbotAI* botAI) : Action(botAI, "drop target") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

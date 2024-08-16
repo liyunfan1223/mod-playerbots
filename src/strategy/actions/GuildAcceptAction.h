@@ -15,7 +15,7 @@ class GuildAcceptAction : public Action
 public:
     GuildAcceptAction(PlayerbotAI* botAI) : Action(botAI, "guild accept") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

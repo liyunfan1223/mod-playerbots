@@ -15,7 +15,7 @@ class GossipHelloAction : public Action
 public:
     GossipHelloAction(PlayerbotAI* botAI) : Action(botAI, "gossip hello") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void TellGossipMenus();

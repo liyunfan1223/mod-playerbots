@@ -15,7 +15,7 @@ class QueryQuestAction : public Action
 public:
     QueryQuestAction(PlayerbotAI* botAI) : Action(botAI, "query quest") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     void TellObjectives(uint32 questId);

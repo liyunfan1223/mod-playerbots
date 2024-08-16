@@ -16,7 +16,7 @@ class TradeAction : public InventoryAction
 public:
     TradeAction(PlayerbotAI* botAI) : InventoryAction(botAI, "trade") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 
 private:
     bool TradeItem(Item const* item, int8 slot);

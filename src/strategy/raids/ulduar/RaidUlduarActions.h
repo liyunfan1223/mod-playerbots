@@ -17,7 +17,7 @@
 //     TryToGetBossAIAction(PlayerbotAI* ai) : Action(ai, "try to get boss ai") {}
 
 // public:
-//     virtual bool Execute(Event event);
+//     virtual bool Execute(Event& event);
 // };
 
 #endif

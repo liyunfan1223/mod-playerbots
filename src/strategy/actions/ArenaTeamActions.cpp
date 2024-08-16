@@ -8,7 +8,7 @@
 #include "ArenaTeamMgr.h"
 #include "Playerbots.h"
 
-bool ArenaTeamAcceptAction::Execute(Event event)
+bool ArenaTeamAcceptAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);

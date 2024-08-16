@@ -10,7 +10,7 @@
 
 ImbueWithPoisonAction::ImbueWithPoisonAction(PlayerbotAI* botAI) : Action(botAI, "apply poison") {}
 
-bool ImbueWithPoisonAction::Execute(Event event)
+bool ImbueWithPoisonAction::Execute(Event& event)
 {
     if (bot->IsInCombat())
         return false;
@@ -67,7 +67,7 @@ bool ImbueWithPoisonAction::Execute(Event event)
 // Search and apply stone to weapons
 ImbueWithStoneAction::ImbueWithStoneAction(PlayerbotAI* botAI) : Action(botAI, "apply stone") {}
 
-bool ImbueWithStoneAction::Execute(Event event)
+bool ImbueWithStoneAction::Execute(Event& event)
 {
     if (bot->IsInCombat())
         return false;
@@ -112,7 +112,7 @@ bool ImbueWithStoneAction::Execute(Event event)
 // Search and apply oil to weapons
 ImbueWithOilAction::ImbueWithOilAction(PlayerbotAI* botAI) : Action(botAI, "apply oil") {}
 
-bool ImbueWithOilAction::Execute(Event event)
+bool ImbueWithOilAction::Execute(Event& event)
 {
     if (bot->IsInCombat())
         return false;
@@ -165,7 +165,7 @@ static const uint32 uPriorizedHealingItemIds[19] = {
 
 TryEmergencyAction::TryEmergencyAction(PlayerbotAI* botAI) : Action(botAI, "try emergency") {}
 
-bool TryEmergencyAction::Execute(Event event)
+bool TryEmergencyAction::Execute(Event& event)
 {
     // Do not use consumable if bot can heal self
     if ((botAI->IsHeal(bot)) && (bot->GetPowerPct(POWER_MANA) > 20))

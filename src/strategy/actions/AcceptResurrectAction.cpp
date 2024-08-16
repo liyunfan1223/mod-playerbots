@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool AcceptResurrectAction::Execute(Event event)
+bool AcceptResurrectAction::Execute(Event& event)
 {
     if (bot->IsAlive())
         return false;

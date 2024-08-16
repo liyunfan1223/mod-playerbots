@@ -8,7 +8,7 @@
 #include "GuildMgr.h"
 #include "Playerbots.h"
 
-bool GuildBankAction::Execute(Event event)
+bool GuildBankAction::Execute(Event& event)
 {
     std::string const text = event.getParam();
     if (text.empty())

@@ -12,7 +12,7 @@
 #include "LootStrategyValue.h"
 #include "Playerbots.h"
 
-bool LootStrategyAction::Execute(Event event)
+bool LootStrategyAction::Execute(Event& event)
 {
     std::string const strategy = event.getParam();
 

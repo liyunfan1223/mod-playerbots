@@ -10,7 +10,7 @@
 #include "ItemUsageValue.h"
 #include "Playerbots.h"
 
-bool QueryItemUsageAction::Execute(Event event)
+bool QueryItemUsageAction::Execute(Event& event)
 {
     return true;
 }

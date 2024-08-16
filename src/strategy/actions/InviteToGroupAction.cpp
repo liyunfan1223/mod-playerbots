@@ -11,7 +11,7 @@
 #include "ServerFacade.h"
 #include "BroadcastHelper.h"
 
-bool InviteToGroupAction::Execute(Event event)
+bool InviteToGroupAction::Execute(Event& event)
 {
     Player* master = event.getOwner();
     if (!master)
@@ -44,7 +44,7 @@ bool InviteToGroupAction::Invite(Player* player)
     return true;
 }
 
-bool InviteNearbyToGroupAction::Execute(Event event)
+bool InviteNearbyToGroupAction::Execute(Event& event)
 {
     GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
     for (auto& i : nearGuids)
@@ -147,7 +147,7 @@ std::vector<Player*> InviteGuildToGroupAction::getGuildMembers()
     return worker.GetResult();
 }
 
-bool InviteGuildToGroupAction::Execute(Event event)
+bool InviteGuildToGroupAction::Execute(Event& event)
 {
     Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 
@@ -206,7 +206,7 @@ bool InviteGuildToGroupAction::isUseful()
     return bot->GetGuildId() && InviteNearbyToGroupAction::isUseful();
 };
 
-bool JoinGroupAction::Execute(Event event)
+bool JoinGroupAction::Execute(Event& event)
 {
     Player* master = event.getOwner();
     Group* group = master->GetGroup();

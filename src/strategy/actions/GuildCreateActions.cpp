@@ -13,7 +13,7 @@
 #include "RandomPlayerbotFactory.h"
 #include "ServerFacade.h"
 
-bool BuyPetitionAction::Execute(Event event)
+bool BuyPetitionAction::Execute(Event& event)
 {
     GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
     bool vendored = false, result = false;
@@ -94,7 +94,7 @@ bool BuyPetitionAction::canBuyPetition(Player* bot)
     return true;
 }
 
-bool PetitionOfferAction::Execute(Event event)
+bool PetitionOfferAction::Execute(Event& event)
 {
     uint32 petitionEntry = 5863;  // GUILD_CHARTER
     std::vector<Item*> petitions = AI_VALUE2(std::vector<Item*>, "inventory items", chat->FormatQItem(5863));
@@ -151,7 +151,7 @@ bool PetitionOfferAction::Execute(Event event)
 
 bool PetitionOfferAction::isUseful() { return !bot->GetGuildId(); }
 
-bool PetitionOfferNearbyAction::Execute(Event event)
+bool PetitionOfferNearbyAction::Execute(Event& event)
 {
     uint32 found = 0;
 
@@ -195,7 +195,8 @@ bool PetitionOfferNearbyAction::Execute(Event event)
         p << i;
         p.rpos(0);
 
-        if (PetitionOfferAction::Execute(Event("petition offer nearby", p)))
+        Event e("petition offer nearby", p);
+        if (PetitionOfferAction::Execute(e))
             found++;
     }
 
@@ -208,7 +209,7 @@ bool PetitionOfferNearbyAction::isUseful()
            AI_VALUE(uint8, "petition signs") < sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS);
 }
 
-bool PetitionTurnInAction::Execute(Event event)
+bool PetitionTurnInAction::Execute(Event& event)
 {
     GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
     bool vendored = false, result = false;
@@ -287,7 +288,7 @@ bool PetitionTurnInAction::isUseful()
            !context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
 }
 
-bool BuyTabardAction::Execute(Event event)
+bool BuyTabardAction::Execute(Event& event)
 {
     bool canBuy = botAI->DoSpecificAction("buy", Event("buy tabard", "Hitem:5976:"));
     if (canBuy && AI_VALUE2(uint32, "item count", chat->FormatQItem(5976)))

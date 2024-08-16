@@ -23,7 +23,7 @@ bool CastAspectOfTheCheetahAction::isUseful()
 
 Value<Unit*>* CastFreezingTrap::GetTargetValue() { return context->GetValue<Unit*>("cc target", "freezing trap"); }
 
-bool FeedPetAction::Execute(Event event)
+bool FeedPetAction::Execute(Event& event)
 {
     if (Pet* pet = bot->GetPet())
         if (pet->getPetType() == HUNTER_PET && pet->GetHappinessState() != HAPPY)
@@ -48,7 +48,7 @@ bool CastAutoShotAction::isUseful()
 
 Value<Unit*>* CastScareBeastCcAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", "scare beast"); }
 
-bool CastScareBeastCcAction::Execute(Event event) { return botAI->CastSpell("scare beast", GetTarget()); }
+bool CastScareBeastCcAction::Execute(Event& event) { return botAI->CastSpell("scare beast", GetTarget()); }
 
 bool CastWingClipAction::isUseful() { return CastSpellAction::isUseful() && !botAI->HasAura(spell, GetTarget()); }
 

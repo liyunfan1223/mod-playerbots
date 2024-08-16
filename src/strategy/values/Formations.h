@@ -71,7 +71,7 @@ class SetFormationAction : public Action
 public:
     SetFormationAction(PlayerbotAI* botAI) : Action(botAI, "set formation") {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

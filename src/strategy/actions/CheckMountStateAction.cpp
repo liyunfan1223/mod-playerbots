@@ -13,7 +13,7 @@
 #include "ServerFacade.h"
 #include "SpellAuraEffects.h"
 
-bool CheckMountStateAction::Execute(Event event)
+bool CheckMountStateAction::Execute(Event& event)
 {
     bool noattackers =
         AI_VALUE2(bool, "combat", "self target") ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true) : true;

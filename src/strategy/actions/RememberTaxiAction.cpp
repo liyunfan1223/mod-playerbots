@@ -9,7 +9,7 @@
 #include "LastMovementValue.h"
 #include "Playerbots.h"
 
-bool RememberTaxiAction::Execute(Event event)
+bool RememberTaxiAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);

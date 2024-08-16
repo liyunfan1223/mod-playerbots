@@ -15,7 +15,7 @@ class RemoveAuraAction : public Action
 public:
     RemoveAuraAction(PlayerbotAI* botAI);
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

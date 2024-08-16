@@ -11,7 +11,7 @@
 #include "ItemVisitors.h"
 #include "Playerbots.h"
 
-bool WtsAction::Execute(Event event)
+bool WtsAction::Execute(Event& event)
 {
     Player* owner = event.getOwner();
     if (!owner)

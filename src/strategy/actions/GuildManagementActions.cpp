@@ -58,7 +58,7 @@ Player* GuidManageAction::GetPlayer(Event event)
     return nullptr;
 }
 
-bool GuidManageAction::Execute(Event event)
+bool GuidManageAction::Execute(Event& event)
 {
     Player* player = GetPlayer(event);
 
@@ -140,7 +140,7 @@ bool GuildRemoveAction::PlayerIsValid(Player* member)
     return member->GetGuildId() == bot->GetGuildId() && GetRankId(bot) < GetRankId(member);
 };
 
-bool GuildManageNearbyAction::Execute(Event event)
+bool GuildManageNearbyAction::Execute(Event& event)
 {
     uint32 found = 0;
 
@@ -306,7 +306,7 @@ bool GuildManageNearbyAction::isUseful()
     return guild->GetRankRights(botMember->GetRankId()) & (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
 }
 
-bool GuildLeaveAction::Execute(Event event)
+bool GuildLeaveAction::Execute(Event& event)
 {
     Player* owner = event.getOwner();
     if (owner && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, owner, true))

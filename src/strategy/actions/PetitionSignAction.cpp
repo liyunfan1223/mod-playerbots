@@ -9,7 +9,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool PetitionSignAction::Execute(Event event)
+bool PetitionSignAction::Execute(Event& event)
 {
     WorldPacket p(event.getPacket());
     p.rpos(0);
