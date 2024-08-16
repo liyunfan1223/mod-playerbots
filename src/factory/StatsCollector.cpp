@@ -504,7 +504,8 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
             break;
         }
         case SPELL_AURA_MOD_ATTACK_POWER:
-            stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
+            if (type_ == CollectorType::MELEE)
+                stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
             break;
         case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
             if (type_ == CollectorType::RANGED)
