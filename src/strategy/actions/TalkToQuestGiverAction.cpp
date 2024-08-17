@@ -53,7 +53,6 @@ bool TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
         out << "|cffff0000Incompleted|r";
         break;
     case QUEST_STATUS_NONE:
-        AcceptQuest(quest, questGiver->GetGUID());
         out << "|cff00ff00Available|r";
         break;
     case QUEST_STATUS_FAILED:
@@ -278,7 +277,6 @@ bool TurnInQueryQuestAction::Execute(Event event)
         out << "|cffff0000Incompleted|r";
         break;
     case QUEST_STATUS_NONE:
-        AcceptQuest(quest, object->GetGUID());
         out << "|cff00ff00Available|r";
         break;
     case QUEST_STATUS_FAILED:
