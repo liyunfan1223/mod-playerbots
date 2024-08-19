@@ -881,9 +881,9 @@ bool MovementAction::IsMovingAllowed(Unit* target)
     if (bot->GetMapId() != target->GetMapId())
         return false;
 
-    float distance = sServerFacade->GetDistance2d(bot, target);
-    if (!bot->InBattleground() && distance > sPlayerbotAIConfig->reactDistance)
-        return false;
+    // float distance = sServerFacade->GetDistance2d(bot, target);
+    // if (!bot->InBattleground() && distance > sPlayerbotAIConfig->reactDistance)
+    //     return false;
 
     return IsMovingAllowed();
 }
@@ -893,9 +893,10 @@ bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
     // removed sqrt as means distance limit was effectively 22500 (ReactDistance�)
     // leaving it commented incase we find ReactDistance limit causes problems
     // float distance = sqrt(bot->GetDistance(x, y, z));
-    float distance = bot->GetDistance(x, y, z);
-    if (!bot->InBattleground() && distance > sPlayerbotAIConfig->reactDistance)
-        return false;
+    
+    // Remove react distance limit
+    // if (!bot->InBattleground())
+    //     return false;
 
     return IsMovingAllowed();
 }
@@ -922,6 +923,7 @@ bool MovementAction::IsWaitingForLastMove(MovementPriority priority)
     // heuristic 5s
     if (lastMove.lastdelayTime + lastMove.msTime > getMSTime())
         return true;
+
 
     return false;
 }

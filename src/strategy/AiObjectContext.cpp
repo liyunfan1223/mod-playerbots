@@ -9,6 +9,8 @@
 #include "ChatActionContext.h"
 #include "ChatTriggerContext.h"
 #include "Playerbots.h"
+#include "RaidUlduarTriggerContext.h"
+#include "RaidUlduarActionContext.h"
 #include "SharedValueContext.h"
 #include "StrategyContext.h"
 #include "TriggerContext.h"
@@ -34,12 +36,14 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new WorldPacketActionContext());
     actionContexts.Add(new RaidActionContext());
     actionContexts.Add(new RaidNaxxActionContext());
+    actionContexts.Add(new RaidUlduarActionContext());
 
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
     triggerContexts.Add(new WorldPacketTriggerContext());
     triggerContexts.Add(new RaidTriggerContext());
     triggerContexts.Add(new RaidNaxxTriggerContext());
+    triggerContexts.Add(new RaidUlduarTriggerContext());
 
     valueContexts.Add(new ValueContext());
 

@@ -175,6 +175,12 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
     //         }
     //     }
     // }
+    if (player->GetVehicle())
+    {
+        botAI->TellError("You cannot summon me while I'm on a vehicle");
+        return false;
+    }
+
     if (!summoner->IsBeingTeleported() && !player->IsBeingTeleported())
     {
         float followAngle = GetFollowAngle();
@@ -222,6 +228,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                 }
 
                 player->GetMotionMaster()->Clear();
+                AI_VALUE(LastMovement&, "last movement").clear();
                 player->TeleportTo(mapId, x, y, z, 0);
                 return true;
             }

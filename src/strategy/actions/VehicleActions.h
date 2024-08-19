@@ -17,6 +17,8 @@ public:
     EnterVehicleAction(PlayerbotAI* botAI, std::string const& name = "enter vehicle") : MovementAction(botAI, name) {}
 
     bool Execute(Event event) override;
+protected:
+    bool EnterVehicle(Unit* vehicleBase, bool moveIfFar);
 };
 
 class LeaveVehicleAction : public MovementAction
