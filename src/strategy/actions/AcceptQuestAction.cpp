@@ -88,7 +88,7 @@ bool AcceptQuestAction::Execute(Event event)
         std::stringstream ss;
         ss << "AcceptQuestAction {" << qInfo->GetTitle() << "} - {" << std::to_string(qInfo->GetQuestId()) << "}";
         LOG_INFO("playerbots", "{}", ss.str().c_str());
-        botAI->TellMaster(ss.str());
+        // botAI->TellMaster(ss.str());
     }
 
     return hasAccept;

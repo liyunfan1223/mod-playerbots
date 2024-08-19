@@ -95,6 +95,9 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(
         new TriggerNode("medium mana", NextAction::array(0, new NextAction("shamanistic rage", 23.0f), nullptr)));
+
+    triggers.push_back(
+        new TriggerNode("low health", NextAction::array(0, new NextAction("shamanistic rage", 23.0f), nullptr)));
 }
 
 void MeleeAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

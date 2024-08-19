@@ -462,7 +462,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
             weight_ *= 1.1;
         }
         if (cls == CLASS_WARRIOR && player_->HasAura(12785) 
-            && (proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2))
+            && (proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2))
         {
             weight_ *= 1.1;
         }

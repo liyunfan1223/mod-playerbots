@@ -13,7 +13,8 @@
     ((1 << ITEM_SUBCLASS_WEAPON_AXE) | (1 << ITEM_SUBCLASS_WEAPON_MACE) | (1 << ITEM_SUBCLASS_WEAPON_SWORD) | \
      (1 << ITEM_SUBCLASS_WEAPON_DAGGER) | (1 << ITEM_SUBCLASS_WEAPON_FIST))
 
-enum StatsOverflowThreshold {
+enum StatsOverflowThreshold
+{
     SPELL_HIT_OVERFLOW = 17,
     MELEE_HIT_OVERFLOW = 8,
     RANGED_HIT_OVERFLOW = 8,
@@ -29,6 +30,10 @@ public:
     void Reset();
     float CalculateItem(uint32 itemId);
     float CalculateEnchant(uint32 enchantId);
+
+    void SetOverflowPenalty(bool apply) { enable_overflow_penalty_ = apply; }
+    void SetItemSetBonus(bool apply) { enable_item_set_bonus_ = apply; }
+    void SetQualityBlend(bool apply) { enable_quality_blend_ = apply; }
 
 private:
     void GenerateWeights(Player* player);
@@ -53,7 +58,7 @@ private:
     bool enable_overflow_penalty_;
     bool enable_item_set_bonus_;
     bool enable_quality_blend_;
-    
+
     float weight_;
     float stats_weights_[STATS_TYPE_MAX];
 };
