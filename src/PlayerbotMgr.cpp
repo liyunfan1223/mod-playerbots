@@ -381,7 +381,7 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
 
         LOG_DEBUG("playerbots", "Bot {} logged out", bot->GetName().c_str());
 
-        // bot->SaveToDB(false, false);
+        bot->SaveToDB(false, false);
 
         if (botAI->GetAiObjectContext())  // Maybe some day re-write to delate all pointer values.
         {
@@ -534,7 +534,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
     }
 
-    // bot->SaveToDB(false, false);
+    bot->SaveToDB(false, false);
     if (master && isRandomAccount && master->GetLevel() < bot->GetLevel())
     {
         // PlayerbotFactory factory(bot, master->GetLevel());
