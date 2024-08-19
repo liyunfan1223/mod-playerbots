@@ -2197,6 +2197,46 @@ void RandomItemMgr::BuildEquipCache()
 void RandomItemMgr::BuildEquipCacheNew()
 {
     LOG_INFO("playerbots", "Loading equipments cache...");
+
+    std::unordered_set<uint32> questItemIds;
+    ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
+    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+    {
+        uint32 questId = i->first;
+        Quest const* quest = i->second;
+
+        if (quest->IsRepeatable())
+            continue;
+
+        if (quest->GetQuestLevel() <= 0)
+            continue;
+
+        if (quest->GetRequiredClasses())
+            continue;
+
+        for (int j = 0; j < quest->GetRewChoiceItemsCount(); j++)
+            if (uint32 itemId = quest->RewardChoiceItemId[j])
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
+                    continue;
+                int requiredLevel = std::max((int)proto->RequiredLevel, quest->GetQuestLevel());
+                equipCacheNew[requiredLevel][proto->InventoryType].push_back(itemId);
+                questItemIds.insert(itemId);
+            }
+
+        for (int j = 0; j < quest->GetRewItemsCount(); j++)
+            if (uint32 itemId = quest->RewardItemId[j])
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
+                    continue;
+                int requiredLevel = std::max((int)proto->RequiredLevel, quest->GetQuestLevel());
+                equipCacheNew[requiredLevel][proto->InventoryType].push_back(itemId);
+                questItemIds.insert(itemId);
+            }
+    }
+
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     for (auto const& itr : *itemTemplates)
     {
@@ -2204,6 +2244,10 @@ void RandomItemMgr::BuildEquipCacheNew()
         if (!proto)
             continue;
         uint32 itemId = proto->ItemId;
+
+        if (questItemIds.find(itemId) != questItemIds.end())
+            continue;
+
         if (IsTestItem(itemId))
         {
             continue;

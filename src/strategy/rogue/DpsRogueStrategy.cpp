@@ -99,10 +99,11 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "slice and dice", NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 2), nullptr)));
 
     triggers.push_back(new TriggerNode("combo points available",
-                                       NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 1), nullptr)));
+                                       NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 1),
+                                                         new NextAction("eviscerate", ACTION_HIGH), nullptr)));
 
     triggers.push_back(new TriggerNode("target with combo points almost dead",
-                                       NextAction::array(0, new NextAction("eviscerate", ACTION_HIGH + 1), nullptr)));
+                                       NextAction::array(0, new NextAction("eviscerate", ACTION_HIGH + 2), nullptr)));
 
     triggers.push_back(
         new TriggerNode("medium threat", NextAction::array(0, new NextAction("vanish", ACTION_HIGH), nullptr)));
@@ -111,8 +112,8 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("low health", NextAction::array(0, new NextAction("evasion", ACTION_HIGH + 9),
                                                         new NextAction("feint", ACTION_HIGH + 8), nullptr)));
 
-    triggers.push_back(
-        new TriggerNode("critical health", NextAction::array(0, new NextAction("cloak of shadows", ACTION_HIGH + 7), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "critical health", NextAction::array(0, new NextAction("cloak of shadows", ACTION_HIGH + 7), nullptr)));
 
     triggers.push_back(
         new TriggerNode("kick", NextAction::array(0, new NextAction("kick", ACTION_INTERRUPT + 2), nullptr)));
@@ -128,8 +129,8 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("light aoe", NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 3), nullptr)));
 
-    triggers.push_back(
-        new TriggerNode("blade flurry", NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("blade flurry",
+                                       NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 2), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "enemy out of melee",
