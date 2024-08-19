@@ -46,7 +46,7 @@ bool FlameLeviathanVehicleAction::Execute(Event event)
             continue;
         if (unit->GetEntry() == 33142)  // Leviathan Defense Turret
             continue;
-        if (unit->GetEntry() == 33133) // Flame Leviathan
+        if (unit->GetEntry() == 33113) // Flame Leviathan
             flame = unit;
         if (!target || bot->GetExactDist(target) > bot->GetExactDist(unit))
         {
@@ -58,7 +58,7 @@ bool FlameLeviathanVehicleAction::Execute(Event event)
 
     // Flame Leviathan is chasing me
     if (flame && flame->GetVictim() == vehicleBase_)
-        if (MoveAvoidChasing(target))
+        if (MoveAvoidChasing(flame))
             return true;
 
     uint32 entry = vehicleBase_->GetEntry();
@@ -69,7 +69,7 @@ bool FlameLeviathanVehicleAction::Execute(Event event)
         case NPC_SALVAGED_DEMOLISHER_TURRET:
             return DemolisherTurretAction(target);
         case NPC_SALVAGED_SIEGE_ENGINE:
-            return SiegeEngineAction(target);
+            return SiegeEngineAction(flame ? flame : target);
         case NPC_SALVAGED_SIEGE_ENGINE_TURRET:
             return SiegeEngineTurretAction(target);
         case NPC_VEHICLE_CHOPPER:
