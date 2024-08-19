@@ -431,7 +431,8 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         // spec with double hand
         // fury without duel wield, arms, bear, retribution, blood dk
         if (isDoubleHand &&
-            ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanDualWield()) ||
+            ((cls == CLASS_HUNTER && !player_->CanDualWield()) ||
+             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanDualWield()) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL) ||
              (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION) ||
              (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_BLOOD) ||

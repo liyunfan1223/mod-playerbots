@@ -197,6 +197,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     {
         VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
         Unit* vehicleBase = vehicle->GetBase();
+        generatePath = vehicleBase->CanFly();
         if (!vehicleBase || !seat || !seat->CanControl())  // is passenger and cant move anyway
             return false;
 
@@ -815,7 +816,6 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
 
     if (target->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD))  // target is moving forward, predict the position
     {
-        
         float needToGo = bot->GetExactDist(target) - distance;
         float timeToGo = MoveDelay(abs(needToGo)) + sPlayerbotAIConfig->reactDelay / 1000.0f;
         float targetMoveDist = timeToGo * target->GetSpeed(MOVE_RUN);
@@ -848,7 +848,8 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
         return false;
     path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), distance);
     G3D::Vector3 endPos = path.GetPath().back();
-    return MoveTo(target->GetMapId(), endPos.x, endPos.y, endPos.z, false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+    return MoveTo(target->GetMapId(), endPos.x, endPos.y, endPos.z, false, false, false, false,
+                  MovementPriority::MOVEMENT_COMBAT);
 }
 
 float MovementAction::GetFollowAngle()
@@ -893,7 +894,7 @@ bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
     // removed sqrt as means distance limit was effectively 22500 (ReactDistance�)
     // leaving it commented incase we find ReactDistance limit causes problems
     // float distance = sqrt(bot->GetDistance(x, y, z));
-    
+
     // Remove react distance limit
     // if (!bot->InBattleground())
     //     return false;
@@ -923,7 +924,6 @@ bool MovementAction::IsWaitingForLastMove(MovementPriority priority)
     // heuristic 5s
     if (lastMove.lastdelayTime + lastMove.msTime > getMSTime())
         return true;
-
 
     return false;
 }
@@ -1516,7 +1516,7 @@ bool MovementAction::MoveAway(Unit* target)
         float dz = bot->GetPositionZ();
         bool exact = true;
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
-                                                               bot->GetPositionZ(), dx, dy, dz))
+                                                            bot->GetPositionZ(), dx, dy, dz))
         {
             // disable prediction if position is invalid
             dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
@@ -1538,7 +1538,7 @@ bool MovementAction::MoveAway(Unit* target)
         dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
         dz = bot->GetPositionZ();
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
-                                                               bot->GetPositionZ(), dx, dy, dz))
+                                                            bot->GetPositionZ(), dx, dy, dz))
         {
             // disable prediction if position is invalid
             dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
@@ -2403,7 +2403,8 @@ bool MoveInsideAction::Execute(Event event) { return MoveInside(bot->GetMapId(),
 bool RotateAroundTheCenterPointAction::Execute(Event event)
 {
     uint32 next_point = GetCurrWaypoint();
-    if (MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT))
+    if (MoveTo(bot->GetMapId(), waypoints[next_point].first, waypoints[next_point].second, bot->GetPositionZ(), false,
+               false, false, false, MovementPriority::MOVEMENT_COMBAT))
     {
         call_counters += 1;
         return true;

@@ -136,6 +136,8 @@ PlayerbotAI::PlayerbotAI(Player* bot)
     engines[BOT_STATE_COMBAT] = AiFactory::createCombatEngine(bot, this, aiObjectContext);
     engines[BOT_STATE_NON_COMBAT] = AiFactory::createNonCombatEngine(bot, this, aiObjectContext);
     engines[BOT_STATE_DEAD] = AiFactory::createDeadEngine(bot, this, aiObjectContext);
+    if (sPlayerbotAIConfig->applyInstanceStrategies)
+        ApplyInstanceStrategies(bot->GetMapId());
     currentEngine = engines[BOT_STATE_NON_COMBAT];
     currentState = BOT_STATE_NON_COMBAT;
 
@@ -650,10 +652,11 @@ void PlayerbotAI::HandleTeleportAck()
             bot->GetSession()->HandleMoveWorldportAck();
         }
         SetNextCheckDelay(urand(2000, 5000));
+        if (sPlayerbotAIConfig->applyInstanceStrategies)
+            ApplyInstanceStrategies(bot->GetMapId(), true);
     }
 
     SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
-
     Reset();
 }
 
@@ -1487,6 +1490,34 @@ std::vector<std::string> PlayerbotAI::GetStrategies(BotState type)
     return e->GetStrategies();
 }
 
+void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
+{
+    std::string strategyName;
+    switch (mapId)
+    {
+        case 533:
+            strategyName = "naxx";
+            break;
+        case 603:
+            strategyName = "uld";
+            break;
+        case 469:
+            strategyName = "bwl";
+            break;
+        default:
+            break;
+    }
+
+    engines[BOT_STATE_COMBAT]->addStrategy(strategyName);
+    engines[BOT_STATE_NON_COMBAT]->addStrategy(strategyName);
+    if (tellMaster && !strategyName.empty())
+    {
+        std::ostringstream out;
+        out << "Add " << strategyName << " instance strategy";
+        TellMaster(out.str());
+    }
+}
+
 bool PlayerbotAI::DoSpecificAction(std::string const name, Event event, bool silent, std::string const qualifier)
 {
     std::ostringstream out;
@@ -1584,6 +1615,8 @@ void PlayerbotAI::ResetStrategies(bool load)
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
+    if (sPlayerbotAIConfig->applyInstanceStrategies)
+        ApplyInstanceStrategies(bot->GetMapId());
 
     for (uint8 i = 0; i < BOT_STATE_MAX; i++)
         engines[i]->Init();
@@ -5736,7 +5769,7 @@ uint32 PlayerbotAI::GetReactDelay()
     bool isResting = bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
     if (!isResting)
     {
-        multiplier = urand(5, 20);
+        multiplier = urand(10, 30);
         return base * multiplier;
     }
 
