@@ -135,15 +135,17 @@ void PlayerbotFactory::Init()
         {
             continue;
         }
-        if (gemId == 49110)
-        {  // unique gem
-            continue;
-        }
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
+
+        if (proto->ItemLevel < 60)
+            continue;
+
         if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
-        {  // unique gem
+        {
             continue;
         }
+        if (sRandomItemMgr->IsTestItem(gemId))
+            continue;
         if (!proto || !sGemPropertiesStore.LookupEntry(proto->GemProperties))
         {
             continue;
@@ -438,7 +440,7 @@ void PlayerbotFactory::Refresh()
     uint32 money = urand(level * 1000, level * 5 * 1000);
     if (bot->GetMoney() < money)
         bot->SetMoney(money);
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::AddConsumables()
@@ -805,17 +807,13 @@ void PlayerbotFactory::ClearSkills()
 
 void PlayerbotFactory::ClearEverything()
 {
-    bot->SaveToDB(false, false);
     bot->GiveLevel(bot->getClass() == CLASS_DEATH_KNIGHT ? sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)
                                                          : sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL));
     bot->SetUInt32Value(PLAYER_XP, 0);
     LOG_INFO("playerbots", "Resetting player...");
     bot->resetTalents(true);
-    bot->SaveToDB(false, false);
     ClearSkills();
-    // bot->SaveToDB(false, false);
     ClearSpells();
-    bot->SaveToDB(false, false);
     ClearInventory();
     ResetQuests();
     bot->SaveToDB(false, false);
@@ -2027,6 +2025,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+            bot->SetCanDualWield(dualWieldLevel);
             break;
         case CLASS_PALADIN:
             SetRandomSkill(SKILL_SWORDS);
@@ -2079,8 +2078,9 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_POLEARMS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
-            bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
+            bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+            bot->SetCanDualWield(dualWieldLevel);
             break;
         case CLASS_ROGUE:
             SetRandomSkill(SKILL_SWORDS);
@@ -2093,6 +2093,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, 1, 1);
+            bot->SetCanDualWield(true);
             break;
         case CLASS_DEATH_KNIGHT:
             SetRandomSkill(SKILL_SWORDS);
@@ -2103,6 +2104,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_2H_AXES);
             SetRandomSkill(SKILL_POLEARMS);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
+            bot->SetCanDualWield(dualWieldLevel);
             break;
         default:
             break;
@@ -2572,7 +2574,6 @@ void PlayerbotFactory::InitInstanceQuests()
 
     ClearInventory();
     bot->SetUInt32Value(PLAYER_XP, currentXP);
-    bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::ClearInventory()
@@ -3329,7 +3330,7 @@ void PlayerbotFactory::InitGuild()
     if (bot->GetGuildId())
         return;
 
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 
     // add guild tabard
     if (bot->GetGuildId() && !bot->HasItemCount(5976, 1))
@@ -3365,7 +3366,7 @@ void PlayerbotFactory::InitGuild()
     if (bot->GetGuildId() && bot->GetLevel() > 9 && urand(0, 4) && !bot->HasItemCount(5976, 1))
         StoreItem(5976, 1);
 
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::InitImmersive()
@@ -3554,7 +3555,7 @@ void PlayerbotFactory::InitArenaTeam()
         arenateams.erase(arenateams.begin() + index);
     }
 
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::ApplyEnchantTemplate()
@@ -3668,6 +3669,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
 
         const GemPropertiesEntry* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
         if (!gemProperties)
+            continue;
+
+        if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 && enchantGem >= 39900)
             continue;
 
         uint32 requiredLevel = gemTemplate->ItemLevel;

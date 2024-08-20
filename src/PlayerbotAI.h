@@ -129,26 +129,25 @@ enum ChatChannelSource
     SRC_UNDEFINED
 };
 static std::map<ChatChannelSource, std::string> ChatChannelSourceStr = {
-    { SRC_GUILD, "SRC_GUILD"},
-    { SRC_WORLD, "SRC_WORLD"},
-    { SRC_GENERAL, "SRC_GENERAL"},
-    { SRC_TRADE, "SRC_TRADE"},
-    { SRC_LOOKING_FOR_GROUP, "SRC_LOOKING_FOR_GROUP"},
-    { SRC_LOCAL_DEFENSE, "SRC_LOCAL_DEFENSE"},
-    { SRC_WORLD_DEFENSE, "SRC_WORLD_DEFENSE"},
-    { SRC_GUILD_RECRUITMENT, "SRC_GUILD_RECRUITMENT"},
+    {SRC_GUILD, "SRC_GUILD"},
+    {SRC_WORLD, "SRC_WORLD"},
+    {SRC_GENERAL, "SRC_GENERAL"},
+    {SRC_TRADE, "SRC_TRADE"},
+    {SRC_LOOKING_FOR_GROUP, "SRC_LOOKING_FOR_GROUP"},
+    {SRC_LOCAL_DEFENSE, "SRC_LOCAL_DEFENSE"},
+    {SRC_WORLD_DEFENSE, "SRC_WORLD_DEFENSE"},
+    {SRC_GUILD_RECRUITMENT, "SRC_GUILD_RECRUITMENT"},
 
-    { SRC_SAY, "SRC_SAY"},
-    { SRC_WHISPER, "SRC_WHISPER"},
-    { SRC_EMOTE, "SRC_EMOTE"},
-    { SRC_TEXT_EMOTE, "SRC_TEXT_EMOTE"},
-    { SRC_YELL, "SRC_YELL"},
+    {SRC_SAY, "SRC_SAY"},
+    {SRC_WHISPER, "SRC_WHISPER"},
+    {SRC_EMOTE, "SRC_EMOTE"},
+    {SRC_TEXT_EMOTE, "SRC_TEXT_EMOTE"},
+    {SRC_YELL, "SRC_YELL"},
 
-    { SRC_PARTY, "SRC_PARTY"},
-    { SRC_RAID, "SRC_RAID"},
+    {SRC_PARTY, "SRC_PARTY"},
+    {SRC_RAID, "SRC_RAID"},
 
-    { SRC_UNDEFINED, "SRC_UNDEFINED"}
-};
+    {SRC_UNDEFINED, "SRC_UNDEFINED"}};
 enum ChatChannelId
 {
     GENERAL = 1,
@@ -384,16 +383,18 @@ public:
     std::string const HandleRemoteCommand(std::string const command);
     void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
     void QueueChatResponse(const ChatQueuedReply reply);
-	void HandleBotOutgoingPacket(WorldPacket const& packet);
+    void HandleBotOutgoingPacket(WorldPacket const& packet);
     void HandleMasterIncomingPacket(WorldPacket const& packet);
     void HandleMasterOutgoingPacket(WorldPacket const& packet);
     void HandleTeleportAck();
     void ChangeEngine(BotState type);
     void DoNextAction(bool minimal = false);
-    virtual bool DoSpecificAction(std::string const name, Event event = Event(), bool silent = false, std::string const qualifier = "");
+    virtual bool DoSpecificAction(std::string const name, Event event = Event(), bool silent = false,
+                                  std::string const qualifier = "");
     void ChangeStrategy(std::string const name, BotState type);
     void ClearStrategies(BotState type);
     std::vector<std::string> GetStrategies(BotState type);
+    void ApplyInstanceStrategies(uint32 mapId, bool tellMaster = false);
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(std::string const name, BotState type);
     BotState GetState() { return currentState; };
@@ -434,8 +435,10 @@ public:
 
     bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
-    bool TellMasterNoFacing(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
-    bool TellMasterNoFacing(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
+    bool TellMasterNoFacing(std::ostringstream& stream,
+                            PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
+    bool TellMasterNoFacing(std::string const text,
+                            PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellError(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool SayToGuild(const std::string& msg);
     bool SayToWorld(const std::string& msg);
@@ -523,12 +526,16 @@ public:
     bool AllowActive(ActivityType activityType);
     bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
 
-    //Check if player is safe to use.
+    // Check if player is safe to use.
     bool IsSafe(Player* player);
     bool IsSafe(WorldObject* obj);
     ChatChannelSource GetChatChannelSource(Player* bot, uint32 type, std::string channelName);
 
-    bool HasCheat(BotCheatMask mask) { return ((uint32)mask & (uint32)cheatMask) != 0 || ((uint32)mask & (uint32)sPlayerbotAIConfig->botCheatMask) != 0; }
+    bool HasCheat(BotCheatMask mask)
+    {
+        return ((uint32)mask & (uint32)cheatMask) != 0 ||
+               ((uint32)mask & (uint32)sPlayerbotAIConfig->botCheatMask) != 0;
+    }
     BotCheatMask GetCheat() { return cheatMask; }
     void SetCheat(BotCheatMask mask) { cheatMask = mask; }
 
@@ -561,9 +568,10 @@ public:
     std::set<uint32> GetAllCurrentQuestIds();
     std::set<uint32> GetCurrentIncompleteQuestIds();
     void PetFollow();
-    
+
 private:
-    static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore, bool mixed = false);
+    static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
+                                   bool mixed = false);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
 
     void HandleCommands();
@@ -571,8 +579,8 @@ private:
 
 protected:
     Player* bot;
-	Player* master;
-	uint32 accountId;
+    Player* master;
+    uint32 accountId;
     AiObjectContext* aiObjectContext;
     Engine* currentEngine;
     Engine* engines[BOT_STATE_MAX];

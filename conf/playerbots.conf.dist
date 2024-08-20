@@ -369,8 +369,8 @@ AiPlayerbot.SyncQuestForPlayer = 0
 #
 #
 
-# Bot can flee for enemy
-AiPlayerbot.FleeingEnabled = 1
+# Auto add dungeon/raid strategies when entering the instance if implemented
+AiPlayerbot.ApplyInstanceStrategies = 1
 
 # Enable auto avoid aoe (experimental)
 # Default: 1 (enable)
@@ -387,6 +387,9 @@ AiPlayerbot.AutoSaveMana = 1
 # Healer bot save mana threshold
 # Default: 60 (60%)
 AiPlayerbot.SaveManaThreshold = 60
+
+# Bot can flee for enemy
+AiPlayerbot.FleeingEnabled = 1
 
 #
 #

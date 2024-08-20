@@ -19,3 +19,10 @@
 #include "ShamanActions.h"
 #include "UseMeetingStoneAction.h"
 #include "WarriorActions.h"
+
+float FlameLeviathanMultiplier::GetValue(Action* action)
+{
+    // if (dynamic_cast<FleeAction*>(action))
+    //     return 0.0f;
+    return 1.0f;
+}

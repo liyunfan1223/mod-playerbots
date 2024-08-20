@@ -61,6 +61,10 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         new TriggerNode("talk", NextAction::array(0, new NextAction("gossip hello", relevance),
                                                   new NextAction("talk to quest giver", relevance), nullptr)));
     triggers.push_back(
+        new TriggerNode("enter vehicle", NextAction::array(0, new NextAction("enter vehicle", relevance), nullptr)));
+    triggers.push_back(
+        new TriggerNode("leave vehicle", NextAction::array(0, new NextAction("leave vehicle", relevance), nullptr)));
+    triggers.push_back(
         new TriggerNode("cast", NextAction::array(0, new NextAction("cast custom spell", relevance), nullptr)));
     triggers.push_back(
         new TriggerNode("castnc", NextAction::array(0, new NextAction("cast custom nc spell", relevance), nullptr)));

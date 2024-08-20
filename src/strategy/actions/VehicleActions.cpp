@@ -7,8 +7,11 @@
 
 #include "BattlegroundIC.h"
 #include "ItemVisitors.h"
+#include "ObjectDefines.h"
 #include "Playerbots.h"
+#include "QuestValues.h"
 #include "ServerFacade.h"
+#include "Unit.h"
 #include "Vehicle.h"
 
 // TODO methods to enter/exit vehicle should be added to BGTactics or MovementAction (so that we can better control
@@ -20,12 +23,30 @@ bool EnterVehicleAction::Execute(Event event)
     // do not switch vehicles yet
     if (bot->GetVehicle())
         return false;
+    
+    Player* master = botAI->GetMaster();
+    // Triggered by a chat command
+    if (event.getOwner() && master && master->GetTarget())
+    {
+        Unit* vehicleBase = botAI->GetUnit(master->GetTarget());
+        if (!vehicleBase)
+            return false;
+        Vehicle* veh = vehicleBase->GetVehicleKit();
+        if (vehicleBase->IsVehicle() && veh && veh->GetAvailableSeatCount())
+        {
+            return EnterVehicle(vehicleBase, false);
+        }
+        return false;
+    }
 
     GuidVector npcs = AI_VALUE(GuidVector, "nearest vehicles");
     for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
     {
         Unit* vehicleBase = botAI->GetUnit(*i);
         if (!vehicleBase)
+            continue;
+        
+        if (vehicleBase->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             continue;
 
         // dont let them get in the cannons as they'll stay forever and do nothing useful
@@ -44,25 +65,34 @@ bool EnterVehicleAction::Execute(Event event)
         if (vehicleBase->GetVehicleKit()->IsVehicleInUse())
             continue;
 
-        float dist = sServerFacade->GetDistance2d(bot, vehicleBase);
-        if (dist > 40.0f)
-            continue;
-
-        if (dist > INTERACTION_DISTANCE)
-            return MoveTo(vehicleBase);
-
-        bot->EnterVehicle(vehicleBase);
-
-        if (!bot->IsOnVehicle(vehicleBase))
-            return false;
-
-        // dismount because bots can enter vehicle on mount
-        WorldPacket emptyPacket;
-        bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
-        return true;
+        if (EnterVehicle(vehicleBase, true))
+            return true;
     }
 
     return false;
+}
+
+bool EnterVehicleAction::EnterVehicle(Unit* vehicleBase, bool moveIfFar)
+{
+    float dist = sServerFacade->GetDistance2d(bot, vehicleBase);
+    if (dist > 40.0f)
+        return false;
+
+    if (dist > INTERACTION_DISTANCE && !moveIfFar)
+        return false;
+
+    if (dist > INTERACTION_DISTANCE)
+        return MoveTo(vehicleBase);
+    // Use HandleSpellClick instead of Unit::EnterVehicle to handle special vehicle script (ulduar)
+    vehicleBase->HandleSpellClick(bot);
+
+    if (!bot->IsOnVehicle(vehicleBase))
+        return false;
+
+    // dismount because bots can enter vehicle on mount
+    WorldPacket emptyPacket;
+    bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+    return true;
 }
 
 bool LeaveVehicleAction::Execute(Event event)
