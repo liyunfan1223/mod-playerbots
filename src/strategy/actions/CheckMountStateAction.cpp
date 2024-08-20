@@ -132,11 +132,14 @@ bool CheckMountStateAction::isUseful()
     if (bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
         return false;
 
-    // checks both outdoors flag, and whether bot is clipping below floor slightly
-    // because that will cause bot to falsely indicate outdoors state and try
-    // mount indoors (seems to mostly be an issue in tunnels of WSG and AV)
-    if (!bot->IsOutdoors() || bot->GetPositionZ() < bot->GetMapWaterOrGroundLevel(
-                                                        bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
+    if (!bot->IsOutdoors())
+        return false;
+
+    // in addition to checking IsOutdoors, also check whether bot is clipping below floor slightly because that will
+    // cause bot to falsly indicate they are outdoors. This fixes bug where bot tries to mount indoors (which seems
+    // to mostly be an issue in tunnels of WSG and AV)
+    if (!bot->IsMounted() && bot->GetPositionZ() < bot->GetMapWaterOrGroundLevel(
+                                                       bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
         return false;
 
     if (bot->InArena())
