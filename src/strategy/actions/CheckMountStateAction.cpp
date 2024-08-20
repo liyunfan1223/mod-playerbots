@@ -15,48 +15,49 @@
 
 bool CheckMountStateAction::Execute(Event event)
 {
-    bool noattackers =
-        AI_VALUE2(bool, "combat", "self target") ? (AI_VALUE(uint8, "attacker count") > 0 ? false : true) : true;
+    bool noattackers = !AI_VALUE2(bool, "combat", "self target") || !AI_VALUE(uint8, "attacker count");
     bool enemy = AI_VALUE(Unit*, "enemy player target");
     bool dps = AI_VALUE(Unit*, "dps target");
     bool shouldDismount = false;
     bool shouldMount = false;
-    // bool chasedistance = false;
-    float attack_distance;
-    float mount_distance;
-    if (PlayerbotAI::IsMelee(bot))
-    {
-        attack_distance = sPlayerbotAIConfig->meleeDistance + 2.0f;
-        mount_distance = sPlayerbotAIConfig->meleeDistance + 10.0f;
-    }
-    else
-    {
-        attack_distance = sPlayerbotAIConfig->spellDistance + 2.0f;
-        mount_distance = sPlayerbotAIConfig->spellDistance + 10.0f;
-    }
 
-    Unit* currentTarget = AI_VALUE(Unit*, "current target");
-
-    if (currentTarget)
+    if (Unit* currentTarget = AI_VALUE(Unit*, "current target"))
     {
+        float dismount_distance;
+        float mount_distance;
+        if (PlayerbotAI::IsMelee(bot))
+        {
+            dismount_distance = sPlayerbotAIConfig->meleeDistance + 2.0f;
+            mount_distance = sPlayerbotAIConfig->meleeDistance + 10.0f;
+        }
+        else
+        {
+            dismount_distance = sPlayerbotAIConfig->spellDistance + 2.0f;
+            mount_distance = sPlayerbotAIConfig->spellDistance + 10.0f;
+        }
+
+        // warrior bots should dismount far enough to charge (because its important for generating some initial rage),
+        // a real player would be riding toward enemy mashing the charge key but the bots wont cast charge while mounted
+        if (CLASS_WARRIOR == bot->getClass())
+            dismount_distance = std::max(18.0f, dismount_distance);
+
+        // mount_distance should be >= 21 regardless of class, because when travelling a distance < 21 it takes longer
+        // to cast mount-spell than the time saved from the speed increase. At a distance of 21 both approaches take 3
+        // seconds:
+        // 21 / 7  =  21 / 14 + 1.5  =  3   (7 = dismounted speed  14 = epic-mount speed  1.5 = mount-spell cast time)
+        mount_distance = std::max(21.0f, mount_distance);
+
         float combatReach = bot->GetCombatReach() + currentTarget->GetCombatReach();
-        attack_distance += combatReach;
         float disToTarget = bot->GetExactDist(currentTarget);
-        shouldDismount = disToTarget <= attack_distance;
+        shouldDismount = disToTarget <= dismount_distance + combatReach;
+        shouldMount = disToTarget > mount_distance + combatReach;
     }
     else
+    {
         shouldDismount = false;
-
-    if (currentTarget)
-    {
-        float combatReach = bot->GetCombatReach() + currentTarget->GetCombatReach();
-        mount_distance += combatReach;
-        float disToTarget = bot->GetExactDist(currentTarget);
-        shouldMount = disToTarget > mount_distance;
-    }
-    else
         shouldMount = true;
-    
+    }
+
     if (bot->IsMounted() && shouldDismount)
     {
         WorldPacket emptyPacket;
@@ -132,11 +133,14 @@ bool CheckMountStateAction::isUseful()
     if (bot->HasUnitState(UNIT_STATE_IN_FLIGHT))
         return false;
 
-    // checks both outdoors flag, and whether bot is clipping below floor slightly
-    // because that will cause bot to falsely indicate outdoors state and try
-    // mount indoors (seems to mostly be an issue in tunnels of WSG and AV)
-    if (!bot->IsOutdoors() || bot->GetPositionZ() < bot->GetMapWaterOrGroundLevel(
-                                                        bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
+    if (!bot->IsOutdoors())
+        return false;
+
+    // in addition to checking IsOutdoors, also check whether bot is clipping below floor slightly because that will
+    // cause bot to falsly indicate they are outdoors. This fixes bug where bot tries to mount indoors (which seems
+    // to mostly be an issue in tunnels of WSG and AV)
+    if (!bot->IsMounted() && bot->GetPositionZ() < bot->GetMapWaterOrGroundLevel(
+                                                       bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
         return false;
 
     if (bot->InArena())
