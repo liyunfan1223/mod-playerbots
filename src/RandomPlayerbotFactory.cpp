@@ -412,7 +412,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     std::vector<std::future<void>> account_creations;
     int account_creation = 0;
 
-    LOG_INFO("playerbots", "Creating cache for names, gender and race.");
+    LOG_INFO("playerbots", "Creating cache for names per gender and race.");
     QueryResult result = CharacterDatabase.Query("SELECT name, gender FROM playerbots_names");
     if (!result)
     {
