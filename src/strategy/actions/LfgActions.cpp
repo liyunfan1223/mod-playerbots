@@ -212,6 +212,9 @@ bool LfgAcceptAction::Execute(Event event)
 
         return true;
     }
+    
+    if (event.getPacket().empty())
+        return false;
 
     WorldPacket p(event.getPacket());
 
