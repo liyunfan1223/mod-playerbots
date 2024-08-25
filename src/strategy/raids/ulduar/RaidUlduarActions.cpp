@@ -47,15 +47,15 @@ bool FlameLeviathanVehicleAction::Execute(Event event)
         if (unit->GetEntry() == 33142)  // Leviathan Defense Turret
             continue;
         if (unit->GetEntry() == 33113) // Flame Leviathan
+        {
             flame = unit;
+            continue;
+        }
         if (!target || bot->GetExactDist(target) > bot->GetExactDist(unit))
         {
             target = unit;
         }
     }
-    if (!target)
-        return false;
-
     // Flame Leviathan is chasing me
     if (flame && flame->GetVictim() == vehicleBase_)
         if (MoveAvoidChasing(flame))
@@ -65,15 +65,15 @@ bool FlameLeviathanVehicleAction::Execute(Event event)
     switch (entry)
     {
         case NPC_SALVAGED_DEMOLISHER:
-            return DemolisherAction(target);
+            return DemolisherAction(flame ? flame : target);
         case NPC_SALVAGED_DEMOLISHER_TURRET:
-            return DemolisherTurretAction(target);
+            return DemolisherTurretAction(target ? target: flame);
         case NPC_SALVAGED_SIEGE_ENGINE:
             return SiegeEngineAction(flame ? flame : target);
         case NPC_SALVAGED_SIEGE_ENGINE_TURRET:
-            return SiegeEngineTurretAction(target);
+            return SiegeEngineTurretAction(target ? target: flame);
         case NPC_VEHICLE_CHOPPER:
-            return ChopperAction(target);
+            return ChopperAction(target ? target: flame);
         default:
             break;
     }
@@ -82,6 +82,8 @@ bool FlameLeviathanVehicleAction::Execute(Event event)
 
 bool FlameLeviathanVehicleAction::MoveAvoidChasing(Unit* target)
 {
+    if (!target)
+        return false;
     if (avoidChaseIdx == -1)
     {
         for (int i = 0; i < corners.size(); i++)
@@ -106,6 +108,8 @@ bool FlameLeviathanVehicleAction::MoveAvoidChasing(Unit* target)
 
 bool FlameLeviathanVehicleAction::DemolisherAction(Unit* target)
 {
+    if (!target)
+        return false;
     Aura* bluePyrite = target->GetAura(68605);
     if (!bluePyrite || (bluePyrite->GetStackAmount() <= 6 && vehicleBase_->GetPower(POWER_ENERGY) > 25) || bluePyrite->GetDuration() <= 5000)
     {
@@ -129,6 +133,7 @@ bool FlameLeviathanVehicleAction::DemolisherAction(Unit* target)
 
 bool FlameLeviathanVehicleAction::DemolisherTurretAction(Unit* target)
 {
+    int32 liquidCount = 0;
     {
         GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
         for (auto i = npcs.begin(); i != npcs.end(); i++)
@@ -136,7 +141,12 @@ bool FlameLeviathanVehicleAction::DemolisherTurretAction(Unit* target)
             Unit* unit = botAI->GetUnit(*i);
             if (!unit)
                 continue;
-            if (unit->GetEntry() == 33189 && vehicleBase_->GetPower(POWER_ENERGY) <= 25) // Liquid Pyrite
+            if (unit->GetEntry() != 33189)
+                continue;
+            if (unit->GetDistance(bot) >= 49.0f)
+                continue;
+            ++liquidCount;
+            if (vehicleBase_->GetPower(POWER_ENERGY) <= 25) // Liquid Pyrite
             {
                 uint32 spellId = 62479;
                 if (botAI->CanCastVehicleSpell(spellId, unit))
@@ -148,6 +158,7 @@ bool FlameLeviathanVehicleAction::DemolisherTurretAction(Unit* target)
             }
         }
     }
+    if (liquidCount <= 10)
     {
         GuidVector targets = AI_VALUE(GuidVector, "possible targets");
         for (auto i = targets.begin(); i != targets.end(); i++)
@@ -167,6 +178,8 @@ bool FlameLeviathanVehicleAction::DemolisherTurretAction(Unit* target)
             }
         }
     }
+    if (!target)
+        return false;
     uint32 spellId = 62634;
     if (botAI->CanCastVehicleSpell(spellId, target))
         if (botAI->CastVehicleSpell(spellId, target))
@@ -179,6 +192,8 @@ bool FlameLeviathanVehicleAction::DemolisherTurretAction(Unit* target)
 
 bool FlameLeviathanVehicleAction::SiegeEngineAction(Unit* target)
 {
+    if (!target)
+        return false;
     if (target->GetCurrentSpell(CURRENT_CHANNELED_SPELL) || target->HasAura(62396))
     {
         uint32 spellId = 62522;
@@ -201,6 +216,8 @@ bool FlameLeviathanVehicleAction::SiegeEngineAction(Unit* target)
 
 bool FlameLeviathanVehicleAction::SiegeEngineTurretAction(Unit* target)
 {
+    if (!target)
+        return false;
     uint32 spellId = 62358;
     if (botAI->CanCastVehicleSpell(spellId, target))
         if (botAI->CastVehicleSpell(spellId, target))
@@ -213,6 +230,8 @@ bool FlameLeviathanVehicleAction::SiegeEngineTurretAction(Unit* target)
 
 bool FlameLeviathanVehicleAction::ChopperAction(Unit* target)
 {
+    if (!target)
+        return false;
     uint32 spellId = 62286;
     if (botAI->CanCastVehicleSpell(spellId, target))
         if (botAI->CastVehicleSpell(spellId, target))
