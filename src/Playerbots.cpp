@@ -179,19 +179,16 @@ public:
     {
         if (sRandomPlayerbotMgr->IsRandomBot(player))
         {
-            return false;
+            return true;
         }
-        return true;
     }
 
     bool OnBeforeAchiComplete(Player* player, AchievementEntry const* /*achievement*/) override
     {
         if (sRandomPlayerbotMgr->IsRandomBot(player))
         {
-            return false;
+            return true;
         }
-        return true;
-    }
 };
 
 class PlayerbotsMiscScript : public MiscScript
