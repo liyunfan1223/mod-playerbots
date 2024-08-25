@@ -15,8 +15,6 @@ bool XpGainAction::Execute(Event event)
 {
     context->GetValue<uint32>("death count")->Set(0);
 
-    if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->playerbotsXPrate == 1)
-        return true;
 
     WorldPacket p(event.getPacket());  // (8+4+1+4+8)
     ObjectGuid guid;
@@ -42,6 +40,9 @@ bool XpGainAction::Execute(Event event)
         BroadcastHelper::BroadcastKill(botAI, bot, creature);
     }
 
+    if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->playerbotsXPrate == 1)
+        return true;
+    
     Unit* victim = nullptr;
     if (guid)
         victim = botAI->GetUnit(guid);
