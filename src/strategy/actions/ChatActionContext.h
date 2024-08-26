@@ -132,6 +132,7 @@ public:
         creators["stay chat shortcut"] = &ChatActionContext::stay_chat_shortcut;
         creators["flee chat shortcut"] = &ChatActionContext::flee_chat_shortcut;
         creators["runaway chat shortcut"] = &ChatActionContext::runaway_chat_shortcut;
+        creators["move from group chat shortcut"] = &ChatActionContext::move_from_group_chat_shortcut;
         creators["grind chat shortcut"] = &ChatActionContext::grind_chat_shortcut;
         creators["tank attack chat shortcut"] = &ChatActionContext::tank_attack_chat_shortcut;
         creators["gossip hello"] = &ChatActionContext::gossip_hello;
@@ -208,6 +209,7 @@ private:
     static Action* runaway_chat_shortcut(PlayerbotAI* botAI) { return new GoawayChatShortcutAction(botAI); }
     static Action* stay_chat_shortcut(PlayerbotAI* botAI) { return new StayChatShortcutAction(botAI); }
     static Action* follow_chat_shortcut(PlayerbotAI* botAI) { return new FollowChatShortcutAction(botAI); }
+    static Action* move_from_group_chat_shortcut(PlayerbotAI* botAI) { return new MoveFromGroupChatShortcutAction(botAI); }
     static Action* gb(PlayerbotAI* botAI) { return new GuildBankAction(botAI); }
     static Action* bank(PlayerbotAI* botAI) { return new BankAction(botAI); }
     static Action* help(PlayerbotAI* botAI) { return new HelpAction(botAI); }

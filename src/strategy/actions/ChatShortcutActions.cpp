@@ -33,8 +33,8 @@ bool FollowChatShortcutAction::Execute(Event event)
         return false;
 
     // botAI->Reset();
-    botAI->ChangeStrategy("+follow,-passive,-grind", BOT_STATE_NON_COMBAT);
-    botAI->ChangeStrategy("-follow,-passive,-grind", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("+follow,-passive,-grind,-move from group", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-follow,-passive,-grind,-move from group", BOT_STATE_COMBAT);
     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
 
     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
@@ -102,12 +102,27 @@ bool StayChatShortcutAction::Execute(Event event)
         return false;
 
     botAI->Reset();
-    botAI->ChangeStrategy("+stay,-passive", BOT_STATE_NON_COMBAT);
-    botAI->ChangeStrategy("-follow,-passive", BOT_STATE_COMBAT);
+    botAI->ChangeStrategy("+stay,-passive,-move from group", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("-follow,-passive,-move from group", BOT_STATE_COMBAT);
 
     SetReturnPosition(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
 
     botAI->TellMaster("Staying");
+    return true;
+}
+
+bool MoveFromGroupChatShortcutAction::Execute(Event event)
+{
+    Player* master = GetMaster();
+    if (!master)
+        return false;
+
+    // dont need to remove stay or follow, move from group takes priority over both
+    // (see their isUseful() methods)
+    botAI->ChangeStrategy("+move from group", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("+move from group", BOT_STATE_COMBAT);
+
+    botAI->TellMaster("Moving away from group");
     return true;
 }
 

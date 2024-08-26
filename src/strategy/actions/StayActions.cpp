@@ -42,6 +42,12 @@ bool StayAction::Execute(Event event) { return Stay(); }
 
 bool StayAction::isUseful()
 {
+    // move from group takes priority over stay as it's added and removed automatically
+    // (without removing/adding stay)
+    if (botAI->HasStrategy("move from group", BOT_STATE_COMBAT) ||
+        botAI->HasStrategy("move from group", BOT_STATE_NON_COMBAT))
+        return false;
+
     // Only useful if the bot is currently moving
     return AI_VALUE2(bool, "moving", "self target");
 }

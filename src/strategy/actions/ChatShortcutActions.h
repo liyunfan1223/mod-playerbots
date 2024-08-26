@@ -35,6 +35,14 @@ public:
     bool Execute(Event event) override;
 };
 
+class MoveFromGroupChatShortcutAction : public Action
+{
+public:
+    MoveFromGroupChatShortcutAction(PlayerbotAI* botAI) : Action(botAI, "move from group chat shortcut") {}
+
+    bool Execute(Event event) override;
+};
+
 class FleeChatShortcutAction : public ReturnPositionResetAction
 {
 public:

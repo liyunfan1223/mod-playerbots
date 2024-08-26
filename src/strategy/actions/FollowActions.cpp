@@ -48,15 +48,19 @@ bool FollowAction::Execute(Event event)
 
 bool FollowAction::isUseful()
 {
-    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr)
-    {
+    // move from group takes priority over follow as it's added and removed automatically
+    // (without removing/adding follow)
+    if (botAI->HasStrategy("move from group", BOT_STATE_COMBAT) ||
+        botAI->HasStrategy("move from group", BOT_STATE_NON_COMBAT))
         return false;
-    }
+
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr)
+        return false;
+
     Formation* formation = AI_VALUE(Formation*, "formation");
     if (!formation)
-    {
         return false;
-    }
+
     std::string const target = formation->GetTargetName();
 
     Unit* fTarget = nullptr;
