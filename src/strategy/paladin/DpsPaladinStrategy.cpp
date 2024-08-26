@@ -39,7 +39,7 @@ private:
     {
         return new ActionNode("seal of vengeance",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
+                              /*A*/ NextAction::array(0, new NextAction("seal of command"), nullptr),
                               /*C*/ nullptr);
     }
 
@@ -47,7 +47,7 @@ private:
     {
         return new ActionNode("seal of command",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("seal of corruption"), nullptr),
+                              /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), nullptr),
                               /*C*/ nullptr);
     }
 
@@ -94,7 +94,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericPaladinStrategy::InitTriggers(triggers);
 
     triggers.push_back(
-        new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", ACTION_HIGH), NULL)));
+        new TriggerNode("seal", NextAction::array(0, new NextAction("seal of corruption", ACTION_HIGH), NULL)));
     // triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", 90.0f),
     // nullptr)));
     triggers.push_back(

@@ -949,7 +949,6 @@ void RandomItemMgr::BuildItemInfoCache()
 
     PlayerbotsDatabaseTransaction trans = PlayerbotsDatabase.BeginTransaction();
 
-    // generate stat weights for classes/specs
     for (auto const& itr : *itemTemplate)
     {
         ItemTemplate const* proto = &itr.second;
@@ -958,11 +957,12 @@ void RandomItemMgr::BuildItemInfoCache()
 
         // skip non armor/weapon
         if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR &&
-            proto->Class != ITEM_CLASS_CONTAINER && proto->Class != ITEM_CLASS_PROJECTILE)
+            proto->Class != ITEM_CLASS_CONTAINER && proto->Class != ITEM_CLASS_PROJECTILE &&
+            proto->Class != ITEM_CLASS_GEM)
             continue;
 
-        if (!CanEquipItemNew(proto))
-            continue;
+        // if (!CanEquipItemNew(proto))
+        //     continue;
 
         // skip test items
         if (strstr(proto->Name1.c_str(), "(Test)") || strstr(proto->Name1.c_str(), "(TEST)") ||
@@ -990,29 +990,29 @@ void RandomItemMgr::BuildItemInfoCache()
             proto->RequiredReputationRank > 0)
             continue;*/
 
-        if (proto->RequiredHonorRank > 0 || proto->RequiredSkillRank > 0 || proto->RequiredCityRank > 0)
-            continue;
+        // if (proto->RequiredHonorRank > 0 || proto->RequiredSkillRank > 0 || proto->RequiredCityRank > 0)
+        //     continue;
 
-        // skip random enchant items
-        if (proto->RandomProperty)
-            continue;
+        // // skip random enchant items
+        // if (proto->RandomProperty)
+        //     continue;
 
-        // skip heirloom items
-        if (proto->Quality == ITEM_QUALITY_HEIRLOOM)
-            continue;
+        // // skip heirloom items
+        // if (proto->Quality == ITEM_QUALITY_HEIRLOOM)
+        //     continue;
 
-        // check possible equip slots
-        EquipmentSlots slot = EQUIPMENT_SLOT_START;
-        for (std::map<EquipmentSlots, std::set<InventoryType> >::iterator i = viableSlots.begin();
-             i != viableSlots.end(); ++i)
-        {
-            std::set<InventoryType> slots = viableSlots[(EquipmentSlots)i->first];
-            if (slots.find((InventoryType)proto->InventoryType) != slots.end())
-                slot = i->first;
-        }
+        // // check possible equip slots
+        // EquipmentSlots slot = EQUIPMENT_SLOT_START;
+        // for (std::map<EquipmentSlots, std::set<InventoryType> >::iterator i = viableSlots.begin();
+        //      i != viableSlots.end(); ++i)
+        // {
+        //     std::set<InventoryType> slots = viableSlots[(EquipmentSlots)i->first];
+        //     if (slots.find((InventoryType)proto->InventoryType) != slots.end())
+        //         slot = i->first;
+        // }
 
-        if (slot == EQUIPMENT_SLOT_START)
-            continue;
+        // if (slot == EQUIPMENT_SLOT_START)
+        //     continue;
 
         // Init Item cache
         // ItemInfoEntry cacheInfo;
@@ -2197,6 +2197,46 @@ void RandomItemMgr::BuildEquipCache()
 void RandomItemMgr::BuildEquipCacheNew()
 {
     LOG_INFO("playerbots", "Loading equipments cache...");
+
+    std::unordered_set<uint32> questItemIds;
+    ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
+    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+    {
+        uint32 questId = i->first;
+        Quest const* quest = i->second;
+
+        if (quest->IsRepeatable())
+            continue;
+
+        if (quest->GetQuestLevel() <= 0)
+            continue;
+
+        if (quest->GetRequiredClasses())
+            continue;
+
+        for (int j = 0; j < quest->GetRewChoiceItemsCount(); j++)
+            if (uint32 itemId = quest->RewardChoiceItemId[j])
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
+                    continue;
+                int requiredLevel = std::max((int)proto->RequiredLevel, quest->GetQuestLevel());
+                equipCacheNew[requiredLevel][proto->InventoryType].push_back(itemId);
+                questItemIds.insert(itemId);
+            }
+
+        for (int j = 0; j < quest->GetRewItemsCount(); j++)
+            if (uint32 itemId = quest->RewardItemId[j])
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
+                    continue;
+                int requiredLevel = std::max((int)proto->RequiredLevel, quest->GetQuestLevel());
+                equipCacheNew[requiredLevel][proto->InventoryType].push_back(itemId);
+                questItemIds.insert(itemId);
+            }
+    }
+
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     for (auto const& itr : *itemTemplates)
     {
@@ -2204,6 +2244,10 @@ void RandomItemMgr::BuildEquipCacheNew()
         if (!proto)
             continue;
         uint32 itemId = proto->ItemId;
+
+        if (questItemIds.find(itemId) != questItemIds.end())
+            continue;
+
         if (IsTestItem(itemId))
         {
             continue;

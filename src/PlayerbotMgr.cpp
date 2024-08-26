@@ -49,6 +49,10 @@ public:
 
 void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId)
 {
+    // bot is loading
+    if (botLoading.find(playerGuid) != botLoading.end())
+        return;
+
     // has bot already been added?
     Player* bot = ObjectAccessor::FindConnectedPlayer(playerGuid);
     if (bot && bot->IsInWorld())
@@ -65,6 +69,8 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
         return;
     }
 
+    botLoading.insert(playerGuid);
+    
     if (WorldSession* masterSession = sWorld->FindSession(masterAccountId))
     {
         masterSession->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder))
@@ -81,13 +87,6 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
 
 void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder)
 {
-    // has bot already been added?
-    Player* loginBot = ObjectAccessor::FindConnectedPlayer(holder.GetGuid());
-    if (loginBot && loginBot->IsInWorld())
-    {
-        return;
-    }
-
     uint32 botAccountId = holder.GetAccountId();
 
     // At login DBC locale should be what the server is set to use by default (as spells etc are hardcoded to ENUS this
@@ -102,8 +101,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     {
         botSession->LogoutPlayer(true);
         delete botSession;
-        // LOG_ERROR("playerbots", "Error logging in bot {}, please try to reset all random bots",
-        // holder.GetGuid().ToString().c_str());
+        botLoading.erase(holder.GetGuid());
         return;
     }
 
@@ -160,12 +158,8 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         }
         botSession->LogoutPlayer(true);
         delete botSession;
-        // OnBotLogin(bot);
-        // LogoutPlayerBot(bot->GetGUID());
-
-        // LOG_ERROR("playerbots", "Attempt to add not allowed bot {}, please try to reset all random bots",
-        // bot->GetName());
     }
+    botLoading.erase(holder.GetGuid());
 }
 
 void PlayerbotHolder::UpdateSessions()

@@ -106,6 +106,7 @@ public:
         creators["nearest npcs"] = &ValueContext::nearest_npcs;
         creators["nearest totems"] = &ValueContext::nearest_totems;
         creators["nearest vehicles"] = &ValueContext::nearest_vehicles;
+        creators["nearest vehicles far"] = &ValueContext::nearest_vehicles_far;
         creators["nearest friendly players"] = &ValueContext::nearest_friendly_players;
         creators["closest friendly players"] = &ValueContext::closest_friendly_players;
         creators["nearest enemy players"] = &ValueContext::nearest_enemy_players;
@@ -394,6 +395,7 @@ private:
     static UntypedValue* nearest_npcs(PlayerbotAI* botAI) { return new NearestNpcsValue(botAI); }
     static UntypedValue* nearest_totems(PlayerbotAI* botAI) { return new NearestTotemsValue(botAI); }
     static UntypedValue* nearest_vehicles(PlayerbotAI* botAI) { return new NearestVehiclesValue(botAI); }
+    static UntypedValue* nearest_vehicles_far(PlayerbotAI* botAI) { return new NearestVehiclesValue(botAI, 200.0f); }
     static UntypedValue* nearest_friendly_players(PlayerbotAI* botAI) { return new NearestFriendlyPlayersValue(botAI); }
     static UntypedValue* closest_friendly_players(PlayerbotAI* botAI)
     {

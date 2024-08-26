@@ -13,9 +13,15 @@
 class RaidUlduarActionContext : public NamedObjectContext<Action>
 {
 public:
-    RaidUlduarActionContext() {}
+    RaidUlduarActionContext()
+    {
+        creators["flame leviathan vehicle"] = &RaidUlduarActionContext::flame_leviathan_vehicle;
+        creators["flame leviathan enter vehicle"] = &RaidUlduarActionContext::flame_leviathan_enter_vehicle;
+    }
 
 private:
+    static Action* flame_leviathan_vehicle(PlayerbotAI* ai) { return new FlameLeviathanVehicleAction(ai); }
+    static Action* flame_leviathan_enter_vehicle(PlayerbotAI* ai) { return new FlameLeviathanEnterVehicleAction(ai); }
 };
 
 #endif

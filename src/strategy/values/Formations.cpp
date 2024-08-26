@@ -90,7 +90,7 @@ public:
         float y = master->GetPositionY() + sin(angle) * range;
         float z = master->GetPositionZ();
         if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                           master->GetPositionZ(), x, y, z))
+                                                               master->GetPositionZ(), x, y, z))
         {
             x = master->GetPositionX() + cos(angle) * range;
             y = master->GetPositionY() + sin(angle) * range;
@@ -140,8 +140,8 @@ public:
             float y = master->GetPositionY() + sin(angle) * range + dy;
             float z = master->GetPositionZ();
             z = bot->GetMapHeight(x, y, z + 5.0f);
-            if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                           master->GetPositionZ(), x, y, z))
+            if (!master->GetMap()->CheckCollisionAndGetValidCoords(
+                    master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), x, y, z))
             {
                 x = master->GetPositionX() + cos(angle) * range + dx;
                 y = master->GetPositionY() + sin(angle) * range + dy;
@@ -158,13 +158,13 @@ public:
         float z = master->GetPositionZ();
         z = bot->GetMapHeight(x, y, z + 5.0f);
         if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                           master->GetPositionZ(), x, y, z))
-            {
-                x = master->GetPositionX() + cos(angle) * range + dx;
-                y = master->GetPositionY() + sin(angle) * range + dy;
-                z = master->GetPositionZ() + master->GetHoverHeight();
-                z = master->GetMapHeight(x, y, z);
-            }
+                                                               master->GetPositionZ(), x, y, z))
+        {
+            x = master->GetPositionX() + cos(angle) * range + dx;
+            y = master->GetPositionY() + sin(angle) * range + dy;
+            z = master->GetPositionZ() + master->GetHoverHeight();
+            z = master->GetMapHeight(x, y, z);
+        }
         return WorldLocation(master->GetMapId(), x, y, z);
     }
 
@@ -216,13 +216,13 @@ public:
         float x = target->GetPositionX() + cos(angle) * range;
         float y = target->GetPositionY() + sin(angle) * range;
         float z = target->GetPositionZ();
-        if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                           master->GetPositionZ(), x, y, z))
+        if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(),
+                                                               target->GetPositionZ(), x, y, z))
         {
             x = target->GetPositionX() + cos(angle) * range;
             y = target->GetPositionY() + sin(angle) * range;
             z = target->GetPositionZ() + target->GetHoverHeight();
-            z = master->GetMapHeight(x, y, z);
+            z = target->GetMapHeight(x, y, z);
         }
         return WorldLocation(bot->GetMapId(), x, y, z);
     }
@@ -383,8 +383,8 @@ public:
 
             if (minDist)
             {
-                if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                           master->GetPositionZ(), x, y, z))
+                if (!master->GetMap()->CheckCollisionAndGetValidCoords(
+                        master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), x, y, z))
                 {
                     x = master->GetPositionX() + cos(angle) * range + cos(followAngle) * followRange;
                     y = master->GetPositionY() + sin(angle) * range + sin(followAngle) * followRange;
@@ -398,7 +398,7 @@ public:
         }
 
         if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
-                                                           master->GetPositionZ(), x, y, z))
+                                                               master->GetPositionZ(), x, y, z))
         {
             x = master->GetPositionX() + cos(angle) * range + cos(followAngle) * followRange;
             y = master->GetPositionY() + sin(angle) * range + sin(followAngle) * followRange;

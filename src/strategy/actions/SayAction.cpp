@@ -206,20 +206,21 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint
         return;
     }
 
-    //toxic links
-    if (msg.starts_with(sPlayerbotAIConfig->toxicLinksPrefix)
-        && (GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg).size() > 0 || GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllQuestIds(msg).size() > 0))
-    {
-        HandleToxicLinksReply(bot, chatChannelSource, msg, name);
-        return;
-    }
+    // Disable since ExtractAllItemIds bad performance
+    // //toxic links
+    // if (msg.starts_with(sPlayerbotAIConfig->toxicLinksPrefix)
+    //     && (GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg).size() > 0 || GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllQuestIds(msg).size() > 0))
+    // {
+    //     HandleToxicLinksReply(bot, chatChannelSource, msg, name);
+    //     return;
+    // }
 
-    //thunderfury
-    if (GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg).count(19019))
-    {
-        HandleThunderfuryReply(bot, chatChannelSource, msg, name);
-        return;
-    }
+    // //thunderfury
+    // if (GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg).count(19019))
+    // {
+    //     HandleThunderfuryReply(bot, chatChannelSource, msg, name);
+    //     return;
+    // }
 
     auto messageRepy = GenerateReplyMessage(bot, msg, guid1, name);
     SendGeneralResponse(bot, chatChannelSource, messageRepy, name);
@@ -317,6 +318,8 @@ bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatC
 }
 bool ChatReplyAction::HandleWTBItemsReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
 {
+    // Disable since ExtractAllItemIds bad performance
+    return false;
     auto messageItemIds = GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllItemIds(msg);
 
     if (messageItemIds.empty())
@@ -410,6 +413,8 @@ bool ChatReplyAction::HandleWTBItemsReply(Player* bot, ChatChannelSource chatCha
 }
 bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
 {
+    // Disable since ExtractAllQuestIds bad performance
+    return false;
     auto messageQuestIds = GET_PLAYERBOT_AI(bot)->GetChatHelper()->ExtractAllQuestIds(msg);
 
     if (messageQuestIds.empty())

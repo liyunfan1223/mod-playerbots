@@ -8,6 +8,7 @@
 
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <vector>
 
 #include "AiFactory.h"
@@ -203,7 +204,7 @@ private:
     std::map<std::string, uint32> weightStatLink;
     std::map<std::string, uint32> weightRatingLink;
     std::map<uint32, ItemInfoEntry> itemInfoCache;
-    std::set<uint32> itemForTest;
+    std::unordered_set<uint32> itemForTest;
     static std::set<uint32> itemCache;
     // equipCacheNew[RequiredLevel][InventoryType]
     std::map<uint32, std::map<uint32, std::vector<uint32>>> equipCacheNew;

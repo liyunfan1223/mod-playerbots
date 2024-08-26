@@ -286,6 +286,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotNonCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotNonCombatStrategies", "");
     combatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.CombatStrategies", "+custom::say");
     nonCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.NonCombatStrategies", "+custom::say,+return");
+    applyInstanceStrategies = sConfigMgr->GetOption<bool>("AiPlayerbot.ApplyInstanceStrategies", true);
 
     commandPrefix = sConfigMgr->GetOption<std::string>("AiPlayerbot.CommandPrefix", "");
     commandSeparator = sConfigMgr->GetOption<std::string>("AiPlayerbot.CommandSeparator", "\\\\");
@@ -477,11 +478,11 @@ bool PlayerbotAIConfig::Initialize()
     {
         return true;
     }
-    PlayerbotFactory::Init();
     sRandomItemMgr->Init();
     sRandomItemMgr->InitAfterAhBot();
     sPlayerbotTextMgr->LoadBotTexts();
     sPlayerbotTextMgr->LoadBotTextChance();
+    PlayerbotFactory::Init();
 
     if (!sPlayerbotAIConfig->autoDoQuests)
     {

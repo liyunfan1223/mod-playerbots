@@ -141,7 +141,7 @@ private:
     void Prepare();
     // void InitSecondEquipmentSet();
     // void InitEquipmentNew(bool incremental);
-    bool CanEquipItem(ItemTemplate const* proto, uint32 desiredQuality);
+    bool CanEquipItem(ItemTemplate const* proto);
     bool CanEquipUnseenItem(uint8 slot, uint16& dest, uint32 item);
     void InitTradeSkills();
     void UpdateTradeSkills();

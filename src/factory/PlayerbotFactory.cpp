@@ -135,15 +135,17 @@ void PlayerbotFactory::Init()
         {
             continue;
         }
-        if (gemId == 49110)
-        {  // unique gem
-            continue;
-        }
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
+
+        if (proto->ItemLevel < 60)
+            continue;
+
         if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
-        {  // unique gem
+        {
             continue;
         }
+        if (sRandomItemMgr->IsTestItem(gemId))
+            continue;
         if (!proto || !sGemPropertiesStore.LookupEntry(proto->GemProperties))
         {
             continue;
@@ -438,7 +440,7 @@ void PlayerbotFactory::Refresh()
     uint32 money = urand(level * 1000, level * 5 * 1000);
     if (bot->GetMoney() < money)
         bot->SetMoney(money);
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::AddConsumables()
@@ -805,17 +807,13 @@ void PlayerbotFactory::ClearSkills()
 
 void PlayerbotFactory::ClearEverything()
 {
-    bot->SaveToDB(false, false);
     bot->GiveLevel(bot->getClass() == CLASS_DEATH_KNIGHT ? sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)
                                                          : sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL));
     bot->SetUInt32Value(PLAYER_XP, 0);
     LOG_INFO("playerbots", "Resetting player...");
     bot->resetTalents(true);
-    bot->SaveToDB(false, false);
     ClearSkills();
-    // bot->SaveToDB(false, false);
     ClearSpells();
-    bot->SaveToDB(false, false);
     ClearInventory();
     ResetQuests();
     bot->SaveToDB(false, false);
@@ -1254,6 +1252,7 @@ bool PlayerbotFactory::CanEquipWeapon(ItemTemplate const* proto)
         case CLASS_ROGUE:
             if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
                 return false;
@@ -1263,12 +1262,9 @@ bool PlayerbotFactory::CanEquipWeapon(ItemTemplate const* proto)
     return true;
 }
 
-bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQuality)
+bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto)
 {
     if (proto->Duration != 0)
-        return false;
-
-    if (proto->Quality != desiredQuality)
         return false;
 
     if (proto->Bonding == BIND_QUEST_ITEM /*|| proto->Bonding == BIND_WHEN_USE*/)
@@ -1278,29 +1274,15 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
         return true;
 
     uint32 requiredLevel = proto->RequiredLevel;
-    if (!requiredLevel)
+    bool hasItem = bot->HasItemCount(proto->ItemId, 1, true);
+    // bot->GetItemCount()
+    // !requiredLevel -> it's a quest reward item
+    if (!requiredLevel && hasItem)
         return false;
 
     uint32 level = bot->GetLevel();
-    uint32 delta = 2;
-    if (level < 15)
-        delta = std::min(level, 15u);  // urand(7, 15);
-    // else if (proto->Class == ITEM_CLASS_WEAPON || proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-    //     delta = urand(2, 3);
-    // else if (!(level % 10) || (level % 10) == 9)
-    //     delta = 2;
-    else if (level < 40)
-        delta = 10;  // urand(5, 10);
-    else if (level < 60)
-        delta = 6;  // urand(3, 7);
-    else if (level < 70)
-        delta = 9;  // urand(2, 5);
-    else if (level < 80)
-        delta = 9;  // urand(2, 4);
-    else if (level == 80)
-        delta = 9;  // urand(2, 4);
 
-    if (desiredQuality > ITEM_QUALITY_NORMAL && (requiredLevel > level || requiredLevel < level - delta))
+    if (requiredLevel > level)
         return false;
 
     return true;
@@ -1492,7 +1474,6 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         do
         {
-            ItemTemplateContainer const* itemTemplate = sObjectMgr->GetItemTemplateStore();
             for (uint32 requiredLevel = bot->GetLevel(); requiredLevel > std::max((int32)bot->GetLevel() - delta, 0);
                  requiredLevel--)
             {
@@ -1527,9 +1508,12 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                         if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
                             continue;
 
-                        if (!CanEquipItem(proto, desiredQuality))
+                        if (proto->Quality != desiredQuality)
                             continue;
 
+                        if (!CanEquipItem(proto))
+                            continue;
+                        
                         if (proto->Class == ITEM_CLASS_ARMOR &&
                             (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS ||
                              slot == EQUIPMENT_SLOT_CHEST || slot == EQUIPMENT_SLOT_WAIST ||
@@ -1594,6 +1578,11 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             uint32 newItemId = ids[index];
 
             uint16 dest;
+            
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(newItemId);
+
+            if (!CanEquipItem(proto))
+                continue;
 
             if (oldItem && oldItem->GetTemplate()->ItemId == newItemId)
                 continue;
@@ -1608,36 +1597,12 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                 bestItemForSlot = newItemId;
             }
         }
-        // for (int attempts = 0; attempts < std::max((int)(ids.size() * 0.75), 1); attempts++)
-        // {
-        //     uint32 index = urand(0, ids.size() - 1);
-        //     uint32 newItemId = ids[index];
-
-        //     uint16 dest;
-
-        //     if (oldItem && oldItem->GetTemplate()->ItemId == newItemId)
-        //         continue;
-
-        //     if (!CanEquipUnseenItem(slot, dest, newItemId))
-        //         continue;
-            
-        //     float cur_score = calculator.CalculateItem(newItemId);
-        //     if (cur_score > bestScoreForSlot)
-        //     {
-        //         bestScoreForSlot = cur_score;
-        //         bestItemForSlot = newItemId;
-        //     }
-        // }
         if (bestItemForSlot == 0)
         {
             continue;
         }
         if (oldItem)
         {
-            // uint8 dstBag = NULL_BAG;
-            // WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
-            // packet << INVENTORY_SLOT_BAG_0 << slot << dstBag;
-            // bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
             bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
         }
         uint16 dest;
@@ -2060,6 +2025,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+            bot->SetCanDualWield(dualWieldLevel);
             break;
         case CLASS_PALADIN:
             SetRandomSkill(SKILL_SWORDS);
@@ -2112,8 +2078,9 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_POLEARMS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
-            bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
+            bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+            bot->SetCanDualWield(dualWieldLevel);
             break;
         case CLASS_ROGUE:
             SetRandomSkill(SKILL_SWORDS);
@@ -2126,6 +2093,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, 1, 1);
+            bot->SetCanDualWield(true);
             break;
         case CLASS_DEATH_KNIGHT:
             SetRandomSkill(SKILL_SWORDS);
@@ -2136,6 +2104,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_2H_AXES);
             SetRandomSkill(SKILL_POLEARMS);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
+            bot->SetCanDualWield(dualWieldLevel);
             break;
         default:
             break;
@@ -2605,7 +2574,6 @@ void PlayerbotFactory::InitInstanceQuests()
 
     ClearInventory();
     bot->SetUInt32Value(PLAYER_XP, currentXP);
-    bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::ClearInventory()
@@ -3333,8 +3301,11 @@ void PlayerbotFactory::InitInventoryEquip()
 
         if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
             continue;
-
-        if (!CanEquipItem(proto, desiredQuality))
+        
+        if (proto->Quality != desiredQuality)
+            continue;
+        
+        if (!CanEquipItem(proto))
             continue;
 
         ids.push_back(itr.first);
@@ -3359,7 +3330,7 @@ void PlayerbotFactory::InitGuild()
     if (bot->GetGuildId())
         return;
 
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 
     // add guild tabard
     if (bot->GetGuildId() && !bot->HasItemCount(5976, 1))
@@ -3395,7 +3366,7 @@ void PlayerbotFactory::InitGuild()
     if (bot->GetGuildId() && bot->GetLevel() > 9 && urand(0, 4) && !bot->HasItemCount(5976, 1))
         StoreItem(5976, 1);
 
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::InitImmersive()
@@ -3584,7 +3555,7 @@ void PlayerbotFactory::InitArenaTeam()
         arenateams.erase(arenateams.begin() + index);
     }
 
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::ApplyEnchantTemplate()
@@ -3698,6 +3669,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
 
         const GemPropertiesEntry* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
         if (!gemProperties)
+            continue;
+
+        if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 && enchantGem >= 39900)
             continue;
 
         uint32 requiredLevel = gemTemplate->ItemLevel;

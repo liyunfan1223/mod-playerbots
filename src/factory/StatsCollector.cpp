@@ -89,13 +89,21 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 s
     bool canNextTrigger = true;
 
     uint32 procFlags;
+    uint32 procChance;
     if (eventEntry && eventEntry->procFlags)
         procFlags = eventEntry->procFlags;
     else
         procFlags = spellInfo->ProcFlags;
-
-    if (procFlags && !CanBeTriggeredByType(spellInfo, procFlags))
+    
+    if (eventEntry && eventEntry->customChance)
+        procChance = eventEntry->customChance;
+    else
+        procChance = spellInfo->ProcChance;
+    bool lowChance =  procChance <= 5;
+    
+    if (lowChance || (procFlags && !CanBeTriggeredByType(spellInfo, procFlags)))
         canNextTrigger = false;
+
     if (spellInfo->StackAmount)
     {
         // Heuristic multiplier for spell with stackAmount since high stackAmount may not be available
@@ -504,7 +512,8 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
             break;
         }
         case SPELL_AURA_MOD_ATTACK_POWER:
-            stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
+            if (type_ == CollectorType::MELEE)
+                stats[STATS_TYPE_ATTACK_POWER] += val * multiplier;
             break;
         case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
             if (type_ == CollectorType::RANGED)
