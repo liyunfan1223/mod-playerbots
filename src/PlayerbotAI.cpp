@@ -1504,6 +1504,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 469:
             strategyName = "bwl";
             break;
+        case 409:
+            strategyName = "mc";
+            break;
         default:
             break;
     }
