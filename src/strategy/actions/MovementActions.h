@@ -47,7 +47,9 @@ protected:
     bool Flee(Unit* target);
     void ClearIdleState();
     void UpdateMovementState();
-    bool MoveAway(Unit* target);
+    bool MoveAway(Unit* target, float distance = sPlayerbotAIConfig -> fleeDistance);
+    bool MoveFromGroup(float distance);
+    bool Move(float angle, float distance);
     bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->followDistance, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
     Position BestPositionForMeleeToFlee(Position pos, float radius);
@@ -247,5 +249,13 @@ protected:
     uint32 intervals, call_counters;
     bool clockwise;
     std::vector<std::pair<float, float>> waypoints;
+};
+
+class MoveFromGroupAction : public MovementAction
+{
+public:
+    MoveFromGroupAction(PlayerbotAI* botAI, std::string const name = "move from group") : MovementAction(botAI, name) {}
+
+    bool Execute(Event event) override;
 };
 #endif
