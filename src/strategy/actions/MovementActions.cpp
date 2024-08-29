@@ -1501,7 +1501,7 @@ void MovementAction::ClearIdleState()
     context->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 }
 
-bool MovementAction::MoveAway(Unit* target)
+bool MovementAction::MoveAway(Unit* target, float distance)
 {
     if (!target)
     {
@@ -1511,16 +1511,16 @@ bool MovementAction::MoveAway(Unit* target)
     for (float delta = 0; delta <= M_PI / 2; delta += M_PI / 8)
     {
         float angle = init_angle + delta;
-        float dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
-        float dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+        float dx = bot->GetPositionX() + cos(angle) * distance;
+        float dy = bot->GetPositionY() + sin(angle) * distance;
         float dz = bot->GetPositionZ();
         bool exact = true;
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
                                                             bot->GetPositionZ(), dx, dy, dz))
         {
             // disable prediction if position is invalid
-            dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
-            dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+            dx = bot->GetPositionX() + cos(angle) * distance;
+            dy = bot->GetPositionY() + sin(angle) * distance;
             dz = bot->GetPositionZ();
             exact = false;
         }
@@ -1534,15 +1534,15 @@ bool MovementAction::MoveAway(Unit* target)
         }
         exact = true;
         angle = init_angle - delta;
-        dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
-        dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+        dx = bot->GetPositionX() + cos(angle) * distance;
+        dy = bot->GetPositionY() + sin(angle) * distance;
         dz = bot->GetPositionZ();
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
                                                             bot->GetPositionZ(), dx, dy, dz))
         {
             // disable prediction if position is invalid
-            dx = bot->GetPositionX() + cos(angle) * sPlayerbotAIConfig->fleeDistance;
-            dy = bot->GetPositionY() + sin(angle) * sPlayerbotAIConfig->fleeDistance;
+            dx = bot->GetPositionX() + cos(angle) * distance;
+            dy = bot->GetPositionY() + sin(angle) * distance;
             dz = bot->GetPositionZ();
             exact = false;
         }
@@ -1552,6 +1552,63 @@ bool MovementAction::MoveAway(Unit* target)
         }
     }
     return false;
+}
+
+// just calculates average position of group and runs away from that position
+bool MovementAction::MoveFromGroup(float distance)
+{
+    LOG_ERROR("playerbots", "MovementAction::MoveFromGroup");
+    //if (Player* master = botAI->GetMaster())
+    //{
+    //    return MoveAway(master);
+    //}
+    if (Group* group = bot->GetGroup())
+    {
+        uint32 mapId = bot->GetMapId();
+        float closestDist = FLT_MAX;
+        float x = 0.0f;
+        float y = 0.0f;
+        uint32 count = 0;
+
+        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+        {
+            Player* player = gref->GetSource();
+            if (!player || player == bot || !player->IsAlive() || player->GetMapId() != mapId)
+                continue;
+            float dist = bot->GetDistance2d(player);
+            if (closestDist > dist)
+                closestDist = dist;
+            x += player->GetPositionX();
+            y += player->GetPositionY();
+            count++;
+        }
+
+        if (count && closestDist < distance)
+        {
+            x /= count;
+            y /= count;
+            // x and y are now average position of the group members
+            float angle = bot->GetAngle(x, y) + M_PI;
+            return Move(angle, distance - closestDist);
+        }
+    }
+    return false;
+}
+
+bool MovementAction::Move(float angle, float distance)
+{
+    float x = bot->GetPositionX() + cos(angle) * distance;
+    float y = bot->GetPositionY() + sin(angle) * distance;
+
+    //TODO do we need GetMapWaterOrGroundLevel() if we're using CheckCollisionAndGetValidCoords() ?
+    float z = bot->GetMapWaterOrGroundLevel(x, y, bot->GetPositionZ());
+    if (z == -100000.0f || z == -200000.0f)
+        z = bot->GetPositionZ();
+    if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                        bot->GetPositionZ(), x, y, z, false))
+        return false;
+
+    return MoveTo(bot->GetMapId(), x, y, z);
 }
 
 bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float distance, MovementPriority priority)
@@ -2410,4 +2467,12 @@ bool RotateAroundTheCenterPointAction::Execute(Event& event)
         return true;
     }
     return false;
+}
+
+bool MoveFromGroupAction::Execute(Event event)
+{
+    float distance = atoi(event.getParam().c_str());
+    if (!distance)
+        distance = 20.0f; // flee distance from config is too small for this
+    return MoveFromGroup(distance);
 }

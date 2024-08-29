@@ -29,6 +29,7 @@
 #include "MaintenanceStrategy.h"
 #include "MarkRtiStrategy.h"
 #include "MeleeCombatStrategy.h"
+#include "MoveFromGroupStrategy.h"
 #include "NamedObjectContext.h"
 #include "NonCombatStrategy.h"
 #include "PassiveStrategy.h"
@@ -115,6 +116,7 @@ public:
         creators["aaoe"] = &StrategyContext::avoid_aoe;
         creators["move random"] = &StrategyContext::move_random;
         creators["formation"] = &StrategyContext::combat_formation;
+        creators["move from group"] = &StrategyContext::move_from_group;
     }
 
 private:
@@ -179,6 +181,7 @@ private:
     static Strategy* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeStrategy(botAI); }
     static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
     static Strategy* combat_formation(PlayerbotAI* ai) { return new CombatFormationStrategy(ai); }
+    static Strategy* move_from_group(PlayerbotAI* botAI) { return new MoveFromGroupStrategy(botAI); }
 };
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>

@@ -24,6 +24,7 @@ PassiveMultiplier::PassiveMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "pa
     if (allowedParts.empty())
     {
         allowedParts.push_back("follow");
+        allowedParts.push_back("move from group");
         allowedParts.push_back("stay");
         allowedParts.push_back("chat shortcut");
     }
