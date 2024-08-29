@@ -10,7 +10,7 @@ class McCheckShouldMoveFromGroupAction : public Action
 public:
     McCheckShouldMoveFromGroupAction(PlayerbotAI* botAI, std::string const name = "mc check should move from group")
         : Action(botAI, name) {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 class McMoveFromBaronGeddonAction : public MovementAction
@@ -18,7 +18,7 @@ class McMoveFromBaronGeddonAction : public MovementAction
 public:
     McMoveFromBaronGeddonAction(PlayerbotAI* botAI, std::string const name = "mc move from baron geddon")
         : MovementAction(botAI, name) {}
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 
 #endif

@@ -256,6 +256,6 @@ class MoveFromGroupAction : public MovementAction
 public:
     MoveFromGroupAction(PlayerbotAI* botAI, std::string const name = "move from group") : MovementAction(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event& event) override;
 };
 #endif

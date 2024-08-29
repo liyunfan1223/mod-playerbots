@@ -2469,7 +2469,7 @@ bool RotateAroundTheCenterPointAction::Execute(Event& event)
     return false;
 }
 
-bool MoveFromGroupAction::Execute(Event event)
+bool MoveFromGroupAction::Execute(Event& event)
 {
     float distance = atoi(event.getParam().c_str());
     if (!distance)
