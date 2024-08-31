@@ -510,9 +510,11 @@ bool ChatReplyAction::SendGeneralResponse(Player* bot, ChatChannelSource chatCha
         }
         case ChatChannelSource::SRC_GENERAL:
         {
-            //may reply to the same channel or whisper
-            GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::GENERAL);
-            GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
+            //may reply to the same channel 80% or whisper
+            if (urand(0, 100) < 80)
+                GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::GENERAL);
+            else
+                GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
             break;
         }
         case ChatChannelSource::SRC_TRADE:
