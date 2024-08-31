@@ -5178,6 +5178,32 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, std::string const spellname)
     return bcount;
 }
 
+int32 PlayerbotAI::GetNearGroupMemberCount(float dis)
+{
+    int count = 1; // yourself
+    if (Group* group = bot->GetGroup())
+    {
+        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+        {
+            Player* member = gref->GetSource();
+            if (member == bot) // calculated
+                continue;
+
+            if (!member || !member->IsInWorld())
+                continue;
+
+            if (member->GetMapId() != bot->GetMapId())
+                continue;
+            
+            if (member->GetExactDist(bot) > dis)
+                continue;
+
+            count++;
+        }
+    }
+    return count;
+}
+
 bool PlayerbotAI::CanMove()
 {
     // do not allow if not vehicle driver

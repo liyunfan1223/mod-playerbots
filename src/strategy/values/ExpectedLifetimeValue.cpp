@@ -31,7 +31,7 @@ float ExpectedGroupDpsValue::Calculate()
     }
     else
     {
-        dps_num = group->GetMembersCount() * 0.7;
+        dps_num = botAI->GetNearGroupMemberCount() * 0.7;
     }
     uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(bot, true, false, 12);
     // efficiency record based on rare gear level, is there better calculation method?
