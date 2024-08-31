@@ -18,12 +18,14 @@
 #include "Group.h"
 #include "GroupMgr.h"
 #include "ObjectAccessor.h"
+#include "ObjectGuid.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
 #include "PlayerbotSecurity.h"
 #include "Playerbots.h"
+#include "RandomPlayerbotMgr.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include "ChannelMgr.h"
@@ -1003,44 +1005,20 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             messages.push_back("Error: Invalid Class. Try again.");
             return messages;
         }
-        uint8 master_race = master->getRace();
-        std::string race_limit;
-        switch (master_race)
+        uint8 teamId = master->GetTeamId(true);
+        std::vector<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
+        for (size_t i = 0; i < guidCache.size(); i++)
         {
-            case 1:
-            case 3:
-            case 4:
-            case 7:
-            case 11:
-                race_limit = "1, 3, 4, 7, 11";
-                break;
-            case 2:
-            case 5:
-            case 6:
-            case 8:
-            case 10:
-                race_limit = "2, 5, 6, 8, 10";
-                break;
-        }
-        uint32 maxAccountId = sPlayerbotAIConfig->randomBotAccounts.back();
-        // find a bot fit conditions and not in any guild
-        QueryResult results = CharacterDatabase.Query(
-            "SELECT guid FROM characters "
-            "WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) AND "
-            "guid NOT IN ( SELECT guid FROM guild_member ) "
-            "AND account <= {} "
-            "ORDER BY account DESC LIMIT 1",
-            claz, race_limit, maxAccountId);
-        if (results)
-        {
-            Field* fields = results->Fetch();
-            ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
+            ObjectGuid guid = guidCache[i];
+            if (botLoading.find(guid) != botLoading.end())
+                continue;
+            if (ObjectAccessor::FindConnectedPlayer(guid))
+                continue;
             AddPlayerBot(guid, master->GetSession()->GetAccountId());
-
             messages.push_back("Add class " + std::string(charname));
             return messages;
         }
-        messages.push_back("Add class failed.");
+        messages.push_back("Add class failed, no available characters!");
         return messages;
     }
 

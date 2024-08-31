@@ -6,6 +6,7 @@
 #ifndef _PLAYERBOT_RANDOMPLAYERBOTMGR_H
 #define _PLAYERBOT_RANDOMPLAYERBOTMGR_H
 
+#include "ObjectGuid.h"
 #include "PlayerbotMgr.h"
 
 struct BattlegroundInfo
@@ -166,7 +167,9 @@ public:
     float getActivityMod() { return activityMod; }
     float getActivityPercentage() { return activityMod * 100.0f; }
     void setActivityPercentage(float percentage) { activityMod = percentage / 100.0f; }
+    static uint8 GetTeamClassIdx(bool isAlliance, uint8 claz) { return isAlliance * 20 + claz; }
 
+    std::map<uint8, std::vector<ObjectGuid>> addclassCache;
 protected:
     void OnBotLoginInternal(Player* const bot) override;
 
@@ -190,6 +193,7 @@ private:
     void RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth = false);
     uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
     void PrepareTeleportCache();
+    void PrepareAddclassCache();
     typedef void (RandomPlayerbotMgr::*ConsoleCommandHandler)(Player*);
 
     std::vector<Player*> players;
