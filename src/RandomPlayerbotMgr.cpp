@@ -162,6 +162,8 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
     {
         sPlayerbotCommandServer->Start();
         PrepareTeleportCache();
+        if (sPlayerbotAIConfig->addClassCommand)
+            PrepareAddclassCache();
     }
 
     BattlegroundData.clear();
@@ -1473,40 +1475,44 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         } while (results->NextRow());
     }
     LOG_INFO("playerbots", "{} banker locations for level collected.", collected_locs);
+}
 
-    // temporary only use locsPerLevelCache, so disable rpgLocsCacheLevel cache
-
-    // LOG_INFO("playerbots", "Preparing RPG teleport caches for {} factions...", sFactionTemplateStore.GetNumRows());
-    // results = WorldDatabase.Query("SELECT map, position_x, position_y, position_z, r.race, r.minl, r.maxl FROM
-    // creature c INNER JOIN playerbots_rpg_races r ON c.id1 = r.entry "
-    //     "WHERE r.race < 15");
-    // if (results)
-    // {
-    //     do
-    //     {
-    //         Field* fields = results->Fetch();
-    //         uint16 mapId = fields[0].Get<uint16>();
-    //         float x = fields[1].Get<float>();
-    //         float y = fields[2].Get<float>();
-    //         float z = fields[3].Get<float>();
-    //         uint32 race = fields[4].Get<uint32>();
-    //         uint32 minl = fields[5].Get<uint32>();
-    //         uint32 maxl = fields[6].Get<uint32>();
-
-    //         for (uint32 level = 1; level < sPlayerbotAIConfig->randomBotMaxLevel + 1; level++)
-    //         {
-    //             if (level > maxl || level < minl)
-    //                 continue;
-
-    //             WorldLocation loc(mapId, x, y, z, 0);
-    //             for (uint32 r = 1; r < MAX_RACES; r++)
-    //             {
-    //                 if (race == r || race == 0)
-    //                     rpgLocsCacheLevel[r][level].push_back(loc);
-    //             }
-    //         }
-    //     } while (results->NextRow());
-    // }
+void RandomPlayerbotMgr::PrepareAddclassCache()
+{
+    int32 maxAccountId = sPlayerbotAIConfig->randomBotAccounts.back();
+    int32 minIdx =
+        sPlayerbotAIConfig->randomBotAccounts.size() - 1 >= sPlayerbotAIConfig->addClassAccountPoolSize
+            ? sPlayerbotAIConfig->randomBotAccounts.size() - sPlayerbotAIConfig->addClassAccountPoolSize : 0;
+    int32 minAccountId = sPlayerbotAIConfig->randomBotAccounts[minIdx];
+    if (minAccountId < 0)
+    {
+        LOG_ERROR("playerbots", "No available account for add class!");
+    }
+    int32 collected = 0;
+    for (uint8 claz = CLASS_WARRIOR; claz <= CLASS_DRUID; claz++)
+    {
+        if (claz == 10)
+            continue;
+        QueryResult results = CharacterDatabase.Query(
+            "SELECT guid, race FROM characters "
+            "WHERE account >= {} AND account <= {} AND class = '{}' AND online = 0 AND "
+            "guid NOT IN ( SELECT guid FROM guild_member ) "
+            "ORDER BY account DESC",
+            minAccountId, maxAccountId, claz);
+        if (results)
+        {
+            do
+            {
+                Field* fields = results->Fetch();
+                ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
+                uint32 race = fields[1].Get<uint32>();
+                bool isAlliance = race == 1 || race == 3 || race == 4 || race == 7 || race == 11;
+                addclassCache[GetTeamClassIdx(isAlliance, claz)].push_back(guid);
+                collected++;
+            } while (results->NextRow());
+        }
+    }
+    LOG_INFO("playerbots", "{} characters collected for addclass command.", collected);
 }
 
 void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
@@ -2395,7 +2401,7 @@ void RandomPlayerbotMgr::PrintStats()
             ++engine_combat;
         else
             ++engine_dead;
-        
+
         uint8 spec = AiFactory::GetPlayerSpecTab(bot);
         switch (bot->getClass())
         {
@@ -2779,4 +2785,3 @@ ObjectGuid const RandomPlayerbotMgr::GetBattleMasterGUID(Player* bot, Battlegrou
 
     return battleMasterGUID;
 }
-

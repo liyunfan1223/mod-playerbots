@@ -80,6 +80,7 @@ AiPlayerbot.Enabled = 1
 AiPlayerbot.RandomBotAutologin = 1
 
 # Random bot account
+# Please ensure that RandomBotAccountCount is greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
 AiPlayerbot.RandomBotAccountCount = 200
 
 # Random bot count
@@ -108,11 +109,15 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 AiPlayerbot.MaxAddedBots = 40
 
 # Maximum number of bots per class added by one account
-AiPlayerbot.MaxAddedBotsPerClass = 10
+AiPlayerbot.MaxAddedBotsPerClass = 40
 
 # Enable/Disable create bot by addclass command (0 = GM only, 1 = enable)
 # default: 1 (enable)
 AiPlayerbot.AddClassCommand = 1
+
+# Set the addclass command account pool size
+# Addclass command uses a subset of accounts from RandomBotAccountCount
+AiPlayerbot.AddClassAccountPoolSize = 50
 
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
 # default: 1 (accept based on level)
