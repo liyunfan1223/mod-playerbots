@@ -71,7 +71,6 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
                 max = tabs[i];
             }
         }
-
         return tab;
     }
     else

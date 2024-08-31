@@ -878,14 +878,31 @@ void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_templa
     uint32 total_tabs = tabs[0] + tabs[1] + tabs[2];
     if (increment && total_tabs != 0)
     {
+        /// @todo: match current talent with template
         specTab = AiFactory::GetPlayerSpecTab(bot);
-    }
+        /// @todo: fix cat druid hardcode
+        if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20 && PlayerbotAI::IsDps(bot))
+            specTab = 3;
+        }
     else
     {
-        uint32 point = urand(0, 100);
-        uint32 p1 = sPlayerbotAIConfig->randomClassSpecProb[cls][0];
-        uint32 p2 = p1 + sPlayerbotAIConfig->randomClassSpecProb[cls][1];
-        specTab = point < p1 ? 0 : (point < p2 ? 1 : 2);
+        uint32 point = urand(1, 100);
+        uint32 currentP = 0;
+        int i;
+        for (i = 0; i < MAX_SPECNO; i++)
+        {
+            currentP += sPlayerbotAIConfig->randomClassSpecProb[cls][i];
+            if (point <= currentP)
+            {
+                specTab = i;
+                break;
+            }
+        }
+        if (i == MAX_SPECNO)
+        {
+            specTab = 0;
+            LOG_ERROR("playerbots", "Fail to select spec num for bot {}! Set to 0.", bot->GetName());
+        }
     }
     if (reset)
     {
@@ -896,12 +913,13 @@ void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_templa
     {
         InitTalentsByTemplate(specTab);
     }
-    else
-    {
-        InitTalents(specTab);
-        if (bot->GetFreeTalentPoints())
-            InitTalents((specTab + 1) % 3);
-    }
+    // always use template now
+    // else
+    // {
+    //     InitTalents(specTab);
+    //     if (bot->GetFreeTalentPoints())
+    //         InitTalents((specTab + 1) % 3);
+    // }
     bot->SendTalentsInfoData(false);
 }
 
@@ -1433,7 +1451,7 @@ void Shuffle(std::vector<uint32>& items)
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
     std::unordered_map<uint8, std::vector<uint32>> items;
-    int tab = AiFactory::GetPlayerSpecTab(bot);
+    // int tab = AiFactory::GetPlayerSpecTab(bot);
 
     uint32 blevel = bot->GetLevel();
     int32 delta = 2;
@@ -3062,6 +3080,9 @@ void PlayerbotFactory::InitGlyphs(bool increment)
 
     uint8 cls = bot->getClass();
     uint8 tab = AiFactory::GetPlayerSpecTab(bot);
+    /// @todo: fix cat druid hardcode
+    if (bot->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL && PlayerbotAI::IsDps(bot))
+        tab = 3;
     std::list<uint32> glyphs;
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)

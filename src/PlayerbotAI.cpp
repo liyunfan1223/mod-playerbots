@@ -1998,6 +1998,10 @@ bool PlayerbotAI::IsDps(Player* player)
             {
                 return true;
             }
+            if (tab == DRUID_TAB_FERAL && !IsTank(player))
+            {
+                return true;
+            }
             break;
         case CLASS_SHAMAN:
             if (tab != SHAMAN_TAB_RESTORATION)
@@ -2792,8 +2796,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     }
 
     uint32 CastingTime = !spellInfo->IsChanneled() ? spellInfo->CalcCastTime(bot) : spellInfo->GetDuration();
-    bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
-    if ((CastingTime || interruptOnMove) && bot->isMoving())
+    // bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
+    if ((CastingTime || spellInfo->IsAutoRepeatRangedSpell()) && bot->isMoving())
     {
         if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
         {

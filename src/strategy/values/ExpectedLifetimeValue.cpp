@@ -13,6 +13,9 @@ float ExpectedLifetimeValue::Calculate()
         return 0.0f;
     }
     float dps = AI_VALUE(float, "expected group dps");
+    bool aoePenalty = AI_VALUE(uint8, "attacker count") >= 3;
+    if (aoePenalty)
+        dps *= 0.75;
     float res = target->GetHealth() / dps;
     // bot->Say(target->GetName() + " lifetime: " + std::to_string(res), LANG_UNIVERSAL);
     return res;

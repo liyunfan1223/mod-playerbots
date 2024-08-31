@@ -95,10 +95,22 @@ public:
     BashInterruptSpellTrigger(PlayerbotAI* botAI) : InterruptSpellTrigger(botAI, "bash") {}
 };
 
-class TigersFuryTrigger : public BoostTrigger
+class TigersFuryTrigger : public BuffTrigger
 {
 public:
-    TigersFuryTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "tiger's fury") {}
+    TigersFuryTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "tiger's fury") {}
+};
+
+class BerserkTrigger : public BoostTrigger
+{
+public:
+    BerserkTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "berserk") {}
+};
+
+class SavageRoarTrigger : public BuffTrigger
+{
+public:
+    SavageRoarTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "savage roar") {}
 };
 
 class NaturesGraspTrigger : public BoostTrigger
