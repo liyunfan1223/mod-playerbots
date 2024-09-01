@@ -51,11 +51,14 @@ bool CastMagmaTotemAction::isUseful() {
 }
 
 bool CastFireNovaAction::isUseful() {
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
     Creature* fireTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[1]);
     if (!fireTotem)
         return false;
     
-    if (bot->GetDistance(fireTotem) > 8.0f)
+    if (target->GetDistance(fireTotem) > 8.0f)
         return false;
     
     return CastMeleeSpellAction::isUseful(); 
