@@ -2646,7 +2646,7 @@ void PlayerbotFactory::InitAmmo()
     bot->SetAmmo(entry);
 }
 
-uint32 PlayerbotFactory::CalcMixedGearScore(uint32 gs, uint32 quality) { return gs * (quality + 1); }
+uint32 PlayerbotFactory::CalcMixedGearScore(uint32 gs, uint32 quality) { return gs * PlayerbotAI::GetItemScoreMultiplier(ItemQualities(quality)); }
 
 void PlayerbotFactory::InitMounts()
 {

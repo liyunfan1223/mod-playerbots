@@ -12,6 +12,7 @@
 #include "ItemTemplate.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotFactory.h"
 #include "SharedDefines.h"
 #include "StatsCollector.h"
 #include "Unit.h"
@@ -49,12 +50,12 @@ void StatsWeightCalculator::Reset()
 float StatsWeightCalculator::CalculateItem(uint32 itemId)
 {
     ItemTemplate const* proto = &sObjectMgr->GetItemTemplateStore()->at(itemId);
-    
+
     if (!proto)
         return 0.0f;
 
     Reset();
-    
+
     collector_->CollectItemStats(proto);
 
     GenerateWeights(player_);
@@ -67,25 +68,25 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId)
 
     if (enable_item_set_bonus_)
         CalculateItemSetBonus(player_, proto);
-    
+
     CalculateSocketBonus(player_, proto);
 
     if (enable_quality_blend_)
         // Blend with item quality and level
-        weight_ *= (proto->Quality + 1) * proto->ItemLevel;
-    
+        weight_ *= PlayerbotFactory::CalcMixedGearScore(proto->ItemLevel, proto->Quality);
+
     return weight_;
 }
 
 float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
 {
     SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
-    
+
     if (!enchant)
         return 0.0f;
 
     Reset();
-    
+
     collector_->CollectEnchantStats(enchant);
 
     GenerateWeights(player_);
@@ -121,7 +122,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 1.5f;
         stats_weights_[STATS_TYPE_HASTE] += 1.4f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 5.0f;
-    } 
+    }
     else if (cls == CLASS_HUNTER && tab == HUNTER_TAB_MARKSMANSHIP)
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.2f;
@@ -168,7 +169,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
     }
-    else if (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY)       //  fury
+    else if (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY)  //  fury
     {
         stats_weights_[STATS_TYPE_AGILITY] += 1.8f;
         stats_weights_[STATS_TYPE_STRENGTH] += 2.6f;
@@ -180,7 +181,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.5f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
     }
-    else if (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS)       // arm 
+    else if (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS)  // arm
     {
         stats_weights_[STATS_TYPE_AGILITY] += 1.6f;
         stats_weights_[STATS_TYPE_STRENGTH] += 2.3f;
@@ -192,7 +193,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_EXPERTISE] += 1.4f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
     }
-    else if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_FROST) // frost dk
+    else if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_FROST)  // frost dk
     {
         stats_weights_[STATS_TYPE_AGILITY] += 1.8f;
         stats_weights_[STATS_TYPE_STRENGTH] += 2.6f;
@@ -216,7 +217,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_EXPERTISE] += 1.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
     }
-    else if (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION)    // retribution
+    else if (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION)  // retribution
     {
         stats_weights_[STATS_TYPE_AGILITY] += 1.1f;
         stats_weights_[STATS_TYPE_STRENGTH] += 2.5f;
@@ -244,8 +245,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 8.5f;
     }
-    else if (cls == CLASS_WARLOCK || 
-             cls == CLASS_MAGE ||
+    else if (cls == CLASS_WARLOCK || cls == CLASS_MAGE ||
              (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW) ||     // shadow
              (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ELEMENTAL) ||  // element
              (cls == CLASS_DRUID && tab == DRUID_TAB_BALANCE))        // balance
@@ -272,7 +272,8 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_HASTE] += 1.0f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 1.0f;
     }
-    else if ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) || (cls == CLASS_PALADIN && tab == PALADIN_TAB_PROTECTION))
+    else if ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) ||
+             (cls == CLASS_PALADIN && tab == PALADIN_TAB_PROTECTION))
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.0f;
         stats_weights_[STATS_TYPE_STRENGTH] += 1.0f;
@@ -361,33 +362,33 @@ void StatsWeightCalculator::CalculateItemSetBonus(Player* player, ItemTemplate c
         if (player->ItemSetEff[i])
         {
             ItemSetEffect* eff = player->ItemSetEff[i];
-            
+
             uint32 setId = eff->setid;
             if (itemSet != setId)
                 continue;
-            
-            const ItemSetEntry *setEntry = sItemSetStore.LookupEntry(setId);
+
+            const ItemSetEntry* setEntry = sItemSetStore.LookupEntry(setId);
             if (!setEntry)
                 continue;
-            
+
             uint32 itemCount = eff->item_count;
             uint32 max_items = 0;
             for (size_t j = 0; j < MAX_ITEM_SET_SPELLS; j++)
                 max_items = std::max(max_items, setEntry->items_to_triggerspell[j]);
             if (itemCount < max_items)
             {
-                multiplier += 0.1f * itemCount; // 10% bonus for each item already equipped
+                multiplier += 0.1f * itemCount;  // 10% bonus for each item already equipped
             }
             else
             {
-                multiplier = 1.0f; // All item set effect has been triggerred
+                multiplier = 1.0f;  // All item set effect has been triggerred
             }
             break;
         }
     }
 
     if (i == player->ItemSetEff.size())
-        multiplier = 1.05f; // this is the first item in the item set
+        multiplier = 1.05f;  // this is the first item in the item set
 
     weight_ *= multiplier;
 }
@@ -395,17 +396,18 @@ void StatsWeightCalculator::CalculateItemSetBonus(Player* player, ItemTemplate c
 void StatsWeightCalculator::CalculateSocketBonus(Player* player, ItemTemplate const* proto)
 {
     uint32 socketNum = 0;
-    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS;
+         ++enchant_slot)
     {
         uint8 socketColor = proto->Socket[enchant_slot - SOCK_ENCHANTMENT_SLOT].Color;
-        
-        if (!socketColor) // no socket slot
+
+        if (!socketColor)  // no socket slot
             continue;
 
         socketNum++;
     }
 
-    float multiplier = 1.0f + socketNum * 0.03f; // 3% bonus for socket
+    float multiplier = 1.0f + socketNum * 0.03f;  // 3% bonus for socket
 
     weight_ *= multiplier;
 }
@@ -469,13 +471,13 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         {
             weight_ *= 0.1;
         }
-        if (cls == CLASS_ROGUE && player_->HasAura(13964) 
-            && (proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE))
+        if (cls == CLASS_ROGUE && player_->HasAura(13964) &&
+            (proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE))
         {
             weight_ *= 1.1;
         }
-        if (cls == CLASS_WARRIOR && player_->HasAura(12785) 
-            && (proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2))
+        if (cls == CLASS_WARRIOR && player_->HasAura(12785) &&
+            (proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2))
         {
             weight_ *= 1.1;
         }
@@ -523,7 +525,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
         else if (hit_current >= hit_overflow * 0.8)
             stats_weights_[STATS_TYPE_HIT] /= 1.5;
     }
-    
+
     {
         if (type_ == CollectorType::MELEE)
         {
@@ -536,7 +538,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
                 stats_weights_[STATS_TYPE_EXPERTISE] /= 1.5;
         }
     }
-    
+
     {
         if (type_ == CollectorType::MELEE)
         {

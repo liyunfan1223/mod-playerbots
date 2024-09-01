@@ -3,6 +3,7 @@
 #include "AiFactory.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
+#include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
 
@@ -26,13 +27,13 @@ float EstimatedGroupDpsValue::Calculate()
 {
     float totalDps;
 
-    std::vector<Player*> groupPlayer={bot};
+    std::vector<Player*> groupPlayer = {bot};
     if (Group* group = bot->GetGroup())
     {
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (member == bot) // calculated
+            if (member == bot)  // calculated
                 continue;
 
             if (!member || !member->IsInWorld())
@@ -40,7 +41,7 @@ float EstimatedGroupDpsValue::Calculate()
 
             if (member->GetMapId() != bot->GetMapId())
                 continue;
-            
+
             if (member->GetExactDist(bot) > sPlayerbotAIConfig->sightDistance)
                 continue;
 
@@ -59,16 +60,25 @@ float EstimatedGroupDpsValue::Calculate()
         float basicDps = GetBasicDps(player->GetLevel());
         float basicGs = GetBasicGs(player->GetLevel());
         uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(player, true, false, 12);
-
-        float gap = (float)mixedGearScore / basicGs - 1;
-        float gs_modifier = gap * 3 + 1;
+        float gs_modifier = (float)mixedGearScore / basicGs;
+        // bonus for wotlk epic gear
+        if (mixedGearScore >= 300)
+        {
+            gs_modifier *= 1 + (mixedGearScore - 300) * 0.01;
+        }
         if (gs_modifier < 0.75)
             gs_modifier = 0.75;
         if (gs_modifier > 4)
             gs_modifier = 4;
         totalDps += basicDps * roleMultiplier * gs_modifier;
     }
-
+    // Group buff bonus
+    if (groupPlayer.size() >= 25)
+        totalDps *= 1.2;
+    else if (groupPlayer.size() >= 10)
+        totalDps *= 1.1;
+    else if (groupPlayer.size() >= 5)
+        totalDps *= 1.05;
     return totalDps;
 }
 
@@ -98,11 +108,11 @@ float EstimatedGroupDpsValue::GetBasicDps(uint32 level)
     }
     else if (level <= 70)
     {
-        basic_dps = 450 + (level - 60) * 40;
+        basic_dps = 550 + (level - 60) * 65;
     }
     else
     {
-        basic_dps = 750 + (level - 70) * 175;
+        basic_dps = 1200 + (level - 70) * 200;
     }
     return basic_dps;
 }
@@ -113,23 +123,23 @@ float EstimatedGroupDpsValue::GetBasicGs(uint32 level)
 
     if (level <= 8)
     {
-        basic_gs = (level + 5) * 2;
+        basic_gs = PlayerbotFactory::CalcMixedGearScore(level + 5, ITEM_QUALITY_NORMAL);
     }
     else if (level <= 15)
     {
-        basic_gs = (level + 5) * 3;
+        basic_gs = PlayerbotFactory::CalcMixedGearScore(level + 5, ITEM_QUALITY_UNCOMMON);
     }
     else if (level <= 60)
     {
-        basic_gs = (level + 5) * 4;
+        basic_gs = PlayerbotFactory::CalcMixedGearScore(level + 5, ITEM_QUALITY_RARE);
     }
     else if (level <= 70)
     {
-        basic_gs = (85 + (level - 60) * 3) * 4;
+        basic_gs = PlayerbotFactory::CalcMixedGearScore(85 + (level - 60) * 3, ITEM_QUALITY_RARE);
     }
     else
     {
-        basic_gs = (155 + (level - 70) * 4) * 4;
+        basic_gs = PlayerbotFactory::CalcMixedGearScore(155 + (level - 70) * 4, ITEM_QUALITY_RARE);
     }
     return basic_gs;
 }

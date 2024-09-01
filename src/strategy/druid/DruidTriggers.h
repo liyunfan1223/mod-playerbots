@@ -75,8 +75,6 @@ class MoonfireTrigger : public DebuffTrigger
 {
 public:
     MoonfireTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "moonfire", 1, true) {}
-
-    bool IsActive() override;
 };
 
 class FaerieFireTrigger : public DebuffTrigger
