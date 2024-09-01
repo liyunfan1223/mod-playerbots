@@ -916,7 +916,7 @@ AiPlayerbot.PremadeSpecGlyph.7.0 = 41536,43385,41532,43386,44923,45776
 AiPlayerbot.PremadeSpecLink.7.0.60 = 4530001520213351102301351
 AiPlayerbot.PremadeSpecLink.7.0.80 = 3530001523213351322301351-005050031
 AiPlayerbot.PremadeSpecName.7.1 = enh pve
-AiPlayerbot.PremadeSpecGlyph.7.1 = 41530,43385,41539,43386,44923,41540
+AiPlayerbot.PremadeSpecGlyph.7.1 = 41542,43385,41539,43386,44923,45771
 AiPlayerbot.PremadeSpecLink.7.1.60 = -30205033005001333031131131051
 AiPlayerbot.PremadeSpecLink.7.1.80 = 053030052-30205033005021333031131131051
 AiPlayerbot.PremadeSpecName.7.2 = resto pve
@@ -996,7 +996,7 @@ AiPlayerbot.PremadeSpecLink.11.2.60 = --230033312031501531050013051
 AiPlayerbot.PremadeSpecLink.11.2.80 = 05320001--230033312031512531153313051
 AiPlayerbot.PremadeSpecName.11.3 = cat pve
 AiPlayerbot.PremadeSpecGlyph.11.3 = 40902,43331,40901,43335,44922,45604
-AiPlayerbot.PremadeSpecLink.11.3.60 = -553202032322010052100030310501
+AiPlayerbot.PremadeSpecLink.11.3.60 = -552202032322010053100030310501
 AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 
 #
@@ -1183,11 +1183,12 @@ AiPlayerbot.RandomClassSpecIndex.9.2 = 2
 
 AiPlayerbot.RandomClassSpecProb.11.0 = 20
 AiPlayerbot.RandomClassSpecIndex.11.0 = 0
-AiPlayerbot.RandomClassSpecProb.11.1 = 40
+AiPlayerbot.RandomClassSpecProb.11.1 = 25
 AiPlayerbot.RandomClassSpecIndex.11.1 = 1
-AiPlayerbot.RandomClassSpecProb.11.2 = 40
+AiPlayerbot.RandomClassSpecProb.11.2 = 35
 AiPlayerbot.RandomClassSpecIndex.11.2 = 2
-
+AiPlayerbot.RandomClassSpecProb.11.3 = 20
+AiPlayerbot.RandomClassSpecIndex.11.3 = 3
 #
 #
 #

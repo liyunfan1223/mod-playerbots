@@ -110,13 +110,17 @@ public:
         creators["no water totem"] = &ShamanATriggerFactoryInternal::no_water_totem;
         creators["no air totem"] = &ShamanATriggerFactoryInternal::no_air_totem;
         creators["earth shield on main tank"] = &ShamanATriggerFactoryInternal::earth_shield_on_main_tank;
-        creators["maelstrom weapon"] = &ShamanATriggerFactoryInternal::maelstrom_weapon;
+        creators["maelstrom weapon 3"] = &ShamanATriggerFactoryInternal::maelstrom_weapon_3;
+        creators["maelstrom weapon 4"] = &ShamanATriggerFactoryInternal::maelstrom_weapon_4;
+        creators["maelstrom weapon 5"] = &ShamanATriggerFactoryInternal::maelstrom_weapon_5;
         creators["flame shock"] = &ShamanATriggerFactoryInternal::flame_shock;
         creators["wrath of air totem"] = &ShamanATriggerFactoryInternal::wrath_of_air_totem;
     }
 
 private:
-    static Trigger* maelstrom_weapon(PlayerbotAI* botAI) { return new MaelstromWeaponTrigger(botAI); }
+    static Trigger* maelstrom_weapon_3(PlayerbotAI* botAI) { return new MaelstromWeaponTrigger(botAI, 3); }
+    static Trigger* maelstrom_weapon_4(PlayerbotAI* botAI) { return new MaelstromWeaponTrigger(botAI, 4); }
+    static Trigger* maelstrom_weapon_5(PlayerbotAI* botAI) { return new MaelstromWeaponTrigger(botAI, 5); }
     static Trigger* heroism(PlayerbotAI* botAI) { return new HeroismTrigger(botAI); }
     static Trigger* bloodlust(PlayerbotAI* botAI) { return new BloodlustTrigger(botAI); }
     static Trigger* elemental_mastery(PlayerbotAI* botAI) { return new ElementalMasteryTrigger(botAI); }
@@ -234,6 +238,7 @@ public:
         creators["lava burst"] = &ShamanAiObjectContextInternal::lava_burst;
         creators["earth shield on main tank"] = &ShamanAiObjectContextInternal::earth_shield_on_main_tank;
         creators["fire elemental totem"] = &ShamanAiObjectContextInternal::fire_elemental_totem;
+        creators["fire elemental totem melee"] = &ShamanAiObjectContextInternal::fire_elemental_totem_melee;
         creators["totem of wrath"] = &ShamanAiObjectContextInternal::totem_of_wrath;
         creators["wrath of air totem"] = &ShamanAiObjectContextInternal::wrath_of_air_totem;
         creators["shamanistic rage"] = &ShamanAiObjectContextInternal::shamanistic_rage;
@@ -314,6 +319,7 @@ private:
     static Action* earth_shield_on_main_tank(PlayerbotAI* ai) { return new CastEarthShieldOnMainTankAction(ai); }
     static Action* totem_of_wrath(PlayerbotAI* ai) { return new CastTotemOfWrathAction(ai); }
     static Action* fire_elemental_totem(PlayerbotAI* ai) { return new CastFireElementalTotemAction(ai); }
+    static Action* fire_elemental_totem_melee(PlayerbotAI* ai) { return new CastFireElementalTotemMeleeAction(ai); }
     static Action* wrath_of_air_totem(PlayerbotAI* ai) { return new CastWrathOfAirTotemAction(ai); }
     static Action* shamanistic_rage(PlayerbotAI* ai) { return new CastShamanisticRageAction(ai); }
     static Action* feral_spirit(PlayerbotAI* ai) { return new CastFeralSpiritAction(ai); }

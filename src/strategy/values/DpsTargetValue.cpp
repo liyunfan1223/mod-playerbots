@@ -291,7 +291,7 @@ Unit* DpsTargetValue::Calculate()
         return rti;
 
     // FindLeastHpTargetStrategy strategy(botAI);
-    float dps = AI_VALUE(float, "expected group dps");
+    float dps = AI_VALUE(float, "estimated group dps");
     if (botAI->IsCaster(bot))
     {
         CasterFindTargetSmartStrategy strategy(botAI, dps);

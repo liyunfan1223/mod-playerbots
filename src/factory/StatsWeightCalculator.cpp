@@ -132,7 +132,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_HASTE] += 1.8f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 5.0f;
     }
-    else if ((cls == CLASS_ROGUE && tab == ROGUE_TAB_COMBAT) || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL && !PlayerbotAI::IsTank(player)))
+    else if (cls == CLASS_ROGUE && tab == ROGUE_TAB_COMBAT)
     {
         stats_weights_[STATS_TYPE_AGILITY] += 1.8f;
         stats_weights_[STATS_TYPE_STRENGTH] += 1.1f;
@@ -143,7 +143,19 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_HASTE] += 1.4f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
-    } 
+    }
+    else if (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL && !PlayerbotAI::IsTank(player))
+    {
+        stats_weights_[STATS_TYPE_AGILITY] += 2.4f;
+        stats_weights_[STATS_TYPE_STRENGTH] += 2.3f;
+        stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 2.1f;
+        stats_weights_[STATS_TYPE_HIT] += 1.9f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.8f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.4f;
+        stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 5.0f;
+    }
     else if (cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY))
     {
         stats_weights_[STATS_TYPE_AGILITY] += 1.7f;
@@ -224,13 +236,13 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_STRENGTH] += 1.1f;
         stats_weights_[STATS_TYPE_INTELLECT] += 0.5f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
-        stats_weights_[STATS_TYPE_SPELL_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_SPELL_POWER] += 0.9f;
         stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 1.2f;
         stats_weights_[STATS_TYPE_HIT] += 1.7f;
         stats_weights_[STATS_TYPE_CRIT] += 1.4f;
         stats_weights_[STATS_TYPE_HASTE] += 1.8f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
-        stats_weights_[STATS_TYPE_MELEE_DPS] += 5.2f;
+        stats_weights_[STATS_TYPE_MELEE_DPS] += 8.5f;
     }
     else if (cls == CLASS_WARLOCK || 
              cls == CLASS_MAGE ||

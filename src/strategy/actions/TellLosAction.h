@@ -30,10 +30,10 @@ public:
     virtual bool Execute(Event event);
 };
 
-class TellExpectedDpsAction : public Action
+class TellEstimatedDpsAction : public Action
 {
 public:
-    TellExpectedDpsAction(PlayerbotAI* ai) : Action(ai, "tell expected dps") {}
+    TellEstimatedDpsAction(PlayerbotAI* ai) : Action(ai, "tell estimated dps") {}
 
     virtual bool Execute(Event event);
 };

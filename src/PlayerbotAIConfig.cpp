@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
+#include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 
 template <class T>
@@ -329,15 +330,22 @@ bool PlayerbotAIConfig::Initialize()
                 parsedSpecLinkOrder[cls][spec][level] = ParseTempTalentsOrder(cls, premadeSpecLink[cls][spec][level]);
             }
         }
-        for (uint32 spec = 0; spec < 3; ++spec)
+        for (uint32 spec = 0; spec < MAX_SPECNO; ++spec)
         {
             std::ostringstream os;
             os << "AiPlayerbot.RandomClassSpecProb." << cls << "." << spec;
-            randomClassSpecProb[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
+            uint32 def;
+            if (spec <= 1)
+                def = 33;
+            else if (spec == 2)
+                def = 34;
+            else
+                def = 0;
+            randomClassSpecProb[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), def, false);
             os.str("");
             os.clear();
             os << "AiPlayerbot.RandomClassSpecIndex." << cls << "." << spec;
-            randomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), spec + 1);
+            randomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), spec, false);
         }
     }
 
@@ -475,6 +483,9 @@ bool PlayerbotAIConfig::Initialize()
     selfBotLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.SelfBotLevel", 1);
 
     RandomPlayerbotFactory::CreateRandomBots();
+    if (sPlayerbotAIConfig->addClassCommand)
+        sRandomPlayerbotMgr->PrepareAddclassCache();
+    
     if (World::IsStopped())
     {
         return true;

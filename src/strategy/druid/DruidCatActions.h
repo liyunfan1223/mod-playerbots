@@ -35,10 +35,23 @@ public:
     CastTigersFuryAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "tiger's fury") {}
 };
 
+class CastSavageRoarAction : public CastBuffSpellAction
+{
+public:
+    CastSavageRoarAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "savage roar") {}
+    std::string const GetTargetName() override { return "current target"; }
+};
+
 class CastRakeAction : public CastDebuffSpellAction
 {
 public:
-    CastRakeAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "rake") {}
+    CastRakeAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "rake", true, 6.0f) {}
+};
+
+class CastRakeOnMeleeAttackersAction : public CastDebuffSpellOnMeleeAttackerAction
+{
+public:
+    CastRakeOnMeleeAttackersAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "rake", true, 6.0f) {}
 };
 
 class CastClawAction : public CastMeleeSpellAction
@@ -65,10 +78,10 @@ public:
     CastFerociousBiteAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "ferocious bite") {}
 };
 
-class CastRipAction : public CastMeleeSpellAction
+class CastRipAction : public CastMeleeDebuffSpellAction
 {
 public:
-    CastRipAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "rip") {}
+    CastRipAction(PlayerbotAI* botAI) : CastMeleeDebuffSpellAction(botAI, "rip", true, 12.0f) {}
 };
 
 class CastShredAction : public CastMeleeSpellAction

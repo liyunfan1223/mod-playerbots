@@ -47,7 +47,7 @@ float CastTimeMultiplier::GetValue(Action* action)
             return 1.0f;
         }
 
-        if (castTime > (1000 * target->GetHealth() / AI_VALUE(float, "expected group dps")))
+        if (castTime > (1000 * target->GetHealth() / AI_VALUE(float, "estimated group dps")))
         {
             return 0.1f;
         }

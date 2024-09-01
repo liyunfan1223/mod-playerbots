@@ -162,8 +162,6 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
     {
         sPlayerbotCommandServer->Start();
         PrepareTeleportCache();
-        if (sPlayerbotAIConfig->addClassCommand)
-            PrepareAddclassCache();
     }
 
     BattlegroundData.clear();

@@ -26,7 +26,7 @@
 #include "DuelTargetValue.h"
 #include "EnemyHealerTargetValue.h"
 #include "EnemyPlayerValue.h"
-#include "ExpectedLifetimeValue.h"
+#include "EstimatedLifetimeValue.h"
 #include "Formations.h"
 #include "GrindTargetValue.h"
 #include "GroupValues.h"
@@ -299,8 +299,8 @@ public:
         creators["boss target"] = &ValueContext::boss_target;
         creators["nearest triggers"] = &ValueContext::nearest_triggers;
         creators["neglect threat"] = &ValueContext::neglect_threat;
-        creators["expected lifetime"] = &ValueContext::expected_lifetime;
-        creators["expected group dps"] = &ValueContext::expected_group_dps;
+        creators["estimated lifetime"] = &ValueContext::expected_lifetime;
+        creators["estimated group dps"] = &ValueContext::expected_group_dps;
         creators["area debuff"] = &ValueContext::area_debuff;
         creators["nearest trap with damage"] = &ValueContext::nearest_trap_with_damange;
         creators["disperse distance"] = &ValueContext::disperse_distance;
@@ -538,8 +538,8 @@ private:
     static UntypedValue* boss_target(PlayerbotAI* ai) { return new BossTargetValue(ai); }
     static UntypedValue* nearest_triggers(PlayerbotAI* ai) { return new NearestTriggersValue(ai); }
     static UntypedValue* neglect_threat(PlayerbotAI* ai) { return new NeglectThreatResetValue(ai); }
-    static UntypedValue* expected_lifetime(PlayerbotAI* ai) { return new ExpectedLifetimeValue(ai); }
-    static UntypedValue* expected_group_dps(PlayerbotAI* ai) { return new ExpectedGroupDpsValue(ai); }
+    static UntypedValue* expected_lifetime(PlayerbotAI* ai) { return new EstimatedLifetimeValue(ai); }
+    static UntypedValue* expected_group_dps(PlayerbotAI* ai) { return new EstimatedGroupDpsValue(ai); }
     static UntypedValue* area_debuff(PlayerbotAI* ai) { return new AreaDebuffValue(ai); }
     static UntypedValue* nearest_trap_with_damange(PlayerbotAI* ai) { return new NearestTrapWithDamageValue(ai); }
     static UntypedValue* disperse_distance(PlayerbotAI* ai) { return new DisperseDistanceValue(ai); }

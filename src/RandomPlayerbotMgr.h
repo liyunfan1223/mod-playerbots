@@ -169,6 +169,7 @@ public:
     void setActivityPercentage(float percentage) { activityMod = percentage / 100.0f; }
     static uint8 GetTeamClassIdx(bool isAlliance, uint8 claz) { return isAlliance * 20 + claz; }
 
+    void PrepareAddclassCache();
     std::map<uint8, std::vector<ObjectGuid>> addclassCache;
 protected:
     void OnBotLoginInternal(Player* const bot) override;
@@ -193,7 +194,6 @@ private:
     void RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth = false);
     uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
     void PrepareTeleportCache();
-    void PrepareAddclassCache();
     typedef void (RandomPlayerbotMgr::*ConsoleCommandHandler)(Player*);
 
     std::vector<Player*> players;
