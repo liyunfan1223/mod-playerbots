@@ -252,12 +252,12 @@ public:
             return false;
 
         Aura* roar = botAI->GetAura("savage roar", bot);
-        bool roarCheck = roar && roar->GetDuration() > 8000;
+        bool roarCheck = !roar || roar->GetDuration() > 8000;
         if (!roarCheck)
             return false;
 
         Aura* rip = botAI->GetAura("rip", target, true);
-        bool ripCheck = rip && rip->GetDuration() > 8000;
+        bool ripCheck = !rip || rip->GetDuration() > 8000;
         if (!ripCheck)
             return false;
 
