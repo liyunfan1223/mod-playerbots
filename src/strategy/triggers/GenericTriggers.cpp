@@ -83,6 +83,8 @@ bool EnergyAvailable::IsActive() { return AI_VALUE2(uint8, "energy", "self targe
 
 bool ComboPointsAvailableTrigger::IsActive() { return AI_VALUE2(uint8, "combo", "current target") >= amount; }
 
+bool ComboPointsNotFullTrigger::IsActive() { return AI_VALUE2(uint8, "combo", "current target") < amount; }
+
 bool TargetWithComboPointsLowerHealTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");

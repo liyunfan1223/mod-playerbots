@@ -126,6 +126,17 @@ private:
     float lifeTime;
 };
 
+class ComboPointsNotFullTrigger : public StatAvailable
+{
+public:
+    ComboPointsNotFullTrigger(PlayerbotAI* botAI, int32 amount = 5, std::string const name = "combo points not full")
+        : StatAvailable(botAI, amount, name)
+    {
+    }
+
+    bool IsActive() override;
+};
+
 class LoseAggroTrigger : public Trigger
 {
 public:

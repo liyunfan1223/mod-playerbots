@@ -122,8 +122,7 @@ CatDpsDruidStrategy::CatDpsDruidStrategy(PlayerbotAI* botAI) : FeralDruidStrateg
 
 NextAction** CatDpsDruidStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("shred", ACTION_DEFAULT + 0.4f),
-                             new NextAction("tiger's fury", ACTION_DEFAULT + 0.1f), nullptr);
+    return NextAction::array(0, new NextAction("tiger's fury", ACTION_DEFAULT + 0.1f), nullptr);
 }
 
 void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -131,9 +130,17 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     FeralDruidStrategy::InitTriggers(triggers);
 
     // Default priority
-    triggers.push_back(new TriggerNode("high energy available",
+    triggers.push_back(new TriggerNode("almost full energy available",
+                                       NextAction::array(0, new NextAction("shred", ACTION_DEFAULT + 0.4f), nullptr)));
+    triggers.push_back(new TriggerNode("combo points not full",
+                                       NextAction::array(0, new NextAction("shred", ACTION_DEFAULT + 0.4f), nullptr)));
+    triggers.push_back(new TriggerNode("almost full energy available",
                                        NextAction::array(0, new NextAction("mangle (cat)", ACTION_DEFAULT + 0.3f), nullptr)));
-    triggers.push_back(new TriggerNode("high energy available",
+    triggers.push_back(new TriggerNode("combo points not full and high energy",
+                                       NextAction::array(0, new NextAction("mangle (cat)", ACTION_DEFAULT + 0.3f), nullptr)));
+    triggers.push_back(new TriggerNode("almost full energy available",
+                                       NextAction::array(0, new NextAction("claw", ACTION_DEFAULT + 0.2f), nullptr)));
+    triggers.push_back(new TriggerNode("combo points not full and high energy",
                                        NextAction::array(0, new NextAction("claw", ACTION_DEFAULT + 0.2f), nullptr)));
     triggers.push_back(
         new TriggerNode("faerie fire (feral)",
