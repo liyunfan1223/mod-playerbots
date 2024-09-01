@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
+#include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 
 template <class T>
@@ -482,6 +483,9 @@ bool PlayerbotAIConfig::Initialize()
     selfBotLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.SelfBotLevel", 1);
 
     RandomPlayerbotFactory::CreateRandomBots();
+    if (sPlayerbotAIConfig->addClassCommand)
+        sRandomPlayerbotMgr->PrepareAddclassCache();
+    
     if (World::IsStopped())
     {
         return true;
