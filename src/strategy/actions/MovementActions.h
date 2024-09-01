@@ -30,7 +30,7 @@ protected:
     bool MoveToLOS(WorldObject* target, bool ranged = false);
     bool MoveTo(uint32 mapId, float x, float y, float z, bool idle = false, bool react = false,
                 bool normal_only = false, bool exact_waypoint = false, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
-    bool MoveTo(Unit* target, float distance = 0.0f, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
+    bool MoveTo(WorldObject* target, float distance = 0.0f, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool MoveNear(WorldObject* target, float distance = sPlayerbotAIConfig->contactDistance, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     float GetFollowAngle();
     bool Follow(Unit* target, float distance = sPlayerbotAIConfig->followDistance);
@@ -39,7 +39,8 @@ protected:
     bool ReachCombatTo(Unit* target, float distance = 0.0f);
     float MoveDelay(float distance);
     void WaitForReach(float distance);
-    bool IsMovingAllowed(Unit* target);
+    void SetNextMovementDelay(float delayMillis);
+    bool IsMovingAllowed(WorldObject* target);
     bool IsMovingAllowed(uint32 mapId, float x, float y, float z);
     bool IsDuplicateMove(uint32 mapId, float x, float y, float z);
     bool IsWaitingForLastMove(MovementPriority priority);
