@@ -83,9 +83,8 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "no fire totem",
         NextAction::array(0, new NextAction("reach melee", 23.0f), new NextAction("magma totem", 22.0f), nullptr)));
 
-    triggers.push_back(new TriggerNode("fire elemental totem",
-                                       NextAction::array(0, new NextAction("reach melee", 33.0f),
-                                                         new NextAction("fire elemental totem", 32.0f), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "fire elemental totem", NextAction::array(0, new NextAction("fire elemental totem melee", 32.0f), nullptr)));
 
     triggers.push_back(
         new TriggerNode("no air totem", NextAction::array(0, new NextAction("windfury totem", 20.0f), nullptr)));

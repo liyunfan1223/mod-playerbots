@@ -66,7 +66,9 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // shock", 21.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("no fire totem", NextAction::array(0, new NextAction("totem of wrath", 15.0f), NULL)));
-
+    triggers.push_back(new TriggerNode("fire elemental totem",
+                                       NextAction::array(0, new NextAction("fire elemental totem", 32.0f), nullptr)));
+                                       
     triggers.push_back(
         new TriggerNode("medium mana", NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
     
