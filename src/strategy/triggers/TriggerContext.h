@@ -96,6 +96,7 @@ public:
 
         creators["combo points available"] = &TriggerContext::ComboPointsAvailable;
         creators["combo points 3 available"] = &TriggerContext::ComboPoints3Available;
+        creators["target with combo points almost dead"] = &TriggerContext::target_with_combo_points_almost_dead;
 
         creators["medium threat"] = &TriggerContext::MediumThreat;
 
@@ -309,6 +310,10 @@ private:
     }
     static Trigger* ComboPointsAvailable(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI); }
     static Trigger* ComboPoints3Available(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI, 3); }
+    static Trigger* target_with_combo_points_almost_dead(PlayerbotAI* ai)
+    {
+        return new TargetWithComboPointsLowerHealTrigger(ai, 3, 3.0f);
+    }
     static Trigger* MediumThreat(PlayerbotAI* botAI) { return new MediumThreatTrigger(botAI); }
     static Trigger* Dead(PlayerbotAI* botAI) { return new DeadTrigger(botAI); }
     static Trigger* corpse_near(PlayerbotAI* botAI) { return new CorpseNearTrigger(botAI); }
