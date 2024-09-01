@@ -103,6 +103,8 @@ public:
         creators["party member remove curse"] = &DruidTriggerFactoryInternal::party_member_remove_curse;
         creators["eclipse (solar) cooldown"] = &DruidTriggerFactoryInternal::eclipse_solar_cooldown;
         creators["eclipse (lunar) cooldown"] = &DruidTriggerFactoryInternal::eclipse_lunar_cooldown;
+        creators["mangle (cat)"] = &DruidTriggerFactoryInternal::mangle_cat;
+        creators["ferocious bite time"] = &DruidTriggerFactoryInternal::ferocious_bite_time;
     }
 
 private:
@@ -137,6 +139,8 @@ private:
     static Trigger* party_member_remove_curse(PlayerbotAI* ai) { return new DruidPartyMemberRemoveCurseTrigger(ai); }
     static Trigger* eclipse_solar_cooldown(PlayerbotAI* ai) { return new EclipseSolarCooldownTrigger(ai); }
     static Trigger* eclipse_lunar_cooldown(PlayerbotAI* ai) { return new EclipseLunarCooldownTrigger(ai); }
+    static Trigger* mangle_cat(PlayerbotAI* ai) { return new MangleCatTrigger(ai); }
+    static Trigger* ferocious_bite_time(PlayerbotAI* ai) { return new FerociousBiteTimeTrigger(ai); }
 };
 
 class DruidAiObjectContextInternal : public NamedObjectContext<Action>

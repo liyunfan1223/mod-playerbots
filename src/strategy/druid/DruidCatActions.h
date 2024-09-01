@@ -60,11 +60,10 @@ public:
     CastClawAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "claw") {}
 };
 
-class CastMangleCatAction : public CastMeleeDebuffSpellAction
+class CastMangleCatAction : public CastMeleeSpellAction
 {
 public:
-    CastMangleCatAction(PlayerbotAI* botAI) : CastMeleeDebuffSpellAction(botAI, "mangle (cat)", false, 0.0f) {}
-    bool isUseful() override;
+    CastMangleCatAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "mangle (cat)") {}
 };
 
 class CastSwipeCatAction : public CastMeleeSpellAction

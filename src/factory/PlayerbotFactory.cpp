@@ -881,7 +881,7 @@ void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_templa
         /// @todo: match current talent with template
         specTab = AiFactory::GetPlayerSpecTab(bot);
         /// @todo: fix cat druid hardcode
-        if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20 && PlayerbotAI::IsDps(bot))
+        if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20 && !bot->HasAura(16931))
             specTab = 3;
         }
     else
@@ -3081,7 +3081,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     uint8 cls = bot->getClass();
     uint8 tab = AiFactory::GetPlayerSpecTab(bot);
     /// @todo: fix cat druid hardcode
-    if (bot->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL && PlayerbotAI::IsDps(bot))
+    if (bot->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL && bot->GetLevel() >= 20 && !bot->HasAura(16931))
         tab = 3;
     std::list<uint32> glyphs;
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
