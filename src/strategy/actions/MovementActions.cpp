@@ -762,7 +762,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // return true;
 }
 
-bool MovementAction::MoveTo(Unit* target, float distance, MovementPriority priority)
+bool MovementAction::MoveTo(WorldObject* target, float distance, MovementPriority priority)
 {
     if (!IsMovingAllowed(target))
         return false;
@@ -874,7 +874,7 @@ float MovementAction::GetFollowAngle()
     return 0;
 }
 
-bool MovementAction::IsMovingAllowed(Unit* target)
+bool MovementAction::IsMovingAllowed(WorldObject* target)
 {
     if (!target)
         return false;
@@ -1272,6 +1272,8 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
 
     // bot->GetMotionMaster()->Clear();
     bot->GetMotionMaster()->MoveChase((Unit*)obj, distance);
+
+    // TODO shouldnt this use "last movement" value?
     WaitForReach(bot->GetExactDist2d(obj) - distance);
     return true;
 }
@@ -1295,6 +1297,7 @@ float MovementAction::MoveDelay(float distance)
     return delay;
 }
 
+// TODO should this be removed? (or modified to use "last movement" value?)
 void MovementAction::WaitForReach(float distance)
 {
     float delay = 1000.0f * MoveDelay(distance);
@@ -1311,6 +1314,15 @@ void MovementAction::WaitForReach(float distance)
         delay = 0;
 
     botAI->SetNextCheckDelay((uint32)delay);
+}
+
+// similiar to botAI->SetNextCheckDelay() but only stops movement
+void MovementAction::SetNextMovementDelay(float delayMillis)
+{
+    AI_VALUE(LastMovement&, "last movement")
+        .Set(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetOrientation(),
+             delayMillis,
+             MovementPriority::MOVEMENT_FORCED);
 }
 
 bool MovementAction::Flee(Unit* target)
