@@ -3,8 +3,8 @@
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
-#ifndef _PLAYERBOT_EXPECTEDLIFETIMEVALUE_H
-#define _PLAYERBOT_EXPECTEDLIFETIMEVALUE_H
+#ifndef _PLAYERBOT_EstimatedLifetimeValue_H
+#define _PLAYERBOT_EstimatedLifetimeValue_H
 
 #include "NamedObjectContext.h"
 #include "PossibleTargetsValue.h"
@@ -15,22 +15,26 @@ class PlayerbotAI;
 class Unit;
 
 // [target health] / [expected group single target dps] = [expected lifetime]
-class ExpectedLifetimeValue : public FloatCalculatedValue, public Qualified
+class EstimatedLifetimeValue : public FloatCalculatedValue, public Qualified
 {
 public:
-    ExpectedLifetimeValue(PlayerbotAI* botAI) : FloatCalculatedValue(botAI, "expected lifetime") {}
+    EstimatedLifetimeValue(PlayerbotAI* botAI) : FloatCalculatedValue(botAI, "estimated lifetime") {}
 
 public:
     float Calculate() override;
 };
 
-class ExpectedGroupDpsValue : public FloatCalculatedValue
+class EstimatedGroupDpsValue : public FloatCalculatedValue
 {
 public:
-    ExpectedGroupDpsValue(PlayerbotAI* botAI) : FloatCalculatedValue(botAI, "expected group dps", 20 * 1000) {}
+    EstimatedGroupDpsValue(PlayerbotAI* botAI) : FloatCalculatedValue(botAI, "estimated group dps", 20 * 1000) {}
 
 public:
     float Calculate() override;
+
+protected:
+    float GetBasicDps(uint32 level);
+    float GetBasicGs(uint32 level);
 };
 
 #endif

@@ -52,7 +52,7 @@ Unit* MeleeAttackerWithoutAuraTargetValue::Calculate()
         if (!bot->IsWithinMeleeRange(unit))
             continue;
         
-        if (checkArc && !bot->HasInArc(CAST_ANGLE_IN_FRONT, unit))
+        if (checkArc && !bot->HasInArc(M_PI, unit))
             continue;
 
         if (unit->GetHealth() < max_health)

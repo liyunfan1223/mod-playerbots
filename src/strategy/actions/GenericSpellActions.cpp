@@ -364,5 +364,5 @@ bool CastDebuffSpellAction::isUseful()
         return false;
     }
     return CastAuraSpellAction::isUseful() &&
-           (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+           (target->GetHealth() / AI_VALUE(float, "estimated group dps")) >= needLifeTime;
 }

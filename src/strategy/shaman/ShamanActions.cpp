@@ -17,7 +17,7 @@ bool CastTotemAction::isUseful()
         {
             return false;
         }
-        float dps = AI_VALUE(float, "expected group dps");
+        float dps = AI_VALUE(float, "estimated group dps");
         if (target->GetHealth() / dps < needLifeTime)
         {
             return false;

@@ -133,5 +133,5 @@ bool TargetWithComboPointsLowerHealTrigger::IsActive()
         return false;
     }
     return ComboPointsAvailableTrigger::IsActive() &&
-           (target->GetHealth() / AI_VALUE(float, "expected group dps")) <= lifeTime;
+           (target->GetHealth() / AI_VALUE(float, "estimated group dps")) <= lifeTime;
 }
