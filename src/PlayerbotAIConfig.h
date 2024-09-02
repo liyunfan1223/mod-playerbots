@@ -63,7 +63,7 @@ public:
         tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance, aoeRadius, rpgDistance,
         targetPosRecalcDistance, farDistance, healDistance, aggroDistance;
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
-    uint32 lowMana, mediumMana;
+    uint32 lowMana, mediumMana, highMana;
     bool autoSaveMana;
     uint32 saveManaThreshold;
     bool autoAvoidAoe;

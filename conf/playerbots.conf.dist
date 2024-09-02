@@ -342,6 +342,7 @@ AiPlayerbot.MediumHealth = 65
 AiPlayerbot.AlmostFullHealth = 85
 AiPlayerbot.LowMana = 15
 AiPlayerbot.MediumMana = 40
+AiPlayerbot.HighMana = 65
 
 #
 #

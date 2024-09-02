@@ -10,6 +10,7 @@
 #include "BattlegroundWS.h"
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
@@ -64,7 +65,7 @@ bool PetAttackTrigger::IsActive()
 
 bool HighManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < 65;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->highMana;
 }
 
 bool AlmostFullManaTrigger::IsActive()

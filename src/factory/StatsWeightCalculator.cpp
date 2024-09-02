@@ -224,7 +224,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_INTELLECT] += 0.15f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
         stats_weights_[STATS_TYPE_SPELL_POWER] += 0.3f;
-        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 0.8f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 0.5f;
         stats_weights_[STATS_TYPE_HIT] += 1.9f;
         stats_weights_[STATS_TYPE_CRIT] += 1.2f;
         stats_weights_[STATS_TYPE_HASTE] += 1.3f;

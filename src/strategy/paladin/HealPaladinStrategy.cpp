@@ -50,7 +50,9 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(
         new TriggerNode("medium group heal occasion",
-                        NextAction::array(0, new NextAction("divine sacrifice", ACTION_CRITICAL_HEAL + 5), nullptr)));
+                        NextAction::array(0, new NextAction("divine sacrifice", ACTION_CRITICAL_HEAL + 5),
+                        new NextAction("avenging wrath", ACTION_HIGH + 4), 
+                        nullptr)));
 
     triggers.push_back(
         new TriggerNode("party member critical health",
