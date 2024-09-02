@@ -245,6 +245,8 @@ bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chat
             GET_PLAYERBOT_AI(bot)->SayToChannel(responseMessage, ChatChannelId::GENERAL);
             break;
         }
+        default:
+            break;
     }
 
     GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
@@ -309,6 +311,8 @@ bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatC
             GET_PLAYERBOT_AI(bot)->SayToGuild(BOT_TEXT2("suggest_toxic_links", placeholders));
             break;
         }
+        default:
+            break;
     }
 
     GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 60));
@@ -404,6 +408,8 @@ bool ChatReplyAction::HandleWTBItemsReply(Player* bot, ChatChannelSource chatCha
                 }
                 break;
             }
+            default:
+            break;
         }
         GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 60));
     }
@@ -490,6 +496,8 @@ bool ChatReplyAction::HandleLFGQuestsReply(Player* bot, ChatChannelSource chatCh
                 GET_PLAYERBOT_AI(bot)->Whisper(responseMessage, name);
                 break;
             }
+            default:
+            break;
         }
         GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
     }

@@ -98,6 +98,8 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                        NextAction::array(0, new NextAction("holy shield", ACTION_HIGH + 4), nullptr)));
     // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of sanctuary",
     // ACTION_HIGH + 9), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "avenging wrath", NextAction::array(0, new NextAction("avenging wrath", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(
         new TriggerNode("target critical health",
                         NextAction::array(0, new NextAction("hammer of wrath", ACTION_CRITICAL_HEAL), nullptr)));

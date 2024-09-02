@@ -75,8 +75,6 @@ class MoonfireTrigger : public DebuffTrigger
 {
 public:
     MoonfireTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "moonfire", 1, true) {}
-
-    bool IsActive() override;
 };
 
 class FaerieFireTrigger : public DebuffTrigger
@@ -252,12 +250,12 @@ public:
             return false;
 
         Aura* roar = botAI->GetAura("savage roar", bot);
-        bool roarCheck = !roar || roar->GetDuration() > 8000;
+        bool roarCheck = !roar || roar->GetDuration() > 10000;
         if (!roarCheck)
             return false;
 
         Aura* rip = botAI->GetAura("rip", target, true);
-        bool ripCheck = !rip || rip->GetDuration() > 8000;
+        bool ripCheck = !rip || rip->GetDuration() > 10000;
         if (!ripCheck)
             return false;
 
