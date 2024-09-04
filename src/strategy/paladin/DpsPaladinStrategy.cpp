@@ -83,18 +83,20 @@ DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrat
 NextAction** DpsPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0,
-                             new NextAction("crusader strike", ACTION_DEFAULT + 0.6f),
-                             new NextAction("hammer of wrath", ACTION_DEFAULT + 0.5f),
+                             new NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
+                             new NextAction("crusader strike", ACTION_DEFAULT + 0.5f),
                              new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.4f),
                              new NextAction("divine storm", ACTION_DEFAULT + 0.3f),
                              new NextAction("consecration", ACTION_DEFAULT + 0.1f),
-                             new NextAction("melee", ACTION_DEFAULT), NULL);
+                             new NextAction("melee", ACTION_DEFAULT), nullptr);
 }
 
 void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
+    // triggers.push_back(new TriggerNode(
+    //     "enough mana", NextAction::array(0, new NextAction("consecration", ACTION_DEFAULT + 0.2f), nullptr)));
     triggers.push_back(
         new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_DEFAULT + 0.2f), nullptr)));
     triggers.push_back(
