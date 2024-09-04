@@ -45,7 +45,7 @@ NextAction** DpsHunterStrategy::getDefaultActions()
         new NextAction("explosive shot", ACTION_DEFAULT + 0.6f), new NextAction("aimed shot", ACTION_DEFAULT + 0.5f),
         new NextAction("silencing shot", ACTION_DEFAULT + 0.4f),
         new NextAction("kill command", ACTION_DEFAULT + 0.3f),
-        new NextAction("arcane shot", ACTION_DEFAULT + 0.2f),
+        // new NextAction("arcane shot", ACTION_DEFAULT + 0.2f),
         new NextAction("steady shot", ACTION_DEFAULT + 0.1f),
         new NextAction("auto shot", ACTION_DEFAULT), nullptr);
 }

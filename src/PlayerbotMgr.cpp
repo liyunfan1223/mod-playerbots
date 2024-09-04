@@ -724,14 +724,14 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
                                         sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
                 PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
                 factory.Randomize(false);
-                return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) +
+                return "ok, gear score limit: " + std::to_string(mixedGearScore / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) +
                        "(for epic)";
             }
             else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
             {
                 PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
                 factory.Randomize(false);
-                return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
+                return "ok, gear score limit: " + std::to_string(gs / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) + "(for epic)";
             }
         }
 
