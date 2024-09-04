@@ -48,6 +48,7 @@ private:
     bool NotBestArmorType(uint32 item_subclass_armor);
 
     void ApplyOverflowPenalty(Player* player);
+    void ApplyWeightFinetune(Player* player);
     CollectorType GetHitOverflowType(Player* player);
 
 private:

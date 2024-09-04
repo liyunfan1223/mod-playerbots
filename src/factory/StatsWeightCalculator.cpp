@@ -108,6 +108,7 @@ void StatsWeightCalculator::GenerateWeights(Player* player)
 {
     GenerateBasicWeights(player);
     GenerateAdditionalWeights(player);
+    ApplyWeightFinetune(player);
 }
 
 void StatsWeightCalculator::GenerateBasicWeights(Player* player)
@@ -458,7 +459,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
             weight_ *= 0.1;
         }
         // fury with titan's grip
-        if ((!isDoubleHand || proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM) &&
+        if ((!isDoubleHand || proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || proto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF) &&
             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && player_->CanTitanGrip()))
         {
             weight_ *= 0.1;
@@ -596,6 +597,19 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
                 validPoints = 0;
 
             collector_->stats[STATS_TYPE_ARMOR_PENETRATION] = std::min(collector_->stats[STATS_TYPE_ARMOR_PENETRATION], (int)validPoints);
+        }
+    }
+}
+
+void StatsWeightCalculator::ApplyWeightFinetune(Player* player)
+{
+    {
+        if (type_ == CollectorType::MELEE || type_ == CollectorType::RANGED)
+        {
+            float armor_penetration_current, armor_penetration_overflow;
+            armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
+            if (armor_penetration_current > 50)
+                stats_weights_[STATS_TYPE_ARMOR_PENETRATION] *= 1.2f;
         }
     }
 }
