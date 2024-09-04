@@ -216,6 +216,9 @@ AiPlayerbot.AutoEquipUpgradeLoot = 1
 # Default: 1.1 (Equip when the equipment score is 1.1 times higher than the current)
 AiPlayerbot.EquipUpgradeThreshold = 1.1
 
+# Two rounds of equipment initialization to create more suitable gear
+AiPlayerbot.TwoRoundsGearInit = 0
+
 #
 #
 #

@@ -271,6 +271,7 @@ public:
     std::string autoPickReward;
     bool autoEquipUpgradeLoot;
     float equipUpgradeThreshold;
+    bool twoRoundsGearInit;
     bool syncQuestWithPlayer;
     bool syncQuestForPlayer;
     std::string autoTrainSpells;
