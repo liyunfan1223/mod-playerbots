@@ -58,6 +58,9 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId)
 
     collector_->CollectItemStats(proto);
 
+    if (enable_overflow_penalty_)
+        ApplyOverflowPenalty(player_);
+
     GenerateWeights(player_);
     for (uint32 i = 0; i < STATS_TYPE_MAX; i++)
     {
@@ -89,6 +92,9 @@ float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
 
     collector_->CollectEnchantStats(enchant);
 
+    if (enable_overflow_penalty_)
+        ApplyOverflowPenalty(player_);
+
     GenerateWeights(player_);
     for (uint32 i = 0; i < STATS_TYPE_MAX; i++)
     {
@@ -102,9 +108,6 @@ void StatsWeightCalculator::GenerateWeights(Player* player)
 {
     GenerateBasicWeights(player);
     GenerateAdditionalWeights(player);
-
-    if (enable_overflow_penalty_)
-        ApplyOverflowPenalty(player);
 }
 
 void StatsWeightCalculator::GenerateBasicWeights(Player* player)
@@ -219,15 +222,15 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     }
     else if (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION)  // retribution
     {
-        stats_weights_[STATS_TYPE_AGILITY] += 1.1f;
+        stats_weights_[STATS_TYPE_AGILITY] += 1.3f;
         stats_weights_[STATS_TYPE_STRENGTH] += 2.5f;
         stats_weights_[STATS_TYPE_INTELLECT] += 0.15f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
         stats_weights_[STATS_TYPE_SPELL_POWER] += 0.3f;
-        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 0.5f;
+        stats_weights_[STATS_TYPE_ARMOR_PENETRATION] += 0.7f;
         stats_weights_[STATS_TYPE_HIT] += 1.9f;
-        stats_weights_[STATS_TYPE_CRIT] += 1.2f;
-        stats_weights_[STATS_TYPE_HASTE] += 1.3f;
+        stats_weights_[STATS_TYPE_CRIT] += 1.3f;
+        stats_weights_[STATS_TYPE_HASTE] += 1.2f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
     }
@@ -414,12 +417,12 @@ void StatsWeightCalculator::CalculateSocketBonus(Player* player, ItemTemplate co
 
 void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
 {
-    // penalty for different type armor
-    if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass >= ITEM_SUBCLASS_ARMOR_CLOTH &&
-        proto->SubClass <= ITEM_SUBCLASS_ARMOR_PLATE && NotBestArmorType(proto->SubClass))
-    {
-        weight_ *= 0.8;
-    }
+    // // penalty for different type armor
+    // if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass >= ITEM_SUBCLASS_ARMOR_CLOTH &&
+    //     proto->SubClass <= ITEM_SUBCLASS_ARMOR_PLATE && NotBestArmorType(proto->SubClass))
+    // {
+    //     weight_ *= 1.0;
+    // }
     // double hand
     if (proto->Class == ITEM_CLASS_WEAPON)
     {
@@ -444,7 +447,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         }
         // spec with double hand
         // fury without duel wield, arms, bear, retribution, blood dk
-        if (isDoubleHand &&
+        if (!isDoubleHand &&
             ((cls == CLASS_HUNTER && !player_->CanDualWield()) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanDualWield()) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL) ||
@@ -452,13 +455,13 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
              (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_BLOOD) ||
              (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && !player_->CanDualWield())))
         {
-            weight_ *= 10;
+            weight_ *= 0.1;
         }
         // fury with titan's grip
-        if (isDoubleHand && proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+        if ((!isDoubleHand || proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM) &&
             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && player_->CanTitanGrip()))
         {
-            weight_ *= 10;
+            weight_ *= 0.1;
         }
     }
     if (proto->Class == ITEM_CLASS_WEAPON)
@@ -481,6 +484,9 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         {
             weight_ *= 1.1;
         }
+        bool slowDelay = proto->Delay > 2500;
+        if (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && slowDelay)
+            weight_ *= 1.1;
     }
 }
 
@@ -505,37 +511,57 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
 {
     {
         float hit_current, hit_overflow;
-        if (type_ == CollectorType::SPELL)
+        float validPoints;
+        // m_modMeleeHitChance = (float)GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+        // m_modMeleeHitChance += GetRatingBonusValue(CR_HIT_MELEE);
+        if (GetHitOverflowType(player) == CollectorType::SPELL)
         {
-            hit_current = player->GetRatingBonusValue(CR_HIT_SPELL);
+            hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+            hit_current += player->GetRatingBonusValue(CR_HIT_SPELL);
             hit_overflow = SPELL_HIT_OVERFLOW;
+            if (hit_overflow > hit_current)
+                validPoints = (hit_overflow - hit_current) / player->GetRatingMultiplier(CR_HIT_SPELL);
+            else
+                validPoints = 0;
         }
-        else if (type_ == CollectorType::MELEE)
+        else if (GetHitOverflowType(player) == CollectorType::MELEE)
         {
-            hit_current = player->GetRatingBonusValue(CR_HIT_MELEE);
+            hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+            hit_current += player->GetRatingBonusValue(CR_HIT_MELEE);
             hit_overflow = MELEE_HIT_OVERFLOW;
+            if (hit_overflow > hit_current)
+                validPoints = (hit_overflow - hit_current) / player->GetRatingMultiplier(CR_HIT_MELEE);
+            else
+                validPoints = 0;
         }
         else
         {
-            hit_current = player->GetRatingBonusValue(CR_HIT_RANGED);
+            hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+            hit_current += player->GetRatingBonusValue(CR_HIT_RANGED);
             hit_overflow = RANGED_HIT_OVERFLOW;
+            if (hit_overflow > hit_current)
+                validPoints = (hit_overflow - hit_current) / player->GetRatingMultiplier(CR_HIT_RANGED);
+            else
+                validPoints = 0;
         }
-        if (hit_current >= hit_overflow)
-            stats_weights_[STATS_TYPE_HIT] = 0.0f;
-        else if (hit_current >= hit_overflow * 0.8)
-            stats_weights_[STATS_TYPE_HIT] /= 1.5;
+        collector_->stats[STATS_TYPE_HIT] = std::min(collector_->stats[STATS_TYPE_HIT], (int)validPoints);
     }
 
     {
         if (type_ == CollectorType::MELEE)
         {
             float expertise_current, expertise_overflow;
-            expertise_current = player->GetRatingBonusValue(CR_EXPERTISE);
+            expertise_current = player->GetUInt32Value(PLAYER_EXPERTISE);
+            expertise_current += player->GetRatingBonusValue(CR_EXPERTISE);
             expertise_overflow = EXPERTISE_OVERFLOW;
-            if (expertise_current >= expertise_overflow)
-                stats_weights_[STATS_TYPE_EXPERTISE] = 0.0f;
-            else if (expertise_current >= expertise_overflow * 0.8)
-                stats_weights_[STATS_TYPE_EXPERTISE] /= 1.5;
+
+            float validPoints;
+            if (expertise_overflow > expertise_current)
+                validPoints = (expertise_overflow - expertise_current) / player->GetRatingMultiplier(CR_EXPERTISE);
+            else
+                validPoints = 0;
+
+            collector_->stats[STATS_TYPE_EXPERTISE] = std::min(collector_->stats[STATS_TYPE_EXPERTISE], (int)validPoints);
         }
     }
 
@@ -545,10 +571,14 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
             float defense_current, defense_overflow;
             defense_current = player->GetRatingBonusValue(CR_DEFENSE_SKILL);
             defense_overflow = DEFENSE_OVERFLOW;
-            if (defense_current >= defense_overflow)
-                stats_weights_[STATS_TYPE_DEFENSE] /= 2;
-            else if (defense_current >= defense_overflow * 0.8)
-                stats_weights_[STATS_TYPE_DEFENSE] /= 1.5;
+
+            float validPoints;
+            if (defense_overflow > defense_current)
+                validPoints = (defense_overflow - defense_current) / player->GetRatingMultiplier(CR_DEFENSE_SKILL);
+            else
+                validPoints = 0;
+
+            collector_->stats[STATS_TYPE_DEFENSE] = std::min(collector_->stats[STATS_TYPE_DEFENSE], (int)validPoints);
         }
     }
 
@@ -558,10 +588,29 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
             float armor_penetration_current, armor_penetration_overflow;
             armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
             armor_penetration_overflow = ARMOR_PENETRATION_OVERFLOW;
-            if (armor_penetration_current >= armor_penetration_overflow)
-                stats_weights_[STATS_TYPE_ARMOR_PENETRATION] = 0.0f;
-            if (armor_penetration_current >= armor_penetration_overflow * 0.8)
-                stats_weights_[STATS_TYPE_ARMOR_PENETRATION] /= 1.5;
+
+            float validPoints;
+            if (armor_penetration_overflow > armor_penetration_current)
+                validPoints = (armor_penetration_overflow - armor_penetration_current) / player->GetRatingMultiplier(CR_ARMOR_PENETRATION);
+            else
+                validPoints = 0;
+
+            collector_->stats[STATS_TYPE_ARMOR_PENETRATION] = std::min(collector_->stats[STATS_TYPE_ARMOR_PENETRATION], (int)validPoints);
         }
     }
 }
+
+CollectorType StatsWeightCalculator::GetHitOverflowType(Player* player)
+{
+    cls = player->getClass();
+    tab = AiFactory::GetPlayerSpecTab(player);
+    if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_UNHOLY)
+        return CollectorType::SPELL;
+    if (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT)
+        return CollectorType::SPELL;
+    if (cls == CLASS_ROGUE)
+        return CollectorType::SPELL;
+
+    return type_;
+}
+   
