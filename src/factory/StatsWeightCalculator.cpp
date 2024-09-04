@@ -32,6 +32,15 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
     cls = player->getClass();
     tab = AiFactory::GetPlayerSpecTab(player);
 
+    if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_UNHOLY)
+        hitOverflowType_ = CollectorType::SPELL;
+    else if (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT)
+        hitOverflowType_ = CollectorType::SPELL;
+    else if (cls == CLASS_ROGUE)
+        hitOverflowType_ = CollectorType::SPELL;
+    else
+        hitOverflowType_ = type_;
+
     enable_overflow_penalty_ = true;
     enable_item_set_bonus_ = true;
     enable_quality_blend_ = true;
@@ -515,7 +524,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
         float validPoints;
         // m_modMeleeHitChance = (float)GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
         // m_modMeleeHitChance += GetRatingBonusValue(CR_HIT_MELEE);
-        if (GetHitOverflowType(player) == CollectorType::SPELL)
+        if (hitOverflowType_ == CollectorType::SPELL)
         {
             hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
             hit_current += player->GetRatingBonusValue(CR_HIT_SPELL);
@@ -525,7 +534,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
             else
                 validPoints = 0;
         }
-        else if (GetHitOverflowType(player) == CollectorType::MELEE)
+        else if (hitOverflowType_ == CollectorType::MELEE)
         {
             hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
             hit_current += player->GetRatingBonusValue(CR_HIT_MELEE);
@@ -613,18 +622,3 @@ void StatsWeightCalculator::ApplyWeightFinetune(Player* player)
         }
     }
 }
-
-CollectorType StatsWeightCalculator::GetHitOverflowType(Player* player)
-{
-    cls = player->getClass();
-    tab = AiFactory::GetPlayerSpecTab(player);
-    if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_UNHOLY)
-        return CollectorType::SPELL;
-    if (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT)
-        return CollectorType::SPELL;
-    if (cls == CLASS_ROGUE)
-        return CollectorType::SPELL;
-
-    return type_;
-}
-   

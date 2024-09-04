@@ -49,11 +49,11 @@ private:
 
     void ApplyOverflowPenalty(Player* player);
     void ApplyWeightFinetune(Player* player);
-    CollectorType GetHitOverflowType(Player* player);
 
 private:
     Player* player_;
     CollectorType type_;
+    CollectorType hitOverflowType_;
     std::unique_ptr<StatsCollector> collector_;
     uint8 cls;
     int tab;
