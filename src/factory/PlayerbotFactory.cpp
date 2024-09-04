@@ -39,6 +39,7 @@
 
 #define PLAYER_SKILL_INDEX(x) (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 
+const uint64 diveMask = (1LL << 7) | (1LL << 44) | (1LL << 37) | (1LL << 38) | (1LL << 26) | (1LL << 30) | (1LL << 27) | (1LL << 33) | (1LL << 24) | (1LL << 34);
 uint32 PlayerbotFactory::tradeSkills[] = {SKILL_ALCHEMY,        SKILL_ENCHANTING,  SKILL_SKINNING,  SKILL_TAILORING,
                                           SKILL_LEATHERWORKING, SKILL_ENGINEERING, SKILL_HERBALISM, SKILL_MINING,
                                           SKILL_BLACKSMITHING,  SKILL_COOKING,     SKILL_FIRST_AID, SKILL_FISHING,
@@ -611,8 +612,10 @@ void PlayerbotFactory::InitPetTalents()
         // pet_family->petTalentType);
         return;
     }
-    // pet->resetTalents();
     std::unordered_map<uint32, std::vector<TalentEntry const*>> spells;
+    bool diveTypePet = (1LL << ci->family) & diveMask;
+    LOG_INFO("playerbots", "DIVEMASK:{}", diveMask);
+
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
@@ -624,49 +627,112 @@ void PlayerbotFactory::InitPetTalents()
         // prevent learn talent for different family (cheating)
         if (!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
             continue;
-
+        bool diveClass = talentInfo->TalentID == 2201 || talentInfo->TalentID == 2208 || talentInfo->TalentID == 2219 || talentInfo->TalentID == 2203;
+        if (diveClass && !diveTypePet)
+            continue;
+        bool dashClass = talentInfo->TalentID == 2119 || talentInfo->TalentID == 2207 || talentInfo->TalentID == 2111 || talentInfo->TalentID == 2109;
+        if (dashClass && diveTypePet)
+            continue;
         spells[talentInfo->Row].push_back(talentInfo);
     }
 
-    uint32 curTalentPoints = pet->GetFreeTalentPoints();
+    std::vector<std::vector<uint32>> order = sPlayerbotAIConfig->parsedHunterPetLinkOrder[pet_family->petTalentType][20];
     uint32 maxTalentPoints = pet->GetMaxTalentPointsForLevel(pet->GetLevel());
-    int row = 0;
-    // LOG_INFO("playerbots", "{} learning, max talent points: {}, cur: {}", bot->GetName().c_str(), maxTalentPoints,
-    // curTalentPoints);
-    for (auto i = spells.begin(); i != spells.end(); ++i, ++row)
-    {
-        std::vector<TalentEntry const*>& spells_row = i->second;
-        if (spells_row.empty())
-        {
-            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(), i->first);
-            continue;
-        }
-        int attemptCount = 0;
-        // keep learning for the last row
-        while (!spells_row.empty() &&
-               ((((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * (row + 1)) || (row == 5)) &&
-               attemptCount++ < 10 && pet->GetFreeTalentPoints())
-        {
-            int index = urand(0, spells_row.size() - 1);
-            TalentEntry const* talentInfo = spells_row[index];
-            int maxRank = 0;
-            for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints()); ++rank)
-            {
-                uint32 spellId = talentInfo->RankID[rank];
-                if (!spellId)
-                    continue;
 
-                maxRank = rank;
-            }
-            // LOG_INFO("playerbots", "{} learn pet talent {}({})", bot->GetName().c_str(), talentInfo->TalentID,
-            // maxRank);
-            if (talentInfo->DependsOn)
+    if (order.empty())
+    {
+        int row = 0;
+        for (auto i = spells.begin(); i != spells.end(); ++i, ++row)
+        {
+            std::vector<TalentEntry const*>& spells_row = i->second;
+            if (spells_row.empty())
             {
-                bot->LearnPetTalent(pet->GetGUID(), talentInfo->DependsOn,
-                                    std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName().c_str(), i->first);
+                continue;
             }
-            bot->LearnPetTalent(pet->GetGUID(), talentInfo->TalentID, maxRank);
-            spells_row.erase(spells_row.begin() + index);
+            int attemptCount = 0;
+            // keep learning for the last row
+            while (!spells_row.empty() &&
+                ((((int)maxTalentPoints - (int)pet->GetFreeTalentPoints()) < 3 * (row + 1)) || (row == 5)) &&
+                attemptCount++ < 10 && pet->GetFreeTalentPoints())
+            {
+                int index = urand(0, spells_row.size() - 1);
+                TalentEntry const* talentInfo = spells_row[index];
+                int maxRank = 0;
+                for (int rank = 0; rank < std::min((uint32)MAX_TALENT_RANK, (uint32)pet->GetFreeTalentPoints()); ++rank)
+                {
+                    uint32 spellId = talentInfo->RankID[rank];
+                    if (!spellId)
+                        continue;
+
+                    maxRank = rank;
+                }
+                // LOG_INFO("playerbots", "{} learn pet talent {}({})", bot->GetName().c_str(), talentInfo->TalentID,
+                // maxRank);
+                if (talentInfo->DependsOn)
+                {
+                    bot->LearnPetTalent(pet->GetGUID(), talentInfo->DependsOn,
+                                        std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                }
+                bot->LearnPetTalent(pet->GetGUID(), talentInfo->TalentID, maxRank);
+                spells_row.erase(spells_row.begin() + index);
+            }
+        }
+    }
+    else
+    {
+        uint32 spec = pet_family->petTalentType;
+        uint32 startPoints = pet->GetMaxTalentPointsForLevel(pet->GetLevel());
+        while (startPoints > 1 && startPoints < 20 &&
+            sPlayerbotAIConfig->parsedHunterPetLinkOrder[spec][startPoints].size() == 0)
+        {
+            startPoints--;
+        }
+
+        for (uint32 points = startPoints; points <= 20; points++)
+        {
+            if (sPlayerbotAIConfig->parsedHunterPetLinkOrder[spec][points].size() == 0)
+                continue;
+            for (std::vector<uint32>& p : sPlayerbotAIConfig->parsedHunterPetLinkOrder[spec][points])
+            {
+                uint32 row = p[0], col = p[1], lvl = p[2];
+                uint32 talentID = 0;
+                uint32 learnLevel = 0;
+                std::vector<TalentEntry const*>& spell = spells[row];
+                for (TalentEntry const* talentInfo : spell)
+                {
+                    if (talentInfo->Col != col)
+                    {
+                        continue;
+                    }
+                    if (talentInfo->DependsOn)
+                    {
+                        bot->LearnPetTalent(pet->GetGUID(),talentInfo->DependsOn,
+                                            std::min(talentInfo->DependsOnRank, bot->GetFreeTalentPoints() - 1));
+                    }
+                    talentID = talentInfo->TalentID;
+
+                    uint32 currentTalentRank = 0;
+                    for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
+                    {
+                        if (talentInfo->RankID[rank] && pet->HasSpell(talentInfo->RankID[rank]))
+                        {
+                            currentTalentRank = rank + 1;
+                            break;
+                        }
+                    }
+                    learnLevel = std::min(lvl, pet->GetFreeTalentPoints() + currentTalentRank) - 1;
+                }
+                bot->LearnPetTalent(pet->GetGUID(), talentID, learnLevel);
+                if (pet->GetFreeTalentPoints() == 0)
+                {
+                    break;
+                }
+            }
+            if (pet->GetFreeTalentPoints() == 0)
+            {
+                break;
+            }
         }
     }
     bot->SendTalentsInfoData(true);
@@ -1467,6 +1533,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
     else if (blevel == 80)
         delta = 9;
 
+    StatsWeightCalculator calculator(bot);
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
@@ -1483,6 +1550,18 @@ void PlayerbotFactory::InitEquipment(bool incremental)
 
         if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
             continue;
+
+        Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+
+        if (!incremental && oldItem)
+        {
+            continue;
+        }
+
+        if (oldItem)
+        {
+            bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+        }
 
         uint32 desiredQuality = itemQuality;
         if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
@@ -1555,41 +1634,19 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                     break;
             }
         } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_NORMAL);
-    }
-
-    StatsWeightCalculator calculator(bot);
-    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
-    {
-        if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
-            continue;
-
-        if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
-            continue;
-
-        if (level < 25 && slot == EQUIPMENT_SLOT_NECK)
-            continue;
-
-        if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
-            continue;
 
         std::vector<uint32>& ids = items[slot];
         if (ids.empty())
         {
             continue;
         }
-        Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-
-        if (incremental && !IsDesiredReplacement(oldItem))
-        {
-            continue;
-        }
-
+        
         float bestScoreForSlot = -1;
         uint32 bestItemForSlot = 0;
         for (int index = 0; index < ids.size(); index++)
         {
             uint32 skipProb = 25;
-            if (urand(0, 100) <= skipProb)
+            if (urand(1, 100) <= skipProb)
                 continue;
             
             uint32 newItemId = ids[index];
@@ -1599,9 +1656,6 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             ItemTemplate const* proto = sObjectMgr->GetItemTemplate(newItemId);
 
             if (!CanEquipItem(proto))
-                continue;
-
-            if (oldItem && oldItem->GetTemplate()->ItemId == newItemId)
                 continue;
 
             if (!CanEquipUnseenItem(slot, dest, newItemId))
@@ -1618,10 +1672,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         {
             continue;
         }
-        if (oldItem)
-        {
-            bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
-        }
+        
         uint16 dest;
         if (!CanEquipUnseenItem(slot, dest, bestItemForSlot))
         {
@@ -1632,10 +1683,28 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         {
             newItem->AddToWorld();
             newItem->AddToUpdateQueueOf(bot);
-            // bot->AutoUnequipOffhandIfNeed();
-            // EnchantItem(newItem);
         }
     }
+    // secondary init for better equips
+    if (!incremental)
+        InitEquipment(true);
+    
+    // for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+    // {
+    //     if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+    //         continue;
+
+    //     if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
+    //         continue;
+
+    //     if (level < 25 && slot == EQUIPMENT_SLOT_NECK)
+    //         continue;
+
+    //     if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
+    //         continue;
+
+        
+    // }
 }
 
 bool PlayerbotFactory::IsDesiredReplacement(Item* item)
@@ -3818,7 +3887,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 if (!gemProperties)
                     continue;
 
-                if ((socketColor & gemProperties->color) == 0)
+                if ((socketColor & gemProperties->color) == 0 && gemProperties->color == 1) // meta socket
                     continue;
 
                 uint32 enchant_id = gemProperties->spellitemenchantement;
@@ -3829,6 +3898,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 StatsWeightCalculator calculator(bot);
                 float score = calculator.CalculateEnchant(enchant_id);
                 if (curCount[0] != 0)
+                {
                     // Ensure meta gem activation
                     for (int i = 1; i < curCount.size(); i++)
                     {
@@ -3838,6 +3908,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                             break;
                         }
                     }
+                }
+                if (socketColor & gemProperties->color)
+                    score *= 1.2;
                 if (score > bestGemScore)
                 {
                     enchantIdChosen = enchant_id;

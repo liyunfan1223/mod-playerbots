@@ -195,7 +195,9 @@ public:
     std::string premadeSpecGlyph[MAX_CLASSES][MAX_SPECNO];
     std::vector<uint32> parsedSpecGlyph[MAX_CLASSES][MAX_SPECNO];
     std::string premadeSpecLink[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+    std::string premadeHunterPetLink[3][21];
     std::vector<std::vector<uint32>> parsedSpecLinkOrder[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+    std::vector<std::vector<uint32>> parsedHunterPetLinkOrder[3][21];
     uint32 randomClassSpecProb[MAX_CLASSES][MAX_SPECNO];
     uint32 randomClassSpecIndex[MAX_CLASSES][MAX_SPECNO];
 
@@ -325,6 +327,7 @@ public:
 
     void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
     static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
+    static std::vector<std::vector<uint32>> ParseTempPetTalentsOrder(uint32 spec, std::string temp_talents_order);
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

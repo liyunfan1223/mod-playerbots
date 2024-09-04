@@ -331,6 +331,17 @@ bool PlayerbotAIConfig::Initialize()
                 parsedSpecLinkOrder[cls][spec][level] = ParseTempTalentsOrder(cls, premadeSpecLink[cls][spec][level]);
             }
         }
+        for (uint32 spec = 0; spec < 3; ++spec)
+        {
+            for (uint32 points = 0; points < 21; ++points)
+            {
+                std::ostringstream os;
+                os << "AiPlayerbot.PremadeHunterPetLink." << spec << "." << points;
+                premadeHunterPetLink[spec][points] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
+                parsedHunterPetLinkOrder[spec][points] =
+                    ParseTempPetTalentsOrder(spec, premadeHunterPetLink[spec][points]);
+            }
+        }
         for (uint32 spec = 0; spec < MAX_SPECNO; ++spec)
         {
             std::ostringstream os;
@@ -486,7 +497,7 @@ bool PlayerbotAIConfig::Initialize()
     RandomPlayerbotFactory::CreateRandomBots();
     if (sPlayerbotAIConfig->addClassCommand)
         sRandomPlayerbotMgr->PrepareAddclassCache();
-    
+
     if (World::IsStopped())
     {
         return true;
@@ -759,4 +770,48 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
         res.insert(res.end(), order.begin(), order.end());
     }
     return res;
+}
+
+std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempPetTalentsOrder(uint32 spec, std::string tab_link)
+{
+    // check bad link
+    // uint32 classMask = 1 << (cls - 1);
+    std::vector<TalentEntry const*> spells;
+    std::vector<std::vector<uint32>> orders;
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    {
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
+        if (!talentInfo)
+            continue;
+
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+        if (!talentTabInfo)
+            continue;
+
+        if (!((1 << spec) & talentTabInfo->petTalentMask))
+            continue;
+        // skip some duplicate spells like dash/dive
+        if (talentInfo->TalentID == 2201 || talentInfo->TalentID == 2208 || talentInfo->TalentID == 2219 || talentInfo->TalentID == 2203)
+            continue;
+        
+        spells.push_back(talentInfo);
+    }
+    std::sort(spells.begin(), spells.end(),
+              [&](TalentEntry const* lhs, TalentEntry const* rhs)
+              { return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col; });
+    for (int i = 0; i < tab_link.size(); i++)
+    {
+        if (i >= spells.size())
+        {
+            break;
+        }
+        int lvl = tab_link[i] - '0';
+        if (lvl == 0)
+            continue;
+        orders.push_back({spells[i]->Row, spells[i]->Col, (uint32)lvl});
+    }
+    // sort by talent tab size
+    std::sort(orders.begin(), orders.end(), [&](auto& lhs, auto& rhs) { return lhs.size() > rhs.size(); });
+
+    return orders;
 }
