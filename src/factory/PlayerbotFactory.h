@@ -122,7 +122,7 @@ public:
     static void InitTalentsByParsedSpecLink(Player* bot, std::vector<std::vector<uint32>> parsedSpecLink, bool reset);
     void InitAvailableSpells();
     void InitClassSpells();
-    void InitEquipment(bool incremental);
+    void InitEquipment(bool incremental, bool second_chance = false);
     void InitPet();
     void InitAmmo();
     static uint32 CalcMixedGearScore(uint32 gs, uint32 quality);

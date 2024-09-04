@@ -614,7 +614,6 @@ void PlayerbotFactory::InitPetTalents()
     }
     std::unordered_map<uint32, std::vector<TalentEntry const*>> spells;
     bool diveTypePet = (1LL << ci->family) & diveMask;
-    LOG_INFO("playerbots", "DIVEMASK:{}", diveMask);
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
@@ -1513,7 +1512,7 @@ void Shuffle(std::vector<uint32>& items)
 //     }
 // }
 
-void PlayerbotFactory::InitEquipment(bool incremental)
+void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 {
     std::unordered_map<uint8, std::vector<uint32>> items;
     // int tab = AiFactory::GetPlayerSpecTab(bot);
@@ -1553,15 +1552,12 @@ void PlayerbotFactory::InitEquipment(bool incremental)
 
         Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
-        if (!incremental && oldItem)
-        {
-            continue;
-        }
-
-        if (oldItem)
+        if (second_chance && oldItem)
         {
             bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
         }
+
+        oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
         uint32 desiredQuality = itemQuality;
         if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
@@ -1668,17 +1664,38 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                 bestItemForSlot = newItemId;
             }
         }
+
         if (bestItemForSlot == 0)
         {
             continue;
         }
-        
         uint16 dest;
         if (!CanEquipUnseenItem(slot, dest, bestItemForSlot))
         {
             continue;
         }
+        
+        if (incremental && oldItem)
+        {
+            float old_score = calculator.CalculateItem(oldItem->GetEntry());
+            if (bestScoreForSlot < 1.2f * old_score)
+                continue;
+        }
+
+        if (oldItem)
+        {
+            uint8 bagIndex = oldItem->GetBagSlot();
+            uint8 slot = oldItem->GetSlot();
+            uint8 dstBag = NULL_BAG;
+
+            WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
+            packet << bagIndex << slot << dstBag;
+            bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
+        }
+        
         Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
+        bot->AutoUnequipOffhandIfNeed();
+        // bot->AutoUnequipOffhandIfNeed();
         if (newItem)
         {
             newItem->AddToWorld();
@@ -1686,25 +1703,10 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
     }
     // secondary init for better equips
-    if (!incremental)
-        InitEquipment(true);
+    if (!incremental && !second_chance)
+        InitEquipment(incremental, true);
     
-    // for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
-    // {
-    //     if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
-    //         continue;
 
-    //     if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
-    //         continue;
-
-    //     if (level < 25 && slot == EQUIPMENT_SLOT_NECK)
-    //         continue;
-
-    //     if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
-    //         continue;
-
-        
-    // }
 }
 
 bool PlayerbotFactory::IsDesiredReplacement(Item* item)
@@ -1978,7 +1980,7 @@ bool PlayerbotFactory::CanEquipUnseenItem(uint8 slot, uint16& dest, uint32 item)
 
     if (Item* pItem = Item::CreateItem(item, 1, bot, false, 0, true))
     {
-        InventoryResult result = bot->CanEquipItem(slot, dest, pItem, true, false);
+        InventoryResult result = botAI->CanEquipItem(slot, dest, pItem, true, true);
         pItem->RemoveFromUpdateQueueOf(bot);
         delete pItem;
         return result == EQUIP_ERR_OK;

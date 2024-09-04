@@ -845,6 +845,22 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strncmp(cmd, "initself=", 9))
     {
+        if (!strcmp(cmd, "initself=uncommon"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_UNCOMMON);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
         if (!strcmp(cmd, "initself=rare"))
         {
             if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
@@ -867,6 +883,22 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             {
                 // OnBotLogin(master);
                 PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        if (!strcmp(cmd, "initself=legendary"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_LEGENDARY);
                 factory.Randomize(false);
                 messages.push_back("initself ok");
                 return messages;
