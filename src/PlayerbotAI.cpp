@@ -1506,6 +1506,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 409:
             strategyName = "mc";
             break;
+        case 509:
+            strategyName = "aq20";
+            break;
         default:
             break;
     }
@@ -1997,6 +2000,10 @@ bool PlayerbotAI::IsDps(Player* player)
             break;
         case CLASS_DRUID:
             if (tab == DRUID_TAB_BALANCE)
+            {
+                return true;
+            }
+            if (tab == DRUID_TAB_FERAL && !IsTank(player))
             {
                 return true;
             }
@@ -2794,8 +2801,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     }
 
     uint32 CastingTime = !spellInfo->IsChanneled() ? spellInfo->CalcCastTime(bot) : spellInfo->GetDuration();
-    bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
-    if ((CastingTime || interruptOnMove) && bot->isMoving())
+    // bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
+    if ((CastingTime || spellInfo->IsAutoRepeatRangedSpell()) && bot->isMoving())
     {
         if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
         {
@@ -4321,7 +4328,7 @@ void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uin
         return;
 
     uint8 type = proto->InventoryType;
-    uint32 level = mixed ? proto->ItemLevel * (1 + proto->Quality) : proto->ItemLevel;
+    uint32 level = mixed ? proto->ItemLevel * PlayerbotAI::GetItemScoreMultiplier(ItemQualities(proto->Quality)) : proto->ItemLevel;
 
     switch (type)
     {
@@ -5176,6 +5183,32 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, std::string const spellname)
     return bcount;
 }
 
+int32 PlayerbotAI::GetNearGroupMemberCount(float dis)
+{
+    int count = 1; // yourself
+    if (Group* group = bot->GetGroup())
+    {
+        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+        {
+            Player* member = gref->GetSource();
+            if (member == bot) // calculated
+                continue;
+
+            if (!member || !member->IsInWorld())
+                continue;
+
+            if (member->GetMapId() != bot->GetMapId())
+                continue;
+            
+            if (member->GetExactDist(bot) > dis)
+                continue;
+
+            count++;
+        }
+    }
+    return count;
+}
+
 bool PlayerbotAI::CanMove()
 {
     // do not allow if not vehicle driver
@@ -5806,4 +5839,33 @@ void PlayerbotAI::PetFollow()
     charmInfo->RemoveStayPosition();
     charmInfo->SetForcedSpell(0);
     charmInfo->SetForcedTargetGUID();
+}
+
+float PlayerbotAI::GetItemScoreMultiplier(ItemQualities quality)
+{
+    switch (quality)
+    {
+        // each quality increase 1.1x
+        case ITEM_QUALITY_POOR:
+            return 1.0f;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            return 1.1f;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            return 1.21f;
+            break;
+        case ITEM_QUALITY_RARE:
+            return 1.331f;
+            break;
+        case ITEM_QUALITY_EPIC:
+            return 1.4641f;
+            break;
+        case ITEM_QUALITY_LEGENDARY:
+            return 1.61051f;
+            break;
+        default:
+            break;
+    }
+    return 1.0f;
 }

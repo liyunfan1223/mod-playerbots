@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
+#include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 
 template <class T>
@@ -93,6 +94,7 @@ bool PlayerbotAIConfig::Initialize()
     almostFullHealth = sConfigMgr->GetOption<int32>("AiPlayerbot.AlmostFullHealth", 85);
     lowMana = sConfigMgr->GetOption<int32>("AiPlayerbot.LowMana", 15);
     mediumMana = sConfigMgr->GetOption<int32>("AiPlayerbot.MediumMana", 40);
+    highMana = sConfigMgr->GetOption<int32>("AiPlayerbot.HighMana", 65);
     autoSaveMana = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoSaveMana", true);
     saveManaThreshold = sConfigMgr->GetOption<int32>("AiPlayerbot.SaveManaThreshold", 60);
     autoAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoAvoidAoe", true);
@@ -329,15 +331,22 @@ bool PlayerbotAIConfig::Initialize()
                 parsedSpecLinkOrder[cls][spec][level] = ParseTempTalentsOrder(cls, premadeSpecLink[cls][spec][level]);
             }
         }
-        for (uint32 spec = 0; spec < 3; ++spec)
+        for (uint32 spec = 0; spec < MAX_SPECNO; ++spec)
         {
             std::ostringstream os;
             os << "AiPlayerbot.RandomClassSpecProb." << cls << "." << spec;
-            randomClassSpecProb[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
+            uint32 def;
+            if (spec <= 1)
+                def = 33;
+            else if (spec == 2)
+                def = 34;
+            else
+                def = 0;
+            randomClassSpecProb[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), def, false);
             os.str("");
             os.clear();
             os << "AiPlayerbot.RandomClassSpecIndex." << cls << "." << spec;
-            randomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), spec + 1);
+            randomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), spec, false);
         }
     }
 
@@ -420,6 +429,7 @@ bool PlayerbotAIConfig::Initialize()
     maxAddedBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBots", 40);
     maxAddedBotsPerClass = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBotsPerClass", 10);
     addClassCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassCommand", 1);
+    addClassAccountPoolSize = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassAccountPoolSize", 50);
     maintenanceCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.MaintenanceCommand", 1);
     autoGearCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearCommand", 1);
     autoGearQualityLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearQualityLimit", 3);
@@ -474,6 +484,9 @@ bool PlayerbotAIConfig::Initialize()
     selfBotLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.SelfBotLevel", 1);
 
     RandomPlayerbotFactory::CreateRandomBots();
+    if (sPlayerbotAIConfig->addClassCommand)
+        sRandomPlayerbotMgr->PrepareAddclassCache();
+    
     if (World::IsStopped())
     {
         return true;

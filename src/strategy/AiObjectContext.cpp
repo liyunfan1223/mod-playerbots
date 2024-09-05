@@ -25,6 +25,8 @@
 #include "raids/naxxramas/RaidNaxxTriggerContext.h"
 #include "raids/moltencore/RaidMcActionContext.h"
 #include "raids/moltencore/RaidMcTriggerContext.h"
+#include "raids/aq20/RaidAq20ActionContext.h"
+#include "raids/aq20/RaidAq20TriggerContext.h"
 
 AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
 {
@@ -41,6 +43,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new RaidNaxxActionContext());
     actionContexts.Add(new RaidUlduarActionContext());
     actionContexts.Add(new RaidMcActionContext());
+    actionContexts.Add(new RaidAq20ActionContext());
 
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
@@ -49,6 +52,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     triggerContexts.Add(new RaidNaxxTriggerContext());
     triggerContexts.Add(new RaidUlduarTriggerContext());
     triggerContexts.Add(new RaidMcTriggerContext());
+    triggerContexts.Add(new RaidAq20TriggerContext());
 
     valueContexts.Add(new ValueContext());
 

@@ -77,8 +77,6 @@ public:
         creators["tricks of the trade on main tank"] = &RogueTriggerFactoryInternal::tricks_of_the_trade_on_main_tank;
         creators["adrenaline rush"] = &RogueTriggerFactoryInternal::adrenaline_rush;
         creators["blade fury"] = &RogueTriggerFactoryInternal::blade_fury;
-        creators["target with combo points almost dead"] =
-            &RogueTriggerFactoryInternal::target_with_combo_points_almost_dead;
     }
 
 private:
@@ -101,10 +99,6 @@ private:
     static Trigger* tricks_of_the_trade_on_main_tank(PlayerbotAI* ai)
     {
         return new TricksOfTheTradeOnMainTankTrigger(ai);
-    }
-    static Trigger* target_with_combo_points_almost_dead(PlayerbotAI* ai)
-    {
-        return new TargetWithComboPointsLowerHealTrigger(ai, 3, 3.0f);
     }
 };
 

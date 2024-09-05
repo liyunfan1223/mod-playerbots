@@ -63,7 +63,7 @@ public:
         tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance, aoeRadius, rpgDistance,
         targetPosRecalcDistance, farDistance, healDistance, aggroDistance;
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
-    uint32 lowMana, mediumMana;
+    uint32 lowMana, mediumMana, highMana;
     bool autoSaveMana;
     uint32 saveManaThreshold;
     bool autoAvoidAoe;
@@ -306,6 +306,7 @@ public:
     float autoInitEquipLevelLimitRatio;
     int32 maxAddedBots, maxAddedBotsPerClass;
     int32 addClassCommand;
+    int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
     int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
 

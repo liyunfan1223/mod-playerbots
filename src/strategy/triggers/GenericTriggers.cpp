@@ -10,6 +10,7 @@
 #include "BattlegroundWS.h"
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
@@ -64,7 +65,7 @@ bool PetAttackTrigger::IsActive()
 
 bool HighManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < 65;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->highMana;
 }
 
 bool AlmostFullManaTrigger::IsActive()
@@ -82,6 +83,19 @@ bool RageAvailable::IsActive() { return AI_VALUE2(uint8, "rage", "self target") 
 bool EnergyAvailable::IsActive() { return AI_VALUE2(uint8, "energy", "self target") >= amount; }
 
 bool ComboPointsAvailableTrigger::IsActive() { return AI_VALUE2(uint8, "combo", "current target") >= amount; }
+
+bool ComboPointsNotFullTrigger::IsActive() { return AI_VALUE2(uint8, "combo", "current target") < amount; }
+
+bool TargetWithComboPointsLowerHealTrigger::IsActive()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target || !target->IsAlive() || !target->IsInWorld())
+    {
+        return false;
+    }
+    return ComboPointsAvailableTrigger::IsActive() &&
+           (target->GetHealth() / AI_VALUE(float, "estimated group dps")) <= lifeTime;
+}
 
 bool LoseAggroTrigger::IsActive() { return !AI_VALUE2(bool, "has aggro", "current target"); }
 
@@ -221,7 +235,7 @@ bool DebuffTrigger::IsActive()
     {
         return false;
     }
-    return BuffTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+    return BuffTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "estimated group dps")) >= needLifeTime;
 }
 
 bool DebuffOnBossTrigger::IsActive()

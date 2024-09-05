@@ -972,7 +972,8 @@ void RandomItemMgr::BuildItemInfoCache()
             strstr(proto->Name1.c_str(), " TEST") || strstr(proto->Name1.c_str(), "2200 ") ||
             strstr(proto->Name1.c_str(), "Deprecated ") || strstr(proto->Name1.c_str(), "Unused ") ||
             strstr(proto->Name1.c_str(), "Monster ") || strstr(proto->Name1.c_str(), "[PH]") ||
-            strstr(proto->Name1.c_str(), "(OLD)") || strstr(proto->Name1.c_str(), "QR"))
+            strstr(proto->Name1.c_str(), "(OLD)") || strstr(proto->Name1.c_str(), "QR") ||
+            strstr(proto->Name1.c_str(), "zzOLD"))
         {
             itemForTest.insert(proto->ItemId);
             continue;

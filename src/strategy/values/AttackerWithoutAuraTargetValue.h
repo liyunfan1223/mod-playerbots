@@ -28,7 +28,9 @@ protected:
 class MeleeAttackerWithoutAuraTargetValue : public AttackerWithoutAuraTargetValue
 {
 public:
-    MeleeAttackerWithoutAuraTargetValue(PlayerbotAI* botAI) : AttackerWithoutAuraTargetValue(botAI, "melee") {}
+    MeleeAttackerWithoutAuraTargetValue(PlayerbotAI* botAI, bool checkArc = true) : AttackerWithoutAuraTargetValue(botAI, "melee"), checkArc(checkArc) {}
+    Unit* Calculate() override;
+    bool checkArc;
 };
 
 #endif

@@ -51,8 +51,8 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell",
     // ACTION_NORMAL + 9), nullptr))); triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new
     // NextAction("flametongue weapon", 23.0f), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "enough mana", NextAction::array(0, new NextAction("chain lightning", ACTION_DEFAULT + 0.1f), nullptr)));
+    // triggers.push_back(new TriggerNode(
+    //     "enough mana", NextAction::array(0, new NextAction("chain lightning", ACTION_DEFAULT + 0.1f), nullptr)));
         
     triggers.push_back(new TriggerNode("main hand weapon no imbue",
                                        NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
@@ -66,7 +66,9 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // shock", 21.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("no fire totem", NextAction::array(0, new NextAction("totem of wrath", 15.0f), NULL)));
-
+    triggers.push_back(new TriggerNode("fire elemental totem",
+                                       NextAction::array(0, new NextAction("fire elemental totem", 32.0f), nullptr)));
+                                       
     triggers.push_back(
         new TriggerNode("medium mana", NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
     

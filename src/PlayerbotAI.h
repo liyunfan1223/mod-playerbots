@@ -469,6 +469,7 @@ public:
     void ImbueItem(Item* item);
     void EnchantItemT(uint32 spellid, uint8 slot);
     uint32 GetBuffedCount(Player* player, std::string const spellname);
+    int32 GetNearGroupMemberCount(float dis = sPlayerbotAIConfig->sightDistance);
 
     virtual bool CanCastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
     virtual bool CastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
@@ -568,6 +569,7 @@ public:
     std::set<uint32> GetAllCurrentQuestIds();
     std::set<uint32> GetCurrentIncompleteQuestIds();
     void PetFollow();
+    static float GetItemScoreMultiplier(ItemQualities quality);
 
 private:
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,

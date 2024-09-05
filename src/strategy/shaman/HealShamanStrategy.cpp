@@ -104,6 +104,11 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("medium mana", NextAction::array(0, new NextAction("mana tide totem", ACTION_HIGH + 5), NULL)));
 
+    triggers.push_back(
+        new TriggerNode("no fire totem", NextAction::array(0, new NextAction("flametongue totem", 7.0f),
+                                                           new NextAction("searing totem", 6.0f), nullptr)));
+    triggers.push_back(new TriggerNode("fire elemental totem",
+                                       NextAction::array(0, new NextAction("fire elemental totem", 32.0f), nullptr)));                                                       
     triggers.push_back(new TriggerNode(
         "party member to heal out of spell range",
         NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), nullptr)));

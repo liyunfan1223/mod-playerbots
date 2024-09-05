@@ -64,6 +64,7 @@ public:
         creators["light energy available"] = &TriggerContext::LightEnergyAvailable;
         creators["medium energy available"] = &TriggerContext::MediumEnergyAvailable;
         creators["high energy available"] = &TriggerContext::HighEnergyAvailable;
+        creators["almost full energy available"] = &TriggerContext::AlmostFullEnergyAvailable;
 
         creators["loot available"] = &TriggerContext::LootAvailable;
         creators["no attackers"] = &TriggerContext::NoAttackers;
@@ -96,6 +97,9 @@ public:
 
         creators["combo points available"] = &TriggerContext::ComboPointsAvailable;
         creators["combo points 3 available"] = &TriggerContext::ComboPoints3Available;
+        creators["target with combo points almost dead"] = &TriggerContext::target_with_combo_points_almost_dead;
+        creators["combo points not full"] = &TriggerContext::ComboPointsNotFull;
+        creators["combo points not full and high energy"] = &TriggerContext::ComboPointsNotFullAndHighEnergy;
 
         creators["medium threat"] = &TriggerContext::MediumThreat;
 
@@ -279,6 +283,7 @@ private:
     static Trigger* LightEnergyAvailable(PlayerbotAI* botAI) { return new LightEnergyAvailableTrigger(botAI); }
     static Trigger* MediumEnergyAvailable(PlayerbotAI* botAI) { return new MediumEnergyAvailableTrigger(botAI); }
     static Trigger* HighEnergyAvailable(PlayerbotAI* botAI) { return new HighEnergyAvailableTrigger(botAI); }
+    static Trigger* AlmostFullEnergyAvailable(PlayerbotAI* botAI) { return new EnergyAvailable(botAI, 90); }
     static Trigger* LootAvailable(PlayerbotAI* botAI) { return new LootAvailableTrigger(botAI); }
     static Trigger* NoAttackers(PlayerbotAI* botAI) { return new NoAttackersTrigger(botAI); }
     static Trigger* TankAssist(PlayerbotAI* botAI) { return new TankAssistTrigger(botAI); }
@@ -309,6 +314,12 @@ private:
     }
     static Trigger* ComboPointsAvailable(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI); }
     static Trigger* ComboPoints3Available(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI, 3); }
+    static Trigger* target_with_combo_points_almost_dead(PlayerbotAI* ai)
+    {
+        return new TargetWithComboPointsLowerHealTrigger(ai, 3, 3.0f);
+    }
+    static Trigger* ComboPointsNotFull(PlayerbotAI* botAI) { return new ComboPointsNotFullTrigger(botAI); }
+    static Trigger* ComboPointsNotFullAndHighEnergy(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "combo points not full", "high energy available"); }
     static Trigger* MediumThreat(PlayerbotAI* botAI) { return new MediumThreatTrigger(botAI); }
     static Trigger* Dead(PlayerbotAI* botAI) { return new DeadTrigger(botAI); }
     static Trigger* corpse_near(PlayerbotAI* botAI) { return new CorpseNearTrigger(botAI); }

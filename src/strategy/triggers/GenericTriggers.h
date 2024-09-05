@@ -113,6 +113,30 @@ public:
     bool IsActive() override;
 };
 
+class TargetWithComboPointsLowerHealTrigger : public ComboPointsAvailableTrigger
+{
+public:
+    TargetWithComboPointsLowerHealTrigger(PlayerbotAI* ai, int32 combo_point = 5, float lifeTime = 8.0f)
+        : ComboPointsAvailableTrigger(ai, combo_point), lifeTime(lifeTime)
+    {
+    }
+    bool IsActive() override;
+
+private:
+    float lifeTime;
+};
+
+class ComboPointsNotFullTrigger : public StatAvailable
+{
+public:
+    ComboPointsNotFullTrigger(PlayerbotAI* botAI, int32 amount = 5, std::string const name = "combo points not full")
+        : StatAvailable(botAI, amount, name)
+    {
+    }
+
+    bool IsActive() override;
+};
+
 class LoseAggroTrigger : public Trigger
 {
 public:

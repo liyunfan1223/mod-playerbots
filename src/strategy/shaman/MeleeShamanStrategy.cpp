@@ -72,11 +72,8 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("flame shock", NextAction::array(0, new NextAction("flame shock", 20.0f), nullptr)));
     triggers.push_back(
-        new TriggerNode("maelstrom weapon", NextAction::array(0, new NextAction("lightning bolt", 25.0f), nullptr)));
-    triggers.push_back(new TriggerNode("not facing target",
-                                       NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), nullptr)));
-    // triggers.push_back(new TriggerNode("enemy too close for melee", NextAction::array(0, new NextAction("move out of
-    // enemy contact", ACTION_NORMAL + 8), nullptr)));
+        new TriggerNode("maelstrom weapon 4", NextAction::array(0, new NextAction("lightning bolt", 25.0f), nullptr)));
+
     triggers.push_back(new TriggerNode(
         "medium aoe", NextAction::array(0, new NextAction("strength of earth totem", ACTION_LIGHT_HEAL), nullptr)));
     triggers.push_back(new TriggerNode(
@@ -86,9 +83,8 @@ void MeleeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "no fire totem",
         NextAction::array(0, new NextAction("reach melee", 23.0f), new NextAction("magma totem", 22.0f), nullptr)));
 
-    triggers.push_back(new TriggerNode("fire elemental totem",
-                                       NextAction::array(0, new NextAction("reach melee", 33.0f),
-                                                         new NextAction("fire elemental totem", 32.0f), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "fire elemental totem", NextAction::array(0, new NextAction("fire elemental totem melee", 32.0f), nullptr)));
 
     triggers.push_back(
         new TriggerNode("no air totem", NextAction::array(0, new NextAction("windfury totem", 20.0f), nullptr)));

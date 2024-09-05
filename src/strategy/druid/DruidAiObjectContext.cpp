@@ -83,6 +83,8 @@ public:
         creators["moonfire"] = &DruidTriggerFactoryInternal::moonfire;
         creators["nature's grasp"] = &DruidTriggerFactoryInternal::natures_grasp;
         creators["tiger's fury"] = &DruidTriggerFactoryInternal::tigers_fury;
+        creators["berserk"] = &DruidTriggerFactoryInternal::berserk;
+        creators["savage roar"] = &DruidTriggerFactoryInternal::savage_roar;
         creators["rake"] = &DruidTriggerFactoryInternal::rake;
         creators["mark of the wild"] = &DruidTriggerFactoryInternal::mark_of_the_wild;
         creators["mark of the wild on party"] = &DruidTriggerFactoryInternal::mark_of_the_wild_on_party;
@@ -101,6 +103,8 @@ public:
         creators["party member remove curse"] = &DruidTriggerFactoryInternal::party_member_remove_curse;
         creators["eclipse (solar) cooldown"] = &DruidTriggerFactoryInternal::eclipse_solar_cooldown;
         creators["eclipse (lunar) cooldown"] = &DruidTriggerFactoryInternal::eclipse_lunar_cooldown;
+        creators["mangle (cat)"] = &DruidTriggerFactoryInternal::mangle_cat;
+        creators["ferocious bite time"] = &DruidTriggerFactoryInternal::ferocious_bite_time;
     }
 
 private:
@@ -117,6 +121,8 @@ private:
     static Trigger* faerie_fire(PlayerbotAI* botAI) { return new FaerieFireTrigger(botAI); }
     static Trigger* natures_grasp(PlayerbotAI* botAI) { return new NaturesGraspTrigger(botAI); }
     static Trigger* tigers_fury(PlayerbotAI* botAI) { return new TigersFuryTrigger(botAI); }
+    static Trigger* berserk(PlayerbotAI* botAI) { return new BerserkTrigger(botAI); }
+    static Trigger* savage_roar(PlayerbotAI* botAI) { return new SavageRoarTrigger(botAI); }
     static Trigger* rake(PlayerbotAI* botAI) { return new RakeTrigger(botAI); }
     static Trigger* mark_of_the_wild(PlayerbotAI* botAI) { return new MarkOfTheWildTrigger(botAI); }
     static Trigger* mark_of_the_wild_on_party(PlayerbotAI* botAI) { return new MarkOfTheWildOnPartyTrigger(botAI); }
@@ -133,6 +139,8 @@ private:
     static Trigger* party_member_remove_curse(PlayerbotAI* ai) { return new DruidPartyMemberRemoveCurseTrigger(ai); }
     static Trigger* eclipse_solar_cooldown(PlayerbotAI* ai) { return new EclipseSolarCooldownTrigger(ai); }
     static Trigger* eclipse_lunar_cooldown(PlayerbotAI* ai) { return new EclipseLunarCooldownTrigger(ai); }
+    static Trigger* mangle_cat(PlayerbotAI* ai) { return new MangleCatTrigger(ai); }
+    static Trigger* ferocious_bite_time(PlayerbotAI* ai) { return new FerociousBiteTimeTrigger(ai); }
 };
 
 class DruidAiObjectContextInternal : public NamedObjectContext<Action>
@@ -174,6 +182,7 @@ public:
         creators["mangle (cat)"] = &DruidAiObjectContextInternal::mangle_cat;
         creators["swipe (cat)"] = &DruidAiObjectContextInternal::swipe_cat;
         creators["rake"] = &DruidAiObjectContextInternal::rake;
+        creators["rake on attacker"] = &DruidAiObjectContextInternal::rake_on_attacker;
         creators["ferocious bite"] = &DruidAiObjectContextInternal::ferocious_bite;
         creators["rip"] = &DruidAiObjectContextInternal::rip;
         creators["cower"] = &DruidAiObjectContextInternal::cower;
@@ -188,6 +197,7 @@ public:
         creators["abolish poison on party"] = &DruidAiObjectContextInternal::abolish_poison_on_party;
         creators["berserk"] = &DruidAiObjectContextInternal::berserk;
         creators["tiger's fury"] = &DruidAiObjectContextInternal::tigers_fury;
+        creators["savage roar"] = &DruidAiObjectContextInternal::savage_roar;
         creators["mark of the wild"] = &DruidAiObjectContextInternal::mark_of_the_wild;
         creators["mark of the wild on party"] = &DruidAiObjectContextInternal::mark_of_the_wild_on_party;
         creators["regrowth"] = &DruidAiObjectContextInternal::regrowth;
@@ -257,6 +267,7 @@ private:
     static Action* mangle_cat(PlayerbotAI* botAI) { return new CastMangleCatAction(botAI); }
     static Action* swipe_cat(PlayerbotAI* botAI) { return new CastSwipeCatAction(botAI); }
     static Action* rake(PlayerbotAI* botAI) { return new CastRakeAction(botAI); }
+    static Action* rake_on_attacker(PlayerbotAI* botAI) { return new CastRakeOnMeleeAttackersAction(botAI); }
     static Action* ferocious_bite(PlayerbotAI* botAI) { return new CastFerociousBiteAction(botAI); }
     static Action* rip(PlayerbotAI* botAI) { return new CastRipAction(botAI); }
     static Action* cower(PlayerbotAI* botAI) { return new CastCowerAction(botAI); }
@@ -271,6 +282,7 @@ private:
     static Action* abolish_poison_on_party(PlayerbotAI* botAI) { return new CastAbolishPoisonOnPartyAction(botAI); }
     static Action* berserk(PlayerbotAI* botAI) { return new CastBerserkAction(botAI); }
     static Action* tigers_fury(PlayerbotAI* botAI) { return new CastTigersFuryAction(botAI); }
+    static Action* savage_roar(PlayerbotAI* botAI) { return new CastSavageRoarAction(botAI); }
     static Action* mark_of_the_wild(PlayerbotAI* botAI) { return new CastMarkOfTheWildAction(botAI); }
     static Action* mark_of_the_wild_on_party(PlayerbotAI* botAI) { return new CastMarkOfTheWildOnPartyAction(botAI); }
     static Action* regrowth(PlayerbotAI* botAI) { return new CastRegrowthAction(botAI); }
