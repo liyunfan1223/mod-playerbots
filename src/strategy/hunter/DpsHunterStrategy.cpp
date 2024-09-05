@@ -41,12 +41,13 @@ DpsHunterStrategy::DpsHunterStrategy(PlayerbotAI* botAI) : GenericHunterStrategy
 NextAction** DpsHunterStrategy::getDefaultActions()
 {
     return NextAction::array(
-        0, new NextAction("kill shot", ACTION_DEFAULT + 0.6f), new NextAction("chimera shot", ACTION_DEFAULT + 0.5f),
-        new NextAction("explosive shot", ACTION_DEFAULT + 0.4f), new NextAction("aimed shot", ACTION_DEFAULT + 0.3f),
-        /*new NextAction("arcane shot", ACTION_DEFAULT + 0.2f),*/ new NextAction("steady shot", ACTION_DEFAULT + 0.1f),
+        0, new NextAction("kill shot", ACTION_DEFAULT + 0.8f), new NextAction("chimera shot", ACTION_DEFAULT + 0.7f),
+        new NextAction("explosive shot", ACTION_DEFAULT + 0.6f), new NextAction("aimed shot", ACTION_DEFAULT + 0.5f),
+        new NextAction("silencing shot", ACTION_DEFAULT + 0.4f),
+        new NextAction("kill command", ACTION_DEFAULT + 0.3f),
+        // new NextAction("arcane shot", ACTION_DEFAULT + 0.2f),
+        new NextAction("steady shot", ACTION_DEFAULT + 0.1f),
         new NextAction("auto shot", ACTION_DEFAULT), nullptr);
-    // return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new
-    // NextAction("auto attack", 9.0f), nullptr);
 }
 
 void DpsHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

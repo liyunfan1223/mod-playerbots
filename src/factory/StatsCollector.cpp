@@ -233,7 +233,7 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
             if (type_ != CollectorType::SPELL_HEAL)
                 stats[STATS_TYPE_CRIT] += 50;
             return true;
-        case 59620:
+        case 59620: // Berserk
             if (type_ == CollectorType::MELEE)
                 stats[STATS_TYPE_ATTACK_POWER] += 120;
             return true;
@@ -254,6 +254,10 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
             /// Noticing that heroic item can not be triggered, probably a bug to report to AC
             if (type_ == CollectorType::SPELL_HEAL)
                 return true;
+            break;
+        case 71903: // Shadowmourne
+            stats[STATS_TYPE_STRENGTH] += 200;
+            return true;
         default:
             break;
     }

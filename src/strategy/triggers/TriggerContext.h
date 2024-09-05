@@ -102,6 +102,7 @@ public:
         creators["combo points not full and high energy"] = &TriggerContext::ComboPointsNotFullAndHighEnergy;
 
         creators["medium threat"] = &TriggerContext::MediumThreat;
+        creators["low tank threat"] = &TriggerContext::low_tank_threat;
 
         creators["dead"] = &TriggerContext::Dead;
         creators["corpse near"] = &TriggerContext::corpse_near;
@@ -321,6 +322,8 @@ private:
     static Trigger* ComboPointsNotFull(PlayerbotAI* botAI) { return new ComboPointsNotFullTrigger(botAI); }
     static Trigger* ComboPointsNotFullAndHighEnergy(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "combo points not full", "high energy available"); }
     static Trigger* MediumThreat(PlayerbotAI* botAI) { return new MediumThreatTrigger(botAI); }
+    static Trigger* low_tank_threat(PlayerbotAI* botAI) { return new LowTankThreatTrigger(botAI); }
+    // static Trigger* MediumThreat(PlayerbotAI* botAI) { return new MediumThreatTrigger(botAI); }
     static Trigger* Dead(PlayerbotAI* botAI) { return new DeadTrigger(botAI); }
     static Trigger* corpse_near(PlayerbotAI* botAI) { return new CorpseNearTrigger(botAI); }
     static Trigger* PartyMemberDead(PlayerbotAI* botAI) { return new PartyMemberDeadTrigger(botAI); }

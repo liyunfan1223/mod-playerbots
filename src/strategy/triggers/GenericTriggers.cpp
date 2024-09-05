@@ -14,6 +14,7 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
+#include "ThreatMgr.h"
 #include "Timer.h"
 
 bool LowManaTrigger::IsActive()
@@ -183,6 +184,22 @@ bool NoTargetTrigger::IsActive() { return !AI_VALUE(Unit*, "current target"); }
 bool MyAttackerCountTrigger::IsActive()
 {
     return AI_VALUE2(bool, "combat", "self target") && AI_VALUE(uint8, "my attacker count") >= amount;
+}
+
+bool LowTankThreatTrigger::IsActive()
+{
+    Unit* mt = AI_VALUE(Unit*, "main tank");
+    if (!mt)
+        return false;
+
+    Unit* current_target = AI_VALUE(Unit*, "current target");
+    if (!current_target)
+        return false;
+
+    ThreatMgr& mgr = current_target->GetThreatMgr();
+    float threat = mgr.GetThreat(bot);
+    float tankThreat = mgr.GetThreat(mt);
+    return tankThreat == 0.0f || threat > tankThreat * 0.5f;
 }
 
 bool AoeTrigger::IsActive()

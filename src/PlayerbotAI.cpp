@@ -5257,6 +5257,7 @@ bool PlayerbotAI::EqualLowercaseName(std::string s1, std::string s2)
     return true;
 }
 
+// A custom CanEquipItem (remove AutoUnequipOffhand in FindEquipSlot to prevent unequip on `item usage` calculation)
 InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading) const
 {
     dest = 0;
@@ -5277,11 +5278,9 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
             if (pItem->IsBindedNotWith(bot))
                 return EQUIP_ERR_DONT_OWN_THAT_ITEM;
 
-            // Yunfan: skip it
-            // // check count of items (skip for auto move for same player from bank)
-            // InventoryResult res = bot->CanTakeMoreSimilarItems(pItem);
-            // if (res != EQUIP_ERR_OK)
-            //     return res;
+            InventoryResult res = bot->CanTakeMoreSimilarItems(pItem);
+            if (res != EQUIP_ERR_OK)
+                return res;
 
             ScalingStatDistributionEntry const* ssd =
                 pProto->ScalingStatDistribution
@@ -5300,7 +5299,7 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
             if (!bot->CanUseAttackType(bot->GetAttackBySlot(eslot)))
                 return EQUIP_ERR_NOT_WHILE_DISARMED;
 
-            InventoryResult res = bot->CanUseItem(pItem, not_loading);
+            res = bot->CanUseItem(pItem, not_loading);
             if (res != EQUIP_ERR_OK)
                 return res;
 

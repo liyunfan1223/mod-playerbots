@@ -370,7 +370,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
                 break;
         }
 
-        if (loginBots)
+        if (loginBots && botLoading.empty())
         {
             loginBots += updateBots;
             loginBots = std::min(loginBots, maxNewBots);
@@ -1040,6 +1040,9 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     }
 
     SetEventValue(bot, "login", 0, 0);
+
+    if (!player->IsInWorld())
+        return false;
 
     if (player->GetGroup() || player->HasUnitState(UNIT_STATE_IN_FLIGHT))
         return false;

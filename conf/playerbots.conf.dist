@@ -216,6 +216,9 @@ AiPlayerbot.AutoEquipUpgradeLoot = 1
 # Default: 1.1 (Equip when the equipment score is 1.1 times higher than the current)
 AiPlayerbot.EquipUpgradeThreshold = 1.1
 
+# Two rounds of equipment initialization to create more suitable gear
+AiPlayerbot.TwoRoundsGearInit = 0
+
 #
 #
 #
@@ -821,13 +824,25 @@ AiPlayerbot.PremadeSpecGlyph.3.0 = 42912,43350,42902,43351,43338,45732
 AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112243100511351
 AiPlayerbot.PremadeSpecLink.3.0.80 = 51200201505112253100531351-015305021
 AiPlayerbot.PremadeSpecName.3.1 = mm pve
-AiPlayerbot.PremadeSpecGlyph.3.1 = 42912,43350,42915,43351,43338,45732
-AiPlayerbot.PremadeSpecLink.3.1.60 = -015305101230013233135030051
+AiPlayerbot.PremadeSpecGlyph.3.1 = 42912,43350,42914,43351,43338,45732
+AiPlayerbot.PremadeSpecLink.3.1.60 = -015305101230013233125031051
 AiPlayerbot.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
 AiPlayerbot.PremadeSpecName.3.2 = surv pve
 AiPlayerbot.PremadeSpecGlyph.3.2 = 42912,43350,45731,43351,43338,45732
-AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135001331
-AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330522135301331
+AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
+AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330532135301321
+
+# HUNTER PET
+#
+# Ferocity
+AiPlayerbot.PremadeHunterPetLink.0.16 = 2100003030103010101
+AiPlayerbot.PremadeHunterPetLink.0.20 = 2100013030103010122
+# Tenacity
+AiPlayerbot.PremadeHunterPetLink.1.16 = 21103000300120101001
+AiPlayerbot.PremadeHunterPetLink.1.20 = 21303010300120101002
+# Cunning
+AiPlayerbot.PremadeHunterPetLink.2.16 = 2100020330000211001
+AiPlayerbot.PremadeHunterPetLink.2.20 = 21000203300002110221
 
 #
 #
@@ -965,7 +980,7 @@ AiPlayerbot.PremadeSpecLink.9.0.70 = 2350022001113510053500131151--55
 AiPlayerbot.PremadeSpecLink.9.0.80 = 2350022001113510253500331151--5500000501
 AiPlayerbot.PremadeSpecName.9.1 = emo pve
 AiPlayerbot.PremadeSpecGlyph.9.1 = 45785,43390,50077,43394,43393,42459
-AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530131201-55
+AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530135201051
 AiPlayerbot.PremadeSpecLink.9.1.70 = -003203301135112530135201051-55
 AiPlayerbot.PremadeSpecLink.9.1.80 = -003203301135112530135221351-55000005
 AiPlayerbot.PremadeSpecName.9.2 = destro pve
@@ -1165,11 +1180,11 @@ AiPlayerbot.RandomClassSpecIndex.8.2 = 2
 #
 #
 
-AiPlayerbot.RandomClassSpecProb.9.0 = 40
+AiPlayerbot.RandomClassSpecProb.9.0 = 45
 AiPlayerbot.RandomClassSpecIndex.9.0 = 0
-AiPlayerbot.RandomClassSpecProb.9.1 = 40
+AiPlayerbot.RandomClassSpecProb.9.1 = 45
 AiPlayerbot.RandomClassSpecIndex.9.1 = 1
-AiPlayerbot.RandomClassSpecProb.9.2 = 20
+AiPlayerbot.RandomClassSpecProb.9.2 = 10
 AiPlayerbot.RandomClassSpecIndex.9.2 = 2
 
 #

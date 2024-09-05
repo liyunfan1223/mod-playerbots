@@ -10,6 +10,7 @@
 
 #include "HealthTriggers.h"
 #include "RangeTriggers.h"
+#include "Trigger.h"
 
 class PlayerbotAI;
 class Unit;
@@ -246,6 +247,13 @@ class MediumThreatTrigger : public MyAttackerCountTrigger
 {
 public:
     MediumThreatTrigger(PlayerbotAI* botAI) : MyAttackerCountTrigger(botAI, 2) {}
+};
+
+class LowTankThreatTrigger : public Trigger
+{
+public:
+    LowTankThreatTrigger(PlayerbotAI* botAI) : Trigger(botAI, "low tank threat") {}
+    bool IsActive() override;
 };
 
 class AoeTrigger : public AttackerCountTrigger

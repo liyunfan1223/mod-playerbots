@@ -141,7 +141,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                        NextAction::array(0, new NextAction("expose armor", ACTION_HIGH + 3), nullptr)));
 
     triggers.push_back(new TriggerNode(
-        "tricks of the trade on main tank",
+        "low tank threat",
         NextAction::array(0, new NextAction("tricks of the trade on main tank", ACTION_HIGH + 7), nullptr)));
 }
 
