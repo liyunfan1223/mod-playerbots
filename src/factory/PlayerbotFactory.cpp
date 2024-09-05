@@ -235,6 +235,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
     LOG_DEBUG("playerbots", "Initializing spells (step 1)...");
     // bot->LearnDefaultSkills();
+    bot->LearnDefaultSkills();
     InitClassSpells();
     InitAvailableSpells();
     if (pmo)
@@ -425,7 +426,10 @@ void PlayerbotFactory::Refresh()
     InitFood();
     InitReagents();
     // InitPotions();
-    InitTalentsTree(true, true, true);
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    {
+        InitTalentsTree(true, true, true);
+    }
     InitPet();
     InitPetTalents();
     InitClassSpells();
@@ -885,7 +889,7 @@ void PlayerbotFactory::ClearEverything()
     ClearSpells();
     ClearInventory();
     ResetQuests();
-    bot->SaveToDB(false, false);
+    // bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::ClearSpells()
@@ -1616,7 +1620,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
                         if (proto->Quality != desiredQuality)
                             continue;
-
+                        // delay heavy check
                         // if (!CanEquipItem(proto))
                         //     continue;
 
@@ -1634,7 +1638,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE &&
                             proto->Class != ITEM_CLASS_WEAPON)
                             continue;
-
+                        // delay heavy check
                         // uint16 dest = 0;
                         // if (CanEquipUnseenItem(slot, dest, itemId))
                         items[slot].push_back(itemId);
@@ -1690,6 +1694,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                 continue;
         }
 
+        
         if (oldItem)
         {
             uint8 bagIndex = oldItem->GetBagSlot();
@@ -1701,13 +1706,18 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
         }
 
+        oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        // fail to store in bag
+        if (oldItem)
+            continue;
+
         Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
         bot->AutoUnequipOffhandIfNeed();
-        if (newItem)
-        {
-            newItem->AddToWorld();
-            newItem->AddToUpdateQueueOf(bot);
-        }
+        // if (newItem)
+        // {
+        //     newItem->AddToWorld();
+            // newItem->AddToUpdateQueueOf(bot);
+        // }
     }
     // Secondary init for better equips
     /// @todo: clean up duplicate code
@@ -1770,11 +1780,11 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             }
             Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
             bot->AutoUnequipOffhandIfNeed();
-            if (newItem)
-            {
-                newItem->AddToWorld();
-                newItem->AddToUpdateQueueOf(bot);
-            }
+            // if (newItem)
+            // {
+            //     newItem->AddToWorld();
+            //     newItem->AddToUpdateQueueOf(bot);
+            // }
         }
     }
 }
@@ -2305,8 +2315,6 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 
 void PlayerbotFactory::InitAvailableSpells()
 {
-    bot->LearnDefaultSkills();
-
     if (trainerIdCache.empty())
     {
         CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
@@ -2324,7 +2332,8 @@ void PlayerbotFactory::InitAvailableSpells()
             trainerIdCache.push_back(trainerId);
         }
     }
-    uint32 learnedCounter = 0;
+    // uint32 learnedCounter = 0;
+    // uint32 oktest = 0;
     for (uint32 trainerId : trainerIdCache)
     {
         TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
@@ -2368,6 +2377,7 @@ void PlayerbotFactory::InitAvailableSpells()
             {
                 continue;
             }
+            // oktest++;
             if (tSpell->learnedSpell[0])
             {
                 bot->learnSpell(tSpell->learnedSpell[0], false);
@@ -2377,8 +2387,9 @@ void PlayerbotFactory::InitAvailableSpells()
                 botAI->CastSpell(tSpell->spell, bot);
             }
         }
-        if (++learnedCounter > 20)
-            break;
+        // LOG_INFO("playerbots", "C: {}, ok: {}", ++learnedCounter, oktest);
+        // if (++learnedCounter > 20)
+        //     break;
     }
 }
 
