@@ -17,14 +17,26 @@ BUFF_TRIGGER(ImprovedIcyTalonsTrigger, "improved icy talons");
 class PlagueStrikeDebuffTrigger : public DebuffTrigger
 {
 public:
-    PlagueStrikeDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "blood plague", true, .0f) {}
+    PlagueStrikeDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "blood plague", 1, true, .0f) {}
+};
+
+class PlagueStrike8sDebuffTrigger : public DebuffTrigger
+{
+public:
+    PlagueStrike8sDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "blood plague", 1, true, .0f, 3000) {}
 };
 
 // DEBUFF_CHECKISOWNER_TRIGGER(IcyTouchDebuffTrigger, "frost fever");
 class IcyTouchDebuffTrigger : public DebuffTrigger
 {
 public:
-    IcyTouchDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost fever", true, .0f) {}
+    IcyTouchDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost fever", 1, true, .0f) {}
+};
+
+class IcyTouch8sDebuffTrigger : public DebuffTrigger
+{
+public:
+    IcyTouch8sDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frost fever", 1, true, .0f, 3000) {}
 };
 
 BUFF_TRIGGER(UnbreakableArmorTrigger, "unbreakable armor");
@@ -162,7 +174,7 @@ public:
 class DesolationTrigger : public BuffTrigger
 {
 public:
-    DesolationTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "desolation") {}
+    DesolationTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "desolation", 1, false, true, 10000) {}
     bool IsActive() override;
 };
 

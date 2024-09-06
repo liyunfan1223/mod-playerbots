@@ -53,7 +53,7 @@ bool HighUnholyRuneTrigger::IsActive()
 }
 bool DesolationTrigger::IsActive()
 {
-    return bot->HasAura(66817) && !botAI->HasAura("desolation", GetTarget(), false, true, -1, true);
+    return bot->HasAura(66817) && BuffTrigger::IsActive();
 }
 
 bool DeathAndDecayCooldownTrigger::IsActive()
@@ -62,5 +62,5 @@ bool DeathAndDecayCooldownTrigger::IsActive()
     if (!spellId)
         return true;
     
-    return bot->GetSpellCooldownDelay(spellId) >= 2000;
+    return bot->GetSpellCooldownDelay(spellId) >= 3000;
 }
