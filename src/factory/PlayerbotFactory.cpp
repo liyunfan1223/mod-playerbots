@@ -3880,7 +3880,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         }
         availableGems.push_back(enchantGem);
     }
-
+    StatsWeightCalculator calculator(bot);
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
@@ -3940,7 +3940,6 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 {
                     continue;
                 }
-                StatsWeightCalculator calculator(bot);
                 float score = calculator.CalculateEnchant(enchant_id);
                 if (score >= bestScore)
                 {

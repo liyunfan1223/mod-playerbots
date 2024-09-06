@@ -29,13 +29,14 @@ bool TellAttackersAction::Execute(Event event)
     botAI->TellMaster("--- Attackers ---");
 
     GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
+    int32 count = 0;
     for (ObjectGuid const guid : attackers)
     {
         Unit* unit = botAI->GetUnit(guid);
         if (!unit || !unit->IsAlive())
             continue;
 
-        botAI->TellMaster(unit->GetName());
+        botAI->TellMaster(std::to_string(++count) + std::string(".") + unit->GetName());
     }
 
     botAI->TellMaster("--- Threat ---");

@@ -814,39 +814,25 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     float combatDistance = bot->GetCombatReach() + target->GetCombatReach();
     distance += combatDistance;
 
-    if (target->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD))  // target is moving forward, predict the position
-    {
-        float needToGo = bot->GetExactDist(target) - distance;
-        float timeToGo = MoveDelay(abs(needToGo)) + sPlayerbotAIConfig->reactDelay / 1000.0f;
-        float targetMoveDist = timeToGo * target->GetSpeed(MOVE_RUN);
-        targetMoveDist = std::min(5.0f, targetMoveDist);
-        tx += targetMoveDist * cos(target->GetOrientation());
-        ty += targetMoveDist * sin(target->GetOrientation());
-        if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(),
-                                                               target->GetPositionZ(), tx, ty, tz))
-        {
-            // disable prediction if position is invalid
-            tx = target->GetPositionX();
-            ty = target->GetPositionY();
-            tz = target->GetPositionZ();
-        }
-        // Prediction may cause this, which makes ShortenPathUntilDist fail
-        if (bot->GetExactDist(tx, ty, tz) <= distance)
-        {
-            tx = target->GetPositionX();
-            ty = target->GetPositionY();
-            tz = target->GetPositionZ();
-        }
-    }
     if (bot->GetExactDist(tx, ty, tz) <= distance)
         return false;
+
     PathGenerator path(bot);
     path.CalculatePath(tx, ty, tz, false);
     PathType type = path.GetPathType();
     int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE;
     if (!(type & typeOk))
         return false;
-    path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), distance);
+    float shortenTo = distance;
+
+    // Avoid walking too far when moving towards each other
+    if (bot->GetDistance(tx, ty, tz) >= 10.0f)
+        shortenTo = std::max(distance, bot->GetDistance(tx, ty, tz) / 2);
+
+    if (bot->GetExactDist(tx, ty, tz) <= shortenTo)
+        return false;
+
+    path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), shortenTo);
     G3D::Vector3 endPos = path.GetPath().back();
     return MoveTo(target->GetMapId(), endPos.x, endPos.y, endPos.z, false, false, false, false,
                   MovementPriority::MOVEMENT_COMBAT);
