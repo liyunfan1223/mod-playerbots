@@ -57,7 +57,7 @@ enum CollectorType : uint8
 class StatsCollector
 {
 public:
-    StatsCollector(CollectorType type);
+    StatsCollector(CollectorType type, int32 cls = -1);
     StatsCollector(StatsCollector& stats) = default;
     void Reset();
     void CollectItemStats(ItemTemplate const* proto);
@@ -78,6 +78,7 @@ private:
     
 private:
     CollectorType type_;
+    uint32 cls_;
 };
 
 #endif

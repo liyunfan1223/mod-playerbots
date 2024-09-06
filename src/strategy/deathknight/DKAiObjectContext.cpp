@@ -87,6 +87,8 @@ public:
         creators["chains of ice"] = &DeathKnightTriggerFactoryInternal::chains_of_ice;
         creators["unbreakable armor"] = &DeathKnightTriggerFactoryInternal::unbreakable_armor;
         creators["high blood rune"] = &DeathKnightTriggerFactoryInternal::high_blood_rune;
+        creators["high frost rune"] = &DeathKnightTriggerFactoryInternal::high_frost_rune;
+        creators["high unholy rune"] = &DeathKnightTriggerFactoryInternal::high_unholy_rune;
         creators["freezing fog"] = &DeathKnightTriggerFactoryInternal::freezing_fog;
         creators["no desolation"] = &DeathKnightTriggerFactoryInternal::no_desolation;
         creators["death and decay cooldown"] = &DeathKnightTriggerFactoryInternal::death_and_decay_cooldown;
@@ -122,6 +124,8 @@ private:
     static Trigger* chains_of_ice(PlayerbotAI* botAI) { return new ChainsOfIceSnareTrigger(botAI); }
     static Trigger* unbreakable_armor(PlayerbotAI* botAI) { return new UnbreakableArmorTrigger(botAI); }
     static Trigger* high_blood_rune(PlayerbotAI* botAI) { return new HighBloodRuneTrigger(botAI); }
+    static Trigger* high_frost_rune(PlayerbotAI* botAI) { return new HighFrostRuneTrigger(botAI); }
+    static Trigger* high_unholy_rune(PlayerbotAI* botAI) { return new HighUnholyRuneTrigger(botAI); }
     static Trigger* freezing_fog(PlayerbotAI* botAI) { return new FreezingFogTrigger(botAI); }
     static Trigger* no_desolation(PlayerbotAI* botAI) { return new DesolationTrigger(botAI); }
     static Trigger* death_and_decay_cooldown(PlayerbotAI* botAI) { return new DeathAndDecayCooldownTrigger(botAI); }

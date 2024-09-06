@@ -46,14 +46,14 @@ WorldLocation ArrowFormation::GetLocationInternal()
 
     float x = master->GetPositionX() - masterUnit->GetX() + botUnit->GetX();
     float y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
-    float z = master->GetPositionZ();
+    float z = master->GetPositionZ() + master->GetHoverHeight();
     if (!master->GetMap()->CheckCollisionAndGetValidCoords(master, master->GetPositionX(), master->GetPositionY(),
                                                            master->GetPositionZ(), x, y, z))
     {
         x = master->GetPositionX() - masterUnit->GetX() + botUnit->GetX();
         y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
         z = master->GetPositionZ() + master->GetHoverHeight();
-        z = master->GetMapHeight(x, y, z);
+        master->UpdateAllowedPositionZ(x, y, z);
     }
     return WorldLocation(master->GetMapId(), x, y, z);
 }

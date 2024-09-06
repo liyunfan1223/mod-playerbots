@@ -139,6 +139,20 @@ public:
     bool IsActive() override;
 };
 
+class HighFrostRuneTrigger : public Trigger
+{
+public:
+    HighFrostRuneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "high frost rune") {}
+    bool IsActive() override;
+};
+
+class HighUnholyRuneTrigger : public Trigger
+{
+public:
+    HighUnholyRuneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "high unholy rune") {}
+    bool IsActive() override;
+};
+
 class FreezingFogTrigger : public HasAuraTrigger
 {
 public:

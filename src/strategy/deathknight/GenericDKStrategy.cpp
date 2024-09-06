@@ -135,7 +135,7 @@ private:
     {
         return new ActionNode("death and decay",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("blood tap"), nullptr),
+                              /*A*/ nullptr,
                               /*C*/ nullptr);
     }
 
@@ -177,17 +177,16 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("mind freeze on enemy healer",
                         NextAction::array(0, new NextAction("mind freeze on enemy healer", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
-        "bone shield", NextAction::array(0, new NextAction("bone shield", ACTION_NORMAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode(
         "horn of winter", NextAction::array(0, new NextAction("horn of winter", ACTION_NORMAL + 1), nullptr)));
-    // triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("reach melee",
-    // ACTION_NORMAL + 8), nullptr)));
+    triggers.push_back(new TriggerNode("critical health",
+                                       NextAction::array(0, new NextAction("death pact", ACTION_HIGH + 5), nullptr)));
+    
     triggers.push_back(
         new TriggerNode("low health", NextAction::array(0, new NextAction("icebound fortitude", ACTION_HIGH + 5),
                                                         new NextAction("rune tap", ACTION_HIGH + 4), nullptr)));
-    triggers.push_back(new TriggerNode("medium health",
-                                       NextAction::array(0, new NextAction("rune tap", ACTION_NORMAL + 4),
-                                                         new NextAction("death strike", ACTION_NORMAL + 3), nullptr)));
+    // triggers.push_back(new TriggerNode("medium health",
+    //                                    NextAction::array(0, new NextAction("rune tap", ACTION_NORMAL + 4),
+    //                                                      new NextAction("death strike", ACTION_NORMAL + 3), nullptr)));
     triggers.push_back(
         new TriggerNode("icy touch", NextAction::array(0, new NextAction("icy touch", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(
