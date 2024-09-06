@@ -101,10 +101,10 @@ void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("dd cd and no desolation",
                                        NextAction::array(0, new NextAction("blood strike", ACTION_DEFAULT + 0.75f), nullptr)));
 
-    triggers.push_back(
-        new TriggerNode("icy touch", NextAction::array(0, new NextAction("icy touch", ACTION_HIGH + 2), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "plague strike", NextAction::array(0, new NextAction("plague strike", ACTION_HIGH + 1), nullptr)));
+    // triggers.push_back(
+    //     new TriggerNode("icy touch", NextAction::array(0, new NextAction("icy touch", ACTION_HIGH + 2), nullptr)));
+    // triggers.push_back(new TriggerNode(
+    //     "plague strike", NextAction::array(0, new NextAction("plague strike", ACTION_HIGH + 1), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "high frost rune", NextAction::array(0, 
@@ -117,11 +117,11 @@ void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "high blood rune", NextAction::array(0, new NextAction("blood strike", ACTION_NORMAL + 1), nullptr)));
 
-    // triggers.push_back(
-    //     new TriggerNode("dd cd and plague strike 8s", NextAction::array(0, new NextAction("plague strike", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(
+        new TriggerNode("dd cd and plague strike 8s", NextAction::array(0, new NextAction("plague strike", ACTION_HIGH + 2), nullptr)));
 
-    // triggers.push_back(
-    //     new TriggerNode("dd cd and icy touch 8s", NextAction::array(0, new NextAction("icy touch", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(
+        new TriggerNode("dd cd and icy touch 8s", NextAction::array(0, new NextAction("icy touch", ACTION_HIGH + 1), nullptr)));
 
 
     // triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction(, ACTION_NORMAL + 2), nullptr)));
