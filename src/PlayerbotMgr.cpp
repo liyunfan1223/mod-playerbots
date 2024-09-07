@@ -128,6 +128,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         allowed = false;
         out << "Failure: You are not allowed to control bot " << bot->GetName().c_str();
     }
+
     if (allowed && masterSession)
     {
         Player* player = masterSession->GetPlayer();
@@ -145,6 +146,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
             out << "Failure: You have added too many bots for this class";
         }
     }
+    
     if (allowed)
     {
         sRandomPlayerbotMgr->OnPlayerLogin(bot);
@@ -1305,7 +1307,7 @@ uint32 PlayerbotHolder::GetPlayerbotsCountByClass(uint32 cls)
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
-        if (bot->getClass() == cls)
+        if (bot && bot->IsInWorld() && bot->getClass() == cls)
         {
             count++;
         }

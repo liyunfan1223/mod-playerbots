@@ -165,16 +165,10 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player)
 
 bool SummonAction::Teleport(Player* summoner, Player* player)
 {
-    Player* master = GetMaster();
-    // if (master->GetMap() && master->GetMap()->IsDungeon()) {
-    //     InstanceMap* map = master->GetMap()->ToInstanceMap();
-    //     if (map) {
-    //         if (map->CannotEnter(player, true) == Map::CANNOT_ENTER_MAX_PLAYERS) {
-    //             botAI->TellError("I can not enter this dungeon");
-    //                 return false;
-    //         }
-    //     }
-    // }
+    // Player* master = GetMaster();
+    if (!summoner)
+        return false;
+    
     if (player->GetVehicle())
     {
         botAI->TellError("You cannot summon me while I'm on a vehicle");
@@ -197,13 +191,13 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                         ->botRepairWhenSummon)  // .conf option to repair bot gear when summoned 0 = off, 1 = on
                     bot->DurabilityRepairAll(false, 1.0f, false);
 
-                if (master->IsInCombat() && !sPlayerbotAIConfig->allowSummonInCombat)
+                if (summoner->IsInCombat() && !sPlayerbotAIConfig->allowSummonInCombat)
                 {
                     botAI->TellError("You cannot summon me while you're in combat");
                     return false;
                 }
 
-                if (!master->IsAlive() && !sPlayerbotAIConfig->allowSummonWhenMasterIsDead)
+                if (!summoner->IsAlive() && !sPlayerbotAIConfig->allowSummonWhenMasterIsDead)
                 {
                     botAI->TellError("You cannot summon me while you're dead");
                     return false;
@@ -218,7 +212,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
                 bool revive =
                     sPlayerbotAIConfig->reviveBotWhenSummoned == 2 ||
-                    (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !master->IsInCombat() && master->IsAlive());
+                    (sPlayerbotAIConfig->reviveBotWhenSummoned == 1 && !summoner->IsInCombat() && summoner->IsAlive());
 
                 if (bot->isDead() && revive)
                 {
