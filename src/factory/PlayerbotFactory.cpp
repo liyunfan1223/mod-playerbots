@@ -207,7 +207,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         ClearAllItems();
     }
-    // bot->SaveToDB(false, false);
+    bot->RemoveAllSpellCooldown();
+    UnbindInstance();
 
     bot->GiveLevel(level);
     bot->InitStatsForLevel();
