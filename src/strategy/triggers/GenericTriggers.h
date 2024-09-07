@@ -308,10 +308,12 @@ public:
 class BuffTrigger : public SpellTrigger
 {
 public:
-    BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false)
+    BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false, bool checkDuration = false, uint32 beforeDuration = 0)
         : SpellTrigger(botAI, spell, checkInterval)
     {
         this->checkIsOwner = checkIsOwner;
+        this->checkDuration = checkDuration;
+        this->beforeDuration = beforeDuration;
     }
 
 public:
@@ -320,6 +322,8 @@ public:
 
 protected:
     bool checkIsOwner;
+    bool checkDuration;
+    uint32 beforeDuration;
 };
 
 class BuffOnPartyTrigger : public BuffTrigger
@@ -379,8 +383,8 @@ class DebuffTrigger : public BuffTrigger
 {
 public:
     DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false,
-                  float needLifeTime = 8.0f)
-        : BuffTrigger(botAI, spell, checkInterval, checkIsOwner), needLifeTime(needLifeTime)
+                  float needLifeTime = 8.0f, uint32 beforeDuration = 0)
+        : BuffTrigger(botAI, spell, checkInterval, checkIsOwner, false, beforeDuration), needLifeTime(needLifeTime)
     {
     }
 

@@ -310,23 +310,21 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             bot->SetPower(bot->getPowerType(), bot->GetMaxPower(bot->getPowerType()));
     }
 
-    if (!CanUpdateAI())
-        return;
-
-    // check activity
     AllowActivity();
 
-    // if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) {
-    //     return;
-    // }
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-    if (currentSpell && currentSpell->getState() == SPELL_STATE_CASTING && currentSpell->GetCastTime())
+    if (currentSpell && currentSpell->getState() == SPELL_STATE_PREPARING)
     {
-        nextAICheckDelay = currentSpell->GetCastTime() + sPlayerbotAIConfig->reactDelay;
-        SetNextCheckDelay(nextAICheckDelay);
-        if (!CanUpdateAI())
-            return;
+        if (currentSpell->m_targets.GetUnitTarget() && !currentSpell->m_targets.GetUnitTarget()->IsAlive())
+        {
+            bot->InterruptSpell(CURRENT_GENERIC_SPELL);
+            SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+        }
+        return;
     }
+
+    if (!CanUpdateAI())
+        return;
 
     if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup())
     {
@@ -898,9 +896,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             p >> casterGuid.ReadAsPacked();
             if (casterGuid != bot->GetGUID())
                 return;
-
+            uint8 count, result;
             uint32 spellId;
-            p >> spellId;
+            p >> count >> spellId >> result;
             SpellInterrupted(spellId);
             return;
         }
@@ -1134,21 +1132,15 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 
 void PlayerbotAI::SpellInterrupted(uint32 spellid)
 {
+    for (uint8 type = CURRENT_MELEE_SPELL; type < CURRENT_CHANNELED_SPELL; type++)
+    {
+        Spell* spell = bot->GetCurrentSpell((CurrentSpellTypes)type);
+        if (!spell)
+            continue;
+        if (spell->GetSpellInfo()->Id == spellid)
+            bot->InterruptSpell((CurrentSpellTypes)type);
+    }
     LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get();
-    if (!spellid || lastSpell.id != spellid)
-        return;
-
-    time_t now = time(nullptr);
-    if (now <= lastSpell.timer)
-        return;
-
-    uint32 castTimeSpent = 1000 * (now - lastSpell.timer);
-    int32 globalCooldown = CalculateGlobalCooldown(lastSpell.id);
-    if (static_cast<int32>(castTimeSpent) < globalCooldown)
-        SetNextCheckDelay(globalCooldown - castTimeSpent);
-    else
-        SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
-
     lastSpell.id = 0;
 }
 
@@ -1512,14 +1504,15 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         default:
             break;
     }
-
+    if (strategyName.empty())
+        return;
     engines[BOT_STATE_COMBAT]->addStrategy(strategyName);
     engines[BOT_STATE_NON_COMBAT]->addStrategy(strategyName);
     if (tellMaster && !strategyName.empty())
     {
         std::ostringstream out;
         out << "Add " << strategyName << " instance strategy";
-        TellMaster(out.str());
+        TellMasterNoFacing(out.str());
     }
 }
 
@@ -3616,6 +3609,7 @@ bool PlayerbotAI::IsInVehicle(bool canControl, bool canCast, bool canAttack, boo
 
 void PlayerbotAI::WaitForSpellCast(Spell* spell)
 {
+    return;
     SpellInfo const* spellInfo = spell->GetSpellInfo();
     uint32 castTime = spell->GetCastTime();
     // float castTime = spell->GetCastTime();

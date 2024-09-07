@@ -77,7 +77,7 @@ GuidVector NearestTrapWithDamageValue::Calculate()
             continue;
         }
         const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (spellInfo->IsPositive())
+        if (!spellInfo || spellInfo->IsPositive())
         {
             continue;
         }

@@ -165,7 +165,7 @@ public:
 class CastGhoulFrenzyAction : public CastBuffSpellAction
 {
 public:
-    CastGhoulFrenzyAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ghoul frenzy") {}
+    CastGhoulFrenzyAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ghoul frenzy", false, 5000) {}
     std::string const GetTargetName() override { return "pet target"; }
 };
 
@@ -242,7 +242,7 @@ class CastDeathAndDecayAction : public CastSpellAction
 {
 public:
     CastDeathAndDecayAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "death and decay") {}
-    ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+    // ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastHornOfWinterAction : public CastSpellAction
