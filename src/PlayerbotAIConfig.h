@@ -67,6 +67,8 @@ public:
     bool autoSaveMana;
     uint32 saveManaThreshold;
     bool autoAvoidAoe;
+    float maxAoeAvoidRadius;
+    std::set<uint32> aoeAvoidSpellWhitelist;
     bool tellWhenAvoidAoe;
 
     uint32 openGoSpell;

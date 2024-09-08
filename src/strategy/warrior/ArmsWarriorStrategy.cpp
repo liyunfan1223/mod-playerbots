@@ -65,7 +65,10 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "victory rush", NextAction::array(0, new NextAction("victory rush", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode(
         "high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 10), nullptr)));
-    triggers.push_back(new TriggerNode("medium rage available", NextAction::array(0, new NextAction("slam", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("medium rage available", 
+        NextAction::array(0, new NextAction("slam", ACTION_HIGH + 1),
+        new NextAction("thunder clap", ACTION_HIGH),
+        nullptr)));
     triggers.push_back(
         new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(
@@ -76,5 +79,5 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "critical health", NextAction::array(0, new NextAction("intimidating shout", ACTION_EMERGENCY), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe",
-                                       NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 1), nullptr)));
+                                       NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), nullptr)));
 }

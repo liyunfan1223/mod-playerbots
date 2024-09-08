@@ -30,6 +30,19 @@ void LoadList(std::string const value, T& list)
 }
 
 template <class T>
+void LoadSet(std::string const value, T& set)
+{
+    std::vector<std::string> ids = split(value, ',');
+    for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++)
+    {
+        uint32 id = atoi((*i).c_str());
+        // if (!id)
+        //     continue;
+        set.insert(id);
+    }
+}
+
+template <class T>
 void LoadListString(std::string const value, T& list)
 {
     std::vector<std::string> strings = split(value, ',');
@@ -98,7 +111,10 @@ bool PlayerbotAIConfig::Initialize()
     autoSaveMana = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoSaveMana", true);
     saveManaThreshold = sConfigMgr->GetOption<int32>("AiPlayerbot.SaveManaThreshold", 60);
     autoAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoAvoidAoe", true);
-    tellWhenAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.TellWhenAvoidAoe", true);
+    maxAoeAvoidRadius = sConfigMgr->GetOption<float>("AiPlayerbot.MaxAoeAvoidRadius", 15.0f);
+    LoadSet<std::set<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AoeAvoidSpellWhitelist", "50759,57491"),
+                              aoeAvoidSpellWhitelist);
+    tellWhenAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.TellWhenAvoidAoe", false);
 
     randomGearLoweringChance = sConfigMgr->GetOption<float>("AiPlayerbot.RandomGearLoweringChance", 0.0f);
     randomGearQualityLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomGearQualityLimit", 3);
@@ -792,9 +808,10 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempPetTalentsOrder(uin
         if (!((1 << spec) & talentTabInfo->petTalentMask))
             continue;
         // skip some duplicate spells like dash/dive
-        if (talentInfo->TalentID == 2201 || talentInfo->TalentID == 2208 || talentInfo->TalentID == 2219 || talentInfo->TalentID == 2203)
+        if (talentInfo->TalentID == 2201 || talentInfo->TalentID == 2208 || talentInfo->TalentID == 2219 ||
+            talentInfo->TalentID == 2203)
             continue;
-        
+
         spells.push_back(talentInfo);
     }
     std::sort(spells.begin(), spells.end(),

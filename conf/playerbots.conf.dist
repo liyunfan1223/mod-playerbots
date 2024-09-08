@@ -357,7 +357,7 @@ AiPlayerbot.HighMana = 65
 #
 #
 
-# Bots pick their quest reward (yes = picks first useful item, no = list all rewards, ask = pick useful item and lists if multiple)
+# Bots pick their quest reward (yes = picks the most useful item, no = list all rewards, ask = pick useful item and lists if multiple)
 AiPlayerbot.AutoPickReward = yes
 
 # Sync quests with player (Bots will complete quests the moment you hand them in. Bots will ignore looting quest items.)
@@ -385,9 +385,11 @@ AiPlayerbot.ApplyInstanceStrategies = 1
 # Default: 1 (enable)
 AiPlayerbot.AutoAvoidAoe = 1
 
-# Tell which spell is avoiding (experimental)
-# Default: 1 (enable)
-AiPlayerbot.TellWhenAvoidAoe = 1
+# Only avoid aoe spells with a radius smaller than this value
+AiPlayerbot.MaxAoeAvoidRadius = 15.0
+
+# A whitelist of aoe spell IDs that should not be avoided
+AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491
 
 # Enable healer bot save mana
 # Default: 1 (enable)
@@ -1280,6 +1282,10 @@ AiPlayerbot.SpellDump = 0
 AiPlayerbot.LogInGroupOnly = 1
 AiPlayerbot.LogValuesPerTick = 0
 AiPlayerbot.RandomChangeMultiplier = 1
+
+# Tell which spell is avoiding (experimental)
+# Default: 0 (disable)
+AiPlayerbot.TellWhenAvoidAoe = 0
 
 # Enables/Disables performance monitor
 AiPlayerbot.PerfMonEnabled = 0

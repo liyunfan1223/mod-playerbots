@@ -1624,10 +1624,10 @@ void PlayerbotAI::ResetStrategies(bool load)
     //     sPlayerbotDbStore->Load(this);
 }
 
-bool PlayerbotAI::IsRanged(Player* player)
+bool PlayerbotAI::IsRanged(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_RANGED);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
@@ -1660,18 +1660,18 @@ bool PlayerbotAI::IsRanged(Player* player)
     return true;
 }
 
-bool PlayerbotAI::IsMelee(Player* player) { return !IsRanged(player); }
+bool PlayerbotAI::IsMelee(Player* player, bool bySpec) { return !IsRanged(player, bySpec); }
 
-bool PlayerbotAI::IsCaster(Player* player) { return IsRanged(player) && player->getClass() != CLASS_HUNTER; }
+bool PlayerbotAI::IsCaster(Player* player, bool bySpec) { return IsRanged(player, bySpec) && player->getClass() != CLASS_HUNTER; }
 
-bool PlayerbotAI::IsCombo(Player* player)
+bool PlayerbotAI::IsCombo(Player* player, bool bySpec)
 {
     // int tab = AiFactory::GetPlayerSpecTab(player);
     return player->getClass() == CLASS_ROGUE ||
            (player->getClass() == CLASS_DRUID && player->HasAura(768));  // cat druid
 }
 
-bool PlayerbotAI::IsRangedDps(Player* player) { return IsRanged(player) && IsDps(player); }
+bool PlayerbotAI::IsRangedDps(Player* player, bool bySpec) { return IsRanged(player, bySpec) && IsDps(player, bySpec); }
 
 bool PlayerbotAI::IsHealAssistantOfIndex(Player* player, int index)
 {
@@ -1894,10 +1894,10 @@ int32 PlayerbotAI::GetMeleeIndex(Player* player)
     return 0;
 }
 
-bool PlayerbotAI::IsTank(Player* player)
+bool PlayerbotAI::IsTank(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_TANK);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
@@ -1932,10 +1932,10 @@ bool PlayerbotAI::IsTank(Player* player)
     return false;
 }
 
-bool PlayerbotAI::IsHeal(Player* player)
+bool PlayerbotAI::IsHeal(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_HEAL);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
@@ -1969,10 +1969,10 @@ bool PlayerbotAI::IsHeal(Player* player)
     return false;
 }
 
-bool PlayerbotAI::IsDps(Player* player)
+bool PlayerbotAI::IsDps(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_DPS);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
