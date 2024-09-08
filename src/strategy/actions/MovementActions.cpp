@@ -1819,12 +1819,17 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
     {
         return false;
     }
+    if (sPlayerbotAIConfig->aoeAvoidSpellWhitelist.find(spellInfo->Id) != sPlayerbotAIConfig->aoeAvoidSpellWhitelist.end())
+        return false;
+
     DynamicObject* dynOwner = aura->GetDynobjOwner();
     if (!dynOwner || !dynOwner->IsInWorld())
     {
         return false;
     }
     float radius = dynOwner->GetRadius();
+    if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
+        return false;
     if (bot->GetDistance(dynOwner) > radius)
     {
         return false;
@@ -1838,7 +1843,7 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
             lastTellTimer = time(NULL);
             lastMoveTimer = getMSTime();
             std::ostringstream out;
-            out << "I'm avoiding " << name.str() << "...";
+            out << "I'm avoiding " << name.str() << " (" << spellInfo->Id << ")" << " Radius " << radius << " - [Aura]";
             bot->Say(out.str(), LANG_UNIVERSAL);
         }
         return true;
@@ -1869,17 +1874,28 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
         {
             continue;
         }
+        // 0 trap with no despawn after cast. 1 trap despawns after cast. 2 bomb casts on spawn.
+        if (goInfo->trap.type != 0)
+            continue;
+
         uint32 spellId = goInfo->trap.spellId;
         if (!spellId)
         {
             continue;
         }
+
+        if (sPlayerbotAIConfig->aoeAvoidSpellWhitelist.find(spellId) != sPlayerbotAIConfig->aoeAvoidSpellWhitelist.end())
+            continue;
+
         const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo || spellInfo->IsPositive())
         {
             continue;
         }
+
         float radius = (float)goInfo->trap.diameter / 2;
+        if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
+            continue;
         // for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
         //     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA) {
         //         if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE) {
@@ -1903,7 +1919,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
                 lastTellTimer = time(NULL);
                 lastMoveTimer = getMSTime();
                 std::ostringstream out;
-                out << "I'm avoiding " << name.str() << "...";
+                out << "I'm avoiding " << name.str() << " (" << spellInfo->Id << ")" << " Radius " << radius << " - [Trap]";
                 bot->Say(out.str(), LANG_UNIVERSAL);
             }
             return true;
@@ -1946,6 +1962,8 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                     sSpellMgr->GetSpellInfo(spellInfo->Effects[aurEff->GetEffIndex()].TriggerSpell);
                 if (!triggerSpellInfo)
                     continue;
+                if (sPlayerbotAIConfig->aoeAvoidSpellWhitelist.find(triggerSpellInfo->Id) != sPlayerbotAIConfig->aoeAvoidSpellWhitelist.end())
+                    return false;
                 for (int j = 0; j < MAX_SPELL_EFFECTS; j++)
                 {
                     if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
@@ -1955,6 +1973,8 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                         {
                             break;
                         }
+                        if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
+                            continue;
                         std::ostringstream name;
                         name << triggerSpellInfo->SpellName[LOCALE_enUS];  //<< "] (unit)";
                         if (FleePosition(unit->GetPosition(), radius))
@@ -1964,7 +1984,7 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                                 lastTellTimer = time(NULL);
                                 lastMoveTimer = getMSTime();
                                 std::ostringstream out;
-                                out << "I'm avoiding " << name.str() << "...";
+                                out << "I'm avoiding " << name.str() << " (" << triggerSpellInfo->Id << ")" << " Radius " << radius << " - [Unit Trigger]";
                                 bot->Say(out.str(), LANG_UNIVERSAL);
                             }
                         }

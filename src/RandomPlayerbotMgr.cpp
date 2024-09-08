@@ -1867,6 +1867,7 @@ void RandomPlayerbotMgr::GetBots()
         PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BY_OWNER_AND_EVENT);
     stmt->SetData(0, 0);
     stmt->SetData(1, "add");
+    uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
         do
@@ -1875,6 +1876,9 @@ void RandomPlayerbotMgr::GetBots()
             uint32 bot = fields[0].Get<uint32>();
             if (GetEventValue(bot, "add"))
                 currentBots.push_back(bot);
+
+            if (currentBots.size() >= maxAllowedBotCount)
+                break;
         } while (result->NextRow());
     }
 }
@@ -2402,53 +2406,14 @@ void RandomPlayerbotMgr::PrintStats()
             ++engine_combat;
         else
             ++engine_dead;
-
-        uint8 spec = AiFactory::GetPlayerSpecTab(bot);
-        switch (bot->getClass())
-        {
-            case CLASS_DRUID:
-                if (spec == 2)
-                    ++heal;
-                else
-                    ++dps;
-                break;
-            case CLASS_PALADIN:
-                if (spec == 1)
-                    ++tank;
-                else if (spec == 0)
-                    ++heal;
-                else
-                    ++dps;
-                break;
-            case CLASS_PRIEST:
-                if (spec != 2)
-                    ++heal;
-                else
-                    ++dps;
-                break;
-            case CLASS_SHAMAN:
-                if (spec == 2)
-                    ++heal;
-                else
-                    ++dps;
-                break;
-            case CLASS_WARRIOR:
-                if (spec == 2)
-                    ++tank;
-                else
-                    ++dps;
-                break;
-            case CLASS_DEATH_KNIGHT:
-                if (spec == 0)
-                    tank++;
-                else
-                    dps++;
-                break;
-            default:
-                ++dps;
-                break;
-        }
-
+        
+        if (botAI->IsHeal(bot, true))
+            ++heal;
+        else if (botAI->IsTank(bot, true))
+            ++tank;
+        else
+            ++dps;
+        
         if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
         {
             TravelState state = target->getTravelState();

@@ -94,7 +94,7 @@ private:
     {
         return new ActionNode("mana potion",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("drink"), nullptr),
+                              /*A*/ nullptr,
                               /*C*/ nullptr);
     }
 

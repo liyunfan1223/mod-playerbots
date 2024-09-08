@@ -11,6 +11,7 @@
 #include "Object.h"
 #include "Playerbots.h"
 #include "QuestDef.h"
+#include "StatsWeightCalculator.h"
 #include "WorldPacket.h"
 #include "BroadcastHelper.h"
 
@@ -176,8 +177,20 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
         bestIds = BestRewards(quest);
         if (!bestIds.empty())
         {
-            ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[*bestIds.begin()]);
-            bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
+            StatsWeightCalculator calc(bot);
+            uint32 best = 0;
+            float bestScore = 0;
+            for (uint32 id : bestIds)
+            {
+                float score = calc.CalculateItem(quest->RewardChoiceItemId[id]);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    best = id;
+                }
+            }
+            ItemTemplate const* item = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[best]);
+            bot->RewardQuest(quest, best, questGiver, true);
             out << "Rewarded " << ChatHelper::FormatItem(item);
         }
         else
