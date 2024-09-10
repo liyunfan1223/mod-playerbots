@@ -17,6 +17,7 @@ public:
     {
         creators["bwl check onyxia scale cloak"] = &RaidActionContext::bwl_check_onyxia_scale_cloak;
         creators["bwl turn off suppression device"] = &RaidActionContext::bwl_turn_off_suppression_device;
+        creators["bwl use hourglass sand"] = &RaidActionContext::bwl_use_hourglass_sand;
     }
 
 private:
@@ -27,6 +28,10 @@ private:
     static Action* bwl_turn_off_suppression_device(PlayerbotAI* botAI)
     {
         return new BwlTurnOffSuppressionDeviceAction(botAI);
+    }
+    static Action* bwl_use_hourglass_sand(PlayerbotAI* botAI)
+    {
+        return new BwlUseHourglassSandAction(botAI);
     }
 };
 

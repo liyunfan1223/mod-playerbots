@@ -20,3 +20,5 @@ bool BwlSuppressionDeviceTrigger::IsActive()
     }
     return false;
 }
+
+bool BwlAfflictionBronzeTrigger::IsActive() { return bot->HasAura(23170); }

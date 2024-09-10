@@ -28,3 +28,5 @@ bool BwlTurnOffSuppressionDeviceAction::Execute(Event event)
     }
     return true;
 }
+
+bool BwlUseHourglassSandAction::Execute(Event event) { return botAI->CastSpell(23645, bot); }
