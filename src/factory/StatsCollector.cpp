@@ -11,7 +11,7 @@
 #include "SpellMgr.h"
 #include "UpdateFields.h"
 
-StatsCollector::StatsCollector(CollectorType type) : type_(type) { Reset(); }
+StatsCollector::StatsCollector(CollectorType type, int32 cls) : type_(type), cls_(cls) { Reset(); }
 
 void StatsCollector::Reset()
 {
@@ -233,7 +233,7 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
             if (type_ != CollectorType::SPELL_HEAL)
                 stats[STATS_TYPE_CRIT] += 50;
             return true;
-        case 59620:
+        case 59620: // Berserk
             if (type_ == CollectorType::MELEE)
                 stats[STATS_TYPE_ATTACK_POWER] += 120;
             return true;
@@ -243,6 +243,18 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
         case 67771: // Death's Verdict (heroic)
             stats[STATS_TYPE_ATTACK_POWER] += 260;
             return true;
+        case 71406: // Tiny Abomination in a Jar
+            if (cls_ == CLASS_PALADIN)
+                stats[STATS_TYPE_ATTACK_POWER] += 600;
+            else
+                stats[STATS_TYPE_ATTACK_POWER] += 150;
+            return true;
+        case 71545: // Tiny Abomination in a Jar (heroic)
+            if (cls_ == CLASS_PALADIN)
+                stats[STATS_TYPE_ATTACK_POWER] += 800;
+            else
+                stats[STATS_TYPE_ATTACK_POWER] += 200;
+            return true;    
         case 71519: // Deathbringer's Will
             stats[STATS_TYPE_ATTACK_POWER] += 350;
             return true;
@@ -254,6 +266,10 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
             /// Noticing that heroic item can not be triggered, probably a bug to report to AC
             if (type_ == CollectorType::SPELL_HEAL)
                 return true;
+            break;
+        case 71903: // Shadowmourne
+            stats[STATS_TYPE_STRENGTH] += 200;
+            return true;
         default:
             break;
     }

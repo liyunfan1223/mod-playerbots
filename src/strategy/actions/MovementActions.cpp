@@ -762,7 +762,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     // return true;
 }
 
-bool MovementAction::MoveTo(Unit* target, float distance, MovementPriority priority)
+bool MovementAction::MoveTo(WorldObject* target, float distance, MovementPriority priority)
 {
     if (!IsMovingAllowed(target))
         return false;
@@ -814,39 +814,25 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     float combatDistance = bot->GetCombatReach() + target->GetCombatReach();
     distance += combatDistance;
 
-    if (target->HasUnitMovementFlag(MOVEMENTFLAG_FORWARD))  // target is moving forward, predict the position
-    {
-        float needToGo = bot->GetExactDist(target) - distance;
-        float timeToGo = MoveDelay(abs(needToGo)) + sPlayerbotAIConfig->reactDelay / 1000.0f;
-        float targetMoveDist = timeToGo * target->GetSpeed(MOVE_RUN);
-        targetMoveDist = std::min(5.0f, targetMoveDist);
-        tx += targetMoveDist * cos(target->GetOrientation());
-        ty += targetMoveDist * sin(target->GetOrientation());
-        if (!target->GetMap()->CheckCollisionAndGetValidCoords(target, target->GetPositionX(), target->GetPositionY(),
-                                                               target->GetPositionZ(), tx, ty, tz))
-        {
-            // disable prediction if position is invalid
-            tx = target->GetPositionX();
-            ty = target->GetPositionY();
-            tz = target->GetPositionZ();
-        }
-        // Prediction may cause this, which makes ShortenPathUntilDist fail
-        if (bot->GetExactDist(tx, ty, tz) <= distance)
-        {
-            tx = target->GetPositionX();
-            ty = target->GetPositionY();
-            tz = target->GetPositionZ();
-        }
-    }
     if (bot->GetExactDist(tx, ty, tz) <= distance)
         return false;
+
     PathGenerator path(bot);
     path.CalculatePath(tx, ty, tz, false);
     PathType type = path.GetPathType();
     int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE;
     if (!(type & typeOk))
         return false;
-    path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), distance);
+    float shortenTo = distance;
+
+    // Avoid walking too far when moving towards each other
+    if (bot->GetDistance(tx, ty, tz) >= 10.0f)
+        shortenTo = std::max(distance, bot->GetDistance(tx, ty, tz) / 2);
+
+    if (bot->GetExactDist(tx, ty, tz) <= shortenTo)
+        return false;
+
+    path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), shortenTo);
     G3D::Vector3 endPos = path.GetPath().back();
     return MoveTo(target->GetMapId(), endPos.x, endPos.y, endPos.z, false, false, false, false,
                   MovementPriority::MOVEMENT_COMBAT);
@@ -874,7 +860,7 @@ float MovementAction::GetFollowAngle()
     return 0;
 }
 
-bool MovementAction::IsMovingAllowed(Unit* target)
+bool MovementAction::IsMovingAllowed(WorldObject* target)
 {
     if (!target)
         return false;
@@ -1272,6 +1258,8 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
 
     // bot->GetMotionMaster()->Clear();
     bot->GetMotionMaster()->MoveChase((Unit*)obj, distance);
+
+    // TODO shouldnt this use "last movement" value?
     WaitForReach(bot->GetExactDist2d(obj) - distance);
     return true;
 }
@@ -1295,6 +1283,7 @@ float MovementAction::MoveDelay(float distance)
     return delay;
 }
 
+// TODO should this be removed? (or modified to use "last movement" value?)
 void MovementAction::WaitForReach(float distance)
 {
     float delay = 1000.0f * MoveDelay(distance);
@@ -1311,6 +1300,15 @@ void MovementAction::WaitForReach(float distance)
         delay = 0;
 
     botAI->SetNextCheckDelay((uint32)delay);
+}
+
+// similiar to botAI->SetNextCheckDelay() but only stops movement
+void MovementAction::SetNextMovementDelay(float delayMillis)
+{
+    AI_VALUE(LastMovement&, "last movement")
+        .Set(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetOrientation(),
+             delayMillis,
+             MovementPriority::MOVEMENT_FORCED);
 }
 
 bool MovementAction::Flee(Unit* target)
@@ -1821,12 +1819,17 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
     {
         return false;
     }
+    if (sPlayerbotAIConfig->aoeAvoidSpellWhitelist.find(spellInfo->Id) != sPlayerbotAIConfig->aoeAvoidSpellWhitelist.end())
+        return false;
+
     DynamicObject* dynOwner = aura->GetDynobjOwner();
     if (!dynOwner || !dynOwner->IsInWorld())
     {
         return false;
     }
     float radius = dynOwner->GetRadius();
+    if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
+        return false;
     if (bot->GetDistance(dynOwner) > radius)
     {
         return false;
@@ -1840,7 +1843,7 @@ bool AvoidAoeAction::AvoidAuraWithDynamicObj()
             lastTellTimer = time(NULL);
             lastMoveTimer = getMSTime();
             std::ostringstream out;
-            out << "I'm avoiding " << name.str() << "...";
+            out << "I'm avoiding " << name.str() << " (" << spellInfo->Id << ")" << " Radius " << radius << " - [Aura]";
             bot->Say(out.str(), LANG_UNIVERSAL);
         }
         return true;
@@ -1871,17 +1874,28 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
         {
             continue;
         }
+        // 0 trap with no despawn after cast. 1 trap despawns after cast. 2 bomb casts on spawn.
+        if (goInfo->trap.type != 0)
+            continue;
+
         uint32 spellId = goInfo->trap.spellId;
         if (!spellId)
         {
             continue;
         }
+
+        if (sPlayerbotAIConfig->aoeAvoidSpellWhitelist.find(spellId) != sPlayerbotAIConfig->aoeAvoidSpellWhitelist.end())
+            continue;
+
         const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo || spellInfo->IsPositive())
         {
             continue;
         }
+
         float radius = (float)goInfo->trap.diameter / 2;
+        if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
+            continue;
         // for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
         //     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA) {
         //         if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE) {
@@ -1905,7 +1919,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
                 lastTellTimer = time(NULL);
                 lastMoveTimer = getMSTime();
                 std::ostringstream out;
-                out << "I'm avoiding " << name.str() << "...";
+                out << "I'm avoiding " << name.str() << " (" << spellInfo->Id << ")" << " Radius " << radius << " - [Trap]";
                 bot->Say(out.str(), LANG_UNIVERSAL);
             }
             return true;
@@ -1948,6 +1962,8 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                     sSpellMgr->GetSpellInfo(spellInfo->Effects[aurEff->GetEffIndex()].TriggerSpell);
                 if (!triggerSpellInfo)
                     continue;
+                if (sPlayerbotAIConfig->aoeAvoidSpellWhitelist.find(triggerSpellInfo->Id) != sPlayerbotAIConfig->aoeAvoidSpellWhitelist.end())
+                    return false;
                 for (int j = 0; j < MAX_SPELL_EFFECTS; j++)
                 {
                     if (triggerSpellInfo->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
@@ -1957,6 +1973,8 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                         {
                             break;
                         }
+                        if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
+                            continue;
                         std::ostringstream name;
                         name << triggerSpellInfo->SpellName[LOCALE_enUS];  //<< "] (unit)";
                         if (FleePosition(unit->GetPosition(), radius))
@@ -1966,7 +1984,7 @@ bool AvoidAoeAction::AvoidUnitWithDamageAura()
                                 lastTellTimer = time(NULL);
                                 lastMoveTimer = getMSTime();
                                 std::ostringstream out;
-                                out << "I'm avoiding " << name.str() << "...";
+                                out << "I'm avoiding " << name.str() << " (" << triggerSpellInfo->Id << ")" << " Radius " << radius << " - [Unit Trigger]";
                                 bot->Say(out.str(), LANG_UNIVERSAL);
                             }
                         }

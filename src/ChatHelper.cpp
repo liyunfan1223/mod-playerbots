@@ -593,34 +593,41 @@ void ChatHelper::eraseAllSubStr(std::string& mainStr, std::string const toErase)
     }
 }
 
-std::set<uint32> ChatHelper::ExtractAllQuestIds(const std::string& text)
+std::set<uint32> extractGeneric(std::string_view text, std::string_view prefix)
 {
-    std::set<uint32> ids;
+    std::set<uint32_t> ids;
+    std::string_view text_view = text;
 
-    std::regex rgx("Hquest:[0-9]+");
-    auto begin = std::sregex_iterator(text.begin(), text.end(), rgx);
-    auto end = std::sregex_iterator();
-    for (std::sregex_iterator i = begin; i != end; ++i)
+    size_t pos = 0;
+    while ((pos = text_view.find(prefix, pos)) != std::string::npos)
     {
-        std::smatch match = *i;
-        ids.insert(std::stoi(match.str().erase(0, 7)));
+        // skip "Hquest:/Hitem:"
+        pos += prefix.size();
+
+        // extract everything after "Hquest:/Hitem:"
+        size_t end_pos = text_view.find_first_not_of("0123456789", pos);
+        std::string_view number_str = text_view.substr(pos, end_pos - pos);
+
+        uint32 number = 0;
+        
+        auto [ptr, ec] = std::from_chars(number_str.data(), number_str.data() + number_str.size(), number);
+
+        if (ec == std::errc())
+        {
+            ids.insert(number);
+        }
+        pos = end_pos;
     }
 
     return ids;
 }
 
+std::set<uint32> ChatHelper::ExtractAllQuestIds(const std::string& text)
+{
+    return extractGeneric(text, "Hquest:");
+}
+
 std::set<uint32> ChatHelper::ExtractAllItemIds(const std::string& text)
 {
-    std::set<uint32> ids;
-
-    std::regex rgx("Hitem:[0-9]+");
-    auto begin = std::sregex_iterator(text.begin(), text.end(), rgx);
-    auto end = std::sregex_iterator();
-    for (std::sregex_iterator i = begin; i != end; ++i)
-    {
-        std::smatch match = *i;
-        ids.insert(std::stoi(match.str().erase(0, 6)));
-    }
-
-    return ids;
+    return extractGeneric(text, "Hitem:");
 }

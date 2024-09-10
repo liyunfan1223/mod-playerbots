@@ -310,23 +310,22 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             bot->SetPower(bot->getPowerType(), bot->GetMaxPower(bot->getPowerType()));
     }
 
-    if (!CanUpdateAI())
-        return;
-
-    // check activity
     AllowActivity();
 
-    // if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) {
-    //     return;
-    // }
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-    if (currentSpell && currentSpell->getState() == SPELL_STATE_CASTING && currentSpell->GetCastTime())
+    if (currentSpell && currentSpell->getState() == SPELL_STATE_PREPARING)
     {
-        nextAICheckDelay = currentSpell->GetCastTime() + sPlayerbotAIConfig->reactDelay;
-        SetNextCheckDelay(nextAICheckDelay);
-        if (!CanUpdateAI())
-            return;
+        if (currentSpell->m_targets.GetUnitTarget() && !currentSpell->m_targets.GetUnitTarget()->IsAlive() &&
+            currentSpell->GetSpellInfo() && !currentSpell->GetSpellInfo()->IsAllowingDeadTarget())
+        {
+            bot->InterruptSpell(CURRENT_GENERIC_SPELL);
+            SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+        }
+        return;
     }
+
+    if (!CanUpdateAI())
+        return;
 
     if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup())
     {
@@ -898,9 +897,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             p >> casterGuid.ReadAsPacked();
             if (casterGuid != bot->GetGUID())
                 return;
-
+            uint8 count, result;
             uint32 spellId;
-            p >> spellId;
+            p >> count >> spellId >> result;
             SpellInterrupted(spellId);
             return;
         }
@@ -1005,26 +1004,25 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     if (lang == LANG_ADDON)
                         return;
 
-                    // Disable since ExtractAllItemIds bad performance
-                    // if (message.starts_with(sPlayerbotAIConfig->toxicLinksPrefix) &&
-                    //     (GetChatHelper()->ExtractAllItemIds(message).size() > 0 ||
-                    //      GetChatHelper()->ExtractAllQuestIds(message).size() > 0) &&
-                    //     sPlayerbotAIConfig->toxicLinksRepliesChance)
-                    // {
-                    //     if (urand(0, 50) > 0 || urand(1, 100) > sPlayerbotAIConfig->toxicLinksRepliesChance)
-                    //     {
-                    //         return;
-                    //     }
-                    // }
-                    // else if ((GetChatHelper()->ExtractAllItemIds(message).count(19019) &&
-                    //           sPlayerbotAIConfig->thunderfuryRepliesChance))
-                    // {
-                    //     if (urand(0, 60) > 0 || urand(1, 100) > sPlayerbotAIConfig->thunderfuryRepliesChance)
-                    //     {
-                    //         return;
-                    //     }
-                    // }
-                    // else
+                    if (message.starts_with(sPlayerbotAIConfig->toxicLinksPrefix) &&
+                        (GetChatHelper()->ExtractAllItemIds(message).size() > 0 ||
+                        GetChatHelper()->ExtractAllQuestIds(message).size() > 0) &&
+                        sPlayerbotAIConfig->toxicLinksRepliesChance)
+                    {
+                        if (urand(0, 50) > 0 || urand(1, 100) > sPlayerbotAIConfig->toxicLinksRepliesChance)
+                        {
+                            return;
+                        }
+                    }
+                    else if ((GetChatHelper()->ExtractAllItemIds(message).count(19019) &&
+                            sPlayerbotAIConfig->thunderfuryRepliesChance))
+                    {
+                        if (urand(0, 60) > 0 || urand(1, 100) > sPlayerbotAIConfig->thunderfuryRepliesChance)
+                        {
+                            return;
+                        }
+                    }
+                    else
                     {
                         if (isFromFreeBot && urand(0, 20))
                             return;
@@ -1135,21 +1133,15 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 
 void PlayerbotAI::SpellInterrupted(uint32 spellid)
 {
+    for (uint8 type = CURRENT_MELEE_SPELL; type < CURRENT_CHANNELED_SPELL; type++)
+    {
+        Spell* spell = bot->GetCurrentSpell((CurrentSpellTypes)type);
+        if (!spell)
+            continue;
+        if (spell->GetSpellInfo()->Id == spellid)
+            bot->InterruptSpell((CurrentSpellTypes)type);
+    }
     LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get();
-    if (!spellid || lastSpell.id != spellid)
-        return;
-
-    time_t now = time(nullptr);
-    if (now <= lastSpell.timer)
-        return;
-
-    uint32 castTimeSpent = 1000 * (now - lastSpell.timer);
-    int32 globalCooldown = CalculateGlobalCooldown(lastSpell.id);
-    if (static_cast<int32>(castTimeSpent) < globalCooldown)
-        SetNextCheckDelay(globalCooldown - castTimeSpent);
-    else
-        SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
-
     lastSpell.id = 0;
 }
 
@@ -1507,17 +1499,21 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 409:
             strategyName = "mc";
             break;
+        case 509:
+            strategyName = "aq20";
+            break;
         default:
             break;
     }
-
+    if (strategyName.empty())
+        return;
     engines[BOT_STATE_COMBAT]->addStrategy(strategyName);
     engines[BOT_STATE_NON_COMBAT]->addStrategy(strategyName);
     if (tellMaster && !strategyName.empty())
     {
         std::ostringstream out;
         out << "Add " << strategyName << " instance strategy";
-        TellMaster(out.str());
+        TellMasterNoFacing(out.str());
     }
 }
 
@@ -1628,10 +1624,10 @@ void PlayerbotAI::ResetStrategies(bool load)
     //     sPlayerbotDbStore->Load(this);
 }
 
-bool PlayerbotAI::IsRanged(Player* player)
+bool PlayerbotAI::IsRanged(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_RANGED);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
@@ -1664,18 +1660,18 @@ bool PlayerbotAI::IsRanged(Player* player)
     return true;
 }
 
-bool PlayerbotAI::IsMelee(Player* player) { return !IsRanged(player); }
+bool PlayerbotAI::IsMelee(Player* player, bool bySpec) { return !IsRanged(player, bySpec); }
 
-bool PlayerbotAI::IsCaster(Player* player) { return IsRanged(player) && player->getClass() != CLASS_HUNTER; }
+bool PlayerbotAI::IsCaster(Player* player, bool bySpec) { return IsRanged(player, bySpec) && player->getClass() != CLASS_HUNTER; }
 
-bool PlayerbotAI::IsCombo(Player* player)
+bool PlayerbotAI::IsCombo(Player* player, bool bySpec)
 {
     // int tab = AiFactory::GetPlayerSpecTab(player);
     return player->getClass() == CLASS_ROGUE ||
            (player->getClass() == CLASS_DRUID && player->HasAura(768));  // cat druid
 }
 
-bool PlayerbotAI::IsRangedDps(Player* player) { return IsRanged(player) && IsDps(player); }
+bool PlayerbotAI::IsRangedDps(Player* player, bool bySpec) { return IsRanged(player, bySpec) && IsDps(player, bySpec); }
 
 bool PlayerbotAI::IsHealAssistantOfIndex(Player* player, int index)
 {
@@ -1898,10 +1894,10 @@ int32 PlayerbotAI::GetMeleeIndex(Player* player)
     return 0;
 }
 
-bool PlayerbotAI::IsTank(Player* player)
+bool PlayerbotAI::IsTank(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_TANK);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
@@ -1936,10 +1932,10 @@ bool PlayerbotAI::IsTank(Player* player)
     return false;
 }
 
-bool PlayerbotAI::IsHeal(Player* player)
+bool PlayerbotAI::IsHeal(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_HEAL);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
@@ -1973,10 +1969,10 @@ bool PlayerbotAI::IsHeal(Player* player)
     return false;
 }
 
-bool PlayerbotAI::IsDps(Player* player)
+bool PlayerbotAI::IsDps(Player* player, bool bySpec)
 {
     PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
-    if (botAi)
+    if (!bySpec && botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_DPS);
 
     int tab = AiFactory::GetPlayerSpecTab(player);
@@ -1995,6 +1991,10 @@ bool PlayerbotAI::IsDps(Player* player)
             break;
         case CLASS_DRUID:
             if (tab == DRUID_TAB_BALANCE)
+            {
+                return true;
+            }
+            if (tab == DRUID_TAB_FERAL && !IsTank(player))
             {
                 return true;
             }
@@ -2792,8 +2792,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     }
 
     uint32 CastingTime = !spellInfo->IsChanneled() ? spellInfo->CalcCastTime(bot) : spellInfo->GetDuration();
-    bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
-    if ((CastingTime || interruptOnMove) && bot->isMoving())
+    // bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
+    if ((CastingTime || spellInfo->IsAutoRepeatRangedSpell()) && bot->isMoving())
     {
         if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
         {
@@ -3610,6 +3610,7 @@ bool PlayerbotAI::IsInVehicle(bool canControl, bool canCast, bool canAttack, boo
 
 void PlayerbotAI::WaitForSpellCast(Spell* spell)
 {
+    return;
     SpellInfo const* spellInfo = spell->GetSpellInfo();
     uint32 castTime = spell->GetCastTime();
     // float castTime = spell->GetCastTime();
@@ -4319,7 +4320,7 @@ void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uin
         return;
 
     uint8 type = proto->InventoryType;
-    uint32 level = mixed ? proto->ItemLevel * (1 + proto->Quality) : proto->ItemLevel;
+    uint32 level = mixed ? proto->ItemLevel * PlayerbotAI::GetItemScoreMultiplier(ItemQualities(proto->Quality)) : proto->ItemLevel;
 
     switch (type)
     {
@@ -5174,6 +5175,32 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, std::string const spellname)
     return bcount;
 }
 
+int32 PlayerbotAI::GetNearGroupMemberCount(float dis)
+{
+    int count = 1; // yourself
+    if (Group* group = bot->GetGroup())
+    {
+        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+        {
+            Player* member = gref->GetSource();
+            if (member == bot) // calculated
+                continue;
+
+            if (!member || !member->IsInWorld())
+                continue;
+
+            if (member->GetMapId() != bot->GetMapId())
+                continue;
+            
+            if (member->GetExactDist(bot) > dis)
+                continue;
+
+            count++;
+        }
+    }
+    return count;
+}
+
 bool PlayerbotAI::CanMove()
 {
     // do not allow if not vehicle driver
@@ -5224,6 +5251,7 @@ bool PlayerbotAI::EqualLowercaseName(std::string s1, std::string s2)
     return true;
 }
 
+// A custom CanEquipItem (remove AutoUnequipOffhand in FindEquipSlot to prevent unequip on `item usage` calculation)
 InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading) const
 {
     dest = 0;
@@ -5244,11 +5272,9 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
             if (pItem->IsBindedNotWith(bot))
                 return EQUIP_ERR_DONT_OWN_THAT_ITEM;
 
-            // Yunfan: skip it
-            // // check count of items (skip for auto move for same player from bank)
-            // InventoryResult res = bot->CanTakeMoreSimilarItems(pItem);
-            // if (res != EQUIP_ERR_OK)
-            //     return res;
+            InventoryResult res = bot->CanTakeMoreSimilarItems(pItem);
+            if (res != EQUIP_ERR_OK)
+                return res;
 
             ScalingStatDistributionEntry const* ssd =
                 pProto->ScalingStatDistribution
@@ -5267,7 +5293,7 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
             if (!bot->CanUseAttackType(bot->GetAttackBySlot(eslot)))
                 return EQUIP_ERR_NOT_WHILE_DISARMED;
 
-            InventoryResult res = bot->CanUseItem(pItem, not_loading);
+            res = bot->CanUseItem(pItem, not_loading);
             if (res != EQUIP_ERR_OK)
                 return res;
 
@@ -5804,4 +5830,33 @@ void PlayerbotAI::PetFollow()
     charmInfo->RemoveStayPosition();
     charmInfo->SetForcedSpell(0);
     charmInfo->SetForcedTargetGUID();
+}
+
+float PlayerbotAI::GetItemScoreMultiplier(ItemQualities quality)
+{
+    switch (quality)
+    {
+        // each quality increase 1.1x
+        case ITEM_QUALITY_POOR:
+            return 1.0f;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            return 1.1f;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            return 1.21f;
+            break;
+        case ITEM_QUALITY_RARE:
+            return 1.331f;
+            break;
+        case ITEM_QUALITY_EPIC:
+            return 1.4641f;
+            break;
+        case ITEM_QUALITY_LEGENDARY:
+            return 1.61051f;
+            break;
+        default:
+            break;
+    }
+    return 1.0f;
 }

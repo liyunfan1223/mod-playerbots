@@ -10,6 +10,7 @@
 
 #include "HealthTriggers.h"
 #include "RangeTriggers.h"
+#include "Trigger.h"
 
 class PlayerbotAI;
 class Unit;
@@ -107,6 +108,30 @@ class ComboPointsAvailableTrigger : public StatAvailable
 public:
     ComboPointsAvailableTrigger(PlayerbotAI* botAI, int32 amount = 5)
         : StatAvailable(botAI, amount, "combo points available")
+    {
+    }
+
+    bool IsActive() override;
+};
+
+class TargetWithComboPointsLowerHealTrigger : public ComboPointsAvailableTrigger
+{
+public:
+    TargetWithComboPointsLowerHealTrigger(PlayerbotAI* ai, int32 combo_point = 5, float lifeTime = 8.0f)
+        : ComboPointsAvailableTrigger(ai, combo_point), lifeTime(lifeTime)
+    {
+    }
+    bool IsActive() override;
+
+private:
+    float lifeTime;
+};
+
+class ComboPointsNotFullTrigger : public StatAvailable
+{
+public:
+    ComboPointsNotFullTrigger(PlayerbotAI* botAI, int32 amount = 5, std::string const name = "combo points not full")
+        : StatAvailable(botAI, amount, name)
     {
     }
 
@@ -224,6 +249,13 @@ public:
     MediumThreatTrigger(PlayerbotAI* botAI) : MyAttackerCountTrigger(botAI, 2) {}
 };
 
+class LowTankThreatTrigger : public Trigger
+{
+public:
+    LowTankThreatTrigger(PlayerbotAI* botAI) : Trigger(botAI, "low tank threat") {}
+    bool IsActive() override;
+};
+
 class AoeTrigger : public AttackerCountTrigger
 {
 public:
@@ -276,10 +308,12 @@ public:
 class BuffTrigger : public SpellTrigger
 {
 public:
-    BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false)
+    BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false, bool checkDuration = false, uint32 beforeDuration = 0)
         : SpellTrigger(botAI, spell, checkInterval)
     {
         this->checkIsOwner = checkIsOwner;
+        this->checkDuration = checkDuration;
+        this->beforeDuration = beforeDuration;
     }
 
 public:
@@ -288,6 +322,8 @@ public:
 
 protected:
     bool checkIsOwner;
+    bool checkDuration;
+    uint32 beforeDuration;
 };
 
 class BuffOnPartyTrigger : public BuffTrigger
@@ -347,8 +383,8 @@ class DebuffTrigger : public BuffTrigger
 {
 public:
     DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false,
-                  float needLifeTime = 8.0f)
-        : BuffTrigger(botAI, spell, checkInterval, checkIsOwner), needLifeTime(needLifeTime)
+                  float needLifeTime = 8.0f, uint32 beforeDuration = 0)
+        : BuffTrigger(botAI, spell, checkInterval, checkIsOwner, false, beforeDuration), needLifeTime(needLifeTime)
     {
     }
 

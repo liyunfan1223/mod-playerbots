@@ -11,13 +11,13 @@
 std::map<uint32, SkillLineAbilityEntry const*> ListSpellsAction::skillSpells;
 std::set<uint32> ListSpellsAction::vendorItems;
 
-bool CompareSpells(std::pair<uint32, std::string>& s1, std::pair<uint32, std::string>& s2)
+bool CompareSpells(const std::pair<uint32, std::string>& s1, const std::pair<uint32, std::string>& s2)
 {
     SpellInfo const* si1 = sSpellMgr->GetSpellInfo(s1.first);
     SpellInfo const* si2 = sSpellMgr->GetSpellInfo(s2.first);
     if (!si1 || !si2)
     {
-        LOG_ERROR("playerbots", "SpellInfo missing.");
+        LOG_ERROR("playerbots", "SpellInfo missing. {} {}", s1.first, s2.first);
         return false;
     }
     uint32 p1 = si1->SchoolMask * 20000;
@@ -54,7 +54,7 @@ bool CompareSpells(std::pair<uint32, std::string>& s1, std::pair<uint32, std::st
 
     if (p1 == p2)
     {
-        return strcmp(si1->SpellName[0], si1->SpellName[1]) > 0;
+        return strcmp(si1->SpellName[0], si2->SpellName[0]) > 0;
     }
 
     return p1 > p2;
@@ -273,7 +273,11 @@ std::vector<std::pair<uint32, std::string>> ListSpellsAction::GetSpellList(std::
 
         if (out.str().empty())
             continue;
-
+        
+        if (itr->first == 0)
+        {
+            LOG_ERROR("playerbots", "?! {}", itr->first);
+        }
         spells.push_back(std::pair<uint32, std::string>(itr->first, out.str()));
         alreadySeenList += spellInfo->SpellName[0];
         alreadySeenList += ",";

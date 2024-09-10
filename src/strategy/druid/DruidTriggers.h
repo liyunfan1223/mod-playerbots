@@ -9,6 +9,8 @@
 #include "CureTriggers.h"
 #include "GenericTriggers.h"
 #include "Player.h"
+#include "PlayerbotAI.h"
+#include "Playerbots.h"
 #include "SharedDefines.h"
 
 class PlayerbotAI;
@@ -73,8 +75,6 @@ class MoonfireTrigger : public DebuffTrigger
 {
 public:
     MoonfireTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "moonfire", 1, true) {}
-
-    bool IsActive() override;
 };
 
 class FaerieFireTrigger : public DebuffTrigger
@@ -95,10 +95,22 @@ public:
     BashInterruptSpellTrigger(PlayerbotAI* botAI) : InterruptSpellTrigger(botAI, "bash") {}
 };
 
-class TigersFuryTrigger : public BoostTrigger
+class TigersFuryTrigger : public BuffTrigger
 {
 public:
-    TigersFuryTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "tiger's fury") {}
+    TigersFuryTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "tiger's fury") {}
+};
+
+class BerserkTrigger : public BoostTrigger
+{
+public:
+    BerserkTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "berserk") {}
+};
+
+class SavageRoarTrigger : public BuffTrigger
+{
+public:
+    SavageRoarTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "savage roar") {}
 };
 
 class NaturesGraspTrigger : public BoostTrigger
@@ -210,6 +222,45 @@ class EclipseLunarCooldownTrigger : public SpellCooldownTrigger
 public:
     EclipseLunarCooldownTrigger(PlayerbotAI* ai) : SpellCooldownTrigger(ai, "eclipse (lunar)") {}
     bool IsActive() override { return bot->HasSpellCooldown(48518); }
+};
+
+class MangleCatTrigger : public DebuffTrigger
+{
+public:
+    MangleCatTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "mangle (cat)", 1, false, 0.0f) {}
+    bool IsActive() override
+    {
+        return DebuffTrigger::IsActive() && !botAI->HasAura("mangle (bear)", GetTarget(), false, false, -1, true)
+            && !botAI->HasAura("trauma", GetTarget(), false, false, -1, true);
+    }
+};
+
+class FerociousBiteTimeTrigger : public Trigger
+{
+public:
+    FerociousBiteTimeTrigger(PlayerbotAI* ai) : Trigger(ai, "ferocious bite time") {}
+    bool IsActive() override
+    {
+        Unit* target = AI_VALUE(Unit*, "current target");
+        if (!target)
+            return false;
+
+        uint8 cp = AI_VALUE2(uint8, "combo", "current target");
+        if (cp < 5)
+            return false;
+
+        Aura* roar = botAI->GetAura("savage roar", bot);
+        bool roarCheck = !roar || roar->GetDuration() > 10000;
+        if (!roarCheck)
+            return false;
+
+        Aura* rip = botAI->GetAura("rip", target, true);
+        bool ripCheck = !rip || rip->GetDuration() > 10000;
+        if (!ripCheck)
+            return false;
+
+        return true;
+    }
 };
 
 #endif

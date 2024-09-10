@@ -18,12 +18,14 @@
 #include "Group.h"
 #include "GroupMgr.h"
 #include "ObjectAccessor.h"
+#include "ObjectGuid.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
 #include "PlayerbotSecurity.h"
 #include "Playerbots.h"
+#include "RandomPlayerbotMgr.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include "ChannelMgr.h"
@@ -126,6 +128,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         allowed = false;
         out << "Failure: You are not allowed to control bot " << bot->GetName().c_str();
     }
+
     if (allowed && masterSession)
     {
         Player* player = masterSession->GetPlayer();
@@ -143,6 +146,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
             out << "Failure: You have added too many bots for this class";
         }
     }
+    
     if (allowed)
     {
         sRandomPlayerbotMgr->OnPlayerLogin(bot);
@@ -722,14 +726,14 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
                                         sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
                 PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
                 factory.Randomize(false);
-                return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) +
+                return "ok, gear score limit: " + std::to_string(mixedGearScore / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) +
                        "(for epic)";
             }
             else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
             {
                 PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
                 factory.Randomize(false);
-                return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
+                return "ok, gear score limit: " + std::to_string(gs / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) + "(for epic)";
             }
         }
 
@@ -843,6 +847,22 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strncmp(cmd, "initself=", 9))
     {
+        if (!strcmp(cmd, "initself=uncommon"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_UNCOMMON);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
         if (!strcmp(cmd, "initself=rare"))
         {
             if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
@@ -865,6 +885,22 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             {
                 // OnBotLogin(master);
                 PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        if (!strcmp(cmd, "initself=legendary"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_LEGENDARY);
                 factory.Randomize(false);
                 messages.push_back("initself ok");
                 return messages;
@@ -1003,44 +1039,20 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             messages.push_back("Error: Invalid Class. Try again.");
             return messages;
         }
-        uint8 master_race = master->getRace();
-        std::string race_limit;
-        switch (master_race)
+        uint8 teamId = master->GetTeamId(true);
+        std::vector<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
+        for (size_t i = 0; i < guidCache.size(); i++)
         {
-            case 1:
-            case 3:
-            case 4:
-            case 7:
-            case 11:
-                race_limit = "1, 3, 4, 7, 11";
-                break;
-            case 2:
-            case 5:
-            case 6:
-            case 8:
-            case 10:
-                race_limit = "2, 5, 6, 8, 10";
-                break;
-        }
-        uint32 maxAccountId = sPlayerbotAIConfig->randomBotAccounts.back();
-        // find a bot fit conditions and not in any guild
-        QueryResult results = CharacterDatabase.Query(
-            "SELECT guid FROM characters "
-            "WHERE name IN (SELECT name FROM playerbots_names) AND class = '{}' AND online = 0 AND race IN ({}) AND "
-            "guid NOT IN ( SELECT guid FROM guild_member ) "
-            "AND account <= {} "
-            "ORDER BY account DESC LIMIT 1",
-            claz, race_limit, maxAccountId);
-        if (results)
-        {
-            Field* fields = results->Fetch();
-            ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
+            ObjectGuid guid = guidCache[i];
+            if (botLoading.find(guid) != botLoading.end())
+                continue;
+            if (ObjectAccessor::FindConnectedPlayer(guid))
+                continue;
             AddPlayerBot(guid, master->GetSession()->GetAccountId());
-
             messages.push_back("Add class " + std::string(charname));
             return messages;
         }
-        messages.push_back("Add class failed.");
+        messages.push_back("Add class failed, no available characters!");
         return messages;
     }
 
@@ -1295,7 +1307,7 @@ uint32 PlayerbotHolder::GetPlayerbotsCountByClass(uint32 cls)
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
-        if (bot->getClass() == cls)
+        if (bot && bot->IsInWorld() && bot->getClass() == cls)
         {
             count++;
         }

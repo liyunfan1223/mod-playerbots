@@ -401,14 +401,14 @@ public:
     void ResetStrategies(bool load = false);
     void ReInitCurrentEngine();
     void Reset(bool full = false);
-    static bool IsTank(Player* player);
-    static bool IsHeal(Player* player);
-    static bool IsDps(Player* player);
-    static bool IsRanged(Player* player);
-    static bool IsMelee(Player* player);
-    static bool IsCaster(Player* player);
-    static bool IsCombo(Player* player);
-    static bool IsRangedDps(Player* player);
+    static bool IsTank(Player* player, bool bySpec = false);
+    static bool IsHeal(Player* player, bool bySpec = false);
+    static bool IsDps(Player* player, bool bySpec = false);
+    static bool IsRanged(Player* player, bool bySpec = false);
+    static bool IsMelee(Player* player, bool bySpec = false);
+    static bool IsCaster(Player* player, bool bySpec = false);
+    static bool IsCombo(Player* player, bool bySpec = false);
+    static bool IsRangedDps(Player* player, bool bySpec = false);
     static bool IsMainTank(Player* player);
     bool IsAssistTank(Player* player);
     bool IsAssistTankOfIndex(Player* player, int index);
@@ -469,6 +469,7 @@ public:
     void ImbueItem(Item* item);
     void EnchantItemT(uint32 spellid, uint8 slot);
     uint32 GetBuffedCount(Player* player, std::string const spellname);
+    int32 GetNearGroupMemberCount(float dis = sPlayerbotAIConfig->sightDistance);
 
     virtual bool CanCastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
     virtual bool CastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
@@ -568,6 +569,7 @@ public:
     std::set<uint32> GetAllCurrentQuestIds();
     std::set<uint32> GetCurrentIncompleteQuestIds();
     void PetFollow();
+    static float GetItemScoreMultiplier(ItemQualities quality);
 
 private:
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,

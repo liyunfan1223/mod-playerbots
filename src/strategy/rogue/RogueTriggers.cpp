@@ -124,14 +124,3 @@ bool OffHandWeaponNoEnchantTrigger::IsActive()
         return false;
     return true;
 }
-
-bool TargetWithComboPointsLowerHealTrigger::IsActive()
-{
-    Unit* target = AI_VALUE(Unit*, "current target");
-    if (!target || !target->IsAlive() || !target->IsInWorld())
-    {
-        return false;
-    }
-    return ComboPointsAvailableTrigger::IsActive() &&
-           (target->GetHealth() / AI_VALUE(float, "expected group dps")) <= lifeTime;
-}

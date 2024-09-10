@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
+#include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 
 template <class T>
@@ -25,6 +26,19 @@ void LoadList(std::string const value, T& list)
         // if (!id)
         //     continue;
         list.push_back(id);
+    }
+}
+
+template <class T>
+void LoadSet(std::string const value, T& set)
+{
+    std::vector<std::string> ids = split(value, ',');
+    for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++)
+    {
+        uint32 id = atoi((*i).c_str());
+        // if (!id)
+        //     continue;
+        set.insert(id);
     }
 }
 
@@ -93,10 +107,14 @@ bool PlayerbotAIConfig::Initialize()
     almostFullHealth = sConfigMgr->GetOption<int32>("AiPlayerbot.AlmostFullHealth", 85);
     lowMana = sConfigMgr->GetOption<int32>("AiPlayerbot.LowMana", 15);
     mediumMana = sConfigMgr->GetOption<int32>("AiPlayerbot.MediumMana", 40);
+    highMana = sConfigMgr->GetOption<int32>("AiPlayerbot.HighMana", 65);
     autoSaveMana = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoSaveMana", true);
     saveManaThreshold = sConfigMgr->GetOption<int32>("AiPlayerbot.SaveManaThreshold", 60);
     autoAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoAvoidAoe", true);
-    tellWhenAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.TellWhenAvoidAoe", true);
+    maxAoeAvoidRadius = sConfigMgr->GetOption<float>("AiPlayerbot.MaxAoeAvoidRadius", 15.0f);
+    LoadSet<std::set<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AoeAvoidSpellWhitelist", "50759,57491,13810"),
+                              aoeAvoidSpellWhitelist);
+    tellWhenAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.TellWhenAvoidAoe", false);
 
     randomGearLoweringChance = sConfigMgr->GetOption<float>("AiPlayerbot.RandomGearLoweringChance", 0.0f);
     randomGearQualityLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomGearQualityLimit", 3);
@@ -331,13 +349,31 @@ bool PlayerbotAIConfig::Initialize()
         }
         for (uint32 spec = 0; spec < 3; ++spec)
         {
+            for (uint32 points = 0; points < 21; ++points)
+            {
+                std::ostringstream os;
+                os << "AiPlayerbot.PremadeHunterPetLink." << spec << "." << points;
+                premadeHunterPetLink[spec][points] = sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false);
+                parsedHunterPetLinkOrder[spec][points] =
+                    ParseTempPetTalentsOrder(spec, premadeHunterPetLink[spec][points]);
+            }
+        }
+        for (uint32 spec = 0; spec < MAX_SPECNO; ++spec)
+        {
             std::ostringstream os;
             os << "AiPlayerbot.RandomClassSpecProb." << cls << "." << spec;
-            randomClassSpecProb[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), 33);
+            uint32 def;
+            if (spec <= 1)
+                def = 33;
+            else if (spec == 2)
+                def = 34;
+            else
+                def = 0;
+            randomClassSpecProb[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), def, false);
             os.str("");
             os.clear();
             os << "AiPlayerbot.RandomClassSpecIndex." << cls << "." << spec;
-            randomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), spec + 1);
+            randomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(os.str().c_str(), spec, false);
         }
     }
 
@@ -420,6 +456,7 @@ bool PlayerbotAIConfig::Initialize()
     maxAddedBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBots", 40);
     maxAddedBotsPerClass = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxAddedBotsPerClass", 10);
     addClassCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassCommand", 1);
+    addClassAccountPoolSize = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassAccountPoolSize", 50);
     maintenanceCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.MaintenanceCommand", 1);
     autoGearCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearCommand", 1);
     autoGearQualityLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearQualityLimit", 3);
@@ -450,6 +487,7 @@ bool PlayerbotAIConfig::Initialize()
     autoPickReward = sConfigMgr->GetOption<std::string>("AiPlayerbot.AutoPickReward", "yes");
     autoEquipUpgradeLoot = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoEquipUpgradeLoot", true);
     equipUpgradeThreshold = sConfigMgr->GetOption<float>("AiPlayerbot.EquipUpgradeThreshold", 1.1f);
+    twoRoundsGearInit = sConfigMgr->GetOption<bool>("AiPlayerbot.TwoRoundsGearInit", false);
     syncQuestWithPlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncQuestWithPlayer", true);
     syncQuestForPlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncQuestForPlayer", false);
     autoTrainSpells = sConfigMgr->GetOption<std::string>("AiPlayerbot.AutoTrainSpells", "yes");
@@ -478,6 +516,9 @@ bool PlayerbotAIConfig::Initialize()
     {
         return true;
     }
+    if (sPlayerbotAIConfig->addClassCommand)
+        sRandomPlayerbotMgr->PrepareAddclassCache();
+
     sRandomItemMgr->Init();
     sRandomItemMgr->InitAfterAhBot();
     sPlayerbotTextMgr->LoadBotTexts();
@@ -746,4 +787,49 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
         res.insert(res.end(), order.begin(), order.end());
     }
     return res;
+}
+
+std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempPetTalentsOrder(uint32 spec, std::string tab_link)
+{
+    // check bad link
+    // uint32 classMask = 1 << (cls - 1);
+    std::vector<TalentEntry const*> spells;
+    std::vector<std::vector<uint32>> orders;
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    {
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
+        if (!talentInfo)
+            continue;
+
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+        if (!talentTabInfo)
+            continue;
+
+        if (!((1 << spec) & talentTabInfo->petTalentMask))
+            continue;
+        // skip some duplicate spells like dash/dive
+        if (talentInfo->TalentID == 2201 || talentInfo->TalentID == 2208 || talentInfo->TalentID == 2219 ||
+            talentInfo->TalentID == 2203)
+            continue;
+
+        spells.push_back(talentInfo);
+    }
+    std::sort(spells.begin(), spells.end(),
+              [&](TalentEntry const* lhs, TalentEntry const* rhs)
+              { return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col; });
+    for (int i = 0; i < tab_link.size(); i++)
+    {
+        if (i >= spells.size())
+        {
+            break;
+        }
+        int lvl = tab_link[i] - '0';
+        if (lvl == 0)
+            continue;
+        orders.push_back({spells[i]->Row, spells[i]->Col, (uint32)lvl});
+    }
+    // sort by talent tab size
+    std::sort(orders.begin(), orders.end(), [&](auto& lhs, auto& rhs) { return lhs.size() > rhs.size(); });
+
+    return orders;
 }

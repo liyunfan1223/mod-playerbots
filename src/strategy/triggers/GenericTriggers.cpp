@@ -10,9 +10,11 @@
 #include "BattlegroundWS.h"
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
+#include "ThreatMgr.h"
 #include "Timer.h"
 
 bool LowManaTrigger::IsActive()
@@ -64,7 +66,7 @@ bool PetAttackTrigger::IsActive()
 
 bool HighManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < 65;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->highMana;
 }
 
 bool AlmostFullManaTrigger::IsActive()
@@ -82,6 +84,19 @@ bool RageAvailable::IsActive() { return AI_VALUE2(uint8, "rage", "self target") 
 bool EnergyAvailable::IsActive() { return AI_VALUE2(uint8, "energy", "self target") >= amount; }
 
 bool ComboPointsAvailableTrigger::IsActive() { return AI_VALUE2(uint8, "combo", "current target") >= amount; }
+
+bool ComboPointsNotFullTrigger::IsActive() { return AI_VALUE2(uint8, "combo", "current target") < amount; }
+
+bool TargetWithComboPointsLowerHealTrigger::IsActive()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target || !target->IsAlive() || !target->IsInWorld())
+    {
+        return false;
+    }
+    return ComboPointsAvailableTrigger::IsActive() &&
+           (target->GetHealth() / AI_VALUE(float, "estimated group dps")) <= lifeTime;
+}
 
 bool LoseAggroTrigger::IsActive() { return !AI_VALUE2(bool, "has aggro", "current target"); }
 
@@ -137,7 +152,16 @@ bool OutNumberedTrigger::IsActive()
 bool BuffTrigger::IsActive()
 {
     Unit* target = GetTarget();
-    return SpellTrigger::IsActive() && !botAI->HasAura(spell, target, false, checkIsOwner);
+    if (!target)
+        return false;
+    if (!SpellTrigger::IsActive())
+        return false;
+    Aura* aura = botAI->GetAura(spell, target, checkIsOwner, checkDuration);
+    if (!aura)
+        return true;
+    if (beforeDuration && aura->GetDuration() < beforeDuration)
+        return true;
+    return false;
 }
 
 Value<Unit*>* BuffOnPartyTrigger::GetTargetValue()
@@ -169,6 +193,22 @@ bool NoTargetTrigger::IsActive() { return !AI_VALUE(Unit*, "current target"); }
 bool MyAttackerCountTrigger::IsActive()
 {
     return AI_VALUE2(bool, "combat", "self target") && AI_VALUE(uint8, "my attacker count") >= amount;
+}
+
+bool LowTankThreatTrigger::IsActive()
+{
+    Unit* mt = AI_VALUE(Unit*, "main tank");
+    if (!mt)
+        return false;
+
+    Unit* current_target = AI_VALUE(Unit*, "current target");
+    if (!current_target)
+        return false;
+
+    ThreatMgr& mgr = current_target->GetThreatMgr();
+    float threat = mgr.GetThreat(bot);
+    float tankThreat = mgr.GetThreat(mt);
+    return tankThreat == 0.0f || threat > tankThreat * 0.5f;
 }
 
 bool AoeTrigger::IsActive()
@@ -221,7 +261,7 @@ bool DebuffTrigger::IsActive()
     {
         return false;
     }
-    return BuffTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+    return BuffTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "estimated group dps")) >= needLifeTime;
 }
 
 bool DebuffOnBossTrigger::IsActive()

@@ -34,8 +34,9 @@ ArmsWarriorStrategy::ArmsWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 
 NextAction** ArmsWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("bladestorm", ACTION_DEFAULT + 0.1f),
-                             new NextAction("melee", ACTION_DEFAULT), nullptr);
+    return NextAction::array(0, new NextAction("bladestorm", ACTION_DEFAULT + 0.2f),
+                            new NextAction("mortal strike", ACTION_DEFAULT + 0.1f),
+                            new NextAction("melee", ACTION_DEFAULT), nullptr);
 }
 
 void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -63,9 +64,11 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "victory rush", NextAction::array(0, new NextAction("victory rush", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode(
-        "medium rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 10), nullptr)));
-    /*triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("slam", ACTION_HIGH
-     * + 1), nullptr)));*/
+        "high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 10), nullptr)));
+    triggers.push_back(new TriggerNode("medium rage available", 
+        NextAction::array(0, new NextAction("slam", ACTION_HIGH + 1),
+        new NextAction("thunder clap", ACTION_HIGH),
+        nullptr)));
     triggers.push_back(
         new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(
@@ -75,6 +78,6 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "rend on attacker", NextAction::array(0, new NextAction("rend on attacker", ACTION_HIGH + 5), nullptr)));
     triggers.push_back(new TriggerNode(
         "critical health", NextAction::array(0, new NextAction("intimidating shout", ACTION_EMERGENCY), nullptr)));
-    triggers.push_back(new TriggerNode("medium rage available",
-                                       NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe",
+                                       NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), nullptr)));
 }

@@ -172,7 +172,7 @@ public:
         creators["rtsc"] = &ChatActionContext::rtsc;
         creators["naxx chat shortcut"] = &ChatActionContext::naxx_chat_shortcut;
         creators["bwl chat shortcut"] = &ChatActionContext::bwl_chat_shortcut;
-        creators["tell expected dps"] = &ChatActionContext::tell_expected_dps;
+        creators["tell estimated dps"] = &ChatActionContext::tell_estimated_dps;
         creators["join"] = &ChatActionContext::join;
         creators["calc"] = &ChatActionContext::calc;
     }
@@ -271,7 +271,7 @@ private:
     static Action* rtsc(PlayerbotAI* botAI) { return new RTSCAction(botAI); }
     static Action* naxx_chat_shortcut(PlayerbotAI* ai) { return new NaxxChatShortcutAction(ai); }
     static Action* bwl_chat_shortcut(PlayerbotAI* ai) { return new BwlChatShortcutAction(ai); }
-    static Action* tell_expected_dps(PlayerbotAI* ai) { return new TellExpectedDpsAction(ai); }
+    static Action* tell_estimated_dps(PlayerbotAI* ai) { return new TellEstimatedDpsAction(ai); }
     static Action* join(PlayerbotAI* ai) { return new JoinGroupAction(ai); }
     static Action* calc(PlayerbotAI* ai) { return new TellCalculateItemAction(ai); }
 };

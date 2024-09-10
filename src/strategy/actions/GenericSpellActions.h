@@ -37,16 +37,20 @@ protected:
 class CastAuraSpellAction : public CastSpellAction
 {
 public:
-    CastAuraSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false)
+    CastAuraSpellAction(PlayerbotAI* botAI, std::string const spell, bool isOwner = false, bool checkDuration = false, uint32 beforeDuration = 0)
         : CastSpellAction(botAI, spell)
     {
         this->isOwner = isOwner;
+        this->beforeDuration = beforeDuration;
+        this->checkDuration = checkDuration;
     }
 
     bool isUseful() override;
 
 protected:
     bool isOwner;
+    bool checkDuration;
+    uint32 beforeDuration;
 };
 
 class CastMeleeSpellAction : public CastSpellAction
@@ -107,7 +111,7 @@ public:
 class CastBuffSpellAction : public CastAuraSpellAction
 {
 public:
-    CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = false);
+    CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner = false, uint32 beforeDuration = 0);
 
     std::string const GetTargetName() override { return "self target"; }
 };

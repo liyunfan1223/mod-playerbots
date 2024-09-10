@@ -78,6 +78,9 @@ END_SPELL_ACTION()
 BEGIN_RANGED_SPELL_ACTION(CastKillShotAction, "kill shot")
 END_SPELL_ACTION()
 
+BEGIN_RANGED_SPELL_ACTION(CastSilencingShotAction, "silencing shot")
+END_SPELL_ACTION()
+
 BEGIN_RANGED_SPELL_ACTION(CastTranquilizingShotAction, "tranquilizing shot")
 END_SPELL_ACTION()
 
@@ -135,6 +138,14 @@ class CastMendPetAction : public CastAuraSpellAction
 {
 public:
     CastMendPetAction(PlayerbotAI* botAI) : CastAuraSpellAction(botAI, "mend pet") {}
+
+    std::string const GetTargetName() override { return "pet target"; }
+};
+
+class CastKillCommandAction : public CastAuraSpellAction
+{
+public:
+    CastKillCommandAction(PlayerbotAI* botAI) : CastAuraSpellAction(botAI, "kill command") {}
 
     std::string const GetTargetName() override { return "pet target"; }
 };

@@ -63,10 +63,12 @@ public:
         tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance, aoeRadius, rpgDistance,
         targetPosRecalcDistance, farDistance, healDistance, aggroDistance;
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
-    uint32 lowMana, mediumMana;
+    uint32 lowMana, mediumMana, highMana;
     bool autoSaveMana;
     uint32 saveManaThreshold;
     bool autoAvoidAoe;
+    float maxAoeAvoidRadius;
+    std::set<uint32> aoeAvoidSpellWhitelist;
     bool tellWhenAvoidAoe;
 
     uint32 openGoSpell;
@@ -195,7 +197,9 @@ public:
     std::string premadeSpecGlyph[MAX_CLASSES][MAX_SPECNO];
     std::vector<uint32> parsedSpecGlyph[MAX_CLASSES][MAX_SPECNO];
     std::string premadeSpecLink[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+    std::string premadeHunterPetLink[3][21];
     std::vector<std::vector<uint32>> parsedSpecLinkOrder[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+    std::vector<std::vector<uint32>> parsedHunterPetLinkOrder[3][21];
     uint32 randomClassSpecProb[MAX_CLASSES][MAX_SPECNO];
     uint32 randomClassSpecIndex[MAX_CLASSES][MAX_SPECNO];
 
@@ -269,6 +273,7 @@ public:
     std::string autoPickReward;
     bool autoEquipUpgradeLoot;
     float equipUpgradeThreshold;
+    bool twoRoundsGearInit;
     bool syncQuestWithPlayer;
     bool syncQuestForPlayer;
     std::string autoTrainSpells;
@@ -306,6 +311,7 @@ public:
     float autoInitEquipLevelLimitRatio;
     int32 maxAddedBots, maxAddedBotsPerClass;
     int32 addClassCommand;
+    int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
     int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
 
@@ -324,6 +330,7 @@ public:
 
     void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
     static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
+    static std::vector<std::vector<uint32>> ParseTempPetTalentsOrder(uint32 spec, std::string temp_talents_order);
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

@@ -80,6 +80,7 @@ AiPlayerbot.Enabled = 1
 AiPlayerbot.RandomBotAutologin = 1
 
 # Random bot account
+# Please ensure that RandomBotAccountCount is greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
 AiPlayerbot.RandomBotAccountCount = 200
 
 # Random bot count
@@ -108,11 +109,15 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 AiPlayerbot.MaxAddedBots = 40
 
 # Maximum number of bots per class added by one account
-AiPlayerbot.MaxAddedBotsPerClass = 10
+AiPlayerbot.MaxAddedBotsPerClass = 40
 
 # Enable/Disable create bot by addclass command (0 = GM only, 1 = enable)
 # default: 1 (enable)
 AiPlayerbot.AddClassCommand = 1
+
+# Set the addclass command account pool size
+# Addclass command uses a subset of accounts from RandomBotAccountCount
+AiPlayerbot.AddClassAccountPoolSize = 50
 
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
 # default: 1 (accept based on level)
@@ -210,6 +215,9 @@ AiPlayerbot.AutoEquipUpgradeLoot = 1
 # Equip upgrade threshold for auto equip upgrade
 # Default: 1.1 (Equip when the equipment score is 1.1 times higher than the current)
 AiPlayerbot.EquipUpgradeThreshold = 1.1
+
+# Two rounds of equipment initialization to create more suitable gear
+AiPlayerbot.TwoRoundsGearInit = 0
 
 #
 #
@@ -337,6 +345,7 @@ AiPlayerbot.MediumHealth = 65
 AiPlayerbot.AlmostFullHealth = 85
 AiPlayerbot.LowMana = 15
 AiPlayerbot.MediumMana = 40
+AiPlayerbot.HighMana = 65
 
 #
 #
@@ -348,7 +357,7 @@ AiPlayerbot.MediumMana = 40
 #
 #
 
-# Bots pick their quest reward (yes = picks first useful item, no = list all rewards, ask = pick useful item and lists if multiple)
+# Bots pick their quest reward (yes = picks the most useful item, no = list all rewards, ask = pick useful item and lists if multiple)
 AiPlayerbot.AutoPickReward = yes
 
 # Sync quests with player (Bots will complete quests the moment you hand them in. Bots will ignore looting quest items.)
@@ -376,9 +385,11 @@ AiPlayerbot.ApplyInstanceStrategies = 1
 # Default: 1 (enable)
 AiPlayerbot.AutoAvoidAoe = 1
 
-# Tell which spell is avoiding (experimental)
-# Default: 1 (enable)
-AiPlayerbot.TellWhenAvoidAoe = 1
+# Only avoid aoe spells with a radius smaller than this value
+AiPlayerbot.MaxAoeAvoidRadius = 15.0
+
+# A whitelist of aoe spell IDs that should not be avoided
+AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810
 
 # Enable healer bot save mana
 # Default: 1 (enable)
@@ -765,12 +776,12 @@ AiPlayerbot.RandomBotInWorldWithRotationDisabled = 31104000
 
 AiPlayerbot.PremadeSpecName.1.0 = arms pve
 AiPlayerbot.PremadeSpecGlyph.1.0 = 43418,43395,43423,43399,49084,43421
-AiPlayerbot.PremadeSpecLink.1.0.60 = 3022032023335100202012013031241
-AiPlayerbot.PremadeSpecLink.1.0.80 = 3022032123335100202012013031251-32505010002
+AiPlayerbot.PremadeSpecLink.1.0.60 = 3022032023335100002012211231241
+AiPlayerbot.PremadeSpecLink.1.0.80 = 3022032023335100102012213231251-305-2033
 AiPlayerbot.PremadeSpecName.1.1 = fury pve
 AiPlayerbot.PremadeSpecGlyph.1.1 = 43418,43395,43414,43399,49084,43432
 AiPlayerbot.PremadeSpecLink.1.1.60 = -305053000500310053120501351
-AiPlayerbot.PremadeSpecLink.1.1.80 = 30202300233-305053000500310153120511351
+AiPlayerbot.PremadeSpecLink.1.1.80 = 32002300233-305053000500310153120511351
 AiPlayerbot.PremadeSpecName.1.2 = prot pve
 AiPlayerbot.PremadeSpecGlyph.1.2 = 43424,43395,43425,43399,49084,45793
 AiPlayerbot.PremadeSpecLink.1.2.60 = --053351225000210521030113321
@@ -815,13 +826,25 @@ AiPlayerbot.PremadeSpecGlyph.3.0 = 42912,43350,42902,43351,43338,45732
 AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112243100511351
 AiPlayerbot.PremadeSpecLink.3.0.80 = 51200201505112253100531351-015305021
 AiPlayerbot.PremadeSpecName.3.1 = mm pve
-AiPlayerbot.PremadeSpecGlyph.3.1 = 42912,43350,42915,43351,43338,45732
-AiPlayerbot.PremadeSpecLink.3.1.60 = -015305101230013233135030051
-AiPlayerbot.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
+AiPlayerbot.PremadeSpecGlyph.3.1 = 42912,43350,42914,43351,43338,45732
+AiPlayerbot.PremadeSpecLink.3.1.60 = -025315101030013233125031051
+AiPlayerbot.PremadeSpecLink.3.1.80 = 502-025335101030013233135031351-5000002
 AiPlayerbot.PremadeSpecName.3.2 = surv pve
 AiPlayerbot.PremadeSpecGlyph.3.2 = 42912,43350,45731,43351,43338,45732
-AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135001331
-AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330522135301331
+AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
+AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330532135301321
+
+# HUNTER PET
+#
+# Ferocity
+AiPlayerbot.PremadeHunterPetLink.0.16 = 2100003030103010101
+AiPlayerbot.PremadeHunterPetLink.0.20 = 2100013030103010122
+# Tenacity
+AiPlayerbot.PremadeHunterPetLink.1.16 = 21103000300120101001
+AiPlayerbot.PremadeHunterPetLink.1.20 = 21303010300120101002
+# Cunning
+AiPlayerbot.PremadeHunterPetLink.2.16 = 2100020330000211001
+AiPlayerbot.PremadeHunterPetLink.2.20 = 21000203300002110221
 
 #
 #
@@ -889,8 +912,8 @@ AiPlayerbot.PremadeSpecLink.6.1.60 = -32003350332203012300023101351
 AiPlayerbot.PremadeSpecLink.6.1.80 = -32002350352203012300033101351-230200305003
 AiPlayerbot.PremadeSpecName.6.2 = unholy pve
 AiPlayerbot.PremadeSpecGlyph.6.2 = 43542,43673,45804,43544,43672,43549
-AiPlayerbot.PremadeSpecLink.6.2.60 = --2300303050032152000150213130051
-AiPlayerbot.PremadeSpecLink.6.2.80 = -320053500002-2300303050032152000150213130051
+AiPlayerbot.PremadeSpecLink.6.2.60 = --2301303050032151000150013131151
+AiPlayerbot.PremadeSpecLink.6.2.80 = -320033500002-2301303050032151000150013133151
 AiPlayerbot.PremadeSpecName.6.3 = double aura blood pve
 AiPlayerbot.PremadeSpecGlyph.6.3 = 45805,43673,43827,43544,43672,43554
 AiPlayerbot.PremadeSpecLink.6.3.60 = 005512153330030320102013-305
@@ -911,7 +934,7 @@ AiPlayerbot.PremadeSpecGlyph.7.0 = 41536,43385,41532,43386,44923,45776
 AiPlayerbot.PremadeSpecLink.7.0.60 = 4530001520213351102301351
 AiPlayerbot.PremadeSpecLink.7.0.80 = 3530001523213351322301351-005050031
 AiPlayerbot.PremadeSpecName.7.1 = enh pve
-AiPlayerbot.PremadeSpecGlyph.7.1 = 41530,43385,41539,43386,44923,41540
+AiPlayerbot.PremadeSpecGlyph.7.1 = 41542,43385,41539,43386,44923,45771
 AiPlayerbot.PremadeSpecLink.7.1.60 = -30205033005001333031131131051
 AiPlayerbot.PremadeSpecLink.7.1.80 = 053030052-30205033005021333031131131051
 AiPlayerbot.PremadeSpecName.7.2 = resto pve
@@ -959,7 +982,7 @@ AiPlayerbot.PremadeSpecLink.9.0.70 = 2350022001113510053500131151--55
 AiPlayerbot.PremadeSpecLink.9.0.80 = 2350022001113510253500331151--5500000501
 AiPlayerbot.PremadeSpecName.9.1 = emo pve
 AiPlayerbot.PremadeSpecGlyph.9.1 = 45785,43390,50077,43394,43393,42459
-AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530131201-55
+AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530135201051
 AiPlayerbot.PremadeSpecLink.9.1.70 = -003203301135112530135201051-55
 AiPlayerbot.PremadeSpecLink.9.1.80 = -003203301135112530135221351-55000005
 AiPlayerbot.PremadeSpecName.9.2 = destro pve
@@ -991,7 +1014,7 @@ AiPlayerbot.PremadeSpecLink.11.2.60 = --230033312031501531050013051
 AiPlayerbot.PremadeSpecLink.11.2.80 = 05320001--230033312031512531153313051
 AiPlayerbot.PremadeSpecName.11.3 = cat pve
 AiPlayerbot.PremadeSpecGlyph.11.3 = 40902,43331,40901,43335,44922,45604
-AiPlayerbot.PremadeSpecLink.11.3.60 = -553202032322010052100030310501
+AiPlayerbot.PremadeSpecLink.11.3.60 = -552202032322010053100030310501
 AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 
 #
@@ -1159,11 +1182,11 @@ AiPlayerbot.RandomClassSpecIndex.8.2 = 2
 #
 #
 
-AiPlayerbot.RandomClassSpecProb.9.0 = 40
+AiPlayerbot.RandomClassSpecProb.9.0 = 45
 AiPlayerbot.RandomClassSpecIndex.9.0 = 0
-AiPlayerbot.RandomClassSpecProb.9.1 = 40
+AiPlayerbot.RandomClassSpecProb.9.1 = 45
 AiPlayerbot.RandomClassSpecIndex.9.1 = 1
-AiPlayerbot.RandomClassSpecProb.9.2 = 20
+AiPlayerbot.RandomClassSpecProb.9.2 = 10
 AiPlayerbot.RandomClassSpecIndex.9.2 = 2
 
 #
@@ -1178,11 +1201,12 @@ AiPlayerbot.RandomClassSpecIndex.9.2 = 2
 
 AiPlayerbot.RandomClassSpecProb.11.0 = 20
 AiPlayerbot.RandomClassSpecIndex.11.0 = 0
-AiPlayerbot.RandomClassSpecProb.11.1 = 40
+AiPlayerbot.RandomClassSpecProb.11.1 = 25
 AiPlayerbot.RandomClassSpecIndex.11.1 = 1
-AiPlayerbot.RandomClassSpecProb.11.2 = 40
+AiPlayerbot.RandomClassSpecProb.11.2 = 35
 AiPlayerbot.RandomClassSpecIndex.11.2 = 2
-
+AiPlayerbot.RandomClassSpecProb.11.3 = 20
+AiPlayerbot.RandomClassSpecIndex.11.3 = 3
 #
 #
 #
@@ -1258,6 +1282,10 @@ AiPlayerbot.SpellDump = 0
 AiPlayerbot.LogInGroupOnly = 1
 AiPlayerbot.LogValuesPerTick = 0
 AiPlayerbot.RandomChangeMultiplier = 1
+
+# Tell which spell is avoiding (experimental)
+# Default: 0 (disable)
+AiPlayerbot.TellWhenAvoidAoe = 0
 
 # Enables/Disables performance monitor
 AiPlayerbot.PerfMonEnabled = 0

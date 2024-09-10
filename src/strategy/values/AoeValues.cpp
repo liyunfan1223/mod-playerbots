@@ -145,6 +145,9 @@ Aura* AreaDebuffValue::Calculate()
                 {
                     continue;
                 }
+                // float radius = dynOwner->GetRadius();
+                // if (radius > 12.0f)
+                //     continue;
                 return aura;
             }
         }

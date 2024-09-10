@@ -241,7 +241,7 @@ public:
 class MaelstromWeaponTrigger : public HasAuraStackTrigger
 {
 public:
-    MaelstromWeaponTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "maelstrom weapon", 5) {}
+    MaelstromWeaponTrigger(PlayerbotAI* botAI, int stack = 5) : HasAuraStackTrigger(botAI, "maelstrom weapon", stack) {}
 };
 
 class WindShearInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger

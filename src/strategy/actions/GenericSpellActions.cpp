@@ -162,8 +162,14 @@ bool CastMeleeDebuffSpellAction::isUseful()
 
 bool CastAuraSpellAction::isUseful()
 {
-    return GetTarget() && (GetTarget() != nullptr) && CastSpellAction::isUseful() &&
-           !botAI->HasAura(spell, GetTarget(), false, isOwner);
+    if (!GetTarget() || !CastSpellAction::isUseful())
+        return false;
+    Aura* aura = botAI->GetAura(spell, GetTarget(), isOwner, checkDuration);
+    if (!aura)
+        return true;
+    if (beforeDuration && aura->GetDuration() < beforeDuration)
+        return true;
+    return false;
 }
 
 CastEnchantItemAction::CastEnchantItemAction(PlayerbotAI* botAI, std::string const spell)
@@ -251,8 +257,8 @@ Value<Unit*>* CastDebuffSpellOnMeleeAttackerAction::GetTargetValue()
     return context->GetValue<Unit*>("melee attacker without aura", spell);
 }
 
-CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner)
-    : CastAuraSpellAction(botAI, spell, checkIsOwner)
+CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner, uint32 beforeDuration)
+    : CastAuraSpellAction(botAI, spell, checkIsOwner, false, beforeDuration)
 {
     range = botAI->GetRange("spell");
 }
@@ -364,5 +370,5 @@ bool CastDebuffSpellAction::isUseful()
         return false;
     }
     return CastAuraSpellAction::isUseful() &&
-           (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+           (target->GetHealth() / AI_VALUE(float, "estimated group dps")) >= needLifeTime;
 }
