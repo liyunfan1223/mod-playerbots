@@ -12,4 +12,11 @@ public:
     bool IsActive() override;
 };
 
+class BwlAfflictionBronzeTrigger : public Trigger
+{
+public:
+    BwlAfflictionBronzeTrigger(PlayerbotAI* botAI) : Trigger(botAI, "bwl affliction bronze") {}
+    bool IsActive() override;
+};
+
 #endif

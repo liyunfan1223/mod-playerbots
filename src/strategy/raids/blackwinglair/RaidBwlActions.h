@@ -23,4 +23,11 @@ public:
     bool Execute(Event event) override;
 };
 
+class BwlUseHourglassSandAction : public Action
+{
+public:
+    BwlUseHourglassSandAction(PlayerbotAI* botAI) : Action(botAI, "bwl use hourglass sand") {}
+    bool Execute(Event event) override;
+};
+
 #endif
