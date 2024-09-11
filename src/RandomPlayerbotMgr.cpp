@@ -1014,26 +1014,26 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     if (isLogginIn)
         return false;
 
+    uint32 randomTime;
     if (!player)
     {
         AddPlayerBot(botGUID, 0);
-        SetEventValue(bot, "login", 1, sPlayerbotAIConfig->randomBotUpdateInterval);
+        SetEventValue(bot, "login", 1,
+                      std::max(1, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 0.2)));
 
-        uint32 randomTime =
-            urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
+        randomTime = urand(std::max(5, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval)),
+                                  std::max(15, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 2.2)));
         SetEventValue(bot, "update", 1, randomTime);
 
         // do not randomize or teleport immediately after server start (prevent lagging)
         if (!GetEventValue(bot, "randomize"))
         {
-            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval * 5,
-                               sPlayerbotAIConfig->randomBotUpdateInterval * 20);
-            ScheduleRandomize(bot, randomTime);
+            ScheduleRandomize(bot, std::max(3, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 0.5)));
         }
         if (!GetEventValue(bot, "teleport"))
         {
-            randomTime = urand(sPlayerbotAIConfig->randomBotUpdateInterval * 5,
-                               sPlayerbotAIConfig->randomBotUpdateInterval * 20);
+            randomTime = urand(std::max(7, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 0.8)),
+                               std::max(14, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 2)));
             ScheduleTeleport(bot, randomTime);
         }
         return true;
@@ -1076,8 +1076,9 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         if (update)
             ProcessBot(player);
 
-        uint32 randomTime =
-            urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
+        randomTime = urand(
+            sPlayerbotAIConfig->minRandomBotReviveTime,
+            sPlayerbotAIConfig->maxRandomBotReviveTime);
         SetEventValue(bot, "update", 1, randomTime);
 
         return true;

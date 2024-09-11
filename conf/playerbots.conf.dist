@@ -728,14 +728,14 @@ AiPlayerbot.FastReactInBG = 1
 #
 
 # All In seconds
-AiPlayerbot.RandomBotUpdateInterval = 20
+AiPlayerbot.RandomBotUpdateInterval = 1
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
 AiPlayerbot.MinRandomBotInWorldTime = 3600
-AiPlayerbot.MaxRandomBotInWorldTime = 43200
-AiPlayerbot.MinRandomBotRandomizeTime = 302400
+AiPlayerbot.MaxRandomBotInWorldTime = 1209600
+AiPlayerbot.MinRandomBotRandomizeTime = 7200
 AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
-AiPlayerbot.RandomBotsPerInterval = 500
+AiPlayerbot.RandomBotsPerInterval = 60
 AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
