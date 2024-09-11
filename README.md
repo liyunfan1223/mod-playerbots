@@ -24,9 +24,9 @@ git clone https://github.com/liyunfan1223/mod-playerbots.git --branch=master
 
 ## Quick Start & Documentation
 
-For a quick start and an extensive set of commands, you can refer to the manual for the original version of playerbots by ike3. Most of the basic commands are available for this module. You can find the documentation here: [Playerbots Documentation](https://github.com/liyunfan1223/mod-playerbots/wiki/Playerbot-Documentation).
+For a quick start and an extensive set of commands, please refer to documentation here: [Playerbots Documentation](https://github.com/liyunfan1223/mod-playerbots/wiki/Playerbot-Documentation).
 
-Please be aware that documentation may be missing some newly added commands as the project is still under development.
+Please be aware that documentation for some newly added commands is currently lacking as the project is still under development.
 
 ## Progress
 
