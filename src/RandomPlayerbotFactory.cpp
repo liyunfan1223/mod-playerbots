@@ -12,6 +12,7 @@
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h"
 #include "SocialMgr.h"
 
 std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
@@ -245,8 +246,6 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     {
         player->learnSpell(50977, false);
     }
-    // player->SaveToDB(true, false);
-    // player->RewardQuest(const Quest *quest, uint32 reward, Object *questGiver)
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId,
               name.c_str(), race, cls);
 
@@ -424,7 +423,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
         Field* fields = result->Fetch();
         std::string name = fields[0].Get<std::string>();
         NameRaceAndGender raceAndGender = static_cast<NameRaceAndGender>(fields[1].Get<uint8>());
-        nameCache[raceAndGender].push_back(name);
+        if (sObjectMgr->CheckPlayerName(name) == CHAR_NAME_SUCCESS)
+            nameCache[raceAndGender].push_back(name);
 
     } while (result->NextRow());
 
