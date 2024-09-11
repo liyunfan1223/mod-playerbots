@@ -218,7 +218,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                 {
                     bot->ResurrectPlayer(1.0f, false);
                     botAI->TellMasterNoFacing("I live, again!");
-                    botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
+                    botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
                 }
 
                 player->GetMotionMaster()->Clear();

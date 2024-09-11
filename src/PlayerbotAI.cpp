@@ -682,6 +682,7 @@ void PlayerbotAI::Reset(bool full)
 
     aiObjectContext->GetValue<Unit*>("old target")->Set(nullptr);
     aiObjectContext->GetValue<Unit*>("current target")->Set(nullptr);
+    aiObjectContext->GetValue<GuidVector>("prioritized targets")->Reset();
     aiObjectContext->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid::Empty);
     aiObjectContext->GetValue<GuidPosition>("rpg target")->Set(GuidPosition());
     aiObjectContext->GetValue<LootObject>("loot target")->Set(LootObject());
