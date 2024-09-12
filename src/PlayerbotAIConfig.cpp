@@ -156,7 +156,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotAutologin", true);
     minRandomBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBots", 50);
     maxRandomBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBots", 200);
-    randomBotUpdateInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotUpdateInterval", MINUTE);
+    randomBotUpdateInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotUpdateInterval", 1);
     randomBotCountChangeMinInterval =
         sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotCountChangeMinInterval", 30 * MINUTE);
     randomBotCountChangeMaxInterval =
@@ -164,7 +164,7 @@ bool PlayerbotAIConfig::Initialize()
     minRandomBotInWorldTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotInWorldTime", 2 * HOUR);
     maxRandomBotInWorldTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotInWorldTime", 12 * HOUR);
     minRandomBotRandomizeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotRandomizeTime", 2 * HOUR);
-    maxRandomBotRandomizeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotRandomizeTime", 14 * 24 * HOUR);
+    maxRandomBotRandomizeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotRandomizeTime", 12 * HOUR);
     minRandomBotChangeStrategyTime =
         sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotChangeStrategyTime", 30 * MINUTE);
     maxRandomBotChangeStrategyTime =
@@ -176,7 +176,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotInWorldWithRotationDisabled =
         sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotInWorldWithRotationDisabled", 1 * YEAR);
     randomBotTeleportDistance = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotTeleportDistance", 100);
-    randomBotsPerInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotsPerInterval", MINUTE);
+    randomBotsPerInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotsPerInterval", 60);
     minRandomBotsPriceChangeInterval =
         sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotsPriceChangeInterval", 2 * HOUR);
     maxRandomBotsPriceChangeInterval =
