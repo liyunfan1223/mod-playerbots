@@ -663,7 +663,7 @@ WorldLocation MoveFormation::MoveSingleLine(std::vector<Player*> line, float dif
             float lz = cz;
 
             Player* master = botAI->GetMaster();
-            if (!master->GetMap()->CheckCollisionAndGetValidCoords(
+            if (!master || !master->GetMap()->CheckCollisionAndGetValidCoords(
                     master, master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), lx, ly, lz))
             {
                 lx = x + cos(angle) * radius;

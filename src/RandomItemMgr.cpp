@@ -967,15 +967,6 @@ void RandomItemMgr::BuildItemInfoCache()
         if (!proto)
             continue;
 
-        // skip non armor/weapon
-        if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR &&
-            proto->Class != ITEM_CLASS_CONTAINER && proto->Class != ITEM_CLASS_PROJECTILE &&
-            proto->Class != ITEM_CLASS_GEM)
-            continue;
-
-        // if (!CanEquipItemNew(proto))
-        //     continue;
-
         // skip test items
         if (strstr(proto->Name1.c_str(), "(Test)") || strstr(proto->Name1.c_str(), "(TEST)") ||
             strstr(proto->Name1.c_str(), "(test)") || strstr(proto->Name1.c_str(), "(JEFFTEST)") ||
