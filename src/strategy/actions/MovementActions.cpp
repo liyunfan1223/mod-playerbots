@@ -1893,7 +1893,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
             continue;
         }
 
-        float radius = (float)goInfo->trap.diameter / 2;
+        float radius = (float)goInfo->trap.diameter / 2 + go->GetCombatReach();
         if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
             continue;
         // for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {

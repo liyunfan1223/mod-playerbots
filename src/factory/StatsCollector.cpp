@@ -229,6 +229,12 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId) {
     // trinket
     switch (spellId)
     {
+        case 27521: // Insightful Earthstorm Diamond
+            stats[STATS_TYPE_MANA_REGENERATION] += 20;
+            return true;
+        case 55381: // Insightful Earthsiege Diamond
+            stats[STATS_TYPE_MANA_REGENERATION] += 40;
+            return true;
         case 39442: // Darkmoon Card: Wrath
             if (type_ != CollectorType::SPELL_HEAL)
                 stats[STATS_TYPE_CRIT] += 50;
@@ -667,6 +673,16 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
         {
             if (canNextTrigger)
                 CollectSpellStats(effectInfo.TriggerSpell, multiplier, triggerCooldown);
+            break;
+        }
+        case SPELL_AURA_MOD_CRIT_DAMAGE_BONUS:
+        {
+            if (type_ != CollectorType::SPELL_HEAL)
+            {
+                int32 statType = effectInfo.MiscValue;
+                if (statType & SPELL_SCHOOL_MASK_NORMAL) // physical
+                    stats[STATS_TYPE_CRIT] += 30 * val * multiplier;
+            }
             break;
         }
         default:

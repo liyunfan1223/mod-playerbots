@@ -116,9 +116,6 @@ void PlayerbotFactory::Init()
         if (id == 47181 || id == 50358 || id == 47242 || id == 52639 || id == 47147 || id == 7218)  // Test Enchant
             continue;
 
-        if (strstr(spellInfo->SpellName[0], "Test"))
-            continue;
-
         uint32 requiredLevel = spellInfo->BaseLevel;
 
         for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
@@ -137,8 +134,11 @@ void PlayerbotFactory::Init()
             // SpellInfo const* enchantSpell = sSpellMgr->GetSpellInfo(enchant->spellid[0]);
             // if (!enchantSpell)
             //     continue;
+            if (strstr(spellInfo->SpellName[0], "Test"))
+                break;
 
             enchantSpellIdCache.push_back(id);
+            break;
             // LOG_INFO("playerbots", "Add {} to enchantment spells", id);
         }
     }
@@ -161,6 +161,7 @@ void PlayerbotFactory::Init()
         }
         if (sRandomItemMgr->IsTestItem(gemId))
             continue;
+
         if (!proto || !sGemPropertiesStore.LookupEntry(proto->GemProperties))
         {
             continue;
