@@ -1,6 +1,8 @@
 #include "RaidIccActions.h"
 
 #include "Playerbots.h"
+#include "Timer.h"
+#include "Vehicle.h"
 
 enum CreatureIds {
     NPC_KOR_KRON_BATTLE_MAGE                    = 37117,
@@ -69,6 +71,7 @@ bool IccGunshipEnterCannonAction::Execute(Event event)
     // do not switch vehicles yet
     if (bot->GetVehicle())
         return false;
+
     Unit* vehicleToEnter = nullptr;
     GuidVector npcs = AI_VALUE(GuidVector, "nearest vehicles");
     for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
@@ -80,13 +83,19 @@ bool IccGunshipEnterCannonAction::Execute(Event event)
         if (vehicleBase->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             continue;
         
+        if (!vehicleBase->IsFriendlyTo(bot))
+            continue;
+        
+        if (!vehicleBase->GetVehicleKit() || !vehicleBase->GetVehicleKit()->GetAvailableSeatCount())
+            continue;
+
         uint32 entry = vehicleBase->GetEntry();
         if (entry != 36838 && entry != 36839)
             continue;
         
         if (vehicleBase->HasAura(69704) || vehicleBase->HasAura(69705))
             continue;
-
+        
         if (!vehicleToEnter || bot->GetExactDist(vehicleToEnter) > bot->GetExactDist(vehicleBase))
             vehicleToEnter = vehicleBase;
     }
@@ -110,8 +119,11 @@ bool IccGunshipEnterCannonAction::EnterVehicle(Unit* vehicleBase, bool moveIfFar
     if (dist > INTERACTION_DISTANCE)
         return MoveTo(vehicleBase);
 
+
     botAI->RemoveShapeshift();
-    // Use HandleSpellClick instead of Unit::EnterVehicle to handle special vehicle script (ulduar)
+
+    bot->GetMotionMaster()->Clear();
+    bot->StopMoving();
     vehicleBase->HandleSpellClick(bot);
 
     if (!bot->IsOnVehicle(vehicleBase))
