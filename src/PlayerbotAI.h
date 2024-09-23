@@ -603,6 +603,7 @@ protected:
     bool inCombat = false;
     BotCheatMask cheatMask = BotCheatMask::none;
     Position jumpDestination = Position();
+    uint32 nextTransportCheck = 0;
 };
 
 #endif

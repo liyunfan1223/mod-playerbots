@@ -43,6 +43,7 @@
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
+#include "Transport.h"
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
@@ -324,6 +325,30 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         return;
     }
 
+    if (nextTransportCheck > elapsed)
+            nextTransportCheck -= elapsed;
+        else
+            nextTransportCheck = 0;
+
+    if (!nextTransportCheck)
+    {
+        nextTransportCheck = 1000;
+        Transport* newTransport = bot->GetMap()->GetTransportForPos(bot->GetPhaseMask(), bot->GetPositionX(),
+                                                                    bot->GetPositionY(), bot->GetPositionZ(), bot);
+        if (newTransport != bot->GetTransport())
+        {
+            LOG_DEBUG("playerbots", "Bot {} is on a transport", bot->GetName());
+
+            if (bot->GetTransport())
+                bot->GetTransport()->RemovePassenger(bot, true);
+
+            if (newTransport)
+                newTransport->AddPassenger(bot, true);
+
+            bot->StopMovingOnCurrentPos();
+        }
+    }
+    
     if (!CanUpdateAI())
         return;
 
@@ -1488,20 +1513,23 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
     std::string strategyName;
     switch (mapId)
     {
+        case 409:
+            strategyName = "mc";
+            break;
+        case 469:
+            strategyName = "bwl";
+            break;
+        case 509:
+            strategyName = "aq20";
+            break;
         case 533:
             strategyName = "naxx";
             break;
         case 603:
             strategyName = "uld";
             break;
-        case 469:
-            strategyName = "bwl";
-            break;
-        case 409:
-            strategyName = "mc";
-            break;
-        case 509:
-            strategyName = "aq20";
+        case 631:
+            strategyName = "icc";
             break;
         default:
             break;

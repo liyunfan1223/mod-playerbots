@@ -111,7 +111,7 @@ bool FlameLeviathanVehicleAction::DemolisherAction(Unit* target)
     if (!target)
         return false;
     Aura* bluePyrite = target->GetAura(68605);
-    if (!bluePyrite || (bluePyrite->GetStackAmount() <= 6 && vehicleBase_->GetPower(POWER_ENERGY) > 25) || bluePyrite->GetDuration() <= 5000)
+    if (!bluePyrite || (vehicleBase_->GetPower(POWER_ENERGY) >= 20) || bluePyrite->GetDuration() <= 5000)
     {
         uint32 spellId = 62490;
         if (botAI->CanCastVehicleSpell(spellId, target))

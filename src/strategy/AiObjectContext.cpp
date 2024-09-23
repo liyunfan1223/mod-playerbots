@@ -9,6 +9,8 @@
 #include "ChatActionContext.h"
 #include "ChatTriggerContext.h"
 #include "Playerbots.h"
+#include "RaidIccActionContext.h"
+#include "RaidIccTriggerContext.h"
 #include "RaidUlduarTriggerContext.h"
 #include "RaidUlduarActionContext.h"
 #include "SharedValueContext.h"
@@ -38,20 +40,22 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new ActionContext());
     actionContexts.Add(new ChatActionContext());
     actionContexts.Add(new WorldPacketActionContext());
+    actionContexts.Add(new RaidMcActionContext());
     actionContexts.Add(new RaidBwlActionContext());
+    actionContexts.Add(new RaidAq20ActionContext());
     actionContexts.Add(new RaidNaxxActionContext());
     actionContexts.Add(new RaidUlduarActionContext());
-    actionContexts.Add(new RaidMcActionContext());
-    actionContexts.Add(new RaidAq20ActionContext());
+    actionContexts.Add(new RaidIccActionContext());
 
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
     triggerContexts.Add(new WorldPacketTriggerContext());
+    triggerContexts.Add(new RaidMcTriggerContext());
     triggerContexts.Add(new RaidBwlTriggerContext());
+    triggerContexts.Add(new RaidAq20TriggerContext());
     triggerContexts.Add(new RaidNaxxTriggerContext());
     triggerContexts.Add(new RaidUlduarTriggerContext());
-    triggerContexts.Add(new RaidMcTriggerContext());
-    triggerContexts.Add(new RaidAq20TriggerContext());
+    triggerContexts.Add(new RaidIccTriggerContext());
 
     valueContexts.Add(new ValueContext());
 
