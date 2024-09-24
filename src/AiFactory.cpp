@@ -279,11 +279,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     }
     if (sPlayerbotAIConfig->autoSaveMana)
     {
-        engine->addStrategy("smana", false);
+        engine->addStrategy("save mana", false);
     }
     if (sPlayerbotAIConfig->autoAvoidAoe && facade->HasRealPlayerMaster())
     {
-        engine->addStrategy("aaoe", false);
+        engine->addStrategy("avoid aoe", false);
     }
     engine->addStrategy("formation", false);
     switch (player->getClass())
@@ -387,6 +387,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategiesNoInit("unholy", "unholy aoe", "dps assist", nullptr);
 
             break;
+    }
+    if (PlayerbotAI::IsTank(player, true)) {
+        engine->addStrategy("tank face", false);
+    }
+    if (PlayerbotAI::IsMelee(player, true) && PlayerbotAI::IsDps(player, true)) {
+        engine->addStrategy("behind", false);
     }
 
     if (facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player))
@@ -599,7 +605,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 
     if (sPlayerbotAIConfig->autoSaveMana)
     {
-        nonCombatEngine->addStrategy("smana", false);
+        nonCombatEngine->addStrategy("save mana", false);
     }
     if ((sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
     {

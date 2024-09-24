@@ -99,7 +99,7 @@ class AvoidAoeAction : public MovementAction
 {
 public:
     AvoidAoeAction(PlayerbotAI* botAI, int moveInterval = 1000)
-        : MovementAction(botAI, "aaoe"), moveInterval(moveInterval)
+        : MovementAction(botAI, "avoid aoe"), moveInterval(moveInterval)
     {
     }
 
@@ -115,11 +115,12 @@ protected:
     int moveInterval;
 };
 
+
 class CombatFormationMoveAction : public MovementAction
 {
 public:
-    CombatFormationMoveAction(PlayerbotAI* botAI, int moveInterval = 1000)
-        : MovementAction(botAI, "combat formation move"), moveInterval(moveInterval)
+    CombatFormationMoveAction(PlayerbotAI* botAI, std::string name = "combat formation move", int moveInterval = 1000)
+        : MovementAction(botAI, name), moveInterval(moveInterval)
     {
     }
 
@@ -127,10 +128,20 @@ public:
     bool Execute(Event event) override;
 
 protected:
-    Position AverageGroupPos(float dis = sPlayerbotAIConfig->sightDistance);
+    Position AverageGroupPos(float dis = sPlayerbotAIConfig->sightDistance, bool ranged = false, bool self = false);
     Player* NearestGroupMember(float dis = sPlayerbotAIConfig->sightDistance);
+    float AverageGroupAngle(Unit* from, bool ranged = false, bool self = false);
+    Position GetNearestPosition(const std::vector<Position>& positions);
     int lastMoveTimer = 0;
     int moveInterval;
+};
+
+class TankFaceAction : public CombatFormationMoveAction
+{
+public:
+    TankFaceAction(PlayerbotAI* botAI) : CombatFormationMoveAction(botAI, "tank face") {}
+
+    bool Execute(Event event) override;
 };
 
 class DisperseSetAction : public Action
@@ -178,14 +189,12 @@ public:
     bool isPossible() override;
 };
 
-class SetBehindTargetAction : public MovementAction
+class SetBehindTargetAction : public CombatFormationMoveAction
 {
 public:
-    SetBehindTargetAction(PlayerbotAI* botAI) : MovementAction(botAI, "set behind") {}
+    SetBehindTargetAction(PlayerbotAI* botAI) : CombatFormationMoveAction(botAI, "set behind") {}
 
     bool Execute(Event event) override;
-    bool isUseful() override;
-    bool isPossible() override;
 };
 
 class MoveOutOfCollisionAction : public MovementAction

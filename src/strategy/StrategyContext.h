@@ -60,8 +60,7 @@ public:
         creators["gather"] = &StrategyContext::gather;
         creators["emote"] = &StrategyContext::emote;
         creators["passive"] = &StrategyContext::passive;
-        // creators["conserve mana"] = &StrategyContext::conserve_mana;
-        creators["smana"] = &StrategyContext::auto_save_mana;
+        creators["save mana"] = &StrategyContext::auto_save_mana;
         creators["food"] = &StrategyContext::food;
         creators["chat"] = &StrategyContext::chat;
         creators["default"] = &StrategyContext::world_packet;
@@ -113,7 +112,8 @@ public:
         creators["group"] = &StrategyContext::group;
         creators["guild"] = &StrategyContext::guild;
         creators["grind"] = &StrategyContext::grind;
-        creators["aaoe"] = &StrategyContext::avoid_aoe;
+        creators["avoid aoe"] = &StrategyContext::avoid_aoe;
+        creators["tank face"] = &StrategyContext::tank_face;
         creators["move random"] = &StrategyContext::move_random;
         creators["formation"] = &StrategyContext::combat_formation;
         creators["move from group"] = &StrategyContext::move_from_group;
@@ -179,6 +179,7 @@ private:
     static Strategy* guild (PlayerbotAI* botAI) { return new GuildStrategy(botAI); }
     static Strategy* grind(PlayerbotAI* botAI) { return new GrindingStrategy(botAI); }
     static Strategy* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeStrategy(botAI); }
+    static Strategy* tank_face(PlayerbotAI* botAI) { return new TankFaceStrategy(botAI); }
     static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
     static Strategy* combat_formation(PlayerbotAI* ai) { return new CombatFormationStrategy(ai); }
     static Strategy* move_from_group(PlayerbotAI* botAI) { return new MoveFromGroupStrategy(botAI); }

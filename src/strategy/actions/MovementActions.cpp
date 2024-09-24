@@ -24,6 +24,7 @@
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
+#include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "Position.h"
@@ -202,7 +203,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             return false;
 
         float distance = vehicleBase->GetExactDist(x, y, z);  // use vehicle distance, not bot
-        if (distance > sPlayerbotAIConfig->contactDistance)
+        if (distance > 0.01f)
         {
             MotionMaster& mm = *vehicleBase->GetMotionMaster();  // need to move vehicle, not bot
             mm.Clear();
@@ -217,7 +218,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     else if (exact_waypoint || disableMoveSplinePath || !generatePath)
     {
         float distance = bot->GetExactDist(x, y, z);
-        if (distance > sPlayerbotAIConfig->contactDistance)
+        if (distance > 0.01f)
         {
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
@@ -247,7 +248,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             return false;
         }
         float distance = bot->GetExactDist(x, y, modifiedZ);
-        if (distance > sPlayerbotAIConfig->contactDistance)
+        if (distance > 0.01f)
         {
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
@@ -2140,7 +2141,7 @@ bool MovementAction::FleePosition(Position pos, float radius)
 bool MovementAction::CheckLastFlee(float curAngle, std::list<FleeInfo>& infoList)
 {
     uint32 curTS = getMSTime();
-    curAngle = fmod(curAngle, 2 * M_PI);
+    curAngle = Position::NormalizeOrientation(curAngle);
     while (!infoList.empty())
     {
         if (infoList.size() > 10 || infoList.front().timestamp + 5000 < curTS)
@@ -2159,7 +2160,7 @@ bool MovementAction::CheckLastFlee(float curAngle, std::list<FleeInfo>& infoList
         {
             continue;
         }
-        float revAngle = fmod(info.angle + M_PI, 2 * M_PI);
+        float revAngle = Position::NormalizeOrientation(info.angle + M_PI);
         // angle too close
         if (fabs(revAngle - curAngle) < M_PI / 4)
         {
@@ -2179,13 +2180,14 @@ bool CombatFormationMoveAction::isUseful()
     {
         return false;
     }
-    float dis = AI_VALUE(float, "disperse distance");
-    return dis > 0.0f;
+    return true;
 }
 
 bool CombatFormationMoveAction::Execute(Event event)
 {
     float dis = AI_VALUE(float, "disperse distance");
+    if (dis <= 0.0f)
+        return false;
     Player* playerToLeave = NearestGroupMember(dis);
     if (playerToLeave && bot->GetExactDist(playerToLeave) < dis)
     {
@@ -2197,7 +2199,7 @@ bool CombatFormationMoveAction::Execute(Event event)
     return false;
 }
 
-Position CombatFormationMoveAction::AverageGroupPos(float dis)
+Position CombatFormationMoveAction::AverageGroupPos(float dis, bool ranged, bool self)
 {
     float averageX = 0, averageY = 0, averageZ = 0;
     int cnt = 0;
@@ -2210,10 +2212,19 @@ Position CombatFormationMoveAction::AverageGroupPos(float dis)
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
     {
         Player* member = ObjectAccessor::FindPlayer(itr->guid);
-        if (!member || !member->IsAlive() || member->GetMapId() != bot->GetMapId() || member->IsCharmed() ||
+        if (!member)
+            continue;
+
+        if (!self && member == bot)
+            continue;
+
+        if (ranged && !PlayerbotAI::IsRanged(member))
+            continue;
+
+        if (!member->IsAlive() || member->GetMapId() != bot->GetMapId() || member->IsCharmed() ||
             sServerFacade->GetDistance2d(bot, member) > dis)
             continue;
-        cnt++;
+
         averageX += member->GetPositionX();
         averageY += member->GetPositionY();
         averageZ += member->GetPositionZ();
@@ -2222,6 +2233,51 @@ Position CombatFormationMoveAction::AverageGroupPos(float dis)
     averageY /= cnt;
     averageZ /= cnt;
     return Position(averageX, averageY, averageZ);
+}
+
+float CombatFormationMoveAction::AverageGroupAngle(Unit* from, bool ranged, bool self)
+{
+    Group* group = bot->GetGroup();
+    if (!from || !group)
+    {
+        return 0.0f;
+    }
+    float average = 0.0f;
+    int cnt = 0;
+    Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
+    for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
+    {
+        Player* member = ObjectAccessor::FindPlayer(itr->guid);
+        if (!member)
+            continue;
+
+        if (!self && member == bot)
+            continue;
+
+        if (ranged && !PlayerbotAI::IsRanged(member))
+            continue;
+
+        if (!member->IsAlive() || member->GetMapId() != bot->GetMapId() || member->IsCharmed() ||
+            sServerFacade->GetDistance2d(bot, member) > sPlayerbotAIConfig->sightDistance)
+            continue;
+
+        cnt++;
+        average += from->GetAngle(member);
+    }
+    if (cnt)
+        average /= cnt;
+    return average;
+}
+
+Position CombatFormationMoveAction::GetNearestPosition(const std::vector<Position>& positions)
+{
+    Position result;
+    for (const Position& pos : positions)
+    {
+        if (bot->GetExactDist(pos) < bot->GetExactDist(result))
+            result = pos;
+    }
+    return result;
 }
 
 Player* CombatFormationMoveAction::NearestGroupMember(float dis)
@@ -2247,6 +2303,60 @@ Player* CombatFormationMoveAction::NearestGroupMember(float dis)
         }
     }
     return result;
+}
+
+bool TankFaceAction::Execute(Event event)
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+
+    if (!bot->GetGroup())
+        return false;
+
+    if (!bot->IsWithinMeleeRange(target))
+        return false;
+
+    if (!AI_VALUE2(bool, "has aggro", "current target"))
+        return false;
+    
+    float averageAngle = AverageGroupAngle(target, true);
+
+    if (averageAngle == 0.0f)
+        return false;
+
+    float deltaAngle = Position::NormalizeOrientation(averageAngle - target->GetAngle(bot));
+    if (deltaAngle > M_PI)
+        deltaAngle -= 2.0f * M_PI; // -PI..PI
+
+    float tolerable = M_PI_2;
+
+    if (fabs(deltaAngle) > tolerable)
+        return false;
+
+    float goodAngle1 = Position::NormalizeOrientation(averageAngle + M_PI * 5 / 8);
+    float goodAngle2 = Position::NormalizeOrientation(averageAngle - M_PI * 5 / 8);
+
+    // if dist < bot->GetMeleeRange(target) / 2, target will move backward
+    float dist = std::max(bot->GetExactDist(target), bot->GetMeleeRange(target) / 2) - bot->GetCombatReach() - target->GetCombatReach();
+    std::vector<Position> availablePos;
+    float x, y, z;
+    target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle1);
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+        x, y, z))
+    {
+        availablePos.push_back(Position(x, y, z));
+    }
+    target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+        x, y, z))
+    {
+        availablePos.push_back(Position(x, y, z));
+    }
+    if (availablePos.empty())
+        return false;
+    Position nearest = GetNearestPosition(availablePos);
+    return MoveTo(bot->GetMapId(), nearest.GetPositionX(), nearest.GetPositionY(), nearest.GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
 }
 
 bool DisperseSetAction::Execute(Event event)
@@ -2388,25 +2498,43 @@ bool SetBehindTargetAction::Execute(Event event)
     if (!target)
         return false;
 
-    float angle = GetFollowAngle() / 3 + target->GetOrientation() + M_PI;
+    if (target->GetVictim() == bot)
+        return false;
 
-    // return ChaseTo(target, 0.f, angle);
+    if (!bot->IsWithinMeleeRange(target))
+        return false;
 
-    float distance = sPlayerbotAIConfig->contactDistance;
-    float x = target->GetPositionX() + cos(angle) * distance;
-    float y = target->GetPositionY() + sin(angle) * distance;
-    float z = target->GetPositionZ();
-    bot->UpdateGroundPositionZ(x, y, z);
+    float deltaAngle = Position::NormalizeOrientation(target->GetOrientation() - target->GetAngle(bot));
+    if (deltaAngle > M_PI)
+        deltaAngle -= 2.0f * M_PI; // -PI..PI
 
-    return MoveTo(bot->GetMapId(), x, y, z);
-}
+    float tolerable = M_PI_2;
 
-bool SetBehindTargetAction::isUseful() { return !AI_VALUE2(bool, "behind", "current target"); }
+    if (fabs(deltaAngle) > tolerable)
+        return false;
 
-bool SetBehindTargetAction::isPossible()
-{
-    Unit* target = AI_VALUE(Unit*, "current target");
-    return target && !(target->GetVictim() && target->GetVictim()->GetGUID() == bot->GetGUID());
+    float goodAngle1 = Position::NormalizeOrientation(target->GetOrientation() + M_PI * 5 / 8);
+    float goodAngle2 = Position::NormalizeOrientation(target->GetOrientation() - M_PI * 5 / 8);
+
+    float dist = std::max(bot->GetExactDist(target), bot->GetMeleeRange(target) / 2) - bot->GetCombatReach() - target->GetCombatReach();
+    std::vector<Position> availablePos;
+    float x, y, z;
+    target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle1);
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+        x, y, z))
+    {
+        availablePos.push_back(Position(x, y, z));
+    }
+    target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+        x, y, z))
+    {
+        availablePos.push_back(Position(x, y, z));
+    }
+    if (availablePos.empty())
+        return false;
+    Position nearest = GetNearestPosition(availablePos);
+    return MoveTo(bot->GetMapId(), nearest.GetPositionX(), nearest.GetPositionY(), nearest.GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
 }
 
 bool MoveOutOfCollisionAction::Execute(Event event)

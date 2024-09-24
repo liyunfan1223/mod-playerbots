@@ -2023,7 +2023,7 @@ bool PlayerbotAI::IsDps(Player* player, bool bySpec)
             {
                 return true;
             }
-            if (tab == DRUID_TAB_FERAL && !IsTank(player))
+            if (tab == DRUID_TAB_FERAL && !IsTank(player, bySpec))
             {
                 return true;
             }
