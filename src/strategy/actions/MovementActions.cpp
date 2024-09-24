@@ -2242,7 +2242,9 @@ float CombatFormationMoveAction::AverageGroupAngle(Unit* from, bool ranged, bool
     {
         return 0.0f;
     }
-    float average = 0.0f;
+    // float average = 0.0f;
+    float sumX = 0.0f;
+    float sumY = 0.0f;
     int cnt = 0;
     Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
@@ -2262,11 +2264,17 @@ float CombatFormationMoveAction::AverageGroupAngle(Unit* from, bool ranged, bool
             continue;
 
         cnt++;
-        average += from->GetAngle(member);
+        sumX += member->GetPositionX() - from->GetPositionX();
+        sumY += member->GetPositionY() - from->GetPositionY();
     }
-    if (cnt)
-        average /= cnt;
-    return average;
+    if (cnt == 0)
+        return 0.0f;
+
+    // unnecessary division
+    // sumX /= cnt;
+    // sumY /= cnt;
+
+    return atan2(sumY, sumX);
 }
 
 Position CombatFormationMoveAction::GetNearestPosition(const std::vector<Position>& positions)

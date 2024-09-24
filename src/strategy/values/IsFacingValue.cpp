@@ -4,6 +4,7 @@
  */
 
 #include "IsFacingValue.h"
+#include <cmath>
 
 #include "Playerbots.h"
 
@@ -13,5 +14,5 @@ bool IsFacingValue::Calculate()
     if (!target)
         return false;
 
-    return bot->HasInArc(CAST_ANGLE_IN_FRONT, target);
+    return bot->HasInArc(M_PI_2, target);
 }
