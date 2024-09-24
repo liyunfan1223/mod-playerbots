@@ -1102,7 +1102,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             bot->GetMotionMaster()->Clear();
 
             Unit* currentTarget = GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
-            bot->GetMotionMaster()->MoveKnockbackFromForPlayer(bot->GetPositionX() + vcos, bot->GetPositionY() + vsin,
+            bot->GetMotionMaster()->MoveKnockbackFromForPlayer(bot->GetPositionX() - vcos, bot->GetPositionY() - vsin,
                                                                horizontalSpeed, verticalSpeed);
 
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
