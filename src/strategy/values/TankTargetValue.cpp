@@ -73,6 +73,15 @@ public:
     bool IsBetter(Unit* new_unit, Unit* old_unit)
     {
         Player* bot = botAI->GetBot();
+        // if group has multiple tanks, main tank just focus on the current target
+        Unit* currentTarget = botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
+        if (currentTarget && botAI->IsMainTank(bot) && botAI->GetGroupTankNum(bot) > 1)
+        {
+            if (old_unit == currentTarget)
+                return false;
+            if (new_unit == currentTarget)
+                return true;
+        }
         float new_threat = new_unit->GetThreatMgr().GetThreat(bot);
         float old_threat = old_unit->GetThreatMgr().GetThreat(bot);
         float new_dis = bot->GetDistance(new_unit);

@@ -525,7 +525,10 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         sGroupMgr->AddGroup(newGroup);
         newGroup->AddMember(bot);
     }
-
+    // if (master)
+    // {
+    //     // bot->TeleportTo(master);
+    // }
     uint32 accountId = bot->GetSession()->GetAccountId();
     bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
 

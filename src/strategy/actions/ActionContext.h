@@ -91,8 +91,9 @@ public:
         creators["reach party member to resurrect"] = &ActionContext::reach_party_member_to_resurrect;
         creators["flee"] = &ActionContext::flee;
         creators["flee with pet"] = &ActionContext::flee_with_pet;
-        creators["aaoe"] = &ActionContext::avoid_aoe;
+        creators["avoid aoe"] = &ActionContext::avoid_aoe;
         creators["combat formation move"] = &ActionContext::combat_formation_move;
+        creators["tank face"] = &ActionContext::tank_face;
         creators["disperse set"] = &ActionContext::disperse_set;
         creators["gift of the naaru"] = &ActionContext::gift_of_the_naaru;
         creators["shoot"] = &ActionContext::shoot;
@@ -276,6 +277,7 @@ private:
     static Action* flee_with_pet(PlayerbotAI* botAI) { return new FleeWithPetAction(botAI); }
     static Action* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeAction(botAI); }
     static Action* combat_formation_move(PlayerbotAI* botAI) { return new CombatFormationMoveAction(botAI); }
+    static Action* tank_face(PlayerbotAI* botAI) { return new TankFaceAction(botAI); }
     static Action* disperse_set(PlayerbotAI* botAI) { return new DisperseSetAction(botAI); }
     static Action* gift_of_the_naaru(PlayerbotAI* botAI) { return new CastGiftOfTheNaaruAction(botAI); }
     static Action* lifeblood(PlayerbotAI* botAI) { return new CastLifeBloodAction(botAI); }

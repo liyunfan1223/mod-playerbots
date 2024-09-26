@@ -5,6 +5,7 @@
 
 #include "RtiTargetValue.h"
 
+#include "AttackersValue.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -61,7 +62,7 @@ Unit* RtiTargetValue::Calculate()
     //////////////////////////////////////////////////////end: delete below check
 
     Unit* unit = botAI->GetUnit(guid);
-    if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) ||
+    if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) || !AttackersValue::IsValidTarget(unit, bot) || 
         sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, unit),
                                              sPlayerbotAIConfig->sightDistance))
         return nullptr;

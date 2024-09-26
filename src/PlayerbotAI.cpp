@@ -314,6 +314,8 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     AllowActivity();
 
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (!currentSpell)
+        currentSpell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
     if (currentSpell && currentSpell->getState() == SPELL_STATE_PREPARING)
     {
         if (currentSpell->m_targets.GetUnitTarget() && !currentSpell->m_targets.GetUnitTarget()->IsAlive() &&
@@ -326,9 +328,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     }
 
     if (nextTransportCheck > elapsed)
-            nextTransportCheck -= elapsed;
-        else
-            nextTransportCheck = 0;
+        nextTransportCheck -= elapsed;
+    else
+        nextTransportCheck = 0;
 
     if (!nextTransportCheck)
     {
@@ -1093,7 +1095,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                 horizontalSpeed = 0.11f;
             }
             verticalSpeed = -verticalSpeed;
-
+            // high vertical may result in stuck as bot can not handle gravity
+            if (verticalSpeed > 35.0f)
+                break;
             // stop casting
             InterruptSpell();
 
@@ -1102,7 +1106,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             bot->GetMotionMaster()->Clear();
 
             Unit* currentTarget = GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
-            bot->GetMotionMaster()->MoveKnockbackFromForPlayer(bot->GetPositionX() + vcos, bot->GetPositionY() + vsin,
+            bot->GetMotionMaster()->MoveKnockbackFromForPlayer(bot->GetPositionX() - vcos, bot->GetPositionY() - vsin,
                                                                horizontalSpeed, verticalSpeed);
 
             // bot->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
@@ -2023,7 +2027,7 @@ bool PlayerbotAI::IsDps(Player* player, bool bySpec)
             {
                 return true;
             }
-            if (tab == DRUID_TAB_FERAL && !IsTank(player))
+            if (tab == DRUID_TAB_FERAL && !IsTank(player, bySpec))
             {
                 return true;
             }
@@ -2086,6 +2090,25 @@ bool PlayerbotAI::IsMainTank(Player* player)
         }
     }
     return false;
+}
+
+uint32 PlayerbotAI::GetGroupTankNum(Player* player)
+{
+    Group* group = player->GetGroup();
+    if (!group)
+    {
+        return 0;
+    }
+    uint32 result = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (IsTank(member) && member->IsAlive())
+        {
+            result++;
+        }
+    }
+    return result;
 }
 
 bool PlayerbotAI::IsAssistTank(Player* player) { return IsTank(player) && !IsMainTank(player); }

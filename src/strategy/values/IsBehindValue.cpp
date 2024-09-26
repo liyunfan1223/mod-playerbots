@@ -4,6 +4,7 @@
  */
 
 #include "IsBehindValue.h"
+#include <cmath>
 
 #include "Playerbots.h"
 
@@ -14,8 +15,10 @@ bool IsBehindValue::Calculate()
         return false;
 
     float targetOrientation = target->GetOrientation();
-    float orientation = bot->GetOrientation();
-    float distance = bot->GetDistance(target);
 
-    return distance <= ATTACK_DISTANCE && abs(targetOrientation - orientation) < M_PI / 2;
+    float deltaAngle = Position::NormalizeOrientation(targetOrientation - target->GetAngle(bot));
+    if (deltaAngle > M_PI)
+        deltaAngle -= 2.0f * M_PI; // -PI..PI
+
+    return fabs(deltaAngle) > M_PI_2;
 }
