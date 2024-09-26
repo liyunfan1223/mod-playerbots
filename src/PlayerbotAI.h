@@ -410,6 +410,7 @@ public:
     static bool IsCombo(Player* player, bool bySpec = false);
     static bool IsRangedDps(Player* player, bool bySpec = false);
     static bool IsMainTank(Player* player);
+    static uint32 GetGroupTankNum(Player* player);
     bool IsAssistTank(Player* player);
     bool IsAssistTankOfIndex(Player* player, int index);
     bool IsHealAssistantOfIndex(Player* player, int index);

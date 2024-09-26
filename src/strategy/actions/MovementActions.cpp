@@ -1883,16 +1883,7 @@ bool AvoidAoeAction::AvoidGameObjectWithDamage()
         float radius = (float)goInfo->trap.diameter / 2 + go->GetCombatReach();
         if (!radius || radius > sPlayerbotAIConfig->maxAoeAvoidRadius)
             continue;
-        // for (int i = 0; i < MAX_SPELL_EFFECTS; i++) {
-        //     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA) {
-        //         if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE) {
-        //             radius = spellInfo->Effects[i].CalcRadius();
-        //             break;
-        //         }
-        //     } else if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE) {
-        //         break;
-        //     }
-        // }
+
         if (bot->GetDistance(go) > radius)
         {
             continue;
@@ -2353,12 +2344,26 @@ bool TankFaceAction::Execute(Event event)
     if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
         x, y, z))
     {
-        availablePos.push_back(Position(x, y, z));
+        /// @todo: movement control now is a mess, prepare to rewrite
+        std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
+        Position pos(x, y, z);
+        float angle = bot->GetAngle(&pos);
+        if (CheckLastFlee(angle, infoList))
+        {
+            availablePos.push_back(Position(x, y, z));
+        }
     }
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
     if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
         x, y, z))
     {
+        std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
+        Position pos(x, y, z);
+        float angle = bot->GetAngle(&pos);
+        if (CheckLastFlee(angle, infoList))
+        {
+            availablePos.push_back(Position(x, y, z));
+        }
         availablePos.push_back(Position(x, y, z));
     }
     if (availablePos.empty())
@@ -2531,12 +2536,27 @@ bool SetBehindTargetAction::Execute(Event event)
     if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
         x, y, z))
     {
+        /// @todo: movement control now is a mess, prepare to rewrite
+        std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
+        Position pos(x, y, z);
+        float angle = bot->GetAngle(&pos);
+        if (CheckLastFlee(angle, infoList))
+        {
+            availablePos.push_back(Position(x, y, z));
+        }
         availablePos.push_back(Position(x, y, z));
     }
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
     if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
         x, y, z))
     {
+        std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
+        Position pos(x, y, z);
+        float angle = bot->GetAngle(&pos);
+        if (CheckLastFlee(angle, infoList))
+        {
+            availablePos.push_back(Position(x, y, z));
+        }
         availablePos.push_back(Position(x, y, z));
     }
     if (availablePos.empty())

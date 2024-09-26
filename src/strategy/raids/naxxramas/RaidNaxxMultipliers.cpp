@@ -27,7 +27,7 @@ float GrobbulusMultiplier::GetValue(Action* action)
     {
         return 1.0f;
     }
-    if (dynamic_cast<AvoidAoeAction*>(action))
+    if (dynamic_cast<AvoidAoeAction*>(action) || dynamic_cast<CombatFormationMoveAction*>(action))
     {
         return 0.0f;
     }
@@ -48,7 +48,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
     uint32 curr_dance = eventMap->GetNextEventTime(4);
     uint32 curr_timer = eventMap->GetTimer();
     uint32 curr_erupt = eventMap->GetNextEventTime(3);
-    if (dynamic_cast<SetBehindTargetAction*>(action))
+    if (dynamic_cast<CombatFormationMoveAction*>(action))
     {
         return 0.0f;
     }
@@ -87,7 +87,8 @@ float LoathebGenericMultiplier::GetValue(Action* action)
     context->GetValue<bool>("neglect threat")->Set(true);
     if (botAI->GetState() == BOT_STATE_COMBAT &&
         (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
-         dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) || dynamic_cast<FleeAction*>(action)))
+         dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) || dynamic_cast<FleeAction*>(action) ||
+         dynamic_cast<CombatFormationMoveAction*>(action)))
     {
         return 0.0f;
     }
@@ -113,7 +114,8 @@ float ThaddiusGenericMultiplier::GetValue(Action* action)
     if (helper.IsPhasePet() &&
         (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
          dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
-         dynamic_cast<ReachPartyMemberToHealAction*>(action) || dynamic_cast<BuffOnMainTankAction*>(action)))
+         dynamic_cast<ReachPartyMemberToHealAction*>(action) || dynamic_cast<BuffOnMainTankAction*>(action) ||
+         dynamic_cast<CombatFormationMoveAction*>(action)))
     {
         return 0.0f;
     }
@@ -151,7 +153,8 @@ float SapphironGenericMultiplier::GetValue(Action* action)
     {
         return 1.0f;
     }
-    if (dynamic_cast<FollowAction*>(action) || dynamic_cast<CastDeathGripAction*>(action))
+    if (dynamic_cast<FollowAction*>(action) || dynamic_cast<CastDeathGripAction*>(action) ||
+        dynamic_cast<CombatFormationMoveAction*>(action))
     {
         return 0.0f;
     }

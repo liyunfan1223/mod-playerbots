@@ -326,9 +326,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     }
 
     if (nextTransportCheck > elapsed)
-            nextTransportCheck -= elapsed;
-        else
-            nextTransportCheck = 0;
+        nextTransportCheck -= elapsed;
+    else
+        nextTransportCheck = 0;
 
     if (!nextTransportCheck)
     {
@@ -2088,6 +2088,25 @@ bool PlayerbotAI::IsMainTank(Player* player)
         }
     }
     return false;
+}
+
+uint32 PlayerbotAI::GetGroupTankNum(Player* player)
+{
+    Group* group = player->GetGroup();
+    if (!group)
+    {
+        return 0;
+    }
+    uint32 result = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (IsTank(member) && member->IsAlive())
+        {
+            result++;
+        }
+    }
+    return result;
 }
 
 bool PlayerbotAI::IsAssistTank(Player* player) { return IsTank(player) && !IsMainTank(player); }
