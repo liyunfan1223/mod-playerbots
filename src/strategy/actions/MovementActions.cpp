@@ -2333,8 +2333,8 @@ bool TankFaceAction::Execute(Event event)
     if (fabs(deltaAngle) > tolerable)
         return false;
 
-    float goodAngle1 = Position::NormalizeOrientation(averageAngle + M_PI * 5 / 8);
-    float goodAngle2 = Position::NormalizeOrientation(averageAngle - M_PI * 5 / 8);
+    float goodAngle1 = Position::NormalizeOrientation(averageAngle + M_PI * 3 / 5);
+    float goodAngle2 = Position::NormalizeOrientation(averageAngle - M_PI * 3 / 5);
 
     // if dist < bot->GetMeleeRange(target) / 2, target will move backward
     float dist = std::max(bot->GetExactDist(target), bot->GetMeleeRange(target) / 2) - bot->GetCombatReach() - target->GetCombatReach();
@@ -2526,8 +2526,8 @@ bool SetBehindTargetAction::Execute(Event event)
     if (fabs(deltaAngle) > tolerable)
         return false;
 
-    float goodAngle1 = Position::NormalizeOrientation(target->GetOrientation() + M_PI * 5 / 8);
-    float goodAngle2 = Position::NormalizeOrientation(target->GetOrientation() - M_PI * 5 / 8);
+    float goodAngle1 = Position::NormalizeOrientation(target->GetOrientation() + M_PI * 3 / 5);
+    float goodAngle2 = Position::NormalizeOrientation(target->GetOrientation() - M_PI * 3 / 5);
 
     float dist = std::max(bot->GetExactDist(target), bot->GetMeleeRange(target) / 2) - bot->GetCombatReach() - target->GetCombatReach();
     std::vector<Position> availablePos;
