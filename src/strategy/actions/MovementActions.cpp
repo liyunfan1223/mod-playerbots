@@ -2364,7 +2364,6 @@ bool TankFaceAction::Execute(Event event)
         {
             availablePos.push_back(Position(x, y, z));
         }
-        availablePos.push_back(Position(x, y, z));
     }
     if (availablePos.empty())
         return false;
@@ -2544,7 +2543,6 @@ bool SetBehindTargetAction::Execute(Event event)
         {
             availablePos.push_back(Position(x, y, z));
         }
-        availablePos.push_back(Position(x, y, z));
     }
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
     if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
@@ -2557,7 +2555,6 @@ bool SetBehindTargetAction::Execute(Event event)
         {
             availablePos.push_back(Position(x, y, z));
         }
-        availablePos.push_back(Position(x, y, z));
     }
     if (availablePos.empty())
         return false;
