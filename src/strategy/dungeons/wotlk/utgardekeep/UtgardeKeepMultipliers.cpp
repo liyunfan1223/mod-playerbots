@@ -7,7 +7,6 @@
 float PrinceKelesethMultiplier::GetValue(Action* action)
 {
 	Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
-
     if (!boss)
     {
         return 1.0f;
@@ -37,7 +36,7 @@ float SkarvaldAndDalronnMultiplier::GetValue(Action* action)
 
 float IngvarThePlundererMultiplier::GetValue(Action* action)
 {
-	Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
     bool isTank = botAI->IsTank(bot);
     if (!boss)
     {
@@ -58,8 +57,7 @@ float IngvarThePlundererMultiplier::GetValue(Action* action)
         {
             if (dynamic_cast<CastSpellAction*>(action))
             {
-                std::string const name = action->getName();
-                uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+                uint32 spellId = AI_VALUE2(uint32, "spell id", action->getName());
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 if (!spellInfo)
                 {

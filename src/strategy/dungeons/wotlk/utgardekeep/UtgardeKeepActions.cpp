@@ -4,7 +4,7 @@
 
 bool AttackFrostTombAction::Execute(Event event)
 {
-    Unit* frost_tomb = nullptr;
+    Unit* frostTomb = nullptr;
 
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name
@@ -15,27 +15,26 @@ bool AttackFrostTombAction::Execute(Event event)
         Unit* unit = botAI->GetUnit(*i);
         if (unit && unit->GetName() == "Frost Tomb")
         {
-            frost_tomb = unit;
+            frostTomb = unit;
             break;
         }
     }
-    if (!frost_tomb || AI_VALUE(Unit*, "current target") == frost_tomb)
+    if (!frostTomb || AI_VALUE(Unit*, "current target") == frostTomb)
     {
         return false;
     }
-    return Attack(frost_tomb);
+    return Attack(frostTomb);
 }
 
 // TODO: Possibly add player stacking behaviour close to tank, to prevent Skarvald charging ranged
 bool AttackDalronnAction::Execute(Event event)
 {
-    Unit* target = AI_VALUE2(Unit*, "find target", "dalronn the controller");
-
-    if (!target || AI_VALUE(Unit*, "current target") == target)
+    Unit* boss = AI_VALUE2(Unit*, "find target", "dalronn the controller");
+    if (!boss || AI_VALUE(Unit*, "current target") == boss)
     {
         return false;
     }
-    return Attack(target);
+    return Attack(boss);
 }
 
 bool IngvarStopCastingAction::Execute(Event event)
