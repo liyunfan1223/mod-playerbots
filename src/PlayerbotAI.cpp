@@ -1529,11 +1529,59 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 533:
             strategyName = "naxx";
             break;
+        case 574:
+            strategyName = "wotlk-uk";      // Utgarde Keep
+            break;
+        case 575:
+            strategyName = "wotlk-up";      // Utgarde Pinnacle
+            break;
+        case 576:
+            strategyName = "wotlk-nex";     // The Nexus
+            break;
+        case 578:
+            strategyName = "wotlk-occ";     // The Oculus
+            break;
+        case 595:
+            strategyName = "wotlk-cos";     // The Culling of Stratholme
+            break;
+        case 599:
+            strategyName = "wotlk-hos";     // Halls of Stone
+            break;
+        case 600:
+            strategyName = "wotlk-dtk";     // Drak'Tharon Keep
+            break;
+        case 601:
+            strategyName = "wotlk-an";      // Azjol-Nerub
+            break;
+        case 602:
+            strategyName = "wotlk-hol";     // Halls of Lightning
+            break;
         case 603:
             strategyName = "uld";
             break;
+        case 604:
+            strategyName = "wotlk-gd";      // Gundrak
+            break;
+        case 608:
+            strategyName = "wotlk-vh";      // Violet Hold
+            break;
+        case 619:
+            strategyName = "wotlk-ok";      // Ahn'kahet: The Old Kingdom
+            break;
         case 631:
             strategyName = "icc";
+            break;
+        case 632:
+            strategyName = "wotlk-fos";     // The Forge of Souls
+            break;
+        case 650:
+            strategyName = "wotlk-toc";     // Trial of the Champion
+            break;
+        case 658:
+            strategyName = "wotlk-pos";     // Pit of Saron
+            break;
+        case 668:
+            strategyName = "wotlk-hor";     // Halls of Reflection
             break;
         default:
             break;
