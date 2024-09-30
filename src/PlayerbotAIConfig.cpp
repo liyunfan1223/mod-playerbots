@@ -464,7 +464,7 @@ bool PlayerbotAIConfig::Initialize()
 
     playerbotsXPrate = sConfigMgr->GetOption<int32>("AiPlayerbot.KillXPRate", 1);
     disableDeathKnightLogin = sConfigMgr->GetOption<bool>("AiPlayerbot.DisableDeathKnightLogin", 0);
-    botActiveAlone = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAlone", 10);
+    botActiveAlone = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAlone", 100);
 
     enablePrototypePerformanceDiff = sConfigMgr->GetOption<bool>("AiPlayerbot.EnablePrototypePerformanceDiff", false);
     diffWithPlayer = sConfigMgr->GetOption<int32>("AiPlayerbot.DiffWithPlayer", 100);
