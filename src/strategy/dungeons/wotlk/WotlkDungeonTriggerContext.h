@@ -1,5 +1,5 @@
-#ifndef _PLAYERBOT_WOTLKDUNGEONTRIGGERCONTEXT_H_
-#define _PLAYERBOT_WOTLKDUNGEONTRIGGERCONTEXT_H_
+#ifndef _PLAYERBOT_WOTLKDUNGEONTRIGGERCONTEXT_H
+#define _PLAYERBOT_WOTLKDUNGEONTRIGGERCONTEXT_H
 
 #include "utgardekeep/UtgardeKeepTriggerContext.h"
 // #include "nexus/NexusTriggerContext.h"

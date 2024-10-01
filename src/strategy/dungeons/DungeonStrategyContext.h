@@ -1,5 +1,5 @@
-#ifndef _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H_
-#define _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H_
+#ifndef _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H
+#define _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H
 
 #include "Strategy.h"
 #include "wotlk/utgardekeep/UtgardeKeepStrategy.h"
