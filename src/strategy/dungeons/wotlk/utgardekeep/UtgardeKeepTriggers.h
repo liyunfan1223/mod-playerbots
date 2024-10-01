@@ -9,7 +9,7 @@
 
 // Taken from:
 // src/server/scripts/Northrend/UtgardeKeep/UtgardeKeep/boss_ingvar_the_plunderer.cpp
-enum eSpells
+enum Spells
 {
     SPELL_SUMMON_VALKYR             = 42912,
     SPELL_RESURRECTION_BEAM         = 42857,
