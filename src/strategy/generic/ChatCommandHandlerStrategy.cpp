@@ -92,6 +92,8 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         new TriggerNode("dps", NextAction::array(0, new NextAction("tell estimated dps", relevance), NULL)));
     triggers.push_back(
         new TriggerNode("disperse", NextAction::array(0, new NextAction("disperse set", relevance), NULL)));
+    triggers.push_back(
+	    new TriggerNode("open items", NextAction::array(0, new NextAction("open items", relevance), nullptr)));
 }
 
 ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
@@ -164,4 +166,5 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("rtsc");
     supported.push_back("drink");
     supported.push_back("calc");
+    supported.push_back("open items");
 }
