@@ -33,6 +33,10 @@ bool DivineSpiritTrigger::IsActive()
 
 bool PrayerOfFortitudeTrigger::IsActive()
 {
+    Unit* target = GetTarget();
+    if (!target || !target->IsPlayer())
+        return false;
+
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("prayer of fortitude", GetTarget()) &&
            botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
            botAI->GetBuffedCount((Player*)GetTarget(), "prayer of fortitude") < 4 &&
@@ -41,6 +45,10 @@ bool PrayerOfFortitudeTrigger::IsActive()
 
 bool PrayerOfSpiritTrigger::IsActive()
 {
+    Unit* target = GetTarget();
+    if (!target || !target->IsPlayer())
+        return false;
+    
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("prayer of spirit", GetTarget()) &&
            botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
            // botAI->GetManaPercent() > 50 &&
