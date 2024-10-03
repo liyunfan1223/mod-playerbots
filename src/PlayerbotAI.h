@@ -527,6 +527,7 @@ public:
     bool HasManyPlayersNearby(uint32 trigerrValue = 20, float range = sPlayerbotAIConfig->sightDistance);
     bool AllowActive(ActivityType activityType);
     bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
+    uint32 AutoScaleActivity(uint32 mod);
 
     // Check if player is safe to use.
     bool IsSafe(Player* player);

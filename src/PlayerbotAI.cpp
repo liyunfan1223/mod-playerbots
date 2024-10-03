@@ -4095,8 +4095,6 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
             return true;
     }
 
-    uint32 maxDiff = sWorldUpdateTime.GetMaxUpdateTime();
-
     Group* group = bot->GetGroup();
     if (group)
     {
@@ -4176,37 +4174,10 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     if (sPlayerbotAIConfig->botActiveAlone <= 0)
         return false;
 
-    if (sPlayerbotAIConfig->botActiveAlone >= 100)
-        return true;
-
-    if (maxDiff > 1000)
-        return false;
-
-    uint32 mod = 100;
-
-    // if has real players - slow down continents without player
-    if (maxDiff > 100)
-        mod = 50;
-
-    if (maxDiff > 150)
-        mod = 25;
-
-    if (maxDiff > 200)
-        mod = 10;
-
-    if (maxDiff > 250)
+    uint32 mod = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
+    if (sPlayerbotAIConfig->botActiveAloneAutoScale) 
     {
-        if (Map* map = bot->GetMap())
-        {
-            if (map->GetEntry()->IsWorldMap())
-            {
-                if (!HasRealPlayers(map))
-                    return false;
-
-                if (!map->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY()))
-                    return false;
-            }
-        }
+        mod = AutoScaleActivity(mod);
     }
 
     uint32 ActivityNumber =
@@ -4230,6 +4201,31 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
     allowActive[activityType] = allowed;
     allowActiveCheckTimer[activityType] = time(nullptr);
     return allowed;
+}
+
+uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
+{
+    uint32 maxDiff = sWorldUpdateTime.GetAverageUpdateTime();
+    
+    if (maxDiff > 500) return 0;
+    if (maxDiff > 250)
+    {
+        if (Map* map = bot->GetMap())
+        {
+            if (map->GetEntry()->IsWorldMap() && 
+                (!HasRealPlayers(map) || 
+                !map->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY())))
+                return 0;
+        }
+
+        return (mod * 1) / 10;
+    }
+    if (maxDiff > 200) return (mod * 3) / 10;
+    if (maxDiff > 150) return (mod * 5) / 10;
+    if (maxDiff > 100) return (mod * 6) / 10;
+    if (maxDiff > 80)  return (mod * 9) / 10;
+
+    return mod;
 }
 
 bool PlayerbotAI::IsOpposing(Player* player) { return IsOpposing(player->getRace(), bot->getRace()); }
