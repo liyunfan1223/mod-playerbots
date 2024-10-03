@@ -335,7 +335,7 @@ public:
 class CastFlameShockAction : public CastDebuffSpellAction
 {
 public:
-    CastFlameShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flame shock", true) {}
+    CastFlameShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flame shock", true, 6.0f) {}
 };
 
 class CastEarthShockAction : public CastSpellAction

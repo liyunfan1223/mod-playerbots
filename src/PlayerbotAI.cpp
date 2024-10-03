@@ -3339,11 +3339,11 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     //     }
     // }
 
-    WaitForSpellCast(spell);
-    if (spell->GetCastTime())
-        aiObjectContext->GetValue<LastSpellCast&>("last spell cast")
-            ->Get()
-            .Set(spellId, target->GetGUID(), time(nullptr));
+    // WaitForSpellCast(spell);
+    
+    aiObjectContext->GetValue<LastSpellCast&>("last spell cast")
+        ->Get()
+        .Set(spellId, target->GetGUID(), time(nullptr));
 
     aiObjectContext->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 
@@ -3473,7 +3473,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         }
     }
 
-    WaitForSpellCast(spell);
+    // WaitForSpellCast(spell);
     aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, bot->GetGUID(), time(nullptr));
     aiObjectContext->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 
@@ -3688,7 +3688,7 @@ bool PlayerbotAI::CastVehicleSpell(uint32 spellId, Unit* target)
         return false;
     }
 
-    WaitForSpellCast(spell);
+    // WaitForSpellCast(spell);
 
     // aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, target->GetGUID(), time(0));
     // aiObjectContext->GetValue<botAI::PositionMap&>("position")->Get()["random"].Reset();
@@ -3745,23 +3745,15 @@ bool PlayerbotAI::IsInVehicle(bool canControl, bool canCast, bool canAttack, boo
 
 void PlayerbotAI::WaitForSpellCast(Spell* spell)
 {
-    return;
     SpellInfo const* spellInfo = spell->GetSpellInfo();
     uint32 castTime = spell->GetCastTime();
-    // float castTime = spell->GetCastTime();
-    // if (spellInfo->IsChanneled())
-    // {
-    //     int32 duration = spellInfo->GetDuration();
-    //     bot->ApplySpellMod(spellInfo->Id, SPELLMOD_DURATION, duration);
-    //     if (duration > 0)
-    //         castTime += duration;
-    // }
-
-    // castTime = ceil(castTime);
-
-    // uint32 globalCooldown = CalculateGlobalCooldown(spellInfo->Id);
-    // if (castTime < globalCooldown)
-    //     castTime = globalCooldown;
+    if (spellInfo->IsChanneled())
+    {
+        int32 duration = spellInfo->GetDuration();
+        bot->ApplySpellMod(spellInfo->Id, SPELLMOD_DURATION, duration);
+        if (duration > 0)
+            castTime += duration;
+    }
 
     SetNextCheckDelay(castTime + sPlayerbotAIConfig->reactDelay);
 }

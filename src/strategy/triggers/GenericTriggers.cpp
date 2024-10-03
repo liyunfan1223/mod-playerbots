@@ -76,7 +76,7 @@ bool AlmostFullManaTrigger::IsActive()
 
 bool EnoughManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > 65;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->highMana;
 }
 
 bool RageAvailable::IsActive() { return AI_VALUE2(uint8, "rage", "self target") >= amount; }
@@ -364,6 +364,34 @@ bool GenericBoostTrigger::IsActive()
     if (target && target->ToPlayer())
         return true;
     return AI_VALUE(uint8, "balance") <= balance;
+}
+
+bool HealerShouldAttackTrigger::IsActive() 
+{
+    // nobody can help me
+    if (botAI->GetNearGroupMemberCount(sPlayerbotAIConfig->sightDistance) <= 1)
+        return true;
+    
+    bool almostFullMana = AI_VALUE2(bool, "has mana", "self target") &&
+        AI_VALUE2(uint8, "mana", "self target") < 85;
+
+    // high pressure
+    if (AI_VALUE(uint8, "balance") <= 50 && almostFullMana)
+        return false;
+    
+    bool highMana = AI_VALUE2(bool, "has mana", "self target") &&
+        AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->highMana;
+
+    if (AI_VALUE(uint8, "balance") <= 100 && highMana)
+        return false;
+    
+    bool mediumMana = AI_VALUE2(bool, "has mana", "self target") &&
+        AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->mediumMana;
+
+    if (mediumMana)
+        return false;
+
+    return true;
 }
 
 bool ItemCountTrigger::IsActive() { return AI_VALUE2(uint32, "item count", item) < count; }

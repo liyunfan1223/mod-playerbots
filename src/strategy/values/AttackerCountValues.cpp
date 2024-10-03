@@ -94,7 +94,7 @@ uint8 BalancePercentValue::Calculate()
                 level *= 3;
                 break;
             case CREATURE_ELITE_WORLDBOSS:
-                level *= 30;
+                level *= 20;
                 break;
         }
 

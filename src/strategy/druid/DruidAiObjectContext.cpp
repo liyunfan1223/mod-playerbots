@@ -14,6 +14,7 @@
 #include "DruidShapeshiftActions.h"
 #include "DruidTriggers.h"
 #include "GenericDruidNonCombatStrategy.h"
+#include "GenericDruidStrategy.h"
 #include "HealDruidStrategy.h"
 #include "MeleeDruidStrategy.h"
 #include "Playerbots.h"
@@ -33,6 +34,7 @@ public:
         creators["buff"] = &DruidStrategyFactoryInternal::buff;
         creators["boost"] = &DruidStrategyFactoryInternal::boost;
         creators["cc"] = &DruidStrategyFactoryInternal::cc;
+        creators["assist dps"] = &DruidStrategyFactoryInternal::assist_dps;
     }
 
 private:
@@ -45,6 +47,7 @@ private:
     static Strategy* buff(PlayerbotAI* botAI) { return new GenericDruidBuffStrategy(botAI); }
     static Strategy* boost(PlayerbotAI* botAI) { return new DruidBoostStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new DruidCcStrategy(botAI); }
+    static Strategy* assist_dps(PlayerbotAI* botAI) { return new DruidAssistDpsStrategy(botAI); }
 };
 
 class DruidDruidStrategyFactoryInternal : public NamedObjectContext<Strategy>

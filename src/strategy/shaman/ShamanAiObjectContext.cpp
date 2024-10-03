@@ -6,6 +6,7 @@
 #include "ShamanAiObjectContext.h"
 
 #include "CasterShamanStrategy.h"
+#include "GenericShamanStrategy.h"
 #include "HealShamanStrategy.h"
 #include "MeleeShamanStrategy.h"
 #include "NamedObjectContext.h"
@@ -25,6 +26,7 @@ public:
         creators["melee aoe"] = &ShamanStrategyFactoryInternal::melee_aoe;
         creators["caster aoe"] = &ShamanStrategyFactoryInternal::caster_aoe;
         creators["cure"] = &ShamanStrategyFactoryInternal::cure;
+        creators["assist dps"] = &ShamanStrategyFactoryInternal::assist_dps;
     }
 
 private:
@@ -33,6 +35,7 @@ private:
     static Strategy* melee_aoe(PlayerbotAI* botAI) { return new MeleeAoeShamanStrategy(botAI); }
     static Strategy* caster_aoe(PlayerbotAI* botAI) { return new CasterAoeShamanStrategy(botAI); }
     static Strategy* cure(PlayerbotAI* botAI) { return new ShamanCureStrategy(botAI); }
+    static Strategy* assist_dps(PlayerbotAI* botAI) { return new ShamanAssistDpsStrategy(botAI); }
 };
 
 class ShamanBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>

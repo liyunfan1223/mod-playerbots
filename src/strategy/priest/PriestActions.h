@@ -68,7 +68,13 @@ CURE_PARTY_ACTION(CastCureDiseaseOnPartyAction, "cure disease", DISPEL_DISEASE);
 CURE_ACTION(CastAbolishDiseaseAction, "abolish disease");
 CURE_PARTY_ACTION(CastAbolishDiseaseOnPartyAction, "abolish disease", DISPEL_DISEASE);
 
-DEBUFF_CHECKISOWNER_ACTION(CastHolyFireAction, "holy fire");
+// DEBUFF_CHECKISOWNER_ACTION(CastHolyFireAction, "holy fire");
+class CastHolyFireAction : public CastDebuffSpellAction
+{
+public:
+    CastHolyFireAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "holy fire", true, 0.0f) {}
+};
+
 // shadow 2.4.3
 // BUFF_ACTION(CastShadowfiendAction, "shadowfiend");
 SPELL_ACTION(CastShadowWordDeathAction, "shadow word: death");

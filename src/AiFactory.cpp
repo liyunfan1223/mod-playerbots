@@ -277,10 +277,6 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     {
         engine->addStrategiesNoInit("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
     }
-    if (sPlayerbotAIConfig->autoSaveMana)
-    {
-        engine->addStrategy("save mana", false);
-    }
     if (sPlayerbotAIConfig->autoAvoidAoe && facade->HasRealPlayerMaster())
     {
         engine->addStrategy("avoid aoe", false);
@@ -394,7 +390,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     if (PlayerbotAI::IsMelee(player, true) && PlayerbotAI::IsDps(player, true)) {
         engine->addStrategy("behind", false);
     }
-
+    if (PlayerbotAI::IsHeal(player, true))
+    {
+        if (sPlayerbotAIConfig->autoSaveMana)
+            engine->addStrategy("save mana", false);
+        engine->addStrategy("assist dps", false);
+    }
     if (facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player))
     {
         if (!player->GetGroup())

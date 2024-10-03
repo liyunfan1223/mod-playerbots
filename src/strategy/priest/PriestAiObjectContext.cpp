@@ -5,6 +5,7 @@
 
 #include "PriestAiObjectContext.h"
 
+#include "GenericPriestStrategy.h"
 #include "HolyPriestStrategy.h"
 #include "NamedObjectContext.h"
 #include "Playerbots.h"
@@ -30,6 +31,7 @@ public:
         creators["boost"] = &PriestStrategyFactoryInternal::boost;
         creators["rshadow"] = &PriestStrategyFactoryInternal::rshadow;
         creators["cc"] = &PriestStrategyFactoryInternal::cc;
+        creators["assist dps"] = &PriestStrategyFactoryInternal::assist_dps;
     }
 
 private:
@@ -42,6 +44,7 @@ private:
     static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
     static Strategy* shadow_debuff(PlayerbotAI* botAI) { return new ShadowPriestDebuffStrategy(botAI); }
     static Strategy* cure(PlayerbotAI* botAI) { return new PriestCureStrategy(botAI); }
+    static Strategy* assist_dps(PlayerbotAI* botAI) { return new PriestAssistDpsStrategy(botAI); }
 };
 
 class PriestCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>

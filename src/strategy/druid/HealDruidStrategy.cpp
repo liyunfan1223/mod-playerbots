@@ -10,7 +10,12 @@
 class HealDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    HealDruidStrategyActionNodeFactory() { creators["nourish on party"] = &nourtish_on_party; }
+    HealDruidStrategyActionNodeFactory() {
+        creators["nourish on party"] = &nourtish_on_party;
+        creators["wild growth on party"] = &wild_growth_on_party;
+        creators["rejuvenation on party"] = &rejuvenation_on_party;
+        creators["regrowth on party"] = &regrowth_on_party;
+    }
 
 private:
     static ActionNode* nourtish_on_party([[maybe_unused]] PlayerbotAI* botAI)
@@ -18,6 +23,27 @@ private:
         return new ActionNode("nourish on party",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("healing touch on party"), nullptr),
+                              /*C*/ nullptr);
+    }
+    static ActionNode* wild_growth_on_party([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("wild growth on party",
+                              /*P*/ NextAction::array(0, new NextAction("tree form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+    static ActionNode* rejuvenation_on_party([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("rejuvenation on party",
+                              /*P*/ NextAction::array(0, new NextAction("tree form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+    static ActionNode* regrowth_on_party([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("regrowth on party",
+                              /*P*/ NextAction::array(0, new NextAction("tree form"), nullptr),
+                              /*A*/ nullptr,
                               /*C*/ nullptr);
     }
 };
@@ -33,19 +59,18 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell",
     // ACTION_NORMAL + 9), nullptr)));
-    triggers.push_back(
-        new TriggerNode("tree form", NextAction::array(0, new NextAction("tree form", ACTION_HIGH + 1), nullptr)));
+    // triggers.push_back(
+    //     new TriggerNode("tree form", NextAction::array(0, new NextAction("tree form", ACTION_HIGH + 1), nullptr)));
+
     triggers.push_back(new TriggerNode(
         "party member to heal out of spell range",
         NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 9), nullptr)));
-    triggers.push_back(
-        new TriggerNode("party member remove curse",
-                        NextAction::array(0, new NextAction("remove curse on party", ACTION_DISPEL + 7), NULL)));
+
     // CRITICAL
     triggers.push_back(
         new TriggerNode("party member critical health",
                         NextAction::array(0, new NextAction("swiftmend on party", ACTION_CRITICAL_HEAL + 4),
-                                          new NextAction("wild growth", ACTION_CRITICAL_HEAL + 3),
+                                          new NextAction("wild growth on party", ACTION_CRITICAL_HEAL + 3),
                                           new NextAction("regrowth on party", ACTION_CRITICAL_HEAL + 2),
                                           new NextAction("nourish on party", ACTION_CRITICAL_HEAL + 1),
                                           // new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 0),
@@ -66,7 +91,6 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                           new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 8),
                                           new NextAction("swiftmend on party", ACTION_MEDIUM_HEAL + 7),
                                           new NextAction("nourish on party", ACTION_MEDIUM_HEAL + 6),
-                                          // new NextAction("healing touch on party", ACTION_MEDIUM_HEAL + 5),
                                           NULL)));
 
     // MEDIUM
