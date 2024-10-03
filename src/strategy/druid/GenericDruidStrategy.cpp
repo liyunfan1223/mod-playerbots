@@ -158,7 +158,15 @@ void DruidAssistDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("healer should attack",
                         NextAction::array(0,
+                            new NextAction("cancel tree form", ACTION_DEFAULT + 0.3f),
                             new NextAction("moonfire", ACTION_DEFAULT + 0.2f),
                             new NextAction("wrath", ACTION_DEFAULT + 0.1f),
+                            new NextAction("starfire", ACTION_DEFAULT),
+                            nullptr)));
+
+    triggers.push_back(
+        new TriggerNode("medium aoe and healer should attack",
+                        NextAction::array(0,
+                            new NextAction("hurricane", ACTION_DEFAULT + 0.7f),
                             nullptr)));
 }

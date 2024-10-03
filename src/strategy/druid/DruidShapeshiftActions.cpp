@@ -45,6 +45,17 @@ bool CastCasterFormAction::Execute(Event event)
     return true;
 }
 
+bool CastCancelTreeFormAction::isUseful()
+{
+    return botAI->HasAura(33891, bot);
+}
+
+bool CastCancelTreeFormAction::Execute(Event event)
+{
+    botAI->RemoveAura("tree of life");
+    return true;
+}
+
 bool CastTreeFormAction::isUseful()
 {
     return GetTarget() && CastSpellAction::isUseful() && !botAI->HasAura(33891, bot);

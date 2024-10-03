@@ -484,8 +484,8 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         engine->removeStrategy("threat", false);
         engine->addStrategy("boost", false);
 
-        if ((player->getClass() == CLASS_DRUID && tab == 2) || (player->getClass() == CLASS_SHAMAN && tab == 2))
-            engine->addStrategiesNoInit("caster", "caster aoe", nullptr);
+        // if ((player->getClass() == CLASS_DRUID && tab == 2) || (player->getClass() == CLASS_SHAMAN && tab == 2))
+        //     engine->addStrategiesNoInit("caster", "caster aoe", nullptr);
 
         // if (player->getClass() == CLASS_DRUID && tab == 1)
         //     engine->addStrategiesNoInit(/*"behind",*/ "dps", nullptr);

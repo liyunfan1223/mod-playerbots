@@ -95,8 +95,8 @@ void PriestAssistDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         NextAction::array(0,
                             new NextAction("shadow word: pain", ACTION_DEFAULT + 0.5f),
                             new NextAction("holy fire", ACTION_DEFAULT + 0.4f),
-                            // new NextAction("mind blast", ACTION_DEFAULT + 0.3f),
-                            new NextAction("smite", ACTION_DEFAULT + 0.1f),
+                            new NextAction("smite", ACTION_DEFAULT + 0.3f),
+                            new NextAction("mind blast", ACTION_DEFAULT + 0.2f),
                             new NextAction("shoot", ACTION_DEFAULT),
                             nullptr)));
     

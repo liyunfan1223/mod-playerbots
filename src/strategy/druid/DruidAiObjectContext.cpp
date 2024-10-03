@@ -164,6 +164,7 @@ public:
         creators["travel form"] = &DruidAiObjectContextInternal::travel_form;
         creators["aquatic form"] = &DruidAiObjectContextInternal::aquatic_form;
         creators["caster form"] = &DruidAiObjectContextInternal::caster_form;
+        creators["cancel tree form"] = &DruidAiObjectContextInternal::cancel_tree_form;
         creators["mangle (bear)"] = &DruidAiObjectContextInternal::mangle_bear;
         creators["maul"] = &DruidAiObjectContextInternal::maul;
         creators["bash"] = &DruidAiObjectContextInternal::bash;
@@ -249,6 +250,7 @@ private:
     static Action* travel_form(PlayerbotAI* botAI) { return new CastTravelFormAction(botAI); }
     static Action* aquatic_form(PlayerbotAI* botAI) { return new CastAquaticFormAction(botAI); }
     static Action* caster_form(PlayerbotAI* botAI) { return new CastCasterFormAction(botAI); }
+    static Action* cancel_tree_form(PlayerbotAI* botAI) { return new CastCancelTreeFormAction(botAI); }
     static Action* mangle_bear(PlayerbotAI* botAI) { return new CastMangleBearAction(botAI); }
     static Action* maul(PlayerbotAI* botAI) { return new CastMaulAction(botAI); }
     static Action* bash(PlayerbotAI* botAI) { return new CastBashAction(botAI); }
