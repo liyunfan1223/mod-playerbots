@@ -113,21 +113,33 @@ bool QueryQuestAction::Execute(Event event)
 void QueryQuestAction::TellObjectives(uint32 questId)
 {
     Quest const* questTemplate = sObjectMgr->GetQuestTemplate(questId);
+    
+    // Checks if the questTemplate is valid
+    if (!questTemplate)
+    {
+        botAI->TellMaster("Quest template not found.");
+        return;
+    }
+
     QuestStatusData questStatus = bot->getQuestStatusMap()[questId];
 
     for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {
+        // Checks for objective text
         if (!questTemplate->ObjectiveText[i].empty())
             botAI->TellMaster(questTemplate->ObjectiveText[i]);
 
+        // Checks for required items
         if (questTemplate->RequiredItemId[i])
         {
             uint32 required = questTemplate->RequiredItemCount[i];
             uint32 available = questStatus.ItemCount[i];
             ItemTemplate const* proto = sObjectMgr->GetItemTemplate(questTemplate->RequiredItemId[i]);
-            TellObjective(chat->FormatItem(proto), available, required);
+            if (proto)
+                TellObjective(chat->FormatItem(proto), available, required);
         }
 
+        // Checks for required NPCs or GOs
         if (questTemplate->RequiredNpcOrGo[i])
         {
             uint32 required = questTemplate->RequiredNpcOrGoCount[i];
@@ -135,8 +147,7 @@ void QueryQuestAction::TellObjectives(uint32 questId)
 
             if (questTemplate->RequiredNpcOrGo[i] < 0)
             {
-                if (GameObjectTemplate const* info =
-                        sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
+                if (GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(-questTemplate->RequiredNpcOrGo[i]))
                     TellObjective(info->name, available, required);
             }
             else
