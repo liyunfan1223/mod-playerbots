@@ -703,8 +703,7 @@ void PlayerbotAI::HandleTeleportAck()
             p << (uint32)0;  // supposed to be flags? not used currently
             p << (uint32)0;  // time - not currently used
             bot->GetSession()->HandleMoveTeleportAck(p);
-        }
-        SetNextCheckDelay(urand(1000, 3000));
+        };
     }
     if (bot->IsBeingTeleportedFar())
     {
@@ -712,13 +711,13 @@ void PlayerbotAI::HandleTeleportAck()
         {
             bot->GetSession()->HandleMoveWorldportAck();
         }
-        SetNextCheckDelay(urand(2000, 5000));
+        // SetNextCheckDelay(urand(2000, 5000));
         if (sPlayerbotAIConfig->applyInstanceStrategies)
             ApplyInstanceStrategies(bot->GetMapId(), true);
+        Reset();
     }
 
     SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
-    Reset();
 }
 
 void PlayerbotAI::Reset(bool full)
@@ -1198,7 +1197,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
 
 void PlayerbotAI::SpellInterrupted(uint32 spellid)
 {
-    for (uint8 type = CURRENT_MELEE_SPELL; type < CURRENT_CHANNELED_SPELL; type++)
+    for (uint8 type = CURRENT_MELEE_SPELL; type <= CURRENT_CHANNELED_SPELL; type++)
     {
         Spell* spell = bot->GetCurrentSpell((CurrentSpellTypes)type);
         if (!spell)
@@ -1206,8 +1205,8 @@ void PlayerbotAI::SpellInterrupted(uint32 spellid)
         if (spell->GetSpellInfo()->Id == spellid)
             bot->InterruptSpell((CurrentSpellTypes)type);
     }
-    LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get();
-    lastSpell.id = 0;
+    // LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get();
+    // lastSpell.id = 0;
 }
 
 int32 PlayerbotAI::CalculateGlobalCooldown(uint32 spellid)
