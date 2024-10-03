@@ -180,7 +180,7 @@ public:
     }
 
 private:
-    static Action* open_items(PlayerbotAI* botAI) { return new OpenItemsAction(botAI); }
+    static Action* open_items(PlayerbotAI* botAI) { return new OpenItemAction(botAI); }
     static Action* range(PlayerbotAI* botAI) { return new RangeAction(botAI); }
     static Action* flag(PlayerbotAI* botAI) { return new FlagAction(botAI); }
     static Action* craft(PlayerbotAI* botAI) { return new SetCraftAction(botAI); }
