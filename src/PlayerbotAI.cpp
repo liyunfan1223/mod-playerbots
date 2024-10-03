@@ -43,6 +43,7 @@
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellInfo.h"
 #include "Transport.h"
 #include "Unit.h"
 #include "UpdateTime.h"
@@ -318,12 +319,43 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         currentSpell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
     if (currentSpell && currentSpell->getState() == SPELL_STATE_PREPARING)
     {
+        const SpellInfo* spellInfo = currentSpell->GetSpellInfo();
+        
+        // interrupt if target is dead
         if (currentSpell->m_targets.GetUnitTarget() && !currentSpell->m_targets.GetUnitTarget()->IsAlive() &&
-            currentSpell->GetSpellInfo() && !currentSpell->GetSpellInfo()->IsAllowingDeadTarget())
+            spellInfo && !spellInfo->IsAllowingDeadTarget())
         {
-            bot->InterruptSpell(CURRENT_GENERIC_SPELL);
+            InterruptSpell();
             SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
         }
+
+        bool isHeal = false;
+        bool isSingleTarget = true;
+
+        for (uint8 i = 0; i < 3; ++i)
+        {
+            if (!spellInfo->Effects[i].Effect)
+                continue;
+
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL ||
+                spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+                spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MECHANICAL)
+                isHeal = true;
+            
+            if ((spellInfo->Effects[i].TargetA.GetTarget() && spellInfo->Effects[i].TargetA.GetTarget() != TARGET_UNIT_TARGET_ALLY) || 
+                (spellInfo->Effects[i].TargetB.GetTarget() && spellInfo->Effects[i].TargetB.GetTarget() != TARGET_UNIT_TARGET_ALLY))
+            {
+                isSingleTarget = false;
+            }
+        }
+        // interrupt if target ally has full health (heal by other member)
+        if (isHeal && isSingleTarget && currentSpell->m_targets.GetUnitTarget() && currentSpell->m_targets.GetUnitTarget()->IsFullHealth())
+        {
+            InterruptSpell();
+            SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+        }
+
+        // wait for spell cast
         return;
     }
 
@@ -3733,13 +3765,10 @@ void PlayerbotAI::WaitForSpellCast(Spell* spell)
 
 void PlayerbotAI::InterruptSpell()
 {
-    for (uint8 type = CURRENT_MELEE_SPELL; type < CURRENT_CHANNELED_SPELL; type++)
+    for (uint8 type = CURRENT_MELEE_SPELL; type <= CURRENT_CHANNELED_SPELL; type++)
     {
         Spell* spell = bot->GetCurrentSpell((CurrentSpellTypes)type);
         if (!spell)
-            continue;
-
-        if (spell->m_spellInfo->IsPositive())
             continue;
 
         bot->InterruptSpell((CurrentSpellTypes)type);
