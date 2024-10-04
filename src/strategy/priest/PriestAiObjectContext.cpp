@@ -195,7 +195,7 @@ public:
         creators["fade"] = &PriestAiObjectContextInternal::fade;
         creators["inner fire"] = &PriestAiObjectContextInternal::inner_fire;
         creators["resurrection"] = &PriestAiObjectContextInternal::resurrection;
-        creators["circle of healing"] = &PriestAiObjectContextInternal::circle_of_healing;
+        creators["circle of healing on party"] = &PriestAiObjectContextInternal::circle_of_healing;
         creators["psychic scream"] = &PriestAiObjectContextInternal::psychic_scream;
         creators["vampiric touch"] = &PriestAiObjectContextInternal::vampiric_touch;
         creators["vampiric touch on attacker"] = &PriestAiObjectContextInternal::vampiric_touch_on_attacker;

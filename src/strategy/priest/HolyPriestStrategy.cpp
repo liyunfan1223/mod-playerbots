@@ -63,8 +63,8 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericPriestStrategy::InitTriggers(triggers);
 
     triggers.push_back(
-        new TriggerNode("group heal occasion",
-                        NextAction::array(0, new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), NULL)));
+        new TriggerNode("group heal setting",
+                        NextAction::array(0, new NextAction("circle of healing on party", ACTION_MEDIUM_HEAL + 8), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "medium group heal occasion",
@@ -77,28 +77,28 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                           new NextAction("guardian spirit on party", ACTION_CRITICAL_HEAL + 6),
                           new NextAction("power word: shield on party", ACTION_CRITICAL_HEAL + 5),
                           new NextAction("flash heal on party", ACTION_CRITICAL_HEAL + 3),
-                          new NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 2), NULL)));
+                          new NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 2), nullptr)));
 
     triggers.push_back(
         new TriggerNode("party member low health",
-                        NextAction::array(0, new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 4),
+                        NextAction::array(0, new NextAction("circle of healing on party", ACTION_MEDIUM_HEAL + 4),
                                           new NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 3),
                                           new NextAction("prayer of mending on party", ACTION_MEDIUM_HEAL + 2),
-                                          new NextAction("flash heal on party", ACTION_MEDIUM_HEAL + 1), NULL)));
+                                          new NextAction("flash heal on party", ACTION_MEDIUM_HEAL + 1), nullptr)));
 
     triggers.push_back(
         new TriggerNode("party member medium health",
-                        NextAction::array(0, new NextAction("circle of healing", ACTION_LIGHT_HEAL + 7),
+                        NextAction::array(0, new NextAction("circle of healing on party", ACTION_LIGHT_HEAL + 7),
                                           new NextAction("prayer of mending on party", ACTION_LIGHT_HEAL + 6),
                                           new NextAction("flash heal on party", ACTION_LIGHT_HEAL + 5),
                                           // new NextAction("renew on party", ACTION_LIGHT_HEAL + 8),
-                                          NULL)));
+                                          nullptr)));
 
     triggers.push_back(
         new TriggerNode("party member almost full health",
                         NextAction::array(0, new NextAction("renew on party", ACTION_LIGHT_HEAL + 2),
                                           // new NextAction("flash heal on party", ACTION_LIGHT_HEAL + 1),
-                                          NULL)));
+                                          nullptr)));
 
     triggers.push_back(new TriggerNode(
         "party member to heal out of spell range",

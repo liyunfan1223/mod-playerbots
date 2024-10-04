@@ -210,7 +210,7 @@ public:
         creators["lesser healing wave on party"] = &ShamanAiObjectContextInternal::lesser_healing_wave_on_party;
         creators["earth shield"] = &ShamanAiObjectContextInternal::earth_shield;
         creators["earth shield on party"] = &ShamanAiObjectContextInternal::earth_shield_on_party;
-        creators["chain heal"] = &ShamanAiObjectContextInternal::chain_heal;
+        creators["chain heal on party"] = &ShamanAiObjectContextInternal::chain_heal;
         creators["riptide"] = &ShamanAiObjectContextInternal::riptide;
         creators["riptide on party"] = &ShamanAiObjectContextInternal::riptide_on_party;
         creators["stormstrike"] = &ShamanAiObjectContextInternal::stormstrike;

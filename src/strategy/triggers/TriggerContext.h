@@ -139,7 +139,7 @@ public:
         creators["medium aoe heal"] = &TriggerContext::medium_aoe_heal;
         creators["almost full aoe heal"] = &TriggerContext::almost_full_aoe_heal;
 
-        creators["group heal occasion"] = &TriggerContext::group_heal_occasion;
+        creators["group heal setting"] = &TriggerContext::group_heal_occasion;
         creators["medium group heal occasion"] = &TriggerContext::medium_group_heal_occasion;
         creators["invalid target"] = &TriggerContext::invalid_target;
         creators["lfg proposal active"] = &TriggerContext::lfg_proposal_active;
@@ -246,7 +246,7 @@ private:
     }
     static Trigger* group_heal_occasion(PlayerbotAI* ai)
     {
-        return new AoeInGroupTrigger(ai, "group heal occasion", "almost full");
+        return new AoeInGroupTrigger(ai, "group heal setting", "almost full");
     }
     static Trigger* medium_group_heal_occasion(PlayerbotAI* ai)
     {

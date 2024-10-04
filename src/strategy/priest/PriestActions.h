@@ -55,7 +55,14 @@ HEAL_PARTY_ACTION(CastRenewOnPartyAction, "renew", 15.0f, HealingManaEfficiency:
 HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending", 15.0f, HealingManaEfficiency::MEDIUM);
 HEAL_PARTY_ACTION(CastBindingHealAction, "binding heal", 15.0f, HealingManaEfficiency::MEDIUM);
 HEAL_PARTY_ACTION(CastPrayerOfHealingAction, "prayer of healing", 15.0f, HealingManaEfficiency::MEDIUM);
-AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing", 15.0f, HealingManaEfficiency::HIGH);
+// AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing", 15.0f, HealingManaEfficiency::HIGH);
+class CastCircleOfHealingAction : public HealPartyMemberAction
+{
+public:
+    CastCircleOfHealingAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "circle of healing", 15.0f, HealingManaEfficiency::HIGH)
+    {
+    }
+};
 AOE_HEAL_ACTION(CastLightwellAction, "lightwell", 15.0f, HealingManaEfficiency::MEDIUM);
 
 SPELL_ACTION(CastSmiteAction, "smite");

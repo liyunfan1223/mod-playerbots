@@ -18,7 +18,7 @@ public:
         creators["windfury weapon"] = &windfury_weapon;
         creators["lesser healing wave"] = &lesser_healing_wave;
         creators["lesser healing wave on party"] = &lesser_healing_wave_on_party;
-        creators["chain heal"] = &chain_heal;
+        creators["chain heal on party"] = &chain_heal;
         creators["riptide"] = &riptide;
         creators["riptide on party"] = &riptide_on_party;
         creators["earth shock"] = &earth_shock;
@@ -75,9 +75,9 @@ private:
 
     static ActionNode* chain_heal([[maybe_unused]] PlayerbotAI* botAI)
     {
-        return new ActionNode("chain heal",
+        return new ActionNode("chain heal on party",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("lesser healing wave"), nullptr),
+                              /*A*/ NextAction::array(0, new NextAction("lesser healing wave on party"), nullptr),
                               /*C*/ nullptr);
     }
 
@@ -117,7 +117,7 @@ void GenericShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("party member medium health", NextAction::array(0, new NextAction("lesser
     // healing wave on party", 25.0f), nullptr))); triggers.push_back(new TriggerNode("party member low health",
     // NextAction::array(0, new NextAction("riptide on party", 25.0f), nullptr))); triggers.push_back(new
-    // TriggerNode("medium aoe heal", NextAction::array(0, new NextAction("chain heal", 27.0f), nullptr)));
+    // TriggerNode("medium aoe heal", NextAction::array(0, new NextAction("chain heal on party", 27.0f), nullptr)));
     // triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("lesser healing
     // wave", 26.0f), nullptr))); triggers.push_back(new TriggerNode("low health", NextAction::array(0, new
     // NextAction("riptide", 26.0f), nullptr)));
