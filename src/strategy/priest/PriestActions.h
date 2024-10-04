@@ -52,7 +52,13 @@ HEAL_PARTY_ACTION(CastGreaterHealOnPartyAction, "greater heal", 50.0f, HealingMa
 HEAL_PARTY_ACTION(CastPowerWordShieldOnPartyAction, "power word: shield", 15.0f, HealingManaEfficiency::VERY_HIGH);
 HEAL_PARTY_ACTION(CastFlashHealOnPartyAction, "flash heal", 15.0f, HealingManaEfficiency::LOW);
 HEAL_PARTY_ACTION(CastRenewOnPartyAction, "renew", 15.0f, HealingManaEfficiency::VERY_HIGH);
-HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending", 15.0f, HealingManaEfficiency::MEDIUM);
+// HEAL_PARTY_ACTION(CastPrayerOfMendingAction, "prayer of mending", 10.0f, HealingManaEfficiency::HIGH);
+class CastPrayerOfMendingAction : public HealPartyMemberAction
+{
+public:
+    CastPrayerOfMendingAction(PlayerbotAI* botAI) : HealPartyMemberAction(botAI, "prayer of mending", 10.0f, HealingManaEfficiency::HIGH, false) {}
+};
+
 HEAL_PARTY_ACTION(CastBindingHealAction, "binding heal", 15.0f, HealingManaEfficiency::MEDIUM);
 HEAL_PARTY_ACTION(CastPrayerOfHealingAction, "prayer of healing", 15.0f, HealingManaEfficiency::MEDIUM);
 // AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing", 15.0f, HealingManaEfficiency::HIGH);
@@ -169,11 +175,22 @@ public:
     virtual std::string const GetTargetName() { return "current target"; }
 };
 
-class CastPowerWordShieldOnAlmostFullHealthBelow : public HealPartyMemberAction
+class CastPowerWordShieldOnAlmostFullHealthBelowAction : public HealPartyMemberAction
 {
 public:
-    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI* ai)
+    CastPowerWordShieldOnAlmostFullHealthBelowAction(PlayerbotAI* ai)
         : HealPartyMemberAction(ai, "power word: shield", 15.0f, HealingManaEfficiency::HIGH)
+    {
+    }
+    bool isUseful() override;
+    Unit* GetTarget() override;
+};
+
+class CastPowerWordShieldOnNotFullAction : public HealPartyMemberAction
+{
+public:
+    CastPowerWordShieldOnNotFullAction(PlayerbotAI* ai)
+        : HealPartyMemberAction(ai, "power word: shield", 5.0f, HealingManaEfficiency::HIGH)
     {
     }
     bool isUseful() override;
