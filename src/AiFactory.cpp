@@ -394,7 +394,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     {
         if (sPlayerbotAIConfig->autoSaveMana)
             engine->addStrategy("save mana", false);
-        engine->addStrategy("assist dps", false);
+        engine->addStrategy("healer dps", false);
     }
     if (facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player))
     {

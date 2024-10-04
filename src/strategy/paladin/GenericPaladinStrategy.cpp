@@ -72,7 +72,7 @@ void PaladinCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("turn undead", NextAction::array(0, new NextAction("turn undead", ACTION_HIGH + 1), nullptr)));
 }
 
-void PaladinAssistDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("healer should attack",

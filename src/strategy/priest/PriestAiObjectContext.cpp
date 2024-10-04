@@ -31,7 +31,7 @@ public:
         creators["boost"] = &PriestStrategyFactoryInternal::boost;
         creators["rshadow"] = &PriestStrategyFactoryInternal::rshadow;
         creators["cc"] = &PriestStrategyFactoryInternal::cc;
-        creators["assist dps"] = &PriestStrategyFactoryInternal::assist_dps;
+        creators["healer dps"] = &PriestStrategyFactoryInternal::healer_dps;
     }
 
 private:
@@ -44,7 +44,7 @@ private:
     static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
     static Strategy* shadow_debuff(PlayerbotAI* botAI) { return new ShadowPriestDebuffStrategy(botAI); }
     static Strategy* cure(PlayerbotAI* botAI) { return new PriestCureStrategy(botAI); }
-    static Strategy* assist_dps(PlayerbotAI* botAI) { return new PriestAssistDpsStrategy(botAI); }
+    static Strategy* healer_dps(PlayerbotAI* botAI) { return new PriestHealerDpsStrategy(botAI); }
 };
 
 class PriestCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>

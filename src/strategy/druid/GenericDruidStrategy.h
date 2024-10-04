@@ -46,13 +46,13 @@ public:
     std::string const getName() override { return "cc"; }
 };
 
-class DruidAssistDpsStrategy : public Strategy
+class DruidHealerDpsStrategy : public Strategy
 {
 public:
-    DruidAssistDpsStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+    DruidHealerDpsStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "assist dps"; }
+    std::string const getName() override { return "healer dps"; }
 };
 
 #endif

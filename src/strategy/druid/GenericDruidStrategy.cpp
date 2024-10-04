@@ -153,7 +153,7 @@ void DruidCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "hibernate", NextAction::array(0, new NextAction("hibernate on cc", ACTION_HIGH + 3), nullptr)));
 }
 
-void DruidAssistDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void DruidHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("healer should attack",

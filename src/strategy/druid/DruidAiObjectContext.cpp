@@ -34,7 +34,7 @@ public:
         creators["buff"] = &DruidStrategyFactoryInternal::buff;
         creators["boost"] = &DruidStrategyFactoryInternal::boost;
         creators["cc"] = &DruidStrategyFactoryInternal::cc;
-        creators["assist dps"] = &DruidStrategyFactoryInternal::assist_dps;
+        creators["healer dps"] = &DruidStrategyFactoryInternal::healer_dps;
     }
 
 private:
@@ -47,7 +47,7 @@ private:
     static Strategy* buff(PlayerbotAI* botAI) { return new GenericDruidBuffStrategy(botAI); }
     static Strategy* boost(PlayerbotAI* botAI) { return new DruidBoostStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new DruidCcStrategy(botAI); }
-    static Strategy* assist_dps(PlayerbotAI* botAI) { return new DruidAssistDpsStrategy(botAI); }
+    static Strategy* healer_dps(PlayerbotAI* botAI) { return new DruidHealerDpsStrategy(botAI); }
 };
 
 class DruidDruidStrategyFactoryInternal : public NamedObjectContext<Strategy>

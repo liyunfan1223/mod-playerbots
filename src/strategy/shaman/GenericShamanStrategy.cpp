@@ -164,7 +164,7 @@ void ShamanCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         NextAction::array(0, new NextAction("cleanse spirit curse on party", 23.0f), nullptr)));
 }
 
-void ShamanAssistDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void ShamanHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("healer should attack",

@@ -88,7 +88,7 @@ void PriestCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("shackle undead", NextAction::array(0, new NextAction("shackle undead", 31.0f), nullptr)));
 }
 
-void PriestAssistDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PriestHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("healer should attack",
