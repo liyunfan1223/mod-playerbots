@@ -166,7 +166,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         }
     }
 
-    if (raceOptions.size() == 0)
+    if (raceOptions.empty())
     {
         LOG_ERROR("playerbots", "No races available for class: {}", cls);
         return nullptr;
