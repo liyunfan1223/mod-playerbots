@@ -8,7 +8,8 @@ bool KelesethFrostTombTrigger::IsActive()
     GuidVector members = AI_VALUE(GuidVector, "group members");
     for (auto& member : members)
     {
-        if (botAI->GetUnit(member)->HasAura(DEBUFF_FROST_TOMB))
+        Unit* unit = botAI->GetUnit(member);
+        if (unit && unit->HasAura(DEBUFF_FROST_TOMB))
         {
             return true;
         }
