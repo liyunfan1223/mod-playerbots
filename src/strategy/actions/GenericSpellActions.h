@@ -129,7 +129,7 @@ class CastHealingSpellAction : public CastAuraSpellAction
 {
 public:
     CastHealingSpellAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f,
-                           HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM);
+                           HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM, bool isOwner = true);
 
     std::string const GetTargetName() override { return "self target"; }
     bool isUseful() override;
@@ -177,8 +177,8 @@ class HealPartyMemberAction : public CastHealingSpellAction, public PartyMemberA
 {
 public:
     HealPartyMemberAction(PlayerbotAI* botAI, std::string const spell, uint8 estAmount = 15.0f,
-                          HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM)
-        : CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency), PartyMemberActionNameSupport(spell)
+                          HealingManaEfficiency manaEfficiency = HealingManaEfficiency::MEDIUM, bool isOwner = true)
+        : CastHealingSpellAction(botAI, spell, estAmount, manaEfficiency, isOwner), PartyMemberActionNameSupport(spell)
     {
     }
 

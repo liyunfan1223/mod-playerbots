@@ -70,8 +70,8 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         NextAction::array(0,
                                           new NextAction("tree form", ACTION_CRITICAL_HEAL + 4.1f),
                                           new NextAction("swiftmend on party", ACTION_CRITICAL_HEAL + 4),
-                                          new NextAction("wild growth on party", ACTION_CRITICAL_HEAL + 3),
-                                          new NextAction("regrowth on party", ACTION_CRITICAL_HEAL + 2),
+                                          new NextAction("regrowth on party", ACTION_CRITICAL_HEAL + 3),
+                                          new NextAction("wild growth on party", ACTION_CRITICAL_HEAL + 2),
                                           new NextAction("nourish on party", ACTION_CRITICAL_HEAL + 1),
                                           // new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 0),
                                           nullptr)));
@@ -80,36 +80,46 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("party member critical health",
                         NextAction::array(0, new NextAction("nature's swiftness", ACTION_CRITICAL_HEAL + 4), nullptr)));
 
+    triggers.push_back(new TriggerNode(
+        "group heal setting",
+        NextAction::array(0, 
+                          new NextAction("tree form", ACTION_MEDIUM_HEAL + 2.3f),
+                          new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 2.2f),
+                          new NextAction("rejuvenation on not full", ACTION_MEDIUM_HEAL + 2.1f),
+                          nullptr)));
+
     triggers.push_back(
-        new TriggerNode("medium group heal occasion",
-                        NextAction::array(0, new NextAction("tranquility", ACTION_CRITICAL_HEAL + 5), nullptr)));
+        new TriggerNode("medium group heal setting",
+                        NextAction::array(0, 
+                        new NextAction("tree form", ACTION_CRITICAL_HEAL + 0.6f),
+                        new NextAction("tranquility", ACTION_CRITICAL_HEAL + 0.5f), nullptr)));
 
     // LOW
     triggers.push_back(
         new TriggerNode("party member low health",
-                        NextAction::array(0, new NextAction("tree form", ACTION_MEDIUM_HEAL + 9.1f),
-                                          new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 9),
-                                          new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 8),
-                                          new NextAction("swiftmend on party", ACTION_MEDIUM_HEAL + 7),
-                                          new NextAction("nourish on party", ACTION_MEDIUM_HEAL + 6),
+                        NextAction::array(0, new NextAction("tree form", ACTION_MEDIUM_HEAL + 1.5f),
+                                          new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 1.4f),
+                                          new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 1.3f),
+                                          new NextAction("swiftmend on party", ACTION_MEDIUM_HEAL + 1.2),
+                                          new NextAction("nourish on party", ACTION_MEDIUM_HEAL + 1.1f),
                                           nullptr)));
 
     // MEDIUM
     triggers.push_back(
         new TriggerNode("party member medium health",
                         NextAction::array(0, 
-                                          new NextAction("tree form", ACTION_MEDIUM_HEAL + 4.1f),
-                                          new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 4),
-                                          new NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 3),
-                                          new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 2),
-                                          new NextAction("nourish on party", ACTION_MEDIUM_HEAL + 1), nullptr)));
+                                          new NextAction("tree form", ACTION_MEDIUM_HEAL + 0.5f),
+                                          new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 0.4f),
+                                          new NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 0.3f),
+                                          new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 0.2f),
+                                          new NextAction("nourish on party", ACTION_MEDIUM_HEAL + 0.1f), nullptr)));
 
     // almost full
     triggers.push_back(
         new TriggerNode("party member almost full health",
-                        NextAction::array(0, new NextAction("wild growth on party", ACTION_LIGHT_HEAL + 3),
-                                          new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 2),
-                                          new NextAction("regrowth on party", ACTION_LIGHT_HEAL + 1), nullptr)));
+                        NextAction::array(0, new NextAction("wild growth on party", ACTION_LIGHT_HEAL + 0.3f),
+                                          new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 0.2f),
+                                          new NextAction("regrowth on party", ACTION_LIGHT_HEAL + 0.1f), nullptr)));
 
     triggers.push_back(
         new TriggerNode("medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 5), nullptr)));

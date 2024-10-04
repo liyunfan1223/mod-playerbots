@@ -175,6 +175,8 @@ public:
         creators["power word: shield on party"] = &PriestAiObjectContextInternal::power_word_shield_on_party;
         creators["power word: shield on almost full health below"] =
             &PriestAiObjectContextInternal::power_word_shield_on_almost_full_health_below;
+        creators["power word: shield on not full"] =
+            &PriestAiObjectContextInternal::power_word_shield_on_not_full;
         creators["renew"] = &PriestAiObjectContextInternal::renew;
         creators["renew on party"] = &PriestAiObjectContextInternal::renew_on_party;
         creators["greater heal"] = &PriestAiObjectContextInternal::greater_heal;
@@ -285,7 +287,11 @@ private:
     }
     static Action* power_word_shield_on_almost_full_health_below(PlayerbotAI* ai)
     {
-        return new CastPowerWordShieldOnAlmostFullHealthBelow(ai);
+        return new CastPowerWordShieldOnAlmostFullHealthBelowAction(ai);
+    }
+    static Action* power_word_shield_on_not_full(PlayerbotAI* ai)
+    {
+        return new CastPowerWordShieldOnNotFullAction(ai);
     }
     static Action* renew(PlayerbotAI* botAI) { return new CastRenewAction(botAI); }
     static Action* renew_on_party(PlayerbotAI* botAI) { return new CastRenewOnPartyAction(botAI); }

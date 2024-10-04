@@ -311,4 +311,16 @@ public:
     CastEnrageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "enrage") {}
 };
 
+
+class CastRejuvenationOnNotFullAction : public HealPartyMemberAction
+{
+public:
+    CastRejuvenationOnNotFullAction(PlayerbotAI* ai)
+        : HealPartyMemberAction(ai, "rejuvenation", 5.0f, HealingManaEfficiency::VERY_HIGH)
+    {
+    }
+    bool isUseful() override;
+    Unit* GetTarget() override;
+};
+
 #endif

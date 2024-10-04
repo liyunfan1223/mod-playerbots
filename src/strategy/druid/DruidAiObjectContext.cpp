@@ -209,6 +209,7 @@ public:
         creators["healing touch"] = &DruidAiObjectContextInternal::healing_touch;
         creators["regrowth on party"] = &DruidAiObjectContextInternal::regrowth_on_party;
         creators["rejuvenation on party"] = &DruidAiObjectContextInternal::rejuvenation_on_party;
+        creators["rejuvenation on not full"] = &DruidAiObjectContextInternal::rejuvenation_on_not_full;
         creators["healing touch on party"] = &DruidAiObjectContextInternal::healing_touch_on_party;
         creators["rebirth"] = &DruidAiObjectContextInternal::rebirth;
         creators["revive"] = &DruidAiObjectContextInternal::revive;
@@ -295,6 +296,7 @@ private:
     static Action* healing_touch(PlayerbotAI* botAI) { return new CastHealingTouchAction(botAI); }
     static Action* regrowth_on_party(PlayerbotAI* botAI) { return new CastRegrowthOnPartyAction(botAI); }
     static Action* rejuvenation_on_party(PlayerbotAI* botAI) { return new CastRejuvenationOnPartyAction(botAI); }
+    static Action* rejuvenation_on_not_full(PlayerbotAI* botAI) { return new CastRejuvenationOnNotFullAction(botAI); }
     static Action* healing_touch_on_party(PlayerbotAI* botAI) { return new CastHealingTouchOnPartyAction(botAI); }
     static Action* rebirth(PlayerbotAI* botAI) { return new CastRebirthAction(botAI); }
     static Action* revive(PlayerbotAI* botAI) { return new CastReviveAction(botAI); }
