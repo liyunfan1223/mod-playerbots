@@ -145,15 +145,12 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("medium mana", NextAction::array(0, new NextAction("innervate", ACTION_HIGH + 9), NULL)));
     triggers.push_back(new TriggerNode("enemy too close for spell",
                                        NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
-    triggers.push_back(
-        new TriggerNode("party member remove curse",
-                        NextAction::array(0, new NextAction("remove curse on party", ACTION_DISPEL + 7), NULL)));
 }
 
 void CasterDruidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
-        new TriggerNode("high aoe", NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 1), nullptr)));
+        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
         "light aoe", NextAction::array(0, new NextAction("starfall", ACTION_NORMAL + 5),
                                        new NextAction("insect swarm on attacker", ACTION_NORMAL + 3),

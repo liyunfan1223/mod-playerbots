@@ -87,3 +87,23 @@ void PriestCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("shackle undead", NextAction::array(0, new NextAction("shackle undead", 31.0f), nullptr)));
 }
+
+void PriestHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(
+        new TriggerNode("healer should attack",
+                        NextAction::array(0,
+                            new NextAction("shadow word: pain", ACTION_DEFAULT + 0.5f),
+                            new NextAction("holy fire", ACTION_DEFAULT + 0.4f),
+                            new NextAction("smite", ACTION_DEFAULT + 0.3f),
+                            new NextAction("mind blast", ACTION_DEFAULT + 0.2f),
+                            new NextAction("shoot", ACTION_DEFAULT),
+                            nullptr)));
+    
+    triggers.push_back(
+        new TriggerNode("medium aoe and healer should attack",
+                        NextAction::array(0,
+                            new NextAction("mind sear", ACTION_DEFAULT + 0.5f),
+                            nullptr)));
+}
+

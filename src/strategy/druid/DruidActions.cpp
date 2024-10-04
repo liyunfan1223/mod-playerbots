@@ -48,3 +48,34 @@ bool CastRebirthAction::isUseful()
     return CastSpellAction::isUseful() &&
            AI_VALUE2(float, "distance", GetTargetName()) <= sPlayerbotAIConfig->spellDistance;
 }
+
+Unit* CastRejuvenationOnNotFullAction::GetTarget()
+{
+    Group* group = bot->GetGroup();
+    MinValueCalculator calc(100);
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* player = gref->GetSource();
+        if (!player)
+            continue;
+        if (player->isDead() || player->IsFullHealth())
+        {
+            continue;
+        }
+        if (player->GetDistance2d(bot) > sPlayerbotAIConfig->spellDistance)
+        {
+            continue;
+        }
+        if (botAI->HasAura("rejuvenation", player))
+        {
+            continue;
+        }
+        calc.probe(player->GetHealthPct(), player);
+    }
+    return (Unit*)calc.param;
+}
+
+bool CastRejuvenationOnNotFullAction::isUseful()
+{
+    return GetTarget();
+}

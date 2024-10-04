@@ -49,8 +49,8 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("main hand weapon no imbue",
                                        NextAction::array(0, new NextAction("earthliving weapon", 22.0f), nullptr)));
     triggers.push_back(new TriggerNode(
-        "group heal occasion",
-        NextAction::array(0, new NextAction("riptide on party", 23.0f), new NextAction("chain heal", 22.0f), NULL)));
+        "group heal setting",
+        NextAction::array(0, new NextAction("riptide on party", 23.0f), new NextAction("chain heal on party", 22.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member critical health",

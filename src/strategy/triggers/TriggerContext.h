@@ -48,6 +48,7 @@ public:
         creators["almost full mana"] = &TriggerContext::AlmostFullMana;
         creators["enough mana"] = &TriggerContext::EnoughMana;
 
+
         creators["party member critical health"] = &TriggerContext::PartyMemberCriticalHealth;
         creators["party member low health"] = &TriggerContext::PartyMemberLowHealth;
         creators["party member medium health"] = &TriggerContext::PartyMemberMediumHealth;
@@ -82,6 +83,9 @@ public:
         creators["light aoe"] = &TriggerContext::LightAoe;
         creators["medium aoe"] = &TriggerContext::MediumAoe;
         creators["high aoe"] = &TriggerContext::HighAoe;
+
+        creators["healer should attack"] = &TriggerContext::healer_should_attack;
+        creators["medium aoe and healer should attack"] = &TriggerContext::medium_aoe_and_healer_should_attack;
 
         creators["has area debuff"] = &TriggerContext::HasAreaDebuff;
 
@@ -135,8 +139,8 @@ public:
         creators["medium aoe heal"] = &TriggerContext::medium_aoe_heal;
         creators["almost full aoe heal"] = &TriggerContext::almost_full_aoe_heal;
 
-        creators["group heal occasion"] = &TriggerContext::group_heal_occasion;
-        creators["medium group heal occasion"] = &TriggerContext::medium_group_heal_occasion;
+        creators["group heal setting"] = &TriggerContext::group_heal_occasion;
+        creators["medium group heal setting"] = &TriggerContext::medium_group_heal_occasion;
         creators["invalid target"] = &TriggerContext::invalid_target;
         creators["lfg proposal active"] = &TriggerContext::lfg_proposal_active;
 
@@ -242,11 +246,11 @@ private:
     }
     static Trigger* group_heal_occasion(PlayerbotAI* ai)
     {
-        return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.6);
+        return new AoeInGroupTrigger(ai, "group heal setting", "almost full");
     }
     static Trigger* medium_group_heal_occasion(PlayerbotAI* ai)
     {
-        return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.6);
+        return new AoeInGroupTrigger(ai, "medium group heal setting", "medium");
     }
     static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
     static Trigger* swimming(PlayerbotAI* botAI) { return new IsSwimmingTrigger(botAI); }
@@ -265,6 +269,8 @@ private:
     static Trigger* LightAoe(PlayerbotAI* botAI) { return new LightAoeTrigger(botAI); }
     static Trigger* MediumAoe(PlayerbotAI* botAI) { return new MediumAoeTrigger(botAI); }
     static Trigger* HighAoe(PlayerbotAI* botAI) { return new HighAoeTrigger(botAI); }
+    static Trigger* healer_should_attack(PlayerbotAI* botAI) { return new HealerShouldAttackTrigger(botAI); }
+    static Trigger* medium_aoe_and_healer_should_attack(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "medium aoe", "healer should attack"); }
     static Trigger* HasAreaDebuff(PlayerbotAI* botAI) { return new HasAreaDebuffTrigger(botAI); }
     static Trigger* LoseAggro(PlayerbotAI* botAI) { return new LoseAggroTrigger(botAI); }
     static Trigger* HasAggro(PlayerbotAI* botAI) { return new HasAggroTrigger(botAI); }

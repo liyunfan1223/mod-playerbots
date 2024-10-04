@@ -186,14 +186,13 @@ protected:
 class AoeInGroupTrigger : public Trigger
 {
 public:
-    AoeInGroupTrigger(PlayerbotAI* ai, std::string name, std::string type, float ratio)
-        : Trigger(ai, name), ratio(ratio), type(type)
+    AoeInGroupTrigger(PlayerbotAI* ai, std::string name, std::string type)
+        : Trigger(ai, name), type(type)
     {
     }
     bool IsActive() override;
 
 protected:
-    float ratio;
     std::string type;
 };
 

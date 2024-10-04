@@ -38,7 +38,7 @@ bool TogglePetSpellAutoCastAction::Execute(Event event)
         bool shouldApply = true;
         // imp's spell, felhunte's intelligence, cat stealth
         if (spellId == 4511 || spellId == 1742 || spellId == 54424 || spellId == 57564 || spellId == 57565 ||
-            spellId == 57566 || spellId == 57567 || spellId == 24450 || spellId == 53477)
+            spellId == 57566 || spellId == 57567 || spellId == 24450)
         {
             shouldApply = false;
         }

@@ -22,7 +22,7 @@ public:
         creators["cleanse magic"] = &cleanse_magic;
         creators["cleanse poison on party"] = &cleanse_poison_on_party;
         creators["cleanse disease on party"] = &cleanse_disease_on_party;
-        // creators["seal of wisdom"] = &seal_of_wisdom;
+        creators["seal of wisdom"] = &seal_of_wisdom;
         creators["seal of justice"] = &seal_of_justice;
         creators["hand of reckoning"] = &hand_of_reckoning;
         creators["judgement"] = &judgement;
@@ -147,13 +147,13 @@ private:
                               /*A*/ NextAction::array(0, new NextAction("purify disease on party"), nullptr),
                               /*C*/ nullptr);
     }
-    // static ActionNode* seal_of_wisdom(PlayerbotAI* ai)
-    // {
-    //     return new ActionNode ("seal of wisdom",
-    //         /*P*/ NULL,
-    //         /*A*/ NextAction::array(0, new NextAction("seal of justice"), NULL),
-    //         /*C*/ NULL);
-    // }
+    static ActionNode* seal_of_wisdom(PlayerbotAI* ai)
+    {
+        return new ActionNode ("seal of wisdom",
+            /*P*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("seal of righteousness"), NULL),
+            /*C*/ NULL);
+    }
     static ActionNode* seal_of_justice(PlayerbotAI* ai)
     {
         return new ActionNode("seal of justice",

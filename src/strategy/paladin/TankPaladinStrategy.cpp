@@ -73,7 +73,7 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericPaladinStrategy::InitTriggers(triggers);
 
     triggers.push_back(
-        new TriggerNode("seal", NextAction::array(0, new NextAction("seal of command", ACTION_HIGH), nullptr)));
+        new TriggerNode("seal", NextAction::array(0, new NextAction("seal of corruption", ACTION_HIGH), nullptr)));
     triggers.push_back(
         new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 9), nullptr)));
     // triggers.push_back(new TriggerNode("devotion aura", NextAction::array(0, new NextAction("devotion aura", 90.0f),
@@ -106,7 +106,7 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "righteous fury", NextAction::array(0, new NextAction("righteous fury", ACTION_HIGH + 8), nullptr)));
     triggers.push_back(
-        new TriggerNode("medium group heal occasion",
+        new TriggerNode("medium group heal setting",
                         NextAction::array(0, new NextAction("divine sacrifice", ACTION_HIGH + 5), nullptr)));
     triggers.push_back(new TriggerNode(
         "enough mana", NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 4), nullptr)));

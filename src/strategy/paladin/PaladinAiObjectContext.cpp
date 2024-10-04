@@ -25,6 +25,7 @@ public:
         creators["boost"] = &PaladinStrategyFactoryInternal::boost;
         creators["cc"] = &PaladinStrategyFactoryInternal::cc;
         creators["bthreat"] = &PaladinStrategyFactoryInternal::bthreat;
+        creators["healer dps"] = &PaladinStrategyFactoryInternal::healer_dps;
     }
 
 private:
@@ -33,6 +34,7 @@ private:
     static Strategy* boost(PlayerbotAI* botAI) { return new PaladinBoostStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new PaladinCcStrategy(botAI); }
     static Strategy* bthreat(PlayerbotAI* botAI) { return new PaladinBuffThreatStrategy(botAI); }
+    static Strategy* healer_dps(PlayerbotAI* botAI) { return new PaladinHealerDpsStrategy(botAI); }
 };
 
 class PaladinResistanceStrategyFactoryInternal : public NamedObjectContext<Strategy>

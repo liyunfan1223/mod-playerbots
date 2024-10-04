@@ -277,10 +277,6 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     {
         engine->addStrategiesNoInit("racials", "chat", "default", "cast time", "duel", "boost", nullptr);
     }
-    if (sPlayerbotAIConfig->autoSaveMana)
-    {
-        engine->addStrategy("save mana", false);
-    }
     if (sPlayerbotAIConfig->autoAvoidAoe && facade->HasRealPlayerMaster())
     {
         engine->addStrategy("avoid aoe", false);
@@ -394,7 +390,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     if (PlayerbotAI::IsMelee(player, true) && PlayerbotAI::IsDps(player, true)) {
         engine->addStrategy("behind", false);
     }
-
+    if (PlayerbotAI::IsHeal(player, true))
+    {
+        if (sPlayerbotAIConfig->autoSaveMana)
+            engine->addStrategy("save mana", false);
+        engine->addStrategy("healer dps", false);
+    }
     if (facade->IsRealPlayer() || sRandomPlayerbotMgr->IsRandomBot(player))
     {
         if (!player->GetGroup())
@@ -483,8 +484,8 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         engine->removeStrategy("threat", false);
         engine->addStrategy("boost", false);
 
-        if ((player->getClass() == CLASS_DRUID && tab == 2) || (player->getClass() == CLASS_SHAMAN && tab == 2))
-            engine->addStrategiesNoInit("caster", "caster aoe", nullptr);
+        // if ((player->getClass() == CLASS_DRUID && tab == 2) || (player->getClass() == CLASS_SHAMAN && tab == 2))
+        //     engine->addStrategiesNoInit("caster", "caster aoe", nullptr);
 
         // if (player->getClass() == CLASS_DRUID && tab == 1)
         //     engine->addStrategiesNoInit(/*"behind",*/ "dps", nullptr);
