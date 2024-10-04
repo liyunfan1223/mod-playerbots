@@ -317,13 +317,13 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (!currentSpell)
         currentSpell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
-    if (currentSpell && currentSpell->getState() == SPELL_STATE_PREPARING)
+    if (currentSpell && currentSpell->GetSpellInfo() && currentSpell->getState() == SPELL_STATE_PREPARING)
     {
         const SpellInfo* spellInfo = currentSpell->GetSpellInfo();
         
         // interrupt if target is dead
         if (currentSpell->m_targets.GetUnitTarget() && !currentSpell->m_targets.GetUnitTarget()->IsAlive() &&
-            spellInfo && !spellInfo->IsAllowingDeadTarget())
+            !spellInfo->IsAllowingDeadTarget())
         {
             InterruptSpell();
             SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
