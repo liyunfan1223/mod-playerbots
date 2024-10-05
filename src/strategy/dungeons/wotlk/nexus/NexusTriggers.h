@@ -1,93 +1,88 @@
 #ifndef _PLAYERBOT_WOTLKDUNGEONNEXTRIGGERS_H
 #define _PLAYERBOT_WOTLKDUNGEONNEXTRIGGERS_H
 
-#include "EventMap.h"
 #include "Trigger.h"
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
 #include "DungeonStrategyUtils.h"
 
-// Taken from:
-// src/server/scripts/Northrend/UtgardeKeep/UtgardeKeep/boss_ingvar_the_plunderer.cpp
-enum Spells
+enum NexusIDs
 {
-    SPELL_SUMMON_VALKYR             = 42912,
-    SPELL_RESURRECTION_BEAM         = 42857,
-    SPELL_RESURRECTION_BALL         = 42862,
-    SPELL_RESURRECTION_HEAL         = 42704,
-    SPELL_INGVAR_TRANSFORM          = 42796,
+    // Faction Commander
+    NPC_ALLIANCE_COMMANDER          = 27949,
+    NPC_HORDE_COMMANDER             = 27947,
+    NPC_COMMANDER_STOUTBEARD        = 26796,
+    NPC_COMMANDER_KOLURG            = 26798,
+    // SPELL_FRIGHTENING_SHOUT         = 19134,
+    SPELL_WHIRLWIND                 = 38618,
 
-    SPELL_STAGGERING_ROAR_N         = 42708,
-    SPELL_STAGGERING_ROAR_H         = 59708,
-    SPELL_CLEAVE                    = 42724,
-    SPELL_SMASH_N                   = 42669,
-    SPELL_SMASH_H                   = 59706,
-    SPELL_ENRAGE_N                  = 42705,
-    SPELL_ENRAGE_H                  = 59707,
+    // Grand Magus Telestra
+    NPC_TELESTRA                    = 26731,
+    NPC_FIRE_MAGUS                  = 26928,
+    NPC_FROST_MAGUS                 = 26930,
+    NPC_ARCANE_MAGUS                = 26929,
 
-    SPELL_DREADFUL_ROAR_N           = 42729,
-    SPELL_DREADFUL_ROAR_H           = 59734,
-    SPELL_WOE_STRIKE_N              = 42730,
-    SPELL_WOE_STRIKE_H              = 59735,
-    SPELL_DARK_SMASH                = 42723,
-    SPELL_SHADOW_AXE                = 42749,
+    // Anomalus
+    BUFF_RIFT_SHIELD                = 47748,
 
-    // Added
-    DEBUFF_FROST_TOMB               = 48400,
+    // Ormorok the Tree Shaper
+    // NPC_CRYSTAL_SPIKE               = 27099,
+    GO_CRYSTAL_SPIKE                = 188537,
 };
 
-#define SPELL_STAGGERING_ROAR       DUNGEON_MODE(bot, SPELL_STAGGERING_ROAR_N, SPELL_STAGGERING_ROAR_H)
-#define SPELL_DREADFUL_ROAR         DUNGEON_MODE(bot, SPELL_DREADFUL_ROAR_N, SPELL_DREADFUL_ROAR_H)
-#define SPELL_WOE_STRIKE            DUNGEON_MODE(bot, SPELL_WOE_STRIKE_N, SPELL_WOE_STRIKE_H)
-#define SPELL_SMASH                 DUNGEON_MODE(bot, SPELL_SMASH_N, SPELL_SMASH_H)
-#define SPELL_ENRAGE                DUNGEON_MODE(bot, SPELL_ENRAGE_N, SPELL_ENRAGE_H)
-
-class KelesethFrostTombTrigger : public Trigger
+class FactionCommanderWhirlwindTrigger : public Trigger
 {
 public:
-    KelesethFrostTombTrigger(PlayerbotAI* ai) : Trigger(ai, "keleseth frost tomb") {}
+    FactionCommanderWhirlwindTrigger(PlayerbotAI* ai) : Trigger(ai, "faction commander whirlwind") {}
     bool IsActive() override;
 };
 
-class DalronnNontankTrigger : public Trigger
+class TelestraFirebombTrigger : public Trigger
 {
 public:
-    DalronnNontankTrigger(PlayerbotAI* ai) : Trigger(ai, "dalronn non-tank") {}
+    TelestraFirebombTrigger(PlayerbotAI* ai) : Trigger(ai, "telestra firebomb spread") {}
     bool IsActive() override;
 };
 
-class IngvarStaggeringRoarTrigger : public Trigger
+class TelestraSplitPhaseTrigger : public Trigger
 {
 public:
-    IngvarStaggeringRoarTrigger(PlayerbotAI* ai) : Trigger(ai, "ingvar staggering roar") {}
+    TelestraSplitPhaseTrigger(PlayerbotAI* ai) : Trigger(ai, "telestra split phase") {}
     bool IsActive() override;
 };
 
-class IngvarDreadfulRoarTrigger : public Trigger
+class ChaoticRiftTrigger : public Trigger
 {
 public:
-    IngvarDreadfulRoarTrigger(PlayerbotAI* ai) : Trigger(ai, "ingvar dreadful roar") {}
+    ChaoticRiftTrigger(PlayerbotAI* ai) : Trigger(ai, "chaotic rift") {}
     bool IsActive() override;
 };
 
-class IngvarSmashTankTrigger : public Trigger
+class OrmorokSpikesTrigger : public Trigger
 {
 public:
-    IngvarSmashTankTrigger(PlayerbotAI* ai) : Trigger(ai, "ingvar smash tank") {}
+    OrmorokSpikesTrigger(PlayerbotAI* ai) : Trigger(ai, "ormorok spikes") {}
     bool IsActive() override;
 };
 
-class IngvarSmashTankReturnTrigger : public Trigger
+class OrmorokStackTrigger : public Trigger
 {
 public:
-    IngvarSmashTankReturnTrigger(PlayerbotAI* ai) : Trigger(ai, "ingvar smash tank return") {}
+    OrmorokStackTrigger(PlayerbotAI* ai) : Trigger(ai, "ormorok stack") {}
     bool IsActive() override;
 };
 
-class NotBehindIngvarTrigger : public Trigger
+class IntenseColdTrigger : public Trigger
 {
 public:
-    NotBehindIngvarTrigger(PlayerbotAI* ai) : Trigger(ai, "not behind ingvar") {}
+    IntenseColdTrigger(PlayerbotAI* ai) : Trigger(ai, "intense cold") {}
+    bool IsActive() override;
+};
+
+class DragonPositioningTrigger : public Trigger
+{
+public:
+    DragonPositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "dragon positioning") {}
     bool IsActive() override;
 };
 
