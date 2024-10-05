@@ -167,7 +167,7 @@ bool RearFlankPositionAction::isUseful()
     // Total 180 degrees (whole front half)
     bool inFront = boss->HasInArc(2.f * DRAGON_MELEE_MIN_ANGLE, bot);
     // Rear check does not need to double this angle as the logic is inverted
-    // and we are subtracing from 2pi.
+    // and we are subtracting from 2pi.
     bool inBack = !boss->HasInArc((2.f * M_PI) - DRAGON_MELEE_MAX_ANGLE, bot);
 
     return inFront || inBack;
