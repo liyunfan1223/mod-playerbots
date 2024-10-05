@@ -12,6 +12,7 @@ class AttackFrostTombAction : public AttackAction
 public:
     AttackFrostTombAction(PlayerbotAI* ai) : AttackAction(ai, "attack frost tomb") {}
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class AttackDalronnAction : public AttackAction
@@ -32,16 +33,16 @@ class IngvarDodgeSmashAction : public MovementAction
 {
 public:
     IngvarDodgeSmashAction(PlayerbotAI* ai) : MovementAction(ai, "ingvar dodge smash") {}
-    bool isUseful() override;
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class IngvarSmashReturnAction : public MovementAction
 {
 public:
     IngvarSmashReturnAction(PlayerbotAI* ai) : MovementAction(ai, "ingvar smash return") {}
-    bool isUseful() override;
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 #endif
