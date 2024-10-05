@@ -165,6 +165,13 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
             raceOptions.push_back(race);
         }
     }
+
+    if (raceOptions.empty())
+    {
+        LOG_ERROR("playerbots", "No races available for class: {}", cls);
+        return nullptr;
+    }
+
     uint8 race = raceOptions[urand(0, raceOptions.size() - 1)];
 
     const auto raceAndGender = CombineRaceAndGender(gender, race);
