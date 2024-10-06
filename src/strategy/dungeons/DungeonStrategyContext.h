@@ -4,12 +4,12 @@
 #include "Strategy.h"
 #include "wotlk/utgardekeep/UtgardeKeepStrategy.h"
 #include "wotlk/nexus/NexusStrategy.h"
+#include "wotlk/azjolnerub/AzjolNerubStrategy.h"
 
 /*
 Full list/TODO:
 
-Azjol-Nerub: Azjol-Nerub - AN
-Krik'thir the Gatewatcher, Hadronox, Anub'arak
+
 Ahn'kahet: The Old Kingdom - OK
 Elder Nadox, Prince Taldaram, Jedoga Shadowseeker, Herald Volazj, Amanitar (Heroic Only)
 Drak'Tharon Keep - DTK
@@ -76,7 +76,8 @@ class DungeonStrategyContext : public NamedObjectContext<Strategy>
     private:
         static Strategy* wotlk_uk(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_nex(PlayerbotAI* botAI) { return new WotlkDungeonNexStrategy(botAI); }
-        static Strategy* wotlk_an(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
+        static Strategy* wotlk_an(PlayerbotAI* botAI) { return new WotlkDungeonANStrategy(botAI); }
+        
         static Strategy* wotlk_ok(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_dtk(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_vh(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
