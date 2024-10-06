@@ -106,6 +106,5 @@ bool AnubarakDodgePoundAction::Execute(Event event)
     // Can be adjusted - this value tends to mirror how a human would play,
     // and visibly ensures you won't get hit while not creating excessive movements.
     float distanceExtra = 2.0f;
-    bot->Yell("MOVING", LANG_UNIVERSAL);
     return Move(bot->GetAngle(boss), distance + distanceExtra);
 }
