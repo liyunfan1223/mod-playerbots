@@ -1,15 +1,12 @@
 #ifndef _PLAYERBOT_WOTLKDUNGEONUKTRIGGERS_H
 #define _PLAYERBOT_WOTLKDUNGEONUKTRIGGERS_H
 
-#include "EventMap.h"
 #include "Trigger.h"
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
 #include "DungeonStrategyUtils.h"
 
-// Taken from:
-// src/server/scripts/Northrend/UtgardeKeep/UtgardeKeep/boss_ingvar_the_plunderer.cpp
-enum eSpells
+enum UtgardeKeepIDs
 {
     SPELL_SUMMON_VALKYR             = 42912,
     SPELL_RESURRECTION_BEAM         = 42857,
@@ -32,7 +29,6 @@ enum eSpells
     SPELL_DARK_SMASH                = 42723,
     SPELL_SHADOW_AXE                = 42749,
 
-    // Added
     DEBUFF_FROST_TOMB               = 48400,
 };
 

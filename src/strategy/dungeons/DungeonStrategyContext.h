@@ -1,14 +1,13 @@
-#ifndef _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H_
-#define _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H_
+#ifndef _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H
+#define _PLAYERBOT_DUNGEONSTRATEGYCONTEXT_H
 
 #include "Strategy.h"
 #include "wotlk/utgardekeep/UtgardeKeepStrategy.h"
+#include "wotlk/nexus/NexusStrategy.h"
 
 /*
 Full list/TODO:
 
-The Nexus - Nex
-Grand Magus Telestra, Anomalus, Ormorok the Tree-Shaper, Keristrasza, Commander Stoutbeard (Horde Heroic Only)/Commander Kolurg (Alliance Heroic Only)
 Azjol-Nerub: Azjol-Nerub - AN
 Krik'thir the Gatewatcher, Hadronox, Anub'arak
 Ahn'kahet: The Old Kingdom - OK
@@ -76,7 +75,7 @@ class DungeonStrategyContext : public NamedObjectContext<Strategy>
         }
     private:
         static Strategy* wotlk_uk(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
-        static Strategy* wotlk_nex(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
+        static Strategy* wotlk_nex(PlayerbotAI* botAI) { return new WotlkDungeonNexStrategy(botAI); }
         static Strategy* wotlk_an(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_ok(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_dtk(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
