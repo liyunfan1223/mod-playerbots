@@ -82,7 +82,7 @@ bool DropTargetAction::Execute(Event event)
     bot->SetTarget(ObjectGuid::Empty);
     bot->SetSelection(ObjectGuid());
     botAI->ChangeEngine(BOT_STATE_NON_COMBAT);
-    botAI->InterruptSpell();
+    // botAI->InterruptSpell();
     bot->AttackStop();
 
     // if (Pet* pet = bot->GetPet())

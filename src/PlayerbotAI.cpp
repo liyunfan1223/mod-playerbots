@@ -1515,7 +1515,7 @@ void PlayerbotAI::DoNextAction(bool min)
 
 void PlayerbotAI::ReInitCurrentEngine()
 {
-    InterruptSpell();
+    // InterruptSpell();
     currentEngine->Init();
 }
 
