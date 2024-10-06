@@ -25,7 +25,7 @@ bool AttackWebWrapAction::Execute(Event event)
     {
         return false;
     }
-    bot->Yell("ATTACKING WRAP", LANG_UNIVERSAL);
+    
     return Attack(webWrap);
 }
 
