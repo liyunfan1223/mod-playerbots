@@ -360,6 +360,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         }
 
         // wait for spell cast
+        YieldThread(GetReactDelay());
         return;
     }
 
@@ -386,9 +387,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             bot->StopMovingOnCurrentPos();
         }
     }
-    
-    if (!CanUpdateAI())
-        return;
 
     if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup())
 	{
