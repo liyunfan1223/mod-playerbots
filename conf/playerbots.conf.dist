@@ -728,7 +728,7 @@ AiPlayerbot.FastReactInBG = 1
 #
 
 # All In seconds
-AiPlayerbot.RandomBotUpdateInterval = 10
+AiPlayerbot.RandomBotUpdateInterval = 20
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
 AiPlayerbot.MinRandomBotInWorldTime = 3600
