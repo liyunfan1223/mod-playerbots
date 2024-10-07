@@ -1462,10 +1462,6 @@ AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
 # The default is 10. With 10% of all bots going active or inactive each minute.
 AiPlayerbot.BotActiveAlone = 100
 
-# Specify 1 for enabled, 0 for disabled.
-# The default is 1. Automatically adjusts 'BotActiveAlone' percentage based on server latency.
-AiPlayerbot.botActiveAloneAutoScale = 1
-
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
 AiPlayerbot.PremadeAvoidAoe = 62234-4

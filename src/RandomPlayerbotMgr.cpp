@@ -1108,6 +1108,9 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
 bool RandomPlayerbotMgr::ProcessBot(Player* player)
 {
+    if (!player || !player->IsInWorld() || player->IsBeingTeleported() || player->GetSession()->isLogingOut())
+        return false;
+
     uint32 bot = player->GetGUID().GetCounter();
 
     if (player->InBattleground())
