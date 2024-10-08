@@ -4,7 +4,7 @@
 #include "utgardekeep/UtgardeKeepActionContext.h"
 #include "nexus/NexusActionContext.h"
 #include "azjolnerub/AzjolNerubActionContext.h"
-// #include "oldkingdom/OldKingdomActionContext.h"
+#include "oldkingdom/OldKingdomActionContext.h"
 // #include "draktharonkeep/DraktharonKeepActionContext.h"
 // #include "violethold/VioletHoldActionContext.h"
 // #include "gundrak/GundrakActionContext.h"
