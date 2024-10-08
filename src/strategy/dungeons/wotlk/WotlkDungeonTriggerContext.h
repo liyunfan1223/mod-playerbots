@@ -4,7 +4,7 @@
 #include "utgardekeep/UtgardeKeepTriggerContext.h"
 #include "nexus/NexusTriggerContext.h"
 #include "azjolnerub/AzjolNerubTriggerContext.h"
-// #include "oldkingdom/OldKingdomTriggerContext.h"
+#include "oldkingdom/OldKingdomTriggerContext.h"
 // #include "draktharonkeep/DraktharonKeepTriggerContext.h"
 // #include "violethold/VioletHoldTriggerContext.h"
 // #include "gundrak/GundrakTriggerContext.h"
