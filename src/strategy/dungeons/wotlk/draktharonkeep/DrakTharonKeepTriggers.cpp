@@ -57,5 +57,5 @@ bool ArcaneFieldTrigger::IsActive()
 
 bool GiftOfTharonjaTrigger::IsActive()
 {
-    return bool(bot->HasAura(SPELL_GIFT_OF_THARONJA));
+    return bot->HasAura(SPELL_GIFT_OF_THARONJA);
 }

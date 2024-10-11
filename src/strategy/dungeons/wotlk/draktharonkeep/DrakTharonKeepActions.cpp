@@ -154,7 +154,7 @@ bool NovosTargetPriorityAction::Execute(Event event)
 
     for (Unit* primaryTarget : selectedTargets)
     {
-        // Attack the first valid split target in the priority list
+        // Attack the first valid target in the priority list
         if (primaryTarget)
         {
             if (AI_VALUE(Unit*, "current target") != primaryTarget)
