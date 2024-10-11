@@ -4288,7 +4288,9 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 
     // GetPriorityBracket acitivity
     float activePerc = 100;
-    if (sPlayerbotAIConfig->botActiveAloneSmartScale)
+    if (sPlayerbotAIConfig->botActiveAloneSmartScale &&
+        bot->GetLevel() >= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMinLevel &&
+        bot->GetLevel() <= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMaxLevel)
     {
         std::pair<uint8, uint8> priorityBracket = GetPriorityBracket(type);
         if (!priorityBracket.second) return true; 
