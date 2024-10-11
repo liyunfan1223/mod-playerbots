@@ -17,6 +17,7 @@ float PrinceKelesethMultiplier::GetValue(Action* action)
     }
     return 1.0f;
 }
+
 float SkarvaldAndDalronnMultiplier::GetValue(Action* action)
 {
     // Unit* skarvald = AI_VALUE2(Unit*, "find target", "skarvald the constructor");

@@ -182,11 +182,11 @@ bool RearFlankPositionAction::Execute(Event event)
     // Need to reduce this value very slightly, or the bots get the jitters -
     // may be due to rounding errors. Need to bring them just inside their attack range.
     // This boss has a big hitbox so we can reduce by 50% and it's still fine and looks better.
+    // TODO: Investigate using bot->GetObjectSize() for sizing
     float distance = bot->GetMeleeRange(boss) * 0.5f;
     // Alternatively, summing both unit's melee ranges seems to give a fairly natural range.
     // Use whichever gives the best results..
     // float distanceOffset = bot->GetMeleeReach() + boss->GetMeleeReach();
-    
     Position leftFlank = boss->GetPosition();
     Position rightFlank = boss->GetPosition();
     Position* destination = nullptr;
