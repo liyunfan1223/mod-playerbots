@@ -1263,11 +1263,6 @@ Playerbots.Updates.EnableDatabases = 1
 # Command server port, 0 - disabled
 AiPlayerbot.CommandServerPort = 8888
 
-# Diff with/without player in server. The server will tune bot activity to reach the desired server tick speed (in ms).# PLAYERBOT SYSTEM SETTINGS       #
-AiPlayerbot.EnablePrototypePerformanceDiff = 0
-AiPlayerbot.DiffWithPlayer = 100
-AiPlayerbot.DiffEmpty = 200
-
 #
 #
 #
@@ -1464,11 +1459,14 @@ AiPlayerbot.BotActiveAlone = 100
 
 # Specify smart scaling is enabled or not.
 # The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
-# Only when botLevel is between WhenMinLevel and WhenMaxLevel.
 AiPlayerbot.botActiveAloneSmartScale = 1
+# Only when botLevel is between WhenMinLevel and WhenMaxLevel.
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
-
+# The server will tune bot activity to reach the desired server tick speed (in ms)
+# bots will only join battleground when there is no lag based on latency diffs below
+AiPlayerbot.botActiveAloneSmartScaleDiffWithPlayer = 100
+AiPlayerbot.botActiveAloneSmartScaleDiffEmpty = 200
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
