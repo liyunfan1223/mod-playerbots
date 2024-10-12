@@ -4190,7 +4190,7 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
 // Ie. { 10, 20 } means all bots in this bracket will be inactive below 10% activityMod,
 // and will be active above 20% activityMod and scale between those values.
 std::pair<uint32, uint32> PlayerbotAI::GetPriorityBracket(ActivePiorityType type)
-{  
+{
     switch (type)
     {
         case ActivePiorityType::HAS_REAL_PLAYER_MASTER:
@@ -4203,24 +4203,27 @@ std::pair<uint32, uint32> PlayerbotAI::GetPriorityBracket(ActivePiorityType type
         case ActivePiorityType::IN_COMBAT:
             return {0, 10};
         case ActivePiorityType::IN_BG_QUEUE:
-        case ActivePiorityType::IN_LFG:
             return {0, 20};
-        case ActivePiorityType::NEARBY_PLAYER:
+        case ActivePiorityType::IN_LFG:
             return {0, 30};
-        case ActivePiorityType::PLAYER_FRIEND:
+        case ActivePiorityType::NEARBY_PLAYER:
             return {0, 40};
-        case ActivePiorityType::IN_ACTIVE_AREA:
+        case ActivePiorityType::PLAYER_FRIEND:
         case ActivePiorityType::PLAYER_GUILD:
             return {0, 50};
+        case ActivePiorityType::IN_ACTIVE_AREA:
+            return {30, 100};
         case ActivePiorityType::IN_ACTIVE_MAP:
-            return {20, 100};
+            return {50, 100};
         case ActivePiorityType::IN_INACTIVE_MAP:
-            return {50, 100};
+            return {70, 100};
         case ActivePiorityType::IN_EMPTY_SERVER:
-            return {90, 100};
+            return {80, 100};
         default:
-            return {50, 100};
+            return {90, 100};
     }
+
+    return {90, 100};
 }
 
 bool PlayerbotAI::AllowActive(ActivityType activityType)
