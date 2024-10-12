@@ -17,7 +17,7 @@ class WotlkDungeonNexTriggerContext : public NamedObjectContext<Trigger>
             creators["ormorok spikes"] = &WotlkDungeonNexTriggerContext::ormorok_spikes;
             creators["ormorok stack"] = &WotlkDungeonNexTriggerContext::ormorok_stack;
             creators["intense cold"] = &WotlkDungeonNexTriggerContext::intense_cold;
-            creators["dragon positioning"] = &WotlkDungeonNexTriggerContext::dragon_positioning;
+            creators["keristrasza positioning"] = &WotlkDungeonNexTriggerContext::keristrasza_positioning;
         }
     private:
         static Trigger* faction_commander_whirlwind(PlayerbotAI* ai) { return new FactionCommanderWhirlwindTrigger(ai); }
@@ -27,7 +27,7 @@ class WotlkDungeonNexTriggerContext : public NamedObjectContext<Trigger>
         static Trigger* ormorok_spikes(PlayerbotAI* ai) { return new OrmorokSpikesTrigger(ai); }
         static Trigger* ormorok_stack(PlayerbotAI* ai) { return new OrmorokStackTrigger(ai); }
         static Trigger* intense_cold(PlayerbotAI* ai) { return new IntenseColdTrigger(ai); }
-        static Trigger* dragon_positioning(PlayerbotAI* ai) { return new DragonPositioningTrigger(ai); }
+        static Trigger* keristrasza_positioning(PlayerbotAI* ai) { return new KeristraszaPositioningTrigger(ai); }
 };
 
 #endif

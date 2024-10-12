@@ -15,7 +15,6 @@ class WotlkDungeonNexActionContext : public NamedObjectContext<Action>
             creators["chaotic rift target"] = &WotlkDungeonNexActionContext::chaotic_rift_target;
             creators["dodge spikes"] = &WotlkDungeonNexActionContext::dodge_spikes;
             creators["intense cold jump"] = &WotlkDungeonNexActionContext::intense_cold_jump;
-            creators["rear flank position"] = &WotlkDungeonNexActionContext::rear_flank_position;
         }
     private:
         static Action* move_from_whirlwind(PlayerbotAI* ai) { return new MoveFromWhirlwindAction(ai); }
@@ -24,7 +23,6 @@ class WotlkDungeonNexActionContext : public NamedObjectContext<Action>
         static Action* chaotic_rift_target(PlayerbotAI* ai) { return new ChaoticRiftTargetAction(ai); }
         static Action* dodge_spikes(PlayerbotAI* ai) { return new DodgeSpikesAction(ai); }
         static Action* intense_cold_jump(PlayerbotAI* ai) { return new IntenseColdJumpAction(ai); }
-        static Action* rear_flank_position(PlayerbotAI* ai) { return new RearFlankPositionAction(ai); }
 };
 
 #endif

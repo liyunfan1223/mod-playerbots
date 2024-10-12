@@ -66,6 +66,8 @@ bool NovosTargetPriorityAction::Execute(Event event)
     // Designate a dps char to handle the stairs adds.
     // This is probably better as a melee, so just pick the first
     // melee dps in the party. If none exist, pick the first ranged.
+    
+    // TODO: Switch to botAI->Index instead, cleaner
     Player* stairsDps = nullptr;
     GuidVector members = AI_VALUE(GuidVector, "group members");
     for (auto& member : members)
