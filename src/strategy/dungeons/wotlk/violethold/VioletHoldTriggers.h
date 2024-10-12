@@ -12,7 +12,7 @@ enum VioletHoldIDs
     SPELL_DRAINED                      = 59820,
     NPC_ICHOR_GLOBULE                  = 29321,
 
-    // Ichoron
+    // Zuramat the Obliterator
     SPELL_VOID_SHIFTED                 = 54343,
     SPELL_SHROUD_OF_DARKNESS_N         = 54524,
     SPELL_SHROUD_OF_DARKNESS_H         = 59745,
