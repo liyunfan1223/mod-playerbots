@@ -79,10 +79,10 @@ public:
     bool IsActive() override;
 };
 
-class DragonPositioningTrigger : public Trigger
+class KeristraszaPositioningTrigger : public Trigger
 {
 public:
-    DragonPositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "dragon positioning") {}
+    KeristraszaPositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "keristrasza positioning") {}
     bool IsActive() override;
 };
 

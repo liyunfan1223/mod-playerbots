@@ -38,9 +38,9 @@ void WotlkDungeonNexStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // Keristrasza
     triggers.push_back(new TriggerNode("intense cold",
         NextAction::array(0, new NextAction("intense cold jump", ACTION_MOVE + 5), nullptr)));
-    // Flank dragon positioning for non-tank melee
-    triggers.push_back(new TriggerNode("dragon positioning",
-        NextAction::array(0, new NextAction("rear flank position", ACTION_MOVE + 4), nullptr)));
+    // Flank dragon positioning
+    triggers.push_back(new TriggerNode("keristrasza positioning",
+        NextAction::array(0, new NextAction("rear flank", ACTION_MOVE + 4), nullptr)));
     // TODO: Add frost resist aura for paladins?
 }
 

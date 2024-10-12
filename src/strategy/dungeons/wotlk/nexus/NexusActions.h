@@ -68,12 +68,4 @@ public:
     bool Execute(Event event) override;
 };
 
-class RearFlankPositionAction : public MovementAction
-{
-public:
-    RearFlankPositionAction(PlayerbotAI* ai) : MovementAction(ai, "rear flank position") {}
-    bool Execute(Event event) override;
-    bool isUseful() override;
-};
-
 #endif

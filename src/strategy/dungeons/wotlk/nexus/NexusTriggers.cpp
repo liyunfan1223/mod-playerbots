@@ -98,8 +98,10 @@ bool IntenseColdTrigger::IsActive()
     return boss && botAI->GetAura("intense cold", bot, false, false, stackThreshold);
 }
 
-bool DragonPositioningTrigger::IsActive()
+bool KeristraszaPositioningTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "keristrasza");
-    return boss && botAI->IsMelee(bot) && !botAI->IsTank(bot);
+    // Include healers here for now, otherwise they stand in things
+    return boss && !botAI->IsTank(bot) && !botAI->IsRangedDps(bot);
+    // return boss && botAI->IsMelee(bot) && !botAI->IsTank(bot);
 }

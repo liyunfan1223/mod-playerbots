@@ -39,7 +39,9 @@ float KrikthirMultiplier::GetValue(Action* action)
     {
         // Do not target swap
         // TODO: Need to suppress AoE actions but unsure how to identify them
-        if (dynamic_cast<DpsAssistAction*>(action))
+        // TODO: TEST AOE Avoid
+        if (dynamic_cast<DpsAssistAction*>(action)
+            || dynamic_cast<DpsAoeAction*>(action))
         {
             return 0.0f;
         }
