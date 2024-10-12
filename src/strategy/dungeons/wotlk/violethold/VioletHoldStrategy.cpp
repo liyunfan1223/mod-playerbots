@@ -10,7 +10,7 @@ void WotlkDungeonVHStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("attack erekem", ACTION_RAID + 1), nullptr)));
     
     // Moragg
-    // TODO: This guy has Optic Link which may require stacking, add if needed
+    // TODO: This guy has Optic Link which may require moving, add if needed
 
     // Ichoron
     triggers.push_back(new TriggerNode("ichoron target",
