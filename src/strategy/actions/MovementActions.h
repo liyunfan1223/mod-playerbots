@@ -18,6 +18,9 @@ class Unit;
 class WorldObject;
 class Position;
 
+#define ANGLE_45_DEG (static_cast<float>(M_PI) / 4.f)
+#define ANGLE_90_DEG M_PI_2
+#define ANGLE_120_DEG (2.f * static_cast<float>(M_PI) / 3.f)
 
 class MovementAction : public Action
 {
@@ -144,6 +147,27 @@ public:
     bool Execute(Event event) override;
 };
 
+class RearFlankAction : public MovementAction
+{
+// 90 degree minimum angle prevents any frontal cleaves/breaths and avoids parry-hasting the boss.
+// 120 degree maximum angle leaves a 120 degree symmetrical cone at the tail end which is usually enough to avoid tail swipes.
+// Some dragons or mobs may have different danger zone angles, override if needed.
+public:
+    RearFlankAction(PlayerbotAI* botAI, float distance = 0.0f, float minAngle = ANGLE_90_DEG, float maxAngle = ANGLE_120_DEG)
+        : MovementAction(botAI, "rear flank")
+        {
+            this->distance = distance;
+            this->minAngle = minAngle;
+            this->maxAngle = maxAngle;
+        }
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+
+protected:
+    float distance, minAngle, maxAngle;
+};
+
 class DisperseSetAction : public Action
 {
 public:
@@ -268,4 +292,5 @@ public:
 
     bool Execute(Event event) override;
 };
+
 #endif

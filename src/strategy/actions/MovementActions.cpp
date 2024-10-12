@@ -2372,6 +2372,46 @@ bool TankFaceAction::Execute(Event event)
     return MoveTo(bot->GetMapId(), nearest.GetPositionX(), nearest.GetPositionY(), nearest.GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
 }
 
+bool RearFlankAction::isUseful()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target) { return false; }
+
+    // Need to double the front angle check to account for mirrored angle.
+    bool inFront = target->HasInArc(2.f * minAngle, bot);
+    // Rear check does not need to double this angle as the logic is inverted
+    // and we are subtracting from 2pi.
+    bool inRear = !target->HasInArc((2.f * M_PI) - maxAngle, bot);
+
+    return inFront || inRear;
+}
+
+bool RearFlankAction::Execute(Event event)
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target) { return false; }
+
+    float angle = frand(minAngle, maxAngle);
+    float baseDistance = bot->GetMeleeRange(target) * 0.5f;
+    Position leftFlank = target->GetPosition();
+    Position rightFlank = target->GetPosition();
+    Position* destination = nullptr;
+    leftFlank.RelocatePolarOffset(angle, baseDistance + distance);
+    rightFlank.RelocatePolarOffset(-angle, baseDistance + distance);
+
+    if (bot->GetExactDist2d(leftFlank) < bot->GetExactDist2d(rightFlank))
+    {
+        destination = &leftFlank;
+    }
+    else
+    {
+        destination = &rightFlank;
+    }
+    
+    return MoveTo(bot->GetMapId(), destination->GetPositionX(), destination->GetPositionY(), destination->GetPositionZ(),
+                  false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
+}
+
 bool DisperseSetAction::Execute(Event event)
 {
     std::string const text = event.getParam();
