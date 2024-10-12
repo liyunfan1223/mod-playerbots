@@ -71,3 +71,17 @@ void PaladinCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("turn undead", NextAction::array(0, new NextAction("turn undead", ACTION_HIGH + 1), nullptr)));
 }
+
+void PaladinHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(
+        new TriggerNode("healer should attack",
+                        NextAction::array(0,
+                            new NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
+                            new NextAction("holy shock", ACTION_DEFAULT + 0.5f),
+                            new NextAction("shield of righteousness", ACTION_DEFAULT + 0.4f),
+                            new NextAction("judgement of light", ACTION_DEFAULT + 0.3f),
+                            new NextAction("consecration", ACTION_DEFAULT + 0.2f),
+                            new NextAction("exorcism", ACTION_DEFAULT+ 0.1f),
+                            nullptr)));
+}

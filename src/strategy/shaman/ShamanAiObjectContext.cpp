@@ -6,6 +6,7 @@
 #include "ShamanAiObjectContext.h"
 
 #include "CasterShamanStrategy.h"
+#include "GenericShamanStrategy.h"
 #include "HealShamanStrategy.h"
 #include "MeleeShamanStrategy.h"
 #include "NamedObjectContext.h"
@@ -25,6 +26,7 @@ public:
         creators["melee aoe"] = &ShamanStrategyFactoryInternal::melee_aoe;
         creators["caster aoe"] = &ShamanStrategyFactoryInternal::caster_aoe;
         creators["cure"] = &ShamanStrategyFactoryInternal::cure;
+        creators["healer dps"] = &ShamanStrategyFactoryInternal::healer_dps;
     }
 
 private:
@@ -33,6 +35,7 @@ private:
     static Strategy* melee_aoe(PlayerbotAI* botAI) { return new MeleeAoeShamanStrategy(botAI); }
     static Strategy* caster_aoe(PlayerbotAI* botAI) { return new CasterAoeShamanStrategy(botAI); }
     static Strategy* cure(PlayerbotAI* botAI) { return new ShamanCureStrategy(botAI); }
+    static Strategy* healer_dps(PlayerbotAI* botAI) { return new ShamanHealerDpsStrategy(botAI); }
 };
 
 class ShamanBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -207,7 +210,7 @@ public:
         creators["lesser healing wave on party"] = &ShamanAiObjectContextInternal::lesser_healing_wave_on_party;
         creators["earth shield"] = &ShamanAiObjectContextInternal::earth_shield;
         creators["earth shield on party"] = &ShamanAiObjectContextInternal::earth_shield_on_party;
-        creators["chain heal"] = &ShamanAiObjectContextInternal::chain_heal;
+        creators["chain heal on party"] = &ShamanAiObjectContextInternal::chain_heal;
         creators["riptide"] = &ShamanAiObjectContextInternal::riptide;
         creators["riptide on party"] = &ShamanAiObjectContextInternal::riptide_on_party;
         creators["stormstrike"] = &ShamanAiObjectContextInternal::stormstrike;

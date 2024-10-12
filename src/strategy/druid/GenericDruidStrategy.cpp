@@ -130,6 +130,11 @@ void DruidCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("party member cure poison",
                         NextAction::array(0, new NextAction("abolish poison on party", ACTION_DISPEL + 1), nullptr)));
+    
+    triggers.push_back(
+        new TriggerNode("party member remove curse",
+                        NextAction::array(0, new NextAction("remove curse on party", ACTION_DISPEL + 7), NULL)));
+    
 }
 
 void DruidBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -146,4 +151,23 @@ void DruidCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "entangling roots kite", NextAction::array(0, new NextAction("entangling roots", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode(
         "hibernate", NextAction::array(0, new NextAction("hibernate on cc", ACTION_HIGH + 3), nullptr)));
+}
+
+void DruidHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(
+        new TriggerNode("healer should attack",
+                        NextAction::array(0,
+                            new NextAction("cancel tree form", ACTION_DEFAULT + 0.3f),
+                            new NextAction("moonfire", ACTION_DEFAULT + 0.2f),
+                            new NextAction("wrath", ACTION_DEFAULT + 0.1f),
+                            new NextAction("starfire", ACTION_DEFAULT),
+                            nullptr)));
+
+    // long cast time
+    // triggers.push_back(
+    //     new TriggerNode("medium aoe and healer should attack",
+    //                     NextAction::array(0,
+    //                         new NextAction("hurricane", ACTION_DEFAULT + 0.7f),
+    //                         nullptr)));
 }

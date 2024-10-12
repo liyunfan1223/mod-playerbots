@@ -292,12 +292,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     if (!sPlayerbotAIConfig->randomBotAutologin || !sPlayerbotAIConfig->enabled)
         return;
 
-    if (sPlayerbotAIConfig->enablePrototypePerformanceDiff)
+    if (sPlayerbotAIConfig->botActiveAloneSmartScale)
     {
-        LOG_INFO("playerbots", "---------------------------------------");
-        LOG_INFO("playerbots",
-                 "PROTOTYPE: Playerbot performance enhancements are active. Issues and instability may occur.");
-        LOG_INFO("playerbots", "---------------------------------------");
         ScaleBotActivity();
     }
 
@@ -414,8 +410,9 @@ void RandomPlayerbotMgr::ScaleBotActivity()
     // max/min activity
 
     //    % increase/decrease                   wanted diff                                         , avg diff
-    float activityPercentageMod = pid.calculate(
-        sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer,
+    float activityPercentageMod = pid.calculate(sRandomPlayerbotMgr->GetPlayers().empty() ?
+        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffEmpty :
+        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffWithPlayer,
         sWorldUpdateTime.GetAverageUpdateTime());
 
     activityPercentage = activityPercentageMod + 50;
@@ -1108,6 +1105,9 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
 bool RandomPlayerbotMgr::ProcessBot(Player* player)
 {
+    if (!player || !player->IsInWorld() || player->IsBeingTeleported() || player->GetSession()->isLogingOut())
+        return false;
+
     uint32 bot = player->GetGUID().GetCounter();
 
     if (player->InBattleground())

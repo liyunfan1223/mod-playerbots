@@ -1,5 +1,5 @@
-#ifndef _PLAYERBOT_DUNGEONUTILS_H_
-#define _PLAYERBOT_DUNGEONUTILS_H_
+#ifndef _PLAYERBOT_DUNGEONUTILS_H
+#define _PLAYERBOT_DUNGEONUTILS_H
 
 
 template<class T> inline

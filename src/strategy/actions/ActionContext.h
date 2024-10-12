@@ -94,6 +94,7 @@ public:
         creators["avoid aoe"] = &ActionContext::avoid_aoe;
         creators["combat formation move"] = &ActionContext::combat_formation_move;
         creators["tank face"] = &ActionContext::tank_face;
+        creators["rear flank"] = &ActionContext::rear_flank;
         creators["disperse set"] = &ActionContext::disperse_set;
         creators["gift of the naaru"] = &ActionContext::gift_of_the_naaru;
         creators["shoot"] = &ActionContext::shoot;
@@ -278,6 +279,7 @@ private:
     static Action* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeAction(botAI); }
     static Action* combat_formation_move(PlayerbotAI* botAI) { return new CombatFormationMoveAction(botAI); }
     static Action* tank_face(PlayerbotAI* botAI) { return new TankFaceAction(botAI); }
+    static Action* rear_flank(PlayerbotAI* botAI) { return new RearFlankAction(botAI); }
     static Action* disperse_set(PlayerbotAI* botAI) { return new DisperseSetAction(botAI); }
     static Action* gift_of_the_naaru(PlayerbotAI* botAI) { return new CastGiftOfTheNaaruAction(botAI); }
     static Action* lifeblood(PlayerbotAI* botAI) { return new CastLifeBloodAction(botAI); }

@@ -202,9 +202,9 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
                     {
                         LogAction("A:%s - PREREQ", action->getName().c_str());
 
-                        if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.02, false, event, "prereq"))
+                        if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.002f, false, event, "prereq"))
                         {
-                            PushAgain(actionNode, relevance + 0.01, event);
+                            PushAgain(actionNode, relevance + 0.001f, event);
                             continue;
                         }
                     }
@@ -226,7 +226,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
                     else
                     {
                         LogAction("A:%s - FAILED", action->getName().c_str());
-                        MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
+                        MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.003f, false, event, "alt");
                     }
                 }
                 else
@@ -246,7 +246,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
                         botAI->TellMasterNoFacing(out);
                     }
                     LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
-                    MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
+                    MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.003f, false, event, "alt");
                 }
             }
             else

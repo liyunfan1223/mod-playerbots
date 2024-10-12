@@ -2,6 +2,7 @@
 #include "UtgardeKeepActions.h"
 #include "UtgardeKeepStrategy.h"
 
+bool AttackFrostTombAction::isUseful() { return !botAI->IsHeal(bot); }
 bool AttackFrostTombAction::Execute(Event event)
 {
     Unit* frostTomb = nullptr;

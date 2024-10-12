@@ -24,7 +24,18 @@ bool AoeHealTrigger::IsActive() { return AI_VALUE2(uint8, "aoe heal", type) >= c
 
 bool AoeInGroupTrigger::IsActive()
 {
-    Group* group = bot->GetGroup();
-    return group && group->GetMembersCount() >= 5 &&
-           AI_VALUE2(uint8, "aoe heal", type) >= (group->GetMembersCount() * ratio);
+    int32 member = botAI->GetNearGroupMemberCount();
+    if (member < 5)
+        return false;
+    int threshold = member * 0.5;
+    if (member <= 5)
+        threshold = 3;
+    else if (member <= 10)
+        threshold = std::min(threshold, 5);
+    else if (member <= 25)
+        threshold = std::min(threshold, 10);
+    else
+        threshold = std::min(threshold, 15);
+
+    return AI_VALUE2(uint8, "aoe heal", type) >= threshold;
 }

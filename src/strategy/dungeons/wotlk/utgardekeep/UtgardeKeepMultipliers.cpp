@@ -6,7 +6,7 @@
 
 float PrinceKelesethMultiplier::GetValue(Action* action)
 {
-	Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
     if (!boss)
     {
         return 1.0f;
@@ -15,8 +15,9 @@ float PrinceKelesethMultiplier::GetValue(Action* action)
     {
         return 0.0f;
     }
-	return 1.0f;
+    return 1.0f;
 }
+
 float SkarvaldAndDalronnMultiplier::GetValue(Action* action)
 {
     // Unit* skarvald = AI_VALUE2(Unit*, "find target", "skarvald the constructor");

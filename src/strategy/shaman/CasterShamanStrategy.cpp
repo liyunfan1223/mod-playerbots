@@ -51,8 +51,8 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell",
     // ACTION_NORMAL + 9), nullptr))); triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new
     // NextAction("flametongue weapon", 23.0f), nullptr)));
-    // triggers.push_back(new TriggerNode(
-    //     "enough mana", NextAction::array(0, new NextAction("chain lightning", ACTION_DEFAULT + 0.1f), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "enough mana", NextAction::array(0, new NextAction("chain lightning", ACTION_DEFAULT + 0.1f), nullptr)));
         
     triggers.push_back(new TriggerNode("main hand weapon no imbue",
                                        NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));

@@ -18,7 +18,7 @@ bool CastRemoveShadowformAction::Execute(Event event)
     return true;
 }
 
-Unit* CastPowerWordShieldOnAlmostFullHealthBelow::GetTarget()
+Unit* CastPowerWordShieldOnAlmostFullHealthBelowAction::GetTarget()
 {
     Group* group = bot->GetGroup();
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
@@ -47,7 +47,7 @@ Unit* CastPowerWordShieldOnAlmostFullHealthBelow::GetTarget()
     return nullptr;
 }
 
-bool CastPowerWordShieldOnAlmostFullHealthBelow::isUseful()
+bool CastPowerWordShieldOnAlmostFullHealthBelowAction::isUseful()
 {
     Group* group = bot->GetGroup();
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
@@ -74,4 +74,35 @@ bool CastPowerWordShieldOnAlmostFullHealthBelow::isUseful()
         return true;
     }
     return false;
+}
+
+Unit* CastPowerWordShieldOnNotFullAction::GetTarget()
+{
+    Group* group = bot->GetGroup();
+    MinValueCalculator calc(100);
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* player = gref->GetSource();
+        if (!player)
+            continue;
+        if (player->isDead() || player->IsFullHealth())
+        {
+            continue;
+        }
+        if (player->GetDistance2d(bot) > sPlayerbotAIConfig->spellDistance)
+        {
+            continue;
+        }
+        if (botAI->HasAnyAuraOf(player, "weakened soul", "power word: shield", nullptr))
+        {
+            continue;
+        }
+        calc.probe(player->GetHealthPct(), player);
+    }
+    return (Unit*)calc.param;
+}
+
+bool CastPowerWordShieldOnNotFullAction::isUseful()
+{
+    return GetTarget();
 }

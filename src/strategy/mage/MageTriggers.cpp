@@ -29,7 +29,7 @@ bool FingersOfFrostSingleTrigger::IsActive()
 {
     // Fingers of Frost "stack" count is always 1.
     // The value is instead stored in the charges.
-    Aura* aura = botAI->GetAura(getName(), GetTarget(), false, true, -1);
+    Aura* aura = botAI->GetAura("fingers of frost", bot, false, true, -1);
     return (aura && aura->GetCharges() == 1);
 }
 

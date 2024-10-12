@@ -27,7 +27,7 @@ HealPaladinStrategy::HealPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStr
 
 NextAction** HealPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("judgement of light", ACTION_DEFAULT + 2), nullptr);
+    return NextAction::array(0, new NextAction("judgement of light", ACTION_DEFAULT), nullptr);
 }
 
 void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -49,7 +49,7 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("reach party member to heal", ACTION_EMERGENCY + 3), nullptr)));
 
     triggers.push_back(
-        new TriggerNode("medium group heal occasion",
+        new TriggerNode("medium group heal setting",
                         NextAction::array(0, new NextAction("divine sacrifice", ACTION_CRITICAL_HEAL + 5),
                         new NextAction("avenging wrath", ACTION_HIGH + 4), 
                         nullptr)));

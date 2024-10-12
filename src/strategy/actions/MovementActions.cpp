@@ -827,11 +827,12 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     float shortenTo = distance;
 
     // Avoid walking too far when moving towards each other
-    if (bot->GetDistance(tx, ty, tz) >= 10.0f)
-        shortenTo = std::max(distance, bot->GetDistance(tx, ty, tz) / 2);
+    float disToGo = bot->GetExactDist(tx, ty, tz) - distance;
+    if (disToGo >= 10.0f)
+        shortenTo = disToGo / 2 + distance;
 
-    if (bot->GetExactDist(tx, ty, tz) <= shortenTo)
-        return false;
+    // if (bot->GetExactDist(tx, ty, tz) <= shortenTo)
+    //     return false;
 
     path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), shortenTo);
     G3D::Vector3 endPos = path.GetPath().back();
@@ -2313,7 +2314,7 @@ bool TankFaceAction::Execute(Event event)
     if (!bot->GetGroup())
         return false;
 
-    if (!bot->IsWithinMeleeRange(target))
+    if (!bot->IsWithinMeleeRange(target) || target->isMoving())
         return false;
 
     if (!AI_VALUE2(bool, "has aggro", "current target"))
@@ -2369,6 +2370,46 @@ bool TankFaceAction::Execute(Event event)
         return false;
     Position nearest = GetNearestPosition(availablePos);
     return MoveTo(bot->GetMapId(), nearest.GetPositionX(), nearest.GetPositionY(), nearest.GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
+}
+
+bool RearFlankAction::isUseful()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target) { return false; }
+
+    // Need to double the front angle check to account for mirrored angle.
+    bool inFront = target->HasInArc(2.f * minAngle, bot);
+    // Rear check does not need to double this angle as the logic is inverted
+    // and we are subtracting from 2pi.
+    bool inRear = !target->HasInArc((2.f * M_PI) - maxAngle, bot);
+
+    return inFront || inRear;
+}
+
+bool RearFlankAction::Execute(Event event)
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target) { return false; }
+
+    float angle = frand(minAngle, maxAngle);
+    float baseDistance = bot->GetMeleeRange(target) * 0.5f;
+    Position leftFlank = target->GetPosition();
+    Position rightFlank = target->GetPosition();
+    Position* destination = nullptr;
+    leftFlank.RelocatePolarOffset(angle, baseDistance + distance);
+    rightFlank.RelocatePolarOffset(-angle, baseDistance + distance);
+
+    if (bot->GetExactDist2d(leftFlank) < bot->GetExactDist2d(rightFlank))
+    {
+        destination = &leftFlank;
+    }
+    else
+    {
+        destination = &rightFlank;
+    }
+    
+    return MoveTo(bot->GetMapId(), destination->GetPositionX(), destination->GetPositionY(), destination->GetPositionZ(),
+                  false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
 }
 
 bool DisperseSetAction::Execute(Event event)
@@ -2513,7 +2554,7 @@ bool SetBehindTargetAction::Execute(Event event)
     if (target->GetVictim() == bot)
         return false;
 
-    if (!bot->IsWithinMeleeRange(target))
+    if (!bot->IsWithinMeleeRange(target) || target->isMoving())
         return false;
 
     float deltaAngle = Position::NormalizeOrientation(target->GetOrientation() - target->GetAngle(bot));

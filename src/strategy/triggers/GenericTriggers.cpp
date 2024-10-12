@@ -9,6 +9,8 @@
 
 #include "BattlegroundWS.h"
 #include "CreatureAI.h"
+#include "GameTime.h"
+#include "LastSpellCastValue.h"
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
@@ -76,7 +78,7 @@ bool AlmostFullManaTrigger::IsActive()
 
 bool EnoughManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > 65;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig->highMana;
 }
 
 bool RageAvailable::IsActive() { return AI_VALUE2(uint8, "rage", "self target") >= amount; }
@@ -364,6 +366,39 @@ bool GenericBoostTrigger::IsActive()
     if (target && target->ToPlayer())
         return true;
     return AI_VALUE(uint8, "balance") <= balance;
+}
+
+bool HealerShouldAttackTrigger::IsActive() 
+{
+    // nobody can help me
+    if (botAI->GetNearGroupMemberCount(sPlayerbotAIConfig->sightDistance) <= 1)
+        return true;
+    
+    if (AI_VALUE2(uint8, "health", "party member to heal") < sPlayerbotAIConfig->almostFullHealth)
+        return false;
+    
+    // special check for resto druid (dont remove tree of life frequently)
+    if (bot->GetAura(33891))
+    {
+        LastSpellCast& lastSpell = botAI->GetAiObjectContext()->GetValue<LastSpellCast&>("last spell cast")->Get();
+        if (lastSpell.timer + 5 > time(nullptr))
+            return false;
+    }
+
+    int manaThreshold;
+    int balance = AI_VALUE(uint8, "balance");
+    // higher threshold in higher pressure
+    if (balance <= 50)
+        manaThreshold = 85;
+    else if (balance <= 100)
+        manaThreshold = sPlayerbotAIConfig->highMana;
+    else
+        manaThreshold = sPlayerbotAIConfig->mediumMana;
+
+    if (AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < manaThreshold)
+        return false;
+
+    return true;
 }
 
 bool ItemCountTrigger::IsActive() { return AI_VALUE2(uint32, "item count", item) < count; }

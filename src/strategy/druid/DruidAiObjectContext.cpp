@@ -14,6 +14,7 @@
 #include "DruidShapeshiftActions.h"
 #include "DruidTriggers.h"
 #include "GenericDruidNonCombatStrategy.h"
+#include "GenericDruidStrategy.h"
 #include "HealDruidStrategy.h"
 #include "MeleeDruidStrategy.h"
 #include "Playerbots.h"
@@ -33,6 +34,7 @@ public:
         creators["buff"] = &DruidStrategyFactoryInternal::buff;
         creators["boost"] = &DruidStrategyFactoryInternal::boost;
         creators["cc"] = &DruidStrategyFactoryInternal::cc;
+        creators["healer dps"] = &DruidStrategyFactoryInternal::healer_dps;
     }
 
 private:
@@ -45,6 +47,7 @@ private:
     static Strategy* buff(PlayerbotAI* botAI) { return new GenericDruidBuffStrategy(botAI); }
     static Strategy* boost(PlayerbotAI* botAI) { return new DruidBoostStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new DruidCcStrategy(botAI); }
+    static Strategy* healer_dps(PlayerbotAI* botAI) { return new DruidHealerDpsStrategy(botAI); }
 };
 
 class DruidDruidStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -161,6 +164,7 @@ public:
         creators["travel form"] = &DruidAiObjectContextInternal::travel_form;
         creators["aquatic form"] = &DruidAiObjectContextInternal::aquatic_form;
         creators["caster form"] = &DruidAiObjectContextInternal::caster_form;
+        creators["cancel tree form"] = &DruidAiObjectContextInternal::cancel_tree_form;
         creators["mangle (bear)"] = &DruidAiObjectContextInternal::mangle_bear;
         creators["maul"] = &DruidAiObjectContextInternal::maul;
         creators["bash"] = &DruidAiObjectContextInternal::bash;
@@ -205,6 +209,7 @@ public:
         creators["healing touch"] = &DruidAiObjectContextInternal::healing_touch;
         creators["regrowth on party"] = &DruidAiObjectContextInternal::regrowth_on_party;
         creators["rejuvenation on party"] = &DruidAiObjectContextInternal::rejuvenation_on_party;
+        creators["rejuvenation on not full"] = &DruidAiObjectContextInternal::rejuvenation_on_not_full;
         creators["healing touch on party"] = &DruidAiObjectContextInternal::healing_touch_on_party;
         creators["rebirth"] = &DruidAiObjectContextInternal::rebirth;
         creators["revive"] = &DruidAiObjectContextInternal::revive;
@@ -246,6 +251,7 @@ private:
     static Action* travel_form(PlayerbotAI* botAI) { return new CastTravelFormAction(botAI); }
     static Action* aquatic_form(PlayerbotAI* botAI) { return new CastAquaticFormAction(botAI); }
     static Action* caster_form(PlayerbotAI* botAI) { return new CastCasterFormAction(botAI); }
+    static Action* cancel_tree_form(PlayerbotAI* botAI) { return new CastCancelTreeFormAction(botAI); }
     static Action* mangle_bear(PlayerbotAI* botAI) { return new CastMangleBearAction(botAI); }
     static Action* maul(PlayerbotAI* botAI) { return new CastMaulAction(botAI); }
     static Action* bash(PlayerbotAI* botAI) { return new CastBashAction(botAI); }
@@ -290,6 +296,7 @@ private:
     static Action* healing_touch(PlayerbotAI* botAI) { return new CastHealingTouchAction(botAI); }
     static Action* regrowth_on_party(PlayerbotAI* botAI) { return new CastRegrowthOnPartyAction(botAI); }
     static Action* rejuvenation_on_party(PlayerbotAI* botAI) { return new CastRejuvenationOnPartyAction(botAI); }
+    static Action* rejuvenation_on_not_full(PlayerbotAI* botAI) { return new CastRejuvenationOnNotFullAction(botAI); }
     static Action* healing_touch_on_party(PlayerbotAI* botAI) { return new CastHealingTouchOnPartyAction(botAI); }
     static Action* rebirth(PlayerbotAI* botAI) { return new CastRebirthAction(botAI); }
     static Action* revive(PlayerbotAI* botAI) { return new CastReviveAction(botAI); }

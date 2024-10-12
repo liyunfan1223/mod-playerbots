@@ -55,7 +55,7 @@ void PriestNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         NextAction::array(0, new NextAction("renew on party", ACTION_LIGHT_HEAL + 3), NULL)));
 
     triggers.push_back(
-        new TriggerNode("medium aoe heal", NextAction::array(0, new NextAction("circle of healing", 27.0f), NULL)));
+        new TriggerNode("group heal setting", NextAction::array(0, new NextAction("circle of healing on party", 27.0f), NULL)));
 }
 
 void PriestBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

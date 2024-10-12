@@ -728,7 +728,7 @@ AiPlayerbot.FastReactInBG = 1
 #
 
 # All In seconds
-AiPlayerbot.RandomBotUpdateInterval = 10
+AiPlayerbot.RandomBotUpdateInterval = 20
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
 AiPlayerbot.MinRandomBotInWorldTime = 3600
@@ -1002,16 +1002,16 @@ AiPlayerbot.PremadeSpecLink.9.2.80 = -03310030003-05203205210331051335230351
 
 AiPlayerbot.PremadeSpecName.11.0 = balance pve
 AiPlayerbot.PremadeSpecGlyph.11.0 = 40916,43331,40921,43335,44922,40919
-AiPlayerbot.PremadeSpecLink.11.0.60 = 5012203115331003213302301231
-AiPlayerbot.PremadeSpecLink.11.0.80 = 5012203125331103213305301231--205003212
+AiPlayerbot.PremadeSpecLink.11.0.60 = 5022203105331003213005301231
+AiPlayerbot.PremadeSpecLink.11.0.80 = 5032203105331303213305301231--205003012
 AiPlayerbot.PremadeSpecName.11.1 = bear pve
 AiPlayerbot.PremadeSpecGlyph.11.1 = 40897,43331,46372,43335,43332,40899
 AiPlayerbot.PremadeSpecLink.11.1.60 = -500232130322110353100301310501
 AiPlayerbot.PremadeSpecLink.11.1.80 = -501232130322110353120303313511-20350001
 AiPlayerbot.PremadeSpecName.11.2 = resto pve
 AiPlayerbot.PremadeSpecGlyph.11.2 = 40913,43331,40906,43335,44922,45602
-AiPlayerbot.PremadeSpecLink.11.2.60 = --230033312031501531050013051
-AiPlayerbot.PremadeSpecLink.11.2.80 = 05320001--230033312031512531153313051
+AiPlayerbot.PremadeSpecLink.11.2.60 = --230033312031500531050113051
+AiPlayerbot.PremadeSpecLink.11.2.80 = 05320031--230033312031501531053313051
 AiPlayerbot.PremadeSpecName.11.3 = cat pve
 AiPlayerbot.PremadeSpecGlyph.11.3 = 40902,43331,40901,43335,44922,45604
 AiPlayerbot.PremadeSpecLink.11.3.60 = -552202032322010053100030310501
@@ -1263,11 +1263,6 @@ Playerbots.Updates.EnableDatabases = 1
 # Command server port, 0 - disabled
 AiPlayerbot.CommandServerPort = 8888
 
-# Diff with/without player in server. The server will tune bot activity to reach the desired server tick speed (in ms).# PLAYERBOT SYSTEM SETTINGS       #
-AiPlayerbot.EnablePrototypePerformanceDiff = 0
-AiPlayerbot.DiffWithPlayer = 100
-AiPlayerbot.DiffEmpty = 200
-
 #
 #
 #
@@ -1462,9 +1457,16 @@ AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
 # The default is 10. With 10% of all bots going active or inactive each minute.
 AiPlayerbot.BotActiveAlone = 100
 
-# Specify 1 for enabled, 0 for disabled.
-# The default is 1. Automatically adjusts 'BotActiveAlone' percentage based on server latency.
-AiPlayerbot.botActiveAloneAutoScale = 1
+# Specify smart scaling is enabled or not.
+# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
+AiPlayerbot.botActiveAloneSmartScale = 1
+# Only when botLevel is between WhenMinLevel and WhenMaxLevel.
+AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
+AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
+# The server will tune bot activity to reach the desired server tick speed (in ms)
+# bots will only join battleground when there is no lag based on latency diffs below
+AiPlayerbot.botActiveAloneSmartScaleDiffWithPlayer = 100
+AiPlayerbot.botActiveAloneSmartScaleDiffEmpty = 200
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
