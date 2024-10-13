@@ -4101,10 +4101,12 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
             if (member == bot)
                 continue;
 
+            //IN_GROUP_WITH_REAL_PLAYER
             PlayerbotAI* memberBotAI = GET_PLAYERBOT_AI(member);
             if (!memberBotAI || memberBotAI->HasRealPlayerMaster())
                 return ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER;
 
+            //IN_GROUP_WITH_REAL_PLAYER
             if (group->IsLeader(member->GetGUID()))
             {
                 if (!memberBotAI->AllowActivity(PARTY_ACTIVITY))
@@ -4113,22 +4115,27 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
         }
     }
 
+    //IN_INSTANCE
     if (bot->IsBeingTeleported())  // Allow activity while teleportation.
         return ActivePiorityType::IN_INSTANCE;
 
+    //IN_INSTANCE
     if (!WorldPosition(bot).isOverworld())
         return ActivePiorityType::IN_INSTANCE;
 
-    if (HasPlayerNearby())
+    //VISIBLE_FOR_PLAYER
+    if (HasPlayerNearby(sPlayerbotAIConfig->reactDistance))
         return ActivePiorityType::VISIBLE_FOR_PLAYER;
 
+    //IN_COMBAT
     if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
     {
-        // Is in combat.Defend yourself.
+        // Is in combat, defend yourself.
         if (bot->IsInCombat())
             return ActivePiorityType::IN_COMBAT;
     }
 
+    //NEARBY_PLAYER
     if (HasPlayerNearby(300.f))
         return ActivePiorityType::NEARBY_PLAYER;
 
@@ -4153,33 +4160,38 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
     if (isLFG)
         return ActivePiorityType::IN_LFG;
 
-    // If has real players - slow down continents without player
-    // This means we first disable bots in a different continent/area.
+    //IN_EMPTY_SERVER
     if (sRandomPlayerbotMgr->GetPlayers().empty())
         return ActivePiorityType::IN_EMPTY_SERVER;
 
-    // friends always active
-    //  for (auto& player : sRandomPlayerbotMgr->GetPlayers())
-    //  {
-    //      if (!player || !player->IsInWorld())
-    //          continue;
+    //PLAYER_FRIEND (on friendlist of real player) (needs to be tested for stability)
+    /*for (auto& player : sRandomPlayerbotMgr->GetPlayers())
+    {
+          if (!player || !player->IsInWorld())
+              continue;
 
-    //     if (player->GetSocial()->HasFriend(bot->GetGUID()))
-    //         return ActivePiorityType::PLAYER_FRIEND;
-    // }
+         if (player->GetSocial() &&
+             bot->GetGUID() &&
+             player->GetSocial()->HasFriend(bot->GetGUID()))
+             return ActivePiorityType::PLAYER_FRIEND;
+    }*/
 
-    // real guild always active if member+
+    //PLAYER_GUILD (contains real player)
     if (IsInRealGuild())
         return ActivePiorityType::PLAYER_GUILD;
 
+    //IN_INACTIVE_MAP 
     if (bot->IsBeingTeleported() || !bot->IsInWorld() || !HasRealPlayers(bot->GetMap()))
         return ActivePiorityType::IN_INACTIVE_MAP;
+
+    //IN_ACTIVE_MAP
+    if (!bot->IsBeingTeleported() && bot->IsInWorld() && HasRealPlayers(bot->GetMap()))
+    return ActivePiorityType::IN_ACTIVE_MAP;
 
     // IN_ACTIVE_AREA
     if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
     {
-        // Many bots nearby. Do not do heavy area checks.
-        if (HasManyPlayersNearby())
+        if (HasManyPlayersNearby(20, sPlayerbotAIConfig->sightDistance))
             return ActivePiorityType::IN_ACTIVE_AREA;
     }
 
