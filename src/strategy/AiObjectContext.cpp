@@ -56,6 +56,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new WotlkDungeonOKActionContext());
     actionContexts.Add(new WotlkDungeonDTKActionContext());
     actionContexts.Add(new WotlkDungeonVHActionContext());
+    actionContexts.Add(new WotlkDungeonGDActionContext());
 
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
@@ -72,6 +73,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     triggerContexts.Add(new WotlkDungeonOKTriggerContext());
     triggerContexts.Add(new WotlkDungeonDTKTriggerContext());
     triggerContexts.Add(new WotlkDungeonVHTriggerContext());
+    triggerContexts.Add(new WotlkDungeonGDTriggerContext());
 
     valueContexts.Add(new ValueContext());
 
