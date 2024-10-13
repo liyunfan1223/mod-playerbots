@@ -8,12 +8,11 @@
 #include "wotlk/oldkingdom/OldKingdomStrategy.h"
 #include "wotlk/draktharonkeep/DrakTharonKeepStrategy.h"
 #include "wotlk/violethold/VioletHoldStrategy.h"
+#include "wotlk/gundrak/GundrakStrategy.h"
 
 /*
 Full list/TODO:
 
-Gundrak - GD
-Slad'ran, Drakkari Colossus, Moorabi, Gal'darah, Eck the Ferocious (Heroic only)
 Halls of Stone - HoS
 Maiden of Grief, Krystallus, Tribunal of Ages, Sjonnir The Ironshaper
 Halls of Lightning - HoL
@@ -76,8 +75,8 @@ class DungeonStrategyContext : public NamedObjectContext<Strategy>
         static Strategy* wotlk_ok(PlayerbotAI* botAI) { return new WotlkDungeonOKStrategy(botAI); }
         static Strategy* wotlk_dtk(PlayerbotAI* botAI) { return new WotlkDungeonDTKStrategy(botAI); }
         static Strategy* wotlk_vh(PlayerbotAI* botAI) { return new WotlkDungeonVHStrategy(botAI); }
+        static Strategy* wotlk_gd(PlayerbotAI* botAI) { return new WotlkDungeonGDStrategy(botAI); }
 
-        static Strategy* wotlk_gd(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_hos(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_hol(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_occ(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
