@@ -4095,7 +4095,7 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (!member || !member->IsInWorld() && member->GetMapId() != bot->GetMapId())
+            if (!member || (!member->IsInWorld() && member->GetMapId() != bot->GetMapId()))
                 continue;
 
             if (member == bot)
@@ -4181,12 +4181,18 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
         return ActivePiorityType::PLAYER_GUILD;
 
     //IN_INACTIVE_MAP 
-    if (bot->IsBeingTeleported() || !bot->IsInWorld() || !HasRealPlayers(bot->GetMap()))
-        return ActivePiorityType::IN_INACTIVE_MAP;
+    if (bot->IsBeingTeleported() ||
+        !bot->IsInWorld() ||
+        !HasRealPlayers(bot->GetMap()) ||
+        !bot->GetMap()->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY()))
+            return ActivePiorityType::IN_INACTIVE_MAP;
 
     //IN_ACTIVE_MAP
-    if (!bot->IsBeingTeleported() && bot->IsInWorld() && HasRealPlayers(bot->GetMap()))
-    return ActivePiorityType::IN_ACTIVE_MAP;
+    if (!bot->IsBeingTeleported() &&
+        bot->IsInWorld() &&
+        HasRealPlayers(bot->GetMap()) &&
+        bot->GetMap()->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY()))
+            return ActivePiorityType::IN_ACTIVE_MAP;
 
     // IN_ACTIVE_AREA
     if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
@@ -4196,46 +4202,6 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
     }
 
     return ActivePiorityType::IN_ACTIVE_AREA;
-}
-
-// Returns the lower and upper bracket for bots to be active.
-// Ie. { 10, 20 } means all bots in this bracket will be inactive below 10% activityMod,
-// and will be active above 20% activityMod and scale between those values.
-std::pair<uint32, uint32> PlayerbotAI::GetPriorityBracket(ActivePiorityType type)
-{
-    switch (type)
-    {
-        case ActivePiorityType::HAS_REAL_PLAYER_MASTER:
-        case ActivePiorityType::IS_REAL_PLAYER:
-        case ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER:
-        case ActivePiorityType::IN_INSTANCE:
-        case ActivePiorityType::VISIBLE_FOR_PLAYER:
-            return {0, 0};
-        case ActivePiorityType::IS_ALWAYS_ACTIVE:
-        case ActivePiorityType::IN_COMBAT:
-            return {0, 10};
-        case ActivePiorityType::IN_BG_QUEUE:
-            return {0, 20};
-        case ActivePiorityType::IN_LFG:
-            return {0, 30};
-        case ActivePiorityType::NEARBY_PLAYER:
-            return {0, 40};
-        case ActivePiorityType::PLAYER_FRIEND:
-        case ActivePiorityType::PLAYER_GUILD:
-            return {0, 50};
-        case ActivePiorityType::IN_ACTIVE_AREA:
-            return {30, 100};
-        case ActivePiorityType::IN_ACTIVE_MAP:
-            return {50, 100};
-        case ActivePiorityType::IN_INACTIVE_MAP:
-            return {70, 100};
-        case ActivePiorityType::IN_EMPTY_SERVER:
-            return {80, 100};
-        default:
-            return {90, 100};
-    }
-
-    return {90, 100};
 }
 
 bool PlayerbotAI::AllowActive(ActivityType activityType)
@@ -4299,26 +4265,25 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         }
     }
 
-    // GetPriorityBracket acitivity
-    float activePerc = 100;
+    uint32 botActiveAlonePerc = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
+    uint32 mod = botActiveAlonePerc;
+    if (botActiveAlonePerc <= 0) return false;
+    if (botActiveAlonePerc >= 100) return true;
+
     if (sPlayerbotAIConfig->botActiveAloneSmartScale &&
         bot->GetLevel() >= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMinLevel &&
         bot->GetLevel() <= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMaxLevel)
     {
-        std::pair<uint8, uint8> priorityBracket = GetPriorityBracket(type);
-        if (!priorityBracket.second) return true; 
-        float activityPercentage = sRandomPlayerbotMgr->getActivityPercentage();
-        if (priorityBracket.first >= activityPercentage) return false;
-        if (priorityBracket.second <= activityPercentage && priorityBracket.second < 100) return true;
-        activePerc = (activityPercentage - priorityBracket.first) / (priorityBracket.second - priorityBracket.first);
-        activePerc *= (priorityBracket.second == 100) ? sPlayerbotAIConfig->botActiveAlone : 100;
+        // float activityPercentage = sRandomPlayerbotMgr->getActivityPercentage();
+        mod = SmartScaleActivity(type, botActiveAlonePerc);
     }
 
-    // The last number if the amount it cycles per min. Currently set to 1% of the active bots.
-    uint32 ActivityNumber = GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100, activePerc * 0.01f);
+    //The last number if the amount it cycles per min. Currently set to 1% of the active bots.
+    uint32 ActivityNumber = GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100,
+        botActiveAlonePerc * static_cast<float>(mod) / 100 * 0.01f);
 
-    // The given percentage of bots should be active and rotate 1% of those active bots each minute.  
-    return ActivityNumber <= (activePerc);
+    //The given percentage of bots should be active and rotate 1% of those active bots each minute.
+    return ActivityNumber <= (botActiveAlonePerc * mod) / 100;
 }
 
 bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
@@ -4333,6 +4298,70 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
     allowActive[activityType] = allowed;
     allowActiveCheckTimer[activityType] = time(nullptr);
     return allowed;
+}
+
+uint32 PlayerbotAI::SmartScaleActivity(ActivePiorityType type, uint32 botActiveAlonePerc)
+{
+    uint32 maxDiff = sWorldUpdateTime.GetPercentile(90);
+    //uint32 maxDiff = sWorldUpdateTime.GetMaxUpdateTimeOfCurrentTable();
+    //uint32 maxDiff = sWorldUpdateTime.GetMaxUpdateTime();
+    if (maxDiff > 500)
+        return 0;
+
+    float ActivePiorityTypeMod = 1;
+    switch (type)
+    {
+        case ActivePiorityType::HAS_REAL_PLAYER_MASTER:
+        case ActivePiorityType::IS_REAL_PLAYER:
+        case ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER:
+        case ActivePiorityType::IN_INSTANCE:
+        case ActivePiorityType::VISIBLE_FOR_PLAYER:
+            // we always enforce 100% with the above acitivities
+            // otherwise it will effect the pve gameplay.
+            return 100; 
+        case ActivePiorityType::IS_ALWAYS_ACTIVE:
+        case ActivePiorityType::IN_COMBAT:
+            ActivePiorityTypeMod = 0.9;
+            break;
+        case ActivePiorityType::IN_BG_QUEUE:
+        case ActivePiorityType::IN_LFG:
+            ActivePiorityTypeMod = 0.7;
+            break;
+        case ActivePiorityType::NEARBY_PLAYER:
+        case ActivePiorityType::PLAYER_FRIEND:
+        case ActivePiorityType::PLAYER_GUILD:
+        case ActivePiorityType::IN_ACTIVE_AREA:
+            ActivePiorityTypeMod = 0.6;
+            break;
+        case ActivePiorityType::IN_ACTIVE_MAP:
+        case ActivePiorityType::IN_INACTIVE_MAP:
+            ActivePiorityTypeMod = 0.5;
+            break;
+        case ActivePiorityType::IN_EMPTY_SERVER:
+            ActivePiorityTypeMod = 0.4;
+            break;
+        default:
+            ActivePiorityTypeMod = 0.5;
+            break;
+    }
+
+    if (maxDiff > 250)
+        return ActivePiorityTypeMod * (botActiveAlonePerc * 2) / 10;
+    if (maxDiff > 220)
+        return ActivePiorityTypeMod * (botActiveAlonePerc * 3) / 10;
+    if (maxDiff > 190)
+        return ActivePiorityTypeMod * (botActiveAlonePerc * 4) / 10;
+    if (maxDiff > 160)
+        return ActivePiorityTypeMod * (botActiveAlonePerc * 5) / 10;
+    if (maxDiff > 130)
+        return ActivePiorityTypeMod * (botActiveAlonePerc * 6) / 10;
+    if (maxDiff > 100)
+        return ActivePiorityTypeMod * (botActiveAlonePerc * 8) / 10;
+    if (maxDiff > 80)
+        return ActivePiorityTypeMod * (botActiveAlonePerc * 9) / 10;
+    
+
+    return botActiveAlonePerc;
 }
 
 bool PlayerbotAI::IsOpposing(Player* player) { return IsOpposing(player->getRace(), bot->getRace()); }

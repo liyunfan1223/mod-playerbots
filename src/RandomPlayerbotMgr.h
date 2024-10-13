@@ -103,8 +103,7 @@ public:
     void LogPlayerLocation();
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
 
-private:
-    void ScaleBotActivity();
+//private:
 
 public:
     uint32 activeBots = 0;
