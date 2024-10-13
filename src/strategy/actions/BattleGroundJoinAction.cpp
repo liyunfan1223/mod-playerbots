@@ -234,16 +234,8 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
         return false;
 
     TeamId teamId = bot->GetTeamId();
-    bool noLag = sWorldUpdateTime.GetAverageUpdateTime() < (sRandomPlayerbotMgr->GetPlayers().empty() ?
-        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffEmpty :
-        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffWithPlayer) * 1.1;
-
     uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
     uint32 TeamSize = bg->GetMaxPlayersPerTeam();
-
-    // If performance diff is enabled, only queue if there is no lag
-    if (sPlayerbotAIConfig->botActiveAloneSmartScale && !noLag)
-        return false;
 
     // If the bot is in a group, only the leader can queue
     if (bot->GetGroup() && !bot->GetGroup()->IsLeader(bot->GetGUID()))
@@ -577,16 +569,9 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
         return false;
 
     TeamId teamId = bot->GetTeamId();
-    bool noLag = sWorldUpdateTime.GetAverageUpdateTime() < (sRandomPlayerbotMgr->GetPlayers().empty() ?
-        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffEmpty :
-        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffWithPlayer) * 1.1;
 
     uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
     uint32 TeamSize = bg->GetMaxPlayersPerTeam();
-
-    // If performance diff is enabled, only queue if there is no lag
-    if (sPlayerbotAIConfig->botActiveAloneSmartScale && !noLag)
-        return false;
 
     // If the bot is in a group, only the leader can queue
     if (bot->GetGroup() && !bot->GetGroup()->IsLeader(bot->GetGUID()))
