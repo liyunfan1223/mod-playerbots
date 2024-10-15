@@ -9,12 +9,11 @@
 #include "wotlk/draktharonkeep/DrakTharonKeepStrategy.h"
 #include "wotlk/violethold/VioletHoldStrategy.h"
 #include "wotlk/gundrak/GundrakStrategy.h"
+#include "wotlk/hallsofstone/HallsOfStoneStrategy.h"
 
 /*
 Full list/TODO:
 
-Halls of Stone - HoS
-Maiden of Grief, Krystallus, Tribunal of Ages, Sjonnir The Ironshaper
 Halls of Lightning - HoL
 General Bjarngrim, Volkhan, Ionar, Loken
 The Oculus - Occ
@@ -76,8 +75,8 @@ class DungeonStrategyContext : public NamedObjectContext<Strategy>
         static Strategy* wotlk_dtk(PlayerbotAI* botAI) { return new WotlkDungeonDTKStrategy(botAI); }
         static Strategy* wotlk_vh(PlayerbotAI* botAI) { return new WotlkDungeonVHStrategy(botAI); }
         static Strategy* wotlk_gd(PlayerbotAI* botAI) { return new WotlkDungeonGDStrategy(botAI); }
+        static Strategy* wotlk_hos(PlayerbotAI* botAI) { return new WotlkDungeonHoSStrategy(botAI); }
 
-        static Strategy* wotlk_hos(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_hol(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_occ(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_up(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
