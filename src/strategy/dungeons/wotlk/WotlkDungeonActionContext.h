@@ -8,7 +8,7 @@
 #include "draktharonkeep/DrakTharonKeepActionContext.h"
 #include "violethold/VioletHoldActionContext.h"
 #include "gundrak/GundrakActionContext.h"
-// #include "hallsofstone/HallsOfStoneActionContext.h"
+#include "hallsofstone/HallsOfStoneActionContext.h"
 // #include "hallsoflightning/HallsOfLightningActionContext.h"
 // #include "oculus/OculusActionContext.h"
 // #include "utgardepinnacle/UtgardePinnacleActionContext.h"
