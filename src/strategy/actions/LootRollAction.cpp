@@ -36,6 +36,20 @@ bool LootRollAction::Execute(Event event)
         if (!proto)
             continue;
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
+                // New token handling logic
+        if (proto->Class == ITEM_CLASS_TOKENS)
+        {
+            if (CanBotUseToken(proto, bot))
+            {
+                vote = NEED; // Eligible for "Need"
+            }
+            else
+            {
+                vote = GREED; // Not eligible, so "Greed"
+            }
+        }
+        else
+        {
         switch (proto->Class)
         {
             case ITEM_CLASS_WEAPON:
@@ -204,3 +218,17 @@ bool MasterLootRollAction::Execute(Event event)
 
     return true;
 }
+bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
+{
+    // Get the bitmask for the bot's class
+    uint32 botClassMask = (1 << (bot->getClass() - 1));
+
+    // Check if the bot's class is allowed to use the token
+    if (proto->AllowableClass & botClassMask)
+    {
+        return true; // Bot's class is eligible to use this token
+    }
+
+    return false; // Bot's class cannot use this token
+}
+
