@@ -4224,19 +4224,18 @@ std::pair<uint32, uint32> PlayerbotAI::GetPriorityBracket(ActivePiorityType type
         case ActivePiorityType::PLAYER_GUILD:
             return {0, 50};
         case ActivePiorityType::IN_ACTIVE_AREA:
-            return {30, 100};
-        case ActivePiorityType::IN_ACTIVE_MAP:
-            return {50, 100};
-        case ActivePiorityType::IN_INACTIVE_MAP:
-            return {70, 100};
         case ActivePiorityType::IN_EMPTY_SERVER:
+            return {50, 100};
+        case ActivePiorityType::IN_ACTIVE_MAP:
+            return {70, 100};
+        case ActivePiorityType::IN_INACTIVE_MAP:
             return {80, 100};
         default:
             return {90, 100};
     }
 
     return {90, 100};
-}
+} 
 
 bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
@@ -4300,7 +4299,8 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     }
 
     // GetPriorityBracket acitivity
-    float activePerc = 100;
+    float normalizedBotActiveAlone = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
+    float activePerc = normalizedBotActiveAlone;
     if (sPlayerbotAIConfig->botActiveAloneSmartScale &&
         bot->GetLevel() >= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMinLevel &&
         bot->GetLevel() <= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMaxLevel)
@@ -4311,7 +4311,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         if (priorityBracket.first >= activityPercentage) return false;
         if (priorityBracket.second <= activityPercentage && priorityBracket.second < 100) return true;
         activePerc = (activityPercentage - priorityBracket.first) / (priorityBracket.second - priorityBracket.first);
-        activePerc *= (priorityBracket.second == 100) ? sPlayerbotAIConfig->botActiveAlone : 100;
+        activePerc *= (priorityBracket.second == 100) ? normalizedBotActiveAlone : 100;
     }
 
     // The last number if the amount it cycles per min. Currently set to 1% of the active bots.
