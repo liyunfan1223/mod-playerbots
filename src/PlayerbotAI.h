@@ -547,9 +547,9 @@ public:
     bool HasPlayerNearby(float range = sPlayerbotAIConfig->reactDistance);
     bool HasManyPlayersNearby(uint32 trigerrValue = 20, float range = sPlayerbotAIConfig->sightDistance);
     ActivePiorityType GetPriorityType(ActivityType activityType);
+    std::pair<uint32, uint32> GetPriorityBracket(ActivePiorityType type);
     bool AllowActive(ActivityType activityType);
     bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
-    uint32 SmartScaleActivity(ActivePiorityType type, uint32 botActiveAlonePerc);
 
     // Check if player is safe to use.
     bool IsSafe(Player* player);
