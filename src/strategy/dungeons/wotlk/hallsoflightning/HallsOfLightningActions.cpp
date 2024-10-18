@@ -19,8 +19,15 @@ bool BjarngrimTargetAction::Execute(Event event)
             break;
         }
     }
+
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
     // There are two, we don't want to ping-pong between them if we're attacking one already
-    if (!target || AI_VALUE(Unit*, "current target") == target)
+    if (target && currentTarget && currentTarget->GetEntry() == NPC_STORMFORGED_LIEUTENANT)
+    {
+        return false;
+    }
+
+    if (AI_VALUE(Unit*, "current target") == target)
     {
         return false;
     }

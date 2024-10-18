@@ -19,7 +19,22 @@ float BjarngrimMultiplier::GetValue(Action* action)
         }
     }
 
-    Unit* boss_add = AI_VALUE2(Unit*, "find target", "stormforged lieutenant");
+    // Detect boss adds this way as sometimes they don't get added to threat table on dps bots,
+    // and some dps just stand at range and don't engage the boss at all as they can't find the adds
+    // Unit* boss_add = AI_VALUE2(Unit*, "find target", "stormforged lieutenant");
+    Unit* boss_add = nullptr;
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(*i);
+        if (unit && unit->GetEntry() == NPC_STORMFORGED_LIEUTENANT)
+        {
+            boss_add = unit;
+            break;
+        }
+    }
+
     if (!boss_add || botAI->IsTank(bot)) { return 1.0f; }
 
     if (dynamic_cast<DpsAssistAction*>(action))
