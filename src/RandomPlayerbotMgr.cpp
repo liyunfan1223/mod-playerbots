@@ -292,6 +292,11 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     if (!sPlayerbotAIConfig->randomBotAutologin || !sPlayerbotAIConfig->enabled)
         return;
 
+    if (sPlayerbotAIConfig->botActiveAloneSmartScale)
+    {
+        ScaleBotActivity();
+    }
+
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
     if (!maxAllowedBotCount || (maxAllowedBotCount < sPlayerbotAIConfig->minRandomBots ||
                                 maxAllowedBotCount > sPlayerbotAIConfig->maxRandomBots))
@@ -395,6 +400,27 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     {
         LogPlayerLocation();
     }
+}
+
+void RandomPlayerbotMgr::ScaleBotActivity()
+{
+    float activityPercentage = getActivityPercentage();
+
+    // if (activityPercentage >= 100.0f || activityPercentage <= 0.0f) pid.reset(); //Stop integer buildup during
+    // max/min activity
+
+    //    % increase/decrease                   wanted diff                                         , avg diff
+    float activityPercentageMod = pid.calculate(sRandomPlayerbotMgr->GetPlayers().empty() ?
+        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffEmpty :
+        sPlayerbotAIConfig->botActiveAloneSmartScaleDiffWithPlayer,
+        sWorldUpdateTime.GetAverageUpdateTime());
+
+    activityPercentage = activityPercentageMod + 50;
+
+    // Cap the percentage between 0 and 100.
+    activityPercentage = std::max(0.0f, std::min(100.0f, activityPercentage));
+
+    setActivityPercentage(activityPercentage);
 }
 
 uint32 RandomPlayerbotMgr::AddRandomBots()
