@@ -38,19 +38,15 @@ float KrikthirMultiplier::GetValue(Action* action)
     if (boss && watcher)
     {
         // Do not target swap
-        // TODO: Need to suppress AoE actions but unsure how to identify them
-        // TODO: TEST AOE Avoid
-        if (dynamic_cast<DpsAssistAction*>(action)
-            || dynamic_cast<DpsAoeAction*>(action))
+        if (dynamic_cast<DpsAssistAction*>(action))
         {
             return 0.0f;
         }
-        // Doesn't seem to work
-        // if (action->getThreatType() == Action::ActionThreatType::Aoe)
-        // {
-        //     bot->Yell("Suppressed AoE", LANG_UNIVERSAL);
-        //     return 0.0f;
-        // }
+
+        if (action->getThreatType() == Action::ActionThreatType::Aoe)
+        {
+            return 0.0f;
+        }
     }
     return 1.0f;
 }
