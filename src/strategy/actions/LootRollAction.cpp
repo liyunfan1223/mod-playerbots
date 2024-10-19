@@ -149,7 +149,6 @@ bool LootRollAction::Execute(Event event)
     //             break;
     //     }
     // }
-	
     return true;
 }
 
