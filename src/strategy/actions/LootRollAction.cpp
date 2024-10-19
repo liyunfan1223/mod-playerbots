@@ -12,20 +12,6 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
-bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
-{
-    // Get the bitmask for the bot's class
-    uint32 botClassMask = (1 << (bot->getClass() - 1));
-
-    // Check if the bot's class is allowed to use the token
-    if (proto->AllowableClass & botClassMask)
-    {
-        return true; // Bot's class is eligible to use this token
-    }
-
-    return false; // Bot's class cannot use this token
-}
-
 bool LootRollAction::Execute(Event event)
 {
     Player* bot = QueryItemUsageAction::botAI->GetBot();
@@ -51,7 +37,7 @@ bool LootRollAction::Execute(Event event)
             continue;
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
         
-        // New token handling logic
+        // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), luckily no other items I found have class bits and epic quality.
         if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK && proto->Quality == ITEM_QUALITY_EPIC)
         {
             if (CanBotUseToken(proto, bot))
@@ -167,7 +153,6 @@ bool LootRollAction::Execute(Event event)
     return true;
 }
 
-// Remove the extra closing brace that was here
 
 RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
 {
@@ -236,4 +221,18 @@ bool MasterLootRollAction::Execute(Event event)
     group->CountRollVote(bot->GetGUID(), creatureGuid, CalculateRollVote(proto));
 
     return true;
+}
+
+bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
+{
+    // Get the bitmask for the bot's class
+    uint32 botClassMask = (1 << (bot->getClass() - 1));
+
+    // Check if the bot's class is allowed to use the token
+    if (proto->AllowableClass & botClassMask)
+    {
+        return true; // Bot's class is eligible to use this token
+    }
+
+    return false; // Bot's class cannot use this token
 }
