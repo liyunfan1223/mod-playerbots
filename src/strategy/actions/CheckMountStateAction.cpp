@@ -239,9 +239,16 @@ bool CheckMountStateAction::Mount()
         // continue;
 
         uint32 index = (spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
-                        spellInfo->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
-                           ? 1
-                           : 0;
+                        spellInfo->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
+                        // Winged Steed of the Ebon Blade
+                        // This mount is meant to autoscale from a 150% flyer
+                        // up to a 280% as you train your flying skill up.
+                        // This incorrectly gets categorised as a ground mount, force this to flyer only.
+                        // TODO: Add other scaling mounts here if they have the same issue, or adjust above
+                        // checks so that they are all correctly detected.
+                        spellInfo->Id == 54729)
+                           ? 1      // Flying Mount
+                           : 0;     // Ground Mount
 
         if (index == 0 &&
             std::max(spellInfo->Effects[EFFECT_1].BasePoints, spellInfo->Effects[EFFECT_2].BasePoints) > 59)
