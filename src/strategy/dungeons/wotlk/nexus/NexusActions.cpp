@@ -54,9 +54,16 @@ bool FirebombSpreadAction::Execute(Event event)
         {
             continue;
         }
-        if (bot->GetExactDist2d(botAI->GetUnit(member)) < targetDist)
+
+        Unit* unit = botAI->GetUnit(member);
+        if (!unit) 
         {
-            return MoveAway(botAI->GetUnit(member), targetDist);
+            continue;
+        }
+
+        if (bot->GetExactDist2d(unit) < targetDist)
+        {
+            return MoveAway(unit, targetDist);
         }
     }
     return false;
