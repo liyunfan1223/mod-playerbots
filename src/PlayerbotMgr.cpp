@@ -100,6 +100,8 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     Player* bot = botSession->GetPlayer();
     if (!bot)
     {
+        // Log para debug
+        LOG_ERROR("mod-playerbots", "Bot player could not be loaded for account ID: {}", botAccountId);
         botSession->LogoutPlayer(true);
         delete botSession;
         botLoading.erase(holder.GetGuid());
@@ -108,6 +110,14 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
 
     uint32 masterAccount = holder.GetMasterAccountId();
     WorldSession* masterSession = masterAccount ? sWorld->FindSession(masterAccount) : nullptr;
+
+    // Check if masterSession->GetPlayer() is valid
+    Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
+    if (masterSession && !masterPlayer)
+    {
+        LOG_ERROR("mod-playerbots", "Master session found but no player is associated for master account ID: {}", masterAccount);
+    }
+
     std::ostringstream out;
     bool allowed = false;
     if (botAccountId == masterAccount)
@@ -115,7 +125,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         allowed = true;
     }
     else if (masterSession && sPlayerbotAIConfig->allowGuildBots && bot->GetGuildId() != 0 &&
-             bot->GetGuildId() == masterSession->GetPlayer()->GetGuildId())
+             bot->GetGuildId() == masterPlayer->GetGuildId())
     {
         allowed = true;
     }
@@ -129,10 +139,14 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         out << "Failure: You are not allowed to control bot " << bot->GetName().c_str();
     }
 
-    if (allowed && masterSession)
+    if (allowed && masterSession && masterPlayer)
     {
-        Player* player = masterSession->GetPlayer();
-        PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(player);
+        PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(masterPlayer);
+        if (!mgr)
+        {
+            LOG_ERROR("mod-playerbots", "PlayerbotMgr not found for master player with GUID: {}", masterPlayer->GetGUID().GetRawValue());
+        }
+        
         uint32 count = mgr->GetPlayerbotsCount();
         uint32 cls_count = mgr->GetPlayerbotsCountByClass(bot->getClass());
         if (count >= sPlayerbotAIConfig->maxAddedBots)
@@ -428,14 +442,17 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
     {
+        // Log a warning here to indicate that the botAI is null
+        LOG_ERROR("mod-playerbots", "PlayerbotAI is null for bot with GUID: {}", bot->GetGUID().GetRawValue());
         return;
     }
+
     Player* master = botAI->GetMaster();
-    if (master)
+    if (!master)
     {
-        ObjectGuid masterGuid = master->GetGUID();
-        if (master->GetGroup() && !master->GetGroup()->IsLeader(masterGuid))
-            master->GetGroup()->ChangeLeader(masterGuid);
+        // Log a warning to indicate that the master is null
+        LOG_ERROR("mod-playerbots", "Master is null for bot with GUID: {}", bot->GetGUID().GetRawValue());
+        return;
     }
 
     Group* group = bot->GetGroup();
