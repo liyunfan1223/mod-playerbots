@@ -304,9 +304,13 @@ ItemIds ChatHelper::parseItems(std::string const text)
 
 std::string const ChatHelper::FormatQuest(Quest const* quest)
 {
+    if (!quest)
+    {
+        return "Invalid quest";
+    }
+
     std::ostringstream out;
-    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << quest->GetTitle()
-        << "]|h|r";
+    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << quest->GetTitle() << "]|h|r";
     return out.str();
 }
 
