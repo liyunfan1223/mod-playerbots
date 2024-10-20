@@ -355,8 +355,28 @@ bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
 {
     switch (proto->ItemId)
     {
-        case 2901:  // Mining pick
+        case 756:  // Tunnel Pick
             return botAI->HasSkill(SKILL_MINING);
+        case 778:  // Kobold Excavation Pick
+            return botAI->HasSkill(SKILL_MINING);
+        case 1819:  // Gouging Pick
+            return botAI->HasSkill(SKILL_MINING);
+        case 1893:  // Miner's Revenge
+            return botAI->HasSkill(SKILL_MINING);
+        case 1959:  // Cold Iron Pick
+            return botAI->HasSkill(SKILL_MINING);
+        case 2901:  // Mining Pick
+            return botAI->HasSkill(SKILL_MINING);
+        case 9465:  // Digmaster 5000
+            return botAI->HasSkill(SKILL_MINING);
+        case 20723:  // Brann's Trusty Pick
+            return botAI->HasSkill(SKILL_MINING);
+        case 40772:  // Gnomish Army Knife
+            return botAI->HasSkill(SKILL_MINING) || botAI->HasSkill(SKILL_ENGINEERING) || botAI->HasSkill(SKILL_BLACKSMITHING) || botAI->HasSkill(SKILL_COOKING) || botAI->HasSkill(SKILL_SKINNING);
+        case 40892:  // Hammer Pick
+            return botAI->HasSkill(SKILL_MINING) || botAI->HasSkill(SKILL_BLACKSMITHING);
+        case 40893:  // Bladed Pickaxe
+            return botAI->HasSkill(SKILL_MINING) || botAI->HasSkill(SKILL_SKINNING);
         case 5956:  // Blacksmith Hammer
             return botAI->HasSkill(SKILL_BLACKSMITHING) || botAI->HasSkill(SKILL_ENGINEERING);
         case 6219:  // Arclight Spanner
@@ -372,6 +392,10 @@ bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
         case 16207:  // Runed Arcanite Rod
             return botAI->HasSkill(SKILL_ENCHANTING);
         case 7005:  // Skinning Knife
+            return botAI->HasSkill(SKILL_SKINNING);
+        case 12709:
+            return botAI->HasSkill(SKILL_SKINNING);
+        case 19901:
             return botAI->HasSkill(SKILL_SKINNING);
         case 4471:  // Flint and Tinder
             return botAI->HasSkill(SKILL_COOKING);
