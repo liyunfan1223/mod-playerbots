@@ -464,7 +464,7 @@ INSERT INTO `ai_playerbot_texts` (`name`, `text`, `say_type`, `reply_type`, `tex
 -- %my_level
 ('suggest_something', 'Wanna party in %zone_name.', 0, 0, '', 'Je veux faire la fête dans %zone_name.', '', '', '', '¡Vamos a perrear a %zone_name!', '', 'Ищу группу в %zone_name.'),
 ('suggest_something', 'Anyone is looking for %my_role?', 0, 0, '', 'Quelqu\'un cherche un %my_role ?', '', '', '', '¿Alguien está buscando %my_role?', '', 'Кто-нибудь ищет %my_role?'),
-('suggest_something', '%my_role is looking for quild.', 0, 0, '', '%my_role recherche une guilde.', '', '', '', '%my_role está buscando hermandad.', '', '%my_role ищу гильдию.'),
+('suggest_something', '%my_role is looking for guild.', 0, 0, '', '%my_role recherche une guilde.', '', '', '', '%my_role está buscando hermandad.', '', '%my_role ищу гильдию.'),
 ('suggest_something', 'Looking for gold.', 0, 0, '', 'A la recherche de l\'or.', '', '', '', 'Buscando oro.', '', 'Дайте голды'),
 ('suggest_something', '%my_role wants to join a good guild.', 0, 0, '', '%my_role veut rejoindre une bonne guilde.', '', '', '', '%my_role quiere unirse a una buen hermandad.', '', '%my_role хочу в хорошую гильдию.'),
 ('suggest_something', 'Need a friend.', 0, 0, '', 'Besoin d\'un ami.', '', '', '', 'Necesito un amigo...', '', 'Ищу друга.'),
@@ -1457,19 +1457,3 @@ INSERT INTO `ai_playerbot_texts` (`name`, `text`, `say_type`, `reply_type`, `tex
 
 
 ('dummy_end', 'dummy', 0, 0, '', '', '', '', '', '', '', '');
-
-DROP TABLE IF EXISTS `ai_playerbot_texts_chance`;
-
-CREATE TABLE IF NOT EXISTS `ai_playerbot_texts_chance` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `probability` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=UTF8;
-
-/*!40000 ALTER TABLE `ai_playerbot_texts_chance` DISABLE KEYS */;
-INSERT INTO `ai_playerbot_texts_chance` (`id`, `name`, `probability`) VALUES
-	(1, 'taunt', 30),
-	(2, 'aoe', 75),
-	(3, 'loot', 20);
-/*!40000 ALTER TABLE `ai_playerbot_texts_chance` ENABLE KEYS */;
