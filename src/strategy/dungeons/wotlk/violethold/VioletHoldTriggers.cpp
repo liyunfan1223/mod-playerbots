@@ -6,30 +6,42 @@
 
 bool ErekemTargetTrigger::IsActive()
 {
-    return AI_VALUE2(Unit*, "find target", "erekem") && botAI->IsDps(bot);
+    Unit* boss = AI_VALUE2(Unit*, "find target", "erekem");
+    if (!boss) { return false; }
+
+    return botAI->IsDps(bot);
 }
 
 bool IchoronTargetTrigger::IsActive()
 {
-    return AI_VALUE2(Unit*, "find target", "ichoron") && !botAI->IsHeal(bot);
+    Unit* boss = AI_VALUE2(Unit*, "find target", "ichoron");
+    if (!boss) { return false; }
+
+    return !botAI->IsHeal(bot);
 }
 
 bool VoidShiftTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "zuramat the obliterator");
-    return boss && bot->HasAura(SPELL_VOID_SHIFTED) && !botAI->IsHeal(bot);
+    if (!boss) { return false; }
+
+    return bot->HasAura(SPELL_VOID_SHIFTED) && !botAI->IsHeal(bot);
 }
 
 bool ShroudOfDarknessTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "zuramat the obliterator");
-    return boss && boss->HasAura(SPELL_SHROUD_OF_DARKNESS);
+    if (!boss) { return false; }
+
+    return boss->HasAura(SPELL_SHROUD_OF_DARKNESS);
 }
 
 bool CyanigosaPositioningTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "cyanigosa");
+    if (!boss) { return false; }
+
     // Include healers here for now, otherwise they stand in things
-    return boss && !botAI->IsTank(bot) && !botAI->IsRangedDps(bot);
-    // return boss && botAI->IsMelee(bot) && !botAI->IsTank(bot);
+    return !botAI->IsTank(bot) && !botAI->IsRangedDps(bot);
+    // return botAI->IsMelee(bot) && !botAI->IsTank(bot);
 }

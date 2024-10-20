@@ -9,9 +9,10 @@
 float ElderNadoxMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "elder nadox");
-    Unit* guardian = AI_VALUE2(Unit*, "find target", "ahn'kahar guardian");
+    if (!boss) { return 1.0f; }
 
-    if (boss && guardian)
+    Unit* guardian = AI_VALUE2(Unit*, "find target", "ahn'kahar guardian");
+    if (guardian)
     {
         if (dynamic_cast<DpsAssistAction*>(action))
         {
@@ -24,7 +25,7 @@ float ElderNadoxMultiplier::GetValue(Action* action)
 float JedogaShadowseekerMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "jedoga shadowseeker");
-    // Unit* volunteer = AI_VALUE2(Unit*, "find target", "twilight volunteer");
+    if (!boss) { return 1.0f; }
 
     Unit* volunteer = nullptr;
     // Target is not findable from threat table using AI_VALUE2(),
@@ -41,7 +42,7 @@ float JedogaShadowseekerMultiplier::GetValue(Action* action)
         }
     }
     
-    if (boss && volunteer)
+    if (volunteer)
     {
         if (dynamic_cast<DpsAssistAction*>(action))
         {
@@ -53,9 +54,10 @@ float JedogaShadowseekerMultiplier::GetValue(Action* action)
 
 float ForgottenOneMultiplier::GetValue(Action* action)
 {
-    Unit* npc = AI_VALUE2(Unit*, "find target", "forgotten one");
+    Unit* unit = AI_VALUE2(Unit*, "find target", "forgotten one");
+    if (!unit) { return 1.0f; }
 
-    if (npc && bot->isMoving())
+    if (bot->isMoving())
     {
         if (dynamic_cast<MovementAction*>(action))
         {
