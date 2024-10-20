@@ -19,7 +19,7 @@ bool ShatterSpreadAction::Execute(Event event)
         }
         if (!closestMember || bot->GetExactDist2d(unit) < bot->GetExactDist2d(closestMember))
         {
-            closestMember = botAI->GetUnit(member);
+            closestMember = unit;
         }
     }
 
