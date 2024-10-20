@@ -50,5 +50,4 @@ void WotlkDungeonNexStrategy::InitMultipliers(std::vector<Multiplier*> &multipli
     multipliers.push_back(new TelestraMultiplier(botAI));
     multipliers.push_back(new AnomalusMultiplier(botAI));
     multipliers.push_back(new OrmorokMultiplier(botAI));
-    // multipliers.push_back(new KeristraszaMultiplier(botAI));
 }

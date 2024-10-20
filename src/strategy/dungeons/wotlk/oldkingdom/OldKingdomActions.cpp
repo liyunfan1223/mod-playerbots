@@ -42,22 +42,22 @@ bool AvoidShadowCrashAction::Execute(Event event)
 {
     // Could check all enemy units in range as it's possible to pull multiple of these mobs.
     // They should really be killed 1 by 1, multipulls are messy so we just handle singles for now
-    Unit* npc = AI_VALUE2(Unit*, "find target", "forgotten one");
+    Unit* unit = AI_VALUE2(Unit*, "find target", "forgotten one");
     Unit* victim = nullptr;
     float radius = 10.0f;
     float targetDist = radius + 2.0f;
-    if (!npc) { return false; }
+    if (!unit) { return false; }
 
     // Actively move if targeted by a shadow crash.
     // Spell check not needed, they don't have any other non-instant casts
-    if (npc->HasUnitState(UNIT_STATE_CASTING)) // && npc->FindCurrentSpellBySpellId(SPELL_SHADOW_CRASH))
+    if (unit->HasUnitState(UNIT_STATE_CASTING)) // && unit->FindCurrentSpellBySpellId(SPELL_SHADOW_CRASH))
     {
         // This doesn't seem to avoid casts very well, perhaps because this isn't checked while allies are casting.
         // TODO: Revisit if this is an issue in heroics, otherwise ignore shadow crashes for the most part.
-        victim = botAI->GetUnit(npc->GetTarget());
+        victim = botAI->GetUnit(unit->GetTarget());
         if (victim && bot->GetExactDist2d(victim) < radius)
         {
-            return MoveAway(victim, targetDist - bot->GetExactDist2d(victim));
+            return MoveAway(victim, targetDist - bot->GetExactDist2d(victim->GetPosition()));
         }
     }
 

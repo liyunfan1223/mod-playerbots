@@ -7,6 +7,8 @@ bool AttackErekemAction::Execute(Event event)
 {
     // Focus boss first, adds after
     Unit* boss = AI_VALUE2(Unit*, "find target", "erekem");
+    if (!boss) { return false; }
+
     if (AI_VALUE(Unit*, "current target") != boss)
         {
             return Attack(boss);
@@ -18,6 +20,8 @@ bool AttackIchorGlobuleAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ichoron");
     if (!boss) { return false; }
+
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
 
     // Tank prioritise boss if it's up
     if (botAI->IsTank(bot) && !boss->HasAura(SPELL_DRAINED))
@@ -38,7 +42,6 @@ bool AttackIchorGlobuleAction::Execute(Event event)
         Unit* unit = botAI->GetUnit(*i);
         if (unit && unit->GetEntry() == NPC_ICHOR_GLOBULE)
         {
-            Unit* currentTarget = AI_VALUE(Unit*, "current target");
             // Check IDs here, NOT Unit* pointers:
             // Don't keep swapping between sentries.
             // If we're already attacking one, don't retarget another
@@ -50,7 +53,7 @@ bool AttackIchorGlobuleAction::Execute(Event event)
         }
     }
     // No ichor globules left alive, fall back to targeting boss
-    if (AI_VALUE(Unit*, "current target") != boss)
+    if (currentTarget != boss)
     {
         return Attack(boss);
     }
@@ -62,6 +65,8 @@ bool AttackVoidSentryAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "zuramat the obliterator");
     if (!boss) { return false; }
+
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
     
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name
@@ -73,7 +78,6 @@ bool AttackVoidSentryAction::Execute(Event event)
         Unit* unit = botAI->GetUnit(*i);
         if (unit && unit->GetEntry() == NPC_VOID_SENTRY)
         {
-            Unit* currentTarget = AI_VALUE(Unit*, "current target");
             // Check IDs here, NOT Unit* pointers:
             // Don't keep swapping between sentries.
             // If we're already attacking one, don't retarget another
@@ -85,7 +89,7 @@ bool AttackVoidSentryAction::Execute(Event event)
         }
     }
     // No void sentries left alive, fall back to targeting boss
-    if (AI_VALUE(Unit*, "current target") != boss)
+    if (currentTarget != boss)
     {
         return Attack(boss);
     }
