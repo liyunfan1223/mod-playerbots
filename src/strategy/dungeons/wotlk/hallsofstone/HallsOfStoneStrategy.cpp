@@ -26,5 +26,4 @@ void WotlkDungeonHoSStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 void WotlkDungeonHoSStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     multipliers.push_back(new KrystallusMultiplier(botAI));
-    multipliers.push_back(new SjonnirMultiplier(botAI));
 }

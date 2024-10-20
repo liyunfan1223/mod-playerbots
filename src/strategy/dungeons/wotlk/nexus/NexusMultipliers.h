@@ -39,4 +39,13 @@ class OrmorokMultiplier : public Multiplier
         virtual float GetValue(Action* action);
 };
 
+class KeristraszaMultiplier : public Multiplier
+{
+    public:
+        KeristraszaMultiplier(PlayerbotAI* ai) : Multiplier(ai, "keristrasza") {}
+
+    public:
+        virtual float GetValue(Action* action);
+};
+
 #endif

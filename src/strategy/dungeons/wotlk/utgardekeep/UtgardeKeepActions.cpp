@@ -14,7 +14,7 @@ bool AttackFrostTombAction::Execute(Event event)
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
         Unit* unit = botAI->GetUnit(*i);
-        if (unit && unit->GetEntry() == NPC_FROST_TOMB)
+        if (unit && unit->GetName() == "Frost Tomb")
         {
             frostTomb = unit;
             break;
@@ -31,9 +31,7 @@ bool AttackFrostTombAction::Execute(Event event)
 bool AttackDalronnAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "dalronn the controller");
-    if (!boss) { return false; }
-    
-    if (AI_VALUE(Unit*, "current target") == boss)
+    if (!boss || AI_VALUE(Unit*, "current target") == boss)
     {
         return false;
     }
@@ -44,7 +42,10 @@ bool IngvarStopCastingAction::Execute(Event event)
 {
     // Doesn't work, this action gets queued behind the current spell instead of interrupting it
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss) { return false; }
+    if (!boss)
+    {
+        return false;
+    }
 
     int32 my_spell_id = AI_VALUE(uint32, "active spell");
     if (!my_spell_id || my_spell_id == 0)
@@ -53,7 +54,10 @@ bool IngvarStopCastingAction::Execute(Event event)
     }
     
     Spell* spell = bot->FindCurrentSpellBySpellId(my_spell_id);
-    if (!spell) { return false; }
+    if (!spell)
+    {
+        return false;
+    }
 
     // bot->Yell("cancelling spell="+std::to_string(my_spell_id), LANG_UNIVERSAL);
     bot->InterruptSpell(spell->GetCurrentContainer(), false, true, true);
@@ -67,7 +71,10 @@ bool IngvarDodgeSmashAction::isUseful() { return !AI_VALUE2(bool, "behind", "cur
 bool IngvarDodgeSmashAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss) { return false; }
+    if (!boss)
+    {
+        return false;
+    }
 
     float distance = bot->GetExactDist2d(boss->GetPosition());
     // Extra units to move into the boss, instead of being just 1 pixel past his midpoint.
@@ -81,7 +88,10 @@ bool IngvarSmashReturnAction::isUseful() { return AI_VALUE2(bool, "behind", "cur
 bool IngvarSmashReturnAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss) { return false; }
+    if (!boss)
+    {
+        return false;
+    }
 
     float distance = bot->GetExactDist2d(boss->GetPosition());
     return Move(bot->GetAngle(boss), distance + bot->GetMeleeReach());

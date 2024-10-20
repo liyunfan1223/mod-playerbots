@@ -33,12 +33,11 @@ bool MoveFromWhirlwindAction::Execute(Event event)
         default:
             break;
     }
-    float bossDistance = bot->GetExactDist2d(boss->GetPosition());
-    if (!boss || bossDistance > targetDist)
+    if (!boss || bot->GetExactDist2d(boss->GetPosition()) > targetDist)
     {
         return false;
     }
-    return MoveAway(boss, targetDist - bossDistance);
+    return MoveAway(boss, targetDist - bot->GetExactDist2d(boss->GetPosition()));
 }
 
 bool FirebombSpreadAction::Execute(Event event)
@@ -51,16 +50,13 @@ bool FirebombSpreadAction::Execute(Event event)
     GuidVector members = AI_VALUE(GuidVector, "group members");
     for (auto& member : members)
     {
-        Unit* unit = botAI->GetUnit(member);
-        if (!unit || bot->GetGUID() == member)
+        if (bot->GetGUID() == member)
         {
             continue;
         }
-
-        if (bot->GetExactDist2d(unit) < targetDist)
+        if (bot->GetExactDist2d(botAI->GetUnit(member)) < targetDist)
         {
-            float bossDistance = bot->GetExactDist2d(boss->GetPosition());
-            return MoveAway(unit, targetDist - bossDistance);
+            return MoveAway(botAI->GetUnit(member), targetDist);
         }
     }
     return false;
@@ -74,22 +70,24 @@ bool TelestraSplitTargetAction::Execute(Event event)
 
     for (auto& attacker : attackers)
     {
-        Unit* unit = botAI->GetUnit(attacker);
-        if (!unit) { continue; }
-
-        switch (unit->GetEntry())
+        Unit* npc = botAI->GetUnit(attacker);
+        if (!npc)
+        {
+            continue;
+        }
+        switch (npc->GetEntry())
         {
             // Focus arcane clone first
             case NPC_ARCANE_MAGUS:
-                splitTargets[0] = unit;
+                splitTargets[0] = npc;
                 break;
             // Then the frost clone
             case NPC_FROST_MAGUS:
-                splitTargets[1] = unit;
+                splitTargets[1] = npc;
                 break;
             // Fire clone last
             case NPC_FIRE_MAGUS:
-                splitTargets[2] = unit;
+                splitTargets[2] = npc;
                 break;
         }
     }
@@ -141,15 +139,11 @@ bool ChaoticRiftTargetAction::Execute(Event event)
 bool DodgeSpikesAction::isUseful()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ormorok the tree-shaper");
-    if (!boss) { return false; }
-
     return bot->GetExactDist2d(boss) > 0.5f;
 }
 bool DodgeSpikesAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ormorok the tree-shaper");
-    if (!boss) { return false; }
-    
     return Move(bot->GetAngle(boss), bot->GetExactDist2d(boss) - 0.3f);
 }
 
