@@ -52,15 +52,11 @@ bool FirebombSpreadAction::Execute(Event event)
     for (auto& member : members)
     {
         Unit* unit = botAI->GetUnit(member);
-        if (!unit || bot->GetGUID() == member)
-        {
-            continue;
-        }
+        if (!unit || bot->GetGUID() == member) { continue; }
 
         if (bot->GetExactDist2d(unit) < targetDist)
         {
-            float bossDistance = bot->GetExactDist2d(boss->GetPosition());
-            return MoveAway(unit, targetDist - bossDistance);
+            return MoveAway(unit, targetDist);
         }
     }
     return false;
