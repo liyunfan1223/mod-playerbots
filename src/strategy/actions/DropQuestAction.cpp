@@ -58,54 +58,91 @@ bool DropQuestAction::Execute(Event event)
     return true;
 }
 
+
 bool CleanQuestLogAction::Execute(Event event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
-    std::string link = event.getParam();
-    if (botAI->HasActivePlayerMaster() || !sRandomPlayerbotMgr->IsRandomBot(bot))
+    if (!requester)
+    {
+        botAI->TellMaster("No event owner detected");
         return false;
-
-    uint8 totalQuests = 0;
-    // Count the total quests
-    DropQuestType(totalQuests);
-    if (MAX_QUEST_LOG_SIZE - totalQuests > 6)
-    {
-        // Drop failed quests
-        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE, true, true);
-        return true;
     }
 
-    // Only drop gray quests when able to fight proper lvl quests.
-    if (AI_VALUE(bool, "can fight equal"))
+    // Only output this message if "debug rpg" strategy is enabled
+    if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
-        // Drop gray/red quests.
-        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6);
-        // Drop gray/red quests with progress.
-        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6, false, true);
-        // Drop gray/red completed quests.
-        DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 6, false, true, true);
+        botAI->TellMaster("Clean Quest Log command received, removing grey/trivial quests...");
     }
 
-    if (MAX_QUEST_LOG_SIZE - totalQuests > 4)
-        return true;
+    uint8 botLevel = bot->GetLevel();  // Get bot's level
+    uint8 numQuest = 0;
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        if (bot->GetQuestSlotQuestId(slot))
+        {
+            numQuest++;
+        }
+    }
 
-    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 4, true);  // Drop quests without progress.
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+            continue;
 
-    if (MAX_QUEST_LOG_SIZE - totalQuests > 2)
-        return true;
+        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (!quest)
+            continue;
 
-    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 2, true, true);  // Drop quests with progress.
+        // Determine if quest is trivial by comparing levels
+        int32 questLevel = quest->GetQuestLevel();
+        if (questLevel == -1) // For scaling quests, default to bot level
+        {
+            questLevel = botLevel;
+        }
 
-    if (MAX_QUEST_LOG_SIZE - totalQuests > 0)
-        return true;
+        // Check if the quest is trivial (grey) for the bot
+        if ((botLevel - questLevel) >= 5)
+        {
+            // Output only if "debug rpg" strategy is enabled
+            if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+            {
+                botAI->TellMaster("Quest [ " + quest->GetTitle() + " ] will be removed because it is trivial (grey).");
+            }
 
-    DropQuestType(totalQuests, MAX_QUEST_LOG_SIZE - 1, true, true, true);  // Drop completed quests.
+            // Remove quest
+            bot->SetQuestSlot(slot, 0);
+            bot->TakeQuestSourceItem(questId, false);
+            bot->SetQuestStatus(questId, QUEST_STATUS_NONE);
+            bot->RemoveRewardedQuest(questId);
 
-    if (MAX_QUEST_LOG_SIZE - totalQuests > 0)
-        return true;
+            numQuest--;
 
-    return false;
+            if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+            {
+                const std::string text_quest = ChatHelper::FormatQuest(quest);
+                LOG_INFO("playerbots", "{} => Quest [ {} ] removed", bot->GetName(), quest->GetTitle());
+                bot->Say("Quest [ " + text_quest + " ] removed", LANG_UNIVERSAL);
+            }
+
+            if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+            {
+                botAI->TellMaster("Quest [ " + quest->GetTitle() + " ] has been removed.");
+            }
+        }
+        else
+        {
+            // Only output if "debug rpg" strategy is enabled
+            if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+            {
+                botAI->TellMaster("Quest [ " + quest->GetTitle() + " ] is not trivial and will be kept.");
+            }
+        }
+    }
+
+    return true;
 }
+
 
 void CleanQuestLogAction::DropQuestType(uint8& numQuest, uint8 wantNum, bool isGreen, bool hasProgress, bool isComplete)
 {

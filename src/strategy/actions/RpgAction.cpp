@@ -79,7 +79,7 @@ bool RpgAction::SetNextRpgAction()
                 {
                     NextAction* nextAction = nextActions[i];
 
-                    if (nextAction->getRelevance() > 2.0f)
+                    if (nextAction->getRelevance() > 5.0f)
                         continue;
 
                     if (!isChecked && !trigger->IsActive())
@@ -92,7 +92,7 @@ bool RpgAction::SetNextRpgAction()
                         continue;
 
                     actions.push_back(action);
-                    relevances.push_back((nextAction->getRelevance() - 1) * 1000);
+                    relevances.push_back((nextAction->getRelevance() - 1) * 500);
                 }
                 NextAction::destroy(nextActions);
             }
