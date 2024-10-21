@@ -125,7 +125,7 @@ bool LokenStackAction::isUseful()
 {
     // Minimum hunter range is 5, but values too close to this seem to cause issues..
     // Hunter bots will try and melee in between ranged attacks, or just melee entirely at 5 as they are in range.
-    // 6.5 or 7.0 solves this.
+    // 6.5 or 7.0 solves this for this boss.
     if(bot->getClass() == CLASS_HUNTER)
     {
         return AI_VALUE2(float, "distance", "current target") > 6.5f;
@@ -138,14 +138,15 @@ bool LokenStackAction::Execute(Event event)
     Unit* boss = AI_VALUE2(Unit*, "find target", "loken");
     if (!boss) { return false; }
 
+    float maxMovement = 10.0f;
     if (!boss->HasUnitState(UNIT_STATE_CASTING))
     {
         if(bot->getClass() == CLASS_HUNTER)
         {
-            return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 6.5f, 10.0f));
+            return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 6.5f, maxMovement));
         }
         // else
-        return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss), 10.0f));
+        return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss), maxMovement));
     }
     
     return false;

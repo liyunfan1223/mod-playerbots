@@ -8,16 +8,18 @@ bool CorpseExplodeSpreadAction::Execute(Event event)
     Unit* boss = AI_VALUE2(Unit*, "find target", "trollgore");
     if (!boss) { return false; }
 
-    float distance = 6.0f;  // 5 unit radius, 1 unit added as buffer
+    float distance = 5.0f;
+    float distanceExtra = 2.0f;
     GuidVector corpses = AI_VALUE(GuidVector, "nearest corpses");
     for (auto i = corpses.begin(); i != corpses.end(); ++i)
     {
         Unit* unit = botAI->GetUnit(*i);
         if (unit && unit->GetEntry() == NPC_DRAKKARI_INVADER)
         {
-            if (bot->GetExactDist2d(unit) < distance)
+            float currentDistance = bot->GetExactDist2d(unit);
+            if (currentDistance < distance + distanceExtra)
             {
-                return MoveAway(unit, distance - bot->GetExactDist2d(unit));
+                return MoveAway(unit, distance + distanceExtra - currentDistance);
             }
         }
     }

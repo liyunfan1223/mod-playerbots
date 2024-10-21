@@ -104,6 +104,7 @@ public:
         creators["nearest game objects no los"] = &ValueContext::nearest_game_objects_no_los;
         creators["closest game objects"] = &ValueContext::closest_game_objects;
         creators["nearest npcs"] = &ValueContext::nearest_npcs;
+        creators["nearest hostile npcs"] = &ValueContext::nearest_hostile_npcs;
         creators["nearest totems"] = &ValueContext::nearest_totems;
         creators["nearest vehicles"] = &ValueContext::nearest_vehicles;
         creators["nearest vehicles far"] = &ValueContext::nearest_vehicles_far;
@@ -393,6 +394,7 @@ private:
     }
     static UntypedValue* log_level(PlayerbotAI* botAI) { return new LogLevelValue(botAI); }
     static UntypedValue* nearest_npcs(PlayerbotAI* botAI) { return new NearestNpcsValue(botAI); }
+    static UntypedValue* nearest_hostile_npcs(PlayerbotAI* botAI) { return new NearestHostileNpcsValue(botAI); }
     static UntypedValue* nearest_totems(PlayerbotAI* botAI) { return new NearestTotemsValue(botAI); }
     static UntypedValue* nearest_vehicles(PlayerbotAI* botAI) { return new NearestVehiclesValue(botAI); }
     static UntypedValue* nearest_vehicles_far(PlayerbotAI* botAI) { return new NearestVehiclesValue(botAI, 200.0f); }
