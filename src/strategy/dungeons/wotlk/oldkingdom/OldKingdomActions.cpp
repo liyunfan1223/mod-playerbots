@@ -10,7 +10,6 @@ bool AttackNadoxGuardianAction::Execute(Event event)
     {
         return false;
     }
-    
     return Attack(target);
 }
 
@@ -24,6 +23,10 @@ bool AttackJedogaVolunteerAction::Execute(Event event)
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
         Unit* unit = botAI->GetUnit(*i);
+        if (!unit) // Null check for safety
+        {
+            continue; // Skip null or invalid units
+        }
         if (unit && unit->GetEntry() == NPC_TWILIGHT_VOLUNTEER)
         {
             target = unit;
@@ -55,6 +58,10 @@ bool AvoidShadowCrashAction::Execute(Event event)
         // This doesn't seem to avoid casts very well, perhaps because this isn't checked while allies are casting.
         // TODO: Revisit if this is an issue in heroics, otherwise ignore shadow crashes for the most part.
         victim = botAI->GetUnit(unit->GetTarget());
+        if (!victim) 
+        { 
+            return false; // Exit early if no victim is found
+        }
         if (victim && bot->GetExactDist2d(victim) < radius)
         {
             return MoveAway(victim, targetDist - bot->GetExactDist2d(victim->GetPosition()));
@@ -65,11 +72,20 @@ bool AvoidShadowCrashAction::Execute(Event event)
     if (botAI->IsMelee(bot)) { return false; }
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
+    if (members.empty()) 
+    { 
+        return false; // Exit early if no group members are found
+    }
     for (auto& member : members)
     {
         if (bot->GetGUID() == member)
         {
             continue;
+        }
+        Unit* memberUnit = botAI->GetUnit(member);
+        if (!memberUnit) 
+        {
+            continue; // Skip if the memberUnit is null
         }
         float currentDist = bot->GetExactDist2d(botAI->GetUnit(member));
         if (currentDist < radius)
