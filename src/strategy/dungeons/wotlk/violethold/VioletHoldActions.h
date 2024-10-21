@@ -8,8 +8,6 @@
 #include "Playerbots.h"
 #include "VioletHoldTriggers.h"
 
-// const Position NOVOS_PARTY_POSITION = Position(-378.852f, -760.349f, 28.587f);
-
 class AttackErekemAction : public AttackAction
 {
 public:

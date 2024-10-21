@@ -12,14 +12,14 @@ bool ShatterSpreadAction::Execute(Event event)
     GuidVector members = AI_VALUE(GuidVector, "group members");
     for (auto& member : members)
     {
-        if (bot->GetGUID() == member)
+        Unit* unit = botAI->GetUnit(member);
+        if (!unit || bot->GetGUID() == member)
         {
             continue;
         }
-        if (!closestMember ||
-            bot->GetExactDist2d(botAI->GetUnit(member)) < bot->GetExactDist2d(closestMember))
+        if (!closestMember || bot->GetExactDist2d(unit) < bot->GetExactDist2d(closestMember))
         {
-            closestMember = botAI->GetUnit(member);
+            closestMember = unit;
         }
     }
 

@@ -9,7 +9,7 @@ bool KelesethFrostTombTrigger::IsActive()
     for (auto& member : members)
     {
         Unit* unit = botAI->GetUnit(member);
-        if (unit && unit->HasAura(DEBUFF_FROST_TOMB))
+        if (unit && unit->HasAura(SPELL_FROST_TOMB))
         {
             return true;
         }
@@ -19,21 +19,17 @@ bool KelesethFrostTombTrigger::IsActive()
 
 bool DalronnNontankTrigger::IsActive()
 {
-    Unit* dalronn = AI_VALUE2(Unit*, "find target", "dalronn the controller");
-    if (!dalronn)
-    {
-        return false;
-    }
+    Unit* boss = AI_VALUE2(Unit*, "find target", "dalronn the controller");
+    if (!boss) { return false; }
+
     return !botAI->IsTank(bot);
 }
 
 bool IngvarStaggeringRoarTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss)
-    {
-        return false;
-    }
+    if (!boss) { return false; }
+
     if (boss->HasUnitState(UNIT_STATE_CASTING))
     {
         if (boss->FindCurrentSpellBySpellId(SPELL_STAGGERING_ROAR))
@@ -47,16 +43,12 @@ bool IngvarStaggeringRoarTrigger::IsActive()
 bool IngvarDreadfulRoarTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss)
+    if (!boss) { return false; }
+
+    if (boss->HasUnitState(UNIT_STATE_CASTING) &&
+        boss->FindCurrentSpellBySpellId(SPELL_DREADFUL_ROAR))
     {
-        return false;
-    }
-    if (boss->HasUnitState(UNIT_STATE_CASTING))
-    {
-        if (boss->FindCurrentSpellBySpellId(SPELL_DREADFUL_ROAR))
-        {
-            return true;
-        }
+        return true;
     }
     return false;
 }
@@ -64,10 +56,7 @@ bool IngvarDreadfulRoarTrigger::IsActive()
 bool IngvarSmashTankTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss || !botAI->IsTank(bot))
-    {
-        return false;
-    }
+    if (!boss || !botAI->IsTank(bot)) { return false; }
 
     if (boss->HasUnitState(UNIT_STATE_CASTING))
     {
@@ -86,20 +75,15 @@ bool IngvarSmashTankReturnTrigger::IsActive()
     // if (!boss || !botAI->IsTank(bot) || boss->HasUnitState(UNIT_STATE_CASTING))
     // Ignore casting state as Ingvar will sometimes chain-cast a roar after a smash..
     // We don't want this to prevent our tank from repositioning properly.
-    if (!boss || !botAI->IsTank(bot))
-    {
-        return false;
-    }
+    if (!boss || !botAI->IsTank(bot)) { return false; }
+
     return true;
 }
 
 bool NotBehindIngvarTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss || botAI->IsTank(bot))
-    {
-        return false;
-    }
+    if (!boss || botAI->IsTank(bot)) { return false; }
     
     return AI_VALUE2(bool, "behind", "current target");
 }
