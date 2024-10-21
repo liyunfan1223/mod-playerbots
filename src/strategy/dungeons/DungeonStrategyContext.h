@@ -11,16 +11,14 @@
 #include "wotlk/gundrak/GundrakStrategy.h"
 #include "wotlk/hallsofstone/HallsOfStoneStrategy.h"
 #include "wotlk/hallsoflightning/HallsOfLightningStrategy.h"
+#include "wotlk/utgardepinnacle/UtgardePinnacleStrategy.h"
+#include "wotlk/cullingofstratholme/CullingOfStratholmeStrategy.h"
 
 /*
 Full list/TODO:
 
 The Oculus - Occ
 Drakos the Interrogator, Varos Cloudstrider, Mage-Lord Urom, Ley-Guardian Eregos
-Utgarde Pinnacle - UP
-Svala Sorrowgrave, Gortok Palehoof, Skadi the Ruthless, King Ymiron
-The Culling of Stratholme - CoS
-Meathook, Salramm the Fleshcrafter, Chrono-Lord Epoch, Mal'Ganis, Infinite Corruptor (Heroic only)
 Trial of the Champion - ToC
 Alliance Champions: Deathstalker Visceri, Eressea Dawnsinger, Mokra the Skullcrusher, Runok Wildmane, Zul'tore
 Horde Champions: Ambrose Boltspark, Colosos, Jacob Alerius, Jaelyne Evensong, Lana Stouthammer
@@ -76,11 +74,12 @@ class DungeonStrategyContext : public NamedObjectContext<Strategy>
         static Strategy* wotlk_gd(PlayerbotAI* botAI) { return new WotlkDungeonGDStrategy(botAI); }
         static Strategy* wotlk_hos(PlayerbotAI* botAI) { return new WotlkDungeonHoSStrategy(botAI); }
         static Strategy* wotlk_hol(PlayerbotAI* botAI) { return new WotlkDungeonHoLStrategy(botAI); }
-
+        // static Strategy* wotlk_occ(PlayerbotAI* botAI) { return new WotlkDungeonOccStrategy(botAI); }
         static Strategy* wotlk_occ(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
-        static Strategy* wotlk_up(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
-        static Strategy* wotlk_cos(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
-        static Strategy* wotlk_toc(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
+        static Strategy* wotlk_up(PlayerbotAI* botAI) { return new WotlkDungeonUPStrategy(botAI); }
+        static Strategy* wotlk_cos(PlayerbotAI* botAI) { return new WotlkDungeonCoSStrategy(botAI); }
+        
+        static Strategy* wotlk_toc(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); } // NYI from here down
         static Strategy* wotlk_hor(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_pos(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_fos(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }

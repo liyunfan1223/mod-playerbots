@@ -24,6 +24,19 @@ protected:
     bool AcceptUnit(Unit* unit) override;
 };
 
+class NearestHostileNpcsValue : public NearestUnitsValue
+{
+public:
+    NearestHostileNpcsValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->sightDistance)
+        : NearestUnitsValue(botAI, "nearest hostile npcs", range)
+    {
+    }
+
+protected:
+    void FindUnits(std::list<Unit*>& targets) override;
+    bool AcceptUnit(Unit* unit) override;
+};
+
 class NearestVehiclesValue : public NearestUnitsValue
 {
 public:

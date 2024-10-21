@@ -20,6 +20,15 @@ void NearestNpcsValue::FindUnits(std::list<Unit*>& targets)
 
 bool NearestNpcsValue::AcceptUnit(Unit* unit) { return !unit->IsHostileTo(bot) && !unit->IsPlayer(); }
 
+void NearestHostileNpcsValue::FindUnits(std::list<Unit*>& targets)
+{
+    Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
+    Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
+    Cell::VisitAllObjects(bot, searcher, range);
+}
+
+bool NearestHostileNpcsValue::AcceptUnit(Unit* unit) { return unit->IsHostileTo(bot) && !unit->IsPlayer(); }
+
 void NearestVehiclesValue::FindUnits(std::list<Unit*>& targets)
 {
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
