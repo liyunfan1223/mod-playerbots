@@ -237,10 +237,23 @@ bool LootObject::IsLootPossible(Player* bot)
     if (reqSkillValue > skillValue)
         return false;
 
-    if (skillId == SKILL_MINING && !bot->HasItemCount(2901, 1))
-        return false;
+    if (skillId == SKILL_MINING && !bot->HasItemCount(756, 1) &&
+                                !bot->HasItemCount(778, 1) &&
+                                !bot->HasItemCount(1819, 1) &&
+                                !bot->HasItemCount(1893, 1) &&
+                                !bot->HasItemCount(1959, 1) &&
+                                !bot->HasItemCount(2901, 1) &&
+                                !bot->HasItemCount(9465, 1) &&
+                                !bot->HasItemCount(20723, 1) &&
+                                !bot->HasItemCount(40772, 1) &&
+                                !bot->HasItemCount(40892, 1) &&
+                                !bot->HasItemCount(40893, 1) )
 
-    if (skillId == SKILL_SKINNING && !bot->HasItemCount(7005, 1))
+    if (skillId == SKILL_SKINNING && !bot->HasItemCount(7005, 1) &&
+                                  !bot->HasItemCount(40772, 1) &&
+                                  !bot->HasItemCount(40893, 1) &&
+                                  !bot->HasItemCount(12709, 1) &&
+                                  !bot->HasItemCount(19901, 1) )
         return false;
 
     return true;
