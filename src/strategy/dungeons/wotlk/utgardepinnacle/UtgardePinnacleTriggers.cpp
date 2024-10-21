@@ -11,7 +11,7 @@ bool SkadiFreezingCloudTrigger::IsActive()
     // Need to check two conditions here - the persistent ground effect doesn't
     // seem to be detectable until 3-5 secs in, despite it dealing damage.
     // The initial breath triggers straight away but once it's over, the bots will run back on
-    // to the frezzing cloud and take damage.
+    // to the freezing cloud and take damage.
     // Therefore check both conditions and trigger on either.
 
     // Check this one first, if true then we don't need to iterate over any objects
