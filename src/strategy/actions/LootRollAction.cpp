@@ -36,23 +36,39 @@ bool LootRollAction::Execute(Event event)
         if (!proto)
             continue;
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
-        switch (proto->Class)
+        
+        // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), luckily no other items I found have class bits and epic quality.
+        if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK && proto->Quality == ITEM_QUALITY_EPIC)
         {
-            case ITEM_CLASS_WEAPON:
-            case ITEM_CLASS_ARMOR:
-                if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
-                {
-                    vote = NEED;
-                }
-                else if (usage != ITEM_USAGE_NONE)
-                {
-                    vote = GREED;
-                }
-                break;
-            default:
-                if (StoreLootAction::IsLootAllowed(itemId, botAI))
-                    vote = NEED;
-                break;
+            if (CanBotUseToken(proto, bot))
+            {
+                vote = NEED; // Eligible for "Need"
+            }
+            else
+            {
+                vote = GREED; // Not eligible, so "Greed"
+            }
+        }
+        else
+        {
+            switch (proto->Class)
+            {
+                case ITEM_CLASS_WEAPON:
+                case ITEM_CLASS_ARMOR:
+                    if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
+                    {
+                        vote = NEED;
+                    }
+                    else if (usage != ITEM_USAGE_NONE)
+                    {
+                        vote = GREED;
+                    }
+                    break;
+                default:
+                    if (StoreLootAction::IsLootAllowed(itemId, botAI))
+                        vote = NEED;
+                    break;
+            }
         }
         if (sPlayerbotAIConfig->lootRollLevel == 0)
         {
@@ -80,6 +96,7 @@ bool LootRollAction::Execute(Event event)
                 break;
         }
     }
+	
     // WorldPacket p(event.getPacket()); //WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
     // p.rpos(0); //reset packet pointer
     // p >> guid; //guid of the item rolled
@@ -132,9 +149,9 @@ bool LootRollAction::Execute(Event event)
     //             break;
     //     }
     // }
-
     return true;
 }
+
 
 RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
 {
@@ -165,7 +182,7 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto)
     return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? needVote : PASS;
 }
 
-bool MasterLootRollAction::isUseful() { return !botAI->HasActivePlayerMaster(); };
+bool MasterLootRollAction::isUseful() { return !botAI->HasActivePlayerMaster(); }
 
 bool MasterLootRollAction::Execute(Event event)
 {
@@ -203,4 +220,18 @@ bool MasterLootRollAction::Execute(Event event)
     group->CountRollVote(bot->GetGUID(), creatureGuid, CalculateRollVote(proto));
 
     return true;
+}
+
+bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
+{
+    // Get the bitmask for the bot's class
+    uint32 botClassMask = (1 << (bot->getClass() - 1));
+
+    // Check if the bot's class is allowed to use the token
+    if (proto->AllowableClass & botClassMask)
+    {
+        return true; // Bot's class is eligible to use this token
+    }
+
+    return false; // Bot's class cannot use this token
 }

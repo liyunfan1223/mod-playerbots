@@ -25,6 +25,8 @@ protected:
     RollVote CalculateRollVote(ItemTemplate const* proto);
 };
 
+bool CanBotUseToken(ItemTemplate const* proto, Player* bot);
+
 class MasterLootRollAction : public LootRollAction
 {
 public:
