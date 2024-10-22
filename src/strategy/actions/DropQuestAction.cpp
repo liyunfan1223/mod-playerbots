@@ -101,8 +101,24 @@ bool CleanQuestLogAction::Execute(Event event)
             questLevel = botLevel;
         }
 
+        // Set the level difference for when a quest becomes trivial
+        // This was determined by using the Lua code the client uses
+        int32 trivialLevel = 5;
+        if (botLevel >= 40)
+        {
+            trivialLevel = 8;
+        }
+        else if (botLevel >= 30)
+        {
+            trivialLevel = 7;
+        }
+        else if (botLevel >= 20)
+        {
+            trivialLevel = 6;
+        }
+
         // Check if the quest is trivial (grey) for the bot
-        if ((botLevel - questLevel) >= 5)
+        if ((botLevel - questLevel) >= trivialLevel)
         {
             // Output only if "debug rpg" strategy is enabled
             if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
