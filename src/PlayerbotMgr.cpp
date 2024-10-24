@@ -176,7 +176,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
         botSession->LogoutPlayer(true);
         delete botSession;
     }
-    botLoading.erase(holder.GetGuid());
+    //botLoading.erase(holder.GetGuid());
 }
 
 void PlayerbotHolder::UpdateSessions()
