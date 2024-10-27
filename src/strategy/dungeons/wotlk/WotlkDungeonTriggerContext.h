@@ -10,7 +10,7 @@
 #include "gundrak/GundrakTriggerContext.h"
 #include "hallsofstone/HallsOfStoneTriggerContext.h"
 #include "hallsoflightning/HallsOfLightningTriggerContext.h"
-// #include "oculus/OculusTriggerContext.h"
+#include "oculus/OculusTriggerContext.h"
 #include "utgardepinnacle/UtgardePinnacleTriggerContext.h"
 #include "cullingofstratholme/CullingOfStratholmeTriggerContext.h"
 // #include "trialofthechampion/TrialOfTheChampionTriggerContext.h"

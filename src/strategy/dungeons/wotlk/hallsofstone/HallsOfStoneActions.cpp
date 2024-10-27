@@ -5,10 +5,11 @@
 bool ShatterSpreadAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "krystallus");
-    float radius = 40.0f;
     if (!boss) { return false; }
 
+    float radius = 40.0f;
     Unit* closestMember = nullptr;
+    
     GuidVector members = AI_VALUE(GuidVector, "group members");
     for (auto& member : members)
     {
