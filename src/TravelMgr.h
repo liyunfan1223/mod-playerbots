@@ -10,6 +10,7 @@
 #include <random>
 
 #include "AiObject.h"
+#include "Corpse.h"
 #include "CreatureData.h"
 #include "GameObject.h"
 #include "GridDefines.h"
