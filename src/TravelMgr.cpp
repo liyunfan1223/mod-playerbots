@@ -10,6 +10,7 @@
 
 #include "CellImpl.h"
 #include "ChatHelper.h"
+#include "Corpse.h"
 #include "MMapFactory.h"
 #include "MapMgr.h"
 #include "PathGenerator.h"
