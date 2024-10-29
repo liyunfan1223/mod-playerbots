@@ -439,6 +439,7 @@ void PlayerbotFactory::Refresh()
     // {
     //     InitEquipment(true);
     // }
+    botAI->DoSpecificAction("equip upgrades");
     ClearInventory();
     InitAmmo();
     InitFood();
@@ -461,6 +462,7 @@ void PlayerbotFactory::Refresh()
         if (bot->GetFreeTalentPoints() >= LeveltoPoints(bot->GetLevel())) 
         {
             ChooseBestSpecBasedOnGear();
+            botAI->DoSpecificAction("equip upgrades");
         }
     }
     InitPet();
