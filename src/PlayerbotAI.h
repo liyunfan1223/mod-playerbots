@@ -255,11 +255,12 @@ enum class ActivePiorityType : uint8
     NEARBY_PLAYER = 9,
     PLAYER_FRIEND = 10,
     PLAYER_GUILD = 11,
-    IN_ACTIVE_AREA = 12,
+    IN_VERY_ACTIVE_AREA = 12,
     IN_ACTIVE_MAP = 13,
-    IN_INACTIVE_MAP = 14,
+    IN_NOT_ACTIVE_MAP = 14,
     IN_EMPTY_SERVER = 15,
-    MAX_TYPE
+    ALLOWED_PARTY_ACTIVITY = 16,
+    DEFAULT
 };
 
 enum ActivityType
@@ -547,9 +548,9 @@ public:
     bool HasPlayerNearby(float range = sPlayerbotAIConfig->reactDistance);
     bool HasManyPlayersNearby(uint32 trigerrValue = 20, float range = sPlayerbotAIConfig->sightDistance);
     ActivePiorityType GetPriorityType(ActivityType activityType);
-    std::pair<uint32, uint32> GetPriorityBracket(ActivePiorityType type);
     bool AllowActive(ActivityType activityType);
     bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
+    uint32 SmartScaleActivity(ActivePiorityType type, uint32 botActiveAlonePerc);
 
     // Check if player is safe to use.
     bool IsSafe(Player* player);

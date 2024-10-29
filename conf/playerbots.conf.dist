@@ -728,7 +728,7 @@ AiPlayerbot.FastReactInBG = 1
 #
 
 # All In seconds
-AiPlayerbot.RandomBotUpdateInterval = 20
+AiPlayerbot.RandomBotUpdateInterval = 1
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
 AiPlayerbot.MinRandomBotInWorldTime = 3600
@@ -1459,16 +1459,10 @@ AiPlayerbot.BotActiveAlone = 100
 
 # Specify smart scaling is enabled or not.
 # The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
-AiPlayerbot.botActiveAloneSmartScale = 1
-
 # Only when botLevel is between WhenMinLevel and WhenMaxLevel.
+AiPlayerbot.botActiveAloneSmartScale = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
-
-# The server will tune bot activity to reach the desired server tick speed (in ms)
-# bots will only join battleground when there is no lag based on latency diffs below
-AiPlayerbot.botActiveAloneSmartScaleDiffWithPlayer = 100
-AiPlayerbot.botActiveAloneSmartScaleDiffEmpty = 200
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
