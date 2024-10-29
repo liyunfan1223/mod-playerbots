@@ -995,32 +995,32 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
     
     uint32 randomTime;
-     if (!player)
-     {
-         AddPlayerBot(botGUID, 0);
-         randomTime = urand(1, 2);
-         SetEventValue(bot, "login", 1, randomTime);
+    if (!player)
+    {
+        AddPlayerBot(botGUID, 0);
+        randomTime = urand(1, 2);
+        SetEventValue(bot, "login", 1, randomTime);
 
-         uint32 updateIntervalTurboBoost = isBotInitializing() ? 1 : sPlayerbotAIConfig->randomBotUpdateInterval;
-         randomTime = urand(std::max(5, static_cast<int>(updateIntervalTurboBoost * 0.5)),
-                            std::max(10, static_cast<int>(updateIntervalTurboBoost * 2)));
-         SetEventValue(bot, "update", 1, randomTime);
+        uint32 updateIntervalTurboBoost = isBotInitializing() ? 1 : sPlayerbotAIConfig->randomBotUpdateInterval;
+        randomTime = urand(std::max(5, static_cast<int>(updateIntervalTurboBoost * 0.5)),
+                        std::max(12, static_cast<int>(updateIntervalTurboBoost * 2)));
+        SetEventValue(bot, "update", 1, randomTime);
 
-         // do not randomize or teleport immediately after server start (prevent lagging)
-         if (!GetEventValue(bot, "randomize"))
-         {
-             randomTime = urand(3, std::max(4, static_cast<int>(updateIntervalTurboBoost * 0.4)));
-             ScheduleRandomize(bot, randomTime);
-         }
-         if (!GetEventValue(bot, "teleport"))
-         {
-             randomTime = urand(std::max(7, static_cast<int>(updateIntervalTurboBoost * 0.7)),
-                                std::max(14, static_cast<int>(updateIntervalTurboBoost * 1.4)));
-             ScheduleTeleport(bot, randomTime);
-         }
+        // do not randomize or teleport immediately after server start (prevent lagging)
+        if (!GetEventValue(bot, "randomize"))
+        {
+            randomTime = urand(3, std::max(4, static_cast<int>(updateIntervalTurboBoost * 0.4)));
+            ScheduleRandomize(bot, randomTime);
+        }
+        if (!GetEventValue(bot, "teleport"))
+        {
+            randomTime = urand(std::max(7, static_cast<int>(updateIntervalTurboBoost * 0.7)),
+                            std::max(14, static_cast<int>(updateIntervalTurboBoost * 1.4)));
+            ScheduleTeleport(bot, randomTime);
+        }
 
-         return true;
-     }
+        return true;
+    }
 
     SetEventValue(bot, "login", 0, 0);
 
