@@ -4254,7 +4254,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     }
 
     // Bots do not need to move using PathGenerator.
-    if (activityType == DETAILED_MOVE_ACTIVITY) return false;
+    //if (activityType == DETAILED_MOVE_ACTIVITY) return false;
 
     // All exceptions are now done, below is the code to have a specified % of bots
     // active at all times. The default is 10%. With 0.1% of all bots going active
@@ -4307,21 +4307,18 @@ uint32 PlayerbotAI::SmartScaleActivity(ActivePiorityType type, uint32 botActiveA
         case ActivePiorityType::PLAYER_FRIEND:
         case ActivePiorityType::PLAYER_GUILD:
         case ActivePiorityType::IN_ACTIVE_MAP:
-            if (maxDiff > 200) return 10;
-            if (maxDiff > 150) return 25;
+            if (maxDiff > 200) return 25;
             if (maxDiff > 100) return 50;
             if (maxDiff > 50)  return 80;
             break; 
         case ActivePiorityType::IN_VERY_ACTIVE_AREA:  // Many bots nearby. Do not do heavy area checks.
         case ActivePiorityType::IN_NOT_ACTIVE_MAP:
-            if (maxDiff > 100) return 10;
-            if (maxDiff > 50)  return 25;
-            else return 30;
+            if (maxDiff > 100) return 25;
+            if (maxDiff > 50)  return 50;
         case ActivePiorityType::IN_EMPTY_SERVER:
-            return 10;
+            return 25;
         default:
-            if (maxDiff > 200) return 10;
-            if (maxDiff > 150) return 25;
+            if (maxDiff > 200) return 25;
             if (maxDiff > 100) return 50;
             break;
     }
