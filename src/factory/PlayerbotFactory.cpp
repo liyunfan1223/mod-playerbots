@@ -448,6 +448,21 @@ void PlayerbotFactory::Refresh()
     {
         InitTalentsTree(true, true, true);
     }
+    // Check if bot is above persistence level and has 0/0/0 talents. Try and pick a talent spec based on current gear.
+    if (sPlayerbotAIConfig->equipmentPersistence && bot->GetLevel() >= sPlayerbotAIConfig->equipmentPersistenceLevel)
+    {
+        // Define LeveltoPoints as a lambda function within the block
+        auto LeveltoPoints = [](uint32 level) -> uint32 {
+            uint32 talentPointsForLevel = level < 10 ? 0 : level - 9;
+            return static_cast<uint32>(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
+        };
+        
+        // Only re-evaluate spec based on gear if bot still has unspent talent points, indicating no assigned spec
+        if (bot->GetFreeTalentPoints() >= LeveltoPoints(bot->GetLevel())) 
+        {
+            ChooseBestSpecBasedOnGear();
+        }
+    }
     InitPet();
     InitPetTalents();
     InitClassSpells();
@@ -4206,4 +4221,77 @@ void PlayerbotFactory::IterateItemsInBank(IterateItemsVisitor* visitor)
             }
         }
     }
+}
+//Can be used in case a bot has lost their talents points to pick a spec based on gear score for each spec
+void PlayerbotFactory::ChooseBestSpecBasedOnGear()
+{
+    // Define LeveltoPoints as a lambda function within the block
+    auto LeveltoPoints = [](uint32 level) -> uint32 {
+        uint32 talentPointsForLevel = level < 10 ? 0 : level - 9;
+        return static_cast<uint32>(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
+    };
+
+    // Check if the bot has all talent points unspent (e.g., 0/0/0 talents)
+    if (bot->GetFreeTalentPoints() >= LeveltoPoints(bot->GetLevel()))
+    {
+        uint8 bestSpec = 0;
+        float highestScore = 0.0f;
+        bool debugrpgEnabled = botAI->HasStrategy("debug rpg", BotState::BOT_STATE_NON_COMBAT);
+        uint8 originalSpec = AiFactory::GetPlayerSpecTab(bot);
+
+        // Retrieve the count of available specs for the bot’s class
+        uint8 specCount = GetAvailableSpecsCount(bot->getClass());
+        for (uint8 spec = 0; spec < specCount; ++spec)
+        {
+            // Temporarily set the bot's spec
+            InitTalentsBySpecNo(bot, spec, /*reset=*/true);
+            StatsWeightCalculator calculator(bot);
+            float totalScore = 0.0f;
+
+            for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+            {
+                Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+                if (!item) continue;
+
+                float itemScore = calculator.CalculateItem(item->GetTemplate()->ItemId);
+                totalScore += itemScore;
+            }
+
+            if (debugrpgEnabled)
+            {
+                std::string specName = AiFactory::GetPlayerSpecName(bot);
+                botAI->TellMaster(specName + " score: " + std::to_string(totalScore));
+            }
+
+            if (totalScore > highestScore)
+            {
+                highestScore = totalScore;
+                bestSpec = spec;
+            }
+        }
+
+        // Apply the best spec
+        InitTalentsBySpecNo(bot, bestSpec, /*reset=*/true);
+        sRandomPlayerbotMgr->SetValue(bot->GetGUID().GetCounter(), "specNo", bestSpec);
+        InitTalentsTree(/*increment=*/true, /*use_template=*/true, /*reset=*/true);
+        LOG_INFO("playerbots", "Bot {} assigned spec {} based on gear alignment score {}", bot->GetName(), bestSpec, highestScore);
+    }
+}
+
+
+uint32 PlayerbotFactory::GetAvailableSpecsCount(uint8 botClass) const
+{
+    uint8 specCount = 0;
+    for (int specNo = 0; specNo < MAX_SPECNO; ++specNo)
+    {
+        if (!sPlayerbotAIConfig->premadeSpecName[botClass][specNo].empty())
+        {
+            ++specCount;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return specCount;
 }
