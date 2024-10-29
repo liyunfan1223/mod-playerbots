@@ -3853,6 +3853,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
     int32 bestGemEnchantId[4] = {-1, -1, -1, -1};  // 1, 2, 4, 8 color
     float bestGemScore[4] = {0, 0, 0, 0};
     std::vector<uint32> curCount = GetCurrentGemsCount();
+    uint8 jewelersCount = 0;
     int requiredActive = bot->GetLevel() <= 70 ? 2 : 1;
     std::vector<uint32> availableGems;
     for (const uint32& enchantGem : enchantGemIdCache)
@@ -3982,6 +3983,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             }
             int32 enchantIdChosen = -1;
             int32 colorChosen;
+            bool jewelersGemChosen;
             float bestGemScore = -1;
             for (uint32& enchantGem : availableGems)
             {
@@ -3989,6 +3991,11 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 if (!gemTemplate)
                     continue;
 
+                // Limit jewelers (JC) epic gems to 3
+                bool isJewelersGem = gemTemplate->ItemLimitCategory == 2;
+                if (isJewelersGem && jewelersCount >= 3)
+                    continue;
+                
                 const GemPropertiesEntry* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
                 if (!gemProperties)
                     continue;
@@ -4022,6 +4029,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                     enchantIdChosen = enchant_id;
                     colorChosen = gemProperties->color;
                     bestGemScore = score;
+                    jewelersGemChosen = isJewelersGem;
                 }
             }
             if (enchantIdChosen == -1)
@@ -4030,6 +4038,8 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             item->SetEnchantment(EnchantmentSlot(enchant_slot), enchantIdChosen, 0, 0, bot->GetGUID());
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), true);
             curCount = GetCurrentGemsCount();
+            if (jewelersGemChosen)
+                ++jewelersCount;
         }
     }
 }
