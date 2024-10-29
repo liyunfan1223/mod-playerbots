@@ -165,8 +165,8 @@ public:
 
     static uint8 GetTeamClassIdx(bool isAlliance, uint8 claz) { return isAlliance * 20 + claz; }
 
-    bool isBotInitCompleted() const { return _isBotInitCompleted; }
-    void setIsBotInitCompleted(bool completed) { _isBotInitCompleted = completed; }
+    bool isBotInitializing() const { return _isBotInitializing; }
+    void setBotInitializing(bool completed) { _isBotInitializing = completed; }
 
     void PrepareAddclassCache();
     std::map<uint8, std::vector<ObjectGuid>> addclassCache;
@@ -176,7 +176,7 @@ protected:
 private:
     // pid values are set in constructor
     botPID pid = botPID(1, 50, -50, 0, 0, 0);
-    bool _isBotInitCompleted = false;
+    bool _isBotInitializing = true;
     uint32 GetEventValue(uint32 bot, std::string const event);
     std::string const GetEventData(uint32 bot, std::string const event);
     uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn,
