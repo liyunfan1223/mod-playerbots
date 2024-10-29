@@ -136,6 +136,8 @@ public:
     void ApplyEnchantAndGemsNew(bool destoryOld = true);
     void InitInstanceQuests();
     void UnbindInstance();
+    void ChooseBestSpecBasedOnGear();
+    uint32 GetAvailableSpecsCount(uint8 botClass) const;
 
 private:
     void Prepare();
