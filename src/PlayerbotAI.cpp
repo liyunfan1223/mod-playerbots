@@ -4219,8 +4219,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
     // no activity allowed during bot initialization during first
     // few minutes after starting the server based on maxRandomBots.
-    if (!sRandomPlayerbotMgr->isBotInitCompleted() &&
-        GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.15)
+    if (sRandomPlayerbotMgr->isBotInitializing())
         return false;
 
     // General exceptions
