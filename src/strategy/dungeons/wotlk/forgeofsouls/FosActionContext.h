@@ -1,5 +1,5 @@
-#ifndef _PLAYERBOT_WOTLKDUNGEONNEXACTIONCONTEXT_H
-#define _PLAYERBOT_WOTLKDUNGEONNEXACTIONCONTEXT_H
+#ifndef _PLAYERBOT_WOTLKDUNGEONFOSACTIONCONTEXT_H
+#define _PLAYERBOT_WOTLKDUNGEONFOSACTIONCONTEXT_H
 
 #include "Action.h"
 #include "NamedObjectContext.h"
@@ -9,17 +9,18 @@ class WotlkDungeonFosActionContext : public NamedObjectContext<Action>
 {
     public:
         WotlkDungeonFosActionContext() {
-            creators["csf target"] = &WotlkDungeonFosActionContext::move_from_whirlwind;
-            creators["firebomb spread"] = &WotlkDungeonNexActionContext::firebomb_spread;
+            creators["move from bronjahm"] = &WotlkDungeonFosActionContext::move_from_bronjahm;
+            creators["attack corrupted soul fragment"] = &WotlkDungeonFosActionContext::attack_corrupted_soul_fragment;
+            creators["bronjahm tank position"] = &WotlkDungeonFosActionContext::bronjahm_tank_position;
+            creators["bronjahm tank target"] = &WotlkDungeonFosActionContext::bronjahm_tank_target;
+            creators["bronjahm dps position"] = &WotlkDungeonFosActionContext::bronjahm_dps_position;
         }
     private:
-        static Action* move_from_whirlwind(PlayerbotAI* ai) { return new MoveFromWhirlwindAction(ai); }
-        static Action* firebomb_spread(PlayerbotAI* ai) { return new FirebombSpreadAction(ai); }
-        static Action* telestra_split_target(PlayerbotAI* ai) { return new TelestraSplitTargetAction(ai); }
-        static Action* csf_target(PlayerbotAI* ai) { return new }
-        static Action* chaotic_rift_target(PlayerbotAI* ai) { return new ChaoticRiftTargetAction(ai); }
-        static Action* dodge_spikes(PlayerbotAI* ai) { return new DodgeSpikesAction(ai); }
-        static Action* intense_cold_jump(PlayerbotAI* ai) { return new IntenseColdJumpAction(ai); }
+        static Action* move_from_bronjahm(PlayerbotAI* ai) { return new MoveFromBronjahmAction(ai); }
+        static Action* attack_corrupted_soul_fragment(PlayerbotAI* ai) { return new AttackCorruptedSoulFragmentAction(ai); }
+        static Action* bronjahm_tank_position(PlayerbotAI* ai) { return new BronjahmTankPositionAction(ai); }
+        static Action* bronjahm_tank_target(PlayerbotAI* ai) { return new BronjahmTankTargetAction(ai); }
+        static Action* bronjahm_dps_position(PlayerbotAI* ai) { return new BronjahmDpsPositionAction(ai); }
 };
 
 #endif

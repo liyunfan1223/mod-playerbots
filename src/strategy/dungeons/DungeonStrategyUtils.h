@@ -1,6 +1,6 @@
 #ifndef _PLAYERBOT_DUNGEONUTILS_H
 #define _PLAYERBOT_DUNGEONUTILS_H
-
+#include "Player.h"
 
 template<class T> inline
 const T& DUNGEON_MODE(Player* bot, const T& normal5, const T& heroic10)
