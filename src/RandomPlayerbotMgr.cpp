@@ -315,8 +315,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     }
 
     setBotInitializing(
-        onlineBotCount < maxAllowedBotCount &&
-        GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.15);
+        //onlineBotCount < maxAllowedBotCount && <-- these fields are incorrect when using bot amount min/max are not equal.
+        GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12);
 
     // when server is balancing bots then boost (decrease value of) the nextCheckDelay till
     // onlineBotCount reached the AllowedBotCount.
