@@ -4124,10 +4124,6 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
     if (!WorldPosition(bot).isOverworld())
         return ActivePiorityType::IN_INSTANCE;
 
-    //VISIBLE_FOR_PLAYER
-    if (HasPlayerNearby(sPlayerbotAIConfig->reactDistance))
-        return ActivePiorityType::VISIBLE_FOR_PLAYER;
-
     //IN_COMBAT
     if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
     {
@@ -4136,9 +4132,15 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
             return ActivePiorityType::IN_COMBAT;
     }
 
-    //NEARBY_PLAYER
+    // IN_REACT_DISTANCE
+    if (HasPlayerNearby(sPlayerbotAIConfig->reactDistance))
+        return ActivePiorityType::IN_REACT_DISTANCE;
+
+    // NEARBY_PLAYER acitivity based on yards.
     if (HasPlayerNearby(300.f))
-        return ActivePiorityType::NEARBY_PLAYER;
+        return ActivePiorityType::NEARBY_PLAYER_300;
+    if (HasPlayerNearby(600.f))
+        return ActivePiorityType::NEARBY_PLAYER_600;
 
     //if (sPlayerbotAIConfig->IsFreeAltBot(bot) || HasStrategy("travel once", BotState::BOT_STATE_NON_COMBAT))
     //    return ActivePiorityType::IS_ALWAYS_ACTIVE;
@@ -4205,7 +4207,7 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
         }
     }
 
-    // IN_ACTIVE_AREA
+    // IN_VERY_ACTIVE_AREA
     if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
     {
         if (HasManyPlayersNearby(20, sPlayerbotAIConfig->sightDistance))
@@ -4219,15 +4221,17 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
     // no activity allowed during bot initialization during first
     // few minutes after starting the server based on maxRandomBots.
-    if (!sRandomPlayerbotMgr->isBotInitCompleted() &&
-        GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.15)
+    if (sRandomPlayerbotMgr->isBotInitializing())
         return false;
 
     // General exceptions
     if (activityType == PACKET_ACTIVITY)
         return true;
 
+    uint32 botActiveAlonePerc = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
+    uint32 mod = botActiveAlonePerc;
     ActivePiorityType type = GetPriorityType(activityType);
+
     switch (type)
     {
         case ActivePiorityType::HAS_REAL_PLAYER_MASTER:
@@ -4235,8 +4239,8 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         case ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER:
         case ActivePiorityType::IN_INSTANCE:
         case ActivePiorityType::IN_COMBAT:
-        case ActivePiorityType::NEARBY_PLAYER:
-        case ActivePiorityType::VISIBLE_FOR_PLAYER:
+        case ActivePiorityType::IN_REACT_DISTANCE:
+        case ActivePiorityType::NEARBY_PLAYER_300:
         case ActivePiorityType::IS_ALWAYS_ACTIVE:
             return true;
             break;
@@ -4255,17 +4259,12 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     }
 
     // Bots do not need to move using PathGenerator.
-    if (activityType == DETAILED_MOVE_ACTIVITY) return false;
+    //if (activityType == DETAILED_MOVE_ACTIVITY) return false;
 
     // All exceptions are now done, below is the code to have a specified % of bots
     // active at all times. The default is 10%. With 0.1% of all bots going active
     // or inactive each minute.
     if (sPlayerbotAIConfig->botActiveAlone <= 0) return false;
-
-    // Normalize the configured botActiveAlone value, and set as default mod.
-    uint32 botActiveAlonePerc = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
-    uint32 mod = botActiveAlonePerc;
-
     if (sPlayerbotAIConfig->botActiveAloneSmartScale &&
         bot->GetLevel() >= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMinLevel &&
         bot->GetLevel() <= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMaxLevel)
@@ -4303,26 +4302,28 @@ uint32 PlayerbotAI::SmartScaleActivity(ActivePiorityType type, uint32 botActiveA
         case ActivePiorityType::IN_BG_QUEUE:
         case ActivePiorityType::IN_LFG:
             if (maxDiff > 100) return 80;
-            if (maxDiff > 50)  return 90;
+            if (maxDiff > 100) return 90;
+            break;
+        case ActivePiorityType::NEARBY_PLAYER_600:
+            if (maxDiff > 100) return 50;
+            if (maxDiff > 50)  return 75;
             break;
         case ActivePiorityType::PLAYER_FRIEND:
         case ActivePiorityType::PLAYER_GUILD:
         case ActivePiorityType::IN_ACTIVE_MAP:
-            if (maxDiff > 200) return 10;
-            if (maxDiff > 150) return 25;
+            if (maxDiff > 200) return 30;
             if (maxDiff > 100) return 50;
-            if (maxDiff > 50)  return 80;
-            break; 
-        case ActivePiorityType::IN_VERY_ACTIVE_AREA:  // Many bots nearby. Do not do heavy area checks.
+            if (maxDiff > 50)  return 75;
+            break;
+        case ActivePiorityType::IN_VERY_ACTIVE_AREA:
         case ActivePiorityType::IN_NOT_ACTIVE_MAP:
-            if (maxDiff > 100) return 10;
-            if (maxDiff > 50)  return 25;
-            else return 30;
+            if (maxDiff > 100) return 30;
+            if (maxDiff > 50)  return 50;
+            break;
         case ActivePiorityType::IN_EMPTY_SERVER:
-            return 10;
+            return 30;
         default:
-            if (maxDiff > 200) return 10;
-            if (maxDiff > 150) return 25;
+            if (maxDiff > 200) return 30;
             if (maxDiff > 100) return 50;
             break;
     }
