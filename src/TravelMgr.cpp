@@ -18,6 +18,7 @@
 #include "TransportMgr.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "Corpse.h"
 
 WorldPosition::WorldPosition(std::string const str)
 {

@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "RandomPlayerbotMgr.h"
 #include "ServerFacade.h"
+#include "Corpse.h"
 
 bool ReviveFromCorpseAction::Execute(Event event)
 {
