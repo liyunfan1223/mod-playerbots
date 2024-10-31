@@ -8,15 +8,17 @@
 
 float KrikthirMultiplier::GetValue(Action* action)
 {
+    if (!botAI->IsDps(bot)) { return 1.0f; }
+    
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name
     Unit* boss = nullptr;
     Unit* watcher = nullptr;
-    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    for (auto i = targets.begin(); i != targets.end(); ++i)
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+    for (auto& target : targets)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit* unit = botAI->GetUnit(target);
         if (!unit) { continue; }
 
         switch (unit->GetEntry())
