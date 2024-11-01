@@ -164,7 +164,10 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
         sPlayerbotCommandServer->Start();
         PrepareTeleportCache();
     }
-
+    if (!sPlayerbotAIConfig->randomBotAutologin)
+    {
+        setBotInitializing(false);
+    }
     BattlegroundData.clear();
 
     BgCheckTimer = 0;
