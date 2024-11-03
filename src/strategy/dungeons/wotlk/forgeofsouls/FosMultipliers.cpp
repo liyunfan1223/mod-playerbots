@@ -48,5 +48,8 @@ float AttackFragmentMultiplier::GetValue(Action* action)
     if (fragment && dynamic_cast<BronjahmDpsPositionAction*>(action))
         return 0.0f;
 
+    if (fragment && dynamic_cast<DpsAssistAction*>(action))
+        return 0.0f;
+
     return 1.0f;
 }
