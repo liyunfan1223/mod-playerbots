@@ -8,6 +8,7 @@
 #include <cmath>
 #include <sstream>
 #include <string>
+#include <mutex>
 
 #include "AiFactory.h"
 #include "BudgetValues.h"
@@ -2452,8 +2453,12 @@ bool PlayerbotAI::SayToWorld(const std::string& msg)
 
 bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chanId)
 {
+    // Checks whether the message or ChannelMgr is valid
+    if (msg.empty())
+        return false;
+
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
-    if (!cMgr || msg.empty())
+    if (!cMgr)
         return false;
 
     AreaTableEntry const* current_zone = GetCurrentZone();
@@ -2461,11 +2466,24 @@ bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chan
         return false;
 
     const auto current_str_zone = GetLocalizedAreaName(current_zone);
+
+    std::mutex socialMutex;
+    std::lock_guard<std::mutex> lock(socialMutex);  // Blocking for thread safety when accessing SocialMgr
+
     for (auto const& [key, channel] : cMgr->GetChannels())
     {
-        // check for current zone
-        if (channel && channel->GetChannelId() == chanId)
+        // Checks if the channel pointer is valid
+        if (!channel)
+            continue;
+
+        // Checks if the channel matches the specified ChatChannelId
+        if (channel->GetChannelId() == chanId)
         {
+            // If the channel name is empty, skip it to avoid access problems
+            if (channel->GetName().empty())
+                continue;
+
+            // Checks if the channel name contains the current zone
             const auto does_contains = channel->GetName().find(current_str_zone) != std::string::npos;
             if (chanId != ChatChannelId::LOOKING_FOR_GROUP && chanId != ChatChannelId::WORLD_DEFENSE && !does_contains)
             {
@@ -2473,11 +2491,15 @@ bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chan
             }
             else if (chanId == ChatChannelId::LOOKING_FOR_GROUP || chanId == ChatChannelId::WORLD_DEFENSE)
             {
-                // check if capitals then return false if not
+                // Here you can add the capital check if necessary
             }
 
-            channel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
-            return true;
+            // Final check to ensure the channel is correct before trying to say something
+            if (channel)
+            {
+                channel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+                return true;
+            }
         }
     }
 
