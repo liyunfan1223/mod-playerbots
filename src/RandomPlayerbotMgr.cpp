@@ -40,7 +40,6 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "World.h"
-#include "GameTime.h"
 
 void PrintStatsThread() { sRandomPlayerbotMgr->PrintStats(); }
 
@@ -293,6 +292,15 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     if (!sPlayerbotAIConfig->randomBotAutologin || !sPlayerbotAIConfig->enabled)
         return;
 
+   /* if (sPlayerbotAIConfig->enablePrototypePerformanceDiff)
+    {
+        LOG_INFO("playerbots", "---------------------------------------");
+        LOG_INFO("playerbots",
+                 "PROTOTYPE: Playerbot performance enhancements are active. Issues and instability may occur.");
+        LOG_INFO("playerbots", "---------------------------------------");
+        ScaleBotActivity();
+    }*/
+
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
     if (!maxAllowedBotCount || (maxAllowedBotCount < sPlayerbotAIConfig->minRandomBots ||
                                 maxAllowedBotCount > sPlayerbotAIConfig->maxRandomBots))
@@ -310,13 +318,11 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
 
     uint32 onlineBotFocus = 75;
     if (onlineBotCount < (uint32)(sPlayerbotAIConfig->minRandomBots * 90 / 100))
-    {
         onlineBotFocus = 25;
-    }
 
-    setBotInitializing(
-        //onlineBotCount < maxAllowedBotCount && <-- these fields are incorrect when using bot amount min/max are not equal.
-        GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12);
+    setIsBotInitializing(
+        onlineBotCount < maxAllowedBotCount &&
+        GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.15);
 
     // when server is balancing bots then boost (decrease value of) the nextCheckDelay till
     // onlineBotCount reached the AllowedBotCount.
@@ -403,6 +409,26 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         LogPlayerLocation();
     }
 }
+
+//void RandomPlayerbotMgr::ScaleBotActivity()
+//{
+//    float activityPercentage = getActivityPercentage();
+//
+//    // if (activityPercentage >= 100.0f || activityPercentage <= 0.0f) pid.reset(); //Stop integer buildup during
+//    // max/min activity
+//
+//    //    % increase/decrease                   wanted diff                                         , avg diff
+//    float activityPercentageMod = pid.calculate(
+//        sRandomPlayerbotMgr->GetPlayers().empty() ? sPlayerbotAIConfig->diffEmpty : sPlayerbotAIConfig->diffWithPlayer,
+//        sWorldUpdateTime.GetAverageUpdateTime());
+//
+//    activityPercentage = activityPercentageMod + 50;
+//
+//    // Cap the percentage between 0 and 100.
+//    activityPercentage = std::max(0.0f, std::min(100.0f, activityPercentage));
+//
+//    setActivityPercentage(activityPercentage);
+//}
 
 uint32 RandomPlayerbotMgr::AddRandomBots()
 {
@@ -939,15 +965,12 @@ void RandomPlayerbotMgr::CheckPlayers()
     LOG_INFO("playerbots", "Max player level is {}, max bot level set to {}", playersLevel - 3, playersLevel);
 }
 
-void RandomPlayerbotMgr::ScheduleRandomize(uint32 bot, uint32 time)
-{
-    SetEventValue(bot, "randomize", 1, time);
-}
+void RandomPlayerbotMgr::ScheduleRandomize(uint32 bot, uint32 time) { SetEventValue(bot, "randomize", 1, time); }
 
 void RandomPlayerbotMgr::ScheduleTeleport(uint32 bot, uint32 time)
 {
     if (!time)
-        time = 60 + urand(sPlayerbotAIConfig->randomBotUpdateInterval, sPlayerbotAIConfig->randomBotUpdateInterval * 3);
+        time = urand(sPlayerbotAIConfig->randomBotUpdateInterval, sPlayerbotAIConfig->randomBotUpdateInterval * 2);
 
     SetEventValue(bot, "teleport", 1, time);
 }
@@ -993,7 +1016,6 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     if (isLogginIn)
         return false;
 
-    
     uint32 randomTime;
     if (!player)
     {
@@ -1003,7 +1025,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
         uint32 updateIntervalTurboBoost = isBotInitializing() ? 1 : sPlayerbotAIConfig->randomBotUpdateInterval;
         randomTime = urand(std::max(5, static_cast<int>(updateIntervalTurboBoost * 0.5)),
-                        std::max(12, static_cast<int>(updateIntervalTurboBoost * 2)));
+                           std::max(12, static_cast<int>(updateIntervalTurboBoost * 2)));
         SetEventValue(bot, "update", 1, randomTime);
 
         // do not randomize or teleport immediately after server start (prevent lagging)
@@ -1015,7 +1037,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         if (!GetEventValue(bot, "teleport"))
         {
             randomTime = urand(std::max(7, static_cast<int>(updateIntervalTurboBoost * 0.7)),
-                            std::max(14, static_cast<int>(updateIntervalTurboBoost * 1.4)));
+                               std::max(14, static_cast<int>(updateIntervalTurboBoost * 1.4)));
             ScheduleTeleport(bot, randomTime);
         }
 
@@ -1059,9 +1081,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         if (update)
             ProcessBot(player);
 
-        randomTime = urand(
-            sPlayerbotAIConfig->minRandomBotReviveTime,
-            sPlayerbotAIConfig->maxRandomBotReviveTime);
+        randomTime = urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
         SetEventValue(bot, "update", 1, randomTime);
 
         return true;
@@ -1074,9 +1094,8 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
                  player->GetLevel(), player->GetName().c_str());
         LogoutPlayerBot(botGUID);
         currentBots.remove(bot);
-        SetEventValue(bot, "logout", 1, urand(
-            sPlayerbotAIConfig->minRandomBotInWorldTime, 
-            sPlayerbotAIConfig->maxRandomBotInWorldTime));
+        SetEventValue(bot, "logout", 1,
+                      urand(sPlayerbotAIConfig->minRandomBotInWorldTime, sPlayerbotAIConfig->maxRandomBotInWorldTime));
         return true;
     }
 
@@ -1085,9 +1104,6 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
 bool RandomPlayerbotMgr::ProcessBot(Player* player)
 {
-    if (!player || !player->IsInWorld() || player->IsBeingTeleported() || player->GetSession()->isLogingOut())
-        return false;
-
     uint32 bot = player->GetGUID().GetCounter();
 
     if (player->InBattleground())
@@ -1101,11 +1117,10 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     {
         if (!GetEventValue(bot, "dead"))
         {
-            uint32 randomTime = urand(
-                sPlayerbotAIConfig->minRandomBotReviveTime, 
-                sPlayerbotAIConfig->maxRandomBotReviveTime);
-            LOG_INFO("playerbots", "Mark bot {} as dead, will be revived in {}s.", 
-                player->GetName().c_str(), randomTime);
+            uint32 randomTime =
+                urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
+            LOG_INFO("playerbots", "Mark bot {} as dead, will be revived in {}s.", player->GetName().c_str(),
+                     randomTime);
             SetEventValue(bot, "dead", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
             SetEventValue(bot, "revive", 1, randomTime);
             return false;
@@ -1128,11 +1143,10 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         LOG_INFO("playerbots", "Bot {} remove from group since leader is random bot.", player->GetName().c_str());
     }
 
-
     // only randomize and teleport idle bots
     bool idleBot = false;
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
-    if (botAI) 
+    if (botAI)
     {
         if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
         {
@@ -1141,10 +1155,10 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
                 idleBot = true;
             }
         }
-        else 
+        else
         {
             idleBot = true;
-        }   
+        }
     }
     if (idleBot)
     {
@@ -1152,7 +1166,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         uint32 randomize = GetEventValue(bot, "randomize");
         if (!randomize)
         {
-             // bool randomiser = true;
+            // bool randomiser = true;
             // if (player->GetGuildId())
             // {
             //     if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
@@ -1174,11 +1188,10 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
             // if (randomiser)
             // {
             Randomize(player);
-            LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: randomized", 
-                bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->GetLevel(), player->GetName());
-            uint32 randomTime = urand(
-                sPlayerbotAIConfig->minRandomBotRandomizeTime, 
-                sPlayerbotAIConfig->maxRandomBotRandomizeTime); 
+            LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: randomized", bot,
+                     player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->GetLevel(), player->GetName());
+            uint32 randomTime =
+                urand(sPlayerbotAIConfig->minRandomBotRandomizeTime, sPlayerbotAIConfig->maxRandomBotRandomizeTime);
             ScheduleRandomize(bot, randomTime);
             return true;
         }
@@ -1197,9 +1210,8 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
             LOG_INFO("playerbots", "Bot #{} <{}>: teleport for level and refresh", bot, player->GetName());
             Refresh(player);
             RandomTeleportForLevel(player);
-            uint32 time = urand(
-                sPlayerbotAIConfig->minRandomBotTeleportInterval, 
-                sPlayerbotAIConfig->maxRandomBotTeleportInterval);
+            uint32 time = urand(sPlayerbotAIConfig->minRandomBotTeleportInterval,
+                                sPlayerbotAIConfig->maxRandomBotTeleportInterval);
             ScheduleTeleport(bot, time);
             return true;
         }
@@ -1224,7 +1236,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
 {
     // ignore when alrdy teleported or not in the world yet.
     if (bot->IsBeingTeleported() || !bot->IsInWorld())
-        return; 
+        return;
 
     // ignore when in queue for battle grounds.
     if (bot->InBattlegroundQueue())
@@ -1240,9 +1252,10 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (botAI)
-    {              
+    {
         // ignore when in when taxi with boat/zeppelin and has players nearby
-        if (botAI->IsTaxiFlying() && botAI->HasPlayerNearby())
+        if (bot->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && bot->HasUnitState(UNIT_STATE_IGNORE_PATHFINDING) &&
+            botAI->HasPlayerNearby())
             return;
     }
 
@@ -1505,9 +1518,9 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 void RandomPlayerbotMgr::PrepareAddclassCache()
 {
     int32 maxAccountId = sPlayerbotAIConfig->randomBotAccounts.back();
-    int32 minIdx =
-        sPlayerbotAIConfig->randomBotAccounts.size() - 1 >= sPlayerbotAIConfig->addClassAccountPoolSize
-            ? sPlayerbotAIConfig->randomBotAccounts.size() - sPlayerbotAIConfig->addClassAccountPoolSize : 0;
+    int32 minIdx = sPlayerbotAIConfig->randomBotAccounts.size() - 1 >= sPlayerbotAIConfig->addClassAccountPoolSize
+                       ? sPlayerbotAIConfig->randomBotAccounts.size() - sPlayerbotAIConfig->addClassAccountPoolSize
+                       : 0;
     int32 minAccountId = sPlayerbotAIConfig->randomBotAccounts[minIdx];
     if (minAccountId < 0)
     {
@@ -2430,14 +2443,14 @@ void RandomPlayerbotMgr::PrintStats()
             ++engine_combat;
         else
             ++engine_dead;
-        
+
         if (botAI->IsHeal(bot, true))
             ++heal;
         else if (botAI->IsTank(bot, true))
             ++tank;
         else
             ++dps;
-        
+
         if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
         {
             TravelState state = target->getTravelState();
