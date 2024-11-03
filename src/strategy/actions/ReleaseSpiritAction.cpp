@@ -11,6 +11,7 @@
 #include "ObjectGuid.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "Corpse.h"
 
 bool ReleaseSpiritAction::Execute(Event event)
 {
