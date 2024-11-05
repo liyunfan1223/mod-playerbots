@@ -103,7 +103,8 @@ public:
     void LogPlayerLocation();
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
 
-//private:
+private:
+    //void ScaleBotActivity();
 
 public:
     uint32 activeBots = 0;
@@ -163,10 +164,10 @@ public:
         return BattleMastersCache;
     }
 
+    float getActivityMod() { return activityMod; }
+    float getActivityPercentage() { return activityMod * 100.0f; }
+    void setActivityPercentage(float percentage) { activityMod = percentage / 100.0f; }
     static uint8 GetTeamClassIdx(bool isAlliance, uint8 claz) { return isAlliance * 20 + claz; }
-
-    bool isBotInitializing() const { return _isBotInitializing; }
-    void setBotInitializing(bool completed) { _isBotInitializing = completed; }
 
     void PrepareAddclassCache();
     std::map<uint8, std::vector<ObjectGuid>> addclassCache;
@@ -176,6 +177,7 @@ protected:
 private:
     // pid values are set in constructor
     botPID pid = botPID(1, 50, -50, 0, 0, 0);
+    float activityMod = 0.25;
     bool _isBotInitializing = true;
     uint32 GetEventValue(uint32 bot, std::string const event);
     std::string const GetEventData(uint32 bot, std::string const event);
