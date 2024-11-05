@@ -188,7 +188,7 @@ bool LfgAcceptAction::Execute(Event event)
             LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
                      bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
                      bot->GetName().c_str(), id);
-            sLFGMgr->UpdateProposal(id, bot->GetGUID(), false);
+            sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
             return true;
         }
 
