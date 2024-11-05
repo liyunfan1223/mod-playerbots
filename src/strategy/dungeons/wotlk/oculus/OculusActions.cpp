@@ -161,18 +161,17 @@ bool DrakeAttackAction::Execute(Event event)
 
     if (!target)
     {
-        GuidVector attackers = AI_VALUE(GuidVector, "attackers");
-        for (auto& attacker : attackers)
+        GuidVector npcs = AI_VALUE(GuidVector, "possible targets");
+        for (auto& npc : npcs)
         {
-            Unit* unit = botAI->GetUnit(attacker);
-            if (!unit) { continue; }
+            Unit* unit = botAI->GetUnit(npc);
+            if (!unit || !unit->IsInCombat()) { continue; }
 
-            SET_AI_VALUE(Unit*, "current target", unit);
             target = unit;
             break;
         }
     }
-
+    // Check this again to see if a target was assigned
     if (!target) { return false; }
 
     switch (vehicleBase->GetEntry())

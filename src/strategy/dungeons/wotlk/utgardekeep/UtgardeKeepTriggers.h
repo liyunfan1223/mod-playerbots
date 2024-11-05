@@ -21,12 +21,14 @@ enum UtgardeKeepIDs
     SPELL_DREADFUL_ROAR_H           = 59734,
     SPELL_WOE_STRIKE_N              = 42730,
     SPELL_WOE_STRIKE_H              = 59735,
-    SPELL_DARK_SMASH                = 42723,
+    SPELL_DARK_SMASH_N              = 42723,
+    SPELL_DARK_SMASH_H              = 59709,
 };
 
 #define SPELL_STAGGERING_ROAR       DUNGEON_MODE(bot, SPELL_STAGGERING_ROAR_N, SPELL_STAGGERING_ROAR_H)
 #define SPELL_DREADFUL_ROAR         DUNGEON_MODE(bot, SPELL_DREADFUL_ROAR_N, SPELL_DREADFUL_ROAR_H)
 #define SPELL_SMASH                 DUNGEON_MODE(bot, SPELL_SMASH_N, SPELL_SMASH_H)
+#define SPELL_DARK_SMASH            DUNGEON_MODE(bot, SPELL_DARK_SMASH_N, SPELL_DARK_SMASH_H)
 
 class KelesethFrostTombTrigger : public Trigger
 {
@@ -35,10 +37,10 @@ public:
     bool IsActive() override;
 };
 
-class DalronnNontankTrigger : public Trigger
+class DalronnDpsTrigger : public Trigger
 {
 public:
-    DalronnNontankTrigger(PlayerbotAI* ai) : Trigger(ai, "dalronn non-tank") {}
+    DalronnDpsTrigger(PlayerbotAI* ai) : Trigger(ai, "dalronn dps") {}
     bool IsActive() override;
 };
 

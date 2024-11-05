@@ -17,11 +17,12 @@ bool KelesethFrostTombTrigger::IsActive()
     return false;
 }
 
-bool DalronnNontankTrigger::IsActive()
+bool DalronnDpsTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "dalronn the controller");
-    if (!boss) { return false; }
-
+    if (!boss || !boss->isTargetableForAttack()) { return false; }
+    
+    // This doesn't cause issues with healers currently and they will continue to heal even when included here
     return !botAI->IsTank(bot);
 }
 
@@ -30,12 +31,9 @@ bool IngvarStaggeringRoarTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
     if (!boss) { return false; }
 
-    if (boss->HasUnitState(UNIT_STATE_CASTING))
+    if (boss->FindCurrentSpellBySpellId(SPELL_STAGGERING_ROAR))
     {
-        if (boss->FindCurrentSpellBySpellId(SPELL_STAGGERING_ROAR))
-        {
-            return true;
-        }
+        return true;
     }
     return false;
 }
@@ -45,8 +43,7 @@ bool IngvarDreadfulRoarTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
     if (!boss) { return false; }
 
-    if (boss->HasUnitState(UNIT_STATE_CASTING) &&
-        boss->FindCurrentSpellBySpellId(SPELL_DREADFUL_ROAR))
+    if (boss->FindCurrentSpellBySpellId(SPELL_DREADFUL_ROAR))
     {
         return true;
     }
@@ -58,14 +55,11 @@ bool IngvarSmashTankTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
     if (!boss || !botAI->IsTank(bot)) { return false; }
 
-    if (boss->HasUnitState(UNIT_STATE_CASTING))
-    {
-        if (boss->FindCurrentSpellBySpellId(SPELL_SMASH) ||
-            boss->FindCurrentSpellBySpellId(SPELL_DARK_SMASH))
-            {
-                return true;
-            }
-    }
+    if (boss->FindCurrentSpellBySpellId(SPELL_SMASH) ||
+        boss->FindCurrentSpellBySpellId(SPELL_DARK_SMASH))
+        {
+            return true;
+        }
     return false;
 }
 

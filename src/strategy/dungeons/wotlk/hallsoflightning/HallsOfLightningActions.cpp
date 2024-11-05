@@ -8,11 +8,11 @@ bool BjarngrimTargetAction::Execute(Event event)
 
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name
-    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+    GuidVector npcs = AI_VALUE(GuidVector, "possible targets");
 
-    for (auto i = targets.begin(); i != targets.end(); ++i)
+    for (auto& npc : npcs)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit* unit = botAI->GetUnit(npc);
         if (unit && unit->GetEntry() == NPC_STORMFORGED_LIEUTENANT)
         {
             target = unit;

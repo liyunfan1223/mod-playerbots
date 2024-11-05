@@ -11,9 +11,9 @@ bool AttackFrostTombAction::Execute(Event event)
     // therefore need to search manually for the unit name
     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    for (auto i = targets.begin(); i != targets.end(); ++i)
+    for (auto& target : targets)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit* unit = botAI->GetUnit(target);
         if (unit && unit->GetEntry() == NPC_FROST_TOMB)
         {
             frostTomb = unit;
