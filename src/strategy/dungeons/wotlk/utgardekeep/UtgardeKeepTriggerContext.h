@@ -20,7 +20,7 @@ class WotlkDungeonUKTriggerContext : public NamedObjectContext<Trigger>
         }
     private:
         static Trigger* keleseth_frost_tomb(PlayerbotAI* ai) { return new KelesethFrostTombTrigger(ai); }
-        static Trigger* dalronn_priority_target(PlayerbotAI* ai) { return new DalronnNontankTrigger(ai); }
+        static Trigger* dalronn_priority_target(PlayerbotAI* ai) { return new DalronnDpsTrigger(ai); }
         static Trigger* ingvar_staggering_roar(PlayerbotAI* ai) { return new IngvarStaggeringRoarTrigger(ai); }
         static Trigger* ingvar_dreadful_roar(PlayerbotAI* ai) { return new IngvarDreadfulRoarTrigger(ai); }
         static Trigger* ingvar_smash_tank(PlayerbotAI* ai) { return new IngvarSmashTankTrigger(ai); }

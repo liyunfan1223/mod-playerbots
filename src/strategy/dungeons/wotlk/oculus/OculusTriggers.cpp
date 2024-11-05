@@ -49,18 +49,8 @@ bool GroupFlyingTrigger::IsActive()
 
 bool DrakeCombatTrigger::IsActive()
 {
-    Unit* vehicleBase = bot->GetVehicleBase();
-    if (!vehicleBase) { return false; }
-
-    GuidVector attackers = AI_VALUE(GuidVector, "attackers");
-    for (auto& attacker : attackers)
-    {
-        Unit* target = botAI->GetUnit(attacker);
-        if (!target) { continue; }
-
-        return true;
-    }
-    return false;
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    return !targets.empty();
 }
 
 bool VarosCloudstriderTrigger::IsActive()
@@ -76,7 +66,7 @@ bool UromArcaneExplosionTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "mage-lord urom");
     if (!boss) { return false; }
     
-    return boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_EMPOWERED_ARCANE_EXPLOSION);
+    return bool(boss->FindCurrentSpellBySpellId(SPELL_EMPOWERED_ARCANE_EXPLOSION));
 }
 
 bool UromTimeBombTrigger::IsActive()
