@@ -163,12 +163,8 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
         sPlayerbotCommandServer->Start();
         PrepareTeleportCache();
     }
-    if (!sPlayerbotAIConfig->randomBotAutologin)
-    {
-        setBotInitializing(false);
-    }
-    BattlegroundData.clear();
 
+    BattlegroundData.clear();
     BgCheckTimer = 0;
     LfgCheckTimer = 0;
     PlayersCheckTimer = 0;
@@ -323,9 +319,14 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     if (onlineBotCount < (uint32)(sPlayerbotAIConfig->minRandomBots * 90 / 100))
         onlineBotFocus = 25;
 
-    // when server is balancing bots then boost (decrease value of) the nextCheckDelay till
-    // onlineBotCount reached the AllowedBotCount.
-    uint32 updateIntervalTurboBoost = onlineBotCount < maxAllowedBotCount ? 1 : sPlayerbotAIConfig->randomBotUpdateInterval;
+    // only keep updating till initializing time has completed,
+    // which prevents unneeded expensive GameTime calls.
+    if (_isBotInitializing)
+    {
+        _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.13;
+    }
+
+    uint32 updateIntervalTurboBoost = _isBotInitializing ? 1 : sPlayerbotAIConfig->randomBotUpdateInterval;
     SetNextCheckDelay(updateIntervalTurboBoost * (onlineBotFocus + 25) * 10);
 
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(
@@ -1025,23 +1026,21 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         randomTime = urand(1, 2);
         SetEventValue(bot, "login", 1, randomTime);
 
-        randomTime = urand(
-            std::max(5, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 0.5)),
-            std::max(12, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 2)));
+        uint32 randomBotUpdateInterval = _isBotInitializing ? 1 : sPlayerbotAIConfig->randomBotUpdateInterval;
+        randomTime = urand(std::max(5, static_cast<int>(randomBotUpdateInterval * 0.5)),
+                           std::max(12, static_cast<int>(randomBotUpdateInterval * 2)));
         SetEventValue(bot, "update", 1, randomTime);
 
         // do not randomize or teleport immediately after server start (prevent lagging)
         if (!GetEventValue(bot, "randomize"))
         {
-            randomTime = urand(
-                3,std::max(4, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 0.4)));
+            randomTime = urand(3, std::max(4, static_cast<int>(randomBotUpdateInterval * 0.4)));
             ScheduleRandomize(bot, randomTime);
         }
         if (!GetEventValue(bot, "teleport"))
         {
-            randomTime = urand(
-                std::max(7, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 0.7)),
-                std::max(14, static_cast<int>(sPlayerbotAIConfig->randomBotUpdateInterval * 1.4)));
+            randomTime = urand(std::max(7, static_cast<int>(randomBotUpdateInterval * 0.7)),
+                               std::max(14, static_cast<int>(randomBotUpdateInterval * 1.4)));
             ScheduleTeleport(bot, randomTime);
         }
 

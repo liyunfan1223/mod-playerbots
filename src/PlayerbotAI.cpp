@@ -49,6 +49,7 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "GameTime.h"
 
 std::vector<std::string> PlayerbotAI::dispel_whitelist = {
     "mutating injection",
@@ -4099,17 +4100,36 @@ inline bool HasRealPlayers(Map* map)
 
 bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
+    // only keep updating till initializing time has completed,
+    // which prevents unneeded expensive GameTime calls.
+    if (_isBotInitializing)
+    {
+        _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
+
+        // no activity allowed during bot initialization
+        if (_isBotInitializing)
+        {
+            return false;
+        }
+    }
+
     // General exceptions
     if (activityType == PACKET_ACTIVITY)
+    {
         return true;
+    }
 
-    if (GetMaster())  // Has player master. Always active.
+    // Has player master. Always active.
+    if (GetMaster())  
     {
         PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(GetMaster());
         if (!masterBotAI || masterBotAI->IsRealPlayer())
+        {
             return true;
+        }
     }
 
+    // If grouped up
     Group* group = bot->GetGroup();
     if (group)
     {
@@ -4117,26 +4137,44 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         {
             Player* member = gref->GetSource();
             if (!member || !member->IsInWorld() && member->GetMapId() != bot->GetMapId())
+            {
                 continue;
+            }
 
             if (member == bot)
+            {
                 continue;
+            }
 
             PlayerbotAI* memberBotAI = GET_PLAYERBOT_AI(member);
-            if (!memberBotAI || memberBotAI->HasRealPlayerMaster())
-                return true;
+            {
+                if (!memberBotAI || memberBotAI->HasRealPlayerMaster())
+                {
+                    return true;
+                }
+            }
 
             if (group->IsLeader(member->GetGUID()))
+            {
                 if (!memberBotAI->AllowActivity(PARTY_ACTIVITY))
+                {
                     return false;
+                }
+            }
         }
     }
 
-    if (!WorldPosition(bot).isOverworld())  // bg, raid, dungeon
+    // bg, raid, dungeon
+    if (!WorldPosition(bot).isOverworld())
+    {
         return true;
+    }
 
-    if (bot->InBattlegroundQueue())  // In bg queue. Speed up bg queue/join.
+    // In bg queue. Speed up bg queue/join.
+    if (bot->InBattlegroundQueue())
+    {
         return true;
+    }
 
     bool isLFG = false;
     if (group)
@@ -4146,51 +4184,72 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
             isLFG = true;
         }
     }
-
     if (sLFGMgr->GetState(bot->GetGUID()) != lfg::LFG_STATE_NONE)
     {
         isLFG = true;
     }
-
     if (isLFG)
+    {
         return true;
+    }
 
-    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)  // Is in combat. Defend yourself.
+    // Is in combat. Defend yourself.
+    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
+    {
         if (bot->IsInCombat())
+        {
             return true;
+        }
+    }
 
-    if (HasPlayerNearby(300.f))  // Player is near. Always active.
+    // Player is near. Always active.
+    if (HasPlayerNearby(300.f))
+    {
         return true;
+    }
 
     // friends always active
 
     // HasFriend sometimes cause crash, disable
     // for (auto& player : sRandomPlayerbotMgr->GetPlayers())
     // {
-    //     if (!player || !player->IsInWorld())
+    //     if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
     //         continue;
 
     //     if (player->GetSocial()->HasFriend(bot->GetGUID()))
     //         return true;
     // }
 
-    if (activityType == OUT_OF_PARTY_ACTIVITY ||
-        activityType == GRIND_ACTIVITY)  // Many bots nearby. Do not do heavy area checks.
+   /* if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
+    {
         if (HasManyPlayersNearby())
+        {
             return false;
+        }
+    }*/
 
     // Bots don't need to move using PathGenerator.
     if (activityType == DETAILED_MOVE_ACTIVITY)
+    {
         return false;
+    }
 
-    // All exceptions are now done.
+    if (sPlayerbotAIConfig->botActiveAlone <= 0)
+    {
+        return false;
+    }
+    if (sPlayerbotAIConfig->botActiveAlone >= 100 && !sPlayerbotAIConfig->botActiveAloneSmartScale)
+    {
+        return true;
+    }
+
+    // #######################################################################################
+    // All mandatory conditations are checked to be active or not, from here the remaining
+    // situations are usable for scaling when enabled.
+    // #######################################################################################
+
     // Below is code to have a specified % of bots active at all times.
     // The default is 10%. With 0.1% of all bots going active or inactive each minute.
-    if (sPlayerbotAIConfig->botActiveAlone <= 0)
-        return false;
-    if (sPlayerbotAIConfig->botActiveAlone >= 100 && !sPlayerbotAIConfig->botActiveAloneSmartScale)
-        return true;
-
     uint32 mod = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
     if (sPlayerbotAIConfig->botActiveAloneSmartScale &&
         bot->GetLevel() >= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMinLevel &&
@@ -4225,16 +4284,24 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
 uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 {
     uint32 maxDiff = sWorldUpdateTime.GetAverageUpdateTime();
-    
+
     if (maxDiff > 500) return 0;
     if (maxDiff > 250)
     {
         if (Map* map = bot->GetMap())
         {
-            if (map->GetEntry()->IsWorldMap() && 
-                (!HasRealPlayers(map) || 
-                !map->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY())))
-                return 0;
+            if (map->GetEntry()->IsWorldMap())
+            {
+                if (!HasRealPlayers(map))
+                {
+                    return 0;
+                }
+
+                if (!map->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY()))
+                {
+                    return 0;
+                }
+            }
         }
 
         return (mod * 1) / 10;
@@ -4242,7 +4309,7 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
     if (maxDiff > 200) return (mod * 3) / 10;
     if (maxDiff > 150) return (mod * 5) / 10;
     if (maxDiff > 100) return (mod * 6) / 10;
-    if (maxDiff > 80)  return (mod * 9) / 10;
+    if (maxDiff > 75)  return (mod * 9) / 10;
 
     return mod;
 }

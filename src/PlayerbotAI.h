@@ -580,6 +580,7 @@ private:
 
     void HandleCommands();
     void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
+    bool _isBotInitializing = true;
 
 protected:
     Player* bot;
