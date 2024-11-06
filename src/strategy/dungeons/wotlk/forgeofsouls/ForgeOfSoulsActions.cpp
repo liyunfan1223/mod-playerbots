@@ -1,11 +1,10 @@
 #include "Playerbots.h"
-#include "FosActions.h"
-#include "FosStrategy.h"
+#include "ForgeOfSoulsActions.h"
+#include "ForgeOfSoulsStrategy.h"
 
 bool MoveFromBronjahmAction::Execute(Event event)
-{
-    Unit* boss = nullptr;
-    boss = AI_VALUE2(Unit*, "find target", "bronjahm");
+{    
+    Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
     if (!boss)
         return false;
 
@@ -17,7 +16,6 @@ bool MoveFromBronjahmAction::Execute(Event event)
     return MoveAway(boss, targetDis - distance);
 }
 
-bool MoveFromBronjahmAction::isUseful() { return bot->HasAura(SPELL_CORRUPT_SOUL); }
 
 bool AttackCorruptedSoulFragmentAction::Execute(Event event)
 {
@@ -25,9 +23,9 @@ bool AttackCorruptedSoulFragmentAction::Execute(Event event)
 
     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    for (auto i = targets.begin(); i != targets.end(); ++i)
+    for (auto &target : targets)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit* unit = botAI->GetUnit(target);
         if (unit && unit->GetEntry() == NPC_CORRUPTED_SOUL_FRAGMENT)
         {
             fragment = unit;
@@ -35,40 +33,45 @@ bool AttackCorruptedSoulFragmentAction::Execute(Event event)
         }
     }
 
-    if (!fragment)
-        return false;
-
-    if (botAI->IsDps(bot))
-    {
-        if (AI_VALUE(Unit*, "current target") == fragment)
-            return false;
-
+    if (fragment && AI_VALUE(Unit*, "current target") != fragment)
         return Attack(fragment);
-    }    
-    else
-        return false;
+
+    return false;
     
 }
 
-bool AttackCorruptedSoulFragmentAction::isUseful() { return botAI->IsDps(bot); }
 
-bool BronjahmTankPositionAction::Execute(Event event)
+bool BronjahmGroupPositionAction::Execute(Event event)
 {
-    return MoveTo(bot->GetMapId(), BRONJAHM_TANK_POSITION.GetPositionX(), BRONJAHM_TANK_POSITION.GetPositionY(),
-                  BRONJAHM_TANK_POSITION.GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
+    if (botAI->IsTank(bot))
+        if (bot->GetExactDist2d(BRONJAHM_TANK_POSITION) > 5.0f)
+            return MoveTo(bot->GetMapId(), BRONJAHM_TANK_POSITION.GetPositionX(), BRONJAHM_TANK_POSITION.GetPositionY(),
+                          BRONJAHM_TANK_POSITION.GetPositionZ(), false, false, false, true,
+                          MovementPriority::MOVEMENT_COMBAT);
+        else
+            return false;
+    else
+    {
+        Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
+
+        if (boss)
+        {
+
+        }
+    }
 }
 
-bool BronjahmTankPositionAction::isUseful() { return bot->GetExactDist2d(BRONJAHM_TANK_POSITION) > 5.0f; }
+bool BronjahmGroupPositionAction::isUseful() { return bot->GetExactDist2d(BRONJAHM_TANK_POSITION) > 5.0f; }
 
 bool BronjahmTankTargetAction::Execute(Event event)
 {
     if (botAI->IsTank(bot))
     {
         Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
-        if (AI_VALUE(Unit*, "current target") == boss)
+        if (boss && AI_VALUE(Unit*, "current target") != boss)
+            return Attack(boss);
+        else
             return false;
-
-        return Attack(boss);
     }
     else
         return false;

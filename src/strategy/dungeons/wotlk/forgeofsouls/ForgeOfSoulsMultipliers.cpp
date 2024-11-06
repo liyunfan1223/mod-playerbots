@@ -1,10 +1,10 @@
-#include "FosMultipliers.h"
-#include "FosActions.h"
+#include "ForgeOfSoulsMultipliers.h"
+#include "ForgeOfSoulsActions.h"
 #include "GenericSpellActions.h"
 #include "ChooseTargetActions.h"
 #include "MovementActions.h"
-#include "FosTriggers.h"
-#include "FosActions.h"
+#include "ForgeOfSoulsTriggers.h"
+#include "ForgeOfSoulsActions.h"
 
 
 float BronjahmMultiplier::GetValue(Action* action) {
@@ -35,9 +35,9 @@ float AttackFragmentMultiplier::GetValue(Action* action)
 
     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    for (auto i = targets.begin(); i != targets.end(); ++i)
+    for (auto& target : targets)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit* unit = botAI->GetUnit(target);
         if (unit && unit->GetEntry() == NPC_CORRUPTED_SOUL_FRAGMENT)
         {
             fragment = unit;

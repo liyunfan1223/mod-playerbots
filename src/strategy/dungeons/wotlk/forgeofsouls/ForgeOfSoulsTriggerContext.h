@@ -3,7 +3,7 @@
 
 #include "NamedObjectContext.h"
 #include "AiObjectContext.h"
-#include "FosTriggers.h"
+#include "ForgeOfSoulsTriggers.h"
 
 class WotlkDungeonFosTriggerContext : public NamedObjectContext<Trigger>
 {

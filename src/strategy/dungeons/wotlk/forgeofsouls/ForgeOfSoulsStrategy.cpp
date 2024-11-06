@@ -1,20 +1,17 @@
-#include "FosStrategy.h"
-#include "FosMultipliers.h"
+#include "ForgeOfSoulsStrategy.h"
+#include "ForgeOfSoulsMultipliers.h"
 
-void WotlkDungeonFosStrategy::InitTriggers(std::vector<TriggerNode*>& triggers) {
+void WotlkDungeonFoSStrategy::InitTriggers(std::vector<TriggerNode*>& triggers) {
     triggers.push_back(
         new TriggerNode("move from bronjahm",
                         NextAction::array(0, new NextAction("move from bronjahm", ACTION_MOVE + 5), nullptr)));
     triggers.push_back(new TriggerNode(
         "switch to soul fragment", NextAction::array(0, new NextAction("attack corrupted soul fragment", ACTION_RAID + 1), nullptr)));
     triggers.push_back(new TriggerNode("bronjahm position",
-        NextAction::array(0, new NextAction("bronjahm tank position", ACTION_RAID + 1),
-                          new NextAction("bronjahm tank target", ACTION_RAID),
-                          new NextAction("bronjahm dps position", ACTION_RAID + 2),
-                          nullptr)));
+        NextAction::array(0, new NextAction("bronjahm position", ACTION_RAID + 1), nullptr)));
 }
 
-void WotlkDungeonFosStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void WotlkDungeonFoSStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new BronjahmMultiplier(botAI));
     multipliers.push_back(new AttackFragmentMultiplier(botAI));

@@ -13,7 +13,7 @@
 #include "oculus/OculusTriggerContext.h"
 #include "utgardepinnacle/UtgardePinnacleTriggerContext.h"
 #include "cullingofstratholme/CullingOfStratholmeTriggerContext.h"
-#include "forgeofsouls/FosTriggerContext.h"
+#include "forgeofsouls/ForgeOfSoulsTriggerContext.h"
 // #include "trialofthechampion/TrialOfTheChampionTriggerContext.h"
 // #include "hallsofreflection/HallsOfReflectionTriggerContext.h"
 // #include "pitofsaron/PitOfSaronTriggerContext.h"

@@ -3,11 +3,11 @@
 #include "Multiplier.h"
 #include "Strategy.h"
 
-class WotlkDungeonFosStrategy : public Strategy
+class WotlkDungeonFoSStrategy : public Strategy
 {
 public:
-    WotlkDungeonFosStrategy(PlayerbotAI* ai) : Strategy(ai) {}
-    std::string const getName() override { return "fos"; }
+    WotlkDungeonFoSStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+    std::string const getName() override { return "forge of souls"; }
     void InitTriggers(std::vector<TriggerNode*> &triggers) override;
     void InitMultipliers(std::vector<Multiplier*> &multipliers) override;
 

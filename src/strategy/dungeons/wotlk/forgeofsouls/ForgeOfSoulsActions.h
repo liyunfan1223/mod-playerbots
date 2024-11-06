@@ -5,7 +5,7 @@
 #include "AttackAction.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
-#include "FosTriggers.h"
+#include "ForgeOfSoulsTriggers.h"
 
 const Position BRONJAHM_TANK_POSITION = Position(5297.9204f, 2506.698f, 686.06793f);
 
@@ -14,7 +14,6 @@ class MoveFromBronjahmAction : public MovementAction
 public:
     MoveFromBronjahmAction(PlayerbotAI* ai) : MovementAction(ai, "move from bronjahm") {}
     bool Execute(Event event) override;
-    bool isUseful() override;
 };
 
 class AttackCorruptedSoulFragmentAction : public AttackAction
@@ -22,13 +21,12 @@ class AttackCorruptedSoulFragmentAction : public AttackAction
 public:
     AttackCorruptedSoulFragmentAction(PlayerbotAI* ai) : AttackAction(ai, "attack corrupted soul fragment") {}
     bool Execute(Event event) override;
-    bool isUseful() override;
 };
 
-class BronjahmTankPositionAction : public MovementAction
+class BronjahmGroupPositionAction : public MovementAction
 {
 public:
-    BronjahmTankPositionAction(PlayerbotAI* ai) : MovementAction(ai, "bronjahm tank position") {}
+    BronjahmGroupPositionAction(PlayerbotAI* ai) : MovementAction(ai, "bronjahm group position") {}
 
     bool Execute(Event event) override;
 

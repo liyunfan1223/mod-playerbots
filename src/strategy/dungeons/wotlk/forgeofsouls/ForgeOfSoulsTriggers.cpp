@@ -1,15 +1,14 @@
-#include "FosTriggers.h"
+#include "ForgeOfSoulsTriggers.h"
 #include "Playerbots.h"
 #include "AiObject.h"
 #include "AiObjectContext.h"
 
 bool MoveFromBronjahmTrigger::IsActive()
 {
-    Unit* boss = nullptr;
-    boss = AI_VALUE2(Unit*, "find target", "bronjahm");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
     if (boss && boss->HasUnitState(UNIT_STATE_CASTING))
     {
-        if (boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL))
+        if (boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) && bot->HasAura(SPELL_CORRUPT_SOUL))
             return true;
     }
     return false;
@@ -20,12 +19,13 @@ bool SwitchToSoulFragment::IsActive()
     Unit* fragment = nullptr;
     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    for (auto i = targets.begin(); i != targets.end(); ++i)
+    for (auto& target : targets)
     {
-        Unit* unit = botAI->GetUnit(*i);
+        Unit* unit = botAI->GetUnit(target);
         if (unit && unit->GetEntry() == NPC_CORRUPTED_SOUL_FRAGMENT)
         {
-            return true;
+            if (botAI->IsDps(bot))
+                return true;
         }
     }
 
