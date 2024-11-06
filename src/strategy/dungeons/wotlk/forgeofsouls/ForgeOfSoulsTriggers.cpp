@@ -6,11 +6,10 @@
 bool MoveFromBronjahmTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
-    if (boss && boss->HasUnitState(UNIT_STATE_CASTING))
-    {
-        if (boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) && bot->HasAura(SPELL_CORRUPT_SOUL))
-            return true;
-    }
+
+    if (boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) && bot->HasAura(SPELL_CORRUPT_SOUL))
+        return true;
+
     return false;
 }
 
@@ -36,9 +35,5 @@ bool SwitchToSoulFragment::IsActive()
 bool BronjahmPositionTrigger::IsActive()
 {
 
-    Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
-    if (boss)
-        return true;
-
-    return false;
+    return bool(AI_VALUE2(Unit*, "find target", "bronjahm"));
 }

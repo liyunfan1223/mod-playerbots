@@ -8,15 +8,14 @@
 
 
 float BronjahmMultiplier::GetValue(Action* action) {
-    Unit* boss = nullptr;
-    boss = AI_VALUE2(Unit *, "find target", "bronjahm");
+    Unit* boss = AI_VALUE2(Unit *, "find target", "bronjahm");
     if (!boss)
         return 1.0f;
-    if (botAI->IsTank(bot))
-        if (dynamic_cast<TankAssistAction*>(action))
-            return 0.0f;
 
-    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) &&
+    if (dynamic_cast<TankAssistAction*>(action))
+        return 0.0f;
+
+    if (boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) &&
         bot->HasAura(SPELL_CORRUPT_SOUL))
     {
         if (dynamic_cast<MovementAction*>(action) && !dynamic_cast<MoveFromBronjahmAction*>(action))

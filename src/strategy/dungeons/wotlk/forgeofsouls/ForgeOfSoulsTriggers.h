@@ -6,7 +6,7 @@
 #include "GenericTriggers.h"
 #include "DungeonStrategyUtils.h"
 
-enum FosIDs
+enum ForgeOfSoulsBronjahmIDs
 {
     // Boss1
     NPC_CORRUPTED_SOUL_FRAGMENT = 36535,

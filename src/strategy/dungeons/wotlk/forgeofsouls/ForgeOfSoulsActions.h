@@ -7,7 +7,7 @@
 #include "Playerbots.h"
 #include "ForgeOfSoulsTriggers.h"
 
-const Position BRONJAHM_TANK_POSITION = Position(5297.9204f, 2506.698f, 686.06793f);
+const Position BRONJAHM_TANK_POSITION = Position(5297.920f, 2506.698f, 686.068f);
 
 class MoveFromBronjahmAction : public MovementAction
 {
@@ -33,21 +33,5 @@ public:
     bool isUseful() override;
 };
 
-class BronjahmDpsPositionAction : public MovementAction
-{
-public:
-    BronjahmDpsPositionAction(PlayerbotAI* ai) : MovementAction(ai, "bronjahm dps position") {}
-
-    bool Execute(Event event) override;
-
-    bool isUseful() override;
-};
-
-class BronjahmTankTargetAction : public AttackAction
-{
-public:
-    BronjahmTankTargetAction(PlayerbotAI* ai) : AttackAction(ai, "bronjahm tank target") {}
-    bool Execute(Event event) override;
-};
 
 #endif

@@ -65,53 +65,23 @@ bool BronjahmGroupPositionAction::Execute(Event event)
     else
     {
         float maxMovement = 10.0f;
-        if (bot->getClass() == CLASS_HUNTER)
+
+        if (bot->GetExactDist2d(boss) > maxMovement)
         {
-            return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 6.5f, maxMovement));
+            if (bot->getClass() == CLASS_HUNTER)
+            {
+                return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 6.5f, maxMovement));
+            }
+            else
+            {
+                return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 2.0f, maxMovement));
+            }
         }
         else
-        {
-            return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 2.0f, maxMovement));
-        }
+            return false;
     }
 }
 
 bool BronjahmGroupPositionAction::isUseful() { return true; }
 
-bool BronjahmTankTargetAction::Execute(Event event)
-{
-    if (botAI->IsTank(bot))
-    {
-        Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
-        if (boss && AI_VALUE(Unit*, "current target") != boss)
-            return Attack(boss);
-        else
-            return false;
-    }
-    else
-        return false;
-}
 
-bool BronjahmDpsPositionAction::Execute(Event event)
-{
-    Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
-    if (!boss)
-        return false;
-
-    if (bot->getClass() == CLASS_HUNTER)
-    {
-        return Move(bot->GetAngle(boss), 8.0f);
-    }
-    else
-    {
-        return Move(bot->GetAngle(boss), 5.0f);
-    }
-}
-
-bool BronjahmDpsPositionAction::isUseful()
-{
-    if (bot->GetExactDist2d(BRONJAHM_TANK_POSITION) <= 10.0f)
-        return false;
-
-    return botAI->IsDps(bot) || botAI->IsHeal(bot);
-}
