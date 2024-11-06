@@ -16,7 +16,8 @@ float BronjahmMultiplier::GetValue(Action* action) {
         if (dynamic_cast<TankAssistAction*>(action))
             return 0.0f;
 
-    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL))
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) &&
+        bot->HasAura(SPELL_CORRUPT_SOUL))
     {
         if (dynamic_cast<MovementAction*>(action) && !dynamic_cast<MoveFromBronjahmAction*>(action))
         {
@@ -28,8 +29,6 @@ float BronjahmMultiplier::GetValue(Action* action) {
 
 float AttackFragmentMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsHeal(bot) && dynamic_cast<AttackCorruptedSoulFragmentAction*>(action))
-        return 0.0f;
 
     Unit* fragment = nullptr;
 
@@ -45,10 +44,7 @@ float AttackFragmentMultiplier::GetValue(Action* action)
         }
     }
 
-    if (fragment && dynamic_cast<BronjahmDpsPositionAction*>(action))
-        return 0.0f;
-
-    if (fragment && dynamic_cast<DpsAssistAction*>(action))
+    if (fragment && botAI->IsDps(bot) && dynamic_cast<BronjahmGroupPositionAction*>(action))
         return 0.0f;
 
     return 1.0f;

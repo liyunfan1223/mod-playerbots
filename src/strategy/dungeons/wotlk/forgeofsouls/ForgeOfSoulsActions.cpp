@@ -43,25 +43,40 @@ bool AttackCorruptedSoulFragmentAction::Execute(Event event)
 
 bool BronjahmGroupPositionAction::Execute(Event event)
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
+    if (!boss)
+        return false;
+
     if (botAI->IsTank(bot))
-        if (bot->GetExactDist2d(BRONJAHM_TANK_POSITION) > 5.0f)
-            return MoveTo(bot->GetMapId(), BRONJAHM_TANK_POSITION.GetPositionX(), BRONJAHM_TANK_POSITION.GetPositionY(),
-                          BRONJAHM_TANK_POSITION.GetPositionZ(), false, false, false, true,
-                          MovementPriority::MOVEMENT_COMBAT);
+    {
+        bot->SetTarget(boss->GetGUID());
+        if (AI_VALUE2(bool, "has aggro", "current target"))
+            if (bot->GetExactDist2d(BRONJAHM_TANK_POSITION) > 5.0f)
+                return MoveTo(bot->GetMapId(), BRONJAHM_TANK_POSITION.GetPositionX(),
+                              BRONJAHM_TANK_POSITION.GetPositionY(), BRONJAHM_TANK_POSITION.GetPositionZ(), false,
+                              false, false, true, MovementPriority::MOVEMENT_NORMAL);
+            else
+                return Attack(boss);
         else
-            return false;
+        {
+            return Attack(boss);
+        }
+    }
     else
     {
-        Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
-
-        if (boss)
+        float maxMovement = 10.0f;
+        if (bot->getClass() == CLASS_HUNTER)
         {
-
+            return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 6.5f, maxMovement));
+        }
+        else
+        {
+            return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss) - 2.0f, maxMovement));
         }
     }
 }
 
-bool BronjahmGroupPositionAction::isUseful() { return bot->GetExactDist2d(BRONJAHM_TANK_POSITION) > 5.0f; }
+bool BronjahmGroupPositionAction::isUseful() { return true; }
 
 bool BronjahmTankTargetAction::Execute(Event event)
 {

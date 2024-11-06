@@ -23,10 +23,10 @@ public:
     bool Execute(Event event) override;
 };
 
-class BronjahmGroupPositionAction : public MovementAction
+class BronjahmGroupPositionAction : public AttackAction
 {
 public:
-    BronjahmGroupPositionAction(PlayerbotAI* ai) : MovementAction(ai, "bronjahm group position") {}
+    BronjahmGroupPositionAction(PlayerbotAI* ai) : AttackAction(ai, "bronjahm group position") {}
 
     bool Execute(Event event) override;
 

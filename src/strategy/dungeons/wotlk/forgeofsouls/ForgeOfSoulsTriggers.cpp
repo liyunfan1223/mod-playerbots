@@ -1,5 +1,5 @@
-#include "ForgeOfSoulsTriggers.h"
 #include "Playerbots.h"
+#include "ForgeOfSoulsTriggers.h"
 #include "AiObject.h"
 #include "AiObjectContext.h"
 
