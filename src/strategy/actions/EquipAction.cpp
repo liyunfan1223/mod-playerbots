@@ -9,6 +9,7 @@
 #include "ItemCountValue.h"
 #include "ItemUsageValue.h"
 #include "Playerbots.h"
+#include "StatsWeightCalculator.h"
 
 bool EquipAction::Execute(Event event)
 {
@@ -62,16 +63,17 @@ void EquipAction::EquipItem(Item* item)
 {
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
-    uint32 itemId = item->GetTemplate()->ItemId;
+    const ItemTemplate* itemProto = item->GetTemplate();
+    uint32 itemId = itemProto->ItemId;
 
-    if (item->GetTemplate()->InventoryType == INVTYPE_AMMO)
+    if (itemProto->InventoryType == INVTYPE_AMMO)
     {
         bot->SetAmmo(itemId);
     }
     else
     {
-        bool equipedBag = false;
-        if (item->GetTemplate()->Class == ITEM_CLASS_CONTAINER)
+        bool equippedBag = false;
+        if (itemProto->Class == ITEM_CLASS_CONTAINER)
         {
             Bag* pBag = (Bag*)&item;
             uint8 newBagSlot = GetSmallestBagSlot();
@@ -80,20 +82,64 @@ void EquipAction::EquipItem(Item* item)
                 uint16 src = ((bagIndex << 8) | slot);
                 uint16 dst = ((INVENTORY_SLOT_BAG_0 << 8) | newBagSlot);
                 bot->SwapItem(src, dst);
-                equipedBag = true;
+                equippedBag = true;
             }
         }
 
-        if (!equipedBag)
+        if (!equippedBag)
         {
-            WorldPacket packet(CMSG_AUTOEQUIP_ITEM, 2);
-            packet << bagIndex << slot;
-            bot->GetSession()->HandleAutoEquipItemOpcode(packet);
+            uint8 dstSlot = botAI->FindEquipSlot(item->GetTemplate(), NULL_SLOT, true);
+            if (dstSlot == EQUIPMENT_SLOT_FINGER1 ||
+                dstSlot == EQUIPMENT_SLOT_TRINKET1 ||
+                dstSlot == EQUIPMENT_SLOT_MAINHAND)
+            {
+                Item* const equippedItems[2] = {
+                    bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot),
+                    bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot + 1)
+                };
+
+                if (equippedItems[0])
+                {
+                    if (equippedItems[1])
+                    {
+                        // Both slots are full - determine worst item to replace
+                        StatsWeightCalculator calculator(bot);
+                        calculator.SetItemSetBonus(false);
+                        calculator.SetOverflowPenalty(false);
+                        
+                        // float newItemScore = calculator.CalculateItem(itemId);
+                        float equippedItemScore[2] = {
+                            equippedItemScore[0] = calculator.CalculateItem(equippedItems[0]->GetTemplate()->ItemId),
+                            equippedItemScore[1] = calculator.CalculateItem(equippedItems[1]->GetTemplate()->ItemId)
+                        };
+
+                        // Second item is worse than first, equip candidate item in second slot
+                        if (equippedItemScore[0] > equippedItemScore[1])
+                        {
+                            dstSlot++;
+                        }
+                    }
+                    else    // No item equipped in slot 2, equip in that slot instead of replacing first item
+                    {
+                        dstSlot++;
+                    }
+                }
+            }
+
+            WorldPacket packet(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+            ObjectGuid itemguid = item->GetGUID();
+            
+            packet << itemguid << dstSlot;
+            bot->GetSession()->HandleAutoEquipItemSlotOpcode(packet);
+
+            // WorldPacket packet(CMSG_AUTOEQUIP_ITEM, 2);
+            // packet << bagIndex << slot;
+            // bot->GetSession()->HandleAutoEquipItemOpcode(packet);
         }
     }
 
     std::ostringstream out;
-    out << "equipping " << chat->FormatItem(item->GetTemplate());
+    out << "equipping " << chat->FormatItem(itemProto);
     botAI->TellMaster(out);
 }
 

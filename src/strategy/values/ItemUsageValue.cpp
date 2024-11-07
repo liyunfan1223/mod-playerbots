@@ -205,102 +205,116 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
         !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), itemProto))
         shouldEquip = false;
 
-    Item* oldItem = bot->GetItemByPos(dest);
-
-    // No item equiped
-    if (!oldItem)
+    uint8 possibleSlots = 1;
+    uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
+    if (dstSlot == EQUIPMENT_SLOT_FINGER1 ||
+        dstSlot == EQUIPMENT_SLOT_TRINKET1 ||
+        dstSlot == EQUIPMENT_SLOT_MAINHAND)
     {
-        if (shouldEquip)
-            return ITEM_USAGE_EQUIP;
-        else
-        {
-            return ITEM_USAGE_BAD_EQUIP;
-        }
+        possibleSlots = 2;
     }
 
-    ItemTemplate const* oldItemProto = oldItem->GetTemplate();
-    float oldScore = calculator.CalculateItem(oldItemProto->ItemId);
-    if (oldItem)
+    for (uint8 i = 0; i < possibleSlots; i++)
     {
-        // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
-        if (itemScore || oldScore)
+        bool shouldEquipInSlot = shouldEquip;
+        Item* oldItem = bot->GetItemByPos(dest + i);
+
+        // No item equipped
+        if (!oldItem)
         {
-            shouldEquip = itemScore > oldScore * sPlayerbotAIConfig->equipUpgradeThreshold;
+            if (shouldEquipInSlot)
+                return ITEM_USAGE_EQUIP;
+            else
+            {
+                return ITEM_USAGE_BAD_EQUIP;
+            }
         }
-    }
 
-    // Bigger quiver
-    if (itemProto->Class == ITEM_CLASS_QUIVER)
-    {
-        if (!oldItem || oldItemProto->ContainerSlots < itemProto->ContainerSlots)
+        ItemTemplate const* oldItemProto = oldItem->GetTemplate();
+        float oldScore = calculator.CalculateItem(oldItemProto->ItemId);
+        if (oldItem)
         {
-            return ITEM_USAGE_EQUIP;
+            // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
+            if (itemScore || oldScore)
+            {
+                shouldEquipInSlot = itemScore > oldScore * sPlayerbotAIConfig->equipUpgradeThreshold;
+            }
         }
-        else
+
+        // Bigger quiver
+        if (itemProto->Class == ITEM_CLASS_QUIVER)
         {
-            return ITEM_USAGE_NONE;
+            if (!oldItem || oldItemProto->ContainerSlots < itemProto->ContainerSlots)
+            {
+                return ITEM_USAGE_EQUIP;
+            }
+            else
+            {
+                return ITEM_USAGE_NONE;
+            }
         }
-    }
 
-    bool existingShouldEquip = true;
-    if (oldItemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), oldItemProto))
-        existingShouldEquip = false;
+        bool existingShouldEquip = true;
+        if (oldItemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), oldItemProto))
+            existingShouldEquip = false;
 
-    if (oldItemProto->Class == ITEM_CLASS_ARMOR &&
-        !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), oldItemProto))
-        existingShouldEquip = false;
+        if (oldItemProto->Class == ITEM_CLASS_ARMOR &&
+            !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->GetLevel(), oldItemProto))
+            existingShouldEquip = false;
 
-    // uint32 oldItemPower = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
-    // uint32 newItemPower = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
+        // uint32 oldItemPower = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
+        // uint32 newItemPower = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
 
-    // Compare items based on item level, quality or itemId.
-    bool isBetter = false;
-    if (itemScore > oldScore)
-        isBetter = true;
-    // else if (newItemPower == oldScore && itemProto->Quality > oldItemProto->Quality)
-    //     isBetter = true;
-    // else if (newItemPower == oldScore && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId >
-    // oldItemProto->ItemId)
-    //     isBetter = true;
+        // Compare items based on item level, quality or itemId.
+        bool isBetter = false;
+        if (itemScore > oldScore)
+            isBetter = true;
+        // else if (newItemPower == oldScore && itemProto->Quality > oldItemProto->Quality)
+        //     isBetter = true;
+        // else if (newItemPower == oldScore && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId >
+        // oldItemProto->ItemId)
+        //     isBetter = true;
 
-    Item* item = CurrentItem(itemProto);
-    bool itemIsBroken =
-        item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
-    bool oldItemIsBroken =
-        oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
-
-    if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquip || !existingShouldEquip) && isBetter)
-    {
-        switch (itemProto->Class)
+        Item* item = CurrentItem(itemProto);
+        bool itemIsBroken =
+            item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+        bool oldItemIsBroken =
+            oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+        
+        if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquipInSlot || !existingShouldEquip) && isBetter)
         {
-            case ITEM_CLASS_ARMOR:
-                if (oldItemProto->SubClass <= itemProto->SubClass)
+            switch (itemProto->Class)
+            {
+                case ITEM_CLASS_ARMOR:
+                    if (oldItemProto->SubClass <= itemProto->SubClass)
+                    {
+                        // Need to add some logic to check second slot before returning, but as it happens, all three of these
+                        // return vals will result in an attempted equip action so it wouldn't have much effect currently
+                        if (itemIsBroken && !oldItemIsBroken)
+                            return ITEM_USAGE_BROKEN_EQUIP;
+                        else if (shouldEquipInSlot)
+                            return ITEM_USAGE_REPLACE;
+                        else
+                            return ITEM_USAGE_BAD_EQUIP;
+
+                        break;
+                    }
+                default:
                 {
                     if (itemIsBroken && !oldItemIsBroken)
                         return ITEM_USAGE_BROKEN_EQUIP;
-                    else if (shouldEquip)
-                        return ITEM_USAGE_REPLACE;
+                    else if (shouldEquipInSlot)
+                        return ITEM_USAGE_EQUIP;
                     else
                         return ITEM_USAGE_BAD_EQUIP;
-
-                    break;
                 }
-            default:
-            {
-                if (itemIsBroken && !oldItemIsBroken)
-                    return ITEM_USAGE_BROKEN_EQUIP;
-                else if (shouldEquip)
-                    return ITEM_USAGE_EQUIP;
-                else
-                    return ITEM_USAGE_BAD_EQUIP;
             }
         }
+
+        // Item is not better but current item is broken and new one is not.
+        if (oldItemIsBroken && !itemIsBroken)
+            return ITEM_USAGE_EQUIP;
     }
-
-    // Item is not better but current item is broken and new one is not.
-    if (oldItemIsBroken && !itemIsBroken)
-        return ITEM_USAGE_EQUIP;
-
     return ITEM_USAGE_NONE;
 }
 
