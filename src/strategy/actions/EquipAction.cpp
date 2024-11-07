@@ -88,7 +88,7 @@ void EquipAction::EquipItem(Item* item)
 
         if (!equippedBag)
         {
-            uint8 dstSlot = botAI->FindEquipSlot(item->GetTemplate(), NULL_SLOT, true);
+            uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
             if (dstSlot == EQUIPMENT_SLOT_FINGER1 ||
                 dstSlot == EQUIPMENT_SLOT_TRINKET1 ||
                 dstSlot == EQUIPMENT_SLOT_MAINHAND)
