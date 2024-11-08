@@ -24,7 +24,7 @@ git clone https://github.com/liyunfan1223/mod-playerbots.git --branch=master
 
 ## Quick Start & Documentation
 
-For a quick start and an extensive set of commands, please refer to documentation here: [Playerbots Documentation](https://github.com/liyunfan1223/mod-playerbots/wiki/Playerbot-Documentation).
+For a quick start and an extensive overview of available addons, commands, and recommended configuration please refer to the [Playerbots Wiki](https://github.com/liyunfan1223/mod-playerbots/wiki).
 
 Please be aware that documentation for some newly added commands is currently lacking as the project is still under development.
 
@@ -50,9 +50,10 @@ It's essential to note that there is still a significant amount of work to be do
 
 ## Addon
 
-For enhanced control over the bots and to simplify command usage, you can also make use of our addon:
-- Chinese version: [Unbot Addon (zh)](https://github.com/liyunfan1223/unbot-addon). 
-- English version (maintained by @Revision): [Unbot Addon (en)](https://github.com/noisiver/unbot-addon/tree/english).
+For enhanced control over the bots and to simplify command usage, you can also make use of available Playerbots addons:
+- [Multibot](https://github.com/Macx-Lio/MultiBot) (by Macx-Lio)
+- [Unbot Addon (zh)](https://github.com/liyunfan1223/unbot-addon) (Chinese version by Liyunfan)
+- [Unbot Addon (en)](https://github.com/noisiver/unbot-addon/tree/english) (English version translated by @Revision)
 
 ## Frequently Asked Questions
 
