@@ -89,9 +89,21 @@ void EquipAction::EquipItem(Item* item)
         if (!equippedBag)
         {
             uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
+            bool have2HWeapon = false;
+            bool isValidTGWeapon = false;
+            if (dstSlot == EQUIPMENT_SLOT_MAINHAND)
+            {
+                Item* currentWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+                have2HWeapon = currentWeapon && currentWeapon->GetTemplate()->InventoryType == INVTYPE_2HWEAPON;
+                isValidTGWeapon = itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
+                                  itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+                                  itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2;
+            }
+            
             if (dstSlot == EQUIPMENT_SLOT_FINGER1 ||
                 dstSlot == EQUIPMENT_SLOT_TRINKET1 ||
-                dstSlot == EQUIPMENT_SLOT_MAINHAND)
+                (dstSlot == EQUIPMENT_SLOT_MAINHAND && bot->CanDualWield() &&
+                    ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || (bot->CanTitanGrip() && isValidTGWeapon))))
             {
                 Item* const equippedItems[2] = {
                     bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot),

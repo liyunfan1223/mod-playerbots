@@ -207,11 +207,27 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
 
     uint8 possibleSlots = 1;
     uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
-    if (dstSlot == EQUIPMENT_SLOT_FINGER1 ||
-        dstSlot == EQUIPMENT_SLOT_TRINKET1 ||
-        dstSlot == EQUIPMENT_SLOT_MAINHAND)
+    
+    if (dstSlot == EQUIPMENT_SLOT_FINGER1 || dstSlot == EQUIPMENT_SLOT_TRINKET1)
     {
         possibleSlots = 2;
+    }
+
+    // Check weapon case separately to keep things a bit cleaner
+    bool have2HWeapon = false;
+    bool isValidTGWeapon = false;
+    if (dstSlot == EQUIPMENT_SLOT_MAINHAND)
+    {
+        Item* currentWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+        have2HWeapon = currentWeapon && currentWeapon->GetTemplate()->InventoryType == INVTYPE_2HWEAPON;
+        isValidTGWeapon = itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
+                          itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+                          itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2;
+        
+        if (bot->CanDualWield() && ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || (bot->CanTitanGrip() && isValidTGWeapon)))
+        {
+            possibleSlots = 2;
+        }
     }
 
     for (uint8 i = 0; i < possibleSlots; i++)
