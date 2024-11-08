@@ -15,9 +15,13 @@
 bool QuestAction::Execute(Event event)
 {
     ObjectGuid guid = event.getObject();
-
     Player* master = GetMaster();
 
+    // Checks if the bot and botAI are valid
+    if (!bot || !botAI)
+        return false;
+
+    // Sets guid based on bot or master target
     if (!guid)
     {
         if (!master)
@@ -36,19 +40,27 @@ bool QuestAction::Execute(Event event)
     }
 
     bool result = false;
+
+    // Check the nearest NPCs
     GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
-    for (const auto npc : npcs)
+    for (const auto& npc : npcs)
     {
         Unit* unit = botAI->GetUnit(npc);
         if (unit && bot->GetDistance(unit) <= INTERACTION_DISTANCE)
+        {
             result |= ProcessQuests(unit);
+        }
     }
+
+    // Checks the nearest game objects
     std::list<ObjectGuid> gos = AI_VALUE(std::list<ObjectGuid>, "nearest game objects");
-    for (const auto go : gos)
+    for (const auto& go : gos)
     {
         GameObject* gameobj = botAI->GetGameObject(go);
         if (gameobj && bot->GetDistance(gameobj) <= INTERACTION_DISTANCE)
+        {
             result |= ProcessQuests(gameobj);
+        }
     }
 
     return result;

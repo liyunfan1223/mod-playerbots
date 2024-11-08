@@ -8,6 +8,7 @@
 #include <cmath>
 #include <sstream>
 #include <string>
+#include <mutex>
 
 #include "AiFactory.h"
 #include "BudgetValues.h"
@@ -31,7 +32,6 @@
 #include "ObjectGuid.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
-#include "GameTime.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotMgr.h"
@@ -49,6 +49,7 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "GameTime.h"
 
 std::vector<std::string> PlayerbotAI::dispel_whitelist = {
     "mutating injection",
@@ -240,7 +241,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     {
         return;
     }
-
     // if (!GetMaster() || !GetMaster()->IsInWorld() || !GetMaster()->GetSession() ||
     // GetMaster()->GetSession()->isLogingOut()) {
     //     return;
@@ -303,7 +303,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     //     bot->GetMotionMaster()->Clear();
     //     bot->GetMotionMaster()->MoveIdle();
     // }
-    
     // cheat options
     if (bot->IsAlive() && ((uint32)GetCheat() > 0 || (uint32)sPlayerbotAIConfig->botCheatMask > 0))
     {
@@ -2452,8 +2451,12 @@ bool PlayerbotAI::SayToWorld(const std::string& msg)
 
 bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chanId)
 {
+    // Checks whether the message or ChannelMgr is valid
+    if (msg.empty())
+        return false;
+
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
-    if (!cMgr || msg.empty())
+    if (!cMgr)
         return false;
 
     AreaTableEntry const* current_zone = GetCurrentZone();
@@ -2461,11 +2464,24 @@ bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chan
         return false;
 
     const auto current_str_zone = GetLocalizedAreaName(current_zone);
+
+    std::mutex socialMutex;
+    std::lock_guard<std::mutex> lock(socialMutex);  // Blocking for thread safety when accessing SocialMgr
+
     for (auto const& [key, channel] : cMgr->GetChannels())
     {
-        // check for current zone
-        if (channel && channel->GetChannelId() == chanId)
+        // Checks if the channel pointer is valid
+        if (!channel)
+            continue;
+
+        // Checks if the channel matches the specified ChatChannelId
+        if (channel->GetChannelId() == chanId)
         {
+            // If the channel name is empty, skip it to avoid access problems
+            if (channel->GetName().empty())
+                continue;
+
+            // Checks if the channel name contains the current zone
             const auto does_contains = channel->GetName().find(current_str_zone) != std::string::npos;
             if (chanId != ChatChannelId::LOOKING_FOR_GROUP && chanId != ChatChannelId::WORLD_DEFENSE && !does_contains)
             {
@@ -2473,11 +2489,15 @@ bool PlayerbotAI::SayToChannel(const std::string& msg, const ChatChannelId& chan
             }
             else if (chanId == ChatChannelId::LOOKING_FOR_GROUP || chanId == ChatChannelId::WORLD_DEFENSE)
             {
-                // check if capitals then return false if not
+                // Here you can add the capital check if necessary
             }
 
-            channel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
-            return true;
+            // Final check to ensure the channel is correct before trying to say something
+            if (channel)
+            {
+                channel->Say(bot->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+                return true;
+            }
         }
     }
 
@@ -3929,10 +3949,7 @@ Player* PlayerbotAI::GetGroupMaster()
 
 uint32 PlayerbotAI::GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum, float cyclePerMin)
 {
-    //deterministic seed 
-    uint8 seedNumber = uint8(typeNumber);
-    std::mt19937 rng(seedNumber);
-    uint32 randseed = rng();                                  // Seed random number
+    uint32 randseed = rand32();                               // Seed random number
     uint32 randnum = bot->GetGUID().GetCounter() + randseed;  // Semi-random but fixed number for each bot.
 
     if (cyclePerMin > 0)
@@ -3942,7 +3959,8 @@ uint32 PlayerbotAI::GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum, fl
         randnum += cycle;                            // Make the random number cylce.
     }
 
-    randnum = (randnum % (maxNum + 1));  // Loops the randomnumber at maxNum. Bassically removes all the numbers above 99.
+    randnum =
+        (randnum % (maxNum + 1));  // Loops the randomnumber at maxNum. Bassically removes all the numbers above 99.
     return randnum;  // Now we have a number unique for each bot between 0 and maxNum that increases by cyclePerMin.
 }
 
@@ -4080,73 +4098,83 @@ inline bool HasRealPlayers(Map* map)
     return false;
 }
 
-ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
+bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
-    // First priority - priorities disabled or has player master. Always active.
-    if (HasRealPlayerMaster())
-        return ActivePiorityType::HAS_REAL_PLAYER_MASTER;
+    // only keep updating till initializing time has completed,
+    // which prevents unneeded expensive GameTime calls.
+    if (_isBotInitializing)
+    {
+        _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
 
-    // Self bot in a group with a bot master.
-    if (IsRealPlayer())
-        return ActivePiorityType::IS_REAL_PLAYER;
+        // no activity allowed during bot initialization
+        if (_isBotInitializing)
+        {
+            return false;
+        }
+    }
 
+    // General exceptions
+    if (activityType == PACKET_ACTIVITY)
+    {
+        return true;
+    }
+
+    // Has player master. Always active.
+    if (GetMaster())  
+    {
+        PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(GetMaster());
+        if (!masterBotAI || masterBotAI->IsRealPlayer())
+        {
+            return true;
+        }
+    }
+
+    // If grouped up
     Group* group = bot->GetGroup();
     if (group)
     {
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (!member || (!member->IsInWorld() && member->GetMapId() != bot->GetMapId()))
+            if (!member || !member->IsInWorld() && member->GetMapId() != bot->GetMapId())
+            {
                 continue;
+            }
 
             if (member == bot)
+            {
                 continue;
+            }
 
-            //IN_GROUP_WITH_REAL_PLAYER
             PlayerbotAI* memberBotAI = GET_PLAYERBOT_AI(member);
-            if (!memberBotAI || memberBotAI->HasRealPlayerMaster())
-                return ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER;
+            {
+                if (!memberBotAI || memberBotAI->HasRealPlayerMaster())
+                {
+                    return true;
+                }
+            }
 
-            //ALLOWED_PARTY_ACTIVITY
             if (group->IsLeader(member->GetGUID()))
             {
                 if (!memberBotAI->AllowActivity(PARTY_ACTIVITY))
-                    return ActivePiorityType::ALLOWED_PARTY_ACTIVITY;
+                {
+                    return false;
+                }
             }
         }
     }
 
-    //IN_INSTANCE
-    if (bot->IsBeingTeleported())  // Allow activity while teleportation.
-        return ActivePiorityType::IN_INSTANCE;
-
-    //IN_INSTANCE
+    // bg, raid, dungeon
     if (!WorldPosition(bot).isOverworld())
-        return ActivePiorityType::IN_INSTANCE;
-
-    //IN_COMBAT
-    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
     {
-        // Is in combat, defend yourself.
-        if (bot->IsInCombat())
-            return ActivePiorityType::IN_COMBAT;
+        return true;
     }
 
-    // IN_REACT_DISTANCE
-    if (HasPlayerNearby(sPlayerbotAIConfig->reactDistance))
-        return ActivePiorityType::IN_REACT_DISTANCE;
-
-    // NEARBY_PLAYER acitivity based on yards.
-    if (HasPlayerNearby(300.f))
-        return ActivePiorityType::NEARBY_PLAYER_300;
-    if (HasPlayerNearby(600.f))
-        return ActivePiorityType::NEARBY_PLAYER_600;
-
-    //if (sPlayerbotAIConfig->IsFreeAltBot(bot) || HasStrategy("travel once", BotState::BOT_STATE_NON_COMBAT))
-    //    return ActivePiorityType::IS_ALWAYS_ACTIVE;
-
+    // In bg queue. Speed up bg queue/join.
     if (bot->InBattlegroundQueue())
-        return ActivePiorityType::IN_BG_QUEUE;
+    {
+        return true;
+    }
 
     bool isLFG = false;
     if (group)
@@ -4161,122 +4189,82 @@ ActivePiorityType PlayerbotAI::GetPriorityType(ActivityType activityType)
         isLFG = true;
     }
     if (isLFG)
-        return ActivePiorityType::IN_LFG;
-
-    //IN_EMPTY_SERVER
-    if (sRandomPlayerbotMgr->GetPlayers().empty())
-        return ActivePiorityType::IN_EMPTY_SERVER;
-
-    //PLAYER_FRIEND (on friendlist of real player) (needs to be tested for stability)
-    /*for (auto& player : sRandomPlayerbotMgr->GetPlayers())
     {
-          if (!player || !player->IsInWorld())
-              continue;
+        return true;
+    }
 
-         if (player->GetSocial() &&
-             bot->GetGUID() &&
-             player->GetSocial()->HasFriend(bot->GetGUID()))
-             return ActivePiorityType::PLAYER_FRIEND;
+    // Is in combat. Defend yourself.
+    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
+    {
+        if (bot->IsInCombat())
+        {
+            return true;
+        }
+    }
+
+    // Player is near. Always active.
+    if (HasPlayerNearby(300.f))
+    {
+        return true;
+    }
+
+    // friends always active
+
+    // HasFriend sometimes cause crash, disable
+    // for (auto& player : sRandomPlayerbotMgr->GetPlayers())
+    // {
+    //     if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
+    //         continue;
+
+    //     if (player->GetSocial()->HasFriend(bot->GetGUID()))
+    //         return true;
+    // }
+
+   /* if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
+    {
+        if (HasManyPlayersNearby())
+        {
+            return false;
+        }
     }*/
 
-    //PLAYER_GUILD (contains real player)
-    if (IsInRealGuild())
-        return ActivePiorityType::PLAYER_GUILD;
-
-
-    //IN_NOT_ACTIVE_MAP
-    if (Map* map = bot->GetMap())
+    // Bots don't need to move using PathGenerator.
+    if (activityType == DETAILED_MOVE_ACTIVITY)
     {
-        if (map->GetEntry()->IsWorldMap())
-        {
-            if (!HasRealPlayers(map))
-                return ActivePiorityType::IN_NOT_ACTIVE_MAP;
-
-            if (!map->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY()))
-                return ActivePiorityType::IN_NOT_ACTIVE_MAP;
-        }
-    }
-
-    //IN_ACTIVE_MAP
-    if (Map* map = bot->GetMap())
-    {
-        if (map->GetEntry()->IsWorldMap())
-        {
-            if (HasRealPlayers(map))
-                return ActivePiorityType::IN_ACTIVE_MAP;
-        }
-    }
-
-    // IN_VERY_ACTIVE_AREA
-    if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
-    {
-        if (HasManyPlayersNearby(20, sPlayerbotAIConfig->sightDistance))
-            return ActivePiorityType::IN_VERY_ACTIVE_AREA;
-    }
-
-    return ActivePiorityType::DEFAULT;
-}
-
-bool PlayerbotAI::AllowActive(ActivityType activityType)
-{
-    // no activity allowed during bot initialization during first
-    // few minutes after starting the server based on maxRandomBots.
-    if (sRandomPlayerbotMgr->isBotInitializing())
         return false;
-
-    // General exceptions
-    if (activityType == PACKET_ACTIVITY)
-        return true;
-
-    uint32 botActiveAlonePerc = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
-    uint32 mod = botActiveAlonePerc;
-    ActivePiorityType type = GetPriorityType(activityType);
-
-    switch (type)
-    {
-        case ActivePiorityType::HAS_REAL_PLAYER_MASTER:
-        case ActivePiorityType::IS_REAL_PLAYER:
-        case ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER:
-        case ActivePiorityType::IN_INSTANCE:
-        case ActivePiorityType::IN_COMBAT:
-        case ActivePiorityType::IN_REACT_DISTANCE:
-        case ActivePiorityType::NEARBY_PLAYER_300:
-        case ActivePiorityType::IS_ALWAYS_ACTIVE:
-            return true;
-            break;
-        case ActivePiorityType::ALLOWED_PARTY_ACTIVITY:
-            return false;
-            break;
-        case ActivePiorityType::IN_BG_QUEUE:
-        case ActivePiorityType::IN_LFG:
-        case ActivePiorityType::PLAYER_FRIEND:
-        case ActivePiorityType::PLAYER_GUILD:
-        case ActivePiorityType::IN_ACTIVE_MAP:
-        case ActivePiorityType::IN_NOT_ACTIVE_MAP:
-        case ActivePiorityType::IN_EMPTY_SERVER:
-        default:
-            break;
     }
 
-    // Bots do not need to move using PathGenerator.
-    //if (activityType == DETAILED_MOVE_ACTIVITY) return false;
+    if (sPlayerbotAIConfig->botActiveAlone <= 0)
+    {
+        return false;
+    }
+    if (sPlayerbotAIConfig->botActiveAlone >= 100 && !sPlayerbotAIConfig->botActiveAloneSmartScale)
+    {
+        return true;
+    }
 
-    // All exceptions are now done, below is the code to have a specified % of bots
-    // active at all times. The default is 10%. With 0.1% of all bots going active
-    // or inactive each minute.
-    if (sPlayerbotAIConfig->botActiveAlone <= 0) return false;
+    // #######################################################################################
+    // All mandatory conditations are checked to be active or not, from here the remaining
+    // situations are usable for scaling when enabled.
+    // #######################################################################################
+
+    // Below is code to have a specified % of bots active at all times.
+    // The default is 10%. With 0.1% of all bots going active or inactive each minute.
+    uint32 mod = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
     if (sPlayerbotAIConfig->botActiveAloneSmartScale &&
         bot->GetLevel() >= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMinLevel &&
         bot->GetLevel() <= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMaxLevel)
     {
-        mod = SmartScaleActivity(type, botActiveAlonePerc);
+        mod = AutoScaleActivity(mod);
     }
 
-    uint32 ActivityNumber = GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100,
-        botActiveAlonePerc * static_cast<float>(mod) / 100 * 0.01f);
+    uint32 ActivityNumber =
+        GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100,
+                         sPlayerbotAIConfig->botActiveAlone * static_cast<float>(mod) / 100 * 0.01f);
 
-    // The given percentage of bots should be active and rotate 1% of those active bots each minute.
-    return ActivityNumber <= (botActiveAlonePerc * mod) / 100;  
+    return ActivityNumber <=
+           (sPlayerbotAIConfig->botActiveAlone * mod) /
+               100;  // The given percentage of bots should be active and rotate 1% of those active bots each minute.
 }
 
 bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
@@ -4293,42 +4281,37 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
     return allowed;
 }
 
-uint32 PlayerbotAI::SmartScaleActivity(ActivePiorityType type, uint32 botActiveAlonePerc)
+uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 {
-    uint32 maxDiff = sWorldUpdateTime.GetMaxUpdateTime();
-    if (maxDiff > 1000) return false;
-    switch (type)
-    {
-        case ActivePiorityType::IN_BG_QUEUE:
-        case ActivePiorityType::IN_LFG:
-            if (maxDiff > 100) return 80;
-            if (maxDiff > 100) return 90;
-            break;
-        case ActivePiorityType::NEARBY_PLAYER_600:
-            if (maxDiff > 100) return 50;
-            if (maxDiff > 50)  return 75;
-            break;
-        case ActivePiorityType::PLAYER_FRIEND:
-        case ActivePiorityType::PLAYER_GUILD:
-        case ActivePiorityType::IN_ACTIVE_MAP:
-            if (maxDiff > 200) return 30;
-            if (maxDiff > 100) return 50;
-            if (maxDiff > 50)  return 75;
-            break;
-        case ActivePiorityType::IN_VERY_ACTIVE_AREA:
-        case ActivePiorityType::IN_NOT_ACTIVE_MAP:
-            if (maxDiff > 100) return 30;
-            if (maxDiff > 50)  return 50;
-            break;
-        case ActivePiorityType::IN_EMPTY_SERVER:
-            return 30;
-        default:
-            if (maxDiff > 200) return 30;
-            if (maxDiff > 100) return 50;
-            break;
-    }
+    uint32 maxDiff = sWorldUpdateTime.GetAverageUpdateTime();
 
-    return botActiveAlonePerc;
+    if (maxDiff > 500) return 0;
+    if (maxDiff > 250)
+    {
+        if (Map* map = bot->GetMap())
+        {
+            if (map->GetEntry()->IsWorldMap())
+            {
+                if (!HasRealPlayers(map))
+                {
+                    return 0;
+                }
+
+                if (!map->IsGridLoaded(bot->GetPositionX(), bot->GetPositionY()))
+                {
+                    return 0;
+                }
+            }
+        }
+
+        return (mod * 1) / 10;
+    }
+    if (maxDiff > 200) return (mod * 3) / 10;
+    if (maxDiff > 150) return (mod * 5) / 10;
+    if (maxDiff > 100) return (mod * 6) / 10;
+    if (maxDiff > 75)  return (mod * 9) / 10;
+
+    return mod;
 }
 
 bool PlayerbotAI::IsOpposing(Player* player) { return IsOpposing(player->getRace(), bot->getRace()); }
@@ -5438,27 +5421,13 @@ bool PlayerbotAI::CanMove()
     if (IsInVehicle() && !IsInVehicle(true))
         return false;
 
-    if (bot->isFrozen() ||
-        bot->IsPolymorphed() ||
-        (bot->isDead() && !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)) ||
-        bot->IsBeingTeleported() ||
-        bot->isInRoots() ||
-        bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) ||
-        bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) ||
-        bot->IsCharmed() ||
-        bot->HasAuraType(SPELL_AURA_MOD_STUN) ||
-        bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
-        bot->HasUnitState(UNIT_STATE_LOST_CONTROL))
-
+    if (bot->isFrozen() || bot->IsPolymorphed() || (bot->isDead() && !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)) ||
+        bot->IsBeingTeleported() || bot->isInRoots() || bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) ||
+        bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || bot->IsCharmed() || bot->HasAuraType(SPELL_AURA_MOD_STUN) ||
+        bot->HasUnitState(UNIT_STATE_IN_FLIGHT) || bot->HasUnitState(UNIT_STATE_LOST_CONTROL))
         return false;
 
     return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE;
-}
-
-bool PlayerbotAI::IsTaxiFlying()
-{
-    return bot->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) &&
-        bot->HasUnitState(UNIT_STATE_IGNORE_PATHFINDING);
 }
 
 bool PlayerbotAI::IsInRealGuild()

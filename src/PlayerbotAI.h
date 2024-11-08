@@ -241,30 +241,6 @@ enum class GuilderType : uint8
     VERY_LARGE = 250
 };
 
-enum class ActivePiorityType : uint8
-{
-    IS_REAL_PLAYER = 0,
-    HAS_REAL_PLAYER_MASTER = 1,
-    IN_GROUP_WITH_REAL_PLAYER = 2,
-    IN_INSTANCE = 3,
-    IS_ALWAYS_ACTIVE = 4,
-    IN_COMBAT = 5,
-    IN_BG_QUEUE = 6,
-    IN_LFG = 7,
-    IN_REACT_DISTANCE = 8,
-    NEARBY_PLAYER_300 = 9,
-    NEARBY_PLAYER_600 = 10,
-    NEARBY_PLAYER_900 = 11,
-    PLAYER_FRIEND = 12,
-    PLAYER_GUILD = 13,
-    IN_VERY_ACTIVE_AREA = 14,
-    IN_ACTIVE_MAP = 15,
-    IN_NOT_ACTIVE_MAP = 16,
-    IN_EMPTY_SERVER = 17,
-    ALLOWED_PARTY_ACTIVITY = 18,
-    DEFAULT
-};
-
 enum ActivityType
 {
     GRIND_ACTIVITY = 1,
@@ -274,8 +250,8 @@ enum ActivityType
     PACKET_ACTIVITY = 5,
     DETAILED_MOVE_ACTIVITY = 6,
     PARTY_ACTIVITY = 7,
-    REACT_ACTIVITY = 8,
-    ALL_ACTIVITY = 9,
+    ALL_ACTIVITY = 8,
+
     MAX_ACTIVITY_TYPE
 };
 
@@ -549,10 +525,9 @@ public:
     bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig->reactDistance);
     bool HasPlayerNearby(float range = sPlayerbotAIConfig->reactDistance);
     bool HasManyPlayersNearby(uint32 trigerrValue = 20, float range = sPlayerbotAIConfig->sightDistance);
-    ActivePiorityType GetPriorityType(ActivityType activityType);
     bool AllowActive(ActivityType activityType);
     bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
-    uint32 SmartScaleActivity(ActivePiorityType type, uint32 botActiveAlonePerc);
+    uint32 AutoScaleActivity(uint32 mod);
 
     // Check if player is safe to use.
     bool IsSafe(Player* player);
@@ -579,7 +554,6 @@ public:
     void ResetJumpDestination() { jumpDestination = Position(); }
 
     bool CanMove();
-    bool IsTaxiFlying();
     bool IsInRealGuild();
     static std::vector<std::string> dispel_whitelist;
     bool EqualLowercaseName(std::string s1, std::string s2);
@@ -606,6 +580,7 @@ private:
 
     void HandleCommands();
     void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
+    bool _isBotInitializing = true;
 
 protected:
     Player* bot;
