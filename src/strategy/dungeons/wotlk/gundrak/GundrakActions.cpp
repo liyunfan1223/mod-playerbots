@@ -19,6 +19,32 @@ bool AvoidPoisonNovaAction::Execute(Event event)
     return false;
 }
 
+bool AttackSnakeWrapAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "slad'ran");
+    if (!boss) { return false; }
+
+    Unit* snakeWrap = nullptr;
+    // Target is not findable from threat table using AI_VALUE2(),
+    // therefore need to search manually for the unit name
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+
+    for (auto& target : targets)
+    {
+        Unit* unit = botAI->GetUnit(target);
+        if (unit && unit->GetEntry() == NPC_SNAKE_WRAP)
+        {
+            Unit* currentTarget = AI_VALUE(Unit*, "current target");
+            if (!currentTarget || currentTarget->GetEntry() != NPC_SNAKE_WRAP)
+            {
+            return Attack(unit);
+            }
+        }
+    }
+
+    return false;
+}
+
 bool AvoidWhirlingSlashAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "gal'darah");

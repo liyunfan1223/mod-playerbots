@@ -17,9 +17,12 @@ void WotlkDungeonUPStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     
     // King Ymiron
     // May need to avoid orb.. unclear if the generic avoid AoE does this well
+    triggers.push_back(new TriggerNode("ymiron bane",
+        NextAction::array(0, new NextAction("stop attack", ACTION_RAID + 5), nullptr)));
 }
 
 void WotlkDungeonUPStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     multipliers.push_back(new SkadiMultiplier(botAI));
+    multipliers.push_back(new YmironMultiplier(botAI));
 }

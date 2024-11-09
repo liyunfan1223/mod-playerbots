@@ -11,13 +11,38 @@ float SladranMultiplier::GetValue(Action* action)
     Unit* boss = AI_VALUE2(Unit*, "find target", "slad'ran");
     if (!boss) { return 1.0f; }
 
-    if (boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_POISON_NOVA))
+    if (boss->FindCurrentSpellBySpellId(SPELL_POISON_NOVA))
+    {
+        if (dynamic_cast<MovementAction*>(action) && !dynamic_cast<AvoidPoisonNovaAction*>(action))
         {
-            if (dynamic_cast<MovementAction*>(action) && !dynamic_cast<AvoidPoisonNovaAction*>(action))
-            {
-                return 0.0f;
-            }
+            return 0.0f;
         }
+    }
+
+    if (!botAI->IsDps(bot)) { return 1.0f; }
+
+    if (action->getThreatType() == Action::ActionThreatType::Aoe)
+    {
+        return 0.0f;
+    }
+
+    Unit* snakeWrap = nullptr;
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+    for (auto& target : targets)
+    {
+        Unit* unit = botAI->GetUnit(target);
+        if (unit && unit->GetEntry() == NPC_SNAKE_WRAP)
+        {
+            snakeWrap = unit;
+            break;
+        }
+    }
+    // Prevent auto-target acquisition during snake wraps
+    if (snakeWrap && dynamic_cast<DpsAssistAction*>(action))
+    {
+        return 0.0f;
+    }
+
     return 1.0f;
 }
 

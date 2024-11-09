@@ -11,6 +11,7 @@ enum GundrakIDs
     // Slad'ran
     SPELL_POISON_NOVA_N             = 55081,
     SPELL_POISON_NOVA_H             = 59842,
+    NPC_SNAKE_WRAP                  = 29742,
     
     // Gal'darah
     SPELL_WHIRLING_SLASH_N          = 55250,
@@ -24,6 +25,13 @@ class SladranPoisonNovaTrigger : public Trigger
 {
 public:
     SladranPoisonNovaTrigger(PlayerbotAI* ai) : Trigger(ai, "slad'ran poison nova") {}
+    bool IsActive() override;
+};
+
+class SladranSnakeWrapTrigger : public Trigger
+{
+public:
+    SladranSnakeWrapTrigger(PlayerbotAI* ai) : Trigger(ai, "slad'ran snake wrap") {}
     bool IsActive() override;
 };
 

@@ -12,4 +12,13 @@ class SkadiMultiplier : public Multiplier
         virtual float GetValue(Action* action);
 };
 
+class YmironMultiplier : public Multiplier
+{
+    public:
+        YmironMultiplier(PlayerbotAI* ai) : Multiplier(ai, "king ymiron") {}
+
+    public:
+        virtual float GetValue(Action* action);
+};
+
 #endif

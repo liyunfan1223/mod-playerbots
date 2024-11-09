@@ -13,13 +13,14 @@ void WotlkDungeonGDStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // Will re-test in heroic, decent dps groups should be able to blast him down with no funky strats.
     triggers.push_back(new TriggerNode("poison nova",
         NextAction::array(0, new NextAction("avoid poison nova", ACTION_RAID + 5), nullptr)));
+    triggers.push_back(new TriggerNode("snake wrap",
+        NextAction::array(0, new NextAction("attack snake wrap", ACTION_RAID + 4), nullptr)));
     
     // Gal'darah
     triggers.push_back(new TriggerNode("whirling slash",
         NextAction::array(0, new NextAction("avoid whirling slash", ACTION_RAID + 5), nullptr)));
     
     // Eck the Ferocious (Heroic only)
-    // TODO
 }
 
 void WotlkDungeonGDStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
