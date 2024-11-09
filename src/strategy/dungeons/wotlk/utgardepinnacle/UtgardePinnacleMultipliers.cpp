@@ -82,3 +82,18 @@ float SkadiMultiplier::GetValue(Action* action)
 
     return 1.0f;
 }
+
+float YmironMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "king ymiron");
+    if (!boss) { return 1.0f; }
+
+    if (boss->FindCurrentSpellBySpellId(SPELL_BANE) || boss->HasAura(SPELL_BANE))
+    {
+        if (dynamic_cast<AttackAction*>(action))
+        {
+            return 0.0f;
+        }
+    }
+    return 1.0f;
+}

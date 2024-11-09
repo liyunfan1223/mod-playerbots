@@ -46,3 +46,11 @@ bool SkadiWhirlwindTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "skadi the ruthless");
     return boss && boss->HasAura(SPELL_SKADI_WHIRLWIND);
 }
+
+bool YmironBaneTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "king ymiron");
+    if (!boss) { return false; }
+
+    return boss->FindCurrentSpellBySpellId(SPELL_BANE) || boss->HasAura(SPELL_BANE);
+}
