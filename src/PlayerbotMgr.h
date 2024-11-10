@@ -42,7 +42,7 @@ public:
     void HandleBotPackets(WorldSession* session);
 
     void LogoutAllBots();
-    void OnBotLogin(Player* const bot);
+    void OnBotLogin(Player* bot);
 
     std::vector<std::string> HandlePlayerbotCommand(char const* args, Player* master = nullptr);
     std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin,
