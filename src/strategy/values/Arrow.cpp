@@ -22,10 +22,9 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float offset = 0.f;
 
     Player* master = botAI->GetMaster();
-    if (!master)
-    {
+    if (!botAI->IsSafe(master))
         return Formation::NullLocation;
-    }
+
     float orientation = master->GetOrientation();
     MultiLineUnitPlacer placer(orientation);
 
