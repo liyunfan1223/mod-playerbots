@@ -42,6 +42,9 @@ WorldLocation ArrowFormation::GetLocationInternal()
     offset += rangedLines * sPlayerbotAIConfig->followDistance;
     healers.PlaceUnits(&placer);
     healers.Move(-cos(orientation) * offset, -sin(orientation) * offset);
+	
+    if (!masterUnit || !botUnit)
+        return Formation::NullLocation;
 
     float x = master->GetPositionX() - masterUnit->GetX() + botUnit->GetX();
     float y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
@@ -95,7 +98,7 @@ void ArrowFormation::FillSlotsExceptMaster()
             else if (member != botAI->GetMaster())
                 FindSlot(member)->AddLast(new FormationUnit(index, false));
             ++index;
-		{
+		}
         gref = gref->next();
     }
 }
