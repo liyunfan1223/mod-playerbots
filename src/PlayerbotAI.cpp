@@ -4098,6 +4098,41 @@ inline bool HasRealPlayers(Map* map)
     return false;
 }
 
+inline bool ZoneHasRealPlayers(Player* bot)
+{
+    Map* map = bot->GetMap();
+    if (!bot || !map)
+    {
+        return false;
+    }
+
+    Map::PlayerList const& players = bot->GetMap()->GetPlayers();
+    if (players.IsEmpty())
+    {
+        return false;
+    }
+
+    for (auto const& itr : players)
+    {
+        Player* player = itr.GetSource();
+        if (!player || !player->IsVisible())
+        {
+            continue;
+        }
+
+        if (player->GetZoneId() == bot->GetZoneId())
+        {
+            PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+            if (!botAI || botAI->IsRealPlayer() || botAI->HasRealPlayerMaster())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
     // only keep updating till initializing time has completed,
@@ -4119,6 +4154,33 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         return true;
     }
 
+    // bg, raid, dungeon
+    if (!WorldPosition(bot).isOverworld())
+    {
+        return true;
+    }
+
+    // Is in combat. Defend yourself.
+    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
+    {
+        if (bot->IsInCombat())
+        {
+            return true;
+        }
+    }
+
+    // bot zone has active players.
+    if (ZoneHasRealPlayers(bot))
+    {
+        return true;
+    }
+
+    // when in real guild
+    if (IsInRealGuild())
+    {
+        return true;
+    }
+
     // Has player master. Always active.
     if (GetMaster())  
     {
@@ -4129,7 +4191,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         }
     }
 
-    // If grouped up
+    // if grouped up
     Group* group = bot->GetGroup();
     if (group)
     {
@@ -4164,12 +4226,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         }
     }
 
-    // bg, raid, dungeon
-    if (!WorldPosition(bot).isOverworld())
-    {
-        return true;
-    }
-
+    
     // In bg queue. Speed up bg queue/join.
     if (bot->InBattlegroundQueue())
     {
@@ -4193,40 +4250,34 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         return true;
     }
 
-    // Is in combat. Defend yourself.
-    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
-    {
-        if (bot->IsInCombat())
-        {
-            return true;
-        }
-    }
-
     // Player is near. Always active.
     if (HasPlayerNearby(300.f))
     {
         return true;
     }
 
-    // friends always active
-
-    // HasFriend sometimes cause crash, disable
-    // for (auto& player : sRandomPlayerbotMgr->GetPlayers())
-    // {
-    //     if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
-    //         continue;
-
-    //     if (player->GetSocial()->HasFriend(bot->GetGUID()))
-    //         return true;
-    // }
-
-   /* if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
+    // HasFriend
+    for (auto& player : sRandomPlayerbotMgr->GetPlayers())
     {
-        if (HasManyPlayersNearby())
+        if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
         {
-            return false;
+            continue;
         }
-    }*/
+
+        if (player->GetSocial()->HasFriend(bot->GetGUID()))
+        {
+            return true;
+        }
+    }
+
+    // Force the bots to spread
+    if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
+    {
+        if (HasManyPlayersNearby(10, sPlayerbotAIConfig->sightDistance))
+        {
+            return true;
+        }
+    }
 
     // Bots don't need to move using PathGenerator.
     if (activityType == DETAILED_MOVE_ACTIVITY)
