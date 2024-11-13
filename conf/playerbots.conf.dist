@@ -1454,7 +1454,10 @@ AiPlayerbot.RandombotsWalkingRPG = 0
 AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
 
 # Specify percent of active bots
-# The default is 10. With 10% of all bots going active or inactive each minute.
+# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
+# This value is only applied to inactive areas where no real-players are detected, when
+# real-players are nearby, friend, group, guild, bg, instances etc the value is always
+# enforced to 100%
 AiPlayerbot.BotActiveAlone = 100
 
 # Specify smart scaling is enabled or not.
