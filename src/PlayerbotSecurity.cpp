@@ -181,7 +181,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
 {
     DenyReason reason = PLAYERBOT_DENY_NONE;
     PlayerbotSecurityLevel realLevel = LevelFor(from, &reason, ignoreGroup);
-    if (realLevel >= level)
+    if (realLevel >= level || from == bot)
         return true;
 
     PlayerbotAI* fromBotAI = GET_PLAYERBOT_AI(from);
