@@ -170,8 +170,38 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     pItem->RemoveFromUpdateQueueOf(bot);
     delete pItem;
 
-    if (result != EQUIP_ERR_OK)
+    if (result != EQUIP_ERR_OK && result != EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+    {
         return ITEM_USAGE_NONE;
+    }
+    // Check is unique items are equipped or not
+    bool needToCheckUnique = false;
+    if (result == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+    {
+        needToCheckUnique = true;
+    }
+    else if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+    {
+        needToCheckUnique = true;
+    }
+    
+    if (needToCheckUnique)
+    {
+        // Count the total number of the item (equipped + in bags)
+        uint32 totalItemCount = bot->GetItemCount(itemProto->ItemId, true);
+        
+        // Count the number of the item in bags only
+        uint32 bagItemCount = bot->GetItemCount(itemProto->ItemId, false);
+        
+        // Determine if the unique item is already equipped
+        bool isEquipped = (totalItemCount > bagItemCount);
+        
+        if (isEquipped)
+        {
+            return ITEM_USAGE_NONE;  // Item is already equipped
+        }
+        // If not equipped, continue processing
+    }
 
     if (itemProto->Class == ITEM_CLASS_QUIVER)
         if (bot->getClass() != CLASS_HUNTER)
@@ -207,7 +237,17 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
 
     uint8 possibleSlots = 1;
     uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
-    
+    // Check if dest wasn't set correctly by CanEquipItem and use FindEquipSlot instead
+    // This occurs with unique items that are already in the bots bags when CanEquipItem is called
+    if (dest == 0)
+    {
+        if (dstSlot != NULL_SLOT)
+        {
+            // Construct dest from dstSlot
+            dest = (INVENTORY_SLOT_BAG_0 << 8) | dstSlot;
+        }
+    }
+
     if (dstSlot == EQUIPMENT_SLOT_FINGER1 || dstSlot == EQUIPMENT_SLOT_TRINKET1)
     {
         possibleSlots = 2;
