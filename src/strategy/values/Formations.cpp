@@ -437,6 +437,7 @@ float Formation::GetFollowAngle()
         {
             if (Player* member = ref->GetSource())
             {
+                if (!member || member == bot || !member->IsAlive() || bot->GetMapId() != member->GetMapId()) continue;
                 if (member != master && !botAI->IsTank(member) && !botAI->IsHeal(member))
                 {
                     roster.insert(roster.begin() + roster.size() / 2, member);
@@ -448,6 +449,7 @@ float Formation::GetFollowAngle()
         {
             if (Player* member = ref->GetSource())
             {
+                if (!member || member == bot || !member->IsAlive() || bot->GetMapId() != member->GetMapId()) continue;
                 if (member != master && botAI->IsHeal(member))
                 {
                     roster.insert(roster.begin() + roster.size() / 2, member);
@@ -460,6 +462,7 @@ float Formation::GetFollowAngle()
         {
             if (Player* member = ref->GetSource())
             {
+                if (!member || member == bot || !member->IsAlive() || bot->GetMapId() != member->GetMapId()) continue;
                 if (member != master && botAI->IsTank(member))
                 {
                     if (left)
