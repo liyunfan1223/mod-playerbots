@@ -171,7 +171,57 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     delete pItem;
 
     if (result != EQUIP_ERR_OK)
-        return ITEM_USAGE_NONE;
+    {
+        // Handle unique items
+        if (result == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+        {
+            // Count the total number of the item the bot already has (equipped + in bags)
+            uint32 totalItemCount = bot->GetItemCount(itemProto->ItemId, true);  // true counts both equipped and in bags
+    
+            // Count the number of the item in bags only
+            uint32 bagItemCount = bot->GetItemCount(itemProto->ItemId, false); // false counts items in bags only
+    
+            // Determine if the unique item is already equipped
+            bool isEquipped = (totalItemCount > bagItemCount);
+    
+            // If the bot has one of the unique item and it's already equipped, it cannot equip or carry more
+            if (isEquipped)
+            {
+                return ITEM_USAGE_NONE;  // Item is not used in this case
+            }
+            // If the item is not already equipped, allow the bot to continue evaluating the item despite the error
+        }
+        else
+        {
+            // For other errors, the item is not used
+            return ITEM_USAGE_NONE;  // Item is not used in case of other errors
+        }
+    }
+    else
+    {
+        // Handle unique equippable items
+        if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+        {
+            // Count the total number of the item (equipped + in bags)
+            uint32 totalItemCount = bot->GetItemCount(itemProto->ItemId, true);  // true counts both equipped and in bags
+    
+            // Count the number of the item in bags only
+            uint32 bagItemCount = bot->GetItemCount(itemProto->ItemId, false); // false counts items in bags only
+    
+            // Determine if the unique item is already equipped
+            bool isEquipped = (totalItemCount > bagItemCount);
+    
+            if (isEquipped)
+            {
+                // Item is unique equippable and already equipped
+                return ITEM_USAGE_NONE;
+            }
+    
+            // If the item is not equipped but exists in bags, allow equipping
+            // No action needed here; the function will continue to handle equipping
+        }
+        // If the item is not unique equippable, proceed with equipping
+    }
 
     if (itemProto->Class == ITEM_CLASS_QUIVER)
         if (bot->getClass() != CLASS_HUNTER)
@@ -207,7 +257,16 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
 
     uint8 possibleSlots = 1;
     uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
-    
+    // Check if dest wasn't set correctly by CanEquipItem and use dstSlot instead
+    if (dest == 0)
+    {
+        if (dstSlot != NULL_SLOT)
+        {
+            // Construct dest from dstSlot
+            dest = (INVENTORY_SLOT_BAG_0 << 8) | dstSlot;
+        }
+    }
+
     if (dstSlot == EQUIPMENT_SLOT_FINGER1 || dstSlot == EQUIPMENT_SLOT_TRINKET1)
     {
         possibleSlots = 2;
