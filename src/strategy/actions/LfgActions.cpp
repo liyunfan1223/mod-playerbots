@@ -69,8 +69,10 @@ uint32 LfgJoinAction::GetRoles()
             else
                 return PLAYER_ROLE_DAMAGE;
             break;
+
         default:
             return PLAYER_ROLE_DAMAGE;
+			break;
     }
 
     return PLAYER_ROLE_DAMAGE;
@@ -83,14 +85,14 @@ bool LfgJoinAction::JoinLFG()
     if (state != LFG_STATE_NONE)
         return false;
 
-    ItemCountByQuality visitor;
+    /*ItemCountByQuality visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
     bool random = urand(0, 100) < 20;
     bool heroic = urand(0, 100) < 50 &&
                   (visitor.count[ITEM_QUALITY_EPIC] >= 3 || visitor.count[ITEM_QUALITY_RARE] >= 10) &&
                   bot->GetLevel() >= 70;
     bool rbotAId = !heroic && (urand(0, 100) < 50 && visitor.count[ITEM_QUALITY_EPIC] >= 5 &&
-                               (bot->GetLevel() == 60 || bot->GetLevel() == 70 || bot->GetLevel() == 80));
+                               (bot->GetLevel() == 60 || bot->GetLevel() == 70 || bot->GetLevel() == 80));*/
 
     LfgDungeonSet list;
     std::vector<uint32> selected;
@@ -173,9 +175,9 @@ bool LfgRoleCheckAction::Execute(Event event)
 
 bool LfgAcceptAction::Execute(Event event)
 {
-    LfgState status = sLFGMgr->GetState(bot->GetGUID());
+    /*LfgState status = sLFGMgr->GetState(bot->GetGUID());
     if (status != LFG_STATE_PROPOSAL)
-        return false;
+        return false;*/
 
     uint32 id = AI_VALUE(uint32, "lfg proposal");
     if (id)
@@ -271,9 +273,12 @@ bool LfgJoinAction::isUseful()
 
     if (bot->GetLevel() < 15)
         return false;
+	
+	// don't use if active player master
+    if (GET_PLAYERBOT_AI(bot)->IsRealPlayer())
+        return false;
 
-    if ((botAI->GetMaster() && !GET_PLAYERBOT_AI(botAI->GetMaster())) ||
-        bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() != bot->GetGUID())
+    if (bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() != bot->GetGUID())
     {
         // botAI->ChangeStrategy("-lfg", BOT_STATE_NON_COMBAT);
         return false;
