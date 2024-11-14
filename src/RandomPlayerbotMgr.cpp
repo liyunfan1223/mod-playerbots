@@ -2248,7 +2248,7 @@ void RandomPlayerbotMgr::OnBotLoginInternal(Player* const bot)
     {
         bot->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
     }
-    else if (!sPlayerbotAIConfig->randomBotFixedLevel)
+    else
     {
         bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
     }
