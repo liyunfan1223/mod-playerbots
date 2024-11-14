@@ -2243,6 +2243,15 @@ void RandomPlayerbotMgr::OnBotLoginInternal(Player* const bot)
 {
     LOG_INFO("playerbots", "{}/{} Bot {} logged in", playerBots.size(), sRandomPlayerbotMgr->GetMaxAllowedBotCount(),
              bot->GetName().c_str());
+    
+    if (sPlayerbotAIConfig->randomBotFixedLevel)
+    {
+        bot->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    }
+    else if (!sPlayerbotAIConfig->randomBotFixedLevel)
+    {
+        bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    }
 }
 
 void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
