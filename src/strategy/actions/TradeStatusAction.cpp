@@ -147,30 +147,30 @@ bool TradeStatusAction::CheckTrade()
     if (!bot->GetTradeData() || !trader->GetTradeData())
         return false;
 
+	bool isGivingItem = false;
+	for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
+	{
+		Item* item = bot->GetTradeData()->GetItem((TradeSlots)slot);
+		if (item)
+		{
+			isGivingItem = true;
+			break;
+		}
+	}
+
+	bool isGettingItem = false;
+	for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
+	{
+		Item* item = trader->GetTradeData()->GetItem((TradeSlots)slot);
+		if (item)
+		{
+			isGettingItem = true;
+			break;
+		}
+	}
+
     if (!botAI->HasActivePlayerMaster() && GET_PLAYERBOT_AI(bot->GetTrader()))
     {
-        bool isGivingItem = false;
-        for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
-        {
-            Item* item = bot->GetTradeData()->GetItem((TradeSlots)slot);
-            if (item)
-            {
-                isGivingItem = true;
-                break;
-            }
-        }
-
-        bool isGettingItem = false;
-        for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
-        {
-            Item* item = trader->GetTradeData()->GetItem((TradeSlots)slot);
-            if (item)
-            {
-                isGettingItem = true;
-                break;
-            }
-        }
-
         if (isGettingItem)
         {
             if (bot->GetGroup() && bot->GetGroup()->IsMember(bot->GetTrader()->GetGUID()) &&
@@ -182,10 +182,12 @@ bool TradeStatusAction::CheckTrade()
         }
         return isGettingItem;
     }
+	
     if (!bot->GetSession())
     {
         return false;
     }
+	
     uint32 accountId = bot->GetSession()->GetAccountId();
     if (!sPlayerbotAIConfig->IsInRandomAccountList(accountId))
     {
@@ -235,6 +237,17 @@ bool TradeStatusAction::CheckTrade()
 
     if (!botMoney && !playerMoney)
         return true;
+	
+	// Player just wants money from the bot
+    if ( ! isGettingItem && ! isGivingItem && botMoney > playerMoney )
+    {
+        std::ostringstream out;
+        out << "You are a thief!";
+        botAI->TellMaster( out );
+        botAI->PlaySound( TEXT_EMOTE_SIGH );
+        return true;
+    }
+	
 
     if (!botItemsMoney && !playerItemsMoney)
     {
