@@ -313,6 +313,8 @@ public:
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
     int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
+	
+	bool allowRandomBotsAtm;
 
     std::string const GetTimestampStr();
     bool hasLog(std::string const fileName)

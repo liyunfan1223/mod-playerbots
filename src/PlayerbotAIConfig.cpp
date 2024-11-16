@@ -509,6 +509,9 @@ bool PlayerbotAIConfig::Initialize()
     deleteRandomBotArenaTeams = sConfigMgr->GetOption<bool>("AiPlayerbot.DeleteRandomBotArenaTeams", false);
     randomBotArenaTeamMaxRating = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotArenaTeamMaxRating", 2000);
     randomBotArenaTeamMinRating = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotArenaTeamMinRating", 1000);
+	
+	// Random Bots ATM
+	allowRandomBotsAtm = sConfigMgr->GetOption<bool>("AiPlayerbot.AllowRandomBotsAtm", false);
 
     selfBotLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.SelfBotLevel", 1);
 

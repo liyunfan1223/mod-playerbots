@@ -491,6 +491,10 @@ AiPlayerbot.RandomBotJoinLfg = 1
 # Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 AiPlayerbot.DisableDeathKnightLogin = 0
 
+# Allow random bots to be used as ATM
+# Players can trade random bots and request an amount of gold from them via whisper command
+AiPlayerbot.AllowRandomBotsAtm = 0
+
 #
 #
 #
