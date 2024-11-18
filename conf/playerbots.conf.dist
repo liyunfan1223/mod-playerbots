@@ -424,7 +424,7 @@ AiPlayerbot.AutoGearCommand = 1
 # default: 3 (rare)
 AiPlayerbot.AutoGearQualityLimit = 3
 
-# Equips gear score limitation for auto gear command (0 = no limit)
+# Equips item level (not gearScore) limitation for auto gear command (0 = no limit)
 # default: 0 (no limit)
 AiPlayerbot.AutoGearScoreLimit = 0
 
