@@ -7,7 +7,7 @@ bool MoveFromBronjahmTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
 
-    if (boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) && bot->HasAura(SPELL_CORRUPT_SOUL))
+    if (boss && boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) && bot->HasAura(SPELL_CORRUPT_SOUL))
         return true;
 
     return false;
