@@ -23,7 +23,7 @@ bool AttackCorruptedSoulFragmentAction::Execute(Event event)
 
     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    for (auto &target : targets)
+    for (auto& target : targets)
     {
         Unit* unit = botAI->GetUnit(target);
         if (unit && unit->GetEntry() == NPC_CORRUPTED_SOUL_FRAGMENT)
