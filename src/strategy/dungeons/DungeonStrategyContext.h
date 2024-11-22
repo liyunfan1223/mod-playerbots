@@ -15,6 +15,7 @@
 #include "wotlk/utgardepinnacle/UtgardePinnacleStrategy.h"
 #include "wotlk/cullingofstratholme/CullingOfStratholmeStrategy.h"
 #include "wotlk/forgeofsouls/ForgeOfSoulsStrategy.h"
+#include "wotlk/pitofsaron/PitOfSaronStrategy.h"
 
 /*
 Full list/TODO:
@@ -78,10 +79,11 @@ class DungeonStrategyContext : public NamedObjectContext<Strategy>
         static Strategy* wotlk_up(PlayerbotAI* botAI) { return new WotlkDungeonUPStrategy(botAI); }
         static Strategy* wotlk_cos(PlayerbotAI* botAI) { return new WotlkDungeonCoSStrategy(botAI); }
         static Strategy* wotlk_fos(PlayerbotAI* botAI) { return new WotlkDungeonFoSStrategy(botAI); }
+        static Strategy* wotlk_pos(PlayerbotAI* botAI) { return new WotlkDungeonPoSStrategy(botAI); }
         // NYI from here down
         static Strategy* wotlk_toc(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
         static Strategy* wotlk_hor(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
-        static Strategy* wotlk_pos(PlayerbotAI* botAI) { return new WotlkDungeonUKStrategy(botAI); }
+        
         
 };
 
