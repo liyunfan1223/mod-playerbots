@@ -834,17 +834,14 @@ bool AnubrekhanPositionAction::Execute(Event event)
     {
         return false;
     }
-    EventMap* eventMap = &boss_ai->events;
-    uint32 locust = eventMap->GetNextEventTime(2);
-    uint32 timer = eventMap->GetTimer();
     bool inPhase = botAI->HasAura("locust swarm", boss) || boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-    if (inPhase || (locust && locust - timer <= 8000))
+    if (inPhase)
     {
         if (botAI->IsMainTank(bot))
         {
             uint32 nearest = FindNearestWaypoint();
             uint32 next_point;
-            if (inPhase || (locust && locust - timer <= 3000))
+            if (inPhase)
             {
                 next_point = (nearest + 1) % intervals;
             }

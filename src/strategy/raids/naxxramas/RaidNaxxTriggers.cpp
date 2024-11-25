@@ -50,26 +50,6 @@ bool BossEventTrigger<T>::IsActive()
     return false;
 }
 
-template <class T>
-bool BossPhaseTrigger<T>::IsActive()
-{
-    Unit* boss = AI_VALUE2(Unit*, "find target", boss_name);
-    if (!boss)
-    {
-        return false;
-    }
-    if (this->phase_mask == 0)
-    {
-        return true;
-    }
-    T* boss_ai = dynamic_cast<T*>(boss->GetAI());
-    EventMap* eventMap = &boss_ai->events;
-    uint8 phase_mask = eventMap->GetPhaseMask();
-    // bot->Yell("phase mask detected: " + to_string(phase_mask) + " compare with " + to_string(this->phase_mask),
-    // LANG_UNIVERSAL);
-    return phase_mask == this->phase_mask;
-}
-
 bool GrobbulusCloudTrigger::IsActive()
 {
     Unit* boss = AI_VALUE(Unit*, "boss target");
@@ -162,21 +142,6 @@ bool SapphironFlightTrigger::IsActive()
     return helper.IsPhaseFlight();
 }
 
-// bool SapphironGroundExceptMainTankTrigger::IsActive()
-// {
-//     return BossPhaseTrigger::IsActive() && !botAI->IsMainTank(bot);
-// }
-
-// bool SapphironFlightTrigger::IsActive()
-// {
-//     return BossPhaseTrigger::IsActive();
-// }
-
-// bool SapphironGroundChillTrigger::IsActive()
-// {
-//     return BossPhaseTrigger::IsActive() && !botAI->IsMainTank(bot) && botAI->HasAura("chill", bot);
-// }
-
 bool GluthTrigger::IsActive() { return helper.UpdateBossAI(); }
 
 bool GluthMainTankMortalWoundTrigger::IsActive()
@@ -203,6 +168,15 @@ bool GluthMainTankMortalWoundTrigger::IsActive()
 }
 
 bool KelthuzadTrigger::IsActive() { return helper.UpdateBossAI(); }
+
+bool AnubrekhanTrigger::IsActive() {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
+    if (!boss)
+    {
+        return false;
+    }
+    return true;
+}
 
 bool LoathebTrigger::IsActive() { return helper.UpdateBossAI(); }
 
@@ -234,4 +208,3 @@ bool ThaddiusPhaseThaddiusTrigger::IsActive()
 }
 
 template bool BossEventTrigger<Grobbulus::boss_grobbulus::boss_grobbulusAI>::IsActive();
-template bool BossPhaseTrigger<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI>::IsActive();

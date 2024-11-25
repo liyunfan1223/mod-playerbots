@@ -49,23 +49,6 @@ protected:
     uint32 boss_entry, event_id, last_event_time;
 };
 
-template <class T>
-class BossPhaseTrigger : public Trigger
-{
-public:
-    BossPhaseTrigger(PlayerbotAI* ai, std::string boss_name, uint32 phase_mask, std::string name = "boss event")
-        : Trigger(ai, name, 1)
-    {
-        this->boss_name = boss_name;
-        this->phase_mask = phase_mask;
-    }
-    virtual bool IsActive();
-
-protected:
-    std::string boss_name;
-    uint32 phase_mask;
-};
-
 class GrobbulusCloudTrigger : public BossEventTrigger<Grobbulus::boss_grobbulus::boss_grobbulusAI>
 {
 public:
@@ -117,10 +100,11 @@ private:
     KelthuzadBossHelper helper;
 };
 
-class AnubrekhanTrigger : public BossPhaseTrigger<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI>
+class AnubrekhanTrigger : public Trigger
 {
 public:
-    AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
+    AnubrekhanTrigger(PlayerbotAI* ai) : Trigger(ai, "anub'rekhan") {}
+    bool IsActive() override;
 };
 
 class ThaddiusPhasePetTrigger : public Trigger
@@ -194,12 +178,6 @@ private:
     SapphironBossHelper helper;
 };
 
-// class SapphironGroundExceptMainTankTrigger : public BossPhaseTrigger
-// {
-// public:
-//     SapphironGroundExceptMainTankTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sapphiron", (1 << (2 - 1)),
-//     "sapphiron ground except main tank") {} virtual bool IsActive();
-// };
 
 class SapphironFlightTrigger : public Trigger
 {
@@ -210,20 +188,6 @@ public:
 private:
     SapphironBossHelper helper;
 };
-
-// class SapphironGroundChillTrigger : public BossPhaseTrigger
-// {
-// public:
-//     SapphironGroundChillTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sapphiron", 0, "sapphiron chill") {}
-//     virtual bool IsActive();
-// };
-
-// class KelthuzadPhaseTwoTrigger : public BossPhaseTrigger
-// {
-// public:
-//     KelthuzadPhaseTwoTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "kel'thuzad", 1 << (2 - 1), "kel'thuzad
-//     trigger") {}
-// };
 
 class GluthTrigger : public Trigger
 {
@@ -257,5 +221,4 @@ private:
     LoathebBossHelper helper;
 };
 
-// template BossEventTrigger<class boss_grobbulus::boss_grobbulusAI>;
 #endif
