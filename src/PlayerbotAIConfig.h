@@ -275,6 +275,7 @@ public:
     bool twoRoundsGearInit;
     bool syncQuestWithPlayer;
     bool syncQuestForPlayer;
+    bool dropObsoleteQuests;
     std::string autoTrainSpells;
     bool autoPickTalents;
     bool autoUpgradeEquip;

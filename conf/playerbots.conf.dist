@@ -368,6 +368,10 @@ AiPlayerbot.SyncQuestWithPlayer = 1
 # Default: 0 (disabled)
 AiPlayerbot.SyncQuestForPlayer = 0
 
+# Bots will drop obsolete quests
+# Default: 1 (enabled)
+AiPlayerbot.DropObsoleteQuests = 1
+
 #
 #
 #
