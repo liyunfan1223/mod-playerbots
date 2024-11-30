@@ -171,6 +171,10 @@ public:
 
     void PrepareAddclassCache();
     std::map<uint8, std::vector<ObjectGuid>> addclassCache;
+    std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
+    std::map<uint8, std::vector<WorldLocation>> allianceInnkeeperPerLevelCache;
+    std::map<uint8, std::vector<WorldLocation>> hordeInnkeeperPerLevelCache;
+    std::map<uint8, std::vector<WorldLocation>> bankerLocsPerLevelCache;
 protected:
     void OnBotLoginInternal(Player* const bot) override;
 
@@ -199,8 +203,7 @@ private:
 
     std::vector<Player*> players;
     uint32 processTicks;
-    std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
-    std::map<uint8, std::vector<WorldLocation>> bankerLocsPerLevelCache;
+    
 
     // std::map<uint32, std::vector<WorldLocation>> rpgLocsCache;
     std::map<uint32, std::map<uint32, std::vector<WorldLocation>>> rpgLocsCacheLevel;

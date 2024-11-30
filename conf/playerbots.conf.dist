@@ -588,6 +588,11 @@ AiPlayerbot.RandomBotGroupNearby = 0
 # Default: 1 (enabled)
 AiPlayerbot.AutoDoQuests = 1
 
+# Random Bots will behave more like real players (exprimental)
+# This option will override AutoDoQuests
+# Default: 0 (disabled)
+AiPlayerbot.EnableNewRpgStrategy = 0
+
 # Quest items to leave (do not destroy)
 AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000"
 

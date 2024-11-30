@@ -62,6 +62,7 @@
 #include "VehicleActions.h"
 #include "WorldBuffAction.h"
 #include "XpGainAction.h"
+#include "NewRpgAction.h"
 
 class PlayerbotAI;
 
@@ -240,6 +241,10 @@ public:
 
         creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
         creators["pet attack"] = &ActionContext::pet_attack; 
+
+        creators["new rpg status update"] = &ActionContext::new_rpg_status_update;
+        creators["new rpg go grind"] = &ActionContext::new_rpg_go_grind;
+        creators["new rpg move random"] = &ActionContext::new_rpg_move_random;
     }
 
 private:
@@ -415,6 +420,10 @@ private:
 
     static Action* toggle_pet_spell(PlayerbotAI* ai) { return new TogglePetSpellAutoCastAction(ai); }
     static Action* pet_attack(PlayerbotAI* ai) { return new PetAttackAction(ai); }
+
+    static Action* new_rpg_status_update(PlayerbotAI* ai) { return new NewRpgStatusUpdateAction(ai); }
+    static Action* new_rpg_go_grind(PlayerbotAI* ai) { return new NewRpgGoGrindAction(ai); }
+    static Action* new_rpg_move_random(PlayerbotAI* ai) { return new NewRpgMoveRandomAction(ai); }
 };
 
 #endif

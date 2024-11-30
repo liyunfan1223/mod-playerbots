@@ -280,6 +280,7 @@ public:
     bool autoUpgradeEquip;
     bool autoLearnTrainerSpells;
     bool autoDoQuests;
+    bool enableNewRpgStrategy;
     bool syncLevelWithPlayers;
     bool freeFood;
     bool autoLearnQuestSpells;

@@ -29,6 +29,7 @@
 #include "MotionMaster.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "NewRpgStrategy.h"
 #include "ObjectGuid.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
@@ -774,7 +775,8 @@ void PlayerbotAI::Reset(bool full)
     bot->GetMotionMaster()->Clear();
     // bot->CleanupAfterTaxiFlight();
     InterruptSpell();
-
+    rpgInfo = NewRpgInfo();
+    
     if (full)
     {
         for (uint8 i = 0; i < BOT_STATE_MAX; i++)
@@ -4137,16 +4139,16 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
     // only keep updating till initializing time has completed,
     // which prevents unneeded expensive GameTime calls.
-    if (_isBotInitializing)
-    {
-        _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
+    // if (_isBotInitializing)
+    // {
+    //     _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
 
-        // no activity allowed during bot initialization
-        if (_isBotInitializing)
-        {
-            return false;
-        }
-    }
+    //     // no activity allowed during bot initialization
+    //     if (_isBotInitializing)
+    //     {
+    //         return false;
+    //     }
+    // }
 
     // General exceptions
     if (activityType == PACKET_ACTIVITY)
