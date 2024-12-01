@@ -308,5 +308,7 @@ class UseSoulstoneAction : public UseSpellItemAction
 {
 public:
     UseSoulstoneAction(PlayerbotAI* ai) : UseSpellItemAction(ai, "soulstone") {}
+
+    Unit* GetTarget() override;
 };
 #endif
