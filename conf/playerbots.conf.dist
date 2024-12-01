@@ -67,7 +67,7 @@
 
 ###################################
 #                                 #
-# GENERAL SETTINGS              #
+# GENERAL SETTINGS                #
 #                                 #
 ###################################
 
@@ -1410,9 +1410,6 @@ AiPlayerbot.BroadcastChanceGuildManagement = 30000
 # Custom config to allow logfiles to be created.
 # Example: AiPlayerbot.AllowedLogFiles = travelNodes.csv,travelPaths.csv,TravelNodeStore.h,bot_movement.csv,bot_location.csv
 AiPlayerbot.AllowedLogFiles = ""
-
-Appender.Playerbots=2,5,0,Playerbots.log,w
-Logger.playerbots=5,Console Playerbots
 
 #
 #
