@@ -1603,6 +1603,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 608:
             strategyName = "wotlk-vh";      // Violet Hold
             break;
+        case 615:
+            strategyName = "wotlk-os";      // Obsidian Sanctum
+            break;
         case 619:
             strategyName = "wotlk-ok";      // Ahn'kahet: The Old Kingdom
             break;

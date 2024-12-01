@@ -24,6 +24,8 @@
 #include "raids/blackwinglair/RaidBwlTriggerContext.h"
 #include "raids/naxxramas/RaidNaxxActionContext.h"
 #include "raids/naxxramas/RaidNaxxTriggerContext.h"
+#include "raids/obsidiansanctum/RaidOsActionContext.h"
+#include "raids/obsidiansanctum/RaidOsTriggerContext.h"
 #include "raids/moltencore/RaidMcActionContext.h"
 #include "raids/moltencore/RaidMcTriggerContext.h"
 #include "raids/aq20/RaidAq20ActionContext.h"
@@ -48,6 +50,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new RaidBwlActionContext());
     actionContexts.Add(new RaidAq20ActionContext());
     actionContexts.Add(new RaidNaxxActionContext());
+    actionContexts.Add(new RaidOsActionContext());
     actionContexts.Add(new RaidUlduarActionContext());
     actionContexts.Add(new RaidIccActionContext());
     actionContexts.Add(new WotlkDungeonUKActionContext());
@@ -71,6 +74,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     triggerContexts.Add(new RaidBwlTriggerContext());
     triggerContexts.Add(new RaidAq20TriggerContext());
     triggerContexts.Add(new RaidNaxxTriggerContext());
+    triggerContexts.Add(new RaidOsTriggerContext());
     triggerContexts.Add(new RaidUlduarTriggerContext());
     triggerContexts.Add(new RaidIccTriggerContext());
     triggerContexts.Add(new WotlkDungeonUKTriggerContext());
