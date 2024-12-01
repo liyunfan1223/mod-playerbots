@@ -20,16 +20,30 @@ enum class NewRpgStatus
     // Exploring nearby
     NEAR_RANDOM,
     NEAR_NPC,
-    // Idling
+    // Taking a break
+    REST,
+    // Initial status
     IDLE
 };
 
 struct NewRpgInfo
 {
     NewRpgStatus status{NewRpgStatus::IDLE};
+    // NewRpgStatus::GO_GRIND
     WorldPosition grindPos{};
-    uint32 lastGrind{0};
+    uint32 lastGoGrind{0};
+    // NewRpgStatus::GO_INNKEEPER
+    WorldPosition innKeeperPos{};
+    uint32 lastGoInnKeeper{0};
+    // NewRpgStatus::NEAR_NPC
+    GuidPosition npcPos{};
     uint32 lastNearNpc{0};
+    uint32 lastReachNpc{0};
+    // NewRpgStatus::NEAR_RANDOM
+    uint32 lastNearRandom{0};
+    // NewRpgStatus::REST
+    uint32 lastRest{0};
+
     std::string ToString()
     {
         std::stringstream out;
@@ -51,9 +65,14 @@ struct NewRpgInfo
             case NewRpgStatus::IDLE:
                 out << "IDLE";
                 break;
+            case NewRpgStatus::REST:
+                out << "REST";
+                break;
+            default:
+                out << "UNKNOWN";
         }
         out << "\nGrindPos: " << grindPos.GetMapId() << " " << grindPos.GetPositionX() << " " << grindPos.GetPositionY() << " " << grindPos.GetPositionZ();
-        out << "\nLastGrind: " << lastGrind;
+        out << "\nlastGoGrind: " << lastGoGrind;
         return out.str();
     }
 };

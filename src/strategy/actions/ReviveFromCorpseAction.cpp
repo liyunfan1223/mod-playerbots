@@ -188,7 +188,7 @@ bool FindCorpseAction::Execute(Event event)
 
             if (!moved)
             {
-                moved = botAI->DoSpecificAction("spirit healer");
+                moved = botAI->DoSpecificAction("spirit healer", Event(), true);
             }
         }
     }

@@ -244,7 +244,9 @@ public:
 
         creators["new rpg status update"] = &ActionContext::new_rpg_status_update;
         creators["new rpg go grind"] = &ActionContext::new_rpg_go_grind;
+        creators["new rpg go innkeeper"] = &ActionContext::new_rpg_go_innkeeper;
         creators["new rpg move random"] = &ActionContext::new_rpg_move_random;
+        creators["new rpg move npc"] = &ActionContext::new_rpg_move_npc;
     }
 
 private:
@@ -423,7 +425,9 @@ private:
 
     static Action* new_rpg_status_update(PlayerbotAI* ai) { return new NewRpgStatusUpdateAction(ai); }
     static Action* new_rpg_go_grind(PlayerbotAI* ai) { return new NewRpgGoGrindAction(ai); }
+    static Action* new_rpg_go_innkeeper(PlayerbotAI* ai) { return new NewRpgGoInnKeeperAction(ai); }
     static Action* new_rpg_move_random(PlayerbotAI* ai) { return new NewRpgMoveRandomAction(ai); }
+    static Action* new_rpg_move_npc(PlayerbotAI* ai) { return new NewRpgMoveNpcAction(ai); }
 };
 
 #endif

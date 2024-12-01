@@ -21,9 +21,13 @@ public:
     NewRpgStatusUpdateAction(PlayerbotAI* botAI) : Action(botAI, "new rpg status update") {}
     bool Execute(Event event) override;
 protected:
-    const int32 setGrindInterval = 5 * 60 * 1000;
-    const int32 setNpcInterval = 5 * 60 * 1000;
+    // const int32 setGrindInterval = 5 * 60 * 1000;
+    // const int32 setNpcInterval = 1 * 60 * 1000;
+    const int32 statusNearNpcDuration = 3 * 60 * 1000;
+    const int32 statusNearRandomDuration = 3 * 60 * 1000;
+    const int32 statusRestDuration = 1 * 60 * 1000;
     WorldPosition SelectRandomGrindPos();
+    WorldPosition SelectRandomInnKeeperPos();
 };
 
 class NewRpgGoFarAwayPosAction : public MovementAction
@@ -45,6 +49,14 @@ public:
     bool Execute(Event event) override;
 };
 
+class NewRpgGoInnKeeperAction : public NewRpgGoFarAwayPosAction
+{
+public:
+    NewRpgGoInnKeeperAction(PlayerbotAI* botAI) : NewRpgGoFarAwayPosAction(botAI, "new rpg go innkeeper") {}
+    bool Execute(Event event) override;
+};
+
+
 class NewRpgMoveRandomAction : public MovementAction
 {
 public:
@@ -52,6 +64,15 @@ public:
     bool Execute(Event event) override;
 protected:
     const float moveStep = 50.0f;
+};
+
+class NewRpgMoveNpcAction : public MovementAction
+{
+public:
+    NewRpgMoveNpcAction(PlayerbotAI* botAI) : MovementAction(botAI, "new rpg move npcs") {}
+    bool Execute(Event event) override;
+protected:
+    const uint32 stayTime = 8 * 1000;
 };
 
 #endif

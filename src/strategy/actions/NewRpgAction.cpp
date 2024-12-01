@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "NewRpgStrategy.h"
+#include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
 #include "Player.h"
@@ -28,27 +29,45 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
     {
         case NewRpgStatus::IDLE:
         {
-            // // IDLE -> NEAR_NPC
-            // if (!info.lastNearNpc || info.lastNearNpc + setNpcInterval < getMSTime() && urand(1, 100) <= 50)
-            // {
-            //     info.lastNearNpc = getMSTime();
-            //     GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
-            //     if (possibleTargets.empty())
-            //         break;
-            //     info.status = NewRpgStatus::NEAR_NPC;
-            // }
-            // IDLE -> GO_GRIND
-            if (!info.lastGrind || info.lastGrind + setGrindInterval < getMSTime())
+            uint32 roll = urand(1, 100);
+            // IDLE -> NEAR_NPC
+            // if ((!info.lastNearNpc || info.lastNearNpc + setNpcInterval < getMSTime()) && roll <= 30)
+            if (roll <= 20)
             {
-                info.lastGrind = getMSTime();
+                info.lastNearNpc = getMSTime();
+                GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
+                if (possibleTargets.empty())
+                    break;
+                info.status = NewRpgStatus::NEAR_NPC;
+                return true;
+            }
+            // IDLE -> GO_INNKEEPER
+            if (bot->GetLevel() >= 6 && roll <= 30)
+            {
+                WorldPosition pos = SelectRandomInnKeeperPos();
+                if (pos == WorldPosition() || bot->GetExactDist(pos) < 50.0f)
+                    break;
+                info.lastGoInnKeeper = getMSTime();
+                info.status = NewRpgStatus::GO_INNKEEPER;
+                info.innKeeperPos = pos;
+                return true;
+            }
+            // IDLE -> GO_GRIND
+            if (roll <= 90)
+            {
                 WorldPosition pos = SelectRandomGrindPos();
                 if (pos == WorldPosition())
                     break;
+                info.lastGoGrind = getMSTime();
                 info.status = NewRpgStatus::GO_GRIND;
                 info.grindPos = pos;
                 return true;
             }
-            break;
+            // IDLE -> REST
+            info.status = NewRpgStatus::REST;
+            info.lastRest = getMSTime();
+            bot->SetStandState(UNIT_STAND_STATE_SIT);
+            return true;
         }
         case NewRpgStatus::GO_GRIND:
         {
@@ -58,33 +77,62 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             if (bot->GetExactDist(originalPos) < 10.0f)
             {
                 info.status = NewRpgStatus::NEAR_RANDOM;
+                info.lastNearRandom = getMSTime();
                 info.grindPos = WorldPosition();
                 return true;
             }
-            // just choose another grindPos
-            if (!info.lastGrind || info.lastGrind + setGrindInterval < getMSTime())
+            // // just choose another grindPos
+            // if (!info.lastGoGrind || info.lastGoGrind + setGrindInterval < getMSTime())
+            // {
+            //     WorldPosition pos = SelectRandomGrindPos();
+            //     if (pos == WorldPosition())
+            //         break;
+            //     info.status = NewRpgStatus::GO_GRIND;
+            //     info.lastGoGrind = getMSTime();
+            //     info.grindPos = pos;
+            //     return true;
+            // }
+            break;
+        }
+        case NewRpgStatus::GO_INNKEEPER:
+        {
+            WorldPosition& originalPos = info.innKeeperPos;
+            assert(info.grindPos != WorldPosition());
+            // GO_INNKEEPER -> NEAR_NPC
+            if (bot->GetExactDist(originalPos) < 10.0f)
             {
-                WorldPosition pos = SelectRandomGrindPos();
-                if (pos == WorldPosition())
-                    break;
-                info.status = NewRpgStatus::GO_GRIND;
-                info.lastGrind = getMSTime();
-                info.grindPos = pos;
+                info.lastNearNpc = getMSTime();
+                info.status = NewRpgStatus::NEAR_NPC;
+                info.innKeeperPos = WorldPosition();
                 return true;
             }
             break;
         }
         case NewRpgStatus::NEAR_RANDOM:
         {
-            // NEAR_RANDOM -> GO_GRIND
-            if (!info.lastGrind || info.lastGrind + setGrindInterval < getMSTime())
+            // NEAR_RANDOM -> IDLE
+            if (info.lastNearRandom + statusNearRandomDuration < getMSTime())
             {
-                WorldPosition pos = SelectRandomGrindPos();
-                if (pos == WorldPosition())
-                    break;
-                info.lastGrind = getMSTime();
-                botAI->rpgInfo.status = NewRpgStatus::GO_GRIND;
-                botAI->rpgInfo.grindPos = pos;
+                info.status = NewRpgStatus::IDLE;
+                return true;
+            }
+            break;
+        }
+        case NewRpgStatus::NEAR_NPC:
+        {
+            if (info.lastNearNpc + statusNearNpcDuration < getMSTime())
+            {
+                info.status = NewRpgStatus::IDLE;
+                return true;
+            }
+            break;
+        }
+        case NewRpgStatus::REST:
+        {
+            // REST -> IDLE
+            if (info.lastRest + statusRestDuration < getMSTime())
+            {
+                info.status = NewRpgStatus::IDLE;
                 return true;
             }
             break;
@@ -128,6 +176,35 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
     LOG_INFO("playerbots", "[New Rpg] Bot {} select random grind pos Map:{} X:{} Y:{} Z:{} ({}+{} available in {})",
              bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
              hi_prepared_locs.size(), lo_prepared_locs.size() - hi_prepared_locs.size(), locs.size());
+    return dest;
+}
+
+WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
+{
+    const std::vector<WorldLocation>& locs = IsAlliance(bot->getRace())
+                                                 ? sRandomPlayerbotMgr->allianceInnkeeperPerLevelCache[bot->GetLevel()]
+                                                 : sRandomPlayerbotMgr->hordeInnkeeperPerLevelCache[bot->GetLevel()];
+    std::vector<WorldLocation> prepared_locs;
+    for (auto& loc : locs)
+    {
+        if (bot->GetMapId() != loc.GetMapId())
+            continue;
+        
+        float range = bot->GetLevel() <= 5 ? 500.0f : 2500.0f;
+        if (bot->GetExactDist(loc) < range)
+        {
+            prepared_locs.push_back(loc);
+        }
+    }
+    WorldPosition dest;
+    if (!prepared_locs.empty())
+    {
+        uint32 idx = urand(0, prepared_locs.size() - 1);
+        dest = prepared_locs[idx];
+    }
+    LOG_INFO("playerbots", "[New Rpg] Bot {} select random inn keeper pos Map:{} X:{} Y:{} Z:{} ({} available in {})",
+             bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
+             prepared_locs.size(), locs.size());
     return dest;
 }
 
@@ -184,6 +261,8 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
 
 bool NewRpgGoGrindAction::Execute(Event event) { return MoveFarTo(botAI->rpgInfo.grindPos); }
 
+bool NewRpgGoInnKeeperAction::Execute(Event event) { return MoveFarTo(botAI->rpgInfo.innKeeperPos); }
+
 bool NewRpgMoveRandomAction::Execute(Event event)
 {
     float distance = rand_norm() * moveStep;
@@ -211,4 +290,76 @@ bool NewRpgMoveRandomAction::Execute(Event event)
     }
 
     return false;
+}
+
+bool NewRpgMoveNpcAction::Execute(Event event)
+{
+    NewRpgInfo& info = botAI->rpgInfo;
+    if (!info.npcPos)
+    {
+        GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
+        if (possibleTargets.empty())
+            return false;
+        int idx = urand(0, possibleTargets.size() - 1);
+        ObjectGuid guid = possibleTargets[idx];
+        Unit* unit = botAI->GetUnit(guid);
+        if (unit)
+        {
+            info.npcPos = GuidPosition(unit);
+            info.lastReachNpc = 0;
+        }
+        else
+            return false;
+    }
+
+    if (bot->GetDistance(info.npcPos) <= INTERACTION_DISTANCE)
+    {
+        if (!info.lastReachNpc)
+        {
+            info.lastReachNpc = getMSTime();
+            return true;
+        }
+
+        if (info.lastReachNpc && info.lastReachNpc + stayTime > getMSTime())
+            return false;
+
+        info.npcPos = GuidPosition();
+        info.lastReachNpc = 0;
+    }
+    else
+    {
+        assert(info.npcPos);
+        Unit* unit = botAI->GetUnit(info.npcPos);
+        if (!unit)
+            return false;
+        float x = unit->GetPositionX();
+        float y = unit->GetPositionY();
+        float z = unit->GetPositionZ();
+        float mapId = unit->GetMapId();
+        float angle = 0.f;
+        if (bot->IsWithinLOS(x, y, z))
+        {
+            if (!unit->isMoving())
+                angle = unit->GetAngle(bot) + (M_PI * irand(-25, 25) / 100.0);  // Closest 45 degrees towards the target
+            else
+                angle = unit->GetOrientation() +
+                        (M_PI * irand(-25, 25) / 100.0);  // 45 degrees infront of target (leading it's movement)
+        }
+        else
+            angle = 2 * M_PI * rand_norm();  // A circle around the target.
+
+        x += cos(angle) * INTERACTION_DISTANCE * rand_norm();
+        y += sin(angle) * INTERACTION_DISTANCE * rand_norm();
+        bool exact = true;
+        if (!unit->GetMap()->CheckCollisionAndGetValidCoords(unit, unit->GetPositionX(), unit->GetPositionY(),
+                                                             unit->GetPositionZ(), x, y, z))
+        {
+            x = unit->GetPositionX();
+            y = unit->GetPositionY();
+            z = unit->GetPositionZ();
+            exact = false;
+        }
+        return MoveTo(mapId, x, y, z, false, false, false, exact);
+    }
+    return true;
 }
