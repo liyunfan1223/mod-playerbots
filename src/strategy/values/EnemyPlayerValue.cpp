@@ -18,7 +18,7 @@ bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
         !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NON_ATTACKABLE_2) &&
         ((inCannon || !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))) &&
         /*!enemy->HasStealthAura() && !enemy->HasInvisibilityAura()*/ enemy->CanSeeOrDetect(bot) &&
-        !(enemy->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION)))
+        !(enemy->HasSpiritOfRedemptionAura()))
         return true;
 
     return false;
