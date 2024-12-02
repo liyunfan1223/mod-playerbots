@@ -173,7 +173,7 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
         uint32 idx = urand(0, lo_prepared_locs.size() - 1);
         dest = lo_prepared_locs[idx];
     }
-    LOG_INFO("playerbots", "[New Rpg] Bot {} select random grind pos Map:{} X:{} Y:{} Z:{} ({}+{} available in {})",
+    LOG_DEBUG("playerbots", "[New Rpg] Bot {} select random grind pos Map:{} X:{} Y:{} Z:{} ({}+{} available in {})",
              bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
              hi_prepared_locs.size(), lo_prepared_locs.size() - hi_prepared_locs.size(), locs.size());
     return dest;
@@ -202,7 +202,7 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
         uint32 idx = urand(0, prepared_locs.size() - 1);
         dest = prepared_locs[idx];
     }
-    LOG_INFO("playerbots", "[New Rpg] Bot {} select random inn keeper pos Map:{} X:{} Y:{} Z:{} ({} available in {})",
+    LOG_DEBUG("playerbots", "[New Rpg] Bot {} select random inn keeper pos Map:{} X:{} Y:{} Z:{} ({} available in {})",
              bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
              prepared_locs.size(), locs.size());
     return dest;

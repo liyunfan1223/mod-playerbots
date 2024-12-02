@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <boost/thread/thread.hpp>
 #include <cstdlib>
+#include <ctime>
 #include <iomanip>
 #include <random>
 
@@ -30,6 +31,7 @@
 #include "GuildTaskMgr.h"
 #include "LFGMgr.h"
 #include "MapMgr.h"
+#include "NewRpgStrategy.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
@@ -359,6 +361,17 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             activateCheckLfgQueueThread();
     }
 
+    if (time(nullptr) > (printStatsTimer + 300))
+    {
+        if (!printStatsTimer)
+        {
+            printStatsTimer = time(nullptr);
+        }
+        else
+        {
+            activatePrintStatsThread();
+        }
+    }
     uint32 updateBots = sPlayerbotAIConfig->randomBotsPerInterval * onlineBotFocus / 100;
     uint32 maxNewBots = onlineBotCount < maxAllowedBotCount ? maxAllowedBotCount - onlineBotCount : 0;
     uint32 loginBots = std::min(sPlayerbotAIConfig->randomBotsPerInterval - updateBots, maxNewBots);
@@ -593,7 +606,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
 
     BgCheckTimer = time(nullptr);
 
-    LOG_INFO("playerbots", "Checking BG Queue...");
+    LOG_DEBUG("playerbots", "Checking BG Queue...");
 
     BattlegroundData.clear();
 
@@ -900,7 +913,7 @@ void RandomPlayerbotMgr::LogBattlegroundInfo()
                      bgInfo.bgHordePlayerCount + bgInfo.bgHordeBotCount, bgInfo.bgInstanceCount);
         }
     }
-    LOG_INFO("playerbots", "BG Queue check finished");
+    LOG_DEBUG("playerbots", "BG Queue check finished");
 }
 
 void RandomPlayerbotMgr::CheckLfgQueue()
@@ -908,7 +921,7 @@ void RandomPlayerbotMgr::CheckLfgQueue()
     if (!LfgCheckTimer || time(nullptr) > (LfgCheckTimer + 30))
         LfgCheckTimer = time(nullptr);
 
-    LOG_INFO("playerbots", "Checking LFG Queue...");
+    LOG_DEBUG("playerbots", "Checking LFG Queue...");
 
     // Clear LFG list
     LfgDungeons[TEAM_ALLIANCE].clear();
@@ -938,7 +951,7 @@ void RandomPlayerbotMgr::CheckLfgQueue()
         }
     }
 
-    LOG_INFO("playerbots", "LFG Queue check finished");
+    LOG_DEBUG("playerbots", "LFG Queue check finished");
 }
 
 void RandomPlayerbotMgr::CheckPlayers()
@@ -1129,7 +1142,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
             uint32 randomTime = urand(
                 sPlayerbotAIConfig->minRandomBotReviveTime, 
                 sPlayerbotAIConfig->maxRandomBotReviveTime);
-            LOG_INFO("playerbots", "Mark bot {} as dead, will be revived in {}s.", 
+            LOG_DEBUG("playerbots", "Mark bot {} as dead, will be revived in {}s.", 
                 player->GetName().c_str(), randomTime);
             SetEventValue(bot, "dead", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
             SetEventValue(bot, "revive", 1, randomTime);
@@ -1199,7 +1212,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
             // if (randomiser)
             // {
             Randomize(player);
-            LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: randomized", 
+            LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: randomized", 
                 bot, player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->GetLevel(), player->GetName());
             uint32 randomTime = urand(
                 sPlayerbotAIConfig->minRandomBotRandomizeTime, 
@@ -1219,7 +1232,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         uint32 teleport = GetEventValue(bot, "teleport");
         if (!teleport)
         {
-            LOG_INFO("playerbots", "Bot #{} <{}>: teleport for level and refresh", bot, player->GetName());
+            LOG_DEBUG("playerbots", "Bot #{} <{}>: teleport for level and refresh", bot, player->GetName());
             Refresh(player);
             RandomTeleportForLevel(player);
             uint32 time = urand(
@@ -1364,7 +1377,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         }
 
         const LocaleConstant& locale = sWorld->GetDefaultDbcLocale();
-        LOG_INFO("playerbots",
+        LOG_DEBUG("playerbots",
                  "Random teleporting bot {} (level {}) to Map: {} ({}) Zone: {} ({}) Area: {} ({}) ZoneLevel: {} AreaLevel: {} {},{},{} ({}/{} "
                  "locations)",
                  bot->GetName().c_str(), bot->GetLevel(), map->GetId(), map->GetMapName(), zone->ID,
@@ -1503,7 +1516,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 continue;
             const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
             uint32 level = area->area_level;
-            LOG_INFO("playerbots", "Area: {} Level: {} creature_entry: {}", area->ID, level, c_entry);
+            // LOG_INFO("playerbots", "Area: {} Level: {} creature_entry: {}", area->ID, level, c_entry);
             int range = level <= 10 ? 6 : 8;
             for (int32 l = (int32)level; l <= (int32)level + range; l++)
             {
@@ -2456,7 +2469,8 @@ Player* RandomPlayerbotMgr::GetRandomPlayer()
 
 void RandomPlayerbotMgr::PrintStats()
 {
-    LOG_INFO("playerbots", "{} Random Bots online", playerBots.size());
+    printStatsTimer = time(nullptr);
+    LOG_INFO("playerbots", "Random Bots Stats: {} online", playerBots.size());
 
     std::map<uint8, uint32> alliance, horde;
     for (uint32 i = 0; i < 10; ++i)
@@ -2498,6 +2512,7 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 engine_dead = 0;
     uint32 stateCount[MAX_TRAVEL_STATE + 1] = {0};
     std::vector<std::pair<Quest const*, int32>> questCount;
+    std::unordered_map<NewRpgStatus, int> rpgStatusCount;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
     {
         Player* bot = i->second;
@@ -2566,6 +2581,9 @@ void RandomPlayerbotMgr::PrintStats()
         else
             ++dps;
         
+        if (sPlayerbotAIConfig->enableNewRpgStrategy)
+            rpgStatusCount[botAI->rpgInfo.status]++;
+
         if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
         {
             TravelState state = target->getTravelState();
@@ -2644,19 +2662,27 @@ void RandomPlayerbotMgr::PrintStats()
     LOG_INFO("playerbots", "    In Rest: {}", rest);
     LOG_INFO("playerbots", "    Dead: {}", dead);
 
+    LOG_INFO("playerbots", "Bots rpg status:", dead);
+    LOG_INFO("playerbots", "    IDLE: {}", rpgStatusCount[NewRpgStatus::IDLE]);
+    LOG_INFO("playerbots", "    REST: {}", rpgStatusCount[NewRpgStatus::REST]);
+    LOG_INFO("playerbots", "    GO_GRIND: {}", rpgStatusCount[NewRpgStatus::GO_GRIND]);
+    LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[NewRpgStatus::GO_INNKEEPER]);
+    LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[NewRpgStatus::NEAR_RANDOM]);
+    LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[NewRpgStatus::NEAR_NPC]);
+
     LOG_INFO("playerbots", "Bots engine:", dead);
     LOG_INFO("playerbots", "    Non-combat: {}", engine_noncombat);
     LOG_INFO("playerbots", "    Combat: {}", engine_combat);
     LOG_INFO("playerbots", "    Dead: {}", engine_dead);
 
-    LOG_INFO("playerbots", "Bots questing:");
-    LOG_INFO("playerbots", "    Picking quests: {}",
-             stateCount[TRAVEL_STATE_TRAVEL_PICK_UP_QUEST] + stateCount[TRAVEL_STATE_WORK_PICK_UP_QUEST]);
-    LOG_INFO("playerbots", "    Doing quests: {}",
-             stateCount[TRAVEL_STATE_TRAVEL_DO_QUEST] + stateCount[TRAVEL_STATE_WORK_DO_QUEST]);
-    LOG_INFO("playerbots", "    Completing quests: {}",
-             stateCount[TRAVEL_STATE_TRAVEL_HAND_IN_QUEST] + stateCount[TRAVEL_STATE_WORK_HAND_IN_QUEST]);
-    LOG_INFO("playerbots", "    Idling: {}", stateCount[TRAVEL_STATE_IDLE]);
+    // LOG_INFO("playerbots", "Bots questing:");
+    // LOG_INFO("playerbots", "    Picking quests: {}",
+    //          stateCount[TRAVEL_STATE_TRAVEL_PICK_UP_QUEST] + stateCount[TRAVEL_STATE_WORK_PICK_UP_QUEST]);
+    // LOG_INFO("playerbots", "    Doing quests: {}",
+    //          stateCount[TRAVEL_STATE_TRAVEL_DO_QUEST] + stateCount[TRAVEL_STATE_WORK_DO_QUEST]);
+    // LOG_INFO("playerbots", "    Completing quests: {}",
+    //          stateCount[TRAVEL_STATE_TRAVEL_HAND_IN_QUEST] + stateCount[TRAVEL_STATE_WORK_HAND_IN_QUEST]);
+    // LOG_INFO("playerbots", "    Idling: {}", stateCount[TRAVEL_STATE_IDLE]);
 
     /*sort(questCount.begin(), questCount.end(), [](std::pair<Quest const*, int32> i, std::pair<Quest const*, int32> j)
     {return i.second > j.second; });

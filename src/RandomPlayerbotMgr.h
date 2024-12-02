@@ -192,6 +192,7 @@ private:
     time_t BgCheckTimer;
     time_t LfgCheckTimer;
     time_t PlayersCheckTimer;
+    time_t printStatsTimer;
     uint32 AddRandomBots();
     bool ProcessBot(uint32 bot);
     void ScheduleRandomize(uint32 bot, uint32 time);
