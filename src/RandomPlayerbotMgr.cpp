@@ -2513,13 +2513,15 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 stateCount[MAX_TRAVEL_STATE + 1] = {0};
     std::vector<std::pair<Quest const*, int32>> questCount;
     std::unordered_map<NewRpgStatus, int> rpgStatusCount;
+    uint8 maxBotLevel = 0;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
     {
         Player* bot = i->second;
         if (IsAlliance(bot->getRace()))
-            ++alliance[bot->GetLevel() / 10];
+            ++alliance[bot->GetLevel()];
         else
-            ++horde[bot->GetLevel() / 10];
+            ++horde[bot->GetLevel()];
+        maxBotLevel = std::max(maxBotLevel, bot->GetLevel());
 
         ++perRace[bot->getRace()];
         ++perClass[bot->getClass()];
@@ -2613,18 +2615,22 @@ void RandomPlayerbotMgr::PrintStats()
     }
 
     LOG_INFO("playerbots", "Bots level:");
-    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-    for (uint8 i = 0; i < 10; ++i)
+    // uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    uint32 currentAlliance = 0, currentHorde = 0;
+    uint32 step = std::max(1, (maxBotLevel + 4) / 8);
+    uint32 from = 1;
+    for (uint8 i = 1; i <= maxBotLevel; ++i)
     {
-        if (!alliance[i] && !horde[i])
-            continue;
+        currentAlliance += alliance[i];
+        currentHorde += horde[i];
 
-        uint32 from = i * 10;
-        uint32 to = std::min(from + 9, maxLevel);
-        if (!from)
-            from = 1;
-
-        LOG_INFO("playerbots", "    {}..{}: {} alliance, {} horde", from, to, alliance[i], horde[i]);
+        if (((i + 1) % step == 0) || i == maxBotLevel)
+        {
+            LOG_INFO("playerbots", "    {}..{}: {} alliance, {} horde", from, i, currentAlliance, currentHorde);
+            currentAlliance = 0;
+            currentHorde = 0;
+            from = i + 1;
+        }
     }
 
     LOG_INFO("playerbots", "Bots race:");
@@ -2671,7 +2677,7 @@ void RandomPlayerbotMgr::PrintStats()
         LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[NewRpgStatus::NEAR_RANDOM]);
         LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[NewRpgStatus::NEAR_NPC]);
     }
-    
+
     LOG_INFO("playerbots", "Bots engine:", dead);
     LOG_INFO("playerbots", "    Non-combat: {}", engine_noncombat);
     LOG_INFO("playerbots", "    Combat: {}", engine_combat);
