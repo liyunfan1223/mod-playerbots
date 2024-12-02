@@ -52,27 +52,34 @@ struct NewRpgInfo
         {
             case NewRpgStatus::GO_GRIND:
                 out << "GO_GRIND";
+                out << "\nGrindPos: " << grindPos.GetMapId() << " " << grindPos.GetPositionX() << " " << grindPos.GetPositionY() << " " << grindPos.GetPositionZ();
+                out << "\nlastGoGrind: " << lastGoGrind;
                 break;
             case NewRpgStatus::GO_INNKEEPER:
                 out << "GO_INNKEEPER";
+                out << "\nInnKeeperPos: " << innKeeperPos.GetMapId() << " " << innKeeperPos.GetPositionX() << " " << innKeeperPos.GetPositionY() << " " << innKeeperPos.GetPositionZ();
+                out << "\nlastGoInnKeeper: " << lastGoInnKeeper;
                 break;
             case NewRpgStatus::NEAR_NPC:
                 out << "NEAR_NPC";
+                out << "\nNpcPos: " << npcPos.GetMapId() << " " << npcPos.GetPositionX() << " " << npcPos.GetPositionY() << " " << npcPos.GetPositionZ();
+                out << "\nlastNearNpc: " << lastNearNpc;
+                out << "\nlastReachNpc: " << lastReachNpc;
                 break;
             case NewRpgStatus::NEAR_RANDOM:
                 out << "NEAR_RANDOM";
+                out << "\nlastNearNpc: " << lastNearRandom;
                 break;
             case NewRpgStatus::IDLE:
                 out << "IDLE";
                 break;
             case NewRpgStatus::REST:
                 out << "REST";
+                out << "\nlastNearNpc: " << lastRest;
                 break;
             default:
                 out << "UNKNOWN";
         }
-        out << "\nGrindPos: " << grindPos.GetMapId() << " " << grindPos.GetPositionX() << " " << grindPos.GetPositionY() << " " << grindPos.GetPositionZ();
-        out << "\nlastGoGrind: " << lastGoGrind;
         return out.str();
     }
 };

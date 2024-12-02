@@ -2661,15 +2661,17 @@ void RandomPlayerbotMgr::PrintStats()
     LOG_INFO("playerbots", "    In BG: {}", inBg);
     LOG_INFO("playerbots", "    In Rest: {}", rest);
     LOG_INFO("playerbots", "    Dead: {}", dead);
-
-    LOG_INFO("playerbots", "Bots rpg status:", dead);
-    LOG_INFO("playerbots", "    IDLE: {}", rpgStatusCount[NewRpgStatus::IDLE]);
-    LOG_INFO("playerbots", "    REST: {}", rpgStatusCount[NewRpgStatus::REST]);
-    LOG_INFO("playerbots", "    GO_GRIND: {}", rpgStatusCount[NewRpgStatus::GO_GRIND]);
-    LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[NewRpgStatus::GO_INNKEEPER]);
-    LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[NewRpgStatus::NEAR_RANDOM]);
-    LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[NewRpgStatus::NEAR_NPC]);
-
+    if (sPlayerbotAIConfig->enableNewRpgStrategy)
+    {
+        LOG_INFO("playerbots", "Bots rpg status:", dead);
+        LOG_INFO("playerbots", "    IDLE: {}", rpgStatusCount[NewRpgStatus::IDLE]);
+        LOG_INFO("playerbots", "    REST: {}", rpgStatusCount[NewRpgStatus::REST]);
+        LOG_INFO("playerbots", "    GO_GRIND: {}", rpgStatusCount[NewRpgStatus::GO_GRIND]);
+        LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[NewRpgStatus::GO_INNKEEPER]);
+        LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[NewRpgStatus::NEAR_RANDOM]);
+        LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[NewRpgStatus::NEAR_NPC]);
+    }
+    
     LOG_INFO("playerbots", "Bots engine:", dead);
     LOG_INFO("playerbots", "    Non-combat: {}", engine_noncombat);
     LOG_INFO("playerbots", "    Combat: {}", engine_combat);
