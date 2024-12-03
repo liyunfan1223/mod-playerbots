@@ -1,6 +1,7 @@
 #include "NewRpgAction.h"
 
 #include <cmath>
+#include <cstdint>
 
 #include "NewRpgStrategy.h"
 #include "ObjectDefines.h"
@@ -217,7 +218,7 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     }
 
     int attempt = 10;
-    float minDelta = MAXFLOAT;
+    float minDelta = M_PI;
     const float x = bot->GetPositionX();
     const float y = bot->GetPositionY();
     const float z = bot->GetPositionZ();

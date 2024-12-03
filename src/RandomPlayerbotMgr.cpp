@@ -39,9 +39,11 @@
 #include "PlayerbotCommandServer.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
+#include "Position.h"
 #include "Random.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
+#include "TravelMgr.h"
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "World.h"
@@ -1420,7 +1422,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "position_x, "
         "position_y, "
         "position_z, "
-        "t.minlevel "
+        "t.maxlevel "
         "FROM "
         "(SELECT "
         "map, "
@@ -1431,12 +1433,15 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "WHERE "
         "t.npcflag = 0 "
         "AND t.lootid != 0 "
-        "AND t.unit_flags != 768 "
         "AND t.maxlevel - t.minlevel < 3 "
         "AND map IN ({}) "
-        "AND c.id1 != 32820 "
+        "AND t.entry != 32820 "
+        "AND t.entry != 24196 "
         "AND c.spawntimesecs < 1000 "
-        "AND t.faction != 188 "
+        "AND t.faction not in (11, 71, 79, 85, 188) "
+        "AND (t.unit_flags & 256) = 0 "
+        "AND (t.unit_flags & 4096) = 0 "
+        // "AND (t.flags_extra & 32768) = 0 "
         "GROUP BY "
         "map, "
         "ROUND(position_x / 50), "
@@ -1516,23 +1521,42 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 continue;
             const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
             uint32 level = area->area_level;
-            // LOG_INFO("playerbots", "Area: {} Level: {} creature_entry: {}", area->ID, level, c_entry);
-            int range = level <= 10 ? 6 : 8;
-            for (int32 l = (int32)level; l <= (int32)level + range; l++)
+            for (int i = 2; i<= 80; i++)
             {
-                if (l < 1 || l > maxLevel)
+                std::vector<WorldLocation> &locs = locsPerLevelCache[i - 1];
+                for (auto &levelLoc : locs)
                 {
-                    continue;
-                }
-                if (!(entry->hostileMask & 4))
-                {
-                    hordeInnkeeperPerLevelCache[(uint8)l].push_back(loc);
-                }
-                if (!(entry->hostileMask & 2))
-                {
-                    allianceInnkeeperPerLevelCache[(uint8)l].push_back(loc);
+                    if (loc.GetMapId() == levelLoc.GetMapId() && loc.GetExactDist(levelLoc) <= 500.0f)
+                    {
+                        if (!(entry->hostileMask & 4))
+                        {
+                            hordeInnkeeperPerLevelCache[i].push_back(loc);
+                        }
+                        if (!(entry->hostileMask & 2))
+                        {
+                            allianceInnkeeperPerLevelCache[i].push_back(loc);
+                        }
+                        // LOG_INFO("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} ({},{},{},{})", area->ID, level, c_entry, i, levelLoc.GetPositionX(), levelLoc.GetPositionY(), levelLoc.GetPositionZ(), levelLoc.GetMapId());
+                        break;
+                    }
                 }
             }
+            // int range = level <= 10 ? 6 : 8;
+            // for (int32 l = (int32)level; l <= (int32)level + range; l++)
+            // {
+            //     if (l < 1 || l > maxLevel)
+            //     {
+            //         continue;
+            //     }
+            //     if (!(entry->hostileMask & 4))
+            //     {
+            //         hordeInnkeeperPerLevelCache[(uint8)l].push_back(loc);
+            //     }
+            //     if (!(entry->hostileMask & 2))
+            //     {
+            //         allianceInnkeeperPerLevelCache[(uint8)l].push_back(loc);
+            //     }
+            // }
         } while (results->NextRow());
     }
     // add all initial position
@@ -1547,7 +1571,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 
             WorldPosition pos(info->mapId, info->positionX, info->positionY, info->positionZ, info->orientation);
 
-            for (int32 l = 1; l <= 6; l++)
+            for (int32 l = 1; l <= 5; l++)
             {
                 if ((1 << (i - 1)) & RACEMASK_ALLIANCE)
                     allianceInnkeeperPerLevelCache[(uint8)l].push_back(pos);
@@ -1676,7 +1700,7 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
         locs = &locsPerLevelCache[level];
     LOG_DEBUG("playerbots", "Random teleporting bot {} for level {} ({} locations available)", bot->GetName().c_str(),
               bot->GetLevel(), locs->size());
-    if (level >= 5 && urand(0, 100) < sPlayerbotAIConfig->probTeleToBankers * 100)
+    if (level >= 10 && urand(0, 100) < sPlayerbotAIConfig->probTeleToBankers * 100)
     {
         RandomTeleport(bot, bankerLocsPerLevelCache[level], true);
     }

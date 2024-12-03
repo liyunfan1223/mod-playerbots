@@ -560,7 +560,7 @@ bool PlayerbotAIConfig::IsInRandomQuestItemList(uint32 id)
 
 bool PlayerbotAIConfig::IsPvpProhibited(uint32 zoneId, uint32 areaId)
 {
-    return IsInPvpProhibitedZone(zoneId) || IsInPvpProhibitedArea(areaId);
+    return IsInPvpProhibitedZone(zoneId) || IsInPvpProhibitedArea(areaId) || IsInPvpProhibitedZone(areaId);
 }
 
 bool PlayerbotAIConfig::IsInPvpProhibitedZone(uint32 id)
