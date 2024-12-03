@@ -5,6 +5,7 @@
 
 #include "WorldBuffAction.h"
 
+#include "AiFactory.h"
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -37,6 +38,11 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
             continue;
 
         if (wb.classId != 0 && wb.classId != unit->getClass())
+            continue;
+
+        uint8 tab = AiFactory::GetPlayerSpecTab(unit->ToPlayer());
+
+        if (wb.specId != tab)
             continue;
 
         if (wb.minLevel != 0 && wb.minLevel > unit->GetLevel())
