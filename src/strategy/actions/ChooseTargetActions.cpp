@@ -10,8 +10,8 @@
 #include "LootObjectStack.h"
 #include "Playerbots.h"
 #include "PossibleRpgTargetsValue.h"
-#include "ServerFacade.h"
 #include "PvpTriggers.h"
+#include "ServerFacade.h"
 
 bool AttackEnemyPlayerAction::isUseful()
 {
@@ -125,6 +125,36 @@ bool AttackAnythingAction::isPossible() { return AttackAction::isPossible() && G
 bool DpsAssistAction::isUseful()
 {
     if (PlayerHasFlag::IsCapturingFlag(bot))
+        return false;
+
+    return true;
+}
+
+bool AttackRtiTargetAction::Execute(Event event)
+{
+    Unit* rtiTarget = AI_VALUE(Unit*, "rti target");
+
+    if (rtiTarget && rtiTarget->IsInWorld() && rtiTarget->GetMapId() == bot->GetMapId())
+    {
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({rtiTarget->GetGUID()});
+        bool result = Attack(botAI->GetUnit(rtiTarget->GetGUID()));
+        if (result)
+        {
+            context->GetValue<ObjectGuid>("pull target")->Set(rtiTarget->GetGUID());
+            return true;
+        }
+    }
+    else
+    {
+        botAI->TellError("I dont see my rti attack target");
+    }
+
+    return false;
+}
+
+bool AttackRtiTargetAction::isUseful()
+{
+    if (botAI->ContainsStrategy(STRATEGY_TYPE_HEAL))
         return false;
 
     return true;
