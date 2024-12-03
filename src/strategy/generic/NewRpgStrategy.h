@@ -68,14 +68,14 @@ struct NewRpgInfo
                 break;
             case NewRpgStatus::NEAR_RANDOM:
                 out << "NEAR_RANDOM";
-                out << "\nlastNearNpc: " << lastNearRandom;
+                out << "\nlastNearRandom: " << lastNearRandom;
                 break;
             case NewRpgStatus::IDLE:
                 out << "IDLE";
                 break;
             case NewRpgStatus::REST:
                 out << "REST";
-                out << "\nlastNearNpc: " << lastRest;
+                out << "\nlastRest: " << lastRest;
                 break;
             default:
                 out << "UNKNOWN";

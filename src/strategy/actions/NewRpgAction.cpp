@@ -348,19 +348,19 @@ bool NewRpgMoveNpcAction::Execute(Event event)
         }
         else
             angle = 2 * M_PI * rand_norm();  // A circle around the target.
-
-        x += cos(angle) * INTERACTION_DISTANCE * rand_norm();
-        y += sin(angle) * INTERACTION_DISTANCE * rand_norm();
-        bool exact = true;
+        float rnd = rand_norm();
+        x += cos(angle) * INTERACTION_DISTANCE * rnd;
+        y += sin(angle) * INTERACTION_DISTANCE * rnd;
+        // bool exact = true;
         if (!unit->GetMap()->CheckCollisionAndGetValidCoords(unit, unit->GetPositionX(), unit->GetPositionY(),
                                                              unit->GetPositionZ(), x, y, z))
         {
             x = unit->GetPositionX();
             y = unit->GetPositionY();
             z = unit->GetPositionZ();
-            exact = false;
+            // exact = false;
         }
-        return MoveTo(mapId, x, y, z, false, false, false, exact);
+        return MoveTo(mapId, x, y, z, false, false, false, true);
     }
     return true;
 }
