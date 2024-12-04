@@ -98,7 +98,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
         case NewRpgStatus::GO_INNKEEPER:
         {
             WorldPosition& originalPos = info.innKeeperPos;
-            assert(info.grindPos != WorldPosition());
+            assert(info.innKeeperPos != WorldPosition());
             // GO_INNKEEPER -> NEAR_NPC
             if (bot->GetExactDist(originalPos) < 10.0f)
             {
@@ -217,17 +217,17 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
     }
 
-    int attempt = 10;
     float minDelta = M_PI;
     const float x = bot->GetPositionX();
     const float y = bot->GetPositionY();
     const float z = bot->GetPositionZ();
     float rx, ry, rz;
     bool found = false;
+    int attempt = 5;
     while (--attempt)
     {
         float angle = bot->GetAngle(&dest);
-        float delta = (rand_norm() - 0.5) * M_PI;
+        float delta = (rand_norm() - 0.5) * M_PI * 0.6;
         angle += delta;
         float dis = rand_norm() * pathFinderDis;
         float dx = x + cos(angle) * dis;
@@ -241,14 +241,11 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         if (canReach)
         {
             G3D::Vector3 endPos = path.GetPath().back();
-            if (fabs(delta) < minDelta)
-            {
-                found = true;
-                minDelta = fabs(delta);
-                rx = endPos.x;
-                ry = endPos.y;
-                rz = endPos.z;
-            }
+            found = true;
+            rx = endPos.x;
+            ry = endPos.y;
+            rz = endPos.z;
+            break;
         }
     }
     if (found)

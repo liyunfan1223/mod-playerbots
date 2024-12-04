@@ -39,6 +39,7 @@
 #include "Playerbots.h"
 #include "PointMovementGenerator.h"
 #include "PositionValue.h"
+#include "RandomPlayerbotMgr.h"
 #include "SayAction.h"
 #include "ScriptMgr.h"
 #include "ServerFacade.h"
@@ -4107,20 +4108,11 @@ inline bool ZoneHasRealPlayers(Player* bot)
     {
         return false;
     }
-
-    Map::PlayerList const& players = bot->GetMap()->GetPlayers();
-    if (players.IsEmpty())
+    
+    for (auto& player : sRandomPlayerbotMgr->GetPlayers())
     {
-        return false;
-    }
-
-    for (auto const& itr : players)
-    {
-        Player* player = itr.GetSource();
-        if (!player || !player->IsVisible())
-        {
+        if (player->GetMapId() != bot->GetMapId())
             continue;
-        }
 
         if (player->GetZoneId() == bot->GetZoneId())
         {
