@@ -5,6 +5,7 @@
 #include "Strategy.h"
 #include "RaidBwlStrategy.h"
 #include "RaidNaxxStrategy.h"
+#include "RaidOsStrategy.h"
 #include "RaidMcStrategy.h"
 #include "RaidAq20Strategy.h"
 #include "RaidIccStrategy.h"
@@ -21,6 +22,7 @@ public:
         creators["bwl"] = &RaidStrategyContext::bwl;
         creators["aq20"] = &RaidStrategyContext::aq20;
         creators["naxx"] = &RaidStrategyContext::naxx;
+        creators["wotlk-os"] = &RaidStrategyContext::wotlk_os;
         creators["uld"] = &RaidStrategyContext::uld;
         creators["icc"] = &RaidStrategyContext::icc;
     }
@@ -30,6 +32,7 @@ private:
     static Strategy* bwl(PlayerbotAI* botAI) { return new RaidBwlStrategy(botAI); }
     static Strategy* aq20(PlayerbotAI* botAI) { return new RaidAq20Strategy(botAI); }
     static Strategy* naxx(PlayerbotAI* botAI) { return new RaidNaxxStrategy(botAI); }
+    static Strategy* wotlk_os(PlayerbotAI* botAI) { return new RaidOsStrategy(botAI); }
     static Strategy* uld(PlayerbotAI* botAI) { return new RaidUlduarStrategy(botAI); }
     static Strategy* icc(PlayerbotAI* botAI) { return new RaidIccStrategy(botAI); }
 };
