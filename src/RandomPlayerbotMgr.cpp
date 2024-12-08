@@ -1430,7 +1430,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "AND map IN ({}) "
         "AND t.entry not in (32820, 24196, 30627, 30617) "
         "AND c.spawntimesecs < 1000 "
-        "AND t.faction not in (11, 71, 79, 85, 188) "
+        "AND t.faction not in (11, 71, 79, 85, 188, 1575) "
         "AND (t.unit_flags & 256) = 0 "
         "AND (t.unit_flags & 4096) = 0 "
         // "AND (t.flags_extra & 32768) = 0 "
@@ -1537,9 +1537,9 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 {
                     allianceStarterPerLevelCache[i].push_back(loc);
                 }
-                // LOG_INFO("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
-                //          level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
-                //          levelLoc.GetPositionZ(), levelLoc.GetMapId());
+                LOG_INFO("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
+                         level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
+                         levelLoc.GetPositionZ(), levelLoc.GetMapId());
             }
             // int range = level <= 10 ? 6 : 8;
             // for (int32 l = (int32)level; l <= (int32)level + range; l++)
