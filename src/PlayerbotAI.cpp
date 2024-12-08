@@ -4371,7 +4371,7 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
             }
         }
 
-        return (mod * 1 / 10);
+        return (mod * 1) / 10;
     }
 
     if (chkDiff > diffLimitFloor + (3 * spread)) return (mod * 3) / 10;
