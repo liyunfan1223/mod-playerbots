@@ -1524,7 +1524,7 @@ AiPlayerbot.BotActiveAlone = 100
 AiPlayerbot.botActiveAloneSmartScale = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
-AiPlayerbot.botActiveAloneDiffMethod = 1
+AiPlayerbot.botActiveAloneDiffMethod = 2
 AiPlayerbot.botActiveAloneDiffLimitFloor = 30
 AiPlayerbot.botActiveAloneDiffLimitCeiling = 60
 
