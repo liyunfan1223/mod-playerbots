@@ -183,8 +183,8 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
 WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
 {
     const std::vector<WorldLocation>& locs = IsAlliance(bot->getRace())
-                                                 ? sRandomPlayerbotMgr->allianceInnkeeperPerLevelCache[bot->GetLevel()]
-                                                 : sRandomPlayerbotMgr->hordeInnkeeperPerLevelCache[bot->GetLevel()];
+                                                 ? sRandomPlayerbotMgr->allianceStarterPerLevelCache[bot->GetLevel()]
+                                                 : sRandomPlayerbotMgr->hordeStarterPerLevelCache[bot->GetLevel()];
     std::vector<WorldLocation> prepared_locs;
     for (auto& loc : locs)
     {
