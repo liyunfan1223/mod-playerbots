@@ -1514,6 +1514,13 @@ AiPlayerbot.BotActiveAlone = 100
 # Specify smart scaling is enabled or not.
 # The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
 # Only when botLevel is between WhenMinLevel and WhenMaxLevel.
+#
+# AiPlayerbot.botActiveAloneDiff
+#   Method: 1 - Check against average Diff
+#   Method: 2 - Check against Max Diff (spikes)
+#
+#   LimitFloor - No active bot decrease below this DIFF
+#   LimitFCeiling - Max active bot decrease above this DIFF
 AiPlayerbot.botActiveAloneSmartScale = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
