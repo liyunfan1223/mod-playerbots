@@ -44,7 +44,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 }
             }
             // IDLE -> GO_INNKEEPER
-            if (bot->GetLevel() >= 6 && roll <= 55)
+            else if (bot->GetLevel() >= 6 && roll <= 50)
             {
                 WorldPosition pos = SelectRandomInnKeeperPos();
                 if (pos != WorldPosition() && bot->GetExactDist(pos) > 50.0f)
@@ -56,7 +56,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 }
             }
             // IDLE -> GO_GRIND
-            if (roll <= 90)
+            else if (roll <= 90)
             {
                 WorldPosition pos = SelectRandomGrindPos();
                 if (pos != WorldPosition())
@@ -167,7 +167,7 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
         }
     }
     WorldPosition dest;
-    if (urand(1, 100) <= 75 && !hi_prepared_locs.empty())
+    if (urand(1, 100) <= 50 && !hi_prepared_locs.empty())
     {
         uint32 idx = urand(0, hi_prepared_locs.size() - 1);
         dest = hi_prepared_locs[idx];
