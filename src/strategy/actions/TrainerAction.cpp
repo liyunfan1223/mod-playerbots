@@ -203,9 +203,15 @@ bool AutoGearAction::Execute(Event event)
         return false;
     }
 
-    if (botAI->HasActivePlayerMaster() && !sRandomPlayerbotMgr->IsRandomBot(bot))
+    Player* master = botAI->GetMaster();
+    if (!master)
+        return false;
+
+    // Check if bot is from player roster (not a random bot)
+    uint32 botAccountId = bot->GetSession()->GetAccountId();
+    if (!sPlayerbotAIConfig->IsInRandomAccountList(botAccountId))
     {
-        botAI->TellError("You cannot use autogear on player alts.");
+        master->Say("I won't auto-gear anyone from the playerbot roster.", LANG_UNIVERSAL);
         return false;
     }
 
