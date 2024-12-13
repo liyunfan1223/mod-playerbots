@@ -44,7 +44,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 }
             }
             // IDLE -> GO_INNKEEPER
-            else if (bot->GetLevel() >= 6 && roll <= 50)
+            else if (bot->GetLevel() >= 6 && roll <= 55)
             {
                 WorldPosition pos = SelectRandomInnKeeperPos();
                 if (pos != WorldPosition() && bot->GetExactDist(pos) > 50.0f)
