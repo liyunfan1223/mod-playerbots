@@ -314,7 +314,7 @@ public:
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
-    int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
+    int32 autoGearCommand, autoGearCommandAltBots, autoGearQualityLimit, autoGearScoreLimit;
 
     std::string const GetTimestampStr();
     bool hasLog(std::string const fileName)

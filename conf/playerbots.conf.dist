@@ -424,6 +424,10 @@ AiPlayerbot.MaintenanceCommand = 1
 # default: 1 (enable)
 AiPlayerbot.AutoGearCommand = 1
 
+# Enable/Disable autogear command on player alt bots
+# Default: 1 (enable)
+AiPlayerbot.AutoGearCommandAltBots = 1
+
 # Equips quality limitation for auto gear command (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
 # default: 3 (rare)
 AiPlayerbot.AutoGearQualityLimit = 3
