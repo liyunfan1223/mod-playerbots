@@ -1451,6 +1451,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "AND t.faction not in (11, 71, 79, 85, 188, 1575) "
         "AND (t.unit_flags & 256) = 0 "
         "AND (t.unit_flags & 4096) = 0 "
+        "AND t.rank = 0 "
         // "AND (t.flags_extra & 32768) = 0 "
         "GROUP BY "
         "map, "
@@ -1531,20 +1532,28 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 continue;
             const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
             uint32 level = area->area_level;
-            for (int i = 1; i <= 80; i++)
+            for (int i = 5; i <= 80; i++)
             {
                 std::vector<WorldLocation>& locs = locsPerLevelCache[i];
                 int counter = 0;
                 WorldLocation levelLoc;
                 for (auto& checkLoc : locs)
                 {
-                    if (loc.GetMapId() == checkLoc.GetMapId() && loc.GetExactDist(checkLoc) <= 500.0f)
+                    if (loc.GetMapId() != checkLoc.GetMapId())
+                        continue;
+
+                    if (map->GetZoneId(1, loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) != 
+                        map->GetZoneId(1, checkLoc.GetPositionX(), checkLoc.GetPositionY(), checkLoc.GetPositionZ()))
+                        continue;
+
+                    if (loc.GetMapId() == checkLoc.GetMapId() && loc.GetExactDist(checkLoc) <= 1000.0f)
                     {
+                        
                         counter++;
                         levelLoc = checkLoc;
                     }
                 }
-                if (counter < 3)
+                if (counter < 15)
                     continue;
 
                 if (!(entry->hostileMask & 4))
