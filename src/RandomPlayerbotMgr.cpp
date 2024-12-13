@@ -1525,7 +1525,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             uint32 c_entry = fields[6].Get<uint32>();
             const FactionTemplateEntry* entry = sFactionTemplateStore.LookupEntry(faction);
 
-            WorldLocation loc(mapId, x, y, z, orient + M_PI);
+            WorldLocation loc(mapId, x + cos(orient) * 5.0f, y + sin(orient) * 5.0f, z + 0.5f, orient + M_PI);
             collected_locs++;
             Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
             if (!map)
@@ -1631,6 +1631,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "AND t.faction != 69 "
         "AND t.entry != 30606 "
         "AND t.entry != 30608 "
+        "AND t.entry != 29282 "
         "AND t.faction != 69 "
         "AND map IN ({}) "
         "ORDER BY "

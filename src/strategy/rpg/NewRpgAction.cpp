@@ -155,6 +155,10 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
     {
         if (bot->GetMapId() != loc.GetMapId())
             continue;
+        
+        if (bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) != 
+            bot->GetZoneId())
+            continue;
 
         if (bot->GetExactDist(loc) < 500.0f)
         {
@@ -220,35 +224,41 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
     }
 
+    // performance optimization
+    if (IsWaitingForLastMove(MovementPriority::MOVEMENT_NORMAL))
+    {
+        return false;
+    }
+
     float minDelta = M_PI;
     const float x = bot->GetPositionX();
     const float y = bot->GetPositionY();
     const float z = bot->GetPositionZ();
     float rx, ry, rz;
     bool found = false;
-    int attempt = 5;
+    int attempt = 10;
     while (--attempt)
     {
         float angle = bot->GetAngle(&dest);
-        float delta = (rand_norm() - 0.5) * M_PI * 0.6;
+        float delta = (rand_norm() - 0.5) * M_PI * 2;
         angle += delta;
         float dis = rand_norm() * pathFinderDis;
         float dx = x + cos(angle) * dis;
         float dy = y + sin(angle) * dis;
-        float dz = z;
+        float dz = z + 5.0f;
+        bot->UpdateAllowedPositionZ(dx, dy, dz);
         PathGenerator path(bot);
         path.CalculatePath(dx, dy, dz);
-        // bool canReach = bot->GetMap()->CanReachPositionAndGetValidCoords(bot, x, y, z, dx, dy, dz, false);
         bool canReach = path.GetPathType() & PATHFIND_NORMAL;
 
-        if (canReach)
+        if (canReach && fabs(delta) <= minDelta)
         {
-            G3D::Vector3 endPos = path.GetPath().back();
             found = true;
+            G3D::Vector3 endPos = path.GetPath().back();
             rx = endPos.x;
             ry = endPos.y;
             rz = endPos.z;
-            break;
+            minDelta = fabs(delta);
         }
     }
     if (found)
@@ -256,8 +266,9 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         return MoveTo(bot->GetMapId(), rx, ry, rz, false, false, false, true);
     }
     // fallback to direct move
-    float angle = bot->GetAngle(&dest);
-    return MoveTo(bot->GetMapId(), x + cos(angle) * pathFinderDis, y + sin(angle) * pathFinderDis, z);
+    // float angle = bot->GetAngle(&dest);
+    // return MoveTo(bot->GetMapId(), x + cos(angle) * pathFinderDis, y + sin(angle) * pathFinderDis, z);
+    return false;
 }
 
 bool NewRpgGoGrindAction::Execute(Event event) { return MoveFarTo(botAI->rpgInfo.grindPos); }
