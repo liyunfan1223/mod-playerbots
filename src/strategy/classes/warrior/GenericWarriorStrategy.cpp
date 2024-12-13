@@ -16,7 +16,7 @@ void GenericWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
     triggers.push_back(new TriggerNode(
-        "enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
+        "enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_HIGH + 1), nullptr)));
     /*triggers.push_back(new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 1),
     nullptr))); triggers.push_back(new TriggerNode("shield bash", NextAction::array(0, new NextAction("shield bash",
     ACTION_INTERRUPT + 4), nullptr))); triggers.push_back(new TriggerNode("shield bash on enemy healer",

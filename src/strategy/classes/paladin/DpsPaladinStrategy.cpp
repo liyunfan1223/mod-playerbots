@@ -131,5 +131,5 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     //     NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), NULL)));
 
     triggers.push_back(new TriggerNode("enemy out of melee",
-                                       NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), NULL)));
+                                       NextAction::array(0, new NextAction("reach melee", ACTION_HIGH + 1), NULL)));
 }
