@@ -165,7 +165,7 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
             hi_prepared_locs.push_back(loc);
         }
 
-        if (bot->GetExactDist(loc) < 1500.0f)
+        if (bot->GetExactDist(loc) < 2500.0f)
         {
             lo_prepared_locs.push_back(loc);
         }
@@ -221,7 +221,7 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     float dis = bot->GetExactDist(dest);
     if (dis < pathFinderDis)
     {
-        return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
+        return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), false, false, false, true);
     }
 
     // performance optimization
@@ -249,12 +249,14 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         bot->UpdateAllowedPositionZ(dx, dy, dz);
         PathGenerator path(bot);
         path.CalculatePath(dx, dy, dz);
-        bool canReach = path.GetPathType() & PATHFIND_NORMAL;
+        PathType type = path.GetPathType();
+        
+        bool canReach = type == PATHFIND_INCOMPLETE || type == PATHFIND_NORMAL;
 
         if (canReach && fabs(delta) <= minDelta)
         {
             found = true;
-            G3D::Vector3 endPos = path.GetPath().back();
+            const G3D::Vector3 &endPos = path.GetActualEndPosition();
             rx = endPos.x;
             ry = endPos.y;
             rz = endPos.z;
@@ -265,7 +267,7 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     {
         return MoveTo(bot->GetMapId(), rx, ry, rz, false, false, false, true);
     }
-    // fallback to direct move
+    // don't fallback to direct move
     // float angle = bot->GetAngle(&dest);
     // return MoveTo(bot->GetMapId(), x + cos(angle) * pathFinderDis, y + sin(angle) * pathFinderDis, z);
     return false;
