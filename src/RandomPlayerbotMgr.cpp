@@ -1537,6 +1537,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 if (!map)
                     continue;
                 const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
+                uint32 zoneId = area->zone ? area->zone : area->ID;
                 uint32 level = area->area_level;
                 for (int i = 5; i <= maxLevel; i++)
                 {
@@ -1550,14 +1551,15 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                         
                         if (loc.GetExactDist(checkLoc) > 1000.0f)
                             continue;
-
-                        if (area->zone != 
+                        
+                        if (zoneId != 
                             map->GetZoneId(1, checkLoc.GetPositionX(), checkLoc.GetPositionY(), checkLoc.GetPositionZ()))
                             continue;
 
                         counter++;
                         levelLoc = checkLoc;
                     }
+
                     if (counter < 15)
                         continue;
 
