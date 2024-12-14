@@ -1532,7 +1532,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 continue;
             const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
             uint32 level = area->area_level;
-            for (int i = 5; i <= 80; i++)
+            for (int i = 5; i <= maxLevel; i++)
             {
                 std::vector<WorldLocation>& locs = locsPerLevelCache[i];
                 int counter = 0;
@@ -1542,11 +1542,11 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                     if (loc.GetMapId() != checkLoc.GetMapId())
                         continue;
 
-                    if (map->GetZoneId(1, loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) != 
+                    if (area->zone != 
                         map->GetZoneId(1, checkLoc.GetPositionX(), checkLoc.GetPositionY(), checkLoc.GetPositionZ()))
                         continue;
 
-                    if (loc.GetMapId() == checkLoc.GetMapId() && loc.GetExactDist(checkLoc) <= 1000.0f)
+                    if (loc.GetExactDist(checkLoc) <= 1000.0f)
                     {
                         
                         counter++;
@@ -1564,7 +1564,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 {
                     allianceStarterPerLevelCache[i].push_back(loc);
                 }
-                LOG_INFO("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
+                LOG_DEBUG("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
                          level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
                          levelLoc.GetPositionZ(), levelLoc.GetMapId());
             }
