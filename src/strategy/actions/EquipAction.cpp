@@ -194,12 +194,12 @@ void EquipAction::EquipItem(Item* item)
                     bot->GetSession()->HandleAutoEquipItemSlotOpcode(offhandPacket);
             
                     std::ostringstream moveMsg;
-                    moveMsg << "moving " << chat->FormatItem(oldMHProto) << " to offhand";
+                    moveMsg << "Main hand upgrade found. Moving " << chat->FormatItem(oldMHProto) << " to offhand";
                     botAI->TellMaster(moveMsg);
                 }
             
                 std::ostringstream out;
-                out << "equipping " << chat->FormatItem(itemProto) << " in main hand as an upgrade";
+                out << "Equipping " << chat->FormatItem(itemProto) << " in main hand";
                 botAI->TellMaster(out);
                 return;
             }
@@ -214,7 +214,7 @@ void EquipAction::EquipItem(Item* item)
                 bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
 
                 std::ostringstream out;
-                out << "equipping " << chat->FormatItem(itemProto) << " in offhand as an upgrade";
+                out << "Equipping " << chat->FormatItem(itemProto) << " in offhand";
                 botAI->TellMaster(out);
                 return;
             }
