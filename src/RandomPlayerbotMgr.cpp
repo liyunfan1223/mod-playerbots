@@ -1433,6 +1433,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "position_x, "
         "position_y, "
         "position_z, "
+        "t.minlevel, "
         "t.maxlevel "
         "FROM "
         "(SELECT "
@@ -1476,7 +1477,9 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             float x = fields[1].Get<float>();
             float y = fields[2].Get<float>();
             float z = fields[3].Get<float>();
-            uint32 level = fields[4].Get<uint32>();
+            uint32 min_level = fields[4].Get<uint32>();
+            uint32 max_level = fields[5].Get<uint32>();
+            uint32 level = (min_level + max_level) / 2;
             WorldLocation loc(mapId, x, y, z, 0);
             collected_locs++;
             for (int32 l = (int32)level - (int32)sPlayerbotAIConfig->randomBotTeleHigherLevel;
@@ -1490,9 +1493,12 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             }
         } while (results->NextRow());
     }
-    LOG_INFO("playerbots", "{} locations for level collected.", collected_locs);
+    LOG_INFO("playerbots", ">> {} locations for level collected.", collected_locs);
 
-    results = WorldDatabase.Query(
+    LOG_INFO("playerbots", "Preparing innkeepers locations for level collected");
+    if (sPlayerbotAIConfig->enableNewRpgStrategy)
+    {
+        results = WorldDatabase.Query(
         "SELECT "
         "map, "
         "position_x, "
@@ -1510,106 +1516,90 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "ORDER BY "
         "t.minlevel;",
         sPlayerbotAIConfig->randomBotMapsAsString.c_str());
-    collected_locs = 0;
-    if (results)
-    {
-        do
+        collected_locs = 0;
+        if (results)
         {
-            Field* fields = results->Fetch();
-            uint16 mapId = fields[0].Get<uint16>();
-            float x = fields[1].Get<float>();
-            float y = fields[2].Get<float>();
-            float z = fields[3].Get<float>();
-            float orient = fields[4].Get<float>();
-            uint32 faction = fields[5].Get<uint32>();
-            uint32 c_entry = fields[6].Get<uint32>();
-            const FactionTemplateEntry* entry = sFactionTemplateStore.LookupEntry(faction);
-
-            WorldLocation loc(mapId, x + cos(orient) * 5.0f, y + sin(orient) * 5.0f, z + 0.5f, orient + M_PI);
-            collected_locs++;
-            Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
-            if (!map)
-                continue;
-            const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
-            uint32 level = area->area_level;
-            for (int i = 5; i <= maxLevel; i++)
+            do
             {
-                std::vector<WorldLocation>& locs = locsPerLevelCache[i];
-                int counter = 0;
-                WorldLocation levelLoc;
-                for (auto& checkLoc : locs)
+                Field* fields = results->Fetch();
+                uint16 mapId = fields[0].Get<uint16>();
+                float x = fields[1].Get<float>();
+                float y = fields[2].Get<float>();
+                float z = fields[3].Get<float>();
+                float orient = fields[4].Get<float>();
+                uint32 faction = fields[5].Get<uint32>();
+                uint32 c_entry = fields[6].Get<uint32>();
+                const FactionTemplateEntry* entry = sFactionTemplateStore.LookupEntry(faction);
+
+                WorldLocation loc(mapId, x + cos(orient) * 5.0f, y + sin(orient) * 5.0f, z + 0.5f, orient + M_PI);
+                collected_locs++;
+                Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
+                if (!map)
+                    continue;
+                const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
+                uint32 level = area->area_level;
+                for (int i = 5; i <= maxLevel; i++)
                 {
-                    if (loc.GetMapId() != checkLoc.GetMapId())
-                        continue;
-
-                    if (area->zone != 
-                        map->GetZoneId(1, checkLoc.GetPositionX(), checkLoc.GetPositionY(), checkLoc.GetPositionZ()))
-                        continue;
-
-                    if (loc.GetExactDist(checkLoc) <= 1000.0f)
+                    std::vector<WorldLocation>& locs = locsPerLevelCache[i];
+                    int counter = 0;
+                    WorldLocation levelLoc;
+                    for (auto& checkLoc : locs)
                     {
+                        if (loc.GetMapId() != checkLoc.GetMapId())
+                            continue;
                         
+                        if (loc.GetExactDist(checkLoc) > 1000.0f)
+                            continue;
+
+                        if (area->zone != 
+                            map->GetZoneId(1, checkLoc.GetPositionX(), checkLoc.GetPositionY(), checkLoc.GetPositionZ()))
+                            continue;
+
                         counter++;
                         levelLoc = checkLoc;
                     }
+                    if (counter < 15)
+                        continue;
+
+                    if (!(entry->hostileMask & 4))
+                    {
+                        hordeStarterPerLevelCache[i].push_back(loc);
+                    }
+                    if (!(entry->hostileMask & 2))
+                    {
+                        allianceStarterPerLevelCache[i].push_back(loc);
+                    }
+                    LOG_DEBUG("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
+                            level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
+                            levelLoc.GetPositionZ(), levelLoc.GetMapId());
                 }
-                if (counter < 15)
+            } while (results->NextRow());
+        }
+        // add all initial position
+        for (uint32 i = 1; i < MAX_RACES; i++)
+        {
+            for (uint32 j = 1; j < MAX_CLASSES; j++)
+            {
+                PlayerInfo const* info = sObjectMgr->GetPlayerInfo(i, j);
+
+                if (!info)
                     continue;
 
-                if (!(entry->hostileMask & 4))
+                WorldPosition pos(info->mapId, info->positionX, info->positionY, info->positionZ, info->orientation);
+
+                for (int32 l = 1; l <= 5; l++)
                 {
-                    hordeStarterPerLevelCache[i].push_back(loc);
+                    if ((1 << (i - 1)) & RACEMASK_ALLIANCE)
+                        allianceStarterPerLevelCache[(uint8)l].push_back(pos);
+                    else
+                        hordeStarterPerLevelCache[(uint8)l].push_back(pos);
                 }
-                if (!(entry->hostileMask & 2))
-                {
-                    allianceStarterPerLevelCache[i].push_back(loc);
-                }
-                LOG_DEBUG("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
-                         level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
-                         levelLoc.GetPositionZ(), levelLoc.GetMapId());
+                break;
             }
-            // int range = level <= 10 ? 6 : 8;
-            // for (int32 l = (int32)level; l <= (int32)level + range; l++)
-            // {
-            //     if (l < 1 || l > maxLevel)
-            //     {
-            //         continue;
-            //     }
-            //     if (!(entry->hostileMask & 4))
-            //     {
-            //         hordeStarterPerLevelCache[(uint8)l].push_back(loc);
-            //     }
-            //     if (!(entry->hostileMask & 2))
-            //     {
-            //         allianceStarterPerLevelCache[(uint8)l].push_back(loc);
-            //     }
-            // }
-        } while (results->NextRow());
-    }
-    // add all initial position
-    for (uint32 i = 1; i < MAX_RACES; i++)
-    {
-        for (uint32 j = 1; j < MAX_CLASSES; j++)
-        {
-            PlayerInfo const* info = sObjectMgr->GetPlayerInfo(i, j);
-
-            if (!info)
-                continue;
-
-            WorldPosition pos(info->mapId, info->positionX, info->positionY, info->positionZ, info->orientation);
-
-            for (int32 l = 1; l <= 5; l++)
-            {
-                if ((1 << (i - 1)) & RACEMASK_ALLIANCE)
-                    allianceStarterPerLevelCache[(uint8)l].push_back(pos);
-                else
-                    hordeStarterPerLevelCache[(uint8)l].push_back(pos);
-            }
-            break;
         }
+        LOG_INFO("playerbots", ">> {} innkeepers locations for level collected.", collected_locs);
     }
-    LOG_INFO("playerbots", "{} innkeepers locations for level collected.", collected_locs);
-
+    
     results = WorldDatabase.Query(
         "SELECT "
         "map, "
@@ -1673,7 +1663,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             }
         } while (results->NextRow());
     }
-    LOG_INFO("playerbots", "{} banker locations for level collected.", collected_locs);
+    LOG_INFO("playerbots", ">> {} banker locations for level collected.", collected_locs);
 }
 
 void RandomPlayerbotMgr::PrepareAddclassCache()
@@ -1711,7 +1701,7 @@ void RandomPlayerbotMgr::PrepareAddclassCache()
             } while (results->NextRow());
         }
     }
-    LOG_INFO("playerbots", "{} characters collected for addclass command.", collected);
+    LOG_INFO("playerbots", ">> {} characters collected for addclass command.", collected);
 }
 
 void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
@@ -2565,6 +2555,7 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 stateCount[MAX_TRAVEL_STATE + 1] = {0};
     std::vector<std::pair<Quest const*, int32>> questCount;
     std::unordered_map<NewRpgStatus, int> rpgStatusCount;
+    std::unordered_map<uint32, int> zoneCount;
     uint8 maxBotLevel = 0;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
     {
@@ -2634,6 +2625,8 @@ void RandomPlayerbotMgr::PrintStats()
             ++tank;
         else
             ++dps;
+        
+        zoneCount[bot->GetZoneId()]++;
 
         if (sPlayerbotAIConfig->enableNewRpgStrategy)
             rpgStatusCount[botAI->rpgInfo.status]++;
@@ -2719,6 +2712,15 @@ void RandomPlayerbotMgr::PrintStats()
     LOG_INFO("playerbots", "    In BG: {}", inBg);
     LOG_INFO("playerbots", "    In Rest: {}", rest);
     LOG_INFO("playerbots", "    Dead: {}", dead);
+    
+    // LOG_INFO("playerbots", "Bots zone:");
+    // for (auto &[zond_id, counter] : zoneCount)
+    // {
+    //     const AreaTableEntry* entry = sAreaTableStore.LookupEntry(zond_id);
+    //     std::string name = PlayerbotAI::GetLocalizedAreaName(entry);
+    //     LOG_INFO("playerbots", "    {}: {}", name, counter);
+    // }
+    
     if (sPlayerbotAIConfig->enableNewRpgStrategy)
     {
         LOG_INFO("playerbots", "Bots rpg status:", dead);

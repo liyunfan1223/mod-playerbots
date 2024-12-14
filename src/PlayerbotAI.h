@@ -433,7 +433,7 @@ public:
     std::vector<Player*> GetPlayersInGroup();
     const AreaTableEntry* GetCurrentArea();
     const AreaTableEntry* GetCurrentZone();
-    std::string GetLocalizedAreaName(const AreaTableEntry* entry);
+    static std::string GetLocalizedAreaName(const AreaTableEntry* entry);
 
     bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

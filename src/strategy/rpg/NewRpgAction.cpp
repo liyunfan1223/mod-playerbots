@@ -33,7 +33,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             uint32 roll = urand(1, 100);
             // IDLE -> NEAR_NPC
             // if ((!info.lastNearNpc || info.lastNearNpc + setNpcInterval < getMSTime()) && roll <= 30)
-            if (roll <= 40)
+            if (roll <= 30)
             {
                 info.lastNearNpc = getMSTime();
                 GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
@@ -44,7 +44,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 }
             }
             // IDLE -> GO_INNKEEPER
-            else if (bot->GetLevel() >= 6 && roll <= 55)
+            else if (bot->GetLevel() >= 6 && roll <= 45)
             {
                 WorldPosition pos = SelectRandomInnKeeperPos();
                 if (pos != WorldPosition() && bot->GetExactDist(pos) > 50.0f)
@@ -155,8 +155,8 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
     {
         if (bot->GetMapId() != loc.GetMapId())
             continue;
-        
-        if (bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) != 
+
+        if (bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) !=
             bot->GetZoneId())
             continue;
 
@@ -182,8 +182,8 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
         dest = lo_prepared_locs[idx];
     }
     LOG_DEBUG("playerbots", "[New Rpg] Bot {} select random grind pos Map:{} X:{} Y:{} Z:{} ({}+{} available in {})",
-             bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
-             hi_prepared_locs.size(), lo_prepared_locs.size() - hi_prepared_locs.size(), locs.size());
+              bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
+              hi_prepared_locs.size(), lo_prepared_locs.size() - hi_prepared_locs.size(), locs.size());
     return dest;
 }
 
@@ -197,7 +197,7 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
     {
         if (bot->GetMapId() != loc.GetMapId())
             continue;
-        
+
         float range = bot->GetLevel() <= 5 ? 500.0f : 2500.0f;
         if (bot->GetExactDist(loc) < range)
         {
@@ -211,8 +211,8 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
         dest = prepared_locs[idx];
     }
     LOG_DEBUG("playerbots", "[New Rpg] Bot {} select random inn keeper pos Map:{} X:{} Y:{} Z:{} ({} available in {})",
-             bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
-             prepared_locs.size(), locs.size());
+              bot->GetName(), dest.GetMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(),
+              prepared_locs.size(), locs.size());
     return dest;
 }
 
@@ -221,7 +221,8 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     float dis = bot->GetExactDist(dest);
     if (dis < pathFinderDis)
     {
-        return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), false, false, false, true);
+        return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), false, false,
+                      false, true);
     }
 
     // performance optimization
@@ -250,13 +251,13 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         PathGenerator path(bot);
         path.CalculatePath(dx, dy, dz);
         PathType type = path.GetPathType();
-        
+
         bool canReach = type == PATHFIND_INCOMPLETE || type == PATHFIND_NORMAL;
 
         if (canReach && fabs(delta) <= minDelta)
         {
             found = true;
-            const G3D::Vector3 &endPos = path.GetActualEndPosition();
+            const G3D::Vector3& endPos = path.GetActualEndPosition();
             rx = endPos.x;
             ry = endPos.y;
             rz = endPos.z;

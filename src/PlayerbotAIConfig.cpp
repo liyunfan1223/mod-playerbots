@@ -399,6 +399,7 @@ bool PlayerbotAIConfig::Initialize()
 
     worldBuffs.clear();
 
+    LOG_INFO("playerbots", "Loading Worldbuff...");
     for (uint32 factionId = 0; factionId < 3; factionId++)
     {
         for (uint32 classId = 0; classId < MAX_CLASSES; classId++)
