@@ -270,7 +270,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
     LOG_DEBUG("playerbots", "Initializing talents...");
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitTalentsTree();
     }
@@ -305,7 +305,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
     LOG_DEBUG("playerbots", "Initializing equipmemt...");
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitEquipment(incremental, incremental ? false : sPlayerbotAIConfig->twoRoundsGearInit);
     }
