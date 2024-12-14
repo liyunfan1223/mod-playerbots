@@ -207,7 +207,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     Prepare();
     LOG_DEBUG("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!sPlayerbotAIConfig->equipmentPersistence || level < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         bot->resetTalents(true);
     }
