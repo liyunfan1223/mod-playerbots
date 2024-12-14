@@ -154,7 +154,7 @@ void EquipAction::EquipItem(Item* item)
                                         (mhProto->InventoryType == INVTYPE_2HWEAPON && mhIsValidTG));
                 }
 
-                // If new weapon is best of all three, put it in main hand
+                // If new weapon is best of all three, put it in main hand// If new weapon is best of all three, put it in main hand
                 if (newIsBest && canGoMain)
                 {
                     // Equip new weapon in main hand
@@ -164,7 +164,7 @@ void EquipAction::EquipItem(Item* item)
                         eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_MAINHAND);
                         bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
                     }
-
+                
                     // If there was a main hand item, try to move it to offhand if it improves offhand
                     if (mainHandItem && mainHandCanGoOff)
                     {
@@ -177,7 +177,7 @@ void EquipAction::EquipItem(Item* item)
                             bot->GetSession()->HandleAutoEquipItemSlotOpcode(offhandPacket);
                         }
                     }
-
+                
                     std::ostringstream out;
                     out << "equipping " << chat->FormatItem(itemProto) << " as the best weapon in main hand";
                     botAI->TellMaster(out);
@@ -185,12 +185,21 @@ void EquipAction::EquipItem(Item* item)
                 }
                 else if (betterThanOff && canGoOff)
                 {
+                    // If offhand is empty, just verify logic:
+                    // Since newIsBest is false, the main hand is already equal or better than the new weapon.
+                    // Thus, equipping this weapon in offhand is safe and correct.
+                    if (!offHandItem)
+                    {
+                        // No additional main hand check needed because if it were better than main hand,
+                        // newIsBest would have triggered above.
+                    }
+                
                     // Equip the new weapon in offhand
                     WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
                     ObjectGuid newItemGuid = item->GetGUID();
                     eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_OFFHAND);
                     bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
-
+                
                     std::ostringstream out;
                     out << "equipping " << chat->FormatItem(itemProto) << " in offhand";
                     botAI->TellMaster(out);
