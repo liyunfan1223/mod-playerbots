@@ -469,6 +469,9 @@ bool PlayerbotAIConfig::Initialize()
     disableDeathKnightLogin = sConfigMgr->GetOption<bool>("AiPlayerbot.DisableDeathKnightLogin", 0);
     botActiveAlone = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAlone", 100);
     botActiveAloneSmartScale = sConfigMgr->GetOption<bool>("AiPlayerbot.botActiveAloneSmartScale", 1);
+    botActiveAloneDiffMethod = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAloneDiffMethod", 2);
+    botActiveAloneDiffLimitFloor = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAloneDiffLimitFloor", 30);
+    botActiveAloneDiffLimitCeiling = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAloneDiffLimitCeiling", 60);
     botActiveAloneSmartScaleWhenMinLevel =
         sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel", 1);
     botActiveAloneSmartScaleWhenMaxLevel =
