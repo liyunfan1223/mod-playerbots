@@ -99,7 +99,111 @@ void EquipAction::EquipItem(Item* item)
                                   itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
                                   itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2;
             }
-            
+
+            // New logic: Ensure strongest weapon is in main hand for dual wield/Titan Grip scenarios
+            bool isWeapon = (itemProto->Class == ITEM_CLASS_WEAPON);
+            bool canDualWieldOrTG = (bot->CanDualWield() || (bot->CanTitanGrip() && itemProto->InventoryType == INVTYPE_2HWEAPON));
+            if (isWeapon && canDualWieldOrTG && dstSlot == EQUIPMENT_SLOT_MAINHAND &&
+                ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || (bot->CanTitanGrip() && isValidTGWeapon)))
+            {
+                // Compare current mainhand and offhand weapons to the new item
+                Item* mainHandItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+                Item* offHandItem  = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+
+                StatsWeightCalculator calculator(bot);
+                calculator.SetItemSetBonus(false);
+                calculator.SetOverflowPenalty(false);
+
+                float newItemScore   = calculator.CalculateItem(itemId);
+                float mainHandScore  = mainHandItem ? calculator.CalculateItem(mainHandItem->GetTemplate()->ItemId) : 0.0f;
+                float offHandScore   = offHandItem  ? calculator.CalculateItem(offHandItem->GetTemplate()->ItemId) : 0.0f;
+
+                // Determine if new weapon is best
+                bool newIsBest = (newItemScore > mainHandScore && newItemScore > offHandScore);
+                bool betterThanOff = (newItemScore > offHandScore) && !newIsBest;
+
+                // Check that the new item can go main hand
+                bool canGoMain = (itemProto->InventoryType == INVTYPE_WEAPON ||
+                                  itemProto->InventoryType == INVTYPE_WEAPONMAINHAND ||
+                                  (bot->CanTitanGrip() && itemProto->InventoryType == INVTYPE_2HWEAPON));
+
+                // Check Titan Grip offhand eligibility
+                bool canTGOff = false;
+                if (bot->CanTitanGrip() && itemProto->InventoryType == INVTYPE_2HWEAPON)
+                {
+                    // Titan Grip allows 2H axes, maces, swords in offhand
+                    canTGOff = (isValidTGWeapon);
+                }
+
+                // Check that the new item can go off hand
+                bool canGoOff = (itemProto->InventoryType == INVTYPE_WEAPON ||
+                                 itemProto->InventoryType == INVTYPE_WEAPONOFFHAND ||
+                                 canTGOff);
+
+                // Check what the main hand item can do if we move it
+                bool mainHandCanGoOff = false;
+                if (mainHandItem)
+                {
+                    const ItemTemplate* mhProto = mainHandItem->GetTemplate();
+                    bool mhIsValidTG = (bot->CanTitanGrip() && mhProto->InventoryType == INVTYPE_2HWEAPON &&
+                                        (mhProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
+                                         mhProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+                                         mhProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2));
+                    mainHandCanGoOff = (mhProto->InventoryType == INVTYPE_WEAPON ||
+                                        mhProto->InventoryType == INVTYPE_WEAPONOFFHAND ||
+                                        (mhProto->InventoryType == INVTYPE_2HWEAPON && mhIsValidTG));
+                }
+
+                // If new weapon is best of all three, put it in main hand
+                if (newIsBest && canGoMain)
+                {
+                    // Equip new weapon in main hand
+                    {
+                        WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+                        ObjectGuid newItemGuid = item->GetGUID();
+                        eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_MAINHAND);
+                        bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
+                    }
+
+                    // If there was a main hand item, try to move it to offhand if it improves offhand
+                    if (mainHandItem && mainHandCanGoOff)
+                    {
+                        // Only move if it's better than the current offhand or offhand is empty
+                        if (!offHandItem || mainHandScore > offHandScore)
+                        {
+                            WorldPacket offhandPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+                            ObjectGuid oldMHGuid = mainHandItem->GetGUID();
+                            offhandPacket << oldMHGuid << uint8(EQUIPMENT_SLOT_OFFHAND);
+                            bot->GetSession()->HandleAutoEquipItemSlotOpcode(offhandPacket);
+                        }
+                    }
+
+                    std::ostringstream out;
+                    out << "equipping " << chat->FormatItem(itemProto) << " as the best weapon in main hand";
+                    botAI->TellMaster(out);
+                    return;
+                }
+                else if (betterThanOff && canGoOff)
+                {
+                    // Equip the new weapon in offhand
+                    WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+                    ObjectGuid newItemGuid = item->GetGUID();
+                    eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_OFFHAND);
+                    bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
+
+                    std::ostringstream out;
+                    out << "equipping " << chat->FormatItem(itemProto) << " in offhand";
+                    botAI->TellMaster(out);
+                    return;
+                }
+                else
+                {
+                    // Not an improvement or can't place it properly, do nothing
+                    return;
+                }
+            }
+
+            // Existing logic below - do not remove or modify existing comments
             if (dstSlot == EQUIPMENT_SLOT_FINGER1 ||
                 dstSlot == EQUIPMENT_SLOT_TRINKET1 ||
                 (dstSlot == EQUIPMENT_SLOT_MAINHAND && bot->CanDualWield() &&
