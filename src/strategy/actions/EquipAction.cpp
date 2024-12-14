@@ -91,22 +91,29 @@ void EquipAction::EquipItem(Item* item)
             uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
             bool have2HWeapon = false;
             bool isValidTGWeapon = false;
-            if (dstSlot == EQUIPMENT_SLOT_MAINHAND)
+
+            if (bot->CanTitanGrip() && itemProto->InventoryType == INVTYPE_2HWEAPON)
+            {
+                isValidTGWeapon = (itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
+                                   itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+                                   itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2);
+            }
+
+            // Check if we currently have a 2H weapon in main hand
             {
                 Item* currentWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 have2HWeapon = currentWeapon && currentWeapon->GetTemplate()->InventoryType == INVTYPE_2HWEAPON;
-                isValidTGWeapon = itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
-                                  itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
-                                  itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2;
             }
 
-            // New logic: Ensure strongest weapon is in main hand for dual wield/Titan Grip scenarios
             bool isWeapon = (itemProto->Class == ITEM_CLASS_WEAPON);
             bool canDualWieldOrTG = (bot->CanDualWield() || (bot->CanTitanGrip() && itemProto->InventoryType == INVTYPE_2HWEAPON));
-            if (isWeapon && canDualWieldOrTG && dstSlot == EQUIPMENT_SLOT_MAINHAND &&
-                ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || (bot->CanTitanGrip() && isValidTGWeapon)))
+
+            // Perform best-weapon logic if this is a weapon and the bot can dual wield or Titan Grip
+            if (isWeapon && canDualWieldOrTG &&
+                ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) ||
+                 (bot->CanTitanGrip() && isValidTGWeapon)))
             {
-                // Compare current mainhand and offhand weapons to the new item
+                // Compare new item to mainhand and offhand regardless of initial dstSlot
                 Item* mainHandItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 Item* offHandItem  = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
 
@@ -118,29 +125,24 @@ void EquipAction::EquipItem(Item* item)
                 float mainHandScore  = mainHandItem ? calculator.CalculateItem(mainHandItem->GetTemplate()->ItemId) : 0.0f;
                 float offHandScore   = offHandItem  ? calculator.CalculateItem(offHandItem->GetTemplate()->ItemId) : 0.0f;
 
-                // Determine if new weapon is best
                 bool newIsBest = (newItemScore > mainHandScore && newItemScore > offHandScore);
                 bool betterThanOff = (newItemScore > offHandScore) && !newIsBest;
 
-                // Check that the new item can go main hand
                 bool canGoMain = (itemProto->InventoryType == INVTYPE_WEAPON ||
                                   itemProto->InventoryType == INVTYPE_WEAPONMAINHAND ||
                                   (bot->CanTitanGrip() && itemProto->InventoryType == INVTYPE_2HWEAPON));
 
-                // Check Titan Grip offhand eligibility
                 bool canTGOff = false;
                 if (bot->CanTitanGrip() && itemProto->InventoryType == INVTYPE_2HWEAPON)
                 {
-                    // Titan Grip allows 2H axes, maces, swords in offhand
-                    canTGOff = (isValidTGWeapon);
+                    // Titan Grip allows certain 2H weapons in offhand
+                    canTGOff = isValidTGWeapon;
                 }
 
-                // Check that the new item can go off hand
                 bool canGoOff = (itemProto->InventoryType == INVTYPE_WEAPON ||
                                  itemProto->InventoryType == INVTYPE_WEAPONOFFHAND ||
                                  canTGOff);
 
-                // Check what the main hand item can do if we move it
                 bool mainHandCanGoOff = false;
                 if (mainHandItem)
                 {
@@ -149,14 +151,18 @@ void EquipAction::EquipItem(Item* item)
                                         (mhProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
                                          mhProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
                                          mhProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2));
+
                     mainHandCanGoOff = (mhProto->InventoryType == INVTYPE_WEAPON ||
                                         mhProto->InventoryType == INVTYPE_WEAPONOFFHAND ||
                                         (mhProto->InventoryType == INVTYPE_2HWEAPON && mhIsValidTG));
                 }
 
-                // If new weapon is best of all three, put it in main hand// If new weapon is best of all three, put it in main hand
+                // Decide final equip slot based on comparison
                 if (newIsBest && canGoMain)
                 {
+                    // Equip in main hand
+                    dstSlot = EQUIPMENT_SLOT_MAINHAND;
+
                     // Equip new weapon in main hand
                     {
                         WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
@@ -164,11 +170,10 @@ void EquipAction::EquipItem(Item* item)
                         eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_MAINHAND);
                         bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
                     }
-                
+
                     // If there was a main hand item, try to move it to offhand if it improves offhand
                     if (mainHandItem && mainHandCanGoOff)
                     {
-                        // Only move if it's better than the current offhand or offhand is empty
                         if (!offHandItem || mainHandScore > offHandScore)
                         {
                             WorldPacket offhandPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
@@ -177,7 +182,7 @@ void EquipAction::EquipItem(Item* item)
                             bot->GetSession()->HandleAutoEquipItemSlotOpcode(offhandPacket);
                         }
                     }
-                
+
                     std::ostringstream out;
                     out << "equipping " << chat->FormatItem(itemProto) << " as the best weapon in main hand";
                     botAI->TellMaster(out);
@@ -185,21 +190,14 @@ void EquipAction::EquipItem(Item* item)
                 }
                 else if (betterThanOff && canGoOff)
                 {
-                    // If offhand is empty, just verify logic:
-                    // Since newIsBest is false, the main hand is already equal or better than the new weapon.
-                    // Thus, equipping this weapon in offhand is safe and correct.
-                    if (!offHandItem)
-                    {
-                        // No additional main hand check needed because if it were better than main hand,
-                        // newIsBest would have triggered above.
-                    }
-                
-                    // Equip the new weapon in offhand
+                    // Equip in offhand
+                    dstSlot = EQUIPMENT_SLOT_OFFHAND;
+
                     WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
                     ObjectGuid newItemGuid = item->GetGUID();
                     eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_OFFHAND);
                     bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
-                
+
                     std::ostringstream out;
                     out << "equipping " << chat->FormatItem(itemProto) << " in offhand";
                     botAI->TellMaster(out);
@@ -207,12 +205,14 @@ void EquipAction::EquipItem(Item* item)
                 }
                 else
                 {
-                    // Not an improvement or can't place it properly, do nothing
+                    // Not an improvement, do nothing and return
                     return;
                 }
             }
 
-            // Existing logic below - do not remove or modify existing comments
+            // If we reach here, either not a dual-wield scenario, not a better weapon scenario,
+            // or the item isn't a weapon. Fall back to existing logic.
+
             if (dstSlot == EQUIPMENT_SLOT_FINGER1 ||
                 dstSlot == EQUIPMENT_SLOT_TRINKET1 ||
                 (dstSlot == EQUIPMENT_SLOT_MAINHAND && bot->CanDualWield() &&
@@ -231,8 +231,7 @@ void EquipAction::EquipItem(Item* item)
                         StatsWeightCalculator calculator(bot);
                         calculator.SetItemSetBonus(false);
                         calculator.SetOverflowPenalty(false);
-                        
-                        // float newItemScore = calculator.CalculateItem(itemId);
+
                         float equippedItemScore[2] = {
                             equippedItemScore[0] = calculator.CalculateItem(equippedItems[0]->GetTemplate()->ItemId),
                             equippedItemScore[1] = calculator.CalculateItem(equippedItems[1]->GetTemplate()->ItemId)
@@ -244,22 +243,18 @@ void EquipAction::EquipItem(Item* item)
                             dstSlot++;
                         }
                     }
-                    else    // No item equipped in slot 2, equip in that slot instead of replacing first item
+                    else // No item equipped in slot 2, equip in that slot
                     {
                         dstSlot++;
                     }
                 }
             }
 
+            // Perform the final equip if no special logic applied
             WorldPacket packet(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
             ObjectGuid itemguid = item->GetGUID();
-            
             packet << itemguid << dstSlot;
             bot->GetSession()->HandleAutoEquipItemSlotOpcode(packet);
-
-            // WorldPacket packet(CMSG_AUTOEQUIP_ITEM, 2);
-            // packet << bagIndex << slot;
-            // bot->GetSession()->HandleAutoEquipItemOpcode(packet);
         }
     }
 
@@ -267,6 +262,7 @@ void EquipAction::EquipItem(Item* item)
     out << "equipping " << chat->FormatItem(itemProto);
     botAI->TellMaster(out);
 }
+
 
 bool EquipUpgradesAction::Execute(Event event)
 {
