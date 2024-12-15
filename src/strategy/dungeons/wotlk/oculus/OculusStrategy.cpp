@@ -36,7 +36,7 @@ void WotlkDungeonOccStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 void WotlkDungeonOccStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
 {
     multipliers.push_back(new MountingDrakeMultiplier(botAI));
-    multipliers.push_back(new FlyingMultiplier(botAI));
+    multipliers.push_back(new OccFlyingMultiplier(botAI));
     multipliers.push_back(new UromMultiplier(botAI));
     multipliers.push_back(new EregosMultiplier(botAI));
 }

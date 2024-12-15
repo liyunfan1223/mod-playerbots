@@ -1606,6 +1606,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 615:
             strategyName = "wotlk-os";      // Obsidian Sanctum
             break;
+        case 616:
+            strategyName = "wotlk-eoe";     // Eye Of Eternity
+            break;
         case 619:
             strategyName = "wotlk-ok";      // Ahn'kahet: The Old Kingdom
             break;
