@@ -17,8 +17,8 @@ PlayerbotSecurity::PlayerbotSecurity(Player* const bot) : bot(bot)
 
 PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* reason, bool ignoreGroup)
 {
-    if (from->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
-        return PLAYERBOT_SECURITY_ALLOW_ALL;
+    //if (from->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+    //    return PLAYERBOT_SECURITY_ALLOW_ALL;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
@@ -248,17 +248,17 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                     out << "I am in a full group. Will do it later";
                     break;
                 case PLAYERBOT_DENY_IS_LEADER:
-                    out << "I am currently leading a group. I can invite you if you want.";
+                    out << "I am currently leading a group. I can invite you if you want";
                     break;
                 case PLAYERBOT_DENY_NOT_LEADER:
                     if (botAI->GetGroupMaster())
                     {
                         out << "I am in a group with " << botAI->GetGroupMaster()->GetName()
-                            << ". You can ask him for invite.";
+                            << ". You can ask him/her for an invite";
                     }
                     else
                     {
-                        out << "I am in a group with someone else. You can ask him for invite.";
+                        out << "I am in a group with someone else. You can ask him/her for an invite";
                     }
                     break;
                 case PLAYERBOT_DENY_BG:
