@@ -1479,7 +1479,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             float z = fields[3].Get<float>();
             uint32 min_level = fields[4].Get<uint32>();
             uint32 max_level = fields[5].Get<uint32>();
-            uint32 level = (min_level + max_level) / 2;
+            uint32 level = (min_level + max_level + 1) / 2;
             WorldLocation loc(mapId, x, y, z, 0);
             collected_locs++;
             for (int32 l = (int32)level - (int32)sPlayerbotAIConfig->randomBotTeleHigherLevel;
