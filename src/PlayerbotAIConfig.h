@@ -266,6 +266,7 @@ public:
     uint32 botActiveAlone;
     uint32 BotActiveAloneWhenInRadius;
     bool BotActiveAloneForceWhenInZone;
+    bool BotActiveAloneForceWhenInMap;
     bool BotActiveAloneForceWhenIsFriend;
     bool BotActiveAloneForceWhenInGuild;
     bool botActiveAloneSmartScale;
