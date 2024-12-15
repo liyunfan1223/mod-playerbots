@@ -38,17 +38,17 @@ public:
     bool Execute(Event event) override;
 };
 
-class FlyDrakeAction : public MovementAction
+class OccFlyDrakeAction : public MovementAction
 {
 public:
-    FlyDrakeAction(PlayerbotAI* ai) : MovementAction(ai, "fly drake") {}
+    OccFlyDrakeAction(PlayerbotAI* ai) : MovementAction(ai, "occ fly drake") {}
     bool Execute(Event event) override;
 };
 
-class DrakeAttackAction : public Action
+class OccDrakeAttackAction : public Action
 {
 public:
-    DrakeAttackAction(PlayerbotAI* botAI) : Action(botAI, "drake attack") {}
+    OccDrakeAttackAction(PlayerbotAI* botAI) : Action(botAI, "occ drake attack") {}
     bool Execute(Event event) override;
 
 protected:
@@ -57,7 +57,6 @@ protected:
     bool AmberDrakeAction(Unit* target);
     bool EmeraldDrakeAction(Unit* target);
     bool RubyDrakeAction(Unit* target);
-
 };
 
 class AvoidArcaneExplosionAction : public MovementAction
