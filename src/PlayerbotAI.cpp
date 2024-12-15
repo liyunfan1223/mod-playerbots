@@ -4172,6 +4172,15 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         }
     }
 
+    // bot map has active players.
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenInMap)
+    {
+        if (HasRealPlayers(bot->GetMap()))
+        {
+            return true;
+        }
+    }
+
     // bot zone has active players.
     if (sPlayerbotAIConfig->BotActiveAloneForceWhenInZone)
     {
