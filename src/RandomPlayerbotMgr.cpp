@@ -1549,7 +1549,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                         if (loc.GetMapId() != checkLoc.GetMapId())
                             continue;
                         
-                        if (loc.GetExactDist(checkLoc) > 1000.0f)
+                        if (loc.GetExactDist(checkLoc) > 1500.0f)
                             continue;
                         
                         if (zoneId != 
@@ -1558,6 +1558,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 
                         counter++;
                         levelLoc = checkLoc;
+                        if (counter >= 15)
+                            break;
                     }
 
                     if (counter < 15)
