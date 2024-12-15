@@ -69,6 +69,8 @@ public:
     AttackRtiTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack rti target") {}
 
     std::string const GetTargetName() override { return "rti target"; }
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class AttackEnemyFlagCarrierAction : public AttackAction

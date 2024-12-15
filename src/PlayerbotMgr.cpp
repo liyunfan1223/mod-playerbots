@@ -958,9 +958,17 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "reload"))
     {
-        messages.push_back("Reloading config");
-        sPlayerbotAIConfig->Initialize();
-        return messages;
+        if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        {
+            sPlayerbotAIConfig->Initialize();
+            messages.push_back("Config reloaded.");
+            return messages;
+        }
+        else
+        {
+            messages.push_back("ERROR: Only GM can use this command.");
+            return messages;
+        }
     }
 
     if (!strcmp(cmd, "tweak"))

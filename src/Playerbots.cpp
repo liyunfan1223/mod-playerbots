@@ -52,7 +52,7 @@ public:
 
     void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam) override
     {
-        statementIndex = CHAR_UPD_CHAR_ONLINE;
+        statementIndex = CHAR_UPD_CHAR_OFFLINE;
         statementParam = player->GetGUID().GetCounter();
     }
 

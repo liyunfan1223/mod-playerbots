@@ -67,7 +67,7 @@
 
 ###################################
 #                                 #
-# GENERAL SETTINGS              #
+# GENERAL SETTINGS                #
 #                                 #
 ###################################
 
@@ -367,6 +367,10 @@ AiPlayerbot.SyncQuestWithPlayer = 1
 # Bots will auto-complete quests for the player when handing in
 # Default: 0 (disabled)
 AiPlayerbot.SyncQuestForPlayer = 0
+
+# Bots will drop obsolete quests
+# Default: 1 (enabled)
+AiPlayerbot.DropObsoleteQuests = 1
 
 #
 #
@@ -1024,6 +1028,56 @@ AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 
 ###################################
 #                                 #
+# WORLD BUFFS					  #
+#                                 #
+###################################
+
+####################################################################################################
+# 
+#
+#
+
+# Applies a permanent buff to all bots when not in combat simulating flasks, food, rune etc.
+# WorldBuff.Faction.Class.Spec.MinLevel.MaxLevel
+
+AiPlayerbot.WorldBuff.0.1.0.80.80 = 53760,57358					#WARRIOR ARMS
+AiPlayerbot.WorldBuff.0.1.1.80.80 = 53760,57358					#WARRIOR FURY
+AiPlayerbot.WorldBuff.0.1.2.80.80 = 53758,57356					#WARRIOR PROTECTION
+AiPlayerbot.WorldBuff.0.2.0.80.80 = 60347,53749,57332			#PALADIN HOLY
+AiPlayerbot.WorldBuff.0.2.1.80.80 = 53758,57356					#PALADIN PROTECTION
+AiPlayerbot.WorldBuff.0.2.2.80.80 = 53760,57371					#PALADIN RETRIBUTION
+AiPlayerbot.WorldBuff.0.3.0.80.80 = 53760,57325					#HUNTER BEAST
+AiPlayerbot.WorldBuff.0.3.1.80.80 = 53760,57358					#HUNTER MARKSMANSHIP
+AiPlayerbot.WorldBuff.0.3.2.80.80 = 53760,57367					#HUNTER SURVIVAL
+AiPlayerbot.WorldBuff.0.4.0.80.80 = 53760,57325					#ROGUE ASSASINATION
+AiPlayerbot.WorldBuff.0.4.1.80.80 = 53760,57358					#ROGUE COMBAT
+AiPlayerbot.WorldBuff.0.4.2.80.80 = 53760,57367					#ROGUE SUBTLETY
+AiPlayerbot.WorldBuff.0.5.0.80.80 = 53755,57327					#PRIEST DISCIPLINE
+AiPlayerbot.WorldBuff.0.5.1.80.80 = 53755,57327					#PRIEST HOLY
+AiPlayerbot.WorldBuff.0.5.2.80.80 = 53755,57327					#PRIEST SHADOW
+AiPlayerbot.WorldBuff.0.6.0.80.80 = 53758,57356					#DEATH KNIGHT BLOOD
+AiPlayerbot.WorldBuff.0.6.1.80.80 = 53760,57358					#DEATH KNIGHT FROST
+AiPlayerbot.WorldBuff.0.6.2.80.80 = 53760,57358					#DEATH KNIGHT UNHOLY
+AiPlayerbot.WorldBuff.0.7.0.80.80 = 53755,57327					#SHAMAN ELEMENTAL
+AiPlayerbot.WorldBuff.0.7.1.80.80 = 53760,57325					#SHAMAN ENHANCEMENT
+AiPlayerbot.WorldBuff.0.7.2.80.80 = 53755,57327					#SHAMAN RESTORATION
+AiPlayerbot.WorldBuff.0.8.0.80.80 = 53755,57327					#MAGE ARCANE
+AiPlayerbot.WorldBuff.0.8.1.80.80 = 53755,57327					#MAGE FIRE
+AiPlayerbot.WorldBuff.0.8.2.80.80 = 53755,57327					#MAGE FROST
+AiPlayerbot.WorldBuff.0.9.0.80.80 = 53755,57327					#WARLOCK AFFLICTION
+AiPlayerbot.WorldBuff.0.9.1.80.80 = 53755,57327					#WARLOCK DEMONOLOGY
+AiPlayerbot.WorldBuff.0.9.2.80.80 = 53755,57327					#WARLOCK DESTRUCTION
+AiPlayerbot.WorldBuff.0.11.0.80.80 = 53755,57327				#DRUID BALANCE
+AiPlayerbot.WorldBuff.0.11.1.80.80 = 53749,53763,57367			#DRUID FERAL
+AiPlayerbot.WorldBuff.0.11.2.80.80 = 54212,57334				#DRUID RESTORATION
+
+#
+#
+#
+###################################################################################################
+
+###################################
+#                                 #
 # RANDOM BOT DEFAULT TALENT SPEC  #
 #                                 #
 ###################################
@@ -1410,9 +1464,6 @@ AiPlayerbot.BroadcastChanceGuildManagement = 30000
 # Custom config to allow logfiles to be created.
 # Example: AiPlayerbot.AllowedLogFiles = travelNodes.csv,travelPaths.csv,TravelNodeStore.h,bot_movement.csv,bot_location.csv
 AiPlayerbot.AllowedLogFiles = ""
-
-Appender.Playerbots=2,5,0,Playerbots.log,w
-Logger.playerbots=5,Console Playerbots
 
 #
 #

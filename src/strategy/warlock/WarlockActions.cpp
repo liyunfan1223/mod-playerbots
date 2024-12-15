@@ -23,3 +23,5 @@ bool CastFearOnCcAction::isPossible() { return botAI->CanCastSpell("fear", GetTa
 bool CastFearOnCcAction::isUseful() { return true; }
 
 bool CastLifeTapAction::isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->lowHealth; }
+
+Unit* UseSoulstoneAction::GetTarget() { return botAI->GetMaster(); }

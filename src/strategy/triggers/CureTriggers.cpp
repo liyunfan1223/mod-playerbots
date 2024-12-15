@@ -25,4 +25,8 @@ bool PartyMemberNeedCureTrigger::IsActive()
     return target && target->IsInWorld();
 }
 
-bool NeedWorldBuffTrigger::IsActive() { return !WorldBuffAction::NeedWorldBuffs(bot).empty(); }
+bool NeedWorldBuffTrigger::IsActive()
+{
+    std::any_of(WorldBuffAction::NeedWorldBuffs(bot).begin(), WorldBuffAction::NeedWorldBuffs(bot).end(),
+                [](const auto& wb) { return true; });
+}
