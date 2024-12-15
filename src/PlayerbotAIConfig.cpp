@@ -473,6 +473,10 @@ bool PlayerbotAIConfig::Initialize()
     BotActiveAloneForceWhenIsFriend = sConfigMgr->GetOption<bool>("AiPlayerbot.BotActiveAloneForceWhenIsFriend", 1);
     BotActiveAloneForceWhenInGuild = sConfigMgr->GetOption<bool>("AiPlayerbot.BotActiveAloneForceWhenInGuild", 1);
     botActiveAloneSmartScale = sConfigMgr->GetOption<bool>("AiPlayerbot.botActiveAloneSmartScale", 1);
+    botActiveAloneSmartScaleDiffLimitfloor =
+        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor", 70);
+    botActiveAloneSmartScaleDiffLimitCeiling =
+        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling", 250);
     botActiveAloneSmartScaleWhenMinLevel =
         sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel", 1);
     botActiveAloneSmartScaleWhenMaxLevel =

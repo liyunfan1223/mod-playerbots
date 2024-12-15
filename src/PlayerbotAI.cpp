@@ -4346,10 +4346,16 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
 
 uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 {
-    uint32 maxDiff = sWorldUpdateTime.GetAverageUpdateTime();
+    uint32 maxDiff = sWorldUpdateTime.GetMaxUpdateTime();
+    uint32 diffLimitFloor = sPlayerbotAIConfig->botActiveAloneSmartScaleDiffLimitfloor;
+    uint32 diffLimitCeiling = sPlayerbotAIConfig->botActiveAloneSmartScaleDiffLimitCeiling;
+    double spreadSize = (double) (diffLimitCeiling - diffLimitFloor) / 4; // scaleSteps - 1
 
-    if (maxDiff > 500) return 0;
-    if (maxDiff > 250)
+    // deal with high spikes, create server breathing space.
+    if (maxDiff > (2 * diffLimitCeiling)) return 0;
+
+    // apply scaling
+    if (maxDiff > diffLimitFloor + (4 * spreadSize))
     {
         if (Map* map = bot->GetMap())
         {
@@ -4369,10 +4375,10 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 
         return (mod * 1) / 10;
     }
-    if (maxDiff > 200) return (mod * 3) / 10;
-    if (maxDiff > 150) return (mod * 5) / 10;
-    if (maxDiff > 100) return (mod * 6) / 10;
-    if (maxDiff > 75)  return (mod * 9) / 10;
+    if (maxDiff > diffLimitFloor + (3 * spreadSize)) return (mod * 3) / 10;
+    if (maxDiff > diffLimitFloor + (2 * spreadSize)) return (mod * 5) / 10;
+    if (maxDiff > diffLimitFloor + (1 * spreadSize)) return (mod * 7) / 10;
+    if (maxDiff > diffLimitFloor + (0 * spreadSize)) return (mod * 9) / 10;
 
     return mod;
 }
