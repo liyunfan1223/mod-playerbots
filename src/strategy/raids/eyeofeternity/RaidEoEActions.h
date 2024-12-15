@@ -3,62 +3,67 @@
 
 #include "MovementActions.h"
 #include "AttackAction.h"
+#include "GenericSpellActions.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 
-// const float TSUNAMI_LEFT_SAFE_MELEE = 552.0f;
-// const float TSUNAMI_LEFT_SAFE_RANGED = 504.0f;
-// const float TSUNAMI_RIGHT_SAFE_ALL = 529.0f;
-// const std::pair<float, float> SARTHARION_MAINTANK_POSITION = {3258.5f, 532.5f};
-// const std::pair<float, float> SARTHARION_OFFTANK_POSITION = {3230.0f, 526.0f};
-// const std::pair<float, float> SARTHARION_RANGED_POSITION = {3248.0f, 507.0f};
+const std::pair<float, float> MALYGOS_MAINTANK_POSITION = {757.0f, 1337.0f};
+const std::pair<float, float> MALYGOS_STACK_POSITION = {755.0f, 1301.0f};
 
-// class SartharionTankPositionAction : public AttackAction
-// {
-// public:
-//     SartharionTankPositionAction(PlayerbotAI* botAI, std::string const name = "sartharion tank position")
-//         : AttackAction(botAI, name) {}
-//     bool Execute(Event event) override;
-// };
+class MalygosPositionAction : public MovementAction
+{
+public:
+    MalygosPositionAction(PlayerbotAI* botAI, std::string const name = "malygos position")
+        : MovementAction(botAI, name) {}
+    bool Execute(Event event) override;
+};
 
-// class AvoidTwilightFissureAction : public MovementAction
-// {
-// public:
-//     AvoidTwilightFissureAction(PlayerbotAI* botAI, std::string const name = "avoid twilight fissure")
-//         : MovementAction(botAI, name) {}
-//     bool Execute(Event event) override;
-// };
+class MalygosTargetAction : public AttackAction
+{
+public:
+    MalygosTargetAction(PlayerbotAI* botAI, std::string const name = "malygos target")
+        : AttackAction(botAI, name) {}
+    bool Execute(Event event) override;
+};
 
-// class AvoidFlameTsunamiAction : public MovementAction
-// {
-// public:
-//     AvoidFlameTsunamiAction(PlayerbotAI* botAI, std::string const name = "avoid flame tsunami")
-//         : MovementAction(botAI, name) {}
-//     bool Execute(Event event) override;
-// };
+class PullPowerSparkAction : public CastSpellAction
+{
+public:
+    PullPowerSparkAction(PlayerbotAI* botAI, std::string const name = "pull power spark")
+        : CastSpellAction(botAI, "death grip") {}
+    bool Execute(Event event) override;
+    bool isPossible() override;
+    bool isUseful() override;
+};
 
-// class SartharionAttackPriorityAction : public AttackAction
-// {
-// public:
-//     SartharionAttackPriorityAction(PlayerbotAI* botAI, std::string const name = "sartharion attack priority")
-//         : AttackAction(botAI, name) {}
-//     bool Execute(Event event) override;
-// };
+class KillPowerSparkAction : public AttackAction
+{
+public:
+    KillPowerSparkAction(PlayerbotAI* botAI, std::string const name = "kill power spark")
+        : AttackAction(botAI, name) {}
+    bool Execute(Event event) override;
+};
 
-// class EnterTwilightPortalAction : public MovementAction
-// {
-// public:
-//     EnterTwilightPortalAction(PlayerbotAI* botAI, std::string const name = "enter twilight portal")
-//         : MovementAction(botAI, name) {}
-//     bool Execute(Event event) override;
-// };
+class EoEFlyDrakeAction : public MovementAction
+{
+public:
+    EoEFlyDrakeAction(PlayerbotAI* ai) : MovementAction(ai, "eoe fly drake") {}
+    bool Execute(Event event) override;
+    bool isPossible() override;
+};
 
-// class ExitTwilightPortalAction : public MovementAction
-// {
-// public:
-//     ExitTwilightPortalAction(PlayerbotAI* botAI, std::string const name = "exit twilight portal")
-//         : MovementAction(botAI, name) {}
-//     bool Execute(Event event) override;
-// };
+class EoEDrakeAttackAction : public Action
+{
+public:
+    EoEDrakeAttackAction(PlayerbotAI* botAI) : Action(botAI, "eoe drake attack") {}
+    bool Execute(Event event) override;
+    bool isPossible() override;
+
+protected:
+    Unit* vehicleBase;
+    bool CastDrakeSpellAction(Unit* target, uint32 spellId, uint32 cooldown);
+    bool DrakeDpsAction(Unit* target);
+    bool DrakeHealAction();
+};
 
 #endif

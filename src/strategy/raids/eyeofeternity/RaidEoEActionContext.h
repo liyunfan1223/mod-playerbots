@@ -10,21 +10,21 @@ class RaidEoEActionContext : public NamedObjectContext<Action>
 public:
     RaidEoEActionContext()
     {
-        // creators["sartharion tank position"] = &RaidOsActionContext::tank_position;
-        // creators["avoid twilight fissure"] = &RaidOsActionContext::avoid_twilight_fissure;
-        // creators["avoid flame tsunami"] = &RaidOsActionContext::avoid_flame_tsunami;
-        // creators["sartharion attack priority"] = &RaidOsActionContext::attack_priority;
-        // creators["enter twilight portal"] = &RaidOsActionContext::enter_twilight_portal;
-        // creators["exit twilight portal"] = &RaidOsActionContext::exit_twilight_portal;
+        creators["malygos position"] = &RaidEoEActionContext::position;
+        creators["malygos target"] = &RaidEoEActionContext::target;
+        // creators["pull power spark"] = &RaidEoEActionContext::pull_power_spark;
+        // creators["kill power spark"] = &RaidEoEActionContext::kill_power_spark;
+        creators["fly drake"] = &RaidEoEActionContext::fly_drake;
+        creators["drake attack"] = &RaidEoEActionContext::drake_attack;
     }
 
 private:
-    // static Action* tank_position(PlayerbotAI* ai) { return new SartharionTankPositionAction(ai); }
-    // static Action* avoid_twilight_fissure(PlayerbotAI* ai) { return new AvoidTwilightFissureAction(ai); }
-    // static Action* avoid_flame_tsunami(PlayerbotAI* ai) { return new AvoidFlameTsunamiAction(ai); }
-    // static Action* attack_priority(PlayerbotAI* ai) { return new SartharionAttackPriorityAction(ai); }
-    // static Action* enter_twilight_portal(PlayerbotAI* ai) { return new EnterTwilightPortalAction(ai); }
-    // static Action* exit_twilight_portal(PlayerbotAI* ai) { return new ExitTwilightPortalAction(ai); }
+    static Action* position(PlayerbotAI* ai) { return new MalygosPositionAction(ai); }
+    static Action* target(PlayerbotAI* ai) { return new MalygosTargetAction(ai); }
+    // static Action* pull_power_spark(PlayerbotAI* ai) { return new PullPowerSparkAction(ai); }
+    // static Action* kill_power_spark(PlayerbotAI* ai) { return new KillPowerSparkAction(ai); }
+    static Action* fly_drake(PlayerbotAI* ai) { return new EoEFlyDrakeAction(ai); }
+    static Action* drake_attack(PlayerbotAI* ai) { return new EoEDrakeAttackAction(ai); }
 };
 
 #endif

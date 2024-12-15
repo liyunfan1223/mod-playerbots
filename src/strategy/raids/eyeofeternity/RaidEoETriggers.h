@@ -7,114 +7,52 @@
 
 enum EyeOfEternityIDs
 {
-    // // Bosses
-    // NPC_SARTHARION                              = 28860,
-    // NPC_SHADRON                                 = 30451,
-    // NPC_TENEBRON                                = 30452,
-    // NPC_VESPERON                                = 30449,
+    NPC_MALYGOS                         = 28859,
+    NPC_POWER_SPARK                     = 30084,
+    NPC_NEXUS_LORD                      = 30245,
+    NPC_SCION_OF_ETERNITY               = 30249,
+    NPC_WYRMREST_SKYTALON               = 30161,
+    
+    SPELL_POWER_SPARK_VISUAL            = 55845,
+    SPELL_POWER_SPARK_GROUND_BUFF       = 55852,
+    SPELL_POWER_SPARK_MALYGOS_BUFF      = 56152,
 
-    // // Mini-boss shared
-    // SPELL_SHADOW_BREATH                         = 57570,
-    // SPELL_SHADOW_FISSURE                        = 57579,
-    // SPELL_SUMMON_TWILIGHT_WHELP                 = 58035,
-    // SPELL_GIFT_OF_TWILIGHT_SHADOW               = 57835,
-    // SPELL_TWILIGHT_TORMENT_VESPERON             = 57935,
+    SPELL_TELEPORT_VISUAL               = 52096,
 
-    // // Sartharion
-    // SPELL_SARTHARION_CLEAVE                     = 56909,
-    // SPELL_SARTHARION_FLAME_BREATH               = 56908,
-    // SPELL_SARTHARION_TAIL_LASH                  = 56910,
-    // SPELL_CYCLONE_AURA_PERIODIC                 = 57598,
-    // SPELL_LAVA_STRIKE_DUMMY                     = 57578,
-    // SPELL_LAVA_STRIKE_DUMMY_TRIGGER             = 57697,
-    // SPELL_LAVA_STRIKE_SUMMON                    = 57572,
-    // SPELL_SARTHARION_PYROBUFFET                 = 56916,
-    // SPELL_SARTHARION_BERSERK                    = 61632,
-    // SPELL_SARTHARION_TWILIGHT_REVENGE           = 60639,
+    SPELL_SCION_ARCANE_BARRAGE          = 56397,
+    SPELL_ARCANE_SHOCK_N                = 57058,
+    SPELL_ARCANE_SHOCK_H                = 60073,
+    SPELL_HASTE                         = 57060,
 
-    // // Sartharion with drakes
-    // SPELL_WILL_OF_SARTHARION                    = 61254,
-    // SPELL_POWER_OF_TENEBRON                     = 61248,
-    // SPELL_POWER_OF_VESPERON                     = 61251,
-    // SPELL_POWER_OF_SHADRON                      = 58105,
-    // SPELL_GIFT_OF_TWILIGHT_FIRE                 = 58766,
+    SPELL_ALEXSTRASZA_GIFT              = 61028,
 
-    // // Visuals
-    // SPELL_EGG_MARKER_VISUAL                     = 58547,
-    // SPELL_FLAME_TSUNAMI_VISUAL                  = 57494,
-
-    // // Misc
-    // SPELL_FADE_ARMOR                            = 60708,
-    // SPELL_FLAME_TSUNAMI_DAMAGE_AURA             = 57492,
-    // SPELL_FLAME_TSUNAMI_LEAP                    = 60241,
-    // SPELL_SARTHARION_PYROBUFFET_TRIGGER         = 57557,
-
-    // NPC_TWILIGHT_EGG                            = 30882,
-    // NPC_TWILIGHT_WHELP                          = 30890,
-    // NPC_DISCIPLE_OF_SHADRON                     = 30688,
-    // NPC_DISCIPLE_OF_VESPERON                    = 30858,
-    // NPC_ACOLYTE_OF_SHADRON                      = 31218,
-    // NPC_ACOLYTE_OF_VESPERON                     = 31219,
-
-    // // Sartharion fight
-    // NPC_LAVA_BLAZE                              = 30643,
-    // NPC_FLAME_TSUNAMI                           = 30616,
-    // NPC_SAFE_AREA_TRIGGER                       = 30494,
-    // NPC_TWILIGHT_FISSURE                        = 30641,
-    // GO_TWILIGHT_PORTAL                          = 193988,
-    // GO_NORMAL_PORTAL                            = 193989,
-    // SPELL_TWILIGHT_SHIFT                        = 57874,
+    // Drake Abilities:
+    // DPS
+    SPELL_FLAME_SPIKE                   = 56091,
+    SPELL_ENGULF_IN_FLAMES              = 56092,
+    // Healing
+    SPELL_REVIVIFY                      = 57090,
+    SPELL_LIFE_BURST                    = 57143,
+    // Utility
+    SPELL_FLAME_SHIELD                  = 57108,
+    SPELL_BLAZING_SPEED                 = 57092,
 };
 
-const uint32 EOE_MAP_ID = 615;
+const uint32 EOE_MAP_ID = 616;
 
-// class SartharionTankTrigger : public Trigger
-// {
-// public:
-//     SartharionTankTrigger(PlayerbotAI* botAI) : Trigger(botAI, "sartharion tank") {}
-//     bool IsActive() override;
-// };
+class MalygosTrigger : public Trigger
+{
+public:
+    MalygosTrigger(PlayerbotAI* botAI) : Trigger(botAI, "malygos") {}
+    bool IsActive() override;
+    uint8 static getPhase(Player* bot, Unit* boss);
+};
 
-// class FlameTsunamiTrigger : public Trigger
-// {
-// public:
-//     FlameTsunamiTrigger(PlayerbotAI* botAI) : Trigger(botAI, "flame tsunami") {}
-//     bool IsActive() override;
-// };
-
-// class TwilightFissureTrigger : public Trigger
-// {
-// public:
-//     TwilightFissureTrigger(PlayerbotAI* botAI) : Trigger(botAI, "twilight fissure") {}
-//     bool IsActive() override;
-// };
-
-// class SartharionDpsTrigger : public Trigger
-// {
-// public:
-//     SartharionDpsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "sartharion dps") {}
-//     bool IsActive() override;
-// };
-
-// class SartharionMeleePositioningTrigger : public Trigger
-// {
-// public:
-//     SartharionMeleePositioningTrigger(PlayerbotAI* botAI) : Trigger(botAI, "sartharion melee positioning") {}
-//     bool IsActive() override;
-// };
-
-// class TwilightPortalEnterTrigger : public Trigger
-// {
-// public:
-//     TwilightPortalEnterTrigger(PlayerbotAI* botAI) : Trigger(botAI, "twilight portal enter") {}
-//     bool IsActive() override;
-// };
-
-// class TwilightPortalExitTrigger : public Trigger
-// {
-// public:
-//     TwilightPortalExitTrigger(PlayerbotAI* botAI) : Trigger(botAI, "twilight portal exit") {}
-//     bool IsActive() override;
-// };
+class PowerSparkTrigger : public Trigger
+{
+public:
+    PowerSparkTrigger(PlayerbotAI* botAI) : Trigger(botAI, "power spark") {}
+    bool IsActive() override;
+};
 
 #endif

@@ -3,244 +3,388 @@
 
 #include "Playerbots.h"
 
-// bool SartharionTankPositionAction::Execute(Event event)
+
+bool MalygosPositionAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
+    if (!boss) { return false; }
+
+    uint8 phase = MalygosTrigger::getPhase(bot, boss);
+
+    float distance = 5.0f;
+
+    if (phase == 1)
+    {
+        Unit* spark = nullptr;
+
+        GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+        for (auto& target : targets)
+        {
+            Unit* unit = botAI->GetUnit(target);
+            if (unit && unit->GetEntry() == NPC_POWER_SPARK)
+            {
+                spark = unit;
+                break;
+            }
+        }
+
+        // Position tank
+        if (botAI->IsMainTank(bot))
+        {
+            if (bot->GetDistance2d(MALYGOS_MAINTANK_POSITION.first, MALYGOS_MAINTANK_POSITION.second) > distance)
+            {
+                return MoveTo(EOE_MAP_ID, MALYGOS_MAINTANK_POSITION.first, MALYGOS_MAINTANK_POSITION.second, bot->GetPositionZ(),
+                    false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+            }
+            return false;
+        }
+        // Position DK for spark pull
+        // else if (spark && bot->IsClass(CLASS_DEATH_KNIGHT))
+        // {
+        //     if (bot->GetDistance2d(MALYGOS_STACK_POSITION.first, MALYGOS_STACK_POSITION.second) > distance)
+        //     {
+        //         bot->Yell("SPARK SPAWNED, MOVING TO STACK", LANG_UNIVERSAL);
+        //         return MoveTo(EOE_MAP_ID, MALYGOS_STACK_POSITION.first, MALYGOS_STACK_POSITION.second, bot->GetPositionZ(),
+        //             false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+        //     }
+        //     return false;
+        // }
+        else if (spark)
+        {
+            return false;
+        }
+        else if (!bot->IsClass(CLASS_HUNTER))
+        {
+            if (bot->GetDistance2d(MALYGOS_STACK_POSITION.first, MALYGOS_STACK_POSITION.second) > (distance * 3.0f))
+            {
+                return MoveTo(EOE_MAP_ID, MALYGOS_STACK_POSITION.first, MALYGOS_STACK_POSITION.second, bot->GetPositionZ(),
+                    false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+            }
+            return false;
+        }
+    }
+
+    return false;
+}
+
+bool MalygosTargetAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
+    if (!boss) { return false; }
+
+    uint8 phase = MalygosTrigger::getPhase(bot, boss);
+
+    if (phase == 1)
+    {
+        if (botAI->IsHeal(bot)) { return false; }
+
+        Unit* newTarget = boss;
+        Unit* spark = nullptr;
+
+        // GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+        // for (auto& target : targets)
+        // {
+        //     Unit* unit = botAI->GetUnit(target);
+        //     if (unit && unit->GetEntry() == NPC_POWER_SPARK)
+        //     {
+        //         spark = unit;
+        //         break;
+        //     }
+        // }
+
+        // if (spark && botAI->IsRangedDps(bot))
+        // {
+        //     newTarget = spark;
+        // }
+
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+
+        if (!currentTarget || currentTarget->GetEntry() != newTarget->GetEntry())
+        {
+            return Attack(newTarget);
+        }
+    }
+    else if (phase == 2)
+    {
+        if (botAI->IsHeal(bot)) { return false; }
+
+        Unit* newTarget = nullptr;
+        Unit* nexusLord = nullptr;
+        Unit* scionOfEternity = nullptr;
+
+        GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+        for (auto& target : targets)
+        {
+            Unit* unit = botAI->GetUnit(target);
+            if (!unit) { continue; }
+
+            if (unit->GetEntry() == NPC_NEXUS_LORD)
+            {
+                nexusLord = unit;
+            }
+            else if (unit->GetEntry() == NPC_SCION_OF_ETERNITY)
+            {
+                scionOfEternity = unit;
+            }
+        }
+
+        if (botAI->IsRangedDps(bot) && scionOfEternity)
+        {
+            newTarget = scionOfEternity;
+        }
+        else
+        {
+            newTarget = nexusLord;
+        }
+
+        if (!newTarget) { return false; }
+
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+        if (!currentTarget || currentTarget->GetEntry() != newTarget->GetEntry())
+        {
+            return Attack(newTarget);
+        }
+    }
+
+    // else if (phase == 3)
+    // {}
+
+    return false;
+}
+
+// bool PullPowerSparkAction::Execute(Event event)
 // {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "sartharion");
-//     if (!boss) { return false; }
+//     Unit* spark = nullptr;
 
-//     // Unit* shadron = AI_VALUE2(Unit*, "find target", "shadron");
-//     // Unit* tenebron = AI_VALUE2(Unit*, "find target", "tenebron");
-//     // Unit* vesperon = AI_VALUE2(Unit*, "find target", "vesperon");
-//     Unit* shadron = nullptr;
-//     Unit* tenebron = nullptr;
-//     Unit* vesperon = nullptr;
-
-//     // Detect incoming drakes before they are on aggro table
 //     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 //     for (auto& target : targets)
 //     {
 //         Unit* unit = botAI->GetUnit(target);
-//         if (!unit) { continue; }
-
-//         switch (unit->GetEntry())
+//         if (unit && unit->GetEntry() == NPC_POWER_SPARK)
 //         {
-//             case NPC_SHADRON:
-//                 shadron = unit;
-//                 continue;
-//             case NPC_TENEBRON:
-//                 tenebron = unit;
-//                 continue;
-//             case NPC_VESPERON:
-//                 vesperon = unit;
-//                 continue;
-//             default:
-//                 continue;
+//             spark = unit;
+//             break;
 //         }
 //     }
 
-//     Position currentPos = bot->GetPosition();
-//     // Adjustable, this is the acceptable distance to stack point that will be accepted as "safe"
-//     float looseDistance = 12.0f;
+//     if (!spark) { return false; }
 
-//     if (botAI->IsMainTank(bot))
+//     if (spark->GetDistance2d(MALYGOS_STACK_POSITION.first, MALYGOS_STACK_POSITION.second) > 3.0f)
 //     {
-//         if (bot->GetExactDist2d(SARTHARION_MAINTANK_POSITION.first, SARTHARION_MAINTANK_POSITION.second) > looseDistance)
-//         {
-//             return MoveTo(OS_MAP_ID, SARTHARION_MAINTANK_POSITION.first, SARTHARION_MAINTANK_POSITION.second, currentPos.GetPositionZ(),
-//                 false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
-//         }
-//     }
-//     // Offtank grab drakes
-//     else if (shadron || tenebron || vesperon)
-//     {
-//         float triggerDistance = 100.0f;
-//         // Prioritise threat before positioning
-//         if (tenebron && bot->GetExactDist2d(tenebron) < triggerDistance &&
-//             tenebron->GetTarget() != bot->GetGUID() && AI_VALUE(Unit*, "current target") != tenebron)
-//         {
-//             return Attack(tenebron);
-//         }
-//         if (shadron && bot->GetExactDist2d(shadron) < triggerDistance &&
-//             shadron->GetTarget() != bot->GetGUID() && AI_VALUE(Unit*, "current target") != shadron)
-//         {
-//             return Attack(shadron);
-//         }
-//         if (vesperon && bot->GetExactDist2d(vesperon) < triggerDistance &&
-//             vesperon->GetTarget() != bot->GetGUID() && AI_VALUE(Unit*, "current target") != vesperon)
-//         {
-//             return Attack(vesperon);
-//         }
-
-//         bool drakeInCombat = (tenebron && bot->GetExactDist2d(tenebron) < triggerDistance) ||
-//                                 (shadron && bot->GetExactDist2d(shadron) < triggerDistance) ||
-//                                 (vesperon && bot->GetExactDist2d(vesperon) < triggerDistance);
-//         // Offtank has threat on drakes, check positioning
-//         if (drakeInCombat && bot->GetExactDist2d(SARTHARION_OFFTANK_POSITION.first, SARTHARION_OFFTANK_POSITION.second) > looseDistance)
-//         {
-//             return MoveTo(OS_MAP_ID, SARTHARION_OFFTANK_POSITION.first, SARTHARION_OFFTANK_POSITION.second, currentPos.GetPositionZ(),
-//                 false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
-//         }
-//     }
-//     return false;
-// }
-
-// bool AvoidTwilightFissureAction::Execute(Event event)
-// {
-//     const float radius = 5.0f;
-
-//     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-//     for (auto& npc : npcs)
-//     {
-//         Unit* unit = botAI->GetUnit(npc);
-//         if (unit && unit->GetEntry() == NPC_TWILIGHT_FISSURE)
-//         {
-//             float currentDistance = bot->GetDistance2d(unit);
-//             if (currentDistance < radius)
-//             {
-//                 return MoveAway(unit, radius - currentDistance);
-//             }
-//         }
-//     }
-//     return false;
-// }
-
-// bool AvoidFlameTsunamiAction::Execute(Event event)
-// {
-//     // Adjustable, this is the acceptable distance to stack point that will be accepted as "safe"
-//     float looseDistance = 4.0f;
-
-//     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-//     for (auto& npc : npcs)
-//     {
-//         Unit* unit = botAI->GetUnit(npc);
-//         if (unit && unit->GetEntry() == NPC_FLAME_TSUNAMI)
-//         {
-//             Position currentPos = bot->GetPosition();
-
-//             // I think these are centrepoints for the wave segments. Either way they uniquely identify the wave
-//             // direction as they have different coords for the left and right waves
-//             // int casting is not a mistake, need to avoid FP errors somehow.
-//             // I always saw these accurate to around 6 decimal places, but if there are issues,
-//             // can switch this to abs comparison of floats which would technically be more robust.
-//             int posY = (int) unit->GetPositionY();
-//             if (posY == 505 || posY == 555)     // RIGHT WAVE
-//             {
-//                 bool wavePassed = currentPos.GetPositionX() > unit->GetPositionX();
-//                 if (wavePassed)
-//                 {
-//                     return false;
-//                 }
-
-//                 if (bot->GetExactDist2d(currentPos.GetPositionX(), TSUNAMI_RIGHT_SAFE_ALL) > looseDistance)
-//                 {
-//                     return MoveTo(OS_MAP_ID, currentPos.GetPositionX(), TSUNAMI_RIGHT_SAFE_ALL, currentPos.GetPositionZ(),
-//                         false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
-//                 }
-//             }
-//             else    // LEFT WAVE
-//             {
-//                 bool wavePassed = currentPos.GetPositionX() < unit->GetPositionX();
-//                 if (wavePassed)
-//                 {
-//                     return false;
-//                 }
-
-//                 if (botAI->IsMelee(bot))
-//                 {
-//                     if (bot->GetExactDist2d(currentPos.GetPositionX(), TSUNAMI_LEFT_SAFE_MELEE) > looseDistance)
-//                     {
-//                         return MoveTo(OS_MAP_ID, currentPos.GetPositionX(), TSUNAMI_LEFT_SAFE_MELEE, currentPos.GetPositionZ(),
-//                             false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
-//                     }
-//                 }
-//                 else    // Ranged/healers
-//                 {
-//                     if (bot->GetExactDist2d(currentPos.GetPositionX(), TSUNAMI_LEFT_SAFE_RANGED) > looseDistance)
-//                     {
-//                         return MoveTo(OS_MAP_ID, currentPos.GetPositionX(), TSUNAMI_LEFT_SAFE_RANGED, currentPos.GetPositionZ(),
-//                             false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     return false;
-// }
-
-// bool SartharionAttackPriorityAction::Execute(Event event)
-// {
-//     Unit* sartharion = AI_VALUE2(Unit*, "find target", "sartharion");
-//     Unit* shadron = AI_VALUE2(Unit*, "find target", "shadron");
-//     Unit* tenebron = AI_VALUE2(Unit*, "find target", "tenebron");
-//     Unit* vesperon = AI_VALUE2(Unit*, "find target", "vesperon");
-//     Unit* acolyte = AI_VALUE2(Unit*, "find target", "acolyte of shadron");
-
-//     Unit* target = nullptr;
-
-//     if (acolyte)
-//     {
-//         target = acolyte;
-//     }
-//     else if (vesperon)
-//     {
-//         target = vesperon;
-//     }
-//     else if (tenebron)
-//     {
-//         target = tenebron;
-//     }
-//     else if (shadron)
-//     {
-//         target = shadron;
-//     }
-//     else if (sartharion)
-//     {
-//         target = sartharion;
-//     }
-
-//     if (target && AI_VALUE(Unit*, "current target") != target)
-//     {
-//         return Attack(target);
+//         bot->Yell("GRIPPING SPARK", LANG_UNIVERSAL);
+//         return botAI->CastSpell("death grip", spark);
 //     }
 
 //     return false;
 // }
 
-// bool EnterTwilightPortalAction::Execute(Event event)
+// bool PullPowerSparkAction::isPossible()
 // {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "sartharion");
-//     if (!boss || !boss->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE)) { return false; }
+//     Unit* spark = nullptr;
 
-//     GameObject* portal = bot->FindNearestGameObject(GO_TWILIGHT_PORTAL, 100.0f);
-//     if (!portal) { return false; }
-
-//     if (!portal->IsAtInteractDistance(bot))
+//     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+//     for (auto& target : targets)
 //     {
-//         return MoveTo(portal, fmaxf(portal->GetInteractionDistance() - 1.0f, 0.0f));
+//         Unit* unit = botAI->GetUnit(target);
+//         if (unit && unit->GetEntry() == NPC_POWER_SPARK)
+//         {
+//             spark = unit;
+//             break;
+//         }
 //     }
 
-//     // Go through portal
-//     WorldPacket data1(CMSG_GAMEOBJ_USE);
-//     data1 << portal->GetGUID();
-//     bot->GetSession()->HandleGameObjectUseOpcode(data1);
-
-//     return true;
+//     return botAI->CanCastSpell(spell, spark);
 // }
 
-// bool ExitTwilightPortalAction::Execute(Event event)
+// bool PullPowerSparkAction::isUseful()
 // {
-//     GameObject* portal = bot->FindNearestGameObject(GO_NORMAL_PORTAL, 100.0f);
-//     if (!portal) { return false; }
+//     Unit* spark = nullptr;
 
-//     if (!portal->IsAtInteractDistance(bot))
+//     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+//     for (auto& target : targets)
 //     {
-//         return MoveTo(portal, fmaxf(portal->GetInteractionDistance() - 1.0f, 0.0f));
+//         Unit* unit = botAI->GetUnit(target);
+//         if (unit && unit->GetEntry() == NPC_POWER_SPARK)
+//         {
+//             spark = unit;
+//             break;
+//         }
 //     }
 
-//     // Go through portal
-//     WorldPacket data1(CMSG_GAMEOBJ_USE);
-//     data1 << portal->GetGUID();
-//     bot->GetSession()->HandleGameObjectUseOpcode(data1);
+//     if (!spark)
+//         return false;
 
-//     return true;
+//     if (!spark->IsInWorld() || spark->GetMapId() != bot->GetMapId())
+//         return false;
+    
+//     return bot->GetDistance2d(MALYGOS_STACK_POSITION.first, MALYGOS_STACK_POSITION.second) < 3.0f;
 // }
+
+// bool KillPowerSparkAction::Execute(Event event)
+// {
+//     return false;
+// }
+
+bool EoEFlyDrakeAction::isPossible()
+{
+    Unit* vehicleBase = bot->GetVehicleBase();
+    return (vehicleBase && vehicleBase->GetEntry() == NPC_WYRMREST_SKYTALON);
+}
+bool EoEFlyDrakeAction::Execute(Event event)
+{
+    Player* master = botAI->GetMaster();
+    if (!master) { return false; }
+    Unit* masterVehicle = master->GetVehicleBase();
+    Unit* vehicleBase = bot->GetVehicleBase();
+    if (!vehicleBase || !masterVehicle) { return false; }
+
+    MotionMaster* mm = vehicleBase->GetMotionMaster();
+    Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
+    if (boss && false)
+    {
+        // Handle as boss encounter instead of formation flight
+        mm->Clear(false);
+        float distance = vehicleBase->GetExactDist(boss);
+        float range = 55.0f;    // Drake range is 60yd
+        if (distance > range)
+        {
+            mm->MoveForwards(boss, range - distance);
+            vehicleBase->SendMovementFlagUpdate();
+            return true;
+        }
+
+        vehicleBase->SetFacingToObject(boss);
+        mm->MoveIdle();
+        vehicleBase->SendMovementFlagUpdate();
+        return false;
+    }
+
+    if (vehicleBase->GetExactDist(masterVehicle) > 5.0f)
+    {
+        uint8 numPlayers;
+        bot->GetRaidDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ? numPlayers = 25 : numPlayers = 10;
+        // 3/4 of a circle, with frontal cone 90 deg unobstructed
+        float angle = botAI->GetGroupSlotIndex(bot) * (2*M_PI - M_PI_2)/numPlayers + M_PI_2;
+        // float angle = M_PI;
+        vehicleBase->SetCanFly(true);
+        mm->MoveFollow(masterVehicle, 3.0f, angle);
+        vehicleBase->SendMovementFlagUpdate();
+        return true;
+    }
+    return false;
+}
+
+bool EoEDrakeAttackAction::isPossible()
+{
+    Unit* vehicleBase = bot->GetVehicleBase();
+    return (vehicleBase && vehicleBase->GetEntry() == NPC_WYRMREST_SKYTALON);
+}
+bool EoEDrakeAttackAction::Execute(Event event)
+{
+    vehicleBase = bot->GetVehicleBase();
+    if (!vehicleBase) { return false; }
+
+    // Unit* target = AI_VALUE(Unit*, "current target");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
+    // if (!boss) { return false; }
+
+    if (!boss)
+    {
+        GuidVector npcs = AI_VALUE(GuidVector, "possible targets");
+        for (auto& npc : npcs)
+        {
+            Unit* unit = botAI->GetUnit(npc);
+            if (!unit || unit->GetEntry() != NPC_MALYGOS) { continue; }
+
+            boss = unit;
+            break;
+        }
+    }
+    // Check this again to see if a target was assigned
+    if (!boss) { return false; }
+
+    if (botAI->IsHeal(bot))
+    {
+        return DrakeHealAction();
+    }
+    else
+    {
+        return DrakeDpsAction(boss);
+    }
+
+    return false;
+}
+
+bool EoEDrakeAttackAction::CastDrakeSpellAction(Unit* target, uint32 spellId, uint32 cooldown)
+{
+    if (botAI->CanCastVehicleSpell(spellId, target))
+        if (botAI->CastVehicleSpell(spellId, target))
+        {
+            vehicleBase->AddSpellCooldown(spellId, 0, cooldown);
+            return true;
+        }
+    return false;
+}
+
+bool EoEDrakeAttackAction::DrakeDpsAction(Unit* target)
+{
+    Unit* vehicleBase = bot->GetVehicleBase();
+    if (!vehicleBase) { return false; }
+
+    Vehicle* veh = bot->GetVehicle();
+
+    uint8 comboPoints = vehicleBase->GetComboPoints(target);
+    if (comboPoints >= 2)
+    {
+        return CastDrakeSpellAction(target, SPELL_ENGULF_IN_FLAMES, 0);
+    }
+    else
+    {
+        return CastDrakeSpellAction(target, SPELL_FLAME_SPIKE, 0);
+    }
+}
+
+bool EoEDrakeAttackAction::DrakeHealAction()
+{
+    Unit* vehicleBase = bot->GetVehicleBase();
+    if (!vehicleBase) { return false; }
+
+    Unit* target = vehicleBase->GetComboTarget();
+    if (!target)
+    {
+        // Unit* newTarget = nullptr;
+        Unit* newTarget = vehicleBase;
+        GuidVector members = AI_VALUE(GuidVector, "group members");
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit)
+            {
+                continue;
+            }
+
+            Unit* drake = unit->GetVehicleBase();
+            if (!drake || drake->IsFullHealth()) { continue; }
+
+            if (!newTarget || drake->GetHealthPct() < newTarget->GetHealthPct() - 5.0f)
+            {
+                newTarget = drake;
+            }
+        }
+        target = newTarget;
+    }
+
+    uint8 comboPoints = vehicleBase->GetComboPoints(target);
+    if (comboPoints >= 5)
+    {
+        return CastDrakeSpellAction(target, SPELL_LIFE_BURST, 0);
+    }
+    else
+    {
+        // "Revivify" may be bugged server-side:
+        // "botAI->CanCastVehicleSpell()" returns SPELL_FAILED_BAD_TARGETS when targeting drakes.
+        // Forcing the cast attempt seems to succeed, not sure what's going on here.
+        // return CastDrakeSpellAction(target, SPELL_REVIVIFY, 0);
+        return botAI->CastVehicleSpell(SPELL_REVIVIFY, target);
+    }
+}

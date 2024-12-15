@@ -4,13 +4,13 @@
 
 #include "Multiplier.h"
 
-// class SartharionMultiplier : public Multiplier
-// {
-// public:
-//     SartharionMultiplier(PlayerbotAI* ai) : Multiplier(ai, "sartharion") {}
+class MalygosMultiplier : public Multiplier
+{
+public:
+    MalygosMultiplier(PlayerbotAI* ai) : Multiplier(ai, "malygos") {}
 
-// public:
-//     virtual float GetValue(Action* action);
-// };
+public:
+    virtual float GetValue(Action* action);
+};
 
 #endif
