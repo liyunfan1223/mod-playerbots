@@ -1512,11 +1512,11 @@ AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
 AiPlayerbot.BotActiveAlone = 100
 
 # Force botActiveAlone when bot is ... of real player
-AiPlayerbot.BotActiveAloneForceWhenInRadius = 150;
-AiPlayerbot.BotActiveAloneForceWhenInZone = 1;
-AiPlayerbot.BotActiveAloneForceWhenInMap = 0;
-AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1;
-AiPlayerbot.BotActiveAloneForceWhenInGuild = 1;
+AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
+AiPlayerbot.BotActiveAloneForceWhenInZone = 1
+AiPlayerbot.BotActiveAloneForceWhenInMap = 0
+AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
+AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 
 # Specify smart scaling is enabled or not.
 # The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
