@@ -720,7 +720,7 @@ void PlayerbotAI::HandleTeleportAck()
         // SetNextCheckDelay(urand(2000, 5000));
         if (sPlayerbotAIConfig->applyInstanceStrategies)
             ApplyInstanceStrategies(bot->GetMapId(), true);
-        Reset();
+        Reset(true);
     }
 
     SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
@@ -769,14 +769,14 @@ void PlayerbotAI::Reset(bool full)
             ->setTarget(sTravelMgr->nullTravelDestination, sTravelMgr->nullWorldPosition, true);
         aiObjectContext->GetValue<TravelTarget*>("travel target")->Get()->setStatus(TRAVEL_STATUS_EXPIRED);
         aiObjectContext->GetValue<TravelTarget*>("travel target")->Get()->setExpireIn(1000);
+        rpgInfo = NewRpgInfo();
     }
 
     aiObjectContext->GetValue<GuidSet&>("ignore rpg target")->Get().clear();
 
     bot->GetMotionMaster()->Clear();
-    // bot->CleanupAfterTaxiFlight();
+
     InterruptSpell();
-    rpgInfo = NewRpgInfo();
     
     if (full)
     {

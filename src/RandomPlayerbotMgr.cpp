@@ -1495,7 +1495,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
     }
     LOG_INFO("playerbots", ">> {} locations for level collected.", collected_locs);
 
-    LOG_INFO("playerbots", "Preparing innkeepers locations for level collected");
+    LOG_INFO("playerbots", "Preparing innkeepers locations for level collected...");
     if (sPlayerbotAIConfig->enableNewRpgStrategy)
     {
         results = WorldDatabase.Query(
