@@ -4173,19 +4173,31 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     }
 
     // bot zone has active players.
-    if (ZoneHasRealPlayers(bot))
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenInZone)
     {
-        return true;
+        if (ZoneHasRealPlayers(bot))
+        {
+            return true;
+        }
     }
 
     // when in real guild
-    if (IsInRealGuild())
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenInGuild)
+    {
+        if (IsInRealGuild())
+        {
+            return true;
+        }
+    }
+
+    // Player is near. Always active.
+    if (HasPlayerNearby(sPlayerbotAIConfig->BotActiveAloneWhenInRadius))
     {
         return true;
     }
 
     // Has player master. Always active.
-    if (GetMaster())  
+    if (GetMaster())
     {
         PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(GetMaster());
         if (!masterBotAI || masterBotAI->IsRealPlayer())
@@ -4253,30 +4265,27 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         return true;
     }
 
-    // Player is near. Always active.
-    if (HasPlayerNearby(300.f))
-    {
-        return true;
-    }
-
     // HasFriend
-    for (auto& player : sRandomPlayerbotMgr->GetPlayers())
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenIsFriend)
     {
-        if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
+        for (auto& player : sRandomPlayerbotMgr->GetPlayers())
         {
-            continue;
-        }
+            if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
+            {
+                continue;
+            }
 
-        if (player->GetSocial()->HasFriend(bot->GetGUID()))
-        {
-            return true;
+            if (player->GetSocial()->HasFriend(bot->GetGUID()))
+            {
+                return true;
+            }
         }
     }
 
     // Force the bots to spread
     if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
     {
-        if (HasManyPlayersNearby(10, sPlayerbotAIConfig->sightDistance))
+        if (HasManyPlayersNearby(10, 40))
         {
             return true;
         }

@@ -264,6 +264,10 @@ public:
     uint32 playerbotsXPrate;
     bool disableDeathKnightLogin;
     uint32 botActiveAlone;
+    uint32 BotActiveAloneWhenInRadius;
+    bool BotActiveAloneForceWhenInZone;
+    bool BotActiveAloneForceWhenIsFriend;
+    bool BotActiveAloneForceWhenInGuild;
     bool botActiveAloneSmartScale;
     uint32 botActiveAloneSmartScaleWhenMinLevel;
     uint32 botActiveAloneSmartScaleWhenMaxLevel;
