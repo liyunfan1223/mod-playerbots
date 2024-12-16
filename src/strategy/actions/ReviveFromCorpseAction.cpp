@@ -360,4 +360,4 @@ bool SpiritHealerAction::Execute(Event event)
     return false;
 }
 
-bool SpiritHealerAction::isUseful() { return bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST); }
+bool SpiritHealerAction::isUseful() { return bot->HasPlayerFlag(PLAYER_FLAGS_GHOST); }

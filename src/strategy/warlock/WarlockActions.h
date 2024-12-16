@@ -7,6 +7,7 @@
 #define _PLAYERBOT_WARLOCKACTIONS_H
 
 #include "GenericSpellActions.h"
+#include "UseItemAction.h"
 
 class PlayerbotAI;
 class Unit;
@@ -301,5 +302,13 @@ class CastIncinerateAction : public CastSpellAction
 {
 public:
     CastIncinerateAction(PlayerbotAI* ai) : CastSpellAction(ai, "incinerate") {}
+};
+
+class UseSoulstoneAction : public UseSpellItemAction
+{
+public:
+    UseSoulstoneAction(PlayerbotAI* ai) : UseSpellItemAction(ai, "soulstone") {}
+
+    Unit* GetTarget() override;
 };
 #endif

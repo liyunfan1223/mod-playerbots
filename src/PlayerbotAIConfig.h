@@ -247,6 +247,7 @@ public:
         uint32 spellId;
         uint32 factionId = 0;
         uint32 classId = 0;
+        uint32 specId = 0;
         uint32 minLevel = 0;
         uint32 maxLevel = 0;
     };
@@ -275,6 +276,7 @@ public:
     bool twoRoundsGearInit;
     bool syncQuestWithPlayer;
     bool syncQuestForPlayer;
+    bool dropObsoleteQuests;
     std::string autoTrainSpells;
     bool autoPickTalents;
     bool autoUpgradeEquip;
@@ -327,7 +329,7 @@ public:
     }
     void log(std::string const fileName, const char* str, ...);
 
-    void loadWorldBuf(uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
+    void loadWorldBuf(uint32 factionId, uint32 classId, uint32 specId, uint32 minLevel, uint32 maxLevel);
     static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
     static std::vector<std::vector<uint32>> ParseTempPetTalentsOrder(uint32 spec, std::string temp_talents_order);
 };

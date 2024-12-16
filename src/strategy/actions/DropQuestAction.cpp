@@ -68,6 +68,11 @@ bool CleanQuestLogAction::Execute(Event event)
         return false;
     }
 
+    if (!sPlayerbotAIConfig->dropObsoleteQuests)
+    {
+        return false;
+    }
+
     // Only output this message if "debug rpg" strategy is enabled
     if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {

@@ -184,6 +184,7 @@ public:
         creators["metamorphosis"] = &WarlockAiObjectContextInternal::metamorphosis;
         creators["soul fire"] = &WarlockAiObjectContextInternal::soul_fire;
         creators["incinerate"] = &WarlockAiObjectContextInternal::incinerate;
+        creators["soulstone"] = &WarlockAiObjectContextInternal::soulstone;
     }
 
 private:
@@ -239,6 +240,7 @@ private:
     static Action* metamorphosis(PlayerbotAI* ai) { return new CastMetamorphosisAction(ai); }
     static Action* soul_fire(PlayerbotAI* ai) { return new CastSoulFireAction(ai); }
     static Action* incinerate(PlayerbotAI* ai) { return new CastIncinerateAction(ai); }
+    static Action* soulstone(PlayerbotAI* ai) { return new UseSoulstoneAction(ai); }
 };
 
 WarlockAiObjectContext::WarlockAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
