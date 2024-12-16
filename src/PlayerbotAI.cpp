@@ -4360,13 +4360,10 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 {
     uint32 diffLimitFloor = sPlayerbotAIConfig->botActiveAloneDiffLimitFloor;
     uint32 diffLimitCeil = sPlayerbotAIConfig->botActiveAloneDiffLimitCeiling;
-    uint32 chkDiff = sWorldUpdateTime.GetAverageUpdateTime();  // By default check against average Diff
+    uint32 chkDiff = (sPlayerbotAIConfig->botActiveAloneDiffMethod == 2) ? sWorldUpdateTime.GetMaxUpdateTime() : sWorldUpdateTime.GetAverageUpdateTime();
 
     if (diffLimitFloor > diffLimitCeil)
         diffLimitFloor = diffLimitCeil;
-
-    if (sPlayerbotAIConfig->botActiveAloneDiffMethod != 1)  // if set in config,
-        chkDiff = sWorldUpdateTime.GetMaxUpdateTime();  // check against 100th percentile (spikes)
 
     if (chkDiff <= diffLimitFloor) return mod;
     if (chkDiff >= diffLimitCeil) return 0;
