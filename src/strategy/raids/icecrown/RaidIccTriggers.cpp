@@ -296,3 +296,29 @@ bool IccPutricideGasCloudTrigger::IsActive()
 
     return true;
 }
+
+bool IccPutricideMainTankMutatedPlagueTrigger::IsActive()
+{
+    bool bossPresent = false;
+    if (AI_VALUE2(Unit*, "find target", "professor putricide"))
+        bossPresent = true;
+
+    if (!bossPresent)
+        return false;
+
+    if (!botAI->IsAssistTankOfIndex(bot, 0))
+    {
+        return false;
+    }
+    Unit* mt = AI_VALUE(Unit*, "main tank");
+    if (!mt)
+    {
+        return false;
+    }
+    Aura* aura = botAI->GetAura("mutated plague", mt, false, true);
+    if (!aura || aura->GetStackAmount() < 4)
+    {
+        return false;
+    }
+    return true;
+}

@@ -176,4 +176,11 @@ public:
     bool IsActive() override;
 };
 
+class IccPutricideMainTankMutatedPlagueTrigger : public Trigger
+{
+public:
+    IccPutricideMainTankMutatedPlagueTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc putricide main tank mutated plague") {}
+    bool IsActive() override;
+};
+
 #endif

@@ -80,6 +80,9 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("icc putricide growing ooze puddle",
         NextAction::array(0, new NextAction("icc putricide growing ooze puddle", ACTION_EMERGENCY + 5), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc putricide main tank mutated plague",
+        NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 6), nullptr)));
 }
 
 void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
