@@ -78,8 +78,9 @@ bool MalygosTargetAction::Execute(Event event)
     {
         if (botAI->IsHeal(bot)) { return false; }
 
+        // Init this as boss by default, if no better target is found just fall back to Malygos
         Unit* newTarget = boss;
-        Unit* spark = nullptr;
+        // Unit* spark = nullptr;
 
         // GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
         // for (auto& target : targets)
