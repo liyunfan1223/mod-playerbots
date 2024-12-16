@@ -202,6 +202,16 @@ bool AutoGearAction::Execute(Event event)
         botAI->TellError("autogear command is not allowed, please check the configuration.");
         return false;
     }
+
+    if (!sPlayerbotAIConfig->autoGearCommandAltBots)
+    {
+        if (!sRandomPlayerbotMgr->IsRandomBot(bot))
+        {
+            botAI->TellError("You cannot use autogear on alt bots.");
+            return false;
+        }
+    }
+
     botAI->TellMaster("I'm auto gearing");
     uint32 gs = sPlayerbotAIConfig->autoGearScoreLimit == 0
                     ? 0

@@ -165,6 +165,13 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
     }
 
     BattlegroundData.clear();
+    for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
+    {
+        for (int queueType = BATTLEGROUND_QUEUE_AV; queueType < MAX_BATTLEGROUND_QUEUE_TYPES; ++queueType)
+        {
+            BattlegroundData[queueType][bracket] = BattlegroundInfo();
+        }
+    }
     BgCheckTimer = 0;
     LfgCheckTimer = 0;
     PlayersCheckTimer = 0;
@@ -341,19 +348,19 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     if (sPlayerbotAIConfig->syncLevelWithPlayers && !players.empty())
     {
         if (time(nullptr) > (PlayersCheckTimer + 60))
-            activateCheckPlayersThread();
+            sRandomPlayerbotMgr->CheckPlayers();
     }
 
     if (sPlayerbotAIConfig->randomBotJoinBG /* && !players.empty()*/)
     {
         if (time(nullptr) > (BgCheckTimer + 30))
-            activateCheckBgQueueThread();
+            sRandomPlayerbotMgr->CheckBgQueue();
     }
 
     if (sPlayerbotAIConfig->randomBotJoinLfg /* && !players.empty()*/)
     {
         if (time(nullptr) > (LfgCheckTimer + 30))
-            activateCheckLfgQueueThread();
+            sRandomPlayerbotMgr->CheckLfgQueue();
     }
 
     uint32 updateBots = sPlayerbotAIConfig->randomBotsPerInterval * onlineBotFocus / 100;
@@ -593,6 +600,14 @@ void RandomPlayerbotMgr::CheckBgQueue()
     LOG_INFO("playerbots", "Checking BG Queue...");
 
     BattlegroundData.clear();
+
+    for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
+    {
+        for (int queueType = BATTLEGROUND_QUEUE_AV; queueType < MAX_BATTLEGROUND_QUEUE_TYPES; ++queueType)
+        {
+            BattlegroundData[queueType][bracket] = BattlegroundInfo();
+        }
+    }
 
     for (Player* player : players)
     {
@@ -840,7 +855,8 @@ void RandomPlayerbotMgr::LogBattlegroundInfo()
             for (const auto& bracketIdPair : queueTypePair.second)
             {
                 auto& bgInfo = bracketIdPair.second;
-
+                if (bgInfo.minLevel == 0)
+                    continue;
                 LOG_INFO("playerbots",
                          "ARENA:{} {}: Player (Skirmish:{}, Rated:{}) Bots (Skirmish:{}, Rated:{}) Total (Skirmish:{} "
                          "Rated:{}), Instances (Skirmish:{} Rated:{})",
@@ -889,6 +905,8 @@ void RandomPlayerbotMgr::LogBattlegroundInfo()
         for (const auto& bracketIdPair : queueTypePair.second)
         {
             auto& bgInfo = bracketIdPair.second;
+            if (bgInfo.minLevel == 0)
+                continue;
 
             LOG_INFO("playerbots", "BG:{} {}: Player ({}:{}) Bot ({}:{}) Total (A:{} H:{}), Instances {}", _bgType,
                      std::to_string(bgInfo.minLevel) + "-" + std::to_string(bgInfo.maxLevel),
