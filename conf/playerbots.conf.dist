@@ -1531,7 +1531,7 @@ AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 #   Method: 2 - Check against Max Diff (spikes)
 #
 #   LimitFloor - No active bot decrease below this DIFF
-#   LimitFCeiling - Max active bot decrease above this DIFF
+#   LimitCeiling - Max active bot decrease above this DIFF
 AiPlayerbot.botActiveAloneSmartScale = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
