@@ -15,39 +15,6 @@
 #include "ScriptedCreature.h"
 #include "WarriorActions.h"
 
-// float SartharionMultiplier::GetValue(Action* action)
-// {
-//     Unit* boss = AI_VALUE2(Unit*, "find target", "sartharion");
-//     if (!boss) { return 1.0f; }
-
-//     Unit* target = action->GetTarget();
-
-//     if (botAI->IsMainTank(bot) && dynamic_cast<TankFaceAction*>(action))
-//     {
-//         // return 0.0f;
-//     }
-
-//     if (botAI->IsDps(bot) && dynamic_cast<DpsAssistAction*>(action))
-//     {
-//         return 0.0f;
-//     }
-
-//     if (botAI->IsMainTank(bot) && target && target != boss &&
-//         (dynamic_cast<TankAssistAction*>(action) || dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-//          dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action)))
-//     {
-//         return 0.0f;
-//     }
-
-//     if (botAI->IsAssistTank(bot) && target && target == boss &&
-//         (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-//          dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action)))
-//     {
-//         return 0.0f;
-//     }
-//     return 1.0f;
-// }
-
 float MalygosMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
