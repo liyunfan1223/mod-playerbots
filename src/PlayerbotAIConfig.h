@@ -264,12 +264,17 @@ public:
     uint32 playerbotsXPrate;
     bool disableDeathKnightLogin;
     uint32 botActiveAlone;
+    uint32 botActiveAloneSmartScaleWhenMinLevel;
+    uint32 botActiveAloneSmartScaleWhenMaxLevel;
     uint32 botActiveAloneDiffMethod;
     uint32 botActiveAloneDiffLimitFloor;
     uint32 botActiveAloneDiffLimitCeiling;
+    uint32 BotActiveAloneWhenInRadius;
     bool botActiveAloneSmartScale;
-    uint32 botActiveAloneSmartScaleWhenMinLevel;
-    uint32 botActiveAloneSmartScaleWhenMaxLevel;
+    bool BotActiveAloneForceWhenInZone;
+    bool BotActiveAloneForceWhenInMap;
+    bool BotActiveAloneForceWhenIsFriend;
+    bool BotActiveAloneForceWhenInGuild;
 
     bool freeMethodLoot;
     int32 lootRollLevel;
@@ -317,7 +322,7 @@ public:
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
-    int32 autoGearCommand, autoGearQualityLimit, autoGearScoreLimit;
+    int32 autoGearCommand, autoGearCommandAltBots, autoGearQualityLimit, autoGearScoreLimit;
 
     std::string const GetTimestampStr();
     bool hasLog(std::string const fileName)

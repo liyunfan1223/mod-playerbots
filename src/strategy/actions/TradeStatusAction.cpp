@@ -207,7 +207,7 @@ bool TradeStatusAction::CheckTrade()
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
         Item* item = bot->GetTradeData()->GetItem((TradeSlots)slot);
-        if (item && !item->GetTemplate()->SellPrice)
+        if (item && !item->GetTemplate()->SellPrice && !item->GetTemplate()->IsConjuredConsumable())
         {
             std::ostringstream out;
             out << chat->FormatItem(item->GetTemplate()) << " - This is not for sale";

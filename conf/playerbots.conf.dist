@@ -424,6 +424,10 @@ AiPlayerbot.MaintenanceCommand = 1
 # default: 1 (enable)
 AiPlayerbot.AutoGearCommand = 1
 
+# Enable/Disable autogear command on player alt bots
+# Default: 1 (enable)
+AiPlayerbot.AutoGearCommandAltBots = 1
+
 # Equips quality limitation for auto gear command (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
 # default: 3 (rare)
 AiPlayerbot.AutoGearQualityLimit = 3
@@ -1510,6 +1514,13 @@ AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
 # real-players are nearby, friend, group, guild, bg, instances etc the value is always
 # enforced to 100%
 AiPlayerbot.BotActiveAlone = 100
+
+# Force botActiveAlone when bot is ... of real player
+AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
+AiPlayerbot.BotActiveAloneForceWhenInZone = 1
+AiPlayerbot.BotActiveAloneForceWhenInMap = 0
+AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
+AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 
 # Specify smart scaling is enabled or not.
 # The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
