@@ -256,19 +256,41 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     // Check weapon case separately to keep things a bit cleaner
     bool have2HWeapon = false;
     bool isValidTGWeapon = false;
+
     if (dstSlot == EQUIPMENT_SLOT_MAINHAND)
     {
         Item* currentWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
         have2HWeapon = currentWeapon && currentWeapon->GetTemplate()->InventoryType == INVTYPE_2HWEAPON;
-        isValidTGWeapon = itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
-                          itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
-                          itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2;
-        
-        if (bot->CanDualWield() && ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || (bot->CanTitanGrip() && isValidTGWeapon)))
+    
+        // Determine if the new weapon is a valid Titan Grip weapon
+        isValidTGWeapon = (itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
+                           itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+                           itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2);
+    
+        // If the bot can Titan Grip, ignore any 2H weapon that isn't a 2H sword, mace, or axe.
+        if (bot->CanTitanGrip())
+        {
+            // If this weapon is 2H but not one of the valid TG weapon types, do not equip it at all.
+            if (itemProto->InventoryType == INVTYPE_2HWEAPON && !isValidTGWeapon)
+            {
+                return ITEM_USAGE_NONE;
+            }
+        }
+    
+        // Now handle the logic for equipping and possible offhand slots
+        // If the bot can Dual Wield and:
+        // - The weapon is not 2H and we currently don't have a 2H weapon equipped
+        // OR
+        // - The bot can Titan Grip and it is a valid TG weapon
+        // Then we can consider the offhand slot as well.
+        if (bot->CanDualWield() && 
+            ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || 
+             (bot->CanTitanGrip() && isValidTGWeapon)))
         {
             possibleSlots = 2;
         }
     }
+
 
     for (uint8 i = 0; i < possibleSlots; i++)
     {

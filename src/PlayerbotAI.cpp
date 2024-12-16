@@ -1606,6 +1606,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 615:
             strategyName = "wotlk-os";      // Obsidian Sanctum
             break;
+        case 616:
+            strategyName = "wotlk-eoe";     // Eye Of Eternity
+            break;
         case 619:
             strategyName = "wotlk-ok";      // Ahn'kahet: The Old Kingdom
             break;
@@ -4172,20 +4175,41 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         }
     }
 
-    // bot zone has active players.
-    if (ZoneHasRealPlayers(bot))
+    // bot map has active players.
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenInMap)
     {
-        return true;
+        if (HasRealPlayers(bot->GetMap()))
+        {
+            return true;
+        }
+    }
+
+    // bot zone has active players.
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenInZone)
+    {
+        if (ZoneHasRealPlayers(bot))
+        {
+            return true;
+        }
     }
 
     // when in real guild
-    if (IsInRealGuild())
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenInGuild)
+    {
+        if (IsInRealGuild())
+        {
+            return true;
+        }
+    }
+
+    // Player is near. Always active.
+    if (HasPlayerNearby(sPlayerbotAIConfig->BotActiveAloneWhenInRadius))
     {
         return true;
     }
 
     // Has player master. Always active.
-    if (GetMaster())  
+    if (GetMaster())
     {
         PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(GetMaster());
         if (!masterBotAI || masterBotAI->IsRealPlayer())
@@ -4253,30 +4277,27 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         return true;
     }
 
-    // Player is near. Always active.
-    if (HasPlayerNearby(300.f))
-    {
-        return true;
-    }
-
     // HasFriend
-    for (auto& player : sRandomPlayerbotMgr->GetPlayers())
+    if (sPlayerbotAIConfig->BotActiveAloneForceWhenIsFriend)
     {
-        if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
+        for (auto& player : sRandomPlayerbotMgr->GetPlayers())
         {
-            continue;
-        }
+            if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
+            {
+                continue;
+            }
 
-        if (player->GetSocial()->HasFriend(bot->GetGUID()))
-        {
-            return true;
+            if (player->GetSocial()->HasFriend(bot->GetGUID()))
+            {
+                return true;
+            }
         }
     }
 
     // Force the bots to spread
     if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY)
     {
-        if (HasManyPlayersNearby(10, sPlayerbotAIConfig->sightDistance))
+        if (HasManyPlayersNearby(10, 40))
         {
             return true;
         }
@@ -5475,10 +5496,10 @@ bool PlayerbotAI::CanMove()
     if (IsInVehicle() && !IsInVehicle(true))
         return false;
 
-    if (bot->isFrozen() || bot->IsPolymorphed() || (bot->isDead() && !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)) ||
-        bot->IsBeingTeleported() || bot->isInRoots() || bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) ||
-        bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || bot->IsCharmed() || bot->HasAuraType(SPELL_AURA_MOD_STUN) ||
-        bot->HasUnitState(UNIT_STATE_IN_FLIGHT) || bot->HasUnitState(UNIT_STATE_LOST_CONTROL))
+    if (bot->isFrozen() || bot->IsPolymorphed() || (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST)) ||
+        bot->IsBeingTeleported() || bot->HasRootAura() || bot->HasSpiritOfRedemptionAura() ||
+        bot->HasConfuseAura() || bot->IsCharmed() || bot->HasStunAura() ||
+        bot->IsInFlight() || bot->HasUnitState(UNIT_STATE_LOST_CONTROL))
         return false;
 
     return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE;
