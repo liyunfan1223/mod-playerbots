@@ -74,6 +74,15 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     {
         return false;
     }
+
+    if (target->IsPlayer() && sPlayerbotAIConfig->IsInPvpProhibitedZone(bot->GetZoneId()))
+    {
+        if (verbose)
+            botAI->TellError("I cannot attack players in prohbited Zones");
+
+        return false;
+    }
+
     std::ostringstream msg;
     msg << target->GetName();
 
