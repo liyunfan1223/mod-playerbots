@@ -4354,7 +4354,9 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 {
     uint32 diffLimitFloor = sPlayerbotAIConfig->botActiveAloneDiffLimitFloor;
     uint32 diffLimitCeil = sPlayerbotAIConfig->botActiveAloneDiffLimitCeiling;
-    uint32 chkDiff = (sPlayerbotAIConfig->botActiveAloneDiffMethod == 2) ? sWorldUpdateTime.GetMaxUpdateTime() : sWorldUpdateTime.GetAverageUpdateTime();
+    uint32 chkDiff = (sPlayerbotAIConfig->botActiveAloneDiffMethod == 2) 
+        ? sWorldUpdateTime.GetMaxUpdateTime() 
+        : sWorldUpdateTime.GetAverageUpdateTime();
 
     if (diffLimitFloor > diffLimitCeil)
         diffLimitFloor = diffLimitCeil;
