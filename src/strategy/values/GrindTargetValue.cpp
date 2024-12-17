@@ -52,7 +52,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
 
     float distance = 0;
     Unit* result = nullptr;
-    std::unordered_map<uint32, bool> needForQuestMap;
+    // std::unordered_map<uint32, bool> needForQuestMap;
 
     for (ObjectGuid const guid : targets)
     {
@@ -99,18 +99,18 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
 		if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
 		    continue;
 
-        if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
-            needForQuestMap[unit->GetEntry()] = needForQuest(unit);
+        // if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
+        //     needForQuestMap[unit->GetEntry()] = needForQuest(unit);
 
-        if (!needForQuestMap[unit->GetEntry()])
-        {
-            Creature* creature = dynamic_cast<Creature*>(unit);
-            if ((urand(0, 100) < 60 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() &&
-                context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() != "GrindTravelDestination")))
-            {
-                continue;
-            }
-        }
+        // if (!needForQuestMap[unit->GetEntry()])
+        // {
+        //     Creature* creature = dynamic_cast<Creature*>(unit);
+        //     if ((urand(0, 100) < 60 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() &&
+        //         context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() != "GrindTravelDestination")))
+        //     {
+        //         continue;
+        //     }
+        // }
 
         if (Creature* creature = unit->ToCreature())
             if (CreatureTemplate const* CreatureTemplate = creature->GetCreatureTemplate())
@@ -142,8 +142,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         else
         {
             float newdistance = bot->GetDistance(unit);
-            if (!result || (newdistance < distance &&
-                            urand(0, abs(distance - newdistance)) > sPlayerbotAIConfig->sightDistance * 0.1))
+            if (!result || (newdistance < distance))
             {
                 distance = newdistance;
                 result = unit;

@@ -31,6 +31,7 @@
 #include "MeleeCombatStrategy.h"
 #include "MoveFromGroupStrategy.h"
 #include "NamedObjectContext.h"
+#include "NewRpgStrategy.h"
 #include "NonCombatStrategy.h"
 #include "PassiveStrategy.h"
 #include "PullStrategy.h"
@@ -82,6 +83,7 @@ public:
         creators["reveal"] = &StrategyContext::reveal;
         creators["collision"] = &StrategyContext::collision;
         creators["rpg"] = &StrategyContext::rpg;
+        creators["new rpg"] = &StrategyContext::new_rpg;
         creators["travel"] = &StrategyContext::travel;
         creators["explore"] = &StrategyContext::explore;
         creators["map"] = &StrategyContext::map;
@@ -152,6 +154,7 @@ private:
     static Strategy* reveal(PlayerbotAI* botAI) { return new RevealStrategy(botAI); }
     static Strategy* collision(PlayerbotAI* botAI) { return new CollisionStrategy(botAI); }
     static Strategy* rpg(PlayerbotAI* botAI) { return new RpgStrategy(botAI); }
+    static Strategy* new_rpg(PlayerbotAI* botAI) { return new NewRpgStrategy(botAI); }
     static Strategy* travel(PlayerbotAI* botAI) { return new TravelStrategy(botAI); }
     static Strategy* explore(PlayerbotAI* botAI) { return new ExploreStrategy(botAI); }
     static Strategy* map(PlayerbotAI* botAI) { return new MapStrategy(botAI); }

@@ -29,6 +29,7 @@
 #include "MotionMaster.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "NewRpgStrategy.h"
 #include "ObjectGuid.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
@@ -38,6 +39,7 @@
 #include "Playerbots.h"
 #include "PointMovementGenerator.h"
 #include "PositionValue.h"
+#include "RandomPlayerbotMgr.h"
 #include "SayAction.h"
 #include "ScriptMgr.h"
 #include "ServerFacade.h"
@@ -718,7 +720,7 @@ void PlayerbotAI::HandleTeleportAck()
         // SetNextCheckDelay(urand(2000, 5000));
         if (sPlayerbotAIConfig->applyInstanceStrategies)
             ApplyInstanceStrategies(bot->GetMapId(), true);
-        Reset();
+        Reset(true);
     }
 
     SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
@@ -767,14 +769,15 @@ void PlayerbotAI::Reset(bool full)
             ->setTarget(sTravelMgr->nullTravelDestination, sTravelMgr->nullWorldPosition, true);
         aiObjectContext->GetValue<TravelTarget*>("travel target")->Get()->setStatus(TRAVEL_STATUS_EXPIRED);
         aiObjectContext->GetValue<TravelTarget*>("travel target")->Get()->setExpireIn(1000);
+        rpgInfo = NewRpgInfo();
     }
 
     aiObjectContext->GetValue<GuidSet&>("ignore rpg target")->Get().clear();
 
     bot->GetMotionMaster()->Clear();
-    // bot->CleanupAfterTaxiFlight();
-    InterruptSpell();
 
+    InterruptSpell();
+    
     if (full)
     {
         for (uint8 i = 0; i < BOT_STATE_MAX; i++)
@@ -4111,20 +4114,11 @@ inline bool ZoneHasRealPlayers(Player* bot)
     {
         return false;
     }
-
-    Map::PlayerList const& players = bot->GetMap()->GetPlayers();
-    if (players.IsEmpty())
+    
+    for (auto& player : sRandomPlayerbotMgr->GetPlayers())
     {
-        return false;
-    }
-
-    for (auto const& itr : players)
-    {
-        Player* player = itr.GetSource();
-        if (!player || !player->IsVisible())
-        {
+        if (player->GetMapId() != bot->GetMapId())
             continue;
-        }
 
         if (player->GetZoneId() == bot->GetZoneId())
         {
@@ -4143,16 +4137,16 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
     // only keep updating till initializing time has completed,
     // which prevents unneeded expensive GameTime calls.
-    if (_isBotInitializing)
-    {
-        _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
+    // if (_isBotInitializing)
+    // {
+    //     _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
 
-        // no activity allowed during bot initialization
-        if (_isBotInitializing)
-        {
-            return false;
-        }
-    }
+    //     // no activity allowed during bot initialization
+    //     if (_isBotInitializing)
+    //     {
+    //         return false;
+    //     }
+    // }
 
     // General exceptions
     if (activityType == PACKET_ACTIVITY)
@@ -4203,7 +4197,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     }
 
     // Player is near. Always active.
-    if (HasPlayerNearby(sPlayerbotAIConfig->BotActiveAloneWhenInRadius))
+    if (HasPlayerNearby(sPlayerbotAIConfig->BotActiveAloneForceWhenInRadius))
     {
         return true;
     }

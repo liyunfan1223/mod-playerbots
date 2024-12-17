@@ -12,6 +12,8 @@
 #include "LfgTriggers.h"
 #include "LootTriggers.h"
 #include "NamedObjectContext.h"
+#include "NewRpgStrategy.h"
+#include "NewRpgTriggers.h"
 #include "PvpTriggers.h"
 #include "RaidNaxxTriggers.h"
 #include "RpgTriggers.h"
@@ -213,6 +215,10 @@ public:
         creators["rpg craft"] = &TriggerContext::rpg_craft;
         creators["rpg trade useful"] = &TriggerContext::rpg_trade_useful;
         creators["rpg duel"] = &TriggerContext::rpg_duel;
+        creators["go grind status"] = &TriggerContext::go_grind_status;
+        creators["go innkeeper status"] = &TriggerContext::go_innkeeper_status;
+        creators["near random status"] = &TriggerContext::near_random_status;
+        creators["near npc status"] = &TriggerContext::near_npc_status;
     }
 
 private:
@@ -402,6 +408,10 @@ private:
     static Trigger* rpg_craft(PlayerbotAI* botAI) { return new RpgCraftTrigger(botAI); }
     static Trigger* rpg_trade_useful(PlayerbotAI* botAI) { return new RpgTradeUsefulTrigger(botAI); }
     static Trigger* rpg_duel(PlayerbotAI* botAI) { return new RpgDuelTrigger(botAI); }
+    static Trigger* go_grind_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::GO_GRIND); }
+    static Trigger* go_innkeeper_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::GO_INNKEEPER); }
+    static Trigger* near_random_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::NEAR_RANDOM); }
+    static Trigger* near_npc_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::NEAR_NPC); }
 };
 
 #endif

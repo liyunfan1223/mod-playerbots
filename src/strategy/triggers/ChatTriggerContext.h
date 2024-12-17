@@ -24,6 +24,7 @@ public:
         creators["reputation"] = &ChatTriggerContext::reputation;
         creators["log"] = &ChatTriggerContext::log;
         creators["los"] = &ChatTriggerContext::los;
+        creators["rpg status"] = &ChatTriggerContext::rpg_status;
         creators["aura"] = &ChatTriggerContext::aura;
         creators["drop"] = &ChatTriggerContext::drop;
         creators["share"] = &ChatTriggerContext::share;
@@ -211,6 +212,7 @@ private:
     static Trigger* reputation(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "reputation"); }
     static Trigger* log(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "log"); }
     static Trigger* los(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "los"); }
+    static Trigger* rpg_status(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "rpg status"); }
     static Trigger* aura(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "aura"); }
     static Trigger* loot_all(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "add all loot"); }
     static Trigger* release(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "release"); }
