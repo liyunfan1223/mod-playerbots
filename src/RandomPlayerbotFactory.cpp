@@ -556,7 +556,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         totalRandomBotChars += AccountMgr::GetCharactersCount(accountId);
     }
 
-    LOG_INFO("server.loading", "{} random bot accounts with {} characters available",
+    LOG_INFO("server.loading", ">> {} random bot accounts with {} characters available",
              sPlayerbotAIConfig->randomBotAccounts.size(), totalRandomBotChars);
 }
 
