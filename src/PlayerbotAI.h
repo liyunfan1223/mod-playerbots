@@ -21,6 +21,7 @@
 #include "PlayerbotTextMgr.h"
 #include "SpellAuras.h"
 #include "WorldPacket.h"
+#include "NewRpgStrategy.h"
 
 class AiObjectContext;
 class Creature;
@@ -432,7 +433,7 @@ public:
     std::vector<Player*> GetPlayersInGroup();
     const AreaTableEntry* GetCurrentArea();
     const AreaTableEntry* GetCurrentZone();
-    std::string GetLocalizedAreaName(const AreaTableEntry* entry);
+    static std::string GetLocalizedAreaName(const AreaTableEntry* entry);
 
     bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
@@ -572,6 +573,7 @@ public:
     std::set<uint32> GetCurrentIncompleteQuestIds();
     void PetFollow();
     static float GetItemScoreMultiplier(ItemQualities quality);
+    NewRpgInfo rpgInfo;
 
 private:
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
@@ -580,7 +582,7 @@ private:
 
     void HandleCommands();
     void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
-    bool _isBotInitializing = true;
+    bool _isBotInitializing = false;
 
 protected:
     Player* bot;

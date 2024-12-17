@@ -177,7 +177,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 }
 
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only,
-                            bool exact_waypoint, MovementPriority priority)
+                            bool exact_waypoint, MovementPriority priority, bool lessDelay)
 {
     UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z))
@@ -210,6 +210,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             mm.Clear();
             mm.MovePoint(0, x, y, z, generatePath);
             float delay = 1000.0f * (distance / vehicleBase->GetSpeed(MOVE_RUN));
+            if (lessDelay)
+            {
+                delay -= botAI->GetReactDelay();
+            }
             delay = std::max(.0f, delay);
             delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay, priority);
@@ -233,6 +237,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             mm.Clear();
             mm.MovePoint(0, x, y, z, generatePath);
             float delay = 1000.0f * MoveDelay(distance);
+            if (lessDelay)
+            {
+                delay -= botAI->GetReactDelay();
+            }
             delay = std::max(.0f, delay);
             delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay, priority);
@@ -264,6 +272,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             mm.Clear();
             mm.MovePoint(0, endP.x, endP.y, endP.z, generatePath);
             float delay = 1000.0f * MoveDelay(distance);
+            if (lessDelay)
+            {
+                delay -= botAI->GetReactDelay();
+            }
             delay = std::max(.0f, delay);
             delay = std::min((float)sPlayerbotAIConfig->maxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay, priority);
@@ -822,7 +834,7 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     PathGenerator path(bot);
     path.CalculatePath(tx, ty, tz, false);
     PathType type = path.GetPathType();
-    int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE;
+    int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE | PATHFIND_SHORTCUT;
     if (!(type & typeOk))
         return false;
     float shortenTo = distance;
@@ -838,7 +850,7 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     path.ShortenPathUntilDist(G3D::Vector3(tx, ty, tz), shortenTo);
     G3D::Vector3 endPos = path.GetPath().back();
     return MoveTo(target->GetMapId(), endPos.x, endPos.y, endPos.z, false, false, false, false,
-                  MovementPriority::MOVEMENT_COMBAT);
+                  MovementPriority::MOVEMENT_COMBAT, true);
 }
 
 float MovementAction::GetFollowAngle()
@@ -2013,8 +2025,15 @@ Position MovementAction::BestPositionForMeleeToFlee(Position pos, float radius)
         }
         bool strict = checkAngle.strict;
         float fleeDis = std::min(radius + 1.0f, sPlayerbotAIConfig->fleeDistance);
-        Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis, bot->GetPositionY() + sin(angle) * fleeDis,
-                         bot->GetPositionZ()};
+        float dx = bot->GetPositionX() + cos(angle) * fleeDis;
+        float dy = bot->GetPositionY() + sin(angle) * fleeDis;
+        float dz = bot->GetPositionZ();
+        if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                            bot->GetPositionZ(), dx, dy, dz))
+        {
+            continue;
+        }
+        Position fleePos{dx, dy, dz};
         if (strict && currentTarget &&
             fleePos.GetExactDist(currentTarget) - currentTarget->GetCombatReach() >
                 sPlayerbotAIConfig->tooCloseDistance &&
@@ -2069,8 +2088,15 @@ Position MovementAction::BestPositionForRangedToFlee(Position pos, float radius)
         }
         bool strict = checkAngle.strict;
         float fleeDis = std::min(radius + 1.0f, sPlayerbotAIConfig->fleeDistance);
-        Position fleePos{bot->GetPositionX() + cos(angle) * fleeDis, bot->GetPositionY() + sin(angle) * fleeDis,
-                         bot->GetPositionZ()};
+        float dx = bot->GetPositionX() + cos(angle) * fleeDis;
+        float dy = bot->GetPositionY() + sin(angle) * fleeDis;
+        float dz = bot->GetPositionZ();
+        if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                            bot->GetPositionZ(), dx, dy, dz))
+        {
+            continue;
+        }
+        Position fleePos{dx, dy, dz};
         if (strict && currentTarget &&
             fleePos.GetExactDist(currentTarget) - currentTarget->GetCombatReach() > sPlayerbotAIConfig->spellDistance)
         {
@@ -2082,6 +2108,7 @@ Position MovementAction::BestPositionForRangedToFlee(Position pos, float radius)
         {
             continue;
         }
+
         if (pos.GetExactDist(fleePos) > farestDis)
         {
             farestDis = pos.GetExactDist(fleePos);
