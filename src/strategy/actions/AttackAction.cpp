@@ -106,7 +106,7 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     if ((target->IsPlayer() || target->IsPet()) && sPlayerbotAIConfig->IsInPvpProhibitedZone(bot->GetZoneId()))
     {
         if (verbose)
-            botAI->TellError("I cannot attack others in PVP prohbited zones");
+            botAI->TellError("I cannot attack others in PvP prohibited zones");
 
         return false;
     }
