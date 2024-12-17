@@ -4203,7 +4203,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     }
 
     // Player is near. Always active.
-    if (HasPlayerNearby(sPlayerbotAIConfig->BotActiveAloneWhenInRadius))
+    if (HasPlayerNearby(sPlayerbotAIConfig->BotActiveAloneForceWhenInRadius))
     {
         return true;
     }
