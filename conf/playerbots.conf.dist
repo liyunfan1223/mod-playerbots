@@ -1541,8 +1541,8 @@ AiPlayerbot.botActiveAloneSmartScale = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 AiPlayerbot.botActiveAloneDiffMethod = 2
-AiPlayerbot.botActiveAloneDiffLimitFloor = 30
-AiPlayerbot.botActiveAloneDiffLimitCeiling = 60
+AiPlayerbot.botActiveAloneDiffLimitFloor = 40
+AiPlayerbot.botActiveAloneDiffLimitCeiling = 150
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
