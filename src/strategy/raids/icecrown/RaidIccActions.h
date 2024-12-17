@@ -27,7 +27,8 @@ const Position ICC_ROTFACE_TANK_POSITION = Position(4447.061f, 3150.9758f, 360.3
 const Position ICC_ROTFACE_SAFE_POSITION = Position(4446.557f, 3065.6594f, 360.51843f);
 const Position ICC_PUTRICIDE_TANK_OOZE_POSITION = Position(4362.709f, 3229.1448f, 389.4083f);
 const Position ICC_PUTRICIDE_TANK_GAS_CLOUD_POSITION = Position(4397.0386f, 3221.385f, 389.3999f);
-
+const Position ICC_BPC_OT_POSITION = Position(4649.2236f, 2796.0972f, 361.1815f);
+const Position ICC_BPC_MT_POSITION = Position(4648.5674f, 2744.847f, 361.18222f);
 //Lord Marrogwar
 class IccLmTankPositionAction : public AttackAction
 {
@@ -196,5 +197,37 @@ public:
         : AttackAction(botAI, name) {}
     bool Execute(Event event) override;
 };
+
+
+//BPC
+class IccBpcKelesethTankAction : public AttackAction
+{
+public:
+    IccBpcKelesethTankAction(PlayerbotAI* botAI) : AttackAction(botAI, "icc bpc keleseth tank") {}
+    bool Execute(Event event) override;
+};
+
+class IccBpcNucleusAction : public AttackAction
+{
+public:
+    IccBpcNucleusAction(PlayerbotAI* botAI) : AttackAction(botAI, "icc bpc nucleus") {}
+    bool Execute(Event event) override;
+};
+
+class IccBpcMainTankAction : public AttackAction
+{
+public:
+    IccBpcMainTankAction(PlayerbotAI* botAI) : AttackAction(botAI, "icc bpc main tank") {}
+    bool Execute(Event event) override;
+};
+
+//BPC Vortex
+class IccBpcEmpoweredVortexAction : public MovementAction
+{
+public:
+    IccBpcEmpoweredVortexAction(PlayerbotAI* botAI) : MovementAction(botAI, "icc bpc empowered vortex") {}
+    bool Execute(Event event) override;
+};
+
 
 #endif

@@ -322,3 +322,84 @@ bool IccPutricideMainTankMutatedPlagueTrigger::IsActive()
     }
     return true;
 }
+
+//BPC
+bool IccBpcKelesethTankTrigger::IsActive()
+{
+    if (!botAI->IsAssistTank(bot))
+        return false;
+
+    // First priority is to check for nucleuses that need to be picked up
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(*i);
+        if (unit && unit->IsAlive() && unit->GetEntry() == 38369) // Dark Nucleus entry
+        {
+            if (!unit->GetVictim() || unit->GetVictim() != bot)
+                return false; // Don't tank Keleseth if there's a nucleus to grab
+        }
+    }
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    if (!boss || boss->GetEntry() != 37972) // Verify it's actually Keleseth
+        return false;
+
+    return true;
+}
+
+bool IccBpcNucleusTrigger::IsActive()
+{
+    if (!botAI->IsAssistTank(bot))
+        return false;
+
+    // Actively look for any nucleus that isn't targeting us
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(*i);
+        if (unit && unit->IsAlive() && unit->GetEntry() == 38369) // Dark Nucleus entry
+        {
+            if (!unit->GetVictim() || unit->GetVictim() != bot)
+                return true; // Found a nucleus that needs to be picked up
+        }
+    }
+
+    return false;
+}
+
+bool IccBpcMainTankTrigger::IsActive()
+{
+    if (!botAI->IsMainTank(bot))
+        return false;
+
+    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+    Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
+    
+    return valanar != nullptr || taldaram != nullptr;
+}
+
+bool IccBpcEmpoweredVortexTrigger::IsActive()
+{
+    // Tanks should ignore this mechanic
+    if (botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
+        return false;
+
+    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+    if (!valanar || !valanar->IsAlive())
+        return false;
+
+    // For ranged, spread whenever Valanar is empowered
+    if (botAI->IsRanged(bot))
+        return valanar->HasAura(70952); // Invocation of Blood
+
+    // For melee, only spread during vortex cast
+    if (valanar->HasAura(70952) && // Invocation of Blood
+        valanar->GetCurrentSpell(CURRENT_GENERIC_SPELL) && 
+        valanar->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == 72039)
+    {
+        return true;
+    }
+
+    return false;
+}

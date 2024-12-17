@@ -30,6 +30,10 @@ public:
         creators["icc putricide volatile ooze"] = &RaidIccActionContext::icc_putricide_volatile_ooze;
         creators["icc putricide gas cloud"] = &RaidIccActionContext::icc_putricide_gas_cloud;
         creators["icc putricide growing ooze puddle"] = &RaidIccActionContext::icc_putricide_growing_ooze_puddle;
+        creators["icc bpc keleseth tank"] = &RaidIccActionContext::icc_bpc_keleseth_tank;
+        creators["icc bpc nucleus"] = &RaidIccActionContext::icc_bpc_nucleus;
+        creators["icc bpc main tank"] = &RaidIccActionContext::icc_bpc_main_tank;
+        creators["icc bpc empowered vortex"] = &RaidIccActionContext::icc_bpc_empowered_vortex;
     }
 
 private:
@@ -53,6 +57,10 @@ private:
     static Action* icc_putricide_volatile_ooze(PlayerbotAI* ai) { return new IccPutricideVolatileOozeAction(ai); }
     static Action* icc_putricide_gas_cloud(PlayerbotAI* ai) { return new IccPutricideGasCloudAction(ai); }
     static Action* icc_putricide_growing_ooze_puddle(PlayerbotAI* ai) { return new IccPutricideGrowingOozePuddleAction(ai); }
+    static Action* icc_bpc_keleseth_tank(PlayerbotAI* ai) { return new IccBpcKelesethTankAction(ai); }
+    static Action* icc_bpc_nucleus(PlayerbotAI* ai) { return new IccBpcNucleusAction(ai); }
+    static Action* icc_bpc_main_tank(PlayerbotAI* ai) { return new IccBpcMainTankAction(ai); }
+    static Action* icc_bpc_empowered_vortex(PlayerbotAI* botAI) { return new IccBpcEmpoweredVortexAction(botAI); }
 };
 
 #endif

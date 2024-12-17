@@ -183,4 +183,34 @@ public:
     bool IsActive() override;
 };
 
+//BPC
+class IccBpcKelesethTankTrigger : public Trigger 
+{
+public:
+    IccBpcKelesethTankTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bpc keleseth tank") {}
+    bool IsActive() override;
+};
+
+class IccBpcNucleusTrigger : public Trigger
+{
+public:
+    IccBpcNucleusTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bpc nucleus") {}
+    bool IsActive() override;
+};
+
+class IccBpcMainTankTrigger : public Trigger
+{
+public:
+    IccBpcMainTankTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bpc main tank") {}
+    bool IsActive() override;
+};
+
+//BPC Vortex
+class IccBpcEmpoweredVortexTrigger : public Trigger
+{
+public:
+    IccBpcEmpoweredVortexTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bpc empowered vortex") {}
+    bool IsActive() override;
+};
+
 #endif

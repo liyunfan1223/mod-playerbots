@@ -1,8 +1,7 @@
-#ifndef _PLAYERRBOT_RAIDICCMULTIPLIERS_H_
-#define _PLAYERRBOT_RAIDICCMULTIPLIERS_H_
+#ifndef _PLAYERBOT_RAIDICCMULTIPLIERS_H
+#define _PLAYERBOT_RAIDICCMULTIPLIERS_H
 
 #include "Multiplier.h"
-
 
 class IccAddsDbsMultiplier : public Multiplier
 {
@@ -40,6 +39,14 @@ class IccAddsPutricideMultiplier : public Multiplier
 public:
     IccAddsPutricideMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc adds putricide") {}
     virtual float GetValue(Action* action);
+};
+
+//BPC
+class BpcAssistMultiplier : public Multiplier
+{
+public:
+    BpcAssistMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "bpc assist") {}
+    float GetValue(Action* action) override;
 };
 
 #endif

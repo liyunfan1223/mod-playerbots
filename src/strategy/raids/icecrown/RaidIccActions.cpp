@@ -219,8 +219,6 @@ bool IccRottingFrostGiantTankPositionAction::Execute(Event event)
             return MoveTo(bot->GetMapId(), ICC_ROTTING_FROST_GIANT_TANK_POSITION.GetPositionX(),
                           ICC_ROTTING_FROST_GIANT_TANK_POSITION.GetPositionY(), ICC_ROTTING_FROST_GIANT_TANK_POSITION.GetPositionZ(), false,
                           false, false, true, MovementPriority::MOVEMENT_NORMAL);
-        else
-            return Attack(boss);
     }
 
     float radius = 5.0f;
@@ -977,6 +975,166 @@ bool IccPutricideGasCloudAction::Execute(Event event)
                      ICC_PUTRICIDE_TANK_GAS_CLOUD_POSITION.GetPositionY(),
                      ICC_PUTRICIDE_TANK_GAS_CLOUD_POSITION.GetPositionZ(),
                      false, true, false, true, MovementPriority::MOVEMENT_NORMAL);
+    }
+
+    return false;
+}
+
+//BPC
+bool IccBpcKelesethTankAction::Execute(Event event)
+{
+    if (!botAI->IsAssistTank(bot))
+        return false;
+
+    // First check for any nucleus that needs to be picked up
+    bool isCollectingNuclei = false;
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(*i);
+        if (unit && unit->IsAlive() && unit->GetEntry() == 38369) // Dark Nucleus entry
+        {
+            if (!unit->GetVictim() || unit->GetVictim() != bot)
+            {
+                isCollectingNuclei = true;
+                return Attack(unit); // Pick up any nucleus that isn't targeting us
+            }
+        }
+    }
+
+    // If not collecting nuclei, move to OT position
+    if (!isCollectingNuclei && bot->GetExactDist2d(ICC_BPC_OT_POSITION) > 5.0f)
+        return MoveTo(bot->GetMapId(), ICC_BPC_OT_POSITION.GetPositionX(),
+                    ICC_BPC_OT_POSITION.GetPositionY(), ICC_BPC_OT_POSITION.GetPositionZ(),
+                    false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    if (!boss || boss->GetEntry() != 37972) // Verify it's actually Keleseth
+        return false;
+
+    return Attack(boss);
+}
+
+bool IccBpcNucleusAction::Execute(Event event)
+{
+    if (!botAI->IsAssistTank(bot))
+        return false;
+
+    // Actively look for any nucleus that isn't targeting us
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(*i);
+        if (unit && unit->IsAlive() && unit->GetEntry() == 38369) // Dark Nucleus entry
+        {
+            if (!unit->GetVictim() || unit->GetVictim() != bot)
+                return Attack(unit); // Pick up any nucleus that isn't targeting us
+        }
+    }
+
+    return false;
+}
+
+bool IccBpcMainTankAction::Execute(Event event)
+{
+    if (!botAI->IsMainTank(bot))
+        return false;
+
+    // Move to MT position if we're not there
+    if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 5.0f)
+        return MoveTo(bot->GetMapId(), ICC_BPC_MT_POSITION.GetPositionX(),
+                    ICC_BPC_MT_POSITION.GetPositionY(), ICC_BPC_MT_POSITION.GetPositionZ(),
+                    false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
+
+    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+    Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+
+    // Keep current prince if we have one
+    if (currentTarget && (currentTarget == valanar || currentTarget == taldaram))
+        return Attack(currentTarget);
+
+    // Pick a new prince
+    if (valanar)
+        return Attack(valanar);
+    if (taldaram)
+        return Attack(taldaram);
+
+    return false;
+}
+
+bool IccBpcEmpoweredVortexAction::Execute(Event event)
+{
+    // Double check that we're not a tank
+    if (botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
+        return false;
+
+    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+    if (!valanar)
+        return false;
+
+    float radius = 12.0f;
+    float moveIncrement = 3.0f;
+    bool isRanged = botAI->IsRanged(bot);
+
+    GuidVector members = AI_VALUE(GuidVector, "group members");
+    if (isRanged)
+    {
+        // Ranged: spread from other ranged
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit || !unit->IsAlive() || unit == bot || 
+                botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || !botAI->IsRanged(bot))
+                continue;
+
+            float dist = bot->GetExactDist2d(unit);
+            if (dist < radius)
+            {
+                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
+                return MoveAway(unit, moveDistance);
+            }
+        }
+    }
+    else
+    {
+        // Melee: move opposite to ranged group
+        float avgX = 0, avgY = 0;
+        int rangedCount = 0;
+
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit || !unit->IsAlive() || !botAI->IsRanged(bot))
+                continue;
+
+            avgX += unit->GetPositionX();
+            avgY += unit->GetPositionY();
+            rangedCount++;
+        }
+
+        if (rangedCount > 0)
+        {
+            avgX /= rangedCount;
+            avgY /= rangedCount;
+
+            // Direction from ranged to Valanar
+            float dx = valanar->GetPositionX() - avgX;
+            float dy = valanar->GetPositionY() - avgY;
+            float len = sqrt(dx*dx + dy*dy);
+            
+            if (len > 0)
+            {
+                dx /= len;
+                dy /= len;
+                float targetX = valanar->GetPositionX() + dx * 5.0f;
+                float targetY = valanar->GetPositionY() + dy * 5.0f;
+                float targetZ = valanar->GetPositionZ();
+                bot->UpdateAllowedPositionZ(targetX, targetY, targetZ);
+
+                return MoveTo(bot->GetMapId(), targetX, targetY, targetZ);
+            }
+        }
     }
 
     return false;

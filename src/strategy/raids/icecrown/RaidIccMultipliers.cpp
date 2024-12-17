@@ -191,4 +191,32 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
+//bpc
+float BpcAssistMultiplier::GetValue(Action* action)
+{
+    if (!action)
+        return 1.0f;
 
+    Unit* keleseth = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    if (!keleseth || !keleseth->IsAlive())
+        return 1.0f;
+
+    // For assist tank during BPC fight
+    if (botAI->IsAssistTank(bot))
+    {
+        // Allow BPC-specific actions
+        if (dynamic_cast<IccBpcKelesethTankAction*>(action) || 
+            dynamic_cast<IccBpcNucleusAction*>(action))
+            return 1.0f;
+
+        // Disable normal assist behavior
+        if (dynamic_cast<TankAssistAction*>(action))
+            return 0.0f;
+
+        // Disable following
+        if (dynamic_cast<FollowAction*>(action))
+            return 0.0f;
+    }
+
+    return 1.0f;
+}
