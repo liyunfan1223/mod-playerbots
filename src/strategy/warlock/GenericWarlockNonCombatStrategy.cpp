@@ -48,7 +48,7 @@ private:
     {
         return new ActionNode("summon succubus",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("summon imp"), nullptr),
+                              /*A*/ NextAction::array(0, new NextAction("summon voidwalker"), nullptr),
                               /*C*/ nullptr);
     }
     static ActionNode* summon_felhunter([[maybe_unused]] PlayerbotAI* botAI)
