@@ -1003,7 +1003,7 @@ bool IccBpcKelesethTankAction::Execute(Event event)
     }
 
     // If not collecting nuclei, move to OT position
-    if (!isCollectingNuclei && bot->GetExactDist2d(ICC_BPC_OT_POSITION) > 5.0f)
+    if (!isCollectingNuclei && bot->GetExactDist2d(ICC_BPC_OT_POSITION) > 20.0f)
         return MoveTo(bot->GetMapId(), ICC_BPC_OT_POSITION.GetPositionX(),
                     ICC_BPC_OT_POSITION.GetPositionY(), ICC_BPC_OT_POSITION.GetPositionZ(),
                     false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
@@ -1041,7 +1041,7 @@ bool IccBpcMainTankAction::Execute(Event event)
         return false;
 
     // Move to MT position if we're not there
-    if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 5.0f)
+    if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 20.0f)
         return MoveTo(bot->GetMapId(), ICC_BPC_MT_POSITION.GetPositionX(),
                     ICC_BPC_MT_POSITION.GetPositionY(), ICC_BPC_MT_POSITION.GetPositionZ(),
                     false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
