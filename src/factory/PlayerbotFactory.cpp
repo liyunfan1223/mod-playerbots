@@ -424,7 +424,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     bot->SetHealth(bot->GetMaxHealth());
     bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     bot->SaveToDB(false, false);
-    LOG_INFO("playerbots", "Initialization Done.");
+    // LOG_INFO("playerbots", "Initialization Done.");
     if (pmo)
         pmo->finish();
 }

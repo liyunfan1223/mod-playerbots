@@ -14,7 +14,7 @@ class PlayerbotAI;
 class PossibleRpgTargetsValue : public NearestUnitsValue
 {
 public:
-    PossibleRpgTargetsValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig->rpgDistance);
+    PossibleRpgTargetsValue(PlayerbotAI* botAI, float range = 70.0f);
 
     static std::vector<uint32> allowedNpcFlags;
 

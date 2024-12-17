@@ -264,7 +264,7 @@ public:
     uint32 playerbotsXPrate;
     bool disableDeathKnightLogin;
     uint32 botActiveAlone;
-    uint32 BotActiveAloneWhenInRadius;
+    uint32 BotActiveAloneForceWhenInRadius;
     bool BotActiveAloneForceWhenInZone;
     bool BotActiveAloneForceWhenInMap;
     bool BotActiveAloneForceWhenIsFriend;
@@ -287,6 +287,7 @@ public:
     bool autoUpgradeEquip;
     bool autoLearnTrainerSpells;
     bool autoDoQuests;
+    bool enableNewRpgStrategy;
     bool syncLevelWithPlayers;
     bool freeFood;
     bool autoLearnQuestSpells;

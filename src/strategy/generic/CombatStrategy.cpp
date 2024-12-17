@@ -22,7 +22,7 @@ void CombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("not facing target",
                                        NextAction::array(0, new NextAction("set facing", ACTION_MOVE + 7), nullptr)));
     triggers.push_back(
-        new TriggerNode("pet attack", NextAction::array(0, new NextAction("pet attack", ACTION_NORMAL), nullptr)));
+        new TriggerNode("pet attack", NextAction::array(0, new NextAction("pet attack", 40.0f), nullptr)));
     // triggers.push_back(new TriggerNode("combat long stuck", NextAction::array(0, new NextAction("hearthstone", 0.9f),
     // new NextAction("repop", 0.8f), nullptr)));
 }
