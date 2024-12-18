@@ -1540,9 +1540,9 @@ AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 AiPlayerbot.botActiveAloneSmartScale = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
-AiPlayerbot.botActiveAloneDiffMethod = 2
-AiPlayerbot.botActiveAloneDiffLimitFloor = 40
-AiPlayerbot.botActiveAloneDiffLimitCeiling = 150
+AiPlayerbot.botActiveAloneSmartScaleDiffMethod = 2
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitFloor = 40
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 150
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
