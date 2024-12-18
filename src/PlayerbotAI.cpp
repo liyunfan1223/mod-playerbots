@@ -4352,9 +4352,9 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
 
 uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 {
-    uint32 diffLimitFloor = sPlayerbotAIConfig->botActiveAloneDiffLimitFloor;
-    uint32 diffLimitCeil = sPlayerbotAIConfig->botActiveAloneDiffLimitCeiling;
-    uint32 chkDiff = (sPlayerbotAIConfig->botActiveAloneDiffMethod == 2) 
+    uint32 diffLimitFloor = sPlayerbotAIConfig->botActiveAloneSmartScaleDiffLimitFloor;
+    uint32 diffLimitCeil = sPlayerbotAIConfig->botActiveAloneSmartScaleDiffLimitCeiling;
+    uint32 chkDiff = (sPlayerbotAIConfig->botActiveAloneSmartScaleDiffMethod == 2) 
         ? sWorldUpdateTime.GetMaxUpdateTime() 
         : sWorldUpdateTime.GetAverageUpdateTime();
 
@@ -4387,10 +4387,10 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 
         return (mod * 1) / 10;
     }
-
-    if (chkDiff > diffLimitFloor + (3 * spread)) return (mod * 3) / 10;
-    if (chkDiff > diffLimitFloor + (2 * spread)) return (mod * 6) / 10;
-    if (chkDiff > diffLimitFloor + (1 * spread)) return (mod * 9) / 10;
+    if (chkDiff > diffLimitFloor + (3 * spread)) return (mod * 2) / 10;
+    if (chkDiff > diffLimitFloor + (2 * spread)) return (mod * 4) / 10;
+    if (chkDiff > diffLimitFloor + (1 * spread)) return (mod * 7) / 10;
+    if (chkDiff > diffLimitFloor + (0 * spread)) return (mod * 9) / 10;
 
     return mod;
 }
