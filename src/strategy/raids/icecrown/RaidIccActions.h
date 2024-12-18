@@ -29,6 +29,9 @@ const Position ICC_PUTRICIDE_TANK_OOZE_POSITION = Position(4362.709f, 3229.1448f
 const Position ICC_PUTRICIDE_TANK_GAS_CLOUD_POSITION = Position(4397.0386f, 3221.385f, 389.3999f);
 const Position ICC_BPC_OT_POSITION = Position(4649.2236f, 2796.0972f, 361.1815f);
 const Position ICC_BPC_MT_POSITION = Position(4648.5674f, 2744.847f, 361.18222f);
+const Position ICC_BQL_CENTER_POSITION = Position(4595.0f, 2769.0f, 400.0f);
+const Position ICC_BQL_TANK_POSITION = Position(4616.102f, 2768.9167f, 400.13797f);
+
 //Lord Marrogwar
 class IccLmTankPositionAction : public AttackAction
 {
@@ -203,21 +206,24 @@ public:
 class IccBpcKelesethTankAction : public AttackAction
 {
 public:
-    IccBpcKelesethTankAction(PlayerbotAI* botAI) : AttackAction(botAI, "icc bpc keleseth tank") {}
+    IccBpcKelesethTankAction(PlayerbotAI* botAI) 
+        : AttackAction(botAI, "icc bpc keleseth tank") {}
     bool Execute(Event event) override;
 };
 
 class IccBpcNucleusAction : public AttackAction
 {
 public:
-    IccBpcNucleusAction(PlayerbotAI* botAI) : AttackAction(botAI, "icc bpc nucleus") {}
+    IccBpcNucleusAction(PlayerbotAI* botAI) 
+        : AttackAction(botAI, "icc bpc nucleus") {}
     bool Execute(Event event) override;
 };
 
 class IccBpcMainTankAction : public AttackAction
 {
 public:
-    IccBpcMainTankAction(PlayerbotAI* botAI) : AttackAction(botAI, "icc bpc main tank") {}
+    IccBpcMainTankAction(PlayerbotAI* botAI) 
+        : AttackAction(botAI, "icc bpc main tank") {}
     bool Execute(Event event) override;
 };
 
@@ -225,7 +231,33 @@ public:
 class IccBpcEmpoweredVortexAction : public MovementAction
 {
 public:
-    IccBpcEmpoweredVortexAction(PlayerbotAI* botAI) : MovementAction(botAI, "icc bpc empowered vortex") {}
+    IccBpcEmpoweredVortexAction(PlayerbotAI* botAI) 
+        : MovementAction(botAI, "icc bpc empowered vortex") {}
+    bool Execute(Event event) override;
+};
+
+//Blood Queen Lana'thel
+class IccBqlTankPositionAction : public AttackAction
+{
+public:
+    IccBqlTankPositionAction(PlayerbotAI* botAI) 
+        : AttackAction(botAI, "icc bql tank position") {}
+    bool Execute(Event event) override;
+};  
+
+class IccBqlPactOfDarkfallenAction : public MovementAction
+{
+public:
+    IccBqlPactOfDarkfallenAction(PlayerbotAI* botAI) 
+        : MovementAction(botAI, "icc bql pact of darkfallen") {}
+    bool Execute(Event event) override;
+};
+
+class IccBqlVampiricBiteAction : public AttackAction
+{
+public:
+    IccBqlVampiricBiteAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc bql vampiric bite") {}
     bool Execute(Event event) override;
 };
 

@@ -96,6 +96,16 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("icc bpc empowered vortex",
         NextAction::array(0, new NextAction("icc bpc empowered vortex", ACTION_INTERRUPT), nullptr)));
+    
+    //BQL
+    triggers.push_back(new TriggerNode("icc bql tank position",
+        NextAction::array(0, new NextAction("icc bql tank position", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc bql pact of darkfallen",
+        NextAction::array(0, new NextAction("icc bql pact of darkfallen", ACTION_EMERGENCY +1), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc bql vampiric bite",
+        NextAction::array(0, new NextAction("icc bql vampiric bite", ACTION_EMERGENCY + 2), nullptr)));
 }
 
 void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
@@ -105,4 +115,6 @@ void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
     multipliers.push_back(new RotfaceMultiplier(botAI));
     multipliers.push_back(new IccAddsPutricideMultiplier(botAI));
     multipliers.push_back(new BpcAssistMultiplier(botAI));
+    multipliers.push_back(new IccBqlPactOfDarkfallenMultiplier(botAI));
+    multipliers.push_back(new IccBqlVampiricBiteMultiplier(botAI));
 }

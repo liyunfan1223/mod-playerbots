@@ -220,3 +220,39 @@ float BpcAssistMultiplier::GetValue(Action* action)
 
     return 1.0f;
 }
+
+float IccBqlPactOfDarkfallenMultiplier::GetValue(Action* action)
+{
+    if (!action)
+        return 1.0f;
+
+    if (action->getName() == "icc bql pact of darkfallen")
+        return 1.0f;
+
+    // If bot has Pact of Darkfallen aura, return 0 for all other actions
+    if (bot->HasAura(71340))
+        return 0.0f;
+
+    return 1.0f;
+}
+
+float IccBqlVampiricBiteMultiplier::GetValue(Action* action)
+{
+    if (!bot->HasAura(70867)) // If bot doesn't have vampire buff
+        return 1.0f;
+
+    if (bot->HasAura(70877)) // If bot has frenzied bloodthirst
+    {
+        if (dynamic_cast<IccBqlVampiricBiteAction*>(action))
+            return 5.0f;  // Highest priority for bite action
+        else if (dynamic_cast<DpsAssistAction*>(action) ||
+                 dynamic_cast<TankAssistAction*>(action) ||
+                 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
+                 dynamic_cast<CombatFormationMoveAction*>(action))
+            return 0.0f;  // Disable all formation/movement actions
+        else
+            return 0.0f;  // Disable all other actions
+    }
+
+    return 1.0f;
+}

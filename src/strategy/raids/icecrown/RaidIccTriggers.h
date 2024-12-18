@@ -205,7 +205,6 @@ public:
     bool IsActive() override;
 };
 
-//BPC Vortex
 class IccBpcEmpoweredVortexTrigger : public Trigger
 {
 public:
@@ -213,4 +212,25 @@ public:
     bool IsActive() override;
 };
 
+//Bql
+class IccBqlTankPositionTrigger : public Trigger
+{
+public:
+    IccBqlTankPositionTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bql tank position") {}
+    bool IsActive() override;
+};
+
+class IccBqlPactOfDarkfallenTrigger : public Trigger
+{
+public:
+    IccBqlPactOfDarkfallenTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bql pact of darkfallen") {}
+    bool IsActive() override;
+};
+
+class IccBqlVampiricBiteTrigger : public Trigger
+{
+public:
+    IccBqlVampiricBiteTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bql vampiric bite") {}
+    bool IsActive() override;
+};
 #endif

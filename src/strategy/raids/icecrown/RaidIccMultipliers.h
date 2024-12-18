@@ -49,4 +49,19 @@ public:
     float GetValue(Action* action) override;
 };
 
+class IccBqlPactOfDarkfallenMultiplier : public Multiplier
+{
+public:
+    IccBqlPactOfDarkfallenMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "pact of darkfallen multiplier") {}
+
+    float GetValue(Action* action) override;
+};
+
+class IccBqlVampiricBiteMultiplier : public Multiplier
+{
+public:
+    IccBqlVampiricBiteMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc bql vampiric bite") {}
+    virtual float GetValue(Action* action);
+};
+
 #endif

@@ -403,3 +403,37 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
 
     return false;
 }
+
+//BQL
+bool IccBqlTankPositionTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
+    if (!boss || !(botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsRanged(bot))) 
+        return false;
+
+    return true;
+}
+
+bool IccBqlPactOfDarkfallenTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
+    if (!boss || !bot->HasAura(71340)) 
+        return false;
+
+    return true;
+}
+
+bool IccBqlVampiricBiteTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
+    if (!boss) 
+        return false;
+
+    // Only trigger when bot has Frenzied Bloodthirst
+    if (!bot->HasAura(70877))
+        return false;
+
+    // Add a debug yell when trigger activates
+    bot->Yell("Vampiric Bite Trigger Active!", LANG_UNIVERSAL);
+    return true;
+}

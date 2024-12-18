@@ -34,6 +34,10 @@ public:
         creators["icc bpc nucleus"] = &RaidIccActionContext::icc_bpc_nucleus;
         creators["icc bpc main tank"] = &RaidIccActionContext::icc_bpc_main_tank;
         creators["icc bpc empowered vortex"] = &RaidIccActionContext::icc_bpc_empowered_vortex;
+        creators["icc bql tank position"] = &RaidIccActionContext::icc_bql_tank_position;
+        creators["icc bql pact of darkfallen"] = &RaidIccActionContext::icc_bql_pact_of_darkfallen;
+        creators["icc bql vampiric bite"] = &RaidIccActionContext::icc_bql_vampiric_bite;
+
     }
 
 private:
@@ -61,6 +65,9 @@ private:
     static Action* icc_bpc_nucleus(PlayerbotAI* ai) { return new IccBpcNucleusAction(ai); }
     static Action* icc_bpc_main_tank(PlayerbotAI* ai) { return new IccBpcMainTankAction(ai); }
     static Action* icc_bpc_empowered_vortex(PlayerbotAI* botAI) { return new IccBpcEmpoweredVortexAction(botAI); }
+    static Action* icc_bql_tank_position(PlayerbotAI* ai) { return new IccBqlTankPositionAction(ai); }
+    static Action* icc_bql_pact_of_darkfallen(PlayerbotAI* ai) { return new IccBqlPactOfDarkfallenAction(ai); }
+    static Action* icc_bql_vampiric_bite(PlayerbotAI* ai) { return new IccBqlVampiricBiteAction(ai); }
 };
 
 #endif
