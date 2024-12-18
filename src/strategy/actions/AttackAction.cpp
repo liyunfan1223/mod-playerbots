@@ -74,6 +74,7 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     {
         return false;
     }
+
     std::ostringstream msg;
     msg << target->GetName();
 
@@ -88,9 +89,11 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
 
     if (!bot->IsWithinLOSInMap(target))
     {
-        msg << " is not on my sight";
+        msg << " is not in my sight";
         if (verbose)
             botAI->TellError(msg.str());
+        
+        return false;
     }
 
     if (target->isDead())
@@ -98,6 +101,15 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
         msg << " is dead";
         if (verbose)
             botAI->TellError(msg.str());
+
+        return false;
+    }
+
+    if (sPlayerbotAIConfig->IsInPvpProhibitedZone(bot->GetZoneId())
+        && (target->IsPlayer() || target->IsPet() || !bot->IsValidAttackTarget(target)))
+    {
+        if (verbose)
+            botAI->TellError("I cannot attack others in PvP prohibited zones");
 
         return false;
     }
