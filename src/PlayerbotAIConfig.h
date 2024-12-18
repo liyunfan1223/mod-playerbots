@@ -263,20 +263,20 @@ public:
     bool disableRandomLevels;
     uint32 playerbotsXPrate;
     bool disableDeathKnightLogin;
+
     uint32 botActiveAlone;
+    uint32 BotActiveAloneForceWhenInRadius;
+    bool BotActiveAloneForceWhenInZone;
+    bool BotActiveAloneForceWhenInMap;
+    bool BotActiveAloneForceWhenIsFriend;
+    bool BotActiveAloneForceWhenInGuild; 
 
     bool botActiveAloneSmartScale;
     uint32 botActiveAloneSmartScaleWhenMinLevel;
     uint32 botActiveAloneSmartScaleWhenMaxLevel;
-    uint32 botActiveAloneDiffMethod;
-    uint32 botActiveAloneDiffLimitFloor;
-    uint32 botActiveAloneDiffLimitCeiling;
-    uint32 BotActiveAloneForceWhenInRadius;
-
-    bool BotActiveAloneForceWhenInZone;
-    bool BotActiveAloneForceWhenInMap;
-    bool BotActiveAloneForceWhenIsFriend;
-    bool BotActiveAloneForceWhenInGuild;    
+    uint32 botActiveAloneSmartScaleDiffMethod;
+    uint32 botActiveAloneSmartScaleDiffLimitFloor;
+    uint32 botActiveAloneSmartScaleDiffLimitCeiling;
 
     bool freeMethodLoot;
     int32 lootRollLevel;
