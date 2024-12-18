@@ -661,7 +661,7 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
     {
         // Move non-tanks inside
         return MoveInside(
-            RazorscaleBossHelper::ULDUAR_MAP_ID,
+            ULDUAR_MAP_ID,
             RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
             RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y,
             bot->GetPositionZ(),
@@ -687,7 +687,7 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
 
     // Move main tank inside
     return MoveInside(
-        RazorscaleBossHelper::ULDUAR_MAP_ID,
+        ULDUAR_MAP_ID,
         RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
         RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y,
         bot->GetPositionZ(),
@@ -843,7 +843,7 @@ bool RazorscaleGroundedAction::Execute(Event event)
             // If at the initial landing position, use 12-yard radius with a
             // 20 yard offset on the Y axis so everyone is behind the boss
             return MoveInside(
-                RazorscaleBossHelper::ULDUAR_MAP_ID,
+                ULDUAR_MAP_ID,
                 RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
                 RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y - 20.0f,
                 bot->GetPositionZ(),
@@ -854,7 +854,7 @@ bool RazorscaleGroundedAction::Execute(Event event)
 
         // Otherwise, move inside a 12-yard radius around the arena center
         return MoveInside(
-            RazorscaleBossHelper::ULDUAR_MAP_ID,
+            ULDUAR_MAP_ID,
             RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
             RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y,
             bot->GetPositionZ(),
