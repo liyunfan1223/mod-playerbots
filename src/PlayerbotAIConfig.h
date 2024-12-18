@@ -264,14 +264,19 @@ public:
     uint32 playerbotsXPrate;
     bool disableDeathKnightLogin;
     uint32 botActiveAlone;
-    uint32 BotActiveAloneWhenInRadius;
-    bool BotActiveAloneForceWhenInZone;
-    bool BotActiveAloneForceWhenInMap;
-    bool BotActiveAloneForceWhenIsFriend;
-    bool BotActiveAloneForceWhenInGuild;
+
     bool botActiveAloneSmartScale;
     uint32 botActiveAloneSmartScaleWhenMinLevel;
     uint32 botActiveAloneSmartScaleWhenMaxLevel;
+    uint32 botActiveAloneDiffMethod;
+    uint32 botActiveAloneDiffLimitFloor;
+    uint32 botActiveAloneDiffLimitCeiling;
+    uint32 BotActiveAloneForceWhenInRadius;
+
+    bool BotActiveAloneForceWhenInZone;
+    bool BotActiveAloneForceWhenInMap;
+    bool BotActiveAloneForceWhenIsFriend;
+    bool BotActiveAloneForceWhenInGuild;    
 
     bool freeMethodLoot;
     int32 lootRollLevel;
@@ -287,6 +292,7 @@ public:
     bool autoUpgradeEquip;
     bool autoLearnTrainerSpells;
     bool autoDoQuests;
+    bool enableNewRpgStrategy;
     bool syncLevelWithPlayers;
     bool freeFood;
     bool autoLearnQuestSpells;

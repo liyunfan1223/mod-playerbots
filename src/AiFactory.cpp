@@ -631,7 +631,11 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             // nonCombatEngine->addStrategy("group");
             // nonCombatEngine->addStrategy("guild");
 
-            if (sPlayerbotAIConfig->autoDoQuests)
+            if (sPlayerbotAIConfig->enableNewRpgStrategy)
+            {
+                nonCombatEngine->addStrategy("new rpg", false);
+            }
+            else if (sPlayerbotAIConfig->autoDoQuests)
             {
                 // nonCombatEngine->addStrategy("travel");
                 nonCombatEngine->addStrategy("rpg", false);

@@ -596,6 +596,11 @@ AiPlayerbot.RandomBotGroupNearby = 0
 # Default: 1 (enabled)
 AiPlayerbot.AutoDoQuests = 1
 
+# Random Bots will behave more like real players (exprimental)
+# This option will override AutoDoQuests
+# Default: 0 (disabled)
+AiPlayerbot.EnableNewRpgStrategy = 0
+
 # Quest items to leave (do not destroy)
 AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000"
 
@@ -717,10 +722,10 @@ AiPlayerbot.RandomBotArenaTeamMinRating = 1000
 AiPlayerbot.DeleteRandomBotArenaTeams = 0
 
 # PvP Restricted Zones (bots don't pvp)
-AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298"
+AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,139"
 
 # PvP Restricted Areas (bots don't pvp)
-AiPlayerbot.PvpProhibitedAreaIds = "976,35,392"
+AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268"
 
 # Improve react speed in battleground and arena (may cause lag)
 AiPlayerbot.FastReactInBG = 1
@@ -1525,9 +1530,19 @@ AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 # Specify smart scaling is enabled or not.
 # The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
 # Only when botLevel is between WhenMinLevel and WhenMaxLevel.
+#
+# AiPlayerbot.botActiveAloneDiff
+#   Method: 1 - Check against average Diff
+#   Method: 2 - Check against Max Diff (spikes)
+#
+#   LimitFloor - No active bot decrease below this DIFF
+#   LimitCeiling - Max active bot decrease above this DIFF
 AiPlayerbot.botActiveAloneSmartScale = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
+AiPlayerbot.botActiveAloneDiffMethod = 2
+AiPlayerbot.botActiveAloneDiffLimitFloor = 40
+AiPlayerbot.botActiveAloneDiffLimitCeiling = 150
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
@@ -1537,7 +1552,6 @@ AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
 AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
 AiPlayerbot.MinRandomBotChangeStrategyTime = 180
 AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
-
 
 # How often tasks are changed
 AiPlayerbot.MinGuildTaskChangeTime = 172800

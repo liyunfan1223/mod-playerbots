@@ -106,6 +106,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("reputation");
     supported.push_back("log");
     supported.push_back("los");
+    supported.push_back("rpg status");
     supported.push_back("aura");
     supported.push_back("drop");
     supported.push_back("share");

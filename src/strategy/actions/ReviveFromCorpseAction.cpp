@@ -188,7 +188,7 @@ bool FindCorpseAction::Execute(Event event)
 
             if (!moved)
             {
-                moved = botAI->DoSpecificAction("spirit healer");
+                moved = botAI->DoSpecificAction("spirit healer", Event(), true);
             }
         }
     }
@@ -347,16 +347,16 @@ bool SpiritHealerAction::Execute(Event event)
     if (moved)
         return true;
 
-    if (!botAI->HasActivePlayerMaster())
-    {
-        context->GetValue<uint32>("death count")->Set(dCount + 1);
-        return bot->TeleportTo(ClosestGrave->Map, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, 0.f);
-    }
+    // if (!botAI->HasActivePlayerMaster())
+    // {
+    context->GetValue<uint32>("death count")->Set(dCount + 1);
+    return bot->TeleportTo(ClosestGrave->Map, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, 0.f);
+    // }
 
-    LOG_INFO("playerbots", "Bot {} {}:{} <{}> can't find a spirit healer", bot->GetGUID().ToString().c_str(),
-             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
+    // LOG_INFO("playerbots", "Bot {} {}:{} <{}> can't find a spirit healer", bot->GetGUID().ToString().c_str(),
+    //          bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
 
-    botAI->TellError("Cannot find any spirit healer nearby");
+    // botAI->TellError("Cannot find any spirit healer nearby");
     return false;
 }
 
