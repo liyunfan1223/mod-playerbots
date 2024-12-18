@@ -3,17 +3,22 @@
 
 #include <cmath>
 
+#include "AiObjectContext.h"
 #include "DBCEnums.h"
 #include "GameObject.h"
+#include "Group.h"
 #include "LastMovementValue.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
+#include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
+#include "Player.h"
 #include "Playerbots.h"
 #include "Position.h"
 #include "RaidUlduarBossHelper.h"
 #include "RaidUlduarScripts.h"
 #include "RaidUlduarStrategy.h"
+#include "RtiValue.h"
 #include "ScriptedCreature.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
@@ -392,4 +397,626 @@ bool FlameLeviathanEnterVehicleAction::AllMainVehiclesOnUse()
     Difficulty diff = bot->GetRaidDifficulty();
     int maxC = (diff == RAID_DIFFICULTY_10MAN_NORMAL || diff == RAID_DIFFICULTY_10MAN_HEROIC) ? 2 : 5;
     return demolisher >= maxC && siege >= maxC;
+}
+bool RazorscaleAvoidDevouringFlameAction::Execute(Event event)
+{
+    RazorscaleBossHelper razorscaleHelper(botAI);
+
+    if (!razorscaleHelper.UpdateBossAI())
+    {
+        return false;
+    }
+
+    bool isMainTank = botAI->IsMainTank(bot);
+    const float flameRadius = 3.5f;
+
+    // Main tank moves further so they can hold adds away from flames, but only during the air phases
+    const float safeDistanceMultiplier = (isMainTank && !razorscaleHelper.IsGroundPhase()) ? 2.3f : 1.0f;
+    const float safeDistance = flameRadius * safeDistanceMultiplier;
+
+    // Get the boss
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss)
+    {
+        return false;
+    }
+
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    Unit* closestFlame = nullptr;
+    float closestDistance = std::numeric_limits<float>::max();
+
+    // Find the closest Devouring Flame
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->GetEntry() == RazorscaleBossHelper::UNIT_DEVOURING_FLAME)
+        {
+            float distance = bot->GetDistance2d(unit);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestFlame = unit;
+            }
+        }
+    }
+
+    // Handle movement from flames
+    if (closestDistance < safeDistance)
+    {
+        return MoveAway(closestFlame, safeDistance);
+    }
+    return false;
+}
+
+bool RazorscaleAvoidDevouringFlameAction::isUseful()
+{
+    bool isMainTank = botAI->IsMainTank(bot);
+
+    const float flameRadius = 3.5f;
+    const float safeDistanceMultiplier = isMainTank ? 2.3f : 1.0f;
+    const float safeDistance = flameRadius * safeDistanceMultiplier;
+
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->GetEntry() == RazorscaleBossHelper::UNIT_DEVOURING_FLAME)
+        {
+            float distance = bot->GetDistance2d(unit);
+            if (distance < safeDistance)
+            {
+                return true; // Bot is within the danger distance
+            }
+        }
+    }
+
+    return false; // No nearby flames or bot is at a safe distance
+}
+
+bool RazorscaleAvoidSentinelAction::Execute(Event event)
+{
+    bool isTank = botAI->IsTank(bot);
+    bool isMainTank = botAI->IsMainTank(bot);
+    if (isTank && !isMainTank)
+    {
+        return false;
+    }
+
+    bool isRanged = botAI->IsRanged(bot);
+    const float radius = 8.0f;
+
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+
+    Unit* lowestHealthSentinel = nullptr;
+    uint32 lowestHealth = UINT32_MAX;
+    bool movedAway = false;
+
+    // Iterate through all nearby NPCs
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->GetEntry() == RazorscaleBossHelper::UNIT_DARK_RUNE_SENTINEL)
+        {
+            // Check if this sentinel has the lowest health
+            if (unit->GetHealth() < lowestHealth)
+            {
+                lowestHealth = unit->GetHealth();
+                lowestHealthSentinel = unit;
+            }
+
+            // Move away if ranged and too close
+            if (isRanged && bot->GetDistance2d(unit) < radius)
+            {
+                movedAway = MoveAway(unit, radius) || movedAway;
+            }
+        }
+    }
+
+    // Mark the lowest-health sentinel with Skull if main tank
+    if (isMainTank && lowestHealthSentinel)
+    {
+        Group* group = bot->GetGroup();
+        if (group)
+        {
+            int8 skullIndex = 7; // Skull
+            ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
+            if (currentSkullTarget && lowestHealthSentinel->GetGUID() != currentSkullTarget)
+            {
+                group->SetTargetIcon(skullIndex, bot->GetGUID(), lowestHealthSentinel->GetGUID());
+            }
+        }
+    }
+
+    return movedAway; // Return true if moved
+}
+
+bool RazorscaleAvoidSentinelAction::isUseful()
+{
+    bool isTank = botAI->IsTank(bot);
+    bool isMainTank = botAI->IsMainTank(bot);
+    if (isTank && !isMainTank)
+    {
+        return false;
+    }
+
+    // Main tank always tries to mark sentinel
+    if (isMainTank)
+    {
+        return true;
+    }
+
+    bool isRanged = botAI->IsRanged(bot);
+    const float radius = 8.0f; 
+
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->GetEntry() == RazorscaleBossHelper::UNIT_DARK_RUNE_SENTINEL)
+        {
+            if (isRanged && bot->GetDistance2d(unit) < radius)
+            {
+                return true; 
+            }
+        }
+    }
+
+    return false;
+}
+
+bool RazorscaleAvoidWhirlwindAction::Execute(Event event)
+{
+    if (botAI->IsTank(bot))
+    {
+        return false;
+    }
+
+    const float radius = 8.0f;
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->GetEntry() == RazorscaleBossHelper::UNIT_DARK_RUNE_SENTINEL)
+        {
+            float currentDistance = bot->GetDistance2d(unit);
+            if (currentDistance < radius)
+            {
+                return MoveAway(unit, radius);
+            }
+        }
+    }
+    return false;
+}
+
+bool RazorscaleAvoidWhirlwindAction::isUseful()
+{
+    // Tanks do not avoid Whirlwind
+    if (botAI->IsTank(bot))
+    {
+        return false;
+    }
+
+    const float radius = 8.0f;
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->GetEntry() == RazorscaleBossHelper::UNIT_DARK_RUNE_SENTINEL)
+        {
+            if (unit->HasAura(RazorscaleBossHelper::SPELL_SENTINEL_WHIRLWIND) || unit->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            {
+                if (bot->GetDistance2d(unit) < radius)
+                {
+                    return true; 
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool RazorscaleIgnoreBossAction::isUseful()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss)
+    {
+        return false; 
+    }
+
+    // Check if the boss is flying
+    if (boss->GetPositionZ() >= RazorscaleBossHelper::RAZORSCALE_FLYING_Z_THRESHOLD)
+    {
+        bool isMainTank = botAI->IsMainTank(bot);
+        // Check if the bot is outside the designated area
+        if (bot->GetDistance2d(RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X, RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y) > RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS + 25.0f)
+        {
+            return true;
+        }
+        // Check moon mark if main tank
+        if (isMainTank)
+        {
+            Group* group = bot->GetGroup();
+            if (group)
+            {
+                int8 moonIndex = 4;
+                ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+                return currentMoonTarget != boss->GetGUID();
+            }
+        }
+    }
+    return false;
+}
+
+bool RazorscaleIgnoreBossAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss)
+    {
+        return false; 
+    }
+
+    bool isMainTank = botAI->IsMainTank(bot);
+    if (!isMainTank)
+    {
+        // Move non-tanks inside
+        return MoveInside(
+            RazorscaleBossHelper::ULDUAR_MAP_ID,
+            RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
+            RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y,
+            bot->GetPositionZ(),
+            RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS - 10.0f,
+            MovementPriority::MOVEMENT_NORMAL
+        );
+    }
+
+    Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
+    // Assign moon rti to boss
+    int8 moonIndex = 4;
+    ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+    if (currentMoonTarget != boss->GetGUID())
+    {
+        group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
+        SetNextMovementDelay(1000);
+    }
+
+    // Move main tank inside
+    return MoveInside(
+        RazorscaleBossHelper::ULDUAR_MAP_ID,
+        RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
+        RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y,
+        bot->GetPositionZ(),
+        RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS - 10.0f,
+        MovementPriority::MOVEMENT_NORMAL
+    );
+}
+
+bool RazorscaleGroundedAction::isUseful()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss || !boss->IsAlive() || boss->GetPositionZ() > RazorscaleBossHelper::RAZORSCALE_FLYING_Z_THRESHOLD)
+    {
+        return false;
+    }
+
+    if (botAI->IsMainTank(bot))
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+            return false;
+
+        // Check if the boss is marked with Moon
+        int8 moonIndex = 4;
+        ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+
+        // Useful only if the boss is currently marked with Moon
+        return currentMoonTarget == boss->GetGUID();
+    }
+
+    if (botAI->IsTank(bot) && !botAI->IsMainTank(bot))
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+            return false;
+
+        // Find the main tank
+        Player* mainTank = nullptr;
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (member && botAI->IsMainTank(member))
+            {
+                mainTank = member;
+                break;
+            }
+        }
+
+        if (mainTank)
+        {
+            constexpr float maxDistance = 2.0f; 
+            float distanceToMainTank = bot->GetDistance2d(mainTank);
+            return (distanceToMainTank > maxDistance);
+        }
+    }
+
+    if (botAI->IsMelee(bot))
+    {
+        return false;
+    }
+
+    if (botAI->IsRanged(bot))
+    {
+        constexpr float landingX = 588.0f;
+        constexpr float landingY = -166.0f;
+        constexpr float landingZ = 391.1f;
+
+        float bossX = boss->GetPositionX();
+        float bossY = boss->GetPositionY();
+        float bossZ = boss->GetPositionZ();
+
+        bool atInitialLandingPosition = (fabs(bossX - landingX) < 2.0f) &&
+                                        (fabs(bossY - landingY) < 2.0f) &&
+                                        (fabs(bossZ - landingZ) < 1.0f);
+
+        constexpr float initialLandingRadius = 14.0f;
+        constexpr float normalRadius = 12.0f;
+
+        if (atInitialLandingPosition)
+        {
+            float adjustedCenterX = RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X;
+            float adjustedCenterY = RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y - 20.0f;
+
+            float distanceToAdjustedCenter = bot->GetDistance2d(adjustedCenterX, adjustedCenterY);
+            return distanceToAdjustedCenter > initialLandingRadius;
+        }
+
+        float distanceToCenter = bot->GetDistance2d(RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X, RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y);
+        return distanceToCenter > normalRadius;
+    }
+
+    return false;
+}
+
+bool RazorscaleGroundedAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss || !boss->IsAlive() || boss->GetPositionZ() > RazorscaleBossHelper::RAZORSCALE_FLYING_Z_THRESHOLD)
+        return false;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    if (botAI->IsMainTank(bot))
+    {
+        int8 moonIndex = 4;
+        ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+        if (currentMoonTarget == boss->GetGUID())
+        {
+            group->SetTargetIcon(moonIndex, bot->GetGUID(), ObjectGuid::Empty);
+            SetNextMovementDelay(1000);
+            return true;
+        }
+    }
+
+    if (botAI->IsTank(bot))
+    {
+        Player* mainTank = nullptr;
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (member && botAI->IsMainTank(member))
+            {
+                mainTank = member;
+                break;
+            }
+        }
+
+        if (mainTank)
+        {
+            constexpr float followDistance = 2.0f;
+            return MoveNear(mainTank, followDistance, MovementPriority::MOVEMENT_COMBAT);
+        }
+    }
+
+    if (botAI->IsRanged(bot))
+    {
+        constexpr float landingX = 588.0f;
+        constexpr float landingY = -166.0f;
+        constexpr float landingZ = 391.1f;
+
+        float bossX = boss->GetPositionX();
+        float bossY = boss->GetPositionY();
+        float bossZ = boss->GetPositionZ();
+
+        bool atInitialLandingPosition = (fabs(bossX - landingX) < 2.0f) &&
+                                        (fabs(bossY - landingY) < 2.0f) &&
+                                        (fabs(bossZ - landingZ) < 1.0f);
+
+        if (atInitialLandingPosition)
+        {
+            // If at the initial landing position, use 12-yard radius with a
+            // 20 yard offset on the Y axis so everyone is behind the boss
+            return MoveInside(
+                RazorscaleBossHelper::ULDUAR_MAP_ID,
+                RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
+                RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y - 20.0f,
+                bot->GetPositionZ(),
+                RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS - 12.0f,
+                MovementPriority::MOVEMENT_COMBAT
+            );
+        }
+
+        // Otherwise, move inside a 12-yard radius around the arena center
+        return MoveInside(
+            RazorscaleBossHelper::ULDUAR_MAP_ID,
+            RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
+            RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y,
+            bot->GetPositionZ(),
+            12.0f,
+            MovementPriority::MOVEMENT_COMBAT
+        );
+    }
+    return false;
+}
+
+bool RazorscaleHarpoonAction::Execute(Event event)
+{
+    RazorscaleBossHelper razorscaleHelper(botAI);
+
+    // Update the boss AI context
+    if (!razorscaleHelper.UpdateBossAI())
+        return false;
+
+    Unit* boss = razorscaleHelper.GetBoss();
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Retrieve harpoon data from the helper
+    const std::vector<RazorscaleBossHelper::HarpoonData>& harpoonData = razorscaleHelper.GetHarpoonData();
+
+    GameObject* closestHarpoon = nullptr;
+    float minDistance = std::numeric_limits<float>::max();
+
+    // Find the nearest harpoon that hasn't been fired and is not on cooldown
+    for (const auto& harpoon : harpoonData)
+    {
+        if (razorscaleHelper.IsHarpoonFired(harpoon.chainSpellId))
+            continue;
+
+        if (GameObject* harpoonGO = bot->FindNearestGameObject(harpoon.gameObjectEntry, 200.0f))
+        {
+            if (RazorscaleBossHelper::IsHarpoonReady(harpoonGO))
+            {
+                float distance = bot->GetDistance2d(harpoonGO);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestHarpoon = harpoonGO;
+                }
+            }
+        }
+    }
+
+    if (!closestHarpoon)
+        return false;
+
+    // Find the nearest ranged DPS (not a healer) to the harpoon
+    Player* closestRangedDPS = nullptr;
+    minDistance = std::numeric_limits<float>::max();
+    GuidVector groupBots = AI_VALUE(GuidVector, "group members");
+
+    for (auto& guid : groupBots)
+    {
+        Player* member = ObjectAccessor::FindPlayer(guid);
+        if (member && member->IsAlive() && botAI->IsRanged(member) && botAI->IsDps(member) && !botAI->IsHeal(member))
+        {
+            float distance = member->GetDistance2d(closestHarpoon);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestRangedDPS = member;
+            }
+        }
+    }
+
+    // Only proceed if this bot is the closest ranged DPS
+    if (closestRangedDPS != bot)
+        return false;
+
+    float botDist = bot->GetDistance(closestHarpoon);
+    if (botDist > INTERACTION_DISTANCE - 1.0f)
+    {
+        return MoveTo(bot->GetMapId(),
+                      closestHarpoon->GetPositionX(),
+                      closestHarpoon->GetPositionY(),
+                      closestHarpoon->GetPositionZ());
+    }
+
+    SetNextMovementDelay(1000);
+
+    // Interact with the harpoon
+    {
+        WorldPacket usePacket(CMSG_GAMEOBJ_USE);
+        usePacket << closestHarpoon->GetGUID();
+        bot->GetSession()->HandleGameObjectUseOpcode(usePacket);
+    }
+
+    {
+        WorldPacket reportPacket(CMSG_GAMEOBJ_REPORT_USE);
+        reportPacket << closestHarpoon->GetGUID();
+        bot->GetSession()->HandleGameobjectReportUse(reportPacket);
+    }
+
+    RazorscaleBossHelper::SetHarpoonOnCooldown(closestHarpoon);
+
+    return true;
+}
+
+bool RazorscaleHarpoonAction::isUseful()
+{
+    RazorscaleBossHelper razorscaleHelper(botAI);
+
+    // Update the boss AI context to ensure we have the latest info
+    if (!razorscaleHelper.UpdateBossAI())
+        return false;
+
+    Unit* boss = razorscaleHelper.GetBoss();
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    const std::vector<RazorscaleBossHelper::HarpoonData>& harpoonData = razorscaleHelper.GetHarpoonData();
+
+    for (const auto& harpoon : harpoonData)
+    {
+        if (razorscaleHelper.IsHarpoonFired(harpoon.chainSpellId))
+            continue;
+
+        if (GameObject* harpoonGO = bot->FindNearestGameObject(harpoon.gameObjectEntry, 200.0f))
+        {
+            if (RazorscaleBossHelper::IsHarpoonReady(harpoonGO))
+            {
+                // Check if this bot is a ranged DPS (not a healer)
+                if (botAI->IsRanged(bot) && botAI->IsDps(bot) && !botAI->IsHeal(bot))
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool RazorscaleFuseArmorAction::isUseful()
+{
+    if (!botAI->IsMainTank(bot))
+        return false;
+
+    Aura* fuseArmor = bot->GetAura(RazorscaleBossHelper::SPELL_FUSEARMOR);
+    if (!fuseArmor)
+        return false;
+
+    return fuseArmor->GetStackAmount() >= RazorscaleBossHelper::FUSEARMOR_THRESHOLD;
+}
+
+bool RazorscaleFuseArmorAction::Execute(Event event)
+{
+    if (!botAI->IsMainTank(bot))
+    {
+        return false;
+    }
+
+    RazorscaleBossHelper bossHelper(botAI);
+    bossHelper.AssignRolesBasedOnHealth();
+
+    // Check if the bot is still the main tank after reassignment
+    if (botAI->IsMainTank(bot))
+    {
+        return false;
+    }
+    return true;
 }
