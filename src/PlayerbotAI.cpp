@@ -4352,10 +4352,22 @@ bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
 
 uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 {
-    uint32 maxDiff = sWorldUpdateTime.GetAverageUpdateTime();
+    uint32 diffLimitFloor = sPlayerbotAIConfig->botActiveAloneSmartScaleDiffLimitFloor;
+    uint32 diffLimitCeil = sPlayerbotAIConfig->botActiveAloneSmartScaleDiffLimitCeiling;
+    uint32 chkDiff = (sPlayerbotAIConfig->botActiveAloneSmartScaleDiffMethod == 2) 
+        ? sWorldUpdateTime.GetMaxUpdateTime() 
+        : sWorldUpdateTime.GetAverageUpdateTime();
 
-    if (maxDiff > 500) return 0;
-    if (maxDiff > 250)
+    if (diffLimitFloor > diffLimitCeil)
+        diffLimitFloor = diffLimitCeil;
+
+    if (chkDiff <= diffLimitFloor) return mod;
+    if (chkDiff >= diffLimitCeil) return 0;
+
+    uint32 diffRange = diffLimitCeil - diffLimitFloor;
+    double spread = (double)diffRange / 5;  // Calculate the equal spread between each number /w 5 steps
+
+    if (chkDiff > diffLimitFloor + (4 * spread))
     {
         if (Map* map = bot->GetMap())
         {
@@ -4375,10 +4387,10 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
 
         return (mod * 1) / 10;
     }
-    if (maxDiff > 200) return (mod * 3) / 10;
-    if (maxDiff > 150) return (mod * 5) / 10;
-    if (maxDiff > 100) return (mod * 6) / 10;
-    if (maxDiff > 75)  return (mod * 9) / 10;
+    if (chkDiff > diffLimitFloor + (3 * spread)) return (mod * 2) / 10;
+    if (chkDiff > diffLimitFloor + (2 * spread)) return (mod * 4) / 10;
+    if (chkDiff > diffLimitFloor + (1 * spread)) return (mod * 7) / 10;
+    if (chkDiff > diffLimitFloor + (0 * spread)) return (mod * 9) / 10;
 
     return mod;
 }

@@ -476,10 +476,11 @@ bool PlayerbotAIConfig::Initialize()
     BotActiveAloneForceWhenIsFriend = sConfigMgr->GetOption<bool>("AiPlayerbot.BotActiveAloneForceWhenIsFriend", 1);
     BotActiveAloneForceWhenInGuild = sConfigMgr->GetOption<bool>("AiPlayerbot.BotActiveAloneForceWhenInGuild", 1);
     botActiveAloneSmartScale = sConfigMgr->GetOption<bool>("AiPlayerbot.botActiveAloneSmartScale", 1);
-    botActiveAloneSmartScaleWhenMinLevel =
-        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel", 1);
-    botActiveAloneSmartScaleWhenMaxLevel =
-        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel", 80);
+    botActiveAloneSmartScaleDiffMethod = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAloneSmartScaleDiffMethod", 2);
+    botActiveAloneSmartScaleDiffLimitFloor = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAloneSmartScaleDiffLimitFloor", 40);
+    botActiveAloneSmartScaleDiffLimitCeiling = sConfigMgr->GetOption<int32>("AiPlayerbot.BotActiveAloneSmartScaleDiffLimitCeiling", 150);
+    botActiveAloneSmartScaleWhenMinLevel = sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel", 1);
+    botActiveAloneSmartScaleWhenMaxLevel = sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel", 80);
 
     randombotsWalkingRPG = sConfigMgr->GetOption<bool>("AiPlayerbot.RandombotsWalkingRPG", false);
     randombotsWalkingRPGInDoors = sConfigMgr->GetOption<bool>("AiPlayerbot.RandombotsWalkingRPG.InDoors", false);
