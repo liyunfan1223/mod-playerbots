@@ -207,7 +207,10 @@ void PlayerbotFactory::Randomize(bool incremental)
     Prepare();
     LOG_DEBUG("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
-    bot->resetTalents(true);
+    if (!sPlayerbotAIConfig->equipmentPersistence || level < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    {
+        bot->resetTalents(true);
+    }
     // bot->SaveToDB(false, false);
     ClearSkills();
     // bot->SaveToDB(false, false);
@@ -267,7 +270,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
     LOG_DEBUG("playerbots", "Initializing talents...");
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitTalentsTree();
     }
@@ -302,7 +305,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
     LOG_DEBUG("playerbots", "Initializing equipmemt...");
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitEquipment(incremental, incremental ? false : sPlayerbotAIConfig->twoRoundsGearInit);
     }
