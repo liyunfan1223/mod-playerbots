@@ -151,6 +151,9 @@ bool LfgJoinAction::JoinLFG()
     // Set RbotAId Browser comment
     std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot, false, false));
     
+    // JoinLfg is not threadsafe, so make packet and queue into session
+    // sLFGMgr->JoinLfg(bot, roleMask, list, _gs);
+
     WorldPacket* data = new WorldPacket(CMSG_LFG_JOIN);
     *data << (uint32)roleMask;
     *data << (bool)false;
