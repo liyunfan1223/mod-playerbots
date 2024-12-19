@@ -396,6 +396,10 @@ bool IccGunshipTeleportAllyAction::Execute(Event event)
     if (!boss)
         return false;
 
+    // Only target the mage that is channeling Below Zero
+    if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
+        return false;
+
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
     if (bot->GetTarget() != boss->GetGUID())
@@ -412,6 +416,10 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "skybreaker sorcerer");
     if (!boss)
+        return false;
+
+    // Only target the sorcerer that is channeling Below Zero
+    if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
         return false;
 
     bot->SetTarget(boss->GetGUID());
