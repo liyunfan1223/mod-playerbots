@@ -28,6 +28,13 @@ public:
     bool IsActive() override;
 };
 
+class IccRangedPositionLadyDeathwhisperTrigger : public Trigger
+{
+public:
+    IccRangedPositionLadyDeathwhisperTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc ranged position lady deathwhisper") {}
+    bool IsActive() override;
+};
+
 class IccAddsLadyDeathwhisperTrigger : public Trigger
 {
 public:

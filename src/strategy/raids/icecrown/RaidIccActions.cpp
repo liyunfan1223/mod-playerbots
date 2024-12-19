@@ -112,6 +112,38 @@ bool IccDarkReckoningAction::Execute(Event event)
     return false;
 }
 
+bool IccRangedPositionLadyDeathwhisperAction::Execute(Event event)
+{
+    if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
+    {
+    float radius = 5.0f;
+    float moveIncrement = 3.0f;
+    bool isRanged = botAI->IsRanged(bot);
+
+    GuidVector members = AI_VALUE(GuidVector, "group members");
+    if (isRanged)
+    {
+        // Ranged: spread from other members
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit || !unit->IsAlive() || unit == bot)
+                continue;
+
+            float dist = bot->GetExactDist2d(unit);
+            if (dist < radius)
+            {
+                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
+                return MoveAway(unit, moveDistance);
+            }
+        }
+    }
+
+    return false;  // Everyone is in position
+    }
+    return false;
+}
+
 bool IccAddsLadyDeathwhisperAction::Execute(Event event)
 {
     if (botAI->IsMainTank(bot) || botAI->IsHeal(bot))
@@ -193,13 +225,17 @@ bool IccShadeLadyDeathwhisperAction::Execute(Event event)
     for (auto& npc : npcs)
     {
         Unit* unit = botAI->GetUnit(npc);
-        if (unit && unit->GetEntry() == 38222) //vengeful sahde ID
+        if (unit && unit->GetEntry() == 38222) //vengeful shade ID
         {
-            float currentDistance = bot->GetDistance2d(unit);
-            // Move away from the Vengeful Shade if the bot is too close
-            if (currentDistance < radius)
+            // Only run away if the shade is targeting us
+            if (unit->GetVictim() == bot)
             {
-                return MoveAway(unit, radius - currentDistance);
+                float currentDistance = bot->GetDistance2d(unit);
+                // Move away from the Vengeful Shade if the bot is too close
+                if (currentDistance < radius)
+                {
+                    return MoveAway(unit, radius - currentDistance);
+                }
             }
         }
     }
@@ -221,7 +257,7 @@ bool IccRottingFrostGiantTankPositionAction::Execute(Event event)
                           false, false, true, MovementPriority::MOVEMENT_NORMAL);
     }
 
-    float radius = 5.0f;
+    float radius = 10.0f;
     float distanceExtra = 2.0f;
 
     GuidVector members = AI_VALUE(GuidVector, "group members");

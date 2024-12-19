@@ -20,7 +20,8 @@ bool IccLmTankPositionTrigger::IsActive()
 bool IccSpikeNearTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "lord marrowgar");
-    if (!boss) { return false; }
+    if (!boss) 
+        return false;
 
     return botAI->IsRangedDps(bot);
 }
@@ -29,9 +30,19 @@ bool IccSpikeNearTrigger::IsActive()
 bool IccDarkReckoningTrigger::IsActive()
 {
     Unit* add = AI_VALUE2(Unit*, "find target", "deathspeaker high priest");
-    if (add || bot->HasAura(69483)) { return true; }
+    if (add || bot->HasAura(69483)) 
+        return true;
 
     return false;
+}
+
+bool IccRangedPositionLadyDeathwhisperTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "lady deathwhisper");
+    if (!boss) 
+        return false;
+
+    return (botAI->IsRangedDps(bot) || botAI->IsHeal(bot));
 }
 
 bool IccAddsLadyDeathwhisperTrigger::IsActive()

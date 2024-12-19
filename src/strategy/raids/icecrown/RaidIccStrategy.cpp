@@ -15,6 +15,9 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("icc dark reckoning",
         NextAction::array(0, new NextAction("icc dark reckoning", ACTION_MOVE + 5), nullptr)));
 
+    triggers.push_back(new TriggerNode("icc ranged position lady deathwhisper", 
+        NextAction::array(0, new NextAction("icc ranged position lady deathwhisper", ACTION_MOVE + 2), nullptr)));
+
     triggers.push_back(new TriggerNode("icc adds lady deathwhisper",
         NextAction::array(0, new NextAction("icc adds lady deathwhisper", ACTION_RAID + 3), nullptr)));
 

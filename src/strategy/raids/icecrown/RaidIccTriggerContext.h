@@ -13,6 +13,7 @@ public:
         creators["icc lm tank position"] = &RaidIccTriggerContext::icc_lm_tank_position;
         creators["icc spike near"] = &RaidIccTriggerContext::icc_spike_near;
         creators["icc dark reckoning"] = &RaidIccTriggerContext::icc_dark_reckoning;
+        creators["icc ranged position lady deathwhisper"] = &RaidIccTriggerContext::icc_ranged_position_lady_deathwhisper;
         creators["icc adds lady deathwhisper"] = &RaidIccTriggerContext::icc_adds_lady_deathwhisper;
         creators["icc shade lady deathwhisper"] = &RaidIccTriggerContext::icc_shade_lady_deathwhisper;
         creators["icc rotting frost giant tank position"] = &RaidIccTriggerContext::icc_rotting_frost_giant_tank_position;
@@ -47,6 +48,7 @@ private:
     static Trigger* icc_lm_tank_position(PlayerbotAI* ai) { return new IccLmTankPositionTrigger(ai); }
     static Trigger* icc_spike_near(PlayerbotAI* ai) { return new IccSpikeNearTrigger(ai); }
     static Trigger* icc_dark_reckoning(PlayerbotAI* ai) { return new IccDarkReckoningTrigger(ai); }
+    static Trigger* icc_ranged_position_lady_deathwhisper(PlayerbotAI* ai) { return new IccRangedPositionLadyDeathwhisperTrigger(ai); }
     static Trigger* icc_adds_lady_deathwhisper(PlayerbotAI* ai) { return new IccAddsLadyDeathwhisperTrigger(ai); }
     static Trigger* icc_shade_lady_deathwhisper(PlayerbotAI* ai) { return new IccShadeLadyDeathwhisperTrigger(ai); }
     static Trigger* icc_rotting_frost_giant_tank_position(PlayerbotAI* ai) { return new IccRottingFrostGiantTankPositionTrigger(ai); }

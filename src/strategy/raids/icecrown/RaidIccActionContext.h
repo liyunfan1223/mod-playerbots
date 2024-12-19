@@ -13,6 +13,7 @@ public:
         creators["icc lm tank position"] = &RaidIccActionContext::icc_lm_tank_position; 
         creators["icc spike"] = &RaidIccActionContext::icc_spike;
         creators["icc dark reckoning"] = &RaidIccActionContext::icc_dark_reckoning;
+        creators["icc ranged position lady deathwhisper"] = &RaidIccActionContext::icc_ranged_position_lady_deathwhisper;
         creators["icc adds lady deathwhisper"] = &RaidIccActionContext::icc_adds_lady_deathwhisper;
         creators["icc shade lady deathwhisper"] = &RaidIccActionContext::icc_shade_lady_deathwhisper;
         creators["icc rotting frost giant tank position"] = &RaidIccActionContext::icc_rotting_frost_giant_tank_position;
@@ -37,13 +38,13 @@ public:
         creators["icc bql tank position"] = &RaidIccActionContext::icc_bql_tank_position;
         creators["icc bql pact of darkfallen"] = &RaidIccActionContext::icc_bql_pact_of_darkfallen;
         creators["icc bql vampiric bite"] = &RaidIccActionContext::icc_bql_vampiric_bite;
-
     }
 
 private:
     static Action* icc_lm_tank_position(PlayerbotAI* ai) { return new IccLmTankPositionAction(ai); }
     static Action* icc_spike(PlayerbotAI* ai) { return new IccSpikeAction(ai); }
     static Action* icc_dark_reckoning(PlayerbotAI* ai) { return new IccDarkReckoningAction(ai); }
+    static Action* icc_ranged_position_lady_deathwhisper(PlayerbotAI* ai) { return new IccRangedPositionLadyDeathwhisperAction(ai); }
     static Action* icc_adds_lady_deathwhisper(PlayerbotAI* ai) { return new IccAddsLadyDeathwhisperAction(ai); }
     static Action* icc_shade_lady_deathwhisper(PlayerbotAI* ai) { return new IccShadeLadyDeathwhisperAction(ai); }
     static Action* icc_rotting_frost_giant_tank_position(PlayerbotAI* ai) { return new IccRottingFrostGiantTankPositionAction(ai); }
@@ -68,6 +69,7 @@ private:
     static Action* icc_bql_tank_position(PlayerbotAI* ai) { return new IccBqlTankPositionAction(ai); }
     static Action* icc_bql_pact_of_darkfallen(PlayerbotAI* ai) { return new IccBqlPactOfDarkfallenAction(ai); }
     static Action* icc_bql_vampiric_bite(PlayerbotAI* ai) { return new IccBqlVampiricBiteAction(ai); }
+    
 };
 
 #endif

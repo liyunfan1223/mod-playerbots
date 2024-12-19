@@ -57,6 +57,14 @@ public:
     bool Execute(Event event) override;
 };
 
+class IccRangedPositionLadyDeathwhisperAction : public AttackAction
+{
+public:
+    IccRangedPositionLadyDeathwhisperAction(PlayerbotAI* botAI, std::string const name = "icc ranged position lady deathwhisper")
+        : AttackAction(botAI, name) {}
+    bool Execute(Event event) override;
+};
+
 class IccAddsLadyDeathwhisperAction : public AttackAction
 {
 public:
@@ -260,6 +268,7 @@ public:
             : AttackAction(botAI, "icc bql vampiric bite") {}
     bool Execute(Event event) override;
 };
+
 
 
 #endif
