@@ -452,27 +452,31 @@ bool IccDbsTankPositionAction::Execute(Event event)
 
     if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
     {
-    float radius = 10.0f;
-    Unit* closestMember = nullptr;
+    float radius = 9.0f;
+    float moveIncrement = 3.0f;
+    bool isRanged = botAI->IsRanged(bot);
+
     GuidVector members = AI_VALUE(GuidVector, "group members");
-        
-    for (auto& member : members)
+    if (isRanged)
     {
-        Unit* unit = botAI->GetUnit(member);
-        if (!unit || bot->GetGUID() == member)
+        // Ranged: spread from other members
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit || !unit->IsAlive() || unit == bot || botAI->IsTank(bot) || botAI->IsMelee(bot))
                 continue;
 
-        if (botAI->IsAssistTank(bot))
-            continue;
-
-        if (!closestMember || bot->GetExactDist2d(unit) < bot->GetExactDist2d(closestMember))
-            closestMember = unit;
+            float dist = bot->GetExactDist2d(unit);
+            if (dist < radius)
+            {
+                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
+                return MoveAway(unit, moveDistance);
+            }
+        }
     }
 
-    if (closestMember && bot->GetExactDist2d(closestMember) < radius)
-        return MoveAway(closestMember, 2.0f);
+    return false;  // Everyone is in position
     }
-
     return false;
 }
 
