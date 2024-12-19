@@ -23,6 +23,8 @@ const std::vector<uint32> availableTargets = {
     NPC_SKYBREAKER_SORCERER,        NPC_IGB_MURADIN_BRONZEBEARD
 };
 
+static std::vector<ObjectGuid> sporeOrder;
+
 //Lord Marrowgwar
 bool IccLmTankPositionAction::Execute(Event event)
 {
@@ -549,7 +551,6 @@ bool IccFestergutTankPositionAction::Execute(Event event)
     }
 
     float radius = 10.0f;
-    Unit* closestMember = nullptr;
     GuidVector members = AI_VALUE(GuidVector, "group members");
     
     // First check if any group members have spores
@@ -567,83 +568,99 @@ bool IccFestergutTankPositionAction::Execute(Event event)
     // Only spread out if no spores are active
     if (!sporesPresent && (botAI->IsRanged(bot) || botAI->IsHeal(bot)))
     {
+        // Find closest player (including melee)
+        Unit* closestPlayer = nullptr;
+        float minDist = radius;
+        
         for (auto& member : members)
         {
             Unit* unit = botAI->GetUnit(member);
-            if (!unit || bot->GetGUID() == member)
-            {
+            if (!unit || unit == bot)
                 continue;
-            }
-            if (!closestMember || bot->GetExactDist2d(unit) < bot->GetExactDist2d(closestMember))
+                
+            float dist = bot->GetExactDist2d(unit);
+            if (dist < minDist)
             {
-                closestMember = unit;
+                minDist = dist;
+                closestPlayer = unit;
             }
         }
 
-        if (closestMember && bot->GetExactDist2d(closestMember) < radius)
+        if (closestPlayer)
         {
-            return MoveAway(closestMember, 2.0f);
+            // Move away from closest player, but maintain roughly max range from boss
+            float distToCenter = bot->GetExactDist2d(ICC_FESTERGUT_TANK_POSITION);
+            float moveDistance = (distToCenter > 25.0f) ? 2.0f : 3.0f; // Move less if already far from center
+            return MoveAway(closestPlayer, moveDistance);
         }
-        return false; // Already at good distance
     }
     return false;
 }
 
 bool IccFestergutSporeAction::Execute(Event event)
 {
-    bool hasSpore = bot->HasAura(69279); // gas spore
-    bool anySporePresent = false;
-    bool meleeSporePresent = false;
     const float POSITION_TOLERANCE = 4.0f;
     const float SPREAD_RADIUS = 2.0f;  // How far apart ranged should spread
 
+    bool hasSpore = bot->HasAura(69279); // gas spore
+    
     // If bot has spore, stop attacking
     if (hasSpore)
     {
         bot->AttackStop();
     }
 
-    // First check if we're already correctly positioned
-    bool atMeleeSpot = bot->GetExactDist2d(ICC_FESTERGUT_MELEE_SPORE) < POSITION_TOLERANCE;
-    
     // Calculate a unique spread position for ranged
-    float angle = (bot->GetGUID().GetCounter() % 8) * (M_PI / 4); // Divide circle into 8 positions
+    float angle = (bot->GetGUID().GetCounter() % 16) * (M_PI / 8); // Divide circle into 16 positions
     Position spreadRangedPos = ICC_FESTERGUT_RANGED_SPORE;
     spreadRangedPos.m_positionX += cos(angle) * SPREAD_RADIUS;
     spreadRangedPos.m_positionY += sin(angle) * SPREAD_RADIUS;
-    
-    bool atRangedSpot = bot->GetExactDist2d(spreadRangedPos) < POSITION_TOLERANCE;
 
-    // Check if any spores exist and if melee spot is taken
+    // Find all spored players and the one with lowest GUID
+    ObjectGuid lowestGuid;
+    bool isFirst = true;
+    std::vector<Unit*> sporedPlayers;
+    
     GuidVector members = AI_VALUE(GuidVector, "group members");
     for (auto& member : members)
     {
         Unit* unit = botAI->GetUnit(member);
-        if (!unit || unit == bot)
+        if (!unit)
             continue;
 
         if (unit->HasAura(69279))
         {
-            anySporePresent = true;
-            if (unit->GetExactDist2d(ICC_FESTERGUT_MELEE_SPORE) < POSITION_TOLERANCE)
+            sporedPlayers.push_back(unit);
+            if (isFirst || unit->GetGUID() < lowestGuid)
             {
-                meleeSporePresent = true;
+                lowestGuid = unit->GetGUID();
+                isFirst = false;
             }
         }
     }
 
-    if (!anySporePresent)
+    // If no spores present at all, return
+    if (sporedPlayers.empty())
         return false;
-
-    // If we already have spore and are in position, stay there
-    if (hasSpore && ((meleeSporePresent && atRangedSpot) || (!meleeSporePresent && atMeleeSpot)))
-        return true;
 
     Position targetPos;
     if (hasSpore)
     {
-        // If bot has spore, go to melee if spot is free, otherwise ranged
-        targetPos = meleeSporePresent ? spreadRangedPos : ICC_FESTERGUT_MELEE_SPORE;
+        // If bot is tank, always go melee
+        if (botAI->IsTank(bot))
+        {
+            targetPos = ICC_FESTERGUT_MELEE_SPORE;
+        }
+        // If this bot has the lowest GUID among spored players, it goes melee
+        else if (bot->GetGUID() == lowestGuid)
+        {
+            targetPos = ICC_FESTERGUT_MELEE_SPORE;
+        }
+        // All other spored players go ranged
+        else
+        {
+            targetPos = spreadRangedPos;
+        }
     }
     else
     {
@@ -655,7 +672,7 @@ bool IccFestergutSporeAction::Execute(Event event)
     if (bot->GetExactDist2d(targetPos) > POSITION_TOLERANCE)
     {
         return MoveTo(bot->GetMapId(), targetPos.GetPositionX(), targetPos.GetPositionY(), targetPos.GetPositionZ(),
-                     false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+                     true, false, false, true, MovementPriority::MOVEMENT_FORCED);
     }
 
     return hasSpore;

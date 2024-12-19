@@ -51,7 +51,7 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
             if (dynamic_cast<IccAddsDbsAction*>(action))
                 return 2.0f;
             else if (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) || 
-                    dynamic_cast<formationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
+                    dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
                 return 0.0f;
         }
     }
@@ -78,7 +78,8 @@ float FestergutMultiplier::GetValue(Action* action)
     if (bot->HasAura(69279) && (bot->getClass() == CLASS_HUNTER))
     {
         if (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
-            dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) || dynamic_cast<CombatFormationMoveAction*>(action))
+            dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) || dynamic_cast<CombatFormationMoveAction*>(action) ||
+            dynamic_cast<FleeAction*>(action))
         {
             return 0.0f;
         }
