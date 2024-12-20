@@ -203,7 +203,7 @@ bool CheckMountStateAction::Mount()
             masterSpell = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetSpellInfo();
             masterSpeed = std::max(masterSpell->Effects[1].BasePoints, masterSpell->Effects[2].BasePoints);
         }
-        else if (masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC)
+        else if ((masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC) && !bot->InBattleground())
         {
             masterMountType = 1;
             masterSpeed = (masterInShapeshiftForm == FORM_FLIGHT_EPIC) ? 279 : 149;
