@@ -8,9 +8,13 @@
 #include "AiFactory.h"
 #include "ItemVisitors.h"
 #include "LFGMgr.h"
+#include "LFGPackets.h"
+#include "Opcodes.h"
 #include "Playerbots.h"
+#include "World.h"
 
 using namespace lfg;
+
 
 bool LfgJoinAction::Execute(Event event) { return JoinLFG(); }
 
@@ -146,7 +150,22 @@ bool LfgJoinAction::JoinLFG()
 
     // Set RbotAId Browser comment
     std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot, false, false));
-    sLFGMgr->JoinLfg(bot, roleMask, list, _gs);
+    
+    // JoinLfg is not threadsafe, so make packet and queue into session
+    // sLFGMgr->JoinLfg(bot, roleMask, list, _gs);
+
+    WorldPacket* data = new WorldPacket(CMSG_LFG_JOIN);
+    *data << (uint32)roleMask;
+    *data << (bool)false;
+    *data << (bool)false;
+    // Slots
+    *data << (uint8)(list.size());
+    for (uint32 dungeon : list)
+        *data << (uint32)dungeon;
+    // Needs
+    *data << (uint8)3 << (uint8)0 << (uint8)0 << (uint8)0;
+    *data << _gs;
+    bot->GetSession()->QueuePacket(data);
 
     return true;
 }
