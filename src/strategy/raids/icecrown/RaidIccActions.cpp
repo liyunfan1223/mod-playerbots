@@ -685,7 +685,7 @@ bool IccRotfaceTankPositionAction::Execute(Event event)
     if (!boss)
     return false;
 
-    // Tank positioning logic
+    // Main tank positioning logic
     if (botAI->IsMainTank(bot))
     {
         if (bot->GetExactDist2d(ICC_ROTFACE_TANK_POSITION) > 7.0f)
@@ -694,129 +694,136 @@ bool IccRotfaceTankPositionAction::Execute(Event event)
                       false, false, true, MovementPriority::MOVEMENT_FORCED);
     }
 
-    // Assist tank positioning for big ooze and small ooze management
+    // Assist tank positioning for big ooze
     if (botAI->IsAssistTank(bot))
     {
-        // If we have the ooze flood aura, don't try to tank anything
+        // If we have the ooze flood aura, move away
         if (bot->HasAura(71215))
         {
-            return MoveTo(boss->GetMapId(), boss->GetPositionX() + 10.0f * cos(bot->GetAngle(boss)),
-                         boss->GetPositionY() + 10.0f * sin(bot->GetAngle(boss)), bot->GetPositionZ(), false,
+            return MoveTo(boss->GetMapId(), boss->GetPositionX() + 5.0f * cos(bot->GetAngle(boss)),
+                         boss->GetPositionY() + 5.0f * sin(bot->GetAngle(boss)), bot->GetPositionZ(), false,
                          false, false, true, MovementPriority::MOVEMENT_FORCED);
         }
-        Unit* bigOoze = AI_VALUE2(Unit*, "find target", "big ooze");
-        Unit* smallOoze = AI_VALUE2(Unit*, "find target", "little ooze");
 
-        // Only care about big ooze
+        Unit* bigOoze = AI_VALUE2(Unit*, "find target", "big ooze");
         if (bigOoze)
         {
-            // Taunt the big ooze if it's not targeting us
+            // Taunt if not targeting us
             if (bigOoze->GetVictim() != bot)
             {
                 if (botAI->CastSpell("taunt", bigOoze))
                     return true;
-                return Attack(bigOoze);  // If taunt fails or is on cooldown, keep attacking
+                return Attack(bigOoze);
             }
 
-            // If we have aggro on big ooze
+            // Keep big ooze at designated position
             if (bigOoze->GetVictim() == bot)
             {
-                // If there's a small ooze, move to it but keep attacking big ooze
-                if (smallOoze)
+                if (bot->GetExactDist2d(ICC_ROTFACE_BIG_OOZE_POSITION) > 5.0f)
                 {
-                    if (bot->GetExactDist2d(smallOoze) > 5.0f)
-                    {
-                        MoveTo(smallOoze->GetMapId(), smallOoze->GetPositionX(),
-                              smallOoze->GetPositionY(), bot->GetPositionZ(), false,
-                              false, false, true, MovementPriority::MOVEMENT_FORCED);
-                    }
-                    return Attack(bigOoze);  // Keep attacking big ooze while moving
+                    return MoveTo(bot->GetMapId(), ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionX(),
+                              ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionY(), ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionZ(),
+                              false, false, false, true, MovementPriority::MOVEMENT_FORCED);
                 }
-                // Position handling for big ooze when no small ooze exists
-                else
-                {
-                    float angle = boss->GetAngle(bigOoze);
-                    float targetX = boss->GetPositionX() + (30.0f * cos(angle));
-                    float targetY = boss->GetPositionY() + (30.0f * sin(angle));
-
-                    if (abs(boss->GetExactDist2d(bot) - 30.0f) > 5.0f)
-                    {
-                        MoveTo(bot->GetMapId(), targetX, targetY, bot->GetPositionZ(), false,
-                              false, false, true, MovementPriority::MOVEMENT_FORCED);
-                    }
-                    return Attack(bigOoze);
-                }
+                return Attack(bigOoze);
             }
-            
-            // If big ooze exists but we don't have aggro, keep trying to get it
+
             return Attack(bigOoze);
         }
-
-        // If no big ooze exists, stop all ooze-related actions and return to normal tanking behavior
-        bot->AttackStop();
-        return false;
     }
 
     return false;
 }
 
-// New action for group positioning
 bool IccRotfaceGroupPositionAction::Execute(Event event)
 {
     // Find Rotface
     Unit* boss = AI_VALUE2(Unit*, "find target", "rotface");
     if (!boss)
-        return false;
+        return false;   
 
-    if (!bot->HasAura(71215) && !bot->HasAura(69789))  // ooze flood id
-    {
-        float radius = 10.0f;
-        Unit* closestMember = nullptr;
-        GuidVector members = AI_VALUE(GuidVector, "group members");
-        
-        for (auto& member : members)
-        {
-            Unit* unit = botAI->GetUnit(member);
-            if (!unit || bot->GetGUID() == member)
-                continue;
+ 
 
-            if (botAI->IsAssistTank(bot))
-                continue;
-
-            if (!closestMember || bot->GetExactDist2d(unit) < bot->GetExactDist2d(closestMember))
-                closestMember = unit;
-        }
-
-        if (closestMember && bot->GetExactDist2d(closestMember) < radius)
-            return MoveAway(closestMember, 2.0f);
-            
-        return false;
-    }
+    // Check for puddles and move away if too close
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
     
-    // Ooze flood movement logic
-    if (bot->HasAura(71215) || bot->HasAura(69789))
+    for (auto& npc : npcs)
     {
-        bot->AttackStop();
-        bot->InterruptNonMeleeSpells(false);
-        
-        float currentDistance = bot->GetExactDist2d(boss);
-        const float DESIRED_DISTANCE = 4.0f;
-        
-        // Only move if we're not at the desired distance
-        if (abs(currentDistance - DESIRED_DISTANCE) > 2.0f)  // 2.0f tolerance
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit)
         {
-            float dx = boss->GetPositionX() - bot->GetPositionX();
-            float dy = boss->GetPositionY() - bot->GetPositionY();
-            float angle = atan2(dy, dx);
-
-            // Calculate position that maintains 10 yards from boss
-            float moveX = boss->GetPositionX() - (cos(angle) * DESIRED_DISTANCE);
-            float moveY = boss->GetPositionY() - (sin(angle) * DESIRED_DISTANCE);
-            
-            return MoveTo(bot->GetMapId(), moveX, moveY, bot->GetPositionZ(), 
-                false, true, false, true, MovementPriority::MOVEMENT_FORCED);
+            if (unit->GetEntry() == 37013) // puddle
+            {
+                float puddleDistance = bot->GetExactDist2d(unit);
+               
+                
+                if (puddleDistance < 30.0f && (bot->HasAura(71215) || bot->HasAura(69789)))
+                {
+                    float dx = boss->GetPositionX() - unit->GetPositionX();
+                    float dy = boss->GetPositionY() - unit->GetPositionY();
+                    float angle = atan2(dy, dx);
+                    
+                    // Move away from puddle in smaller increment
+                    float moveDistance = std::min(35.0f - puddleDistance, 5.0f);
+                    float moveX = boss->GetPositionX() + (moveDistance * cos(angle));
+                    float moveY = boss->GetPositionY() + (moveDistance * sin(angle));
+                    
+                    return MoveTo(boss->GetMapId(), moveX, moveY, boss->GetPositionZ(), 
+                        false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+                }
+            }
         }
-        return true; // Stay in place if at correct distance
+    }
+
+    // Check if we're targeted by little ooze
+    Unit* smallOoze = AI_VALUE2(Unit*, "find target", "little ooze");
+    if (smallOoze && smallOoze->GetVictim() == bot)
+    {
+        if (bot->GetExactDist2d(ICC_ROTFACE_BIG_OOZE_POSITION) > 3.0f)
+        {
+            return MoveTo(bot->GetMapId(), ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionX(),
+                        ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionY(), ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionZ(),
+                        false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+        }
+        return true; // Stay at position
+    }
+
+    if(botAI->IsRanged(bot) || botAI->IsHeal(bot))
+    {
+        if (!bot->HasAura(71215) && !bot->HasAura(69789))  // ooze flood id
+        {
+            float radius = 10.0f;
+            Unit* closestMember = nullptr;
+            float minDist = radius;
+            GuidVector members = AI_VALUE(GuidVector, "group members");
+        
+            for (auto& member : members)
+            {
+                Unit* unit = botAI->GetUnit(member);
+                if (!unit || bot->GetGUID() == member)
+                    continue;
+
+                // Skip distance check if the other unit is an assist tank
+                if (botAI->IsAssistTank(bot))
+                    continue;
+
+             float dist = bot->GetExactDist2d(unit);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closestMember = unit;
+                }
+            }
+
+         if (closestMember)
+            {
+                float distToCenter = bot->GetExactDist2d(ICC_ROTFACE_TANK_POSITION);
+                float moveDistance = (distToCenter > 25.0f) ? 2.0f : 3.0f;
+                return MoveAway(closestMember, moveDistance);
+            }
+            
+            return false;
+        }
     }
 
     return false;
@@ -841,11 +848,7 @@ bool IccRotfaceMoveAwayFromExplosionAction::Execute(Event event)
     
     // Move to the position
     return MoveTo(bot->GetMapId(), moveX, moveY, moveZ,
-                 true,  // generatePath
-                 true,  // forceDest 
-                 true,  // straightLine
-                 true,  // forceRecalculateSpeed
-                 MovementPriority::MOVEMENT_FORCED);
+                 false, false, false, true, MovementPriority::MOVEMENT_FORCED);
 }
 
 //PP

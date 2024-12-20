@@ -114,10 +114,11 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new IccAddsDbsMultiplier(botAI));
-    multipliers.push_back(new FestergutMultiplier(botAI));
-    multipliers.push_back(new RotfaceMultiplier(botAI));
+    multipliers.push_back(new IccFestergutMultiplier(botAI));
+    multipliers.push_back(new IccRotfaceMultiplier(botAI));
+    //multipliers.push_back(new IccRotfaceGroupPositionMultiplier(botAI));
     multipliers.push_back(new IccAddsPutricideMultiplier(botAI));
-    multipliers.push_back(new BpcAssistMultiplier(botAI));
+    multipliers.push_back(new IccBpcAssistMultiplier(botAI));
     multipliers.push_back(new IccBqlPactOfDarkfallenMultiplier(botAI));
     multipliers.push_back(new IccBqlVampiricBiteMultiplier(botAI));
 }

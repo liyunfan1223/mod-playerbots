@@ -58,7 +58,7 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
-float FestergutMultiplier::GetValue(Action* action)
+float IccFestergutMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "festergut");
     if (!boss)
@@ -87,7 +87,7 @@ float FestergutMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
-float RotfaceMultiplier::GetValue(Action* action)
+float IccRotfaceMultiplier::GetValue(Action* action)
 {
     // If we're already executing the escape movement, don't interrupt it
     if (dynamic_cast<IccRotfaceMoveAwayFromExplosionAction*>(action))
@@ -146,14 +146,12 @@ float RotfaceMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
-/*float PutricideVolatileOozeMultiplier::GetValue(Action* action)
+/*float IccRotfaceGroupPositionMultiplier::GetValue(Action* action)
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "volatile ooze");
-    if (!boss)
+    if (dynamic_cast<IccRotfaceGroupPositionAction*>(action))
         return 1.0f;
 
-    // Ignore formation actions when volatile ooze mechanic is active
-    if (dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FleeAction*>(action) || dynamic_cast<FollowAction*>(action))
+    if (dynamic_cast<CombatFormationMoveAction*>(action))
         return 0.0f;
 
     return 1.0f;
@@ -194,7 +192,7 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
 }
 
 //bpc
-float BpcAssistMultiplier::GetValue(Action* action)
+float IccBpcAssistMultiplier::GetValue(Action* action)
 {
     if (!action)
         return 1.0f;
@@ -258,3 +256,5 @@ float IccBqlVampiricBiteMultiplier::GetValue(Action* action)
 
     return 1.0f;
 }
+
+

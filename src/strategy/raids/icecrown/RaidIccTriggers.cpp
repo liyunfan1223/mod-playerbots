@@ -269,7 +269,7 @@ bool IccRotfaceTankPositionTrigger::IsActive()
 bool IccRotfaceGroupPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "rotface");
-    if (!boss || botAI->IsMelee(bot) || botAI->IsTank(bot) || botAI->IsAssistTank(bot) || botAI->IsMainTank(bot)) { return false; }
+    if (!boss) { return false; }
 
     return true;
 }

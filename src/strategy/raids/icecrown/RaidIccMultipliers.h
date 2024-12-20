@@ -10,30 +10,31 @@ public:
     virtual float GetValue(Action* action);
 };
 
-class FestergutMultiplier : public Multiplier
+class IccFestergutMultiplier : public Multiplier
 {
 public:
-    FestergutMultiplier(PlayerbotAI* ai) : Multiplier(ai, "festergut") {}
+    IccFestergutMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc festergut") {}
 
 public:
     virtual float GetValue(Action* action);
 };
 
-
-class RotfaceMultiplier : public Multiplier
+//ROTFACE
+class IccRotfaceMultiplier : public Multiplier
 {
 public:
-    RotfaceMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rotface") {}
+    IccRotfaceMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc rotface") {}
     virtual float GetValue(Action* action);
 };
 
-/*class PutricideVolatileOozeMultiplier : public Multiplier
+/*class IccRotfaceGroupPositionMultiplier : public Multiplier
 {
 public:
-    PutricideVolatileOozeMultiplier(PlayerbotAI* ai) : Multiplier(ai, "putricide volatile ooze") {}
+    IccRotfaceGroupPositionMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc rotface group position") {}
     virtual float GetValue(Action* action);
-};*/    
+};*/
 
+//PP
 class IccAddsPutricideMultiplier : public Multiplier
 {
 public:
@@ -42,17 +43,18 @@ public:
 };
 
 //BPC
-class BpcAssistMultiplier : public Multiplier
+class IccBpcAssistMultiplier : public Multiplier
 {
 public:
-    BpcAssistMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "bpc assist") {}
+    IccBpcAssistMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc bpc assist") {}
     float GetValue(Action* action) override;
 };
 
+//BQL
 class IccBqlPactOfDarkfallenMultiplier : public Multiplier
 {
 public:
-    IccBqlPactOfDarkfallenMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "pact of darkfallen multiplier") {}
+    IccBqlPactOfDarkfallenMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc bql pact of darkfallen multiplier") {}
 
     float GetValue(Action* action) override;
 };
