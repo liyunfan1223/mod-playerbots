@@ -184,5 +184,14 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     // Assign the single main tank
     group->SetGroupMemberFlag(newMainTank->GetGUID(), true, MEMBER_FLAG_MAINTANK);
 
+    // Notify if the new main tank is a real player
+    if (GET_PLAYERBOT_AI(newMainTank)->IsRealPlayer())
+    {
+        const std::string playerName = newMainTank->GetName();
+        const auto text = BOT_TEXT2("%s please taunt Razorscale now!", { playerName });
+        botAI->Say(text);
+    }
+
     _lastRoleSwapTime = std::time(nullptr);
 }
+
