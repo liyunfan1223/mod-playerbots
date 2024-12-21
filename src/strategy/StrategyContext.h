@@ -119,6 +119,7 @@ public:
         creators["move random"] = &StrategyContext::move_random;
         creators["formation"] = &StrategyContext::combat_formation;
         creators["move from group"] = &StrategyContext::move_from_group;
+        creators["worldbuff"] = &StrategyContext::world_buff;
     }
 
 private:
@@ -186,6 +187,7 @@ private:
     static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
     static Strategy* combat_formation(PlayerbotAI* ai) { return new CombatFormationStrategy(ai); }
     static Strategy* move_from_group(PlayerbotAI* botAI) { return new MoveFromGroupStrategy(botAI); }
+    static Strategy* world_buff(PlayerbotAI* botAI) { return new WorldBuffStrategy(botAI); }
 };
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>
