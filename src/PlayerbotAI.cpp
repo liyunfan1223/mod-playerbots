@@ -4135,6 +4135,12 @@ inline bool ZoneHasRealPlayers(Player* bot)
 
 bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
+    // when botActiveAlone is 100% and smartScale disabled
+    if (sPlayerbotAIConfig->botActiveAlone >= 100 && !sPlayerbotAIConfig->botActiveAloneSmartScale)
+    {
+        return true;
+    }
+
     // Is in combat. Always defend yourself.
     if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
     {
@@ -4159,12 +4165,6 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 
     // General exceptions
     if (activityType == PACKET_ACTIVITY)
-    {
-        return true;
-    }
-
-    // when botActiveAlone is 100% and smartScale disabled
-    if (sPlayerbotAIConfig->botActiveAlone >= 100 && !sPlayerbotAIConfig->botActiveAloneSmartScale)
     {
         return true;
     }
