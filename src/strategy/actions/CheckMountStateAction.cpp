@@ -74,13 +74,13 @@ bool CheckMountStateAction::Execute(Event event)
         auto masterInShapeshiftForm = master->GetShapeshiftForm();
 
         // bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
-        if ((master->IsMounted() || masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC)
+        if ((master->IsMounted() || masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC || masterInShapeshiftForm == FORM_TRAVEL)
             && !bot->IsMounted() && noattackers && shouldMount && !bot->IsInCombat() && botAI->GetState() != BOT_STATE_COMBAT)
         {
             return Mount();
         }
 
-        if ((!master->IsMounted() && masterInShapeshiftForm != FORM_FLIGHT && masterInShapeshiftForm != FORM_FLIGHT_EPIC)
+        if ((!master->IsMounted() && masterInShapeshiftForm != FORM_FLIGHT && masterInShapeshiftForm != FORM_FLIGHT_EPIC && masterInShapeshiftForm != FORM_TRAVEL)
             && bot->IsMounted())
         {
             WorldPacket emptyPacket;
