@@ -188,7 +188,7 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     if (GET_PLAYERBOT_AI(newMainTank)->IsRealPlayer())
     {
         const std::string playerName = newMainTank->GetName();
-        const auto text = BOT_TEXT2("%s please taunt Razorscale now!", { playerName });
+        const std::string text = playerName + ", please taunt Razorscale now!";
         botAI->Say(text);
     }
 
