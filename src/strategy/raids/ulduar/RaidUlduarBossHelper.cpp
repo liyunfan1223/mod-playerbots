@@ -145,33 +145,35 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     if (!group)
         return;
 
-    // Gather all tank bots in the group, excluding those with Fuse Armor
-    std::vector<Player*> tankBots;
+    // Gather all tank-capable players (bots and real players) in the group, excluding those with Fuse Armor
+    std::vector<Player*> tankCandidates;
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member || !botAI->IsTank(member) || !member->IsAlive())
+        if (!member || !botAI->IsTank(member, true) || !member->IsAlive())
             continue;
 
         Aura* fuseArmor = member->GetAura(SPELL_FUSEARMOR);
         if (fuseArmor && fuseArmor->GetStackAmount() >= FUSEARMOR_THRESHOLD)
             continue;
 
-        tankBots.push_back(member);
+        tankCandidates.push_back(member);
     }
 
-    if (tankBots.empty())
+    if (tankCandidates.empty())
         return;
 
     // Sort tanks by max health descending
-    std::sort(tankBots.begin(), tankBots.end(),
+    std::sort(tankCandidates.begin(), tankCandidates.end(),
         [](Player* a, Player* b)
         {
             return a->GetMaxHealth() > b->GetMaxHealth();
         }
     );
 
-    Player* newMainTank = tankBots[0];
+    Player* newMainTank = tankCandidates[0];
+    if (!newMainTank) // Safety check
+        return;
 
     // Remove all MAINTANK flags
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
@@ -185,13 +187,11 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     group->SetGroupMemberFlag(newMainTank->GetGUID(), true, MEMBER_FLAG_MAINTANK);
 
     // Notify if the new main tank is a real player
-    if (GET_PLAYERBOT_AI(newMainTank)->IsRealPlayer())
+    if (GET_PLAYERBOT_AI(newMainTank) && GET_PLAYERBOT_AI(newMainTank)->IsRealPlayer())
     {
-        const std::string playerName = newMainTank->GetName();
-        const std::string text = playerName + ", please taunt Razorscale now!";
+        const std::string text = newMainTank->GetName() + ", please taunt Razorscale now!";
         botAI->Say(text);
     }
 
     _lastRoleSwapTime = std::time(nullptr);
 }
-
