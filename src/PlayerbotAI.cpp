@@ -4135,18 +4135,33 @@ inline bool ZoneHasRealPlayers(Player* bot)
 
 bool PlayerbotAI::AllowActive(ActivityType activityType)
 {
+    // when botActiveAlone is 100% and smartScale disabled
+    if (sPlayerbotAIConfig->botActiveAlone >= 100 && !sPlayerbotAIConfig->botActiveAloneSmartScale)
+    {
+        return true;
+    }
+
+    // Is in combat. Always defend yourself.
+    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
+    {
+        if (bot->IsInCombat())
+        {
+            return true;
+        }
+    }
+    
     // only keep updating till initializing time has completed,
     // which prevents unneeded expensive GameTime calls.
-    // if (_isBotInitializing)
-    // {
-    //     _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
+    if (_isBotInitializing)
+    {
+        _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.12;
 
-    //     // no activity allowed during bot initialization
-    //     if (_isBotInitializing)
-    //     {
-    //         return false;
-    //     }
-    // }
+        // no activity allowed during bot initialization
+        if (_isBotInitializing)
+        {
+            return false;
+        }
+    }
 
     // General exceptions
     if (activityType == PACKET_ACTIVITY)
@@ -4159,16 +4174,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     {
         return true;
     }
-
-    // Is in combat. Defend yourself.
-    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY)
-    {
-        if (bot->IsInCombat())
-        {
-            return true;
-        }
-    }
-
+    
     // bot map has active players.
     if (sPlayerbotAIConfig->BotActiveAloneForceWhenInMap)
     {
@@ -4307,11 +4313,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     {
         return false;
     }
-    if (sPlayerbotAIConfig->botActiveAlone >= 100 && !sPlayerbotAIConfig->botActiveAloneSmartScale)
-    {
-        return true;
-    }
-
+    
     // #######################################################################################
     // All mandatory conditations are checked to be active or not, from here the remaining
     // situations are usable for scaling when enabled.
