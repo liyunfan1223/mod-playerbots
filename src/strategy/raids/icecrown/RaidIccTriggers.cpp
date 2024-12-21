@@ -441,7 +441,7 @@ bool IccBqlVampiricBiteTrigger::IsActive()
         return false;
 
     // Only trigger when bot has Frenzied Bloodthirst
-    if (!bot->HasAura(70877))
+    if (!(bot->HasAura(70877) || bot->HasAura(71474)))
         return false;
 
     // Add a debug yell when trigger activates

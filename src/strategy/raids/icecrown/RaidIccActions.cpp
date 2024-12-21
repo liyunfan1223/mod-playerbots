@@ -1230,13 +1230,13 @@ bool IccBqlTankPositionAction::Execute(Event event)
     bool isRanged = botAI->IsRanged(bot);
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    if (isRanged && !bot->HasAura(70877))
+    if (isRanged && !(bot->HasAura(70877) || bot->HasAura(71474)))
     {
         // Ranged: spread from other ranged
         for (auto& member : members)
         {
             Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || unit == bot || unit->HasAura(70877))
+            if (!unit || !unit->IsAlive() || unit == bot || unit->HasAura(70877) || unit->HasAura(71474))
                 continue;
 
             float dist = bot->GetExactDist2d(unit);
@@ -1257,48 +1257,80 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event event)
     if (!bot->HasAura(71340))
         return false;
 
-    // If bot is tank, wait for others
-    if (botAI->IsTank(bot))
-        return false;
-
     const float POSITION_TOLERANCE = 1.0f;  // Within 1 yards to break the link
 
     // Find other players with Pact of the Darkfallen
-    Player* closestPlayer = nullptr;
-    float minDist = FLT_MAX;
-    int playersWithAura = 0;  // Debug counter
+    std::vector<Player*> playersWithAura;
+    Player* tankWithAura = nullptr;
 
     Group* group = bot->GetGroup();
     if (!group)
         return false;
 
+    // Gather all players with the aura
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
-        if (!member || member->GetGUID() == bot->GetGUID())  // Explicitly check GUID instead of pointer
+        if (!member || member->GetGUID() == bot->GetGUID())
             continue;
 
-        // Check if player has Pact of the Darkfallen
-        if (member->HasAura(71340))
+        if (member->HasAura(71340)) //pact of darkfallen
         {
-            playersWithAura++;
-            float dist = bot->GetDistance(member);
-            if (dist < minDist)
-            {
-                minDist = dist;
-                closestPlayer = member;
-            }
+            playersWithAura.push_back(member);
+            // If this player is a tank, store them
+            if (botAI->IsTank(bot))
+                tankWithAura = member;
         }
     }
 
-    // If we found another player with the aura
-    if (closestPlayer)
+    // If we found other players with the aura
+    if (!playersWithAura.empty())
     {
-        // If we're too far, move closer
-        if (bot->GetDistance(closestPlayer) > POSITION_TOLERANCE)
+        Position targetPos;
+        
+        if (playersWithAura.size() >= 2)  // 3 or more total (including this bot)
         {
-            botAI->SetNextCheckDelay(500);  // Reduce check delay for smoother movement
-            return MoveTo(bot->GetMapId(), closestPlayer->GetPositionX(), closestPlayer->GetPositionY(), closestPlayer->GetPositionZ(),
+            if (tankWithAura)
+            {
+                // Move to tank's position if we're not a tank
+                if (!botAI->IsTank(bot))
+                {
+                    targetPos.Relocate(tankWithAura);
+                }
+                else
+                {
+                    // If we are the tank, stay put
+                    return true;
+                }
+            }
+            else
+            {
+                // Calculate center position of all affected players
+                float sumX = bot->GetPositionX();
+                float sumY = bot->GetPositionY();
+                float sumZ = bot->GetPositionZ();
+                int count = 1;  // Start with 1 for this bot
+
+                for (Player* player : playersWithAura)
+                {
+                    sumX += player->GetPositionX();
+                    sumY += player->GetPositionY();
+                    sumZ += player->GetPositionZ();
+                    count++;
+                }
+
+                targetPos.Relocate(sumX / count, sumY / count, sumZ / count);
+            }
+        }
+        else  // Only one other player has aura
+        {
+            targetPos.Relocate(playersWithAura[0]);
+        }
+
+        // Move to target position if we're not already there
+        if (bot->GetDistance(targetPos) > POSITION_TOLERANCE)
+        {
+            return MoveTo(bot->GetMapId(), targetPos.GetPositionX(), targetPos.GetPositionY(), targetPos.GetPositionZ(),
                          false, false, false, true, MovementPriority::MOVEMENT_FORCED);
         }
         return true;
@@ -1307,7 +1339,7 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event event)
     // If no other players found with aura, move to center
     if (bot->GetDistance(ICC_BQL_CENTER_POSITION) > POSITION_TOLERANCE)
     {
-        botAI->SetNextCheckDelay(500);  // Reduce check delay for smoother movement
+        botAI->SetNextCheckDelay(500);
         return MoveTo(bot->GetMapId(), ICC_BQL_CENTER_POSITION.GetPositionX(), ICC_BQL_CENTER_POSITION.GetPositionY(), ICC_BQL_CENTER_POSITION.GetPositionZ(),
                      false, false, false, true, MovementPriority::MOVEMENT_FORCED);
     }
@@ -1318,14 +1350,12 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event event)
 bool IccBqlVampiricBiteAction::Execute(Event event)
 {
     // Only act when bot has Frenzied Bloodthirst
-    if (!bot->HasAura(70877))
+    if (!(bot->HasAura(70877) || bot->HasAura(71474)))
         return false;
 
     // Only DPS and healers should try to bite
     if (!botAI->IsDps(bot) && !botAI->IsHeal(bot))
         return false;
-
-    bot->Yell("I am frenzied! Looking for someone to bite!", LANG_UNIVERSAL);
 
     const float BITE_RANGE = 2.0f;
     Player* target = nullptr;
@@ -1343,10 +1373,11 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
         if (!member || member == bot || !member->IsAlive())
             continue;
 
-        // Skip if already has essence, frenzy, or is a tank
-        if (member->HasAura(70879) || member->HasAura(70877) || member->HasAura(70867) || botAI->IsTank(member))
+        // Skip if already has essence, frenzy, or is a tank, or uncontrollable frenzy
+        if (member->HasAura(70867) || member->HasAura(70877) || member->HasAura(70879) || member->HasAura(71473) 
+           || member->HasAura(71474) || member->HasAura(71525) || member->HasAura(71530) || member->HasAura(71531) 
+           || member->HasAura(71532) || member->HasAura(71533) || member->HasAura(70923) || botAI->IsTank(member))
         {
-            bot->Yell("Skipping " + member->GetName() + " - already has essence/frenzy or is tank", LANG_UNIVERSAL);
             continue;
         }
 
@@ -1360,25 +1391,21 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
     if (!dpsTargets.empty())
     {
         target = dpsTargets[0];  // Take first available DPS
-        bot->Yell("Found DPS target to bite: " + target->GetName(), LANG_UNIVERSAL);
     }
     // If no DPS available, try healers
     else if (!healTargets.empty())
     {
         target = healTargets[0];  // Take first available healer
-        bot->Yell("No DPS found, biting healer: " + target->GetName(), LANG_UNIVERSAL);
     }
 
     if (!target)
     {
-        bot->Yell("No valid targets found to bite!", LANG_UNIVERSAL);
         return false;
     }
 
     // Double check target is still alive
     if (!target->IsAlive())
     {
-        bot->Yell("Target died before I could bite them!", LANG_UNIVERSAL);
         return false;
     }
 
@@ -1389,7 +1416,6 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
 
     if (bot->IsWithinLOS(x, y, z) && bot->GetExactDist2d(target) > BITE_RANGE)
     {
-        bot->Yell("Moving to bite " + target->GetName(), LANG_UNIVERSAL);
         return MoveTo(target->GetMapId(), x, y, z, false, false, false, true, MovementPriority::MOVEMENT_FORCED);
     }
 
@@ -1399,11 +1425,9 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
         // Final alive check before casting
         if (!target->IsAlive())
         {
-            bot->Yell("Target died as I was about to bite them!", LANG_UNIVERSAL);
             return false;
         }
 
-        bot->Yell("Casting Vampiric Bite on " + target->GetName(), LANG_UNIVERSAL);
         if (botAI->CanCastSpell(70946, target))
         {
             return botAI->CastSpell(70946, target);

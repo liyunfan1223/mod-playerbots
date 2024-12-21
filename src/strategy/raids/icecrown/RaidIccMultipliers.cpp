@@ -238,10 +238,11 @@ float IccBqlPactOfDarkfallenMultiplier::GetValue(Action* action)
 
 float IccBqlVampiricBiteMultiplier::GetValue(Action* action)
 {
-    if (!bot->HasAura(70867)) // If bot doesn't have vampire buff
+    Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
+    if (!boss)
         return 1.0f;
 
-    if (bot->HasAura(70877)) // If bot has frenzied bloodthirst
+    if (bot->HasAura(70877) || bot->HasAura(71474)) // If bot has frenzied bloodthirst
     {
         if (dynamic_cast<IccBqlVampiricBiteAction*>(action))
             return 5.0f;  // Highest priority for bite action
