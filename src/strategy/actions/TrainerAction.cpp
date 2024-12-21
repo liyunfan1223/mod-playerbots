@@ -205,7 +205,8 @@ bool AutoGearAction::Execute(Event event)
 
     if (!sPlayerbotAIConfig->autoGearCommandAltBots)
     {
-        if (!sRandomPlayerbotMgr->IsRandomBot(bot))
+        uint32 botAccountId = bot->GetSession()->GetAccountId();
+        if (!sPlayerbotAIConfig->IsInRandomAccountList(botAccountId))
         {
             botAI->TellError("You cannot use autogear on alt bots.");
             return false;
