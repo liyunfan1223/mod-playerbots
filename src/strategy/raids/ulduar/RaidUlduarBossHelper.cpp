@@ -190,7 +190,7 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     if (GET_PLAYERBOT_AI(newMainTank) && GET_PLAYERBOT_AI(newMainTank)->IsRealPlayer())
     {
         const std::string text = newMainTank->GetName() + ", please taunt Razorscale now!";
-        botAI->Say(text);
+        bot->Say(text, LANG_UNIVERSAL);
     }
 
     _lastRoleSwapTime = std::time(nullptr);
