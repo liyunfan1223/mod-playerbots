@@ -420,88 +420,76 @@ float Formation::GetFollowAngle()
     uint32 index = 1;
     uint32 total = 1;
 
-    // If the bot is following a master, but not part of group
-    if (!group && master)
+    std::vector<Player*> roster;
+
+    if (group)
     {
+        bool left = true;  // Used for alternating tanks' positions
+
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+
+            // Skip the master
+            if (member == master)
+                continue;
+
+            // Skip invalid, dead, or out-of-map members
+            if (!member || !member->IsAlive() || bot->GetMapId() != member->GetMapId())
+                continue;
+
+            // Put DPS in the middle
+            if (!botAI->IsTank(member) && !botAI->IsHeal(member))
+            {
+                roster.insert(roster.begin() + roster.size() / 2, member);
+            }
+
+            // Put Healers in the middle
+            else if (botAI->IsHeal(member))
+            {
+                roster.insert(roster.begin() + roster.size() / 2, member);
+            }
+
+            // Handle tanks (alternate between front and back)
+            else if (botAI->IsTank(member))
+            {
+                if (left)
+                    roster.push_back(member);  // Place tank at the back
+                else
+                    roster.insert(roster.begin(), member);  // Place tank at the front
+
+                left = !left;  // Alternate for the next tank
+            }
+
+            total++;
+        }
+    }
+    else if (master)
+    {
+        // If the bot is following a master, look up the bot's position in the master's list
         PlayerbotMgr* masterBotMgr = GET_PLAYERBOT_MGR(master);
         if (masterBotMgr && !GET_PLAYERBOT_AI(master))
         {
-            // Find the bot's index in the master bot's list
-            for (auto i = masterBotMgr->GetPlayerBotsBegin(); i != masterBotMgr->GetPlayerBotsEnd(); ++i)
+            for (auto it = masterBotMgr->GetPlayerBotsBegin(); it != masterBotMgr->GetPlayerBotsEnd(); ++it)
             {
-                if (i->second == bot)
+                if (it->second == bot)
                 {
-                    index = total;
+                    index = total;  // Found bot in master's list, set the index
                     break;
                 }
                 ++total;
             }
         }
     }
-    else if (group)
+
+    // Find the bot's position in the roster
+    auto it = std::find(roster.begin(), roster.end(), bot);
+    if (it != roster.end())
     {
-        std::vector<Player*> roster;
-
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-        {
-            if (Player* member = ref->GetSource())
-            {
-                if (!member || !member->IsAlive() || bot->GetMapId() != member->GetMapId())
-                    continue;
-
-                if (member != master && !botAI->IsTank(member) && !botAI->IsHeal(member))
-                {
-                    roster.push_back(member);
-                }
-            }
-        }
-
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-        {
-            if (Player* member = ref->GetSource())
-            {
-                if (!member || !member->IsAlive() || bot->GetMapId() != member->GetMapId())
-                    continue;
-
-                if (member != master && botAI->IsHeal(member))
-                {
-                    roster.push_back(member);
-                }
-            }
-        }
-
-        bool left = true;
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-        {
-            if (Player* member = ref->GetSource())
-            {
-                if (!member || !member->IsAlive() || bot->GetMapId() != member->GetMapId())
-                    continue;
-
-                if (member != master && botAI->IsTank(member))
-                {
-                    if (left)
-                        roster.push_back(member);
-                    else
-                        roster.insert(roster.begin(), member);
-
-                    left = !left;  // Alternate the position for the next tank
-                }
-            }
-        }
-
-        // Determine the bot's index in the roster
-        for (Player* playerRoster : roster)
-        {
-            if (playerRoster == bot)
-                break;
-            ++index;
-        }
-
-        total = roster.size() + 1;  // Total number of players in the roster (including the master)
+        index = std::distance(roster.begin(), it) + 1;  // Find bot's index in the roster
     }
 
-    // Calculate the follow angle relative to the master
+    // Return
     float start = (master ? master->GetOrientation() : 0.0f);
     return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
