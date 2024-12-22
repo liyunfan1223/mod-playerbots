@@ -627,32 +627,48 @@ bool RazorscaleIgnoreBossAction::isUseful()
     // Check if the boss is flying
     if (boss->GetPositionZ() >= RazorscaleBossHelper::RAZORSCALE_FLYING_Z_THRESHOLD)
     {
+        // Check if the bot is outside the designated area
+        if (bot->GetDistance2d(
+                RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
+                RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y) > RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS + 25.0f)
+        {
+            return true; // Movement to the center is the top priority for all bots
+        }
+
         Group* group = bot->GetGroup();
         if (!group)
         {
             return false;
         }
 
-        Player* mainTank = AI_VALUE(Unit*, "main tank");
-        if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
+        // Check if the boss is already set as the moon marker
+        int8 moonIndex = 4; // Moon marker index
+        ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+        if (currentMoonTarget == boss->GetGUID())
         {
-            // Check if this bot is the lowest-indexed assistant tank
-            for (int i = 0; ; ++i)
-            {
-                if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot))
-                {
-                    return true; // Bot is the first valid tank
-                }
-            }
+            return false; // Moon marker is already correctly set, no further action needed
         }
 
-        // Check if the bot is the main tank
-        if (botAI->IsMainTank(bot))
+        // Proceed to tank-specific logic
+        Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
+        Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
+
+        // If this bot is the main tank, it needs to set the moon marker
+        if (mainTankUnit == bot)
         {
-            // Check moon mark if main tank
-            int8 moonIndex = 4;
-            ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
-            return currentMoonTarget != boss->GetGUID();
+            return true;
+        }
+
+        // If the main tank is a human, check if this bot is the lowest-indexed bot tank
+        if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a human player
+        {
+            for (int i = 0; ; ++i)
+            {
+                if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot)) // Valid bot tank
+                {
+                    return true; // This bot should assign the marker
+                }
+            }
         }
     }
 
@@ -673,40 +689,11 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
         return false;
     }
 
-    Player* mainTank = AI_VALUE(Unit*, "main tank");
-    bool isMainTank = botAI->IsMainTank(bot);
-
-    // If the main tank is a real player, assign the moon marker using the bot with the lowest index
-    if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
+    // Check if the bot is outside the designated area and move inside first
+    if (bot->GetDistance2d(
+            RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
+            RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y) > RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS + 25.0f)
     {
-        for (int i = 0; ; ++i)
-        {
-            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot)) // Bot is a valid tank
-            {
-                int8 moonIndex = 4;
-                ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
-                if (currentMoonTarget != boss->GetGUID())
-                {
-                    group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
-                    SetNextMovementDelay(1000);
-                }
-                break; // Use the first valid bot tank
-            }
-        }
-    }
-    else if (isMainTank) // If this bot is the main tank
-    {
-        int8 moonIndex = 4;
-        ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
-        if (currentMoonTarget != boss->GetGUID())
-        {
-            group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
-            SetNextMovementDelay(1000);
-        }
-    }
-    else
-    {
-        // Move non-tanks inside
         return MoveInside(
             ULDUAR_MAP_ID,
             RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
@@ -717,7 +704,38 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
         );
     }
 
-    // Move tanks inside the arena
+    // Check if the boss is already set as the moon marker
+    int8 moonIndex = 4;
+    ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+    if (currentMoonTarget == boss->GetGUID())
+    {
+        return false; // Moon marker is already correctly set
+    }
+
+    // Get the main tank and determine role
+    Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
+    Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
+
+    // If the main tank is a human, assign the moon marker using the lowest-indexed bot tank
+    if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
+    {
+        for (int i = 0; ; ++i)
+        {
+            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot)) // Bot is a valid tank
+            {
+                group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
+                SetNextMovementDelay(1000);
+                break; // Assign the moon marker and stop
+            }
+        }
+    }
+    else if (mainTankUnit == bot) // If this bot is the main tank
+    {
+        group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
+        SetNextMovementDelay(1000);
+    }
+
+    // Tanks move inside the arena
     return MoveInside(
         ULDUAR_MAP_ID,
         RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
