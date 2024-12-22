@@ -72,7 +72,7 @@ public:
     };
 
     explicit RazorscaleBossHelper(PlayerbotAI* botAI) 
-        : AiObject(botAI), _boss(nullptr), _lastRoleSwapTime(0), _roleSwapCooldown(10) {}
+        : AiObject(botAI), _boss(nullptr) {}
 
     bool UpdateBossAI();
     Unit* GetBoss() const;
@@ -93,8 +93,12 @@ public:
 
 private:
     Unit* _boss;
-    std::time_t _lastRoleSwapTime;
-    const std::time_t _roleSwapCooldown;
+
+    // A map to track the last role swap *per bot* by their GUID
+    static std::unordered_map<ObjectGuid, std::time_t> _lastRoleSwapTime;
+    
+    // The cooldown that applies to every bot
+    static const std::time_t _roleSwapCooldown = 10;
 
     static std::unordered_map<ObjectGuid, time_t> _harpoonCooldowns;
 };
