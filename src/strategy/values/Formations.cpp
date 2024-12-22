@@ -430,12 +430,12 @@ float Formation::GetFollowAngle()
         {
             Player* member = ref->GetSource();
 
-            // Skip the master
-            if (member == master)
-                continue;
-
             // Skip invalid, dead, or out-of-map members
             if (!member || !member->IsAlive() || bot->GetMapId() != member->GetMapId())
+                continue;
+
+            // Skip the master
+            if (member == master)
                 continue;
 
             // Put DPS in the middle
