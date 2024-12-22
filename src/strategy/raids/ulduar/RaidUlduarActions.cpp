@@ -477,11 +477,6 @@ bool RazorscaleAvoidSentinelAction::Execute(Event event)
 {
     bool isTank = botAI->IsTank(bot);
     bool isMainTank = botAI->IsMainTank(bot);
-    if (isTank && !isMainTank)
-    {
-        return false;
-    }
-
     bool isRanged = botAI->IsRanged(bot);
     const float radius = 8.0f;
 
