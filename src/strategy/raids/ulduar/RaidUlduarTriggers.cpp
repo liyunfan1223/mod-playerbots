@@ -212,6 +212,17 @@ bool RazorscaleHarpoonAvailableTrigger::IsActive()
 
 bool RazorscaleFuseArmorTrigger::IsActive()
 {
+    // Get the boss entity
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    // Only proceed if this bot can actually tank
+    if (!botAI->IsTank(bot))
+        return false;
+
     Group* group = bot->GetGroup();
     if (!group)
         return false;
