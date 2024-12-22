@@ -1,3 +1,4 @@
+#include "ChatHelper.h"
 #include "RaidUlduarBossHelper.h"
 #include "ObjectAccessor.h"
 #include "GameObject.h"
@@ -189,7 +190,10 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     // Notify if the new main tank is a real player
     if (GET_PLAYERBOT_AI(newMainTank) && GET_PLAYERBOT_AI(newMainTank)->IsRealPlayer())
     {
-        const std::string text = newMainTank->GetName() + ", please taunt Razorscale now!";
+        const std::string playerName = newMainTank->GetName();
+        const std::string text = playerName + " please taunt Razorscale now!";
+        
+        // const std::string text = newMainTank->GetName() + ", please taunt Razorscale now!";
         bot->Say(text, LANG_UNIVERSAL);
     }
 
