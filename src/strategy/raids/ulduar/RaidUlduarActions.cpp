@@ -562,7 +562,6 @@ bool RazorscaleAvoidSentinelAction::Execute(Event event)
 
 bool RazorscaleAvoidSentinelAction::isUseful()
 {
-    bool isTank = botAI->IsTank(bot);
     bool isMainTank = botAI->IsMainTank(bot);
     Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
     Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
