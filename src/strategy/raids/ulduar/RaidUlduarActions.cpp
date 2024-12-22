@@ -524,8 +524,8 @@ bool RazorscaleAvoidSentinelAction::Execute(Event event)
                     int8 skullIndex = 7; // Skull
                     ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
     
-                    // Only assign the Skull marker if it’s not already set to the sentinel
-                    if (currentSkullTarget && lowestHealthSentinel->GetGUID() != currentSkullTarget)
+                    // If there's no skull set yet, or the skull is on a different target, set the sentinel
+                    if (!currentSkullTarget || (lowestHealthSentinel->GetGUID() != currentSkullTarget))
                     {
                         group->SetTargetIcon(skullIndex, bot->GetGUID(), lowestHealthSentinel->GetGUID());
                     }
@@ -542,8 +542,8 @@ bool RazorscaleAvoidSentinelAction::Execute(Event event)
             int8 skullIndex = 7; // Skull
             ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
     
-            // Only assign the Skull marker if it’s not already set to the sentinel
-            if (currentSkullTarget && lowestHealthSentinel->GetGUID() != currentSkullTarget)
+            // If there's no skull set yet, or the skull is on a different target, set the sentinel
+            if (!currentSkullTarget || (lowestHealthSentinel->GetGUID() != currentSkullTarget))
             {
                 group->SetTargetIcon(skullIndex, bot->GetGUID(), lowestHealthSentinel->GetGUID());
             }
