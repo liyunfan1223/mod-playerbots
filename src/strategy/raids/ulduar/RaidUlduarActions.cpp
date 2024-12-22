@@ -662,7 +662,7 @@ bool RazorscaleIgnoreBossAction::isUseful()
         // If the main tank is a human, check if this bot is the lowest-indexed bot tank
         if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a human player
         {
-            for (int i = 0; ; ++i)
+        for (int i = 0; i < 3; ++i) // Only iterate through the first 3 indexes
             {
                 if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot)) // Valid bot tank
                 {
@@ -719,7 +719,7 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
     // If the main tank is a human, assign the moon marker using the lowest-indexed bot tank
     if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
     {
-        for (int i = 0; ; ++i)
+        for (int i = 0; i < 3; ++i) // Only iterate through the first 3 indexes
         {
             if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot)) // Bot is a valid tank
             {
