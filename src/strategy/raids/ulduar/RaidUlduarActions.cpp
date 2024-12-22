@@ -440,6 +440,12 @@ bool RazorscaleAvoidDevouringFlameAction::Execute(Event event)
         }
     }
 
+    // Off tanks are following the main tank during grounded and should prioritise stacking
+    if (razorscaleHelper.IsGroundPhase() && (botAI->IsTank(bot) && !botAI->IsMainTank(bot)))
+    {
+        return false;
+    }
+
     // Handle movement from flames
     if (closestDistance < safeDistance)
     {
