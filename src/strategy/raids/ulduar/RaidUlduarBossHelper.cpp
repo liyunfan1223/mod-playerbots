@@ -122,14 +122,15 @@ bool RazorscaleBossHelper::AreRolesAssigned() const
     if (!group)
         return false;
 
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    // Retrieve the group member slot list (GUID + flags + other info)
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    for (auto const& slot : slots)
     {
-        Player* member = ref->GetSource();
-        if (!member)
-            continue;
-
-        if (botAI->IsMainTank(member))
+        // Check if this member has the MAINTANK flag
+        if (slot.flags & MEMBER_FLAG_MAINTANK)
+        {
             return true;
+        }
     }
 
     return false;
