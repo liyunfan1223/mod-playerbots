@@ -44,7 +44,7 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "razorscale fuse armor trigger",
-        NextAction::array(0, new NextAction("razorscale fuse armor action", ACTION_MOVE), nullptr)));
+        NextAction::array(0, new NextAction("razorscale fuse armor action", ACTION_RAID + 2), nullptr)));
 
 }
 
