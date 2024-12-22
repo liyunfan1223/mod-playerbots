@@ -72,7 +72,7 @@ public:
     };
 
     explicit RazorscaleBossHelper(PlayerbotAI* botAI) 
-        : AiObject(botAI), _boss(nullptr), _lastRoleSwapTime(0), _roleSwapCooldown(10) {}
+        : AiObject(botAI), _boss(nullptr) {}
 
     bool UpdateBossAI();
     Unit* GetBoss() const;
