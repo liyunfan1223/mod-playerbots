@@ -9,7 +9,11 @@
 #include "Playerbots.h"
 #include "World.h"
 
+// Prevent harpoon spam
 std::unordered_map<ObjectGuid, time_t> RazorscaleBossHelper::_harpoonCooldowns;
+// Prevent role assignment spam
+std::unordered_map<ObjectGuid, std::time_t> RazorscaleBossHelper::_lastRoleSwapTime;
+const std::time_t RazorscaleBossHelper::_roleSwapCooldown; 
 
 bool RazorscaleBossHelper::UpdateBossAI()
 {
