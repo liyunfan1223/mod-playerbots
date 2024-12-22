@@ -222,5 +222,10 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
 
     bot->Yell(text, LANG_UNIVERSAL);
 
-    _lastRoleSwapTime = std::time(nullptr);
+    ObjectGuid botGuid = bot->GetGUID();
+    if (!botGuid)
+        return;
+
+    // Store the *current* time in the map for this bot
+    _lastRoleSwapTime[botGuid] = std::time(nullptr);
 }
