@@ -133,8 +133,24 @@ bool RazorscaleBossHelper::AreRolesAssigned() const
 
 bool RazorscaleBossHelper::CanSwapRoles() const
 {
+    // Identify the GUID of the current bot
+    ObjectGuid botGuid = bot->GetGUID();
+    if (!botGuid)
+        return false;
+
+    // If no entry exists yet for this bot, initialize it to 0
+    auto it = _lastRoleSwapTime.find(botGuid);
+    if (it == _lastRoleSwapTime.end())
+    {
+        _lastRoleSwapTime[botGuid] = 0;
+        it = _lastRoleSwapTime.find(botGuid);
+    }
+
+    // Compare the current time against the stored time
     std::time_t currentTime = std::time(nullptr);
-    return (currentTime - _lastRoleSwapTime) >= _roleSwapCooldown;
+    std::time_t lastSwapTime = it->second;
+
+    return (currentTime - lastSwapTime) >= _roleSwapCooldown;
 }
 
 void RazorscaleBossHelper::AssignRolesBasedOnHealth()
