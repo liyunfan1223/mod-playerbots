@@ -633,7 +633,7 @@ bool RazorscaleIgnoreBossAction::isUseful()
             return false;
         }
 
-        Player* mainTank = botAI->IsMainTank();
+        Player* mainTank = AI_VALUE(Unit*, "main tank");
         if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
         {
             // Check if this bot is the lowest-indexed assistant tank
@@ -673,7 +673,7 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
         return false;
     }
 
-    Player* mainTank = botAI->IsMainTank();
+    Player* mainTank = AI_VALUE(Unit*, "main tank");
     bool isMainTank = botAI->IsMainTank(bot);
 
     // If the main tank is a real player, assign the moon marker using the bot with the lowest index
