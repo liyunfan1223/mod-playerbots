@@ -635,6 +635,11 @@ bool RazorscaleIgnoreBossAction::isUseful()
             return true; // Movement to the center is the top priority for all bots
         }
 
+        if (!botAI->IsTank(bot))
+        {
+            return false;
+        }
+        
         Group* group = bot->GetGroup();
         if (!group)
         {
@@ -702,6 +707,11 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
             RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS - 10.0f,
             MovementPriority::MOVEMENT_NORMAL
         );
+    }
+
+    if (!botAI->IsTank(bot))
+    {
+        return false;
     }
 
     // Check if the boss is already set as the moon marker
