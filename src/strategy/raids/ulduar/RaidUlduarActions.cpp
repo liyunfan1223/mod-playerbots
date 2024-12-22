@@ -919,7 +919,7 @@ bool RazorscaleGroundedAction::Execute(Event event)
     }
 
 
-    if (mainTank && (botAI->IsTank(bot) && !botAI->IsMainTank(bot))
+    if (mainTank && (botAI->IsTank(bot) && !botAI->IsMainTank(bot)))
     {
 
             constexpr float followDistance = 2.0f;
