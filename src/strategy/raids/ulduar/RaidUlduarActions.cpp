@@ -621,30 +621,41 @@ bool RazorscaleIgnoreBossAction::isUseful()
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
     if (!boss)
     {
-        return false; 
+        return false;
     }
 
     // Check if the boss is flying
     if (boss->GetPositionZ() >= RazorscaleBossHelper::RAZORSCALE_FLYING_Z_THRESHOLD)
     {
-        bool isMainTank = botAI->IsMainTank(bot);
-        // Check if the bot is outside the designated area
-        if (bot->GetDistance2d(RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X, RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_Y) > RazorscaleBossHelper::RAZORSCALE_ARENA_RADIUS + 25.0f)
+        Group* group = bot->GetGroup();
+        if (!group)
         {
-            return true;
+            return false;
         }
-        // Check moon mark if main tank
-        if (isMainTank)
+
+        Player* mainTank = botAI->GetMainTank();
+        if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
         {
-            Group* group = bot->GetGroup();
-            if (group)
+            // Check if this bot is the lowest-indexed assistant tank
+            for (int i = 0; ; ++i)
             {
-                int8 moonIndex = 4;
-                ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
-                return currentMoonTarget != boss->GetGUID();
+                if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot))
+                {
+                    return true; // Bot is the first valid tank
+                }
             }
         }
+
+        // Check if the bot is the main tank
+        if (botAI->IsMainTank(bot))
+        {
+            // Check moon mark if main tank
+            int8 moonIndex = 4;
+            ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+            return currentMoonTarget != boss->GetGUID();
+        }
     }
+
     return false;
 }
 
@@ -653,11 +664,47 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
     if (!boss)
     {
-        return false; 
+        return false;
     }
 
+    Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
+    Player* mainTank = botAI->GetMainTank();
     bool isMainTank = botAI->IsMainTank(bot);
-    if (!isMainTank)
+
+    // If the main tank is a real player, assign the moon marker using the bot with the lowest index
+    if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
+    {
+        for (int i = 0; ; ++i)
+        {
+            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot)) // Bot is a valid tank
+            {
+                int8 moonIndex = 4;
+                ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+                if (currentMoonTarget != boss->GetGUID())
+                {
+                    group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
+                    SetNextMovementDelay(1000);
+                }
+                break; // Use the first valid bot tank
+            }
+        }
+    }
+    else if (isMainTank) // If this bot is the main tank
+    {
+        int8 moonIndex = 4;
+        ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
+        if (currentMoonTarget != boss->GetGUID())
+        {
+            group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
+            SetNextMovementDelay(1000);
+        }
+    }
+    else
     {
         // Move non-tanks inside
         return MoveInside(
@@ -670,22 +717,7 @@ bool RazorscaleIgnoreBossAction::Execute(Event event)
         );
     }
 
-    Group* group = bot->GetGroup();
-    if (!group)
-    {
-        return false;
-    }
-
-    // Assign moon rti to boss
-    int8 moonIndex = 4;
-    ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
-    if (currentMoonTarget != boss->GetGUID())
-    {
-        group->SetTargetIcon(moonIndex, bot->GetGUID(), boss->GetGUID());
-        SetNextMovementDelay(1000);
-    }
-
-    // Move main tank inside
+    // Move tanks inside the arena
     return MoveInside(
         ULDUAR_MAP_ID,
         RazorscaleBossHelper::RAZORSCALE_ARENA_CENTER_X,
