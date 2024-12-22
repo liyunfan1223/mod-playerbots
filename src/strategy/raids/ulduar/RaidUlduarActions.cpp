@@ -563,15 +563,25 @@ bool RazorscaleAvoidSentinelAction::isUseful()
 {
     bool isTank = botAI->IsTank(bot);
     bool isMainTank = botAI->IsMainTank(bot);
-    if (isTank && !isMainTank)
-    {
-        return false;
-    }
-
-    // Main tank always tries to mark sentinel
+    Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
+    Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
+    
+    // If this bot is the main tank, it should always try to mark
     if (isMainTank)
     {
         return true;
+    }
+    
+    // If the main tank is a human, check if this bot is one of the first three valid bot tanks
+    if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a human player
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot)) // Bot is a valid tank
+            {
+                return true; // This bot should assist with marking
+            }
+        }
     }
 
     bool isRanged = botAI->IsRanged(bot);
