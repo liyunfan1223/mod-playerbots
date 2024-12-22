@@ -9,7 +9,11 @@
 #include "Playerbots.h"
 #include "World.h"
 
+// Prevent harpoon spam
 std::unordered_map<ObjectGuid, time_t> RazorscaleBossHelper::_harpoonCooldowns;
+// Prevent role assignment spam
+std::unordered_map<ObjectGuid, std::time_t> RazorscaleBossHelper::_lastRoleSwapTime;
+const std::time_t RazorscaleBossHelper::_roleSwapCooldown; 
 
 bool RazorscaleBossHelper::UpdateBossAI()
 {
@@ -118,14 +122,15 @@ bool RazorscaleBossHelper::AreRolesAssigned() const
     if (!group)
         return false;
 
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    // Retrieve the group member slot list (GUID + flags + other info)
+    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    for (auto const& slot : slots)
     {
-        Player* member = ref->GetSource();
-        if (!member)
-            continue;
-
-        if (botAI->IsMainTank(member))
+        // Check if this member has the MAINTANK flag
+        if (slot.flags & MEMBER_FLAG_MAINTANK)
+        {
             return true;
+        }
     }
 
     return false;
@@ -133,12 +138,30 @@ bool RazorscaleBossHelper::AreRolesAssigned() const
 
 bool RazorscaleBossHelper::CanSwapRoles() const
 {
+    // Identify the GUID of the current bot
+    ObjectGuid botGuid = bot->GetGUID();
+    if (!botGuid)
+        return false;
+
+    // If no entry exists yet for this bot, initialize it to 0
+    auto it = _lastRoleSwapTime.find(botGuid);
+    if (it == _lastRoleSwapTime.end())
+    {
+        _lastRoleSwapTime[botGuid] = 0;
+        it = _lastRoleSwapTime.find(botGuid);
+    }
+
+    // Compare the current time against the stored time
     std::time_t currentTime = std::time(nullptr);
-    return (currentTime - _lastRoleSwapTime) >= _roleSwapCooldown;
+    std::time_t lastSwapTime = it->second;
+
+    return (currentTime - lastSwapTime) >= _roleSwapCooldown;
 }
+
 
 void RazorscaleBossHelper::AssignRolesBasedOnHealth()
 {
+    // Check if enough time has passed since last swap
     if (!CanSwapRoles())
         return;
 
@@ -146,7 +169,7 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     if (!group)
         return;
 
-    // Gather all tank-capable players (bots and real players) in the group, excluding those with Fuse Armor
+    // Gather all tank-capable players (bots + real players), excluding those with too many Fuse Armor stacks
     std::vector<Player*> tankCandidates;
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
@@ -161,10 +184,11 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
         tankCandidates.push_back(member);
     }
 
+    // If there are no viable tanks, do nothing
     if (tankCandidates.empty())
         return;
 
-    // Sort tanks by max health descending
+    // Sort by highest max health first
     std::sort(tankCandidates.begin(), tankCandidates.end(),
         [](Player* a, Player* b)
         {
@@ -172,11 +196,12 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
         }
     );
 
+    // Pick the top candidate
     Player* newMainTank = tankCandidates[0];
     if (!newMainTank) // Safety check
         return;
 
-    // Remove all MAINTANK flags
+    // Unflag everyone from main tank
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
@@ -187,27 +212,15 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     // Assign the single main tank
     group->SetGroupMemberFlag(newMainTank->GetGUID(), true, MEMBER_FLAG_MAINTANK);
 
-    // Notify if the new main tank is a real player
-    // If newMainTank is a real player, GET_PLAYERBOT_AI(...) should be null
-    PlayerbotAI* newMainTankAI = GET_PLAYERBOT_AI(newMainTank);
-    
-    // If this is a normal bot, newMainTankAI won't be nullptr, but it won't be a real player either
-    bool isRealPlayer = (newMainTankAI == nullptr);
-    
-    if (!isRealPlayer)
-    {
-        return;
-    }
-    
-    // Otherwise, we have a real player
+    // Yell a message regardless of whether the new main tank is a bot or a real player
     const std::string playerName = newMainTank->GetName();
-    const std::string text = playerName + " please taunt Razorscale now!";
-
+    const std::string text = playerName + " set as main tank!";
     bot->Yell(text, LANG_UNIVERSAL);
 
     ObjectGuid botGuid = bot->GetGUID();
     if (!botGuid)
         return;
-    
+
+    // Set current time in the cooldown map for this bot to start cooldown
     _lastRoleSwapTime[botGuid] = std::time(nullptr);
 }
