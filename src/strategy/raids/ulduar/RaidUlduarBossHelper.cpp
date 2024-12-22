@@ -205,5 +205,9 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
 
     bot->Yell(text, LANG_UNIVERSAL);
 
-    _lastRoleSwapTime = std::time(nullptr);
+    ObjectGuid botGuid = bot->GetGUID();
+    if (!botGuid)
+        return;
+    
+    _lastRoleSwapTime[botGuid] = std::time(nullptr);
 }
