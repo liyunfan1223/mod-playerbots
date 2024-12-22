@@ -188,14 +188,23 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     group->SetGroupMemberFlag(newMainTank->GetGUID(), true, MEMBER_FLAG_MAINTANK);
 
     // Notify if the new main tank is a real player
-    if (GET_PLAYERBOT_AI(newMainTank) && GET_PLAYERBOT_AI(newMainTank)->IsRealPlayer())
+    // If newMainTank is a real player, GET_PLAYERBOT_AI(...) should be null
+    PlayerbotAI* newMainTankAI = GET_PLAYERBOT_AI(newMainTank);
+    
+    // If this is a normal bot, newMainTankAI won't be nullptr, but it won't be a real player either
+    bool isRealPlayer = (newMainTankAI == nullptr);
+    
+    if (!isRealPlayer)
     {
-        const std::string playerName = newMainTank->GetName();
-        const std::string text = playerName + " please taunt Razorscale now!";
-        
-        // const std::string text = newMainTank->GetName() + ", please taunt Razorscale now!";
-        bot->Say(text, LANG_UNIVERSAL);
+        return;
     }
+    
+    // Otherwise, we have a real player
+    const std::string playerName = newMainTank->GetName();
+    const std::string text = playerName + " please taunt Razorscale now!";
+    
+    bot->Say("Test message from Razorscale debug!", LANG_UNIVERSAL);
+    bot->Say(text, LANG_UNIVERSAL);
 
     _lastRoleSwapTime = std::time(nullptr);
 }
