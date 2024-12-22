@@ -993,30 +993,52 @@ bool RazorscaleHarpoonAction::isUseful()
 
 bool RazorscaleFuseArmorAction::isUseful()
 {
-    if (!botAI->IsMainTank(bot))
+    // If this bot cannot tank at all, no need to do anything
+    if (!botAI->IsTank(bot))
         return false;
 
-    Aura* fuseArmor = bot->GetAura(RazorscaleBossHelper::SPELL_FUSEARMOR);
-    if (!fuseArmor)
+    // If this bot is the main tank AND has Fuse Armor at the threshold, return true immediately
+    if (botAI->IsMainTank(bot))
+    {
+        Aura* fuseArmor = bot->GetAura(RazorscaleBossHelper::SPELL_FUSEARMOR);
+        if (fuseArmor && fuseArmor->GetStackAmount() >= RazorscaleBossHelper::FUSEARMOR_THRESHOLD)
+            return true;
+    }
+
+    // Otherwise, check if there's any other main tank with high Fuse Armor
+    Group* group = bot->GetGroup();
+    if (!group)
         return false;
 
-    return fuseArmor->GetStackAmount() >= RazorscaleBossHelper::FUSEARMOR_THRESHOLD;
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member)
+            continue;
+
+        if (botAI->IsMainTank(member) && member != bot)
+        {
+            Aura* fuseArmor = member->GetAura(RazorscaleBossHelper::SPELL_FUSEARMOR);
+            if (fuseArmor && fuseArmor->GetStackAmount() >= RazorscaleBossHelper::FUSEARMOR_THRESHOLD)
+            {
+                // There is another main tank with high Fuse Armor
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool RazorscaleFuseArmorAction::Execute(Event event)
 {
-    if (!botAI->IsMainTank(bot))
-    {
-        return false;
-    }
+    // We already know from isUseful() that:
+    //  1) This bot can tank, AND
+    //  2) There is at least one main tank (possibly this bot) with Fuse Armor >= threshold.
 
     RazorscaleBossHelper bossHelper(botAI);
-    bossHelper.AssignRolesBasedOnHealth();
 
-    // Check if the bot is still the main tank after reassignment
-    if (botAI->IsMainTank(bot))
-    {
-        return false;
-    }
+    // Attempt to reassign the roles based on health/Fuse Armor debuff
+    bossHelper.AssignRolesBasedOnHealth();
     return true;
 }
