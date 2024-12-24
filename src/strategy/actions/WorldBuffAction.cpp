@@ -41,8 +41,7 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
             continue;
 
         uint8 tab = AiFactory::GetPlayerSpecTab(unit->ToPlayer());
-
-        if (wb.specId != tab)
+        if (wb.specId != tab && wb.specId != 4) // Include Cat Druid spec ID (4)
             continue;
 
         if (wb.minLevel != 0 && wb.minLevel > unit->GetLevel())
@@ -54,7 +53,20 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
         if (unit->HasAura(wb.spellId))
             continue;
 
-        retVec.push_back(wb.spellId);
+        Player* player = unit->ToPlayer();
+        if (player)
+        {
+            // Check if the druid has the Thick Hide talent
+            bool isBear = player->HasTalent(16929, 1); // Thick Hide Talent ID
+
+            // Use Cat Druid buffs if not a Bear Druid
+            uint8 effectiveSpec = isBear ? tab : 4;
+
+            if (wb.specId == effectiveSpec)
+            {
+                retVec.push_back(wb.spellId);
+            }
+        }
     }
 
     return std::move(retVec);
