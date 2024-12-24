@@ -495,7 +495,7 @@ float Formation::GetFollowAngle()
 }
 
 FormationValue::FormationValue(PlayerbotAI* botAI)
-    : ManualSetValue<Formation*>(botAI, new NearFormation(botAI), "formation")
+    : ManualSetValue<Formation*>(botAI, new ChaosFormation(botAI), "formation")
 {
 }
 
@@ -526,7 +526,7 @@ bool FormationValue::Load(std::string const formation)
 
         value = new QueueFormation(botAI);
     }
-    else if (formation == "chaos")
+    else if (formation == "chaos" || formation == "default")
     {
         if (value)
             delete value;
@@ -561,7 +561,7 @@ bool FormationValue::Load(std::string const formation)
 
         value = new ArrowFormation(botAI);
     }
-    else if (formation == "near" || formation == "default")
+    else if (formation == "near")
     {
         if (value)
             delete value;
