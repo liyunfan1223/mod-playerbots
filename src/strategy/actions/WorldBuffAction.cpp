@@ -26,48 +26,63 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
     std::vector<uint32> retVec;
 
     if (sPlayerbotAIConfig->worldBuffs.empty())
-        return std::move(retVec);
+        return retVec;
 
     FactionTemplateEntry const* humanFaction = sFactionTemplateStore.LookupEntry(1);
     uint32 factionId =
         (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL) ? 1 : 2;
 
-    for (auto& wb : sPlayerbotAIConfig->worldBuffs)
+    Player* player = unit->ToPlayer();
+    if (!player)
+        return retVec;
+
+    uint8 playerClass = player->getClass();
+    uint8 playerLevel = player->GetLevel();
+
+    uint8 tab = AiFactory::GetPlayerSpecTab(player);
+
+    // We'll store the final "effective" spec ID here.
+    // For non-Feral druids (and all other classes),
+    // effectiveSpec = tab by default.
+    uint8 effectiveSpec = tab;
+
+    // If this is a druid in the Feral tab, decide Bear vs. Cat
+    if (playerClass == CLASS_DRUID && tab == 1)  // 1 = feral
     {
+        bool isBear = player->HasTalent(16929, 1); // 16929 (rank 1) = Thick Hide
+        if (!isBear)
+        {
+            // If not bear, then treat it as "cat" spec = 4
+            effectiveSpec = 4;
+        }
+        // If bear, effectiveSpec remains 1
+    }
+
+    for (auto const& wb : sPlayerbotAIConfig->worldBuffs)
+    {
+        // Faction check
         if (wb.factionId != 0 && wb.factionId != factionId)
             continue;
 
-        if (wb.classId != 0 && wb.classId != unit->getClass())
+        // Class check
+        if (wb.classId != 0 && wb.classId != playerClass)
             continue;
 
-        uint8 tab = AiFactory::GetPlayerSpecTab(unit->ToPlayer());
-        if (wb.specId != tab && wb.specId != 4) // Include Cat Druid spec ID (4)
+        // Level check
+        if (wb.minLevel != 0 && wb.minLevel > playerLevel)
+            continue;
+        if (wb.maxLevel != 0 && wb.maxLevel < playerLevel)
             continue;
 
-        if (wb.minLevel != 0 && wb.minLevel > unit->GetLevel())
+        // Already has aura?
+        if (player->HasAura(wb.spellId))
             continue;
 
-        if (wb.maxLevel != 0 && wb.maxLevel < unit->GetLevel())
-            continue;
-
-        if (unit->HasAura(wb.spellId))
-            continue;
-
-        Player* player = unit->ToPlayer();
-        if (player)
-        {
-            // Check if the druid has the Thick Hide talent
-            bool isBear = player->HasTalent(16929, 1); // Thick Hide Talent ID
-
-            // Use Cat Druid buffs if not a Bear Druid
-            uint8 effectiveSpec = isBear ? tab : 4;
-
-            if (wb.specId == effectiveSpec)
-            {
-                retVec.push_back(wb.spellId);
-            }
-        }
+        // Final check: does the world-buff spec ID match our effective spec?
+        if (wb.specId == effectiveSpec)
+            retVec.push_back(wb.spellId);
     }
 
-    return std::move(retVec);
+    return retVec;
 }
+
