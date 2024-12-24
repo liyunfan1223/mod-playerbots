@@ -32,14 +32,14 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
     uint32 factionId =
         (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL) ? 1 : 2;
 
-    Player* player = unit->ToPlayer();
-    if (!player)
+    Player* bot = unit->ToPlayer();
+    if (!bot)
         return retVec;
 
-    uint8 playerClass = player->getClass();
-    uint8 playerLevel = player->GetLevel();
+    uint8 botClass = bot->getClass();
+    uint8 botLevel = bot->GetLevel();
 
-    uint8 tab = AiFactory::GetPlayerSpecTab(player);
+    uint8 tab = AiFactory::GetPlayerSpecTab(bot);
 
     // We'll store the final "effective" spec ID here.
     // For non-Feral druids (and all other classes),
@@ -47,9 +47,9 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
     uint8 effectiveSpec = tab;
 
     // If this is a druid in the Feral tab, decide Bear vs. Cat
-    if (playerClass == CLASS_DRUID && tab == 1)  // 1 = feral
+    if (botClass == CLASS_DRUID && tab == 1)  // 1 = feral
     {
-        bool isBear = player->HasTalent(16931, bot->GetActiveSpec()); // Thick Hide rank 3
+        bool isBear = bot->HasTalent(16931, bot->GetActiveSpec()); // Thick Hide rank 3
         if (!isBear)
         {
             // If not bear, then treat it as "cat" spec = 4
@@ -65,17 +65,17 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
             continue;
 
         // Class check
-        if (wb.classId != 0 && wb.classId != playerClass)
+        if (wb.classId != 0 && wb.classId != botClass)
             continue;
 
         // Level check
-        if (wb.minLevel != 0 && wb.minLevel > playerLevel)
+        if (wb.minLevel != 0 && wb.minLevel > botLevel)
             continue;
-        if (wb.maxLevel != 0 && wb.maxLevel < playerLevel)
+        if (wb.maxLevel != 0 && wb.maxLevel < botLevel)
             continue;
 
         // Already has aura?
-        if (player->HasAura(wb.spellId))
+        if (bot->HasAura(wb.spellId))
             continue;
 
         // Final check: does the world-buff spec ID match our effective spec?
