@@ -49,7 +49,7 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
     // If this is a druid in the Feral tab, decide Bear vs. Cat
     if (playerClass == CLASS_DRUID && tab == 1)  // 1 = feral
     {
-        bool isBear = player->HasTalent(16929, 1); // 16929 (rank 1) = Thick Hide
+        bool isBear = player->HasTalent(16931, bot->GetActiveSpec()); // Thick Hide rank 3
         if (!isBear)
         {
             // If not bear, then treat it as "cat" spec = 4
