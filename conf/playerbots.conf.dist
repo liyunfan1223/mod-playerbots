@@ -495,6 +495,11 @@ AiPlayerbot.PreQuests = 0
 # Enable LFG for random bots
 AiPlayerbot.RandomBotJoinLfg = 1
 
+# Percentage ratio of alliance and horde
+# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
+AiPlayerbot.RandomBotAllianceRatio = 50
+AiPlayerbot.RandomBotHordeRatio = 50
+
 # Disable death knight for bots login
 # Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 AiPlayerbot.DisableDeathKnightLogin = 0
