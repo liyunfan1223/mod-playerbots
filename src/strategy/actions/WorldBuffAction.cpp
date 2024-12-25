@@ -52,11 +52,24 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
         bool isBear = bot->HasTalent(16931, bot->GetActiveSpec()); // Thick Hide rank 3
         if (!isBear)
         {
-            // If not bear, then treat it as "cat" spec = 4
-            effectiveSpec = 4;
+            // If not bear, then treat it as "cat" spec = 3
+            effectiveSpec = 3;
         }
         // If bear, effectiveSpec remains 1
     }
+
+    // If this is a Death Knight in the Blood tab, decide Tank vs. DPS
+    if (botClass == CLASS_DEATH_KNIGHT && tab == 0)  // 0 = Blood
+    {
+        bool isTank = bot->HasTalent(55226, bot->GetActiveSpec()); // Blade Barrier rank 5
+        if (!isTank)
+        {
+            // If not tank, then treat it as DPS spec = 3
+            effectiveSpec = 3;
+        }
+        // If tank, effectiveSpec remains unchanged
+    }
+
 
     for (auto const& wb : sPlayerbotAIConfig->worldBuffs)
     {
