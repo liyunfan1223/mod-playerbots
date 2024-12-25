@@ -464,6 +464,9 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         maxAllowedBotCount -= currentBots.size();
         maxAllowedBotCount = std::min(sPlayerbotAIConfig->randomBotsPerInterval, maxAllowedBotCount);
 
+        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / (sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio);
+        uint32 allowedHordeCount = maxAllowedBotCount - allowedAllianceCount;
+
         for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin();
              i != sPlayerbotAIConfig->randomBotAccounts.end(); i++)
         {
@@ -500,17 +503,29 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
                 if (sPlayerbotAIConfig->disableDeathKnightLogin)
                 {
-                    QueryResult result = CharacterDatabase.Query("Select class from characters where guid = {}", guid);
-                    if (!result)
-                    {
-                        continue;
-                    }
-                    Field* fields = result->Fetch();
-                    uint32 rClass = fields[0].Get<uint32>();
+                    uint32 rClass = fields[1].Get<uint8>();
                     if (rClass == CLASS_DEATH_KNIGHT)
                     {
                         continue;
                     }
+                }
+                uint32 rRace = fields[2].Get<uint8>();
+                uint32 isAlliance = IsAlliance(rRace);
+                if (!allowedAllianceCount && isAlliance)
+                {
+                    continue;
+                }
+                if (!allowedHordeCount && !isAlliance)
+                {
+                    continue;
+                }
+                if (isAlliance)
+                {
+                    allowedAllianceCount--;
+                }
+                else
+                {
+                    allowedHordeCount--;
                 }
                 guids.push_back(guid);
             } while (result->NextRow());
@@ -540,7 +555,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
         if (maxAllowedBotCount)
             LOG_ERROR("playerbots",
-                      "Not enough random bot accounts available. Need {} more, try to increase RandomBotAccountCount "
+                      "Not enough random bot accounts available. Try to increase RandomBotAccountCount "
                       "in your conf file",
                       ceil(maxAllowedBotCount / 10));
     }
