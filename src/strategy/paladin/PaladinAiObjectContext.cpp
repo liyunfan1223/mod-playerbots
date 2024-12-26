@@ -314,15 +314,27 @@ private:
     static Action* divine_storm(PlayerbotAI* botAI) { return new CastDivineStormAction(botAI); }
     static Action* blessing_of_kings_on_party(PlayerbotAI* botAI)
     {
-        return new CastBlessingOfKingsOnPartyAction(botAI);
+        if (botAI->GetBot()->GetLevel() >= 60) {
+            return new CastGreaterBlessingOfKingsOnPartyAction(botAI);
+        } else {
+            return new CastBlessingOfKingsOnPartyAction(botAI);
+        }
     }
     static Action* blessing_of_might_on_party(PlayerbotAI* botAI)
     {
-        return new CastBlessingOfMightOnPartyAction(botAI);
+        if (botAI->GetBot()->GetLevel() >= 52) {
+            return new CastGreaterBlessingOfMightOnPartyAction(botAI);
+        } else {
+            return new CastBlessingOfMightOnPartyAction(botAI);
+        }
     }
     static Action* blessing_of_wisdom_on_party(PlayerbotAI* botAI)
     {
-        return new CastBlessingOfWisdomOnPartyAction(botAI);
+        if (botAI->GetBot()->GetLevel() >= 60) {
+            return new CastGreaterBlessingOfWisdomOnPartyAction(botAI);
+        } else {
+            return new CastBlessingOfWisdomOnPartyAction(botAI);
+        }
     }
     static Action* redemption(PlayerbotAI* botAI) { return new CastRedemptionAction(botAI); }
     static Action* crusader_strike(PlayerbotAI* botAI) { return new CastCrusaderStrikeAction(botAI); }

@@ -111,6 +111,14 @@ public:
     bool Execute(Event event) override;
 };
 
+class CastGreaterBlessingOfMightOnPartyAction : public BuffOnPartyAction
+{
+public:
+    CastGreaterBlessingOfMightOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "greater blessing of might") {}
+
+    std::string const getName() override { return "blessing of might on party"; }
+};
+
 class CastBlessingOfWisdomAction : public CastBuffSpellAction
 {
 public:
@@ -129,6 +137,14 @@ public:
     bool Execute(Event event) override;
 };
 
+class CastGreaterBlessingOfWisdomOnPartyAction : public BuffOnPartyAction
+{
+public:
+    CastGreaterBlessingOfWisdomOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "greater blessing of wisdom") {}
+
+    std::string const getName() override { return "blessing of wisdom on party"; }
+};
+
 class CastBlessingOfKingsAction : public CastBuffSpellAction
 {
 public:
@@ -143,6 +159,14 @@ public:
     std::string const getName() override { return "blessing of kings on party"; }
 };
 
+class CastGreaterBlessingOfKingsOnPartyAction : public CastBlessingOnPartyAction
+{
+public:
+    CastGreaterBlessingOfKingsOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "greater blessing of kings") {}
+
+    std::string const getName() override { return "blessing of kings on party"; }
+};
+
 class CastBlessingOfSanctuaryAction : public CastBuffSpellAction
 {
 public:
@@ -152,9 +176,15 @@ public:
 class CastBlessingOfSanctuaryOnPartyAction : public CastBlessingOnPartyAction
 {
 public:
-    CastBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "blessing of sanctuary")
-    {
-    }
+    CastBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "blessing of sanctuary") {}
+
+    std::string const getName() override { return "blessing of sanctuary on party"; }
+};
+
+class CastGreaterBlessingOfSanctuaryOnPartyAction : public CastBlessingOnPartyAction
+{
+public:
+    CastGreaterBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "greater blessing of sanctuary") {}
 
     std::string const getName() override { return "blessing of sanctuary on party"; }
 };
