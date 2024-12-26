@@ -246,13 +246,13 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         float dis = rand_norm() * pathFinderDis;
         float dx = x + cos(angle) * dis;
         float dy = y + sin(angle) * dis;
-        float dz = z + 5.0f;
+        float dz = z + 0.5f;
         bot->UpdateAllowedPositionZ(dx, dy, dz);
         PathGenerator path(bot);
         path.CalculatePath(dx, dy, dz);
         PathType type = path.GetPathType();
 
-        bool canReach = type == PATHFIND_INCOMPLETE || type == PATHFIND_NORMAL;
+        bool canReach = type == PATHFIND_NORMAL;
 
         if (canReach && fabs(delta) <= minDelta)
         {
