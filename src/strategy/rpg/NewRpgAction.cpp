@@ -197,7 +197,11 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
     {
         if (bot->GetMapId() != loc.GetMapId())
             continue;
-
+        
+        if (bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) !=
+            bot->GetZoneId())
+            continue;
+            
         float range = bot->GetLevel() <= 5 ? 500.0f : 2500.0f;
         if (bot->GetExactDist(loc) < range)
         {
