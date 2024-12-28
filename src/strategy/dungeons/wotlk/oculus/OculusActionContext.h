@@ -12,7 +12,7 @@ class WotlkDungeonOccActionContext : public NamedObjectContext<Action>
             creators["avoid unstable sphere"] = &WotlkDungeonOccActionContext::avoid_unstable_sphere;
             creators["mount drake"] = &WotlkDungeonOccActionContext::mount_drake;
             creators["dismount drake"] = &WotlkDungeonOccActionContext::dismount_drake;
-            creators["fly drake"] = &WotlkDungeonOccActionContext::fly_drake;
+            creators["occ fly drake"] = &WotlkDungeonOccActionContext::fly_drake;
             creators["drake attack"] = &WotlkDungeonOccActionContext::drake_attack;
             creators["avoid arcane explosion"] = &WotlkDungeonOccActionContext::avoid_arcane_explosion;
             creators["time bomb spread"] = &WotlkDungeonOccActionContext::time_bomb_spread;

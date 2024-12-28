@@ -14,7 +14,7 @@ public:
         creators["malygos target"] = &RaidEoEActionContext::target;
         // creators["pull power spark"] = &RaidEoEActionContext::pull_power_spark;
         // creators["kill power spark"] = &RaidEoEActionContext::kill_power_spark;
-        creators["fly drake"] = &RaidEoEActionContext::fly_drake;
+        creators["eoe fly drake"] = &RaidEoEActionContext::fly_drake;
         creators["drake attack"] = &RaidEoEActionContext::drake_attack;
     }
 
