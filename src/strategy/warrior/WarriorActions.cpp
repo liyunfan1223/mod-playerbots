@@ -38,6 +38,9 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
             !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
         {
             selectedTarget = member;
+            LOG_INFO("playerbots", "Bot {} <{}> selected Main Tank {} <{}> for Vigilance", 
+                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                     member->GetGUID().ToString().c_str(), member->GetName().c_str());
             break;
         }
     }
@@ -54,6 +57,9 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
                     !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
                 {
                     selectedTarget = member;
+                    LOG_INFO("playerbots", "Bot {} <{}> selected Assist Tank {} <{}> for Vigilance", 
+                             bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                             member->GetGUID().ToString().c_str(), member->GetName().c_str());
                     break;
                 }
             }
