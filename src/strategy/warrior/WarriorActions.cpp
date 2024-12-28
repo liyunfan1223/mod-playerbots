@@ -15,7 +15,71 @@ bool CastSunderArmorAction::isUseful()
 
 Value<Unit*>* CastVigilanceAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", "vigilance");
+    Group* group = bot->GetGroup();
+    if (!group)
+        return nullptr;
+
+    // Check if Vigilance is already active and owned by the bot
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+            return nullptr; // Bot already has Vigilance on someone
+    }
+
+    Unit* mainTank = nullptr;
+
+    // Step 1: Prioritize Main Tank
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (member && member != bot && botAI->IsMainTank(member) &&
+            !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+        {
+            mainTank = member;
+            break;
+        }
+    }
+
+    if (mainTank)
+        return context->GetValue<Unit*>("target", mainTank);
+
+    // Step 2: Check Assist Tanks by Index
+    for (int index = 0; index < MAX_ASSIST_TANKS; ++index)
+    {
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (member && member != bot && botAI->IsAssistTankOfIndex(member, index) &&
+                !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+            {
+                return context->GetValue<Unit*>("target", member);
+            }
+        }
+    }
+
+    // Step 3: Fall Back to Highest DPS (based on gear score)
+    Player* highestGearScorePlayer = nullptr;
+    uint32 highestGearScore = 0;
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (member && member != bot && !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+        {
+            uint32 gearScore = botAI->GetEquipGearScore(member, false, false); // Exclude bags and bank
+            if (gearScore > highestGearScore)
+            {
+                highestGearScore = gearScore;
+                highestGearScorePlayer = member;
+            }
+        }
+    }
+
+    if (highestGearScorePlayer)
+        return context->GetValue<Unit*>("target", highestGearScorePlayer);
+
+    return nullptr; // No valid target found
 }
 
 bool CastVigilanceAction::Execute(Event event)
