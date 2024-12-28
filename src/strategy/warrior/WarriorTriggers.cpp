@@ -15,9 +15,24 @@ bool BloodrageBuffTrigger::IsActive()
 
 bool VigilanceTrigger::IsActive()
 {
-    // Check for an appropriate target for Vigilance
+    // Get a potential target that doesn't already have Vigilance
     Unit* target = context->GetValue<Unit*>("party member without aura", "vigilance")->Get();
-    
-    // Ensure the target exists, is not the bot itself, and the bot doesn't already have Vigilance active
-    return target && target != bot && !botAI->HasAura("vigilance", bot);
+    if (!target || target == bot) // Prevent self-casting
+        return false;
+
+    // Check if the bot has Vigilance on another member
+    Group* group = bot->GetGroup();
+    if (group)
+    {
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+                return false; // Vigilance is already applied by this bot
+        }
+    }
+
+    // Return true if there's a valid target and no conflicts
+    return true;
 }
+
