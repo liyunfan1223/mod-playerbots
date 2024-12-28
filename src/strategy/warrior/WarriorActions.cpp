@@ -18,66 +18,59 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     Group* group = bot->GetGroup();
     if (!group)
     {
-        LOG_INFO("playerbots", "Bot {} <{}> found no group to apply Vigilance", 
+        LOG_INFO("playerbots", "Bot {} <{}> is not in a group, Vigilance cannot be applied", 
                  bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
-        return new ManualSetValue<Unit*>(botAI, nullptr); // Return a valid but empty value
+        return new ManualSetValue<Unit*>(botAI, nullptr);
     }
 
-    Player* selectedTarget = nullptr;
+    Player* currentVigilanceTarget = nullptr;
 
-    // Step 1: Check if Vigilance is already applied by the bot
+    // Check if Vigilance is already applied by the bot
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
         if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
         {
-            LOG_INFO("playerbots", "Bot {} <{}> already has Vigilance applied to {} <{}>", 
-                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                     member->GetGUID().ToString().c_str(), member->GetName().c_str());
-            return new ManualSetValue<Unit*>(botAI, nullptr); // No need to reapply Vigilance
-        }
-    }
-
-    // Step 2: Prioritize Main Tank
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-    {
-        Player* member = ref->GetSource();
-        if (member && member != bot && botAI->IsMainTank(member) &&
-            !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
-        {
-            selectedTarget = member;
-            LOG_INFO("playerbots", "Bot {} <{}> selected Main Tank {} <{}> for Vigilance", 
-                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                     member->GetGUID().ToString().c_str(), member->GetName().c_str());
+            currentVigilanceTarget = member;
             break;
         }
     }
 
-    // Step 3: Check Assist Tanks if no Main Tank is selected
-    if (!selectedTarget)
+    // Determine the highest-priority target
+    Player* highestPriorityTarget = nullptr;
+
+    // Step 1: Check Main Tank
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (member && member != bot && botAI->IsMainTank(member))
+        {
+            highestPriorityTarget = member;
+            break;
+        }
+    }
+
+    // Step 2: Check Assist Tanks if no Main Tank is selected
+    if (!highestPriorityTarget)
     {
         for (int index = 0; index < 2; ++index)
         {
             for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
             {
                 Player* member = ref->GetSource();
-                if (member && member != bot && botAI->IsAssistTankOfIndex(member, index) &&
-                    !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+                if (member && member != bot && botAI->IsAssistTankOfIndex(member, index))
                 {
-                    selectedTarget = member;
-                    LOG_INFO("playerbots", "Bot {} <{}> selected Assist Tank {} <{}> for Vigilance", 
-                             bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                             member->GetGUID().ToString().c_str(), member->GetName().c_str());
+                    highestPriorityTarget = member;
                     break;
                 }
             }
-            if (selectedTarget)
+            if (highestPriorityTarget)
                 break;
         }
     }
 
-    // Step 4: Fall Back to Highest DPS if no tanks are valid targets
-    if (!selectedTarget)
+    // Step 3: Fall Back to Highest DPS
+    if (!highestPriorityTarget)
     {
         Player* highestGearScorePlayer = nullptr;
         uint32 highestGearScore = 0;
@@ -85,7 +78,7 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->GetSource();
-            if (member && member != bot && !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+            if (member && member != bot)
             {
                 uint32 gearScore = botAI->GetEquipGearScore(member, false, false); // Exclude bags and bank
                 if (gearScore > highestGearScore)
@@ -96,30 +89,39 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
             }
         }
 
-        selectedTarget = highestGearScorePlayer;
+        highestPriorityTarget = highestGearScorePlayer;
     }
 
-    // Step 5: Convert to Unit* and return the appropriate target
-    if (selectedTarget)
+    // If no valid target, return nullptr
+    if (!highestPriorityTarget)
     {
-        Unit* targetUnit = selectedTarget->ToUnit();
-        if (targetUnit)
-        {
-            LOG_INFO("playerbots", "Bot {} <{}> will cast Vigilance on {} <{}>", 
-                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                     targetUnit->GetGUID().ToString().c_str(), targetUnit->GetName().c_str());
-            return new ManualSetValue<Unit*>(botAI, targetUnit); // Wrap and return the target
-        }
-        else
-        {
-            LOG_INFO("playerbots", "Bot {} <{}> selected invalid target (not a Unit*)", 
-                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
-        }
+        LOG_INFO("playerbots", "Bot {} <{}> found no valid target for Vigilance", 
+                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+        return new ManualSetValue<Unit*>(botAI, nullptr);
     }
 
-    LOG_INFO("playerbots", "Bot {} <{}> found no valid target for Vigilance", 
+    // If the current target is already the highest-priority target, do nothing
+    if (currentVigilanceTarget == highestPriorityTarget)
+    {
+        LOG_INFO("playerbots", "Bot {} <{}> already has Vigilance on the highest-priority target {} <{}>", 
+                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                 currentVigilanceTarget->GetGUID().ToString().c_str(), currentVigilanceTarget->GetName().c_str());
+        return new ManualSetValue<Unit*>(botAI, nullptr);
+    }
+
+    // Assign the new target
+    Unit* targetUnit = highestPriorityTarget->ToUnit();
+    if (targetUnit)
+    {
+        LOG_INFO("playerbots", "Bot {} <{}> will cast Vigilance on {} <{}>", 
+                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                 targetUnit->GetGUID().ToString().c_str(), targetUnit->GetName().c_str());
+        return new ManualSetValue<Unit*>(botAI, targetUnit);
+    }
+
+    LOG_INFO("playerbots", "Bot {} <{}> selected an invalid target for Vigilance (not a Unit*)", 
              bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
-    return new ManualSetValue<Unit*>(botAI, nullptr); // Return a valid but empty value
+    return new ManualSetValue<Unit*>(botAI, nullptr);
 }
 
 bool CastVigilanceAction::Execute(Event event)
