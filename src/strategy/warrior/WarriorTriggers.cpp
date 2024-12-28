@@ -74,10 +74,6 @@ bool VigilanceTrigger::IsActive()
     // Trigger if no Vigilance is active or the current target is not the highest-priority target
     if (!currentVigilanceTarget || currentVigilanceTarget != highestPriorityTarget)
     {
-        LOG_INFO("playerbots", "Bot {} <{}> needs to reassign Vigilance to {} <{}>", 
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                 highestPriorityTarget ? highestPriorityTarget->GetGUID().ToString().c_str() : "none", 
-                 highestPriorityTarget ? highestPriorityTarget->GetName().c_str() : "none");
         return true;
     }
 
