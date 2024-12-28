@@ -100,7 +100,7 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
             LOG_INFO("playerbots", "Bot {} <{}> will cast Vigilance on {} <{}>", 
                      bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
                      targetUnit->GetGUID().ToString().c_str(), targetUnit->GetName().c_str());
-            return targetUnit; // Directly return the targetUnit
+            return new ManualSetValue<Unit*>(context, targetUnit); // Wrap and return the target
         }
         else
         {
