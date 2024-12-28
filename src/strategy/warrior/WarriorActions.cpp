@@ -104,5 +104,9 @@ bool CastVigilanceAction::Execute(Event event)
     if (!target || target == bot)
         return false;
 
+    LOG_INFO("playerbots", "Bot {} <{}> attempts to cast Vigilance on {} <{}>", 
+                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                 target->GetGUID().ToString().c_str(), target->GetName().c_str());
+
     return botAI->CastSpell("vigilance", target);
 }
