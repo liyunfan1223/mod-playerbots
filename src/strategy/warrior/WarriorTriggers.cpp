@@ -15,24 +15,92 @@ bool BloodrageBuffTrigger::IsActive()
 
 bool VigilanceTrigger::IsActive()
 {
-    // Get a potential target that doesn't already have Vigilance
-    Unit* target = context->GetValue<Unit*>("party member without aura", "vigilance")->Get();
-    if (!target || target == bot) // Prevent self-casting
-        return false;
-
-    // Check if the bot has Vigilance on another member
     Group* group = bot->GetGroup();
-    if (group)
+    if (!group)
     {
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        LOG_INFO("playerbots", "Bot {} <{}> is not in a group, Vigilance cannot be applied", 
+                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+        return false;
+    }
+
+    Player* currentVigilanceTarget = nullptr;
+
+    // Check if Vigilance is already applied by the bot
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
         {
-            Player* member = ref->GetSource();
-            if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
-                return false; // Vigilance is already applied by this bot
+            currentVigilanceTarget = member;
+            break;
         }
     }
 
-    // Return true if there's a valid target and no conflicts
-    return true;
-}
+    // Find the highest-priority target
+    Player* highestPriorityTarget = nullptr;
 
+    // Step 1: Check Main Tank
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (member && member != bot && botAI->IsMainTank(member))
+        {
+            highestPriorityTarget = member;
+            break;
+        }
+    }
+
+    // Step 2: Check Assist Tanks if no Main Tank is selected
+    if (!highestPriorityTarget)
+    {
+        for (int index = 0; index < MAX_ASSIST_TANKS; ++index)
+        {
+            for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+            {
+                Player* member = ref->GetSource();
+                if (member && member != bot && botAI->IsAssistTankOfIndex(member, index))
+                {
+                    highestPriorityTarget = member;
+                    break;
+                }
+            }
+            if (highestPriorityTarget)
+                break;
+        }
+    }
+
+    // Step 3: Fall Back to Highest DPS
+    if (!highestPriorityTarget)
+    {
+        Player* highestGearScorePlayer = nullptr;
+        uint32 highestGearScore = 0;
+
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (member && member != bot)
+            {
+                uint32 gearScore = botAI->GetEquipGearScore(member, false, false); // Exclude bags and bank
+                if (gearScore > highestGearScore)
+                {
+                    highestGearScore = gearScore;
+                    highestGearScorePlayer = member;
+                }
+            }
+        }
+
+        highestPriorityTarget = highestGearScorePlayer;
+    }
+
+    // Trigger if no Vigilance is active or the current target is not the highest-priority target
+    if (!currentVigilanceTarget || currentVigilanceTarget != highestPriorityTarget)
+    {
+        LOG_INFO("playerbots", "Bot {} <{}> needs to reassign Vigilance to {} <{}>", 
+                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                 highestPriorityTarget ? highestPriorityTarget->GetGUID().ToString().c_str() : "none", 
+                 highestPriorityTarget ? highestPriorityTarget->GetName().c_str() : "none");
+        return true;
+    }
+
+    return false; // No need to reassign Vigilance
+}
