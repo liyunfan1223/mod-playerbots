@@ -15,7 +15,7 @@ bool BloodrageBuffTrigger::IsActive()
 
 bool VigilanceTrigger::IsActive()
 {
-    if (!bot->HasSpell(50720)
+    if (!bot->HasSpell(50720))
     {
         return false;
     }
