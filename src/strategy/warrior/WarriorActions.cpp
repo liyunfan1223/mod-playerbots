@@ -91,9 +91,23 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
         selectedTarget = highestGearScorePlayer;
     }
 
-    // Step 5: Return the appropriate target
+    // Step 5: Convert to Unit* and return the appropriate target
     if (selectedTarget)
-        return context->GetValue<Unit*>("party member without aura", selectedTarget->GetName());
+    {
+        Unit* targetUnit = selectedTarget->ToUnit();
+        if (targetUnit)
+        {
+            LOG_INFO("playerbots", "Bot {} <{}> will cast Vigilance on {} <{}>", 
+                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                     targetUnit->GetGUID().ToString().c_str(), targetUnit->GetName().c_str());
+            return targetUnit; // Directly return the targetUnit
+        }
+        else
+        {
+            LOG_INFO("playerbots", "Bot {} <{}> selected invalid target (not a Unit*)", 
+                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+        }
+    }
     
     return nullptr;
 }
