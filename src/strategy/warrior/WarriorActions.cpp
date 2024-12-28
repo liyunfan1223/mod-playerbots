@@ -17,9 +17,12 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
 {
     Group* group = bot->GetGroup();
     if (!group)
-        return nullptr;
+    {
+        LOG_INFO("playerbots", "Bot {} <{}> found no group to apply Vigilance", 
+                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+        return new ManualSetValue<Unit*>(botAI, nullptr); // Return a valid but empty value
+    }
 
-    // Determine the target to apply Vigilance
     Player* selectedTarget = nullptr;
 
     // Step 1: Check if Vigilance is already applied by the bot
@@ -27,7 +30,12 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     {
         Player* member = ref->GetSource();
         if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
-            return nullptr; // Vigilance already applied, no need to reapply
+        {
+            LOG_INFO("playerbots", "Bot {} <{}> already has Vigilance applied to {} <{}>", 
+                     bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
+                     member->GetGUID().ToString().c_str(), member->GetName().c_str());
+            return new ManualSetValue<Unit*>(botAI, nullptr); // No need to reapply Vigilance
+        }
     }
 
     // Step 2: Prioritize Main Tank
@@ -108,8 +116,10 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
                      bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
         }
     }
-    
-    return nullptr;
+
+    LOG_INFO("playerbots", "Bot {} <{}> found no valid target for Vigilance", 
+             bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+    return new ManualSetValue<Unit*>(botAI, nullptr); // Return a valid but empty value
 }
 
 bool CastVigilanceAction::Execute(Event event)
