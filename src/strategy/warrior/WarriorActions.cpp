@@ -18,8 +18,6 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     Group* group = bot->GetGroup();
     if (!group)
     {
-        // LOG_INFO("playerbots", "Bot {} <{}> is not in a group, Vigilance cannot be applied", 
-        //         bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
         return new ManualSetValue<Unit*>(botAI, nullptr);
     }
 
@@ -76,17 +74,12 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     // If no valid target, return nullptr
     if (!highestPriorityTarget)
     {
-        LOG_INFO("playerbots", "Bot {} <{}> found no valid target for Vigilance", 
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
         return new ManualSetValue<Unit*>(botAI, nullptr);
     }
 
     // If the current target is already the highest-priority target, do nothing
     if (currentVigilanceTarget == highestPriorityTarget)
     {
-        LOG_INFO("playerbots", "Bot {} <{}> already has Vigilance on the highest-priority target {} <{}>", 
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                 currentVigilanceTarget->GetGUID().ToString().c_str(), currentVigilanceTarget->GetName().c_str());
         return new ManualSetValue<Unit*>(botAI, nullptr);
     }
 
@@ -94,14 +87,9 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     Unit* targetUnit = highestPriorityTarget->ToUnit();
     if (targetUnit)
     {
-        LOG_INFO("playerbots", "Bot {} <{}> will cast Vigilance on {} <{}>", 
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                 targetUnit->GetGUID().ToString().c_str(), targetUnit->GetName().c_str());
         return new ManualSetValue<Unit*>(botAI, targetUnit);
     }
 
-    LOG_INFO("playerbots", "Bot {} <{}> selected an invalid target for Vigilance (not a Unit*)", 
-             bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
     return new ManualSetValue<Unit*>(botAI, nullptr);
 }
 
@@ -110,10 +98,6 @@ bool CastVigilanceAction::Execute(Event event)
     Unit* target = GetTarget();
     if (!target || target == bot)
         return false;
-
-    LOG_INFO("playerbots", "Bot {} <{}> attempts to cast Vigilance on {} <{}>", 
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str(),
-                 target->GetGUID().ToString().c_str(), target->GetName().c_str());
 
     return botAI->CastSpell("vigilance", target);
 }
