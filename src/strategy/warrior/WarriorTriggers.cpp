@@ -37,7 +37,7 @@ bool VigilanceTrigger::IsActive()
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member || member == bot)
+        if (!member || member == bot || !member->IsAlive())
             continue;
 
         // Check if member has Vigilance applied by the bot
