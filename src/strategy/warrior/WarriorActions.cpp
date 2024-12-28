@@ -24,73 +24,54 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     }
 
     Player* currentVigilanceTarget = nullptr;
+    Player* mainTank = nullptr;
+    Player* assistTank1 = nullptr;
+    Player* assistTank2 = nullptr;
+    Player* highestGearScorePlayer = nullptr;
+    uint32 highestGearScore = 0;
 
-    // Check if Vigilance is already applied by the bot
+    // Iterate once through the group to gather all necessary information
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
+        if (!member || member == bot)
+            continue;
+
+        // Check if member has Vigilance applied by the bot
+        if (!currentVigilanceTarget && botAI->HasAura("vigilance", member, false, true))
         {
             currentVigilanceTarget = member;
-            break;
+        }
+
+        // Identify Main Tank
+        if (!mainTank && botAI->IsMainTank(member))
+        {
+            mainTank = member;
+        }
+
+        // Identify Assist Tanks
+        if (assistTank1 == nullptr && botAI->IsAssistTankOfIndex(member, 0))
+        {
+            assistTank1 = member;
+        }
+        else if (assistTank2 == nullptr && botAI->IsAssistTankOfIndex(member, 1))
+        {
+            assistTank2 = member;
+        }
+
+        // Determine Highest Gear Score
+        uint32 gearScore = botAI->GetEquipGearScore(member, false, false);
+        if (gearScore > highestGearScore)
+        {
+            highestGearScore = gearScore;
+            highestGearScorePlayer = member;
         }
     }
 
     // Determine the highest-priority target
-    Player* highestPriorityTarget = nullptr;
-
-    // Step 1: Check Main Tank
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-    {
-        Player* member = ref->GetSource();
-        if (member && member != bot && botAI->IsMainTank(member))
-        {
-            highestPriorityTarget = member;
-            break;
-        }
-    }
-
-    // Step 2: Check Assist Tanks if no Main Tank is selected
-    if (!highestPriorityTarget)
-    {
-        for (int index = 0; index < 2; ++index)
-        {
-            for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-            {
-                Player* member = ref->GetSource();
-                if (member && member != bot && botAI->IsAssistTankOfIndex(member, index))
-                {
-                    highestPriorityTarget = member;
-                    break;
-                }
-            }
-            if (highestPriorityTarget)
-                break;
-        }
-    }
-
-    // Step 3: Fall Back to Highest DPS
-    if (!highestPriorityTarget)
-    {
-        Player* highestGearScorePlayer = nullptr;
-        uint32 highestGearScore = 0;
-
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-        {
-            Player* member = ref->GetSource();
-            if (member && member != bot)
-            {
-                uint32 gearScore = botAI->GetEquipGearScore(member, false, false); // Exclude bags and bank
-                if (gearScore > highestGearScore)
-                {
-                    highestGearScore = gearScore;
-                    highestGearScorePlayer = member;
-                }
-            }
-        }
-
-        highestPriorityTarget = highestGearScorePlayer;
-    }
+    Player* highestPriorityTarget = mainTank ? mainTank :
+                                      (assistTank1 ? assistTank1 :
+                                      (assistTank2 ? assistTank2 : highestGearScorePlayer));
 
     // If no valid target, return nullptr
     if (!highestPriorityTarget)
