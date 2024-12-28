@@ -42,10 +42,10 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     }
 
     if (mainTank)
-        return context->GetValue<Unit*>("target", mainTank);
+        return mainTank; // Return the main tank directly
 
     // Step 2: Check Assist Tanks by Index
-    for (int index = 0; index < MAX_ASSIST_TANKS; ++index)
+    for (int index = 0; index < 2; ++index)
     {
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
