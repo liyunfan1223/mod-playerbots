@@ -18,8 +18,8 @@ bool VigilanceTrigger::IsActive()
     Group* group = bot->GetGroup();
     if (!group)
     {
-        LOG_INFO("playerbots", "Bot {} <{}> is not in a group, Vigilance cannot be applied", 
-                 bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
+        // LOG_INFO("playerbots", "Bot {} <{}> is not in a group, Vigilance cannot be applied", 
+        //         bot->GetGUID().ToString().c_str(), bot->GetName().c_str());
         return false;
     }
 
