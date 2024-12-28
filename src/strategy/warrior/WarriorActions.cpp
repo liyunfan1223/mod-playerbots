@@ -19,29 +19,31 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     if (!group)
         return nullptr;
 
-    // Check if Vigilance is already active and owned by the bot
+    // Determine the target to apply Vigilance
+    Player* selectedTarget = nullptr;
+
+    // Step 1: Check if Vigilance is already applied by the bot
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
         if (member && botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
-            return nullptr; // Bot already has Vigilance on someone
+            return nullptr; // Vigilance already applied, no need to reapply
     }
 
-    Unit* target = nullptr;
-
-    // Step 1: Prioritize Main Tank
+    // Step 2: Prioritize Main Tank
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
         if (member && member != bot && botAI->IsMainTank(member) &&
             !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
         {
-            target = member;
+            selectedTarget = member;
             break;
         }
     }
 
-    if (!target) // Step 2: Check Assist Tanks by Index
+    // Step 3: Check Assist Tanks if no Main Tank is selected
+    if (!selectedTarget)
     {
         for (int index = 0; index < 2; ++index)
         {
@@ -51,16 +53,17 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
                 if (member && member != bot && botAI->IsAssistTankOfIndex(member, index) &&
                     !botAI->HasAura("vigilance", member, false, true)) // checkIsOwner = true
                 {
-                    target = member;
+                    selectedTarget = member;
                     break;
                 }
             }
-            if (target)
+            if (selectedTarget)
                 break;
         }
     }
 
-    if (!target) // Step 3: Fall Back to Highest DPS (based on gear score)
+    // Step 4: Fall Back to Highest DPS if no tanks are valid targets
+    if (!selectedTarget)
     {
         Player* highestGearScorePlayer = nullptr;
         uint32 highestGearScore = 0;
@@ -79,11 +82,14 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
             }
         }
 
-        target = highestGearScorePlayer;
+        selectedTarget = highestGearScorePlayer;
     }
 
-    // Return the target wrapped as a Value<Unit*>* if valid, otherwise nullptr
-    return target ? new ManualSetValue<Unit*>(context, target) : nullptr;
+    // Step 5: Return the appropriate target
+    if (selectedTarget)
+        return context->GetValue<Unit*>("party member without aura", selectedTarget->GetName());
+    
+    return nullptr;
 }
 
 bool CastVigilanceAction::Execute(Event event)
