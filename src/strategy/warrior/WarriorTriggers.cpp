@@ -53,7 +53,7 @@ bool VigilanceTrigger::IsActive()
     // Step 2: Check Assist Tanks if no Main Tank is selected
     if (!highestPriorityTarget)
     {
-        for (int index = 0; index < MAX_ASSIST_TANKS; ++index)
+        for (int index = 0; index < 2; ++index)
         {
             for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
             {
