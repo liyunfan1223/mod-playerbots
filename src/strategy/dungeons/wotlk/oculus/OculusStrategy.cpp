@@ -17,7 +17,7 @@ void WotlkDungeonOccStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("group flying",
         NextAction::array(0, new NextAction("occ fly drake", ACTION_NORMAL + 1), nullptr)));
     triggers.push_back(new TriggerNode("drake combat",
-        NextAction::array(0, new NextAction("drake attack", ACTION_NORMAL + 5), nullptr)));
+        NextAction::array(0, new NextAction("occ drake attack", ACTION_NORMAL + 5), nullptr)));
 
     // Varos Cloudstrider
     // Seems to be no way to identify the marked cores, may need to hook boss AI..
