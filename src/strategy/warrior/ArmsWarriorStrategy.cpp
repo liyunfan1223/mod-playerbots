@@ -64,7 +64,7 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "victory rush", NextAction::array(0, new NextAction("victory rush", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode(
-        "high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 10), nullptr)));
+        "high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("medium rage available", 
         NextAction::array(0, new NextAction("slam", ACTION_HIGH + 1),
         new NextAction("thunder clap", ACTION_HIGH),
