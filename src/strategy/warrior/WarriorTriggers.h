@@ -63,6 +63,14 @@ public:
     RendDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rend", 1, true) {}
 };
 
+class VigilanceTrigger : public BuffOnPartyTrigger
+{
+public:
+    VigilanceTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "vigilance") {}
+
+    bool IsActive() override; 
+};
+
 // class SlamTrigger : public HasAuraTrigger
 // {
 // public:
