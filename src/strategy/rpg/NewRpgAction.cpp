@@ -197,7 +197,11 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
     {
         if (bot->GetMapId() != loc.GetMapId())
             continue;
-
+        
+        if (bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) !=
+            bot->GetZoneId())
+            continue;
+            
         float range = bot->GetLevel() <= 5 ? 500.0f : 2500.0f;
         if (bot->GetExactDist(loc) < range)
         {
@@ -246,13 +250,13 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         float dis = rand_norm() * pathFinderDis;
         float dx = x + cos(angle) * dis;
         float dy = y + sin(angle) * dis;
-        float dz = z + 5.0f;
+        float dz = z + 0.5f;
         bot->UpdateAllowedPositionZ(dx, dy, dz);
         PathGenerator path(bot);
         path.CalculatePath(dx, dy, dz);
         PathType type = path.GetPathType();
 
-        bool canReach = type == PATHFIND_INCOMPLETE || type == PATHFIND_NORMAL;
+        bool canReach = type == PATHFIND_NORMAL;
 
         if (canReach && fabs(delta) <= minDelta)
         {
