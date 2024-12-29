@@ -42,6 +42,20 @@ public:
         creators["icc bql tank position"] = &RaidIccTriggerContext::icc_bql_tank_position;
         creators["icc bql pact of darkfallen"] = &RaidIccTriggerContext::icc_bql_pact_of_darkfallen;
         creators["icc bql vampiric bite"] = &RaidIccTriggerContext::icc_bql_vampiric_bite;
+        creators["icc valkyre spear"] = &RaidIccTriggerContext::icc_valkyre_spear;
+        creators["icc sister svalna"] = &RaidIccTriggerContext::icc_sister_svalna;
+        creators["icc valithria portal"] = &RaidIccTriggerContext::icc_valithria_portal;
+        creators["icc valithria heal"] = &RaidIccTriggerContext::icc_valithria_heal;
+        creators["icc valithria dream cloud"] = &RaidIccTriggerContext::icc_valithria_dream_cloud;
+        creators["icc sindragosa tank position"] = &RaidIccTriggerContext::icc_sindragosa_tank_position;    
+        creators["icc sindragosa frost beacon"] = &RaidIccTriggerContext::icc_sindragosa_frost_beacon;
+        creators["icc sindragosa blistering cold"] = &RaidIccTriggerContext::icc_sindragosa_blistering_cold;    
+        creators["icc sindragosa unchained magic"] = &RaidIccTriggerContext::icc_sindragosa_unchained_magic;
+        creators["icc sindragosa chilled to the bone"] = &RaidIccTriggerContext::icc_sindragosa_chilled_to_the_bone;
+        creators["icc sindragosa mystic buffet"] = &RaidIccTriggerContext::icc_sindragosa_mystic_buffet;
+        creators["icc sindragosa main tank mystic buffet"] = &RaidIccTriggerContext::icc_sindragosa_main_tank_mystic_buffet;
+        creators["icc sindragosa frost bomb"] = &RaidIccTriggerContext::icc_sindragosa_frost_bomb;
+        creators["icc sindragosa tank swap position"] = &RaidIccTriggerContext::icc_sindragosa_tank_swap_position;
     }
 
 private:
@@ -77,6 +91,20 @@ private:
     static Trigger* icc_bql_tank_position(PlayerbotAI* ai) { return new IccBqlTankPositionTrigger(ai); }
     static Trigger* icc_bql_pact_of_darkfallen(PlayerbotAI* ai) { return new IccBqlPactOfDarkfallenTrigger(ai); }
     static Trigger* icc_bql_vampiric_bite(PlayerbotAI* ai) { return new IccBqlVampiricBiteTrigger(ai); }
+    static Trigger* icc_valkyre_spear(PlayerbotAI* ai) { return new IccValkyreSpearTrigger(ai); }
+    static Trigger* icc_sister_svalna(PlayerbotAI* ai) { return new IccSisterSvalnaTrigger(ai); }
+    static Trigger* icc_valithria_portal(PlayerbotAI* ai) { return new IccValithriaPortalTrigger(ai); }
+    static Trigger* icc_valithria_heal(PlayerbotAI* ai) { return new IccValithriaHealTrigger(ai); }
+    static Trigger* icc_valithria_dream_cloud(PlayerbotAI* ai) { return new IccValithriaDreamCloudTrigger(ai); }
+    static Trigger* icc_sindragosa_tank_position(PlayerbotAI* ai) { return new IccSindragosaTankPositionTrigger(ai); }  
+    static Trigger* icc_sindragosa_frost_beacon(PlayerbotAI* ai) { return new IccSindragosaFrostBeaconTrigger(ai); }    
+    static Trigger* icc_sindragosa_blistering_cold(PlayerbotAI* ai) { return new IccSindragosaBlisteringColdTrigger(ai); }  
+    static Trigger* icc_sindragosa_unchained_magic(PlayerbotAI* ai) { return new IccSindragosaUnchainedMagicTrigger(ai); }
+    static Trigger* icc_sindragosa_chilled_to_the_bone(PlayerbotAI* ai) { return new IccSindragosaChilledToTheBoneTrigger(ai); }
+    static Trigger* icc_sindragosa_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMysticBuffetTrigger(ai); }
+    static Trigger* icc_sindragosa_main_tank_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMainTankMysticBuffetTrigger(ai); }
+    static Trigger* icc_sindragosa_frost_bomb(PlayerbotAI* ai) { return new IccSindragosaFrostBombTrigger(ai); }
+    static Trigger* icc_sindragosa_tank_swap_position(PlayerbotAI* ai) { return new IccSindragosaTankSwapPositionTrigger(ai); }
 };
 
 #endif

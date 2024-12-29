@@ -38,6 +38,19 @@ public:
         creators["icc bql tank position"] = &RaidIccActionContext::icc_bql_tank_position;
         creators["icc bql pact of darkfallen"] = &RaidIccActionContext::icc_bql_pact_of_darkfallen;
         creators["icc bql vampiric bite"] = &RaidIccActionContext::icc_bql_vampiric_bite;
+        creators["icc valkyre spear"] = &RaidIccActionContext::icc_valkyre_spear;
+        creators["icc sister svalna"] = &RaidIccActionContext::icc_sister_svalna;
+        creators["icc valithria portal"] = &RaidIccActionContext::icc_valithria_portal;
+        creators["icc valithria heal"] = &RaidIccActionContext::icc_valithria_heal;
+        creators["icc valithria dream cloud"] = &RaidIccActionContext::icc_valithria_dream_cloud;
+        creators["icc sindragosa tank position"] = &RaidIccActionContext::icc_sindragosa_tank_position;
+        creators["icc sindragosa frost beacon"] = &RaidIccActionContext::icc_sindragosa_frost_beacon;
+        creators["icc sindragosa blistering cold"] = &RaidIccActionContext::icc_sindragosa_blistering_cold;
+        creators["icc sindragosa unchained magic"] = &RaidIccActionContext::icc_sindragosa_unchained_magic;
+        creators["icc sindragosa chilled to the bone"] = &RaidIccActionContext::icc_sindragosa_chilled_to_the_bone;
+        creators["icc sindragosa mystic buffet"] = &RaidIccActionContext::icc_sindragosa_mystic_buffet; 
+        creators["icc sindragosa frost bomb"] = &RaidIccActionContext::icc_sindragosa_frost_bomb;
+        creators["icc sindragosa tank swap position"] = &RaidIccActionContext::icc_sindragosa_tank_swap_position;
     }
 
 private:
@@ -65,11 +78,23 @@ private:
     static Action* icc_bpc_keleseth_tank(PlayerbotAI* ai) { return new IccBpcKelesethTankAction(ai); }
     static Action* icc_bpc_nucleus(PlayerbotAI* ai) { return new IccBpcNucleusAction(ai); }
     static Action* icc_bpc_main_tank(PlayerbotAI* ai) { return new IccBpcMainTankAction(ai); }
-    static Action* icc_bpc_empowered_vortex(PlayerbotAI* botAI) { return new IccBpcEmpoweredVortexAction(botAI); }
+    static Action* icc_bpc_empowered_vortex(PlayerbotAI* ai) { return new IccBpcEmpoweredVortexAction(ai); }
     static Action* icc_bql_tank_position(PlayerbotAI* ai) { return new IccBqlTankPositionAction(ai); }
     static Action* icc_bql_pact_of_darkfallen(PlayerbotAI* ai) { return new IccBqlPactOfDarkfallenAction(ai); }
     static Action* icc_bql_vampiric_bite(PlayerbotAI* ai) { return new IccBqlVampiricBiteAction(ai); }
-    
+    static Action* icc_valkyre_spear(PlayerbotAI* ai) { return new IccValkyreSpearAction(ai); }
+    static Action* icc_sister_svalna(PlayerbotAI* ai) { return new IccSisterSvalnaAction(ai); }
+    static Action* icc_valithria_portal(PlayerbotAI* ai) { return new IccValithriaPortalAction(ai); }
+    static Action* icc_valithria_heal(PlayerbotAI* ai) { return new IccValithriaHealAction(ai); }
+    static Action* icc_valithria_dream_cloud(PlayerbotAI* ai) { return new IccValithriaDreamCloudAction(ai); }
+    static Action* icc_sindragosa_tank_position(PlayerbotAI* ai) { return new IccSindragosaTankPositionAction(ai); }
+    static Action* icc_sindragosa_frost_beacon(PlayerbotAI* ai) { return new IccSindragosaFrostBeaconAction(ai); }  
+    static Action* icc_sindragosa_blistering_cold(PlayerbotAI* ai) { return new IccSindragosaBlisteringColdAction(ai); }
+    static Action* icc_sindragosa_unchained_magic(PlayerbotAI* ai) { return new IccSindragosaUnchainedMagicAction(ai); }
+    static Action* icc_sindragosa_chilled_to_the_bone(PlayerbotAI* ai) { return new IccSindragosaChilledToTheBoneAction(ai); }
+    static Action* icc_sindragosa_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMysticBuffetAction(ai); }    
+    static Action* icc_sindragosa_frost_bomb(PlayerbotAI* ai) { return new IccSindragosaFrostBombAction(ai); }
+    static Action* icc_sindragosa_tank_swap_position(PlayerbotAI* ai) { return new IccSindragosaTankSwapPositionAction(ai); }
 };
 
 #endif

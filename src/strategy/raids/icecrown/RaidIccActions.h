@@ -32,6 +32,20 @@ const Position ICC_BPC_OT_POSITION = Position(4649.2236f, 2796.0972f, 361.1815f)
 const Position ICC_BPC_MT_POSITION = Position(4648.5674f, 2744.847f, 361.18222f);
 const Position ICC_BQL_CENTER_POSITION = Position(4595.0f, 2769.0f, 400.0f);
 const Position ICC_BQL_TANK_POSITION = Position(4616.102f, 2768.9167f, 400.13797f);
+const Position ICC_SINDRAGOSA_TANK_POSITION = Position(4408.016f, 2508.0647f, 203.37955f);
+const Position ICC_SINDRAGOSA_RANGED_POSITION = Position(4373.7686f, 2498.0042f, 203.38176f);
+const Position ICC_SINDRAGOSA_MELEE_POSITION = Position(4389.22f, 2499.5237f, 203.38033f);
+const Position ICC_SINDRAGOSA_BLISTERING_COLD_POSITION = Position(4357.036f, 2484.5574f, 203.4777f);   
+const Position ICC_SINDRAGOSA_THOMB1_POSITION = Position(4381.819f, 2471.1448f, 203.37704f);       // Westmost position
+const Position ICC_SINDRAGOSA_THOMB2_POSITION = Position(4381.819f, 2483.1448f, 203.37704f);       // 12y east from pos1
+const Position ICC_SINDRAGOSA_THOMB3_POSITION = Position(4381.819f, 2471.1448f, 203.37704f);       // Same as pos1
+const Position ICC_SINDRAGOSA_THOMB4_POSITION = Position(4381.819f, 2483.1448f, 203.37704f);       // Same as pos2
+const Position ICC_SINDRAGOSA_THOMB5_POSITION = Position(4381.819f, 2495.1448f, 203.37704f);       // 12y east from pos2/4
+const Position ICC_SINDRAGOSA_CENTER_POSITION = Position(4408.0464f, 2484.478f, 203.37529f);           
+const Position ICC_SINDRAGOSA_THOMBMB2_POSITION = Position(4382.6113f, 2505.4922f, 203.38197f);       
+const Position ICC_SINDRAGOSA_FBOMB_POSITION = Position(4400.031f, 2507.0295f, 203.37929f);       
+const Position ICC_SINDRAGOSA_LOS2_POSITION = Position(4376.0938f, 2511.103f, 203.38303f);              
+
 
 //Lord Marrogwar
 class IccLmTankPositionAction : public AttackAction
@@ -270,6 +284,110 @@ public:
     bool Execute(Event event) override;
 };
 
+//VDW
+class IccValkyreSpearAction : public AttackAction
+{
+public:
+    IccValkyreSpearAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc valkyre spear") {}
+    bool Execute(Event event) override;
+};
+    
+class IccSisterSvalnaAction : public AttackAction
+{
+public:
+    IccSisterSvalnaAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sister svalna") {}
+    bool Execute(Event event) override;
+};
 
+class IccValithriaPortalAction : public MovementAction
+{
+public:
+    IccValithriaPortalAction(PlayerbotAI* botAI) 
+            : MovementAction(botAI, "icc valithria portal") {}
+    bool Execute(Event event) override;
+};
+
+class IccValithriaHealAction : public AttackAction
+{
+public:
+    IccValithriaHealAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc valithria heal") {}
+    bool Execute(Event event) override;
+};
+
+class IccValithriaDreamCloudAction : public MovementAction
+{
+public:
+    IccValithriaDreamCloudAction(PlayerbotAI* botAI) 
+            : MovementAction(botAI, "icc valithria dream cloud") {}
+    bool Execute(Event event) override;
+};
+
+//Sindragosa
+class IccSindragosaTankPositionAction : public AttackAction
+{
+public:
+    IccSindragosaTankPositionAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sindragosa tank position") {}
+    bool Execute(Event event) override;
+};
+
+class IccSindragosaFrostBeaconAction : public AttackAction
+{
+public:
+    IccSindragosaFrostBeaconAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sindragosa frost beacon") {}
+    bool Execute(Event event) override;
+};
+
+class IccSindragosaBlisteringColdAction : public AttackAction
+{
+public:
+    IccSindragosaBlisteringColdAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sindragosa blistering cold") {}
+    bool Execute(Event event) override;
+};
+
+class IccSindragosaUnchainedMagicAction : public AttackAction
+{
+public:
+    IccSindragosaUnchainedMagicAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sindragosa unchained magic") {}
+    bool Execute(Event event) override;
+};
+
+class IccSindragosaChilledToTheBoneAction : public AttackAction
+{
+public:
+    IccSindragosaChilledToTheBoneAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sindragosa chilled to the bone") {}
+    bool Execute(Event event) override;
+}; 
+
+class IccSindragosaMysticBuffetAction : public AttackAction
+{
+public:
+    IccSindragosaMysticBuffetAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sindragosa mystic buffet") {}
+    bool Execute(Event event) override;
+};
+
+class IccSindragosaFrostBombAction : public AttackAction
+{
+public:
+    IccSindragosaFrostBombAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc sindragosa frost bomb") {}
+    bool Execute(Event event) override;
+};
+
+class IccSindragosaTankSwapPositionAction : public AttackAction 
+{
+    public:
+        IccSindragosaTankSwapPositionAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "sindragosa tank swap position") {}
+        bool Execute(Event event) override;
+};
 
 #endif

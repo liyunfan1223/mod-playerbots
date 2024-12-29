@@ -36,17 +36,18 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
         for (auto& guid : targets)
         {
             Unit* unit = botAI->GetUnit(guid);
-            if (unit && (unit->GetEntry() == 38508 || //blood beast
-                        unit->GetEntry() == 38596 || 
-                        unit->GetEntry() == 38597 || 
-                        unit->GetEntry() == 38598))
+            if (unit && unit->IsAlive() && (
+                unit->GetEntry() == 38508 || //blood beast
+                unit->GetEntry() == 38596 || 
+                unit->GetEntry() == 38597 || 
+                unit->GetEntry() == 38598))
             {
                 hasAdds = true;
                 break;
             }
         }
 
-        if (hasAdds)
+        if (hasAdds && !botAI->IsMainTank(bot))
         {
             if (dynamic_cast<IccAddsDbsAction*>(action))
                 return 2.0f;
@@ -221,6 +222,7 @@ float IccBpcAssistMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
+//BQL
 float IccBqlPactOfDarkfallenMultiplier::GetValue(Action* action)
 {
     if (!action)
@@ -258,4 +260,165 @@ float IccBqlVampiricBiteMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
+//VDW
+float IccValithriaDreamCloudMultiplier::GetValue(Action* action)
+{
+    if (!bot->HasAura(70766))
+        return 1.0f;
 
+    // If bot is in dream state, prioritize cloud collection over other actions
+    if (bot->HasAura(70766) && dynamic_cast<IccValithriaDreamCloudAction*>(action))
+        return 2.0f;
+    else if (dynamic_cast<FollowAction*>(action))
+        return 0.0f;
+
+    return 1.0f;
+}
+
+//SINDRAGOSA
+float IccSindragosaTankPositionMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return 1.0f;
+
+    if (dynamic_cast<IccSindragosaTankPositionAction*>(action))
+        return 1.0f;
+    else if (dynamic_cast<CombatFormationMoveAction*>(action))
+        return 0.0f;    
+    return 1.0f;
+}
+
+float IccSindragosaFrostBeaconMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return 1.0f;
+
+    if (!dynamic_cast<IccSindragosaFrostBeaconAction*>(action))
+        return 1.0f;
+
+    // Highest priority if we have beacon
+    if (bot->HasAura(70126))
+        return 2.0f;
+
+    // Lower priority for non-beaconed players
+    float const MIN_SAFE_DISTANCE = 11.0f;
+    GuidVector members = AI_VALUE(GuidVector, "group members");
+    
+    for (auto& member : members)
+    {
+        Unit* player = botAI->GetUnit(member);
+        if (!player || player->GetGUID() == bot->GetGUID())
+            continue;
+            
+        if (player->HasAura(70126)) // Frost Beacon
+        {
+            float dist = bot->GetExactDist2d(player);
+            if (dist < MIN_SAFE_DISTANCE)
+                return 1.5f;  // Medium priority if too close to beaconed player
+        }
+    }
+
+    return 1.0f;
+}
+
+float IccSindragosaBlisteringColdPriorityMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return 1.0f;
+
+    // Check if boss is casting blistering cold (using both normal and heroic spell IDs)
+    if (boss->HasUnitState(UNIT_STATE_CASTING) && 
+        (boss->FindCurrentSpellBySpellId(70123) || boss->FindCurrentSpellBySpellId(71047) || 
+         boss->FindCurrentSpellBySpellId(71048) || boss->FindCurrentSpellBySpellId(71049)))
+    {
+        // If this is the blistering cold action, give it highest priority
+        if (dynamic_cast<IccSindragosaBlisteringColdAction*>(action) ||
+            dynamic_cast<IccSindragosaTankSwapPositionAction*>(action))
+            return 5.0f;
+
+        // Disable all other actions while blistering cold is casting
+        return 0.0f;
+    }
+
+    return 1.0f;
+}
+
+float IccSindragosaMysticBuffetMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return 1.0f;
+
+    if (boss->GetVictim() == bot)
+        return 1.0f;
+
+    // Only modify actions if we have buffet stacks
+    Aura* aura = bot->GetAura(70127);
+    Aura* aura2 = bot->GetAura(72528);
+    
+    // Return normal priority if no auras or not enough stacks
+    if (!aura && !aura2)
+        return 1.0f;
+        
+    bool hasEnoughStacks = (aura && aura->GetStackAmount() >= 3) || (aura2 && aura2->GetStackAmount() >= 3);
+    if (!hasEnoughStacks)
+        return 1.0f;
+
+    if (dynamic_cast<IccSindragosaMysticBuffetAction*>(action) || 
+        dynamic_cast<IccSindragosaTankSwapPositionAction*>(action))
+        return 5.0f;
+    else if (dynamic_cast<CombatFormationMoveAction*>(action) || 
+             dynamic_cast<IccSindragosaTankPositionAction*>(action)
+             || dynamic_cast<FollowAction*>(action))
+        return 0.0f;    
+    return 1.0f;
+}
+
+float IccSindragosaFrostBombMultiplier::GetValue(Action* action)
+{
+    if (!action || !bot || !bot->IsAlive())
+        return 1.0f;
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return 1.0f;
+
+    float const MAX_REACTION_RANGE = 200.0f;
+
+    // Check if there's an active frost bomb marker within range
+    bool hasMarkerInRange = false;
+    float closestDist = std::numeric_limits<float>::max();
+    
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (!unit || !unit->IsAlive())
+            continue;
+
+        if (unit->HasAura(70022))  // Frost bomb visual
+        {
+            float dist = bot->GetDistance(unit);
+            if (dist <= MAX_REACTION_RANGE && dist < closestDist)
+            {
+                hasMarkerInRange = true;
+                closestDist = dist;
+            }
+        }
+    }
+
+    if (!hasMarkerInRange)
+        return 1.0f;
+
+    if (dynamic_cast<IccSindragosaFrostBombAction*>(action))
+        return 5.0f;
+    else if (dynamic_cast<CombatFormationMoveAction*>(action) || 
+             dynamic_cast<IccSindragosaTankPositionAction*>(action)
+             || dynamic_cast<IccSindragosaBlisteringColdAction*>(action)
+             || dynamic_cast<FollowAction*>(action))
+        return 0.0f;    
+    return 1.0f;
+}

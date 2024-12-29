@@ -240,4 +240,107 @@ public:
     IccBqlVampiricBiteTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc bql vampiric bite") {}
     bool IsActive() override;
 };
+
+//VDW
+class IccValkyreSpearTrigger : public Trigger
+{
+public:
+    IccValkyreSpearTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc valkyre spear") {}
+    bool IsActive() override;
+};  
+
+class IccSisterSvalnaTrigger : public Trigger
+{
+public:
+    IccSisterSvalnaTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sister svalna") {}
+    bool IsActive() override;
+};
+
+class IccValithriaPortalTrigger : public Trigger
+{
+public:
+    IccValithriaPortalTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc valithria portal") {}
+    bool IsActive() override;
+};
+
+class IccValithriaHealTrigger : public Trigger
+{
+public:
+    IccValithriaHealTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc valithria heal") {}
+    bool IsActive() override;
+};
+
+class IccValithriaDreamCloudTrigger : public Trigger
+{
+public:
+    IccValithriaDreamCloudTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc valithria dream cloud") {}
+    bool IsActive() override;
+};
+
+
+//SINDRAGOSA
+class IccSindragosaTankPositionTrigger : public Trigger
+{
+public:
+    IccSindragosaTankPositionTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa tank position") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaFrostBeaconTrigger : public Trigger
+{
+public:
+    IccSindragosaFrostBeaconTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa frost beacon") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaBlisteringColdTrigger : public Trigger
+{
+public:
+    IccSindragosaBlisteringColdTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa blistering cold") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaUnchainedMagicTrigger : public Trigger   
+{
+public:
+    IccSindragosaUnchainedMagicTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa unchained magic") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaChilledToTheBoneTrigger : public Trigger
+{
+public:
+    IccSindragosaChilledToTheBoneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa chilled to the bone") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaMysticBuffetTrigger : public Trigger
+{
+public:
+    IccSindragosaMysticBuffetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa mystic buffet") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaMainTankMysticBuffetTrigger : public Trigger
+{
+public:
+    IccSindragosaMainTankMysticBuffetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa main tank mystic buffet") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaTankSwapPositionTrigger : public Trigger
+{
+public:
+    IccSindragosaTankSwapPositionTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa tank swap position") {}
+    bool IsActive() override;
+};
+
+class IccSindragosaFrostBombTrigger : public Trigger
+{
+public:
+    IccSindragosaFrostBombTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc sindragosa frost bomb") {}
+    bool IsActive() override;
+};
+
+
 #endif

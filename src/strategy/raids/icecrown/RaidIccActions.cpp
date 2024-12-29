@@ -106,7 +106,6 @@ bool IccDarkReckoningAction::Execute(Event event)
 {
     if (bot->HasAura(69483) && bot->GetExactDist2d(ICC_DARK_RECKONING_SAFE_POSITION) > 2.0f) //dark reckoning spell id
     {
-        botAI->Yell("Dark Reckoning - moving to safe position");
         return MoveTo(bot->GetMapId(), ICC_DARK_RECKONING_SAFE_POSITION.GetPositionX(),
                       ICC_DARK_RECKONING_SAFE_POSITION.GetPositionY(), ICC_DARK_RECKONING_SAFE_POSITION.GetPositionZ(), false,
                       false, false, true, MovementPriority::MOVEMENT_NORMAL);
@@ -233,6 +232,7 @@ bool IccShadeLadyDeathwhisperAction::Execute(Event event)
             if (unit->GetVictim() == bot)
             {
                 float currentDistance = bot->GetDistance2d(unit);
+               
                 // Move away from the Vengeful Shade if the bot is too close
                 if (currentDistance < radius)
                 {
@@ -452,6 +452,9 @@ bool IccDbsTankPositionAction::Execute(Event event)
                           false, false, true, MovementPriority::MOVEMENT_NORMAL);
     }
 
+    if (bot->HasAura(71042) || bot->HasAura(72408))
+        return true;
+
     if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
     {
     float radius = 9.0f;
@@ -491,6 +494,9 @@ bool IccAddsDbsAction::Execute(Event event)
     // Find the boss
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
     if (!boss) { return false; }
+
+    if (!(bot->HasAura(71042) || bot->HasAura(72408)) && botAI->IsMainTank(bot)) //rune of blood aura
+        return false;
 
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     
@@ -1353,10 +1359,6 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
     if (!(bot->HasAura(70877) || bot->HasAura(71474)))
         return false;
 
-    // Only DPS and healers should try to bite
-    if (!botAI->IsDps(bot) && !botAI->IsHeal(bot))
-        return false;
-
     const float BITE_RANGE = 2.0f;
     Player* target = nullptr;
     Group* group = bot->GetGroup();
@@ -1435,4 +1437,749 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
     }
 
     return false;
+}
+
+//VDW
+
+//Valkyre 38248 spear, 50307 spear in inv, Sister Svalna 37126, aether shield 71463
+
+bool IccValkyreSpearAction::Execute(Event event)
+{
+    // Find the nearest spear
+    Creature* spear = bot->FindNearestCreature(38248, 100.0f);
+    if (!spear)
+        return false;
+
+    // Move to the spear if not in range
+    if (!spear->IsWithinDistInMap(bot, INTERACTION_DISTANCE))
+    {
+        return MoveTo(spear, INTERACTION_DISTANCE);
+    }
+
+    // Remove shapeshift forms
+    botAI->RemoveShapeshift();
+
+    // Stop movement and click the spear
+    bot->GetMotionMaster()->Clear();
+    bot->StopMoving();
+    spear->HandleSpellClick(bot);
+
+    // Dismount if mounted
+    WorldPacket emptyPacket;
+    bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+
+    return false;
+}
+
+bool IccSisterSvalnaAction::Execute(Event event)
+{
+    Unit* svalna = AI_VALUE2(Unit*, "find target", "sister svalna");
+    if (!svalna || !svalna->HasAura(71463)) // Check for Aether Shield aura
+        return false;
+
+    // Check if bot has the spear item
+    if (!botAI->HasItemInInventory(50307))
+        return false;
+
+    // Get all items from inventory
+    std::vector<Item*> items = botAI->GetInventoryItems();
+    for (Item* item : items)
+    {
+        if (item->GetEntry() == 50307) // Spear ID
+        {
+            botAI->ImbueItem(item, svalna); // Use spear on Svalna
+            return false;
+        }
+    }
+
+    return false;
+}
+
+bool IccValithriaPortalAction::Execute(Event event)
+{
+    if (!botAI->IsHeal(bot) || bot->getClass() == CLASS_DRUID || bot->HasAura(70766))
+        return false;
+
+    // Find the nearest portal
+    Creature* portal = bot->FindNearestCreature(37945, 100.0f); // Dream Portal
+    if (!portal)
+        portal = bot->FindNearestCreature(38430, 100.0f); // Nightmare Portal
+
+    if (!portal)
+        return false;
+
+    // Move to the portal if the bot is not at the interact distance
+    if (!portal->IsWithinDistInMap(bot, INTERACTION_DISTANCE))
+    {
+        return MoveTo(portal, INTERACTION_DISTANCE);
+    }
+
+    // Remove shapeshift forms
+    botAI->RemoveShapeshift();
+
+    // Stop movement and click the portal
+    bot->GetMotionMaster()->Clear();
+    bot->StopMoving();
+    portal->HandleSpellClick(bot);
+
+    // Dismount if mounted
+    WorldPacket emptyPacket;
+    bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+
+    return false;
+}
+
+bool IccValithriaHealAction::Execute(Event event)
+{
+    if (!botAI->IsHeal(bot))
+        return false;
+
+    // Find Valithria
+    if (Creature* valithria = bot->FindNearestCreature(36789, 100.0f))
+    {
+        switch (bot->getClass())
+        {
+            case CLASS_SHAMAN:
+                return botAI->CastSpell(49276, valithria); // Lesser Healing Wave
+            case CLASS_PRIEST:
+                return botAI->CastSpell(48071, valithria); // Flash Heal
+            case CLASS_PALADIN:
+                return botAI->CastSpell(48782, valithria); // Holy Light
+            default:
+                return false;
+        }
+    }
+
+    return false;
+}
+
+bool IccValithriaDreamCloudAction::Execute(Event event)
+{
+    // Only execute if we're in dream state
+    if (!bot->HasAura(70766))
+        return false;
+
+    // Find nearest cloud of either type that we haven't collected
+    Creature* dreamCloud = bot->FindNearestCreature(37985, 100.0f);
+    Creature* nightmareCloud = bot->FindNearestCreature(38421, 100.0f);
+
+    // If we have emerald vigor, prioritize dream clouds
+    if (bot->HasAura(70873))
+    {
+        if (dreamCloud)
+            return MoveTo(dreamCloud->GetMapId(), dreamCloud->GetPositionX(), dreamCloud->GetPositionY(), dreamCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+        if (nightmareCloud)
+            return MoveTo(nightmareCloud->GetMapId(), nightmareCloud->GetPositionX(), nightmareCloud->GetPositionY(), nightmareCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+    }
+    // Otherwise prioritize nightmare clouds
+    else
+    {
+        if (nightmareCloud)
+            return MoveTo(nightmareCloud->GetMapId(), nightmareCloud->GetPositionX(), nightmareCloud->GetPositionY(), nightmareCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+        if (dreamCloud)
+            return MoveTo(dreamCloud->GetMapId(), dreamCloud->GetPositionX(), dreamCloud->GetPositionY(), dreamCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+    }
+
+    return false;
+}
+
+//Sindragosa
+
+bool IccSindragosaTankPositionAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss || boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
+        return false;
+
+    if ((botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot)) && (boss->GetVictim() == bot)) 
+    {
+        float distBossToCenter = boss->GetExactDist2d(ICC_SINDRAGOSA_CENTER_POSITION);
+        float distToTankPos = bot->GetExactDist2d(ICC_SINDRAGOSA_TANK_POSITION);
+        float targetOrientation = M_PI / 2; // We want boss to face east
+        float currentOrientation = boss->GetOrientation();
+        
+        // Normalize both orientations to 0-2π range
+        currentOrientation = fmod(currentOrientation + 2 * M_PI, 2 * M_PI);
+        targetOrientation = fmod(targetOrientation + 2 * M_PI, 2 * M_PI);
+        
+        float orientationDiff = currentOrientation - targetOrientation;
+        
+        // Normalize the difference to be between -PI and PI
+        while (orientationDiff > M_PI) orientationDiff -= 2 * M_PI;
+        while (orientationDiff < -M_PI) orientationDiff += 2 * M_PI;
+        
+        
+        // Stage 1: Move boss to center if too far
+        if (distBossToCenter > 20.0f)
+        {
+            
+            // Calculate direction vector from boss to center
+            float dirX = ICC_SINDRAGOSA_CENTER_POSITION.GetPositionX() - boss->GetPositionX();
+            float dirY = ICC_SINDRAGOSA_CENTER_POSITION.GetPositionY() - boss->GetPositionY();
+            
+            // Move 10 yards beyond center in the same direction
+            float moveX = ICC_SINDRAGOSA_CENTER_POSITION.GetPositionX() + (dirX / distBossToCenter) * 10.0f;
+            float moveY = ICC_SINDRAGOSA_CENTER_POSITION.GetPositionY() + (dirY / distBossToCenter) * 10.0f;
+            
+            return MoveTo(bot->GetMapId(), moveX, moveY, boss->GetPositionZ(),
+                         false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+        }
+        
+        // Stage 2: Get to tank position when boss is centered
+        if (distToTankPos > 5.0f)
+        {
+            return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_TANK_POSITION.GetPositionX(),
+                      ICC_SINDRAGOSA_TANK_POSITION.GetPositionY(),
+                      ICC_SINDRAGOSA_TANK_POSITION.GetPositionZ(),
+                      false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+        }
+        
+        // Stage 3: Adjust orientation when in position
+        bool needsOrientationAdjust = std::abs(orientationDiff) > 0.15f;
+        if (needsOrientationAdjust)
+        {
+            // When we have negative difference (currentOrientation < targetOrientation)
+            // We need to move south to make the orientation more positive
+            float currentX = bot->GetPositionX();
+            float currentY = bot->GetPositionY();
+            float moveX, moveY;
+            
+            // For negative difference (need to increase orientation) -> move south
+            // For positive difference (need to decrease orientation) -> move north
+            if (orientationDiff < 0)
+            {
+                moveX = currentX - 2.0f; // Move south to increase orientation
+                moveY = currentY;
+            }
+            else
+            {
+                moveX = currentX + 2.0f; // Move north to decrease orientation
+                moveY = currentY;
+            }
+            
+            return MoveTo(bot->GetMapId(), moveX, moveY, bot->GetPositionZ(),
+                        false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+        }
+        return false;
+    }
+    
+    // Non-tanks should stay on the left flank to avoid both cleave and tail smash
+    if (boss && !(boss->GetVictim() == bot) /*&& !bot->HasAura(69762)*/)
+    {
+        if (botAI->IsRanged(bot))
+        {
+            float const TOLERANCE = 15.0f;        // 15 yard tolerance
+            float const MAX_STEP = 5.0f;          // Maximum distance to move in one step
+            
+            float distToTarget = bot->GetExactDist2d(ICC_SINDRAGOSA_RANGED_POSITION);
+
+            // Only move if outside tolerance
+            if (distToTarget > TOLERANCE)
+            {
+                // Calculate direction vector to target
+                float dirX = ICC_SINDRAGOSA_RANGED_POSITION.GetPositionX() - bot->GetPositionX();
+                float dirY = ICC_SINDRAGOSA_RANGED_POSITION.GetPositionY() - bot->GetPositionY();
+                
+                // Normalize direction vector
+                float length = sqrt(dirX * dirX + dirY * dirY);
+                dirX /= length;
+                dirY /= length;
+
+                // Calculate intermediate point
+                float stepSize = std::min(MAX_STEP, distToTarget);
+                float moveX = bot->GetPositionX() + dirX * stepSize;
+                float moveY = bot->GetPositionY() + dirY * stepSize;
+
+                return MoveTo(bot->GetMapId(), moveX, moveY, ICC_SINDRAGOSA_RANGED_POSITION.GetPositionZ(),
+                             false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+            }
+            return false;
+        }
+        else
+        {
+            float const TOLERANCE = 10.0f;  // 10 yard tolerance for melee
+            float const MAX_STEP = 5.0f;    // Maximum distance to move in one step
+
+            float distToTarget = bot->GetExactDist2d(ICC_SINDRAGOSA_MELEE_POSITION);
+
+            // Only move if outside tolerance
+            if (distToTarget > TOLERANCE)
+            {
+                // Calculate direction vector to target
+                float dirX = ICC_SINDRAGOSA_MELEE_POSITION.GetPositionX() - bot->GetPositionX();
+                float dirY = ICC_SINDRAGOSA_MELEE_POSITION.GetPositionY() - bot->GetPositionY();
+                
+                // Normalize direction vector
+                float length = sqrt(dirX * dirX + dirY * dirY);
+                dirX /= length;
+                dirY /= length;
+
+                // Calculate intermediate point
+                float stepSize = std::min(MAX_STEP, distToTarget);
+                float moveX = bot->GetPositionX() + dirX * stepSize;
+                float moveY = bot->GetPositionY() + dirY * stepSize;
+
+                return MoveTo(bot->GetMapId(), moveX, moveY, ICC_SINDRAGOSA_MELEE_POSITION.GetPositionZ(),
+                            false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+            }
+            return false;
+        }
+    }
+    return false;
+}
+
+bool IccSindragosaTankSwapPositionAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return false;
+
+    // Only for assist tank
+    if (!botAI->IsAssistTankOfIndex(bot, 0))
+        return false;
+
+    float distToTankPos = bot->GetExactDist2d(ICC_SINDRAGOSA_TANK_POSITION);
+    
+    // Move to tank position
+    if (distToTankPos > 3.0f)  // Tighter tolerance for tank swap
+    {
+        return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_TANK_POSITION.GetPositionX(),
+                     ICC_SINDRAGOSA_TANK_POSITION.GetPositionY(),
+                     ICC_SINDRAGOSA_TANK_POSITION.GetPositionZ(),
+                     false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+    }
+
+    return false;
+}
+
+bool IccSindragosaFrostBeaconAction::Execute(Event event)
+{
+    float const POSITION_TOLERANCE = 3.0f; // Increased tolerance to reduce jitter
+    
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return false;
+   
+    // Handle beaconed players
+    if (bot->HasAura(70126))
+    {
+        if (boss && boss->HealthBelowPct(35)) 
+        {
+            // Only move if not already at position (with tolerance)
+            if (bot->GetExactDist2d(ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionX(), ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionY()) > POSITION_TOLERANCE)
+            {
+                return MoveTo(bot->GetMapId(), 
+                            ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionX(),
+                            ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionY(),
+                            ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionZ(),
+                            false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+            }
+            return false;
+        }
+        else
+        {
+            Position const* tombPosition;
+            uint8 beaconIndex = 0;
+            bool foundSelf = false;
+            
+            Group* group = bot->GetGroup();
+            if (!group)
+                return false;
+
+            // Find this bot's index among players with Frost Beacon
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player* member = itr->GetSource();
+                if (!member || !member->IsAlive() || !member->HasAura(70126)) // Only count alive players with Frost Beacon
+                    continue;
+
+                if (member == bot)
+                {
+                    foundSelf = true;
+                    break;
+                }
+                beaconIndex++;
+            }
+
+            if (!foundSelf)
+                return false;
+
+            switch (beaconIndex) {
+                case 0:
+                    tombPosition = &ICC_SINDRAGOSA_THOMB1_POSITION;
+                    break;
+                case 1:
+                    tombPosition = &ICC_SINDRAGOSA_THOMB2_POSITION;
+                    break;
+                case 2:
+                    tombPosition = &ICC_SINDRAGOSA_THOMB3_POSITION;
+                    break;
+                case 3:
+                    tombPosition = &ICC_SINDRAGOSA_THOMB4_POSITION;
+                    break;
+                default:
+                    tombPosition = &ICC_SINDRAGOSA_THOMB5_POSITION;
+                    break;
+            }
+            
+            // Only move if not already at position (with tolerance)
+            float dist = bot->GetExactDist2d(tombPosition->GetPositionX(), tombPosition->GetPositionY());
+            if (dist > POSITION_TOLERANCE)
+            {
+                return MoveTo(bot->GetMapId(), tombPosition->GetPositionX(),
+                              tombPosition->GetPositionY(),
+                              tombPosition->GetPositionZ(),
+                              false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+            }
+            return false;
+        }
+    }
+    // Handle non-beaconed players
+    else
+    {
+        float const MIN_SAFE_DISTANCE = 13.0f;
+        float const MAX_SAFE_DISTANCE = 30.0f;
+        float const MOVE_TOLERANCE = 2.0f; // Tolerance for movement to reduce jitter
+        
+        GuidVector members = AI_VALUE(GuidVector, "group members");
+        std::vector<Unit*> beaconedPlayers;
+        
+        for (auto& member : members)
+        {
+            Unit* player = botAI->GetUnit(member);
+            if (!player || player->GetGUID() == bot->GetGUID())
+                continue;
+                
+            if (player->HasAura(70126)) // Frost Beacon
+                beaconedPlayers.push_back(player);
+        }
+        
+        if (beaconedPlayers.empty())
+            return false;
+
+        // Different behavior for air phase
+        if (boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
+        {
+            if (!bot->HasAura(70126)) // If not beaconed, move to safe position
+            {
+                float dist = bot->GetExactDist2d(ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionX(),
+                                               ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionY());
+                if (dist > POSITION_TOLERANCE)
+                {
+                    return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionX(),
+                                ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionY(),
+                                ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionZ(),
+                                false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+                }
+            }
+            return false;
+        }
+        else
+        {
+            // Ground phase - use existing vector-based movement
+            bool needToMove = false;
+            float moveX = 0, moveY = 0;
+            
+            for (Unit* beaconedPlayer : beaconedPlayers)
+            {
+                float dist = bot->GetExactDist2d(beaconedPlayer);
+                if (dist < MIN_SAFE_DISTANCE + MOVE_TOLERANCE)
+                {
+                    needToMove = true;
+                    float angle = bot->GetAngle(beaconedPlayer);
+                    float moveDistance = std::min(5.0f, MIN_SAFE_DISTANCE - dist + MOVE_TOLERANCE);
+                    
+                    moveX += cos(angle + M_PI) * moveDistance;
+                    moveY += sin(angle + M_PI) * moveDistance;
+                }
+            }
+            
+            if (needToMove && !bot->HasAura(70126))
+            {
+                float posX = bot->GetPositionX() + moveX;
+                float posY = bot->GetPositionY() + moveY;
+                float posZ = bot->GetPositionZ();
+                bot->UpdateAllowedPositionZ(posX, posY, posZ);
+                
+                // Only move if the change in position is significant
+                if (std::abs(moveX) > MOVE_TOLERANCE || std::abs(moveY) > MOVE_TOLERANCE)
+                {
+                    return MoveTo(bot->GetMapId(), posX, posY, posZ, 
+                                false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool IccSindragosaBlisteringColdAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return false;
+
+    // Only non-tanks should move out
+    if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
+        return false;
+
+    float dist = bot->GetDistance(boss);
+    // Only move if we're too close to the boss (< 26 yards)
+    if (dist < 26.0f)
+    {
+        float const MAX_STEP = 5.0f;
+        float distToSafeSpot = bot->GetDistance2d(ICC_SINDRAGOSA_BLISTERING_COLD_POSITION.GetPositionX(),
+                                                 ICC_SINDRAGOSA_BLISTERING_COLD_POSITION.GetPositionY());
+        
+        if (distToSafeSpot > 0.1f)  // Avoid division by zero
+        {
+            float ratio = std::min(MAX_STEP / distToSafeSpot, 1.0f);
+            float moveX = bot->GetPositionX() + (ICC_SINDRAGOSA_BLISTERING_COLD_POSITION.GetPositionX() - bot->GetPositionX()) * ratio;
+            float moveY = bot->GetPositionY() + (ICC_SINDRAGOSA_BLISTERING_COLD_POSITION.GetPositionY() - bot->GetPositionY()) * ratio;
+
+            return MoveTo(bot->GetMapId(), moveX, moveY, ICC_SINDRAGOSA_BLISTERING_COLD_POSITION.GetPositionZ(),
+                         false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
+        }
+    }
+    return false;
+}
+
+bool IccSindragosaUnchainedMagicAction::Execute(Event event)
+{
+    /*if (bot->HasAura(69762)) // unchained magic
+    {
+        float const SAFE_DISTANCE = 20.0f;
+        float moveIncrement = 5.0f;
+        bool needsToMove = false;
+        float moveX = bot->GetPositionX();
+        float moveY = bot->GetPositionY();
+
+        // Check distance to other players
+        GuidVector members = AI_VALUE(GuidVector, "group members");
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit || !unit->IsAlive() || unit == bot)
+                continue;
+
+            float dist = bot->GetExactDist2d(unit);
+            if (dist < SAFE_DISTANCE)
+            {
+                needsToMove = true;
+                float moveDistance = std::min(moveIncrement, SAFE_DISTANCE - dist + 1.0f);
+                return MoveAway(unit, moveDistance);
+            }
+        }
+    }*/
+
+    if (Aura* aura = bot->GetAura(69766))
+    {
+        if (aura->GetStackAmount() >= 6)
+            return true; // Stop casting spells
+    }
+
+    return false;
+}
+
+bool IccSindragosaChilledToTheBoneAction::Execute(Event event)
+{
+    if (bot->HasAura(70106)) // Chilled to the Bone
+    {
+         if (Aura* aura = bot->GetAura(70106))
+        {
+            if (aura->GetStackAmount() >= 8)
+            {
+                bot->AttackStop();
+                return true; // Stop casting spells
+            }
+        }
+    }
+
+    return false;  
+}
+
+bool IccSindragosaMysticBuffetAction::Execute(Event event)
+{
+
+    // Get boss to check if it exists
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return false;
+
+    if (!bot || !bot->IsAlive())
+        return false;
+
+    // Check if we have Mystic Buffet
+    Aura* aura = bot->GetAura(70127);
+    Aura* aura2 = bot->GetAura(72528);
+    if (!aura && !aura2)
+        return false;
+
+    if (bot->HasAura(70126))  // Ice Block
+        return false;
+
+    //if tank and is victim of boss, do nothing
+    if (botAI->IsTank(bot) && (boss->GetVictim() == bot))
+        return false;
+
+    // For non-tanks, require 3+ stacks
+    if (!((aura && aura->GetStackAmount() >= 3) || (aura2 && aura2->GetStackAmount() >= 3)))
+        return false;
+
+    // Find nearest player with ice tomb
+    Unit* nearestTomb = nullptr;
+    float minDist = 150.0f;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (!member || !member->IsAlive() || member == bot)
+            continue;
+
+        if (member->HasAura(70157))  // Ice Tomb
+        {
+            float dist = bot->GetDistance(member);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestTomb = member;
+            }
+        }
+    }
+
+    // If no tombs found, return false
+    if (!nearestTomb)
+    {
+        return false;
+    }
+
+    if (nearestTomb->IsWithinDist2d(ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionX(), 
+                                        ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionY(), 1.0f))
+    {
+        // Check if already at LOS2 position
+        if (bot->IsWithinDist2d(ICC_SINDRAGOSA_LOS2_POSITION.GetPositionX(), 
+                               ICC_SINDRAGOSA_LOS2_POSITION.GetPositionY(), 1.0f))
+        {
+            return false;
+        }
+
+        return MoveTo(bot->GetMapId(),
+                     ICC_SINDRAGOSA_LOS2_POSITION.GetPositionX(),
+                     ICC_SINDRAGOSA_LOS2_POSITION.GetPositionY(),
+                     ICC_SINDRAGOSA_LOS2_POSITION.GetPositionZ(),
+                     false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+    }
+    
+    return false; // Tomb not at MB2 position
+}
+
+bool IccSindragosaFrostBombAction::Execute(Event event)
+{
+    if (!bot || !bot->IsAlive() || bot->HasAura(70157)) // Skip if dead or in Ice Tomb
+        return false;
+
+    // Find frost bomb marker
+    Unit* marker = nullptr;
+    Player* nearestTombPlayer = nullptr;
+    float minDist = 150.0f;
+    int tombPlayerCount = 0;
+
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    if (npcs.empty())
+        return false;
+
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (!unit || !unit->IsAlive())
+            continue;
+
+        if (unit->HasAura(70022)) // Frost bomb visual
+        {
+            marker = unit;
+            break;
+        }
+    }
+
+    if (!marker)
+        return false;
+
+    // Find players in ice tomb
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (!member || !member->IsAlive() || member == bot)
+            continue;
+
+        if (member->HasAura(70157))  // Ice Tomb aura
+        {
+            tombPlayerCount++;
+            float dist = bot->GetDistance(member);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestTombPlayer = member;
+            }
+        }
+    }
+
+    // If no tombs or only one tomb, stop
+    if (!nearestTombPlayer)
+        return false;
+
+    if (tombPlayerCount <= 1)
+    {
+        Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+        if (!boss)
+            return false;
+
+        // If boss HP below 20% and we're already not in LOS of marker, stay in position
+        if (boss->GetHealthPct() < 20 && !marker->IsWithinLOS(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
+        {
+            bot->AttackStop();
+            return true;
+        }
+        
+        // Otherwise handle normal single tomb case
+        if (!marker->IsWithinLOS(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
+        {
+            bot->AttackStop();
+            return true;
+        }
+        
+        // If we have LOS with marker, we need to move behind tomb
+        float angle = marker->GetAngle(nearestTombPlayer);
+        float posX = nearestTombPlayer->GetPositionX() + cos(angle) * 5.0f;
+        float posY = nearestTombPlayer->GetPositionY() + sin(angle) * 5.0f;
+        float posZ = nearestTombPlayer->GetPositionZ();
+        
+        return MoveTo(bot->GetMapId(), posX, posY, posZ,
+                     false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+    }
+
+    // Calculate position behind tomb for normal case (more than 1 tomb)
+    float angle = marker->GetAngle(nearestTombPlayer);
+    float posX = nearestTombPlayer->GetPositionX() + cos(angle) * 5.0f;
+    float posY = nearestTombPlayer->GetPositionY() + sin(angle) * 5.0f;
+    float posZ = nearestTombPlayer->GetPositionZ();
+
+    // If we're already in position and not in LOS of marker, stop
+    if (bot->GetDistance2d(posX, posY) < 2.0f && !marker->IsWithinLOS(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
+    {
+        bot->AttackStop();
+        return true;
+    }
+
+    // Otherwise move to position
+    return MoveTo(bot->GetMapId(), posX, posY, posZ,
+                 false, false, false, true, MovementPriority::MOVEMENT_FORCED);
 }

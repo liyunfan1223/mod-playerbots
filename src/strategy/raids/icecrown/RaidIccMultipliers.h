@@ -66,4 +66,55 @@ public:
     virtual float GetValue(Action* action);
 };
 
+//VDW
+class IccValithriaDreamCloudMultiplier : public Multiplier
+{
+public:
+    IccValithriaDreamCloudMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc valithria dream cloud") {}
+    virtual float GetValue(Action* action);
+};
+
+//SINDRAGOSA
+class IccSindragosaTankPositionMultiplier : public Multiplier
+{
+public:
+    IccSindragosaTankPositionMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc sindragosa tank position") {}
+    virtual float GetValue(Action* action);
+};
+
+class IccSindragosaFrostBeaconMultiplier : public Multiplier
+{
+public:
+    IccSindragosaFrostBeaconMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc sindragosa frost beacon") {}
+    virtual float GetValue(Action* action);
+};
+
+/*class IccSindragosaFlyingMultiplier : public Multiplier
+{
+public:
+    IccSindragosaFlyingMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc sindragosa flying") {}
+    virtual float GetValue(Action* action);
+};*/
+
+class IccSindragosaMysticBuffetMultiplier : public Multiplier
+{
+public:
+    IccSindragosaMysticBuffetMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc sindragosa mystic buffet") {}
+    virtual float GetValue(Action* action);
+};
+
+class IccSindragosaBlisteringColdPriorityMultiplier : public Multiplier
+{
+public:
+    IccSindragosaBlisteringColdPriorityMultiplier(PlayerbotAI* ai) : Multiplier(ai, "sindragosa blistering cold priority") {}
+
+    float GetValue(Action* action) override;
+};
+
+class IccSindragosaFrostBombMultiplier : public Multiplier
+{
+public:
+    IccSindragosaFrostBombMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc sindragosa frost bomb") {}
+    virtual float GetValue(Action* action);
+};
 #endif

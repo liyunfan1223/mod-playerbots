@@ -45,21 +45,21 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("icc dbs tank position", ACTION_RAID + 3), nullptr)));
     
     triggers.push_back(new TriggerNode("icc dbs main tank rune of blood",
-        NextAction::array(0, new NextAction("taunt spell", ACTION_RAID + 4), nullptr)));
+        NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 4), nullptr)));
 
     triggers.push_back(new TriggerNode("icc adds dbs",
         NextAction::array(0, new NextAction("icc adds dbs", ACTION_RAID + 5), nullptr)));
     
     //DOGS
     triggers.push_back(new TriggerNode("icc stinky precious main tank mortal wound",
-        NextAction::array(0, new NextAction("taunt spell", ACTION_RAID + 4), nullptr)));
+        NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 4), nullptr)));
     
     //FESTERGUT
     triggers.push_back(new TriggerNode("icc festergut tank position",
         NextAction::array(0, new NextAction("icc festergut tank position", ACTION_MOVE + 4), nullptr)));
     
     triggers.push_back(new TriggerNode("icc festergut main tank gastric bloat",
-        NextAction::array(0, new NextAction("taunt spell", ACTION_RAID + 6), nullptr)));
+        NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 6), nullptr)));
 
     triggers.push_back(new TriggerNode("icc festergut spore",
         NextAction::array(0, new NextAction("icc festergut spore", ACTION_MOVE + 5), nullptr)));
@@ -108,7 +108,51 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("icc bql pact of darkfallen", ACTION_EMERGENCY +1), nullptr)));
 
     triggers.push_back(new TriggerNode("icc bql vampiric bite",
-        NextAction::array(0, new NextAction("icc bql vampiric bite", ACTION_EMERGENCY + 2), nullptr)));
+        NextAction::array(0, new NextAction("icc bql vampiric bite", ACTION_EMERGENCY + 5), nullptr)));
+
+    //VDW
+    triggers.push_back(new TriggerNode("icc valkyre spear",
+        NextAction::array(0, new NextAction("icc valkyre spear", ACTION_EMERGENCY + 5), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc sister svalna",
+        NextAction::array(0, new NextAction("icc sister svalna", ACTION_RAID + 5), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc valithria portal",
+        NextAction::array(0, new NextAction("icc valithria portal", ACTION_RAID + 5), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc valithria heal", 
+        NextAction::array(0, new NextAction("icc valithria heal", ACTION_RAID+1), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc valithria dream cloud",
+        NextAction::array(0, new NextAction("icc valithria dream cloud", ACTION_RAID + 4), nullptr)));
+
+    //SINDRAGOSA
+    triggers.push_back(new TriggerNode("icc sindragosa tank position",
+        NextAction::array(0, new NextAction("icc sindragosa tank position", ACTION_RAID + 1), nullptr)));   
+
+    triggers.push_back(new TriggerNode("icc sindragosa frost beacon",
+        NextAction::array(0, new NextAction("icc sindragosa frost beacon", ACTION_RAID + 5), nullptr)));    
+
+    triggers.push_back(new TriggerNode("icc sindragosa blistering cold",
+        NextAction::array(0, new NextAction("icc sindragosa blistering cold", ACTION_EMERGENCY + 4), nullptr))); 
+
+    triggers.push_back(new TriggerNode("icc sindragosa unchained magic",
+        NextAction::array(0, new NextAction("icc sindragosa unchained magic", ACTION_RAID + 2), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc sindragosa chilled to the bone",
+        NextAction::array(0, new NextAction("icc sindragosa chilled to the bone", ACTION_RAID + 2), nullptr))); 
+
+    triggers.push_back(new TriggerNode("icc sindragosa mystic buffet",
+        NextAction::array(0, new NextAction("icc sindragosa mystic buffet", ACTION_RAID + 3), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc sindragosa main tank mystic buffet",
+        NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 3), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc sindragosa frost bomb",
+        NextAction::array(0, new NextAction("icc sindragosa frost bomb", ACTION_RAID + 7), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc sindragosa tank swap position",
+        NextAction::array(0, new NextAction("icc sindragosa tank swap position", ACTION_EMERGENCY + 2), nullptr)));
 }
 
 void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
@@ -121,4 +165,11 @@ void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
     multipliers.push_back(new IccBpcAssistMultiplier(botAI));
     multipliers.push_back(new IccBqlPactOfDarkfallenMultiplier(botAI));
     multipliers.push_back(new IccBqlVampiricBiteMultiplier(botAI));
+    multipliers.push_back(new IccValithriaDreamCloudMultiplier(botAI));
+    multipliers.push_back(new IccSindragosaTankPositionMultiplier(botAI));
+    multipliers.push_back(new IccSindragosaFrostBeaconMultiplier(botAI));
+    //multipliers.push_back(new IccSindragosaFlyingMultiplier(botAI));
+    multipliers.push_back(new IccSindragosaMysticBuffetMultiplier(botAI));
+    multipliers.push_back(new IccSindragosaBlisteringColdPriorityMultiplier(botAI));
+    multipliers.push_back(new IccSindragosaFrostBombMultiplier(botAI));
 }
