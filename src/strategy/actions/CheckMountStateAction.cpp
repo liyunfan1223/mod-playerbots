@@ -71,14 +71,17 @@ bool CheckMountStateAction::Execute(Event event)
         if (!bot->GetGroup() || bot->GetGroup()->GetLeaderGUID() != master->GetGUID())
             return false;
 
+        auto masterInShapeshiftForm = master->GetShapeshiftForm();
+
         // bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
-        if (master->IsMounted() && !bot->IsMounted() && noattackers && shouldMount && !bot->IsInCombat() &&
-            botAI->GetState() != BOT_STATE_COMBAT)
+        if ((master->IsMounted() || masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC || masterInShapeshiftForm == FORM_TRAVEL)
+            && !bot->IsMounted() && noattackers && shouldMount && !bot->IsInCombat() && botAI->GetState() != BOT_STATE_COMBAT)
         {
             return Mount();
         }
 
-        if (!master->IsMounted() && bot->IsMounted())
+        if ((!master->IsMounted() && masterInShapeshiftForm != FORM_FLIGHT && masterInShapeshiftForm != FORM_FLIGHT_EPIC && masterInShapeshiftForm != FORM_TRAVEL)
+            && bot->IsMounted())
         {
             WorldPacket emptyPacket;
             bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
@@ -188,12 +191,23 @@ bool CheckMountStateAction::Mount()
     botAI->RemoveShapeshift();
     botAI->RemoveAura("tree of life");
     int32 masterSpeed = 59;
+    int32 masterMountType = 0;
     SpellInfo const* masterSpell = nullptr;
 
-    if (master && !master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).empty() && !bot->InBattleground())
+    if (master != nullptr && !bot->InBattleground())
     {
-        masterSpell = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetSpellInfo();
-        masterSpeed = std::max(masterSpell->Effects[1].BasePoints, masterSpell->Effects[2].BasePoints);
+        auto masterInShapeshiftForm = master->GetShapeshiftForm();
+
+        if (!master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).empty())
+        {
+            masterSpell = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetSpellInfo();
+            masterSpeed = std::max(masterSpell->Effects[1].BasePoints, masterSpell->Effects[2].BasePoints);
+        }
+        else if (masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC)
+        {
+            masterMountType = 1;
+            masterSpeed = (masterInShapeshiftForm == FORM_FLIGHT_EPIC) ? 279 : 149;
+        }
     }
     else
     {
@@ -261,7 +275,6 @@ bool CheckMountStateAction::Mount()
         allSpells[index][effect].push_back(spellId);
     }
 
-    int32 masterMountType = 0;
     if (masterSpell)
     {
         masterMountType = (masterSpell->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
