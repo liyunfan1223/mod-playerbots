@@ -22,6 +22,7 @@ public:
         creators["heroic throw taunt"] = &heroic_throw_taunt;
         creators["taunt"] = &taunt;
         creators["taunt spell"] = &taunt;
+        creators["vigilance"] = &vigilance;
     }
 
 private:
@@ -39,6 +40,14 @@ private:
         return new ActionNode("taunt",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("heroic throw taunt"), nullptr),
+                              /*C*/ nullptr);
+    }
+
+    static ActionNode* vigilance(PlayerbotAI* botAI)
+    {
+        return new ActionNode("vigilance",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
                               /*C*/ nullptr);
     }
 };
@@ -59,6 +68,9 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericWarriorStrategy::InitTriggers(triggers);
 
+    triggers.push_back(new TriggerNode(
+        "vigilance",
+        NextAction::array(0, new NextAction("vigilance", ACTION_HIGH + 7), nullptr)));
     triggers.push_back(
         new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("heroic throw", ACTION_MOVE + 11),
                                                                 new NextAction("charge", ACTION_MOVE + 10), nullptr)));
