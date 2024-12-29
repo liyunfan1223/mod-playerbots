@@ -63,10 +63,10 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                        NextAction::array(0, new NextAction("overpower", ACTION_HIGH + 4), nullptr)));
     triggers.push_back(new TriggerNode(
         "victory rush", NextAction::array(0, new NextAction("victory rush", ACTION_INTERRUPT), nullptr)));
-    triggers.push_back(new TriggerNode("high rage available", 
-            NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH),
-            new NextAction("slam", ACTION_HIGH + 1),
-            nullptr)));
+    triggers.push_back(new TriggerNode("high rage available",
+        NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH),
+                             new NextAction("slam", ACTION_HIGH + 1),
+                                nullptr)));
     // triggers.push_back(new TriggerNode("medium rage available", 
     //      NextAction::array(0, new NextAction("slam", ACTION_HIGH + 1),
     //      new NextAction("thunder clap", ACTION_HIGH),
@@ -82,4 +82,8 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "critical health", NextAction::array(0, new NextAction("intimidating shout", ACTION_EMERGENCY), nullptr)));
     // triggers.push_back(new TriggerNode("medium aoe",
     //                                   NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe", 
+        NextAction::array(0, new NextAction("sweeping strikes", ACTION_HIGH + 7),
+                             new NextAction("bladestorm", ACTION_HIGH + 6),
+                                nullptr)));
 }
