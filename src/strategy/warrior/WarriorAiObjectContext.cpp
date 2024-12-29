@@ -78,6 +78,7 @@ public:
         creators["thunder clap on snare target"] = &WarriorTriggerFactoryInternal::thunder_clap_on_snare_target;
         creators["thunder clap"] = &WarriorTriggerFactoryInternal::thunder_clap;
         creators["bloodthirst"] = &WarriorTriggerFactoryInternal::bloodthirst;
+        creators["whirlwind"] = &WarriorTriggerFactoryInternal::whirlwind;
         creators["berserker rage"] = &WarriorTriggerFactoryInternal::berserker_rage;
         creators["pummel on enemy healer"] = &WarriorTriggerFactoryInternal::pummel_on_enemy_healer;
         creators["pummel"] = &WarriorTriggerFactoryInternal::pummel;
@@ -157,6 +158,7 @@ private:
     }
     static Trigger* berserker_rage(PlayerbotAI* botAI) { return new BerserkerRageBuffTrigger(botAI); }
     static Trigger* bloodthirst(PlayerbotAI* botAI) { return new BloodthirstBuffTrigger(botAI); }
+    static Trigger* whirlwind(PlayerbotAI* botAI) { return new WhirlwindTrigger(botAI); }
     static Trigger* thunder_clap_on_snare_target(PlayerbotAI* botAI) { return new ThunderClapSnareTrigger(botAI); }
     static Trigger* thunder_clap(PlayerbotAI* botAI) { return new ThunderClapTrigger(botAI); }
     static Trigger* mortal_strike(PlayerbotAI* botAI) { return new MortalStrikeDebuffTrigger(botAI); }
