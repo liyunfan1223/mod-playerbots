@@ -67,11 +67,18 @@ bool PetAttackAction::Execute(Event event)
     {
         return false;
     }
+
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
     {
         return false;
     }
+
+    if (!bot->IsValidAttackTarget(target))
+    {
+        return false;
+    }
+
     pet->SetReactState(REACT_PASSIVE);
     pet->ClearUnitState(UNIT_STATE_FOLLOW);
     pet->AttackStop();
