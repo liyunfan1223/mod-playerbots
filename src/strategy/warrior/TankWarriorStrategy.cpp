@@ -89,7 +89,9 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("sunder armor", NextAction::array(0, new NextAction("devastate", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("medium rage available",
-                                       NextAction::array(0, new NextAction("shield slam", ACTION_HIGH + 1), nullptr)));
+        NextAction::array(0, new NextAction("shield slam", ACTION_HIGH + 2),
+                             new NextAction("devastate", ACTION_HIGH + 1),
+                             nullptr)));
     triggers.push_back(new TriggerNode(
         "shield block", NextAction::array(0, new NextAction("shield block", ACTION_INTERRUPT + 1), nullptr)));
     triggers.push_back(
@@ -129,7 +131,7 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("protect party member",
                                        NextAction::array(0, new NextAction("intervene", ACTION_EMERGENCY), nullptr)));
     triggers.push_back(new TriggerNode(
-        "high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 1), nullptr)));
+        "high rage available", NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("medium rage available",
                                        NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 1), nullptr)));
 }
