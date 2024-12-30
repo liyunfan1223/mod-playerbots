@@ -14,8 +14,8 @@ public:
         creators["malygos target"] = &RaidEoEActionContext::target;
         // creators["pull power spark"] = &RaidEoEActionContext::pull_power_spark;
         // creators["kill power spark"] = &RaidEoEActionContext::kill_power_spark;
-        creators["fly drake"] = &RaidEoEActionContext::fly_drake;
-        creators["drake attack"] = &RaidEoEActionContext::drake_attack;
+        creators["eoe fly drake"] = &RaidEoEActionContext::eoe_fly_drake;
+        creators["eoe drake attack"] = &RaidEoEActionContext::eoe_drake_attack;
     }
 
 private:
@@ -23,8 +23,8 @@ private:
     static Action* target(PlayerbotAI* ai) { return new MalygosTargetAction(ai); }
     // static Action* pull_power_spark(PlayerbotAI* ai) { return new PullPowerSparkAction(ai); }
     // static Action* kill_power_spark(PlayerbotAI* ai) { return new KillPowerSparkAction(ai); }
-    static Action* fly_drake(PlayerbotAI* ai) { return new EoEFlyDrakeAction(ai); }
-    static Action* drake_attack(PlayerbotAI* ai) { return new EoEDrakeAttackAction(ai); }
+    static Action* eoe_fly_drake(PlayerbotAI* ai) { return new EoEFlyDrakeAction(ai); }
+    static Action* eoe_drake_attack(PlayerbotAI* ai) { return new EoEDrakeAttackAction(ai); }
 };
 
 #endif
