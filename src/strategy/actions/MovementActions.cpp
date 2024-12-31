@@ -1522,14 +1522,8 @@ void MovementAction::ClearIdleState()
     context->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 }
 
-bool MovementAction::MoveAway(Unit* target, float distance)
+bool MovementAction::MoveAway(Unit* target, float distance, bool backwards)
 {
-    // MotionMaster& mm = *bot->GetMotionMaster();
-    // mm.Clear();
-    // mm.MoveBackwards(target, distance);
-    // botAI->SetNextCheckDelay(3000);
-    // // bot->GetSpeed()
-    // return true;
     if (!target)
     {
         return false;
@@ -1551,7 +1545,7 @@ bool MovementAction::MoveAway(Unit* target, float distance)
             dz = bot->GetPositionZ();
             exact = false;
         }
-        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, true))
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, backwards))
         {
             return true;
         }
@@ -1573,7 +1567,7 @@ bool MovementAction::MoveAway(Unit* target, float distance)
             dz = bot->GetPositionZ();
             exact = false;
         }
-        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, true))
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, backwards))
         {
             return true;
         }
@@ -1774,7 +1768,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
 bool FleeAction::Execute(Event event)
 {
     // return Flee(AI_VALUE(Unit*, "current target"));
-    return MoveAway(AI_VALUE(Unit*, "current target"));
+    return MoveAway(AI_VALUE(Unit*, "current target"), true);
 }
 
 bool FleeAction::isUseful()
