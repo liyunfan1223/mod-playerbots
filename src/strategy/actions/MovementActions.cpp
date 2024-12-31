@@ -1768,7 +1768,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
 bool FleeAction::Execute(Event event)
 {
     // return Flee(AI_VALUE(Unit*, "current target"));
-    return MoveAway(AI_VALUE(Unit*, "current target"), true);
+    return MoveAway(AI_VALUE(Unit*, "current target"), sPlayerbotAIConfig->fleeDistance, true);
 }
 
 bool FleeAction::isUseful()
