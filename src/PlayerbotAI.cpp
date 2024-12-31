@@ -4115,11 +4115,16 @@ inline bool ZoneHasRealPlayers(Player* bot)
         return false;
     }
     
-    for (auto& player : sRandomPlayerbotMgr->GetPlayers())
+    for (Player* player : sRandomPlayerbotMgr->GetPlayers())
     {
         if (player->GetMapId() != bot->GetMapId())
             continue;
-
+        
+        if (player->IsGameMaster() && !player->IsVisible())
+        {
+            continue;
+        }
+        
         if (player->GetZoneId() == bot->GetZoneId())
         {
             PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
