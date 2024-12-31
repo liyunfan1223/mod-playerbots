@@ -241,7 +241,7 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     const float z = bot->GetPositionZ();
     float rx, ry, rz;
     bool found = false;
-    int attempt = 10;
+    int attempt = 3;
     while (--attempt)
     {
         float angle = bot->GetAngle(&dest);
