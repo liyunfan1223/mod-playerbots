@@ -17,6 +17,7 @@ public:
         creators["piercing howl"] = &piercing_howl;
         creators["mocking blow"] = &mocking_blow;
         creators["heroic strike"] = &heroic_strike;
+        creators["enraged regeneration"] = &enraged_regeneration;
     }
 
 private:
@@ -25,6 +26,14 @@ private:
     ACTION_NODE_A(piercing_howl, "piercing howl", "mocking blow");
     ACTION_NODE_A(mocking_blow, "mocking blow", "hamstring");
     ACTION_NODE_A(heroic_strike, "heroic strike", "melee");
+
+    static ActionNode* enraged_regeneration(PlayerbotAI* botAI)
+    {
+        return new ActionNode("enraged regeneration",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 };
 
 ArmsWarriorStrategy::ArmsWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStrategy(botAI)
@@ -93,9 +102,11 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("death wish", NextAction::array(0, new NextAction("death wish", ACTION_HIGH + 2), nullptr)));
 
-    triggers.push_back(new TriggerNode(
-        "critical health", NextAction::array(0, new NextAction("intimidating shout", ACTION_EMERGENCY), nullptr)));
-    
+    triggers.push_back(new TriggerNode("critical health",
+        NextAction::array(0, new NextAction("enraged regeneration", ACTION_EMERGENCY + 1),
+                             new NextAction("intimidating shout", ACTION_EMERGENCY),
+                                nullptr)));
+
     // triggers.push_back(new TriggerNode("medium aoe",
     //                                   NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), nullptr)));
     /*
