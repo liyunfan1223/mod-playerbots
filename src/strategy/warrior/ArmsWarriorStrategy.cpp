@@ -49,7 +49,7 @@ private:
     {
         return new ActionNode("shattering throw",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("shattering throw"), nullptr),
+                              /*A*/ nullptr,
                               /*C*/ nullptr);
     }
 };
@@ -130,7 +130,7 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("retaliation", ACTION_EMERGENCY + 1), nullptr)));
 
     triggers.push_back(new TriggerNode("shattering throw trigger",
-        NextAction::array(0, new NextAction("shattering throw", ACTION_EMERGENCY + 2), nullptr)));
+        NextAction::array(0, new NextAction("shattering throw", ACTION_INTERRUPT + 1), nullptr)));
 
     // triggers.push_back(new TriggerNode("medium aoe",
     //                                   NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), nullptr)));
