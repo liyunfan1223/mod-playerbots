@@ -155,7 +155,10 @@ public:
 class CastShatteringThrowAction : public CastDebuffSpellAction
 {
 public:
-    CastShatteringThrowAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "shattering throw") {}
+    CastShatteringThrowAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "shattering throw")
+    {
+        range = 25.0f;
+    }
 
     Value<Unit*>* GetTargetValue() override;
     bool Execute(Event event) override;
