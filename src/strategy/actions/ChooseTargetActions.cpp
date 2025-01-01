@@ -48,10 +48,12 @@ bool AttackAnythingAction::isUseful()
     if (!target)
         return false;
 
-    bool rpgGoStatus = botAI->rpgInfo.status == NewRpgStatus::GO_GRIND ||
-                       botAI->rpgInfo.status == NewRpgStatus::GO_INNKEEPER;
+    bool inactiveGrindStatus = botAI->rpgInfo.status == NewRpgStatus::GO_GRIND ||
+                               botAI->rpgInfo.status == NewRpgStatus::NEAR_NPC ||
+                               botAI->rpgInfo.status == NewRpgStatus::REST ||
+                               botAI->rpgInfo.status == NewRpgStatus::GO_INNKEEPER;
 
-    if (rpgGoStatus && bot->GetDistance(target) > 25.0f)
+    if (inactiveGrindStatus && bot->GetDistance(target) > 25.0f)
         return false;
 
     std::string const name = std::string(target->GetName());
