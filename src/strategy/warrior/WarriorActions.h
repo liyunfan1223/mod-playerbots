@@ -64,7 +64,7 @@ MELEE_ACTION(CastMockingBlowAction, "mocking blow");
 // arms 3.3.5
 SPELL_ACTION(CastHeroicThrowAction, "heroic throw");
 SNARE_ACTION(CastHeroicThrowSnareAction, "heroic throw");
-DEBUFF_ACTION(CastShatteringThrowAction, "shattering throw");
+// DEBUFF_ACTION(CastShatteringThrowAction, "shattering throw");
 
 // arms talents
 MELEE_ACTION(CastMortalStrikeAction, "mortal strike");
@@ -151,5 +151,15 @@ public:
 
     bool isUseful() override;
 };
+
+class CastShatteringThrowAction : public CastDebuffSpellAction
+{
+public:
+    CastShatteringThrowAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "shattering throw") {}
+
+    Value<Unit*>* GetTargetValue() override;
+    bool Execute(Event event) override;
+};
+
 
 #endif
