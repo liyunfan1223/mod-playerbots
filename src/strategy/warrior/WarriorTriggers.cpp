@@ -101,6 +101,7 @@ bool ShatteringThrowTrigger::IsActive()
              enemy->HasAura(45438) || // Ice Block
              enemy->HasAura(41450)))  // Blessing of Protection
         {
+            LOG_INFO("playerbots", "ShatteringThrowTrigger: Valid target found: GUID {}", guid.GetRawValue());
             return true;
         }
     }
