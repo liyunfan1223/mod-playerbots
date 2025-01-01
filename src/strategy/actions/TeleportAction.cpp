@@ -19,7 +19,7 @@ bool TeleportAction::Execute(Event event)
         176296, 194011, 194012, 189993, 176500, 176501, 193955, 193425, 193772, 193604, 
         191006, 191007, 191008, 191009, 191013, 191014, 191010, 190960, 191011, 191012, 
         183317, 183321, 183322, 187056, 183323, 183324, 183325, 183326, 183327, 190203, 
-        190204, 190205, 190206, 193908, 181575, 181576, 181577, 181578 
+        190204, 190205, 190206, 193908, 181575, 181576, 181577, 181578, 202277, 202278
     };
 
     // Try teleporting using allowed portals
@@ -67,7 +67,7 @@ bool TeleportAction::Execute(Event event)
             continue;
 
         GameObjectTemplate const* goInfo = go->GetGOInfo();
-        if (goInfo->type != GAMEOBJECT_TYPE_SPELLCASTER)
+        if (goInfo->type != GAMEOBJECT_TYPE_SPELLCASTER && goInfo->type != GAMEOBJECT_TYPE_GOOBER)
             continue;
 
         uint32 spellId = goInfo->spellcaster.spellId;
