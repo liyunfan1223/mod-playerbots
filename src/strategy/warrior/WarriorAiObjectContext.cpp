@@ -101,6 +101,7 @@ public:
         // creators["slam"] = &WarriorTriggerFactoryInternal::slam;
 
         creators["vigilance"] = &WarriorTriggerFactoryInternal::vigilance;
+        creators["shattering throw"] = &WarriorTriggerFactoryInternal::shattering_throw;
     }
 
 private:
@@ -172,6 +173,7 @@ private:
     // static Trigger* slam(PlayerbotAI* ai) { return new SlamTrigger(ai); }
 
     static Trigger* vigilance(PlayerbotAI* botAI) { return new VigilanceTrigger(botAI); }
+    static Trigger* shattering_throw(PlayerbotAI* botAI) { return new ShatteringThrowTrigger(botAI); }
 };
 
 class WarriorAiObjectContextInternal : public NamedObjectContext<Action>
