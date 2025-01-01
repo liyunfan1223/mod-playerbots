@@ -110,7 +110,7 @@ bool CastRetaliationAction::isUseful()
     for (ObjectGuid const& guid : attackers)
     {
         Unit* attacker = botAI->GetUnit(guid);
-        if (!attacker || !attacker->IsAlive())
+        if (!attacker || !attacker->IsAlive() || attacker->GetVictim() != bot)
             continue;
 
         // Check if the attacker is melee-based using unit_class
