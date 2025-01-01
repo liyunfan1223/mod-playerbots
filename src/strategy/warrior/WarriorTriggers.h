@@ -75,7 +75,7 @@ public:
 class ShatteringThrowTrigger : public Trigger
 {
 public:
-    ShatteringThrowTrigger(PlayerbotAI* botAI) : Trigger(botAI, "shattering throw") {}
+    ShatteringThrowTrigger(PlayerbotAI* botAI) : Trigger(botAI, "shattering throw trigger") {}
 
     bool IsActive() override;
 };
