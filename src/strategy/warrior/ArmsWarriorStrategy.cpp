@@ -49,7 +49,7 @@ private:
     {
         return new ActionNode("shattering throw",
                               /*P*/ nullptr,
-                              /*A*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("shattering throw"), nullptr),
                               /*C*/ nullptr);
     }
 };
