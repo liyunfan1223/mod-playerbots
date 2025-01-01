@@ -158,6 +158,10 @@ Value<Unit*>* CastShatteringThrowAction::GetTargetValue()
              enemy->HasAura(45438) || // Ice Block
              enemy->HasAura(41450)))  // Blessing of Protection
         {
+            LOG_INFO("playerbots", "Bot Name = {}, ShatteringThrowTrigger: Valid target found: Name = {}, GUID = {}", 
+                bot->GetName(), 
+                enemy->GetName().empty() ? "Unknown" : enemy->GetName(), 
+                guid.GetRawValue());
             return new ManualSetValue<Unit*>(botAI, enemy);
         }
     }
@@ -173,5 +177,11 @@ bool CastShatteringThrowAction::Execute(Event event)
     if (!target || target == bot)
         return false;
 
+    LOG_INFO("playerbots", "Bot Name = {}, Casting Shattering Throw at target: Name = {}, GUID = {}", 
+             bot->GetName(), 
+             target->GetName().empty() ? "Unknown" : target->GetName(), 
+             target->GetGUID().GetRawValue());
+
     return botAI->CastSpell("shattering throw", target);
 }
+
