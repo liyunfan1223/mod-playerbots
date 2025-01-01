@@ -18,6 +18,8 @@ public:
         creators["mocking blow"] = &mocking_blow;
         creators["heroic strike"] = &heroic_strike;
         creators["enraged regeneration"] = &enraged_regeneration;
+        creators["retaliation"] = &retaliation;
+        retaliation
     }
 
 private:
@@ -30,6 +32,14 @@ private:
     static ActionNode* enraged_regeneration(PlayerbotAI* botAI)
     {
         return new ActionNode("enraged regeneration",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+
+    static ActionNode* retaliation(PlayerbotAI* botAI)
+    {
+        return new ActionNode("retaliation",
                               /*P*/ nullptr,
                               /*A*/ nullptr,
                               /*C*/ nullptr);
@@ -107,6 +117,8 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                              new NextAction("intimidating shout", ACTION_EMERGENCY),
                                 nullptr)));
 
+    triggers.push_back(new TriggerNode("medium health",
+        NextAction::array(0, new NextAction("retaliation", ACTION_EMERGENCY), nullptr)));
     // triggers.push_back(new TriggerNode("medium aoe",
     //                                   NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), nullptr)));
     /*
