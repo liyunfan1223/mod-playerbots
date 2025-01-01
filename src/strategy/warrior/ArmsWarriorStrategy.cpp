@@ -19,6 +19,7 @@ public:
         creators["heroic strike"] = &heroic_strike;
         creators["enraged regeneration"] = &enraged_regeneration;
         creators["retaliation"] = &retaliation;
+        creators["shattering throw"] = &shattering_throw;
     }
 
 private:
@@ -39,6 +40,14 @@ private:
     static ActionNode* retaliation(PlayerbotAI* botAI)
     {
         return new ActionNode("retaliation",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+
+    static ActionNode* shattering_throw(PlayerbotAI* botAI)
+    {
+        return new ActionNode("shattering throw",
                               /*P*/ nullptr,
                               /*A*/ nullptr,
                               /*C*/ nullptr);
