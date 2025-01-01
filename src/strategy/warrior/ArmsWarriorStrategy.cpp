@@ -129,7 +129,7 @@ void ArmsWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("almost full health",
         NextAction::array(0, new NextAction("retaliation", ACTION_EMERGENCY + 1), nullptr)));
 
-    triggers.push_back(new TriggerNode("shattering throw",
+    triggers.push_back(new TriggerNode("shattering throw trigger",
         NextAction::array(0, new NextAction("shattering throw", ACTION_EMERGENCY + 2), nullptr)));
 
     // triggers.push_back(new TriggerNode("medium aoe",
