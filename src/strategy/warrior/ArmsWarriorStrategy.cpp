@@ -19,7 +19,6 @@ public:
         creators["heroic strike"] = &heroic_strike;
         creators["enraged regeneration"] = &enraged_regeneration;
         creators["retaliation"] = &retaliation;
-        retaliation
     }
 
 private:
