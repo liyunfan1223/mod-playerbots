@@ -141,3 +141,37 @@ bool CastRetaliationAction::isUseful()
     // Only cast Retaliation if there are at least 2 melee attackers and the buff is not active
     return meleeAttackers >= 2 && !botAI->HasAura("retaliation", bot);
 }
+
+Value<Unit*>* CastShatteringThrowAction::GetTargetValue()
+{
+    GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
+
+    for (ObjectGuid const& guid : enemies)
+    {
+        Unit* enemy = botAI->GetUnit(guid);
+        if (!enemy || !enemy->IsAlive() || enemy->IsFriendlyTo(bot))
+            continue;
+
+        // Check if the enemy is within 25 yards and has the specific auras
+        if (bot->IsWithinDistInMap(enemy, 25.0f) &&
+            (enemy->HasAura(642) ||   // Divine Shield
+             enemy->HasAura(45438) || // Ice Block
+             enemy->HasAura(41450)))  // Blessing of Protection
+        {
+            return new ManualSetValue<Unit*>(botAI, enemy);
+        }
+    }
+
+    // No valid target
+    return new ManualSetValue<Unit*>(botAI, nullptr);
+}
+
+
+bool CastShatteringThrowAction::Execute(Event event)
+{
+    Unit* target = GetTarget();
+    if (!target || target == bot)
+        return false;
+
+    return botAI->CastSpell("shattering throw", target);
+}
