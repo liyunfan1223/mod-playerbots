@@ -117,7 +117,9 @@ bool CastRetaliationAction::isUseful()
         if (attacker->GetTypeId() == TYPEID_UNIT)
         {
             Creature* creature = attacker->ToCreature();
-            if (creature && (creature->IsClass(UNIT_CLASS_WARRIOR) || creature->IsClass(UNIT_CLASS_ROGUE)))
+            if (creature && (creature->IsClass(CLASS_WARRIOR)
+                || creature->IsClass(CLASS_ROGUE)
+                || creature->IsClass(CLASS_PALADIN)))
             {
                 ++meleeAttackers;
             }
