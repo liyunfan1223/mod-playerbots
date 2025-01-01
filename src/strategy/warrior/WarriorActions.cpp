@@ -101,3 +101,41 @@ bool CastVigilanceAction::Execute(Event event)
 
     return botAI->CastSpell("vigilance", target);
 }
+
+bool CastRetaliationAction::isUseful()
+{
+    uint8 meleeAttackers = 0;
+    GuidVector attackers = AI_VALUE(GuidVector, "attackers");
+
+    for (ObjectGuid const& guid : attackers)
+    {
+        Unit* attacker = botAI->GetUnit(guid);
+        if (!attacker || !attacker->IsAlive())
+            continue;
+
+        // Check if the attacker is melee-based using unit_class
+        if (attacker->GetTypeId() == TYPEID_UNIT)
+        {
+            Creature* creature = attacker->ToCreature();
+            if (creature && (creature->IsClass(UNIT_CLASS_WARRIOR) || creature->IsClass(UNIT_CLASS_ROGUE)))
+            {
+                ++meleeAttackers;
+            }
+        }
+        else if (attacker->GetTypeId() == TYPEID_PLAYER)
+        {
+            Player* playerAttacker = attacker->ToPlayer();
+            if (playerAttacker && botAI->IsMelee(playerAttacker)) // Reuse existing Player melee check
+            {
+                ++meleeAttackers;
+            }
+        }
+
+        // Early exit if we already have enough melee attackers
+        if (meleeAttackers >= 2)
+            break;
+    }
+
+    // Only cast Retaliation if there are at least 2 melee attackers and the buff is not active
+    return meleeAttackers >= 2 && !botAI->HasAura("retaliation", bot);
+}
