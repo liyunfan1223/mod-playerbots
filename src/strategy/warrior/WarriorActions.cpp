@@ -173,6 +173,7 @@ Value<Unit*>* CastShatteringThrowAction::GetTargetValue()
 
 bool CastShatteringThrowAction::Execute(Event event)
 {
+    LOG_INFO("playerbots", "Bot Name = {}, Executing Shattering Throw function", bot->GetName());
     Unit* target = GetTarget();
     if (!target || target == bot)
         return false;
