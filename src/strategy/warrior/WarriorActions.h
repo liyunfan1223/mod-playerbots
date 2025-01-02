@@ -157,7 +157,7 @@ class CastShatteringThrowAction : public CastSpellAction
 public:
     CastShatteringThrowAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shattering throw") {}
 
-    Value<Unit*>* GetTargetValue() override;
+    Unit* GetTarget() override;
     bool isUseful() override;
     bool Execute(Event event) override;
 };
