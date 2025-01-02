@@ -170,12 +170,39 @@ Value<Unit*>* CastShatteringThrowAction::GetTargetValue()
     return new ManualSetValue<Unit*>(botAI, nullptr);
 }
 
+bool CastShatteringThrowAction::isUseful()
+{
+    GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
+
+    for (ObjectGuid const& guid : enemies)
+    {
+        Unit* enemy = botAI->GetUnit(guid);
+        if (!enemy || !enemy->IsAlive() || enemy->IsFriendlyTo(bot))
+            continue;
+
+        // Check if the enemy is within 25 yards and has the specific auras
+        if (bot->IsWithinDistInMap(enemy, 25.0f) &&
+            (enemy->HasAura(642) ||   // Divine Shield
+             enemy->HasAura(45438) || // Ice Block
+             enemy->HasAura(41450)))  // Blessing of Protection
+        {
+            LOG_INFO("playerbots", "Bot Name = {}, ShatteringThrowAction::isUseful: Valid target found: Name = {}, GUID = {}", 
+                bot->GetName(), 
+                enemy->GetName().empty() ? "Unknown" : enemy->GetName(), 
+                guid.GetRawValue());
+
+            return true;
+        }
+    }
+
+    return false; // No valid targets within range
+}
 
 bool CastShatteringThrowAction::Execute(Event event)
 {
     LOG_INFO("playerbots", "Bot Name = {}, Executing Shattering Throw function", bot->GetName());
     Unit* target = GetTarget();
-    if (!target || target == bot)
+    if (!target)
         return false;
 
     LOG_INFO("playerbots", "Bot Name = {}, Casting Shattering Throw at target: Name = {}, GUID = {}", 
@@ -185,4 +212,3 @@ bool CastShatteringThrowAction::Execute(Event event)
 
     return botAI->CastSpell("shattering throw", target);
 }
-
