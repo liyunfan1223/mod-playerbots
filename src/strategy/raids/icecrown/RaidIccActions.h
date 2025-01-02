@@ -28,6 +28,10 @@ const Position ICC_ROTFACE_BIG_OOZE_POSITION = Position(4432.687f, 3142.3035f, 3
 const Position ICC_ROTFACE_SAFE_POSITION = Position(4446.557f, 3065.6594f, 360.51843f);
 const Position ICC_PUTRICIDE_TANK_OOZE_POSITION = Position(4362.709f, 3229.1448f, 389.4083f);
 const Position ICC_PUTRICIDE_TANK_GAS_CLOUD_POSITION = Position(4397.0386f, 3221.385f, 389.3999f);
+const Position ICC_PUTRICIDE_GAS1_POSITION = Position(4350.772f, 3249.9773f, 389.39508f);
+const Position ICC_PUTRICIDE_GAS2_POSITION = Position(4390.002f, 3204.8855f, 389.39938f);
+const Position ICC_PUTRICIDE_GAS3_POSITION = Position(4367.753f, 3177.5894f, 389.39575f);
+const Position ICC_PUTRICIDE_GAS4_POSITION = Position(4321.8486f, 3206.464f, 389.3982f);
 const Position ICC_BPC_OT_POSITION = Position(4649.2236f, 2796.0972f, 361.1815f);
 const Position ICC_BPC_MT_POSITION = Position(4648.5674f, 2744.847f, 361.18222f);
 const Position ICC_BQL_CENTER_POSITION = Position(4595.0f, 2769.0f, 400.0f);
@@ -44,7 +48,8 @@ const Position ICC_SINDRAGOSA_THOMB5_POSITION = Position(4381.819f, 2495.1448f, 
 const Position ICC_SINDRAGOSA_CENTER_POSITION = Position(4408.0464f, 2484.478f, 203.37529f);           
 const Position ICC_SINDRAGOSA_THOMBMB2_POSITION = Position(4382.6113f, 2505.4922f, 203.38197f);       
 const Position ICC_SINDRAGOSA_FBOMB_POSITION = Position(4400.031f, 2507.0295f, 203.37929f);       
-const Position ICC_SINDRAGOSA_LOS2_POSITION = Position(4376.0938f, 2511.103f, 203.38303f);              
+const Position ICC_SINDRAGOSA_LOS2_POSITION = Position(4376.0938f, 2511.103f, 203.38303f); 
+const Position ICC_LICH_KING_ADDS_POSITION = Position(486.63647f, -2095.7915f, 840.857f);           
 
 
 //Lord Marrogwar
@@ -218,12 +223,20 @@ public:
 
 class IccPutricideGasCloudAction : public AttackAction
 {
-public:
+    public:
     IccPutricideGasCloudAction(PlayerbotAI* botAI, std::string const name = "icc putricide gas cloud")
         : AttackAction(botAI, name) {}
-    bool Execute(Event event) override;
+        bool Execute(Event event) override;
+    private:
+        static uint8_t lastKnownPosition; // 0 = none, 1-4 = positions 1-4
 };
 
+class AvoidMalleableGooAction : public MovementAction 
+{
+    public:
+        AvoidMalleableGooAction(PlayerbotAI* ai) : MovementAction(ai, "avoid malleable goo") {}
+        bool Execute(Event event) override;
+};
 
 //BPC
 class IccBpcKelesethTankAction : public AttackAction
@@ -389,5 +402,33 @@ class IccSindragosaTankSwapPositionAction : public AttackAction
             : AttackAction(botAI, "sindragosa tank swap position") {}
         bool Execute(Event event) override;
 };
+
+
+//LK
+class IccLichKingNecroticPlagueAction : public MovementAction
+{
+    public:
+        IccLichKingNecroticPlagueAction(PlayerbotAI* botAI) 
+            : MovementAction(botAI, "icc lich king necrotic plague") {}
+        bool Execute(Event event) override;
+};
+
+class IccLichKingWinterAction : public AttackAction
+{
+    public:
+        IccLichKingWinterAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc lich king winter") {}
+        bool Execute(Event event) override;
+};
+
+class IccLichKingAddsAction : public AttackAction
+{
+    public:
+        IccLichKingAddsAction(PlayerbotAI* botAI) 
+            : AttackAction(botAI, "icc lich king adds") {}
+        bool Execute(Event event) override;
+};
+
+
 
 #endif

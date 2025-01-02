@@ -76,16 +76,19 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     //PP
     triggers.push_back(new TriggerNode("icc putricide volatile ooze",
-        NextAction::array(0, new NextAction("icc putricide volatile ooze", ACTION_EMERGENCY + 5), nullptr)));
+        NextAction::array(0, new NextAction("icc putricide volatile ooze", ACTION_EMERGENCY + 4), nullptr)));
 
     triggers.push_back(new TriggerNode("icc putricide gas cloud",
         NextAction::array(0, new NextAction("icc putricide gas cloud", ACTION_EMERGENCY + 5), nullptr)));
 
     triggers.push_back(new TriggerNode("icc putricide growing ooze puddle",
-        NextAction::array(0, new NextAction("icc putricide growing ooze puddle", ACTION_EMERGENCY + 5), nullptr)));
+        NextAction::array(0, new NextAction("icc putricide growing ooze puddle", ACTION_EMERGENCY + 3), nullptr)));
 
     triggers.push_back(new TriggerNode("icc putricide main tank mutated plague",
         NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 6), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc putricide malleable goo",
+        NextAction::array(0, new NextAction("avoid malleable goo", ACTION_EMERGENCY + 2), nullptr)));
 
     //BPC
     triggers.push_back(new TriggerNode("icc bpc keleseth tank",
@@ -153,11 +156,23 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("icc sindragosa tank swap position",
         NextAction::array(0, new NextAction("icc sindragosa tank swap position", ACTION_EMERGENCY + 2), nullptr)));
+
+    //LICH KING
+    triggers.push_back(new TriggerNode("icc lich king necrotic plague",
+        NextAction::array(0, new NextAction("icc lich king necrotic plague", ACTION_EMERGENCY + 3), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc lich king winter",
+        NextAction::array(0, new NextAction("icc lich king winter", ACTION_RAID +1), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc lich king adds",
+        NextAction::array(0, new NextAction("icc lich king adds", ACTION_RAID +2), nullptr)));
 }
 
 void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
+    multipliers.push_back(new IccLadyDeathwhisperMultiplier(botAI));
     multipliers.push_back(new IccAddsDbsMultiplier(botAI));
+    multipliers.push_back(new IccDogsMultiplier(botAI));
     multipliers.push_back(new IccFestergutMultiplier(botAI));
     multipliers.push_back(new IccRotfaceMultiplier(botAI));
     //multipliers.push_back(new IccRotfaceGroupPositionMultiplier(botAI));
@@ -172,4 +187,6 @@ void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
     multipliers.push_back(new IccSindragosaMysticBuffetMultiplier(botAI));
     multipliers.push_back(new IccSindragosaBlisteringColdPriorityMultiplier(botAI));
     multipliers.push_back(new IccSindragosaFrostBombMultiplier(botAI));
+    multipliers.push_back(new IccLichKingNecroticPlagueMultiplier(botAI));
+    multipliers.push_back(new IccLichKingAddsMultiplier(botAI));
 }

@@ -215,25 +215,7 @@ bool LowTankThreatTrigger::IsActive()
 
 bool AoeTrigger::IsActive()
 {
-    Unit* current_target = AI_VALUE(Unit*, "current target");
-    if (!current_target)
-    {
-        return false;
-    }
-    GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
-    int attackers_count = 0;
-    for (ObjectGuid const guid : attackers)
-    {
-        Unit* unit = botAI->GetUnit(guid);
-        if (!unit || !unit->IsAlive())
-            continue;
-
-        if (unit->GetExactDist2d(current_target) <= range)
-        {
-            attackers_count++;
-        }
-    }
-    return attackers_count >= amount;
+    return false; // Disable all AOE attacks
 }
 
 bool NoFoodTrigger::IsActive()

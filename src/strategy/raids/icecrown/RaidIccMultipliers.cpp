@@ -21,12 +21,46 @@
 #include "WarriorActions.h"
 #include "PlayerbotAI.h"
 
+float IccLadyDeathwhisperMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "lady deathwhisper");
+    if (!boss)
+    {
+        return 1.0f;
+    }
+
+    if (dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
+    {
+        return 0.0f;
+    }
+
+    return 1.0f;
+}
+
 float IccAddsDbsMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
     if (!boss)
     {
         return 1.0f;
+    }
+
+    if (dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
+    {
+        return 0.0f;
+    }
+
+    if (botAI->IsMainTank(bot))
+    {
+        Aura* aura = botAI->GetAura("rune of blood", bot);
+        if (aura)
+        {
+            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
+                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action))
+            {
+                return 0.0f;
+            }
+        }
     }
 
     if (botAI->IsDps(bot))
@@ -59,6 +93,30 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
+float IccDogsMultiplier::GetValue(Action* action)
+{
+    bool bossPresent = false;
+    if (AI_VALUE2(Unit*, "find target", "stinky") || AI_VALUE2(Unit*, "find target", "precious"))
+        bossPresent = true;
+
+    if (!bossPresent)
+        return 1.0f;
+
+    if (botAI->IsMainTank(bot))
+    {
+        Aura* aura = botAI->GetAura("mortal wound", bot, false, true);
+        if (aura && aura->GetStackAmount() >= 8)
+        {
+            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
+                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action))
+            {
+                return 0.0f;
+            }
+        }
+    }
+    return 1.0f;
+}
+
 float IccFestergutMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "festergut");
@@ -67,12 +125,21 @@ float IccFestergutMultiplier::GetValue(Action* action)
         return 1.0f;
     }
 
-    // Check if any bot has spore aura
-    if (bot->HasAura(69279) || botAI->IsMelee(bot))
+    if (dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
     {
-        if (dynamic_cast<CombatFormationMoveAction*>(action))
+        return 0.0f;
+    }
+
+    if (botAI->IsMainTank(bot))
+    {
+        Aura* aura = botAI->GetAura("gastric bloat", bot, false, true);
+        if (aura && aura->GetStackAmount() >= 6)
         {
-            return 0.0f;
+            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
+                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action))
+            {
+                return 0.0f;
+            }
         }
     }
 
@@ -97,7 +164,15 @@ float IccRotfaceMultiplier::GetValue(Action* action)
     Unit* boss = AI_VALUE2(Unit*, "find target", "big ooze");
     if (!boss) { return 1.0f; }
 
-    if (dynamic_cast<FleeAction*>(action)) { return 0.0f; }
+    if (dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
+    {
+        return 0.0f;
+    }
+
+    if (dynamic_cast<FleeAction*>(action)) 
+    { 
+        return 0.0f; 
+    }
 
     static std::map<ObjectGuid, uint32> lastExplosionTimes;
     static std::map<ObjectGuid, bool> hasMoved;
@@ -166,6 +241,19 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
         return 1.0f;
     }
 
+    if (botAI->IsMainTank(bot))
+    {
+        Aura* aura = botAI->GetAura("mutated plague", bot, false, true);
+        if (aura && aura->GetStackAmount() >= 4)
+        {
+            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
+                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action))
+            {
+                return 0.0f;
+            }
+        }
+    }
+
     if (botAI->IsDps(bot))
     {
         GuidVector targets = AI_VALUE(GuidVector, "possible targets");
@@ -173,8 +261,8 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
         for (auto& guid : targets)
         {
             Unit* unit = botAI->GetUnit(guid);
-            if (unit && (unit->GetEntry() == 37697 || //volatile ooze
-                        unit->GetEntry() == 37562))    //gas cloud
+            if (unit && (unit->GetEntry() == 37697 || unit->GetEntry() == 38604 || unit->GetEntry() == 38758 || unit->GetEntry() == 38759 ||//volatile ooze
+                        unit->GetEntry() == 37562 || unit->GetEntry() == 38602 || unit->GetEntry() == 38760 || unit->GetEntry() == 38761)) //gas cloud
             {
                 hasAdds = true;
                 break;
@@ -352,6 +440,19 @@ float IccSindragosaMysticBuffetMultiplier::GetValue(Action* action)
     if (!boss)
         return 1.0f;
 
+    if (botAI->IsMainTank(bot))
+    {
+        Aura* aura = botAI->GetAura("mystic buffet", bot, false, true);
+        if (aura && aura->GetStackAmount() >= 8)
+        {
+            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
+                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action))
+            {
+                return 0.0f;
+            }
+        }
+    }
+
     if (boss->GetVictim() == bot)
         return 1.0f;
 
@@ -372,7 +473,7 @@ float IccSindragosaMysticBuffetMultiplier::GetValue(Action* action)
         return 5.0f;
     else if (dynamic_cast<CombatFormationMoveAction*>(action) || 
              dynamic_cast<IccSindragosaTankPositionAction*>(action)
-             || dynamic_cast<FollowAction*>(action))
+             || dynamic_cast<FollowAction*>(action) || dynamic_cast<TankAssistAction*>(action))
         return 0.0f;    
     return 1.0f;
 }
@@ -422,3 +523,104 @@ float IccSindragosaFrostBombMultiplier::GetValue(Action* action)
         return 0.0f;    
     return 1.0f;
 }
+
+float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
+{
+    // Allow plague movement action to proceed
+    if (dynamic_cast<IccLichKingNecroticPlagueAction*>(action))
+        return 1.0f;
+    // Block combat formation and cure actions by default
+    else if (dynamic_cast<CombatFormationMoveAction*>(action))
+        return 0.0f;
+
+    // Handle cure actions
+    if (dynamic_cast<CurePartyMemberAction*>(action))
+    {
+        static std::map<ObjectGuid, uint32> plagueTimes;
+        static std::map<ObjectGuid, bool> allowCure;
+        
+        Unit* target = action->GetTarget();
+        if (!target || !target->IsPlayer())
+            return 0.0f;
+
+        ObjectGuid targetGuid = target->GetGUID();
+        uint32 currentTime = getMSTime();
+
+        // Check if target has plague
+        bool hasPlague = target->HasAura(70338) || target->HasAura(73785) || 
+                        target->HasAura(73786) || target->HasAura(73787) ||
+                        target->HasAura(70337) || target->HasAura(73912) || 
+                        target->HasAura(73913) || target->HasAura(73914); 
+
+        // If no plague, reset timers and block cure
+        if (!hasPlague)
+        {
+            plagueTimes.erase(targetGuid);
+            allowCure.erase(targetGuid);
+            return 0.0f;
+        }
+
+        // If we haven't seen this plague yet, start the timer
+        if (plagueTimes.find(targetGuid) == plagueTimes.end())
+        {
+            plagueTimes[targetGuid] = currentTime;
+            allowCure[targetGuid] = false;
+            return 0.0f;
+        }
+
+        // If we've already allowed cure for this plague instance, keep allowing it
+        if (allowCure[targetGuid])
+        {
+            return 1.0f;
+        }
+
+        // Check if enough time has passed
+        uint32 timeSincePlague = currentTime - plagueTimes[targetGuid];
+        if (timeSincePlague >= 3000)
+        {
+            allowCure[targetGuid] = true;
+            return 1.0f;
+        }
+        else
+        {
+            return 0.0f;
+        }
+    }
+
+    return 1.0f;
+}
+
+float IccLichKingAddsMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
+    if (!boss)
+        return 1.0f;
+
+    if (botAI->IsMainTank(bot) && dynamic_cast<IccLichKingWinterAction*>(action))
+    {
+        if (dynamic_cast<TankAssistAction*>(action))
+            return 0.0f;
+    }
+
+    if (botAI->IsAssistTank(bot))
+    {
+        // Allow BPC-specific actions
+        if (dynamic_cast<IccLichKingAddsAction*>(action))
+            return 1.0f;
+
+        // Disable normal assist behavior
+        if (dynamic_cast<TankAssistAction*>(action))
+            return 0.0f;
+
+        if (dynamic_cast<CurePartyMemberAction*>(action))
+            return 0.0f;
+
+        // Disable following
+        if (dynamic_cast<FollowAction*>(action))
+            return 0.0f;
+    }
+
+    return 1.0f;
+}
+
+//raging spirit, Ice sphere, valkyere shadowguard, sphere 36633 39305 39306 39307

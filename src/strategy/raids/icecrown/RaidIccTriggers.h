@@ -190,6 +190,13 @@ public:
     bool IsActive() override;
 };
 
+class IccPutricideMalleableGooTrigger : public Trigger 
+{
+public:
+    IccPutricideMalleableGooTrigger(PlayerbotAI* ai) : Trigger(ai, "icc putricide malleable goo") {}
+    bool IsActive() override;
+};
+
 //BPC
 class IccBpcKelesethTankTrigger : public Trigger 
 {
@@ -342,5 +349,27 @@ public:
     bool IsActive() override;
 };
 
+
+//LICH KING
+class IccLichKingNecroticPlagueTrigger : public Trigger 
+{
+public:
+    IccLichKingNecroticPlagueTrigger(PlayerbotAI* ai) : Trigger(ai, "icc lich king necrotic plague") {}
+    bool IsActive() override;
+};
+
+class IccLichKingWinterTrigger : public Trigger
+{
+public:
+    IccLichKingWinterTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc lich king winter") {}
+    bool IsActive() override;
+};
+
+class IccLichKingAddsTrigger : public Trigger
+{
+public:
+    IccLichKingAddsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc lich king adds") {}
+    bool IsActive() override;
+};
 
 #endif

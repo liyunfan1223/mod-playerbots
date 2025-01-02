@@ -31,6 +31,7 @@ public:
         creators["icc putricide volatile ooze"] = &RaidIccActionContext::icc_putricide_volatile_ooze;
         creators["icc putricide gas cloud"] = &RaidIccActionContext::icc_putricide_gas_cloud;
         creators["icc putricide growing ooze puddle"] = &RaidIccActionContext::icc_putricide_growing_ooze_puddle;
+        creators["avoid malleable goo"] = &RaidIccActionContext::avoid_malleable_goo;
         creators["icc bpc keleseth tank"] = &RaidIccActionContext::icc_bpc_keleseth_tank;
         creators["icc bpc nucleus"] = &RaidIccActionContext::icc_bpc_nucleus;
         creators["icc bpc main tank"] = &RaidIccActionContext::icc_bpc_main_tank;
@@ -51,6 +52,9 @@ public:
         creators["icc sindragosa mystic buffet"] = &RaidIccActionContext::icc_sindragosa_mystic_buffet; 
         creators["icc sindragosa frost bomb"] = &RaidIccActionContext::icc_sindragosa_frost_bomb;
         creators["icc sindragosa tank swap position"] = &RaidIccActionContext::icc_sindragosa_tank_swap_position;
+        creators["icc lich king necrotic plague"] = &RaidIccActionContext::icc_lich_king_necrotic_plague;
+        creators["icc lich king winter"] = &RaidIccActionContext::icc_lich_king_winter;
+        creators["icc lich king adds"] = &RaidIccActionContext::icc_lich_king_adds;
     }
 
 private:
@@ -75,6 +79,7 @@ private:
     static Action* icc_putricide_volatile_ooze(PlayerbotAI* ai) { return new IccPutricideVolatileOozeAction(ai); }
     static Action* icc_putricide_gas_cloud(PlayerbotAI* ai) { return new IccPutricideGasCloudAction(ai); }
     static Action* icc_putricide_growing_ooze_puddle(PlayerbotAI* ai) { return new IccPutricideGrowingOozePuddleAction(ai); }
+    static Action* avoid_malleable_goo(PlayerbotAI* ai) { return new AvoidMalleableGooAction(ai); }
     static Action* icc_bpc_keleseth_tank(PlayerbotAI* ai) { return new IccBpcKelesethTankAction(ai); }
     static Action* icc_bpc_nucleus(PlayerbotAI* ai) { return new IccBpcNucleusAction(ai); }
     static Action* icc_bpc_main_tank(PlayerbotAI* ai) { return new IccBpcMainTankAction(ai); }
@@ -95,6 +100,10 @@ private:
     static Action* icc_sindragosa_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMysticBuffetAction(ai); }    
     static Action* icc_sindragosa_frost_bomb(PlayerbotAI* ai) { return new IccSindragosaFrostBombAction(ai); }
     static Action* icc_sindragosa_tank_swap_position(PlayerbotAI* ai) { return new IccSindragosaTankSwapPositionAction(ai); }
+    static Action* icc_lich_king_necrotic_plague(PlayerbotAI* ai) { return new IccLichKingNecroticPlagueAction(ai); }
+    static Action* icc_lich_king_winter(PlayerbotAI* ai) { return new IccLichKingWinterAction(ai); }
+    static Action* icc_lich_king_adds(PlayerbotAI* ai) { return new IccLichKingAddsAction(ai); }
+
 };
 
 #endif

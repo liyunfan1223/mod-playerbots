@@ -35,6 +35,7 @@ public:
         creators["icc putricide gas cloud"] = &RaidIccTriggerContext::icc_putricide_gas_cloud;
         creators["icc putricide growing ooze puddle"] = &RaidIccTriggerContext::icc_putricide_growing_ooze_puddle;
         creators["icc putricide main tank mutated plague"] = &RaidIccTriggerContext::icc_putricide_main_tank_mutated_plague;
+        creators["icc putricide malleable goo"] = &RaidIccTriggerContext::icc_putricide_malleable_goo;
         creators["icc bpc keleseth tank"] = &RaidIccTriggerContext::icc_bpc_keleseth_tank;
         creators["icc bpc nucleus"] = &RaidIccTriggerContext::icc_bpc_nucleus;
         creators["icc bpc main tank"] = &RaidIccTriggerContext::icc_bpc_main_tank;
@@ -56,6 +57,9 @@ public:
         creators["icc sindragosa main tank mystic buffet"] = &RaidIccTriggerContext::icc_sindragosa_main_tank_mystic_buffet;
         creators["icc sindragosa frost bomb"] = &RaidIccTriggerContext::icc_sindragosa_frost_bomb;
         creators["icc sindragosa tank swap position"] = &RaidIccTriggerContext::icc_sindragosa_tank_swap_position;
+        creators["icc lich king necrotic plague"] = &RaidIccTriggerContext::icc_lich_king_necrotic_plague;
+        creators["icc lich king winter"] = &RaidIccTriggerContext::icc_lich_king_winter;
+        creators["icc lich king adds"] = &RaidIccTriggerContext::icc_lich_king_adds;
     }
 
 private:
@@ -84,6 +88,7 @@ private:
     static Trigger* icc_putricide_gas_cloud(PlayerbotAI* ai) { return new IccPutricideGasCloudTrigger(ai); }
     static Trigger* icc_putricide_growing_ooze_puddle(PlayerbotAI* ai) { return new IccPutricideGrowingOozePuddleTrigger(ai); }
     static Trigger* icc_putricide_main_tank_mutated_plague(PlayerbotAI* ai) { return new IccPutricideMainTankMutatedPlagueTrigger(ai); }
+    static Trigger* icc_putricide_malleable_goo(PlayerbotAI* ai) { return new IccPutricideMalleableGooTrigger(ai); }
     static Trigger* icc_bpc_keleseth_tank(PlayerbotAI* ai) { return new IccBpcKelesethTankTrigger(ai); }
     static Trigger* icc_bpc_nucleus(PlayerbotAI* ai) { return new IccBpcNucleusTrigger(ai); }
     static Trigger* icc_bpc_main_tank(PlayerbotAI* ai) { return new IccBpcMainTankTrigger(ai); }
@@ -105,6 +110,10 @@ private:
     static Trigger* icc_sindragosa_main_tank_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMainTankMysticBuffetTrigger(ai); }
     static Trigger* icc_sindragosa_frost_bomb(PlayerbotAI* ai) { return new IccSindragosaFrostBombTrigger(ai); }
     static Trigger* icc_sindragosa_tank_swap_position(PlayerbotAI* ai) { return new IccSindragosaTankSwapPositionTrigger(ai); }
+    static Trigger* icc_lich_king_necrotic_plague(PlayerbotAI* ai) { return new IccLichKingNecroticPlagueTrigger(ai); }
+    static Trigger* icc_lich_king_winter(PlayerbotAI* ai) { return new IccLichKingWinterTrigger(ai); }
+    static Trigger* icc_lich_king_adds(PlayerbotAI* ai) { return new IccLichKingAddsTrigger(ai); }
+    
 };
 
 #endif

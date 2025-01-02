@@ -3,6 +3,15 @@
 
 #include "Multiplier.h"
 
+//Lady Deathwhisper
+class IccLadyDeathwhisperMultiplier : public Multiplier
+{
+public:
+    IccLadyDeathwhisperMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc lady deathwhisper") {}
+    virtual float GetValue(Action* action);
+};
+
+//DBS
 class IccAddsDbsMultiplier : public Multiplier
 {
 public:
@@ -10,12 +19,20 @@ public:
     virtual float GetValue(Action* action);
 };
 
+//DOGS
+
+class IccDogsMultiplier : public Multiplier
+{
+public:
+    IccDogsMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc dogs") {}
+    virtual float GetValue(Action* action);
+};
+
+//FESTERGUT
 class IccFestergutMultiplier : public Multiplier
 {
 public:
     IccFestergutMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc festergut") {}
-
-public:
     virtual float GetValue(Action* action);
 };
 
@@ -47,16 +64,15 @@ class IccBpcAssistMultiplier : public Multiplier
 {
 public:
     IccBpcAssistMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc bpc assist") {}
-    float GetValue(Action* action) override;
+    virtual float GetValue(Action* action);
 };
 
 //BQL
 class IccBqlPactOfDarkfallenMultiplier : public Multiplier
 {
 public:
-    IccBqlPactOfDarkfallenMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc bql pact of darkfallen multiplier") {}
-
-    float GetValue(Action* action) override;
+    IccBqlPactOfDarkfallenMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc bql pact of darkfallen multiplier") {}    
+    virtual float GetValue(Action* action) override;
 };
 
 class IccBqlVampiricBiteMultiplier : public Multiplier
@@ -108,7 +124,7 @@ class IccSindragosaBlisteringColdPriorityMultiplier : public Multiplier
 public:
     IccSindragosaBlisteringColdPriorityMultiplier(PlayerbotAI* ai) : Multiplier(ai, "sindragosa blistering cold priority") {}
 
-    float GetValue(Action* action) override;
+    virtual float GetValue(Action* action) override;
 };
 
 class IccSindragosaFrostBombMultiplier : public Multiplier
@@ -117,4 +133,20 @@ public:
     IccSindragosaFrostBombMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc sindragosa frost bomb") {}
     virtual float GetValue(Action* action);
 };
+
+class IccLichKingNecroticPlagueMultiplier : public Multiplier
+{
+public:
+    IccLichKingNecroticPlagueMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc lich king necrotic plague") {}
+    virtual float GetValue(Action* action);
+};
+
+class IccLichKingAddsMultiplier : public Multiplier
+{
+public:
+    IccLichKingAddsMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc lich king adds") {}
+    virtual float GetValue(Action* action);
+};
+
+
 #endif

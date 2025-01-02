@@ -170,7 +170,7 @@ bool IccDbsMainTankRuneOfBloodTrigger::IsActive()
     if (!mt) 
         return false; 
     
-    Aura* aura = botAI->GetAura("rune of blood", mt, false, true);
+    Aura* aura = botAI->GetAura("rune of blood", mt);
     if (!aura) 
         return false;
     
@@ -205,7 +205,7 @@ bool IccStinkyPreciousMainTankMortalWoundTrigger::IsActive()
         return false;
     }
     Aura* aura = botAI->GetAura("mortal wound", mt, false, true);
-    if (!aura || aura->GetStackAmount() < 6)
+    if (!aura || aura->GetStackAmount() < 8)
     {
         return false;
     }
@@ -238,7 +238,7 @@ bool IccFestergutMainTankGastricBloatTrigger::IsActive()
     {
         return false;
     }
-    Aura* aura = botAI->GetAura("gastric bloat", mt, false, true);
+    Aura* aura = botAI->GetAura("Gastric Bloat", mt, false, true);
     if (!aura || aura->GetStackAmount() < 6)
     {
         return false;
@@ -339,12 +339,50 @@ bool IccPutricideMainTankMutatedPlagueTrigger::IsActive()
     {
         return false;
     }
-    Aura* aura = botAI->GetAura("mutated plague", mt, false, true);
+    Aura* aura = botAI->GetAura("Mutated Plague", mt, false, true);
     if (!aura || aura->GetStackAmount() < 4)
     {
         return false;
     }
     return true;
+}
+
+bool IccPutricideMalleableGooTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
+    if (!boss)
+        return false;
+
+    // Check if we are directly targeted
+    if (bot->HasAura(72295))
+        return true;
+
+    // Check for other players targeted by goo and if we're in the path
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* player = itr->GetSource();
+        if (!player || !player->IsAlive() || player == bot)
+            continue;
+
+        if (player->HasAura(72295))
+        {
+            // Check if we're in the path between boss and target
+            float angle = boss->GetAngle(player);
+            float myAngle = boss->GetAngle(bot);
+            float angleDiff = std::abs(angle - myAngle);
+            if (angleDiff < M_PI / 6 && // Within 30 degree cone
+                bot->GetDistance(boss) < player->GetDistance(boss)) // We're closer to boss than target
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 //BPC
@@ -690,4 +728,40 @@ bool IccSindragosaFrostBombTrigger::IsActive()
     }
 
     return false;
+}
+
+bool IccLichKingNecroticPlagueTrigger::IsActive()
+{
+    if (!bot || !bot->IsAlive())
+        return false;
+
+    // Check for plague by name instead of ID
+    bool hasPlague = botAI->HasAura("Necrotic Plague", bot);
+
+    return hasPlague;
+}
+
+bool IccLichKingWinterTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
+    if (!boss) 
+        return false;
+    
+    // Check for either Remorseless Winter
+    bool hasWinterAura = boss->HasAura(72259) || boss->HasAura(74273) || boss->HasAura(74274) || boss->HasAura(74275);
+    bool hasWinter2Aura = boss->HasAura(68981) || boss->HasAura(74270) || boss->HasAura(74271) || boss->HasAura(74272);
+
+    if (!hasWinterAura && !hasWinter2Aura)
+        return false;   
+
+    return true;
+}
+
+bool IccLichKingAddsTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
+    if (!boss) 
+        return false;
+
+    return true;
 }
