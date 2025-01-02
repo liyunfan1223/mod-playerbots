@@ -142,7 +142,7 @@ bool CastRetaliationAction::isUseful()
     return meleeAttackers >= 2 && !botAI->HasAura("retaliation", bot);
 }
 
-Value<Unit*>* CastShatteringThrowAction::GetTargetValue()
+Unit* CastShatteringThrowAction::GetTarget()
 {
     GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
 
@@ -152,22 +152,20 @@ Value<Unit*>* CastShatteringThrowAction::GetTargetValue()
         if (!enemy || !enemy->IsAlive() || enemy->IsFriendlyTo(bot))
             continue;
 
-        // Check if the enemy is within 25 yards and has the specific auras
         if (bot->IsWithinDistInMap(enemy, 25.0f) &&
             (enemy->HasAura(642) ||   // Divine Shield
              enemy->HasAura(45438) || // Ice Block
              enemy->HasAura(41450)))  // Blessing of Protection
         {
-            LOG_INFO("playerbots", "Bot Name = {}, CastShatteringThrowAction: Valid target found: Name = {}, GUID = {}", 
+            LOG_INFO("playerbots", "Bot Name = {}, CastShatteringThrowAction::GetTarget: Valid target found: Name = {}, GUID = {}", 
                 bot->GetName(), 
                 enemy->GetName().empty() ? "Unknown" : enemy->GetName(), 
                 guid.GetRawValue());
-            return new ManualSetValue<Unit*>(botAI, enemy);
+            return enemy;
         }
     }
 
-    // No valid target
-    return new ManualSetValue<Unit*>(botAI, nullptr);
+    return nullptr; // No valid target
 }
 
 bool CastShatteringThrowAction::isUseful()
