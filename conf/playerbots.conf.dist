@@ -1534,10 +1534,19 @@ AiPlayerbot.BotActiveAloneForceWhenInMap = 0
 AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
 AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 
-# Specify smart scaling is enabled or not.
+# SmartScale is enabled or not.
 # The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
-# Only when botLevel is between WhenMinLevel and WhenMaxLevel.
+# (The scaling will be overruled by the BotActiveAloneForceWhen...rules)
+#
+#   Limitfloor - when DIFF (latency) above floor, activity scaling is applied starting with 90%
+#   LimitCeiling - when DIFF (latency) above ceiling, activity is 0%;
+#
+#   MinLevel - only apply scaling when level is above or equal to min(bot)Level
+#   MaxLevel - only apply scaling when level is lower or equal of max(bot)Level
+#
 AiPlayerbot.botActiveAloneSmartScale = 1
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
 AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
 AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 
