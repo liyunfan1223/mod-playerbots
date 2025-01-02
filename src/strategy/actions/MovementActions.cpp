@@ -177,7 +177,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 }
 
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only,
-                            bool exact_waypoint, MovementPriority priority, bool lessDelay)
+                            bool exact_waypoint, MovementPriority priority, bool lessDelay, bool backwards)
 {
     UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z))
@@ -208,8 +208,16 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         {
             MotionMaster& mm = *vehicleBase->GetMotionMaster();  // need to move vehicle, not bot
             mm.Clear();
-            mm.MovePoint(0, x, y, z, generatePath);
-            float delay = 1000.0f * (distance / vehicleBase->GetSpeed(MOVE_RUN));
+            if (!backwards)
+            {
+                mm.MovePoint(0, x, y, z, generatePath);
+            }
+            else
+            {
+                mm.MovePointBackwards(0, x, y, z, generatePath);
+            }
+            float speed = backwards ? vehicleBase->GetSpeed(MOVE_RUN_BACK) : vehicleBase->GetSpeed(MOVE_RUN);
+            float delay = 1000.0f * (distance / speed);
             if (lessDelay)
             {
                 delay -= botAI->GetReactDelay();
@@ -235,8 +243,15 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             }
             MotionMaster& mm = *bot->GetMotionMaster();
             mm.Clear();
-            mm.MovePoint(0, x, y, z, generatePath);
-            float delay = 1000.0f * MoveDelay(distance);
+            if (!backwards)
+            {
+                mm.MovePoint(0, x, y, z, generatePath);
+            }
+            else
+            {
+                mm.MovePointBackwards(0, x, y, z, generatePath);
+            }
+            float delay = 1000.0f * MoveDelay(distance, backwards);
             if (lessDelay)
             {
                 delay -= botAI->GetReactDelay();
@@ -270,8 +285,15 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             MotionMaster& mm = *bot->GetMotionMaster();
             G3D::Vector3 endP = path.back();
             mm.Clear();
-            mm.MovePoint(0, endP.x, endP.y, endP.z, generatePath);
-            float delay = 1000.0f * MoveDelay(distance);
+            if (!backwards)
+            {
+                mm.MovePoint(0, x, y, z, generatePath);
+            }
+            else
+            {
+                mm.MovePointBackwards(0, x, y, z, generatePath);
+            }
+            float delay = 1000.0f * MoveDelay(distance, backwards);
             if (lessDelay)
             {
                 delay -= botAI->GetReactDelay();
@@ -1265,20 +1287,20 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
     return true;
 }
 
-float MovementAction::MoveDelay(float distance)
+float MovementAction::MoveDelay(float distance, bool backwards)
 {
     float speed;
     if (bot->isSwimming())
     {
-        speed = bot->GetSpeed(MOVE_SWIM);
+        speed = backwards ? bot->GetSpeed(MOVE_SWIM_BACK) : bot->GetSpeed(MOVE_SWIM);
     }
     else if (bot->IsFlying())
     {
-        speed = bot->GetSpeed(MOVE_FLIGHT);
+        speed = backwards ? bot->GetSpeed(MOVE_FLIGHT_BACK) : bot->GetSpeed(MOVE_FLIGHT);
     }
     else
     {
-        speed = bot->GetSpeed(MOVE_RUN);
+        speed = backwards ? bot->GetSpeed(MOVE_RUN_BACK) :bot->GetSpeed(MOVE_RUN);
     }
     float delay = distance / speed;
     return delay;
@@ -1500,7 +1522,7 @@ void MovementAction::ClearIdleState()
     context->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 }
 
-bool MovementAction::MoveAway(Unit* target, float distance)
+bool MovementAction::MoveAway(Unit* target, float distance, bool backwards)
 {
     if (!target)
     {
@@ -1523,7 +1545,7 @@ bool MovementAction::MoveAway(Unit* target, float distance)
             dz = bot->GetPositionZ();
             exact = false;
         }
-        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT))
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, backwards))
         {
             return true;
         }
@@ -1545,7 +1567,7 @@ bool MovementAction::MoveAway(Unit* target, float distance)
             dz = bot->GetPositionZ();
             exact = false;
         }
-        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT))
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, backwards))
         {
             return true;
         }
@@ -1746,7 +1768,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
 bool FleeAction::Execute(Event event)
 {
     // return Flee(AI_VALUE(Unit*, "current target"));
-    return MoveAway(AI_VALUE(Unit*, "current target"));
+    return MoveAway(AI_VALUE(Unit*, "current target"), sPlayerbotAIConfig->fleeDistance, true);
 }
 
 bool FleeAction::isUseful()
