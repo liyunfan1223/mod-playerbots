@@ -158,8 +158,8 @@ public:
     CastShatteringThrowAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shattering throw") {}
 
     Value<Unit*>* GetTargetValue() override;
+    bool isUseful() override;
     bool Execute(Event event) override;
 };
-
 
 #endif
