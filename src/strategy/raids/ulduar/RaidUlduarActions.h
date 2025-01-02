@@ -11,6 +11,10 @@
 #include "RaidUlduarBossHelper.h"
 #include "Vehicle.h"
 
+//
+//  Flame Leviathan
+//
+
 class FlameLeviathanVehicleAction : public MovementAction
 {
 public:
@@ -40,6 +44,66 @@ protected:
     bool EnterVehicle(Unit* vehicleBase, bool moveIfFar);
     bool ShouldEnter(Unit* vehicleBase);
     bool AllMainVehiclesOnUse();
+};
+
+//
+//  Razorscale
+//
+
+class RazorscaleAvoidDevouringFlameAction : public MovementAction
+{
+public:
+    RazorscaleAvoidDevouringFlameAction(PlayerbotAI* botAI) : MovementAction(botAI, "razorscale avoid devouring flames") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class RazorscaleAvoidSentinelAction : public MovementAction
+{
+public:
+    RazorscaleAvoidSentinelAction(PlayerbotAI* botAI) : MovementAction(botAI, "razorscale avoid sentinel") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class RazorscaleIgnoreBossAction : public AttackAction
+{
+public:
+    RazorscaleIgnoreBossAction(PlayerbotAI* botAI) : AttackAction(botAI, "razorscale ignore flying alone") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class RazorscaleAvoidWhirlwindAction : public MovementAction
+{
+public:
+    RazorscaleAvoidWhirlwindAction(PlayerbotAI* botAI) : MovementAction(botAI, "razorscale avoid whirlwind") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class RazorscaleGroundedAction : public AttackAction
+{
+public:
+    RazorscaleGroundedAction(PlayerbotAI* botAI) : AttackAction(botAI, "razorscale grounded") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class RazorscaleHarpoonAction : public MovementAction
+{
+public:
+    RazorscaleHarpoonAction(PlayerbotAI* botAI) : MovementAction(botAI, "razorscale harpoon action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class RazorscaleFuseArmorAction : public MovementAction
+{
+public:
+    RazorscaleFuseArmorAction(PlayerbotAI* botAI) : MovementAction(botAI, "razorscale fuse armor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 #endif

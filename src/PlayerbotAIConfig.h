@@ -262,6 +262,8 @@ public:
     bool randomBotFixedLevel;
     bool disableRandomLevels;
     uint32 playerbotsXPrate;
+    uint32 randomBotAllianceRatio;
+    uint32 randomBotHordeRatio;
     bool disableDeathKnightLogin;
     uint32 botActiveAlone;
     uint32 BotActiveAloneForceWhenInRadius;
