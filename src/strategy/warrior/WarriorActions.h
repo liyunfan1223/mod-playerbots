@@ -159,7 +159,7 @@ public:
 
     Unit* GetTarget() override;
     bool isUseful() override;
-    bool Execute(Event event) override;
+    // bool Execute(Event event) override;
 };
 
 #endif
