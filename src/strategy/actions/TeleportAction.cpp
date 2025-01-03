@@ -11,6 +11,7 @@
 
 bool TeleportAction::Execute(Event event)
 {
+    /*
     // List of allowed portal entries (you can populate this dynamically)
     std::vector<uint32> allowedPortals = { 
         187055, 195142, 195141, 201797, 202079, 194481, 195682, 191164, 176498, 182351, 
@@ -58,6 +59,8 @@ bool TeleportAction::Execute(Event event)
         bot->GetSession()->HandleGameObjectUseOpcode(data);
         return true;
     }
+    */
+    
     // If no portal was found, fallback to spellcaster-type game objects
     GuidVector gos = *context->GetValue<GuidVector>("nearest game objects");
     for (ObjectGuid const guid : gos)
@@ -72,7 +75,7 @@ bool TeleportAction::Execute(Event event)
 
         uint32 spellId = goInfo->spellcaster.spellId;
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
+        if (!spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
             continue;
 
         std::ostringstream out;
