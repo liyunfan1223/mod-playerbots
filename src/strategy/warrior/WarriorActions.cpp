@@ -196,6 +196,7 @@ bool CastShatteringThrowAction::isUseful()
     return false; // No valid targets within range
 }
 
+/*
 bool CastShatteringThrowAction::Execute(Event event)
 {
     LOG_INFO("playerbots", "Bot Name = {}, Executing Shattering Throw function", bot->GetName());
@@ -210,3 +211,4 @@ bool CastShatteringThrowAction::Execute(Event event)
 
     return botAI->CastSpell("shattering throw", target);
 }
+*/
