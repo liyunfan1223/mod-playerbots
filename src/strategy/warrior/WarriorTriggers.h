@@ -72,6 +72,15 @@ public:
     bool IsActive() override; 
 };
 
+class ShatteringThrowTrigger : public Trigger
+{
+public:
+    ShatteringThrowTrigger(PlayerbotAI* botAI) : Trigger(botAI, "shattering throw trigger") {}
+
+    bool IsActive() override;
+};
+
+
 // class SlamTrigger : public HasAuraTrigger
 // {
 // public:

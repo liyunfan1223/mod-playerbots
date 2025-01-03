@@ -84,3 +84,39 @@ bool VigilanceTrigger::IsActive()
 
     return false; // No need to reassign Vigilance
 }
+
+bool ShatteringThrowTrigger::IsActive()
+{
+    // Spell cooldown check
+    if (!bot->HasSpell(64382))
+    {
+        return false;
+    }
+
+    // Spell cooldown check
+    if (bot->HasSpellCooldown(64382))
+    {
+        return false;
+    }
+
+    GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
+
+    for (ObjectGuid const& guid : enemies)
+    {
+        Unit* enemy = botAI->GetUnit(guid);
+        if (!enemy || !enemy->IsAlive() || enemy->IsFriendlyTo(bot))
+            continue;
+
+        // Check if the enemy is within 25 yards and has the specific auras
+        if (bot->IsWithinDistInMap(enemy, 25.0f) &&
+            (enemy->HasAura(642) ||   // Divine Shield
+             enemy->HasAura(45438) || // Ice Block
+             enemy->HasAura(41450)))  // Blessing of Protection
+        {
+            return true;
+        }
+    }
+
+    return false; // No valid targets within range
+}
+

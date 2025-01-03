@@ -101,3 +101,144 @@ bool CastVigilanceAction::Execute(Event event)
 
     return botAI->CastSpell("vigilance", target);
 }
+
+bool CastRetaliationAction::isUseful()
+{
+    // Spell cooldown check
+    if (!bot->HasSpell(20230))
+    {
+        return false;
+    }
+
+    // Spell cooldown check
+    if (bot->HasSpellCooldown(20230))
+    {
+        return false;
+    }
+
+    uint8 meleeAttackers = 0;
+    GuidVector attackers = AI_VALUE(GuidVector, "attackers");
+
+    for (ObjectGuid const& guid : attackers)
+    {
+        Unit* attacker = botAI->GetUnit(guid);
+        if (!attacker || !attacker->IsAlive() || attacker->GetVictim() != bot)
+            continue;
+
+        // Check if the attacker is melee-based using unit_class
+        if (attacker->GetTypeId() == TYPEID_UNIT)
+        {
+            Creature* creature = attacker->ToCreature();
+            if (creature && (creature->IsClass(CLASS_WARRIOR)
+                || creature->IsClass(CLASS_ROGUE)
+                || creature->IsClass(CLASS_PALADIN)))
+            {
+                ++meleeAttackers;
+            }
+        }
+        else if (attacker->GetTypeId() == TYPEID_PLAYER)
+        {
+            Player* playerAttacker = attacker->ToPlayer();
+            if (playerAttacker && botAI->IsMelee(playerAttacker)) // Reuse existing Player melee check
+            {
+                ++meleeAttackers;
+            }
+        }
+
+        // Early exit if we already have enough melee attackers
+        if (meleeAttackers >= 2)
+            break;
+    }
+
+    // Only cast Retaliation if there are at least 2 melee attackers and the buff is not active
+    return meleeAttackers >= 2 && !botAI->HasAura("retaliation", bot);
+}
+
+Unit* CastShatteringThrowAction::GetTarget()
+{
+    GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
+
+    for (ObjectGuid const& guid : enemies)
+    {
+        Unit* enemy = botAI->GetUnit(guid);
+        if (!enemy || !enemy->IsAlive() || enemy->IsFriendlyTo(bot))
+            continue;
+
+        if (bot->IsWithinDistInMap(enemy, 25.0f) &&
+            (enemy->HasAura(642) ||   // Divine Shield
+             enemy->HasAura(45438) || // Ice Block
+             enemy->HasAura(41450)))  // Blessing of Protection
+        {
+            return enemy;
+        }
+    }
+
+    return nullptr; // No valid target
+}
+
+bool CastShatteringThrowAction::isUseful()
+{
+
+    // Spell cooldown check
+    if (!bot->HasSpell(64382))
+    {
+        return false;
+    }
+
+    // Spell cooldown check
+    if (bot->HasSpellCooldown(64382))
+    {
+        return false;
+    }
+
+    GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
+
+    for (ObjectGuid const& guid : enemies)
+    {
+        Unit* enemy = botAI->GetUnit(guid);
+        if (!enemy || !enemy->IsAlive() || enemy->IsFriendlyTo(bot))
+            continue;
+
+        // Check if the enemy is within 25 yards and has the specific auras
+        if (bot->IsWithinDistInMap(enemy, 25.0f) &&
+            (enemy->HasAura(642) ||   // Divine Shield
+             enemy->HasAura(45438) || // Ice Block
+             enemy->HasAura(41450)))  // Blessing of Protection
+        {
+            return true;
+        }
+    }
+
+    return false; // No valid targets within range
+}
+
+bool CastShatteringThrowAction::isPossible()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    // Range check: Shattering Throw is 30 yards    
+    if (!bot->IsWithinDistInMap(target, 30.0f))
+    {
+        return false;
+    }
+
+    // Check line of sight
+    if (!bot->IsWithinLOSInMap(target))
+    {
+        return false;
+    }
+
+    // If the minimal checks above pass, simply return true.
+    return true;
+}
+
+bool CastShatteringThrowAction::Execute(Event event)
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    return botAI->CastSpell("shattering throw", target);
+}

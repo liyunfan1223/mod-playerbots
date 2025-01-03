@@ -60,11 +60,11 @@ SNARE_ACTION(CastThunderClapSnareAction, "thunder clap");
 SNARE_ACTION(CastHamstringAction, "hamstring");
 MELEE_ACTION(CastOverpowerAction, "overpower");
 MELEE_ACTION(CastMockingBlowAction, "mocking blow");
-BUFF_ACTION(CastRetaliationAction, "retaliation");
+// BUFF_ACTION(CastRetaliationAction, "retaliation");
 // arms 3.3.5
 SPELL_ACTION(CastHeroicThrowAction, "heroic throw");
 SNARE_ACTION(CastHeroicThrowSnareAction, "heroic throw");
-DEBUFF_ACTION(CastShatteringThrowAction, "shattering throw");
+// DEBUFF_ACTION(CastShatteringThrowAction, "shattering throw");
 
 // arms talents
 MELEE_ACTION(CastMortalStrikeAction, "mortal strike");
@@ -141,6 +141,25 @@ public:
     CastVigilanceAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "vigilance") {}
 
     Value<Unit*>* GetTargetValue() override;
+    bool Execute(Event event) override;
+};
+
+class CastRetaliationAction : public CastBuffSpellAction
+{
+public:
+    CastRetaliationAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "retaliation") {}
+
+    bool isUseful() override;
+};
+
+class CastShatteringThrowAction : public CastSpellAction
+{
+public:
+    CastShatteringThrowAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shattering throw") {}
+
+    Unit* GetTarget() override;
+    bool isUseful() override;
+    bool isPossible() override;
     bool Execute(Event event) override;
 };
 
