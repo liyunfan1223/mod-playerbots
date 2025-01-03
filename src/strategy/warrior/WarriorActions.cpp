@@ -221,7 +221,7 @@ bool CastShatteringThrowAction::isPossible()
     }
 
     // Range check: Shattering Throw is 30 yards    
-    if (!bot->IsWithinDistInMap(target, 30.0f)
+    if (!bot->IsWithinDistInMap(target, 30.0f))
     {
         return false;
     }
