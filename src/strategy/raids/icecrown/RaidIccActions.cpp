@@ -1049,11 +1049,11 @@ bool IccPutricideGasCloudAction::Execute(Event event)
             }
 
             if (nextPos)
-        {
-            return MoveTo(bot->GetMapId(), nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), 
+            {
+                return MoveTo(bot->GetMapId(), nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), 
                      false, false, false, true, MovementPriority::MOVEMENT_FORCED);
-    }
-    }
+            }
+        }
         return false;
     }
     // If bot doesn't have aura, check if anyone else does
@@ -2367,6 +2367,42 @@ bool IccLichKingWinterAction::Execute(Event event)
         }
     }
 
+    if(botAI->IsMelee(bot) && botAI->IsDps(bot))
+    {
+        // Check for raging spirits or shambling horrors
+        GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+        for (auto& npc : npcs)
+        {
+            Unit* unit = botAI->GetUnit(npc);
+            if (unit && unit->IsAlive() && (unit->GetEntry() == 37698 || unit->GetEntry() == 39299 || 
+                    unit->GetEntry() == 39300 || unit->GetEntry() == 39301 || // Shambling entry
+                    unit->GetEntry() == 36701 || unit->GetEntry() == 39302 ||
+                    unit->GetEntry() == 39303 || unit->GetEntry() == 39304)) // Raging Spirit entry
+            {
+                // Check if we're in front of the add
+                if (unit->HasInArc(M_PI/3, bot))  // 60 degree frontal arc
+                {
+                    // Move to behind the add
+                    float angle = unit->GetOrientation() + M_PI;  // Opposite of add's facing
+                    float distance = 3.0f;  // Close enough to melee but behind
+
+                    float newX = unit->GetPositionX() - distance * cos(angle);
+                    float newY = unit->GetPositionY() - distance * sin(angle);
+                    float newZ = unit->GetPositionZ();
+                
+                    bot->UpdateAllowedPositionZ(newX, newY, newZ);
+                
+                    if (bot->IsWithinLOS(newX, newY, newZ))
+                    {
+                    return MoveTo(bot->GetMapId(), newX, newY, newZ);
+                    }
+                }
+            }
+        }
+    }
+
+       
+
     if (botAI->IsRanged(bot))
     {
         // Find assist tank
@@ -2438,6 +2474,47 @@ bool IccLichKingAddsAction::Execute(Event event)
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
     if (!boss)
         return false;
+
+    GuidVector npcs1 = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs1)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->IsAlive() && unit->GetEntry() == 38757) // Defile NPC
+        {
+            if (bot->GetDistance(unit) < 20.0f) // If within 20 yards
+            {
+                // Get predicted position from MoveAway before actually moving
+                float angle = unit->GetAngle(bot);
+                float testX = bot->GetPositionX() + 8.0f * cos(angle);
+                float testY = bot->GetPositionY() + 8.0f * sin(angle);
+                float testZ = bot->GetPositionZ();
+
+                bot->UpdateAllowedPositionZ(testX, testY, testZ);
+
+                // Only move if the position is valid
+                if (bot->IsWithinLOS(testX, testY, testZ) && 
+                    fabs(testZ - bot->GetPositionZ()) < 5.0f) // Prevent too large Z changes
+                {
+                    return MoveAway(unit, 8.0f);
+                }
+                else
+                {
+                    // Try smaller distance if first fails
+                    testX = bot->GetPositionX() + 5.0f * cos(angle);
+                    testY = bot->GetPositionY() + 5.0f * sin(angle);
+                    testZ = bot->GetPositionZ();
+                    
+                    bot->UpdateAllowedPositionZ(testX, testY, testZ);
+                    
+                    if (bot->IsWithinLOS(testX, testY, testZ) && 
+                        fabs(testZ - bot->GetPositionZ()) < 5.0f)
+                    {
+                        return MoveAway(unit, 5.0f);
+                    }
+                }
+            }
+        }
+    }
 
     // Check for Val'kyr Shadowguard targeting real players
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -2604,4 +2681,4 @@ bool IccLichKingAddsAction::Execute(Event event)
         }
     }
     return false;
-} 
+}
