@@ -157,10 +157,6 @@ Unit* CastShatteringThrowAction::GetTarget()
              enemy->HasAura(45438) || // Ice Block
              enemy->HasAura(41450)))  // Blessing of Protection
         {
-            LOG_INFO("playerbots", "Bot Name = {}, CastShatteringThrowAction::GetTarget: Valid target found: Name = {}, GUID = {}", 
-                bot->GetName(), 
-                enemy->GetName().empty() ? "Unknown" : enemy->GetName(), 
-                guid.GetRawValue());
             return enemy;
         }
     }
@@ -170,6 +166,19 @@ Unit* CastShatteringThrowAction::GetTarget()
 
 bool CastShatteringThrowAction::isUseful()
 {
+
+    // Spell cooldown check
+    if (!bot->HasSpell(64382))
+    {
+        return false;
+    }
+
+    // Spell cooldown check
+    if (bot->HasSpellCooldown(64382))
+    {
+        return false;
+    }
+
     GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
 
     for (ObjectGuid const& guid : enemies)
@@ -184,11 +193,6 @@ bool CastShatteringThrowAction::isUseful()
              enemy->HasAura(45438) || // Ice Block
              enemy->HasAura(41450)))  // Blessing of Protection
         {
-            LOG_INFO("playerbots", "Bot Name = {}, ShatteringThrowAction::isUseful: Valid target found: Name = {}, GUID = {}", 
-                bot->GetName(), 
-                enemy->GetName().empty() ? "Unknown" : enemy->GetName(), 
-                guid.GetRawValue());
-
             return true;
         }
     }
@@ -201,24 +205,6 @@ bool CastShatteringThrowAction::isPossible()
     Unit* target = GetTarget();
     if (!target)
         return false;
-
-    // Spell cooldown check
-    if (!bot->HasSpell(64382))
-    {
-        LOG_INFO("playerbots",
-            "CastShatteringThrowAction::isPossible - Spell not known. Bot: {}, Spell ID: {}",
-            bot->GetName(), 64382);
-        return false;
-    }
-
-    // Spell cooldown check
-    if (bot->HasSpellCooldown(64382))
-    {
-        LOG_INFO("playerbots",
-            "CastShatteringThrowAction::isPossible - Spell is on cooldown. Bot: {}, Spell ID: {}",
-            bot->GetName(), 64382);
-        return false;
-    }
 
     // Range check: Shattering Throw is 30 yards    
     if (!bot->IsWithinDistInMap(target, 30.0f))
@@ -233,23 +219,14 @@ bool CastShatteringThrowAction::isPossible()
     }
 
     // If the minimal checks above pass, simply return true.
-    LOG_INFO("playerbots",
-        "CastShatteringThrowAction::isPossible - Passed, returning true. Bot: {}, Target: {}",
-        bot->GetName(), target->GetName().empty() ? "Unknown" : target->GetName());
     return true;
 }
 
 bool CastShatteringThrowAction::Execute(Event event)
 {
-    LOG_INFO("playerbots", "Bot Name = {}, Executing Shattering Throw function", bot->GetName());
     Unit* target = GetTarget();
     if (!target)
         return false;
-
-    LOG_INFO("playerbots", "Bot Name = {}, Casting Shattering Throw at target: Name = {}, GUID = {}", 
-             bot->GetName(), 
-             target->GetName().empty() ? "Unknown" : target->GetName(), 
-             target->GetGUID().GetRawValue());
 
     return botAI->CastSpell("shattering throw", target);
 }
