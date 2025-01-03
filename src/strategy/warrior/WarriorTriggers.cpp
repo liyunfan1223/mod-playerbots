@@ -87,6 +87,18 @@ bool VigilanceTrigger::IsActive()
 
 bool ShatteringThrowTrigger::IsActive()
 {
+    // Spell cooldown check
+    if (!bot->HasSpell(64382))
+    {
+        return false;
+    }
+
+    // Spell cooldown check
+    if (bot->HasSpellCooldown(64382))
+    {
+        return false;
+    }
+
     GuidVector enemies = AI_VALUE(GuidVector, "possible targets");
 
     for (ObjectGuid const& guid : enemies)
