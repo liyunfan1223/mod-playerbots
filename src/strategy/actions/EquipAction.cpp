@@ -96,6 +96,21 @@ void EquipAction::EquipItem(Item* item)
     // If we didn't equip as a bag, try to equip as gear
     if (!equippedBag)
     {
+        // Ranged weapons aren't handled by the rest of the weapon equip logic
+        // Handle them early here to avoid issues.
+        if (invType == INVTYPE_RANGED || invType == INVTYPE_THROWN || invType == INVTYPE_RANGEDRIGHT)
+        {
+            WorldPacket packet(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+            ObjectGuid itemguid = item->GetGUID();
+            packet << itemguid << uint8(EQUIPMENT_SLOT_RANGED);
+            bot->GetSession()->HandleAutoEquipItemSlotOpcode(packet);
+        
+            std::ostringstream out;
+            out << "Equipping " << chat->FormatItem(itemProto) << " in ranged slot";
+            botAI->TellMaster(out);
+            return;
+        }
+
         uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
 
         // Check if the item is a weapon and whether the bot can dual wield or use Titan Grip
