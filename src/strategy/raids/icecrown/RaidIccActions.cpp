@@ -1099,51 +1099,31 @@ bool IccPutricideGasCloudAction::Execute(Event event)
 
 bool AvoidMalleableGooAction::Execute(Event event)
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    if (!boss)
-        return false;
-
-    // If we're directly targeted, move sideways
-    if (bot->HasAura(72295))
+    if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
     {
-        float angle = boss->GetAngle(bot);
-        float newAngle = angle + M_PI/2.0f; // Move 90 degrees to the side
-        float dist = 10.0f;
-        float newX = bot->GetPositionX() + cos(newAngle) * dist;
-        float newY = bot->GetPositionY() + sin(newAngle) * dist;
-        float newZ = bot->GetPositionZ();
-        bot->UpdateAllowedPositionZ(newX, newY, newZ);
+        float radius = 7.0f;
+        float moveIncrement = 3.0f;
+        bool isRanged = botAI->IsRanged(bot);
 
-        return MoveTo(bot->GetMapId(), newX, newY, newZ);
-    }
-
-    // Otherwise we're in the path of someone else's goo, find that player
-    Group* group = bot->GetGroup();
-    if (!group)
-        return false;
-
-    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        Player* player = itr->GetSource();
-        if (!player || !player->IsAlive() || player == bot)
-            continue;
-
-        if (player->HasAura(72295))
+       GuidVector members = AI_VALUE(GuidVector, "group members");
+        if (isRanged)
         {
-            float angle = boss->GetAngle(player);
-            float myAngle = boss->GetAngle(bot);
-            float angleDiff = angle - myAngle;
-            
-            // Move perpendicular to the goo path
-            float moveAngle = angle + (angleDiff > 0 ? -M_PI/2.0f : M_PI/2.0f);
-            float dist = 10.0f;
-            float newX = bot->GetPositionX() + cos(moveAngle) * dist;
-            float newY = bot->GetPositionY() + sin(moveAngle) * dist;
-    float newZ = bot->GetPositionZ();
-    bot->UpdateAllowedPositionZ(newX, newY, newZ);
+            // Ranged: spread from other members
+            for (auto& member : members)
+            {
+                Unit* unit = botAI->GetUnit(member);
+                if (!unit || !unit->IsAlive() || unit == bot || botAI->IsTank(bot) || botAI->IsMelee(bot))
+                    continue;
 
-    return MoveTo(bot->GetMapId(), newX, newY, newZ);
-}
+                float dist = bot->GetExactDist2d(unit);
+                if (dist < radius)
+                {   
+                    float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
+                    return MoveAway(unit, moveDistance);
+                }
+            }
+        }
+        return false;
     }
 
     return false;

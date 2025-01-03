@@ -254,6 +254,12 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
         }
     }
 
+    if (dynamic_cast<IccPutricideVolatileOozeAction*>(action) || dynamic_cast<IccPutricideGasCloudAction*>(action))
+    {
+        if (dynamic_cast<AvoidMalleableGooAction*>(action))
+            return 0.0f;
+    }   
+
     if (botAI->IsDps(bot))
     {
         GuidVector targets = AI_VALUE(GuidVector, "possible targets");

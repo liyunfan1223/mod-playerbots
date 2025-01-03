@@ -300,7 +300,10 @@ bool IccRotfaceMoveAwayFromExplosionTrigger::IsActive()
 bool IccPutricideGrowingOozePuddleTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    if (!boss) { return false; }
+    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
+    
+    if (!boss || botHasAura) 
+        return false;
 
     return true;
 }
@@ -350,39 +353,18 @@ bool IccPutricideMainTankMutatedPlagueTrigger::IsActive()
 bool IccPutricideMalleableGooTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    if (!boss)
+    if (!boss) 
         return false;
 
-    // Check if we are directly targeted
-    if (bot->HasAura(72295))
-        return true;
-
-    // Check for other players targeted by goo and if we're in the path
-    Group* group = bot->GetGroup();
-    if (!group)
+    Unit* boss1 = AI_VALUE2(Unit*, "find target", "volatile ooze");
+    if (boss1) 
         return false;
 
-    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        Player* player = itr->GetSource();
-        if (!player || !player->IsAlive() || player == bot)
-            continue;
+    Unit* boss2 = AI_VALUE2(Unit*, "find target", "gas cloud");
+    if (boss2) 
+        return false;
 
-        if (player->HasAura(72295))
-        {
-            // Check if we're in the path between boss and target
-            float angle = boss->GetAngle(player);
-            float myAngle = boss->GetAngle(bot);
-            float angleDiff = std::abs(angle - myAngle);
-            if (angleDiff < M_PI / 6 && // Within 30 degree cone
-                bot->GetDistance(boss) < player->GetDistance(boss)) // We're closer to boss than target
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return true;
 }
 
 //BPC
