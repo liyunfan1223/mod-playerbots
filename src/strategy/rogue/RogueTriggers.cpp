@@ -105,7 +105,8 @@ bool SprintTrigger::IsActive()
 
 bool ExposeArmorTrigger::IsActive()
 {
-    return DebuffTrigger::IsActive() && !botAI->HasAura("sunder armor", bot, false, false, -1, true) &&
+    Unit* target = AI_VALUE(Unit*, "current target"); // Get the bot's current target
+    return DebuffTrigger::IsActive() && !botAI->HasAura("sunder armor", target, false, false, -1, true) &&
            AI_VALUE2(uint8, "combo", "current target") <= 3;
 }
 
