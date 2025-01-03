@@ -11,6 +11,7 @@
 
 bool TeleportAction::Execute(Event event)
 {
+    /*
     // List of allowed portal entries (you can populate this dynamically)
     std::vector<uint32> allowedPortals = { 
         187055, 195142, 195141, 201797, 202079, 194481, 195682, 191164, 176498, 182351, 
@@ -19,7 +20,7 @@ bool TeleportAction::Execute(Event event)
         176296, 194011, 194012, 189993, 176500, 176501, 193955, 193425, 193772, 193604, 
         191006, 191007, 191008, 191009, 191013, 191014, 191010, 190960, 191011, 191012, 
         183317, 183321, 183322, 187056, 183323, 183324, 183325, 183326, 183327, 190203, 
-        190204, 190205, 190206
+        190204, 190205, 190206, 193908, 181575, 181576, 181577, 181578, 202277, 202278
     };
 
     // Try teleporting using allowed portals
@@ -58,6 +59,8 @@ bool TeleportAction::Execute(Event event)
         bot->GetSession()->HandleGameObjectUseOpcode(data);
         return true;
     }
+    */
+    
     // If no portal was found, fallback to spellcaster-type game objects
     GuidVector gos = *context->GetValue<GuidVector>("nearest game objects");
     for (ObjectGuid const guid : gos)
@@ -67,12 +70,12 @@ bool TeleportAction::Execute(Event event)
             continue;
 
         GameObjectTemplate const* goInfo = go->GetGOInfo();
-        if (goInfo->type != GAMEOBJECT_TYPE_SPELLCASTER)
+        if (goInfo->type != GAMEOBJECT_TYPE_SPELLCASTER && goInfo->type != GAMEOBJECT_TYPE_GOOBER)
             continue;
 
         uint32 spellId = goInfo->spellcaster.spellId;
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
+        if (!spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
             continue;
 
         std::ostringstream out;
