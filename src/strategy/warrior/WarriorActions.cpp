@@ -203,7 +203,7 @@ bool CastShatteringThrowAction::isPossible()
         return false;
 
     // Spell cooldown check
-    if (bot->HasSpell(64382))
+    if (!bot->HasSpell(64382))
     {
         LOG_INFO("playerbots",
             "CastShatteringThrowAction::isPossible - Spell not known. Bot: {}, Spell ID: {}",
