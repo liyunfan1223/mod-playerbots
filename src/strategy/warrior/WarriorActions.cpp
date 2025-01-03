@@ -104,6 +104,18 @@ bool CastVigilanceAction::Execute(Event event)
 
 bool CastRetaliationAction::isUseful()
 {
+    // Spell cooldown check
+    if (!bot->HasSpell(20230))
+    {
+        return false;
+    }
+
+    // Spell cooldown check
+    if (bot->HasSpellCooldown(20230))
+    {
+        return false;
+    }
+
     uint8 meleeAttackers = 0;
     GuidVector attackers = AI_VALUE(GuidVector, "attackers");
 
