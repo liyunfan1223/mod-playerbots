@@ -202,9 +202,26 @@ bool CastShatteringThrowAction::isPossible()
     if (!target)
         return false;
 
-    // Example range check: Shattering Throw is typically 30 yards in WotLK, but
-    // you can adapt to your code's expected range, e.g. 25.0f if you prefer
-    float distance = sServerFacade->GetDistance2d(bot, target);
+    // Spell cooldown check
+    if (bot->HasSpell(64382))
+    {
+        LOG_INFO("playerbots",
+            "CastShatteringThrowAction::isPossible - Spell not known. Bot: {}, Spell ID: {}",
+            bot->GetName(), 64382);
+        return false;
+    }
+
+    // Spell cooldown check
+    if (bot->HasSpellCooldown(64382))
+    {
+        LOG_INFO("playerbots",
+            "CastShatteringThrowAction::isPossible - Spell is on cooldown. Bot: {}, Spell ID: {}",
+            bot->GetName(), 64382);
+        return false;
+    }
+
+    // Range check: Shattering Throw is 30 yards    
+    float distance = bot->GetDistance2d(bot, target);
     if (distance > 30.0f)
     {
         return false;
