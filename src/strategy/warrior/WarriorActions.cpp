@@ -196,7 +196,33 @@ bool CastShatteringThrowAction::isUseful()
     return false; // No valid targets within range
 }
 
-/*
+bool CastShatteringThrowAction::isPossible()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    // Example range check: Shattering Throw is typically 30 yards in WotLK, but
+    // you can adapt to your code's expected range, e.g. 25.0f if you prefer
+    float distance = sServerFacade->GetDistance2d(bot, target);
+    if (distance > 30.0f)
+    {
+        return false;
+    }
+
+    // Check line of sight
+    if (!bot->IsWithinLOSInMap(target))
+    {
+        return false;
+    }
+
+    // If the minimal checks above pass, simply return true.
+    LOG_INFO("playerbots",
+        "CastShatteringThrowAction::isPossible - Passed, returning true. Bot: {}, Target: {}",
+        bot->GetName(), target->GetName().empty() ? "Unknown" : target->GetName());
+    return true;
+}
+
 bool CastShatteringThrowAction::Execute(Event event)
 {
     LOG_INFO("playerbots", "Bot Name = {}, Executing Shattering Throw function", bot->GetName());
@@ -211,4 +237,3 @@ bool CastShatteringThrowAction::Execute(Event event)
 
     return botAI->CastSpell("shattering throw", target);
 }
-*/
