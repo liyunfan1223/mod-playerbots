@@ -424,4 +424,13 @@ public:
     bool Execute(Event event) override;
     bool isUseful() override;
 };
+
+class CastGreaterBlessingAction : public Action
+{
+public:
+    CastGreaterBlessingAction(PlayerbotAI* botAI) : Action(botAI, "cast greater blessing") { }
+
+    bool Execute(Event event) override;
+};
+
 #endif
