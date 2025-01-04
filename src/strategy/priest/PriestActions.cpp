@@ -106,20 +106,3 @@ bool CastPowerWordShieldOnNotFullAction::isUseful()
 {
     return GetTarget();
 }
-
-bool CastPowerWordFortitudeOnPartyAction::Execute(Event event)
-{
-    Unit* target = GetTarget();
-    if (!target)
-        return false;
-
-    // If in a group, try Prayer first
-    Group* group = botAI->GetBot()->GetGroup();
-    if (group && botAI->CanCastSpell("prayer of fortitude", target))
-    {
-        return botAI->CastSpell("prayer of fortitude", target);
-    }
-
-    // Otherwise do normal single-target
-    return botAI->CastSpell("power word: fortitude", target);
-}

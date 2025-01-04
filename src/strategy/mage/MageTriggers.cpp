@@ -10,16 +10,12 @@
 
 bool ArcaneIntellectOnPartyTrigger::IsActive()
 {
-    return BuffOnPartyTrigger::IsActive() &&
-        !botAI->HasAnyAuraOf(GetTarget(), "arcane brilliance", "arcane intellect", "dalaran brilliance",
-            "dalaran intellect", nullptr);
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("arcane brilliance", GetTarget());
 }
 
 bool ArcaneIntellectTrigger::IsActive()
 {
-    return BuffTrigger::IsActive() &&
-        !botAI->HasAnyAuraOf(GetTarget(), "arcane brilliance", "arcane intellect", "dalaran brilliance",
-            "dalaran intellect", nullptr);
+    return BuffTrigger::IsActive() && !botAI->HasAura("arcane brilliance", GetTarget());
 }
 
 bool MageArmorTrigger::IsActive()

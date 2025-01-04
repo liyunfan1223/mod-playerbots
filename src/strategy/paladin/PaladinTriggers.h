@@ -239,12 +239,4 @@ class AvengingWrathTrigger : public BoostTrigger
 public:
     AvengingWrathTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "avenging wrath") {}
 };
-
-class CastGreaterBlessingTrigger : public Trigger
-{
-public:
-    CastGreaterBlessingTrigger(PlayerbotAI* botAI) : Trigger(botAI, "cast greater blessing") { }
-
-    bool IsActive() override;
-};
 #endif

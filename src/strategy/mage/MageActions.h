@@ -120,7 +120,6 @@ class CastArcaneIntellectOnPartyAction : public BuffOnPartyAction
 {
 public:
     CastArcaneIntellectOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "arcane intellect") {}
-    bool Execute(Event event) override;
 };
 
 class CastRemoveCurseAction : public CastCureSpellAction
