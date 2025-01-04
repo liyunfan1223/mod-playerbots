@@ -406,6 +406,27 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 		}
 	}
 
+    if (bot->GetGroup() && bot->GetGroup()->isLFGGroup())
+    {
+        bool hasRealPlayer = false;
+        for (GroupReference* ref = bot->GetGroup()->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member)
+                continue;
+            PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
+            if (memberAI && !memberAI->IsRealPlayer())
+                continue;
+            hasRealPlayer = true;
+            break;
+        }
+        if (!hasRealPlayer)
+        {
+            bot->RemoveFromGroup();
+            ResetStrategies();
+        }
+    }
+
     bool min = minimal;
     UpdateAIInternal(elapsed, min);
     YieldThread(GetReactDelay());
