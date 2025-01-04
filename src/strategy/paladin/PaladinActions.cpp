@@ -4,6 +4,7 @@
  */
 
 #include "PaladinActions.h"
+#include "BlessingManager.h"
 
 #include "AiFactory.h"
 #include "Event.h"
@@ -169,4 +170,73 @@ bool CastCancelDivineSacrificeAction::Execute(Event event)
 bool CastCancelDivineSacrificeAction::isUseful()
 {
     return botAI->HasAura("divine sacrifice", GetTarget(), false, true, -1, true);
+}
+
+bool CastGreaterBlessingAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    // Gather assignments
+    auto assignment = AssignBlessingsForGroup(botAI);
+
+    // Find what is assigned to *this* Paladin
+    auto paladinIt = assignment.find(bot);
+    if (paladinIt == assignment.end())
+        return false; // No blessings assigned
+
+    // For each (class -> blessing) assigned, search for a player missing it
+    for (auto& kv : paladinIt->second)
+    {
+        uint8 classId = kv.first;
+        GreaterBlessingType gBlessing = kv.second;
+
+        // Convert the blessing to a spell name
+        std::string spellName;
+        std::string auraName; 
+        switch (gBlessing)
+        {
+            case GREATER_BLESSING_OF_MIGHT:
+                spellName = "greater blessing of might";
+                auraName  = "greater blessing of might";
+                break;
+            case GREATER_BLESSING_OF_WISDOM:
+                spellName = "greater blessing of wisdom";
+                auraName  = "greater blessing of wisdom";
+                break;
+            case GREATER_BLESSING_OF_KINGS:
+                spellName = "greater blessing of kings";
+                auraName  = "greater blessing of kings";
+                break;
+            case GREATER_BLESSING_OF_SANCTUARY:
+                spellName = "greater blessing of sanctuary";
+                auraName  = "greater blessing of sanctuary";
+                break;
+        }
+
+        // Find the first raid member of that class who lacks the aura
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member || !member->IsInWorld())
+                continue;
+
+            if (member->getClass() == classId && !botAI->HasAura(auraName, member))
+            {
+                // Found a target
+                botAI->TellMaster("Casting " + spellName + " on " + member->GetName());
+                bool casted = botAI->CastSpell(spellName, member);
+                // Return true as soon as we cast a single Greater Blessing
+                return casted;
+            }
+        }
+    }
+
+    // If we reach here, we didn't find any missing aura
+    return false;
 }
