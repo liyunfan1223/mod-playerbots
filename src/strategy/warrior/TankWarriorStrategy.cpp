@@ -23,6 +23,7 @@ public:
         creators["taunt"] = &taunt;
         creators["taunt spell"] = &taunt;
         creators["vigilance"] = &vigilance;
+        creators["enraged regeneration"] = &enraged_regeneration;
     }
 
 private:
@@ -46,6 +47,14 @@ private:
     static ActionNode* vigilance(PlayerbotAI* botAI)
     {
         return new ActionNode("vigilance",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+
+    static ActionNode* enraged_regeneration(PlayerbotAI* botAI)
+    {
+        return new ActionNode("enraged regeneration",
                               /*P*/ nullptr,
                               /*A*/ nullptr,
                               /*C*/ nullptr);
@@ -105,8 +114,10 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("heroic throw on snare target", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode(
         "low health", NextAction::array(0, new NextAction("shield wall", ACTION_MEDIUM_HEAL), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "critical health", NextAction::array(0, new NextAction("last stand", ACTION_EMERGENCY + 3), nullptr)));
+    triggers.push_back(new TriggerNode("critical health", 
+        NextAction::array(0, new NextAction("last stand", ACTION_EMERGENCY + 3),
+                             new NextAction("enraged regeneration", ACTION_EMERGENCY + 2),
+                                nullptr)));
     // triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("battle shout taunt",
     // ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
