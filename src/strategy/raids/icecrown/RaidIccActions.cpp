@@ -37,7 +37,7 @@ bool IccLmTankPositionAction::Execute(Event event)
     bot->SetTarget(boss->GetGUID());
     if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
     {
-        if (bot->GetExactDist2d(ICC_LM_TANK_POSITION) > 5.0f)
+        if (bot->GetExactDist2d(ICC_LM_TANK_POSITION) > 15.0f)
             return MoveTo(bot->GetMapId(), ICC_LM_TANK_POSITION.GetPositionX(),
                           ICC_LM_TANK_POSITION.GetPositionY(), ICC_LM_TANK_POSITION.GetPositionZ(), false,
                           false, false, true, MovementPriority::MOVEMENT_NORMAL);
@@ -402,7 +402,11 @@ bool IccGunshipTeleportAllyAction::Execute(Event event)
 
     // Only target the mage that is channeling Below Zero
     if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
-        return false;
+    {
+        if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_ALLY2) > 45.0f)
+            return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionX(),
+                          ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionY(), ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionZ(), bot->GetOrientation());
+    }
 
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
@@ -424,7 +428,11 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
 
     // Only target the sorcerer that is channeling Below Zero
     if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
-        return false;
+    {
+        if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_HORDE2) > 45.0f)
+            return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionX(),
+                          ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionY(), ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionZ(), bot->GetOrientation());
+    }
 
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
@@ -1190,28 +1198,30 @@ bool IccBpcNucleusAction::Execute(Event event)
 
 bool IccBpcMainTankAction::Execute(Event event)
 {
-    if (!botAI->IsMainTank(bot))
+    if (botAI->IsMainTank(bot))
+    {
+        // Move to MT position if we're not there
+        if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 20.0f)
+            return MoveTo(bot->GetMapId(), ICC_BPC_MT_POSITION.GetPositionX(),
+                        ICC_BPC_MT_POSITION.GetPositionY(), ICC_BPC_MT_POSITION.GetPositionZ(),
+                        false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
+
+        Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+        Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+
+        // Keep current prince if we have one
+        if (currentTarget && (currentTarget == valanar || currentTarget == taldaram))
+            return Attack(currentTarget);
+
+        // Pick a new prince that isn't targeting us
+        if (valanar && (!valanar->GetVictim() || valanar->GetVictim() != bot))
+            return Attack(valanar);
+        if (taldaram && (!taldaram->GetVictim() || taldaram->GetVictim() != bot))
+            return Attack(taldaram);
+
         return false;
-
-    // Move to MT position if we're not there
-    if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 20.0f)
-        return MoveTo(bot->GetMapId(), ICC_BPC_MT_POSITION.GetPositionX(),
-                    ICC_BPC_MT_POSITION.GetPositionY(), ICC_BPC_MT_POSITION.GetPositionZ(),
-                    false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
-
-    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
-    Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
-    Unit* currentTarget = AI_VALUE(Unit*, "current target");
-
-    // Keep current prince if we have one
-    if (currentTarget && (currentTarget == valanar || currentTarget == taldaram))
-        return Attack(currentTarget);
-
-    // Pick a new prince
-    if (valanar)
-        return Attack(valanar);
-    if (taldaram)
-        return Attack(taldaram);
+    }
 
     return false;
 }

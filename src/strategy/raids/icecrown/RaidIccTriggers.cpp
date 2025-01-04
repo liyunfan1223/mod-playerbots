@@ -370,6 +370,10 @@ bool IccPutricideMalleableGooTrigger::IsActive()
 //BPC
 bool IccBpcKelesethTankTrigger::IsActive()
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    if (!boss) 
+        return false;
+
     if (!botAI->IsAssistTank(bot))
         return false;
 
@@ -385,15 +389,15 @@ bool IccBpcKelesethTankTrigger::IsActive()
         }
     }
 
-    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
-    if (!boss || boss->GetEntry() != 37972) // Verify it's actually Keleseth
-        return false;
-
     return true;
 }
 
 bool IccBpcNucleusTrigger::IsActive()
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    if (!boss) 
+        return false;
+
     if (!botAI->IsAssistTank(bot))
         return false;
 
@@ -414,13 +418,11 @@ bool IccBpcNucleusTrigger::IsActive()
 
 bool IccBpcMainTankTrigger::IsActive()
 {
-    if (!botAI->IsMainTank(bot))
-        return false;
-
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
     Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
-    
-    return valanar != nullptr || taldaram != nullptr;
+    Unit* keleseth = AI_VALUE2(Unit*, "find target", "prince keleseth");
+
+    return valanar != nullptr || taldaram != nullptr || keleseth != nullptr;
 }
 
 bool IccBpcEmpoweredVortexTrigger::IsActive()
