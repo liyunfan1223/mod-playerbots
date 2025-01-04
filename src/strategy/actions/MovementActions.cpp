@@ -236,11 +236,11 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-            if (bot->IsNonMeleeSpellCast(true))
-            {
-                bot->CastStop();
-                botAI->InterruptSpell();
-            }
+            // if (bot->IsNonMeleeSpellCast(true))
+            // {
+            //     bot->CastStop();
+            //     botAI->InterruptSpell();
+            // }
             MotionMaster& mm = *bot->GetMotionMaster();
             mm.Clear();
             if (!backwards)
@@ -277,11 +277,11 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-            if (bot->IsNonMeleeSpellCast(true))
-            {
-                bot->CastStop();
-                botAI->InterruptSpell();
-            }
+            // if (bot->IsNonMeleeSpellCast(true))
+            // {
+            //     bot->CastStop();
+            //     botAI->InterruptSpell();
+            // }
             MotionMaster& mm = *bot->GetMotionMaster();
             G3D::Vector3 endP = path.back();
             mm.Clear();

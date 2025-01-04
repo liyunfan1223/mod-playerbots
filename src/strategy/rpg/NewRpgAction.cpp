@@ -44,7 +44,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 }
             }
             // IDLE -> GO_INNKEEPER
-            else if (bot->GetLevel() >= 6 && roll <= 45)
+            else if (roll <= 45)
             {
                 WorldPosition pos = SelectRandomInnKeeperPos();
                 if (pos != WorldPosition() && bot->GetExactDist(pos) > 50.0f)
@@ -245,7 +245,7 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     while (--attempt)
     {
         float angle = bot->GetAngle(&dest);
-        float delta = (rand_norm() - 0.5) * M_PI * 2;
+        float delta = urand(1, 100) <= 75 ? (rand_norm() - 0.5) * M_PI * 0.5 : (rand_norm() - 0.5) * M_PI * 2;
         angle += delta;
         float dis = rand_norm() * pathFinderDis;
         float dx = x + cos(angle) * dis;

@@ -392,7 +392,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         }
     }
 
-    if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup())
+    if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup() && !bot->GetGroup()->isLFGGroup())
 	{
 		Player* leader = bot->GetGroup()->GetLeader();
 		if (leader && leader != bot) // Checks if the leader is valid and is not the bot itself
@@ -1312,11 +1312,9 @@ void PlayerbotAI::DoNextAction(bool min)
     // if in combat but stick with old data - clear targets
     if (currentEngine == engines[BOT_STATE_NON_COMBAT] && bot->IsInCombat())
     {
-        if (aiObjectContext->GetValue<Unit*>("current target")->Get() != nullptr ||
-            aiObjectContext->GetValue<ObjectGuid>("pull target")->Get() != ObjectGuid::Empty ||
-            aiObjectContext->GetValue<Unit*>("dps target")->Get() != nullptr)
+        if (aiObjectContext->GetValue<Unit*>("current target")->Get() != nullptr)
         {
-            Reset();
+            aiObjectContext->GetValue<Unit*>("current target")->Set(nullptr);
         }
     }
 
