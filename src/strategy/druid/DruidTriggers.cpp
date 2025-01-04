@@ -9,16 +9,12 @@
 
 bool MarkOfTheWildOnPartyTrigger::IsActive()
 {
-    // Check both Gift & Mark auras
-    return BuffOnPartyTrigger::IsActive() &&
-           !botAI->HasAnyAuraOf(GetTarget(), "gift of the wild", "mark of the wild", nullptr);
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget());
 }
 
 bool MarkOfTheWildTrigger::IsActive()
 {
-    // Same check for single-target scenario
-    return BuffTrigger::IsActive() &&
-           !botAI->HasAnyAuraOf(GetTarget(), "gift of the wild", "mark of the wild", nullptr);
+    return BuffTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget());
 }
 
 bool ThornsOnPartyTrigger::IsActive()

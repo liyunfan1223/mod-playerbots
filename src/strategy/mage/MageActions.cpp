@@ -21,24 +21,3 @@ bool CastConeOfColdAction::isUseful()
     bool targetClose = sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 10.f);
     return facingTarget && targetClose;
 }
-
-bool CastArcaneIntellectOnPartyAction::Execute(Event event)
-{
-    Unit* target = GetTarget();
-    if (!target)
-        return false;
-
-    Group* group = botAI->GetBot()->GetGroup();
-
-    if (group)
-    {
-        if (botAI->CanCastSpell("dalaran brilliance", target))
-            return botAI->CastSpell("dalaran brilliance", target);
-
-        if (botAI->CanCastSpell("arcane brilliance", target))
-            return botAI->CastSpell("arcane brilliance", target);
-    }
-
-    // If not in a group or we cannot cast brilliance, fall back to arcane intellect
-    return botAI->CastSpell("arcane intellect", target);
-}

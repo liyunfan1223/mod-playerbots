@@ -68,7 +68,6 @@ public:
         creators["bmana"] = &PaladinBuffStrategyFactoryInternal::bmana;
         creators["bdps"] = &PaladinBuffStrategyFactoryInternal::bdps;
         creators["bstats"] = &PaladinBuffStrategyFactoryInternal::bstats;
-        creators["bgreater"] = &PaladinBuffStrategyFactoryInternal::bgreater;
     }
 
 private:
@@ -76,8 +75,6 @@ private:
     static Strategy* bmana(PlayerbotAI* botAI) { return new PaladinBuffManaStrategy(botAI); }
     static Strategy* bdps(PlayerbotAI* botAI) { return new PaladinBuffDpsStrategy(botAI); }
     static Strategy* bstats(PlayerbotAI* botAI) { return new PaladinBuffStatsStrategy(botAI); }
-
-    static Strategy* bgreater(PlayerbotAI* botAI) { return new PaladinBuffGreaterBlessingStrategy(botAI); }
 };
 
 class PaladinCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -145,8 +142,6 @@ public:
         creators["blessing of might on party"] = &PaladinTriggerFactoryInternal::blessing_of_might_on_party;
 
         creators["avenging wrath"] = &PaladinTriggerFactoryInternal::avenging_wrath;
-        creators["cast greater blessing"] = &PaladinTriggerFactoryInternal::cast_greater_blessing;
-
     }
 
 private:
@@ -213,8 +208,6 @@ private:
     static Trigger* blessing_of_might_on_party(PlayerbotAI* botAI) { return new BlessingOfMightOnPartyTrigger(botAI); }
 
     static Trigger* avenging_wrath(PlayerbotAI* botAI) { return new AvengingWrathTrigger(botAI); }
-    static Trigger* cast_greater_blessing(PlayerbotAI* botAI) { return new CastGreaterBlessingTrigger(botAI); }
-
 };
 
 class PaladinAiObjectContextInternal : public NamedObjectContext<Action>
@@ -301,7 +294,6 @@ public:
         creators["divine illumination"] = &PaladinAiObjectContextInternal::divine_illumination;
         creators["divine sacrifice"] = &PaladinAiObjectContextInternal::divine_sacrifice;
         creators["cancel divine sacrifice"] = &PaladinAiObjectContextInternal::cancel_divine_sacrifice;
-        creators["cast greater blessing"] = &PaladinAiObjectContextInternal::cast_greater_blessing;
     }
 
 private:
@@ -403,7 +395,6 @@ private:
     static Action* divine_illumination(PlayerbotAI* ai) { return new CastDivineIlluminationAction(ai); }
     static Action* divine_sacrifice(PlayerbotAI* ai) { return new CastDivineSacrificeAction(ai); }
     static Action* cancel_divine_sacrifice(PlayerbotAI* ai) { return new CastCancelDivineSacrificeAction(ai); }
-    static Action* cast_greater_blessing(PlayerbotAI* ai) { return new CastGreaterBlessingAction(ai); }
 };
 
 PaladinAiObjectContext::PaladinAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
