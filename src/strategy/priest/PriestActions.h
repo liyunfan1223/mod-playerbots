@@ -14,7 +14,7 @@ class PlayerbotAI;
 
 // disc
 BUFF_ACTION(CastPowerWordFortitudeAction, "power word: fortitude");
-BUFF_PARTY_ACTION(CastPowerWordFortitudeOnPartyAction, "power word: fortitude");
+// BUFF_PARTY_ACTION(CastPowerWordFortitudeOnPartyAction, "power word: fortitude");
 BUFF_PARTY_ACTION(CastPrayerOfFortitudeOnPartyAction, "prayer of fortitude");
 BUFF_ACTION(CastPowerWordShieldAction, "power word: shield");
 
@@ -208,6 +208,13 @@ class CastGuardianSpiritOnPartyAction : public HealPartyMemberAction
 {
 public:
     CastGuardianSpiritOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "guardian spirit", 40.0f, HealingManaEfficiency::MEDIUM) {}
+};
+
+class CastPowerWordFortitudeOnPartyAction : public BuffOnPartyAction
+{
+public:
+    CastPowerWordFortitudeOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "power word: fortitude") {}
+    bool Execute(Event event) override;
 };
 
 #endif

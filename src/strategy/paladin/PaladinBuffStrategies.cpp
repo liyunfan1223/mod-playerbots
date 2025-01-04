@@ -86,3 +86,18 @@ void PaladinBuffStatsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of kings",
     // ACTION_HIGH + 8), nullptr)));
 }
+
+void PaladinBuffGreaterBlessingStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    // The "cast greater blessing" trigger is the one you wrote that checks:
+    //   - Are we in a large group/raid? 
+    //   - Do we have any assigned Greater Blessings that are missing on a raid member?
+    // If so, it returns true (active).
+    // Then the action is "cast greater blessing," which attempts to find a target and cast.
+
+    triggers.push_back(new TriggerNode(
+        "cast greater blessing",                          // The name you gave to your custom trigger
+        NextAction::array(0,
+            new NextAction("cast greater blessing", 10.0f),  // 10.0f = priority, tweak as you like
+            nullptr)));
+}
