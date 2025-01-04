@@ -10,7 +10,7 @@
 
 bool CastTotemAction::isUseful()
 {
-    if (needLifeTime > 0.1f)
+    if (needLifeTime > 0.1f && AI_VALUE(uint8, "attacker count") < 3)
     {
         Unit* target = AI_VALUE(Unit*, "current target");
         if (!target)
