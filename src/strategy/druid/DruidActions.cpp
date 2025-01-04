@@ -79,3 +79,24 @@ bool CastRejuvenationOnNotFullAction::isUseful()
 {
     return GetTarget();
 }
+
+bool CastMarkOfTheWildOnPartyAction::Execute(Event event)
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    // Is the bot in a group?
+    Group* group = botAI->GetBot()->GetGroup();
+    if (group)
+    {
+        // If the bot can cast "gift of the wild" on this target, do so
+        if (botAI->CanCastSpell("gift of the wild", target))
+        {
+            return botAI->CastSpell("gift of the wild", target);
+        }
+    }
+
+    // Otherwise, fall back to single-target "mark of the wild"
+    return botAI->CastSpell("mark of the wild", target);
+}
