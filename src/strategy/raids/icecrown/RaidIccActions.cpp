@@ -999,6 +999,14 @@ bool IccPutricideGasCloudAction::Execute(Event event)
     if (!gasCloud)
         return false;
 
+    static ObjectGuid lastGasCloudGuid;
+    // If this is a new gas cloud, reset to position 2
+    if (lastGasCloudGuid != gasCloud->GetGUID())
+    {
+        lastGasCloudGuid = gasCloud->GetGUID();
+        lastKnownPosition = 0;  // This will make it go to position 2
+    }
+
     // Check if this bot has Gaseous Bloat
     bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
     
@@ -1015,10 +1023,10 @@ bool IccPutricideGasCloudAction::Execute(Event event)
         const Position* nextPos = nullptr;
         
         // Determine current position
-        if (dist1 < 5.0f) currentPosition = 1;
-        else if (dist2 < 5.0f) currentPosition = 2;
-        else if (dist3 < 5.0f) currentPosition = 3;
-        else if (dist4 < 5.0f) currentPosition = 4;
+        if (dist1 < 8.0f) currentPosition = 1;
+        else if (dist2 < 8.0f) currentPosition = 2;
+        else if (dist3 < 8.0f) currentPosition = 3;
+        else if (dist4 < 8.0f) currentPosition = 4;
 
         // If we're at a new position, update last known position
         if (currentPosition != 0 && currentPosition != lastKnownPosition)
@@ -1026,8 +1034,8 @@ bool IccPutricideGasCloudAction::Execute(Event event)
             lastKnownPosition = currentPosition;
         }
 
-        // If we haven't reached our last known position yet, don't start new movement
-        if (lastKnownPosition != 0 && lastKnownPosition != currentPosition)
+        // Only prevent movement if we're already moving and haven't reached the target yet
+        if (lastKnownPosition != 0 && lastKnownPosition != currentPosition && AI_VALUE(bool, "moving"))
         {
             return false;
         }
@@ -1038,10 +1046,6 @@ bool IccPutricideGasCloudAction::Execute(Event event)
             switch(currentPosition)
             {
                 case 0: // Not at any position
-                case 4: // At position 4, go to 1
-            nextPos = &ICC_PUTRICIDE_GAS1_POSITION;
-                    lastKnownPosition = 1;
-                    break;
                 case 1:
                     nextPos = &ICC_PUTRICIDE_GAS2_POSITION;
                     lastKnownPosition = 2;
@@ -1054,13 +1058,31 @@ bool IccPutricideGasCloudAction::Execute(Event event)
                     nextPos = &ICC_PUTRICIDE_GAS4_POSITION;
                     lastKnownPosition = 4;
                     break;
+                case 4:
+                    nextPos = &ICC_PUTRICIDE_GAS1_POSITION;
+                    lastKnownPosition = 1;
+                    break;
             }
 
             if (nextPos)
             {
+                // Use PathGenerator to find a safe path to the target
+                PathGenerator path(bot);
+                path.CalculatePath(nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), false);
+                
+                if (path.GetPathType() == PATHFIND_NORMAL || path.GetPathType() == PATHFIND_INCOMPLETE)
+                {
+                    return MoveTo(bot->GetMapId(), nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), 
+                         false, true, false, false, MovementPriority::MOVEMENT_FORCED);
+                }
+                else
+                {
+                    // If no valid path found, try to move directly (old behavior)
                 return MoveTo(bot->GetMapId(), nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), 
                      false, false, false, true, MovementPriority::MOVEMENT_FORCED);
             }
+            }
+            return false;
         }
         return false;
     }
@@ -1091,13 +1113,13 @@ bool IccPutricideGasCloudAction::Execute(Event event)
             lastKnownPosition = 0;
         return Attack(gasCloud);
     }
-    // If no one has aura yet, everyone stays at position 1
+    // If no one has aura yet, everyone stays at position 2
         else if (!someoneHasAura)
     {
             lastKnownPosition = 0;
-        return MoveTo(bot->GetMapId(), ICC_PUTRICIDE_GAS1_POSITION.GetPositionX(), 
-                     ICC_PUTRICIDE_GAS1_POSITION.GetPositionY(),
-                     ICC_PUTRICIDE_GAS1_POSITION.GetPositionZ(),
+        return MoveTo(bot->GetMapId(), ICC_PUTRICIDE_GAS2_POSITION.GetPositionX(), 
+                     ICC_PUTRICIDE_GAS2_POSITION.GetPositionY(),
+                     ICC_PUTRICIDE_GAS2_POSITION.GetPositionZ(),
                      false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
         }
     }

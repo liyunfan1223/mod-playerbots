@@ -279,7 +279,7 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
         {
             if (dynamic_cast<IccPutricideVolatileOozeAction*>(action) || dynamic_cast<IccPutricideGasCloudAction*>(action))
                 return 2.0f;
-            else if (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
+            else if (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) || dynamic_cast<AvoidMalleableGooAction*>(action))
                 return 0.0f;
         }
     }
