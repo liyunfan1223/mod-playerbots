@@ -107,7 +107,7 @@ bool CastPowerWordShieldOnNotFullAction::isUseful()
     return GetTarget();
 }
 
-bool CastPowerWordFortitudeAction::Execute(Event event)
+bool CastPowerWordFortitudeOnPartyAction::Execute(Event event)
 {
     Unit* target = GetTarget();
     if (!target)
