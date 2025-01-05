@@ -452,7 +452,7 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
 bool IccBqlTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
-    if (!boss || !(botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsRanged(bot))) 
+    if (!boss) 
         return false;
 
     return true;

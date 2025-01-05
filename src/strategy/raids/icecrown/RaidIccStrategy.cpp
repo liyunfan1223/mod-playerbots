@@ -108,10 +108,10 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("icc bql tank position", ACTION_RAID), nullptr)));
 
     triggers.push_back(new TriggerNode("icc bql pact of darkfallen",
-        NextAction::array(0, new NextAction("icc bql pact of darkfallen", ACTION_EMERGENCY +1), nullptr)));
+        NextAction::array(0, new NextAction("icc bql pact of darkfallen", ACTION_RAID +1), nullptr)));
 
     triggers.push_back(new TriggerNode("icc bql vampiric bite",
-        NextAction::array(0, new NextAction("icc bql vampiric bite", ACTION_EMERGENCY + 5), nullptr)));
+        NextAction::array(0, new NextAction("icc bql vampiric bite", ACTION_RAID + 2), nullptr)));
 
     //VDW
     triggers.push_back(new TriggerNode("icc valkyre spear",

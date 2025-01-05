@@ -1400,9 +1400,7 @@ bool IccBpcEmpoweredVortexAction::Execute(Event event)
 
 bool IccBqlTankPositionAction::Execute(Event event)
 {
-    // Only tanks should move to tank position
-    if (!(botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsRanged(bot)))
-        return false;
+    Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
 
     // If tank is not at position, move there
     if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
@@ -1416,9 +1414,10 @@ bool IccBqlTankPositionAction::Execute(Event event)
     float radius = 8.0f;
     float moveIncrement = 3.0f;
     bool isRanged = botAI->IsRanged(bot);
+    bool isMelee = botAI->IsMelee(bot);
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    if (isRanged && !(bot->HasAura(70877) || bot->HasAura(71474)))
+    if (isRanged && !(bot->HasAura(70877) || bot->HasAura(71474) && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))) //frenzied bloodthrist
     {
         // Ranged: spread from other ranged
         for (auto& member : members)
@@ -1435,7 +1434,23 @@ bool IccBqlTankPositionAction::Execute(Event event)
             }
         }
     }
+    if (isMelee && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)) // melee also spread
+    {
+        // Melee: spread from other melee
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit || !unit->IsAlive() || unit == bot || unit->HasAura(70877) || unit->HasAura(71474))
+                continue;
 
+            float dist = bot->GetExactDist2d(unit);
+            if (dist < radius)
+            {
+                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
+                return MoveAway(unit, moveDistance);
+            }
+        }
+    }
     return false;  // Everyone is in position
 }
 
