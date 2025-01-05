@@ -152,7 +152,7 @@ bool CheckMountStateAction::isUseful()
     if (!GET_PLAYERBOT_AI(bot)->HasStrategy("mount", BOT_STATE_NON_COMBAT) && !bot->IsMounted())
         return false;
 
-    bool firstmount = bot->GetLevel() >= 20;
+    bool firstmount = bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel;
     if (!firstmount)
         return false;
 
@@ -178,7 +178,7 @@ bool CheckMountStateAction::isUseful()
 
 bool CheckMountStateAction::Mount()
 {
-    uint32 secondmount = 40;
+    uint32 secondmount = sPlayerbotAIConfig->useFastGroundMountAtMinLevel;
 
     if (bot->isMoving())
     {
