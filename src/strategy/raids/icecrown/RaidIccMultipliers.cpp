@@ -21,6 +21,15 @@
 #include "WarriorActions.h"
 #include "PlayerbotAI.h"
 
+//LK global variables
+namespace {
+    uint32 g_lastPlagueTime = 0;
+    bool g_plagueAllowedToCure = false;
+    std::map<ObjectGuid, uint32> g_plagueTimes;
+    std::map<ObjectGuid, bool> g_allowCure;
+    std::mutex g_plagueMutex;  // Add mutex for thread safety
+}
+
 float IccLadyDeathwhisperMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "lady deathwhisper");
@@ -542,55 +551,56 @@ float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
     // Handle cure actions
     if (dynamic_cast<CurePartyMemberAction*>(action))
     {
-        static std::map<ObjectGuid, uint32> plagueTimes;
-        static std::map<ObjectGuid, bool> allowCure;
-        
-        Unit* target = action->GetTarget();
-        if (!target || !target->IsPlayer())
-            return 0.0f;
+        Group* group = bot->GetGroup();
+        if (!group)
+            return 1.0f;
 
-        ObjectGuid targetGuid = target->GetGUID();
+        // Check if any bot in the group has plague
+        bool anyBotHasPlague = false;
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            if (Player* member = ref->GetSource())
+            {
+                if (botAI->HasAura("Necrotic Plague", member))
+                {
+                    anyBotHasPlague = true;
+                    break;
+                }
+            }
+        }
+
         uint32 currentTime = getMSTime();
 
-        // Check if target has plague
-        bool hasPlague = target->HasAura(70338) || target->HasAura(73785) || 
-                        target->HasAura(73786) || target->HasAura(73787) ||
-                        target->HasAura(70337) || target->HasAura(73912) || 
-                        target->HasAura(73913) || target->HasAura(73914); 
-
-        // If no plague, reset timers and block cure
-        if (!hasPlague)
+        // Reset state if no one has plague
+        if (!anyBotHasPlague)
         {
-            plagueTimes.erase(targetGuid);
-            allowCure.erase(targetGuid);
+            g_lastPlagueTime = 0;
+            g_plagueAllowedToCure = false;
+            return 1.0f;
+        }
+
+        // Start timer if this is a new plague
+        if (g_lastPlagueTime == 0)
+        {
+            g_lastPlagueTime = currentTime;
+            g_plagueAllowedToCure = false;
             return 0.0f;
         }
 
-        // If we haven't seen this plague yet, start the timer
-        if (plagueTimes.find(targetGuid) == plagueTimes.end())
-        {
-            plagueTimes[targetGuid] = currentTime;
-            allowCure[targetGuid] = false;
-            return 0.0f;
-        }
-
-        // If we've already allowed cure for this plague instance, keep allowing it
-        if (allowCure[targetGuid])
+        // Once we allow cure, keep allowing it until plague is gone
+        if (g_plagueAllowedToCure)
         {
             return 1.0f;
         }
 
-        // Check if enough time has passed
-        uint32 timeSincePlague = currentTime - plagueTimes[targetGuid];
-        if (timeSincePlague >= 3000)
+        // Check if enough time has passed (3,5 seconds)
+        if (currentTime - g_lastPlagueTime >= 3500)
         {
-            allowCure[targetGuid] = true;
+            g_plagueAllowedToCure = true;
             return 1.0f;
         }
-        else
-        {
-            return 0.0f;
-        }
+
+        return 0.0f;
     }
 
     return 1.0f;
