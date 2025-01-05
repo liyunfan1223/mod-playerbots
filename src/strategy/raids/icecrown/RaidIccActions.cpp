@@ -1737,11 +1737,11 @@ bool IccValithriaHealAction::Execute(Event event)
         switch (bot->getClass())
         {
             case CLASS_SHAMAN:
-                return botAI->CastSpell(49276, valithria); // Lesser Healing Wave
+                return valithria->HasAura(61301) ? botAI->CastSpell(49273, valithria) : botAI->CastSpell(61301, valithria); // Cast Healing Wave if Riptide is up, otherwise cast Riptide
             case CLASS_PRIEST:
-                return botAI->CastSpell(48071, valithria); // Flash Heal
+                return valithria->HasAura(48068) ? botAI->CastSpell(48063, valithria) : botAI->CastSpell(48068, valithria); // Cast Greater Heal if Renew is up, otherwise cast Renew
             case CLASS_PALADIN:
-                return botAI->CastSpell(48782, valithria); // Holy Light
+                return valithria->HasAura(53563) ? botAI->CastSpell(48782, valithria) : botAI->CastSpell(53563, valithria); // Cast Holy Light if Beacon is up, otherwise cast Beacon of Light
             default:
                 return false;
         }
