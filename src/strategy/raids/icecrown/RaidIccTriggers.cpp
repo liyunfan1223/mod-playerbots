@@ -437,12 +437,10 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
 
     // For ranged, spread whenever Valanar is empowered
     if (botAI->IsRanged(bot))
-        return valanar->HasAura(70952); // Invocation of Blood
+        return valanar->HasAura(71596); // Invocation of Blood
 
     // For melee, only spread during vortex cast
-    if (valanar->HasAura(70952) && // Invocation of Blood
-        valanar->GetCurrentSpell(CURRENT_GENERIC_SPELL) && 
-        valanar->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == 72039)
+    if (valanar->HasAura(71596) && valanar->HasUnitState(UNIT_STATE_CASTING) && valanar->FindCurrentSpellBySpellId(72039))
     {
         return true;
     }

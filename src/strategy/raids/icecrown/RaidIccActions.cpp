@@ -1244,7 +1244,78 @@ bool IccBpcMainTankAction::Execute(Event event)
 
         return false;
     }
+    
+    if (!botAI->IsTank(bot))
+    {
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+        GuidVector targets = AI_VALUE(GuidVector, "possible targets");
 
+        // First check if skull-marked target is a valid empowered prince
+        Unit* skullTarget = nullptr;
+        if (Group* group = bot->GetGroup())
+        {
+            if (ObjectGuid skullGuid = group->GetTargetIcon(7)) // 7 = skull
+            {
+                skullTarget = botAI->GetUnit(skullGuid);
+                if (skullTarget && skullTarget->IsAlive() && skullTarget->HasAura(71596) &&
+                    (skullTarget->GetEntry() == 37972 ||    // Keleseth
+                     skullTarget->GetEntry() == 37973 ||    // Taldaram
+                     skullTarget->GetEntry() == 37970))     // Valanar
+                {
+                    return Attack(skullTarget);
+                }
+            }
+        }
+
+        // If no valid skull target, search for empowered prince
+        Unit* empoweredPrince = nullptr;
+        for (auto i = targets.begin(); i != targets.end(); ++i)
+        {
+            Unit* unit = botAI->GetUnit(*i);
+            if (!unit || !unit->IsAlive())
+                continue;
+
+            if (unit->HasAura(71596))
+            {
+                if (unit->GetEntry() == 37972 ||    // Keleseth
+                 unit->GetEntry() == 37973 ||    // Taldaram
+                    unit->GetEntry() == 37970)      // Valanar
+                {
+                empoweredPrince = unit;
+
+                    // Mark empowered prince with skull if in group
+                    if (Group* group = bot->GetGroup())
+                    {
+                        group->SetTargetIcon(7, bot->GetGUID(), unit->GetGUID()); // 7 = skull
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Attack empowered prince if found and current target doesn't have aura
+        if (empoweredPrince)
+        {
+            // Only switch if current target doesn't have the aura
+            if (!currentTarget || !currentTarget->HasAura(71596))
+            {
+                return Attack(empoweredPrince);
+            }
+            else
+            {
+                return Attack(currentTarget);
+            }
+        }
+
+        // Keep current prince target if no empowered prince found
+        if (currentTarget && (currentTarget->GetEntry() == 37972 ||   // Keleseth
+                             currentTarget->GetEntry() == 37973 ||   // Taldaram
+                             currentTarget->GetEntry() == 37970))    // Valanar
+        {
+            return Attack(currentTarget);
+        }
+
+    }
     return false;
 }
 
