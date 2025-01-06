@@ -37,7 +37,7 @@ bool IccLmTankPositionAction::Execute(Event event)
     bot->SetTarget(boss->GetGUID());
     if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
     {
-        if (bot->GetExactDist2d(ICC_LM_TANK_POSITION) > 5.0f)
+        if (bot->GetExactDist2d(ICC_LM_TANK_POSITION) > 15.0f)
             return MoveTo(bot->GetMapId(), ICC_LM_TANK_POSITION.GetPositionX(),
                           ICC_LM_TANK_POSITION.GetPositionY(), ICC_LM_TANK_POSITION.GetPositionZ(), false,
                           false, false, true, MovementPriority::MOVEMENT_NORMAL);
@@ -402,7 +402,11 @@ bool IccGunshipTeleportAllyAction::Execute(Event event)
 
     // Only target the mage that is channeling Below Zero
     if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
-        return false;
+    {
+        if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_ALLY2) > 45.0f)
+            return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionX(),
+                          ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionY(), ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionZ(), bot->GetOrientation());
+    }
 
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
@@ -424,7 +428,11 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
 
     // Only target the sorcerer that is channeling Below Zero
     if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
-        return false;
+    {
+        if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_HORDE2) > 45.0f)
+            return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionX(),
+                          ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionY(), ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionZ(), bot->GetOrientation());
+    }
 
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
@@ -991,6 +999,14 @@ bool IccPutricideGasCloudAction::Execute(Event event)
     if (!gasCloud)
         return false;
 
+    static ObjectGuid lastGasCloudGuid;
+    // If this is a new gas cloud, reset to position 2
+    if (lastGasCloudGuid != gasCloud->GetGUID())
+    {
+        lastGasCloudGuid = gasCloud->GetGUID();
+        lastKnownPosition = 0;  // This will make it go to position 2
+    }
+
     // Check if this bot has Gaseous Bloat
     bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
     
@@ -1007,10 +1023,10 @@ bool IccPutricideGasCloudAction::Execute(Event event)
         const Position* nextPos = nullptr;
         
         // Determine current position
-        if (dist1 < 5.0f) currentPosition = 1;
-        else if (dist2 < 5.0f) currentPosition = 2;
-        else if (dist3 < 5.0f) currentPosition = 3;
-        else if (dist4 < 5.0f) currentPosition = 4;
+        if (dist1 < 8.0f) currentPosition = 1;
+        else if (dist2 < 8.0f) currentPosition = 2;
+        else if (dist3 < 8.0f) currentPosition = 3;
+        else if (dist4 < 8.0f) currentPosition = 4;
 
         // If we're at a new position, update last known position
         if (currentPosition != 0 && currentPosition != lastKnownPosition)
@@ -1018,8 +1034,8 @@ bool IccPutricideGasCloudAction::Execute(Event event)
             lastKnownPosition = currentPosition;
         }
 
-        // If we haven't reached our last known position yet, don't start new movement
-        if (lastKnownPosition != 0 && lastKnownPosition != currentPosition)
+        // Only prevent movement if we're already moving and haven't reached the target yet
+        if (lastKnownPosition != 0 && lastKnownPosition != currentPosition && AI_VALUE(bool, "moving"))
         {
             return false;
         }
@@ -1030,10 +1046,6 @@ bool IccPutricideGasCloudAction::Execute(Event event)
             switch(currentPosition)
             {
                 case 0: // Not at any position
-                case 4: // At position 4, go to 1
-            nextPos = &ICC_PUTRICIDE_GAS1_POSITION;
-                    lastKnownPosition = 1;
-                    break;
                 case 1:
                     nextPos = &ICC_PUTRICIDE_GAS2_POSITION;
                     lastKnownPosition = 2;
@@ -1046,13 +1058,31 @@ bool IccPutricideGasCloudAction::Execute(Event event)
                     nextPos = &ICC_PUTRICIDE_GAS4_POSITION;
                     lastKnownPosition = 4;
                     break;
+                case 4:
+                    nextPos = &ICC_PUTRICIDE_GAS1_POSITION;
+                    lastKnownPosition = 1;
+                    break;
             }
 
             if (nextPos)
             {
+                // Use PathGenerator to find a safe path to the target
+                PathGenerator path(bot);
+                path.CalculatePath(nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), false);
+                
+                if (path.GetPathType() == PATHFIND_NORMAL || path.GetPathType() == PATHFIND_INCOMPLETE)
+                {
+                    return MoveTo(bot->GetMapId(), nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), 
+                         false, true, false, false, MovementPriority::MOVEMENT_FORCED);
+                }
+                else
+                {
+                    // If no valid path found, try to move directly (old behavior)
                 return MoveTo(bot->GetMapId(), nextPos->GetPositionX(), nextPos->GetPositionY(), nextPos->GetPositionZ(), 
                      false, false, false, true, MovementPriority::MOVEMENT_FORCED);
             }
+            }
+            return false;
         }
         return false;
     }
@@ -1083,13 +1113,13 @@ bool IccPutricideGasCloudAction::Execute(Event event)
             lastKnownPosition = 0;
         return Attack(gasCloud);
     }
-    // If no one has aura yet, everyone stays at position 1
+    // If no one has aura yet, everyone stays at position 2
         else if (!someoneHasAura)
     {
             lastKnownPosition = 0;
-        return MoveTo(bot->GetMapId(), ICC_PUTRICIDE_GAS1_POSITION.GetPositionX(), 
-                     ICC_PUTRICIDE_GAS1_POSITION.GetPositionY(),
-                     ICC_PUTRICIDE_GAS1_POSITION.GetPositionZ(),
+        return MoveTo(bot->GetMapId(), ICC_PUTRICIDE_GAS2_POSITION.GetPositionX(), 
+                     ICC_PUTRICIDE_GAS2_POSITION.GetPositionY(),
+                     ICC_PUTRICIDE_GAS2_POSITION.GetPositionZ(),
                      false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
         }
     }
@@ -1190,29 +1220,102 @@ bool IccBpcNucleusAction::Execute(Event event)
 
 bool IccBpcMainTankAction::Execute(Event event)
 {
-    if (!botAI->IsMainTank(bot))
+    if (botAI->IsMainTank(bot))
+    {
+        // Move to MT position if we're not there
+        if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 20.0f)
+            return MoveTo(bot->GetMapId(), ICC_BPC_MT_POSITION.GetPositionX(),
+                        ICC_BPC_MT_POSITION.GetPositionY(), ICC_BPC_MT_POSITION.GetPositionZ(),
+                        false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
+
+        Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+        Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+
+        // Keep current prince if we have one
+        if (currentTarget && (currentTarget == valanar || currentTarget == taldaram))
+            return Attack(currentTarget);
+
+        // Pick a new prince that isn't targeting us
+        if (valanar && (!valanar->GetVictim() || valanar->GetVictim() != bot))
+            return Attack(valanar);
+        if (taldaram && (!taldaram->GetVictim() || taldaram->GetVictim() != bot))
+            return Attack(taldaram);
+
         return false;
+    }
+    
+    if (!botAI->IsTank(bot))
+    {
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+        GuidVector targets = AI_VALUE(GuidVector, "possible targets");
 
-    // Move to MT position if we're not there
-    if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 20.0f)
-        return MoveTo(bot->GetMapId(), ICC_BPC_MT_POSITION.GetPositionX(),
-                    ICC_BPC_MT_POSITION.GetPositionY(), ICC_BPC_MT_POSITION.GetPositionZ(),
-                    false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
+        // First check if skull-marked target is a valid empowered prince
+        Unit* skullTarget = nullptr;
+        if (Group* group = bot->GetGroup())
+        {
+            if (ObjectGuid skullGuid = group->GetTargetIcon(7)) // 7 = skull
+            {
+                skullTarget = botAI->GetUnit(skullGuid);
+                if (skullTarget && skullTarget->IsAlive() && skullTarget->HasAura(71596) &&
+                    (skullTarget->GetEntry() == 37972 ||    // Keleseth
+                     skullTarget->GetEntry() == 37973 ||    // Taldaram
+                     skullTarget->GetEntry() == 37970))     // Valanar
+                {
+                    return Attack(skullTarget);
+                }
+            }
+        }
 
-    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
-    Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
-    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+        // If no valid skull target, search for empowered prince
+        Unit* empoweredPrince = nullptr;
+        for (auto i = targets.begin(); i != targets.end(); ++i)
+        {
+            Unit* unit = botAI->GetUnit(*i);
+            if (!unit || !unit->IsAlive())
+                continue;
 
-    // Keep current prince if we have one
-    if (currentTarget && (currentTarget == valanar || currentTarget == taldaram))
-        return Attack(currentTarget);
+            if (unit->HasAura(71596))
+            {
+                if (unit->GetEntry() == 37972 ||    // Keleseth
+                 unit->GetEntry() == 37973 ||    // Taldaram
+                    unit->GetEntry() == 37970)      // Valanar
+                {
+                empoweredPrince = unit;
 
-    // Pick a new prince
-    if (valanar)
-        return Attack(valanar);
-    if (taldaram)
-        return Attack(taldaram);
+                    // Mark empowered prince with skull if in group
+                    if (Group* group = bot->GetGroup())
+                    {
+                        group->SetTargetIcon(7, bot->GetGUID(), unit->GetGUID()); // 7 = skull
+                    }
+                    break;
+                }
+            }
+        }
 
+        // Attack empowered prince if found and current target doesn't have aura
+        if (empoweredPrince)
+        {
+            // Only switch if current target doesn't have the aura
+            if (!currentTarget || !currentTarget->HasAura(71596))
+            {
+                return Attack(empoweredPrince);
+            }
+            else
+            {
+                return Attack(currentTarget);
+            }
+        }
+
+        // Keep current prince target if no empowered prince found
+        if (currentTarget && (currentTarget->GetEntry() == 37972 ||   // Keleseth
+                             currentTarget->GetEntry() == 37973 ||   // Taldaram
+                             currentTarget->GetEntry() == 37970))    // Valanar
+        {
+            return Attack(currentTarget);
+        }
+
+    }
     return false;
 }
 
@@ -1297,9 +1400,7 @@ bool IccBpcEmpoweredVortexAction::Execute(Event event)
 
 bool IccBqlTankPositionAction::Execute(Event event)
 {
-    // Only tanks should move to tank position
-    if (!(botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsRanged(bot)))
-        return false;
+    Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
 
     // If tank is not at position, move there
     if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
@@ -1313,9 +1414,10 @@ bool IccBqlTankPositionAction::Execute(Event event)
     float radius = 8.0f;
     float moveIncrement = 3.0f;
     bool isRanged = botAI->IsRanged(bot);
+    bool isMelee = botAI->IsMelee(bot);
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    if (isRanged && !(bot->HasAura(70877) || bot->HasAura(71474)))
+    if (isRanged && !(bot->HasAura(70877) || bot->HasAura(71474) && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))) //frenzied bloodthrist
     {
         // Ranged: spread from other ranged
         for (auto& member : members)
@@ -1332,7 +1434,23 @@ bool IccBqlTankPositionAction::Execute(Event event)
             }
         }
     }
+    if (isMelee && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)) // melee also spread
+    {
+        // Melee: spread from other melee
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit || !unit->IsAlive() || unit == bot || unit->HasAura(70877) || unit->HasAura(71474))
+                continue;
 
+            float dist = bot->GetExactDist2d(unit);
+            if (dist < radius)
+            {
+                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
+                return MoveAway(unit, moveDistance);
+            }
+        }
+    }
     return false;  // Everyone is in position
 }
 
@@ -1619,11 +1737,11 @@ bool IccValithriaHealAction::Execute(Event event)
         switch (bot->getClass())
         {
             case CLASS_SHAMAN:
-                return botAI->CastSpell(49276, valithria); // Lesser Healing Wave
+                return valithria->HasAura(61301) ? botAI->CastSpell(49273, valithria) : botAI->CastSpell(61301, valithria); // Cast Healing Wave if Riptide is up, otherwise cast Riptide
             case CLASS_PRIEST:
-                return botAI->CastSpell(48071, valithria); // Flash Heal
+                return valithria->HasAura(48068) ? botAI->CastSpell(48063, valithria) : botAI->CastSpell(48068, valithria); // Cast Greater Heal if Renew is up, otherwise cast Renew
             case CLASS_PALADIN:
-                return botAI->CastSpell(48782, valithria); // Holy Light
+                return valithria->HasAura(53563) ? botAI->CastSpell(48782, valithria) : botAI->CastSpell(53563, valithria); // Cast Holy Light if Beacon is up, otherwise cast Beacon of Light
             default:
                 return false;
         }

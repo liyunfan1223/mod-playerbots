@@ -370,6 +370,10 @@ bool IccPutricideMalleableGooTrigger::IsActive()
 //BPC
 bool IccBpcKelesethTankTrigger::IsActive()
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    if (!boss) 
+        return false;
+
     if (!botAI->IsAssistTank(bot))
         return false;
 
@@ -385,15 +389,15 @@ bool IccBpcKelesethTankTrigger::IsActive()
         }
     }
 
-    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
-    if (!boss || boss->GetEntry() != 37972) // Verify it's actually Keleseth
-        return false;
-
     return true;
 }
 
 bool IccBpcNucleusTrigger::IsActive()
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
+    if (!boss) 
+        return false;
+
     if (!botAI->IsAssistTank(bot))
         return false;
 
@@ -414,13 +418,11 @@ bool IccBpcNucleusTrigger::IsActive()
 
 bool IccBpcMainTankTrigger::IsActive()
 {
-    if (!botAI->IsMainTank(bot))
-        return false;
-
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
     Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
-    
-    return valanar != nullptr || taldaram != nullptr;
+    Unit* keleseth = AI_VALUE2(Unit*, "find target", "prince keleseth");
+
+    return valanar != nullptr || taldaram != nullptr || keleseth != nullptr;
 }
 
 bool IccBpcEmpoweredVortexTrigger::IsActive()
@@ -435,12 +437,10 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
 
     // For ranged, spread whenever Valanar is empowered
     if (botAI->IsRanged(bot))
-        return valanar->HasAura(70952); // Invocation of Blood
+        return valanar->HasAura(71596); // Invocation of Blood
 
     // For melee, only spread during vortex cast
-    if (valanar->HasAura(70952) && // Invocation of Blood
-        valanar->GetCurrentSpell(CURRENT_GENERIC_SPELL) && 
-        valanar->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == 72039)
+    if (valanar->HasAura(71596) && valanar->HasUnitState(UNIT_STATE_CASTING) && valanar->FindCurrentSpellBySpellId(72039))
     {
         return true;
     }
@@ -452,7 +452,7 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
 bool IccBqlTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
-    if (!boss || !(botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsRanged(bot))) 
+    if (!boss) 
         return false;
 
     return true;
