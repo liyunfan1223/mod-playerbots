@@ -23,7 +23,7 @@ bool Formation::IsNullLocation(WorldLocation const& loc) { return IsSameLocation
 
 WorldLocation MoveAheadFormation::GetLocation()
 {
-    Player* master = botAI->GetGroupMaster();
+    Player* master = GetMaster();
     if (!master || master == bot)
         return WorldLocation();
 
@@ -110,7 +110,7 @@ public:
 
     WorldLocation GetLocationInternal() override
     {
-        Player* master = botAI->GetGroupMaster();
+        Player* master = GetMaster();
         if (!master)
             return WorldLocation();
 
@@ -120,7 +120,7 @@ public:
         time_t now = time(nullptr);
         if (!lastChangeTime || now - lastChangeTime >= 3)
         {
-            Player* master = botAI->GetGroupMaster();
+            Player* master = GetMaster();
             if (!master)
                 return WorldLocation();
 
@@ -185,7 +185,7 @@ public:
         float range = 2.0f;
 
         Unit* target = AI_VALUE(Unit*, "current target");
-        Player* master = botAI->GetGroupMaster();
+        Player* master = GetMaster();
         if (!target && target != bot)
             target = master;
 
@@ -239,7 +239,7 @@ public:
 
         float range = 2.0f;
 
-        Player* master = botAI->GetGroupMaster();
+        Player* master = GetMaster();
         if (!master)
             return Formation::NullLocation;
 
