@@ -8,6 +8,7 @@
 #	PLAYERBOT SETTINGS
 #		GENERAL
 #		SUMMON OPTIONS
+#       MOUNT
 #		GEAR
 #		LOOTING
 #		TIMERS
@@ -193,6 +194,36 @@ AiPlayerbot.ReviveBotWhenSummoned = 1
 # Enable/Disable bot repair gear when summon (0 = no, 1 = yes)
 # default: 1
 AiPlayerbot.BotRepairWhenSummon = 1
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
+# MOUNT
+#
+#
+
+# Defines at what level a bot will naturally use its 60% ground mount
+# note: was level 20 during WotLK, 30 during TBC, 40 during Vanilla
+# default: 20
+AiPlayerbot.UseGroundMountAtMinLevel = 20
+
+# Defines at what level a bot will naturally use its 100% fast ground mount
+# note: was level 40 during WotLK, 60 during Vanilla
+# default: 40
+AiPlayerbot.UseFastGroundMountAtMinLevel = 40
+
+# Defines at what level a bot will naturally use its 150% fly mount
+# note: was level 60 during WotLK, 70 during TBC
+# default: 60
+AiPlayerbot.UseFlyMountAtMinLevel = 60;
+
+# Defines at what level a bot will naturally use its 280% fast fly mount
+# note: was level 70 during WotLK and TBC
+# default: 70
+AiPlayerbot.UseFastFlyMountAtMinLevel = 70;
 
 #
 #

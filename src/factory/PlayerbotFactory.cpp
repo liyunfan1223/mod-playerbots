@@ -2825,10 +2825,10 @@ uint32 PlayerbotFactory::CalcMixedGearScore(uint32 gs, uint32 quality)
 
 void PlayerbotFactory::InitMounts()
 {
-    uint32 firstmount = 20;
-    uint32 secondmount = 40;
-    uint32 thirdmount = 60;
-    uint32 fourthmount = 70;
+    uint32 firstmount = sPlayerbotAIConfig->useGroundMountAtMinLevel;
+    uint32 secondmount = sPlayerbotAIConfig->useFastGroundMountAtMinLevel;
+    uint32 thirdmount = sPlayerbotAIConfig->useFlyMountAtMinLevel;
+    uint32 fourthmount = sPlayerbotAIConfig->useFastFlyMountAtMinLevel;
 
     if (bot->GetLevel() < firstmount)
         return;
