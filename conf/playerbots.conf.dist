@@ -218,12 +218,12 @@ AiPlayerbot.UseFastGroundMountAtMinLevel = 40
 # Defines at what level a bot will naturally use its 150% fly mount
 # note: was level 60 during WotLK, 70 during TBC
 # default: 60
-AiPlayerbot.UseFlyMountAtMinLevel = 60;
+AiPlayerbot.UseFlyMountAtMinLevel = 60
 
 # Defines at what level a bot will naturally use its 280% fast fly mount
 # note: was level 70 during WotLK and TBC
 # default: 70
-AiPlayerbot.UseFastFlyMountAtMinLevel = 70;
+AiPlayerbot.UseFastFlyMountAtMinLevel = 70
 
 #
 #
