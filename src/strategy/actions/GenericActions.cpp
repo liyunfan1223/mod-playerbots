@@ -24,21 +24,37 @@ bool TogglePetSpellAutoCastAction::Execute(Event event)
     {
         return false;
     }
+    // hack on high level spell after low level initialization
+    std::vector<unsigned int> shouldRemove;
+    for (unsigned int& m_autospell : pet->m_autospells)
+    {
+        if (!pet->HasSpell(m_autospell))
+        {
+            shouldRemove.push_back(m_autospell);
+        }
+    }
+    for (unsigned int spellId : shouldRemove)
+    {
+        auto autospellItr = std::find(pet->m_autospells.begin(), pet->m_autospells.end(), spellId);
+        if (autospellItr != pet->m_autospells.end())
+            pet->m_autospells.erase(autospellItr);
+    }
     bool toggled = false;
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
     {
         if (itr->second.state == PETSPELL_REMOVED)
             continue;
-
+        
         uint32 spellId = itr->first;
         const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (spellInfo->IsPassive())
+        if (!spellInfo->IsAutocastable())
             continue;
 
         bool shouldApply = true;
-        // imp's spell, felhunte's intelligence, cat stealth
-        if (spellId == 4511 || spellId == 1742 || spellId == 54424 || spellId == 57564 || spellId == 57565 ||
-            spellId == 57566 || spellId == 57567 || spellId == 24450)
+        // spellId == 4511 || spellId == 54424 || spellId == 57564 || spellId == 57565 ||
+        // spellId == 57566 || spellId == 57567 ||
+        // cat stealth, prowl
+        if (spellId == 1742 || spellId == 24450)
         {
             shouldApply = false;
         }
