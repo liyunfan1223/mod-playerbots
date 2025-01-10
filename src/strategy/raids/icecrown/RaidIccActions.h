@@ -51,7 +51,14 @@ const Position ICC_SINDRAGOSA_CENTER_POSITION = Position(4408.0464f, 2484.478f, 
 const Position ICC_SINDRAGOSA_THOMBMB2_POSITION = Position(4382.6113f, 2505.4922f, 203.38197f);       
 const Position ICC_SINDRAGOSA_FBOMB_POSITION = Position(4400.031f, 2507.0295f, 203.37929f);       
 const Position ICC_SINDRAGOSA_LOS2_POSITION = Position(4376.0938f, 2511.103f, 203.38303f); 
-const Position ICC_LICH_KING_ADDS_POSITION = Position(486.63647f, -2095.7915f, 840.857f);           
+const Position ICC_LICH_KING_ADDS_POSITION = Position(486.63647f, -2095.7915f, 840.857f);
+const Position ICC_LK_FROST1_POSITION = Position(503.96548f, -2183.216f, 840.857f);           
+const Position ICC_LK_FROST2_POSITION = Position(563.07166f, -2125.7578f, 840.857f);           
+const Position ICC_LK_FROST3_POSITION = Position(503.40182f, -2067.3435f, 840.857f); 
+const Position ICC_LK_FROSTR1_POSITION = Position(481.168f, -2177.8723f, 840.857f); 
+const Position ICC_LK_FROSTR2_POSITION = Position(562.20807f, -2100.2393f, 840.857f); 
+const Position ICC_LK_FROSTR3_POSITION = Position(526.35297f, -2071.0317f, 840.857f);
+         
 
 
 //Lord Marrogwar
