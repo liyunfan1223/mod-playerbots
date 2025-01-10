@@ -7,29 +7,30 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Bug Description**
+A clear and concise description of what the bug is. If the bug is a crash, a crash log must be posted or the issue will be removed.
 
-**Commit hash**
+**Commit Hash**
 The hash of the current commit.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**How To Reproduce Bug**
+Detailed steps to reproduce the behavior.
 
-**Expected behavior**
+**Expected Behavior**
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Modules**
+Please list all modules used as many are known to cause conflicts with Playerbots.
 
-**Additional context**
+**Playerbot Settings**
+Number of bots, scaling settings, etc if performance related.
+
+**System**
+OS: [e.g. Windows, Linux]
+Hardware: [e.g. CPU if performance related]
+
+**Additional Context**
 Add any other context about the problem here.
