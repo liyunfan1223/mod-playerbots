@@ -146,167 +146,106 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
     bool actionExecuted = false;
     ActionBasket* basket = nullptr;
-
     time_t currentTime = time(nullptr);
-    // aiObjectContext->Update();
+
+    // Update triggers and push default actions
     ProcessTriggers(minimal);
     PushDefaultActions();
 
     uint32 iterations = 0;
     uint32 iterationsPerTick = queue.Size() * (minimal ? 2 : sPlayerbotAIConfig->iterationsPerTick);
-    do
+    
+    while (++iterations <= iterationsPerTick)
     {
         basket = queue.Peek();
+        if (!basket)
+            break;
 
-        if (basket)
+        float relevance = basket->getRelevance();  // for reference
+        bool skipPrerequisites = basket->isSkipPrerequisites();
+
+        if (minimal && (relevance < 100))
+            continue;
+
+        Event event = basket->getEvent();
+        ActionNode* actionNode = queue.Pop();  // NOTE: Pop() deletes basket
+        Action* action = InitializeAction(actionNode);
+
+        if (!action)
         {
-            float relevance = basket->getRelevance();  // just for reference
-            bool skipPrerequisites = basket->isSkipPrerequisites();
-
-            if (minimal && (relevance < 100))
-                continue;
-
-            Event event = basket->getEvent();
-            // NOTE: queue.Pop() deletes basket
-            ActionNode* actionNode = queue.Pop();
-            Action* action = InitializeAction(actionNode);
-
-            if (action)
+            LogAction("A:%s - UNKNOWN", actionNode->getName().c_str());
+        }
+        else if (action->isUseful())
+        {
+            // Apply multipliers early to avoid unnecessary iterations
+            for (Multiplier* multiplier : multipliers)
+            {
+                relevance *= multiplier->GetValue(action);
                 action->setRelevance(relevance);
 
-            if (!action)
-            {
-                // LOG_ERROR("playerbots", "Action: {} - is UNKNOWN - c:{} l:{}", actionNode->getName().c_str(),
-                // botAI->GetBot()->getClass(), botAI->GetBot()->GetLevel());
-                LogAction("A:%s - UNKNOWN", actionNode->getName().c_str());
-            }
-            else if (action->isUseful())
-            {
-                for (std::vector<Multiplier*>::iterator i = multipliers.begin(); i != multipliers.end(); i++)
+                if (relevance <= 0)
                 {
-                    Multiplier* multiplier = *i;
-                    relevance *= multiplier->GetValue(action);
-                    action->setRelevance(relevance);
+                    LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(), action->getName().c_str());
+                    break;
+                }
+            }
 
-                    if (!relevance)
+            if (action->isPossible() && relevance > 0)
+            {
+                if (!skipPrerequisites)
+                {
+                    LogAction("A:%s - PREREQ", action->getName().c_str());
+
+                    if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.002f, false, event, "prereq"))
                     {
-                        LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(),
-                                  action->getName().c_str());
-                        break;
+                        PushAgain(actionNode, relevance + 0.001f, event);
+                        continue;
                     }
                 }
 
-                if (action->isPossible() && relevance)
+                PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_ACTION, action->getName(), &aiObjectContext->performanceStack);
+                actionExecuted = ListenAndExecute(action, event);
+                if (pmo)
+                    pmo->finish();
+
+                if (actionExecuted)
                 {
-                    if (!skipPrerequisites)
-                    {
-                        LogAction("A:%s - PREREQ", action->getName().c_str());
-
-                        if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.002f, false, event, "prereq"))
-                        {
-                            PushAgain(actionNode, relevance + 0.001f, event);
-                            continue;
-                        }
-                    }
-
-                    PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_ACTION, action->getName(),
-                                                                                  &aiObjectContext->performanceStack);
-                    actionExecuted = ListenAndExecute(action, event);
-                    if (pmo)
-                        pmo->finish();
-
-                    if (actionExecuted)
-                    {
-                        LogAction("A:%s - OK", action->getName().c_str());
-                        MultiplyAndPush(actionNode->getContinuers(), relevance, false, event, "cont");
-                        lastRelevance = relevance;
-                        delete actionNode;
-                        break;
-                    }
-                    else
-                    {
-                        LogAction("A:%s - FAILED", action->getName().c_str());
-                        MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.003f, false, event, "alt");
-                    }
+                    LogAction("A:%s - OK", action->getName().c_str());
+                    MultiplyAndPush(actionNode->getContinuers(), relevance, false, event, "cont");
+                    lastRelevance = relevance;
+                    delete actionNode;  // Safe memory management
+                    break;
                 }
                 else
                 {
-                    if (botAI->HasStrategy("debug", BOT_STATE_NON_COMBAT))
-                    {
-                        std::ostringstream out;
-                        out << "do: ";
-                        out << action->getName();
-                        out << " impossible (";
-
-                        out << action->getRelevance() << ")";
-
-                        if (!event.GetSource().empty())
-                            out << " [" << event.GetSource() << "]";
-
-                        botAI->TellMasterNoFacing(out);
-                    }
-                    LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
+                    LogAction("A:%s - FAILED", action->getName().c_str());
                     MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.003f, false, event, "alt");
                 }
             }
             else
             {
-                if (botAI->HasStrategy("debug", BOT_STATE_NON_COMBAT))
-                {
-                    std::ostringstream out;
-                    out << "do: ";
-                    out << action->getName();
-                    out << " useless (";
-
-                    out << action->getRelevance() << ")";
-
-                    if (!event.GetSource().empty())
-                        out << " [" << event.GetSource() << "]";
-
-                    botAI->TellMasterNoFacing(out);
-                }
-                lastRelevance = relevance;
-                LogAction("A:%s - USELESS", action->getName().c_str());
+                LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
+                MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.003f, false, event, "alt");
             }
-
-            delete actionNode;
         }
-    } while (basket && ++iterations <= iterationsPerTick);
-
-    // if (!basket)
-    // {
-    //     lastRelevance = 0.0f;
-    //     PushDefaultActions();
-
-    //     // prevent the delay after pushing default actions
-    //     if (queue.Peek() && depth < 1 && !minimal)
-    //         return DoNextAction(unit, depth + 1, minimal);
-    // }
-
-    // MEMORY FIX TEST
-    /*
-    do
-    {
-        basket = queue.Peek();
-        if (basket)
+        else
         {
-            // NOTE: queue.Pop() deletes basket
-            delete queue.Pop();
+            LogAction("A:%s - USELESS", action->getName().c_str());
+            lastRelevance = relevance;
         }
+
+        delete actionNode;  // Always delete after processing the action node
     }
-    while (basket);
-    */
 
     if (time(nullptr) - currentTime > 1)
     {
-        LogAction("too long execution");
+        LogAction("Execution time exceeded 1 second");
     }
 
     if (!actionExecuted)
-        LogAction("no actions executed");
+        LogAction("No actions executed");
 
-    queue.RemoveExpired();
-
+    queue.RemoveExpired();  // Clean up expired actions in the queue
     return actionExecuted;
 }
 
@@ -567,7 +506,7 @@ std::string const Engine::ListStrategies()
     std::string s = "Strategies: ";
 
     if (strategies.empty())
-        return std::move(s);
+        return s;
 
     for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
