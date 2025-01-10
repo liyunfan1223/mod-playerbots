@@ -159,10 +159,10 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     //LICH KING
     triggers.push_back(new TriggerNode("icc lich king necrotic plague",
-        NextAction::array(0, new NextAction("icc lich king necrotic plague", ACTION_EMERGENCY + 3), nullptr)));
+        NextAction::array(0, new NextAction("icc lich king necrotic plague", ACTION_RAID + 3), nullptr)));
 
     triggers.push_back(new TriggerNode("icc lich king winter",
-        NextAction::array(0, new NextAction("icc lich king winter", ACTION_RAID +1), nullptr)));
+        NextAction::array(0, new NextAction("icc lich king winter", ACTION_RAID +5), nullptr)));
 
     triggers.push_back(new TriggerNode("icc lich king adds",
         NextAction::array(0, new NextAction("icc lich king adds", ACTION_RAID +2), nullptr)));
