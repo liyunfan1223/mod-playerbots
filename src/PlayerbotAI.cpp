@@ -2703,6 +2703,8 @@ bool PlayerbotAI::HasAura(uint32 spellId, Unit const* unit)
     // return false;
 }
 
+// SAW
+
 Aura* PlayerbotAI::GetAura(std::string const name, Unit* unit, bool checkIsOwner, bool checkDuration, int checkStack)
 {
     if (!unit)
@@ -2714,7 +2716,7 @@ Aura* PlayerbotAI::GetAura(std::string const name, Unit* unit, bool checkIsOwner
 
     wstrToLower(wnamepart);
 
-    for (uint32 auraType = SPELL_AURA_BIND_SIGHT; auraType < TOTAL_AURAS; auraType++)
+    for (uint32 auraType = SPELL_AURA_BIND_SIGHT; auraType < TOTAL_AURAS; ++auraType)
     {
         Unit::AuraEffectList const& auras = unit->GetAuraEffectsByType((AuraType)auraType);
         if (auras.empty())
@@ -2723,36 +2725,28 @@ Aura* PlayerbotAI::GetAura(std::string const name, Unit* unit, bool checkIsOwner
         for (AuraEffect const* aurEff : auras)
         {
             SpellInfo const* spellInfo = aurEff->GetSpellInfo();
+            std::string const& auraName = spellInfo->SpellName[0];
 
-            std::string const auraName = spellInfo->SpellName[0];
+            // Directly skip if name mismatch (both length and content)
             if (auraName.empty() || auraName.length() != wnamepart.length() || !Utf8FitTo(auraName, wnamepart))
                 continue;
 
-            if (IsRealAura(bot, aurEff, unit))
-            {
-                if (checkIsOwner && aurEff)
-                {
-                    if (aurEff->GetCasterGUID() != bot->GetGUID())
-                        continue;
-                }
+            if (!IsRealAura(bot, aurEff, unit))
+                continue;
 
-                if (checkDuration && aurEff)
-                {
-                    if (aurEff->GetBase()->GetDuration() == -1)
-                    {
-                        continue;
-                    }
-                }
+            // Check owner if necessary
+            if (checkIsOwner && aurEff->GetCasterGUID() != bot->GetGUID())
+                continue;
 
-                if (checkStack != -1 && aurEff)
-                {
-                    if (aurEff->GetBase()->GetStackAmount() < checkStack)
-                    {
-                        continue;
-                    }
-                }
-                return aurEff->GetBase();
-            }
+            // Check duration if necessary
+            if (checkDuration && aurEff->GetBase()->GetDuration() == -1)
+                continue;
+
+            // Check stack if necessary
+            if (checkStack != -1 && aurEff->GetBase()->GetStackAmount() < checkStack)
+                continue;
+
+            return aurEff->GetBase();
         }
     }
 
@@ -2768,15 +2762,14 @@ bool PlayerbotAI::HasAnyAuraOf(Unit* player, ...)
     va_start(vl, player);
 
     const char* cur;
-    do
+    while ((cur = va_arg(vl, const char*)) != nullptr)
     {
-        cur = va_arg(vl, const char*);
-        if (cur && HasAura(cur, player))
+        if (HasAura(cur, player))
         {
             va_end(vl);
             return true;
         }
-    } while (cur);
+    }
 
     va_end(vl);
     return false;
