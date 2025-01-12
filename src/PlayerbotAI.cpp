@@ -328,13 +328,14 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     if (currentSpell && currentSpell->GetSpellInfo() && currentSpell->getState() == SPELL_STATE_PREPARING)
     {
         const SpellInfo* spellInfo = currentSpell->GetSpellInfo();
-        
+        Unit* spellTarget = currentSpell->m_targets.GetUnitTarget();
         // interrupt if target is dead
-        if (currentSpell->m_targets.GetUnitTarget() && !currentSpell->m_targets.GetUnitTarget()->IsAlive() &&
+        if (spellTarget && !spellTarget->IsAlive() &&
             !spellInfo->IsAllowingDeadTarget())
         {
             InterruptSpell();
             SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+            return;
         }
 
         bool isHeal = false;
@@ -357,10 +358,16 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             }
         }
         // interrupt if target ally has full health (heal by other member)
-        if (isHeal && isSingleTarget && currentSpell->m_targets.GetUnitTarget() && currentSpell->m_targets.GetUnitTarget()->IsFullHealth())
+        if (isHeal && isSingleTarget && spellTarget && spellTarget->IsFullHealth())
         {
             InterruptSpell();
             SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+            return;
+        }
+
+        if (spellTarget && !bot->HasInArc(CAST_ANGLE_IN_FRONT, spellTarget) && (spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT))
+        {
+            sServerFacade->SetFacingTo(bot, spellTarget);
         }
 
         // wait for spell cast
