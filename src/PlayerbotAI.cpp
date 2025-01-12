@@ -5940,10 +5940,12 @@ uint32 PlayerbotAI::GetReactDelay()
         if (sPlayerbotAIConfig->fastReactInBG && inBG)
             return base;
 
-        if (!bot->IsInCombat())
+        bool inCombat = bot->IsInCombat();
+
+        if (!inCombat)
             return base * 10.0f;
 
-        else if (bot->IsInCombat())
+        else if (inCombat)
             return base * 2.5f;
 
         return base;
