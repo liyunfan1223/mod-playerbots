@@ -24,7 +24,7 @@ protected:
     // const int32 setGrindInterval = 5 * 60 * 1000;
     // const int32 setNpcInterval = 1 * 60 * 1000;
     const int32 statusNearNpcDuration = 5 * 60 * 1000;
-    const int32 statusNearRandomDuration = 2 * 60 * 1000;
+    const int32 statusNearRandomDuration = 5 * 60 * 1000;
     const int32 statusRestDuration = 30 * 1000;
     WorldPosition SelectRandomGrindPos();
     WorldPosition SelectRandomInnKeeperPos();
