@@ -334,7 +334,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             !spellInfo->IsAllowingDeadTarget())
         {
             InterruptSpell();
-            SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+            YieldThread(GetReactDelay());
             return;
         }
 
@@ -361,7 +361,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         if (isHeal && isSingleTarget && spellTarget && spellTarget->IsFullHealth())
         {
             InterruptSpell();
-            SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+            YieldThread(GetReactDelay());
             return;
         }
 
