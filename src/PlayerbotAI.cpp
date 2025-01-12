@@ -231,88 +231,90 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     else
         nextAICheckDelay = 0;
 
-    // Early return
-    if (!bot ||
-        !CanUpdateAI() ||
-        !bot->IsInWorld() ||
-        !bot->GetSession() ||
-        bot->GetSession()->isLogingOut() ||
-        bot->IsDuringRemoveFromWorld())
-    {
+    // Early return if bot is in invalid state
+    if (!bot || !bot->IsInWorld() || !bot->GetSession() || bot->GetSession()->isLogingOut() || bot->IsDuringRemoveFromWorld())
         return;
-    }
 
-    // Cheat options (set bot health and power if cheats are enabled)
-    if (bot->IsAlive() && ((uint32)GetCheat() > 0 || (uint32)sPlayerbotAIConfig->botCheatMask > 0))
+    // Handle cheat options (set bot health and power if cheats are enabled)
+    if (bot->IsAlive() && (static_cast<uint32>(GetCheat()) > 0 || static_cast<uint32>(sPlayerbotAIConfig->botCheatMask) > 0))
     {
         if (HasCheat(BotCheatMask::health))
             bot->SetFullHealth();
+
         if (HasCheat(BotCheatMask::mana) && bot->getPowerType() == POWER_MANA)
             bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
+
         if (HasCheat(BotCheatMask::power) && bot->getPowerType() != POWER_MANA)
             bot->SetPower(bot->getPowerType(), bot->GetMaxPower(bot->getPowerType()));
     }
 
+    if (!CanUpdateAI())
+        return;
+
     AllowActivity();
 
-    // Spell handling
+    // Handle the current spell
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (!currentSpell)
         currentSpell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
 
-    if (currentSpell && currentSpell->GetSpellInfo() && currentSpell->getState() == SPELL_STATE_PREPARING)
+    if (currentSpell)
     {
         const SpellInfo* spellInfo = currentSpell->GetSpellInfo();
-        Unit* spellTarget = currentSpell->m_targets.GetUnitTarget();
-
-        // Interrupt if target is dead or the spell is not allowed on dead targets
-        if (spellTarget && !spellTarget->IsAlive() && !spellInfo->IsAllowingDeadTarget())
+        if (spellInfo && currentSpell->getState() == SPELL_STATE_PREPARING)
         {
-            InterruptSpell();
-            YieldThread(GetReactDelay());
-            return;
-        }
-
-        bool isHeal = false;
-        bool isSingleTarget = true;
-
-        // Check spell effects for healing and target type
-        for (uint8 i = 0; i < 3 && !isHeal; ++i)  // Stop once a healing effect is found
-        {
-            const auto& effect = spellInfo->Effects[i];
-            if (!effect.Effect)
-                continue;
-
-            if (effect.Effect == SPELL_EFFECT_HEAL || effect.Effect == SPELL_EFFECT_HEAL_MAX_HEALTH || effect.Effect == SPELL_EFFECT_HEAL_MECHANICAL)
-                isHeal = true;
-            
-            if ((effect.TargetA.GetTarget() && effect.TargetA.GetTarget() != TARGET_UNIT_TARGET_ALLY) || 
-                (effect.TargetB.GetTarget() && effect.TargetB.GetTarget() != TARGET_UNIT_TARGET_ALLY))
+            Unit* spellTarget = currentSpell->m_targets.GetUnitTarget();
+            // Interrupt if target is dead or spell can't target dead units
+            if (spellTarget && !spellTarget->IsAlive() && !spellInfo->IsAllowingDeadTarget())
             {
-                isSingleTarget = false;
+                InterruptSpell();
+                YieldThread(GetReactDelay());
+                return;
             }
-        }
 
-        // Interrupt if target ally has full health (healed by another member)
-        if (isHeal && isSingleTarget && spellTarget && spellTarget->IsFullHealth())
-        {
-            InterruptSpell();
+            bool isHeal = false;
+            bool isSingleTarget = true;
+
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                if (!spellInfo->Effects[i].Effect)
+                    continue;
+
+                // Check if spell is a heal
+                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL ||
+                    spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+                    spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_MECHANICAL)
+                    isHeal = true;
+
+                // Check if spell is single-target
+                if ((spellInfo->Effects[i].TargetA.GetTarget() && spellInfo->Effects[i].TargetA.GetTarget() != TARGET_UNIT_TARGET_ALLY) || 
+                    (spellInfo->Effects[i].TargetB.GetTarget() && spellInfo->Effects[i].TargetB.GetTarget() != TARGET_UNIT_TARGET_ALLY))
+                {
+                    isSingleTarget = false;
+                }
+            }
+
+            // Interrupt if target ally has full health (heal by other member)
+            if (isHeal && isSingleTarget && spellTarget && spellTarget->IsFullHealth())
+            {
+                InterruptSpell();
+                YieldThread(GetReactDelay());
+                return;
+            }
+
+            // Ensure bot is facing target if necessary
+            if (spellTarget && !bot->HasInArc(CAST_ANGLE_IN_FRONT, spellTarget) && (spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT))
+            {
+                sServerFacade->SetFacingTo(bot, spellTarget);
+            }
+
+            // Wait for spell cast
             YieldThread(GetReactDelay());
             return;
         }
-
-        // Ensure the bot is facing the target if needed
-        if (spellTarget && !bot->HasInArc(CAST_ANGLE_IN_FRONT, spellTarget) && (spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT))
-        {
-            sServerFacade->SetFacingTo(bot, spellTarget);
-        }
-
-        // Wait for spell cast
-        YieldThread(GetReactDelay());
-        return;
     }
 
-    // Transport check (optimized for clarity)
+    // Handle transport check delay
     if (nextTransportCheck > elapsed)
         nextTransportCheck -= elapsed;
     else
@@ -323,6 +325,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         nextTransportCheck = 1000;
         Transport* newTransport = bot->GetMap()->GetTransportForPos(bot->GetPhaseMask(), bot->GetPositionX(),
                                                                     bot->GetPositionY(), bot->GetPositionZ(), bot);
+
         if (newTransport != bot->GetTransport())
         {
             LOG_DEBUG("playerbots", "Bot {} is on a transport", bot->GetName());
@@ -337,50 +340,55 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         }
     }
 
-    // Group validation (optimized into a separate method for clarity)
+    // Update the bot's group status (moved to helper function)
     UpdateAIGroupMembership();
 
-    // Execute internal AI update logic
-    bool min = minimal;
-    UpdateAIInternal(elapsed, min);
+    // Update internal AI
+    UpdateAIInternal(elapsed, minimal);
     YieldThread(GetReactDelay());
 }
 
 // Helper function for UpdateAI to check group membership and handle removal if necessary
 void PlayerbotAI::UpdateAIGroupMembership()
 {
-    if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup() && !bot->GetGroup()->isLFGGroup())
+    if (bot->GetGroup())
     {
-        Player* leader = bot->GetGroup()->GetLeader();
-        if (leader && leader != bot) // Check if the leader is valid and is not the bot itself
+        // Handle non-LFG group scenario
+        if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && !bot->GetGroup()->isLFGGroup())
         {
-            PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
-            if (leaderAI && !leaderAI->IsRealPlayer())
+            Player* leader = bot->GetGroup()->GetLeader();
+            if (leader && leader != bot)
+            {
+                PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
+                if (leaderAI && !leaderAI->IsRealPlayer())
+                {
+                    bot->RemoveFromGroup();
+                    ResetStrategies();
+                }
+            }
+        }
+        // Handle LFG group scenario
+        else if (bot->GetGroup()->isLFGGroup())
+        {
+            bool hasRealPlayer = false;
+            for (GroupReference* ref = bot->GetGroup()->GetFirstMember(); ref; ref = ref->next())
+            {
+                Player* member = ref->GetSource();
+                if (member)
+                {
+                    PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
+                    if (memberAI && memberAI->IsRealPlayer())
+                    {
+                        hasRealPlayer = true;
+                        break;
+                    }
+                }
+            }
+            if (!hasRealPlayer)
             {
                 bot->RemoveFromGroup();
                 ResetStrategies();
             }
-        }
-    }
-
-    if (bot->GetGroup() && bot->GetGroup()->isLFGGroup())
-    {
-        bool hasRealPlayer = false;
-        for (GroupReference* ref = bot->GetGroup()->GetFirstMember(); ref; ref = ref->next())
-        {
-            Player* member = ref->GetSource();
-            if (!member)
-                continue;
-            PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
-            if (memberAI && !memberAI->IsRealPlayer())
-                continue;
-            hasRealPlayer = true;
-            break;
-        }
-        if (!hasRealPlayer)
-        {
-            bot->RemoveFromGroup();
-            ResetStrategies();
         }
     }
 }
