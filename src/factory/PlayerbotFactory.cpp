@@ -2185,6 +2185,7 @@ void PlayerbotFactory::InitSkills()
     uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;
     SetRandomSkill(SKILL_DEFENSE);
+    SetRandomSkill(SKILL_UNARMED);
     switch (bot->getClass())
     {
         case CLASS_DRUID:
@@ -2328,8 +2329,8 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 
     uint16 step = bot->GetSkillValue(id) ? bot->GetSkillStep(id) : 1;
 
-    if (!bot->HasSkill(id) || value > curValue)
-        bot->SetSkill(id, step, value, maxValue);
+    // if (!bot->HasSkill(id) || value > curValue)
+    bot->SetSkill(id, step, value, maxValue);
 }
 
 void PlayerbotFactory::InitAvailableSpells()
