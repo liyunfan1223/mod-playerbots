@@ -2475,7 +2475,7 @@ void PlayerbotFactory::InitClassSpells()
         case CLASS_WARLOCK:
             bot->learnSpell(687, true);
             bot->learnSpell(686, true);
-            bot->learnSpell(688, true);  // summon imp
+            bot->learnSpell(688, false);  // summon imp
             if (level >= 10)
             {
                 bot->learnSpell(697, false);  // summon voidwalker
