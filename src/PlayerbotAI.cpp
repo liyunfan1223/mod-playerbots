@@ -5937,17 +5937,14 @@ uint32 PlayerbotAI::GetReactDelay()
             return base;
 
         bool inBG = bot->InBattleground() || bot->InArena();
-        if (HasRealPlayerMaster() || (sPlayerbotAIConfig->fastReactInBG && inBG))
+        if (sPlayerbotAIConfig->fastReactInBG && inBG)
             return base;
 
-        bool inCombat = bot->IsInCombat();
-        bool useMinimumDelay = false;
+        if (!bot->IsInCombat())
+            return base * 10.0f;
 
-        if (bot && !inCombat)
-            useMinimumDelay = true;
-
-        if (useMinimumDelay)
-            return base * 10;
+        else if (bot->IsInCombat())
+            return base * 2.5f;
 
         return base;
     }
@@ -5962,8 +5959,7 @@ uint32 PlayerbotAI::GetReactDelay()
 
     if (inBG)
     {
-        bool inCombat = bot->IsInCombat() || currentState == BOT_STATE_COMBAT;
-        if (inCombat)
+        if (bot->IsInCombat() || currentState == BOT_STATE_COMBAT)
         {
             multiplier = sPlayerbotAIConfig->fastReactInBG ? 2.5f : 5.0f;
             return base * multiplier;
