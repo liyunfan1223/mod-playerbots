@@ -2650,7 +2650,7 @@ bool PlayerbotAI::HasAura(std::string const name, Unit* unit, bool maxStack, boo
                     continue;
 
                 // Check aura duration if necessary
-                if (checkDuration && aurEff && aurEff->GetBase()->GetDuration() == -1)
+                if (checkDuration && aurEff->GetBase()->GetDuration() == -1)
                     continue;
 
                 // Count stacks and charges
