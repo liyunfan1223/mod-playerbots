@@ -379,6 +379,7 @@ public:
     virtual ~PlayerbotAI();
 
     void UpdateAI(uint32 elapsed, bool minimal = false) override;
+    void UpdateAIGroupMembership();
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
 
     std::string const HandleRemoteCommand(std::string const command);
