@@ -2867,7 +2867,7 @@ void PlayerbotFactory::InitMounts()
             fast = {23225, 23223, 23222};
             break;
         case RACE_TROLL:
-            slow = {10796, 10799, 8395, 472};
+            slow = {10796, 10799, 8395};
             fast = {23241, 23242, 23243};
             break;
         case RACE_DRAENEI:
