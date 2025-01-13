@@ -811,7 +811,7 @@ void PlayerbotFactory::InitPet()
             {
                 if (petStable->CurrentPet)
                 {
-                    petStable->CurrentPet.value();
+                    (void)petStable->CurrentPet.value(); // Explicitly ignore the return value
                     // petStable->CurrentPet.reset();
                     bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
                     bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
