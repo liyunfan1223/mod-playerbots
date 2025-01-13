@@ -679,7 +679,7 @@ void RandomPlayerbotFactory::CreateAccount(const std::string& accountName)
 void RandomPlayerbotFactory::CreateBotCharacters(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
 {
     uint32 totalRandomBotChars = 0;
-    uint32 totalCharCount = sPlayerbotAIConfig->randomBotAccountCount * 10;
+
     std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
     int bot_creation = 0;
