@@ -732,17 +732,25 @@ bool IccLichKingWinterTrigger::IsActive()
     // Check for either Remorseless Winter
     bool hasWinterAura = boss->HasAura(72259) || boss->HasAura(74273) || boss->HasAura(74274) || boss->HasAura(74275);
     bool hasWinter2Aura = boss->HasAura(68981) || boss->HasAura(74270) || boss->HasAura(74271) || boss->HasAura(74272);
+    bool isCasting = boss->HasUnitState(UNIT_STATE_CASTING);
+    bool isWinter = boss->FindCurrentSpellBySpellId(77259) || boss->FindCurrentSpellBySpellId(74273) || boss->FindCurrentSpellBySpellId(68981) || boss->FindCurrentSpellBySpellId(74270) ||
+                    boss->FindCurrentSpellBySpellId(74274) || boss->FindCurrentSpellBySpellId(74275) || boss->FindCurrentSpellBySpellId(74271) || boss->FindCurrentSpellBySpellId(74272);
 
-    if (!hasWinterAura && !hasWinter2Aura)
-        return false;   
+    if (hasWinterAura || hasWinter2Aura)
+        return true;   
 
-    return true;
+    if (isCasting && isWinter)
+        return true;
+
+    return false;
 }
 
 bool IccLichKingAddsTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
-    if (!boss) 
+    Unit* spiritWarden = AI_VALUE2(Unit*, "find target", "spirit warden");
+
+    if (!boss && !spiritWarden)  
         return false;
 
     return true;
