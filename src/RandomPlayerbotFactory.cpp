@@ -525,7 +525,7 @@ void RandomPlayerbotFactory::DeleteBotCharacters(uint32 accountId)
             Field* fields = charactersResult->Fetch();
             uint64 charGuid = fields[0].Get<uint64>();
             LOG_INFO("playerbots", "Deleting character guid: {}", charGuid);
-            Player::DeleteFromDB(charGuid, accountId, false);
+            Player::DeleteFromDB(charGuid, accountId, false, true);
         } while (charactersResult->NextRow());
     }
 }
