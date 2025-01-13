@@ -49,15 +49,24 @@ public:
     RandomPlayerbotFactory(uint32 accountId);
     virtual ~RandomPlayerbotFactory() {}
 
-    Player* CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& names);
+    Player* CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
     static void CreateRandomBots();
+    static void DeleteRandomBotAccounts();
     static void CreateRandomGuilds();
-    static void CreateRandomArenaTeams(ArenaType slot, uint32 count);
-    static std::string const CreateRandomGuildName();
+    static void CreateRandomArenaTeams(ArenaType type, uint32 count);
 
 private:
     std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
+    static std::string const CreateRandomGuildName();
     static std::string const CreateRandomArenaTeamName();
+    static void CreateNameCache(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
+    static uint32 GetNextBotAccountCounter();
+    static void CreateBotAccounts(uint32& botAccountCounter);
+    static void CreateAccount(const std::string& accountName);
+    static void CreateBotCharacters(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
+    static std::vector<uint32> GetBotAccountIds();
+    static void DeleteBotCharacters(uint32 accountId);
+    static uint8 SelectRandomRace(uint8 cls, bool alliance);
 
     uint32 accountId;
     static std::map<uint8, std::vector<uint8>> availableRaces;
