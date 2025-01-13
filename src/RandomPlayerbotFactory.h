@@ -54,10 +54,10 @@ public:
     static void DeleteRandomBotAccounts();
     static void CreateRandomGuilds();
     static void CreateRandomArenaTeams(ArenaType type, uint32 count);
+    static std::string const CreateRandomGuildName();
 
 private:
     std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
-    static std::string const CreateRandomGuildName();
     static std::string const CreateRandomArenaTeamName();
     static void CreateNameCache(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
     static uint32 GetNextBotAccountCounter();
