@@ -351,41 +351,46 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 // Helper function for UpdateAI to check group membership and handle removal if necessary
 void PlayerbotAI::UpdateAIGroupMembership()
 {
-    if (bot && bot->GetGroup())
-    {
-        if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup() && !bot->GetGroup()->isLFGGroup())
-        {
-            Player* leader = bot->GetGroup()->GetLeader();
-            if (leader && leader != bot) // Checks if the leader is valid and is not the bot itself
-            {
-                PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
-                if (leaderAI && !leaderAI->IsRealPlayer())
-                {
-                    bot->RemoveFromGroup();
-                    ResetStrategies();
-                }
-            }
-        }
+    if (!bot || !bot->GetGroup())
+        return;
 
-        if (bot->GetGroup() && bot->GetGroup()->isLFGGroup())
+    Group* group = bot->GetGroup();
+
+    if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && !group->isLFGGroup())
+    {
+        Player* leader = group->GetLeader();
+        if (leader && leader != bot)  // Ensure the leader is valid and not the bot itself
         {
-            bool hasRealPlayer = false;
-            for (GroupReference* ref = bot->GetGroup()->GetFirstMember(); ref; ref = ref->next())
-            {
-                Player* member = ref->GetSource();
-                if (!member)
-                    continue;
-                PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
-                if (memberAI && !memberAI->IsRealPlayer())
-                    continue;
-                hasRealPlayer = true;
-                break;
-            }
-            if (!hasRealPlayer)
+            PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
+            if (leaderAI && !leaderAI->IsRealPlayer())
             {
                 bot->RemoveFromGroup();
                 ResetStrategies();
             }
+        }
+    }
+    else if (group->isLFGGroup())
+    {
+        bool hasRealPlayer = false;
+
+        // Iterate over all group members to check if at least one is a real player
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member)
+                continue;
+
+            PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
+            if (memberAI && !memberAI->IsRealPlayer())
+                continue;
+
+            hasRealPlayer = true;
+            break;
+        }
+        if (!hasRealPlayer)
+        {
+            bot->RemoveFromGroup();
+            ResetStrategies();
         }
     }
 }
