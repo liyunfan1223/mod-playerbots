@@ -2185,6 +2185,7 @@ void PlayerbotFactory::InitSkills()
     uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;
     SetRandomSkill(SKILL_DEFENSE);
+    SetRandomSkill(SKILL_UNARMED);
     switch (bot->getClass())
     {
         case CLASS_DRUID:
@@ -2328,8 +2329,8 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 
     uint16 step = bot->GetSkillValue(id) ? bot->GetSkillStep(id) : 1;
 
-    if (!bot->HasSkill(id) || value > curValue)
-        bot->SetSkill(id, step, value, maxValue);
+    // if (!bot->HasSkill(id) || value > curValue)
+    bot->SetSkill(id, step, value, maxValue);
 }
 
 void PlayerbotFactory::InitAvailableSpells()
@@ -2475,7 +2476,7 @@ void PlayerbotFactory::InitClassSpells()
         case CLASS_WARLOCK:
             bot->learnSpell(687, true);
             bot->learnSpell(686, true);
-            bot->learnSpell(688, true);  // summon imp
+            bot->learnSpell(688, false);  // summon imp
             if (level >= 10)
             {
                 bot->learnSpell(697, false);  // summon voidwalker
@@ -2867,7 +2868,7 @@ void PlayerbotFactory::InitMounts()
             fast = {23225, 23223, 23222};
             break;
         case RACE_TROLL:
-            slow = {10796, 10799, 8395, 472};
+            slow = {10796, 10799, 8395};
             fast = {23241, 23242, 23243};
             break;
         case RACE_DRAENEI:

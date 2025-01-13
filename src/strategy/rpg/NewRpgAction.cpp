@@ -18,8 +18,11 @@
 
 bool TellRpgStatusAction::Execute(Event event)
 {
+    Player* owner = event.getOwner();
+    if (!owner)
+        return false;
     std::string out = botAI->rpgInfo.ToString();
-    botAI->TellMasterNoFacing(out);
+    bot->Whisper(out.c_str(), LANG_UNIVERSAL, owner);
     return true;
 }
 
