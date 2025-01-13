@@ -805,20 +805,24 @@ void PlayerbotFactory::InitPet()
                 continue;
             uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
             uint32 pet_number = sObjectMgr->GeneratePetNumber();
-            if (bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
+
+            if (const PetStable* petStable = bot->GetPetStable())
             {
-                bot->GetPetStable()->CurrentPet.value();
-                // bot->GetPetStable()->CurrentPet.reset();
-                bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
-                bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+                if (petStable->CurrentPet)
+                {
+                    petStable->CurrentPet.value();
+                    // petStable->CurrentPet.reset();
+                    bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
+                    bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+                }
+                if (petStable->GetUnslottedHunterPet())
+                {
+                    petStable->UnslottedPets.clear();
+                    bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
+                    bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+                }
             }
-            if (bot->GetPetStable() && bot->GetPetStable()->GetUnslottedHunterPet())
-            {
-                bot->GetPetStable()->UnslottedPets.clear();
-                bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
-                bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
-            }
-            // }
+
             pet = bot->CreateTamedPetFrom(co->Entry, 0);
             if (!pet)
             {
