@@ -78,7 +78,7 @@ void PlayerbotFactory::Init()
 
             if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
                 continue;
-            
+
             if (quest->GetRewSpellCast() > 0)
             {
                 int32 spellId = quest->GetRewSpellCast();
@@ -806,7 +806,8 @@ void PlayerbotFactory::InitPet()
             uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
             uint32 pet_number = sObjectMgr->GeneratePetNumber();
 
-            if (const PetStable* petStable = bot->GetPetStable())
+            PetStable* petStable = bot->GetPetStable();
+            if (petStable)
             {
                 if (petStable->CurrentPet)
                 {
@@ -1716,7 +1717,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                 continue;
         }
 
-        
+
         if (oldItem)
         {
             uint8 bagIndex = oldItem->GetBagSlot();
@@ -4003,7 +4004,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 bool isJewelersGem = gemTemplate->ItemLimitCategory == 2;
                 if (isJewelersGem && jewelersCount >= 3)
                     continue;
-                
+
                 const GemPropertiesEntry* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
                 if (!gemProperties)
                     continue;
