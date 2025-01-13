@@ -351,7 +351,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 // Helper function for UpdateAI to check group membership and handle removal if necessary
 void PlayerbotAI::UpdateAIGroupMembership()
 {
-    if (bot->GetGroup())
+    if (bot && bot->GetGroup())
     {
         if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup() && !bot->GetGroup()->isLFGGroup())
         {
