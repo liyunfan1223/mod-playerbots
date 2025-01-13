@@ -1098,8 +1098,6 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         return true;
     }
 
-    SetEventValue(bot, "login", 0, 0);
-
     if (!player->IsInWorld())
         return false;
 
