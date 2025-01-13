@@ -691,7 +691,7 @@ void RandomPlayerbotFactory::CreateBotCharacters(std::unordered_map<NameRaceAndG
         sPlayerbotAIConfig->randomBotAccounts.push_back(accountId);
 
         uint32 count = AccountMgr::GetCharactersCount(accountId);
-        if (count >= sPlayerbotAIConfig->maxCharactersPerAccount) // Check against the config value
+        if (count >= sPlayerbotAIConfig->MaxAddedBots) // Check against the config value
         {
             continue;
         }
