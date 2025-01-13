@@ -501,7 +501,7 @@ void RandomPlayerbotFactory::DeleteRandomBotAccounts()
 void RandomPlayerbotFactory::DeleteBotCharacters(uint32 accountId)
 {
     // Retrieve the account name from the database
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_USERNAME_BY_ACCOUNT_ID);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_USERNAME_BY_ID);
     stmt->SetData(0, accountId);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
