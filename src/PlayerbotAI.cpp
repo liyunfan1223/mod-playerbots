@@ -353,11 +353,10 @@ void PlayerbotAI::UpdateAIGroupMembership()
 {
     if (bot->GetGroup())
     {
-        // Handle non-LFG group scenario
-        if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && !bot->GetGroup()->isLFGGroup())
+        if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup() && !bot->GetGroup()->isLFGGroup())
         {
             Player* leader = bot->GetGroup()->GetLeader();
-            if (leader && leader != bot)
+            if (leader && leader != bot) // Checks if the leader is valid and is not the bot itself
             {
                 PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
                 if (leaderAI && !leaderAI->IsRealPlayer())
@@ -367,22 +366,20 @@ void PlayerbotAI::UpdateAIGroupMembership()
                 }
             }
         }
-        // Handle LFG group scenario
-        else if (bot->GetGroup()->isLFGGroup())
+
+        if (bot->GetGroup() && bot->GetGroup()->isLFGGroup())
         {
             bool hasRealPlayer = false;
             for (GroupReference* ref = bot->GetGroup()->GetFirstMember(); ref; ref = ref->next())
             {
                 Player* member = ref->GetSource();
-                if (member)
-                {
-                    PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
-                    if (memberAI && memberAI->IsRealPlayer())
-                    {
-                        hasRealPlayer = true;
-                        break;
-                    }
-                }
+                if (!member)
+                    continue;
+                PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
+                if (memberAI && !memberAI->IsRealPlayer())
+                    continue;
+                hasRealPlayer = true;
+                break;
             }
             if (!hasRealPlayer)
             {
