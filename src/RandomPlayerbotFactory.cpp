@@ -151,31 +151,42 @@ RandomPlayerbotFactory::RandomPlayerbotFactory(uint32 accountId) : accountId(acc
     }
 }
 
+/**
+ * @brief Create a random bot character.
+ *
+ * This function creates a random bot character for the given class. It generates a random gender and race,
+ * creates a random bot name, initializes the player object, and saves it to the database.
+ *
+ * Example:
+ * If cls = CLASS_WARRIOR, the function will create a random bot character of class warrior with a random gender,
+ * race, and name.
+ *
+ * @param session The WorldSession for the bot.
+ * @param cls The class of the bot to be created.
+ * @param nameCache A cache of names for each race and gender combination.
+ * @return A pointer to the created Player object, or nullptr if the creation failed.
+ */
 Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
 {
     LOG_DEBUG("playerbots", "Creating new random bot for class {}", cls);
 
+    // Generate a random gender (0 for male, 1 for female)
     uint8 gender = rand() % 2 ? GENDER_MALE : GENDER_FEMALE;
-    bool alliance = rand() % 2 ? true : false;
-    std::vector<uint8> raceOptions;
-    for (const auto& race : availableRaces[cls])
-    {
-        if (alliance == IsAlliance(race))
-        {
-            raceOptions.push_back(race);
-        }
-    }
 
-    if (raceOptions.empty())
+    // Generate a random alliance flag
+    bool alliance = rand() % 2 ? true : false;
+
+    // Select a random race based on the alliance flag
+    uint8 race = SelectRandomRace(cls, alliance);
+    if (race == 0)
     {
-        LOG_ERROR("playerbots", "No races available for class: {}", cls);
         return nullptr;
     }
 
-    uint8 race = raceOptions[urand(0, raceOptions.size() - 1)];
-
+    // Combine the race and gender to create a unique identifier
     const auto raceAndGender = CombineRaceAndGender(gender, race);
 
+    // Retrieve or generate a random bot name
     std::string name;
     if (nameCache.empty())
     {
@@ -193,12 +204,15 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         swap(nameCache[raceAndGender][i], nameCache[raceAndGender].back());
         nameCache[raceAndGender].pop_back();
     }
+
+    // Check if the name creation was successful
     if (name.empty())
     {
         LOG_ERROR("playerbots", "Unable to get random bot name!");
         return nullptr;
     }
 
+    // Collect customization options (skin color, face, hair, facial hair) based on the race and gender
     std::vector<uint8> skinColors, facialHairTypes;
     std::vector<std::pair<uint8, uint8>> faces, hairs;
     for (CharSectionsEntry const* charSection : sCharSectionsStore)
@@ -223,17 +237,21 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         }
     }
 
+    // Select random customization options
     uint8 skinColor = skinColors[urand(0, skinColors.size() - 1)];
     std::pair<uint8, uint8> face = faces[urand(0, faces.size() - 1)];
     std::pair<uint8, uint8> hair = hairs[urand(0, hairs.size() - 1)];
 
+    // Determine if facial hair should be excluded
     bool excludeCheck = (race == RACE_TAUREN) || (race == RACE_DRAENEI) ||
                         (gender == GENDER_FEMALE && race != RACE_NIGHTELF && race != RACE_UNDEAD_PLAYER);
     uint8 facialHair = excludeCheck ? 0 : facialHairTypes[urand(0, facialHairTypes.size() - 1)];
 
+    // Create a CharacterCreateInfo object with the collected information
     std::unique_ptr<CharacterCreateInfo> characterInfo = std::make_unique<CharacterCreateInfo>(
         name, race, cls, gender, face.second, face.first, hair.first, hair.second, facialHair);
 
+    // Create a new Player object and initialize it
     Player* player = new Player(session);
     player->GetMotionMaster()->Initialize();
     if (!player->Create(sObjectMgr->GetGenerator<HighGuid::Player>().Generate(), characterInfo.get()))
@@ -246,17 +264,48 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         return nullptr;
     }
 
+    // Set various player flags and initialize stats
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
 
+    // Learn specific spells for certain classes
     if (player->getClass() == CLASS_DEATH_KNIGHT)
     {
         player->learnSpell(50977, false);
     }
+
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId,
               name.c_str(), race, cls);
 
+    // Return the created player object
     return player;
+}
+
+/**
+ * @brief Filter available races based on the alliance flag and select a random race.
+ *
+ * @param cls The class of the bot to be created.
+ * @param alliance The alliance flag (true for alliance, false for horde).
+ * @return A random race for the given class and alliance flag.
+ */
+uint8 RandomPlayerbotFactory::SelectRandomRace(uint8 cls, bool alliance)
+{
+    std::vector<uint8> raceOptions;
+    for (const auto& race : availableRaces[cls])
+    {
+        if (alliance == IsAlliance(race))
+        {
+            raceOptions.push_back(race);
+        }
+    }
+
+    if (raceOptions.empty())
+    {
+        LOG_ERROR("playerbots", "No races available for class: {}", cls);
+        return 0;
+    }
+
+    return raceOptions[urand(0, raceOptions.size() - 1)];
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender raceAndGender)
@@ -369,59 +418,128 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
     return std::move(botName);
 }
 
+/**
+ * @brief Create random bot accounts and characters.
+ *
+ * This function creates random bot accounts and characters based on the configuration.
+ * It first checks if random bot accounts should be deleted and calls DeleteRandomBotAccounts if true.
+ * It then creates a cache of names, gets the next bot account counter, creates new bot accounts,
+ * and creates random bot characters.
+ *
+ * Example:
+ * If sPlayerbotAIConfig->randomBotAccountPrefix = "RNDBOT" and sPlayerbotAIConfig->randomBotAccountCount = 100,
+ * the function will create 100 random bot accounts and characters.
+ */
 void RandomPlayerbotFactory::CreateRandomBots()
 {
-    // Get all bot accounts based on the botAccountPrefix
-    QueryResult botAccountsResult = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'",
-                                                        sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
-    std::vector<uint32> botAccountIds;
-    if (botAccountsResult)
-    {
-        do
-        {
-            Field* fields = botAccountsResult->Fetch();
-            uint32 accountId = fields[0].Get<uint32>();
-            botAccountIds.push_back(accountId);
-        } while (botAccountsResult->NextRow());
-    }
-
-    /* multi-thread here is meaningless? since the async db operations */
     if (sPlayerbotAIConfig->deleteRandomBotAccounts)
     {
-        std::vector<uint32> botAccounts;
-        std::vector<uint32> botFriends;
-
-        LOG_INFO("playerbots", "Deleting all random bot characters, {} accounts collected...", botAccounts.size());
-        QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'",
-                                                  sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
-        int32 deletion_count = 0;
-        if (results)
-        {
-            do
-            {
-                Field* fields = results->Fetch();
-                uint32 accId = fields[0].Get<uint32>();
-                LOG_INFO("playerbots", "Deleting account accID: {}({})...", accId, ++deletion_count);
-                AccountMgr::DeleteAccount(accId);
-            } while (results->NextRow());
-        }
-
-        PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
-        /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created
-           correctly the better way is turning the async db operation to sync db operation */
-        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
-        LOG_INFO("playerbots", "Random bot characters deleted.");
-        LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
-        World::StopNow(SHUTDOWN_EXIT_CODE);
+        DeleteRandomBotAccounts();
         return;
     }
 
     LOG_INFO("playerbots", "Creating random bot accounts...");
     std::unordered_map<NameRaceAndGender, std::vector<std::string>> nameCache;
-    uint32 totalAccCount = sPlayerbotAIConfig->randomBotAccountCount;
-    std::vector<std::future<void>> account_creations;
-    int account_creation = 0;
+    CreateNameCache(nameCache);
 
+    if (nameCache.empty())
+    {
+        LOG_ERROR("playerbots", "Failed to create name cache. Aborting random bot creation.");
+        return;
+    }
+
+    uint32 botAccountCounter = GetNextBotAccountCounter();
+
+    CreateBotAccounts(botAccountCounter);
+
+    LOG_INFO("playerbots", "Creating random bot characters...");
+    CreateBotCharacters(nameCache);
+}
+
+/**
+ * @brief Delete all random bot accounts.
+ *
+ * This function deletes all accounts with usernames that match the configured bot account prefix.
+ * It logs the deletion process, deletes associated bot characters, executes a prepared statement to delete random bots from the PlayerbotsDatabase,
+ * and stops the server.
+ */
+void RandomPlayerbotFactory::DeleteRandomBotAccounts()
+{
+    std::vector<uint32> botAccounts = GetBotAccountIds();
+    LOG_INFO("playerbots", "Deleting all random bot characters, {} accounts collected...", botAccounts.size());
+
+    int32 deletion_count = 0;
+    for (uint32 accId : botAccounts)
+    {
+        LOG_INFO("playerbots", "Deleting characters for account accID: {}({})...", accId, ++deletion_count);
+        DeleteBotCharacters(accId);
+        LOG_INFO("playerbots", "Deleting account accID: {}({})...", accId, deletion_count);
+        AccountMgr::DeleteAccount(accId);
+    }
+
+    PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
+    /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created
+           correctly the better way is turning the async db operation to sync db operation */
+    std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
+    LOG_INFO("playerbots", "Random bot characters deleted.");
+    LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
+    World::StopNow(SHUTDOWN_EXIT_CODE);
+}
+
+/**
+ * @brief Delete all characters associated with a bot account.
+ *
+ * This function deletes all characters associated with the given bot account ID.
+ * It first checks if the account is a bot account by verifying the prefix in the account name.
+ *
+ * Example:
+ * If accountId = 1 and the account name starts with the configured bot account prefix,
+ * the function will delete all characters associated with the account ID 1.
+ *
+ * @param accountId The ID of the bot account whose characters are to be deleted.
+ */
+void RandomPlayerbotFactory::DeleteBotCharacters(uint32 accountId)
+{
+    // Retrieve the account name from the database
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_USERNAME_BY_ACCOUNT_ID);
+    stmt->SetData(0, accountId);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+    if (!result)
+        return;
+
+    Field* fields = result->Fetch();
+    std::string accountName = fields[0].Get<std::string>();
+
+    // Check if the account name starts with the configured bot account prefix
+    if (accountName.find(sPlayerbotAIConfig->randomBotAccountPrefix) != 0)
+    {
+        LOG_ERROR("playerbots", "Account ID {} is not a bot account. Skipping character deletion.", accountId);
+        return;
+    }
+
+    QueryResult charactersResult = CharacterDatabase.Query("SELECT guid FROM characters WHERE account = {}", accountId);
+    if (charactersResult)
+    {
+        do
+        {
+            Field* fields = charactersResult->Fetch();
+            uint64 charGuid = fields[0].Get<uint64>();
+            LOG_INFO("playerbots", "Deleting character guid: {}", charGuid);
+            Player::DeleteFromDB(charGuid, accountId, false);
+        } while (charactersResult->NextRow());
+    }
+}
+
+/**
+ * @brief Create a cache of names for each race and gender combination.
+ *
+ * This function queries the database for names and genders from the playerbots_names table.
+ * It checks if each name is valid and adds it to the nameCache for the corresponding race and gender combination.
+ *
+ * @param nameCache A cache of names for each race and gender combination.
+ */
+void RandomPlayerbotFactory::CreateNameCache(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
+{
     LOG_INFO("playerbots", "Creating cache for names per gender and race.");
     QueryResult result = CharacterDatabase.Query("SELECT name, gender FROM playerbots_names");
     if (!result)
@@ -429,6 +547,14 @@ void RandomPlayerbotFactory::CreateRandomBots()
         LOG_ERROR("playerbots", "No more unused names left");
         return;
     }
+
+     // Estimate the number of names and reserve space in the vectors to reserve space and avoid multiple reallocations.
+    size_t estimatedSize = result->GetRowCount();
+    for (auto& entry : nameCache)
+    {
+        entry.second.reserve(estimatedSize);
+    }
+
     do
     {
         Field* fields = result->Fetch();
@@ -436,86 +562,144 @@ void RandomPlayerbotFactory::CreateRandomBots()
         NameRaceAndGender raceAndGender = static_cast<NameRaceAndGender>(fields[1].Get<uint8>());
         if (sObjectMgr->CheckPlayerName(name) == CHAR_NAME_SUCCESS)
             nameCache[raceAndGender].push_back(name);
-
     } while (result->NextRow());
+}
 
-    // Get the highest existing account ID to prevent messing with / overriding existing accounts
-    QueryResult maxAccountIdResult = LoginDatabase.Query("SELECT MAX(id) FROM account");
-    uint32 startAccountId = 0;
-    if (maxAccountIdResult)
+/**
+ * @brief Get the next available bot account counter.
+ *
+ * This function queries the database to find the highest existing bot account number
+ * based on the configured bot account prefix. It extracts the numeric suffix from the
+ * highest bot account username and calculates the next available bot account number.
+ *
+ * This is important to ensure that new bot accounts are created with unique and sequential
+ * account numbers, avoiding conflicts with existing accounts.
+ *
+ * @return The next available bot account counter.
+ */
+uint32 RandomPlayerbotFactory::GetNextBotAccountCounter()
+{
+    QueryResult botAccountsResult = LoginDatabase.Query("SELECT username FROM account WHERE username LIKE '{}%%' ORDER BY username DESC LIMIT 1",
+                                                        sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+    uint32 botAccountCounter = 1; // Initialize the bot account counter
+    if (botAccountsResult)
     {
-        Field* fields = maxAccountIdResult->Fetch();
-        startAccountId = fields[0].Get<uint32>() + 1;
+        Field* fields = botAccountsResult->Fetch();
+        std::string highestBotAccount = fields[0].Get<std::string>();
+        std::string suffix = highestBotAccount.substr(sPlayerbotAIConfig->randomBotAccountPrefix.length());
+        botAccountCounter = std::stoi(suffix) + 1;
     }
+    return botAccountCounter;
+}
 
-    for (uint32 accountNumber = startAccountId; accountNumber < startAccountId + sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
+/**
+ * @brief Create new bot accounts.
+ *
+ * This function creates new bot accounts up to the configured number of random bot accounts.
+ * It uses the botAccountCounter to determine the starting point for creating new accounts.
+ * For each new account, it constructs the account name using the configured prefix and the counter value,
+ * checks if the account already exists, and creates the account if it does not exist.
+ *
+ * Example:
+ * If sPlayerbotAIConfig->randomBotAccountPrefix = "RNDBOT" and sPlayerbotAIConfig->randomBotAccountCount = 100,
+ * and botAccountCounter = 51, the function will create accounts "RNDBOT51" to "RNDBOT100".
+ *
+ * @param botAccountCounter The starting counter value for creating new bot accounts.
+ */
+void RandomPlayerbotFactory::CreateBotAccounts(uint32& botAccountCounter)
+{
+    // Create new bot accounts if the current bot account counter is less than the configured bot account count
+    if (botAccountCounter < sPlayerbotAIConfig->randomBotAccountCount)
     {
-        std::ostringstream out;
-        out << sPlayerbotAIConfig->randomBotAccountPrefix << accountNumber;
-        std::string const accountName = out.str();
+        // Create new bot accounts until the configured bot account count is reached
+        for (uint32 i = botAccountCounter; i <= sPlayerbotAIConfig->randomBotAccountCount; ++i)
+        {
+            std::ostringstream out;
+            out << sPlayerbotAIConfig->randomBotAccountPrefix << botAccountCounter++;
+            std::string const accountName = out.str();
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
-        stmt->SetData(0, accountName);
-        PreparedQueryResult result = LoginDatabase.Query(stmt);
-        if (result)
-        {
-            continue;
-        }
-        account_creation++;
-        std::string password = "";
-        if (sPlayerbotAIConfig->randomBotRandomPassword)
-        {
-            for (int i = 0; i < 10; i++)
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
+            stmt->SetData(0, accountName);
+            PreparedQueryResult result = LoginDatabase.Query(stmt);
+            if (result)
             {
-                password += (char)urand('!', 'z');
+                continue;
             }
+            CreateAccount(accountName);
         }
-        else
-            password = accountName;
-
-        AccountMgr::CreateAccount(accountName, password);
-
-        LOG_DEBUG("playerbots", "Account {} created for random bots", accountName.c_str());
     }
+}
 
-    if (account_creation)
+/**
+ * @brief Create a new bot account.
+ *
+ * This function creates a new bot account with the given account name. It generates a password for the account
+ * based on the configuration. If the configuration specifies a random password, it generates a random 10-character
+ * password. Otherwise, it uses the account name as the password. The function then calls AccountMgr::CreateAccount
+ * to create the account in the database.
+ *
+ * Example:
+ * If accountName = "RNDBOT51" and sPlayerbotAIConfig->randomBotRandomPassword = true,
+ * the function will create an account "RNDBOT51" with a random 10-character password.
+ *
+ * @param accountName The name of the account to be created.
+ */
+void RandomPlayerbotFactory::CreateAccount(const std::string& accountName)
+{
+    std::string password = "";
+    if (sPlayerbotAIConfig->randomBotRandomPassword)
     {
-        /* wait for async accounts create to make character create correctly, same as account delete */
-        LOG_INFO("playerbots", "Waiting for {} accounts loading into database...", account_creation);
-        std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
+        for (int i = 0; i < 10; i++)
+        {
+            password += (char)urand('!', 'z');
+        }
     }
+    else
+        password = accountName;
 
-    LOG_INFO("playerbots", "Creating random bot characters...");
+    AccountMgr::CreateAccount(accountName, password);
+    LOG_DEBUG("playerbots", "Account {} created for random bots", accountName.c_str());
+}
+
+/**
+ * @brief Create random bot characters for each bot account.
+ *
+ * This function iterates over the list of bot account IDs, checks the number of characters for each account,
+ * and creates new characters if the account has fewer characters than the configured maximum.
+ * It retrieves the account name from the database and creates random bot characters for each class
+ * that the account does not already have.
+ *
+ * Example:
+ * If sPlayerbotAIConfig->randomBotAccountPrefix = "RNDBOT", sPlayerbotAIConfig->randomBotAccountCount = 100,
+ * sPlayerbotAIConfig->maxCharactersPerAccount = 10, and botAccountIds = {1, 2, 3}, the function will create
+ * random bot characters for accounts "RNDBOT1", "RNDBOT2", and "RNDBOT3" if they have fewer than 10 characters.
+ *
+ * @param nameCache A cache of names for each race and gender combination.
+ */
+void RandomPlayerbotFactory::CreateBotCharacters(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
+{
     uint32 totalRandomBotChars = 0;
     uint32 totalCharCount = sPlayerbotAIConfig->randomBotAccountCount * 10;
     std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
     int bot_creation = 0;
 
-    for (uint32 accountNumber = startAccountId; accountNumber < startAccountId + sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
+    std::vector<uint32> botAccountIds = GetBotAccountIds();
+
+    for (uint32 accountId : botAccountIds)
     {
-        std::ostringstream out;
-        out << sPlayerbotAIConfig->randomBotAccountPrefix << accountNumber;
-        std::string const accountName = out.str();
+        sPlayerbotAIConfig->randomBotAccounts.push_back(accountId);
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
-        stmt->SetData(0, accountName);
-        PreparedQueryResult result = LoginDatabase.Query(stmt);
-        if (!result)
-            continue;
-
-        sPlayerbotAIConfig->randomBotAccounts.push_back(accountNumber);
-
-        uint32 count = AccountMgr::GetCharactersCount(accountNumber);
-        if (count >= 10)
+        uint32 count = AccountMgr::GetCharactersCount(accountId);
+        if (count >= sPlayerbotAIConfig->maxCharactersPerAccount) // Check against the config value
         {
             continue;
         }
-        LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber,
+        LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", accountId,
             sPlayerbotAIConfig->randomBotAccountCount);
-        RandomPlayerbotFactory factory(accountNumber);
+        RandomPlayerbotFactory factory(accountId);
 
-        WorldSession* session = new WorldSession(accountNumber, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
+        WorldSession* session = new WorldSession(accountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
                                                  time_t(0), LOCALE_enUS, 0, false, false, 0, true);
         sessionBots.push_back(session);
 
@@ -536,7 +720,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
                 if (Player* playerBot = factory.CreateRandomBot(session, cls, nameCache))
                 {
                     playerBot->SaveToDB(true, false);
-                    sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountNumber, playerBot->GetName(),
+                    sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(),
                                                             playerBot->getGender(), playerBot->getRace(),
                                                             playerBot->getClass(), playerBot->GetLevel());
                     playerBot->CleanupsBeforeDelete();
@@ -545,7 +729,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
                 }
                 else
                 {
-                    LOG_ERROR("playerbots", "Fail to create character for account {}", accountNumber);
+                    LOG_ERROR("playerbots", "Fail to create character for account {}", accountId);
                 }
             }
         }
@@ -555,6 +739,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     {
         LOG_INFO("playerbots", "Waiting for {} characters loading into database...", bot_creation);
         /* wait for characters load into database, or characters will fail to loggin */
+        // TODO: find a better way to wait for characters to be loaded into the database
         std::this_thread::sleep_for(5s + bot_creation * 5ms);
     }
 
@@ -568,6 +753,35 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     LOG_INFO("server.loading", ">> {} random bot accounts with {} characters available",
              sPlayerbotAIConfig->randomBotAccounts.size(), totalRandomBotChars);
+}
+
+/**
+ * @brief Get the list of bot account IDs.
+ *
+ * This function queries the database for accounts with usernames that match the configured bot account prefix.
+ * It collects the IDs of these accounts and returns them in a vector.
+ *
+ * Example:
+ * If sPlayerbotAIConfig->randomBotAccountPrefix = "RNDBOT" and the database contains accounts with usernames
+ * "RNDBOT1", "RNDBOT2", and "RNDBOT3", the function will return a vector containing the IDs of these accounts.
+ *
+ * @return A vector containing the IDs of the bot accounts.
+ */
+std::vector<uint32> RandomPlayerbotFactory::GetBotAccountIds()
+{
+    std::vector<uint32> botAccountIds;
+    QueryResult botAccountsResult = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'",
+                                                        sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+    if (botAccountsResult)
+    {
+        do
+        {
+            Field* fields = botAccountsResult->Fetch();
+            uint32 accountId = fields[0].Get<uint32>();
+            botAccountIds.push_back(accountId);
+        } while (botAccountsResult->NextRow());
+    }
+    return botAccountIds;
 }
 
 void RandomPlayerbotFactory::CreateRandomGuilds()
