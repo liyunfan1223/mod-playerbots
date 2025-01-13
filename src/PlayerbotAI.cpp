@@ -4810,124 +4810,62 @@ void PlayerbotAI::Ping(float x, float y)
     }
 }
 
-// Find Poison ...Natsukawa
+// Helper function to iterate through items in the inventory and bags
+Item* PlayerbotAI::FindItemInInventory(std::function<bool(ItemTemplate const*)> checkItem) const
+{
+    // List out items in the main backpack
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+    {
+        if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        {
+            ItemTemplate const* pItemProto = pItem->GetTemplate();
+            if (pItemProto && bot->CanUseItem(pItemProto) == EQUIP_ERR_OK && checkItem(pItemProto))
+                return pItem;
+        }
+    }
+
+    // List out items in other removable backpacks
+    for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+    {
+        if (Bag const* const pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
+        {
+            for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
+            {
+                if (Item* const pItem = bot->GetItemByPos(bag, slot))
+                {
+                    ItemTemplate const* pItemProto = pItem->GetTemplate();
+                    if (pItemProto && bot->CanUseItem(pItemProto) == EQUIP_ERR_OK && checkItem(pItemProto))
+                        return pItem;
+                }
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+// Find Poison
 Item* PlayerbotAI::FindPoison() const
 {
-    // list out items in main backpack
-    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
-    {
-        if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-        {
-            ItemTemplate const* pItemProto = pItem->GetTemplate();
-            if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
-                continue;
-
-            if (pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == 6)
-                return pItem;
-        }
-    }
-    // list out items in other removable backpacks
-    for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
-    {
-        if (Bag const* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
-        {
-            for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
-            {
-                if (Item* const pItem = bot->GetItemByPos(bag, slot))
-                {
-                    ItemTemplate const* pItemProto = pItem->GetTemplate();
-                    if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
-                        continue;
-
-                    if (pItemProto->Class == ITEM_CLASS_CONSUMABLE &&
-                        pItemProto->SubClass == ITEM_SUBCLASS_ITEM_ENHANCEMENT)
-                        return pItem;
-                }
-            }
-        }
-    }
-
-    return nullptr;
+    return FindItemInInventory([](ItemTemplate const* pItemProto) -> bool {
+        return pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == 6;
+    });
 }
 
+// Find Consumable
 Item* PlayerbotAI::FindConsumable(uint32 displayId) const
 {
-    // list out items in main backpack
-    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
-    {
-        if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-        {
-            ItemTemplate const* pItemProto = pItem->GetTemplate();
-            if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
-                continue;
-
-            if ((pItemProto->Class == ITEM_CLASS_CONSUMABLE || pItemProto->Class == ITEM_CLASS_TRADE_GOODS) &&
-                pItemProto->DisplayInfoID == displayId)
-                return pItem;
-        }
-    }
-
-    // list out items in other removable backpacks
-    for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
-    {
-        if (Bag const* const pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
-        {
-            for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
-            {
-                if (Item* const pItem = bot->GetItemByPos(bag, slot))
-                {
-                    ItemTemplate const* pItemProto = pItem->GetTemplate();
-                    if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
-                        continue;
-
-                    if ((pItemProto->Class == ITEM_CLASS_CONSUMABLE || pItemProto->Class == ITEM_CLASS_TRADE_GOODS) &&
-                        pItemProto->DisplayInfoID == displayId)
-                        return pItem;
-                }
-            }
-        }
-    }
-
-    return nullptr;
+    return FindItemInInventory([displayId](ItemTemplate const* pItemProto) -> bool {
+        return (pItemProto->Class == ITEM_CLASS_CONSUMABLE || pItemProto->Class == ITEM_CLASS_TRADE_GOODS) && pItemProto->DisplayInfoID == displayId;
+    });
 }
 
+// Find Bandage
 Item* PlayerbotAI::FindBandage() const
 {
-    // list out items in main backpack
-    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
-    {
-        if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-        {
-            ItemTemplate const* pItemProto = pItem->GetTemplate();
-            if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
-                continue;
-
-            if (pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == ITEM_SUBCLASS_BANDAGE)
-                return pItem;
-        }
-    }
-
-    // list out items in other removable backpacks
-    for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
-    {
-        if (Bag const* const pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
-        {
-            for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
-            {
-                if (Item* const pItem = bot->GetItemByPos(bag, slot))
-                {
-                    ItemTemplate const* pItemProto = pItem->GetTemplate();
-                    if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
-                        continue;
-
-                    if (pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == ITEM_SUBCLASS_BANDAGE)
-                        return pItem;
-                }
-            }
-        }
-    }
-
-    return nullptr;
+    return FindItemInInventory([](ItemTemplate const* pItemProto) -> bool {
+        return pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == ITEM_SUBCLASS_BANDAGE;
+    });
 }
 
 static const uint32 uPriorizedSharpStoneIds[8] = {ADAMANTITE_SHARPENING_DISPLAYID, FEL_SHARPENING_DISPLAYID,
