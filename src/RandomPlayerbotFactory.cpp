@@ -581,7 +581,7 @@ uint32 RandomPlayerbotFactory::GetNextBotAccountCounter()
 {
     QueryResult botAccountsResult = LoginDatabase.Query("SELECT username FROM account WHERE username LIKE '{}%%' ORDER BY username DESC LIMIT 1",
                                                         sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
-    uint32 botAccountCounter = 1; // Initialize the bot account counter
+    uint32 botAccountCounter = 0; // Initialize the bot account counter
     if (botAccountsResult)
     {
         Field* fields = botAccountsResult->Fetch();
