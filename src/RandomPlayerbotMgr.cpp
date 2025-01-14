@@ -179,7 +179,6 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
             BattlegroundData[queueType][bracket] = BattlegroundInfo();
         }
     }
-    PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots where event = 'add'");
     BgCheckTimer = 0;
     LfgCheckTimer = 0;
     PlayersCheckTimer = 0;
