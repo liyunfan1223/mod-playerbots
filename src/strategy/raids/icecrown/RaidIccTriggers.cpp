@@ -300,18 +300,37 @@ bool IccRotfaceMoveAwayFromExplosionTrigger::IsActive()
 bool IccPutricideGrowingOozePuddleTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
+    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot) || botAI->HasAura("Volatile Ooze Adhesive", bot);
     
     if (!boss || botHasAura) 
         return false;
 
-    return true;
+    // Check for nearby growing ooze puddles (37690) and slime puddles (70341)
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (!unit)
+            continue;
+
+        uint32 entry = unit->GetEntry();
+        if (entry == 37690 || entry == 70341)  // Growing Ooze Puddle or Slime Puddle
+        {
+                return true;
+        }
+    }
+
+    return false;
 }
 
 bool IccPutricideVolatileOozeTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "volatile ooze");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
+
+    if (botAI->HasAura("Gaseous Bloat", bot))
+        return false;
 
     return true;
 }
