@@ -307,6 +307,22 @@ float IccBpcAssistMultiplier::GetValue(Action* action)
     if (!keleseth || !keleseth->IsAlive())
         return 1.0f;
 
+    Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
+    if (aura) 
+    {
+        if (aura->GetStackAmount() > 18 && botAI->IsTank(bot))
+        {
+            if (dynamic_cast<MovementAction*>(action))
+                return 0.0f;
+        }
+
+        if (aura->GetStackAmount() > 12 && !botAI->IsTank(bot))
+        {
+            if (dynamic_cast<MovementAction*>(action))
+                return 0.0f;
+        }
+    }
+
     // For assist tank during BPC fight
     if (botAI->IsAssistTank(bot))
     {

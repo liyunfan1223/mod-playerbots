@@ -1476,7 +1476,7 @@ bool IccBpcMainTankAction::Execute(Event event)
 bool IccBpcEmpoweredVortexAction::Execute(Event event)
 {
     // Double check that we're not a tank
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
+    if (botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsTank(bot))
         return false;
 
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
@@ -1484,65 +1484,28 @@ bool IccBpcEmpoweredVortexAction::Execute(Event event)
         return false;
 
     float radius = 12.0f;
-    float moveIncrement = 3.0f;
-    bool isRanged = botAI->IsRanged(bot);
-
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    if (isRanged)
+
+    for (auto& member : members)
     {
-        // Ranged: spread from other ranged
-        for (auto& member : members)
-        {
-            Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || unit == bot || 
-                botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || !botAI->IsRanged(bot))
-                continue;
+        Unit* unit = botAI->GetUnit(member);
+        if (!unit || !unit->IsAlive() || unit == bot)
+            continue;
 
-            float dist = bot->GetExactDist2d(unit);
-            if (dist < radius)
-            {
-                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return MoveAway(unit, moveDistance);
-            }
-        }
-    }
-    else
-    {
-        // Melee: move opposite to ranged group
-        float avgX = 0, avgY = 0;
-        int rangedCount = 0;
-
-        for (auto& member : members)
-        {
-            Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || !botAI->IsRanged(bot))
-                continue;
-
-            avgX += unit->GetPositionX();
-            avgY += unit->GetPositionY();
-            rangedCount++;
-        }
-
-        if (rangedCount > 0)
-        {
-            avgX /= rangedCount;
-            avgY /= rangedCount;
-
-            // Direction from ranged to Valanar
-            float dx = valanar->GetPositionX() - avgX;
-            float dy = valanar->GetPositionY() - avgY;
-            float len = sqrt(dx*dx + dy*dy);
+        float dist = bot->GetExactDist2d(unit);
+        if (dist < radius)
+        {   
+            float moveDistance = radius - dist + 1.0f;
             
-            if (len > 0)
+            // Calculate potential new position
+            float angle = bot->GetAngle(unit);
+            float newX = bot->GetPositionX() + cos(angle + M_PI) * moveDistance;
+            float newY = bot->GetPositionY() + sin(angle + M_PI) * moveDistance;
+            
+            // Only move if we have line of sight
+            if (bot->IsWithinLOS(newX, newY, bot->GetPositionZ()))
             {
-                dx /= len;
-                dy /= len;
-                float targetX = valanar->GetPositionX() + dx * 5.0f;
-                float targetY = valanar->GetPositionY() + dy * 5.0f;
-                float targetZ = valanar->GetPositionZ();
-                bot->UpdateAllowedPositionZ(targetX, targetY, targetZ);
-
-                return MoveTo(bot->GetMapId(), targetX, targetY, targetZ);
+                return MoveAway(unit, moveDistance);
             }
         }
     }
@@ -1859,10 +1822,15 @@ bool IccValithriaPortalAction::Execute(Event event)
     if (!portal)
         return false;
 
-    // Move to the portal if the bot is not at the interact distance
-    if (!portal->IsWithinDistInMap(bot, INTERACTION_DISTANCE))
+    // Move exactly to portal position
+    float portalX = portal->GetPositionX();
+    float portalY = portal->GetPositionY();
+    float portalZ = portal->GetPositionZ();
+
+    // If not at exact portal position, move there
+    if (bot->GetDistance2d(portalX, portalY) > 0.1f)
     {
-        return MoveTo(portal, INTERACTION_DISTANCE);
+        return MoveTo(portal->GetMapId(), portalX, portalY, portalZ, false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
     }
 
     // Remove shapeshift forms
@@ -1885,6 +1853,12 @@ bool IccValithriaHealAction::Execute(Event event)
     if (!botAI->IsHeal(bot))
         return false;
 
+    if (!bot->HasAura(70766)) //dream state
+    {
+        bot->SetSpeed(MOVE_RUN, 1.0f, true);
+        bot->SetSpeed(MOVE_WALK, 1.0f, true);
+        bot->SetSpeed(MOVE_FLIGHT, 1.0f, true);
+    }
     // Find Valithria
     if (Creature* valithria = bot->FindNearestCreature(36789, 100.0f))
     {
@@ -1909,6 +1883,15 @@ bool IccValithriaDreamCloudAction::Execute(Event event)
     // Only execute if we're in dream state
     if (!bot->HasAura(70766))
         return false;
+
+    // Set speed to match players in dream state
+    if (bot->HasAura(70766))
+    {
+        bot->SetSpeed(MOVE_RUN, 2.0f, true);
+        bot->SetSpeed(MOVE_WALK, 2.0f, true);
+        bot->SetSpeed(MOVE_FLIGHT, 2.0f, true);
+    }
+   
 
     // Find nearest cloud of either type that we haven't collected
     Creature* dreamCloud = bot->FindNearestCreature(37985, 100.0f);
