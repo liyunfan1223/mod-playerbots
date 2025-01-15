@@ -256,13 +256,7 @@ uint8 SpeedValue::Calculate()
     if (!target)
         return 100;
 
-    float speedRate = target->GetSpeedRate(MOVE_RUN);
-    
-    // If in Dream State, double the speed to match player speed
-    if (target->HasAura(70766)) // Dream State
-        speedRate *= 2.0f;
-
-    return (uint8)(100.0f * speedRate);
+    return (uint8)(100.0f * target->GetSpeedRate(MOVE_RUN));
 }
 
 bool IsInGroupValue::Calculate() { return bot->GetGroup(); }
