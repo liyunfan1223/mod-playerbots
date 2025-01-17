@@ -267,7 +267,7 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
 
     if (dynamic_cast<IccPutricideVolatileOozeAction*>(action) || dynamic_cast<IccPutricideGasCloudAction*>(action))
     {
-        if (dynamic_cast<AvoidMalleableGooAction*>(action))
+        if (dynamic_cast<AvoidMalleableGooAction*>(action) || dynamic_cast<IccPutricideGrowingOozePuddleAction*>(action))
             return 0.0f;
     }   
 
@@ -306,6 +306,22 @@ float IccBpcAssistMultiplier::GetValue(Action* action)
     Unit* keleseth = AI_VALUE2(Unit*, "find target", "prince keleseth");
     if (!keleseth || !keleseth->IsAlive())
         return 1.0f;
+
+    Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
+    if (aura) 
+    {
+        if (aura->GetStackAmount() > 18 && botAI->IsTank(bot))
+        {
+            if (dynamic_cast<MovementAction*>(action))
+                return 0.0f;
+        }
+
+        if (aura->GetStackAmount() > 12 && !botAI->IsTank(bot))
+        {
+            if (dynamic_cast<MovementAction*>(action))
+                return 0.0f;
+        }
+    }
 
     // For assist tank during BPC fight
     if (botAI->IsAssistTank(bot))

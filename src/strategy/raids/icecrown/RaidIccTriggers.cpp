@@ -274,7 +274,8 @@ bool IccFestergutSporeTrigger::IsActive()
 bool IccRotfaceTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "rotface");
-    if (!boss || !(botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))) { return false; }
+    if (!boss || !(botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))) 
+        return false;
 
     return true;
 }
@@ -300,18 +301,37 @@ bool IccRotfaceMoveAwayFromExplosionTrigger::IsActive()
 bool IccPutricideGrowingOozePuddleTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
+    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot) || botAI->HasAura("Volatile Ooze Adhesive", bot);
     
     if (!boss || botHasAura) 
         return false;
 
-    return true;
+    // Check for nearby growing ooze puddles (37690) and slime puddles (70341)
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (!unit)
+            continue;
+
+        uint32 entry = unit->GetEntry();
+        if (entry == 37690 || entry == 70341)  // Growing Ooze Puddle or Slime Puddle
+        {
+                return true;
+        }
+    }
+
+    return false;
 }
 
 bool IccPutricideVolatileOozeTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "volatile ooze");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
+
+    if (botAI->HasAura("Gaseous Bloat", bot))
+        return false;
 
     return true;
 }
@@ -319,7 +339,8 @@ bool IccPutricideVolatileOozeTrigger::IsActive()
 bool IccPutricideGasCloudTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "gas cloud");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
     return true;
 }
@@ -377,6 +398,11 @@ bool IccBpcKelesethTankTrigger::IsActive()
     if (!botAI->IsAssistTank(bot))
         return false;
 
+    Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
+    if (aura) 
+        if (aura->GetStackAmount() > 18)
+            return false;
+
     // First priority is to check for nucleuses that need to be picked up
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
     for (auto i = targets.begin(); i != targets.end(); ++i)
@@ -400,6 +426,11 @@ bool IccBpcNucleusTrigger::IsActive()
 
     if (!botAI->IsAssistTank(bot))
         return false;
+
+    Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
+    if (aura) 
+        if (aura->GetStackAmount() > 18)
+            return false;
 
     // Actively look for any nucleus that isn't targeting us
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
@@ -434,6 +465,11 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
     if (!valanar || !valanar->IsAlive())
         return false;
+
+    Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
+    if (aura)
+        if (aura->GetStackAmount() > 12)
+            return false;
 
     // For ranged, spread whenever Valanar is empowered
     if (botAI->IsRanged(bot))

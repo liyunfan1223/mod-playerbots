@@ -48,6 +48,7 @@ public:
         creators["baoe"] = &PaladinResistanceStrategyFactoryInternal::baoe;
         creators["barmor"] = &PaladinResistanceStrategyFactoryInternal::barmor;
         creators["bcast"] = &PaladinResistanceStrategyFactoryInternal::bcast;
+        creators["bspeed"] = &PaladinResistanceStrategyFactoryInternal::bspeed;
     }
 
 private:
@@ -57,6 +58,7 @@ private:
     static Strategy* baoe(PlayerbotAI* botAI) { return new PaladinBuffAoeStrategy(botAI); }
     static Strategy* barmor(PlayerbotAI* botAI) { return new PaladinBuffArmorStrategy(botAI); }
     static Strategy* bcast(PlayerbotAI* botAI) { return new PaladinBuffCastStrategy(botAI); }
+    static Strategy* bspeed(PlayerbotAI* botAI) { return new PaladinBuffSpeedStrategy(botAI); }
 };
 
 class PaladinBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>

@@ -28,12 +28,12 @@ const Position ICC_FESTERGUT_MELEE_SPORE = Position(4269.1772f, 3144.7673f, 360.
 const Position ICC_ROTFACE_TANK_POSITION = Position(4447.061f, 3150.9758f, 360.38568f);
 const Position ICC_ROTFACE_BIG_OOZE_POSITION = Position(4432.687f, 3142.3035f, 360.38623f);
 const Position ICC_ROTFACE_SAFE_POSITION = Position(4446.557f, 3065.6594f, 360.51843f);
-const Position ICC_PUTRICIDE_TANK_OOZE_POSITION = Position(4362.709f, 3229.1448f, 389.4083f);
-const Position ICC_PUTRICIDE_TANK_GAS_CLOUD_POSITION = Position(4397.0386f, 3221.385f, 389.3999f);
-const Position ICC_PUTRICIDE_GAS1_POSITION = Position(4350.772f, 3249.9773f, 389.39508f);
-const Position ICC_PUTRICIDE_GAS2_POSITION = Position(4390.002f, 3204.8855f, 389.39938f);
-const Position ICC_PUTRICIDE_GAS3_POSITION = Position(4367.753f, 3177.5894f, 389.39575f);
-const Position ICC_PUTRICIDE_GAS4_POSITION = Position(4321.8486f, 3206.464f, 389.3982f);
+//const Position ICC_PUTRICIDE_TANK_OOZE_POSITION = Position(4362.709f, 3229.1448f, 389.4083f);
+//const Position ICC_PUTRICIDE_TANK_GAS_CLOUD_POSITION = Position(4397.0386f, 3221.385f, 389.3999f);
+//const Position ICC_PUTRICIDE_GAS1_POSITION = Position(4350.772f, 3249.9773f, 389.39508f);
+//const Position ICC_PUTRICIDE_GAS2_POSITION = Position(4390.002f, 3204.8855f, 389.39938f);
+//const Position ICC_PUTRICIDE_GAS3_POSITION = Position(4367.753f, 3177.5894f, 389.39575f);
+//const Position ICC_PUTRICIDE_GAS4_POSITION = Position(4321.8486f, 3206.464f, 389.3982f);
 const Position ICC_BPC_OT_POSITION = Position(4649.2236f, 2796.0972f, 361.1815f);
 const Position ICC_BPC_MT_POSITION = Position(4648.5674f, 2744.847f, 361.18222f);
 const Position ICC_BQL_CENTER_POSITION = Position(4595.0f, 2769.0f, 400.0f);
@@ -58,8 +58,6 @@ const Position ICC_LK_FROST3_POSITION = Position(503.40182f, -2067.3435f, 840.85
 const Position ICC_LK_FROSTR1_POSITION = Position(481.168f, -2177.8723f, 840.857f); 
 const Position ICC_LK_FROSTR2_POSITION = Position(562.20807f, -2100.2393f, 840.857f); 
 const Position ICC_LK_FROSTR3_POSITION = Position(526.35297f, -2071.0317f, 840.857f);
-         
-
 
 //Lord Marrogwar
 class IccLmTankPositionAction : public AttackAction
@@ -236,14 +234,13 @@ class IccPutricideGasCloudAction : public AttackAction
     IccPutricideGasCloudAction(PlayerbotAI* botAI, std::string const name = "icc putricide gas cloud")
         : AttackAction(botAI, name) {}
         bool Execute(Event event) override;
-    private:
-        static uint8_t lastKnownPosition; // 0 = none, 1-4 = positions 1-4
 };
 
 class AvoidMalleableGooAction : public MovementAction 
 {
     public:
-        AvoidMalleableGooAction(PlayerbotAI* ai) : MovementAction(ai, "avoid malleable goo") {}
+        AvoidMalleableGooAction(PlayerbotAI* botAI, std::string const name = "avoid malleable goo"  ) 
+        : MovementAction(botAI, name) {}
         bool Execute(Event event) override;
 };
 

@@ -76,19 +76,19 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     //PP
     triggers.push_back(new TriggerNode("icc putricide volatile ooze",
-        NextAction::array(0, new NextAction("icc putricide volatile ooze", ACTION_EMERGENCY + 4), nullptr)));
+        NextAction::array(0, new NextAction("icc putricide volatile ooze", ACTION_RAID + 4), nullptr)));
 
     triggers.push_back(new TriggerNode("icc putricide gas cloud",
-        NextAction::array(0, new NextAction("icc putricide gas cloud", ACTION_EMERGENCY + 5), nullptr)));
+        NextAction::array(0, new NextAction("icc putricide gas cloud", ACTION_RAID + 5), nullptr)));
 
     triggers.push_back(new TriggerNode("icc putricide growing ooze puddle",
-        NextAction::array(0, new NextAction("icc putricide growing ooze puddle", ACTION_EMERGENCY + 3), nullptr)));
+        NextAction::array(0, new NextAction("icc putricide growing ooze puddle", ACTION_RAID + 3), nullptr)));
 
     triggers.push_back(new TriggerNode("icc putricide main tank mutated plague",
-        NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 6), nullptr)));
+        NextAction::array(0, new NextAction("taunt spell", ACTION_RAID + 6), nullptr)));
 
     triggers.push_back(new TriggerNode("icc putricide malleable goo",
-        NextAction::array(0, new NextAction("avoid malleable goo", ACTION_EMERGENCY + 2), nullptr)));
+        NextAction::array(0, new NextAction("avoid malleable goo", ACTION_RAID + 2), nullptr)));
 
     //BPC
     triggers.push_back(new TriggerNode("icc bpc keleseth tank",

@@ -1065,16 +1065,11 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         return false;
     }
 
-    uint32 isLogginIn = GetEventValue(bot, "login");
-    if (isLogginIn)
-        return false;
-
     uint32 randomTime;
     if (!player)
     {
         AddPlayerBot(botGUID, 0);
         randomTime = urand(1, 2);
-        SetEventValue(bot, "login", 1, randomTime);
 
         uint32 randomBotUpdateInterval = _isBotInitializing ? 1 : sPlayerbotAIConfig->randomBotUpdateInterval;
         randomTime = urand(std::max(5, static_cast<int>(randomBotUpdateInterval * 0.5)),
@@ -1096,8 +1091,6 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
         return true;
     }
-
-    SetEventValue(bot, "login", 0, 0);
 
     if (!player->IsInWorld())
         return false;
@@ -2504,7 +2497,6 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
     if (IsRandomBot(player))
     {
         ObjectGuid::LowType guid = player->GetGUID().GetCounter();
-        SetEventValue(guid, "login", 0, 0);
     }
     else
     {
