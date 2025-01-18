@@ -731,7 +731,8 @@ AiPlayerbot.RandomBotAutoJoinBG = 0
 # Brackets for warsong 0:10-19, 1:20-29, 2:30-39, 3:40-49 etc. Default: 7 (level 80)
 # Brackets for rated arena: 0:10-14, 1:15-19 etc. Default: 14 (80-84)
 # For lower level ranges to work in Rated Arena, custom code changes need to be made.
-# Count = amount of games Bots auto fill. (Count 1 for WSG = 20 bots).
+# Count = amount of BATTLEGROUNDS Bots auto fill. This is PER BRACKET, so it can ramp up quickly. (i.e. Count 1 for WSG = 20 bots)
+# Ensure you have enough eligible bots.
 AiPlayerbot.randomBotAutoJoinICBrackets = 0,1
 AiPlayerbot.randomBotAutoJoinEYBrackets = 0,1,2
 AiPlayerbot.randomBotAutoJoinAVBrackets = 0,1,2,3
