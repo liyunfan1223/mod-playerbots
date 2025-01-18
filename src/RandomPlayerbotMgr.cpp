@@ -859,16 +859,16 @@ void RandomPlayerbotMgr::CheckBgQueue()
         std::vector<uint32> abBrackets = parseBrackets(sPlayerbotAIConfig->randomBotAutoJoinABBrackets);
         std::vector<uint32> wsBrackets = parseBrackets(sPlayerbotAIConfig->randomBotAutoJoinWSBrackets);
 
-        auto updateRatedArenaInstanceCount = [&](uint32 queueType, uint32 bracket, uint32 count) {
-            BattlegroundData[queueType][bracket].ratedArenaInstanceCount =
-                std::max(count, BattlegroundData[queueType][bracket].ratedArenaInstanceCount);
+        auto updateRatedArenaInstanceCount = [&](uint32 queueType, uint32 bracket, uint32 minCount) {
+            if (BattlegroundData[queueType][bracket].ratedArenaInstanceCount < minCount)
+                BattlegroundData[queueType][bracket].ratedArenaInstanceCount++;
         };
 
-        auto updateBGInstanceCount = [&](uint32 queueType, std::vector<uint32> brackets, uint32 count) {
+        auto updateBGInstanceCount = [&](uint32 queueType, std::vector<uint32> brackets, uint32 minCount) {
             for (uint32 bracket : brackets)
             {
-                BattlegroundData[queueType][bracket].bgInstanceCount =
-                    std::max(count, BattlegroundData[queueType][bracket].bgInstanceCount);
+                if (BattlegroundData[queueType][bracket].bgInstanceCount < minCount)
+                    BattlegroundData[queueType][bracket].bgInstanceCount++;
             }
         };
 
