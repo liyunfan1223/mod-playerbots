@@ -732,10 +732,10 @@ AiPlayerbot.RandomBotAutoJoinBG = 0
 # Brackets for rated arena: 0:10-14, 1:15-19 etc. Default: 14 (80-84)
 # For lower level ranges to work in Rated Arena, custom code changes need to be made.
 # Count = amount of games Bots auto fill. (Count 1 for WSG = 20 bots).
-AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1
-AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2
-AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3
-AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6
+AiPlayerbot.randomBotAutoJoinICBrackets = 0,1
+AiPlayerbot.randomBotAutoJoinEYBrackets = 0,1,2
+AiPlayerbot.randomBotAutoJoinAVBrackets = 0,1,2,3
+AiPlayerbot.randomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
 AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6,7
 
 AiPlayerbot.RandomBotAutoJoinBGICCount = 0
