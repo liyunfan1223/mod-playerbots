@@ -746,7 +746,6 @@ AiPlayerbot.RandomBotAutoJoinBGWSCount = 0
 
 AiPlayerbot.RandomBotAutoJoinArenaBracket = 14
 
-AiPlayerbot.RandomBotAutoJoinBGWarsongCount = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena2v2Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena3v3Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count = 0
