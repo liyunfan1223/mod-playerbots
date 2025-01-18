@@ -71,6 +71,8 @@ void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("decimation", NextAction::array(0, new NextAction("soul fire", 16.0f), NULL)));
 
+    triggers.push_back(new TriggerNode("life tap glyph buff", NextAction::array(0, new NextAction("life tap", 28.0f), NULL)));
+
     triggers.push_back(
         new TriggerNode("metamorphosis", NextAction::array(0, new NextAction("metamorphosis", 20.0f), NULL)));
 }
@@ -78,9 +80,9 @@ void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void DpsAoeWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
-        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("seed of corruption", 39.0f),
-                                                        new NextAction("seed of corruption on attacker", 38.0f),
-                                                        new NextAction("rain of fire", 37.0f), nullptr)));
+        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("seed of corruption", 33.0f),
+                                                        new NextAction("seed of corruption on attacker", 32.0f),
+                                                        new NextAction("rain of fire", 31.0f), nullptr)));
     triggers.push_back(new TriggerNode("corruption on attacker",
                                        NextAction::array(0, new NextAction("corruption on attacker", 27.0f), nullptr)));
     triggers.push_back(
