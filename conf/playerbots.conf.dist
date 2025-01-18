@@ -743,7 +743,7 @@ AiPlayerbot.RandomBotAutoJoinBG = 0
 
 # Arena Considerations:
 # - Rated Arena brackets default to level 80-84 (bracket 14).
-# - Custom code changes may be required for lower-level arena brackets to function properly.
+# - Custom code changes are required for lower-level arena brackets to function properly.
 
 # Battleground bracket ranges:
 AiPlayerbot.RandomBotAutoJoinICBrackets = 0,1
