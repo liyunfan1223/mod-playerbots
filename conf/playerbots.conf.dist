@@ -733,10 +733,10 @@ AiPlayerbot.RandomBotAutoJoinBG = 0
 # For lower level ranges to work in Rated Arena, custom code changes need to be made.
 # Count = amount of BATTLEGROUNDS Bots auto fill. This is PER BRACKET, so it can ramp up quickly. (i.e. Count 1 for WSG = 20 bots)
 # Ensure you have enough eligible bots.
-AiPlayerbot.randomBotAutoJoinICBrackets = 0,1
-AiPlayerbot.randomBotAutoJoinEYBrackets = 0,1,2
-AiPlayerbot.randomBotAutoJoinAVBrackets = 0,1,2,3
-AiPlayerbot.randomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
+AiPlayerbot.RandomBotAutoJoinICBrackets = 0,1
+AiPlayerbot.RandomBotAutoJoinEYBrackets = 0,1,2
+AiPlayerbot.RandomBotAutoJoinAVBrackets = 0,1,2,3
+AiPlayerbot.RandomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
 AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6,7
 
 AiPlayerbot.RandomBotAutoJoinBGICCount = 0
