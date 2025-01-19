@@ -194,4 +194,11 @@ public:
     bool IsActive() override;
 };
 
+class NoFocusMagicTrigger : public Trigger
+{
+public:
+    NoFocusMagicTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no focus magic") {}
+    bool IsActive() override;
+};
+
 #endif

@@ -63,3 +63,24 @@ bool FrostbiteOnTargetTrigger::IsActive()
     }
     return botAI->HasAura(spell, target);
 }
+
+bool NoFocusMagicTrigger::IsActive()
+{
+    if (!bot->HasSpell(54646))
+        return false;
+    
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (!member || member == bot || !member->IsAlive())
+            continue;
+
+        if (member->HasAura(54646, bot->GetGUID()))
+            return false;
+    }
+    return true;
+}

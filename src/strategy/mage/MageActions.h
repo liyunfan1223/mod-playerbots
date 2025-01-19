@@ -302,4 +302,11 @@ public:
     CastMirrorImageAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mirror image") {}
 };
 
+class CastFocusMagicOnPartyAction : public CastSpellAction
+{
+public:
+    CastFocusMagicOnPartyAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "focus magic") {}
+    Unit* GetTarget() override;
+};
+
 #endif
