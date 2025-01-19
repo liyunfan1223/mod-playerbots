@@ -158,6 +158,9 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("icc sindragosa tank swap position", ACTION_EMERGENCY + 2), nullptr)));
 
     //LICH KING
+    triggers.push_back(new TriggerNode("icc lich king shadow trap",
+        NextAction::array(0, new NextAction("icc lich king shadow trap", ACTION_RAID + 6), nullptr)));
+
     triggers.push_back(new TriggerNode("icc lich king necrotic plague",
         NextAction::array(0, new NextAction("icc lich king necrotic plague", ACTION_RAID + 3), nullptr)));
 

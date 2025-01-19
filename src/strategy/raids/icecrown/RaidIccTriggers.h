@@ -351,10 +351,17 @@ public:
 
 
 //LICH KING
+class IccLichKingShadowTrapTrigger : public Trigger
+{
+public:
+    IccLichKingShadowTrapTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc lich king shadow trap") {}
+    bool IsActive() override;
+};
+
 class IccLichKingNecroticPlagueTrigger : public Trigger 
 {
 public:
-    IccLichKingNecroticPlagueTrigger(PlayerbotAI* ai) : Trigger(ai, "icc lich king necrotic plague") {}
+    IccLichKingNecroticPlagueTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc lich king necrotic plague") {}
     bool IsActive() override;
 };
 

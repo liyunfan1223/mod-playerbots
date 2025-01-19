@@ -513,8 +513,6 @@ float IccSindragosaMysticBuffetMultiplier::GetValue(Action* action)
 
 float IccSindragosaFrostBombMultiplier::GetValue(Action* action)
 {
-    if (!action || !bot || !bot->IsAlive())
-        return 1.0f;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
     if (!boss)
@@ -552,7 +550,7 @@ float IccSindragosaFrostBombMultiplier::GetValue(Action* action)
     else if (dynamic_cast<CombatFormationMoveAction*>(action) || 
              dynamic_cast<IccSindragosaTankPositionAction*>(action)
              || dynamic_cast<IccSindragosaBlisteringColdAction*>(action)
-             || dynamic_cast<FollowAction*>(action))
+             || dynamic_cast<FollowAction*>(action) || dynamic_cast<AttackAction*>(action))
         return 0.0f;    
     return 1.0f;
 }
