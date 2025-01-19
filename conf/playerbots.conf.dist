@@ -23,6 +23,7 @@
 #		LEVELS
 #		GEAR
 #		QUESTS
+#		ACTIVITIES
 #		SPELLS
 #		STRATEGIES
 #		TELEPORTS
@@ -611,6 +612,50 @@ AiPlayerbot.EquipmentPersistenceLevel = 80
 # Randombots automatically upgrade equipments on levelup
 # Default: 1 (enabled)
 AiPlayerbot.AutoUpgradeEquip = 1
+
+# Only set wolf pets for hunters to have higher damage (0 = disabled, 1 = enabled for max-level, 2 = enabled)
+# Default: 0 (disabled)
+AiPlayerbot.HunterWolfPet = 0
+
+#
+#
+#
+####################################################################################################
+
+
+####################################################################################################
+# ACTIVITIES
+#
+#
+# Specify percent of active bots
+# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
+# This value is only applied to inactive areas where no real-players are detected, when
+# real-players are nearby, friend, group, guild, bg, instances etc the value is always
+# enforced to 100%
+AiPlayerbot.BotActiveAlone = 100
+
+# Force botActiveAlone when bot is ... of real player
+AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
+AiPlayerbot.BotActiveAloneForceWhenInZone = 1
+AiPlayerbot.BotActiveAloneForceWhenInMap = 0
+AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
+AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
+
+# SmartScale is enabled or not.
+# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
+# (The scaling will be overruled by the BotActiveAloneForceWhen...rules)
+#
+#   Limitfloor - when DIFF (latency) above floor, activity scaling is applied starting with 90%
+#   LimitCeiling - when DIFF (latency) above ceiling, activity is 0%;
+#
+#   MinLevel - only apply scaling when level is above or equal to min(bot)Level
+#   MaxLevel - only apply scaling when level is lower or equal of max(bot)Level
+#
+AiPlayerbot.botActiveAloneSmartScale = 1
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
+AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
+AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 
 #
 #
@@ -1550,36 +1595,6 @@ AiPlayerbot.RandombotsWalkingRPG = 0
 
 # Set randombots movement speed to walking only inside buildings
 AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
-
-# Specify percent of active bots
-# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
-# This value is only applied to inactive areas where no real-players are detected, when
-# real-players are nearby, friend, group, guild, bg, instances etc the value is always
-# enforced to 100%
-AiPlayerbot.BotActiveAlone = 100
-
-# Force botActiveAlone when bot is ... of real player
-AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
-AiPlayerbot.BotActiveAloneForceWhenInZone = 1
-AiPlayerbot.BotActiveAloneForceWhenInMap = 0
-AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
-AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
-
-# SmartScale is enabled or not.
-# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
-# (The scaling will be overruled by the BotActiveAloneForceWhen...rules)
-#
-#   Limitfloor - when DIFF (latency) above floor, activity scaling is applied starting with 90%
-#   LimitCeiling - when DIFF (latency) above ceiling, activity is 0%;
-#
-#   MinLevel - only apply scaling when level is above or equal to min(bot)Level
-#   MaxLevel - only apply scaling when level is lower or equal of max(bot)Level
-#
-AiPlayerbot.botActiveAloneSmartScale = 1
-AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
-AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
-AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
-AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...

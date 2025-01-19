@@ -36,6 +36,7 @@
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "StatsWeightCalculator.h"
+#include "World.h"
 
 #define PLAYER_SKILL_INDEX(x) (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 
@@ -784,6 +785,13 @@ void PlayerbotFactory::InitPet()
                 continue;
 
             if (itr->second.minlevel > bot->GetLevel())
+                continue;
+
+            bool onlyWolf = sPlayerbotAIConfig->hunterWolfPet == 2 ||
+                            (sPlayerbotAIConfig->hunterWolfPet == 1 &&
+                             bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
+            // Wolf only (for higher dps)
+            if (onlyWolf && itr->second.family != CREATURE_FAMILY_WOLF)
                 continue;
 
             ids.push_back(itr->first);
