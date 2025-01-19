@@ -53,7 +53,7 @@ bool QuestAction::Execute(Event event)
     }
 
     // Checks the nearest game objects
-    std::list<ObjectGuid> gos = AI_VALUE(std::list<ObjectGuid>, "nearest game objects");
+    GuidVector gos = AI_VALUE(GuidVector, "nearest game objects");
     for (const auto& go : gos)
     {
         GameObject* gameobj = botAI->GetGameObject(go);
