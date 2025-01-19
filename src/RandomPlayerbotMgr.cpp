@@ -862,7 +862,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
         auto updateRatedArenaInstanceCount = [&](uint32 queueType, uint32 bracket, uint32 minCount) {
             if (BattlegroundData[queueType][bracket].activeRatedArenaQueue < minCount &&
                 BattlegroundData[queueType][bracket].ratedArenaInstanceCount < minCount)
-                BattlegroundData[queueType][bracket].ratedArenaInstanceCount++;
+                BattlegroundData[queueType][bracket].activeRatedArenaQueue++;
         };
 
         auto updateBGInstanceCount = [&](uint32 queueType, std::vector<uint32> brackets, uint32 minCount) {
@@ -870,7 +870,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
             {
                 if (BattlegroundData[queueType][bracket].activeBgQueue < minCount &&
                     BattlegroundData[queueType][bracket].bgInstanceCount < minCount)   
-                    BattlegroundData[queueType][bracket].bgInstanceCount++;
+                    BattlegroundData[queueType][bracket].activeBgQueue++;
             }
         };
 
