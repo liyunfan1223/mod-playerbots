@@ -171,6 +171,7 @@ class ArcaneBlastStackTrigger : public HasAuraStackTrigger
 {
 public:
     ArcaneBlastStackTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "arcane blast", 3, 1) {}
+    bool IsActive() override;
 };
 
 class MirrorImageTrigger : public BoostTrigger

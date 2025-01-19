@@ -12,6 +12,9 @@ Value<Unit*>* CastPolymorphAction::GetTargetValue() { return context->GetValue<U
 
 bool CastFrostNovaAction::isUseful()
 {
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && target->ToCreature() && target->ToCreature()->HasMechanicTemplateImmunity(1 << (MECHANIC_FREEZE - 1)))
+        return false;
     return sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 10.f);
 }
 
@@ -20,4 +23,23 @@ bool CastConeOfColdAction::isUseful()
     bool facingTarget = AI_VALUE2(bool, "facing", "current target");
     bool targetClose = sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 10.f);
     return facingTarget && targetClose;
+}
+
+bool CastDragonsBreathAction::isUseful()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+    bool facingTarget = AI_VALUE2(bool, "facing", "current target");
+    bool targetClose = bot->IsWithinCombatRange(target, 10.0f);
+    return facingTarget && targetClose;
+}
+
+bool CastBlastWaveAction::isUseful()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+    bool targetClose = bot->IsWithinCombatRange(target, 10.0f);
+    return targetClose;
 }

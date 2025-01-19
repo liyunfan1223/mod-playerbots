@@ -33,6 +33,17 @@ bool FingersOfFrostSingleTrigger::IsActive()
     return (aura && aura->GetCharges() == 1);
 }
 
+bool ArcaneBlastStackTrigger::IsActive()
+{
+    Aura* aura = botAI->GetAura(getName(), GetTarget(), false, true, 3);
+    if (!aura)
+        return false;
+    if (aura->GetStackAmount() >= 4)
+        return true;
+    bool hasMissileBarrage = botAI->HasAura(44401, bot);
+    return hasMissileBarrage;
+}
+
 bool FrostNovaOnTargetTrigger::IsActive()
 {
     Unit* target = GetTarget();

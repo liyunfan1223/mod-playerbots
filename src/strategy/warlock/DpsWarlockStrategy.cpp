@@ -49,8 +49,8 @@ DpsWarlockStrategy::DpsWarlockStrategy(PlayerbotAI* botAI) : GenericWarlockStrat
 NextAction** DpsWarlockStrategy::getDefaultActions()
 {
     return NextAction::array(
-        0, new NextAction("haunt", ACTION_DEFAULT + 0.3f), new NextAction("demonic empowerment", ACTION_DEFAULT + 0.2f),
-        new NextAction("shadow bolt", ACTION_DEFAULT + 0.1f), new NextAction("shoot", ACTION_DEFAULT), nullptr);
+        0, new NextAction("haunt", ACTION_DEFAULT + 0.4f), new NextAction("demonic empowerment", ACTION_DEFAULT + 0.3f),
+        new NextAction("shadow bolt", ACTION_DEFAULT + 0.2f), new NextAction("shoot", ACTION_DEFAULT), nullptr);
 }
 
 void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -71,6 +71,10 @@ void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("decimation", NextAction::array(0, new NextAction("soul fire", 16.0f), NULL)));
 
+    // cast during movement
+    triggers.push_back(
+        new TriggerNode("high mana", NextAction::array(0, new NextAction("life tap", ACTION_DEFAULT + 0.1f), nullptr)));
+        
     triggers.push_back(new TriggerNode("life tap glyph buff", NextAction::array(0, new NextAction("life tap", 28.0f), NULL)));
 
     triggers.push_back(

@@ -184,6 +184,7 @@ public:
         creators["polymorph"] = &MageAiObjectContextInternal::polymorph;
         creators["spellsteal"] = &MageAiObjectContextInternal::spellsteal;
         creators["living bomb"] = &MageAiObjectContextInternal::living_bomb;
+        creators["living bomb on attackers"] = &MageAiObjectContextInternal::living_bomb_on_attackers;
         creators["dragon's breath"] = &MageAiObjectContextInternal::dragons_breath;
         creators["blast wave"] = &MageAiObjectContextInternal::blast_wave;
         creators["invisibility"] = &MageAiObjectContextInternal::invisibility;
@@ -242,6 +243,7 @@ private:
     static Action* polymorph(PlayerbotAI* botAI) { return new CastPolymorphAction(botAI); }
     static Action* spellsteal(PlayerbotAI* botAI) { return new CastSpellstealAction(botAI); }
     static Action* living_bomb(PlayerbotAI* botAI) { return new CastLivingBombAction(botAI); }
+    static Action* living_bomb_on_attackers(PlayerbotAI* botAI) { return new CastLivingBombOnAttackersAction(botAI); }
     static Action* dragons_breath(PlayerbotAI* botAI) { return new CastDragonsBreathAction(botAI); }
     static Action* blast_wave(PlayerbotAI* botAI) { return new CastBlastWaveAction(botAI); }
     static Action* invisibility(PlayerbotAI* botAI) { return new CastInvisibilityAction(botAI); }
