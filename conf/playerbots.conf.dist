@@ -613,7 +613,7 @@ AiPlayerbot.EquipmentPersistenceLevel = 80
 # Default: 1 (enabled)
 AiPlayerbot.AutoUpgradeEquip = 1
 
-# Only set wolf pets for hunters to have higher damage (0 = disabled, 1 = enabled for max-level, 2 = enabled)
+# Only set wolf pets for hunters to have higher damage (0 = disabled, 1 = enabled only for max-level, 2 = enabled)
 # Default: 0 (disabled)
 AiPlayerbot.HunterWolfPet = 0
 

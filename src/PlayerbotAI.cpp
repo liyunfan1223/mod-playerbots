@@ -2929,8 +2929,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 
     Unit* oldSel = bot->GetSelectedUnit();
     // TRIGGERED_IGNORE_POWER_AND_REAGENT_COST flag for not calling CheckPower in check
-    // which causes buff charge to be ineffectively reduced (e.g. dk freezing fog for howling blast)
-    /// @TODO: Fix all calling on ApplySpellMod
+    // which avoids buff charge to be ineffectively reduced (e.g. dk freezing fog for howling blast)
+    /// @TODO: Fix all calls to ApplySpellMod
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
 
     spell->m_targets.SetUnitTarget(target);
