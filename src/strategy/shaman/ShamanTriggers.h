@@ -302,7 +302,7 @@ public:
 class FlameShockTrigger : public DebuffTrigger
 {
 public:
-    FlameShockTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "flame shock", 1, true) {}
+    FlameShockTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "flame shock", 1, true, 6.0f) {}
 };
 
 class WrathOfAirTotemTrigger : public TotemTrigger

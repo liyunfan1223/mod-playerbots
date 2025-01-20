@@ -108,6 +108,7 @@ public:
         creators["mirror image"] = &MageTriggerFactoryInternal::mirror_image;
         creators["frost nova on target"] = &MageTriggerFactoryInternal::frost_nova_on_target;
         creators["frostbite on target"] = &MageTriggerFactoryInternal::frostbite_on_target;
+        creators["no focus magic"] = &MageTriggerFactoryInternal::no_focus_magic;
     }
 
 private:
@@ -141,6 +142,7 @@ private:
     static Trigger* mirror_image(PlayerbotAI* botAI) { return new MirrorImageTrigger(botAI); }
     static Trigger* frost_nova_on_target(PlayerbotAI* botAI) { return new FrostNovaOnTargetTrigger(botAI); }
     static Trigger* frostbite_on_target(PlayerbotAI* botAI) { return new FrostbiteOnTargetTrigger(botAI); }
+    static Trigger* no_focus_magic(PlayerbotAI* botAI) { return new NoFocusMagicTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
@@ -184,6 +186,7 @@ public:
         creators["polymorph"] = &MageAiObjectContextInternal::polymorph;
         creators["spellsteal"] = &MageAiObjectContextInternal::spellsteal;
         creators["living bomb"] = &MageAiObjectContextInternal::living_bomb;
+        creators["living bomb on attackers"] = &MageAiObjectContextInternal::living_bomb_on_attackers;
         creators["dragon's breath"] = &MageAiObjectContextInternal::dragons_breath;
         creators["blast wave"] = &MageAiObjectContextInternal::blast_wave;
         creators["invisibility"] = &MageAiObjectContextInternal::invisibility;
@@ -195,6 +198,7 @@ public:
         creators["fire ward"] = &MageAiObjectContextInternal::fire_ward;
         creators["frost ward"] = &MageAiObjectContextInternal::frost_ward;
         creators["mirror image"] = &MageAiObjectContextInternal::mirror_image;
+        creators["focus magic on party"] = &MageAiObjectContextInternal::focus_magic_on_party;
     }
 
 private:
@@ -242,6 +246,7 @@ private:
     static Action* polymorph(PlayerbotAI* botAI) { return new CastPolymorphAction(botAI); }
     static Action* spellsteal(PlayerbotAI* botAI) { return new CastSpellstealAction(botAI); }
     static Action* living_bomb(PlayerbotAI* botAI) { return new CastLivingBombAction(botAI); }
+    static Action* living_bomb_on_attackers(PlayerbotAI* botAI) { return new CastLivingBombOnAttackersAction(botAI); }
     static Action* dragons_breath(PlayerbotAI* botAI) { return new CastDragonsBreathAction(botAI); }
     static Action* blast_wave(PlayerbotAI* botAI) { return new CastBlastWaveAction(botAI); }
     static Action* invisibility(PlayerbotAI* botAI) { return new CastInvisibilityAction(botAI); }
@@ -251,6 +256,7 @@ private:
         return new CastCounterspellOnEnemyHealerAction(botAI);
     }
     static Action* mirror_image(PlayerbotAI* botAI) { return new CastMirrorImageAction(botAI); }
+    static Action* focus_magic_on_party(PlayerbotAI* botAI) { return new CastFocusMagicOnPartyAction(botAI); }
 };
 
 MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

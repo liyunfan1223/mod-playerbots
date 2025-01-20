@@ -5,6 +5,7 @@
 
 #include "ShamanTriggers.h"
 
+#include "ItemTemplate.h"
 #include "Playerbots.h"
 
 /*
@@ -46,8 +47,12 @@ bool MainHandWeaponNoImbueTrigger::IsActive()
 bool OffHandWeaponNoImbueTrigger::IsActive()
 {
     Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-    if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) ||
-        itemForSpell->GetTemplate()->InventoryType != INVTYPE_WEAPON)
+    if (!itemForSpell)
+        return false;
+    uint32 invType = itemForSpell->GetTemplate()->InventoryType;
+    bool allowedType = (invType == INVTYPE_WEAPON) || (invType == INVTYPE_WEAPONOFFHAND);
+    if (itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) ||
+        !allowedType)
         return false;
     return true;
 }

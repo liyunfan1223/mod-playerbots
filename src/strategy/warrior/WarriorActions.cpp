@@ -13,12 +13,12 @@ bool CastSunderArmorAction::isUseful()
     return !aura || aura->GetStackAmount() < 5 || aura->GetDuration() <= 6000;
 }
 
-Value<Unit*>* CastVigilanceAction::GetTargetValue()
+Unit* CastVigilanceAction::GetTarget()
 {
     Group* group = bot->GetGroup();
     if (!group)
     {
-        return new ManualSetValue<Unit*>(botAI, nullptr);
+        return nullptr;
     }
 
     Player* currentVigilanceTarget = nullptr;
@@ -74,23 +74,23 @@ Value<Unit*>* CastVigilanceAction::GetTargetValue()
     // If no valid target, return nullptr
     if (!highestPriorityTarget)
     {
-        return new ManualSetValue<Unit*>(botAI, nullptr);
+        return nullptr;
     }
 
     // If the current target is already the highest-priority target, do nothing
     if (currentVigilanceTarget == highestPriorityTarget)
     {
-        return new ManualSetValue<Unit*>(botAI, nullptr);
+        return nullptr;
     }
 
     // Assign the new target
     Unit* targetUnit = highestPriorityTarget->ToUnit();
     if (targetUnit)
     {
-        return new ManualSetValue<Unit*>(botAI, targetUnit);
+        return targetUnit;
     }
 
-    return new ManualSetValue<Unit*>(botAI, nullptr);
+    return nullptr;
 }
 
 bool CastVigilanceAction::Execute(Event event)

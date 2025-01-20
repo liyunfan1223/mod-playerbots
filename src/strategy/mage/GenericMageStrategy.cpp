@@ -59,7 +59,7 @@ private:
     {
         return new ActionNode("fire blast",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("scorch"), nullptr),
+                              /*A*/ nullptr,
                               /*C*/ nullptr);
     }
 
@@ -115,16 +115,16 @@ private:
     {
         return new ActionNode("dragon's breath",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("blast wave"), nullptr),
-                              /*C*/ NextAction::array(0, new NextAction("flamestrike", 71.0f), nullptr));
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
     }
 
     static ActionNode* blast_wave([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("blast wave",
                               /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("frost nova"), nullptr),
-                              /*C*/ NextAction::array(0, new NextAction("flamestrike", 71.0f), nullptr));
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
     }
 
     static ActionNode* remove_curse([[maybe_unused]] PlayerbotAI* botAI)
@@ -194,8 +194,7 @@ void MageBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 50.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("presence of mind", NextAction::array(0, new NextAction("presence of mind", 42.0f), nullptr)));
-    // triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 41.0f),
-    // nullptr)));
+    // triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 41.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 41.0f), nullptr)));
 }

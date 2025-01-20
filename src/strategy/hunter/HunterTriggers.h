@@ -101,10 +101,18 @@ public:
     TrueshotAuraTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "trueshot aura") {}
 };
 
+class NoTrackTrigger : public BuffTrigger
+{
+public:
+    NoTrackTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "no track") {}
+    bool IsActive() override;
+};
+
 class SerpentStingOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
 public:
     SerpentStingOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "serpent sting", true) {}
+    bool IsActive() override;
 };
 
 BEGIN_TRIGGER(HunterPetNotHappy, Trigger)

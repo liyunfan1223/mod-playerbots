@@ -36,6 +36,7 @@
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "StatsWeightCalculator.h"
+#include "World.h"
 
 #define PLAYER_SKILL_INDEX(x) (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 
@@ -784,6 +785,13 @@ void PlayerbotFactory::InitPet()
                 continue;
 
             if (itr->second.minlevel > bot->GetLevel())
+                continue;
+
+            bool onlyWolf = sPlayerbotAIConfig->hunterWolfPet == 2 ||
+                            (sPlayerbotAIConfig->hunterWolfPet == 1 &&
+                             bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
+            // Wolf only (for higher dps)
+            if (onlyWolf && itr->second.family != CREATURE_FAMILY_WOLF)
                 continue;
 
             ids.push_back(itr->first);
@@ -2807,11 +2815,11 @@ void PlayerbotFactory::InitAmmo()
 
     uint32 entry = sRandomItemMgr->GetAmmo(level, subClass);
     uint32 count = bot->GetItemCount(entry);
-    uint32 maxCount = 6000;
+    uint32 maxCount = bot->getClass() == CLASS_HUNTER ? 6000 : 1000;
 
-    if (count < maxCount / 2)
+    if (count < maxCount)
     {
-        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount / 2))
+        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount - count))
         {
             newItem->AddToUpdateQueueOf(bot);
         }

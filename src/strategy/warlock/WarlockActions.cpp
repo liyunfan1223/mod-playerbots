@@ -18,7 +18,7 @@ Value<Unit*>* CastFearOnCcAction::GetTargetValue() { return context->GetValue<Un
 
 bool CastFearOnCcAction::Execute(Event event) { return botAI->CastSpell("fear", GetTarget()); }
 
-bool CastFearOnCcAction::isPossible() { return botAI->CanCastSpell("fear", GetTarget()); }
+bool CastFearOnCcAction::isPossible() { return true; }
 
 bool CastFearOnCcAction::isUseful() { return true; }
 

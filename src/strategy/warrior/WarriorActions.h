@@ -140,7 +140,7 @@ class CastVigilanceAction : public BuffOnPartyAction
 public:
     CastVigilanceAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "vigilance") {}
 
-    Value<Unit*>* GetTargetValue() override;
+    Unit* GetTarget() override;
     bool Execute(Event event) override;
 };
 
