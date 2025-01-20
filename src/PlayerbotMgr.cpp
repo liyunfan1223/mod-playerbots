@@ -484,10 +484,11 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
         if (!groupValid)
         {
-            WorldPacket p;
-            std::string const member = bot->GetName();
-            p << uint32(PARTY_OP_LEAVE) << member << uint32(0);
-            bot->GetSession()->HandleGroupDisbandOpcode(p);
+            bot->RemoveFromGroup();
+            // WorldPacket p;
+            // std::string const member = bot->GetName();
+            // p << uint32(PARTY_OP_LEAVE) << member << uint32(0);
+            // bot->GetSession()->HandleGroupDisbandOpcode(p);
         }
     }
 

@@ -57,10 +57,10 @@ public:
     CastPyroblastAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "pyroblast") {}
 };
 
-class CastFlamestrikeAction : public CastSpellAction
+class CastFlamestrikeAction : public CastDebuffSpellAction
 {
 public:
-    CastFlamestrikeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "flamestrike") {}
+    CastFlamestrikeAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flamestrike", true, 0.0f) {}
     ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
@@ -243,11 +243,18 @@ public:
     CastLivingBombAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "living bomb", true) {}
 };
 
+class CastLivingBombOnAttackersAction : public CastDebuffSpellOnAttackerAction
+{
+public:
+    CastLivingBombOnAttackersAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "living bomb", true) {}
+};
+
 class CastDragonsBreathAction : public CastSpellAction
 {
 public:
     CastDragonsBreathAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "dragon's breath") {}
     ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+    bool isUseful() override;
 };
 
 class CastBlastWaveAction : public CastSpellAction
@@ -255,6 +262,7 @@ class CastBlastWaveAction : public CastSpellAction
 public:
     CastBlastWaveAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "blast wave") {}
     ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+    bool isUseful() override;
 };
 
 class CastInvisibilityAction : public CastBuffSpellAction
@@ -292,6 +300,13 @@ class CastMirrorImageAction : public CastBuffSpellAction
 {
 public:
     CastMirrorImageAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mirror image") {}
+};
+
+class CastFocusMagicOnPartyAction : public CastSpellAction
+{
+public:
+    CastFocusMagicOnPartyAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "focus magic") {}
+    Unit* GetTarget() override;
 };
 
 #endif

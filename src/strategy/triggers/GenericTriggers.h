@@ -618,8 +618,8 @@ public:
     {
     }
 
-    std::string const GetTargetName() { return "self target"; }
-    virtual bool IsActive();
+    std::string const GetTargetName() override { return "self target"; }
+    bool IsActive() override;
 
 private:
     int stack;

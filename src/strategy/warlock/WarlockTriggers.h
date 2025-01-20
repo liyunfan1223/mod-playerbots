@@ -163,6 +163,13 @@ public:
     bool IsActive() override;
 };
 
+class LifeTapGlyphBuffTrigger : public BuffTrigger
+{
+public:
+    LifeTapGlyphBuffTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "life tap") {}
+    bool IsActive() override;
+};
+
 class MoltenCoreTrigger : public HasAuraTrigger
 {
 public:
