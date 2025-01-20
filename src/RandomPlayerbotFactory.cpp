@@ -686,8 +686,12 @@ void RandomPlayerbotFactory::CreateBotCharacters(std::unordered_map<NameRaceAndG
 
     std::vector<uint32> botAccountIds = GetBotAccountIds();
 
+    uint32 totalAccounts = botAccountIds.size();
+    uint32 currentAccountIndex = 0;
+
     for (uint32 accountId : botAccountIds)
     {
+        currentAccountIndex++;
         sPlayerbotAIConfig->randomBotAccounts.push_back(accountId);
 
         uint32 count = AccountMgr::GetCharactersCount(accountId);
@@ -695,8 +699,7 @@ void RandomPlayerbotFactory::CreateBotCharacters(std::unordered_map<NameRaceAndG
         {
             continue;
         }
-        LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", accountId,
-            sPlayerbotAIConfig->randomBotAccountCount);
+        LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", currentAccountIndex, totalAccounts);
         RandomPlayerbotFactory factory(accountId);
 
         WorldSession* session = new WorldSession(accountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
