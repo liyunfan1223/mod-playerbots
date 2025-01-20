@@ -466,68 +466,40 @@ void RandomPlayerbotFactory::CreateRandomBots()
 void RandomPlayerbotFactory::DeleteRandomBotAccounts()
 {
     std::vector<uint32> botAccounts = GetBotAccountIds();
-    LOG_INFO("playerbots", "Deleting all random bot characters, {} accounts collected...", botAccounts.size());
+    uint32 totalAccounts = botAccounts.size();
+    LOG_INFO("playerbots", "Deleting all random bot accounts, {} accounts collected...", totalAccounts);
 
-    int32 deletion_count = 0;
-    for (uint32 accId : botAccounts)
+    uint32 currentAccountIndex = 0;
+
+    // Delete all random bot accounts and characters
+    for (uint32 accountId : botAccounts)
     {
-        LOG_INFO("playerbots", "Deleting characters for account accID: {}({})...", accId, ++deletion_count);
-        DeleteBotCharacters(accId);
-        LOG_INFO("playerbots", "Deleting account accID: {}({})...", accId, deletion_count);
-        AccountMgr::DeleteAccount(accId);
-    }
+        currentAccountIndex++;
 
+        // Retrieve the account name from the database
+        std::string accountName = AccountMgr::GetName(accountId, accountName);
+        std::string botAccountPrefix = sPlayerbotAIConfig->randomBotAccountPrefix;
+        std::string botAccountNumber = accountName.substr(botAccountPrefix.length());
+
+        // Check if the account name starts with the configured bot account prefix
+        if (accountName.find(botAccountPrefix) == std::string::npos)
+        {
+            LOG_ERROR("playerbots", "Account {} is not a bot account. Skipping Account and character deletion.", currentAccountIndex);
+            return;
+        }
+
+        LOG_INFO("playerbots", "Deleting bot account: {} (account {} / {})...", botAccountNumber, currentAccountIndex, totalAccounts);
+        AccountMgr::DeleteAccount(accountId);
+    }
+    // TODO: this should probably be part of a "cleanup" function including other statements from here: https://github.com/liyunfan1223/mod-playerbots/wiki/Playerbot-Queries#clear-bots
     PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
+
     /* TODO(yunfan): we need to sleep here to wait for async account deleted, or the newly account won't be created
            correctly the better way is turning the async db operation to sync db operation */
     std::this_thread::sleep_for(10ms * sPlayerbotAIConfig->randomBotAccountCount);
-    LOG_INFO("playerbots", "Random bot characters deleted.");
+    LOG_INFO("playerbots", "Random bot accounts and characters deleted.");
     LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
     World::StopNow(SHUTDOWN_EXIT_CODE);
-}
-
-/**
- * @brief Delete all characters associated with a bot account.
- *
- * This function deletes all characters associated with the given bot account ID.
- * It first checks if the account is a bot account by verifying the prefix in the account name.
- *
- * Example:
- * If accountId = 1 and the account name starts with the configured bot account prefix,
- * the function will delete all characters associated with the account ID 1.
- *
- * @param accountId The ID of the bot account whose characters are to be deleted.
- */
-void RandomPlayerbotFactory::DeleteBotCharacters(uint32 accountId)
-{
-    // Retrieve the account name from the database
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_USERNAME_BY_ID);
-    stmt->SetData(0, accountId);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-    if (!result)
-        return;
-
-    Field* fields = result->Fetch();
-    std::string accountName = fields[0].Get<std::string>();
-
-    // Check if the account name starts with the configured bot account prefix
-    if (accountName.find(sPlayerbotAIConfig->randomBotAccountPrefix) != 0)
-    {
-        LOG_ERROR("playerbots", "Account ID {} is not a bot account. Skipping character deletion.", accountId);
-        return;
-    }
-
-    QueryResult charactersResult = CharacterDatabase.Query("SELECT guid FROM characters WHERE account = {}", accountId);
-    if (charactersResult)
-    {
-        do
-        {
-            Field* fields = charactersResult->Fetch();
-            uint64 charGuid = fields[0].Get<uint64>();
-            LOG_INFO("playerbots", "Deleting character guid: {}", charGuid);
-            Player::DeleteFromDB(charGuid, accountId, false, true);
-        } while (charactersResult->NextRow());
-    }
 }
 
 /**

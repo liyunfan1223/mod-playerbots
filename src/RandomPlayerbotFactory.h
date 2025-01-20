@@ -65,7 +65,6 @@ private:
     static void CreateAccount(const std::string& accountName);
     static void CreateBotCharacters(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
     static std::vector<uint32> GetBotAccountIds();
-    static void DeleteBotCharacters(uint32 accountId);
     static uint8 SelectRandomRace(uint8 cls, bool alliance);
 
     uint32 accountId;
