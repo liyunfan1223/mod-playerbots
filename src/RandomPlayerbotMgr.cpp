@@ -360,7 +360,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
 
     if (sPlayerbotAIConfig->randomBotJoinBG /* && !players.empty()*/)
     {
-        if (time(nullptr) > (BgCheckTimer + 30))
+        if (time(nullptr) > (BgCheckTimer + 45))
             sRandomPlayerbotMgr->CheckBgQueue();
     }
 
