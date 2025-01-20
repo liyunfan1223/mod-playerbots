@@ -768,18 +768,56 @@ AiPlayerbot.AutoTeleportForLevel = 1
 # Enable BG/Arena for random Bots
 AiPlayerbot.RandomBotJoinBG = 1
 
-# Enable Auto join BG - bots randomly join WSG and 2v2 Arena if server is not lagging
+# Enable Auto join BG - have bots start BG's and Arenas on their own
 AiPlayerbot.RandomBotAutoJoinBG = 0
 
-# Required for RandomBotAutoJoinBG
-# Currently you can select 1 bracket (level range) for bots to auto join.
-# Brackets for warsong 0:10-19, 1:20-29, 2:30-39, 3:40-49 etc. Default: 7 (level 80)
-# Brackets for rated arena: 0:10-14, 1:15-19 etc. Default: 14 (80-84)
-# For lower level ranges to work in Rated Arena, custom code changes need to be made.
-# Count = amount of games Bots auto fill. (Count 1 for WSG = 20 bots).
-AiPlayerbot.RandomBotAutoJoinWarsongBracket = 7
+# Required Configuration for RandomBotAutoJoinBG
+#
+# Known issue: When enabling a lot of brackats in combination with multiple instances,
+#              can lead to more instances created by bots than intended (over-queuing).
+#
+# This section controls the level brackets and 
+# automatic bot participation in battlegrounds and arenas.
+#
+# Brackets:
+# - Specify the level ranges for bots to auto-join:
+#   - Warsong Gulch (WS): 0 = 10-19, 1 = 20-29, 2 = 30-39, ..., 7 = 80 (default: 7)
+#   - Rated Arena: 0 = 10-14, 1 = 15-19, ..., 14 = 80-84 (default: 14)
+# - Multiple brackets can be specified as a comma-separated list (e.g., "0,2,5").
+#
+# Counts:
+# - Specify the number of Battlegrounds to auto-fill per bracket.
+# - For battlegrounds, Count is the number of bots per bracket. For example:
+#   - Warsong Gulch Count = 1 adds 20 bots (10 per team).
+# - Ensure there are enough eligible bots to meet the specified counts.
+#
+# Arena Considerations:
+# - Rated Arena brackets default to level 80-84 (bracket 14).
+# - Custom code changes are required for lower-level arena brackets to function properly.
+#
+# Battleground bracket range possibilities:
+# AiPlayerbot.RandomBotAutoJoinICBrackets = 0,1
+# AiPlayerbot.RandomBotAutoJoinEYBrackets = 0,1,2
+# AiPlayerbot.RandomBotAutoJoinAVBrackets = 0,1,2,3
+# AiPlayerbot.RandomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
+# AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6,7
+
+AiPlayerbot.RandomBotAutoJoinICBrackets = 1
+AiPlayerbot.RandomBotAutoJoinEYBrackets = 2
+AiPlayerbot.RandomBotAutoJoinAVBrackets = 3
+AiPlayerbot.RandomBotAutoJoinABBrackets = 6
+AiPlayerbot.RandomBotAutoJoinWSBrackets = 7
+
+# Battlegrounds count (per bracket!):
+AiPlayerbot.RandomBotAutoJoinBGICCount = 0
+AiPlayerbot.RandomBotAutoJoinBGEYCount = 1
+AiPlayerbot.RandomBotAutoJoinBGAVCount = 0
+AiPlayerbot.RandomBotAutoJoinBGABCount = 1
+AiPlayerbot.RandomBotAutoJoinBGWSCount = 1
+
+# Arena configuration:
 AiPlayerbot.RandomBotAutoJoinArenaBracket = 14
-AiPlayerbot.RandomBotAutoJoinBGWarsongCount = 0
+
 AiPlayerbot.RandomBotAutoJoinBGRatedArena2v2Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena3v3Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count = 0
