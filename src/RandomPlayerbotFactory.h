@@ -61,7 +61,7 @@ private:
     static std::string const CreateRandomArenaTeamName();
     static void CreateNameCache(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
     static uint32 GetNextBotAccountCounter();
-    static void CreateBotAccounts(uint32& botAccountCounter);
+    static void CreateBotAccounts(uint32& currentBotAccountCount, uint32& botAccountCounter);
     static void CreateAccount(const std::string& accountName);
     static void CreateBotCharacters(std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
     static std::vector<uint32> GetBotAccountIds();

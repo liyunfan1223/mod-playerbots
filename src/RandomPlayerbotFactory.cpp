@@ -450,9 +450,26 @@ void RandomPlayerbotFactory::CreateRandomBots()
         return;
     }
 
+    // Get the total number of bot accounts and the current number of bot accounts
+    uint32 totalBotAccounts = 0;
+    uint32 currentBotAccountCount = 0;
+
+    totalBotAccounts = sPlayerbotAIConfig->randomBotAccountCount;
+    currentBotAccountCount = GetBotAccountIds().size();
+
+    // Get the next bot account counter
     uint32 botAccountCounter = GetNextBotAccountCounter();
 
-    CreateBotAccounts(botAccountCounter);
+    if (botAccountCounter == 0 || totalBotAccounts == 0)
+    {
+        LOG_ERROR("playerbots", "Failed to create bot accounts. Aborting random bot creation.");
+        return;
+    }
+
+    if (currentBotAccountCount <= totalBotAccounts)
+    {
+        CreateBotAccounts(currentBotAccountCount, botAccountCounter);
+    }
 
     LOG_INFO("playerbots", "Creating random bot characters...");
     CreateBotCharacters(nameCache);
@@ -593,27 +610,29 @@ uint32 RandomPlayerbotFactory::GetNextBotAccountCounter()
  *
  * @param botAccountCounter The starting counter value for creating new bot accounts.
  */
-void RandomPlayerbotFactory::CreateBotAccounts(uint32& botAccountCounter)
+void RandomPlayerbotFactory::CreateBotAccounts(uint32& currentBotAccountCount, uint32& botAccountCounter)
 {
-    // Create new bot accounts if the current bot account counter is less than the configured bot account count
-    if (botAccountCounter < sPlayerbotAIConfig->randomBotAccountCount)
-    {
-        // Create new bot accounts until the configured bot account count is reached
-        for (uint32 i = botAccountCounter; i <= sPlayerbotAIConfig->randomBotAccountCount; ++i)
-        {
-            std::ostringstream out;
-            out << sPlayerbotAIConfig->randomBotAccountPrefix << botAccountCounter++;
-            std::string const accountName = out.str();
+    // number of accounts to create
+    uint32 totalAccounts = sPlayerbotAIConfig->randomBotAccountCount;
+    uint32 currentAccounts = currentBotAccountCount;
 
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
-            stmt->SetData(0, accountName);
-            PreparedQueryResult result = LoginDatabase.Query(stmt);
-            if (result)
-            {
-                continue;
-            }
-            CreateAccount(accountName);
+    // Create new bot accounts until the configured bot account count is reached
+    for (uint32 i = currentAccounts; i < totalAccounts; ++i)
+    {
+        std::ostringstream out;
+        out << sPlayerbotAIConfig->randomBotAccountPrefix << botAccountCounter++;
+        std::string const accountName = out.str();
+
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
+        stmt->SetData(0, accountName);
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+        if (result)
+        {
+            continue;
         }
+
+        LOG_INFO("playerbots", "Creating new bot account: {} / {}", i+1, sPlayerbotAIConfig->randomBotAccountCount);
+        CreateAccount(accountName);
     }
 }
 
