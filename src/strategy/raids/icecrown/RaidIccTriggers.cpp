@@ -551,10 +551,10 @@ bool IccValithriaPortalTrigger::IsActive()
 
 bool IccValithriaHealTrigger::IsActive()
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "valithria dreamwalker");
+    Unit* boss = bot->FindNearestCreature(36789, 100.0f);
     if (!boss) 
         return false;
-
+    
     // Only healers should use healing
     if (!botAI->IsHeal(bot) || bot->HasAura(70766))
         return false;
