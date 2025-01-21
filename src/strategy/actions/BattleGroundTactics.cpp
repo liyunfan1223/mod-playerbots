@@ -2454,8 +2454,8 @@ bool BGTactics::selectObjective(bool reset)
         {
             BattlegroundAV* alterValleyBG = (BattlegroundAV*)bg;
             uint32 role = context->GetValue<uint32>("bg role")->Get();
-            bool supportDefense = role < 3;  // defensive role and mine capture (mine capture disabled for now)
-            bool advancedAttack = role > 5;  // doesnt wait for point to be fully captured before moving on
+            bool supportDefense = role < 2;  // defensive role and mine capture (mine capture disabled for now)
+            bool advancedAttack = role > 4;  // doesnt wait for point to be fully captured before moving on
 
             // some of the code below is a bit inefficent (lots of rechecking same variables, could be made more
             // efficient with a refactor) but it's been left this way so it can be easily reordered. in future we could
