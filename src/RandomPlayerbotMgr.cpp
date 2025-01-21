@@ -717,6 +717,15 @@ void RandomPlayerbotMgr::CheckBgQueue()
             // BG Logic
             else
             {
+                // if self-bot
+                if (GET_PLAYERBOT_AI(player))
+                {
+                    if (teamId == TEAM_ALLIANCE)
+                        BattlegroundData[queueTypeId][bracketId].bgAllianceBotCount++;
+                    else
+                        BattlegroundData[queueTypeId][bracketId].bgHordeBotCount++;
+                }
+
                 if (teamId == TEAM_ALLIANCE)
                     BattlegroundData[queueTypeId][bracketId].bgAlliancePlayerCount++;
                 else
