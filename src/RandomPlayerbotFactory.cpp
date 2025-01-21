@@ -15,6 +15,8 @@
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 
+#include <algorithm>
+
 std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
 
 constexpr RandomPlayerbotFactory::NameRaceAndGender RandomPlayerbotFactory::CombineRaceAndGender(uint8 gender,
@@ -477,18 +479,31 @@ void RandomPlayerbotFactory::DeleteRandomBotAccounts()
         currentAccountIndex++;
 
         // Retrieve the account name from the database
-        std::string accountName = AccountMgr::GetName(accountId, accountName);
+        std::string accountName;
+        if (!AccountMgr::GetName(accountId, accountName))
+        {
+            LOG_ERROR("playerbots", "Failed to retrieve account name for account ID {}. Skipping account and character deletion.", accountId);
+            continue;
+        }
+
         std::string botAccountPrefix = sPlayerbotAIConfig->randomBotAccountPrefix;
+
+        // Convert accountName and botAccountPrefix to touppercase for case-insensitive comparison
+        std::string accountNameUpper = accountName;
+        std::string botAccountPrefixUpper = botAccountPrefix;
+        std::transform(accountNameUpper.begin(), accountNameUpper.end(), accountNameUpper.begin(), ::toupper);
+        std::transform(botAccountPrefixUpper.begin(), botAccountPrefixUpper.end(), botAccountPrefixUpper.begin(), ::toupper);
+
         std::string botAccountNumber = accountName.substr(botAccountPrefix.length());
 
         // Check if the account name starts with the configured bot account prefix
-        if (accountName.find(botAccountPrefix) == std::string::npos)
+        if (accountNameUpper.find(botAccountPrefixUpper) == std::string::npos)
         {
-            LOG_ERROR("playerbots", "Account {} is not a bot account. Skipping Account and character deletion.", currentAccountIndex);
-            return;
+            LOG_ERROR("playerbots", "Account {} is not a bot account. Skipping character deletion.", currentAccountIndex);
+            continue;
         }
 
-        LOG_INFO("playerbots", "Deleting bot account: {} (account {} / {})...", botAccountNumber, currentAccountIndex, totalAccounts);
+        LOG_INFO("playerbots", "Deleting bot account: {} / {}...", currentAccountIndex, totalAccounts);
         AccountMgr::DeleteAccount(accountId);
     }
     // TODO: this should probably be part of a "cleanup" function including other statements from here: https://github.com/liyunfan1223/mod-playerbots/wiki/Playerbot-Queries#clear-bots
