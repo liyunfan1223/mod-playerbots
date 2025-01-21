@@ -2463,11 +2463,19 @@ bool BGTactics::selectObjective(bool reset)
 
             if (bot->GetTeamId() == TEAM_HORDE)
             {
-                bool enemyTowersDown =
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_NORTH).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_SOUTH).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEWING_BUNKER).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_STONEHEART_BUNKER).State == POINT_DESTROYED;
+                int towersDestroyed = 0;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_NORTH).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_SOUTH).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEWING_BUNKER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_STONEHEART_BUNKER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+
+                // Now require only 2 to be destroyed
+                bool enemyTowersDown = (towersDestroyed >= 2);
+
                 // End Boss
                 if (enemyTowersDown &&
                     alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FIRSTAID_STATION).OwnerId != TEAM_ALLIANCE &&
@@ -2652,11 +2660,19 @@ bool BGTactics::selectObjective(bool reset)
             }
             else  // TEAM_ALLIANCE
             {
-                bool enemyTowersDown =
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_WTOWER).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_ETOWER).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_TOWER_POINT).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEBLOOD_TOWER).State == POINT_DESTROYED;
+                int towersDestroyed = 0;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_WTOWER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_ETOWER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_TOWER_POINT).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEBLOOD_TOWER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+
+                // Now require only 2 to be destroyed
+                bool enemyTowersDown = (towersDestroyed >= 2);
+                
                 // End Boss
                 if (enemyTowersDown && alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_HUT).OwnerId != TEAM_HORDE &&
                     alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_HUT).TotalOwnerId != TEAM_HORDE)
