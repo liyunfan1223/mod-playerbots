@@ -171,7 +171,7 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
         PrepareTeleportCache();
     }
 
-    BattlegroundData.clear(); // SAW
+    BattlegroundData.clear(); // Clear here and here only.
 
     for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
     {
