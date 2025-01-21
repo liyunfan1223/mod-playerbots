@@ -403,23 +403,25 @@ bool IccGunshipTeleportAllyAction::Execute(Event event)
     if (!boss)
         return false;
 
-    // Only target the mage that is channeling Below Zero
+    // Only proceed if the mage is channeling Below Zero
     if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
     {
+        // If not casting and we're too far from waiting position, go there
         if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_ALLY2) > 45.0f)
             return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionX(),
                           ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionY(), ICC_GUNSHIP_TELEPORT_ALLY2.GetPositionZ(), bot->GetOrientation());
+        return false;
     }
 
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
     if (bot->GetTarget() != boss->GetGUID())
         return false;
-
+        
     if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_ALLY) > 15.0f)
         return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_ALLY.GetPositionX(),
                       ICC_GUNSHIP_TELEPORT_ALLY.GetPositionY(), ICC_GUNSHIP_TELEPORT_ALLY.GetPositionZ(), bot->GetOrientation());
-    else
+    
         return Attack(boss);
 }
 
@@ -429,12 +431,14 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
     if (!boss)
         return false;
 
-    // Only target the sorcerer that is channeling Below Zero
+    // Only proceed if the sorcerer is channeling Below Zero
     if (!(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(69705)))
     {
+        // If not casting and we're too far from waiting position, go there
         if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_HORDE2) > 45.0f)
             return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionX(),
                           ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionY(), ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionZ(), bot->GetOrientation());
+        return false;
     }
 
     bot->SetTarget(boss->GetGUID());
@@ -445,7 +449,7 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
     if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_HORDE) > 15.0f)
         return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_HORDE.GetPositionX(),
                       ICC_GUNSHIP_TELEPORT_HORDE.GetPositionY(), ICC_GUNSHIP_TELEPORT_HORDE.GetPositionZ(), bot->GetOrientation());
-    else
+    
         return Attack(boss);
 }
 
@@ -1054,7 +1058,8 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
         }
     }
 
-    // For melee
+    /*
+    // For melee old stacking
     if (botAI->IsMelee(bot) && !botAI->IsMainTank(bot))
     {
         // If ooze exists and someone has aura, attack the ooze
@@ -1072,6 +1077,18 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
                             stackTarget->GetPositionY(), stackTarget->GetPositionZ(),
                             false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
             }
+        }
+    }
+    */
+
+    // For melee new only attacking
+    if (botAI->IsMelee(bot) && !botAI->IsMainTank(bot))
+    {
+        // If ooze exists and someone has aura, attack the ooze
+        if (ooze)
+        {
+            bot->SetTarget(ooze->GetGUID());
+            return Attack(ooze);
         }
     }
 
@@ -1539,41 +1556,41 @@ bool IccBqlTankPositionAction::Execute(Event event)
     float moveIncrement = 3.0f;
     bool isRanged = botAI->IsRanged(bot);
     bool isMelee = botAI->IsMelee(bot);
+    Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    if (isRanged && !(bot->HasAura(70877) || bot->HasAura(71474) && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))) //frenzied bloodthrist
+    if (isRanged && !aura) //frenzied bloodthrist
     {
         // Ranged: spread from other ranged
         for (auto& member : members)
         {
             Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || unit == bot || unit->HasAura(70877) || unit->HasAura(71474))
+            if (!unit || !unit->IsAlive() || unit == bot || botAI->GetAura("Frenzied Bloodthirst", unit))
                 continue;
 
             float dist = bot->GetExactDist2d(unit);
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return FleePosition(unit->GetPosition(), moveDistance);
-                // return MoveAway(unit, moveDistance);
+                return MoveAway(unit, moveDistance);
             }
         }
     }
-    if (isMelee && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)) // melee also spread
+
+    if (isMelee && !aura && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)) // melee also spread
     {
         // Melee: spread from other melee
         for (auto& member : members)
         {
             Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || unit == bot || unit->HasAura(70877) || unit->HasAura(71474))
+            if (!unit || !unit->IsAlive() || unit == bot || botAI->GetAura("Frenzied Bloodthirst", unit))
                 continue;
 
             float dist = bot->GetExactDist2d(unit);
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return FleePosition(unit->GetPosition(), moveDistance);
-                // return MoveAway(unit, moveDistance);
+                return MoveAway(unit, moveDistance);
             }
         }
     }
@@ -1583,7 +1600,8 @@ bool IccBqlTankPositionAction::Execute(Event event)
 bool IccBqlPactOfDarkfallenAction::Execute(Event event)
 {
     // Check if bot has Pact of the Darkfallen
-    if (!bot->HasAura(71340))
+    Aura* aura = botAI->GetAura("Pact of the Darkfallen", bot);
+    if (!aura) 
         return false;
 
     const float POSITION_TOLERANCE = 1.0f;  // Within 1 yards to break the link
@@ -1603,7 +1621,7 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event event)
         if (!member || member->GetGUID() == bot->GetGUID())
             continue;
 
-        if (member->HasAura(71340)) //pact of darkfallen
+        if (botAI->GetAura("Pact of the Darkfallen", member)) //pact of darkfallen
         {
             playersWithAura.push_back(member);
             // If this player is a tank, store them
@@ -1679,7 +1697,9 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event event)
 bool IccBqlVampiricBiteAction::Execute(Event event)
 {
     // Only act when bot has Frenzied Bloodthirst
-    if (!(bot->HasAura(70877) || bot->HasAura(71474)))
+    Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
+
+    if (!aura) 
         return false;
 
     const float BITE_RANGE = 2.0f;
@@ -1688,9 +1708,26 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
     if (!group)
         return false;
 
-    // Create lists for potential targets
-    std::vector<Player*> dpsTargets;
-    std::vector<Player*> healTargets;
+    // Create lists for potential targets with their distances
+    std::vector<std::pair<Player*, float>> dpsTargets;
+    std::vector<std::pair<Player*, float>> healTargets;
+
+    // Get list of players who are currently being targeted
+    std::set<ObjectGuid> currentlyTargetedPlayers;
+    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member || !member->IsAlive() || member == bot)
+            continue;
+
+        if (botAI->GetAura("Frenzied Bloodthirst", member))
+        {
+            if (ObjectGuid targetGuid = member->GetTarget())
+            {
+                currentlyTargetedPlayers.insert(targetGuid);
+            }
+        }
+    }
 
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -1699,28 +1736,40 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
             continue;
 
         // Skip if already has essence, frenzy, or is a tank, or uncontrollable frenzy
-        if (member->HasAura(70867) || member->HasAura(70877) || member->HasAura(70879) || member->HasAura(71473) 
-           || member->HasAura(71474) || member->HasAura(71525) || member->HasAura(71530) || member->HasAura(71531) 
-           || member->HasAura(71532) || member->HasAura(71533) || member->HasAura(70923) || botAI->IsTank(member))
+        if (botAI->GetAura("Frenzied Bloodthirst", member) || botAI->GetAura("Essence of the Blood Queen", member) || botAI->GetAura("Uncontrollable Frenzy", member) || botAI->IsTank(member))
         {
             continue;
         }
 
+        // Skip if this player is currently targeted by another bot
+        if (currentlyTargetedPlayers.find(member->GetGUID()) != currentlyTargetedPlayers.end())
+            continue;
+
+        float distance = bot->GetDistance(member);
+        
         if (botAI->IsDps(member))
-            dpsTargets.push_back(member);
+            dpsTargets.push_back(std::make_pair(member, distance));
         else if (botAI->IsHeal(member))
-            healTargets.push_back(member);
+            healTargets.push_back(std::make_pair(member, distance));
     }
 
-    // First try DPS targets
+    // Sort both vectors by distance
+    auto sortByDistance = [](const std::pair<Player*, float>& a, const std::pair<Player*, float>& b) {
+        return a.second < b.second;
+    };
+
+    std::sort(dpsTargets.begin(), dpsTargets.end(), sortByDistance);
+    std::sort(healTargets.begin(), healTargets.end(), sortByDistance);
+
+    // First try closest DPS target
     if (!dpsTargets.empty())
     {
-        target = dpsTargets[0];  // Take first available DPS
+        target = dpsTargets[0].first;
     }
-    // If no DPS available, try healers
+    // If no DPS available, try closest healer
     else if (!healTargets.empty())
     {
-        target = healTargets[0];  // Take first available healer
+        target = healTargets[0].first;
     }
 
     if (!target)
@@ -1753,9 +1802,9 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
             return false;
         }
 
-        if (botAI->CanCastSpell(70946, target))
+        if (botAI->CanCastSpell("Vampiric Bite", target))
         {
-            return botAI->CastSpell(70946, target);
+            return botAI->CastSpell("Vampiric Bite", target);
         }
     }
 
@@ -2728,7 +2777,7 @@ bool IccLichKingAddsAction::Execute(Event event)
         return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(),
                           bot->GetPositionY(), 840.857f, bot->GetOrientation());
 
-    //temp soultion for bots when they get teleport far away into another dimension (they are unable to attack spirit warden)
+    //temp soultion for bots when they get teleport far away into another dimension (they are unable to attack spirit warden) in heroic they will be in safe spot while player is surviving vile spirits
     Difficulty diff = bot->GetRaidDifficulty();
     if (!(diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC) && abs(bot->GetPositionY() - -2095.7915f) > 200.0f)
     {
