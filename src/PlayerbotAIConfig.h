@@ -173,12 +173,25 @@ public:
 
     bool randomBotJoinBG;
     bool randomBotAutoJoinBG;
-    uint32 randomBotAutoJoinWarsongBracket;
+
+    std::string randomBotAutoJoinICBrackets;
+    std::string randomBotAutoJoinEYBrackets;
+    std::string randomBotAutoJoinAVBrackets;
+    std::string randomBotAutoJoinABBrackets;
+    std::string randomBotAutoJoinWSBrackets;
+
+    uint32 randomBotAutoJoinBGICCount;
+    uint32 randomBotAutoJoinBGEYCount;
+    uint32 randomBotAutoJoinBGAVCount;
+    uint32 randomBotAutoJoinBGABCount;
+    uint32 randomBotAutoJoinBGWSCount;
+
     uint32 randomBotAutoJoinArenaBracket;
-    uint32 randomBotAutoJoinBGWarsongCount;
+
     uint32 randomBotAutoJoinBGRatedArena2v2Count;
     uint32 randomBotAutoJoinBGRatedArena3v3Count;
     uint32 randomBotAutoJoinBGRatedArena5v5Count;
+
     bool randomBotLoginAtStartup;
     uint32 randomBotTeleLowerLevel, randomBotTeleHigherLevel;
     bool logInGroupOnly, logValuesPerTick;

@@ -138,7 +138,8 @@ bool IccRangedPositionLadyDeathwhisperAction::Execute(Event event)
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return MoveAway(unit, moveDistance);
+                return FleePosition(unit->GetPosition(), moveDistance);
+                // return MoveAway(unit, moveDistance);
             }
         }
     }
@@ -274,9 +275,10 @@ bool IccRottingFrostGiantTankPositionAction::Execute(Event event)
         }
 
         Unit* unit = botAI->GetUnit(member);
-        if ((botAI->IsHeal(bot) || botAI->IsDps(bot)) && bot->GetExactDist2d(unit) < radius)
+        if (unit && (botAI->IsHeal(bot) || botAI->IsDps(bot)) && bot->GetExactDist2d(unit) < radius)
         {
-            return MoveAway(unit, radius + distanceExtra - bot->GetExactDist2d(unit));
+            return FleePosition(unit->GetPosition(), radius + distanceExtra - bot->GetExactDist2d(unit));
+            // return MoveAway(unit, radius + distanceExtra - bot->GetExactDist2d(unit));
         }
     }
     return Attack(boss);
@@ -486,7 +488,8 @@ bool IccDbsTankPositionAction::Execute(Event event)
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return MoveAway(unit, moveDistance);
+                return FleePosition(unit->GetPosition(), moveDistance);
+                // return MoveAway(unit, moveDistance);
             }
         }
     }
@@ -608,7 +611,8 @@ bool IccFestergutTankPositionAction::Execute(Event event)
             // Move away from closest player, but maintain roughly max range from boss
             float distToCenter = bot->GetExactDist2d(ICC_FESTERGUT_TANK_POSITION);
             float moveDistance = (distToCenter > 25.0f) ? 2.0f : 3.0f; // Move less if already far from center
-            return MoveAway(closestPlayer, moveDistance);
+            return FleePosition(closestPlayer->GetPosition(), moveDistance);
+            // return MoveAway(closestPlayer, moveDistance);
         }
     }
     return false;
@@ -841,7 +845,8 @@ bool IccRotfaceGroupPositionAction::Execute(Event event)
             {
                 float distToCenter = bot->GetExactDist2d(ICC_ROTFACE_TANK_POSITION);
                 float moveDistance = (distToCenter > 25.0f) ? 2.0f : 3.0f;
-                return MoveAway(closestMember, moveDistance);
+                // return MoveAway(closestMember, moveDistance);
+                return FleePosition(closestMember->GetPosition(), moveDistance);
             }
             
             return false;
@@ -1302,7 +1307,8 @@ bool AvoidMalleableGooAction::Execute(Event event)
                     // Only move if we have line of sight
                     if (bot->IsWithinLOS(newX, newY, bot->GetPositionZ()))
                     {
-                        return MoveAway(unit, moveDistance);
+                        return FleePosition(unit->GetPosition(), moveDistance);
+                        // return MoveAway(unit, moveDistance);
                     }
                 }
             }
@@ -1505,7 +1511,8 @@ bool IccBpcEmpoweredVortexAction::Execute(Event event)
             // Only move if we have line of sight
             if (bot->IsWithinLOS(newX, newY, bot->GetPositionZ()))
             {
-                return MoveAway(unit, moveDistance);
+                return FleePosition(unit->GetPosition(), moveDistance);
+                // return MoveAway(unit, moveDistance);
             }
         }
     }
@@ -1547,7 +1554,8 @@ bool IccBqlTankPositionAction::Execute(Event event)
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return MoveAway(unit, moveDistance);
+                return FleePosition(unit->GetPosition(), moveDistance);
+                // return MoveAway(unit, moveDistance);
             }
         }
     }
@@ -1564,7 +1572,8 @@ bool IccBqlTankPositionAction::Execute(Event event)
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return MoveAway(unit, moveDistance);
+                return FleePosition(unit->GetPosition(), moveDistance);
+                // return MoveAway(unit, moveDistance);
             }
         }
     }

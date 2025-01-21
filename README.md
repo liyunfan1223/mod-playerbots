@@ -1,20 +1,38 @@
- [English](README.md) | [Español](README_ES.md) | [中文](README_CN.md)
+<p align="center">
+    <a href="https://github.com/liyunfan1223/mod-playerbots/blob/master/README.md">English</a>
+    |
+    <a href="https://github.com/liyunfan1223/mod-playerbots/blob/master/README_CN.md">中文</a>
+</p>
+
+
+<div align="center">
+  <img src="icon.png" alt="Playerbots Icon" width="700px">
+</div>
+
+<div align="center">
+    <img src="https://github.com/liyunfan1223/mod-playerbots/actions/workflows/macos_build.yml/badge.svg">
+    <img src="https://github.com/liyunfan1223/mod-playerbots/actions/workflows/core_build.yml/badge.svg">
+    <img src="https://github.com/liyunfan1223/mod-playerbots/actions/workflows/windows_build.yml/badge.svg">
+</div>
 
 # Playerbots Module
+`mod-playerbots` is an [AzerothCore](https://www.azerothcore.org/) module that adds player-like bots to a server. The project is based off [IKE3's Playerbots](https://github.com/ike3/mangosbot). Features include:
 
-Welcome to the Playerbots Module for AzerothCore, a work in progress project based on the IKE3 Playerbots. These Playerbots utilize actual player data, allowing you to interact with your own alts, form parties, level up characters, and much more.
+- Bots that utilize real player data, allowing players to interact with their other characters, form parties, level up, and more;
+- Random bots that wander through the world and behave like players, simulating the MMO experience;
+- Bots capable of running raids and battlegrounds;
+- Highly configurable settings to define how bots behave;
+- Excellent performance, even when running thousands of bots.
 
-If you encounter any errors or experience crashes, we kindly request that you report them as GitHub issues. Your valuable feedback will help us improve and enhance this project collaboratively.
+**This project is still under development**. If you encounter any errors or experience crashes, we kindly request that you [report them as GitHub issues](https://github.com/liyunfan1223/mod-playerbots/issues/new?template=bug_report.md). Your valuable feedback will help us improve this project collaboratively.
 
-You can also get more information in our [discord](https://discord.gg/NQm5QShwf9).
+**Playerbots Module** has a **[Discord server](https://discord.gg/NQm5QShwf9)** where you can discuss the project.
 
 ## Installation
 
-Please note that this module requires specific custom changes to AzerothCore. To ensure compatibility, you must compile it with a custom branch from my fork, which can be found here: [liyunfan1223/azerothcore-wotlk/tree/Playerbot](https://github.com/liyunfan1223/azerothcore-wotlk/tree/Playerbot).
+### Classic Installation
 
-To install this module, please refer to the AzerothCore Wiki for detailed instructions: [AzerothCore Installation Guide](https://www.azerothcore.org/wiki/installation).
-
-We've provided a simple method to clone the module:
+`mod-playerbots` requires a custom branch of AzerothCore to work: [liyunfan1223/azerothcore-wotlk/tree/Playerbot](https://github.com/liyunfan1223/azerothcore-wotlk/tree/Playerbot). To install the module, simply run:
 
 ```bash
 git clone https://github.com/liyunfan1223/azerothcore-wotlk.git --branch=Playerbot
@@ -22,57 +40,54 @@ cd azerothcore-wotlk/modules
 git clone https://github.com/liyunfan1223/mod-playerbots.git --branch=master
 ```
 
-## Quick Start & Documentation
+For more information, refer to the [AzerothCore Installation Guide](https://www.azerothcore.org/wiki/installation) and [Installing a Module](https://www.azerothcore.org/wiki/installing-a-module) pages.
 
-For a quick start and an extensive overview of available addons, commands, and recommended configuration please refer to the [Playerbots Wiki](https://github.com/liyunfan1223/mod-playerbots/wiki).
+### Docker Installation
 
-Please be aware that documentation for some newly added commands is currently lacking as the project is still under development.
+**Docker installation is considered experimental.** To install the module on a Docker installation, run:
 
-## Progress
+```bash
+git clone https://github.com/liyunfan1223/azerothcore-wotlk.git --branch=Playerbot
+cd azerothcore-wotlk/modules
+git clone https://github.com/liyunfan1223/mod-playerbots.git --branch=master
+```
 
-The module primarily emphasizes the following key features, and we have implemented improvements in these areas:
+Then, in the `docker-compose.yml` file, in the `volumes` section of the `ac-worldserver` container, add the modules folder to the volumes, like so:
 
-- **Bots in World (Random bot):** We have enhanced the behavior of random bots to make them mimic real players more closely, creating a more authentic player server environment.
+```bash
+volumes:
+      - ${DOCKER_VOL_ETC:-./env/dist/etc}:/azerothcore/env/dist/etc
+      - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_DATA:-ac-client-data}:/azerothcore/env/dist/data/:ro
+      - ./modules:/azerothcore/modules
+```
 
-- **Bots in Raid:** We've empowered bots to conquer challenging raid content by implementing specific strategies for various bosses, making raid encounters more engaging. Additionally, we have enhanced bots' capabilities in various roles such as DPS, healing, and tanking, ensuring they contribute effectively to the success of raid groups.
+Then, run `docker compose up -d --build`. For more information, refer to the [Install With Docker](https://www.azerothcore.org/wiki/install-with-docker) page.
 
-- **Bots in Battleground:** Bots are now capable of actively participating in battlegrounds alongside real players, adding depth and excitement to these PvP scenarios.
+## Documentation
 
-- **Interation with Bots:** We have improved the interaction between real players and bots, enabling players to complete quests and level up with multiple characters while collaborating with the bot companions.
+The [Playerbots Wiki](https://github.com/liyunfan1223/mod-playerbots/wiki) contains an extensive overview of addons, commands, and recommended configurations. Please note that documentation may be incomplete or out-of-date in some sections. Contributions are welcome.
 
-- **Player Progression Path:** We have designed an improved progression path for players, complemented by bots, to offer an alternative and engaging gameplay experience.
+## Frequently Asked Questions
 
-- **Stability:** Our efforts have focused on enhancing the overall stability of AzerothCore when using the Playerbots module. These improvements aim to prevent server crashes and ensure a smoother experience for all users.
+- **Why aren't my bots casting spells?** Please make sure that the necessary English DBC file (enUS) is present.
+- **What platforms are supported?** We support Ubuntu, Windows, and macOS. Other Linux distros may work, but will not receive support.
+- **Why isn't my source compiling?** Please [check the build status of our CI](https://github.com/liyunfan1223/mod-playerbots/actions). If the latest build is failing, rever to the last successful commit until we address the issue.
 
-- **Configuration:** We have introduced a range of configurable options to cater to players with varying requirements, allowing for a more personalized experience.
+## Addons
 
-It's essential to note that there is still a significant amount of work to be done as we continue to enhance the project. We welcome everyone to contribute in various ways.
+Typically, bots are controlled via chat commands. For larger bot groups, this can be unwieldy. As an alternative, community members have developed client Add-Ons to allow controlling bots through the in-game UI. We recommend you check out their projects:
 
-## Addon
-
-For enhanced control over the bots and to simplify command usage, you can also make use of available Playerbots addons:
 - [Multibot](https://github.com/Macx-Lio/MultiBot) (by Macx-Lio)
 - [Unbot Addon (zh)](https://github.com/liyunfan1223/unbot-addon) (Chinese version by Liyunfan)
 - [Unbot Addon (en)](https://github.com/noisiver/unbot-addon/tree/english) (English version translated by @Revision)
 
-## Frequently Asked Questions
-
-**Bots can't cast spells**
-
-- Please make sure that the necessary English DBC file (enUS) is present.
-
-**Compilation error**
-
-- We support for Ubuntu, Windows, and macOS.
-
-- Continuous integration workflows have been established. You can review the build status in [GitHub Actions](https://github.com/liyunfan1223/mod-playerbots/actions).
-
-- If the latest build status fails, please revert to the previous commit. We will address the issue ASAP.
-
 ## Acknowledgements
 
-The code for this module is ported from [ZhengPeiRu21/mod-playerbots](https://github.com/ZhengPeiRu21/mod-playerbots) and [celguar/mangosbot-bots](https://github.com/celguar/mangosbot-bots). We extend our gratitude to @ZhengPeiRu21 and @celguar for the continued efforts in maintaining the module.
+`mod-playerbots` is is based off [ZhengPeiRu21/mod-playerbots](https://github.com/ZhengPeiRu21/mod-playerbots) and [celguar/mangosbot-bots](https://github.com/celguar/mangosbot-bots). We extend our gratitude to [@ZhengPeiRu21](https://github.com/ZhengPeiRu21) and [@celguar](https://github.com/celguar) for the continued efforts in maintaining the module.
 
-We also want to express our sincere appreciation to all individuals who have contributed to playerbot development. Your dedication and efforts have been instrumental in shaping this project, and we are thankful for your contributions.
+Also, a thank you to the many contributors who've helped build this project:
 
-
+<a href="https://github.com/liyunfan1223/mod-playerbots/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=liyunfan1223/mod-playerbots" />
+</a>
