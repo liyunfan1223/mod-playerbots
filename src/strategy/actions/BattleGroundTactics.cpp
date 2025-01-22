@@ -4316,8 +4316,22 @@ bool BGTactics::protectFC()
         return false;
 
     Unit* teamFC = AI_VALUE(Unit*, "team flag carrier");
-    if (teamFC && bot->IsWithinDistInMap(teamFC, 50.0f))
-        return Follow(teamFC);
+
+    if (!teamFC || teamFC == bot)
+    {
+        return false;
+    }
+
+    if (!bot->IsInCombat() && !bot->IsWithinDistInMap(teamFC, 20.0f))
+    {
+        // Get the flag carrier's position
+        float fcX = teamFC->GetPositionX();
+        float fcY = teamFC->GetPositionY();
+        float fcZ = teamFC->GetPositionZ();
+        uint32 mapId = bot->GetMapId();
+        
+        return MoveNear(mapId, fcX, fcY, fcZ, 5.0f, MovementPriority::MOVEMENT_NORMAL);
+    }
 
     return false;
 }
