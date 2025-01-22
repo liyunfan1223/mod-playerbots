@@ -654,6 +654,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
     LOG_DEBUG("playerbots", "Checking BG Queue...");
 
     // Initialize Battleground Data (do not clear here)
+    
     for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
     {
         for (int queueType = BATTLEGROUND_QUEUE_AV; queueType < MAX_BATTLEGROUND_QUEUE_TYPES; ++queueType)
@@ -756,7 +757,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
     // Process player bots
     for (auto& [guid, bot] : playerBots)
     {
-        if (!bot || !bot->InBattlegroundQueue() || !IsRandomBot(bot))
+        if (!bot || !bot->InBattlegroundQueue() || !bot->IsInWorld() || !IsRandomBot(bot))  // !bot->IsInWorld() ||
             continue;
 
         Battleground* bg = bot->GetBattleground();
@@ -874,7 +875,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
         std::vector<uint32> wsBrackets = parseBrackets(sPlayerbotAIConfig->randomBotAutoJoinWSBrackets);
 
         // Check both bgInstanceCount / bgInstances.size
-        // to help counter against inconsistencies
+        // to help counter against potentional inconsistencies
         auto updateRatedArenaInstanceCount = [&](uint32 queueType, uint32 bracket, uint32 minCount) {
             if (BattlegroundData[queueType][bracket].activeRatedArenaQueue == 0 &&
                 BattlegroundData[queueType][bracket].ratedArenaInstanceCount < minCount &&
@@ -978,7 +979,7 @@ void RandomPlayerbotMgr::LogBattlegroundInfo()
                      std::to_string(bgInfo.minLevel) + "-" + std::to_string(bgInfo.maxLevel),
                      bgInfo.bgAlliancePlayerCount, bgInfo.bgHordePlayerCount, bgInfo.bgAllianceBotCount,
                      bgInfo.bgHordeBotCount, bgInfo.bgAlliancePlayerCount + bgInfo.bgAllianceBotCount,
-                     bgInfo.bgHordePlayerCount + bgInfo.bgHordeBotCount, bgInfo.bgInstanceCount, bgInfo.activeBgQueue); 
+                     bgInfo.bgHordePlayerCount + bgInfo.bgHordeBotCount, bgInfo.bgInstanceCount, bgInfo.activeBgQueue);
         }
     }
     LOG_DEBUG("playerbots", "BG Queue check finished");
