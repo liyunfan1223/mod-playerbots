@@ -29,6 +29,8 @@ void WarsongStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("low mana", NextAction::array(0, new NextAction("bg use buff", 30.0f), nullptr)));
     triggers.push_back(new TriggerNode(
         "enemy flagcarrier near", NextAction::array(0, new NextAction("attack enemy flag carrier", 80.0f), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "team has flag", NextAction::array(0, new NextAction("bg protect fc", 75.0f), nullptr)));
     triggers.push_back(new TriggerNode("player has flag",
                                        NextAction::array(0, new NextAction("bg move to objective", 90.0f), nullptr)));
 }
