@@ -756,7 +756,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
     // Process player bots
     for (auto& [guid, bot] : playerBots)
     {
-        if (!bot || !bot->InBattlegroundQueue() || !bot->IsInWorld() || !IsRandomBot(bot))
+        if (!bot || !bot->InBattlegroundQueue() || !IsRandomBot(bot))
             continue;
 
         Battleground* bg = bot->GetBattleground();
