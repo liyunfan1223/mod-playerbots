@@ -497,7 +497,9 @@ bool IccBqlTankPositionTrigger::IsActive()
 bool IccBqlPactOfDarkfallenTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
-    if (!boss || !bot->HasAura(71340)) 
+
+    Aura* aura = botAI->GetAura("Pact of the Darkfallen", bot);
+    if (!boss || !aura) 
         return false;
 
     return true;
@@ -509,8 +511,9 @@ bool IccBqlVampiricBiteTrigger::IsActive()
     if (!boss) 
         return false;
 
+    Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
     // Only trigger when bot has Frenzied Bloodthirst
-    if (!(bot->HasAura(70877) || bot->HasAura(71474)))
+    if (!aura)
         return false;
 
     return true;
