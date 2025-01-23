@@ -411,6 +411,7 @@ class IccSindragosaTankSwapPositionAction : public AttackAction
 };
 
 
+
 //LK
 class IccLichKingShadowTrapAction : public MovementAction
 {
@@ -444,6 +445,12 @@ class IccLichKingAddsAction : public AttackAction
         bool Execute(Event event) override;
 };
 
-
+//ICC Aura
+class IccAuraAction : public Action
+{
+public:
+    IccAuraAction(PlayerbotAI* botAI) : Action(botAI, "icc aura") {}
+    bool Execute(Event event) override;
+};
 
 #endif

@@ -56,6 +56,7 @@ public:
         creators["icc lich king necrotic plague"] = &RaidIccActionContext::icc_lich_king_necrotic_plague;
         creators["icc lich king winter"] = &RaidIccActionContext::icc_lich_king_winter;
         creators["icc lich king adds"] = &RaidIccActionContext::icc_lich_king_adds;
+        creators["icc aura"] = &RaidIccActionContext::icc_aura;
     }
 
 private:
@@ -105,7 +106,7 @@ private:
     static Action* icc_lich_king_necrotic_plague(PlayerbotAI* ai) { return new IccLichKingNecroticPlagueAction(ai); }
     static Action* icc_lich_king_winter(PlayerbotAI* ai) { return new IccLichKingWinterAction(ai); }
     static Action* icc_lich_king_adds(PlayerbotAI* ai) { return new IccLichKingAddsAction(ai); }
-
+    static Action* icc_aura(PlayerbotAI* ai) { return new IccAuraAction(ai); }
 };
 
 #endif

@@ -169,6 +169,10 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("icc lich king adds",
         NextAction::array(0, new NextAction("icc lich king adds", ACTION_RAID +2), nullptr)));
+
+    // Add ICC aura trigger
+    triggers.push_back(new TriggerNode("icc aura",
+        NextAction::array(0, new NextAction("icc aura", ACTION_RAID), nullptr)));
 }
 
 void RaidIccStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
