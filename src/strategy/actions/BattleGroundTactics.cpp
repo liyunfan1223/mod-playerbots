@@ -2234,12 +2234,8 @@ bool BGTactics::Execute(Event event)
 
     if (getName() == "protect fc")
     {
-        if (!bot->IsMounted() && !bot->IsInCombat())
-            if (botAI->DoSpecificAction("check mount state"))
-                return true;
-
         uint32 role = context->GetValue<uint32>("bg role")->Get();
-        bool supporter = role < 5;
+        bool supporter = role < 4;
         if (supporter && protectFC())
             return true;
     }
@@ -2454,8 +2450,8 @@ bool BGTactics::selectObjective(bool reset)
         {
             BattlegroundAV* alterValleyBG = (BattlegroundAV*)bg;
             uint32 role = context->GetValue<uint32>("bg role")->Get();
-            bool supportDefense = role < 3;  // defensive role and mine capture (mine capture disabled for now)
-            bool advancedAttack = role > 5;  // doesnt wait for point to be fully captured before moving on
+            bool supportDefense = role < 2;  // defensive role and mine capture (mine capture disabled for now)
+            bool advancedAttack = role > 4;  // doesnt wait for point to be fully captured before moving on
 
             // some of the code below is a bit inefficent (lots of rechecking same variables, could be made more
             // efficient with a refactor) but it's been left this way so it can be easily reordered. in future we could
@@ -2463,11 +2459,19 @@ bool BGTactics::selectObjective(bool reset)
 
             if (bot->GetTeamId() == TEAM_HORDE)
             {
-                bool enemyTowersDown =
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_NORTH).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_SOUTH).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEWING_BUNKER).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_STONEHEART_BUNKER).State == POINT_DESTROYED;
+                int towersDestroyed = 0;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_NORTH).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_DUNBALDAR_SOUTH).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEWING_BUNKER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_STONEHEART_BUNKER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+
+                // Now require only 2 to be destroyed
+                bool enemyTowersDown = (towersDestroyed >= 2);
+
                 // End Boss
                 if (enemyTowersDown &&
                     alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FIRSTAID_STATION).OwnerId != TEAM_ALLIANCE &&
@@ -2652,11 +2656,19 @@ bool BGTactics::selectObjective(bool reset)
             }
             else  // TEAM_ALLIANCE
             {
-                bool enemyTowersDown =
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_WTOWER).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_ETOWER).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_TOWER_POINT).State == POINT_DESTROYED &&
-                    alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEBLOOD_TOWER).State == POINT_DESTROYED;
+                int towersDestroyed = 0;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_WTOWER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_ETOWER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_TOWER_POINT).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+                if (alterValleyBG->GetAVNodeInfo(BG_AV_NODES_ICEBLOOD_TOWER).State == POINT_DESTROYED)
+                    ++towersDestroyed;
+
+                // Now require only 2 to be destroyed
+                bool enemyTowersDown = (towersDestroyed >= 2);
+                
                 // End Boss
                 if (enemyTowersDown && alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_HUT).OwnerId != TEAM_HORDE &&
                     alterValleyBG->GetAVNodeInfo(BG_AV_NODES_FROSTWOLF_HUT).TotalOwnerId != TEAM_HORDE)
@@ -4300,8 +4312,22 @@ bool BGTactics::protectFC()
         return false;
 
     Unit* teamFC = AI_VALUE(Unit*, "team flag carrier");
-    if (teamFC && bot->IsWithinDistInMap(teamFC, 50.0f))
-        return Follow(teamFC);
+
+    if (!teamFC || teamFC == bot)
+    {
+        return false;
+    }
+
+    if (!bot->IsInCombat() && !bot->IsWithinDistInMap(teamFC, 20.0f))
+    {
+        // Get the flag carrier's position
+        float fcX = teamFC->GetPositionX();
+        float fcY = teamFC->GetPositionY();
+        float fcZ = teamFC->GetPositionZ();
+        uint32 mapId = bot->GetMapId();
+        
+        return MoveNear(mapId, fcX, fcY, fcZ, 5.0f, MovementPriority::MOVEMENT_NORMAL);
+    }
 
     return false;
 }
