@@ -41,7 +41,7 @@ const Position ICC_BQL_TANK_POSITION = Position(4616.102f, 2768.9167f, 400.13797
 const Position ICC_SINDRAGOSA_TANK_POSITION = Position(4408.016f, 2508.0647f, 203.37955f);
 const Position ICC_SINDRAGOSA_RANGED_POSITION = Position(4373.7686f, 2498.0042f, 203.38176f);
 const Position ICC_SINDRAGOSA_MELEE_POSITION = Position(4389.22f, 2499.5237f, 203.38033f);
-const Position ICC_SINDRAGOSA_BLISTERING_COLD_POSITION = Position(4357.036f, 2484.5574f, 203.4777f);   
+const Position ICC_SINDRAGOSA_BLISTERING_COLD_POSITION = Position(4345.922f, 2484.708f, 206.22516f);
 const Position ICC_SINDRAGOSA_THOMB1_POSITION = Position(4381.819f, 2471.1448f, 203.37704f);       // Westmost position
 const Position ICC_SINDRAGOSA_THOMB2_POSITION = Position(4381.819f, 2483.1448f, 203.37704f);       // 12y east from pos1
 const Position ICC_SINDRAGOSA_THOMB3_POSITION = Position(4381.819f, 2471.1448f, 203.37704f);       // Same as pos1
@@ -49,7 +49,7 @@ const Position ICC_SINDRAGOSA_THOMB4_POSITION = Position(4381.819f, 2483.1448f, 
 const Position ICC_SINDRAGOSA_THOMB5_POSITION = Position(4381.819f, 2495.1448f, 203.37704f);       // 12y east from pos2/4
 const Position ICC_SINDRAGOSA_CENTER_POSITION = Position(4408.0464f, 2484.478f, 203.37529f);           
 const Position ICC_SINDRAGOSA_THOMBMB2_POSITION = Position(4382.6113f, 2505.4922f, 203.38197f);       
-const Position ICC_SINDRAGOSA_FBOMB_POSITION = Position(4400.031f, 2507.0295f, 203.37929f);       
+const Position ICC_SINDRAGOSA_FBOMB_POSITION = Position(4400.031f, 2507.0295f, 203.37929f);      //old 4400.031f, 2507.0295f, 203.37929f  //alternate for 10 man  4366.0225f, 2501.569f, 203.38226f 
 const Position ICC_SINDRAGOSA_LOS2_POSITION = Position(4376.0938f, 2511.103f, 203.38303f); 
 const Position ICC_LICH_KING_ADDS_POSITION = Position(486.63647f, -2095.7915f, 840.857f);
 const Position ICC_LK_FROST1_POSITION = Position(503.96548f, -2183.216f, 840.857f);           
@@ -353,19 +353,19 @@ public:
     bool Execute(Event event) override;
 };
 
-class IccSindragosaFrostBeaconAction : public AttackAction
+class IccSindragosaFrostBeaconAction : public MovementAction
 {
 public:
     IccSindragosaFrostBeaconAction(PlayerbotAI* botAI) 
-            : AttackAction(botAI, "icc sindragosa frost beacon") {}
+            : MovementAction(botAI, "icc sindragosa frost beacon") {}
     bool Execute(Event event) override;
 };
 
-class IccSindragosaBlisteringColdAction : public AttackAction
+class IccSindragosaBlisteringColdAction : public MovementAction
 {
 public:
     IccSindragosaBlisteringColdAction(PlayerbotAI* botAI) 
-            : AttackAction(botAI, "icc sindragosa blistering cold") {}
+            : MovementAction(botAI, "icc sindragosa blistering cold") {}
     bool Execute(Event event) override;
 };
 
@@ -393,11 +393,11 @@ public:
     bool Execute(Event event) override;
 };
 
-class IccSindragosaFrostBombAction : public AttackAction
+class IccSindragosaFrostBombAction : public MovementAction
 {
 public:
     IccSindragosaFrostBombAction(PlayerbotAI* botAI) 
-            : AttackAction(botAI, "icc sindragosa frost bomb") {}
+            : MovementAction(botAI, "icc sindragosa frost bomb") {}
     bool Execute(Event event) override;
 };
 
@@ -411,6 +411,14 @@ class IccSindragosaTankSwapPositionAction : public AttackAction
 
 
 //LK
+class IccLichKingShadowTrapAction : public MovementAction
+{
+    public:
+        IccLichKingShadowTrapAction(PlayerbotAI* botAI) 
+            : MovementAction(botAI, "icc lich king shadow trap") {}
+        bool Execute(Event event) override;
+};
+
 class IccLichKingNecroticPlagueAction : public MovementAction
 {
     public:

@@ -6,6 +6,7 @@
 #include "WarlockAiObjectContext.h"
 
 #include "DpsWarlockStrategy.h"
+#include "GenericTriggers.h"
 #include "GenericWarlockNonCombatStrategy.h"
 #include "NamedObjectContext.h"
 #include "Playerbots.h"
@@ -98,6 +99,7 @@ public:
         creators["unstable affliction on attacker"] = &WarlockTriggerFactoryInternal::unstable_affliction_on_attacker;
         creators["haunt"] = &WarlockTriggerFactoryInternal::haunt;
         creators["decimation"] = &WarlockTriggerFactoryInternal::decimation;
+        creators["life tap glyph buff"] = &WarlockTriggerFactoryInternal::life_tap_glyph_buff;
         creators["molten core"] = &WarlockTriggerFactoryInternal::molten_core;
         creators["metamorphosis"] = &WarlockTriggerFactoryInternal::metamorphosis;
     }
@@ -131,6 +133,7 @@ private:
     }
     static Trigger* haunt(PlayerbotAI* ai) { return new HauntTrigger(ai); }
     static Trigger* decimation(PlayerbotAI* ai) { return new DecimationTrigger(ai); }
+    static Trigger* life_tap_glyph_buff(PlayerbotAI* ai) { return new LifeTapGlyphBuffTrigger(ai); }
     static Trigger* molten_core(PlayerbotAI* ai) { return new MoltenCoreTrigger(ai); }
     static Trigger* metamorphosis(PlayerbotAI* ai) { return new MetamorphosisTrigger(ai); }
 };

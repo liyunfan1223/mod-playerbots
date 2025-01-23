@@ -41,8 +41,11 @@ DpsHunterStrategy::DpsHunterStrategy(PlayerbotAI* botAI) : GenericHunterStrategy
 NextAction** DpsHunterStrategy::getDefaultActions()
 {
     return NextAction::array(
-        0, new NextAction("kill shot", ACTION_DEFAULT + 0.8f), new NextAction("chimera shot", ACTION_DEFAULT + 0.7f),
-        new NextAction("explosive shot", ACTION_DEFAULT + 0.6f), new NextAction("aimed shot", ACTION_DEFAULT + 0.5f),
+        0,
+        new NextAction("explosive shot", ACTION_HIGH + 1.0f),
+        new NextAction("kill shot", ACTION_DEFAULT + 0.8f),
+        new NextAction("chimera shot", ACTION_DEFAULT + 0.6f),
+        new NextAction("aimed shot", ACTION_DEFAULT + 0.5f),
         new NextAction("silencing shot", ACTION_DEFAULT + 0.4f),
         new NextAction("kill command", ACTION_DEFAULT + 0.3f),
         // new NextAction("arcane shot", ACTION_DEFAULT + 0.2f),
@@ -55,7 +58,7 @@ void DpsHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericHunterStrategy::InitTriggers(triggers);
 
     triggers.push_back(
-        new TriggerNode("black arrow", NextAction::array(0, new NextAction("black arrow", 15.0f), nullptr)));
+        new TriggerNode("black arrow", NextAction::array(0, new NextAction("black arrow", 19.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("low mana", NextAction::array(0, new NextAction("viper sting", 23.0f), nullptr)));
     triggers.push_back(

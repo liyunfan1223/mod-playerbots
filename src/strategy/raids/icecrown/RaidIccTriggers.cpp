@@ -497,7 +497,9 @@ bool IccBqlTankPositionTrigger::IsActive()
 bool IccBqlPactOfDarkfallenTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
-    if (!boss || !bot->HasAura(71340)) 
+
+    Aura* aura = botAI->GetAura("Pact of the Darkfallen", bot);
+    if (!boss || !aura) 
         return false;
 
     return true;
@@ -509,8 +511,9 @@ bool IccBqlVampiricBiteTrigger::IsActive()
     if (!boss) 
         return false;
 
+    Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
     // Only trigger when bot has Frenzied Bloodthirst
-    if (!(bot->HasAura(70877) || bot->HasAura(71474)))
+    if (!aura)
         return false;
 
     return true;
@@ -551,6 +554,10 @@ bool IccValithriaPortalTrigger::IsActive()
 
 bool IccValithriaHealTrigger::IsActive()
 {
+    Unit* boss = bot->FindNearestCreature(36789, 100.0f);
+    if (!boss) 
+        return false;
+    
     // Only healers should use healing
     if (!botAI->IsHeal(bot) || bot->HasAura(70766))
         return false;
@@ -600,6 +607,9 @@ bool IccSindragosaFrostBeaconTrigger::IsActive()
     if (!group)
         return false;
 
+    if (boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && !boss->HealthBelowPct(35))
+        return true;
+
     Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); ++itr)
     {
@@ -619,12 +629,17 @@ bool IccSindragosaBlisteringColdTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsTank(bot))
+    if (botAI->IsMainTank(bot))
         return false;
 
     // Don't move if any bot in group has ice tomb
     Group* group = bot->GetGroup();
     if (!group)
+        return false;
+
+    float dist = bot->GetDistance(boss);
+    
+    if (dist >= 30.0f)
         return false;
 
     bool isCasting = boss->HasUnitState(UNIT_STATE_CASTING);
@@ -658,15 +673,20 @@ bool IccSindragosaMysticBuffetTrigger::IsActive()
     if (!boss)
         return false;
     
-    Aura* aura = bot->GetAura(70127);
-    Aura* aura2 = bot->GetAura(72528);
-    if (!aura && !aura2)
+    if (botAI->IsTank(bot) && boss->GetVictim() == bot)
         return false;
 
-    if (bot->HasAura(70126))  // Ice Block
+    Aura* aura = botAI->GetAura("mystic buffet", bot, false, true);
+    if (!aura)
         return false;
 
-    if ((aura && aura->GetStackAmount() >= 3) || (aura2 && aura2->GetStackAmount() >= 3))
+    if (bot->HasAura(70126))  // Frost Beacon
+        return false;
+
+    if (aura->GetStackAmount() >= 2 && botAI->IsAssistTank(bot))
+        return true;
+
+    if (aura->GetStackAmount() >= 3)
         return true;
 
     return false;
@@ -678,27 +698,35 @@ bool IccSindragosaMainTankMysticBuffetTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (!botAI->IsAssistTankOfIndex(bot, 0))
-    {
+    if (botAI->IsTank(bot) && boss->GetVictim() == bot)
         return false;
-    }
+
+    // Only for assist tank
+    if (!botAI->IsAssistTankOfIndex(bot, 0))
+        return false;
+
+    // Don't swap if we have frost beacon
+    if (bot->HasAura(70126))   // Frost Beacon
+        return false;
+
     Unit* mt = AI_VALUE(Unit*, "main tank");
     if (!mt)
-    {
         return false;
-    }
-    Aura* aura = botAI->GetAura("mystic buffet", mt, false, true);
-    if (!aura || aura->GetStackAmount() < 8)
-    {
+
+    // Check main tank stacks
+    Aura* mtAura = botAI->GetAura("mystic buffet", mt, false, true);
+    if (!mtAura || mtAura->GetStackAmount() < 9)
         return false;
-    }
+
+    // Check our own stacks - don't taunt if we have too many
+    Aura* selfAura = botAI->GetAura("mystic buffet", bot, false, true);
+    if (selfAura && selfAura->GetStackAmount() > 6)
+        return false;
 
     // Only taunt if we're in position
     float distToTankPos = bot->GetExactDist2d(ICC_SINDRAGOSA_TANK_POSITION);
     if (distToTankPos > 3.0f)
-    {
         return false;
-    }
 
     return true;
 }
@@ -706,26 +734,41 @@ bool IccSindragosaMainTankMysticBuffetTrigger::IsActive()
 bool IccSindragosaTankSwapPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
-    if (!boss) return false;
+    if (!boss)
+        return false;
 
-    if (!botAI->IsAssistTankOfIndex(bot, 0)) return false;
+    // Only for assist tank
+    if (!botAI->IsAssistTankOfIndex(bot, 0))
+        return false;
 
-    // Don't tank swap if we have frost beacon
-    if (bot->HasAura(70126)) return false;  // Frost Beacon
+    // Don't move to position if we have frost beacon
+    if (bot->HasAura(70126))   // Frost Beacon
+        return false;
 
-    // First check our own stacks - don't try to tank if we have too many
+    // Check our own stacks - don't try to tank if we have too many
     Aura* selfAura = botAI->GetAura("mystic buffet", bot, false, true);
-    if (selfAura && selfAura->GetStackAmount() >= 8) return false;
+    if (selfAura && selfAura->GetStackAmount() > 6)
+        return false;
 
     // Check if main tank has high stacks
     Unit* mt = AI_VALUE(Unit*, "main tank");
-    if (!mt) return false;
+    if (!mt)    
+        return false;
 
-    Aura* aura = botAI->GetAura("mystic buffet", mt, false, true);
-    if (!aura) return false;
+    Aura* mtAura = botAI->GetAura("mystic buffet", mt, false, true);
+    if (!mtAura)
+        return false;
 
-    uint32 stacks = aura->GetStackAmount();
-    return (stacks >= 7);  // Start moving at 7 stacks
+    uint32 mtStacks = mtAura->GetStackAmount();
+    if (mtStacks < 9)  // Only start moving when MT has 5+ stacks
+        return false;
+
+    // Check if we're already in position
+    float distToTankPos = bot->GetExactDist2d(ICC_SINDRAGOSA_TANK_POSITION);
+    if (distToTankPos <= 3.0f)
+        return false;
+
+    return true;  // Move to position if all conditions are met
 }
 
 bool IccSindragosaFrostBombTrigger::IsActive()
@@ -746,6 +789,17 @@ bool IccSindragosaFrostBombTrigger::IsActive()
     }
 
     return false;
+}
+
+//LK
+
+bool IccLichKingShadowTrapTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
+    if (!boss)
+        return false;
+
+    return true;
 }
 
 bool IccLichKingNecroticPlagueTrigger::IsActive()

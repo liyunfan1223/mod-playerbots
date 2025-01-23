@@ -74,14 +74,14 @@ public:
         creators["plague strike"] = &DeathKnightTriggerFactoryInternal::plague_strike;
         creators["plague strike on attacker"] = &DeathKnightTriggerFactoryInternal::plague_strike_on_attacker;
         creators["icy touch"] = &DeathKnightTriggerFactoryInternal::icy_touch;
-        creators["icy touch 8s"] = &DeathKnightTriggerFactoryInternal::icy_touch_8s;
-        creators["dd cd and icy touch 8s"] = &DeathKnightTriggerFactoryInternal::dd_cd_and_icy_touch_8s;
+        creators["icy touch 3s"] = &DeathKnightTriggerFactoryInternal::icy_touch_3s;
+        creators["dd cd and icy touch 3s"] = &DeathKnightTriggerFactoryInternal::dd_cd_and_icy_touch_3s;
         creators["death coil"] = &DeathKnightTriggerFactoryInternal::death_coil;
         creators["icy touch on attacker"] = &DeathKnightTriggerFactoryInternal::icy_touch_on_attacker;
         creators["improved icy talons"] = &DeathKnightTriggerFactoryInternal::improved_icy_talons;
         creators["plague strike"] = &DeathKnightTriggerFactoryInternal::plague_strike;
-        creators["plague strike 8s"] = &DeathKnightTriggerFactoryInternal::plague_strike_8s;
-        creators["dd cd and plague strike 8s"] = &DeathKnightTriggerFactoryInternal::dd_cd_and_plague_strike_8s;
+        creators["plague strike 3s"] = &DeathKnightTriggerFactoryInternal::plague_strike_3s;
+        creators["dd cd and plague strike 3s"] = &DeathKnightTriggerFactoryInternal::dd_cd_and_plague_strike_3s;
         creators["horn of winter"] = &DeathKnightTriggerFactoryInternal::horn_of_winter;
         creators["mind freeze"] = &DeathKnightTriggerFactoryInternal::mind_freeze;
         creators["mind freeze on enemy healer"] = &DeathKnightTriggerFactoryInternal::mind_freeze_on_enemy_healer;
@@ -94,6 +94,7 @@ public:
         creators["high blood rune"] = &DeathKnightTriggerFactoryInternal::high_blood_rune;
         creators["high frost rune"] = &DeathKnightTriggerFactoryInternal::high_frost_rune;
         creators["high unholy rune"] = &DeathKnightTriggerFactoryInternal::high_unholy_rune;
+        creators["no rune"] = &DeathKnightTriggerFactoryInternal::no_rune;
         creators["freezing fog"] = &DeathKnightTriggerFactoryInternal::freezing_fog;
         creators["no desolation"] = &DeathKnightTriggerFactoryInternal::no_desolation;
         creators["dd cd and no desolation"] = &DeathKnightTriggerFactoryInternal::dd_cd_and_no_desolation;
@@ -106,15 +107,15 @@ private:
     static Trigger* pestilence_glyph(PlayerbotAI* botAI) { return new PestilenceGlyphTrigger(botAI); }
     static Trigger* blood_strike(PlayerbotAI* botAI) { return new BloodStrikeTrigger(botAI); }
     static Trigger* plague_strike(PlayerbotAI* botAI) { return new PlagueStrikeDebuffTrigger(botAI); }
-    static Trigger* plague_strike_8s(PlayerbotAI* botAI) { return new PlagueStrike8sDebuffTrigger(botAI); }
-    static Trigger* dd_cd_and_plague_strike_8s(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "death and decay cooldown", "plague strike 8s"); }
+    static Trigger* plague_strike_3s(PlayerbotAI* botAI) { return new PlagueStrike3sDebuffTrigger(botAI); }
+    static Trigger* dd_cd_and_plague_strike_3s(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "death and decay cooldown", "plague strike 3s"); }
     static Trigger* plague_strike_on_attacker(PlayerbotAI* botAI)
     {
         return new PlagueStrikeDebuffOnAttackerTrigger(botAI);
     }
     static Trigger* icy_touch(PlayerbotAI* botAI) { return new IcyTouchDebuffTrigger(botAI); }
-    static Trigger* icy_touch_8s(PlayerbotAI* botAI) { return new IcyTouch8sDebuffTrigger(botAI); }
-    static Trigger* dd_cd_and_icy_touch_8s(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "death and decay cooldown", "icy touch 8s"); }
+    static Trigger* icy_touch_3s(PlayerbotAI* botAI) { return new IcyTouch3sDebuffTrigger(botAI); }
+    static Trigger* dd_cd_and_icy_touch_3s(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "death and decay cooldown", "icy touch 3s"); }
     static Trigger* death_coil(PlayerbotAI* botAI) { return new DeathCoilTrigger(botAI); }
     static Trigger* icy_touch_on_attacker(PlayerbotAI* botAI) { return new IcyTouchDebuffOnAttackerTrigger(botAI); }
     static Trigger* improved_icy_talons(PlayerbotAI* botAI) { return new ImprovedIcyTalonsTrigger(botAI); }
@@ -136,6 +137,7 @@ private:
     static Trigger* high_blood_rune(PlayerbotAI* botAI) { return new HighBloodRuneTrigger(botAI); }
     static Trigger* high_frost_rune(PlayerbotAI* botAI) { return new HighFrostRuneTrigger(botAI); }
     static Trigger* high_unholy_rune(PlayerbotAI* botAI) { return new HighUnholyRuneTrigger(botAI); }
+    static Trigger* no_rune(PlayerbotAI* botAI) { return new NoRuneTrigger(botAI); }
     static Trigger* freezing_fog(PlayerbotAI* botAI) { return new FreezingFogTrigger(botAI); }
     static Trigger* no_desolation(PlayerbotAI* botAI) { return new DesolationTrigger(botAI); }
     static Trigger* dd_cd_and_no_desolation(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "death and decay cooldown", "no desolation"); }

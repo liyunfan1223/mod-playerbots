@@ -15,10 +15,10 @@ ShadowPriestStrategy::ShadowPriestStrategy(PlayerbotAI* botAI) : GenericPriestSt
 
 NextAction** ShadowPriestStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("mind blast", ACTION_DEFAULT + 0.2f),
-                             // new NextAction("shadow word: death", 12.0f),
-                             new NextAction("mind flay", ACTION_DEFAULT + 0.1f),
-                             new NextAction("shoot", ACTION_DEFAULT), NULL);
+    return NextAction::array(0, new NextAction("mind blast", ACTION_DEFAULT + 0.3f),
+                             new NextAction("mind flay", ACTION_DEFAULT + 0.2f),
+                             new NextAction("shadow word: death", ACTION_DEFAULT + 0.1f), // cast during movement
+                             new NextAction("shoot", ACTION_DEFAULT), nullptr);
 }
 
 void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

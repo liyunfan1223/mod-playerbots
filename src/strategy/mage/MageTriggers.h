@@ -171,6 +171,7 @@ class ArcaneBlastStackTrigger : public HasAuraStackTrigger
 {
 public:
     ArcaneBlastStackTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "arcane blast", 3, 1) {}
+    bool IsActive() override;
 };
 
 class MirrorImageTrigger : public BoostTrigger
@@ -190,6 +191,13 @@ class FrostbiteOnTargetTrigger : public DebuffTrigger
 {
 public:
     FrostbiteOnTargetTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frostbite", 1, false) {}
+    bool IsActive() override;
+};
+
+class NoFocusMagicTrigger : public Trigger
+{
+public:
+    NoFocusMagicTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no focus magic") {}
     bool IsActive() override;
 };
 

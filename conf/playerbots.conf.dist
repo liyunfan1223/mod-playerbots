@@ -23,6 +23,7 @@
 #		LEVELS
 #		GEAR
 #		QUESTS
+#		ACTIVITIES
 #		SPELLS
 #		STRATEGIES
 #		TELEPORTS
@@ -612,6 +613,50 @@ AiPlayerbot.EquipmentPersistenceLevel = 80
 # Default: 1 (enabled)
 AiPlayerbot.AutoUpgradeEquip = 1
 
+# Only set wolf pets for hunters to have higher damage (0 = disabled, 1 = enabled only for max-level, 2 = enabled)
+# Default: 0 (disabled)
+AiPlayerbot.HunterWolfPet = 0
+
+#
+#
+#
+####################################################################################################
+
+
+####################################################################################################
+# ACTIVITIES
+#
+#
+# Specify percent of active bots
+# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
+# This value is only applied to inactive areas where no real-players are detected, when
+# real-players are nearby, friend, group, guild, bg, instances etc the value is always
+# enforced to 100%
+AiPlayerbot.BotActiveAlone = 100
+
+# Force botActiveAlone when bot is ... of real player
+AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
+AiPlayerbot.BotActiveAloneForceWhenInZone = 1
+AiPlayerbot.BotActiveAloneForceWhenInMap = 0
+AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
+AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
+
+# SmartScale is enabled or not.
+# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
+# (The scaling will be overruled by the BotActiveAloneForceWhen...rules)
+#
+#   Limitfloor - when DIFF (latency) above floor, activity scaling is applied starting with 90%
+#   LimitCeiling - when DIFF (latency) above ceiling, activity is 0%;
+#
+#   MinLevel - only apply scaling when level is above or equal to min(bot)Level
+#   MaxLevel - only apply scaling when level is lower or equal of max(bot)Level
+#
+AiPlayerbot.botActiveAloneSmartScale = 1
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
+AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
+AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
+
 #
 #
 #
@@ -723,18 +768,56 @@ AiPlayerbot.AutoTeleportForLevel = 1
 # Enable BG/Arena for random Bots
 AiPlayerbot.RandomBotJoinBG = 1
 
-# Enable Auto join BG - bots randomly join WSG and 2v2 Arena if server is not lagging
+# Enable Auto join BG - have bots start BG's and Arenas on their own
 AiPlayerbot.RandomBotAutoJoinBG = 0
 
-# Required for RandomBotAutoJoinBG
-# Currently you can select 1 bracket (level range) for bots to auto join.
-# Brackets for warsong 0:10-19, 1:20-29, 2:30-39, 3:40-49 etc. Default: 7 (level 80)
-# Brackets for rated arena: 0:10-14, 1:15-19 etc. Default: 14 (80-84)
-# For lower level ranges to work in Rated Arena, custom code changes need to be made.
-# Count = amount of games Bots auto fill. (Count 1 for WSG = 20 bots).
-AiPlayerbot.RandomBotAutoJoinWarsongBracket = 7
+# Required Configuration for RandomBotAutoJoinBG
+#
+# Known issue: When enabling a lot of brackats in combination with multiple instances,
+#              can lead to more instances created by bots than intended (over-queuing).
+#
+# This section controls the level brackets and 
+# automatic bot participation in battlegrounds and arenas.
+#
+# Brackets:
+# - Specify the level ranges for bots to auto-join:
+#   - Warsong Gulch (WS): 0 = 10-19, 1 = 20-29, 2 = 30-39, ..., 7 = 80 (default: 7)
+#   - Rated Arena: 0 = 10-14, 1 = 15-19, ..., 14 = 80-84 (default: 14)
+# - Multiple brackets can be specified as a comma-separated list (e.g., "0,2,5").
+#
+# Counts:
+# - Specify the number of Battlegrounds to auto-fill per bracket.
+# - For battlegrounds, Count is the number of bots per bracket. For example:
+#   - Warsong Gulch Count = 1 adds 20 bots (10 per team).
+# - Ensure there are enough eligible bots to meet the specified counts.
+#
+# Arena Considerations:
+# - Rated Arena brackets default to level 80-84 (bracket 14).
+# - Custom code changes are required for lower-level arena brackets to function properly.
+#
+# Battleground bracket range possibilities:
+# AiPlayerbot.RandomBotAutoJoinICBrackets = 0,1
+# AiPlayerbot.RandomBotAutoJoinEYBrackets = 0,1,2
+# AiPlayerbot.RandomBotAutoJoinAVBrackets = 0,1,2,3
+# AiPlayerbot.RandomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
+# AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6,7
+
+AiPlayerbot.RandomBotAutoJoinICBrackets = 1
+AiPlayerbot.RandomBotAutoJoinEYBrackets = 2
+AiPlayerbot.RandomBotAutoJoinAVBrackets = 3
+AiPlayerbot.RandomBotAutoJoinABBrackets = 6
+AiPlayerbot.RandomBotAutoJoinWSBrackets = 7
+
+# Battlegrounds count (per bracket!):
+AiPlayerbot.RandomBotAutoJoinBGICCount = 0
+AiPlayerbot.RandomBotAutoJoinBGEYCount = 1
+AiPlayerbot.RandomBotAutoJoinBGAVCount = 0
+AiPlayerbot.RandomBotAutoJoinBGABCount = 1
+AiPlayerbot.RandomBotAutoJoinBGWSCount = 1
+
+# Arena configuration:
 AiPlayerbot.RandomBotAutoJoinArenaBracket = 14
-AiPlayerbot.RandomBotAutoJoinBGWarsongCount = 0
+
 AiPlayerbot.RandomBotAutoJoinBGRatedArena2v2Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena3v3Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count = 0
@@ -960,7 +1043,7 @@ AiPlayerbot.PremadeSpecGlyph.6.1 = 45805,43673,43547,43544,43672,43543
 AiPlayerbot.PremadeSpecLink.6.1.60 = -32003350332203012300023101351
 AiPlayerbot.PremadeSpecLink.6.1.80 = -32002350352203012300033101351-230200305003
 AiPlayerbot.PremadeSpecName.6.2 = unholy pve
-AiPlayerbot.PremadeSpecGlyph.6.2 = 43542,43673,45804,43544,43672,43549
+AiPlayerbot.PremadeSpecGlyph.6.2 = 43542,43673,43546,43544,43672,43549
 AiPlayerbot.PremadeSpecLink.6.2.60 = --2301303050032151000150013131151
 AiPlayerbot.PremadeSpecLink.6.2.80 = -320033500002-2301303050032151000150013133151
 AiPlayerbot.PremadeSpecName.6.3 = double aura blood pve
@@ -1550,36 +1633,6 @@ AiPlayerbot.RandombotsWalkingRPG = 0
 
 # Set randombots movement speed to walking only inside buildings
 AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
-
-# Specify percent of active bots
-# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
-# This value is only applied to inactive areas where no real-players are detected, when
-# real-players are nearby, friend, group, guild, bg, instances etc the value is always
-# enforced to 100%
-AiPlayerbot.BotActiveAlone = 100
-
-# Force botActiveAlone when bot is ... of real player
-AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
-AiPlayerbot.BotActiveAloneForceWhenInZone = 1
-AiPlayerbot.BotActiveAloneForceWhenInMap = 0
-AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
-AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
-
-# SmartScale is enabled or not.
-# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
-# (The scaling will be overruled by the BotActiveAloneForceWhen...rules)
-#
-#   Limitfloor - when DIFF (latency) above floor, activity scaling is applied starting with 90%
-#   LimitCeiling - when DIFF (latency) above ceiling, activity is 0%;
-#
-#   MinLevel - only apply scaling when level is above or equal to min(bot)Level
-#   MaxLevel - only apply scaling when level is lower or equal of max(bot)Level
-#
-AiPlayerbot.botActiveAloneSmartScale = 1
-AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
-AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
-AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
-AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...
