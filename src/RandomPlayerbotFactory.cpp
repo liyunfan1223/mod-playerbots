@@ -450,24 +450,23 @@ void RandomPlayerbotFactory::CreateRandomBots()
         return;
     }
 
-    // Get the total number of bot accounts and the current number of bot accounts
+    // Get the total number of bot accounts to create from the configuration
     uint32 totalBotAccounts = 0;
-    uint32 currentBotAccountCount = 0;
-
     totalBotAccounts = sPlayerbotAIConfig->randomBotAccountCount;
-    currentBotAccountCount = GetBotAccountIds().size();
 
-    // Get the next bot account counter
-    uint32 botAccountCounter = GetNextBotAccountCounter();
-
-    if (botAccountCounter == 0 || totalBotAccounts == 0)
+    if (totalBotAccounts == 0)
     {
-        LOG_ERROR("playerbots", "Failed to create bot accounts. Aborting random bot creation.");
+        LOG_ERROR("playerbots", "Total bot accounts is set to 0. Aborting random bot creation.");
         return;
     }
 
+    // Get the current number of bot accounts
+    uint32 currentBotAccountCount = GetBotAccountIds().size();
+
     if (currentBotAccountCount <= totalBotAccounts)
     {
+        // Get the next bot account counter
+        uint32 botAccountCounter = GetNextBotAccountCounter();
         CreateBotAccounts(currentBotAccountCount, botAccountCounter);
     }
 
@@ -585,15 +584,15 @@ uint32 RandomPlayerbotFactory::GetNextBotAccountCounter()
 {
     QueryResult botAccountsResult = LoginDatabase.Query("SELECT username FROM account WHERE username LIKE '{}%%' ORDER BY username DESC LIMIT 1",
                                                         sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
-    uint32 botAccountCounter = 0; // Initialize the bot account counter
+    uint32 nextBotAccount = 1; // Initialize the bot account counter
     if (botAccountsResult)
     {
         Field* fields = botAccountsResult->Fetch();
         std::string highestBotAccount = fields[0].Get<std::string>();
         std::string suffix = highestBotAccount.substr(sPlayerbotAIConfig->randomBotAccountPrefix.length());
-        botAccountCounter = std::stoi(suffix) + 1;
+        nextBotAccount = std::stoi(suffix) + 1;
     }
-    return botAccountCounter;
+    return nextBotAccount;
 }
 
 /**
