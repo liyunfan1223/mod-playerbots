@@ -3309,13 +3309,25 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     // Get the flag or defend flag carrier
                     Unit* teamFC = AI_VALUE(Unit*, "team flag carrier");
-                    if (teamFC)
+                    if (teamFC && teamFC != bot) // Ensure there's a flag carrier and it's not the bot
                     {
-                        BgObjective = teamFC;
-                        // pos.Set(teamFC->GetPositionX(), teamFC->GetPositionY(), teamFC->GetPositionZ(),
-                        // bot->GetMapId());
-                        if (sServerFacade->GetDistance2d(bot, teamFC) < 50.0f)
-                            Follow(teamFC);
+                        BgObjective = teamFC; // Set the objective to the flag carrier
+                    
+                        if (!bot->IsInCombat()) // Only act if the bot is not in combat
+                        {
+                            // If the bot is too far, move closer
+                            if (!bot->IsWithinDistInMap(teamFC, 20.0f))
+                            {
+                                // Get the flag carrier's position
+                                float fcX = teamFC->GetPositionX();
+                                float fcY = teamFC->GetPositionY();
+                                float fcZ = teamFC->GetPositionZ();
+                                uint32 mapId = teamFC->GetMapId();
+                    
+                                // Move near the flag carrier
+                                MoveNear(mapId, fcX, fcY, fcZ, 5.0f, MovementPriority::MOVEMENT_NORMAL);
+                            }
+                        }
                     }
                     else
                     {
