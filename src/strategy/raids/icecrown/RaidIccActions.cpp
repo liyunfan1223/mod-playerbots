@@ -3298,29 +3298,3 @@ bool IccLichKingAddsAction::Execute(Event event)
 
     return false;
 }
-
-bool IccAuraAction::Execute(Event event)
-{
-    // Check if player is in ICC (map 631)
-    if (bot->GetMapId() != 631)
-    {
-        // Remove both auras when not in ICC
-        bot->RemoveAura(73822); // Horde aura
-        bot->RemoveAura(73828); // Alliance aura
-        return false;
-    }
-
-    // Apply appropriate aura based on faction
-    if (bot->GetTeamId() == TEAM_HORDE)
-    {
-        if (!bot->HasAura(73822))
-            bot->AddAura(73822, bot);
-    }
-    else
-    {
-        if (!bot->HasAura(73828))
-            bot->AddAura(73828, bot);
-    }
-
-    return true;
-}

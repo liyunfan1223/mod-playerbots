@@ -379,12 +379,4 @@ public:
     bool IsActive() override;
 };
 
-//ICC Aura
-class IccAuraTrigger : public Trigger 
-{
-public:
-    IccAuraTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc aura") {}
-    bool IsActive() override;
-};
-
 #endif

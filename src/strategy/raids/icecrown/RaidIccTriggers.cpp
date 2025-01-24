@@ -845,14 +845,3 @@ bool IccLichKingAddsTrigger::IsActive()
 
     return true;
 }
-
-bool IccAuraTrigger::IsActive()
-{
-    if (bot->GetMapId() != 631)
-        return false;
-
-    if (bot->GetTeamId() == TEAM_HORDE)
-        return !bot->HasAura(73822);
-    else
-        return !bot->HasAura(73828);
-}
