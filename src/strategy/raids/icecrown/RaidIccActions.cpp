@@ -2250,7 +2250,8 @@ bool IccSindragosaFrostBeaconAction::Execute(Event event)
             return false;
 
         // Different behavior for air phase
-        if (boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
+        Difficulty diff = bot->GetRaidDifficulty();
+        if (boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && (diff == RAID_DIFFICULTY_25MAN_NORMAL || diff == RAID_DIFFICULTY_25MAN_HEROIC))
         {
             if (!bot->HasAura(70126)) // If not beaconed, move to safe position
             {
@@ -2261,6 +2262,22 @@ bool IccSindragosaFrostBeaconAction::Execute(Event event)
                     return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionX(),
                                 ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionY(),
                                 ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionZ(),
+                                false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                }
+            }
+            return false;
+        }
+        else if (boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && (diff == RAID_DIFFICULTY_10MAN_NORMAL || diff == RAID_DIFFICULTY_10MAN_HEROIC))
+        {
+            if (!bot->HasAura(70126)) // If not beaconed, move to safe position
+            {
+                float dist = bot->GetExactDist2d(ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionX(),
+                                               ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionY());
+                if (dist > POSITION_TOLERANCE)
+                {
+                    return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionX(),
+                                ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionY(),
+                                ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionZ(),
                                 false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
                 }
             }
