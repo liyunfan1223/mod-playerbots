@@ -978,11 +978,13 @@ bool MovementAction::Follow(Unit* target, float distance) { return Follow(target
 
 void MovementAction::UpdateMovementState()
 {
-    if (bot->Unit::IsUnderWater() || bot->GetLiquidData().Status == LIQUID_MAP_IN_WATER)
+    int8 botInLiquidState = bot->GetLiquidData().Status;
+
+    if (botInLiquidState == LIQUID_MAP_IN_WATER || botInLiquidState == LIQUID_MAP_UNDER_WATER)
     {
         bot->SetSwim(true);
     }
-    else if (!bot->Unit::IsInWater())
+    else if (botInLiquidState == LIQUID_MAP_NO_WATER)
     {
         bot->SetSwim(false);
     }
@@ -1001,7 +1003,9 @@ void MovementAction::UpdateMovementState()
         bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
     }
 
-    bot->SendMovementFlagUpdate();
+    // Invoking bot->SendMovementFlagUpdate() here causes weird behaviour in shallow waters and possibly elsewhere.
+    // bot->SendMovementFlagUpdate();
+
     // Temporary speed increase in group
     // if (botAI->HasRealPlayerMaster()) {
     //     bot->SetSpeedRate(MOVE_RUN, 1.1f);
