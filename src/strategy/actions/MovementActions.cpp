@@ -978,7 +978,7 @@ bool MovementAction::Follow(Unit* target, float distance) { return Follow(target
 
 void MovementAction::UpdateMovementState()
 {
-    if (bot->Unit::IsUnderWater())
+    if (bot->Unit::IsUnderWater() || bot->GetLiquidData().Status == LIQUID_MAP_IN_WATER)
     {
         bot->SetSwim(true);
     }
