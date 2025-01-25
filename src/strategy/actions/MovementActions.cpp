@@ -984,7 +984,7 @@ void MovementAction::UpdateMovementState()
     {
         bot->SetSwim(true);
     }
-    else if (botInLiquidState == LIQUID_MAP_NO_WATER)
+    else
     {
         bot->SetSwim(false);
     }
