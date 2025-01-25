@@ -84,8 +84,8 @@ NextAction** DpsPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0,
                              new NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
-                             new NextAction("crusader strike", ACTION_DEFAULT + 0.5f),
-                             new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.4f),
+                             new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.5f),
+                             new NextAction("crusader strike", ACTION_DEFAULT + 0.4f),
                              new NextAction("divine storm", ACTION_DEFAULT + 0.3f),
                              new NextAction("consecration", ACTION_DEFAULT + 0.1f),
                              new NextAction("melee", ACTION_DEFAULT), nullptr);
