@@ -470,6 +470,15 @@ void RandomPlayerbotFactory::CreateRandomBots()
         CreateBotAccounts(currentBotAccountCount, botAccountCounter);
     }
 
+    uint32 new_bot_accounts = totalBotAccounts - currentBotAccountCount;
+
+    if (new_bot_accounts)
+    {
+        /* wait for async accounts create to make character create correctly, same as account delete */
+        LOG_INFO("playerbots", "Waiting for {} accounts loading into database...", new_bot_accounts);
+        std::this_thread::sleep_for(10ms * );
+    }
+
     LOG_INFO("playerbots", "Creating random bot characters...");
     CreateBotCharacters(nameCache);
 }
@@ -700,7 +709,7 @@ void RandomPlayerbotFactory::CreateBotCharacters(std::unordered_map<NameRaceAndG
         sPlayerbotAIConfig->randomBotAccounts.push_back(accountId);
 
         uint32 count = AccountMgr::GetCharactersCount(accountId);
-        if (count >= sPlayerbotAIConfig->maxAddedBots) // Check against the config value
+        if (count >= 10)
         {
             continue;
         }
