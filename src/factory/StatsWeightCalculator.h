@@ -40,7 +40,7 @@ private:
     void GenerateBasicWeights(Player* player);
     void GenerateAdditionalWeights(Player* player);
 
-    void CalculateItemSetBonus(Player* player, ItemTemplate const* proto);
+    void CalculateItemSetMod(Player* player, ItemTemplate const* proto);
     void CalculateSocketBonus(Player* player, ItemTemplate const* proto);
 
     void CalculateItemTypePenalty(ItemTemplate const* proto);

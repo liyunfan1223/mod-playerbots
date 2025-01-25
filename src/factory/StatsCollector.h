@@ -42,15 +42,19 @@ enum StatsType : uint8
     // Stats for weapon dps
     STATS_TYPE_MELEE_DPS,
     STATS_TYPE_RANGED_DPS,
-    STATS_TYPE_MAX = 25
+    // Bonus for unrecognized stats
+    STATS_TYPE_BONUS,
+    STATS_TYPE_MAX = 26
 };
 
 enum CollectorType : uint8
 {
-    MELEE       = 1,
-    RANGED      = 2,
-    SPELL_DMG   = 4,
-    SPELL_HEAL  = 8,
+    MELEE_DMG = 1,
+    MELEE_TANK = 2,
+    RANGED = 4,
+    SPELL_DMG = 8,
+    SPELL_HEAL = 16,
+    MELEE = MELEE_DMG | MELEE_TANK,
     SPELL = SPELL_DMG | SPELL_HEAL
 };
 
@@ -63,19 +67,21 @@ public:
     void CollectItemStats(ItemTemplate const* proto);
     void CollectSpellStats(uint32 spellId, float multiplier = 1.0f, int32 spellCooldown = -1);
     void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant);
+    bool CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags, bool strict = true);
+    bool CheckSpellValidation(uint32 spellFamilyName, flag96 spelFalimyFlags, bool strict = true);
 
 public:
     int32 stats[STATS_TYPE_MAX];
 
 private:
-    bool CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags);
     void CollectByItemStatType(uint32 itemStatType, int32 val);
     bool SpecialSpellFilter(uint32 spellId);
     bool SpecialEnchantFilter(uint32 enchantSpellId);
 
-    void HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger, uint32 triggerCooldown);
+    void HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger,
+                         uint32 triggerCooldown);
     int32 AverageValue(const SpellEffectInfo& effectInfo);
-    
+
 private:
     CollectorType type_;
     uint32 cls_;

@@ -233,6 +233,7 @@ public:
         creators["insect swarm on attacker"] = &DruidAiObjectContextInternal::insect_swarm_on_attacker;
         creators["moonfire on attacker"] = &DruidAiObjectContextInternal::moonfire_on_attacker;
         creators["enrage"] = &DruidAiObjectContextInternal::enrage;
+        creators["force of nature"] = &DruidAiObjectContextInternal::force_of_nature;
     }
 
 private:
@@ -317,6 +318,7 @@ private:
     static Action* insect_swarm_on_attacker(PlayerbotAI* ai) { return new CastInsectSwarmOnAttackerAction(ai); }
     static Action* moonfire_on_attacker(PlayerbotAI* ai) { return new CastMoonfireOnAttackerAction(ai); }
     static Action* enrage(PlayerbotAI* ai) { return new CastEnrageAction(ai); }
+    static Action* force_of_nature(PlayerbotAI* ai) { return new CastForceOfNatureAction(ai); }
 };
 
 DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
