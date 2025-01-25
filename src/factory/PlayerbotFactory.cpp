@@ -38,8 +38,6 @@
 #include "StatsWeightCalculator.h"
 #include "World.h"
 
-#define PLAYER_SKILL_INDEX(x) (PLAYER_SKILL_INFO_1_1 + ((x)*3))
-
 const uint64 diveMask = (1LL << 7) | (1LL << 44) | (1LL << 37) | (1LL << 38) | (1LL << 26) | (1LL << 30) | (1LL << 27) |
                         (1LL << 33) | (1LL << 24) | (1LL << 34);
 uint32 PlayerbotFactory::tradeSkills[] = {SKILL_ALCHEMY,        SKILL_ENCHANTING,  SKILL_SKINNING,  SKILL_TAILORING,
@@ -79,14 +77,16 @@ void PlayerbotFactory::Init()
 
             if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
                 continue;
-            
+
             if (quest->GetRewSpellCast() > 0)
             {
                 int32 spellId = quest->GetRewSpellCast();
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 if (!spellInfo)
                     continue;
-            } else if (quest->GetRewSpell() > 0) {
+            }
+            else if (quest->GetRewSpell() > 0)
+            {
                 int32 spellId = quest->GetRewSpell();
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 if (!spellInfo)
@@ -271,7 +271,8 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
     LOG_DEBUG("playerbots", "Initializing talents...");
-    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence ||
+        bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitTalentsTree();
     }
@@ -306,7 +307,8 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
     LOG_DEBUG("playerbots", "Initializing equipmemt...");
-    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    if (!incremental || !sPlayerbotAIConfig->equipmentPersistence ||
+        bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         InitEquipment(incremental, incremental ? false : sPlayerbotAIConfig->twoRoundsGearInit);
     }
@@ -1559,27 +1561,16 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
     // int tab = AiFactory::GetPlayerSpecTab(bot);
 
     uint32 blevel = bot->GetLevel();
-    int32 delta = 2;
-    if (blevel < 15)
-        delta = std::min(blevel, 15u);
-    else if (blevel < 40)
-        delta = 10;
-    else if (blevel < 60)
-        delta = 6;
-    else if (blevel < 70)
-        delta = 9;
-    else if (blevel < 80)
-        delta = 9;
-    else if (blevel == 80)
-        delta = 9;
+    int32 delta = std::min(blevel, 10u);
 
     StatsWeightCalculator calculator(bot);
-    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+    // Reverse order may work better
+    for (int32 slot = (int32)EQUIPMENT_SLOT_TABARD; slot >= (int32)EQUIPMENT_SLOT_START; slot--)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
             continue;
 
-        if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
+        if (level < 50 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
             continue;
 
         if (level < 30 && slot == EQUIPMENT_SLOT_NECK)
@@ -1670,8 +1661,6 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         items[slot].push_back(itemId);
                     }
                 }
-                if (items[slot].size() >= 25)
-                    break;
             }
         } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_NORMAL);
 
@@ -1719,8 +1708,6 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             if (bestScoreForSlot < 1.2f * old_score)
                 continue;
         }
-
-        
         if (oldItem)
         {
             uint8 bagIndex = oldItem->GetBagSlot();
@@ -1742,19 +1729,19 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         // if (newItem)
         // {
         //     newItem->AddToWorld();
-            // newItem->AddToUpdateQueueOf(bot);
+        // newItem->AddToUpdateQueueOf(bot);
         // }
     }
     // Secondary init for better equips
     /// @todo: clean up duplicate code
     if (second_chance)
     {
-        for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+        for (int32 slot = (int32)EQUIPMENT_SLOT_TABARD; slot >= (int32)EQUIPMENT_SLOT_START; slot--)
         {
             if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
                 continue;
 
-            if (level < 40 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
+            if (level < 50 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
                 continue;
 
             if (level < 30 && slot == EQUIPMENT_SLOT_NECK)
@@ -2087,7 +2074,7 @@ bool PlayerbotFactory::CanEquipUnseenItem(uint8 slot, uint16& dest, uint32 item)
     if (Item* pItem = Item::CreateItem(item, 1, bot, false, 0, true))
     {
         InventoryResult result = botAI ? botAI->CanEquipItem(slot, dest, pItem, true, true)
-            : bot->CanEquipItem(slot, dest, pItem, true, true);
+                                       : bot->CanEquipItem(slot, dest, pItem, true, true);
         pItem->RemoveFromUpdateQueueOf(bot);
         delete pItem;
         return result == EQUIP_ERR_OK;
@@ -2360,8 +2347,6 @@ void PlayerbotFactory::InitAvailableSpells()
             trainerIdCache.push_back(trainerId);
         }
     }
-    // uint32 learnedCounter = 0;
-    // uint32 oktest = 0;
     for (uint32 trainerId : trainerIdCache)
     {
         TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
@@ -2379,7 +2364,7 @@ void PlayerbotFactory::InitAvailableSpells()
             if (!tSpell)
                 continue;
 
-            if (!tSpell->learnedSpell[0] && !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[0]))
+            if (tSpell->learnedSpell[0] && !bot->IsSpellFitByClassAndRace(tSpell->learnedSpell[0]))
                 continue;
 
             TrainerSpellState state = bot->GetTrainerSpellState(tSpell);
@@ -2394,7 +2379,8 @@ void PlayerbotFactory::InitAvailableSpells()
                     continue;
 
                 if (spellInfo->Effects[j].Effect == SPELL_EFFECT_PROFICIENCY ||
-                    spellInfo->Effects[j].Effect == SPELL_EFFECT_SKILL_STEP ||
+                    (spellInfo->Effects[j].Effect == SPELL_EFFECT_SKILL_STEP &&
+                     spellInfo->Effects[j].MiscValue != SKILL_RIDING) ||
                     spellInfo->Effects[j].Effect == SPELL_EFFECT_DUAL_WIELD)
                 {
                     learn = false;
@@ -2405,19 +2391,12 @@ void PlayerbotFactory::InitAvailableSpells()
             {
                 continue;
             }
-            // oktest++;
-            if (tSpell->learnedSpell[0])
-            {
+
+            if (tSpell->IsCastable())
+                bot->CastSpell(bot, tSpell->spell, true);
+            else
                 bot->learnSpell(tSpell->learnedSpell[0], false);
-            }
-            // else
-            // {
-            //     botAI->CastSpell(tSpell->spell, bot);
-            // }
         }
-        // LOG_INFO("playerbots", "C: {}, ok: {}", ++learnedCounter, oktest);
-        // if (++learnedCounter > 20)
-        //     break;
     }
 }
 
@@ -2460,6 +2439,8 @@ void PlayerbotFactory::InitClassSpells()
             // to leave DK starting area
             bot->learnSpell(53428, false);
             bot->learnSpell(50977, false);
+            bot->learnSpell(49142, false);
+            bot->learnSpell(48778, false);
             break;
         case CLASS_HUNTER:
             bot->learnSpell(2973, true);
@@ -3866,7 +3847,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
     float bestGemScore[4] = {0, 0, 0, 0};
     std::vector<uint32> curCount = GetCurrentGemsCount();
     uint8 jewelersCount = 0;
-    int requiredActive = bot->GetLevel() <= 70 ? 2 : 1;
+    int requiredActive = 2;
     std::vector<uint32> availableGems;
     for (const uint32& enchantGem : enchantGemIdCache)
     {
@@ -4007,7 +3988,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 bool isJewelersGem = gemTemplate->ItemLimitCategory == 2;
                 if (isJewelersGem && jewelersCount >= 3)
                     continue;
-                
+
                 const GemPropertiesEntry* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
                 if (!gemProperties)
                     continue;
