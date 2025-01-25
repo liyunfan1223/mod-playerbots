@@ -992,19 +992,20 @@ void MovementAction::UpdateMovementState()
     bool onGround = bot->GetPositionZ() <
                     bot->GetMapWaterOrGroundLevel(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()) + 1.0f;
 
+    // Keep bot->SendMovementFlagUpdate() withing the if statements to not intefere with bot behavior on ground/(shallow) waters
     if (!bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) &&
         bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !onGround)
     {
         bot->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+        bot->SendMovementFlagUpdate();
     }
-    if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) &&
+
+    else if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) &&
         (!bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || onGround))
     {
         bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+        bot->SendMovementFlagUpdate();
     }
-
-    // Invoking bot->SendMovementFlagUpdate() here causes weird behaviour in shallow waters and possibly elsewhere.
-    // bot->SendMovementFlagUpdate();
 
     // Temporary speed increase in group
     // if (botAI->HasRealPlayerMaster()) {
