@@ -131,8 +131,8 @@ bool PlayerbotAIConfig::Initialize()
     inviteChat = sConfigMgr->GetOption<bool>("AiPlayerbot.InviteChat", false);
     allowPlayerBots = sConfigMgr->GetOption<bool>("AiPlayerbot.AllowPlayerBots", false);
 
-    randomBotMapsAsString = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotMaps", "0,1,530,571");
-    LoadList<std::vector<uint32>>(randomBotMapsAsString, randomBotMaps);
+    LoadList<std::vector<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotMaps","0,1,530,571"), randomBotMaps);
     probTeleToBankers = sConfigMgr->GetOption<float>("AiPlayerbot.ProbTeleToBankers", 0.25f);
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestItems",
