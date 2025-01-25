@@ -2164,18 +2164,15 @@ void PlayerbotFactory::InitSkills()
     uint32 maxValue = level * 5;
     bot->UpdateSkillsForLevel();
 
-    uint16 step = bot->GetSkillValue(SKILL_RIDING) ? bot->GetSkillStep(SKILL_RIDING) : 1;
-
-    if (bot->GetLevel() >= 70)
-        bot->SetSkill(SKILL_RIDING, step, 300, 300);
-    else if (bot->GetLevel() >= 60)
-        bot->SetSkill(SKILL_RIDING, step, 225, 225);
-    else if (bot->GetLevel() >= 40)
-        bot->SetSkill(SKILL_RIDING, step, 150, 150);
-    else if (bot->GetLevel() >= 20)
-        bot->SetSkill(SKILL_RIDING, step, 75, 75);
-    else
-        bot->SetSkill(SKILL_RIDING, 0, 0, 0);
+    bot->SetSkill(SKILL_RIDING, 0, 0, 0);
+    if (bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
+        bot->learnSpell(33388);
+    if (bot->GetLevel() >= sPlayerbotAIConfig->useFastGroundMountAtMinLevel)
+        bot->learnSpell(33391);
+    if (bot->GetLevel() >= sPlayerbotAIConfig->useFlyMountAtMinLevel)
+        bot->learnSpell(34090);
+    if (bot->GetLevel() >= sPlayerbotAIConfig->useFastFlyMountAtMinLevel)
+        bot->learnSpell(34091);
 
     uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;

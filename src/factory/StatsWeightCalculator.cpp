@@ -549,6 +549,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
         if (hitOverflowType_ & CollectorType::SPELL)
         {
             hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+            hit_current += player->GetTotalAuraModifier(SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT); // suppression (18176)
             hit_current += player->GetRatingBonusValue(CR_HIT_SPELL);
             hit_overflow = SPELL_HIT_OVERFLOW;
             if (hit_overflow > hit_current)
