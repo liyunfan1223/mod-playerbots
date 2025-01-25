@@ -477,7 +477,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     {
         /* wait for async accounts create to make character create correctly, same as account delete */
         LOG_INFO("playerbots", "Waiting for {} accounts loading into database...", new_bot_accounts);
-        std::this_thread::sleep_for(10ms * );
+        std::this_thread::sleep_for(10ms * new_bot_accounts);
     }
 
     LOG_INFO("playerbots", "Creating random bot characters...");
