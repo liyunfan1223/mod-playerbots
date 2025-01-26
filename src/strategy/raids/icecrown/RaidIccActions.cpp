@@ -40,8 +40,8 @@ bool IccLmTankPositionAction::Execute(Event event)
     {
         if (bot->GetExactDist2d(ICC_LM_TANK_POSITION) > 15.0f)
             return MoveTo(bot->GetMapId(), ICC_LM_TANK_POSITION.GetPositionX(),
-                          ICC_LM_TANK_POSITION.GetPositionY(), ICC_LM_TANK_POSITION.GetPositionZ(), false,
-                          false, false, true, MovementPriority::MOVEMENT_NORMAL);
+                          ICC_LM_TANK_POSITION.GetPositionY(), ICC_LM_TANK_POSITION.GetPositionZ(), 
+                          false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
         else
             return Attack(boss);
     }
@@ -50,15 +50,13 @@ bool IccLmTankPositionAction::Execute(Event event)
 
 bool IccSpikeAction::Execute(Event event)
 {
+    Aura* aura = botAI->GetAura("Impaled", bot);
+
     // If we're impaled, we can't do anything
-    if (bot->HasAura(69065) || // Impaled (10N)
-        bot->HasAura(72669) || // Impaled (25N)
-        bot->HasAura(72670) || // Impaled (10H)
-        bot->HasAura(72671))   // Impaled (25H)
-    {
+    if (aura)
         return false;
-    }
-    // Find the bos
+
+    // Find the boss
     Unit* boss = AI_VALUE2(Unit*, "find target", "lord marrowgar");
     if (!boss) { return false; }
 
@@ -709,6 +707,16 @@ bool IccRotfaceTankPositionAction::Execute(Event event)
     Unit* boss = AI_VALUE2(Unit*, "find target", "rotface");
     if (!boss)
     return false;
+
+    // Mark Rotface with skull if not already marked
+    if (Group* group = bot->GetGroup())
+    {
+        ObjectGuid skullGuid = group->GetTargetIcon(7); // 7 = skull
+        if (!skullGuid || !botAI->GetUnit(skullGuid))
+        {
+            group->SetTargetIcon(7, bot->GetGUID(), boss->GetGUID());
+        }
+    }
 
     // Main tank positioning logic
     if (botAI->IsMainTank(bot))

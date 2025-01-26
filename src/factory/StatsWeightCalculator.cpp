@@ -14,6 +14,8 @@
 #include "PlayerbotAI.h"
 #include "PlayerbotFactory.h"
 #include "SharedDefines.h"
+#include "SpellAuraDefines.h"
+#include "SpellMgr.h"
 #include "StatsCollector.h"
 #include "Unit.h"
 
@@ -23,14 +25,15 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
         type_ = CollectorType::SPELL_HEAL;
     else if (PlayerbotAI::IsCaster(player))
         type_ = CollectorType::SPELL_DMG;
+    else if (PlayerbotAI::IsTank(player))
+        type_ = CollectorType::MELEE_TANK;
     else if (PlayerbotAI::IsMelee(player))
-        type_ = CollectorType::MELEE;
+        type_ = CollectorType::MELEE_DMG;
     else
         type_ = CollectorType::RANGED;
     cls = player->getClass();
     tab = AiFactory::GetPlayerSpecTab(player);
     collector_ = std::make_unique<StatsCollector>(type_, cls);
-
 
     if (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_UNHOLY)
         hitOverflowType_ = CollectorType::SPELL;
@@ -79,7 +82,7 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId)
     CalculateItemTypePenalty(proto);
 
     if (enable_item_set_bonus_)
-        CalculateItemSetBonus(player_, proto);
+        CalculateItemSetMod(player_, proto);
 
     CalculateSocketBonus(player_, proto);
 
@@ -125,6 +128,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     // Basic weights
     stats_weights_[STATS_TYPE_STAMINA] += 0.01f;
     stats_weights_[STATS_TYPE_ARMOR] += 0.001f;
+    stats_weights_[STATS_TYPE_BONUS] += 1.0f;
 
     if (cls == CLASS_HUNTER && (tab == HUNTER_TAB_BEASTMASTER || tab == HUNTER_TAB_SURVIVAL))
     {
@@ -259,8 +263,8 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_MELEE_DPS] += 8.5f;
     }
     else if (cls == CLASS_WARLOCK || (cls == CLASS_MAGE && tab != MAGE_TAB_FIRE) ||
-             (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW) ||     // shadow
-             (cls == CLASS_DRUID && tab == DRUID_TAB_BALANCE))        // balance
+             (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW) ||  // shadow
+             (cls == CLASS_DRUID && tab == DRUID_TAB_BALANCE))     // balance
     {
         stats_weights_[STATS_TYPE_INTELLECT] += 0.3f;
         stats_weights_[STATS_TYPE_SPIRIT] += 0.6f;
@@ -311,7 +315,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_DEFENSE] += 2.5f;
         stats_weights_[STATS_TYPE_PARRY] += 2.0f;
         stats_weights_[STATS_TYPE_DODGE] += 2.0f;
-        stats_weights_[STATS_TYPE_RESILIENCE] += 2.0f;
+        // stats_weights_[STATS_TYPE_RESILIENCE] += 2.0f;
         stats_weights_[STATS_TYPE_BLOCK_RATING] += 1.0f;
         stats_weights_[STATS_TYPE_BLOCK_VALUE] += 0.5f;
         stats_weights_[STATS_TYPE_ARMOR] += 0.15f;
@@ -330,7 +334,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_DEFENSE] += 3.5f;
         stats_weights_[STATS_TYPE_PARRY] += 2.0f;
         stats_weights_[STATS_TYPE_DODGE] += 2.0f;
-        stats_weights_[STATS_TYPE_RESILIENCE] += 2.0f;
+        // stats_weights_[STATS_TYPE_RESILIENCE] += 2.0f;
         stats_weights_[STATS_TYPE_ARMOR] += 0.15f;
         stats_weights_[STATS_TYPE_HIT] += 2.0f;
         stats_weights_[STATS_TYPE_CRIT] += 0.5f;
@@ -347,7 +351,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;
         stats_weights_[STATS_TYPE_DEFENSE] += 0.3f;
         stats_weights_[STATS_TYPE_DODGE] += 0.7f;
-        stats_weights_[STATS_TYPE_RESILIENCE] += 1.0f;
+        // stats_weights_[STATS_TYPE_RESILIENCE] += 1.0f;
         stats_weights_[STATS_TYPE_ARMOR] += 0.15f;
         stats_weights_[STATS_TYPE_HIT] += 3.0f;
         stats_weights_[STATS_TYPE_CRIT] += 1.3f;
@@ -380,7 +384,7 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
     }
 }
 
-void StatsWeightCalculator::CalculateItemSetBonus(Player* player, ItemTemplate const* proto)
+void StatsWeightCalculator::CalculateItemSetMod(Player* player, ItemTemplate const* proto)
 {
     uint32 itemSet = proto->ItemSet;
     if (!itemSet)
@@ -466,7 +470,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         // enhancement, rogue, ice dk, unholy dk, shield tank, fury warrior without titan's grip but with duel wield
         if (isDoubleHand &&
             ((cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && player_->CanDualWield()) ||
-             (cls == CLASS_ROGUE) || (cls == CLASS_DEATH_KNIGHT && tab != DEATHKNIGHT_TAB_BLOOD) ||
+             (cls == CLASS_ROGUE) || (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_FROST) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanTitanGrip() && player_->CanDualWield()) ||
              (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) ||
              (cls == CLASS_PALADIN && tab == PALADIN_TAB_PROTECTION)))
@@ -486,14 +490,12 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
             weight_ *= 0.1;
         }
         // fury with titan's grip
-        if ((!isDoubleHand || proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || proto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF) &&
+        if ((!isDoubleHand || proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM ||
+             proto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF) &&
             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && player_->CanTitanGrip()))
         {
             weight_ *= 0.1;
         }
-    }
-    if (proto->Class == ITEM_CLASS_WEAPON)
-    {
         if (cls == CLASS_HUNTER && proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN)
         {
             weight_ *= 0.1;
@@ -511,6 +513,10 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
             (proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2))
         {
             weight_ *= 1.1;
+        }
+        if (cls == CLASS_DEATH_KNIGHT && player_->HasAura(50138) && !isDoubleHand)
+        {
+            weight_ *= 1.3;
         }
         bool slowDelay = proto->Delay > 2500;
         if (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && slowDelay)
@@ -540,11 +546,10 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
     {
         float hit_current, hit_overflow;
         float validPoints;
-        // m_modMeleeHitChance = (float)GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
-        // m_modMeleeHitChance += GetRatingBonusValue(CR_HIT_MELEE);
-        if (hitOverflowType_ == CollectorType::SPELL)
+        if (hitOverflowType_ & CollectorType::SPELL)
         {
             hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+            hit_current += player->GetTotalAuraModifier(SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT); // suppression (18176)
             hit_current += player->GetRatingBonusValue(CR_HIT_SPELL);
             hit_overflow = SPELL_HIT_OVERFLOW;
             if (hit_overflow > hit_current)
@@ -552,7 +557,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
             else
                 validPoints = 0;
         }
-        else if (hitOverflowType_ == CollectorType::MELEE)
+        else if (hitOverflowType_ & CollectorType::MELEE)
         {
             hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
             hit_current += player->GetRatingBonusValue(CR_HIT_MELEE);
@@ -576,7 +581,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
     }
 
     {
-        if (type_ == CollectorType::MELEE)
+        if (type_ & CollectorType::MELEE)
         {
             float expertise_current, expertise_overflow;
             expertise_current = player->GetUInt32Value(PLAYER_EXPERTISE);
@@ -589,12 +594,13 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
             else
                 validPoints = 0;
 
-            collector_->stats[STATS_TYPE_EXPERTISE] = std::min(collector_->stats[STATS_TYPE_EXPERTISE], (int)validPoints);
+            collector_->stats[STATS_TYPE_EXPERTISE] =
+                std::min(collector_->stats[STATS_TYPE_EXPERTISE], (int)validPoints);
         }
     }
 
     {
-        if (type_ == CollectorType::MELEE)
+        if (type_ & CollectorType::MELEE)
         {
             float defense_current, defense_overflow;
             defense_current = player->GetRatingBonusValue(CR_DEFENSE_SKILL);
@@ -611,7 +617,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
     }
 
     {
-        if (type_ == CollectorType::MELEE || type_ == CollectorType::RANGED)
+        if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
         {
             float armor_penetration_current, armor_penetration_overflow;
             armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
@@ -619,11 +625,13 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
 
             float validPoints;
             if (armor_penetration_overflow > armor_penetration_current)
-                validPoints = (armor_penetration_overflow - armor_penetration_current) / player->GetRatingMultiplier(CR_ARMOR_PENETRATION);
+                validPoints = (armor_penetration_overflow - armor_penetration_current) /
+                              player->GetRatingMultiplier(CR_ARMOR_PENETRATION);
             else
                 validPoints = 0;
 
-            collector_->stats[STATS_TYPE_ARMOR_PENETRATION] = std::min(collector_->stats[STATS_TYPE_ARMOR_PENETRATION], (int)validPoints);
+            collector_->stats[STATS_TYPE_ARMOR_PENETRATION] =
+                std::min(collector_->stats[STATS_TYPE_ARMOR_PENETRATION], (int)validPoints);
         }
     }
 }
@@ -631,7 +639,7 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
 void StatsWeightCalculator::ApplyWeightFinetune(Player* player)
 {
     {
-        if (type_ == CollectorType::MELEE || type_ == CollectorType::RANGED)
+        if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
         {
             float armor_penetration_current, armor_penetration_overflow;
             armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
