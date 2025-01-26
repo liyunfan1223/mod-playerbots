@@ -190,7 +190,7 @@ private:
     uint32 itemQuality;
     uint32 gearScoreLimit;
     static std::list<uint32> specialQuestIds;
-    std::vector<uint32> trainerIdCache;
+    static std::unordered_map<uint32, std::vector<uint32>> trainerIdCache;
     static std::vector<uint32> enchantSpellIdCache;
     static std::vector<uint32> enchantGemIdCache;
 
