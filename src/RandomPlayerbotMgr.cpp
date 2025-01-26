@@ -168,7 +168,6 @@ RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
     if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
     {
         sPlayerbotCommandServer->Start();
-        PrepareTeleportCache();
     }
 
     BattlegroundData.clear(); // Clear here and here only.
@@ -1746,6 +1745,22 @@ void RandomPlayerbotMgr::PrepareAddclassCache()
         }
     }
     LOG_INFO("playerbots", ">> {} characters collected for addclass command.", collected);
+}
+
+void RandomPlayerbotMgr::Init()
+{
+    if (sPlayerbotAIConfig->addClassCommand)
+        sRandomPlayerbotMgr->PrepareAddclassCache();
+    
+    if (sPlayerbotAIConfig->enabled)
+    {
+        sRandomPlayerbotMgr->PrepareTeleportCache();
+    }
+    
+    if (sPlayerbotAIConfig->randomBotJoinBG)
+        sRandomPlayerbotMgr->LoadBattleMastersCache();
+
+    PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots WHERE event = 'add'");
 }
 
 void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)

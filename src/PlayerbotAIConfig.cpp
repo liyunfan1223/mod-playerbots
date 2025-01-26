@@ -548,9 +548,12 @@ bool PlayerbotAIConfig::Initialize()
     {
         return true;
     }
-    if (sPlayerbotAIConfig->addClassCommand)
-        sRandomPlayerbotMgr->PrepareAddclassCache();
 
+    if (sPlayerbotAIConfig->enabled)
+    {
+        sRandomPlayerbotMgr->Init();
+    }
+    
     sRandomItemMgr->Init();
     sRandomItemMgr->InitAfterAhBot();
     sPlayerbotTextMgr->LoadBotTexts();
@@ -563,8 +566,6 @@ bool PlayerbotAIConfig::Initialize()
         sTravelMgr->LoadQuestTravelTable();
     }
 
-    if (sPlayerbotAIConfig->randomBotJoinBG)
-        sRandomPlayerbotMgr->LoadBattleMastersCache();
 
     if (sPlayerbotAIConfig->randomBotSuggestDungeons)
     {
