@@ -669,13 +669,28 @@ bool IccFestergutSporeAction::Execute(Event event)
     Position targetPos;
     if (hasSpore)
     {
-        // If bot is tank, always go melee
-        if (botAI->IsTank(bot))
+        bool mainTankHasSpore = false;
+        GuidVector members = AI_VALUE(GuidVector, "group members");
+        for (auto& member : members)
+        {
+            Unit* unit = botAI->GetUnit(member);
+            if (!unit)
+                continue;
+
+            if (botAI->IsMainTank(unit->ToPlayer()) && unit->HasAura(69279))
+            {
+                mainTankHasSpore = true;
+                break;
+            }
+        }
+
+        // If bot is main tank, always go melee regardless of GUID
+        if (botAI->IsMainTank(bot))
         {
             targetPos = ICC_FESTERGUT_MELEE_SPORE;
         }
-        // If this bot has the lowest GUID among spored players, it goes melee
-        else if (bot->GetGUID() == lowestGuid)
+        // If this bot has the lowest GUID among spored players AND is not a tank AND main tank is not spored
+        else if (bot->GetGUID() == lowestGuid && !botAI->IsTank(bot) && !mainTankHasSpore)
         {
             targetPos = ICC_FESTERGUT_MELEE_SPORE;
         }
