@@ -38,10 +38,11 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             // if ((!info.lastNearNpc || info.lastNearNpc + setNpcInterval < getMSTime()) && roll <= 30)
             if (roll <= 30)
             {
-                info.lastNearNpc = getMSTime();
                 GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
                 if (!possibleTargets.empty())
                 {
+                    info.Reset();
+                    info.lastNearNpc = getMSTime();
                     info.status = NewRpgStatus::NEAR_NPC;
                     return true;
                 }
@@ -52,6 +53,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 WorldPosition pos = SelectRandomInnKeeperPos();
                 if (pos != WorldPosition() && bot->GetExactDist(pos) > 50.0f)
                 {
+                    info.Reset();
                     info.lastGoInnKeeper = getMSTime();
                     info.status = NewRpgStatus::GO_INNKEEPER;
                     info.innKeeperPos = pos;
@@ -64,6 +66,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 WorldPosition pos = SelectRandomGrindPos();
                 if (pos != WorldPosition())
                 {
+                    info.Reset();
                     info.lastGoGrind = getMSTime();
                     info.status = NewRpgStatus::GO_GRIND;
                     info.grindPos = pos;
@@ -71,6 +74,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                 }
             }
             // IDLE -> REST
+            info.Reset();
             info.status = NewRpgStatus::REST;
             info.lastRest = getMSTime();
             bot->SetStandState(UNIT_STAND_STATE_SIT);
@@ -83,22 +87,12 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             // GO_GRIND -> NEAR_RANDOM
             if (bot->GetExactDist(originalPos) < 10.0f)
             {
+                info.Reset();
                 info.status = NewRpgStatus::NEAR_RANDOM;
                 info.lastNearRandom = getMSTime();
                 info.grindPos = WorldPosition();
                 return true;
             }
-            // // just choose another grindPos
-            // if (!info.lastGoGrind || info.lastGoGrind + setGrindInterval < getMSTime())
-            // {
-            //     WorldPosition pos = SelectRandomGrindPos();
-            //     if (pos == WorldPosition())
-            //         break;
-            //     info.status = NewRpgStatus::GO_GRIND;
-            //     info.lastGoGrind = getMSTime();
-            //     info.grindPos = pos;
-            //     return true;
-            // }
             break;
         }
         case NewRpgStatus::GO_INNKEEPER:
@@ -108,6 +102,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             // GO_INNKEEPER -> NEAR_NPC
             if (bot->GetExactDist(originalPos) < 10.0f)
             {
+                info.Reset();
                 info.lastNearNpc = getMSTime();
                 info.status = NewRpgStatus::NEAR_NPC;
                 info.innKeeperPos = WorldPosition();
@@ -120,6 +115,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             // NEAR_RANDOM -> IDLE
             if (info.lastNearRandom + statusNearRandomDuration < getMSTime())
             {
+                info.Reset();
                 info.status = NewRpgStatus::IDLE;
                 return true;
             }
@@ -129,6 +125,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
         {
             if (info.lastNearNpc + statusNearNpcDuration < getMSTime())
             {
+                info.Reset();
                 info.status = NewRpgStatus::IDLE;
                 return true;
             }
@@ -139,6 +136,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             // REST -> IDLE
             if (info.lastRest + statusRestDuration < getMSTime())
             {
+                info.Reset();
                 info.status = NewRpgStatus::IDLE;
                 return true;
             }
@@ -173,7 +171,7 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomGrindPos()
             lo_prepared_locs.push_back(loc);
         }
     }
-    WorldPosition dest;
+    WorldPosition dest{};
     if (urand(1, 100) <= 50 && !hi_prepared_locs.empty())
     {
         uint32 idx = urand(0, hi_prepared_locs.size() - 1);
@@ -211,7 +209,7 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
             prepared_locs.push_back(loc);
         }
     }
-    WorldPosition dest;
+    WorldPosition dest{};
     if (!prepared_locs.empty())
     {
         uint32 idx = urand(0, prepared_locs.size() - 1);
@@ -225,6 +223,9 @@ WorldPosition NewRpgStatusUpdateAction::SelectRandomInnKeeperPos()
 
 bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
 {
+    if (dest == WorldPosition())
+        return false;
+
     float dis = bot->GetExactDist(dest);
     if (dis < pathFinderDis)
     {
@@ -236,6 +237,27 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     if (IsWaitingForLastMove(MovementPriority::MOVEMENT_NORMAL))
     {
         return false;
+    }
+
+    // stuck check
+    float disToDest = bot->GetDistance(dest);
+    if (disToDest + 1.0f < botAI->rpgInfo.nearestMoveFarDis)
+    {
+        botAI->rpgInfo.nearestMoveFarDis = disToDest;
+        botAI->rpgInfo.stuckTs = getMSTime();
+        botAI->rpgInfo.stuckAttempts = 0;
+    }
+    else if (++botAI->rpgInfo.stuckAttempts >= 10 && botAI->rpgInfo.stuckTs + stuckTime < getMSTime())
+    {
+        // Unfortunately we've been stuck here for over 5 mins, fallback to teleporting directly to the destination
+        botAI->rpgInfo.stuckTs = getMSTime();
+        botAI->rpgInfo.stuckAttempts = 0;
+        const AreaTableEntry* entry = sAreaTableStore.LookupEntry(bot->GetZoneId());
+        std::string zone_name = PlayerbotAI::GetLocalizedAreaName(entry);
+        LOG_DEBUG("playerbots", "[New Rpg] Teleport {} from ({},{},{},{}) to ({},{},{},{}) as it stuck when moving far - Zone: {} ({})", bot->GetName(),
+            bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(),
+            dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), dest.getMapId(), bot->GetZoneId(), zone_name);
+        return bot->TeleportTo(dest);
     }
 
     float minDelta = M_PI;
@@ -254,12 +276,11 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
         float dx = x + cos(angle) * dis;
         float dy = y + sin(angle) * dis;
         float dz = z + 0.5f;
-        bot->UpdateAllowedPositionZ(dx, dy, dz);
         PathGenerator path(bot);
         path.CalculatePath(dx, dy, dz);
         PathType type = path.GetPathType();
-
-        bool canReach = type == PATHFIND_NORMAL;
+        uint32 typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY;
+        bool canReach = !(type & (~typeOk));
 
         if (canReach && fabs(delta) <= minDelta)
         {
@@ -275,9 +296,6 @@ bool NewRpgGoFarAwayPosAction::MoveFarTo(WorldPosition dest)
     {
         return MoveTo(bot->GetMapId(), rx, ry, rz, false, false, false, true);
     }
-    // don't fallback to direct move
-    // float angle = bot->GetAngle(&dest);
-    // return MoveTo(bot->GetMapId(), x + cos(angle) * pathFinderDis, y + sin(angle) * pathFinderDis, z);
     return false;
 }
 

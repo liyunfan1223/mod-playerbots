@@ -15,13 +15,14 @@
 #include "Common.h"
 #include "Event.h"
 #include "Item.h"
+#include "NewRpgStrategy.h"
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
 #include "PlayerbotTextMgr.h"
 #include "SpellAuras.h"
+#include "Util.h"
 #include "WorldPacket.h"
-#include "NewRpgStrategy.h"
 
 class AiObjectContext;
 class Creature;
@@ -419,7 +420,7 @@ public:
     bool HasAggro(Unit* unit);
     int32 GetGroupSlotIndex(Player* player);
     int32 GetRangedIndex(Player* player);
-    int32 GetClassIndex(Player* player, uint8_t cls);
+    int32 GetClassIndex(Player* player, uint8 cls);
     int32 GetRangedDpsIndex(Player* player);
     int32 GetMeleeIndex(Player* player);
 
@@ -573,6 +574,8 @@ public:
     std::set<uint32> GetCurrentIncompleteQuestIds();
     void PetFollow();
     static float GetItemScoreMultiplier(ItemQualities quality);
+    static bool IsHealingSpell(uint32 spellFamilyName, flag96 spelFalimyFlags);
+    static SpellFamilyNames Class2SpellFamilyName(uint8 cls);
     NewRpgInfo rpgInfo;
 
 private:
