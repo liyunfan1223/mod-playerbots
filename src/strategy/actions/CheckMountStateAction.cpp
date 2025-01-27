@@ -108,7 +108,7 @@ bool CheckMountStateAction::isUseful()
         return false;
 
     // Do not mount when level lower than minimum required
-    if (bool firstmount = bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
+    if (bot->GetLevel() < sPlayerbotAIConfig->useGroundMountAtMinLevel)
         return false;
 
     // Do not use with BG Flags
