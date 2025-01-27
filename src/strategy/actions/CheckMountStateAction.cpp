@@ -42,6 +42,7 @@ bool CheckMountStateAction::Execute(Event event)
         return true;
     }
 
+    // If there is a master and bot not in BG
     Player* master = GetMaster();
     if (master && !bot->InBattleground())
     {
@@ -60,20 +61,8 @@ bool CheckMountStateAction::Execute(Event event)
         return false;
     }
 
-    // For random bots
-    // if (!bot->InBattleground() && !master && !bot->IsMounted() && noAttackers && shouldMount && !bot->IsInCombat())
-    //     return Mount();
-
-    // if (ShouldMountInBattleground())
-    //     return Mount();
-
-    // if (!bot->IsFlying() && shouldDismount && bot->IsMounted() && (AI_VALUE(Unit*, "enemy player target") || AI_VALUE(Unit*, "dps target") || (!noAttackers && bot->IsInCombat())))
-    // {
-    //     Dismount();
-    //     return true;
-    // }
-
-    if (!bot->InBattleground() && !master)
+    // If there is no master and bot not in BG
+    if (!master && !bot->InBattleground())
     {
         if (!bot->IsMounted() && noAttackers && shouldMount && !bot->IsInCombat())
         {
@@ -81,24 +70,23 @@ bool CheckMountStateAction::Execute(Event event)
         }
     }
 
+    // If the bot is in BG
     if (bot->InBattleground() && shouldMount && noAttackers && !bot->IsInCombat() && !bot->IsMounted())
     {
+        // WSG Specific - Do not mount when carrying the flag
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
         {
-            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
             if (bot->HasAura(23333) || bot->HasAura(23335))
             {
                 return false;
             }
         }
-
         return Mount();
     }
 
     if (!bot->IsFlying() && shouldDismount && bot->IsMounted() && (enemy || dps || (!noAttackers && bot->IsInCombat())))
     {
-        WorldPacket emptyPacket;
-        bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+        Dismount();
         return true;
     }
     
@@ -110,7 +98,7 @@ bool CheckMountStateAction::isUseful()
     if (botAI->IsInVehicle() || bot->isDead() || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) || !bot->IsOutdoors() || bot->InArena())
         return false;
 
-    // in addition to checking IsOutdoors, also check whether bot is clipping below floor slightly because that will
+    // In addition to checking IsOutdoors, also check whether bot is clipping below floor slightly because that will
     // cause bot to falsly indicate they are outdoors. This fixes bug where bot tries to mount indoors (which seems
     // to mostly be an issue in tunnels of WSG and AV)
     if (!bot->IsMounted() && bot->GetPositionZ() < bot->GetMapWaterOrGroundLevel(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
@@ -171,7 +159,7 @@ bool CheckMountStateAction::Mount()
 
 float CheckMountStateAction::CalculateDismountDistance() const
 {
-    // warrior bots should dismount far enough to charge (because its important for generating some initial rage),
+    // Warrior bots should dismount far enough to charge (because its important for generating some initial rage),
     // a real player would be riding toward enemy mashing the charge key but the bots wont cast charge while mounted
     bool isMelee = PlayerbotAI::IsMelee(bot);
     float dismountDistance = isMelee ? sPlayerbotAIConfig->meleeDistance + 2.0f : sPlayerbotAIConfig->spellDistance + 2.0f;
@@ -180,7 +168,7 @@ float CheckMountStateAction::CalculateDismountDistance() const
 
 float CheckMountStateAction::CalculateMountDistance() const
 {
-    // mount distance should be >= 21 regardless of class, because when travelling a distance < 21 it takes longer
+    // Mount distance should be >= 21 regardless of class, because when travelling a distance < 21 it takes longer
     // to cast mount-spell than the time saved from the speed increase. At a distance of 21 both approaches take 3
     // seconds:
     // 21 / 7  =  21 / 14 + 1.5  =  3   (7 = dismounted speed  14 = epic-mount speed  1.5 = mount-spell cast time)
@@ -208,24 +196,9 @@ bool CheckMountStateAction::ShouldDismountForMaster(Player* master) const
     return !isMasterMounted && bot->IsMounted();
 }
 
-bool CheckMountStateAction::ShouldMountInBattleground() const
-{
-    if (!bot->InBattleground() || bot->IsMounted() || bot->IsInCombat())
-        return false;
-
-    if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
-    {
-        BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
-        if (bot->HasAura(23333) || bot->HasAura(23335))
-            return false;
-    }
-
-    return true;
-}
-
 int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
 {
-    // If there ia a master
+    // If there ia a master and bot not in BG
     if (master != nullptr && !bot->InBattleground())
     {
         auto masterInShapeshiftForm = master->GetShapeshiftForm();
