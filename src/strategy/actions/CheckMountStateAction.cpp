@@ -233,8 +233,15 @@ int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
                 continue;
 
             int32 speed = std::max(spellInfo->Effects[1].BasePoints, spellInfo->Effects[2].BasePoints);
+
             if (speed > 59)
+            {
+                // Ensure max speed of 99 in BG
+                if (bot->InBattleground())
+                    return (speed > 99) ? 99 : speed;
+
                 return speed;
+            }
         }
     }
 
