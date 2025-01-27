@@ -200,6 +200,9 @@ bool CheckMountStateAction::ShouldDismountForMaster(Player* master) const
 
 int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
 {
+    if (bot->GetPureSkillValue(SKILL_RIDING) <= 75 && bot->GetLevel() < sPlayerbotAIConfig->useFastGroundMountAtMinLevel)
+        return 59;
+
     // If there ia a master and bot not in BG
     if (master != nullptr && !bot->InBattleground())
     {
