@@ -107,9 +107,11 @@ bool CheckMountStateAction::isUseful()
     if (!GET_PLAYERBOT_AI(bot)->HasStrategy("mount", BOT_STATE_NON_COMBAT) && !bot->IsMounted())
         return false;
 
-    if (bot->GetLevel() < 20)
+    // Do not mount when level lower than minimum required
+    if (bool firstmount = bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
         return false;
 
+    // Do not use with BG Flags
     if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
         return false;
 
