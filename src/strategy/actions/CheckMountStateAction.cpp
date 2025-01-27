@@ -46,6 +46,8 @@ bool CheckMountStateAction::Execute(Event event)
     Player* master = GetMaster();
     if (master && !bot->InBattleground())
     {
+        masterInShapeshiftForm = master->GetShapeshiftForm();
+
         if (!bot->GetGroup() || bot->GetGroup()->GetLeaderGUID() != master->GetGUID())
             return false;
 
@@ -186,14 +188,12 @@ void CheckMountStateAction::Dismount()
 
 bool CheckMountStateAction::ShouldFollowMasterMountState(Player* master, bool noAttackers, bool shouldMount) const
 {
-    auto masterInShapeshiftForm = master->GetShapeshiftForm();
     bool isMasterMounted = master->IsMounted() || masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC || masterInShapeshiftForm == FORM_TRAVEL;
     return isMasterMounted && !bot->IsMounted() && noAttackers && shouldMount && !bot->IsInCombat() && botAI->GetState() != BOT_STATE_COMBAT;
 }
 
 bool CheckMountStateAction::ShouldDismountForMaster(Player* master) const
 {
-    auto masterInShapeshiftForm = master->GetShapeshiftForm();
     bool isMasterMounted = master->IsMounted() || masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC || masterInShapeshiftForm == FORM_TRAVEL;
     return !isMasterMounted && bot->IsMounted();
 }
@@ -203,8 +203,6 @@ int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
     // If there ia a master and bot not in BG
     if (master != nullptr && !bot->InBattleground())
     {
-        auto masterInShapeshiftForm = master->GetShapeshiftForm();
-
         auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
         if (!auraEffects.empty())
         {
@@ -332,7 +330,6 @@ uint32 CheckMountStateAction::GetMountType(Player* master) const
         return 0;
 
     auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
-    auto masterInShapeshiftForm = master->GetShapeshiftForm();
 
     if (!auraEffects.empty())
     {

@@ -21,6 +21,7 @@ public:
     bool Mount();
 
 private:
+    ShapeshiftForm masterInShapeshiftForm;
     float CalculateDismountDistance() const;
     float CalculateMountDistance() const;
     void Dismount();
