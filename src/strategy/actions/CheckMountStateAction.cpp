@@ -15,6 +15,8 @@
 bool CheckMountStateAction::Execute(Event event)
 {
     bool noAttackers = !AI_VALUE2(bool, "combat", "self target") || !AI_VALUE(uint8, "attacker count");
+    bool enemy = AI_VALUE(Unit*, "enemy player target");
+    bool dps = AI_VALUE(Unit*, "dps target");
     bool shouldDismount = false;
     bool shouldMount = false;
 
@@ -59,18 +61,47 @@ bool CheckMountStateAction::Execute(Event event)
     }
 
     // For random bots
-    if (!bot->InBattleground() && !master && !bot->IsMounted() && noAttackers && shouldMount && !bot->IsInCombat())
-        return Mount();
+    // if (!bot->InBattleground() && !master && !bot->IsMounted() && noAttackers && shouldMount && !bot->IsInCombat())
+    //     return Mount();
 
-    if (ShouldMountInBattleground())
-        return Mount();
+    // if (ShouldMountInBattleground())
+    //     return Mount();
 
-    if (!bot->IsFlying() && shouldDismount && bot->IsMounted() && (AI_VALUE(Unit*, "enemy player target") || AI_VALUE(Unit*, "dps target") || (!noAttackers && bot->IsInCombat())))
+    // if (!bot->IsFlying() && shouldDismount && bot->IsMounted() && (AI_VALUE(Unit*, "enemy player target") || AI_VALUE(Unit*, "dps target") || (!noAttackers && bot->IsInCombat())))
+    // {
+    //     Dismount();
+    //     return true;
+    // }
+
+    if (!bot->InBattleground() && !master)
     {
-        Dismount();
-        return true;
+        if (!bot->IsMounted() && noAttackers && shouldMount && !bot->IsInCombat())
+        {
+            return Mount();
+        }
     }
 
+    if (bot->InBattleground() && shouldMount && noAttackers && !bot->IsInCombat() && !bot->IsMounted())
+    {
+        if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
+        {
+            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+            if (bot->HasAura(23333) || bot->HasAura(23335))
+            {
+                return false;
+            }
+        }
+
+        return Mount();
+    }
+
+    if (!bot->IsFlying() && shouldDismount && bot->IsMounted() && (enemy || dps || (!noAttackers && bot->IsInCombat())))
+    {
+        WorldPacket emptyPacket;
+        bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+        return true;
+    }
+    
     return false;
 }
 
@@ -194,21 +225,42 @@ bool CheckMountStateAction::ShouldMountInBattleground() const
 
 int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
 {
-    if (!master || bot->InBattleground())
-        return 59;
-
-    auto masterInShapeshiftForm = master->GetShapeshiftForm();
-
-    auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
-    if (!auraEffects.empty())
+    // If there ia a master
+    if (master != nullptr && !bot->InBattleground())
     {
-        SpellInfo const* masterSpell = auraEffects.front()->GetSpellInfo();
-        return std::max(masterSpell->Effects[1].BasePoints, masterSpell->Effects[2].BasePoints);
+        auto masterInShapeshiftForm = master->GetShapeshiftForm();
+
+        auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
+        if (!auraEffects.empty())
+        {
+            SpellInfo const* masterSpell = auraEffects.front()->GetSpellInfo();
+            return std::max(masterSpell->Effects[1].BasePoints, masterSpell->Effects[2].BasePoints);
+        }
+
+        else if (masterInShapeshiftForm == FORM_FLIGHT_EPIC)
+            return 279;
+
+        else if (masterInShapeshiftForm == FORM_FLIGHT)
+            return 149;
     }
-    else if (masterInShapeshiftForm == FORM_FLIGHT_EPIC)
-        return 279;
-    else if (masterInShapeshiftForm == FORM_FLIGHT)
-        return 149;
+    else
+    // Bots on their own
+    {
+        for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
+        {
+            uint32 spellId = itr->first;
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo || spellInfo->Effects[0].ApplyAuraName != SPELL_AURA_MOUNTED)
+                continue;
+
+            if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active || spellInfo->IsPassive())
+                continue;
+
+            int32 speed = std::max(spellInfo->Effects[1].BasePoints, spellInfo->Effects[2].BasePoints);
+            if (speed > 59)
+                return speed;
+        }
+    }
 
     return 59;
 }
