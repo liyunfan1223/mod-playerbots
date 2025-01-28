@@ -270,12 +270,19 @@ public:
     bool Execute(Event event) override;
 };
 
-//BPC Vortex
 class IccBpcEmpoweredVortexAction : public MovementAction
 {
 public:
     IccBpcEmpoweredVortexAction(PlayerbotAI* botAI) 
         : MovementAction(botAI, "icc bpc empowered vortex") {}
+    bool Execute(Event event) override;
+};
+
+class IccBpcKineticBombAction : public AttackAction
+{
+public:
+    IccBpcKineticBombAction(PlayerbotAI* botAI) 
+        : AttackAction(botAI, "icc bpc kinetic bomb") {}
     bool Execute(Event event) override;
 };
 

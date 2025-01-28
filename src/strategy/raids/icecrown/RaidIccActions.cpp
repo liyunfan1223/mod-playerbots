@@ -1,4 +1,6 @@
 #include "RaidIccActions.h"
+#include "strategy/values/NearestNpcsValue.h"
+#include "ObjectAccessor.h"
 #include "RaidIccStrategy.h"
 #include "Playerbots.h"
 #include "Timer.h"
@@ -1426,21 +1428,22 @@ bool IccBpcMainTankAction::Execute(Event event)
         if (bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 20.0f)
             return MoveTo(bot->GetMapId(), ICC_BPC_MT_POSITION.GetPositionX(),
                         ICC_BPC_MT_POSITION.GetPositionY(), ICC_BPC_MT_POSITION.GetPositionZ(),
-                        false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
+                        false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
 
         Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
         Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
-        Unit* currentTarget = AI_VALUE(Unit*, "current target");
 
-        // Keep current prince if we have one
-        if (currentTarget && (currentTarget == valanar || currentTarget == taldaram))
-            return Attack(currentTarget);
-
-        // Pick a new prince that isn't targeting us
-        if (valanar && (!valanar->GetVictim() || valanar->GetVictim() != bot))
+        // Attack any prince that's not targeting us
+        if (valanar && valanar->IsAlive() && (!valanar->GetVictim() || valanar->GetVictim() != bot))
             return Attack(valanar);
-        if (taldaram && (!taldaram->GetVictim() || taldaram->GetVictim() != bot))
+        if (taldaram && taldaram->IsAlive() && (!taldaram->GetVictim() || taldaram->GetVictim() != bot))
             return Attack(taldaram);
+
+        // If both princes are targeting us or dead, maintain current target
+        Unit* currentTarget = AI_VALUE(Unit*, "current target");
+        if (currentTarget && currentTarget->IsAlive() && 
+            (currentTarget == valanar || currentTarget == taldaram))
+            return Attack(currentTarget);
 
         return false;
     }
@@ -1449,23 +1452,6 @@ bool IccBpcMainTankAction::Execute(Event event)
     {
         Unit* currentTarget = AI_VALUE(Unit*, "current target");
         GuidVector targets = AI_VALUE(GuidVector, "possible targets");
-
-        // First check if skull-marked target is a valid empowered prince
-        Unit* skullTarget = nullptr;
-        if (Group* group = bot->GetGroup())
-        {
-            if (ObjectGuid skullGuid = group->GetTargetIcon(7)) // 7 = skull
-            {
-                skullTarget = botAI->GetUnit(skullGuid);
-                if (skullTarget && skullTarget->IsAlive() && skullTarget->HasAura(71596) &&
-                    (skullTarget->GetEntry() == 37972 ||    // Keleseth
-                     skullTarget->GetEntry() == 37973 ||    // Taldaram
-                     skullTarget->GetEntry() == 37970))     // Valanar
-                {
-                    return Attack(skullTarget);
-                }
-            }
-        }
 
         // If no valid skull target, search for empowered prince
         Unit* empoweredPrince = nullptr;
@@ -1483,79 +1469,199 @@ bool IccBpcMainTankAction::Execute(Event event)
                 {
                 empoweredPrince = unit;
 
-                    // Mark empowered prince with skull if in group
+                    // Mark empowered prince with skull if in group and not already marked
                     if (Group* group = bot->GetGroup())
                     {
+                        ObjectGuid currentSkullGuid = group->GetTargetIcon(7);
+                        if (currentSkullGuid.IsEmpty() || currentSkullGuid != unit->GetGUID())
+                        {
                         group->SetTargetIcon(7, bot->GetGUID(), unit->GetGUID()); // 7 = skull
+                    }
                     }
                     break;
                 }
             }
         }
-
-        // Attack empowered prince if found and current target doesn't have aura
-        if (empoweredPrince)
-        {
-            // Only switch if current target doesn't have the aura
-            if (!currentTarget || !currentTarget->HasAura(71596))
-            {
-                return Attack(empoweredPrince);
-            }
-            else
-            {
-                return Attack(currentTarget);
-            }
-        }
-
-        // Keep current prince target if no empowered prince found
-        if (currentTarget && (currentTarget->GetEntry() == 37972 ||   // Keleseth
-                             currentTarget->GetEntry() == 37973 ||   // Taldaram
-                             currentTarget->GetEntry() == 37970))    // Valanar
-        {
-            return Attack(currentTarget);
-        }
-
     }
     return false;
 }
 
 bool IccBpcEmpoweredVortexAction::Execute(Event event)
 {
-    // Double check that we're not a tank
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) || botAI->IsTank(bot))
-        return false;
-
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
-    if (!valanar)
+    if (!valanar || !valanar->HasUnitState(UNIT_STATE_CASTING))
         return false;
 
-    float radius = 12.0f;
-    GuidVector members = AI_VALUE(GuidVector, "group members");
+    float const MIN_SPREAD = 12.0f;
+    float const MOVE_INCREMENT = 10.0f;
+    
+    // Use MT position as reference point to move away from
+    Position const* mtPos = &ICC_BPC_MT_POSITION;
+    float centerX = mtPos->GetPositionX();
+    float centerY = mtPos->GetPositionY();
+    float centerZ = mtPos->GetPositionZ();
 
-    for (auto& member : members)
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    // Get all alive group members and sort by GUID for consistent movement directions
+    std::vector<std::pair<ObjectGuid, Player*>> sortedMembers;
+    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
-        Unit* unit = botAI->GetUnit(member);
-        if (!unit || !unit->IsAlive() || unit == bot)
-            continue;
+        Player* member = itr->GetSource();
+        if (member && member->IsAlive() && !botAI->IsTank(member))
+        {
+            sortedMembers.push_back(std::make_pair(member->GetGUID(), member));
+        }
+    }
+    std::sort(sortedMembers.begin(), sortedMembers.end());
 
-        float dist = bot->GetExactDist2d(unit);
-        if (dist < radius)
-        {   
-            float moveDistance = radius - dist + 1.0f;
-            
-            // Calculate potential new position
-            float angle = bot->GetAngle(unit);
-            float newX = bot->GetPositionX() + cos(angle + M_PI) * moveDistance;
-            float newY = bot->GetPositionY() + sin(angle + M_PI) * moveDistance;
-            
-            // Only move if we have line of sight
-            if (bot->IsWithinLOS(newX, newY, bot->GetPositionZ()))
+    // Find this bot's index to determine movement direction
+    int botIndex = -1;
+    for (size_t i = 0; i < sortedMembers.size(); ++i)
+    {
+        if (sortedMembers[i].first == bot->GetGUID())
+        {
+            botIndex = i;
+            break;
+        }
+    }
+
+    if (botIndex == -1)
+        return false;
+
+    // Calculate base angle based on bot index (split into 12 directions)
+    float baseAngle = botIndex * (2.0f * M_PI / 12.0f);
+
+    // Calculate current distance from MT position
+    float currentDist = bot->GetDistance2d(centerX, centerY);
+    
+    // If too close to others, move further out
+    bool needToMove = false;
+    if (currentDist < MIN_SPREAD)
+        needToMove = true;
+    else
+    {
+        // Check distance to other players
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* member = itr->GetSource();
+            if (!member || !member->IsAlive() || member == bot)
+                continue;
+
+            if (bot->GetDistance2d(member) < MIN_SPREAD)
             {
-                return FleePosition(unit->GetPosition(), moveDistance);
-                // return MoveAway(unit, moveDistance);
+                needToMove = true;
+                break;
             }
         }
     }
+
+    if (!needToMove)
+        return false;
+
+    // Calculate new position further out in our assigned direction
+    float moveDistance = std::max(MOVE_INCREMENT, currentDist + MOVE_INCREMENT);
+    float targetX = centerX + cos(baseAngle) * moveDistance;
+    float targetY = centerY + sin(baseAngle) * moveDistance;
+    float targetZ = centerZ;
+
+    // Update Z coordinate and check LOS
+    bot->UpdateAllowedPositionZ(targetX, targetY, targetZ);
+    if (!bot->IsWithinLOS(targetX, targetY, targetZ))
+    {
+        // Try adjusting angle if LOS fails
+        for (float angleAdjust = -M_PI/6; angleAdjust <= M_PI/6; angleAdjust += M_PI/12)
+        {
+            if (angleAdjust == 0)
+                continue;
+
+            float newX = centerX + cos(baseAngle + angleAdjust) * moveDistance;
+            float newY = centerY + sin(baseAngle + angleAdjust) * moveDistance;
+            float newZ = centerZ;
+            
+            bot->UpdateAllowedPositionZ(newX, newY, newZ);
+            if (bot->IsWithinLOS(newX, newY, newZ))
+            {
+                targetX = newX;
+                targetY = newY;
+                targetZ = newZ;
+                break;
+            }
+        }
+    }
+
+    return MoveTo(bot->GetMapId(), targetX, targetY, targetZ, 
+                false, false, false, false, MovementPriority::MOVEMENT_COMBAT, true, false);
+}
+
+bool IccBpcKineticBombAction::Execute(Event event)
+{
+    // Only allow ranged DPS to handle bombs
+    if (!botAI->IsRangedDps(bot))
+        return false;
+    
+    //for some reason they sometimes decide to move up in the air when they attack the kinetic bomb and that will make everyone tp to entrance...
+    if (bot->GetPositionZ() > 371.16473f)
+        return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(),
+                          bot->GetPositionY(), 366.16473f, bot->GetOrientation());
+
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+
+    // If we're already attacking a bomb and it's still in range, stick with it
+    if (currentTarget && currentTarget->IsAlive() && currentTarget->GetName() == "Kinetic Bomb")
+    {
+        float heightDiff = currentTarget->GetPositionZ() - bot->GetPositionZ();
+        if (heightDiff < 25.0f)
+            return false;  // Continue current attack
+    }
+
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+
+    // Find the lowest reachable bomb
+    Unit* bestBomb = nullptr;
+    float lowestHeightDiff = 25.0f;  // Maximum height we care about
+
+    for (auto& guid : targets)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsAlive() || unit->GetName() != "Kinetic Bomb")
+            continue;
+
+        float heightDiff = unit->GetPositionZ() - bot->GetPositionZ();
+        if (heightDiff < lowestHeightDiff)
+        {
+            // Check if any closer ranged DPS is already attacking this bomb
+            bool alreadyHandled = false;
+            Group* group = bot->GetGroup();
+            if (group)
+            {
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    Player* member = itr->GetSource();
+                    if (!member || member == bot || !member->IsAlive() || !botAI->IsRangedDps(member))
+                        continue;
+
+                    if (member->GetTarget() == unit->GetGUID() && member->GetDistance(unit) < bot->GetDistance(unit))
+                    {
+                        alreadyHandled = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!alreadyHandled)
+            {
+                bestBomb = unit;
+                lowestHeightDiff = heightDiff;
+            }
+        }
+    }
+
+    // Attack the lowest unhandled bomb if found
+    if (bestBomb)
+        return Attack(bestBomb);
 
     return false;
 }
