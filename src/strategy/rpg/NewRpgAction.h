@@ -39,7 +39,8 @@ public:
 
 protected:
     // WorldPosition dest;
-    float pathFinderDis = 70.0f; // path finder
+    const float pathFinderDis = 70.0f; // path finder
+    const uint32 stuckTime = 5 * 60 * 1000;
 };
 
 class NewRpgGoGrindAction : public NewRpgGoFarAwayPosAction

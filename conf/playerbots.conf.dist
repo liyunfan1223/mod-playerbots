@@ -507,7 +507,6 @@ AiPlayerbot.RandomBotRandomPassword = 0
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 
 # Enable/Disable rotation of bots (randomly select a bot from the bots pool to go online and rotate them periodically)
-# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 # default: 0 (disable, the online bots are fixed)
 AiPlayerbot.EnableRotation = 0
 
@@ -528,12 +527,10 @@ AiPlayerbot.PreQuests = 0
 AiPlayerbot.RandomBotJoinLfg = 1
 
 # Percentage ratio of alliance and horde
-# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 AiPlayerbot.RandomBotAllianceRatio = 50
 AiPlayerbot.RandomBotHordeRatio = 50
 
 # Disable death knight for bots login
-# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 AiPlayerbot.DisableDeathKnightLogin = 0
 
 #

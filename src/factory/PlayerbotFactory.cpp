@@ -49,6 +49,7 @@ std::list<uint32> PlayerbotFactory::classQuestIds;
 std::list<uint32> PlayerbotFactory::specialQuestIds;
 std::vector<uint32> PlayerbotFactory::enchantSpellIdCache;
 std::vector<uint32> PlayerbotFactory::enchantGemIdCache;
+std::unordered_map<uint32, std::vector<uint32>> PlayerbotFactory::trainerIdCache;
 
 PlayerbotFactory::PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality, uint32 gearScoreLimit)
     : level(level), itemQuality(itemQuality), gearScoreLimit(gearScoreLimit), bot(bot)
@@ -2327,7 +2328,7 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 
 void PlayerbotFactory::InitAvailableSpells()
 {
-    if (trainerIdCache.empty())
+    if (trainerIdCache[bot->getClass()].empty())
     {
         CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
         for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin();
@@ -2341,10 +2342,10 @@ void PlayerbotFactory::InitAvailableSpells()
                 continue;
 
             uint32 trainerId = co.Entry;
-            trainerIdCache.push_back(trainerId);
+            trainerIdCache[bot->getClass()].push_back(trainerId);
         }
     }
-    for (uint32 trainerId : trainerIdCache)
+    for (uint32 trainerId : trainerIdCache[bot->getClass()])
     {
         TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
         if (!trainer_spells)

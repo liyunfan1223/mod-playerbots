@@ -170,6 +170,8 @@ public:
     static uint8 GetTeamClassIdx(bool isAlliance, uint8 claz) { return isAlliance * 20 + claz; }
 
     void PrepareAddclassCache();
+    void PrepareTeleportCache();
+    void Init();
     std::map<uint8, std::vector<ObjectGuid>> addclassCache;
     std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
     std::map<uint8, std::vector<WorldLocation>> allianceStarterPerLevelCache;
@@ -199,7 +201,6 @@ private:
     void RandomTeleport(Player* bot);
     void RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth = false);
     uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
-    void PrepareTeleportCache();
     typedef void (RandomPlayerbotMgr::*ConsoleCommandHandler)(Player*);
 
     std::vector<Player*> players;
