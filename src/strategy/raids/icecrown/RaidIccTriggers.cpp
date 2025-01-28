@@ -1,7 +1,8 @@
 #include "RaidIccTriggers.h"
 #include "RaidIccActions.h"
-
+#include "strategy/values/NearestNpcsValue.h"
 #include "PlayerbotAIConfig.h"
+#include "ObjectAccessor.h"
 #include "GenericTriggers.h"
 #include "DungeonStrategyUtils.h"
 #include "EventMap.h"
@@ -463,7 +464,7 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
         return false;
 
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
-    if (!valanar || !valanar->IsAlive())
+    if (!valanar)
         return false;
 
     Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
@@ -471,20 +472,61 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
         if (aura->GetStackAmount() > 12)
             return false;
 
+    Aura* auraValanar = botAI->GetAura("Invocation of Blood", valanar);
+    if (!auraValanar)
+        return false;
+
     // For ranged, spread whenever Valanar is empowered
-    if (botAI->IsRanged(bot))
-        return valanar->HasAura(71596); // Invocation of Blood
+    //if (botAI->IsRanged(bot) && auraValanar)
+        //return true;
 
     // For melee, only spread during vortex cast
-    if (valanar->HasAura(71596) && valanar->HasUnitState(UNIT_STATE_CASTING) && valanar->FindCurrentSpellBySpellId(72039))
-    {
+    if (auraValanar && valanar->HasUnitState(UNIT_STATE_CASTING))
         return true;
-    }
 
     return false;
 }
 
-//BQL
+bool IccBpcKineticBombTrigger::IsActive()
+{
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+
+    // Check for hunters first
+    bool hasHunter = false;
+    Group* group = bot->GetGroup();
+    if (group)
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* member = itr->GetSource();
+            if (member && member->getClass() == CLASS_HUNTER && member->IsAlive())
+            {
+                hasHunter = true;
+                break;
+            }
+        }
+    }
+
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->GetName() == "Kinetic Bomb" && 
+            ((unit->GetPositionZ() - bot->GetPositionZ()) < 25.0f))
+        {
+            if (hasHunter)
+            {
+                return bot->getClass() == CLASS_HUNTER; // Only hunters can handle bombs
+            }
+            else if (botAI->IsRangedDps(bot))
+            {
+                return true; // If no hunters, any ranged DPS can handle bombs
+            }
+        }
+    }
+    return false;
+}
+
+ //BQL
 bool IccBqlTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");

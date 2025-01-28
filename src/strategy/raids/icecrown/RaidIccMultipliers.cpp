@@ -323,6 +323,48 @@ float IccBpcAssistMultiplier::GetValue(Action* action)
         }
     }
 
+    Unit* Valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+    if (!Valanar || !Valanar->IsAlive())
+        return 1.0f;
+
+    Aura* auraValanar = botAI->GetAura("Invocation of Blood", Valanar);
+
+    if (!botAI->IsTank(bot) && auraValanar && Valanar->HasUnitState(UNIT_STATE_CASTING))
+    {
+        if (dynamic_cast<IccBpcEmpoweredVortexAction*>(action)) 
+            return 1.0f;
+
+        if (dynamic_cast<AttackRtiTargetAction*>(action) ||
+            dynamic_cast<TankAssistAction*>(action) ||
+            dynamic_cast<DpsAssistAction*>(action) ||
+            dynamic_cast<IccBpcMainTankAction*>(action) ||
+            dynamic_cast<CombatFormationMoveAction*>(action))
+            return 0.0f;
+    }
+
+    if (botAI->IsRangedDps(bot))
+    {
+        GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+        for (auto& npc : npcs)
+        {
+            Unit* unit = botAI->GetUnit(npc);
+            if (unit)
+            {
+                if (unit->GetName() == "Kinetic Bomb" && ((unit->GetPositionZ() - bot->GetPositionZ()) < 25.0f))
+                {
+                    if (dynamic_cast<IccBpcKineticBombAction*>(action))
+                        return 1.0f;
+
+                    if (dynamic_cast<AttackRtiTargetAction*>(action) ||
+                        dynamic_cast<TankAssistAction*>(action) ||
+                        dynamic_cast<DpsAssistAction*>(action) ||
+                        dynamic_cast<IccBpcMainTankAction*>(action))
+                        return 0.0f;
+                }
+            }
+        }
+    }
+
     // For assist tank during BPC fight
     if (botAI->IsAssistTank(bot))
     {

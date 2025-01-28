@@ -98,10 +98,13 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("icc bpc nucleus", ACTION_RAID + 2), nullptr)));
 
     triggers.push_back(new TriggerNode("icc bpc main tank",
-        NextAction::array(0, new NextAction("icc bpc main tank", ACTION_RAID + 4), nullptr)));
+        NextAction::array(0, new NextAction("icc bpc main tank", ACTION_RAID + 3), nullptr)));
 
     triggers.push_back(new TriggerNode("icc bpc empowered vortex",
-        NextAction::array(0, new NextAction("icc bpc empowered vortex", ACTION_RAID + 3), nullptr)));
+        NextAction::array(0, new NextAction("icc bpc empowered vortex", ACTION_RAID + 4), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc bpc kinetic bomb",
+        NextAction::array(0, new NextAction("icc bpc kinetic bomb", ACTION_RAID + 6), nullptr)));
     
     //BQL
     triggers.push_back(new TriggerNode("icc bql tank position",
