@@ -3153,8 +3153,8 @@ bool BGTactics::selectObjective(bool reset)
                         // or distance difference is insignificantly better and coinflip
                         // the reason it doesn't just check if distance is better is to avoid bot going to same point every time
                         if (closestObjectiveOwnership < ownership ||
-                            closestObjectiveDist - 30 > dist ||
-                            (closestObjectiveDist > dist && urand(0, 1)))
+                            closestObjectiveDist - 15 > dist ||
+                            (closestObjectiveDist > dist && urand(0, 2)))
                         {
                             closestObjectiveOwnership = ownership;
                             closestObjectiveDist = dist;
