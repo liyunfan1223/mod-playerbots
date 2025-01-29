@@ -81,7 +81,8 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     GameObject* go = botAI->GetGameObject(lootGUID);
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
-        bool isQuestItemOnly = false;
+        bool onlyHasQuestItems = true;
+        bool hasAnyQuestItems = false;
 
         GameObjectQuestItemList const* items = sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
         for (int i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
@@ -89,18 +90,87 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
             if (!items || i >= items->size())
                 break;
 
-            auto itemId = uint32((*items)[i]);
+            uint32 itemId = uint32((*items)[i]);
+            if (!itemId)
+                continue;
+
+            hasAnyQuestItems = true;
 
             if (IsNeededForQuest(bot, itemId))
             {
                 this->guid = lootGUID;
                 return;
             }
-            isQuestItemOnly |= itemId > 0;
+
+            const ItemTemplate* proto = sObjectMgr->GetItemTemplate(itemId);
+            if (!proto)
+                continue;
+
+            if (proto->Class != ITEM_CLASS_QUEST)
+            {
+                onlyHasQuestItems = false;
+            }
         }
 
-        if (isQuestItemOnly)
+        // Retrieve the correct loot table entry
+        uint32 lootEntry = go->GetGOInfo()->GetLootId();
+        if (lootEntry == 0)
             return;
+
+        // Check the main loot template
+        if (const LootTemplate* lootTemplate = LootTemplates_Gameobject.GetLootFor(lootEntry))
+        {
+            Loot loot;
+            lootTemplate->Process(loot, LootTemplates_Gameobject, 1, bot);
+
+            for (const LootItem& item : loot.items)
+            {
+                uint32 itemId = item.itemid;
+                if (!itemId)
+                    continue;
+
+                const ItemTemplate* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (!proto)
+                    continue;
+
+                if (proto->Class != ITEM_CLASS_QUEST)
+                {
+                    onlyHasQuestItems = false;
+                    break;
+                }
+
+                // If this item references another loot table, process it
+                if (const LootTemplate* refLootTemplate = LootTemplates_Reference.GetLootFor(itemId))
+                {
+                    Loot refLoot;
+                    refLootTemplate->Process(refLoot, LootTemplates_Reference, 1, bot);
+
+                    for (const LootItem& refItem : refLoot.items)
+                    {
+                        uint32 refItemId = refItem.itemid;
+                        if (!refItemId)
+                            continue;
+
+                        const ItemTemplate* refProto = sObjectMgr->GetItemTemplate(refItemId);
+                        if (!refProto)
+                            continue;
+
+                        if (refProto->Class != ITEM_CLASS_QUEST)
+                        {
+                            onlyHasQuestItems = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // If gameobject has only quest items that bot doesn’t need, skip it.
+        if (hasAnyQuestItems && onlyHasQuestItems)
+            return;
+
+        // Otherwise, loot it.
+        guid = lootGUID;
 
         uint32 goId = go->GetEntry();
         uint32 lockId = go->GetGOInfo()->GetLockId();
@@ -119,6 +189,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
                         guid = lootGUID;
                     }
                     break;
+
                 case LOCK_KEY_SKILL:
                     if (goId == 13891 || goId == 19535)  // Serpentbloom
                     {
@@ -131,6 +202,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
                         guid = lootGUID;
                     }
                     break;
+
                 case LOCK_KEY_NONE:
                     guid = lootGUID;
                     break;
@@ -200,7 +272,11 @@ LootObject::LootObject(LootObject const& other)
 
 bool LootObject::IsLootPossible(Player* bot)
 {
-    if (IsEmpty() || !GetWorldObject(bot))
+    if (IsEmpty() || !bot)
+        return false;
+
+    WorldObject* worldObj = GetWorldObject(bot);  // Store result to avoid multiple calls
+    if (!worldObj)
         return false;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
@@ -211,7 +287,7 @@ bool LootObject::IsLootPossible(Player* bot)
     if (reqItem && !bot->HasItemCount(reqItem, 1))
         return false;
 
-    if (abs(GetWorldObject(bot)->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE)
+    if (abs(worldObj->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE -2.0f)
         return false;
 
     Creature* creature = botAI->GetCreature(guid);
@@ -236,25 +312,32 @@ bool LootObject::IsLootPossible(Player* bot)
     uint32 skillValue = uint32(bot->GetSkillValue(skillId));
     if (reqSkillValue > skillValue)
         return false;
-
-    if (skillId == SKILL_MINING && !bot->HasItemCount(756, 1) &&
-                                !bot->HasItemCount(778, 1) &&
-                                !bot->HasItemCount(1819, 1) &&
-                                !bot->HasItemCount(1893, 1) &&
-                                !bot->HasItemCount(1959, 1) &&
-                                !bot->HasItemCount(2901, 1) &&
-                                !bot->HasItemCount(9465, 1) &&
-                                !bot->HasItemCount(20723, 1) &&
-                                !bot->HasItemCount(40772, 1) &&
-                                !bot->HasItemCount(40892, 1) &&
-                                !bot->HasItemCount(40893, 1) )
-
-    if (skillId == SKILL_SKINNING && !bot->HasItemCount(7005, 1) &&
-                                  !bot->HasItemCount(40772, 1) &&
-                                  !bot->HasItemCount(40893, 1) &&
-                                  !bot->HasItemCount(12709, 1) &&
-                                  !bot->HasItemCount(19901, 1) )
-        return false;
+    
+    if (skillId == SKILL_MINING &&
+        !bot->HasItemCount(756, 1) &&
+        !bot->HasItemCount(778, 1) &&
+        !bot->HasItemCount(1819, 1) &&
+        !bot->HasItemCount(1893, 1) &&
+        !bot->HasItemCount(1959, 1) &&
+        !bot->HasItemCount(2901, 1) &&
+        !bot->HasItemCount(9465, 1) &&
+        !bot->HasItemCount(20723, 1) &&
+        !bot->HasItemCount(40772, 1) &&
+        !bot->HasItemCount(40892, 1) &&
+        !bot->HasItemCount(40893, 1))
+    {
+        return false;  // Bot is missing a mining pick
+    }
+    
+    if (skillId == SKILL_SKINNING &&
+        !bot->HasItemCount(7005, 1) &&
+        !bot->HasItemCount(40772, 1) &&
+        !bot->HasItemCount(40893, 1) &&
+        !bot->HasItemCount(12709, 1) &&
+        !bot->HasItemCount(19901, 1))
+    {
+        return false;  // Bot is missing a skinning knife
+    }
 
     return true;
 }
@@ -297,7 +380,6 @@ LootObject LootObjectStack::GetLoot(float maxDistance)
     std::vector<LootObject> ordered = OrderByDistance(maxDistance);
     return ordered.empty() ? LootObject() : *ordered.begin();
 }
-
 std::vector<LootObject> LootObjectStack::OrderByDistance(float maxDistance)
 {
     availableLoot.shrink(time(nullptr) - 30);
@@ -308,17 +390,23 @@ std::vector<LootObject> LootObjectStack::OrderByDistance(float maxDistance)
     {
         ObjectGuid guid = i->guid;
         LootObject lootObject(bot, guid);
-        if (!lootObject.IsLootPossible(bot))
+        if (!lootObject.IsLootPossible(bot)) // Ensure loot object is valid
             continue;
 
-        float distance = bot->GetDistance(lootObject.GetWorldObject(bot));
+        WorldObject* worldObj = lootObject.GetWorldObject(bot);
+        if (!worldObj) // Prevent null pointer dereference
+        {
+            continue;
+        }
+
+        float distance = bot->GetDistance(worldObj);
         if (!maxDistance || distance <= maxDistance)
             sortedMap[distance] = lootObject;
     }
 
     std::vector<LootObject> result;
-    for (std::map<float, LootObject>::iterator i = sortedMap.begin(); i != sortedMap.end(); i++)
-        result.push_back(i->second);
+    for (auto& [_, lootObject] : sortedMap)
+        result.push_back(lootObject);
 
     return result;
 }
