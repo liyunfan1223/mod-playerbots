@@ -4057,26 +4057,45 @@ bool BGTactics::startNewPathFree(std::vector<BattleBotPath*> const& vPaths)
     return moveToObjectiveWp(currentPath, currentPoint, reverse);
 }
 
+/**
+ * @brief Handles flag/base capturing gameplay in battlegrounds
+ * 
+ * This function manages the logic for capturing flags and bases in various battlegrounds.
+ * It handles:
+ * - Enemy detection and combat near objectives
+ * - Coordination with friendly players who are capturing
+ * - Different capture mechanics for each battleground type
+ * - Proper positioning and movement
+ * 
+ * @param vPaths Vector of possible paths the bot can take
+ * @param vFlagIds Vector of flag/base GameObjects that can be captured
+ * @return true if handling a flag/base action, false otherwise
+ */
 bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<uint32> const& vFlagIds)
 {
+    // Basic sanity checks
     Battleground* bg = bot->GetBattleground();
     if (!bg)
         return false;
 
+    // Get the actual BG type (in case of random BG)
     BattlegroundTypeId bgType = bg->GetBgTypeID();
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
 
+    // Initialize vectors for nearby objects and players
     GuidVector closeObjects;
     GuidVector closePlayers;
     float flagRange = 0.0f;
 
+    // Set up appropriate search ranges and object lists based on BG type
     switch (bgType)
     {
         case BATTLEGROUND_AV:
         case BATTLEGROUND_AB:
         case BATTLEGROUND_IC:
         {
+            // For territory control BGs, use standard interaction range
             closeObjects = *context->GetValue<GuidVector>("closest game objects");
             closePlayers = *context->GetValue<GuidVector>("closest friendly players");
             flagRange = INTERACTION_DISTANCE;
@@ -4085,6 +4104,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
         case BATTLEGROUND_WS:
         case BATTLEGROUND_EY:
         {
+            // For flag carrying BGs, use wider range and ignore LOS
             closeObjects = *context->GetValue<GuidVector>("nearest game objects no los");
             closePlayers = *context->GetValue<GuidVector>("closest friendly players");
             flagRange = 25.0f;
@@ -4097,7 +4117,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
     if (closeObjects.empty())
         return false;
 
-    // First check if there are enemies near flag we're trying to capture
+    // First identify which flag/base we're trying to interact with
     GameObject* targetFlag = nullptr;
     for (ObjectGuid const guid : closeObjects)
     {
@@ -4105,47 +4125,53 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
         if (!go)
             continue;
 
+        // Check if this object is a valid capture target
         std::vector<uint32>::const_iterator f = find(vFlagIds.begin(), vFlagIds.end(), go->GetEntry());
         if (f == vFlagIds.end())
             continue;
 
+        // Verify the object is active and ready
         if (!go->isSpawned() || go->GetGoState() != GO_STATE_READY)
             continue;
 
+        // Check if we're in range (using double range for enemy detection)
         float const dist = bot->GetDistance(go);
-        if (flagRange && dist > flagRange * 2.0f) // Check wider range for enemies
+        if (flagRange && dist > flagRange * 2.0f)
             continue;
 
         targetFlag = go;
         break;
     }
 
+    // If we found a valid flag/base to interact with
     if (targetFlag)
     {
-        // Check if enemy players are near the flag
+        // Check for enemy players near the flag using bot's targeting system
         Unit* enemyPlayer = AI_VALUE(Unit*, "enemy player target");
         if (enemyPlayer && enemyPlayer->IsAlive())
         {
-            // If enemy is near the flag, let combat AI handle it
+            // If enemy is near the flag, engage them before attempting capture
             float enemyDist = enemyPlayer->GetDistance(targetFlag);
             if (enemyDist < flagRange * 2.0f)
             {
+                // Set enemy as current target and let combat AI handle it
                 context->GetValue<Unit*>("current target")->Set(enemyPlayer);
-                return false; // Let combat AI take over
+                return false;
             }
         }
     }
 
-    // No enemies around, check for friendly capturers
+    // Check if friendly players are already capturing
     if (!closePlayers.empty())
     {
-        // Count how many friendly players are capturing
+        // Track number of friendly players capturing and the closest one
         uint32 numCapturing = 0;
         Unit* capturingPlayer = nullptr;
         for (auto& guid : closePlayers)
         {
             if (Unit* pFriend = botAI->GetUnit(guid))
             {
+                // Check if they're casting the capture spell
                 if (Spell* spell = pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                 {
                     if (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER)
@@ -4157,11 +4183,10 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             }
         }
 
-        // If friendlies are capturing, stay to defend
+        // If friendlies are capturing, stay to defend but don't capture
         if (numCapturing > 0 && capturingPlayer)
         {
-            // Stay in range to defend but don't capture
-            // Move a short distance away if too close to avoid crowding
+            // Move away if too close to avoid crowding
             if (bot->GetDistance2d(capturingPlayer) < 3.0f)
             {
                 float angle = bot->GetAngle(capturingPlayer);
@@ -4170,26 +4195,31 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                 MoveTo(bot->GetMapId(), x, y, bot->GetPositionZ());
             }
             
+            // Reset objective and take new path for defending
             resetObjective();
             startNewPathBegin(vPaths);
             return true;
         }
     }
 
-    // Now proceed with capture if area is clear
+    // Area is clear of enemies and no friendlies are capturing
+    // Proceed with capture mechanics
     for (ObjectGuid const guid : closeObjects)
     {
         GameObject* go = botAI->GetGameObject(guid);
         if (!go)
             continue;
 
+        // Validate this is a capture target
         std::vector<uint32>::const_iterator f = find(vFlagIds.begin(), vFlagIds.end(), go->GetEntry());
         if (f == vFlagIds.end())
             continue;
 
+        // Check object is active
         if (!go->isSpawned() || go->GetGoState() != GO_STATE_READY)
             continue;
 
+        // Verify we can interact with it
         if (!bot->CanUseBattlegroundObject(go) && bgType != BATTLEGROUND_WS)
             continue;
 
@@ -4197,20 +4227,24 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
         if (flagRange && dist > flagRange)
             continue;
 
+        // Special handling for WSG and EY base flags
         bool atBase = bgType == BATTLEGROUND_WS ? go->GetEntry() == vFlagsWS[bot->GetTeamId()]
                    : bgType == BATTLEGROUND_EY ? go->GetEntry() == vFlagsEY[0]
                    : false;
 
+        // Don't capture own flag in WSG unless carrying enemy flag
         if (atBase && bgType == BATTLEGROUND_WS &&
             !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG)))
             continue;
 
+        // Handle capture mechanics based on BG type
         switch (bgType)
         {
             case BATTLEGROUND_AV:
             case BATTLEGROUND_AB:
             case BATTLEGROUND_IC:
             {
+                // Prevent capturing from inside flag pole
                 if (dist == 0.0f)
                 {
                     float const moveDist = bot->GetObjectSize() + go->GetObjectSize() + 0.1f;
@@ -4218,12 +4252,14 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                                go->GetPositionY() + (urand(0, 1) ? -moveDist : moveDist), go->GetPositionZ());
                 }
 
+                // Dismount before capturing
                 if (bot->IsMounted())
                     bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
                 if (bot->IsInDisallowedMountForm())
                     bot->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
+                // Cast the capture spell
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_CAPTURE_BANNER);
                 if (!spellInfo)
                     return false;
@@ -4236,12 +4272,12 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
 
                 resetObjective();
                 return true;
-                break;
             }
             case BATTLEGROUND_WS:
             {
                 if (dist < INTERACTION_DISTANCE)
                 {
+                    // Handle flag capture at base
                     if (atBase)
                     {
                         if (bot->GetTeamId() == TEAM_HORDE)
@@ -4259,12 +4295,14 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                         return true;
                     }
 
+                    // Dismount before picking up flag
                     if (bot->IsMounted())
                         bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
                     if (bot->IsInDisallowedMountForm())
                         bot->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
+                    // Pick up the flag
                     WorldPacket data(CMSG_GAMEOBJ_USE);
                     data << go->GetGUID();
                     bot->GetSession()->HandleGameObjectUseOpcode(data);
@@ -4274,20 +4312,22 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                 }
                 else
                 {
+                    // Move to flag if not in range
                     return MoveTo(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
                 }
-                break;
             }
             case BATTLEGROUND_EY:
             {
                 if (dist < INTERACTION_DISTANCE)
                 {
+                    // Dismount before interacting
                     if (bot->IsMounted())
                         bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
                     if (bot->IsInDisallowedMountForm())
                         bot->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
+                    // Handle center flag differently (requires spell cast)
                     if (atBase)
                     {
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_CAPTURE_BANNER);
@@ -4302,6 +4342,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                         return true;
                     }
 
+                    // Pick up dropped flag
                     WorldPacket data(CMSG_GAMEOBJ_USE);
                     data << go->GetGUID();
                     bot->GetSession()->HandleGameObjectUseOpcode(data);
@@ -4311,9 +4352,9 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                 }
                 else
                 {
+                    // Move to flag if not in range
                     return MoveTo(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
                 }
-                break;
             }
             default:
                 break;
