@@ -138,7 +138,7 @@ bool IccRangedPositionLadyDeathwhisperAction::Execute(Event event)
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return FleePosition(unit->GetPosition(), moveDistance);
+                return FleePosition(unit->GetPosition(), moveDistance, 250U);
                 // return MoveAway(unit, moveDistance);
             }
         }
@@ -151,13 +151,20 @@ bool IccRangedPositionLadyDeathwhisperAction::Execute(Event event)
 
 bool IccAddsLadyDeathwhisperAction::Execute(Event event)
 {
-    if (botAI->IsMainTank(bot) || botAI->IsHeal(bot))
-    {
-        return false;
-    }
-    // Find the boss
     Unit* boss = AI_VALUE2(Unit*, "find target", "lady deathwhisper");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
+
+    if (botAI->IsTank(bot) && boss->GetHealthPct() < 98.0f)
+    {
+        if (bot->GetExactDist2d(ICC_LDW_TANK_POSTION) > 20.0f)
+        return MoveTo(bot->GetMapId(), ICC_LDW_TANK_POSTION.GetPositionX(),
+                      ICC_LDW_TANK_POSTION.GetPositionY(), ICC_LDW_TANK_POSTION.GetPositionZ(), false,
+                      false, false, false, MovementPriority::MOVEMENT_COMBAT);
+    }
+
+    if (botAI->IsMainTank(bot) || botAI->IsHeal(bot))
+        return false;
 
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     
@@ -418,7 +425,7 @@ bool IccGunshipTeleportAllyAction::Execute(Event event)
     if (bot->GetTarget() != boss->GetGUID())
         return false;
         
-    if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_ALLY) > 15.0f)
+    if (!botAI->IsAssistTank(bot) && bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_ALLY) > 15.0f)
         return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_ALLY.GetPositionX(),
                       ICC_GUNSHIP_TELEPORT_ALLY.GetPositionY(), ICC_GUNSHIP_TELEPORT_ALLY.GetPositionZ(), bot->GetOrientation());
     
@@ -446,7 +453,7 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
     if (bot->GetTarget() != boss->GetGUID())
         return false;
 
-    if (bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_HORDE) > 15.0f)
+    if (!botAI->IsAssistTank(bot) && bot->GetExactDist2d(ICC_GUNSHIP_TELEPORT_HORDE) > 15.0f)
         return bot->TeleportTo(bot->GetMapId(), ICC_GUNSHIP_TELEPORT_HORDE.GetPositionX(),
                       ICC_GUNSHIP_TELEPORT_HORDE.GetPositionY(), ICC_GUNSHIP_TELEPORT_HORDE.GetPositionZ(), bot->GetOrientation());
     
@@ -469,51 +476,84 @@ bool IccDbsTankPositionAction::Execute(Event event)
                           false, false, true, MovementPriority::MOVEMENT_NORMAL);
     }
 
-    if (bot->HasAura(71042) || bot->HasAura(72408))
+    if (botAI->GetAura("Rune of Blood", bot))
         return true;
 
     if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
     {
-    float radius = 9.0f;
-    float moveIncrement = 3.0f;
-    bool isRanged = botAI->IsRanged(bot);
+        // Get group and position in group
+        Group* group = bot->GetGroup();
+        if (!group)
+            return false;
 
-    GuidVector members = AI_VALUE(GuidVector, "group members");
-    if (isRanged)
-    {
-        // Ranged: spread from other members
-        for (auto& member : members)
+        // Find this bot's position among ranged/healers in the group
+        int rangedIndex = -1;
+        int currentIndex = 0;
+        
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || unit == bot || botAI->IsTank(bot) || botAI->IsMelee(bot))
+            Player* member = itr->GetSource();
+            if (!member || !member->IsAlive())
                 continue;
 
-            float dist = bot->GetExactDist2d(unit);
-            if (dist < radius)
+            if ((botAI->IsRanged(member) || botAI->IsHeal(member)) && !botAI->IsTank(member))
             {
-                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return FleePosition(unit->GetPosition(), moveDistance);
-                // return MoveAway(unit, moveDistance);
+                if (member == bot)
+                {
+                    rangedIndex = currentIndex;
+                    break;
+                }
+                currentIndex++;
             }
         }
-    }
 
-    return false;  // Everyone is in position
+        if (rangedIndex == -1)
+            return false;
+
+        // Fixed positions calculation
+        float tankToBossAngle = 3.14f;
+        const float minBossDistance = 15.0f;
+        const float spreadDistance = 10.0f;
+        
+        // Calculate position in a fixed grid (3 rows x 5 columns)
+        int row = rangedIndex / 5;
+        int col = rangedIndex % 5;
+        
+        // Calculate base position
+        float xOffset = (col - 2) * spreadDistance; // Center around tank position
+        float yOffset = minBossDistance + (row * spreadDistance); // Each row further back
+        
+        // Add zigzag offset for odd rows
+        if (row % 2 == 1)
+            xOffset += spreadDistance / 2;
+
+        // Rotate position based on tank-to-boss angle
+        float finalX = ICC_DBS_TANK_POSITION.GetPositionX() + (cos(tankToBossAngle) * yOffset - sin(tankToBossAngle) * xOffset);
+        float finalY = ICC_DBS_TANK_POSITION.GetPositionY() + (sin(tankToBossAngle) * yOffset + cos(tankToBossAngle) * xOffset);
+        float finalZ = ICC_DBS_TANK_POSITION.GetPositionZ();
+        
+        // Update Z coordinate
+        bot->UpdateAllowedPositionZ(finalX, finalY, finalZ);
+
+        // Move if not in position
+        if (bot->GetExactDist2d(finalX, finalY) > 3.0f)
+            return MoveTo(bot->GetMapId(), finalX, finalY, finalZ,
+                         false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
     }
+    
     return false;
 }
 
 bool IccAddsDbsAction::Execute(Event event)
 {
     if (botAI->IsHeal(bot))
-    {
         return false;
-    }
-    // Find the boss
-    Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
-    if (!boss) { return false; }
 
-    if (!(bot->HasAura(71042) || bot->HasAura(72408)) && botAI->IsMainTank(bot)) //rune of blood aura
+    Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
+    if (!boss)
+        return false;
+
+    if (!botAI->GetAura("Rune of Blood", bot) && botAI->IsMainTank(bot))
         return false;
 
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
@@ -558,6 +598,7 @@ bool IccAddsDbsAction::Execute(Event event)
 
     return false;
 }
+
  //FESTERGUT
 bool IccFestergutTankPositionAction::Execute(Event event)
 {
@@ -574,50 +615,116 @@ bool IccFestergutTankPositionAction::Execute(Event event)
                       false, false, true, MovementPriority::MOVEMENT_NORMAL);
     }
 
-    float radius = 10.0f;
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    
-    // First check if any group members have spores
     bool sporesPresent = false;
     for (auto& member : members)
     {
         Unit* unit = botAI->GetUnit(member);
-        if (unit && unit->HasAura(69279)) // gas spore
+        if (!unit)
+            continue;
+
+        if (unit->HasAura(69279))
         {
             sporesPresent = true;
             break;
         }
     }
 
-    // Only spread out if no spores are active
     if (!sporesPresent && (botAI->IsRanged(bot) || botAI->IsHeal(bot)))
     {
-        // Find closest player (including melee)
-        Unit* closestPlayer = nullptr;
-        float minDist = radius;
+        Group* group = bot->GetGroup();
+        if (!group)
+            return false;
+
+        // Separate counters for healers and ranged DPS
+        int healerIndex = -1;
+        int rangedDpsIndex = -1;
+        int currentHealerIndex = 0;
+        int currentRangedDpsIndex = 0;
         
-        for (auto& member : members)
+        // First pass: count total healers and ranged
+        int totalHealers = 0;
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            Unit* unit = botAI->GetUnit(member);
-            if (!unit || unit == bot)
+            Player* member = itr->GetSource();
+            if (!member || !member->IsAlive() || botAI->IsTank(member))
                 continue;
-                
-            float dist = bot->GetExactDist2d(unit);
-            if (dist < minDist)
-            {
-                minDist = dist;
-                closestPlayer = unit;
-            }
+
+            if (botAI->IsHeal(member))
+                totalHealers++;
         }
 
-        if (closestPlayer)
+        // Second pass: assign positions
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            // Move away from closest player, but maintain roughly max range from boss
-            float distToCenter = bot->GetExactDist2d(ICC_FESTERGUT_TANK_POSITION);
-            float moveDistance = (distToCenter > 25.0f) ? 2.0f : 3.0f; // Move less if already far from center
-            return FleePosition(closestPlayer->GetPosition(), moveDistance);
-            // return MoveAway(closestPlayer, moveDistance);
+            Player* member = itr->GetSource();
+            if (!member || !member->IsAlive() || botAI->IsTank(member))
+                continue;
+
+                if (member == bot)
+                {
+                if (botAI->IsHeal(bot))
+                    healerIndex = currentHealerIndex;
+                else if (botAI->IsRanged(bot))
+                    rangedDpsIndex = currentRangedDpsIndex;
+                    break;
+                }
+
+            if (botAI->IsHeal(member))
+                currentHealerIndex++;
+            else if (botAI->IsRanged(member))
+                currentRangedDpsIndex++;
+            }
+
+        int positionIndex;
+        if (healerIndex != -1)
+        {
+            // Healers get positions in first two rows
+            int healersPerRow = (totalHealers + 1) / 2; // Round up
+            positionIndex = healerIndex;
+            // Ensure healer is in first two rows
+            if (positionIndex >= healersPerRow)
+            {
+                positionIndex = positionIndex - healersPerRow + 5; // Move to second row
+            }
         }
+        else if (rangedDpsIndex != -1)
+        {
+            // Ranged DPS start from where healers end
+            positionIndex = totalHealers + rangedDpsIndex;
+        }
+        else
+            return false;
+
+        // Fixed positions calculation
+        float tankToBossAngle = 4.58f;
+        const float minBossDistance = 20.0f;
+        const float spreadDistance = 10.0f;
+        
+        // Calculate position in a fixed grid (3 rows x 5 columns)
+        int row = positionIndex / 5;
+        int col = positionIndex % 5;
+        
+        // Calculate base position
+        float xOffset = (col - 2) * spreadDistance; // Center around tank position
+        float yOffset = minBossDistance + (row * spreadDistance); // Each row further back
+        
+        // Add zigzag offset for odd rows
+        if (row % 2 == 1)
+            xOffset += spreadDistance / 2;
+
+        // Rotate position based on tank-to-boss angle
+        float finalX = ICC_FESTERGUT_TANK_POSITION.GetPositionX() + (cos(tankToBossAngle) * yOffset - sin(tankToBossAngle) * xOffset);
+        float finalY = ICC_FESTERGUT_TANK_POSITION.GetPositionY() + (sin(tankToBossAngle) * yOffset + cos(tankToBossAngle) * xOffset);
+        float finalZ = ICC_FESTERGUT_TANK_POSITION.GetPositionZ();
+        
+        // Update Z coordinate
+        bot->UpdateAllowedPositionZ(finalX, finalY, finalZ);
+
+        // Move if not in position
+        if (bot->GetExactDist2d(finalX, finalY) > 3.0f)
+            return MoveTo(bot->GetMapId(), finalX, finalY, finalZ,
+                         false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
     }
     return false;
 }
@@ -888,7 +995,7 @@ bool IccRotfaceGroupPositionAction::Execute(Event event)
 bool IccRotfaceMoveAwayFromExplosionAction::Execute(Event event)
 {
     if (botAI->IsMainTank(bot) || bot->HasAura(71215))
-    { return false; }
+        return false;
 
     // Stop current actions first
     bot->AttackStop();
@@ -1671,55 +1778,151 @@ bool IccBpcKineticBombAction::Execute(Event event)
 bool IccBqlTankPositionAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
+    Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
+    Aura* aura2 = botAI->GetAura("Swarming Shadows", bot);
 
     // If tank is not at position, move there
-    if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
+    if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) && !(aura || aura2))
     {
-    if (bot->GetExactDist2d(ICC_BQL_TANK_POSITION) > 20.0f)
-        return MoveTo(bot->GetMapId(), ICC_BQL_TANK_POSITION.GetPositionX(),
-                    ICC_BQL_TANK_POSITION.GetPositionY(), ICC_BQL_TANK_POSITION.GetPositionZ(),
-                    false, true, false, true, MovementPriority::MOVEMENT_COMBAT);
+        if (bot->GetExactDist2d(ICC_BQL_TANK_POSITION) > 10.0f)
+            return MoveTo(bot->GetMapId(), ICC_BQL_TANK_POSITION.GetPositionX(),
+                        ICC_BQL_TANK_POSITION.GetPositionY(), ICC_BQL_TANK_POSITION.GetPositionZ(),
+                        false, false, false, true, MovementPriority::MOVEMENT_FORCED);
     }
 
+    // If assist tank and no blood mirror, move to extact postion of main tank
+    if (botAI->IsAssistTank(bot) && !botAI->GetAura("Blood Mirror", bot) && !(aura || aura2))
+    {
+        Unit* mainTank = AI_VALUE(Unit*, "main tank");
+        if (!mainTank)
+            return false;
+
+        return MoveTo(bot->GetMapId(), mainTank->GetPositionX(), mainTank->GetPositionY(), mainTank->GetPositionZ(), 
+                     false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+    }
+    
     float radius = 8.0f;
     float moveIncrement = 3.0f;
     bool isRanged = botAI->IsRanged(bot);
     bool isMelee = botAI->IsMelee(bot);
-    Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
+
+    //if bot has Swarming Shadows, move to the wall
+    if (aura2)
+    {
+        // Get current position and map
+        float currentX = bot->GetPositionX();
+        float currentY = bot->GetPositionY();
+        float currentZ = bot->GetPositionZ();
+        Map* map = bot->GetMap();
+
+        float bestDist = 100.0f;
+        float bestX = currentX;
+        float bestY = currentY;
+        bool foundWall = false;
+
+        // Check only east (0) and west (π) directions for walls
+        float angles[2] = {M_PI_2, -M_PI_2};  // East = π/2, West = -π/2
+        for (float angle : angles)
+        {
+            float dx = cos(angle);
+            float dy = sin(angle);
+            
+            // Binary search to find the wall
+            float minDist = 5.0f;
+            float maxDist = 100.0f;
+            float wallDist = maxDist;
+            
+            for (int i = 0; i < 8; i++)
+            {
+                float testDist = (minDist + maxDist) / 2;
+                float testX = currentX + dx * testDist;
+                float testY = currentY + dy * testDist;
+                float testZ = currentZ;
+                
+                bool heightFound = map->GetHeight(testX, testY, testZ);
+                if (!heightFound)
+                    testZ = currentZ;
+                
+                bool hasLos = map->isInLineOfSight(currentX, currentY, currentZ + 2.0f,
+                                                 testX, testY, testZ + 2.0f,
+                                                 bot->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing);
+                
+                if (hasLos)
+                {
+                    minDist = testDist;
+                }
+                else
+                {
+                    maxDist = testDist;
+                    wallDist = testDist;
+                    foundWall = true;
+                }
+            }
+            
+            if (foundWall && wallDist < bestDist)
+            {
+                bestDist = wallDist;
+                bestX = currentX + dx * (wallDist - 2.0f);  // Stay 2 yards from wall
+                bestY = currentY + dy * (wallDist - 2.0f);
+            }
+        }
+
+        // Only move if we're too far from the wall
+        if (foundWall && bestDist > 10.0f)
+        {
+            // Verify we still have the aura before moving
+            if (!botAI->GetAura("Swarming Shadows", bot))
+                return false;
+
+            return MoveTo(bot->GetMapId(), bestX, bestY, bot->GetPositionZ(), 
+                         false, false, false, true, MovementPriority::MOVEMENT_FORCED);
+        }
+    }
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    if (isRanged && !aura) //frenzied bloodthrist
+    
+    if (isRanged && !aura && !aura2) //frenzied bloodthrist
     {
         // Ranged: spread from other ranged
         for (auto& member : members)
         {
             Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || unit == bot || botAI->GetAura("Frenzied Bloodthirst", unit))
+            if (!unit || !unit->IsAlive() || unit == bot || botAI->GetAura("Frenzied Bloodthirst", unit) || botAI->GetAura("Uncontrollable Frenzy", unit))
                 continue;
 
             float dist = bot->GetExactDist2d(unit);
             if (dist < radius)
             {
                 float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return MoveAway(unit, moveDistance);
+                return FleePosition(unit->GetPosition(), moveDistance, 250U);
+                //return MoveAway(unit, moveDistance);
             }
         }
     }
 
-    if (isMelee && !aura && boss->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)) // melee also spread
+    if (isMelee && !aura && !aura2 && ((boss->GetPositionZ() - bot->GetPositionZ()) > 5.0f)) // melee also spread
     {
         // Melee: spread from other melee
         for (auto& member : members)
         {
             Unit* unit = botAI->GetUnit(member);
-            if (!unit || !unit->IsAlive() || unit == bot || botAI->GetAura("Frenzied Bloodthirst", unit))
+            if (!unit || !unit->IsAlive() || unit == bot || botAI->GetAura("Frenzied Bloodthirst", unit) || botAI->GetAura("Uncontrollable Frenzy", unit))
                 continue;
 
             float dist = bot->GetExactDist2d(unit);
             if (dist < radius)
             {
-                float moveDistance = std::min(moveIncrement, radius - dist + 1.0f);
-                return MoveAway(unit, moveDistance);
+                // Calculate direction away from nearby player
+                float dx = bot->GetPositionX() - unit->GetPositionX();
+                float dy = bot->GetPositionY() - unit->GetPositionY();
+                float angle = atan2(dy, dx);
+                
+                // Move 8 yards away from the player
+                float newX = unit->GetPositionX() + cos(angle) * 8.0f;
+                float newY = unit->GetPositionY() + sin(angle) * 8.0f;
+                
+                return MoveTo(bot->GetMapId(), newX, newY, bot->GetPositionZ(),
+                            false, false, false, true, MovementPriority::MOVEMENT_FORCED);
             }
         }
     }
@@ -1907,7 +2110,9 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
     }
 
     // Double check target is still alive
-    if (!target->IsAlive())
+    if (!target->IsAlive() || (botAI->GetAura("Frenzied Bloodthirst", target)
+        || botAI->GetAura("Essence of the Blood Queen", target)
+        || botAI->GetAura("Uncontrollable Frenzy", target)))
     {
         return false;
     }
@@ -1917,7 +2122,10 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
     float y = target->GetPositionY();
     float z = target->GetPositionZ();
 
-    if (bot->IsWithinLOS(x, y, z) && bot->GetExactDist2d(target) > BITE_RANGE)
+    if (bot->IsWithinLOS(x, y, z) && bot->GetExactDist2d(target) > BITE_RANGE
+        && !(botAI->GetAura("Frenzied Bloodthirst", target) 
+        || botAI->GetAura("Essence of the Blood Queen", target)
+        || botAI->GetAura("Uncontrollable Frenzy", target)))
     {
         return MoveTo(target->GetMapId(), x, y, z, false, false, false, true, MovementPriority::MOVEMENT_FORCED);
     }
@@ -1926,7 +2134,9 @@ bool IccBqlVampiricBiteAction::Execute(Event event)
     if (bot->IsWithinLOS(x, y, z) && bot->GetExactDist2d(target) <= BITE_RANGE)
     {
         // Final alive check before casting
-        if (!target->IsAlive())
+        if (!target->IsAlive() || (botAI->GetAura("Frenzied Bloodthirst", target)
+            || botAI->GetAura("Essence of the Blood Queen", target)
+            || botAI->GetAura("Uncontrollable Frenzy", target)))
         {
             return false;
         }
@@ -2047,10 +2257,33 @@ bool IccValithriaHealAction::Execute(Event event)
         bot->SetSpeed(MOVE_FLIGHT, 1.0f, true);
     }
     // Find Valithria
+    
+    if (bot->GetPositionZ() > 367.961f)
+        return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(),
+                          bot->GetPositionY(), 365.0f, bot->GetOrientation());
+
     if (Creature* valithria = bot->FindNearestCreature(36789, 100.0f))
     {
         switch (bot->getClass())
         {
+            case CLASS_DRUID:
+            {
+                // Check for Rejuvenation (48441)
+                if (!valithria->HasAura(48441))
+                    return botAI->CastSpell(48441, valithria);
+
+                // Check for Regrowth (48443)
+                if (!valithria->HasAura(48443))
+                    return botAI->CastSpell(48443, valithria);
+
+                // Check for Lifebloom stacks (48451)
+                Aura* lifebloom = valithria->GetAura(48451);
+                if (!lifebloom || lifebloom->GetStackAmount() < 3)
+                    return botAI->CastSpell(48451, valithria);
+
+                // If all HoTs are up with full stacks, cast Wild Growth (53251)
+                return botAI->CastSpell(53251, valithria);
+            }
             case CLASS_SHAMAN:
                 return valithria->HasAura(61301) ? botAI->CastSpell(49273, valithria) : botAI->CastSpell(61301, valithria); // Cast Healing Wave if Riptide is up, otherwise cast Riptide
             case CLASS_PRIEST:

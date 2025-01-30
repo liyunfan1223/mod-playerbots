@@ -68,7 +68,8 @@ bool IccRangedPositionLadyDeathwhisperTrigger::IsActive()
 bool IccAddsLadyDeathwhisperTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "lady deathwhisper");
-    if (!boss) { return false; }
+    if (!boss) 
+        return false;
 
      return true;
 }
@@ -587,6 +588,61 @@ bool IccValithriaPortalTrigger::IsActive()
     if (!botAI->IsHeal(bot) || bot->HasAura(70766))
         return false;
 
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    // Count healers and collect their GUIDs
+    std::vector<ObjectGuid> healerGuids;
+    int healerCount = 0;
+
+    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        if (botAI->IsHeal(member))
+        {
+            healerCount++;
+            healerGuids.push_back(member->GetGUID());
+        }
+    }
+
+    // Sort GUIDs to ensure consistent ordering
+    std::sort(healerGuids.begin(), healerGuids.end());
+
+    // Find position of current bot's GUID in the sorted list
+    auto botGuidPos = std::find(healerGuids.begin(), healerGuids.end(), bot->GetGUID());
+    if (botGuidPos == healerGuids.end())
+        return false;
+
+    int healerIndex = std::distance(healerGuids.begin(), botGuidPos);
+
+    // Determine if this healer should focus on raid
+    bool shouldHealRaid = false;
+    
+    if (healerCount > 3)
+    {
+        // If more than 3 healers, 2 should heal raid
+        if (bot->getClass() == CLASS_DRUID)
+            shouldHealRaid = true;  // Druids prioritize raid healing
+        else
+            shouldHealRaid = (healerIndex >= (healerCount - 2));  // Last 2 healers (by GUID) heal raid if no druid
+    }
+    else
+    {
+        // If 3 or fewer healers, 1 should heal raid
+        if (bot->getClass() == CLASS_DRUID)
+            shouldHealRaid = true;  // Druids prioritize raid healing
+        else
+            shouldHealRaid = (healerIndex == (healerCount - 1));  // Last healer (by GUID) heals raid if no druid
+    }
+
+    // Raid healers should not use portals
+    if (shouldHealRaid)
+        return false;
+
     // Find the nearest portal creature
     Creature* portal = bot->FindNearestCreature(37945, 100.0f);  // Only check within 10 yards
     Creature* portal2 = bot->FindNearestCreature(38430, 100.0f); // Only check within 10 yards
@@ -604,6 +660,62 @@ bool IccValithriaHealTrigger::IsActive()
     if (!botAI->IsHeal(bot) || bot->HasAura(70766))
         return false;
 
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    // Count healers and collect their GUIDs
+    std::vector<ObjectGuid> healerGuids;
+    int healerCount = 0;
+
+    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        if (botAI->IsHeal(member))
+        {
+            healerCount++;
+            healerGuids.push_back(member->GetGUID());
+        }
+    }
+
+    // Sort GUIDs to ensure consistent ordering
+    std::sort(healerGuids.begin(), healerGuids.end());
+
+    // Find position of current bot's GUID in the sorted list
+    auto botGuidPos = std::find(healerGuids.begin(), healerGuids.end(), bot->GetGUID());
+    if (botGuidPos == healerGuids.end())
+        return false;
+
+    int healerIndex = std::distance(healerGuids.begin(), botGuidPos);
+
+    // Determine if this healer should focus on raid
+    bool shouldHealRaid = false;
+    
+    if (healerCount > 3)
+    {
+        // If more than 3 healers, 2 should heal raid
+        if (bot->getClass() == CLASS_DRUID)
+            shouldHealRaid = true;  // Druids prioritize raid healing
+        else
+            shouldHealRaid = (healerIndex >= (healerCount - 2));  // Last 2 healers (by GUID) heal raid if no druid
+    }
+    else
+    {
+        // If 3 or fewer healers, 1 should heal raid
+        if (bot->getClass() == CLASS_DRUID)
+            shouldHealRaid = true;  // Druids prioritize raid healing
+        else
+            shouldHealRaid = (healerIndex == (healerCount - 1));  // Last healer (by GUID) heals raid if no druid
+    }
+
+    // If assigned to raid healing, return false to not heal Valithria
+    if (shouldHealRaid)
+        return false;
+
+    // For Valithria healers, check portal logic
     // If no portal is found within 100 yards, we should heal
     if (!bot->FindNearestCreature(37945, 100.0f) && !bot->FindNearestCreature(38430, 100.0f))
         return true;
