@@ -407,17 +407,29 @@ float IccBqlVampiricBiteMultiplier::GetValue(Action* action)
     if (!boss)
         return 1.0f;
 
-    if (bot->HasAura(70877) || bot->HasAura(71474)) // If bot has frenzied bloodthirst
+    Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
+
+    if (botAI->IsMelee(bot) && ((boss->GetPositionZ() - bot->GetPositionZ()) > 5.0f) && !aura)
+        {
+            if (dynamic_cast<DpsAssistAction*>(action) ||
+                dynamic_cast<TankAssistAction*>(action) ||
+                dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
+                dynamic_cast<CombatFormationMoveAction*>(action))
+                return 0.0f;
+        }
+
+    // If bot has frenzied bloodthirst, allow highest priority for bite action
+    if (aura) // If bot has frenzied bloodthirst
     {
         if (dynamic_cast<IccBqlVampiricBiteAction*>(action))
             return 5.0f;  // Highest priority for bite action
-        else if (dynamic_cast<DpsAssistAction*>(action) ||
-                 dynamic_cast<TankAssistAction*>(action) ||
-                 dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
-                 dynamic_cast<CombatFormationMoveAction*>(action))
+
+        if (dynamic_cast<DpsAssistAction*>(action) || 
+            dynamic_cast<IccBqlTankPositionAction*>(action) ||
+            dynamic_cast<TankAssistAction*>(action) ||
+            dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
+            dynamic_cast<CombatFormationMoveAction*>(action))
             return 0.0f;  // Disable all formation/movement actions
-        else
-            return 0.0f;  // Disable all other actions
     }
 
     return 1.0f;
