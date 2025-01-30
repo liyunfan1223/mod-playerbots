@@ -117,6 +117,10 @@ bool CheckMountStateAction::isUseful()
     if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
         return false;
 
+    // Allow mounting while transformed only if the form allows it
+    if (bot->HasAuraType(SPELL_AURA_TRANSFORM) && bot->IsInDisallowedMountForm())
+        return false;
+
     // Only mount if BG starts in less than 30 sec
     if (bot->InBattleground())
     {
