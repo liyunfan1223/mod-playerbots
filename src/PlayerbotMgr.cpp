@@ -448,11 +448,11 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
 
     Player* master = botAI->GetMaster();
-    if (!master)
+	if (master)
     {
-        // Log a warning to indicate that the master is null
-        LOG_DEBUG("mod-playerbots", "Master is null for bot with GUID: {}", bot->GetGUID().GetRawValue());
-        return;
+        ObjectGuid masterGuid = master->GetGUID();
+        if (master->GetGroup() && !master->GetGroup()->IsLeader(masterGuid))
+            master->GetGroup()->ChangeLeader(masterGuid);
     }
 
     Group* group = bot->GetGroup();
@@ -471,14 +471,14 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
                     break;
                 }
             }
-            else
+
+			// Don't disband alt groups when master goes away 
+            // (will need to manually disband with leave command)
+			uint32 account = sCharacterCache->GetCharacterAccountIdByGuid(member);
+            if (!sPlayerbotAIConfig->IsInRandomAccountList(account))
             {
-                uint32 account = sCharacterCache->GetCharacterAccountIdByGuid(member);
-                if (!sPlayerbotAIConfig->IsInRandomAccountList(account))
-                {
-                    groupValid = true;
-                    break;
-                }
+                groupValid = true;
+                break;
             }
         }
 
