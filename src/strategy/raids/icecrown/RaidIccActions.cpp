@@ -1172,7 +1172,7 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
     }
 
     // If no one has aura, find a ranged player to stack with
-    if (!anyoneHasAura && !stackTarget)
+    /*if (!anyoneHasAura && !stackTarget)
     {
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -1182,13 +1182,14 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
                 botAI->HasAura("Unbound Plague", member))
                 continue;
 
-            if (botAI->IsRanged(member))
+            if (botAI->IsRanged(member) && )
             {
                 stackTarget = member;
                 break;
             }
         }
     }
+    */
 
     /*
     // For melee old stacking
@@ -1230,7 +1231,6 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
         // Always try to stack
         if (stackTarget && bot->GetDistance2d(stackTarget) > STACK_DISTANCE)
         {
-            bot->AttackStop();
             return MoveTo(bot->GetMapId(), stackTarget->GetPositionX(),
                         stackTarget->GetPositionY(), stackTarget->GetPositionZ(),
                         false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
@@ -3063,8 +3063,6 @@ bool IccLichKingWinterAction::Execute(Event event)
     float currentDistance = bot->GetDistance2d(boss);
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
 
-    if (currentDistance < 48.0f)
-    {
         if (botAI->IsRanged(bot))
         {
             // Calculate distances to group positions
@@ -3085,7 +3083,7 @@ bool IccLichKingWinterAction::Execute(Event event)
                 float posX = bot->GetPositionX() + cos(angle) * 5.0f;
                 float posY = bot->GetPositionY() + sin(angle) * 5.0f;
                 return MoveTo(bot->GetMapId(), posX, posY, 840.857f,
-                        false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                        false, false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
             }
         }
         else
@@ -3102,16 +3100,25 @@ bool IccLichKingWinterAction::Execute(Event event)
                 targetPos = &ICC_LK_FROST3_POSITION;
 
             float distToTarget = bot->GetDistance2d(targetPos->GetPositionX(), targetPos->GetPositionY());
-            if (distToTarget > 10.0f)
+            if (distToTarget > 3.0f && !botAI->IsTank(bot))
             {
                 float angle = bot->GetAngle(targetPos);
                 float posX = bot->GetPositionX() + cos(angle) * 5.0f;
                 float posY = bot->GetPositionY() + sin(angle) * 5.0f;
                 return MoveTo(bot->GetMapId(), posX, posY, 840.857f,
-                    false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                    false, false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
+            }
+            
+            if (distToTarget > 5.0f && botAI->IsTank(bot))
+            {
+                float angle = bot->GetAngle(targetPos);
+                float posX = bot->GetPositionX() + cos(angle) * 5.0f;
+                float posY = bot->GetPositionY() + sin(angle) * 5.0f;
+                return MoveTo(bot->GetMapId(), posX, posY, 840.857f,
+                    false, false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
             }
         }
-    }
+
     // Check for spheres if we're at a safe distance
     if (bot->getClass() == CLASS_HUNTER)
     {
@@ -3491,71 +3498,70 @@ bool IccLichKingAddsAction::Execute(Event event)
 
                 if (isGrabbingPlayer)
                 {
-                    // Check if Valkyr is already CC'd
-                    if (botAI->HasAura("Frost Nova", closestValkyr) || botAI->HasAura("Deep Freeze", closestValkyr) ||
-                        botAI->HasAura("Entangling Roots", closestValkyr) ||
-                        botAI->HasAura("Hammer of Justice", closestValkyr) ||
-                        botAI->HasAura("Hamstring", closestValkyr) ||
-                        botAI->HasAura("Concussive Shot", closestValkyr) ||
-                        botAI->HasAura("Kidney Shot", closestValkyr) || botAI->HasAura("Gouge", closestValkyr) ||
-                        botAI->HasAura("Frost Shock", closestValkyr) || botAI->HasAura("Chains of Ice", closestValkyr))
-                    {
-                        return Attack(closestValkyr);
-                    }
-
                     // Try to CC the Val'kyr based on class priority - only stuns and slows
-                    if (bot->getClass() == CLASS_MAGE)
+                    if (bot->getClass() == CLASS_MAGE && !botAI->HasAura("Frost Nova", closestValkyr))
                     {
-                        if (botAI->CastSpell("Frost Nova", closestValkyr))
-                            return true;
-                        if (botAI->CastSpell("Deep Freeze", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Frost Nova", closestValkyr);
                     }
-                    else if (bot->getClass() == CLASS_DRUID)
+                    else if (bot->getClass() == CLASS_DRUID && !botAI->HasAura("Entangling Roots", closestValkyr))
                     {
-                        if (botAI->CastSpell("Entangling Roots", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Entangling Roots", closestValkyr);
                     }
-                    else if (bot->getClass() == CLASS_PALADIN)
+                    else if (bot->getClass() == CLASS_PALADIN && !botAI->HasAura("Hammer of Justice", closestValkyr))
                     {
-                        if (botAI->CastSpell("Hammer of Justice", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Hammer of Justice", closestValkyr);
                     }
-                    else if (bot->getClass() == CLASS_WARRIOR)
+                    else if (bot->getClass() == CLASS_WARRIOR && !botAI->HasAura("Hamstring", closestValkyr))
                     {
-                        if (botAI->CastSpell("Hamstring", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Hamstring", closestValkyr);
                     }
-                    else if (bot->getClass() == CLASS_HUNTER)
+                    else if (bot->getClass() == CLASS_HUNTER && !botAI->HasAura("Concussive Shot", closestValkyr))
                     {
-                        if (botAI->CastSpell("Concussive Shot", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Concussive Shot", closestValkyr);
                     }
-                    else if (bot->getClass() == CLASS_ROGUE)
+                    else if (bot->getClass() == CLASS_ROGUE && !botAI->HasAura("Kidney Shot", closestValkyr))
                     {
-                        if (botAI->CastSpell("Kidney Shot", closestValkyr))
-                            return true;
-                        if (botAI->CastSpell("Gouge", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Kidney Shot", closestValkyr);
                     }
-                    else if (bot->getClass() == CLASS_SHAMAN)
+                    else if (bot->getClass() == CLASS_SHAMAN && !botAI->HasAura("Frost Shock", closestValkyr))
                     {
-                        if (botAI->CastSpell("Frost Shock", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Frost Shock", closestValkyr);
                     }
-                    else if (bot->getClass() == CLASS_DEATH_KNIGHT)
+                    else if (bot->getClass() == CLASS_DEATH_KNIGHT && !botAI->HasAura("Chains of Ice", closestValkyr))
                     {
-                        if (botAI->CastSpell("Chains of Ice", closestValkyr))
-                            return true;
+                        return botAI->CastSpell("Chains of Ice", closestValkyr);
                     }
-
-                    // If no CC available or all failed, attack the Val'kyr
-                    return Attack(closestValkyr);
                 }
+
+                // If no CC available or all failed, attack the Val'kyr
+                return Attack(closestValkyr);
             }
         }
     }
 
+    // Find closest shambling horror
+    GuidVector npcs2 = AI_VALUE(GuidVector, "nearest hostile npcs");
+    Unit* closestHorror = nullptr;
+    float minHorrorDistance = std::numeric_limits<float>::max();
+
+    for (auto& npc : npcs2)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (unit && unit->IsAlive() &&
+            (unit->GetEntry() == 37698 || unit->GetEntry() == 39299 || unit->GetEntry() == 39300 || unit->GetEntry() == 39301))  // Shambling horror entries
+        {
+            float distance = bot->GetDistance(unit);
+            if (distance < minHorrorDistance)
+            {
+                minHorrorDistance = distance;
+                closestHorror = unit;
+            }
+        }
+    }
+
+    // If bot is hunter and shambling is enraged, use Tranquilizing Shot
+    if (bot->getClass() == CLASS_HUNTER && closestHorror && botAI->HasAura("Enrage", closestHorror))
+        return botAI->CastSpell("Tranquilizing Shot", closestHorror);
 
     if (!botAI->IsAssistTank(bot) && !boss->HealthBelowPct(71))
     {
@@ -3617,7 +3623,7 @@ bool IccLichKingAddsAction::Execute(Event event)
             return MoveTo(bot->GetMapId(), ICC_LICH_KING_ADDS_POSITION.GetPositionX(), 
                         ICC_LICH_KING_ADDS_POSITION.GetPositionY(), 
                         ICC_LICH_KING_ADDS_POSITION.GetPositionZ(),
-                        false,true, false, false, MovementPriority::MOVEMENT_COMBAT);
+                        false, true, false, false, MovementPriority::MOVEMENT_COMBAT);
         }
         return false; // Stay in position and keep facing current target
     }
