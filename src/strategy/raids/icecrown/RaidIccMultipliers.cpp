@@ -681,13 +681,23 @@ float IccLichKingAddsMultiplier::GetValue(Action* action)
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
     if (!boss)
         return 1.0f;
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
 
     if (dynamic_cast<IccLichKingWinterAction*>(action))
     {
-        if(dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<IccLichKingAddsAction*>(action))
+        if (currentTarget && currentTarget->GetGUID() == boss->GetGUID())
+        { 
+            if (dynamic_cast<ReachMeleeAction*>(action) || dynamic_cast<ReachSpellAction*>(action) || dynamic_cast<ReachTargetAction*>(action))
+                return 0.0f;
+        }
+
+        if (dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<IccLichKingAddsAction*>(action))
             return 0.0f;
+
         return 1.0f;
     }
+
+    //melee reach, spell reach, ranged reach
 
     if (botAI->IsRanged(bot))
     {
