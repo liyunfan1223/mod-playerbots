@@ -166,7 +166,7 @@ bool AutoReleaseSpiritAction::isUseful()
                 botReleaseTimes[botId] = now;
 
             // Wait 8 seconds before releasing.
-            if (now - botReleaseTimes[botId] < 8)
+            if (now - botReleaseTimes[botId] < 6)
                 return false;
         }
         // Erase the release time for this bot.
