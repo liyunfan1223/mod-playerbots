@@ -93,6 +93,17 @@ bool AutoReleaseSpiritAction::Execute(Event event)
     LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> auto released", bot->GetGUID().ToString().c_str(),
               bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
 
+    // When bot dies in BG, wait a couple of seconds before release.
+    // This prevents currently casted (ranged) spells to be re-directed to the bot's ghost.
+    if (bot->InBattleground()) 
+    {
+        if (bg_release_time == 0) 
+            bg_release_time = time(nullptr);
+
+        if (time(nullptr) - bg_release_time < 2) 
+            return false;
+    }
+
     WorldPacket packet(CMSG_REPOP_REQUEST);
     packet << uint8(0);
     bot->GetSession()->HandleRepopRequestOpcode(packet);
@@ -128,12 +139,14 @@ bool AutoReleaseSpiritAction::Execute(Event event)
         }
         else if (!botAI->IsRealPlayer()) // below doesnt work properly on realplayer, but its also not needed
         {
-            bg_gossip_time = time(NULL);
+            bg_release_time = time(nullptr);
+            bg_gossip_time = time(nullptr);
             WorldPacket packet(CMSG_GOSSIP_HELLO);
             packet << guid;
             bot->GetSession()->HandleGossipHelloOpcode(packet);
         }
     }
+
     botAI->SetNextCheckDelay(1000);
     return true;
 }
