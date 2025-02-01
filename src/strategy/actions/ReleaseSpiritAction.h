@@ -33,7 +33,7 @@ public:
     bool isUseful() override;
 
 private:
-    uint32_t bg_release_time = 0;
+    inline static std::unordered_map<uint32_t, time_t> botReleaseTimes;
     uint32_t bg_gossip_time = 0;
 };
 

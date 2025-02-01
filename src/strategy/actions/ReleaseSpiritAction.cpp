@@ -90,19 +90,8 @@ bool AutoReleaseSpiritAction::Execute(Event event)
         context->GetValue<uint32>("death count")->Set(dCount + 1);
     }
 
-    // When bot dies in BG, wait a couple of seconds before release.
-    // This prevents currently casted (ranged) spells to be re-directed to the bot's ghost.
-    if (bot->InBattleground()) 
-    {
-        if (bg_release_time == 0) 
-            bg_release_time = time(nullptr);
-
-        if (time(nullptr) - bg_release_time < 2) 
-            return false;
-    }
-
     LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> auto released", bot->GetGUID().ToString().c_str(),
-    bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
+              bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
 
     WorldPacket packet(CMSG_REPOP_REQUEST);
     packet << uint8(0);
@@ -139,14 +128,12 @@ bool AutoReleaseSpiritAction::Execute(Event event)
         }
         else if (!botAI->IsRealPlayer()) // below doesnt work properly on realplayer, but its also not needed
         {
-            bg_release_time = time(nullptr);
-            bg_gossip_time = time(nullptr);
+            bg_gossip_time = time(NULL);
             WorldPacket packet(CMSG_GOSSIP_HELLO);
             packet << guid;
             bot->GetSession()->HandleGossipHelloOpcode(packet);
         }
     }
-
     botAI->SetNextCheckDelay(1000);
     return true;
 }
@@ -159,8 +146,33 @@ bool AutoReleaseSpiritAction::isUseful()
     if (bot->InArena())
         return false;
 
+    // if (bot->InBattleground())
+    //     return true;
+
+    // When bot dies in BG, wait a couple of seconds before release.
+    // This prevents currently casted (ranged) spells to be re-directed to the bot's ghost.
+    // Use a static map to track release times for each bot.
     if (bot->InBattleground())
+    {
+        auto botId = bot->GetGUID().GetRawValue();
+
+        // If the bot is not a ghost yet, delay release some.
+        if (!bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
+        {
+            time_t now = time(nullptr);
+
+            // If this bot has no recorded release time yet, set it to now.
+            if (botReleaseTimes.find(botId) == botReleaseTimes.end())
+                botReleaseTimes[botId] = now;
+
+            // Wait 8 seconds before releasing.
+            if (now - botReleaseTimes[botId] < 8)
+                return false;
+        }
+        // Erase the release time for this bot.
+        botReleaseTimes.erase(botId);
         return true;
+    }
 
     if (bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
         return false;
