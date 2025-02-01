@@ -90,9 +90,6 @@ bool AutoReleaseSpiritAction::Execute(Event event)
         context->GetValue<uint32>("death count")->Set(dCount + 1);
     }
 
-    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> auto released", bot->GetGUID().ToString().c_str(),
-              bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
-
     // When bot dies in BG, wait a couple of seconds before release.
     // This prevents currently casted (ranged) spells to be re-directed to the bot's ghost.
     if (bot->InBattleground()) 
@@ -103,6 +100,9 @@ bool AutoReleaseSpiritAction::Execute(Event event)
         if (time(nullptr) - bg_release_time < 2) 
             return false;
     }
+
+    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> auto released", bot->GetGUID().ToString().c_str(),
+    bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
 
     WorldPacket packet(CMSG_REPOP_REQUEST);
     packet << uint8(0);
