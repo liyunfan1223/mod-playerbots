@@ -33,6 +33,7 @@ public:
     bool isUseful() override;
 
 private:
+    uint32_t bg_release_time = 0;
     uint32_t bg_gossip_time = 0;
 };
 
