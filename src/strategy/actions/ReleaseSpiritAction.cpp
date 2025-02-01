@@ -165,7 +165,7 @@ bool AutoReleaseSpiritAction::isUseful()
             if (botReleaseTimes.find(botId) == botReleaseTimes.end())
                 botReleaseTimes[botId] = now;
 
-            // Wait 8 seconds before releasing.
+            // Wait 6 seconds before releasing.
             if (now - botReleaseTimes[botId] < 6)
                 return false;
         }
