@@ -68,7 +68,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
 
     bool isRndbot = !masterAccountId;
-    bool sameAccount = accountId == masterAccountId;
+    bool sameAccount = sPlayerbotAIConfig->allowAccountBots && accountId == masterAccountId;
     Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
     bool sameGuild = sPlayerbotAIConfig->allowGuildBots && guild && guild->GetMember(playerGuid); 
 
@@ -643,14 +643,6 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(guid.GetCounter());
     bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(botAccount);
     bool isMasterAccount = (masterAccountId == botAccount);
-
-    if (!isRandomAccount && !isMasterAccount && !admin && masterguid)
-    {
-        Player* master = ObjectAccessor::FindConnectedPlayer(masterguid);
-        if (master && (!sPlayerbotAIConfig->allowGuildBots || !masterGuildId ||
-                       (masterGuildId && sCharacterCache->GetCharacterGuildIdByGuid(guid) != masterGuildId)))
-            return "not in your guild or account";
-    }
 
     if (cmd == "add" || cmd == "login")
     {

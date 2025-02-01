@@ -125,6 +125,9 @@ AiPlayerbot.GroupInvitationPermission = 1
 # auto-login all player alts as bots on player login
 AiPlayerbot.BotAutologin = 0
 
+# Allow/deny bots from your account
+AiPlayerbot.AllowAccountBots = 1
+
 # Allow/deny bots from your guild
 AiPlayerbot.AllowGuildBots = 1
 

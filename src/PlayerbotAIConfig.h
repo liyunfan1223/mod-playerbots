@@ -54,7 +54,7 @@ public:
     bool IsInPvpProhibitedArea(uint32 id);
 
     bool enabled;
-    bool allowGuildBots;
+    bool allowAccountBots, allowGuildBots;
     bool randomBotGuildNearby, randomBotInvitePlayer, inviteChat;
     uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime, expireActionTime,
         dispelAuraDuration, passiveDelay, repeatDelay, errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
