@@ -27,11 +27,12 @@ public:
     PlayerbotHolder();
     virtual ~PlayerbotHolder(){};
 
-    void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId);
+    void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId, bool byAddClass = false);
     void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder);
 
     void LogoutPlayerBot(ObjectGuid guid);
     void DisablePlayerBot(ObjectGuid guid);
+    void RemoveFromPlayerbotsMap(ObjectGuid guid);
     Player* GetPlayerBot(ObjectGuid guid) const;
     Player* GetPlayerBot(ObjectGuid::LowType lowGuid) const;
     PlayerBotMap::const_iterator GetPlayerBotsBegin() const { return playerBots.begin(); }
@@ -42,7 +43,7 @@ public:
     void HandleBotPackets(WorldSession* session);
 
     void LogoutAllBots();
-    void OnBotLogin(Player* const bot);
+    void OnBotLogin(Player* const bot, bool byAddClass = false);
 
     std::vector<std::string> HandlePlayerbotCommand(char const* args, Player* master = nullptr);
     std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin,
@@ -58,6 +59,7 @@ protected:
     virtual void OnBotLoginInternal(Player* const bot) = 0;
 
     PlayerBotMap playerBots;
+    std::unordered_set<ObjectGuid> addClassBots;
     std::unordered_set<ObjectGuid> botLoading;
 };
 

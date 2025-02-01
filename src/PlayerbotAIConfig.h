@@ -54,7 +54,7 @@ public:
     bool IsInPvpProhibitedArea(uint32 id);
 
     bool enabled;
-    bool allowGuildBots, allowPlayerBots;
+    bool allowAccountBots, allowGuildBots;
     bool randomBotGuildNearby, randomBotInvitePlayer, inviteChat;
     uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime, expireActionTime,
         dispelAuraDuration, passiveDelay, repeatDelay, errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
@@ -334,7 +334,7 @@ public:
     bool botRepairWhenSummon;
     bool autoInitOnly;
     float autoInitEquipLevelLimitRatio;
-    int32 maxAddedBots, maxAddedBotsPerClass;
+    int32 maxAddedBots;
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
