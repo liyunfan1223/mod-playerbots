@@ -146,8 +146,33 @@ bool AutoReleaseSpiritAction::isUseful()
     if (bot->InArena())
         return false;
 
+    // if (bot->InBattleground())
+    //     return true;
+
+    // When bot dies in BG, wait a couple of seconds before release.
+    // This prevents currently casted (ranged) spells to be re-directed to the bot's ghost.
+    // Use a static map to track release times for each bot.
     if (bot->InBattleground())
+    {
+        auto botId = bot->GetGUID().GetRawValue();
+
+        // If the bot is not a ghost yet, delay release some.
+        if (!bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
+        {
+            time_t now = time(nullptr);
+
+            // If this bot has no recorded release time yet, set it to now.
+            if (botReleaseTimes.find(botId) == botReleaseTimes.end())
+                botReleaseTimes[botId] = now;
+
+            // Wait 6 seconds before releasing.
+            if (now - botReleaseTimes[botId] < 6)
+                return false;
+        }
+        // Erase the release time for this bot.
+        botReleaseTimes.erase(botId);
         return true;
+    }
 
     if (bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
         return false;
