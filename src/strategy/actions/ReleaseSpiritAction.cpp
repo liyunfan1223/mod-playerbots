@@ -55,17 +55,16 @@ void ReleaseSpiritAction::IncrementDeathCount() const
     }
 }
 
-void ReleaseSpiritAction::LogRelease(const std::string& releaseType, bool isAutoRelease) const
+void ReleaseSpiritAction::LogRelease(const std::string& releaseMsg, bool isAutoRelease) const
 {
     const std::string teamPrefix = bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H";
-    const auto logLevel = isAutoRelease ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
-    
+
     LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> {}",
         bot->GetGUID().ToString().c_str(),
         teamPrefix,
         bot->GetLevel(),
         bot->GetName().c_str(),
-        releaseType.c_str());
+        releaseMsg.c_str());
 }
 
 // AutoReleaseSpiritAction implementation
@@ -196,11 +195,8 @@ bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
     return true;
 }
 
-// RepopAction implementation
 bool RepopAction::Execute(Event event)
 {
-    // LogRelease("repops at graveyard", true);
-
     const GraveyardStruct* graveyard = GetGrave(
         AI_VALUE(uint32, "death count") > 10 || 
         CalculateDeadTime() > 30 * MINUTE
