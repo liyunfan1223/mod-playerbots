@@ -48,6 +48,7 @@ bool ReleaseSpiritAction::Execute(Event event)
 
 void ReleaseSpiritAction::IncrementDeathCount() const
 {
+    // Death Count to prevent skeleton piles
     Player* master = botAI->GetMaster();
     if (!master || GET_PLAYERBOT_AI(master))
     {
