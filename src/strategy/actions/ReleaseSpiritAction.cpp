@@ -30,8 +30,8 @@ bool ReleaseSpiritAction::Execute(Event event)
     }
 
     const WorldPacket& packet = event.getPacket();
-    const std::string message = !packet.empty() && packet.GetOpcode() == CMSG_REPOP_REQUEST 
-                                ? "Releasing..." 
+    const std::string message = !packet.empty() && packet.GetOpcode() == CMSG_REPOP_REQUEST
+                                ? "Releasing..."
                                 : "Meet me at the graveyard";
     botAI->TellMasterNoFacing(message);
 
