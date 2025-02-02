@@ -30,8 +30,8 @@ bool ReleaseSpiritAction::Execute(Event event)
     }
 
     const WorldPacket& packet = event.getPacket();
-    const std::string message = !packet.empty() && packet.GetOpcode() == CMSG_REPOP_REQUEST
-                                ? "Releasing..."
+    const std::string message = !packet.empty() && packet.GetOpcode() == CMSG_REPOP_REQUEST 
+                                ? "Releasing..." 
                                 : "Meet me at the graveyard";
     botAI->TellMasterNoFacing(message);
 
@@ -173,22 +173,50 @@ bool AutoReleaseSpiritAction::ShouldAutoRelease() const
         sPlayerbotAIConfig->sightDistance);
 }
 
+// bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
+// {
+//     if (bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
+//     {
+//         m_botReleaseTimes.erase(bot->GetGUID().GetRawValue());
+//         return true;
+//     }
+
+//     const uint32_t botId = bot->GetGUID().GetRawValue();
+//     const time_t now = time(nullptr);
+//     constexpr time_t RELEASE_DELAY = 6;
+
+//     if (m_botReleaseTimes.find(botId) == m_botReleaseTimes.end())
+//         m_botReleaseTimes[botId] = now;
+
+//     if (now - m_botReleaseTimes[botId] < RELEASE_DELAY)
+//         return false;
+
+//     m_botReleaseTimes.erase(botId);
+//     return true;
+// }
+
 bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
 {
+    // The below delays release to spirit with 6 seconds.
+    // This prevents currently casted (ranged) spells to be re-directed to the died bot's ghost.
+    const int32_t botId = bot->GetGUID().GetRawValue();
+
+    // If the bot already is a spirit, erase release time and return true
     if (bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
     {
-        m_botReleaseTimes.erase(bot->GetGUID().GetRawValue());
+        m_botReleaseTimes.erase(botId);
         return true;
     }
 
-    const uint32_t botId = bot->GetGUID().GetRawValue();
+    // Delay release to spirit.
     const time_t now = time(nullptr);
     constexpr time_t RELEASE_DELAY = 6;
 
-    if (m_botReleaseTimes.find(botId) == m_botReleaseTimes.end())
-        m_botReleaseTimes[botId] = now;
+    auto& lastReleaseTime = m_botReleaseTimes[botId];
+    if (lastReleaseTime == 0)
+        lastReleaseTime = now;
 
-    if (now - m_botReleaseTimes[botId] < RELEASE_DELAY)
+    if (now - lastReleaseTime < RELEASE_DELAY)
         return false;
 
     m_botReleaseTimes.erase(botId);
