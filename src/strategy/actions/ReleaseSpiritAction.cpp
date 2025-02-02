@@ -7,6 +7,7 @@
 
 #include "Event.h"
 #include "GameGraveyard.h"
+#include "NearestNpcsValue.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "Playerbots.h"
@@ -102,13 +103,16 @@ bool AutoReleaseSpiritAction::Execute(Event event)
 
     if (bot->InBattleground() && (time(NULL) - bg_gossip_time >= 15 || !bot->HasAura(SPELL_WAITING_FOR_RESURRECT)))
     {
-        GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
+        // Increased range as default view distance can be insufficient
+        // when a graveyard gets lost to opposing faction meanwhile.
+        float bgRange = 500.0f;
+        GuidVector npcs = NearestNpcsValue(botAI, bgRange);
         ObjectGuid guid;
         Unit* unit;
         for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
         {
             unit = botAI->GetUnit(*i);
-            if (unit && unit->IsSpiritService())
+            if (unit && unit->IsFriendlyTo(bot) && unit->IsSpiritService())
             {
                 guid = unit->GetGUID();
                 break;
@@ -165,7 +169,7 @@ bool AutoReleaseSpiritAction::isUseful()
             if (botReleaseTimes.find(botId) == botReleaseTimes.end())
                 botReleaseTimes[botId] = now;
 
-            // Wait 6 seconds before releasing.
+            // Wait 8 seconds before releasing.
             if (now - botReleaseTimes[botId] < 6)
                 return false;
         }
