@@ -11,10 +11,10 @@
 
 class PlayerbotAI;
 
-class ReleaseSpiritAction : public Action 
+class ReleaseSpiritAction : public Action
 {
 public:
-    ReleaseSpiritAction(PlayerbotAI* botAI, const std::string& name = "release") 
+    ReleaseSpiritAction(PlayerbotAI* botAI, const std::string& name = "release")
         : Action(botAI, name) {}
 
     bool Execute(Event event) override;
@@ -24,7 +24,7 @@ protected:
     void IncrementDeathCount() const;
 };
 
-class AutoReleaseSpiritAction : public ReleaseSpiritAction 
+class AutoReleaseSpiritAction : public ReleaseSpiritAction
 {
 public:
     AutoReleaseSpiritAction(PlayerbotAI* botAI, const std::string& name = "auto release")
@@ -42,7 +42,7 @@ private:
     time_t m_bgGossipTime = 0;
 };
 
-class RepopAction : public SpiritHealerAction 
+class RepopAction : public SpiritHealerAction
 {
 public:
     RepopAction(PlayerbotAI* botAI, const std::string& name = "repop")
