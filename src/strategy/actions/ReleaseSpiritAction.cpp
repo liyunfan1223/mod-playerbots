@@ -105,7 +105,7 @@ bool AutoReleaseSpiritAction::Execute(Event event)
     {
         // Increased range as default view distance can be insufficient
         // when a graveyard gets lost to opposing faction meanwhile.
-        float bgRange = 500.0f;
+        float bgRange = 2000.0f;
         GuidVector npcs = NearestNpcsValue(botAI, bgRange);
         ObjectGuid guid;
         Unit* unit;
