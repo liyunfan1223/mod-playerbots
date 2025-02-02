@@ -7,6 +7,7 @@
 
 #include "Event.h"
 #include "GameGraveyard.h"
+#include "NearestNpcsValue.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "Playerbots.h"
@@ -110,16 +111,17 @@ bool AutoReleaseSpiritAction::HandleBattlegroundSpiritHealer()
     if ((now - m_bgGossipTime < RESURRECT_DELAY) && 
         bot->HasAura(SPELL_WAITING_FOR_RESURRECT))
     {
-        return true;
+        return false;
     }
 
-    GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
+    float bgRange = 2000.0f;
+    GuidVector npcs = NearestNpcsValue(botAI, bgRange);
     Unit* spiritHealer = nullptr;
-    
+
     for (const auto& guid : npcs)
     {
         Unit* unit = botAI->GetUnit(guid);
-        if (unit && unit->IsSpiritService())
+        if (unit && unit->IsFriendlyTo(bot) && unit->IsSpiritService())
         {
             spiritHealer = unit;
             break;
@@ -127,15 +129,17 @@ bool AutoReleaseSpiritAction::HandleBattlegroundSpiritHealer()
     }
 
     if (!spiritHealer)
-        return true;
+        return false;
 
     if (bot->GetDistance(spiritHealer) >= INTERACTION_DISTANCE)
     {
-        // bot needs to actually click spirit-healer in BG to get res timer going
+        // Bot needs to actually click spirit-healer in BG to get res timer going
         // and in IOC it's not within clicking range when they res in own base
-        MotionMaster& mm = *bot->GetMotionMaster();
-        mm.Clear();
-        mm.MovePoint(bot->GetMapId(), spiritHealer->GetPositionX(), spiritHealer->GetPositionY(), spiritHealer->GetPositionZ(), true);
+
+        // Teleport to nearest friendly Spirit Healer when not currently in range of one.
+        bot->TeleportTo(bot->GetMapId(), spiritHealer->GetPositionX(), spiritHealer->GetPositionY(), spiritHealer->GetPositionZ(), 0.f);
+        RESET_AI_VALUE(bool, "combat::self target");
+        RESET_AI_VALUE(WorldPosition, "current position");
     }
     else if (!botAI->IsRealPlayer())
     {
@@ -172,28 +176,6 @@ bool AutoReleaseSpiritAction::ShouldAutoRelease() const
         AI_VALUE2(float, "distance", "master target"),
         sPlayerbotAIConfig->sightDistance);
 }
-
-// bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
-// {
-//     if (bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
-//     {
-//         m_botReleaseTimes.erase(bot->GetGUID().GetRawValue());
-//         return true;
-//     }
-
-//     const uint32_t botId = bot->GetGUID().GetRawValue();
-//     const time_t now = time(nullptr);
-//     constexpr time_t RELEASE_DELAY = 6;
-
-//     if (m_botReleaseTimes.find(botId) == m_botReleaseTimes.end())
-//         m_botReleaseTimes[botId] = now;
-
-//     if (now - m_botReleaseTimes[botId] < RELEASE_DELAY)
-//         return false;
-
-//     m_botReleaseTimes.erase(botId);
-//     return true;
-// }
 
 bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
 {
