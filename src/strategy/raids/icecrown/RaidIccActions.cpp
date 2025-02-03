@@ -2376,7 +2376,7 @@ bool IccSindragosaTankPositionAction::Execute(Event event)
             float moveY = ICC_SINDRAGOSA_CENTER_POSITION.GetPositionY() + (dirY / distBossToCenter) * 10.0f;
             
             return MoveTo(bot->GetMapId(), moveX, moveY, boss->GetPositionZ(),
-                         false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                         false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
         }
         
         // Stage 2: Get to tank position when boss is centered
@@ -2385,7 +2385,7 @@ bool IccSindragosaTankPositionAction::Execute(Event event)
             return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_TANK_POSITION.GetPositionX(),
                       ICC_SINDRAGOSA_TANK_POSITION.GetPositionY(),
                       ICC_SINDRAGOSA_TANK_POSITION.GetPositionZ(),
-                      false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                      false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
         }
         
         // Stage 3: Adjust orientation when in position
@@ -2412,7 +2412,7 @@ bool IccSindragosaTankPositionAction::Execute(Event event)
             }
             
             return MoveTo(bot->GetMapId(), moveX, moveY, bot->GetPositionZ(),
-                        false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                        false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
         }
         return false;
     }
@@ -2500,7 +2500,7 @@ bool IccSindragosaTankSwapPositionAction::Execute(Event event)
         return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_TANK_POSITION.GetPositionX(),
                      ICC_SINDRAGOSA_TANK_POSITION.GetPositionY(),
                      ICC_SINDRAGOSA_TANK_POSITION.GetPositionZ(),
-                     false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                     false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
     }
 
     return false;
@@ -2508,7 +2508,7 @@ bool IccSindragosaTankSwapPositionAction::Execute(Event event)
 
 bool IccSindragosaFrostBeaconAction::Execute(Event event)
 {
-    float const POSITION_TOLERANCE = 3.0f; // Increased tolerance to reduce jitter
+    float const POSITION_TOLERANCE = 1.0f;
     
     Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
     if (!boss)
@@ -2526,7 +2526,7 @@ bool IccSindragosaFrostBeaconAction::Execute(Event event)
                             ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionX(),
                             ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionY(),
                             ICC_SINDRAGOSA_THOMBMB2_POSITION.GetPositionZ(),
-                            false, false, false, false, MovementPriority::MOVEMENT_FORCED);
+                            false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
             }
             return false;
         }
@@ -2583,7 +2583,7 @@ bool IccSindragosaFrostBeaconAction::Execute(Event event)
                 return MoveTo(bot->GetMapId(), tombPosition->GetPositionX(),
                               tombPosition->GetPositionY(),
                               tombPosition->GetPositionZ(),
-                              false, false, false, false, MovementPriority::MOVEMENT_FORCED);
+                              false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
             }
             return false;
         }
@@ -2624,7 +2624,7 @@ bool IccSindragosaFrostBeaconAction::Execute(Event event)
                     return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionX(),
                                 ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionY(),
                                 ICC_SINDRAGOSA_FBOMB_POSITION.GetPositionZ(),
-                                false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                                false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
                 }
             }
             return false;
@@ -2640,7 +2640,7 @@ bool IccSindragosaFrostBeaconAction::Execute(Event event)
                     return MoveTo(bot->GetMapId(), ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionX(),
                                 ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionY(),
                                 ICC_SINDRAGOSA_FBOMB10_POSITION.GetPositionZ(),
-                                false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                                false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
                 }
             }
             return false;
@@ -2676,7 +2676,7 @@ bool IccSindragosaFrostBeaconAction::Execute(Event event)
                 if (std::abs(moveX) > MOVE_TOLERANCE || std::abs(moveY) > MOVE_TOLERANCE)
                 {
                     return MoveTo(bot->GetMapId(), posX, posY, posZ,
-                                false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                                false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
                 }
             }
         }
