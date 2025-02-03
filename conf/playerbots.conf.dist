@@ -107,11 +107,8 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 #
 #
 
-# Maximum number of bots added by one account
+# The maximum number of bots that a player can control simultaneously
 AiPlayerbot.MaxAddedBots = 40
-
-# Maximum number of bots per class added by one account
-AiPlayerbot.MaxAddedBotsPerClass = 40
 
 # Enable/Disable create bot by addclass command (0 = GM only, 1 = enable)
 # default: 1 (enable)
@@ -128,11 +125,10 @@ AiPlayerbot.GroupInvitationPermission = 1
 # auto-login all player alts as bots on player login
 AiPlayerbot.BotAutologin = 0
 
-# Allow login other players' characters as bots
-# Default: 0 (disabled)
-AiPlayerbot.AllowPlayerBots = 0
+# Allow/deny bots from the player's account
+AiPlayerbot.AllowAccountBots = 1
 
-# Allow/deny bots from your guild
+# Allow/deny bots in the player's guild
 AiPlayerbot.AllowGuildBots = 1
 
 # Randombots will invite nearby bots to guilds
@@ -860,8 +856,8 @@ AiPlayerbot.FastReactInBG = 1
 AiPlayerbot.RandomBotUpdateInterval = 20
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
-AiPlayerbot.MinRandomBotInWorldTime = 3600
-AiPlayerbot.MaxRandomBotInWorldTime = 1209600
+AiPlayerbot.MinRandomBotInWorldTime = 600
+AiPlayerbot.MaxRandomBotInWorldTime = 28800
 AiPlayerbot.MinRandomBotRandomizeTime = 7200
 AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
 AiPlayerbot.RandomBotsPerInterval = 60
