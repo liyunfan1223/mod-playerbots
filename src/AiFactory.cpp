@@ -304,7 +304,16 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 0)
                 engine->addStrategiesNoInit("arcane", "arcane aoe", nullptr);
             else if (tab == 1)
-                engine->addStrategiesNoInit("fire", "fire aoe", nullptr);
+            {
+                if (player->HasSpell(44614) /*Frostfire Bolt*/ && player->HasAura(15047) /*Ice Shards*/)
+                {
+                    engine->addStrategiesNoInit("frostfire", "frostfire aoe", nullptr);
+                }
+                else
+                {
+                    engine->addStrategiesNoInit("fire", "fire aoe", nullptr);
+                }
+            } 
             else
                 engine->addStrategiesNoInit("frost", "frost aoe", nullptr);
 

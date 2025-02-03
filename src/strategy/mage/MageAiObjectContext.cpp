@@ -7,6 +7,7 @@
 
 #include "ArcaneMageStrategy.h"
 #include "FireMageStrategy.h"
+#include "FrostFireMageStrategy.h"
 #include "FrostMageStrategy.h"
 #include "GenericMageNonCombatStrategy.h"
 #include "MageActions.h"
@@ -23,6 +24,7 @@ public:
         creators["nc"] = &MageStrategyFactoryInternal::nc;
         creators["pull"] = &MageStrategyFactoryInternal::pull;
         creators["fire aoe"] = &MageStrategyFactoryInternal::fire_aoe;
+        creators["frostfire aoe"] = &MageStrategyFactoryInternal::frostfire_aoe; 
         creators["frost aoe"] = &MageStrategyFactoryInternal::frost_aoe;
         creators["arcane aoe"] = &MageStrategyFactoryInternal::arcane_aoe;
         creators["cure"] = &MageStrategyFactoryInternal::cure;
@@ -35,6 +37,7 @@ private:
     static Strategy* nc(PlayerbotAI* botAI) { return new GenericMageNonCombatStrategy(botAI); }
     static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
     static Strategy* fire_aoe(PlayerbotAI* botAI) { return new FireMageAoeStrategy(botAI); }
+    static Strategy* frostfire_aoe(PlayerbotAI* botAI) { return new FrostFireMageAoeStrategy(botAI); }
     static Strategy* frost_aoe(PlayerbotAI* botAI) { return new FrostMageAoeStrategy(botAI); }
     static Strategy* arcane_aoe(PlayerbotAI* botAI) { return new ArcaneMageAoeStrategy(botAI); }
     static Strategy* cure(PlayerbotAI* botAI) { return new MageCureStrategy(botAI); }
@@ -50,12 +53,14 @@ public:
     {
         creators["frost"] = &MageCombatStrategyFactoryInternal::frost;
         creators["fire"] = &MageCombatStrategyFactoryInternal::fire;
+        creators["frostfire"] = &MageCombatStrategyFactoryInternal::frostfire;
         creators["arcane"] = &MageCombatStrategyFactoryInternal::arcane;
     }
 
 private:
     static Strategy* frost(PlayerbotAI* botAI) { return new FrostMageStrategy(botAI); }
     static Strategy* fire(PlayerbotAI* botAI) { return new FireMageStrategy(botAI); }
+    static Strategy* frostfire(PlayerbotAI* botAI) { return new FrostFireMageStrategy(botAI); }
     static Strategy* arcane(PlayerbotAI* botAI) { return new ArcaneMageStrategy(botAI); }
 };
 
@@ -109,6 +114,7 @@ public:
         creators["frost nova on target"] = &MageTriggerFactoryInternal::frost_nova_on_target;
         creators["frostbite on target"] = &MageTriggerFactoryInternal::frostbite_on_target;
         creators["no focus magic"] = &MageTriggerFactoryInternal::no_focus_magic;
+        creators["frostfire bolt"] = &MageTriggerFactoryInternal::frostfire_bolt;
     }
 
 private:
@@ -143,6 +149,7 @@ private:
     static Trigger* frost_nova_on_target(PlayerbotAI* botAI) { return new FrostNovaOnTargetTrigger(botAI); }
     static Trigger* frostbite_on_target(PlayerbotAI* botAI) { return new FrostbiteOnTargetTrigger(botAI); }
     static Trigger* no_focus_magic(PlayerbotAI* botAI) { return new NoFocusMagicTrigger(botAI); }
+    static Trigger* frostfire_bolt(PlayerbotAI* botAI) { return new FrostfireBoltTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
