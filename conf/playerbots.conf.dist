@@ -107,11 +107,8 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 #
 #
 
-# Maximum number of bots added by one account
+# The maximum number of bots that a player can control simultaneously
 AiPlayerbot.MaxAddedBots = 40
-
-# Maximum number of bots per class added by one account
-AiPlayerbot.MaxAddedBotsPerClass = 40
 
 # Enable/Disable create bot by addclass command (0 = GM only, 1 = enable)
 # default: 1 (enable)
@@ -128,11 +125,10 @@ AiPlayerbot.GroupInvitationPermission = 1
 # auto-login all player alts as bots on player login
 AiPlayerbot.BotAutologin = 0
 
-# Allow login other players' characters as bots
-# Default: 0 (disabled)
-AiPlayerbot.AllowPlayerBots = 0
+# Allow/deny bots from the player's account
+AiPlayerbot.AllowAccountBots = 1
 
-# Allow/deny bots from your guild
+# Allow/deny bots in the player's guild
 AiPlayerbot.AllowGuildBots = 1
 
 # Randombots will invite nearby bots to guilds
@@ -860,8 +856,8 @@ AiPlayerbot.FastReactInBG = 1
 AiPlayerbot.RandomBotUpdateInterval = 20
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
-AiPlayerbot.MinRandomBotInWorldTime = 3600
-AiPlayerbot.MaxRandomBotInWorldTime = 1209600
+AiPlayerbot.MinRandomBotInWorldTime = 600
+AiPlayerbot.MaxRandomBotInWorldTime = 28800
 AiPlayerbot.MinRandomBotRandomizeTime = 7200
 AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
 AiPlayerbot.RandomBotsPerInterval = 60
@@ -1093,6 +1089,10 @@ AiPlayerbot.PremadeSpecName.8.2 = frost pve
 AiPlayerbot.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
 AiPlayerbot.PremadeSpecLink.8.2.60 = --0533030313203100030152231151
 AiPlayerbot.PremadeSpecLink.8.2.80 = 23002303110003--0533030313203100030152231351
+AiPlayerbot.PremadeSpecName.8.3 = frostfire pve
+AiPlayerbot.PremadeSpecGlyph.8.3 = 44684,44920,42751,43339,43364,45737
+AiPlayerbot.PremadeSpecLink.8.3.60 = -2305032012303331053120300051
+AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120311351-023303031
 
 #
 #

@@ -567,9 +567,7 @@ void RandomPlayerbotMgr::LoadBattleMastersCache()
 {
     BattleMastersCache.clear();
 
-    LOG_INFO("playerbots", "---------------------------------------");
-    LOG_INFO("playerbots", "          Loading BattleMasters Cache  ");
-    LOG_INFO("playerbots", "---------------------------------------");
+    LOG_INFO("playerbots", "Loading BattleMasters Cache...");
 
     QueryResult result = WorldDatabase.Query("SELECT `entry`,`bg_template` FROM `battlemaster_entry`");
 
@@ -1534,9 +1532,9 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
     }
     LOG_INFO("playerbots", ">> {} locations for level collected.", collected_locs);
 
-    LOG_INFO("playerbots", "Preparing innkeepers locations for level...");
     if (sPlayerbotAIConfig->enableNewRpgStrategy)
     {
+        LOG_INFO("playerbots", "Preparing innkeepers locations for level...");
         results = WorldDatabase.Query(
         "SELECT "
         "map, "
