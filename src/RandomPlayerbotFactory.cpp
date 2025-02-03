@@ -282,6 +282,12 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
         botName = fields[0].Get<std::string>();
         if (ObjectMgr::CheckPlayerName(botName) == CHAR_NAME_SUCCESS)  // Checks for reservation & profanity, too
         {
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+            stmt->SetData(0, botName);
+
+            if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+                continue;
+            
             return botName;
         } 
     }
@@ -346,6 +352,14 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
             botName.clear();
             continue;
         }
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+        stmt->SetData(0, botName);
+
+        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        {
+            botName.clear();
+            continue;
+        }
         return std::move(botName);
     }
 
@@ -359,6 +373,14 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
             botName += (i == 0 ? 'A' : 'a') + rand() % 26;
         }
         if (ObjectMgr::CheckPlayerName(botName) != CHAR_NAME_SUCCESS)  // Checks for reservation & profanity, too
+        {
+            botName.clear();
+            continue;
+        }
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+        stmt->SetData(0, botName);
+
+        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
         {
             botName.clear();
             continue;
@@ -502,7 +524,37 @@ void RandomPlayerbotFactory::CreateRandomBots()
         {
             continue;
         }
-        LOG_INFO("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1,
+
+        if (!nameCached)
+        {
+            nameCached = true;
+            LOG_INFO("playerbots", "Creating cache for names per gender and race...");
+            QueryResult result = CharacterDatabase.Query("SELECT name, gender FROM playerbots_names");
+            if (!result)
+            {
+                LOG_ERROR("playerbots", "No more unused names left");
+                return;
+            }
+            do
+            {
+                Field* fields = result->Fetch();
+                std::string name = fields[0].Get<std::string>();
+                NameRaceAndGender raceAndGender = static_cast<NameRaceAndGender>(fields[1].Get<uint8>());
+                if (sObjectMgr->CheckPlayerName(name) == CHAR_NAME_SUCCESS)
+                {
+                    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+                    stmt->SetData(0, name);
+
+                    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+                        continue;
+                    
+                    nameCache[raceAndGender].push_back(name);
+                }
+
+            } while (result->NextRow());
+        }
+        
+        LOG_DEBUG("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1,
             sPlayerbotAIConfig->randomBotAccountCount);
         RandomPlayerbotFactory factory(accountId);
 
