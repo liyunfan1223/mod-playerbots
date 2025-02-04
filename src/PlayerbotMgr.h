@@ -27,7 +27,7 @@ public:
     PlayerbotHolder();
     virtual ~PlayerbotHolder(){};
 
-    void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId, bool byAddClass = false);
+    void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId);
     void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder);
 
     void LogoutPlayerBot(ObjectGuid guid);
@@ -43,7 +43,7 @@ public:
     void HandleBotPackets(WorldSession* session);
 
     void LogoutAllBots();
-    void OnBotLogin(Player* const bot, bool byAddClass = false);
+    void OnBotLogin(Player* const bot);
 
     std::vector<std::string> HandlePlayerbotCommand(char const* args, Player* master = nullptr);
     std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin,
@@ -59,7 +59,6 @@ protected:
     virtual void OnBotLoginInternal(Player* const bot) = 0;
 
     PlayerBotMap playerBots;
-    std::unordered_set<ObjectGuid> addClassBots;
     std::unordered_set<ObjectGuid> botLoading;
 };
 

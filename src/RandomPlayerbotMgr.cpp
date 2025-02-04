@@ -1737,7 +1737,7 @@ void RandomPlayerbotMgr::PrepareAddclassCache()
                 ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
                 uint32 race = fields[1].Get<uint32>();
                 bool isAlliance = race == 1 || race == 3 || race == 4 || race == 7 || race == 11;
-                addclassCache[GetTeamClassIdx(isAlliance, claz)].push_back(guid);
+                addclassCache[GetTeamClassIdx(isAlliance, claz)].insert(guid);
                 collected++;
             } while (results->NextRow());
         }
@@ -2110,6 +2110,22 @@ bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
         return false;
     if (std::find(currentBots.begin(), currentBots.end(), bot) != currentBots.end())
         return true;
+    return false;
+}
+
+bool RandomPlayerbotMgr::IsAddclassBot(ObjectGuid::LowType bot)
+{
+    ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(bot);
+    for (uint8 claz = CLASS_WARRIOR; claz <= CLASS_DRUID; claz++)
+    {
+        if (claz == 10)
+            continue;
+        for (uint8 isAlliance = 0; isAlliance <= 1; isAlliance++)
+        {
+            if (addclassCache[GetTeamClassIdx(isAlliance, claz)].find(guid) != addclassCache[GetTeamClassIdx(isAlliance, claz)].end())
+                return true;
+        }
+    }
     return false;
 }
 
