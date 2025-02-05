@@ -668,7 +668,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(guid.GetCounter());
 
     if (!addClassBot)
-        return "ERROR: You can not use this command on non-addclass random bot.";
+        return "ERROR: You can not use this command on non-addclass bot.";
     
     if (!admin)
     {

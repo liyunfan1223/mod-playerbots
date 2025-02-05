@@ -1709,6 +1709,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 
 void RandomPlayerbotMgr::PrepareAddclassCache()
 {
+    /// @FIXME: Modifying RandomBotAccountCount may cause the original addclass bots to be converted into rndbots,
+    // which needs to be fixed by separating the two accounts in implementation
     size_t poolSize = sPlayerbotAIConfig->addClassAccountPoolSize;
     size_t start = sPlayerbotAIConfig->randomBotAccounts.size() > poolSize ? sPlayerbotAIConfig->randomBotAccounts.size() - poolSize : 0;
     int32 collected = 0;
