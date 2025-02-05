@@ -1054,6 +1054,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
                 continue;
             if (ObjectAccessor::FindConnectedPlayer(guid))
                 continue;
+            if (sCharacterCache->GetCharacterGuildIdByGuid(guid))
+                continue;
             AddPlayerBot(guid, master->GetSession()->GetAccountId());
             messages.push_back("Add class " + std::string(charname));
             return messages;

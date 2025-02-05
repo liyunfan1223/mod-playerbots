@@ -1709,37 +1709,32 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 
 void RandomPlayerbotMgr::PrepareAddclassCache()
 {
-    int32 maxAccountId = sPlayerbotAIConfig->randomBotAccounts.back();
-    int32 minIdx = sPlayerbotAIConfig->randomBotAccounts.size() - 1 >= sPlayerbotAIConfig->addClassAccountPoolSize
-                       ? sPlayerbotAIConfig->randomBotAccounts.size() - sPlayerbotAIConfig->addClassAccountPoolSize
-                       : 0;
-    int32 minAccountId = sPlayerbotAIConfig->randomBotAccounts[minIdx];
-    if (minAccountId < 0)
-    {
-        LOG_ERROR("playerbots", "No available account for add class!");
-    }
+    size_t poolSize = sPlayerbotAIConfig->addClassAccountPoolSize;
+    size_t start = sPlayerbotAIConfig->randomBotAccounts.size() > poolSize ? sPlayerbotAIConfig->randomBotAccounts.size() - poolSize : 0;
     int32 collected = 0;
-    for (uint8 claz = CLASS_WARRIOR; claz <= CLASS_DRUID; claz++)
+    for (size_t i = start; i < sPlayerbotAIConfig->randomBotAccounts.size(); i++)
     {
-        if (claz == 10)
-            continue;
-        QueryResult results = CharacterDatabase.Query(
-            "SELECT guid, race FROM characters "
-            "WHERE account >= {} AND account <= {} AND class = '{}' AND online = 0 AND "
-            "guid NOT IN ( SELECT guid FROM guild_member ) "
-            "ORDER BY account DESC",
-            minAccountId, maxAccountId, claz);
-        if (results)
+        for (uint8 claz = CLASS_WARRIOR; claz <= CLASS_DRUID; claz++)
         {
-            do
+            if (claz == 10)
+                continue;
+            QueryResult results = CharacterDatabase.Query(
+                "SELECT guid, race FROM characters "
+                "WHERE account = {} AND class = '{}' AND online = 0 "
+                "ORDER BY account DESC",
+                sPlayerbotAIConfig->randomBotAccounts[i], claz);
+            if (results)
             {
-                Field* fields = results->Fetch();
-                ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
-                uint32 race = fields[1].Get<uint32>();
-                bool isAlliance = race == 1 || race == 3 || race == 4 || race == 7 || race == 11;
-                addclassCache[GetTeamClassIdx(isAlliance, claz)].insert(guid);
-                collected++;
-            } while (results->NextRow());
+                do
+                {
+                    Field* fields = results->Fetch();
+                    ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32>());
+                    uint32 race = fields[1].Get<uint32>();
+                    bool isAlliance = race == 1 || race == 3 || race == 4 || race == 7 || race == 11;
+                    addclassCache[GetTeamClassIdx(isAlliance, claz)].insert(guid);
+                    collected++;
+                } while (results->NextRow());
+            }
         }
     }
     LOG_INFO("playerbots", ">> {} characters collected for addclass command.", collected);
