@@ -111,6 +111,7 @@ public:
     static bool HandlePlayerbotConsoleCommand(ChatHandler* handler, char const* args);
     bool IsRandomBot(Player* bot);
     bool IsRandomBot(ObjectGuid::LowType bot);
+    bool IsAddclassBot(ObjectGuid::LowType bot);
     void Randomize(Player* bot);
     void Clear(Player* bot);
     void RandomizeFirst(Player* bot);
@@ -172,7 +173,7 @@ public:
     void PrepareAddclassCache();
     void PrepareTeleportCache();
     void Init();
-    std::map<uint8, std::vector<ObjectGuid>> addclassCache;
+    std::map<uint8, std::unordered_set<ObjectGuid>> addclassCache;
     std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
     std::map<uint8, std::vector<WorldLocation>> allianceStarterPerLevelCache;
     std::map<uint8, std::vector<WorldLocation>> hordeStarterPerLevelCache;

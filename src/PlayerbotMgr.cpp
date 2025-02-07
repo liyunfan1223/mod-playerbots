@@ -39,17 +39,16 @@ private:
     uint32 masterAccountId;
     PlayerbotHolder* playerbotHolder;
 public:
-    PlayerbotLoginQueryHolder(PlayerbotHolder* playerbotHolder, uint32 masterAccount, uint32 accountId, ObjectGuid guid, bool byAddClass)
-        : LoginQueryHolder(accountId, guid), masterAccountId(masterAccount), playerbotHolder(playerbotHolder), byAddClass(byAddClass)
+    PlayerbotLoginQueryHolder(PlayerbotHolder* playerbotHolder, uint32 masterAccount, uint32 accountId, ObjectGuid guid)
+        : LoginQueryHolder(accountId, guid), masterAccountId(masterAccount), playerbotHolder(playerbotHolder)
     {
     }
 
     uint32 GetMasterAccountId() const { return masterAccountId; }
     PlayerbotHolder* GetPlayerbotHolder() { return playerbotHolder; }
-    bool byAddClass;
 };
 
-void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId, bool byAddClass)
+void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId)
 {
     // bot is loading
     if (botLoading.find(playerGuid) != botLoading.end())
@@ -71,12 +70,13 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     bool sameAccount = sPlayerbotAIConfig->allowAccountBots && accountId == masterAccountId;
     Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
     bool sameGuild = sPlayerbotAIConfig->allowGuildBots && guild && guild->GetMember(playerGuid); 
+    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter());
 
     bool allowed = true;
     std::ostringstream out;
     std::string botName;
     sCharacterCache->GetCharacterNameByGuid(playerGuid, botName);
-    if (!isRndbot && !sameAccount && !sameGuild && !byAddClass)
+    if (!isRndbot && !sameAccount && !sameGuild && !addClassBot)
     {
         allowed = false;
         out << "Failure: You are not allowed to control bot " << botName.c_str();
@@ -106,7 +106,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
         return;
     }
     std::shared_ptr<PlayerbotLoginQueryHolder> holder =
-        std::make_shared<PlayerbotLoginQueryHolder>(this, masterAccountId, accountId, playerGuid, byAddClass);
+        std::make_shared<PlayerbotLoginQueryHolder>(this, masterAccountId, accountId, playerGuid);
     if (!holder->Initialize())
     {
         return;
@@ -131,7 +131,6 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
 void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder)
 {
     uint32 botAccountId = holder.GetAccountId();
-    bool byAddClass = holder.byAddClass;
     // At login DBC locale should be what the server is set to use by default (as spells etc are hardcoded to ENUS this
     // allows channels to work as intended)
     WorldSession* botSession = new WorldSession(botAccountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
@@ -161,7 +160,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     }
     
     sRandomPlayerbotMgr->OnPlayerLogin(bot);
-    OnBotLogin(bot, byAddClass);
+    OnBotLogin(bot);
 
     botLoading.erase(holder.GetGuid());
 }
@@ -403,9 +402,7 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
 
 void PlayerbotHolder::RemoveFromPlayerbotsMap(ObjectGuid guid)
 {
-    playerBots.erase(guid);
-    if (addClassBots.find(guid) != addClassBots.end())
-        addClassBots.erase(guid);    
+    playerBots.erase(guid);   
 }
 
 Player* PlayerbotHolder::GetPlayerBot(ObjectGuid playerGuid) const
@@ -421,7 +418,7 @@ Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
     return (it == playerBots.end()) ? 0 : it->second;
 }
 
-void PlayerbotHolder::OnBotLogin(Player* const bot, bool byAddClass)
+void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
     // Prevent duplicate login
     if (playerBots.find(bot->GetGUID()) != playerBots.end())
@@ -431,9 +428,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot, bool byAddClass)
 
     sPlayerbotsMgr->AddPlayerbotData(bot, true);
     playerBots[bot->GetGUID()] = bot;
-    if (byAddClass)
-        addClassBots.insert(bot->GetGUID());
-
+    
     OnBotLoginInternal(bot);
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
@@ -482,10 +477,6 @@ void PlayerbotHolder::OnBotLogin(Player* const bot, bool byAddClass)
         if (!groupValid)
         {
             bot->RemoveFromGroup();
-            // WorldPacket p;
-            // std::string const member = bot->GetName();
-            // p << uint32(PARTY_OP_LEAVE) << member << uint32(0);
-            // bot->GetSession()->HandleGroupDisbandOpcode(p);
         }
     }
 
@@ -557,7 +548,8 @@ void PlayerbotHolder::OnBotLogin(Player* const bot, bool byAddClass)
     }
 
     bot->SaveToDB(false, false);
-    if (byAddClass && master && isRandomAccount && master->GetLevel() < bot->GetLevel())
+    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(bot->GetGUID().GetCounter());
+    if (addClassBot && master && isRandomAccount && master->GetLevel() < bot->GetLevel())
     {
         // PlayerbotFactory factory(bot, master->GetLevel());
         // factory.Randomize(false);
@@ -673,21 +665,10 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     if (!bot)
         return "bot not found";
     
-    bool addClassBot = true;
-    if (!isRandomAccount || isRandomBot)
-    {
-        addClassBot = false;
-    }
-
-    if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
-    {
-        PlayerbotMgr* masterMgr = GET_PLAYERBOT_MGR(master);
-        if (masterMgr && masterMgr->addClassBots.find(guid) == masterMgr->addClassBots.end())
-            addClassBot = false;
-    }
+    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(guid.GetCounter());
 
     if (!addClassBot)
-        return "ERROR: You can not use this command on non-addclass random bot.";
+        return "ERROR: You can not use this command on non-addclass bot.";
     
     if (!admin)
     {
@@ -1066,15 +1047,16 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             return messages;
         }
         uint8 teamId = master->GetTeamId(true);
-        std::vector<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
-        for (size_t i = 0; i < guidCache.size(); i++)
+        const std::unordered_set<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
+        for (const ObjectGuid &guid: guidCache)
         {
-            ObjectGuid guid = guidCache[i];
             if (botLoading.find(guid) != botLoading.end())
                 continue;
             if (ObjectAccessor::FindConnectedPlayer(guid))
                 continue;
-            AddPlayerBot(guid, master->GetSession()->GetAccountId(), true);
+            if (sCharacterCache->GetCharacterGuildIdByGuid(guid))
+                continue;
+            AddPlayerBot(guid, master->GetSession()->GetAccountId());
             messages.push_back("Add class " + std::string(charname));
             return messages;
         }
