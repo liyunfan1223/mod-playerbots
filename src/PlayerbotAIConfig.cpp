@@ -427,9 +427,9 @@ bool PlayerbotAIConfig::Initialize()
                 {
                     for (uint32 maxLevel = minLevel; maxLevel <= randomBotMaxLevel; maxLevel++)
                     {
-                        loadWorldBuf(factionId, classId, specId, minLevel, maxLevel);
+                        loadWorldBuff(factionId, classId, specId, minLevel, maxLevel);
                     }
-                    loadWorldBuf(factionId, classId, specId, minLevel, 0);
+                    loadWorldBuff(factionId, classId, specId, minLevel, 0);
                 }
             }
         }
@@ -676,7 +676,7 @@ void PlayerbotAIConfig::log(std::string const fileName, char const* str, ...)
     fflush(stdout);
 }
 
-void PlayerbotAIConfig::loadWorldBuf(uint32 factionId1, uint32 classId1, uint32 specId1, uint32 minLevel1, uint32 maxLevel1)
+void PlayerbotAIConfig::loadWorldBuff(uint32 factionId1, uint32 classId1, uint32 specId1, uint32 minLevel1, uint32 maxLevel1)
 {
     std::vector<uint32> buffs;
 
