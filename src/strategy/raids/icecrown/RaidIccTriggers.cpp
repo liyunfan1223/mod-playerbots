@@ -492,6 +492,11 @@ bool IccBpcKineticBombTrigger::IsActive()
 {
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
 
+    Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
+    if (aura)
+        if (aura->GetStackAmount() > 12)
+            return false;
+
     // Check for hunters first
     bool hasHunter = false;
     Group* group = bot->GetGroup();
@@ -584,6 +589,15 @@ bool IccSisterSvalnaTrigger::IsActive()
 
 bool IccValithriaPortalTrigger::IsActive()
 {
+
+    Unit* boss = bot->FindNearestCreature(36789, 100.0f);
+    if (!boss) 
+        return false;
+
+    //for gruop position for non healers
+    if(!botAI->IsHeal(bot) && (bot->GetDistance(ICC_VDW_GROUP_POSITION) > 35.0f))
+        return true;
+    
     // Only healers should use portals
     if (!botAI->IsHeal(bot) || bot->HasAura(70766))
         return false;
