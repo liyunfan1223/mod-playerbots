@@ -35,6 +35,7 @@ enum class HealingManaEfficiency : uint8
 };
 
 #define MAX_SPECNO 20
+#define MAX_WORLDBUFF_SPECNO 3
 
 class PlayerbotAIConfig
 {
