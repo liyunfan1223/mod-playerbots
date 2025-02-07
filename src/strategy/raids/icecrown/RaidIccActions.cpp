@@ -420,6 +420,10 @@ bool IccGunshipTeleportAllyAction::Execute(Event event)
         return false;
     }
 
+    if (Group* group = bot->GetGroup())
+        if (group->GetTargetIcon(7) != boss->GetGUID())
+            group->SetTargetIcon(7, bot->GetGUID(), boss->GetGUID());
+
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
     if (bot->GetTarget() != boss->GetGUID())
@@ -447,6 +451,10 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
                           ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionY(), ICC_GUNSHIP_TELEPORT_HORDE2.GetPositionZ(), bot->GetOrientation());
         return false;
     }
+
+    if (Group* group = bot->GetGroup())
+        if (group->GetTargetIcon(7) != boss->GetGUID())
+            group->SetTargetIcon(7, bot->GetGUID(), boss->GetGUID());
 
     bot->SetTarget(boss->GetGUID());
     // Check if the bot is targeting a valid boss before teleporting
@@ -928,6 +936,10 @@ bool IccRotfaceGroupPositionAction::Execute(Event event)
                     float moveX = boss->GetPositionX() + (moveDistance * cos(angle));
                     float moveY = boss->GetPositionY() + (moveDistance * sin(angle));
                     
+                    // Check if position is in LoS before moving
+                    if (!bot->IsWithinLOS(moveX, moveY, boss->GetPositionZ()))
+                        return false;
+                    
                     return MoveTo(boss->GetMapId(), moveX, moveY, boss->GetPositionZ(), 
                         false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
                 }
@@ -943,6 +955,12 @@ bool IccRotfaceGroupPositionAction::Execute(Event event)
     {
         if (bot->GetExactDist2d(ICC_ROTFACE_BIG_OOZE_POSITION) > 3.0f)
         {
+            // Check if position is in LoS before moving
+            if (!bot->IsWithinLOS(ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionX(),
+                ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionY(),
+                ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionZ()))
+                return false;
+
             return MoveTo(bot->GetMapId(), ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionX(),
                         ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionY(), ICC_ROTFACE_BIG_OOZE_POSITION.GetPositionZ(),
                         false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
@@ -982,7 +1000,7 @@ bool IccRotfaceGroupPositionAction::Execute(Event event)
                 float distToCenter = bot->GetExactDist2d(ICC_ROTFACE_TANK_POSITION);
                 float moveDistance = (distToCenter > 25.0f) ? 2.0f : 3.0f;
                 // return MoveAway(closestMember, moveDistance);
-                return FleePosition(closestMember->GetPosition(), moveDistance);
+                return FleePosition(closestMember->GetPosition(), moveDistance, 250U);
             }
             
             return false;
@@ -1008,6 +1026,10 @@ bool IccRotfaceMoveAwayFromExplosionAction::Execute(Event event)
     float moveX = bot->GetPositionX() + 20.0f * cos(angle);
     float moveY = bot->GetPositionY() + 20.0f * sin(angle);
     float moveZ = bot->GetPositionZ();
+    
+    // Check if position is in LoS before moving
+    if (!bot->IsWithinLOS(moveX, moveY, moveZ))
+        return false;
     
     // Move to the position
     return MoveTo(bot->GetMapId(), moveX, moveY, moveZ,
@@ -1146,6 +1168,25 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
     if (botHasAura2 || botHasAura3)
         return false;
 
+    // Mark Volatile Ooze with skull if not already marked
+    if (Group* group = bot->GetGroup())
+    {
+        ObjectGuid skullGuid = group->GetTargetIcon(7); // 7 = skull
+        Unit* markedUnit = botAI->GetUnit(skullGuid);
+        
+        // Clear mark if current marked target is dead
+        if (markedUnit && !markedUnit->IsAlive())
+        {
+            group->SetTargetIcon(7, bot->GetGUID(), ObjectGuid::Empty);
+        }
+
+        // Mark new ooze if it exists and nothing is marked
+        if (ooze && ooze->IsAlive() && (!skullGuid || !markedUnit))
+        {
+            group->SetTargetIcon(7, bot->GetGUID(), ooze->GetGUID());
+        }
+    }
+
     // Check for aura on any group member
     Group* group = bot->GetGroup();
     if (!group)
@@ -1261,8 +1302,9 @@ bool IccPutricideGasCloudAction::Execute(Event event)
     if (!gasCloud)
         return false;
 
-    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
     Unit* volatileOoze = AI_VALUE2(Unit*, "find target", "volatile ooze");
+
+    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
     
     if(!botHasAura && volatileOoze)
         return false;
@@ -2208,7 +2250,13 @@ bool IccSisterSvalnaAction::Execute(Event event)
 
 bool IccValithriaPortalAction::Execute(Event event)
 {
-    if (!botAI->IsHeal(bot) || bot->getClass() == CLASS_DRUID || bot->HasAura(70766))
+    //Added movement for non healers, didnt want to make another action just for this
+    if (!botAI->IsHeal(bot))
+       return MoveTo(bot->GetMapId(), ICC_VDW_GROUP_POSITION.GetPositionX(), ICC_VDW_GROUP_POSITION.GetPositionY(), ICC_VDW_GROUP_POSITION.GetPositionZ(),
+                     false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
+
+    //Portal action
+    if (!botAI->IsHeal(bot) || bot->HasAura(70766))
         return false;
 
     // Find the nearest portal
@@ -2248,6 +2296,9 @@ bool IccValithriaPortalAction::Execute(Event event)
 bool IccValithriaHealAction::Execute(Event event)
 {
     if (!botAI->IsHeal(bot))
+        return false;
+
+    if (bot->GetHealthPct() < 50.0f)
         return false;
 
     if (!bot->HasAura(70766)) //dream state
@@ -2731,7 +2782,7 @@ bool IccSindragosaBlisteringColdAction::Execute(Event event)
             float moveY = bot->GetPositionY() + dirY * STEP_SIZE;
 
             return MoveTo(bot->GetMapId(), moveX, moveY, bot->GetPositionZ(),
-                         false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                         false, false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
         }
     }
     return false;
@@ -2886,14 +2937,14 @@ bool IccSindragosaFrostBombAction::Execute(Event event)
     if (bot->GetDistance2d(posX, posY) > 2.0f)
     {
     return MoveTo(bot->GetMapId(), posX, posY, posZ,
-                 false, false, false, false, MovementPriority::MOVEMENT_FORCED);
+                 false, false, false, true, MovementPriority::MOVEMENT_FORCED);
     }
 
     // Check if we have LOS to marker from our position
     if (!marker->IsWithinLOS(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()))
         return true; // Stay in position using tomb for LOS
 
-    return true;
+    return false;
 }
 
 bool IccLichKingShadowTrapAction::Execute(Event event)
