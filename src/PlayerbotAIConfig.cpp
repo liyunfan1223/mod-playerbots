@@ -684,12 +684,7 @@ void PlayerbotAIConfig::loadWorldBuff(uint32 factionId, uint32 classId, uint32 s
 
     const std::vector<KeyPattern> patterns =
     {
-        // Most specific to least specific
         {"AiPlayerbot.WorldBuff.%u.%u.%u.%u.%u", true},  // Always check full key
-        {"AiPlayerbot.WorldBuff.%u.%u.%u",       (minLevel == 1 && maxLevel == MAX_LEVEL)},  // Fallback: all levels
-        {"AiPlayerbot.WorldBuff.%u.%u",          (specId == 0)},  // Fallback: all specs
-        {"AiPlayerbot.WorldBuff.%u",             (classId == 0)},  // Fallback: all classes
-        {"AiPlayerbot.WorldBuff",                (factionId == 0)}  // Global fallback
     };
 
     for (const auto& p : patterns)
