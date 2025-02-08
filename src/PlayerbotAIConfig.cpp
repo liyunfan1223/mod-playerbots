@@ -674,88 +674,38 @@ void PlayerbotAIConfig::log(std::string const fileName, char const* str, ...)
     fflush(stdout);
 }
 
-void PlayerbotAIConfig::loadWorldBuff(uint32 factionId1, uint32 classId1, uint32 specId1, uint32 minLevel1, uint32 maxLevel1)
+void PlayerbotAIConfig::loadWorldBuff(uint32 factionId, uint32 classId, uint32 specId, uint32 minLevel, uint32 maxLevel)
 {
-    std::vector<uint32> buffs;
-
-    std::ostringstream os;
-    os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1 << "." << maxLevel1;
-
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-    for (auto buff : buffs)
+    struct KeyPattern
     {
-        worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-        worldBuffs.push_back(wb);
-    }
+        std::string format;
+        bool condition;
+    };
 
-    if (maxLevel1 == 0)
+    const std::vector<KeyPattern> patterns =
     {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1;
+        // Most specific to least specific
+        {"AiPlayerbot.WorldBuff.%u.%u.%u.%u.%u", true},  // Always check full key
+        {"AiPlayerbot.WorldBuff.%u.%u.%u",       (minLevel == 1 && maxLevel == MAX_LEVEL)},  // Fallback: all levels
+        {"AiPlayerbot.WorldBuff.%u.%u",          (specId == 0)},  // Fallback: all specs
+        {"AiPlayerbot.WorldBuff.%u",             (classId == 0)},  // Fallback: all classes
+        {"AiPlayerbot.WorldBuff",                (factionId == 0)}  // Global fallback
+    };
 
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
+    for (const auto& p : patterns)
+    {
+        if (!p.condition)
+            continue;
 
-        for (auto buff : buffs)
+        char buffer[256];
+        snprintf(buffer, sizeof(buffer), p.format.c_str(), factionId, classId, specId, minLevel, maxLevel);
+
+        std::vector<uint32> buffs;
+        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(buffer, "", false), buffs);
+
+        for (uint32 buff : buffs)
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (maxLevel1 == 0 && minLevel1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1 << "." << specId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (factionId1 == 0 && classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff";
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            worldBuffs.push_back({buff, factionId, classId, specId, minLevel, maxLevel});
         }
     }
 }
