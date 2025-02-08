@@ -427,7 +427,6 @@ bool PlayerbotAIConfig::Initialize()
                     {
                         loadWorldBuff(factionId, classId, specId, minLevel, maxLevel);
                     }
-                    loadWorldBuff(factionId, classId, specId, minLevel, 0);
                 }
             }
         }
