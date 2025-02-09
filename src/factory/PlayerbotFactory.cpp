@@ -1021,13 +1021,13 @@ void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_templa
     {
         InitTalentsByTemplate(specTab);
     }
-    // always use template now
-    // else
-    // {
-    //     InitTalents(specTab);
-    //     if (bot->GetFreeTalentPoints())
-    //         InitTalents((specTab + 1) % 3);
-    // }
+    // if LimitTalentsExpansion = 1 there may be unused talent points
+    if (bot->GetFreeTalentPoints())
+        InitTalents((specTab + 1) % 3);
+
+    if (bot->GetFreeTalentPoints())
+        InitTalents((specTab + 2) % 3);
+    
     bot->SendTalentsInfoData(false);
 }
 
@@ -2620,6 +2620,12 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
         for (std::vector<uint32>& p : sPlayerbotAIConfig->parsedSpecLinkOrder[cls][specIndex][level])
         {
             uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
+            if (sPlayerbotAIConfig->limitTalentsExpansion && bot->GetLevel() <= 60 && (row > 6 || (row == 6 && col != 1)))
+                continue;
+
+            if (sPlayerbotAIConfig->limitTalentsExpansion && bot->GetLevel() <= 70 && (row > 8 || (row == 8 && col != 1)))
+                continue;
+
             uint32 talentID = 0;
             uint32 learnLevel = 0;
             std::vector<TalentEntry const*>& spells = spells_row[row];
@@ -3222,6 +3228,12 @@ void PlayerbotFactory::InitGlyphs(bool increment)
                 bot->SetGlyph(slotIndex, 0, true);
             }
         }
+    }
+
+    if (sPlayerbotAIConfig->limitTalentsExpansion && bot->GetLevel() <= 70)
+    {
+        bot->SendTalentsInfoData(false);
+        return;
     }
 
     uint32 level = bot->GetLevel();

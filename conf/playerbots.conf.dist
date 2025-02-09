@@ -529,6 +529,11 @@ AiPlayerbot.RandomBotHordeRatio = 50
 # Disable death knight for bots login
 AiPlayerbot.DisableDeathKnightLogin = 0
 
+# Enable expansion limitation for talents and glyphs - ie: level <= 60 bot only uses talents
+# available in vanilla, level <= 70 bot only uses talents available in TBC)
+# Default: 0
+AiPlayerbot.LimitTalentsExpansion = 0
+
 #
 #
 #
