@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `ai_playerbot_texts` (
 INSERT INTO `ai_playerbot_texts` (`name`, `text`, `say_type`, `reply_type`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES
 
 -- Updated Chatter Text over 900 lines added by https://github.com/AzoraNova on 12 jan 2025
+-- Translated Chatter Text to German by https://github.com/Raz0r1337 on 10 feb 2025
 
 -- strings
 ('string_unknown_area', 'the middle of nowhere', 0, 0, '', 'au milieu de nulle part', 'Mitten im Nirgendwo', '', '', '', '', ''),
