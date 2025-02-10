@@ -140,17 +140,18 @@ bool CheckMountStateAction::isUseful()
     if (bot->GetLevel() < sPlayerbotAIConfig->useGroundMountAtMinLevel)
         return false;
 
-    // Do not use when carrying BG Flags
-    if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
-        return false;
-
     // Allow mounting while transformed only if the form allows it
     if (bot->HasAuraType(SPELL_AURA_TRANSFORM) && bot->IsInDisallowedMountForm())
         return false;
 
-    // Only mount if BG starts in less than 30 sec
+    // BG Logic
     if (bot->InBattleground())
     {
+        // Do not use when carrying BG Flags
+        if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
+            return false;
+
+        // Only mount if BG starts in less than 30 sec
         if (Battleground* bg = bot->GetBattleground())
             if (bg->GetStatus() == STATUS_WAIT_JOIN && bg->GetStartDelayTime() > BG_START_DELAY_30S)
                 return false;
