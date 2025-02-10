@@ -236,13 +236,14 @@ bool CheckMountStateAction::ShouldDismountForMaster(Player* master) const
 
 int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master, const MountData& mountData) const
 {
+    // Check riding skill and level requirements
     int32 ridingSkill = bot->GetPureSkillValue(SKILL_RIDING);
     int32 botLevel = bot->GetLevel();
 
     if (ridingSkill <= 75 && botLevel < static_cast<int32>(sPlayerbotAIConfig->useFastGroundMountAtMinLevel))
         return 59;
 
-     // If there is a master and bot not in BG, use master's aura effects.
+    // If there is a master and bot not in BG, use master's aura effects.
     if (master && !bot->InBattleground())
     {
         auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
