@@ -400,6 +400,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     {
         std::vector<uint32> botAccounts;
         std::vector<uint32> botFriends;
+
         uint32 totalAccountCount = (sPlayerbotAIConfig->maxRandomBots / 10) + sPlayerbotAIConfig->addClassAccountPoolSize;
         for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
         {
