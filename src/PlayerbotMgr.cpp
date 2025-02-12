@@ -31,6 +31,7 @@
 #include "WorldSession.h"
 #include "ChannelMgr.h"
 #include "BroadcastHelper.h"
+#include "PlayerbotDbStore.h"
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
 class PlayerbotLoginQueryHolder : public LoginQueryHolder
@@ -487,9 +488,9 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
     else
     {
-        // botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
-        botAI->ResetStrategies();
+        botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
     }
+    sPlayerbotDbStore->Load(botAI);
 
     if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {
