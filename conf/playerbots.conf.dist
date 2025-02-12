@@ -111,7 +111,6 @@ AiPlayerbot.MaxAddedBots = 40
 AiPlayerbot.AddClassCommand = 1
 
 # Set the addclass command account pool size
-# Addclass command uses a subset of accounts from RandomBotAccountCount
 AiPlayerbot.AddClassAccountPoolSize = 50
 
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
@@ -502,7 +501,7 @@ AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 # default: 0 (disable, the online bots are fixed)
 AiPlayerbot.EnableRotation = 0
 
-# Bots pool size for rotation (should be less than RandomBotAccountCount * 10)
+# Bots pool size for rotation (should be less than MaxRandomBots)
 AiPlayerbot.RotationPoolSize = 500
 
 AiPlayerbot.RandomBotMinLevel = 1
