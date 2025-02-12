@@ -15,7 +15,6 @@
 MountData CollectMountData(const Player* bot)
 {
     MountData data;
-    // Iterate once over the spell map. Finally, we won't torture your CPU as before.
     for (auto& entry : bot->GetSpellMap())
     {
         uint32 spellId = entry.first;
@@ -28,22 +27,12 @@ MountData CollectMountData(const Player* bot)
 
         int32 effect1 = spellInfo->Effects[1].BasePoints;
         int32 effect2 = spellInfo->Effects[2].BasePoints;
-        int32 speed = std::max(effect1, effect2);
 
-        // Check for swift mount criteria.
-        // Note: if the aura isn't the swift one, then a high speed qualifies; otherwise, we check the alternate threshold.
-        if ((speed > 59 && spellInfo->Effects[1].ApplyAuraName != SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ||
-            (speed > 149 && spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
-        {
-            data.swiftMount = true;
-        }
+        int32 speed = std::max(effect1, effect2);
 
         // Update max speed if appropriate.
         if (speed > data.maxSpeed)
-        {
-            // In BG, clamp max speed to 99 later; here we just store the maximum found.
-            data.maxSpeed = speed;
-        }
+            data.maxSpeed = speed;  // In BG, clamp max speed to 99 later; here we just store the maximum found.
 
         // Determine index: flight if either effect has flight aura or specific mount ID.
         uint32 index = (spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
@@ -115,25 +104,10 @@ bool CheckMountStateAction::Execute(Event event)
         return false;
     }
 
-    // If there is no master and bot not in BG
-    if (!master && !inBattleground)
-    {
-        if (!bot->IsMounted() && noAttackers && shouldMount && !bot->IsInCombat())
-            return Mount();
-    }
-
-    // If the bot is in BG
-    if (inBattleground && shouldMount && noAttackers && !bot->IsInCombat() && !bot->IsMounted())
-    {
-        // WSG Specific - Do not mount when carrying the flag
-        if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
-        {
-            if (bot->HasAura(23333) || bot->HasAura(23335))
-                return false;
-        }
-
+    // If there is no master or bot in BG
+    if ((!master || inBattleground) && !bot->IsMounted() &&
+        noAttackers && shouldMount && !bot->IsInCombat())
         return Mount();
-    }
 
     if (!bot->IsFlying() && shouldDismount && bot->IsMounted() &&
         (enemy || dps || (!noAttackers && bot->IsInCombat())))
@@ -166,17 +140,18 @@ bool CheckMountStateAction::isUseful()
     if (bot->GetLevel() < sPlayerbotAIConfig->useGroundMountAtMinLevel)
         return false;
 
-    // Do not use with BG Flags
-    if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
-        return false;
-
     // Allow mounting while transformed only if the form allows it
     if (bot->HasAuraType(SPELL_AURA_TRANSFORM) && bot->IsInDisallowedMountForm())
         return false;
 
-    // Only mount if BG starts in less than 30 sec
+    // BG Logic
     if (bot->InBattleground())
     {
+        // Do not use when carrying BG Flags
+        if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
+            return false;
+
+        // Only mount if BG starts in less than 30 sec
         if (Battleground* bg = bot->GetBattleground())
             if (bg->GetStatus() == STATUS_WAIT_JOIN && bg->GetStartDelayTime() > BG_START_DELAY_30S)
                 return false;
@@ -190,19 +165,16 @@ bool CheckMountStateAction::Mount()
     if (bot->isMoving())
         bot->StopMoving();
 
-    // If there is a master, we'll need to clear a few things before mounting.
     Player* master = GetMaster();
     botAI->RemoveShapeshift();
     botAI->RemoveAura("tree of life");
 
-    int32 masterSpeed = CalculateMasterMountSpeed(master);
-    MountData mountData = CollectMountData(bot);  // One pass for all mount info.
-    bool hasSwiftMount = mountData.swiftMount;
+    MountData mountData = CollectMountData(bot);
+    int32 masterSpeed = CalculateMasterMountSpeed(master, mountData);
 
     if (TryPreferredMount(master))
         return true;
 
-    // Cache the spells for the mount type using our freshly collected data.
     int32 masterMountType = GetMountType(master);
     auto spellsIt = mountData.allSpells.find(masterMountType);
     if (spellsIt != mountData.allSpells.end())
@@ -262,12 +234,12 @@ bool CheckMountStateAction::ShouldDismountForMaster(Player* master) const
     return !isMasterMounted && bot->IsMounted();
 }
 
-int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
+int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master, const MountData& mountData) const
 {
+    // Check riding skill and level requirements
     int32 ridingSkill = bot->GetPureSkillValue(SKILL_RIDING);
     int32 botLevel = bot->GetLevel();
 
-    // Check riding skill and level requirements
     if (ridingSkill <= 75 && botLevel < static_cast<int32>(sPlayerbotAIConfig->useFastGroundMountAtMinLevel))
         return 59;
 
@@ -289,16 +261,34 @@ int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
     }
     else
     {
-        // Bots on their own: use our cached mount data to avoid iterating again.
-        MountData data = CollectMountData(bot);
-        int32 speed = data.maxSpeed;
-        // Ensure max speed of 99 in BG if necessary.
+        // Bots on their own.
+        int32 speed = mountData.maxSpeed;
         if (bot->InBattleground() && speed > 99)
             return 99;
+
         return speed;
     }
 
     return 59;
+}
+
+uint32 CheckMountStateAction::GetMountType(Player* master) const
+{
+    if (!master)
+        return 0;
+
+    auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
+
+    if (!auraEffects.empty())
+    {
+        SpellInfo const* masterSpell = auraEffects.front()->GetSpellInfo();
+        return (masterSpell->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
+                masterSpell->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ? 1 : 0;
+    }
+    else if (masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC)
+        return 1;
+
+    return 0;
 }
 
 bool CheckMountStateAction::TryPreferredMount(Player* master) const
@@ -341,25 +331,6 @@ bool CheckMountStateAction::TryPreferredMount(Player* master) const
         }
     }
     return false;
-}
-
-uint32 CheckMountStateAction::GetMountType(Player* master) const
-{
-    if (!master)
-        return 0;
-
-    auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
-
-    if (!auraEffects.empty())
-    {
-        SpellInfo const* masterSpell = auraEffects.front()->GetSpellInfo();
-        return (masterSpell->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
-                masterSpell->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ? 1 : 0;
-    }
-    else if (masterInShapeshiftForm == FORM_FLIGHT || masterInShapeshiftForm == FORM_FLIGHT_EPIC)
-        return 1;
-
-    return 0;
 }
 
 bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::vector<uint32>>& spells, int32 masterSpeed) const
