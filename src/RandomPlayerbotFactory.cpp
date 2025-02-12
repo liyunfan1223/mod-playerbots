@@ -400,8 +400,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     {
         std::vector<uint32> botAccounts;
         std::vector<uint32> botFriends;
-
-        uint32 totalAccountCount = (sPlayerbotAIConfig->maxRandomBots / 10) + sPlayerbotAIConfig->addClassAccountPoolSize;
+        uint32 totalAccountCount = (sPlayerbotAIConfig->maxRandomBots / 10) + sPlayerbotAIConfig->addClassAccountPoolSize +1;
         for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
         {
             std::ostringstream out;
@@ -441,7 +440,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     LOG_INFO("playerbots", "Creating random bot accounts...");
     std::unordered_map<NameRaceAndGender, std::vector<std::string>> nameCache;
-    uint32 totalAccountCount = (sPlayerbotAIConfig->maxRandomBots / 10) + sPlayerbotAIConfig->addClassAccountPoolSize;
+    uint32 totalAccountCount = (sPlayerbotAIConfig->maxRandomBots / 10) + sPlayerbotAIConfig->addClassAccountPoolSize +1;
     std::vector<std::future<void>> account_creations;
     int account_creation = 0;
 
@@ -547,7 +546,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
         
         LOG_DEBUG("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1,
-            (sPlayerbotAIConfig->maxRandomBots / 10) + sPlayerbotAIConfig->addClassAccountPoolSize);
+            (sPlayerbotAIConfig->maxRandomBots / 10) + sPlayerbotAIConfig->addClassAccountPoolSize +1);
         RandomPlayerbotFactory factory(accountId);
 
         WorldSession* session = new WorldSession(accountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
