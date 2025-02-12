@@ -502,7 +502,7 @@ AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 AiPlayerbot.EnableRotation = 0
 
 # Bots pool size for rotation (should be less than MaxRandomBots)
-AiPlayerbot.RotationPoolSize = 500
+AiPlayerbot.RotationPoolSize = 20
 
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
