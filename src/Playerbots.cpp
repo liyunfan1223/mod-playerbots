@@ -98,6 +98,17 @@ public:
             sPlayerbotsMgr->AddPlayerbotData(player, false);
             sRandomPlayerbotMgr->OnPlayerLogin(player);
 
+            // Before modifying the following messages, please make sure it does not violate the AGPLv3.0 license
+            // especially if you are distributing a repack or hosting a public server
+            // e.g. you can replace the URL with your own repository,
+            // but it should be publicly accessible and include all modifications you've made
+            if (sPlayerbotAIConfig->enabled)
+            {
+                ChatHandler(player->GetSession()).SendSysMessage(
+                    "|cff00ff00Playerbots:|r This server runs with |cff00ccffmod-playerbots|r "
+                    "|cffcccccchttps://github.com/liyunfan1223/mod-playerbots|r");
+            }
+
             if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
             {
                 std::string roundedTime =
@@ -105,7 +116,8 @@ public:
                 roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
 
                 ChatHandler(player->GetSession()).SendSysMessage(
-                    "Playerbots: bot initialization at server startup takes about '" + roundedTime + "' minutes.");
+                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '" 
+                    + roundedTime + "' minutes.");
             }
         }
     }
@@ -244,8 +256,23 @@ public:
 
     void OnBeforeWorldInitialized() override
     {
-        uint32 oldMSTime = getMSTime();
+        // Before modifying the following messages, please make sure it does not violate the AGPLv3.0 license
+        // especially if you are distributing a repack or hosting a public server
+        // e.g. you can replace the URL with your own repository,
+        // but it should be publicly accessible and include all modifications you've made
+        LOG_INFO("server.loading", "============================================================");
+        LOG_INFO("server.loading", "||                                                        ||");
+        LOG_INFO("server.loading", "||             AzerothCore Playerbots Module              ||");
+        LOG_INFO("server.loading", "||                                                        ||");
+        LOG_INFO("server.loading", "============================================================");
+        LOG_INFO("server.loading", "||    mod-playerbots is a community-driven open-source    ||");
+        LOG_INFO("server.loading", "|| project based on AzerothCore, licensed under AGPLv3.0  ||");
+        LOG_INFO("server.loading", "============================================================");
+        LOG_INFO("server.loading", "||     https://github.com/liyunfan1223/mod-playerbots     ||");
+        LOG_INFO("server.loading", "============================================================");
 
+        uint32 oldMSTime = getMSTime();
+        
         LOG_INFO("server.loading", " ");
         LOG_INFO("server.loading", "Load Playerbots Config...");
 
