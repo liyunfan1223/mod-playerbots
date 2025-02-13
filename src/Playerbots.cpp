@@ -105,7 +105,7 @@ public:
             if (sPlayerbotAIConfig->enabled)
             {
                 ChatHandler(player->GetSession()).SendSysMessage(
-                    "|cff00ff00Playerbots:|r This server runs with |cff00ccffmod-playerbots|r "
+                    "|cff00ff00This server runs with |cff00ccffmod-playerbots|r "
                     "|cffcccccchttps://github.com/liyunfan1223/mod-playerbots|r");
             }
 
