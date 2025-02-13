@@ -48,12 +48,3 @@ bool TreeFormTrigger::IsActive() { return !botAI->HasAura(33891, bot); }
 
 bool CatFormTrigger::IsActive() { return !botAI->HasAura("cat form", bot); }
 
-bool GiftOfTheWildTrigger::IsActive() 
-{ 
-    BuffTrigger::IsActive() && !botAI->HasAura("mark of the wild", GetTarget()); 
-}
-
-bool GiftOfTheWildOnPartyTrigger::IsActive() 
-{ 
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("mark of the wild", GetTarget()); 
-}
