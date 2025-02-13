@@ -91,6 +91,8 @@ public:
         creators["rake"] = &DruidTriggerFactoryInternal::rake;
         creators["mark of the wild"] = &DruidTriggerFactoryInternal::mark_of_the_wild;
         creators["mark of the wild on party"] = &DruidTriggerFactoryInternal::mark_of_the_wild_on_party;
+        creators["gift of the wild"] = &DruidTriggerFactoryInternal::gift_of_the_wild;
+        creators["gift of the wild on party"] = &DruidTriggerFactoryInternal::gift_of_the_wild_on_party;
         creators["cure poison"] = &DruidTriggerFactoryInternal::cure_poison;
         creators["party member cure poison"] = &DruidTriggerFactoryInternal::party_member_cure_poison;
         creators["entangling roots"] = &DruidTriggerFactoryInternal::entangling_roots;
@@ -129,6 +131,8 @@ private:
     static Trigger* rake(PlayerbotAI* botAI) { return new RakeTrigger(botAI); }
     static Trigger* mark_of_the_wild(PlayerbotAI* botAI) { return new MarkOfTheWildTrigger(botAI); }
     static Trigger* mark_of_the_wild_on_party(PlayerbotAI* botAI) { return new MarkOfTheWildOnPartyTrigger(botAI); }
+    static Trigger* gift_of_the_wild(PlayerbotAI* botAI) { return new GiftOfTheWildTrigger(botAI); }
+    static Trigger* gift_of_the_wild_on_party(PlayerbotAI* botAI) { return new GiftOfTheWildOnPartyTrigger(botAI); }
     static Trigger* cure_poison(PlayerbotAI* botAI) { return new CurePoisonTrigger(botAI); }
     static Trigger* party_member_cure_poison(PlayerbotAI* botAI) { return new PartyMemberCurePoisonTrigger(botAI); }
     static Trigger* entangling_roots(PlayerbotAI* botAI) { return new EntanglingRootsTrigger(botAI); }
@@ -204,6 +208,8 @@ public:
         creators["savage roar"] = &DruidAiObjectContextInternal::savage_roar;
         creators["mark of the wild"] = &DruidAiObjectContextInternal::mark_of_the_wild;
         creators["mark of the wild on party"] = &DruidAiObjectContextInternal::mark_of_the_wild_on_party;
+        creators["gift of the wild"] = &DruidAiObjectContextInternal::gift_of_the_wild;
+        creators["gift of the wild on party"] = &DruidAiObjectContextInternal::gift_of_the_wild_on_party;
         creators["regrowth"] = &DruidAiObjectContextInternal::regrowth;
         creators["rejuvenation"] = &DruidAiObjectContextInternal::rejuvenation;
         creators["healing touch"] = &DruidAiObjectContextInternal::healing_touch;
@@ -292,6 +298,8 @@ private:
     static Action* savage_roar(PlayerbotAI* botAI) { return new CastSavageRoarAction(botAI); }
     static Action* mark_of_the_wild(PlayerbotAI* botAI) { return new CastMarkOfTheWildAction(botAI); }
     static Action* mark_of_the_wild_on_party(PlayerbotAI* botAI) { return new CastMarkOfTheWildOnPartyAction(botAI); }
+    static Action* gift_of_the_wild(PlayerbotAI* botAI) { return new CastGiftOfTheWildAction(botAI); }
+    static Action* gift_of_the_wild_on_party(PlayerbotAI* botAI) { return new CastGiftOfTheWildOnPartyAction(botAI); }
     static Action* regrowth(PlayerbotAI* botAI) { return new CastRegrowthAction(botAI); }
     static Action* rejuvenation(PlayerbotAI* botAI) { return new CastRejuvenationAction(botAI); }
     static Action* healing_touch(PlayerbotAI* botAI) { return new CastHealingTouchAction(botAI); }

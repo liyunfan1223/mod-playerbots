@@ -17,6 +17,19 @@ bool MarkOfTheWildTrigger::IsActive()
     return BuffTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget());
 }
 
+bool GiftOfTheWildOnPartyTrigger::IsActive()
+{
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget()) &&
+           botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
+           botAI->GetBuffedCount((Player*)GetTarget(), "gift of the wild") < 4 &&
+           !botAI->GetBuffedCount((Player*)GetTarget(), "mark of the wild");
+}
+
+bool GiftOfTheWildTrigger::IsActive()
+{
+    return BuffTrigger::IsActive() && !botAI->HasAura("mark of the wild", GetTarget());
+}
+
 bool ThornsOnPartyTrigger::IsActive()
 {
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("thorns", GetTarget());
@@ -34,3 +47,13 @@ bool BearFormTrigger::IsActive() { return !botAI->HasAnyAuraOf(bot, "bear form",
 bool TreeFormTrigger::IsActive() { return !botAI->HasAura(33891, bot); }
 
 bool CatFormTrigger::IsActive() { return !botAI->HasAura("cat form", bot); }
+
+bool GiftOfTheWildTrigger::IsActive() 
+{ 
+    BuffTrigger::IsActive() && !botAI->HasAura("mark of the wild", GetTarget()); 
+}
+
+bool GiftOfTheWildOnPartyTrigger::IsActive() 
+{ 
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("mark of the wild", GetTarget()); 
+}
