@@ -17,11 +17,6 @@ void PlayerbotDbStore::Load(PlayerbotAI* botAI)
     stmt->SetData(0, guid);
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
-        botAI->ClearStrategies(BOT_STATE_COMBAT);
-        botAI->ClearStrategies(BOT_STATE_NON_COMBAT);
-        botAI->ChangeStrategy("+chat", BOT_STATE_COMBAT);
-        botAI->ChangeStrategy("+chat", BOT_STATE_NON_COMBAT);
-
         std::vector<std::string> values;
         do
         {
@@ -32,9 +27,17 @@ void PlayerbotDbStore::Load(PlayerbotAI* botAI)
             if (key == "value")
                 values.push_back(value);
             else if (key == "co")
+            {
+                botAI->ClearStrategies(BOT_STATE_COMBAT);
+                botAI->ChangeStrategy("+chat", BOT_STATE_COMBAT);
                 botAI->ChangeStrategy(value, BOT_STATE_COMBAT);
+            }
             else if (key == "nc")
+            {
+                botAI->ClearStrategies(BOT_STATE_NON_COMBAT);
+                botAI->ChangeStrategy("+chat", BOT_STATE_NON_COMBAT);
                 botAI->ChangeStrategy(value, BOT_STATE_NON_COMBAT);
+            }
             else if (key == "dead")
                 botAI->ChangeStrategy(value, BOT_STATE_DEAD);
         } while (result->NextRow());
@@ -48,6 +51,11 @@ void PlayerbotDbStore::Save(PlayerbotAI* botAI)
     ObjectGuid::LowType guid = botAI->GetBot()->GetGUID().GetCounter();
 
     Reset(botAI);
+
+    PlayerbotsDatabasePreparedStatement* deleteStatement =
+        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_DB_STORE);
+    deleteStatement->SetData(0, guid);
+    PlayerbotsDatabase.Execute(deleteStatement);
 
     std::vector<std::string> data = botAI->GetAiObjectContext()->Save();
     for (std::vector<std::string>::iterator i = data.begin(); i != data.end(); ++i)
