@@ -7,6 +7,7 @@
 #define _PLAYERBOT_HUNTERACTIONS_H
 
 #include "AiObject.h"
+#include "Event.h"
 #include "GenericSpellActions.h"
 
 class PlayerbotAI;
@@ -83,6 +84,27 @@ END_SPELL_ACTION()
 
 BEGIN_RANGED_SPELL_ACTION(CastTranquilizingShotAction, "tranquilizing shot")
 END_SPELL_ACTION()
+
+class CastDisengageAction : public CastSpellAction
+{
+public:
+    CastDisengageAction(PlayerbotAI* botAI): CastSpellAction(botAI, "disengage") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class CastImmolationTrapAction : public CastSpellAction
+{
+public:
+    CastImmolationTrapAction(PlayerbotAI* botAI): CastSpellAction(botAI, "immolation trap") {}
+};
+
+class CastExplosiveTrapAction : public CastSpellAction
+{
+public:
+    CastExplosiveTrapAction(PlayerbotAI* botAI): CastSpellAction(botAI, "explosive trap") {}
+};
 
 class CastAspectOfTheHawkAction : public CastBuffSpellAction
 {

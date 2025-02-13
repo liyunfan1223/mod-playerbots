@@ -5,12 +5,22 @@
 
 #include "HunterTriggers.h"
 
+#include "GenericSpellActions.h"
 #include "GenericTriggers.h"
 #include "HunterActions.h"
+#include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
+
+bool BlackArrowTrigger::IsActive()
+{
+    if (botAI->HasStrategy("trap weave", BOT_STATE_COMBAT))
+        return false;
+
+    return DebuffTrigger::IsActive();
+}
 
 bool HunterAspectOfTheHawkTrigger::IsActive()
 {

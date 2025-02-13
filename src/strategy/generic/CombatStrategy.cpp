@@ -75,9 +75,6 @@ NextAction** AvoidAoeStrategy::getDefaultActions()
 
 void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    // triggers.push_back(new TriggerNode(
-    //         "has area debuff",
-    //         NextAction::array(0, new NextAction("flee", ACTION_EMERGENCY + 5), NULL)));
 }
 
 void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

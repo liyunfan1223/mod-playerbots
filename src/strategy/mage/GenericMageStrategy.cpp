@@ -179,6 +179,9 @@ void GenericMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("fire ward", NextAction::array(0, new NextAction("fire ward", ACTION_EMERGENCY), nullptr)));
     triggers.push_back(
         new TriggerNode("frost ward", NextAction::array(0, new NextAction("frost ward", ACTION_EMERGENCY), nullptr)));
+        
+        triggers.push_back(new TriggerNode("enemy too close for spell",
+            NextAction::array(0, new NextAction("blink back", ACTION_MOVE + 5), nullptr)));
 }
 
 void MageCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

@@ -25,6 +25,7 @@ public:
         creators["boost"] = &HunterStrategyFactoryInternal::boost;
         creators["pet"] = &HunterStrategyFactoryInternal::pet;
         creators["cc"] = &HunterStrategyFactoryInternal::cc;
+        creators["trap weave"] = &HunterStrategyFactoryInternal::trap_weave;
     }
 
 private:
@@ -35,6 +36,7 @@ private:
     static Strategy* boost(PlayerbotAI* botAI) { return new HunterBoostStrategy(botAI); }
     static Strategy* pet(PlayerbotAI* botAI) { return new HunterPetStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new HunterCcStrategy(botAI); }
+    static Strategy* trap_weave(PlayerbotAI* botAI) { return new HunterTrapWeaveStrategy(botAI); }
 };
 
 class HunterBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -88,6 +90,7 @@ public:
         creators["misdirection on main tank"] = &HunterTriggerFactoryInternal::misdirection_on_main_tank;
         creators["tranquilizing shot enrage"] = &HunterTriggerFactoryInternal::remove_enrage;
         creators["tranquilizing shot magic"] = &HunterTriggerFactoryInternal::remove_magic;
+        creators["immolation trap no cd"] = &HunterTriggerFactoryInternal::immolation_trap_no_cd;
     }
 
 private:
@@ -122,6 +125,7 @@ private:
     static Trigger* misdirection_on_main_tank(PlayerbotAI* ai) { return new MisdirectionOnMainTankTrigger(ai); }
     static Trigger* remove_enrage(PlayerbotAI* ai) { return new TargetRemoveEnrageTrigger(ai); }
     static Trigger* remove_magic(PlayerbotAI* ai) { return new TargetRemoveMagicTrigger(ai); }
+    static Trigger* immolation_trap_no_cd(PlayerbotAI* ai) { return new ImmolationTrapNoCdTrigger(ai); }
 };
 
 class HunterAiObjectContextInternal : public NamedObjectContext<Action>
@@ -176,6 +180,9 @@ public:
         creators["kill shot"] = &HunterAiObjectContextInternal::kill_shot;
         creators["misdirection on main tank"] = &HunterAiObjectContextInternal::misdirection_on_main_tank;
         creators["silencing shot"] = &HunterAiObjectContextInternal::silencing_shot;
+        creators["disengage"] = &HunterAiObjectContextInternal::disengage;
+        creators["immolation trap"] = &HunterAiObjectContextInternal::immolation_trap;
+        creators["explosive trap"] = &HunterAiObjectContextInternal::explosive_trap;
     }
 
 private:
@@ -225,7 +232,9 @@ private:
     static Action* kill_shot(PlayerbotAI* ai) { return new CastKillShotAction(ai); }
     static Action* misdirection_on_main_tank(PlayerbotAI* ai) { return new CastMisdirectionOnMainTankAction(ai); }
     static Action* silencing_shot(PlayerbotAI* ai) { return new CastSilencingShotAction(ai); }
-    
+    static Action* disengage(PlayerbotAI* ai) { return new CastDisengageAction(ai); }
+    static Action* immolation_trap(PlayerbotAI* ai) { return new CastImmolationTrapAction(ai); }
+    static Action* explosive_trap(PlayerbotAI* ai) { return new CastExplosiveTrapAction(ai); }
 };
 
 HunterAiObjectContext::HunterAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
