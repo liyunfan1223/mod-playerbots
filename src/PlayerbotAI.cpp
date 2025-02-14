@@ -5346,12 +5346,9 @@ bool PlayerbotAI::CanMove()
     return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE;
 }
 
-bool PlayerbotAI::IsInRealGuild()
+bool PlayerbotAI::IsRealGuild(uint32 guildId)
 {
-    if (!bot->GetGuildId())
-        return false;
-
-    Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    Guild* guild = sGuildMgr->GetGuildById(guildId);
     if (!guild)
     {
         return false;
@@ -5361,6 +5358,14 @@ bool PlayerbotAI::IsInRealGuild()
         return false;
 
     return !(sPlayerbotAIConfig->IsInRandomAccountList(leaderAccount));
+}
+
+bool PlayerbotAI::IsInRealGuild()
+{
+    if (!bot->GetGuildId())
+        return false;
+
+    return IsRealGuild(bot->GetGuildId());
 }
 
 void PlayerbotAI::QueueChatResponse(const ChatQueuedReply chatReply) { chatReplies.push_back(std::move(chatReply)); }
