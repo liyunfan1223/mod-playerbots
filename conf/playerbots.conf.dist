@@ -81,13 +81,15 @@ AiPlayerbot.Enabled = 1
 # Enable random bot system
 AiPlayerbot.RandomBotAutologin = 1
 
-# Random bot account
-# Please ensure that RandomBotAccountCount is greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
-AiPlayerbot.RandomBotAccountCount = 200
-
 # Random bot count
 AiPlayerbot.MinRandomBots = 50
 AiPlayerbot.MaxRandomBots = 50
+
+# Random bot accounts
+# If you are not using any expansion at all, you may have to set this manually, then
+# please ensure that RandomBotAccountCount is at least greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
+# default: 0 - Automatic
+AiPlayerbot.RandomBotAccountCount = 0
 
 # Delete all random bot accounts (reset randombots)
 AiPlayerbot.DeleteRandomBotAccounts = 0
@@ -115,7 +117,6 @@ AiPlayerbot.MaxAddedBots = 40
 AiPlayerbot.AddClassCommand = 1
 
 # Set the addclass command account pool size
-# Addclass command uses a subset of accounts from RandomBotAccountCount
 AiPlayerbot.AddClassAccountPoolSize = 50
 
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
@@ -506,8 +507,8 @@ AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 # default: 0 (disable, the online bots are fixed)
 AiPlayerbot.EnableRotation = 0
 
-# Bots pool size for rotation (should be less than RandomBotAccountCount * 10)
-AiPlayerbot.RotationPoolSize = 500
+# Bots pool size for rotation (should be less than MaxRandomBots)
+AiPlayerbot.RotationPoolSize = 20
 
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
