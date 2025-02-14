@@ -393,34 +393,44 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
     return std::move(botName);
 }
 
+uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
+{
+    // Calculates the total number of required accounts, either using the specified randomBotAccountCount
+    // or determining it dynamically based on the WOTLK condition, max random bots, rotation pool size,
+    // and additional class account pool size.
+
+    // Checks if randomBotAccountCount is set, otherwise calculate it dynamically.
+    if (sPlayerbotAIConfig->randomBotAccountCount > 0)
+    {
+        return sPlayerbotAIConfig->randomBotAccountCount;
+    }
+
+    bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING;
+
+    // Determine divisor based on WOTLK condition
+    int divisor = isWOTLK ? 10 : 9;
+
+    // Calculate max bots or rotation pool size
+    int maxBotsOrRotation = std::max(
+        sPlayerbotAIConfig->maxRandomBots,
+        sPlayerbotAIConfig->enableRotation ? sPlayerbotAIConfig->rotationPoolSize : 0
+    );
+
+    // Calculate base accounts, add class account pool size, and add 1 as a fixed offset
+    uint32 baseAccounts = maxBotsOrRotation / divisor;
+    return baseAccounts + sPlayerbotAIConfig->addClassAccountPoolSize + 1;
+}
+
 void RandomPlayerbotFactory::CreateRandomBots()
 {
-    bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING;
     /* multi-thread here is meaningless? since the async db operations */
     if (sPlayerbotAIConfig->deleteRandomBotAccounts)
     {
         std::vector<uint32> botAccounts;
         std::vector<uint32> botFriends;
 
-        // Calculates the total number of required accounts, either using the specified randomBotAccountCount
-        // or determining it dynamically based on the WOTLK condition, max random bots, rotation pool size,
-        // and additional class account pool size,
-        uint32 totalAccountCount;
-        if (sPlayerbotAIConfig->randomBotAccountCount > 0)
-        {
-            totalAccountCount = sPlayerbotAIConfig->randomBotAccountCount;
-        }
-        else
-        {
-            int divisor = isWOTLK ? 10 : 9;
-            int maxBotsOrRotation = std::max(
-                sPlayerbotAIConfig->maxRandomBots,
-                sPlayerbotAIConfig->enableRotation ? sPlayerbotAIConfig->rotationPoolSize : 0
-            );
-
-            uint32 baseAccounts = maxBotsOrRotation / divisor;
-            totalAccountCount = baseAccounts + sPlayerbotAIConfig->addClassAccountPoolSize + 1;
-        }
+        // Calculates the total number of required accounts.
+        uint32 totalAccountCount = CalculateTotalAccountCount();
 
         for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
         {
@@ -464,25 +474,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
     std::vector<std::future<void>> account_creations;
     int account_creation = 0;
 
-    // Calculates the total number of required accounts, either using the specified randomBotAccountCount
-    // or determining it dynamically based on the WOTLK condition, max random bots, rotation pool size,
-    // and additional class account pool size,
-    uint32 totalAccountCount;
-    if (sPlayerbotAIConfig->randomBotAccountCount > 0)
-    {
-        totalAccountCount = sPlayerbotAIConfig->randomBotAccountCount;
-    }
-    else
-    {
-        int divisor = isWOTLK ? 10 : 9;
-        int maxBotsOrRotation = std::max(
-            sPlayerbotAIConfig->maxRandomBots,
-            sPlayerbotAIConfig->enableRotation ? sPlayerbotAIConfig->rotationPoolSize : 0
-        );
-
-        uint32 baseAccounts = maxBotsOrRotation / divisor;
-        totalAccountCount = baseAccounts + sPlayerbotAIConfig->addClassAccountPoolSize + 1;
-    }
+    // Calculates the total number of required accounts.
+    uint32 totalAccountCount = CalculateTotalAccountCount();
 
     for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
     {
