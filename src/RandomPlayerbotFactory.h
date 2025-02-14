@@ -60,6 +60,7 @@ private:
     static std::string const CreateRandomArenaTeamName();
 
     uint32 accountId;
+    static uint32 CalculateTotalAccountCount();
     static std::map<uint8, std::vector<uint8>> availableRaces;
 };
 
