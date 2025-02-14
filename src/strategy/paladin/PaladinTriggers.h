@@ -234,9 +234,50 @@ public:
     }
 };
 
+class BlessingOfSanctuaryOnPartyTrigger : public BuffTrigger
+{
+public:
+    BlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) 
+        : BuffTrigger(botAI, "blessing of sanctuary", 2 * 2000) {} // 每4秒检查一次
+};
+
+//greater blessing on party triggers
+class GreaterBlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of kings", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+class GreaterBlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI)
+        : BuffOnPartyTrigger(botAI, "greater blessing of might,greater blessing of wisdom", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+class GreaterBlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfMightOnPartyTrigger(PlayerbotAI* botAI)
+        : BuffOnPartyTrigger(botAI, "greater blessing of might,greater blessing of wisdom", 2 * 2000) {}
+        bool IsActive() override;
+};
+
+class GreaterBlessingOfSanctuaryOnPartyTrigger : public BuffTrigger
+{
+public:
+    GreaterBlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) 
+        : BuffTrigger(botAI, "greater blessing of sanctuary", 2 * 2000) {} // 每4秒检查一次
+    bool IsActive() override;
+};
+//
+
 class AvengingWrathTrigger : public BoostTrigger
 {
 public:
     AvengingWrathTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "avenging wrath") {}
 };
+
 #endif
