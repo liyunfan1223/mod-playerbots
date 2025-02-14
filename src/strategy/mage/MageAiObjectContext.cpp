@@ -94,6 +94,8 @@ public:
         creators["ice barrier"] = &MageTriggerFactoryInternal::ice_barrier;
         creators["arcane intellect"] = &MageTriggerFactoryInternal::arcane_intellect;
         creators["arcane intellect on party"] = &MageTriggerFactoryInternal::arcane_intellect_on_party;
+        creators["arcane brilliance"] = &MageTriggerFactoryInternal::arcane_brilliance;
+        creators["arcane brilliance on party"] = &MageTriggerFactoryInternal::arcane_brilliance_on_party;
         creators["mage armor"] = &MageTriggerFactoryInternal::mage_armor;
         creators["remove curse"] = &MageTriggerFactoryInternal::remove_curse;
         creators["remove curse on party"] = &MageTriggerFactoryInternal::remove_curse_on_party;
@@ -134,6 +136,8 @@ private:
     static Trigger* ice_barrier(PlayerbotAI* botAI) { return new IceBarrierTrigger(botAI); }
     static Trigger* arcane_intellect(PlayerbotAI* botAI) { return new ArcaneIntellectTrigger(botAI); }
     static Trigger* arcane_intellect_on_party(PlayerbotAI* botAI) { return new ArcaneIntellectOnPartyTrigger(botAI); }
+    static Trigger* arcane_brilliance(PlayerbotAI* botAI) { return new ArcaneBrillianceTrigger(botAI); }
+    static Trigger* arcane_brilliance_on_party(PlayerbotAI* botAI) { return new ArcaneBrillianceOnPartyTrigger(botAI); }
     static Trigger* mage_armor(PlayerbotAI* botAI) { return new MageArmorTrigger(botAI); }
     static Trigger* remove_curse(PlayerbotAI* botAI) { return new RemoveCurseTrigger(botAI); }
     static Trigger* remove_curse_on_party(PlayerbotAI* botAI) { return new PartyMemberRemoveCurseTrigger(botAI); }
@@ -168,6 +172,8 @@ public:
         creators["frost nova"] = &MageAiObjectContextInternal::frost_nova;
         creators["arcane intellect"] = &MageAiObjectContextInternal::arcane_intellect;
         creators["arcane intellect on party"] = &MageAiObjectContextInternal::arcane_intellect_on_party;
+        creators["arcane brilliance"] = &MageAiObjectContextInternal::arcane_brilliance;
+        creators["arcane brilliance on party"] = &MageAiObjectContextInternal::arcane_brilliance_on_party;
         creators["conjure water"] = &MageAiObjectContextInternal::conjure_water;
         creators["conjure food"] = &MageAiObjectContextInternal::conjure_food;
         creators["molten armor"] = &MageAiObjectContextInternal::molten_armor;
@@ -225,6 +231,8 @@ private:
     static Action* frost_nova(PlayerbotAI* botAI) { return new CastFrostNovaAction(botAI); }
     static Action* arcane_intellect(PlayerbotAI* botAI) { return new CastArcaneIntellectAction(botAI); }
     static Action* arcane_intellect_on_party(PlayerbotAI* botAI) { return new CastArcaneIntellectOnPartyAction(botAI); }
+    static Action* arcane_brilliance(PlayerbotAI* botAI) { return new CastArcaneBrillianceAction(botAI); }
+    static Action* arcane_brilliance_on_party(PlayerbotAI* botAI) { return new CastArcaneBrillianceOnPartyAction(botAI); }
     static Action* conjure_water(PlayerbotAI* botAI) { return new CastConjureWaterAction(botAI); }
     static Action* conjure_food(PlayerbotAI* botAI) { return new CastConjureFoodAction(botAI); }
     static Action* molten_armor(PlayerbotAI* botAI) { return new CastMoltenArmorAction(botAI); }
