@@ -253,7 +253,7 @@ class GreaterBlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     GreaterBlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "greater blessing of might,greater blessing of wisdom", 2 * 2000) {}
+        : BuffOnPartyTrigger(botAI, "greater blessing of wisdom", 2 * 2000) {}
     bool IsActive() override;
 };
 
@@ -261,7 +261,7 @@ class GreaterBlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     GreaterBlessingOfMightOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "greater blessing of might,greater blessing of wisdom", 2 * 2000) {}
+        : BuffOnPartyTrigger(botAI, "greater blessing of might", 2 * 2000) {}
         bool IsActive() override;
 };
 

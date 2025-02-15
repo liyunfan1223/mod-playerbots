@@ -160,45 +160,42 @@ public:
 };
 
 //greater blessing on paryt actions
-class CastGreaterBlessingOfKingsOnPartyAction : public BuffOnPartyAction
+class CastGreaterBlessingOfKingsOnPartyAction : public CastBlessingOnPartyAction
 {
 public:
     CastGreaterBlessingOfKingsOnPartyAction(PlayerbotAI* botAI) 
-        : BuffOnPartyAction(botAI, "greater blessing of kings") {}
-
-    std::string const getName() override { return "greater blessing of kings on party"; }
-    bool Execute(Event event) override;
+        : CastBlessingOnPartyAction(botAI, "greater blessing of kings") 
+    {
+    }
 };
 
-class CastGreaterBlessingOfSanctuaryOnPartyAction : public BuffOnPartyAction
-{
-public:
-    CastGreaterBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) 
-        : BuffOnPartyAction(botAI, "greater blessing of sanctuary") {}
-
-    std::string const getName() override { return "greater blessing of sanctuary on party"; }
-    bool Execute(Event event) override;
-};
-
-class CastGreaterBlessingOfMightOnPartyAction : public BuffOnPartyAction
+class CastGreaterBlessingOfMightOnPartyAction : public CastBlessingOnPartyAction
 {
 public:
     CastGreaterBlessingOfMightOnPartyAction(PlayerbotAI* botAI) 
-        : BuffOnPartyAction(botAI, "greater blessing of might") {}
-
-    std::string const getName() override { return "greater blessing of might on party"; }
-    bool Execute(Event event) override;
+        : CastBlessingOnPartyAction(botAI, "greater blessing of might") 
+    {
+    }
 };
 
-class CastGreaterBlessingOfWisdomOnPartyAction : public BuffOnPartyAction
+class CastGreaterBlessingOfWisdomOnPartyAction : public CastBlessingOnPartyAction
 {
 public:
     CastGreaterBlessingOfWisdomOnPartyAction(PlayerbotAI* botAI) 
-        : BuffOnPartyAction(botAI, "greater blessing of wisdom") {}
-
-    std::string const getName() override { return "greater blessing of wisdom on party"; }
-    bool Execute(Event event) override;
+        : CastBlessingOnPartyAction(botAI, "greater blessing of wisdom") 
+    {
+    }
 };
+
+class CastGreaterBlessingOfSanctuaryOnPartyAction : public CastBlessingOnPartyAction
+{
+public:
+    CastGreaterBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) 
+        : CastBlessingOnPartyAction(botAI, "greater blessing of sanctuary") 
+    {
+    }
+};
+
 //end
 class CastHolyLightAction : public CastHealingSpellAction
 {
