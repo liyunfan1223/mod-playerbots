@@ -25,11 +25,22 @@ WorldPosition::WorldPosition(std::string const str)
     std::vector<std::string> tokens = split(str, '|');
     if (tokens.size() == 5)
     {
-        m_mapId = std::stoi(tokens[0]);
-        m_positionX = std::stof(tokens[1]);
-        m_positionY = std::stof(tokens[2]);
-        m_positionZ = std::stof(tokens[3]);
-        m_orientation = std::stof(tokens[4]);
+        try
+        {
+            m_mapId = std::stoi(tokens[0]);
+            m_positionX = std::stof(tokens[1]);
+            m_positionY = std::stof(tokens[2]);
+            m_positionZ = std::stof(tokens[3]);
+            m_orientation = std::stof(tokens[4]);
+        }
+        catch (const std::exception&)
+        {
+            m_mapId = 0;
+            m_positionX = 0.0f;
+            m_positionY = 0.0f;
+            m_positionZ = 0.0f;
+            m_orientation = 0.0f;
+        }
     }
 }
 
