@@ -80,6 +80,7 @@ public:
         : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 2 * 2000)
     {
     }
+
 };
 
 class BlessingTrigger : public BuffTrigger
