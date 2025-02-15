@@ -29,173 +29,179 @@ bool CrusaderAuraTrigger::IsActive()
 bool BlessingTrigger::IsActive()
 {
     Unit* target = GetTarget();
+    Group* group = botAI->GetBot()->GetGroup();
+    if ((!group || !botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget())) && !group->isRaidGroup()) 
+    {
+        return false; // // 同一小队，否则不触发
+    }
     return SpellTrigger::IsActive() && !botAI->HasAnyAuraOf(target, "blessing of might", "blessing of wisdom",
                                                             "blessing of kings", "blessing of sanctuary", nullptr);
 }
 
 //greater blessing on party triggers
-bool GreaterBlessingOfKingsOnPartyTrigger::IsActive()
+//add function
+inline bool IsPaladinSelectedForBlessing(ObjectGuid botGUID, const std::string& blessingName)
 {
-    Player* bot = botAI->GetBot(); // 获取当前角色
-    Group* group = bot->GetGroup(); // 获取当前组
-    if (!group || !group->isRaidGroup()) // 检查是否为团队
+    if (blessingName.empty())
+        return false;
+
+    Player* bot = ObjectAccessor::FindPlayer(botGUID);
+    if (!bot)
+        return false;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    std::vector<Player*> selectedPaladins;
+    std::set<Player*> visitedPaladins;
+
+    for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
     {
-        return false; // 不在团队中，不触发
+        Player* member = groupRef->GetSource();
+        if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member))
+            continue;
+
+        BotRoles role = AiFactory::GetPlayerRoles(member);
+        if (role == BOT_ROLE_TANK)
+            selectedPaladins.push_back(member);
+        else
+            selectedPaladins.insert(selectedPaladins.begin(), member);
+
+        visitedPaladins.insert(member);
+
+        if (selectedPaladins.size() >= 4)
+            break;
     }
 
-    Unit* target = GetTarget(); // 获取目标单位
-    if (!target)
+    size_t paladinOrder = 0;
+    for (size_t i = 0; i < selectedPaladins.size(); ++i)
     {
-        return false; // 目标不存在，不触发
+        if (selectedPaladins[i]->GetGUID() == botGUID)
+        {
+            paladinOrder = i + 1;
+            break;
+        }
     }
 
-    // 定义需要检查的强化祝福名称
-    const std::string greaterBlessingOfKings = "greater blessing of kings";
-    const std::string greaterBlessingOfMight = "greater blessing of might";
-    const std::string greaterBlessingOfWisdom = "greater blessing of wisdom";
-    const std::string greaterBlessingOfSanctuary = "greater blessing of sanctuary";
+    if (paladinOrder == 0)
+        return false;
 
-    // 检查目标身上是否有任何来源的 Greater Blessing of Kings
-    if (botAI->HasAura(greaterBlessingOfKings, target, false, false, 1, false))
-    {
-        return false; // 目标身上有 Greater Blessing of Kings（无论来源），不触发
-    }
+    static const std::string BLESSING_KINGS = "greater blessing of kings";
+    static const std::string BLESSING_MIGHT = "greater blessing of might";
+    static const std::string BLESSING_WISDOM = "greater blessing of wisdom";
+    static const std::string BLESSING_SANCTUARY = "greater blessing of sanctuary";
 
-    // 检查目标身上是否有当前角色施加的其他强化祝福
-    if (botAI->HasAura(greaterBlessingOfMight, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfWisdom, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfSanctuary, target, false, true, 1, false))
-    {
-        return false; // 目标身上有当前角色施加的其他强化祝福，不触发
-    }
+    if (blessingName == BLESSING_KINGS && paladinOrder == 1)
+        return true;
+    else if (blessingName == BLESSING_MIGHT && paladinOrder == 2)
+        return true;
+    else if (blessingName == BLESSING_WISDOM && paladinOrder == 3)
+        return true;
+    else if (blessingName == BLESSING_SANCTUARY && paladinOrder == 4)
+        return true;
 
-    // 如果目标身上没有 Greater Blessing of Kings，且没有当前角色施加的其他强化祝福，触发
-    return true;
+    return false;
 }
 
+bool GreaterBlessingOfKingsOnPartyTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup() || !botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()))
+        return false;
+
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    if (!IsPaladinSelectedForBlessing(bot->GetGUID(), "greater blessing of kings"))
+        return false;
+
+    if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false))
+        return false;
+
+    if (botAI->HasAura("greater blessing of might", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false))
+        return false;
+
+    return true;
+}
 
 bool GreaterBlessingOfWisdomOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot(); // 获取当前角色
-    Group* group = bot->GetGroup(); // 获取当前组
-    if (!group || !group->isRaidGroup()) // 检查是否为团队
-    {
-        return false; // 不在团队中，不触发
-    }
+    Player* bot = botAI->GetBot();
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup() || !botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()))
+        return false;
 
-    Unit* target = GetTarget(); // 获取目标单位
+    Unit* target = GetTarget();
     if (!target)
-    {
-        return false; // 目标不存在，不触发
-    }
+        return false;
 
-    // 定义需要检查的强化祝福名称
-    const std::string greaterBlessingOfKings = "greater blessing of kings";
-    const std::string greaterBlessingOfMight = "greater blessing of might";
-    const std::string greaterBlessingOfWisdom = "greater blessing of wisdom";
-    const std::string greaterBlessingOfSanctuary = "greater blessing of sanctuary";
+    if (!IsPaladinSelectedForBlessing(bot->GetGUID(), "greater blessing of wisdom"))
+        return false;
 
-    // 检查目标身上是否有任何来源的 Greater Blessing of Wisdom
-    if (botAI->HasAura("greater" + GetActualBlessingOfWisdom(target), target, false, false, 1, false))
-    {
-        return false; // 目标身上有 Greater Blessing of Wisdom（无论来源），不触发
-    }
+    if (botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
+        return false;
 
-    // 检查目标身上是否有当前角色施加的其他强化祝福
-    if (botAI->HasAura(greaterBlessingOfKings, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfMight, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfSanctuary, target, false, true, 1, false))
-    {
-        return false; // 目标身上有当前角色施加的其他强化祝福，不触发
-    }
+    if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of might", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false))
+        return false;
 
-    // 如果目标身上没有 Greater Blessing of Wisdom，且没有当前角色施加的其他强化祝福，触发
     return true;
 }
 
-
 bool GreaterBlessingOfMightOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot(); // 获取当前角色
-    Group* group = bot->GetGroup(); // 获取当前组
-    if (!group || !group->isRaidGroup()) // 检查是否为团队
-    {
-        return false; // 不在团队中，不触发
-    }
+    Player* bot = botAI->GetBot();
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup() || !botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()))
+        return false;
 
-    Unit* target = GetTarget(); // 获取目标单位
+    Unit* target = GetTarget();
     if (!target)
-    {
-        return false; // 目标不存在，不触发
-    }
+        return false;
 
-    // 定义需要检查的强化祝福名称
-    const std::string greaterBlessingOfKings = "greater blessing of kings";
-    const std::string greaterBlessingOfMight = "greater blessing of might";
-    const std::string greaterBlessingOfWisdom = "greater blessing of wisdom";
-    const std::string greaterBlessingOfSanctuary = "greater blessing of sanctuary";
+    // 使用 std::string 对象作为参数
+    if (!IsPaladinSelectedForBlessing(bot->GetGUID(), std::string("greater blessing of might")))
+        return false;
 
-    // 检查目标身上是否有任何来源的 Greater Blessing of Might
-    if (botAI->HasAura("greater" + GetActualBlessingOfMight(target), target, false, false, 1, false))
-    {
-        return false; // 目标身上有 Greater Blessing of Might（无论来源），不触发
-    }
+    if (botAI->HasAura("greater blessing of might", target, false, true, 1, false))
+        return false;
 
-    // 检查目标身上是否有当前角色施加的其他强化祝福
-    if (botAI->HasAura(greaterBlessingOfKings, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfWisdom, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfSanctuary, target, false, true, 1, false))
-    {
-        return false; // 目标身上有当前角色施加的其他强化祝福，不触发
-    }
+    if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false))
+        return false;
 
-    // 如果目标身上没有 Greater Blessing of Might，且没有当前角色施加的其他强化祝福，触发
     return true;
 }
 
 bool GreaterBlessingOfSanctuaryOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot(); // 获取当前角色
-    Group* group = bot->GetGroup(); // 获取当前组
-    Unit* target = GetTarget(); // 获取目标单位
-    if (!target)
-    {
-        return false; // 目标不存在，不触发
-    }
-
-    if (!group || !group->isRaidGroup() || !botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget())) // 检查是否为团队
-    {
-        return false; // 不在团队中，不触发
-    }
-
-    // 使用 GetPlayerRoles 函数检查当前角色的天赋专精
-    BotRoles role = AiFactory::GetPlayerRoles(bot);
-    if (!(role & BOT_ROLE_TANK)) // 如果天赋不是坦克专精，则不触发
-    {
+    Player* bot = botAI->GetBot();
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup() || !botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()))
         return false;
-    }
 
-    // 定义需要检查的强化祝福名称
-    const std::string greaterBlessingOfKings = "greater blessing of kings";
-    const std::string greaterBlessingOfMight = "greater blessing of might";
-    const std::string greaterBlessingOfWisdom = "greater blessing of wisdom";
-    const std::string greaterBlessingOfSanctuary = "greater blessing of sanctuary";
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
 
-    // 检查目标身上是否有任何来源的 Greater Blessing of Sanctuary
-    if (botAI->HasAura(greaterBlessingOfSanctuary, target, false, false, 1, false))
-    {
-        return false; // 目标身上有 Greater Blessing of Sanctuary（无论来源），不触发
-    }
+    if (!IsPaladinSelectedForBlessing(bot->GetGUID(), "greater blessing of sanctuary"))
+        return false;
 
-    // 检查目标身上是否有当前角色施加的其他强化祝福
-    if (botAI->HasAura(greaterBlessingOfKings, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfMight, target, false, true, 1, false) ||
-        botAI->HasAura(greaterBlessingOfWisdom, target, false, true, 1, false))
-    {
-        return false; // 目标身上有当前角色施加的其他强化祝福，不触发
-    }
+    if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false))
+        return false;
 
-    // 如果目标身上没有 Greater Blessing of Sanctuary，且没有当前角色施加的其他强化祝福，触发
+    if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of might", target, false, true, 1, false) ||
+        botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
+        return false;
+
     return true;
 }
 

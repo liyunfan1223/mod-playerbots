@@ -173,279 +173,28 @@ bool CastCancelDivineSacrificeAction::isUseful()
 
 bool CastGreaterBlessingOfKingsOnPartyAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    Group* group = bot->GetGroup();
     Unit* target = GetTarget();
-    if (!bot || !group)
-        return false;
-
-    // 定义骑士的天赋顺序
-    enum PaladinSpecOrder {
-        SPEC_PALADIN_HOLY,    // 奶骑
-        SPEC_PALADIN_RETRIBUTION, // 惩戒骑
-        SPEC_PALADIN_PROTECTION   // 防骑
-    };
-
-    std::vector<Player*> selectedPaladins; // 用于存储选中的骑士
-    std::set<Player*> visitedPaladins; // 防止重复选择同一个骑士
-
-    // 最多选择4个骑士
-    while (selectedPaladins.size() < 4)
-    {
-        bool found = false;
-
-        // 按照天赋顺序选择骑士
-        for (int specOrder : {SPEC_PALADIN_HOLY, SPEC_PALADIN_RETRIBUTION, SPEC_PALADIN_PROTECTION})
-        {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
-            {
-                Player* member = groupRef->GetSource();
-                if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member))
-                    continue;
-
-                // 检查天赋是否匹配
-                BotRoles role = AiFactory::GetPlayerRoles(member);
-                bool isHoly = (specOrder == SPEC_PALADIN_HOLY && role == BOT_ROLE_HEALER);
-                bool isRetribution = (specOrder == SPEC_PALADIN_RETRIBUTION && role == BOT_ROLE_DPS);
-                bool isProtection = (specOrder == SPEC_PALADIN_PROTECTION && role == BOT_ROLE_TANK);
-
-                if (isHoly || isRetribution || isProtection)
-                {
-                    selectedPaladins.push_back(member);
-                    visitedPaladins.insert(member);
-                    found = true;
-                    break; // 找到一个骑士后跳出内层循环
-                }
-            }
-
-            if (found)
-                break; // 找到一个骑士后跳出外层循环
-        }
-
-        if (!found)
-            break; // 如果没有找到骑士，结束循环
-    }
-
-    // 如果没有选中任何骑士，返回 false
-    if (selectedPaladins.empty())
-        return false;
-
-    // 如果当前目标是第一个骑士，施放 Greater Blessing of Kings
-    if (selectedPaladins.front()->GetGUID() == bot->GetGUID())
-    {
-        botAI->CastSpell("greater blessing of kings", target);
-        return true;
-    }
-
-    return false;
+    botAI->CastSpell("greater blessing of sanctuary", target);
+    return true;
 }
 
 bool CastGreaterBlessingOfMightOnPartyAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    Group* group = bot->GetGroup();
     Unit* target = GetTarget();
-
-    if (!bot || !group)
-        return false;
-
-    // 定义骑士的天赋顺序
-    enum PaladinSpecOrder {
-        SPEC_PALADIN_HOLY,    // 奶骑
-        SPEC_PALADIN_RETRIBUTION, // 惩戒骑
-        SPEC_PALADIN_PROTECTION   // 防骑
-    };
-
-    std::vector<Player*> selectedPaladins; // 用于存储选中的骑士
-    std::set<Player*> visitedPaladins; // 防止重复选择同一个骑士
-
-    // 最多选择4个骑士
-    while (selectedPaladins.size() < 4)
-    {
-        bool found = false;
-
-        // 按照天赋顺序选择骑士
-        for (int specOrder : {SPEC_PALADIN_HOLY, SPEC_PALADIN_RETRIBUTION, SPEC_PALADIN_PROTECTION})
-        {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
-            {
-                Player* member = groupRef->GetSource();
-                if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member))
-                    continue;
-
-                // 检查天赋是否匹配
-                BotRoles role = AiFactory::GetPlayerRoles(member);
-                bool isHoly = (specOrder == SPEC_PALADIN_HOLY && role == BOT_ROLE_HEALER);
-                bool isRetribution = (specOrder == SPEC_PALADIN_RETRIBUTION && role == BOT_ROLE_DPS);
-                bool isProtection = (specOrder == SPEC_PALADIN_PROTECTION && role == BOT_ROLE_TANK);
-
-                if (isHoly || isRetribution || isProtection)
-                {
-                    selectedPaladins.push_back(member);
-                    visitedPaladins.insert(member);
-                    found = true;
-                    break; // 找到一个骑士后跳出内层循环
-                }
-            }
-
-            if (found)
-                break; // 找到一个骑士后跳出外层循环
-        }
-
-        if (!found)
-            break; // 如果没有找到骑士，结束循环
-    }
-
-    // 如果没有选中任何骑士，或者没有第二个骑士，返回 false
-    if (selectedPaladins.size() < 2)
-        return false;
-
-    // 如果当前角色是第二个选中的骑士，施放 Greater Blessing of Might
-    if (selectedPaladins[1]->GetGUID() == bot->GetGUID())
-    {
-        botAI->CastSpell("greater" +GetActualBlessingOfMight(target), target);
-        return true;
-    }
-
+    botAI->CastSpell("greater" +GetActualBlessingOfMight(target), target);
     return false;
 }
 
 bool CastGreaterBlessingOfWisdomOnPartyAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    Group* group = bot->GetGroup();
     Unit* target = GetTarget();
-
-    if (!bot || !group)
-        return false;
-
-    // 定义骑士的天赋顺序
-    enum PaladinSpecOrder {
-        SPEC_PALADIN_HOLY,    // 奶骑
-        SPEC_PALADIN_RETRIBUTION, // 惩戒骑
-        SPEC_PALADIN_PROTECTION   // 防骑
-    };
-
-    std::vector<Player*> selectedPaladins; // 用于存储选中的骑士
-    std::set<Player*> visitedPaladins; // 防止重复选择同一个骑士
-
-    // 最多选择4个骑士
-    while (selectedPaladins.size() < 4)
-    {
-        bool found = false;
-
-        // 按照天赋顺序选择骑士
-        for (int specOrder : {SPEC_PALADIN_HOLY, SPEC_PALADIN_RETRIBUTION, SPEC_PALADIN_PROTECTION})
-        {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
-            {
-                Player* member = groupRef->GetSource();
-                if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member))
-                    continue;
-
-                // 检查天赋是否匹配
-                BotRoles role = AiFactory::GetPlayerRoles(member);
-                bool isHoly = (specOrder == SPEC_PALADIN_HOLY && role == BOT_ROLE_HEALER);
-                bool isRetribution = (specOrder == SPEC_PALADIN_RETRIBUTION && role == BOT_ROLE_DPS);
-                bool isProtection = (specOrder == SPEC_PALADIN_PROTECTION && role == BOT_ROLE_TANK);
-
-                if (isHoly || isRetribution || isProtection)
-                {
-                    selectedPaladins.push_back(member);
-                    visitedPaladins.insert(member);
-                    found = true;
-                    break; // 找到一个骑士后跳出内层循环
-                }
-            }
-
-            if (found)
-                break; // 找到一个骑士后跳出外层循环
-        }
-
-        if (!found)
-            break; // 如果没有找到骑士，结束循环
-    }
-
-    // 如果没有选中任何骑士，或者没有第三个骑士，返回 false
-    if (selectedPaladins.size() < 3)
-        return false;
-
-    // 如果当前角色是第三个选中的骑士，施放 Greater Blessing of Wisdom
-    if (selectedPaladins[2]->GetGUID() == bot->GetGUID())
-    {
-        botAI->CastSpell("greater" +GetActualBlessingOfWisdom(target), target);
-        return true;
-    }
-
-    return false;
+    botAI->CastSpell("greater" +GetActualBlessingOfWisdom(target), target);
+    return true;
 }
 
 bool CastGreaterBlessingOfSanctuaryOnPartyAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    Group* group = bot->GetGroup();
     Unit* target = GetTarget();
-
-    if (!bot || !group)
-        return false;
-
-    // 定义骑士的天赋顺序
-    enum PaladinSpecOrder {
-        SPEC_PALADIN_HOLY,    // 奶骑
-        SPEC_PALADIN_RETRIBUTION, // 惩戒骑
-        SPEC_PALADIN_PROTECTION   // 防骑
-    };
-
-    std::vector<Player*> selectedPaladins; // 用于存储选中的骑士
-    std::set<Player*> visitedPaladins; // 防止重复选择同一个骑士
-
-    // 最多选择4个骑士
-    while (selectedPaladins.size() < 4)
-    {
-        bool found = false;
-
-        // 按照天赋顺序选择骑士
-        for (int specOrder : {SPEC_PALADIN_HOLY, SPEC_PALADIN_RETRIBUTION, SPEC_PALADIN_PROTECTION})
-        {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
-            {
-                Player* member = groupRef->GetSource();
-                if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member))
-                    continue;
-
-                // 检查天赋是否匹配
-                BotRoles role = AiFactory::GetPlayerRoles(member);
-                bool isHoly = (specOrder == SPEC_PALADIN_HOLY && role == BOT_ROLE_HEALER);
-                bool isRetribution = (specOrder == SPEC_PALADIN_RETRIBUTION && role == BOT_ROLE_DPS);
-                bool isProtection = (specOrder == SPEC_PALADIN_PROTECTION && role == BOT_ROLE_TANK);
-
-                if (isHoly || isRetribution || isProtection)
-                {
-                    selectedPaladins.push_back(member);
-                    visitedPaladins.insert(member);
-                    found = true;
-                    break; // 找到一个骑士后跳出内层循环
-                }
-            }
-
-            if (found)
-                break; // 找到一个骑士后跳出外层循环
-        }
-
-        if (!found)
-            break; // 如果没有找到骑士，结束循环
-    }
-
-    // 如果没有选中任何骑士，或者没有第四个骑士，返回 false
-    if (selectedPaladins.size() < 4)
-        return false;
-
-    // 如果当前角色是第四个选中的骑士，施放 Greater Blessing of Sanctuary
-    if (selectedPaladins[3]->GetGUID() == bot->GetGUID())
-    {
-        botAI->CastSpell("greater blessing of sanctuary", target);
-        return true;
-    }
-
-    return false;
+    botAI->CastSpell("greater blessing of sanctuary", target);
+    return true;
 }
