@@ -171,30 +171,3 @@ bool CastCancelDivineSacrificeAction::isUseful()
     return botAI->HasAura("divine sacrifice", GetTarget(), false, true, -1, true);
 }
 
-bool CastGreaterBlessingOfKingsOnPartyAction::Execute(Event event)
-{
-    Unit* target = GetTarget();
-    botAI->CastSpell("greater blessing of sanctuary", target);
-    return true;
-}
-
-bool CastGreaterBlessingOfMightOnPartyAction::Execute(Event event)
-{
-    Unit* target = GetTarget();
-    botAI->CastSpell("greater" +GetActualBlessingOfMight(target), target);
-    return false;
-}
-
-bool CastGreaterBlessingOfWisdomOnPartyAction::Execute(Event event)
-{
-    Unit* target = GetTarget();
-    botAI->CastSpell("greater" +GetActualBlessingOfWisdom(target), target);
-    return true;
-}
-
-bool CastGreaterBlessingOfSanctuaryOnPartyAction::Execute(Event event)
-{
-    Unit* target = GetTarget();
-    botAI->CastSpell("greater blessing of sanctuary", target);
-    return true;
-}
