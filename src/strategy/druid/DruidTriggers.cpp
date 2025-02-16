@@ -20,7 +20,6 @@ bool MarkOfTheWildTrigger::IsActive()
 bool GiftOfTheWildOnPartyTrigger::IsActive()
 {
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget()) &&
-           botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
            botAI->GetBuffedCount((Player*)GetTarget(), "gift of the wild") < 4 &&
            !botAI->GetBuffedCount((Player*)GetTarget(), "mark of the wild");
 }

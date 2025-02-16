@@ -39,210 +39,200 @@ bool BlessingTrigger::IsActive()
        return false;
 
     return SpellTrigger::IsActive() && !botAI->HasAnyAuraOf(target, "blessing of might", "blessing of wisdom",
-                                                            "greater blessing of kings", "blessing of sanctuary", nullptr); 
+                                                            "blessing of kings", "blessing of sanctuary", nullptr); 
 }
 
 //greater blessing on party triggers
-//add function
-inline size_t IsPaladinSelectedForBlessing(PlayerbotAI* botAI)
+
+PaladinSelectionGroup* PaladinSelectionGroupManager::GetPaladinSelectionGroup(Group* group)
 {
-    // 获取当前角色
-    Player* bot = botAI->GetBot();
-    if (!bot)  // 确保bot不为空
-        return 0;
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (groupCache.find(group) == groupCache.end())
+    {
+        groupCache[group] = std::make_unique<PaladinSelectionGroup>(group);
+    }
+    return groupCache[group].get();
+}
 
-    // 获取当前团队
-    Group* group = bot->GetGroup();
-    if (!group)  // 确保团队不为空
-        return 0;
-
-    // 用于存储排序后的骑士
+std::vector<Player*> PaladinSelectionGroup::GetSortedPaladins() const
+{
     std::vector<Player*> selectedPaladins;
-    std::set<Player*> visitedPaladins;
+    std::set<ObjectGuid> visitedPaladins;
 
-    // 遍历团队成员，选择骑士
-    for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
+    for (const GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
     {
         Player* member = groupRef->GetSource();
-        if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member))
+        if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member->GetGUID()))
             continue;
-    
+
         BotRoles role = AiFactory::GetPlayerRoles(member);
-    
-        // 将防骑插入到数组的第一个位置，非防骑插入到后面
+
         if (role == BOT_ROLE_TANK)
-            selectedPaladins.insert(selectedPaladins.begin(), member);  // 防骑放在最前面
+            selectedPaladins.insert(selectedPaladins.begin(), member); 
         else
-            selectedPaladins.push_back(member);  // 非防骑放在后面
-    
-        visitedPaladins.insert(member);
-    
-        if (selectedPaladins.size() >= 4)  // 限制最多选择4个骑士
+            selectedPaladins.push_back(member); 
+
+        visitedPaladins.insert(member->GetGUID());
+
+        if (selectedPaladins.size() >= MAX_PALADINS)
             break;
     }
-    
-    // 将数组反转，确保最后一个骑士是防骑
+
     std::reverse(selectedPaladins.begin(), selectedPaladins.end());
 
-    // 确定当前骑士的顺序
-    size_t paladinOrder = 0;
-    const ObjectGuid botGuid = bot->GetGUID();  // 缓存bot的GUID，避免重复调用
+    return selectedPaladins;
+}
+
+size_t PaladinSelectionGroup::GetPaladinOrderForBlessing(PlayerbotAI* botAI) const
+{
+    if (!botAI)
+        return 0;
+
+    Player* bot = botAI->GetBot();
+    if (!bot || bot->getClass() != CLASS_PALADIN)
+        return 0;
+
+    std::vector<Player*> selectedPaladins = GetSortedPaladins();
+
+    const ObjectGuid botGuid = bot->GetGUID();
     for (size_t i = 0; i < selectedPaladins.size(); ++i)
     {
         if (selectedPaladins[i]->GetGUID() == botGuid)
         {
-            paladinOrder = i + 1;  // 从1开始计数
-            break;
+            return i + 1; 
         }
     }
 
-    // 通知团队选出了多少个骑士
-    if (!selectedPaladins.empty())
-    {
-        std::string message = "Selected " + std::to_string(selectedPaladins.size()) + " paladins for blessings.";
-        botAI->Yell(message);
-    }
-
-    return paladinOrder;  // 返回骑士的顺序
+    return 0;  
 }
 
 bool GreaterBlessingOfKingsOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();  // 获取当前角色
-    if (!bot)  // 修改点1：确保bot不为空
+    Player* bot = botAI->GetBot(); 
+    if (!bot)
         return false;
 
-    Group* group = bot->GetGroup();  // 获取当前团队
-    if (!group)  // 修改点2：确保团队不为空
+    Group* group = bot->GetGroup(); 
+    if (!group) 
         return false;
 
-    Unit* target = GetTarget();  // 获取目标单位
-    if (!target)  // 修改点3：确保目标不为空
+    Unit* target = GetTarget(); 
+    if (!target)
         return false;
 
-    // 确保角色和目标都在同一个团队中，并且是小队而不是团队
     if (!group->isRaidGroup())
         return false;
-    // 先检查目标是否已有当前角色施放的任何强效祝福
-    if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of kings", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of might", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
-    {
+
+    if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false))
         return false;
+    
+    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+
+    size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
+
+    if (paladinOrder == 1)
+    {
+        //botAI->TellMaster("准备施放强效王者祝福！");
+        return true;
     }
 
-    // 再检查当前骑士的顺序是否为1
-    if (IsPaladinSelectedForBlessing(botAI) != 1)
-    {
-        return false;
-    }    
-    return true;
+    return false;
 }
+
 
 bool GreaterBlessingOfMightOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();  // 获取当前角色
-    if (!bot)  // 修改点1：确保bot不为空
+    Player* bot = botAI->GetBot();
+    if (!bot)
         return false;
 
-    Group* group = bot->GetGroup();  // 获取当前团队
-    if (!group)  // 修改点2：确保团队不为空
+    Group* group = bot->GetGroup();
+    if (!group)
         return false;
 
-    Unit* target = GetTarget();  // 获取目标单位
-    if (!target)  // 修改点3：确保目标不为空
+    Unit* target = GetTarget();
+    if (!target)
         return false;
 
-    // 确保角色和目标都在同一个团队中，并且是小队而不是团队
     if (!group->isRaidGroup())
         return false;
 
-    // 先检查目标是否已有当前角色施放的任何强效祝福
-    if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of kings", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of might", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
-    {
+    if (botAI->HasAura("greater blessing of might", target, false, true, 1, false))
         return false;
+
+    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
+
+    if (paladinOrder == 2)
+    {
+        //botAI->TellMaster("准备施放强效力量祝福！");
+        return true;
     }
 
-    // 再检查当前骑士的顺序是否为2
-    if (IsPaladinSelectedForBlessing(botAI) != 2)
-        return false;
-
-    return true;
+    return false;
 }
 
 bool GreaterBlessingOfWisdomOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();  // 获取当前角色
-    if (!bot)  // 修改点1：确保bot不为空
+    Player* bot = botAI->GetBot();
+    if (!bot)
         return false;
 
-    Group* group = bot->GetGroup();  // 获取当前团队
-    if (!group)  // 修改点2：确保团队不为空
+    Group* group = bot->GetGroup();
+    if (!group)
         return false;
 
-    Unit* target = GetTarget();  // 获取目标单位
-    if (!target)  // 修改点3：确保目标不为空
+    Unit* target = GetTarget();
+    if (!target)
         return false;
 
-    // 确保角色和目标都在同一个团队中，并且是小队而不是团队
     if (!group->isRaidGroup())
         return false;
 
-    // 先检查目标是否已有当前角色施放的任何强效祝福
-    if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of kings", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of might", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
-    {
+    if (botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
         return false;
+
+    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
+
+    if (paladinOrder == 3)
+    {
+        //botAI->TellMaster("准备施放强效智慧祝福！");
+        return true;
     }
 
-    // 再检查当前骑士的顺序是否为3
-    if (IsPaladinSelectedForBlessing(botAI) != 3)
-        return false;
-
-    return true;
+    return false;
 }
 
 bool GreaterBlessingOfSanctuaryOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();  // 获取当前角色
-    if (!bot)  // 修改点1：确保bot不为空
-        return false;
-    
-        BotRoles role = AiFactory::GetPlayerRoles(bot);
-    if (role != BOT_ROLE_TANK)  // 如果当前骑士的天赋不是防御天赋，返回false
-        return false;
-    
-        Group* group = bot->GetGroup();  // 获取当前团队
-    if (!group)  // 修改点2：确保团队不为空
+    Player* bot = botAI->GetBot();
+    if (!bot)
         return false;
 
-    Unit* target = GetTarget();  // 获取目标单位
-    if (!target)  // 修改点3：确保目标不为空
+    Group* group = bot->GetGroup();
+    if (!group)
         return false;
 
-    // 确保角色和目标都在同一个团队中，并且是小队而不是团队
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
     if (!group->isRaidGroup())
         return false;
 
-    // 先检查目标是否已有当前角色施放的任何强效祝福
-    if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of kings", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of might", target, false, true, 1, false) ||
-        botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
-    {
+    if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false))
         return false;
+
+    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
+
+    if (paladinOrder == 4)
+    {
+        //botAI->TellMaster("准备施放强效庇护祝福！");
+        return true;
     }
 
-    // 再检查当前骑士的顺序是否为4
-    if (IsPaladinSelectedForBlessing(botAI) != 4)
-        return false;
-
-    return true;
+    return false;
 }
 
