@@ -132,6 +132,12 @@ AiPlayerbot.AllowAccountBots = 1
 # Allow/deny bots in the player's guild
 AiPlayerbot.AllowGuildBots = 1
 
+# Random bot guild count
+AiPlayerbot.RandomBotGuildCount = 20
+
+# Delete all random bot guilds
+AiPlayerbot.DeleteRandomBotGuilds = 0
+
 # Randombots will invite nearby bots to guilds
 AiPlayerbot.RandomBotGuildNearby = 0
 
@@ -1621,12 +1627,6 @@ AiPlayerbot.EnableGuildTasks = 0
 
 # Enable dungeon suggestions in lower case randomly
 AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
-
-# Random bot guild count
-AiPlayerbot.RandomBotGuildCount = 20
-
-# Delete all random bot guilds
-AiPlayerbot.DeleteRandomBotGuilds = 0
 
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
 AiPlayerbot.RandomBotRpgChance = 0.20

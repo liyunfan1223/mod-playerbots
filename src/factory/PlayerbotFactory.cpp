@@ -392,9 +392,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     // bot->SaveToDB(false, false);
 
     // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
-    // LOG_INFO("playerbots", "Initializing guilds...");
     // bot->SaveToDB(false, false);
-    InitGuild();
+    if (sPlayerbotAIConfig->randomBotGuildCount > 0)
+    {
+        LOG_INFO("playerbots", "Initializing guilds...");
+        InitGuild();
+    }
     // bot->SaveToDB(false, false);
     // if (pmo)
     //    pmo->finish();
