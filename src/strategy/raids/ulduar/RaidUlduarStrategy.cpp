@@ -46,6 +46,12 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "razorscale fuse armor trigger",
         NextAction::array(0, new NextAction("razorscale fuse armor action", ACTION_RAID + 2), nullptr)));
 
+    //
+    // Hodir
+    //
+    triggers.push_back(new TriggerNode(
+        "hodir biting cold", NextAction::array(0, new NextAction("intense cold jump", ACTION_MOVE + 5), nullptr)));
+
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

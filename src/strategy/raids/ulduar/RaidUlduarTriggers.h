@@ -76,4 +76,11 @@ public:
     bool IsActive() override;
 };
 
+class HodirBitingColdTrigger : public Trigger
+{
+public:
+    HodirBitingColdTrigger(PlayerbotAI* ai) : Trigger(ai, "hodir biting cold") {}
+    bool IsActive() override;
+};
+
 #endif

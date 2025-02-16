@@ -241,3 +241,12 @@ bool RazorscaleFuseArmorTrigger::IsActive()
 
     return false;
 }
+
+bool HodirBitingColdTrigger::IsActive()
+{
+    // Adjust as needed - too much interrupting loses dps time,
+    // but too many stacks is deadly. Assuming 2 is a good number to clear
+    int stackThreshold = 2;
+    Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
+    return boss && botAI->GetAura("biting cold", bot, false, false, stackThreshold);
+}
