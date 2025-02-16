@@ -50,8 +50,11 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // Hodir
     //
     triggers.push_back(new TriggerNode(
-        "hodir biting cold", NextAction::array(0, new NextAction("intense cold jump", ACTION_MOVE + 5), nullptr)));
-
+        "hodir near snowpacked icicle",
+        NextAction::array(0, new NextAction("hodir move snowpacked icicle", ACTION_RAID + 5), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "hodir biting cold", NextAction::array(0, new NextAction("intense cold jump", ACTION_RAID + 4), nullptr)));
+    
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

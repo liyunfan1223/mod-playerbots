@@ -106,4 +106,12 @@ public:
     bool isUseful() override;
 };
 
+class HodirMoveSnowpackedIcicleAction : public MovementAction
+{
+public:
+    HodirMoveSnowpackedIcicleAction(PlayerbotAI* botAI) : MovementAction(botAI, "hodir move snowpacked icicle") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 #endif

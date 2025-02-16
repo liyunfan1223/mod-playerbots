@@ -244,9 +244,22 @@ bool RazorscaleFuseArmorTrigger::IsActive()
 
 bool HodirBitingColdTrigger::IsActive()
 {
-    // Adjust as needed - too much interrupting loses dps time,
-    // but too many stacks is deadly. Assuming 2 is a good number to clear
-    int stackThreshold = 2;
     Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
-    return boss && botAI->GetAura("biting cold", bot, false, false, stackThreshold);
+    return boss && botAI->GetAura("biting cold", bot, false, false);
+}
+
+//Snowpacked Icicle Target
+bool HodirNearSnowpackedIcicleTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    // Find the nearest Snowpacked Icicle Target
+    Creature* target = bot->FindNearestCreature(33174, 100.0f);
+    if (!target)
+        return false;
 }
