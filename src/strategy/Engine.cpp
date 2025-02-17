@@ -245,15 +245,14 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     if (!actionExecuted)
         LogAction("No actions executed");
     
-    queue.RemoveExpired();  // Clean up expired actions in the queue
-    // do
-    // {
-    //     ActionNode* action = queue.Pop();
-    //     if (!action)
-    //         break;
+    do
+    {
+        ActionNode* action = queue.Pop();
+        if (!action)
+            break;
 
-    //     delete action;
-    // } while (true);
+        delete action;
+    } while (true);
 
     return actionExecuted;
 }
