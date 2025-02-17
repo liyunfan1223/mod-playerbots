@@ -110,12 +110,13 @@ float ThaddiusGenericMultiplier::GetValue(Action* action)
     {
         return 1.0f;
     }
+    if (dynamic_cast<CombatFormationMoveAction*>(action))
+        return 0.0f;
     // pet phase
     if (helper.IsPhasePet() &&
         (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
          dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
-         dynamic_cast<ReachPartyMemberToHealAction*>(action) || dynamic_cast<BuffOnMainTankAction*>(action) ||
-         dynamic_cast<CombatFormationMoveAction*>(action)))
+         dynamic_cast<ReachPartyMemberToHealAction*>(action) || dynamic_cast<BuffOnMainTankAction*>(action)))
     {
         return 0.0f;
     }
