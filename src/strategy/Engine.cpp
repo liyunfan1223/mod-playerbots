@@ -86,6 +86,8 @@ Engine::~Engine(void)
 
 void Engine::Reset()
 {
+    strategyTypeMask = 0;
+    
     ActionNode* action = nullptr;
 
     while ((action = queue.Pop()) != nullptr)
