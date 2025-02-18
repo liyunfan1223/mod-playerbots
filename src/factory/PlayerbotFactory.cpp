@@ -395,7 +395,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     // bot->SaveToDB(false, false);
     if (sPlayerbotAIConfig->randomBotGuildCount > 0)
     {
-        LOG_INFO("playerbots", "Initializing guilds...");
+        LOG_DEBUG("playerbots", "Initializing guilds...");
         InitGuild();
     }
     // bot->SaveToDB(false, false);
