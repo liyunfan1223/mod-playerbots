@@ -206,6 +206,7 @@ public:
         creators["frost ward"] = &MageAiObjectContextInternal::frost_ward;
         creators["mirror image"] = &MageAiObjectContextInternal::mirror_image;
         creators["focus magic on party"] = &MageAiObjectContextInternal::focus_magic_on_party;
+        creators["blink back"] = &MageAiObjectContextInternal::blink_back;
     }
 
 private:
@@ -264,6 +265,7 @@ private:
     }
     static Action* mirror_image(PlayerbotAI* botAI) { return new CastMirrorImageAction(botAI); }
     static Action* focus_magic_on_party(PlayerbotAI* botAI) { return new CastFocusMagicOnPartyAction(botAI); }
+    static Action* blink_back(PlayerbotAI* botAI) { return new CastBlinkBackAction(botAI); }
 };
 
 MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

@@ -7,6 +7,7 @@
 
 #include "Event.h"
 #include "GenericSpellActions.h"
+#include "PlayerbotAI.h"
 #include "Playerbots.h"
 
 bool CastHuntersMarkAction::isUseful() { return CastDebuffSpellAction::isUseful(); }
@@ -45,6 +46,22 @@ bool CastAutoShotAction::isUseful()
     }
     return AI_VALUE(uint32, "active spell") != AI_VALUE2(uint32, "spell id", getName());
 }
+
+bool CastDisengageAction::Execute(Event event)
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+    // can cast spell check passed in isUseful()
+    bot->SetOrientation(bot->GetAngle(target));
+    return CastSpellAction::Execute(event);
+}
+
+bool CastDisengageAction::isUseful()
+{
+    return !botAI->HasStrategy("trap weave", BOT_STATE_COMBAT);
+}
+
 
 Value<Unit*>* CastScareBeastCcAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", "scare beast"); }
 
