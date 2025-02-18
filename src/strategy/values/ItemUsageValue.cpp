@@ -103,39 +103,50 @@ ItemUsage ItemUsageValue::Calculate()
             return ITEM_USAGE_QUEST;
 
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
+    {
         if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
         {
-            if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+            Item* rangedWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            Item* equippedAmmo = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_AMMO);
+    
+            uint32 requiredSubClass = 0;
+            if (rangedWeapon)
             {
-                uint32 subClass = 0;
-                switch (pItem->GetTemplate()->SubClass)
+                switch (rangedWeapon->GetTemplate()->SubClass)
                 {
                     case ITEM_SUBCLASS_WEAPON_GUN:
-                        subClass = ITEM_SUBCLASS_BULLET;
+                        requiredSubClass = ITEM_SUBCLASS_BULLET;
                         break;
                     case ITEM_SUBCLASS_WEAPON_BOW:
                     case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-                        subClass = ITEM_SUBCLASS_ARROW;
+                        requiredSubClass = ITEM_SUBCLASS_ARROW;
                         break;
                 }
-
-                if (proto->SubClass == subClass)
+            }
+    
+            if (proto->SubClass == requiredSubClass)
+            {
+                float ammoCount = BetterStacks(proto, "ammo");
+                float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2;
+    
+                // If the bot has no ammo equipped, prioritize equipping it
+                if (!equippedAmmo)
+                    return ITEM_USAGE_EQUIP;
+    
+                // If the bot needs more ammo, mark it for purchase or keeping
+                if (ammoCount < requiredAmmo)
                 {
-                    float ammo = BetterStacks(proto, "ammo");
-                    float needAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2;
-
-                    if (ammo < needAmmo)  // We already have enough of the current ammo.
-                    {
-                        ammo += CurrentStacks(proto);
-
-                        if (ammo < needAmmo)  // Buy ammo to get to the proper supply
-                            return ITEM_USAGE_AMMO;
-                        else if (ammo < needAmmo + 1)
-                            return ITEM_USAGE_KEEP;  // Keep the ammo until we have too much.
-                    }
+                    ammoCount += CurrentStacks(proto);
+    
+                    if (ammoCount < requiredAmmo)  // Buy ammo to reach the proper supply
+                        return ITEM_USAGE_AMMO;
+                    else if (ammoCount < requiredAmmo + 1)
+                        return ITEM_USAGE_KEEP;  // Keep the ammo if we don't have too much.
                 }
             }
         }
+    }
+
 
     // Need to add something like free bagspace or item value.
     if (proto->SellPrice > 0)
