@@ -64,8 +64,9 @@ ItemUsage ItemUsageValue::Calculate()
 
     if (proto->Class == ITEM_CLASS_KEY)
         return ITEM_USAGE_USE;
-
-    if (proto->Class == ITEM_CLASS_CONSUMABLE)
+    
+    if (proto->Class == ITEM_CLASS_CONSUMABLE && 
+        (proto->MaxCount == 0 || AI_VALUE2(uint32, "item count", proto->Name1) < proto->MaxCount))
     {
         std::string const foodType = GetConsumableType(proto, bot->GetPower(POWER_MANA));
 
