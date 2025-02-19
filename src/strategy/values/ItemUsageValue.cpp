@@ -128,7 +128,7 @@ ItemUsage ItemUsageValue::Calculate()
             {
                 float ammoCount = BetterStacks(proto, "ammo");
                 float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2; // Hunters get 8 stacks, others 2
-                unit32 currentAmmoId = bot->GetUInt32Value(PLAYER_AMMO_ID)
+                uint32 currentAmmoId = bot->GetUInt32Value(PLAYER_AMMO_ID)
 
                 // Check if the bot has an ammo type assigned
                 if (currentAmmoId == 0)
