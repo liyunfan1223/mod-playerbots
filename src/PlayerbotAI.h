@@ -462,6 +462,7 @@ public:
     bool PlayEmote(uint32 emote);
     void Ping(float x, float y);
     Item* FindPoison() const;
+    Item* FindAmmo() const;
     Item* FindBandage() const;
     Item* FindConsumable(uint32 displayId) const;
     Item* FindStoneFor(Item* weapon) const;

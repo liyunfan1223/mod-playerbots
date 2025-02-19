@@ -596,6 +596,7 @@ public:
         : ItemCountTrigger(botAI, item, count, interval)
     {
     }
+    bool IsActive() override;
 };
 
 class HasAuraTrigger : public Trigger
