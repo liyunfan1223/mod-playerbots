@@ -11,6 +11,7 @@
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
+#include "StatsWeightCalculator.h"
 
 bool BuyAction::Execute(Event event)
 {
@@ -60,6 +61,10 @@ bool BuyAction::Execute(Event event)
 
             if (m_items_sorted.empty())
                 continue;
+
+            StatsWeightCalculator calculator(bot);
+            calculator.SetItemSetBonus(false);
+            calculator.SetOverflowPenalty(false);
 
             std::sort(m_items_sorted.begin(), m_items_sorted.end(),
                       [](VendorItem* i, VendorItem* j) {
