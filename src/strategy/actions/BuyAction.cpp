@@ -66,21 +66,34 @@ bool BuyAction::Execute(Event event)
                           return sObjectMgr->GetItemTemplate(i->item)->ItemLevel >
                                  sObjectMgr->GetItemTemplate(j->item)->ItemLevel;
                       });
-
+            
+            std::unordered_map<uint32, uint32> bestPurchasedSubClass;  // Track best subclass for each item class
+            
             for (auto& tItem : m_items_sorted)
             {
-                for (uint32 i = 0; i < 10; i++)  // Buy 10 times or until no longer usefull/possible
+                for (uint32 i = 0; i < 10; i++)  // Buy 10 times or until no longer useful/possible
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
                     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
-
+            
+                    if (!proto)
+                        continue;
+            
+                    uint32 itemClass = proto->Class;
+                    uint32 itemSubClass = proto->SubClass;
+            
+                    // Skip if we already bought a better subclass of this item class
+                    if (bestPurchasedSubClass.find(itemClass) != bestPurchasedSubClass.end() &&
+                        bestPurchasedSubClass[itemClass] > itemSubClass)  
+                    {
+                        break;  // Lower-tier item, skip buying
+                    }
+            
                     uint32 price = proto->BuyPrice;
-
-                    // reputation discount
                     price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
-
+            
                     NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
-
+            
                     switch (usage)
                     {
                         case ITEM_USAGE_REPLACE:
@@ -102,18 +115,20 @@ bool BuyAction::Execute(Event event)
                         default:
                             break;
                     }
-
+            
                     if (needMoneyFor == NeedMoneyFor::none)
                         break;
-
+            
                     if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
                         break;
-
+            
                     if (!BuyItem(tItems, vendorguid, proto))
                         break;
-
-                    if (usage == ITEM_USAGE_REPLACE ||
-                        usage == ITEM_USAGE_EQUIP)  // Equip upgrades and stop buying this time.
+            
+                    // Store the best subclass per item class
+                    bestPurchasedSubClass[itemClass] = itemSubClass;
+            
+                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP)
                     {
                         botAI->DoSpecificAction("equip upgrades");
                         break;
