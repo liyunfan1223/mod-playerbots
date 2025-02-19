@@ -108,7 +108,7 @@ ItemUsage ItemUsageValue::Calculate()
         {
             Item* rangedWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
             uint32 requiredSubClass = 0;
-    
+
             if (rangedWeapon)
             {
                 switch (rangedWeapon->GetTemplate()->SubClass)
@@ -122,19 +122,30 @@ ItemUsage ItemUsageValue::Calculate()
                         break;
                 }
             }
-    
+
             // Ensure the item is the correct ammo type for the equipped ranged weapon
             if (proto->SubClass == requiredSubClass)
             {
                 float ammoCount = BetterStacks(proto, "ammo");
                 float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2; // Hunters get 8 stacks, others 2
-    
+
                 // Check if the bot has an ammo type assigned
                 if (bot->GetUInt32Value(PLAYER_AMMO_ID) == 0)
                 {
                     return ITEM_USAGE_EQUIP;  // Equip the ammo if no ammo
                 }
+                // Compare new ammo vs current equipped ammo
+                ItemTemplate const* currentAmmoProto = sObjectMgr->GetItemTemplate(currentAmmoId);
+                if (currentAmmoProto)
+                {
+                    uint32 currentAmmoDPS = (currentAmmoProto->Damage[0].DamageMin + currentAmmoProto->Damage[0].DamageMax) * 1000 / 2;
+                    uint32 newAmmoDPS = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2;
     
+                    if (newAmmoDPS > currentAmmoDPS) // New ammo meets upgrade condition
+                    {
+                        return ITEM_USAGE_EQUIP;
+                    }
+                }
                 // Ensure we have enough ammo in the inventory
                 if (ammoCount < requiredAmmo)
                 {
