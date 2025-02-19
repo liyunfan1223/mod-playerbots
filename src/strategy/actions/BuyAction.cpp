@@ -107,7 +107,7 @@ bool BuyAction::Execute(Event event)
                             usageOut << "ITEM_USAGE_SKILL";
                             break;
                         default:
-                            usageOut << "UNKNOWN";
+                            usageOut << "UNKNOWN (" << static_cast<int>(usage) << ")";
                             break;
                     }
 
