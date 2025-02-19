@@ -122,6 +122,18 @@ public:
     CastArcaneIntellectOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "arcane intellect") {}
 };
 
+class CastArcaneBrillianceAction : public CastBuffSpellAction
+{
+public:
+    CastArcaneBrillianceAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane brilliance") {}
+};
+
+class CastArcaneBrillianceOnPartyAction : public BuffOnPartyAction
+{
+public:
+    CastArcaneBrillianceOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "arcane brilliance") {}
+};
+
 class CastRemoveCurseAction : public CastCureSpellAction
 {
 public:

@@ -10,6 +10,7 @@
 #include "GenericTriggers.h"
 #include "SharedDefines.h"
 #include "Unit.h"
+#include "Group.h"
 
 class PlayerbotAI;
 
@@ -80,6 +81,7 @@ public:
         : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 2 * 2000)
     {
     }
+
 };
 
 class BlessingTrigger : public BuffTrigger
@@ -234,9 +236,81 @@ public:
     }
 };
 
+class BlessingOfSanctuaryOnPartyTrigger : public BuffTrigger
+{
+public:
+    BlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) 
+        : BuffTrigger(botAI, "blessing of sanctuary", 2 * 2000) {} // 每4秒检查一次
+};
+
+//greater blessing on party triggers
+class PaladinSelectionGroup
+{
+public:
+    PaladinSelectionGroup(Group* group) : group(group) {}
+
+    size_t GetPaladinOrderForBlessing(PlayerbotAI* botAI) const;
+    std::vector<Player*> GetSortedPaladins() const;
+
+private:
+    static constexpr size_t MAX_PALADINS = 4;
+    Group* group;  // 保存对 Group 的指针
+};
+
+class PaladinSelectionGroupManager
+{
+public:
+    static PaladinSelectionGroupManager& GetInstance()
+    {
+        static PaladinSelectionGroupManager instance;
+        return instance;
+    }
+
+    PaladinSelectionGroup* GetPaladinSelectionGroup(Group* group);
+
+private:
+    std::unordered_map<Group*, std::unique_ptr<PaladinSelectionGroup>> groupCache;
+    mutable std::mutex mutex_;
+};
+
+
+
+class GreaterBlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of kings", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+class GreaterBlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI)
+        : BuffOnPartyTrigger(botAI, "greater blessing of wisdom", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+class GreaterBlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfMightOnPartyTrigger(PlayerbotAI* botAI)
+        : BuffOnPartyTrigger(botAI, "greater blessing of might", 2 * 2000) {}
+        bool IsActive() override;
+};
+
+class GreaterBlessingOfSanctuaryOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) 
+        : BuffOnPartyTrigger(botAI, "greater blessing of sanctuary", 2 * 2000) {} // 每4秒检查一次
+    bool IsActive() override;
+};
+//
+
 class AvengingWrathTrigger : public BoostTrigger
 {
 public:
     AvengingWrathTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "avenging wrath") {}
 };
+
 #endif

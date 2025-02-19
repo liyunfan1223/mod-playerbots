@@ -170,3 +170,4 @@ bool CastCancelDivineSacrificeAction::isUseful()
 {
     return botAI->HasAura("divine sacrifice", GetTarget(), false, true, -1, true);
 }
+
