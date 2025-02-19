@@ -155,6 +155,7 @@ bool BuyAction::Execute(Event event)
                     std::ostringstream out;
                     out << "Nobody sells " << ChatHelper::FormatItem(proto) << " nearby";
                     botAI->TellMaster(out.str());
+                    continue;
                 }
 
                 ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
