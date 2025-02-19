@@ -116,7 +116,7 @@ bool BuyAction::Execute(Event event)
             
                     // Skip if we already bought a better item for this slot
                     if (bestPurchasedItemScore.find(invType) != bestPurchasedItemScore.end() &&
-                        bestPurchasedItemScore[invType] >= newScore)
+                        bestPurchasedItemScore[invType] > newScore)
                     {
                         break;  // Skip lower-scoring items
                     }
