@@ -650,8 +650,11 @@ bool AmmoCountTrigger::IsActive()
             {
                 for (uint32 slot = 0; slot < container->GetBagSize(); ++slot)
                 {
-                    if (Item* item = container->GetItemByPos(slot) && visitor.Visit(item))
-                        return true;  // Found suitable ammo
+                    if (Item* item = container->GetItemByPos(slot))
+                    {
+                        if (visitor.Visit(item))
+                            return true;  // Found suitable ammo
+                    }
                 }
             }
         }
