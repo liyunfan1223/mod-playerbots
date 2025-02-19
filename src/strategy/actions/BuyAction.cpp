@@ -67,18 +67,25 @@ bool BuyAction::Execute(Event event)
             calculator.SetOverflowPenalty(false);
 
             std::sort(m_items_sorted.begin(), m_items_sorted.end(),
-                      [&calculator](VendorItem* i, VendorItem* j) {  // Capture calculator by reference
-                          ItemTemplate const* item1 = sObjectMgr->GetItemTemplate(i->item);
-                          ItemTemplate const* item2 = sObjectMgr->GetItemTemplate(j->item);
-            
-                          if (!item1 || !item2)
-                              return false;
-            
-                          float score1 = calculator.CalculateItem(item1->ItemId);
-                          float score2 = calculator.CalculateItem(item2->ItemId);
-            
-                          return score1 > score2; // Sort in descending order (highest score first)
-                      });
+                [&calculator](VendorItem* i, VendorItem* j) 
+                {
+                    ItemTemplate const* item1 = sObjectMgr->GetItemTemplate(i->item);
+                    ItemTemplate const* item2 = sObjectMgr->GetItemTemplate(j->item);
+    
+                    if (!item1 || !item2)
+                        return false;
+                
+                    float score1 = calculator.CalculateItem(item1->ItemId);
+                    float score2 = calculator.CalculateItem(item2->ItemId);
+
+                    // Fallback to itemlevel if either score is 0
+                    if (score1 == 0 || score2 == 0)
+                    {
+                        score1 = item1->ItemLevel;
+                        score2 = item2->ItemLevel;
+                    }
+                    return score1 > score2; // Sort in descending order (highest score first)
+                });
 
 
             
@@ -127,7 +134,7 @@ bool BuyAction::Execute(Event event)
                     }
             
                     // Skip if the bot already has a better or equal item equipped
-                    if (oldScore >= newScore)
+                    if (oldScore > newScore)
                         break;
             
                     uint32 price = proto->BuyPrice;
