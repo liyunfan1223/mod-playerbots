@@ -63,11 +63,20 @@ bool BuyAction::Execute(Event event)
 
             std::sort(m_items_sorted.begin(), m_items_sorted.end(),
                       [](VendorItem* i, VendorItem* j) {
-                          return sObjectMgr->GetItemTemplate(i->item)->ItemLevel >
-                                 sObjectMgr->GetItemTemplate(j->item)->ItemLevel;
-                      });
+                          ItemTemplate const* item1 = sObjectMgr->GetItemTemplate(i->item);
+                          ItemTemplate const* item2 = sObjectMgr->GetItemTemplate(j->item);
             
-            std::unordered_map<uint32, uint32> bestPurchasedSubClass;  // Track best subclass for each item class
+                          if (!item1 || !item2)
+                              return false;
+            
+                          float score1 = calculator.CalculateItem(item1->ItemId);
+                          float score2 = calculator.CalculateItem(item2->ItemId);
+            
+                          return score1 > score2; // Sort in descending order (highest score first)
+                      });
+
+            
+            std::unordered_map<uint32, float> bestPurchasedItemScore;  // Track best item score per InventoryType
             
             for (auto& tItem : m_items_sorted)
             {
@@ -78,7 +87,7 @@ bool BuyAction::Execute(Event event)
             
                 if (proto->Class == ITEM_CLASS_CONSUMABLE || proto->Class == ITEM_CLASS_PROJECTILE)
                 {
-                    maxPurchases = 10;  // Allow up to 10 purchases if it's a consumable
+                    maxPurchases = 10;  // Allow up to 10 purchases if it's a consumable or projectile
                 }
             
                 for (uint32 i = 0; i < maxPurchases; i++)
@@ -87,15 +96,31 @@ bool BuyAction::Execute(Event event)
                     if (!proto)
                         continue;
             
-                    uint32 itemClass = proto->Class;
-                    uint32 itemSubClass = proto->SubClass;
+                    uint32 invType = proto->InventoryType;
             
-                    // Skip if we already bought a better subclass of this item class
-                    if (bestPurchasedSubClass.find(itemClass) != bestPurchasedSubClass.end() &&
-                        bestPurchasedSubClass[itemClass] > itemSubClass)  
+                    // Calculate item score
+                    float newScore = calculator.CalculateItem(proto->ItemId);
+            
+                    // Skip if we already bought a better item for this slot
+                    if (bestPurchasedItemScore.find(invType) != bestPurchasedItemScore.end() &&
+                        bestPurchasedItemScore[invType] >= newScore)
                     {
-                        break;  // Lower-tier item, skip buying
+                        break;  // Skip lower-scoring items
                     }
+            
+                    // Check the bot's currently equipped item for this slot
+                    Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bot->GetEquipSlotForInventoryType(invType));
+                    float oldScore = 0.0f;
+                    if (oldItem)
+                    {
+                        ItemTemplate const* oldItemProto = oldItem->GetTemplate();
+                        if (oldItemProto)
+                            oldScore = calculator.CalculateItem(oldItemProto->ItemId);
+                    }
+            
+                    // Skip if the bot already has a better or equal item equipped
+                    if (oldScore >= newScore)
+                        break;
             
                     uint32 price = proto->BuyPrice;
                     price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
@@ -134,18 +159,15 @@ bool BuyAction::Execute(Event event)
                     if (!BuyItem(tItems, vendorguid, proto))
                         break;
             
-                    // Store the best subclass per item class
-                    bestPurchasedSubClass[itemClass] = itemSubClass;
+                    // Store the best item score per InventoryType
+                    bestPurchasedItemScore[invType] = newScore;
             
-                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP ||
-                        usage == ITEM_USAGE_BAD_EQUIP || usage == ITEM_USAGE_BROKEN_EQUIP)
+                    if (needMoneyFor == NeedMoneyFor::gear)
                     {
                         botAI->DoSpecificAction("equip upgrades");
-                        break;
                     }
                 }
             }
-
         }
         else
         {
