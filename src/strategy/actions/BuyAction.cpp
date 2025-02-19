@@ -132,6 +132,8 @@ bool BuyAction::Execute(Event event)
                     {
                         case ITEM_USAGE_REPLACE:
                         case ITEM_USAGE_EQUIP:
+                        case ITEM_USAGE_BAD_EQUIP:
+                        case ITEM_USAGE_BROKEN_EQUIP:
                             needMoneyFor = NeedMoneyFor::gear;
                             break;
                         case ITEM_USAGE_AMMO:
