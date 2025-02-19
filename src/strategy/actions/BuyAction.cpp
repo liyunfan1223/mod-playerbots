@@ -74,6 +74,11 @@ bool BuyAction::Execute(Event event)
                 for (uint32 i = 0; i < 10; i++)  // Buy 10 times or until no longer useful/possible
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
+
+                    if (!proto)
+                        continue;
+
                     // Report item usage to master
                     std::ostringstream usageOut;
                     usageOut << "Item usage for " << ChatHelper::FormatItem(proto) << ": ";
@@ -107,10 +112,6 @@ bool BuyAction::Execute(Event event)
                     }
 
                     botAI->TellMaster(usageOut.str());
-                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
-            
-                    if (!proto)
-                        continue;
             
                     uint32 itemClass = proto->Class;
                     uint32 itemSubClass = proto->SubClass;
