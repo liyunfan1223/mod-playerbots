@@ -72,26 +72,12 @@ public:
     }
 };
 
-class PlayerbotsMetricScript : public MetricScript
-{
-public:
-    PlayerbotsMetricScript() : MetricScript("PlayerbotsMetricScript") {}
-
-    void OnMetricLogging() override
-    {
-        if (sMetric->IsEnabled())
-        {
-            sMetric->LogValue("db_queue_playerbots", uint64(PlayerbotsDatabase.QueueSize()), {});
-        }
-    }
-};
-
 class PlayerbotsPlayerScript : public PlayerScript
 {
 public:
     PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript") {}
 
-    void OnLogin(Player* player) override
+    void OnPlayerLogin(Player* player) override
     {
         if (!player->GetSession()->IsBot())
         {
@@ -122,7 +108,7 @@ public:
         }
     }
 
-    void OnAfterUpdate(Player* player, uint32 diff) override
+    void OnPlayerAfterUpdate(Player* player, uint32 diff) override
     {
         if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
         {
@@ -135,7 +121,7 @@ public:
         }
     }
 
-    bool CanPlayerUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
+    bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
     {
         if (type == CHAT_MSG_WHISPER)
         {
@@ -150,7 +136,7 @@ public:
         return true;
     }
 
-    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
+    void OnPlayerChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
     {
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -164,7 +150,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg) override
+    void OnPlayerChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg) override
     {
         if (type == CHAT_MSG_GUILD)
         {
@@ -185,7 +171,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Channel* channel) override
+    void OnPlayerChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Channel* channel) override
     {
         if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
@@ -198,7 +184,7 @@ public:
         sRandomPlayerbotMgr->HandleCommand(type, msg, player);
     }
 
-    bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* /*criteria*/) override
+    bool OnPlayerBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* /*criteria*/) override
     {
         if (sRandomPlayerbotMgr->IsRandomBot(player))
         {
@@ -207,7 +193,7 @@ public:
         return true;
     }
 
-    bool OnBeforeAchiComplete(Player* player, AchievementEntry const* /*achievement*/) override
+    bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* /*achievement*/) override
     {
         if (sRandomPlayerbotMgr->IsRandomBot(player))
         {
@@ -372,7 +358,6 @@ public:
 void AddPlayerbotsScripts()
 {
     new PlayerbotsDatabaseScript();
-    new PlayerbotsMetricScript();
     new PlayerbotsPlayerScript();
     new PlayerbotsMiscScript();
     new PlayerbotsServerScript();
