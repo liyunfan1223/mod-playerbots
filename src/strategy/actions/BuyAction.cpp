@@ -67,7 +67,7 @@ bool BuyAction::Execute(Event event)
             calculator.SetOverflowPenalty(false);
 
             std::sort(m_items_sorted.begin(), m_items_sorted.end(),
-                      [](VendorItem* i, VendorItem* j) {
+                      [&calculator](VendorItem* i, VendorItem* j) {  // Capture calculator by reference
                           ItemTemplate const* item1 = sObjectMgr->GetItemTemplate(i->item);
                           ItemTemplate const* item2 = sObjectMgr->GetItemTemplate(j->item);
             
@@ -79,6 +79,7 @@ bool BuyAction::Execute(Event event)
             
                           return score1 > score2; // Sort in descending order (highest score first)
                       });
+
 
             
             std::unordered_map<uint32, float> bestPurchasedItemScore;  // Track best item score per InventoryType
