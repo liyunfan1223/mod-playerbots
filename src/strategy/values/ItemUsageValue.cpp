@@ -107,9 +107,8 @@ ItemUsage ItemUsageValue::Calculate()
         if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
         {
             Item* rangedWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-            Item* equippedAmmo = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_AMMO);
-    
             uint32 requiredSubClass = 0;
+    
             if (rangedWeapon)
             {
                 switch (rangedWeapon->GetTemplate()->SubClass)
@@ -124,16 +123,19 @@ ItemUsage ItemUsageValue::Calculate()
                 }
             }
     
+            // Ensure the item is the correct ammo type for the equipped ranged weapon
             if (proto->SubClass == requiredSubClass)
             {
                 float ammoCount = BetterStacks(proto, "ammo");
-                float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2;
+                float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2; // Hunters get 8 stacks, others 2
     
-                // If the bot has no ammo equipped, prioritize equipping it
-                if (!equippedAmmo)
-                    return ITEM_USAGE_EQUIP;
+                // Check if the bot has an ammo type assigned
+                if (bot->GetUInt32Value(PLAYER_AMMO_ID) == 0)
+                {
+                    return ITEM_USAGE_EQUIP;  // Equip the ammo if no ammo
+                }
     
-                // If the bot needs more ammo, mark it for purchase or keeping
+                // Ensure we have enough ammo in the inventory
                 if (ammoCount < requiredAmmo)
                 {
                     ammoCount += CurrentStacks(proto);
@@ -146,7 +148,6 @@ ItemUsage ItemUsageValue::Calculate()
             }
         }
     }
-
 
     // Need to add something like free bagspace or item value.
     if (proto->SellPrice > 0)
