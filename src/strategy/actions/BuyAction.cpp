@@ -137,7 +137,8 @@ bool BuyAction::Execute(Event event)
                     // Store the best subclass per item class
                     bestPurchasedSubClass[itemClass] = itemSubClass;
             
-                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP || ITEM_USAGE_BAD_EQUIP || ITEM_USAGE_BROKEN_EQUIP)
+                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP ||
+                        usage == ITEM_USAGE_BAD_EQUIP || usage == ITEM_USAGE_BROKEN_EQUIP)
                     {
                         botAI->DoSpecificAction("equip upgrades");
                         break;
@@ -169,7 +170,8 @@ bool BuyAction::Execute(Event event)
                 }
 
                 ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
-                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP || ITEM_USAGE_BAD_EQUIP || ITEM_USAGE_BROKEN_EQUIP)
+                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP ||
+                    usage == ITEM_USAGE_BAD_EQUIP || usage == ITEM_USAGE_BROKEN_EQUIP)
                 {
                     botAI->DoSpecificAction("equip upgrades");
                     break;
