@@ -637,20 +637,21 @@ bool AmmoCountTrigger::IsActive()
 {
     uint32 currentAmmoId = bot->GetUInt32Value(PLAYER_AMMO_ID);
 
-    // If no ammo is equipped, but there is ammo in the bag, return true
-    if (currentAmmoId == 0)
+    if (currentAmmoId == 0)  // No ammo equipped
     {
-        // Check if the bot has any suitable ammo in its bags
-        if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
         {
             FindAmmoVisitor visitor(bot, pItem->GetTemplate()->SubClass);
-            IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
+            PlayerbotFactory factory(bot, bot->GetLevel());
+            factory.IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
+
             if (!visitor.GetResult().empty())
             {
-                return true;  // No ammo equipped but ammo is available
+                return true;  // Ammo exists in bag but is not equipped
             }
         }
     }
 
     return ItemCountTrigger::IsActive();
 }
+
