@@ -405,7 +405,7 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
 
     // Avoid creating accounts if both maxRandom & ClassBots are set to zero.
     if (sPlayerbotAIConfig->maxRandomBots == 0 &&
-        sPlayerbotAIConfig->addClassAccountPoolSize == 0)
+        !sPlayerbotAIConfig->enableRotation)
         return 0;
 
     bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING;
