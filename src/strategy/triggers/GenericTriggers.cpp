@@ -637,26 +637,8 @@ bool AmmoCountTrigger::IsActive()
     if (bot->GetUInt32Value(PLAYER_AMMO_ID) != 0)  
         return ItemCountTrigger::IsActive();  // Ammo already equipped
 
-    if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-    {
-        FindAmmoVisitor visitor(bot, pItem->GetTemplate()->SubClass);
-
-        // Iterate over all bags and check for suitable ammo
-        for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
-        {
-            if (Bag* container = bot->GetBagByPos(bag))
-            {
-                for (uint32 slot = 0; slot < container->GetBagSize(); ++slot)
-                {
-                    if (Item* item = container->GetItemByPos(slot))
-                    {
-                        if (visitor.Visit(item))
-                            return true;  // Found suitable ammo
-                    }
-                }
-            }
-        }
-    }
+    if (botAI->FindAmmo())  
+        return true;  // Found ammo in inventory but not equipped
 
     return ItemCountTrigger::IsActive();
 }
