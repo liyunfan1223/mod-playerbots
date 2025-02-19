@@ -146,6 +146,10 @@ ItemUsage ItemUsageValue::Calculate()
                     {
                         return ITEM_USAGE_EQUIP;
                     }
+                    if (newAmmoDPS < currentAmmoDPS) // New ammo is worse
+                    {
+                        return ITEM_USAGE_NONE;
+                    }
                 }
                 // Ensure we have enough ammo in the inventory
                 if (ammoCount < requiredAmmo)
