@@ -71,47 +71,21 @@ bool BuyAction::Execute(Event event)
             
             for (auto& tItem : m_items_sorted)
             {
-                for (uint32 i = 0; i < 10; i++)  // Buy 10 times or until no longer useful/possible
+                uint32 maxPurchases = 1;  // Default to buying once
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
+                if (!proto)
+                    continue;
+            
+                if (proto->Class == ITEM_CLASS_CONSUMABLE || proto->Class == ITEM_CLASS_PROJECTILE)
+                {
+                    maxPurchases = 10;  // Allow up to 10 purchases if it's a consumable
+                }
+            
+                for (uint32 i = 0; i < maxPurchases; i++)
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
-                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
-
                     if (!proto)
                         continue;
-
-                    // Report item usage to master
-                    std::ostringstream usageOut;
-                    usageOut << "Item usage for " << ChatHelper::FormatItem(proto) << ": ";
-                    
-                    switch (usage)
-                    {
-                        case ITEM_USAGE_NONE:
-                            usageOut << "ITEM_USAGE_NONE";
-                            break;
-                        case ITEM_USAGE_REPLACE:
-                            usageOut << "ITEM_USAGE_REPLACE";
-                            break;
-                        case ITEM_USAGE_EQUIP:
-                            usageOut << "ITEM_USAGE_EQUIP";
-                            break;
-                        case ITEM_USAGE_AMMO:
-                            usageOut << "ITEM_USAGE_AMMO";
-                            break;
-                        case ITEM_USAGE_QUEST:
-                            usageOut << "ITEM_USAGE_QUEST";
-                            break;
-                        case ITEM_USAGE_USE:
-                            usageOut << "ITEM_USAGE_USE";
-                            break;
-                        case ITEM_USAGE_SKILL:
-                            usageOut << "ITEM_USAGE_SKILL";
-                            break;
-                        default:
-                            usageOut << "UNKNOWN (" << static_cast<int>(usage) << ")";
-                            break;
-                    }
-
-                    botAI->TellMaster(usageOut.str());
             
                     uint32 itemClass = proto->Class;
                     uint32 itemSubClass = proto->SubClass;
@@ -127,7 +101,6 @@ bool BuyAction::Execute(Event event)
                     price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
             
                     NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
-            
                     switch (usage)
                     {
                         case ITEM_USAGE_REPLACE:
@@ -164,13 +137,14 @@ bool BuyAction::Execute(Event event)
                     // Store the best subclass per item class
                     bestPurchasedSubClass[itemClass] = itemSubClass;
             
-                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP)
+                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP || ITEM_USAGE_BAD_EQUIP || ITEM_USAGE_BROKEN_EQUIP)
                     {
                         botAI->DoSpecificAction("equip upgrades");
                         break;
                     }
                 }
             }
+
         }
         else
         {
@@ -195,7 +169,7 @@ bool BuyAction::Execute(Event event)
                 }
 
                 ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
-                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP)
+                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP || ITEM_USAGE_BAD_EQUIP || ITEM_USAGE_BROKEN_EQUIP)
                 {
                     botAI->DoSpecificAction("equip upgrades");
                     break;
