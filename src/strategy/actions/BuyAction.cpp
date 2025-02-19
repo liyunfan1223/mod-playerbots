@@ -156,6 +156,13 @@ bool BuyAction::Execute(Event event)
                     out << "Nobody sells " << ChatHelper::FormatItem(proto) << " nearby";
                     botAI->TellMaster(out.str());
                 }
+
+                ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
+                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP)
+                {
+                    botAI->DoSpecificAction("equip upgrades");
+                    break;
+                }
             }
         }
     }
