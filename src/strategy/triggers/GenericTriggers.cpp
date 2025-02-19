@@ -10,12 +10,12 @@
 #include "BattlegroundWS.h"
 #include "CreatureAI.h"
 #include "GameTime.h"
-//#include "InventoryAction.h"
+// #include "InventoryAction.h"
 #include "ItemVisitors.h"
 #include "LastSpellCastValue.h"
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
-#include "PlayerbotFactory.h"
+// #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
@@ -636,23 +636,26 @@ Value<Unit*>* BuffOnMainTankTrigger::GetTargetValue() { return context->GetValue
 
 bool AmmoCountTrigger::IsActive()
 {
-    uint32 currentAmmoId = bot->GetUInt32Value(PLAYER_AMMO_ID);
+    if (bot->GetUInt32Value(PLAYER_AMMO_ID) != 0)  
+        return ItemCountTrigger::IsActive();  // Ammo already equipped
 
-    if (currentAmmoId == 0)  // No ammo equipped
+    if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
     {
-        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-        {
-            FindAmmoVisitor visitor(bot, pItem->GetTemplate()->SubClass);
-            PlayerbotFactory factory(bot, bot->GetLevel());
-            factory.IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
+        FindAmmoVisitor visitor(bot, pItem->GetTemplate()->SubClass);
 
-            if (!visitor.GetResult().empty())
+        // Iterate over all bags and check for suitable ammo
+        for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+        {
+            if (Bag* container = bot->GetBagByPos(bag))
             {
-                return true;  // Ammo exists in bag but is not equipped
+                for (uint32 slot = 0; slot < container->GetBagSize(); ++slot)
+                {
+                    if (Item* item = container->GetItemByPos(slot) && visitor.Visit(item))
+                        return true;  // Found suitable ammo
+                }
             }
         }
     }
 
     return ItemCountTrigger::IsActive();
 }
-
