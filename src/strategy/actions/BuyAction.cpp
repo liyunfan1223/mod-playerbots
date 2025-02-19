@@ -115,7 +115,9 @@ bool BuyAction::Execute(Event event)
                     }
             
                     // Check the bot's currently equipped item for this slot
-                    Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bot->GetEquipSlotForInventoryType(invType));
+                    uint8 dstSlot = botAI->FindEquipSlot(proto, NULL_SLOT, true);
+                    Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot);
+
                     float oldScore = 0.0f;
                     if (oldItem)
                     {
