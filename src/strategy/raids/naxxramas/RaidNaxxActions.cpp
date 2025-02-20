@@ -829,11 +829,6 @@ bool AnubrekhanPositionAction::Execute(Event event)
     {
         return false;
     }
-    auto* boss_ai = dynamic_cast<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI*>(boss->GetAI());
-    if (!boss_ai)
-    {
-        return false;
-    }
     bool inPhase = botAI->HasAura("locust swarm", boss) || boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (inPhase)
     {
