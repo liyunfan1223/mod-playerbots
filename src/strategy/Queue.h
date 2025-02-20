@@ -53,6 +53,14 @@ public:
      */
     uint32 Size();
 
+    /**
+     * @brief Removes and deletes expired actions from the queue
+     * 
+     * Uses sPlayerbotAIConfig->expireActionTime to determine if actions have expired.
+     * Both the ActionNode and ActionBasket are deleted for expired actions.
+     */
+    void RemoveExpired();
+
 private:
     /**
      * @brief Updates existing basket with new relevance and cleans up new basket
@@ -69,6 +77,11 @@ private:
      * @brief Extracts action from basket and handles basket cleanup
      */
     ActionNode* extractAndDeleteBasket(ActionBasket* basket);
+
+    /**
+     * @brief Collects all expired baskets into the provided list
+     */
+    void collectExpiredBaskets(std::list<ActionBasket*>& expiredBaskets);
 
     /**
      * @brief Removes and deletes all baskets in the provided list

@@ -305,6 +305,9 @@ AiPlayerbot.DisableMoveSplinePath = 0
 # default: 3
 AiPlayerbot.MaxMovementSearchTime = 3
 
+# Action expiration time
+AiPlayerbot.ExpireActionTime = 5000
+
 # Max dispel auras duration
 AiPlayerbot.DispelAuraDuration = 700
 
