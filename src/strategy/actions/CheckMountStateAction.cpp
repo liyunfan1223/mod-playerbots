@@ -172,8 +172,9 @@ bool CheckMountStateAction::Mount()
     MountData mountData = CollectMountData(bot);
     int32 masterSpeed = CalculateMasterMountSpeed(master, mountData);
 
-    if (TryPreferredMount(master))
-        return true;
+    // Disabled for now as it is not implemented / documented yet. See https://github.com/liyunfan1223/mod-playerbots/pull/622
+    //if (TryPreferredMount(master))
+    //    return true;
 
     int32 masterMountType = GetMountType(master);
     auto spellsIt = mountData.allSpells.find(masterMountType);
