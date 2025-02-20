@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
- */
+* Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+* and/or modify it under version 2 of the License, or (at your option), any later version.
+*/
 
 #include "RandomPlayerbotFactory.h"
 
@@ -19,7 +19,7 @@
 std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
 
 constexpr RandomPlayerbotFactory::NameRaceAndGender RandomPlayerbotFactory::CombineRaceAndGender(uint8 gender,
-                                                                                                 uint8 race)
+                                                                                                uint8 race)
 {
     switch (race)
     {
@@ -244,7 +244,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         delete player;
 
         LOG_ERROR("playerbots", "Unable to create random bot for account {} - name: \"{}\"; race: {}; class: {}",
-                  accountId, name.c_str(), race, cls);
+                accountId, name.c_str(), race, cls);
         return nullptr;
     }
 
@@ -256,7 +256,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         player->learnSpell(50977, false);
     }
     LOG_DEBUG("playerbots", "Random bot created for account {} - name: \"{}\"; race: {}; class: {}", accountId,
-              name.c_str(), race, cls);
+            name.c_str(), race, cls);
 
     return player;
 }
@@ -393,6 +393,37 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
     return std::move(botName);
 }
 
+uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
+{
+    // Calculates the total number of required accounts, either using the specified randomBotAccountCount
+    // or determining it dynamically based on the WOTLK condition, max random bots, rotation pool size,
+    // and additional class account pool size.
+
+    // Checks if randomBotAccountCount is set, otherwise calculate it dynamically.
+    if (sPlayerbotAIConfig->randomBotAccountCount > 0)
+        return sPlayerbotAIConfig->randomBotAccountCount;
+
+    // Avoid creating accounts if both maxRandom & ClassBots are set to zero.
+    if (sPlayerbotAIConfig->maxRandomBots == 0 &&
+        sPlayerbotAIConfig->addClassAccountPoolSize == 0)
+        return 0;
+
+    bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING;
+
+    // Determine divisor based on WOTLK condition
+    int divisor = isWOTLK ? 10 : 9;
+
+    // Calculate max bots or rotation pool size
+    int maxBotsOrRotation = std::max(
+        sPlayerbotAIConfig->maxRandomBots,
+        sPlayerbotAIConfig->enableRotation ? sPlayerbotAIConfig->rotationPoolSize : 0
+    );
+
+    // Calculate base accounts, add class account pool size, and add 1 as a fixed offset
+    uint32 baseAccounts = maxBotsOrRotation / divisor;
+    return baseAccounts + sPlayerbotAIConfig->addClassAccountPoolSize + 1;
+}
+
 void RandomPlayerbotFactory::CreateRandomBots()
 {
     /* multi-thread here is meaningless? since the async db operations */
@@ -401,7 +432,10 @@ void RandomPlayerbotFactory::CreateRandomBots()
         std::vector<uint32> botAccounts;
         std::vector<uint32> botFriends;
 
-        for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
+        // Calculates the total number of required accounts.
+        uint32 totalAccountCount = CalculateTotalAccountCount();
+
+        for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
         {
             std::ostringstream out;
             out << sPlayerbotAIConfig->randomBotAccountPrefix << accountNumber;
@@ -413,7 +447,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         LOG_INFO("playerbots", "Deleting all random bot characters, {} accounts collected...", botAccounts.size());
         QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'",
-                                                  sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+                                                sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
         int32 deletion_count = 0;
         if (results)
         {
@@ -440,11 +474,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     LOG_INFO("playerbots", "Creating random bot accounts...");
     std::unordered_map<NameRaceAndGender, std::vector<std::string>> nameCache;
-    uint32 totalAccCount = sPlayerbotAIConfig->randomBotAccountCount;
     std::vector<std::future<void>> account_creations;
     int account_creation = 0;
 
-    for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
+    // Calculates the total number of required accounts.
+    uint32 totalAccountCount = CalculateTotalAccountCount();
+
+    for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
     {
         std::ostringstream out;
         out << sPlayerbotAIConfig->randomBotAccountPrefix << accountNumber;
@@ -488,13 +524,12 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     LOG_INFO("playerbots", "Creating random bot characters...");
     uint32 totalRandomBotChars = 0;
-    uint32 totalCharCount = sPlayerbotAIConfig->randomBotAccountCount * 10;
     std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
     int bot_creation = 0;
 
     bool nameCached = false;
-    for (uint32 accountNumber = 0; accountNumber < sPlayerbotAIConfig->randomBotAccountCount; ++accountNumber)
+    for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
     {
         std::ostringstream out;
         out << sPlayerbotAIConfig->randomBotAccountPrefix << accountNumber;
@@ -546,12 +581,11 @@ void RandomPlayerbotFactory::CreateRandomBots()
             } while (result->NextRow());
         }
         
-        LOG_DEBUG("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1,
-            sPlayerbotAIConfig->randomBotAccountCount);
+        LOG_DEBUG("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1, totalAccountCount);
         RandomPlayerbotFactory factory(accountId);
 
         WorldSession* session = new WorldSession(accountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
-                                                 time_t(0), LOCALE_enUS, 0, false, false, 0, true);
+                                                time_t(0), LOCALE_enUS, 0, false, false, 0, true);
         sessionBots.push_back(session);
 
         for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES - count; ++cls)
@@ -607,7 +641,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     }
 
     LOG_INFO("server.loading", ">> {} random bot accounts with {} characters available",
-             sPlayerbotAIConfig->randomBotAccounts.size(), totalRandomBotChars);
+            sPlayerbotAIConfig->randomBotAccounts.size(), totalRandomBotChars);
 }
 
 void RandomPlayerbotFactory::CreateRandomGuilds()
@@ -677,7 +711,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         if (!player)
         {
             LOG_ERROR("playerbots", "ObjectAccessor Cannot find player to set leader for guild {} . Skipped...",
-                      guildName.c_str());
+                    guildName.c_str());
             continue;
         }
 
@@ -688,7 +722,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         if (!guild->Create(player, guildName))
         {
             LOG_ERROR("playerbots", "Error creating guild [ {} ] with leader [ {} ]", guildName.c_str(),
-                      player->GetName().c_str());
+                    player->GetName().c_str());
             delete guild;
             continue;
         }

@@ -4,6 +4,7 @@
  */
 
 #include "MageActions.h"
+#include <cmath>
 
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
@@ -17,6 +18,10 @@ bool CastFrostNovaAction::isUseful()
     Unit* target = AI_VALUE(Unit*, "current target");
     if (target && target->ToCreature() && target->ToCreature()->HasMechanicTemplateImmunity(1 << (MECHANIC_FREEZE - 1)))
         return false;
+
+    if (target->isFrozen())
+        return false;
+    
     return sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 10.f);
 }
 
@@ -87,4 +92,14 @@ Unit* CastFocusMagicOnPartyAction::GetTarget()
         return healer;
 
     return target;
+}
+
+bool CastBlinkBackAction::Execute(Event event)
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+    // can cast spell check passed in isUseful()
+    bot->SetOrientation(bot->GetAngle(target) + M_PI);
+    return CastSpellAction::Execute(event);
 }

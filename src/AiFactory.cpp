@@ -369,6 +369,10 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_HUNTER:
             engine->addStrategiesNoInit("dps", "aoe", "bdps", "dps assist", nullptr);
             engine->addStrategy("dps debuff", false);
+            // if (tab == HUNTER_TAB_SURVIVAL)
+            // {
+            //     engine->addStrategy("trap weave", false);
+            // }
             break;
         case CLASS_ROGUE:
             if (tab == ROGUE_TAB_ASSASSINATION)
