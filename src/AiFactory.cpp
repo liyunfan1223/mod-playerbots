@@ -356,7 +356,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategiesNoInit("heal", "cure", "dps assist", nullptr);
             else
             {
-                if (player->HasSpell(768) && !player->HasAura(16931) /*thick hide*/)
+                if (player->HasSpell(768) /*cat form*/&& !player->HasAura(16931) /*thick hide*/)
                 {
                     engine->addStrategiesNoInit("cat", "dps assist", nullptr);
                 }
