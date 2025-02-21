@@ -446,4 +446,6 @@ bool BlessingOfSanctuaryOnPartyTrigger::IsActive()
     return BuffOnPartyTrigger::IsActive() && 
     !botAI->HasAura("greater blessing of sanctuary", target) && 
     !botAI->HasAura("blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target);
+
+
 }
