@@ -201,45 +201,37 @@ bool LfgAcceptAction::Execute(Event event)
     uint32 id = AI_VALUE(uint32, "lfg proposal");
     if (id)
     {
-        // if (urand(0, 1 + 10 / sPlayerbotAIConfig->randomChangeMultiplier))
-        //     return false;
-
         if (bot->IsInCombat() || bot->isDead())
         {
-            /// @FIXME: Race condition
             LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
                      bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
                      bot->GetName().c_str(), id);
             sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
+            botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
             return true;
         }
 
         LOG_INFO("playerbots", "Bot {} {}:{} <{}> accepts LFG proposal {}", bot->GetGUID().ToString().c_str(),
                  bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), id);
 
-        botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
-
         bot->ClearUnitState(UNIT_STATE_ALL_STATE);
-        /// @FIXME: Race condition
         sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
+        botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
 
         if (sRandomPlayerbotMgr->IsRandomBot(bot) && !bot->GetGroup())
         {
             sRandomPlayerbotMgr->Refresh(bot);
             botAI->ResetStrategies();
-            // bot->TeleportToHomebind();
         }
 
         botAI->Reset();
-
         return true;
     }
-    
+
     if (event.getPacket().empty())
         return false;
 
     WorldPacket p(event.getPacket());
-
     uint32 dungeon;
     uint8 state;
     p >> dungeon >> state >> id;
