@@ -201,6 +201,9 @@ bool LfgAcceptAction::Execute(Event event)
     uint32 id = AI_VALUE(uint32, "lfg proposal");
     if (id)
     {
+        // if (urand(0, 1 + 10 / sPlayerbotAIConfig->randomChangeMultiplier))
+        //     return false;
+
         if (bot->IsInCombat() || bot->isDead())
         {
             LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
@@ -208,6 +211,7 @@ bool LfgAcceptAction::Execute(Event event)
                      bot->GetName().c_str(), id);
             sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
             botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
+
             return true;
         }
 
@@ -225,6 +229,7 @@ bool LfgAcceptAction::Execute(Event event)
         }
 
         botAI->Reset();
+
         return true;
     }
 
