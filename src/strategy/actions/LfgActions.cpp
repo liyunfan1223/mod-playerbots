@@ -226,6 +226,7 @@ bool LfgAcceptAction::Execute(Event event)
         {
             sRandomPlayerbotMgr->Refresh(bot);
             botAI->ResetStrategies();
+            // bot->TeleportToHomebind();
         }
 
         botAI->Reset();
