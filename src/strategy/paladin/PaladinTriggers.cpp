@@ -10,6 +10,7 @@
 #include "Playerbots.h"
 #include "Group.h"
 #include "AiFactory.h"
+#include "SharedDefines.h"
 
 bool SealTrigger::IsActive()
 {
@@ -26,7 +27,7 @@ bool CrusaderAuraTrigger::IsActive()
     return AI_VALUE2(bool, "mounted", "self target") && !botAI->HasAura("crusader aura", target);
 }
 
-bool BlessingTrigger::IsActive()
+/*bool BlessingTrigger::IsActive()
 {
     Unit* target = GetTarget();
     Player* bot = botAI->GetBot();
@@ -39,8 +40,9 @@ bool BlessingTrigger::IsActive()
        return false;
 
     return SpellTrigger::IsActive() && !botAI->HasAnyAuraOf(target, "blessing of might", "blessing of wisdom",
-                                                            "blessing of kings", "blessing of sanctuary", nullptr); 
+                                                                     "blessing of kings", nullptr); 
 }
+ */
 
 //greater blessing on party triggers
 
@@ -56,7 +58,7 @@ PaladinSelectionGroup* PaladinSelectionGroupManager::GetPaladinSelectionGroup(Gr
 
 std::vector<Player*> PaladinSelectionGroup::GetSortedPaladins() const
 {
-    std::vector<Player*> selectedPaladins;
+    std::vector<Player*> allPaladins;
     std::set<ObjectGuid> visitedPaladins;
 
     for (const GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
@@ -65,17 +67,45 @@ std::vector<Player*> PaladinSelectionGroup::GetSortedPaladins() const
         if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member->GetGUID()))
             continue;
 
-        BotRoles role = AiFactory::GetPlayerRoles(member);
+        if (member->GetLevel() >= 60)
+        {
+            allPaladins.push_back(member);
+            visitedPaladins.insert(member->GetGUID());
+        }
+    }
 
+    std::stable_sort(allPaladins.begin(), allPaladins.end(), [](Player* a, Player* b) {
+        return a->GetLevel() > b->GetLevel();
+    });
+
+    std::vector<Player*> selectedPaladins;
+    Player* highestLevelTank = nullptr;
+
+    for (Player* paladin : allPaladins)
+    {
+        BotRoles role = AiFactory::GetPlayerRoles(paladin);
         if (role == BOT_ROLE_TANK)
-            selectedPaladins.insert(selectedPaladins.begin(), member); 
-        else
-            selectedPaladins.push_back(member); 
+        {
+            highestLevelTank = paladin;
+            selectedPaladins.push_back(paladin);
+            break;
+        }
+    }
 
-        visitedPaladins.insert(member->GetGUID());
+    if (!highestLevelTank && !allPaladins.empty())
+    {
+        selectedPaladins.push_back(allPaladins[0]);
+    }
 
+    for (Player* paladin : allPaladins)
+    {
         if (selectedPaladins.size() >= MAX_PALADINS)
             break;
+
+        if (std::find(selectedPaladins.begin(), selectedPaladins.end(), paladin) == selectedPaladins.end())
+        {
+            selectedPaladins.push_back(paladin);
+        }
     }
 
     std::reverse(selectedPaladins.begin(), selectedPaladins.end());
@@ -108,56 +138,35 @@ size_t PaladinSelectionGroup::GetPaladinOrderForBlessing(PlayerbotAI* botAI) con
 
 bool GreaterBlessingOfKingsOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot(); 
-    if (!bot)
-        return false;
+    Group* group = bot->GetGroup();
+        if (!group)
+            return false;
 
-    Group* group = bot->GetGroup(); 
-    if (!group) 
-        return false;
-
-    Unit* target = GetTarget(); 
-    if (!target)
-        return false;
-
+    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
+    
     if (!group->isRaidGroup())
         return false;
-
-    if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false))
-        return false;
     
-    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
-
-    size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
-
-    if (paladinOrder == 1)
+        if (paladinOrder == 1)
     {
-        //botAI->TellMaster("准备施放强效王者祝福！");
+        Unit* target = GetTarget();
+        if (!target  || target->GetLevel() < 50)
+            return false;
+       
+        if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false))
+            return false;
+
         return true;
     }
 
     return false;
 }
 
-
 bool GreaterBlessingOfMightOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    if (!bot)
-        return false;
-
     Group* group = bot->GetGroup();
     if (!group)
-        return false;
-
-    Unit* target = GetTarget();
-    if (!target)
-        return false;
-
-    if (!group->isRaidGroup())
-        return false;
-
-    if (botAI->HasAura("greater blessing of might", target, false, true, 1, false))
         return false;
 
     PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
@@ -165,63 +174,52 @@ bool GreaterBlessingOfMightOnPartyTrigger::IsActive()
 
     if (paladinOrder == 2)
     {
-        //botAI->TellMaster("准备施放强效力量祝福！");
+        if (!group->isRaidGroup())
+            return false;
+            Unit* target = GetTarget();
+            
+        if (!target || target->GetLevel() < 42)
+            return false;        
+          
+        if (botAI->HasAura("greater blessing of might", target, false, true, 1, false))
+            return false;
         return true;
     }
-
     return false;
 }
 
 bool GreaterBlessingOfWisdomOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    if (!bot)
-        return false;
-
     Group* group = bot->GetGroup();
     if (!group)
-        return false;
-
-    Unit* target = GetTarget();
-    if (!target)
-        return false;
-
-    if (!group->isRaidGroup())
-        return false;
-
-    if (botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
         return false;
 
     PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
     size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
 
-    if (paladinOrder == 3)
+    if (paladinOrder == 3) 
     {
-        //botAI->TellMaster("准备施放强效智慧祝福！");
+        if (!group->isRaidGroup())
+            return false;
+
+        Unit* target = GetTarget();
+
+        if (!target || target->GetLevel() < 44)
+            return false;
+        
+            if (botAI->HasAura("greater blessing of wisdom", target, false, true, 1, false))
+            return false;
+
         return true;
     }
-
     return false;
 }
 
+
 bool GreaterBlessingOfSanctuaryOnPartyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    if (!bot)
-        return false;
-
     Group* group = bot->GetGroup();
     if (!group)
-        return false;
-
-    Unit* target = GetTarget();
-    if (!target)
-        return false;
-
-    if (!group->isRaidGroup())
-        return false;
-
-    if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false))
         return false;
 
     PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
@@ -229,10 +227,223 @@ bool GreaterBlessingOfSanctuaryOnPartyTrigger::IsActive()
 
     if (paladinOrder == 4)
     {
-        //botAI->TellMaster("准备施放强效庇护祝福！");
+        if (!group->isRaidGroup())
+            return false;
+
+        Unit* target = GetTarget();
+        if (!target || target->GetLevel() < 50)
+            return false;
+
+        if (botAI->HasAura("greater blessing of sanctuary", target, false, true, 1, false))
+            return false;
+
         return true;
     }
-
     return false;
 }
 
+//blessing triggers
+bool BlessingOfKingsTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    if (!bot) 
+        return false;
+
+    Group* group = bot->GetGroup();
+
+    if (group && group->isRaidGroup() || bot->GetLevel() >= 60)
+        return false;
+
+    return BuffTrigger::IsActive() && !botAI->HasAura("greater blessing of kings", bot) && !botAI->HasAura("blessing of kings", bot);
+}
+
+bool BlessingOfWisdomTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    if (!bot)
+       return false;
+
+    Group* group = bot->GetGroup();
+    if (group && group->isRaidGroup() || bot->GetLevel() >= 60)
+        return false;
+
+    if (!botAI->HasAura("greater blessing of wisdom", bot))
+    {
+        Aura* existingAura = botAI->GetAura("blessing of wisdom", bot);
+
+        if (existingAura)
+        {
+            Unit* caster = existingAura->GetCaster();
+            if (caster && bot->GetLevel() > caster->GetLevel())
+            {
+                return true;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+bool BlessingOfMightTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    Group* group = bot->GetGroup();
+
+    if (group && group->isRaidGroup() || bot->GetLevel() >= 60)
+        return false;
+
+    if (!botAI->HasAura("greater blessing of might", bot))
+    {
+        Aura* existingAura = botAI->GetAura("blessing of might", bot);
+
+        if (existingAura)
+        {
+            Unit* caster = existingAura->GetCaster();
+            if (caster && bot->GetLevel() > caster->GetLevel())
+            {
+                return true;
+            }
+        return true;
+        }
+    }
+    return false;
+}
+
+bool BlessingOfSanctuaryTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    if (!bot) 
+        return false;
+
+    Group* group = bot->GetGroup();
+
+    if (group && group->isRaidGroup() || bot->GetLevel() >= 60)
+        return false;
+
+    int tab = AiFactory::GetPlayerSpecTab(bot);
+    if (tab == !PALADIN_TAB_PROTECTION)
+        return false;
+        
+    return !botAI->HasAura("greater blessing of sanctuary", bot) && !botAI->HasAura("blessing of sanctuary", bot); 
+}
+
+//blessing on party triggers
+bool BlessingOfKingsOnPartyTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    Unit* target = GetTarget();
+    Group* group = bot->GetGroup();
+
+    if (!bot || !target || !group) 
+    {
+        return false;
+    }
+    
+    if (bot->GetLevel() >= 60 && group->isRaidGroup())
+    {
+        return false;
+    }
+    
+    return BuffOnPartyTrigger::IsActive() && 
+    !botAI->HasAura("greater blessing of kings", target) && 
+    !botAI->HasAura("blessing of kings", target);
+}
+
+
+bool BlessingOfWisdomOnPartyTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    Unit* target = GetTarget();
+    Group* group = bot->GetGroup();
+
+    if (!bot || !target || !group)
+    {
+        return false;
+    }
+    if (bot->GetLevel() >= 60 && group->isRaidGroup())
+    {
+        return false;
+    }    
+    
+    if (!botAI->HasAura("greater blessing of wisdom", target))
+    {
+        Aura* existingAura = botAI->GetAura("blessing of wisdom", target);
+        if (existingAura)
+        {
+            uint8 existingCasterLevel = existingAura->GetCasterLevel();
+            if (bot->GetLevel() > existingCasterLevel)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+    return false; 
+}
+
+bool BlessingOfMightOnPartyTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    Unit* target = GetTarget();
+    Group* group = bot->GetGroup();
+
+    if (!bot || !target || !group)
+    {
+        return false;
+    }
+    if (bot->GetLevel() >= 60 && group->isRaidGroup())
+    {
+        return false;
+    }    
+    
+    if (!botAI->HasAura("greater blessing of might", target))
+    {
+        Aura* existingAura = botAI->GetAura("blessing of might", target);
+        if (existingAura)
+        {
+            uint8 existingCasterLevel = existingAura->GetCasterLevel();
+            if (bot->GetLevel() > existingCasterLevel)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+    return false; 
+}
+
+bool BlessingOfSanctuaryOnPartyTrigger::IsActive() 
+{ 
+    Player* bot = botAI->GetBot();
+    Unit* target = GetTarget();
+    Group* group = bot->GetGroup();
+
+    if (!bot || !target || !group) 
+    {
+        return false;
+    }
+    
+    if (bot->GetLevel() >= 60 && group->isRaidGroup())
+    {
+        return false;
+    }
+    
+    int tab = AiFactory::GetPlayerSpecTab(bot);
+    if (tab == !PALADIN_TAB_PROTECTION)
+    {
+        return false;
+    }   
+
+    return BuffOnPartyTrigger::IsActive() && 
+    !botAI->HasAura("greater blessing of sanctuary", target) && 
+    !botAI->HasAura("blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target);
+}

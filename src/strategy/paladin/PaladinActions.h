@@ -80,6 +80,7 @@ public:
     bool isUseful() override;
 };
 
+//blessing actions
 class CastBlessingOfMightAction : public CastBuffSpellAction
 {
 public:
