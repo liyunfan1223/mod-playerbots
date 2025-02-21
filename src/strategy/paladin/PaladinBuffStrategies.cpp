@@ -33,9 +33,6 @@ void PaladinBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("blessing of wisdom on party",
                         NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("blessing of might on party",
-                        NextAction::array(0, new NextAction("blessing of might on party", 11.0f), nullptr)));
     // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of wisdom",
     // ACTION_HIGH + 8), nullptr)));
 }
@@ -60,9 +57,6 @@ void PaladinBuffHealthStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
     triggers.push_back(
         new TriggerNode("blessing of wisdom on party",
                         NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("blessing of might on party",
-                        NextAction::array(0, new NextAction("blessing of might on party", 11.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("blessing of kings",
                         NextAction::array(0, new NextAction("blessing of kings", 11.0f), nullptr)));
@@ -102,9 +96,7 @@ void PaladinBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("blessing of might on party",
-                        NextAction::array(0, new NextAction("blessing of might on party", 11.0f), nullptr)));
-
-            
+                        NextAction::array(0, new NextAction("blessing of might on party", 11.0f), nullptr)));            
                             
     // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of might",
     // ACTION_HIGH + 8), nullptr)));
