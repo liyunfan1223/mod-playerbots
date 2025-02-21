@@ -87,8 +87,6 @@ bool BuyAction::Execute(Event event)
                     return score1 > score2; // Sort in descending order (highest score first)
                 });
 
-
-            
             std::unordered_map<uint32, float> bestPurchasedItemScore;  // Track best item score per InventoryType
             
             for (auto& tItem : m_items_sorted)
@@ -106,21 +104,19 @@ bool BuyAction::Execute(Event event)
                 for (uint32 i = 0; i < maxPurchases; i++)
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
-                    if (!proto)
-                        continue;
-            
+
                     uint32 invType = proto->InventoryType;
-            
+
                     // Calculate item score
                     float newScore = calculator.CalculateItem(proto->ItemId);
-            
+
                     // Skip if we already bought a better item for this slot
                     if (bestPurchasedItemScore.find(invType) != bestPurchasedItemScore.end() &&
                         bestPurchasedItemScore[invType] > newScore)
                     {
                         break;  // Skip lower-scoring items
                     }
-            
+
                     // Check the bot's currently equipped item for this slot
                     uint8 dstSlot = botAI->FindEquipSlot(proto, NULL_SLOT, true);
                     Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot);
@@ -132,14 +128,14 @@ bool BuyAction::Execute(Event event)
                         if (oldItemProto)
                             oldScore = calculator.CalculateItem(oldItemProto->ItemId);
                     }
-            
+
                     // Skip if the bot already has a better or equal item equipped
                     if (oldScore > newScore)
                         break;
-            
+
                     uint32 price = proto->BuyPrice;
                     price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
-            
+
                     NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
                     switch (usage)
                     {
@@ -164,19 +160,19 @@ bool BuyAction::Execute(Event event)
                         default:
                             break;
                     }
-            
+
                     if (needMoneyFor == NeedMoneyFor::none)
                         break;
-            
+
                     if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
                         break;
-            
+
                     if (!BuyItem(tItems, vendorguid, proto))
                         break;
-            
+
                     // Store the best item score per InventoryType
                     bestPurchasedItemScore[invType] = newScore;
-            
+
                     if (needMoneyFor == NeedMoneyFor::gear)
                     {
                         botAI->DoSpecificAction("equip upgrades");
