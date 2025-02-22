@@ -87,12 +87,12 @@ public:
         float new_dis = bot->GetDistance(new_unit);
         float old_dis = bot->GetDistance(old_unit);
         // hasAggro? -> withinMelee? -> threat
-        if (GetIntervalLevel(new_unit) > GetIntervalLevel(old_unit))
+        if (GetIntervalLevel(new_unit) != GetIntervalLevel(old_unit))
         {
-            return true;
+            return GetIntervalLevel(new_unit) > GetIntervalLevel(old_unit);
         }
         int32_t interval = GetIntervalLevel(new_unit);
-        if (interval == 1)
+        if (interval == 2)
         {
             return new_dis < old_dis;
         }
@@ -101,6 +101,10 @@ public:
     int32_t GetIntervalLevel(Unit* unit)
     {
         if (!botAI->HasAggro(unit))
+        {
+            return 2;
+        }
+        if (botAI->GetBot()->IsWithinMeleeRange(unit))
         {
             return 1;
         }

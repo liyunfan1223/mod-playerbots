@@ -59,7 +59,8 @@ FrostMageStrategy::FrostMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy(b
 
 NextAction** FrostMageStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("frostbolt", ACTION_DEFAULT + 0.2f),
+    return NextAction::array(0, new NextAction("frostbolt", ACTION_DEFAULT + 0.3f),
+                             new NextAction("fire blast", ACTION_DEFAULT + 0.2f), // cast during movement
                              new NextAction("shoot", ACTION_DEFAULT + 0.1f),
                              new NextAction("fireball", ACTION_DEFAULT), nullptr);
 }

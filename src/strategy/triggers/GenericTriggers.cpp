@@ -10,6 +10,7 @@
 #include "BattlegroundWS.h"
 #include "CreatureAI.h"
 #include "GameTime.h"
+#include "ItemVisitors.h"
 #include "LastSpellCastValue.h"
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
@@ -227,8 +228,7 @@ bool AoeTrigger::IsActive()
         Unit* unit = botAI->GetUnit(guid);
         if (!unit || !unit->IsAlive())
             continue;
-
-        if (unit->GetExactDist2d(current_target) <= range)
+        if (unit->GetDistance(current_target->GetPosition()) <= range)
         {
             attackers_count++;
         }
@@ -630,3 +630,14 @@ bool IsFallingFarTrigger::IsActive() { return bot->HasUnitMovementFlag(MOVEMENTF
 bool HasAreaDebuffTrigger::IsActive() { return AI_VALUE2(bool, "has area debuff", "self target"); }
 
 Value<Unit*>* BuffOnMainTankTrigger::GetTargetValue() { return context->GetValue<Unit*>("main tank", spell); }
+
+bool AmmoCountTrigger::IsActive()
+{
+    if (bot->GetUInt32Value(PLAYER_AMMO_ID) != 0)  
+        return ItemCountTrigger::IsActive();  // Ammo already equipped
+
+    if (botAI->FindAmmo())  
+        return true;  // Found ammo in inventory but not equipped
+
+    return ItemCountTrigger::IsActive();
+}

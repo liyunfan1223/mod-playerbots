@@ -613,14 +613,15 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 
     if (!player->InBattleground())
     {
-        nonCombatEngine->addStrategiesNoInit("nc", "food", "chat", "follow", "default", "quest", "loot", "gather", "duel",
-                                       "buff", "mount", "emote", nullptr);
+        nonCombatEngine->addStrategiesNoInit("nc", "food", "chat", "follow", "default", "quest", "loot",
+                                            "gather", "duel", "pvp", "buff", "mount", "emote", nullptr);
     }
 
     if (sPlayerbotAIConfig->autoSaveMana)
     {
         nonCombatEngine->addStrategy("save mana", false);
     }
+
     if ((sRandomPlayerbotMgr->IsRandomBot(player)) && !player->InBattleground())
     {
         Player* master = facade->GetMaster();
@@ -638,11 +639,11 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             // if (!urand(0, 3))
             //     nonCombatEngine->addStrategy("attack tagged");
 
-            nonCombatEngine->addStrategy("pvp", false);
+            // nonCombatEngine->addStrategy("pvp", false);
             // nonCombatEngine->addStrategy("collision");
-            nonCombatEngine->addStrategy("grind", false);
             // nonCombatEngine->addStrategy("group");
             // nonCombatEngine->addStrategy("guild");
+            nonCombatEngine->addStrategy("grind", false);
 
             if (sPlayerbotAIConfig->enableNewRpgStrategy)
             {
@@ -675,7 +676,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                     PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master);
                     if (masterBotAI || sRandomPlayerbotMgr->IsRandomBot(player))
                     {
-                        nonCombatEngine->addStrategy("pvp", false);
+                        // nonCombatEngine->addStrategy("pvp", false);
                         // nonCombatEngine->addStrategy("collision");
                         // nonCombatEngine->addStrategy("group");
                         // nonCombatEngine->addStrategy("guild");
@@ -695,7 +696,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                     }
                     else
                     {
-                        nonCombatEngine->addStrategy("pvp", false);
+                        // nonCombatEngine->addStrategy("pvp", false);
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig->nonCombatStrategies);
                     }
                 }
