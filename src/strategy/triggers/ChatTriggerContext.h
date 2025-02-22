@@ -108,7 +108,7 @@ public:
         creators["cdebug"] = &ChatTriggerContext::cdebug;
         creators["cs"] = &ChatTriggerContext::cs;
         creators["wts"] = &ChatTriggerContext::wts;
-        creators["hire"] = &ChatTriggerContext::hire;
+        // creators["hire"] = &ChatTriggerContext::hire;  // Not correctly implemented at this time, would cause crash and other issues.
         creators["craft"] = &ChatTriggerContext::craft;
         creators["flag"] = &ChatTriggerContext::craft;
         creators["range"] = &ChatTriggerContext::range;
