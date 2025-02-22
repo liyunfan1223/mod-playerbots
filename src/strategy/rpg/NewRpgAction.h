@@ -34,7 +34,6 @@ class NewRpgGoFarAwayPosAction : public MovementAction
 {
 public:
     NewRpgGoFarAwayPosAction(PlayerbotAI* botAI, std::string name) : MovementAction(botAI, name) {}
-    // bool Execute(Event event) override;
     bool MoveFarTo(WorldPosition dest);
 
 protected:
@@ -74,6 +73,13 @@ public:
     bool Execute(Event event) override;
 protected:
     const uint32 stayTime = 8 * 1000;
+};
+
+class NewRpgQuestingAction : public NewRpgGoFarAwayPosAction
+{
+public:
+    NewRpgQuestingAction(PlayerbotAI* botAI) : NewRpgGoFarAwayPosAction(botAI, "new rpg questing") {}
+    bool Execute(Event event) override;
 };
 
 #endif

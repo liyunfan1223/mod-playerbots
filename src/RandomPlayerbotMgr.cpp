@@ -1458,6 +1458,82 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
               tlocs.size());
 }
 
+void RandomPlayerbotMgr::PrepareZone2LevelBracket()
+{
+    // Classic WoW - Low - level zones
+    zone2LevelBracket[1] = {5, 12}; // Dun Morogh
+    zone2LevelBracket[12] = {5, 12}; // Elwynn Forest
+    zone2LevelBracket[14] = {5, 12}; // Durotar
+    zone2LevelBracket[85] = {5, 12}; // Tirisfal Glades
+    zone2LevelBracket[141] = {5, 12}; // Teldrassil
+    zone2LevelBracket[215] = {5, 12}; // Mulgore
+    zone2LevelBracket[3430] = {5, 12}; // Eversong Woods
+    zone2LevelBracket[3524] = {5, 12}; // Azuremyst Isle
+
+    // Classic WoW - Mid - level zones
+    zone2LevelBracket[17] = {10, 25}; // Barrens
+    zone2LevelBracket[38] = {10, 20}; // Loch Modan
+    zone2LevelBracket[40] = {10, 21}; // Westfall
+    zone2LevelBracket[130] = {10, 23}; // Silverpine Forest
+    zone2LevelBracket[148] = {10, 21}; // Darkshore
+    zone2LevelBracket[3433] = {10, 22}; // Ghostlands
+    zone2LevelBracket[3525] = {10, 21}; // Bloodmyst Isle
+
+    // Classic WoW - High - level zones
+    zone2LevelBracket[10] = {19, 33}; // Deadwind Pass
+    zone2LevelBracket[11] = {21, 30}; // Wetlands
+    zone2LevelBracket[44] = {16, 28}; // Redridge Mountains
+    zone2LevelBracket[267] = {20, 34}; // Hillsbrad Foothills
+    zone2LevelBracket[331] = {18, 33}; // Ashenvale
+    zone2LevelBracket[400] = {24, 36}; // Thousand Needles
+    zone2LevelBracket[406] = {16, 29}; // Stonetalon Mountains
+
+    // Classic WoW - Higher - level zones
+    zone2LevelBracket[3] = {36, 46}; // Badlands
+    zone2LevelBracket[8] = {36, 46}; // Swamp of Sorrows
+    zone2LevelBracket[15] = {35, 46}; // Dustwallow Marsh
+    zone2LevelBracket[16] = {45, 52}; // Azshara
+    zone2LevelBracket[33] = {32, 47}; // Stranglethorn Vale
+    zone2LevelBracket[45] = {30, 42}; // Arathi Highlands
+    zone2LevelBracket[47] = {42, 51}; // Hinterlands
+    zone2LevelBracket[51] = {45, 51}; // Searing Gorge
+    zone2LevelBracket[357] = {40, 52}; // Feralas
+    zone2LevelBracket[405] = {30, 41}; // Desolace
+    zone2LevelBracket[440] = {41, 52}; // Tanaris
+
+    // Classic WoW - Top - level zones
+    zone2LevelBracket[4] = {52, 57}; // Blasted Lands
+    zone2LevelBracket[28] = {50, 60}; // Western Plaguelands
+    zone2LevelBracket[46] = {51, 60}; // Burning Steppes
+    zone2LevelBracket[139] = {54, 62}; // Eastern Plaguelands
+    zone2LevelBracket[361] = {47, 57}; // Felwood
+    zone2LevelBracket[490] = {49, 56}; // Un'Goro Crater
+    zone2LevelBracket[618] = {54, 61}; // Winterspring
+    zone2LevelBracket[1377] = {54, 63}; // Silithus
+
+    // The Burning Crusade - Zones
+    zone2LevelBracket[3483] = {56, 66}; // Hellfire Peninsula
+    zone2LevelBracket[3518] = {64, 70}; // Nagrand
+    zone2LevelBracket[3519] = {62, 73}; // Terokkar Forest
+    zone2LevelBracket[3520] = {66, 73}; // Shadowmoon Valley
+    zone2LevelBracket[3521] = {60, 67}; // Zangarmarsh
+    zone2LevelBracket[3522] = {64, 73}; // Blade's Edge Mountains
+    zone2LevelBracket[3523] = {67, 73}; // Netherstorm
+    zone2LevelBracket[4080] = {68, 73}; // Isle of Quel'Danas
+
+    // Wrath of the Lich King - Zones
+    zone2LevelBracket[65] = {71, 77}; // Dragonblight
+    zone2LevelBracket[66] = {74, 80}; // Zul'Drak
+    zone2LevelBracket[67] = {77, 80}; // Storm Peaks
+    zone2LevelBracket[210] = {77, 80}; // Icecrown Glacier
+    zone2LevelBracket[394] = {72, 78}; // Grizzly Hills
+    zone2LevelBracket[495] = {68, 74}; // Howling Fjord
+    zone2LevelBracket[2817] = {77, 80}; // Crystalsong Forest
+    zone2LevelBracket[3537] = {68, 75}; // Borean Tundra
+    zone2LevelBracket[3711] = {75, 80}; // Sholazar Basin
+    zone2LevelBracket[4197] = {79, 80}; // Wintergrasp
+}
+
 void RandomPlayerbotMgr::PrepareTeleportCache()
 {
     uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
@@ -1534,6 +1610,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 
     if (sPlayerbotAIConfig->enableNewRpgStrategy)
     {
+        PrepareZone2LevelBracket();
         LOG_INFO("playerbots", "Preparing innkeepers locations for level...");
         results = WorldDatabase.Query(
         "SELECT "
@@ -1578,28 +1655,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 uint32 level = area->area_level;
                 for (int i = 5; i <= maxLevel; i++)
                 {
-                    std::vector<WorldLocation>& locs = locsPerLevelCache[i];
-                    int counter = 0;
-                    WorldLocation levelLoc;
-                    for (auto& checkLoc : locs)
-                    {
-                        if (loc.GetMapId() != checkLoc.GetMapId())
-                            continue;
-                        
-                        if (loc.GetExactDist(checkLoc) > 1500.0f)
-                            continue;
-                        
-                        if (zoneId != 
-                            map->GetZoneId(1, checkLoc.GetPositionX(), checkLoc.GetPositionY(), checkLoc.GetPositionZ()))
-                            continue;
-
-                        counter++;
-                        levelLoc = checkLoc;
-                        if (counter >= 15)
-                            break;
-                    }
-
-                    if (counter < 15)
+                    if (zone2LevelBracket.find(zoneId) == zone2LevelBracket.end() || !zone2LevelBracket[zoneId].InsideBracket(i))
                         continue;
 
                     if (!(entry->hostileMask & 4))
@@ -1610,11 +1666,26 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                     {
                         allianceStarterPerLevelCache[i].push_back(loc);
                     }
-                    LOG_DEBUG("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
-                            level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
-                            levelLoc.GetPositionZ(), levelLoc.GetMapId());
+                    // if (!zone2LevelBracket[zoneId].low)
+                    //     zone2LevelBracket[zoneId].low = i;
+                    // else
+                    //     zone2LevelBracket[zoneId].low = std::min(zone2LevelBracket[zoneId].low, (uint32)i);
+                    // if (!zone2LevelBracket[zoneId].high)
+                    //     zone2LevelBracket[zoneId].high = i;
+                    // else
+                    //     zone2LevelBracket[zoneId].high = std::max(zone2LevelBracket[zoneId].high, (uint32)i);
+                    // LOG_DEBUG("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
+                    //         level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
+                    //         levelLoc.GetPositionZ(), levelLoc.GetMapId());
                 }
             } while (results->NextRow());
+        }
+
+        for (auto item : zone2LevelBracket)
+        {
+            const AreaTableEntry* entry = sAreaTableStore.LookupEntry(item.first);
+            std::string zone_name = PlayerbotAI::GetLocalizedAreaName(entry);
+            LOG_INFO("playerbots", "Zone: {} ({}) [{}, {}]", item.first, zone_name, item.second.low, item.second.high);
         }
         // add all initial position
         for (uint32 i = 1; i < MAX_RACES; i++)
@@ -1763,6 +1834,10 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     if (bot->InBattleground())
         return;
 
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (botAI && botAI->HasPlayerNearby(300.0f))
+        return;
+    
     uint32 level = bot->GetLevel();
     uint8 race = bot->getRace();
     std::vector<WorldLocation>* locs = nullptr;
@@ -1785,6 +1860,10 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
 void RandomPlayerbotMgr::RandomTeleportGrindForLevel(Player* bot)
 {
     if (bot->InBattleground())
+        return;
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (botAI && botAI->HasPlayerNearby(300.0f))
         return;
 
     uint32 level = bot->GetLevel();
