@@ -802,7 +802,7 @@ bool StatsCollector::CheckSpellValidation(uint32 spellFamilyName, flag96 spelFal
     if (cls_ == CLASS_PALADIN && spellFamilyName == SPELLFAMILY_PALADIN && (type_ & CollectorType::MELEE_DMG))
     {
         uint32 retributionFlagsA = 0x0;
-        uint32 retributionFlagsB = 0x100000;  // shield of righteouness
+        uint32 retributionFlagsB = 0x100000 | 0x40;  // shield of righteouness | holy shield
         uint32 retributionFlagsC = 0x0;
         flag96 invalidFlags = {retributionFlagsA, retributionFlagsB, retributionFlagsC};
         if (spelFalimyFlags & invalidFlags)

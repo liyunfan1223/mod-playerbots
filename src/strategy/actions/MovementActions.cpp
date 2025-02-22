@@ -1583,7 +1583,7 @@ bool MovementAction::MoveAway(Unit* target, float distance, bool backwards)
 // just calculates average position of group and runs away from that position
 bool MovementAction::MoveFromGroup(float distance)
 {
-    LOG_ERROR("playerbots", "MovementAction::MoveFromGroup");
+    // LOG_ERROR("playerbots", "MovementAction::MoveFromGroup");
     //if (Player* master = botAI->GetMaster())
     //{
     //    return MoveAway(master);
