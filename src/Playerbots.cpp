@@ -75,7 +75,16 @@ public:
 class PlayerbotsPlayerScript : public PlayerScript
 {
 public:
-    PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript") {}
+    PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript", {
+        PLAYERHOOK_ON_LOGIN,
+        PLAYERHOOK_ON_AFTER_UPDATE,
+        PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT,
+        PLAYERHOOK_CAN_PLAYER_USE_GROUP_CHAT,
+        PLAYERHOOK_CAN_PLAYER_USE_CHAT,
+        PLAYERHOOK_CAN_PLAYER_USE_CHANNEL_CHAT,
+        PLAYERHOOK_ON_BEFORE_CRITERIA_PROGRESS,
+        PLAYERHOOK_ON_BEFORE_ACHI_COMPLETE
+    }) {}
 
     void OnPlayerLogin(Player* player) override
     {
@@ -225,7 +234,9 @@ public:
 class PlayerbotsServerScript : public ServerScript
 {
 public:
-    PlayerbotsServerScript() : ServerScript("PlayerbotsServerScript") {}
+    PlayerbotsServerScript() : ServerScript("PlayerbotsServerScript", {
+        SERVERHOOK_CAN_PACKET_RECEIVE
+    }) {}
 
     void OnPacketReceived(WorldSession* session, WorldPacket const& packet) override
     {
@@ -238,7 +249,9 @@ public:
 class PlayerbotsWorldScript : public WorldScript
 {
 public:
-    PlayerbotsWorldScript() : WorldScript("PlayerbotsWorldScript") {}
+    PlayerbotsWorldScript() : WorldScript("PlayerbotsWorldScript", {
+        WORLDHOOK_ON_BEFORE_WORLD_INITIALIZED
+    }) {}
 
     void OnBeforeWorldInitialized() override
     {
