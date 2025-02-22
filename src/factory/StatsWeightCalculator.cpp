@@ -293,16 +293,24 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_HASTE] += 1.0f;
     }
     else if ((cls == CLASS_PALADIN && tab == PALADIN_TAB_HOLY) ||       // holy
-             (cls == CLASS_PRIEST && tab != PRIEST_TAB_SHADOW) ||       // discipline / holy
-             (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_RESTORATION) ||  // heal
+             (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_RESTORATION))    // heal
+    {
+        stats_weights_[STATS_TYPE_INTELLECT] += 0.9f;
+        stats_weights_[STATS_TYPE_SPIRIT] += 0.15f;
+        stats_weights_[STATS_TYPE_HEAL_POWER] += 1.0f;
+        stats_weights_[STATS_TYPE_MANA_REGENERATION] += 0.9f;
+        stats_weights_[STATS_TYPE_CRIT] += 0.6f;
+        stats_weights_[STATS_TYPE_HASTE] += 0.8f;
+    }
+    else if ((cls == CLASS_PRIEST && tab != PRIEST_TAB_SHADOW) ||       // discipline / holy
              (cls == CLASS_DRUID && tab == DRUID_TAB_RESTORATION))
     {
         stats_weights_[STATS_TYPE_INTELLECT] += 0.8f;
-        stats_weights_[STATS_TYPE_SPIRIT] += 0.8f;
+        stats_weights_[STATS_TYPE_SPIRIT] += 0.6f;
         stats_weights_[STATS_TYPE_HEAL_POWER] += 1.0f;
-        stats_weights_[STATS_TYPE_MANA_REGENERATION] += 1.2f;
-        stats_weights_[STATS_TYPE_CRIT] += 0.7f;
-        stats_weights_[STATS_TYPE_HASTE] += 1.0f;
+        stats_weights_[STATS_TYPE_MANA_REGENERATION] += 0.9f;
+        stats_weights_[STATS_TYPE_CRIT] += 0.6f;
+        stats_weights_[STATS_TYPE_HASTE] += 0.8f;
         stats_weights_[STATS_TYPE_RANGED_DPS] += 1.0f;
     }
     else if ((cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) ||
@@ -551,6 +559,12 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
             hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
             hit_current += player->GetTotalAuraModifier(SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT); // suppression (18176)
             hit_current += player->GetRatingBonusValue(CR_HIT_SPELL);
+
+            if (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW && player->HasAura(15835)) // Shadow Focus
+                hit_current += 3;
+            if (cls == CLASS_MAGE && tab == MAGE_TAB_ARCANE && player->HasAura(12840)) // Arcane Focus
+                hit_current += 3;
+
             hit_overflow = SPELL_HIT_OVERFLOW;
             if (hit_overflow > hit_current)
                 validPoints = (hit_overflow - hit_current) / player->GetRatingMultiplier(CR_HIT_SPELL);
