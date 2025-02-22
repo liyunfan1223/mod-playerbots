@@ -5431,7 +5431,7 @@ InventoryResult PlayerbotAI::CanEquipItem(uint8 slot, uint16& dest, Item* pItem,
         ItemTemplate const* pProto = pItem->GetTemplate();
         if (pProto)
         {
-            if (!sScriptMgr->CanEquipItem(bot, slot, dest, pItem, swap, not_loading))
+            if (!sScriptMgr->OnPlayerCanEquipItem(bot, slot, dest, pItem, swap, not_loading))
                 return EQUIP_ERR_CANT_DO_RIGHT_NOW;
 
             // item used

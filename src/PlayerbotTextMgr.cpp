@@ -6,6 +6,7 @@
 #include "PlayerbotTextMgr.h"
 
 #include "Playerbots.h"
+#include "WorldSessionMgr.h"
 
 void PlayerbotTextMgr::replaceAll(std::string& str, const std::string& from, const std::string& to)
 {
@@ -184,7 +185,7 @@ uint32 PlayerbotTextMgr::GetLocalePriority()
     uint32 topLocale = 0;
 
     // if no real players online, reset top locale
-    if (!sWorld->GetActiveSessionCount())
+    if (!sWorldSessionMgr->GetActiveSessionCount())
     {
         ResetLocalePriority();
         return 0;
