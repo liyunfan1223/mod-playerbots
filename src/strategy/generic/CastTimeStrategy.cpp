@@ -13,15 +13,13 @@ float CastTimeMultiplier::GetValue(Action* action)
     if (action == nullptr)
         return 1.0f;
 
-    // uint8 targetHealth = AI_VALUE2(uint8, "health", "current target");
-    std::string const name = action->getName();
-
     if (!action->GetTarget() || action->GetTarget() != AI_VALUE(Unit*, "current target"))
         return 1.0f;
 
     if (/*targetHealth < sPlayerbotAIConfig->criticalHealth && */ dynamic_cast<CastSpellAction*>(action))
     {
-        uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+        CastSpellAction* spellAction = dynamic_cast<CastSpellAction*>(action);
+        uint32 spellId = AI_VALUE2(uint32, "spell id", spellAction->getSpell());
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
             return 1.0f;
@@ -35,7 +33,7 @@ float CastTimeMultiplier::GetValue(Action* action)
         if (spellInfo->IsChanneled())
         {
             int32 duration = spellInfo->GetDuration();
-            bot->ApplySpellMod(spellInfo->Id, SPELLMOD_DURATION, duration);
+            // bot->ApplySpellMod(spellInfo->Id, SPELLMOD_DURATION, duration);
             duration = std::min(duration, 3000);
             if (duration > 0)
                 castTime += duration;

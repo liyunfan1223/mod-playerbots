@@ -75,6 +75,7 @@ class BlackArrowTrigger : public DebuffTrigger
 {
 public:
     BlackArrowTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "black arrow", 1, true) {}
+    bool IsActive() override;
 };
 
 class HuntersMarkTrigger : public DebuffTrigger
@@ -185,4 +186,11 @@ class TargetRemoveMagicTrigger : public TargetAuraDispelTrigger
 public:
     TargetRemoveMagicTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_MAGIC) {}
 };
+
+class ImmolationTrapNoCdTrigger : public SpellNoCooldownTrigger
+{
+public:
+    ImmolationTrapNoCdTrigger(PlayerbotAI* ai) : SpellNoCooldownTrigger(ai, "immolation trap") {}
+};
+
 #endif

@@ -1154,3 +1154,34 @@ bool RazorscaleFuseArmorAction::Execute(Event event)
     bossHelper.AssignRolesBasedOnHealth();
     return true;
 }
+
+bool HodirMoveSnowpackedIcicleAction::isUseful()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    // Find the nearest Snowpacked Icicle Target
+    Creature* target = bot->FindNearestCreature(33174, 100.0f);
+    if (!target)
+        return false;
+
+    // Check that boss is stacked on Snowpacked Icicle
+    if (bot->GetDistance2d(target->GetPositionX(), target->GetPositionY()) <= 3.0f)
+    {
+        return false;
+    }
+}
+
+bool HodirMoveSnowpackedIcicleAction::Execute(Event event)
+{
+    Creature* target = bot->FindNearestCreature(33174, 100.0f);
+    if (!target)
+        return false;
+
+    return MoveTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false,
+                  false, false, true, MovementPriority::MOVEMENT_NORMAL);
+}

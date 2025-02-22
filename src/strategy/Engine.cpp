@@ -87,27 +87,23 @@ Engine::~Engine(void)
 void Engine::Reset()
 {
     strategyTypeMask = 0;
+    
     ActionNode* action = nullptr;
-    do
-    {
-        action = queue.Pop();
-        if (!action)
-            break;
 
+    while ((action = queue.Pop()) != nullptr)
+    {
         delete action;
-    } while (true);
+    }
 
-    for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
+    for (TriggerNode* trigger : triggers)
     {
-        TriggerNode* trigger = *i;
         delete trigger;
     }
 
     triggers.clear();
 
-    for (std::vector<Multiplier*>::iterator i = multipliers.begin(); i != multipliers.end(); i++)
+    for (Multiplier* multiplier : multipliers)
     {
-        Multiplier* multiplier = *i;
         delete multiplier;
     }
 
@@ -243,9 +239,10 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     }
 
     if (!actionExecuted)
-        LogAction("No actions executed");
+        LogAction("no actions executed");
 
-    queue.RemoveExpired();  // Clean up expired actions in the queue
+    queue.RemoveExpired();
+
     return actionExecuted;
 }
 
