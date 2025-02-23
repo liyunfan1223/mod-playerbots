@@ -14,7 +14,7 @@ bool MarkOfTheWildOnPartyTrigger::IsActive()
 
 bool MarkOfTheWildTrigger::IsActive()
 {
-    return BuffTrigger::IsActive() && !botAI->HasAura("gift of the wild", target);
+    return BuffTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget());
 }
 
 bool GiftOfTheWildOnPartyTrigger::IsActive()
