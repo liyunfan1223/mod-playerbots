@@ -54,6 +54,8 @@ void GenericMageNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trigg
 
     triggers.push_back(
         new TriggerNode("arcane intellect", NextAction::array(0, new NextAction("arcane intellect", 21.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("arcane brilliance", NextAction::array(0, new NextAction("arcane brilliance", 22.0f), nullptr)));
     
     triggers.push_back(
         new TriggerNode("no focus magic", NextAction::array(0, new NextAction("focus magic on party", 19.0f), nullptr)));
@@ -80,7 +82,10 @@ void MageBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("arcane intellect on party",
                         NextAction::array(0, new NextAction("arcane intellect on party", 20.0f), nullptr)));
-    // triggers.push_back(new TriggerNode("give water", NextAction::array(0, new NextAction("give water", 14.0f),
+    triggers.push_back(
+        new TriggerNode("arcane brilliance", 
+                        NextAction::array(0, new NextAction("arcane brilliance", 21.0f), nullptr)));
+                        // triggers.push_back(new TriggerNode("give water", NextAction::array(0, new NextAction("give water", 14.0f),
     // nullptr))); triggers.push_back(new TriggerNode("give food", NextAction::array(0, new NextAction("give
     // food", 13.0f), nullptr)));
 }

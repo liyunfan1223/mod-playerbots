@@ -30,6 +30,21 @@ public:
     bool IsActive() override;
 };
 
+class ArcaneBrillianceOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    ArcaneBrillianceOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "arcane brilliance", 2 * 2000) {}
+
+    bool IsActive() override;
+};
+
+class ArcaneBrillianceTrigger : public BuffTrigger
+{
+public:
+    ArcaneBrillianceTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane brilliance", 2 * 2000) {}
+    bool IsActive() override;
+};
+
 class MageArmorTrigger : public BuffTrigger
 {
 public:

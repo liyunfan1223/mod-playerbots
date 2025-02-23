@@ -38,7 +38,6 @@ bool PrayerOfFortitudeTrigger::IsActive()
         return false;
 
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("prayer of fortitude", GetTarget()) &&
-           botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
            botAI->GetBuffedCount((Player*)GetTarget(), "prayer of fortitude") < 4 &&
            !botAI->GetBuffedCount((Player*)GetTarget(), "power word: fortitude");
 }
