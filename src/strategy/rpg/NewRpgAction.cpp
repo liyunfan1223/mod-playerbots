@@ -301,9 +301,12 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         uint32 objectiveIdx = poiInfo[rndIdx].objectiveIdx;
 
         float dx = nearestPoi.x, dy = nearestPoi.y;
+
         // z = MAX_HEIGHT as we do not know accurate z
-        WorldPosition pos(bot->GetMapId(), dx, dy,
-            std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy)));
+        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+        if (dz == INVALID_HEIGHT)
+            return false;
+        WorldPosition pos(bot->GetMapId(), dx, dy, dz);
         botAI->rpgInfo.do_quest.pos = pos;
         botAI->rpgInfo.do_quest.objectiveIdx = objectiveIdx;
     }

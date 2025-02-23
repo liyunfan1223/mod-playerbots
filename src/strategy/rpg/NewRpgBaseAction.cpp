@@ -2,6 +2,7 @@
 #include "ChatHelper.h"
 #include "G3D/Vector2.h"
 #include "GossipDef.h"
+#include "GridTerrainData.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "ObjectAccessor.h"
@@ -459,9 +460,13 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
 
         if (bot->GetDistance2d(dx, dy) >= 1500.0f)
             continue;
+        
+        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+        
+        if (dz == INVALID_HEIGHT)
+            continue;
 
-        if (bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy,
-            std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy))))
+        if (bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
             continue;
 
         poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
