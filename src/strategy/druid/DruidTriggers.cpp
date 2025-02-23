@@ -14,19 +14,25 @@ bool MarkOfTheWildOnPartyTrigger::IsActive()
 
 bool MarkOfTheWildTrigger::IsActive()
 {
-    return BuffTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget());
+    return BuffTrigger::IsActive() && !botAI->HasAura("gift of the wild", target);
 }
 
 bool GiftOfTheWildOnPartyTrigger::IsActive()
 {
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("gift of the wild", GetTarget()) &&
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("gift of the wild", target) &&
            botAI->GetBuffedCount((Player*)GetTarget(), "gift of the wild") < 4 &&
            !botAI->GetBuffedCount((Player*)GetTarget(), "mark of the wild");
 }
 
 bool GiftOfTheWildTrigger::IsActive()
 {
-    return BuffTrigger::IsActive() && !botAI->HasAura("mark of the wild", GetTarget());
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+    return BuffTrigger::IsActive() && !botAI->HasAura("mark of the wild", target);
 }
 
 bool ThornsOnPartyTrigger::IsActive()

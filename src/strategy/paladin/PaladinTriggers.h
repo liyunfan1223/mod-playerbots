@@ -305,29 +305,37 @@ private:
     static constexpr size_t MAX_PALADINS = 4;
     Group* group;
 
-    mutable std::vector<Player*> sortedPaladins_; // 缓存排序后的圣骑士列表
-    mutable uint32 lastGroupUpdateFlag_ = 0;      // 上次的团队更新标志
-    mutable std::mutex mutex_;                    // 线程安全锁
+    mutable std::vector<Player*> sortedPaladins_; 
+    mutable uint32 lastGroupUpdateFlag_ = 0;      
+    mutable std::mutex mutex_;                   
 };
 
 class PaladinSelectionGroupManager 
 {
 public:
     static PaladinSelectionGroupManager& GetInstance(Group* group);
+
     static void RemoveInstance(Group* group);
+
     PaladinSelectionGroup* GetPaladinSelectionGroup() const;
+
     void UpdatePaladinSelectionGroup(Group* group);
 private:
     explicit PaladinSelectionGroupManager(Group* group);
+
     PaladinSelectionGroupManager(const PaladinSelectionGroupManager&) = delete;
+
     PaladinSelectionGroupManager& operator=(const PaladinSelectionGroupManager&) = delete;
+
     static std::unordered_map<Group*, std::unique_ptr<PaladinSelectionGroupManager>>& GetInstances();
+
     std::unique_ptr<PaladinSelectionGroup> paladinSelectionGroup_;
 };
 class GreaterBlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     GreaterBlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of kings", 2 * 2000) {}
+
     bool IsActive() override;
 };
 
@@ -335,6 +343,7 @@ class GreaterBlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     GreaterBlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of wisdom", 2 * 2000) {}
+
     bool IsActive() override;
 };
 
@@ -342,6 +351,7 @@ class GreaterBlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     GreaterBlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of might", 2 * 2000) {}
+
         bool IsActive() override;
 };
 
@@ -349,6 +359,7 @@ class GreaterBlessingOfSanctuaryOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     GreaterBlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of sanctuary", 2 * 2000) {}
+    
     bool IsActive() override;
 };
 //

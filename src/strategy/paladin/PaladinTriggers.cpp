@@ -45,17 +45,6 @@ bool CrusaderAuraTrigger::IsActive()
  */
 
 //greater blessing on party triggers
-/*
-PaladinSelectionGroup* PaladinSelectionGroupManager::GetPaladinSelectionGroup(Group* group)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (groupCache.find(group) == groupCache.end())
-    {
-        groupCache[group] = std::make_unique<PaladinSelectionGroup>(group);
-    }
-    return groupCache[group].get();
-}
-*/
 
 std::unordered_map<Group*, std::unique_ptr<PaladinSelectionGroupManager>>& PaladinSelectionGroupManager::GetInstances() 
 {
@@ -97,98 +86,15 @@ PaladinSelectionGroupManager::PaladinSelectionGroupManager(Group* group)
     LOG_INFO("module.playerbots", "PaladinSelectionGroupManager created for group {}", group->GetGUID().ToString());
 }
 
-/*
-std::vector<Player*> PaladinSelectionGroup::GetSortedPaladins() const
-{
-    std::vector<Player*> allPaladins;
-    std::set<ObjectGuid> visitedPaladins;
-
-    for (const GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
-    {
-        Player* member = groupRef->GetSource();
-        if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member->GetGUID()))
-            continue;
-
-        if (member->GetLevel() >= 60)
-        {
-            allPaladins.push_back(member);
-            visitedPaladins.insert(member->GetGUID());
-        }
-    }
-
-    std::stable_sort(allPaladins.begin(), allPaladins.end(), [](Player* a, Player* b) {
-        return a->GetLevel() > b->GetLevel();
-    });
-
-    std::vector<Player*> selectedPaladins;
-    Player* highestLevelTank = nullptr;
-    
-    for (Player* paladin : allPaladins)
-    {
-        BotRoles role = AiFactory::GetPlayerRoles(paladin);
-        if (role == BOT_ROLE_TANK)
-        {
-            highestLevelTank = paladin;
-            selectedPaladins.push_back(paladin);
-            break;
-        }
-    }
-
-    if (!highestLevelTank && !allPaladins.empty())
-    {
-        selectedPaladins.push_back(allPaladins[0]);
-    }
-
-    for (Player* paladin : allPaladins)
-    {
-        if (selectedPaladins.size() >= MAX_PALADINS)
-            break;
-
-        if (std::find(selectedPaladins.begin(), selectedPaladins.end(), paladin) == selectedPaladins.end())
-        {
-            selectedPaladins.push_back(paladin);
-        }
-    }
-
-    std::reverse(selectedPaladins.begin(), selectedPaladins.end());
-
-    return selectedPaladins;
-}
-
-size_t PaladinSelectionGroup::GetPaladinOrderForBlessing(PlayerbotAI* botAI) const
-{
-    if (!botAI)
-        return 0;
-
-    Player* bot = botAI->GetBot();
-    if (!bot || bot->getClass() != CLASS_PALADIN)
-        return 0;
-
-    std::vector<Player*> selectedPaladins = GetSortedPaladins();
-    const ObjectGuid botGuid = bot->GetGUID();
-    for (size_t i = 0; i < selectedPaladins.size(); ++i)
-    {
-        if (selectedPaladins[i]->GetGUID() == botGuid)
-        {
-            return i + 1; 
-        }
-    }
-
-    return 0;  
-}
-*/
-
 void PaladinSelectionGroup::UpdateIfNeeded(uint32 groupUpdateFlag) const
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    // 如果团队状态已更新或缓存为空，重新计算排序结果
     if ((groupUpdateFlag & GROUP_UPDATE_FLAG_STATUS) || sortedPaladins_.empty())
     {
         sortedPaladins_.clear();
         std::set<ObjectGuid> visitedPaladins;
 
-        // 获取团队中的所有圣骑士
         for (const GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
         {
             Player* member = groupRef->GetSource();
@@ -202,12 +108,10 @@ void PaladinSelectionGroup::UpdateIfNeeded(uint32 groupUpdateFlag) const
             }
         }
 
-        // 对圣骑士进行排序（按等级从高到低）
         std::stable_sort(sortedPaladins_.begin(), sortedPaladins_.end(), [](Player* a, Player* b) {
             return a->GetLevel() > b->GetLevel();
         });
 
-        // 选择最高等级的坦克圣骑士
         Player* highestLevelTank = nullptr;
         for (Player* paladin : sortedPaladins_)
         {
@@ -219,7 +123,6 @@ void PaladinSelectionGroup::UpdateIfNeeded(uint32 groupUpdateFlag) const
             }
         }
 
-        // 构建最终的圣骑士列表
         std::vector<Player*> selectedPaladins;
         if (highestLevelTank)
         {
@@ -230,7 +133,6 @@ void PaladinSelectionGroup::UpdateIfNeeded(uint32 groupUpdateFlag) const
             selectedPaladins.push_back(sortedPaladins_[0]);
         }
 
-        // 添加其他圣骑士，直到达到最大数量
         for (Player* paladin : sortedPaladins_)
         {
             if (selectedPaladins.size() >= MAX_PALADINS)
@@ -242,10 +144,8 @@ void PaladinSelectionGroup::UpdateIfNeeded(uint32 groupUpdateFlag) const
             }
         }
 
-        // 反转列表（如果需要）
         std::reverse(selectedPaladins.begin(), selectedPaladins.end());
 
-        // 更新缓存
         LOG_INFO("module.playerbots", "Updating PaladinSelectionGroup for group {}", group->GetGUID().ToString());
         sortedPaladins_ = selectedPaladins;
         lastGroupUpdateFlag_ = groupUpdateFlag;
@@ -269,17 +169,16 @@ size_t PaladinSelectionGroup::GetPaladinOrderForBlessing(PlayerbotAI* botAI) con
     if (!bot || bot->getClass() != CLASS_PALADIN)
         return 0;
 
-    // 查找当前圣骑士在排序列表中的位置
     const ObjectGuid botGuid = bot->GetGUID();
     for (size_t i = 0; i < sortedPaladins_.size(); ++i)
     {
         if (sortedPaladins_[i]->GetGUID() == botGuid)
         {
-            return i + 1; // 返回顺序（从 1 开始）
+            return i + 1; 
         }
     }
 
-    return 0; // 如果当前圣骑士不在列表中，返回 0
+    return 0; 
 }
 
 bool GreaterBlessingOfKingsOnPartyTrigger::IsActive()
