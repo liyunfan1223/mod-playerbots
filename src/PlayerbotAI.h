@@ -15,6 +15,7 @@
 #include "Common.h"
 #include "Event.h"
 #include "Item.h"
+#include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
@@ -579,6 +580,7 @@ public:
     static bool IsHealingSpell(uint32 spellFamilyName, flag96 spelFalimyFlags);
     static SpellFamilyNames Class2SpellFamilyName(uint8 cls);
     NewRpgInfo rpgInfo;
+    NewRpgStatistic rpgStatistic;
 
 private:
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,

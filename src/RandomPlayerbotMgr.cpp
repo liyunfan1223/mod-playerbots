@@ -31,6 +31,7 @@
 #include "GuildTaskMgr.h"
 #include "LFGMgr.h"
 #include "MapMgr.h"
+#include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
@@ -2700,9 +2701,8 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 engine_noncombat = 0;
     uint32 engine_combat = 0;
     uint32 engine_dead = 0;
-    uint32 stateCount[MAX_TRAVEL_STATE + 1] = {0};
-    std::vector<std::pair<Quest const*, int32>> questCount;
     std::unordered_map<NewRpgStatus, int> rpgStatusCount;
+    NewRpgStatistic rpgStasticTotal;
     std::unordered_map<uint32, int> zoneCount;
     uint8 maxBotLevel = 0;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
@@ -2777,41 +2777,19 @@ void RandomPlayerbotMgr::PrintStats()
         zoneCount[bot->GetZoneId()]++;
 
         if (sPlayerbotAIConfig->enableNewRpgStrategy)
-            rpgStatusCount[botAI->rpgInfo.status]++;
-
-        if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
         {
-            TravelState state = target->getTravelState();
-            stateCount[state]++;
-
-            Quest const* quest;
-            if (target->getDestination())
-                quest = target->getDestination()->GetQuestTemplate();
-
-            if (quest)
-            {
-                bool found = false;
-
-                for (auto& q : questCount)
-                {
-                    if (q.first != quest)
-                        continue;
-
-                    q.second++;
-                    found = true;
-                }
-
-                if (!found)
-                    questCount.push_back(std::make_pair(quest, 1));
-            }
+            rpgStatusCount[botAI->rpgInfo.status]++;
+            rpgStasticTotal += botAI->rpgStatistic;
         }
     }
 
+    
     LOG_INFO("playerbots", "Bots level:");
     // uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-    uint32 currentAlliance = 0, currentHorde = 0;
-    uint32 step = std::max(1, (maxBotLevel + 4) / 8);
-    uint32 from = 1;
+    uint32_t currentAlliance = 0, currentHorde = 0;
+    uint32_t step = std::max(1, static_cast<int>((maxBotLevel + 4) / 8));
+    uint32_t from = 1;
+
     for (uint8 i = 1; i <= maxBotLevel; ++i)
     {
         currentAlliance += alliance[i];
@@ -2871,19 +2849,24 @@ void RandomPlayerbotMgr::PrintStats()
     
     if (sPlayerbotAIConfig->enableNewRpgStrategy)
     {
-        LOG_INFO("playerbots", "Bots rpg status:", dead);
-        LOG_INFO("playerbots", "    IDLE: {}", rpgStatusCount[NewRpgStatus::IDLE]);
-        LOG_INFO("playerbots", "    REST: {}", rpgStatusCount[NewRpgStatus::REST]);
-        LOG_INFO("playerbots", "    GO_GRIND: {}", rpgStatusCount[NewRpgStatus::GO_GRIND]);
-        LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[NewRpgStatus::GO_INNKEEPER]);
-        LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[NewRpgStatus::NEAR_RANDOM]);
-        LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[NewRpgStatus::NEAR_NPC]);
+        LOG_INFO("playerbots", "Bots rpg status:");
+        LOG_INFO("playerbots", "    Idle: {}, Rest: {}, GoGrind: {}, GoInnkeeper: {}, MoveRandom: {}, MoveNpc: {}, DoQuest: {}",
+            rpgStatusCount[RPG_IDLE], rpgStatusCount[RPG_REST], rpgStatusCount[RPG_GO_GRIND], rpgStatusCount[RPG_GO_INNKEEPER],
+            rpgStatusCount[RPG_NEAR_RANDOM], rpgStatusCount[RPG_NEAR_NPC], rpgStatusCount[RPG_DO_QUEST]);
+            
+        // LOG_INFO("playerbots", "    IDLE: {}", rpgStatusCount[RPG_IDLE]);
+        // LOG_INFO("playerbots", "    REST: {}", rpgStatusCount[RPG_REST]);
+        // LOG_INFO("playerbots", "    GO_GRIND: {}", rpgStatusCount[RPG_GO_GRIND]);
+        // LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[RPG_GO_INNKEEPER]);
+        // LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[RPG_NEAR_RANDOM]);
+        // LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[RPG_NEAR_NPC]);
+        LOG_INFO("playerbots", "Bots quest:");
+        LOG_INFO("playerbots", "    Accepted: {}, Completed: {}, Rewarded: {}, Dropped: {}",
+            rpgStasticTotal.questAccepted, rpgStasticTotal.questCompleted, rpgStasticTotal.questRewarded, rpgStasticTotal.questDropped);
     }
 
     LOG_INFO("playerbots", "Bots engine:", dead);
-    LOG_INFO("playerbots", "    Non-combat: {}", engine_noncombat);
-    LOG_INFO("playerbots", "    Combat: {}", engine_combat);
-    LOG_INFO("playerbots", "    Dead: {}", engine_dead);
+    LOG_INFO("playerbots", "    Non-combat: {}, Combat: {}, Dead: {}", engine_noncombat, engine_combat, engine_dead);
 
     // LOG_INFO("playerbots", "Bots questing:");
     // LOG_INFO("playerbots", "    Picking quests: {}",

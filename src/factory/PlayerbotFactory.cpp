@@ -960,13 +960,8 @@ void PlayerbotFactory::ResetQuests()
         // remove all quest entries for 'entry' from quest log
         for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
         {
-            uint32 quest = bot->GetQuestSlotQuestId(slot);
-            if (quest == entry)
-            {
-                bot->SetQuestSlot(slot, 0);
-            }
+            bot->SetQuestSlot(slot, 0);
         }
-
         // reset rewarded for restart repeatable quest
         bot->getQuestStatusMap().erase(entry);
         // bot->getQuestStatusMap()[entry].m_rewarded = false;

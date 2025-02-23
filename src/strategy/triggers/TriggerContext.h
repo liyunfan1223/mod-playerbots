@@ -219,6 +219,7 @@ public:
         creators["go innkeeper status"] = &TriggerContext::go_innkeeper_status;
         creators["near random status"] = &TriggerContext::near_random_status;
         creators["near npc status"] = &TriggerContext::near_npc_status;
+        creators["do quest status"] = &TriggerContext::do_quest_status;
     }
 
 private:
@@ -408,10 +409,11 @@ private:
     static Trigger* rpg_craft(PlayerbotAI* botAI) { return new RpgCraftTrigger(botAI); }
     static Trigger* rpg_trade_useful(PlayerbotAI* botAI) { return new RpgTradeUsefulTrigger(botAI); }
     static Trigger* rpg_duel(PlayerbotAI* botAI) { return new RpgDuelTrigger(botAI); }
-    static Trigger* go_grind_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::GO_GRIND); }
-    static Trigger* go_innkeeper_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::GO_INNKEEPER); }
-    static Trigger* near_random_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::NEAR_RANDOM); }
-    static Trigger* near_npc_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, NewRpgStatus::NEAR_NPC); }
+    static Trigger* go_grind_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_GO_GRIND); }
+    static Trigger* go_innkeeper_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_GO_INNKEEPER); }
+    static Trigger* near_random_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_NEAR_RANDOM); }
+    static Trigger* near_npc_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_NEAR_NPC); }
+    static Trigger* do_quest_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_DO_QUEST); }
 };
 
 #endif

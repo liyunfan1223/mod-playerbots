@@ -48,14 +48,6 @@ bool AttackAnythingAction::isUseful()
     if (!target)
         return false;
 
-    bool inactiveGrindStatus = botAI->rpgInfo.status == NewRpgStatus::GO_GRIND ||
-                               botAI->rpgInfo.status == NewRpgStatus::NEAR_NPC ||
-                               botAI->rpgInfo.status == NewRpgStatus::REST ||
-                               botAI->rpgInfo.status == NewRpgStatus::GO_INNKEEPER;
-
-    if (inactiveGrindStatus && bot->GetDistance(target) > 25.0f)
-        return false;
-
     std::string const name = std::string(target->GetName());
     // Check for invalid targets: Dummy, Charge Target, Melee Target, Ranged Target
     if (!name.empty() &&

@@ -1,0 +1,56 @@
+#ifndef _PLAYERBOT_NEWRPGBASEACTION_H
+#define _PLAYERBOT_NEWRPGBASEACTION_H
+
+#include "Duration.h"
+#include "LastMovementValue.h"
+#include "MovementActions.h"
+#include "NewRpgStrategy.h"
+#include "Object.h"
+#include "ObjectDefines.h"
+#include "ObjectGuid.h"
+#include "QuestDef.h"
+#include "TravelMgr.h"
+#include "PlayerbotAI.h"
+
+struct POIInfo {
+    G3D::Vector2 pos;
+    uint32 objectiveIdx;
+};
+
+/// @TODO: make it a base (composition) class for all new rpg actions
+/// All functions that may be shared by multiple actions should be declared here
+/// And we should make all actions composable instead of inheritable
+class NewRpgBaseAction : public MovementAction
+{
+public:
+    NewRpgBaseAction(PlayerbotAI* botAI, std::string name) : MovementAction(botAI, name) {}
+    
+protected:
+    // MOVEMENT RELATED
+    bool MoveFarTo(WorldPosition dest);
+    bool MoveNpcTo(GuidPosition dest, float distance = INTERACTION_DISTANCE);
+    bool MoveRandomNear(float moveSTep = 50.0f);
+    bool ForceToWait(uint32 duration, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
+
+    // QUEST RELATED
+    bool SearchQuestGiverAndAcceptOrReward();
+    GuidPosition ChooseNpcToInteract(bool questgiverOnly = false, float distanceLimit = 0.0f);
+    bool InteractWithNpcForQuest(ObjectGuid guid);
+    bool AcceptQuest(Quest const* quest, ObjectGuid guid);
+    bool TurnInQuest(Quest const* quest, ObjectGuid guid);
+    uint32 BestReward(Quest const* quest);
+
+protected:
+    uint32 SelectQuestToDo(Player* bot);
+    
+    bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo> &poiInfo);
+    static WorldPosition SelectRandomGrindPos(Player* bot);
+    static WorldPosition SelectRandomInnKeeperPos(Player* bot);
+
+protected:
+    // WorldPosition dest;
+    const float pathFinderDis = 70.0f; // path finder
+    const uint32 stuckTime = 5 * 60 * 1000;
+};
+
+#endif

@@ -4,38 +4,59 @@
 void NewRpgInfo::ChangeToGoGrind(WorldPosition pos)
 {
     Reset();
-    status = NewRpgStatus::GO_GRIND;
+    status = RPG_GO_GRIND;
+    go_grind = GoGrind();
     go_grind.pos = pos;
 }
 
 void NewRpgInfo::ChangeToGoInnkeeper(WorldPosition pos)
 {
     Reset();
-    status = NewRpgStatus::GO_INNKEEPER;
+    status = RPG_GO_INNKEEPER;
+    go_innkeeper = GoInnkeeper();
     go_innkeeper.pos = pos;
 }
 
 void NewRpgInfo::ChangeToNearNpc()
 {
     Reset();
-    status = NewRpgStatus::NEAR_NPC;
+    status = RPG_NEAR_NPC;
+    near_npc = NearNpc();
 }
 
 void NewRpgInfo::ChangeToNearRandom()
 {
-    status = NewRpgStatus::NEAR_RANDOM;
+    Reset();
+    status = RPG_NEAR_RANDOM;
+    near_random = NearRandom();
+}
+
+void NewRpgInfo::ChangeToDoQuest(uint32 questId, const Quest* quest)
+{
+    Reset();
+    status = RPG_DO_QUEST;
+    do_quest = DoQuest();
+    do_quest.questId = questId;
+    do_quest.quest = quest;
 }
 
 void NewRpgInfo::ChangeToRest()
 {
-    status = NewRpgStatus::REST;
+    Reset();
+    status = RPG_REST;
+    rest = Rest();
 }
 
 void NewRpgInfo::ChangeToIdle()
 {
-    status = NewRpgStatus::IDLE;
+    Reset();
+    status = RPG_IDLE;
 }
 
+bool NewRpgInfo::CanChangeTo(NewRpgStatus status)
+{
+    return true;
+}
 
 void NewRpgInfo::Reset()
 {
@@ -49,32 +70,39 @@ std::string NewRpgInfo::ToString()
     out << "Status: ";
     switch (status)
     {
-        case NewRpgStatus::GO_GRIND:
+        case RPG_GO_GRIND:
             out << "GO_GRIND";
             out << "\nGrindPos: " << go_grind.pos.GetMapId() << " " << go_grind.pos.GetPositionX() << " " << go_grind.pos.GetPositionY() << " " << go_grind.pos.GetPositionZ();
             out << "\nlastGoGrind: " << startT;
             break;
-        case NewRpgStatus::GO_INNKEEPER:
+        case RPG_GO_INNKEEPER:
             out << "GO_INNKEEPER";
             out << "\nInnKeeperPos: " << go_innkeeper.pos.GetMapId() << " " << go_innkeeper.pos.GetPositionX() << " " << go_innkeeper.pos.GetPositionY() << " " << go_innkeeper.pos.GetPositionZ();
             out << "\nlastGoInnKeeper: " << startT;
             break;
-        case NewRpgStatus::NEAR_NPC:
+        case RPG_NEAR_NPC:
             out << "NEAR_NPC";
-            out << "\nNpcPos: " << near_npc.pos.GetMapId() << " " << near_npc.pos.GetPositionX() << " " << near_npc.pos.GetPositionY() << " " << near_npc.pos.GetPositionZ();
+            out << "\nNpc: " << near_npc.pos.GetMapId() << " " << near_npc.pos.GetPositionX() << " " << near_npc.pos.GetPositionY() << " " << near_npc.pos.GetPositionZ() << " " << near_npc.pos.GetCounter();
             out << "\nlastNearNpc: " << startT;
             out << "\nlastReachNpc: " << near_npc.lastReach;
             break;
-        case NewRpgStatus::NEAR_RANDOM:
+        case RPG_NEAR_RANDOM:
             out << "NEAR_RANDOM";
             out << "\nlastNearRandom: " << startT;
             break;
-        case NewRpgStatus::IDLE:
+        case RPG_IDLE:
             out << "IDLE";
             break;
-        case NewRpgStatus::REST:
+        case RPG_REST:
             out << "REST";
             out << "\nlastRest: " << startT;
+            break;
+        case RPG_DO_QUEST:
+            out << "DO_QUEST";
+            out << "\nquestId: " << do_quest.questId;
+            out << "\nobjectiveIdx: " << do_quest.objectiveIdx;
+            out << "\npoiPos: " << do_quest.pos.GetMapId() << " " << do_quest.pos.GetPositionX() << " " << do_quest.pos.GetPositionY() << " " << do_quest.pos.GetPositionZ();
+            out << "\nlastReachPOI: " << do_quest.lastReachPOI;
             break;
         default:
             out << "UNKNOWN";
