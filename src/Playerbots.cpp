@@ -75,7 +75,16 @@ public:
 class PlayerbotsPlayerScript : public PlayerScript
 {
 public:
-    PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript") {}
+    PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript", {
+        PLAYERHOOK_ON_LOGIN,
+        PLAYERHOOK_ON_AFTER_UPDATE,
+        PLAYERHOOK_ON_CHAT,
+        PLAYERHOOK_ON_CHAT_WITH_CHANNEL,
+        PLAYERHOOK_ON_CHAT_WITH_GROUP,
+        PLAYERHOOK_ON_BEFORE_CRITERIA_PROGRESS,
+        PLAYERHOOK_ON_BEFORE_ACHI_COMPLETE,
+        PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT
+    }) {}
 
     void OnPlayerLogin(Player* player) override
     {
@@ -225,7 +234,9 @@ public:
 class PlayerbotsServerScript : public ServerScript
 {
 public:
-    PlayerbotsServerScript() : ServerScript("PlayerbotsServerScript") {}
+    PlayerbotsServerScript() : ServerScript("PlayerbotsServerScript", {
+        SERVERHOOK_CAN_PACKET_RECEIVE
+    }) {}
 
     void OnPacketReceived(WorldSession* session, WorldPacket const& packet) override
     {
@@ -238,7 +249,9 @@ public:
 class PlayerbotsWorldScript : public WorldScript
 {
 public:
-    PlayerbotsWorldScript() : WorldScript("PlayerbotsWorldScript") {}
+    PlayerbotsWorldScript() : WorldScript("PlayerbotsWorldScript", {
+        WORLDHOOK_ON_BEFORE_WORLD_INITIALIZED
+    }) {}
 
     void OnBeforeWorldInitialized() override
     {
@@ -246,16 +259,16 @@ public:
         // especially if you are distributing a repack or hosting a public server
         // e.g. you can replace the URL with your own repository,
         // but it should be publicly accessible and include all modifications you've made
-        LOG_INFO("server.loading", "============================================================");
-        LOG_INFO("server.loading", "||                                                        ||");
-        LOG_INFO("server.loading", "||             AzerothCore Playerbots Module              ||");
-        LOG_INFO("server.loading", "||                                                        ||");
-        LOG_INFO("server.loading", "============================================================");
-        LOG_INFO("server.loading", "||    mod-playerbots is a community-driven open-source    ||");
-        LOG_INFO("server.loading", "|| project based on AzerothCore, licensed under AGPLv3.0  ||");
-        LOG_INFO("server.loading", "============================================================");
-        LOG_INFO("server.loading", "||     https://github.com/liyunfan1223/mod-playerbots     ||");
-        LOG_INFO("server.loading", "============================================================");
+        LOG_INFO("server.loading", "╔══════════════════════════════════════════════════════════╗");
+        LOG_INFO("server.loading", "║                                                          ║");
+        LOG_INFO("server.loading", "║              AzerothCore Playerbots Module               ║");
+        LOG_INFO("server.loading", "║                                                          ║");
+        LOG_INFO("server.loading", "╟──────────────────────────────────────────────────────────╢");
+        LOG_INFO("server.loading", "║     mod-playerbots is a community-driven open-source     ║");
+        LOG_INFO("server.loading", "║  project based on AzerothCore, licensed under AGPLv3.0   ║");
+        LOG_INFO("server.loading", "╟──────────────────────────────────────────────────────────╢");
+        LOG_INFO("server.loading", "║      https://github.com/liyunfan1223/mod-playerbots      ║");
+        LOG_INFO("server.loading", "╚══════════════════════════════════════════════════════════╝");
 
         uint32 oldMSTime = getMSTime();
         
