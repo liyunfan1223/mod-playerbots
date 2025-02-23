@@ -27,6 +27,7 @@
 #include "ScriptMgr.h"
 #include "cs_playerbots.h"
 #include "cmath"
+#include "PaladinTriggers.h"
 
 class PlayerbotsDatabaseScript : public DatabaseScript
 {
@@ -368,6 +369,17 @@ public:
     void OnPlayerbotLogoutBots() override { sRandomPlayerbotMgr->LogoutAllBots(); }
 };
 
+class CustomGroupScript : public GroupScript
+{
+public:
+    CustomGroupScript() : GroupScript("CustomGroupScript") {}
+
+    void OnDisband(Group* group) override
+    {
+        PaladinSelectionGroupManager::RemoveInstance(group);
+    }
+};
+
 void AddPlayerbotsScripts()
 {
     new PlayerbotsDatabaseScript();
@@ -378,4 +390,5 @@ void AddPlayerbotsScripts()
     new PlayerbotsScript();
 
     AddSC_playerbots_commandscript();
+    new CustomGroupScript();
 }

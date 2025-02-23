@@ -45,7 +45,7 @@ bool CrusaderAuraTrigger::IsActive()
  */
 
 //greater blessing on party triggers
-
+/*
 PaladinSelectionGroup* PaladinSelectionGroupManager::GetPaladinSelectionGroup(Group* group)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -55,7 +55,49 @@ PaladinSelectionGroup* PaladinSelectionGroupManager::GetPaladinSelectionGroup(Gr
     }
     return groupCache[group].get();
 }
+*/
 
+std::unordered_map<Group*, std::unique_ptr<PaladinSelectionGroupManager>>& PaladinSelectionGroupManager::GetInstances() 
+{
+    static std::unordered_map<Group*, std::unique_ptr<PaladinSelectionGroupManager>> instances;
+    return instances;
+}
+
+PaladinSelectionGroupManager& PaladinSelectionGroupManager::GetInstance(Group* group) 
+{
+    auto& instances = GetInstances();
+    auto it = instances.find(group);
+    if (it == instances.end()) 
+    {
+        it = instances.emplace(group, std::unique_ptr<PaladinSelectionGroupManager>(new PaladinSelectionGroupManager(group))).first;
+    }
+    return *it->second;
+}
+
+void PaladinSelectionGroupManager::RemoveInstance(Group* group) 
+{
+    LOG_INFO("module.playerbots", "Removing PaladinSelectionGroupManager instance for group {}", group->GetGUID().ToString());
+    GetInstances().erase(group);
+}
+
+PaladinSelectionGroup* PaladinSelectionGroupManager::GetPaladinSelectionGroup() const 
+{
+    return paladinSelectionGroup_.get();
+}
+
+void PaladinSelectionGroupManager::UpdatePaladinSelectionGroup(Group* group) 
+{
+    LOG_INFO("module.playerbots", "Updating PaladinSelectionGroup for group {}", group->GetGUID().ToString());
+    paladinSelectionGroup_ = std::make_unique<PaladinSelectionGroup>(group);
+}
+
+PaladinSelectionGroupManager::PaladinSelectionGroupManager(Group* group) 
+    : paladinSelectionGroup_(std::make_unique<PaladinSelectionGroup>(group)) 
+{
+    LOG_INFO("module.playerbots", "PaladinSelectionGroupManager created for group {}", group->GetGUID().ToString());
+}
+
+/*
 std::vector<Player*> PaladinSelectionGroup::GetSortedPaladins() const
 {
     std::vector<Player*> allPaladins;
@@ -80,7 +122,7 @@ std::vector<Player*> PaladinSelectionGroup::GetSortedPaladins() const
 
     std::vector<Player*> selectedPaladins;
     Player* highestLevelTank = nullptr;
-
+    
     for (Player* paladin : allPaladins)
     {
         BotRoles role = AiFactory::GetPlayerRoles(paladin);
@@ -123,7 +165,6 @@ size_t PaladinSelectionGroup::GetPaladinOrderForBlessing(PlayerbotAI* botAI) con
         return 0;
 
     std::vector<Player*> selectedPaladins = GetSortedPaladins();
-
     const ObjectGuid botGuid = bot->GetGUID();
     for (size_t i = 0; i < selectedPaladins.size(); ++i)
     {
@@ -135,28 +176,138 @@ size_t PaladinSelectionGroup::GetPaladinOrderForBlessing(PlayerbotAI* botAI) con
 
     return 0;  
 }
+*/
+
+void PaladinSelectionGroup::UpdateIfNeeded(uint32 groupUpdateFlag) const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    // 如果团队状态已更新或缓存为空，重新计算排序结果
+    if ((groupUpdateFlag & GROUP_UPDATE_FLAG_STATUS) || sortedPaladins_.empty())
+    {
+        sortedPaladins_.clear();
+        std::set<ObjectGuid> visitedPaladins;
+
+        // 获取团队中的所有圣骑士
+        for (const GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
+        {
+            Player* member = groupRef->GetSource();
+            if (!member || member->getClass() != CLASS_PALADIN || visitedPaladins.count(member->GetGUID()))
+                continue;
+
+            if (member->GetLevel() >= 60)
+            {
+                sortedPaladins_.push_back(member);
+                visitedPaladins.insert(member->GetGUID());
+            }
+        }
+
+        // 对圣骑士进行排序（按等级从高到低）
+        std::stable_sort(sortedPaladins_.begin(), sortedPaladins_.end(), [](Player* a, Player* b) {
+            return a->GetLevel() > b->GetLevel();
+        });
+
+        // 选择最高等级的坦克圣骑士
+        Player* highestLevelTank = nullptr;
+        for (Player* paladin : sortedPaladins_)
+        {
+            BotRoles role = AiFactory::GetPlayerRoles(paladin);
+            if (role == BOT_ROLE_TANK)
+            {
+                highestLevelTank = paladin;
+                break;
+            }
+        }
+
+        // 构建最终的圣骑士列表
+        std::vector<Player*> selectedPaladins;
+        if (highestLevelTank)
+        {
+            selectedPaladins.push_back(highestLevelTank);
+        }
+        else if (!sortedPaladins_.empty())
+        {
+            selectedPaladins.push_back(sortedPaladins_[0]);
+        }
+
+        // 添加其他圣骑士，直到达到最大数量
+        for (Player* paladin : sortedPaladins_)
+        {
+            if (selectedPaladins.size() >= MAX_PALADINS)
+                break;
+
+            if (std::find(selectedPaladins.begin(), selectedPaladins.end(), paladin) == selectedPaladins.end())
+            {
+                selectedPaladins.push_back(paladin);
+            }
+        }
+
+        // 反转列表（如果需要）
+        std::reverse(selectedPaladins.begin(), selectedPaladins.end());
+
+        // 更新缓存
+        LOG_INFO("module.playerbots", "Updating PaladinSelectionGroup for group {}", group->GetGUID().ToString());
+        sortedPaladins_ = selectedPaladins;
+        lastGroupUpdateFlag_ = groupUpdateFlag;
+    }
+}
+
+std::vector<Player*> PaladinSelectionGroup::GetSortedPaladins(uint32 groupUpdateFlag)
+{
+    UpdateIfNeeded(groupUpdateFlag);
+    return sortedPaladins_;
+}
+
+size_t PaladinSelectionGroup::GetPaladinOrderForBlessing(PlayerbotAI* botAI) const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (!botAI)
+        return 0;
+
+    Player* bot = botAI->GetBot();
+    if (!bot || bot->getClass() != CLASS_PALADIN)
+        return 0;
+
+    // 查找当前圣骑士在排序列表中的位置
+    const ObjectGuid botGuid = bot->GetGUID();
+    for (size_t i = 0; i < sortedPaladins_.size(); ++i)
+    {
+        if (sortedPaladins_[i]->GetGUID() == botGuid)
+        {
+            return i + 1; // 返回顺序（从 1 开始）
+        }
+    }
+
+    return 0; // 如果当前圣骑士不在列表中，返回 0
+}
 
 bool GreaterBlessingOfKingsOnPartyTrigger::IsActive()
 {
     Group* group = bot->GetGroup();
-        if (!group)
-            return false;
+    if (!group || !group->isRaidGroup())
+        return false;
 
-    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    PaladinSelectionGroupManager& manager = PaladinSelectionGroupManager::GetInstance(group);    
+    PaladinSelectionGroup* paladinGroup = manager.GetPaladinSelectionGroup();
+    if (!paladinGroup)
+        return false;
+
+    uint32 currentGroupUpdateFlag = bot->GetGroupUpdateFlag();
+
+    std::vector<Player*> sortedPaladins = paladinGroup->GetSortedPaladins(currentGroupUpdateFlag);
+
     size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
     
-    if (!group->isRaidGroup())
-        return false;
-    
-        if (paladinOrder == 1)
+    if (paladinOrder == 1)
     {
         Unit* target = GetTarget();
-        if (!target  || target->GetLevel() < 50)
+        if (!target || target->GetLevel() < 50)
             return false;
        
         if (botAI->HasAura("greater blessing of kings", target, false, true, 1, false))
             return false;
-
+        
         return true;
     }
 
@@ -166,17 +317,24 @@ bool GreaterBlessingOfKingsOnPartyTrigger::IsActive()
 bool GreaterBlessingOfMightOnPartyTrigger::IsActive()
 {
     Group* group = bot->GetGroup();
-    if (!group)
+    if (!group || !group->isRaidGroup())
         return false;
+    
+    PaladinSelectionGroupManager& manager = PaladinSelectionGroupManager::GetInstance(group);
+    PaladinSelectionGroup* paladinGroup = manager.GetPaladinSelectionGroup();
+    
+    if (!paladinGroup)
+    return false;
 
-    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    uint32 currentGroupUpdateFlag = bot->GetGroupUpdateFlag();
+
+    std::vector<Player*> sortedPaladins = paladinGroup->GetSortedPaladins(currentGroupUpdateFlag);
+
     size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
 
     if (paladinOrder == 2)
     {
-        if (!group->isRaidGroup())
-            return false;
-            Unit* target = GetTarget();
+        Unit* target = GetTarget();
             
         if (!target || target->GetLevel() < 42)
             return false;        
@@ -191,17 +349,23 @@ bool GreaterBlessingOfMightOnPartyTrigger::IsActive()
 bool GreaterBlessingOfWisdomOnPartyTrigger::IsActive()
 {
     Group* group = bot->GetGroup();
-    if (!group)
+    if (!group || !group->isRaidGroup())
         return false;
 
-    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    PaladinSelectionGroupManager& manager = PaladinSelectionGroupManager::GetInstance(group);
+    PaladinSelectionGroup* paladinGroup = manager.GetPaladinSelectionGroup();
+
+    if (!paladinGroup)
+        return false;
+
+    uint32 currentGroupUpdateFlag = bot->GetGroupUpdateFlag();
+
+    std::vector<Player*> sortedPaladins = paladinGroup->GetSortedPaladins(currentGroupUpdateFlag);
+    
     size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
 
     if (paladinOrder == 3) 
     {
-        if (!group->isRaidGroup())
-            return false;
-
         Unit* target = GetTarget();
 
         if (!target || target->GetLevel() < 44)
@@ -215,21 +379,26 @@ bool GreaterBlessingOfWisdomOnPartyTrigger::IsActive()
     return false;
 }
 
-
 bool GreaterBlessingOfSanctuaryOnPartyTrigger::IsActive()
 {
     Group* group = bot->GetGroup();
-    if (!group)
+    if (!group || !group->isRaidGroup())
         return false;
 
-    PaladinSelectionGroup* paladinGroup = PaladinSelectionGroupManager::GetInstance().GetPaladinSelectionGroup(group);
+    PaladinSelectionGroupManager& manager = PaladinSelectionGroupManager::GetInstance(group);
+    PaladinSelectionGroup* paladinGroup = manager.GetPaladinSelectionGroup();
+
+    if (!paladinGroup)
+        return false;
+
+    uint32 currentGroupUpdateFlag = bot->GetGroupUpdateFlag();
+
+    std::vector<Player*> sortedPaladins = paladinGroup->GetSortedPaladins(currentGroupUpdateFlag);
+    
     size_t paladinOrder = paladinGroup->GetPaladinOrderForBlessing(botAI);
 
     if (paladinOrder == 4)
     {
-        if (!group->isRaidGroup())
-            return false;
-
         Unit* target = GetTarget();
         if (!target || target->GetLevel() < 50)
             return false;
@@ -445,7 +614,4 @@ bool BlessingOfSanctuaryOnPartyTrigger::IsActive()
 
     return BuffOnPartyTrigger::IsActive() && 
     !botAI->HasAura("greater blessing of sanctuary", target) && 
-    !botAI->HasAura("blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target);
-
-
-}
+    !botAI->HasAura("blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target, false, true, 1, false);}

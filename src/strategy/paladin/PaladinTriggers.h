@@ -12,6 +12,7 @@
 #include "Unit.h"
 #include "Group.h"
 
+
 class PlayerbotAI;
 
 inline std::string const GetActualBlessingOfMight(Unit* target)
@@ -277,7 +278,7 @@ public:
 
 
 //greater blessing on party triggers
-class PaladinSelectionGroup
+/*class PaladinSelectionGroup
 {
 public:
     PaladinSelectionGroup(Group* group) : group(group) {}
@@ -288,24 +289,41 @@ public:
 private:
     static constexpr size_t MAX_PALADINS = 4;
     Group* group;
-};
+};*/
 
-class PaladinSelectionGroupManager
+class PaladinSelectionGroup
 {
 public:
-    static PaladinSelectionGroupManager& GetInstance()
-    {
-        static PaladinSelectionGroupManager instance;
-        return instance;
-    }
+    PaladinSelectionGroup(Group* group) : group(group) {}
 
-    PaladinSelectionGroup* GetPaladinSelectionGroup(Group* group);
+    size_t GetPaladinOrderForBlessing(PlayerbotAI* botAI) const;
+    std::vector<Player*> GetSortedPaladins(uint32 groupUpdateFlag);
 
 private:
-    std::unordered_map<Group*, std::unique_ptr<PaladinSelectionGroup>> groupCache;
-    mutable std::mutex mutex_;
+    void UpdateIfNeeded(uint32 groupUpdateFlag) const;
+
+    static constexpr size_t MAX_PALADINS = 4;
+    Group* group;
+
+    mutable std::vector<Player*> sortedPaladins_; // 缓存排序后的圣骑士列表
+    mutable uint32 lastGroupUpdateFlag_ = 0;      // 上次的团队更新标志
+    mutable std::mutex mutex_;                    // 线程安全锁
 };
 
+class PaladinSelectionGroupManager 
+{
+public:
+    static PaladinSelectionGroupManager& GetInstance(Group* group);
+    static void RemoveInstance(Group* group);
+    PaladinSelectionGroup* GetPaladinSelectionGroup() const;
+    void UpdatePaladinSelectionGroup(Group* group);
+private:
+    explicit PaladinSelectionGroupManager(Group* group);
+    PaladinSelectionGroupManager(const PaladinSelectionGroupManager&) = delete;
+    PaladinSelectionGroupManager& operator=(const PaladinSelectionGroupManager&) = delete;
+    static std::unordered_map<Group*, std::unique_ptr<PaladinSelectionGroupManager>>& GetInstances();
+    std::unique_ptr<PaladinSelectionGroup> paladinSelectionGroup_;
+};
 class GreaterBlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
