@@ -77,8 +77,6 @@ class PlayerbotsPlayerScript : public PlayerScript
 public:
     PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript", {
         PLAYERHOOK_ON_LOGIN,
-        PLAYERHOOK_ON_LOGOUT,
-        PLAYERHOOK_ON_BEFORE_UPDATE,
         PLAYERHOOK_ON_AFTER_UPDATE,
         PLAYERHOOK_ON_CHAT,
         PLAYERHOOK_ON_CHAT_WITH_CHANNEL,
