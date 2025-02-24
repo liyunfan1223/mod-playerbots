@@ -4271,10 +4271,9 @@ void PlayerbotFactory::InitKeyring()
         uint32 keyId = keyPair.second;
         if (keyId > 0)
         {
-            Item* newItem = StoreNewItemInInventorySlot(bot,keyId, 1);
-            if (newItem)
+            if (Item* newItem = StoreNewItemInInventorySlot(bot,keyId, 1))
             {
-                bot->SaveToDB();
+                newItem->AddToUpdateQueueOf(bot);
             }
         }
     }
