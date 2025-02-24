@@ -4237,24 +4237,24 @@ void PlayerbotFactory::InitKeyring()
     if (!bot)
         return;
 
-    ReputationMgr& repMgr = bot->GetReputationMgr();
-
+    ReputationMgr& repMgr = bot->GetReputationMgr(); // Reference, use . instead of ->
+    
     std::vector<std::pair<uint32, uint32>> keysToCheck;
 
     // Reputation-based Keys (Honored requirement)
-    if (repMgr->GetRank(sFactionStore.LookupEntry(1011)) >= REP_HONORED && !bot->HasItemCount(30633, 1))
+    if (repMgr.GetRank(sFactionStore.LookupEntry(1011)) >= REP_HONORED && !bot->HasItemCount(30633, 1))
         keysToCheck.emplace_back(1011, 30633); // Lower City - Auchenai Key
-    if (repMgr->GetRank(sFactionStore.LookupEntry(942)) >= REP_HONORED && !bot->HasItemCount(30623, 1))
+    if (repMgr.GetRank(sFactionStore.LookupEntry(942)) >= REP_HONORED && !bot->HasItemCount(30623, 1))
         keysToCheck.emplace_back(942, 30623); // Cenarion Expedition - Reservoir Key
-    if (repMgr->GetRank(sFactionStore.LookupEntry(989)) >= REP_HONORED && !bot->HasItemCount(30635, 1))
+    if (repMgr.GetRank(sFactionStore.LookupEntry(989)) >= REP_HONORED && !bot->HasItemCount(30635, 1))
         keysToCheck.emplace_back(989, 30635); // Keepers of Time - Key of Time
-    if (repMgr->GetRank(sFactionStore.LookupEntry(935)) >= REP_HONORED && !bot->HasItemCount(30634, 1))
+    if (repMgr.GetRank(sFactionStore.LookupEntry(935)) >= REP_HONORED && !bot->HasItemCount(30634, 1))
         keysToCheck.emplace_back(935, 30634); // The Sha'tar - Warpforged Key
 
     // Faction-specific Keys (Honored requirement)
-    if (bot->GetTeam() == ALLIANCE && repMgr->GetRank(sFactionStore.LookupEntry(946)) >= REP_HONORED && !bot->HasItemCount(30622, 1))
+    if (bot->GetTeam() == ALLIANCE && repMgr.GetRank(sFactionStore.LookupEntry(946)) >= REP_HONORED && !bot->HasItemCount(30622, 1))
         keysToCheck.emplace_back(946, 30622); // Honor Hold - Flamewrought Key (Alliance)
-    if (bot->GetTeam() == HORDE && repMgr->GetRank(sFactionStore.LookupEntry(947)) >= REP_HONORED && !bot->HasItemCount(30637, 1))
+    if (bot->GetTeam() == HORDE && repMgr.GetRank(sFactionStore.LookupEntry(947)) >= REP_HONORED && !bot->HasItemCount(30637, 1))
         keysToCheck.emplace_back(947, 30637); // Thrallmar - Flamewrought Key (Horde)
 
     // Keys that do not require Rep or Faction
