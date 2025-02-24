@@ -136,6 +136,7 @@ public:
     void ApplyEnchantAndGemsNew(bool destoryOld = true);
     void InitInstanceQuests();
     void UnbindInstance();
+    void InitKeyring();
 
 private:
     void Prepare();
