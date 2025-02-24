@@ -137,6 +137,7 @@ public:
     void InitInstanceQuests();
     void UnbindInstance();
     void InitKeyring();
+    void InitReputation();
 
 private:
     void Prepare();
