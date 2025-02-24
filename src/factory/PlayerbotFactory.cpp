@@ -252,10 +252,19 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Quests");
         InitInstanceQuests();
+        InitAttunementQuests();
+        if (pmo)
+            pmo->finish();
+    }
+    else
+    {
+        pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Quests");
+        InitAttunementQuests();
         if (pmo)
             pmo->finish();
     }
 
+    InitAttunementQuests()
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
     LOG_DEBUG("playerbots", "Initializing spells (step 1)...");
     // bot->LearnDefaultSkills();
@@ -462,6 +471,7 @@ void PlayerbotFactory::Refresh()
     // {
     //     InitEquipment(true);
     // }
+    InitAttunementQuests();
     ClearInventory();
     InitAmmo();
     InitFood();
@@ -4265,7 +4275,8 @@ void PlayerbotFactory::InitKeyring()
         keysToCheck.emplace_back(947, 30637); // Thrallmar - Flamewrought Key (Horde)
 
     // Keys that do not require Rep or Faction
-    std::vector<uint32> nonRepKeys = {28395, 27991, 31084}; // Shattered Halls Key, Shadow Labyrinth Key, Key to the Arcatraz
+    // Shattered Halls Key, Shadow Labyrinth Key, Key to the Arcatraz, Master's Key
+    std::vector<uint32> nonRepKeys = {28395, 27991, 31084, 24490};
     for (uint32 keyId : nonRepKeys)
     {
         if (!bot->HasItemCount(keyId, 1))
@@ -4330,3 +4341,37 @@ void PlayerbotFactory::InitReputation()
     }
 }
 
+void PlayerbotFactory::InitAttunementQuests()
+{
+    if (bot->GetLevel() < 60)
+        return; // Only apply for level 60+ bots
+
+    uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
+
+    // List of attunement quest IDs
+    std::list<uint32> attunementQuests = {
+        // Caverns of Time - Part 1
+        10279, // To The Master's Lair
+        10277, // The Caverns of Time
+
+        // Caverns of Time - Part 2 (Escape from Durnholde Keep)
+        10282, // Old Hillsbrad
+        10283, // Taretha's Diversion
+        10284, // Escape from Durnholde
+        10285, // Return to Andormu
+
+        // Caverns of Time - Part 2 (The Black Morass)
+        10296, // The Black Morass
+        10297, // The Opening of the Dark Portal
+        10298  // Hero of the Brood
+    };
+
+    // Complete all attunement quests for the bot
+    InitQuests(attunementQuests);
+
+    // Ensure bot's level remains unchanged
+    bot->GiveLevel(level);
+    bot->SetUInt32Value(PLAYER_XP, currentXP);
+
+    ClearInventory();
+}
