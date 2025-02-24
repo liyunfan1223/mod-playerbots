@@ -138,6 +138,7 @@ public:
     void UnbindInstance();
     void InitKeyring();
     void InitReputation();
+    void InitAttunementQuests();
 
 private:
     void Prepare();
