@@ -4342,13 +4342,14 @@ void PlayerbotFactory::InitReputation()
 
 void PlayerbotFactory::InitAttunementQuests()
 {
-    if (bot->GetLevel() < 60)
-        return; // Only apply for level 60+ bots
+    uint32 level = bot->GetLevel();
+    if (level < 55)
+        return; // Only apply for level 55+ bots
 
     uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
 
     // List of attunement quest IDs
-    std::list<uint32> attunementQuests = {
+    std::list<uint32> attunementQuestsTBC = {
         // Caverns of Time - Part 1
         10279, // To The Master's Lair
         10277, // The Caverns of Time
@@ -4362,15 +4363,41 @@ void PlayerbotFactory::InitAttunementQuests()
         // Caverns of Time - Part 2 (The Black Morass)
         10296, // The Black Morass
         10297, // The Opening of the Dark Portal
-        10298  // Hero of the Brood
+        10298, // Hero of the Brood
+
+        // Magister's Terrace Attunement
+        11481, // Crisis at the Sunwell
+        11482, // Duty Calls
+        11488, // Magisters' Terrace
+        11490, // The Scryer's Scryer
+        11492  // Hard to Kill
     };
 
-    // Complete all attunement quests for the bot
-    InitQuests(attunementQuests);
+    // Complete all level-appropriate attunement quests for the bot
+    if (level >= 60)
+    {
+        std::list<uint32> questsToComplete;
 
-    // Ensure bot's level remains unchanged
+        // Check each quest status before adding to the completion list
+        for (uint32 questId : attunementQuestsTBC)
+        {
+            QuestStatus questStatus = bot->GetQuestStatus(questId);
+
+            if (questStatus == QUEST_STATUS_NONE) // Quest not yet taken/completed
+            {
+                questsToComplete.push_back(questId);
+            }
+        }
+
+        // Only complete quests that haven't been finished yet
+        if (!questsToComplete.empty())
+        {
+            InitQuests(questsToComplete);
+        }
+    }
+
+    // Reset XP so bot's level remains unchanged
     bot->GiveLevel(level);
     bot->SetUInt32Value(PLAYER_XP, currentXP);
-
-    ClearInventory();
 }
+
