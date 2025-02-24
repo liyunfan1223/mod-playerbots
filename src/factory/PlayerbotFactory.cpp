@@ -4237,9 +4237,6 @@ void PlayerbotFactory::InitKeyring()
         return;
 
     ReputationMgr& repMgr = bot->GetReputationMgr();
-    PlayerbotAI* ai = bot->GetPlayerbotAI();
-    if (!ai)
-        return;
 
     std::vector<std::pair<uint32, uint32>> keysToCheck;
 
@@ -4276,10 +4273,8 @@ void PlayerbotFactory::InitKeyring()
             Item* newItem = bot->StoreNewItemInInventorySlot(keyId, 1);
             if (newItem)
             {
-                ai->TellMaster("I have received a key: " + std::to_string(keyId));
                 bot->SaveToDB();
             }
         }
     }
 }
-
