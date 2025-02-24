@@ -164,6 +164,7 @@ bool MaintenanceAction::Execute(Event event)
     }
     botAI->TellMaster("I'm maintaining");
     PlayerbotFactory factory(bot, bot->GetLevel());
+    factory.InitAttunementQuests();
     factory.InitBags(false);
     factory.InitAmmo();
     factory.InitFood();
