@@ -1686,7 +1686,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         {
             const AreaTableEntry* entry = sAreaTableStore.LookupEntry(item.first);
             std::string zone_name = PlayerbotAI::GetLocalizedAreaName(entry);
-            LOG_INFO("playerbots", "Zone: {} ({}) [{}, {}]", item.first, zone_name, item.second.low, item.second.high);
+            // LOG_INFO("playerbots", "Zone: {} ({}) [{}, {}]", item.first, zone_name, item.second.low, item.second.high);
         }
         // add all initial position
         for (uint32 i = 1; i < MAX_RACES; i++)

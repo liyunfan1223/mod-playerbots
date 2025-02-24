@@ -115,7 +115,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
             botAI->rpgInfo.status == RPG_REST ||
             botAI->rpgInfo.status == RPG_GO_INNKEEPER ||
             botAI->rpgInfo.status == RPG_DO_QUEST;
-        // unit->SetInCombatWith()
+
         if (inactiveGrindStatus && (bot->GetDistance(unit) > 25.0f || !bot->IsHostileTo(unit)))
         {
             if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())

@@ -17,7 +17,7 @@ struct POIInfo {
     uint32 objectiveIdx;
 };
 
-/// @TODO: make it a base (composition) class for all new rpg actions
+/// A base (composition) class for all new rpg actions
 /// All functions that may be shared by multiple actions should be declared here
 /// And we should make all actions composable instead of inheritable
 class NewRpgBaseAction : public MovementAction
@@ -39,10 +39,10 @@ protected:
     bool AcceptQuest(Quest const* quest, ObjectGuid guid);
     bool TurnInQuest(Quest const* quest, ObjectGuid guid);
     uint32 BestReward(Quest const* quest);
+    bool IsQuestWorthDoing(Quest const* quest);
+    bool IsQuestCapableDoing(Quest const* quest);
 
 protected:
-    uint32 SelectQuestToDo(Player* bot);
-    
     bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo> &poiInfo);
     static WorldPosition SelectRandomGrindPos(Player* bot);
     static WorldPosition SelectRandomInnKeeperPos(Player* bot);

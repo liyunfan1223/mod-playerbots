@@ -1,10 +1,12 @@
 #include "NewRpgBaseAction.h"
 #include "ChatHelper.h"
 #include "G3D/Vector2.h"
+#include "GameObject.h"
 #include "GossipDef.h"
 #include "GridTerrainData.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
@@ -201,17 +203,22 @@ bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
             continue;
 
         const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
-        if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->SatisfyQuestLog(false))
+        if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
+            bot->SatisfyQuestLog(false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
         {
             AcceptQuest(quest, guid);
+            botAI->TellMasterNoFacing("Quest accepted " + ChatHelper::FormatQuest(quest));
             BroadcastHelper::BroadcastQuestAccepted(botAI, bot, quest);
             botAI->rpgStatistic.questAccepted++;
+            if (quest->IsAutoComplete())
+                botAI->rpgStatistic.questCompleted++;
             LOG_DEBUG("playerbots", "[New rpg] {} accept quest {}", bot->GetName(), quest->GetQuestId());
             // botAI->TellMasterNoFacing("I just accept quest! " + std::to_string(item.QuestId));
         }
-        if (status == QUEST_STATUS_COMPLETE)
+        if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
         {
             TurnInQuest(quest, guid);
+            botAI->TellMasterNoFacing("Quest rewarded " + ChatHelper::FormatQuest(quest));
             BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
             botAI->rpgStatistic.questRewarded++;
             LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), quest->GetQuestId());
@@ -303,6 +310,36 @@ uint32 NewRpgBaseAction::BestReward(Quest const* quest)
     }
 }
 
+bool NewRpgBaseAction::IsQuestWorthDoing(Quest const* quest)
+{
+    bool isLowLevelQuest = bot->GetLevel() > (bot->GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF));
+
+    if (isLowLevelQuest)
+        return false;
+
+    if (quest->IsRepeatable())
+        return false;
+
+    return true;
+}
+
+bool NewRpgBaseAction::IsQuestCapableDoing(Quest const* quest)
+{
+    bool highLevelQuest = bot->GetLevel() + 4 < bot->GetQuestLevel(quest);
+    if (highLevelQuest)
+        return false;
+
+    // Elite quest and dungeon quest etc
+    if (quest->GetType() != 0)
+        return false;
+
+    // now we only capable of doing solo quests
+    if (quest->GetSuggestedPlayers() >= 2)
+        return false;
+
+    return true;
+}
+
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 {
     if (GuidPosition pos = ChooseNpcToInteract(true, 80.0f))
@@ -327,12 +364,18 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
     // Unit* unitWithQuest = nullptr;
     for (ObjectGuid& guid: possibleTargets)
     {
-        Unit* unit = botAI->GetUnit(guid);
-        if (!unit || !unit->ToCreature())
+        WorldObject* object = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
+        if (!object)
+            object = ObjectAccessor::GetGameObject(*bot, guid);
+
+        if (!object)
             continue;
 
-        if (distanceLimit && bot->GetDistance(unit) > distanceLimit)
+        if (distanceLimit && bot->GetDistance(object) > distanceLimit)
             continue;
+
+        // if (bot->GetQuestDialogStatus(object) < DIALOG_STATUS_AVAILABLE)
+        //     continue;
 
         bot->PrepareQuestMenu(guid);
         const QuestMenu &menu = bot->PlayerTalkClass->GetQuestMenu();
@@ -342,10 +385,13 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
         for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
         {
             const QuestMenuItem &item = menu.GetItem(idx);
+            const Quest* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
+            if (!quest)
+                continue;
             const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
-            if (status == QUEST_STATUS_COMPLETE)
+            if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
             {
-                return GuidPosition(unit);
+                return GuidPosition(object);
             }
         }
         for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
@@ -355,9 +401,10 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
             if (!quest)
                 continue;
             const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
-            if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->SatisfyQuestLog(false))
+            if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
+                bot->SatisfyQuestLog(false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
             {
-                return GuidPosition(unit);
+                return GuidPosition(object);
             }
         }
     }
@@ -368,17 +415,15 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
 
     int idx = urand(0, possibleTargets.size() - 1);
     ObjectGuid guid = possibleTargets[idx];
-    Unit* unit = botAI->GetUnit(guid);
-    if (unit)
+    WorldObject* object = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
+    if (!object)
+        object = ObjectAccessor::GetGameObject(*bot, guid);
+
+    if (object)
     {
-        return GuidPosition(unit);
+        return GuidPosition(object);
     }
     return GuidPosition();
-}
-
-uint32 NewRpgBaseAction::SelectQuestToDo(Player* bot)
-{
-
 }
 
 static std::vector<float> GenerateRandomWeights(int n) {
