@@ -4285,7 +4285,6 @@ void PlayerbotFactory::InitKeyring()
         }
     }
 }
-
 void PlayerbotFactory::InitReputation()
 {
     if (!bot)
@@ -4317,8 +4316,17 @@ void PlayerbotFactory::InitReputation()
         if (!factionEntry)
             continue;
 
-         // Bottom of Honored rank
+        // Bottom of Honored rank
         int32 honoredRep = ReputationMgr::ReputationRankToStanding(static_cast<ReputationRank>(REP_HONORED - 1)) + 1;
-        repMgr.SetReputation(factionEntry, honoredRep);
+
+        // Get bot's current reputation with this faction
+        int32 currentRep = repMgr.GetReputation(factionEntry);
+
+        // Only set reputation if it's lower than the required Honored value
+        if (currentRep < honoredRep)
+        {
+            repMgr.SetReputation(factionEntry, honoredRep);
+        }
     }
 }
+
