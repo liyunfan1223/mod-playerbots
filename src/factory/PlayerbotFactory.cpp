@@ -4252,9 +4252,9 @@ void PlayerbotFactory::InitKeyring()
         keysToCheck.emplace_back(935, 30634); // The Sha'tar - Warpforged Key
 
     // Faction-specific Keys (Honored requirement)
-    if (bot->GetTeam() == ALLIANCE && repMgr.GetRank(sFactionStore.LookupEntry(946)) >= REP_HONORED && !bot->HasItemCount(30622, 1))
+    if (bot->GetTeamId() == TEAM_ALLIANCE && repMgr.GetRank(sFactionStore.LookupEntry(946)) >= REP_HONORED && !bot->HasItemCount(30622, 1))
         keysToCheck.emplace_back(946, 30622); // Honor Hold - Flamewrought Key (Alliance)
-    if (bot->GetTeam() == HORDE && repMgr.GetRank(sFactionStore.LookupEntry(947)) >= REP_HONORED && !bot->HasItemCount(30637, 1))
+    if (bot->GetTeamId() == TEAM_HORDE && repMgr.GetRank(sFactionStore.LookupEntry(947)) >= REP_HONORED && !bot->HasItemCount(30637, 1))
         keysToCheck.emplace_back(947, 30637); // Thrallmar - Flamewrought Key (Horde)
 
     // Keys that do not require Rep or Faction
