@@ -174,6 +174,7 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitClassSpells();
     factory.InitAvailableSpells();
     factory.InitSkills();
+    factory.InitReputation();
     factory.InitMounts();
     factory.InitGlyphs(true);
     factory.InitKeyring();
