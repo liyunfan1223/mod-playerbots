@@ -360,6 +360,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
+    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Keys");
+    LOG_DEBUG("playerbots", "Initializing keys...");
+    InitKeyring();
+    if (pmo)
+        pmo->finish();
+
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EqSets");
     LOG_DEBUG("playerbots", "Initializing second equipment set...");
     // InitSecondEquipmentSet();
@@ -464,6 +470,7 @@ void PlayerbotFactory::Refresh()
     InitAvailableSpells();
     InitSkills();
     InitMounts();
+    InitKeyring();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
     {
         ApplyEnchantAndGemsNew();
@@ -4223,3 +4230,59 @@ void PlayerbotFactory::IterateItemsInBank(IterateItemsVisitor* visitor)
         }
     }
 }
+
+void PlayerbotFactory::InitKeyring()
+{
+    if (!bot)
+        return;
+
+    ReputationMgr* repMgr = bot->GetReputationMgr();
+    if (!repMgr)
+        return;
+
+    PlayerbotAI* ai = bot->GetPlayerbotAI();
+    if (!ai)
+        return;
+
+    std::vector<std::pair<uint32, uint32>> keysToCheck;
+
+    // Reputation-based Keys (Honored requirement)
+    if (repMgr->GetRank(sFactionStore.LookupEntry(1011)) >= REP_HONORED && !bot->HasItemCount(30633, 1))
+        keysToCheck.emplace_back(1011, 30633); // Lower City - Auchenai Key
+    if (repMgr->GetRank(sFactionStore.LookupEntry(942)) >= REP_HONORED && !bot->HasItemCount(30623, 1))
+        keysToCheck.emplace_back(942, 30623); // Cenarion Expedition - Reservoir Key
+    if (repMgr->GetRank(sFactionStore.LookupEntry(989)) >= REP_HONORED && !bot->HasItemCount(30635, 1))
+        keysToCheck.emplace_back(989, 30635); // Keepers of Time - Key of Time
+    if (repMgr->GetRank(sFactionStore.LookupEntry(935)) >= REP_HONORED && !bot->HasItemCount(30634, 1))
+        keysToCheck.emplace_back(935, 30634); // The Sha'tar - Warpforged Key
+
+    // Faction-specific Keys (Honored requirement)
+    if (bot->GetTeam() == ALLIANCE && repMgr->GetRank(sFactionStore.LookupEntry(946)) >= REP_HONORED && !bot->HasItemCount(30622, 1))
+        keysToCheck.emplace_back(946, 30622); // Honor Hold - Flamewrought Key (Alliance)
+    if (bot->GetTeam() == HORDE && repMgr->GetRank(sFactionStore.LookupEntry(947)) >= REP_HONORED && !bot->HasItemCount(30637, 1))
+        keysToCheck.emplace_back(947, 30637); // Thrallmar - Flamewrought Key (Horde)
+
+    // Keys that do not require Rep or Faction
+    std::vector<uint32> nonRepKeys = {28395, 27991, 31084}; // Shattered Halls Key, Shadow Labyrinth Key, Key to the Arcatraz
+    for (uint32 keyId : nonRepKeys)
+    {
+        if (!bot->HasItemCount(keyId, 1))
+            keysToCheck.emplace_back(0, keyId);
+    }
+
+    // Assign keys
+    for (auto const& keyPair : keysToCheck)
+    {
+        uint32 keyId = keyPair.second;
+        if (keyId > 0)
+        {
+            Item* newItem = bot->StoreNewItemInInventorySlot(keyId, 1);
+            if (newItem)
+            {
+                ai->TellMaster("I have received a key: " + std::to_string(keyId));
+                bot->SaveToDB();
+            }
+        }
+    }
+}
+
