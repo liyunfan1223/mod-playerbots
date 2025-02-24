@@ -4237,9 +4237,6 @@ void PlayerbotFactory::InitKeyring()
         return;
 
     ReputationMgr& repMgr = bot->GetReputationMgr();
-    if (!repMgr)
-        return;
-
     PlayerbotAI* ai = bot->GetPlayerbotAI();
     if (!ai)
         return;
