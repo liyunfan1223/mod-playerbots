@@ -4317,8 +4317,7 @@ void PlayerbotFactory::InitReputation()
         if (!factionEntry)
             continue;
 
-        int32 honoredRep = ReputationMgr::ReputationRankToStanding(REP_HONORED);
+        int32 honoredRep = ReputationMgr::ReputationRankToStanding(REP_HONORED - 1) + 1; // Bottom of Honored
         repMgr.SetReputation(factionEntry, honoredRep);
     }
 }
-
