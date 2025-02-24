@@ -297,6 +297,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
+    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reputation");
+    LOG_DEBUG("playerbots", "Initializing reputation...");
+    InitReputation();
+    if (pmo)
+        pmo->finish();
+
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Mounts");
     LOG_DEBUG("playerbots", "Initializing mounts...");
     InitMounts();
@@ -470,6 +476,7 @@ void PlayerbotFactory::Refresh()
     InitClassSpells();
     InitAvailableSpells();
     InitSkills();
+    InitReputation();
     InitMounts();
     InitKeyring();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
@@ -4278,3 +4285,40 @@ void PlayerbotFactory::InitKeyring()
         }
     }
 }
+
+void PlayerbotFactory::InitReputation()
+{
+    if (!bot)
+        return;
+
+    if (bot->GetLevel() < 70)
+        return; // Only apply for level 70+ bots
+
+    ReputationMgr& repMgr = bot->GetReputationMgr();
+
+    // List of factions that require Honored reputation for heroic keys
+    std::vector<uint32> factions = {
+        1011, // Lower City
+        942,  // Cenarion Expedition
+        989,  // Keepers of Time
+        935   // The Sha'tar
+    };
+
+    // Add faction-specific reputation
+    if (bot->GetTeamId() == TEAM_ALLIANCE)
+        factions.push_back(946); // Honor Hold (Alliance)
+    else if (bot->GetTeamId() == TEAM_HORDE)
+        factions.push_back(947); // Thrallmar (Horde)
+
+    // Set reputation to Honored for each required faction
+    for (uint32 factionId : factions)
+    {
+        FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+        if (!factionEntry)
+            continue;
+
+        int32 honoredRep = ReputationMgr::ReputationRankToStanding(REP_HONORED);
+        repMgr.SetReputation(factionEntry, honoredRep);
+    }
+}
+
