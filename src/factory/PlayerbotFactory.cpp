@@ -264,7 +264,6 @@ void PlayerbotFactory::Randomize(bool incremental)
             pmo->finish();
     }
 
-    InitAttunementQuests()
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
     LOG_DEBUG("playerbots", "Initializing spells (step 1)...");
     // bot->LearnDefaultSkills();
