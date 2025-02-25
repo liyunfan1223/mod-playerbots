@@ -27,12 +27,6 @@ void DefaultQuestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "gossip hello", NextAction::array(0, new NextAction("talk to quest giver", relevance), nullptr)));
     triggers.push_back(new TriggerNode(
         "complete quest", NextAction::array(0, new NextAction("talk to quest giver", relevance), nullptr)));
-    
-    /// @FIXME:These actions can never be triggered as action always be cleared after drop target (change engine)
-    // triggers.push_back(new TriggerNode(
-    //     "quest update add kill", NextAction::array(0, new NextAction("quest update add kill", relevance), nullptr)));
-    // triggers.push_back(new TriggerNode(
-    //     "quest update add item", NextAction::array(0, new NextAction("quest update add item", relevance), nullptr)));
 }
 
 DefaultQuestStrategy::DefaultQuestStrategy(PlayerbotAI* botAI) : QuestStrategy(botAI) {}

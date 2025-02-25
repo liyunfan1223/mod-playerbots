@@ -207,7 +207,8 @@ bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
             bot->SatisfyQuestLog(false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
         {
             AcceptQuest(quest, guid);
-            botAI->TellMasterNoFacing("Quest accepted " + ChatHelper::FormatQuest(quest));
+            if (botAI->GetMaster())
+                botAI->TellMasterNoFacing("Quest accepted " + ChatHelper::FormatQuest(quest));
             BroadcastHelper::BroadcastQuestAccepted(botAI, bot, quest);
             botAI->rpgStatistic.questAccepted++;
             if (quest->IsAutoComplete())
@@ -218,7 +219,8 @@ bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
         if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
         {
             TurnInQuest(quest, guid);
-            botAI->TellMasterNoFacing("Quest rewarded " + ChatHelper::FormatQuest(quest));
+            if (botAI->GetMaster())
+                botAI->TellMasterNoFacing("Quest rewarded " + ChatHelper::FormatQuest(quest));
             BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
             botAI->rpgStatistic.questRewarded++;
             LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), quest->GetQuestId());

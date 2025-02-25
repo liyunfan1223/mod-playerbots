@@ -2860,7 +2860,7 @@ void RandomPlayerbotMgr::PrintStats()
         // LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[RPG_GO_INNKEEPER]);
         // LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[RPG_NEAR_RANDOM]);
         // LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[RPG_NEAR_NPC]);
-        LOG_INFO("playerbots", "Bots quest:");
+        LOG_INFO("playerbots", "Bots total quests:");
         LOG_INFO("playerbots", "    Accepted: {}, Completed: {}, Rewarded: {}, Dropped: {}",
             rpgStasticTotal.questAccepted, rpgStasticTotal.questCompleted, rpgStasticTotal.questRewarded, rpgStasticTotal.questDropped);
     }

@@ -270,7 +270,6 @@ bool NewRpgDoQuestAction::Execute(Event event)
         {
             // if quest is completed, back to innkeeper to reward
             BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, quest);
-            botAI->rpgStatistic.questCompleted++;
             WorldPosition pos = NewRpgStatusUpdateAction::SelectRandomInnKeeperPos(bot);
             if (pos != WorldPosition())
             {
@@ -288,10 +287,37 @@ bool NewRpgDoQuestAction::Execute(Event event)
 
 bool NewRpgDoQuestAction::DoIncompleteQuest()
 {
+    uint32 questId = RPG_INFO(do_quest, questId);
+    if (botAI->rpgInfo.do_quest.pos != WorldPosition())
+    {
+        /// @TODO: extract to a new function
+        uint32 currentObjective = botAI->rpgInfo.do_quest.objectiveIdx;
+        // check if the objective has completed
+        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
+        bool completed = true;
+        if (currentObjective < QUEST_OBJECTIVES_COUNT)
+        {
+            if (q_status.CreatureOrGOCount[currentObjective] < quest->RequiredNpcOrGoCount[currentObjective])
+                completed = false;
+        }
+        else if (currentObjective < QUEST_OBJECTIVES_COUNT + QUEST_ITEM_OBJECTIVES_COUNT)
+        {
+            if (q_status.ItemCount[currentObjective - QUEST_OBJECTIVES_COUNT] <
+                quest->RequiredItemCount[currentObjective - QUEST_OBJECTIVES_COUNT])
+                completed = false;
+        }
+        if (completed)
+        {
+            botAI->rpgInfo.do_quest.lastReachPOI = 0;
+            botAI->rpgInfo.do_quest.pos = WorldPosition();
+            botAI->rpgInfo.do_quest.objectiveIdx = 0;
+        }
+    }
     if (botAI->rpgInfo.do_quest.pos == WorldPosition())
     {
         std::vector<POIInfo> poiInfo;
-        if (!GetQuestPOIPosAndObjectiveIdx(RPG_INFO(do_quest, questId), poiInfo))
+        if (!GetQuestPOIPosAndObjectiveIdx(questId, poiInfo))
         {
             botAI->rpgInfo.ChangeToIdle();
             return false;
@@ -307,6 +333,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         if (dz == INVALID_HEIGHT)
             return false;
         WorldPosition pos(bot->GetMapId(), dx, dy, dz);
+        botAI->rpgInfo.do_quest.lastReachPOI = 0;
         botAI->rpgInfo.do_quest.pos = pos;
         botAI->rpgInfo.do_quest.objectiveIdx = objectiveIdx;
     }
@@ -327,7 +354,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         if (GetMSTimeDiffToNow(botAI->rpgInfo.do_quest.lastReachPOI) >= poiStayTime)
         {
             botAI->rpgInfo.do_quest.lastReachPOI = 0;
-            botAI->rpgInfo.do_quest.pos = 0;
+            botAI->rpgInfo.do_quest.pos = WorldPosition();
             botAI->rpgInfo.do_quest.objectiveIdx = 0;
             return true;
         }
