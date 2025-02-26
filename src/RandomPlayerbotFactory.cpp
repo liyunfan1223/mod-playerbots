@@ -453,7 +453,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots");
     
         // Delete all characters from bot accounts
-        CharacterDatabase.Execute("DELETE FROM characters WHERE account IN (SELECT id FROM acore_auth.account WHERE username LIKE '{}%')", 
+        CharacterDatabase.Execute("DELETE FROM characters WHERE account IN (SELECT id FROM acore_auth.account WHERE username LIKE '{}%%')", 
                              sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
     
         // Clean up orphaned records in character-related tables
