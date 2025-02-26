@@ -5943,7 +5943,7 @@ uint32 PlayerbotAI::GetReactDelay()
         }
         else
         {
-            return static_cast<uint32>(base * (sPlayerbotAIConfig->fastReactInBG ? 2.5f : 5.0f));
+            return static_cast<uint32>(base * (sPlayerbotAIConfig->fastReactInBG ? 1.0f : 10.0f));
         }
     }
 
