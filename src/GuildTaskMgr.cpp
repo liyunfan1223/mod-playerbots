@@ -168,7 +168,7 @@ public:
 
     bool Apply(ItemTemplate const* proto) override
     {
-        uint32* tradeSkills = PlayerbotFactory::tradeSkills;
+        //uint32* tradeSkills = PlayerbotFactory::tradeSkills;
 
         for (uint32 i = 0; i < 13; ++i)
         {
@@ -576,6 +576,9 @@ std::map<uint32, uint32> GuildTaskMgr::GetTaskValues(uint32 owner, std::string c
 
 uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string const type, uint32* validIn /* = nullptr */)
 {
+    // validIn parameter is intentionally unused in this function
+    (void)validIn;  // Explicitly mark as unused to suppress warning
+    
     uint32 value = 0;
 
     PlayerbotsDatabasePreparedStatement* stmt =
@@ -622,7 +625,7 @@ uint32 GuildTaskMgr::SetTaskValue(uint32 owner, uint32 guildId, std::string cons
     return value;
 }
 
-bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
+bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* /* handler */, char const* args)
 {
     if (!sPlayerbotAIConfig->guildTaskEnabled)
     {
