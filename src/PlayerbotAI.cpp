@@ -2068,7 +2068,7 @@ bool PlayerbotAI::IsMainTank(Player* player)
     Group* group = player->GetGroup();
     if (!group)
     {
-        return false;
+        return IsTank(player);
     }
     ObjectGuid mainTank = ObjectGuid();
     Group::MemberSlotList const& slots = group->GetMemberSlots();

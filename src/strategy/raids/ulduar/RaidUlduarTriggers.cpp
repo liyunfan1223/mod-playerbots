@@ -260,6 +260,5 @@ bool HodirNearSnowpackedIcicleTrigger::IsActive()
 
     // Find the nearest Snowpacked Icicle Target
     Creature* target = bot->FindNearestCreature(33174, 100.0f);
-    if (!target)
-        return false;
+    return target != nullptr;
 }
