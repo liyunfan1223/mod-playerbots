@@ -172,9 +172,9 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitPet();
     factory.InitPetTalents();
     factory.InitClassSpells();
-    factory.InitSpecialSpells();
     factory.InitAvailableSpells();
     factory.InitSkills();
+    factory.InitSpecialSpells();
     factory.InitMounts();
     factory.InitGlyphs(true);
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
