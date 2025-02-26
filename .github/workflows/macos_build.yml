@@ -6,7 +6,7 @@ on:
     branches: [ "master" ]
 
 concurrency:
-  group: ${{ github.head_ref || github.run_id }}
+  group: "macos-build-${{ github.event.pull_request.number }}"
   cancel-in-progress: true
 
 jobs:
