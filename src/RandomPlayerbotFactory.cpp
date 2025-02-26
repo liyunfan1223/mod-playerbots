@@ -506,7 +506,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     
         // Finally, delete the bot accounts themselves
         LOG_INFO("playerbots", "Deleting random bot accounts...");
-        QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%'",
+        QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'",
                                              sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
         int32 deletion_count = 0;
         if (results)
