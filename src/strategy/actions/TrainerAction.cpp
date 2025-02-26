@@ -172,6 +172,7 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitPet();
     factory.InitPetTalents();
     factory.InitClassSpells();
+    factory.InitSpecialSpells();
     factory.InitAvailableSpells();
     factory.InitSkills();
     factory.InitMounts();

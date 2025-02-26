@@ -1174,6 +1174,8 @@ bool HodirMoveSnowpackedIcicleAction::isUseful()
     {
         return false;
     }
+
+    return true;
 }
 
 bool HodirMoveSnowpackedIcicleAction::Execute(Event event)
