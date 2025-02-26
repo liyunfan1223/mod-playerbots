@@ -260,6 +260,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
 
 bool QuestUpdateCompleteAction::Execute(Event event)
 {
+    // the action can hardly be triggered
     WorldPacket p(event.getPacket());
     p.rpos(0);
 
@@ -272,18 +273,21 @@ bool QuestUpdateCompleteAction::Execute(Event event)
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
     if (qInfo)
     {
-        std::map<std::string, std::string> placeholders;
+        // std::map<std::string, std::string> placeholders;
+        // placeholders["%quest_link"] = format;
+        
+        // if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+        // {
+            //     LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
+            //     bot->Say("Quest [ " + format + " ] completed", LANG_UNIVERSAL);
+            // }
         const auto format = ChatHelper::FormatQuest(qInfo);
-        placeholders["%quest_link"] = format;
-
-        if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
-        {
-            LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
-            bot->Say("Quest [ " + format + " ] completed", LANG_UNIVERSAL);
-        }
-        botAI->TellMasterNoFacing("Quest completed " + format);
+        if (botAI->GetMaster())
+            botAI->TellMasterNoFacing("Quest completed " + format);
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, qInfo);
         botAI->rpgStatistic.questCompleted++;
+        // LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), qInfo->GetQuestId());
+        // botAI->rpgStatistic.questCompleted++;
     }
 
     return true;

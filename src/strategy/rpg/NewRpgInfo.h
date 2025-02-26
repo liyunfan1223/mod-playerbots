@@ -56,7 +56,7 @@ struct NewRpgInfo
     struct DoQuest {
         const Quest* quest{nullptr};
         uint32 questId{0};
-        uint32 objectiveIdx{0};
+        int32 objectiveIdx{0};
         WorldPosition pos{};
         uint32 lastReachPOI{0};
     };

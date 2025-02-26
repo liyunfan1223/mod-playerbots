@@ -116,7 +116,9 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
             botAI->rpgInfo.status == RPG_GO_INNKEEPER ||
             botAI->rpgInfo.status == RPG_DO_QUEST;
 
-        if (inactiveGrindStatus && (bot->GetDistance(unit) > 25.0f || !bot->IsHostileTo(unit)))
+        bool notHostile = !bot->IsHostileTo(unit) || (unit->ToCreature() && unit->ToCreature()->IsCivilian());
+        bool outOfAggro = unit->ToCreature() && bot->GetDistance(unit) > (unit->ToCreature()->GetAggroRange(bot) + 10.0f);
+        if (inactiveGrindStatus && (outOfAggro || notHostile))
         {
             if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
                 needForQuestMap[unit->GetEntry()] = needForQuest(unit);
@@ -197,7 +199,9 @@ bool GrindTargetValue::needForQuest(Unit* target)
                 if (uint32 lootId = data->lootid)
                 {
                     if (LootTemplates_Creature.HaveQuestLootForPlayer(lootId, bot))
+                    {
                         return true;
+                    }
                 }
             }
         }

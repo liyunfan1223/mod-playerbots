@@ -211,10 +211,7 @@ bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
                 botAI->TellMasterNoFacing("Quest accepted " + ChatHelper::FormatQuest(quest));
             BroadcastHelper::BroadcastQuestAccepted(botAI, bot, quest);
             botAI->rpgStatistic.questAccepted++;
-            if (quest->IsAutoComplete())
-                botAI->rpgStatistic.questCompleted++;
             LOG_DEBUG("playerbots", "[New rpg] {} accept quest {}", bot->GetName(), quest->GetQuestId());
-            // botAI->TellMasterNoFacing("I just accept quest! " + std::to_string(item.QuestId));
         }
         if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
         {
@@ -223,8 +220,7 @@ bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
                 botAI->TellMasterNoFacing("Quest rewarded " + ChatHelper::FormatQuest(quest));
             BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
             botAI->rpgStatistic.questRewarded++;
-            LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), quest->GetQuestId());
-            // botAI->TellMasterNoFacing("I just reward quest! " + std::to_string(item.QuestId));
+            LOG_DEBUG("playerbots", "[New rpg] {} turned in quest {}", bot->GetName(), quest->GetQuestId());
         }
     }
     return true;
@@ -342,8 +338,92 @@ bool NewRpgBaseAction::IsQuestCapableDoing(Quest const* quest)
     return true;
 }
 
+bool NewRpgBaseAction::OrganizeQuestLog()
+{
+    int32 freeSlotNum = 0;
+
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(i);
+        if (!questId)
+            freeSlotNum++;
+    }
+    
+    // it's ok if we have two more free slots
+    if (freeSlotNum >= 2)
+        return false;
+
+    int32 dropped = 0;
+    // remove quests that not worth doing or not capable of doing
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(i);
+        if (!questId)
+            continue;
+
+        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (!IsQuestWorthDoing(quest) || !IsQuestCapableDoing(quest)) // festival / class quest
+        {
+            LOG_DEBUG("playerbots", "[New rpg] {} drop quest {}", bot->GetName(), questId);
+            WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
+            packet << questId;
+            bot->GetSession()->HandleQuestLogRemoveQuest(packet);
+            if (botAI->GetMaster())
+                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+            dropped++;
+        }
+    }
+    
+    // drop more than 8 quests at once to avoid repeated accept and drop
+    if (dropped >= 8)
+        return true;
+
+    // remove festival/class quests and quests in different zone
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(i);
+        if (!questId)
+            continue;
+
+        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (quest->GetZoneOrSort() < 0 ||
+            (quest->GetZoneOrSort() > 0 && quest->GetZoneOrSort() != bot->GetZoneId()))
+        {
+            LOG_DEBUG("playerbots", "[New rpg] {} drop quest {}", bot->GetName(), questId);
+            WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
+            packet << questId;
+            bot->GetSession()->HandleQuestLogRemoveQuest(packet);
+            if (botAI->GetMaster())
+                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+            dropped++;
+        }
+    }
+
+    if (dropped >= 8)
+        return true;
+
+    // clear quests log
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(i);
+        if (!questId)
+            continue;
+
+        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        LOG_DEBUG("playerbots", "[New rpg] {} drop quest {}", bot->GetName(), questId);
+        WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
+        packet << questId;
+        bot->GetSession()->HandleQuestLogRemoveQuest(packet);
+        if (botAI->GetMaster())
+            botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+    }
+
+    return true;
+}
+
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 {
+    OrganizeQuestLog();
     if (GuidPosition pos = ChooseNpcToInteract(true, 80.0f))
     {
         if (bot->GetDistance(pos) <= INTERACTION_DISTANCE)
@@ -442,7 +522,7 @@ static std::vector<float> GenerateRandomWeights(int n) {
     return weights;
 }
 
-bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo> &poiInfo)
+bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo> &poiInfo, bool toComplete)
 {
     Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
     if (!quest)
@@ -451,13 +531,59 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
     const QuestPOIVector* poiVector = sObjectMgr->GetQuestPOIVector(questId);
     if (!poiVector)
     {
-        // botAI->rpgInfo.ChangeToIdle();
         return false;
     }
+
     const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
 
+    if (toComplete && q_status.Status == QUEST_STATUS_COMPLETE)
+    {
+        for (const QuestPOI &qPoi : *poiVector)
+        {
+            if (qPoi.MapId != bot->GetMapId())
+                continue;
+            
+            // not the poi pos to reward quest
+            if (qPoi.ObjectiveIndex != -1)
+                continue;
+            
+            if (qPoi.points.size() == 0)
+                continue;
+
+            float dx = 0, dy = 0;
+            std::vector<float> weights = GenerateRandomWeights(qPoi.points.size());
+            for (size_t i = 0; i < qPoi.points.size(); i++)
+            {
+                const QuestPOIPoint &point = qPoi.points[i];
+                dx += point.x * weights[i];
+                dy += point.y * weights[i];
+            }
+    
+            if (bot->GetDistance2d(dx, dy) >= 1500.0f)
+                continue;
+            
+            float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+            
+            if (dz == INVALID_HEIGHT)
+                continue;
+    
+            if (bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
+                continue;
+    
+            poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+        }
+
+        if (poiInfo.empty())
+            return false;
+
+        return true;
+    }
+
+    if (q_status.Status != QUEST_STATUS_INCOMPLETE)
+        return false;
+
     // Get incomplete quest objective index
-    std::vector<uint32> incompleteObjectiveIdx;
+    std::vector<int32> incompleteObjectiveIdx;
     for (int i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {
         int32 npcOrGo = quest->RequiredNpcOrGo[i];
@@ -520,7 +646,7 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
     }
 
     if (poiInfo.size() == 0) {
-        LOG_DEBUG("playerbots", "[New rpg] {}: No available poi can be found for quest {}", bot->GetName(), questId);
+        // LOG_DEBUG("playerbots", "[New rpg] {}: No available poi can be found for quest {}", bot->GetName(), questId);
         return false;
     }
 
@@ -530,6 +656,13 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
 WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
 {
     const std::vector<WorldLocation>& locs = sRandomPlayerbotMgr->locsPerLevelCache[bot->GetLevel()];
+    float hiRange = 500.0f;
+    float loRange = 2500.0f;
+    if (bot->GetLevel() < 5)
+    {
+        hiRange /= 10;
+        loRange /= 10;
+    }
     std::vector<WorldLocation> lo_prepared_locs, hi_prepared_locs;
     for (auto& loc : locs)
     {

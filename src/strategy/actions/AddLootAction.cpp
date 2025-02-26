@@ -46,7 +46,7 @@ bool AddAllLootAction::AddLoot(ObjectGuid guid) { return AI_VALUE(LootObjectStac
 bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 {
     LootObject loot(bot, guid);
-    // botAI->TellMasterNoFacing("guid: " + std::to_string(guid.GetCounter()));
+    
     WorldObject* wo = loot.GetWorldObject(bot);
     if (loot.IsEmpty() || !wo)
         return false;
@@ -56,6 +56,5 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 
     if (!loot.IsLootPossible(bot))
         return false;
-    // botAI->TellMasterNoFacing("Add loot! " + std::to_string(guid.GetCounter()));
     return AddAllLootAction::AddLoot(guid);
 }

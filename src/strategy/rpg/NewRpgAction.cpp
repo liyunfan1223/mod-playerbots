@@ -89,14 +89,14 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             // IDLE -> GO_GRIND
             else if (roll <= 100)
             {
-                if (roll >= 60)
+                if (roll >= 55)
                 {
                     std::vector<uint32> availableQuests;
                     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
                     {
                         uint32 questId = bot->GetQuestSlotQuestId(slot);
                         std::vector<POIInfo> poiInfo;
-                        if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo))
+                        if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
                         {
                             availableQuests.push_back(questId);
                         }
@@ -128,7 +128,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
         case RPG_GO_GRIND:
         {
             WorldPosition& originalPos = info.go_grind.pos;
-            assert(info.grindPos != WorldPosition());
+            assert(info.go_grind.pos != WorldPosition());
             // GO_GRIND -> NEAR_RANDOM
             if (bot->GetExactDist(originalPos) < 10.0f)
             {
@@ -140,7 +140,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
         case RPG_GO_INNKEEPER:
         {
             WorldPosition& originalPos = info.go_innkeeper.pos;
-            assert(info.innKeeperPos != WorldPosition());
+            assert(info.go_innkeeper.pos != WorldPosition());
             // GO_INNKEEPER -> NEAR_NPC
             if (bot->GetExactDist(originalPos) < 10.0f)
             {
@@ -268,13 +268,22 @@ bool NewRpgDoQuestAction::Execute(Event event)
             return DoIncompleteQuest();
         case QUEST_STATUS_COMPLETE:
         {
-            // if quest is completed, back to innkeeper to reward
+            // if quest is completed, back to poi with -1 idx to reward
             BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, quest);
-            WorldPosition pos = NewRpgStatusUpdateAction::SelectRandomInnKeeperPos(bot);
-            if (pos != WorldPosition())
+            botAI->rpgStatistic.questCompleted++;
+            std::vector<POIInfo> poiInfo;
+            // get the place to get rewarded
+            if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
             {
-                info.ChangeToGoInnkeeper(pos);
-                return true;
+                float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
+                // z = MAX_HEIGHT as we do not know accurate z
+                float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+                if (dz == INVALID_HEIGHT)
+                    return false;
+                WorldPosition pos(bot->GetMapId(), dx, dy, dz);
+                botAI->rpgInfo.do_quest.lastReachPOI = 0;
+                botAI->rpgInfo.do_quest.pos = pos;
+                botAI->rpgInfo.do_quest.objectiveIdx = -1;
             }
         }
         default:
@@ -291,7 +300,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
     if (botAI->rpgInfo.do_quest.pos != WorldPosition())
     {
         /// @TODO: extract to a new function
-        uint32 currentObjective = botAI->rpgInfo.do_quest.objectiveIdx;
+        int32 currentObjective = botAI->rpgInfo.do_quest.objectiveIdx;
         // check if the objective has completed
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
@@ -319,12 +328,13 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         std::vector<POIInfo> poiInfo;
         if (!GetQuestPOIPosAndObjectiveIdx(questId, poiInfo))
         {
+            // can't find a poi pos to go, stop doing quest for now
             botAI->rpgInfo.ChangeToIdle();
             return false;
         }
         uint32 rndIdx = urand(0, poiInfo.size() - 1);
         G3D::Vector2 nearestPoi = poiInfo[rndIdx].pos;
-        uint32 objectiveIdx = poiInfo[rndIdx].objectiveIdx;
+        int32 objectiveIdx = poiInfo[rndIdx].objectiveIdx;
 
         float dx = nearestPoi.x, dy = nearestPoi.y;
 

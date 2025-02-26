@@ -1585,7 +1585,8 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             continue;
 
         if (level < 5 && (slot != EQUIPMENT_SLOT_MAINHAND) && (slot != EQUIPMENT_SLOT_OFFHAND) &&
-            (slot != EQUIPMENT_SLOT_FEET) && (slot != EQUIPMENT_SLOT_LEGS) && (slot != EQUIPMENT_SLOT_CHEST))
+            (slot != EQUIPMENT_SLOT_FEET) && (slot != EQUIPMENT_SLOT_LEGS) && (slot != EQUIPMENT_SLOT_CHEST) &&
+            (slot != EQUIPMENT_SLOT_RANGED))
             continue;
 
         Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);

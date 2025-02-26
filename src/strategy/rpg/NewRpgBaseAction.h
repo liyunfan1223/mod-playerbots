@@ -14,7 +14,7 @@
 
 struct POIInfo {
     G3D::Vector2 pos;
-    uint32 objectiveIdx;
+    int32 objectiveIdx;
 };
 
 /// A base (composition) class for all new rpg actions
@@ -41,9 +41,10 @@ protected:
     uint32 BestReward(Quest const* quest);
     bool IsQuestWorthDoing(Quest const* quest);
     bool IsQuestCapableDoing(Quest const* quest);
+    bool OrganizeQuestLog();
 
 protected:
-    bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo> &poiInfo);
+    bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo> &poiInfo, bool toComplete = false);
     static WorldPosition SelectRandomGrindPos(Player* bot);
     static WorldPosition SelectRandomInnKeeperPos(Player* bot);
 
