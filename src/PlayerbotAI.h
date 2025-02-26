@@ -409,8 +409,8 @@ public:
     static bool IsRanged(Player* player, bool bySpec = false);
     static bool IsMelee(Player* player, bool bySpec = false);
     static bool IsCaster(Player* player, bool bySpec = false);
-    static bool IsCombo(Player* player, bool bySpec = false);
     static bool IsRangedDps(Player* player, bool bySpec = false);
+    static bool IsCombo(Player* player);
     static bool IsMainTank(Player* player);
     static uint32 GetGroupTankNum(Player* player);
     bool IsAssistTank(Player* player);
@@ -485,8 +485,8 @@ public:
     virtual bool HasAuraToDispel(Unit* player, uint32 dispelType);
     bool CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell = true, Item* itemTarget = nullptr,
                       Item* castItem = nullptr);
-    bool CanCastSpell(uint32 spellid, GameObject* goTarget, uint8 effectMask, bool checkHasSpell = true);
-    bool CanCastSpell(uint32 spellid, float x, float y, float z, uint8 effectMask, bool checkHasSpell = true,
+    bool CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkHasSpell = true);
+    bool CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell = true,
                       Item* itemTarget = nullptr);
 
     bool HasAura(uint32 spellId, Unit const* player);
@@ -522,7 +522,7 @@ public:
     bool IsAlt();
     Player* GetGroupMaster();
     // Returns a semi-random (cycling) number that is fixed for each bot.
-    uint32 GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum = 100, float cyclePerMin = 1);
+    uint32 GetFixedBotNumer(uint32 maxNum = 100, float cyclePerMin = 1);
     GrouperType GetGrouperType();
     GuilderType GetGuilderType();
     bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig->reactDistance);

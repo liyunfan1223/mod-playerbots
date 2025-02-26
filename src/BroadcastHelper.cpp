@@ -16,7 +16,7 @@ uint8 BroadcastHelper::GetLocale()
     return locale;
 }
 
-bool BroadcastHelper::BroadcastTest(PlayerbotAI* ai, Player* bot)
+bool BroadcastHelper::BroadcastTest(PlayerbotAI* ai, Player* /* bot */)
 {
     //return something to ignore the logic
     return false;
@@ -609,7 +609,7 @@ bool BroadcastHelper::BroadcastLevelup(PlayerbotAI* ai, Player* bot)
     return false;
 }
 
-bool BroadcastHelper::BroadcastGuildMemberPromotion(PlayerbotAI* ai, Player* bot, Player* player)
+bool BroadcastHelper::BroadcastGuildMemberPromotion(PlayerbotAI* ai, Player* /* bot */, Player* player)
 {
     if (!sPlayerbotAIConfig->enableBroadcasts)
         return false;
@@ -627,7 +627,7 @@ bool BroadcastHelper::BroadcastGuildMemberPromotion(PlayerbotAI* ai, Player* bot
     return false;
 }
 
-bool BroadcastHelper::BroadcastGuildMemberDemotion(PlayerbotAI* ai, Player* bot, Player* player)
+bool BroadcastHelper::BroadcastGuildMemberDemotion(PlayerbotAI* ai, Player* /* bot */, Player* player)
 {
     if (urand(1, sPlayerbotAIConfig->broadcastChanceMaxValue) <= sPlayerbotAIConfig->broadcastChanceGuildManagement)
     {
@@ -643,7 +643,7 @@ bool BroadcastHelper::BroadcastGuildMemberDemotion(PlayerbotAI* ai, Player* bot,
     return false;
 }
 
-bool BroadcastHelper::BroadcastGuildGroupOrRaidInvite(PlayerbotAI* ai, Player* bot, Player* player, Group* group)
+bool BroadcastHelper::BroadcastGuildGroupOrRaidInvite(PlayerbotAI* ai, Player* /* bot */, Player* player, Group* group)
 {
     if (!sPlayerbotAIConfig->enableBroadcasts)
         return false;
