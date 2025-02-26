@@ -1818,10 +1818,6 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     if (bot->InBattleground())
         return;
 
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (botAI && botAI->HasPlayerNearby(300.0f))
-        return;
-    
     uint32 level = bot->GetLevel();
     uint8 race = bot->getRace();
     std::vector<WorldLocation>* locs = nullptr;
@@ -1844,10 +1840,6 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
 void RandomPlayerbotMgr::RandomTeleportGrindForLevel(Player* bot)
 {
     if (bot->InBattleground())
-        return;
-
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (botAI && botAI->HasPlayerNearby(300.0f))
         return;
 
     uint32 level = bot->GetLevel();

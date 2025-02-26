@@ -366,7 +366,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         {
             LOG_DEBUG("playerbots", "[New rpg] {} drop quest {}", bot->GetName(), questId);
             WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-            packet << questId;
+            packet << (uint8)i;
             bot->GetSession()->HandleQuestLogRemoveQuest(packet);
             if (botAI->GetMaster())
                 botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
@@ -392,7 +392,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         {
             LOG_DEBUG("playerbots", "[New rpg] {} drop quest {}", bot->GetName(), questId);
             WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-            packet << questId;
+            packet << (uint8)i;
             bot->GetSession()->HandleQuestLogRemoveQuest(packet);
             if (botAI->GetMaster())
                 botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
@@ -414,7 +414,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
         LOG_DEBUG("playerbots", "[New rpg] {} drop quest {}", bot->GetName(), questId);
         WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-        packet << questId;
+        packet << (uint8)i;
         bot->GetSession()->HandleQuestLogRemoveQuest(packet);
         if (botAI->GetMaster())
             botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));

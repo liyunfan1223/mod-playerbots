@@ -11,6 +11,7 @@ NextAction** GrindingStrategy::getDefaultActions() { return nullptr; }
 
 void GrindingStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+    // reduce lower than loot
     triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("drink", 4.2f), nullptr)));
     triggers.push_back(new TriggerNode("timer", NextAction::array(0, new NextAction("food", 4.1f), nullptr)));
     triggers.push_back(
