@@ -460,7 +460,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         PlayerbotsDatabase.Execute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM acore_characters.characters)");
 
         // Clean up orphaned entries in playerbots_db_store
-        PlayerbotsDatabase.Execute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM acore_characters.characters WHERE account IN (SELECT id FROM acore_auth.account WHERE username NOT LIKE '%s%%'))", 
+        PlayerbotsDatabase.Execute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM acore_characters.characters WHERE account IN (SELECT id FROM acore_auth.account WHERE username NOT LIKE '{}%%'))", 
                                sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
         
         // Clean up orphaned records in character-related tables
