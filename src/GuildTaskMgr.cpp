@@ -575,7 +575,7 @@ std::map<uint32, uint32> GuildTaskMgr::GetTaskValues(uint32 owner, std::string c
 }
 
 uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string const type, [[maybe_unused]] uint32* validIn /* = nullptr */)
-{   
+{
     uint32 value = 0;
 
     PlayerbotsDatabasePreparedStatement* stmt =
