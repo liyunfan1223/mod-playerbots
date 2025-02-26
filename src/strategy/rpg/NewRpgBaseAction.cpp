@@ -370,6 +370,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             bot->GetSession()->HandleQuestLogRemoveQuest(packet);
             if (botAI->GetMaster())
                 botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+            botAI->rpgStatistic.questDropped++;
             dropped++;
         }
     }
@@ -395,6 +396,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             bot->GetSession()->HandleQuestLogRemoveQuest(packet);
             if (botAI->GetMaster())
                 botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+            botAI->rpgStatistic.questDropped++;
             dropped++;
         }
     }
@@ -416,6 +418,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         bot->GetSession()->HandleQuestLogRemoveQuest(packet);
         if (botAI->GetMaster())
             botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+        botAI->rpgStatistic.questDropped++;
     }
 
     return true;

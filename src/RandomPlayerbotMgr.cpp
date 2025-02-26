@@ -1667,27 +1667,10 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                     {
                         allianceStarterPerLevelCache[i].push_back(loc);
                     }
-                    // if (!zone2LevelBracket[zoneId].low)
-                    //     zone2LevelBracket[zoneId].low = i;
-                    // else
-                    //     zone2LevelBracket[zoneId].low = std::min(zone2LevelBracket[zoneId].low, (uint32)i);
-                    // if (!zone2LevelBracket[zoneId].high)
-                    //     zone2LevelBracket[zoneId].high = i;
-                    // else
-                    //     zone2LevelBracket[zoneId].high = std::max(zone2LevelBracket[zoneId].high, (uint32)i);
-                    // LOG_DEBUG("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
-                    //         level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
-                    //         levelLoc.GetPositionZ(), levelLoc.GetMapId());
                 }
             } while (results->NextRow());
         }
 
-        for (auto item : zone2LevelBracket)
-        {
-            const AreaTableEntry* entry = sAreaTableStore.LookupEntry(item.first);
-            std::string zone_name = PlayerbotAI::GetLocalizedAreaName(entry);
-            // LOG_INFO("playerbots", "Zone: {} ({}) [{}, {}]", item.first, zone_name, item.second.low, item.second.high);
-        }
         // add all initial position
         for (uint32 i = 1; i < MAX_RACES; i++)
         {
@@ -2853,13 +2836,7 @@ void RandomPlayerbotMgr::PrintStats()
         LOG_INFO("playerbots", "    Idle: {}, Rest: {}, GoGrind: {}, GoInnkeeper: {}, MoveRandom: {}, MoveNpc: {}, DoQuest: {}",
             rpgStatusCount[RPG_IDLE], rpgStatusCount[RPG_REST], rpgStatusCount[RPG_GO_GRIND], rpgStatusCount[RPG_GO_INNKEEPER],
             rpgStatusCount[RPG_NEAR_RANDOM], rpgStatusCount[RPG_NEAR_NPC], rpgStatusCount[RPG_DO_QUEST]);
-            
-        // LOG_INFO("playerbots", "    IDLE: {}", rpgStatusCount[RPG_IDLE]);
-        // LOG_INFO("playerbots", "    REST: {}", rpgStatusCount[RPG_REST]);
-        // LOG_INFO("playerbots", "    GO_GRIND: {}", rpgStatusCount[RPG_GO_GRIND]);
-        // LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[RPG_GO_INNKEEPER]);
-        // LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[RPG_NEAR_RANDOM]);
-        // LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[RPG_NEAR_NPC]);
+
         LOG_INFO("playerbots", "Bots total quests:");
         LOG_INFO("playerbots", "    Accepted: {}, Rewarded: {}, Dropped: {}",
             rpgStasticTotal.questAccepted, rpgStasticTotal.questRewarded, rpgStasticTotal.questDropped);
