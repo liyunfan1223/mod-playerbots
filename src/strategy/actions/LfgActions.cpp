@@ -36,8 +36,8 @@ uint32 LfgJoinAction::GetRoles()
         case CLASS_DRUID:
             if (spec == 2)
                 return PLAYER_ROLE_HEALER;
-            else if (spec == 1)
-                return (PLAYER_ROLE_TANK | PLAYER_ROLE_DAMAGE);
+            else if (spec == 1 && bot->HasAura(16931) /* thick hide */)
+                return PLAYER_ROLE_TANK;
             else
                 return PLAYER_ROLE_DAMAGE;
             break;
@@ -206,6 +206,7 @@ bool LfgAcceptAction::Execute(Event event)
 
         if (bot->IsInCombat() || bot->isDead())
         {
+            /// @FIXME: Race condition
             LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
                      bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
                      bot->GetName().c_str(), id);
@@ -219,7 +220,7 @@ bool LfgAcceptAction::Execute(Event event)
         botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
 
         bot->ClearUnitState(UNIT_STATE_ALL_STATE);
-
+        /// @FIXME: Race condition
         sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
 
         if (sRandomPlayerbotMgr->IsRandomBot(bot) && !bot->GetGroup())

@@ -322,7 +322,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_WARRIOR:
             if (tab == 2)
                 engine->addStrategiesNoInit("tank", "tank assist", "aoe", nullptr);
-            else if (player->GetLevel() < 36 || tab == 0)
+            else if (tab == 0 || !player->HasSpell(1680)) // Whirlwind
                 engine->addStrategiesNoInit("arms", "aoe", "dps assist", /*"behind",*/ nullptr);
             else
                 engine->addStrategiesNoInit("fury", "aoe", "dps assist", /*"behind",*/ nullptr);
@@ -356,7 +356,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategiesNoInit("heal", "cure", "dps assist", nullptr);
             else
             {
-                if (player->GetLevel() >= 20 && !player->HasAura(16931) /*thick hide*/)
+                if (player->HasSpell(768) /*cat form*/&& !player->HasAura(16931) /*thick hide*/)
                 {
                     engine->addStrategiesNoInit("cat", "dps assist", nullptr);
                 }
