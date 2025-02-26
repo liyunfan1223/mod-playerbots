@@ -546,7 +546,7 @@ bool GuildTaskMgr::IsGuildTaskItem(uint32 itemId, uint32 guildId)
 }
 
 std::map<uint32, uint32> GuildTaskMgr::GetTaskValues(uint32 owner, std::string const type,
-                                                     uint32* validIn /* = nullptr */)
+                                                     [[maybe_unused]] uint32* validIn /* = nullptr */)
 {
     std::map<uint32, uint32> results;
 
@@ -571,10 +571,10 @@ std::map<uint32, uint32> GuildTaskMgr::GetTaskValues(uint32 owner, std::string c
         } while (result->NextRow());
     }
 
-    return std::move(results);
+    return results;
 }
 
-uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string const type, uint32* validIn /* = nullptr */)
+uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string const type, [[maybe_unused]] uint32* validIn /* = nullptr */)
 {
     // validIn parameter is intentionally unused in this function
     (void)validIn;  // Explicitly mark as unused to suppress warning
