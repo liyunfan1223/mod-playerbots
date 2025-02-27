@@ -31,6 +31,7 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotDbStore.h"
 #include "Playerbots.h"
+#include "QuestDef.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
 #include "ReputationMgr.h"
@@ -974,25 +975,23 @@ void PlayerbotFactory::ClearSpells()
 
 void PlayerbotFactory::ResetQuests()
 {
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        bot->SetQuestSlot(slot, 0);
+    }
     ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
         Quest const* quest = i->second;
 
         uint32 entry = quest->GetQuestId();
+        if (bot->GetQuestStatus(entry) == QUEST_STATUS_NONE)
+            continue;
+        
+        bot->RemoveRewardedQuest(entry);
+        bot->RemoveActiveQuest(entry, false);
 
-        // remove all quest entries for 'entry' from quest log
-        for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
-        {
-            bot->SetQuestSlot(slot, 0);
-        }
-        // reset rewarded for restart repeatable quest
-        bot->getQuestStatusMap().erase(entry);
-        // bot->getQuestStatusMap()[entry].m_rewarded = false;
-        // bot->getQuestStatusMap()[entry].m_status = QUEST_STATUS_NONE;
     }
-    // bot->UpdateForQuestWorldObjects();
-    CharacterDatabase.Execute("DELETE FROM character_queststatus WHERE guid = {}", bot->GetGUID().GetCounter());
 }
 
 void PlayerbotFactory::InitSpells() { InitAvailableSpells(); }
