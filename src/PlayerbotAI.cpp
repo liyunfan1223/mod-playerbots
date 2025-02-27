@@ -2707,8 +2707,6 @@ bool PlayerbotAI::HasAura(uint32 spellId, Unit const* unit)
     // return false;
 }
 
-// SAW
-
 Aura* PlayerbotAI::GetAura(std::string const name, Unit* unit, bool checkIsOwner, bool checkDuration, int checkStack)
 {
     if (!unit)
@@ -3036,7 +3034,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkH
 
     return false;
 }
-// SAW
+
 bool PlayerbotAI::CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell,
                                Item* itemTarget)
 {
