@@ -369,9 +369,9 @@ AiPlayerbot.AggroDistance = 22
 #
 #
 
-# Set kill XP rate for bots (default: 1)
-# Server XP Rate * AiPlayerbot.KillXPRate
-AiPlayerbot.KillXPRate = 1
+# Set XP rate for bots (default: 1.0)
+# Server XP Rate * AiPlayerbot.PlayerbotsXPRate
+AiPlayerbot.PlayerbotsXPRate = 1.0
 
 # Health/Mana levels
 AiPlayerbot.CriticalHealth = 25
