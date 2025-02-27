@@ -90,6 +90,7 @@ public:
     bool Execute(Event event) override;
 protected:
     bool DoIncompleteQuest();
+    bool DoCompletedQuest();
     
     const uint32 poiStayTime = 1 * 60 * 1000;
 };

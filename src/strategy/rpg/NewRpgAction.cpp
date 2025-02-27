@@ -26,6 +26,7 @@
 #include "Timer.h"
 #include "TravelMgr.h"
 #include "BroadcastHelper.h"
+#include "World.h"
 
 bool TellRpgStatusAction::Execute(Event event)
 {
@@ -267,30 +268,11 @@ bool NewRpgDoQuestAction::Execute(Event event)
         case QUEST_STATUS_INCOMPLETE:
             return DoIncompleteQuest();
         case QUEST_STATUS_COMPLETE:
-        {
-            // if quest is completed, back to poi with -1 idx to reward
-            BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, quest);
-            botAI->rpgStatistic.questCompleted++;
-            std::vector<POIInfo> poiInfo;
-            // get the place to get rewarded
-            if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
-            {
-                float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
-                // z = MAX_HEIGHT as we do not know accurate z
-                float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
-                if (dz == INVALID_HEIGHT)
-                    return false;
-                WorldPosition pos(bot->GetMapId(), dx, dy, dz);
-                botAI->rpgInfo.do_quest.lastReachPOI = 0;
-                botAI->rpgInfo.do_quest.pos = pos;
-                botAI->rpgInfo.do_quest.objectiveIdx = -1;
-            }
-        }
+            return DoCompletedQuest();
         default:
             break;
     }
     botAI->rpgInfo.ChangeToIdle();
-    // LOG_INFO("playerbots", "quest status unimplemented: {}", questStatus);
     return true;
 }
 
@@ -316,6 +298,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
                 quest->RequiredItemCount[currentObjective - QUEST_OBJECTIVES_COUNT])
                 completed = false;
         }
+        // the current objective is completed, clear and find a new objective later
         if (completed)
         {
             botAI->rpgInfo.do_quest.lastReachPOI = 0;
@@ -347,7 +330,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         botAI->rpgInfo.do_quest.pos = pos;
         botAI->rpgInfo.do_quest.objectiveIdx = objectiveIdx;
     }
-    // LOG_INFO("playerbots", "Select poi : ({}, {}) Idx: {}", dx, dy, objectiveIdx);
+
     if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 20.0f)
         return MoveFarTo(botAI->rpgInfo.do_quest.pos);
     else
@@ -374,5 +357,46 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
 
     /// @TODO: q_status.Explored
     
+    return false;
+}
+
+bool NewRpgDoQuestAction::DoCompletedQuest()
+{
+    uint32 questId = RPG_INFO(quest, questId);
+    const Quest* quest = RPG_INFO(quest, quest);
+    
+    if (RPG_INFO(quest, objectiveIdx) != -1)
+    {
+        // if quest is completed, back to poi with -1 idx to reward
+        BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, quest);
+        botAI->rpgStatistic.questCompleted++;
+        std::vector<POIInfo> poiInfo;
+        // get the place to get rewarded
+        if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
+        {
+            float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
+            // z = MAX_HEIGHT as we do not know accurate z
+            float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+            if (dz == INVALID_HEIGHT)
+            {
+                return false;
+            }
+            WorldPosition pos(bot->GetMapId(), dx, dy, dz);
+            botAI->rpgInfo.do_quest.lastReachPOI = 0;
+            botAI->rpgInfo.do_quest.pos = pos;
+            botAI->rpgInfo.do_quest.objectiveIdx = -1;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    if (botAI->rpgInfo.do_quest.pos == WorldPosition())
+        return false;
+
+    if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 20.0f)
+        return MoveFarTo(botAI->rpgInfo.do_quest.pos);
+
     return false;
 }
