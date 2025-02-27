@@ -227,7 +227,10 @@ bool NewRpgMoveNpcAction::Execute(Event event)
         // No npc can be found, switch to IDLE
         GuidPosition pos = ChooseNpcToInteract();
         if (pos.IsEmpty())
+        {
             info.ChangeToIdle();
+            return true;
+        }
         info.near_npc.pos = pos;
         info.near_npc.lastReach = 0;
         return true;
@@ -244,6 +247,7 @@ bool NewRpgMoveNpcAction::Execute(Event event)
         if (info.near_npc.lastReach && GetMSTimeDiffToNow(info.near_npc.lastReach) < npcStayTime)
             return false;
 
+        // has reached the npc for more than `npcStayTime`, select the next target
         info.near_npc.pos = GuidPosition();
         info.near_npc.lastReach = 0;
     }
@@ -323,8 +327,11 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
 
         // z = MAX_HEIGHT as we do not know accurate z
         float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+
+        // double check for GetQuestPOIPosAndObjectiveIdx
         if (dz == INVALID_HEIGHT)
             return false;
+
         WorldPosition pos(bot->GetMapId(), dx, dy, dz);
         botAI->rpgInfo.do_quest.lastReachPOI = 0;
         botAI->rpgInfo.do_quest.pos = pos;
@@ -332,7 +339,9 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
     }
 
     if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 20.0f)
+    {
         return MoveFarTo(botAI->rpgInfo.do_quest.pos);
+    }
     else
     {
         // Now we are near the quest objective
@@ -371,24 +380,26 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, quest);
         botAI->rpgStatistic.questCompleted++;
         std::vector<POIInfo> poiInfo;
+        if (!GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
+        {
+            // can't find a poi pos to reward, stop doing quest for now
+            botAI->rpgInfo.ChangeToIdle();
+            return false;
+        }
         // get the place to get rewarded
         if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
         {
             float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
             // z = MAX_HEIGHT as we do not know accurate z
             float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+
+            // double check for GetQuestPOIPosAndObjectiveIdx
             if (dz == INVALID_HEIGHT)
-            {
                 return false;
-            }
             WorldPosition pos(bot->GetMapId(), dx, dy, dz);
             botAI->rpgInfo.do_quest.lastReachPOI = 0;
             botAI->rpgInfo.do_quest.pos = pos;
             botAI->rpgInfo.do_quest.objectiveIdx = -1;
-        }
-        else
-        {
-            return false;
         }
     }
 
@@ -398,5 +409,7 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
     if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 20.0f)
         return MoveFarTo(botAI->rpgInfo.do_quest.pos);
 
+    // now we are near the qoi of reward
+    // the quest should be rewarded by SearchQuestGiverAndAcceptOrReward
     return false;
 }

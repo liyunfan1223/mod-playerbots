@@ -86,7 +86,7 @@ struct NewRpgInfo
         DoQuest quest;
     };
 
-    bool HasStatusPersisted(uint32 maxDuration) { return startT + maxDuration < getMSTime(); }
+    bool HasStatusPersisted(uint32 maxDuration) { return GetMSTimeDiffToNow(startT) > maxDuration; }
     void ChangeToGoGrind(WorldPosition pos);
     void ChangeToGoInnkeeper(WorldPosition pos);
     void ChangeToNearNpc();

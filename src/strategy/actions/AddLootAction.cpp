@@ -46,7 +46,7 @@ bool AddAllLootAction::AddLoot(ObjectGuid guid) { return AI_VALUE(LootObjectStac
 bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 {
     LootObject loot(bot, guid);
-    
+
     WorldObject* wo = loot.GetWorldObject(bot);
     if (loot.IsEmpty() || !wo)
         return false;
@@ -56,5 +56,6 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 
     if (!loot.IsLootPossible(bot))
         return false;
+
     return AddAllLootAction::AddLoot(guid);
 }

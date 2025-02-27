@@ -117,7 +117,8 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
             botAI->rpgInfo.status == RPG_DO_QUEST;
 
         bool notHostile = !bot->IsHostileTo(unit) || (unit->ToCreature() && unit->ToCreature()->IsCivilian());
-        bool outOfAggro = unit->ToCreature() && bot->GetDistance(unit) > (unit->ToCreature()->GetAggroRange(bot) + 10.0f);
+        float aggroRange = std::min(30.0f, unit->ToCreature()->GetAggroRange(bot) + 10.0f);
+        bool outOfAggro = unit->ToCreature() && bot->GetDistance(unit) > aggroRange;
         if (inactiveGrindStatus && (outOfAggro || notHostile))
         {
             if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
