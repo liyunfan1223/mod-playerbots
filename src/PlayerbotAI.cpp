@@ -5920,10 +5920,10 @@ uint32 PlayerbotAI::GetReactDelay()
         bool inCombat = bot->IsInCombat();
 
         if (!inCombat)
-            return base * 10.0f;
+            return base * 10;
 
         else if (inCombat)
-            return base * 2.5f;
+            return static_cast<uint32>(base * 2.5f);
 
         return base;
     }
@@ -5949,7 +5949,7 @@ uint32 PlayerbotAI::GetReactDelay()
 
     // When in combat, return 5 times the base
     if (bot->IsInCombat() || currentState == BOT_STATE_COMBAT)
-        return base * 5.0f;
+        return base * 5;
 
     // When not resting, return 10-30 times the base
     if (!bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
