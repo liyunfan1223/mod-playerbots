@@ -316,7 +316,7 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
 
             if (bot->isMoving())
                 bot->StopMoving();
-            
+
             uint32 index = urand(0, ids.size() - 1);
             return botAI->CastSpell(ids[index], bot);
         }
