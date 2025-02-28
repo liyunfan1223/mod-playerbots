@@ -30,19 +30,19 @@ MountData CollectMountData(const Player* bot)
 
         int32 speed = std::max(effect1, effect2);
 
-        // Update max speed if appropriate.
+        // Update max speed if appropriate
         if (speed > data.maxSpeed)
-            data.maxSpeed = speed;  // In BG, clamp max speed to 99 later; here we just store the maximum found.
+            data.maxSpeed = speed;  // In BG, clamp max speed to 99 later; here we just store the maximum found
 
         // Determine index: flight if either effect has flight aura or specific mount ID.
         uint32 index = (spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
                         spellInfo->Effects[2].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
                         // Winged Steed of the Ebon Blade
                         // This mount is meant to autoscale from a 150% flyer
-                        // up to a 280% as you train your flying skill up.
-                        // This incorrectly gets categorised as a ground mount, force this to flyer only.
+                        // up to a 280% as you train your flying skill up
+                        // This incorrectly gets categorised as a ground mount, force this to flyer only
                         // TODO: Add other scaling mounts here if they have the same issue, or adjust above
-                        // checks so that they are all correctly detected.
+                        // checks so that they are all correctly detected
                         spellInfo->Id == 54729) ? 1 : 0;
         data.allSpells[index][speed].push_back(spellId);
     }
@@ -97,7 +97,7 @@ bool CheckMountStateAction::isUseful()
         botInShapeshiftForm = bot->GetShapeshiftForm();
 
         // Note: The one check that actually matters (most) here is for FORM_TRAVEL
-        // as FORM_FLIGHT is handled later on.
+        // as FORM_FLIGHT is handled later on
         if ((masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm == FORM_TRAVEL) ||
             (masterInShapeshiftForm == FORM_FLIGHT && botInShapeshiftForm == FORM_FLIGHT) ||
             (masterInShapeshiftForm == FORM_FLIGHT_EPIC && botInShapeshiftForm == FORM_FLIGHT_EPIC))
@@ -132,7 +132,7 @@ bool CheckMountStateAction::Execute(Event /*event*/)
         shouldMount = true;
     }
 
-    // If should dismount, or master (if any) is no longer in travel form, yet bot still is, remove the shapeshifts
+    // If should dismount, or master (if any) is no longer in travel form/mounted, yet bot still is, remove the shapeshifts
     if (shouldDismount ||
         (masterInShapeshiftForm != FORM_TRAVEL && botInShapeshiftForm == FORM_TRAVEL) ||
         (masterInShapeshiftForm != FORM_FLIGHT && botInShapeshiftForm == FORM_FLIGHT && master && !master->IsMounted()) ||
@@ -182,6 +182,7 @@ bool CheckMountStateAction::Execute(Event /*event*/)
 
 bool CheckMountStateAction::Mount()
 {
+    // Disabled for now until properly implemented
     //if (TryPreferredMount(master))
     //    return true;
 
@@ -231,7 +232,7 @@ bool CheckMountStateAction::TryForms(Player* /*master*/, int32 masterMountType, 
         return true;
     }
 
-    // Check if master is in Flight Form or has an epic flying mount and bot can swift flight form
+    // Check if master is in Swift Flight Form or has an epic flying mount and bot can swift flight form
     if (bot->HasSpell(SPELL_SWIFT_FLIGHT_FORM) &&
         ((masterInShapeshiftForm == FORM_FLIGHT_EPIC && botInShapeshiftForm != FORM_FLIGHT_EPIC) ||
         (masterMountType == 1 && masterSpeed == 279)))
@@ -293,7 +294,7 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
         if ((masterSpeed > 59 && currentSpeed < 99) || (masterSpeed > 149 && currentSpeed < 279))
             continue;
 
-        // Pick a random mount from the candidate group.
+        // Pick a random mount from the candidate group
         const auto& ids = pair.second;
         if (!ids.empty())
         {
@@ -313,7 +314,7 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
 float CheckMountStateAction::CalculateDismountDistance() const
 {
     // Warrior bots should dismount far enough to charge (because it's important for generating some initial rage),
-    // a real player would be riding toward enemy mashing the charge key but the bots won't cast charge while mounted.
+    // a real player would be riding toward enemy mashing the charge key but the bots won't cast charge while mounted
     bool isMelee = PlayerbotAI::IsMelee(bot);
     float dismountDistance = isMelee ? sPlayerbotAIConfig->meleeDistance + 2.0f : sPlayerbotAIConfig->spellDistance + 2.0f;
     return bot->getClass() == CLASS_WARRIOR ? std::max(18.0f, dismountDistance) : dismountDistance;
@@ -356,7 +357,7 @@ int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master, const Mou
     if (ridingSkill <= 75 && botLevel < static_cast<int32>(sPlayerbotAIConfig->useFastGroundMountAtMinLevel))
         return 59;
 
-    // If there is a master and bot not in BG, use master's aura effects.
+    // If there is a master and bot not in BG, use master's aura effects
     if (master && !bot->InBattleground())
     {
         auto auraEffects = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
@@ -374,7 +375,7 @@ int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master, const Mou
     }
     else
     {
-        // Bots on their own.
+        // Bots on their own
         int32 speed = mountData.maxSpeed;
         if (bot->InBattleground() && speed > 99)
             return 99;
