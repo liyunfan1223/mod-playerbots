@@ -313,12 +313,9 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
         const auto& ids = pair.second;
         if (!ids.empty())
         {
-            //botAI->RemoveShapeshift();
-            //botAI->RemoveAura("tree of life");
-    
             if (bot->isMoving())
                 bot->StopMoving();
-            
+
             uint32 index = urand(0, ids.size() - 1);
             return botAI->CastSpell(ids[index], bot);
         }
