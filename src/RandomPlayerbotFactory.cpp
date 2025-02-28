@@ -278,7 +278,7 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
         {
             break;
         }
-        
+
         Field* fields = result->Fetch();
         botName = fields[0].Get<std::string>();
         if (ObjectMgr::CheckPlayerName(botName) == CHAR_NAME_SUCCESS)  // Checks for reservation & profanity, too
@@ -288,9 +288,9 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
 
             if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                 continue;
-            
+
             return botName;
-        } 
+        }
     }
 
     // CONLANG NAME GENERATION
@@ -447,22 +447,26 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
 
         LOG_INFO("playerbots", "Deleting all random bot characters and accounts...");
-    
+
         // First execute all the cleanup SQL commands
         // Clear playerbots_random_bots table
         PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots");
-    
+
+        // Get the database names dynamically
+        std::string loginDBName = LoginDatabase.GetConnectionInfo()->database;
+        std::string characterDBName = CharacterDatabase.GetConnectionInfo()->database;
+
         // Delete all characters from bot accounts
-        CharacterDatabase.Execute("DELETE FROM characters WHERE account IN (SELECT id FROM acore_auth.account WHERE username LIKE '{}%%')", 
-                             sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+        CharacterDatabase.Execute("DELETE FROM characters WHERE account IN (SELECT id FROM " + loginDBName + ".account WHERE username LIKE '{}%%')",
+            sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
 
         // Clean up orphaned entries in playerbots_guild_tasks
-        PlayerbotsDatabase.Execute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM acore_characters.characters)");
+        PlayerbotsDatabase.Execute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM " + characterDBName + ".characters)");
 
         // Clean up orphaned entries in playerbots_db_store
-        PlayerbotsDatabase.Execute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM acore_characters.characters WHERE account IN (SELECT id FROM acore_auth.account WHERE username NOT LIKE '{}%%'))", 
-                               sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
-        
+        PlayerbotsDatabase.Execute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM " + characterDBName + ".characters WHERE account IN (SELECT id FROM " + loginDBName + ".account WHERE username NOT LIKE '{}%%'))",
+            sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+
         // Clean up orphaned records in character-related tables
         CharacterDatabase.Execute("DELETE FROM arena_team_member WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM arena_team WHERE arenaTeamId NOT IN (SELECT arenaTeamId FROM arena_team_member)");
@@ -475,13 +479,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
         CharacterDatabase.Execute("DELETE FROM character_homebind WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM item_instance WHERE owner_guid NOT IN (SELECT guid FROM characters) AND owner_guid > 0");
         CharacterDatabase.Execute("DELETE FROM character_inventory WHERE guid NOT IN (SELECT guid FROM characters)");
-    
+
         // Clean up pet data
         CharacterDatabase.Execute("DELETE FROM character_pet WHERE owner NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM pet_aura WHERE guid NOT IN (SELECT id FROM character_pet)");
         CharacterDatabase.Execute("DELETE FROM pet_spell WHERE guid NOT IN (SELECT id FROM character_pet)");
         CharacterDatabase.Execute("DELETE FROM pet_spell_cooldown WHERE guid NOT IN (SELECT id FROM character_pet)");
-    
+
         // Clean up character data
         CharacterDatabase.Execute("DELETE FROM character_queststatus WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM character_queststatus_rewarded WHERE guid NOT IN (SELECT guid FROM characters)");
@@ -492,25 +496,25 @@ void RandomPlayerbotFactory::CreateRandomBots()
         CharacterDatabase.Execute("DELETE FROM character_spell_cooldown WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM character_talent WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM corpse WHERE guid NOT IN (SELECT guid FROM characters)");
-    
+
         // Clean up group data
         CharacterDatabase.Execute("DELETE FROM `groups` WHERE leaderGuid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM group_member WHERE memberGuid NOT IN (SELECT guid FROM characters)");
-    
+
         // Clean up mail
         CharacterDatabase.Execute("DELETE FROM mail WHERE receiver NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM mail_items WHERE receiver NOT IN (SELECT guid FROM characters)");
-    
+
         // Clean up guild data
         CharacterDatabase.Execute("DELETE FROM guild WHERE leaderguid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM guild_bank_eventlog WHERE guildid NOT IN (SELECT guildid FROM guild)");
         CharacterDatabase.Execute("DELETE FROM guild_member WHERE guildid NOT IN (SELECT guildid FROM guild) OR guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM guild_rank WHERE guildid NOT IN (SELECT guildid FROM guild)");
-    
+
         // Clean up petition data
         CharacterDatabase.Execute("DELETE FROM petition WHERE ownerguid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM petition_sign WHERE ownerguid NOT IN (SELECT guid FROM characters) OR playerguid NOT IN (SELECT guid FROM characters)");
-    
+
         // Finally, delete the bot accounts themselves
         LOG_INFO("playerbots", "Deleting random bot accounts...");
         QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'",
@@ -528,7 +532,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
 
         uint32 timer = getMSTime();
-    
+
         // Wait for all pending database operations to complete
         while (LoginDatabase.QueueSize() || CharacterDatabase.QueueSize() || PlayerbotsDatabase.QueueSize())
         {
@@ -548,7 +552,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     // Calculates the total number of required accounts.
     uint32 totalAccountCount = CalculateTotalAccountCount();
     uint32 timer = getMSTime();
-    
+
     for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
     {
         std::ostringstream out;
@@ -582,7 +586,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     {
         LOG_INFO("playerbots", "Waiting for {} accounts loading into database ({} queries)...", account_creation, LoginDatabase.QueueSize());
         /* wait for async accounts create to make character create correctly */
-        
+
         while (LoginDatabase.QueueSize())
         {
             std::this_thread::sleep_for(1s);
@@ -642,13 +646,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
                     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                         continue;
-                    
+
                     nameCache[raceAndGender].push_back(name);
                 }
 
             } while (result->NextRow());
         }
-        
+
         LOG_DEBUG("playerbots", "Creating random bot characters for account: [{}/{}]", accountNumber + 1, totalAccountCount);
         RandomPlayerbotFactory factory(accountId);
 
