@@ -452,54 +452,20 @@ void RandomPlayerbotFactory::CreateRandomBots()
         // Clear playerbots_random_bots table
         PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots");
 
-        // Get the Login database name dynamically
-        QueryResult loginDatabaseResult = LoginDatabase.Query("SELECT DATABASE()");
-        if (!loginDatabaseResult)
-        {
-            LOG_ERROR("module", "Failed to retrieve LoginDatabase name.");
-            return;
-        }
-
-        // Extract the actual database name from the query result
-        Field* loginFields = loginDatabaseResult->Fetch();
-        std::string loginDBName = loginFields[0].Get<std::string>(); // Convert QueryResult to std::string
+        // Get the database names dynamically
+        std::string loginDBName = LoginDatabase.GetConnectionInfo()->database;
+        std::string characterDBName = CharacterDatabase.GetConnectionInfo()->database;
 
         // Delete all characters from bot accounts
-        std::ostringstream loginDBNameQuery;
-        loginDBNameQuery << "DELETE FROM characters WHERE account IN (SELECT id FROM "
-                        << loginDBName << ".account WHERE username LIKE '"
-                        << sPlayerbotAIConfig->randomBotAccountPrefix << "%')";
-
-        CharacterDatabase.Execute(loginDBNameQuery.str());
-
-
-        // Get the Character database name dynamically
-        QueryResult characterDatabaseResult = CharacterDatabase.Query("SELECT DATABASE()");
-        if (!characterDatabaseResult)
-        {
-            LOG_ERROR("module", "Failed to retrieve CharacterDatabase name.");
-            return;
-        }
-
-        // Extract the actual database name from the query result
-        Field* characterFields = characterDatabaseResult->Fetch();
-        std::string characterDBName = characterFields[0].Get<std::string>(); // Convert QueryResult to std::string
+        CharacterDatabase.Execute("DELETE FROM characters WHERE account IN (SELECT id FROM " + loginDBName + ".account WHERE username LIKE '{}%%')",
+            sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
 
         // Clean up orphaned entries in playerbots_guild_tasks
-        std::ostringstream characterDBNameQuery;
-        characterDBNameQuery << "DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM "
-                            << characterDBName << ".characters)";
-
-        CharacterDatabase.Execute(characterDBNameQuery.str());
+        PlayerbotsDatabase.Execute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM " + characterDBName + ".characters)");
 
         // Clean up orphaned entries in playerbots_db_store
-        std::ostringstream playerbotsDBQuery;
-        playerbotsDBQuery << "DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM "
-                        << characterDBName << ".characters WHERE account IN (SELECT id FROM "
-                        << loginDBName << ".account WHERE username NOT LIKE '"
-                        << sPlayerbotAIConfig->randomBotAccountPrefix << "%'))";
-
-        PlayerbotsDatabase.Execute(playerbotsDBQuery.str());
+        PlayerbotsDatabase.Execute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM " + characterDBName + ".characters WHERE account IN (SELECT id FROM " + loginDBName + ".account WHERE username NOT LIKE '{}%%'))",
+            sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
 
         // Clean up orphaned records in character-related tables
         CharacterDatabase.Execute("DELETE FROM arena_team_member WHERE guid NOT IN (SELECT guid FROM characters)");
