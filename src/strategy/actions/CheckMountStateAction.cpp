@@ -233,28 +233,19 @@ bool CheckMountStateAction::TryForms(Player* /*master*/, int32 masterMountType, 
 {
     // Check if master is in Travel Form and bot can do the same
     if (bot->HasSpell(SPELL_TRAVEL_FORM) && masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm != FORM_TRAVEL)
-    {
-        botAI->CastSpell(SPELL_TRAVEL_FORM, bot);
-        return true;
-    }
+        return botAI->CastSpell(SPELL_TRAVEL_FORM, bot);
 
     // Check if master is in Flight Form or has a flying mount and bot can flight form
     if (bot->HasSpell(SPELL_FLIGHT_FORM) &&
         ((masterInShapeshiftForm == FORM_FLIGHT && botInShapeshiftForm != FORM_FLIGHT) ||
-        (masterMountType == 1 && masterSpeed == 149)))
-    {
-        botAI->CastSpell(SPELL_FLIGHT_FORM, bot);
-        return true;
-    }
+         (masterMountType == 1 && masterSpeed == 149)))
+            return botAI->CastSpell(SPELL_FLIGHT_FORM, bot);
 
     // Check if master is in Flight Form or has an epic flying mount and bot can swift flight form
     if (bot->HasSpell(SPELL_SWIFT_FLIGHT_FORM) &&
         ((masterInShapeshiftForm == FORM_FLIGHT_EPIC && botInShapeshiftForm != FORM_FLIGHT_EPIC) ||
-        (masterMountType == 1 && masterSpeed == 279)))
-    {
-        botAI->CastSpell(SPELL_SWIFT_FLIGHT_FORM, bot);
-        return true;
-    }
+         (masterMountType == 1 && masterSpeed == 279)))
+            return botAI->CastSpell(SPELL_SWIFT_FLIGHT_FORM, bot);
 
     return false;
 }
