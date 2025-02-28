@@ -313,7 +313,6 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
         const auto& ids = pair.second;
         if (!ids.empty())
         {
-
             if (bot->isMoving())
                 bot->StopMoving();
 
