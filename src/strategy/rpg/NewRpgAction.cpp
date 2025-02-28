@@ -386,21 +386,19 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
             botAI->rpgInfo.ChangeToIdle();
             return false;
         }
-        // get the place to get rewarded
-        if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
-        {
-            float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
-            // z = MAX_HEIGHT as we do not know accurate z
-            float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+        assert(poiInfo.size() > 0);
+        // now we get the place to get rewarded
+        float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
+        // z = MAX_HEIGHT as we do not know accurate z
+        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
 
-            // double check for GetQuestPOIPosAndObjectiveIdx
-            if (dz == INVALID_HEIGHT)
-                return false;
-            WorldPosition pos(bot->GetMapId(), dx, dy, dz);
-            botAI->rpgInfo.do_quest.lastReachPOI = 0;
-            botAI->rpgInfo.do_quest.pos = pos;
-            botAI->rpgInfo.do_quest.objectiveIdx = -1;
-        }
+        // double check for GetQuestPOIPosAndObjectiveIdx
+        if (dz == INVALID_HEIGHT)
+            return false;
+        WorldPosition pos(bot->GetMapId(), dx, dy, dz);
+        botAI->rpgInfo.do_quest.lastReachPOI = 0;
+        botAI->rpgInfo.do_quest.pos = pos;
+        botAI->rpgInfo.do_quest.objectiveIdx = -1;
     }
 
     if (botAI->rpgInfo.do_quest.pos == WorldPosition())
