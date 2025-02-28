@@ -4284,7 +4284,7 @@ void PlayerbotAI::RemoveShapeshift()
     RemoveAura("moonkin form");
     RemoveAura("travel form");
     RemoveAura("cat form");
-    RemoveAura("flight form");
+    RemoveAura("flight form"); bot->RemoveAura(33943);  // The latter added for now as RemoveAura("flight form") currently does not work.
     RemoveAura("swift flight form");
     RemoveAura("aquatic form");
     RemoveAura("ghost wolf");
