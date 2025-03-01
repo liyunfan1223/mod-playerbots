@@ -411,17 +411,43 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
     bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING;
 
     // Determine divisor based on WOTLK condition
-    int divisor = isWOTLK ? 10 : 9;
+    int divisor = CalculateAvailableCharsPerAccount();
 
-    // Calculate max bots or rotation pool size
-    int maxBotsOrRotation = std::max(
-        sPlayerbotAIConfig->maxRandomBots,
-        sPlayerbotAIConfig->enableRotation ? sPlayerbotAIConfig->rotationPoolSize : 0
-    );
+    // Calculate max bots
+    int maxBots = sPlayerbotAIConfig->maxRandomBots;
+    // Take perodic online - offline into account
+    if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
+    {
+        maxBots *= sPlayerbotAIConfig->periodicOnlineOfflineRatio;
+    }
 
     // Calculate base accounts, add class account pool size, and add 1 as a fixed offset
-    uint32 baseAccounts = maxBotsOrRotation / divisor;
+    uint32 baseAccounts = maxBots / divisor;
     return baseAccounts + sPlayerbotAIConfig->addClassAccountPoolSize + 1;
+}
+
+uint32 RandomPlayerbotFactory::CalculateAvailableCharsPerAccount()
+{
+    bool noDK = sPlayerbotAIConfig->disableDeathKnightLogin || sWorld->getIntConfig(CONFIG_EXPANSION) != EXPANSION_WRATH_OF_THE_LICH_KING;
+
+    uint32 availableChars = noDK ? 9 : 10;
+
+    uint32 hordeRatio = sPlayerbotAIConfig->randomBotHordeRatio;
+    uint32 allianceRatio = sPlayerbotAIConfig->randomBotAllianceRatio;
+
+    // horde : alliance = 50 : 50 -> 0%
+    // horde : alliance = 0 : 50 -> 50%
+    // horde : alliance = 10 : 50 -> 40%
+    float unavailableRatio = static_cast<float>((std::max(hordeRatio, allianceRatio) - std::min(hordeRatio, allianceRatio))) /
+        (std::max(hordeRatio, allianceRatio) * 2);
+
+    if (unavailableRatio != 0)
+    {
+        // conservative floor to ensure enough chars (may result in more accounts than needed)
+        availableChars = availableChars - availableChars * unavailableRatio;
+    }
+
+    return availableChars;
 }
 
 void RandomPlayerbotFactory::CreateRandomBots()

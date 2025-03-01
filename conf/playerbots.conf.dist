@@ -509,13 +509,6 @@ AiPlayerbot.RandomBotRandomPassword = 0
 # Accounts to create for random bots
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 
-# Enable/Disable rotation of bots (randomly select a bot from the bots pool to go online and rotate them periodically)
-# default: 0 (disable, the online bots are fixed)
-AiPlayerbot.EnableRotation = 0
-
-# Bots pool size for rotation (should be higher than MaxRandomBots)
-AiPlayerbot.RotationPoolSize = 100
-
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
 
@@ -528,6 +521,16 @@ AiPlayerbot.PreQuests = 0
 
 # Enable LFG for random bots
 AiPlayerbot.RandomBotJoinLfg = 1
+
+# Enable/Disable periodic online - offline to mimic the real-world scenario where not all players are online simultaneously
+# When enabled, bots are randomly selected to go online or offline periodically from a larger set
+# Default: 0 (disabled, the set of online bots remains fixed)
+AiPlayerbot.EnablePeriodicOnlineOffline = 0
+
+# Defines the ratio between the total number of bots (including offline ones) and the number of bots currently online (MaxRandomBots)
+# This setting must greater than 1.0 and only applies when EnablePeriodicOnlineOffline
+# Default: 2.0 (total number of bots is twice the number of MaxRandomBots)
+AiPlayerbot.PeriodicOnlineOfflineRatio = 2.0
 
 # Percentage ratio of alliance and horde
 AiPlayerbot.RandomBotAllianceRatio = 50
@@ -877,7 +880,7 @@ AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
 AiPlayerbot.MaxRandomBotTeleportInterval = 18000
-AiPlayerbot.RandomBotInWorldWithRotationDisabled = 31104000
+AiPlayerbot.PermanantlyInWorldTime = 31104000
 
 #
 #
