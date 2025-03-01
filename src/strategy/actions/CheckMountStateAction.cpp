@@ -55,10 +55,11 @@ bool CheckMountStateAction::isUseful()
         !bot->IsOutdoors() || bot->InArena())
         return false;
 
-    // Not useful when in Combat and not currently mounted
-    if (!bot->IsMounted() && (bot->IsInCombat() || botAI->GetState() == BOT_STATE_COMBAT))
+    // Not useful when in combat and not currently mounted / travel formed
+    if ((bot->IsInCombat() || botAI->GetState() == BOT_STATE_COMBAT) &&
+        !bot->IsMounted() && !botInShapeshiftForm == FORM_TRAVEL && !botInShapeshiftForm == FORM_FLIGHT && !botInShapeshiftForm == FORM_FLIGHT_EPIC)
         return false;
-
+ 
     // In addition to checking IsOutdoors, also check whether bot is clipping below floor slightly because that will
     // cause bot to falsly indicate they are outdoors. This fixes bug where bot tries to mount indoors (which seems
     // to mostly be an issue in tunnels of WSG and AV)
@@ -237,7 +238,8 @@ void CheckMountStateAction::Dismount()
 bool CheckMountStateAction::TryForms(Player* /*master*/, int32 masterMountType, int32 masterSpeed) const
 {
     // Check if master is in Travel Form and bot can do the same
-    if (botAI->CanCastSpell(SPELL_TRAVEL_FORM, bot, true) && masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm != FORM_TRAVEL)
+    if (botAI->CanCastSpell(SPELL_TRAVEL_FORM, bot, true) &&
+        masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm != FORM_TRAVEL)
     {
         botAI->CastSpell(SPELL_TRAVEL_FORM, bot);
         return true;
@@ -251,11 +253,11 @@ bool CheckMountStateAction::TryForms(Player* /*master*/, int32 masterMountType, 
         botAI->CastSpell(SPELL_FLIGHT_FORM, bot);
 
         // Compensate speedbuff
-        bot->SetSpeed(MOVE_RUN, 2.5, false);
+        bot->SetSpeed(MOVE_RUN, 2.5, true);
         return true;
     }
 
-    // Check if master is in Flight Form or has an epic flying mount and bot can swift flight form
+    // Check if master is in Swift Flight Form or has an epic flying mount and bot can swift flight form
     if (botAI->CanCastSpell(SPELL_SWIFT_FLIGHT_FORM, bot, true) &&
         ((masterInShapeshiftForm == FORM_FLIGHT_EPIC && botInShapeshiftForm != FORM_FLIGHT_EPIC) ||
         (masterMountType == 1 && masterSpeed == 279)))
@@ -263,7 +265,7 @@ bool CheckMountStateAction::TryForms(Player* /*master*/, int32 masterMountType, 
         botAI->CastSpell(SPELL_SWIFT_FLIGHT_FORM, bot);
 
         // Compensate speedbuff
-        bot->SetSpeed(MOVE_RUN, 3.8, false);
+        bot->SetSpeed(MOVE_RUN, 3.8, true);
         return true;
     }
 
