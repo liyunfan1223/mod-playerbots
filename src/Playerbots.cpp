@@ -23,6 +23,8 @@
 #include "DatabaseLoader.h"
 #include "GuildTaskMgr.h"
 #include "Metric.h"
+#include "PlayerScript.h"
+#include "PlayerbotAIConfig.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
 #include "cs_playerbots.h"
@@ -83,7 +85,8 @@ public:
         PLAYERHOOK_ON_CHAT_WITH_GROUP,
         PLAYERHOOK_ON_BEFORE_CRITERIA_PROGRESS,
         PLAYERHOOK_ON_BEFORE_ACHI_COMPLETE,
-        PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT
+        PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT,
+        PLAYERHOOK_ON_GIVE_EXP
     }) {}
 
     void OnPlayerLogin(Player* player) override
@@ -209,6 +212,17 @@ public:
             return false;
         }
         return true;
+    }
+
+    void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
+    {
+        if (!player->GetSession()->IsBot())
+            return;
+        
+        if (sPlayerbotAIConfig->playerbotsXPrate != 1.0)
+        {
+            amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->playerbotsXPrate));
+        }
     }
 };
 
