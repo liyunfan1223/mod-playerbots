@@ -71,7 +71,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             if (roll <= 30)
             {
                 GuidVector possibleTargets = AI_VALUE(GuidVector, "possible new rpg targets");
-                if (!possibleTargets.empty())
+                if (possibleTargets.size() >= 3)
                 {
                     info.ChangeToNearNpc();
                     return true;
@@ -90,7 +90,7 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
             // IDLE -> GO_GRIND
             else if (roll <= 100)
             {
-                if (roll >= 55)
+                if (roll >= 60)
                 {
                     std::vector<uint32> availableQuests;
                     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
@@ -317,7 +317,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         {
             // can't find a poi pos to go, stop doing quest for now
             botAI->rpgInfo.ChangeToIdle();
-            return false;
+            return true;
         }
         uint32 rndIdx = urand(0, poiInfo.size() - 1);
         G3D::Vector2 nearestPoi = poiInfo[rndIdx].pos;
@@ -355,13 +355,37 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         // stayed at this POI for more than 1 minutes
         if (GetMSTimeDiffToNow(botAI->rpgInfo.do_quest.lastReachPOI) >= poiStayTime)
         {
+            bool hasProgression = false;
+            int32 currentObjective = botAI->rpgInfo.do_quest.objectiveIdx;
+            // check if the objective has progression
+            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+            const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
+            if (currentObjective < QUEST_OBJECTIVES_COUNT)
+            {
+                if (q_status.CreatureOrGOCount[currentObjective] != 0 && quest->RequiredNpcOrGoCount[currentObjective])
+                    hasProgression = true;
+            }
+            else if (currentObjective < QUEST_OBJECTIVES_COUNT + QUEST_ITEM_OBJECTIVES_COUNT)
+            {
+                if (q_status.ItemCount[currentObjective - QUEST_OBJECTIVES_COUNT] != 0 &&
+                    quest->RequiredItemCount[currentObjective - QUEST_OBJECTIVES_COUNT])
+                    hasProgression = true;
+            }
+            if (!hasProgression)
+            {
+                // we has reach the poi for more than 2 mins but no progession
+                // may not be able to complete this quest
+                botAI->rpgInfo.ChangeToIdle();
+                return true;
+            }
+            // clear and select another poi later
             botAI->rpgInfo.do_quest.lastReachPOI = 0;
             botAI->rpgInfo.do_quest.pos = WorldPosition();
             botAI->rpgInfo.do_quest.objectiveIdx = 0;
             return true;
         }
 
-        return MoveRandomNear(20.0f);
+        return MoveRandomNear(50.0f);
     }
 
     /// @TODO: q_status.Explored

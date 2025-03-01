@@ -120,7 +120,7 @@ bool NewRpgBaseAction::MoveNpcTo(GuidPosition pos, float distance)
         angle = unit->GetOrientation() +
                 (M_PI * irand(-25, 25) / 100.0);  // 45 degrees infront of target (leading it's movement)
                 
-    float rnd = 0.5 * rand_norm();
+    float rnd = rand_norm();
     x += cos(angle) * distance * rnd;
     y += sin(angle) * distance * rnd;
     if (!unit->GetMap()->CheckCollisionAndGetValidCoords(unit, unit->GetPositionX(), unit->GetPositionY(),

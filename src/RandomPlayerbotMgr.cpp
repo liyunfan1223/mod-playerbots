@@ -371,7 +371,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             sRandomPlayerbotMgr->CheckLfgQueue();
     }
 
-    if (time(nullptr) > (printStatsTimer + 300))
+    if (sPlayerbotAIConfig->randomBotAutologin && time(nullptr) > (printStatsTimer + 300))
     {
         if (!printStatsTimer)
         {
@@ -1513,7 +1513,7 @@ void RandomPlayerbotMgr::PrepareZone2LevelBracket()
     zone2LevelBracket[1377] = {54, 63}; // Silithus
 
     // The Burning Crusade - Zones
-    zone2LevelBracket[3483] = {56, 66}; // Hellfire Peninsula
+    zone2LevelBracket[3483] = {58, 66}; // Hellfire Peninsula
     zone2LevelBracket[3518] = {64, 70}; // Nagrand
     zone2LevelBracket[3519] = {62, 73}; // Terokkar Forest
     zone2LevelBracket[3520] = {66, 73}; // Shadowmoon Valley
