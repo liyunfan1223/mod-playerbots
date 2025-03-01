@@ -415,7 +415,7 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
 
     // Calculate max bots
     int maxBots = sPlayerbotAIConfig->maxRandomBots;
-    // Take perodic online - offline into account)
+    // Take perodic online - offline into account
     if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
     {
         maxBots *= sPlayerbotAIConfig->periodicOnlineOfflineRatio;

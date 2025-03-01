@@ -528,7 +528,7 @@ AiPlayerbot.RandomBotJoinLfg = 1
 AiPlayerbot.EnablePeriodicOnlineOffline = 0
 
 # Defines the ratio between the total number of bots (including offline ones) and the number of bots currently online (MaxRandomBots)
-# This setting only applies when EnablePeriodicOnlineOffline is set to 1.
+# This setting must greater than 1.0 and only applies when EnablePeriodicOnlineOffline
 # Default: 2.0 (total number of bots is twice the number of MaxRandomBots)
 AiPlayerbot.PeriodicOnlineOfflineRatio = 2.0
 
