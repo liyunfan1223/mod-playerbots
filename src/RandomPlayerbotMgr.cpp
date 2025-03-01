@@ -47,6 +47,7 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "World.h"
+#include "RandomPlayerbotFactory.h"
 
 void PrintStatsThread() { sRandomPlayerbotMgr->PrintStats(); }
 
@@ -464,18 +465,25 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         maxAllowedBotCount -= currentBots.size();
         maxAllowedBotCount = std::min(sPlayerbotAIConfig->randomBotsPerInterval, maxAllowedBotCount);
 
-        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / (sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio);
+        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) /
+            (sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio);
         uint32 allowedHordeCount = maxAllowedBotCount - allowedAllianceCount;
 
         for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin();
              i != sPlayerbotAIConfig->randomBotAccounts.end(); i++)
         {
             uint32 accountId = *i;
-            if (sPlayerbotAIConfig->enableRotation)
+            if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
             {
-                uint32 limit = std::min((uint32)sPlayerbotAIConfig->randomBotAccounts.size(),
-                                        sPlayerbotAIConfig->rotationPoolSize / 10 + 1);
-                uint32 index = urand(0, limit);
+                // minus addclass bots account
+                int32 baseAccount = RandomPlayerbotFactory::CalculateTotalAccountCount() - sPlayerbotAIConfig->addClassAccountPoolSize;
+                
+                if (baseAccount <= 0 || baseAccount > sPlayerbotAIConfig->randomBotAccounts.size())
+                {
+                    LOG_ERROR("playerbots", "Account calculation error with PeriodicOnlineOffline");
+                    return 0;
+                }
+                uint32 index = urand(0, baseAccount - 1);
                 accountId = sPlayerbotAIConfig->randomBotAccounts[index];
             }
             CharacterDatabasePreparedStatement* stmt =
@@ -535,10 +543,10 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
             for (uint32& guid : guids)
             {
-                uint32 add_time = sPlayerbotAIConfig->enableRotation
+                uint32 add_time = sPlayerbotAIConfig->enablePeriodicOnlineOffline
                                       ? urand(sPlayerbotAIConfig->minRandomBotInWorldTime,
                                               sPlayerbotAIConfig->maxRandomBotInWorldTime)
-                                      : sPlayerbotAIConfig->randomBotInWorldWithRotationDisabled;
+                                      : sPlayerbotAIConfig->permanantlyInWorldTime;
 
                 SetEventValue(guid, "add", 1, add_time);
                 SetEventValue(guid, "logout", 0, 0);
