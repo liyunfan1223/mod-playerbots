@@ -34,14 +34,11 @@ bool AttackAnythingAction::isUseful()
     if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot not allowed to be active
         return false;
 
-    if (!AI_VALUE(bool, "can move around"))
+    if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
         return false;
-    
-        
-    // if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() &&
-    //     ChooseRpgTargetAction::isFollowValid(
-    //         bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))  // Bot is traveling
-    //     return false;
+
+    if (bot->IsInCombat())
+        return false;
 
     Unit* target = GetTarget();
 
