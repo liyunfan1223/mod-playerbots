@@ -304,8 +304,15 @@ bool CheckMountStateAction::TryPreferredMount(Player* master) const
             if (!mounts.empty())
             {
                 uint32 index = urand(0, mounts.size() - 1);
-                if (index < mounts.size() && sSpellMgr->GetSpellInfo(mounts[index]))
-                    return botAI->CastSpell(mounts[index], bot);
+                if (index < mounts.size() && sSpellMgr->GetSpellInfo(mounts[index]) &&
+                    botAI->CanCastSpell(mounts[index], bot))
+                {
+                    if (bot->isMoving())
+                        bot->StopMoving();
+    
+                    botAI->CastSpell(mounts[index], bot);
+                    return true;
+                }
             }
         }
     }
@@ -324,11 +331,16 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
         const auto& ids = pair.second;
         if (!ids.empty())
         {
-            if (bot->isMoving())
-                bot->StopMoving();
-
             uint32 index = urand(0, ids.size() - 1);
-            return botAI->CastSpell(ids[index], bot);
+
+            if (botAI->CanCastSpell(ids[index], bot))
+            {
+                if (bot->isMoving())
+                    bot->StopMoving();
+
+                botAI->CastSpell(ids[index], bot);
+                return true;
+            }
         }
     }
     return false;
