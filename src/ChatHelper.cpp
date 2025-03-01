@@ -483,7 +483,7 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
             break;
 
         std::string const entryC = text.substr(pos, endPos - pos);  // get std::string const within window i.e entry
-        uint32 entry = atol(entryC.c_str());                        // convert ascii to float
+        //uint32 entry = atol(entryC.c_str());                        // convert ascii to float
 
         ObjectGuid lootCurrent = ObjectGuid(guid);
 
