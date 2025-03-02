@@ -59,7 +59,7 @@ bool CheckMountStateAction::isUseful()
     if ((bot->IsInCombat() || botAI->GetState() == BOT_STATE_COMBAT) &&
         !bot->IsMounted() && !botInShapeshiftForm == FORM_TRAVEL && !botInShapeshiftForm == FORM_FLIGHT && !botInShapeshiftForm == FORM_FLIGHT_EPIC)
         return false;
-
+ 
     // In addition to checking IsOutdoors, also check whether bot is clipping below floor slightly because that will
     // cause bot to falsly indicate they are outdoors. This fixes bug where bot tries to mount indoors (which seems
     // to mostly be an issue in tunnels of WSG and AV)
@@ -93,28 +93,19 @@ bool CheckMountStateAction::isUseful()
                 return false;
     }
 
-    master = GetMaster();
-
-    // Not useful if master and bot are both in a specific form already
-    if (master)
-    {
-        botInShapeshiftForm = bot->GetShapeshiftForm();
-        masterInShapeshiftForm = master->GetShapeshiftForm();
-
-        // Note: The one check that actually matters (most) here is for FORM_TRAVEL
-        // as FORM_FLIGHT's are handled later on
-        if ((masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm == FORM_TRAVEL) ||
-            (masterInShapeshiftForm == FORM_FLIGHT && botInShapeshiftForm == FORM_FLIGHT) ||
-            (masterInShapeshiftForm == FORM_FLIGHT_EPIC && botInShapeshiftForm == FORM_FLIGHT_EPIC))
-            return false;
-
-    }
-
     return true;
 }
 
 bool CheckMountStateAction::Execute(Event /*event*/)
 {
+    master = GetMaster();
+
+    if (master)
+    {
+        botInShapeshiftForm = bot->GetShapeshiftForm();
+        masterInShapeshiftForm = master->GetShapeshiftForm();
+    }
+
     // Determine if there are no attackers
     bool noAttackers = !AI_VALUE2(bool, "combat", "self target") || !AI_VALUE(uint8, "attacker count");
     bool enemy = AI_VALUE(Unit*, "enemy player target");
