@@ -2,6 +2,7 @@
 #define _PLAYERBOT_NEWRPGINFO_H
 
 #include "Define.h"
+#include "ObjectGuid.h"
 #include "ObjectMgr.h"
 #include "QuestDef.h"
 #include "Strategy.h"
@@ -45,7 +46,7 @@ struct NewRpgInfo
     // RPG_NEAR_NPC
     struct NearNpc {
         NearNpc() = default;
-        GuidPosition pos{};
+        ObjectGuid npc{};
         uint32 lastReach{0};
     };
     // RPG_NEAR_RANDOM

@@ -9,6 +9,7 @@
 #include "GossipDef.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
@@ -222,25 +223,27 @@ bool NewRpgMoveRandomAction::Execute(Event event)
 bool NewRpgMoveNpcAction::Execute(Event event)
 {
     NewRpgInfo& info = botAI->rpgInfo;
-    if (!info.near_npc.pos)
+    if (!info.near_npc.npc)
     {
         // No npc can be found, switch to IDLE
-        GuidPosition pos = ChooseNpcToInteract();
-        if (pos.IsEmpty())
+        ObjectGuid npc = ChooseNpcToInteract();
+        if (npc.IsEmpty())
         {
             info.ChangeToIdle();
             return true;
         }
-        info.near_npc.pos = pos;
+        info.near_npc.npc = npc;
         info.near_npc.lastReach = 0;
         return true;
     }
-    if (bot->GetDistance(info.near_npc.pos) <= INTERACTION_DISTANCE)
+
+    Unit* unit = botAI->GetUnit(info.near_npc.npc);
+    if (unit && bot->GetDistance(unit) <= INTERACTION_DISTANCE)
     {
         if (!info.near_npc.lastReach)
         {
             info.near_npc.lastReach = getMSTime();
-            InteractWithNpcForQuest(info.near_npc.pos);
+            InteractWithNpcForQuest(info.near_npc.npc);
             return true;
         }
 
@@ -248,12 +251,12 @@ bool NewRpgMoveNpcAction::Execute(Event event)
             return false;
 
         // has reached the npc for more than `npcStayTime`, select the next target
-        info.near_npc.pos = GuidPosition();
+        info.near_npc.npc = ObjectGuid();
         info.near_npc.lastReach = 0;
     }
     else
     {
-        return MoveNpcTo(info.near_npc.pos);
+        return MoveNpcTo(info.near_npc.npc);
     }
     return true;
 }

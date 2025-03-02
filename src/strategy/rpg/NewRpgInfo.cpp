@@ -82,7 +82,7 @@ std::string NewRpgInfo::ToString()
             break;
         case RPG_NEAR_NPC:
             out << "NEAR_NPC";
-            out << "\nNpc: " << near_npc.pos.GetMapId() << " " << near_npc.pos.GetPositionX() << " " << near_npc.pos.GetPositionY() << " " << near_npc.pos.GetPositionZ() << " " << near_npc.pos.GetCounter();
+            out << "\nnpcEntry: " << near_npc.npc.GetCounter();
             out << "\nlastNearNpc: " << startT;
             out << "\nlastReachNpc: " << near_npc.lastReach;
             break;

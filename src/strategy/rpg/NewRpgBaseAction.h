@@ -28,13 +28,13 @@ public:
 protected:
     // MOVEMENT RELATED
     bool MoveFarTo(WorldPosition dest);
-    bool MoveNpcTo(GuidPosition dest, float distance = INTERACTION_DISTANCE);
+    bool MoveNpcTo(ObjectGuid guid, float distance = INTERACTION_DISTANCE);
     bool MoveRandomNear(float moveStep = 50.0f);
     bool ForceToWait(uint32 duration, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
 
     // QUEST RELATED
     bool SearchQuestGiverAndAcceptOrReward();
-    GuidPosition ChooseNpcToInteract(bool questgiverOnly = false, float distanceLimit = 0.0f);
+    ObjectGuid ChooseNpcToInteract(bool questgiverOnly = false, float distanceLimit = 0.0f);
     bool InteractWithNpcForQuest(ObjectGuid guid);
     bool AcceptQuest(Quest const* quest, ObjectGuid guid);
     bool TurnInQuest(Quest const* quest, ObjectGuid guid);

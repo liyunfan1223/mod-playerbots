@@ -14,6 +14,7 @@
 #include "BudgetValues.h"
 #include "ChannelMgr.h"
 #include "CharacterPackets.h"
+#include "Common.h"
 #include "CreatureAIImpl.h"
 #include "CreatureData.h"
 #include "EmoteAction.h"
@@ -2290,10 +2291,15 @@ const AreaTableEntry* PlayerbotAI::GetCurrentZone()
 
 std::string PlayerbotAI::GetLocalizedAreaName(const AreaTableEntry* entry)
 {
+    std::string name;
     if (entry)
-        return entry->area_name[sWorld->GetDefaultDbcLocale()];
+    {
+        name = entry->area_name[sWorld->GetDefaultDbcLocale()];
+        if (name.empty())
+            name = entry->area_name[LOCALE_enUS];
+    }
 
-    return "";
+    return name;
 }
 
 std::string PlayerbotAI::GetLocalizedCreatureName(uint32 entry)

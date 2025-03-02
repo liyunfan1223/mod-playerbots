@@ -103,9 +103,9 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
     return false;
 }
 
-bool NewRpgBaseAction::MoveNpcTo(GuidPosition pos, float distance)
+bool NewRpgBaseAction::MoveNpcTo(ObjectGuid guid, float distance)
 {
-    Unit* unit = botAI->GetUnit(pos);
+    Unit* unit = botAI->GetUnit(guid);
     if (!unit)
         return false;
     float x = unit->GetPositionX();
@@ -435,24 +435,25 @@ bool NewRpgBaseAction::OrganizeQuestLog()
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 {
     OrganizeQuestLog();
-    if (GuidPosition pos = ChooseNpcToInteract(true, 80.0f))
+    if (ObjectGuid npc = ChooseNpcToInteract(true, 80.0f))
     {
-        if (bot->GetDistance(pos) <= INTERACTION_DISTANCE)
+        const WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npc);
+        if (bot->GetDistance(object) <= INTERACTION_DISTANCE)
         {
-            InteractWithNpcForQuest(pos);
+            InteractWithNpcForQuest(npc);
             ForceToWait(5000);
             return true;
         }
-        return MoveNpcTo(pos);
+        return MoveNpcTo(npc);
     }
     return false;
 }
 
-GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float distanceLimit)
+ObjectGuid NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float distanceLimit)
 {
     GuidVector possibleTargets = AI_VALUE(GuidVector, "possible new rpg targets");
     if (possibleTargets.empty())
-        return GuidPosition();
+        return ObjectGuid();
     Unit* selected = nullptr;
     // Unit* unitWithQuest = nullptr;
     for (ObjectGuid& guid: possibleTargets)
@@ -487,7 +488,7 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
             const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
             if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
             {
-                return GuidPosition(object);
+                return object->GetGUID();
             }
         }
         for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
@@ -501,14 +502,14 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
             if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
                 bot->CanAddQuest(quest, false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
             {
-                return GuidPosition(object);
+                return object->GetGUID();
             }
         }
     }
 
     // No questgiver to accept or reward
     if (questgiverOnly)
-        return GuidPosition();
+        return ObjectGuid();
 
     int idx = urand(0, possibleTargets.size() - 1);
     ObjectGuid guid = possibleTargets[idx];
@@ -518,9 +519,9 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
 
     if (object)
     {
-        return GuidPosition(object);
+        return object->GetGUID();
     }
-    return GuidPosition();
+    return ObjectGuid();
 }
 
 static std::vector<float> GenerateRandomWeights(int n) {
