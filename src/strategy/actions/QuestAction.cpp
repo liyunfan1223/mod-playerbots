@@ -4,7 +4,9 @@
  */
 
 #include "QuestAction.h"
+#include <sstream>
 
+#include "Chat.h"
 #include "ChatHelper.h"
 #include "Event.h"
 #include "Playerbots.h"
@@ -258,6 +260,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
 
 bool QuestUpdateCompleteAction::Execute(Event event)
 {
+    // the action can hardly be triggered
     WorldPacket p(event.getPacket());
     p.rpos(0);
 
@@ -265,22 +268,26 @@ bool QuestUpdateCompleteAction::Execute(Event event)
     p >> questId;
 
     p.print_storage();
-    LOG_INFO("playerbots", "Packet: empty{} questId{}", p.empty(), questId);
+    // LOG_INFO("playerbots", "Packet: empty{} questId{}", p.empty(), questId);
 
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
     if (qInfo)
     {
-        std::map<std::string, std::string> placeholders;
+        // std::map<std::string, std::string> placeholders;
+        // placeholders["%quest_link"] = format;
+        
+        // if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+        // {
+            //     LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
+            //     bot->Say("Quest [ " + format + " ] completed", LANG_UNIVERSAL);
+            // }
         const auto format = ChatHelper::FormatQuest(qInfo);
-        placeholders["%quest_link"] = format;
-
-        if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
-        {
-            LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
-            bot->Say("Quest [ " + format + " ] completed", LANG_UNIVERSAL);
-        }
-        botAI->TellMasterNoFacing("Quest completed " + format);
+        if (botAI->GetMaster())
+            botAI->TellMasterNoFacing("Quest completed " + format);
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, qInfo);
+        botAI->rpgStatistic.questCompleted++;
+        // LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), qInfo->GetQuestId());
+        // botAI->rpgStatistic.questCompleted++;
     }
 
     return true;
@@ -296,14 +303,19 @@ bool QuestUpdateAddKillAction::Execute(Event event)
 
     uint32 entry, questId, available, required;
     p >> questId >> entry >> available >> required;
-
+    // LOG_INFO("playerbots", "[New rpg] Quest {} -> Creature {} ({}/{})", questId, entry, available, required);
     const Quest* qInfo = sObjectMgr->GetQuestTemplate(questId);
     if (qInfo && (entry & 0x80000000))
     {
         entry &= 0x7FFFFFFF;
         const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
         if (info)
+        {
             BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, info->name);
+            std::ostringstream out;
+            out << info->name << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+            botAI->TellMasterNoFacing(out.str());
+        }
     }
     else if (qInfo)
     {
@@ -311,24 +323,11 @@ bool QuestUpdateAddKillAction::Execute(Event event)
         if (info)
         {
             BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, info->Name);
+            std::ostringstream out;
+            out << info->Name << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+            botAI->TellMasterNoFacing(out.str());
         }
-    }
-    else
-    {
-        std::map<std::string, std::string> placeholders;
-        placeholders["%quest_id"] = questId;
-        placeholders["%available"] = available;
-        placeholders["%required"] = required;
-
-        if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_COMBAT) || botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT))
-        {
-            LOG_INFO("playerbots", "{} => {}", bot->GetName(), BOT_TEXT2("%available/%required for questId: %quest_id", placeholders));
-            botAI->Say(BOT_TEXT2("%available/%required for questId: %quest_id", placeholders));
-        }
-
-        botAI->TellMasterNoFacing(BOT_TEXT2("%available/%required for questId: %quest_id", placeholders));
-    }
-    
+    }    
     return false;
 }
 

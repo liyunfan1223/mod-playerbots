@@ -79,7 +79,7 @@ WorldPacketHandlerStrategy::WorldPacketHandlerStrategy(PlayerbotAI* botAI) : Pas
 
     // quests
     supported.push_back("quest update add kill");
-    supported.push_back("quest update add item");
+    // supported.push_back("quest update add item");
     supported.push_back("quest update failed");
     supported.push_back("quest update failed timer");
     supported.push_back("quest update complete");
