@@ -228,8 +228,11 @@ void CheckMountStateAction::Dismount()
     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
 }
 
-bool CheckMountStateAction::TryForms(Player* /*master*/, int32 masterMountType, int32 masterSpeed) const
+bool CheckMountStateAction::TryForms(Player* master, int32 masterMountType, int32 masterSpeed) const
 {
+    if (!master)
+        return false;
+
     // Check if master is in Travel Form and bot can do the same
     if (botAI->CanCastSpell(SPELL_TRAVEL_FORM, bot, true) &&
         masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm != FORM_TRAVEL)
