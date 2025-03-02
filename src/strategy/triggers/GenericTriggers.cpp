@@ -198,6 +198,13 @@ bool MyAttackerCountTrigger::IsActive()
     return AI_VALUE2(bool, "combat", "self target") && AI_VALUE(uint8, "my attacker count") >= amount;
 }
 
+bool MediumThreatTrigger::IsActive()
+{
+    if (!AI_VALUE(Unit*, "main tank"))
+        return false;
+    return MyAttackerCountTrigger::IsActive();
+}
+
 bool LowTankThreatTrigger::IsActive()
 {
     Unit* mt = AI_VALUE(Unit*, "main tank");
