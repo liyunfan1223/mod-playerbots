@@ -318,6 +318,9 @@ bool NewRpgBaseAction::IsQuestWorthDoing(Quest const* quest)
     if (quest->IsRepeatable())
         return false;
 
+    if (quest->IsSeasonal())
+        return false;
+
     return true;
 }
 
