@@ -2982,6 +2982,10 @@ void PlayerbotFactory::InitPotions()
     for (uint8 i = 0; i < 2; ++i)
     {
         uint32 effect = effects[i];
+
+        if (effect == SPELL_EFFECT_ENERGIZE && !bot->GetPower(POWER_MANA))
+            continue;
+        
         FindPotionVisitor visitor(bot, effect);
         IterateItems(&visitor);
         if (!visitor.GetResult().empty())
