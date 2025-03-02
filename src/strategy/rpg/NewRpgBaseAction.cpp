@@ -204,7 +204,7 @@ bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
 
         const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
-            bot->SatisfyQuestLog(false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+            bot->CanAddQuest(quest, false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
         {
             AcceptQuest(quest, guid);
             if (botAI->GetMaster())
@@ -365,7 +365,9 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             continue;
 
         const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!IsQuestWorthDoing(quest) || !IsQuestCapableDoing(quest)) // festival / class quest
+        if (!IsQuestWorthDoing(quest) ||
+            !IsQuestCapableDoing(quest) ||
+            bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED)
         {
             LOG_DEBUG("playerbots", "[New rpg] {} drop quest {}", bot->GetName(), questId);
             WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
@@ -490,7 +492,7 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
                 continue;
             const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
             if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
-                bot->SatisfyQuestLog(false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+                bot->CanAddQuest(quest, false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
             {
                 return GuidPosition(object);
             }
