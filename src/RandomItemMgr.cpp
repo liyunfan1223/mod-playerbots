@@ -2313,8 +2313,9 @@ void RandomItemMgr::BuildAmmoCache()
         for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_BULLET; subClass++)
         {
             QueryResult results = WorldDatabase.Query(
-                "SELECT entry, Flags FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} and duration = 0 "
-                "ORDER BY stackable DESC, RequiredLevel DESC",
+                "SELECT entry FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} AND duration = 0 "
+                "AND (Flags & 16) = 0 AND dmg_min1 != 0 AND RequiredLevel != 0  "
+                "ORDER BY stackable DESC, ItemLevel DESC",
                 ITEM_CLASS_PROJECTILE, subClass, level);
             if (!results)
                 continue;
@@ -2322,22 +2323,16 @@ void RandomItemMgr::BuildAmmoCache()
             {
                 Field* fields = results->Fetch();
                 uint32 entry = fields[0].Get<uint32>();
-                uint32 flags = fields[1].Get<uint32>();
-                if (flags & ITEM_FLAG_DEPRECATED)
-                {
-                    continue;
-                }
-                ammoCache[level][subClass] = entry;
+                ammoCache[level][subClass].push_back(entry);
                 ++counter;
-                break;
             } while (results->NextRow());
         }
     }
 
-    LOG_INFO("server.loading", "Cached {} types of ammo", counter);  // TEST
+    LOG_INFO("server.loading", "Cached {} ammo", counter);  // TEST
 }
 
-uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass) { return ammoCache[level][subClass]; }
+std::vector<uint32> RandomItemMgr::GetAmmo(uint32 level, uint32 subClass) { return ammoCache[level][subClass]; }
 
 void RandomItemMgr::BuildPotionCache()
 {
