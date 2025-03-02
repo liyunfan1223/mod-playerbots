@@ -9,6 +9,7 @@
 #include "Chat.h"
 #include "ChatHelper.h"
 #include "Event.h"
+#include "ObjectMgr.h"
 #include "Playerbots.h"
 #include "ReputationMgr.h"
 #include "ServerFacade.h"
@@ -311,9 +312,10 @@ bool QuestUpdateAddKillAction::Execute(Event event)
         const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
         if (info)
         {
-            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, info->name);
+            std::string infoName = botAI->GetLocalizedGameObjectName(entry);
+            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
             std::ostringstream out;
-            out << info->name << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+            out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
             botAI->TellMasterNoFacing(out.str());
         }
     }
@@ -322,9 +324,10 @@ bool QuestUpdateAddKillAction::Execute(Event event)
         CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(entry);
         if (info)
         {
-            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, info->Name);
+            std::string infoName = botAI->GetLocalizedCreatureName(entry);
+            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
             std::ostringstream out;
-            out << info->Name << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+            out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
             botAI->TellMasterNoFacing(out.str());
         }
     }    

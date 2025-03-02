@@ -13,6 +13,7 @@
 #include "ChatFilter.h"
 #include "ChatHelper.h"
 #include "Common.h"
+#include "CreatureData.h"
 #include "Event.h"
 #include "Item.h"
 #include "NewRpgInfo.h"
@@ -436,7 +437,8 @@ public:
     const AreaTableEntry* GetCurrentArea();
     const AreaTableEntry* GetCurrentZone();
     static std::string GetLocalizedAreaName(const AreaTableEntry* entry);
-
+    static std::string GetLocalizedCreatureName(uint32 entry);
+    static std::string GetLocalizedGameObjectName(uint32 entry);
     bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMasterNoFacing(std::ostringstream& stream,

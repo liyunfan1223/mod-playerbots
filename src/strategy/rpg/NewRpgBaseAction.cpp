@@ -195,6 +195,9 @@ bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
     if (menu.Empty())
         return true;
 
+    if (!creature->IsQuestGiver())
+        return true;
+
     for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
     {
         const QuestMenuItem &item = menu.GetItem(idx);
