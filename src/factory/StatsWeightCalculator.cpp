@@ -126,7 +126,7 @@ void StatsWeightCalculator::GenerateWeights(Player* player)
 void StatsWeightCalculator::GenerateBasicWeights(Player* player)
 {
     // Basic weights
-    stats_weights_[STATS_TYPE_STAMINA] += 0.01f;
+    stats_weights_[STATS_TYPE_STAMINA] += 0.1f;
     stats_weights_[STATS_TYPE_ARMOR] += 0.001f;
     stats_weights_[STATS_TYPE_BONUS] += 1.0f;
 
@@ -508,7 +508,8 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         {
             weight_ *= 0.1;
         }
-        if (cls == CLASS_ROGUE && tab == ROGUE_TAB_ASSASSINATION && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
+        if (cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY) &&
+            proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
         {
             weight_ *= 0.1;
         }

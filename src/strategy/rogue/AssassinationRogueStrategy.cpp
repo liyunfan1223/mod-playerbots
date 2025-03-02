@@ -10,6 +10,8 @@ public:
     {
         creators["mutilate"] = &mutilate;
         creators["envenom"] = &envenom;
+        creators["backstab"] = &backstab;
+        creators["rupture"] = &rupture;
     }
 
 private:
@@ -17,15 +19,29 @@ private:
     {
         return new ActionNode("mutilate",
                               /*P*/ NULL,
-                              /*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
+                              /*A*/ NextAction::array(0, new NextAction("backstab"), nullptr),
                               /*C*/ NULL);
     }
     static ActionNode* envenom(PlayerbotAI* ai)
     {
         return new ActionNode("envenom",
                               /*P*/ NULL,
-                              /*A*/ NextAction::array(0, new NextAction("eviscerate"), NULL),
+                              /*A*/ NextAction::array(0, new NextAction("rupture"), nullptr),
                               /*C*/ NULL);
+    }
+    static ActionNode* backstab(PlayerbotAI* ai)
+    {
+        return new ActionNode("backstab",
+                              /*P*/ NULL,
+                              /*A*/ NextAction::array(0, new NextAction("sinister strike"), nullptr),
+                              /*C*/ NULL);
+    }
+    static ActionNode* rupture(PlayerbotAI* botAI)
+    {
+        return new ActionNode("rupture",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("eviscerate"), nullptr),
+                              /*C*/ nullptr);
     }
 };
 
@@ -48,7 +64,7 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
                                                          new NextAction("ambush", ACTION_HIGH + 6), nullptr)));
 
     triggers.push_back(new TriggerNode("high energy available",
-                                       NextAction::array(0, new NextAction("mutilate", ACTION_NORMAL + 3), NULL)));
+                                       NextAction::array(0, new NextAction("mutilate", ACTION_NORMAL + 3), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "hunger for blood", NextAction::array(0, new NextAction("hunger for blood", ACTION_HIGH + 6), NULL)));
@@ -57,8 +73,13 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
                                        NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 5), NULL)));
 
     triggers.push_back(new TriggerNode("combo points 3 available",
-                                       NextAction::array(0, new NextAction("envenom", ACTION_HIGH + 4), NULL)));
+                                       NextAction::array(0, new NextAction("envenom", ACTION_HIGH + 5),
+                                       new NextAction("eviscerate", ACTION_HIGH + 3), nullptr)));
 
+    triggers.push_back(new TriggerNode("target with combo points almost dead",
+                                       NextAction::array(0, new NextAction("envenom", ACTION_HIGH + 4),
+                                       new NextAction("eviscerate", ACTION_HIGH + 2), nullptr)));
+                                       
     triggers.push_back(
         new TriggerNode("expose armor", NextAction::array(0, new NextAction("expose armor", ACTION_HIGH + 3), NULL)));
 
@@ -69,8 +90,8 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         new TriggerNode("low health", NextAction::array(0, new NextAction("evasion", ACTION_HIGH + 9),
                                                         new NextAction("feint", ACTION_HIGH + 8), nullptr)));
 
-    triggers.push_back(
-        new TriggerNode("critical health", NextAction::array(0, new NextAction("cloak of shadows", ACTION_HIGH + 7), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "critical health", NextAction::array(0, new NextAction("cloak of shadows", ACTION_HIGH + 7), nullptr)));
 
     triggers.push_back(
         new TriggerNode("kick", NextAction::array(0, new NextAction("kick", ACTION_INTERRUPT + 2), NULL)));
