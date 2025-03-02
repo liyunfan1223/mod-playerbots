@@ -463,9 +463,12 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
 
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
             continue;
+        
+        if (object->ToCreature() && !object->ToCreature()->IsQuestGiver())
+            continue;
 
-        // if (bot->GetQuestDialogStatus(object) < DIALOG_STATUS_AVAILABLE)
-        //     continue;
+        if (object->ToGameObject() && object->ToGameObject()->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
+            continue;
 
         bot->PrepareQuestMenu(guid);
         const QuestMenu &menu = bot->PlayerTalkClass->GetQuestMenu();
@@ -490,6 +493,7 @@ GuidPosition NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float di
             const Quest* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
             if (!quest)
                 continue;
+
             const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
             if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
                 bot->CanAddQuest(quest, false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
