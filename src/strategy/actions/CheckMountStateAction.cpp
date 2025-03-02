@@ -69,7 +69,7 @@ bool CheckMountStateAction::isUseful()
     if ((bot->IsInCombat() || botAI->GetState() == BOT_STATE_COMBAT) &&
         !bot->IsMounted() && botInShapeshiftForm != FORM_TRAVEL && botInShapeshiftForm != FORM_FLIGHT && botInShapeshiftForm != FORM_FLIGHT_EPIC)
         return false;
- 
+
     // In addition to checking IsOutdoors, also check whether bot is clipping below floor slightly because that will
     // cause bot to falsly indicate they are outdoors. This fixes bug where bot tries to mount indoors (which seems
     // to mostly be an issue in tunnels of WSG and AV)
