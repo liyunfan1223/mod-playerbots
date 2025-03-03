@@ -297,7 +297,8 @@ void EquipAction::EquipItem(Item* item)
 
 bool EquipUpgradesAction::Execute(Event event)
 {
-    if (!sPlayerbotAIConfig->autoEquipUpgradeLoot/* && !sRandomPlayerbotMgr->IsRandomBot(bot)*/)
+    /*
+    if (!sPlayerbotAIConfig->autoEquipUpgradeLoot && !sRandomPlayerbotMgr->IsRandomBot(bot))
         return false;
 
     if (event.GetSource() == "trade status")
@@ -310,7 +311,7 @@ bool EquipUpgradesAction::Execute(Event event)
         if (status != TRADE_STATUS_TRADE_ACCEPT)
             return false;
     }
-
+    */
     ListItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
 
