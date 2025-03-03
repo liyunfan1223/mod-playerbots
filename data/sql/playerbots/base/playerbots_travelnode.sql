@@ -3790,5 +3790,4 @@ INSERT INTO `playerbots_travelnode` (`id`, `name`, `map_id`, `x`, `y`, `z`, `lin
 (3776, 'Sholazar Basin The Bones of Nozronn', 571, 5215.95, 5707.58, -85.1135, 1),
 (3777, 'Icecrown Ironwall Rampart', 571, 7765.14, 2732.93, 415.052, 1),
 (3778, 'Alterac Valley', 30, -857.527, -463.559, 47.8953, 1),
-(3779, 'Alterac Valley', 30, -380.387, -123.127, 25.7814, 1),
-(3780, 'Highlord Mograine', 533, 2524.32, -2951.28, 245.633, 1);
+(3779, 'Alterac Valley', 30, -380.387, -123.127, 25.7814, 1);
