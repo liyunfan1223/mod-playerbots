@@ -40,6 +40,10 @@ bool UnlockItemAction::Execute(Event event)
                 UnlockItem(item, bag, slot);
                 foundLockedItem = true;
             }
+            else
+            {
+                botAI->TellError("CanUnlockItem returned false");
+            }
         }
     }
 
