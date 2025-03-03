@@ -132,7 +132,8 @@ void EquipAction::EquipItem(Item* item)
         Item* currentMHItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
         bool have2HWeaponEquipped = (currentMHItem && currentMHItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON);
 
-        bool canDualWieldOrTG = (canDualWield || (canTitanGrip && isTwoHander));
+        // bool canDualWieldOrTG = (canDualWield || (canTitanGrip && isTwoHander));
+        bool canDualWieldOrTG = (canDualWield || isTwoHander);
 
         // If this is a weapon and we can dual wield or Titan Grip, check if we can improve main/off-hand setup
         if (isWeapon && canDualWieldOrTG)
