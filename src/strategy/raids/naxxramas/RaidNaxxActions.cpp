@@ -53,9 +53,9 @@ uint32 GrobbulusRotateAction::GetCurrWaypoint()
     }
     auto* boss_ai = dynamic_cast<Grobbulus::boss_grobbulus::boss_grobbulusAI*>(boss->GetAI());
     if (!boss_ai || boss_ai->events.Empty())
-	{
+    {
         return false;
-	}
+    }
     EventMap* eventMap = &boss_ai->events;
     const uint32 event_time = eventMap->GetNextEventTime(2);
     return (event_time / 15000) % intervals;
@@ -70,9 +70,9 @@ bool HeiganDanceAction::CalculateSafe()
     }
     auto* boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(boss->GetAI());
     if (!boss_ai || boss_ai->events.Empty())
-	{
+    {
         return false;
-	}
+    }
     EventMap* eventMap = &boss_ai->events;
     uint32 curr_phase = boss_ai->currentPhase;
     uint32 curr_erupt = eventMap->GetNextEventTime(3);
