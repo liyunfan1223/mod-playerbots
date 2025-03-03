@@ -154,7 +154,7 @@ void EquipAction::EquipItem(Item* item)
             // Determine where this weapon can go
             bool canGoMain = (invType == INVTYPE_WEAPON ||
                               invType == INVTYPE_WEAPONMAINHAND ||
-                              (canTitanGrip && isTwoHander));
+                              isTwoHander);
 
             bool canTGOff = false;
             if (canTitanGrip && isTwoHander && isValidTGWeapon)
@@ -186,7 +186,8 @@ void EquipAction::EquipItem(Item* item)
             // and if conditions allow (e.g. no conflicting 2H logic)
             bool betterThanMH = (newItemScore > mainHandScore);
             bool mhConditionOK = ((invType != INVTYPE_2HWEAPON && !have2HWeaponEquipped) ||
-                                  (canTitanGrip && isValidTGWeapon));
+                      (isTwoHander && !canTitanGrip) ||
+                      (canTitanGrip && isValidTGWeapon));
 
             if (canGoMain && betterThanMH && mhConditionOK)
             {
@@ -276,12 +277,6 @@ void EquipAction::EquipItem(Item* item)
                     dstSlot++;
                 }
             }
-        }
-
-        // Force two-handed weapons into main hand if the bot can’t Titan Grip
-        if (invType == INVTYPE_2HWEAPON && !bot->CanTitanGrip())
-        {
-            dstSlot = EQUIPMENT_SLOT_MAINHAND;
         }
 
         // Equip the item in the chosen slot
