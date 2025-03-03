@@ -431,17 +431,21 @@ bool HorsemanAttactInOrderAction::Execute(Event event)
     }
     Unit* target = nullptr;
     Unit* thane = AI_VALUE2(Unit*, "find target", "thane korth'azz");
-    Unit* baron = AI_VALUE2(Unit*, "find target", "baron rivendare");
     Unit* lady = AI_VALUE2(Unit*, "find target", "lady blaumeux");
     Unit* sir = AI_VALUE2(Unit*, "find target", "sir zeliek");
+    Unit* fourth = AI_VALUE2(Unit*, "find target", "baron rivendare");
+    if (!fourth)
+    {
+        fourth = AI_VALUE2(Unit*, "find target", "highlord mograine");
+    }
     std::vector<Unit*> attack_order;
     if (botAI->IsAssistTank(bot))
     {
-        attack_order = {baron, thane, lady, sir};
+        attack_order = {fourth, thane, lady, sir};
     }
     else
     {
-        attack_order = {thane, baron, lady, sir};
+        attack_order = {thane, fourth, lady, sir};
     }
     for (Unit* t : attack_order)
     {
