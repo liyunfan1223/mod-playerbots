@@ -297,7 +297,6 @@ void EquipAction::EquipItem(Item* item)
 
 bool EquipUpgradesAction::Execute(Event event)
 {
-    /*
     if (!sPlayerbotAIConfig->autoEquipUpgradeLoot && !sRandomPlayerbotMgr->IsRandomBot(bot))
         return false;
 
@@ -311,7 +310,7 @@ bool EquipUpgradesAction::Execute(Event event)
         if (status != TRADE_STATUS_TRADE_ACCEPT)
             return false;
     }
-    */
+
     ListItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
 
@@ -321,9 +320,9 @@ bool EquipUpgradesAction::Execute(Event event)
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", i->first);
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
-            LOG_INFO("playerbots", "Bot {} <{}> EquipUpgradesAction {} ({})", bot->GetGUID().ToString().c_str(),
-                bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ?
-                "wrong item but empty slot" : "");
+            // LOG_INFO("playerbots", "Bot {} <{}> EquipUpgradesAction {} ({})", bot->GetGUID().ToString().c_str(),
+            //    bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ?
+            //    "wrong item but empty slot" : "");
             items.insert(i->first);
         }
     }
@@ -343,9 +342,9 @@ bool EquipUpgradeAction::Execute(Event event)
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", i->first);
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
-            LOG_INFO("playerbots", "Bot {} <{}> EquipUpgradeAction item {} ({})", bot->GetGUID().ToString().c_str(),
-                bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ?
-                "wrong item but empty slot" : "");
+            // LOG_INFO("playerbots", "Bot {} <{}> EquipUpgradeAction item {} ({})", bot->GetGUID().ToString().c_str(),
+            //    bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ?
+            //    "wrong item but empty slot" : "");
             items.insert(i->first);
         }
     }
