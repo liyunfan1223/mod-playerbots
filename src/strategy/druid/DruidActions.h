@@ -98,6 +98,18 @@ public:
     CastMarkOfTheWildOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "mark of the wild") {}
 };
 
+class CastGiftOfTheWildAction : public CastBuffSpellAction
+{
+public:
+    CastGiftOfTheWildAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "gift of the wild") {}
+};
+
+class CastGiftOfTheWildOnPartyAction : public BuffOnPartyAction
+{
+public:
+    CastGiftOfTheWildOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "gift of the wild") {}
+};
+
 class CastSurvivalInstinctsAction : public CastBuffSpellAction
 {
 public:

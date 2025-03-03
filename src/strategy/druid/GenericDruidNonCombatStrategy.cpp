@@ -16,6 +16,9 @@ public:
         creators["thorns on party"] = &thorns_on_party;
         creators["mark of the wild"] = &mark_of_the_wild;
         creators["mark of the wild on party"] = &mark_of_the_wild_on_party;
+        creators["gift of the wild"] = &gift_of_the_wild;
+        creators["gift of the wild on party"] = &gift_of_the_wild_on_party;
+        
         // creators["innervate"] = &innervate;
         creators["regrowth_on_party"] = &regrowth_on_party;
         creators["rejuvenation on party"] = &rejuvenation_on_party;
@@ -52,6 +55,22 @@ private:
     static ActionNode* mark_of_the_wild_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("mark of the wild on party",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+
+    static ActionNode* gift_of_the_wild([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("gift of the wild",
+                              /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+
+    static ActionNode* gift_of_the_wild_on_party([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("gift of the wild on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                               /*A*/ nullptr,
                               /*C*/ nullptr);
@@ -111,6 +130,8 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
 
     triggers.push_back(
         new TriggerNode("mark of the wild", NextAction::array(0, new NextAction("mark of the wild", 14.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("gift of the wild", NextAction::array(0, new NextAction("gift of the wild", 16.0f), nullptr)));
     // triggers.push_back(new TriggerNode("thorns", NextAction::array(0, new NextAction("thorns", 12.0f), nullptr)));
     // triggers.push_back(new TriggerNode("cure poison", NextAction::array(0, new NextAction("abolish poison", 21.0f),
     // nullptr)));
@@ -167,6 +188,10 @@ void GenericDruidBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("mark of the wild on party",
                         NextAction::array(0, new NextAction("mark of the wild on party", 13.0f), nullptr)));
-    triggers.push_back(new TriggerNode("thorns on main tank",
-                                       NextAction::array(0, new NextAction("thorns on main tank", 11.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("gift of the wild on party", 
+                        NextAction::array(0, new NextAction("gift of the wild on party", 15.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("thorns on main tank",
+                        NextAction::array(0, new NextAction("thorns on main tank", 11.0f), nullptr)));
 }

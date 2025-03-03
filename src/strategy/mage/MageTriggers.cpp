@@ -18,6 +18,23 @@ bool ArcaneIntellectTrigger::IsActive()
     return BuffTrigger::IsActive() && !botAI->HasAura("arcane brilliance", GetTarget());
 }
 
+bool ArcaneBrillianceOnPartyTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("arcane intellect", target) && 
+    botAI->GetBuffedCount((Player*)GetTarget(), "arcane brilliance") < 4;
+}
+
+bool ArcaneBrillianceTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+    return BuffTrigger::IsActive() && !botAI->HasAura("arcane brilliance", target);
+}
+
 bool MageArmorTrigger::IsActive()
 {
     Unit* target = GetTarget();

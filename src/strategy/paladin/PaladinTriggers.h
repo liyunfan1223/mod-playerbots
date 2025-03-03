@@ -73,6 +73,7 @@ INTERRUPT_HEALER_TRIGGER(RepentanceOnHealerTrigger, "repentance on enemy healer"
 SNARE_TRIGGER(RepentanceSnareTrigger, "repentance on snare target");
 INTERRUPT_TRIGGER(RepentanceInterruptTrigger, "repentance");
 
+/*
 class BlessingOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
@@ -89,7 +90,7 @@ public:
 
     bool IsActive() override;
 };
-
+*/
 class HammerOfJusticeInterruptSpellTrigger : public InterruptSpellTrigger
 {
 public:
@@ -210,29 +211,130 @@ public:
     SacredShieldOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "sacred shield", false) {}
 };
 
+//blessing triggers
+class BlessingOfKingsTrigger : public BuffTrigger
+{
+public:
+    BlessingOfKingsTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of kings", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+class BlessingOfWisdomTrigger : public BuffTrigger
+{
+public:
+    BlessingOfWisdomTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of wisdom", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+class BlessingOfMightTrigger : public BuffTrigger
+{
+public:
+    BlessingOfMightTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of might", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+class BlessingOfSanctuaryTrigger : public BuffTrigger
+{
+public:
+    BlessingOfSanctuaryTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of sanctuary", 2 * 2000) {}
+    bool IsActive() override;
+};
+
+//blessing on party tiggers
+
 class BlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     BlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings", 2 * 2000) {}
+    bool IsActive() override;
 };
+
 
 class BlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
-    BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2 * 2000)
-    {
-    }
+    BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of wisdom", 2 * 2000) {} //double name;
+        bool IsActive() override;
 };
+
 
 class BlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
-    BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2 * 2000)
-    {
-    }
+    BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might", 2 * 2000) {}
+        bool IsActive() override;
 };
+
+
+class BlessingOfSanctuaryOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    BlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of sanctuary", 2 * 2000) {}
+        bool IsActive() override; 
+};
+
+
+//greater blessing on party triggers
+class TeamPaladinManager
+{
+public:
+    explicit TeamPaladinManager(ObjectGuid groupGuid);
+    ~TeamPaladinManager();
+
+    void UpdatePaladinList();
+    int GetPaladinOrder(ObjectGuid guid) const;
+
+private:
+    ObjectGuid groupGuid;
+    std::vector<ObjectGuid> sortedPaladins;
+};
+
+class TeamPaladinManagerFactory
+{
+public:
+    static std::shared_ptr<TeamPaladinManager> GetTeamPaladinManager(ObjectGuid groupGuid, int lifetimeSeconds = 30);
+    static void ClearTeamPaladinManager(uint32 groupId);
+
+private:
+    static std::unordered_map<uint32, std::shared_ptr<TeamPaladinManager>> teamManagerMap;
+    static std::mutex teamManagerMutex;
+
+    static void ScheduleDestruction(uint32 groupId, int lifetimeSeconds);
+};
+
+class GreaterBlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of kings", 2 * 2000) {}
+
+    bool IsActive() override;
+};
+
+class GreaterBlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of wisdom", 2 * 2000) {}
+
+    bool IsActive() override;
+};
+
+class GreaterBlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of might", 2 * 2000) {}
+
+        bool IsActive() override;
+};
+
+class GreaterBlessingOfSanctuaryOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GreaterBlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "greater blessing of sanctuary", 2 * 2000) {}
+    
+    bool IsActive() override;
+};
+//
+
 
 class AvengingWrathTrigger : public BoostTrigger
 {

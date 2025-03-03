@@ -37,10 +37,8 @@ bool PrayerOfFortitudeTrigger::IsActive()
     if (!target || !target->IsPlayer())
         return false;
 
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("prayer of fortitude", GetTarget()) &&
-           botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
-           botAI->GetBuffedCount((Player*)GetTarget(), "prayer of fortitude") < 4 &&
-           !botAI->GetBuffedCount((Player*)GetTarget(), "power word: fortitude");
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("power word: fortitude", GetTarget()) &&
+           botAI->GetBuffedCount((Player*)GetTarget(), "prayer of fortitude") < 4;
 }
 
 bool PrayerOfSpiritTrigger::IsActive()
@@ -49,11 +47,9 @@ bool PrayerOfSpiritTrigger::IsActive()
     if (!target || !target->IsPlayer())
         return false;
     
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("prayer of spirit", GetTarget()) &&
-           botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("divine spirit", GetTarget()) &&
            // botAI->GetManaPercent() > 50 &&
-           botAI->GetBuffedCount((Player*)GetTarget(), "prayer of spirit") < 4 &&
-           !botAI->GetBuffedCount((Player*)GetTarget(), "divine spirit");
+           botAI->GetBuffedCount((Player*)GetTarget(), "prayer of spirit") < 4;
 }
 
 bool InnerFireTrigger::IsActive()
