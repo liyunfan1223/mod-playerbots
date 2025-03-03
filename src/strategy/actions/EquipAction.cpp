@@ -278,6 +278,12 @@ void EquipAction::EquipItem(Item* item)
             }
         }
 
+        // Force two-handed weapons into main hand if the bot can’t Titan Grip
+        if (invType == INVTYPE_2HWEAPON && !bot->CanTitanGrip())
+        {
+            dstSlot = EQUIPMENT_SLOT_MAINHAND;
+        }
+
         // Equip the item in the chosen slot
         {
             WorldPacket packet(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
@@ -288,7 +294,7 @@ void EquipAction::EquipItem(Item* item)
     }
 
     std::ostringstream out;
-    out << "equipping " << chat->FormatItem(itemProto);
+    out << "Equipping " << chat->FormatItem(itemProto);
     botAI->TellMaster(out);
 }
 
