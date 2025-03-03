@@ -15,7 +15,6 @@ bool QueryItemUsageAction::Execute(Event event)
     std::string param = event.getParam();
     if (param.empty())
     {
-        botAI->TellMaster("Please specify an item.");
         return false;
     }
 
@@ -23,7 +22,6 @@ bool QueryItemUsageAction::Execute(Event event)
     ItemIds itemIds = chat->parseItems(param);
     if (itemIds.empty())
     {
-        botAI->TellMaster("Invalid item or item not found.");
         return false;
     }
 
@@ -42,7 +40,6 @@ bool QueryItemUsageAction::Execute(Event event)
         return true; // Only process the first valid item
     }
 
-    botAI->TellMaster("Could not determine item usage.");
     return false;
 }
 
