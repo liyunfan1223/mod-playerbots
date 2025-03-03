@@ -22,6 +22,10 @@ bool UnlockItemAction::Execute(Event event)
             UnlockItem(item, INVENTORY_SLOT_BAG_0, slot);
             foundLockedItem = true;
         }
+        else
+        {
+            botAI->TellError("CanUnlockItem returned false");
+        }
     }
 
     // Check items in the bags
