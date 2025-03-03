@@ -75,6 +75,7 @@
 #include "WhoAction.h"
 #include "WtsAction.h"
 #include "OpenItemAction.h"
+#include "UnlockItemAction.h"
 
 class ChatActionContext : public NamedObjectContext<Action>
 {
@@ -82,6 +83,7 @@ public:
     ChatActionContext()
     {
         creators["open items"] = &ChatActionContext::open_items;
+        creators["unlock items"] = &ChatActionContext::unlock_items;
         creators["range"] = &ChatActionContext::range;
         creators["stats"] = &ChatActionContext::stats;
         creators["quests"] = &ChatActionContext::quests;
@@ -183,6 +185,7 @@ public:
 
 private:
     static Action* open_items(PlayerbotAI* botAI) { return new OpenItemAction(botAI); }
+    static Action* unlock_items(PlayerbotAI* botAI) { return new UnlockItemAction(botAI); }
     static Action* range(PlayerbotAI* botAI) { return new RangeAction(botAI); }
     static Action* flag(PlayerbotAI* botAI) { return new FlagAction(botAI); }
     static Action* craft(PlayerbotAI* botAI) { return new SetCraftAction(botAI); }
