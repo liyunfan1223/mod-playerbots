@@ -3234,15 +3234,19 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
             // Check spell target type
             if (targets.GetUnitTarget())
             {
-                out << "Target: Unit (" << targets.GetUnitTarget()->GetName() << "), ";
+                out << "Target: Unit (" << targets.GetUnitTarget()->GetName() 
+                    << ", Low GUID: " << targets.GetUnitTarget()->GetGUID().GetCounter()
+                    << ", High GUID: " << targets.GetUnitTarget()->GetGUID().GetHigh() << "), ";
             }
             else if (targets.GetGOTarget())
             {
-                out << "Target: GameObject (" << targets.GetGOTarget()->GetGUID() << "), ";
+                out << "Target: GameObject (Low GUID: " << targets.GetGOTarget()->GetGUID().GetCounter()
+                    << ", High GUID: " << targets.GetGOTarget()->GetGUID().GetHigh() << "), ";
             }
             else if (targets.GetItemTarget())
             {
-                out << "Target: Item (" << targets.GetItemTarget()->GetGUID() << "), ";
+                out << "Target: Item (Low GUID: " << targets.GetItemTarget()->GetGUID().GetCounter()
+                    << ", High GUID: " << targets.GetItemTarget()->GetGUID().GetHigh() << "), ";
             }
             else
             {
@@ -3256,7 +3260,9 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
                 Item* tradeItem = bot->GetTradeData()->GetTraderData()->GetItem(TRADE_SLOT_NONTRADED);
                 if (tradeItem)
                 {
-                    out << "Trade Item: " << tradeItem->GetEntry() << " (" << tradeItem->GetGUID() << "), ";
+                    out << "Trade Item: " << tradeItem->GetEntry() 
+                        << " (Low GUID: " << tradeItem->GetGUID().GetCounter()
+                        << ", High GUID: " << tradeItem->GetGUID().GetHigh() << "), ";
                 }
                 else
                 {
