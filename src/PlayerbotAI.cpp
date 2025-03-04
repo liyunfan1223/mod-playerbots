@@ -3188,7 +3188,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
             if (trader && lockbox && lockbox->GetTemplate()->LockID > 0 && lockbox->IsLocked())
             {
                 targets.SetTradeItemTarget(bot);
-                targets.SetUnitTarget(bot);
+                // targets.SetUnitTarget(bot);
                 faceTo = trader;
             }
             else
