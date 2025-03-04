@@ -35,6 +35,7 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
                                                                           new NextAction("taxi", relevance), nullptr)));
     triggers.push_back(new TriggerNode("taxi done", NextAction::array(0, new NextAction("taxi", relevance), nullptr)));
     triggers.push_back(new TriggerNode("trade status", NextAction::array(0, new NextAction("accept trade", relevance), new NextAction("equip upgrades", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("trade status extended", NextAction::array(0, new NextAction("trade status extended", relevance), nullptr)));
     triggers.push_back(new TriggerNode("area trigger", NextAction::array(0, new NextAction("reach area trigger", relevance), nullptr)));
     triggers.push_back(new TriggerNode("within area trigger", NextAction::array(0, new NextAction("area trigger", relevance), nullptr)));
     triggers.push_back(new TriggerNode("loot response", NextAction::array(0, new NextAction("store loot", relevance), nullptr)));
