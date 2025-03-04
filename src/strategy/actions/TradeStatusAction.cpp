@@ -15,7 +15,6 @@
 #include "Playerbots.h"
 #include "RandomPlayerbotMgr.h"
 #include "SetCraftAction.h"
-#include "Action.h"
 
 bool TradeStatusAction::Execute(Event event)
 {
@@ -26,7 +25,7 @@ bool TradeStatusAction::Execute(Event event)
 
     PlayerbotAI* traderBotAI = GET_PLAYERBOT_AI(trader);
     
-    // Allow both the master and group members to trade
+    // Allow the master and group members to trade
     if (trader != master && !traderBotAI && (!bot->GetGroup() || !bot->GetGroup()->IsMember(trader->GetGUID())))
     {
         bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader);
@@ -113,63 +112,11 @@ bool TradeStatusAction::Execute(Event event)
     {
         if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, trader, sPlayerbotAIConfig->sightDistance))
             bot->SetFacingToObject(trader);
-    
+
         BeginTrade();
-    
-        // Detect if a lockbox is in the Do Not Trade slot and unlock it automatically
-        TradeData* tradeData = trader->GetTradeData();
-        if (tradeData)
-        {
-            Item* lockbox = tradeData->GetItem(TRADE_SLOT_NONTRADED);
-            if (lockbox && lockbox->GetTemplate()->LockID > 0 && lockbox->IsLocked()) // Only locked items
-            {
-                if (bot->getClass() == CLASS_ROGUE && bot->HasSpell(1804)) // Ensure bot is a Rogue with Pick Lock
-                {
-                    botAI->TellMaster("Let me unlock that for you...");
-    
-                    uint32 spellId = 1804; // Pick Lock spell ID
-                    botAI->CastSpell(spellId, bot, lockbox); // Cast Pick Lock on the traded item
-    
-                    botAI->SetNextCheckDelay(4000); // Wait 4 seconds before accepting the trade
-                }
-                else
-                {
-                    botAI->TellMaster("Not a rogue, or no Pick lock spell");
-                }
-            }
-            else
-            {
-                botAI->TellMaster("No lockbox, Invalid LockID, or box is not locked");
-            }
-        }
-        else
-        {
-            botAI->TellMaster("No trade data found");
-        }
-    
+
         return true;
     }
-
-        
-/*
-        // Detect if a lockbox is in the Do Not Trade slot
-        TradeData* tradeData = trader->GetTradeData();
-        if (tradeData)
-        {
-            Item* lockbox = tradeData->GetItem(TRADE_SLOT_NONTRADED);
-            if (lockbox && lockbox->GetTemplate()->LockID > 0 && lockbox->IsLocked()) // Only locked items
-            {
-                if (bot->getClass() == CLASS_ROGUE && bot->HasSpell(1804)) // Check if bot is a Rogue with Pick Lock
-                {
-                    uint32 spellId = 1804; // Pick Lock spell ID
-                    botAI->CastSpell(spellId, bot, false, lockbox);
-    
-                    botAI->TellMaster("Let me unlock that for you...");
-                    botAI->SetNextCheckDelay(4000); // Wait 4 seconds before accepting the trade
-                }
-            }
-        }
-*/  
     return false;
 }
 
