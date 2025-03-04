@@ -15,6 +15,7 @@
 #include "Playerbots.h"
 #include "RandomPlayerbotMgr.h"
 #include "SetCraftAction.h"
+#include "Action.h"
 
 bool TradeStatusAction::Execute(Event event)
 {
@@ -127,7 +128,7 @@ bool TradeStatusAction::Execute(Event event)
                     botAI->TellMaster("Let me unlock that for you...");
     
                     uint32 spellId = 1804; // Pick Lock spell ID
-                    botAI->CastSpell(spellId, bot, false, lockbox); // Cast Pick Lock on the traded item
+                    botAI->CastSpell(spellId, bot, lockbox); // Cast Pick Lock on the traded item
     
                     botAI->SetNextCheckDelay(4000); // Wait 4 seconds before accepting the trade
                 }
