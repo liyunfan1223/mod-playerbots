@@ -40,12 +40,6 @@ bool OpenItemAction::Execute(Event event)
         }
     }
 
-    // If no openable items found
-    if (!foundOpenable)
-    {
-        botAI->TellError("No openable items in inventory.");
-    }
-
     return foundOpenable;
 }
 
