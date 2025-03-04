@@ -22,10 +22,6 @@ bool UnlockItemAction::Execute(Event event)
             UnlockItem(item, INVENTORY_SLOT_BAG_0, slot);
             foundLockedItem = true;
         }
-        else
-        {
-            botAI->TellError("CanUnlockItem returned false");
-        }
     }
 
     // Check items in the bags
@@ -44,17 +40,7 @@ bool UnlockItemAction::Execute(Event event)
                 UnlockItem(item, bag, slot);
                 foundLockedItem = true;
             }
-            else
-            {
-                botAI->TellError("CanUnlockItem returned false");
-            }
         }
-    }
-
-    // If no locked items found
-    if (!foundLockedItem)
-    {
-        botAI->TellError("No locked items in inventory.");
     }
 
     return foundLockedItem;
@@ -115,12 +101,6 @@ bool UnlockItemAction::CanUnlockItem(Item* item)
 
 void UnlockItemAction::UnlockItem(Item* item, uint8 bag, uint8 slot)
 {
-    if (!bot->HasSpell(PICK_LOCK_SPELL_ID))
-    {
-        botAI->TellError("Cannot unlock, Pick Lock spell is missing.");
-        return;
-    }
-
     // Use CastSpell to unlock the item
     if (botAI->CastSpell(PICK_LOCK_SPELL_ID, bot, item))
     {
