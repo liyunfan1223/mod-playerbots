@@ -3228,7 +3228,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
             std::ostringstream out;
             out << "Spell cast failed - ";
             out << "Spell ID: " << spellId << " (" << ChatHelper::FormatSpell(spellInfo) << "), ";
-            out << "Error Code: " << result << ", ";
+            out << "Error Code: " << static_cast<int>(result) << " (0x" << std::hex << static_cast<int>(result) << std::dec << "), ";
             out << "Bot: " << bot->GetName() << ", ";
     
             // Check spell target type
@@ -3238,19 +3238,17 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
                     << ", Low GUID: " << targets.GetUnitTarget()->GetGUID().GetCounter()
                     << ", High GUID: " << static_cast<uint32>(targets.GetUnitTarget()->GetGUID().GetHigh()) << "), ";
             }
-            else if (targets.GetGOTarget())
+
+            if (targets.GetGOTarget())
             {
                 out << "Target: GameObject (Low GUID: " << targets.GetGOTarget()->GetGUID().GetCounter()
                     << ", High GUID: " << static_cast<uint32>(targets.GetGOTarget()->GetGUID().GetHigh()) << "), ";
             }
-            else if (targets.GetItemTarget())
+
+            if (targets.GetItemTarget())
             {
                 out << "Target: Item (Low GUID: " << targets.GetItemTarget()->GetGUID().GetCounter()
                     << ", High GUID: " << static_cast<uint32>(targets.GetItemTarget()->GetGUID().GetHigh()) << "), ";
-            }
-            else
-            {
-                out << "Target: None, ";
             }
     
             // Check if bot is in trade mode
