@@ -88,7 +88,7 @@ void UnlockTradedItemAction::UnlockItem(Item* item)
     if (botAI->CastSpell(PICK_LOCK_SPELL_ID, bot->GetTrader(), item)) // Unit target is trader
     {
         std::ostringstream out;
-        out << "Used Pick Lock on: " << item->GetTemplate()->Name1;
+        out << "Picking Lock on traded item: " << item->GetTemplate()->Name1;
         botAI->TellMaster(out.str());
     }
     else
