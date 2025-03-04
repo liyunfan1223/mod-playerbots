@@ -3223,6 +3223,53 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         //     LOG_DEBUG("playerbots", "Spell cast failed. - target name: {}, spellid: {}, bot name: {}, result: {}",
         //         target->GetName(), spellId, bot->GetName(), result);
         // }
+        if (HasStrategy("debug spell", BOT_STATE_NON_COMBAT))
+        {
+            std::ostringstream out;
+            out << "Spell cast failed - ";
+            out << "Spell ID: " << spellId << " (" << ChatHelper::FormatSpell(spellInfo) << "), ";
+            out << "Error Code: " << result << ", ";
+            out << "Bot: " << bot->GetName() << ", ";
+    
+            // Check spell target type
+            if (targets.GetUnitTarget())
+            {
+                out << "Target: Unit (" << targets.GetUnitTarget()->GetName() << "), ";
+            }
+            else if (targets.GetGOTarget())
+            {
+                out << "Target: GameObject (" << targets.GetGOTarget()->GetGUID() << "), ";
+            }
+            else if (targets.GetItemTarget())
+            {
+                out << "Target: Item (" << targets.GetItemTarget()->GetGUID() << "), ";
+            }
+            else
+            {
+                out << "Target: None, ";
+            }
+    
+            // Check if bot is in trade mode
+            if (bot->GetTradeData())
+            {
+                out << "Trade Mode: Active, ";
+                Item* tradeItem = bot->GetTradeData()->GetTraderData()->GetItem(TRADE_SLOT_NONTRADED);
+                if (tradeItem)
+                {
+                    out << "Trade Item: " << tradeItem->GetEntry() << " (" << tradeItem->GetGUID() << "), ";
+                }
+                else
+                {
+                    out << "Trade Item: None, ";
+                }
+            }
+            else
+            {
+                out << "Trade Mode: Inactive, ";
+            }
+    
+            TellMasterNoFacing(out);
+        }
         return false;
     }
     // if (spellInfo->Effects[0].Effect == SPELL_EFFECT_OPEN_LOCK || spellInfo->Effects[0].Effect ==
