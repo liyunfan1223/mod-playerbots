@@ -107,11 +107,29 @@ bool TradeStatusAction::Execute(Event event)
     {
         if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, trader, sPlayerbotAIConfig->sightDistance))
             bot->SetFacingToObject(trader);
-
+    
         BeginTrade();
+    
+        // Detect if a lockbox is in the Do Not Trade slot
+        TradeData* tradeData = trader->GetTradeData();
+        if (tradeData)
+        {
+            Item* lockbox = tradeData->GetItem(TRADE_SLOT_NONTRADED);
+            if (lockbox && lockbox->GetTemplate()->LockID > 0 && lockbox->IsLocked()) // Only locked items
+            {
+                if (bot->getClass() == CLASS_ROGUE && bot->HasSpell(1804)) // Check if bot is a Rogue with Pick Lock
+                {
+                    uint32 spellId = 1804; // Pick Lock spell ID
+                    botAI->CastSpell(spellId, bot, false, lockbox);
+    
+                    botAI->TellMaster("Let me unlock that for you...");
+                    botAI->SetNextCheckDelay(4000); // Wait 4 seconds before accepting the trade
+                }
+            }
+        }
+    
         return true;
     }
-
     return false;
 }
 
