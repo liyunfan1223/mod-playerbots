@@ -58,10 +58,18 @@ bool TradeStatusExtendedAction::Execute(Event event)
         {
             botAI->TellMaster("Detecting locked item in trade...");
 
-            if (bot->getClass() == CLASS_ROGUE && bot->HasSpell(1804)) // Pick Lock spell
+            // Get the actual item reference from TradeData
+            Item* lockbox = tradeData->GetItem(TRADE_SLOT_NONTRADED);
+            if (!lockbox)
+            {
+                botAI->TellMaster("Error: Cannot find the lockbox item.");
+                return false;
+            }
+
+            if (bot->getClass() == CLASS_ROGUE && bot->HasSpell(1804) && lockbox->IsLocked()) // Pick Lock spell
             {
                 botAI->TellMaster("Let me unlock that for you...");
-                botAI->CastSpell(1804, bot, nullptr); // Attempt to cast Pick Lock
+                botAI->CastSpell(1804, bot, lockbox); // Attempt to cast Pick Lock on the lockbox
                 botAI->SetNextCheckDelay(4000); // Delay before accepting trade
             }
             else
