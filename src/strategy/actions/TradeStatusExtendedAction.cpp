@@ -11,6 +11,10 @@ bool TradeStatusExtendedAction::Execute(Event event)
     if (!trader)
         return false;
 
+    TradeData* tradeData = trader->GetTradeData();
+    if (!tradeData)
+        return false;
+
     WorldPacket p(event.getPacket());
     p.rpos(0);
 
