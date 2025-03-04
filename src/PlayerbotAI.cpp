@@ -3179,6 +3179,12 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         else if (itemTarget)
         {
             targets.SetItemTarget(itemTarget);
+            Player* trader = bot->GetTrader();
+            if (trader)
+            {
+                targets.SetUnitTarget(trader);
+                faceTo = trader;
+            }
         }
         else
         {
