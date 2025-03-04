@@ -80,7 +80,7 @@ bool CheckMountStateAction::isUseful()
 
     // Not useful when bot does not have mount strat and is not currently mounted
     if (!GET_PLAYERBOT_AI(bot)->HasStrategy("mount", BOT_STATE_NON_COMBAT) && !bot->IsMounted())
-       return false;
+        return false;
 
     // Not useful when level lower than minimum required
     if (bot->GetLevel() < sPlayerbotAIConfig->useGroundMountAtMinLevel)
@@ -144,8 +144,9 @@ bool CheckMountStateAction::Execute(Event /*event*/)
         return true;
     }
 
-    // If there is a master and bot not in BG
     bool inBattleground = bot->InBattleground();
+
+    // If there is a master and bot not in BG
     if (master && !inBattleground)
     {
         Group* group = bot->GetGroup();
@@ -305,9 +306,6 @@ bool CheckMountStateAction::TryPreferredMount(Player* master) const
                 if (index < mounts.size() && sSpellMgr->GetSpellInfo(mounts[index]) &&
                     botAI->CanCastSpell(mounts[index], bot))
                 {
-                    if (bot->isMoving())
-                        bot->StopMoving();
-    
                     botAI->CastSpell(mounts[index], bot);
                     return true;
                 }
@@ -319,6 +317,10 @@ bool CheckMountStateAction::TryPreferredMount(Player* master) const
 
 bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::vector<uint32>>& spells, int32 masterSpeed) const
 {
+    // Required here as otherwise bots won't mount in BG's due to them constant moving
+    if (bot->isMoving())
+        bot->StopMoving();
+
     for (const auto& pair : spells)
     {
         int32 currentSpeed = pair.first;
@@ -333,9 +335,6 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
 
             if (botAI->CanCastSpell(ids[index], bot))
             {
-                if (bot->isMoving())
-                    bot->StopMoving();
-
                 botAI->CastSpell(ids[index], bot);
                 return true;
             }
@@ -370,7 +369,7 @@ bool CheckMountStateAction::ShouldFollowMasterMountState(Player* master, bool no
                                                     masterInShapeshiftForm == FORM_FLIGHT_EPIC ||
                                                     masterInShapeshiftForm == FORM_TRAVEL);
     return isMasterMounted && !bot->IsMounted() && noAttackers &&
-           shouldMount && !bot->IsInCombat() && botAI->GetState() != BOT_STATE_COMBAT;
+        shouldMount && !bot->IsInCombat() && botAI->GetState() != BOT_STATE_COMBAT;
 }
 
 bool CheckMountStateAction::ShouldDismountForMaster(Player* master) const
