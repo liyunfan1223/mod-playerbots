@@ -1,7 +1,7 @@
 /*
-* Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
-* and/or modify it under version 2 of the License, or (at your option), any later version.
-*/
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
+ */
 
 #include "CheckMountStateAction.h"
 #include "BattlegroundWS.h"
@@ -80,7 +80,7 @@ bool CheckMountStateAction::isUseful()
 
     // Not useful when bot does not have mount strat and is not currently mounted
     if (!GET_PLAYERBOT_AI(bot)->HasStrategy("mount", BOT_STATE_NON_COMBAT) && !bot->IsMounted())
-    return false;
+        return false;
 
     // Not useful when level lower than minimum required
     if (bot->GetLevel() < sPlayerbotAIConfig->useGroundMountAtMinLevel)
