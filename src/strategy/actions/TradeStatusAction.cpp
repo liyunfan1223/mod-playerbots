@@ -132,6 +132,14 @@ bool TradeStatusAction::Execute(Event event)
     
                     botAI->SetNextCheckDelay(4000); // Wait 4 seconds before accepting the trade
                 }
+                else
+                {
+                    botAI->TellMaster("Not a rogue, or no Pick lock spell");
+                }
+            }
+            else
+            {
+                botAI->TellMaster("No lockbox, Invalid LockID, or box is not locked");
             }
         }
         else
