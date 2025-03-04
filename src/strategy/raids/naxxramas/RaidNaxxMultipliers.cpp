@@ -41,8 +41,11 @@ float HeiganDanceMultiplier::GetValue(Action* action)
     {
         return 1.0f;
     }
-
     auto* boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(boss->GetAI());
+    if (!boss_ai || boss_ai->events.Empty())
+    {
+        return 1.0f;
+    }
     EventMap* eventMap = &boss_ai->events;
     uint32 curr_phase = boss_ai->currentPhase;
     uint32 curr_dance = eventMap->GetNextEventTime(4);
