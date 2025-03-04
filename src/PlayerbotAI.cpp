@@ -3181,15 +3181,26 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         else if (itemTarget)
         {
             Player* trader = bot->GetTrader();
-            if (trader)
+            TradeData* tradeData = bot->GetTradeData();
+        
+            if (trader && tradeData)
             {
-                targets.SetTradeItemTarget(bot);
-                targets.SetUnitTarget(bot);
-                faceTo = trader;
+                Item* lockbox = tradeData->GetItem(TRADE_SLOT_NONTRADED);
+                
+                if (lockbox && lockbox->GetTemplate()->LockID > 0 && lockbox->IsLocked()) // Only SetTradeItemTarget if a locked item exists
+                {
+                    targets.SetTradeItemTarget(bot);
+                    targets.SetUnitTarget(bot);
+                    faceTo = trader;
+                }
+                else
+                {
+                    targets.SetItemTarget(itemTarget); // Fallback to normal item targeting because no lockbox is in the trade window
+                }
             }
             else
             {
-                targets.SetItemTarget(itemTarget);
+                targets.SetItemTarget(itemTarget); // Normal item targeting outside of trade
             }
         }
         else
