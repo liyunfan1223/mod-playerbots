@@ -26,9 +26,6 @@ struct MountData
 
 struct PreferredMountCache
 {
-    bool tableExists = false;
-    bool tableChecked = false;
-    std::vector<uint32> preferredMounts;
     std::vector<uint32> groundMounts;
     std::vector<uint32> flightMounts;
 };
