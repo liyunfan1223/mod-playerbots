@@ -26,7 +26,7 @@ bool TradeStatusAction::Execute(Event event)
     PlayerbotAI* traderBotAI = GET_PLAYERBOT_AI(trader);
     
     // Allow both the master and group members to trade
-    if (trader != master && !traderBotAI && !bot->GetGroup() && !bot->GetGroup()->IsMember(trader->GetGUID()))
+    if (trader != master && !traderBotAI && (!bot->GetGroup() || !bot->GetGroup()->IsMember(trader->GetGUID())))
     {
         bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader);
         return false;
