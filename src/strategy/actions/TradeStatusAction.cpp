@@ -134,6 +134,10 @@ bool TradeStatusAction::Execute(Event event)
                 }
             }
         }
+        else
+        {
+            botAI->TellMaster("No trade data found");
+        }
     
         return true;
     }
