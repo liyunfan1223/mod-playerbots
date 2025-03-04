@@ -37,6 +37,7 @@
 #include "TellCastFailedAction.h"
 #include "TellMasterAction.h"
 #include "TradeStatusAction.h"
+#include "TradeStatusExtendedAction.h"
 #include "UseMeetingStoneAction.h"
 #include "NamedObjectContext.h"
 
