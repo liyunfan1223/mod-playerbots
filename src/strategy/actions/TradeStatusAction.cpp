@@ -109,7 +109,7 @@ bool TradeStatusAction::Execute(Event event)
             bot->SetFacingToObject(trader);
     
         BeginTrade();
-    
+/*
         // Detect if a lockbox is in the Do Not Trade slot
         TradeData* tradeData = trader->GetTradeData();
         if (tradeData)
@@ -127,7 +127,7 @@ bool TradeStatusAction::Execute(Event event)
                 }
             }
         }
-    
+*/  
         return true;
     }
     return false;
