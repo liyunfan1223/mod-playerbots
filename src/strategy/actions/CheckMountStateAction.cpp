@@ -195,7 +195,6 @@ bool CheckMountStateAction::Mount()
         botAI->RemoveAura("tree of life");
     }
 
-    // Disabled for now until properly implemented
     if (TryPreferredMount(master))
         return true;
 
