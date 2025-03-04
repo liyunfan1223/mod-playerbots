@@ -3236,17 +3236,17 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
             {
                 out << "Target: Unit (" << targets.GetUnitTarget()->GetName() 
                     << ", Low GUID: " << targets.GetUnitTarget()->GetGUID().GetCounter()
-                    << ", High GUID: " << targets.GetUnitTarget()->GetGUID().GetHigh() << "), ";
+                    << ", High GUID: " << static_cast<uint32>(targets.GetUnitTarget()->GetGUID().GetHigh()) << "), ";
             }
             else if (targets.GetGOTarget())
             {
                 out << "Target: GameObject (Low GUID: " << targets.GetGOTarget()->GetGUID().GetCounter()
-                    << ", High GUID: " << targets.GetGOTarget()->GetGUID().GetHigh() << "), ";
+                    << ", High GUID: " << static_cast<uint32>(targets.GetGOTarget()->GetGUID().GetHigh()) << "), ";
             }
             else if (targets.GetItemTarget())
             {
                 out << "Target: Item (Low GUID: " << targets.GetItemTarget()->GetGUID().GetCounter()
-                    << ", High GUID: " << targets.GetItemTarget()->GetGUID().GetHigh() << "), ";
+                    << ", High GUID: " << static_cast<uint32>(targets.GetItemTarget()->GetGUID().GetHigh()) << "), ";
             }
             else
             {
@@ -3262,7 +3262,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
                 {
                     out << "Trade Item: " << tradeItem->GetEntry() 
                         << " (Low GUID: " << tradeItem->GetGUID().GetCounter()
-                        << ", High GUID: " << tradeItem->GetGUID().GetHigh() << "), ";
+                        << ", High GUID: " << static_cast<uint32>(tradeItem->GetGUID().GetHigh()) << "), ";
                 }
                 else
                 {
@@ -3276,6 +3276,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     
             TellMasterNoFacing(out);
         }
+
         return false;
     }
     // if (spellInfo->Effects[0].Effect == SPELL_EFFECT_OPEN_LOCK || spellInfo->Effects[0].Effect ==
