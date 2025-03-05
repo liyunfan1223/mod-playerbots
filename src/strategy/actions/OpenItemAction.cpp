@@ -40,12 +40,6 @@ bool OpenItemAction::Execute(Event event)
         }
     }
 
-    // If no openable items found
-    if (!foundOpenable)
-    {
-        botAI->TellError("No openable items in inventory.");
-    }
-
     return foundOpenable;
 }
 
@@ -58,8 +52,9 @@ bool OpenItemAction::CanOpenItem(Item* item)
     if (!itemTemplate)
         return false;
 
-    // Check if the item has the openable flag
-    return itemTemplate->Flags & ITEM_FLAG_HAS_LOOT;
+    // Check if the item has the openable flag and is not locked
+    return (itemTemplate->Flags & ITEM_FLAG_HAS_LOOT) && 
+       (itemTemplate->LockID == 0 || !item->IsLocked());
 }
 
 void OpenItemAction::OpenItem(Item* item, uint8 bag, uint8 slot)
