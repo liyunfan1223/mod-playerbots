@@ -12,8 +12,9 @@ void CombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("enemy out of spell",
                                        NextAction::array(0, new NextAction("reach spell", ACTION_HIGH), nullptr)));
+    // drop target relevance 99 (lower than Worldpacket triggers)
     triggers.push_back(
-        new TriggerNode("invalid target", NextAction::array(0, new NextAction("drop target", 100), nullptr)));
+        new TriggerNode("invalid target", NextAction::array(0, new NextAction("drop target", 99), nullptr)));
     triggers.push_back(
         new TriggerNode("mounted", NextAction::array(0, new NextAction("check mount state", 54), nullptr)));
     // triggers.push_back(new TriggerNode("out of react range", NextAction::array(0, new NextAction("flee to master",
