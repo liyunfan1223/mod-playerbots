@@ -92,10 +92,25 @@ ItemUsage ItemUsageValue::Calculate()
     if (equip != ITEM_USAGE_NONE)
         return equip;
 
+    // Get item instance to check if it's soulbound
+    Item* item = bot->GetItemByEntry(proto->ItemId);
+    bool isSoulbound = item && item->IsSoulBound();
+
     if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) &&
-        proto->Bonding != BIND_WHEN_PICKED_UP && botAI->HasSkill(SKILL_ENCHANTING) &&
+        botAI->HasSkill(SKILL_ENCHANTING) &&
         proto->Quality >= ITEM_QUALITY_UNCOMMON)
-        return ITEM_USAGE_DISENCHANT;
+    {
+        // Retrieve the bot's Enchanting skill level
+        uint32 enchantingSkill = bot->GetSkillValue(SKILL_ENCHANTING);
+
+        // Check if the bot has a high enough skill to disenchant this item
+        if (proto->RequiredDisenchantSkill > 0 && enchantingSkill < proto->RequiredDisenchantSkill)
+            return ITEM_USAGE_NONE; // Not skilled enough to disenchant
+
+        // BoE (Bind on Equip) items should NOT be disenchanted unless they are already bound
+        if (proto->Bonding == BIND_WHEN_PICKED_UP || (proto->Bonding == BIND_WHEN_EQUIPPED && isSoulbound))
+            return ITEM_USAGE_DISENCHANT;
+    }
 
     // While sync is on, do not loot quest items that are also Useful for master. Master
     if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer ||
@@ -169,7 +184,7 @@ ItemUsage ItemUsageValue::Calculate()
     // Need to add something like free bagspace or item value.
     if (proto->SellPrice > 0)
     {
-        if (proto->Quality > ITEM_QUALITY_NORMAL)
+        if (proto->Quality >= ITEM_QUALITY_NORMAL && !isSoulbound)
         {
             return ITEM_USAGE_AH;
         }
