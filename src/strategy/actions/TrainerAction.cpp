@@ -208,14 +208,11 @@ bool AutoGearAction::Execute(Event event)
         return false;
     }
 
-    if (!sPlayerbotAIConfig->autoGearCommandAltBots)
+    if (!sPlayerbotAIConfig->autoGearCommandAltBots &&
+        !sPlayerbotAIConfig->IsInRandomAccountList(bot->GetSession()->GetAccountId()))
     {
-        uint32 botAccountId = bot->GetSession()->GetAccountId();
-        if (!sPlayerbotAIConfig->IsInRandomAccountList(botAccountId))
-        {
-            botAI->TellError("You cannot use autogear on alt bots.");
-            return false;
-        }
+        botAI->TellError("You cannot use autogear on alt bots.");
+        return false;
     }
 
     botAI->TellMaster("I'm auto gearing");
