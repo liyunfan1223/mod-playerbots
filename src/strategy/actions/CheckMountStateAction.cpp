@@ -14,7 +14,7 @@
 
 // Define the static map / init bool for caching bot preferred mount data globally
 std::unordered_map<uint32, PreferredMountCache> CheckMountStateAction::mountCache;
-bool CheckMountStateAction::preferredMountTableExists = false;
+bool CheckMountStateAction::preferredMountTableChecked = false;
 
 MountData CollectMountData(const Player* bot)
 {
@@ -277,7 +277,7 @@ bool CheckMountStateAction::TryPreferredMount(Player* master) const
     uint32 botGUID = bot->GetGUID().GetRawValue();
 
     // Build cache (only once)
-    if (!preferredMountTableExists)
+    if (!preferredMountTableChecked)
     {
         // Verify preferred mounts table existance in the database
         QueryResult checkTable = PlayerbotsDatabase.Query(
@@ -285,7 +285,7 @@ bool CheckMountStateAction::TryPreferredMount(Player* master) const
 
         if (checkTable && checkTable->Fetch()[0].Get<uint32>() == 1)
         {
-            preferredMountTableExists = true;
+            preferredMountTableChecked = true;
 
             // Cache all mounts of both types globally, for all entries
             QueryResult result = PlayerbotsDatabase.Query("SELECT guid, spellid, type FROM playerbots_preferred_mounts");
@@ -312,9 +312,12 @@ bool CheckMountStateAction::TryPreferredMount(Player* master) const
                 LOG_INFO("playerbots", "Preferred mounts initialized | Total records: {}", totalResults);
             }
         }
-        else // If the SQL table is missing, return false
+        else // If the SQL table is missing, log an error and return false
         {
-            LOG_ERROR("playerbots", "Preferred mounts SQL table playerbots_preferred_mounts does not exist!");
+            preferredMountTableChecked = true;
+
+            LOG_DEBUG("playerbots", "Preferred mounts SQL table playerbots_preferred_mounts does not exist!");
+
             return false;
         }
     }
