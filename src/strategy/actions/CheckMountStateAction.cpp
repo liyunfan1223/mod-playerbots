@@ -14,7 +14,7 @@
 
 // Define the static map / init bool for caching bot preferred mount data globally
 std::unordered_map<uint32, PreferredMountCache> CheckMountStateAction::mountCache;
-bool CheckMountStateAction::preferredMountTableExists = false;
+bool CheckMountStateAction::preferredMountTableChecked = false;
 
 MountData CollectMountData(const Player* bot)
 {
