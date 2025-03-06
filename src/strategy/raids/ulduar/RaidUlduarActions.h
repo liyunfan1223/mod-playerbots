@@ -114,4 +114,20 @@ public:
     bool isUseful() override;
 };
 
+class FreyaMoveAwayNatureBombAction : public MovementAction
+{
+public:
+    FreyaMoveAwayNatureBombAction(PlayerbotAI* botAI) : MovementAction(botAI, "freya move away nature bomb") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class FreyaMarkEonarsGiftAction : public MovementAction
+{
+public:
+    FreyaMarkEonarsGiftAction(PlayerbotAI* botAI) : MovementAction(botAI, "freya mark eonars gift") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 #endif
