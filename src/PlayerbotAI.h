@@ -15,13 +15,14 @@
 #include "Common.h"
 #include "Event.h"
 #include "Item.h"
+#include "NewRpgStrategy.h"
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
 #include "PlayerbotTextMgr.h"
 #include "SpellAuras.h"
+#include "Util.h"
 #include "WorldPacket.h"
-#include "NewRpgStrategy.h"
 
 class AiObjectContext;
 class Creature;
@@ -408,8 +409,8 @@ public:
     static bool IsRanged(Player* player, bool bySpec = false);
     static bool IsMelee(Player* player, bool bySpec = false);
     static bool IsCaster(Player* player, bool bySpec = false);
-    static bool IsCombo(Player* player, bool bySpec = false);
     static bool IsRangedDps(Player* player, bool bySpec = false);
+    static bool IsCombo(Player* player);
     static bool IsMainTank(Player* player);
     static uint32 GetGroupTankNum(Player* player);
     bool IsAssistTank(Player* player);
@@ -419,7 +420,7 @@ public:
     bool HasAggro(Unit* unit);
     int32 GetGroupSlotIndex(Player* player);
     int32 GetRangedIndex(Player* player);
-    int32 GetClassIndex(Player* player, uint8_t cls);
+    int32 GetClassIndex(Player* player, uint8 cls);
     int32 GetRangedDpsIndex(Player* player);
     int32 GetMeleeIndex(Player* player);
 
@@ -461,6 +462,7 @@ public:
     bool PlayEmote(uint32 emote);
     void Ping(float x, float y);
     Item* FindPoison() const;
+    Item* FindAmmo() const;
     Item* FindBandage() const;
     Item* FindConsumable(uint32 displayId) const;
     Item* FindStoneFor(Item* weapon) const;
@@ -483,8 +485,8 @@ public:
     virtual bool HasAuraToDispel(Unit* player, uint32 dispelType);
     bool CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell = true, Item* itemTarget = nullptr,
                       Item* castItem = nullptr);
-    bool CanCastSpell(uint32 spellid, GameObject* goTarget, uint8 effectMask, bool checkHasSpell = true);
-    bool CanCastSpell(uint32 spellid, float x, float y, float z, uint8 effectMask, bool checkHasSpell = true,
+    bool CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkHasSpell = true);
+    bool CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell = true,
                       Item* itemTarget = nullptr);
 
     bool HasAura(uint32 spellId, Unit const* player);
@@ -520,7 +522,7 @@ public:
     bool IsAlt();
     Player* GetGroupMaster();
     // Returns a semi-random (cycling) number that is fixed for each bot.
-    uint32 GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum = 100, float cyclePerMin = 1);
+    uint32 GetFixedBotNumer(uint32 maxNum = 100, float cyclePerMin = 1);
     GrouperType GetGrouperType();
     GuilderType GetGuilderType();
     bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig->reactDistance);
@@ -555,6 +557,7 @@ public:
     void ResetJumpDestination() { jumpDestination = Position(); }
 
     bool CanMove();
+    static bool IsRealGuild(uint32 guildId);
     bool IsInRealGuild();
     static std::vector<std::string> dispel_whitelist;
     bool EqualLowercaseName(std::string s1, std::string s2);
@@ -573,13 +576,16 @@ public:
     std::set<uint32> GetCurrentIncompleteQuestIds();
     void PetFollow();
     static float GetItemScoreMultiplier(ItemQualities quality);
+    static bool IsHealingSpell(uint32 spellFamilyName, flag96 spelFalimyFlags);
+    static SpellFamilyNames Class2SpellFamilyName(uint8 cls);
     NewRpgInfo rpgInfo;
 
 private:
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
                                    bool mixed = false);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
-
+    void UpdateAIGroupMembership();
+    Item* FindItemInInventory(std::function<bool(ItemTemplate const*)> checkItem) const;
     void HandleCommands();
     void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
     bool _isBotInitializing = false;

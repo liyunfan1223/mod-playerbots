@@ -33,7 +33,7 @@ bool FollowAction::Execute(Event event)
         
         MovementPriority priority = botAI->GetState() == BOT_STATE_COMBAT ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_NORMAL;
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), false, false, false,
-                       true, priority);
+                       true, priority, true);
     }
 
     if (Pet* pet = bot->GetPet())

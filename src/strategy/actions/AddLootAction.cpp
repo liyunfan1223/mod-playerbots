@@ -51,29 +51,11 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
     if (loot.IsEmpty() || !wo)
         return false;
 
-    if (!bot->IsWithinLOSInMap(wo))
-        return false;
-
     if (loot.skillId == SKILL_NONE)
         return false;
 
     if (!loot.IsLootPossible(bot))
         return false;
-
-    if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, wo), INTERACTION_DISTANCE))
-    {
-        std::list<Unit*> targets;
-        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(bot, bot, sPlayerbotAIConfig->lootDistance);
-        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
-        Cell::VisitAllObjects(bot, searcher, sPlayerbotAIConfig->lootDistance * 1.5f);
-        if (!targets.empty())
-        {
-            std::ostringstream out;
-            out << "Kill that " << targets.front()->GetName() << " so I can loot freely";
-            botAI->TellError(out.str());
-            return false;
-        }
-    }
 
     return AddAllLootAction::AddLoot(guid);
 }

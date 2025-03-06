@@ -33,6 +33,17 @@ bool FingersOfFrostSingleTrigger::IsActive()
     return (aura && aura->GetCharges() == 1);
 }
 
+bool ArcaneBlastStackTrigger::IsActive()
+{
+    Aura* aura = botAI->GetAura(getName(), GetTarget(), false, true, 3);
+    if (!aura)
+        return false;
+    if (aura->GetStackAmount() >= 4)
+        return true;
+    bool hasMissileBarrage = botAI->HasAura(44401, bot);
+    return hasMissileBarrage;
+}
+
 bool FrostNovaOnTargetTrigger::IsActive()
 {
     Unit* target = GetTarget();
@@ -51,4 +62,25 @@ bool FrostbiteOnTargetTrigger::IsActive()
         return false;
     }
     return botAI->HasAura(spell, target);
+}
+
+bool NoFocusMagicTrigger::IsActive()
+{
+    if (!bot->HasSpell(54646))
+        return false;
+    
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (!member || member == bot || !member->IsAlive())
+            continue;
+
+        if (member->HasAura(54646, bot->GetGUID()))
+            return false;
+    }
+    return true;
 }

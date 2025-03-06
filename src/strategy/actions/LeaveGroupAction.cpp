@@ -84,9 +84,7 @@ bool LeaveGroupAction::Leave(Player* player)
     bool shouldStay = randomBot && bot->GetGroup() && player == bot;
     if (!shouldStay)
     {
-        WorldPacket p;
-        p << uint32(PARTY_OP_LEAVE) << bot->GetName() << uint32(0);
-        bot->GetSession()->HandleGroupDisbandOpcode(p);
+        bot->RemoveFromGroup();
     }
 
     if (randomBot)

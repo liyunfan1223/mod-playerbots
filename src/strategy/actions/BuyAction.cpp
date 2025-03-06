@@ -11,6 +11,7 @@
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
+#include "StatsWeightCalculator.h"
 
 bool BuyAction::Execute(Event event)
 {
@@ -61,30 +62,87 @@ bool BuyAction::Execute(Event event)
             if (m_items_sorted.empty())
                 continue;
 
-            std::sort(m_items_sorted.begin(), m_items_sorted.end(),
-                      [](VendorItem* i, VendorItem* j) {
-                          return sObjectMgr->GetItemTemplate(i->item)->ItemLevel >
-                                 sObjectMgr->GetItemTemplate(j->item)->ItemLevel;
-                      });
+            StatsWeightCalculator calculator(bot);
+            calculator.SetItemSetBonus(false);
+            calculator.SetOverflowPenalty(false);
 
+            std::sort(m_items_sorted.begin(), m_items_sorted.end(),
+                [&calculator](VendorItem* i, VendorItem* j) 
+                {
+                    ItemTemplate const* item1 = sObjectMgr->GetItemTemplate(i->item);
+                    ItemTemplate const* item2 = sObjectMgr->GetItemTemplate(j->item);
+    
+                    if (!item1 || !item2)
+                        return false;
+                
+                    float score1 = calculator.CalculateItem(item1->ItemId);
+                    float score2 = calculator.CalculateItem(item2->ItemId);
+
+                    // Fallback to itemlevel if either score is 0
+                    if (score1 == 0 || score2 == 0)
+                    {
+                        score1 = item1->ItemLevel;
+                        score2 = item2->ItemLevel;
+                    }
+                    return score1 > score2; // Sort in descending order (highest score first)
+                });
+
+            std::unordered_map<uint32, float> bestPurchasedItemScore;  // Track best item score per InventoryType
+            
             for (auto& tItem : m_items_sorted)
             {
-                for (uint32 i = 0; i < 10; i++)  // Buy 10 times or until no longer usefull/possible
+                uint32 maxPurchases = 1;  // Default to buying once
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
+                if (!proto)
+                    continue;
+            
+                if (proto->Class == ITEM_CLASS_CONSUMABLE || proto->Class == ITEM_CLASS_PROJECTILE)
+                {
+                    maxPurchases = 10;  // Allow up to 10 purchases if it's a consumable or projectile
+                }
+            
+                for (uint32 i = 0; i < maxPurchases; i++)
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
-                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
+
+                    uint32 invType = proto->InventoryType;
+
+                    // Calculate item score
+                    float newScore = calculator.CalculateItem(proto->ItemId);
+
+                    // Skip if we already bought a better item for this slot
+                    if (bestPurchasedItemScore.find(invType) != bestPurchasedItemScore.end() &&
+                        bestPurchasedItemScore[invType] > newScore)
+                    {
+                        break;  // Skip lower-scoring items
+                    }
+
+                    // Check the bot's currently equipped item for this slot
+                    uint8 dstSlot = botAI->FindEquipSlot(proto, NULL_SLOT, true);
+                    Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot);
+
+                    float oldScore = 0.0f;
+                    if (oldItem)
+                    {
+                        ItemTemplate const* oldItemProto = oldItem->GetTemplate();
+                        if (oldItemProto)
+                            oldScore = calculator.CalculateItem(oldItemProto->ItemId);
+                    }
+
+                    // Skip if the bot already has a better or equal item equipped
+                    if (oldScore > newScore)
+                        break;
 
                     uint32 price = proto->BuyPrice;
-
-                    // reputation discount
                     price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
 
                     NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
-
                     switch (usage)
                     {
                         case ITEM_USAGE_REPLACE:
                         case ITEM_USAGE_EQUIP:
+                        case ITEM_USAGE_BAD_EQUIP:
+                        case ITEM_USAGE_BROKEN_EQUIP:
                             needMoneyFor = NeedMoneyFor::gear;
                             break;
                         case ITEM_USAGE_AMMO:
@@ -112,11 +170,12 @@ bool BuyAction::Execute(Event event)
                     if (!BuyItem(tItems, vendorguid, proto))
                         break;
 
-                    if (usage == ITEM_USAGE_REPLACE ||
-                        usage == ITEM_USAGE_EQUIP)  // Equip upgrades and stop buying this time.
+                    // Store the best item score per InventoryType
+                    bestPurchasedItemScore[invType] = newScore;
+
+                    if (needMoneyFor == NeedMoneyFor::gear)
                     {
                         botAI->DoSpecificAction("equip upgrades");
-                        break;
                     }
                 }
             }
@@ -140,6 +199,15 @@ bool BuyAction::Execute(Event event)
                     std::ostringstream out;
                     out << "Nobody sells " << ChatHelper::FormatItem(proto) << " nearby";
                     botAI->TellMaster(out.str());
+                    continue;
+                }
+
+                ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
+                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP ||
+                    usage == ITEM_USAGE_BAD_EQUIP || usage == ITEM_USAGE_BROKEN_EQUIP)
+                {
+                    botAI->DoSpecificAction("equip upgrades");
+                    break;
                 }
             }
         }

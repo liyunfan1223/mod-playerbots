@@ -23,8 +23,8 @@ public:
 protected:
     // const int32 setGrindInterval = 5 * 60 * 1000;
     // const int32 setNpcInterval = 1 * 60 * 1000;
-    const int32 statusNearNpcDuration = 2 * 60 * 1000;
-    const int32 statusNearRandomDuration = 2 * 60 * 1000;
+    const int32 statusNearNpcDuration = 5 * 60 * 1000;
+    const int32 statusNearRandomDuration = 5 * 60 * 1000;
     const int32 statusRestDuration = 30 * 1000;
     WorldPosition SelectRandomGrindPos();
     WorldPosition SelectRandomInnKeeperPos();
@@ -39,7 +39,8 @@ public:
 
 protected:
     // WorldPosition dest;
-    float pathFinderDis = 70.0f; // path finder
+    const float pathFinderDis = 70.0f; // path finder
+    const uint32 stuckTime = 5 * 60 * 1000;
 };
 
 class NewRpgGoGrindAction : public NewRpgGoFarAwayPosAction

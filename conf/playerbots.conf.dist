@@ -5,57 +5,59 @@
 ###################################################################################################
 # SECTION INDEX
 #   GENERAL SETTINGS
-#	PLAYERBOT SETTINGS
-#		GENERAL
-#		SUMMON OPTIONS
-#		GEAR
-#		LOOTING
-#		TIMERS
-#		DISTANCES
-#		THRESHOLDS
-#		QUESTS
-#		COMBAT
-#		CHEATS
-#		SPELLS
-#	PLAYERBOT RNDBOT SPECIFIC SETTINGS
-#		GENERAL
-#		LEVELS
-#		GEAR
-#		QUESTS
-#		SPELLS
-#		STRATEGIES
-#		TELEPORTS
-#		BATTLEGROUND & ARENA & PVP
-#		INTERVALS
-#	PREMADE SPECS
-#		INFORMATION
-#		WARRIOR
-#		PALADIN
-#		HUNTER
-#		ROGUE
-#		PRIEST
-#		DEATHKNIGHT
-#		SHAMAN
-#		MAGE
-#		WARLOCK
-#		DRUID
-#	RANDOM BOT DEFAULT TALENT SPEC 
-#    	WARRIOR
-# 		PALADIN
-#       HUNTER
-#   	ROGUE
-#   	PRIEST
-#   	DEATHKNIGHT
-#	    SHAMAN
-#   	MAGE
-#   	WARLOCK
-#   	DRUID
-#	PLAYERBOT SYSTEM SETTINGS
-#		DATABASE & CONNECTIONS
-#		DEBUG		
-#		CHAT SETTINGS
-#		LOGS
-#	DEPRECIATED (TEMPORARY)
+#    PLAYERBOT SETTINGS
+#        GENERAL
+#        SUMMON OPTIONS
+#        MOUNT
+#        GEAR
+#        LOOTING
+#        TIMERS
+#        DISTANCES
+#        THRESHOLDS
+#        QUESTS
+#        COMBAT
+#        CHEATS
+#        SPELLS
+#    PLAYERBOT RNDBOT SPECIFIC SETTINGS
+#        GENERAL
+#        LEVELS
+#        GEAR
+#        QUESTS
+#        ACTIVITIES
+#        SPELLS
+#        STRATEGIES
+#        TELEPORTS
+#        BATTLEGROUND & ARENA & PVP
+#        INTERVALS
+#    PREMADE SPECS
+#        INFORMATION
+#        WARRIOR
+#        PALADIN
+#        HUNTER
+#        ROGUE
+#        PRIEST
+#        DEATHKNIGHT
+#        SHAMAN
+#        MAGE
+#        WARLOCK
+#        DRUID
+#    RANDOM BOT DEFAULT TALENT SPEC 
+#        WARRIOR
+#        PALADIN
+#        HUNTER
+#        ROGUE
+#        PRIEST
+#        DEATHKNIGHT
+#        SHAMAN
+#        MAGE
+#        WARLOCK
+#        DRUID
+#    PLAYERBOT SYSTEM SETTINGS
+#        DATABASE & CONNECTIONS
+#        DEBUG        
+#        CHAT SETTINGS
+#        LOGS
+#    DEPRECIATED (TEMPORARY)
 #
 #
 #
@@ -79,13 +81,15 @@ AiPlayerbot.Enabled = 1
 # Enable random bot system
 AiPlayerbot.RandomBotAutologin = 1
 
-# Random bot account
-# Please ensure that RandomBotAccountCount is greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
-AiPlayerbot.RandomBotAccountCount = 200
-
 # Random bot count
 AiPlayerbot.MinRandomBots = 50
 AiPlayerbot.MaxRandomBots = 50
+
+# Random bot accounts
+# If you are not using any expansion at all, you may have to set this manually, then
+# please ensure that RandomBotAccountCount is at least greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
+# default: 0 - Automatic
+AiPlayerbot.RandomBotAccountCount = 0
 
 # Delete all random bot accounts (reset randombots)
 AiPlayerbot.DeleteRandomBotAccounts = 0
@@ -105,18 +109,14 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 #
 #
 
-# Maximum number of bots added by one account
+# The maximum number of bots that a player can control simultaneously
 AiPlayerbot.MaxAddedBots = 40
-
-# Maximum number of bots per class added by one account
-AiPlayerbot.MaxAddedBotsPerClass = 40
 
 # Enable/Disable create bot by addclass command (0 = GM only, 1 = enable)
 # default: 1 (enable)
 AiPlayerbot.AddClassCommand = 1
 
 # Set the addclass command account pool size
-# Addclass command uses a subset of accounts from RandomBotAccountCount
 AiPlayerbot.AddClassAccountPoolSize = 50
 
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
@@ -126,12 +126,17 @@ AiPlayerbot.GroupInvitationPermission = 1
 # auto-login all player alts as bots on player login
 AiPlayerbot.BotAutologin = 0
 
-# Allow login other players' characters as bots
-# Default: 0 (disabled)
-AiPlayerbot.AllowPlayerBots = 0
+# Allow/deny bots from the player's account
+AiPlayerbot.AllowAccountBots = 1
 
-# Allow/deny bots from your guild
+# Allow/deny bots in the player's guild
 AiPlayerbot.AllowGuildBots = 1
+
+# Random bot guild count
+AiPlayerbot.RandomBotGuildCount = 20
+
+# Delete all random bot guilds
+AiPlayerbot.DeleteRandomBotGuilds = 0
 
 # Randombots will invite nearby bots to guilds
 AiPlayerbot.RandomBotGuildNearby = 0
@@ -193,6 +198,36 @@ AiPlayerbot.ReviveBotWhenSummoned = 1
 # Enable/Disable bot repair gear when summon (0 = no, 1 = yes)
 # default: 1
 AiPlayerbot.BotRepairWhenSummon = 1
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
+# MOUNT
+#
+#
+
+# Defines at what level a bot will naturally use its 60% ground mount
+# note: was level 20 during WotLK, 30 during TBC, 40 during Vanilla
+# default: 20
+AiPlayerbot.UseGroundMountAtMinLevel = 20
+
+# Defines at what level a bot will naturally use its 100% fast ground mount
+# note: was level 40 during WotLK, 60 during Vanilla
+# default: 40
+AiPlayerbot.UseFastGroundMountAtMinLevel = 40
+
+# Defines at what level a bot will naturally use its 150% fly mount
+# note: was level 60 during WotLK, 70 during TBC
+# default: 60
+AiPlayerbot.UseFlyMountAtMinLevel = 60
+
+# Defines at what level a bot will naturally use its 280% fast fly mount
+# note: was level 70 during WotLK and TBC
+# default: 70
+AiPlayerbot.UseFastFlyMountAtMinLevel = 70
 
 #
 #
@@ -334,9 +369,9 @@ AiPlayerbot.AggroDistance = 22
 #
 #
 
-# Set kill XP rate for bots (default: 1)
-# Server XP Rate * AiPlayerbot.KillXPRate
-AiPlayerbot.KillXPRate = 1
+# Set XP rate for bots (default: 1.0)
+# Server XP Rate * AiPlayerbot.PlayerbotsXPRate
+AiPlayerbot.PlayerbotsXPRate = 1.0
 
 # Health/Mana levels
 AiPlayerbot.CriticalHealth = 25
@@ -474,14 +509,6 @@ AiPlayerbot.RandomBotRandomPassword = 0
 # Accounts to create for random bots
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 
-# Enable/Disable rotation of bots (randomly select a bot from the bots pool to go online and rotate them periodically)
-# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
-# default: 0 (disable, the online bots are fixed)
-AiPlayerbot.EnableRotation = 0
-
-# Bots pool size for rotation (should be less than RandomBotAccountCount * 10)
-AiPlayerbot.RotationPoolSize = 500
-
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
 
@@ -495,9 +522,27 @@ AiPlayerbot.PreQuests = 0
 # Enable LFG for random bots
 AiPlayerbot.RandomBotJoinLfg = 1
 
+# Enable/Disable periodic online - offline to mimic the real-world scenario where not all players are online simultaneously
+# When enabled, bots are randomly selected to go online or offline periodically from a larger set
+# Default: 0 (disabled, the set of online bots remains fixed)
+AiPlayerbot.EnablePeriodicOnlineOffline = 0
+
+# Defines the ratio between the total number of bots (including offline ones) and the number of bots currently online (MaxRandomBots)
+# This setting must greater than 1.0 and only applies when EnablePeriodicOnlineOffline
+# Default: 2.0 (total number of bots is twice the number of MaxRandomBots)
+AiPlayerbot.PeriodicOnlineOfflineRatio = 2.0
+
+# Percentage ratio of alliance and horde
+AiPlayerbot.RandomBotAllianceRatio = 50
+AiPlayerbot.RandomBotHordeRatio = 50
+
 # Disable death knight for bots login
-# Need to reset rndbot after changing the setting (.playerbot rndbot reset)
 AiPlayerbot.DisableDeathKnightLogin = 0
+
+# Enable expansion limitation for talents and glyphs - ie: level <= 60 bot only uses talents
+# available in vanilla, level <= 70 bot only uses talents available in TBC)
+# Default: 0
+AiPlayerbot.LimitTalentsExpansion = 0
 
 #
 #
@@ -575,6 +620,50 @@ AiPlayerbot.EquipmentPersistenceLevel = 80
 # Randombots automatically upgrade equipments on levelup
 # Default: 1 (enabled)
 AiPlayerbot.AutoUpgradeEquip = 1
+
+# Only set wolf pets for hunters to have higher damage (0 = disabled, 1 = enabled only for max-level, 2 = enabled)
+# Default: 0 (disabled)
+AiPlayerbot.HunterWolfPet = 0
+
+#
+#
+#
+####################################################################################################
+
+
+####################################################################################################
+# ACTIVITIES
+#
+#
+# Specify percent of active bots
+# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
+# This value is only applied to inactive areas where no real-players are detected, when
+# real-players are nearby, friend, group, guild, bg, instances etc the value is always
+# enforced to 100%
+AiPlayerbot.BotActiveAlone = 100
+
+# Force botActiveAlone when bot is ... of real player
+AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
+AiPlayerbot.BotActiveAloneForceWhenInZone = 1
+AiPlayerbot.BotActiveAloneForceWhenInMap = 0
+AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
+AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
+
+# SmartScale is enabled or not.
+# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
+# (The scaling will be overruled by the BotActiveAloneForceWhen...rules)
+#
+#   Limitfloor - when DIFF (latency) above floor, activity scaling is applied starting with 90%
+#   LimitCeiling - when DIFF (latency) above ceiling, activity is 0%;
+#
+#   MinLevel - only apply scaling when level is above or equal to min(bot)Level
+#   MaxLevel - only apply scaling when level is lower or equal of max(bot)Level
+#
+AiPlayerbot.botActiveAloneSmartScale = 1
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
+AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
+AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 
 #
 #
@@ -687,18 +776,56 @@ AiPlayerbot.AutoTeleportForLevel = 1
 # Enable BG/Arena for random Bots
 AiPlayerbot.RandomBotJoinBG = 1
 
-# Enable Auto join BG - bots randomly join WSG and 2v2 Arena if server is not lagging
+# Enable Auto join BG - have bots start BG's and Arenas on their own
 AiPlayerbot.RandomBotAutoJoinBG = 0
 
-# Required for RandomBotAutoJoinBG
-# Currently you can select 1 bracket (level range) for bots to auto join.
-# Brackets for warsong 0:10-19, 1:20-29, 2:30-39, 3:40-49 etc. Default: 7 (level 80)
-# Brackets for rated arena: 0:10-14, 1:15-19 etc. Default: 14 (80-84)
-# For lower level ranges to work in Rated Arena, custom code changes need to be made.
-# Count = amount of games Bots auto fill. (Count 1 for WSG = 20 bots).
-AiPlayerbot.RandomBotAutoJoinWarsongBracket = 7
+# Required Configuration for RandomBotAutoJoinBG
+#
+# Known issue: When enabling a lot of brackats in combination with multiple instances,
+#              can lead to more instances created by bots than intended (over-queuing).
+#
+# This section controls the level brackets and 
+# automatic bot participation in battlegrounds and arenas.
+#
+# Brackets:
+# - Specify the level ranges for bots to auto-join:
+#   - Warsong Gulch (WS): 0 = 10-19, 1 = 20-29, 2 = 30-39, ..., 7 = 80 (default: 7)
+#   - Rated Arena: 0 = 10-14, 1 = 15-19, ..., 14 = 80-84 (default: 14)
+# - Multiple brackets can be specified as a comma-separated list (e.g., "0,2,5").
+#
+# Counts:
+# - Specify the number of Battlegrounds to auto-fill per bracket.
+# - For battlegrounds, Count is the number of bots per bracket. For example:
+#   - Warsong Gulch Count = 1 adds 20 bots (10 per team).
+# - Ensure there are enough eligible bots to meet the specified counts.
+#
+# Arena Considerations:
+# - Rated Arena brackets default to level 80-84 (bracket 14).
+# - Custom code changes are required for lower-level arena brackets to function properly.
+#
+# Battleground bracket range possibilities:
+# AiPlayerbot.RandomBotAutoJoinICBrackets = 0,1
+# AiPlayerbot.RandomBotAutoJoinEYBrackets = 0,1,2
+# AiPlayerbot.RandomBotAutoJoinAVBrackets = 0,1,2,3
+# AiPlayerbot.RandomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
+# AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6,7
+
+AiPlayerbot.RandomBotAutoJoinICBrackets = 1
+AiPlayerbot.RandomBotAutoJoinEYBrackets = 2
+AiPlayerbot.RandomBotAutoJoinAVBrackets = 3
+AiPlayerbot.RandomBotAutoJoinABBrackets = 6
+AiPlayerbot.RandomBotAutoJoinWSBrackets = 7
+
+# Battlegrounds count (per bracket!):
+AiPlayerbot.RandomBotAutoJoinBGICCount = 0
+AiPlayerbot.RandomBotAutoJoinBGEYCount = 1
+AiPlayerbot.RandomBotAutoJoinBGAVCount = 0
+AiPlayerbot.RandomBotAutoJoinBGABCount = 1
+AiPlayerbot.RandomBotAutoJoinBGWSCount = 1
+
+# Arena configuration:
 AiPlayerbot.RandomBotAutoJoinArenaBracket = 14
-AiPlayerbot.RandomBotAutoJoinBGWarsongCount = 0
+
 AiPlayerbot.RandomBotAutoJoinBGRatedArena2v2Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena3v3Count = 0
 AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count = 0
@@ -725,7 +852,7 @@ AiPlayerbot.DeleteRandomBotArenaTeams = 0
 AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,139"
 
 # PvP Restricted Areas (bots don't pvp)
-AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268"
+AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312"
 
 # Improve react speed in battleground and arena (may cause lag)
 AiPlayerbot.FastReactInBG = 1
@@ -744,8 +871,8 @@ AiPlayerbot.FastReactInBG = 1
 AiPlayerbot.RandomBotUpdateInterval = 20
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
-AiPlayerbot.MinRandomBotInWorldTime = 3600
-AiPlayerbot.MaxRandomBotInWorldTime = 1209600
+AiPlayerbot.MinRandomBotInWorldTime = 600
+AiPlayerbot.MaxRandomBotInWorldTime = 28800
 AiPlayerbot.MinRandomBotRandomizeTime = 7200
 AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
 AiPlayerbot.RandomBotsPerInterval = 60
@@ -753,7 +880,7 @@ AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
 AiPlayerbot.MaxRandomBotTeleportInterval = 18000
-AiPlayerbot.RandomBotInWorldWithRotationDisabled = 31104000
+AiPlayerbot.PermanantlyInWorldTime = 31104000
 
 #
 #
@@ -924,7 +1051,7 @@ AiPlayerbot.PremadeSpecGlyph.6.1 = 45805,43673,43547,43544,43672,43543
 AiPlayerbot.PremadeSpecLink.6.1.60 = -32003350332203012300023101351
 AiPlayerbot.PremadeSpecLink.6.1.80 = -32002350352203012300033101351-230200305003
 AiPlayerbot.PremadeSpecName.6.2 = unholy pve
-AiPlayerbot.PremadeSpecGlyph.6.2 = 43542,43673,45804,43544,43672,43549
+AiPlayerbot.PremadeSpecGlyph.6.2 = 43542,43673,43546,43544,43672,43549
 AiPlayerbot.PremadeSpecLink.6.2.60 = --2301303050032151000150013131151
 AiPlayerbot.PremadeSpecLink.6.2.80 = -320033500002-2301303050032151000150013133151
 AiPlayerbot.PremadeSpecName.6.3 = double aura blood pve
@@ -977,6 +1104,10 @@ AiPlayerbot.PremadeSpecName.8.2 = frost pve
 AiPlayerbot.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
 AiPlayerbot.PremadeSpecLink.8.2.60 = --0533030313203100030152231151
 AiPlayerbot.PremadeSpecLink.8.2.80 = 23002303110003--0533030313203100030152231351
+AiPlayerbot.PremadeSpecName.8.3 = frostfire pve
+AiPlayerbot.PremadeSpecGlyph.8.3 = 44684,44920,42751,43339,43364,45737
+AiPlayerbot.PremadeSpecLink.8.3.60 = -2305032012303331053120300051
+AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120311351-023303031
 
 #
 #
@@ -1037,7 +1168,7 @@ AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 
 ###################################
 #                                 #
-# WORLD BUFFS					  #
+# WORLD BUFFS                     #
 #                                 #
 ###################################
 
@@ -1049,36 +1180,38 @@ AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 # Applies a permanent buff to all bots when not in combat simulating flasks, food, rune etc.
 # WorldBuff.Faction.Class.Spec.MinLevel.MaxLevel
 
-AiPlayerbot.WorldBuff.0.1.0.80.80 = 53760,57358					#WARRIOR ARMS
-AiPlayerbot.WorldBuff.0.1.1.80.80 = 53760,57358					#WARRIOR FURY
-AiPlayerbot.WorldBuff.0.1.2.80.80 = 53758,57356					#WARRIOR PROTECTION
-AiPlayerbot.WorldBuff.0.2.0.80.80 = 60347,53749,57332			#PALADIN HOLY
-AiPlayerbot.WorldBuff.0.2.1.80.80 = 53758,57356					#PALADIN PROTECTION
-AiPlayerbot.WorldBuff.0.2.2.80.80 = 53760,57371					#PALADIN RETRIBUTION
-AiPlayerbot.WorldBuff.0.3.0.80.80 = 53760,57325					#HUNTER BEAST
-AiPlayerbot.WorldBuff.0.3.1.80.80 = 53760,57358					#HUNTER MARKSMANSHIP
-AiPlayerbot.WorldBuff.0.3.2.80.80 = 53760,57367					#HUNTER SURVIVAL
-AiPlayerbot.WorldBuff.0.4.0.80.80 = 53760,57325					#ROGUE ASSASINATION
-AiPlayerbot.WorldBuff.0.4.1.80.80 = 53760,57358					#ROGUE COMBAT
-AiPlayerbot.WorldBuff.0.4.2.80.80 = 53760,57367					#ROGUE SUBTLETY
-AiPlayerbot.WorldBuff.0.5.0.80.80 = 53755,57327					#PRIEST DISCIPLINE
-AiPlayerbot.WorldBuff.0.5.1.80.80 = 53755,57327					#PRIEST HOLY
-AiPlayerbot.WorldBuff.0.5.2.80.80 = 53755,57327					#PRIEST SHADOW
-AiPlayerbot.WorldBuff.0.6.0.80.80 = 53758,57356					#DEATH KNIGHT BLOOD
-AiPlayerbot.WorldBuff.0.6.1.80.80 = 53760,57358					#DEATH KNIGHT FROST
-AiPlayerbot.WorldBuff.0.6.2.80.80 = 53760,57358					#DEATH KNIGHT UNHOLY
-AiPlayerbot.WorldBuff.0.7.0.80.80 = 53755,57327					#SHAMAN ELEMENTAL
-AiPlayerbot.WorldBuff.0.7.1.80.80 = 53760,57325					#SHAMAN ENHANCEMENT
-AiPlayerbot.WorldBuff.0.7.2.80.80 = 53755,57327					#SHAMAN RESTORATION
-AiPlayerbot.WorldBuff.0.8.0.80.80 = 53755,57327					#MAGE ARCANE
-AiPlayerbot.WorldBuff.0.8.1.80.80 = 53755,57327					#MAGE FIRE
-AiPlayerbot.WorldBuff.0.8.2.80.80 = 53755,57327					#MAGE FROST
-AiPlayerbot.WorldBuff.0.9.0.80.80 = 53755,57327					#WARLOCK AFFLICTION
-AiPlayerbot.WorldBuff.0.9.1.80.80 = 53755,57327					#WARLOCK DEMONOLOGY
-AiPlayerbot.WorldBuff.0.9.2.80.80 = 53755,57327					#WARLOCK DESTRUCTION
-AiPlayerbot.WorldBuff.0.11.0.80.80 = 53755,57327				#DRUID BALANCE
-AiPlayerbot.WorldBuff.0.11.1.80.80 = 53749,53763,57367			#DRUID FERAL
-AiPlayerbot.WorldBuff.0.11.2.80.80 = 54212,57334				#DRUID RESTORATION
+AiPlayerbot.WorldBuff.0.1.0.80.80 = 53760,57358                    #WARRIOR ARMS
+AiPlayerbot.WorldBuff.0.1.1.80.80 = 53760,57358                    #WARRIOR FURY
+AiPlayerbot.WorldBuff.0.1.2.80.80 = 53758,57356                    #WARRIOR PROTECTION
+AiPlayerbot.WorldBuff.0.2.0.80.80 = 60347,53749,57332              #PALADIN HOLY
+AiPlayerbot.WorldBuff.0.2.1.80.80 = 53758,57356                    #PALADIN PROTECTION
+AiPlayerbot.WorldBuff.0.2.2.80.80 = 53760,57371                    #PALADIN RETRIBUTION
+AiPlayerbot.WorldBuff.0.3.0.80.80 = 53760,57325                    #HUNTER BEAST
+AiPlayerbot.WorldBuff.0.3.1.80.80 = 53760,57358                    #HUNTER MARKSMANSHIP
+AiPlayerbot.WorldBuff.0.3.2.80.80 = 53760,57367                    #HUNTER SURVIVAL
+AiPlayerbot.WorldBuff.0.4.0.80.80 = 53760,57325                    #ROGUE ASSASINATION
+AiPlayerbot.WorldBuff.0.4.1.80.80 = 53760,57358                    #ROGUE COMBAT
+AiPlayerbot.WorldBuff.0.4.2.80.80 = 53760,57367                    #ROGUE SUBTLETY
+AiPlayerbot.WorldBuff.0.5.0.80.80 = 53755,57327                    #PRIEST DISCIPLINE
+AiPlayerbot.WorldBuff.0.5.1.80.80 = 53755,57327                    #PRIEST HOLY
+AiPlayerbot.WorldBuff.0.5.2.80.80 = 53755,57327                    #PRIEST SHADOW
+AiPlayerbot.WorldBuff.0.6.0.80.80 = 53758,57356                    #DEATH KNIGHT BLOOD
+AiPlayerbot.WorldBuff.0.6.1.80.80 = 53760,57358                    #DEATH KNIGHT FROST
+AiPlayerbot.WorldBuff.0.6.2.80.80 = 53760,57358                    #DEATH KNIGHT UNHOLY
+AiPlayerbot.WorldBuff.0.6.3.80.80 = 53760,57371                    #DEATH KNIGHT BLOOD DPS
+AiPlayerbot.WorldBuff.0.7.0.80.80 = 53755,57327                    #SHAMAN ELEMENTAL
+AiPlayerbot.WorldBuff.0.7.1.80.80 = 53760,57325                    #SHAMAN ENHANCEMENT
+AiPlayerbot.WorldBuff.0.7.2.80.80 = 53755,57327                    #SHAMAN RESTORATION
+AiPlayerbot.WorldBuff.0.8.0.80.80 = 53755,57327                    #MAGE ARCANE
+AiPlayerbot.WorldBuff.0.8.1.80.80 = 53755,57327                    #MAGE FIRE
+AiPlayerbot.WorldBuff.0.8.2.80.80 = 53755,57327                    #MAGE FROST
+AiPlayerbot.WorldBuff.0.9.0.80.80 = 53755,57327                    #WARLOCK AFFLICTION
+AiPlayerbot.WorldBuff.0.9.1.80.80 = 53755,57327                    #WARLOCK DEMONOLOGY
+AiPlayerbot.WorldBuff.0.9.2.80.80 = 53755,57327                    #WARLOCK DESTRUCTION
+AiPlayerbot.WorldBuff.0.11.0.80.80 = 53755,57327                   #DRUID BALANCE
+AiPlayerbot.WorldBuff.0.11.1.80.80 = 53749,53763,57367             #DRUID FERAL BEAR
+AiPlayerbot.WorldBuff.0.11.2.80.80 = 54212,57334                   #DRUID RESTORATION
+AiPlayerbot.WorldBuff.0.11.3.80.80 = 53760,57358                   #DRUID FERAL CAT
 
 #
 #
@@ -1498,12 +1631,6 @@ AiPlayerbot.EnableGuildTasks = 0
 # Enable dungeon suggestions in lower case randomly
 AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
 
-# Random bot guild count
-AiPlayerbot.RandomBotGuildCount = 20
-
-# Delete all random bot guilds
-AiPlayerbot.DeleteRandomBotGuilds = 0
-
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
 AiPlayerbot.RandomBotRpgChance = 0.20
 
@@ -1512,27 +1639,6 @@ AiPlayerbot.RandombotsWalkingRPG = 0
 
 # Set randombots movement speed to walking only inside buildings
 AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
-
-# Specify percent of active bots
-# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
-# This value is only applied to inactive areas where no real-players are detected, when
-# real-players are nearby, friend, group, guild, bg, instances etc the value is always
-# enforced to 100%
-AiPlayerbot.BotActiveAlone = 100
-
-# Force botActiveAlone when bot is ... of real player
-AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
-AiPlayerbot.BotActiveAloneForceWhenInZone = 1
-AiPlayerbot.BotActiveAloneForceWhenInMap = 0
-AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
-AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
-
-# Specify smart scaling is enabled or not.
-# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
-# Only when botLevel is between WhenMinLevel and WhenMaxLevel.
-AiPlayerbot.botActiveAloneSmartScale = 1
-AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
-AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 
 # Premade spell to avoid (undetected spells)
 # spellid-radius, ...

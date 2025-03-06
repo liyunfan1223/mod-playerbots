@@ -79,8 +79,15 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
         return false;
 
     Creature* creature = botAI->GetCreature(lootObject.guid);
-    if (creature && bot->GetDistance(creature) > INTERACTION_DISTANCE)
+    if (creature && bot->GetDistance(creature) > INTERACTION_DISTANCE - 2.0f)
         return false;
+
+    // Dismount if the bot is mounted
+    if (bot->IsMounted())
+    {
+        bot->Dismount();
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig->lootDelay); // Small delay to avoid animation issues
+    }
 
     if (creature && creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
     {
@@ -116,7 +123,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     }
 
     GameObject* go = botAI->GetGameObject(lootObject.guid);
-    if (go && bot->GetDistance(go) > INTERACTION_DISTANCE)
+    if (go && bot->GetDistance(go) > INTERACTION_DISTANCE - 2.0f)
         return false;
 
     if (go && (go->GetGoState() != GO_STATE_READY))
@@ -418,6 +425,7 @@ bool StoreLootAction::Execute(Event event)
         WorldPacket packet(CMSG_AUTOSTORE_LOOT_ITEM, 1);
         packet << itemindex;
         bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig->lootDelay);
 
         if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT) && sPlayerbotAIConfig->randomBotEmote)
             botAI->PlayEmote(TEXT_EMOTE_CHEER);

@@ -52,6 +52,10 @@ uint32 GrobbulusRotateAction::GetCurrWaypoint()
         return false;
     }
     auto* boss_ai = dynamic_cast<Grobbulus::boss_grobbulus::boss_grobbulusAI*>(boss->GetAI());
+    if (!boss_ai || boss_ai->events.Empty())
+    {
+        return false;
+    }
     EventMap* eventMap = &boss_ai->events;
     const uint32 event_time = eventMap->GetNextEventTime(2);
     return (event_time / 15000) % intervals;
@@ -65,6 +69,10 @@ bool HeiganDanceAction::CalculateSafe()
         return false;
     }
     auto* boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(boss->GetAI());
+    if (!boss_ai || boss_ai->events.Empty())
+    {
+        return false;
+    }
     EventMap* eventMap = &boss_ai->events;
     uint32 curr_phase = boss_ai->currentPhase;
     uint32 curr_erupt = eventMap->GetNextEventTime(3);
@@ -423,17 +431,21 @@ bool HorsemanAttactInOrderAction::Execute(Event event)
     }
     Unit* target = nullptr;
     Unit* thane = AI_VALUE2(Unit*, "find target", "thane korth'azz");
-    Unit* baron = AI_VALUE2(Unit*, "find target", "baron rivendare");
     Unit* lady = AI_VALUE2(Unit*, "find target", "lady blaumeux");
     Unit* sir = AI_VALUE2(Unit*, "find target", "sir zeliek");
+    Unit* fourth = AI_VALUE2(Unit*, "find target", "baron rivendare");
+    if (!fourth)
+    {
+        fourth = AI_VALUE2(Unit*, "find target", "highlord mograine");
+    }
     std::vector<Unit*> attack_order;
     if (botAI->IsAssistTank(bot))
     {
-        attack_order = {baron, thane, lady, sir};
+        attack_order = {fourth, thane, lady, sir};
     }
     else
     {
-        attack_order = {thane, baron, lady, sir};
+        attack_order = {thane, fourth, lady, sir};
     }
     for (Unit* t : attack_order)
     {
@@ -826,11 +838,6 @@ bool AnubrekhanPositionAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
     if (!boss)
-    {
-        return false;
-    }
-    auto* boss_ai = dynamic_cast<Anubrekhan::boss_anubrekhan::boss_anubrekhanAI*>(boss->GetAI());
-    if (!boss_ai)
     {
         return false;
     }

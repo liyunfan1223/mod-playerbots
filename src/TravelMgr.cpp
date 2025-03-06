@@ -22,12 +22,26 @@
 
 WorldPosition::WorldPosition(std::string const str)
 {
-    std::stringstream out(str);
-    out >> this->m_mapId;
-    out >> this->m_positionX;
-    out >> this->m_positionY;
-    out >> this->m_positionZ;
-    out >> this->m_orientation;
+    std::vector<std::string> tokens = split(str, '|');
+    if (tokens.size() == 5)
+    {
+        try
+        {
+            m_mapId = std::stoi(tokens[0]);
+            m_positionX = std::stof(tokens[1]);
+            m_positionY = std::stof(tokens[2]);
+            m_positionZ = std::stof(tokens[3]);
+            m_orientation = std::stof(tokens[4]);
+        }
+        catch (const std::exception&)
+        {
+            m_mapId = 0;
+            m_positionX = 0.0f;
+            m_positionY = 0.0f;
+            m_positionZ = 0.0f;
+            m_orientation = 0.0f;
+        }
+    }
 }
 
 WorldPosition::WorldPosition(uint32 mapId, const Position& pos)
@@ -361,13 +375,25 @@ std::string const WorldPosition::print()
 std::string const WorldPosition::to_string()
 {
     std::stringstream out;
-    out << GetMapId();
-    out << GetPositionX();
-    out << GetPositionY();
-    out << GetPositionZ();
-    out << GetOrientation();
+    out << m_mapId << '|';
+    out << m_positionX << '|';
+    out << m_positionY << '|';
+    out << m_positionZ << '|';
+    out << m_orientation;
     return out.str();
-};
+}
+
+std::vector<std::string> WorldPosition::split(const std::string& s, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter))
+    {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
 
 void WorldPosition::printWKT(std::vector<WorldPosition> points, std::ostringstream& out, uint32 dim, bool loop)
 {

@@ -6,6 +6,8 @@
 #include "HallsOfLightningTriggers.h"
 #include "Action.h"
 
+#include "WarriorActions.h"
+
 float BjarngrimMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "general bjarngrim");
@@ -73,31 +75,52 @@ float IonarMultiplier::GetValue(Action* action)
     Unit* boss = AI_VALUE2(Unit*, "find target", "ionar");
     if (!boss) { return 1.0f; }
 
-    if(!bot->CanSeeOrDetect(boss))
+    // Check if the boss has dispersed into Sparks (not visible).
+    if (!bot->CanSeeOrDetect(boss))
+    {
+        // Block MovementActions except for specific exceptions.
+        if (dynamic_cast<MovementAction*>(action)
+            && !dynamic_cast<DispersePositionAction*>(action)
+            && !dynamic_cast<StaticOverloadSpreadAction*>(action))
         {
-            if (dynamic_cast<MovementAction*>(action)
-                && !dynamic_cast<DispersePositionAction*>(action)
-                && !dynamic_cast<StaticOverloadSpreadAction*>(action))
-            {
-                return 0.0f;
-            }
+            return 0.0f;
         }
+    }
+
+    if (boss->FindCurrentSpellBySpellId(SPELL_DISPERSE))
+    {
+        // Explicitly block the CastChargeAction during dispersal.
+        if (dynamic_cast<CastChargeAction*>(action))
+        {
+            return 0.0f;
+        }
+    }
     return 1.0f;
 }
-
 float LokenMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "loken");
     if (!boss) { return 1.0f; }
 
+    // Prevent FleeAction from being executed.
     if (dynamic_cast<FleeAction*>(action)) { return 0.0f; }
 
-    if (boss->FindCurrentSpellBySpellId(SPELL_LIGHTNING_NOVA)
-        && dynamic_cast<MovementAction*>(action)
-        && !dynamic_cast<AvoidLightningNovaAction*>(action))
+    // Prevent MovementActions during Lightning Nova unless it's AvoidLightningNovaAction.
+    if (boss->FindCurrentSpellBySpellId(SPELL_LIGHTNING_NOVA))
     {
-        return 0.0f;
+        if (dynamic_cast<MovementAction*>(action)
+            && !dynamic_cast<AvoidLightningNovaAction*>(action))
+        {
+            return 0.0f;
+        }
+
+        // Specifically prevent Charge during Lightning Nova.
+        if (dynamic_cast<CastChargeAction*>(action))
+        {
+            return 0.0f;
+        }
     }
 
-    return 1.0f;
+    return 1.0f; // Default multiplier value for other cases.
 }
+

@@ -5,6 +5,7 @@
 
 #include "WarlockTriggers.h"
 
+#include "GenericTriggers.h"
 #include "Playerbots.h"
 
 bool DemonArmorTrigger::IsActive()
@@ -44,4 +45,13 @@ bool DecimationTrigger::IsActive()
 {
     Aura* aura = botAI->GetAura(getName(), GetTarget(), false, true);
     return aura && aura->GetDuration() > 3000;
+}
+
+bool LifeTapGlyphBuffTrigger::IsActive()
+{
+    // Check life tap glyph first
+    if (!botAI->HasAura(63320, bot))
+        return false;
+
+    return BuffTrigger::IsActive();
 }

@@ -54,6 +54,33 @@ bool CastCustomSpellAction::Execute(Event event)
         ltrim(text);
     }
 
+    uint32 spell = 0;
+    if (!target)
+    {
+        size_t onPos = FindLastSeparator(text, " on ");
+        if (onPos != std::string::npos)
+        {
+            std::string targetName = text.substr(onPos + 4);
+            ltrim(targetName);
+            if (!targetName.empty())
+            {
+                // check if spell still exists after we remove " on PlayerName" part
+                std::string truncatedText = text.substr(0, onPos);
+                ltrim(truncatedText);
+                spell = AI_VALUE2(uint32, "spell id", truncatedText);
+
+                if (spell)
+                {
+                    if (Player* targetPlayer = ObjectAccessor::FindPlayerByName(targetName))
+                    {
+                        target = targetPlayer;
+                        text = truncatedText;
+                    }
+                }
+            }
+        }
+    }
+
     if (!target)
         if (master && master->GetTarget())
             target = botAI->GetUnit(master->GetTarget());
@@ -81,7 +108,8 @@ bool CastCustomSpellAction::Execute(Event event)
         }
     }
 
-    uint32 spell = AI_VALUE2(uint32, "spell id", text);
+    if (!spell)
+        spell = AI_VALUE2(uint32, "spell id", text);
 
     std::ostringstream msg;
     if (!spell)

@@ -177,7 +177,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
 }
 
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only,
-                            bool exact_waypoint, MovementPriority priority, bool lessDelay)
+                            bool exact_waypoint, MovementPriority priority, bool lessDelay, bool backwards)
 {
     UpdateMovementState();
     if (!IsMovingAllowed(mapId, x, y, z))
@@ -208,8 +208,16 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         {
             MotionMaster& mm = *vehicleBase->GetMotionMaster();  // need to move vehicle, not bot
             mm.Clear();
-            mm.MovePoint(0, x, y, z, generatePath);
-            float delay = 1000.0f * (distance / vehicleBase->GetSpeed(MOVE_RUN));
+            if (!backwards)
+            {
+                mm.MovePoint(0, x, y, z, generatePath);
+            }
+            else
+            {
+                mm.MovePointBackwards(0, x, y, z, generatePath);
+            }
+            float speed = backwards ? vehicleBase->GetSpeed(MOVE_RUN_BACK) : vehicleBase->GetSpeed(MOVE_RUN);
+            float delay = 1000.0f * (distance / speed);
             if (lessDelay)
             {
                 delay -= botAI->GetReactDelay();
@@ -228,15 +236,22 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-            if (bot->IsNonMeleeSpellCast(true))
-            {
-                bot->CastStop();
-                botAI->InterruptSpell();
-            }
+            // if (bot->IsNonMeleeSpellCast(true))
+            // {
+            //     bot->CastStop();
+            //     botAI->InterruptSpell();
+            // }
             MotionMaster& mm = *bot->GetMotionMaster();
             mm.Clear();
-            mm.MovePoint(0, x, y, z, generatePath);
-            float delay = 1000.0f * MoveDelay(distance);
+            if (!backwards)
+            {
+                mm.MovePoint(0, x, y, z, generatePath);
+            }
+            else
+            {
+                mm.MovePointBackwards(0, x, y, z, generatePath);
+            }
+            float delay = 1000.0f * MoveDelay(distance, backwards);
             if (lessDelay)
             {
                 delay -= botAI->GetReactDelay();
@@ -262,16 +277,23 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             if (bot->IsSitState())
                 bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-            if (bot->IsNonMeleeSpellCast(true))
-            {
-                bot->CastStop();
-                botAI->InterruptSpell();
-            }
+            // if (bot->IsNonMeleeSpellCast(true))
+            // {
+            //     bot->CastStop();
+            //     botAI->InterruptSpell();
+            // }
             MotionMaster& mm = *bot->GetMotionMaster();
             G3D::Vector3 endP = path.back();
             mm.Clear();
-            mm.MovePoint(0, endP.x, endP.y, endP.z, generatePath);
-            float delay = 1000.0f * MoveDelay(distance);
+            if (!backwards)
+            {
+                mm.MovePoint(0, x, y, z, generatePath);
+            }
+            else
+            {
+                mm.MovePointBackwards(0, x, y, z, generatePath);
+            }
+            float delay = 1000.0f * MoveDelay(distance, backwards);
             if (lessDelay)
             {
                 delay -= botAI->GetReactDelay();
@@ -956,11 +978,13 @@ bool MovementAction::Follow(Unit* target, float distance) { return Follow(target
 
 void MovementAction::UpdateMovementState()
 {
-    if (bot->Unit::IsUnderWater())
+    int8 botInLiquidState = bot->GetLiquidData().Status;
+
+    if (botInLiquidState == LIQUID_MAP_IN_WATER || botInLiquidState == LIQUID_MAP_UNDER_WATER)
     {
         bot->SetSwim(true);
     }
-    else if (!bot->Unit::IsInWater())
+    else
     {
         bot->SetSwim(false);
     }
@@ -968,18 +992,21 @@ void MovementAction::UpdateMovementState()
     bool onGround = bot->GetPositionZ() <
                     bot->GetMapWaterOrGroundLevel(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()) + 1.0f;
 
+    // Keep bot->SendMovementFlagUpdate() withing the if statements to not intefere with bot behavior on ground/(shallow) waters
     if (!bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) &&
         bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !onGround)
     {
         bot->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+        bot->SendMovementFlagUpdate();
     }
-    if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) &&
+
+    else if (bot->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) &&
         (!bot->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || onGround))
     {
         bot->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+        bot->SendMovementFlagUpdate();
     }
 
-    bot->SendMovementFlagUpdate();
     // Temporary speed increase in group
     // if (botAI->HasRealPlayerMaster()) {
     //     bot->SetSpeedRate(MOVE_RUN, 1.1f);
@@ -1265,20 +1292,20 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
     return true;
 }
 
-float MovementAction::MoveDelay(float distance)
+float MovementAction::MoveDelay(float distance, bool backwards)
 {
     float speed;
     if (bot->isSwimming())
     {
-        speed = bot->GetSpeed(MOVE_SWIM);
+        speed = backwards ? bot->GetSpeed(MOVE_SWIM_BACK) : bot->GetSpeed(MOVE_SWIM);
     }
     else if (bot->IsFlying())
     {
-        speed = bot->GetSpeed(MOVE_FLIGHT);
+        speed = backwards ? bot->GetSpeed(MOVE_FLIGHT_BACK) : bot->GetSpeed(MOVE_FLIGHT);
     }
     else
     {
-        speed = bot->GetSpeed(MOVE_RUN);
+        speed = backwards ? bot->GetSpeed(MOVE_RUN_BACK) :bot->GetSpeed(MOVE_RUN);
     }
     float delay = distance / speed;
     return delay;
@@ -1500,7 +1527,7 @@ void MovementAction::ClearIdleState()
     context->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 }
 
-bool MovementAction::MoveAway(Unit* target, float distance)
+bool MovementAction::MoveAway(Unit* target, float distance, bool backwards)
 {
     if (!target)
     {
@@ -1523,7 +1550,7 @@ bool MovementAction::MoveAway(Unit* target, float distance)
             dz = bot->GetPositionZ();
             exact = false;
         }
-        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT))
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, backwards))
         {
             return true;
         }
@@ -1545,7 +1572,7 @@ bool MovementAction::MoveAway(Unit* target, float distance)
             dz = bot->GetPositionZ();
             exact = false;
         }
-        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT))
+        if (MoveTo(target->GetMapId(), dx, dy, dz, false, false, true, exact, MovementPriority::MOVEMENT_COMBAT, false, backwards))
         {
             return true;
         }
@@ -1556,11 +1583,6 @@ bool MovementAction::MoveAway(Unit* target, float distance)
 // just calculates average position of group and runs away from that position
 bool MovementAction::MoveFromGroup(float distance)
 {
-    LOG_ERROR("playerbots", "MovementAction::MoveFromGroup");
-    //if (Player* master = botAI->GetMaster())
-    //{
-    //    return MoveAway(master);
-    //}
     if (Group* group = bot->GetGroup())
     {
         uint32 mapId = bot->GetMapId();
@@ -1746,7 +1768,7 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
 bool FleeAction::Execute(Event event)
 {
     // return Flee(AI_VALUE(Unit*, "current target"));
-    return MoveAway(AI_VALUE(Unit*, "current target"));
+    return MoveAway(AI_VALUE(Unit*, "current target"), sPlayerbotAIConfig->fleeDistance, true);
 }
 
 bool FleeAction::isUseful()
@@ -2122,8 +2144,13 @@ Position MovementAction::BestPositionForRangedToFlee(Position pos, float radius)
     return Position();
 }
 
-bool MovementAction::FleePosition(Position pos, float radius)
+bool MovementAction::FleePosition(Position pos, float radius, uint32 minInterval)
 {
+    std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
+
+    if (!infoList.empty() && infoList.back().timestamp + minInterval > getMSTime())
+        return false;
+
     Position bestPos;
     if (botAI->IsMelee(bot))
     {
@@ -2138,7 +2165,6 @@ bool MovementAction::FleePosition(Position pos, float radius)
         if (MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false,
                    false, true, false, MovementPriority::MOVEMENT_COMBAT))
         {
-            std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
             uint32 curTS = getMSTime();
             while (!infoList.empty())
             {

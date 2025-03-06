@@ -36,7 +36,7 @@ float EstimatedGroupDpsValue::Calculate()
             if (member == bot)  // calculated
                 continue;
 
-            if (!member || !member->IsInWorld())
+            if (!member || !member->IsInWorld() || !member->IsAlive())
                 continue;
 
             if (member->GetMapId() != bot->GetMapId())

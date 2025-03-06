@@ -43,7 +43,10 @@ struct NewRpgInfo
     uint32 lastNearRandom{0};
     // NewRpgStatus::REST
     uint32 lastRest{0};
-
+    // MOVE_FAR
+    float nearestMoveFarDis{FLT_MAX};
+    uint32 stuckTs{0};
+    uint32 stuckAttempts{0};
     std::string ToString()
     {
         std::stringstream out;
@@ -81,6 +84,10 @@ struct NewRpgInfo
                 out << "UNKNOWN";
         }
         return out.str();
+    }
+    void Reset()
+    {
+        *this = NewRpgInfo();
     }
 };
 

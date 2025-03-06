@@ -108,7 +108,7 @@ public:
         creators["cdebug"] = &ChatTriggerContext::cdebug;
         creators["cs"] = &ChatTriggerContext::cs;
         creators["wts"] = &ChatTriggerContext::wts;
-        creators["hire"] = &ChatTriggerContext::hire;
+        // creators["hire"] = &ChatTriggerContext::hire;  // Not correctly implemented at this time, would cause crash and other issues.
         creators["craft"] = &ChatTriggerContext::craft;
         creators["flag"] = &ChatTriggerContext::craft;
         creators["range"] = &ChatTriggerContext::range;
@@ -127,6 +127,7 @@ public:
         creators["dps"] = &ChatTriggerContext::dps;
         creators["disperse"] = &ChatTriggerContext::disperse;
         creators["calc"] = &ChatTriggerContext::calc;
+        creators["qi"] = &ChatTriggerContext::qi;
     }
 
 private:
@@ -233,6 +234,7 @@ private:
     static Trigger* dps(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "dps"); }
     static Trigger* disperse(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "disperse"); }
     static Trigger* calc(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "calc"); }
+    static Trigger* qi(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "qi"); }
 };
 
 #endif

@@ -131,6 +131,7 @@ public:
     std::string const print();
 
     std::string const to_string();
+    std::vector<std::string> split(const std::string& s, char delimiter);
 
     void printWKT(std::vector<WorldPosition> points, std::ostringstream& out, uint32 dim = 0, bool loop = false);
     void printWKT(std::ostringstream& out) { printWKT({*this}, out); }

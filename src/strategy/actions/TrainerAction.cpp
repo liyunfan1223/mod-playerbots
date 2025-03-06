@@ -162,8 +162,10 @@ bool MaintenanceAction::Execute(Event event)
         botAI->TellError("maintenance command is not allowed, please check the configuration.");
         return false;
     }
+
     botAI->TellMaster("I'm maintaining");
     PlayerbotFactory factory(bot, bot->GetLevel());
+    factory.InitAttunementQuests();
     factory.InitBags(false);
     factory.InitAmmo();
     factory.InitFood();
@@ -174,14 +176,17 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitClassSpells();
     factory.InitAvailableSpells();
     factory.InitSkills();
+    factory.InitReputation();
+    factory.InitSpecialSpells();
     factory.InitMounts();
     factory.InitGlyphs(true);
+    factory.InitKeyring();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
-    {
         factory.ApplyEnchantAndGemsNew();
-    }
+
     bot->DurabilityRepairAll(false, 1.0f, false);
     bot->SendTalentsInfoData(false);
+
     return true;
 }
 
