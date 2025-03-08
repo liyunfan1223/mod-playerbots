@@ -483,7 +483,6 @@ bool RazorscaleAvoidDevouringFlameAction::isUseful()
 
 bool RazorscaleAvoidSentinelAction::Execute(Event event)
 {
-    bool isTank = botAI->IsTank(bot);
     bool isMainTank = botAI->IsMainTank(bot);
     bool isRanged = botAI->IsRanged(bot);
     const float radius = 8.0f;
@@ -723,6 +722,11 @@ bool RazorscaleIgnoreBossAction::isUseful()
 
 bool RazorscaleIgnoreBossAction::Execute(Event event)
 {
+    if (!bot)
+    {
+        return false;
+    }
+
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
     if (!boss)
     {
@@ -981,6 +985,11 @@ bool RazorscaleGroundedAction::Execute(Event event)
 
 bool RazorscaleHarpoonAction::Execute(Event event)
 {
+    if (!bot)
+    {
+        return false;
+    }
+
     RazorscaleBossHelper razorscaleHelper(botAI);
 
     // Update the boss AI context
@@ -1229,7 +1238,7 @@ bool FreyaMarkEonarsGiftAction::isUseful()
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit id
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
-    Unit* target;
+    Unit* target = nullptr;
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
         target = botAI->GetUnit(*i);
@@ -1254,9 +1263,9 @@ bool FreyaMarkEonarsGiftAction::isUseful()
 
     int8 skullIndex = 7;
     ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-    if (currentSkullTarget == target->GetGUID())
+    if (!target || currentSkullTarget == target->GetGUID())
     {
-        return false;  // Skull marker is already correctly set
+        return false;  // Skull marker is already correctly set or no Eonar's Gift found
     }
 
     return true;
@@ -1269,7 +1278,7 @@ bool FreyaMarkEonarsGiftAction::Execute(Event event)
     Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
 
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
-    Unit* target;
+    Unit* target = nullptr;
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
         Unit* unit = botAI->GetUnit(*i);
@@ -1307,6 +1316,7 @@ bool FreyaMarkEonarsGiftAction::Execute(Event event)
                     if (!currentSkullTarget || (target->GetGUID() != currentSkullTarget))
                     {
                         group->SetTargetIcon(skullIndex, bot->GetGUID(), target->GetGUID());
+                        return true;
                     }
                 }
                 break;  // Stop after finding the first valid bot tank
@@ -1325,7 +1335,10 @@ bool FreyaMarkEonarsGiftAction::Execute(Event event)
             if (!currentSkullTarget || (target->GetGUID() != currentSkullTarget))
             {
                 group->SetTargetIcon(skullIndex, bot->GetGUID(), target->GetGUID());
+                return true;
             }
         }
     }
+
+    return false;
 }
