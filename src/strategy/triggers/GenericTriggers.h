@@ -243,10 +243,18 @@ public:
     std::string const getName() override { return "my attacker count"; }
 };
 
+class BeingAttackedTrigger : public MyAttackerCountTrigger
+{
+public:
+    BeingAttackedTrigger(PlayerbotAI* botAI) : MyAttackerCountTrigger(botAI, 1) {}
+    std::string const getName() override { return "being attacked"; }
+};
+
 class MediumThreatTrigger : public MyAttackerCountTrigger
 {
 public:
     MediumThreatTrigger(PlayerbotAI* botAI) : MyAttackerCountTrigger(botAI, 2) {}
+    bool IsActive() override;
 };
 
 class LowTankThreatTrigger : public Trigger

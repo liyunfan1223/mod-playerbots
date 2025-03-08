@@ -652,6 +652,9 @@ void PlayerbotFactory::AddConsumables()
 
 void PlayerbotFactory::InitPetTalents()
 {
+    if (bot->GetLevel() <= 70 && sPlayerbotAIConfig->limitTalentsExpansion)
+        return;
+
     Pet* pet = bot->GetPet();
     if (!pet)
     {
@@ -1670,9 +1673,6 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
                         if (proto->Quality != desiredQuality)
                             continue;
-                        // delay heavy check
-                        // if (!CanEquipItem(proto))
-                        //     continue;
 
                         if (proto->Class == ITEM_CLASS_ARMOR &&
                             (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS ||
@@ -1688,9 +1688,6 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE &&
                             proto->Class != ITEM_CLASS_WEAPON)
                             continue;
-                        // delay heavy check
-                        // uint16 dest = 0;
-                        // if (CanEquipUnseenItem(slot, dest, itemId))
                         items[slot].push_back(itemId);
                     }
                 }
@@ -2830,7 +2827,28 @@ void PlayerbotFactory::InitAmmo()
     if (!subClass)
         return;
 
-    uint32 entry = sRandomItemMgr->GetAmmo(level, subClass);
+    std::vector<uint32> ammoEntryList = sRandomItemMgr->GetAmmo(level, subClass);
+    uint32 entry = 0;
+    for (uint32 tEntry : ammoEntryList)
+    {
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tEntry);
+        if (!proto)
+            continue;
+
+        // disable next expansion ammo
+        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 60 && tEntry >= 23728)
+            continue;
+        
+        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 70 && tEntry >= 35570)
+            continue;
+        
+        entry = tEntry;
+        break;
+    }
+
+    if (!entry)
+        return;
+
     uint32 count = bot->GetItemCount(entry);
     uint32 maxCount = bot->getClass() == CLASS_HUNTER ? 6000 : 1000;
 
@@ -2984,6 +3002,10 @@ void PlayerbotFactory::InitPotions()
     for (uint8 i = 0; i < 2; ++i)
     {
         uint32 effect = effects[i];
+
+        if (effect == SPELL_EFFECT_ENERGIZE && !bot->GetPower(POWER_MANA))
+            continue;
+        
         FindPotionVisitor visitor(bot, effect);
         IterateItems(&visitor);
         if (!visitor.GetResult().empty())
