@@ -4,9 +4,14 @@
  */
 
 #include "QuestAction.h"
+#include <sstream>
 
+#include "Chat.h"
 #include "ChatHelper.h"
 #include "Event.h"
+#include "ItemTemplate.h"
+#include "ObjectGuid.h"
+#include "ObjectMgr.h"
 #include "Playerbots.h"
 #include "ReputationMgr.h"
 #include "ServerFacade.h"
@@ -258,6 +263,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
 
 bool QuestUpdateCompleteAction::Execute(Event event)
 {
+    // the action can hardly be triggered
     WorldPacket p(event.getPacket());
     p.rpos(0);
 
@@ -265,22 +271,26 @@ bool QuestUpdateCompleteAction::Execute(Event event)
     p >> questId;
 
     p.print_storage();
-    LOG_INFO("playerbots", "Packet: empty{} questId{}", p.empty(), questId);
+    // LOG_INFO("playerbots", "Packet: empty{} questId{}", p.empty(), questId);
 
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
     if (qInfo)
     {
-        std::map<std::string, std::string> placeholders;
+        // std::map<std::string, std::string> placeholders;
+        // placeholders["%quest_link"] = format;
+        
+        // if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
+        // {
+            //     LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
+            //     bot->Say("Quest [ " + format + " ] completed", LANG_UNIVERSAL);
+            // }
         const auto format = ChatHelper::FormatQuest(qInfo);
-        placeholders["%quest_link"] = format;
-
-        if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
-        {
-            LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
-            bot->Say("Quest [ " + format + " ] completed", LANG_UNIVERSAL);
-        }
-        botAI->TellMasterNoFacing("Quest completed " + format);
+        if (botAI->GetMaster())
+            botAI->TellMasterNoFacing("Quest completed " + format);
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, qInfo);
+        botAI->rpgStatistic.questCompleted++;
+        // LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), qInfo->GetQuestId());
+        // botAI->rpgStatistic.questCompleted++;
     }
 
     return true;
@@ -296,39 +306,39 @@ bool QuestUpdateAddKillAction::Execute(Event event)
 
     uint32 entry, questId, available, required;
     p >> questId >> entry >> available >> required;
-
+    // LOG_INFO("playerbots", "[New rpg] Quest {} -> Creature {} ({}/{})", questId, entry, available, required);
     const Quest* qInfo = sObjectMgr->GetQuestTemplate(questId);
     if (qInfo && (entry & 0x80000000))
     {
         entry &= 0x7FFFFFFF;
         const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
         if (info)
-            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, info->name);
+        {
+            std::string infoName = botAI->GetLocalizedGameObjectName(entry);
+            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
+            if (botAI->GetMaster())
+            {
+                std::ostringstream out;
+                out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+                botAI->TellMasterNoFacing(out.str());
+            }
+        }
     }
     else if (qInfo)
     {
         CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(entry);
         if (info)
         {
-            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, info->Name);
+            std::string infoName = botAI->GetLocalizedCreatureName(entry);
+            BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
+            if (botAI->GetMaster())
+            {
+                std::ostringstream out;
+                out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+                botAI->TellMasterNoFacing(out.str());
+            }
         }
-    }
-    else
-    {
-        std::map<std::string, std::string> placeholders;
-        placeholders["%quest_id"] = questId;
-        placeholders["%available"] = available;
-        placeholders["%required"] = required;
-
-        if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_COMBAT) || botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT))
-        {
-            LOG_INFO("playerbots", "{} => {}", bot->GetName(), BOT_TEXT2("%available/%required for questId: %quest_id", placeholders));
-            botAI->Say(BOT_TEXT2("%available/%required for questId: %quest_id", placeholders));
-        }
-
-        botAI->TellMasterNoFacing(BOT_TEXT2("%available/%required for questId: %quest_id", placeholders));
-    }
-    
+    }    
     return false;
 }
 
@@ -363,8 +373,62 @@ bool QuestUpdateAddItemAction::Execute(Event event)
 
             BroadcastHelper::BroadcastQuestUpdateAddItem(botAI, bot, pair.first, availableItemsCount, requiredItemsCount, itemPrototype);
         }
-    }
+    } 
+    return false;
+}
+
+bool QuestItemPushResultAction::Execute(Event event)
+{
+    WorldPacket packet = event.getPacket();
+    ObjectGuid guid;
+    uint32 received, created, sendChatMessage, itemSlot, itemEntry, itemSuffixFactory, count, itemCount;
+    uint8 bagSlot;
+    int32 itemRandomPropertyId;
+    packet >> guid >> received >> created >> sendChatMessage;
+    packet >> bagSlot >> itemSlot >> itemEntry >> itemSuffixFactory >> itemRandomPropertyId;
+    packet >> count >> itemCount;
+
+    if (guid != bot->GetGUID())
+        return false;
     
+    const ItemTemplate* proto = sObjectMgr->GetItemTemplate(itemEntry);
+    if (!proto)
+        return false;
+
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(i);
+        if (!questId)
+            continue;
+
+        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (!quest)
+            return false;
+
+        const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
+        
+        for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
+        {
+            uint32 itemId = quest->RequiredItemId[i];
+            if (!itemId)
+                continue;
+            
+            int32 previousCount = itemCount - count;
+            if (itemId == itemEntry && previousCount < quest->RequiredItemCount[i])
+            {
+                if (botAI->GetMaster())
+                {
+                    std::string itemLink = ChatHelper::FormatItem(proto);
+                    std::ostringstream out;
+                    int32 required = quest->RequiredItemCount[i];
+                    int32 available = std::min((int32)itemCount, required);
+                    out << itemLink << " " << available << "/" << required << " " << ChatHelper::FormatQuest(quest);
+                    botAI->TellMasterNoFacing(out.str());
+                }
+            }
+        }
+    }
+
     return false;
 }
 

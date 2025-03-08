@@ -23,4 +23,16 @@ protected:
     bool AcceptUnit(Unit* unit) override;
 };
 
+class PossibleNewRpgTargetsValue : public NearestUnitsValue
+{
+public:
+    PossibleNewRpgTargetsValue(PlayerbotAI* botAI, float range = 150.0f);
+
+    static std::vector<uint32> allowedNpcFlags;
+    GuidVector Calculate() override;
+protected:
+    void FindUnits(std::list<Unit*>& targets) override;
+    bool AcceptUnit(Unit* unit) override;
+};
+
 #endif
