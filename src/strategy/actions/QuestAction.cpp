@@ -9,6 +9,8 @@
 #include "Chat.h"
 #include "ChatHelper.h"
 #include "Event.h"
+#include "ItemTemplate.h"
+#include "ObjectGuid.h"
 #include "ObjectMgr.h"
 #include "Playerbots.h"
 #include "ReputationMgr.h"
@@ -314,9 +316,12 @@ bool QuestUpdateAddKillAction::Execute(Event event)
         {
             std::string infoName = botAI->GetLocalizedGameObjectName(entry);
             BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
-            std::ostringstream out;
-            out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
-            botAI->TellMasterNoFacing(out.str());
+            if (botAI->GetMaster())
+            {
+                std::ostringstream out;
+                out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+                botAI->TellMasterNoFacing(out.str());
+            }
         }
     }
     else if (qInfo)
@@ -326,9 +331,12 @@ bool QuestUpdateAddKillAction::Execute(Event event)
         {
             std::string infoName = botAI->GetLocalizedCreatureName(entry);
             BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
-            std::ostringstream out;
-            out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
-            botAI->TellMasterNoFacing(out.str());
+            if (botAI->GetMaster())
+            {
+                std::ostringstream out;
+                out << infoName << " " << available << "/" << required << " " << ChatHelper::FormatQuest(qInfo);
+                botAI->TellMasterNoFacing(out.str());
+            }
         }
     }    
     return false;
@@ -365,8 +373,62 @@ bool QuestUpdateAddItemAction::Execute(Event event)
 
             BroadcastHelper::BroadcastQuestUpdateAddItem(botAI, bot, pair.first, availableItemsCount, requiredItemsCount, itemPrototype);
         }
-    }
+    } 
+    return false;
+}
+
+bool QuestItemPushResultAction::Execute(Event event)
+{
+    WorldPacket packet = event.getPacket();
+    ObjectGuid guid;
+    uint32 received, created, sendChatMessage, itemSlot, itemEntry, itemSuffixFactory, count, itemCount;
+    uint8 bagSlot;
+    int32 itemRandomPropertyId;
+    packet >> guid >> received >> created >> sendChatMessage;
+    packet >> bagSlot >> itemSlot >> itemEntry >> itemSuffixFactory >> itemRandomPropertyId;
+    packet >> count >> itemCount;
+
+    if (guid != bot->GetGUID())
+        return false;
     
+    const ItemTemplate* proto = sObjectMgr->GetItemTemplate(itemEntry);
+    if (!proto)
+        return false;
+
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(i);
+        if (!questId)
+            continue;
+
+        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (!quest)
+            return false;
+
+        const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
+        
+        for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
+        {
+            uint32 itemId = quest->RequiredItemId[i];
+            if (!itemId)
+                continue;
+            
+            int32 previousCount = itemCount - count;
+            if (itemId == itemEntry && previousCount < quest->RequiredItemCount[i])
+            {
+                if (botAI->GetMaster())
+                {
+                    std::string itemLink = ChatHelper::FormatItem(proto);
+                    std::ostringstream out;
+                    int32 required = quest->RequiredItemCount[i];
+                    int32 available = std::min((int32)itemCount, required);
+                    out << itemLink << " " << available << "/" << required << " " << ChatHelper::FormatQuest(quest);
+                    botAI->TellMasterNoFacing(out.str());
+                }
+            }
+        }
+    }
+
     return false;
 }
 
