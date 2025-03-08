@@ -97,6 +97,9 @@ bool NewRpgStatusUpdateAction::Execute(Event event)
                     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
                     {
                         uint32 questId = bot->GetQuestSlotQuestId(slot);
+                        if (botAI->lowPriorityQuest.find(questId) != botAI->lowPriorityQuest.end())
+                            continue;
+
                         std::vector<POIInfo> poiInfo;
                         if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
                         {
@@ -376,8 +379,12 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
             }
             if (!hasProgression)
             {
-                // we has reach the poi for more than 2 mins but no progession
-                // may not be able to complete this quest
+                // we has reach the poi for more than 5 mins but no progession
+                // may not be able to complete this quest, marked as abandoned
+                /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
+                botAI->lowPriorityQuest.insert(questId);
+                botAI->rpgStatistic.questAbandoned++;
+                LOG_DEBUG("playerbots", "[New rpg] {} marked as abandoned quest {}", bot->GetName(), questId);
                 botAI->rpgInfo.ChangeToIdle();
                 return true;
             }

@@ -92,7 +92,7 @@ protected:
     bool DoIncompleteQuest();
     bool DoCompletedQuest();
     
-    const uint32 poiStayTime = 2 * 60 * 1000;
+    const uint32 poiStayTime = 5 * 60 * 1000;
 };
 
 #endif

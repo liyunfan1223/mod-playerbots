@@ -104,6 +104,7 @@ struct NewRpgStatistic
 {
     uint32 questAccepted{0};
     uint32 questCompleted{0};
+    uint32 questAbandoned{0};
     uint32 questRewarded{0};
     uint32 questDropped{0};
     NewRpgStatistic operator+(const NewRpgStatistic& other) const
@@ -111,6 +112,7 @@ struct NewRpgStatistic
         NewRpgStatistic result;
         result.questAccepted = this->questAccepted + other.questAccepted;
         result.questCompleted = this->questCompleted + other.questCompleted;
+        result.questAbandoned = this->questAbandoned + other.questAbandoned;
         result.questRewarded = this->questRewarded + other.questRewarded;
         result.questDropped = this->questDropped + other.questDropped;
         return result;
@@ -119,6 +121,7 @@ struct NewRpgStatistic
     {
         this->questAccepted += other.questAccepted;
         this->questCompleted += other.questCompleted;
+        this->questAbandoned += other.questAbandoned;
         this->questRewarded += other.questRewarded;
         this->questDropped += other.questDropped;
         return *this;
