@@ -31,6 +31,22 @@ public:
     bool IsActive() override;
 };
 
+class GiftOfTheWildTrigger : public BuffTrigger
+{
+public:
+    GiftOfTheWildTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "gift of the wild", 2 * 2000) {}
+
+    bool IsActive() override;
+};
+
+class GiftOfTheWildOnPartyTrigger : public BuffOnPartyTrigger
+{
+public:
+    GiftOfTheWildOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "gift of the wild", 2 * 2000) {}
+
+    bool IsActive() override;
+};
+
 class ThornsOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:

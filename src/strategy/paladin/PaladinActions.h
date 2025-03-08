@@ -159,6 +159,45 @@ public:
     std::string const getName() override { return "blessing of sanctuary on party"; }
 };
 
+//greater blessing on paryt actions
+class CastGreaterBlessingOfKingsOnPartyAction : public CastBlessingOnPartyAction
+{
+public:
+    CastGreaterBlessingOfKingsOnPartyAction(PlayerbotAI* botAI) 
+        : CastBlessingOnPartyAction(botAI, "greater blessing of kings") 
+    {
+    }
+};
+
+class CastGreaterBlessingOfMightOnPartyAction : public CastBlessingOnPartyAction
+{
+public:
+    CastGreaterBlessingOfMightOnPartyAction(PlayerbotAI* botAI) 
+        : CastBlessingOnPartyAction(botAI, "greater blessing of might") 
+    {
+    }
+};
+
+class CastGreaterBlessingOfWisdomOnPartyAction : public CastBlessingOnPartyAction
+{
+public:
+    CastGreaterBlessingOfWisdomOnPartyAction(PlayerbotAI* botAI) 
+        : CastBlessingOnPartyAction(botAI, "greater blessing of wisdom") 
+    {
+    }
+};
+
+class CastGreaterBlessingOfSanctuaryOnPartyAction : public CastBlessingOnPartyAction
+{
+public:
+    CastGreaterBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) 
+        : CastBlessingOnPartyAction(botAI, "greater blessing of sanctuary") 
+    {
+    }
+};
+
+//end
+
 class CastHolyLightAction : public CastHealingSpellAction
 {
 public:
