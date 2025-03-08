@@ -146,9 +146,4 @@ void HunterTrapWeaveStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode(
         "immolation trap no cd", NextAction::array(0, new NextAction("reach melee", ACTION_HIGH + 3), nullptr)));
-    
-    // triggers.push_back(new TriggerNode(
-    //     "scare beast", NextAction::array(0, new NextAction("scare beast on cc", ACTION_HIGH + 3), nullptr)));
-    // triggers.push_back(new TriggerNode(
-    //     "freezing trap", NextAction::array(0, new NextAction("freezing trap on cc", ACTION_HIGH + 3), nullptr)));
 }

@@ -262,3 +262,49 @@ bool HodirNearSnowpackedIcicleTrigger::IsActive()
     Creature* target = bot->FindNearestCreature(33174, 100.0f);
     return target != nullptr;
 }
+
+bool FreyaNearNatureBombTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "freya");
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    // Find the nearest Nature Bomb
+    GameObject* target = bot->FindNearestGameObject(GOBJECT_NATURE_BOMB, 12.0f);
+    return target != nullptr;
+}
+
+bool FreyaTankNearEonarsGiftTrigger::IsActive()
+{
+    // Only tank bot can mark target
+    if (!botAI->IsTank(bot))
+    {
+        return false;
+    }
+
+    // Check Eonar's gift and it is alive
+
+    // Target is not findable from threat table using AI_VALUE2(),
+    // therefore need to search manually for the unit id
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(*i);
+        if (!unit)
+        {
+            continue;
+        }
+
+        uint32 creatureId = unit->GetEntry();
+        if (creatureId == NPC_EONARS_GIFT && unit->IsAlive())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

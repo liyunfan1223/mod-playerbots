@@ -107,6 +107,7 @@ public:
         creators["combo points not full"] = &TriggerContext::ComboPointsNotFull;
         creators["combo points not full and high energy"] = &TriggerContext::ComboPointsNotFullAndHighEnergy;
 
+        creators["being attacked"] = &TriggerContext::BeingAttacked;
         creators["medium threat"] = &TriggerContext::MediumThreat;
         creators["low tank threat"] = &TriggerContext::low_tank_threat;
 
@@ -334,6 +335,7 @@ private:
     }
     static Trigger* ComboPointsNotFull(PlayerbotAI* botAI) { return new ComboPointsNotFullTrigger(botAI); }
     static Trigger* ComboPointsNotFullAndHighEnergy(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "combo points not full", "high energy available"); }
+    static Trigger* BeingAttacked(PlayerbotAI* botAI) { return new BeingAttackedTrigger(botAI); }
     static Trigger* MediumThreat(PlayerbotAI* botAI) { return new MediumThreatTrigger(botAI); }
     static Trigger* low_tank_threat(PlayerbotAI* botAI) { return new LowTankThreatTrigger(botAI); }
     // static Trigger* MediumThreat(PlayerbotAI* botAI) { return new MediumThreatTrigger(botAI); }

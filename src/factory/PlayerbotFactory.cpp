@@ -241,13 +241,11 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    /*
-    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Immersive");
-    LOG_INFO("playerbots", "Initializing immersive...");
-    InitImmersive();
-    if (pmo)
-        pmo->finish();
-    */
+    // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Immersive");
+    // LOG_INFO("playerbots", "Initializing immersive...");
+    // InitImmersive();
+    // if (pmo)
+    //     pmo->finish();
 
     if (sPlayerbotAIConfig->randomBotPreQuests)
     {
@@ -267,7 +265,6 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
     LOG_DEBUG("playerbots", "Initializing spells (step 1)...");
-    // bot->LearnDefaultSkills();
     bot->LearnDefaultSkills();
     InitClassSpells();
     InitAvailableSpells();
@@ -277,8 +274,6 @@ void PlayerbotFactory::Randomize(bool incremental)
     LOG_DEBUG("playerbots", "Initializing skills (step 1)...");
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills1");
     InitSkills();
-    InitSpecialSpells();
-
     // InitTradeSkills();
     if (pmo)
         pmo->finish();
@@ -312,6 +307,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
+    LOG_DEBUG("playerbots", "Initializing special spells...");
+    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells3");
+    InitSpecialSpells();
+    if (pmo)
+        pmo->finish();
+
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Mounts");
     LOG_DEBUG("playerbots", "Initializing mounts...");
     InitMounts();
@@ -319,11 +320,11 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills2");
+    // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills2");
     // LOG_INFO("playerbots", "Initializing skills (step 2)...");
     // UpdateTradeSkills();
-    if (pmo)
-        pmo->finish();
+    // if (pmo)
+    //     pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
     LOG_DEBUG("playerbots", "Initializing equipmemt...");
@@ -382,11 +383,11 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
 
-    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EqSets");
-    LOG_DEBUG("playerbots", "Initializing second equipment set...");
-    // InitSecondEquipmentSet();
-    if (pmo)
-        pmo->finish();
+    // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EqSets");
+    // LOG_DEBUG("playerbots", "Initializing second equipment set...");
+    //    InitSecondEquipmentSet();
+    // if (pmo)
+    //     pmo->finish();
 
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
     {
@@ -416,7 +417,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     InitGlyphs();
     // bot->SaveToDB(false, false);
 
-    // pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
+    pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds");
     // bot->SaveToDB(false, false);
     if (sPlayerbotAIConfig->randomBotGuildCount > 0)
     {
@@ -424,8 +425,8 @@ void PlayerbotFactory::Randomize(bool incremental)
         InitGuild();
     }
     // bot->SaveToDB(false, false);
-    // if (pmo)
-    //    pmo->finish();
+    if (pmo)
+        pmo->finish();
 
     if (bot->GetLevel() >= 70)
     {
@@ -459,7 +460,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     bot->SetHealth(bot->GetMaxHealth());
     bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     bot->SaveToDB(false, false);
-    // LOG_INFO("playerbots", "Initialization Done.");
+    LOG_DEBUG("playerbots", "Initialization Done.");
     if (pmo)
         pmo->finish();
 }
@@ -487,6 +488,7 @@ void PlayerbotFactory::Refresh()
     InitAvailableSpells();
     InitSkills();
     InitReputation();
+    InitSpecialSpells();
     InitMounts();
     InitKeyring();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
@@ -651,6 +653,9 @@ void PlayerbotFactory::AddConsumables()
 
 void PlayerbotFactory::InitPetTalents()
 {
+    if (bot->GetLevel() <= 70 && sPlayerbotAIConfig->limitTalentsExpansion)
+        return;
+
     Pet* pet = bot->GetPet();
     if (!pet)
     {
@@ -1667,9 +1672,6 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
                         if (proto->Quality != desiredQuality)
                             continue;
-                        // delay heavy check
-                        // if (!CanEquipItem(proto))
-                        //     continue;
 
                         if (proto->Class == ITEM_CLASS_ARMOR &&
                             (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS ||
@@ -1685,9 +1687,6 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE &&
                             proto->Class != ITEM_CLASS_WEAPON)
                             continue;
-                        // delay heavy check
-                        // uint16 dest = 0;
-                        // if (CanEquipUnseenItem(slot, dest, itemId))
                         items[slot].push_back(itemId);
                     }
                 }
@@ -2831,7 +2830,28 @@ void PlayerbotFactory::InitAmmo()
     if (!subClass)
         return;
 
-    uint32 entry = sRandomItemMgr->GetAmmo(level, subClass);
+    std::vector<uint32> ammoEntryList = sRandomItemMgr->GetAmmo(level, subClass);
+    uint32 entry = 0;
+    for (uint32 tEntry : ammoEntryList)
+    {
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tEntry);
+        if (!proto)
+            continue;
+
+        // disable next expansion ammo
+        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 60 && tEntry >= 23728)
+            continue;
+        
+        if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 70 && tEntry >= 35570)
+            continue;
+        
+        entry = tEntry;
+        break;
+    }
+
+    if (!entry)
+        return;
+
     uint32 count = bot->GetItemCount(entry);
     uint32 maxCount = bot->getClass() == CLASS_HUNTER ? 6000 : 1000;
 
@@ -2985,6 +3005,10 @@ void PlayerbotFactory::InitPotions()
     for (uint8 i = 0; i < 2; ++i)
     {
         uint32 effect = effects[i];
+
+        if (effect == SPELL_EFFECT_ENERGIZE && !bot->GetPower(POWER_MANA))
+            continue;
+        
         FindPotionVisitor visitor(bot, effect);
         IterateItems(&visitor);
         if (!visitor.GetResult().empty())
@@ -4403,4 +4427,3 @@ void PlayerbotFactory::InitAttunementQuests()
     bot->GiveLevel(level);
     bot->SetUInt32Value(PLAYER_XP, currentXP);
 }
-

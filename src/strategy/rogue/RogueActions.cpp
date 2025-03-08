@@ -54,6 +54,17 @@ bool CastVanishAction::isUseful()
     return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) && !botAI->HasAura(34976, bot);
 }
 
+bool CastEnvenomAction::isUseful()
+{
+    return AI_VALUE2(uint8, "energy", "self target") >= 35;
+}
+
+bool CastEnvenomAction::isPossible()
+{
+    // alternate to eviscerate if talents unlearned
+    return botAI->HasAura(58410, bot) /* Master Poisoner */;
+}
+
 bool CastTricksOfTheTradeOnMainTankAction::isUseful()
 {
     return CastSpellAction::isUseful() && AI_VALUE2(float, "distance", GetTargetName()) < 20.0f;
