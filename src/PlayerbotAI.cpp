@@ -2807,9 +2807,6 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     if (!target)
         target = bot;
 
-    // if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
-    //     LOG_DEBUG("playerbots", "Can cast spell? - target name: {}, spellid: {}, bot name: {}",
-    //             target->GetName(), spellid, bot->GetName());
 
     if (Pet* pet = bot->GetPet())
         if (pet->HasSpell(spellid))
@@ -2874,23 +2871,6 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 
     if (!itemTarget)
     {
-        // bool positiveSpell = spellInfo->IsPositive();
-        // if (positiveSpell && bot->IsHostileTo(target))
-        //     return false;
-
-        // if (!positiveSpell && bot->IsFriendlyTo(target))
-        //     return false;
-
-        // bool damage = false;
-        // for (uint8 i = EFFECT_0; i <= EFFECT_2; i++)
-        // {
-        //     if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
-        //     {
-        //         damage = true;
-        //         break;
-        //     }
-        // }
-
         if (target->IsImmunedToSpell(spellInfo))
         {
             if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
@@ -2900,21 +2880,6 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
             }
             return false;
         }
-
-        // if (!damage)
-        // {
-        //     for (uint8 i = EFFECT_0; i <= EFFECT_2; i++)
-        //     {
-        //         if (target->IsImmunedToSpellEffect(spellInfo, i)) {
-        //             if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster())) {
-        //                 LOG_DEBUG("playerbots", "target is immuned to spell effect - target name: {}, spellid: {},
-        //                 bot name: {}",
-        //                     target->GetName(), spellid, bot->GetName());
-        //             }
-        //             return false;
-        //         }
-        //     }
-        // }
 
         if (bot != target && sServerFacade->GetDistance2d(bot, target) > sPlayerbotAIConfig->sightDistance)
         {
@@ -3011,8 +2976,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkH
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetGOTarget(goTarget);
-    spell->m_CastItem = aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();
-    spell->m_targets.SetItemTarget(spell->m_CastItem);
+    Item* item = aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();
+    spell->m_targets.SetItemTarget(item);
 
     SpellCastResult result = spell->CheckCast(true);
     delete spell;
@@ -3064,8 +3029,9 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, float x, float y, float z, bool c
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetDst(x, y, z, 0.f);
-    spell->m_CastItem = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();
-    spell->m_targets.SetItemTarget(spell->m_CastItem);
+    
+    Item* item = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();
+    spell->m_targets.SetItemTarget(item);
 
     SpellCastResult result = spell->CheckCast(true);
     delete spell;
@@ -3169,9 +3135,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     SpellCastTargets targets;
     if (spellInfo->Targets & TARGET_FLAG_ITEM)
     {
-        spell->m_CastItem =
-            itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
-        targets.SetItemTarget(spell->m_CastItem);
+        Item* item = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
+        targets.SetItemTarget(item);
 
         if (bot->GetTradeData())
         {
@@ -3345,9 +3310,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     SpellCastTargets targets;
     if (spellInfo->Targets & TARGET_FLAG_ITEM)
     {
-        spell->m_CastItem =
-            itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
-        targets.SetItemTarget(spell->m_CastItem);
+        Item* item = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
+        targets.SetItemTarget(item);
 
         if (bot->GetTradeData())
         {

@@ -7,6 +7,14 @@
 #include "RaidUlduarBossHelper.h"
 #include "Trigger.h"
 
+enum UlduarIDs
+{
+    // Freya
+    NPC_EONARS_GIFT = 33228,
+
+    GOBJECT_NATURE_BOMB = 194902,
+};
+
 //
 // Flame Levi
 //
@@ -87,6 +95,20 @@ class HodirNearSnowpackedIcicleTrigger : public Trigger
 {
 public:
     HodirNearSnowpackedIcicleTrigger(PlayerbotAI* ai) : Trigger(ai, "hodir near snowpacked icicle") {}
+    bool IsActive() override;
+};
+
+class FreyaNearNatureBombTrigger : public Trigger
+{
+public:
+    FreyaNearNatureBombTrigger(PlayerbotAI* ai) : Trigger(ai, "freya near nature bomb") {}
+    bool IsActive() override;
+};
+
+class FreyaTankNearEonarsGiftTrigger : public Trigger
+{
+public:
+    FreyaTankNearEonarsGiftTrigger(PlayerbotAI* ai) : Trigger(ai, "freya tank near eonars gift") {}
     bool IsActive() override;
 };
 

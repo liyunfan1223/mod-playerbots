@@ -6,7 +6,14 @@
 #ifndef _PLAYERBOT_CHECKMOUNTSTATEACTION_H
 #define _PLAYERBOT_CHECKMOUNTSTATEACTION_H
 
+#include <unordered_map>
+#include <vector>
+
 #include "UseItemAction.h"
+
+const uint16 SPELL_TRAVEL_FORM = 783;
+const uint16 SPELL_FLIGHT_FORM = 33943;
+const uint16 SPELL_SWIFT_FLIGHT_FORM = 40120;
 
 struct MountData
 {
@@ -15,6 +22,12 @@ struct MountData
     std::map<uint32, std::map<int32, std::vector<uint32>>> allSpells;
     // Default mount speed.
     int32 maxSpeed = 59;
+};
+
+struct PreferredMountCache
+{
+    std::vector<uint32> groundMounts;
+    std::vector<uint32> flightMounts;
 };
 
 class PlayerbotAI;
@@ -30,7 +43,11 @@ public:
     bool Mount();
 
 private:
+    Player* master;
     ShapeshiftForm masterInShapeshiftForm;
+    ShapeshiftForm botInShapeshiftForm;
+    static std::unordered_map<uint32, PreferredMountCache> mountCache;
+    static bool preferredMountTableChecked;
     float CalculateDismountDistance() const;
     float CalculateMountDistance() const;
     void Dismount();
@@ -39,6 +56,7 @@ private:
     int32 CalculateMasterMountSpeed(Player* master, const MountData& mountData) const;
     bool CheckForSwiftMount() const;
     std::map<uint32, std::map<int32, std::vector<uint32>>> GetAllMountSpells() const;
+    bool TryForms(Player* master, int32 masterMountType, int32 masterSpeed) const;
     bool TryPreferredMount(Player* master) const;
     uint32 GetMountType(Player* master) const;
     bool TryRandomMountFiltered(const std::map<int32, std::vector<uint32>>& spells, int32 masterSpeed) const;

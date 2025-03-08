@@ -26,6 +26,8 @@ public:
         creators["razorscale fuse armor trigger"] = &RaidUlduarTriggerContext::razorscale_fuse_armor_trigger;
         creators["hodir biting cold"] = &RaidUlduarTriggerContext::hodir_biting_cold;
         creators["hodir near snowpacked icicle"] = &RaidUlduarTriggerContext::hodir_near_snowpacked_icicle;
+        creators["freya near nature bomb"] = &RaidUlduarTriggerContext::freya_near_nature_bomb;
+        creators["freya tank near eonars gift"] = &RaidUlduarTriggerContext::freya_tank_near_eonars_gift;
     }
 
 private:
@@ -40,6 +42,8 @@ private:
     static Trigger* razorscale_fuse_armor_trigger(PlayerbotAI* ai) { return new RazorscaleFuseArmorTrigger(ai); }
     static Trigger* hodir_biting_cold(PlayerbotAI* ai) { return new HodirBitingColdTrigger(ai); }
     static Trigger* hodir_near_snowpacked_icicle(PlayerbotAI* ai) { return new HodirNearSnowpackedIcicleTrigger(ai); }
+    static Trigger* freya_near_nature_bomb(PlayerbotAI* ai) { return new FreyaNearNatureBombTrigger(ai); }
+    static Trigger* freya_tank_near_eonars_gift(PlayerbotAI* ai) { return new FreyaTankNearEonarsGiftTrigger(ai); }
 };
 
 #endif
