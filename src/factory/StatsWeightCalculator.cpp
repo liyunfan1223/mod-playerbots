@@ -511,7 +511,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         if (cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY) &&
             proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
         {
-            weight_ *= 0.1;
+            weight_ *= 0.5;
         }
         if (cls == CLASS_ROGUE && player_->HasAura(13964) &&
             (proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE))
