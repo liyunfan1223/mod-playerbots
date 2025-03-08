@@ -6,6 +6,9 @@
 #ifndef _PLAYERBOT_CHECKMOUNTSTATEACTION_H
 #define _PLAYERBOT_CHECKMOUNTSTATEACTION_H
 
+#include <unordered_map>
+#include <vector>
+
 #include "UseItemAction.h"
 
 const uint16 SPELL_TRAVEL_FORM = 783;
@@ -19,6 +22,12 @@ struct MountData
     std::map<uint32, std::map<int32, std::vector<uint32>>> allSpells;
     // Default mount speed.
     int32 maxSpeed = 59;
+};
+
+struct PreferredMountCache
+{
+    std::vector<uint32> groundMounts;
+    std::vector<uint32> flightMounts;
 };
 
 class PlayerbotAI;
@@ -37,6 +46,8 @@ private:
     Player* master;
     ShapeshiftForm masterInShapeshiftForm;
     ShapeshiftForm botInShapeshiftForm;
+    static std::unordered_map<uint32, PreferredMountCache> mountCache;
+    static bool preferredMountTableChecked;
     float CalculateDismountDistance() const;
     float CalculateMountDistance() const;
     void Dismount();
