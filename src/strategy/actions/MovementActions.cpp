@@ -2017,7 +2017,7 @@ Position MovementAction::BestPositionForMeleeToFlee(Position pos, float radius)
     if (currentTarget)
     {
         // Normally, move to left or right is the best position
-        bool isTanking = (currentTarget->CanFreeMove()) && (currentTarget->GetVictim() == bot);
+        bool isTanking = (!currentTarget->isFrozen() && !currentTarget->HasRootAura()) && (currentTarget->GetVictim() == bot);
         float angle = bot->GetAngle(currentTarget);
         float angleLeft = angle + (float)M_PI / 2;
         float angleRight = angle - (float)M_PI / 2;

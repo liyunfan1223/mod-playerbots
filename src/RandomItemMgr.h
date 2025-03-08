@@ -157,7 +157,7 @@ public:
     uint32 GetStatWeight(Player* player, uint32 itemId);
     uint32 GetLiveStatWeight(Player* player, uint32 itemId);
     uint32 GetRandomItem(uint32 level, RandomItemType type, RandomItemPredicate* predicate = nullptr);
-    uint32 GetAmmo(uint32 level, uint32 subClass);
+    std::vector<uint32> GetAmmo(uint32 level, uint32 subClass);
     uint32 GetRandomPotion(uint32 level, uint32 effect);
     uint32 GetRandomFood(uint32 level, uint32 category);
     uint32 GetFood(uint32 level, uint32 category);
@@ -195,7 +195,7 @@ private:
     std::map<RandomItemType, RandomItemPredicate*> predicates;
     BotEquipCache equipCache;
     std::map<EquipmentSlots, std::set<InventoryType>> viableSlots;
-    std::map<uint32, std::map<uint32, uint32>> ammoCache;
+    std::map<uint32, std::map<uint32, std::vector<uint32>>> ammoCache;
     std::map<uint32, std::map<uint32, std::vector<uint32>>> potionCache;
     std::map<uint32, std::map<uint32, std::vector<uint32>>> foodCache;
     std::map<uint32, std::vector<uint32>> tradeCache;

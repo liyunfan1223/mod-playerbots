@@ -113,10 +113,10 @@ public:
     SavageRoarTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "savage roar") {}
 };
 
-class NaturesGraspTrigger : public BoostTrigger
+class NaturesGraspTrigger : public BuffTrigger
 {
 public:
-    NaturesGraspTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "nature's grasp") {}
+    NaturesGraspTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "nature's grasp") {}
 };
 
 class EntanglingRootsTrigger : public HasCcTargetTrigger
