@@ -345,63 +345,56 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         botAI->rpgInfo.do_quest.objectiveIdx = objectiveIdx;
     }
 
-    if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 20.0f)
+    if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 10.0f && !botAI->rpgInfo.do_quest.lastReachPOI)
     {
         return MoveFarTo(botAI->rpgInfo.do_quest.pos);
     }
-    else
+    // Now we are near the quest objective
+    // kill mobs and looting quest should be done automatically by grind strategy
+
+    if (!botAI->rpgInfo.do_quest.lastReachPOI)
     {
-        // Now we are near the quest objective
-        // kill mobs and looting quest should be done automatically by grind strategy
-
-        if (!botAI->rpgInfo.do_quest.lastReachPOI)
+        botAI->rpgInfo.do_quest.lastReachPOI = getMSTime();
+        return true;
+    }
+    // stayed at this POI for more than 5 minutes
+    if (GetMSTimeDiffToNow(botAI->rpgInfo.do_quest.lastReachPOI) >= poiStayTime)
+    {
+        bool hasProgression = false;
+        int32 currentObjective = botAI->rpgInfo.do_quest.objectiveIdx;
+        // check if the objective has progression
+        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
+        if (currentObjective < QUEST_OBJECTIVES_COUNT)
         {
-            botAI->rpgInfo.do_quest.lastReachPOI = getMSTime();
+            if (q_status.CreatureOrGOCount[currentObjective] != 0 && quest->RequiredNpcOrGoCount[currentObjective])
+                hasProgression = true;
+        }
+        else if (currentObjective < QUEST_OBJECTIVES_COUNT + QUEST_ITEM_OBJECTIVES_COUNT)
+        {
+            if (q_status.ItemCount[currentObjective - QUEST_OBJECTIVES_COUNT] != 0 &&
+                quest->RequiredItemCount[currentObjective - QUEST_OBJECTIVES_COUNT])
+                hasProgression = true;
+        }
+        if (!hasProgression)
+        {
+            // we has reach the poi for more than 5 mins but no progession
+            // may not be able to complete this quest, marked as abandoned
+            /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
+            botAI->lowPriorityQuest.insert(questId);
+            botAI->rpgStatistic.questAbandoned++;
+            LOG_DEBUG("playerbots", "[New rpg] {} marked as abandoned quest {}", bot->GetName(), questId);
+            botAI->rpgInfo.ChangeToIdle();
             return true;
         }
-        // stayed at this POI for more than 1 minutes
-        if (GetMSTimeDiffToNow(botAI->rpgInfo.do_quest.lastReachPOI) >= poiStayTime)
-        {
-            bool hasProgression = false;
-            int32 currentObjective = botAI->rpgInfo.do_quest.objectiveIdx;
-            // check if the objective has progression
-            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-            const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
-            if (currentObjective < QUEST_OBJECTIVES_COUNT)
-            {
-                if (q_status.CreatureOrGOCount[currentObjective] != 0 && quest->RequiredNpcOrGoCount[currentObjective])
-                    hasProgression = true;
-            }
-            else if (currentObjective < QUEST_OBJECTIVES_COUNT + QUEST_ITEM_OBJECTIVES_COUNT)
-            {
-                if (q_status.ItemCount[currentObjective - QUEST_OBJECTIVES_COUNT] != 0 &&
-                    quest->RequiredItemCount[currentObjective - QUEST_OBJECTIVES_COUNT])
-                    hasProgression = true;
-            }
-            if (!hasProgression)
-            {
-                // we has reach the poi for more than 5 mins but no progession
-                // may not be able to complete this quest, marked as abandoned
-                /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
-                botAI->lowPriorityQuest.insert(questId);
-                botAI->rpgStatistic.questAbandoned++;
-                LOG_DEBUG("playerbots", "[New rpg] {} marked as abandoned quest {}", bot->GetName(), questId);
-                botAI->rpgInfo.ChangeToIdle();
-                return true;
-            }
-            // clear and select another poi later
-            botAI->rpgInfo.do_quest.lastReachPOI = 0;
-            botAI->rpgInfo.do_quest.pos = WorldPosition();
-            botAI->rpgInfo.do_quest.objectiveIdx = 0;
-            return true;
-        }
-
-        return MoveRandomNear(50.0f);
+        // clear and select another poi later
+        botAI->rpgInfo.do_quest.lastReachPOI = 0;
+        botAI->rpgInfo.do_quest.pos = WorldPosition();
+        botAI->rpgInfo.do_quest.objectiveIdx = 0;
+        return true;
     }
 
-    /// @TODO: q_status.Explored
-    
-    return false;
+    return MoveRandomNear(20.0f);
 }
 
 bool NewRpgDoQuestAction::DoCompletedQuest()
@@ -440,10 +433,26 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
     if (botAI->rpgInfo.do_quest.pos == WorldPosition())
         return false;
 
-    if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 20.0f)
+    if (bot->GetDistance(botAI->rpgInfo.do_quest.pos) > 10.0f && !botAI->rpgInfo.do_quest.lastReachPOI)
         return MoveFarTo(botAI->rpgInfo.do_quest.pos);
 
-    // now we are near the qoi of reward
+    // Now we are near the qoi of reward
     // the quest should be rewarded by SearchQuestGiverAndAcceptOrReward
+    if (!botAI->rpgInfo.do_quest.lastReachPOI)
+    {
+        botAI->rpgInfo.do_quest.lastReachPOI = getMSTime();
+        return true;
+    }
+    // stayed at this POI for more than 5 minutes
+    if (GetMSTimeDiffToNow(botAI->rpgInfo.do_quest.lastReachPOI) >= poiStayTime)
+    {
+        // e.g. Can not reward quest to gameobjects
+        /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
+        botAI->lowPriorityQuest.insert(questId);
+        botAI->rpgStatistic.questAbandoned++;
+        LOG_DEBUG("playerbots", "[New rpg] {} marked as abandoned quest {}", bot->GetName(), questId);
+        botAI->rpgInfo.ChangeToIdle();
+        return true;
+    }
     return false;
 }
