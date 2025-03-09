@@ -44,7 +44,7 @@ public:
     CastStealthAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "stealth") {}
 
     std::string const GetTargetName() override { return "self target"; }
-
+    bool isUseful() override;
     bool isPossible() override;
 };
 

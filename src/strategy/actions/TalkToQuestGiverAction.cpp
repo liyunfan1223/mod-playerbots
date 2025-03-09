@@ -173,7 +173,6 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
     std::ostringstream outid;
     if (!botAI->IsAlt() || sPlayerbotAIConfig->autoPickReward == "yes")
     {
-        // Pick the first item of the best rewards.
         bestIds = BestRewards(quest);
         if (!bestIds.empty())
         {

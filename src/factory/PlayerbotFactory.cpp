@@ -31,6 +31,7 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotDbStore.h"
 #include "Playerbots.h"
+#include "QuestDef.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
 #include "ReputationMgr.h"
@@ -979,30 +980,23 @@ void PlayerbotFactory::ClearSpells()
 
 void PlayerbotFactory::ResetQuests()
 {
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        bot->SetQuestSlot(slot, 0);
+    }
     ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
         Quest const* quest = i->second;
 
         uint32 entry = quest->GetQuestId();
+        if (bot->GetQuestStatus(entry) == QUEST_STATUS_NONE)
+            continue;
+        
+        bot->RemoveRewardedQuest(entry);
+        bot->RemoveActiveQuest(entry, false);
 
-        // remove all quest entries for 'entry' from quest log
-        for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
-        {
-            uint32 quest = bot->GetQuestSlotQuestId(slot);
-            if (quest == entry)
-            {
-                bot->SetQuestSlot(slot, 0);
-            }
-        }
-
-        // reset rewarded for restart repeatable quest
-        bot->getQuestStatusMap().erase(entry);
-        // bot->getQuestStatusMap()[entry].m_rewarded = false;
-        // bot->getQuestStatusMap()[entry].m_status = QUEST_STATUS_NONE;
     }
-    // bot->UpdateForQuestWorldObjects();
-    CharacterDatabase.Execute("DELETE FROM character_queststatus WHERE guid = {}", bot->GetGUID().GetCounter());
 }
 
 void PlayerbotFactory::InitSpells() { InitAvailableSpells(); }
@@ -1618,6 +1612,11 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
             continue;
 
+        if (level < 5 && (slot != EQUIPMENT_SLOT_MAINHAND) && (slot != EQUIPMENT_SLOT_OFFHAND) &&
+            (slot != EQUIPMENT_SLOT_FEET) && (slot != EQUIPMENT_SLOT_LEGS) && (slot != EQUIPMENT_SLOT_CHEST) &&
+            (slot != EQUIPMENT_SLOT_RANGED))
+            continue;
+
         Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
         if (second_chance && oldItem)
@@ -1781,6 +1780,10 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                 continue;
 
             if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
+                continue;
+            
+            if (level < 5 && (slot != EQUIPMENT_SLOT_MAINHAND) && (slot != EQUIPMENT_SLOT_OFFHAND) &&
+                (slot != EQUIPMENT_SLOT_FEET) && (slot != EQUIPMENT_SLOT_LEGS) && (slot != EQUIPMENT_SLOT_CHEST))
                 continue;
 
             if (Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))

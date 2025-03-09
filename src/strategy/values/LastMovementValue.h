@@ -17,6 +17,7 @@ class Unit;
 enum class MovementPriority
 {
     MOVEMENT_IDLE,
+    MOVEMENT_WANDER,
     MOVEMENT_NORMAL,
     MOVEMENT_COMBAT,
     MOVEMENT_FORCED

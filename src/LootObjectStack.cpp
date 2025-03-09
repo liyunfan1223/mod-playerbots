@@ -9,7 +9,7 @@
 #include "Playerbots.h"
 #include "Unit.h"
 
-#define MAX_LOOT_OBJECT_COUNT 10
+#define MAX_LOOT_OBJECT_COUNT 200
 
 LootTarget::LootTarget(ObjectGuid guid) : guid(guid), asOfTime(time(nullptr)) {}
 
