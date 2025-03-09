@@ -75,6 +75,7 @@ struct NewRpgInfo
     float nearestMoveFarDis{FLT_MAX};
     uint32 stuckTs{0};
     uint32 stuckAttempts{0};
+    WorldPosition moveFarPos;
     // END MOVE_FAR
 
     union {
@@ -97,6 +98,7 @@ struct NewRpgInfo
     void ChangeToIdle();
     bool CanChangeTo(NewRpgStatus status);
     void Reset();
+    void SetMoveFarTo(WorldPosition pos);
     std::string ToString();
 };
 

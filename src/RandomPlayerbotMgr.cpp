@@ -1628,8 +1628,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "position_y, "
         "position_z, "
         "orientation, "
-        "t.faction, "
-        "t.entry "
+        "t.faction "
         "FROM "
         "creature c "
         "INNER JOIN creature_template t on c.id1 = t.entry "
@@ -1651,7 +1650,6 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 float z = fields[3].Get<float>();
                 float orient = fields[4].Get<float>();
                 uint32 faction = fields[5].Get<uint32>();
-                uint32 c_entry = fields[6].Get<uint32>();
                 const FactionTemplateEntry* entry = sFactionTemplateStore.LookupEntry(faction);
 
                 WorldLocation loc(mapId, x + cos(orient) * 5.0f, y + sin(orient) * 5.0f, z + 0.5f, orient + M_PI);
@@ -1659,14 +1657,13 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
                 if (!map)
                     continue;
-                const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
+                const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(PHASEMASK_NORMAL, x, y, z));
                 uint32 zoneId = area->zone ? area->zone : area->ID;
-                uint32 level = area->area_level;
-                for (int i = 5; i <= maxLevel; i++)
+                if (zone2LevelBracket.find(zoneId) == zone2LevelBracket.end())
+                    continue;
+                LevelBracket bracket = zone2LevelBracket[zoneId];
+                for (int i = bracket.low; i <= bracket.high; i++)
                 {
-                    if (zone2LevelBracket.find(zoneId) == zone2LevelBracket.end() || !zone2LevelBracket[zoneId].InsideBracket(i))
-                        continue;
-
                     if (!(entry->hostileMask & 4))
                     {
                         hordeStarterPerLevelCache[i].push_back(loc);

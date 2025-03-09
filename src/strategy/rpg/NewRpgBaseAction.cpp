@@ -31,6 +31,12 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
     if (dest == WorldPosition())
         return false;
 
+    if (dest != botAI->rpgInfo.moveFarPos)
+    {
+        // clear stuck information if it's a new dest
+        botAI->rpgInfo.SetMoveFarTo(dest);
+    }
+
     float dis = bot->GetExactDist(dest);
     if (dis < pathFinderDis)
     {
@@ -106,6 +112,11 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 
 bool NewRpgBaseAction::MoveNpcTo(ObjectGuid guid, float distance)
 {
+    if (IsWaitingForLastMove(MovementPriority::MOVEMENT_NORMAL))
+    {
+        return false;
+    }
+
     Unit* unit = botAI->GetUnit(guid);
     if (!unit)
         return false;
@@ -136,6 +147,11 @@ bool NewRpgBaseAction::MoveNpcTo(ObjectGuid guid, float distance)
 
 bool NewRpgBaseAction::MoveRandomNear(float moveStep, MovementPriority priority)
 {
+    if (IsWaitingForLastMove(priority))
+    {
+        return false;
+    }
+    
     float distance = rand_norm() * moveStep;
     Map* map = bot->GetMap();
     const float x = bot->GetPositionX();
