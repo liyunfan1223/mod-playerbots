@@ -563,8 +563,11 @@ AiPlayerbot.DisableRandomLevels = 0
 # Set randombots starting level here if "AiPlayerbot.DisableRandomLevels" enabled
 AiPlayerbot.RandombotStartingLevel = 5
 
-# Chance random bot has max level on first randomize (default 0.15)
-AiPlayerbot.RandomBotMaxLevelChance = 0.15
+# Chance random bot has min level on first randomize (default 0.1)
+AiPlayerbot.RandomBotMinLevelChance = 0.1
+
+# Chance random bot has max level on first randomize (default 0.1)
+AiPlayerbot.RandomBotMaxLevelChance = 0.1
 
 # Fix the level of random bot (won't level up by grinding)
 # Default: 0 (disable)

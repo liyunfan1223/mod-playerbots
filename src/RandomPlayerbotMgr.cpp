@@ -1434,6 +1434,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         z = 0.05f + ground;
         PlayerInfo const* pInfo = sObjectMgr->GetPlayerInfo(bot->getRace(true), bot->getClass());
         float dis = loc.GetExactDist(pInfo->positionX, pInfo->positionY, pInfo->positionZ);
+        
         // yunfan: distance check for low level
         if (bot->GetLevel() <= 4 && (loc.GetMapId() != pInfo->mapId || dis > 500.0f))
         {
@@ -1462,6 +1463,12 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
             bot->SetHomebind(loc, zone->ID);
         }
 
+        // Prevent blink to be detected by visible real players
+        if (dis < 150.0f && botAI->HasPlayerNearby(150.0f))
+        {
+            break;
+        }
+
         bot->GetMotionMaster()->Clear();
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI)
@@ -1478,8 +1485,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     if (pmo)
         pmo->finish();
 
-    LOG_ERROR("playerbots", "Cannot teleport bot {} - no locations available ({} locations)", bot->GetName().c_str(),
-              tlocs.size());
+    // LOG_ERROR("playerbots", "Cannot teleport bot {} - no locations available ({} locations)", bot->GetName().c_str(),
+    //           tlocs.size());
 }
 
 void RandomPlayerbotMgr::PrepareZone2LevelBracket()
@@ -1969,6 +1976,13 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     if (sPlayerbotAIConfig->syncLevelWithPlayers)
         maxLevel = std::max(sPlayerbotAIConfig->randomBotMinLevel,
                             std::min(playersLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
+    
+    uint32 minLevel = sPlayerbotAIConfig->randomBotMinLevel;
+    if (bot->getClass() == CLASS_DEATH_KNIGHT)
+    {
+        maxLevel = std::max(maxLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+        minLevel = std::max(minLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+    }
 
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomizeFirst");
 
@@ -1987,14 +2001,19 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     }
     else
     {
-        level = urand(sPlayerbotAIConfig->randomBotMinLevel, maxLevel);
-        if (urand(1, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
+        uint32 roll = urand(1, 100);
+        if (roll <= 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
+        {
             level = maxLevel;
-
-        if (bot->getClass() == CLASS_DEATH_KNIGHT)
-            level = urand(
-                std::max(sPlayerbotAIConfig->randomBotMinLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)),
-                std::max(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), maxLevel));
+        }
+        else if (roll <= (100 * (sPlayerbotAIConfig->randomBotMaxLevelChance + sPlayerbotAIConfig->randomBotMinLevelChance)))
+        {
+            level = minLevel;
+        }
+        else
+        {
+            level = urand(minLevel, maxLevel);
+        }
     }
 
     if (sPlayerbotAIConfig->disableRandomLevels)
