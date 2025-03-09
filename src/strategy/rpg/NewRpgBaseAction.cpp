@@ -347,7 +347,7 @@ bool NewRpgBaseAction::IsQuestWorthDoing(Quest const* quest)
 
 bool NewRpgBaseAction::IsQuestCapableDoing(Quest const* quest)
 {
-    bool highLevelQuest = bot->GetLevel() + 4 < bot->GetQuestLevel(quest);
+    bool highLevelQuest = bot->GetLevel() + 3 < bot->GetQuestLevel(quest);
     if (highLevelQuest)
         return false;
 
@@ -474,13 +474,13 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
 
     if (possibleTargets.empty() && possibleGameObjects.empty())
         return ObjectGuid();
-    
+
     WorldObject* nearestObject = nullptr;
     for (ObjectGuid& guid: possibleTargets)
     {
         WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid);
 
-        if (!object)
+        if (!object || !object->IsInWorld())
             continue;
 
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
@@ -498,7 +498,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
     {
         WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid);
 
-        if (!object)
+        if (!object || !object->IsInWorld())
             continue;
 
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
@@ -525,7 +525,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
     if (!object)
         object = ObjectAccessor::GetGameObject(*bot, guid);
 
-    if (object)
+    if (object && object->IsInWorld())
     {
         return object->GetGUID();
     }

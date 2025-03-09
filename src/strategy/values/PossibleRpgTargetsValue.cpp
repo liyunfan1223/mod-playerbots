@@ -174,11 +174,7 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
     std::vector<std::pair<ObjectGuid, float>> guidDistancePairs;
     for (GameObject* go : targets)
     {
-        if (!ignoreLos && !bot->IsWithinLOSInMap(go))
-            continue;
-
         bool flagCheck = false;
-        
         for (uint32 goFlag : allowedGOFlags)
         {
             if (go->GetGoType() == goFlag)
@@ -188,6 +184,9 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
             }
         }
         if (!flagCheck)
+            continue;
+        
+        if (!ignoreLos && !bot->IsWithinLOSInMap(go))
             continue;
         
         guidDistancePairs.push_back({go->GetGUID(), bot->GetExactDist(go)});
