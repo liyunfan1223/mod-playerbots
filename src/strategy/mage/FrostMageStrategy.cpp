@@ -79,7 +79,8 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(
         new TriggerNode("medium health", NextAction::array(0, new NextAction("ice barrier", ACTION_NORMAL), nullptr)));
-
+    triggers.push_back(
+        new TriggerNode("being attacked", NextAction::array(0, new NextAction("ice barrier", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
         "brain freeze", NextAction::array(0, new NextAction("frostfire bolt", ACTION_NORMAL + 3), nullptr)));
     // Combo cast the last charge of fingers of frost for double crits.

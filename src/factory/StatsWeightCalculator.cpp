@@ -129,6 +129,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     stats_weights_[STATS_TYPE_STAMINA] += 0.1f;
     stats_weights_[STATS_TYPE_ARMOR] += 0.001f;
     stats_weights_[STATS_TYPE_BONUS] += 1.0f;
+    stats_weights_[STATS_TYPE_MELEE_DPS] += 0.01f;
 
     if (cls == CLASS_HUNTER && (tab == HUNTER_TAB_BEASTMASTER || tab == HUNTER_TAB_SURVIVAL))
     {

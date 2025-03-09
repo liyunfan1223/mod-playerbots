@@ -56,6 +56,8 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("enemy too close for spell",
                                        NextAction::array(0, new NextAction("flee", ACTION_MOVE + 9), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
+    triggers.push_back(new TriggerNode("being attacked",
+        NextAction::array(0, new NextAction("power word: shield", ACTION_HIGH + 1), nullptr)));
 }
 
 PriestCureStrategy::PriestCureStrategy(PlayerbotAI* botAI) : Strategy(botAI)
