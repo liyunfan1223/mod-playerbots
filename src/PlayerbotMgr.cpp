@@ -669,7 +669,8 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     
     bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(guid.GetCounter());
 
-    if (!addClassBot)
+    // Only check addClassBot restriction for init commands, not for addclass command
+    if (!addClassBot && cmd.starts_with("init"))
         return "ERROR: You can not use this command on non-addclass bot.";
     
     if (!admin)
@@ -816,118 +817,237 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!*args)
     {
-        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME\n");
+        messages.push_back("usage: list/reload/tweak/self");
+        messages.push_back("usage: bot add account ACCOUNTNAME");
+        messages.push_back("usage: bot add character CHARACTERNAME");
+        messages.push_back("usage: bot remove account ACCOUNTNAME");
+        messages.push_back("usage: bot remove character CHARACTERNAME");
         messages.push_back("usage: addclass CLASSNAME");
         return messages;
     }
 
     char* cmd = strtok((char*)args, " ");
-    char* charname = strtok(nullptr, " ");
     if (!cmd)
     {
-        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME");
+        messages.push_back("usage: list/reload/tweak/self");
+        messages.push_back("usage: bot add account ACCOUNTNAME");
+        messages.push_back("usage: bot add character CHARACTERNAME");
+        messages.push_back("usage: bot remove account ACCOUNTNAME");
+        messages.push_back("usage: bot remove character CHARACTERNAME");
+        messages.push_back("usage: addclass CLASSNAME");
         return messages;
     }
 
-    if (!strcmp(cmd, "initself"))
+    // Handle addclass command separately since it has a different structure
+    if (!strcmp(cmd, "addclass"))
     {
-        if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        char* className = strtok(nullptr, " ");
+        if (sPlayerbotAIConfig->addClassCommand == 0 && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
         {
-            // OnBotLogin(master);
-            PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
-            factory.Randomize(false);
-            messages.push_back("initself ok");
+            messages.push_back("You do not have permission to create bot by addclass command");
+            return messages;
+        }
+        if (!className)
+        {
+            messages.push_back(
+                "addclass: invalid CLASSNAME(warrior/paladin/hunter/rogue/priest/shaman/mage/warlock/druid/dk)");
+            return messages;
+        }
+        uint8 claz;
+        if (!strcmp(className, "warrior"))
+        {
+            claz = 1;
+        }
+        else if (!strcmp(className, "paladin"))
+        {
+            claz = 2;
+        }
+        else if (!strcmp(className, "hunter"))
+        {
+            claz = 3;
+        }
+        else if (!strcmp(className, "rogue"))
+        {
+            claz = 4;
+        }
+        else if (!strcmp(className, "priest"))
+        {
+            claz = 5;
+        }
+        else if (!strcmp(className, "shaman"))
+        {
+            claz = 7;
+        }
+        else if (!strcmp(className, "mage"))
+        {
+            claz = 8;
+        }
+        else if (!strcmp(className, "warlock"))
+        {
+            claz = 9;
+        }
+        else if (!strcmp(className, "druid"))
+        {
+            claz = 11;
+        }
+        else if (!strcmp(className, "dk"))
+        {
+            claz = 6;
+        }
+        else
+        {
+            messages.push_back("Error: Invalid Class. Try again.");
+            return messages;
+        }
+        uint8 teamId = master->GetTeamId(true);
+        const std::unordered_set<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
+        for (const ObjectGuid &guid: guidCache)
+        {
+            if (botLoading.find(guid) != botLoading.end())
+                continue;
+            if (ObjectAccessor::FindConnectedPlayer(guid))
+                continue;
+            uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(guid);
+            if (guildId && PlayerbotAI::IsRealGuild(guildId))
+                continue;
+            AddPlayerBot(guid, master->GetSession()->GetAccountId());
+            messages.push_back("Add class " + std::string(className));
+            return messages;
+        }
+        messages.push_back("Add class failed, no available characters!");
+        return messages;
+    }
+
+    char* subCmd = strtok(nullptr, " ");
+    char* name = strtok(nullptr, " ");
+
+    if (!strcmp(cmd, "add"))
+    {
+        if (!subCmd || !name)
+        {
+            messages.push_back("usage: bot add account ACCOUNTNAME");
+            messages.push_back("usage: bot add character CHARACTERNAME");
+            return messages;
+        }
+
+        if (!strcmp(subCmd, "account"))
+        {
+            uint32 accountId = GetAccountId(name);
+            if (!accountId)
+            {
+                messages.push_back("Account not found");
+                return messages;
+            }
+
+            std::vector<ObjectGuid> guids = GetAccountBots(accountId);
+            if (guids.empty())
+            {
+                messages.push_back("No characters found for account");
+                return messages;
+            }
+
+            for (ObjectGuid const& guid : guids)
+            {
+                if (ObjectAccessor::FindPlayer(guid))
+                    continue;
+
+                AddPlayerBot(guid, master->GetSession()->GetAccountId());
+            }
+            messages.push_back("Account bots added");
+            return messages;
+        }
+        else if (!strcmp(subCmd, "character"))
+        {
+            ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name);
+            if (guid.IsEmpty())
+            {
+                messages.push_back("Character not found");
+                return messages;
+            }
+
+            if (ObjectAccessor::FindPlayer(guid))
+            {
+                messages.push_back("Character is already logged in");
+                return messages;
+            }
+
+            AddPlayerBot(guid, master->GetSession()->GetAccountId());
+            messages.push_back("Character bot added");
             return messages;
         }
         else
         {
-            messages.push_back("ERROR: Only GM can use this command.");
+            messages.push_back("Invalid subcommand. Use 'account' or 'character'");
             return messages;
         }
     }
-
-    if (!strncmp(cmd, "initself=", 9))
+    else if (!strcmp(cmd, "remove"))
     {
-        if (!strcmp(cmd, "initself=uncommon"))
+        if (!subCmd || !name)
         {
-            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
-            {
-                // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_UNCOMMON);
-                factory.Randomize(false);
-                messages.push_back("initself ok");
-                return messages;
-            }
-            else
-            {
-                messages.push_back("ERROR: Only GM can use this command.");
-                return messages;
-            }
+            messages.push_back("usage: bot remove account ACCOUNTNAME");
+            messages.push_back("usage: bot remove character CHARACTERNAME");
+            return messages;
         }
-        if (!strcmp(cmd, "initself=rare"))
+
+        if (!strcmp(subCmd, "character"))
         {
-            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            if (!strcmp(name, "*") && master)
             {
-                // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_RARE);
-                factory.Randomize(false);
-                messages.push_back("initself ok");
+                Group* group = master->GetGroup();
+                if (!group)
+                {
+                    messages.push_back("you must be in group");
+                    return messages;
+                }
+
+                Group::MemberSlotList slots = group->GetMemberSlots();
+                for (Group::member_citerator i = slots.begin(); i != slots.end(); i++)
+                {
+                    ObjectGuid member = i->guid;
+
+                    if (member == master->GetGUID())
+                        continue;
+
+                    if (!ObjectAccessor::FindPlayer(member))
+                        continue;
+
+                    if (!GetPlayerBot(member))
+                        continue;
+
+                    LogoutPlayerBot(member);
+                }
+                messages.push_back("All group bots removed");
                 return messages;
             }
-            else
+
+            ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name);
+            if (guid.IsEmpty())
             {
-                messages.push_back("ERROR: Only GM can use this command.");
+                messages.push_back("Character not found");
                 return messages;
             }
+
+            if (!ObjectAccessor::FindPlayer(guid))
+            {
+                messages.push_back("Character is not logged in");
+                return messages;
+            }
+
+            if (!GetPlayerBot(guid))
+            {
+                messages.push_back("Not your bot");
+                return messages;
+            }
+
+            LogoutPlayerBot(guid);
+            messages.push_back("Character bot removed");
+            return messages;
         }
-        if (!strcmp(cmd, "initself=epic"))
+        else
         {
-            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
-            {
-                // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
-                factory.Randomize(false);
-                messages.push_back("initself ok");
-                return messages;
-            }
-            else
-            {
-                messages.push_back("ERROR: Only GM can use this command.");
-                return messages;
-            }
-        }
-        if (!strcmp(cmd, "initself=legendary"))
-        {
-            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
-            {
-                // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_LEGENDARY);
-                factory.Randomize(false);
-                messages.push_back("initself ok");
-                return messages;
-            }
-            else
-            {
-                messages.push_back("ERROR: Only GM can use this command.");
-                return messages;
-            }
-        }
-        int32 gs;
-        if (sscanf(cmd, "initself=%d", &gs) != -1)
-        {
-            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
-            {
-                // OnBotLogin(master);
-                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
-                factory.Randomize(false);
-                messages.push_back("initself ok, gs = " + std::to_string(gs));
-                return messages;
-            }
-            else
-            {
-                messages.push_back("ERROR: Only GM can use this command.");
-                return messages;
-            }
+            messages.push_back("Invalid subcommand. Use 'account' or 'character'");
+            return messages;
         }
     }
 
@@ -989,87 +1109,9 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         return messages;
     }
 
-    if (!strcmp(cmd, "addclass"))
-    {
-        if (sPlayerbotAIConfig->addClassCommand == 0 && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
-        {
-            messages.push_back("You do not have permission to create bot by addclass command");
-            return messages;
-        }
-        if (!charname)
-        {
-            messages.push_back(
-                "addclass: invalid CLASSNAME(warrior/paladin/hunter/rogue/priest/shaman/mage/warlock/druid/dk)");
-            return messages;
-        }
-        uint8 claz;
-        if (!strcmp(charname, "warrior"))
-        {
-            claz = 1;
-        }
-        else if (!strcmp(charname, "paladin"))
-        {
-            claz = 2;
-        }
-        else if (!strcmp(charname, "hunter"))
-        {
-            claz = 3;
-        }
-        else if (!strcmp(charname, "rogue"))
-        {
-            claz = 4;
-        }
-        else if (!strcmp(charname, "priest"))
-        {
-            claz = 5;
-        }
-        else if (!strcmp(charname, "shaman"))
-        {
-            claz = 7;
-        }
-        else if (!strcmp(charname, "mage"))
-        {
-            claz = 8;
-        }
-        else if (!strcmp(charname, "warlock"))
-        {
-            claz = 9;
-        }
-        else if (!strcmp(charname, "druid"))
-        {
-            claz = 11;
-        }
-        else if (!strcmp(charname, "dk"))
-        {
-            claz = 6;
-        }
-        else
-        {
-            messages.push_back("Error: Invalid Class. Try again.");
-            return messages;
-        }
-        uint8 teamId = master->GetTeamId(true);
-        const std::unordered_set<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
-        for (const ObjectGuid &guid: guidCache)
-        {
-            if (botLoading.find(guid) != botLoading.end())
-                continue;
-            if (ObjectAccessor::FindConnectedPlayer(guid))
-                continue;
-            uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(guid);
-            if (guildId && PlayerbotAI::IsRealGuild(guildId))
-                continue;
-            AddPlayerBot(guid, master->GetSession()->GetAccountId());
-            messages.push_back("Add class " + std::string(charname));
-            return messages;
-        }
-        messages.push_back("Add class failed, no available characters!");
-        return messages;
-    }
-
     std::string charnameStr;
 
-    if (!charname)
+    if (!name)
     {
         std::string name;
         bool isPlayer = sCharacterCache->GetCharacterNameByGuid(master->GetTarget(), name);
@@ -1086,7 +1128,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     }
     else
     {
-        charnameStr = charname;
+        charnameStr = name;
     }
 
     std::string const cmdStr = cmd;
@@ -1627,4 +1669,21 @@ PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
     }
 
     return nullptr;
+}
+
+std::vector<ObjectGuid> PlayerbotHolder::GetAccountBots(uint32 accountId)
+{
+    std::vector<ObjectGuid> guids;
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
+    stmt->SetData(0, accountId);
+    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            ObjectGuid::LowType guidLow = fields[0].Get<uint32>();
+            guids.push_back(ObjectGuid(HighGuid::Player, guidLow));
+        } while (result->NextRow());
+    }
+    return guids;
 }

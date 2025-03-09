@@ -54,6 +54,7 @@ public:
     std::string const LookupBots(Player* master);
     uint32 GetPlayerbotsCount() { return playerBots.size(); }
     uint32 GetPlayerbotsCountByClass(uint32 cls);
+    std::vector<ObjectGuid> GetAccountBots(uint32 accountId);
 
 protected:
     virtual void OnBotLoginInternal(Player* const bot) = 0;
