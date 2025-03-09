@@ -29,7 +29,7 @@ protected:
     // MOVEMENT RELATED
     bool MoveFarTo(WorldPosition dest);
     bool MoveNpcTo(ObjectGuid guid, float distance = INTERACTION_DISTANCE);
-    bool MoveRandomNear(float moveStep = 50.0f);
+    bool MoveRandomNear(float moveStep = 50.0f, MovementPriority priority = MovementPriority::MOVEMENT_WANDER);
     bool ForceToWait(uint32 duration, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
 
     // QUEST RELATED

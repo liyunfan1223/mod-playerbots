@@ -7,6 +7,7 @@
 #include "ChatHelper.h"
 #include "G3D/Vector2.h"
 #include "GossipDef.h"
+#include "IVMapMgr.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
@@ -335,7 +336,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
 
         // double check for GetQuestPOIPosAndObjectiveIdx
-        if (dz == INVALID_HEIGHT)
+        if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
             return false;
 
         WorldPosition pos(bot->GetMapId(), dx, dy, dz);
@@ -427,8 +428,9 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
         float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
 
         // double check for GetQuestPOIPosAndObjectiveIdx
-        if (dz == INVALID_HEIGHT)
+        if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
             return false;
+        
         WorldPosition pos(bot->GetMapId(), dx, dy, dz);
         botAI->rpgInfo.do_quest.lastReachPOI = 0;
         botAI->rpgInfo.do_quest.pos = pos;
