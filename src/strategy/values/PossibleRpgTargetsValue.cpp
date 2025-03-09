@@ -11,6 +11,8 @@
 #include "ObjectGuid.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "SharedDefines.h"
+#include "NearestGameObjects.h"
 
 std::vector<uint32> PossibleRpgTargetsValue::allowedNpcFlags;
 
@@ -157,4 +159,48 @@ bool PossibleNewRpgTargetsValue::AcceptUnit(Unit* unit)
     }
 
     return false;
+}
+
+std::vector<GameobjectTypes> PossibleNewRpgGameObjectsValue::allowedGOFlags;
+
+GuidVector PossibleNewRpgGameObjectsValue::Calculate()
+{
+    std::list<GameObject*> targets;
+    AnyGameObjectInObjectRangeCheck u_check(bot, range);
+    Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
+    Cell::VisitAllObjects(bot, searcher, range);
+
+    
+    std::vector<std::pair<ObjectGuid, float>> guidDistancePairs;
+    for (GameObject* go : targets)
+    {
+        if (!ignoreLos && !bot->IsWithinLOSInMap(go))
+            continue;
+
+        bool flagCheck = false;
+        
+        for (uint32 goFlag : allowedGOFlags)
+        {
+            if (go->GetGoType() == goFlag)
+            {
+                flagCheck = true;
+                break;
+            }
+        }
+        if (!flagCheck)
+            continue;
+        
+        guidDistancePairs.push_back({go->GetGUID(), bot->GetExactDist(go)});
+    }
+    GuidVector results;
+
+    // Sort by distance
+    std::sort(guidDistancePairs.begin(), guidDistancePairs.end(), [](const auto& a, const auto& b) {
+        return a.second < b.second;
+    });
+    
+    for (const auto& pair : guidDistancePairs) {
+        results.push_back(pair.first);
+    }
+    return results;
 }

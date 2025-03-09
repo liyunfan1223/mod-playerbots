@@ -6,8 +6,10 @@
 #ifndef _PLAYERBOT_POSSIBLERPGTARGETSVALUE_H
 #define _PLAYERBOT_POSSIBLERPGTARGETSVALUE_H
 
+#include "NearestGameObjects.h"
 #include "NearestUnitsValue.h"
 #include "PlayerbotAIConfig.h"
+#include "SharedDefines.h"
 
 class PlayerbotAI;
 
@@ -33,6 +35,26 @@ public:
 protected:
     void FindUnits(std::list<Unit*>& targets) override;
     bool AcceptUnit(Unit* unit) override;
+};
+
+class PossibleNewRpgGameObjectsValue : public ObjectGuidListCalculatedValue
+{
+public:
+    PossibleNewRpgGameObjectsValue(PlayerbotAI* botAI, float range = 150.0f, bool ignoreLos = true)
+        : ObjectGuidListCalculatedValue(botAI, "possible new rpg game objects"), range(range), ignoreLos(ignoreLos)
+    {
+        if (allowedGOFlags.empty())
+        {
+            allowedGOFlags.push_back(GAMEOBJECT_TYPE_QUESTGIVER);
+        }
+    }
+    
+    static std::vector<GameobjectTypes> allowedGOFlags;
+    GuidVector Calculate() override;
+
+private:
+    float range;
+    bool ignoreLos;
 };
 
 #endif

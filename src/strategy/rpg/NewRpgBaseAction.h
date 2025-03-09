@@ -34,8 +34,9 @@ protected:
 
     // QUEST RELATED
     bool SearchQuestGiverAndAcceptOrReward();
-    ObjectGuid ChooseNpcToInteract(bool questgiverOnly = false, float distanceLimit = 0.0f);
-    bool InteractWithNpcForQuest(ObjectGuid guid);
+    ObjectGuid ChooseNpcOrGameObjectToInteract(bool questgiverOnly = false, float distanceLimit = 0.0f);
+    bool HasQuestToAcceptOrReward(WorldObject* object);
+    bool InteractWithNpcOrGameObjectForQuest(ObjectGuid guid);
     bool AcceptQuest(Quest const* quest, ObjectGuid guid);
     bool TurnInQuest(Quest const* quest, ObjectGuid guid);
     uint32 BestReward(Quest const* quest);

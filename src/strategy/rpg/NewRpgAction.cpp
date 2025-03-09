@@ -230,7 +230,7 @@ bool NewRpgMoveNpcAction::Execute(Event event)
     if (!info.near_npc.npc)
     {
         // No npc can be found, switch to IDLE
-        ObjectGuid npc = ChooseNpcToInteract();
+        ObjectGuid npc = ChooseNpcOrGameObjectToInteract();
         if (npc.IsEmpty())
         {
             info.ChangeToIdle();
@@ -247,7 +247,7 @@ bool NewRpgMoveNpcAction::Execute(Event event)
         if (!info.near_npc.lastReach)
         {
             info.near_npc.lastReach = getMSTime();
-            InteractWithNpcForQuest(info.near_npc.npc);
+            InteractWithNpcOrGameObjectForQuest(info.near_npc.npc);
             return true;
         }
 

@@ -197,22 +197,23 @@ bool NewRpgBaseAction::ForceToWait(uint32 duration, MovementPriority priority)
 
 /// @TODO: Fix redundant code
 /// Quest related method refer to TalkToQuestGiverAction.h
-bool NewRpgBaseAction::InteractWithNpcForQuest(ObjectGuid guid)
+bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
 {
-    Creature* creature = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
-    if (!creature)
+    WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid);
+    if (!object || !bot->CanInteractWithQuestGiver(object))
         return false;
 
-    WorldPacket packet(CMSG_GOSSIP_HELLO);
-    packet << guid;
-    bot->GetSession()->HandleGossipHelloOpcode(packet);
+    // Creature* creature = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
+    // if (creature)
+    // {
+    //     WorldPacket packet(CMSG_GOSSIP_HELLO);
+    //     packet << guid;
+    //     bot->GetSession()->HandleGossipHelloOpcode(packet);
+    // }
 
     bot->PrepareQuestMenu(guid);
     const QuestMenu &menu = bot->PlayerTalkClass->GetQuestMenu();
     if (menu.Empty())
-        return true;
-
-    if (!creature->IsQuestGiver())
         return true;
 
     for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
@@ -452,12 +453,12 @@ bool NewRpgBaseAction::OrganizeQuestLog()
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 {
     OrganizeQuestLog();
-    if (ObjectGuid npc = ChooseNpcToInteract(true, 80.0f))
+    if (ObjectGuid npc = ChooseNpcOrGameObjectToInteract(true, 80.0f))
     {
         const WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npc);
         if (bot->GetDistance(object) <= INTERACTION_DISTANCE)
         {
-            InteractWithNpcForQuest(npc);
+            InteractWithNpcOrGameObjectForQuest(npc);
             ForceToWait(5000);
             return true;
         }
@@ -466,18 +467,18 @@ bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
     return false;
 }
 
-ObjectGuid NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float distanceLimit)
+ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly, float distanceLimit)
 {
     GuidVector possibleTargets = AI_VALUE(GuidVector, "possible new rpg targets");
-    if (possibleTargets.empty())
+    GuidVector possibleGameObjects = AI_VALUE(GuidVector, "possible new rpg game objects");
+
+    if (possibleTargets.empty() && possibleGameObjects.empty())
         return ObjectGuid();
-    Unit* selected = nullptr;
-    // Unit* unitWithQuest = nullptr;
+    
+    WorldObject* nearestObject = nullptr;
     for (ObjectGuid& guid: possibleTargets)
     {
-        WorldObject* object = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
-        if (!object)
-            object = ObjectAccessor::GetGameObject(*bot, guid);
+        WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid);
 
         if (!object)
             continue;
@@ -485,44 +486,34 @@ ObjectGuid NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float dist
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
             continue;
         
-        if (object->ToCreature() && !object->ToCreature()->IsQuestGiver())
-            continue;
-
-        if (object->ToGameObject() && object->ToGameObject()->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
-            continue;
-
-        bot->PrepareQuestMenu(guid);
-        const QuestMenu &menu = bot->PlayerTalkClass->GetQuestMenu();
-        if (menu.Empty())
-            continue;
-        
-        for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
+        if (HasQuestToAcceptOrReward(object))
         {
-            const QuestMenuItem &item = menu.GetItem(idx);
-            const Quest* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
-            if (!quest)
-                continue;
-            const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
-            if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
-            {
-                return object->GetGUID();
-            }
-        }
-        for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
-        {
-            const QuestMenuItem &item = menu.GetItem(idx);
-            const Quest* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
-            if (!quest)
-                continue;
-
-            const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
-            if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
-                bot->CanAddQuest(quest, false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
-            {
-                return object->GetGUID();
-            }
+            if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
+                nearestObject = object;
+            break;
         }
     }
+
+    for (ObjectGuid& guid: possibleGameObjects)
+    {
+        WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid);
+
+        if (!object)
+            continue;
+
+        if (distanceLimit && bot->GetDistance(object) > distanceLimit)
+            continue;
+        
+        if (HasQuestToAcceptOrReward(object))
+        {
+            if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
+                nearestObject = object;
+            break;
+        }
+    }
+
+    if (nearestObject)
+        return nearestObject->GetGUID();
 
     // No questgiver to accept or reward
     if (questgiverOnly)
@@ -539,6 +530,43 @@ ObjectGuid NewRpgBaseAction::ChooseNpcToInteract(bool questgiverOnly, float dist
         return object->GetGUID();
     }
     return ObjectGuid();
+}
+
+bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
+{
+    ObjectGuid guid = object->GetGUID();
+    bot->PrepareQuestMenu(guid);
+    const QuestMenu &menu = bot->PlayerTalkClass->GetQuestMenu();
+    if (menu.Empty())
+        return false;
+    
+    for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
+    {
+        const QuestMenuItem &item = menu.GetItem(idx);
+        const Quest* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
+        if (!quest)
+            continue;
+        const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
+        if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
+        {
+            return true;
+        }
+    }
+    for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
+    {
+        const QuestMenuItem &item = menu.GetItem(idx);
+        const Quest* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
+        if (!quest)
+            continue;
+
+        const QuestStatus &status = bot->GetQuestStatus(item.QuestId);
+        if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
+            bot->CanAddQuest(quest, false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 static std::vector<float> GenerateRandomWeights(int n) {
