@@ -519,6 +519,9 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
     if (questgiverOnly)
         return ObjectGuid();
 
+    if (possibleTargets.empty())
+        return ObjectGuid();
+    
     int idx = urand(0, possibleTargets.size() - 1);
     ObjectGuid guid = possibleTargets[idx];
     WorldObject* object = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
