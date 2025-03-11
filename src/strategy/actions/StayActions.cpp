@@ -8,6 +8,7 @@
 #include "Event.h"
 #include "LastMovementValue.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 
 bool StayActionBase::Stay()
 {
@@ -42,6 +43,17 @@ bool StayAction::Execute(Event event) { return Stay(); }
 
 bool StayAction::isUseful()
 {
+    // Check if the bots is in stay position
+    PositionInfo stayPosition = AI_VALUE(PositionMap&, "position")["stay"];
+    if (stayPosition.isSet())
+    {
+        const float distance = bot->GetDistance(stayPosition.x, stayPosition.y, stayPosition.z);
+        if (sPlayerbotAIConfig->followDistance)
+        {
+            return false;
+        }
+    }
+
     // move from group takes priority over stay as it's added and removed automatically
     // (without removing/adding stay)
     if (botAI->HasStrategy("move from group", BOT_STATE_COMBAT) ||

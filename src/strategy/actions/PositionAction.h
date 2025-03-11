@@ -40,6 +40,13 @@ public:
     GuardAction(PlayerbotAI* botAI) : MoveToPositionAction(botAI, "move to position", "guard") {}
 };
 
+class ReturnToStayPositionAction : public MoveToPositionAction
+{
+public:
+    ReturnToStayPositionAction(PlayerbotAI* ai) : MoveToPositionAction(ai, "move to position", "stay") {}
+    virtual bool isPossible();
+};
+
 class SetReturnPositionAction : public Action
 {
 public:
