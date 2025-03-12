@@ -4945,7 +4945,7 @@ Item* PlayerbotAI::FindLockedItem() const
 {
     return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
     {
-        if (!this->botAI->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
+        if (!this->bot->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
             return false;
 
         if (itemTemplate->LockID == 0)  // Ensure the item is actually locked
