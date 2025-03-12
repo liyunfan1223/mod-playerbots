@@ -15,17 +15,14 @@ bool UnlockItemAction::Execute(Event event)
     Item* item = botAI->FindLockedItem();
     if (item)
     {
-        uint8 bag = item->GetBagSlot();  // Retrieves the bag slot (0 for main inventory)
-        uint8 slot = item->GetSlot();    // Retrieves the actual slot inside the bag
-
-        UnlockItem(item, bag, slot);
+        UnlockItem(item);
         foundLockedItem = true;
     }
 
     return foundLockedItem;
 }
 
-void UnlockItemAction::UnlockItem(Item* item, uint8 bag, uint8 slot)
+void UnlockItemAction::UnlockItem(Item* item)
 {
     // Use CastSpell to unlock the item
     if (botAI->CastSpell(PICK_LOCK_SPELL_ID, bot, item))
