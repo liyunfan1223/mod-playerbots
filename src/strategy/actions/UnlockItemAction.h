@@ -13,7 +13,6 @@ public:
     bool Execute(Event event) override;
 
 private:
-    bool CanUnlockItem(Item* item);
     void UnlockItem(Item* item, uint8 bag, uint8 slot);
 };
 
