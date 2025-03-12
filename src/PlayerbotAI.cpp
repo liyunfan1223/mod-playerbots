@@ -4932,6 +4932,52 @@ Item* PlayerbotAI::FindBandage() const
         { return pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == ITEM_SUBCLASS_BANDAGE; });
 }
 
+Item* PlayerbotAI::FindOpenableItem() const
+{
+    return FindItemInInventory([](ItemTemplate const* itemTemplate) -> bool
+    {
+        return (itemTemplate->Flags & ITEM_FLAG_HAS_LOOT) &&
+               (itemTemplate->LockID == 0 || !bot->GetItemByEntry(itemTemplate->ItemId)->IsLocked());
+    });
+}
+
+Item* PlayerbotAI::FindLockedItem() const
+{
+    return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
+    {
+        if (!botAI->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
+            return false;
+
+        if (itemTemplate->LockID == 0)  // Ensure the item is actually locked
+            return false;
+
+        Item* item = bot->GetItemByEntry(itemTemplate->ItemId);
+        if (!item || !item->IsLocked())  // Ensure item instance is locked
+            return false;
+
+        // Check if bot has enough Lockpicking skill
+        LockEntry const* lockInfo = sLockStore.LookupEntry(itemTemplate->LockID);
+        if (!lockInfo)
+            return false;
+
+        for (uint8 j = 0; j < 8; ++j)
+        {
+            if (lockInfo->Type[j] == LOCK_KEY_SKILL)
+            {
+                uint32 skillId = SkillByLockType(LockType(lockInfo->Index[j]));
+                if (skillId == SKILL_LOCKPICKING)
+                {
+                    uint32 requiredSkill = lockInfo->Skill[j];
+                    uint32 botSkill = bot->GetSkillValue(SKILL_LOCKPICKING);
+                    return botSkill >= requiredSkill;
+                }
+            }
+        }
+
+        return false;
+    });
+}
+
 static const uint32 uPriorizedSharpStoneIds[8] = {ADAMANTITE_SHARPENING_DISPLAYID, FEL_SHARPENING_DISPLAYID,
                                                   ELEMENTAL_SHARPENING_DISPLAYID,  DENSE_SHARPENING_DISPLAYID,
                                                   SOLID_SHARPENING_DISPLAYID,      HEAVY_SHARPENING_DISPLAYID,
