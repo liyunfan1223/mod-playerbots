@@ -638,10 +638,21 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(botAccount);
     bool isMasterAccount = (masterAccountId == botAccount);
 
-    if (cmd == "add" || cmd == "login")
+    if (cmd == "add" || cmd == "addaccount" || cmd == "login")
     {
         if (ObjectAccessor::FindPlayer(guid))
             return "player already logged in";
+
+        // For addaccount command, verify it's an account name
+        if (cmd == "addaccount")
+        {
+            uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
+            if (!accountId)
+                return "character not found";
+
+            if (!sPlayerbotAIConfig->allowAccountBots && accountId != masterAccountId)
+                return "you can only add bots from your own account";
+        }
 
         AddPlayerBot(guid, masterAccountId);
         return "ok";
@@ -816,34 +827,17 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!*args)
     {
-        messages.push_back("usage: bot add character/account NAME or bot remove character/account NAME");
-        messages.push_back("usage: bot addclass CLASSNAME");
-        messages.push_back("usage: list/reload/tweak/self");
+        messages.push_back("usage: list/reload/tweak/self or add/addaccount/init/remove PLAYERNAME\n");
+        messages.push_back("usage: addclass CLASSNAME");
         return messages;
     }
 
     char* cmd = strtok((char*)args, " ");
+    char* charname = strtok(nullptr, " ");
     if (!cmd)
     {
-        messages.push_back("usage: bot add character/account NAME or bot remove character/account NAME");
-        messages.push_back("usage: bot addclass CLASSNAME");
-        messages.push_back("usage: list/reload/tweak/self");
+        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME");
         return messages;
-    }
-
-    // Handle the "bot" command prefix if it exists
-    bool hasCommandPrefix = false;
-    if (!strcmp(cmd, "bot"))
-    {
-        hasCommandPrefix = true;
-        cmd = strtok(nullptr, " ");
-        if (!cmd)
-        {
-            messages.push_back("usage: bot add character/account NAME or bot remove character/account NAME");
-            messages.push_back("usage: bot addclass CLASSNAME");
-            messages.push_back("usage: list/reload/tweak/self");
-            return messages;
-        }
     }
 
     if (!strcmp(cmd, "initself"))
@@ -1006,10 +1000,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         return messages;
     }
 
-    // Handle the addclass command to add random bots of specific class
     if (!strcmp(cmd, "addclass"))
     {
-        char* charname = strtok(nullptr, " ");
         if (sPlayerbotAIConfig->addClassCommand == 0 && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
         {
             messages.push_back("You do not have permission to create bot by addclass command");
@@ -1086,151 +1078,20 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         return messages;
     }
 
-    // Handle new command format: "add character", "add account", "remove character", "remove account"
-    if (!strcmp(cmd, "add") || !strcmp(cmd, "remove"))
-    {
-        bool isAdd = !strcmp(cmd, "add");
-        std::string cmdStr = isAdd ? "add" : "remove";
-        
-        // Get the type (character or account) or wildcard
-        char* typeArg = strtok(nullptr, " ");
-        if (!typeArg)
-        {
-            messages.push_back("usage: bot " + cmdStr + " character/account NAME or bot " + cmdStr + " *");
-            return messages;
-        }
-        
-        // Handle wildcard removal
-        if (!strcmp(typeArg, "*") && !isAdd)
-        {
-            std::unordered_set<std::string> bots;
-            for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
-            {
-                if (Player* bot = it->second)
-                    if (bot->IsInWorld())
-                        bots.insert(bot->GetName());
-            }
-            
-            for (const auto& botName : bots)
-            {
-                ObjectGuid member = sCharacterCache->GetCharacterGuidByName(botName);
-                if (member && master)
-                {
-                    std::string result = ProcessBotCommand(cmdStr, member, master->GetGUID(),
-                        master->GetSession()->GetSecurity() >= SEC_GAMEMASTER,
-                        master->GetSession()->GetAccountId(), master->GetGuildId());
-                    messages.push_back(cmdStr + ": " + botName + " - " + result);
-                }
-            }
-            return messages;
-        }
-        
-        std::string typeStr = typeArg;
-        bool isAccount = false;
-        
-        if (typeStr == "character" || typeStr == "char")
-        {
-            isAccount = false;
-        }
-        else if (typeStr == "account" || typeStr == "acc")
-        {
-            isAccount = true;
-        }
-        else
-        {
-            messages.push_back("Invalid type. Use 'character' or 'account' or '*'");
-            return messages;
-        }
-        
-        // Get the name
-        char* nameArg = strtok(nullptr, " ");
-        if (!nameArg)
-        {
-            messages.push_back("usage: bot " + cmdStr + " " + typeStr + " NAME");
-            return messages;
-        }
-        
-        std::string nameStr = nameArg;
-        std::unordered_set<std::string> bots;
-        
-        if (isAccount)
-        {
-            // Handle account level operation
-            uint32 accountId = GetAccountId(nameStr);
-            if (!accountId)
-            {
-                messages.push_back("Account '" + nameStr + "' not found.");
-                return messages;
-            }
-            
-            QueryResult results = CharacterDatabase.Query("SELECT name FROM characters WHERE account = {}", accountId);
-            if (results)
-            {
-                do
-                {
-                    Field* fields = results->Fetch();
-                    std::string const charName = fields[0].Get<std::string>();
-                    bots.insert(charName);
-                } while (results->NextRow());
-            }
-            else
-            {
-                messages.push_back("No characters found for account '" + nameStr + "'.");
-                return messages;
-            }
-        }
-        else
-        {
-            // Handle character level operation
-            bots.insert(nameStr);
-        }
-        
-        for (auto i = bots.begin(); i != bots.end(); ++i)
-        {
-            std::string const bot = *i;
-            
-            std::ostringstream out;
-            out << cmdStr << ": " << bot << " - ";
-            
-            ObjectGuid member = sCharacterCache->GetCharacterGuidByName(bot);
-            if (!member)
-            {
-                out << "character not found";
-            }
-            else if (master && member != master->GetGUID())
-            {
-                out << ProcessBotCommand(cmdStr, member, master->GetGUID(),
-                                      master->GetSession()->GetSecurity() >= SEC_GAMEMASTER,
-                                      master->GetSession()->GetAccountId(), master->GetGuildId());
-            }
-            else if (!master)
-            {
-                out << ProcessBotCommand(cmdStr, member, ObjectGuid::Empty, true, -1, -1);
-            }
-            
-            messages.push_back(out.str());
-        }
-        
-        return messages;
-    }
-
-    // Handle legacy command format for backward compatibility
     std::string charnameStr;
-    char* charname = strtok(nullptr, " ");
 
     if (!charname)
     {
         std::string name;
         bool isPlayer = sCharacterCache->GetCharacterNameByGuid(master->GetTarget(), name);
+        // Player* tPlayer = ObjectAccessor::FindConnectedPlayer(master->GetTarget());
         if (isPlayer)
         {
             charnameStr = name;
         }
         else
         {
-            messages.push_back("usage: bot add character/account NAME or bot remove character/account NAME");
-            messages.push_back("usage: bot addclass CLASSNAME");
-            messages.push_back("usage: list/reload/tweak/self");
+            messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
             return messages;
         }
     }
@@ -1280,34 +1141,48 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     {
         std::string const s = *i;
 
-        // If * is specified, add all bots to the set
-        if (s == "*")
+        if (!strcmp(cmd, "addaccount"))
         {
-            for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+            // When using addaccount, first try to get account ID directly
+            uint32 accountId = GetAccountId(s);
+            if (!accountId)
             {
-                if (Player* bot = it->second)
-                    if (bot->IsInWorld())
-                        bots.insert(bot->GetName());
+                // If not found, try to get account ID from character name
+                ObjectGuid charGuid = sCharacterCache->GetCharacterGuidByName(s);
+                if (!charGuid)
+                {
+                    messages.push_back("Neither account nor character '" + s + "' found");
+                    continue;
+                }
+                accountId = sCharacterCache->GetCharacterAccountIdByGuid(charGuid);
+                if (!accountId)
+                {
+                    messages.push_back("Could not find account for character '" + s + "'");
+                    continue;
+                }
             }
-            continue;
-        }
 
-        uint32 accountId = GetAccountId(s);
-        if (!accountId)
-        {
-            bots.insert(s);
-            continue;
-        }
-
-        QueryResult results = CharacterDatabase.Query("SELECT name FROM characters WHERE account = {}", accountId);
-        if (results)
-        {
-            do
+            QueryResult results = CharacterDatabase.Query("SELECT name FROM characters WHERE account = {}", accountId);
+            if (results)
             {
-                Field* fields = results->Fetch();
-                std::string const charName = fields[0].Get<std::string>();
-                bots.insert(charName);
-            } while (results->NextRow());
+                do
+                {
+                    Field* fields = results->Fetch();
+                    std::string const charName = fields[0].Get<std::string>();
+                    bots.insert(charName);
+                } while (results->NextRow());
+            }
+        }
+        else
+        {
+            // For regular add command, only add the specific character
+            ObjectGuid charGuid = sCharacterCache->GetCharacterGuidByName(s);
+            if (!charGuid)
+            {
+                messages.push_back("Character '" + s + "' not found");
+                continue;
+            }
+            bots.insert(s);
         }
     }
 
@@ -1326,8 +1201,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         else if (master && member != master->GetGUID())
         {
             out << ProcessBotCommand(cmdStr, member, master->GetGUID(),
-                                    master->GetSession()->GetSecurity() >= SEC_GAMEMASTER,
-                                    master->GetSession()->GetAccountId(), master->GetGuildId());
+                                     master->GetSession()->GetSecurity() >= SEC_GAMEMASTER,
+                                     master->GetSession()->GetAccountId(), master->GetGuildId());
         }
         else if (!master)
         {
