@@ -4934,10 +4934,10 @@ Item* PlayerbotAI::FindBandage() const
 
 Item* PlayerbotAI::FindOpenableItem() const
 {
-    return FindItemInInventory([](ItemTemplate const* itemTemplate) -> bool
+    return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
     {
         return (itemTemplate->Flags & ITEM_FLAG_HAS_LOOT) &&
-               (itemTemplate->LockID == 0 || !bot->GetItemByEntry(itemTemplate->ItemId)->IsLocked());
+               (itemTemplate->LockID == 0 || !this->bot->GetItemByEntry(itemTemplate->ItemId)->IsLocked());
     });
 }
 
@@ -4945,13 +4945,13 @@ Item* PlayerbotAI::FindLockedItem() const
 {
     return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
     {
-        if (!botAI->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
+        if (!this->botAI->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
             return false;
 
         if (itemTemplate->LockID == 0)  // Ensure the item is actually locked
             return false;
 
-        Item* item = bot->GetItemByEntry(itemTemplate->ItemId);
+        Item* item = this->bot->GetItemByEntry(itemTemplate->ItemId);
         if (!item || !item->IsLocked())  // Ensure item instance is locked
             return false;
 
@@ -4968,7 +4968,7 @@ Item* PlayerbotAI::FindLockedItem() const
                 if (skillId == SKILL_LOCKPICKING)
                 {
                     uint32 requiredSkill = lockInfo->Skill[j];
-                    uint32 botSkill = bot->GetSkillValue(SKILL_LOCKPICKING);
+                    uint32 botSkill = this->bot->GetSkillValue(SKILL_LOCKPICKING);
                     return botSkill >= requiredSkill;
                 }
             }
