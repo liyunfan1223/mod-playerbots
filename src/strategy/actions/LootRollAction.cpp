@@ -66,7 +66,7 @@ bool LootRollAction::Execute(Event event)
                     break;
                 default:
                     if (StoreLootAction::IsLootAllowed(itemId, botAI))
-                        vote = NEED;
+                        vote = CalculateRollVote(proto); // Ensure correct Need/Greed behavior
                     break;
             }
         }

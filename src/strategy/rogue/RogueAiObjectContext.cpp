@@ -173,7 +173,7 @@ private:
     static Action* check_stealth(PlayerbotAI* botAI) { return new CheckStealthAction(botAI); }
     static Action* sap(PlayerbotAI* botAI) { return new CastSapAction(botAI); }
     static Action* unstealth(PlayerbotAI* botAI) { return new UnstealthAction(botAI); }
-    static Action* envenom(PlayerbotAI* ai) { return new EnvenomAction(ai); }
+    static Action* envenom(PlayerbotAI* ai) { return new CastEnvenomAction(ai); }
     static Action* tricks_of_the_trade_on_main_tank(PlayerbotAI* ai)
     {
         return new CastTricksOfTheTradeOnMainTankAction(ai);

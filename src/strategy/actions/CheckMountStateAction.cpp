@@ -12,6 +12,10 @@
 #include "ServerFacade.h"
 #include "SpellAuraEffects.h"
 
+// Define the static map / init bool for caching bot preferred mount data globally
+std::unordered_map<uint32, PreferredMountCache> CheckMountStateAction::mountCache;
+bool CheckMountStateAction::preferredMountTableChecked = false;
+
 MountData CollectMountData(const Player* bot)
 {
     MountData data;
@@ -191,9 +195,8 @@ bool CheckMountStateAction::Mount()
         botAI->RemoveAura("tree of life");
     }
 
-    // Disabled for now until properly implemented
-    //if (TryPreferredMount(master))
-    //    return true;
+    if (TryPreferredMount(master))
+        return true;
 
     // Get bot mount data
     MountData mountData = CollectMountData(bot);
@@ -271,59 +274,101 @@ bool CheckMountStateAction::TryForms(Player* master, int32 masterMountType, int3
 
 bool CheckMountStateAction::TryPreferredMount(Player* master) const
 {
-    static bool tableExists = false;
-    static bool tableChecked = false;
+    uint32 botGUID = bot->GetGUID().GetRawValue();
 
-    if (!tableChecked)
+    // Build cache (only once)
+    if (!preferredMountTableChecked)
     {
-        // Check for preferred mounts table in db
+        // Verify preferred mounts table existance in the database
         QueryResult checkTable = PlayerbotsDatabase.Query(
             "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = 'acore_playerbots' AND table_name = 'playerbots_preferred_mounts')");
-        tableExists = checkTable && checkTable->Fetch()[0].Get<uint32>() == 1;
-        tableChecked = true;
-    }
 
-    if (tableExists)
-    {
-        // Check for preferred mount entry
-        QueryResult result = PlayerbotsDatabase.Query(
-            "SELECT spellid FROM playerbots_preferred_mounts WHERE guid = {} AND type = {}",
-            bot->GetGUID().GetCounter(), GetMountType(master));
-
-        if (result)
+        if (checkTable && checkTable->Fetch()[0].Get<uint32>() == 1)
         {
-            std::vector<uint32> mounts;
-            do
-            {
-                mounts.push_back(result->Fetch()[0].Get<uint32>());
-            } while (result->NextRow());
+            preferredMountTableChecked = true;
 
-            // Validate spell ID
-            // TODO: May want to do checks for 'bot riding skill > skill required to ride the mount'
-            if (!mounts.empty())
+            // Cache all mounts of both types globally, for all entries
+            QueryResult result = PlayerbotsDatabase.Query("SELECT guid, spellid, type FROM playerbots_preferred_mounts");
+
+            if (result)
             {
-                uint32 index = urand(0, mounts.size() - 1);
-                if (index < mounts.size() && sSpellMgr->GetSpellInfo(mounts[index]) &&
-                    botAI->CanCastSpell(mounts[index], bot))
+                uint32 totalResults = 0;
+                while (auto row = result->Fetch())
                 {
-                    botAI->CastSpell(mounts[index], bot);
-                    return true;
+                    uint32 guid = row[0].Get<uint32>();
+                    uint32 spellId = row[1].Get<uint32>();
+                    uint32 mountType = row[2].Get<uint32>();
+
+                    if (mountType == 0)
+                        mountCache[guid].groundMounts.push_back(spellId);
+
+                    else if (mountType == 1)
+                        mountCache[guid].flightMounts.push_back(spellId);
+
+                    totalResults++;
+
+                    result->NextRow();
                 }
+                LOG_INFO("playerbots", "Preferred mounts initialized | Total records: {}", totalResults);
             }
         }
+        else // If the SQL table is missing, log an error and return false
+        {
+            preferredMountTableChecked = true;
+
+            LOG_DEBUG("playerbots", "Preferred mounts SQL table playerbots_preferred_mounts does not exist!");
+
+            return false;
+        }
     }
+
+    // Pick a random preferred mount from the selection, if available
+    uint32 chosenMountId = 0;
+
+    if (GetMountType(master) == 0 && !mountCache[botGUID].groundMounts.empty())
+    {
+        uint32 index = urand(0, mountCache[botGUID].groundMounts.size() - 1);
+        chosenMountId = mountCache[botGUID].groundMounts[index];
+    }
+
+    else if (GetMountType(master) == 1 && !mountCache[botGUID].flightMounts.empty())
+    {
+        uint32 index = urand(0, mountCache[botGUID].flightMounts.size() - 1);
+        chosenMountId = mountCache[botGUID].flightMounts[index];
+    }
+
+    // No suitable preferred mount found
+    if (chosenMountId == 0)
+        return false;
+
+    // Check if spell exists
+    if (!sSpellMgr->GetSpellInfo(chosenMountId))
+    {
+        LOG_ERROR("playerbots", "Preferred mount failed: Invalid spell {} | Bot Guid: {}", chosenMountId, botGUID);
+        return false;
+    }
+
+    // Required here as otherwise bots won't mount in BG's due to them constant moving
+    if (bot->isMoving())
+        bot->StopMoving();
+
+    // Check if spell can be cast - for now allow all, even if the bot does not have the actual mount
+    //if (botAI->CanCastSpell(mountId, botAI->GetBot()))
+    //{
+    botAI->CastSpell(chosenMountId, botAI->GetBot());
+    return true;
+    //}
+
+    LOG_DEBUG("playerbots", "Preferred mount failed! | Bot Guid: {}", botGUID);
     return false;
 }
 
 bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::vector<uint32>>& spells, int32 masterSpeed) const
 {
-    // Required here as otherwise bots won't mount in BG's due to them constant moving
-    if (bot->isMoving())
-        bot->StopMoving();
-
     for (const auto& pair : spells)
     {
         int32 currentSpeed = pair.first;
+
         if ((masterSpeed > 59 && currentSpeed < 99) || (masterSpeed > 149 && currentSpeed < 279))
             continue;
 
@@ -331,6 +376,10 @@ bool CheckMountStateAction::TryRandomMountFiltered(const std::map<int32, std::ve
         const auto& ids = pair.second;
         if (!ids.empty())
         {
+            // Required here as otherwise bots won't mount in BG's due to them constant moving
+            if (bot->isMoving())
+                bot->StopMoving();
+
             uint32 index = urand(0, ids.size() - 1);
 
             if (botAI->CanCastSpell(ids[index], bot))

@@ -2313,8 +2313,9 @@ void RandomItemMgr::BuildAmmoCache()
         for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_BULLET; subClass++)
         {
             QueryResult results = WorldDatabase.Query(
-                "SELECT entry, Flags FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} and duration = 0 "
-                "ORDER BY stackable DESC, RequiredLevel DESC",
+                "SELECT entry FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} AND duration = 0 "
+                "AND (Flags & 16) = 0 AND dmg_min1 != 0 AND RequiredLevel != 0  "
+                "ORDER BY stackable DESC, ItemLevel DESC",
                 ITEM_CLASS_PROJECTILE, subClass, level);
             if (!results)
                 continue;
@@ -2322,35 +2323,27 @@ void RandomItemMgr::BuildAmmoCache()
             {
                 Field* fields = results->Fetch();
                 uint32 entry = fields[0].Get<uint32>();
-                uint32 flags = fields[1].Get<uint32>();
-                if (flags & ITEM_FLAG_DEPRECATED)
-                {
-                    continue;
-                }
-                ammoCache[level][subClass] = entry;
+                ammoCache[level][subClass].push_back(entry);
                 ++counter;
-                break;
             } while (results->NextRow());
         }
     }
 
-    LOG_INFO("server.loading", "Cached {} types of ammo", counter);  // TEST
+    LOG_INFO("server.loading", "Cached {} ammo", counter);  // TEST
 }
 
-uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass) { return ammoCache[level][subClass]; }
+std::vector<uint32> RandomItemMgr::GetAmmo(uint32 level, uint32 subClass) { return ammoCache[level][subClass]; }
 
 void RandomItemMgr::BuildPotionCache()
 {
     uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-    // if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-    //     maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
-    LOG_INFO("server.loading", "Building potion cache for {} levels", maxLevel);
+    LOG_INFO("playerbots", "Building potion cache for {} levels", maxLevel);
 
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
 
     uint32 counter = 0;
-    for (uint32 level = 1; level <= maxLevel + 1; level += 10)
+    for (uint32 level = 1; level <= maxLevel; level++)
     {
         uint32 effects[] = {SPELL_EFFECT_HEAL, SPELL_EFFECT_ENERGIZE};
         for (uint8 i = 0; i < 2; ++i)
@@ -2367,8 +2360,9 @@ void RandomItemMgr::BuildPotionCache()
                     (proto->SubClass != ITEM_SUBCLASS_POTION && proto->SubClass != ITEM_SUBCLASS_FLASK) ||
                     proto->Bonding != NO_BIND)
                     continue;
-
-                if (proto->RequiredLevel && (proto->RequiredLevel > level || proto->RequiredLevel < level - 10))
+                
+                uint32 requiredLevel = proto->RequiredLevel;
+                if (requiredLevel > level || (level > 15 && requiredLevel < level - 15))
                     continue;
 
                 if (proto->RequiredSkill)
@@ -2380,39 +2374,44 @@ void RandomItemMgr::BuildPotionCache()
                 if (proto->Duration & 0x80000000)
                     continue;
 
-                for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
+                
+                if (proto->AllowableClass != -1)
+                    continue;
+                
+                bool hybrid = false;
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[0].SpellId);
+                if (!spellInfo)
+                    continue;
+                // do not accept hybrid potion
+                for (uint8 i = 1; i < 3; i++)
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[j].SpellId);
-                    if (!spellInfo)
-                        continue;
-
-                    for (uint8 i = 0; i < 3; i++)
+                    if (spellInfo->Effects[i].Effect != 0)
                     {
-                        if (spellInfo->Effects[i].Effect == effect)
-                        {
-                            potionCache[level / 10][effect].push_back(itr.first);
-                            break;
-                        }
+                        hybrid = true;
+                        break;
                     }
                 }
+                if (hybrid)
+                    continue;
+
+                if (spellInfo->Effects[0].Effect == effect)
+                    potionCache[level][effect].push_back(itr.first);
             }
         }
     }
 
-    for (uint32 level = 1; level <= maxLevel + 1; level += 10)
+    for (uint32 level = 1; level <= maxLevel; level++)
     {
         uint32 effects[] = {SPELL_EFFECT_HEAL, SPELL_EFFECT_ENERGIZE};
         for (uint8 i = 0; i < 2; ++i)
         {
             uint32 effect = effects[i];
-            uint32 size = potionCache[level / 10][effect].size();
-            ++counter;
-
-            LOG_DEBUG("server.loading", "Potion cache for level={}, effect={}: {} items", level, effect, size);
+            uint32 size = potionCache[level][effect].size();
+            counter += size;
         }
     }
 
-    LOG_INFO("server.loading", "Cached {} types of potions", counter);  // TEST
+    LOG_INFO("playerbots", "Cached {} potions", counter);
 }
 
 void RandomItemMgr::BuildFoodCache()
@@ -2478,7 +2477,7 @@ void RandomItemMgr::BuildFoodCache()
 
 uint32 RandomItemMgr::GetRandomPotion(uint32 level, uint32 effect)
 {
-    std::vector<uint32> potions = potionCache[(level - 1) / 10][effect];
+    const std::vector<uint32> &potions = potionCache[level][effect];
     if (potions.empty())
         return 0;
 

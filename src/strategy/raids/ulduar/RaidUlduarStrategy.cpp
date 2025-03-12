@@ -54,7 +54,17 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("hodir move snowpacked icicle", ACTION_RAID + 5), nullptr)));
     triggers.push_back(new TriggerNode(
         "hodir biting cold", NextAction::array(0, new NextAction("intense cold jump", ACTION_RAID + 4), nullptr)));
-    
+
+    //
+    // Freya
+    //
+    triggers.push_back(
+        new TriggerNode("freya tank near eonars gift",
+                        NextAction::array(0, new NextAction("freya mark eonars gift", ACTION_RAID + 1), nullptr)));
+
+    triggers.push_back(
+        new TriggerNode("freya near nature bomb",
+                        NextAction::array(0, new NextAction("freya move away nature bomb", ACTION_RAID), nullptr)));
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
