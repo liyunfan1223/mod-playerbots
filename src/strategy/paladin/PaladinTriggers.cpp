@@ -11,6 +11,7 @@
 
 #include "GroupMgr.h"
 #include "AiFactory.h"
+#include <thread>
 
 bool SealTrigger::IsActive()
 {
@@ -538,4 +539,4 @@ bool BlessingOfSanctuaryOnPartyTrigger::IsActive()
 
     return BuffOnPartyTrigger::IsActive() && 
     !botAI->HasAura("greater blessing of sanctuary", target) && 
-    !botAI->HasAura("blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target, false, true, 1, false);}
+    !botAI->HasAura("blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target, false, true, -1, false);}
