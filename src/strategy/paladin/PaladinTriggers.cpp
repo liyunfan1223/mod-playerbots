@@ -13,6 +13,7 @@
 #include "AiFactory.h"
 #include <thread>
 
+
 bool SealTrigger::IsActive()
 {
     Unit* target = GetTarget();
