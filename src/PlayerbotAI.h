@@ -13,8 +13,10 @@
 #include "ChatFilter.h"
 #include "ChatHelper.h"
 #include "Common.h"
+#include "CreatureData.h"
 #include "Event.h"
 #include "Item.h"
+#include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
@@ -435,7 +437,8 @@ public:
     const AreaTableEntry* GetCurrentArea();
     const AreaTableEntry* GetCurrentZone();
     static std::string GetLocalizedAreaName(const AreaTableEntry* entry);
-
+    static std::string GetLocalizedCreatureName(uint32 entry);
+    static std::string GetLocalizedGameObjectName(uint32 entry);
     bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMasterNoFacing(std::ostringstream& stream,
@@ -579,6 +582,8 @@ public:
     static bool IsHealingSpell(uint32 spellFamilyName, flag96 spelFalimyFlags);
     static SpellFamilyNames Class2SpellFamilyName(uint8 cls);
     NewRpgInfo rpgInfo;
+    NewRpgStatistic rpgStatistic;
+    std::unordered_set<uint32> lowPriorityQuest;
 
 private:
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
