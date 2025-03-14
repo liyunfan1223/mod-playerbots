@@ -5,6 +5,7 @@
 
 #include "GrindTargetValue.h"
 
+#include "NewRpgInfo.h"
 #include "Playerbots.h"
 #include "ReputationMgr.h"
 #include "SharedDefines.h"
@@ -52,7 +53,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
 
     float distance = 0;
     Unit* result = nullptr;
-    // std::unordered_map<uint32, bool> needForQuestMap;
+    std::unordered_map<uint32, bool> needForQuestMap;
 
     for (ObjectGuid const guid : targets)
     {
@@ -99,19 +100,6 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
 		if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
 		    continue;
 
-        // if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
-        //     needForQuestMap[unit->GetEntry()] = needForQuest(unit);
-
-        // if (!needForQuestMap[unit->GetEntry()])
-        // {
-        //     Creature* creature = dynamic_cast<Creature*>(unit);
-        //     if ((urand(0, 100) < 60 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() &&
-        //         context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() != "GrindTravelDestination")))
-        //     {
-        //         continue;
-        //     }
-        // }
-
         if (Creature* creature = unit->ToCreature())
             if (CreatureTemplate const* CreatureTemplate = creature->GetCreatureTemplate())
                 if (CreatureTemplate->rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight elite"))
@@ -120,6 +108,26 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         if (!bot->IsWithinLOSInMap(unit))
         {
             continue;
+        }
+
+        bool inactiveGrindStatus = botAI->rpgInfo.status == RPG_GO_GRIND ||
+            botAI->rpgInfo.status == RPG_NEAR_NPC ||
+            botAI->rpgInfo.status == RPG_REST ||
+            botAI->rpgInfo.status == RPG_GO_INNKEEPER ||
+            botAI->rpgInfo.status == RPG_DO_QUEST;
+
+        bool notHostile = !bot->IsHostileTo(unit); /*|| (unit->ToCreature() && unit->ToCreature()->IsCivilian());*/
+        float aggroRange = 30.0f;
+        if (unit->ToCreature())
+            aggroRange = std::min(30.0f, unit->ToCreature()->GetAggroRange(bot) + 10.0f);
+        bool outOfAggro = unit->ToCreature() && bot->GetDistance(unit) > aggroRange;
+        if (inactiveGrindStatus && (outOfAggro || notHostile))
+        {
+            if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
+                needForQuestMap[unit->GetEntry()] = needForQuest(unit);
+
+            if (!needForQuestMap[unit->GetEntry()])
+                continue;
         }
 
         if (group)
@@ -155,8 +163,6 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
 
 bool GrindTargetValue::needForQuest(Unit* target)
 {
-    bool justCheck = (bot->GetGUID() == target->GetGUID());
-
     QuestStatusMap& questMap = bot->getQuestStatusMap();
     for (auto& quest : questMap)
     {
@@ -170,16 +176,9 @@ bool GrindTargetValue::needForQuest(Unit* target)
 
         QuestStatus status = bot->GetQuestStatus(questId);
 
-        if ((status == QUEST_STATUS_COMPLETE && !bot->GetQuestRewardStatus(questId)))
+        if (status == QUEST_STATUS_INCOMPLETE)
         {
-            if (!justCheck && !target->hasInvolvedQuest(questId))
-                continue;
-
-            return true;
-        }
-        else if (status == QUEST_STATUS_INCOMPLETE)
-        {
-            QuestStatusData* questStatus = sTravelMgr->getQuestStatus(bot, questId);
+            const QuestStatusData* questStatus = &bot->getQuestStatusMap()[questId];
 
             if (questTemplate->GetQuestLevel() > bot->GetLevel() + 5)
                 continue;
@@ -193,33 +192,18 @@ bool GrindTargetValue::needForQuest(Unit* target)
                     int required = questTemplate->RequiredNpcOrGoCount[j];
                     int available = questStatus->CreatureOrGOCount[j];
 
-                    if (required && available < required && (target->GetEntry() == entry || justCheck))
+                    if (required && available < required && target->GetEntry() == entry)
                         return true;
-                }
-
-                if (justCheck)
-                {
-                    int32 itemId = questTemplate->RequiredItemId[j];
-
-                    if (itemId && itemId > 0)
-                    {
-                        uint32 required = questTemplate->RequiredItemCount[j];
-                        uint32 available = questStatus->ItemCount[j];
-
-                        if (required && available < required)
-                            return true;
-                    }
                 }
             }
 
-            if (!justCheck)
+            if (CreatureTemplate const* data = sObjectMgr->GetCreatureTemplate(target->GetEntry()))
             {
-                if (CreatureTemplate const* data = sObjectMgr->GetCreatureTemplate(target->GetEntry()))
+                if (uint32 lootId = data->lootid)
                 {
-                    if (uint32 lootId = data->lootid)
+                    if (LootTemplates_Creature.HaveQuestLootForPlayer(lootId, bot))
                     {
-                        if (LootTemplates_Creature.HaveQuestLootForPlayer(lootId, bot))
-                            return true;
+                        return true;
                     }
                 }
             }

@@ -8,7 +8,17 @@
 #include "Event.h"
 #include "ObjectGuid.h"
 #include "Player.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+
+bool CastStealthAction::isUseful()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && bot->GetDistance(target) >= sPlayerbotAIConfig->spellDistance)
+        return false;
+    return true;
+}
+
 
 bool CastStealthAction::isPossible()
 {
