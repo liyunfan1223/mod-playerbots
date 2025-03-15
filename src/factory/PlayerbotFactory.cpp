@@ -1661,8 +1661,13 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
-
-                        if (gearScoreLimit != 0 &&
+                        
+                        bool shouldCheckGS = desiredQuality > sPlayerbotAIConfig->randomGearQualityLimit ||
+                            (sPlayerbotAIConfig->randomGearScoreLimit &&
+                             desiredQuality == sPlayerbotAIConfig->randomGearQualityLimit &&
+                             proto->ItemLevel > sPlayerbotAIConfig->randomGearScoreLimit);
+                        
+                        if (shouldCheckGS && gearScoreLimit != 0 &&
                             CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit)
                         {
                             continue;
