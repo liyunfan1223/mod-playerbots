@@ -135,11 +135,11 @@ protected:
     float targetExpectedLifeTime;
 };
 
-// non caster
-class NonCasterFindTargetSmartStrategy : public FindTargetStrategy
+// General
+class GeneralFindTargetSmartStrategy : public FindTargetStrategy
 {
 public:
-    NonCasterFindTargetSmartStrategy(PlayerbotAI* botAI, float dps)
+    GeneralFindTargetSmartStrategy(PlayerbotAI* botAI, float dps)
         : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
     {
     }
@@ -178,7 +178,6 @@ public:
     {
         float new_time = new_unit->GetHealth() / dps_;
         float old_time = old_unit->GetHealth() / dps_;
-        // [5-20] > (5-0] > (20-inf)
         int new_level = GetIntervalLevel(new_unit);
         int old_level = GetIntervalLevel(old_unit);
         if (new_level != old_level)
@@ -297,20 +296,24 @@ Unit* DpsTargetValue::Calculate()
     if (rti)
         return rti;
 
-    // FindLeastHpTargetStrategy strategy(botAI);
-    Group* group = bot->GetGroup();
     float dps = AI_VALUE(float, "estimated group dps");
-    if (group && botAI->IsCaster(bot))
+    
+    if (botAI->GetNearGroupMemberCount() > 3)
     {
-        CasterFindTargetSmartStrategy strategy(botAI, dps);
-        return TargetValue::FindTarget(&strategy);
+        if (botAI->IsCaster(bot))
+        {
+            // Caster find target strategy avoids casting spells on enemies
+            // with too low health to ensure the effectiveness of casting
+            CasterFindTargetSmartStrategy strategy(botAI, dps);
+            return TargetValue::FindTarget(&strategy);
+        }
+        else if (botAI->IsCombo(bot))
+        {
+            ComboFindTargetSmartStrategy strategy(botAI, dps);
+            return TargetValue::FindTarget(&strategy);
+        }
     }
-    else if (botAI->IsCombo(bot))
-    {
-        ComboFindTargetSmartStrategy strategy(botAI, dps);
-        return TargetValue::FindTarget(&strategy);
-    }
-    NonCasterFindTargetSmartStrategy strategy(botAI, dps);
+    GeneralFindTargetSmartStrategy strategy(botAI, dps);
     return TargetValue::FindTarget(&strategy);
 }
 
