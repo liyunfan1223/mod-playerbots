@@ -409,7 +409,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             loginBots += updateBots;
             loginBots = std::min(loginBots, maxNewBots);
 
-            LOG_INFO("playerbots", "{} new bots", loginBots);
+            LOG_DEBUG("playerbots", "{} new bots prepared to login", loginBots);
 
             // Log in bots
             for (auto bot : availableBots)
@@ -1088,10 +1088,10 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         if (!player || !player->GetGroup())
         {
             if (player)
-                LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
+                LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
                          player->GetLevel(), player->GetName().c_str());
             else
-                LOG_INFO("playerbots", "Bot #{}: log out", bot);
+                LOG_DEBUG("playerbots", "Bot #{}: log out", bot);
 
             SetEventValue(bot, "add", 0, 0);
             currentBots.erase(std::remove(currentBots.begin(), currentBots.end(), bot), currentBots.end());
@@ -1174,7 +1174,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     uint32 logout = GetEventValue(bot, "logout");
     if (player && !logout && !isValid)
     {
-        LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
+        LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
                  player->GetLevel(), player->GetName().c_str());
         LogoutPlayerBot(botGUID);
         currentBots.remove(bot);
