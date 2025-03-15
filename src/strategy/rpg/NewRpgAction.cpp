@@ -227,27 +227,27 @@ bool NewRpgMoveRandomAction::Execute(Event event)
 bool NewRpgMoveNpcAction::Execute(Event event)
 {
     NewRpgInfo& info = botAI->rpgInfo;
-    if (!info.near_npc.npc)
+    if (!info.near_npc.npcOrGo)
     {
         // No npc can be found, switch to IDLE
-        ObjectGuid npc = ChooseNpcOrGameObjectToInteract();
-        if (npc.IsEmpty())
+        ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract();
+        if (npcOrGo.IsEmpty())
         {
             info.ChangeToIdle();
             return true;
         }
-        info.near_npc.npc = npc;
+        info.near_npc.npcOrGo = npcOrGo;
         info.near_npc.lastReach = 0;
         return true;
     }
 
-    Unit* unit = botAI->GetUnit(info.near_npc.npc);
-    if (unit && bot->GetDistance(unit) <= INTERACTION_DISTANCE)
+    WorldObject* object = ObjectAccessor::GetWorldObject(*bot, info.near_npc.npcOrGo);
+    if (object && bot->CanInteractWithQuestGiver(object))
     {
         if (!info.near_npc.lastReach)
         {
             info.near_npc.lastReach = getMSTime();
-            InteractWithNpcOrGameObjectForQuest(info.near_npc.npc);
+            InteractWithNpcOrGameObjectForQuest(info.near_npc.npcOrGo);
             return true;
         }
 
@@ -255,12 +255,12 @@ bool NewRpgMoveNpcAction::Execute(Event event)
             return false;
 
         // has reached the npc for more than `npcStayTime`, select the next target
-        info.near_npc.npc = ObjectGuid();
+        info.near_npc.npcOrGo = ObjectGuid();
         info.near_npc.lastReach = 0;
     }
     else
     {
-        return MoveNpcTo(info.near_npc.npc);
+        return MoveWorldObjectTo(info.near_npc.npcOrGo);
     }
     return true;
 }

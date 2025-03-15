@@ -90,9 +90,9 @@ std::string NewRpgInfo::ToString()
             break;
         case RPG_NEAR_NPC:
             out << "NEAR_NPC";
-            out << "\nnpcEntry: " << near_npc.npc.GetCounter();
+            out << "\nnpcOrGoEntry: " << near_npc.npcOrGo.GetCounter();
             out << "\nlastNearNpc: " << startT;
-            out << "\nlastReachNpc: " << near_npc.lastReach;
+            out << "\nlastReachNpcOrGo: " << near_npc.lastReach;
             break;
         case RPG_NEAR_RANDOM:
             out << "NEAR_RANDOM";
