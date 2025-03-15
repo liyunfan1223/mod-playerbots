@@ -46,7 +46,7 @@ struct NewRpgInfo
     // RPG_NEAR_NPC
     struct NearNpc {
         NearNpc() = default;
-        ObjectGuid npc{};
+        ObjectGuid npcOrGo{};
         uint32 lastReach{0};
     };
     // RPG_NEAR_RANDOM

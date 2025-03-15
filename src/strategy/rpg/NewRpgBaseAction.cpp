@@ -110,37 +110,37 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
     return false;
 }
 
-bool NewRpgBaseAction::MoveNpcTo(ObjectGuid guid, float distance)
+bool NewRpgBaseAction::MoveWorldObjectTo(ObjectGuid guid, float distance)
 {
     if (IsWaitingForLastMove(MovementPriority::MOVEMENT_NORMAL))
     {
         return false;
     }
 
-    Unit* unit = botAI->GetUnit(guid);
-    if (!unit)
+    WorldObject* object = botAI->GetWorldObject(guid);
+    if (!object)
         return false;
-    float x = unit->GetPositionX();
-    float y = unit->GetPositionY();
-    float z = unit->GetPositionZ();
-    float mapId = unit->GetMapId();
+    float x = object->GetPositionX();
+    float y = object->GetPositionY();
+    float z = object->GetPositionZ();
+    float mapId = object->GetMapId();
     float angle = 0.f;
 
-    if (!unit->isMoving())
-        angle = unit->GetAngle(bot) + (M_PI * irand(-25, 25) / 100.0);  // Closest 45 degrees towards the target
+    if (!object->ToUnit() || !object->ToUnit()->isMoving())
+        angle = object->GetAngle(bot) + (M_PI * irand(-25, 25) / 100.0);  // Closest 45 degrees towards the target
     else
-        angle = unit->GetOrientation() +
+        angle = object->GetOrientation() +
                 (M_PI * irand(-25, 25) / 100.0);  // 45 degrees infront of target (leading it's movement)
                 
     float rnd = rand_norm();
     x += cos(angle) * distance * rnd;
     y += sin(angle) * distance * rnd;
-    if (!unit->GetMap()->CheckCollisionAndGetValidCoords(unit, unit->GetPositionX(), unit->GetPositionY(),
-                                                            unit->GetPositionZ(), x, y, z))
+    if (!object->GetMap()->CheckCollisionAndGetValidCoords(object, object->GetPositionX(), object->GetPositionY(),
+                                                           object->GetPositionZ(), x, y, z))
     {
-        x = unit->GetPositionX();
-        y = unit->GetPositionY();
-        z = unit->GetPositionZ();
+        x = object->GetPositionX();
+        y = object->GetPositionY();
+        z = object->GetPositionZ();
     }
     return MoveTo(mapId, x, y, z, false, false, false, true);
 }
@@ -453,16 +453,16 @@ bool NewRpgBaseAction::OrganizeQuestLog()
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 {
     OrganizeQuestLog();
-    if (ObjectGuid npc = ChooseNpcOrGameObjectToInteract(true, 80.0f))
+    if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, 80.0f))
     {
-        const WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npc);
-        if (bot->GetDistance(object) <= INTERACTION_DISTANCE)
+        WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npcOrGo);
+        if (bot->CanInteractWithQuestGiver(object))
         {
-            InteractWithNpcOrGameObjectForQuest(npc);
+            InteractWithNpcOrGameObjectForQuest(npcOrGo);
             ForceToWait(5000);
             return true;
         }
-        return MoveNpcTo(npc);
+        return MoveWorldObjectTo(npcOrGo);
     }
     return false;
 }
