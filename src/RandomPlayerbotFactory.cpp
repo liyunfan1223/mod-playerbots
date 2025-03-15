@@ -981,7 +981,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams(ArenaType type, uint32 count
         sPlayerbotAIConfig->randomBotArenaTeams.push_back(arenateam->GetId());
     }
 
-    LOG_INFO("playerbots", "{} random bot {}vs{} arena teams available", arenaTeamNumber, type, type);
+    LOG_DEBUG("playerbots", "{} random bot {}vs{} arena teams available", arenaTeamNumber, type, type);
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomArenaTeamName()
