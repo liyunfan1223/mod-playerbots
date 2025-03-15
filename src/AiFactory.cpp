@@ -617,7 +617,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                                             "gather", "duel", "pvp", "buff", "mount", "emote", nullptr);
     }
 
-    if (sPlayerbotAIConfig->autoSaveMana)
+    if (sPlayerbotAIConfig->autoSaveMana && PlayerbotAI::IsHeal(player, true))
     {
         nonCombatEngine->addStrategy("save mana", false);
     }
