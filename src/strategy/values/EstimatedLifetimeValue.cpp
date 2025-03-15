@@ -36,6 +36,10 @@ float EstimatedGroupDpsValue::Calculate()
             if (member == bot)  // calculated
                 continue;
 
+            // ignore real player as they may not help with damage
+            if (!GET_PLAYERBOT_AI(member) || GET_PLAYERBOT_AI(member)->IsRealPlayer())
+                continue;
+
             if (!member || !member->IsInWorld() || !member->IsAlive())
                 continue;
 
