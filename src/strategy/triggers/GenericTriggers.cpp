@@ -15,6 +15,7 @@
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
 #include "ThreatMgr.h"
@@ -507,11 +508,22 @@ bool IsBehindTargetTrigger::IsActive()
 
 bool IsNotBehindTargetTrigger::IsActive()
 {
+    if (botAI->HasStrategy("stay", botAI->GetState()))
+    {
+        return false;
+    }
     Unit* target = AI_VALUE(Unit*, "current target");
     return target && !AI_VALUE2(bool, "behind", "current target");
 }
 
-bool IsNotFacingTargetTrigger::IsActive() { return !AI_VALUE2(bool, "facing", "current target"); }
+bool IsNotFacingTargetTrigger::IsActive()
+{
+    if (botAI->HasStrategy("stay", botAI->GetState()))
+    {
+        return false;
+    }
+    return !AI_VALUE2(bool, "facing", "current target");
+}
 
 bool HasCcTargetTrigger::IsActive()
 {
@@ -598,6 +610,18 @@ bool NoNonBotPlayersAroundTrigger::IsActive()
 bool NewPlayerNearbyTrigger::IsActive() { return AI_VALUE(ObjectGuid, "new player nearby"); }
 
 bool CollisionTrigger::IsActive() { return AI_VALUE2(bool, "collision", "self target"); }
+
+bool ReturnToStayPositionTrigger::IsActive()
+{
+    PositionInfo stayPosition = AI_VALUE(PositionMap&, "position")["stay"];
+    if (stayPosition.isSet())
+    {
+        const float distance = bot->GetDistance(stayPosition.x, stayPosition.y, stayPosition.z);
+        return distance > sPlayerbotAIConfig->followDistance;
+    }
+
+    return false;
+}
 
 bool GiveItemTrigger::IsActive()
 {

@@ -827,6 +827,14 @@ public:
     SitTrigger(PlayerbotAI* botAI) : StayTimeTrigger(botAI, sPlayerbotAIConfig->sitDelay, "sit") {}
 };
 
+class ReturnToStayPositionTrigger : public Trigger
+{
+public:
+    ReturnToStayPositionTrigger(PlayerbotAI* ai) : Trigger(ai, "return to stay position", 2) {}
+
+    virtual bool IsActive() override;
+};
+
 class ReturnTrigger : public StayTimeTrigger
 {
 public:

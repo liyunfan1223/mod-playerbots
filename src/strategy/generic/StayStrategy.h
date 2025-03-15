@@ -10,12 +10,13 @@
 
 class PlayerbotAI;
 
-class StayStrategy : public NonCombatStrategy
+class StayStrategy : public Strategy
 {
 public:
-    StayStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) {}
+    StayStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
     std::string const getName() override { return "stay"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     NextAction** getDefaultActions() override;
 };
 

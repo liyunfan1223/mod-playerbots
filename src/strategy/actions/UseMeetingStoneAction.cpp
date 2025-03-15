@@ -11,6 +11,7 @@
 #include "GridNotifiersImpl.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 
 bool UseMeetingStoneAction::Execute(Event event)
 {
@@ -224,6 +225,16 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                 player->GetMotionMaster()->Clear();
                 AI_VALUE(LastMovement&, "last movement").clear();
                 player->TeleportTo(mapId, x, y, z, 0);
+
+                if (botAI->HasStrategy("stay", botAI->GetState()))
+                {
+                    PositionMap& posMap = AI_VALUE(PositionMap&, "position");
+                    PositionInfo stayPosition = posMap["stay"];
+
+                    stayPosition.Set(x,y, z, mapId);
+                    posMap["stay"] = stayPosition;
+                }
+
                 return true;
             }
         }

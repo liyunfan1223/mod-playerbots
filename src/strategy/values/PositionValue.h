@@ -6,6 +6,7 @@
 #ifndef _PLAYERBOT_POSITIONVALUE_H
 #define _PLAYERBOT_POSITIONVALUE_H
 
+#include "NamedObjectContext.h"
 #include "TravelMgr.h"
 #include "Value.h"
 
@@ -15,6 +16,10 @@ class PositionInfo
 {
 public:
     PositionInfo() : valueSet(false), x(0), y(0), z(0), mapId(0) {}
+    PositionInfo(float x, float y, float z, uint32 mapId, bool valueSet = true)
+        : valueSet(valueSet), x(x), y(y), z(z), mapId(mapId)
+    {
+    }
     PositionInfo(PositionInfo const& other)
         : valueSet(other.valueSet), x(other.x), y(other.y), z(other.z), mapId(other.mapId)
     {
@@ -70,6 +75,15 @@ public:
     }
 
     WorldPosition Calculate() override;
+};
+
+class SinglePositionValue : public CalculatedValue<PositionInfo>, public Qualified
+{
+public:
+    SinglePositionValue(PlayerbotAI* ai, std::string name = "pos") : CalculatedValue(ai, name), Qualified() {};
+    virtual PositionInfo Calculate() override;
+    virtual void Set(PositionInfo value) override;
+    virtual void Reset() override;
 };
 
 #endif

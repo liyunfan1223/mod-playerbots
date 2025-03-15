@@ -7,6 +7,13 @@
 
 #include "Playerbots.h"
 
+void StayStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode(
+        "return to stay position",
+        NextAction::array(0, new NextAction("return to stay position", ACTION_MOVE), nullptr)));
+}
+
 NextAction** StayStrategy::getDefaultActions() { return NextAction::array(0, new NextAction("stay", 1.0f), nullptr); }
 
 void SitStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

@@ -135,6 +135,7 @@ public:
         creators["move to loot"] = &ActionContext::move_to_loot;
         creators["open loot"] = &ActionContext::open_loot;
         creators["guard"] = &ActionContext::guard;
+        creators["return to stay position"] = &ActionContext::return_to_stay_position;
         creators["move out of enemy contact"] = &ActionContext::move_out_of_enemy_contact;
         creators["set facing"] = &ActionContext::set_facing;
         creators["set behind"] = &ActionContext::set_behind;
@@ -271,6 +272,7 @@ private:
     static Action* drop_target(PlayerbotAI* botAI) { return new DropTargetAction(botAI); }
     static Action* attack_duel_opponent(PlayerbotAI* botAI) { return new AttackDuelOpponentAction(botAI); }
     static Action* guard(PlayerbotAI* botAI) { return new GuardAction(botAI); }
+    static Action* return_to_stay_position(PlayerbotAI* botAI) { return new ReturnToStayPositionAction(botAI); }
     static Action* open_loot(PlayerbotAI* botAI) { return new OpenLootAction(botAI); }
     static Action* move_to_loot(PlayerbotAI* botAI) { return new MoveToLootAction(botAI); }
     static Action* _return(PlayerbotAI* botAI) { return new ReturnAction(botAI); }
