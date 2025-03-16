@@ -28,7 +28,7 @@ public:
 protected:
     // MOVEMENT RELATED
     bool MoveFarTo(WorldPosition dest);
-    bool MoveNpcTo(ObjectGuid guid, float distance = INTERACTION_DISTANCE);
+    bool MoveWorldObjectTo(ObjectGuid guid, float distance = INTERACTION_DISTANCE);
     bool MoveRandomNear(float moveStep = 50.0f, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool ForceToWait(uint32 duration, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
 
