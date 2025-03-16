@@ -349,7 +349,10 @@ bool BlessingOfKingsTrigger::IsActive()
     if (group && group->isRaidGroup() || bot->GetLevel() >= 60)
         return false;
 
-    return BuffTrigger::IsActive() && !botAI->HasAura("greater blessing of kings", bot) && !botAI->HasAura("blessing of kings", bot);
+    return BuffTrigger::IsActive() && !botAI->HasAura("greater blessing of kings", bot) && 
+    !botAI->HasAura("blessing of might", bot, false, true) && 
+    !botAI->HasAura("blessing of wisdom", bot, false, true) && 
+    !botAI->HasAura("blessing of sanctuary", bot, false, true);
 }
 
 bool BlessingOfWisdomTrigger::IsActive() 
@@ -362,7 +365,7 @@ bool BlessingOfWisdomTrigger::IsActive()
     if (group && group->isRaidGroup() || bot->GetLevel() >= 60)
         return false;
 
-    if (!botAI->HasAura("greater blessing of wisdom", bot))
+    if (!botAI->HasAura("greater blessing of wisdom", bot) && !botAI->HasAura("blessing of kings", bot, false, true))
     {
         Aura* existingAura = botAI->GetAura("blessing of wisdom", bot);
 
@@ -371,10 +374,10 @@ bool BlessingOfWisdomTrigger::IsActive()
             Unit* caster = existingAura->GetCaster();
             if (caster && bot->GetLevel() > caster->GetLevel())
             {
-                return true;
+                return BuffTrigger::IsActive();
             }
         }
-        return true;
+        return BuffTrigger::IsActive();
     }
     return false;
 }
@@ -390,7 +393,7 @@ bool BlessingOfMightTrigger::IsActive()
     if (group && group->isRaidGroup() || bot->GetLevel() >= 60)
         return false;
 
-    if (!botAI->HasAura("greater blessing of might", bot))
+    if (!botAI->HasAura("greater blessing of might", bot) && !botAI->HasAura("blessing of kings", bot, false, true))
     {
         Aura* existingAura = botAI->GetAura("blessing of might", bot);
 
@@ -399,9 +402,9 @@ bool BlessingOfMightTrigger::IsActive()
             Unit* caster = existingAura->GetCaster();
             if (caster && bot->GetLevel() > caster->GetLevel())
             {
-                return true;
+                return BuffTrigger::IsActive();
             }
-        return true;
+        return BuffTrigger::IsActive();
         }
     }
     return false;
@@ -422,7 +425,7 @@ bool BlessingOfSanctuaryTrigger::IsActive()
     if (tab == !PALADIN_TAB_PROTECTION)
         return false;
         
-    return !botAI->HasAura("greater blessing of sanctuary", bot) && !botAI->HasAura("blessing of sanctuary", bot); 
+    return BuffTrigger::IsActive() && !botAI->HasAura("greater blessing of sanctuary", bot) && !botAI->HasAura("blessing of kings", bot, false, true); 
 }
 
 //blessing on party triggers
@@ -444,7 +447,9 @@ bool BlessingOfKingsOnPartyTrigger::IsActive()
     
     return BuffOnPartyTrigger::IsActive() && 
     !botAI->HasAura("greater blessing of kings", target) && 
-    !botAI->HasAura("blessing of kings", target);
+    !botAI->HasAura("blessing of might", target, false, true) && 
+    !botAI->HasAura("blessing of wisdom", target, false, true) && 
+    !botAI->HasAura("blessing of sanctuary", target, false, true);
 }
 
 
@@ -463,7 +468,7 @@ bool BlessingOfWisdomOnPartyTrigger::IsActive()
         return false;
     }    
     
-    if (!botAI->HasAura("greater blessing of wisdom", target))
+    if (!botAI->HasAura("greater blessing of wisdom", target) && !botAI->HasAura("blessing of kings", target, false, true))
     {
         Aura* existingAura = botAI->GetAura("blessing of wisdom", target);
         if (existingAura)
@@ -497,7 +502,7 @@ bool BlessingOfMightOnPartyTrigger::IsActive()
         return false;
     }    
     
-    if (!botAI->HasAura("greater blessing of might", target))
+    if (!botAI->HasAura("greater blessing of might", target) && !botAI->HasAura("blessing of kings", target, false, true))
     {
         Aura* existingAura = botAI->GetAura("blessing of might", target);
         if (existingAura)
@@ -539,5 +544,4 @@ bool BlessingOfSanctuaryOnPartyTrigger::IsActive()
     }   
 
     return BuffOnPartyTrigger::IsActive() && 
-    !botAI->HasAura("greater blessing of sanctuary", target) && 
-    !botAI->HasAura("blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target, false, true, -1, false);}
+    !botAI->HasAura("greater blessing of sanctuary", target) && !botAI->HasAura("blessing of kings", target, false, true);}
