@@ -91,7 +91,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
             LOG_DEBUG("playerbots", "PlayerbotMgr not found for master player with GUID: {}", masterPlayer->GetGUID().GetRawValue());
             return;
         }
-        uint32 count = mgr->GetPlayerbotsCount();
+        uint32 count = mgr->GetPlayerbotsCount() + botLoading.size();
         if (count >= sPlayerbotAIConfig->maxAddedBots)
         {
             allowed = false;
