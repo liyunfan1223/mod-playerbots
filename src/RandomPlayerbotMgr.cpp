@@ -386,7 +386,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         }
         else
         {
-            activatePrintStatsThread();
+            sRandomPlayerbotMgr->PrintStats();
+            // activatePrintStatsThread();
         }
     }
     uint32 updateBots = sPlayerbotAIConfig->randomBotsPerInterval * onlineBotFocus / 100;
@@ -2413,7 +2414,8 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
 
     if (cmd == "stats")
     {
-        activatePrintStatsThread();
+        sRandomPlayerbotMgr->PrintStats();
+        // activatePrintStatsThread();
         return true;
     }
 
@@ -2724,7 +2726,7 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 engine_combat = 0;
     uint32 engine_dead = 0;
     std::unordered_map<NewRpgStatus, int> rpgStatusCount;
-    NewRpgStatistic rpgStasticTotal;
+    // static NewRpgStatistic rpgStasticTotal;
     std::unordered_map<uint32, int> zoneCount;
     uint8 maxBotLevel = 0;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
@@ -2802,6 +2804,7 @@ void RandomPlayerbotMgr::PrintStats()
         {
             rpgStatusCount[botAI->rpgInfo.status]++;
             rpgStasticTotal += botAI->rpgStatistic;
+            botAI->rpgStatistic = NewRpgStatistic();
         }
     }
 
@@ -2819,7 +2822,8 @@ void RandomPlayerbotMgr::PrintStats()
 
         if (((i + 1) % step == 0) || i == maxBotLevel)
         {
-            LOG_INFO("playerbots", "    {}..{}: {} alliance, {} horde", from, i, currentAlliance, currentHorde);
+            if (currentAlliance || currentHorde)
+                LOG_INFO("playerbots", "    {}..{}: {} alliance, {} horde", from, i, currentAlliance, currentHorde);
             currentAlliance = 0;
             currentHorde = 0;
             from = i + 1;
