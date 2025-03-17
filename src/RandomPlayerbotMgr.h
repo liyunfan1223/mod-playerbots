@@ -193,6 +193,7 @@ private:
     botPID pid = botPID(1, 50, -50, 0, 0, 0);
     float activityMod = 0.25;
     bool _isBotInitializing = true;
+    bool _isBotLogging = true;
     uint32 GetEventValue(uint32 bot, std::string const event);
     std::string const GetEventData(uint32 bot, std::string const event);
     uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn,
