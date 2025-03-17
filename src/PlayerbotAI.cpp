@@ -178,6 +178,7 @@ PlayerbotAI::PlayerbotAI(Player* bot)
     botOutgoingPacketHandlers.AddHandler(SMSG_RESURRECT_REQUEST, "resurrect request");
     botOutgoingPacketHandlers.AddHandler(SMSG_INVENTORY_CHANGE_FAILURE, "cannot equip");
     botOutgoingPacketHandlers.AddHandler(SMSG_TRADE_STATUS, "trade status");
+    botOutgoingPacketHandlers.AddHandler(SMSG_TRADE_STATUS_EXTENDED, "trade status extended");
     botOutgoingPacketHandlers.AddHandler(SMSG_LOOT_RESPONSE, "loot response");
     botOutgoingPacketHandlers.AddHandler(SMSG_ITEM_PUSH_RESULT, "item push result");
     botOutgoingPacketHandlers.AddHandler(SMSG_PARTY_COMMAND_RESULT, "party command");
@@ -3173,7 +3174,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     SpellCastTargets targets;
-    if (spellInfo->Targets & TARGET_FLAG_ITEM)
+    if (spellInfo->Effects[0].Effect != SPELL_EFFECT_OPEN_LOCK &&
+        (spellInfo->Targets & TARGET_FLAG_ITEM || spellInfo->Targets & TARGET_FLAG_GAMEOBJECT_ITEM))
     {
         Item* item = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
         targets.SetItemTarget(item);
@@ -3216,6 +3218,20 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
             targets.SetGOTarget(go);
             faceTo = go;
         }
+        else if (itemTarget)
+        {
+            Player* trader = bot->GetTrader();
+            if (trader)
+            {
+                targets.SetTradeItemTarget(bot);
+                targets.SetUnitTarget(bot);
+                faceTo = trader;
+            }
+            else
+            {
+                targets.SetItemTarget(itemTarget);
+            }
+        }
         else
         {
             if (Unit* creature = GetUnit(loot.guid))
@@ -3252,6 +3268,58 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         //     LOG_DEBUG("playerbots", "Spell cast failed. - target name: {}, spellid: {}, bot name: {}, result: {}",
         //         target->GetName(), spellId, bot->GetName(), result);
         // }
+        if (HasStrategy("debug spell", BOT_STATE_NON_COMBAT))
+        {
+            std::ostringstream out;
+            out << "Spell cast failed - ";
+            out << "Spell ID: " << spellId << " (" << ChatHelper::FormatSpell(spellInfo) << "), ";
+            out << "Error Code: " << static_cast<int>(result) << " (0x" << std::hex << static_cast<int>(result) << std::dec << "), ";
+            out << "Bot: " << bot->GetName() << ", ";
+    
+            // Check spell target type
+            if (targets.GetUnitTarget())
+            {
+                out << "Target: Unit (" << targets.GetUnitTarget()->GetName() 
+                    << ", Low GUID: " << targets.GetUnitTarget()->GetGUID().GetCounter()
+                    << ", High GUID: " << static_cast<uint32>(targets.GetUnitTarget()->GetGUID().GetHigh()) << "), ";
+            }
+
+            if (targets.GetGOTarget())
+            {
+                out << "Target: GameObject (Low GUID: " << targets.GetGOTarget()->GetGUID().GetCounter()
+                    << ", High GUID: " << static_cast<uint32>(targets.GetGOTarget()->GetGUID().GetHigh()) << "), ";
+            }
+
+            if (targets.GetItemTarget())
+            {
+                out << "Target: Item (Low GUID: " << targets.GetItemTarget()->GetGUID().GetCounter()
+                    << ", High GUID: " << static_cast<uint32>(targets.GetItemTarget()->GetGUID().GetHigh()) << "), ";
+            }
+    
+            // Check if bot is in trade mode
+            if (bot->GetTradeData())
+            {
+                out << "Trade Mode: Active, ";
+                Item* tradeItem = bot->GetTradeData()->GetTraderData()->GetItem(TRADE_SLOT_NONTRADED);
+                if (tradeItem)
+                {
+                    out << "Trade Item: " << tradeItem->GetEntry() 
+                        << " (Low GUID: " << tradeItem->GetGUID().GetCounter()
+                        << ", High GUID: " << static_cast<uint32>(tradeItem->GetGUID().GetHigh()) << "), ";
+                }
+                else
+                {
+                    out << "Trade Item: None, ";
+                }
+            }
+            else
+            {
+                out << "Trade Mode: Inactive, ";
+            }
+    
+            TellMasterNoFacing(out);
+        }
+
         return false;
     }
     // if (spellInfo->Effects[0].Effect == SPELL_EFFECT_OPEN_LOCK || spellInfo->Effects[0].Effect ==
@@ -3348,7 +3416,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     SpellCastTargets targets;
-    if (spellInfo->Targets & TARGET_FLAG_ITEM)
+    if (spellInfo->Targets & TARGET_FLAG_ITEM || spellInfo->Targets & TARGET_FLAG_GAMEOBJECT_ITEM)
     {
         Item* item = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
         targets.SetItemTarget(item);
@@ -4902,6 +4970,52 @@ Item* PlayerbotAI::FindBandage() const
     return FindItemInInventory(
         [](ItemTemplate const* pItemProto) -> bool
         { return pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == ITEM_SUBCLASS_BANDAGE; });
+}
+
+Item* PlayerbotAI::FindOpenableItem() const
+{
+    return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
+    {
+        return (itemTemplate->Flags & ITEM_FLAG_HAS_LOOT) &&
+               (itemTemplate->LockID == 0 || !this->bot->GetItemByEntry(itemTemplate->ItemId)->IsLocked());
+    });
+}
+
+Item* PlayerbotAI::FindLockedItem() const
+{
+    return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
+    {
+        if (!this->bot->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
+            return false;
+
+        if (itemTemplate->LockID == 0)  // Ensure the item is actually locked
+            return false;
+
+        Item* item = this->bot->GetItemByEntry(itemTemplate->ItemId);
+        if (!item || !item->IsLocked())  // Ensure item instance is locked
+            return false;
+
+        // Check if bot has enough Lockpicking skill
+        LockEntry const* lockInfo = sLockStore.LookupEntry(itemTemplate->LockID);
+        if (!lockInfo)
+            return false;
+
+        for (uint8 j = 0; j < 8; ++j)
+        {
+            if (lockInfo->Type[j] == LOCK_KEY_SKILL)
+            {
+                uint32 skillId = SkillByLockType(LockType(lockInfo->Index[j]));
+                if (skillId == SKILL_LOCKPICKING)
+                {
+                    uint32 requiredSkill = lockInfo->Skill[j];
+                    uint32 botSkill = this->bot->GetSkillValue(SKILL_LOCKPICKING);
+                    return botSkill >= requiredSkill;
+                }
+            }
+        }
+
+        return false;
+    });
 }
 
 static const uint32 uPriorizedSharpStoneIds[8] = {ADAMANTITE_SHARPENING_DISPLAYID, FEL_SHARPENING_DISPLAYID,
