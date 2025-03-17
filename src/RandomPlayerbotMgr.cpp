@@ -465,9 +465,17 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
     {
         maxAllowedBotCount -= currentBots.size();
         maxAllowedBotCount = std::min(sPlayerbotAIConfig->randomBotsPerInterval, maxAllowedBotCount);
+        
+        uint32 totalRatio = sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio;
+        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / totalRatio;
 
-        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) /
-            (sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio);
+        uint32 remainder = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) % totalRatio;
+
+        // Fix #1082: Randomly add one based on reminder
+        if (remainder && urand(1, totalRatio) <= remainder) {
+            allowedAllianceCount++;
+        }
+
         uint32 allowedHordeCount = maxAllowedBotCount - allowedAllianceCount;
 
         for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin();
