@@ -7,7 +7,7 @@
 class NewRpgStatusTrigger : public Trigger
 {
 public:
-    NewRpgStatusTrigger(PlayerbotAI* botAI, NewRpgStatus status = NewRpgStatus::IDLE)
+    NewRpgStatusTrigger(PlayerbotAI* botAI, NewRpgStatus status = RPG_IDLE)
         : Trigger(botAI, "new rpg status"), status(status)
     {
     }

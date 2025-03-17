@@ -43,6 +43,7 @@ void WorldPacketHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
                                                                                 new NextAction("open items", relevance),
                                                                                 new NextAction("query item usage", relevance), 
                                                                                 new NextAction("equip upgrades", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("item push result", NextAction::array(0, new NextAction("quest item push result", relevance), nullptr)));
     triggers.push_back(new TriggerNode("ready check finished", NextAction::array(0, new NextAction("finish ready check", relevance), nullptr)));
     // triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("security check", relevance), new NextAction("check mail", relevance), nullptr)));
     triggers.push_back(new TriggerNode("guild invite", NextAction::array(0, new NextAction("guild accept", relevance), nullptr)));
@@ -83,7 +84,7 @@ WorldPacketHandlerStrategy::WorldPacketHandlerStrategy(PlayerbotAI* botAI) : Pas
 
     // quests
     supported.push_back("quest update add kill");
-    supported.push_back("quest update add item");
+    // supported.push_back("quest update add item");
     supported.push_back("quest update failed");
     supported.push_back("quest update failed timer");
     supported.push_back("quest update complete");
