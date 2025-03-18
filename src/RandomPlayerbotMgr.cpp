@@ -50,6 +50,12 @@
 #include "World.h"
 #include "RandomPlayerbotFactory.h"
 
+struct GuidClassRaceInfo {
+    ObjectGuid::LowType guid;
+    uint32 rClass;
+    uint32 rRace;
+};
+
 void PrintStatsThread() { sRandomPlayerbotMgr->PrintStats(); }
 
 void activatePrintStatsThread()
@@ -465,9 +471,17 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
     {
         maxAllowedBotCount -= currentBots.size();
         maxAllowedBotCount = std::min(sPlayerbotAIConfig->randomBotsPerInterval, maxAllowedBotCount);
+        
+        uint32 totalRatio = sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio;
+        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / totalRatio;
 
-        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) /
-            (sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio);
+        uint32 remainder = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) % totalRatio;
+
+        // Fix #1082: Randomly add one based on reminder
+        if (remainder && urand(1, totalRatio) <= remainder) {
+            allowedAllianceCount++;
+        }
+
         uint32 allowedHordeCount = maxAllowedBotCount - allowedAllianceCount;
 
         for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin();
@@ -493,11 +507,28 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
             if (!result)
                 continue;
-            std::vector<uint32> guids;
-            do
-            {
+            
+            std::vector<GuidClassRaceInfo> allGuidInfos;
+
+            do {
                 Field* fields = result->Fetch();
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                GuidClassRaceInfo info;
+                info.guid = fields[0].Get<uint32>();
+                info.rClass = fields[1].Get<uint8>();
+                info.rRace = fields[2].Get<uint8>();
+                allGuidInfos.push_back(info);
+            } while (result->NextRow());
+
+            // random shuffle for class balance
+            std::mt19937 rnd(time(0));
+            std::shuffle(allGuidInfos.begin(), allGuidInfos.end(), rnd);
+
+            std::vector<uint32> guids;
+            for (const auto& info : allGuidInfos) {
+                ObjectGuid::LowType guid = info.guid;
+                uint32 rClass = info.rClass;
+                uint32 rRace = info.rRace;
+
                 if (GetEventValue(guid, "add"))
                     continue;
 
@@ -510,40 +541,24 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 if (std::find(currentBots.begin(), currentBots.end(), guid) != currentBots.end())
                     continue;
 
-                if (sPlayerbotAIConfig->disableDeathKnightLogin)
-                {
-                    uint32 rClass = fields[1].Get<uint8>();
-                    if (rClass == CLASS_DEATH_KNIGHT)
-                    {
+                if (sPlayerbotAIConfig->disableDeathKnightLogin) {
+                    if (rClass == CLASS_DEATH_KNIGHT) {
                         continue;
                     }
                 }
-                uint32 rRace = fields[2].Get<uint8>();
+
                 uint32 isAlliance = IsAlliance(rRace);
-                if (!allowedAllianceCount && isAlliance)
-                {
+                bool factionNotAllowed = (!allowedAllianceCount && isAlliance) || (!allowedHordeCount && !isAlliance);
+
+                if (factionNotAllowed)
                     continue;
-                }
-                if (!allowedHordeCount && !isAlliance)
-                {
-                    continue;
-                }
-                if (isAlliance)
-                {
+
+                if (isAlliance) {
                     allowedAllianceCount--;
-                }
-                else
-                {
+                } else {
                     allowedHordeCount--;
                 }
-                guids.push_back(guid);
-            } while (result->NextRow());
 
-            std::mt19937 rnd(time(0));
-            std::shuffle(guids.begin(), guids.end(), rnd);
-
-            for (uint32& guid : guids)
-            {
                 uint32 add_time = sPlayerbotAIConfig->enablePeriodicOnlineOffline
                                       ? urand(sPlayerbotAIConfig->minRandomBotInWorldTime,
                                               sPlayerbotAIConfig->maxRandomBotInWorldTime)

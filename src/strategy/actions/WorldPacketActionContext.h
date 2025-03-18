@@ -37,6 +37,7 @@
 #include "TellCastFailedAction.h"
 #include "TellMasterAction.h"
 #include "TradeStatusAction.h"
+#include "TradeStatusExtendedAction.h"
 #include "UseMeetingStoneAction.h"
 #include "NamedObjectContext.h"
 
@@ -65,6 +66,7 @@ public:
         creators["check mount state"] = &WorldPacketActionContext::check_mount_state;
         creators["remember taxi"] = &WorldPacketActionContext::remember_taxi;
         creators["accept trade"] = &WorldPacketActionContext::accept_trade;
+        creators["trade status extended"] = &WorldPacketActionContext::trade_status_extended;
         creators["store loot"] = &WorldPacketActionContext::store_loot;
 
         // quest
@@ -118,6 +120,7 @@ private:
     static Action* party_command(PlayerbotAI* botAI) { return new PartyCommandAction(botAI); }
     static Action* store_loot(PlayerbotAI* botAI) { return new StoreLootAction(botAI); }
     static Action* accept_trade(PlayerbotAI* botAI) { return new TradeStatusAction(botAI); }
+    static Action* trade_status_extended(PlayerbotAI* botAI) { return new TradeStatusExtendedAction(botAI); }
     static Action* remember_taxi(PlayerbotAI* botAI) { return new RememberTaxiAction(botAI); }
     static Action* check_mount_state(PlayerbotAI* botAI) { return new CheckMountStateAction(botAI); }
     static Action* area_trigger(PlayerbotAI* botAI) { return new AreaTriggerAction(botAI); }

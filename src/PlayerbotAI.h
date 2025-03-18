@@ -467,6 +467,8 @@ public:
     Item* FindPoison() const;
     Item* FindAmmo() const;
     Item* FindBandage() const;
+    Item* FindOpenableItem() const;
+    Item* FindLockedItem() const;
     Item* FindConsumable(uint32 displayId) const;
     Item* FindStoneFor(Item* weapon) const;
     Item* FindOilFor(Item* weapon) const;
