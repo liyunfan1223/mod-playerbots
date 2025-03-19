@@ -121,8 +121,14 @@ ItemUsage ItemUsageValue::Calculate()
     // Identify the source of loot
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
     
+    // Get GUID of loot source
+    ObjectGuid lootGuid = lootObject.guid;
+    
+    // Check if loot source is an item
+    bool isLootFromItem = lootGuid.IsItem();
+    
     // If the loot is from an item in the bot’s bags, ignore syncQuestWithPlayer
-    if (lootObject.IsItem() && botNeedsItemForQuest)
+    if (isLootFromItem && botNeedsItemForQuest)
     {
         return ITEM_USAGE_QUEST;
     }
