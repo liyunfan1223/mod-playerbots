@@ -112,49 +112,32 @@ ItemUsage ItemUsageValue::Calculate()
             return ITEM_USAGE_DISENCHANT;
     }
 
-    // While sync is on, do not loot quest items that are also Useful for master. Master
     Player* master = botAI->GetMaster();
+    bool isSelfBot = (master == bot);
+    bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
+    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig->syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
     
-    if (!master)
-    {
-        botAI->TellMaster(chat->FormatItem(proto) + " - Skipping master check because there is no master.");
-    }
-    else
-    {
-        botAI->TellMaster(chat->FormatItem(proto) + " - Checking master's quest usefulness.");
-    }
+    // Identify the source of loot
+    LootObject lootObject = AI_VALUE(LootObject, "loot target");
     
-    if (!sPlayerbotAIConfig->syncQuestWithPlayer)
+    // If the loot is from an item in the bot’s bags, ignore syncQuestWithPlayer
+    if (lootObject.IsItem() && botNeedsItemForQuest)
     {
-        botAI->TellMaster(chat->FormatItem(proto) + " - Skipping master quest check because quest sync is disabled.");
-    }
-    else
-    {
-        botAI->TellMaster(chat->FormatItem(proto) + " - Quest sync is enabled, checking master's quests.");
-    }
-    
-    if (master && sPlayerbotAIConfig->syncQuestWithPlayer && !IsItemUsefulForQuest(master, proto))
-    {
-        botAI->TellMaster(chat->FormatItem(proto) + " - Master does NOT need this item.");
-    }
-    else if (master && sPlayerbotAIConfig->syncQuestWithPlayer)
-    {
-        botAI->TellMaster(chat->FormatItem(proto) + " - Master NEEDS this item.");
-    }
-    
-    if (IsItemUsefulForQuest(botAI->GetBot(), proto))
-    {
-        botAI->TellMaster(chat->FormatItem(proto) + " is needed for a quest - Returning ITEM_USAGE_QUEST!");
         return ITEM_USAGE_QUEST;
     }
-    else
+    
+    // If the bot is NOT acting alone and the master needs this quest item, defer to the master
+    if (!isSelfBot && masterNeedsItemForQuest)
     {
-        botAI->TellMaster(chat->FormatItem(proto) + " is NOT useful for any quest.");
+        return ITEM_USAGE_NONE;
     }
     
-    botAI->TellMaster(chat->FormatItem(proto) + " is NOT useful for any quest including my master's.");
-
-
+    // If the bot itself needs the item for a quest, allow looting
+    if (botNeedsItemForQuest)
+    {
+        return ITEM_USAGE_QUEST;
+    }
+    
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
     {
         if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
