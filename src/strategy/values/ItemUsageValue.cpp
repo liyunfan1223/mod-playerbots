@@ -502,7 +502,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         if (!quest)
             continue;
 
-        // Check if the item itself is required for the quest
+        // Check if the item itself is needed for the quest
         for (uint8 i = 0; i < 4; i++)
         {
             if (quest->RequiredItemId[i] == proto->ItemId)
@@ -510,11 +510,11 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
                 if (AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
                     continue;
 
-                return true; // The item is directly required for a quest
+                return true; // Item is directly required for a quest
             }
         }
 
-        // Check if the item has any spells that create a quest-required item
+        // Check if the item has spells that create a required quest item
         for (uint8 i = 0; i < MAX_ITEM_SPELLS; i++)
         {
             uint32 spellId = proto->Spells[i].SpellId;
@@ -539,7 +539,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
                             if (AI_VALUE2(uint32, "item count", createdItemId) >= quest->RequiredItemCount[j])
                                 continue;
 
-                            return true; // The item is useful because it creates a needed quest item
+                            return true; // Item is useful because it creates a required quest item
                         }
                     }
                 }
@@ -547,7 +547,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         }
     }
 
-    return false; // The item is not useful for any active quests
+    return false; // Item is not useful for any active quests
 }
 
 bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
