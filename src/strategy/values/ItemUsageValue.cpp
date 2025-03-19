@@ -118,12 +118,12 @@ ItemUsage ItemUsageValue::Calculate()
     {
         if (IsItemUsefulForQuest(bot, proto))
         {
-            botAI->TellMaster("✔ " + chat.FormatItem(proto) + " is needed for a quest - Returning ITEM_USAGE_QUEST!");
+            botAI->TellMaster(chat->FormatItem(proto) + " is needed for a quest - Returning ITEM_USAGE_QUEST!");
             return ITEM_USAGE_QUEST;
         }
         else
         {
-            botAI->TellMaster("❌ " + chat.FormatItem(proto) + " is NOT useful for any quest.");
+            botAI->TellMaster(chat->FormatItem(proto) + " is NOT useful for any quest.");
         }
     }
 
