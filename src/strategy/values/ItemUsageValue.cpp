@@ -487,7 +487,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         {
             if (quest->RequiredItemId[i] == proto->ItemId)
             {
-                if (botAI->AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+                if (AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
                 {
                     botAI->TellMaster("Skipping " + chat.FormatItem(proto) + " - Already has enough.");
                     continue;
@@ -534,7 +534,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
                         {
                             botAI->TellMaster(chat.FormatItem(sObjectMgr->GetItemTemplate(createdItemId)) + " is needed for " + chat.FormatQuest(quest));
 
-                            if (botAI->AI_VALUE2(uint32, "item count", createdItemId) >= quest->RequiredItemCount[j])
+                            if (AI_VALUE2(uint32, "item count", createdItemId) >= quest->RequiredItemCount[j])
                             {
                                 botAI->TellMaster("Skipping " + chat.FormatItem(sObjectMgr->GetItemTemplate(createdItemId)) + " - Already has enough.");
                                 continue;
