@@ -471,20 +471,56 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         if (!quest)
             continue;
 
+        // Check if the item itself is needed for the quest
         for (uint8 i = 0; i < 4; i++)
         {
-            if (quest->RequiredItemId[i] != proto->ItemId)
+            if (quest->RequiredItemId[i] == proto->ItemId)
+            {
+                if (GET_PLAYERBOT_AI(player) &&
+                    AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+                    continue;
+
+                return true; // The item is directly required for a quest
+            }
+        }
+
+        // Check if the item creates another item that is needed for an active quest
+        for (uint8 i = 0; i < MAX_ITEM_SPELLS; i++)
+        {
+            uint32 spellId = proto->Spells[i].SpellId;
+            if (!spellId)
                 continue;
 
-            if (GET_PLAYERBOT_AI(player) &&
-                AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
                 continue;
 
-            return true;
+            for (uint8 effectIndex = 0; effectIndex < MAX_SPELL_EFFECTS; effectIndex++)
+            {
+                if (spellInfo->Effects[effectIndex].Effect == SPELL_EFFECT_CREATE_ITEM)
+                {
+                    uint32 createdItemId = spellInfo->Effects[effectIndex].ItemType;
+
+                    // Check if the created item is required for a quest
+                    for (uint8 j = 0; j < 4; j++)
+                    {
+                        if (quest->RequiredItemId[j] == createdItemId)
+                        {
+                            if (GET_PLAYERBOT_AI(player) &&
+                                AI_VALUE2(uint32, "item count", createdItemId) >= quest->RequiredItemCount[j])
+                                continue;
+
+                            LOG_DEBUG("playerbots", "Item {} is useful because it creates quest-required item {}",
+                                      proto->ItemId, createdItemId);
+                            return true; // The item is useful because it creates a needed quest item
+                        }
+                    }
+                }
+            }
         }
     }
 
-    return false;
+    return false; // The item is not useful for any quest the bot has
 }
 
 bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
