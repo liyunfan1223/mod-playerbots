@@ -495,13 +495,6 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
     if (!botAI)
         return false;
 
-    ChatHelper chat(botAI);
-
-    std::ostringstream msg;
-    msg << "Checking quest usefulness for " << chat.FormatItem(proto);
-
-    botAI->TellMaster(msg.str()); // Notify the master that we're checking the item
-
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
         uint32 entry = player->GetQuestSlotQuestId(slot);
@@ -509,81 +502,52 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         if (!quest)
             continue;
 
-        // Check if the item itself is needed for the quest
+        // Check if the item itself is required for the quest
         for (uint8 i = 0; i < 4; i++)
         {
             if (quest->RequiredItemId[i] == proto->ItemId)
             {
                 if (AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
-                {
-                    botAI->TellMaster("Skipping " + chat.FormatItem(proto) + " - Already has enough.");
                     continue;
-                }
 
-                msg << " - Required for " << chat.FormatQuest(quest);
-                botAI->TellMaster(msg.str());
                 return true; // The item is directly required for a quest
             }
         }
 
-        // Check if the item has any spells
-        bool spellFound = false;
+        // Check if the item has any spells that create a quest-required item
         for (uint8 i = 0; i < MAX_ITEM_SPELLS; i++)
         {
             uint32 spellId = proto->Spells[i].SpellId;
             if (!spellId)
                 continue;
 
-            spellFound = true;
-            botAI->TellMaster(chat.FormatItem(proto) + " has a spell: " + chat.FormatSpell(sSpellMgr->GetSpellInfo(spellId)));
-
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo)
-            {
-                botAI->TellMaster("Skipping spell " + std::to_string(spellId) + " - SpellInfo not found.");
                 continue;
-            }
 
-            bool itemCreated = false;
             for (uint8 effectIndex = 0; effectIndex < MAX_SPELL_EFFECTS; effectIndex++)
             {
                 if (spellInfo->Effects[effectIndex].Effect == SPELL_EFFECT_CREATE_ITEM)
                 {
                     uint32 createdItemId = spellInfo->Effects[effectIndex].ItemType;
-                    itemCreated = true;
-
-                    botAI->TellMaster(chat.FormatSpell(spellInfo) + " creates " + chat.FormatItem(sObjectMgr->GetItemTemplate(createdItemId)));
 
                     // Check if the created item is required for a quest
                     for (uint8 j = 0; j < 4; j++)
                     {
                         if (quest->RequiredItemId[j] == createdItemId)
                         {
-                            botAI->TellMaster(chat.FormatItem(sObjectMgr->GetItemTemplate(createdItemId)) + " is needed for " + chat.FormatQuest(quest));
-
                             if (AI_VALUE2(uint32, "item count", createdItemId) >= quest->RequiredItemCount[j])
-                            {
-                                botAI->TellMaster("Skipping " + chat.FormatItem(sObjectMgr->GetItemTemplate(createdItemId)) + " - Already has enough.");
                                 continue;
-                            }
 
-                            botAI->TellMaster(chat.FormatItem(proto) + " is useful because it creates quest-required " + chat.FormatItem(sObjectMgr->GetItemTemplate(createdItemId)));
                             return true; // The item is useful because it creates a needed quest item
                         }
                     }
                 }
             }
-
-            if (!itemCreated)
-                botAI->TellMaster(chat.FormatSpell(spellInfo) + " does not create an item.");
         }
-
-        if (!spellFound)
-            botAI->TellMaster(chat.FormatItem(proto) + " has no usable spells.");
     }
 
-    botAI->TellMaster(chat.FormatItem(proto) + " - Not useful for any active quests.");
-    return false; // The item is not useful for any quest the bot has
+    return false; // The item is not useful for any active quests
 }
 
 bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
