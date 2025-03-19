@@ -113,19 +113,47 @@ ItemUsage ItemUsageValue::Calculate()
     }
 
     // While sync is on, do not loot quest items that are also Useful for master. Master
-    if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer ||
-        !IsItemUsefulForQuest(botAI->GetMaster(), proto))
+    Player* master = botAI->GetMaster();
+    
+    if (!master)
     {
-        if (IsItemUsefulForQuest(bot, proto))
-        {
-            botAI->TellMaster(chat->FormatItem(proto) + " is needed for a quest - Returning ITEM_USAGE_QUEST!");
-            return ITEM_USAGE_QUEST;
-        }
-        else
-        {
-            botAI->TellMaster(chat->FormatItem(proto) + " is NOT useful for any quest.");
-        }
+        botAI->TellMaster(chat->FormatItem(proto) + " - Skipping master check because there is no master.");
     }
+    else
+    {
+        botAI->TellMaster(chat->FormatItem(proto) + " - Checking master's quest usefulness.");
+    }
+    
+    if (!sPlayerbotAIConfig->syncQuestWithPlayer)
+    {
+        botAI->TellMaster(chat->FormatItem(proto) + " - Skipping master quest check because quest sync is disabled.");
+    }
+    else
+    {
+        botAI->TellMaster(chat->FormatItem(proto) + " - Quest sync is enabled, checking master's quests.");
+    }
+    
+    if (master && sPlayerbotAIConfig->syncQuestWithPlayer && !IsItemUsefulForQuest(master, proto))
+    {
+        botAI->TellMaster(chat->FormatItem(proto) + " - Master does NOT need this item.");
+    }
+    else if (master && sPlayerbotAIConfig->syncQuestWithPlayer)
+    {
+        botAI->TellMaster(chat->FormatItem(proto) + " - Master NEEDS this item.");
+    }
+    
+    if (IsItemUsefulForQuest(botAI->GetBot(), proto))
+    {
+        botAI->TellMaster(chat->FormatItem(proto) + " is needed for a quest - Returning ITEM_USAGE_QUEST!");
+        return ITEM_USAGE_QUEST;
+    }
+    else
+    {
+        botAI->TellMaster(chat->FormatItem(proto) + " is NOT useful for any quest.");
+    }
+    
+    botAI->TellMaster(chat->FormatItem(proto) + " is NOT useful for any quest including my master's.");
+
 
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
     {
