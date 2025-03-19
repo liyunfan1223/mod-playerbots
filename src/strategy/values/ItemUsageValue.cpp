@@ -115,8 +115,17 @@ ItemUsage ItemUsageValue::Calculate()
     // While sync is on, do not loot quest items that are also Useful for master. Master
     if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer ||
         !IsItemUsefulForQuest(botAI->GetMaster(), proto))
+    {
         if (IsItemUsefulForQuest(bot, proto))
+        {
+            botAI->TellMaster("✔ " + chat.FormatItem(proto) + " is needed for a quest - Returning ITEM_USAGE_QUEST!");
             return ITEM_USAGE_QUEST;
+        }
+        else
+        {
+            botAI->TellMaster("❌ " + chat.FormatItem(proto) + " is NOT useful for any quest.");
+        }
+    }
 
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
     {
