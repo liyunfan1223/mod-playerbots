@@ -1105,9 +1105,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                         }
                     }
 
-                    QueueChatResponse(
-                        ChatQueuedReply{msgtype, guid1.GetCounter(), guid2.GetCounter(), message, chanName,
-                                                  name, time(nullptr) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15)});
+                    QueueChatResponse(ChatQueuedReply{msgtype, guid1.GetCounter(), guid2.GetCounter(), message,
+                                                      chanName, name,
+                                                      time(nullptr) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15)});
                     GetAiObjectContext()->GetValue<time_t>("last said", "chat")->Set(time(0) + urand(5, 25));
                     return;
                 }
@@ -1244,10 +1244,10 @@ void PlayerbotAI::ChangeEngine(BotState type)
         switch (type)
         {
             case BOT_STATE_COMBAT:
-                // LOG_DEBUG("playerbots",  "=== {} COMBAT ===", bot->GetName().c_str());
+                ChangeEngineOnCombat();
                 break;
             case BOT_STATE_NON_COMBAT:
-                // LOG_DEBUG("playerbots",  "=== {} NON-COMBAT ===", bot->GetName().c_str());
+                ChangeEngineOnNonCombat();
                 break;
             case BOT_STATE_DEAD:
                 // LOG_DEBUG("playerbots",  "=== {} DEAD ===", bot->GetName().c_str());
@@ -1255,6 +1255,23 @@ void PlayerbotAI::ChangeEngine(BotState type)
             default:
                 break;
         }
+    }
+}
+
+void PlayerbotAI::ChangeEngineOnCombat()
+{
+    if (HasStrategy("stay", BOT_STATE_COMBAT))
+    {
+        aiObjectContext->GetValue<PositionInfo>("pos", "stay")
+            ->Set(PositionInfo(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId()));
+    }
+}
+
+void PlayerbotAI::ChangeEngineOnNonCombat()
+{
+    if (HasStrategy("stay", BOT_STATE_NON_COMBAT))
+    {
+        aiObjectContext->GetValue<PositionInfo>("pos", "stay")->Reset();
     }
 }
 
@@ -2848,7 +2865,6 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
     if (!target)
         target = bot;
 
-
     if (Pet* pet = bot->GetPet())
         if (pet->HasSpell(spellid))
             return true;
@@ -3041,8 +3057,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkH
     return false;
 }
 
-bool PlayerbotAI::CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell,
-                               Item* itemTarget)
+bool PlayerbotAI::CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell, Item* itemTarget)
 {
     if (!spellid)
         return false;
@@ -3070,7 +3085,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, float x, float y, float z, bool c
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetDst(x, y, z, 0.f);
-    
+
     Item* item = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();
     spell->m_targets.SetItemTarget(item);
 
@@ -4296,8 +4311,8 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         mod = AutoScaleActivity(mod);
     }
 
-    uint32 ActivityNumber = GetFixedBotNumer(100,
-                                    sPlayerbotAIConfig->botActiveAlone * static_cast<float>(mod) / 100 * 0.01f);
+    uint32 ActivityNumber =
+        GetFixedBotNumer(100, sPlayerbotAIConfig->botActiveAlone * static_cast<float>(mod) / 100 * 0.01f);
 
     return ActivityNumber <=
            (sPlayerbotAIConfig->botActiveAlone * mod) /
@@ -4356,7 +4371,8 @@ void PlayerbotAI::RemoveShapeshift()
     RemoveAura("moonkin form");
     RemoveAura("travel form");
     RemoveAura("cat form");
-    RemoveAura("flight form"); bot->RemoveAura(33943);  // The latter added for now as RemoveAura("flight form") currently does not work.
+    RemoveAura("flight form");
+    bot->RemoveAura(33943);  // The latter added for now as RemoveAura("flight form") currently does not work.
     RemoveAura("swift flight form");
     RemoveAura("aquatic form");
     RemoveAura("ghost wolf");
@@ -4943,11 +4959,9 @@ Item* PlayerbotAI::FindAmmo() const
         }
 
         // Search inventory for the correct ammo type
-        return FindItemInInventory([requiredAmmoType](ItemTemplate const* pItemProto) -> bool
-                                   {
-                                       return pItemProto->Class == ITEM_CLASS_PROJECTILE && 
-                                              pItemProto->SubClass == requiredAmmoType;
-                                   });
+        return FindItemInInventory(
+            [requiredAmmoType](ItemTemplate const* pItemProto) -> bool
+            { return pItemProto->Class == ITEM_CLASS_PROJECTILE && pItemProto->SubClass == requiredAmmoType; });
     }
 
     return nullptr;  // No ranged weapon equipped
@@ -6178,9 +6192,10 @@ bool PlayerbotAI::IsHealingSpell(uint32 spellFamilyName, flag96 spellFalimyFlags
     return spellFalimyFlags & healingFlags;
 }
 
-
-SpellFamilyNames PlayerbotAI::Class2SpellFamilyName(uint8 cls) {
-    switch (cls) {
+SpellFamilyNames PlayerbotAI::Class2SpellFamilyName(uint8 cls)
+{
+    switch (cls)
+    {
         case CLASS_WARRIOR:
             return SPELLFAMILY_WARRIOR;
         case CLASS_PALADIN:

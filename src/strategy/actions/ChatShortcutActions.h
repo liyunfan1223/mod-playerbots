@@ -10,13 +10,15 @@
 
 class PlayerbotAI;
 
-class ReturnPositionResetAction : public Action
+class PositionsResetAction : public Action
 {
 public:
-    ReturnPositionResetAction(PlayerbotAI* botAI, std::string const name) : Action(botAI, name) {}
+    PositionsResetAction(PlayerbotAI* botAI, std::string const name) : Action(botAI, name) {}
 
     void ResetReturnPosition();
     void SetReturnPosition(float x, float y, float z);
+    void ResetStayPosition();
+    void SetStayPosition(float x, float y, float z);
 };
 
 class FollowChatShortcutAction : public MovementAction
@@ -27,10 +29,10 @@ public:
     bool Execute(Event event) override;
 };
 
-class StayChatShortcutAction : public ReturnPositionResetAction
+class StayChatShortcutAction : public PositionsResetAction
 {
 public:
-    StayChatShortcutAction(PlayerbotAI* botAI) : ReturnPositionResetAction(botAI, "stay chat shortcut") {}
+    StayChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "stay chat shortcut") {}
 
     bool Execute(Event event) override;
 };
@@ -43,34 +45,34 @@ public:
     bool Execute(Event event) override;
 };
 
-class FleeChatShortcutAction : public ReturnPositionResetAction
+class FleeChatShortcutAction : public PositionsResetAction
 {
 public:
-    FleeChatShortcutAction(PlayerbotAI* botAI) : ReturnPositionResetAction(botAI, "flee chat shortcut") {}
+    FleeChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "flee chat shortcut") {}
 
     bool Execute(Event event) override;
 };
 
-class GoawayChatShortcutAction : public ReturnPositionResetAction
+class GoawayChatShortcutAction : public PositionsResetAction
 {
 public:
-    GoawayChatShortcutAction(PlayerbotAI* botAI) : ReturnPositionResetAction(botAI, "runaway chat shortcut") {}
+    GoawayChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "runaway chat shortcut") {}
 
     bool Execute(Event event) override;
 };
 
-class GrindChatShortcutAction : public ReturnPositionResetAction
+class GrindChatShortcutAction : public PositionsResetAction
 {
 public:
-    GrindChatShortcutAction(PlayerbotAI* botAI) : ReturnPositionResetAction(botAI, "grind chat shortcut") {}
+    GrindChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "grind chat shortcut") {}
 
     bool Execute(Event event) override;
 };
 
-class TankAttackChatShortcutAction : public ReturnPositionResetAction
+class TankAttackChatShortcutAction : public PositionsResetAction
 {
 public:
-    TankAttackChatShortcutAction(PlayerbotAI* botAI) : ReturnPositionResetAction(botAI, "tank attack chat shortcut") {}
+    TankAttackChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "tank attack chat shortcut") {}
 
     bool Execute(Event event) override;
 };

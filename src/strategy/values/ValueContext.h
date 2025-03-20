@@ -194,6 +194,7 @@ public:
         creators["rti cc"] = &ValueContext::rti_cc;
         creators["rti"] = &ValueContext::rti;
         creators["position"] = &ValueContext::position;
+        creators["pos"] = &ValueContext::pos;
         creators["current position"] = &ValueContext::current_position;
         creators["threat"] = &ValueContext::threat;
 
@@ -342,6 +343,7 @@ private:
     static UntypedValue* attackers(PlayerbotAI* botAI) { return new AttackersValue(botAI); }
 
     static UntypedValue* position(PlayerbotAI* botAI) { return new PositionValue(botAI); }
+    static UntypedValue* pos(PlayerbotAI* ai) { return new SinglePositionValue(ai); }
     static UntypedValue* current_position(PlayerbotAI* botAI) { return new CurrentPositionValue(botAI); }
     static UntypedValue* rti(PlayerbotAI* botAI) { return new RtiValue(botAI); }
     static UntypedValue* rti_cc(PlayerbotAI* botAI) { return new RtiCcValue(botAI); }

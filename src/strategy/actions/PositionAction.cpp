@@ -159,3 +159,25 @@ bool ReturnAction::isUseful()
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()[qualifier];
     return pos.isSet() && AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig->followDistance;
 }
+
+bool ReturnToStayPositionAction::isPossible()
+{
+    PositionMap& posMap = AI_VALUE(PositionMap&, "position");
+    PositionInfo stayPosition = posMap["stay"];
+    if (stayPosition.isSet())
+    {
+        const float distance = bot->GetDistance(stayPosition.x, stayPosition.y, stayPosition.z);
+        if (distance > sPlayerbotAIConfig->reactDistance)
+        {
+            botAI->TellMaster("The stay position is too far to return. I am going to stay where I am now");
+
+            // Set the stay position to current position
+            stayPosition.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
+            posMap["stay"] = stayPosition;
+        }
+
+        return true;
+    }
+
+    return false;
+}
