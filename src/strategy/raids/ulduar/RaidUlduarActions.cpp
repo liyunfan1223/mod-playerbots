@@ -1166,6 +1166,54 @@ bool RazorscaleFuseArmorAction::Execute(Event event)
     return true;
 }
 
+bool IronAssemblyLightningTendrilsAction::isUseful()
+{
+    IronAssemblyLightningTendrilsTrigger ironAssemblyLightningTendrilsTrigger(botAI);
+    return ironAssemblyLightningTendrilsTrigger.IsActive();
+}
+
+bool IronAssemblyLightningTendrilsAction::Execute(Event event)
+{
+    const float radius = 18.0f + 10.0f;  // 18 yards + 10 yards for safety
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "stormcaller brundir");
+    if (!boss)
+        return false;
+
+    float currentDistance = bot->GetDistance2d(boss);
+
+    if (currentDistance < radius)
+    {
+        return MoveAway(boss, radius - currentDistance);
+    }
+
+    return false;
+}
+
+bool IronAssemblyOverloadAction::isUseful()
+{
+    IronAssemblyOverloadTrigger ironAssemblyOverloadTrigger(botAI);
+    return ironAssemblyOverloadTrigger.IsActive();
+}
+
+bool IronAssemblyOverloadAction::Execute(Event event)
+{
+    const float radius = 20.0f + 5.0f;  // 20 yards + 5 yards for safety
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "stormcaller brundir");
+    if (!boss)
+        return false;
+
+    float currentDistance = bot->GetDistance2d(boss);
+
+    if (currentDistance < radius)
+    {
+        return MoveAway(boss, radius - currentDistance);
+    }
+
+    return false;
+}
+
 bool HodirMoveSnowpackedIcicleAction::isUseful()
 {
     // Check boss and it is alive
@@ -1175,13 +1223,19 @@ bool HodirMoveSnowpackedIcicleAction::isUseful()
         return false;
     }
 
+    // Check if boss is casting Flash Freeze
+    if (!boss->HasUnitState(UNIT_STATE_CASTING) || !boss->FindCurrentSpellBySpellId(SPELL_FLASH_FREEZE))
+    {
+        return false;
+    }
+
     // Find the nearest Snowpacked Icicle Target
-    Creature* target = bot->FindNearestCreature(33174, 100.0f);
+    Creature* target = bot->FindNearestCreature(NPC_SNOWPACKED_ICICLE, 100.0f);
     if (!target)
         return false;
 
-    // Check that boss is stacked on Snowpacked Icicle
-    if (bot->GetDistance2d(target->GetPositionX(), target->GetPositionY()) <= 3.0f)
+    // Check that bot is stacked on Snowpacked Icicle
+    if (bot->GetDistance2d(target->GetPositionX(), target->GetPositionY()) <= 5.0f)
     {
         return false;
     }
@@ -1191,12 +1245,42 @@ bool HodirMoveSnowpackedIcicleAction::isUseful()
 
 bool HodirMoveSnowpackedIcicleAction::Execute(Event event)
 {
-    Creature* target = bot->FindNearestCreature(33174, 100.0f);
+    Creature* target = bot->FindNearestCreature(NPC_SNOWPACKED_ICICLE, 100.0f);
     if (!target)
         return false;
 
     return MoveTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false,
-                  false, false, true, MovementPriority::MOVEMENT_NORMAL);
+                  false, false, true, MovementPriority::MOVEMENT_NORMAL, true);
+}
+
+bool HodirBitingColdJumpAction::Execute(Event event)
+{
+    // This needs improving but maybe it should be done in the playerbot core.
+
+    int mapId = bot->GetMap()->GetId();
+    int x = bot->GetPositionX();
+    int y = bot->GetPositionY();
+    int z = bot->GetPositionZ() + 3.98f;
+    float speed = 7.96f;
+
+    UpdateMovementState();
+    if (!IsMovingAllowed(mapId, x, y, z))
+    {
+        return false;
+    }
+    MovementPriority priority;
+    if (IsWaitingForLastMove(priority))
+    {
+        return false;
+    }
+
+    MotionMaster& mm = *bot->GetMotionMaster();
+    mm.Clear();
+    mm.MoveJump(x, y, z, speed, speed, 1, AI_VALUE(Unit*, "current target"));
+    mm.MoveFall(0, true);
+    AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000, priority);
+
+    return true;
 }
 
 bool FreyaMoveAwayNatureBombAction::isUseful()
