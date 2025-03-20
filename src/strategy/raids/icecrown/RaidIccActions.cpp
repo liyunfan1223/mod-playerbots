@@ -3206,8 +3206,35 @@ bool IccLichKingWinterAction::Execute(Event event)
 
 bool IccLichKingAddsAction::Execute(Event event)
 {
+    if (bot->HasAura(68985) || !bot->IsAlive()) // Don't process actions if bot is picked up by Val'kyr or is dead
+        return false;
+    
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
     Unit* spiritWarden = AI_VALUE2(Unit*, "find target", "spirit warden");
+    
+	if (bot->HasAura(30440)) // Random aura tracking whether bot has fallen off edge / been thrown by Val'kyr
+	{
+		if(bot->GetPositionZ() > 779.0f)
+			return JumpTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), 740.01f);
+		else
+		{
+			bot->KillPlayer(); // If bot has jumped past the kill Z (780), kill
+			return true;
+		}
+	}
+    
+    if (boss && (boss->GetHealthPct() < 69) && (boss->GetHealthPct() > 39)) // If boss is in p2, check if bot has been thrown off platform
+    {
+       float dx = bot->GetPositionX() - 503.0f;
+       float dy = bot->GetPositionY() - (-2124.0f);
+       float distance = sqrt(dx*dx + dy*dy); // Calculate distance from the center of the platform
+       
+       if (distance > 52.0f && distance < 70.0f && bot->GetPositionZ() > 780) // If bot has fallen off edge, distance is over 52
+       {
+           bot->AddAura(30440, bot); // Apply random 30 sec aura to track that we've initiated a jump
+           return JumpTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), 740.01f); // Start jumping to the abyss
+       }
+    }
 
     //temp solution for bots going underground due to buggy ice platfroms and adds that go underground
     if (abs(bot->GetPositionZ() - 840.857f) > 1.0f)
