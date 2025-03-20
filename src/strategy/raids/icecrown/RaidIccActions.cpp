@@ -3223,7 +3223,7 @@ bool IccLichKingAddsAction::Execute(Event event)
 		}
 	}
     
-    if (boss && (boss->GetHealthPct() < 69) && (boss->GetHealthPct() > 39)) // If boss is in p2, check if bot has been thrown off platform
+    if (boss && boss->GetHealthPct() < 69 && boss->GetHealthPct() > 39) // If boss is in p2, check if bot has been thrown off platform
     {
        float dx = bot->GetPositionX() - 503.0f;
        float dy = bot->GetPositionY() - (-2124.0f);
