@@ -237,6 +237,13 @@ bool CheckMountStateAction::TryForms(Player* master, int32 masterMountType, int3
     if (!master)
         return false;
 
+    // If both master and bot are in matching forms or master is mounted with corresponding speed, nothing to do
+    else if
+        ((masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm == FORM_TRAVEL) ||
+        ((masterInShapeshiftForm == FORM_FLIGHT || (masterMountType == 1 && masterSpeed == 149)) && botInShapeshiftForm == FORM_FLIGHT) ||
+        ((masterInShapeshiftForm == FORM_FLIGHT_EPIC || (masterMountType == 1 && masterSpeed == 279)) && botInShapeshiftForm == FORM_FLIGHT_EPIC))
+        return true;
+
     // Check if master is in Travel Form and bot can do the same
     if (botAI->CanCastSpell(SPELL_TRAVEL_FORM, bot, true) &&
         masterInShapeshiftForm == FORM_TRAVEL && botInShapeshiftForm != FORM_TRAVEL)
