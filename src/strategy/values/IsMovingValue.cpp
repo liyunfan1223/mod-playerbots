@@ -24,5 +24,7 @@ bool IsSwimmingValue::Calculate()
     if (!target)
         return false;
 
-    return target->IsUnderWater() || (target->GetLiquidData().Status == LIQUID_MAP_IN_WATER && target->CanSwim());
+    int8 targetInLiquidState = target->GetLiquidData().Status;
+
+    return targetInLiquidState == LIQUID_MAP_UNDER_WATER || (targetInLiquidState == LIQUID_MAP_IN_WATER && target->CanSwim());
 }

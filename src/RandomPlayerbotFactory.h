@@ -54,13 +54,14 @@ public:
     static void CreateRandomGuilds();
     static void CreateRandomArenaTeams(ArenaType slot, uint32 count);
     static std::string const CreateRandomGuildName();
+    static uint32 CalculateTotalAccountCount();
+    static uint32 CalculateAvailableCharsPerAccount();
 
 private:
     std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
     static std::string const CreateRandomArenaTeamName();
 
     uint32 accountId;
-    static uint32 CalculateTotalAccountCount();
     static std::map<uint8, std::vector<uint8>> availableRaces;
 };
 

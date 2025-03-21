@@ -94,6 +94,12 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         new TriggerNode("disperse", NextAction::array(0, new NextAction("disperse set", relevance), NULL)));
     triggers.push_back(
 	    new TriggerNode("open items", NextAction::array(0, new NextAction("open items", relevance), nullptr)));
+    triggers.push_back(
+        new TriggerNode("qi", NextAction::array(0, new NextAction("query item usage", relevance), nullptr)));
+    triggers.push_back(
+	    new TriggerNode("unlock items", NextAction::array(0, new NextAction("unlock items", relevance), nullptr)));
+    triggers.push_back(
+	    new TriggerNode("unlock traded item", NextAction::array(0, new NextAction("unlock traded item", relevance), nullptr)));
 }
 
 ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
@@ -107,6 +113,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("log");
     supported.push_back("los");
     supported.push_back("rpg status");
+    supported.push_back("rpg do quest");
     supported.push_back("aura");
     supported.push_back("drop");
     supported.push_back("share");
@@ -168,4 +175,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("drink");
     supported.push_back("calc");
     supported.push_back("open items");
+    supported.push_back("qi");
+    supported.push_back("unlock items");
+    supported.push_back("unlock traded item");
 }

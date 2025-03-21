@@ -44,7 +44,7 @@ public:
     CastStealthAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "stealth") {}
 
     std::string const GetTargetName() override { return "self target"; }
-
+    bool isUseful() override;
     bool isPossible() override;
 };
 
@@ -127,10 +127,12 @@ public:
     CastKickOnEnemyHealerAction(PlayerbotAI* botAI) : CastSpellOnEnemyHealerAction(botAI, "kick") {}
 };
 
-class EnvenomAction : public CastMeleeSpellAction
+class CastEnvenomAction : public CastMeleeSpellAction
 {
 public:
-    EnvenomAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "envenom") {}
+    CastEnvenomAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "envenom") {}
+    bool isUseful() override;
+    bool isPossible() override;
 };
 
 class CastTricksOfTheTradeOnMainTankAction : public BuffOnMainTankAction

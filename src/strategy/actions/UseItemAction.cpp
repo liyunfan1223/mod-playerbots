@@ -63,7 +63,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     if (bot->CanUseItem(item) != EQUIP_ERR_OK)
         return false;
 
-    if (bot->IsNonMeleeSpellCast(true))
+    if (bot->IsNonMeleeSpellCast(false))
         return false;
 
     uint8 bagIndex = item->GetBagSlot();

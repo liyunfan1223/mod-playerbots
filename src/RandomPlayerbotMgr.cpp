@@ -31,6 +31,7 @@
 #include "GuildTaskMgr.h"
 #include "LFGMgr.h"
 #include "MapMgr.h"
+#include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "PerformanceMonitor.h"
 #include "Player.h"
@@ -47,6 +48,13 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "World.h"
+#include "RandomPlayerbotFactory.h"
+
+struct GuidClassRaceInfo {
+    ObjectGuid::LowType guid;
+    uint32 rClass;
+    uint32 rRace;
+};
 
 void PrintStatsThread() { sRandomPlayerbotMgr->PrintStats(); }
 
@@ -370,7 +378,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             sRandomPlayerbotMgr->CheckLfgQueue();
     }
 
-    if (time(nullptr) > (printStatsTimer + 300))
+    if (sPlayerbotAIConfig->randomBotAutologin && time(nullptr) > (printStatsTimer + 300))
     {
         if (!printStatsTimer)
         {
@@ -463,19 +471,34 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
     {
         maxAllowedBotCount -= currentBots.size();
         maxAllowedBotCount = std::min(sPlayerbotAIConfig->randomBotsPerInterval, maxAllowedBotCount);
+        
+        uint32 totalRatio = sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio;
+        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / totalRatio;
 
-        uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / (sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio);
+        uint32 remainder = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) % totalRatio;
+
+        // Fix #1082: Randomly add one based on reminder
+        if (remainder && urand(1, totalRatio) <= remainder) {
+            allowedAllianceCount++;
+        }
+
         uint32 allowedHordeCount = maxAllowedBotCount - allowedAllianceCount;
 
         for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin();
              i != sPlayerbotAIConfig->randomBotAccounts.end(); i++)
         {
             uint32 accountId = *i;
-            if (sPlayerbotAIConfig->enableRotation)
+            if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
             {
-                uint32 limit = std::min((uint32)sPlayerbotAIConfig->randomBotAccounts.size(),
-                                        sPlayerbotAIConfig->rotationPoolSize / 10 + 1);
-                uint32 index = urand(0, limit);
+                // minus addclass bots account
+                int32 baseAccount = RandomPlayerbotFactory::CalculateTotalAccountCount() - sPlayerbotAIConfig->addClassAccountPoolSize;
+                
+                if (baseAccount <= 0 || baseAccount > sPlayerbotAIConfig->randomBotAccounts.size())
+                {
+                    LOG_ERROR("playerbots", "Account calculation error with PeriodicOnlineOffline");
+                    return 0;
+                }
+                uint32 index = urand(0, baseAccount - 1);
                 accountId = sPlayerbotAIConfig->randomBotAccounts[index];
             }
             CharacterDatabasePreparedStatement* stmt =
@@ -484,11 +507,28 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
             if (!result)
                 continue;
-            std::vector<uint32> guids;
-            do
-            {
+            
+            std::vector<GuidClassRaceInfo> allGuidInfos;
+
+            do {
                 Field* fields = result->Fetch();
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                GuidClassRaceInfo info;
+                info.guid = fields[0].Get<uint32>();
+                info.rClass = fields[1].Get<uint8>();
+                info.rRace = fields[2].Get<uint8>();
+                allGuidInfos.push_back(info);
+            } while (result->NextRow());
+
+            // random shuffle for class balance
+            std::mt19937 rnd(time(0));
+            std::shuffle(allGuidInfos.begin(), allGuidInfos.end(), rnd);
+
+            std::vector<uint32> guids;
+            for (const auto& info : allGuidInfos) {
+                ObjectGuid::LowType guid = info.guid;
+                uint32 rClass = info.rClass;
+                uint32 rRace = info.rRace;
+
                 if (GetEventValue(guid, "add"))
                     continue;
 
@@ -501,44 +541,28 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 if (std::find(currentBots.begin(), currentBots.end(), guid) != currentBots.end())
                     continue;
 
-                if (sPlayerbotAIConfig->disableDeathKnightLogin)
-                {
-                    uint32 rClass = fields[1].Get<uint8>();
-                    if (rClass == CLASS_DEATH_KNIGHT)
-                    {
+                if (sPlayerbotAIConfig->disableDeathKnightLogin) {
+                    if (rClass == CLASS_DEATH_KNIGHT) {
                         continue;
                     }
                 }
-                uint32 rRace = fields[2].Get<uint8>();
+
                 uint32 isAlliance = IsAlliance(rRace);
-                if (!allowedAllianceCount && isAlliance)
-                {
+                bool factionNotAllowed = (!allowedAllianceCount && isAlliance) || (!allowedHordeCount && !isAlliance);
+
+                if (factionNotAllowed)
                     continue;
-                }
-                if (!allowedHordeCount && !isAlliance)
-                {
-                    continue;
-                }
-                if (isAlliance)
-                {
+
+                if (isAlliance) {
                     allowedAllianceCount--;
-                }
-                else
-                {
+                } else {
                     allowedHordeCount--;
                 }
-                guids.push_back(guid);
-            } while (result->NextRow());
 
-            std::mt19937 rnd(time(0));
-            std::shuffle(guids.begin(), guids.end(), rnd);
-
-            for (uint32& guid : guids)
-            {
-                uint32 add_time = sPlayerbotAIConfig->enableRotation
+                uint32 add_time = sPlayerbotAIConfig->enablePeriodicOnlineOffline
                                       ? urand(sPlayerbotAIConfig->minRandomBotInWorldTime,
                                               sPlayerbotAIConfig->maxRandomBotInWorldTime)
-                                      : sPlayerbotAIConfig->randomBotInWorldWithRotationDisabled;
+                                      : sPlayerbotAIConfig->permanantlyInWorldTime;
 
                 SetEventValue(guid, "add", 1, add_time);
                 SetEventValue(guid, "logout", 0, 0);
@@ -1458,6 +1482,82 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
               tlocs.size());
 }
 
+void RandomPlayerbotMgr::PrepareZone2LevelBracket()
+{
+    // Classic WoW - Low - level zones
+    zone2LevelBracket[1] = {5, 12}; // Dun Morogh
+    zone2LevelBracket[12] = {5, 12}; // Elwynn Forest
+    zone2LevelBracket[14] = {5, 12}; // Durotar
+    zone2LevelBracket[85] = {5, 12}; // Tirisfal Glades
+    zone2LevelBracket[141] = {5, 12}; // Teldrassil
+    zone2LevelBracket[215] = {5, 12}; // Mulgore
+    zone2LevelBracket[3430] = {5, 12}; // Eversong Woods
+    zone2LevelBracket[3524] = {5, 12}; // Azuremyst Isle
+
+    // Classic WoW - Mid - level zones
+    zone2LevelBracket[17] = {10, 25}; // Barrens
+    zone2LevelBracket[38] = {10, 20}; // Loch Modan
+    zone2LevelBracket[40] = {10, 21}; // Westfall
+    zone2LevelBracket[130] = {10, 23}; // Silverpine Forest
+    zone2LevelBracket[148] = {10, 21}; // Darkshore
+    zone2LevelBracket[3433] = {10, 22}; // Ghostlands
+    zone2LevelBracket[3525] = {10, 21}; // Bloodmyst Isle
+
+    // Classic WoW - High - level zones
+    zone2LevelBracket[10] = {19, 33}; // Deadwind Pass
+    zone2LevelBracket[11] = {21, 30}; // Wetlands
+    zone2LevelBracket[44] = {16, 28}; // Redridge Mountains
+    zone2LevelBracket[267] = {20, 34}; // Hillsbrad Foothills
+    zone2LevelBracket[331] = {18, 33}; // Ashenvale
+    zone2LevelBracket[400] = {24, 36}; // Thousand Needles
+    zone2LevelBracket[406] = {16, 29}; // Stonetalon Mountains
+
+    // Classic WoW - Higher - level zones
+    zone2LevelBracket[3] = {36, 46}; // Badlands
+    zone2LevelBracket[8] = {36, 46}; // Swamp of Sorrows
+    zone2LevelBracket[15] = {35, 46}; // Dustwallow Marsh
+    zone2LevelBracket[16] = {45, 52}; // Azshara
+    zone2LevelBracket[33] = {32, 47}; // Stranglethorn Vale
+    zone2LevelBracket[45] = {30, 42}; // Arathi Highlands
+    zone2LevelBracket[47] = {42, 51}; // Hinterlands
+    zone2LevelBracket[51] = {45, 51}; // Searing Gorge
+    zone2LevelBracket[357] = {40, 52}; // Feralas
+    zone2LevelBracket[405] = {30, 41}; // Desolace
+    zone2LevelBracket[440] = {41, 52}; // Tanaris
+
+    // Classic WoW - Top - level zones
+    zone2LevelBracket[4] = {52, 57}; // Blasted Lands
+    zone2LevelBracket[28] = {50, 60}; // Western Plaguelands
+    zone2LevelBracket[46] = {51, 60}; // Burning Steppes
+    zone2LevelBracket[139] = {54, 62}; // Eastern Plaguelands
+    zone2LevelBracket[361] = {47, 57}; // Felwood
+    zone2LevelBracket[490] = {49, 56}; // Un'Goro Crater
+    zone2LevelBracket[618] = {54, 61}; // Winterspring
+    zone2LevelBracket[1377] = {54, 63}; // Silithus
+
+    // The Burning Crusade - Zones
+    zone2LevelBracket[3483] = {58, 66}; // Hellfire Peninsula
+    zone2LevelBracket[3518] = {64, 70}; // Nagrand
+    zone2LevelBracket[3519] = {62, 73}; // Terokkar Forest
+    zone2LevelBracket[3520] = {66, 73}; // Shadowmoon Valley
+    zone2LevelBracket[3521] = {60, 67}; // Zangarmarsh
+    zone2LevelBracket[3522] = {64, 73}; // Blade's Edge Mountains
+    zone2LevelBracket[3523] = {67, 73}; // Netherstorm
+    zone2LevelBracket[4080] = {68, 73}; // Isle of Quel'Danas
+
+    // Wrath of the Lich King - Zones
+    zone2LevelBracket[65] = {71, 77}; // Dragonblight
+    zone2LevelBracket[66] = {74, 80}; // Zul'Drak
+    zone2LevelBracket[67] = {77, 80}; // Storm Peaks
+    zone2LevelBracket[210] = {77, 80}; // Icecrown Glacier
+    zone2LevelBracket[394] = {72, 78}; // Grizzly Hills
+    zone2LevelBracket[495] = {68, 74}; // Howling Fjord
+    zone2LevelBracket[2817] = {77, 80}; // Crystalsong Forest
+    zone2LevelBracket[3537] = {68, 75}; // Borean Tundra
+    zone2LevelBracket[3711] = {75, 80}; // Sholazar Basin
+    zone2LevelBracket[4197] = {79, 80}; // Wintergrasp
+}
+
 void RandomPlayerbotMgr::PrepareTeleportCache()
 {
     uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
@@ -1534,6 +1634,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 
     if (sPlayerbotAIConfig->enableNewRpgStrategy)
     {
+        PrepareZone2LevelBracket();
         LOG_INFO("playerbots", "Preparing innkeepers locations for level...");
         results = WorldDatabase.Query(
         "SELECT "
@@ -1542,8 +1643,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "position_y, "
         "position_z, "
         "orientation, "
-        "t.faction, "
-        "t.entry "
+        "t.faction "
         "FROM "
         "creature c "
         "INNER JOIN creature_template t on c.id1 = t.entry "
@@ -1565,7 +1665,6 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 float z = fields[3].Get<float>();
                 float orient = fields[4].Get<float>();
                 uint32 faction = fields[5].Get<uint32>();
-                uint32 c_entry = fields[6].Get<uint32>();
                 const FactionTemplateEntry* entry = sFactionTemplateStore.LookupEntry(faction);
 
                 WorldLocation loc(mapId, x + cos(orient) * 5.0f, y + sin(orient) * 5.0f, z + 0.5f, orient + M_PI);
@@ -1573,35 +1672,13 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
                 if (!map)
                     continue;
-                const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(1, x, y, z));
+                const AreaTableEntry* area = sAreaTableStore.LookupEntry(map->GetAreaId(PHASEMASK_NORMAL, x, y, z));
                 uint32 zoneId = area->zone ? area->zone : area->ID;
-                uint32 level = area->area_level;
-                for (int i = 5; i <= maxLevel; i++)
+                if (zone2LevelBracket.find(zoneId) == zone2LevelBracket.end())
+                    continue;
+                LevelBracket bracket = zone2LevelBracket[zoneId];
+                for (int i = bracket.low; i <= bracket.high; i++)
                 {
-                    std::vector<WorldLocation>& locs = locsPerLevelCache[i];
-                    int counter = 0;
-                    WorldLocation levelLoc;
-                    for (auto& checkLoc : locs)
-                    {
-                        if (loc.GetMapId() != checkLoc.GetMapId())
-                            continue;
-                        
-                        if (loc.GetExactDist(checkLoc) > 1500.0f)
-                            continue;
-                        
-                        if (zoneId != 
-                            map->GetZoneId(1, checkLoc.GetPositionX(), checkLoc.GetPositionY(), checkLoc.GetPositionZ()))
-                            continue;
-
-                        counter++;
-                        levelLoc = checkLoc;
-                        if (counter >= 15)
-                            break;
-                    }
-
-                    if (counter < 15)
-                        continue;
-
                     if (!(entry->hostileMask & 4))
                     {
                         hordeStarterPerLevelCache[i].push_back(loc);
@@ -1610,12 +1687,10 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                     {
                         allianceStarterPerLevelCache[i].push_back(loc);
                     }
-                    LOG_DEBUG("playerbots", "Area: {} Level: {} creature_entry: {} add to: {} {}({},{},{},{})", area->ID,
-                            level, c_entry, i, counter, levelLoc.GetPositionX(), levelLoc.GetPositionY(),
-                            levelLoc.GetPositionZ(), levelLoc.GetMapId());
                 }
             } while (results->NextRow());
         }
+
         // add all initial position
         for (uint32 i = 1; i < MAX_RACES; i++)
         {
@@ -2621,9 +2696,8 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 engine_noncombat = 0;
     uint32 engine_combat = 0;
     uint32 engine_dead = 0;
-    uint32 stateCount[MAX_TRAVEL_STATE + 1] = {0};
-    std::vector<std::pair<Quest const*, int32>> questCount;
     std::unordered_map<NewRpgStatus, int> rpgStatusCount;
+    NewRpgStatistic rpgStasticTotal;
     std::unordered_map<uint32, int> zoneCount;
     uint8 maxBotLevel = 0;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
@@ -2698,41 +2772,19 @@ void RandomPlayerbotMgr::PrintStats()
         zoneCount[bot->GetZoneId()]++;
 
         if (sPlayerbotAIConfig->enableNewRpgStrategy)
-            rpgStatusCount[botAI->rpgInfo.status]++;
-
-        if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
         {
-            TravelState state = target->getTravelState();
-            stateCount[state]++;
-
-            Quest const* quest;
-            if (target->getDestination())
-                quest = target->getDestination()->GetQuestTemplate();
-
-            if (quest)
-            {
-                bool found = false;
-
-                for (auto& q : questCount)
-                {
-                    if (q.first != quest)
-                        continue;
-
-                    q.second++;
-                    found = true;
-                }
-
-                if (!found)
-                    questCount.push_back(std::make_pair(quest, 1));
-            }
+            rpgStatusCount[botAI->rpgInfo.status]++;
+            rpgStasticTotal += botAI->rpgStatistic;
         }
     }
 
+    
     LOG_INFO("playerbots", "Bots level:");
     // uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-    uint32 currentAlliance = 0, currentHorde = 0;
-    uint32 step = std::max(1, (maxBotLevel + 4) / 8);
-    uint32 from = 1;
+    uint32_t currentAlliance = 0, currentHorde = 0;
+    uint32_t step = std::max(1, static_cast<int>((maxBotLevel + 4) / 8));
+    uint32_t from = 1;
+
     for (uint8 i = 1; i <= maxBotLevel; ++i)
     {
         currentAlliance += alliance[i];
@@ -2792,19 +2844,18 @@ void RandomPlayerbotMgr::PrintStats()
     
     if (sPlayerbotAIConfig->enableNewRpgStrategy)
     {
-        LOG_INFO("playerbots", "Bots rpg status:", dead);
-        LOG_INFO("playerbots", "    IDLE: {}", rpgStatusCount[NewRpgStatus::IDLE]);
-        LOG_INFO("playerbots", "    REST: {}", rpgStatusCount[NewRpgStatus::REST]);
-        LOG_INFO("playerbots", "    GO_GRIND: {}", rpgStatusCount[NewRpgStatus::GO_GRIND]);
-        LOG_INFO("playerbots", "    GO_INNKEEPER: {}", rpgStatusCount[NewRpgStatus::GO_INNKEEPER]);
-        LOG_INFO("playerbots", "    NEAR_RANDOM: {}", rpgStatusCount[NewRpgStatus::NEAR_RANDOM]);
-        LOG_INFO("playerbots", "    NEAR_NPC: {}", rpgStatusCount[NewRpgStatus::NEAR_NPC]);
+        LOG_INFO("playerbots", "Bots rpg status:");
+        LOG_INFO("playerbots", "    Idle: {}, Rest: {}, GoGrind: {}, GoInnkeeper: {}, MoveRandom: {}, MoveNpc: {}, DoQuest: {}",
+            rpgStatusCount[RPG_IDLE], rpgStatusCount[RPG_REST], rpgStatusCount[RPG_GO_GRIND], rpgStatusCount[RPG_GO_INNKEEPER],
+            rpgStatusCount[RPG_NEAR_RANDOM], rpgStatusCount[RPG_NEAR_NPC], rpgStatusCount[RPG_DO_QUEST]);
+
+        LOG_INFO("playerbots", "Bots total quests:");
+        LOG_INFO("playerbots", "    Accepted: {}, Rewarded: {}, Dropped: {}",
+            rpgStasticTotal.questAccepted, rpgStasticTotal.questRewarded, rpgStasticTotal.questDropped);
     }
 
     LOG_INFO("playerbots", "Bots engine:", dead);
-    LOG_INFO("playerbots", "    Non-combat: {}", engine_noncombat);
-    LOG_INFO("playerbots", "    Combat: {}", engine_combat);
-    LOG_INFO("playerbots", "    Dead: {}", engine_dead);
+    LOG_INFO("playerbots", "    Non-combat: {}, Combat: {}, Dead: {}", engine_noncombat, engine_combat, engine_dead);
 
     // LOG_INFO("playerbots", "Bots questing:");
     // LOG_INFO("playerbots", "    Picking quests: {}",

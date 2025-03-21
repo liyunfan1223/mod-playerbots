@@ -51,11 +51,10 @@ bool TogglePetSpellAutoCastAction::Execute(Event event)
             continue;
 
         bool shouldApply = true;
-        // spellId == 4511 || spellId == 54424 || spellId == 57564 || spellId == 57565 ||
-        // spellId == 57566 || spellId == 57567 ||
-        // cat stealth, prowl
-        if (spellId == 1742 || spellId == 24450)
+        if (spellId == 1742 /*cower*/ || spellId == 24450 /*Prowl*/ ||
+            spellId == 47482 /*Leap*/ /* || spellId == 47481 Gnaw*/)
         {
+            
             shouldApply = false;
         }
         bool isAutoCast = false;

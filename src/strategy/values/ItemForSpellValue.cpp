@@ -71,6 +71,9 @@ Item* ItemForSpellValue::Calculate()
     if (!strcmpi(spellInfo->SpellName[0], "disenchant"))
         return nullptr;
 
+    if (!strcmpi(spellInfo->SpellName[0], "pick lock"))
+        return nullptr;
+
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
     {
         itemForSpell = GetItemFitsToSpellRequirements(slot, spellInfo);

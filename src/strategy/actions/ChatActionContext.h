@@ -75,6 +75,8 @@
 #include "WhoAction.h"
 #include "WtsAction.h"
 #include "OpenItemAction.h"
+#include "UnlockItemAction.h"
+#include "UnlockTradedItemAction.h"
 
 class ChatActionContext : public NamedObjectContext<Action>
 {
@@ -82,6 +84,8 @@ public:
     ChatActionContext()
     {
         creators["open items"] = &ChatActionContext::open_items;
+        creators["unlock items"] = &ChatActionContext::unlock_items;
+        creators["unlock traded item"] = &ChatActionContext::unlock_traded_item;
         creators["range"] = &ChatActionContext::range;
         creators["stats"] = &ChatActionContext::stats;
         creators["quests"] = &ChatActionContext::quests;
@@ -90,6 +94,7 @@ public:
         creators["log"] = &ChatActionContext::log;
         creators["los"] = &ChatActionContext::los;
         creators["rpg status"] = &ChatActionContext::rpg_status;
+        creators["rpg do quest"] = &ChatActionContext::rpg_do_quest;
         creators["aura"] = &ChatActionContext::aura;
         creators["drop"] = &ChatActionContext::drop;
         creators["clean quest log"] = &ChatActionContext::clean_quest_log;
@@ -183,6 +188,8 @@ public:
 
 private:
     static Action* open_items(PlayerbotAI* botAI) { return new OpenItemAction(botAI); }
+    static Action* unlock_items(PlayerbotAI* botAI) { return new UnlockItemAction(botAI); }
+    static Action* unlock_traded_item(PlayerbotAI* botAI) { return new UnlockTradedItemAction(botAI); }
     static Action* range(PlayerbotAI* botAI) { return new RangeAction(botAI); }
     static Action* flag(PlayerbotAI* botAI) { return new FlagAction(botAI); }
     static Action* craft(PlayerbotAI* botAI) { return new SetCraftAction(botAI); }
@@ -261,6 +268,7 @@ private:
     static Action* log(PlayerbotAI* botAI) { return new LogLevelAction(botAI); }
     static Action* los(PlayerbotAI* botAI) { return new TellLosAction(botAI); }
     static Action* rpg_status(PlayerbotAI* botAI) { return new TellRpgStatusAction(botAI); }
+    static Action* rpg_do_quest(PlayerbotAI* botAI) { return new StartRpgDoQuestAction(botAI); }
     static Action* aura(PlayerbotAI* ai) { return new TellAuraAction(ai); }
     static Action* ll(PlayerbotAI* botAI) { return new LootStrategyAction(botAI); }
     static Action* ss(PlayerbotAI* botAI) { return new SkipSpellsListAction(botAI); }

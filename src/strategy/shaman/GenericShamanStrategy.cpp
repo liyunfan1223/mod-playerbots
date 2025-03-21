@@ -22,6 +22,7 @@ public:
         creators["riptide"] = &riptide;
         creators["riptide on party"] = &riptide_on_party;
         creators["earth shock"] = &earth_shock;
+        creators["water shield"] = &water_shield;
     }
 
 private:
@@ -97,6 +98,15 @@ private:
                               /*A*/ nullptr,
                               /*C*/ nullptr);
     }
+
+    static ActionNode* water_shield([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("water shield",
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("lightning shield"), nullptr),
+                              /*C*/ nullptr);
+    }
+    
 };
 
 GenericShamanStrategy::GenericShamanStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI)

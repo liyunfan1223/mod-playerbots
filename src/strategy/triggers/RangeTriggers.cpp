@@ -19,7 +19,7 @@ static float GetSpeedInMotion(Unit* target)
 bool EnemyTooCloseForSpellTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return target && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) &&
+    return target && (target->GetVictim() != bot || target->isFrozen() || target->HasRootAura()) &&
            target->GetObjectSize() <= 10.0f && target->IsWithinCombatRange(bot, MIN_MELEE_REACH);
     //     Unit* target = AI_VALUE(Unit*, "current target");
     //     if (!target) {
@@ -69,7 +69,7 @@ bool EnemyTooCloseForAutoShotTrigger::IsActive()
     if (spellId && bot->HasSpellCooldown(spellId))
         trapToCast = false;
 
-    return !trapToCast && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) &&
+    return !trapToCast && (target->GetVictim() != bot || target->isFrozen() || target->HasRootAura()) &&
            bot->IsWithinMeleeRange(target);
 
     // if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) &&
@@ -100,7 +100,7 @@ bool EnemyTooCloseForShootTrigger::IsActive()
     Unit* target = AI_VALUE(Unit*, "current target");
     // target->IsWithinCombatRange()
 
-    return target && (target->GetVictim() != bot || target->isFrozen() || !target->CanFreeMove()) &&
+    return target && (target->GetVictim() != bot || target->isFrozen() || target->HasRootAura()) &&
            target->IsWithinCombatRange(bot, MIN_MELEE_REACH);
 
     //     Unit* target = AI_VALUE(Unit*, "current target");

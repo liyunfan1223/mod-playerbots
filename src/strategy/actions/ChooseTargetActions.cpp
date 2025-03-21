@@ -34,26 +34,15 @@ bool AttackAnythingAction::isUseful()
     if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot not allowed to be active
         return false;
 
-    if (!AI_VALUE(bool, "can move around"))
+    if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
         return false;
-    
-        
-    // if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() &&
-    //     ChooseRpgTargetAction::isFollowValid(
-    //         bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))  // Bot is traveling
-    //     return false;
+
+    if (bot->IsInCombat())
+        return false;
 
     Unit* target = GetTarget();
 
     if (!target)
-        return false;
-
-    bool inactiveGrindStatus = botAI->rpgInfo.status == NewRpgStatus::GO_GRIND ||
-                               botAI->rpgInfo.status == NewRpgStatus::NEAR_NPC ||
-                               botAI->rpgInfo.status == NewRpgStatus::REST ||
-                               botAI->rpgInfo.status == NewRpgStatus::GO_INNKEEPER;
-
-    if (inactiveGrindStatus && bot->GetDistance(target) > 25.0f)
         return false;
 
     std::string const name = std::string(target->GetName());
