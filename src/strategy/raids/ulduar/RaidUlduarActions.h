@@ -114,6 +114,29 @@ public:
     bool isUseful() override;
 };
 
+class IronAssemblyLightningTendrilsAction : public MovementAction
+{
+public:
+    IronAssemblyLightningTendrilsAction(PlayerbotAI* botAI) : MovementAction(botAI, "iron assembly lightning tendrils action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class IronAssemblyOverloadAction : public MovementAction
+{
+public:
+    IronAssemblyOverloadAction(PlayerbotAI* botAI) : MovementAction(botAI, "iron assembly overload action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class HodirBitingColdJumpAction : public MovementAction
+{
+public:
+    HodirBitingColdJumpAction(PlayerbotAI* ai) : MovementAction(ai, "hodir biting cold jump") {}
+    bool Execute(Event event) override;
+};
+
 class FreyaMoveAwayNatureBombAction : public MovementAction
 {
 public:
