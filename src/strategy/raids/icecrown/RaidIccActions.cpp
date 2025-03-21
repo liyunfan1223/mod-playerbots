@@ -3209,10 +3209,12 @@ bool IccLichKingAddsAction::Execute(Event event)
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
     Unit* spiritWarden = AI_VALUE2(Unit*, "find target", "spirit warden");
 
+    /*
     //temp solution for bots going underground due to buggy ice platfroms and adds that go underground
     if (abs(bot->GetPositionZ() - 840.857f) > 1.0f)
         return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(),
                           bot->GetPositionY(), 840.857f, bot->GetOrientation());
+    */
 
     //temp soultion for bots when they get teleport far away into another dimension (they are unable to attack spirit warden) in heroic they will be in safe spot while player is surviving vile spirits
     Difficulty diff = bot->GetRaidDifficulty();
