@@ -267,13 +267,25 @@ bool LfgLeaveAction::isUseful() { return true; }
 
 bool LfgTeleportAction::Execute(Event event)
 {
-    bool out = false;
+    // Ensure the bot is valid and in a valid state
+    if (!bot || !bot->IsInWorld() || bot->IsBeingTeleported() || bot->IsInFlight())
+    {
+        LOG_DEBUG("LfgTeleportAction: Bot is in an invalid state for teleportation. Bot {} (GUID: {})", bot->GetName().c_str(), bot->GetGUID().GetCounter());
+        return false;
+    }
 
+    // Read the teleportation flag from the packet
+    bool out = false;
     WorldPacket p(event.getPacket());
     if (!p.empty())
     {
         p.rpos(0);
         p >> out;
+    }
+    else
+    {
+        LOG_DEBUG("LfgTeleportAction: Packet is empty or invalid. Bot {} (GUID: {})", bot->GetName().c_str(), bot->GetGUID().GetCounter());
+        return false;
     }
 
     bot->ClearUnitState(UNIT_STATE_ALL_STATE);
