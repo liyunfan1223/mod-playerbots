@@ -4,6 +4,9 @@
 #include "WorldPacket.h"
 #include "Player.h"
 #include "ObjectMgr.h"
+#include "LootObjectStack.h"
+#include "AiObjectContext.h"
+
 bool OpenItemAction::Execute(Event event)
 {
     bool foundOpenable = false;
@@ -26,6 +29,11 @@ void OpenItemAction::OpenItem(Item* item, uint8 bag, uint8 slot)
     WorldPacket packet(CMSG_OPEN_ITEM);
     packet << bag << slot;
     bot->GetSession()->HandleOpenItemOpcode(packet);
+
+    // Store the item GUID as the loot target
+    LootObject lootObject;
+    lootObject.guid = item->GetGUID();
+    botAI->GetAiObjectContext()->GetValue<LootObject>("loot target")->Set(lootObject);
 
     std::ostringstream out;
     out << "Opened item: " << item->GetTemplate()->Name1;

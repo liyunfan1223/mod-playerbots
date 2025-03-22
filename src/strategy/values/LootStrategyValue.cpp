@@ -15,6 +15,15 @@ class NormalLootStrategy : public LootStrategy
 public:
     bool CanLoot(ItemTemplate const* proto, AiObjectContext* context) override
     {
+        // Identify the source of loot, loot it if the source is an item in the bots inventory
+        LootObject lootObject = AI_VALUE(LootObject, "loot target");
+        ObjectGuid lootGuid = lootObject.guid;
+        if (lootGuid.IsItem())
+        {
+            return true;
+        }
+
+        // Otherwise, continue with the normal loot logic
         std::ostringstream out;
         out << proto->ItemId;
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());

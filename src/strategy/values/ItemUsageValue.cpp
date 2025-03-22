@@ -8,6 +8,7 @@
 #include "AiFactory.h"
 #include "ChatHelper.h"
 #include "GuildTaskMgr.h"
+#include "LootObjectStack.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
@@ -112,12 +113,38 @@ ItemUsage ItemUsageValue::Calculate()
             return ITEM_USAGE_DISENCHANT;
     }
 
-    // While sync is on, do not loot quest items that are also Useful for master. Master
-    if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer ||
-        !IsItemUsefulForQuest(botAI->GetMaster(), proto))
-        if (IsItemUsefulForQuest(bot, proto))
-            return ITEM_USAGE_QUEST;
-
+    Player* master = botAI->GetMaster();
+    bool isSelfBot = (master == bot);
+    bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
+    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig->syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
+    
+    // Identify the source of loot
+    LootObject lootObject = AI_VALUE(LootObject, "loot target");
+    
+    // Get GUID of loot source
+    ObjectGuid lootGuid = lootObject.guid;
+    
+    // Check if loot source is an item
+    bool isLootFromItem = lootGuid.IsItem();
+    
+    // If the loot is from an item in the bot’s bags, ignore syncQuestWithPlayer
+    if (isLootFromItem && botNeedsItemForQuest)
+    {
+        return ITEM_USAGE_QUEST;
+    }
+    
+    // If the bot is NOT acting alone and the master needs this quest item, defer to the master
+    if (!isSelfBot && masterNeedsItemForQuest)
+    {
+        return ITEM_USAGE_NONE;
+    }
+    
+    // If the bot itself needs the item for a quest, allow looting
+    if (botNeedsItemForQuest)
+    {
+        return ITEM_USAGE_QUEST;
+    }
+    
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
     {
         if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
@@ -464,6 +491,10 @@ uint32 ItemUsageValue::GetSmallestBagSize()
 
 bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* proto)
 {
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+    if (!botAI)
+        return false;
+
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
         uint32 entry = player->GetQuestSlotQuestId(slot);
@@ -471,20 +502,52 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         if (!quest)
             continue;
 
+        // Check if the item itself is needed for the quest
         for (uint8 i = 0; i < 4; i++)
         {
-            if (quest->RequiredItemId[i] != proto->ItemId)
+            if (quest->RequiredItemId[i] == proto->ItemId)
+            {
+                if (AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+                    continue;
+
+                return true; // Item is directly required for a quest
+            }
+        }
+
+        // Check if the item has spells that create a required quest item
+        for (uint8 i = 0; i < MAX_ITEM_SPELLS; i++)
+        {
+            uint32 spellId = proto->Spells[i].SpellId;
+            if (!spellId)
                 continue;
 
-            if (GET_PLAYERBOT_AI(player) &&
-                AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
                 continue;
 
-            return true;
+            for (uint8 effectIndex = 0; effectIndex < MAX_SPELL_EFFECTS; effectIndex++)
+            {
+                if (spellInfo->Effects[effectIndex].Effect == SPELL_EFFECT_CREATE_ITEM)
+                {
+                    uint32 createdItemId = spellInfo->Effects[effectIndex].ItemType;
+
+                    // Check if the created item is required for a quest
+                    for (uint8 j = 0; j < 4; j++)
+                    {
+                        if (quest->RequiredItemId[j] == createdItemId)
+                        {
+                            if (AI_VALUE2(uint32, "item count", createdItemId) >= quest->RequiredItemCount[j])
+                                continue;
+
+                            return true; // Item is useful because it creates a required quest item
+                        }
+                    }
+                }
+            }
         }
     }
 
-    return false;
+    return false; // Item is not useful for any active quests
 }
 
 bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
