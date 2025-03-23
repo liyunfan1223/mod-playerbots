@@ -63,3 +63,25 @@ bool PositionValue::Load(std::string const text)
 }
 
 WorldPosition CurrentPositionValue::Calculate() { return WorldPosition(bot); }
+
+PositionInfo SinglePositionValue::Calculate()
+{
+    PositionMap& posMap = AI_VALUE(PositionMap&, "position");
+    return posMap[getQualifier()];
+}
+
+void SinglePositionValue::Set(PositionInfo value)
+{
+    PositionMap& posMap = AI_VALUE(PositionMap&, "position");
+    PositionInfo pos = posMap[getQualifier()];
+    pos = value;
+    posMap[getQualifier()] = pos;
+}
+
+void SinglePositionValue::Reset()
+{
+    PositionMap& posMap = AI_VALUE(PositionMap&, "position");
+    PositionInfo pos = posMap[getQualifier()];
+    pos.Reset();
+    posMap[getQualifier()] = pos;
+}

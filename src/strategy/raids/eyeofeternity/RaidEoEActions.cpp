@@ -1,8 +1,6 @@
+#include "Playerbots.h"
 #include "RaidEoEActions.h"
 #include "RaidEoETriggers.h"
-
-#include "Playerbots.h"
-
 
 bool MalygosPositionAction::Execute(Event event)
 {
@@ -280,10 +278,14 @@ bool EoEDrakeAttackAction::isPossible()
     Unit* vehicleBase = bot->GetVehicleBase();
     return (vehicleBase && vehicleBase->GetEntry() == NPC_WYRMREST_SKYTALON);
 }
+
 bool EoEDrakeAttackAction::Execute(Event event)
 {
     vehicleBase = bot->GetVehicleBase();
-    if (!vehicleBase) { return false; }
+    if (!vehicleBase)
+    {
+        return false;
+    }
 
     // Unit* target = AI_VALUE(Unit*, "current target");
     Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
@@ -295,22 +297,55 @@ bool EoEDrakeAttackAction::Execute(Event event)
         for (auto& npc : npcs)
         {
             Unit* unit = botAI->GetUnit(npc);
-            if (!unit || unit->GetEntry() != NPC_MALYGOS) { continue; }
+            if (!unit || unit->GetEntry() != NPC_MALYGOS)
+            {
+                continue;
+            }
 
             boss = unit;
             break;
         }
     }
     // Check this again to see if a target was assigned
-    if (!boss) { return false; }
-
-    if (botAI->IsHeal(bot))
+    if (!boss)
     {
-        return DrakeHealAction();
+        return false;
+    }
+
+    uint8 numHealers;
+    bot->GetRaidDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ? numHealers = 10 : numHealers = 4;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+    std::vector<std::pair<ObjectGuid, Player*>> sortedMembers;
+    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        sortedMembers.push_back(std::make_pair(member->GetGUID(), member));
+    }
+    std::sort(sortedMembers.begin(), sortedMembers.end());
+
+    int botIndex = -1;
+    for (size_t i = 0; i < sortedMembers.size(); ++i)
+    {
+        if (sortedMembers[i].first == bot->GetGUID())
+        {
+            botIndex = i;
+            break;
+        }
+    }
+
+    if (botIndex == -1)
+        return false;
+
+    if (botIndex > numHealers)
+    {
+        return DrakeDpsAction(boss);
     }
     else
     {
-        return DrakeDpsAction(boss);
+        return DrakeHealAction();
     }
 
     return false;
@@ -348,37 +383,15 @@ bool EoEDrakeAttackAction::DrakeDpsAction(Unit* target)
 bool EoEDrakeAttackAction::DrakeHealAction()
 {
     Unit* vehicleBase = bot->GetVehicleBase();
-    if (!vehicleBase) { return false; }
-
-    Unit* target = vehicleBase->GetComboTarget();
-    if (!target)
+    if (!vehicleBase)
     {
-        // Unit* newTarget = nullptr;
-        Unit* newTarget = vehicleBase;
-        GuidVector members = AI_VALUE(GuidVector, "group members");
-        for (auto& member : members)
-        {
-            Unit* unit = botAI->GetUnit(member);
-            if (!unit)
-            {
-                continue;
-            }
-
-            Unit* drake = unit->GetVehicleBase();
-            if (!drake || drake->IsFullHealth()) { continue; }
-
-            if (!newTarget || drake->GetHealthPct() < newTarget->GetHealthPct() - 5.0f)
-            {
-                newTarget = drake;
-            }
-        }
-        target = newTarget;
+        return false;
     }
 
-    uint8 comboPoints = vehicleBase->GetComboPoints(target);
+    uint8 comboPoints = vehicleBase->GetComboPoints(vehicleBase);
     if (comboPoints >= 5)
     {
-        return CastDrakeSpellAction(target, SPELL_LIFE_BURST, 0);
+        return CastDrakeSpellAction(vehicleBase, SPELL_LIFE_BURST, 0);
     }
     else
     {
@@ -386,6 +399,6 @@ bool EoEDrakeAttackAction::DrakeHealAction()
         // "botAI->CanCastVehicleSpell()" returns SPELL_FAILED_BAD_TARGETS when targeting drakes.
         // Forcing the cast attempt seems to succeed, not sure what's going on here.
         // return CastDrakeSpellAction(target, SPELL_REVIVIFY, 0);
-        return botAI->CastVehicleSpell(SPELL_REVIVIFY, target);
+        return botAI->CastVehicleSpell(SPELL_REVIVIFY, vehicleBase);
     }
 }

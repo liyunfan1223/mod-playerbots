@@ -47,24 +47,37 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("razorscale fuse armor action", ACTION_RAID + 2), nullptr)));
 
     //
+    // Iron Assembly
+    //
+    triggers.push_back(new TriggerNode(
+        "iron assembly lightning tendrils trigger",
+        NextAction::array(0, new NextAction("iron assembly lightning tendrils action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "iron assembly overload trigger",
+        NextAction::array(0, new NextAction("iron assembly overload action", ACTION_RAID), nullptr)));
+
+    //
     // Hodir
     //
     triggers.push_back(new TriggerNode(
         "hodir near snowpacked icicle",
-        NextAction::array(0, new NextAction("hodir move snowpacked icicle", ACTION_RAID + 5), nullptr)));
+        NextAction::array(0, new NextAction("hodir move snowpacked icicle", ACTION_RAID + 1), nullptr)));
+
     triggers.push_back(new TriggerNode(
-        "hodir biting cold", NextAction::array(0, new NextAction("intense cold jump", ACTION_RAID + 4), nullptr)));
+        "hodir biting cold",
+        NextAction::array(0, new NextAction("hodir biting cold jump", ACTION_RAID), nullptr)));
 
     //
     // Freya
     //
-    triggers.push_back(
-        new TriggerNode("freya tank near eonars gift",
-                        NextAction::array(0, new NextAction("freya mark eonars gift", ACTION_RAID + 1), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "freya tank near eonars gift",
+        NextAction::array(0, new NextAction("freya mark eonars gift", ACTION_RAID + 1), nullptr)));
 
-    triggers.push_back(
-        new TriggerNode("freya near nature bomb",
-                        NextAction::array(0, new NextAction("freya move away nature bomb", ACTION_RAID), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "freya near nature bomb",
+        NextAction::array(0, new NextAction("freya move away nature bomb", ACTION_RAID), nullptr)));
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

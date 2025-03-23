@@ -392,6 +392,8 @@ public:
     void HandleMasterOutgoingPacket(WorldPacket const& packet);
     void HandleTeleportAck();
     void ChangeEngine(BotState type);
+    void ChangeEngineOnCombat();
+    void ChangeEngineOnNonCombat();
     void DoNextAction(bool minimal = false);
     virtual bool DoSpecificAction(std::string const name, Event event = Event(), bool silent = false,
                                   std::string const qualifier = "");
