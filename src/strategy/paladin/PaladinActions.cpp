@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 
+
 inline std::string const GetActualBlessingOfMight(Unit* target)
 {
     if (!target->ToPlayer())
@@ -88,9 +89,10 @@ inline std::string const GetActualBlessingOfWisdom(Unit* target)
     return "blessing of wisdom";
 }
 
+/*
 Value<Unit*>* CastBlessingOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", name);
+     return context->GetValue<Unit*>("party member without aura", name);
 }
 
 bool CastBlessingOfMightAction::Execute(Event event)
@@ -106,6 +108,7 @@ Value<Unit*>* CastBlessingOfMightOnPartyAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom");
 }
+*/
 
 bool CastBlessingOfMightOnPartyAction::Execute(Event event)
 {
@@ -116,6 +119,7 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event event)
     return botAI->CastSpell(GetActualBlessingOfMight(target), target);
 }
 
+/*
 bool CastBlessingOfWisdomAction::Execute(Event event)
 {
     Unit* target = GetTarget();
@@ -127,8 +131,9 @@ bool CastBlessingOfWisdomAction::Execute(Event event)
 
 Value<Unit*>* CastBlessingOfWisdomOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom");
+    return context->GetValue<Unit*>("party member without aura", "blessing of wisdom,blessing of might");
 }
+*/
 
 bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
 {

@@ -22,14 +22,18 @@ void PaladinBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         NextAction::array(0, new NextAction("greater blessing of wisdom on party", 13.0f), nullptr)));
     
     triggers.push_back(
-        new TriggerNode("blessing of kings",
-                        NextAction::array(0, new NextAction("blessing of kings", 11.0f), nullptr)));
+        new TriggerNode("blessing of wisdom on party",
+                        NextAction::array(0, new NextAction("blessing of wisdom on party", 13.0f), nullptr)));                        
     triggers.push_back(
         new TriggerNode("blessing of kings on party",
-                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));                        
+                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));
     triggers.push_back(
-        new TriggerNode("blessing of wisdom on party",
-                        NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), nullptr)));
+        new TriggerNode("blessing of might on party",
+                        NextAction::array(0, new NextAction("blessing of might on party", 12.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("blessing of wisdom",
+                        NextAction::array(0, new NextAction("blessing of wisdom", 11.0f), nullptr)));
+                        
     // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of wisdom",
     // ACTION_HIGH + 8), nullptr)));
 }
@@ -47,18 +51,19 @@ void PaladinBuffHealthStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
     triggers.push_back(
         new TriggerNode("greater blessing of wisdom on party",
                         NextAction::array(0, new NextAction("greater blessing of wisdom on party", 13.0f), nullptr)));
-    
-    triggers.push_back(
-        new TriggerNode("blessing of wisdom on party",
-                        NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("blessing of kings",
-                        NextAction::array(0, new NextAction("blessing of kings", 11.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("blessing of kings on party",
-                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));
-    // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of kings",
-    // ACTION_HIGH + 8), nullptr)));
+                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));                        
+    triggers.push_back(
+        new TriggerNode("blessing of wisdom on party",
+                        NextAction::array(0, new NextAction("blessing of wisdom on party", 12.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("blessing of might on party",
+                        NextAction::array(0, new NextAction("blessing of might on party", 11.0f), nullptr)));      
+    triggers.push_back(
+        new TriggerNode("blessing of wisdom",
+                        NextAction::array(0, new NextAction("blessing of wisdom", 11.0f), nullptr)));
+    
 }
 
 void PaladinBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -74,18 +79,20 @@ void PaladinBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("greater blessing of wisdom on party",
                         NextAction::array(0, new NextAction("greater blessing of wisdom on party", 13.0f), nullptr)));
-    
-    triggers.push_back(
-        new TriggerNode("blessing of kings",
-                        NextAction::array(0, new NextAction("blessing of kings", 11.0f), nullptr)));\
-    triggers.push_back(
-        new TriggerNode("blessing of kings on party",
-                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));
     triggers.push_back(
         new TriggerNode("blessing of might on party",
-                        NextAction::array(0, new NextAction("blessing of might on party", 11.0f), nullptr)));
-    // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of might",
-    // ACTION_HIGH + 8), nullptr)));
+                        NextAction::array(0, new NextAction("blessing of might on party", 12.0f), nullptr)));                        
+    triggers.push_back(
+        new TriggerNode("blessing of kings on party",
+                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));    
+    triggers.push_back(
+        new TriggerNode("blessing of wisdom on party",
+                        NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), nullptr))); 
+    triggers.push_back(
+        new TriggerNode("blessing of might",
+                        NextAction::array(0, new NextAction("blessing of might", 11.0f), nullptr)));
+
+   
 }
 
 void PaladinShadowResistanceStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -156,16 +163,20 @@ void PaladinBuffStatsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("greater blessing of sanctuary on party",
                         NextAction::array(0, new NextAction("greater blessing of sanctuary on party", 13.0f), nullptr)));
     triggers.push_back(
-        new TriggerNode("blessing of kings",
-                        NextAction::array(0, new NextAction("blessing of kings", 11.0f), nullptr)));
+        new TriggerNode("blessing of sanctuary on party",
+                        NextAction::array(0, new NextAction("blessing of sanctuary on party", 12.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("blessing of kings on party",
+                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));                        
+    triggers.push_back(
+        new TriggerNode("blessing of might on party",
+                        NextAction::array(0, new NextAction("blessing of might on party", 11.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("blessing of wisdom on party",
+                        NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), nullptr))); 
     triggers.push_back(
         new TriggerNode("blessing of sanctuary",
                         NextAction::array(0, new NextAction("blessing of sanctuary", 11.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("blessing of kings on party",
-                        NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("blessing of sanctuary on party",
-                        NextAction::array(0, new NextAction("blessing of sanctuary on party", 11.0f), nullptr)));
+                        
     
 }

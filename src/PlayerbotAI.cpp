@@ -2818,6 +2818,28 @@ bool PlayerbotAI::HasAnyAuraOf(Unit* player, ...)
     return false;
 }
 
+bool PlayerbotAI::HasAnyMyAuraOf(Unit* player, ...) 
+{ 
+    if (!player)
+        return false;
+
+    va_list vl;
+    va_start(vl, player);
+
+    const char* cur;
+    while ((cur = va_arg(vl, const char*)) != nullptr)
+    {
+        if (HasAura(cur, player, false, true))
+        {
+            va_end(vl);
+            return true;
+        }
+    }
+
+    va_end(vl);
+    return false; 
+}
+
 bool PlayerbotAI::CanCastSpell(std::string const name, Unit* target, Item* itemTarget)
 {
     return CanCastSpell(aiObjectContext->GetValue<uint32>("spell id", name)->Get(), target, true, itemTarget);

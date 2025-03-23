@@ -21,8 +21,11 @@ bool PowerWordFortitudeTrigger::IsActive()
 
 bool DivineSpiritOnPartyTrigger::IsActive()
 {
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("divine spirit", GetTarget()) &&
-           !botAI->HasAura("prayer of spirit", GetTarget());
+    Unit* target = GetTarget();
+    if (!target || !target->IsPlayer() || target->GetLevel() < 20)
+        return false;
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("divine spirit", target) &&
+           !botAI->HasAura("prayer of spirit", target);
 }
 
 bool DivineSpiritTrigger::IsActive()
@@ -34,22 +37,28 @@ bool DivineSpiritTrigger::IsActive()
 bool PrayerOfFortitudeTrigger::IsActive()
 {
     Unit* target = GetTarget();
-    if (!target || !target->IsPlayer())
+    if (!target || !target->IsPlayer() || target->GetLevel() < 40)
+        return false;
+    Group* group = botAI->GetBot()->GetGroup();
+    if (!group)
         return false;
 
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("power word: fortitude", GetTarget()) &&
-           botAI->GetBuffedCount((Player*)GetTarget(), "prayer of fortitude") < 4;
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("power word: fortitude", target) &&
+           group->GetMembersCount() - botAI->GetBuffedCount((Player*)GetTarget(), "prayer of fortitude") > 3;
 }
 
 bool PrayerOfSpiritTrigger::IsActive()
 {
     Unit* target = GetTarget();
-    if (!target || !target->IsPlayer())
+    if (!target || !target->IsPlayer() || target->GetLevel() < 40)
+        return false;
+    Group* group = botAI->GetBot()->GetGroup();
+    if (!group)
         return false;
     
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("divine spirit", GetTarget()) &&
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("divine spirit", target) &&
            // botAI->GetManaPercent() > 50 &&
-           botAI->GetBuffedCount((Player*)GetTarget(), "prayer of spirit") < 4;
+           group->GetMembersCount() - botAI->GetBuffedCount((Player*)GetTarget(), "prayer of spirit") > 3;
 }
 
 bool InnerFireTrigger::IsActive()

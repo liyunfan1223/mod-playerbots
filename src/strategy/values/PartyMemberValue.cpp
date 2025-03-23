@@ -23,6 +23,7 @@ Unit* PartyMemberValue::FindPartyMember(std::vector<Player*>* party, FindPlayerP
     return nullptr;
 }
 
+/*
 Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ignoreOutOfGroup)
 {
     Player* master = GetMaster();
@@ -98,6 +99,65 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ign
 
     return nullptr;
 }
+*/
+Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool ignoreOutOfGroup)
+{
+    Player* master = GetMaster();
+    GuidList nearestGroupPlayers;
+
+    if (Group* group = bot->GetGroup())
+    {
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            nearestGroupPlayers.push_back(ref->GetSource()->GetGUID());
+        }
+    }
+    else
+    {
+        // 如果没有团队，只查找当前玩家
+        std::vector<Player*> vec;
+        vec.push_back(bot);
+        Unit* target = FindPartyMember(&vec, predicate);
+        if (target)
+            return target;
+        return nullptr;
+    }
+
+    // 如果有主人，优先检查主人
+    if (master)
+    {
+        if (predicate.Check(master) && Check(master))
+            return master;
+
+        if (Pet* pet = master->GetPet())
+        {
+            if (predicate.Check(pet) && Check(pet))
+                return pet;
+        }
+    }
+
+    // 遍历所有团队成员的GUID
+    for (ObjectGuid const guid : nearestGroupPlayers)
+    {
+        Player* player = botAI->GetPlayer(guid);
+        if (!player)
+            continue;
+
+        // 检查玩家是否满足条件
+        if (predicate.Check(player) && Check(player))
+            return player;
+
+        // 检查玩家的宠物是否满足条件
+        if (Pet* pet = player->GetPet())
+        {
+            if (predicate.Check(pet) && Check(pet))
+                return pet;
+        }
+    }
+
+    return nullptr;
+}
+
 
 bool PartyMemberValue::Check(Unit* player)
 {

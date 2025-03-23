@@ -485,6 +485,7 @@ public:
     virtual bool HasAura(std::string const spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false,
                          int maxAmount = -1, bool checkDuration = false);
     virtual bool HasAnyAuraOf(Unit* player, ...);
+    virtual bool HasAnyMyAuraOf(Unit* player,...);
 
     virtual bool IsInterruptableSpellCasting(Unit* player, std::string const spell);
     virtual bool HasAuraToDispel(Unit* player, uint32 dispelType);

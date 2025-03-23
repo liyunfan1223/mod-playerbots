@@ -226,8 +226,8 @@ private:
     static Trigger* greater_blessing_of_kings_on_party(PlayerbotAI* botAI) { return new GreaterBlessingOfKingsOnPartyTrigger(botAI); }
     static Trigger* greater_blessing_of_wisdom_on_party(PlayerbotAI* botAI) { return new GreaterBlessingOfWisdomOnPartyTrigger(botAI); }    
     static Trigger* greater_blessing_of_might_on_party(PlayerbotAI* botAI) { return new GreaterBlessingOfMightOnPartyTrigger(botAI); }    
-    static Trigger* greater_blessing_of_sanctuary_on_party(PlayerbotAI* botAI) { return new GreaterBlessingOfSanctuaryOnPartyTrigger(botAI); }   
-
+    static Trigger* greater_blessing_of_sanctuary_on_party(PlayerbotAI* botAI) { return new GreaterBlessingOfSanctuaryOnPartyTrigger(botAI); }  
+    //
     static Trigger* avenging_wrath(PlayerbotAI* botAI) { return new AvengingWrathTrigger(botAI); }
 };
 
@@ -256,9 +256,6 @@ public:
         creators["greater blessing of sanctuary on party"] = &PaladinAiObjectContextInternal::greater_blessing_of_sanctuary_on_party;
         //
         creators["divine storm"] = &PaladinAiObjectContextInternal::divine_storm;
-        creators["blessing of kings on party"] = &PaladinAiObjectContextInternal::blessing_of_kings_on_party;
-        creators["blessing of might on party"] = &PaladinAiObjectContextInternal::blessing_of_might_on_party;
-        creators["blessing of wisdom on party"] = &PaladinAiObjectContextInternal::blessing_of_wisdom_on_party;
         creators["redemption"] = &PaladinAiObjectContextInternal::redemption;
         creators["crusader strike"] = &PaladinAiObjectContextInternal::crusader_strike;
         creators["crusader aura"] = &PaladinAiObjectContextInternal::crusader_aura;
