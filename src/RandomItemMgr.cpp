@@ -3,2906 +3,1665 @@
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
-#include "RandomItemMgr.h"
+#include "PlayerbotMgr.h"
 
-#include "ItemTemplate.h"
-#include "LootValues.h"
+#include <cstdio>
+#include <cstring>
+#include <istream>
+#include <string>
+
+#include "ChannelMgr.h"
+#include "CharacterCache.h"
+#include "CharacterPackets.h"
+#include "Common.h"
+#include "Define.h"
+#include "Group.h"
+#include "GroupMgr.h"
+#include "GuildMgr.h"
+#include "ObjectAccessor.h"
+#include "ObjectGuid.h"
+#include "ObjectMgr.h"
+#include "PlayerbotAIConfig.h"
+#include "PlayerbotDbStore.h"
+#include "PlayerbotFactory.h"
+#include "PlayerbotSecurity.h"
 #include "Playerbots.h"
+#include "RandomPlayerbotMgr.h"
+#include "SharedDefines.h"
+#include "WorldSession.h"
+#include "ChannelMgr.h"
+#include "BroadcastHelper.h"
+#include "PlayerbotDbStore.h"
+#include "WorldSessionMgr.h"
 
-char* strstri(char const* str1, char const* str2);
-std::set<uint32> RandomItemMgr::itemCache;
-
-uint64 BotEquipKey::GetKey() { return level + 100 * clazz + 10000 * slot + 1000000 * quality; }
-
-class RandomItemGuildTaskPredicate : public RandomItemPredicate
+PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
+class PlayerbotLoginQueryHolder : public LoginQueryHolder
 {
-public:
-    bool Apply(ItemTemplate const* proto) override
-    {
-        if (proto->Bonding == BIND_WHEN_PICKED_UP || proto->Bonding == BIND_QUEST_ITEM ||
-            proto->Bonding == BIND_WHEN_USE)
-            return false;
-
-        if (proto->Quality < ITEM_QUALITY_NORMAL)
-            return false;
-
-        if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) &&
-            proto->Quality >= ITEM_QUALITY_RARE)
-            return true;
-
-        if (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_CONSUMABLE)
-            return true;
-
-        return false;
-    }
-};
-
-class RandomItemGuildTaskRewardPredicate : public RandomItemPredicate
-{
-public:
-    RandomItemGuildTaskRewardPredicate(bool equip, bool rare) : equip(equip), rare(rare) {}
-
-    bool Apply(ItemTemplate const* proto) override
-    {
-        if (proto->Bonding == BIND_WHEN_PICKED_UP || proto->Bonding == BIND_QUEST_ITEM ||
-            proto->Bonding == BIND_WHEN_USE)
-            return false;
-
-        if (proto->Class == ITEM_CLASS_QUEST)
-            return false;
-
-        if (equip)
-        {
-            uint32 desiredQuality = rare ? ITEM_QUALITY_RARE : ITEM_QUALITY_UNCOMMON;
-            if (proto->Quality < desiredQuality || proto->Quality >= ITEM_QUALITY_EPIC)
-                return false;
-
-            if (proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON)
-                return true;
-        }
-        else
-        {
-            uint32 desiredQuality = rare ? ITEM_QUALITY_UNCOMMON : ITEM_QUALITY_NORMAL;
-            if (proto->Quality < desiredQuality || proto->Quality >= ITEM_QUALITY_RARE)
-                return false;
-
-            if (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_CONSUMABLE)
-                return true;
-        }
-
-        return false;
-    }
-
 private:
-    bool equip;
-    bool rare;
+    uint32 masterAccountId;
+    PlayerbotHolder* playerbotHolder;
+public:
+    PlayerbotLoginQueryHolder(PlayerbotHolder* playerbotHolder, uint32 masterAccount, uint32 accountId, ObjectGuid guid)
+        : LoginQueryHolder(accountId, guid), masterAccountId(masterAccount), playerbotHolder(playerbotHolder)
+    {
+    }
+
+    uint32 GetMasterAccountId() const { return masterAccountId; }
+    PlayerbotHolder* GetPlayerbotHolder() { return playerbotHolder; }
 };
 
-RandomItemMgr::RandomItemMgr()
+void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId)
 {
-    predicates[RANDOM_ITEM_GUILD_TASK] = new RandomItemGuildTaskPredicate();
-    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_GREEN] = new RandomItemGuildTaskRewardPredicate(true, false);
-    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_BLUE] = new RandomItemGuildTaskRewardPredicate(true, true);
-    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_TRADE] = new RandomItemGuildTaskRewardPredicate(false, false);
-    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE] = new RandomItemGuildTaskRewardPredicate(false, true);
+    // bot is loading
+    if (botLoading.find(playerGuid) != botLoading.end())
+        return;
 
-    viableSlots[EQUIPMENT_SLOT_HEAD].insert(INVTYPE_HEAD);
-    viableSlots[EQUIPMENT_SLOT_NECK].insert(INVTYPE_NECK);
-    viableSlots[EQUIPMENT_SLOT_SHOULDERS].insert(INVTYPE_SHOULDERS);
-    viableSlots[EQUIPMENT_SLOT_BODY].insert(INVTYPE_BODY);
-    viableSlots[EQUIPMENT_SLOT_CHEST].insert(INVTYPE_CHEST);
-    viableSlots[EQUIPMENT_SLOT_CHEST].insert(INVTYPE_ROBE);
-    viableSlots[EQUIPMENT_SLOT_WAIST].insert(INVTYPE_WAIST);
-    viableSlots[EQUIPMENT_SLOT_LEGS].insert(INVTYPE_LEGS);
-    viableSlots[EQUIPMENT_SLOT_FEET].insert(INVTYPE_FEET);
-    viableSlots[EQUIPMENT_SLOT_WRISTS].insert(INVTYPE_WRISTS);
-    viableSlots[EQUIPMENT_SLOT_HANDS].insert(INVTYPE_HANDS);
-    viableSlots[EQUIPMENT_SLOT_FINGER1].insert(INVTYPE_FINGER);
-    viableSlots[EQUIPMENT_SLOT_FINGER2].insert(INVTYPE_FINGER);
-    viableSlots[EQUIPMENT_SLOT_TRINKET1].insert(INVTYPE_TRINKET);
-    viableSlots[EQUIPMENT_SLOT_TRINKET2].insert(INVTYPE_TRINKET);
-    viableSlots[EQUIPMENT_SLOT_MAINHAND].insert(INVTYPE_WEAPON);
-    viableSlots[EQUIPMENT_SLOT_MAINHAND].insert(INVTYPE_2HWEAPON);
-    viableSlots[EQUIPMENT_SLOT_MAINHAND].insert(INVTYPE_WEAPONMAINHAND);
-    viableSlots[EQUIPMENT_SLOT_OFFHAND].insert(INVTYPE_WEAPON);
-    viableSlots[EQUIPMENT_SLOT_OFFHAND].insert(INVTYPE_2HWEAPON);
-    viableSlots[EQUIPMENT_SLOT_OFFHAND].insert(INVTYPE_SHIELD);
-    viableSlots[EQUIPMENT_SLOT_OFFHAND].insert(INVTYPE_WEAPONMAINHAND);
-    viableSlots[EQUIPMENT_SLOT_OFFHAND].insert(INVTYPE_HOLDABLE);
-    viableSlots[EQUIPMENT_SLOT_RANGED].insert(INVTYPE_RANGED);
-    viableSlots[EQUIPMENT_SLOT_RANGED].insert(INVTYPE_THROWN);
-    viableSlots[EQUIPMENT_SLOT_RANGED].insert(INVTYPE_RANGEDRIGHT);
-    viableSlots[EQUIPMENT_SLOT_RANGED].insert(INVTYPE_RELIC);
-    viableSlots[EQUIPMENT_SLOT_TABARD].insert(INVTYPE_TABARD);
-    viableSlots[EQUIPMENT_SLOT_BACK].insert(INVTYPE_CLOAK);
+    // has bot already been added?
+    Player* bot = ObjectAccessor::FindConnectedPlayer(playerGuid);
+    if (bot && bot->IsInWorld())
+        return;
 
-    weightStatLink["sta"] = ITEM_MOD_STAMINA;
-    weightStatLink["str"] = ITEM_MOD_STRENGTH;
-    weightStatLink["agi"] = ITEM_MOD_AGILITY;
-    weightStatLink["int"] = ITEM_MOD_INTELLECT;
-    weightStatLink["spi"] = ITEM_MOD_SPIRIT;
+    uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(playerGuid);
+    if (!accountId)
+        return;
+    
+    WorldSession* masterSession = masterAccountId ? sWorldSessionMgr->FindSession(masterAccountId) : nullptr;
+    Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
 
-    weightStatLink["splpwr"] = ITEM_MOD_SPELL_POWER;
-    weightStatLink["atkpwr"] = ITEM_MOD_ATTACK_POWER;
+    bool isRndbot = !masterAccountId;
+    bool sameAccount = sPlayerbotAIConfig->allowAccountBots && accountId == masterAccountId;
+    Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
+    bool sameGuild = sPlayerbotAIConfig->allowGuildBots && guild && guild->GetMember(playerGuid); 
+    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter());
 
-    weightStatLink["exprtng"] = ITEM_MOD_EXPERTISE_RATING;
-    weightStatLink["critstrkrtng"] = ITEM_MOD_CRIT_RATING;
-    weightStatLink["hitrtng"] = ITEM_MOD_HIT_RATING;
-    weightStatLink["hastertng"] = ITEM_MOD_HASTE_RATING;
-    weightStatLink["armorpenrtng"] = ITEM_MOD_ARMOR_PENETRATION_RATING;
-
-    weightStatLink["defrtng"] = ITEM_MOD_DEFENSE_SKILL_RATING;
-    weightStatLink["dodgertng"] = ITEM_MOD_DODGE_RATING;
-    weightStatLink["block"] = ITEM_MOD_BLOCK_VALUE;
-    weightStatLink["blockrtng"] = ITEM_MOD_BLOCK_RATING;
-    weightStatLink["parryrtng"] = ITEM_MOD_PARRY_RATING;
-
-    weightStatLink["manargn"] = ITEM_MOD_MANA_REGENERATION;
-
-    weightRatingLink["exprtng"] = CR_EXPERTISE;
-    weightRatingLink["critstrkrtng"] = CR_CRIT_MELEE;
-    weightRatingLink["hitrtng"] = CR_HIT_MELEE;
-    weightRatingLink["hastertng"] = CR_HASTE_MELEE;
-    weightRatingLink["armorpenrtng"] = CR_ARMOR_PENETRATION;
-
-    weightRatingLink["defrtng"] = CR_DEFENSE_SKILL;
-    weightRatingLink["dodgertng"] = CR_DODGE;
-    weightRatingLink["blockrtng"] = CR_BLOCK;
-    weightRatingLink["parryrtng"] = CR_PARRY;
-}
-
-void RandomItemMgr::Init()
-{
-    BuildItemInfoCache();
-    // BuildEquipCache();
-    BuildEquipCacheNew();
-    BuildAmmoCache();
-    BuildPotionCache();
-    BuildFoodCache();
-    BuildTradeCache();
-}
-
-void RandomItemMgr::InitAfterAhBot()
-{
-    BuildRandomItemCache();
-    // BuildRarityCache();
-}
-
-RandomItemMgr::~RandomItemMgr()
-{
-    for (std::map<RandomItemType, RandomItemPredicate*>::iterator i = predicates.begin(); i != predicates.end(); ++i)
-        delete i->second;
-
-    predicates.clear();
-}
-
-bool RandomItemMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
-{
-    if (!args || !*args)
+    bool allowed = true;
+    std::ostringstream out;
+    std::string botName;
+    sCharacterCache->GetCharacterNameByGuid(playerGuid, botName);
+    if (!isRndbot && !sameAccount && !sameGuild && !addClassBot)
     {
-        LOG_ERROR("playerbots", "Usage: rnditem");
-        return false;
+        allowed = false;
+        out << "Failure: You are not allowed to control bot " << botName.c_str();
     }
-
-    return false;
-}
-
-RandomItemList RandomItemMgr::Query(uint32 level, RandomItemType type, RandomItemPredicate* predicate)
-{
-    RandomItemList& list = randomItemCache[(level - 1) / 10][type];
-
-    RandomItemList result;
-    for (RandomItemList::iterator i = list.begin(); i != list.end(); ++i)
+    if (masterAccountId && masterPlayer)
     {
-        uint32 itemId = *i;
-        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-        if (!proto)
-            continue;
-
-        if (predicate && !predicate->Apply(proto))
-            continue;
-
-        result.push_back(itemId);
-    }
-
-    return result;
-}
-
-void RandomItemMgr::BuildRandomItemCache()
-{
-    if (PreparedQueryResult result =
-            PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RNDITEM_CACHE)))
-    {
-        LOG_INFO("server.loading", "Loading random item cache");
-        uint32 count = 0;
-        do
+        PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(masterPlayer);
+        if (!mgr)
         {
-            Field* fields = result->Fetch();
-            uint32 level = fields[0].Get<uint32>();
-            uint32 type = fields[1].Get<uint32>();
-            uint32 itemId = fields[2].Get<uint32>();
-
-            RandomItemType rit = (RandomItemType)type;
-            randomItemCache[level][rit].push_back(itemId);
-            ++count;
-
-        } while (result->NextRow());
-
-        LOG_INFO("server.loading", "Equipment cache loaded from {} records", count);
-    }
-    else
-    {
-        ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-        LOG_INFO("server.loading", "Building random item cache from {} items", itemTemplates->size());
-
-        for (auto const& itr : *itemTemplates)
-        {
-            ItemTemplate const* proto = &itr.second;
-            if (!proto)
-                continue;
-
-            if (proto->Duration & 0x80000000)
-                continue;
-
-            if (strstri(proto->Name1.c_str(), "qa") || strstri(proto->Name1.c_str(), "test") ||
-                strstri(proto->Name1.c_str(), "deprecated"))
-                continue;
-
-            if (!proto->ItemLevel)
-                continue;
-
-            if (!proto->SellPrice)
-                continue;
-
-            uint32 level = proto->ItemLevel;
-            for (uint32 type = RANDOM_ITEM_GUILD_TASK; type <= RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE; type++)
-            {
-                RandomItemType rit = (RandomItemType)type;
-                if (predicates[rit] && !predicates[rit]->Apply(proto))
-                    continue;
-
-                randomItemCache[level / 10][rit].push_back(itr.first);
-
-                PlayerbotsDatabasePreparedStatement* stmt =
-                    PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_RNDITEM_CACHE);
-                stmt->SetData(0, level / 10);
-                stmt->SetData(1, type);
-                stmt->SetData(2, itr.first);
-                PlayerbotsDatabase.Execute(stmt);
-            }
+            LOG_DEBUG("playerbots", "PlayerbotMgr not found for master player with GUID: {}", masterPlayer->GetGUID().GetRawValue());
+            return;
         }
-
-        uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-        if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-            maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-        for (uint32 level = 0; level < maxLevel / 10; level++)
+        uint32 count = mgr->GetPlayerbotsCount() + botLoading.size();
+        if (count >= sPlayerbotAIConfig->maxAddedBots)
         {
-            for (uint32 type = RANDOM_ITEM_GUILD_TASK; type <= RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE; type++)
-            {
-                RandomItemList list = randomItemCache[level][(RandomItemType)type];
-                LOG_INFO("playerbots", "    Level {}..{} Type {} - {} random items cached", level * 10, level * 10 + 9,
-                         type, list.size());
-
-                for (RandomItemList::iterator i = list.begin(); i != list.end(); ++i)
-                {
-                    uint32 itemId = *i;
-                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                    if (!proto)
-                        continue;
-
-                    LOG_DEBUG("playerbots", "        [{}] {}", itemId, proto->Name1.c_str());
-                }
-            }
+            allowed = false;
+            out << "Failure: You have added too many bots (more than " << sPlayerbotAIConfig->maxAddedBots << ")";
         }
     }
-}
-
-uint32 RandomItemMgr::GetRandomItem(uint32 level, RandomItemType type, RandomItemPredicate* predicate)
-{
-    RandomItemList const& list = Query(level, type, predicate);
-    if (list.empty())
-        return 0;
-
-    uint32 index = urand(0, list.size() - 1);
-    uint32 itemId = list[index];
-
-    return itemId;
-}
-
-bool RandomItemMgr::CanEquipItem(BotEquipKey key, ItemTemplate const* proto)
-{
-    if (proto->Duration & 0x80000000)
-        return false;
-
-    if (proto->Quality != key.quality)
-        return false;
-
-    if (proto->Bonding == BIND_QUEST_ITEM || proto->Bonding == BIND_WHEN_USE)
-        return false;
-
-    if (proto->Class == ITEM_CLASS_CONTAINER)
-        return true;
-
-    std::set<InventoryType> slots = viableSlots[(EquipmentSlots)key.slot];
-    if (slots.find((InventoryType)proto->InventoryType) == slots.end())
-        return false;
-
-    uint32 requiredLevel = proto->RequiredLevel;
-    if (!requiredLevel)
+    if (!allowed)
     {
-        requiredLevel = GetMinLevelFromCache(proto->ItemId);
-    }
-
-    if (!requiredLevel)
-        requiredLevel = key.level;
-
-    uint32 level = key.level;
-
-    uint32 delta = 2;
-    if (level < 15)
-        delta = 15;
-    else if (level < 40)
-        delta = 10;  // urand(5, 10);
-    else if (level < 60)
-        delta = 6;  // urand(3, 7);
-    else if (level < 70)
-        delta = 9;  // urand(2, 5);
-    else if (level < 80)
-        delta = 9;  // urand(2, 4);
-    else if (level == 80)
-        delta = 9;  // urand(2, 4);
-
-    if (key.quality > ITEM_QUALITY_NORMAL && (requiredLevel > level || requiredLevel < level - delta))
-        return false;
-
-    // for (uint32 gap = 60; gap <= 80; gap += 10)
-    // {
-    //     if (level > gap && requiredLevel <= gap)
-    //         return false;
-    // }
-
-    return true;
-}
-
-bool RandomItemMgr::CanEquipItemNew(ItemTemplate const* proto)
-{
-    if (proto->Duration & 0x80000000)
-        return false;
-
-    if (proto->Bonding == BIND_QUEST_ITEM || proto->Bonding == BIND_WHEN_USE)
-        return false;
-
-    if (proto->Class == ITEM_CLASS_CONTAINER)
-        return false;
-
-    bool properSlot = false;
-    for (std::map<EquipmentSlots, std::set<InventoryType> >::iterator i = viableSlots.begin(); i != viableSlots.end();
-         ++i)
-    {
-        std::set<InventoryType> const& slots = viableSlots[(EquipmentSlots)i->first];
-        if (slots.find((InventoryType)proto->InventoryType) != slots.end())
-            properSlot = true;
-    }
-
-    return properSlot;
-}
-
-void RandomItemMgr::AddItemStats(uint32 mod, uint8& sp, uint8& ap, uint8& tank)
-{
-    switch (mod)
-    {
-        case ITEM_MOD_HEALTH:
-        case ITEM_MOD_STAMINA:
-        case ITEM_MOD_MANA:
-        case ITEM_MOD_INTELLECT:
-        case ITEM_MOD_SPIRIT:
-            ++sp;
-            break;
-    }
-
-    switch (mod)
-    {
-        case ITEM_MOD_AGILITY:
-        case ITEM_MOD_STRENGTH:
-        case ITEM_MOD_HEALTH:
-        case ITEM_MOD_STAMINA:
-            ++tank;
-            break;
-    }
-
-    switch (mod)
-    {
-        case ITEM_MOD_HEALTH:
-        case ITEM_MOD_STAMINA:
-        case ITEM_MOD_AGILITY:
-        case ITEM_MOD_STRENGTH:
-            ++ap;
-            break;
-    }
-}
-
-bool RandomItemMgr::CheckItemStats(uint8 clazz, uint8 sp, uint8 ap, uint8 tank)
-{
-    switch (clazz)
-    {
-        case CLASS_PRIEST:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-            if (!sp || ap > sp || tank > sp)
-                return false;
-            break;
-        case CLASS_PALADIN:
-        case CLASS_WARRIOR:
-            if ((!ap && !tank) || sp > ap || sp > tank)
-                return false;
-            break;
-        case CLASS_HUNTER:
-        case CLASS_ROGUE:
-            if (!ap || sp > ap || sp > tank)
-                return false;
-            break;
-    }
-
-    return sp || ap || tank;
-}
-
-std::vector<uint32> RandomItemMgr::GetCachedEquipments(uint32 requiredLevel, uint32 inventoryType)
-{
-    return equipCacheNew[requiredLevel][inventoryType];
-}
-
-bool RandomItemMgr::ShouldEquipArmorForSpec(uint8 playerclass, uint8 spec, ItemTemplate const* proto)
-{
-    if (proto->InventoryType == INVTYPE_TABARD)
-        return true;
-
-    if (!m_weightScales[playerclass][spec].info.id)
-        return false;
-
-    std::unordered_set<uint32> resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_CLOTH};
-
-    switch (playerclass)
-    {
-        case CLASS_WARRIOR:
+        if (masterSession)
         {
-            if (proto->InventoryType == INVTYPE_HOLDABLE)
-                return false;
-
-            if (m_weightScales[playerclass][spec].info.name == "arms" ||
-                m_weightScales[playerclass][spec].info.name == "fury")
-            {
-                resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_LEATHER, ITEM_SUBCLASS_ARMOR_MAIL,
-                                       ITEM_SUBCLASS_ARMOR_PLATE};
-            }
-            else
-                resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_MAIL, ITEM_SUBCLASS_ARMOR_PLATE};
-            break;
+            ChatHandler ch(masterSession);
+            ch.SendSysMessage(out.str());
         }
-        case CLASS_DEATH_KNIGHT:
-        {
-            if (proto->InventoryType == INVTYPE_HOLDABLE)
-                return false;
-
-            resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_SIGIL, ITEM_SUBCLASS_ARMOR_PLATE};
-        }
-        case CLASS_PALADIN:
-        {
-            if (m_weightScales[playerclass][spec].info.name != "holy" && proto->InventoryType == INVTYPE_HOLDABLE)
-                return false;
-
-            if (m_weightScales[playerclass][spec].info.name != "holy")
-                resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_MAIL, ITEM_SUBCLASS_ARMOR_PLATE, ITEM_SUBCLASS_ARMOR_LIBRAM};
-            else
-                resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER, ITEM_SUBCLASS_ARMOR_MAIL,
-                                       ITEM_SUBCLASS_ARMOR_PLATE, ITEM_SUBCLASS_ARMOR_LIBRAM};
-            break;
-        }
-        case CLASS_HUNTER:
-        {
-            if (proto->InventoryType == INVTYPE_HOLDABLE)
-                return false;
-
-            resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER, ITEM_SUBCLASS_ARMOR_MAIL};
-            break;
-        }
-        case CLASS_ROGUE:
-        {
-            if (proto->InventoryType == INVTYPE_HOLDABLE)
-                return false;
-
-            resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER};
-            break;
-        }
-        case CLASS_PRIEST:
-        {
-            resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_CLOTH};
-            break;
-        }
-        case CLASS_SHAMAN:
-        {
-            if (m_weightScales[playerclass][spec].info.name == "enhance" && proto->InventoryType == INVTYPE_HOLDABLE)
-                return false;
-
-            resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_TOTEM, ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER,
-                                   ITEM_SUBCLASS_ARMOR_MAIL};
-            break;
-        }
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-        {
-            resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_CLOTH};
-            break;
-        }
-        case CLASS_DRUID:
-        {
-            if ((m_weightScales[playerclass][spec].info.name == "feraltank" ||
-                 m_weightScales[playerclass][spec].info.name == "feraldps") &&
-                proto->InventoryType == INVTYPE_HOLDABLE)
-                return false;
-
-            resultArmorSubClass = {ITEM_SUBCLASS_ARMOR_IDOL, ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER};
-            break;
-        }
+        return;
     }
-
-    return resultArmorSubClass.find(proto->SubClass) != resultArmorSubClass.end();
-}
-
-bool RandomItemMgr::ShouldEquipWeaponForSpec(uint8 playerclass, uint8 spec, ItemTemplate const* proto)
-{
-    EquipmentSlots slot_mh = EQUIPMENT_SLOT_START;
-    EquipmentSlots slot_oh = EQUIPMENT_SLOT_START;
-    EquipmentSlots slot_rh = EQUIPMENT_SLOT_START;
-    for (std::map<EquipmentSlots, std::set<InventoryType> >::iterator i = viableSlots.begin(); i != viableSlots.end();
-         ++i)
+    std::shared_ptr<PlayerbotLoginQueryHolder> holder =
+        std::make_shared<PlayerbotLoginQueryHolder>(this, masterAccountId, accountId, playerGuid);
+    if (!holder->Initialize())
     {
-        std::set<InventoryType> slots = viableSlots[(EquipmentSlots)i->first];
-        if (slots.find((InventoryType)proto->InventoryType) != slots.end())
-        {
-            if (i->first == EQUIPMENT_SLOT_MAINHAND)
-                slot_mh = i->first;
-            if (i->first == EQUIPMENT_SLOT_OFFHAND)
-                slot_oh = i->first;
-            if (i->first == EQUIPMENT_SLOT_RANGED)
-                slot_rh = i->first;
-        }
-    }
-
-    if (slot_mh == EQUIPMENT_SLOT_START && slot_oh == EQUIPMENT_SLOT_START && slot_rh == EQUIPMENT_SLOT_START)
-        return false;
-
-    if (!m_weightScales[playerclass][spec].info.id)
-        return false;
-
-    std::unordered_set<uint32> mh_weapons;
-    std::unordered_set<uint32> oh_weapons;
-    std::unordered_set<uint32> r_weapons;
-
-    switch (playerclass)
-    {
-        case CLASS_WARRIOR:
-        {
-            if (m_weightScales[playerclass][spec].info.name == "prot")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_SWORD, ITEM_SUBCLASS_WEAPON_AXE, ITEM_SUBCLASS_WEAPON_MACE,
-                              ITEM_SUBCLASS_WEAPON_DAGGER, ITEM_SUBCLASS_WEAPON_FIST};
-                oh_weapons = {ITEM_SUBCLASS_ARMOR_SHIELD};
-                r_weapons = {ITEM_SUBCLASS_WEAPON_BOW, ITEM_SUBCLASS_WEAPON_CROSSBOW, ITEM_SUBCLASS_WEAPON_GUN};
-            }
-            else
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_SWORD2, ITEM_SUBCLASS_WEAPON_AXE2, ITEM_SUBCLASS_WEAPON_MACE2,
-                              ITEM_SUBCLASS_WEAPON_STAFF, ITEM_SUBCLASS_WEAPON_POLEARM};
-                r_weapons = {ITEM_SUBCLASS_WEAPON_BOW, ITEM_SUBCLASS_WEAPON_CROSSBOW, ITEM_SUBCLASS_WEAPON_GUN};
-            }
-            break;
-        }
-        case CLASS_PALADIN:
-        {
-            if (m_weightScales[playerclass][spec].info.name == "prot")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_SWORD, ITEM_SUBCLASS_WEAPON_AXE, ITEM_SUBCLASS_WEAPON_MACE};
-                oh_weapons = {ITEM_SUBCLASS_ARMOR_SHIELD};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_LIBRAM};
-            }
-            else if (m_weightScales[playerclass][spec].info.name == "holy")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_SWORD, ITEM_SUBCLASS_WEAPON_AXE, ITEM_SUBCLASS_WEAPON_MACE};
-                oh_weapons = {ITEM_SUBCLASS_ARMOR_SHIELD, ITEM_SUBCLASS_ARMOR_MISC};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_LIBRAM};
-            }
-            else
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_SWORD2, ITEM_SUBCLASS_WEAPON_AXE2, ITEM_SUBCLASS_WEAPON_MACE2,
-                              ITEM_SUBCLASS_WEAPON_POLEARM};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_LIBRAM};
-            }
-            break;
-        }
-        case CLASS_HUNTER:
-        {
-            mh_weapons = {ITEM_SUBCLASS_WEAPON_SWORD2, ITEM_SUBCLASS_WEAPON_AXE2, ITEM_SUBCLASS_WEAPON_STAFF,
-                          ITEM_SUBCLASS_WEAPON_POLEARM};
-            r_weapons = {ITEM_SUBCLASS_WEAPON_BOW, ITEM_SUBCLASS_WEAPON_CROSSBOW, ITEM_SUBCLASS_WEAPON_GUN};
-            break;
-        }
-        case CLASS_ROGUE:
-        {
-            mh_weapons = {ITEM_SUBCLASS_WEAPON_DAGGER};
-            oh_weapons = {ITEM_SUBCLASS_WEAPON_DAGGER};
-            r_weapons = {ITEM_SUBCLASS_WEAPON_BOW, ITEM_SUBCLASS_WEAPON_CROSSBOW, ITEM_SUBCLASS_WEAPON_GUN};
-            break;
-        }
-        case CLASS_PRIEST:
-        {
-            mh_weapons = {ITEM_SUBCLASS_WEAPON_STAFF, ITEM_SUBCLASS_WEAPON_DAGGER, ITEM_SUBCLASS_WEAPON_MACE};
-            oh_weapons = {ITEM_SUBCLASS_ARMOR_MISC};
-            r_weapons = {ITEM_SUBCLASS_WEAPON_WAND};
-            break;
-        }
-        case CLASS_SHAMAN:
-        {
-            if (m_weightScales[playerclass][spec].info.name == "resto")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_DAGGER, ITEM_SUBCLASS_WEAPON_AXE, ITEM_SUBCLASS_WEAPON_MACE,
-                              ITEM_SUBCLASS_WEAPON_FIST};
-                oh_weapons = {ITEM_SUBCLASS_ARMOR_MISC, ITEM_SUBCLASS_ARMOR_SHIELD};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_TOTEM};
-            }
-            else if (m_weightScales[playerclass][spec].info.name == "enhance")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_MACE2, ITEM_SUBCLASS_WEAPON_AXE2, ITEM_SUBCLASS_WEAPON_DAGGER,
-                              ITEM_SUBCLASS_WEAPON_AXE,   ITEM_SUBCLASS_WEAPON_MACE, ITEM_SUBCLASS_WEAPON_FIST};
-                oh_weapons = {ITEM_SUBCLASS_ARMOR_SHIELD};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_TOTEM};
-            }
-            else
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_STAFF};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_TOTEM};
-            }
-            break;
-        }
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-        {
-            mh_weapons = {ITEM_SUBCLASS_WEAPON_STAFF, ITEM_SUBCLASS_WEAPON_DAGGER, ITEM_SUBCLASS_WEAPON_SWORD};
-            oh_weapons = {ITEM_SUBCLASS_ARMOR_MISC};
-            r_weapons = {ITEM_SUBCLASS_WEAPON_WAND};
-            break;
-        }
-        case CLASS_DRUID:
-        {
-            if (m_weightScales[playerclass][spec].info.name == "feraltank")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_STAFF, ITEM_SUBCLASS_WEAPON_MACE2};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_IDOL};
-            }
-            else if (m_weightScales[playerclass][spec].info.name == "resto")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_STAFF, ITEM_SUBCLASS_WEAPON_DAGGER, ITEM_SUBCLASS_WEAPON_FIST,
-                              ITEM_SUBCLASS_WEAPON_MACE};
-                oh_weapons = {ITEM_SUBCLASS_ARMOR_MISC};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_IDOL};
-            }
-            else if (m_weightScales[playerclass][spec].info.name == "feraldps")
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_STAFF, ITEM_SUBCLASS_WEAPON_MACE2};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_IDOL};
-            }
-            else
-            {
-                mh_weapons = {ITEM_SUBCLASS_WEAPON_STAFF};
-                r_weapons = {ITEM_SUBCLASS_ARMOR_IDOL};
-            }
-            break;
-        }
-    }
-
-    if (slot_mh == EQUIPMENT_SLOT_MAINHAND)
-    {
-        return mh_weapons.find(proto->SubClass) != mh_weapons.end();
-    }
-
-    if (slot_oh == EQUIPMENT_SLOT_OFFHAND)
-    {
-        return oh_weapons.find(proto->SubClass) != oh_weapons.end();
-    }
-
-    if (slot_rh == EQUIPMENT_SLOT_RANGED)
-    {
-        return r_weapons.find(proto->SubClass) != r_weapons.end();
-    }
-
-    return false;
-}
-
-bool RandomItemMgr::CanEquipArmor(uint8 clazz, uint32 level, ItemTemplate const* proto)
-{
-    if (proto->InventoryType == INVTYPE_TABARD)
-        return true;
-
-    if ((clazz == CLASS_WARRIOR || clazz == CLASS_PALADIN || clazz == CLASS_SHAMAN) &&
-        proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-        return true;
-
-    if ((clazz == CLASS_WARRIOR || clazz == CLASS_PALADIN) && level >= 40)
-    {
-        if (proto->SubClass != ITEM_SUBCLASS_ARMOR_PLATE && proto->InventoryType != INVTYPE_CLOAK)
-            return false;
-    }
-
-    if (((clazz == CLASS_WARRIOR || clazz == CLASS_PALADIN) && level < 40) ||
-        ((clazz == CLASS_HUNTER || clazz == CLASS_SHAMAN) && level >= 40))
-    {
-        if (proto->SubClass != ITEM_SUBCLASS_ARMOR_MAIL && proto->InventoryType != INVTYPE_CLOAK)
-            return false;
-    }
-
-    if (((clazz == CLASS_HUNTER || clazz == CLASS_SHAMAN) && level < 40) ||
-        (clazz == CLASS_DRUID || clazz == CLASS_ROGUE))
-    {
-        if (proto->SubClass != ITEM_SUBCLASS_ARMOR_LEATHER && proto->InventoryType != INVTYPE_CLOAK)
-            return false;
-    }
-
-    if (proto->Quality <= ITEM_QUALITY_NORMAL)
-        return true;
-
-    uint8 sp = 0, ap = 0, tank = 0;
-    for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
-    {
-        // for ItemStatValue != 0
-        if (!proto->ItemStat[j].ItemStatValue)
-            continue;
-
-        AddItemStats(proto->ItemStat[j].ItemStatType, sp, ap, tank);
-    }
-
-    return CheckItemStats(clazz, sp, ap, tank);
-}
-
-bool RandomItemMgr::CanEquipWeapon(uint8 clazz, ItemTemplate const* proto)
-{
-    switch (clazz)
-    {
-        case CLASS_PRIEST:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF && proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
-                return false;
-            break;
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF && proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-                return false;
-            break;
-        case CLASS_WARRIOR:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
-                return false;
-            break;
-        case CLASS_PALADIN:
-        case CLASS_DEATH_KNIGHT:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-                return false;
-            break;
-        case CLASS_SHAMAN:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
-                return false;
-            break;
-        case CLASS_DRUID:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM)
-                return false;
-            break;
-        case CLASS_HUNTER:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST && proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM)
-                return false;
-            break;
-        case CLASS_ROGUE:
-            if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER && proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST && proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN && proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW && proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE)
-                return false;
-            break;
-    }
-
-    return true;
-}
-
-void RandomItemMgr::BuildItemInfoCache()
-{
-    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-    // load weightscales
-    LOG_INFO("playerbots", "Loading weightscales info");
-
-    uint32 counter = 1;
-    uint32 totalcount = 0;
-    uint32 statcount = 0;
-    uint32 curClass = CLASS_WARRIOR;
-
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_WEIGHTSCALES);
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
-    {
-        do
-        {
-            Field* fields = result->Fetch();
-            uint32 id = fields[0].Get<uint32>();
-            std::string name = fields[1].Get<std::string>();
-            uint8 clazz = fields[2].Get<uint8>();
-
-            if (clazz != curClass)
-            {
-                counter = 1;
-                curClass = clazz;
-            }
-
-            WeightScale scale;
-            scale.info.id = id;
-            scale.info.name = name;
-            m_weightScales[clazz][counter] = std::move(scale);
-            counter++;
-            totalcount++;
-
-        } while (result->NextRow());
-
-        LOG_INFO("playerbots", "Loaded {} weightscale class specs", totalcount);
-    }
-
-    stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_WEIGHTSCALE_DATA);
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
-    {
-        do
-        {
-            Field* fields = result->Fetch();
-            uint32 id = fields[0].Get<uint32>();
-            std::string field = fields[1].Get<std::string>();
-            uint32 weight = fields[2].Get<uint32>();
-
-            WeightScaleStat stat;
-            stat.stat = field;
-            stat.weight = weight;
-
-            for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES; ++cls)
-            {
-                for (uint32 spec = 1; spec < 5; ++spec)
-                {
-                    if (m_weightScales[cls][spec].info.id == id)
-                        m_weightScales[cls][spec].stats.push_back(std::move(stat));
-                }
-            }
-            statcount++;
-
-        } while (result->NextRow());
-
-        LOG_INFO("playerbots", "Loaded {} weightscale stat weights", statcount);
-    }
-
-    if (m_weightScales[1].empty())
-    {
-        LOG_ERROR("playerbots", "Error loading item weight scales");
         return;
     }
 
-    // vendor items
-    LOG_INFO("playerbots", "Loading vendor item list...");
-
-    std::set<uint32> vendorItems;
-    vendorItems.clear();
-    if (QueryResult result = WorldDatabase.Query("SELECT item FROM npc_vendor"))
+    botLoading.insert(playerGuid);
+    
+    if (WorldSession* masterSession = sWorldSessionMgr->FindSession(masterAccountId))
     {
-        do
-        {
-            Field* fields = result->Fetch();
-            int32 entry = fields[0].Get<int32>();
-            if (entry <= 0)
-                continue;
-
-            vendorItems.insert(entry);
-        } while (result->NextRow());
-    }
-
-    LOG_INFO("playerbots", "Loaded {} vendor items...", vendorItems.size());
-
-    // calculate drop source
-    LOG_INFO("playerbots", "Loading loot templates...");
-    DropMap* dropMap = new DropMap;
-
-    if (CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates())
-    {
-        for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
-        {
-            uint32 sEntry = itr->first;
-            if (LootTemplateAccess const* lTemplateA =
-                    DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::Unit>(sEntry, uint32(1)), LOOT_CORPSE))
-                for (auto const& lItem : lTemplateA->Entries)
-                    dropMap->insert(std::make_pair(lItem->itemid, sEntry));
-        }
-    }
-
-    if (GameObjectTemplateContainer const* gameobjects = sObjectMgr->GetGameObjectTemplates())
-    {
-        for (auto const& itr : *gameobjects)
-        {
-            uint32 sEntry = itr.first;
-            if (LootTemplateAccess const* lTemplateA = DropMapValue::GetLootTemplate(
-                    ObjectGuid::Create<HighGuid::GameObject>(sEntry, uint32(1)), LOOT_CORPSE))
-                for (auto const& lItem : lTemplateA->Entries)
-                    dropMap->insert(std::make_pair(lItem->itemid, sEntry));
-        }
-    }
-
-    LOG_INFO("playerbots", "Loaded {} loot templates...", dropMap->size());
-
-    ItemTemplateContainer const* itemTemplate = sObjectMgr->GetItemTemplateStore();
-    LOG_INFO("playerbots", "Calculating stat weights for {} items...", itemTemplate->size());
-
-    PlayerbotsDatabaseTransaction trans = PlayerbotsDatabase.BeginTransaction();
-
-    for (auto const& itr : *itemTemplate)
-    {
-        ItemTemplate const* proto = &itr.second;
-        if (!proto)
-            continue;
-
-        // skip test items
-        if (strstr(proto->Name1.c_str(), "(Test)") || strstr(proto->Name1.c_str(), "(TEST)") ||
-            strstr(proto->Name1.c_str(), "(test)") || strstr(proto->Name1.c_str(), "(JEFFTEST)") ||
-            strstr(proto->Name1.c_str(), "Test ") || strstr(proto->Name1.c_str(), "Test") ||
-            strstr(proto->Name1.c_str(), "TEST") || strstr(proto->Name1.c_str(), "TEST ") ||
-            strstr(proto->Name1.c_str(), " TEST") || strstr(proto->Name1.c_str(), "2200 ") ||
-            strstr(proto->Name1.c_str(), "Deprecated ") || strstr(proto->Name1.c_str(), "Unused ") ||
-            strstr(proto->Name1.c_str(), "Monster ") || strstr(proto->Name1.c_str(), "[PH]") ||
-            strstr(proto->Name1.c_str(), "(OLD)") || strstr(proto->Name1.c_str(), "QR") ||
-            strstr(proto->Name1.c_str(), "zzOLD"))
-        {
-            itemForTest.insert(proto->ItemId);
-            continue;
-        }
-
-        if (proto->Flags & ITEM_FLAG_DEPRECATED)
-        {
-            itemForTest.insert(proto->ItemId);
-            continue;
-        }
-        // skip items with rank/rep requirements
-        /*if (proto->RequiredHonorRank > 0 ||
-            proto->RequiredSkillRank > 0 ||
-            proto->RequiredCityRank > 0 ||
-            proto->RequiredReputationRank > 0)
-            continue;*/
-
-        // if (proto->RequiredHonorRank > 0 || proto->RequiredSkillRank > 0 || proto->RequiredCityRank > 0)
-        //     continue;
-
-        // // skip random enchant items
-        // if (proto->RandomProperty)
-        //     continue;
-
-        // // skip heirloom items
-        // if (proto->Quality == ITEM_QUALITY_HEIRLOOM)
-        //     continue;
-
-        // // check possible equip slots
-        // EquipmentSlots slot = EQUIPMENT_SLOT_START;
-        // for (std::map<EquipmentSlots, std::set<InventoryType> >::iterator i = viableSlots.begin();
-        //      i != viableSlots.end(); ++i)
-        // {
-        //     std::set<InventoryType> slots = viableSlots[(EquipmentSlots)i->first];
-        //     if (slots.find((InventoryType)proto->InventoryType) != slots.end())
-        //         slot = i->first;
-        // }
-
-        // if (slot == EQUIPMENT_SLOT_START)
-        //     continue;
-
-        // Init Item cache
-        // ItemInfoEntry cacheInfo;
-
-        // for (uint8 clazz = CLASS_WARRIOR; clazz < MAX_CLASSES; ++clazz)
-        // {
-        //     // skip nonexistent classes
-        //     if (!((1 << (clazz - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(clazz))
-        //         continue;
-
-        //     // skip wrong classes
-        //     if ((proto->AllowableClass & (1 << (clazz - 1))) == 0)
-        //         continue;
-
-        //     for (uint32 spec = 1; spec < 5; ++spec)
-        //     {
-        //         if (!m_weightScales[clazz][spec].info.id)
-        //             continue;
-
-        //         // check possible armor for spec
-        //         if (m_weightScales)
-        //         if (proto->Class == ITEM_CLASS_ARMOR && (
-        //             slot == EQUIPMENT_SLOT_HEAD ||
-        //             slot == EQUIPMENT_SLOT_SHOULDERS ||
-        //             slot == EQUIPMENT_SLOT_CHEST ||
-        //             slot == EQUIPMENT_SLOT_WAIST ||
-        //             slot == EQUIPMENT_SLOT_LEGS ||
-        //             slot == EQUIPMENT_SLOT_FEET ||
-        //             slot == EQUIPMENT_SLOT_WRISTS ||
-        //             slot == EQUIPMENT_SLOT_HANDS) &&
-        //             !ShouldEquipArmorForSpec(clazz, spec, proto))
-        //             continue;
-
-        //         // check possible weapon for spec
-        //         if ((proto->Class == ITEM_CLASS_WEAPON || (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD ||
-        //         (proto->SubClass == ITEM_SUBCLASS_ARMOR_MISC && proto->InventoryType == INVTYPE_HOLDABLE))) &&
-        //             !ShouldEquipWeaponForSpec(clazz, spec, proto))
-        //             continue;
-
-        //         StatWeight statWeight;
-        //         statWeight.id = m_weightScales[clazz][spec].info.id;
-        //         uint32 statW = CalculateStatWeight(clazz, spec, proto);
-        //         // set stat weight = 1 for items that can be equipped but have no proper stats
-        //         statWeight.weight = statW ? statW : 1;
-        //         //statWeight.weight = statW;
-        //         // save item statWeight into ItemCache
-        //         cacheInfo.weights[statWeight.id] = statWeight.weight;
-        //         LOG_DEBUG("playerbots", "Item: {}, weight: {}, class: {}, spec: {}", proto->ItemId,
-        //         statWeight.weight, clazz, m_weightScales[clazz][spec].info.name);
-        //     }
-        // }
-
-        // cacheInfo.team = TEAM_NEUTRAL;
-
-        // // check faction
-        // if (proto->Flags2 & ITEM_FLAG2_FACTION_HORDE)
-        //     cacheInfo.team = TEAM_HORDE;
-
-        // if (proto->Flags2 & ITEM_FLAG2_FACTION_ALLIANCE)
-        //     cacheInfo.team = TEAM_ALLIANCE;
-
-        // if (cacheInfo.team == TEAM_NEUTRAL && proto->AllowableRace > 1 && proto->AllowableRace < 8388607)
-        // {
-        //     if (FactionEntry const* faction = sFactionStore.LookupEntry(HORDE))
-        //         if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) != 0)
-        //             cacheInfo.team = TEAM_HORDE;
-
-        //     if (FactionEntry const* faction = sFactionStore.LookupEntry(ALLIANCE))
-        //         if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) != 0)
-        //             cacheInfo.team = TEAM_ALLIANCE;
-        // }
-
-        // if (cacheInfo.team < TEAM_NEUTRAL)
-        //     LOG_DEBUG("playerbots", "Item: {}, team (item): {}", proto->ItemId, cacheInfo.team == TEAM_ALLIANCE ?
-        //     "Alliance" : "Horde");
-
-        // // check min level
-        // if (proto->RequiredLevel)
-        //     cacheInfo.minLevel = proto->RequiredLevel;
-
-        // // check item source
-
-        // if (proto->Flags & ITEM_FLAG_NO_DISENCHANT)
-        // {
-        //     cacheInfo.source = ITEM_SOURCE_PVP;
-        //     LOG_DEBUG("playerbots", "Item: {}, source: PvP Reward", proto->ItemId);
-        // }
-
-        // // check quests
-        // if (cacheInfo.source == ITEM_SOURCE_NONE)
-        // {
-        //     std::vector<uint32> questIds = GetQuestIdsForItem(proto->ItemId);
-        //     if (questIds.size())
-        //     {
-        //         bool isAlly = false;
-        //         bool isHorde = false;
-        //         for (std::vector<uint32>::iterator i = questIds.begin(); i != questIds.end(); ++i)
-        //         {
-        //             Quest const* quest = sObjectMgr->GetQuestTemplate(*i);
-        //             if (quest)
-        //             {
-        //                 cacheInfo.source = ITEM_SOURCE_QUEST;
-        //                 cacheInfo.sourceId = *i;
-        //                 if (!cacheInfo.minLevel)
-        //                     cacheInfo.minLevel = quest->GetMinLevel();
-
-        //                 // check quest team
-        //                 if (cacheInfo.team == TEAM_NEUTRAL)
-        //                 {
-        //                     uint32 reqRace = quest->GetAllowableRaces();
-        //                     if (reqRace)
-        //                     {
-        //                         if ((reqRace & RACEMASK_ALLIANCE) != 0)
-        //                             isAlly = true;
-        //                         else if ((reqRace & RACEMASK_HORDE) != 0)
-        //                             isHorde = true;
-        //                     }
-        //                 }
-        //             }
-        //         }
-
-        //         if (isAlly && isHorde)
-        //             cacheInfo.team = TEAM_NEUTRAL;
-        //         else if (isAlly)
-        //             cacheInfo.team = TEAM_ALLIANCE;
-        //         else if (isHorde)
-        //             cacheInfo.team = TEAM_HORDE;
-
-        //         LOG_DEBUG("playerbots", "Item: {}, team (quest): {}", proto->ItemId, cacheInfo.team == TEAM_ALLIANCE
-        //         ? "Alliance" : cacheInfo.team == TEAM_HORDE ? "Horde" : "Both"); LOG_DEBUG("playerbots", "Item: {},
-        //         source: quest {}, minlevel: {}", proto->ItemId, cacheInfo.sourceId, cacheInfo.minLevel);
-        //     }
-        // }
-
-        // if (cacheInfo.minLevel)
-        //     LOG_DEBUG("playerbots", "Item: {}, minlevel: {}", proto->ItemId, cacheInfo.minLevel);
-
-        // // check vendors
-        // if (cacheInfo.source == ITEM_SOURCE_NONE)
-        // {
-        //     for (std::set<uint32>::iterator i = vendorItems.begin(); i != vendorItems.end(); ++i)
-        //     {
-        //         if (proto->ItemId == *i)
-        //         {
-        //             cacheInfo.source = ITEM_SOURCE_VENDOR;
-        //             LOG_DEBUG("playerbots", "Item: {} source: vendor", proto->ItemId);
-        //             break;
-        //         }
-        //     }
-        // }
-
-        // // check drops
-        // std::vector<int32> creatures;
-        // std::vector<int32> gameobjects;
-        // auto range = dropMap->equal_range(itr.first);
-
-        // for (auto iter = range.first; iter != range.second; ++iter)
-        // {
-        //     if (iter->second > 0)
-        //         creatures.push_back(iter->second);
-        //     else
-        //         gameobjects.push_back(abs(iter->second));
-        // }
-
-        // // check creature drop
-        // if (cacheInfo.source == ITEM_SOURCE_NONE)
-        // {
-        //     if (creatures.size())
-        //     {
-        //         if (creatures.size() == 1)
-        //         {
-        //             cacheInfo.source = ITEM_SOURCE_DROP;
-        //             cacheInfo.sourceId = creatures.front();
-        //             LOG_DEBUG("playerbots", "Item: {}, source: creature drop, ID: {}", proto->ItemId,
-        //             creatures.front());
-        //         }
-        //         else
-        //         {
-        //             cacheInfo.source = ITEM_SOURCE_DROP;
-        //             LOG_DEBUG("playerbots", "Item: {}, source: creatures drop, number: {}", proto->ItemId,
-        //             creatures.size());
-        //         }
-        //     }
-        // }
-
-        // // check gameobject drop
-        // if (cacheInfo.source == ITEM_SOURCE_NONE || (cacheInfo.source == ITEM_SOURCE_DROP && !cacheInfo.sourceId))
-        // {
-        //     if (gameobjects.size())
-        //     {
-        //         if (gameobjects.size() == 1)
-        //         {
-        //             cacheInfo.source = ITEM_SOURCE_DROP;
-        //             cacheInfo.sourceId = gameobjects.front();
-        //             LOG_INFO("playerbots", "Item: {}, source: gameobject, ID: {}", proto->ItemId,
-        //             gameobjects.front());
-        //         }
-        //         else
-        //         {
-        //             cacheInfo.source = ITEM_SOURCE_DROP;
-        //             LOG_INFO("playerbots", "Item: {}, source: gameobjects, number: {}", proto->ItemId,
-        //             gameobjects.size());
-        //         }
-        //     }
-        // }
-
-        // // check faction
-        // if (proto->RequiredReputationFaction > 0 && proto->RequiredReputationFaction != 35 &&
-        // proto->RequiredReputationRank < 15)
-        // {
-        //     cacheInfo.repFaction = proto->RequiredReputationFaction;
-        //     cacheInfo.repRank = proto->RequiredReputationRank;
-        // }
-
-        // cacheInfo.quality = proto->Quality;
-        // cacheInfo.itemId = proto->ItemId;
-        // cacheInfo.slot = slot;
-
-        // // save cache
-        // PlayerbotsDatabasePreparedStatement* stmt =
-        // PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_EQUIP_CACHE_NEW); stmt->SetData(0, proto->ItemId);
-        // trans->Append(stmt);
-
-        // stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_EQUIP_CACHE_NEW);
-        // stmt->SetData(0, cacheInfo.itemId);
-        // stmt->SetData(1, cacheInfo.quality);
-        // stmt->SetData(2, cacheInfo.slot);
-        // stmt->SetData(3, cacheInfo.source);
-        // stmt->SetData(4, cacheInfo.sourceId);
-        // stmt->SetData(5, cacheInfo.team);
-        // stmt->SetData(6, cacheInfo.repFaction);
-        // stmt->SetData(7, cacheInfo.repRank);
-        // stmt->SetData(8, cacheInfo.minLevel);
-
-        // for (uint8 i = 1; i <= MAX_STAT_SCALES; ++i)
-        // {
-        //     if (cacheInfo.weights[i])
-        //         stmt->SetData(8 + i, cacheInfo.weights[i]);
-        //     else
-        //         stmt->SetData(8 + i, 0);
-        // }
-
-        // trans->Append(stmt);
-
-        // itemInfoCache[cacheInfo.itemId] = std::move(cacheInfo);
-    }
-
-    PlayerbotsDatabase.CommitTransaction(trans);
-}
-
-uint32 RandomItemMgr::CalculateStatWeight(uint8 playerclass, uint8 spec, ItemTemplate const* proto)
-{
-    uint32 statWeight = 0;
-    bool isCasterItem = false;
-    bool isAttackItem = false;
-    bool noCaster = (Classes)playerclass == CLASS_WARRIOR || (Classes)playerclass == CLASS_ROGUE ||
-                    (Classes)playerclass == CLASS_DEATH_KNIGHT || (Classes)playerclass == CLASS_HUNTER;
-    uint32 spellPower = 0;
-    uint32 spellHeal = 0;
-    uint32 attackPower = 0;
-    bool hasInt = false;
-    bool hasMana = !((Classes)playerclass == CLASS_WARRIOR || (Classes)playerclass == CLASS_ROGUE ||
-                     (Classes)playerclass == CLASS_DEATH_KNIGHT);
-
-    if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM || proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL ||
-        proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM || proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL)
-        return (uint32)(proto->Quality + proto->ItemLevel);
-
-    // check basic item stats
-    int32 basicStatsWeight = 0;
-    for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
-    {
-        uint32 statType;
-        int32 val;
-        std::string weightName;
-
-        // if (j >= proto->StatsCount)
-        //     continue;
-
-        statType = proto->ItemStat[j].ItemStatType;
-        val = proto->ItemStat[j].ItemStatValue;
-
-        if (val == 0)
-            continue;
-
-        for (std::map<std::string, uint32>::iterator i = weightStatLink.begin(); i != weightStatLink.end(); ++i)
-        {
-            uint32 modd = i->second;
-            if (modd == statType)
-            {
-                weightName = i->first;
-                break;
-            }
-        }
-
-        if (weightName.empty())
-            continue;
-
-        uint32 singleStat = CalculateSingleStatWeight(playerclass, spec, weightName, val);
-        basicStatsWeight += singleStat;
-
-        if (val)
-        {
-            if (weightName == "int" && !noCaster)
-                isCasterItem = true;
-
-            if (weightName == "int")
-                hasInt = true;
-
-            if (weightName == "splpwr")
-                isCasterItem = true;
-
-            if (weightName == "str")
-                isAttackItem = true;
-
-            if (weightName == "agi")
-                isAttackItem = true;
-
-            if (weightName == "atkpwr")
-                isAttackItem = true;
-        }
-    }
-
-    // check armor & block
-    statWeight += CalculateSingleStatWeight(playerclass, spec, "armor", proto->Armor);
-    statWeight += CalculateSingleStatWeight(playerclass, spec, "block", proto->Block);
-
-    // check weapon dps
-    if (proto->IsWeaponVellum())
-    {
-        WeaponAttackType attType = BASE_ATTACK;
-
-        uint32 dps = 0;
-        for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
-        {
-            if (proto->Damage[i].DamageMax == 0)
-                break;
-
-            dps = (proto->Damage[i].DamageMin + proto->Damage[i].DamageMax) / (float)(proto->Delay / 1000.0f) / 2;
-            if (dps)
-            {
-                if (proto->IsRangedWeapon())
-                    statWeight += CalculateSingleStatWeight(playerclass, spec, "rgddps", dps);
-                else
-                    statWeight += CalculateSingleStatWeight(playerclass, spec, "mledps", dps);
-            }
-        }
-    }
-
-    // check item spells
-    for (const auto& spellData : proto->Spells)
-    {
-        // no spell
-        if (!spellData.SpellId)
-            continue;
-
-        // apply only at-equip spells
-        if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-            continue;
-
-        // check if it is valid spell
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
-        if (!spellInfo)
-            continue;
-
-        uint32 spellDamage = 0;
-        uint32 spellHealing = 0;
-        for (uint32 j = 0; j < MAX_SPELL_EFFECTS; j++)
-        {
-            if (spellInfo->Effects[j].Effect == SPELL_EFFECT_APPLY_AURA && spellInfo->Effects[j].BasePoints)
-            {
-                // spell damage
-                // SPELL_AURA_MOD_DAMAGE_DONE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_DAMAGE_DONE)
-                {
-                    spellDamage = spellInfo->Effects[j].BasePoints + 1;
-                }
-
-                // spell healing
-                // SPELL_AURA_MOD_HEALING_DONE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_HEALING_DONE)
-                {
-                    spellHealing = spellInfo->Effects[j].BasePoints + 1;
-                }
-
-                // check spell power
-                if (spellDamage && spellDamage == spellHealing)
-                {
-                    isCasterItem = true;
-                    spellPower += CalculateSingleStatWeight(playerclass, spec, "splpwr", spellDamage);
-                }
-
-                // spell hit rating (pre tbc)
-                // SPELL_AURA_MOD_SPELL_HIT_CHANCE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_SPELL_HIT_CHANCE)
-                {
-                    statWeight += CalculateSingleStatWeight(playerclass, spec, "spellhitrtng",
-                                                            spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // spell crit rating (pre tbc)
-                // SPELL_AURA_MOD_SPELL_CRIT_CHANCE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_SPELL_CRIT_CHANCE)
-                {
-                    statWeight += CalculateSingleStatWeight(playerclass, spec, "spellcritstrkrtng",
-                                                            spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // spell penetration
-                // SPELL_AURA_MOD_TARGET_RESISTANCE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_TARGET_RESISTANCE)
-                {
-                    // check if magic type
-                    if (spellInfo->Effects[j].MiscValue == SPELL_SCHOOL_MASK_SPELL)
-                        statWeight += CalculateSingleStatWeight(playerclass, spec, "spellpenrtng",
-                                                                abs(spellInfo->Effects[j].BasePoints + 1));
-                }
-
-                // check attack power
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
-                {
-                    isAttackItem = true;
-                    attackPower +=
-                        CalculateSingleStatWeight(playerclass, spec, "atkpwr", spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // check ranged ap
-                // SPELL_AURA_MOD_RANGED_ATTACK_POWER
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_RANGED_ATTACK_POWER)
-                {
-                    isAttackItem = true;
-                    attackPower +=
-                        CalculateSingleStatWeight(playerclass, spec, "atkpwr", spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // check block
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_SHIELD_BLOCKVALUE)
-                {
-                    statWeight +=
-                        CalculateSingleStatWeight(playerclass, spec, "block", spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // block chance
-                // SPELL_AURA_MOD_BLOCK_PERCENT
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_BLOCK_PERCENT)
-                {
-                    statWeight +=
-                        CalculateSingleStatWeight(playerclass, spec, "blockrtng", spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // armor penetration
-                // SPELL_AURA_MOD_TARGET_RESISTANCE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_TARGET_RESISTANCE)
-                {
-                    // check if physical type
-                    if (spellInfo->Effects[j].MiscValue == SPELL_SCHOOL_MASK_NORMAL)
-                        statWeight += CalculateSingleStatWeight(playerclass, spec, "armorpenrtng",
-                                                                abs(spellInfo->Effects[j].BasePoints + 1));
-                }
-
-                // hit rating (pre tbc)
-                // SPELL_AURA_MOD_HIT_CHANCE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_HIT_CHANCE)
-                {
-                    statWeight +=
-                        CalculateSingleStatWeight(playerclass, spec, "hitrtng", spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // crit rating (pre tbc)
-                // SPELL_AURA_MOD_HIT_CHANCE
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_CRIT_PCT)
-                {
-                    statWeight += CalculateSingleStatWeight(playerclass, spec, "critstrkrtng",
-                                                            spellInfo->Effects[j].BasePoints + 1);
-                }
-
-                // check defense SPELL_AURA_MOD_SKILL
-                // check block
-                // if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_SKILL)
-                //{
-                //    statWeight += CalculateSingleStatWeight(playerclass, spec, "block",
-                //    spellInfo->Effects[j].BasePoints + 1);
-                //}
-
-                // ratings
-                // enum CombatRating
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_RATING)
-                {
-                    for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
-                    {
-                        if (spellInfo->Effects[j].MiscValue & (1 << rating))
-                        {
-                            int32 val = spellInfo->Effects[j].BasePoints + 1;
-                            std::string weightName;
-
-                            for (std::map<std::string, uint32>::iterator i = weightRatingLink.begin();
-                                 i != weightRatingLink.end(); ++i)
-                            {
-                                uint32 modd = i->second;
-                                if (modd == rating)
-                                {
-                                    weightName = i->first;
-                                    break;
-                                }
-                            }
-
-                            if (weightName.empty())
-                                continue;
-
-                            statWeight += CalculateSingleStatWeight(playerclass, spec, weightName, val);
-                        }
-                    }
-                }
-
-                // mana regen
-                // SPELL_AURA_MOD_POWER_REGEN
-                if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_POWER_REGEN)
-                {
-                    statWeight +=
-                        CalculateSingleStatWeight(playerclass, spec, "manargn", spellInfo->Effects[j].BasePoints + 1);
-                }
-            }
-        }
-    }
-
-    // check for caster item
-    if (isCasterItem || hasInt)
-    {
-        if ((!hasMana || noCaster) && spellPower)
-            return 0;
-
-        if (!hasMana && hasInt)
-            return 0;
-
-        if ((!hasMana && noCaster && playerclass != CLASS_PALADIN) && spellPower > attackPower)
-            return 0;
-
-        bool playerCaster = false;
-        for (std::vector<WeightScaleStat>::iterator i = m_weightScales[playerclass][spec].stats.begin();
-             i != m_weightScales[playerclass][spec].stats.end(); ++i)
-        {
-            if (i->stat == "splpwr" || i->stat == "int" || i->stat == "manargn")
-            {
-                playerCaster = true;
-            }
-        }
-
-        if (!playerCaster)
-            return 0;
-    }
-
-    // check for caster item
-    if (isAttackItem)
-    {
-        if (hasMana && !noCaster && !(hasInt || spellPower))
-            return 0;
-        // if (!noCaster && attackPower)
-        //     return 0;
-
-        bool playerAttacker = false;
-        for (std::vector<WeightScaleStat>::iterator i = m_weightScales[playerclass][spec].stats.begin();
-             i != m_weightScales[playerclass][spec].stats.end(); ++i)
-        {
-            if (i->stat == "str" || i->stat == "agi" || i->stat == "atkpwr" || i->stat == "mledps" ||
-                i->stat == "rgddps")
-            {
-                playerAttacker = true;
-            }
-        }
-
-        if (!playerAttacker)
-            return 0;
-    }
-
-    statWeight += spellPower;
-    statWeight += spellHeal;
-    statWeight += attackPower;
-
-    // handle negative stats
-    if (basicStatsWeight < 0 && (abs(basicStatsWeight) >= statWeight))
-        statWeight = 0;
-    else
-        statWeight += basicStatsWeight;
-
-    return statWeight;
-}
-
-uint32 RandomItemMgr::CalculateSingleStatWeight(uint8 playerclass, uint8 spec, std::string stat, uint32 value)
-{
-    uint32 statWeight = 0;
-    for (std::vector<WeightScaleStat>::iterator i = m_weightScales[playerclass][spec].stats.begin();
-         i != m_weightScales[playerclass][spec].stats.end(); ++i)
-    {
-        if (stat == i->stat)
-        {
-            statWeight = i->weight * value;
-            // if (statWeight)
-            //     LOG_INFO("playerbots", "stat: {}, val: {}, weight: {}, total: {}, class: {}, spec: {}",
-            //         stat, value, i->weight, statWeight, playerclass, m_weightScales[playerclass][spec].info.name);
-            return statWeight;
-        }
-    }
-
-    return statWeight;
-}
-
-uint32 RandomItemMgr::GetQuestIdForItem(uint32 itemId)
-{
-    bool isQuest = false;
-    uint32 questId = 0;
-    ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
-    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
-    {
-        Quest const* quest = i->second;
-
-        uint32 rewItemCount = quest->GetRewItemsCount();
-        for (uint32 i = 0; i < rewItemCount; ++i)
-        {
-            if (!quest->RewardItemId[i])
-                continue;
-
-            if (quest->RewardItemId[i] == itemId)
-            {
-                isQuest = true;
-                questId = quest->GetQuestId();
-                break;
-            }
-        }
-
-        uint32 rewChocieItemCount = quest->GetRewChoiceItemsCount();
-        for (uint32 i = 0; i < rewChocieItemCount; ++i)
-        {
-            if (!quest->RewardChoiceItemId[i])
-                continue;
-
-            if (quest->RewardChoiceItemId[i] == itemId)
-            {
-                isQuest = true;
-                questId = quest->GetQuestId();
-                break;
-            }
-        }
-        if (isQuest)
-            break;
-    }
-    return questId;
-}
-
-std::vector<uint32> RandomItemMgr::GetQuestIdsForItem(uint32 itemId)
-{
-    std::vector<uint32> questIds;
-    ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
-    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
-    {
-        Quest const* quest = i->second;
-
-        uint32 rewItemCount = quest->GetRewItemsCount();
-        for (uint32 i = 0; i < rewItemCount; ++i)
-        {
-            if (!quest->RewardItemId[i])
-                continue;
-
-            if (quest->RewardItemId[i] == itemId)
-            {
-                questIds.push_back(quest->GetQuestId());
-                break;
-            }
-        }
-
-        uint32 rewChocieItemCount = quest->GetRewChoiceItemsCount();
-        for (uint32 i = 0; i < rewChocieItemCount; ++i)
-        {
-            if (!quest->RewardChoiceItemId[i])
-                continue;
-
-            if (quest->RewardChoiceItemId[i] == itemId)
-            {
-                questIds.push_back(quest->GetQuestId());
-                break;
-            }
-        }
-    }
-
-    return std::move(questIds);
-}
-
-uint32 RandomItemMgr::GetUpgrade(Player* player, std::string spec, uint8 slot, uint32 quality, uint32 itemId)
-{
-    if (!player)
-        return 0;
-
-    // get old item statWeight
-    uint32 oldStatWeight = 0;
-    uint32 specId = 0;
-    uint32 closestUpgrade = 0;
-    uint32 closestUpgradeWeight = 0;
-    std::vector<uint32> classspecs;
-
-    for (uint32 specNum = 1; specNum < 5; ++specNum)
-    {
-        if (!m_weightScales[player->getClass()][specNum].info.id)
-            continue;
-
-        classspecs.push_back(m_weightScales[player->getClass()][specNum].info.id);
-
-        if (m_weightScales[player->getClass()][specNum].info.name == spec)
-            specId = m_weightScales[player->getClass()][specNum].info.id;
-    }
-    if (!specId)
-        return 0;
-
-    if (itemId && itemInfoCache.find(itemId) != itemInfoCache.end())
-    {
-        oldStatWeight = itemInfoCache[itemId].weights[specId];
-
-        if (oldStatWeight)
-            LOG_INFO("playerbots", "Old Item: {}, weight: {}", itemId, oldStatWeight);
-        else
-            LOG_INFO("playerbots", "Old item has no stat weight");
-    }
-
-    for (std::map<uint32, ItemInfoEntry>::iterator i = itemInfoCache.begin(); i != itemInfoCache.end(); ++i)
-    {
-        ItemInfoEntry& info = i->second;
-
-        // skip useless items
-        if (info.weights[specId] == 0)
-            continue;
-
-        // skip higher lvl
-        if (info.minLevel > player->GetLevel())
-            continue;
-
-        // skip too low level
-        if (info.minLevel < (player->GetLevel() - 10))
-            continue;
-
-        // skip wrong team
-        if (info.team != TEAM_NEUTRAL && info.team != player->GetTeamId())
-            continue;
-
-        // skip wrong slot
-        if ((EquipmentSlots)info.slot != (EquipmentSlots)slot)
-            continue;
-
-        // skip higher quality
-        if (quality && info.quality != quality)
-            continue;
-
-        // skip worse items
-        if (info.weights[specId] <= oldStatWeight)
-            continue;
-
-        // skip items that only fit in slot, but not stats
-        if (!itemId && info.weights[specId] == 1 && player->GetLevel() > 40)
-            continue;
-
-        // skip quest items
-        if (info.source == ITEM_SOURCE_QUEST)
-        {
-            if (player->GetQuestRewardStatus(info.sourceId) != QUEST_STATUS_COMPLETE)
-                continue;
-        }
-
-        // skip no stats trinkets
-        if (info.weights[specId] == 1 && info.slot == EQUIPMENT_SLOT_NECK || info.slot == EQUIPMENT_SLOT_TRINKET1 ||
-            info.slot == EQUIPMENT_SLOT_TRINKET2 || info.slot == EQUIPMENT_SLOT_FINGER1 ||
-            info.slot == EQUIPMENT_SLOT_FINGER2)
-            continue;
-
-        // check if item stat score is the best among class specs
-        uint32 bestSpecId = 0;
-        uint32 bestSpecScore = 0;
-        for (std::vector<uint32>::iterator i = classspecs.begin(); i != classspecs.end(); ++i)
-        {
-            if (info.weights[*i] > bestSpecScore)
-            {
-                bestSpecId = *i;
-                bestSpecScore = info.weights[specId];
-            }
-        }
-
-        if (bestSpecId && bestSpecId != specId && player->GetLevel() > 40)
-            return 0;
-
-        if (!closestUpgrade)
-        {
-            closestUpgrade = info.itemId;
-            closestUpgradeWeight = info.weights[specId];
-        }
-
-        // pick closest upgrade
-        if (info.weights[specId] < closestUpgradeWeight)
-        {
-            closestUpgrade = info.itemId;
-            closestUpgradeWeight = info.weights[specId];
-        }
-    }
-
-    if (closestUpgrade)
-        LOG_INFO("playerbots", "New Item: {}, weight: {}", closestUpgrade, closestUpgradeWeight);
-
-    return closestUpgrade;
-}
-
-std::vector<uint32> RandomItemMgr::GetUpgradeList(Player* player, std::string spec, uint8 slot, uint32 quality,
-                                                  uint32 itemId, uint32 amount)
-{
-    std::vector<uint32> listItems;
-    if (!player)
-        return std::move(listItems);
-
-    // get old item statWeight
-    uint32 oldStatWeight = 0;
-    uint32 specId = 0;
-    uint32 closestUpgrade = 0;
-    uint32 closestUpgradeWeight = 0;
-    std::vector<uint32> classspecs;
-
-    for (uint32 specNum = 1; specNum < 5; ++specNum)
-    {
-        if (!m_weightScales[player->getClass()][specNum].info.id)
-            continue;
-
-        classspecs.push_back(m_weightScales[player->getClass()][specNum].info.id);
-
-        if (m_weightScales[player->getClass()][specNum].info.name == spec)
-            specId = m_weightScales[player->getClass()][specNum].info.id;
-    }
-
-    if (!specId)
-        return std::move(listItems);
-
-    if (itemId && itemInfoCache.find(itemId) != itemInfoCache.end())
-    {
-        oldStatWeight = itemInfoCache[itemId].weights[specId];
-
-        if (oldStatWeight)
-            LOG_INFO("playerbots", "Old Item: {}, weight: {}", itemId, oldStatWeight);
-        else
-            LOG_INFO("playerbots", "Old item has no stat weight");
-    }
-
-    for (std::map<uint32, ItemInfoEntry>::iterator i = itemInfoCache.begin(); i != itemInfoCache.end(); ++i)
-    {
-        ItemInfoEntry& info = i->second;
-
-        // skip useless items
-        if (info.weights[specId] == 0)
-            continue;
-
-        // skip higher lvl
-        if (info.minLevel > player->GetLevel())
-            continue;
-
-        // skip too low level
-        if ((int32)info.minLevel < (int32)(player->GetLevel() - 20))
-            continue;
-
-        // skip wrong team
-        if (info.team != TEAM_NEUTRAL && info.team != player->GetTeamId())
-            continue;
-
-        // skip wrong slot
-        if ((EquipmentSlots)info.slot != (EquipmentSlots)slot)
-            continue;
-
-        // skip higher quality
-        if (quality && info.quality != quality)
-            continue;
-
-        // skip worse items
-        if (info.weights[specId] <= oldStatWeight)
-            continue;
-
-        // skip items that only fit in slot, but not stats
-        if (!itemId && info.weights[specId] == 1 && player->GetLevel() > 40)
-            continue;
-
-        // skip quest items
-        if (info.source == ITEM_SOURCE_QUEST)
-        {
-            if (player->GetQuestRewardStatus(info.sourceId) != QUEST_STATUS_COMPLETE)
-                continue;
-        }
-
-        // skip no stats trinkets
-        if (info.weights[specId] < 2 && (info.slot == EQUIPMENT_SLOT_NECK || info.slot == EQUIPMENT_SLOT_TRINKET1 ||
-                                         info.slot == EQUIPMENT_SLOT_TRINKET2 || info.slot == EQUIPMENT_SLOT_FINGER1 ||
-                                         info.slot == EQUIPMENT_SLOT_FINGER2))
-            continue;
-
-        // if (player->GetLevel() >= 40)
-        //{
-        //     // check if item stat score is the best among class specs
-        //     uint32 bestSpecId = 0;
-        //     uint32 bestSpecScore = 0;
-        //     for (vector<uint32>::iterator i = classspecs.begin(); i != classspecs.end(); ++i)
-        //     {
-        //         if (info->weights[*i] > bestSpecScore)
-        //         {
-        //             bestSpecId = *i;
-        //             bestSpecScore = info->weights[specId];
-        //         }
-        //     }
-
-        //    if (bestSpecId && bestSpecId != specId)
-        //        continue;
-        //}
-
-        listItems.push_back(info.itemId);
-        // continue;
-
-        // pick closest upgrade
-        if (info.weights[specId] > closestUpgradeWeight)
-        {
-            closestUpgrade = info.itemId;
-            closestUpgradeWeight = info.weights[specId];
-        }
-    }
-
-    if (listItems.size())
-        LOG_INFO("playerbots", "New Items: {}, Old item:%d, New items max: {}", listItems.size(), oldStatWeight,
-                 closestUpgradeWeight);
-
-    return std::move(listItems);
-}
-
-bool RandomItemMgr::HasStatWeight(uint32 itemId)
-{
-    auto itr = itemInfoCache.find(itemId);
-    return itr != itemInfoCache.end();
-}
-
-uint32 RandomItemMgr::GetMinLevelFromCache(uint32 itemId)
-{
-    auto itr = itemInfoCache.find(itemId);
-    if (itr == itemInfoCache.end())
-        return 0;
-
-    return itr->second.minLevel;
-}
-
-uint32 RandomItemMgr::GetStatWeight(Player* player, uint32 itemId)
-{
-    if (!player || !itemId)
-        return 0;
-
-    auto itr = itemInfoCache.find(itemId);
-    if (itr == itemInfoCache.end())
-        return 0;
-
-    uint32 statWeight = 0;
-    uint32 specId = 0;
-    std::vector<uint32> classspecs;
-
-    std::string const& specName = AiFactory::GetPlayerSpecName(player);
-    if (specName.empty())
-        return 0;
-
-    for (uint32 specNum = 1; specNum < 5; ++specNum)
-    {
-        if (!m_weightScales[player->getClass()][specNum].info.id)
-            continue;
-
-        classspecs.push_back(m_weightScales[player->getClass()][specNum].info.id);
-
-        if (m_weightScales[player->getClass()][specNum].info.name == specName)
-            specId = m_weightScales[player->getClass()][specNum].info.id;
-
-        if (m_weightScales[player->getClass()][specNum].info.name == specName)
-        {
-            specId = specNum;
-            break;
-        }
-    }
-
-    if (!specId)
-        return 0;
-
-    statWeight = itr->second.weights[specId];
-
-    return statWeight;
-}
-
-uint32 RandomItemMgr::GetLiveStatWeight(Player* player, uint32 itemId)
-{
-    if (!player || !itemId)
-        return 0;
-
-    auto itr = itemInfoCache.find(itemId);
-    if (itr == itemInfoCache.end())
-        return 0;
-
-    uint32 statWeight = 0;
-    uint32 specId = 0;
-    std::vector<uint32> classspecs;
-
-    std::string const& specName = AiFactory::GetPlayerSpecName(player);
-    if (specName.empty())
-        return 0;
-
-    for (uint32 specNum = 1; specNum < 5; ++specNum)
-    {
-        if (!m_weightScales[player->getClass()][specNum].info.id)
-            continue;
-
-        // for bestSpec check
-        // classspecs.push_back(m_weightScales[player->getClass()][specNum].info.id);
-
-        if (m_weightScales[player->getClass()][specNum].info.name == specName)
-            specId = m_weightScales[player->getClass()][specNum].info.id;
-    }
-    if (!specId)
-        return 0;
-
-    statWeight = itr->second.weights[specId];
-
-    // skip higher lvl
-    if (itr->second.minLevel > player->GetLevel())
-        return 0;
-
-    // skip too low level
-    // if ((int32)info->minLevel < (int32)(player->GetLevel() - 20))
-    //    return 0;
-
-    // skip wrong team
-    if (itr->second.team != TEAM_NEUTRAL && itr->second.team != player->GetTeamId())
-        return 0;
-
-    // skip quest items
-    if (itr->second.source == ITEM_SOURCE_QUEST && itr->second.sourceId)
-    {
-        if (player->GetQuestRewardStatus(itr->second.sourceId) != QUEST_STATUS_COMPLETE)
-            return 0;
-    }
-
-    // skip pvp items
-    if (itr->second.source == ITEM_SOURCE_PVP)
-    {
-        if (!player->GetHonorPoints() && !player->GetArenaPoints())
-            return 0;
-    }
-
-    // skip no stats trinkets
-    if (itr->second.weights[specId] == 1 &&
-        (itr->second.slot == EQUIPMENT_SLOT_NECK || itr->second.slot == EQUIPMENT_SLOT_TRINKET1 ||
-         itr->second.slot == EQUIPMENT_SLOT_TRINKET2 || itr->second.slot == EQUIPMENT_SLOT_FINGER1 ||
-         itr->second.slot == EQUIPMENT_SLOT_FINGER2))
-        return 0;
-
-    // skip items that only fit in slot, but not stats
-    if (!itemId && itr->second.weights[specId] == 1 && player->GetLevel() > 20)
-        return 0;
-
-    // check if item stat score is the best among class specs
-    /*uint32 bestSpecId = 0;
-    uint32 bestSpecScore = 0;
-    for (vector<uint32>::iterator i = classspecs.begin(); i != classspecs.end(); ++i)
-    {
-        if (itemCache[itemId]->weights[*i] > bestSpecScore && itemCache[itemId]->weights[*i] > 1)
-        {
-            bestSpecId = *i;
-            bestSpecScore = itemCache[itemId]->weights[specId];
-        }
-    }
-
-    if (bestSpecId && bestSpecId != specId && player->GetLevel() >= 60)
-        return 0;*/
-
-    return statWeight;
-}
-
-void RandomItemMgr::BuildEquipCache()
-{
-    uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-    if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_EQUIP_CACHE);
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
-    {
-        LOG_INFO("server.loading",
-                 "Loading equipment cache for {} classes, {} levels, {} slots, {} quality from {} items", MAX_CLASSES,
-                 maxLevel, EQUIPMENT_SLOT_END, ITEM_QUALITY_ARTIFACT, itemTemplates->size());
-
-        uint32 count = 0;
-        do
-        {
-            Field* fields = result->Fetch();
-            uint8 clazz = fields[0].Get<uint8>();
-            uint32 level = fields[1].Get<uint32>();
-            uint8 slot = fields[2].Get<uint8>();
-            uint32 quality = fields[3].Get<uint32>();
-            uint32 itemId = fields[4].Get<uint32>();
-
-            BotEquipKey key(level, clazz, slot, quality);
-            equipCache[key].push_back(itemId);
-            ++count;
-        } while (result->NextRow());
-
-        LOG_INFO("playerbots", "Equipment cache loaded from {} records", count);
+        masterSession->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder))
+            .AfterComplete([this](SQLQueryHolderBase const& holder)
+                           { HandlePlayerBotLoginCallback(static_cast<PlayerbotLoginQueryHolder const&>(holder)); });
     }
     else
     {
-        uint64 total = MAX_CLASSES * maxLevel * EQUIPMENT_SLOT_END * ITEM_QUALITY_ARTIFACT;
-        LOG_INFO("server.loading",
-                 "Building equipment cache for {} classes, {} levels, {} slots, {} quality from {} items ({} total)",
-                 MAX_CLASSES, maxLevel, EQUIPMENT_SLOT_END, ITEM_QUALITY_ARTIFACT, itemTemplates->size(), total);
+        sWorld->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder))
+            .AfterComplete([this](SQLQueryHolderBase const& holder)
+                           { HandlePlayerBotLoginCallback(static_cast<PlayerbotLoginQueryHolder const&>(holder)); });
+    }
+}
 
-        for (uint8 class_ = CLASS_WARRIOR; class_ < MAX_CLASSES; ++class_)
+void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder)
+{
+    uint32 botAccountId = holder.GetAccountId();
+    // At login DBC locale should be what the server is set to use by default (as spells etc are hardcoded to ENUS this
+    // allows channels to work as intended)
+    WorldSession* botSession = new WorldSession(botAccountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
+                                                time_t(0), sWorld->GetDefaultDbcLocale(), 0, false, false, 0, true);
+
+    botSession->HandlePlayerLoginFromDB(holder);  // will delete lqh
+
+    Player* bot = botSession->GetPlayer();
+    if (!bot)
+    {
+        // Debug log
+        LOG_DEBUG("mod-playerbots", "Bot player could not be loaded for account ID: {}", botAccountId);
+        botSession->LogoutPlayer(true);
+        delete botSession;
+        botLoading.erase(holder.GetGuid());
+        return;
+    }
+
+    uint32 masterAccount = holder.GetMasterAccountId();
+    WorldSession* masterSession = masterAccount ? sWorldSessionMgr->FindSession(masterAccount) : nullptr;
+
+    // Check if masterSession->GetPlayer() is valid
+    Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
+    if (masterSession && !masterPlayer)
+    {
+        LOG_DEBUG("mod-playerbots", "Master session found but no player is associated for master account ID: {}", masterAccount);
+    }
+    
+    sRandomPlayerbotMgr->OnPlayerLogin(bot);
+    OnBotLogin(bot);
+
+    botLoading.erase(holder.GetGuid());
+}
+
+void PlayerbotHolder::UpdateSessions()
+{
+    for (PlayerBotMap::const_iterator itr = GetPlayerBotsBegin(); itr != GetPlayerBotsEnd(); ++itr)
+    {
+        Player* const bot = itr->second;
+        if (bot->IsBeingTeleported())
         {
-            // skip nonexistent classes
-            if (!((1 << (class_ - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(class_))
-                continue;
-
-            for (uint32 level = 1; level <= maxLevel; ++level)
+            PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+            if (botAI)
             {
-                for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+                botAI->HandleTeleportAck();
+            }
+        }
+        else if (bot->IsInWorld())
+        {
+            HandleBotPackets(bot->GetSession());
+        }
+    }
+}
+
+void PlayerbotHolder::HandleBotPackets(WorldSession* session)
+{
+    WorldPacket* packet;
+    while (session->GetPacketQueue().next(packet))
+    {
+        OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
+        ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
+        opHandle->Call(session, *packet);
+        delete packet;
+    }
+}
+
+void PlayerbotHolder::LogoutAllBots()
+{
+    /*
+    while (true)
+    {
+        PlayerBotMap::const_iterator itr = GetPlayerBotsBegin();
+        if (itr == GetPlayerBotsEnd())
+            break;
+
+        Player* bot= itr->second;
+        if (!GET_PLAYERBOT_AI(bot)->IsRealPlayer())
+            LogoutPlayerBot(bot->GetGUID());
+    }
+    */
+
+    PlayerBotMap bots = playerBots;
+    for (auto& itr : bots)
+    {
+        Player* bot = itr.second;
+        if (!bot)
+            continue;
+
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (!botAI || botAI->IsRealPlayer())
+            continue;
+
+        LogoutPlayerBot(bot->GetGUID());
+    }
+}
+
+void PlayerbotMgr::CancelLogout()
+{
+    Player* master = GetMaster();
+    if (!master)
+        return;
+
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (!botAI || botAI->IsRealPlayer())
+            continue;
+
+        if (bot->GetSession()->isLogingOut())
+        {
+            WorldPackets::Character::LogoutCancel data = WorldPacket(CMSG_LOGOUT_CANCEL);
+            bot->GetSession()->HandleLogoutCancelOpcode(data);
+            botAI->TellMaster("Logout cancelled!");
+        }
+    }
+
+    for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin();
+         it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (!botAI || botAI->IsRealPlayer())
+            continue;
+
+        if (botAI->GetMaster() != master)
+            continue;
+
+        if (bot->GetSession()->isLogingOut())
+        {
+            WorldPackets::Character::LogoutCancel data = WorldPacket(CMSG_LOGOUT_CANCEL);
+            bot->GetSession()->HandleLogoutCancelOpcode(data);
+        }
+    }
+}
+
+void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
+{
+    if (Player* bot = GetPlayerBot(guid))
+    {
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (!botAI)
+            return;
+
+        Group* group = bot->GetGroup();
+        if (group && !bot->InBattleground() && !bot->InBattlegroundQueue() && botAI->HasActivePlayerMaster())
+        {
+            sPlayerbotDbStore->Save(botAI);
+        }
+
+        LOG_INFO("playerbots", "Bot {} logging out", bot->GetName().c_str());
+        bot->SaveToDB(false, false);
+
+        WorldSession* botWorldSessionPtr = bot->GetSession();
+        WorldSession* masterWorldSessionPtr = nullptr;
+
+        if (botWorldSessionPtr->isLogingOut())
+            return;
+
+        Player* master = botAI->GetMaster();
+        if (master)
+            masterWorldSessionPtr = master->GetSession();
+
+        // check for instant logout
+        bool logout = botWorldSessionPtr->ShouldLogOut(time(nullptr));
+
+        if (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr)))
+            logout = true;
+
+        if (masterWorldSessionPtr && !masterWorldSessionPtr->GetPlayer())
+            logout = true;
+
+        if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
+            botWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
+        {
+            logout = true;
+        }
+
+        if (master &&
+            (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || master->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
+             (masterWorldSessionPtr &&
+              masterWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))))
+        {
+            logout = true;
+        }
+
+        TravelTarget* target = nullptr;
+        if (botAI->GetAiObjectContext())  // Maybe some day re-write to delate all pointer values.
+        {
+            target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
+        }
+
+        // Peiru: Allow bots to always instant logout to see if this resolves logout crashes
+        logout = true;
+
+        // if no instant logout, request normal logout
+        if (!logout)
+        {
+            if (bot->GetSession()->isLogingOut())
+                return;
+            else if (bot)
+            {
+                botAI->TellMaster("I'm logging out!");
+                WorldPackets::Character::LogoutRequest data = WorldPacket(CMSG_LOGOUT_REQUEST);
+                botWorldSessionPtr->HandleLogoutRequestOpcode(data);
+                if (!bot)
                 {
-                    for (uint32 quality = ITEM_QUALITY_POOR; quality <= ITEM_QUALITY_ARTIFACT; ++quality)
-                    {
-                        BotEquipKey key(level, class_, slot, quality);
+                    RemoveFromPlayerbotsMap(guid);
+                    delete botWorldSessionPtr;
+                    if (target)
+                        delete target;
+                }
+                return;
+            }
+            else
+            {
+                RemoveFromPlayerbotsMap(guid);     // deletes bot player ptr inside this WorldSession PlayerBotMap
+                delete botWorldSessionPtr;  // finally delete the bot's WorldSession
+                if (target)
+                    delete target;
+            }
+            return;
+        }  // if instant logout possible, do it
+        else if (bot && (logout || !botWorldSessionPtr->isLogingOut()))
+        {
+            botAI->TellMaster("Goodbye!");
+            RemoveFromPlayerbotsMap(guid);                  // deletes bot player ptr inside this WorldSession PlayerBotMap
+            botWorldSessionPtr->LogoutPlayer(true);  // this will delete the bot Player object and PlayerbotAI object
+            delete botWorldSessionPtr;               // finally delete the bot's WorldSession
+        }
+    }
+}
 
-                        RandomItemList items;
-                        for (auto const& itr : *itemTemplates)
-                        {
-                            ItemTemplate const* proto = &itr.second;
-                            if (!proto)
-                                continue;
+void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
+{
+    if (Player* bot = GetPlayerBot(guid))
+    {
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (!botAI)
+        {
+            return;
+        }
+        botAI->TellMaster("Goodbye!");
+        bot->StopMoving();
+        bot->GetMotionMaster()->Clear();
 
-                            if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR &&
-                                proto->Class != ITEM_CLASS_CONTAINER && proto->Class != ITEM_CLASS_PROJECTILE)
-                                continue;
+        Group* group = bot->GetGroup();
+        if (group && !bot->InBattleground() && !bot->InBattlegroundQueue() && botAI->HasActivePlayerMaster())
+        {
+            sPlayerbotDbStore->Save(botAI);
+        }
 
-                            if (!CanEquipItem(key, proto))
-                                continue;
+        LOG_DEBUG("playerbots", "Bot {} logged out", bot->GetName().c_str());
 
-                            if (proto->Class == ITEM_CLASS_ARMOR &&
-                                (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS ||
-                                 slot == EQUIPMENT_SLOT_CHEST || slot == EQUIPMENT_SLOT_WAIST ||
-                                 slot == EQUIPMENT_SLOT_LEGS || slot == EQUIPMENT_SLOT_FEET ||
-                                 slot == EQUIPMENT_SLOT_WRISTS || slot == EQUIPMENT_SLOT_HANDS) &&
-                                !CanEquipArmor(key.clazz, key.level, proto))
-                                continue;
+        bot->SaveToDB(false, false);
 
-                            if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(key.clazz, proto))
-                                continue;
+        if (botAI->GetAiObjectContext())  // Maybe some day re-write to delate all pointer values.
+        {
+            TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
+            if (target)
+                delete target;
+        }
 
-                            if (slot == EQUIPMENT_SLOT_OFFHAND && key.clazz == CLASS_ROGUE &&
-                                proto->Class != ITEM_CLASS_WEAPON)
-                                continue;
+        RemoveFromPlayerbotsMap(guid);  // deletes bot player ptr inside this WorldSession PlayerBotMap
 
-                            items.push_back(itr.first);
+        delete botAI;
+    }
+}
 
-                            PlayerbotsDatabasePreparedStatement* stmt =
-                                PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_EQUIP_CACHE);
-                            stmt->SetData(0, class_);
-                            stmt->SetData(1, level);
-                            stmt->SetData(2, slot);
-                            stmt->SetData(3, quality);
-                            stmt->SetData(4, proto->ItemId);
-                            PlayerbotsDatabase.Execute(stmt);
-                        }
+void PlayerbotHolder::RemoveFromPlayerbotsMap(ObjectGuid guid)
+{
+    playerBots.erase(guid);   
+}
 
-                        equipCache[key] = items;
+Player* PlayerbotHolder::GetPlayerBot(ObjectGuid playerGuid) const
+{
+    PlayerBotMap::const_iterator it = playerBots.find(playerGuid);
+    return (it == playerBots.end()) ? 0 : it->second;
+}
 
-                        LOG_DEBUG("playerbots",
-                                  "Equipment cache for class: {}, level {}, slot {}, quality {}: {} items", class_,
-                                  level, slot, quality, items.size());
-                    }
+Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
+{
+    ObjectGuid playerGuid = ObjectGuid::Create<HighGuid::Player>(lowGuid);
+    PlayerBotMap::const_iterator it = playerBots.find(playerGuid);
+    return (it == playerBots.end()) ? 0 : it->second;
+}
+
+void PlayerbotHolder::OnBotLogin(Player* const bot)
+{
+    // Prevent duplicate login
+    if (playerBots.find(bot->GetGUID()) != playerBots.end())
+    {
+        return;
+    }
+
+    sPlayerbotsMgr->AddPlayerbotData(bot, true);
+    playerBots[bot->GetGUID()] = bot;
+    
+    OnBotLoginInternal(bot);
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+    {
+        // Log a warning here to indicate that the botAI is null
+        LOG_DEBUG("mod-playerbots", "PlayerbotAI is null for bot with GUID: {}", bot->GetGUID().GetRawValue());
+        return;
+    }
+
+    Player* master = botAI->GetMaster();
+    if (!master)
+    {
+        // Log a warning to indicate that the master is null
+        LOG_DEBUG("mod-playerbots", "Master is null for bot with GUID: {}", bot->GetGUID().GetRawValue());
+        return;
+    }
+
+    Group* group = bot->GetGroup();
+    if (group)
+    {
+        bool groupValid = false;
+        Group::MemberSlotList const& slots = group->GetMemberSlots();
+        for (Group::MemberSlotList::const_iterator i = slots.begin(); i != slots.end(); ++i)
+        {
+            ObjectGuid member = i->guid;
+            if (master)
+            {
+                if (master->GetGUID() == member)
+                {
+                    groupValid = true;
+                    break;
+                }
+            }
+            else
+            {
+                uint32 account = sCharacterCache->GetCharacterAccountIdByGuid(member);
+                if (!sPlayerbotAIConfig->IsInRandomAccountList(account))
+                {
+                    groupValid = true;
+                    break;
                 }
             }
         }
 
-        LOG_INFO("server.loading", "Equipment cache saved to DB");
-    }
-}
-
-void RandomItemMgr::BuildEquipCacheNew()
-{
-    LOG_INFO("playerbots", "Loading equipments cache...");
-
-    std::unordered_set<uint32> questItemIds;
-    ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
-    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
-    {
-        uint32 questId = i->first;
-        Quest const* quest = i->second;
-
-        if (quest->IsRepeatable())
-            continue;
-
-        if (quest->GetQuestLevel() <= 0)
-            continue;
-
-        if (quest->GetRequiredClasses())
-            continue;
-
-        for (int j = 0; j < quest->GetRewChoiceItemsCount(); j++)
-            if (uint32 itemId = quest->RewardChoiceItemId[j])
-            {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
-                    continue;
-                int requiredLevel = std::max((int)proto->RequiredLevel, quest->GetQuestLevel());
-                equipCacheNew[requiredLevel][proto->InventoryType].push_back(itemId);
-                questItemIds.insert(itemId);
-            }
-
-        for (int j = 0; j < quest->GetRewItemsCount(); j++)
-            if (uint32 itemId = quest->RewardItemId[j])
-            {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
-                    continue;
-                int requiredLevel = std::max((int)proto->RequiredLevel, quest->GetQuestLevel());
-                equipCacheNew[requiredLevel][proto->InventoryType].push_back(itemId);
-                questItemIds.insert(itemId);
-            }
-    }
-
-    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-    for (auto const& itr : *itemTemplates)
-    {
-        ItemTemplate const* proto = &itr.second;
-        if (!proto)
-            continue;
-        uint32 itemId = proto->ItemId;
-
-        if (questItemIds.find(itemId) != questItemIds.end())
-            continue;
-
-        if (IsTestItem(itemId))
+        if (!groupValid)
         {
-            continue;
+            bot->RemoveFromGroup();
         }
-        if (itemId == 22784)
-        {  // Sunwell Orb
-            continue;
-        }
-        equipCacheNew[proto->RequiredLevel][proto->InventoryType].push_back(itemId);
     }
-}
 
-RandomItemList RandomItemMgr::Query(uint32 level, uint8 clazz, uint8 slot, uint32 quality)
-{
-    // return equipCache[key];
-    BotEquipKey key(level, clazz, slot, quality);
-    RandomItemList items;
-    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-    for (auto const& itr : *itemTemplates)
+    group = bot->GetGroup();
+    if (group)
     {
-        ItemTemplate const* proto = &itr.second;
-        if (!proto)
-            continue;
-
-        if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR &&
-            proto->Class != ITEM_CLASS_CONTAINER && proto->Class != ITEM_CLASS_PROJECTILE)
-            continue;
-
-        if (!CanEquipItem(key, proto))
-            continue;
-
-        if (proto->Class == ITEM_CLASS_ARMOR &&
-            (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS || slot == EQUIPMENT_SLOT_CHEST ||
-             slot == EQUIPMENT_SLOT_WAIST || slot == EQUIPMENT_SLOT_LEGS || slot == EQUIPMENT_SLOT_FEET ||
-             slot == EQUIPMENT_SLOT_WRISTS || slot == EQUIPMENT_SLOT_HANDS) &&
-            !CanEquipArmor(key.clazz, key.level, proto))
-            continue;
-
-        if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(key.clazz, proto))
-            continue;
-
-        if (slot == EQUIPMENT_SLOT_OFFHAND && key.clazz == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
-            continue;
-
-        items.push_back(itr.first);
+        botAI->ResetStrategies();
     }
-    return items;
-}
-
-void RandomItemMgr::BuildAmmoCache()
-{
-    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-    LOG_INFO("server.loading", "Building ammo cache for {} levels", maxLevel);
-
-    uint32 counter = 0;
-    for (uint32 level = 1; level <= maxLevel; level += 1)
+    else
     {
-        for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_BULLET; subClass++)
+        botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
+    }
+    sPlayerbotDbStore->Load(botAI);
+
+    if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))
+    {
+        bot->GetMotionMaster()->MovementExpired();
+        bot->CleanupAfterTaxiFlight();
+    }
+
+    // check activity
+    botAI->AllowActivity(ALL_ACTIVITY, true);
+
+    // set delay on login
+    botAI->SetNextCheckDelay(urand(2000, 4000));
+
+    botAI->TellMaster("Hello!", PLAYERBOT_SECURITY_TALK);
+
+    if (master && master->GetGroup() && !group)
+    {
+        Group* mgroup = master->GetGroup();
+        if (mgroup->GetMembersCount() >= 5)
         {
-            QueryResult results = WorldDatabase.Query(
-                "SELECT entry FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} AND duration = 0 "
-                "AND (Flags & 16) = 0 AND dmg_min1 != 0 AND RequiredLevel != 0  "
-                "ORDER BY stackable DESC, ItemLevel DESC",
-                ITEM_CLASS_PROJECTILE, subClass, level);
-            if (!results)
+            if (!mgroup->isRaidGroup() && !mgroup->isLFGGroup() && !mgroup->isBGGroup() && !mgroup->isBFGroup())
+            {
+                mgroup->ConvertToRaid();
+            }
+            if (mgroup->isRaidGroup())
+            {
+                mgroup->AddMember(bot);
+            }
+        }
+        else
+        {
+            mgroup->AddMember(bot);
+        }
+    }
+    else if (master && !group)
+    {
+        Group* newGroup = new Group();
+        newGroup->Create(master);
+        sGroupMgr->AddGroup(newGroup);
+        newGroup->AddMember(bot);
+    }
+    // if (master)
+    // {
+    //     // bot->TeleportTo(master);
+    // }
+    uint32 accountId = bot->GetSession()->GetAccountId();
+    bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
+
+    if (isRandomAccount && sPlayerbotAIConfig->randomBotFixedLevel)
+    {
+        bot->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    }
+    else if (isRandomAccount && !sPlayerbotAIConfig->randomBotFixedLevel)
+    {
+        bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    }
+
+    bot->SaveToDB(false, false);
+    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(bot->GetGUID().GetCounter());
+    if (addClassBot && master && isRandomAccount && master->GetLevel() < bot->GetLevel())
+    {
+        // PlayerbotFactory factory(bot, master->GetLevel());
+        // factory.Randomize(false);
+        uint32 mixedGearScore =
+            PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+        PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+        factory.Randomize(false);
+    }
+
+    // bots join World chat if not solo oriented
+    if (bot->GetLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) &&
+        GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
+    {
+        // TODO make action/config
+        // Make the bot join the world channel for chat
+        WorldPacket pkt(CMSG_JOIN_CHANNEL);
+        pkt << uint32(0) << uint8(0) << uint8(0);
+        pkt << std::string("World");
+        pkt << "";  // Pass
+        bot->GetSession()->HandleJoinChannel(pkt);
+    }
+
+    // join standard channels
+    uint8 locale = BroadcastHelper::GetLocale();
+    AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
+    ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+    std::string current_zone_name = current_zone ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_zone) : "";
+
+    if (current_zone && cMgr)
+    {
+        for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
+        {
+            ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
+            if (!channel)
                 continue;
+
+            Channel* new_channel = nullptr;
+            switch (channel->ChannelID)
+            {
+                case ChatChannelId::GENERAL:
+                case ChatChannelId::LOCAL_DEFENSE:
+                {
+                    char new_channel_name_buf[100];
+                    snprintf(new_channel_name_buf, 100, channel->pattern[locale], current_zone_name.c_str());
+                    new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+                    break;
+                }
+                case ChatChannelId::TRADE:
+                case ChatChannelId::GUILD_RECRUITMENT:
+                {
+                    char new_channel_name_buf[100];
+                    //3459 is ID for a zone named "City" (only exists for the sake of using its name)
+                    //Currently in magons TBC, if you switch zones, then you join "Trade - <zone>" and "GuildRecruitment - <zone>"
+                    //which is a core bug, should be "Trade - City" and "GuildRecruitment - City" in both 1.12 and TBC
+                    //but if you (actual player) logout in a city and log back in - you join "City" versions
+                    snprintf(new_channel_name_buf, 100, channel->pattern[locale], GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(GetAreaEntryByAreaID(3459)).c_str());
+                    new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+                    break;
+                }
+                case ChatChannelId::LOOKING_FOR_GROUP:
+                case ChatChannelId::WORLD_DEFENSE:
+                {
+                    new_channel = cMgr->GetJoinChannel(channel->pattern[locale], channel->ChannelID);
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            if (new_channel)
+                new_channel->JoinChannel(bot, "");
+        }
+    }
+}
+
+std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid,
+                                                     bool admin, uint32 masterAccountId, uint32 masterGuildId)
+{
+    if (!sPlayerbotAIConfig->enabled || guid.IsEmpty())
+        return "bot system is disabled";
+
+    uint32 botAccount = sCharacterCache->GetCharacterAccountIdByGuid(guid);
+    bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(guid.GetCounter());
+    bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(botAccount);
+    bool isMasterAccount = (masterAccountId == botAccount);
+
+    if (cmd == "add" || cmd == "addaccount" || cmd == "login")
+    {
+        if (ObjectAccessor::FindPlayer(guid))
+            return "player already logged in";
+
+        // For addaccount command, verify it's an account name
+        if (cmd == "addaccount")
+        {
+            uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
+            if (!accountId)
+                return "character not found";
+
+            if (!sPlayerbotAIConfig->allowAccountBots && accountId != masterAccountId)
+                return "you can only add bots from your own account";
+        }
+
+        AddPlayerBot(guid, masterAccountId);
+        return "ok";
+    }
+    else if (cmd == "remove" || cmd == "logout" || cmd == "rm")
+    {
+        if (!ObjectAccessor::FindPlayer(guid))
+            return "player is offline";
+
+        if (!GetPlayerBot(guid))
+            return "not your bot";
+
+        LogoutPlayerBot(guid);
+        return "ok";
+    }
+
+    // if (admin)
+    // {
+    Player* bot = GetPlayerBot(guid);
+    if (!bot)
+        bot = sRandomPlayerbotMgr->GetPlayerBot(guid);
+
+    if (!bot)
+        return "bot not found";
+    
+    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(guid.GetCounter());
+
+    if (!addClassBot)
+        return "ERROR: You can not use this command on non-addclass bot.";
+    
+    if (!admin)
+    {
+        Player* master = ObjectAccessor::FindConnectedPlayer(masterguid);
+        if (master && (master->IsInCombat() || bot->IsInCombat()))
+        {
+            return "ERROR: You can not use this command during combat.";
+        }
+    }
+
+    if (GET_PLAYERBOT_AI(bot))
+    {
+        if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
+        {
+            if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig->autoInitOnly &&
+                cmd != "init=auto")
+            {
+                return "The command is not allowed, use init=auto instead.";
+            }
+            int gs;
+            if (cmd == "init=white" || cmd == "init=common")
+            {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_NORMAL);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=green" || cmd == "init=uncommon")
+            {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_UNCOMMON);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=blue" || cmd == "init=rare")
+            {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_RARE);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=epic" || cmd == "init=purple")
+            {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=legendary" || cmd == "init=yellow")
+            {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY);
+                factory.Randomize(false);
+                return "ok";
+            }
+            else if (cmd == "init=auto")
+            {
+                uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) *
+                                        sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+                factory.Randomize(false);
+                return "ok, gear score limit: " + std::to_string(mixedGearScore / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) +
+                       "(for epic)";
+            }
+            else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
+            {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                factory.Randomize(false);
+                return "ok, gear score limit: " + std::to_string(gs / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) + "(for epic)";
+            }
+        }
+
+        if (cmd == "refresh=raid")
+        {  // TODO: This function is not perfect yet. If you are already in a raid,
+            // after the command is executed, the AI ​​needs to go back online or exit the raid and re-enter.
+            PlayerbotFactory factory(bot, bot->GetLevel());
+            factory.UnbindInstance();
+            return "ok";
+        }
+    }
+
+    if (cmd == "levelup" || cmd == "level")
+    {
+        PlayerbotFactory factory(bot, bot->GetLevel());
+        factory.Randomize(true);
+        return "ok";
+    }
+    else if (cmd == "refresh")
+    {
+        PlayerbotFactory factory(bot, bot->GetLevel());
+        factory.Refresh();
+        return "ok";
+    }
+    else if (cmd == "random")
+    {
+        sRandomPlayerbotMgr->Randomize(bot);
+        return "ok";
+    }
+    else if (cmd == "quests")
+    {
+        PlayerbotFactory factory(bot, bot->GetLevel());
+        factory.InitInstanceQuests();
+        return "Initialization quests";
+    }
+    // }
+
+    return "unknown command";
+}
+
+bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* args)
+{
+    if (!sPlayerbotAIConfig->enabled)
+    {
+        handler->PSendSysMessage("|cffff0000Playerbot system is currently disabled!");
+        return false;
+    }
+
+    WorldSession* m_session = handler->GetSession();
+    if (!m_session)
+    {
+        handler->PSendSysMessage("You may only add bots from an active session");
+        return false;
+    }
+
+    Player* player = m_session->GetPlayer();
+    PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(player);
+    if (!mgr)
+    {
+        handler->PSendSysMessage("You cannot control bots yet");
+        return false;
+    }
+
+    std::vector<std::string> messages = mgr->HandlePlayerbotCommand(args, player);
+    if (messages.empty())
+        return true;
+
+    for (std::vector<std::string>::iterator i = messages.begin(); i != messages.end(); ++i)
+    {
+        handler->PSendSysMessage("{}", i->c_str());
+    }
+
+    return true;
+}
+
+std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* master)
+{
+    std::vector<std::string> messages;
+
+    if (!*args)
+    {
+        messages.push_back("usage: list/reload/tweak/self or add/addaccount/init/remove PLAYERNAME\n");
+        messages.push_back("usage: addclass CLASSNAME");
+        return messages;
+    }
+
+    char* cmd = strtok((char*)args, " ");
+    char* charname = strtok(nullptr, " ");
+    if (!cmd)
+    {
+        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME");
+        return messages;
+    }
+
+    if (!strcmp(cmd, "initself"))
+    {
+        if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        {
+            // OnBotLogin(master);
+            PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
+            factory.Randomize(false);
+            messages.push_back("initself ok");
+            return messages;
+        }
+        else
+        {
+            messages.push_back("ERROR: Only GM can use this command.");
+            return messages;
+        }
+    }
+
+    if (!strncmp(cmd, "initself=", 9))
+    {
+        if (!strcmp(cmd, "initself=uncommon"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_UNCOMMON);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        if (!strcmp(cmd, "initself=rare"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_RARE);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        if (!strcmp(cmd, "initself=epic"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        if (!strcmp(cmd, "initself=legendary"))
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_LEGENDARY);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        int32 gs;
+        if (sscanf(cmd, "initself=%d", &gs) != -1)
+        {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->GetLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                factory.Randomize(false);
+                messages.push_back("initself ok, gs = " + std::to_string(gs));
+                return messages;
+            }
+            else
+            {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+    }
+
+    if (!strcmp(cmd, "list"))
+    {
+        messages.push_back(ListBots(master));
+        return messages;
+    }
+
+    if (!strcmp(cmd, "reload"))
+    {
+        if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        {
+            sPlayerbotAIConfig->Initialize();
+            messages.push_back("Config reloaded.");
+            return messages;
+        }
+        else
+        {
+            messages.push_back("ERROR: Only GM can use this command.");
+            return messages;
+        }
+    }
+
+    if (!strcmp(cmd, "tweak"))
+    {
+        sPlayerbotAIConfig->tweakValue = sPlayerbotAIConfig->tweakValue++;
+        if (sPlayerbotAIConfig->tweakValue > 2)
+            sPlayerbotAIConfig->tweakValue = 0;
+
+        messages.push_back("Set tweakvalue to " + std::to_string(sPlayerbotAIConfig->tweakValue));
+        return messages;
+    }
+
+    if (!strcmp(cmd, "self"))
+    {
+        if (GET_PLAYERBOT_AI(master))
+        {
+            messages.push_back("Disable player botAI");
+            delete GET_PLAYERBOT_AI(master);
+        }
+        else if (sPlayerbotAIConfig->selfBotLevel == 0)
+            messages.push_back("Self-bot is disabled");
+        else if (sPlayerbotAIConfig->selfBotLevel == 1 && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+            messages.push_back("You do not have permission to enable player botAI");
+        else
+        {
+            messages.push_back("Enable player botAI");
+            sPlayerbotsMgr->AddPlayerbotData(master, true);
+            GET_PLAYERBOT_AI(master)->SetMaster(master);
+        }
+
+        return messages;
+    }
+
+    if (!strcmp(cmd, "lookup"))
+    {
+        messages.push_back(LookupBots(master));
+        return messages;
+    }
+
+    if (!strcmp(cmd, "addclass"))
+    {
+        if (sPlayerbotAIConfig->addClassCommand == 0 && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        {
+            messages.push_back("You do not have permission to create bot by addclass command");
+            return messages;
+        }
+        if (!charname)
+        {
+            messages.push_back(
+                "addclass: invalid CLASSNAME(warrior/paladin/hunter/rogue/priest/shaman/mage/warlock/druid/dk)");
+            return messages;
+        }
+        uint8 claz;
+        if (!strcmp(charname, "warrior"))
+        {
+            claz = 1;
+        }
+        else if (!strcmp(charname, "paladin"))
+        {
+            claz = 2;
+        }
+        else if (!strcmp(charname, "hunter"))
+        {
+            claz = 3;
+        }
+        else if (!strcmp(charname, "rogue"))
+        {
+            claz = 4;
+        }
+        else if (!strcmp(charname, "priest"))
+        {
+            claz = 5;
+        }
+        else if (!strcmp(charname, "shaman"))
+        {
+            claz = 7;
+        }
+        else if (!strcmp(charname, "mage"))
+        {
+            claz = 8;
+        }
+        else if (!strcmp(charname, "warlock"))
+        {
+            claz = 9;
+        }
+        else if (!strcmp(charname, "druid"))
+        {
+            claz = 11;
+        }
+        else if (!strcmp(charname, "dk"))
+        {
+            claz = 6;
+        }
+        else
+        {
+            messages.push_back("Error: Invalid Class. Try again.");
+            return messages;
+        }
+        uint8 teamId = master->GetTeamId(true);
+        const std::unordered_set<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
+        for (const ObjectGuid &guid: guidCache)
+        {
+            if (botLoading.find(guid) != botLoading.end())
+                continue;
+            if (ObjectAccessor::FindConnectedPlayer(guid))
+                continue;
+            uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(guid);
+            if (guildId && PlayerbotAI::IsRealGuild(guildId))
+                continue;
+            AddPlayerBot(guid, master->GetSession()->GetAccountId());
+            messages.push_back("Add class " + std::string(charname));
+            return messages;
+        }
+        messages.push_back("Add class failed, no available characters!");
+        return messages;
+    }
+
+    std::string charnameStr;
+
+    if (!charname)
+    {
+        std::string name;
+        bool isPlayer = sCharacterCache->GetCharacterNameByGuid(master->GetTarget(), name);
+        // Player* tPlayer = ObjectAccessor::FindConnectedPlayer(master->GetTarget());
+        if (isPlayer)
+        {
+            charnameStr = name;
+        }
+        else
+        {
+            messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME");
+            return messages;
+        }
+    }
+    else
+    {
+        charnameStr = charname;
+    }
+
+    std::string const cmdStr = cmd;
+
+    std::unordered_set<std::string> bots;
+    if (charnameStr == "*" && master)
+    {
+        Group* group = master->GetGroup();
+        if (!group)
+        {
+            messages.push_back("you must be in group");
+            return messages;
+        }
+
+        Group::MemberSlotList slots = group->GetMemberSlots();
+        for (Group::member_citerator i = slots.begin(); i != slots.end(); i++)
+        {
+            ObjectGuid member = i->guid;
+
+            if (member == master->GetGUID())
+                continue;
+
+            std::string bot;
+            if (sCharacterCache->GetCharacterNameByGuid(member, bot))
+                bots.insert(bot);
+        }
+    }
+
+    if (charnameStr == "!" && master && master->GetSession()->GetSecurity() > SEC_GAMEMASTER)
+    {
+        for (PlayerBotMap::const_iterator i = GetPlayerBotsBegin(); i != GetPlayerBotsEnd(); ++i)
+        {
+            if (Player* bot = i->second)
+                if (bot->IsInWorld())
+                    bots.insert(bot->GetName());
+        }
+    }
+
+    std::vector<std::string> chars = split(charnameStr, ',');
+    for (std::vector<std::string>::iterator i = chars.begin(); i != chars.end(); i++)
+    {
+        std::string const s = *i;
+
+        if (!strcmp(cmd, "addaccount"))
+        {
+            // When using addaccount, first try to get account ID directly
+            uint32 accountId = GetAccountId(s);
+            if (!accountId)
+            {
+                // If not found, try to get account ID from character name
+                ObjectGuid charGuid = sCharacterCache->GetCharacterGuidByName(s);
+                if (!charGuid)
+                {
+                    messages.push_back("Neither account nor character '" + s + "' found");
+                    continue;
+                }
+                accountId = sCharacterCache->GetCharacterAccountIdByGuid(charGuid);
+                if (!accountId)
+                {
+                    messages.push_back("Could not find account for character '" + s + "'");
+                    continue;
+                }
+            }
+
+            QueryResult results = CharacterDatabase.Query("SELECT name FROM characters WHERE account = {}", accountId);
+            if (results)
+            {
+                do
+                {
+                    Field* fields = results->Fetch();
+                    std::string const charName = fields[0].Get<std::string>();
+                    bots.insert(charName);
+                } while (results->NextRow());
+            }
+        }
+        else
+        {
+            // For regular add command, only add the specific character
+            ObjectGuid charGuid = sCharacterCache->GetCharacterGuidByName(s);
+            if (!charGuid)
+            {
+                messages.push_back("Character '" + s + "' not found");
+                continue;
+            }
+            bots.insert(s);
+        }
+    }
+
+    for (auto i = bots.begin(); i != bots.end(); ++i)
+    {
+        std::string const bot = *i;
+
+        std::ostringstream out;
+        out << cmdStr << ": " << bot << " - ";
+
+        ObjectGuid member = sCharacterCache->GetCharacterGuidByName(bot);
+        if (!member)
+        {
+            out << "character not found";
+        }
+        else if (master && member != master->GetGUID())
+        {
+            out << ProcessBotCommand(cmdStr, member, master->GetGUID(),
+                                     master->GetSession()->GetSecurity() >= SEC_GAMEMASTER,
+                                     master->GetSession()->GetAccountId(), master->GetGuildId());
+        }
+        else if (!master)
+        {
+            out << ProcessBotCommand(cmdStr, member, ObjectGuid::Empty, true, -1, -1);
+        }
+
+        messages.push_back(out.str());
+    }
+
+    return messages;
+}
+
+uint32 PlayerbotHolder::GetAccountId(std::string const name) { return AccountMgr::GetId(name); }
+
+uint32 PlayerbotHolder::GetAccountId(ObjectGuid guid)
+{
+    if (!guid.IsPlayer())
+        return 0;
+
+    // prevent DB access for online player
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
+        return player->GetSession()->GetAccountId();
+
+    ObjectGuid::LowType lowguid = guid.GetCounter();
+
+    if (QueryResult result = CharacterDatabase.Query("SELECT account FROM characters WHERE guid = {}", lowguid))
+    {
+        uint32 acc = (*result)[0].Get<uint32>();
+        return acc;
+    }
+
+    return 0;
+}
+
+std::string const PlayerbotHolder::ListBots(Player* master)
+{
+    std::set<std::string> bots;
+    std::map<uint8, std::string> classNames;
+
+    classNames[CLASS_DEATH_KNIGHT] = "Death Knight";
+    classNames[CLASS_DRUID] = "Druid";
+    classNames[CLASS_HUNTER] = "Hunter";
+    classNames[CLASS_MAGE] = "Mage";
+    classNames[CLASS_PALADIN] = "Paladin";
+    classNames[CLASS_PRIEST] = "Priest";
+    classNames[CLASS_ROGUE] = "Rogue";
+    classNames[CLASS_SHAMAN] = "Shaman";
+    classNames[CLASS_WARLOCK] = "Warlock";
+    classNames[CLASS_WARRIOR] = "Warrior";
+    classNames[CLASS_DEATH_KNIGHT] = "DeathKnight";
+
+    std::map<std::string, std::string> online;
+    std::vector<std::string> names;
+    std::map<std::string, std::string> classes;
+
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        std::string const name = bot->GetName();
+        bots.insert(name);
+
+        names.push_back(name);
+        online[name] = "+";
+        classes[name] = classNames[bot->getClass()];
+    }
+
+    if (master)
+    {
+        QueryResult results = CharacterDatabase.Query("SELECT class, name FROM characters WHERE account = {}",
+                                                      master->GetSession()->GetAccountId());
+        if (results)
+        {
             do
             {
                 Field* fields = results->Fetch();
-                uint32 entry = fields[0].Get<uint32>();
-                ammoCache[level][subClass].push_back(entry);
-                ++counter;
+                uint8 cls = fields[0].Get<uint8>();
+                std::string const name = fields[1].Get<std::string>();
+                if (bots.find(name) == bots.end() && name != master->GetSession()->GetPlayerName())
+                {
+                    names.push_back(name);
+                    online[name] = "-";
+                    classes[name] = classNames[cls];
+                }
             } while (results->NextRow());
         }
     }
 
-    LOG_INFO("server.loading", "Cached {} ammo", counter);  // TEST
-}
+    std::sort(names.begin(), names.end());
 
-std::vector<uint32> RandomItemMgr::GetAmmo(uint32 level, uint32 subClass) { return ammoCache[level][subClass]; }
-
-void RandomItemMgr::BuildPotionCache()
-{
-    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-    LOG_INFO("playerbots", "Building potion cache for {} levels", maxLevel);
-
-    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-
-    uint32 counter = 0;
-    for (uint32 level = 1; level <= maxLevel; level++)
+    if (Group* group = master->GetGroup())
     {
-        uint32 effects[] = {SPELL_EFFECT_HEAL, SPELL_EFFECT_ENERGIZE};
-        for (uint8 i = 0; i < 2; ++i)
+        Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
+        for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
-            uint32 effect = effects[i];
-
-            for (auto const& itr : *itemTemplates)
+            Player* member = ObjectAccessor::FindPlayer(itr->guid);
+            if (member && sRandomPlayerbotMgr->IsRandomBot(member))
             {
-                ItemTemplate const* proto = &itr.second;
-                if (!proto)
-                    continue;
+                std::string const name = member->GetName();
 
-                if (proto->Class != ITEM_CLASS_CONSUMABLE ||
-                    (proto->SubClass != ITEM_SUBCLASS_POTION && proto->SubClass != ITEM_SUBCLASS_FLASK) ||
-                    proto->Bonding != NO_BIND)
-                    continue;
-                
-                uint32 requiredLevel = proto->RequiredLevel;
-                if (requiredLevel > level || (level > 15 && requiredLevel < level - 15))
-                    continue;
-
-                if (proto->RequiredSkill)
-                    continue;
-
-                if (proto->Area || proto->Map || proto->RequiredCityRank || proto->RequiredHonorRank)
-                    continue;
-
-                if (proto->Duration & 0x80000000)
-                    continue;
-
-                
-                if (proto->AllowableClass != -1)
-                    continue;
-                
-                bool hybrid = false;
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[0].SpellId);
-                if (!spellInfo)
-                    continue;
-                // do not accept hybrid potion
-                for (uint8 i = 1; i < 3; i++)
-                {
-                    if (spellInfo->Effects[i].Effect != 0)
-                    {
-                        hybrid = true;
-                        break;
-                    }
-                }
-                if (hybrid)
-                    continue;
-
-                if (spellInfo->Effects[0].Effect == effect)
-                    potionCache[level][effect].push_back(itr.first);
+                names.push_back(name);
+                online[name] = "+";
+                classes[name] = classNames[member->getClass()];
             }
         }
     }
 
-    for (uint32 level = 1; level <= maxLevel; level++)
+    std::ostringstream out;
+    bool first = true;
+    out << "Bot roster: ";
+    for (std::vector<std::string>::iterator i = names.begin(); i != names.end(); ++i)
     {
-        uint32 effects[] = {SPELL_EFFECT_HEAL, SPELL_EFFECT_ENERGIZE};
-        for (uint8 i = 0; i < 2; ++i)
-        {
-            uint32 effect = effects[i];
-            uint32 size = potionCache[level][effect].size();
-            counter += size;
-        }
-    }
-
-    LOG_INFO("playerbots", "Cached {} potions", counter);
-}
-
-void RandomItemMgr::BuildFoodCache()
-{
-    uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-    if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-    LOG_INFO("server.loading", "Building food cache for {} levels", maxLevel);
-
-    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-
-    uint32 counter = 0;
-    for (uint32 level = 1; level <= maxLevel + 1; level += 10)
-    {
-        uint32 categories[] = {11, 59};
-        for (int i = 0; i < 2; ++i)
-        {
-            uint32 category = categories[i];
-
-            for (auto const& itr : *itemTemplates)
-            {
-                ItemTemplate const* proto = &itr.second;
-                if (!proto)
-                    continue;
-
-                if (proto->Class != ITEM_CLASS_CONSUMABLE ||
-                    (proto->SubClass != ITEM_SUBCLASS_FOOD && proto->SubClass != ITEM_SUBCLASS_CONSUMABLE) ||
-                    (proto->Spells[0].SpellCategory != category) || proto->Bonding != NO_BIND)
-                    continue;
-
-                if (proto->RequiredLevel && (proto->RequiredLevel > level || proto->RequiredLevel < level - 10))
-                    continue;
-
-                if (proto->RequiredSkill)
-                    continue;
-
-                if (proto->Area || proto->Map || proto->RequiredCityRank || proto->RequiredHonorRank)
-                    continue;
-
-                if (proto->Duration & 0x80000000)
-                    continue;
-
-                foodCache[level / 10][category].push_back(itr.first);
-            }
-        }
-    }
-
-    for (uint32 level = 1; level <= maxLevel + 1; level += 10)
-    {
-        uint32 categories[] = {11, 59};
-        for (uint8 i = 0; i < 2; ++i)
-        {
-            uint32 category = categories[i];
-            uint32 size = foodCache[level / 10][category].size();
-            ++counter;
-            LOG_DEBUG("server.loading", "Food cache for level={}, category={}: {} items", level, category, size);
-        }
-    }
-
-    LOG_INFO("server.loading", "Cached {} types of food", counter);
-}
-
-uint32 RandomItemMgr::GetRandomPotion(uint32 level, uint32 effect)
-{
-    const std::vector<uint32> &potions = potionCache[level][effect];
-    if (potions.empty())
-        return 0;
-
-    return potions[urand(0, potions.size() - 1)];
-}
-
-uint32 RandomItemMgr::GetFood(uint32 level, uint32 category)
-{
-    std::initializer_list<uint32> items;
-    std::vector<uint32> food;
-    if (category == 11)
-    {
-        if (level < 5)
-            items = {787, 117, 4540, 2680};
-        else if (level < 15)
-            items = {2287, 4592, 4541, 21072};
-        else if (level < 25)
-            items = {3770, 16170, 4542, 20074};
-        else if (level < 35)
-            items = {4594, 3771, 1707, 4457};
-        else if (level < 45)
-            items = {4599, 4601, 21552, 17222 /*21030, 16168 */};
-        else if (level < 55)
-            items = {8950, 8952, 8957, 21023 /*21033, 21031 */};
-        else if (level < 65)
-            items = {29292, 27859, 30458, 27662};
-        else if (level < 75)
-            items = {29450, 29451, 29452};
+        if (first)
+            first = false;
         else
-            items = {35947};
+            out << ", ";
+
+        std::string const name = *i;
+        out << online[name] << name << " " << classes[name];
     }
 
-    if (category == 59)
+    return out.str();
+}
+
+std::string const PlayerbotHolder::LookupBots(Player* master)
+{
+    std::list<std::string> messages;
+    messages.push_back("Classes Available:");
+    messages.push_back("|TInterface\\icons\\INV_Sword_27.png:25:25:0:-1|t Warrior");
+    messages.push_back("|TInterface\\icons\\INV_Hammer_01.png:25:25:0:-1|t Paladin");
+    messages.push_back("|TInterface\\icons\\INV_Weapon_Bow_07.png:25:25:0:-1|t Hunter");
+    messages.push_back("|TInterface\\icons\\INV_ThrowingKnife_04.png:25:25:0:-1|t Rogue");
+    messages.push_back("|TInterface\\icons\\INV_Staff_30.png:25:25:0:-1|t Priest");
+    messages.push_back("|TInterface\\icons\\inv_jewelry_talisman_04.png:25:25:0:-1|t Shaman");
+    messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Mage");
+    messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Warlock");
+    messages.push_back("|TInterface\\icons\\Ability_Druid_Maul.png:25:25:0:-1|t Druid");
+    messages.push_back("DK");
+    messages.push_back("(Usage: .bot lookup CLASS)");
+    std::string ret_msg;
+    for (std::string msg : messages)
     {
-        if (level < 5)
-            items = {159, 117};
-        else if (level < 15)
-            items = {1179, 21072};
-        else if (level < 25)
-            items = {1205};
-        else if (level < 35)
-            items = {1708};
-        else if (level < 45)
-            items = {1645};
-        else if (level < 55)
-            items = {8766};
-        else if (level < 65)
-            items = {28399};
-        else if (level < 75)
-            items = {27860};
-        else
-            items = {33445};
+        ret_msg += msg + "\n";
     }
-
-    food.insert(food.end(), items);
-    if (food.empty())
-        return 0;
-    return food[urand(0, food.size() - 1)];
+    return ret_msg;
 }
 
-uint32 RandomItemMgr::GetRandomFood(uint32 level, uint32 category)
+uint32 PlayerbotHolder::GetPlayerbotsCountByClass(uint32 cls)
 {
-    std::vector<uint32> food = foodCache[(level - 1) / 10][category];
-    if (food.empty())
-        return 0;
-
-    return food[urand(0, food.size() - 1)];
-}
-
-void RandomItemMgr::BuildTradeCache()
-{
-    uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
-    if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-    LOG_INFO("server.loading", "Building trade cache for {} levels", maxLevel);
-
-    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-
-    uint32 counter = 0;
-    for (uint32 level = 1; level <= maxLevel + 1; level += 10)
+    uint32 count = 0;
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
-        for (auto const& itr : *itemTemplates)
+        Player* const bot = it->second;
+        if (bot && bot->IsInWorld() && bot->getClass() == cls)
         {
-            ItemTemplate const* proto = &itr.second;
-            if (!proto)
-                continue;
-
-            if (proto->Class != ITEM_CLASS_TRADE_GOODS || proto->Bonding != NO_BIND)
-                continue;
-
-            if (proto->ItemLevel < level)
-                continue;
-
-            if (proto->RequiredLevel && (proto->RequiredLevel > level || proto->RequiredLevel < level - 10))
-                continue;
-
-            if (proto->RequiredSkill)
-                continue;
-
-            tradeCache[level / 10].push_back(itr.first);
+            count++;
         }
     }
+    return count;
+}
 
-    for (uint32 level = 1; level <= maxLevel + 1; level += 10)
+PlayerbotMgr::PlayerbotMgr(Player* const master) : PlayerbotHolder(), master(master), lastErrorTell(0) {}
+
+PlayerbotMgr::~PlayerbotMgr()
+{
+    if (master)
+        sPlayerbotsMgr->RemovePlayerBotData(master->GetGUID(), false);
+}
+
+void PlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
+{
+    SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+    CheckTellErrors(elapsed);
+}
+
+void PlayerbotMgr::HandleCommand(uint32 type, std::string const text)
+{
+    Player* master = GetMaster();
+    if (!master)
+        return;
+
+    if (text.find(sPlayerbotAIConfig->commandSeparator) != std::string::npos)
     {
-        uint32 size = tradeCache[level / 10].size();
-        LOG_DEBUG("server.loading", "Trade cache for level={}: {} items", level, size);
-        ++counter;
+        std::vector<std::string> commands;
+        split(commands, text, sPlayerbotAIConfig->commandSeparator.c_str());
+        for (std::vector<std::string>::iterator i = commands.begin(); i != commands.end(); ++i)
+        {
+            HandleCommand(type, *i);
+        }
+
+        return;
     }
 
-    LOG_INFO("server.loading", "Cached {} trade items", counter);  // TEST
-}
-
-uint32 RandomItemMgr::GetRandomTrade(uint32 level)
-{
-    std::vector<uint32> trade = tradeCache[(level - 1) / 10];
-    if (trade.empty())
-        return 0;
-
-    return trade[urand(0, trade.size() - 1)];
-}
-
-void RandomItemMgr::BuildRarityCache()
-{
-    if (PreparedQueryResult result =
-            PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RARITY_CACHE)))
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
-        LOG_INFO("playerbots", "Loading item rarity cache");
+        Player* const bot = it->second;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+            botAI->HandleCommand(type, text, master);
+    }
 
-        uint32 count = 0;
+    for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin();
+         it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI && botAI->GetMaster() == master)
+            botAI->HandleCommand(type, text, master);
+    }
+}
+
+void PlayerbotMgr::HandleMasterIncomingPacket(WorldPacket const& packet)
+{
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        if (!bot)
+            continue;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+            botAI->HandleMasterIncomingPacket(packet);
+    }
+
+    for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin();
+         it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI && botAI->GetMaster() == GetMaster())
+            botAI->HandleMasterIncomingPacket(packet);
+    }
+
+    switch (packet.GetOpcode())
+    {
+        // if master is logging out, log out all bots
+        case CMSG_LOGOUT_REQUEST:
+        {
+            LogoutAllBots();
+            break;
+        }
+        // if master cancelled logout, cancel too
+        case CMSG_LOGOUT_CANCEL:
+        {
+            CancelLogout();
+            break;
+        }
+    }
+}
+
+void PlayerbotMgr::HandleMasterOutgoingPacket(WorldPacket const& packet)
+{
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+            botAI->HandleMasterOutgoingPacket(packet);
+    }
+
+    for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin();
+         it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI && botAI->GetMaster() == GetMaster())
+            botAI->HandleMasterOutgoingPacket(packet);
+    }
+}
+
+void PlayerbotMgr::SaveToDB()
+{
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        bot->SaveToDB(false, false);
+    }
+
+    for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr->GetPlayerBotsBegin();
+         it != sRandomPlayerbotMgr->GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        if (GET_PLAYERBOT_AI(bot) && GET_PLAYERBOT_AI(bot)->GetMaster() == GetMaster())
+            bot->SaveToDB(false, false);
+    }
+}
+
+void PlayerbotMgr::OnBotLoginInternal(Player* const bot)
+{
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+    {
+        return;
+    }
+    botAI->SetMaster(master);
+    botAI->ResetStrategies();
+
+    LOG_INFO("playerbots", "Bot {} logged in", bot->GetName().c_str());
+}
+
+void PlayerbotMgr::OnPlayerLogin(Player* player)
+{
+    // set locale priority for bot texts
+    sPlayerbotTextMgr->AddLocalePriority(player->GetSession()->GetSessionDbcLocale());
+
+    if (sPlayerbotAIConfig->selfBotLevel > 2)
+        HandlePlayerbotCommand("self", player);
+
+    if (!sPlayerbotAIConfig->botAutologin)
+        return;
+
+    uint32 accountId = player->GetSession()->GetAccountId();
+    QueryResult results = CharacterDatabase.Query("SELECT name FROM characters WHERE account = {}", accountId);
+    if (results)
+    {
+        std::ostringstream out;
+        out << "add ";
+        bool first = true;
         do
         {
-            Field* fields = result->Fetch();
-            uint32 itemId = fields[0].Get<uint32>();
-            float rarity = fields[1].Get<float>();
+            Field* fields = results->Fetch();
 
-            rarityCache[itemId] = rarity;
-            ++count;
+            if (first)
+                first = false;
+            else
+                out << ",";
 
-        } while (result->NextRow());
+            out << fields[0].Get<std::string>();
+        } while (results->NextRow());
 
-        LOG_INFO("playerbots", "Item rarity cache loaded from {} records", count);
+        HandlePlayerbotCommand(out.str().c_str(), player);
+    }
+}
+
+void PlayerbotMgr::TellError(std::string const botName, std::string const text)
+{
+    std::set<std::string> names = errors[text];
+    if (names.find(botName) == names.end())
+    {
+        names.insert(botName);
+    }
+
+    errors[text] = names;
+}
+
+void PlayerbotMgr::CheckTellErrors(uint32 elapsed)
+{
+    time_t now = time(nullptr);
+    if ((now - lastErrorTell) < sPlayerbotAIConfig->errorDelay / 1000)
+        return;
+
+    lastErrorTell = now;
+
+    for (PlayerBotErrorMap::iterator i = errors.begin(); i != errors.end(); ++i)
+    {
+        std::string const text = i->first;
+        std::set<std::string> names = i->second;
+
+        std::ostringstream out;
+        bool first = true;
+        for (std::set<std::string>::iterator j = names.begin(); j != names.end(); ++j)
+        {
+            if (!first)
+                out << ", ";
+            else
+                first = false;
+
+            out << *j;
+        }
+
+        out << "|cfff00000: " << text;
+
+        ChatHandler(master->GetSession()).PSendSysMessage(out.str().c_str());
+    }
+
+    errors.clear();
+}
+
+void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
+{
+    if (!player)
+    {
+        return;
+    }
+    // If the guid already exists in the map, remove it
+
+    if (!isBotAI)
+    {
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
+        if (itr != _playerbotsMgrMap.end())
+        {
+            _playerbotsMgrMap.erase(itr);
+        }
+        PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);
+        ASSERT(_playerbotsMgrMap.emplace(player->GetGUID(), playerbotMgr).second);
+
+        playerbotMgr->OnPlayerLogin(player);
     }
     else
     {
-        ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-        LOG_INFO("playerbots", "Building item rarity cache from {} items", itemTemplates->size());
-
-        for (auto const& itr : *itemTemplates)
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
+        if (itr != _playerbotsAIMap.end())
         {
-            ItemTemplate const* proto = &itr.second;
-            if (!proto)
-                continue;
-
-            if (proto->Duration & 0x80000000)
-                continue;
-
-            if (proto->Quality == ITEM_QUALITY_POOR)
-                continue;
-
-            if (strstri(proto->Name1.c_str(), "qa") || strstri(proto->Name1.c_str(), "test") ||
-                strstri(proto->Name1.c_str(), "deprecated"))
-                continue;
-
-            if (!proto->ItemLevel)
-                continue;
-
-            QueryResult results = WorldDatabase.Query(
-                "SELECT MAX(q.chance) FROM ( "
-                // "-- Creature "
-                "SELECT  "
-                "AVG ( "
-                "   CASE  "
-                "    WHEN lt.groupid = 0 THEN lt.ChanceOrQuestChance  "
-                "    WHEN lt.ChanceOrQuestChance > 0 THEN lt.ChanceOrQuestChance "
-                "    ELSE   "
-                "    IFNULL(100 - (SELECT SUM(ChanceOrQuestChance) FROM creature_loot_template lt1 WHERE lt1.groupid = "
-                "lt.groupid AND lt1.entry = lt.entry AND lt1.ChanceOrQuestChance > 0), 100) "
-                "    / (SELECT COUNT(*) FROM creature_loot_template lt1 WHERE lt1.groupid = lt.groupid AND lt1.entry = "
-                "lt.entry AND lt1.ChanceOrQuestChance = 0) "
-                "    END "
-                ") chance, 'creature' type "
-                "FROM creature_loot_template lt "
-                "JOIN creature_template ct ON ct.LootId = lt.entry "
-                "JOIN creature c ON c.id1 = ct.entry "
-                "WHERE lt.item = {} "
-                "union all "
-                // "-- Gameobject "
-                "SELECT  "
-                "AVG ( "
-                "   CASE  "
-                "    WHEN lt.groupid = 0 THEN lt.ChanceOrQuestChance  "
-                "    WHEN lt.ChanceOrQuestChance > 0 THEN lt.ChanceOrQuestChance "
-                "    ELSE   "
-                "    IFNULL(100 - (SELECT SUM(ChanceOrQuestChance) FROM gameobject_loot_template lt1 WHERE lt1.groupid "
-                "= lt.groupid AND lt1.entry = lt.entry AND lt1.ChanceOrQuestChance > 0), 100) "
-                "    / (SELECT COUNT(*) FROM gameobject_loot_template lt1 WHERE lt1.groupid = lt.groupid AND lt1.entry "
-                "= lt.entry AND lt1.ChanceOrQuestChance = 0) "
-                "    END "
-                ") chance, 'gameobject' type "
-                "FROM gameobject_loot_template lt "
-                "JOIN gameobject_template ct ON ct.data1 = lt.entry "
-                "JOIN gameobject c ON c.id1 = ct.entry "
-                "WHERE lt.item = {} "
-                "union all "
-                // "-- Disenchant "
-                "SELECT  "
-                "AVG ( "
-                "   CASE  "
-                "    WHEN lt.groupid = 0 THEN lt.ChanceOrQuestChance  "
-                "    WHEN lt.ChanceOrQuestChance > 0 THEN lt.ChanceOrQuestChance "
-                "    ELSE   "
-                "    IFNULL(100 - (SELECT SUM(ChanceOrQuestChance) FROM disenchant_loot_template lt1 WHERE lt1.groupid "
-                "= lt.groupid AND lt1.entry = lt.entry AND lt1.ChanceOrQuestChance > 0), 100) "
-                "    / (SELECT COUNT(*) FROM disenchant_loot_template lt1 WHERE lt1.groupid = lt.groupid AND lt1.entry "
-                "= lt.entry AND lt1.ChanceOrQuestChance = 0) "
-                "    END "
-                ") chance, 'disenchant' type "
-                "FROM disenchant_loot_template lt "
-                "JOIN item_template ct ON ct.DisenchantID = lt.entry "
-                "WHERE lt.item = {} "
-                "union all "
-                // "-- Fishing "
-                "SELECT  "
-                "AVG ( "
-                "   CASE  "
-                "    WHEN lt.groupid = 0 THEN lt.ChanceOrQuestChance  "
-                "    WHEN lt.ChanceOrQuestChance > 0 THEN lt.ChanceOrQuestChance "
-                "    ELSE   "
-                "    IFNULL(100 - (SELECT SUM(ChanceOrQuestChance) FROM fishing_loot_template lt1 WHERE lt1.groupid = "
-                "lt.groupid AND lt1.entry = lt.entry AND lt1.ChanceOrQuestChance > 0), 100) "
-                "    / (SELECT COUNT(*) FROM fishing_loot_template lt1 WHERE lt1.groupid = lt.groupid AND lt1.entry = "
-                "lt.entry AND lt1.ChanceOrQuestChance = 0) "
-                "    END "
-                ") chance, 'fishing' type "
-                "FROM fishing_loot_template lt "
-                "WHERE lt.item = {} "
-                "union all "
-                // "-- Skinning "
-                "SELECT  "
-                "AVG ( "
-                "   CASE  "
-                "    WHEN lt.groupid = 0 THEN lt.ChanceOrQuestChance  "
-                "    WHEN lt.ChanceOrQuestChance > 0 THEN lt.ChanceOrQuestChance  "
-                "    ELSE   "
-                "    IFNULL(100 - (SELECT SUM(ChanceOrQuestChance) FROM skinning_loot_template lt1 WHERE lt1.groupid = "
-                "lt.groupid AND lt1.entry = lt.entry AND lt1.ChanceOrQuestChance > 0), 100) "
-                "    * IFNULL((SELECT 1/COUNT(*) FROM skinning_loot_template lt1 WHERE lt1.groupid = lt.groupid AND "
-                "lt1.entry = lt.entry AND lt1.ChanceOrQuestChance = 0), 1) "
-                "    END "
-                ") chance, 'skinning' type "
-                "FROM skinning_loot_template lt "
-                "JOIN creature_template ct ON ct.SkinningLootId = lt.entry "
-                "JOIN creature c ON c.id1 = ct.entry "
-                "WHERE lt.item = {}) q; ",
-                itr.first, itr.first, itr.first, itr.first, itr.first);
-
-            if (results)
-            {
-                Field* fields = results->Fetch();
-                float rarity = fields[0].Get<float>();
-                if (rarity > 0.01)
-                {
-                    rarityCache[itr.first] = rarity;
-
-                    PlayerbotsDatabasePreparedStatement* stmt =
-                        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_RARITY_CACHE);
-                    stmt->SetData(0, itr.first);
-                    stmt->SetData(1, rarity);
-                    PlayerbotsDatabase.Execute(stmt);
-                }
-            }
+            _playerbotsAIMap.erase(itr);
         }
-
-        LOG_INFO("playerbots", "Item rarity cache built from {} items", itemTemplates->size());
+        PlayerbotAI* botAI = new PlayerbotAI(player);
+        ASSERT(_playerbotsAIMap.emplace(player->GetGUID(), botAI).second);
     }
 }
 
-float RandomItemMgr::GetItemRarity(uint32 itemId) { return rarityCache[itemId]; }
-
-inline bool IsCraftedBySpellInfo(ItemTemplate const* proto, SpellInfo const* spellInfo)
+void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 {
-    for (uint32 x = 0; x < MAX_SPELL_REAGENTS; ++x)
+    if (is_AI)
     {
-        if (spellInfo->Reagent[x] <= 0)
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(guid);
+        if (itr != _playerbotsAIMap.end())
         {
-            continue;
-        }
-
-        if (proto->ItemId == spellInfo->Reagent[x])
-        {
-            return true;
+            _playerbotsAIMap.erase(itr);
         }
     }
-
-    for (uint8 i = 0; i < 3; ++i)
+    else
     {
-        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_CREATE_ITEM)
+        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(guid);
+        if (itr != _playerbotsMgrMap.end())
         {
-            if (spellInfo->Effects[i].ItemType == proto->ItemId)
-            {
-                return true;
-            }
+            _playerbotsMgrMap.erase(itr);
         }
     }
-
-    return false;
 }
 
-inline bool IsCraftedBySpell(ItemTemplate const* proto, uint32 spellId)
+PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!spellInfo)
-        return false;
+    if (!(sPlayerbotAIConfig->enabled) || !player)
+    {
+        return nullptr;
+    }
+    // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
+    //     return nullptr;
+    // }
+    auto itr = _playerbotsAIMap.find(player->GetGUID());
+    if (itr != _playerbotsAIMap.end())
+    {
+        if (itr->second->IsBotAI())
+            return reinterpret_cast<PlayerbotAI*>(itr->second);
+    }
 
-    return IsCraftedBySpellInfo(proto, spellInfo);
+    return nullptr;
 }
 
-inline bool IsCraftedBy(ItemTemplate const* proto, uint32 spellId)
+PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
 {
-    if (IsCraftedBySpell(proto, spellId))
-        return true;
-
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!spellInfo)
-        return false;
-
-    for (uint32 effect = 0; effect < 3; ++effect)
+    if (!(sPlayerbotAIConfig->enabled) || !player)
     {
-        uint32 craftId = spellInfo->Effects[effect].TriggerSpell;
-        SpellInfo const* craftSpellInfo = sSpellMgr->GetSpellInfo(craftId);
-        if (!craftSpellInfo)
-            continue;
-
-        if (IsCraftedBySpellInfo(proto, craftSpellInfo))
-            return true;
+        return nullptr;
+    }
+    auto itr = _playerbotsMgrMap.find(player->GetGUID());
+    if (itr != _playerbotsMgrMap.end())
+    {
+        if (!itr->second->IsBotAI())
+            return reinterpret_cast<PlayerbotMgr*>(itr->second);
     }
 
-    return false;
-}
-
-inline bool ContainsInternal(ItemTemplate const* proto, uint32 skillId)
-{
-    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
-    {
-        SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
-        if (!skillLine || skillLine->ID != skillId)
-            continue;
-
-        if (IsCraftedBy(proto, skillLine->Spell))
-            return true;
-    }
-
-    CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
-    for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
-    {
-        if (itr->second.trainer_type != TRAINER_TYPE_TRADESKILLS)
-            continue;
-
-        uint32 trainerId = itr->second.Entry;
-        TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(trainerId);
-        if (!trainer_spells)
-            continue;
-
-        for (TrainerSpellMap::const_iterator iter = trainer_spells->spellList.begin();
-             iter != trainer_spells->spellList.end(); ++iter)
-        {
-            TrainerSpell const* tSpell = &iter->second;
-            if (!tSpell || tSpell->reqSkill != skillId)
-                continue;
-
-            if (IsCraftedBy(proto, tSpell->spell))
-                return true;
-        }
-    }
-
-    std::vector<ItemTemplate*> const* itemTemplates = sObjectMgr->GetItemTemplateStoreFast();
-    for (ItemTemplate const* recipe : *itemTemplates)
-    {
-        if (!recipe)
-            continue;
-
-        if (recipe->Class == ITEM_CLASS_RECIPE &&
-            ((recipe->SubClass == ITEM_SUBCLASS_LEATHERWORKING_PATTERN && skillId == SKILL_LEATHERWORKING) ||
-             (recipe->SubClass == ITEM_SUBCLASS_TAILORING_PATTERN && skillId == SKILL_TAILORING) ||
-             (recipe->SubClass == ITEM_SUBCLASS_ENGINEERING_SCHEMATIC && skillId == SKILL_ENGINEERING) ||
-             (recipe->SubClass == ITEM_SUBCLASS_BLACKSMITHING && skillId == SKILL_BLACKSMITHING) ||
-             (recipe->SubClass == ITEM_SUBCLASS_COOKING_RECIPE && skillId == SKILL_COOKING) ||
-             (recipe->SubClass == ITEM_SUBCLASS_ALCHEMY_RECIPE && skillId == SKILL_ALCHEMY) ||
-             (recipe->SubClass == ITEM_SUBCLASS_FIRST_AID_MANUAL && skillId == SKILL_FIRST_AID) ||
-             (recipe->SubClass == ITEM_SUBCLASS_ENCHANTING_FORMULA && skillId == SKILL_ENCHANTING) ||
-             (recipe->SubClass == ITEM_SUBCLASS_JEWELCRAFTING_RECIPE && skillId == SKILL_JEWELCRAFTING) ||
-             (recipe->SubClass == ITEM_SUBCLASS_FISHING_MANUAL && skillId == SKILL_FISHING)))
-        {
-            for (uint32 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-            {
-                if (IsCraftedBy(proto, recipe->Spells[i].SpellId))
-                    return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-bool RandomItemMgr::IsUsedBySkill(ItemTemplate const* proto, uint32 skillId)
-{
-    if (itemCache.find(proto->ItemId) != itemCache.end())
-        return true;
-
-    switch (proto->Class)
-    {
-        case ITEM_CLASS_TRADE_GOODS:
-        case ITEM_CLASS_MISC:
-        case ITEM_CLASS_REAGENT:
-        case ITEM_CLASS_GEM:
-            break;
-        default:
-            return false;
-    }
-
-    bool contains = ContainsInternal(proto, skillId);
-    if (contains)
-        itemCache.insert(proto->ItemId);
-
-    return contains;
+    return nullptr;
 }
