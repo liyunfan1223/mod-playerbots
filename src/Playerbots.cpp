@@ -30,6 +30,10 @@
 #include "cs_playerbots.h"
 #include "cmath"
 
+// Initialize static members for PlayerbotsUpdateTracker
+std::unordered_map<uint64, std::atomic<bool>> PlayerbotsUpdateTracker::s_playerUpdateFlags;
+std::mutex PlayerbotsUpdateTracker::s_mapMutex;
+
 class PlayerbotsDatabaseScript : public DatabaseScript
 {
 public:
@@ -122,15 +126,28 @@ public:
 
     void OnPlayerAfterUpdate(Player* player, uint32 diff) override
     {
-        if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
+        // Get player's unique identifier
+        uint64 guid = player->GetGUID().GetCounter();
+        
+        // Try to atomically acquire the update flag for this player
+        if (PlayerbotsUpdateTracker::TryAcquireUpdateFlag(guid))
         {
-            botAI->UpdateAI(diff);
-        }
+            // We successfully acquired the update flag, so we can safely update this player's bots
+            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
+            {
+                botAI->UpdateAI(diff);
+            }
 
-        if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
-        {
-            playerbotMgr->UpdateAI(diff);
+            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+            {
+                playerbotMgr->UpdateAI(diff);
+            }
+            
+            // Release the update flag
+            PlayerbotsUpdateTracker::ReleaseUpdateFlag(guid);
         }
+        // If we couldn't acquire the flag, another thread is already updating this player's bots
+        // So we skip this update cycle for this player
     }
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
