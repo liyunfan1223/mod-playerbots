@@ -9,6 +9,7 @@
 #include <cstring>
 #include <istream>
 #include <string>
+#include <mutex>
 
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
