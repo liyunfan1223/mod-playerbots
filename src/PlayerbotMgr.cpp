@@ -645,41 +645,6 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
 }
 
-void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
-{
-    if (!player)
-    {
-        return;
-    }
-    
-    if (!isBotAI)
-    {
-        std::lock_guard<std::mutex> guard(playerbotsMgrMutex);
-        
-        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
-        if (itr != _playerbotsMgrMap.end())
-        {
-            _playerbotsMgrMap.erase(itr);
-        }
-        PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);
-        ASSERT(_playerbotsMgrMap.emplace(player->GetGUID(), playerbotMgr).second);
-
-        playerbotMgr->OnPlayerLogin(player);
-    }
-    else
-    {
-        std::lock_guard<std::mutex> guard(playerbotsAIMutex);
-        
-        std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
-        if (itr != _playerbotsAIMap.end())
-        {
-            _playerbotsAIMap.erase(itr);
-        }
-        PlayerbotAI* botAI = new PlayerbotAI(player);
-        ASSERT(_playerbotsAIMap.emplace(player->GetGUID(), botAI).second);
-    }
-}
-
 std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid,
                                                      bool admin, uint32 masterAccountId, uint32 masterGuildId)
 {
@@ -1638,10 +1603,11 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
     {
         return;
     }
-    // If the guid already exists in the map, remove it
-
+    
     if (!isBotAI)
     {
+        std::lock_guard<std::mutex> guard(playerbotsMgrMutex);
+        
         std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
         if (itr != _playerbotsMgrMap.end())
         {
@@ -1654,6 +1620,8 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
     }
     else
     {
+        std::lock_guard<std::mutex> guard(playerbotsAIMutex);
+        
         std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
         if (itr != _playerbotsAIMap.end())
         {
