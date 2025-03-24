@@ -423,14 +423,12 @@ Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
 
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
-    // First check if bot is valid
     if (!bot)
     {
         LOG_ERROR("playerbots", "OnBotLogin called with null bot pointer");
         return;
     }
 
-    // Use a mutex to protect the playerBots map
     std::lock_guard<std::mutex> guard(playerBotsMutex);
     
     // Prevent duplicate login
@@ -439,7 +437,6 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         return;
     }
 
-    // Safely add the bot data
     try 
     {
         sPlayerbotsMgr->AddPlayerbotData(bot, true);
@@ -454,13 +451,11 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         return;
     }
     
-    // GET_PLAYERBOT_AI can return null, so check before using
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
     {
         // Log a warning here to indicate that the botAI is null
-        LOG_DEBUG("mod-playerbots", "PlayerbotAI is null for bot with GUID: {}", 
-            bot->GetGUID().GetRawValue());
+        LOG_DEBUG("mod-playerbots", "PlayerbotAI is null for bot with GUID: {}", bot->GetGUID().GetRawValue());
         return;
     }
 
@@ -468,19 +463,186 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     if (!master)
     {
         // Log a warning to indicate that the master is null
-        LOG_DEBUG("mod-playerbots", "Master is null for bot with GUID: {}", 
-            bot->GetGUID().GetRawValue());
+        LOG_DEBUG("mod-playerbots", "Master is null for bot with GUID: {}", bot->GetGUID().GetRawValue());
         return;
     }
 
-    // Continue with the rest of the original function...
     Group* group = bot->GetGroup();
     if (group)
     {
-        // Existing group validation logic...
+        bool groupValid = false;
+        Group::MemberSlotList const& slots = group->GetMemberSlots();
+        for (Group::MemberSlotList::const_iterator i = slots.begin(); i != slots.end(); ++i)
+        {
+            ObjectGuid member = i->guid;
+            if (master)
+            {
+                if (master->GetGUID() == member)
+                {
+                    groupValid = true;
+                    break;
+                }
+            }
+            else
+            {
+                uint32 account = sCharacterCache->GetCharacterAccountIdByGuid(member);
+                if (!sPlayerbotAIConfig->IsInRandomAccountList(account))
+                {
+                    groupValid = true;
+                    break;
+                }
+            }
+        }
+
+        if (!groupValid)
+        {
+            bot->RemoveFromGroup();
+        }
     }
-    
-    // Continue with the rest of the original function...
+
+    group = bot->GetGroup();
+    if (group)
+    {
+        botAI->ResetStrategies();
+    }
+    else
+    {
+        botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
+    }
+    sPlayerbotDbStore->Load(botAI);
+
+    if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))
+    {
+        bot->GetMotionMaster()->MovementExpired();
+        bot->CleanupAfterTaxiFlight();
+    }
+
+    // check activity
+    botAI->AllowActivity(ALL_ACTIVITY, true);
+
+    // set delay on login
+    botAI->SetNextCheckDelay(urand(2000, 4000));
+
+    botAI->TellMaster("Hello!", PLAYERBOT_SECURITY_TALK);
+
+    if (master && master->GetGroup() && !group)
+    {
+        Group* mgroup = master->GetGroup();
+        if (mgroup->GetMembersCount() >= 5)
+        {
+            if (!mgroup->isRaidGroup() && !mgroup->isLFGGroup() && !mgroup->isBGGroup() && !mgroup->isBFGroup())
+            {
+                mgroup->ConvertToRaid();
+            }
+            if (mgroup->isRaidGroup())
+            {
+                mgroup->AddMember(bot);
+            }
+        }
+        else
+        {
+            mgroup->AddMember(bot);
+        }
+    }
+    else if (master && !group)
+    {
+        Group* newGroup = new Group();
+        newGroup->Create(master);
+        sGroupMgr->AddGroup(newGroup);
+        newGroup->AddMember(bot);
+    }
+    // if (master)
+    // {
+    //     // bot->TeleportTo(master);
+    // }
+    uint32 accountId = bot->GetSession()->GetAccountId();
+    bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(accountId);
+
+    if (isRandomAccount && sPlayerbotAIConfig->randomBotFixedLevel)
+    {
+        bot->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    }
+    else if (isRandomAccount && !sPlayerbotAIConfig->randomBotFixedLevel)
+    {
+        bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
+    }
+
+    bot->SaveToDB(false, false);
+    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(bot->GetGUID().GetCounter());
+    if (addClassBot && master && isRandomAccount && master->GetLevel() < bot->GetLevel())
+    {
+        // PlayerbotFactory factory(bot, master->GetLevel());
+        // factory.Randomize(false);
+        uint32 mixedGearScore =
+            PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+        PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+        factory.Randomize(false);
+    }
+
+    // bots join World chat if not solo oriented
+    if (bot->GetLevel() >= 10 && sRandomPlayerbotMgr->IsRandomBot(bot) && GET_PLAYERBOT_AI(bot) &&
+        GET_PLAYERBOT_AI(bot)->GetGrouperType() != GrouperType::SOLO)
+    {
+        // TODO make action/config
+        // Make the bot join the world channel for chat
+        WorldPacket pkt(CMSG_JOIN_CHANNEL);
+        pkt << uint32(0) << uint8(0) << uint8(0);
+        pkt << std::string("World");
+        pkt << "";  // Pass
+        bot->GetSession()->HandleJoinChannel(pkt);
+    }
+
+    // join standard channels
+    uint8 locale = BroadcastHelper::GetLocale();
+    AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
+    ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
+    std::string current_zone_name = current_zone ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_zone) : "";
+
+    if (current_zone && cMgr)
+    {
+        for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
+        {
+            ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
+            if (!channel)
+                continue;
+
+            Channel* new_channel = nullptr;
+            switch (channel->ChannelID)
+            {
+                case ChatChannelId::GENERAL:
+                case ChatChannelId::LOCAL_DEFENSE:
+                {
+                    char new_channel_name_buf[100];
+                    snprintf(new_channel_name_buf, 100, channel->pattern[locale], current_zone_name.c_str());
+                    new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+                    break;
+                }
+                case ChatChannelId::TRADE:
+                case ChatChannelId::GUILD_RECRUITMENT:
+                {
+                    char new_channel_name_buf[100];
+                    //3459 is ID for a zone named "City" (only exists for the sake of using its name)
+                    //Currently in magons TBC, if you switch zones, then you join "Trade - <zone>" and "GuildRecruitment - <zone>"
+                    //which is a core bug, should be "Trade - City" and "GuildRecruitment - City" in both 1.12 and TBC
+                    //but if you (actual player) logout in a city and log back in - you join "City" versions
+                    snprintf(new_channel_name_buf, 100, channel->pattern[locale], GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(GetAreaEntryByAreaID(3459)).c_str());
+                    new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+                    break;
+                }
+                case ChatChannelId::LOOKING_FOR_GROUP:
+                case ChatChannelId::WORLD_DEFENSE:
+                {
+                    new_channel = cMgr->GetJoinChannel(channel->pattern[locale], channel->ChannelID);
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            if (new_channel)
+                new_channel->JoinChannel(bot, "");
+        }
+    }
 }
 
 void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
