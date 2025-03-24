@@ -654,7 +654,6 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
     
     if (!isBotAI)
     {
-        // Use a mutex to protect _playerbotsMgrMap
         std::lock_guard<std::mutex> guard(playerbotsMgrMutex);
         
         std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
@@ -669,7 +668,6 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
     }
     else
     {
-        // Use a mutex to protect _playerbotsAIMap
         std::lock_guard<std::mutex> guard(playerbotsAIMutex);
         
         std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
