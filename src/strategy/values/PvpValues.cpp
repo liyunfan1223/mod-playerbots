@@ -44,6 +44,9 @@ Unit* FlagCarrierValue::Calculate()
         {
             BattlegroundEY* bg = (BattlegroundEY*)botAI->GetBot()->GetBattleground();
 
+            if (!bg)
+                return nullptr;
+
             if (bg->GetFlagPickerGUID().IsEmpty())
                 return nullptr;
 
