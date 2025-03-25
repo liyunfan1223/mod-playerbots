@@ -27,6 +27,8 @@
 #include "raids/obsidiansanctum/RaidOsActionContext.h"
 #include "raids/obsidiansanctum/RaidOsTriggerContext.h"
 #include "raids/eyeofeternity/RaidEoEActionContext.h"
+#include "raids/vaultofarchavon/RaidVoATriggerContext.h"
+#include "raids/vaultofarchavon/RaidVoAActionContext.h"
 #include "raids/eyeofeternity/RaidEoETriggerContext.h"
 #include "raids/moltencore/RaidMcActionContext.h"
 #include "raids/moltencore/RaidMcTriggerContext.h"
@@ -54,6 +56,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new RaidNaxxActionContext());
     actionContexts.Add(new RaidOsActionContext());
     actionContexts.Add(new RaidEoEActionContext());
+    actionContexts.Add(new RaidVoAActionContext());
     actionContexts.Add(new RaidUlduarActionContext());
     actionContexts.Add(new RaidIccActionContext());
     actionContexts.Add(new WotlkDungeonUKActionContext());
@@ -79,6 +82,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     triggerContexts.Add(new RaidNaxxTriggerContext());
     triggerContexts.Add(new RaidOsTriggerContext());
     triggerContexts.Add(new RaidEoETriggerContext());
+    triggerContexts.Add(new RaidVoATriggerContext());
     triggerContexts.Add(new RaidUlduarTriggerContext());
     triggerContexts.Add(new RaidIccTriggerContext());
     triggerContexts.Add(new WotlkDungeonUKTriggerContext());
