@@ -122,8 +122,8 @@ bool TradeStatusAction::Execute(Event event)
 
 void TradeStatusAction::BeginTrade()
 {
-
-    if (GET_PLAYERBOT_AI(!trader || bot->GetTrader()))
+    Player* trader = bot->GetTrader();
+    if (!trader || GET_PLAYERBOT_AI(bot->GetTrader()))
         return;
 
     WorldPacket p;
