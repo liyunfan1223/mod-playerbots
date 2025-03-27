@@ -48,8 +48,8 @@ bool UseMeetingStoneAction::Execute(Event event)
         return false;
 
     GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
-    if (!goInfo || goInfo->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
-        return false;
+    if (!goInfo || goInfo->entry != 179944)
+		return false;
 
     return Teleport(master, bot);
 }
