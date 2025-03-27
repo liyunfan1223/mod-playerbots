@@ -32,16 +32,19 @@ protected:
     bool MoveRandomNear(float moveStep = 50.0f, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool ForceToWait(uint32 duration, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
 
-    // QUEST RELATED
-    bool SearchQuestGiverAndAcceptOrReward();
+    // QUEST RELATED CHECK
     ObjectGuid ChooseNpcOrGameObjectToInteract(bool questgiverOnly = false, float distanceLimit = 0.0f);
     bool HasQuestToAcceptOrReward(WorldObject* object);
     bool InteractWithNpcOrGameObjectForQuest(ObjectGuid guid);
-    bool AcceptQuest(Quest const* quest, ObjectGuid guid);
-    bool TurnInQuest(Quest const* quest, ObjectGuid guid);
-    uint32 BestReward(Quest const* quest);
+    bool CanInteractWithQuestGiver(Object* questGiver);
+    bool IsWithinInteractionDist(Object* object);
+    uint32 BestRewardIndex(Quest const* quest);
     bool IsQuestWorthDoing(Quest const* quest);
     bool IsQuestCapableDoing(Quest const* quest);
+    // QUEST RELATED ACTION
+    bool SearchQuestGiverAndAcceptOrReward();
+    bool AcceptQuest(Quest const* quest, ObjectGuid guid);
+    bool TurnInQuest(Quest const* quest, ObjectGuid guid);
     bool OrganizeQuestLog();
 
 protected:
