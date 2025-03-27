@@ -313,6 +313,7 @@ public:
     bool autoLearnQuestSpells;
     bool autoTeleportForLevel;
     bool randomBotGroupNearby;
+    bool enableRandomBotTrading;
     uint32 tweakValue;  // Debugging config
 
     uint32 randomBotArenaTeamCount;
