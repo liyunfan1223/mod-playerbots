@@ -31,7 +31,10 @@ bool AttackEnemyFlagCarrierAction::isUseful()
 
 bool AttackAnythingAction::isUseful()
 {
-    if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot not allowed to be active
+    if (!bot || !botAI)  // Prevents invalid accesses
+        return false;
+
+    if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot cannot be active
         return false;
 
     if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
@@ -41,19 +44,17 @@ bool AttackAnythingAction::isUseful()
         return false;
 
     Unit* target = GetTarget();
-
-    if (!target)
+    if (!target || !target->IsInWorld())  // Checks if the target is valid and in the world
         return false;
 
     std::string const name = std::string(target->GetName());
-    // Check for invalid targets: Dummy, Charge Target, Melee Target, Ranged Target
     if (!name.empty() &&
         (name.find("Dummy") != std::string::npos ||
          name.find("Charge Target") != std::string::npos ||
          name.find("Melee Target") != std::string::npos ||
          name.find("Ranged Target") != std::string::npos))
     {
-        return false;  // Target is one of the disallowed types
+        return false;
     }
 
     return true;
