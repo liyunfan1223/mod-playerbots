@@ -34,7 +34,7 @@ bool TradeStatusAction::Execute(Event event)
 
     if (!sPlayerbotAIConfig->enableRandomBotTrading && sRandomPlayerbotMgr->IsRandomBot(bot))
     {
-        bot->Whisper("Trading is distabled", LANG_UNIVERSAL, trader);
+        bot->Whisper("Trading is disabled", LANG_UNIVERSAL, trader);
         return false;
     }
 
