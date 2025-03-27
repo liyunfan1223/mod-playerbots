@@ -545,7 +545,7 @@ AiPlayerbot.DisableDeathKnightLogin = 0
 AiPlayerbot.LimitTalentsExpansion = 0
 
 # Allow random bots to trade
-AiPlayerbot.EnableRandomBotTrading= 1
+AiPlayerbot.EnableRandomBotTrading = 1
 #
 #
 #
