@@ -1255,32 +1255,36 @@ bool HodirMoveSnowpackedIcicleAction::Execute(Event event)
 
 bool HodirBitingColdJumpAction::Execute(Event event)
 {
-    // This needs improving but maybe it should be done in the playerbot core.
-
-    int mapId = bot->GetMap()->GetId();
-    int x = bot->GetPositionX();
-    int y = bot->GetPositionY();
-    int z = bot->GetPositionZ() + 3.98f;
-    float speed = 7.96f;
-
-    UpdateMovementState();
-    if (!IsMovingAllowed(mapId, x, y, z))
-    {
-        return false;
-    }
-    MovementPriority priority;
-    if (IsWaitingForLastMove(priority))
-    {
-        return false;
-    }
-
-    MotionMaster& mm = *bot->GetMotionMaster();
-    mm.Clear();
-    mm.MoveJump(x, y, z, speed, speed, 1, AI_VALUE(Unit*, "current target"));
-    mm.MoveFall(0, true);
-    AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000, priority);
+    bot->RemoveAurasDueToSpell(SPELL_BITING_COLD_PLAYER_AURA);
 
     return true;
+
+    // Backup when the overall strategy without cheat will be more vialable
+
+    // int mapId = bot->GetMap()->GetId();
+    // int x = bot->GetPositionX();
+    // int y = bot->GetPositionY();
+    // int z = bot->GetPositionZ() + 3.98f;
+    // float speed = 7.96f;
+
+    // UpdateMovementState();
+    // if (!IsMovingAllowed(mapId, x, y, z))
+    //{
+    //     return false;
+    // }
+    // MovementPriority priority;
+    // if (IsWaitingForLastMove(priority))
+    //{
+    //     return false;
+    // }
+
+    // MotionMaster& mm = *bot->GetMotionMaster();
+    // mm.Clear();
+    // mm.MoveJump(x, y, z, speed, speed, 1, AI_VALUE(Unit*, "current target"));
+    // mm.MoveFall(0, true);
+    // AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000, priority);
+
+    // return true;
 }
 
 bool FreyaMoveAwayNatureBombAction::isUseful()
