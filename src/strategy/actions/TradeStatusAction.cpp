@@ -32,6 +32,12 @@ bool TradeStatusAction::Execute(Event event)
         return false;
     }
 
+    if (!sPlayerbotAIConfig->enableRandomBotTrading && sRandomPlayerbotMgr->IsRandomBot(bot))
+    {
+        bot->Whisper("Trading is disabled", LANG_UNIVERSAL, trader);
+        return false;
+    }
+
     // Allow trades from group members or bots
     if ((!bot->GetGroup() || !bot->GetGroup()->IsMember(trader->GetGUID())) &&
         (trader != master || !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master)) &&
