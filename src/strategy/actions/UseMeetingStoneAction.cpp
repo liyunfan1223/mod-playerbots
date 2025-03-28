@@ -217,6 +217,9 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
                 if (bot->isDead() && revive)
                 {
+                    if (!botAI->IsSafe(player) || !botAI->IsSafe(summoner))
+                        return false;
+    
                     bot->ResurrectPlayer(1.0f, false);
                     botAI->TellMasterNoFacing("I live, again!");
                     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
