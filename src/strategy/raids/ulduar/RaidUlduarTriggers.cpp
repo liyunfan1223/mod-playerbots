@@ -242,10 +242,58 @@ bool RazorscaleFuseArmorTrigger::IsActive()
     return false;
 }
 
+bool IronAssemblyLightningTendrilsTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "stormcaller brundir");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is within 35 yards of the boss
+    if (boss->GetDistance(bot) > 35.0f)
+        return false;
+
+    // Check if the boss has the Lightning Tendrils aura
+    return boss->HasAura(SPELL_LIGHTNING_TENDRILS_10_MAN) || boss->HasAura(SPELL_LIGHTNING_TENDRILS_25_MAN);
+}
+
+bool IronAssemblyOverloadTrigger::IsActive()
+{
+    // Check if bot is tank
+    if (botAI->IsTank(bot))
+        return false;
+
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "stormcaller brundir");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is within 35 yards of the boss
+    if (boss->GetDistance(bot) > 35.0f)
+        return false;
+
+    // Check if the boss has the Overload aura
+    return boss->HasAura(SPELL_OVERLOAD_10_MAN) || boss->HasAura(SPELL_OVERLOAD_25_MAN) ||
+           boss->HasAura(SPELL_OVERLOAD_10_MAN_2) || boss->HasAura(SPELL_OVERLOAD_25_MAN_2);
+}
+
 bool HodirBitingColdTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
-    return boss && botAI->GetAura("biting cold", bot, false, false);
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    // Override if boss is casting Flash Freeze
+    if (!boss->HasUnitState(UNIT_STATE_CASTING) || !boss->FindCurrentSpellBySpellId(SPELL_FLASH_FREEZE))
+    {
+        return true;
+    }
+
+    return boss && botAI->GetAura("biting cold", bot, false, false, 2);
 }
 
 //Snowpacked Icicle Target
@@ -258,9 +306,24 @@ bool HodirNearSnowpackedIcicleTrigger::IsActive()
         return false;
     }
 
+    // Check if boss is casting Flash Freeze
+    if (!boss->HasUnitState(UNIT_STATE_CASTING) || !boss->FindCurrentSpellBySpellId(SPELL_FLASH_FREEZE))
+    {
+        return false;
+    }
+
     // Find the nearest Snowpacked Icicle Target
-    Creature* target = bot->FindNearestCreature(33174, 100.0f);
-    return target != nullptr;
+    Creature* target = bot->FindNearestCreature(NPC_SNOWPACKED_ICICLE, 100.0f);
+    if (!target)
+        return false;
+
+    // Check that bot is stacked on Snowpacked Icicle
+    if (bot->GetDistance2d(target->GetPositionX(), target->GetPositionY()) <= 5.0f)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool FreyaNearNatureBombTrigger::IsActive()

@@ -9,9 +9,21 @@
 
 enum UlduarIDs
 {
+    // Iron Assembly
+    SPELL_LIGHTNING_TENDRILS_10_MAN = 61887,
+    SPELL_LIGHTNING_TENDRILS_25_MAN = 63486,
+    SPELL_OVERLOAD_10_MAN = 61869,
+    SPELL_OVERLOAD_25_MAN = 63481,
+    SPELL_OVERLOAD_10_MAN_2 = 63485,
+    SPELL_OVERLOAD_25_MAN_2 = 61886,
+
+    // Hodir
+    NPC_SNOWPACKED_ICICLE = 33174,
+    NPC_TOASTY_FIRE = 33342,
+    SPELL_FLASH_FREEZE = 61968,
+
     // Freya
     NPC_EONARS_GIFT = 33228,
-
     GOBJECT_NATURE_BOMB = 194902,
 };
 
@@ -84,6 +96,26 @@ public:
     bool IsActive() override;
 };
 
+//
+// Iron Assembly
+//
+class IronAssemblyLightningTendrilsTrigger : public Trigger
+{
+public:
+    IronAssemblyLightningTendrilsTrigger(PlayerbotAI* ai) : Trigger(ai, "iron assembly lightning tendrils trigger") {}
+    bool IsActive() override;
+};
+
+class IronAssemblyOverloadTrigger : public Trigger
+{
+public:
+    IronAssemblyOverloadTrigger(PlayerbotAI* ai) : Trigger(ai, "iron assembly overload trigger") {}
+    bool IsActive() override;
+};
+
+//
+// Hodir
+//
 class HodirBitingColdTrigger : public Trigger
 {
 public:
@@ -98,6 +130,9 @@ public:
     bool IsActive() override;
 };
 
+//
+// Freya
+//
 class FreyaNearNatureBombTrigger : public Trigger
 {
 public:

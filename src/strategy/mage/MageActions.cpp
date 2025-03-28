@@ -16,7 +16,10 @@ Value<Unit*>* CastPolymorphAction::GetTargetValue() { return context->GetValue<U
 bool CastFrostNovaAction::isUseful()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    if (target && target->ToCreature() && target->ToCreature()->HasMechanicTemplateImmunity(1 << (MECHANIC_FREEZE - 1)))
+    if (!target || !target->IsInWorld())
+        return false;
+
+    if (target->ToCreature() && target->ToCreature()->HasMechanicTemplateImmunity(1 << (MECHANIC_FREEZE - 1)))
         return false;
 
     if (target->isFrozen())

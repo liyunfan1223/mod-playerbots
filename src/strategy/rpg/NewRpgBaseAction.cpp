@@ -247,6 +247,134 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
     return true;
 }
 
+bool NewRpgBaseAction::CanInteractWithQuestGiver(Object* questGiver)
+{
+    // This is a variant of Player::CanInteractWithQuestGiver
+    // that removes the distance check and keeps all other checks
+    switch (questGiver->GetTypeId())
+    {
+        case TYPEID_UNIT:
+        {
+            ObjectGuid guid = questGiver->GetGUID();
+            uint32 npcflagmask = UNIT_NPC_FLAG_QUESTGIVER;
+            // unit checks
+            if (!guid)
+                return false;
+
+            if (!bot->IsInWorld())
+                return false;
+
+            if (bot->IsInFlight())
+                return false;
+
+            // exist (we need look pets also for some interaction (quest/etc)
+            Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
+            if (!creature)
+                return false;
+
+            // Deathstate checks
+            if (!bot->IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_VISIBLE_TO_GHOSTS))
+                return false;
+
+            // alive or spirit healer
+            if (!creature->IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_INTERACT_WHILE_DEAD))
+                return false;
+
+            // appropriate npc type
+            if (npcflagmask && !creature->HasNpcFlag(NPCFlags(npcflagmask)))
+                return false;
+
+            // not allow interaction under control, but allow with own pets
+            if (creature->GetCharmerGUID())
+                return false;
+
+            // xinef: perform better check
+            if (creature->GetReactionTo(bot) <= REP_UNFRIENDLY)
+                return false;
+
+            // pussywizard: many npcs have missing conditions for class training and rogue trainer can for eg. train dual wield to a shaman :/ too many to change in sql and watch in the future
+            // pussywizard: this function is not used when talking, but when already taking action (buy spell, reset talents, show spell list)
+            if (npcflagmask & (UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS) && creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS && !bot->IsClass((Classes)creature->GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
+                return false;
+            
+            return true;
+        }
+        case TYPEID_GAMEOBJECT:
+        {
+            ObjectGuid guid = questGiver->GetGUID();
+            GameobjectTypes type = GAMEOBJECT_TYPE_QUESTGIVER;
+            if (GameObject* go = bot->GetMap()->GetGameObject(guid))
+            {
+                if (go->GetGoType() == type)
+                {
+                    // Players cannot interact with gameobjects that use the "Point" icon
+                    if (go->GetGOInfo()->IconName == "Point")
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+            return false;
+        }
+        // unused for now
+        // case TYPEID_PLAYER:
+        //     return bot->IsAlive() && questGiver->ToPlayer()->IsAlive();
+        // case TYPEID_ITEM:
+        //     return bot->IsAlive();
+        default:
+            break;
+    }
+    return false;
+}
+
+bool NewRpgBaseAction::IsWithinInteractionDist(Object* questGiver)
+{
+    // This is a variant of Player::CanInteractWithQuestGiver
+    // that only keep the distance check
+    switch (questGiver->GetTypeId())
+    {
+        case TYPEID_UNIT:
+        {
+            ObjectGuid guid = questGiver->GetGUID();
+            // unit checks
+            if (!guid)
+                return false;
+
+            // exist (we need look pets also for some interaction (quest/etc)
+            Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
+            if (!creature)
+                return false;
+
+            if (!creature->IsWithinDistInMap(bot, INTERACTION_DISTANCE))
+                return false;
+            
+            return true;
+        }
+        case TYPEID_GAMEOBJECT:
+        {
+            ObjectGuid guid = questGiver->GetGUID();
+            GameobjectTypes type = GAMEOBJECT_TYPE_QUESTGIVER;
+            if (GameObject* go = bot->GetMap()->GetGameObject(guid))
+            {
+                if (go->IsWithinDistInMap(bot))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        // case TYPEID_PLAYER:
+        //     return bot->IsAlive() && questGiver->ToPlayer()->IsAlive();
+        // case TYPEID_ITEM:
+        //     return bot->IsAlive();
+        default:
+            break;
+    }
+    return false;
+}
+
 bool NewRpgBaseAction::AcceptQuest(Quest const* quest, ObjectGuid guid)
 {
     WorldPacket p(CMSG_QUESTGIVER_ACCEPT_QUEST);
@@ -283,7 +411,7 @@ bool NewRpgBaseAction::TurnInQuest(Quest const* quest, ObjectGuid guid)
     }
     else
     {
-        uint32 bestId = BestReward(quest);
+        uint32 bestId = BestRewardIndex(quest);
         p << bestId;
         bot->GetSession()->HandleQuestgiverChooseRewardOpcode(p);
     }
@@ -291,7 +419,7 @@ bool NewRpgBaseAction::TurnInQuest(Quest const* quest, ObjectGuid guid)
     return true;
 }
 
-uint32 NewRpgBaseAction::BestReward(Quest const* quest)
+uint32 NewRpgBaseAction::BestRewardIndex(Quest const* quest)
 {
     ItemIds returnIds;
     ItemUsage bestUsage = ITEM_USAGE_NONE;
@@ -486,7 +614,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
             continue;
         
-        if (HasQuestToAcceptOrReward(object))
+        if (CanInteractWithQuestGiver(object) && HasQuestToAcceptOrReward(object))
         {
             if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
                 nearestObject = object;
@@ -504,7 +632,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
             continue;
         
-        if (HasQuestToAcceptOrReward(object))
+        if (CanInteractWithQuestGiver(object) && HasQuestToAcceptOrReward(object))
         {
             if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
                 nearestObject = object;

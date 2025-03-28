@@ -242,7 +242,7 @@ bool NewRpgMoveNpcAction::Execute(Event event)
     }
 
     WorldObject* object = ObjectAccessor::GetWorldObject(*bot, info.near_npc.npcOrGo);
-    if (object && bot->GetDistance(object) <= INTERACTION_DISTANCE)
+    if (object && IsWithinInteractionDist(object))
     {
         if (!info.near_npc.lastReach)
         {
