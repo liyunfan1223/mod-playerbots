@@ -246,6 +246,7 @@ class BlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     BlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings", 2 * 2000) {}
+    Value<Unit*>* GetTargetValue() override;
     bool IsActive() override;
 };
 
@@ -253,8 +254,9 @@ public:
 class BlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
-    BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of wisdom", 2 * 2000) {} //double name;
-        bool IsActive() override;
+    BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of wisdom", 2 * 2000) {} 
+    Value<Unit*>* GetTargetValue() override;
+    bool IsActive() override;
 };
 
 
@@ -262,7 +264,8 @@ class BlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might", 2 * 2000) {}
-        bool IsActive() override;
+    Value<Unit*>* GetTargetValue() override;
+    bool IsActive() override;
 };
 
 
@@ -270,7 +273,8 @@ class BlessingOfSanctuaryOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     BlessingOfSanctuaryOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of sanctuary", 2 * 2000) {}
-        bool IsActive() override; 
+    Value<Unit*>* GetTargetValue() override;
+    bool IsActive() override; 
 };
 
 

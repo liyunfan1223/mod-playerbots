@@ -355,7 +355,12 @@ bool BlessingOfSanctuaryTrigger::IsActive()
                                                                                "greater blessing of kings", "blessing of kings", nullptr); 
 }
 
-//blessing on party triggers
+// blessing on party triggers
+Value<Unit*>* BlessingOfKingsOnPartyTrigger::GetTargetValue() 
+{ 
+    return context->GetValue<Unit*>("party member without aura", "greater blessing of kings,blessing of kings"); 
+}
+
 bool BlessingOfKingsOnPartyTrigger::IsActive() 
 { 
     Unit* target = GetTarget();
@@ -363,12 +368,15 @@ bool BlessingOfKingsOnPartyTrigger::IsActive()
     if (!target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40)) 
         return false;
     
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyAuraOf(target, "greater blessing of kings", "blessing of kings", nullptr) 
-                                    && !botAI->HasAnyMyAuraOf(target, "blessing of wisdom", "blessing of might", "blessing of sanctuary", nullptr) ;
-    
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyMyAuraOf(target, "blessing of wisdom", "blessing of might", "blessing of sanctuary", nullptr) ;
 }
 
-bool BlessingOfWisdomOnPartyTrigger::IsActive() 
+Value<Unit*>* BlessingOfWisdomOnPartyTrigger::GetTargetValue() 
+{ 
+    return context->GetValue<Unit*>("party member without aura", "blessing of wisdom,blessing of might") ; 
+}
+
+bool BlessingOfWisdomOnPartyTrigger::IsActive()
 { 
     Unit* target = GetTarget();
     
@@ -378,12 +386,16 @@ bool BlessingOfWisdomOnPartyTrigger::IsActive()
 //    if (target->getClass() == CLASS_WARRIOR || target->getClass() == CLASS_ROGUE || target->getClass() == CLASS_DEATH_KNIGHT)
 //        return false;
 
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyAuraOf(target, "greater blessing of wisdom", "blessing of wisdom", nullptr) 
-                                    && !botAI->HasAnyMyAuraOf(target, "blessing of kings", "blessing of might", "blessing of sanctuary", nullptr) ;
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyMyAuraOf(target, "blessing of kings", "blessing of might", "blessing of sanctuary", nullptr) ;
 
 }
 
-bool BlessingOfMightOnPartyTrigger::IsActive() 
+Value<Unit*>* BlessingOfMightOnPartyTrigger::GetTargetValue() 
+{ 
+    return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom") ;
+}
+
+bool BlessingOfMightOnPartyTrigger::IsActive()
 { 
     Unit* target = GetTarget();
     
@@ -393,12 +405,16 @@ bool BlessingOfMightOnPartyTrigger::IsActive()
 //    if (target->getClass() == CLASS_MAGE || target->getClass() == CLASS_PRIEST || target->getClass() == CLASS_WARLOCK)
 //        return false;
 
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyAuraOf(target, "greater blessing of might", "blessing of might", nullptr) 
-                                    && !botAI->HasAnyMyAuraOf(target, "blessing of kings", "blessing of wisdom", "blessing of sanctuary", nullptr) ;
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyMyAuraOf(target, "blessing of kings", "blessing of wisdom", "blessing of sanctuary", nullptr) ;
 
 }
 
-bool BlessingOfSanctuaryOnPartyTrigger::IsActive() 
+Value<Unit*>* BlessingOfSanctuaryOnPartyTrigger::GetTargetValue() 
+{ 
+    return context->GetValue<Unit*>("party member without aura", "greater blessing of sanctuary,blessing of sanctuary") ;
+}
+
+bool BlessingOfSanctuaryOnPartyTrigger::IsActive()
 { 
     int tab = AiFactory::GetPlayerSpecTab(botAI->GetBot());
     if (tab == !PALADIN_TAB_PROTECTION)
@@ -409,8 +425,5 @@ bool BlessingOfSanctuaryOnPartyTrigger::IsActive()
     if (!target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40))
         return false;    
 
-    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyAuraOf(target,"blessing of sanctuary", "greater blessing of sanctuary", nullptr )
-                                    && !botAI->HasAnyMyAuraOf(target, "greater blessing of kings", "blessing of kings", 
-                                                                      "greater blessing of wisdom", "blessing of wisdom",
-                                                                      "greater blessing of might", "blessing of might", nullptr);
+    return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyMyAuraOf(target, "blessing of kings", "blessing of wisdom", "blessing of might", nullptr) ;
 }

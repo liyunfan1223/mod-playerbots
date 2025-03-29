@@ -116,7 +116,7 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
+    return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
 }
 
 /*
@@ -141,7 +141,7 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
+    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
 }
 
 bool CastSealSpellAction::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }
