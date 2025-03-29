@@ -12,6 +12,7 @@
 #include "Opcodes.h"
 #include "Playerbots.h"
 #include "World.h"
+#include "WorldPacket.h"
 
 using namespace lfg;
 
@@ -179,9 +180,12 @@ bool LfgRoleCheckAction::Execute(Event event)
         // if (currentRoles == newRoles)
         //     return false;
 
-        sLFGMgr->SetRoles(bot->GetGUID(), newRoles);
-
-        sLFGMgr->UpdateRoleCheck(group->GetGUID(), bot->GetGUID(), newRoles);
+        
+        WorldPacket* packet = new WorldPacket(CMSG_LFG_SET_ROLES);
+        *packet << (uint8)newRoles;
+        bot->GetSession()->QueuePacket(packet);
+        // sLFGMgr->SetRoles(bot->GetGUID(), newRoles);
+        // sLFGMgr->UpdateRoleCheck(group->GetGUID(), bot->GetGUID(), newRoles);
 
         LOG_INFO("playerbots", "Bot {} {}:{} <{}>: LFG roles checked", bot->GetGUID().ToString().c_str(),
                  bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str());
@@ -206,11 +210,13 @@ bool LfgAcceptAction::Execute(Event event)
 
         if (bot->IsInCombat() || bot->isDead())
         {
-            /// @FIXME: Race condition
             LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
                      bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
                      bot->GetName().c_str(), id);
-            sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
+            WorldPacket* packet = new WorldPacket(CMSG_LFG_PROPOSAL_RESULT);
+            *packet << (uint32)id << (bool)false;
+            bot->GetSession()->QueuePacket(packet);
+            // sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
             return true;
         }
 
@@ -220,8 +226,10 @@ bool LfgAcceptAction::Execute(Event event)
         botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
 
         bot->ClearUnitState(UNIT_STATE_ALL_STATE);
-        /// @FIXME: Race condition
-        sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
+        WorldPacket* packet = new WorldPacket(CMSG_LFG_PROPOSAL_RESULT);
+        *packet << (uint32)id << (bool)true;
+        bot->GetSession()->QueuePacket(packet);
+        // sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
 
         if (sRandomPlayerbotMgr->IsRandomBot(bot) && !bot->GetGroup())
         {
@@ -259,7 +267,9 @@ bool LfgLeaveAction::Execute(Event event)
     if (sLFGMgr->GetState(bot->GetGUID()) > LFG_STATE_QUEUED)
         return false;
 
-    sLFGMgr->LeaveLfg(bot->GetGUID());
+    WorldPacket* packet = new WorldPacket(CMSG_LFG_LEAVE);
+    bot->GetSession()->QueuePacket(packet);
+    // sLFGMgr->LeaveLfg(bot->GetGUID());
     return true;
 }
 
@@ -278,7 +288,10 @@ bool LfgTeleportAction::Execute(Event event)
 
     bot->ClearUnitState(UNIT_STATE_ALL_STATE);
 
-    sLFGMgr->TeleportPlayer(bot, out);
+    WorldPacket* packet = new WorldPacket(CMSG_LFG_TELEPORT);
+    *packet << out;
+    bot->GetSession()->QueuePacket(packet);
+    // sLFGMgr->TeleportPlayer(bot, out);
 
     return true;
 }
