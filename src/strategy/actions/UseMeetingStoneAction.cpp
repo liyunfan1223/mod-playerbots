@@ -48,8 +48,8 @@ bool UseMeetingStoneAction::Execute(Event event)
         return false;
 
     GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
-    if (!goInfo || goInfo->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
-        return false;
+    if (!goInfo || goInfo->entry != 179944)
+		return false;
 
     return Teleport(master, bot);
 }
@@ -217,6 +217,9 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
                 if (bot->isDead() && revive)
                 {
+                    if (!botAI->IsSafe(player) || !botAI->IsSafe(summoner))
+                        return false;
+    
                     bot->ResurrectPlayer(1.0f, false);
                     botAI->TellMasterNoFacing("I live, again!");
                     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
