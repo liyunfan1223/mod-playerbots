@@ -287,13 +287,12 @@ bool HodirBitingColdTrigger::IsActive()
         return false;
     }
 
-    // Override if boss is casting Flash Freeze
-    if (!boss->HasUnitState(UNIT_STATE_CASTING) || !boss->FindCurrentSpellBySpellId(SPELL_FLASH_FREEZE))
-    {
-        return true;
-    }
+    Player* master = botAI->GetMaster();
+    if (!master || !master->IsAlive())
+        return false;
 
-    return boss && botAI->GetAura("biting cold", bot, false, false, 2);
+    return botAI->GetAura("biting cold", bot, false, false, 2) &&
+           !botAI->GetAura("biting cold", master, false, false, 2);
 }
 
 //Snowpacked Icicle Target
