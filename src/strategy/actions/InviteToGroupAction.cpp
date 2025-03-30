@@ -173,6 +173,9 @@ bool InviteGuildToGroupAction::Execute(Event event)
         if (!player)
             continue;
 
+        if (player == bot)
+            continue;
+
         if (player->GetGroup())
             continue;
 
