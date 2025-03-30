@@ -75,6 +75,9 @@ bool InviteNearbyToGroupAction::Execute(Event event)
         {
             if (!sPlayerbotAIConfig->randomBotGroupNearby)
                 return false;
+
+            if (player->isDND())
+                return false;
         }
 
         if (abs(int32(player->GetLevel() - bot->GetLevel())) > 2)
