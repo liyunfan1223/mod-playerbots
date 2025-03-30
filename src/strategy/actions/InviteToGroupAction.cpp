@@ -167,6 +167,9 @@ bool InviteGuildToGroupAction::Execute(Event event)
         if (player->GetGroup())
             continue;
 
+        if (player->isDND())
+            continue;
+
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
 
         if (botAI)
