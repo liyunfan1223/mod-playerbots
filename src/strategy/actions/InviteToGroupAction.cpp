@@ -62,6 +62,9 @@ bool InviteNearbyToGroupAction::Execute(Event event)
         if (player->isDND())
             continue;
 
+        if (player->IsBeingTeleported())
+            continue;
+
         if (player == bot)
             continue;
 
@@ -168,6 +171,9 @@ bool InviteGuildToGroupAction::Execute(Event event)
             continue;
 
         if (player->isDND())
+            continue;
+
+        if (player->IsBeingTeleported())
             continue;
 
         PlayerbotAI* playerAi = GET_PLAYERBOT_AI(player);
