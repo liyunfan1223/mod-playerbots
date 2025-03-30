@@ -34,7 +34,6 @@ bool MoveFromWhirlwindAction::Execute(Event event)
             break;
     }
     
-    // Check if boss exists before trying to access its properties
     if (!boss)
     {
         return false;
