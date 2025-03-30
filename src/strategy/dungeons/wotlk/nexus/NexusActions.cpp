@@ -34,16 +34,18 @@ bool MoveFromWhirlwindAction::Execute(Event event)
             break;
     }
     
+    // Check if boss exists before trying to access its properties
     if (!boss)
     {
         return false;
     }
     
     float bossDistance = bot->GetExactDist2d(boss->GetPosition());
-    if (!boss || bossDistance > targetDist)
+    if (bossDistance > targetDist)
     {
         return false;
     }
+    
     return MoveAway(boss, targetDist - bossDistance);
 }
 
@@ -162,6 +164,8 @@ bool IntenseColdJumpAction::Execute(Event event)
     // This does a tiny bunnyhop that takes a couple of ms, it doesn't do a natural jump.
     // Adding extra Z offset causes floating, and appears to scale the jump speed based on Z difference.
     // Probably best to revisit once bot movement is improved
+    if (!bot) { return false; }
+    
     return JumpTo(bot->GetMap()->GetId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ() + 0.01f);
     // bot->GetMotionMaster()->MoveFall();
 }
