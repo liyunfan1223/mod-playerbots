@@ -170,23 +170,20 @@ bool InviteGuildToGroupAction::Execute(Event event)
         if (player->isDND())
             continue;
 
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+        PlayerbotAI* playerAi = GET_PLAYERBOT_AI(player);
 
-        if (botAI)
+        if (playerAi)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO &&
-                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
+            if (playerAi->GetGrouperType() == GrouperType::SOLO &&
+                !playerAi->HasRealPlayerMaster()) // Do not invite solo players.
                 continue;
 
-            if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
+            if (playerAi->HasActivePlayerMaster()) // Do not invite alts of active players.
                 continue;
 
-            if (player->GetLevel() >
-                bot->GetLevel() + 5)  // Only invite higher levels that need money so they can grind money and help out.
+            if (player->GetLevel() > bot->GetLevel() + 5) // Invite higher levels that need money so they can grind money and help out.
             {
-                AiObjectContext* botContext = botAI->GetAiObjectContext();
-
-                if (!botContext->GetValue<bool>("should get money")->Get())
+                if (!PAI_VALUE(bool,"should get money"))
                     continue;
             }
         }
@@ -196,10 +193,10 @@ bool InviteGuildToGroupAction::Execute(Event event)
                 return false;
         }
 
-        if (abs(int32(player->GetLevel() - bot->GetLevel())) > 4)
+        if (bot->GetLevel() > player->GetLevel() + 5) // Do not invite members that too low level or risk dragging them to deadly places.
             continue;
 
-        if (!botAI && sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)
+        if (!playerAi && sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)
             continue;
 
         Group* group = bot->GetGroup();
