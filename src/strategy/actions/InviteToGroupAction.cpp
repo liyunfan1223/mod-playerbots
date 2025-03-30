@@ -33,8 +33,8 @@ bool InviteToGroupAction::Invite(Player* player)
 
     if (Group* group = player->GetGroup())
     {
-        if(player->GetPlayerbotAI() && !player->GetPlayerbotAI()->IsRealPlayer())
-            if (!group->IsRaidGroup() && group->GetMembersCount() > 4)
+        if(GET_PLAYERBOT_AI(player) && !player->IsRealPlayer())
+            if (!group->isRaidGroup() && group->GetMembersCount() > 4)
                 group->ConvertToRaid();
     }
 
@@ -80,7 +80,7 @@ bool InviteNearbyToGroupAction::Execute(Event event)
             if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
 
-            if (botAi->IsRealPlayer() && !sPlayerbotAIConfig->randomBotGroupNearby)
+            if (botAI->IsRealPlayer() && !sPlayerbotAIConfig->randomBotGroupNearby)
                 return false;
         }
         else
