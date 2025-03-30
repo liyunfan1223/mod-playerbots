@@ -6,7 +6,7 @@ bool MoveFromWhirlwindAction::Execute(Event event)
 {
     Unit* boss = nullptr;
     uint8 faction = bot->GetTeamId();
-    float targetDist = 10.0f; // Whirlwind tem alcance de 8, adicionando margem de segurança
+    float targetDist = 10.0f; // Whirlwind has a range of 8, adding a safety buffer
 
     switch (bot->GetMap()->GetDifficulty())
     {
@@ -34,17 +34,21 @@ bool MoveFromWhirlwindAction::Execute(Event event)
             break;
     }
 
+    // Ensure boss is valid before accessing its methods
     if (!boss)
     {
         return false;
     }
 
     float bossDistance = bot->GetExactDist2d(boss->GetPosition());
+    
+    // Check if the bot is already at a safe distance
     if (bossDistance > targetDist)
     {
         return false;
     }
 
+    // Move away from the boss to avoid Whirlwind
     return MoveAway(boss, targetDist - bossDistance);
 }
 
