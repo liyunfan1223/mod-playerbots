@@ -32,8 +32,11 @@ bool InviteToGroupAction::Invite(Player* player)
         return false;
 
     if (Group* group = player->GetGroup())
-        if (!group->isRaidGroup() && group->GetMembersCount() > 4)
-            group->ConvertToRaid();
+    {
+        if(player->GetPlayerbotAI() && !player->GetPlayerbotAI()->IsRealPlayer())
+            if (!group->IsRaidGroup() && group->GetMembersCount() > 4)
+                group->ConvertToRaid();
+    }
 
     WorldPacket p;
     uint32 roles_mask = 0;
