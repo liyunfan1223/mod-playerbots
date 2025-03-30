@@ -33,6 +33,12 @@ bool MoveFromWhirlwindAction::Execute(Event event)
         default:
             break;
     }
+    
+    if (!boss)
+    {
+        return false;
+    }
+    
     float bossDistance = bot->GetExactDist2d(boss->GetPosition());
     if (!boss || bossDistance > targetDist)
     {
