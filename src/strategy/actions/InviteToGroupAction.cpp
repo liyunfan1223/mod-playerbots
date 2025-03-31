@@ -33,7 +33,7 @@ bool InviteToGroupAction::Invite(Player* player)
 
     if (Group* group = player->GetGroup())
     {
-        if(GET_PLAYERBOT_AI(player) && !player->IsRealPlayer())
+        if(GET_PLAYERBOT_AI(player) && !GET_PLAYERBOT_AI(player)->IsRealPlayer())
             if (!group->isRaidGroup() && group->GetMembersCount() > 4)
                 group->ConvertToRaid();
     }
