@@ -374,7 +374,9 @@ void PlayerbotAI::UpdateAIGroupMembership()
             PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
             if (leaderAI && !leaderAI->IsRealPlayer())
             {
-                bot->RemoveFromGroup();
+                WorldPacket* packet = new WorldPacket(CMSG_GROUP_DISBAND);
+                bot->GetSession()->QueuePacket(packet);
+                // bot->RemoveFromGroup();
                 ResetStrategies();
             }
         }
@@ -399,7 +401,9 @@ void PlayerbotAI::UpdateAIGroupMembership()
         }
         if (!hasRealPlayer)
         {
-            bot->RemoveFromGroup();
+            WorldPacket* packet = new WorldPacket(CMSG_GROUP_DISBAND);
+            bot->GetSession()->QueuePacket(packet);
+            // bot->RemoveFromGroup();
             ResetStrategies();
         }
     }
