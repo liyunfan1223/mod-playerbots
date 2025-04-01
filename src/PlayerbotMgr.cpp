@@ -1676,3 +1676,75 @@ PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
 
     return nullptr;
 }
+
+void PlayerbotMgr::HandleSetSecurityKeyCommand(Player* player, const std::string& key)
+{
+    uint32 accountId = player->GetSession()->GetAccountId();
+    CharacterDatabase.PExecute("REPLACE INTO playerbot_account_keys (account_id, security_key) VALUES ({}, '{}')", accountId, key);
+    ChatHandler(player->GetSession()).PSendSysMessage("Security key set successfully.");
+}
+
+void PlayerbotMgr::HandleLinkAccountCommand(Player* player, const std::string& accountName, const std::string& key)
+{
+    QueryResult result = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '{}'", accountName);
+    if (!result)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Account not found.");
+        return;
+    }
+
+    Field* fields = result->Fetch();
+    uint32 linkedAccountId = fields[0].Get<uint32>();
+
+    result = CharacterDatabase.PQuery("SELECT security_key FROM playerbot_account_keys WHERE account_id = {}", linkedAccountId);
+    if (!result || result->Fetch()->Get<std::string>() != key)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Invalid security key.");
+        return;
+    }
+
+    uint32 accountId = player->GetSession()->GetAccountId();
+    CharacterDatabase.PExecute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", accountId, linkedAccountId);
+    CharacterDatabase.PExecute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", linkedAccountId, accountId);
+
+    ChatHandler(player->GetSession()).PSendSysMessage("Account linked successfully.");
+}
+
+void PlayerbotMgr::HandleViewLinkedAccountsCommand(Player* player)
+{
+    uint32 accountId = player->GetSession()->GetAccountId();
+    QueryResult result = CharacterDatabase.PQuery("SELECT linked_account_id FROM playerbot_account_links WHERE account_id = {}", accountId);
+
+    if (!result)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("No linked accounts.");
+        return;
+    }
+
+    ChatHandler(player->GetSession()).PSendSysMessage("Linked accounts:");
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 linkedAccountId = fields[0].Get<uint32>();
+        ChatHandler(player->GetSession()).PSendSysMessage("- Account ID: {}", linkedAccountId);
+    } while (result->NextRow());
+}
+
+void PlayerbotMgr::HandleUnlinkAccountCommand(Player* player, const std::string& accountName)
+{
+    QueryResult result = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '{}'", accountName);
+    if (!result)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Account not found.");
+        return;
+    }
+
+    Field* fields = result->Fetch();
+    uint32 linkedAccountId = fields[0].Get<uint32>();
+    uint32 accountId = player->GetSession()->GetAccountId();
+
+    CharacterDatabase.PExecute("DELETE FROM playerbot_account_links WHERE (account_id = {} AND linked_account_id = {}) OR (account_id = {} AND linked_account_id = {})",
+                                accountId, linkedAccountId, linkedAccountId, accountId);
+
+    ChatHandler(player->GetSession()).PSendSysMessage("Account unlinked successfully.");
+}
