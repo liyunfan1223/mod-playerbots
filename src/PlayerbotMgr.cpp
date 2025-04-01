@@ -64,21 +64,22 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(playerGuid);
     if (!accountId)
         return;
-    
+
     WorldSession* masterSession = masterAccountId ? sWorldSessionMgr->FindSession(masterAccountId) : nullptr;
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
 
     bool isRndbot = !masterAccountId;
     bool sameAccount = sPlayerbotAIConfig->allowAccountBots && accountId == masterAccountId;
     Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
-    bool sameGuild = sPlayerbotAIConfig->allowGuildBots && guild && guild->GetMember(playerGuid); 
+    bool sameGuild = sPlayerbotAIConfig->allowGuildBots && guild && guild->GetMember(playerGuid);
     bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter());
+    bool linkedAccount = sPlayerbotAIConfig->AllowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId);
 
     bool allowed = true;
     std::ostringstream out;
     std::string botName;
     sCharacterCache->GetCharacterNameByGuid(playerGuid, botName);
-    if (!isRndbot && !sameAccount && !sameGuild && !addClassBot)
+    if (!isRndbot && !sameAccount && !sameGuild && !addClassBot && !linkedAccount)
     {
         allowed = false;
         out << "Failure: You are not allowed to control bot " << botName.c_str();
@@ -115,7 +116,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     }
 
     botLoading.insert(playerGuid);
-    
+
     if (WorldSession* masterSession = sWorldSessionMgr->FindSession(masterAccountId))
     {
         masterSession->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder))
@@ -128,6 +129,13 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
             .AfterComplete([this](SQLQueryHolderBase const& holder)
                            { HandlePlayerBotLoginCallback(static_cast<PlayerbotLoginQueryHolder const&>(holder)); });
     }
+}
+
+bool PlayerbotHolder::IsAccountLinked(uint32 accountId, uint32 linkedAccountId)
+{
+    QueryResult result = CharacterDatabase.PQuery(
+        "SELECT 1 FROM playerbot_account_links WHERE account_id = {} AND linked_account_id = {}", accountId, linkedAccountId);
+    return result != nullptr;
 }
 
 void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder)
@@ -160,7 +168,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     {
         LOG_DEBUG("mod-playerbots", "Master session found but no player is associated for master account ID: {}", masterAccount);
     }
-    
+
     sRandomPlayerbotMgr->OnPlayerLogin(bot);
     OnBotLogin(bot);
 
@@ -404,7 +412,7 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
 
 void PlayerbotHolder::RemoveFromPlayerbotsMap(ObjectGuid guid)
 {
-    playerBots.erase(guid);   
+    playerBots.erase(guid);
 }
 
 Player* PlayerbotHolder::GetPlayerBot(ObjectGuid playerGuid) const
@@ -430,7 +438,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     sPlayerbotsMgr->AddPlayerbotData(bot, true);
     playerBots[bot->GetGUID()] = bot;
-    
+
     OnBotLoginInternal(bot);
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
@@ -650,8 +658,11 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             if (!accountId)
                 return "character not found";
 
-            if (!sPlayerbotAIConfig->allowAccountBots && accountId != masterAccountId)
-                return "you can only add bots from your own account";
+                if (!sPlayerbotAIConfig->allowAccountBots && accountId != masterAccountId &&
+                    !(sPlayerbotAIConfig->AllowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId)))
+                {
+                    return "you can only add bots from your own account or linked accounts";
+                }
         }
 
         AddPlayerBot(guid, masterAccountId);
@@ -677,12 +688,12 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (!bot)
         return "bot not found";
-    
+
     bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(guid.GetCounter());
 
     if (!addClassBot)
         return "ERROR: You can not use this command on non-addclass bot.";
-    
+
     if (!admin)
     {
         Player* master = ObjectAccessor::FindConnectedPlayer(masterguid);
