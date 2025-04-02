@@ -71,7 +71,7 @@ bool InviteNearbyToGroupAction::Execute(Event event)
         if (player->IsBeingTeleported())
             continue;
 
-        PlayerbotAI* botAi = player->GetPlayerbotAI();
+        PlayerbotAI* botAI = player->GetPlayerbotAI();
         if (botAI)
         {
             if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster())  // Do not invite solo players.
