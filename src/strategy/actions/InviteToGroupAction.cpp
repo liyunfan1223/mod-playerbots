@@ -56,8 +56,11 @@ bool InviteNearbyToGroupAction::Execute(Event event)
         if (!player)
             continue;
 
+        if (player == bot)
+            continue;
+
         if (player->GetMapId() != bot->GetMapId())
-                 continue;
+            continue;
 
         if (player->GetGroup())
             continue;
@@ -68,25 +71,14 @@ bool InviteNearbyToGroupAction::Execute(Event event)
         if (player->IsBeingTeleported())
             continue;
 
-        if (player == bot)
-            continue;
-
+        PlayerbotAI* botAi = player->GetPlayerbotAI();
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO &&
-                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
             if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
-
-            if (botAI->IsRealPlayer() && !sPlayerbotAIConfig->randomBotGroupNearby)
-                return false;
-        }
-        else
-        {
-            if (!sPlayerbotAIConfig->randomBotGroupNearby)
-                return false;
         }
 
         if (abs(int32(player->GetLevel() - bot->GetLevel())) > 2)
