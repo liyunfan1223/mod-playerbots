@@ -83,6 +83,11 @@ public:
 
     void SaveToDB();
 
+    void HandleSetSecurityKeyCommand(Player* player, const std::string& key);
+    void HandleLinkAccountCommand(Player* player, const std::string& accountName, const std::string& key);
+    void HandleViewLinkedAccountsCommand(Player* player);
+    void HandleUnlinkAccountCommand(Player* player, const std::string& accountName);
+
 protected:
     void OnBotLoginInternal(Player* const bot) override;
     void CheckTellErrors(uint32 elapsed);
