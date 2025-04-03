@@ -73,7 +73,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
     bool sameGuild = sPlayerbotAIConfig->allowGuildBots && guild && guild->GetMember(playerGuid);
     bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter());
-    bool linkedAccount = sPlayerbotAIConfig->AllowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId);
+    bool linkedAccount = sPlayerbotAIConfig->allowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId);
 
     bool allowed = true;
     std::ostringstream out;
