@@ -118,7 +118,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
         uint32 accountId = player->GetSession()->GetAccountId();
-        CharacterDatabase.Execute("REPLACE INTO playerbot_account_keys (account_id, security_key) VALUES ({}, '{}')", accountId, args);
+        PlayerbotsDatabase.Execute("REPLACE INTO playerbot_account_keys (account_id, security_key) VALUES ({}, '{}')", accountId, args);
         handler->PSendSysMessage("Security key set successfully.");
         return true;
     }
@@ -147,7 +147,7 @@ public:
         Field* fields = result->Fetch();
         uint32 linkedAccountId = fields[0].Get<uint32>();
 
-        result = CharacterDatabase.Query("SELECT security_key FROM playerbot_account_keys WHERE account_id = {}", linkedAccountId);
+        result = PlayerbotsDatabase.Query("SELECT security_key FROM playerbot_account_keys WHERE account_id = {}", linkedAccountId);
         if (!result || result->Fetch()->Get<std::string>() != key)
         {
             handler->PSendSysMessage("Invalid security key.");
@@ -155,8 +155,8 @@ public:
         }
 
         uint32 accountId = handler->GetSession()->GetAccountId();
-        CharacterDatabase.Execute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", accountId, linkedAccountId);
-        CharacterDatabase.Execute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", linkedAccountId, accountId);
+        PlayerbotsDatabase.Execute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", accountId, linkedAccountId);
+        PlayerbotsDatabase.Execute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", linkedAccountId, accountId);
 
         handler->PSendSysMessage("Account linked successfully.");
         return true;
@@ -168,7 +168,7 @@ public:
         uint32 accountId = player->GetSession()->GetAccountId();
 
         // Query linked account IDs
-        QueryResult result = CharacterDatabase.Query("SELECT linked_account_id FROM playerbot_account_links WHERE account_id = {}", accountId);
+        QueryResult result = PlayerbotsDatabase.Query("SELECT linked_account_id FROM playerbot_account_links WHERE account_id = {}", accountId);
 
         if (!result)
         {
@@ -223,7 +223,7 @@ public:
         uint32 linkedAccountId = fields[0].Get<uint32>();
         uint32 accountId = handler->GetSession()->GetAccountId();
 
-        CharacterDatabase.Execute("DELETE FROM playerbot_account_links WHERE (account_id = {} AND linked_account_id = {}) OR (account_id = {} AND linked_account_id = {})",
+        PlayerbotsDatabase.Execute("DELETE FROM playerbot_account_links WHERE (account_id = {} AND linked_account_id = {}) OR (account_id = {} AND linked_account_id = {})",
                                     accountId, linkedAccountId, linkedAccountId, accountId);
 
         handler->PSendSysMessage("Account unlinked successfully.");
