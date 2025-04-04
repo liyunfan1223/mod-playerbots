@@ -9,6 +9,7 @@
 #include <cstring>
 #include <istream>
 #include <string>
+#include <mutex>
 
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
@@ -422,17 +423,34 @@ Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
 
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
+    if (!bot)
+    {
+        LOG_ERROR("playerbots", "OnBotLogin called with null bot pointer");
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(playerBotsMutex);
+    
     // Prevent duplicate login
     if (playerBots.find(bot->GetGUID()) != playerBots.end())
     {
         return;
     }
 
-    sPlayerbotsMgr->AddPlayerbotData(bot, true);
-    playerBots[bot->GetGUID()] = bot;
+    try 
+    {
+        sPlayerbotsMgr->AddPlayerbotData(bot, true);
+        playerBots[bot->GetGUID()] = bot;
+        
+        OnBotLoginInternal(bot);
+    }
+    catch (std::exception& e)
+    {
+        LOG_ERROR("playerbots", "Exception in OnBotLogin: {} for bot {}", 
+            e.what(), bot->GetName().c_str());
+        return;
+    }
     
-    OnBotLoginInternal(bot);
-
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
     {
@@ -1585,10 +1603,11 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
     {
         return;
     }
-    // If the guid already exists in the map, remove it
-
+    
     if (!isBotAI)
     {
+        std::lock_guard<std::mutex> guard(playerbotsMgrMutex);
+        
         std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
         if (itr != _playerbotsMgrMap.end())
         {
@@ -1601,6 +1620,8 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
     }
     else
     {
+        std::lock_guard<std::mutex> guard(playerbotsAIMutex);
+        
         std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsAIMap.find(player->GetGUID());
         if (itr != _playerbotsAIMap.end())
         {
