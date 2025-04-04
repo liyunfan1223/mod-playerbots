@@ -221,6 +221,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                         return false;
     
                     bot->ResurrectPlayer(1.0f, false);
+                    bot->SpawnCorpseBones();
                     botAI->TellMasterNoFacing("I live, again!");
                     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
                 }
