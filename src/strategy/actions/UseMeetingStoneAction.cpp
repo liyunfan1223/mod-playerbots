@@ -221,6 +221,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
                         return false;
     
                     bot->ResurrectPlayer(1.0f, false);
+                    bot->SpawnCorpseBones();
                     botAI->TellMasterNoFacing("I live, again!");
                     botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
                 }
@@ -243,6 +244,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
         }
     }
 
-    botAI->TellError("Not enough place to summon");
+    if(summoner != player)
+         botAI->TellError("Not enough place to summon");
     return false;
 }
