@@ -356,8 +356,9 @@ bool StoreLootAction::Execute(Event event)
 
     if (gold > 0)
     {
-        WorldPacket packet(CMSG_LOOT_MONEY, 0);
-        bot->GetSession()->HandleLootMoneyOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_LOOT_MONEY, 0);
+        bot->GetSession()->QueuePacket(packet);
+        // bot->GetSession()->HandleLootMoneyOpcode(packet);
     }
 
     for (uint8 i = 0; i < items; ++i)
