@@ -21,7 +21,7 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
 
     float distance = bot->GetDistance(boss);
 
-    // Too close and either in front or behind
+    // Too close (30 yards) and either in front or behind
     if (distance <= 30.0f && (diff < M_PI / 4 || diff > 3 * M_PI / 4))
     {
         float offsetAngle = bossFacing + M_PI_2;  // 90° to the right
@@ -50,7 +50,7 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event)
         return false;
 
     bot->Yell("Spreading out — I'm the Fireball target!", LANG_UNIVERSAL);
-    return MoveFromGroup(9.0f);
+    return MoveFromGroup(9.0f);  // move 9 yards
 }
 
 bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
