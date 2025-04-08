@@ -10,12 +10,12 @@ OnyxiaDeepBreathTrigger::OnyxiaDeepBreathTrigger(PlayerbotAI* botAI) : Trigger(b
 
 bool OnyxiaDeepBreathTrigger::IsActive()
 {
-    Unit* onyxia = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!onyxia || !onyxia->HasUnitState(UNIT_STATE_CASTING))
+    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!boss || !boss->HasUnitState(UNIT_STATE_CASTING))
         return false;
 
     // Check if Onyxia is casting
-    Spell* currentSpell = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    Spell* currentSpell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
 
     if (!currentSpell)
         return false;
@@ -40,18 +40,7 @@ bool OnyxiaDeepBreathTrigger::IsActive()
 
 OnyxiaNearTailTrigger::OnyxiaNearTailTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ony near tail") {}
 
-bool OnyxiaNearTailTrigger::IsActive()
-{
-    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
-
-    if (!boss || botAI->IsTank(bot))
-        return false;
-
-    float angle = bot->GetAngle(boss);
-    float distance = bot->GetDistance(boss);
-
-    return distance < 10.0f && (angle < M_PI / 4 || angle > (2 * M_PI - M_PI / 4));
-}
+bool OnyxiaNearTailTrigger::IsActive() { return !botAI->IsTank(bot) && AI_VALUE2(Unit*, "find target", "onyxia"); }
 
 RaidOnyxiaFireballSplashTrigger::RaidOnyxiaFireballSplashTrigger(PlayerbotAI* botAI)
     : Trigger(botAI, "ony fireball splash incoming")

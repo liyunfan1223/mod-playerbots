@@ -10,6 +10,8 @@
 bool RaidOnyxiaMoveToSideAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!boss)
+        return false;
 
     float angleToBot = boss->GetAngle(bot);
     float bossFacing = boss->GetOrientation();
@@ -17,27 +19,33 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
     if (diff > M_PI)
         diff = 2 * M_PI - diff;
 
-    if (diff < M_PI / 4 || diff > 3 * M_PI / 4)
+    float distance = bot->GetDistance(boss);
+
+    // Too close and either in front or behind
+    if (distance <= 30.0f && (diff < M_PI / 4 || diff > 3 * M_PI / 4))
     {
-        // We're in front or behind, need to move to side
         float offsetAngle = bossFacing + M_PI_2;  // 90° to the right
         float offsetDist = 15.0f;
 
         float sideX = boss->GetPositionX() + offsetDist * cos(offsetAngle);
         float sideY = boss->GetPositionY() + offsetDist * sin(offsetAngle);
 
-        bot->Yell("Moving to Side of Boss!", LANG_UNIVERSAL);
+        bot->Yell("Too close to front or tail — moving to side of Onyxia!", LANG_UNIVERSAL);
         return MoveTo(boss->GetMapId(), sideX, sideY, boss->GetPositionZ(), false, false, false, false,
                       MovementPriority::MOVEMENT_COMBAT);
     }
+
     return false;
 }
 
 bool RaidOnyxiaSpreadOutAction::Execute(Event event)
 {
-    Unit* onyxia = AI_VALUE2(Unit*, "find target", "onyxia");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
 
-    Player* target = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_targets.GetUnitTarget()->ToPlayer();
+    if (!boss)
+        return false;
+
+    Player* target = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_targets.GetUnitTarget()->ToPlayer();
     if (target != bot)
         return false;
 
@@ -48,6 +56,8 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event)
 bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!boss)
+        return false;
 
     Position bossPos = boss->GetPosition();
     float angle = boss->GetOrientation();  // Facing direction in radians
