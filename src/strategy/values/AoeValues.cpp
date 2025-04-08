@@ -135,7 +135,11 @@ Aura* AreaDebuffValue::Calculate()
         for (auto i = list.begin(); i != list.end(); ++i)
         {
             AuraEffect* aurEff = *i;
+            if (!aurEff)
+                continue;
             Aura* aura = aurEff->GetBase();
+            if (!aura)
+                continue;
             AuraObjectType type = aura->GetType();
             bool isPositive = aura->GetSpellInfo()->IsPositive();
             if (type == DYNOBJ_AURA_TYPE && !isPositive)
