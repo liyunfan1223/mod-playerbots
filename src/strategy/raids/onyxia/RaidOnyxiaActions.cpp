@@ -6,16 +6,13 @@
 #include "MovementActions.h"
 #include "Playerbots.h"
 #include "PositionAction.h"
+#include "SharedDefines.h"
 
 bool RaidOnyxiaPositionTankAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
     if (!boss || !botAI->IsTank(bot))
         return false;
-
-    Unit* currentTarget = boss->GetVictim();
-    if (!currentTarget || currentTarget != bot)
-        return false;  // Only the tank with aggro should go to main position
 
     // Back wall
     const float safeX = 31.0f;
@@ -26,6 +23,7 @@ bool RaidOnyxiaPositionTankAction::Execute(Event event)
     float dist = bot->GetExactDist2d(safeX, safeY);
     if (dist > 5.0f)
     {
+        bot->Yell("Moving to Tank Position!", LANG_UNIVERSAL);
         return MoveTo(boss->GetMapId(), safeX, safeY, safeZ, false, false, false, false,
                       MovementPriority::MOVEMENT_COMBAT);
     }
@@ -54,6 +52,7 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
         float sideX = boss->GetPositionX() + offsetDist * cos(offsetAngle);
         float sideY = boss->GetPositionY() + offsetDist * sin(offsetAngle);
 
+        bot->Yell("Moving to Side of Boss!", LANG_UNIVERSAL);
         return MoveTo(boss->GetMapId(), sideX, sideY, boss->GetPositionZ(), false, false, false, false,
                       MovementPriority::MOVEMENT_COMBAT);
     }
@@ -61,7 +60,11 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
     return false;
 }
 
-bool RaidOnyxiaSpreadOutAction::Execute(Event event) { return MoveFromGroup(9.0f); }
+bool RaidOnyxiaSpreadOutAction::Execute(Event event)
+{
+    bot->Yell("Spreading Out!", LANG_UNIVERSAL);
+    return MoveFromGroup(9.0f);
+}
 
 bool RaidOnyxiaAvoidLavaAction::Execute(Event event)
 {
@@ -88,6 +91,7 @@ bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
     float safeX = bossPos.GetPositionX() + offset * cos(sideAngle);
     float safeY = bossPos.GetPositionY() + offset * sin(sideAngle);
 
+    bot->Yell("Running To Safe Zone for Deep Breath!", LANG_UNIVERSAL);
     return MoveTo(boss->GetMapId(), safeX, safeY, bossPos.GetPositionZ(), false, false, false, false,
                   MovementPriority::MOVEMENT_COMBAT);
 }
