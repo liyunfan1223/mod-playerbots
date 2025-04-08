@@ -10,12 +10,16 @@ OnyxiaDeepBreathTrigger::OnyxiaDeepBreathTrigger(PlayerbotAI* botAI) : Trigger(b
 
 bool OnyxiaDeepBreathTrigger::IsActive()
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!boss)
+    Unit* onyxia = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!onyxia || !onyxia->HasUnitState(UNIT_STATE_CASTING))
         return false;
 
-    return boss->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
-           boss->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == 17086;
+    // Check if Onyxia is casting Fireball
+    Spell* currentSpell = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (currentSpell && currentSpell->m_spellInfo->Id != 17086)
+        return true;
+
+    return false;
 }
 
 OnyxiaNearTailTrigger::OnyxiaNearTailTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ony near tail") {}
