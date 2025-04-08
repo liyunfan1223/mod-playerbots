@@ -9,16 +9,6 @@
 
 class PlayerbotAI;
 
-class RaidOnyxiaPositionTankAction : public MovementAction
-{
-public:
-    RaidOnyxiaPositionTankAction(PlayerbotAI* botAI, std::string const name = "ony position tank")
-        : MovementAction(botAI, name)
-    {
-    }
-    bool Execute(Event event) override;
-};
-
 class RaidOnyxiaMoveToSideAction : public MovementAction
 {
 public:
@@ -33,16 +23,6 @@ class RaidOnyxiaSpreadOutAction : public MovementAction
 {
 public:
     RaidOnyxiaSpreadOutAction(PlayerbotAI* botAI, std::string const name = "ony spread out")
-        : MovementAction(botAI, name)
-    {
-    }
-    bool Execute(Event event) override;
-};
-
-class RaidOnyxiaAvoidLavaAction : public MovementAction
-{
-public:
-    RaidOnyxiaAvoidLavaAction(PlayerbotAI* botAI, std::string const name = "ony avoid lava")
         : MovementAction(botAI, name)
     {
     }

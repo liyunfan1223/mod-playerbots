@@ -6,30 +6,6 @@
 #include "MovementActions.h"
 #include "Playerbots.h"
 #include "PositionAction.h"
-#include "SharedDefines.h"
-
-bool RaidOnyxiaPositionTankAction::Execute(Event event)
-{
-    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!boss || !botAI->IsTank(bot))
-        return false;
-
-    // Back wall
-    const float safeX = 31.0f;
-    const float safeY = -209.0f;
-
-    const float safeZ = boss->GetPositionZ();
-
-    float dist = bot->GetExactDist2d(safeX, safeY);
-    if (dist > 5.0f)
-    {
-        bot->Yell("Moving to Tank Position!", LANG_UNIVERSAL);
-        return MoveTo(boss->GetMapId(), safeX, safeY, safeZ, false, false, false, false,
-                      MovementPriority::MOVEMENT_COMBAT);
-    }
-
-    return false;
-}
 
 bool RaidOnyxiaMoveToSideAction::Execute(Event event)
 {
@@ -57,7 +33,6 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
         return MoveTo(boss->GetMapId(), sideX, sideY, boss->GetPositionZ(), false, false, false, false,
                       MovementPriority::MOVEMENT_COMBAT);
     }
-
     return false;
 }
 
@@ -82,15 +57,6 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event)
     return MoveFromGroup(9.0f);
 }
 
-bool RaidOnyxiaAvoidLavaAction::Execute(Event event)
-{
-    if (bot->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
-    {
-        return MoveFromGroup(10.0f);
-    }
-    return false;
-}
-
 bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
@@ -99,7 +65,7 @@ bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
 
     Position bossPos = boss->GetPosition();
     float angle = boss->GetOrientation();  // Facing direction in radians
-    float offset = 25.0f;
+    float offset = 30.0f;
 
     // Pick one side (+90 degrees), perpendicular to breath - urand for a bit of
     // randomness
