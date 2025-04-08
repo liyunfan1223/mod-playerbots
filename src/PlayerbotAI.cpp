@@ -209,8 +209,7 @@ PlayerbotAI::PlayerbotAI(Player* bot)
     masterIncomingPacketHandlers.AddHandler(CMSG_PUSHQUESTTOPARTY, "quest share");
     botOutgoingPacketHandlers.AddHandler(SMSG_QUESTUPDATE_COMPLETE, "quest update complete");
     botOutgoingPacketHandlers.AddHandler(SMSG_QUESTUPDATE_ADD_KILL, "quest update add kill");
-    // botOutgoingPacketHandlers.AddHandler(SMSG_QUESTUPDATE_ADD_ITEM, "quest update add item"); //
-    // SMSG_QUESTUPDATE_ADD_ITEM no longer used
+    // botOutgoingPacketHandlers.AddHandler(SMSG_QUESTUPDATE_ADD_ITEM, "quest update add item"); // SMSG_QUESTUPDATE_ADD_ITEM no longer used
     botOutgoingPacketHandlers.AddHandler(SMSG_QUEST_CONFIRM_ACCEPT, "confirm quest");
 }
 
@@ -1499,11 +1498,11 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
     std::string strategyName;
     switch (mapId)
     {
-        case 409:
-            strategyName = "mc";
-            break;
         case 249:
             strategyName = "onyxia";
+            break;
+        case 409:
+            strategyName = "mc";
             break;
         case 469:
             strategyName = "bwl";
@@ -2345,6 +2344,7 @@ std::string PlayerbotAI::GetLocalizedCreatureName(uint32 entry)
     }
     return name;
 }
+
 
 std::string PlayerbotAI::GetLocalizedGameObjectName(uint32 entry)
 {
@@ -3298,14 +3298,13 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
             std::ostringstream out;
             out << "Spell cast failed - ";
             out << "Spell ID: " << spellId << " (" << ChatHelper::FormatSpell(spellInfo) << "), ";
-            out << "Error Code: " << static_cast<int>(result) << " (0x" << std::hex << static_cast<int>(result)
-                << std::dec << "), ";
+            out << "Error Code: " << static_cast<int>(result) << " (0x" << std::hex << static_cast<int>(result) << std::dec << "), ";
             out << "Bot: " << bot->GetName() << ", ";
-
+    
             // Check spell target type
             if (targets.GetUnitTarget())
             {
-                out << "Target: Unit (" << targets.GetUnitTarget()->GetName()
+                out << "Target: Unit (" << targets.GetUnitTarget()->GetName() 
                     << ", Low GUID: " << targets.GetUnitTarget()->GetGUID().GetCounter()
                     << ", High GUID: " << static_cast<uint32>(targets.GetUnitTarget()->GetGUID().GetHigh()) << "), ";
             }
@@ -3321,7 +3320,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
                 out << "Target: Item (Low GUID: " << targets.GetItemTarget()->GetGUID().GetCounter()
                     << ", High GUID: " << static_cast<uint32>(targets.GetItemTarget()->GetGUID().GetHigh()) << "), ";
             }
-
+    
             // Check if bot is in trade mode
             if (bot->GetTradeData())
             {
@@ -3329,7 +3328,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
                 Item* tradeItem = bot->GetTradeData()->GetTraderData()->GetItem(TRADE_SLOT_NONTRADED);
                 if (tradeItem)
                 {
-                    out << "Trade Item: " << tradeItem->GetEntry()
+                    out << "Trade Item: " << tradeItem->GetEntry() 
                         << " (Low GUID: " << tradeItem->GetGUID().GetCounter()
                         << ", High GUID: " << static_cast<uint32>(tradeItem->GetGUID().GetHigh()) << "), ";
                 }
@@ -3342,7 +3341,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
             {
                 out << "Trade Mode: Inactive, ";
             }
-
+    
             TellMasterNoFacing(out);
         }
 
@@ -4999,50 +4998,48 @@ Item* PlayerbotAI::FindBandage() const
 
 Item* PlayerbotAI::FindOpenableItem() const
 {
-    return FindItemInInventory(
-        [this](ItemTemplate const* itemTemplate) -> bool
-        {
-            return (itemTemplate->Flags & ITEM_FLAG_HAS_LOOT) &&
-                   (itemTemplate->LockID == 0 || !this->bot->GetItemByEntry(itemTemplate->ItemId)->IsLocked());
-        });
+    return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
+    {
+        return (itemTemplate->Flags & ITEM_FLAG_HAS_LOOT) &&
+               (itemTemplate->LockID == 0 || !this->bot->GetItemByEntry(itemTemplate->ItemId)->IsLocked());
+    });
 }
 
 Item* PlayerbotAI::FindLockedItem() const
 {
-    return FindItemInInventory(
-        [this](ItemTemplate const* itemTemplate) -> bool
+    return FindItemInInventory([this](ItemTemplate const* itemTemplate) -> bool
+    {
+        if (!this->bot->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
+            return false;
+
+        if (itemTemplate->LockID == 0)  // Ensure the item is actually locked
+            return false;
+
+        Item* item = this->bot->GetItemByEntry(itemTemplate->ItemId);
+        if (!item || !item->IsLocked())  // Ensure item instance is locked
+            return false;
+
+        // Check if bot has enough Lockpicking skill
+        LockEntry const* lockInfo = sLockStore.LookupEntry(itemTemplate->LockID);
+        if (!lockInfo)
+            return false;
+
+        for (uint8 j = 0; j < 8; ++j)
         {
-            if (!this->bot->HasSkill(SKILL_LOCKPICKING))  // Ensure bot has Lockpicking skill
-                return false;
-
-            if (itemTemplate->LockID == 0)  // Ensure the item is actually locked
-                return false;
-
-            Item* item = this->bot->GetItemByEntry(itemTemplate->ItemId);
-            if (!item || !item->IsLocked())  // Ensure item instance is locked
-                return false;
-
-            // Check if bot has enough Lockpicking skill
-            LockEntry const* lockInfo = sLockStore.LookupEntry(itemTemplate->LockID);
-            if (!lockInfo)
-                return false;
-
-            for (uint8 j = 0; j < 8; ++j)
+            if (lockInfo->Type[j] == LOCK_KEY_SKILL)
             {
-                if (lockInfo->Type[j] == LOCK_KEY_SKILL)
+                uint32 skillId = SkillByLockType(LockType(lockInfo->Index[j]));
+                if (skillId == SKILL_LOCKPICKING)
                 {
-                    uint32 skillId = SkillByLockType(LockType(lockInfo->Index[j]));
-                    if (skillId == SKILL_LOCKPICKING)
-                    {
-                        uint32 requiredSkill = lockInfo->Skill[j];
-                        uint32 botSkill = this->bot->GetSkillValue(SKILL_LOCKPICKING);
-                        return botSkill >= requiredSkill;
-                    }
+                    uint32 requiredSkill = lockInfo->Skill[j];
+                    uint32 botSkill = this->bot->GetSkillValue(SKILL_LOCKPICKING);
+                    return botSkill >= requiredSkill;
                 }
             }
+        }
 
-            return false;
-        });
+        return false;
+    });
 }
 
 static const uint32 uPriorizedSharpStoneIds[8] = {ADAMANTITE_SHARPENING_DISPLAYID, FEL_SHARPENING_DISPLAYID,
