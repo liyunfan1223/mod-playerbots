@@ -1,17 +1,17 @@
 #ifndef _PLAYERBOT_RAIDSTRATEGYCONTEXT_H_
 #define _PLAYERBOT_RAIDSTRATEGYCONTEXT_H_
 
-#include "RaidAq20Strategy.h"
-#include "RaidBwlStrategy.h"
-#include "RaidEoEStrategy.h"
-#include "RaidIccStrategy.h"
-#include "RaidMcStrategy.h"
-#include "RaidNaxxStrategy.h"
 #include "RaidOnyxiaStrategy.h"
-#include "RaidOsStrategy.h"
 #include "RaidUlduarStrategy.h"
-#include "RaidVoAStrategy.h"
 #include "Strategy.h"
+#include "RaidBwlStrategy.h"
+#include "RaidNaxxStrategy.h"
+#include "RaidOsStrategy.h"
+#include "RaidEoEStrategy.h"
+#include "RaidMcStrategy.h"
+#include "RaidAq20Strategy.h"
+#include "RaidIccStrategy.h"
+#include "RaidVoAStrategy.h"
 
 class RaidStrategyContext : public NamedObjectContext<Strategy>
 {
