@@ -543,18 +543,22 @@ bool BGJoinAction::JoinQueue(uint32 type)
     }
 
     botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
-
+    
     if (!isArena)
     {
-        WorldPacket packet(CMSG_BATTLEMASTER_JOIN, 20);
-        packet << bot->GetGUID() << bgTypeId_ << instanceId << joinAsGroup;
-        bot->GetSession()->HandleBattlemasterJoinOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_BATTLEMASTER_JOIN, 20);
+        *packet << bot->GetGUID() << bgTypeId_ << instanceId << joinAsGroup;
+        /// FIX race condition
+        // bot->GetSession()->HandleBattlemasterJoinOpcode(packet);
+        bot->GetSession()->QueuePacket(packet);
     }
     else
     {
-        WorldPacket arena_packet(CMSG_BATTLEMASTER_JOIN_ARENA, 20);
-        arena_packet << unit->GetGUID() << arenaslot << asGroup << uint8(isRated);
-        bot->GetSession()->HandleBattlemasterJoinArena(arena_packet);
+        WorldPacket* arena_packet = new WorldPacket(CMSG_BATTLEMASTER_JOIN_ARENA, 20);
+        *arena_packet << unit->GetGUID() << arenaslot << asGroup << uint8(isRated);
+        /// FIX race condition
+        // bot->GetSession()->HandleBattlemasterJoinArena(arena_packet);
+        bot->GetSession()->QueuePacket(arena_packet);
     }
 
     return true;
