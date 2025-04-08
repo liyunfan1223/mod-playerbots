@@ -2184,6 +2184,19 @@ bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
         return true;
     return false;
 }
+bool RandomPlayerbotMgr::IsAddclassBot(Player* bot)
+{
+    if (bot && GET_PLAYERBOT_AI(bot))
+    {
+        if (GET_PLAYERBOT_AI(bot)->IsRealPlayer())
+            return false;
+    }
+    if (bot)
+    {
+        return IsRandombot(bot->GetGUID().GetCounter());
+    }
+    return false;
+}
 
 bool RandomPlayerbotMgr::IsAddclassBot(ObjectGuid::LowType bot)
 {

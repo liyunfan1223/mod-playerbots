@@ -32,7 +32,7 @@ bool TradeStatusAction::Execute(Event event)
         return false;
     }
 
-    if (sPlayerbotAIConfig->enableRandomBotTrading == 0 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter())))
+    if (sPlayerbotAIConfig->enableRandomBotTrading == 0 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(bot)))
     {
         bot->Whisper("Trading is disabled", LANG_UNIVERSAL, trader);
         return false;
@@ -171,7 +171,7 @@ bool TradeStatusAction::CheckTrade()
                 break;
             }
         }
-        if (isGivingItem && sPlayerbotAIConfig->enableRandomBotTrading == 2 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter())))
+        if (isGivingItem && sPlayerbotAIConfig->enableRandomBotTrading == 2 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(bot)))
         {
             bot->Whisper("Selling is disabled.", LANG_UNIVERSAL, trader);
             return false;
@@ -186,7 +186,7 @@ bool TradeStatusAction::CheckTrade()
                 break;
             }
         }
-        if (isGettingItem && sPlayerbotAIConfig->enableRandomBotTrading == 3 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter())))
+        if (isGettingItem && sPlayerbotAIConfig->enableRandomBotTrading == 3 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(bot)))
         {
             bot->Whisper("Buying is disabled.", LANG_UNIVERSAL, trader);
             return false;
