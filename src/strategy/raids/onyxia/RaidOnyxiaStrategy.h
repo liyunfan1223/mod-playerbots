@@ -10,13 +10,10 @@ class RaidOnyxiaStrategy : public Strategy
 public:
     RaidOnyxiaStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
-    const std::string& getName() const;
+    std::string const getName() override { return "raid onyxia"; }
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
-
-private:
-    static const std::string name;
 };
 
 #endif
