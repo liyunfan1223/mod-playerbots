@@ -47,7 +47,10 @@ bool CastCustomSpellAction::Execute(Event event)
         {
             if (!target)
                 target = botAI->GetUnit(go);
-
+            
+            if (!botAI->GetUnit(go) || !botAI->GetUnit(go)->IsInWorld())
+                continue;
+            
             chat->eraseAllSubStr(text, chat->FormatWorldobject(botAI->GetUnit(go)));
         }
 
