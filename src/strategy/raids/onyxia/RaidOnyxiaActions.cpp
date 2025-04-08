@@ -30,7 +30,7 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
         float sideX = boss->GetPositionX() + offsetDist * cos(offsetAngle);
         float sideY = boss->GetPositionY() + offsetDist * sin(offsetAngle);
 
-        bot->Yell("Too close to front or tail — moving to side of Onyxia!", LANG_UNIVERSAL);
+        // bot->Yell("Too close to front or tail — moving to side of Onyxia!", LANG_UNIVERSAL);
         return MoveTo(boss->GetMapId(), sideX, sideY, boss->GetPositionZ(), false, false, false, false,
                       MovementPriority::MOVEMENT_COMBAT);
     }
@@ -49,7 +49,7 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event)
     if (target != bot)
         return false;
 
-    bot->Yell("Spreading out — I'm the Fireball target!", LANG_UNIVERSAL);
+    // bot->Yell("Spreading out — I'm the Fireball target!", LANG_UNIVERSAL);
     return MoveFromGroup(9.0f);  // move 9 yards
 }
 
@@ -69,7 +69,7 @@ bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
     float safeX = bossPos.GetPositionX() + offset * cos(sideAngle);
     float safeY = bossPos.GetPositionY() + offset * sin(sideAngle);
 
-    bot->Yell("Running To Safe Zone for Deep Breath!", LANG_UNIVERSAL);
+    // bot->Yell("Running To Safe Zone for Deep Breath!", LANG_UNIVERSAL);
     return MoveTo(boss->GetMapId(), safeX, safeY, bossPos.GetPositionZ(), false, false, false, false,
                   MovementPriority::MOVEMENT_COMBAT);
 }
