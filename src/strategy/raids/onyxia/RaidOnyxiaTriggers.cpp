@@ -14,10 +14,26 @@ bool OnyxiaDeepBreathTrigger::IsActive()
     if (!onyxia || !onyxia->HasUnitState(UNIT_STATE_CASTING))
         return false;
 
-    // Check if Onyxia is casting Fireball
+    // Check if Onyxia is casting
     Spell* currentSpell = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-    if (currentSpell && currentSpell->m_spellInfo->Id != 17086)
+
+    if (!currentSpell)
+        return false;
+
+    uint32 spellId = currentSpell->m_spellInfo->Id;
+
+    if (spellId == 17086 ||  // North to South
+        spellId == 18351 ||  // South to North
+        spellId == 18576 ||  // East to West
+        spellId == 18609 ||  // West to East
+        spellId == 18564 ||  // Southeast to Northwest
+        spellId == 18584 ||  // Northwest to Southeast
+        spellId == 18596 ||  // Southwest to Northeast
+        spellId == 18617     // Northeast to Southwest
+    )
+    {
         return true;
+    }
 
     return false;
 }
@@ -27,7 +43,8 @@ OnyxiaNearTailTrigger::OnyxiaNearTailTrigger(PlayerbotAI* botAI) : Trigger(botAI
 bool OnyxiaNearTailTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!boss)
+
+    if (!boss || botAI->IsTank(bot))
         return false;
 
     float angle = bot->GetAngle(boss);

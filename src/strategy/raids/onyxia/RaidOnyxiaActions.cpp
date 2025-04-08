@@ -11,9 +11,6 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
 
-    if (!boss || botAI->IsTank(bot))
-        return false;
-
     float angleToBot = boss->GetAngle(bot);
     float bossFacing = boss->GetOrientation();
     float diff = fabs(angleToBot - bossFacing);
@@ -39,15 +36,6 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
 bool RaidOnyxiaSpreadOutAction::Execute(Event event)
 {
     Unit* onyxia = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!onyxia || !onyxia->HasUnitState(UNIT_STATE_CASTING))
-        return false;
-
-    const SpellInfo* spell = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL)
-                                 ? onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo
-                                 : nullptr;
-
-    if (!spell || spell->Id != 18392)  // Replace with actual spell ID (likely 18392)
-        return false;
 
     Player* target = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_targets.GetUnitTarget()->ToPlayer();
     if (target != bot)
@@ -60,8 +48,6 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event)
 bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!boss)
-        return false;
 
     Position bossPos = boss->GetPosition();
     float angle = boss->GetOrientation();  // Facing direction in radians
