@@ -34,7 +34,8 @@ bool RaidOnyxiaPositionTankAction::Execute(Event event)
 bool RaidOnyxiaMoveToSideAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!boss)
+
+    if (!boss || botAI->IsTank(bot))
         return false;
 
     float angleToBot = boss->GetAngle(bot);
@@ -62,7 +63,22 @@ bool RaidOnyxiaMoveToSideAction::Execute(Event event)
 
 bool RaidOnyxiaSpreadOutAction::Execute(Event event)
 {
-    bot->Yell("Spreading Out!", LANG_UNIVERSAL);
+    Unit* onyxia = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!onyxia || !onyxia->HasUnitState(UNIT_STATE_CASTING))
+        return false;
+
+    const SpellInfo* spell = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL)
+                                 ? onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo
+                                 : nullptr;
+
+    if (!spell || spell->Id != 18392)  // Replace with actual spell ID (likely 18392)
+        return false;
+
+    Player* target = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_targets.GetUnitTarget()->ToPlayer();
+    if (target != bot)
+        return false;
+
+    bot->Yell("Spreading out — I'm the Fireball target!", LANG_UNIVERSAL);
     return MoveFromGroup(9.0f);
 }
 
