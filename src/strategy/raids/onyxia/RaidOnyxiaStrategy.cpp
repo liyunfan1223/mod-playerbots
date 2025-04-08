@@ -25,3 +25,8 @@ void RaidOnyxiaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "ony lava pulse", NextAction::array(0, new NextAction("ony avoid lava", ACTION_MOVE + 3), nullptr)));
 }
+
+void RaidOnyxiaStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+{
+    // Empty for now
+}
