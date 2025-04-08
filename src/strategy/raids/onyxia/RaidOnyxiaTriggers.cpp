@@ -40,7 +40,18 @@ bool OnyxiaDeepBreathTrigger::IsActive()
 
 OnyxiaNearTailTrigger::OnyxiaNearTailTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ony near tail") {}
 
-bool OnyxiaNearTailTrigger::IsActive() { return !botAI->IsTank(bot) && AI_VALUE2(Unit*, "find target", "onyxia"); }
+bool OnyxiaNearTailTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!boss || botAI->IsTank(bot))
+        return false;
+
+    // Skip if Onyxia is in air or transitioning
+    if (!boss->IsInCombat() || boss->IsFlying() || !boss->GetVictim())
+        return false;
+
+    return true;
+}
 
 RaidOnyxiaFireballSplashTrigger::RaidOnyxiaFireballSplashTrigger(PlayerbotAI* botAI)
     : Trigger(botAI, "ony fireball splash incoming")
@@ -49,12 +60,12 @@ RaidOnyxiaFireballSplashTrigger::RaidOnyxiaFireballSplashTrigger(PlayerbotAI* bo
 
 bool RaidOnyxiaFireballSplashTrigger::IsActive()
 {
-    Unit* onyxia = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!onyxia || !onyxia->HasUnitState(UNIT_STATE_CASTING))
+    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!boss || !boss->HasUnitState(UNIT_STATE_CASTING))
         return false;
 
     // Check if Onyxia is casting Fireball
-    Spell* currentSpell = onyxia->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    Spell* currentSpell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (!currentSpell || currentSpell->m_spellInfo->Id != 18392)  // 18392 is the classic Fireball ID
         return false;
 
