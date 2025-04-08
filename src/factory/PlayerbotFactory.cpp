@@ -491,6 +491,7 @@ void PlayerbotFactory::Refresh()
     InitSpecialSpells();
     InitMounts();
     InitKeyring();
+    InitPotions();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
     {
         ApplyEnchantAndGemsNew();
@@ -4278,6 +4279,9 @@ void PlayerbotFactory::IterateItemsInBank(IterateItemsVisitor* visitor)
 void PlayerbotFactory::InitKeyring()
 {
     if (!bot)
+        return;
+    
+    if (bot->GetLevel() < 70)
         return;
 
     ReputationMgr& repMgr = bot->GetReputationMgr(); // Reference, use . instead of ->
