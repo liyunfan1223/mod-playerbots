@@ -181,7 +181,6 @@ bool TradeStatusAction::CheckTrade()
                 break;
             }
         }
-
         
         if (isGettingItem)
         {
@@ -207,6 +206,7 @@ bool TradeStatusAction::CheckTrade()
         int32 playerMoney = trader->GetTradeData()->GetMoney() + playerItemsMoney;
         if (playerMoney || botMoney)
             botAI->PlaySound(playerMoney < botMoney ? TEXT_EMOTE_SIGH : TEXT_EMOTE_THANK);
+
         return true;
     }
 
