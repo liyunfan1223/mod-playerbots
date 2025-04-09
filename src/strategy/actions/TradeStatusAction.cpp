@@ -171,11 +171,6 @@ bool TradeStatusAction::CheckTrade()
                 break;
             }
         }
-        if (isGivingItem && sPlayerbotAIConfig->enableRandomBotTrading == 2 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(bot)))
-        {
-            bot->Whisper("Selling is disabled.", LANG_UNIVERSAL, trader);
-            return false;
-        }
         bool isGettingItem = false;
         for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
         {
@@ -186,11 +181,7 @@ bool TradeStatusAction::CheckTrade()
                 break;
             }
         }
-        if (isGettingItem && sPlayerbotAIConfig->enableRandomBotTrading == 3 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(bot)))
-        {
-            bot->Whisper("Buying is disabled.", LANG_UNIVERSAL, trader);
-            return false;
-        }
+
         
         if (isGettingItem)
         {
@@ -216,7 +207,6 @@ bool TradeStatusAction::CheckTrade()
         int32 playerMoney = trader->GetTradeData()->GetMoney() + playerItemsMoney;
         if (playerMoney || botMoney)
             botAI->PlaySound(playerMoney < botMoney ? TEXT_EMOTE_SIGH : TEXT_EMOTE_THANK);
-
         return true;
     }
 
@@ -224,7 +214,16 @@ bool TradeStatusAction::CheckTrade()
     int32 botMoney = bot->GetTradeData()->GetMoney() + botItemsMoney;
     int32 playerItemsMoney = CalculateCost(trader, false);
     int32 playerMoney = trader->GetTradeData()->GetMoney() + playerItemsMoney;
-
+    if (botItemsMoney > 0 && sPlayerbotAIConfig->enableRandomBotTrading == 2 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(bot)))
+    {
+        bot->Whisper("Selling is disabled.", LANG_UNIVERSAL, trader);
+        return false;
+    }
+    if (playerItemsMoney && sPlayerbotAIConfig->enableRandomBotTrading == 3 && (sRandomPlayerbotMgr->IsRandomBot(bot)|| sRandomPlayerbotMgr->IsAddclassBot(bot)))
+    {
+        bot->Whisper("Buying is disabled.", LANG_UNIVERSAL, trader);
+        return false;
+    }
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
         Item* item = bot->GetTradeData()->GetItem((TradeSlots)slot);

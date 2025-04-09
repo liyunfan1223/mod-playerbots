@@ -2193,7 +2193,7 @@ bool RandomPlayerbotMgr::IsAddclassBot(Player* bot)
     }
     if (bot)
     {
-        return IsRandomBot(bot->GetGUID().GetCounter());
+        return IsAddclassBot(bot->GetGUID().GetCounter());
     }
     return false;
 }
