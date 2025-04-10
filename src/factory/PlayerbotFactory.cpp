@@ -1609,10 +1609,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         if (level < 50 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
             continue;
 
-        if (level < 30 && slot == EQUIPMENT_SLOT_NECK)
-            continue;
-
-        if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
+        if (level < 30 && (slot == EQUIPMENT_SLOT_NECK || slot == EQUIPMENT_SLOT_HEAD))
             continue;
 
         if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
@@ -1632,7 +1629,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
         oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
-        uint32 desiredQuality = itemQuality;
+        int32 desiredQuality = itemQuality;
         if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
         {
             desiredQuality--;
@@ -1667,8 +1664,10 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
+                        
+                        bool shouldCheckGS = desiredQuality > ITEM_QUALITY_NORMAL;
 
-                        if (gearScoreLimit != 0 &&
+                        if (shouldCheckGS && gearScoreLimit != 0 &&
                             CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit)
                         {
                             continue;
@@ -1697,7 +1696,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                     }
                 }
             }
-        } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_NORMAL);
+        } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_POOR);
 
         std::vector<uint32>& ids = items[slot];
         if (ids.empty())
@@ -1779,10 +1778,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             if (level < 50 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
                 continue;
 
-            if (level < 30 && slot == EQUIPMENT_SLOT_NECK)
-                continue;
-
-            if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
+            if (level < 30 && (slot == EQUIPMENT_SLOT_NECK || slot == EQUIPMENT_SLOT_HEAD))
                 continue;
 
             if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
@@ -3973,6 +3969,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         {
             continue;
         }
+        
+        if (item->GetTemplate() && item->GetTemplate()->Quality < ITEM_QUALITY_UNCOMMON)
+            continue;
         int32 bestEnchantId = -1;
         float bestScore = 0;
         for (const uint32& enchantSpell : enchantSpellIdCache)
