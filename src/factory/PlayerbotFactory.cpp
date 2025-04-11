@@ -2308,6 +2308,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_CROSSBOWS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
+            SetRandomSkill(SKILL_LOCKPICKING);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, 1, 1);
             bot->SetCanDualWield(true);
             break;
