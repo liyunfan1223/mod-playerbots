@@ -4269,17 +4269,24 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     // HasFriend
     if (sPlayerbotAIConfig->BotActiveAloneForceWhenIsFriend)
     {
+        if (!bot || !bot->IsInWorld() || !bot->GetGUID())
+            return false;
+
         for (auto& player : sRandomPlayerbotMgr->GetPlayers())
         {
-            if (!player || !player->IsInWorld() || !player->GetSocial() || !bot->GetGUID())
-            {
+            if (!player || !player->IsInWorld())
                 continue;
-            }
 
-            if (player->GetSocial()->HasFriend(bot->GetGUID()))
-            {
+			Player* connectedPlayer = ObjectAccessor::FindPlayer(player->GetGUID());
+            if (!connectedPlayer)
+                continue;
+
+            PlayerSocial* social = player->GetSocial();
+            if (!social)
+                continue;
+
+            if (social->HasFriend(bot->GetGUID()))
                 return true;
-            }
         }
     }
 
