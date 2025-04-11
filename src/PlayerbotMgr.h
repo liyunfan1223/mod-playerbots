@@ -12,6 +12,7 @@
 #include "PlayerbotAIBase.h"
 #include "QueryHolder.h"
 #include "QueryResult.h"
+#include <mutex>
 
 class ChatHandler;
 class PlayerbotAI;
@@ -60,6 +61,8 @@ protected:
 
     PlayerBotMap playerBots;
     std::unordered_set<ObjectGuid> botLoading;
+    mutable std::mutex playerBotsMutex;    // Mutex for playerBots map
+    mutable std::mutex botLoadingMutex;    // Mutex for botLoading set
 };
 
 class PlayerbotMgr : public PlayerbotHolder
@@ -90,6 +93,7 @@ private:
     Player* const master;
     PlayerBotErrorMap errors;
     time_t lastErrorTell;
+    mutable std::mutex errorsMutex;    // Mutex for errors map
 };
 
 class PlayerbotsMgr
@@ -113,6 +117,8 @@ public:
 private:
     std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsAIMap;
     std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsMgrMap;
+    mutable std::mutex playerbotsMgrMutex;    // Mutex for _playerbotsMgrMap
+    mutable std::mutex playerbotsAIMutex;     // Mutex for _playerbotsAIMap
 };
 
 #define sPlayerbotsMgr PlayerbotsMgr::instance()
