@@ -82,8 +82,8 @@ AiPlayerbot.Enabled = 1
 AiPlayerbot.RandomBotAutologin = 1
 
 # Random bot count
-AiPlayerbot.MinRandomBots = 50
-AiPlayerbot.MaxRandomBots = 50
+AiPlayerbot.MinRandomBots = 500
+AiPlayerbot.MaxRandomBots = 500
 
 # Random bot accounts
 # If you are not using any expansion at all, you may have to set this manually, then
@@ -561,10 +561,13 @@ AiPlayerbot.EnableRandomBotTrading = 1
 AiPlayerbot.DisableRandomLevels = 0
 
 # Set randombots starting level here if "AiPlayerbot.DisableRandomLevels" enabled
-AiPlayerbot.RandombotStartingLevel = 5
+AiPlayerbot.RandombotStartingLevel = 1
 
-# Chance random bot has max level on first randomize (default 0.15)
-AiPlayerbot.RandomBotMaxLevelChance = 0.15
+# Chance random bot has min level on first randomize (default 0.1)
+AiPlayerbot.RandomBotMinLevelChance = 0.1
+
+# Chance random bot has max level on first randomize (default 0.1)
+AiPlayerbot.RandomBotMaxLevelChance = 0.1
 
 # Fix the level of random bot (won't level up by grinding)
 # Default: 0 (disable)
@@ -689,8 +692,8 @@ AiPlayerbot.AutoDoQuests = 1
 
 # Random Bots will behave more like real players (exprimental)
 # This option will override AutoDoQuests
-# Default: 0 (disabled)
-AiPlayerbot.EnableNewRpgStrategy = 0
+# Default: 1 (enabled)
+AiPlayerbot.EnableNewRpgStrategy = 1
 
 # Quest items to leave (do not destroy)
 AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000"

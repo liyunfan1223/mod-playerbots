@@ -2362,7 +2362,7 @@ void RandomItemMgr::BuildPotionCache()
                     continue;
                 
                 uint32 requiredLevel = proto->RequiredLevel;
-                if (requiredLevel > level || (level > 15 && requiredLevel < level - 15))
+                if (requiredLevel > level || (level > 13 && requiredLevel < level - 13))
                     continue;
 
                 if (proto->RequiredSkill)
