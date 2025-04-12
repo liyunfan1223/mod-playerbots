@@ -470,15 +470,15 @@ float Formation::GetFollowAngle()
         PlayerbotMgr* masterBotMgr = GET_PLAYERBOT_MGR(master);
         if (masterBotMgr && !GET_PLAYERBOT_AI(master))
         {
-            for (auto it = masterBotMgr->GetPlayerBotsBegin(); it != masterBotMgr->GetPlayerBotsEnd(); ++it)
+            followTarget->GetPlayerbotMgr()->ForEachPlayerbot([&](Player* player)
             {
-                if (it->second == bot)
+                if (player == bot)
                 {
                     index = total;  // Found bot in master's list, set the index
                     break;
                 }
                 ++total;
-            }
+            });
         }
     }
 

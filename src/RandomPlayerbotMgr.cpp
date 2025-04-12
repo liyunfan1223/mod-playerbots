@@ -2512,9 +2512,9 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
 
 void RandomPlayerbotMgr::HandleCommand(uint32 type, std::string const text, Player* fromPlayer, std::string channelName)
 {
-    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    for (auto& itr : playerBots)
     {
-        Player* const bot = it->second;
+        Player* bot = itr.second;
         if (!bot)
             continue;
 
@@ -2536,9 +2536,13 @@ void RandomPlayerbotMgr::OnPlayerLogout(Player* player)
 {
     DisablePlayerBot(player->GetGUID());
 
-    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    for (auto& itr : playerBots)
     {
-        Player* const bot = it->second;
+        Player* bot = itr.second;
+
+        if (!bot)
+            continue;
+
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI && player == botAI->GetMaster())
         {
@@ -2582,9 +2586,13 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
 {
     uint32 botsNearby = 0;
 
-    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    for (auto& itr : playerBots)
     {
-        Player* const bot = it->second;
+        Player* bot = itr.second;
+
+        if (!bot)
+            continue;
+
         if (player == bot /* || GET_PLAYERBOT_AI(player)*/)  // TEST
             continue;
 
@@ -2732,6 +2740,10 @@ void RandomPlayerbotMgr::PrintStats()
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
     {
         Player* bot = i->second;
+
+        if (!bot)
+            continue;
+
         if (IsAlliance(bot->getRace()))
             ++alliance[bot->GetLevel()];
         else
