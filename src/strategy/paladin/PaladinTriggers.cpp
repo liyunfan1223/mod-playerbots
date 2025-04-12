@@ -373,7 +373,7 @@ bool BlessingOfKingsOnPartyTrigger::IsActive()
 
 Value<Unit*>* BlessingOfWisdomOnPartyTrigger::GetTargetValue() 
 { 
-    return context->GetValue<Unit*>("party member without aura", "blessing of wisdom,blessing of might") ; 
+    return context->GetValue<Unit*>("party member without aura", "blessing of wisdom,greater blessing of wisdom") ; 
 }
 
 bool BlessingOfWisdomOnPartyTrigger::IsActive()
@@ -392,7 +392,7 @@ bool BlessingOfWisdomOnPartyTrigger::IsActive()
 
 Value<Unit*>* BlessingOfMightOnPartyTrigger::GetTargetValue() 
 { 
-    return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom") ;
+    return context->GetValue<Unit*>("party member without aura", "blessing of might,greater blessing of might") ;
 }
 
 bool BlessingOfMightOnPartyTrigger::IsActive()
