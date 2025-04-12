@@ -32,8 +32,11 @@ bool InviteToGroupAction::Invite(Player* player)
         return false;
 
     if (Group* group = player->GetGroup())
-        if (!group->isRaidGroup() && group->GetMembersCount() > 4)
-            group->ConvertToRaid();
+    {
+        if(GET_PLAYERBOT_AI(player) && !GET_PLAYERBOT_AI(player)->IsRealPlayer())
+            if (!group->isRaidGroup() && group->GetMembersCount() > 4)
+                group->ConvertToRaid();
+    }
 
     WorldPacket p;
     uint32 roles_mask = 0;
@@ -53,28 +56,28 @@ bool InviteNearbyToGroupAction::Execute(Event event)
         if (!player)
             continue;
 
-        if (!player->GetMapId() != bot->GetMapId())
-                 continue;
+        if (player == bot)
+            continue;
+
+        if (player->GetMapId() != bot->GetMapId())
+            continue;
 
         if (player->GetGroup())
             continue;
 
-        if (player == bot)
+        if (player->isDND())
+            continue;
+
+        if (player->IsBeingTeleported())
             continue;
 
         if (botAI)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO &&
-                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
+            if (botAI->GetGrouperType() == GrouperType::SOLO && !botAI->HasRealPlayerMaster())  // Do not invite solo players.
                 continue;
 
             if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
                 continue;
-        }
-        else
-        {
-            if (!sPlayerbotAIConfig->randomBotGroupNearby)
-                return false;
         }
 
         if (abs(int32(player->GetLevel() - bot->GetLevel())) > 2)
@@ -161,26 +164,32 @@ bool InviteGuildToGroupAction::Execute(Event event)
         if (!player)
             continue;
 
+        if (player == bot)
+            continue;
+
         if (player->GetGroup())
             continue;
 
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+        if (player->isDND())
+            continue;
 
-        if (botAI)
+        if (player->IsBeingTeleported())
+            continue;
+
+        PlayerbotAI* playerAi = GET_PLAYERBOT_AI(player);
+
+        if (playerAi)
         {
-            if (botAI->GetGrouperType() == GrouperType::SOLO &&
-                !botAI->HasRealPlayerMaster())  // Do not invite solo players.
+            if (playerAi->GetGrouperType() == GrouperType::SOLO &&
+                !playerAi->HasRealPlayerMaster()) // Do not invite solo players.
                 continue;
 
-            if (botAI->HasActivePlayerMaster())  // Do not invite alts of active players.
+            if (playerAi->HasActivePlayerMaster()) // Do not invite alts of active players.
                 continue;
 
-            if (player->GetLevel() >
-                bot->GetLevel() + 5)  // Only invite higher levels that need money so they can grind money and help out.
+            if (player->GetLevel() > bot->GetLevel() + 5) // Invite higher levels that need money so they can grind money and help out.
             {
-                AiObjectContext* botContext = botAI->GetAiObjectContext();
-
-                if (!botContext->GetValue<bool>("should get money")->Get())
+                if (!PAI_VALUE(bool,"should get money"))
                     continue;
             }
         }
@@ -190,10 +199,10 @@ bool InviteGuildToGroupAction::Execute(Event event)
                 return false;
         }
 
-        if (abs(int32(player->GetLevel() - bot->GetLevel())) > 4)
+        if (bot->GetLevel() > player->GetLevel() + 5) // Do not invite members that too low level or risk dragging them to deadly places.
             continue;
 
-        if (!botAI && sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)
+        if (!playerAi && sServerFacade->GetDistance2d(bot, player) > sPlayerbotAIConfig->sightDistance)
             continue;
 
         Group* group = bot->GetGroup();
