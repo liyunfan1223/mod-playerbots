@@ -472,13 +472,16 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
                 }
             }
 
-			// Don't disband alt groups when master goes away 
-            // (will need to manually disband with leave command)
-			uint32 account = sCharacterCache->GetCharacterAccountIdByGuid(member);
-            if (!sPlayerbotAIConfig->IsInRandomAccountList(account))
+			// Don't disband alt groups when master goes away
+            // Controlled by config
+            if (sPlayerbotAIConfig->KeepAltsInGroup())
             {
-                groupValid = true;
-                break;
+                uint32 account = sCharacterCache->GetCharacterAccountIdByGuid(member);
+                if (!sPlayerbotAIConfig->IsInRandomAccountList(account))
+                {
+                    groupValid = true;
+                    break;
+                }
             }
         }
 
