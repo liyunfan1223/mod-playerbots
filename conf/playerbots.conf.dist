@@ -82,8 +82,8 @@ AiPlayerbot.Enabled = 1
 AiPlayerbot.RandomBotAutologin = 1
 
 # Random bot count
-AiPlayerbot.MinRandomBots = 50
-AiPlayerbot.MaxRandomBots = 50
+AiPlayerbot.MinRandomBots = 500
+AiPlayerbot.MaxRandomBots = 500
 
 # Random bot accounts
 # If you are not using any expansion at all, you may have to set this manually, then
@@ -544,6 +544,8 @@ AiPlayerbot.DisableDeathKnightLogin = 0
 # Default: 0
 AiPlayerbot.LimitTalentsExpansion = 0
 
+# Allow random bots to trade
+AiPlayerbot.EnableRandomBotTrading = 1
 #
 #
 #
@@ -559,10 +561,13 @@ AiPlayerbot.LimitTalentsExpansion = 0
 AiPlayerbot.DisableRandomLevels = 0
 
 # Set randombots starting level here if "AiPlayerbot.DisableRandomLevels" enabled
-AiPlayerbot.RandombotStartingLevel = 5
+AiPlayerbot.RandombotStartingLevel = 1
 
-# Chance random bot has max level on first randomize (default 0.15)
-AiPlayerbot.RandomBotMaxLevelChance = 0.15
+# Chance random bot has min level on first randomize (default 0.1)
+AiPlayerbot.RandomBotMinLevelChance = 0.1
+
+# Chance random bot has max level on first randomize (default 0.1)
+AiPlayerbot.RandomBotMaxLevelChance = 0.1
 
 # Fix the level of random bot (won't level up by grinding)
 # Default: 0 (disable)
@@ -636,10 +641,10 @@ AiPlayerbot.HunterWolfPet = 0
 #
 #
 # Specify percent of active bots
-# The default is 10. With 10% of all bots going active or inactive each minute. Regardless
-# This value is only applied to inactive areas where no real-players are detected, when
-# real-players are nearby, friend, group, guild, bg, instances etc the value is always
-# enforced to 100%
+# The default is 100%, but would be automatically adjusted if botActiveAloneSmartScale
+# is enabled. Regardless, this value is only applied to inactive areas where no real-players
+# are detected. When real-players are nearby, friend, group, guild, BGs, instances etc,
+# the value is always enforced to 100%
 AiPlayerbot.BotActiveAlone = 100
 
 # Force botActiveAlone when bot is ... of real player
@@ -687,8 +692,8 @@ AiPlayerbot.AutoDoQuests = 1
 
 # Random Bots will behave more like real players (exprimental)
 # This option will override AutoDoQuests
-# Default: 0 (disabled)
-AiPlayerbot.EnableNewRpgStrategy = 0
+# Default: 1 (enabled)
+AiPlayerbot.EnableNewRpgStrategy = 1
 
 # Quest items to leave (do not destroy)
 AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000"

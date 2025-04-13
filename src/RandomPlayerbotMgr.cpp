@@ -386,7 +386,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         }
         else
         {
-            activatePrintStatsThread();
+            sRandomPlayerbotMgr->PrintStats();
+            // activatePrintStatsThread();
         }
     }
     uint32 updateBots = sPlayerbotAIConfig->randomBotsPerInterval * onlineBotFocus / 100;
@@ -415,7 +416,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             loginBots += updateBots;
             loginBots = std::min(loginBots, maxNewBots);
 
-            LOG_INFO("playerbots", "{} new bots", loginBots);
+            LOG_DEBUG("playerbots", "{} new bots prepared to login", loginBots);
 
             // Log in bots
             for (auto bot : availableBots)
@@ -1103,10 +1104,10 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         if (!player || !player->GetGroup())
         {
             if (player)
-                LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
+                LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
                          player->GetLevel(), player->GetName().c_str());
             else
-                LOG_INFO("playerbots", "Bot #{}: log out", bot);
+                LOG_DEBUG("playerbots", "Bot #{}: log out", bot);
 
             SetEventValue(bot, "add", 0, 0);
             currentBots.erase(std::remove(currentBots.begin(), currentBots.end(), bot), currentBots.end());
@@ -1189,7 +1190,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     uint32 logout = GetEventValue(bot, "logout");
     if (player && !logout && !isValid)
     {
-        LOG_INFO("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
+        LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
                  player->GetLevel(), player->GetName().c_str());
         LogoutPlayerBot(botGUID);
         currentBots.remove(bot);
@@ -1434,6 +1435,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         z = 0.05f + ground;
         PlayerInfo const* pInfo = sObjectMgr->GetPlayerInfo(bot->getRace(true), bot->getClass());
         float dis = loc.GetExactDist(pInfo->positionX, pInfo->positionY, pInfo->positionZ);
+        
         // yunfan: distance check for low level
         if (bot->GetLevel() <= 4 && (loc.GetMapId() != pInfo->mapId || dis > 500.0f))
         {
@@ -1462,6 +1464,12 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
             bot->SetHomebind(loc, zone->ID);
         }
 
+        // Prevent blink to be detected by visible real players
+        if (dis < 150.0f && botAI->HasPlayerNearby(150.0f))
+        {
+            break;
+        }
+
         bot->GetMotionMaster()->Clear();
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI)
@@ -1478,8 +1486,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
     if (pmo)
         pmo->finish();
 
-    LOG_ERROR("playerbots", "Cannot teleport bot {} - no locations available ({} locations)", bot->GetName().c_str(),
-              tlocs.size());
+    // LOG_ERROR("playerbots", "Cannot teleport bot {} - no locations available ({} locations)", bot->GetName().c_str(),
+    //           tlocs.size());
 }
 
 void RandomPlayerbotMgr::PrepareZone2LevelBracket()
@@ -1969,6 +1977,13 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     if (sPlayerbotAIConfig->syncLevelWithPlayers)
         maxLevel = std::max(sPlayerbotAIConfig->randomBotMinLevel,
                             std::min(playersLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
+    
+    uint32 minLevel = sPlayerbotAIConfig->randomBotMinLevel;
+    if (bot->getClass() == CLASS_DEATH_KNIGHT)
+    {
+        maxLevel = std::max(maxLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+        minLevel = std::max(minLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+    }
 
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomizeFirst");
 
@@ -1987,14 +2002,19 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     }
     else
     {
-        level = urand(sPlayerbotAIConfig->randomBotMinLevel, maxLevel);
-        if (urand(1, 100) < 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
+        uint32 roll = urand(1, 100);
+        if (roll <= 100 * sPlayerbotAIConfig->randomBotMaxLevelChance)
+        {
             level = maxLevel;
-
-        if (bot->getClass() == CLASS_DEATH_KNIGHT)
-            level = urand(
-                std::max(sPlayerbotAIConfig->randomBotMinLevel, sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL)),
-                std::max(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL), maxLevel));
+        }
+        else if (roll <= (100 * (sPlayerbotAIConfig->randomBotMaxLevelChance + sPlayerbotAIConfig->randomBotMinLevelChance)))
+        {
+            level = minLevel;
+        }
+        else
+        {
+            level = urand(minLevel, maxLevel);
+        }
     }
 
     if (sPlayerbotAIConfig->disableRandomLevels)
@@ -2394,7 +2414,8 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
 
     if (cmd == "stats")
     {
-        activatePrintStatsThread();
+        sRandomPlayerbotMgr->PrintStats();
+        // activatePrintStatsThread();
         return true;
     }
 
@@ -2536,8 +2557,16 @@ void RandomPlayerbotMgr::OnPlayerLogout(Player* player)
 
 void RandomPlayerbotMgr::OnBotLoginInternal(Player* const bot)
 {
-    LOG_INFO("playerbots", "{}/{} Bot {} logged in", playerBots.size(), sRandomPlayerbotMgr->GetMaxAllowedBotCount(),
-             bot->GetName().c_str());
+    if (_isBotLogging)
+    {
+        LOG_INFO("playerbots", "{}/{} Bot {} logged in", playerBots.size(), sRandomPlayerbotMgr->GetMaxAllowedBotCount(),
+                bot->GetName().c_str());
+        
+        if (playerBots.size() == sRandomPlayerbotMgr->GetMaxAllowedBotCount())
+        {
+            _isBotLogging = false;
+        }
+    }
 
     if (sPlayerbotAIConfig->randomBotFixedLevel)
     {
@@ -2697,7 +2726,7 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 engine_combat = 0;
     uint32 engine_dead = 0;
     std::unordered_map<NewRpgStatus, int> rpgStatusCount;
-    NewRpgStatistic rpgStasticTotal;
+    // static NewRpgStatistic rpgStasticTotal;
     std::unordered_map<uint32, int> zoneCount;
     uint8 maxBotLevel = 0;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
@@ -2775,6 +2804,7 @@ void RandomPlayerbotMgr::PrintStats()
         {
             rpgStatusCount[botAI->rpgInfo.status]++;
             rpgStasticTotal += botAI->rpgStatistic;
+            botAI->rpgStatistic = NewRpgStatistic();
         }
     }
 
@@ -2792,7 +2822,8 @@ void RandomPlayerbotMgr::PrintStats()
 
         if (((i + 1) % step == 0) || i == maxBotLevel)
         {
-            LOG_INFO("playerbots", "    {}..{}: {} alliance, {} horde", from, i, currentAlliance, currentHorde);
+            if (currentAlliance || currentHorde)
+                LOG_INFO("playerbots", "    {}..{}: {} alliance, {} horde", from, i, currentAlliance, currentHorde);
             currentAlliance = 0;
             currentHorde = 0;
             from = i + 1;
