@@ -59,17 +59,89 @@ bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
     if (!boss)
         return false;
 
-    Position bossPos = boss->GetPosition();
-    float angle = boss->GetOrientation();  // Facing direction in radians
-    float offset = 30.0f;
+    Spell* currentSpell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (!currentSpell)
+        return false;
 
-    // Pick one side (+90 degrees), perpendicular to breath - urand for a bit of
-    // randomness
-    float sideAngle = angle + (urand(0, 1) ? M_PI_2 : -M_PI_2);
-    float safeX = bossPos.GetPositionX() + offset * cos(sideAngle);
-    float safeY = bossPos.GetPositionY() + offset * sin(sideAngle);
+    uint32 spellId = currentSpell->m_spellInfo->Id;
 
-    // bot->Yell("Running To Safe Zone for Deep Breath!", LANG_UNIVERSAL);
-    return MoveTo(boss->GetMapId(), safeX, safeY, bossPos.GetPositionZ(), false, false, false, false,
+    std::vector<SafeZone> safeZones = GetSafeZonesForBreath(spellId);
+    if (safeZones.empty())
+        return false;
+
+    // Find closest safe zone
+    SafeZone* bestZone = nullptr;
+    float bestDist = std::numeric_limits<float>::max();
+
+    for (auto& zone : safeZones)
+    {
+        float dist = bot->GetExactDist2d(zone.pos.GetPositionX(), zone.pos.GetPositionY());
+        if (dist < bestDist)
+        {
+            bestDist = dist;
+            bestZone = &zone;
+        }
+    }
+
+    if (!bestZone)
+        return false;
+
+    if (bot->IsWithinDist2d(bestZone->pos.GetPositionX(), bestZone->pos.GetPositionY(), bestZone->radius))
+        return false;  // Already safe
+
+    // bot->Yell("Moving to Safe Zone!", LANG_UNIVERSAL);
+    return MoveTo(bot->GetMapId(), bestZone->pos.GetPositionX(), bestZone->pos.GetPositionY(), bot->GetPositionZ(),
+                  false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+}
+
+bool RaidOnyxiaKillWhelpsAction::Execute(Event event)
+{
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+    // If already attacking a whelp, don't swap targets
+    if (currentTarget && currentTarget->GetEntry() == 11262)
+    {
+        return false;
+    }
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    for (ObjectGuid guid : targets)
+    {
+        Creature* unit = botAI->GetCreature(guid);
+        if (!unit || !unit->IsAlive() || !unit->IsInWorld())
+            continue;
+
+        if (unit->GetEntry() == 11262)  // Onyxia Whelp
+        {
+            // bot->Yell("Attacking Whelps!", LANG_UNIVERSAL);
+            return Attack(unit);
+        }
+    }
+    return false;
+}
+
+bool OnyxiaAvoidEggsAction::Execute(Event event)
+{
+    Position botPos = Position(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
+
+    float x, y;
+
+    // get safe zone slightly away from eggs (Can this be dynamic?)
+    if (botPos.GetExactDist2d(-36.0f, -164.0f) <= 5.0f)
+    {
+        x = -10.0f;
+        y = -180.0f;
+    }
+    else if (botPos.GetExactDist2d(-34.0f, -262.0f) <= 5.0f)
+    {
+        x = -16.0f;
+        y = -250.0f;
+    }
+    else
+    {
+        return false;  // Not in danger zone
+    }
+
+    // bot->Yell("Too close to eggs — backing off!", LANG_UNIVERSAL);
+
+    return MoveTo(bot->GetMapId(), x, y, bot->GetPositionZ(), false, false, false, false,
                   MovementPriority::MOVEMENT_COMBAT);
 }

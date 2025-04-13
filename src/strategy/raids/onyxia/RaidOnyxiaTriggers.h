@@ -27,4 +27,18 @@ public:
     bool IsActive() override;
 };
 
+class RaidOnyxiaWhelpsSpawnTrigger : public Trigger
+{
+public:
+    RaidOnyxiaWhelpsSpawnTrigger(PlayerbotAI* botAI);
+    bool IsActive() override;
+};
+
+class OnyxiaAvoidEggsTrigger : public Trigger
+{
+public:
+    OnyxiaAvoidEggsTrigger(PlayerbotAI* botAI);
+    bool IsActive() override;
+};
+
 #endif

@@ -52,7 +52,6 @@ bool OnyxiaNearTailTrigger::IsActive()
 
     return true;
 }
-
 RaidOnyxiaFireballSplashTrigger::RaidOnyxiaFireballSplashTrigger(PlayerbotAI* botAI)
     : Trigger(botAI, "ony fireball splash incoming")
 {
@@ -80,6 +79,32 @@ bool RaidOnyxiaFireballSplashTrigger::IsActive()
         if (bot->GetDistance(unit) < 8.0f)
             return true;
     }
+
+    return false;
+}
+
+RaidOnyxiaWhelpsSpawnTrigger::RaidOnyxiaWhelpsSpawnTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ony whelps spawn") {}
+
+bool RaidOnyxiaWhelpsSpawnTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
+    if (!boss)
+        return false;
+
+    return !botAI->IsHeal(bot) && boss->IsFlying();  // DPS + Tanks only
+}
+
+OnyxiaAvoidEggsTrigger::OnyxiaAvoidEggsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ony avoid eggs") {}
+
+bool OnyxiaAvoidEggsTrigger::IsActive()
+{
+    Position botPos = Position(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
+
+    if (botPos.GetExactDist2d(-35.0f, -165.0f) <= 5.0f)
+        return true;
+
+    if (botPos.GetExactDist2d(-35.0f, -260.0f) <= 5.0f)
+        return true;
 
     return false;
 }
