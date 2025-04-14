@@ -33,6 +33,9 @@ const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED
 const std::vector<Position> corners = {
     {183.53f, 66.53f, 409.80f}, {383.03f, 75.10f, 411.71f}, {379.74f, -133.05f, 410.88f}, {158.67f, -137.54f, 409.80f}};
 
+const Position ULDUAR_KOLOGARN_CRUNCH_ARMOR_RESET_SPOT = Position(1752.4803f, -43.44299f, 448.805f);
+const Position ULDUAR_KOLOGARN_RESTORE_POSITION = Position(1764.3749f, -24.02903f, 448.0f, 0.00087690353);
+
 bool FlameLeviathanVehicleAction::Execute(Event event)
 {
     vehicleBase_ = bot->GetVehicleBase();
@@ -1212,6 +1215,199 @@ bool IronAssemblyOverloadAction::Execute(Event event)
     }
 
     return false;
+}
+
+bool KologarnEyebeamAction::isUseful()
+{
+    KologarnEyebeamTrigger kologarnEyebeamTrigger(botAI);
+    return kologarnEyebeamTrigger.IsActive();
+}
+
+bool KologarnEyebeamAction::Execute(Event event)
+{
+    Aura* aura = AI_VALUE(Aura*, "area debuff");
+    if (!aura || aura->IsRemoved() || aura->IsExpired())
+    {
+        return false;
+    }
+    if (!aura->GetOwner() || !aura->GetOwner()->IsInWorld())
+    {
+        return false;
+    }
+    // Crash fix: maybe change owner due to check interval
+    if (aura->GetType() != DYNOBJ_AURA_TYPE)
+    {
+        return false;
+    }
+
+    DynamicObject* dynOwner = aura->GetDynobjOwner();
+    if (!dynOwner || !dynOwner->IsInWorld())
+    {
+        return false;
+    }
+
+    if (FleePosition(dynOwner->GetPosition(), 30.0f))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool KologarnMarkDpsTargetAction::isUseful()
+{
+    KologarnMarkDpsTargetTrigger kologarnMarkDpsTargetTrigger(botAI);
+    return kologarnMarkDpsTargetTrigger.IsActive();
+}
+
+bool KologarnMarkDpsTargetAction::Execute(Event event)
+{
+    Unit* targetToMark = nullptr;
+    int8 skullIndex = 7;  // Skull
+
+    // Check that there is rubble to mark
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target)
+            continue;
+
+        uint32 creatureId = target->GetEntry();
+        if (target->GetEntry() == NPC_RUBBLE && target->IsAlive())
+        {
+            targetToMark = target;
+        }
+    }
+
+    if (!targetToMark)
+    {
+        Unit* rightArm = AI_VALUE2(Unit*, "find target", "right arm");
+        if (rightArm && rightArm->IsAlive())
+        {
+            targetToMark = rightArm;
+        }
+    }
+
+    if (!targetToMark)
+    {
+        Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+        if (boss && boss->IsAlive())
+        {
+            targetToMark = boss;
+        }
+    }
+
+    if (!targetToMark)
+    {
+        return false;  // No target to mark
+    }
+
+    bool isMainTank = botAI->IsMainTank(bot);
+    Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
+    Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
+
+    if (mainTank && !GET_PLAYERBOT_AI(mainTank))  // Main tank is a real player
+    {
+        // Iterate through the first 3 bot tanks to assign the Skull marker
+        for (int i = 0; i < 3; ++i)
+        {
+            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot))  // Bot is a valid tank
+            {
+                Group* group = bot->GetGroup();
+                if (group)
+                {
+                    group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+                    return true;
+                }
+                break;  // Stop after finding the first valid bot tank
+            }
+        }
+    }
+    else if (isMainTank && bot->IsAlive())  // Bot is the main tank
+    {
+        Group* group = bot->GetGroup();
+        if (group)
+        {
+            group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+            return true;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot) && bot->IsAlive())  // Bot is a valid tank
+            {
+                Group* group = bot->GetGroup();
+                if (group)
+                {
+                    group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+                    return true;
+                }
+                break;  // Stop after finding the first valid bot tank
+            }
+        }
+    }
+
+    return false;
+}
+
+bool KologarnCrunchArmorAction::isUseful()
+{
+    KologarnCrunchArmorTrigger kologarnCrunchArmorTrigger(botAI);
+    return kologarnCrunchArmorTrigger.IsActive();
+}
+
+bool KologarnCrunchArmorAction::Execute(Event event)
+{
+    // Issue the command to move the bot to the specified point.
+    if (!MoveTo(bot->GetMapId(), ULDUAR_KOLOGARN_CRUNCH_ARMOR_RESET_SPOT.GetPositionX(),
+                ULDUAR_KOLOGARN_CRUNCH_ARMOR_RESET_SPOT.GetPositionY(),
+                ULDUAR_KOLOGARN_CRUNCH_ARMOR_RESET_SPOT.GetPositionZ(), false, false, false, false,
+                MovementPriority::MOVEMENT_COMBAT))
+    {
+        return false;
+    }
+
+    // Wait for the Crunch Armor aura to expire
+    Aura* crunchArmorAura = bot->GetAura(SPELL_CRUNCH_ARMOR);
+    if (!crunchArmorAura || crunchArmorAura->IsExpired() || crunchArmorAura->IsRemoved())
+        return false;
+    SetNextMovementDelay(crunchArmorAura->GetDuration());
+
+    return true;
+}
+
+bool KologarnFallFromFloorAction::Execute(Event event)
+{
+    return bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionX(),
+                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionY(),
+                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionZ(),
+                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetOrientation());
+}
+
+bool KologarnFallFromFloorAction::isUseful()
+{
+    KologarnFallFromFloorTrigger kologarnFallFromFloorTrigger(botAI);
+    return kologarnFallFromFloorTrigger.IsActive();
+}
+
+bool KologarnAttackMainBodyAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+    if (!boss)
+        return false;
+    
+    bot->SetTarget(boss->GetGUID());
+    return Attack(boss);
+}
+
+bool KologarnAttackMainBodyAction::isUseful()
+{
+    KologarnAttackMainBodyTrigger kologarnAttackMainBodyTrigger(botAI);
+    return kologarnAttackMainBodyTrigger.IsActive();
 }
 
 bool HodirMoveSnowpackedIcicleAction::isUseful()

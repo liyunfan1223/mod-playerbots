@@ -17,6 +17,16 @@ enum UlduarIDs
     SPELL_OVERLOAD_10_MAN_2 = 63485,
     SPELL_OVERLOAD_25_MAN_2 = 61886,
 
+    //Kologarn
+    NPC_RIGHT_ARM = 32934,
+    NPC_RUBBLE = 33768,
+    SPELL_CRUNCH_ARMOR = 64002,
+
+    SPELL_FOCUSED_EYEBEAM_10_2 = 63346,
+    SPELL_FOCUSED_EYEBEAM_10 = 63347,
+    SPELL_FOCUSED_EYEBEAM_25_2 = 63976,
+    SPELL_FOCUSED_EYEBEAM_25 = 63977,
+
     // Hodir
     NPC_SNOWPACKED_ICICLE = 33174,
     NPC_TOASTY_FIRE = 33342,
@@ -27,6 +37,8 @@ enum UlduarIDs
     NPC_EONARS_GIFT = 33228,
     GOBJECT_NATURE_BOMB = 194902,
 };
+
+const float ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT = 420.0f;
 
 //
 // Flame Levi
@@ -111,6 +123,51 @@ class IronAssemblyOverloadTrigger : public Trigger
 {
 public:
     IronAssemblyOverloadTrigger(PlayerbotAI* ai) : Trigger(ai, "iron assembly overload trigger") {}
+    bool IsActive() override;
+};
+
+//
+// Kologarn
+//
+class KologarnEyebeamTrigger : public Trigger
+{
+public:
+    KologarnEyebeamTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn eyebeam trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnMarkDpsTargetTrigger : public Trigger
+{
+public:
+    KologarnMarkDpsTargetTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn mark dps target trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnCrunchArmorTrigger : public Trigger
+{
+public:
+    KologarnCrunchArmorTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn crunch armor trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnFallFromFloorTrigger : public Trigger
+{
+public:
+    KologarnFallFromFloorTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn fall from floor trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnTauntTrigger : public Trigger
+{
+public:
+    KologarnTauntTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn taunt trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnAttackMainBodyTrigger : public Trigger
+{
+public:
+    KologarnAttackMainBodyTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn attack main body trigger") {}
     bool IsActive() override;
 };
 

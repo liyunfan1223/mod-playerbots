@@ -130,6 +130,46 @@ public:
     bool isUseful() override;
 };
 
+class KologarnEyebeamAction : public MovementAction
+{
+public:
+    KologarnEyebeamAction(PlayerbotAI* botAI) : MovementAction(botAI, "kologarn eyebeam action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnMarkDpsTargetAction : public Action
+{
+public:
+    KologarnMarkDpsTargetAction(PlayerbotAI* botAI) : Action(botAI, "kologarn mark dps target action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnCrunchArmorAction : public MovementAction
+{
+public:
+    KologarnCrunchArmorAction(PlayerbotAI* botAI) : MovementAction(botAI, "kologarn crunch armor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnFallFromFloorAction : public Action
+{
+public:
+    KologarnFallFromFloorAction(PlayerbotAI* botAI) : Action(botAI, "kologarn fall from floor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnAttackMainBodyAction : public AttackAction
+{
+public:
+    KologarnAttackMainBodyAction(PlayerbotAI* botAI) : AttackAction(botAI, "kologarn attack main body action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class HodirBitingColdJumpAction : public MovementAction
 {
 public:
