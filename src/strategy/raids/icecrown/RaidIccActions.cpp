@@ -37,7 +37,6 @@ bool IccLmTankPositionAction::Execute(Event event)
     if (!boss)
         return false;
 
-    bot->SetTarget(boss->GetGUID());
     if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
     {
         if (bot->GetExactDist2d(ICC_LM_TANK_POSITION) > 15.0f)
@@ -45,9 +44,10 @@ bool IccLmTankPositionAction::Execute(Event event)
                           ICC_LM_TANK_POSITION.GetPositionY(), ICC_LM_TANK_POSITION.GetPositionZ(), 
                           false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
         else
-            return Attack(boss);
+            return false;
     }
-    return Attack(boss);
+
+    return false;
 }
 
 bool IccSpikeAction::Execute(Event event)
@@ -60,48 +60,78 @@ bool IccSpikeAction::Execute(Event event)
 
     // Find the boss
     Unit* boss = AI_VALUE2(Unit*, "find target", "lord marrowgar");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
-    Unit* currentTarget = AI_VALUE(Unit*, "current target");
-    
-    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Aura* bossaura = botAI->GetAura("Bone Storm", boss);
 
-    Unit* spikeTarget = nullptr;
-    for (auto i = targets.begin(); i != targets.end(); ++i)
+    if (boss->isInFront(bot) && !botAI->IsTank(bot) && !bossaura)
+        return MoveTo(bot->GetMapId(), -390.6757f, 2230.5283f, 41.99232f, false, false, false, true,
+                      MovementPriority::MOVEMENT_FORCED);
+
+    if (!botAI->IsTank(bot))
+        return false;
+
+    GuidVector spikes = AI_VALUE(GuidVector, "possible targets no los");
+    const uint32 spikeEntries[] = {36619, 38711, 38712};  // spikes id's
+
+    Unit* priorityTarget = nullptr;
+    bool anySpikesExist = false;
+
+    // First check for alive spikes
+    for (uint32 entry : spikeEntries)
     {
-        Unit* unit = botAI->GetUnit(*i);
-        if (unit && (unit->GetEntry() == 36619 ||
-                    unit->GetEntry() == 38711 || 
-                    unit->GetEntry() == 38712))
+        for (const ObjectGuid& guid : spikes)
         {
-            spikeTarget = unit;
-            break;
-        }
-    }
-
-    // Prioritize attacking a bone spike if found
-    if (spikeTarget)
-    {
-        if (currentTarget != spikeTarget)
-        {
-            if (Attack(spikeTarget))
+            Unit* unit = botAI->GetUnit(guid);
+            if (unit && unit->GetEntry() == entry)  // Check if spike exists
             {
-                return Attack(spikeTarget);
+                anySpikesExist = true;  // At least one spike exists
+
+                if (unit->IsAlive())  // Only consider alive ones for targeting
+                {
+                    priorityTarget = unit;
+                    break;
+                }
             }
         }
-        return Attack(spikeTarget); // Already attacking a spike
+        if (priorityTarget)
+            break;
     }
 
-    // No bone spikes found, attack boss if not already targeting
-    if (currentTarget != boss)
+    // Only fallback to boss if NO spikes exist at all (alive or dead)
+    if (!anySpikesExist && boss->IsAlive())
     {
-        if (Attack(boss))
+        priorityTarget = boss;
+    }
+
+    // Update skull icon if needed
+    if (priorityTarget)
+    {
+        if (Group* group = bot->GetGroup())
         {
-            return Attack(boss);
+            ObjectGuid currentSkull = group->GetTargetIcon(7);
+            Unit* currentSkullUnit = botAI->GetUnit(currentSkull);
+
+            bool needsUpdate = false;
+            if (!currentSkullUnit || !currentSkullUnit->IsAlive())
+            {
+                needsUpdate = true;
+            }
+            else if (currentSkullUnit != priorityTarget)
+            {
+                needsUpdate = true;
+            }
+
+            if (needsUpdate)
+            {
+                group->SetTargetIcon(7, bot->GetGUID(), priorityTarget->GetGUID());
+            }
         }
     }
 
     return false;
+
 }
 
 //Lady
@@ -118,10 +148,19 @@ bool IccDarkReckoningAction::Execute(Event event)
 
 bool IccRangedPositionLadyDeathwhisperAction::Execute(Event event)
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "lady deathwhisper");
+    if (!boss)
+        return false;
+
+    float currentDistance = bot->GetDistance2d(boss);
+
+    if (currentDistance < 7.0f || currentDistance > 30.0f)
+        return false;
+
     if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
     {
-    float radius = 5.0f;
-    float moveIncrement = 3.0f;
+    float radius = 3.0f;
+    float moveIncrement = 2.0f;
     bool isRanged = botAI->IsRanged(bot);
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
@@ -155,7 +194,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event event)
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot) && boss->GetHealthPct() < 98.0f)
+    if (botAI->IsTank(bot) && boss->GetHealthPct() < 95.0f)
     {
         if (bot->GetExactDist2d(ICC_LDW_TANK_POSTION) > 20.0f)
         return MoveTo(bot->GetMapId(), ICC_LDW_TANK_POSTION.GetPositionX(),
@@ -163,69 +202,68 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event event)
                       false, false, false, MovementPriority::MOVEMENT_COMBAT);
     }
 
-    if (botAI->IsMainTank(bot) || botAI->IsHeal(bot))
+    if (!botAI->IsTank(bot))
         return false;
 
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     
-    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    Unit* add = nullptr;
-    for (auto i = targets.begin(); i != targets.end(); ++i)
-    {
-        Unit* unit = botAI->GetUnit(*i);
-        if (unit && (unit->GetEntry() == 37949 || //cult adherent
-                    unit->GetEntry() == 38394 || 
-                    unit->GetEntry() == 38625 ||
-                    unit->GetEntry() == 38626 ||
-                    unit->GetEntry() == 38010 ||
-                    unit->GetEntry() == 38397 || 
-                    unit->GetEntry() == 39000 || 
-                    unit->GetEntry() == 39001 || 
-                    unit->GetEntry() == 38136 ||
-                    unit->GetEntry() == 38396 ||
-                    unit->GetEntry() == 38632 ||
-                    unit->GetEntry() == 38633 ||
-                    unit->GetEntry() == 37890 || //cult fanatic
-                    unit->GetEntry() == 38393 ||
-                    unit->GetEntry() == 38628 ||
-                    unit->GetEntry() == 38629 ||
-                    unit->GetEntry() == 38135 ||
-                    unit->GetEntry() == 38395 ||
-                    unit->GetEntry() == 38634 ||
-                    unit->GetEntry() == 38009 ||
-                    unit->GetEntry() == 38398 ||
-                    unit->GetEntry() == 38630 ||
-                    unit->GetEntry() == 38631))
-        {
-            add = unit;
-            break;
-        }
-    }
+    const uint32 targetsEntries[] = {37949, 38394, 38625, 38626, 38010, 38397, 39000, 39001, 38136, 38396, 38632, 38633, 37890, 38393, 38628, 38629, 38135, 38395, 38634, 38009, 38398, 38630, 38631}; //fanatics and adherents
 
-    // Prioritize attacking an add if found
-    if (add)
+    Unit* priorityTarget = nullptr;
+    bool hasValidAdds = false;
+
+    // First check for alive adds
+    for (uint32 entry : targetsEntries)
     {
-        if (currentTarget != add)
+        for (const ObjectGuid& guid : targets)
         {
-            if (Attack(add))
+            Unit* unit = botAI->GetUnit(guid);
+            if (unit && unit->IsAlive() && unit->GetEntry() == entry)
             {
-                return Attack(add);
+                priorityTarget = unit;
+                hasValidAdds = true;
+                break;
             }
         }
-        return Attack(add); // Already attacking an add
+        if (priorityTarget)
+            break;
     }
 
-    // No adds found, attack boss if not already targeting
-    if (currentTarget != boss)
+    // Only fallback to boss if NO adds exist
+    if (!hasValidAdds && boss->IsAlive())
     {
-        if (Attack(boss))
+        priorityTarget = boss;
+    }
+
+    // Update skull icon if needed
+    if (priorityTarget)
+    {
+        if (Group* group = bot->GetGroup())
         {
-            return Attack(boss);
+            ObjectGuid currentSkull = group->GetTargetIcon(7);
+            Unit* currentSkullUnit = botAI->GetUnit(currentSkull);
+
+            bool needsUpdate = false;
+            if (!currentSkullUnit || !currentSkullUnit->IsAlive())
+            {
+                needsUpdate = true;  // No valid skull target
+            }
+            else if (currentSkullUnit != priorityTarget)
+            {
+                needsUpdate = true;  // Different target than desired
+            }
+
+            if (needsUpdate)
+            {
+                group->SetTargetIcon(7, bot->GetGUID(), priorityTarget->GetGUID());
+            }
         }
     }
 
     return false;
+
 }
 
 bool IccShadeLadyDeathwhisperAction::Execute(Event event)

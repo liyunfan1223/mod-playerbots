@@ -25,25 +25,7 @@ bool IccSpikeNearTrigger::IsActive()
     if (!boss) 
         return false;
 
-    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-    for (auto& npc : npcs)
-    {
-        Unit* unit = botAI->GetUnit(npc);
-        if (unit)
-        {
-            if (unit->GetEntry() == 36619 || unit->GetEntry() == 38711 || unit->GetEntry() == 38712 ) //spike ID
-            {
-                if (unit->GetDistance(bot) <= 20.0f)
-                {
-                    return botAI->IsDps(bot);
-                }
-    
-                return botAI->IsRangedDps(bot);
-            }
-        }
-    }
-
-    return false;
+    return true;
 }
 
 //Lady Deathwhisper
