@@ -277,28 +277,6 @@ bool IronAssemblyOverloadTrigger::IsActive()
            boss->HasAura(SPELL_OVERLOAD_10_MAN_2) || boss->HasAura(SPELL_OVERLOAD_25_MAN_2);
 }
 
-bool KologarnEyebeamTrigger::IsActive()
-{
-    // Check boss and it is alive
-    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    Aura* areaDebuff = AI_VALUE(Aura*, "area debuff");
-    if (!areaDebuff || areaDebuff->IsRemoved() || areaDebuff->IsExpired())
-        return false;
-
-    // Check if the area debuff is the Eyebeam
-    uint32 areaDebuffId = areaDebuff->GetId();
-    if (areaDebuffId == SPELL_FOCUSED_EYEBEAM_10_2 || areaDebuffId == SPELL_FOCUSED_EYEBEAM_10 ||
-        areaDebuffId == SPELL_FOCUSED_EYEBEAM_25_2 || areaDebuffId == SPELL_FOCUSED_EYEBEAM_25)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 bool KologarnMarkDpsTargetTrigger::IsActive()
 {
     // Check boss and it is alive
@@ -364,18 +342,6 @@ bool KologarnMarkDpsTargetTrigger::IsActive()
     return true;
 }
 
-bool KologarnCrunchArmorTrigger::IsActive()
-{
-    // Check boss and it is alive
-    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    Aura* crunchArmorAura = bot->GetAura(SPELL_CRUNCH_ARMOR);
-    return crunchArmorAura && !crunchArmorAura->IsExpired() && !crunchArmorAura->IsRemoved() &&
-           crunchArmorAura->GetStackAmount() >= 2;
-}
-
 bool KologarnFallFromFloorTrigger::IsActive()
 {
     // Check boss and it is alive
@@ -387,89 +353,6 @@ bool KologarnFallFromFloorTrigger::IsActive()
 
     // Check if bot is on the floor
     return bot->GetPositionZ() < ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT;
-}
-
-bool KologarnTauntTrigger::IsActive()
-{
-    // Check boss and it is alive
-    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    if ((!botAI->IsMainTank(bot) && !botAI->IsAssistTankOfIndex(bot, 0)) || !bot->IsAlive())
-        return false;
-
-    Aura* crunchArmorAura = bot->GetAura(SPELL_CRUNCH_ARMOR);
-    bool needLooseStacks = false;
-    if (crunchArmorAura && !crunchArmorAura->IsExpired() && !crunchArmorAura->IsRemoved() &&
-        crunchArmorAura->GetStackAmount() >= 2)
-    {
-        needLooseStacks = true;
-    }
-
-    if (needLooseStacks)
-        return false;
-
-    if (boss->GetVictim() == bot)
-        return false;
-
-    if (botAI->IsMainTank(bot))
-    {
-        return true;
-    }
-    else
-    {
-        Group* group = bot->GetGroup();
-        if (!group)
-            return false;
-
-        Player* mainTank = nullptr;
-        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
-        {
-            Player* member = gref->GetSource();
-            if (!member || !member->IsAlive())
-                continue;
-
-            // Check if the member is an assist tank
-            if (botAI->IsMainTank(member))
-            {
-                mainTank = member;
-                break;
-            }
-        }
-
-        if (!mainTank)
-            return false;
-
-        if (!mainTank->IsAlive())
-            return true;
-
-        Aura* mainTankCrunchArmorAura = mainTank->GetAura(SPELL_CRUNCH_ARMOR);
-        if (mainTankCrunchArmorAura && !mainTankCrunchArmorAura->IsExpired() &&
-           !mainTankCrunchArmorAura->IsRemoved() && mainTankCrunchArmorAura->GetStackAmount() >= 2)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool KologarnAttackMainBodyTrigger::IsActive()
-{
-    // Check boss and it is alive
-    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    // Check if bot is main tank or assist tank
-    if (!botAI->IsMainTank(bot) && !botAI->IsAssistTankOfIndex(bot, 0))
-        return false;
-
-    if (bot->GetTarget() == boss->GetGUID())
-        return false;
-
-    return true;
 }
 
 bool HodirBitingColdTrigger::IsActive()

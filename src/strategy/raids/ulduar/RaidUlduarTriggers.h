@@ -129,13 +129,6 @@ public:
 //
 // Kologarn
 //
-class KologarnEyebeamTrigger : public Trigger
-{
-public:
-    KologarnEyebeamTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn eyebeam trigger") {}
-    bool IsActive() override;
-};
-
 class KologarnMarkDpsTargetTrigger : public Trigger
 {
 public:
@@ -143,31 +136,10 @@ public:
     bool IsActive() override;
 };
 
-class KologarnCrunchArmorTrigger : public Trigger
-{
-public:
-    KologarnCrunchArmorTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn crunch armor trigger") {}
-    bool IsActive() override;
-};
-
 class KologarnFallFromFloorTrigger : public Trigger
 {
 public:
     KologarnFallFromFloorTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn fall from floor trigger") {}
-    bool IsActive() override;
-};
-
-class KologarnTauntTrigger : public Trigger
-{
-public:
-    KologarnTauntTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn taunt trigger") {}
-    bool IsActive() override;
-};
-
-class KologarnAttackMainBodyTrigger : public Trigger
-{
-public:
-    KologarnAttackMainBodyTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn attack main body trigger") {}
     bool IsActive() override;
 };
 
