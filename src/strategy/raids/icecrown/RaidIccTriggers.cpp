@@ -126,7 +126,8 @@ bool IccGunshipTeleportAllyTrigger::IsActive()
 bool IccGunshipTeleportHordeTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "skybreaker sorcerer");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
     return true;
 }
@@ -135,7 +136,8 @@ bool IccGunshipTeleportHordeTrigger::IsActive()
 bool IccDbsTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
     return true;
 }
@@ -164,9 +166,10 @@ bool IccDbsMainTankRuneOfBloodTrigger::IsActive()
 bool IccAddsDbsTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
-     return true;
+    return true;
 }
 
 //DOGS

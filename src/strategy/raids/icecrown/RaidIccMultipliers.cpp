@@ -74,33 +74,6 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
         }
     }
 
-    if (botAI->IsDps(bot))
-    {
-        GuidVector targets = AI_VALUE(GuidVector, "possible targets");
-        bool hasAdds = false;
-        for (auto& guid : targets)
-        {
-            Unit* unit = botAI->GetUnit(guid);
-            if (unit && unit->IsAlive() && (
-                unit->GetEntry() == 38508 || //blood beast
-                unit->GetEntry() == 38596 || 
-                unit->GetEntry() == 38597 || 
-                unit->GetEntry() == 38598))
-            {
-                hasAdds = true;
-                break;
-            }
-        }
-
-        if (hasAdds && !botAI->IsMainTank(bot))
-        {
-            if (dynamic_cast<IccAddsDbsAction*>(action))
-                return 2.0f;
-            else if (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) || 
-                    dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
-                return 0.0f;
-        }
-    }
     return 1.0f;
 }
 

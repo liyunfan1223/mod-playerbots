@@ -517,128 +517,171 @@ bool IccDbsTankPositionAction::Execute(Event event)
     if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
     {
         if (bot->GetExactDist2d(ICC_DBS_TANK_POSITION) > 5.0f)
-            return MoveTo(bot->GetMapId(), ICC_DBS_TANK_POSITION.GetPositionX(),
-                          ICC_DBS_TANK_POSITION.GetPositionY(), ICC_DBS_TANK_POSITION.GetPositionZ(), false,
-                          false, false, true, MovementPriority::MOVEMENT_NORMAL);
+            return MoveTo(bot->GetMapId(), ICC_DBS_TANK_POSITION.GetPositionX(), ICC_DBS_TANK_POSITION.GetPositionY(),
+                          ICC_DBS_TANK_POSITION.GetPositionZ(), false, false, false, true,
+                          MovementPriority::MOVEMENT_NORMAL);
     }
 
-    if (botAI->GetAura("Rune of Blood", bot))
+    if (botAI->GetAura("Rune of Blood", bot) && botAI->IsTank(bot))
         return true;
 
     if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
     {
-        // Get group and position in group
-        Group* group = bot->GetGroup();
-        if (!group)
-            return false;
+        const float evasion = 12.0f;
 
-        // Find this bot's position among ranged/healers in the group
-        int rangedIndex = -1;
-        int currentIndex = 0;
-        
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        // Get the nearest hostile NPCs
+        GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+        for (auto& npc : npcs)
         {
-            Player* member = itr->GetSource();
-            if (!member || !member->IsAlive())
-                continue;
-
-            if ((botAI->IsRanged(member) || botAI->IsHeal(member)) && !botAI->IsTank(member))
+            Unit* unit = botAI->GetUnit(npc);
+            if (unit && (unit->GetEntry() == 38508 || unit->GetEntry() == 38596 || unit->GetEntry() == 38597 ||
+                         unit->GetEntry() == 38598))  // blood beast
             {
-                if (member == bot)
+                // Only run away if the blood beast is targeting us
+                if (unit->GetVictim() == bot)
                 {
-                    rangedIndex = currentIndex;
-                    break;
+                    float currentDistance = bot->GetDistance2d(unit);
+
+                    // Move away from the blood beast if the bot is too close
+                    if (currentDistance < evasion)
+                    {
+                        return MoveAway(unit, evasion - currentDistance);
+                    }
                 }
-                currentIndex++;
             }
         }
 
-        if (rangedIndex == -1)
+            // Get group and position in group
+            Group* group = bot->GetGroup();
+            if (!group)
+                return false;
+
+            // Find this bot's position among ranged/healers in the group
+            int rangedIndex = -1;
+            int currentIndex = 0;
+
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player* member = itr->GetSource();
+                if (!member || !member->IsAlive())
+                    continue;
+
+                if ((botAI->IsRanged(member) || botAI->IsHeal(member)) && !botAI->IsTank(member))
+                {
+                    if (member == bot)
+                    {
+                        rangedIndex = currentIndex;
+                        break;
+                    }
+                    currentIndex++;
+                }
+            }
+
+            if (rangedIndex == -1)
+                return false;
+
+            // Fixed positions calculation
+            float tankToBossAngle = 3.14f;
+            const float minBossDistance = 11.0f;
+            const float spreadDistance = 10.0f;
+
+            // Calculate position in a fixed grid (3 rows x 5 columns)
+            int row = rangedIndex / 5;
+            int col = rangedIndex % 5;
+
+            // Calculate base position
+            float xOffset = (col - 2) * spreadDistance;                // Center around tank position
+            float yOffset = minBossDistance + (row * spreadDistance);  // Each row further back
+
+            // Add zigzag offset for odd rows
+            if (row % 2 == 1)
+                xOffset += spreadDistance / 2;
+
+            // Rotate position based on tank-to-boss angle
+            float finalX = ICC_DBS_TANK_POSITION.GetPositionX() +
+                           (cos(tankToBossAngle) * yOffset - sin(tankToBossAngle) * xOffset);
+            float finalY = ICC_DBS_TANK_POSITION.GetPositionY() +
+                           (sin(tankToBossAngle) * yOffset + cos(tankToBossAngle) * xOffset);
+            float finalZ = ICC_DBS_TANK_POSITION.GetPositionZ();
+
+            // Update Z coordinate
+            bot->UpdateAllowedPositionZ(finalX, finalY, finalZ);
+
+            // Move if not in position
+            if (bot->GetExactDist2d(finalX, finalY) > 3.0f)
+                return MoveTo(bot->GetMapId(), finalX, finalY, finalZ, false, false, false, true,
+                              MovementPriority::MOVEMENT_COMBAT);
+
             return false;
+        }
 
-        // Fixed positions calculation
-        float tankToBossAngle = 3.14f;
-        const float minBossDistance = 15.0f;
-        const float spreadDistance = 10.0f;
-        
-        // Calculate position in a fixed grid (3 rows x 5 columns)
-        int row = rangedIndex / 5;
-        int col = rangedIndex % 5;
-        
-        // Calculate base position
-        float xOffset = (col - 2) * spreadDistance; // Center around tank position
-        float yOffset = minBossDistance + (row * spreadDistance); // Each row further back
-        
-        // Add zigzag offset for odd rows
-        if (row % 2 == 1)
-            xOffset += spreadDistance / 2;
-
-        // Rotate position based on tank-to-boss angle
-        float finalX = ICC_DBS_TANK_POSITION.GetPositionX() + (cos(tankToBossAngle) * yOffset - sin(tankToBossAngle) * xOffset);
-        float finalY = ICC_DBS_TANK_POSITION.GetPositionY() + (sin(tankToBossAngle) * yOffset + cos(tankToBossAngle) * xOffset);
-        float finalZ = ICC_DBS_TANK_POSITION.GetPositionZ();
-        
-        // Update Z coordinate
-        bot->UpdateAllowedPositionZ(finalX, finalY, finalZ);
-
-        // Move if not in position
-        if (bot->GetExactDist2d(finalX, finalY) > 3.0f)
-            return MoveTo(bot->GetMapId(), finalX, finalY, finalZ,
-                         false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
+        return false;
     }
-    
-    return false;
-}
 
 bool IccAddsDbsAction::Execute(Event event)
 {
-    if (botAI->IsHeal(bot))
-        return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
     if (!boss)
         return false;
 
-    if (!botAI->GetAura("Rune of Blood", bot) && botAI->IsMainTank(bot))
+    if (!botAI->IsMelee(bot))
         return false;
 
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
-    
-    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
 
-    Unit* add = nullptr;
-    for (auto i = targets.begin(); i != targets.end(); ++i)
-    {
-        Unit* unit = botAI->GetUnit(*i);
-        if (unit && (unit->GetEntry() == 38508 || //blood beast
-                    unit->GetEntry() == 38596 || 
-                    unit->GetEntry() == 38597 || 
-                    unit->GetEntry() == 38598))
-        {
-            add = unit;
-            break;
-        }
-    }
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
 
-    // Prioritize attacking an add if found
-    if (add && !botAI->IsHeal(bot))
+    const uint32 targetsEntries[] = {38508, 38596, 38597, 38598};  // adds
+
+    Unit* priorityTarget = nullptr;
+    bool hasValidAdds = false;
+
+    // First check for alive adds
+    for (uint32 entry : targetsEntries)
     {
-        if (currentTarget != add)
+        for (const ObjectGuid& guid : targets)
         {
-            if (Attack(add))
+            Unit* unit = botAI->GetUnit(guid);
+            if (unit && unit->IsAlive() && unit->GetEntry() == entry)
             {
-                return Attack(add);
+                priorityTarget = unit;
+                hasValidAdds = true;
+                break;
             }
         }
-        return Attack(add); // Already attacking an add
+        if (priorityTarget)
+            break;
     }
 
-    // No adds found, attack boss if not already targeting
-    if (currentTarget != boss)
+    // Only fallback to boss if NO adds exist
+    if (!hasValidAdds && boss->IsAlive())
     {
-        if (Attack(boss))
+        priorityTarget = boss;
+    }
+
+    // Update skull icon if needed
+    if (priorityTarget)
+    {
+        if (Group* group = bot->GetGroup())
         {
-            return Attack(boss);
+            ObjectGuid currentSkull = group->GetTargetIcon(7);
+            Unit* currentSkullUnit = botAI->GetUnit(currentSkull);
+
+            bool needsUpdate = false;
+            if (!currentSkullUnit || !currentSkullUnit->IsAlive())
+            {
+                needsUpdate = true;  // No valid skull target
+            }
+            else if (currentSkullUnit != priorityTarget)
+            {
+                needsUpdate = true;  // Different target than desired
+            }
+
+            if (needsUpdate)
+            {
+                group->SetTargetIcon(7, bot->GetGUID(), priorityTarget->GetGUID());
+            }
         }
     }
 
