@@ -36,6 +36,9 @@ enum UlduarIDs
     // Freya
     NPC_EONARS_GIFT = 33228,
     GOBJECT_NATURE_BOMB = 194902,
+
+    // Buffs
+    SPELL_ASPECT_OF_THE_WILD = 49071,
 };
 
 const float ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT = 420.0f;
@@ -140,6 +143,13 @@ class KologarnFallFromFloorTrigger : public Trigger
 {
 public:
     KologarnFallFromFloorTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn fall from floor trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnNatureResistanceTrigger : public Trigger
+{
+public:
+    KologarnNatureResistanceTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn nature resistance trigger") {}
     bool IsActive() override;
 };
 

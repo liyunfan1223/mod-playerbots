@@ -146,6 +146,14 @@ public:
     bool isUseful() override;
 };
 
+class KologarnNatureResistanceAction : public Action
+{
+public:
+    KologarnNatureResistanceAction(PlayerbotAI* botAI) : Action(botAI, "kologarn nature resistance action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class HodirBitingColdJumpAction : public MovementAction
 {
 public:

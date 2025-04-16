@@ -11,6 +11,7 @@
 #include "SharedDefines.h"
 #include "Trigger.h"
 #include "Vehicle.h"
+#include <HunterBuffStrategies.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -353,6 +354,37 @@ bool KologarnFallFromFloorTrigger::IsActive()
 
     // Check if bot is on the floor
     return bot->GetPositionZ() < ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT;
+}
+
+bool KologarnNatureResistanceTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is alive
+    if (!bot->IsAlive())
+        return false;
+
+    // Check if bot is hunter
+    if (bot->getClass() != CLASS_HUNTER)
+        return false;
+
+    // Check if bot have nature resistance aura
+    if (bot->HasAura(SPELL_ASPECT_OF_THE_WILD))
+        return false;
+
+    // Check if bot dont have already setted nature resistance aura
+    HunterNatureResistanceStrategy hunterNatureResistanceStrategy(botAI);
+    if (botAI->HasStrategy(hunterNatureResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+        return false;
+
+    // Check that the bot actually knows Aspect of the Wild
+    if (!bot->HasActiveSpell(SPELL_ASPECT_OF_THE_WILD))
+        return false;
+
+    return true;
 }
 
 bool HodirBitingColdTrigger::IsActive()

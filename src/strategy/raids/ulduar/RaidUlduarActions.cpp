@@ -24,6 +24,7 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include <HunterBuffStrategies.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -1347,6 +1348,19 @@ bool KologarnFallFromFloorAction::isUseful()
 {
     KologarnFallFromFloorTrigger kologarnFallFromFloorTrigger(botAI);
     return kologarnFallFromFloorTrigger.IsActive();
+}
+
+bool KologarnNatureResistanceAction::Execute(Event event)
+{
+    HunterNatureResistanceStrategy hunterNatureResistanceStrategy(botAI);
+    botAI->ChangeStrategy(std::string("+") + hunterNatureResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
+    return true;
+}
+
+bool KologarnNatureResistanceAction::isUseful()
+{
+    KologarnNatureResistanceTrigger kologarnNatureResistanceTrigger(botAI);
+    return kologarnNatureResistanceTrigger.IsActive();
 }
 
 bool HodirMoveSnowpackedIcicleAction::isUseful()

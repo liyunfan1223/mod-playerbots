@@ -68,6 +68,10 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "kologarn mark dps target trigger",
         NextAction::array(0, new NextAction("kologarn mark dps target action", ACTION_RAID), nullptr)));
 
+    triggers.push_back(new TriggerNode(
+        "kologarn nature resistance trigger",
+        NextAction::array(0, new NextAction("kologarn nature resistance action", ACTION_RAID), nullptr)));
+
     //
     // Hodir
     //
