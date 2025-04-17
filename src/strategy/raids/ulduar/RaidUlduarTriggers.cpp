@@ -12,6 +12,7 @@
 #include "Trigger.h"
 #include "Vehicle.h"
 #include <HunterBuffStrategies.h>
+#include <PaladinBuffStrategies.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -243,6 +244,60 @@ bool RazorscaleFuseArmorTrigger::IsActive()
     return false;
 }
 
+bool RazorscaleFireResistanceTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is paladin
+    if (bot->getClass() != CLASS_PALADIN)
+        return false;
+
+    // Check if bot have fire resistance aura
+    if (bot->HasAura(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    // Check if bot dont have already have fire resistance strategy
+    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
+    if (botAI->HasStrategy(paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+        return false;
+
+    // Check that the bot actually knows the spell
+    if (!bot->HasActiveSpell(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    return true;
+}
+
+bool IgnisFireResistanceTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "ignis the furnace master");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is paladin
+    if (bot->getClass() != CLASS_PALADIN)
+        return false;
+
+    // Check if bot have fire resistance aura
+    if (bot->HasAura(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    // Check if bot dont have already have fire resistance strategy
+    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
+    if (botAI->HasStrategy(paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+        return false;
+
+    // Check that the bot actually knows the spell
+    if (!bot->HasActiveSpell(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    return true;
+}
+
 bool IronAssemblyLightningTendrilsTrigger::IsActive()
 {
     // Check boss and it is alive
@@ -431,6 +486,33 @@ bool HodirNearSnowpackedIcicleTrigger::IsActive()
     {
         return false;
     }
+
+    return true;
+}
+
+bool HodirFrostResistanceTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is paladin
+    if (bot->getClass() != CLASS_PALADIN)
+        return false;
+
+    // Check if bot have frost resistance aura
+    if (bot->HasAura(SPELL_FROST_RESISTANCE_AURA))
+        return false;
+
+    // Check if bot dont have already have frost resistance strategy
+    PaladinFrostResistanceStrategy paladinFrostResistanceStrategy(botAI);
+    if (botAI->HasStrategy(paladinFrostResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+        return false;
+
+    // Check that the bot actually knows the spell
+    if (!bot->HasActiveSpell(SPELL_FROST_RESISTANCE_AURA))
+        return false;
 
     return true;
 }
