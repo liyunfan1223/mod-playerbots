@@ -33,12 +33,15 @@ void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, std::ostrings
         if (spellInfo->Effects[j].Effect == SPELL_EFFECT_LEARN_SPELL)
         {
             uint32 learnedSpell = spellInfo->Effects[j].TriggerSpell;
-            bot->learnSpell(learnedSpell);
-            learned = true;
+            if (!bot->HasSpell(learnedSpell))
+            {
+                bot->learnSpell(learnedSpell);
+                learned = true;
+            }
         }
     }
 
-    if (!learned)
+    if (!learned && !bot->HasSpell(tSpell->spell))
         bot->learnSpell(tSpell->spell);
 
     msg << " - learned";
