@@ -42,7 +42,9 @@ void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, std::ostrings
     }
 
     if (!learned && !bot->HasSpell(tSpell->spell))
+    {
         bot->learnSpell(tSpell->spell);
+    }
 
     msg << " - learned";
 }
