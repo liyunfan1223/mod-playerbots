@@ -162,7 +162,7 @@ bool DebugAction::Execute(Event event)
         std::ostringstream out;
         out << "bad quests:";
 
-        uint32 noT = 0, noG = 0, noO = 0;
+        // uint32 noT = 0, noG = 0, noO = 0; //not used, line marked for removal.
 
         for (auto q : sTravelMgr->quests)
         {
@@ -194,7 +194,7 @@ bool DebugAction::Execute(Event event)
 
         std::string const name = "USER:" + text.substr(9);
 
-        TravelNode* startNode = sTravelNodeMap->addNode(pos, name, false, false);
+        /* TravelNode* startNode  = */ sTravelNodeMap->addNode(pos, name, false, false); // startNode not used, but addNode as side effect, fragment marked for removal.
 
         for (auto& endNode : sTravelNodeMap->getNodes(pos, 2000))
         {
@@ -291,7 +291,7 @@ bool DebugAction::Execute(Event event)
                 Unit* start = nullptr;
                 GuidVector units;
 
-                uint32 time = 60 * IN_MILLISECONDS;
+                // uint32 time = 60 * IN_MILLISECONDS; //not used, line marked for removal.
 
                 std::vector<WorldPosition> ppath = l.second->getPath();
 
@@ -342,7 +342,7 @@ bool DebugAction::Execute(Event event)
     {
         uint32 spellEffect = stoi(text.substr(7));
 
-        Unit* prev = bot;
+        // Unit* prev = bot; //not used, line marked for removal.
 
         for (float i = 0; i < 60; i++)
         {
@@ -373,7 +373,7 @@ bool DebugAction::Execute(Event event)
     {
         uint32 spellEffect = stoi(text.substr(7));
 
-        Unit* prev = bot;
+        // Unit* prev = bot; //not used, line marked for removal.
 
         for (float i = 0; i < 60; i++)
         {
@@ -815,7 +815,7 @@ bool DebugAction::Execute(Event event)
                     uint32 i = dx + dy * 10;
                     GuidVector hits, miss;
 
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(effect);
+                    // SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(effect); //not used, line marked for removal.
                     for (auto tar : all_targets)
                     {
                         // hits.push_back(tar);

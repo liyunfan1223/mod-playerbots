@@ -833,7 +833,7 @@ bool RandomItemMgr::CanEquipWeapon(uint8 clazz, ItemTemplate const* proto)
 
 void RandomItemMgr::BuildItemInfoCache()
 {
-    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    //uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL); //not used, line marked for removal.
 
     // load weightscales
     LOG_INFO("playerbots", "Loading weightscales info");
@@ -1347,7 +1347,7 @@ uint32 RandomItemMgr::CalculateStatWeight(uint8 playerclass, uint8 spec, ItemTem
     // check weapon dps
     if (proto->IsWeaponVellum())
     {
-        WeaponAttackType attType = BASE_ATTACK;
+        //WeaponAttackType attType = BASE_ATTACK; //not used, line marked for removal.
 
         uint32 dps = 0;
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
@@ -2206,7 +2206,7 @@ void RandomItemMgr::BuildEquipCacheNew()
     ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
-        uint32 questId = i->first;
+        //uint32 questId = i->first; //not used in this scope, line marked for removal.
         Quest const* quest = i->second;
 
         if (quest->IsRepeatable())

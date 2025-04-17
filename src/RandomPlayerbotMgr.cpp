@@ -2671,7 +2671,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
 
     if (IsRandomBot(player))
     {
-        ObjectGuid::LowType guid = player->GetGUID().GetCounter();
+        //ObjectGuid::LowType guid = player->GetGUID().GetCounter(); //not used, conditional could be rewritten for simplicity. line marked for removal.
     }
     else
     {
@@ -2729,7 +2729,7 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 changeStrategy = 0;
     uint32 dead = 0;
     uint32 combat = 0;
-    uint32 revive = 0;
+    //uint32 revive = 0; //not used, line marked for removal.
     uint32 taxi = 0;
     uint32 moving = 0;
     uint32 mounted = 0;

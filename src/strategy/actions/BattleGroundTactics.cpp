@@ -3020,7 +3020,7 @@ bool BGTactics::selectObjective(bool reset)
                     std::vector<GameObject*> objectives;
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        WorldObject* pAttackObjectiveObject = nullptr;
+                        // WorldObject* pAttackObjectiveObject = nullptr; //not used, line marked for removal.
                         float attackObjectiveDistance = FLT_MAX;
 
                         for (auto const& objective : AB_AttackObjectives)
@@ -3071,7 +3071,7 @@ bool BGTactics::selectObjective(bool reset)
                 std::vector<GameObject*> objectives;
                 for (auto i = 0; i < 3; ++i)
                 {
-                    WorldObject* pAttackObjectiveObject = nullptr;
+                    //WorldObject* pAttackObjectiveObject = nullptr; //not used, line marked for removal.
                     float attackObjectiveDistance = FLT_MAX;
 
                     for (const auto& objective : AB_AttackObjectives)
@@ -3755,7 +3755,7 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
 
-    PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
+    // PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get(); //not used, line marked for removal.
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
     if (!pos.isSet())
         return false;
