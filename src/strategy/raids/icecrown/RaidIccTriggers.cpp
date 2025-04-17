@@ -25,25 +25,7 @@ bool IccSpikeNearTrigger::IsActive()
     if (!boss) 
         return false;
 
-    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-    for (auto& npc : npcs)
-    {
-        Unit* unit = botAI->GetUnit(npc);
-        if (unit)
-        {
-            if (unit->GetEntry() == 36619 || unit->GetEntry() == 38711 || unit->GetEntry() == 38712 ) //spike ID
-            {
-                if (unit->GetDistance(bot) <= 20.0f)
-                {
-                    return botAI->IsDps(bot);
-                }
-    
-                return botAI->IsRangedDps(bot);
-            }
-        }
-    }
-
-    return false;
+    return true;
 }
 
 //Lady Deathwhisper
@@ -144,7 +126,8 @@ bool IccGunshipTeleportAllyTrigger::IsActive()
 bool IccGunshipTeleportHordeTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "skybreaker sorcerer");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
     return true;
 }
@@ -153,7 +136,8 @@ bool IccGunshipTeleportHordeTrigger::IsActive()
 bool IccDbsTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
     return true;
 }
@@ -182,9 +166,10 @@ bool IccDbsMainTankRuneOfBloodTrigger::IsActive()
 bool IccAddsDbsTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
-     return true;
+    return true;
 }
 
 //DOGS
