@@ -58,6 +58,21 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("iron assembly overload action", ACTION_RAID), nullptr)));
 
     //
+    // Kologarn
+    //
+    triggers.push_back(new TriggerNode(
+        "kologarn fall from floor trigger",
+        NextAction::array(0, new NextAction("kologarn fall from floor action", ACTION_RAID + 1), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "kologarn mark dps target trigger",
+        NextAction::array(0, new NextAction("kologarn mark dps target action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "kologarn nature resistance trigger",
+        NextAction::array(0, new NextAction("kologarn nature resistance action", ACTION_RAID), nullptr)));
+
+    //
     // Hodir
     //
     triggers.push_back(new TriggerNode(
