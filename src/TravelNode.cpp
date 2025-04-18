@@ -1348,6 +1348,9 @@ TravelNodeRoute TravelNodeMap::getRoute(WorldPosition startPos, WorldPosition en
     std::vector<WorldPosition> newStartPath;
     std::vector<TravelNode*> startNodes = m_nodes, endNodes = m_nodes;
 
+    if(!startNodes.size() || !endNodes.size())
+         return TravelNodeRoute();
+
     // Partial sort to get the closest 5 nodes at the begin of the array.
     std::partial_sort(startNodes.begin(), startNodes.begin() + 5, startNodes.end(),
                       [startPos](TravelNode* i, TravelNode* j) { return i->fDist(startPos) < j->fDist(startPos); });
