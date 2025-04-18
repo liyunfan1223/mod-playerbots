@@ -87,7 +87,7 @@ void AutoMaintenanceOnLevelupAction::LearnQuestSpells(std::ostringstream* out)
     ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
-        uint32 questId = i->first;
+        //uint32 questId = i->first; //not used, line marked for removal.
         Quest const* quest = i->second;
 
         if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)

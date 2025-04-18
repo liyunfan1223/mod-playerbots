@@ -92,7 +92,7 @@ bool CastSpellAction::isPossible()
         return false;
     }
 
-    Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    // Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL); //not used, line marked for removal.
     return botAI->CanCastSpell(spell, GetTarget());
 }
 
@@ -321,7 +321,7 @@ bool UseTrinketAction::UseTrinket(Item* item)
 
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
-    uint8 spell_index = 0;
+    // uint8 spell_index = 0; //not used, line marked for removal.
     uint8 cast_count = 1;
     ObjectGuid item_guid = item->GetGUID();
     uint32 glyphIndex = 0;

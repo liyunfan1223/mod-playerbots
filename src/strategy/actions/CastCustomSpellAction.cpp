@@ -262,7 +262,7 @@ bool CastRandomSpellAction::Execute(Event event)
     if (spellList.empty())
         return false;
 
-    bool isCast = false;
+    // bool isCast = false; //not used, line marked for removal.
 
     std::sort(spellList.begin(), spellList.end(),
               [](std::pair<uint32, std::pair<uint32, WorldObject*>> i,

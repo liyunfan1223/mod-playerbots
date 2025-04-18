@@ -129,7 +129,7 @@ bool GossipHelloAction::ProcessGossip(int32 menuToSelect)
         return false;
     }
 
-    GossipMenuItem const* item = menu.GetItem(menuToSelect);
+    // GossipMenuItem const* item = menu.GetItem(menuToSelect); //not used, line marked for removal.
     WorldPacket p;
     std::string code;
     p << GetMaster()->GetTarget();

@@ -18,7 +18,7 @@ class FleePoint
 {
 public:
     FleePoint(PlayerbotAI* botAI, float x, float y, float z)
-        : botAI(botAI), sumDistance(0.0f), minDistance(0.0f), x(x), y(y), z(z)
+        : x(x), y(y), z(z), sumDistance(0.0f), minDistance(0.0f), botAI(botAI)
     {
     }
 

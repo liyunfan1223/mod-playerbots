@@ -129,7 +129,7 @@ void PlayerbotFactory::Init()
         if (!spellInfo)
             continue;
 
-        uint32 requiredLevel = spellInfo->BaseLevel;
+        //uint32 requiredLevel = spellInfo->BaseLevel; //not used, line marked for removal.
 
         for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
         {
@@ -970,7 +970,7 @@ void PlayerbotFactory::ClearSpells()
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         uint32 spellId = itr->first;
-        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        //const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId); //not used, line marked for removal.
         if (itr->second->State == PLAYERSPELL_REMOVED)
         {
             continue;
@@ -2197,7 +2197,7 @@ void PlayerbotFactory::UpdateTradeSkills()
 
 void PlayerbotFactory::InitSkills()
 {
-    uint32 maxValue = level * 5;
+    //uint32 maxValue = level * 5; //not used, line marked for removal.
     bot->UpdateSkillsForLevel();
 
     bot->SetSkill(SKILL_RIDING, 0, 0, 0);
@@ -2354,7 +2354,7 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 
     // uint32 value = urand(maxValue - level, maxValue);
     uint32 value = maxValue;
-    uint32 curValue = bot->GetSkillValue(id);
+    //uint32 curValue = bot->GetSkillValue(id); //not used, line marked for removal.
 
     uint16 step = bot->GetSkillValue(id) ? bot->GetSkillStep(id) : 1;
 
@@ -3324,7 +3324,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
     {
-        uint32 itemId = i->first;
+        //uint32 itemId = i->first; //not used, line marked for removal.
         ItemTemplate const* proto = &i->second;
         if (!proto)
             continue;
@@ -3424,9 +3424,9 @@ void PlayerbotFactory::InitGlyphs(bool increment)
                 ids.push_back(id);
             }
 
-            int maxCount = urand(0, 3);
-            int count = 0;
-            bool found = false;
+            //int maxCount = urand(0, 3); //not used, line marked for removal.
+            //int count = 0; //not used, line marked for removal.
+            //bool found = false; //not used, line marked for removal.
             for (int attempts = 0; attempts < 15; ++attempts)
             {
                 uint32 index = urand(0, ids.size() - 1);
@@ -3444,7 +3444,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
                                                 ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
 
                 bot->SetGlyph(realSlot, id, true);
-                found = true;
+                //found = true; //not used, line marked for removal.
                 break;
             }
         }
@@ -3491,7 +3491,7 @@ void PlayerbotFactory::InitInventorySkill()
 
 Item* PlayerbotFactory::StoreItem(uint32 itemId, uint32 count)
 {
-    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+    //ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId); //not used, line marked for removal.
     ItemPosCountVec sDest;
     InventoryResult msg = bot->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, itemId, count);
     if (msg != EQUIP_ERR_OK)
@@ -3914,8 +3914,8 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
 
 void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
 {
-    int32 bestGemEnchantId[4] = {-1, -1, -1, -1};  // 1, 2, 4, 8 color
-    float bestGemScore[4] = {0, 0, 0, 0};
+    //int32 bestGemEnchantId[4] = {-1, -1, -1, -1};  // 1, 2, 4, 8 color //not used, line marked for removal.
+    //float bestGemScore[4] = {0, 0, 0, 0}; //not used, line marked for removal.
     std::vector<uint32> curCount = GetCurrentGemsCount();
     uint8 jewelersCount = 0;
     int requiredActive = 2;
@@ -4074,7 +4074,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 if (!enchant_id)
                     continue;
 
-                SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                //SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id); //not used, line marked for removal.
                 StatsWeightCalculator calculator(bot);
                 float score = calculator.CalculateEnchant(enchant_id);
                 if (curCount[0] != 0)

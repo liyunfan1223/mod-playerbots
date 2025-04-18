@@ -744,7 +744,7 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
 
 int32 StatsCollector::AverageValue(const SpellEffectInfo& effectInfo)
 {
-    float basePointsPerLevel = effectInfo.RealPointsPerLevel;
+    //float basePointsPerLevel = effectInfo.RealPointsPerLevel; //not used, line marked for removal.
     int32 basePoints = effectInfo.BasePoints;
     int32 randomPoints = int32(effectInfo.DieSides);
 

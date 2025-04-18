@@ -644,7 +644,7 @@ void WorldPosition::loadMapAndVMap(uint32 mapId, uint8 x, uint8 y)
             {
                 // load VMAPs for current map/grid...
                 const MapEntry* i_mapEntry = sMapStore.LookupEntry(mapId);
-                const char* mapName = i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
+                //const char* mapName = i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0"; //not used, (usage are commented out below), line marked for removal.
 
                 int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapMgr()->loadMap(
                     (sWorld->GetDataPath() + "vmaps").c_str(), mapId, x, y);
@@ -1103,7 +1103,7 @@ bool QuestRelationTravelDestination::isActive(Player* bot)
         if (!bot->GetMap()->GetEntry()->IsWorldMap() || !bot->CanTakeQuest(questTemplate, false))
             return false;
 
-        uint32 dialogStatus = sTravelMgr->getDialogStatus(bot, entry, questTemplate);
+        //uint32 dialogStatus = sTravelMgr->getDialogStatus(bot, entry, questTemplate); //not used, shadowed by the next declaration, line marked for removal.
 
         if (AI_VALUE(bool, "can fight equal"))
         {

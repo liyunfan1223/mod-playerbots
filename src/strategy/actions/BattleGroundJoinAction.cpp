@@ -424,7 +424,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     uint32 bgTypeId_ = bgTypeId;
     uint32 instanceId = 0;  // 0 = First Available
 
-    bool isPremade = false;
+    // bool isPremade = false; //not used, line marked for removal.
     bool isArena = false;
     bool isRated = false;
     uint8 arenaslot = 0;
@@ -454,7 +454,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     bool joinAsGroup = bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() == bot->GetGUID();
 
     // in wotlk only arena requires battlemaster guid
-    ObjectGuid guid = isArena ? unit->GetGUID() : bot->GetGUID();
+    // ObjectGuid guid = isArena ? unit->GetGUID() : bot->GetGUID(); //not used, line marked for removal.
 
     switch (bgTypeId)
     {
@@ -874,7 +874,7 @@ bool BGStatusAction::Execute(Event event)
             break;
     }
 
-    TeamId teamId = bot->GetTeamId();
+    //TeamId teamId = bot->GetTeamId(); //not used, line marked for removal.
 
     if (Time1 == TIME_TO_AUTOREMOVE)  // Battleground is over, bot needs to leave
     {
@@ -956,7 +956,7 @@ bool BGStatusAction::Execute(Event event)
         if (leaveQ && ((bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID())) ||
                        !(bot->GetGroup() || botAI->GetMaster())))
         {
-            TeamId teamId = bot->GetTeamId();
+            //TeamId teamId = bot->GetTeamId(); //not used, line marked for removal.
             bool realPlayers = false;
             if (isRated)
                 realPlayers = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaPlayerCount > 0;

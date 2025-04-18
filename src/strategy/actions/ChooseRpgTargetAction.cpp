@@ -117,19 +117,19 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
 
 bool ChooseRpgTargetAction::Execute(Event event)
 {
-    TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
+    //TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target"); //not used, line marked for removal.
     Player* master = botAI->GetMaster();
     GuidPosition masterRpgTarget;
     if (master && master != bot && GET_PLAYERBOT_AI(master) && master->GetMapId() == bot->GetMapId() && !master->IsBeingTeleported())
     {
         Player* player = botAI->GetMaster();
-        GuidPosition masterRpgTarget = PAI_VALUE(GuidPosition, "rpg target");
+        //GuidPosition masterRpgTarget = PAI_VALUE(GuidPosition, "rpg target"); //not used, line marked for removal.
     }
     else
         master = nullptr;
 
     std::unordered_map<ObjectGuid, uint32> targets;
-    uint32 num = 0;
+    // uint32 num = 0; //not used, line marked for removal.
     GuidVector possibleTargets = AI_VALUE(GuidVector, "possible rpg targets");
     GuidVector possibleObjects = AI_VALUE(GuidVector, "nearest game objects no los");
     GuidVector possiblePlayers = AI_VALUE(GuidVector, "nearest friendly players");
@@ -169,7 +169,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
         if (!guidP || !guidP.getMap())
             continue;
 
-        float priority = 1;
+        // float priority = 1; //not used, line marked for removal.
 
         if (guidP.GetWorldObject() && !isFollowValid(bot, guidP.GetWorldObject()))
             continue;
@@ -285,7 +285,7 @@ bool ChooseRpgTargetAction::isUseful()
     if (guidP && guidP.distance(bot) < sPlayerbotAIConfig->reactDistance * 2)
         return false;
 
-    TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
+    // TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target"); //not used, line marked for removal.
 
     //if (travelTarget->isTraveling() && AI_VALUE2(bool, "can free move to", *travelTarget->getPosition()))
         //return false;

@@ -156,7 +156,7 @@ public:
             return message;
 
         bool found = false;
-        bool isRti = false;
+        //bool isRti = false; //not used, shadowed by the next declaration, line marked for removal.
         for (std::vector<std::string>::iterator i = rtis.begin(); i != rtis.end(); i++)
         {
             std::string const rti = *i;
@@ -213,7 +213,7 @@ public:
         Player* bot = botAI->GetBot();
 
         bool found = false;
-        bool isClass = false;
+        //bool isClass = false; //not used, shadowed by the next declaration, line marked for removal.
         for (std::map<std::string, uint8>::iterator i = classNames.begin(); i != classNames.end(); i++)
         {
             bool isClass = message.find(i->first) == 0;

@@ -150,7 +150,7 @@ bool LfgJoinAction::JoinLFG()
              many ? "several dungeons" : dungeon->Name[0]);
 
     // Set RbotAId Browser comment
-    std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot, false, false));
+    std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot/*, false, false*/));
     
     // JoinLfg is not threadsafe, so make packet and queue into session
     // sLFGMgr->JoinLfg(bot, roleMask, list, _gs);

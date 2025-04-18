@@ -11,7 +11,7 @@
 
 bool ChooseTravelTargetAction::Execute(Event event)
 {
-    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    // Player* requester = event.getOwner() ? event.getOwner() : GetMaster(); //not used, line marked for removal.
 
     //Get the current travel target. This target is no longer active.
     TravelTarget* oldTarget = context->GetValue<TravelTarget*>("travel target")->Get();
@@ -501,7 +501,7 @@ bool ChooseTravelTargetAction::SetQuestTarget(TravelTarget* target, bool onlyCom
                 continue;
 
             uint32 questId = quest.first;
-            QuestStatusData* questStatus = &quest.second;
+            // QuestStatusData* questStatus = &quest.second; //not used, line marked for removal.
             const auto questTemplate = sObjectMgr->GetQuestTemplate(questId);
 
             if (!activeQuests && !bot->CanRewardQuest(questTemplate, false))
@@ -826,7 +826,7 @@ TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, std::s
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
 
-    AiObjectContext* context = botAI->GetAiObjectContext();
+    // AiObjectContext* context = botAI->GetAiObjectContext(); //not used, line marked for removal.
 
     std::vector<TravelDestination*> dests;
 

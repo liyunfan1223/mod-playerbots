@@ -657,7 +657,7 @@ void StatsWeightCalculator::ApplyWeightFinetune(Player* player)
     {
         if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
         {
-            float armor_penetration_current, armor_penetration_overflow;
+            float armor_penetration_current/*, armor_penetration_overflow*/; //not used, line marked for removal.
             armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
             if (armor_penetration_current > 50)
                 stats_weights_[STATS_TYPE_ARMOR_PENETRATION] *= 1.2f;
