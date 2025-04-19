@@ -851,6 +851,10 @@ bool IccSindragosaMainTankMysticBuffetTrigger::IsActive()
     if (!boss)
         return false;
 
+    Aura* aura = botAI->GetAura("mystic buffet", bot, false, false);
+    if (botAI->IsTank(bot) && aura) //main tank will delete mystic buffet until I find a better way to swap tanks, atm it is not great since while swapping they will wipe group 7/10 times.
+        bot->RemoveAura(aura->GetId());
+
     if (botAI->IsTank(bot) && boss->GetVictim() == bot)
         return false;
 
@@ -926,6 +930,10 @@ bool IccSindragosaTankSwapPositionTrigger::IsActive()
 
 bool IccSindragosaFrostBombTrigger::IsActive()
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return false;
+
     if (!bot->IsAlive() || bot->HasAura(70157))  // Skip if dead or in Ice Tomb
         return false;
 
