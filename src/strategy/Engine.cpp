@@ -432,59 +432,122 @@ bool Engine::HasStrategy(std::string const name) { return strategies.find(name) 
 void Engine::ProcessTriggers(bool minimal)
 {
     std::unordered_map<Trigger*, Event> fires;
-    for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
+    
+    // Use index-based access with careful bounds checking
+    for (size_t i = 0; i < triggers.size(); i++)
     {
-        TriggerNode* node = *i;
+        // Get trigger node safely
+        TriggerNode* node = i < triggers.size() ? triggers[i] : nullptr;
+        if (!node)
+            continue;
+
+        // Get or initialize trigger with null checks
+        Trigger* trigger = node->getTrigger();
+        if (!trigger)
+        {
+            // Only try to get trigger if context is valid
+            if (aiObjectContext)
+            {
+                trigger = aiObjectContext->GetTrigger(node->getName());
+                if (trigger && node) // Verify node is still valid
+                {
+                    node->setTrigger(trigger);
+                }
+            }
+        }
+
+        if (!trigger)
+            continue;
+
+        // Skip if already processed
+        if (fires.find(trigger) != fires.end())
+            continue;
+
+        // Only process if needed
+        if (testMode || (trigger && trigger->needCheck()))
+        {
+            // Skip low-relevance triggers in minimal mode
+            if (minimal && node && node->getFirstRelevance() < 100)
+                continue;
+
+            // Safe performance monitoring
+            PerformanceMonitorOperation* pmo = nullptr;
+            if (sPerformanceMonitor && trigger)
+            {
+                pmo = sPerformanceMonitor->start(PERF_MON_TRIGGER, trigger->getName(), 
+                    aiObjectContext ? &aiObjectContext->performanceStack : nullptr);
+            }
+
+            // Check the trigger safely
+            Event event;
+            if (trigger)
+            {
+                try {
+                    event = trigger->Check();
+                }
+                catch (...) {
+                    // Log error but continue processing
+                    LogAction("Error checking trigger: %s", trigger->getName().c_str());
+                    if (pmo)
+                        pmo->finish();
+                    continue;
+                }
+            }
+
+            // Clean up performance monitoring
+            if (pmo)
+                pmo->finish();
+
+            // Skip if no event
+            if (!event)
+                continue;
+
+            // Record the fired trigger
+            fires[trigger] = event;
+            
+            // Safe logging
+            if (trigger)
+            {
+                LogAction("T:%s", trigger->getName().c_str());
+            }
+        }
+    }
+
+    // Process the triggers that fired with protection against vector changes
+    for (size_t i = 0; i < triggers.size(); i++)
+    {
+        TriggerNode* node = i < triggers.size() ? triggers[i] : nullptr;
         if (!node)
             continue;
 
         Trigger* trigger = node->getTrigger();
         if (!trigger)
-        {
-            trigger = aiObjectContext->GetTrigger(node->getName());
-            node->setTrigger(trigger);
-        }
-
-        if (!trigger)
             continue;
 
-        if (fires.find(trigger) != fires.end())
+        auto it = fires.find(trigger);
+        if (it == fires.end())
             continue;
 
-        if (testMode || trigger->needCheck())
+        Event event = it->second;
+        NextAction** handlers = node->getHandlers();
+        if (handlers)
         {
-            if (minimal && node->getFirstRelevance() < 100)
-                continue;
-
-            PerformanceMonitorOperation* pmo =
-                sPerformanceMonitor->start(PERF_MON_TRIGGER, trigger->getName(), &aiObjectContext->performanceStack);
-            Event event = trigger->Check();
-            if (pmo)
-                pmo->finish();
-
-            if (!event)
-                continue;
-
-            fires[trigger] = event;
-            LogAction("T:%s", trigger->getName().c_str());
+            MultiplyAndPush(handlers, 0.0f, false, event, "trigger");
         }
     }
 
-    for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
+    // Reset triggers safely
+    for (size_t i = 0; i < triggers.size(); i++)
     {
-        TriggerNode* node = *i;
+        TriggerNode* node = i < triggers.size() ? triggers[i] : nullptr;
+        if (!node)
+            continue;
+
         Trigger* trigger = node->getTrigger();
-        if (fires.find(trigger) == fires.end())
-            continue;
-
-        Event event = fires[trigger];
-        MultiplyAndPush(node->getHandlers(), 0.0f, false, event, "trigger");
-    }
-
-    for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
-    {
-        if (Trigger* trigger = (*i)->getTrigger())
+        if (trigger)
+        {
             trigger->Reset();
+        }
     }
 }
 
