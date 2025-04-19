@@ -268,7 +268,27 @@ bool RazorscaleFireResistanceTrigger::IsActive()
     if (!bot->HasActiveSpell(SPELL_FIRE_RESISTANCE_AURA))
         return false;
 
-    return true;
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive paladin
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_PALADIN)
+        {
+            // Return true only if the current bot is the first alive paladin
+            return member == bot;
+        }
+    }
+
+    return false;
 }
 
 bool IgnisFireResistanceTrigger::IsActive()
@@ -295,7 +315,27 @@ bool IgnisFireResistanceTrigger::IsActive()
     if (!bot->HasActiveSpell(SPELL_FIRE_RESISTANCE_AURA))
         return false;
 
-    return true;
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive paladin
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_PALADIN)
+        {
+            // Return true only if the current bot is the first alive paladin
+            return member == bot;
+        }
+    }
+
+    return false;
 }
 
 bool IronAssemblyLightningTendrilsTrigger::IsActive()
@@ -439,7 +479,27 @@ bool KologarnNatureResistanceTrigger::IsActive()
     if (!bot->HasActiveSpell(SPELL_ASPECT_OF_THE_WILD))
         return false;
 
-    return true;
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive hunter
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_HUNTER)
+        {
+            // Return true only if the current bot is the first alive hunter
+            return member == bot;
+        }
+    }
+
+    return false;
 }
 
 bool HodirBitingColdTrigger::IsActive()
@@ -514,7 +574,27 @@ bool HodirFrostResistanceTrigger::IsActive()
     if (!bot->HasActiveSpell(SPELL_FROST_RESISTANCE_AURA))
         return false;
 
-    return true;
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive paladin
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_PALADIN)
+        {
+            // Return true only if the current bot is the first alive paladin
+            return member == bot;
+        }
+    }
+
+    return false;
 }
 
 bool FreyaNearNatureBombTrigger::IsActive()
