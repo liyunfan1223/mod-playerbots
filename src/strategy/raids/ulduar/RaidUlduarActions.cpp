@@ -12,7 +12,6 @@
 #include "ObjectGuid.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
-#include "Player.h"
 #include "Playerbots.h"
 #include "Position.h"
 #include "RaidUlduarBossHelper.h"
@@ -25,6 +24,7 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include <HunterBuffStrategies.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -32,6 +32,9 @@ const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED
 
 const std::vector<Position> corners = {
     {183.53f, 66.53f, 409.80f}, {383.03f, 75.10f, 411.71f}, {379.74f, -133.05f, 410.88f}, {158.67f, -137.54f, 409.80f}};
+
+const Position ULDUAR_KOLOGARN_CRUNCH_ARMOR_RESET_SPOT = Position(1752.4803f, -43.44299f, 448.805f);
+const Position ULDUAR_KOLOGARN_RESTORE_POSITION = Position(1764.3749f, -24.02903f, 448.0f, 0.00087690353);
 
 bool FlameLeviathanVehicleAction::Execute(Event event)
 {
@@ -273,14 +276,14 @@ bool FlameLeviathanEnterVehicleAction::Execute(Event event)
 
         if (!ShouldEnter(vehicleBase))
             continue;
-        
+
         if (!vehicleToEnter || bot->GetExactDist(vehicleToEnter) > bot->GetExactDist(vehicleBase))
             vehicleToEnter = vehicleBase;
     }
 
     if (!vehicleToEnter)
         return false;
-    
+
     if (EnterVehicle(vehicleToEnter, true))
         return true;
 
@@ -290,7 +293,7 @@ bool FlameLeviathanEnterVehicleAction::Execute(Event event)
 bool FlameLeviathanEnterVehicleAction::EnterVehicle(Unit* vehicleBase, bool moveIfFar)
 {
     float dist = bot->GetDistance(vehicleBase);
-    
+
     if (dist > INTERACTION_DISTANCE && !moveIfFar)
         return false;
 
@@ -517,7 +520,7 @@ bool RazorscaleAvoidSentinelAction::Execute(Event event)
     // Check if the main tank is a human player
     Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
     Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
-    
+
     if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a real player
     {
         // Iterate through the first 3 bot tanks to assign the Skull marker
@@ -530,7 +533,7 @@ bool RazorscaleAvoidSentinelAction::Execute(Event event)
                 {
                     int8 skullIndex = 7; // Skull
                     ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-    
+
                     // If there's no skull set yet, or the skull is on a different target, set the sentinel
                     if (!currentSkullTarget || (lowestHealthSentinel->GetGUID() != currentSkullTarget))
                     {
@@ -548,7 +551,7 @@ bool RazorscaleAvoidSentinelAction::Execute(Event event)
         {
             int8 skullIndex = 7; // Skull
             ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-    
+
             // If there's no skull set yet, or the skull is on a different target, set the sentinel
             if (!currentSkullTarget || (lowestHealthSentinel->GetGUID() != currentSkullTarget))
             {
@@ -566,13 +569,13 @@ bool RazorscaleAvoidSentinelAction::isUseful()
     bool isMainTank = botAI->IsMainTank(bot);
     Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
     Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
-    
+
     // If this bot is the main tank, it should always try to mark
     if (isMainTank)
     {
         return true;
     }
-    
+
     // If the main tank is a human, check if this bot is one of the first three valid bot tanks
     if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a human player
     {
@@ -586,7 +589,7 @@ bool RazorscaleAvoidSentinelAction::isUseful()
     }
 
     bool isRanged = botAI->IsRanged(bot);
-    const float radius = 8.0f; 
+    const float radius = 8.0f;
 
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
     for (auto& npc : npcs)
@@ -596,7 +599,7 @@ bool RazorscaleAvoidSentinelAction::isUseful()
         {
             if (isRanged && bot->GetDistance2d(unit) < radius)
             {
-                return true; 
+                return true;
             }
         }
     }
@@ -647,7 +650,7 @@ bool RazorscaleAvoidWhirlwindAction::isUseful()
             {
                 if (bot->GetDistance2d(unit) < radius)
                 {
-                    return true; 
+                    return true;
                 }
             }
         }
@@ -679,7 +682,7 @@ bool RazorscaleIgnoreBossAction::isUseful()
         {
             return false;
         }
-        
+
         Group* group = bot->GetGroup();
         if (!group)
         {
@@ -843,7 +846,7 @@ bool RazorscaleGroundedAction::isUseful()
 
         if (mainTank)
         {
-            constexpr float maxDistance = 2.0f; 
+            constexpr float maxDistance = 2.0f;
             float distanceToMainTank = bot->GetDistance2d(mainTank);
             return (distanceToMainTank > maxDistance);
         }
@@ -899,7 +902,7 @@ bool RazorscaleGroundedAction::Execute(Event event)
 
     Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
     Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
-    
+
     if (mainTank && !GET_PLAYERBOT_AI(mainTank)) // Main tank is a human player
     {
         // Iterate through the first 3 bot tanks to handle the moon marker
@@ -909,7 +912,7 @@ bool RazorscaleGroundedAction::Execute(Event event)
             {
                 int8 moonIndex = 4;
                 ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
-    
+
                 // If the moon marker is set to the boss, reset it
                 if (currentMoonTarget == boss->GetGUID())
                 {
@@ -924,7 +927,7 @@ bool RazorscaleGroundedAction::Execute(Event event)
     {
         int8 moonIndex = 4;
         ObjectGuid currentMoonTarget = group->GetTargetIcon(moonIndex);
-    
+
         // If the moon marker is set to the boss, reset it
         if (currentMoonTarget == boss->GetGUID())
         {
@@ -934,12 +937,10 @@ bool RazorscaleGroundedAction::Execute(Event event)
         }
     }
 
-
     if (mainTank && (botAI->IsTank(bot) && !botAI->IsMainTank(bot)))
     {
-
-            constexpr float followDistance = 2.0f;
-            return MoveNear(mainTank, followDistance, MovementPriority::MOVEMENT_COMBAT);
+        constexpr float followDistance = 2.0f;
+        return MoveNear(mainTank, followDistance, MovementPriority::MOVEMENT_COMBAT);
     }
 
     if (botAI->IsRanged(bot))
@@ -1212,6 +1213,154 @@ bool IronAssemblyOverloadAction::Execute(Event event)
     }
 
     return false;
+}
+
+bool KologarnMarkDpsTargetAction::isUseful()
+{
+    KologarnMarkDpsTargetTrigger kologarnMarkDpsTargetTrigger(botAI);
+    return kologarnMarkDpsTargetTrigger.IsActive();
+}
+
+bool KologarnMarkDpsTargetAction::Execute(Event event)
+{
+    Unit* targetToMark = nullptr;
+    Unit* targetToCcMark = nullptr;
+    int8 skullIndex = 7;  // Skull
+    int8 moonIndex = 4;   // Moon
+
+    // Check that there is rubble to mark
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target)
+            continue;
+
+        uint32 creatureId = target->GetEntry();
+        if (target->GetEntry() == NPC_RUBBLE && target->IsAlive())
+        {
+            targetToMark = target;
+        }
+    }
+
+    if (!targetToMark)
+    {
+        Unit* rightArm = AI_VALUE2(Unit*, "find target", "right arm");
+        if (rightArm && rightArm->IsAlive())
+        {
+            targetToMark = rightArm;
+        }
+    }
+
+    if (!targetToMark)
+    {
+        Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+        if (boss && boss->IsAlive())
+        {
+            targetToMark = boss;
+        }
+    }
+
+    if (!targetToMark)
+    {
+        return false;  // No target to mark
+    }
+
+    Unit* leftArm = AI_VALUE2(Unit*, "find target", "left arm");
+    if (leftArm && leftArm->IsAlive())
+    {
+        targetToCcMark = leftArm;
+    }
+
+    bool isMainTank = botAI->IsMainTank(bot);
+    Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
+    Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
+
+    if (mainTank && !GET_PLAYERBOT_AI(mainTank))  // Main tank is a real player
+    {
+        // Iterate through the first 3 bot tanks to assign the Skull marker
+        for (int i = 0; i < 3; ++i)
+        {
+            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot))  // Bot is a valid tank
+            {
+                Group* group = bot->GetGroup();
+                if (group)
+                {
+                    group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+                    if (targetToCcMark)
+                    {
+                        group->SetTargetIcon(moonIndex, bot->GetGUID(), targetToCcMark->GetGUID());
+                    }
+                    
+                    return true;
+                }
+                break;  // Stop after finding the first valid bot tank
+            }
+        }
+    }
+    else if (isMainTank && bot->IsAlive())  // Bot is the main tank
+    {
+        Group* group = bot->GetGroup();
+        if (group)
+        {
+            group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+            if (targetToCcMark)
+            {
+                group->SetTargetIcon(moonIndex, bot->GetGUID(), targetToCcMark->GetGUID());
+            }
+            return true;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot) && bot->IsAlive())  // Bot is a valid tank
+            {
+                Group* group = bot->GetGroup();
+                if (group)
+                {
+                    group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+                    if (targetToCcMark)
+                    {
+                        group->SetTargetIcon(moonIndex, bot->GetGUID(), targetToCcMark->GetGUID());
+                    }
+                    return true;
+                }
+                break;  // Stop after finding the first valid bot tank
+            }
+        }
+    }
+
+    return false;
+}
+
+bool KologarnFallFromFloorAction::Execute(Event event)
+{
+    return bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionX(),
+                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionY(),
+                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionZ(),
+                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetOrientation());
+}
+
+bool KologarnFallFromFloorAction::isUseful()
+{
+    KologarnFallFromFloorTrigger kologarnFallFromFloorTrigger(botAI);
+    return kologarnFallFromFloorTrigger.IsActive();
+}
+
+bool KologarnNatureResistanceAction::Execute(Event event)
+{
+    HunterNatureResistanceStrategy hunterNatureResistanceStrategy(botAI);
+    botAI->ChangeStrategy(std::string("+") + hunterNatureResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
+    return true;
+}
+
+bool KologarnNatureResistanceAction::isUseful()
+{
+    KologarnNatureResistanceTrigger kologarnNatureResistanceTrigger(botAI);
+    return kologarnNatureResistanceTrigger.IsActive();
 }
 
 bool HodirMoveSnowpackedIcicleAction::isUseful()
