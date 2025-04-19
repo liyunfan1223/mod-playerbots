@@ -1498,6 +1498,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
     std::string strategyName;
     switch (mapId)
     {
+        case 249:
+            strategyName = "onyxia";
+            break;
         case 409:
             strategyName = "mc";
             break;
