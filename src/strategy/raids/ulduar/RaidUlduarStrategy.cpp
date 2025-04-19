@@ -46,6 +46,17 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "razorscale fuse armor trigger",
         NextAction::array(0, new NextAction("razorscale fuse armor action", ACTION_RAID + 2), nullptr)));
 
+    triggers.push_back(new TriggerNode(
+        "razorscale fire resistance trigger",
+        NextAction::array(0, new NextAction("razorscale fire resistance action", ACTION_RAID), nullptr)));
+
+    //
+    // Ignis
+    //
+    triggers.push_back(new TriggerNode(
+        "ignis fire resistance trigger",
+        NextAction::array(0, new NextAction("ignis fire resistance action", ACTION_RAID), nullptr)));
+
     //
     // Iron Assembly
     //
@@ -82,6 +93,10 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "hodir biting cold",
         NextAction::array(0, new NextAction("hodir biting cold jump", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "hodir frost resistance trigger",
+        NextAction::array(0, new NextAction("hodir frost resistance action", ACTION_RAID), nullptr)));
 
     //
     // Freya

@@ -25,6 +25,7 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include <HunterBuffStrategies.h>
+#include <PaladinBuffStrategies.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -1167,6 +1168,32 @@ bool RazorscaleFuseArmorAction::Execute(Event event)
     return true;
 }
 
+bool RazorscaleFireResistanceAction::isUseful()
+{
+    RazorscaleFireResistanceTrigger razorscaleFireResistanceTrigger(botAI);
+    return razorscaleFireResistanceTrigger.IsActive();
+}
+
+bool RazorscaleFireResistanceAction::Execute(Event event)
+{
+    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
+    botAI->ChangeStrategy(std::string("+") + paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
+    return true;
+}
+
+bool IgnisFireResistanceAction::isUseful()
+{
+    IgnisFireResistanceTrigger ignisFireResistanceTrigger(botAI);
+    return ignisFireResistanceTrigger.IsActive();
+}
+
+bool IgnisFireResistanceAction::Execute(Event event)
+{
+    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
+    botAI->ChangeStrategy(std::string("+") + paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
+    return true;
+}
+
 bool IronAssemblyLightningTendrilsAction::isUseful()
 {
     IronAssemblyLightningTendrilsTrigger ironAssemblyLightningTendrilsTrigger(botAI);
@@ -1434,6 +1461,19 @@ bool HodirBitingColdJumpAction::Execute(Event event)
     // AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000, priority);
 
     // return true;
+}
+
+bool HodirFrostResistanceAction::isUseful()
+{
+    HodirFrostResistanceTrigger hodirFrostResistanceTrigger(botAI);
+    return hodirFrostResistanceTrigger.IsActive();
+}
+
+bool HodirFrostResistanceAction::Execute(Event event)
+{
+    PaladinFrostResistanceStrategy paladinFrostResistanceStrategy(botAI);
+    botAI->ChangeStrategy(std::string("+") + paladinFrostResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
+    return true;
 }
 
 bool FreyaMoveAwayNatureBombAction::isUseful()

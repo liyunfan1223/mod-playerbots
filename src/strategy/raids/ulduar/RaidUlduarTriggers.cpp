@@ -12,6 +12,7 @@
 #include "Trigger.h"
 #include "Vehicle.h"
 #include <HunterBuffStrategies.h>
+#include <PaladinBuffStrategies.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -243,6 +244,100 @@ bool RazorscaleFuseArmorTrigger::IsActive()
     return false;
 }
 
+bool RazorscaleFireResistanceTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is paladin
+    if (bot->getClass() != CLASS_PALADIN)
+        return false;
+
+    // Check if bot have fire resistance aura
+    if (bot->HasAura(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    // Check if bot dont have already have fire resistance strategy
+    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
+    if (botAI->HasStrategy(paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+        return false;
+
+    // Check that the bot actually knows the spell
+    if (!bot->HasActiveSpell(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive paladin
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_PALADIN)
+        {
+            // Return true only if the current bot is the first alive paladin
+            return member == bot;
+        }
+    }
+
+    return false;
+}
+
+bool IgnisFireResistanceTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "ignis the furnace master");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is paladin
+    if (bot->getClass() != CLASS_PALADIN)
+        return false;
+
+    // Check if bot have fire resistance aura
+    if (bot->HasAura(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    // Check if bot dont have already have fire resistance strategy
+    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
+    if (botAI->HasStrategy(paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+        return false;
+
+    // Check that the bot actually knows the spell
+    if (!bot->HasActiveSpell(SPELL_FIRE_RESISTANCE_AURA))
+        return false;
+
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive paladin
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_PALADIN)
+        {
+            // Return true only if the current bot is the first alive paladin
+            return member == bot;
+        }
+    }
+
+    return false;
+}
+
 bool IronAssemblyLightningTendrilsTrigger::IsActive()
 {
     // Check boss and it is alive
@@ -384,7 +479,27 @@ bool KologarnNatureResistanceTrigger::IsActive()
     if (!bot->HasActiveSpell(SPELL_ASPECT_OF_THE_WILD))
         return false;
 
-    return true;
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive hunter
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_HUNTER)
+        {
+            // Return true only if the current bot is the first alive hunter
+            return member == bot;
+        }
+    }
+
+    return false;
 }
 
 bool HodirBitingColdTrigger::IsActive()
@@ -433,6 +548,53 @@ bool HodirNearSnowpackedIcicleTrigger::IsActive()
     }
 
     return true;
+}
+
+bool HodirFrostResistanceTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is paladin
+    if (bot->getClass() != CLASS_PALADIN)
+        return false;
+
+    // Check if bot have frost resistance aura
+    if (bot->HasAura(SPELL_FROST_RESISTANCE_AURA))
+        return false;
+
+    // Check if bot dont have already have frost resistance strategy
+    PaladinFrostResistanceStrategy paladinFrostResistanceStrategy(botAI);
+    if (botAI->HasStrategy(paladinFrostResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+        return false;
+
+    // Check that the bot actually knows the spell
+    if (!bot->HasActiveSpell(SPELL_FROST_RESISTANCE_AURA))
+        return false;
+
+    // Get the group and ensure it's a raid group
+    Group* group = bot->GetGroup();
+    if (!group || !group->isRaidGroup())
+        return false;
+
+    // Iterate through group members to find the first alive paladin
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || !member->IsAlive())
+            continue;
+
+        // Check if the member is a hunter
+        if (member->getClass() == CLASS_PALADIN)
+        {
+            // Return true only if the current bot is the first alive paladin
+            return member == bot;
+        }
+    }
+
+    return false;
 }
 
 bool FreyaNearNatureBombTrigger::IsActive()

@@ -32,12 +32,14 @@ enum UlduarIDs
     NPC_TOASTY_FIRE = 33342,
     SPELL_FLASH_FREEZE = 61968,
     SPELL_BITING_COLD_PLAYER_AURA = 62039,
-
+    
     // Freya
     NPC_EONARS_GIFT = 33228,
     GOBJECT_NATURE_BOMB = 194902,
 
     // Buffs
+    SPELL_FROST_RESISTANCE_AURA = 48945,
+    SPELL_FIRE_RESISTANCE_AURA = 48947,
     SPELL_ASPECT_OF_THE_WILD = 49071,
 };
 
@@ -112,6 +114,23 @@ public:
     bool IsActive() override;
 };
 
+class RazorscaleFireResistanceTrigger : public Trigger
+{
+public:
+    RazorscaleFireResistanceTrigger(PlayerbotAI* ai) : Trigger(ai, "razorscale fire resistance trigger") {}
+    bool IsActive() override;
+};
+
+//
+// Ignis
+//
+class IgnisFireResistanceTrigger : public Trigger
+{
+public:
+    IgnisFireResistanceTrigger(PlayerbotAI* ai) : Trigger(ai, "ignis fire resistance trigger") {}
+    bool IsActive() override;
+};
+
 //
 // Iron Assembly
 //
@@ -167,6 +186,13 @@ class HodirNearSnowpackedIcicleTrigger : public Trigger
 {
 public:
     HodirNearSnowpackedIcicleTrigger(PlayerbotAI* ai) : Trigger(ai, "hodir near snowpacked icicle") {}
+    bool IsActive() override;
+};
+
+class HodirFrostResistanceTrigger : public Trigger
+{
+public:
+    HodirFrostResistanceTrigger(PlayerbotAI* ai) : Trigger(ai, "hodir frost resistance trigger") {}
     bool IsActive() override;
 };
 
