@@ -364,8 +364,9 @@ Value<Unit*>* BlessingOfKingsOnPartyTrigger::GetTargetValue()
 bool BlessingOfKingsOnPartyTrigger::IsActive() 
 { 
     Unit* target = GetTarget();
-    
-    if (!target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40)) 
+    Group* group = bot->GetGroup();
+
+    if (!group || !target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40 && group->isRaidGroup())) 
         return false;
     
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyMyAuraOf(target, "blessing of wisdom", "blessing of might", "blessing of sanctuary", nullptr) ;
@@ -379,8 +380,9 @@ Value<Unit*>* BlessingOfWisdomOnPartyTrigger::GetTargetValue()
 bool BlessingOfWisdomOnPartyTrigger::IsActive()
 { 
     Unit* target = GetTarget();
-    
-    if (!target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40))
+    Group* group = bot->GetGroup();
+
+    if (!group || !target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40 && group->isRaidGroup())) 
         return false;
 
 //    if (target->getClass() == CLASS_WARRIOR || target->getClass() == CLASS_ROGUE || target->getClass() == CLASS_DEATH_KNIGHT)
@@ -398,8 +400,9 @@ Value<Unit*>* BlessingOfMightOnPartyTrigger::GetTargetValue()
 bool BlessingOfMightOnPartyTrigger::IsActive()
 { 
     Unit* target = GetTarget();
-    
-    if (!target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40))
+    Group* group = bot->GetGroup();
+
+    if (!group || !target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40 && group->isRaidGroup())) 
         return false;
 
 //    if (target->getClass() == CLASS_MAGE || target->getClass() == CLASS_PRIEST || target->getClass() == CLASS_WARLOCK)
@@ -421,8 +424,9 @@ bool BlessingOfSanctuaryOnPartyTrigger::IsActive()
         return false;
 
     Unit* target = GetTarget();
-    
-    if (!target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40))
+    Group* group = bot->GetGroup();
+
+    if (!group || !target || !target->IsPlayer() || target->GetLevel() < 20 || (botAI->GetBot()->GetLevel() > 60 && target->GetLevel() > 40 && group->isRaidGroup())) 
         return false;    
 
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAnyMyAuraOf(target, "blessing of kings", "blessing of wisdom", "blessing of might", nullptr) ;
