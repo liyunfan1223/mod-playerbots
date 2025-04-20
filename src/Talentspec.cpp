@@ -260,7 +260,7 @@ void TalentSpec::ReadTalents(Player* bot)
 // Set the talent ranks to the ranks of the link.
 void TalentSpec::ReadTalents(std::string const link)
 {
-    uint32 rank = 0;
+    //uint32 rank = 0; //not used, line marked for removal.
     uint32 pos = 0;
     uint32 tab = 0;
     std::string chr;
@@ -397,7 +397,7 @@ uint32 TalentSpec::highestTree()
 
 std::string const TalentSpec::FormatSpec(Player* bot)
 {
-    uint8 cls = bot->getClass();
+    // uint8 cls = bot->getClass(); //not used, (used in lined 403), line marked for removal.
 
     std::ostringstream out;
     // out << chathelper:: specs[cls][highestTree()] << " (";
@@ -468,7 +468,7 @@ bool TalentSpec::isEarlierVersionOf(TalentSpec& newSpec)
 // Modifies current talents towards new talents up to a maxium of points.
 void TalentSpec::ShiftTalents(TalentSpec* currentSpec, uint32 level)
 {
-    uint32 currentPoints = currentSpec->GetTalentPoints();
+    //uint32 currentPoints = currentSpec->GetTalentPoints(); //not used, line marked for removal.
     if (points >= LeveltoPoints(level))  // We have no more points to spend. Better reset and crop
     {
         CropTalents(level);
