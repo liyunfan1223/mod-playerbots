@@ -106,10 +106,37 @@ public:
     bool isUseful() override;
 };
 
+class RazorscaleFireResistanceAction : public Action
+{
+public:
+    RazorscaleFireResistanceAction(PlayerbotAI* botAI) : Action(botAI, "razorscale fire resistance action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+//
+// Ignis
+//
+class IgnisFireResistanceAction : public Action
+{
+public:
+    IgnisFireResistanceAction(PlayerbotAI* botAI) : Action(botAI, "ignis fire resistance action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class HodirMoveSnowpackedIcicleAction : public MovementAction
 {
 public:
     HodirMoveSnowpackedIcicleAction(PlayerbotAI* botAI) : MovementAction(botAI, "hodir move snowpacked icicle") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class HodirFrostResistanceAction : public Action
+{
+public:
+    HodirFrostResistanceAction(PlayerbotAI* botAI) : Action(botAI, "hodir frost resistance action") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };

@@ -57,6 +57,8 @@
 #include "UpdateTime.h"
 #include "Vehicle.h"
 
+const int SPELL_TITAN_GRIP = 49152;
+
 std::vector<std::string> PlayerbotAI::dispel_whitelist = {
     "mutating injection",
     "frostbolt",
@@ -1498,6 +1500,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
     std::string strategyName;
     switch (mapId)
     {
+        case 249:
+            strategyName = "onyxia";
+            break;
         case 409:
             strategyName = "mc";
             break;
@@ -4393,7 +4398,37 @@ void PlayerbotAI::RemoveShapeshift()
     // RemoveAura("tree of life");
 }
 
-uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBank)
+// NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute one-hand/2H Weapon in wrong slots 
+uint32 PlayerbotAI::GetEquipGearScore(Player* player)
+{
+    //This function aims to calculate the equipped gear score
+ 
+    uint32 sum = 0;
+    uint8 count = EQUIPMENT_SLOT_END - 2;  // ignore body and tabard slots
+    uint8 mh_type = 0;
+
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        Item* item =player->GetItemByPos(INVENTORY_SLOT_BAG_0,i);
+	if (item && i != EQUIPMENT_SLOT_BODY && i != EQUIPMENT_SLOT_TABARD){ 
+            ItemTemplate const* proto = item->GetTemplate();
+	    sum += proto->ItemLevel;
+	    
+    	    //if character is not warfury and have 2 hand weapon equipped, main hand will be counted twice
+	    if (i == SLOT_MAIN_HAND)
+	        mh_type = item->GetTemplate()->InventoryType;
+            if(!player->HasSpell(SPELL_TITAN_GRIP) && mh_type == INVTYPE_2HWEAPON && i == SLOT_MAIN_HAND)
+	        sum  += item->GetTemplate()->ItemLevel;
+	}
+
+    }
+
+    uint32 gs = uint32(sum / count);
+    return gs;
+
+}
+
+/*uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBank)
 {
     std::vector<uint32> gearScore(EQUIPMENT_SLOT_END);
     uint32 twoHandScore = 0;
@@ -4468,6 +4503,7 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBa
         sum += gearScore[i];
     }
 
+
     if (count)
     {
         uint32 res = uint32(sum / count);
@@ -4475,8 +4511,7 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBa
     }
 
     return 0;
-}
-
+}*/
 uint32 PlayerbotAI::GetMixedGearScore(Player* player, bool withBags, bool withBank, uint32 topN)
 {
     std::vector<uint32> gearScore(EQUIPMENT_SLOT_END);
@@ -4624,7 +4659,7 @@ void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uin
         case INVTYPE_SHOULDERS:
             (*gearScore)[EQUIPMENT_SLOT_SHOULDERS] = std::max((*gearScore)[EQUIPMENT_SLOT_SHOULDERS], level);
             break;
-        case INVTYPE_BODY:
+        case INVTYPE_BODY: //Shouldn't be considered when calculating average ilevel
             (*gearScore)[EQUIPMENT_SLOT_BODY] = std::max((*gearScore)[EQUIPMENT_SLOT_BODY], level);
             break;
         case INVTYPE_CHEST:
@@ -4643,7 +4678,7 @@ void PlayerbotAI::_fillGearScoreData(Player* player, Item* item, std::vector<uin
             (*gearScore)[EQUIPMENT_SLOT_WRISTS] = std::max((*gearScore)[EQUIPMENT_SLOT_WRISTS], level);
             break;
         case INVTYPE_HANDS:
-            (*gearScore)[EQUIPMENT_SLOT_HEAD] = std::max((*gearScore)[EQUIPMENT_SLOT_HEAD], level);
+            (*gearScore)[EQUIPMENT_SLOT_HANDS] = std::max((*gearScore)[EQUIPMENT_SLOT_HANDS], level);
             break;
         // equipped gear score check uses both rings and trinkets for calculation, assume that for bags/banks it is the
         // same with keeping second highest score at second slot
