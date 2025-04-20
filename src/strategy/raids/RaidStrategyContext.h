@@ -1,6 +1,7 @@
 #ifndef _PLAYERBOT_RAIDSTRATEGYCONTEXT_H_
 #define _PLAYERBOT_RAIDSTRATEGYCONTEXT_H_
 
+#include "RaidOnyxiaStrategy.h"
 #include "RaidUlduarStrategy.h"
 #include "Strategy.h"
 #include "RaidBwlStrategy.h"
@@ -29,6 +30,7 @@ public:
         creators["voa"] = &RaidStrategyContext::voa;
         creators["uld"] = &RaidStrategyContext::uld;
         creators["icc"] = &RaidStrategyContext::icc;
+        creators["onyxia"] = &RaidStrategyContext::onyxia;
     }
 
 private:
@@ -41,6 +43,7 @@ private:
     static Strategy* voa(PlayerbotAI* botAI) { return new RaidVoAStrategy(botAI); }
     static Strategy* uld(PlayerbotAI* botAI) { return new RaidUlduarStrategy(botAI); }
     static Strategy* icc(PlayerbotAI* botAI) { return new RaidIccStrategy(botAI); }
+    static Strategy* onyxia(PlayerbotAI* botAI) { return new RaidOnyxiaStrategy(botAI); }
 };
 
 #endif
