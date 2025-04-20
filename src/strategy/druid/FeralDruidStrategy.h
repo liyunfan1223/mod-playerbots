@@ -24,7 +24,7 @@ public:
     }
 
 private:
-    static ActionNode* regrowth(PlayerbotAI* botAI)
+    static ActionNode* regrowth([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("regrowth",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -32,7 +32,7 @@ private:
                               /*C*/ NextAction::array(0, new NextAction("melee", 10.0f), nullptr));
     }
 
-    static ActionNode* rejuvenation(PlayerbotAI* botAI)
+    static ActionNode* rejuvenation([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("rejuvenation",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -40,7 +40,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* healing_touch(PlayerbotAI* botAI)
+    static ActionNode* healing_touch([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("healing touch",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -48,7 +48,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* regrowth_on_party(PlayerbotAI* botAI)
+    static ActionNode* regrowth_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("regrowth on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -56,7 +56,7 @@ private:
                               /*C*/ NextAction::array(0, new NextAction("melee", 10.0f), nullptr));
     }
 
-    static ActionNode* rejuvenation_on_party(PlayerbotAI* botAI)
+    static ActionNode* rejuvenation_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("rejuvenation on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
@@ -64,7 +64,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* healing_touch_on_party(PlayerbotAI* botAI)
+    static ActionNode* healing_touch_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("healing touch on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),

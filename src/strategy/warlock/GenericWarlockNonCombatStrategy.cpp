@@ -44,7 +44,7 @@ private:
                               /*A*/ NextAction::array(0, new NextAction("summon imp"), nullptr),
                               /*C*/ nullptr);
     }
-    static ActionNode* summon_succubus(PlayerbotAI* botAI)
+    static ActionNode* summon_succubus([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("summon succubus",
                               /*P*/ nullptr,
