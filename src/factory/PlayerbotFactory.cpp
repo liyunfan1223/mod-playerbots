@@ -2200,21 +2200,33 @@ void PlayerbotFactory::InitSkills()
     //uint32 maxValue = level * 5; //not used, line marked for removal.
     bot->UpdateSkillsForLevel();
 
-    bot->SetSkill(SKILL_RIDING, 0, 0, 0);
     auto SafeLearn = [this](uint32 spellId)
     {
-        if (bot->GetSpellMap().find(spellId) == bot->GetSpellMap().end())
-            bot->learnSpell(spellId, false, true);
+        if (!bot->HasSpell(spellId))
+            bot->learnSpell(spellId, false, true); // Avoid duplicate attempts in DB
     };
 
-    if (bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
-        SafeLearn(33388);
-    if (bot->GetLevel() >= sPlayerbotAIConfig->useFastGroundMountAtMinLevel)
-        SafeLearn(33391);
-    if (bot->GetLevel() >= sPlayerbotAIConfig->useFlyMountAtMinLevel)
-        SafeLearn(34090);
-    if (bot->GetLevel() >= sPlayerbotAIConfig->useFastFlyMountAtMinLevel)
-        SafeLearn(34091);
+// Define Riding skill according to level
+if (bot->GetLevel() >= 70)
+    bot->SetSkill(SKILL_RIDING, 300, 300);
+else if (bot->GetLevel() >= 60)
+    bot->SetSkill(SKILL_RIDING, 225, 225);
+else if (bot->GetLevel() >= 40)
+    bot->SetSkill(SKILL_RIDING, 150, 150);
+else if (bot->GetLevel() >= 20)
+    bot->SetSkill(SKILL_RIDING, 75, 75);
+else
+    bot->SetSkill(SKILL_RIDING, 0, 0);
+
+// Safe learning of mount spells
+if (bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
+    SafeLearn(33388); // Apprentice
+if (bot->GetLevel() >= sPlayerbotAIConfig->useFastGroundMountAtMinLevel)
+    SafeLearn(33391); // Journeyman
+if (bot->GetLevel() >= sPlayerbotAIConfig->useFlyMountAtMinLevel)
+    SafeLearn(34090); // Expert
+if (bot->GetLevel() >= sPlayerbotAIConfig->useFastFlyMountAtMinLevel)
+    SafeLearn(34091); // Artisan
 
     uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;
