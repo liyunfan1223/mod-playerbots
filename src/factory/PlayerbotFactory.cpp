@@ -2203,8 +2203,8 @@ void PlayerbotFactory::InitSkills()
     bot->SetSkill(SKILL_RIDING, 0, 0, 0);
     auto SafeLearn = [this](uint32 spellId)
     {
-        if (!bot->HasSpell(spellId))
-            bot->learnSpell(spellId);
+        if (bot->GetSpellMap().find(spellId) == bot->GetSpellMap().end())
+            bot->learnSpell(spellId, false, true);
     };
 
     if (bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
