@@ -466,19 +466,23 @@ float Formation::GetFollowAngle()
     }
     else if (master)
     {
-        // If the bot is following a master, look up the bot's position in the master's list
         PlayerbotMgr* masterBotMgr = GET_PLAYERBOT_MGR(master);
         if (masterBotMgr && !GET_PLAYERBOT_AI(master))
         {
-            followTarget->GetPlayerbotMgr()->ForEachPlayerbot([&](Player* player)
+            Player* followTarget = master->GetFollowTarget();
+    
+            if (followTarget)
             {
-                if (player == bot)
+                followTarget->GetPlayerbotMgr()->ForEachPlayerbot([&](Player* player)
                 {
-                    index = total;  // Found bot in master's list, set the index
-                    break;
-                }
-                ++total;
-            });
+                    if (player == bot)
+                    {
+                        index = total;
+                        return;
+                    }
+                    ++total;
+                });
+            }
         }
     }
 
