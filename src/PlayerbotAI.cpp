@@ -4411,11 +4411,12 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player)
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         Item* item =player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (item && i != EQUIPMENT_SLOT_BODY && i != EQUIPMENT_SLOT_TABARD){ 
-                ItemTemplate const* proto = item->GetTemplate();
+        if (item && i != EQUIPMENT_SLOT_BODY && i != EQUIPMENT_SLOT_TABARD)
+        { 
+            ItemTemplate const* proto = item->GetTemplate();
             sum += proto->ItemLevel;
             
-                // If character is not warfury and have 2 hand weapon equipped, main hand will be counted twice
+            // If character is not warfury and have 2 hand weapon equipped, main hand will be counted twice
             if (i == SLOT_MAIN_HAND)
                 mh_type = item->GetTemplate()->InventoryType;
             if (!player->HasAura(SPELL_TITAN_GRIP) && mh_type == INVTYPE_2HWEAPON && i == SLOT_MAIN_HAND)
