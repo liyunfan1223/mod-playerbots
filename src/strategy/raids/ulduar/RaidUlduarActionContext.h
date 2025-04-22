@@ -31,6 +31,7 @@ public:
         creators["kologarn mark dps target action"] = &RaidUlduarActionContext::kologarn_mark_dps_target_action;
         creators["kologarn fall from floor action"] = &RaidUlduarActionContext::kologarn_fall_from_floor_action;
         creators["kologarn nature resistance action"] = &RaidUlduarActionContext::kologarn_nature_resistance_action;
+        creators["kologarn rubble slowdown action"] = &RaidUlduarActionContext::kologarn_rubble_slowdown_action;
         creators["hodir move snowpacked icicle"] = &RaidUlduarActionContext::hodir_move_snowpacked_icicle;
         creators["hodir biting cold jump"] = &RaidUlduarActionContext::hodir_biting_cold_jump;
         creators["hodir frost resistance action"] = &RaidUlduarActionContext::hodir_frost_resistance_action;
@@ -55,6 +56,7 @@ private:
     static Action* kologarn_mark_dps_target_action(PlayerbotAI* ai) { return new KologarnMarkDpsTargetAction(ai); }
     static Action* kologarn_fall_from_floor_action(PlayerbotAI* ai) { return new KologarnFallFromFloorAction(ai); }
     static Action* kologarn_nature_resistance_action(PlayerbotAI* ai) { return new KologarnNatureResistanceAction(ai); }
+    static Action* kologarn_rubble_slowdown_action(PlayerbotAI* ai) { return new KologarnRubbleSlowdownAction(ai); }
     static Action* hodir_move_snowpacked_icicle(PlayerbotAI* ai) { return new HodirMoveSnowpackedIcicleAction(ai); }
     static Action* hodir_biting_cold_jump(PlayerbotAI* ai) { return new HodirBitingColdJumpAction(ai); }
     static Action* hodir_frost_resistance_action(PlayerbotAI* ai) { return new HodirFrostResistanceAction(ai); }

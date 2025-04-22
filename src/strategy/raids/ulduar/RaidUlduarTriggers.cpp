@@ -502,6 +502,35 @@ bool KologarnNatureResistanceTrigger::IsActive()
     return false;
 }
 
+bool KologarnRubbleSlowdownTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is hunter
+    if (bot->getClass() != CLASS_HUNTER)
+        return false;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    // Check that the current skull mark is set on rubble
+    int8 skullIndex = 7;
+    ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
+    Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
+    if (!currentSkullUnit || !currentSkullUnit->IsAlive() || currentSkullUnit->GetEntry() != NPC_RUBBLE)
+        return false;
+
+    if (bot->HasSpellCooldown(SPELL_FROST_TRAP))
+        return false;
+
+    return true;
+}
+
 bool HodirBitingColdTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
