@@ -1390,6 +1390,21 @@ bool KologarnNatureResistanceAction::isUseful()
     return kologarnNatureResistanceTrigger.IsActive();
 }
 
+bool KologarnRubbleSlowdownAction::Execute(Event event)
+{
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    int8 skullIndex = 7;
+    ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
+    Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
+    if (!currentSkullUnit || !currentSkullUnit->IsAlive() || currentSkullUnit->GetEntry() != NPC_RUBBLE)
+        return false;
+
+    return botAI->CastSpell("frost trap", currentSkullUnit);
+}
+
 bool HodirMoveSnowpackedIcicleAction::isUseful()
 {
     // Check boss and it is alive

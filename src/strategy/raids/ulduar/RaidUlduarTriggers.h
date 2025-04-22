@@ -26,7 +26,7 @@ enum UlduarIDs
     SPELL_FOCUSED_EYEBEAM_10 = 63347,
     SPELL_FOCUSED_EYEBEAM_25_2 = 63976,
     SPELL_FOCUSED_EYEBEAM_25 = 63977,
-
+    
     // Hodir
     NPC_SNOWPACKED_ICICLE = 33174,
     NPC_TOASTY_FIRE = 33342,
@@ -38,6 +38,7 @@ enum UlduarIDs
     GOBJECT_NATURE_BOMB = 194902,
 
     // Buffs
+    SPELL_FROST_TRAP = 13809,
     SPELL_FROST_RESISTANCE_AURA = 48945,
     SPELL_FIRE_RESISTANCE_AURA = 48947,
     SPELL_ASPECT_OF_THE_WILD = 49071,
@@ -169,6 +170,13 @@ class KologarnNatureResistanceTrigger : public Trigger
 {
 public:
     KologarnNatureResistanceTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn nature resistance trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnRubbleSlowdownTrigger : public Trigger
+{
+public:
+    KologarnRubbleSlowdownTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn rubble slowdown trigger") {}
     bool IsActive() override;
 };
 
