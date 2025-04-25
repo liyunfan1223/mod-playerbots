@@ -106,12 +106,38 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // Freya
     //
     triggers.push_back(new TriggerNode(
-        "freya tank near eonars gift",
-        NextAction::array(0, new NextAction("freya mark eonars gift", ACTION_RAID + 1), nullptr)));
-
-    triggers.push_back(new TriggerNode(
         "freya near nature bomb",
         NextAction::array(0, new NextAction("freya move away nature bomb", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "freya nature resistance trigger",
+        NextAction::array(0, new NextAction("freya nature resistance action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "freya fire resistance trigger",
+        NextAction::array(0, new NextAction("freya fire resistance action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "freya mark dps target trigger",
+        NextAction::array(0, new NextAction("freya mark dps target action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "freya move to healing spore trigger",
+        NextAction::array(0, new NextAction("freya move to healing spore action", ACTION_RAID), nullptr)));
+
+    //
+    // Thorim
+    //
+    triggers.push_back(new TriggerNode(
+        "thorim nature resistance trigger",
+        NextAction::array(0, new NextAction("thorim nature resistance action", ACTION_RAID), nullptr)));
+
+    //
+    // Mimiron
+    //
+    triggers.push_back(new TriggerNode(
+        "mimiron fire resistance trigger",
+        NextAction::array(0, new NextAction("mimiron fire resistance action", ACTION_RAID), nullptr)));
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
