@@ -4398,10 +4398,11 @@ void PlayerbotAI::RemoveShapeshift()
     // RemoveAura("tree of life");
 }
 
-// NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute one-hand/2H Weapon in wrong slots 
+// NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute
+// one-hand/2H Weapon in wrong slots 
 uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 {
-    //This function aims to calculate the equipped gear score
+    // This function aims to calculate the equipped gear score
  
     uint32 sum = 0;
     uint8 count = EQUIPMENT_SLOT_END - 2;  // ignore body and tabard slots
@@ -4409,23 +4410,22 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
-        Item* item =player->GetItemByPos(INVENTORY_SLOT_BAG_0,i);
-	if (item && i != EQUIPMENT_SLOT_BODY && i != EQUIPMENT_SLOT_TABARD){ 
+        Item* item =player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        if (item && i != EQUIPMENT_SLOT_BODY && i != EQUIPMENT_SLOT_TABARD)
+        { 
             ItemTemplate const* proto = item->GetTemplate();
-	    sum += proto->ItemLevel;
-	    
-    	    //if character is not warfury and have 2 hand weapon equipped, main hand will be counted twice
-	    if (i == SLOT_MAIN_HAND)
-	        mh_type = item->GetTemplate()->InventoryType;
-            if(!player->HasSpell(SPELL_TITAN_GRIP) && mh_type == INVTYPE_2HWEAPON && i == SLOT_MAIN_HAND)
-	        sum  += item->GetTemplate()->ItemLevel;
-	}
-
+            sum += proto->ItemLevel;
+            
+            // If character is not warfury and have 2 hand weapon equipped, main hand will be counted twice
+            if (i == SLOT_MAIN_HAND)
+                mh_type = item->GetTemplate()->InventoryType;
+            if (!player->HasAura(SPELL_TITAN_GRIP) && mh_type == INVTYPE_2HWEAPON && i == SLOT_MAIN_HAND)
+                sum += item->GetTemplate()->ItemLevel;
+	    }
     }
 
     uint32 gs = uint32(sum / count);
     return gs;
-
 }
 
 /*uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBank)
