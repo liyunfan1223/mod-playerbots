@@ -217,9 +217,6 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
                 if (bot->isDead() && revive)
                 {
-                    if (!botAI->IsSafe(player) || !botAI->IsSafe(summoner))
-                        return false;
-    
                     bot->ResurrectPlayer(1.0f, false);
                     bot->SpawnCorpseBones();
                     botAI->TellMasterNoFacing("I live, again!");
