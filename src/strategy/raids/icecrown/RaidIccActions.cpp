@@ -275,18 +275,20 @@ bool IccShadeLadyDeathwhisperAction::Execute(Event event)
     for (auto& npc : npcs)
     {
         Unit* unit = botAI->GetUnit(npc);
-        if (unit && unit->GetEntry() == 38222) //vengeful shade ID
+        if (!unit || unit->GetEntry() != 38222)  // vengeful shade ID
+            continue;
+
+        // Only run away if the shade is targeting us
+        // Check by GUID comparison to ensure we're accurately identifying the specific shade in 25HC multiple shades spawn.
+        if (unit->GetVictim() && unit->GetVictim()->GetGUID() == bot->GetGUID())
         {
-            // Only run away if the shade is targeting us
-            if (unit->GetVictim() == bot)
+            float currentDistance = bot->GetDistance2d(unit);
+
+            // Move away from the Vengeful Shade if the bot is too close
+            if (currentDistance < radius)
             {
-                float currentDistance = bot->GetDistance2d(unit);
-               
-                // Move away from the Vengeful Shade if the bot is too close
-                if (currentDistance < radius)
-                {
-                    return MoveAway(unit, radius - currentDistance);
-                }
+                botAI->Reset(); // forces bot to stop channeling or getting locked by any other action
+                return MoveAway(unit, radius - currentDistance);
             }
         }
     }
