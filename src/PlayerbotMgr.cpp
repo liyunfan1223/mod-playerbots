@@ -9,6 +9,7 @@
 #include <cstring>
 #include <istream>
 #include <string>
+#include <unordered_set>
 
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
@@ -33,6 +34,34 @@
 #include "BroadcastHelper.h"
 #include "PlayerbotDbStore.h"
 #include "WorldSessionMgr.h"
+
+class BotInitGuard
+{
+public:
+    BotInitGuard(ObjectGuid guid) : guid(guid), active(false)
+    {
+        if (!botsBeingInitialized.contains(guid))
+        {
+            botsBeingInitialized.insert(guid);
+            active = true;
+        }
+    }
+
+    ~BotInitGuard()
+    {
+        if (active)
+            botsBeingInitialized.erase(guid);
+    }
+
+    bool IsLocked() const { return !active; }
+
+private:
+    ObjectGuid guid;
+    bool active;
+    static std::unordered_set<ObjectGuid> botsBeingInitialized;
+};
+
+std::unordered_set<ObjectGuid> BotInitGuard::botsBeingInitialized;
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
 class PlayerbotLoginQueryHolder : public LoginQueryHolder
@@ -696,6 +725,14 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             {
                 return "The command is not allowed, use init=auto instead.";
             }
+
+            //  Use boot guard
+            BotInitGuard guard(bot->GetGUID());
+            if (guard.IsLocked())
+            {
+                return "Initialization already in progress, please wait.";
+            }
+            
             int gs;
             if (cmd == "init=white" || cmd == "init=common")
             {
