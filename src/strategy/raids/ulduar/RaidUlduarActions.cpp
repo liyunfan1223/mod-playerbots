@@ -24,8 +24,6 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 #include "Vehicle.h"
-#include <HunterBuffStrategies.h>
-#include <PaladinBuffStrategies.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -1168,32 +1166,6 @@ bool RazorscaleFuseArmorAction::Execute(Event event)
     return true;
 }
 
-bool RazorscaleFireResistanceAction::isUseful()
-{
-    RazorscaleFireResistanceTrigger razorscaleFireResistanceTrigger(botAI);
-    return razorscaleFireResistanceTrigger.IsActive();
-}
-
-bool RazorscaleFireResistanceAction::Execute(Event event)
-{
-    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
-    botAI->ChangeStrategy(std::string("+") + paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
-    return true;
-}
-
-bool IgnisFireResistanceAction::isUseful()
-{
-    IgnisFireResistanceTrigger ignisFireResistanceTrigger(botAI);
-    return ignisFireResistanceTrigger.IsActive();
-}
-
-bool IgnisFireResistanceAction::Execute(Event event)
-{
-    PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
-    botAI->ChangeStrategy(std::string("+") + paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
-    return true;
-}
-
 bool IronAssemblyLightningTendrilsAction::isUseful()
 {
     IronAssemblyLightningTendrilsTrigger ironAssemblyLightningTendrilsTrigger(botAI);
@@ -1377,19 +1349,6 @@ bool KologarnFallFromFloorAction::isUseful()
     return kologarnFallFromFloorTrigger.IsActive();
 }
 
-bool KologarnNatureResistanceAction::Execute(Event event)
-{
-    HunterNatureResistanceStrategy hunterNatureResistanceStrategy(botAI);
-    botAI->ChangeStrategy(std::string("+") + hunterNatureResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
-    return true;
-}
-
-bool KologarnNatureResistanceAction::isUseful()
-{
-    KologarnNatureResistanceTrigger kologarnNatureResistanceTrigger(botAI);
-    return kologarnNatureResistanceTrigger.IsActive();
-}
-
 bool KologarnRubbleSlowdownAction::Execute(Event event)
 {
     Group* group = bot->GetGroup();
@@ -1478,19 +1437,6 @@ bool HodirBitingColdJumpAction::Execute(Event event)
     // return true;
 }
 
-bool HodirFrostResistanceAction::isUseful()
-{
-    HodirFrostResistanceTrigger hodirFrostResistanceTrigger(botAI);
-    return hodirFrostResistanceTrigger.IsActive();
-}
-
-bool HodirFrostResistanceAction::Execute(Event event)
-{
-    PaladinFrostResistanceStrategy paladinFrostResistanceStrategy(botAI);
-    botAI->ChangeStrategy(std::string("+") + paladinFrostResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
-    return true;
-}
-
 bool FreyaMoveAwayNatureBombAction::isUseful()
 {
     // Check boss and it is alive
@@ -1517,79 +1463,118 @@ bool FreyaMoveAwayNatureBombAction::Execute(Event event)
     return FleePosition(target->GetPosition(), 13.0f);
 }
 
-bool FreyaMarkEonarsGiftAction::isUseful()
+bool FreyaMarkDpsTargetAction::isUseful()
 {
-    // Only tank bot can mark target
-    if (!botAI->IsTank(bot))
-    {
+    FreyaMarkDpsTargetTrigger freyaMarkDpsTargetTrigger(botAI);
+    return freyaMarkDpsTargetTrigger.IsActive();
+}
+
+bool FreyaMarkDpsTargetAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "freya");
+    if (!boss || !boss->IsAlive())
         return false;
-    }
 
-    // Check Eonar's gift and it is alive
+    Unit* targetToMark = nullptr;
 
-    // Target is not findable from threat table using AI_VALUE2(),
-    // therefore need to search manually for the unit id
+    // Check which adds is up
+    Unit* eonarsGift = nullptr;
+    Unit* ancientConservator = nullptr;
+    Unit* snaplasher = nullptr;
+    Unit* ancientWaterSpirit = nullptr;
+    Unit* stormLasher = nullptr;
+    Unit* firstDetonatingLasher = nullptr;
+
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
     Unit* target = nullptr;
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
         target = botAI->GetUnit(*i);
-        if (!target)
-        {
+        if (!target || !target->IsAlive())
             continue;
-        }
 
-        uint32 creatureId = target->GetEntry();
-        if (creatureId == NPC_EONARS_GIFT && target->IsAlive())
+        if (target->GetEntry() == NPC_EONARS_GIFT)
         {
-            break;
+            eonarsGift = target;
+        }
+        else if (target->GetEntry() == NPC_ANCIENT_CONSERVATOR)
+        {
+            ancientConservator = target;
+        }
+        else if (target->GetEntry() == NPC_SNAPLASHER)
+        {
+            snaplasher = target;
+        }
+        else if (target->GetEntry() == NPC_ANCIENT_WATER_SPIRIT)
+        {
+            ancientWaterSpirit = target;
+        }
+        else if (target->GetEntry() == NPC_STORM_LASHER)
+        {
+            stormLasher = target;
+        }
+        else if (target->GetEntry() == NPC_DETONATING_LASHER && !firstDetonatingLasher)
+        {
+            firstDetonatingLasher = target;
         }
     }
 
-    // Check if Eonar's Gift is already set as the skull marker
-    Group* group = bot->GetGroup();
-    if (!group)
+    // Check that eonars gift is need to be mark
+    if (eonarsGift)
     {
-        return false;
+        targetToMark = eonarsGift;
     }
 
-    int8 skullIndex = 7;
-    ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-    if (!target || currentSkullTarget == target->GetGUID())
+    // Check that ancient conservator is need to be mark
+    if (ancientConservator && !targetToMark)
     {
-        return false;  // Skull marker is already correctly set or no Eonar's Gift found
+        targetToMark = ancientConservator;
     }
 
-    return true;
-}
+    // Check that trio of adds is need to be mark
+    if ((snaplasher || ancientWaterSpirit || stormLasher) && !targetToMark)
+    {
+        Unit* highestHealthUnit = nullptr;
+        uint32 highestHealth = 0;
 
-bool FreyaMarkEonarsGiftAction::Execute(Event event)
-{
+        if (snaplasher && snaplasher->GetHealth() > highestHealth)
+        {
+            highestHealth = snaplasher->GetHealth();
+            highestHealthUnit = snaplasher;
+        }
+        if (ancientWaterSpirit && ancientWaterSpirit->GetHealth() > highestHealth)
+        {
+            highestHealth = ancientWaterSpirit->GetHealth();
+            highestHealthUnit = ancientWaterSpirit;
+        }
+        if (stormLasher && stormLasher->GetHealth() > highestHealth)
+        {
+            highestHealthUnit = stormLasher;
+        }
+
+        // If the highest health unit is not already marked, mark it
+        if (highestHealthUnit)
+        {
+            targetToMark = highestHealthUnit;
+        }
+    }
+
+    // Check that detonating lasher is need to be mark
+    if (firstDetonatingLasher && !targetToMark)
+    {
+        targetToMark = firstDetonatingLasher;
+    }
+
+    if (!targetToMark)
+    {
+        return false;  // No target to mark
+    }
+
     bool isMainTank = botAI->IsMainTank(bot);
     Unit* mainTankUnit = AI_VALUE(Unit*, "main tank");
     Player* mainTank = mainTankUnit ? mainTankUnit->ToPlayer() : nullptr;
-
-    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
-    Unit* target = nullptr;
-    for (auto i = targets.begin(); i != targets.end(); ++i)
-    {
-        Unit* unit = botAI->GetUnit(*i);
-        if (!unit)
-        {
-            continue;
-        }
-
-        uint32 creatureId = unit->GetEntry();
-        if (creatureId == NPC_EONARS_GIFT && unit->IsAlive())
-        {
-            target = unit;
-        }
-    }
-
-    if (!target)
-    {
-        return false;
-    }
+    int8 squareIndex = 5;  // Square
+    int8 skullIndex = 7;  // Skull
 
     if (mainTank && !GET_PLAYERBOT_AI(mainTank))  // Main tank is a real player
     {
@@ -1599,19 +1584,18 @@ bool FreyaMarkEonarsGiftAction::Execute(Event event)
             if (botAI->IsAssistTankOfIndex(bot, i) && GET_PLAYERBOT_AI(bot))  // Bot is a valid tank
             {
                 Group* group = bot->GetGroup();
-                if (group && target)
+                if (group)
                 {
-                    int8 skullIndex = 7;  // Skull
                     ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-
-                    // If there's no skull set yet, or the skull is on a different target, set the Eonar's Gift
-                    if (!currentSkullTarget || (target->GetGUID() != currentSkullTarget))
+    
+                    if (!currentSkullTarget || (targetToMark->GetGUID() != currentSkullTarget))
                     {
-                        group->SetTargetIcon(skullIndex, bot->GetGUID(), target->GetGUID());
+                        group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+                        group->SetTargetIcon(squareIndex, bot->GetGUID(), boss->GetGUID());
                         return true;
                     }
                 }
-                break;  // Stop after finding the first valid bot tank
+                break;
             }
         }
     }
@@ -1620,17 +1604,54 @@ bool FreyaMarkEonarsGiftAction::Execute(Event event)
         Group* group = bot->GetGroup();
         if (group)
         {
-            int8 skullIndex = 7;  // Skull
             ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-
-            // If there's no skull set yet, or the skull is on a different target, set the Eonar's Gift
-            if (!currentSkullTarget || (target->GetGUID() != currentSkullTarget))
+    
+            if (!currentSkullTarget || (targetToMark->GetGUID() != currentSkullTarget))
             {
-                group->SetTargetIcon(skullIndex, bot->GetGUID(), target->GetGUID());
+                group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
+                group->SetTargetIcon(squareIndex, bot->GetGUID(), boss->GetGUID());
+                botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("square");
                 return true;
             }
         }
     }
 
     return false;
+}
+
+bool FreyaMoveToHealingSporeAction::isUseful()
+{
+    FreyaMoveToHealingSporeTrigger freyaMoveToHealingSporeTrigger(botAI);
+    return freyaMoveToHealingSporeTrigger.IsActive();
+}
+
+bool FreyaMoveToHealingSporeAction::Execute(Event event)
+{
+    GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
+    Creature* nearestSpore = nullptr;
+    float nearestDistance = std::numeric_limits<float>::max();
+
+    for (auto guid : targets)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit)
+            continue;
+
+        // Check if this unit is a healthy spore and alive
+        if (unit->GetEntry() != NPC_HEALTHY_SPORE || !unit->IsAlive())
+            continue;
+
+        float distance = bot->GetDistance2d(unit);
+        if (distance < nearestDistance)
+        {
+            nearestDistance = distance;
+            nearestSpore = static_cast<Creature*>(unit);
+        }
+    }
+
+    if (!nearestSpore)
+        return false;
+
+    return MoveTo(nearestSpore->GetMapId(), nearestSpore->GetPositionX(), nearestSpore->GetPositionY(),
+                  nearestSpore->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
 }
