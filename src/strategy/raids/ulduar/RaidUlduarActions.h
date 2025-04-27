@@ -106,37 +106,10 @@ public:
     bool isUseful() override;
 };
 
-class RazorscaleFireResistanceAction : public Action
-{
-public:
-    RazorscaleFireResistanceAction(PlayerbotAI* botAI) : Action(botAI, "razorscale fire resistance action") {}
-    bool Execute(Event event) override;
-    bool isUseful() override;
-};
-
-//
-// Ignis
-//
-class IgnisFireResistanceAction : public Action
-{
-public:
-    IgnisFireResistanceAction(PlayerbotAI* botAI) : Action(botAI, "ignis fire resistance action") {}
-    bool Execute(Event event) override;
-    bool isUseful() override;
-};
-
 class HodirMoveSnowpackedIcicleAction : public MovementAction
 {
 public:
     HodirMoveSnowpackedIcicleAction(PlayerbotAI* botAI) : MovementAction(botAI, "hodir move snowpacked icicle") {}
-    bool Execute(Event event) override;
-    bool isUseful() override;
-};
-
-class HodirFrostResistanceAction : public Action
-{
-public:
-    HodirFrostResistanceAction(PlayerbotAI* botAI) : Action(botAI, "hodir frost resistance action") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -173,14 +146,6 @@ public:
     bool isUseful() override;
 };
 
-class KologarnNatureResistanceAction : public Action
-{
-public:
-    KologarnNatureResistanceAction(PlayerbotAI* botAI) : Action(botAI, "kologarn nature resistance action") {}
-    bool Execute(Event event) override;
-    bool isUseful() override;
-};
-
 class KologarnRubbleSlowdownAction : public Action
 {
 public:
@@ -203,10 +168,19 @@ public:
     bool isUseful() override;
 };
 
-class FreyaMarkEonarsGiftAction : public MovementAction
+class FreyaMarkDpsTargetAction : public MovementAction
 {
 public:
-    FreyaMarkEonarsGiftAction(PlayerbotAI* botAI) : MovementAction(botAI, "freya mark eonars gift") {}
+    FreyaMarkDpsTargetAction(PlayerbotAI* botAI) : MovementAction(botAI, "freya mark dps target action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class FreyaMoveToHealingSporeAction : public MovementAction
+{
+public:
+    FreyaMoveToHealingSporeAction(PlayerbotAI* ai) : MovementAction(ai, "freya move to healing spore action") {}
+
     bool Execute(Event event) override;
     bool isUseful() override;
 };

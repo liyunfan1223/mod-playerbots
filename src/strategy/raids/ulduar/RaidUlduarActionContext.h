@@ -9,6 +9,7 @@
 #include "Action.h"
 #include "NamedObjectContext.h"
 #include "RaidUlduarActions.h"
+#include "BossAuraActions.h"
 
 class RaidUlduarActionContext : public NamedObjectContext<Action>
 {
@@ -36,7 +37,12 @@ public:
         creators["hodir biting cold jump"] = &RaidUlduarActionContext::hodir_biting_cold_jump;
         creators["hodir frost resistance action"] = &RaidUlduarActionContext::hodir_frost_resistance_action;
         creators["freya move away nature bomb"] = &RaidUlduarActionContext::freya_move_away_nature_bomb;
-        creators["freya mark eonars gift"] = &RaidUlduarActionContext::freya_mark_eonars_gift;
+        creators["freya fire resistance action"] = &RaidUlduarActionContext::freya_fire_resistance_action;
+        creators["freya nature resistance action"] = &RaidUlduarActionContext::freya_nature_resistance_action;
+        creators["freya mark dps target action"] = &RaidUlduarActionContext::freya_mark_dps_target_action;
+        creators["freya move to healing spore action"] = &RaidUlduarActionContext::freya_move_to_healing_spore_action;
+        creators["thorim nature resistance action"] = &RaidUlduarActionContext::thorim_nature_resistance_action;
+        creators["mimiron fire resistance action"] = &RaidUlduarActionContext::mimiron_fire_resistance_action;
     }
 
 private:
@@ -49,19 +55,24 @@ private:
     static Action* razorscale_grounded(PlayerbotAI* ai) { return new RazorscaleGroundedAction(ai); }
     static Action* razorscale_harpoon_action(PlayerbotAI* ai) { return new RazorscaleHarpoonAction(ai); }
     static Action* razorscale_fuse_armor_action(PlayerbotAI* ai) { return new RazorscaleFuseArmorAction(ai); }
-    static Action* razorscale_fire_resistance_action(PlayerbotAI* ai) { return new RazorscaleFireResistanceAction(ai); }
-    static Action* ignis_fire_resistance_action(PlayerbotAI* ai) { return new IgnisFireResistanceAction(ai); }
+    static Action* razorscale_fire_resistance_action(PlayerbotAI* ai) { return new BossFireResistanceAction(ai, "razorscale"); }
+    static Action* ignis_fire_resistance_action(PlayerbotAI* ai) { return new BossFireResistanceAction(ai, "ignis the furnace master"); }
     static Action* iron_assembly_lightning_tendrils_action(PlayerbotAI* ai) { return new IronAssemblyLightningTendrilsAction(ai); }
     static Action* iron_assembly_overload_action(PlayerbotAI* ai) { return new IronAssemblyOverloadAction(ai); }
     static Action* kologarn_mark_dps_target_action(PlayerbotAI* ai) { return new KologarnMarkDpsTargetAction(ai); }
     static Action* kologarn_fall_from_floor_action(PlayerbotAI* ai) { return new KologarnFallFromFloorAction(ai); }
-    static Action* kologarn_nature_resistance_action(PlayerbotAI* ai) { return new KologarnNatureResistanceAction(ai); }
+    static Action* kologarn_nature_resistance_action(PlayerbotAI* ai) { return new BossNatureResistanceAction(ai, "kologarn"); }
     static Action* kologarn_rubble_slowdown_action(PlayerbotAI* ai) { return new KologarnRubbleSlowdownAction(ai); }
     static Action* hodir_move_snowpacked_icicle(PlayerbotAI* ai) { return new HodirMoveSnowpackedIcicleAction(ai); }
     static Action* hodir_biting_cold_jump(PlayerbotAI* ai) { return new HodirBitingColdJumpAction(ai); }
-    static Action* hodir_frost_resistance_action(PlayerbotAI* ai) { return new HodirFrostResistanceAction(ai); }
+    static Action* hodir_frost_resistance_action(PlayerbotAI* ai) { return new BossFrostResistanceAction(ai, "hodir"); }
     static Action* freya_move_away_nature_bomb(PlayerbotAI* ai) { return new FreyaMoveAwayNatureBombAction(ai); }
-    static Action* freya_mark_eonars_gift(PlayerbotAI* ai) { return new FreyaMarkEonarsGiftAction(ai); }
+    static Action* freya_fire_resistance_action(PlayerbotAI* ai) { return new BossFireResistanceAction(ai, "freya"); }
+    static Action* freya_nature_resistance_action(PlayerbotAI* ai) { return new BossNatureResistanceAction(ai, "freya"); }
+    static Action* freya_mark_dps_target_action(PlayerbotAI* ai) { return new FreyaMarkDpsTargetAction(ai); }
+    static Action* freya_move_to_healing_spore_action(PlayerbotAI* ai) { return new FreyaMoveToHealingSporeAction(ai); }
+    static Action* thorim_nature_resistance_action(PlayerbotAI* ai) { return new BossNatureResistanceAction(ai, "thorim"); }
+    static Action* mimiron_fire_resistance_action(PlayerbotAI* ai) { return new BossFireResistanceAction(ai, "mimiron"); }
 };
 
 #endif
