@@ -75,7 +75,7 @@ bool TeleportAction::Execute(Event event)
 
         uint32 spellId = goInfo->spellcaster.spellId;
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
+        if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
             continue;
 
         std::ostringstream out;

@@ -9,6 +9,7 @@
 #include "AiObjectContext.h"
 #include "NamedObjectContext.h"
 #include "RaidUlduarTriggers.h"
+#include "BossAuraTriggers.h"
 
 class RaidUlduarTriggerContext : public NamedObjectContext<Trigger>
 {
@@ -36,7 +37,12 @@ public:
         creators["hodir near snowpacked icicle"] = &RaidUlduarTriggerContext::hodir_near_snowpacked_icicle;
         creators["hodir frost resistance trigger"] = &RaidUlduarTriggerContext::hodir_frost_resistance_trigger;
         creators["freya near nature bomb"] = &RaidUlduarTriggerContext::freya_near_nature_bomb;
-        creators["freya tank near eonars gift"] = &RaidUlduarTriggerContext::freya_tank_near_eonars_gift;
+        creators["freya fire resistance trigger"] = &RaidUlduarTriggerContext::freya_fire_resistance_trigger;
+        creators["freya nature resistance trigger"] = &RaidUlduarTriggerContext::freya_nature_resistance_trigger;
+        creators["freya mark dps target trigger"] = &RaidUlduarTriggerContext::freya_mark_dps_target_trigger;
+        creators["freya move to healing spore trigger"] = &RaidUlduarTriggerContext::freya_move_to_healing_spore_trigger;
+        creators["thorim nature resistance trigger"] = &RaidUlduarTriggerContext::thorim_nature_resistance_trigger;
+        creators["mimiron fire resistance trigger"] = &RaidUlduarTriggerContext::mimiron_fire_resistance_trigger;
     }
 
 private:
@@ -49,19 +55,24 @@ private:
     static Trigger* razorscale_grounded(PlayerbotAI* ai) { return new RazorscaleGroundedTrigger(ai); }
     static Trigger* razorscale_harpoon_trigger(PlayerbotAI* ai) { return new RazorscaleHarpoonAvailableTrigger(ai); }
     static Trigger* razorscale_fuse_armor_trigger(PlayerbotAI* ai) { return new RazorscaleFuseArmorTrigger(ai); }
-    static Trigger* razorscale_fire_resistance_trigger(PlayerbotAI* ai) { return new RazorscaleFireResistanceTrigger(ai); }
-    static Trigger* ignis_fire_resistance_trigger(PlayerbotAI* ai) { return new IgnisFireResistanceTrigger(ai); }
+    static Trigger* razorscale_fire_resistance_trigger(PlayerbotAI* ai) { return new BossFireResistanceTrigger(ai, "razorscale"); }
+    static Trigger* ignis_fire_resistance_trigger(PlayerbotAI* ai) { return new BossFireResistanceTrigger(ai, "ignis the furnace master"); }
     static Trigger* iron_assembly_lightning_tendrils_trigger(PlayerbotAI* ai) { return new IronAssemblyLightningTendrilsTrigger(ai); }
     static Trigger* iron_assembly_overload_trigger(PlayerbotAI* ai) { return new IronAssemblyOverloadTrigger(ai); }
     static Trigger* kologarn_mark_dps_target_trigger(PlayerbotAI* ai) { return new KologarnMarkDpsTargetTrigger(ai); }
     static Trigger* kologarn_fall_from_floor_trigger(PlayerbotAI* ai) { return new KologarnFallFromFloorTrigger(ai); }
-    static Trigger* kologarn_nature_resistance_trigger(PlayerbotAI* ai) { return new KologarnNatureResistanceTrigger(ai); }
+    static Trigger* kologarn_nature_resistance_trigger(PlayerbotAI* ai) { return new BossNatureResistanceTrigger(ai, "kologarn"); }
     static Trigger* kologarn_rubble_slowdown_trigger(PlayerbotAI* ai) { return new KologarnRubbleSlowdownTrigger(ai); }
     static Trigger* hodir_biting_cold(PlayerbotAI* ai) { return new HodirBitingColdTrigger(ai); }
     static Trigger* hodir_near_snowpacked_icicle(PlayerbotAI* ai) { return new HodirNearSnowpackedIcicleTrigger(ai); }
-    static Trigger* hodir_frost_resistance_trigger(PlayerbotAI* ai) { return new HodirFrostResistanceTrigger(ai); }
+    static Trigger* hodir_frost_resistance_trigger(PlayerbotAI* ai) { return new BossFrostResistanceTrigger(ai, "hodir"); }
     static Trigger* freya_near_nature_bomb(PlayerbotAI* ai) { return new FreyaNearNatureBombTrigger(ai); }
-    static Trigger* freya_tank_near_eonars_gift(PlayerbotAI* ai) { return new FreyaTankNearEonarsGiftTrigger(ai); }
+    static Trigger* freya_fire_resistance_trigger(PlayerbotAI* ai) { return new BossFireResistanceTrigger(ai, "freya"); }
+    static Trigger* freya_nature_resistance_trigger(PlayerbotAI* ai) { return new BossNatureResistanceTrigger(ai, "freya"); }
+    static Trigger* freya_mark_dps_target_trigger(PlayerbotAI* ai) { return new FreyaMarkDpsTargetTrigger(ai); }
+    static Trigger* freya_move_to_healing_spore_trigger(PlayerbotAI* ai) { return new FreyaMoveToHealingSporeTrigger(ai); }
+    static Trigger* thorim_nature_resistance_trigger(PlayerbotAI* ai) { return new BossNatureResistanceTrigger(ai, "thorim"); }
+    static Trigger* mimiron_fire_resistance_trigger(PlayerbotAI* ai) { return new BossFireResistanceTrigger(ai, "mimiron"); }
 };
 
 #endif

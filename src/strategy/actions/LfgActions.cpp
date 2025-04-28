@@ -198,64 +198,75 @@ bool LfgRoleCheckAction::Execute(Event event)
 
 bool LfgAcceptAction::Execute(Event event)
 {
-    /*LfgState status = sLFGMgr->GetState(bot->GetGUID());
-    if (status != LFG_STATE_PROPOSAL)
-        return false;*/
-
     uint32 id = AI_VALUE(uint32, "lfg proposal");
+
+    // Try accept if already stored
     if (id)
     {
-        // if (urand(0, 1 + 10 / sPlayerbotAIConfig->randomChangeMultiplier))
-        //     return false;
-
         if (bot->IsInCombat() || bot->isDead())
         {
-            LOG_INFO("playerbots", "Bot {} {}:{} <{}> is in combat and refuses LFG proposal {}",
-                     bot->GetGUID().ToString().c_str(), bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(),
-                     bot->GetName().c_str(), id);
             WorldPacket* packet = new WorldPacket(CMSG_LFG_PROPOSAL_RESULT);
-            *packet << (uint32)id << (bool)false;
+            *packet << id << false;
             bot->GetSession()->QueuePacket(packet);
-            // sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
             return true;
         }
 
-        LOG_INFO("playerbots", "Bot {} {}:{} <{}> accepts LFG proposal {}", bot->GetGUID().ToString().c_str(),
-                 bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), id);
-
         botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
-
         bot->ClearUnitState(UNIT_STATE_ALL_STATE);
+
         WorldPacket* packet = new WorldPacket(CMSG_LFG_PROPOSAL_RESULT);
-        *packet << (uint32)id << (bool)true;
+        *packet << id << true;
         bot->GetSession()->QueuePacket(packet);
-        // sLFGMgr->UpdateProposal(id, bot->GetGUID(), true);
 
         if (sRandomPlayerbotMgr->IsRandomBot(bot) && !bot->GetGroup())
         {
             sRandomPlayerbotMgr->Refresh(bot);
             botAI->ResetStrategies();
-            // bot->TeleportToHomebind();
         }
 
         botAI->Reset();
-
         return true;
     }
-    
-    if (event.getPacket().empty())
-        return false;
 
-    WorldPacket p(event.getPacket());
+    // If we get the proposal packet, accept immediately
+    if (!event.getPacket().empty())
+    {
+        WorldPacket p(event.getPacket());
+        uint32 dungeonId;
+        uint8 state;
+        p >> dungeonId >> state >> id;
 
-    uint32 dungeon;
-    uint8 state;
-    p >> dungeon >> state >> id;
+        if (id)
+        {
+            if (bot->IsInCombat() || bot->isDead())
+            {
+                WorldPacket* packet = new WorldPacket(CMSG_LFG_PROPOSAL_RESULT);
+                *packet << id << false;
+                bot->GetSession()->QueuePacket(packet);
+                return true;
+            }
 
-    botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(id);
+            botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
+            bot->ClearUnitState(UNIT_STATE_ALL_STATE);
 
-    return true;
+            WorldPacket* packet = new WorldPacket(CMSG_LFG_PROPOSAL_RESULT);
+            *packet << id << true;
+            bot->GetSession()->QueuePacket(packet);
+
+            if (sRandomPlayerbotMgr->IsRandomBot(bot) && !bot->GetGroup())
+            {
+                sRandomPlayerbotMgr->Refresh(bot);
+                botAI->ResetStrategies();
+            }
+
+            botAI->Reset();
+            return true;
+        }
+    }
+
+    return false;
 }
+
 
 bool LfgLeaveAction::Execute(Event event)
 {
