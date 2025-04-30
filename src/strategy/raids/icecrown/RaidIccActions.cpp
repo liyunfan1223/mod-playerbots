@@ -1123,119 +1123,129 @@ bool IccRotfaceMoveAwayFromExplosionAction::Execute(Event event)
 
 bool IccPutricideGrowingOozePuddleAction::Execute(Event event)
 {
-    const float BASE_RADIUS = 2.0f;
-    const float STACK_MULTIPLIER = 0.5f;
-    const float MIN_DISTANCE = 0.1f; // Minimum distance to consider when bot is very close or inside puddle
 
-    // Get the nearest hostile NPCs
+    // Constants moved outside to prevent recreation on each call
+    static const float BASE_RADIUS = 2.0f;
+    static const float STACK_MULTIPLIER = 0.5f;
+    static const float MIN_DISTANCE = 0.1f;
+    static const float BUFFER_DISTANCE = 2.0f;
+    static const uint32 GROWING_OOZE_PUDDLE_ID = 37690;
+    static const uint32 GROW_AURA_ID = 70347;
+
+    // Cache bot position to avoid multiple calls
+    float botX = bot->GetPositionX();
+    float botY = bot->GetPositionY();
+    float botZ = bot->GetPositionZ();
+
+    // Get the nearest hostile NPCs - only once and store locally
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-    float closestDistance = FLT_MAX;
-    Unit* closestPuddle = nullptr;
-    float closestSafeDistance = BASE_RADIUS;
+    if (npcs.empty())
+        return false;
 
-    // Find the closest puddle and its safe distance
+    // Find puddles and their safe distances in one pass
+    std::vector<std::tuple<Unit*, float, float>> puddles;  // Unit*, distance, safeDistance
+    puddles.reserve(8);                                    // Pre-allocate a reasonable size
+
     for (auto& npc : npcs)
     {
         Unit* unit = botAI->GetUnit(npc);
-        if (unit && unit->GetEntry() == 37690) //growing ooze puddle ID
+        if (!unit || unit->GetEntry() != GROWING_OOZE_PUDDLE_ID)
+            continue;
+
+        float currentDistance = std::max(MIN_DISTANCE, bot->GetExactDist(unit));
+
+        float safeDistance = BASE_RADIUS;
+        if (Aura* grow = unit->GetAura(GROW_AURA_ID))
+            safeDistance += (grow->GetStackAmount() * STACK_MULTIPLIER);
+
+        puddles.emplace_back(unit, currentDistance, safeDistance);
+    }
+
+    // If no puddles found, exit early
+    if (puddles.empty())
+        return false;
+
+    // Find the closest threatening puddle
+    Unit* closestPuddle = nullptr;
+    float closestDistance = FLT_MAX;
+    float closestSafeDistance = BASE_RADIUS;
+    bool needToMove = false;
+
+    for (const auto& [puddle, distance, safeDistance] : puddles)
+    {
+        if (distance < safeDistance && distance < closestDistance)
         {
-            // Use GetExactDist instead of GetDistance2d to handle Z-axis
-            float currentDistance = std::max(MIN_DISTANCE, bot->GetExactDist(unit));
-            if (currentDistance < closestDistance)
-            {
-                closestDistance = currentDistance;
-                closestPuddle = unit;
-            
-                // Calculate safe distance for this puddle
-                if (Aura* grow = unit->GetAura(70347))
-                {
-                    closestSafeDistance = BASE_RADIUS + (grow->GetStackAmount() * STACK_MULTIPLIER);
-                }
-            }
+            closestDistance = distance;
+            closestSafeDistance = safeDistance;
+            closestPuddle = puddle;
+            needToMove = true;
         }
     }
-            
-    // If we found a puddle that's too close, move away from it
-    if (closestPuddle && closestDistance < closestSafeDistance)
+
+    // If we don't need to move, exit early
+    if (!needToMove)
+        return false;
+
+    // Calculate vector from puddle to bot
+    float dx = botX - closestPuddle->GetPositionX();
+    float dy = botY - closestPuddle->GetPositionY();
+    float dist = std::max(MIN_DISTANCE, sqrt(dx * dx + dy * dy));
+
+    // If we're too close or inside, pick a random direction to move
+    if (dist < MIN_DISTANCE * 2)
     {
-        float botX = bot->GetPositionX();
-        float botY = bot->GetPositionY();
-        float botZ = bot->GetPositionZ();
-                
-        // Calculate vector from puddle to bot
-        float dx = botX - closestPuddle->GetPositionX();
-        float dy = botY - closestPuddle->GetPositionY();
-        float dist = std::max(MIN_DISTANCE, sqrt(dx * dx + dy * dy));
-                
-        // If we're too close or inside, pick a random direction to move
-        if (dist < MIN_DISTANCE * 2)
-        {
-            float randomAngle = float(rand()) / float(RAND_MAX) * 2 * M_PI;
-            dx = cos(randomAngle);
-            dy = sin(randomAngle);
-        }
-        else
-        {
-            dx /= dist;
-            dy /= dist;
-        }
+        float randomAngle = float(rand()) / float(RAND_MAX) * 2 * M_PI;
+        dx = cos(randomAngle);
+        dy = sin(randomAngle);
+    }
+    else
+    {
+        dx /= dist;
+        dy /= dist;
+    }
 
-        // Try different angles to find a safe path
-        const int numAngles = 8;
-        float bestMoveX = botX;
-        float bestMoveY = botY;
-        bool foundPath = false;
-        float moveDistance = closestSafeDistance - closestDistance + 2.0f; // Add 2 yards buffer
-                    
-        for (int i = 0; i < numAngles; i++)
-        {
-            float angle = (2 * M_PI * i) / numAngles;
-            float rotatedDx = dx * cos(angle) - dy * sin(angle);
-            float rotatedDy = dx * sin(angle) + dy * cos(angle);
-                        
-            float testX = botX + rotatedDx * moveDistance;
-            float testY = botY + rotatedDy * moveDistance;
-            float testZ = botZ;
+    // Calculate move distance once
+    float moveDistance = closestSafeDistance - closestDistance + BUFFER_DISTANCE;
 
-            // Check if this move would put us too close to any other puddle
-            bool tooCloseToOtherPuddle = false;
-            for (auto& otherNpc : npcs)
+    // Try different angles to find a safe path
+    const int numAngles = 8;
+    for (int i = 0; i < numAngles; i++)
+    {
+        float angle = (2 * M_PI * i) / numAngles;
+        float rotatedDx = dx * cos(angle) - dy * sin(angle);
+        float rotatedDy = dx * sin(angle) + dy * cos(angle);
+
+        float testX = botX + rotatedDx * moveDistance;
+        float testY = botY + rotatedDy * moveDistance;
+
+        // Skip LOS check if too close to other puddles
+        bool tooCloseToOtherPuddle = false;
+        for (const auto& [otherPuddle, _, otherSafeDistance] : puddles)
+        {
+            if (otherPuddle == closestPuddle)
+                continue;
+
+            float newDist =
+                sqrt(pow(testX - otherPuddle->GetPositionX(), 2) + pow(testY - otherPuddle->GetPositionY(), 2));
+
+            if (newDist < otherSafeDistance)
             {
-                Unit* otherUnit = botAI->GetUnit(otherNpc);
-                if (otherUnit && otherUnit->GetEntry() == 37690 && otherUnit != closestPuddle)
-                {
-                    float otherSafeDistance = BASE_RADIUS;
-                    if (Aura* grow = otherUnit->GetAura(70347))
-                    {
-                        otherSafeDistance = BASE_RADIUS + (grow->GetStackAmount() * STACK_MULTIPLIER);
-                    }
-                        
-                    float newDist = sqrt(pow(testX - otherUnit->GetPositionX(), 2) + 
-                                      pow(testY - otherUnit->GetPositionY(), 2));
-                    if (newDist < otherSafeDistance)
-                    {
-                        tooCloseToOtherPuddle = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!tooCloseToOtherPuddle && bot->IsWithinLOS(testX, testY, testZ))
-            {
-                bestMoveX = testX;
-                bestMoveY = testY;
-                foundPath = true;
+                tooCloseToOtherPuddle = true;
                 break;
             }
         }
 
-        if (foundPath)
+        if (!tooCloseToOtherPuddle && bot->IsWithinLOS(testX, testY, botZ))
         {
-            return MoveTo(bot->GetMapId(), bestMoveX, bestMoveY, botZ,
-                false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+            // Found a safe path, move there
+            return MoveTo(bot->GetMapId(), testX, testY, botZ, false, false, false, false,
+                          MovementPriority::MOVEMENT_COMBAT);
         }
     }
-    return false;
+
+    // If we couldn't find a safe path, at least try to move away from the closest puddle
+    return MoveTo(bot->GetMapId(), botX + dx * moveDistance, botY + dy * moveDistance, botZ, false, false, false, false,
+                  MovementPriority::MOVEMENT_COMBAT);
 }
 
 bool IccPutricideVolatileOozeAction::Execute(Event event)
@@ -1830,30 +1840,43 @@ bool IccBpcEmpoweredVortexAction::Execute(Event event)
 
 bool IccBpcKineticBombAction::Execute(Event event)
 {
-    // Only allow ranged DPS to handle bombs
+    // Early exit if not ranged DPS
     if (!botAI->IsRangedDps(bot))
         return false;
-    
-    //for some reason they sometimes decide to move up in the air when they attack the kinetic bomb and that will make everyone tp to entrance...
-    if (bot->GetPositionZ() > 371.16473f)
-        return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(),
-                          bot->GetPositionY(), 366.16473f, bot->GetOrientation());
 
+    // Static constants to avoid recreating them every call
+    static const float MAX_HEIGHT_DIFF = 25.0f;
+    static const float SAFE_HEIGHT = 371.16473f;
+    static const float TELEPORT_HEIGHT = 366.16473f;
+
+    // Handle the edge case where bot is too high (prevent teleport to entrance)
+    if (bot->GetPositionZ() > SAFE_HEIGHT)
+        return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), TELEPORT_HEIGHT,
+                               bot->GetOrientation());
+
+    // Cache bot position once
+    float botZ = bot->GetPositionZ();
+
+    // Check if we're already handling a valid bomb
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
-
-    // If we're already attacking a bomb and it's still in range, stick with it
     if (currentTarget && currentTarget->IsAlive() && currentTarget->GetName() == "Kinetic Bomb")
     {
-        float heightDiff = currentTarget->GetPositionZ() - bot->GetPositionZ();
-        if (heightDiff < 25.0f)
+        float heightDiff = currentTarget->GetPositionZ() - botZ;
+        if (heightDiff < MAX_HEIGHT_DIFF)
             return false;  // Continue current attack
     }
 
+    // Get possible targets once
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    if (targets.empty())
+        return false;
+
+    // Cache group only once
+    Group* group = bot->GetGroup();
 
     // Find the lowest reachable bomb
     Unit* bestBomb = nullptr;
-    float lowestHeightDiff = 25.0f;  // Maximum height we care about
+    float lowestHeightDiff = MAX_HEIGHT_DIFF;
 
     for (auto& guid : targets)
     {
@@ -1861,37 +1884,41 @@ bool IccBpcKineticBombAction::Execute(Event event)
         if (!unit || !unit->IsAlive() || unit->GetName() != "Kinetic Bomb")
             continue;
 
-        float heightDiff = unit->GetPositionZ() - bot->GetPositionZ();
-        if (heightDiff < lowestHeightDiff)
-        {
-            // Check if any closer ranged DPS is already attacking this bomb
-            bool alreadyHandled = false;
-            Group* group = bot->GetGroup();
-            if (group)
-            {
-                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                {
-                    Player* member = itr->GetSource();
-                    if (!member || member == bot || !member->IsAlive() || !botAI->IsRangedDps(member))
-                        continue;
+        float heightDiff = unit->GetPositionZ() - botZ;
+        if (heightDiff >= lowestHeightDiff)
+            continue;
 
-                    if (member->GetTarget() == unit->GetGUID() && member->GetDistance(unit) < bot->GetDistance(unit))
-                    {
-                        alreadyHandled = true;
-                        break;
-                    }
+        // Skip if bot is too far to realistically hit this bomb
+        if (bot->GetDistance(unit) > 30.0f)
+            continue;
+
+        // Check if any closer ranged DPS is already handling this bomb
+        bool alreadyHandled = false;
+
+        if (group)
+        {
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player* member = itr->GetSource();
+                if (!member || member == bot || !member->IsAlive() || !botAI->IsRangedDps(member))
+                    continue;
+
+                if (member->GetTarget() == unit->GetGUID() && member->GetDistance(unit) < bot->GetDistance(unit))
+                {
+                    alreadyHandled = true;
+                    break;
                 }
             }
+        }
 
-            if (!alreadyHandled)
-            {
-                bestBomb = unit;
-                lowestHeightDiff = heightDiff;
-            }
+        if (!alreadyHandled)
+        {
+            bestBomb = unit;
+            lowestHeightDiff = heightDiff;
         }
     }
 
-    // Attack the lowest unhandled bomb if found
+    // Attack the best bomb if found
     if (bestBomb)
         return Attack(bestBomb);
 
@@ -1906,8 +1933,11 @@ bool IccBqlTankPositionAction::Execute(Event event)
     Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
     Aura* aura2 = botAI->GetAura("Swarming Shadows", bot);
 
+    if (!boss)
+        return false;
+
     // If tank is not at position, move there
-    if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot) && !(aura || aura2))
+    if ((botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot)) && !(aura || aura2))
     {
         if (bot->GetExactDist2d(ICC_BQL_TANK_POSITION) > 10.0f)
             return MoveTo(bot->GetMapId(), ICC_BQL_TANK_POSITION.GetPositionX(),
