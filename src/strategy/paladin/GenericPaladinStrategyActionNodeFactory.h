@@ -105,7 +105,7 @@ private:
                               /*A*/ nullptr,  // NextAction::array(0, new NextAction("flash of light"), NULL),
                               /*C*/ nullptr);
     }
-    // static ActionNode* seal_of_light(PlayerbotAI* ai)
+    // static ActionNode* seal_of_light(PlayerbotAI* /* ai */)
     // {
     //     return new ActionNode ("seal of light",
     //         /*P*/ NULL,
