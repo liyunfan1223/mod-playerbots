@@ -9,6 +9,7 @@
 #include <cstring>
 #include <istream>
 #include <string>
+#include <openssl/sha.h>
 
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
@@ -1680,7 +1681,21 @@ PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
 void PlayerbotMgr::HandleSetSecurityKeyCommand(Player* player, const std::string& key)
 {
     uint32 accountId = player->GetSession()->GetAccountId();
-    CharacterDatabase.Execute("REPLACE INTO playerbot_account_keys (account_id, security_key) VALUES ({}, '{}')", accountId, key);
+
+    // Hash the security key using SHA-256
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256((unsigned char*)key.c_str(), key.size(), hash);
+
+    // Convert the hash to a hexadecimal string
+    std::ostringstream hashedKey;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i)
+        hashedKey << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+
+    // Store the hashed key in the database
+    PlayerbotsDatabase.Execute(
+        "REPLACE INTO playerbot_account_keys (account_id, security_key) VALUES ({}, '{}')",
+        accountId, hashedKey.str());
+
     ChatHandler(player->GetSession()).PSendSysMessage("Security key set successfully.");
 }
 
@@ -1697,15 +1712,36 @@ void PlayerbotMgr::HandleLinkAccountCommand(Player* player, const std::string& a
     uint32 linkedAccountId = fields[0].Get<uint32>();
 
     result = PlayerbotsDatabase.Query("SELECT security_key FROM playerbot_account_keys WHERE account_id = {}", linkedAccountId);
-    if (!result || result->Fetch()->Get<std::string>() != key)
+    if (!result)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Invalid security key.");
+        return;
+    }
+
+    // Hash the provided key
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256((unsigned char*)key.c_str(), key.size(), hash);
+
+    // Convert the hash to a hexadecimal string
+    std::ostringstream hashedKey;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i)
+        hashedKey << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+
+    // Compare the hashed key with the stored hashed key
+    std::string storedKey = result->Fetch()->Get<std::string>();
+    if (hashedKey.str() != storedKey)
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Invalid security key.");
         return;
     }
 
     uint32 accountId = player->GetSession()->GetAccountId();
-    PlayerbotsDatabase.Execute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", accountId, linkedAccountId);
-    PlayerbotsDatabase.Execute("INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})", linkedAccountId, accountId);
+    PlayerbotsDatabase.Execute(
+        "INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})",
+        accountId, linkedAccountId);
+    PlayerbotsDatabase.Execute(
+        "INSERT IGNORE INTO playerbot_account_links (account_id, linked_account_id) VALUES ({}, {})",
+        linkedAccountId, accountId);
 
     ChatHandler(player->GetSession()).PSendSysMessage("Account linked successfully.");
 }
@@ -1726,7 +1762,18 @@ void PlayerbotMgr::HandleViewLinkedAccountsCommand(Player* player)
     {
         Field* fields = result->Fetch();
         uint32 linkedAccountId = fields[0].Get<uint32>();
-        ChatHandler(player->GetSession()).PSendSysMessage("- Account ID: {}", linkedAccountId);
+
+        QueryResult accountResult = LoginDatabase.Query("SELECT username FROM account WHERE id = {}", linkedAccountId);
+        if (accountResult)
+        {
+            Field* accountFields = accountResult->Fetch();
+            std::string username = accountFields[0].Get<std::string>();
+            ChatHandler(player->GetSession()).PSendSysMessage("- %s", username.c_str());
+        }
+        else
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage("- Unknown account");
+        }
     } while (result->NextRow());
 }
 
