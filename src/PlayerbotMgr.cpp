@@ -1768,7 +1768,7 @@ void PlayerbotMgr::HandleViewLinkedAccountsCommand(Player* player)
         {
             Field* accountFields = accountResult->Fetch();
             std::string username = accountFields[0].Get<std::string>();
-            ChatHandler(player->GetSession()).PSendSysMessage("- %s", username.c_str());
+            ChatHandler(player->GetSession()).PSendSysMessage("- {}", username.c_str());
         }
         else
         {
