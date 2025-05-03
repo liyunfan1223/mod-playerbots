@@ -3581,7 +3581,9 @@ bool IccLichKingAddsAction::Execute(Event event)
                           ICC_LICH_KING_ADDS_POSITION.GetPositionY(), ICC_LICH_KING_ADDS_POSITION.GetPositionZ(), bot->GetOrientation());
     }
 
-    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(72262) && bot->GetExactDist2d(boss) > 20.0f)    //quake
+    if (!boss)
+    {}
+    else if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(72262) && bot->GetExactDist2d(boss) > 20.0f)    //quake
     {
         float angle = bot->GetAngle(boss);
         float posX = bot->GetPositionX() + cos(angle) * 10.0f;
@@ -3620,8 +3622,9 @@ bool IccLichKingAddsAction::Execute(Event event)
     if (bot->getClass() == CLASS_HUNTER && closestHorror && botAI->HasAura("Enrage", closestHorror))
         return botAI->CastSpell("Tranquilizing Shot", closestHorror);
 
-    // Handle assist tanks - keep them at adds position
-    if (botAI->IsAssistTank(bot) && !boss->HealthBelowPct(71))
+    if (!boss)
+    {}
+    else if (botAI->IsAssistTank(bot) && !boss->HealthBelowPct(71))
     {
         // Actively look for any shambling/spirit/ghoul that isn't targeting us
         GuidVector targets = AI_VALUE(GuidVector, "possible targets");
@@ -3655,7 +3658,9 @@ bool IccLichKingAddsAction::Execute(Event event)
         return false;  // Stay in position and keep facing current target
     }
 
-    if (botAI->IsMelee(bot) && !botAI->IsAssistTank(bot) && !boss->HealthBelowPct(71) && !hasPlague)
+    if (!boss)
+    {}
+    else if (botAI->IsMelee(bot) && !botAI->IsAssistTank(bot) && !boss->HealthBelowPct(71) && !hasPlague)
     {
         float currentDist = bot->GetDistance(ICC_LICH_KING_MELEE_POSITION);
         if (currentDist > 2.0f)
@@ -3666,7 +3671,9 @@ bool IccLichKingAddsAction::Execute(Event event)
         }
     }
 
-    if (botAI->IsRanged(bot) && !boss->HealthBelowPct(71) && !hasPlague && !(diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC))
+    if (!boss)
+    {}
+    else if (botAI->IsRanged(bot) && !boss->HealthBelowPct(71) && !hasPlague && !(diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC))
     {
         float currentDist = bot->GetDistance(ICC_LICH_KING_RANGED_POSITION);
         if (currentDist > 2.0f)
@@ -3676,7 +3683,7 @@ bool IccLichKingAddsAction::Execute(Event event)
                           false, false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
         }
     }
-    
+
     std::vector<Unit*> defiles;
     Unit* closestDefile = nullptr;
     float closestDistance = std::numeric_limits<float>::max();
@@ -3745,7 +3752,9 @@ bool IccLichKingAddsAction::Execute(Event event)
         }
 
         // If we need to move, find the safest direction
-        if (needToMove)
+        if (!boss)
+        {}
+        else if (needToMove)
         {
             // Try 16 different angles for more precise movement
             for (int i = 0; i < 16; i++)
@@ -3810,7 +3819,9 @@ bool IccLichKingAddsAction::Execute(Event event)
     }
 
     // Check if LK is casting Defile - make bots spread
-    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(72762))
+    if (!boss)
+    {}
+    else if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(72762))
     {
         uint32 playerCount = 0;
         uint32 botIndex = 0;
