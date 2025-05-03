@@ -122,10 +122,17 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         std::string key = args;
 
-        PlayerbotMgr::HandleSetSecurityKeyCommand(player, key);
-        handler->PSendSysMessage("Security key set successfully.");
-
-        return true;
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleSetSecurityKeyCommand(player, key);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
     }
 
     static bool HandleLinkAccountCommand(ChatHandler* handler, char const* args)
@@ -143,23 +150,41 @@ public:
         }
 
         Player* player = handler->GetSession()->GetPlayer();
-        PlayerbotMgr::HandleLinkAccountCommand(player, accountName, key);
 
-        return true;
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleLinkAccountCommand(player, accountName, key);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
     }
 
     static bool HandleViewLinkedAccountsCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
-        PlayerbotMgr::HandleViewLinkedAccountsCommand(player);
 
-        return true;
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleViewLinkedAccountsCommand(player);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
     }
 
     static bool HandleUnlinkAccountCommand(ChatHandler* handler, char const* args)
     {
         if (!args || !*args)
-        return false;
+            return false;
 
         char* accountName = strtok((char*)args, " ");
         if (!accountName)
@@ -169,9 +194,18 @@ public:
         }
 
         Player* player = handler->GetSession()->GetPlayer();
-        PlayerbotMgr::HandleUnlinkAccountCommand(player, accountName);
 
-        return true;
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleUnlinkAccountCommand(player, accountName);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
     }
 };
 
