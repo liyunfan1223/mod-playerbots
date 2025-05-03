@@ -12,6 +12,8 @@ void WotlkDungeonToCStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("toc mount", ACTION_RAID + 4), nullptr)));
     triggers.push_back(new TriggerNode("toc mounted",
         NextAction::array(0, new NextAction("toc mounted", ACTION_RAID + 6), nullptr)));
+    triggers.push_back(new TriggerNode("toc eadric",
+        NextAction::array(0, new NextAction("toc eadric", ACTION_RAID + 3), nullptr)));
 
 }
 

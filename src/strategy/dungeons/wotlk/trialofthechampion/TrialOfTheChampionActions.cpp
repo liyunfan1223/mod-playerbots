@@ -245,3 +245,23 @@ bool ToCMountAction::EnterVehicle(Unit* vehicleBase, bool moveIfFar)
     return true;
 }
 
+bool ToCEadricAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "eadric the pure");
+    if (!boss)
+        return false;
+
+    // If Eadric is casting Radiance, face the opposite direction
+    if (boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_RADIANCE))
+    {
+        // Calculate the opposite direction
+        float angle = bot->GetAngle(boss);
+        float newAngle = Position::NormalizeOrientation(angle + M_PI);  // Add 180 degrees (PI radians)
+
+        // Set the bot's orientation to face away from Eadric
+        bot->SetFacingTo(newAngle);
+        return true;
+    }
+
+    return false;
+}

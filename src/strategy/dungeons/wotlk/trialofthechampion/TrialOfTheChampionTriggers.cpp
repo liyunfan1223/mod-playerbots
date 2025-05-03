@@ -74,4 +74,12 @@ bool ToCMountNearTrigger::IsActive()
     return true;
 }
 
+bool ToCEadricTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "eadric the pure");
+    if (!boss)
+        return false;
+
+    return true;
+}
 

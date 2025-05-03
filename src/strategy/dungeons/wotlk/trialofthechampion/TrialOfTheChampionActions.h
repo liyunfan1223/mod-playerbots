@@ -49,4 +49,11 @@ public:
     bool EnterVehicle(Unit* vehicleBase, bool moveIfFar);
 };
 
+class ToCEadricAction : public MovementAction
+{
+public:
+    ToCEadricAction(PlayerbotAI* botAI, std::string const name = "toc eadric")
+        : MovementAction(botAI, name) {}
+    bool Execute(Event event) override;
+};
 #endif

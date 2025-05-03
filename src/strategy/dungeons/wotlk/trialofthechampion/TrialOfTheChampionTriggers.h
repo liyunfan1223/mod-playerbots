@@ -10,17 +10,25 @@ enum TocC_IDs
 {
     // Spells
 
+    // Horse
     SPELL_DEFEND                    = 66482,
+
+    //Eadric
+    SPELL_RADIANCE                  = 66935,
+
 
     // Objects
     OBJECT_LANCE_RACK               = 196398,
 
+
     // Items
     ITEM_LANCE                      = 46106,
+
 
     // Vehicles
     NPC_ARGENT_WARHORSE             = 35644,
     NPC_ARGENT_BATTLEWORG           = 36558,
+
 
     // Horde Champions
     NPC_MOKRA                       = 35572,
@@ -29,12 +37,14 @@ enum TocC_IDs
     NPC_ZULTORE                     = 35570,
     NPC_VISCERI                     = 35617,
 
+
     // Alliance Champions
     NPC_JACOB                       = 34705,
     NPC_AMBROSE                     = 34702,
     NPC_COLOSOS                     = 34701,
     NPC_JAELYNE                     = 34657,
     NPC_LANA                        = 34703,
+
 
     // Grand Champion Minions
     NPC_IRONFORGE_MINION            = 35329,
@@ -48,6 +58,8 @@ enum TocC_IDs
     NPC_SENJIN_MINION               = 35323,
     NPC_UNDERCITY_MINION            = 35327,
 
+
+    // Rest of the bosses and npcs
     NPC_EADRIC                      = 35119,
     NPC_EADRIC_H                    = 35518,
     NPC_PALETRESS                   = 34928,
@@ -100,6 +112,13 @@ class ToCMountNearTrigger : public Trigger
 {
 public:
     ToCMountNearTrigger(PlayerbotAI* botAI) : Trigger(botAI, "toc mount near") {}
+    bool IsActive() override;
+};
+
+class ToCEadricTrigger : public Trigger
+{
+public:
+    ToCEadricTrigger(PlayerbotAI* botAI) : Trigger(botAI, "toc eadric") {}
     bool IsActive() override;
 };
 
