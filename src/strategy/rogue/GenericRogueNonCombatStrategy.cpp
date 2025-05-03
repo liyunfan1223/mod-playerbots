@@ -16,7 +16,7 @@ public:
     }
 
 private:
-    static ActionNode* use_deadly_poison_on_off_hand(PlayerbotAI* botAI)
+    static ActionNode* use_deadly_poison_on_off_hand([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("use deadly poison on off hand",
                               /*P*/ nullptr,
