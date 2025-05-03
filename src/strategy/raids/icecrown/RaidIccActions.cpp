@@ -66,8 +66,26 @@ bool IccSpikeAction::Execute(Event event)
     Aura* bossaura = botAI->GetAura("Bone Storm", boss);
 
     if (boss->isInFront(bot) && !botAI->IsTank(bot) && !bossaura)
-        return MoveTo(bot->GetMapId(), -390.6757f, 2230.5283f, 41.99232f, false, false, false, true,
-                      MovementPriority::MOVEMENT_FORCED);
+    {
+        float distance = bot->GetExactDist2d(-390.6757f, 2230.5283f);
+        if (distance > 3.0f)
+        {
+            // Calculate direction vector
+            float dirX = -390.6757f - bot->GetPositionX();
+            float dirY = 2230.5283f - bot->GetPositionY();
+            float length = sqrt(dirX * dirX + dirY * dirY);
+            dirX /= length;
+            dirY /= length;
+
+            // Move in increments of 3.0f
+            float moveX = bot->GetPositionX() + dirX * 3.0f;
+            float moveY = bot->GetPositionY() + dirY * 3.0f;
+
+            return MoveTo(bot->GetMapId(), moveX, moveY, bot->GetPositionZ(), false, false, false, false,
+                          MovementPriority::MOVEMENT_COMBAT);
+        }
+        return false;
+    }
 
     if (!botAI->IsTank(bot))
         return false;
