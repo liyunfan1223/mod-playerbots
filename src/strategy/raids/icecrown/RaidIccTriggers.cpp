@@ -102,7 +102,14 @@ bool IccGunshipCannonNearTrigger::IsActive()
 {
     if (bot->GetVehicle())
         return false;
-    
+
+    Unit* mount1 = bot->FindNearestCreature(36838, 100.0f);
+
+    Unit* mount2 = bot->FindNearestCreature(36839, 100.0f);
+
+    if (!mount1 && !mount2)
+        return false;
+
     if (!botAI->IsDps(bot))
         return false;
     // Player* master = botAI->GetMaster();
