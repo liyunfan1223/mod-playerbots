@@ -98,13 +98,26 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
 
     bool isRndbot = !masterAccountId;
+    bool allowed = true;
+	std::ostringstream out;
+
+	if(!isRndbot)
+	{
+		time_t CurrentTime = time(nullptr);
+		if (DelayBot && (CurrentTime - DelayBot) <= 10)
+		{
+			allowed = false;
+			out << "Wait 10s to call the next bot";
+		}
+
+		DelayBot = CurrentTime;
+	}
+
     bool sameAccount = sPlayerbotAIConfig->allowAccountBots && accountId == masterAccountId;
     Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
     bool sameGuild = sPlayerbotAIConfig->allowGuildBots && guild && guild->GetMember(playerGuid); 
     bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(playerGuid.GetCounter());
 
-    bool allowed = true;
-    std::ostringstream out;
     std::string botName;
     sCharacterCache->GetCharacterNameByGuid(playerGuid, botName);
     if (!isRndbot && !sameAccount && !sameGuild && !addClassBot)
@@ -290,10 +303,33 @@ void PlayerbotMgr::CancelLogout()
     }
 }
 
-void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
+void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid, uint32 masterAccountId)
 {
     if (Player* bot = GetPlayerBot(guid))
     {
+        //Checks if the bot is in a group and removes it to avoid a possible crash
+		if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(guid))
+		{
+			if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
+			{
+				group->RemoveMember(guid);
+				group = nullptr;
+			}
+		}
+
+		uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
+		
+		if(accountId == masterAccountId)
+		{
+			time_t CurrentTime = time(nullptr);
+			if (DelayBot && (CurrentTime - DelayBot) <= 10)
+			{
+				return;
+			}
+
+			DelayBot = CurrentTime;
+		}
+
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (!botAI)
             return;
@@ -689,7 +725,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         if (!GetPlayerBot(guid))
             return "not your bot";
 
-        LogoutPlayerBot(guid);
+        LogoutPlayerBot(guid, masterAccountId);
         return "ok";
     }
 
