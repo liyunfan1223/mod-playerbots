@@ -4321,7 +4321,7 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     // #######################################################################################
 
     // Below is code to have a specified % of bots active at all times.
-    // The default is 10%. With 0.1% of all bots going active or inactive each minute.
+    // The default is 100%. With 1% of all bots going active or inactive each minute.
     uint32 mod = sPlayerbotAIConfig->botActiveAlone > 100 ? 100 : sPlayerbotAIConfig->botActiveAlone;
     if (sPlayerbotAIConfig->botActiveAloneSmartScale &&
         bot->GetLevel() >= sPlayerbotAIConfig->botActiveAloneSmartScaleWhenMinLevel &&
