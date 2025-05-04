@@ -588,10 +588,12 @@ float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
     if (!boss)
         return 1.0f;
 
+    /*
     if (!botAI->IsHeal(bot) && (dynamic_cast<CurePartyMemberAction*>(action) || dynamic_cast<CastCleanseDiseaseAction*>(action) ||
         dynamic_cast<CastCleanseDiseaseOnPartyAction*>(action) ||
         dynamic_cast<CastCleanseSpiritCurseOnPartyAction*>(action) || dynamic_cast<CastCleanseSpiritAction*>(action)))
         return 0.0f;
+    */
 
     // Handle cure actions
     if (dynamic_cast<CurePartyMemberAction*>(action) || dynamic_cast<CastCleanseDiseaseAction*>(action) ||
@@ -646,8 +648,8 @@ float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
                 return 1.0f;
             }
 
-            // Check if enough time has passed (3 seconds)
-            if (currentTime - g_plagueTimes[plaguedPlayerGuid] >= 3000)
+            // Check if enough time has passed (2,5 seconds)
+            if (currentTime - g_plagueTimes[plaguedPlayerGuid] >= 2500)
             {
                 g_allowCure[plaguedPlayerGuid] = true;
                 return 1.0f;

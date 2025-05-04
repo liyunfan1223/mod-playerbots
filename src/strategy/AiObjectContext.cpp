@@ -9,8 +9,6 @@
 #include "ChatActionContext.h"
 #include "ChatTriggerContext.h"
 #include "Playerbots.h"
-#include "RaidIccActionContext.h"
-#include "RaidIccTriggerContext.h"
 #include "RaidUlduarTriggerContext.h"
 #include "RaidUlduarActionContext.h"
 #include "SharedValueContext.h"
@@ -24,6 +22,8 @@
 #include "raids/blackwinglair/RaidBwlTriggerContext.h"
 #include "raids/naxxramas/RaidNaxxActionContext.h"
 #include "raids/naxxramas/RaidNaxxTriggerContext.h"
+#include "raids/icecrown/RaidIccActionContext.h"
+#include "raids/icecrown/RaidIccTriggerContext.h"
 #include "raids/obsidiansanctum/RaidOsActionContext.h"
 #include "raids/obsidiansanctum/RaidOsTriggerContext.h"
 #include "raids/eyeofeternity/RaidEoEActionContext.h"
@@ -75,6 +75,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new WotlkDungeonUPActionContext());
     actionContexts.Add(new WotlkDungeonCoSActionContext());
     actionContexts.Add(new WotlkDungeonFoSActionContext());
+    actionContexts.Add(new WotlkDungeonToCActionContext());
 
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
@@ -102,6 +103,7 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     triggerContexts.Add(new WotlkDungeonUPTriggerContext());
     triggerContexts.Add(new WotlkDungeonCoSTriggerContext());
     triggerContexts.Add(new WotlkDungeonFosTriggerContext());
+    triggerContexts.Add(new WotlkDungeonToCTriggerContext());
 
     valueContexts.Add(new ValueContext());
 

@@ -22,49 +22,49 @@ public:
     }
 
 private:
-    static ActionNode* melee(PlayerbotAI* botAI)
+    static ActionNode* melee([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("melee",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("mutilate"), nullptr),
                               /*C*/ nullptr);
     }
-    static ActionNode* mutilate(PlayerbotAI* botAI)
+    static ActionNode* mutilate([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("mutilate",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("sinister strike"), nullptr),
                               /*C*/ nullptr);
     }
-    static ActionNode* sinister_strike(PlayerbotAI* botAI)
+    static ActionNode* sinister_strike([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("sinister strike",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("melee"), nullptr),
                               /*C*/ nullptr);
     }
-    static ActionNode* kick(PlayerbotAI* botAI)
+    static ActionNode* kick([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("kick",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("kidney shot"), nullptr),
                               /*C*/ nullptr);
     }
-    static ActionNode* kidney_shot(PlayerbotAI* botAI)
+    static ActionNode* kidney_shot([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("kidney shot",
                               /*P*/ nullptr,
                               /*A*/ nullptr,
                               /*C*/ nullptr);
     }
-    static ActionNode* backstab(PlayerbotAI* botAI)
+    static ActionNode* backstab([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("backstab",
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("mutilate"), nullptr),
                               /*C*/ nullptr);
     }
-    static ActionNode* rupture(PlayerbotAI* botAI)
+    static ActionNode* rupture([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("rupture",
                               /*P*/ nullptr,
@@ -158,7 +158,7 @@ public:
     }
 
 private:
-    static ActionNode* ambush(PlayerbotAI* botAI)
+    static ActionNode* ambush([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("ambush",
                               /*P*/ nullptr,
@@ -166,7 +166,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* cheap_shot(PlayerbotAI* botAI)
+    static ActionNode* cheap_shot([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("cheap shot",
                               /*P*/ nullptr,
@@ -174,7 +174,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* garrote(PlayerbotAI* botAI)
+    static ActionNode* garrote([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("garrote",
                               /*P*/ nullptr,
@@ -182,7 +182,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* sap(PlayerbotAI* botAI)
+    static ActionNode* sap([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("sap",
                               /*P*/ nullptr,
@@ -190,7 +190,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* sinister_strike(PlayerbotAI* botAI)
+    static ActionNode* sinister_strike([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("sinister strike",
                               /*P*/ nullptr,
