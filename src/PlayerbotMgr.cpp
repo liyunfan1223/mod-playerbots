@@ -11,6 +11,7 @@
 #include <string>
 #include <openssl/sha.h>
 #include <unordered_set>
+#include <iomanip>
 
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
