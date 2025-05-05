@@ -6,34 +6,50 @@
 bool MoveFromBronjahmTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
+    if (!boss)
+        return false;
 
-    if (boss && boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) && bot->HasAura(SPELL_CORRUPT_SOUL))
-        return true;
+    if (!boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL))
+        return false;
 
-    return false;
+    if (!bot->HasAura(SPELL_CORRUPT_SOUL))
+        return false;
+
+    return true;
 }
 
 bool SwitchToSoulFragment::IsActive()
 {
-    Unit* fragment = nullptr;
-    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
+    if (!boss)
+        return false;
 
-    for (auto& target : targets)
-    {
-        Unit* unit = botAI->GetUnit(target);
-        if (unit && unit->GetEntry() == NPC_CORRUPTED_SOUL_FRAGMENT)
-        {
-            if (botAI->IsDps(bot))
-                return true;
-        }
-    }
+    Unit* corruptedSoul = bot->FindNearestCreature(NPC_CORRUPTED_SOUL_FRAGMENT, 50.0f);
+    bool activeSoulExists = corruptedSoul && corruptedSoul->IsAlive();
 
-    return false;
-    
+    if (!activeSoulExists)
+        return false;
+
+    return true;   
 }
 
 bool BronjahmPositionTrigger::IsActive()
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
+    if (!boss)
+        return false;
 
-    return bool(AI_VALUE2(Unit*, "find target", "bronjahm"));
+    if (bot->HasAura(SPELL_CORRUPT_SOUL))
+        return false;
+
+    return true;
+}
+
+bool DevourerOfSoulsTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "devourer of souls");
+    if (!boss)
+        return false;
+
+    return true;
 }

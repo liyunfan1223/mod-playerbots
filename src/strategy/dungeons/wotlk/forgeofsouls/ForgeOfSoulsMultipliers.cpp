@@ -15,8 +15,7 @@ float BronjahmMultiplier::GetValue(Action* action) {
     if (dynamic_cast<TankAssistAction*>(action))
         return 0.0f;
 
-    if (boss->FindCurrentSpellBySpellId(SPELL_CORRUPT_SOUL) &&
-        bot->HasAura(SPELL_CORRUPT_SOUL))
+    if (bot->HasAura(SPELL_CORRUPT_SOUL))
     {
         if (dynamic_cast<MovementAction*>(action) && !dynamic_cast<MoveFromBronjahmAction*>(action))
         {
