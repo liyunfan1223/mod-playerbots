@@ -42,6 +42,12 @@
 
 const uint64 diveMask = (1LL << 7) | (1LL << 44) | (1LL << 37) | (1LL << 38) | (1LL << 26) | (1LL << 30) | (1LL << 27) |
                         (1LL << 33) | (1LL << 24) | (1LL << 34);
+
+static std::vector<uint32> initSlotsOrder = {EQUIPMENT_SLOT_TRINKET1, EQUIPMENT_SLOT_TRINKET2, EQUIPMENT_SLOT_MAINHAND,
+    EQUIPMENT_SLOT_OFFHAND, EQUIPMENT_SLOT_RANGED, EQUIPMENT_SLOT_HEAD, EQUIPMENT_SLOT_SHOULDERS, EQUIPMENT_SLOT_CHEST,
+    EQUIPMENT_SLOT_LEGS, EQUIPMENT_SLOT_HANDS, EQUIPMENT_SLOT_NECK, EQUIPMENT_SLOT_BODY, EQUIPMENT_SLOT_WAIST,
+    EQUIPMENT_SLOT_FEET, EQUIPMENT_SLOT_WRISTS, EQUIPMENT_SLOT_FINGER1, EQUIPMENT_SLOT_FINGER2, EQUIPMENT_SLOT_BACK};
+
 uint32 PlayerbotFactory::tradeSkills[] = {SKILL_ALCHEMY,        SKILL_ENCHANTING,  SKILL_SKINNING,  SKILL_TAILORING,
                                           SKILL_LEATHERWORKING, SKILL_ENGINEERING, SKILL_HERBALISM, SKILL_MINING,
                                           SKILL_BLACKSMITHING,  SKILL_COOKING,     SKILL_FIRST_AID, SKILL_FISHING,
@@ -123,7 +129,7 @@ void PlayerbotFactory::Init()
         if (!spellInfo)
             continue;
 
-        uint32 requiredLevel = spellInfo->BaseLevel;
+        //uint32 requiredLevel = spellInfo->BaseLevel; //not used, line marked for removal.
 
         for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
         {
@@ -208,7 +214,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     // {
     //     return;
     // }
-    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"),
+    LOG_DEBUG("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"),
              bot->GetName().c_str(), level, bot->getClass());
     // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
@@ -491,6 +497,7 @@ void PlayerbotFactory::Refresh()
     InitSpecialSpells();
     InitMounts();
     InitKeyring();
+    InitPotions();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
     {
         ApplyEnchantAndGemsNew();
@@ -963,7 +970,7 @@ void PlayerbotFactory::ClearSpells()
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         uint32 spellId = itr->first;
-        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        //const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId); //not used, line marked for removal.
         if (itr->second->State == PLAYERSPELL_REMOVED)
         {
             continue;
@@ -1594,8 +1601,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
     int32 delta = std::min(blevel, 10u);
 
     StatsWeightCalculator calculator(bot);
-    // Reverse order may work better
-    for (int32 slot = (int32)EQUIPMENT_SLOT_TABARD; slot >= (int32)EQUIPMENT_SLOT_START; slot--)
+    for (int32 slot : initSlotsOrder)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
             continue;
@@ -1603,10 +1609,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         if (level < 50 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
             continue;
 
-        if (level < 30 && slot == EQUIPMENT_SLOT_NECK)
-            continue;
-
-        if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
+        if (level < 30 && (slot == EQUIPMENT_SLOT_NECK || slot == EQUIPMENT_SLOT_HEAD))
             continue;
 
         if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
@@ -1626,7 +1629,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
         oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
-        uint32 desiredQuality = itemQuality;
+        int32 desiredQuality = itemQuality;
         if (urand(0, 100) < 100 * sPlayerbotAIConfig->randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
         {
             desiredQuality--;
@@ -1661,8 +1664,10 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
+                        
+                        bool shouldCheckGS = desiredQuality > ITEM_QUALITY_NORMAL;
 
-                        if (gearScoreLimit != 0 &&
+                        if (shouldCheckGS && gearScoreLimit != 0 &&
                             CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit)
                         {
                             continue;
@@ -1691,7 +1696,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                     }
                 }
             }
-        } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_NORMAL);
+        } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_POOR);
 
         std::vector<uint32>& ids = items[slot];
         if (ids.empty())
@@ -1765,7 +1770,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
     /// @todo: clean up duplicate code
     if (second_chance)
     {
-        for (int32 slot = (int32)EQUIPMENT_SLOT_TABARD; slot >= (int32)EQUIPMENT_SLOT_START; slot--)
+        for (int32 slot : initSlotsOrder)
         {
             if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
                 continue;
@@ -1773,17 +1778,15 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             if (level < 50 && (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2))
                 continue;
 
-            if (level < 30 && slot == EQUIPMENT_SLOT_NECK)
-                continue;
-
-            if (level < 25 && slot == EQUIPMENT_SLOT_HEAD)
+            if (level < 30 && (slot == EQUIPMENT_SLOT_NECK || slot == EQUIPMENT_SLOT_HEAD))
                 continue;
 
             if (level < 20 && (slot == EQUIPMENT_SLOT_FINGER1 || slot == EQUIPMENT_SLOT_FINGER2))
                 continue;
-            
+
             if (level < 5 && (slot != EQUIPMENT_SLOT_MAINHAND) && (slot != EQUIPMENT_SLOT_OFFHAND) &&
-                (slot != EQUIPMENT_SLOT_FEET) && (slot != EQUIPMENT_SLOT_LEGS) && (slot != EQUIPMENT_SLOT_CHEST))
+                (slot != EQUIPMENT_SLOT_FEET) && (slot != EQUIPMENT_SLOT_LEGS) && (slot != EQUIPMENT_SLOT_CHEST) &&
+                (slot != EQUIPMENT_SLOT_RANGED))
                 continue;
 
             if (Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
@@ -2194,18 +2197,36 @@ void PlayerbotFactory::UpdateTradeSkills()
 
 void PlayerbotFactory::InitSkills()
 {
-    uint32 maxValue = level * 5;
+    //uint32 maxValue = level * 5; //not used, line marked for removal.
     bot->UpdateSkillsForLevel();
 
-    bot->SetSkill(SKILL_RIDING, 0, 0, 0);
+    auto SafeLearn = [this](uint32 spellId)
+    {
+        if (!bot->HasSpell(spellId))
+            bot->learnSpell(spellId, false, true); // Avoid duplicate attempts in DB
+    };
+
+    // Define Riding skill according to level
+    if (bot->GetLevel() >= 70)
+        bot->SetSkill(SKILL_RIDING, 300, 300, 300);
+    else if (bot->GetLevel() >= 60)
+        bot->SetSkill(SKILL_RIDING, 225, 225, 225);
+    else if (bot->GetLevel() >= 40)
+        bot->SetSkill(SKILL_RIDING, 150, 150, 150);
+    else if (bot->GetLevel() >= 20)
+        bot->SetSkill(SKILL_RIDING, 75, 75, 75);
+    else
+        bot->SetSkill(SKILL_RIDING, 0, 0, 0);
+    
+    // Safe learning of mount spells
     if (bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
-        bot->learnSpell(33388);
+        SafeLearn(33388); // Apprentice
     if (bot->GetLevel() >= sPlayerbotAIConfig->useFastGroundMountAtMinLevel)
-        bot->learnSpell(33391);
+        SafeLearn(33391); // Journeyman
     if (bot->GetLevel() >= sPlayerbotAIConfig->useFlyMountAtMinLevel)
-        bot->learnSpell(34090);
+        SafeLearn(34090); // Expert
     if (bot->GetLevel() >= sPlayerbotAIConfig->useFastFlyMountAtMinLevel)
-        bot->learnSpell(34091);
+        SafeLearn(34091); // Artisan
 
     uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;
@@ -2305,6 +2326,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_CROSSBOWS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
+            SetRandomSkill(SKILL_LOCKPICKING);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, 1, 1);
             bot->SetCanDualWield(true);
             break;
@@ -2350,7 +2372,7 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 
     // uint32 value = urand(maxValue - level, maxValue);
     uint32 value = maxValue;
-    uint32 curValue = bot->GetSkillValue(id);
+    //uint32 curValue = bot->GetSkillValue(id); //not used, line marked for removal.
 
     uint16 step = bot->GetSkillValue(id) ? bot->GetSkillStep(id) : 1;
 
@@ -3320,7 +3342,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
     {
-        uint32 itemId = i->first;
+        //uint32 itemId = i->first; //not used, line marked for removal.
         ItemTemplate const* proto = &i->second;
         if (!proto)
             continue;
@@ -3420,9 +3442,9 @@ void PlayerbotFactory::InitGlyphs(bool increment)
                 ids.push_back(id);
             }
 
-            int maxCount = urand(0, 3);
-            int count = 0;
-            bool found = false;
+            //int maxCount = urand(0, 3); //not used, line marked for removal.
+            //int count = 0; //not used, line marked for removal.
+            //bool found = false; //not used, line marked for removal.
             for (int attempts = 0; attempts < 15; ++attempts)
             {
                 uint32 index = urand(0, ids.size() - 1);
@@ -3440,7 +3462,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
                                                 ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
 
                 bot->SetGlyph(realSlot, id, true);
-                found = true;
+                //found = true; //not used, line marked for removal.
                 break;
             }
         }
@@ -3487,7 +3509,7 @@ void PlayerbotFactory::InitInventorySkill()
 
 Item* PlayerbotFactory::StoreItem(uint32 itemId, uint32 count)
 {
-    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+    //ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId); //not used, line marked for removal.
     ItemPosCountVec sDest;
     InventoryResult msg = bot->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, itemId, count);
     if (msg != EQUIP_ERR_OK)
@@ -3910,8 +3932,8 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
 
 void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
 {
-    int32 bestGemEnchantId[4] = {-1, -1, -1, -1};  // 1, 2, 4, 8 color
-    float bestGemScore[4] = {0, 0, 0, 0};
+    //int32 bestGemEnchantId[4] = {-1, -1, -1, -1};  // 1, 2, 4, 8 color //not used, line marked for removal.
+    //float bestGemScore[4] = {0, 0, 0, 0}; //not used, line marked for removal.
     std::vector<uint32> curCount = GetCurrentGemsCount();
     uint8 jewelersCount = 0;
     int requiredActive = 2;
@@ -3966,6 +3988,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         {
             continue;
         }
+        
+        if (item->GetTemplate() && item->GetTemplate()->Quality < ITEM_QUALITY_UNCOMMON)
+            continue;
         int32 bestEnchantId = -1;
         float bestScore = 0;
         for (const uint32& enchantSpell : enchantSpellIdCache)
@@ -4067,7 +4092,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
                 if (!enchant_id)
                     continue;
 
-                SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                //SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id); //not used, line marked for removal.
                 StatsWeightCalculator calculator(bot);
                 float score = calculator.CalculateEnchant(enchant_id);
                 if (curCount[0] != 0)
@@ -4278,6 +4303,9 @@ void PlayerbotFactory::IterateItemsInBank(IterateItemsVisitor* visitor)
 void PlayerbotFactory::InitKeyring()
 {
     if (!bot)
+        return;
+    
+    if (bot->GetLevel() < 70)
         return;
 
     ReputationMgr& repMgr = bot->GetReputationMgr(); // Reference, use . instead of ->

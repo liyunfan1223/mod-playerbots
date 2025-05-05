@@ -28,7 +28,7 @@ uint32 g_lastPlagueTime = 0;
 bool g_plagueAllowedToCure = false;
 std::map<ObjectGuid, uint32> g_plagueTimes;
 std::map<ObjectGuid, bool> g_allowCure;
-std::mutex g_plagueMutex;  // Add mutex for thread safety
+std::mutex g_plagueMutex;  // Lock before accessing shared variables
 }
 
 
@@ -74,33 +74,6 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
         }
     }
 
-    if (botAI->IsDps(bot))
-    {
-        GuidVector targets = AI_VALUE(GuidVector, "possible targets");
-        bool hasAdds = false;
-        for (auto& guid : targets)
-        {
-            Unit* unit = botAI->GetUnit(guid);
-            if (unit && unit->IsAlive() && (
-                unit->GetEntry() == 38508 || //blood beast
-                unit->GetEntry() == 38596 || 
-                unit->GetEntry() == 38597 || 
-                unit->GetEntry() == 38598))
-            {
-                hasAdds = true;
-                break;
-            }
-        }
-
-        if (hasAdds && !botAI->IsMainTank(bot))
-        {
-            if (dynamic_cast<IccAddsDbsAction*>(action))
-                return 2.0f;
-            else if (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) || 
-                    dynamic_cast<CombatFormationMoveAction*>(action) || dynamic_cast<FollowAction*>(action))
-                return 0.0f;
-        }
-    }
     return 1.0f;
 }
 
@@ -604,22 +577,28 @@ float IccSindragosaFrostBombMultiplier::GetValue(Action* action)
     else if (dynamic_cast<CombatFormationMoveAction*>(action) || 
              dynamic_cast<IccSindragosaTankPositionAction*>(action)
              || dynamic_cast<IccSindragosaBlisteringColdAction*>(action)
-             || dynamic_cast<FollowAction*>(action) || dynamic_cast<AttackAction*>(action))
+             || dynamic_cast<FollowAction*>(action))
         return 0.0f;    
     return 1.0f;
 }
 
 float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
 {
-    // Allow plague movement action to proceed
-    if (dynamic_cast<IccLichKingNecroticPlagueAction*>(action))
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
+    if (!boss)
         return 1.0f;
-    // Block combat formation and cure actions by default
-    else if (dynamic_cast<CombatFormationMoveAction*>(action))
+
+    /*
+    if (!botAI->IsHeal(bot) && (dynamic_cast<CurePartyMemberAction*>(action) || dynamic_cast<CastCleanseDiseaseAction*>(action) ||
+        dynamic_cast<CastCleanseDiseaseOnPartyAction*>(action) ||
+        dynamic_cast<CastCleanseSpiritCurseOnPartyAction*>(action) || dynamic_cast<CastCleanseSpiritAction*>(action)))
         return 0.0f;
+    */
 
     // Handle cure actions
-    if (dynamic_cast<CurePartyMemberAction*>(action))
+    if (dynamic_cast<CurePartyMemberAction*>(action) || dynamic_cast<CastCleanseDiseaseAction*>(action) ||
+        dynamic_cast<CastCleanseDiseaseOnPartyAction*>(action) ||
+        dynamic_cast<CastCleanseSpiritCurseOnPartyAction*>(action) || dynamic_cast<CastCleanseSpiritAction*>(action))
     {
         Group* group = bot->GetGroup();
         if (!group)
@@ -627,6 +606,7 @@ float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
 
         // Check if any bot in the group has plague
         bool anyBotHasPlague = false;
+        ObjectGuid plaguedPlayerGuid;  // Track who has plague
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             if (Player* member = ref->GetSource())
@@ -634,6 +614,7 @@ float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
                 if (botAI->HasAura("Necrotic Plague", member))
                 {
                     anyBotHasPlague = true;
+                    plaguedPlayerGuid = member->GetGUID();  // Changed from GetObjectGuid()
                     break;
                 }
             }
@@ -644,34 +625,43 @@ float IccLichKingNecroticPlagueMultiplier::GetValue(Action* action)
         // Reset state if no one has plague
         if (!anyBotHasPlague)
         {
-            g_lastPlagueTime = 0;
-            g_plagueAllowedToCure = false;
+            std::lock_guard<std::mutex> lock(g_plagueMutex);  // Properly initialized
+            g_plagueTimes.clear();
+            g_allowCure.clear();
             return 1.0f;
         }
 
-        // Start timer if this is a new plague
-        if (g_lastPlagueTime == 0)
-        {
-            g_lastPlagueTime = currentTime;
-            g_plagueAllowedToCure = false;
-            return 0.0f;
-        }
+        {                                                     // New scope for lock_guard
+            std::lock_guard<std::mutex> lock(g_plagueMutex);  // Properly initialized
 
-        // Once we allow cure, keep allowing it until plague is gone
-        if (g_plagueAllowedToCure)
-        {
-            return 1.0f;
-        }
+            // Start timer if this is a new plague
+            if (g_plagueTimes.find(plaguedPlayerGuid) == g_plagueTimes.end())
+            {
+                g_plagueTimes[plaguedPlayerGuid] = currentTime;
+                g_allowCure[plaguedPlayerGuid] = false;
+                return 0.0f;
+            }
 
-        // Check if enough time has passed (3,5 seconds)
-        if (currentTime - g_lastPlagueTime >= 3500)
-        {
-            g_plagueAllowedToCure = true;
-            return 1.0f;
-        }
+            // Once we allow cure, keep allowing it until plague is gone
+            if (g_allowCure[plaguedPlayerGuid])
+            {
+                return 1.0f;
+            }
+
+            // Check if enough time has passed (2,5 seconds)
+            if (currentTime - g_plagueTimes[plaguedPlayerGuid] >= 2500)
+            {
+                g_allowCure[plaguedPlayerGuid] = true;
+                return 1.0f;
+            }
+        }  // lock_guard is automatically released here
 
         return 0.0f;
     }
+
+    // Block combat formation actions by default
+    if (dynamic_cast<CombatFormationMoveAction*>(action))
+        return 0.0f;
 
     return 1.0f;
 }
@@ -696,8 +686,6 @@ float IccLichKingAddsMultiplier::GetValue(Action* action)
 
         return 1.0f;
     }
-
-    //melee reach, spell reach, ranged reach
 
     if (botAI->IsRanged(bot))
     {

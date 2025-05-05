@@ -56,35 +56,35 @@ private:
                               /*A*/ nullptr,
                               /*C*/ nullptr);
     }
-    static ActionNode* regrowth_on_party(PlayerbotAI* ai)
+    static ActionNode* regrowth_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("regrowth on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                               /*A*/ NULL,
                               /*C*/ NULL);
     }
-    static ActionNode* rejuvenation_on_party(PlayerbotAI* ai)
+    static ActionNode* rejuvenation_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("rejuvenation on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                               /*A*/ NULL,
                               /*C*/ NULL);
     }
-    static ActionNode* remove_curse_on_party(PlayerbotAI* ai)
+    static ActionNode* remove_curse_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("remove curse on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                               /*A*/ NULL,
                               /*C*/ NULL);
     }
-    static ActionNode* abolish_poison_on_party(PlayerbotAI* ai)
+    static ActionNode* abolish_poison_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("abolish poison on party",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),
                               /*A*/ NULL,
                               /*C*/ NULL);
     }
-    static ActionNode* revive(PlayerbotAI* ai)
+    static ActionNode* revive([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("revive",
                               /*P*/ NextAction::array(0, new NextAction("caster form"), nullptr),

@@ -129,6 +129,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     stats_weights_[STATS_TYPE_STAMINA] += 0.1f;
     stats_weights_[STATS_TYPE_ARMOR] += 0.001f;
     stats_weights_[STATS_TYPE_BONUS] += 1.0f;
+    stats_weights_[STATS_TYPE_MELEE_DPS] += 0.01f;
 
     if (cls == CLASS_HUNTER && (tab == HUNTER_TAB_BEASTMASTER || tab == HUNTER_TAB_SURVIVAL))
     {
@@ -656,7 +657,7 @@ void StatsWeightCalculator::ApplyWeightFinetune(Player* player)
     {
         if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
         {
-            float armor_penetration_current, armor_penetration_overflow;
+            float armor_penetration_current/*, armor_penetration_overflow*/; //not used, line marked for removal.
             armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
             if (armor_penetration_current > 50)
                 stats_weights_[STATS_TYPE_ARMOR_PENETRATION] *= 1.2f;

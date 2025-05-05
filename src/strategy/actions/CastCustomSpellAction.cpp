@@ -47,7 +47,10 @@ bool CastCustomSpellAction::Execute(Event event)
         {
             if (!target)
                 target = botAI->GetUnit(go);
-
+            
+            if (!botAI->GetUnit(go) || !botAI->GetUnit(go)->IsInWorld())
+                continue;
+            
             chat->eraseAllSubStr(text, chat->FormatWorldobject(botAI->GetUnit(go)));
         }
 
@@ -259,7 +262,7 @@ bool CastRandomSpellAction::Execute(Event event)
     if (spellList.empty())
         return false;
 
-    bool isCast = false;
+    // bool isCast = false; //not used, line marked for removal.
 
     std::sort(spellList.begin(), spellList.end(),
               [](std::pair<uint32, std::pair<uint32, WorldObject*>> i,

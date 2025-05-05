@@ -130,6 +130,29 @@ public:
     bool isUseful() override;
 };
 
+class KologarnMarkDpsTargetAction : public Action
+{
+public:
+    KologarnMarkDpsTargetAction(PlayerbotAI* botAI) : Action(botAI, "kologarn mark dps target action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnFallFromFloorAction : public Action
+{
+public:
+    KologarnFallFromFloorAction(PlayerbotAI* botAI) : Action(botAI, "kologarn fall from floor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnRubbleSlowdownAction : public Action
+{
+public:
+    KologarnRubbleSlowdownAction(PlayerbotAI* botAI) : Action(botAI, "kologarn rubble slowdown action") {}
+    bool Execute(Event event) override;
+};
+
 class HodirBitingColdJumpAction : public MovementAction
 {
 public:
@@ -145,10 +168,19 @@ public:
     bool isUseful() override;
 };
 
-class FreyaMarkEonarsGiftAction : public MovementAction
+class FreyaMarkDpsTargetAction : public MovementAction
 {
 public:
-    FreyaMarkEonarsGiftAction(PlayerbotAI* botAI) : MovementAction(botAI, "freya mark eonars gift") {}
+    FreyaMarkDpsTargetAction(PlayerbotAI* botAI) : MovementAction(botAI, "freya mark dps target action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class FreyaMoveToHealingSporeAction : public MovementAction
+{
+public:
+    FreyaMoveToHealingSporeAction(PlayerbotAI* ai) : MovementAction(ai, "freya move to healing spore action") {}
+
     bool Execute(Event event) override;
     bool isUseful() override;
 };

@@ -10,6 +10,7 @@
 #include <istream>
 #include <string>
 #include <openssl/sha.h>
+#include <unordered_set>
 
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
@@ -34,6 +35,34 @@
 #include "BroadcastHelper.h"
 #include "PlayerbotDbStore.h"
 #include "WorldSessionMgr.h"
+
+class BotInitGuard
+{
+public:
+    BotInitGuard(ObjectGuid guid) : guid(guid), active(false)
+    {
+        if (!botsBeingInitialized.contains(guid))
+        {
+            botsBeingInitialized.insert(guid);
+            active = true;
+        }
+    }
+
+    ~BotInitGuard()
+    {
+        if (active)
+            botsBeingInitialized.erase(guid);
+    }
+
+    bool IsLocked() const { return !active; }
+
+private:
+    ObjectGuid guid;
+    bool active;
+    static std::unordered_set<ObjectGuid> botsBeingInitialized;
+};
+
+std::unordered_set<ObjectGuid> BotInitGuard::botsBeingInitialized;
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
 class PlayerbotLoginQueryHolder : public LoginQueryHolder
@@ -118,18 +147,10 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
 
     botLoading.insert(playerGuid);
 
-    if (WorldSession* masterSession = sWorldSessionMgr->FindSession(masterAccountId))
-    {
-        masterSession->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder))
-            .AfterComplete([this](SQLQueryHolderBase const& holder)
-                           { HandlePlayerBotLoginCallback(static_cast<PlayerbotLoginQueryHolder const&>(holder)); });
-    }
-    else
-    {
-        sWorld->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder))
-            .AfterComplete([this](SQLQueryHolderBase const& holder)
-                           { HandlePlayerBotLoginCallback(static_cast<PlayerbotLoginQueryHolder const&>(holder)); });
-    }
+    // Always login in with world session to avoid race condition
+    sWorld->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder))
+        .AfterComplete([this](SQLQueryHolderBase const& holder)
+                        { HandlePlayerBotLoginCallback(static_cast<PlayerbotLoginQueryHolder const&>(holder)); });
 }
 
 bool PlayerbotHolder::IsAccountLinked(uint32 accountId, uint32 linkedAccountId)
@@ -292,7 +313,7 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
             sPlayerbotDbStore->Save(botAI);
         }
 
-        LOG_INFO("playerbots", "Bot {} logging out", bot->GetName().c_str());
+        LOG_DEBUG("playerbots", "Bot {} logging out", bot->GetName().c_str());
         bot->SaveToDB(false, false);
 
         WorldSession* botWorldSessionPtr = bot->GetSession();
@@ -560,12 +581,15 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     bot->SaveToDB(false, false);
     bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(bot->GetGUID().GetCounter());
-    if (addClassBot && master && isRandomAccount && master->GetLevel() < bot->GetLevel())
+    if (addClassBot && master && isRandomAccount && abs((int)master->GetLevel() - (int)bot->GetLevel()) > 3)
     {
         // PlayerbotFactory factory(bot, master->GetLevel());
         // factory.Randomize(false);
         uint32 mixedGearScore =
             PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+        // work around: distinguish from 0 if no gear
+        if (mixedGearScore == 0)
+            mixedGearScore = 1;
         PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
         factory.Randomize(false);
     }
@@ -643,9 +667,9 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         return "bot system is disabled";
 
     uint32 botAccount = sCharacterCache->GetCharacterAccountIdByGuid(guid);
-    bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(guid.GetCounter());
-    bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(botAccount);
-    bool isMasterAccount = (masterAccountId == botAccount);
+    //bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(guid.GetCounter()); //not used, line marked for removal.
+    //bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(botAccount); //not used, shadowed, line marked for removal.
+    //bool isMasterAccount = (masterAccountId == botAccount); //not used, line marked for removal.
 
     if (cmd == "add" || cmd == "addaccount" || cmd == "login")
     {
@@ -713,6 +737,14 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             {
                 return "The command is not allowed, use init=auto instead.";
             }
+
+            //  Use boot guard
+            BotInitGuard guard(bot->GetGUID());
+            if (guard.IsLocked())
+            {
+                return "Initialization already in progress, please wait.";
+            }
+
             int gs;
             if (cmd == "init=white" || cmd == "init=common")
             {
@@ -748,6 +780,9 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             {
                 uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) *
                                         sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+                // work around: distinguish from 0 if no gear
+                if (mixedGearScore == 0)
+                    mixedGearScore = 1;
                 PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
                 factory.Randomize(false);
                 return "ok, gear score limit: " + std::to_string(mixedGearScore / PlayerbotAI::GetItemScoreMultiplier(ItemQualities(ITEM_QUALITY_EPIC))) +
@@ -1069,6 +1104,11 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         else
         {
             messages.push_back("Error: Invalid Class. Try again.");
+            return messages;
+        }
+        if (claz == 6 && master->GetLevel() < sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL))
+        {
+            messages.push_back("Your level is too low to summon Deathknight");
             return messages;
         }
         uint8 teamId = master->GetTeamId(true);

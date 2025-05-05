@@ -25,25 +25,7 @@ bool IccSpikeNearTrigger::IsActive()
     if (!boss) 
         return false;
 
-    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-    for (auto& npc : npcs)
-    {
-        Unit* unit = botAI->GetUnit(npc);
-        if (unit)
-        {
-            if (unit->GetEntry() == 36619 || unit->GetEntry() == 38711 || unit->GetEntry() == 38712 ) //spike ID
-            {
-                if (unit->GetDistance(bot) <= 20.0f)
-                {
-                    return botAI->IsDps(bot);
-                }
-    
-                return botAI->IsRangedDps(bot);
-            }
-        }
-    }
-
-    return false;
+    return true;
 }
 
 //Lady Deathwhisper
@@ -120,7 +102,14 @@ bool IccGunshipCannonNearTrigger::IsActive()
 {
     if (bot->GetVehicle())
         return false;
-    
+
+    Unit* mount1 = bot->FindNearestCreature(36838, 100.0f);
+
+    Unit* mount2 = bot->FindNearestCreature(36839, 100.0f);
+
+    if (!mount1 && !mount2)
+        return false;
+
     if (!botAI->IsDps(bot))
         return false;
     // Player* master = botAI->GetMaster();
@@ -135,16 +124,24 @@ bool IccGunshipCannonNearTrigger::IsActive()
 
 bool IccGunshipTeleportAllyTrigger::IsActive()
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "kor'kron battle-mage");
-    if (!boss) { return false; }
+    Unit* boss = bot->FindNearestCreature(36939, 100.0f);
+    if (!boss)
+        return false;
+
+    if (!boss->IsHostileTo(bot))
+        return false;
 
     return true;
 }
 
 bool IccGunshipTeleportHordeTrigger::IsActive()
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "skybreaker sorcerer");
-    if (!boss) { return false; }
+    Unit* boss = bot->FindNearestCreature(36948, 100.0f);
+    if (!boss)
+        return false;
+
+    if (!boss->IsHostileTo(bot))
+        return false;
 
     return true;
 }
@@ -153,7 +150,8 @@ bool IccGunshipTeleportHordeTrigger::IsActive()
 bool IccDbsTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
     return true;
 }
@@ -182,9 +180,10 @@ bool IccDbsMainTankRuneOfBloodTrigger::IsActive()
 bool IccAddsDbsTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
-    if (!boss) { return false; }
+    if (!boss)
+        return false;
 
-     return true;
+    return true;
 }
 
 //DOGS
@@ -302,23 +301,25 @@ bool IccRotfaceMoveAwayFromExplosionTrigger::IsActive()
 
 bool IccPutricideGrowingOozePuddleTrigger::IsActive()
 {
+    // Early return if boss doesn't exist
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    bool botHasAura = botAI->HasAura("Gaseous Bloat", bot) || botAI->HasAura("Volatile Ooze Adhesive", bot);
-    
-    if (!boss || botHasAura) 
+    if (!boss)
         return false;
 
-    // Check for nearby growing ooze puddles (37690) and slime puddles (70341)
-    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-    for (auto& npc : npcs)
-    {
-        Unit* unit = botAI->GetUnit(npc);
-        if (!unit)
-            continue;
+    // Early return if bot has debuffs that would make movement dangerous
+    if (botAI->HasAura("Gaseous Bloat", bot) || botAI->HasAura("Volatile Ooze Adhesive", bot))
+        return false;
 
-        uint32 entry = unit->GetEntry();
-        if (entry == 37690 || entry == 70341)  // Growing Ooze Puddle or Slime Puddle
+    // Check for nearby dangerous puddles
+    static const uint32 PUDDLE_IDS[] = {37690, 70341};  // Growing Ooze Puddle, Slime Puddle
+
+    const GuidVector& npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (const auto& npc : npcs)
+    {
+        if (Unit* unit = botAI->GetUnit(npc))
         {
+            const uint32 entry = unit->GetEntry();
+            if (entry == PUDDLE_IDS[0] || entry == PUDDLE_IDS[1])
                 return true;
         }
     }
@@ -490,15 +491,47 @@ bool IccBpcEmpoweredVortexTrigger::IsActive()
 
 bool IccBpcKineticBombTrigger::IsActive()
 {
-    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+    Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
+    Unit* keleseth = AI_VALUE2(Unit*, "find target", "prince keleseth");
 
-    Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
-    if (aura)
+   if (!(valanar || taldaram || keleseth))
+        return false;
+
+    // Early exit condition - if Shadow Prison has too many stacks
+    if (Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true))
+    {
         if (aura->GetStackAmount() > 12)
             return false;
+    }
 
-    // Check for hunters first
-    bool hasHunter = false;
+    // Check for kinetic bombs
+    const GuidVector& npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    bool bombFound = false;
+
+    for (const auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (!unit || unit->GetName() != "Kinetic Bomb")
+            continue;
+
+        // Check if bomb is within valid Z-axis range
+        if (unit->GetPositionZ() - bot->GetPositionZ() < 25.0f)
+        {
+            bombFound = true;
+            break;
+        }
+    }
+
+    // If no bomb is found, no need to handle it
+    if (!bombFound)
+        return false;
+
+    // Check if the bot should handle the bomb
+    if (bot->getClass() == CLASS_HUNTER)
+        return true;  // Hunters always handle bombs
+
+    // If not a hunter, check if there are hunters in the group
     Group* group = bot->GetGroup();
     if (group)
     {
@@ -506,30 +539,12 @@ bool IccBpcKineticBombTrigger::IsActive()
         {
             Player* member = itr->GetSource();
             if (member && member->getClass() == CLASS_HUNTER && member->IsAlive())
-            {
-                hasHunter = true;
-                break;
-            }
+                return false;  // Let the hunter handle it
         }
     }
 
-    for (auto& npc : npcs)
-    {
-        Unit* unit = botAI->GetUnit(npc);
-        if (unit && unit->GetName() == "Kinetic Bomb" && 
-            ((unit->GetPositionZ() - bot->GetPositionZ()) < 25.0f))
-        {
-            if (hasHunter)
-            {
-                return bot->getClass() == CLASS_HUNTER; // Only hunters can handle bombs
-            }
-            else if (botAI->IsRangedDps(bot))
-            {
-                return true; // If no hunters, any ranged DPS can handle bombs
-            }
-        }
-    }
-    return false;
+    // If no hunters are available, any ranged DPS should handle bombs
+    return botAI->IsRangedDps(bot);
 }
 
  //BQL
@@ -545,9 +560,11 @@ bool IccBqlTankPositionTrigger::IsActive()
 bool IccBqlPactOfDarkfallenTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
+    if (!boss)
+        return false;
 
     Aura* aura = botAI->GetAura("Pact of the Darkfallen", bot);
-    if (!boss || !aura) 
+    if (!aura) 
         return false;
 
     return true;
@@ -866,6 +883,10 @@ bool IccSindragosaMainTankMysticBuffetTrigger::IsActive()
     if (!boss)
         return false;
 
+    Aura* aura = botAI->GetAura("mystic buffet", bot, false, false);
+    if (botAI->IsTank(bot) && aura) //main tank will delete mystic buffet until I find a better way to swap tanks, atm it is not great since while swapping they will wipe group 7/10 times.
+        bot->RemoveAura(aura->GetId());
+
     if (botAI->IsTank(bot) && boss->GetVictim() == bot)
         return false;
 
@@ -941,6 +962,10 @@ bool IccSindragosaTankSwapPositionTrigger::IsActive()
 
 bool IccSindragosaFrostBombTrigger::IsActive()
 {
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
+    if (!boss)
+        return false;
+
     if (!bot->IsAlive() || bot->HasAura(70157))  // Skip if dead or in Ice Tomb
         return false;
 
@@ -967,7 +992,25 @@ bool IccLichKingShadowTrapTrigger::IsActive()
     if (!boss)
         return false;
 
-    return true;
+    if (boss->HealthBelowPct(70))
+        return false;
+
+    // search for all nearby traps
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    std::vector<Unit*> nearbyTraps;
+    bool needToMove = false;
+
+    for (auto& npc : npcs)
+    {
+        Unit* unit = botAI->GetUnit(npc);
+        if (!unit || !unit->IsAlive())
+            continue;
+
+        if (unit->GetEntry() == 39137)  // shadow trap
+            return true;
+    }
+
+    return false;
 }
 
 bool IccLichKingNecroticPlagueTrigger::IsActive()
@@ -1006,9 +1049,8 @@ bool IccLichKingWinterTrigger::IsActive()
 bool IccLichKingAddsTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
-    Unit* spiritWarden = AI_VALUE2(Unit*, "find target", "spirit warden");
 
-    if (!boss && !spiritWarden)  
+    if (!boss) 
         return false;
 
     return true;

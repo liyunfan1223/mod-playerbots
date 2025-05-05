@@ -225,7 +225,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
         }
     }
 
-    uint8 skinColor = skinColors[urand(0, skinColors.size() - 1)];
+    //uint8 skinColor = skinColors[urand(0, skinColors.size() - 1)]; //not used, line marked for removal.
     std::pair<uint8, uint8> face = faces[urand(0, faces.size() - 1)];
     std::pair<uint8, uint8> hair = hairs[urand(0, hairs.size() - 1)];
 
@@ -408,7 +408,7 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
         sPlayerbotAIConfig->addClassAccountPoolSize == 0)
         return 0;
 
-    bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING;
+    //bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING; //not used, line marked for removal.
 
     // Determine divisor based on WOTLK condition
     int divisor = CalculateAvailableCharsPerAccount();
@@ -981,7 +981,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams(ArenaType type, uint32 count
         sPlayerbotAIConfig->randomBotArenaTeams.push_back(arenateam->GetId());
     }
 
-    LOG_INFO("playerbots", "{} random bot {}vs{} arena teams available", arenaTeamNumber, type, type);
+    LOG_DEBUG("playerbots", "{} random bot {}vs{} arena teams available", arenaTeamNumber, type, type);
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomArenaTeamName()

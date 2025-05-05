@@ -15,28 +15,28 @@ public:
     }
 
 private:
-    static ActionNode* mutilate(PlayerbotAI* ai)
+    static ActionNode* mutilate([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("mutilate",
                               /*P*/ NULL,
                               /*A*/ NextAction::array(0, new NextAction("backstab"), nullptr),
                               /*C*/ NULL);
     }
-    static ActionNode* envenom(PlayerbotAI* ai)
+    static ActionNode* envenom([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("envenom",
                               /*P*/ NULL,
                               /*A*/ NextAction::array(0, new NextAction("rupture"), nullptr),
                               /*C*/ NULL);
     }
-    static ActionNode* backstab(PlayerbotAI* ai)
+    static ActionNode* backstab([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("backstab",
                               /*P*/ NULL,
                               /*A*/ NextAction::array(0, new NextAction("sinister strike"), nullptr),
                               /*C*/ NULL);
     }
-    static ActionNode* rupture(PlayerbotAI* botAI)
+    static ActionNode* rupture([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("rupture",
                               /*P*/ nullptr,

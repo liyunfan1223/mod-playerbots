@@ -86,7 +86,7 @@ public:
     float randomGearLoweringChance;
     int32 randomGearQualityLimit;
     int32 randomGearScoreLimit;
-    float randomBotMaxLevelChance;
+    float randomBotMinLevelChance, randomBotMaxLevelChance;
     float randomBotRpgChance;
     uint32 minRandomBots, maxRandomBots;
     uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval, randomBotCountChangeMaxInterval;
@@ -313,7 +313,7 @@ public:
     bool autoLearnQuestSpells;
     bool autoTeleportForLevel;
     bool randomBotGroupNearby;
-    bool enableRandomBotTrading;
+    int32 enableRandomBotTrading;
     uint32 tweakValue;  // Debugging config
 
     uint32 randomBotArenaTeamCount;

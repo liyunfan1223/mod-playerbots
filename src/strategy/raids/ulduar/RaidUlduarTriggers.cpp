@@ -36,11 +36,11 @@ bool FlameLeviathanVehicleNearTrigger::IsActive()
 {
     if (bot->GetVehicle())
         return false;
-    
+
     Player* master = botAI->GetMaster();
     if (!master)
         return false;
-    
+
     if (!master->GetVehicle())
         return false;
 
@@ -50,22 +50,22 @@ bool FlameLeviathanVehicleNearTrigger::IsActive()
 bool RazorscaleFlyingAloneTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
-    if (!boss) 
+    if (!boss)
     {
-        return false; 
+        return false;
     }
-    
+
     // Check if the boss is flying
     if (boss->GetPositionZ() < RazorscaleBossHelper::RAZORSCALE_FLYING_Z_THRESHOLD)
     {
-        return false; 
+        return false;
     }
 
     // Get the list of attackers
     GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
     if (attackers.empty())
     {
-        return true; // No attackers implies flying alone
+        return true;  // No attackers implies flying alone
     }
 
     std::vector<Unit*> dark_rune_adds;
@@ -80,8 +80,8 @@ bool RazorscaleFlyingAloneTrigger::IsActive()
         uint32 entry = unit->GetEntry();
 
         // Check for valid dark rune entries
-        if (entry == RazorscaleBossHelper::UNIT_DARK_RUNE_WATCHER || 
-            entry == RazorscaleBossHelper::UNIT_DARK_RUNE_GUARDIAN || 
+        if (entry == RazorscaleBossHelper::UNIT_DARK_RUNE_WATCHER ||
+            entry == RazorscaleBossHelper::UNIT_DARK_RUNE_GUARDIAN ||
             entry == RazorscaleBossHelper::UNIT_DARK_RUNE_SENTINEL)
         {
             dark_rune_adds.push_back(unit);
@@ -92,11 +92,10 @@ bool RazorscaleFlyingAloneTrigger::IsActive()
     return dark_rune_adds.empty();
 }
 
-
 bool RazorscaleDevouringFlamesTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
-    if (!boss) 
+    if (!boss)
         return false;
 
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -115,7 +114,7 @@ bool RazorscaleDevouringFlamesTrigger::IsActive()
 bool RazorscaleAvoidSentinelTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
-    if (!boss) 
+    if (!boss)
         return false;
 
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -134,7 +133,7 @@ bool RazorscaleAvoidSentinelTrigger::IsActive()
 bool RazorscaleAvoidWhirlwindTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
-    if (!boss) 
+    if (!boss)
         return false;
 
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -142,7 +141,8 @@ bool RazorscaleAvoidWhirlwindTrigger::IsActive()
     {
         Unit* unit = botAI->GetUnit(npc);
         if (unit && unit->GetEntry() == RazorscaleBossHelper::UNIT_DARK_RUNE_SENTINEL &&
-            (unit->HasAura(RazorscaleBossHelper::SPELL_SENTINEL_WHIRLWIND) || unit->GetCurrentSpell(CURRENT_CHANNELED_SPELL)))
+            (unit->HasAura(RazorscaleBossHelper::SPELL_SENTINEL_WHIRLWIND) ||
+             unit->GetCurrentSpell(CURRENT_CHANNELED_SPELL)))
         {
             return true;
         }
@@ -154,15 +154,15 @@ bool RazorscaleAvoidWhirlwindTrigger::IsActive()
 bool RazorscaleGroundedTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "razorscale");
-    if (!boss) 
+    if (!boss)
     {
-        return false; 
+        return false;
     }
-    
+
     // Check if the boss is flying
     if (boss->GetPositionZ() < RazorscaleBossHelper::RAZORSCALE_FLYING_Z_THRESHOLD)
     {
-        return true; 
+        return true;
     }
     return false;
 }
@@ -201,7 +201,7 @@ bool RazorscaleHarpoonAvailableTrigger::IsActive()
         {
             if (RazorscaleBossHelper::IsHarpoonReady(harpoonGO))
             {
-                return true; // At least one harpoon is available and ready to be fired
+                return true;  // At least one harpoon is available and ready to be fired
             }
         }
     }
@@ -277,6 +277,113 @@ bool IronAssemblyOverloadTrigger::IsActive()
            boss->HasAura(SPELL_OVERLOAD_10_MAN_2) || boss->HasAura(SPELL_OVERLOAD_25_MAN_2);
 }
 
+bool KologarnMarkDpsTargetTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Only tank bot can mark target
+    if (!botAI->IsTank(bot))
+        return false;
+
+    // Get current raid dps target
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    int8 skullIndex = 7;
+    ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
+    Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
+
+    // Check that rubble is marked
+    if (currentSkullUnit && currentSkullUnit->IsAlive() && currentSkullUnit->GetEntry() == NPC_RUBBLE)
+    {
+        return false;  // Skull marker is already set on rubble
+    }
+
+    // Check that there is rubble to mark
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target)
+            continue;
+
+        uint32 creatureId = target->GetEntry();
+        if (target->GetEntry() == NPC_RUBBLE && target->IsAlive())
+        {
+            return true;  // Found a rubble to mark
+        }
+    }
+
+    // Check that right arm is marked
+    if (currentSkullUnit && currentSkullUnit->IsAlive() && currentSkullUnit->GetEntry() == NPC_RIGHT_ARM)
+    {
+        return false;  // Skull marker is already set on right arm
+    }
+
+    // Check that there is right arm to mark
+    Unit* rightArm = AI_VALUE2(Unit*, "find target", "right arm");
+    if (rightArm && rightArm->IsAlive())
+    {
+        return true;  // Found a right arm to mark
+    }
+
+    // Check that main body is marked
+    if (currentSkullUnit && currentSkullUnit->IsAlive() && currentSkullUnit->GetEntry() == NPC_KOLOGARN)
+    {
+        return false;  // Skull marker is already set on main body
+    }
+
+    // Main body is not marked
+    return true;
+}
+
+bool KologarnFallFromFloorTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    // Check if bot is on the floor
+    return bot->GetPositionZ() < ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT;
+}
+
+bool KologarnRubbleSlowdownTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is hunter
+    if (bot->getClass() != CLASS_HUNTER)
+        return false;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    // Check that the current skull mark is set on rubble
+    int8 skullIndex = 7;
+    ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
+    Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
+    if (!currentSkullUnit || !currentSkullUnit->IsAlive() || currentSkullUnit->GetEntry() != NPC_RUBBLE)
+        return false;
+
+    if (bot->HasSpellCooldown(SPELL_FROST_TRAP))
+        return false;
+
+    return true;
+}
+
 bool HodirBitingColdTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
@@ -295,7 +402,7 @@ bool HodirBitingColdTrigger::IsActive()
            !botAI->GetAura("biting cold", master, false, false, 2);
 }
 
-//Snowpacked Icicle Target
+// Snowpacked Icicle Target
 bool HodirNearSnowpackedIcicleTrigger::IsActive()
 {
     // Check boss and it is alive
@@ -339,34 +446,185 @@ bool FreyaNearNatureBombTrigger::IsActive()
     return target != nullptr;
 }
 
-bool FreyaTankNearEonarsGiftTrigger::IsActive()
+bool FreyaMarkDpsTargetTrigger::IsActive()
 {
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "freya");
+    if (!boss || !boss->IsAlive())
+        return false;
+
     // Only tank bot can mark target
     if (!botAI->IsTank(bot))
-    {
         return false;
+
+    // Get current raid dps target
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    int8 skullIndex = 7;
+    ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
+    Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
+
+    if (currentSkullUnit && !currentSkullUnit->IsAlive())
+    {
+        currentSkullUnit = nullptr;
     }
 
-    // Check Eonar's gift and it is alive
+    // Check which adds is up
+    Unit* eonarsGift = nullptr;
+    Unit* ancientConservator = nullptr;
+    Unit* snaplasher = nullptr;
+    Unit* ancientWaterSpirit = nullptr;
+    Unit* stormLasher = nullptr;
+    Unit* firstDetonatingLasher = nullptr;
 
-    // Target is not findable from threat table using AI_VALUE2(),
-    // therefore need to search manually for the unit id
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
-
+    Unit* target = nullptr;
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
-        Unit* unit = botAI->GetUnit(*i);
-        if (!unit)
-        {
+        target = botAI->GetUnit(*i);
+        if (!target || !target->IsAlive())
             continue;
+
+        if (target->GetEntry() == NPC_EONARS_GIFT)
+        {
+            eonarsGift = target;
+        }
+        else if (target->GetEntry() == NPC_ANCIENT_CONSERVATOR)
+        {
+            ancientConservator = target;
+        }
+        else if (target->GetEntry() == NPC_SNAPLASHER)
+        {
+            snaplasher = target;
+        }
+        else if (target->GetEntry() == NPC_ANCIENT_WATER_SPIRIT)
+        {
+            ancientWaterSpirit = target;
+        }
+        else if (target->GetEntry() == NPC_STORM_LASHER)
+        {
+            stormLasher = target;
+        }
+        else if (target->GetEntry() == NPC_DETONATING_LASHER && !firstDetonatingLasher)
+        {
+            firstDetonatingLasher = target;
+        }
+    }
+
+    // Check that eonars gift is need to be mark
+    if (eonarsGift &&
+        (!currentSkullUnit || currentSkullUnit->GetEntry() != eonarsGift->GetEntry()))
+    {
+        return true;
+    }
+
+    // Check that ancient conservator is need to be mark
+    if (ancientConservator &&
+        (!currentSkullUnit || currentSkullUnit->GetEntry() != ancientConservator->GetEntry()))
+    {
+        return true;
+    }
+
+    // Check that trio of adds is need to be mark
+    if (snaplasher || ancientWaterSpirit || stormLasher)
+    {
+        Unit* highestHealthUnit = nullptr;
+        uint32 highestHealth = 0;
+
+        if (snaplasher && snaplasher->GetHealth() > highestHealth)
+        {
+            highestHealth = snaplasher->GetHealth();
+            highestHealthUnit = snaplasher;
+        }
+        if (ancientWaterSpirit && ancientWaterSpirit->GetHealth() > highestHealth)
+        {
+            highestHealth = ancientWaterSpirit->GetHealth();
+            highestHealthUnit = ancientWaterSpirit;
+        }
+        if (stormLasher && stormLasher->GetHealth() > highestHealth)
+        {
+            highestHealthUnit = stormLasher;
         }
 
-        uint32 creatureId = unit->GetEntry();
-        if (creatureId == NPC_EONARS_GIFT && unit->IsAlive())
+        // If the highest health unit is not already marked, mark it
+        if (highestHealthUnit &&
+            (!currentSkullUnit || currentSkullUnit->GetEntry() != highestHealthUnit->GetEntry()))
         {
             return true;
         }
     }
 
+    // Check that detonating lasher is need to be mark
+    if (firstDetonatingLasher &&
+        (!currentSkullUnit || currentSkullUnit->GetEntry() != firstDetonatingLasher->GetEntry()))
+    {
+        Map* map = bot->GetMap();
+        if (!map || !map->IsRaid())
+            return false;
+
+        uint32 healthThreshold = map->Is25ManRaid() ? 7200 : 4900; // Detonate maximum damage
+
+        // Check that detonate lasher dont kill raid members
+        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+        {
+            Player* member = gref->GetSource();
+            if (!member || !member->IsAlive())
+                continue;
+
+            if (member->GetHealth() < healthThreshold)
+                return false;
+        }
+
+        return true;
+    }
+
     return false;
+}
+
+bool FreyaMoveToHealingSporeTrigger::IsActive()
+{
+    // Check for the Freya boss
+    Unit* boss = AI_VALUE2(Unit*, "find target", "freya");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    if (!botAI->IsRanged(bot))
+        return false;
+
+    Unit* conservatory = AI_VALUE2(Unit*, "find target", "ancient conservator");
+    if (!conservatory || !conservatory->IsAlive())
+        return false;
+
+    
+    GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
+    float nearestDistance = std::numeric_limits<float>::max();
+    bool foundSpore = false;
+
+    // Iterate through all targets to find healthy spores
+    for (const ObjectGuid& guid : targets)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsAlive())
+            continue;
+
+        // Check if the unit is a healthy spore
+        if (unit->GetEntry() == NPC_HEALTHY_SPORE)
+        {
+            foundSpore = true;
+            float distance = bot->GetDistance(unit);
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+            }
+        }
+    }
+
+    // If no healthy spores are found, return false
+    if (!foundSpore)
+        return false;
+
+    // If the nearest spore is farther than 6 yards, a move is required
+    return nearestDistance > 6.0f;
 }
