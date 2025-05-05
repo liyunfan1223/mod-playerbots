@@ -28,6 +28,7 @@ public:
     virtual ~PlayerbotHolder(){};
 
     void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId);
+    bool IsAccountLinked(uint32 accountId, uint32 masterAccountId);
     void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder);
 
     void LogoutPlayerBot(ObjectGuid guid);
@@ -81,6 +82,11 @@ public:
     Player* GetMaster() const { return master; };
 
     void SaveToDB();
+
+    void HandleSetSecurityKeyCommand(Player* player, const std::string& key);
+    void HandleLinkAccountCommand(Player* player, const std::string& accountName, const std::string& key);
+    void HandleViewLinkedAccountsCommand(Player* player);
+    void HandleUnlinkAccountCommand(Player* player, const std::string& accountName);
 
 protected:
     void OnBotLoginInternal(Player* const bot) override;
