@@ -73,6 +73,7 @@ private:
     // normal_only = false, float step = 8.0f);
     const Movement::PointsArray SearchForBestPath(float x, float y, float z, float& modified_z, int maxSearchCount = 5,
                                                   bool normal_only = false, float step = 8.0f);
+    bool wasMovementRestricted = false;
 };
 
 class FleeAction : public MovementAction
