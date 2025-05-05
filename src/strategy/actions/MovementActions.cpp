@@ -1027,6 +1027,20 @@ void MovementAction::UpdateMovementState()
         bot->SendMovementFlagUpdate();
     }
 
+    // See if the bot is currently slowed, rooted, or otherwise unable to move
+    bool isCurrentlyRestricted = bot->isFrozen() || bot->IsPolymorphed() || bot->HasRootAura() || bot->HasStunAura() ||
+                                 bot->HasConfuseAura() || bot->HasUnitState(UNIT_STATE_LOST_CONTROL);
+
+    // Detect if movement restrictions have been lifted
+    if (wasMovementRestricted && !isCurrentlyRestricted && bot->IsAlive())
+    {
+        // CC just ended - refresh movement state to ensure animations play correctly
+        bot->SendMovementFlagUpdate();
+    }
+
+    // Save current state for the next check
+    wasMovementRestricted = isCurrentlyRestricted;
+    
     // Temporary speed increase in group
     // if (botAI->HasRealPlayerMaster()) {
     //     bot->SetSpeedRate(MOVE_RUN, 1.1f);

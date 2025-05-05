@@ -41,7 +41,7 @@
 #        MAGE
 #        WARLOCK
 #        DRUID
-#    RANDOM BOT DEFAULT TALENT SPEC 
+#    RANDOM BOT DEFAULT TALENT SPEC
 #        WARRIOR
 #        PALADIN
 #        HUNTER
@@ -54,7 +54,7 @@
 #        DRUID
 #    PLAYERBOT SYSTEM SETTINGS
 #        DATABASE & CONNECTIONS
-#        DEBUG        
+#        DEBUG
 #        CHAT SETTINGS
 #        LOGS
 #    DEPRECIATED (TEMPORARY)
@@ -131,6 +131,9 @@ AiPlayerbot.AllowAccountBots = 1
 
 # Allow/deny bots in the player's guild
 AiPlayerbot.AllowGuildBots = 1
+
+# Allow linking accounts for shared alt-bot control
+AiPlayerbot.AllowTrustedAccountBots = 1
 
 # Random bot guild count
 AiPlayerbot.RandomBotGuildCount = 20
@@ -790,7 +793,7 @@ AiPlayerbot.RandomBotAutoJoinBG = 0
 # Known issue: When enabling a lot of brackats in combination with multiple instances,
 #              can lead to more instances created by bots than intended (over-queuing).
 #
-# This section controls the level brackets and 
+# This section controls the level brackets and
 # automatic bot participation in battlegrounds and arenas.
 #
 # Brackets:
@@ -1179,7 +1182,7 @@ AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 ###################################
 
 ####################################################################################################
-# 
+#
 #
 #
 
@@ -1231,7 +1234,7 @@ AiPlayerbot.WorldBuff.0.11.3.80.80 = 53760,57358                   #DRUID FERAL 
 ###################################
 
 ####################################################################################################
-# 
+#
 #
 #
 
