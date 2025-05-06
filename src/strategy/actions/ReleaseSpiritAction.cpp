@@ -19,8 +19,14 @@ bool ReleaseSpiritAction::Execute(Event event)
 {
     if (bot->IsAlive())
     {
-        botAI->TellMasterNoFacing("I am not dead, will wait here");
-        botAI->ChangeStrategy("-follow,+stay", BOT_STATE_NON_COMBAT);
+        if (!bot->InBattleground()) 
+        {
+            botAI->TellMasterNoFacing("I am not dead, will wait here");
+            // -follow in bg is overwriten each tick with +follow
+            // +stay in bg causes stuttering effect as bot is cycled between +stay and +follow each tick
+            botAI->ChangeStrategy("-follow,+stay", BOT_STATE_NON_COMBAT);
+        }
+
         return false;
     }
 
