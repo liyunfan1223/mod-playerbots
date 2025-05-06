@@ -3,7 +3,7 @@
 #define _PLAYERRBOT_RAIDNAXXMULTIPLIERS_H_
 
 #include "Multiplier.h"
-#include "raids/naxxramas/RaidNaxxBossHelper.h"
+#include "RaidNaxxBossHelper.h"
 
 class GrobbulusMultiplier : public Multiplier
 {

@@ -1,6 +1,6 @@
 #include "RaidIccTriggers.h"
 #include "RaidIccActions.h"
-#include "strategy/values/NearestNpcsValue.h"
+#include "NearestNpcsValue.h"
 #include "PlayerbotAIConfig.h"
 #include "ObjectAccessor.h"
 #include "GenericTriggers.h"
