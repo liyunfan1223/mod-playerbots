@@ -29,10 +29,10 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("icc rotting frost giant tank position", ACTION_RAID + 5), nullptr)));
 
     triggers.push_back(new TriggerNode("icc gunship cannon near",
-        NextAction::array(0, new NextAction("icc gunship enter cannon", ACTION_RAID + 2), nullptr)));
+        NextAction::array(0, new NextAction("icc gunship enter cannon", ACTION_RAID + 6), nullptr)));
 
     triggers.push_back( new TriggerNode("icc in cannon",
-        NextAction::array(0, new NextAction("icc cannon fire", ACTION_RAID), nullptr)));
+        NextAction::array(0, new NextAction("icc cannon fire", ACTION_RAID+5), nullptr)));
 
     triggers.push_back(new TriggerNode("icc gunship teleport ally",
         NextAction::array(0, new NextAction("icc gunship teleport ally", ACTION_RAID + 4), nullptr)));
