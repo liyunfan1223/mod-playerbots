@@ -76,6 +76,18 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("kologarn fall from floor action", ACTION_RAID + 1), nullptr)));
 
     triggers.push_back(new TriggerNode(
+        "kologarn rti target trigger",
+        NextAction::array(0, new NextAction("kologarn rti target action", ACTION_RAID + 1), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "kologarn eyebeam trigger",
+        NextAction::array(0, new NextAction("kologarn eyebeam action", ACTION_RAID + 1), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "kologarn attack dps target trigger",
+        NextAction::array(0, new NextAction("attack rti target", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
         "kologarn mark dps target trigger",
         NextAction::array(0, new NextAction("kologarn mark dps target action", ACTION_RAID), nullptr)));
 
@@ -86,6 +98,10 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "kologarn rubble slowdown trigger",
         NextAction::array(0, new NextAction("kologarn rubble slowdown action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "kologarn crunch armor trigger",
+        NextAction::array(0, new NextAction("kologarn crunch armor action", ACTION_RAID), nullptr)));
 
     //
     // Hodir
