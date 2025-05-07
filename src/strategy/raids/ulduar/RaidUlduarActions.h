@@ -153,6 +153,30 @@ public:
     bool Execute(Event event) override;
 };
 
+class KologarnEyebeamAction : public MovementAction
+{
+public:
+    KologarnEyebeamAction(PlayerbotAI* botAI) : MovementAction(botAI, "kologarn eyebeam action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnRtiTargetAction : public Action
+{
+public:
+    KologarnRtiTargetAction(PlayerbotAI* botAI) : Action(botAI, "kologarn rti target action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnCrunchArmorAction : public Action
+{
+public:
+    KologarnCrunchArmorAction(PlayerbotAI* botAI) : Action(botAI, "kologarn crunch armor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class HodirBitingColdJumpAction : public MovementAction
 {
 public:

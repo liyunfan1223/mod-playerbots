@@ -384,6 +384,94 @@ bool KologarnRubbleSlowdownTrigger::IsActive()
     return true;
 }
 
+bool KologarnEyebeamTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    GuidVector triggers = AI_VALUE(GuidVector, "possible triggers");
+
+    if (!triggers.empty())
+    {
+        for (ObjectGuid const guid : triggers)
+        {
+            if (Unit* unit = botAI->GetUnit(guid))
+            {
+                std::string triggerName = unit->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale());
+
+                if (triggerName.rfind("Focused Eyebeam", 0) == 0 &&
+                    bot->GetDistance2d(unit) < ULDUAR_KOLOGARN_EYEBEAM_RADIUS + 1.0f)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool KologarnAttackDpsTargetTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Get bot's current target
+    Unit* currentTarget = botAI->GetUnit(bot->GetTarget());
+    if (!currentTarget || !currentTarget->IsAlive())
+        return false;
+
+    // Get the current raid marker from the group
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    ObjectGuid skullTarget = group->GetTargetIcon(skullIndex);
+    ObjectGuid crossTarget = group->GetTargetIcon(crossIndex);
+
+    if (crossTarget && (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0)))
+    {
+        return currentTarget->GetGUID() != crossTarget;
+    }
+    else
+    {
+        return currentTarget->GetGUID() != skullTarget;
+    }
+}
+
+bool KologarnRtiTargetTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    std::string rtiMark = AI_VALUE(std::string, "rti");
+
+    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
+        return rtiMark != "cross";
+
+    return rtiMark != "skull";
+}
+
+bool KologarnCrunchArmorTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    return bot->HasAura(SPELL_CRUNCH_ARMOR);
+}
+
 bool HodirBitingColdTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");
@@ -514,15 +602,13 @@ bool FreyaMarkDpsTargetTrigger::IsActive()
     }
 
     // Check that eonars gift is need to be mark
-    if (eonarsGift &&
-        (!currentSkullUnit || currentSkullUnit->GetEntry() != eonarsGift->GetEntry()))
+    if (eonarsGift && (!currentSkullUnit || currentSkullUnit->GetEntry() != eonarsGift->GetEntry()))
     {
         return true;
     }
 
     // Check that ancient conservator is need to be mark
-    if (ancientConservator &&
-        (!currentSkullUnit || currentSkullUnit->GetEntry() != ancientConservator->GetEntry()))
+    if (ancientConservator && (!currentSkullUnit || currentSkullUnit->GetEntry() != ancientConservator->GetEntry()))
     {
         return true;
     }
@@ -549,8 +635,7 @@ bool FreyaMarkDpsTargetTrigger::IsActive()
         }
 
         // If the highest health unit is not already marked, mark it
-        if (highestHealthUnit &&
-            (!currentSkullUnit || currentSkullUnit->GetEntry() != highestHealthUnit->GetEntry()))
+        if (highestHealthUnit && (!currentSkullUnit || currentSkullUnit->GetEntry() != highestHealthUnit->GetEntry()))
         {
             return true;
         }
@@ -564,7 +649,7 @@ bool FreyaMarkDpsTargetTrigger::IsActive()
         if (!map || !map->IsRaid())
             return false;
 
-        uint32 healthThreshold = map->Is25ManRaid() ? 7200 : 4900; // Detonate maximum damage
+        uint32 healthThreshold = map->Is25ManRaid() ? 7200 : 4900;  // Detonate maximum damage
 
         // Check that detonate lasher dont kill raid members
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
@@ -597,7 +682,6 @@ bool FreyaMoveToHealingSporeTrigger::IsActive()
     if (!conservatory || !conservatory->IsAlive())
         return false;
 
-    
     GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
     float nearestDistance = std::numeric_limits<float>::max();
     bool foundSpore = false;
