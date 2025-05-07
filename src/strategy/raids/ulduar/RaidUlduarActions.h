@@ -130,6 +130,14 @@ public:
     bool isUseful() override;
 };
 
+class IronAssemblyRuneOfPowerAction : public MovementAction
+{
+public:
+    IronAssemblyRuneOfPowerAction(PlayerbotAI* botAI) : MovementAction(botAI, "iron assembly rune of power action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class KologarnMarkDpsTargetAction : public Action
 {
 public:

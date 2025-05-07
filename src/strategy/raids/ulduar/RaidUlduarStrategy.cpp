@@ -68,6 +68,10 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "iron assembly overload trigger",
         NextAction::array(0, new NextAction("iron assembly overload action", ACTION_RAID), nullptr)));
 
+    triggers.push_back(new TriggerNode(
+        "iron assembly rune of power trigger",
+        NextAction::array(0, new NextAction("iron assembly rune of power action", ACTION_RAID), nullptr)));
+
     //
     // Kologarn
     //
