@@ -17,8 +17,7 @@ public:
 
     std::string const getName() override { return "tank assist"; }
     uint32 GetType() const override { return STRATEGY_TYPE_TANK; }
-    NextAction** getDefaultActions() override;
-    // void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
 #endif

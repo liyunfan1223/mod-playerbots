@@ -16,7 +16,7 @@ public:
     DpsAssistStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) {}
 
     std::string const getName() override { return "dps assist"; }
-    NextAction** getDefaultActions() override;
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
 class DpsAoeStrategy : public NonCombatStrategy
