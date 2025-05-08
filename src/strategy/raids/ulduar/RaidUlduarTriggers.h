@@ -47,7 +47,12 @@ enum UlduarIDs
     SPELL_FROST_TRAP = 13809
 };
 
+const int8 skullIndex = 7;  // Skull
+const int8 crossIndex = 6;  // Cross
+const int8 moonIndex = 4;   // Moon
+
 const float ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT = 420.0f;
+const float ULDUAR_KOLOGARN_EYEBEAM_RADIUS = 3.0f;
 
 //
 // Flame Levi
@@ -156,6 +161,34 @@ class KologarnRubbleSlowdownTrigger : public Trigger
 {
 public:
     KologarnRubbleSlowdownTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn rubble slowdown trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnEyebeamTrigger : public Trigger
+{
+public:
+    KologarnEyebeamTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn eyebeam trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnAttackDpsTargetTrigger : public Trigger
+{
+public:
+    KologarnAttackDpsTargetTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn attack dps target trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnRtiTargetTrigger : public Trigger
+{
+public:
+    KologarnRtiTargetTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn rti target trigger") {}
+    bool IsActive() override;
+};
+
+class KologarnCrunchArmorTrigger : public Trigger
+{
+public:
+    KologarnCrunchArmorTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn crunch armor trigger") {}
     bool IsActive() override;
 };
 

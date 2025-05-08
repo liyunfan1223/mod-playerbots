@@ -1423,12 +1423,21 @@ void PlayerbotAI::DoNextAction(bool min)
             master = newMaster;
             botAI->SetMaster(newMaster);
             botAI->ResetStrategies();
-            botAI->ChangeStrategy("+follow", BOT_STATE_NON_COMBAT);
+            
+            if (!bot->InBattleground()) 
+            {
+                botAI->ChangeStrategy("+follow", BOT_STATE_NON_COMBAT);
 
-            if (botAI->GetMaster() == botAI->GetGroupMaster())
-                botAI->TellMaster("Hello, I follow you!");
+                if (botAI->GetMaster() == botAI->GetGroupMaster())
+                    botAI->TellMaster("Hello, I follow you!");
+                else
+                    botAI->TellMaster(!urand(0, 2) ? "Hello!" : "Hi!");
+            }
             else
-                botAI->TellMaster(!urand(0, 2) ? "Hello!" : "Hi!");
+            {
+                // we're in a battleground, stay with the pack and focus on objective 
+                botAI->ChangeStrategy("-follow", BOT_STATE_NON_COMBAT);
+            }
         }
     }
 
