@@ -1215,6 +1215,21 @@ bool IronAssemblyOverloadAction::Execute(Event event)
     return false;
 }
 
+bool IronAssemblyRuneOfPowerAction::isUseful()
+{
+    IronAssemblyRuneOfPowerTrigger ironAssemblyRuneOfPowerTrigger(botAI);
+    return ironAssemblyRuneOfPowerTrigger.IsActive();
+}
+
+bool IronAssemblyRuneOfPowerAction::Execute(Event event)
+{
+    Unit* target = botAI->GetUnit(bot->GetTarget());
+    if (!target || !target->IsAlive())
+        return false;
+
+    return MoveAway(target, 10.0f, true);
+}
+
 bool KologarnMarkDpsTargetAction::isUseful()
 {
     KologarnMarkDpsTargetTrigger kologarnMarkDpsTargetTrigger(botAI);

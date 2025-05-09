@@ -29,6 +29,7 @@ public:
         creators["ignis fire resistance action"] = &RaidUlduarActionContext::ignis_fire_resistance_action;
         creators["iron assembly lightning tendrils action"] = &RaidUlduarActionContext::iron_assembly_lightning_tendrils_action;
         creators["iron assembly overload action"] = &RaidUlduarActionContext::iron_assembly_overload_action;
+        creators["iron assembly rune of power action"] = &RaidUlduarActionContext::iron_assembly_rune_of_power_action;
         creators["kologarn mark dps target action"] = &RaidUlduarActionContext::kologarn_mark_dps_target_action;
         creators["kologarn fall from floor action"] = &RaidUlduarActionContext::kologarn_fall_from_floor_action;
         creators["kologarn nature resistance action"] = &RaidUlduarActionContext::kologarn_nature_resistance_action;
@@ -62,6 +63,7 @@ private:
     static Action* ignis_fire_resistance_action(PlayerbotAI* ai) { return new BossFireResistanceAction(ai, "ignis the furnace master"); }
     static Action* iron_assembly_lightning_tendrils_action(PlayerbotAI* ai) { return new IronAssemblyLightningTendrilsAction(ai); }
     static Action* iron_assembly_overload_action(PlayerbotAI* ai) { return new IronAssemblyOverloadAction(ai); }
+    static Action* iron_assembly_rune_of_power_action(PlayerbotAI* ai) { return new IronAssemblyRuneOfPowerAction(ai); }
     static Action* kologarn_mark_dps_target_action(PlayerbotAI* ai) { return new KologarnMarkDpsTargetAction(ai); }
     static Action* kologarn_fall_from_floor_action(PlayerbotAI* ai) { return new KologarnFallFromFloorAction(ai); }
     static Action* kologarn_nature_resistance_action(PlayerbotAI* ai) { return new BossNatureResistanceAction(ai, "kologarn"); }

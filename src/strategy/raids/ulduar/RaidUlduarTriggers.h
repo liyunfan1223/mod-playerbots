@@ -16,6 +16,7 @@ enum UlduarIDs
     SPELL_OVERLOAD_25_MAN = 63481,
     SPELL_OVERLOAD_10_MAN_2 = 63485,
     SPELL_OVERLOAD_25_MAN_2 = 61886,
+    SPELL_RUNE_OF_POWER = 64320,
 
     //Kologarn
     NPC_RIGHT_ARM = 32934,
@@ -137,6 +138,13 @@ class IronAssemblyOverloadTrigger : public Trigger
 {
 public:
     IronAssemblyOverloadTrigger(PlayerbotAI* ai) : Trigger(ai, "iron assembly overload trigger") {}
+    bool IsActive() override;
+};
+
+class IronAssemblyRuneOfPowerTrigger : public Trigger
+{
+public:
+    IronAssemblyRuneOfPowerTrigger(PlayerbotAI* ai) : Trigger(ai, "iron assembly rune of power trigger") {}
     bool IsActive() override;
 };
 
