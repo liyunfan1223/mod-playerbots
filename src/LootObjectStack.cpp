@@ -85,7 +85,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
         bool hasAnyQuestItems = false;
 
         GameObjectQuestItemList const* items = sObjectMgr->GetGameObjectQuestItemList(go->GetEntry());
-        for (int i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
+        for (size_t i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
         {
             if (!items || i >= items->size())
                 break;
@@ -296,6 +296,11 @@ bool LootObject::IsLootPossible(Player* bot)
         if (!bot->isAllowedToLoot(creature) && skillId != SKILL_SKINNING)
             return false;
     }
+
+    // Prevent bot from running to chests that are unlootable (e.g. Gunship Armory before completing the event)
+    GameObject* go = botAI->GetGameObject(guid);
+    if (go && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE)) 
+        return false;
 
     if (skillId == SKILL_NONE)
         return true;
