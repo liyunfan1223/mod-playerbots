@@ -382,7 +382,7 @@ std::string const ChatHelper::FormatSpell(SpellInfo const* spellInfo)
 std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count, uint32 total)
 {
     char color[32];
-    sprintf(color, "%x", ItemQualityColors[proto->Quality]);
+    snprintf(color, sizeof(color), "%x", ItemQualityColors[proto->Quality]);
 
     std::string itemName;
     const ItemLocale* locale = sObjectMgr->GetItemLocale(proto->ItemId);
@@ -409,7 +409,7 @@ std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count
 std::string const ChatHelper::FormatQItem(uint32 itemId)
 {
     char color[32];
-    sprintf(color, "%x", ItemQualityColors[0]);
+    snprintf(color, sizeof(color), "%x", ItemQualityColors[0]);
 
     std::ostringstream out;
     out << "|c" << color << "|Hitem:" << itemId << ":0:0:0:0:0:0:0"
