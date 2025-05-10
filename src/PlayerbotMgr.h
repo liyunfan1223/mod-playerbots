@@ -31,7 +31,7 @@ public:
     bool IsAccountLinked(uint32 accountId, uint32 masterAccountId);
     void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder);
 
-    void LogoutPlayerBot(ObjectGuid guid);
+    void LogoutPlayerBot(ObjectGuid guid, uint32 masterAccountId = 0);
     void DisablePlayerBot(ObjectGuid guid);
     void RemoveFromPlayerbotsMap(ObjectGuid guid);
     Player* GetPlayerBot(ObjectGuid guid) const;
@@ -49,6 +49,9 @@ public:
     std::vector<std::string> HandlePlayerbotCommand(char const* args, Player* master = nullptr);
     std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin,
                                         uint32 masterAccountId, uint32 masterGuildId);
+
+    std::unordered_map<uint32, time_t> lastBotActionTime; // <masterAccountId, timestamp>
+
     uint32 GetAccountId(std::string const name);
     uint32 GetAccountId(ObjectGuid guid);
     std::string const ListBots(Player* master);
