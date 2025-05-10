@@ -32,8 +32,9 @@ const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED
 const std::vector<Position> corners = {
     {183.53f, 66.53f, 409.80f}, {383.03f, 75.10f, 411.71f}, {379.74f, -133.05f, 410.88f}, {158.67f, -137.54f, 409.80f}};
 
-const Position ULDUAR_KOLOGARN_CRUNCH_ARMOR_RESET_SPOT = Position(1752.4803f, -43.44299f, 448.805f);
-const Position ULDUAR_KOLOGARN_RESTORE_POSITION = Position(1764.3749f, -24.02903f, 448.0f, 0.00087690353);
+const Position ULDUAR_KOLOGARN_RESTORE_POSITION = Position(1764.3749f, -24.02903f, 448.0f, 0.00087690353f);
+const Position ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION = Position(1781.2051f, 9.34402f, 449.0f, 0.00087690353f);
+const Position ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION = Position(1763.2561f, -24.44305f, 449.0f, 0.00087690353f);
 
 bool FlameLeviathanVehicleAction::Execute(Event event)
 {
@@ -1214,6 +1215,21 @@ bool IronAssemblyOverloadAction::Execute(Event event)
     return false;
 }
 
+bool IronAssemblyRuneOfPowerAction::isUseful()
+{
+    IronAssemblyRuneOfPowerTrigger ironAssemblyRuneOfPowerTrigger(botAI);
+    return ironAssemblyRuneOfPowerTrigger.IsActive();
+}
+
+bool IronAssemblyRuneOfPowerAction::Execute(Event event)
+{
+    Unit* target = botAI->GetUnit(bot->GetTarget());
+    if (!target || !target->IsAlive())
+        return false;
+
+    return MoveAway(target, 10.0f, true);
+}
+
 bool KologarnMarkDpsTargetAction::isUseful()
 {
     KologarnMarkDpsTargetTrigger kologarnMarkDpsTargetTrigger(botAI);
@@ -1223,9 +1239,15 @@ bool KologarnMarkDpsTargetAction::isUseful()
 bool KologarnMarkDpsTargetAction::Execute(Event event)
 {
     Unit* targetToMark = nullptr;
+    Unit* additionalTargetToMark = nullptr;
     Unit* targetToCcMark = nullptr;
     int8 skullIndex = 7;  // Skull
+    int8 crossIndex = 6;  // Cross
     int8 moonIndex = 4;   // Moon
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "kologarn");
+    if (!boss || !boss->IsAlive())
+        return false;
 
     // Check that there is rubble to mark
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
@@ -1240,6 +1262,7 @@ bool KologarnMarkDpsTargetAction::Execute(Event event)
         if (target->GetEntry() == NPC_RUBBLE && target->IsAlive())
         {
             targetToMark = target;
+            additionalTargetToMark = boss;
         }
     }
 
@@ -1249,6 +1272,7 @@ bool KologarnMarkDpsTargetAction::Execute(Event event)
         if (rightArm && rightArm->IsAlive())
         {
             targetToMark = rightArm;
+            additionalTargetToMark = boss;
         }
     }
 
@@ -1291,7 +1315,11 @@ bool KologarnMarkDpsTargetAction::Execute(Event event)
                     {
                         group->SetTargetIcon(moonIndex, bot->GetGUID(), targetToCcMark->GetGUID());
                     }
-                    
+                    if (additionalTargetToMark)
+                    {
+                        group->SetTargetIcon(crossIndex, bot->GetGUID(), additionalTargetToMark->GetGUID());
+                    }
+
                     return true;
                 }
                 break;  // Stop after finding the first valid bot tank
@@ -1307,6 +1335,10 @@ bool KologarnMarkDpsTargetAction::Execute(Event event)
             if (targetToCcMark)
             {
                 group->SetTargetIcon(moonIndex, bot->GetGUID(), targetToCcMark->GetGUID());
+            }
+            if (additionalTargetToMark)
+            {
+                group->SetTargetIcon(crossIndex, bot->GetGUID(), additionalTargetToMark->GetGUID());
             }
             return true;
         }
@@ -1324,6 +1356,10 @@ bool KologarnMarkDpsTargetAction::Execute(Event event)
                     if (targetToCcMark)
                     {
                         group->SetTargetIcon(moonIndex, bot->GetGUID(), targetToCcMark->GetGUID());
+                    }
+                    if (additionalTargetToMark)
+                    {
+                        group->SetTargetIcon(crossIndex, bot->GetGUID(), additionalTargetToMark->GetGUID());
                     }
                     return true;
                 }
@@ -1362,6 +1398,84 @@ bool KologarnRubbleSlowdownAction::Execute(Event event)
         return false;
 
     return botAI->CastSpell("frost trap", currentSkullUnit);
+}
+
+bool KologarnEyebeamAction::Execute(Event event)
+{
+    float distanceToLeftPoint = bot->GetExactDist(ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION);
+    float distanceToRightPoint = bot->GetExactDist(ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION);
+
+    bool runToLeftSide;
+    if (!distanceToLeftPoint)
+    {
+        runToLeftSide = true;
+    }
+    else if (!distanceToRightPoint)
+    {
+        runToLeftSide = false;
+    }
+    else
+    {
+        runToLeftSide = distanceToRightPoint > distanceToLeftPoint;
+    }
+
+    bool teleportedToPoint;
+    KologarnEyebeamTrigger kologarnEyebeamTrigger(botAI);
+    if (runToLeftSide)
+    {
+        teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionX(),
+                                            ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionY(),
+                                            ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionZ(),
+                                            ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetOrientation());
+    }
+    else
+    {
+        teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionX(),
+                                            ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionY(),
+                                            ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionZ(),
+                                            ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetOrientation());
+    }
+
+    if (teleportedToPoint)
+        SetNextMovementDelay(5000);
+
+    return teleportedToPoint;
+}
+
+bool KologarnEyebeamAction::isUseful()
+{
+    KologarnEyebeamTrigger kologarnEyebeamTrigger(botAI);
+    return kologarnEyebeamTrigger.IsActive();
+}
+
+bool KologarnRtiTargetAction::isUseful()
+{
+    KologarnRtiTargetTrigger kologarnRtiTargetTrigger(botAI);
+    return kologarnRtiTargetTrigger.IsActive();
+}
+
+bool KologarnRtiTargetAction::Execute(Event event)
+{
+    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
+    {
+        context->GetValue<std::string>("rti")->Set("cross");
+        return true;
+    }
+
+    context->GetValue<std::string>("rti")->Set("skull");
+    return true;
+}
+
+bool KologarnCrunchArmorAction::isUseful()
+{
+    KologarnCrunchArmorTrigger kologarnCrunchArmorTrigger(botAI);
+    return kologarnCrunchArmorTrigger.IsActive();
+}
+
+bool KologarnCrunchArmorAction::Execute(Event event)
+{
+    bot->RemoveAura(SPELL_CRUNCH_ARMOR);
+    return true;
 }
 
 bool HodirMoveSnowpackedIcicleAction::isUseful()
@@ -1587,7 +1701,7 @@ bool FreyaMarkDpsTargetAction::Execute(Event event)
                 if (group)
                 {
                     ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-    
+
                     if (!currentSkullTarget || (targetToMark->GetGUID() != currentSkullTarget))
                     {
                         group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());
@@ -1605,7 +1719,7 @@ bool FreyaMarkDpsTargetAction::Execute(Event event)
         if (group)
         {
             ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
-    
+
             if (!currentSkullTarget || (targetToMark->GetGUID() != currentSkullTarget))
             {
                 group->SetTargetIcon(skullIndex, bot->GetGUID(), targetToMark->GetGUID());

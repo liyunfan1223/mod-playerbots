@@ -37,14 +37,28 @@ bool IccLmTankPositionAction::Execute(Event event)
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot) || botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
+    if (botAI->IsTank(bot))
     {
-        if (bot->GetExactDist2d(ICC_LM_TANK_POSITION) > 15.0f)
-            return MoveTo(bot->GetMapId(), ICC_LM_TANK_POSITION.GetPositionX(),
-                          ICC_LM_TANK_POSITION.GetPositionY(), ICC_LM_TANK_POSITION.GetPositionZ(), 
-                          false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
-        else
-            return false;
+        if ((botAI->HasAggro(boss) && botAI->IsMainTank(bot)) || botAI->IsAssistTank(bot))
+        {
+            float distance = bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
+            if (distance > 3.0f)
+            {
+                // Calculate direction vector
+                float dirX = ICC_LM_TANK_POSITION.GetPositionX() - bot->GetPositionX();
+                float dirY = ICC_LM_TANK_POSITION.GetPositionY() - bot->GetPositionY();
+                float length = sqrt(dirX * dirX + dirY * dirY);
+                dirX /= length;
+                dirY /= length;
+
+                // Move in increments of 3.0f
+                float moveX = bot->GetPositionX() + dirX * 3.0f;
+                float moveY = bot->GetPositionY() + dirY * 3.0f;
+
+                return MoveTo(bot->GetMapId(), moveX, moveY, bot->GetPositionZ(), false, false, false, false,
+                              MovementPriority::MOVEMENT_COMBAT);
+            }
+        }
     }
 
     return false;
@@ -214,10 +228,34 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event event)
 
     if (botAI->IsTank(bot) && boss->GetHealthPct() < 95.0f)
     {
-        if (bot->GetExactDist2d(ICC_LDW_TANK_POSTION) > 20.0f)
-        return MoveTo(bot->GetMapId(), ICC_LDW_TANK_POSTION.GetPositionX(),
-                      ICC_LDW_TANK_POSTION.GetPositionY(), ICC_LDW_TANK_POSTION.GetPositionZ(), false,
-                      false, false, false, MovementPriority::MOVEMENT_COMBAT);
+        // Check if the bot is not the victim of a shade with entry 38222
+        GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+        for (auto& npc : npcs)
+        {
+            Unit* unit = botAI->GetUnit(npc);
+            if (unit && unit->GetEntry() == 38222 && unit->GetVictim() == bot)
+            {
+                return false;  // Exit if the bot is the victim of the shade
+            }
+        }
+
+        float distance = bot->GetExactDist2d(ICC_LDW_TANK_POSTION.GetPositionX(), ICC_LDW_TANK_POSTION.GetPositionY());
+        if (distance > 20.0f)
+        {
+            // Calculate direction vector
+            float dirX = ICC_LDW_TANK_POSTION.GetPositionX() - bot->GetPositionX();
+            float dirY = ICC_LDW_TANK_POSTION.GetPositionY() - bot->GetPositionY();
+            float length = sqrt(dirX * dirX + dirY * dirY);
+            dirX /= length;
+            dirY /= length;
+
+            // Move in increments of 3.0f
+            float moveX = bot->GetPositionX() + dirX * 3.0f;
+            float moveY = bot->GetPositionY() + dirY * 3.0f;
+
+            return MoveTo(bot->GetMapId(), moveX, moveY, bot->GetPositionZ(), false, false, false, false,
+                          MovementPriority::MOVEMENT_COMBAT);
+        }
     }
 
     if (!botAI->IsTank(bot))
@@ -1310,6 +1348,20 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
 
     // Find the ooze
     Unit* ooze = AI_VALUE2(Unit*, "find target", "volatile ooze");
+    if (!ooze)
+        return false;
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
+    if (!boss)
+        return false;
+
+    if (botAI->IsTank(bot) && bot->GetExactDist2d(ICC_PUTRICIDE_TANK_POSITION) > 20.0f && !boss->HealthBelowPct(36) && boss->GetVictim() == bot)
+    {
+        return MoveTo(bot->GetMapId(), ICC_PUTRICIDE_TANK_POSITION.GetPositionX(),
+                      ICC_PUTRICIDE_TANK_POSITION.GetPositionY(), ICC_PUTRICIDE_TANK_POSITION.GetPositionZ(), false, false,
+                      false, true, MovementPriority::MOVEMENT_COMBAT, true, false);
+    }
+
     bool botHasAura = botAI->HasAura("Volatile Ooze Adhesive", bot);
     bool botHasAura2 = botAI->HasAura("Gaseous Bloat", bot);
     bool botHasAura3 = botAI->HasAura("Unbound Plague", bot);
@@ -1453,10 +1505,22 @@ bool IccPutricideGasCloudAction::Execute(Event event)
 
     Unit* volatileOoze = AI_VALUE2(Unit*, "find target", "volatile ooze");
 
+    Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
+    if (!boss)
+        return false;
+
     bool botHasAura = botAI->HasAura("Gaseous Bloat", bot);
     
     if(!botHasAura && volatileOoze)
         return false;
+
+    if (botAI->IsTank(bot) && bot->GetExactDist2d(ICC_PUTRICIDE_TANK_POSITION) > 20.0f && !boss->HealthBelowPct(36) &&
+        boss->GetVictim() == bot)
+    {
+        return MoveTo(bot->GetMapId(), ICC_PUTRICIDE_TANK_POSITION.GetPositionX(),
+                      ICC_PUTRICIDE_TANK_POSITION.GetPositionY(), ICC_PUTRICIDE_TANK_POSITION.GetPositionZ(), false,
+                      false, false, true, MovementPriority::MOVEMENT_COMBAT, true, false);
+    }
 
     if (botHasAura)
     {
@@ -1762,7 +1826,7 @@ bool IccBpcMainTankAction::Execute(Event event)
             if (unit->HasAura(71596))
             {
                 if (unit->GetEntry() == 37972 ||    // Keleseth
-                 unit->GetEntry() == 37973 ||    // Taldaram
+                    unit->GetEntry() == 37973 ||    // Taldaram
                     unit->GetEntry() == 37970)      // Valanar
                 {
                 empoweredPrince = unit;

@@ -67,6 +67,19 @@ void EquipAction::EquipItem(Item* item)
     uint32 itemId = itemProto->ItemId;
     uint8 invType = itemProto->InventoryType;
 
+    // Ensure only the correct classes attempt to equip relics
+    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && bot->getClass() != CLASS_DRUID)
+        return;
+
+    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && bot->getClass() != CLASS_DEATH_KNIGHT)
+        return;
+    
+    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && bot->getClass() != CLASS_PALADIN)
+        return;
+
+    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && bot->getClass() != CLASS_SHAMAN)
+        return;
+
     // Handle ammunition separately
     if (invType == INVTYPE_AMMO)
     {
@@ -82,7 +95,6 @@ void EquipAction::EquipItem(Item* item)
     if (itemProto->Class == ITEM_CLASS_CONTAINER)
     {
         // Attempt to equip as a bag
-        Bag* pBag = reinterpret_cast<Bag*>(item);
         uint8 newBagSlot = GetSmallestBagSlot();
         if (newBagSlot > 0)
         {
@@ -331,7 +343,7 @@ bool EquipUpgradesAction::Execute(Event event)
     return true;
 }
 
-bool EquipUpgradeAction::Execute(Event event)
+bool EquipUpgradeAction::Execute(Event /*event*/)
 {
     ListItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);

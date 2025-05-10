@@ -8,10 +8,16 @@
 
 enum ForgeOfSoulsBronjahmIDs
 {
-    // Boss1
+    // Bronjahm
     NPC_CORRUPTED_SOUL_FRAGMENT = 36535,
 
-    SPELL_CORRUPT_SOUL = 68839
+    SPELL_CORRUPT_SOUL          = 68839,
+    SPELL_SOULSTORM_VISUAL      = 68870,
+    SPELL_SOULSTORM_VISUAL2     = 68904,
+    SPELL_SOULSTORM             = 68872,
+
+    // Devourer of Souls
+    SPELL_WAILING_SOULS         = 68899,
 };
 
 class MoveFromBronjahmTrigger : public Trigger
@@ -34,6 +40,13 @@ class BronjahmPositionTrigger : public Trigger
 {
 public:
     BronjahmPositionTrigger(PlayerbotAI* ai) : Trigger(ai, "bronjahm position") {}
+    bool IsActive() override;
+};
+
+class DevourerOfSoulsTrigger : public Trigger
+{
+public:
+    DevourerOfSoulsTrigger(PlayerbotAI* ai) : Trigger(ai, "devourer of souls") {}
     bool IsActive() override;
 };
 

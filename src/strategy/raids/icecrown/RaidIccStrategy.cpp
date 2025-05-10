@@ -9,7 +9,7 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("icc lm tank position", ACTION_RAID + 5), nullptr)));
 
     triggers.push_back(new TriggerNode("icc spike near",
-        NextAction::array(0, new NextAction("icc spike", ACTION_RAID + 5), nullptr)));
+        NextAction::array(0, new NextAction("icc spike", ACTION_RAID + 3), nullptr)));
 
     //Lady Deathwhisper
     triggers.push_back(new TriggerNode("icc dark reckoning",

@@ -33,5 +33,19 @@ public:
     bool isUseful() override;
 };
 
+class DevourerOfSoulsAction : public AttackAction
+{
+public:
+    DevourerOfSoulsAction(PlayerbotAI * ai, float distance = 10.0f, float delta_angle = M_PI / 8)
+        : AttackAction(ai, "devourer of souls")
+    {
+        this->distance = distance;
+        this->delta_angle = delta_angle;
+    }
+    virtual bool Execute(Event event);
+
+protected:
+    float distance, delta_angle;
+};
 
 #endif

@@ -130,6 +130,14 @@ public:
     bool isUseful() override;
 };
 
+class IronAssemblyRuneOfPowerAction : public MovementAction
+{
+public:
+    IronAssemblyRuneOfPowerAction(PlayerbotAI* botAI) : MovementAction(botAI, "iron assembly rune of power action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class KologarnMarkDpsTargetAction : public Action
 {
 public:
@@ -151,6 +159,30 @@ class KologarnRubbleSlowdownAction : public Action
 public:
     KologarnRubbleSlowdownAction(PlayerbotAI* botAI) : Action(botAI, "kologarn rubble slowdown action") {}
     bool Execute(Event event) override;
+};
+
+class KologarnEyebeamAction : public MovementAction
+{
+public:
+    KologarnEyebeamAction(PlayerbotAI* botAI) : MovementAction(botAI, "kologarn eyebeam action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnRtiTargetAction : public Action
+{
+public:
+    KologarnRtiTargetAction(PlayerbotAI* botAI) : Action(botAI, "kologarn rti target action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class KologarnCrunchArmorAction : public Action
+{
+public:
+    KologarnCrunchArmorAction(PlayerbotAI* botAI) : Action(botAI, "kologarn crunch armor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HodirBitingColdJumpAction : public MovementAction
