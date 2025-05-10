@@ -5,15 +5,15 @@
 #include "AiObjectContext.h"
 #include "ForgeOfSoulsTriggers.h"
 
-class WotlkDungeonFosTriggerContext : public NamedObjectContext<Trigger>
+class WotlkDungeonFoSTriggerContext : public NamedObjectContext<Trigger>
 {
 public:
-    WotlkDungeonFosTriggerContext()
+    WotlkDungeonFoSTriggerContext()
     {
-        creators["bronjahm position"] = &WotlkDungeonFosTriggerContext::bronjahm_position;
-        creators["move from bronjahm"] = &WotlkDungeonFosTriggerContext::move_from_bronjahm;
-        creators["switch to soul fragment"] = &WotlkDungeonFosTriggerContext::switch_to_soul_fragment;
-        creators["devourer of souls"] = &WotlkDungeonFosTriggerContext::devourer_of_souls;
+        creators["bronjahm position"] = &WotlkDungeonFoSTriggerContext::bronjahm_position;
+        creators["move from bronjahm"] = &WotlkDungeonFoSTriggerContext::move_from_bronjahm;
+        creators["switch to soul fragment"] = &WotlkDungeonFoSTriggerContext::switch_to_soul_fragment;
+        creators["devourer of souls"] = &WotlkDungeonFoSTriggerContext::devourer_of_souls;
     }
 
 private:
