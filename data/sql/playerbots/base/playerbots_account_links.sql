@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS `playerbot_account_links`;
+DROP TABLE IF EXISTS `playerbots_account_links`;
 
-CREATE TABLE `playerbot_account_links` (
+CREATE TABLE `playerbots_account_links` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `account_id` INT NOT NULL,
     `linked_account_id` INT NOT NULL,

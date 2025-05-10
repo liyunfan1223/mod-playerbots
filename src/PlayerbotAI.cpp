@@ -19,6 +19,7 @@
 #include "CreatureData.h"
 #include "EmoteAction.h"
 #include "Engine.h"
+#include "EventProcessor.h"
 #include "ExternalEventHelper.h"
 #include "GameObjectData.h"
 #include "GameTime.h"
@@ -6278,4 +6279,24 @@ SpellFamilyNames PlayerbotAI::Class2SpellFamilyName(uint8 cls)
             break;
     }
     return SPELLFAMILY_GENERIC;
+}
+
+void PlayerbotAI::AddTimedEvent(std::function<void()> callback, uint32 delayMs)
+{
+    class LambdaEvent final : public BasicEvent
+    {
+        std::function<void()> _cb;
+    public:
+        explicit LambdaEvent(std::function<void()> cb) : _cb(std::move(cb)) {}
+        bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
+        {
+            _cb();
+            return true;           // remove after execution
+        }
+    };
+
+    // Every Player already owns an EventMap called m_Events
+    bot->m_Events.AddEvent(
+        new LambdaEvent(std::move(callback)),
+        bot->m_Events.CalculateTime(delayMs));
 }

@@ -18,6 +18,7 @@
 #        COMBAT
 #        CHEATS
 #        SPELLS
+#        FLIGHTPATH
 #    PLAYERBOT RNDBOT SPECIFIC SETTINGS
 #        GENERAL
 #        LEVELS
@@ -489,6 +490,28 @@ AiPlayerbot.BotCheats = "taxi"
 
 # ID of spell to open lootable chests
 AiPlayerbot.OpenGoSpell = 6477
+
+#
+#
+#
+###################################################################################################
+
+####################################################################################################
+# FLIGHTPATH
+#
+#
+
+# Min random delay before the 1st follower bot clicks the flight-master (ms)
+AiPlayerbot.BotTaxiDelayMinMs = 350
+
+# Upper bound for the overall taxi delay window (ms) – larger spreads big raids
+AiPlayerbot.BotTaxiDelayMaxMs = 5000
+
+# Fixed gap added per group-slot so bots never take off together (ms)
+AiPlayerbot.BotTaxiGapMs = 200
+
+# Extra small randomness added to each gap so launches don’t look robotic (ms)
+AiPlayerbot.BotTaxiGapJitterMs = 100
 
 #
 #

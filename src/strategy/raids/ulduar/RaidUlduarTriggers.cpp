@@ -277,6 +277,18 @@ bool IronAssemblyOverloadTrigger::IsActive()
            boss->HasAura(SPELL_OVERLOAD_10_MAN_2) || boss->HasAura(SPELL_OVERLOAD_25_MAN_2);
 }
 
+bool IronAssemblyRuneOfPowerTrigger::IsActive()
+{
+    Unit* target = botAI->GetUnit(bot->GetTarget());
+    if (!target || !target->IsAlive())
+        return false;
+
+    if (!target->HasAura(SPELL_RUNE_OF_POWER))
+        return false;
+
+    return botAI->IsTank(bot);
+}
+
 bool KologarnMarkDpsTargetTrigger::IsActive()
 {
     // Check boss and it is alive
