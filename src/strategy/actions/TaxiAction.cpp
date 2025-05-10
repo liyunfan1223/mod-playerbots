@@ -9,7 +9,7 @@
 #include "LastMovementValue.h"
 #include "Playerbots.h"
 #include "PlayerbotAIConfig.h"
-
+#include "Config.h"
 
 bool TaxiAction::Execute(Event event)
 {
@@ -49,6 +49,12 @@ bool TaxiAction::Execute(Event event)
                         nodes.push_back(i);
                 }
         }
+
+        // stagger bot takeoff
+        uint32 delayMin = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiDelayMinMs", 350u, false);
+        uint32 delayMax = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiDelayMaxMs", 5000u, false);
+        uint32 gapMs = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiGapMs", 200u, false);
+        uint32 gapJitterMs = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiGapJitterMs", 100u, false);
 
         // Only for follower bots
         if (botAI->HasRealPlayerMaster())
