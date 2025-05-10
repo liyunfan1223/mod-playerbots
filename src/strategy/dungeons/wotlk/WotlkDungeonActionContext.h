@@ -14,8 +14,8 @@
 #include "utgardepinnacle/UtgardePinnacleActionContext.h"
 #include "cullingofstratholme/CullingOfStratholmeActionContext.h"
 #include "forgeofsouls/ForgeOfSoulsActionContext.h"
+#include "pitofsaron/PitOfSaronActionContext.h"
 #include "trialofthechampion/TrialOfTheChampionActionContext.h"
 // #include "hallsofreflection/HallsOfReflectionActionContext.h"
-// #include "pitofsaron/PitOfSaronActionContext.h"
 
 #endif
