@@ -8,6 +8,8 @@
 #include "Event.h"
 #include "LastMovementValue.h"
 #include "Playerbots.h"
+#include "PlayerbotAIConfig.h"
+#include "Config.h"
 
 bool TaxiAction::Execute(Event event)
 {
@@ -46,6 +48,36 @@ bool TaxiAction::Execute(Event event)
                     if (field < TaxiMaskSize)
                         nodes.push_back(i);
                 }
+        }
+
+        // stagger bot takeoff
+        uint32 delayMin = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiDelayMinMs", 350u, false);
+        uint32 delayMax = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiDelayMaxMs", 5000u, false);
+        uint32 gapMs = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiGapMs", 200u, false);
+        uint32 gapJitterMs = sConfigMgr->GetOption<uint32>("AiPlayerbot.BotTaxiGapJitterMs", 100u, false);
+
+        // Only for follower bots
+        if (botAI->HasRealPlayerMaster())
+        {
+            uint32 index = botAI->GetGroupSlotIndex(bot);
+            uint32 delay = delayMin + index * gapMs + urand(0, gapJitterMs);
+
+            delay = std::min(delay, delayMax);
+
+            // Store the npc’s GUID so we can re-acquire the pointer later
+            ObjectGuid npcGuid = npc->GetGUID();
+
+            // schedule the take-off
+            botAI->AddTimedEvent(
+                [bot = bot, &movement, npcGuid]() -> void
+                {
+                    if (Creature* npcPtr = ObjectAccessor::GetCreature(*bot, npcGuid))
+                        if (!movement.taxiNodes.empty())
+                            bot->ActivateTaxiPathTo(movement.taxiNodes, npcPtr);
+                },
+                delay);
+            botAI->SetNextCheckDelay(delay + 50);
+            return true;
         }
 
         if (param == "?")
