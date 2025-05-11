@@ -30,7 +30,7 @@ public:
     void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId);
     void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder);
 
-    void LogoutPlayerBot(ObjectGuid guid, uint32 masterAccountId = 0);
+    void LogoutPlayerBot(ObjectGuid guid);
     void DisablePlayerBot(ObjectGuid guid);
     void RemoveFromPlayerbotsMap(ObjectGuid guid);
     Player* GetPlayerBot(ObjectGuid guid) const;
@@ -54,7 +54,6 @@ public:
     std::string const LookupBots(Player* master);
     uint32 GetPlayerbotsCount() { return playerBots.size(); }
     uint32 GetPlayerbotsCountByClass(uint32 cls);
-    time_t DelayBot;
 
 protected:
     virtual void OnBotLoginInternal(Player* const bot) = 0;
