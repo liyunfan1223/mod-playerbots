@@ -174,12 +174,17 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
 
     uint32 masterAccount = holder.GetMasterAccountId();
     WorldSession* masterSession = masterAccount ? sWorldSessionMgr->FindSession(masterAccount) : nullptr;
-
-    // Check if masterSession->GetPlayer() is valid
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
-    if (masterSession && !masterPlayer)
+
+    // If the masterPlayer is no longer online, log the bot out immediately
+    if (masterAccount && (!masterSession || !masterPlayer))
     {
-        LOG_DEBUG("mod-playerbots", "Master session found but no player is associated for master account ID: {}", masterAccount);
+        LOG_DEBUG("mod-playerbots", "Master is no longer online, aborting bot login");
+
+        bot->GetSession()->LogoutPlayer(true);
+        delete botSession;
+        botLoading.erase(holder.GetGuid());
+        return;
     }
     
     sRandomPlayerbotMgr->OnPlayerLogin(bot);
