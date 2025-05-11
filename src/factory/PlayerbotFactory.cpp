@@ -813,86 +813,124 @@ void PlayerbotFactory::InitPetTalents()
 void PlayerbotFactory::InitPet()
 {
     Pet* pet = bot->GetPet();
-    if (pet)
+
+    if (!pet && bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
         return;
-
-    if (bot->getClass() != CLASS_HUNTER || bot->GetLevel() < 10)
-        return;
-
-    Map* map = bot->GetMap();
-    if (!map)
-        return;
-
-    std::vector<uint32> ids;
-
-    CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
-    for (auto const& [entry, data] : *creatures)
-    {
-        if (!data.IsTameable(bot->CanTameExoticPets()))
-            continue;
-
-        if (data.minlevel > bot->GetLevel())
-            continue;
-
-        bool onlyWolf = sPlayerbotAIConfig->hunterWolfPet == 2 ||
-                        (sPlayerbotAIConfig->hunterWolfPet == 1 &&
-                         bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
-        if (onlyWolf && data.family != CREATURE_FAMILY_WOLF)
-            continue;
-
-        ids.push_back(entry);
-    }
-
-    if (ids.empty())
-    {
-        LOG_ERROR("playerbots", "No pets available for bot {} ({} level)", bot->GetName().c_str(), bot->GetLevel());
-        return;
-    }
-
-    for (uint32 i = 0; i < 10; ++i)
-    {
-        uint32 index = urand(0, ids.size() - 1);
-        CreatureTemplate const* co = sObjectMgr->GetCreatureTemplate(ids[index]);
-        if (!co || co->Name.size() > 21)
-            continue;
-
-        uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
-        uint32 pet_number = sObjectMgr->GeneratePetNumber();
-
-        pet = bot->CreateTamedPetFrom(co->Entry, 0);
-        if (!pet)
-            continue;
-
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel() - 1);
-        pet->GetMap()->AddToMap(pet->ToCreature());
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel());
-        bot->SetMinion(pet, true);
-        pet->InitTalentForLevel();
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-        bot->PetSpellInitialize();
-        break;
-    }
 
     if (!pet)
+    {
+        if (bot->getClass() != CLASS_HUNTER || bot->GetLevel() < 10)
+            return;
+
+        Map* map = bot->GetMap();
+        if (!map)
+            return;
+
+        std::vector<uint32> ids;
+
+        CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
+        for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
+        {
+            if (!itr->second.IsTameable(bot->CanTameExoticPets()))
+                continue;
+
+            if (itr->second.minlevel > bot->GetLevel())
+                continue;
+
+            bool onlyWolf = sPlayerbotAIConfig->hunterWolfPet == 2 ||
+                            (sPlayerbotAIConfig->hunterWolfPet == 1 &&
+                             bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
+            // Wolf only (for higher dps)
+            if (onlyWolf && itr->second.family != CREATURE_FAMILY_WOLF)
+                continue;
+
+            ids.push_back(itr->first);
+        }
+
+        if (ids.empty())
+        {
+            LOG_ERROR("playerbots", "No pets available for bot {} ({} level)", bot->GetName().c_str(), bot->GetLevel());
+            return;
+        }
+
+        for (uint32 i = 0; i < 10; i++)
+        {
+            uint32 index = urand(0, ids.size() - 1);
+            CreatureTemplate const* co = sObjectMgr->GetCreatureTemplate(ids[index]);
+            if (!co)
+                continue;
+            if (co->Name.size() > 21)
+                continue;
+            uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
+            uint32 pet_number = sObjectMgr->GeneratePetNumber();
+            if (bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
+            {
+                bot->GetPetStable()->CurrentPet.value();
+                // bot->GetPetStable()->CurrentPet.reset();
+                bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
+                bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+            }
+            if (bot->GetPetStable() && bot->GetPetStable()->GetUnslottedHunterPet())
+            {
+                bot->GetPetStable()->UnslottedPets.clear();
+                bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
+                bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+            }
+            // }
+            pet = bot->CreateTamedPetFrom(co->Entry, 0);
+            if (!pet)
+            {
+                continue;
+            }
+
+            // prepare visual effect for levelup
+            pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel() - 1);
+
+            // add to world
+            pet->GetMap()->AddToMap(pet->ToCreature());
+
+            // visual effect for levelup
+            pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel());
+
+            // caster have pet now
+            bot->SetMinion(pet, true);
+
+            pet->InitTalentForLevel();
+
+            pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+            bot->PetSpellInitialize();
+            break;
+        }
+    }
+
+    if (pet)
+    {
+        pet->InitStatsForLevel(bot->GetLevel());
+        pet->SetLevel(bot->GetLevel());
+        pet->SetPower(POWER_HAPPINESS, pet->GetMaxPower(Powers(POWER_HAPPINESS)));
+        pet->SetHealth(pet->GetMaxHealth());
+    }
+    else
     {
         LOG_ERROR("playerbots", "Cannot create pet for bot {}", bot->GetName().c_str());
         return;
     }
 
-    pet->InitStatsForLevel(bot->GetLevel());
-    pet->SetLevel(bot->GetLevel());
-    pet->SetPower(POWER_HAPPINESS, pet->GetMaxPower(Powers(POWER_HAPPINESS)));
-    pet->SetHealth(pet->GetMaxHealth());
-
-    for (auto const& [spellId, data] : pet->m_spells)
+    // LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.", pet->m_spells.size(),
+    // pet->GetPetAutoSpellSize());
+    for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
     {
-        if (data.state == PETSPELL_REMOVED)
+        if (itr->second.state == PETSPELL_REMOVED)
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo || spellInfo->IsPassive())
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        if (!spellInfo)
             continue;
 
+        if (spellInfo->IsPassive())
+        {
+            continue;
+        }
         pet->ToggleAutocast(spellInfo, true);
     }
 }
