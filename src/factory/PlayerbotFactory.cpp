@@ -812,9 +812,9 @@ void PlayerbotFactory::InitPetTalents()
 
 void PlayerbotFactory::InitPet()
 {
-    // Checks if the bot already has a pet active OR saved as current
-    if (bot->GetPet() || (bot->GetPetStable() && bot->GetPetStable()->CurrentPet))
-        return;  // Already have a pet somewhere — don't get another one
+    Pet* pet = bot->GetPet();
+    if (pet)
+        return;
 
     if (bot->getClass() != CLASS_HUNTER || bot->GetLevel() < 10)
         return;
