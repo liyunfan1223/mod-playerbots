@@ -812,6 +812,9 @@ void PlayerbotFactory::InitPetTalents()
 
 void PlayerbotFactory::InitPet()
 {
+    if (bot->GetPetId() != 0)
+    return;
+
     Pet* pet = bot->GetPet();
     if (!pet)
     {
