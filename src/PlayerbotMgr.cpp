@@ -98,24 +98,20 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
 
     bool isRndbot = !masterAccountId;
-
-    std::ostringstream out;
     bool allowed = true;
-    time_t currentTime = time(nullptr);
+	std::ostringstream out;
 
-    if (!isRndbot)
-    {
-        time_t& lastAction = lastBotActionTime[masterAccountId];
-        if (lastAction && (currentTime - lastAction) < 5)
-        {
-            allowed = false;
-            out << "Wait " << (5 - (currentTime - lastAction)) << "s to call the next bot";
-        }
-        else
-        {
-            lastAction = currentTime;
-        }
-    }
+	if(!isRndbot)
+	{
+		time_t CurrentTime = time(nullptr);
+		if (DelayBot && (CurrentTime - DelayBot) <= 10)
+		{
+			allowed = false;
+			out << "Wait 10s to call the next bot";
+		}
+
+		DelayBot = CurrentTime;
+	}
 
     bool sameAccount = sPlayerbotAIConfig->allowAccountBots && accountId == masterAccountId;
     Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
@@ -153,13 +149,6 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
         }
         return;
     }
-
-    // 5 second artificial delay for manual bots (not rndbot)
-    if (!isRndbot)
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-    }
-
     std::shared_ptr<PlayerbotLoginQueryHolder> holder =
         std::make_shared<PlayerbotLoginQueryHolder>(this, masterAccountId, accountId, playerGuid);
     if (!holder->Initialize())
@@ -318,28 +307,28 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid, uint32 masterAccountId)
 {
     if (Player* bot = GetPlayerBot(guid))
     {
-        time_t currentTime = time(nullptr);
+        //Checks if the bot is in a group and removes it to avoid a possible crash
+		if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(guid))
+		{
+			if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
+			{
+				group->RemoveMember(guid);
+				group = nullptr;
+			}
+		}
 
-        if (masterAccountId)
-        {
-            time_t& lastAction = lastBotActionTime[masterAccountId];
-            if (lastAction && (currentTime - lastAction) < 5)
-                return;
-            else
-                lastAction = currentTime;
-        }
+		uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
+		
+		if(accountId == masterAccountId)
+		{
+			time_t CurrentTime = time(nullptr);
+			if (DelayBot && (CurrentTime - DelayBot) <= 10)
+			{
+				return;
+			}
 
-        // 5 second artificial delay
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-
-        // Remove from group if necessary
-        if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(guid))
-        {
-            if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
-            {
-                group->RemoveMember(guid);
-            }
-        }
+			DelayBot = CurrentTime;
+		}
 
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (!botAI)

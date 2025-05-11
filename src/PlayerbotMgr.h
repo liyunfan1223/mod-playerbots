@@ -48,15 +48,13 @@ public:
     std::vector<std::string> HandlePlayerbotCommand(char const* args, Player* master = nullptr);
     std::string const ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin,
                                         uint32 masterAccountId, uint32 masterGuildId);
-
-    std::unordered_map<uint32, time_t> lastBotActionTime; // <masterAccountId, timestamp>
-
     uint32 GetAccountId(std::string const name);
     uint32 GetAccountId(ObjectGuid guid);
     std::string const ListBots(Player* master);
     std::string const LookupBots(Player* master);
     uint32 GetPlayerbotsCount() { return playerBots.size(); }
     uint32 GetPlayerbotsCountByClass(uint32 cls);
+    time_t DelayBot;
 
 protected:
     virtual void OnBotLoginInternal(Player* const bot) = 0;
