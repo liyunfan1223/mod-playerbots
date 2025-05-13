@@ -19,6 +19,7 @@ public:
         creators["seal of command"] = &seal_of_command;
         creators["blessing of might"] = &blessing_of_might;
         creators["crusader strike"] = &crusader_strike;
+        creators["divine plea"] = &divine_plea;
     }
 
 private:
@@ -69,6 +70,14 @@ private:
                               /*A*/ nullptr,
                               /*C*/ nullptr);
     }
+
+    static ActionNode* divine_plea([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("divine plea",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 };
 
 OffHealPaladinStrategy::OffHealPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)
@@ -78,24 +87,25 @@ OffHealPaladinStrategy::OffHealPaladinStrategy(PlayerbotAI* botAI) : GenericPala
 
 NextAction** OffHealPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(
-        0, new NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
-        new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.5f),
-        new NextAction("crusader strike", ACTION_DEFAULT + 0.4f), new NextAction("divine storm", ACTION_DEFAULT + 0.3f),
-        new NextAction("consecration", ACTION_DEFAULT + 0.1f), new NextAction("melee", ACTION_DEFAULT), nullptr);
+    return NextAction::array(0, new NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
+                             new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.5f),
+                             new NextAction("crusader strike", ACTION_DEFAULT + 0.4f),
+                             new NextAction("divine storm", ACTION_DEFAULT + 0.3f),
+                             new NextAction("melee", ACTION_DEFAULT), nullptr);
 }
 
 void OffHealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-    // DPS Triggers (from DpsPaladinStrategy)
+    // DPS Triggers
     triggers.push_back(
         new TriggerNode("seal", NextAction::array(0, new NextAction("seal of corruption", ACTION_HIGH), nullptr)));
     triggers.push_back(
-        new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 5), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "art of war", NextAction::array(0, new NextAction("exorcism", ACTION_DEFAULT + 0.2f), nullptr)));
+        new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 5),
+                                                      new NextAction("divine plea", ACTION_HIGH + 4), nullptr)));
+    triggers.push_back(
+        new TriggerNode("art of war", NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
         "avenging wrath", NextAction::array(0, new NextAction("avenging wrath", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(
@@ -105,8 +115,12 @@ void OffHealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                        NextAction::array(0, new NextAction("reach melee", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
         "retribution aura", NextAction::array(0, new NextAction("retribution aura", ACTION_NORMAL), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "blessing of might", NextAction::array(0, new NextAction("blessing of might", ACTION_NORMAL + 1), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "low health", NextAction::array(0, new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), nullptr)));
 
-    // Healing Triggers (adapted from HealPaladinStrategy)
+    // Healing Triggers
     triggers.push_back(
         new TriggerNode("party member critical health",
                         NextAction::array(0, new NextAction("holy shock on party", ACTION_CRITICAL_HEAL + 6),
