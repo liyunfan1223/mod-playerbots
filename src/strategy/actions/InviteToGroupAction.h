@@ -16,9 +16,13 @@ class InviteToGroupAction : public Action
 public:
     InviteToGroupAction(PlayerbotAI* botAI, std::string const name = "invite") : Action(botAI, name) {}
 
-    bool Execute(Event event) override;
+    bool Execute(Event event) override
+    {
+        Player* master = event.getOwner();
+        return Invite(bot, master);
+    }
 
-    virtual bool Invite(Player* player);
+    virtual bool Invite(Player* inviter, Player* player);
 };
 
 class JoinGroupAction : public InviteToGroupAction
@@ -26,17 +30,12 @@ class JoinGroupAction : public InviteToGroupAction
 public:
     JoinGroupAction(PlayerbotAI* ai, std::string name = "join") : InviteToGroupAction(ai, name) {}
     bool Execute(Event event) override;
-    bool isUseful() override { return !bot->IsBeingTeleported(); }
 };
 
 class InviteNearbyToGroupAction : public InviteToGroupAction
 {
 public:
-    InviteNearbyToGroupAction(PlayerbotAI* botAI, std::string const name = "invite nearby")
-        : InviteToGroupAction(botAI, name)
-    {
-    }
-
+    InviteNearbyToGroupAction(PlayerbotAI* botAI, std::string const name = "invite nearby") : InviteToGroupAction(botAI, name) {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -64,10 +63,17 @@ public:
     }
 
     bool Execute(Event event) override;
-    bool isUseful() override;
+    bool isUseful() { return bot->GetGuildId() && InviteNearbyToGroupAction::isUseful(); };
 
 private:
     std::vector<Player*> getGuildMembers();
+};
+
+class LfgAction : public InviteToGroupAction
+{
+public:
+    LfgAction(PlayerbotAI* botAI, std::string name = "lfg") : InviteToGroupAction(botAI, name) {}
+    bool Execute(Event event) override;
 };
 
 #endif
