@@ -89,7 +89,7 @@ AiPlayerbot.MaxRandomBots = 500
 # Random bot accounts
 # If you are not using any expansion at all, you may have to set this manually, then
 # please ensure that RandomBotAccountCount is at least greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
-# default: 0 - Automatic
+# Default: 0 - Automatic
 AiPlayerbot.RandomBotAccountCount = 0
 
 # Delete all random bot accounts (reset randombots)
@@ -114,14 +114,14 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 AiPlayerbot.MaxAddedBots = 40
 
 # Enable/Disable create bot by addclass command (0 = GM only, 1 = enable)
-# default: 1 (enable)
+# Default: 1 (enable)
 AiPlayerbot.AddClassCommand = 1
 
 # Set the addclass command account pool size
 AiPlayerbot.AddClassAccountPoolSize = 50
 
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
-# default: 1 (accept based on level)
+# Default: 1 (accept based on level)
 AiPlayerbot.GroupInvitationPermission = 1
 
 # auto-login all player alts as bots on player login
@@ -163,11 +163,11 @@ AiPlayerbot.SelfBotLevel = 1
 AiPlayerbot.FreeFood = 1
 
 # Non-GM player can only use init=auto to initialize bots based on their own level and gear score
-# default: 0 (non-gm player can use any intialization commands)
+# Default: 0 (non-gm player can use any intialization commands)
 AiPlayerbot.AutoInitOnly = 0
 
 # The upper limit ratio of bot equipment level for init=auto
-# default: 1.0 (same with the player)
+# Default: 1.0 (same with the player)
 AiPlayerbot.AutoInitEquipLevelLimitRatio = 1.0
 
 # Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
@@ -184,23 +184,23 @@ AiPlayerbot.AutoTrainSpells = yes
 #
 
 # Enable/Disable summoning bots when the master is in combat
-# default: 1 (enabled)
+# Default: 1 (enabled)
 AiPlayerbot.AllowSummonInCombat = 1
 
 # Enable/Disable summoning bots when the master is dead
-# default: 1 (enabled)
+# Default: 1 (enabled)
 AiPlayerbot.AllowSummonWhenMasterIsDead = 1
 
 # Enable/Disable summoning bots when they are dead (0 = only when the bots are ghosts, 1 = always)
-# default: 1 (always)
+# Default: 1 (always)
 AiPlayerbot.AllowSummonWhenBotIsDead = 1
 
 # Enable/Disable reviving the bots when summoning them (0 = disable, 1 = disable in combat, 2 = enable)
-# default: 1 (disable in combat)
+# Default: 1 (disable in combat)
 AiPlayerbot.ReviveBotWhenSummoned = 1
 
 # Enable/Disable bot repair gear when summon (0 = no, 1 = yes)
-# default: 1
+# Default: 1
 AiPlayerbot.BotRepairWhenSummon = 1
 
 #
@@ -215,22 +215,22 @@ AiPlayerbot.BotRepairWhenSummon = 1
 
 # Defines at what level a bot will naturally use its 60% ground mount
 # note: was level 20 during WotLK, 30 during TBC, 40 during Vanilla
-# default: 20
+# Default: 20
 AiPlayerbot.UseGroundMountAtMinLevel = 20
 
 # Defines at what level a bot will naturally use its 100% fast ground mount
 # note: was level 40 during WotLK, 60 during Vanilla
-# default: 40
+# Default: 40
 AiPlayerbot.UseFastGroundMountAtMinLevel = 40
 
 # Defines at what level a bot will naturally use its 150% fly mount
 # note: was level 60 during WotLK, 70 during TBC
-# default: 60
+# Default: 60
 AiPlayerbot.UseFlyMountAtMinLevel = 60
 
 # Defines at what level a bot will naturally use its 280% fast fly mount
 # note: was level 70 during WotLK and TBC
-# default: 70
+# Default: 70
 AiPlayerbot.UseFastFlyMountAtMinLevel = 70
 
 #
@@ -306,7 +306,7 @@ AiPlayerbot.MaxWaitForMove = 5000
 AiPlayerbot.DisableMoveSplinePath = 0
 
 # Max search time for movement (higher for better movement on slopes)
-# default: 3
+# Default: 3
 AiPlayerbot.MaxMovementSearchTime = 3
 
 # Action expiration time
@@ -456,11 +456,11 @@ AiPlayerbot.FleeingEnabled = 1
 #
 
 # Enable/Disable maintenance command, learn all available spells and skills, supplement consumables, repair, etc.
-# default: 1 (enable)
+# Default: 1 (enable)
 AiPlayerbot.MaintenanceCommand = 1
 
 # Enable/Disable autogear command, auto upgrade player bots gears, the quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
-# default: 1 (enable)
+# Default: 1 (enable)
 AiPlayerbot.AutoGearCommand = 1
 
 # Enable/Disable autogear command on player alt bots
@@ -468,11 +468,11 @@ AiPlayerbot.AutoGearCommand = 1
 AiPlayerbot.AutoGearCommandAltBots = 1
 
 # Equips quality limitation for auto gear command (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
-# default: 3 (rare)
+# Default: 3 (rare)
 AiPlayerbot.AutoGearQualityLimit = 3
 
 # Equips item level (not gearScore) limitation for auto gear command (0 = no limit)
-# default: 0 (no limit)
+# Default: 0 (no limit)
 AiPlayerbot.AutoGearScoreLimit = 0
 
 # Enables/Disables bot cheating
@@ -614,11 +614,11 @@ AiPlayerbot.DowngradeMaxLevelBot = 0
 #
 
 # Equips quality limitation for random bots (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
-# default: 3 (rare)
+# Default: 3 (rare)
 AiPlayerbot.RandomGearQualityLimit = 3
 
 # Equips gear score limitation for random bots (0 = no limit)
-# default: 0 (no limit)
+# Default: 0 (no limit)
 AiPlayerbot.RandomGearScoreLimit = 0
 
 # Set minimum level of randombots where gets enchants on items (Maxlevel + 1 to disable)
@@ -643,10 +643,10 @@ AiPlayerbot.RandomGearLoweringChance = 0
 AiPlayerbot.GearScoreCheck = 0
 
 # Enable/Disable bot equipments persistence (stop random initialization) after certain level (EquipmentPersistenceLevel)
-# default: 0 (disable)
+# Default: 0 (disable)
 AiPlayerbot.EquipmentPersistence = 0
 
-# default: 80
+# Default: 80
 AiPlayerbot.EquipmentPersistenceLevel = 80
 
 # Randombots automatically upgrade equipments on levelup
@@ -781,16 +781,18 @@ AiPlayerbot.NonCombatStrategies = ""
 AiPlayerbot.RandomBotMaps = 0,1,530,571
 
 # Probabilty bots teleport to banker (city)
-# default: 0.25
+# Default: 0.25
 AiPlayerbot.ProbTeleToBankers = 0.25
 
 # How far random bots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
 
 # How many levels below the lowest level creature in a zone, can a bot be
+# Default: 1
 AiPlayerbot.RandomBotTeleLowerLevel = 1
 
 # How many levels above the highest level creature in a zone, can a bot be
+# Default: 3
 AiPlayerbot.RandomBotTeleHigherLevel = 3
 
 # Bots automatically teleport to another place for leveling on levelup
