@@ -718,7 +718,7 @@ AiPlayerbot.RandomBotGroupNearby = 0
 AiPlayerbot.AutoDoQuests = 1
 
 # Random Bots will behave more like real players (exprimental)
-# This option will override AutoDoQuests
+# This option will override AutoDoQuests, RandomBotTeleLowerLevel, and RandomBotTeleHigherLevel
 # Default: 1 (enabled)
 AiPlayerbot.EnableNewRpgStrategy = 1
 
@@ -787,9 +787,11 @@ AiPlayerbot.ProbTeleToBankers = 0.25
 # How far random bots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
 
-# Level diff between random bots and nearby creatures for random teleports
-AiPlayerbot.RandomBotTeleLowerLevel = 3
-AiPlayerbot.RandomBotTeleHigherLevel = 1
+# How many levels below the lowest level creature in a zone, can a bot be
+AiPlayerbot.RandomBotTeleLowerLevel = 1
+
+# How many levels above the highest level creature in a zone, can a bot be
+AiPlayerbot.RandomBotTeleHigherLevel = 3
 
 # Bots automatically teleport to another place for leveling on levelup
 # Default: 1 (enabled)
