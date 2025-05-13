@@ -259,7 +259,7 @@ AiPlayerbot.RandomBotShowCloak = 1
 AiPlayerbot.AutoEquipUpgradeLoot = 1
 
 # Threshold for auto equipping upgrades
-# Default: 1.1 (Equip when the equipment score of the new item is 1.1 times higher than the currently equiped item)
+# Default: 1.1 (Equip when the equipment score of the new item is 1.1 times higher than the currently equipped item)
 AiPlayerbot.EquipUpgradeThreshold = 1.1
 
 # Two rounds of equipment initialization to create more suitable gear
