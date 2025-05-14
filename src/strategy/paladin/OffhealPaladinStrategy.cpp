@@ -3,7 +3,7 @@
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
-#include "OffHealPaladinStrategy.h"
+#include "OffhealPaladinStrategy.h"
 
 #include "Playerbots.h"
 #include "Strategy.h"
