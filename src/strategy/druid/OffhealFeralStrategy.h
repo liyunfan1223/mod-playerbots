@@ -10,10 +10,10 @@
 
 class PlayerbotAI;
 
-class OffHealFeralStrategy : public FeralDruidStrategy
+class OffhealFeralStrategy : public FeralDruidStrategy
 {
 public:
-    OffHealFeralStrategy(PlayerbotAI* botAI);
+    OffhealFeralStrategy(PlayerbotAI* botAI);
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "offheal"; }

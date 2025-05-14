@@ -3,15 +3,15 @@
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 
-#include "OffHealFeralStrategy.h"
+#include "OffhealFeralStrategy.h"
 
 #include "Playerbots.h"
 #include "Strategy.h"
 
-class OffHealFeralStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+class OffhealFeralStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    OffHealFeralStrategyActionNodeFactory()
+    OffhealFeralStrategyActionNodeFactory()
     {
         creators["cat form"] = &cat_form;
         creators["mangle (cat)"] = &mangle_cat;
@@ -116,12 +116,12 @@ private:
     }
 };
 
-OffHealFeralStrategy::OffHealFeralStrategy(PlayerbotAI* botAI) : FeralDruidStrategy(botAI)
+OffhealFeralStrategy::OffhealFeralStrategy(PlayerbotAI* botAI) : FeralDruidStrategy(botAI)
 {
-    actionNodeFactories.Add(new OffHealFeralStrategyActionNodeFactory());
+    actionNodeFactories.Add(new OffhealFeralStrategyActionNodeFactory());
 }
 
-NextAction** OffHealFeralStrategy::getDefaultActions()
+NextAction** OffhealFeralStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction("mangle (cat)", ACTION_DEFAULT + 0.5f),
                              new NextAction("shred", ACTION_DEFAULT + 0.4f),
@@ -129,7 +129,7 @@ NextAction** OffHealFeralStrategy::getDefaultActions()
                              new NextAction("cat form", ACTION_DEFAULT - 0.1f), nullptr);
 }
 
-void OffHealFeralStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void OffhealFeralStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     FeralDruidStrategy::InitTriggers(triggers);
 

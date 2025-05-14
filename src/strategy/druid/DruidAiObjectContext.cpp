@@ -17,7 +17,7 @@
 #include "GenericDruidStrategy.h"
 #include "HealDruidStrategy.h"
 #include "MeleeDruidStrategy.h"
-#include "OffHealFeralStrategy.h"
+#include "OffhealFeralStrategy.h"
 #include "Playerbots.h"
 
 class DruidStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -70,7 +70,7 @@ private:
     static Strategy* cat(PlayerbotAI* botAI) { return new CatDpsDruidStrategy(botAI); }
     static Strategy* caster(PlayerbotAI* botAI) { return new CasterDruidStrategy(botAI); }
     static Strategy* heal(PlayerbotAI* botAI) { return new HealDruidStrategy(botAI); }
-    static Strategy* offheal(PlayerbotAI* botAI) { return new OffHealFeralStrategy(botAI); }
+    static Strategy* offheal(PlayerbotAI* botAI) { return new OffhealFeralStrategy(botAI); }
 };
 
 class DruidTriggerFactoryInternal : public NamedObjectContext<Trigger>

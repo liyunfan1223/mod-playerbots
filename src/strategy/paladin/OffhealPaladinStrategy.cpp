@@ -8,10 +8,10 @@
 #include "Playerbots.h"
 #include "Strategy.h"
 
-class OffHealPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+class OffhealPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    OffHealPaladinStrategyActionNodeFactory()
+    OffhealPaladinStrategyActionNodeFactory()
     {
         creators["retribution aura"] = &retribution_aura;
         creators["seal of corruption"] = &seal_of_corruption;
@@ -80,12 +80,12 @@ private:
     }
 };
 
-OffHealPaladinStrategy::OffHealPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)
+OffhealPaladinStrategy::OffhealPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)
 {
-    actionNodeFactories.Add(new OffHealPaladinStrategyActionNodeFactory());
+    actionNodeFactories.Add(new OffhealPaladinStrategyActionNodeFactory());
 }
 
-NextAction** OffHealPaladinStrategy::getDefaultActions()
+NextAction** OffhealPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
                              new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.5f),
@@ -94,7 +94,7 @@ NextAction** OffHealPaladinStrategy::getDefaultActions()
                              new NextAction("melee", ACTION_DEFAULT), nullptr);
 }
 
-void OffHealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void OffhealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
