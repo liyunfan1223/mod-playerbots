@@ -813,6 +813,10 @@ void PlayerbotFactory::InitPetTalents()
 void PlayerbotFactory::InitPet()
 {
     Pet* pet = bot->GetPet();
+
+    if (!pet && bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
+        return;
+
     if (!pet)
     {
         if (bot->getClass() != CLASS_HUNTER || bot->GetLevel() < 10)
