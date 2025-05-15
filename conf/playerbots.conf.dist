@@ -798,6 +798,7 @@ AiPlayerbot.RandomBotTeleportDistance = 100
 AiPlayerbot.RandomBotTeleLowerLevel = 1
 
 # How many levels above the highest-level creature in a zone, can a bot be
+# This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
 # Default: 3 (randombot will leave if they are more than 3 levels higher)
 AiPlayerbot.RandomBotTeleHigherLevel = 3
 
