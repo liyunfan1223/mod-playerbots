@@ -30,6 +30,7 @@ public:
     void Reset();
     float CalculateItem(uint32 itemId);
     float CalculateEnchant(uint32 enchantId);
+    float CalculateRandomProperty(int32 randomPropertyId, uint32 itemId);
 
     void SetOverflowPenalty(bool apply) { enable_overflow_penalty_ = apply; }
     void SetItemSetBonus(bool apply) { enable_item_set_bonus_ = apply; }

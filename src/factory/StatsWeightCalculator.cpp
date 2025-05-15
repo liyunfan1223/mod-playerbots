@@ -9,6 +9,7 @@
 
 #include "AiFactory.h"
 #include "DBCStores.h"
+#include "ItemEnchantmentMgr.h"
 #include "ItemTemplate.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAI.h"
@@ -103,6 +104,66 @@ float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
     Reset();
 
     collector_->CollectEnchantStats(enchant);
+
+    if (enable_overflow_penalty_)
+        ApplyOverflowPenalty(player_);
+
+    GenerateWeights(player_);
+    for (uint32 i = 0; i < STATS_TYPE_MAX; i++)
+    {
+        weight_ += stats_weights_[i] * collector_->stats[i];
+    }
+
+    return weight_;
+}
+
+float StatsWeightCalculator::CalculateRandomProperty(int32 randomPropertyId, uint32 itemId)
+{
+    Reset();
+
+    if (randomPropertyId > 0)
+    {
+        ItemRandomPropertiesEntry const* item_rand = sItemRandomPropertiesStore.LookupEntry(randomPropertyId);
+        if (!item_rand)
+        {
+            return 0.0f;
+        }
+
+        for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
+        {
+            uint32 enchantId = item_rand->Enchantment[i - PROP_ENCHANTMENT_SLOT_0];
+            SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+            if (enchant)
+                collector_->CollectEnchantStats(enchant);
+        }
+    }
+    else
+    {
+        ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(-randomPropertyId);
+        if (!item_rand)
+        {
+            return 0.0f;
+        }
+
+        for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
+        {
+            uint32 enchantId = item_rand->Enchantment[i - PROP_ENCHANTMENT_SLOT_0];
+            SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+            uint32 enchant_amount = 0;
+
+            for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
+            {
+                if (item_rand->Enchantment[k] == enchantId)
+                {
+                    enchant_amount = uint32((item_rand->AllocationPct[k] * GenerateEnchSuffixFactor(itemId)) / 10000);
+                    break;
+                }
+            }
+
+            if (enchant)
+                collector_->CollectEnchantStats(enchant, enchant_amount);
+        }
+    }
 
     if (enable_overflow_penalty_)
         ApplyOverflowPenalty(player_);
@@ -293,8 +354,8 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 0.8f;
         stats_weights_[STATS_TYPE_HASTE] += 1.0f;
     }
-    else if ((cls == CLASS_PALADIN && tab == PALADIN_TAB_HOLY) ||       // holy
-             (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_RESTORATION))    // heal
+    else if ((cls == CLASS_PALADIN && tab == PALADIN_TAB_HOLY) ||     // holy
+             (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_RESTORATION))  // heal
     {
         stats_weights_[STATS_TYPE_INTELLECT] += 0.9f;
         stats_weights_[STATS_TYPE_SPIRIT] += 0.15f;
@@ -303,7 +364,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 0.6f;
         stats_weights_[STATS_TYPE_HASTE] += 0.8f;
     }
-    else if ((cls == CLASS_PRIEST && tab != PRIEST_TAB_SHADOW) ||       // discipline / holy
+    else if ((cls == CLASS_PRIEST && tab != PRIEST_TAB_SHADOW) ||  // discipline / holy
              (cls == CLASS_DRUID && tab == DRUID_TAB_RESTORATION))
     {
         stats_weights_[STATS_TYPE_INTELLECT] += 0.8f;
@@ -559,12 +620,13 @@ void StatsWeightCalculator::ApplyOverflowPenalty(Player* player)
         if (hitOverflowType_ & CollectorType::SPELL)
         {
             hit_current = player->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
-            hit_current += player->GetTotalAuraModifier(SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT); // suppression (18176)
+            hit_current +=
+                player->GetTotalAuraModifier(SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT);  // suppression (18176)
             hit_current += player->GetRatingBonusValue(CR_HIT_SPELL);
 
-            if (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW && player->HasAura(15835)) // Shadow Focus
+            if (cls == CLASS_PRIEST && tab == PRIEST_TAB_SHADOW && player->HasAura(15835))  // Shadow Focus
                 hit_current += 3;
-            if (cls == CLASS_MAGE && tab == MAGE_TAB_ARCANE && player->HasAura(12840)) // Arcane Focus
+            if (cls == CLASS_MAGE && tab == MAGE_TAB_ARCANE && player->HasAura(12840))  // Arcane Focus
                 hit_current += 3;
 
             hit_overflow = SPELL_HIT_OVERFLOW;
@@ -657,7 +719,7 @@ void StatsWeightCalculator::ApplyWeightFinetune(Player* player)
     {
         if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
         {
-            float armor_penetration_current/*, armor_penetration_overflow*/; //not used, line marked for removal.
+            float armor_penetration_current /*, armor_penetration_overflow*/;  // not used, line marked for removal.
             armor_penetration_current = player->GetRatingBonusValue(CR_ARMOR_PENETRATION);
             if (armor_penetration_current > 50)
                 stats_weights_[STATS_TYPE_ARMOR_PENETRATION] *= 1.2f;
