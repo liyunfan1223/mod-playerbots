@@ -792,12 +792,12 @@ AiPlayerbot.ProbTeleToBankers = 0.25
 # How far randombots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
 
-# How many levels below the lowest level creature in a zone, can a bot be
+# How many levels below the lowest-level creature in a zone, can a bot be
 # This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
 # Default: 1 (randombot will leave if they are more than 1 level lower)
 AiPlayerbot.RandomBotTeleLowerLevel = 1
 
-# How many levels above the highest level creature in a zone, can a bot be
+# How many levels above the highest-level creature in a zone, can a bot be
 # Default: 3 (randombot will leave if they are more than 3 levels higher)
 AiPlayerbot.RandomBotTeleHigherLevel = 3
 
