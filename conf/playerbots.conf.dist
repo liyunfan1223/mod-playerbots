@@ -674,7 +674,7 @@ AiPlayerbot.HunterWolfPet = 0
 #
 #
 # Specify percent of active bots
-# The Default is 100% but will be automatically adjusted if botActiveAloneSmartScale
+# The default is 100% but will be automatically adjusted if botActiveAloneSmartScale
 # is enabled. Regardless, this value is only applied to inactive areas where no real players
 # are detected. When real players are nearby, the value is always enforced to 100%
 AiPlayerbot.BotActiveAlone = 100
@@ -687,7 +687,7 @@ AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
 AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 
 # SmartScale (automatic scaling of percentage of active bots based on latency)
-# The Default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
+# The default is 1. When enabled (smart) scales the 'BotActiveAlone' value.
 # (The scaling will be overruled by the BotActiveAloneForceWhen...rules)
 #
 #   Limitfloor - when DIFF (latency) above floor, activity scaling is applied starting with 90%
@@ -765,7 +765,7 @@ AiPlayerbot.RandomBotSpellIds = "54197"
 #
 #
 
-# Random bot Default strategies (applied after Defaults)
+# Random bot default strategies (applied after defaults)
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
 # AiPlayerbot.RandomBotNonCombatStrategies = "+grind,+loot,+rpg,+custom::say"
 AiPlayerbot.RandomBotNonCombatStrategies = ""
@@ -792,15 +792,15 @@ AiPlayerbot.ProbTeleToBankers = 0.25
 # How far randombots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
 
-# Randombots will leave any zone in which their level is lower than the lowest-level creature in the zone by the below number
+# How many levels below the lowest-level creature in a zone, can a bot be
 # This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
-# Default: 3 (randombot will leave if they are more than 3 levels lower)
-AiPlayerbot.RandomBotTeleLowerLevel = 3
+# Default: 1 (randombot will leave if they are more than 1 level lower)
+AiPlayerbot.RandomBotTeleLowerLevel = 1
 
-# Randombots will leave any zone in which their level is higher than the highest-level creature in the zone by the below number
+# How many levels above the highest-level creature in a zone, can a bot be
 # This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
-# Default: 1 (randombot will leave if they are more than 1 level higher)
-AiPlayerbot.RandomBotTeleHigherLevel = 1
+# Default: 3 (randombot will leave if they are more than 3 levels higher)
+AiPlayerbot.RandomBotTeleHigherLevel = 3
 
 # Bots automatically teleport to another place for leveling on levelup
 # Default: 1 (enabled)
@@ -841,7 +841,7 @@ AiPlayerbot.RandomBotAutoJoinBG = 0
 # - Ensure there are enough eligible bots to meet the specified counts.
 #
 # Arena Considerations:
-# - Rated arena brackets Default to level 80-84 (bracket 14).
+# - Rated arena brackets default to level 80-84 (bracket 14).
 # - Custom code changes are required for lower-level arena brackets to function properly.
 #
 # Battleground bracket range possibilities:
