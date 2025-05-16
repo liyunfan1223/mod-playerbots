@@ -96,7 +96,7 @@ AiPlayerbot.RandomBotAccountCount = 0
 # To apply this, set the number to 1 and run the Worldserver. Once deletion is complete, if you would like to recreate randombots, set the number back to 0 and rerun the Worldserver.
 AiPlayerbot.DeleteRandomBotAccounts = 0
 
-###################################################################################################
+####################################################################################################
 
 ###################################
 #                                 #
