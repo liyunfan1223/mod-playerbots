@@ -45,7 +45,13 @@ public:
         creators["freya nature resistance action"] = &RaidUlduarActionContext::freya_nature_resistance_action;
         creators["freya mark dps target action"] = &RaidUlduarActionContext::freya_mark_dps_target_action;
         creators["freya move to healing spore action"] = &RaidUlduarActionContext::freya_move_to_healing_spore_action;
+        creators["thorim frost resistance action"] = &RaidUlduarActionContext::thorim_frost_resistance_action;
         creators["thorim nature resistance action"] = &RaidUlduarActionContext::thorim_nature_resistance_action;
+        creators["thorim unbalancing strike action"] = &RaidUlduarActionContext::thorim_unbalancing_strike_action;
+        creators["thorim mark dps target action"] = &RaidUlduarActionContext::thorim_mark_dps_target_action;
+        creators["thorim arena positioning action"] = &RaidUlduarActionContext::thorim_arena_positioning_action;
+        creators["thorim gauntlet positioning action"] = &RaidUlduarActionContext::thorim_gauntlet_positioning_action;
+        creators["thorim phase 2 positioning action"] = &RaidUlduarActionContext::thorim_phase2_positioning_action;
         creators["mimiron fire resistance action"] = &RaidUlduarActionContext::mimiron_fire_resistance_action;
     }
 
@@ -79,7 +85,13 @@ private:
     static Action* freya_nature_resistance_action(PlayerbotAI* ai) { return new BossNatureResistanceAction(ai, "freya"); }
     static Action* freya_mark_dps_target_action(PlayerbotAI* ai) { return new FreyaMarkDpsTargetAction(ai); }
     static Action* freya_move_to_healing_spore_action(PlayerbotAI* ai) { return new FreyaMoveToHealingSporeAction(ai); }
+    static Action* thorim_frost_resistance_action(PlayerbotAI* ai) { return new BossFrostResistanceAction(ai, "thorim"); }
     static Action* thorim_nature_resistance_action(PlayerbotAI* ai) { return new BossNatureResistanceAction(ai, "thorim"); }
+    static Action* thorim_unbalancing_strike_action(PlayerbotAI* ai) { return new ThorimUnbalancingStrikeAction(ai); }
+    static Action* thorim_mark_dps_target_action(PlayerbotAI* ai) { return new ThorimMarkDpsTargetAction(ai); }
+    static Action* thorim_arena_positioning_action(PlayerbotAI* ai) { return new ThorimArenaPositioningAction(ai); }
+    static Action* thorim_gauntlet_positioning_action(PlayerbotAI* ai) { return new ThorimGauntletPositioningAction(ai); }
+    static Action* thorim_phase2_positioning_action(PlayerbotAI* ai) { return new ThorimPhase2PositioningAction(ai); }
     static Action* mimiron_fire_resistance_action(PlayerbotAI* ai) { return new BossFireResistanceAction(ai, "mimiron"); }
 };
 
