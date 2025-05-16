@@ -766,13 +766,13 @@ AiPlayerbot.OpenGoSpell = 6477
 #
 #
 
-# Additional randombot default strategies
-# Randombots have default strategies based on spec; strategies added here will apply to all randombots and be in addition to spec-based default strategies
+# Additional randombot strategies
+# Strategies added here are applied to all randombots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
 AiPlayerbot.RandomBotNonCombatStrategies = ""
 
-# Additional altbot default strategies
-# Altbots have default strategies based on spec; strategies added here will apply to all altbots and be in addition to spec-based default strategies
+# Additional altbot strategies
+# Strategies added here are applied to all altbots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
 
