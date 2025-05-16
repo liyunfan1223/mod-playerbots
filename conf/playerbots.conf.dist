@@ -1223,9 +1223,8 @@ AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 #
 
 # Applies a permanent buff to all bots simulating effects of spells, flasks, food, runes, etc.
-# Requires nc +worldbuff command ingame to enable
+# Requires sending the command "nc +worldbuff" in chat to a bot (or a group of bots) to enable
 # Numbers after the equal signs are spell IDs and may be customized
-# Additionally, the numbers after AiPlayerbot.WorldBuff can be customized and represent Faction.Class.Spec.MinLevel.MaxLevel (but the edit must be made in both the .conf and .conf.dist file to work)
 # See Randombots Default Talent Specs for more info on each spec; they are listed in that section by the names in the parentheticals (e.g., arms pve, fury pve)
 
 AiPlayerbot.WorldBuff.0.1.0.80.80 = 53760,57358                    #WARRIOR ARMS (arms pve)
