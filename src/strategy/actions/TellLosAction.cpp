@@ -146,9 +146,7 @@ bool TellCalculateItemAction::Execute(Event event)
     const ItemTemplate* proto = sObjectMgr->GetItemTemplate(item.itemId);
     if (!proto)
         return false;
-    float score = calculator.CalculateItem(item.itemId);
-    if (item.randomPropertyId)
-        score += calculator.CalculateRandomProperty(item.randomPropertyId, item.itemId);
+    float score = calculator.CalculateItem(item.itemId, item.randomPropertyId);
 
     std::ostringstream out;
     out << "Calculated score of " << chat->FormatItem(proto) << " : " << score;

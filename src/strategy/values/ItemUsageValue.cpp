@@ -306,10 +306,8 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
     calculator.SetItemSetBonus(false);
     calculator.SetOverflowPenalty(false);
     
-    float itemScore = calculator.CalculateItem(itemProto->ItemId);
-    if (randomPropertyId)
-        itemScore += calculator.CalculateRandomProperty(randomPropertyId, itemProto->ItemId);
-
+    float itemScore = calculator.CalculateItem(itemProto->ItemId, randomPropertyId);
+    
     if (itemScore)
         shouldEquip = true;
 
@@ -393,13 +391,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         }
 
         ItemTemplate const* oldItemProto = oldItem->GetTemplate();
-        float oldScore = calculator.CalculateItem(oldItemProto->ItemId);
+        float oldScore = calculator.CalculateItem(oldItemProto->ItemId, oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
         if (oldItem)
         {
-            if (oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID))
-            {
-                oldScore += calculator.CalculateRandomProperty(oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID), itemProto->ItemId);
-            }
             // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
             if (itemScore || oldScore)
             {

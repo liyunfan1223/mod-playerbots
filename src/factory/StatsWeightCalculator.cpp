@@ -60,7 +60,7 @@ void StatsWeightCalculator::Reset()
     }
 }
 
-float StatsWeightCalculator::CalculateItem(uint32 itemId)
+float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyIds)
 {
     ItemTemplate const* proto = &sObjectMgr->GetItemTemplateStore()->at(itemId);
 
@@ -70,6 +70,9 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId)
     Reset();
 
     collector_->CollectItemStats(proto);
+    
+    if (randomPropertyIds != 0)
+        CalculateRandomProperty(randomPropertyIds, itemId);
 
     if (enable_overflow_penalty_)
         ApplyOverflowPenalty(player_);
@@ -117,16 +120,14 @@ float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
     return weight_;
 }
 
-float StatsWeightCalculator::CalculateRandomProperty(int32 randomPropertyId, uint32 itemId)
+void StatsWeightCalculator::CalculateRandomProperty(int32 randomPropertyId, uint32 itemId)
 {
-    Reset();
-
     if (randomPropertyId > 0)
     {
         ItemRandomPropertiesEntry const* item_rand = sItemRandomPropertiesStore.LookupEntry(randomPropertyId);
         if (!item_rand)
         {
-            return 0.0f;
+            return;
         }
 
         for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
@@ -142,7 +143,7 @@ float StatsWeightCalculator::CalculateRandomProperty(int32 randomPropertyId, uin
         ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(-randomPropertyId);
         if (!item_rand)
         {
-            return 0.0f;
+            return;
         }
 
         for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
@@ -164,17 +165,6 @@ float StatsWeightCalculator::CalculateRandomProperty(int32 randomPropertyId, uin
                 collector_->CollectEnchantStats(enchant, enchant_amount);
         }
     }
-
-    if (enable_overflow_penalty_)
-        ApplyOverflowPenalty(player_);
-
-    GenerateWeights(player_);
-    for (uint32 i = 0; i < STATS_TYPE_MAX; i++)
-    {
-        weight_ += stats_weights_[i] * collector_->stats[i];
-    }
-
-    return weight_;
 }
 
 void StatsWeightCalculator::GenerateWeights(Player* player)
