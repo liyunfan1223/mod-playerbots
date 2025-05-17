@@ -1,5 +1,5 @@
 ##################################################
-# PLAYERBOTS CONFIGURATION FILE                   #
+# PLAYERBOTS CONFIGURATION FILE                  #
 ##################################################
 
 # Overview
@@ -7,7 +7,7 @@
 # "Altbot": characters created on player accounts, which may be logged in by the player and invited to groups and given commands like randombots. Depending on settings, altbots can be limited to characters on the active player's account or in the active player's guild.
 # Information about commands to control bots and set their strategies can be found on the wiki at https://github.com/liyunfan1223/mod-playerbots/wiki/Playerbot-Commands.
 
-###################################################################################################
+####################################################################################################
 # SECTION INDEX
 #   GENERAL SETTINGS
 #    PLAYERBOTS SETTINGS
@@ -67,11 +67,7 @@
 #
 #
 #
-#
-#
-###################################################################################################
-
-###################################################################################################
+####################################################################################################
 
 ###################################
 #                                 #
@@ -93,18 +89,18 @@ AiPlayerbot.MaxRandomBots = 500
 
 # Randombot accounts
 # If you are not using any expansion at all, you may have to set this manually, in which case please ensure that RandomBotAccountCount is at least greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
-# Default: 0 - Automatic
+# Default: 0 (automatic)
 AiPlayerbot.RandomBotAccountCount = 0
 
 # Delete all randombot accounts
 # To apply this, set the number to 1 and run the Worldserver. Once deletion is complete, if you would like to recreate randombots, set the number back to 0 and rerun the Worldserver.
 AiPlayerbot.DeleteRandomBotAccounts = 0
 
-###################################################################################################
+####################################################################################################
 
 ###################################
 #                                 #
-# PLAYERBOTS SETTINGS              #
+# PLAYERBOTS SETTINGS             #
 #                                 #
 ###################################
 
@@ -162,7 +158,7 @@ AiPlayerbot.InviteChat = 0
 AiPlayerbot.SummonWhenGroup = 1
 
 # Player can be activated as a bot (selfbot)
-# Selfbot permission level (0 = disabled, 1 = GM only (Default), 2 = all players, 3 = activate on login)
+# Selfbot permission level (0 = disabled, 1 = GM only (default), 2 = all players, 3 = activate on login)
 AiPlayerbot.SelfBotLevel = 1
 
 # Give free food to bots
@@ -202,7 +198,7 @@ AiPlayerbot.AllowSummonWhenMasterIsDead = 1
 # Default: 1 (always)
 AiPlayerbot.AllowSummonWhenBotIsDead = 1
 
-# Enable/Disable reviving the bots when summoning them (0 = disabled, 1 = disabled in combat, 2 = enabled)
+# Enable/Disable reviving bots when summoning them (0 = disabled, 1 = disabled in combat, 2 = enabled)
 # Default: 1 (disabled in combat)
 AiPlayerbot.ReviveBotWhenSummoned = 1
 
@@ -305,7 +301,7 @@ AiPlayerbot.GlobalCooldown = 500
 # Max wait time when moving
 AiPlayerbot.MaxWaitForMove = 5000
 
-# Disables use of MoveSplinePath for bot movement, will result in more erratic bot movement but means stun/snare/root/etc will work on bots (they wont reliably work when MoveSplinePath is enabled, though slowing effects still work ok)
+# Disable use of MoveSplinePath for bot movement, will result in more erratic bot movement but means stun/snare/root/etc will work on bots (they wont reliably work when MoveSplinePath is enabled, though slowing effects still work ok)
 # Default: 0 - MoveSplinePath enabled
 #          1 - MoveSplinePath disabled in BG/Arena only
 #          2 - MoveSplinePath disabled everywhere
@@ -375,12 +371,13 @@ AiPlayerbot.AggroDistance = 22
 ####################################################################################################
 
 ####################################################################################################
-#THRESHOLDS
+# THRESHOLDS
 #
 #
 
-# Set XP rate for bots (Default: 1.0)
-# Server XP Rate * AiPlayerbot.PlayerbotsXPRate
+# Set XP rate for bots
+# Default: 1.0
+# Actual XP Rate will be = Server XP Rate * AiPlayerbot.PlayerbotsXPRate
 AiPlayerbot.PlayerbotsXPRate = 1.0
 
 # Health/Mana levels
@@ -405,8 +402,8 @@ AiPlayerbot.HighMana = 65
 # Bots pick their quest rewards (yes = picks the most useful item, no = list all rewards, ask = pick useful item and lists if multiple)
 AiPlayerbot.AutoPickReward = yes
 
-# Sync quests with player (Bots will complete quests the moment you hand them in. Bots will ignore looting quest items.)
-# Default: 1 (enable)
+# Sync quests with player (Bots will complete quests the moment you hand them in and will not loot quest items.)
+# Default: 1 (enabled)
 AiPlayerbot.SyncQuestWithPlayer = 1
 
 # Bots will auto-complete quests for the player when handing in bots' quests
@@ -481,26 +478,20 @@ AiPlayerbot.AutoGearQualityLimit = 3
 # Default: 0 (no limit)
 AiPlayerbot.AutoGearScoreLimit = 0
 
-# Enables/Disables cheats for bots
-AiPlayerbot.BotCheats = "taxi"
+# Enable/Disable cheats for bots
+# "gold" (bots have infinite gold)
+# "health" (bots have infinite health)
+# "mana" (bots have infinite mana)
+# "power" (bots have infinite energy, rage, and runic power)
+# "taxi" (bots may use all flight paths, though they will not actually learn them) 
+# To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,taxi")
+# Default: taxi is enabled
+AiPlayerbot.BotCheats = "taxi" 
 
 #
 #
 #
 ####################################################################################################
-
-####################################################################################################
-# SPELLS
-#
-#
-
-# ID of spell to open lootable chests
-AiPlayerbot.OpenGoSpell = 6477
-
-#
-#
-#
-###################################################################################################
 
 ####################################################################################################
 # FLIGHTPATH
@@ -522,7 +513,7 @@ AiPlayerbot.BotTaxiGapJitterMs = 100
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
 #######################################
 #                                     #
@@ -535,7 +526,7 @@ AiPlayerbot.BotTaxiGapJitterMs = 100
 #
 #
 
-# Enables/Disables randomly generated password for randombot accounts
+# Enable/Disable randomly generated password for randombot accounts
 AiPlayerbot.RandomBotRandomPassword = 0
 
 # Prefix for account names to create for randombots
@@ -572,13 +563,15 @@ AiPlayerbot.RandomBotHordeRatio = 50
 # Disable logging in of death knight bots
 AiPlayerbot.DisableDeathKnightLogin = 0
 
-# Enable expansion limitation for talents and glyphs (i.e., level ≤ 60 means bots only use talents available in vanilla, level ≤ 70 means bots only use talents available in TBC)
-# Default: 0
+# Enable simulated expansion limitation for talents and glyphs
+# If enabled, limits talent trees to 5 rows plus the middle talent of the 6th row for bots until level 61 and 7 rows plus the middle talent of the 8th row for bots until level 71
+# Default: 0 (disabled)
 AiPlayerbot.LimitTalentsExpansion = 0
 
 # Configure randombots and addClass bot trading (0: Disabled, 1: Enabled, 2: Only Buy, 3: Only Sell)
-# Default: 1 (Enabled)
+# Default: 1 (enabled)
 AiPlayerbot.EnableRandomBotTrading = 1
+
 #
 #
 #
@@ -596,10 +589,12 @@ AiPlayerbot.DisableRandomLevels = 0
 # Set randombots' starting level here if "AiPlayerbot.DisableRandomLevels" enabled
 AiPlayerbot.RandombotStartingLevel = 1
 
-# Chance randombot has min level on first randomize (Default 0.1)
+# Chance randombot has min level on first randomize
+# Default: 0.1 (10%)
 AiPlayerbot.RandomBotMinLevelChance = 0.1
 
-# Chance randombot has max level on first randomize (Default 0.1)
+# Chance randombot has max level on first randomize
+# Default 0.1 (10%)
 AiPlayerbot.RandomBotMaxLevelChance = 0.1
 
 # Fix the level of randombots (they won't level up)
@@ -633,15 +628,18 @@ AiPlayerbot.RandomGearScoreLimit = 0
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
 
-# Enable expansion limitation for bot enchants (i.e., level ≤ 60 maens bots only use enchants available in vanilla, level ≤ 70 means bots only use enchants available in TBC)
-# Default: 1
+# Enable expansion limitation for bot enchants
+# If enabled, bots will not use TBC enchants until level 61 or WotLK enchanges until level 71
+# Default: 1 (enabled)
 AiPlayerbot.LimitEnchantExpansion = 1
 
-# Enable expansion limitation for gear (i.e., level ≤ 60 means bots only us gear available in vanilla, level ≤ 70 means bots only use gear available in TBC)
-# Default: 1
+# Enable expansion limitation for gear
+# If enabled, bots will not equip TBC gear until level 61 or WotLK gear until level 71
+# Default: 1 (enabled)
 AiPlayerbot.LimitGearExpansion = 1
 
-# Chance randombot has lower gear
+# Chance randombot will have less-than-optimized generated gear
+# Set between 0 (0%) and 1 (100%)
 AiPlayerbot.RandomGearLoweringChance = 0
 
 # Randombots check player's gearscore level and deny the group invitation if it's too low
@@ -728,7 +726,7 @@ AiPlayerbot.AutoDoQuests = 1
 AiPlayerbot.EnableNewRpgStrategy = 1
 
 # Quest items to keep in bots' inventories (do not destroy)
-AiPlayerbot.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12344,12382,13704,16309,17191"
+AiPlayerbot.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12382,13704,16309"
 
 #
 #
@@ -752,8 +750,11 @@ AiPlayerbot.AutoLearnTrainerSpells = 1
 # Default: 1 (enabled)
 AiPlayerbot.AutoPickTalents = 1
 
-# Spells every random bot will learn automatically and every altbot will learn with maintenance (54197 - cold weather flying)
+# Spells every randombot will learn automatically and every altbot will learn with maintenance (54197 - cold weather flying)
 AiPlayerbot.RandomBotSpellIds = "54197"
+
+# ID of spell to open lootable chests
+AiPlayerbot.OpenGoSpell = 6477
 
 #
 #
@@ -765,10 +766,13 @@ AiPlayerbot.RandomBotSpellIds = "54197"
 #
 #
 
-# Random bot default strategies (applied after defaults)
+# Additional randombot strategies
+# Strategies added here are applied to all randombots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
 AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
-# AiPlayerbot.RandomBotNonCombatStrategies = "+grind,+loot,+rpg,+custom::say"
 AiPlayerbot.RandomBotNonCombatStrategies = ""
+
+# Additional altbot strategies
+# Strategies added here are applied to all altbots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
 
@@ -934,7 +938,7 @@ AiPlayerbot.PermanantlyInWorldTime = 31104000
 #                                 #
 ###################################
 
-###################################################################################################
+####################################################################################################
 # INFORMATION
 #
 #
@@ -948,9 +952,9 @@ AiPlayerbot.PermanantlyInWorldTime = 31104000
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # WARRIOR
 #
 #
@@ -971,9 +975,9 @@ AiPlayerbot.PremadeSpecLink.1.2.80 = 3500030023-301-053351225000210521030113321
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # PALADIN
 #
 #
@@ -995,9 +999,9 @@ AiPlayerbot.PremadeSpecLink.2.2.80 = 050501-05-05232051203331302133231331
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # HUNTER
 #
 #
@@ -1030,9 +1034,9 @@ AiPlayerbot.PremadeHunterPetLink.2.20 = 21000203300002110221
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # ROGUE
 #
 #
@@ -1053,9 +1057,9 @@ AiPlayerbot.PremadeSpecLink.4.2.80 = 30532010114--5022012030321121350115031151
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # PRIEST
 #
 #
@@ -1076,9 +1080,9 @@ AiPlayerbot.PremadeSpecLink.5.2.80 = 0503203--325023051223010323152301351
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # DEATHKNIGHT
 #
 #
@@ -1103,9 +1107,9 @@ AiPlayerbot.PremadeSpecLink.6.3.80 = 005512153330030320102013-3050505002023001-0
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # SHAMAN
 #
 #
@@ -1126,9 +1130,9 @@ AiPlayerbot.PremadeSpecLink.7.2.80 = -00502033-50005331335310501122331251
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # MAGE
 #
 #
@@ -1153,9 +1157,9 @@ AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120311351-023303031
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # WARLOCK
 #
 #
@@ -1178,9 +1182,9 @@ AiPlayerbot.PremadeSpecLink.9.2.80 = -03310030003-05203205210331051335230351
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
-###################################################################################################
+####################################################################################################
 # DRUID
 #
 #
@@ -1205,7 +1209,7 @@ AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
 ###################################
 #                                 #
@@ -1218,52 +1222,52 @@ AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053100030310511-205503012
 #
 #
 
-# Applies a permanent buff to all bots when not in combat simulating effects of buffs, flasks, food, rune etc.
-# Requires nc +worldbuff command ingame to enable
-# Inputs are spell IDs
-# WorldBuff.Faction.Class.Spec.MinLevel.MaxLevel
+# Applies a permanent buff to all bots simulating effects of spells, flasks, food, runes, etc.
+# Requires sending the command "nc +worldbuff" in chat to a bot (or a group of bots) to enable
+# Numbers after the equal signs are spell IDs and may be customized
+# See Randombots Default Talent Specs for more info on each spec; they are listed in that section by the names in the parentheticals (e.g., arms pve, fury pve)
 
-AiPlayerbot.WorldBuff.0.1.0.80.80 = 53760,57358                    #WARRIOR ARMS
-AiPlayerbot.WorldBuff.0.1.1.80.80 = 53760,57358                    #WARRIOR FURY
-AiPlayerbot.WorldBuff.0.1.2.80.80 = 53758,57356                    #WARRIOR PROTECTION
-AiPlayerbot.WorldBuff.0.2.0.80.80 = 60347,53749,57332              #PALADIN HOLY
-AiPlayerbot.WorldBuff.0.2.1.80.80 = 53758,57356                    #PALADIN PROTECTION
-AiPlayerbot.WorldBuff.0.2.2.80.80 = 53760,57371                    #PALADIN RETRIBUTION
-AiPlayerbot.WorldBuff.0.3.0.80.80 = 53760,57325                    #HUNTER BEAST
-AiPlayerbot.WorldBuff.0.3.1.80.80 = 53760,57358                    #HUNTER MARKSMANSHIP
-AiPlayerbot.WorldBuff.0.3.2.80.80 = 53760,57367                    #HUNTER SURVIVAL
-AiPlayerbot.WorldBuff.0.4.0.80.80 = 53760,57325                    #ROGUE ASSASINATION
-AiPlayerbot.WorldBuff.0.4.1.80.80 = 53760,57358                    #ROGUE COMBAT
-AiPlayerbot.WorldBuff.0.4.2.80.80 = 53760,57367                    #ROGUE SUBTLETY
-AiPlayerbot.WorldBuff.0.5.0.80.80 = 53755,57327                    #PRIEST DISCIPLINE
-AiPlayerbot.WorldBuff.0.5.1.80.80 = 53755,57327                    #PRIEST HOLY
-AiPlayerbot.WorldBuff.0.5.2.80.80 = 53755,57327                    #PRIEST SHADOW
-AiPlayerbot.WorldBuff.0.6.0.80.80 = 53758,57356                    #DEATH KNIGHT BLOOD
-AiPlayerbot.WorldBuff.0.6.1.80.80 = 53760,57358                    #DEATH KNIGHT FROST
-AiPlayerbot.WorldBuff.0.6.2.80.80 = 53760,57358                    #DEATH KNIGHT UNHOLY
-AiPlayerbot.WorldBuff.0.6.3.80.80 = 53760,57371                    #DEATH KNIGHT BLOOD DPS
-AiPlayerbot.WorldBuff.0.7.0.80.80 = 53755,57327                    #SHAMAN ELEMENTAL
-AiPlayerbot.WorldBuff.0.7.1.80.80 = 53760,57325                    #SHAMAN ENHANCEMENT
-AiPlayerbot.WorldBuff.0.7.2.80.80 = 53755,57327                    #SHAMAN RESTORATION
-AiPlayerbot.WorldBuff.0.8.0.80.80 = 53755,57327                    #MAGE ARCANE
-AiPlayerbot.WorldBuff.0.8.1.80.80 = 53755,57327                    #MAGE FIRE
-AiPlayerbot.WorldBuff.0.8.2.80.80 = 53755,57327                    #MAGE FROST
-AiPlayerbot.WorldBuff.0.9.0.80.80 = 53755,57327                    #WARLOCK AFFLICTION
-AiPlayerbot.WorldBuff.0.9.1.80.80 = 53755,57327                    #WARLOCK DEMONOLOGY
-AiPlayerbot.WorldBuff.0.9.2.80.80 = 53755,57327                    #WARLOCK DESTRUCTION
-AiPlayerbot.WorldBuff.0.11.0.80.80 = 53755,57327                   #DRUID BALANCE
-AiPlayerbot.WorldBuff.0.11.1.80.80 = 53749,53763,57367             #DRUID FERAL BEAR
-AiPlayerbot.WorldBuff.0.11.2.80.80 = 54212,57334                   #DRUID RESTORATION
-AiPlayerbot.WorldBuff.0.11.3.80.80 = 53760,57358                   #DRUID FERAL CAT
+AiPlayerbot.WorldBuff.0.1.0.80.80 = 53760,57358                    #WARRIOR ARMS (arms pve)
+AiPlayerbot.WorldBuff.0.1.1.80.80 = 53760,57358                    #WARRIOR FURY (fury pve)
+AiPlayerbot.WorldBuff.0.1.2.80.80 = 53758,57356                    #WARRIOR PROTECTION (prot pve)
+AiPlayerbot.WorldBuff.0.2.0.80.80 = 60347,53749,57332              #PALADIN HOLY (holy pve)
+AiPlayerbot.WorldBuff.0.2.1.80.80 = 53758,57356                    #PALADIN PROTECTION (prot pve)
+AiPlayerbot.WorldBuff.0.2.2.80.80 = 53760,57371                    #PALADIN RETRIBUTION (ret pve)
+AiPlayerbot.WorldBuff.0.3.0.80.80 = 53760,57325                    #HUNTER BEAST (bm pve)
+AiPlayerbot.WorldBuff.0.3.1.80.80 = 53760,57358                    #HUNTER MARKSMANSHIP (mm pve)
+AiPlayerbot.WorldBuff.0.3.2.80.80 = 53760,57367                    #HUNTER SURVIVAL (surv pve)
+AiPlayerbot.WorldBuff.0.4.0.80.80 = 53760,57325                    #ROGUE ASSASINATION (as pve)
+AiPlayerbot.WorldBuff.0.4.1.80.80 = 53760,57358                    #ROGUE COMBAT (combat pve)
+AiPlayerbot.WorldBuff.0.4.2.80.80 = 53760,57367                    #ROGUE SUBTLETY (subtlety pve)
+AiPlayerbot.WorldBuff.0.5.0.80.80 = 53755,57327                    #PRIEST DISCIPLINE (disc pve)
+AiPlayerbot.WorldBuff.0.5.1.80.80 = 53755,57327                    #PRIEST HOLY (holy pve)
+AiPlayerbot.WorldBuff.0.5.2.80.80 = 53755,57327                    #PRIEST SHADOW (shadow pve)
+AiPlayerbot.WorldBuff.0.6.0.80.80 = 53758,57356                    #DEATH KNIGHT BLOOD (blood pve)
+AiPlayerbot.WorldBuff.0.6.1.80.80 = 53760,57358                    #DEATH KNIGHT FROST (frost pve)
+AiPlayerbot.WorldBuff.0.6.2.80.80 = 53760,57358                    #DEATH KNIGHT UNHOLY (unholy pve)
+AiPlayerbot.WorldBuff.0.6.3.80.80 = 53760,57371                    #DEATH KNIGHT BLOOD DPS (double aura blood pve)
+AiPlayerbot.WorldBuff.0.7.0.80.80 = 53755,57327                    #SHAMAN ELEMENTAL (ele pve)
+AiPlayerbot.WorldBuff.0.7.1.80.80 = 53760,57325                    #SHAMAN ENHANCEMENT (enh pve)
+AiPlayerbot.WorldBuff.0.7.2.80.80 = 53755,57327                    #SHAMAN RESTORATION (resto pve)
+AiPlayerbot.WorldBuff.0.8.0.80.80 = 53755,57327                    #MAGE ARCANE (arcane pve)
+AiPlayerbot.WorldBuff.0.8.1.80.80 = 53755,57327                    #MAGE FIRE (fire pve)
+AiPlayerbot.WorldBuff.0.8.2.80.80 = 53755,57327                    #MAGE FROST (frost pve)
+AiPlayerbot.WorldBuff.0.9.0.80.80 = 53755,57327                    #WARLOCK AFFLICTION (affli pve)
+AiPlayerbot.WorldBuff.0.9.1.80.80 = 53755,57327                    #WARLOCK DEMONOLOGY (demo pve)
+AiPlayerbot.WorldBuff.0.9.2.80.80 = 53755,57327                    #WARLOCK DESTRUCTION (destro pve)
+AiPlayerbot.WorldBuff.0.11.0.80.80 = 53755,57327                   #DRUID BALANCE (balance pve)
+AiPlayerbot.WorldBuff.0.11.1.80.80 = 53749,53763,57367             #DRUID FERAL BEAR (bear pve)
+AiPlayerbot.WorldBuff.0.11.2.80.80 = 54212,57334                   #DRUID RESTORATION (resto pve)
+AiPlayerbot.WorldBuff.0.11.3.80.80 = 53760,57358                   #DRUID FERAL CAT (cat pve)
 
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
 ###################################
 #                                 #
-# RANDOM BOT DEFAULT TALENT SPECS #
+# RANDOMBOT DEFAULT TALENT SPECS  #
 #                                 #
 ###################################
 
@@ -1446,10 +1450,11 @@ AiPlayerbot.RandomClassSpecProb.11.2 = 35
 AiPlayerbot.RandomClassSpecIndex.11.2 = 2
 AiPlayerbot.RandomClassSpecProb.11.3 = 20
 AiPlayerbot.RandomClassSpecIndex.11.3 = 3
+
 #
 #
 #
-###################################################################################################
+####################################################################################################
 
 
 ###################################
@@ -1518,10 +1523,10 @@ AiPlayerbot.LogValuesPerTick = 0
 AiPlayerbot.RandomChangeMultiplier = 1
 
 # Tell which spell is avoiding (experimental)
-# Default: 0 (disable)
+# Default: 0 (disabled)
 AiPlayerbot.TellWhenAvoidAoe = 0
 
-# Enables/Disables performance monitor
+# Enable/Disable performance monitor
 AiPlayerbot.PerfMonEnabled = 0
 
 #
@@ -1534,7 +1539,7 @@ AiPlayerbot.PerfMonEnabled = 0
 #
 #
 
-# Prefix for bot chat commands (e.g. follow, stay)
+# Prefix for bot chat commands (e.g., follow, stay)
 AiPlayerbot.CommandPrefix = ""
 
 # Separator for bot chat commands
@@ -1544,7 +1549,7 @@ AiPlayerbot.CommandSeparator = "\\\\"
 AiPlayerbot.RandomBotTalk = 1
 # Enable bots emoting
 AiPlayerbot.RandomBotEmote = 0
-# Enable random bots suggesting dungeons in chat
+# Enable randombots suggesting dungeons in chat
 AiPlayerbot.RandomBotSuggestDungeons = 1
 # Bots greet players when invited
 AiPlayerbot.EnableGreet = 0
@@ -1565,10 +1570,12 @@ AiPlayerbot.RandomBotSayWithoutMaster = 0
 ####################################################################################################
 
 ####################################################################################################
-#
 # Broadcast rates
 #
-# 1 - to enable broadcasts globally, 0 - to disable (Default 1)
+#
+
+# Enable/disable broadcasts globally
+# Default: 1 (enabled)
 AiPlayerbot.EnableBroadcasts = 1
 #
 # All broadcast chances should be in range 0-30000
@@ -1654,17 +1661,11 @@ AiPlayerbot.AllowedLogFiles = ""
 #
 ####################################################################################################
 
-###################################################################################################
-###################################################################################################
-###################################################################################################
-###################################################################################################
-###################################################################################################
-
 ##############################################
-# Deprecated (temporary)                     #
+# Deprecated Settings (yet still in use)     #
 ##############################################
 
-# Log on all random bots on start
+# Log on all randombots on start
 AiPlayerbot.RandomBotLoginAtStartup = 1
 
 # Guild Task system
