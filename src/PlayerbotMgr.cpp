@@ -330,6 +330,9 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
         // check for instant logout
         bool logout = botWorldSessionPtr->ShouldLogOut(time(nullptr));
 
+        // make instant logout for now
+        logout = true;
+
         if (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr)))
             logout = true;
 
@@ -355,9 +358,6 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
         {
             target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
         }
-
-        // Peiru: Allow bots to always instant logout to see if this resolves logout crashes
-        logout = true;
 
         // if no instant logout, request normal logout
         if (!logout)
@@ -441,14 +441,14 @@ void PlayerbotHolder::RemoveFromPlayerbotsMap(ObjectGuid guid)
 Player* PlayerbotHolder::GetPlayerBot(ObjectGuid playerGuid) const
 {
     PlayerBotMap::const_iterator it = playerBots.find(playerGuid);
-    return (it == playerBots.end()) ? 0 : it->second;
+    return (it == playerBots.end()) ? nullptr : it->second ? it->second : nullptr;
 }
 
 Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
 {
     ObjectGuid playerGuid = ObjectGuid::Create<HighGuid::Player>(lowGuid);
     PlayerBotMap::const_iterator it = playerBots.find(playerGuid);
-    return (it == playerBots.end()) ? 0 : it->second;
+    return (it == playerBots.end()) ? nullptr : it->second ? it->second : nullptr;
 }
 
 void PlayerbotHolder::OnBotLogin(Player* const bot)
