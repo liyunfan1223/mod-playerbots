@@ -525,9 +525,9 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
     // {
     //     weight_ *= 1.0;
     // }
-    // double hand
     if (proto->Class == ITEM_CLASS_WEAPON)
     {
+        // double hand
         bool isDoubleHand = proto->Class == ITEM_CLASS_WEAPON &&
                             !(ITEM_SUBCLASS_MASK_SINGLE_HAND & (1 << proto->SubClass)) &&
                             !(ITEM_SUBCLASS_MASK_WEAPON_RANGED & (1 << proto->SubClass));
@@ -535,29 +535,41 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         if (isDoubleHand)
         {
             weight_ *= 0.5;
-        }
-        // spec without double hand
-        // enhancement, rogue, ice dk, unholy dk, shield tank, fury warrior without titan's grip but with duel wield
-        if (isDoubleHand &&
-            ((cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && player_->CanDualWield()) ||
-             (cls == CLASS_ROGUE) || (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_FROST) ||
-             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanTitanGrip() && player_->CanDualWield()) ||
-             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) ||
-             (cls == CLASS_PALADIN && tab == PALADIN_TAB_PROTECTION)))
-        {
-            weight_ *= 0.1;
+            // spec without double hand
+            // enhancement, rogue, ice dk, unholy dk, shield tank, fury warrior without titan's grip but with duel wield
+            if (((cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && player_->CanDualWield()) ||
+                 (cls == CLASS_ROGUE) || (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_FROST) ||
+                 (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanTitanGrip() && player_->CanDualWield()) ||
+                 (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_PROTECTION) ||
+                 (cls == CLASS_PALADIN && tab == PALADIN_TAB_PROTECTION)))
+            {
+                weight_ *= 0.1;
+            }
+
         }
         // spec with double hand
         // fury without duel wield, arms, bear, retribution, blood dk
-        if (!isDoubleHand &&
-            ((cls == CLASS_HUNTER && !player_->CanDualWield()) ||
-             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanDualWield()) ||
-             (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL) ||
-             (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION) ||
-             (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_BLOOD) ||
-             (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && !player_->CanDualWield())))
+        if (!isDoubleHand)
         {
-            weight_ *= 0.1;
+            if ((cls == CLASS_HUNTER && !player_->CanDualWield()) ||
+                (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_FURY && !player_->CanDualWield()) ||
+                (cls == CLASS_WARRIOR && tab == WARRIOR_TAB_ARMS) || (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL) ||
+                (cls == CLASS_PALADIN && tab == PALADIN_TAB_RETRIBUTION) ||
+                (cls == CLASS_DEATH_KNIGHT && tab == DEATHKNIGHT_TAB_BLOOD) ||
+                (cls == CLASS_SHAMAN && tab == SHAMAN_TAB_ENHANCEMENT && !player_->CanDualWield()))
+            {
+                weight_ *= 0.1;
+            }
+            // caster's main hand (cannot duel weapon but can equip two-hands stuff)
+            if (cls == CLASS_MAGE ||
+                cls == CLASS_PRIEST ||
+                cls == CLASS_WARLOCK ||
+                cls == CLASS_DRUID ||
+                (cls == CLASS_SHAMAN && !player_->CanDualWield()))
+            {
+                weight_ *= 0.65;
+            }
+            
         }
         // fury with titan's grip
         if ((!isDoubleHand || proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM ||
@@ -566,15 +578,18 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         {
             weight_ *= 0.1;
         }
+        
         if (cls == CLASS_HUNTER && proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN)
         {
             weight_ *= 0.1;
         }
+        
         if (cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY) &&
             proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER)
         {
             weight_ *= 0.5;
         }
+
         if (cls == CLASS_ROGUE && player_->HasAura(13964) &&
             (proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE))
         {
