@@ -806,7 +806,7 @@ AiPlayerbot.RandomBotTeleHigherLevel = 3
 # Default: 1 (enabled)
 AiPlayerbot.AutoTeleportForLevel = 1
 
-# Bots' minimum and maximum level per zone when teleporting
+# Bots' minimum and maximum level when teleporting in and out of a zone, according to the new RPG strategy
 # Requires EnableNewRpgStrategy enabled
 # Format: AiPlayerbot.ZoneBracket.zoneID = minLevel,maxLevel
 #
