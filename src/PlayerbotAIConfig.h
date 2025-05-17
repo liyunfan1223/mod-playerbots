@@ -348,6 +348,12 @@ public:
     uint32 useFlyMountAtMinLevel;
     uint32 useFastFlyMountAtMinLevel;
 
+    // stagger flightpath takeoff
+    uint32 delayMin;
+    uint32 delayMax;
+    uint32 gapMs;
+    uint32 gapJitterMs;
+
     std::string const GetTimestampStr();
     bool hasLog(std::string const fileName)
     {

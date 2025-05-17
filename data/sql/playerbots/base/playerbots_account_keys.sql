@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS `playerbot_account_keys`;
+DROP TABLE IF EXISTS `playerbots_account_keys`;
 
-CREATE TABLE `playerbot_account_keys` (
+CREATE TABLE `playerbots_account_keys` (
     `account_id` INT PRIMARY KEY,
     `security_key` VARCHAR(255) NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -29,6 +29,7 @@ public:
     LootObject() : skillId(0), reqSkillValue(0), reqItem(0) {}
     LootObject(Player* bot, ObjectGuid guid);
     LootObject(LootObject const& other);
+    LootObject& operator=(LootObject const& other) = default;
 
     bool IsEmpty() { return !guid; }
     bool IsLootPossible(Player* bot);
