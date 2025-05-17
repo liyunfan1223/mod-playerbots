@@ -312,6 +312,41 @@ bool PlayerbotAIConfig::Initialize()
     randomBotTeleHigherLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotTeleHigherLevel", 3);
     openGoSpell = sConfigMgr->GetOption<int32>("AiPlayerbot.OpenGoSpell", 6477);
 
+    // Zones for NewRpgStrategy teleportation brackets
+    std::vector<uint32> zoneIds = {
+        // Classic WoW - Low-level zones
+        1, 12, 14, 85, 141, 215, 3430, 3524,
+        // Classic WoW - Mid-level zones
+        17, 38, 40, 130, 148, 3433, 3525,
+        // Classic WoW - High-level zones
+        10, 11, 44, 267, 331, 400, 406,
+        // Classic WoW - Higher-level zones
+        3, 8, 15, 16, 33, 45, 47, 51, 357, 405, 440,
+        // Classic WoW - Top-level zones
+        4, 28, 46, 139, 361, 490, 618, 1377,
+        // The Burning Crusade - Zones
+        3483, 3518, 3519, 3520, 3521, 3522, 3523, 4080,
+        // Wrath of the Lich King - Zones
+        65, 66, 67, 210, 394, 495, 2817, 3537, 3711, 4197
+    };
+
+    for (uint32 zoneId : zoneIds)
+    {
+        std::string setting = "AiPlayerbot.ZoneBracket." + std::to_string(zoneId);
+        std::string value = sConfigMgr->GetOption<std::string>(setting, "");
+        
+        if (!value.empty())
+        {
+            size_t commaPos = value.find(',');
+            if (commaPos != std::string::npos)
+            {
+                uint32 minLevel = atoi(value.substr(0, commaPos).c_str());
+                uint32 maxLevel = atoi(value.substr(commaPos + 1).c_str());
+                zoneBrackets[zoneId] = std::make_pair(minLevel, maxLevel);
+            }
+        }
+    }
+
     randomChangeMultiplier = sConfigMgr->GetOption<float>("AiPlayerbot.RandomChangeMultiplier", 1.0);
 
     randomBotCombatStrategies = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotCombatStrategies", "-threat");
