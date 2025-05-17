@@ -1563,7 +1563,12 @@ void RandomPlayerbotMgr::PrepareZone2LevelBracket()
     zone2LevelBracket[2817] = {77, 80}; // Crystalsong Forest
     zone2LevelBracket[3537] = {68, 75}; // Borean Tundra
     zone2LevelBracket[3711] = {75, 80}; // Sholazar Basin
-    zone2LevelBracket[4197] = {79, 80}; // Wintergrasp
+    zone2LevelBracket[4197] = {79, 80}; // Wintergrasp    
+    
+    // Override with values from config
+    for (auto const& [zoneId, bracketPair] : sPlayerbotAIConfig->zoneBrackets) {
+        zone2LevelBracket[zoneId] = {bracketPair.first, bracketPair.second};
+    }
 }
 
 void RandomPlayerbotMgr::PrepareTeleportCache()
