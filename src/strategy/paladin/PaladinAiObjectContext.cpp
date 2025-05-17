@@ -8,6 +8,7 @@
 #include "DpsPaladinStrategy.h"
 #include "GenericPaladinNonCombatStrategy.h"
 #include "HealPaladinStrategy.h"
+#include "OffhealRetPaladinStrategy.h"
 #include "NamedObjectContext.h"
 #include "PaladinActions.h"
 #include "PaladinBuffStrategies.h"
@@ -87,12 +88,14 @@ public:
         creators["tank"] = &PaladinCombatStrategyFactoryInternal::tank;
         creators["dps"] = &PaladinCombatStrategyFactoryInternal::dps;
         creators["heal"] = &PaladinCombatStrategyFactoryInternal::heal;
+        creators["offheal"] = &PaladinCombatStrategyFactoryInternal::offheal;
     }
 
 private:
     static Strategy* tank(PlayerbotAI* botAI) { return new TankPaladinStrategy(botAI); }
     static Strategy* dps(PlayerbotAI* botAI) { return new DpsPaladinStrategy(botAI); }
     static Strategy* heal(PlayerbotAI* botAI) { return new HealPaladinStrategy(botAI); }
+    static Strategy* offheal(PlayerbotAI* botAI) { return new OffhealRetPaladinStrategy(botAI); }
 };
 
 class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>
