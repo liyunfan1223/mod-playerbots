@@ -8,6 +8,7 @@
 #include "BearTankDruidStrategy.h"
 #include "CasterDruidStrategy.h"
 #include "CatDpsDruidStrategy.h"
+#include "OffhealDruidCatStrategy.h"
 #include "DruidActions.h"
 #include "DruidBearActions.h"
 #include "DruidCatActions.h"
@@ -61,6 +62,7 @@ public:
         creators["caster"] = &DruidDruidStrategyFactoryInternal::caster;
         creators["dps"] = &DruidDruidStrategyFactoryInternal::cat;
         creators["heal"] = &DruidDruidStrategyFactoryInternal::heal;
+        creators["offheal"] = &DruidDruidStrategyFactoryInternal::offheal;
     }
 
 private:
@@ -68,6 +70,7 @@ private:
     static Strategy* cat(PlayerbotAI* botAI) { return new CatDpsDruidStrategy(botAI); }
     static Strategy* caster(PlayerbotAI* botAI) { return new CasterDruidStrategy(botAI); }
     static Strategy* heal(PlayerbotAI* botAI) { return new HealDruidStrategy(botAI); }
+    static Strategy* offheal(PlayerbotAI* botAI) { return new OffhealDruidCatStrategy(botAI); }
 };
 
 class DruidTriggerFactoryInternal : public NamedObjectContext<Trigger>
