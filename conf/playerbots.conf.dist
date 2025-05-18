@@ -810,6 +810,142 @@ AiPlayerbot.RandomBotTeleHigherLevel = 3
 # Default: 1 (enabled)
 AiPlayerbot.AutoTeleportForLevel = 1
 
+# Bots' minimum and maximum level when teleporting in and out of a zone, according to the new RPG strategy
+# Requires EnableNewRpgStrategy enabled
+# Format: AiPlayerbot.ZoneBracket.zoneID = minLevel,maxLevel
+#
+# Classic WoW - Low-level zones:
+# Dun Morogh             (Zone ID:    1    Default Min,Max:  5,12)
+# Elwynn Forest          (Zone ID:   12    Default Min,Max:  5,12)
+# Durotar                (Zone ID:   14    Default Min,Max:  5,12)
+# Tirisfal Glades        (Zone ID:   85    Default Min,Max:  5,12)
+# Teldrassil             (Zone ID:  141    Default Min,Max:  5,12)
+# Mulgore                (Zone ID:  215    Default Min,Max:  5,12)
+# Eversong Woods         (Zone ID: 3430    Default Min,Max:  5,12)
+# Azuremyst Isle         (Zone ID: 3524    Default Min,Max:  5,12)
+AiPlayerbot.ZoneBracket.1 = 5,12
+AiPlayerbot.ZoneBracket.12 = 5,12
+AiPlayerbot.ZoneBracket.14 = 5,12
+AiPlayerbot.ZoneBracket.85 = 5,12
+AiPlayerbot.ZoneBracket.141 = 5,12
+AiPlayerbot.ZoneBracket.215 = 5,12
+AiPlayerbot.ZoneBracket.3430 = 5,12
+AiPlayerbot.ZoneBracket.3524 = 5,12
+
+# Classic WoW - Mid-level zones:
+# Barrens                (Zone ID:   17    Default Min,Max: 10,25)
+# Loch Modan             (Zone ID:   38    Default Min,Max: 10,20)
+# Westfall               (Zone ID:   40    Default Min,Max: 10,21)
+# Silverpine Forest      (Zone ID:  130    Default Min,Max: 10,23)
+# Darkshore              (Zone ID:  148    Default Min,Max: 10,21)
+# Ghostlands             (Zone ID: 3433    Default Min,Max: 10,22)
+# Bloodmyst Isle         (Zone ID: 3525    Default Min,Max: 10,21)
+AiPlayerbot.ZoneBracket.17 = 10,25
+AiPlayerbot.ZoneBracket.38 = 10,20
+AiPlayerbot.ZoneBracket.40 = 10,21
+AiPlayerbot.ZoneBracket.130 = 10,23
+AiPlayerbot.ZoneBracket.148 = 10,21
+AiPlayerbot.ZoneBracket.3433 = 10,22
+AiPlayerbot.ZoneBracket.3525 = 10,21
+
+# Classic WoW - High-level zones:
+# Deadwind Pass          (Zone ID:   10    Default Min,Max: 19,33)
+# Wetlands               (Zone ID:   11    Default Min,Max: 21,30)
+# Redridge Mountains     (Zone ID:   44    Default Min,Max: 16,28)
+# Hillsbrad Foothills    (Zone ID:  267    Default Min,Max: 20,34)
+# Ashenvale              (Zone ID:  331    Default Min,Max: 18,33)
+# Thousand Needles       (Zone ID:  400    Default Min,Max: 24,36)
+# Stonetalon Mountains   (Zone ID:  406    Default Min,Max: 16,29)
+AiPlayerbot.ZoneBracket.10 = 19,33
+AiPlayerbot.ZoneBracket.11 = 21,30
+AiPlayerbot.ZoneBracket.44 = 16,28
+AiPlayerbot.ZoneBracket.267 = 20,34
+AiPlayerbot.ZoneBracket.331 = 18,33
+AiPlayerbot.ZoneBracket.400 = 24,36
+AiPlayerbot.ZoneBracket.406 = 16,29
+
+# Classic WoW - Higher-level zones:
+# Badlands               (Zone ID:    3    Default Min,Max: 36,46)
+# Swamp of Sorrows       (Zone ID:    8    Default Min,Max: 36,46)
+# Dustwallow Marsh       (Zone ID:   15    Default Min,Max: 35,46)
+# Azshara                (Zone ID:   16    Default Min,Max: 45,52)
+# Stranglethorn Vale     (Zone ID:   33    Default Min,Max: 32,47)
+# Arathi Highlands       (Zone ID:   45    Default Min,Max: 30,42)
+# Hinterlands            (Zone ID:   47    Default Min,Max: 42,51)
+# Searing Gorge          (Zone ID:   51    Default Min,Max: 45,51)
+# Feralas                (Zone ID:  357    Default Min,Max: 40,52)
+# Desolace               (Zone ID:  405    Default Min,Max: 30,41)
+# Tanaris                (Zone ID:  440    Default Min,Max: 41,52)
+AiPlayerbot.ZoneBracket.3 = 36,46
+AiPlayerbot.ZoneBracket.8 = 36,46
+AiPlayerbot.ZoneBracket.15 = 35,46
+AiPlayerbot.ZoneBracket.16 = 45,52
+AiPlayerbot.ZoneBracket.33 = 32,47
+AiPlayerbot.ZoneBracket.45 = 30,42
+AiPlayerbot.ZoneBracket.47 = 42,51
+AiPlayerbot.ZoneBracket.51 = 45,51
+AiPlayerbot.ZoneBracket.357 = 40,52
+AiPlayerbot.ZoneBracket.405 = 30,41
+AiPlayerbot.ZoneBracket.440 = 41,52
+
+# Classic WoW - Top-level zones:
+# Blasted Lands          (Zone ID:    4    Default Min,Max: 52,57)
+# Western Plaguelands    (Zone ID:   28    Default Min,Max: 50,60)
+# Burning Steppes        (Zone ID:   46    Default Min,Max: 51,60)
+# Eastern Plaguelands    (Zone ID:  139    Default Min,Max: 54,62)
+# Felwood                (Zone ID:  361    Default Min,Max: 47,57)
+# Un'Goro Crater         (Zone ID:  490    Default Min,Max: 49,56)
+# Winterspring           (Zone ID:  618    Default Min,Max: 54,61)
+# Silithus               (Zone ID: 1377    Default Min,Max: 54,63)
+AiPlayerbot.ZoneBracket.4 = 52,57
+AiPlayerbot.ZoneBracket.28 = 50,60
+AiPlayerbot.ZoneBracket.46 = 51,60
+AiPlayerbot.ZoneBracket.139 = 54,62
+AiPlayerbot.ZoneBracket.361 = 47,57
+AiPlayerbot.ZoneBracket.490 = 49,56
+AiPlayerbot.ZoneBracket.618 = 54,61
+AiPlayerbot.ZoneBracket.1377 = 54,63
+
+# The Burning Crusade - Zones:
+# Hellfire Peninsula     (Zone ID: 3483    Default Min,Max: 58,66)
+# Nagrand                (Zone ID: 3518    Default Min,Max: 64,70)
+# Terokkar Forest        (Zone ID: 3519    Default Min,Max: 62,73)
+# Shadowmoon Valley      (Zone ID: 3520    Default Min,Max: 66,73)
+# Zangarmarsh            (Zone ID: 3521    Default Min,Max: 60,67)
+# Blade's Edge Mountains (Zone ID: 3522    Default Min,Max: 64,73)
+# Netherstorm            (Zone ID: 3523    Default Min,Max: 67,73)
+# Isle of Quel'Danas     (Zone ID: 4080    Default Min,Max: 68,73)
+AiPlayerbot.ZoneBracket.3483 = 58,66
+AiPlayerbot.ZoneBracket.3518 = 64,70
+AiPlayerbot.ZoneBracket.3519 = 62,73
+AiPlayerbot.ZoneBracket.3520 = 66,73
+AiPlayerbot.ZoneBracket.3521 = 60,67
+AiPlayerbot.ZoneBracket.3522 = 64,73
+AiPlayerbot.ZoneBracket.3523 = 67,73
+AiPlayerbot.ZoneBracket.4080 = 68,73
+
+# Wrath of the Lich King - Zones:
+# Dragonblight           (Zone ID:   65    Default Min,Max: 71,77)
+# Zul'Drak               (Zone ID:   66    Default Min,Max: 74,80)
+# Storm Peaks            (Zone ID:   67    Default Min,Max: 77,80)
+# Icecrown Glacier       (Zone ID:  210    Default Min,Max: 77,80)
+# Grizzly Hills          (Zone ID:  394    Default Min,Max: 72,78)
+# Howling Fjord          (Zone ID:  495    Default Min,Max: 68,74)
+# Crystalsong Forest     (Zone ID: 2817    Default Min,Max: 77,80)
+# Borean Tundra          (Zone ID: 3537    Default Min,Max: 68,75)
+# Sholazar Basin         (Zone ID: 3711    Default Min,Max: 75,80)
+# Wintergrasp            (Zone ID: 4197    Default Min,Max: 79,80)
+AiPlayerbot.ZoneBracket.65 = 71,77
+AiPlayerbot.ZoneBracket.66 = 74,80
+AiPlayerbot.ZoneBracket.67 = 77,80
+AiPlayerbot.ZoneBracket.210 = 77,80
+AiPlayerbot.ZoneBracket.394 = 72,78
+AiPlayerbot.ZoneBracket.495 = 68,74
+AiPlayerbot.ZoneBracket.2817 = 77,80
+AiPlayerbot.ZoneBracket.3537 = 68,75
+AiPlayerbot.ZoneBracket.3711 = 75,80
+AiPlayerbot.ZoneBracket.4197 = 79,80
+
 #
 #
 #
