@@ -375,11 +375,6 @@ AiPlayerbot.AggroDistance = 22
 #
 #
 
-# Set XP rate for bots
-# Default: 1.0
-# Actual XP Rate will be = Server XP Rate * AiPlayerbot.PlayerbotsXPRate
-AiPlayerbot.PlayerbotsXPRate = 1.0
-
 # Health/Mana levels
 AiPlayerbot.CriticalHealth = 25
 AiPlayerbot.LowHealth = 45
@@ -604,6 +599,10 @@ AiPlayerbot.RandomBotFixedLevel = 0
 # Set RandomBotMaxLevel bots to RandomBotMinLevel
 # Default: 0 (disabled)
 AiPlayerbot.DowngradeMaxLevelBot = 0
+
+# Set XP rate for random bots (Default: 1.0)
+# Server XP Rate * AiPlayerbot.RandomBotXPRate
+AiPlayerbot.RandomBotXPRate = 1.0
 
 #
 #

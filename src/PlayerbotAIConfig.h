@@ -275,7 +275,7 @@ public:
     bool randomBotShowCloak;
     bool randomBotFixedLevel;
     bool disableRandomLevels;
-    float playerbotsXPrate;
+    float randomBotXPRate;
     uint32 randomBotAllianceRatio;
     uint32 randomBotHordeRatio;
     bool disableDeathKnightLogin;
