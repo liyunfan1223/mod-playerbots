@@ -286,6 +286,9 @@ bool IronAssemblyRuneOfPowerTrigger::IsActive()
     if (!target->HasAura(SPELL_RUNE_OF_POWER))
         return false;
 
+    if (target->GetVictim() != bot)
+        return false;
+
     return botAI->IsTank(bot);
 }
 
