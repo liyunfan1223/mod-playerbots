@@ -17,12 +17,15 @@
 
 #include "Playerbots.h"
 
+#include "AccountScript.h"
 #include "Channel.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "GuildTaskMgr.h"
 #include "Metric.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
 #include "PlayerScript.h"
 #include "PlayerbotAIConfig.h"
 #include "RandomPlayerbotMgr.h"
@@ -114,7 +117,7 @@ public:
                 roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
 
                 ChatHandler(player->GetSession()).SendSysMessage(
-                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '" 
+                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '"
                     + roundedTime + "' minutes.");
             }
         }
@@ -218,7 +221,7 @@ public:
     {
         if (!player->GetSession()->IsBot())
             return;
-        
+
         if (!sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
@@ -288,7 +291,7 @@ public:
         LOG_INFO("server.loading", "╚══════════════════════════════════════════════════════════╝");
 
         uint32 oldMSTime = getMSTime();
-        
+
         LOG_INFO("server.loading", " ");
         LOG_INFO("server.loading", "Load Playerbots Config...");
 
@@ -389,6 +392,32 @@ public:
     }
 };
 
+class PlayerbotsAccountScript : public AccountScript
+{
+public:
+    PlayerbotsAccountScript() : AccountScript("PlayerbotsAccountScript") {}
+
+    void OnAccountLogin(uint32 accountId) override
+    {
+        // Query all character guids for this account
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
+        stmt->SetData(0, accountId);
+        LOG_INFO("playerbots", "Checking for online bots for account {}", accountId);
+        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        {
+            do
+            {
+                ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].Get<uint32>());
+                if (Player* player = ObjectAccessor::FindPlayer(guid))
+                {
+                    LOG_INFO("playerbots", "Logging out bot character {} for account {}", player->GetName(), accountId);
+                    LogoutAltBot(player->GetGUID());
+                }
+            } while (result->NextRow());
+        }
+    }
+};
+
 void AddPlayerbotsScripts()
 {
     new PlayerbotsDatabaseScript();
@@ -397,6 +426,7 @@ void AddPlayerbotsScripts()
     new PlayerbotsServerScript();
     new PlayerbotsWorldScript();
     new PlayerbotsScript();
+    new PlayerbotsAccountScript();
 
     AddSC_playerbots_commandscript();
 }

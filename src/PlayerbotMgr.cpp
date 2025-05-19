@@ -397,6 +397,35 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
     }
 }
 
+void LogoutAltBot(ObjectGuid guid)
+{
+    // Try to get the bot object and its master directly
+    if (Player* bot = ObjectAccessor::FindPlayer(guid))
+    {
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+        {
+            Player* master = botAI->GetMaster();
+            if (master)
+            {
+                PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(master);
+                if (mgr && mgr->GetPlayerBot(guid))
+                {
+                    mgr->LogoutPlayerBot(guid);
+                    return;
+                }
+            }
+        }
+    }
+
+    // Fallback: forcibly kick if still in world
+    if (Player* player = ObjectAccessor::FindPlayer(guid))
+    {
+        LOG_INFO("playerbots", "Bot {} not tracked in any manager, forcing KickPlayer", player->GetName());
+        player->GetSession()->KickPlayer();
+    }
+}
+
 void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
 {
     if (Player* bot = GetPlayerBot(guid))
