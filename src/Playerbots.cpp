@@ -96,6 +96,16 @@ public:
     {
         if (!player->GetSession()->IsBot())
         {
+            // If this character is currently online as a bot, log out the bot first
+            if (Player* bot = ObjectAccessor::FindPlayer(player->GetGUID()))
+            {
+                if (bot != player) // should not be the same pointer
+                {
+                    LOG_INFO("playerbots", "Real player logging in, logging out bot for character {}", player->GetName());
+                    LogoutAltBot(player->GetGUID());
+                }
+            }
+
             sPlayerbotsMgr->AddPlayerbotData(player, false);
             sRandomPlayerbotMgr->OnPlayerLogin(player);
 
@@ -392,31 +402,6 @@ public:
     }
 };
 
-class PlayerbotsAccountScript : public AccountScript
-{
-public:
-    PlayerbotsAccountScript() : AccountScript("PlayerbotsAccountScript") {}
-
-    void OnAccountLogin(uint32 accountId) override
-    {
-        // Query all character guids for this account
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
-        stmt->SetData(0, accountId);
-        LOG_INFO("playerbots", "Checking for online bots for account {}", accountId);
-        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-        {
-            do
-            {
-                ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].Get<uint32>());
-                if (Player* player = ObjectAccessor::FindPlayer(guid))
-                {
-                    LOG_INFO("playerbots", "Logging out bot character {} for account {}", player->GetName(), accountId);
-                    LogoutAltBot(player->GetGUID());
-                }
-            } while (result->NextRow());
-        }
-    }
-};
 
 void AddPlayerbotsScripts()
 {
@@ -426,7 +411,6 @@ void AddPlayerbotsScripts()
     new PlayerbotsServerScript();
     new PlayerbotsWorldScript();
     new PlayerbotsScript();
-    new PlayerbotsAccountScript();
 
     AddSC_playerbots_commandscript();
 }
