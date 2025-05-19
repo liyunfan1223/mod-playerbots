@@ -108,6 +108,13 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("kologarn crunch armor action", ACTION_RAID), nullptr)));
 
     //
+    // Auriaya
+    //
+    triggers.push_back(new TriggerNode(
+        "auriaya fall from floor trigger",
+        NextAction::array(0, new NextAction("auriaya fall from floor action", ACTION_RAID), nullptr)));
+
+    //
     // Hodir
     //
     triggers.push_back(new TriggerNode(

@@ -484,6 +484,17 @@ bool KologarnCrunchArmorTrigger::IsActive()
     return bot->HasAura(SPELL_CRUNCH_ARMOR);
 }
 
+bool AuriayaFallFromFloorTrigger::IsActive()
+{
+    // Check boss and it is alive
+    Unit* boss = AI_VALUE2(Unit*, "find target", "auriaya");
+    if (!boss || !boss->IsAlive())
+        return false;
+
+    // Check if bot is on the floor
+    return bot->GetPositionZ() < ULDUAR_AURIAYA_AXIS_Z_PATHING_ISSUE_DETECT;
+}
+
 bool HodirBitingColdTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "hodir");

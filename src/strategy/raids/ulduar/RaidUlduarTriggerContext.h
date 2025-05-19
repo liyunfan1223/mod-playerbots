@@ -38,6 +38,7 @@ public:
         creators["kologarn rti target trigger"] = &RaidUlduarTriggerContext::kologarn_rti_target_trigger;
         creators["kologarn crunch armor trigger"] = &RaidUlduarTriggerContext::kologarn_crunch_armor_trigger;
         creators["kologarn attack dps target trigger"] = &RaidUlduarTriggerContext::kologarn_attack_dps_target_trigger;
+        creators["auriaya fall from floor trigger"] = &RaidUlduarTriggerContext::auriaya_fall_from_floor_trigger;
         creators["hodir biting cold"] = &RaidUlduarTriggerContext::hodir_biting_cold;
         creators["hodir near snowpacked icicle"] = &RaidUlduarTriggerContext::hodir_near_snowpacked_icicle;
         creators["hodir frost resistance trigger"] = &RaidUlduarTriggerContext::hodir_frost_resistance_trigger;
@@ -80,6 +81,7 @@ private:
     static Trigger* kologarn_rti_target_trigger(PlayerbotAI* ai) { return new KologarnRtiTargetTrigger(ai); }
     static Trigger* kologarn_crunch_armor_trigger(PlayerbotAI* ai) { return new KologarnCrunchArmorTrigger(ai); }
     static Trigger* kologarn_attack_dps_target_trigger(PlayerbotAI* ai) { return new KologarnAttackDpsTargetTrigger(ai); }
+    static Trigger* auriaya_fall_from_floor_trigger(PlayerbotAI* ai) { return new AuriayaFallFromFloorTrigger(ai); }
     static Trigger* hodir_biting_cold(PlayerbotAI* ai) { return new HodirBitingColdTrigger(ai); }
     static Trigger* hodir_near_snowpacked_icicle(PlayerbotAI* ai) { return new HodirNearSnowpackedIcicleTrigger(ai); }
     static Trigger* hodir_frost_resistance_trigger(PlayerbotAI* ai) { return new BossFrostResistanceTrigger(ai, "hodir"); }
