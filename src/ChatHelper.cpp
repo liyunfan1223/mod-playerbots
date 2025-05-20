@@ -305,6 +305,49 @@ ItemIds ChatHelper::parseItems(std::string const text)
     return itemIds;
 }
 
+ItemWithRandomProperty ChatHelper::parseItemWithRandomProperty(std::string const text)
+{
+    ItemWithRandomProperty res;
+    
+    size_t itemStart = text.find("Hitem:");
+    if (itemStart == std::string::npos)
+        return res;
+    
+    itemStart += 6;
+    if (itemStart >= text.length())
+        return res;
+    
+    size_t colonPos = text.find(':', itemStart);
+    if (colonPos == std::string::npos)
+        return res;
+    
+    std::string itemIdStr = text.substr(itemStart, colonPos - itemStart);
+    res.itemId = atoi(itemIdStr.c_str());
+    
+    std::vector<std::string> params;
+    size_t currentPos = colonPos + 1;
+    
+    while (currentPos < text.length()) {
+        size_t nextColon = text.find(':', currentPos);
+        if (nextColon == std::string::npos) {
+            size_t hTag = text.find("|h", currentPos);
+            if (hTag != std::string::npos) {
+                params.push_back(text.substr(currentPos, hTag - currentPos));
+            }
+            break;
+        }
+        
+        params.push_back(text.substr(currentPos, nextColon - currentPos));
+        currentPos = nextColon + 1;
+    }
+    
+    if (params.size() >= 6) {
+        res.randomPropertyId = atoi(params[5].c_str());
+    }
+    
+    return res;
+}
+
 std::string const ChatHelper::FormatQuest(Quest const* quest)
 {
     if (!quest)

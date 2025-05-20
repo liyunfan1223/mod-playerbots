@@ -9,6 +9,7 @@
 #include "Group.h"
 #include "ItemUsageValue.h"
 #include "LootAction.h"
+#include "ObjectMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
@@ -30,12 +31,24 @@ bool LootRollAction::Execute(Event event)
         ObjectGuid guid = roll->itemGUID;
         uint32 slot = roll->itemSlot;
         uint32 itemId = roll->itemid;
+        int32 randomProperty = 0;
+        if (roll->itemRandomPropId)
+            randomProperty = roll->itemRandomPropId;
+        else if (roll->itemRandomSuffix)
+            randomProperty = -((int)roll->itemRandomSuffix);
 
         RollVote vote = PASS;
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
-        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemId);
+        
+        std::string itemUsageParam;
+        if (randomProperty != 0) {
+            itemUsageParam = std::to_string(itemId) + "," + std::to_string(randomProperty);
+        } else {
+            itemUsageParam = std::to_string(itemId);
+        }
+        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
         
         // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), luckily no other items I found have class bits and epic quality.
         if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK && proto->Quality == ITEM_QUALITY_EPIC)

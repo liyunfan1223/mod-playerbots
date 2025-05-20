@@ -8,6 +8,7 @@
 #include "AiFactory.h"
 #include "ChatHelper.h"
 #include "GuildTaskMgr.h"
+#include "Item.h"
 #include "LootObjectStack.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
@@ -18,7 +19,16 @@
 
 ItemUsage ItemUsageValue::Calculate()
 {
-    uint32 itemId = atoi(qualifier.c_str());
+    uint32 itemId = 0;
+    uint32 randomPropertyId = 0;
+    size_t pos = qualifier.find(",");
+    if (pos != std::string::npos) {
+        itemId = atoi(qualifier.substr(0, pos).c_str());
+        randomPropertyId = atoi(qualifier.substr(pos + 1).c_str());
+    } else {
+        itemId = atoi(qualifier.c_str());
+    }
+
     if (!itemId)
         return ITEM_USAGE_NONE;
 
@@ -89,7 +99,7 @@ ItemUsage ItemUsageValue::Calculate()
     if (bot->GetGuildId() && sGuildTaskMgr->IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
-    ItemUsage equip = QueryItemUsageForEquip(proto);
+    ItemUsage equip = QueryItemUsageForEquip(proto, randomPropertyId);
     if (equip != ITEM_USAGE_NONE)
         return equip;
 
@@ -224,7 +234,7 @@ ItemUsage ItemUsageValue::Calculate()
     return ITEM_USAGE_NONE;
 }
 
-ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
+ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, int32 randomPropertyId)
 {
     if (bot->CanUseItem(itemProto) != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
@@ -296,7 +306,8 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     calculator.SetItemSetBonus(false);
     calculator.SetOverflowPenalty(false);
     
-    float itemScore = calculator.CalculateItem(itemProto->ItemId);
+    float itemScore = calculator.CalculateItem(itemProto->ItemId, randomPropertyId);
+    
     if (itemScore)
         shouldEquip = true;
 
@@ -380,7 +391,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
         }
 
         ItemTemplate const* oldItemProto = oldItem->GetTemplate();
-        float oldScore = calculator.CalculateItem(oldItemProto->ItemId);
+        float oldScore = calculator.CalculateItem(oldItemProto->ItemId, oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
         if (oldItem)
         {
             // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
