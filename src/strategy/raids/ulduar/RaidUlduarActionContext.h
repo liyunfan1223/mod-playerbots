@@ -37,6 +37,7 @@ public:
         creators["kologarn eyebeam action"] = &RaidUlduarActionContext::kologarn_eyebeam_action;
         creators["kologarn rti target action"] = &RaidUlduarActionContext::kologarn_rti_target_action;
         creators["kologarn crunch armor action"] = &RaidUlduarActionContext::kologarn_crunch_armor_action;
+        creators["auriaya fall from floor action"] = &RaidUlduarActionContext::auriaya_fall_from_floor_action;
         creators["hodir move snowpacked icicle"] = &RaidUlduarActionContext::hodir_move_snowpacked_icicle;
         creators["hodir biting cold jump"] = &RaidUlduarActionContext::hodir_biting_cold_jump;
         creators["hodir frost resistance action"] = &RaidUlduarActionContext::hodir_frost_resistance_action;
@@ -77,6 +78,7 @@ private:
     static Action* kologarn_eyebeam_action(PlayerbotAI* ai) { return new KologarnEyebeamAction(ai); }
     static Action* kologarn_rti_target_action(PlayerbotAI* ai) { return new KologarnRtiTargetAction(ai); }
     static Action* kologarn_crunch_armor_action(PlayerbotAI* ai) { return new KologarnCrunchArmorAction(ai); }
+    static Action* auriaya_fall_from_floor_action(PlayerbotAI* ai) { return new AuriayaFallFromFloorAction(ai); }
     static Action* hodir_move_snowpacked_icicle(PlayerbotAI* ai) { return new HodirMoveSnowpackedIcicleAction(ai); }
     static Action* hodir_biting_cold_jump(PlayerbotAI* ai) { return new HodirBitingColdJumpAction(ai); }
     static Action* hodir_frost_resistance_action(PlayerbotAI* ai) { return new BossFrostResistanceAction(ai, "hodir"); }

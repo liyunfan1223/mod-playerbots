@@ -74,7 +74,7 @@ const float ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT = 420.0f;
 const float ULDUAR_KOLOGARN_EYEBEAM_RADIUS = 3.0f;
 const float ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD = 429.6094f;
 const float ULDUAR_THORIM_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
-
+const float ULDUAR_AURIAYA_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
 
 const Position ULDUAR_THORIM_NEAR_ARENA_CENTER = Position(2134.9854f, -263.11853f, 419.8465f);
 const Position ULDUAR_THORIM_NEAR_ENTRANCE_POSITION = Position(2172.4355f, -258.27957f, 418.47162f);
@@ -237,6 +237,16 @@ class KologarnCrunchArmorTrigger : public Trigger
 {
 public:
     KologarnCrunchArmorTrigger(PlayerbotAI* ai) : Trigger(ai, "kologarn crunch armor trigger") {}
+    bool IsActive() override;
+};
+
+//
+// Auriaya
+//
+class AuriayaFallFromFloorTrigger : public Trigger
+{
+public:
+    AuriayaFallFromFloorTrigger(PlayerbotAI* ai) : Trigger(ai, "auriaya fall from floor trigger") {}
     bool IsActive() override;
 };
 
