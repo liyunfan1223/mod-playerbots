@@ -99,7 +99,6 @@ public:
             // If this character is currently online as a bot, log out the bot first
             if (Player* bot = ObjectAccessor::FindPlayer(player->GetGUID()))
             {
-                LOG_INFO("playerbots", "Real player logging in, logging out bot for character {}", player->GetName());
                 LogoutAltBot(player->GetGUID());
             }
 

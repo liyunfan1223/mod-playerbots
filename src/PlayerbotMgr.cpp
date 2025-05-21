@@ -411,7 +411,12 @@ void LogoutAltBot(ObjectGuid guid)
                 PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(master);
                 if (mgr && mgr->GetPlayerBot(guid))
                 {
+                    LOG_INFO("playerbots", "Real player logging in, logging out bot for character {}", bot->GetName());
                     mgr->LogoutPlayerBot(guid);
+
+                    // Remove from master's PlayerbotMgr map
+                    mgr->RemoveFromPlayerbotsMap(guid);
+
                     return;
                 }
             }
