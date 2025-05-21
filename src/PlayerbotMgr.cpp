@@ -397,10 +397,10 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
     }
 }
 
-void LogoutAltBot(Player* player)
+void LogoutAltBot(ObjectGuid guid)
 {
     // Try to get the bot object and its master directly
-    if (Player* bot = ObjectAccessor::FindPlayer(player->GetGUID()))
+    if (Player* bot = ObjectAccessor::FindPlayer(guid))
     {
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI)
@@ -409,16 +409,16 @@ void LogoutAltBot(Player* player)
             if (master)
             {
                 PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(master);
-                if (mgr && mgr->GetPlayerBot())
+                if (mgr && mgr->GetPlayerBot(guid))
                 {
                     LOG_INFO("playerbots", "Real player logging in, logging out bot for character {}", bot->GetName());
-                    mgr->LogoutPlayerBot(player->GetGUID()id);
+                    mgr->LogoutPlayerBot(guid);
 
                     // Remove from master's PlayerbotMgr map
-                    mgr->RemoveFromPlayerbotsMap(player->GetGUID());
+                    mgr->RemoveFromPlayerbotsMap(guid);
 
-                    // Set AI master pointer to player
-                    botAI->SetMaster(player);
+                    // Set AI master pointer to player (named "bot" in this instance)
+                    botAI->SetMaster(bot);
 
                     return;
                 }

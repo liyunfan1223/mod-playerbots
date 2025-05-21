@@ -122,6 +122,6 @@ private:
 };
 
 #define sPlayerbotsMgr PlayerbotsMgr::instance()
-void LogoutAltBot(Player* player);
+void LogoutAltBot(ObjectGuid guid);
 
 #endif
