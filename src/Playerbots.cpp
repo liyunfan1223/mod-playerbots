@@ -99,11 +99,8 @@ public:
             // If this character is currently online as a bot, log out the bot first
             if (Player* bot = ObjectAccessor::FindPlayer(player->GetGUID()))
             {
-                if (bot != player) // should not be the same pointer
-                {
-                    LOG_INFO("playerbots", "Real player logging in, logging out bot for character {}", player->GetName());
-                    LogoutAltBot(player->GetGUID());
-                }
+                LOG_INFO("playerbots", "Real player logging in, logging out bot for character {}", player->GetName());
+                LogoutAltBot(player->GetGUID());
             }
 
             sPlayerbotsMgr->AddPlayerbotData(player, false);
