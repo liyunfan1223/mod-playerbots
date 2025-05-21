@@ -417,6 +417,9 @@ void LogoutAltBot(ObjectGuid guid)
                     // Remove from master's PlayerbotMgr map
                     mgr->RemoveFromPlayerbotsMap(guid);
 
+                    // Set AI master pointer to player
+                    botAI->SetMaster(player);
+
                     return;
                 }
             }

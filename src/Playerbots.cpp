@@ -100,9 +100,6 @@ public:
             if (Player* bot = ObjectAccessor::FindPlayer(player->GetGUID()))
             {
                 LogoutAltBot(player->GetGUID());
-
-                // Set AI master pointer to player
-                botAI->SetMaster(player);
             }
 
             sPlayerbotsMgr->AddPlayerbotData(player, false);
