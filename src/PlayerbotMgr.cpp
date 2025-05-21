@@ -704,8 +704,13 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (cmd == "add" || cmd == "addaccount" || cmd == "login")
     {
-        if (ObjectAccessor::FindPlayer(guid))
-            return "player already logged in";
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+        {
+            if (!player->GetSession()->IsBot())
+                return "Cannot add bot: character is currently being played by a real player.";
+            else
+                return "player already logged in as bot";
+        }
 
         // For addaccount command, verify it's an account name
         if (cmd == "addaccount")
