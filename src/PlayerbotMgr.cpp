@@ -417,13 +417,6 @@ void LogoutAltBot(ObjectGuid guid)
             }
         }
     }
-
-    // Fallback: forcibly kick if still in world
-    if (Player* player = ObjectAccessor::FindPlayer(guid))
-    {
-        LOG_INFO("playerbots", "Bot {} not tracked in any manager, forcing KickPlayer", player->GetName());
-        player->GetSession()->KickPlayer();
-    }
 }
 
 void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
