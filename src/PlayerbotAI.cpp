@@ -4384,12 +4384,8 @@ uint32 PlayerbotAI::AutoScaleActivity(uint32 mod)
     // Calculate lag progress from floor to ceiling (0 to 1)
     double lagProgress = (maxDiff - diffLimitFloor) / (double)(diffLimitCeiling - diffLimitFloor);
     
-    // Convert to 5% steps (20 steps total from 100% down to 0%)
-    int stepNumber = static_cast<int>(lagProgress * 20);
-    double activePercentage = (20 - stepNumber) / 20.0;
-    
-    // Apply the percentage to the mod value
-    return static_cast<uint32>(mod * activePercentage);
+    // Apply the percentage of active bots (the complement of lag progress) to the mod value
+    return static_cast<uint32>(mod * (1 - lagProgress));
 }
 
 bool PlayerbotAI::IsOpposing(Player* player) { return IsOpposing(player->getRace(), bot->getRace()); }
