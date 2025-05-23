@@ -46,7 +46,20 @@ void UnequipAction::UnequipItem(FindItemVisitor* visitor)
     IterateItems(visitor, ITERATE_ALL_ITEMS);
     std::vector<Item*> items = visitor->GetResult();
     if (!items.empty())
-        UnequipItem(*items.begin());
+    {
+        // Prefer equipped item
+        auto equipped = std::find_if(items.begin(), items.end(),
+                                     [](Item* item)
+                                     {
+                                         uint8 bag = item->GetBagSlot();
+                                         return bag == INVENTORY_SLOT_BAG_0 && item->GetSlot() < EQUIPMENT_SLOT_END;
+                                     });
+
+        if (equipped != items.end())
+            UnequipItem(*equipped);
+        else
+            UnequipItem(*items.begin());
+    }
 }
 
 void UnequipAction::UnequipItem(Item* item)
