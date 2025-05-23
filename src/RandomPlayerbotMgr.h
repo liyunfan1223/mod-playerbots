@@ -206,6 +206,8 @@ private:
     time_t BgCheckTimer;
     time_t LfgCheckTimer;
     time_t PlayersCheckTimer;
+    time_t RealPlayerLastTimeSeen = 0;
+    time_t DelayLoginBotsTimer;
     time_t printStatsTimer;
     uint32 AddRandomBots();
     bool ProcessBot(uint32 bot);
