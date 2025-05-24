@@ -333,6 +333,8 @@ public:
     bool equipmentPersistence;
     int32 equipmentPersistenceLevel;
     int32 groupInvitationPermission;
+    bool keepAltsInGroup = false;
+    bool KeepAltsInGroup() const { return keepAltsInGroup; }
     bool allowSummonInCombat;
     bool allowSummonWhenMasterIsDead;
     bool allowSummonWhenBotIsDead;
