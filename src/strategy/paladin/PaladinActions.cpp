@@ -12,13 +12,23 @@
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
+#include "../../../../../src/server/scripts/Spells/spell_generic.cpp"
 
-inline std::string const GetActualBlessingOfMight(Unit* target)
+inline std::string const GetActualBlessingOfMight(Unit* target, PlayerbotAI* botAI, Player* bot)
 {
-    if (!target->ToPlayer())
+    Player* targetPlayer = target->ToPlayer();
+
+    if (!targetPlayer)
     {
         return "blessing of might";
     }
+
+    if (targetPlayer->HasTankSpec() && !targetPlayer->HasAura(SPELL_BLESSING_OF_SANCTUARY) &&
+        bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY))
+    {
+        return "blessing of sanctuary";
+    }
+
     int tab = AiFactory::GetPlayerSpecTab(target->ToPlayer());
     switch (target->getClass())
     {
@@ -99,7 +109,7 @@ bool CastBlessingOfMightAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
+    return botAI->CastSpell(GetActualBlessingOfMight(target, botAI, bot), target);
 }
 
 Value<Unit*>* CastBlessingOfMightOnPartyAction::GetTargetValue()
@@ -113,7 +123,7 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
+    return botAI->CastSpell(GetActualBlessingOfMight(target, botAI, bot), target);
 }
 
 bool CastBlessingOfWisdomAction::Execute(Event event)
