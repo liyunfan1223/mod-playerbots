@@ -41,7 +41,28 @@ bool LootRollAction::Execute(Event event)
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
-        
+            
+    // Set up the check to allow loot rolls to have the disenchant option
+    // if anyone in the group has the required skill level otherwise
+    // greed on the item. 
+    bool DePresent = false;
+    Group::MemberSlotList const& members = group->GetMemberSlots();
+
+    for (GroupReference* ref = group->GetFirstMember(); ref != nullptr; ref = ref->next())
+    {
+    Player* member = ref->GetSource();
+    if (!member)
+        continue;
+
+    uint32 enchantingSkill = member->GetSkillValue(SKILL_ENCHANTING);
+
+    if (member->HasSkill(SKILL_ENCHANTING) &&
+        (proto->RequiredDisenchantSkill == 0 || enchantingSkill >= proto->RequiredDisenchantSkill))
+        {
+            DePresent = true;
+            break;
+        }
+    }
         std::string itemUsageParam;
         if (randomProperty != 0) {
             itemUsageParam = std::to_string(itemId) + "," + std::to_string(randomProperty);
@@ -95,15 +116,49 @@ bool LootRollAction::Execute(Event event)
             }
             else if (vote == GREED)
             {
-                if (bot->HasSkill(SKILL_ENCHANTING))
+            if (DePresent && proto->DisenchantID != 0 && sPlayerbotAIConfig->allowDisenchant == 1)
+            {
+                switch (proto->Quality)
                 {
+                    case ITEM_QUALITY_UNCOMMON: // Green
+                    if (sPlayerbotAIConfig->deGreens == 1)
+                    {
                     vote = DISENCHANT;
-                }
-                else
-                {     
-                vote = GREED;
-                }
-            }
+                    }
+                break;
+
+                    case ITEM_QUALITY_RARE: // Blue
+                    if (sPlayerbotAIConfig->deBlues == 1)
+                    {
+                    vote = DISENCHANT;
+                    }
+                break;
+
+                    case ITEM_QUALITY_EPIC: // Purple
+                    if (sPlayerbotAIConfig->dePurples == 1)
+                    {
+                    vote = DISENCHANT;
+                    }
+                break;
+
+                    case ITEM_QUALITY_LEGENDARY: // Orange
+                    if (sPlayerbotAIConfig->deOranges == 1)
+                    {
+                    vote = DISENCHANT;
+                    }
+                break;
+
+            default:
+                // Do nothing — vote remains GREED
+                break;
+        }
+    }
+    else
+    {
+        vote = GREED; // Not disenchantable or allowed
+    }
+}
+
         }
         switch (group->GetLootMethod())
         {
@@ -117,58 +172,6 @@ bool LootRollAction::Execute(Event event)
         }
     }
 	
-    // WorldPacket p(event.getPacket()); //WorldPacket packet for CMSG_LOOT_ROLL, (8+4+1)
-    // p.rpos(0); //reset packet pointer
-    // p >> guid; //guid of the item rolled
-    // p >> slot; //number of players invited to roll
-    // p >> rollType; //need,greed or pass on roll
-
-    // std::vector<Roll*> rolls = group->GetRolls();
-    // bot->Say("guid:" + std::to_string(guid.GetCounter()) +
-    //     "item entry:" + std::to_string(guid.GetEntry()), LANG_UNIVERSAL);
-    // for (std::vector<Roll*>::iterator i = rolls.begin(); i != rolls.end(); ++i)
-    // {
-    //     if ((*i)->isValid() && (*i)->itemGUID == guid && (*i)->itemSlot == slot)
-    //     {
-    //         uint32 itemId = (*i)->itemid;
-    //         bot->Say("item entry2:" + std::to_string(itemId), LANG_UNIVERSAL);
-    //         ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
-    //         if (!proto)
-    //             continue;
-
-    //         switch (proto->Class)
-    //         {
-    //         case ITEM_CLASS_WEAPON:
-    //         case ITEM_CLASS_ARMOR:
-    //             if (!QueryItemUsage(proto).empty())
-    //                 vote = NEED;
-    //             else if (bot->HasSkill(SKILL_ENCHANTING))
-    //                 vote = DISENCHANT;
-    //             break;
-    //         default:
-    //             if (StoreLootAction::IsLootAllowed(itemId, botAI))
-    //                 vote = NEED;
-    //             break;
-    //         }
-    //         break;
-    //     }
-    // }
-
-    // if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(guid.GetEntry()))
-    // {
-    //     switch (proto->Class)
-    //     {
-    //         case ITEM_CLASS_WEAPON:
-    //         case ITEM_CLASS_ARMOR:
-    //             if (!QueryItemUsage(proto).empty())
-    //                 vote = NEED;
-    //             break;
-    //         default:
-    //             if (StoreLootAction::IsLootAllowed(guid.GetEntry(), botAI))
-    //                 vote = NEED;
-    //             break;
-    //     }
-    // }
     return true;
 }
 

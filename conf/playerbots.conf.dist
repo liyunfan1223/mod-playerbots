@@ -282,6 +282,15 @@ AiPlayerbot.FreeMethodLoot = 0
 # Default: 1 (greed)
 AiPlayerbot.LootRollLevel = 1
 
+# Bots will be allowed to roll Disenchant if allowed and meet
+# the proper conditions.
+# Default: 0 (disabled)
+AiPlayerBot.Disenchant = 0
+AiPlayerBot.Disenchant.Uncommon = 0
+AiPlayerBot.Disenchant.Rare = 0
+AiPlayerBot.Disenchant.Epic = 0
+AiPlayerBot.Disenchant.Legendary = 0
+
 #
 #
 #

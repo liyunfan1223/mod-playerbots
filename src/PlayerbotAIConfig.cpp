@@ -556,6 +556,11 @@ bool PlayerbotAIConfig::Initialize()
     // SPP automation
     freeMethodLoot = sConfigMgr->GetOption<bool>("AiPlayerbot.FreeMethodLoot", false);
     lootRollLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.LootRollLevel", 1);
+    allowDisenchant = sConfigMgr->GetOption<bool>("AiPlayerBot.Disenchant", false);
+    deGreens = sConfigMgr->GetOption<bool>("AiPlayerBot.Disenchant.Uncommon", false);
+    deBlues = sConfigMgr->GetOption<bool>("AiPlayerBot.Disenchant.Rare", false);
+    dePurples = sConfigMgr->GetOption<bool>("AiPlayerBot.Disenchant.Epic", false);
+    deOranges = sConfigMgr->GetOption<bool>("AiPlayerBot.Disenchant.Legendary", false);
     autoPickReward = sConfigMgr->GetOption<std::string>("AiPlayerbot.AutoPickReward", "yes");
     autoEquipUpgradeLoot = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoEquipUpgradeLoot", true);
     equipUpgradeThreshold = sConfigMgr->GetOption<float>("AiPlayerbot.EquipUpgradeThreshold", 1.1f);
