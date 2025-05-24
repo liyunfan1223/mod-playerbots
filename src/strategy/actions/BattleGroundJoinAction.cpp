@@ -554,11 +554,9 @@ bool BGJoinAction::JoinQueue(uint32 type)
     }
     else
     {
-        WorldPacket* arena_packet = new WorldPacket(CMSG_BATTLEMASTER_JOIN_ARENA, 20);
-        *arena_packet << unit->GetGUID() << arenaslot << asGroup << uint8(isRated);
-        /// FIX race condition
-        // bot->GetSession()->HandleBattlemasterJoinArena(arena_packet);
-        bot->GetSession()->QueuePacket(arena_packet);
+        WorldPacket arena_packet(CMSG_BATTLEMASTER_JOIN_ARENA, 20);
+        arena_packet << unit->GetGUID() << arenaslot << asGroup << uint8(isRated);
+        bot->GetSession()->HandleBattlemasterJoinArena(arena_packet);
     }
 
     return true;
