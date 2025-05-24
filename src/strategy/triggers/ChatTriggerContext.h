@@ -88,6 +88,7 @@ public:
         creators["cast"] = &ChatTriggerContext::cast;
         creators["castnc"] = &ChatTriggerContext::castnc;
         creators["invite"] = &ChatTriggerContext::invite;
+        creators["lfg"] = &ChatTriggerContext::lfg;
         creators["spell"] = &ChatTriggerContext::spell;
         creators["rti"] = &ChatTriggerContext::rti;
         creators["revive"] = &ChatTriggerContext::revive;
@@ -164,6 +165,7 @@ private:
     static Trigger* revive(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "revive"); }
     static Trigger* rti(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "rti"); }
     static Trigger* invite(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "invite"); }
+    static Trigger* lfg(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "lfg"); }
     static Trigger* cast(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "cast"); }
     static Trigger* castnc(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "castnc"); }
     static Trigger* talk(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "talk"); }
