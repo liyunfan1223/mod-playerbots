@@ -91,11 +91,18 @@ bool LootRollAction::Execute(Event event)
         {
             if (vote == NEED)
             {
-                vote = GREED;
+                vote = NEED;
             }
             else if (vote == GREED)
             {
-                vote = PASS;
+                if (bot->HasSkill(SKILL_ENCHANTING))
+                {
+                    vote = DISENCHANT;
+                }
+                else
+                {     
+                vote = GREED;
+                }
             }
         }
         switch (group->GetLootMethod())
