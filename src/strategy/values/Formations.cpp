@@ -23,7 +23,7 @@ bool Formation::IsNullLocation(WorldLocation const& loc) { return IsSameLocation
 
 WorldLocation MoveAheadFormation::GetLocation()
 {
-    Player* master = botAI->GetGroupMaster();
+    Player* master = GetMaster();
     if (!master || master == bot)
         return WorldLocation();
 
@@ -110,7 +110,7 @@ public:
 
     WorldLocation GetLocationInternal() override
     {
-        Player* master = botAI->GetGroupMaster();
+        Player* master = GetMaster();
         if (!master)
             return WorldLocation();
 
@@ -120,7 +120,7 @@ public:
         time_t now = time(nullptr);
         if (!lastChangeTime || now - lastChangeTime >= 3)
         {
-            Player* master = botAI->GetGroupMaster();
+            Player* master = GetMaster();
             if (!master)
                 return WorldLocation();
 
@@ -185,7 +185,7 @@ public:
         float range = 2.0f;
 
         Unit* target = AI_VALUE(Unit*, "current target");
-        Player* master = botAI->GetGroupMaster();
+        Player* master = GetMaster();
         if (!target && target != bot)
             target = master;
 
@@ -239,7 +239,7 @@ public:
 
         float range = 2.0f;
 
-        Player* master = botAI->GetGroupMaster();
+        Player* master = GetMaster();
         if (!master)
             return Formation::NullLocation;
 
@@ -413,82 +413,89 @@ float Formation::GetFollowAngle()
     Group* group = bot->GetGroup();
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
 
+    // If there's no master and no group
+    if (!master && !group)
+        return 0.0f;
+
     uint32 index = 1;
     uint32 total = 1;
 
-    PlayerbotMgr* masterBotMgr = nullptr;
-    if (master)
-        masterBotMgr = GET_PLAYERBOT_MGR(master);
-    if (!group && master && !GET_PLAYERBOT_AI(master) && masterBotMgr)
-    {
-        for (PlayerBotMap::const_iterator i = masterBotMgr->GetPlayerBotsBegin(); i != masterBotMgr->GetPlayerBotsEnd();
-             ++i)
-        {
-            if (i->second == bot)
-                index = total;
+    std::vector<Player*> roster;
 
-            ++total;
+    if (group)
+    {
+        bool left = true;  // Used for alternating tanks' positions
+
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+
+            // Skip invalid, dead, or out-of-map members
+            if (!member || !member->IsAlive() || bot->GetMapId() != member->GetMapId())
+                continue;
+
+            // Skip the master
+            if (member == master)
+                continue;
+
+            // Put DPS in the middle
+            if (!botAI->IsTank(member) && !botAI->IsHeal(member))
+            {
+                roster.insert(roster.begin() + roster.size() / 2, member);
+            }
+
+            // Put Healers in the middle
+            else if (botAI->IsHeal(member))
+            {
+                roster.insert(roster.begin() + roster.size() / 2, member);
+            }
+
+            // Handle tanks (alternate between front and back)
+            else if (botAI->IsTank(member))
+            {
+                if (left)
+                    roster.push_back(member);  // Place tank at the back
+                else
+                    roster.insert(roster.begin(), member);  // Place tank at the front
+
+                left = !left;  // Alternate for the next tank
+            }
+
+            total++;
         }
     }
-    else if (group)
+    else if (master)
     {
-        std::vector<Player*> roster;
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        // If the bot is following a master, look up the bot's position in the master's list
+        PlayerbotMgr* masterBotMgr = GET_PLAYERBOT_MGR(master);
+        if (masterBotMgr && !GET_PLAYERBOT_AI(master))
         {
-            if (Player* member = ref->GetSource())
+            for (auto it = masterBotMgr->GetPlayerBotsBegin(); it != masterBotMgr->GetPlayerBotsEnd(); ++it)
             {
-                if (member != master && !botAI->IsTank(member) && !botAI->IsHeal(member))
+                if (it->second == bot)
                 {
-                    roster.insert(roster.begin() + roster.size() / 2, member);
+                    index = total;  // Found bot in master's list, set the index
+                    break;
                 }
+                ++total;
             }
         }
-
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-        {
-            if (Player* member = ref->GetSource())
-            {
-                if (member != master && botAI->IsHeal(member))
-                {
-                    roster.insert(roster.begin() + roster.size() / 2, member);
-                }
-            }
-        }
-
-        bool left = true;
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-        {
-            if (Player* member = ref->GetSource())
-            {
-                if (member != master && botAI->IsTank(member))
-                {
-                    if (left)
-                        roster.push_back(member);
-                    else
-                        roster.insert(roster.begin(), member);
-
-                    left = !left;
-                }
-            }
-        }
-
-        for (Player* playerRoster : roster)
-        {
-            if (playerRoster == bot)
-                break;
-
-            ++index;
-        }
-
-        total = roster.size() + 1;
     }
 
+    // Find the bot's position in the roster
+    auto it = std::find(roster.begin(), roster.end(), bot);
+    if (it != roster.end())
+    {
+        index = std::distance(roster.begin(), it) + 1;  // Find bot's index in the roster
+    }
+
+    // Return
     float start = (master ? master->GetOrientation() : 0.0f);
     return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
 
 FormationValue::FormationValue(PlayerbotAI* botAI)
-    : ManualSetValue<Formation*>(botAI, new NearFormation(botAI), "formation")
+    : ManualSetValue<Formation*>(botAI, new ChaosFormation(botAI), "formation")
 {
 }
 
@@ -519,7 +526,7 @@ bool FormationValue::Load(std::string const formation)
 
         value = new QueueFormation(botAI);
     }
-    else if (formation == "chaos")
+    else if (formation == "chaos" || formation == "default")
     {
         if (value)
             delete value;
@@ -554,7 +561,7 @@ bool FormationValue::Load(std::string const formation)
 
         value = new ArrowFormation(botAI);
     }
-    else if (formation == "near" || formation == "default")
+    else if (formation == "near")
     {
         if (value)
             delete value;
@@ -602,7 +609,7 @@ bool SetFormationAction::Execute(Event event)
         str << "Invalid formation: |cffff0000" << formation;
         botAI->TellMaster(str);
         botAI->TellMaster(
-            "Please set to any of:|cffffffff near (default), queue, chaos, circle, line, shield, arrow, melee, far");
+            "Please set to any of:|cffffffff chaos (default), near, queue, circle, line, shield, arrow, melee, far");
         return false;
     }
 

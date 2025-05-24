@@ -62,6 +62,7 @@
 #include "VehicleActions.h"
 #include "WorldBuffAction.h"
 #include "XpGainAction.h"
+#include "NewRpgAction.h"
 
 class PlayerbotAI;
 
@@ -134,6 +135,7 @@ public:
         creators["move to loot"] = &ActionContext::move_to_loot;
         creators["open loot"] = &ActionContext::open_loot;
         creators["guard"] = &ActionContext::guard;
+        creators["return to stay position"] = &ActionContext::return_to_stay_position;
         creators["move out of enemy contact"] = &ActionContext::move_out_of_enemy_contact;
         creators["set facing"] = &ActionContext::set_facing;
         creators["set behind"] = &ActionContext::set_behind;
@@ -240,6 +242,13 @@ public:
 
         creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
         creators["pet attack"] = &ActionContext::pet_attack; 
+
+        creators["new rpg status update"] = &ActionContext::new_rpg_status_update;
+        creators["new rpg go grind"] = &ActionContext::new_rpg_go_grind;
+        creators["new rpg go innkeeper"] = &ActionContext::new_rpg_go_innkeeper;
+        creators["new rpg move random"] = &ActionContext::new_rpg_move_random;
+        creators["new rpg move npc"] = &ActionContext::new_rpg_move_npc;
+        creators["new rpg do quest"] = &ActionContext::new_rpg_do_quest;
     }
 
 private:
@@ -263,6 +272,7 @@ private:
     static Action* drop_target(PlayerbotAI* botAI) { return new DropTargetAction(botAI); }
     static Action* attack_duel_opponent(PlayerbotAI* botAI) { return new AttackDuelOpponentAction(botAI); }
     static Action* guard(PlayerbotAI* botAI) { return new GuardAction(botAI); }
+    static Action* return_to_stay_position(PlayerbotAI* botAI) { return new ReturnToStayPositionAction(botAI); }
     static Action* open_loot(PlayerbotAI* botAI) { return new OpenLootAction(botAI); }
     static Action* move_to_loot(PlayerbotAI* botAI) { return new MoveToLootAction(botAI); }
     static Action* _return(PlayerbotAI* botAI) { return new ReturnAction(botAI); }
@@ -415,6 +425,13 @@ private:
 
     static Action* toggle_pet_spell(PlayerbotAI* ai) { return new TogglePetSpellAutoCastAction(ai); }
     static Action* pet_attack(PlayerbotAI* ai) { return new PetAttackAction(ai); }
+
+    static Action* new_rpg_status_update(PlayerbotAI* ai) { return new NewRpgStatusUpdateAction(ai); }
+    static Action* new_rpg_go_grind(PlayerbotAI* ai) { return new NewRpgGoGrindAction(ai); }
+    static Action* new_rpg_go_innkeeper(PlayerbotAI* ai) { return new NewRpgGoInnKeeperAction(ai); }
+    static Action* new_rpg_move_random(PlayerbotAI* ai) { return new NewRpgMoveRandomAction(ai); }
+    static Action* new_rpg_move_npc(PlayerbotAI* ai) { return new NewRpgMoveNpcAction(ai); }
+    static Action* new_rpg_do_quest(PlayerbotAI* ai) { return new NewRpgDoQuestAction(ai); }
 };
 
 #endif

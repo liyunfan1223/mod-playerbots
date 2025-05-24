@@ -66,4 +66,11 @@ public:
     bool Execute(Event event) override;
 };
 
+class QuestItemPushResultAction : public Action
+{
+public:
+    QuestItemPushResultAction(PlayerbotAI* ai) : Action(ai, "quest item push result") {}
+    bool Execute(Event event) override;;
+};
+
 #endif

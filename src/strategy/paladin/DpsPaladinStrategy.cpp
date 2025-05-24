@@ -84,8 +84,8 @@ NextAction** DpsPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0,
                              new NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
-                             new NextAction("crusader strike", ACTION_DEFAULT + 0.5f),
-                             new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.4f),
+                             new NextAction("judgement of wisdom", ACTION_DEFAULT + 0.5f),
+                             new NextAction("crusader strike", ACTION_DEFAULT + 0.4f),
                              new NextAction("divine storm", ACTION_DEFAULT + 0.3f),
                              new NextAction("consecration", ACTION_DEFAULT + 0.1f),
                              new NextAction("melee", ACTION_DEFAULT), nullptr);
@@ -131,5 +131,5 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     //     NextAction::array(0, new NextAction("set facing", ACTION_NORMAL + 7), NULL)));
 
     triggers.push_back(new TriggerNode("enemy out of melee",
-                                       NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), NULL)));
+                                       NextAction::array(0, new NextAction("reach melee", ACTION_HIGH + 1), NULL)));
 }

@@ -25,6 +25,11 @@ struct ItemTemplate;
 typedef std::set<uint32> ItemIds;
 typedef std::set<uint32> SpellIds;
 
+struct ItemWithRandomProperty {
+    uint32 itemId{0};
+    int32 randomPropertyId{0};
+};
+
 class ChatHelper : public PlayerbotAIAware
 {
 public:
@@ -33,6 +38,7 @@ public:
     static std::string const formatMoney(uint32 copper);
     static uint32 parseMoney(std::string const text);
     static ItemIds parseItems(std::string const text);
+    static ItemWithRandomProperty parseItemWithRandomProperty(std::string const text);
     uint32 parseSpell(std::string const text);
     static std::string parseValue(const std::string& type, const std::string& text);
 

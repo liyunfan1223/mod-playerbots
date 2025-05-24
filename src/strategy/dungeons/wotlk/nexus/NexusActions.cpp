@@ -6,8 +6,8 @@ bool MoveFromWhirlwindAction::Execute(Event event)
 {
     Unit* boss = nullptr;
     uint8 faction = bot->GetTeamId();
-    float targetDist = 10.0f; // Whirlwind has range of 8, add a couple for safety buffer
-    
+    float targetDist = 10.0f; // Whirlwind has a range of 8, adding a safety buffer
+
     switch (bot->GetMap()->GetDifficulty())
     {
         case DUNGEON_DIFFICULTY_NORMAL:
@@ -15,7 +15,7 @@ bool MoveFromWhirlwindAction::Execute(Event event)
             {
                 boss = AI_VALUE2(Unit*, "find target", "horde commander");
             }
-            else //if (faction == TEAM_HORDE)
+            else // TEAM_HORDE
             {
                 boss = AI_VALUE2(Unit*, "find target", "alliance commander");
             }
@@ -25,7 +25,7 @@ bool MoveFromWhirlwindAction::Execute(Event event)
             {
                 boss = AI_VALUE2(Unit*, "find target", "commander kolurg");
             }
-            else //if (faction == TEAM_HORDE)
+            else // TEAM_HORDE
             {
                 boss = AI_VALUE2(Unit*, "find target", "commander stoutbeard");
             }
@@ -33,11 +33,22 @@ bool MoveFromWhirlwindAction::Execute(Event event)
         default:
             break;
     }
-    float bossDistance = bot->GetExactDist2d(boss->GetPosition());
-    if (!boss || bossDistance > targetDist)
+
+    // Ensure boss is valid before accessing its methods
+    if (!boss)
     {
         return false;
     }
+
+    float bossDistance = bot->GetExactDist2d(boss->GetPosition());
+    
+    // Check if the bot is already at a safe distance
+    if (bossDistance > targetDist)
+    {
+        return false;
+    }
+
+    // Move away from the boss to avoid Whirlwind
     return MoveAway(boss, targetDist - bossDistance);
 }
 

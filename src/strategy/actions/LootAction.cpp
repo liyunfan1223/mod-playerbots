@@ -18,8 +18,8 @@
 #include "GuildMgr.h"
 #include "BroadcastHelper.h"
 
-bool LootAction::Execute(Event event)
-{
+bool LootAction::Execute(Event /*event*/)
+{   
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
@@ -29,9 +29,10 @@ bool LootAction::Execute(Event event)
 
     if (!prevLoot.IsEmpty() && prevLoot.guid != lootObject.guid)
     {
-        WorldPacket packet(CMSG_LOOT_RELEASE, 8);
-        packet << prevLoot.guid;
-        bot->GetSession()->HandleLootReleaseOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_LOOT_RELEASE, 8);
+        *packet << prevLoot.guid;
+        bot->GetSession()->QueuePacket(packet);
+        // bot->GetSession()->HandleLootReleaseOpcode(packet);
     }
 
     context->GetValue<LootObject>("loot target")->Set(lootObject);
@@ -60,7 +61,7 @@ enum ProfessionSpells
     TAILORING = 3908
 };
 
-bool OpenLootAction::Execute(Event event)
+bool OpenLootAction::Execute(Event /*event*/)
 {
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
     bool result = DoLoot(lootObject);
@@ -69,7 +70,6 @@ bool OpenLootAction::Execute(Event event)
         AI_VALUE(LootObjectStack*, "available loot")->Remove(lootObject.guid);
         context->GetValue<LootObject>("loot target")->Set(LootObject());
     }
-
     return result;
 }
 
@@ -79,14 +79,22 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
         return false;
 
     Creature* creature = botAI->GetCreature(lootObject.guid);
-    if (creature && bot->GetDistance(creature) > INTERACTION_DISTANCE)
+    if (creature && bot->GetDistance(creature) > INTERACTION_DISTANCE - 2.0f)
         return false;
+
+    // Dismount if the bot is mounted
+    if (bot->IsMounted())
+    {
+        bot->Dismount();
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig->lootDelay); // Small delay to avoid animation issues
+    }
 
     if (creature && creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
     {
-        WorldPacket packet(CMSG_LOOT, 8);
-        packet << lootObject.guid;
-        bot->GetSession()->HandleLootOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_LOOT, 8);
+        *packet << lootObject.guid;
+        bot->GetSession()->QueuePacket(packet);
+        // bot->GetSession()->HandleLootOpcode(packet);
         botAI->SetNextCheckDelay(sPlayerbotAIConfig->lootDelay);
         return true;
     }
@@ -116,10 +124,18 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     }
 
     GameObject* go = botAI->GetGameObject(lootObject.guid);
-    if (go && bot->GetDistance(go) > INTERACTION_DISTANCE)
+    if (go && bot->GetDistance(go) > INTERACTION_DISTANCE - 2.0f)
         return false;
 
     if (go && (go->GetGoState() != GO_STATE_READY))
+        return false;
+
+    // This prevents dungeon chests like Tribunal Chest (Halls of Stone) from being ninja'd by the bots
+    if (go && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND))
+        return false;
+
+    // This prevents raid chests like Gunship Armory (ICC) from being ninja'd by the bots
+    if (go && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
         return false;
 
     if (lootObject.skillId == SKILL_MINING)
@@ -180,7 +196,7 @@ uint32 OpenLootAction::GetOpeningSpell(LootObject& lootObject, GameObject* go)
     return sPlayerbotAIConfig->openGoSpell;
 }
 
-bool OpenLootAction::CanOpenLock(LootObject& lootObject, SpellInfo const* spellInfo, GameObject* go)
+bool OpenLootAction::CanOpenLock(LootObject& /*lootObject*/, SpellInfo const* spellInfo, GameObject* go)
 {
     for (uint8 effIndex = 0; effIndex <= EFFECT_2; effIndex++)
     {
@@ -195,8 +211,6 @@ bool OpenLootAction::CanOpenLock(LootObject& lootObject, SpellInfo const* spellI
         LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
         if (!lockInfo)
             return false;
-
-        bool reqKey = false;  // some locks not have reqs
 
         for (uint8 j = 0; j < 8; ++j)
         {
@@ -349,8 +363,9 @@ bool StoreLootAction::Execute(Event event)
 
     if (gold > 0)
     {
-        WorldPacket packet(CMSG_LOOT_MONEY, 0);
-        bot->GetSession()->HandleLootMoneyOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_LOOT_MONEY, 0);
+        bot->GetSession()->QueuePacket(packet);
+        // bot->GetSession()->HandleLootMoneyOpcode(packet);
     }
 
     for (uint8 i = 0; i < items; ++i)
@@ -359,7 +374,6 @@ bool StoreLootAction::Execute(Event event)
         uint32 itemcount;
         uint8 lootslot_type;
         uint8 itemindex;
-        bool grab = false;
 
         p >> itemindex;
         p >> itemid;
@@ -415,9 +429,11 @@ bool StoreLootAction::Execute(Event event)
                         sGuildTaskMgr->CheckItemTask(itemid, itemcount, ref->GetSource(), bot);
         }
 
-        WorldPacket packet(CMSG_AUTOSTORE_LOOT_ITEM, 1);
-        packet << itemindex;
-        bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_AUTOSTORE_LOOT_ITEM, 1);
+        *packet << itemindex;
+        bot->GetSession()->QueuePacket(packet);
+        // bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig->lootDelay);
 
         if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT) && sPlayerbotAIConfig->randomBotEmote)
             botAI->PlayEmote(TEXT_EMOTE_CHEER);
@@ -431,9 +447,10 @@ bool StoreLootAction::Execute(Event event)
     AI_VALUE(LootObjectStack*, "available loot")->Remove(guid);
 
     // release loot
-    WorldPacket packet(CMSG_LOOT_RELEASE, 8);
-    packet << guid;
-    bot->GetSession()->HandleLootReleaseOpcode(packet);
+    WorldPacket* packet = new WorldPacket(CMSG_LOOT_RELEASE, 8);
+    *packet << guid;
+    bot->GetSession()->QueuePacket(packet);
+    // bot->GetSession()->HandleLootReleaseOpcode(packet);
     return true;
 }
 
@@ -493,22 +510,22 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
     return canLoot;
 }
 
-bool ReleaseLootAction::Execute(Event event)
+bool ReleaseLootAction::Execute(Event /*event*/)
 {
     GuidVector gos = context->GetValue<GuidVector>("nearest game objects")->Get();
     for (ObjectGuid const guid : gos)
     {
-        WorldPacket packet(CMSG_LOOT_RELEASE, 8);
-        packet << guid;
-        bot->GetSession()->HandleLootReleaseOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_LOOT_RELEASE, 8);
+        *packet << guid;
+        bot->GetSession()->QueuePacket(packet);
     }
 
     GuidVector corpses = context->GetValue<GuidVector>("nearest corpses")->Get();
     for (ObjectGuid const guid : corpses)
     {
-        WorldPacket packet(CMSG_LOOT_RELEASE, 8);
-        packet << guid;
-        bot->GetSession()->HandleLootReleaseOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_LOOT_RELEASE, 8);
+        *packet << guid;
+        bot->GetSession()->QueuePacket(packet);
     }
 
     return true;

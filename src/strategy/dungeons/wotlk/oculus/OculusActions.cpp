@@ -111,7 +111,7 @@ bool DismountDrakeAction::Execute(Event event)
     return false;
 }
 
-bool FlyDrakeAction::Execute(Event event)
+bool OccFlyDrakeAction::Execute(Event event)
 {
     Player* master = botAI->GetMaster();
     if (!master) { return false; }
@@ -152,7 +152,7 @@ bool FlyDrakeAction::Execute(Event event)
     return false;
 }
 
-bool DrakeAttackAction::Execute(Event event)
+bool OccDrakeAttackAction::Execute(Event event)
 {
     vehicleBase = bot->GetVehicleBase();
     if (!vehicleBase) { return false; }
@@ -188,7 +188,7 @@ bool DrakeAttackAction::Execute(Event event)
     return false;
 }
 
-bool DrakeAttackAction::CastDrakeSpellAction(Unit* target, uint32 spellId, uint32 cooldown)
+bool OccDrakeAttackAction::CastDrakeSpellAction(Unit* target, uint32 spellId, uint32 cooldown)
 {
     if (botAI->CanCastVehicleSpell(spellId, target))
         if (botAI->CastVehicleSpell(spellId, target))
@@ -199,7 +199,7 @@ bool DrakeAttackAction::CastDrakeSpellAction(Unit* target, uint32 spellId, uint3
     return false;
 }
 
-bool DrakeAttackAction::AmberDrakeAction(Unit* target)
+bool OccDrakeAttackAction::AmberDrakeAction(Unit* target)
 {
     Aura* shockCharges = target->GetAura(SPELL_SHOCK_CHARGE, vehicleBase->GetGUID());
     if (shockCharges && shockCharges->GetStackAmount() > 8)
@@ -225,7 +225,7 @@ bool DrakeAttackAction::AmberDrakeAction(Unit* target)
     return false;
 }
 
-bool DrakeAttackAction::EmeraldDrakeAction(Unit* target)
+bool OccDrakeAttackAction::EmeraldDrakeAction(Unit* target)
 {
     Aura* poisonStacks = target->GetAura(SPELL_LEECHING_POISON, vehicleBase->GetGUID());
     if (!poisonStacks || (poisonStacks->GetStackAmount() < 3 ||
@@ -286,7 +286,7 @@ bool DrakeAttackAction::EmeraldDrakeAction(Unit* target)
     return false;
 }
 
-bool DrakeAttackAction::RubyDrakeAction(Unit* target)
+bool OccDrakeAttackAction::RubyDrakeAction(Unit* target)
 {
     Aura* evasiveCharges = vehicleBase->GetAura(SPELL_EVASIVE_CHARGES);
     Aura* evasiveManeuvers = vehicleBase->GetAura(SPELL_EVASIVE_MANEUVERS);

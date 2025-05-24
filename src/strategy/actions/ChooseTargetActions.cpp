@@ -8,10 +8,11 @@
 #include "ChooseRpgTargetAction.h"
 #include "Event.h"
 #include "LootObjectStack.h"
+#include "NewRpgStrategy.h"
 #include "Playerbots.h"
 #include "PossibleRpgTargetsValue.h"
-#include "ServerFacade.h"
 #include "PvpTriggers.h"
+#include "ServerFacade.h"
 
 bool AttackEnemyPlayerAction::isUseful()
 {
@@ -30,31 +31,31 @@ bool AttackEnemyFlagCarrierAction::isUseful()
 
 bool AttackAnythingAction::isUseful()
 {
-    if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot not allowed to be active
+    if (!bot || !botAI)  // Prevents invalid accesses
         return false;
 
-    if (!AI_VALUE(bool, "can move around"))
+    if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot cannot be active
         return false;
 
-    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() &&
-        ChooseRpgTargetAction::isFollowValid(
-            bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))  // Bot is traveling
+    if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
         return false;
-    // if (bot->IsInCombat()) {
-    //     return false;
-    // }
+
+    if (bot->IsInCombat())
+        return false;
+
     Unit* target = GetTarget();
-
-    if (!target)
+    if (!target || !target->IsInWorld())  // Checks if the target is valid and in the world
         return false;
 
     std::string const name = std::string(target->GetName());
-    if (!name.empty() && name.find("Dummy") != std::string::npos)  // Target is not a targetdummy
+    if (!name.empty() &&
+        (name.find("Dummy") != std::string::npos ||
+         name.find("Charge Target") != std::string::npos ||
+         name.find("Melee Target") != std::string::npos ||
+         name.find("Ranged Target") != std::string::npos))
+    {
         return false;
-
-    // if (!ChooseRpgTargetAction::isFollowValid(bot, target))                               //Do not grind mobs far
-    // away from master.
-    //     return false;
+    }
 
     return true;
 }
@@ -125,6 +126,36 @@ bool AttackAnythingAction::isPossible() { return AttackAction::isPossible() && G
 bool DpsAssistAction::isUseful()
 {
     if (PlayerHasFlag::IsCapturingFlag(bot))
+        return false;
+
+    return true;
+}
+
+bool AttackRtiTargetAction::Execute(Event event)
+{
+    Unit* rtiTarget = AI_VALUE(Unit*, "rti target");
+
+    if (rtiTarget && rtiTarget->IsInWorld() && rtiTarget->GetMapId() == bot->GetMapId())
+    {
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({rtiTarget->GetGUID()});
+        bool result = Attack(botAI->GetUnit(rtiTarget->GetGUID()));
+        if (result)
+        {
+            context->GetValue<ObjectGuid>("pull target")->Set(rtiTarget->GetGUID());
+            return true;
+        }
+    }
+    else
+    {
+        botAI->TellError("I dont see my rti attack target");
+    }
+
+    return false;
+}
+
+bool AttackRtiTargetAction::isUseful()
+{
+    if (botAI->ContainsStrategy(STRATEGY_TYPE_HEAL))
         return false;
 
     return true;

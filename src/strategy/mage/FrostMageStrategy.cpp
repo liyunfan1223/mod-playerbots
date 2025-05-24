@@ -59,8 +59,10 @@ FrostMageStrategy::FrostMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy(b
 
 NextAction** FrostMageStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("frostbolt", ACTION_DEFAULT + 0.1f),
-                             new NextAction("shoot", ACTION_DEFAULT), nullptr);
+    return NextAction::array(0, new NextAction("frostbolt", ACTION_DEFAULT + 0.3f),
+                             new NextAction("fire blast", ACTION_DEFAULT + 0.2f), // cast during movement
+                             new NextAction("shoot", ACTION_DEFAULT + 0.1f),
+                             new NextAction("fireball", ACTION_DEFAULT), nullptr);
 }
 
 void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -76,8 +78,9 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(
-        new TriggerNode("ice barrier", NextAction::array(0, new NextAction("ice barrier", ACTION_NORMAL), nullptr)));
-
+        new TriggerNode("medium health", NextAction::array(0, new NextAction("ice barrier", ACTION_NORMAL), nullptr)));
+    triggers.push_back(
+        new TriggerNode("being attacked", NextAction::array(0, new NextAction("ice barrier", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
         "brain freeze", NextAction::array(0, new NextAction("frostfire bolt", ACTION_NORMAL + 3), nullptr)));
     // Combo cast the last charge of fingers of frost for double crits.

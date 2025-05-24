@@ -75,6 +75,7 @@ class BlackArrowTrigger : public DebuffTrigger
 {
 public:
     BlackArrowTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "black arrow", 1, true) {}
+    bool IsActive() override;
 };
 
 class HuntersMarkTrigger : public DebuffTrigger
@@ -101,10 +102,18 @@ public:
     TrueshotAuraTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "trueshot aura") {}
 };
 
+class NoTrackTrigger : public BuffTrigger
+{
+public:
+    NoTrackTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "no track") {}
+    bool IsActive() override;
+};
+
 class SerpentStingOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
 public:
     SerpentStingOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "serpent sting", true) {}
+    bool IsActive() override;
 };
 
 BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
@@ -177,4 +186,11 @@ class TargetRemoveMagicTrigger : public TargetAuraDispelTrigger
 public:
     TargetRemoveMagicTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_MAGIC) {}
 };
+
+class ImmolationTrapNoCdTrigger : public SpellNoCooldownTrigger
+{
+public:
+    ImmolationTrapNoCdTrigger(PlayerbotAI* ai) : SpellNoCooldownTrigger(ai, "immolation trap") {}
+};
+
 #endif

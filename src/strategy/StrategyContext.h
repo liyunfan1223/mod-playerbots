@@ -31,6 +31,7 @@
 #include "MeleeCombatStrategy.h"
 #include "MoveFromGroupStrategy.h"
 #include "NamedObjectContext.h"
+#include "NewRpgStrategy.h"
 #include "NonCombatStrategy.h"
 #include "PassiveStrategy.h"
 #include "PullStrategy.h"
@@ -82,6 +83,7 @@ public:
         creators["reveal"] = &StrategyContext::reveal;
         creators["collision"] = &StrategyContext::collision;
         creators["rpg"] = &StrategyContext::rpg;
+        creators["new rpg"] = &StrategyContext::new_rpg;
         creators["travel"] = &StrategyContext::travel;
         creators["explore"] = &StrategyContext::explore;
         creators["map"] = &StrategyContext::map;
@@ -117,6 +119,7 @@ public:
         creators["move random"] = &StrategyContext::move_random;
         creators["formation"] = &StrategyContext::combat_formation;
         creators["move from group"] = &StrategyContext::move_from_group;
+        creators["worldbuff"] = &StrategyContext::world_buff;
     }
 
 private:
@@ -152,6 +155,7 @@ private:
     static Strategy* reveal(PlayerbotAI* botAI) { return new RevealStrategy(botAI); }
     static Strategy* collision(PlayerbotAI* botAI) { return new CollisionStrategy(botAI); }
     static Strategy* rpg(PlayerbotAI* botAI) { return new RpgStrategy(botAI); }
+    static Strategy* new_rpg(PlayerbotAI* botAI) { return new NewRpgStrategy(botAI); }
     static Strategy* travel(PlayerbotAI* botAI) { return new TravelStrategy(botAI); }
     static Strategy* explore(PlayerbotAI* botAI) { return new ExploreStrategy(botAI); }
     static Strategy* map(PlayerbotAI* botAI) { return new MapStrategy(botAI); }
@@ -183,6 +187,7 @@ private:
     static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
     static Strategy* combat_formation(PlayerbotAI* ai) { return new CombatFormationStrategy(ai); }
     static Strategy* move_from_group(PlayerbotAI* botAI) { return new MoveFromGroupStrategy(botAI); }
+    static Strategy* world_buff(PlayerbotAI* botAI) { return new WorldBuffStrategy(botAI); }
 };
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>

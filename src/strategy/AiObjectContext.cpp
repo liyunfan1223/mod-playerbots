@@ -9,8 +9,6 @@
 #include "ChatActionContext.h"
 #include "ChatTriggerContext.h"
 #include "Playerbots.h"
-#include "RaidIccActionContext.h"
-#include "RaidIccTriggerContext.h"
 #include "RaidUlduarTriggerContext.h"
 #include "RaidUlduarActionContext.h"
 #include "SharedValueContext.h"
@@ -24,6 +22,16 @@
 #include "raids/blackwinglair/RaidBwlTriggerContext.h"
 #include "raids/naxxramas/RaidNaxxActionContext.h"
 #include "raids/naxxramas/RaidNaxxTriggerContext.h"
+#include "raids/icecrown/RaidIccActionContext.h"
+#include "raids/icecrown/RaidIccTriggerContext.h"
+#include "raids/obsidiansanctum/RaidOsActionContext.h"
+#include "raids/obsidiansanctum/RaidOsTriggerContext.h"
+#include "raids/eyeofeternity/RaidEoEActionContext.h"
+#include "raids/vaultofarchavon/RaidVoATriggerContext.h"
+#include "raids/onyxia/RaidOnyxiaActionContext.h"
+#include "raids/onyxia/RaidOnyxiaTriggerContext.h"
+#include "raids/vaultofarchavon/RaidVoAActionContext.h"
+#include "raids/eyeofeternity/RaidEoETriggerContext.h"
 #include "raids/moltencore/RaidMcActionContext.h"
 #include "raids/moltencore/RaidMcTriggerContext.h"
 #include "raids/aq20/RaidAq20ActionContext.h"
@@ -46,8 +54,12 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new WorldPacketActionContext());
     actionContexts.Add(new RaidMcActionContext());
     actionContexts.Add(new RaidBwlActionContext());
+    actionContexts.Add(new RaidOnyxiaActionContext());
     actionContexts.Add(new RaidAq20ActionContext());
     actionContexts.Add(new RaidNaxxActionContext());
+    actionContexts.Add(new RaidOsActionContext());
+    actionContexts.Add(new RaidEoEActionContext());
+    actionContexts.Add(new RaidVoAActionContext());
     actionContexts.Add(new RaidUlduarActionContext());
     actionContexts.Add(new RaidIccActionContext());
     actionContexts.Add(new WotlkDungeonUKActionContext());
@@ -62,14 +74,21 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new WotlkDungeonOccActionContext());
     actionContexts.Add(new WotlkDungeonUPActionContext());
     actionContexts.Add(new WotlkDungeonCoSActionContext());
+    actionContexts.Add(new WotlkDungeonFoSActionContext());
+    actionContexts.Add(new WotlkDungeonPoSActionContext());
+    actionContexts.Add(new WotlkDungeonToCActionContext());
 
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
     triggerContexts.Add(new WorldPacketTriggerContext());
     triggerContexts.Add(new RaidMcTriggerContext());
     triggerContexts.Add(new RaidBwlTriggerContext());
+    triggerContexts.Add(new RaidOnyxiaTriggerContext());
     triggerContexts.Add(new RaidAq20TriggerContext());
     triggerContexts.Add(new RaidNaxxTriggerContext());
+    triggerContexts.Add(new RaidOsTriggerContext());
+    triggerContexts.Add(new RaidEoETriggerContext());
+    triggerContexts.Add(new RaidVoATriggerContext());
     triggerContexts.Add(new RaidUlduarTriggerContext());
     triggerContexts.Add(new RaidIccTriggerContext());
     triggerContexts.Add(new WotlkDungeonUKTriggerContext());
@@ -84,6 +103,9 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     triggerContexts.Add(new WotlkDungeonOccTriggerContext());
     triggerContexts.Add(new WotlkDungeonUPTriggerContext());
     triggerContexts.Add(new WotlkDungeonCoSTriggerContext());
+    triggerContexts.Add(new WotlkDungeonFoSTriggerContext());
+    triggerContexts.Add(new WotlkDungeonPoSTriggerContext());
+    triggerContexts.Add(new WotlkDungeonToCTriggerContext());
 
     valueContexts.Add(new ValueContext());
 

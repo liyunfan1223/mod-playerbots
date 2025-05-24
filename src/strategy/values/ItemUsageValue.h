@@ -43,7 +43,7 @@ public:
     ItemUsage Calculate() override;
 
 private:
-    ItemUsage QueryItemUsageForEquip(ItemTemplate const* proto);
+    ItemUsage QueryItemUsageForEquip(ItemTemplate const* proto, int32 randomPropertyId = 0);
     uint32 GetSmallestBagSize();
     bool IsItemUsefulForQuest(Player* player, ItemTemplate const* proto);
     bool IsItemNeededForSkill(ItemTemplate const* proto);

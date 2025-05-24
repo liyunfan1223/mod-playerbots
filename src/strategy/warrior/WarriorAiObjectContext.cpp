@@ -78,6 +78,7 @@ public:
         creators["thunder clap on snare target"] = &WarriorTriggerFactoryInternal::thunder_clap_on_snare_target;
         creators["thunder clap"] = &WarriorTriggerFactoryInternal::thunder_clap;
         creators["bloodthirst"] = &WarriorTriggerFactoryInternal::bloodthirst;
+        creators["whirlwind"] = &WarriorTriggerFactoryInternal::whirlwind;
         creators["berserker rage"] = &WarriorTriggerFactoryInternal::berserker_rage;
         creators["pummel on enemy healer"] = &WarriorTriggerFactoryInternal::pummel_on_enemy_healer;
         creators["pummel"] = &WarriorTriggerFactoryInternal::pummel;
@@ -98,6 +99,9 @@ public:
         creators["intercept and far enemy"] = &WarriorTriggerFactoryInternal::intercept_and_far_enemy;
         creators["intercept and rage"] = &WarriorTriggerFactoryInternal::intercept_and_rage;
         // creators["slam"] = &WarriorTriggerFactoryInternal::slam;
+
+        creators["vigilance"] = &WarriorTriggerFactoryInternal::vigilance;
+        creators["shattering throw trigger"] = &WarriorTriggerFactoryInternal::shattering_throw_trigger;
     }
 
 private:
@@ -157,6 +161,7 @@ private:
     }
     static Trigger* berserker_rage(PlayerbotAI* botAI) { return new BerserkerRageBuffTrigger(botAI); }
     static Trigger* bloodthirst(PlayerbotAI* botAI) { return new BloodthirstBuffTrigger(botAI); }
+    static Trigger* whirlwind(PlayerbotAI* botAI) { return new WhirlwindTrigger(botAI); }
     static Trigger* thunder_clap_on_snare_target(PlayerbotAI* botAI) { return new ThunderClapSnareTrigger(botAI); }
     static Trigger* thunder_clap(PlayerbotAI* botAI) { return new ThunderClapTrigger(botAI); }
     static Trigger* mortal_strike(PlayerbotAI* botAI) { return new MortalStrikeDebuffTrigger(botAI); }
@@ -166,6 +171,9 @@ private:
     static Trigger* revenge(PlayerbotAI* botAI) { return new RevengeAvailableTrigger(botAI); }
     static Trigger* sunder_armor(PlayerbotAI* botAI) { return new SunderArmorDebuffTrigger(botAI); }
     // static Trigger* slam(PlayerbotAI* ai) { return new SlamTrigger(ai); }
+
+    static Trigger* vigilance(PlayerbotAI* botAI) { return new VigilanceTrigger(botAI); }
+    static Trigger* shattering_throw_trigger(PlayerbotAI* botAI) { return new ShatteringThrowTrigger(botAI); }
 };
 
 class WarriorAiObjectContextInternal : public NamedObjectContext<Action>
@@ -235,6 +243,8 @@ public:
         creators["heroic throw"] = &WarriorAiObjectContextInternal::heroic_throw;
         creators["heroic throw on snare target"] = &WarriorAiObjectContextInternal::heroic_throw_on_snare_target;
         creators["shattering throw"] = &WarriorAiObjectContextInternal::shattering_throw;
+        creators["vigilance"] = &WarriorAiObjectContextInternal::vigilance;
+        creators["enraged regeneration"] = &WarriorAiObjectContextInternal::enraged_regeneration;
     }
 
 private:
@@ -304,6 +314,8 @@ private:
     static Action* heroic_throw_on_snare_target(PlayerbotAI* botAI) { return new CastHeroicThrowSnareAction(botAI); }
     static Action* heroic_throw(PlayerbotAI* botAI) { return new CastHeroicThrowAction(botAI); }
     static Action* bladestorm(PlayerbotAI* botAI) { return new CastBladestormAction(botAI); }
+    static Action* vigilance(PlayerbotAI* botAI) { return new CastVigilanceAction(botAI); }
+    static Action* enraged_regeneration(PlayerbotAI* botAI) { return new CastEnragedRegenerationAction(botAI); }
 };
 
 WarriorAiObjectContext::WarriorAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

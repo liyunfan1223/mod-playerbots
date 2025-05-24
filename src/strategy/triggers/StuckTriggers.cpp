@@ -8,6 +8,7 @@
 #include "CellImpl.h"
 #include "PathGenerator.h"
 #include "Playerbots.h"
+#include "MMapFactory.h"
 
 bool MoveStuckTrigger::IsActive()
 {

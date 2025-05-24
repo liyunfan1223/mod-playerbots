@@ -45,6 +45,7 @@ DEBUFF_TRIGGER(ShockwaveTrigger, "shockwave");
 BOOST_TRIGGER(DeathWishTrigger, "death wish");
 BOOST_TRIGGER(RecklessnessTrigger, "recklessness");
 BUFF_TRIGGER(BloodthirstBuffTrigger, "bloodthirst");
+BUFF_TRIGGER(WhirlwindTrigger, "whirlwind");
 BUFF_TRIGGER(BerserkerRageBuffTrigger, "berserker rage");
 INTERRUPT_HEALER_TRIGGER(ShieldBashInterruptEnemyHealerSpellTrigger, "shield bash");
 INTERRUPT_TRIGGER(ShieldBashInterruptSpellTrigger, "shield bash");
@@ -62,6 +63,23 @@ class RendDebuffTrigger : public DebuffTrigger
 public:
     RendDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rend", 1, true) {}
 };
+
+class VigilanceTrigger : public BuffOnPartyTrigger
+{
+public:
+    VigilanceTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "vigilance") {}
+
+    bool IsActive() override; 
+};
+
+class ShatteringThrowTrigger : public Trigger
+{
+public:
+    ShatteringThrowTrigger(PlayerbotAI* botAI) : Trigger(botAI, "shattering throw trigger") {}
+
+    bool IsActive() override;
+};
+
 
 // class SlamTrigger : public HasAuraTrigger
 // {

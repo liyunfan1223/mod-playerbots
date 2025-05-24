@@ -22,10 +22,9 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float offset = 0.f;
 
     Player* master = botAI->GetMaster();
-    if (!master)
-    {
+    if (!botAI->IsSafe(master))
         return Formation::NullLocation;
-    }
+
     float orientation = master->GetOrientation();
     MultiLineUnitPlacer placer(orientation);
 
@@ -43,6 +42,9 @@ WorldLocation ArrowFormation::GetLocationInternal()
     offset += rangedLines * sPlayerbotAIConfig->followDistance;
     healers.PlaceUnits(&placer);
     healers.Move(-cos(orientation) * offset, -sin(orientation) * offset);
+	
+    if (!masterUnit || !botUnit)
+        return Formation::NullLocation;
 
     float x = master->GetPositionX() - masterUnit->GetX() + botUnit->GetX();
     float y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
@@ -89,14 +91,15 @@ void ArrowFormation::FillSlotsExceptMaster()
     while (gref)
     {
         Player* member = gref->GetSource();
-
-        if (member == bot)
-            FindSlot(member)->AddLast(botUnit = new FormationUnit(index, false));
-        else if (member != botAI->GetMaster())
-            FindSlot(member)->AddLast(new FormationUnit(index, false));
-
+        if (botAI->IsSafe(member))
+        {
+            if (member == bot)
+                FindSlot(member)->AddLast(botUnit = new FormationUnit(index, false));
+            else if (member != botAI->GetMaster())
+                FindSlot(member)->AddLast(new FormationUnit(index, false));
+            ++index;
+		}
         gref = gref->next();
-        ++index;
     }
 }
 

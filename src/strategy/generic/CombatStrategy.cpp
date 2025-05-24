@@ -12,8 +12,9 @@ void CombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("enemy out of spell",
                                        NextAction::array(0, new NextAction("reach spell", ACTION_HIGH), nullptr)));
+    // drop target relevance 99 (lower than Worldpacket triggers)
     triggers.push_back(
-        new TriggerNode("invalid target", NextAction::array(0, new NextAction("drop target", 100), nullptr)));
+        new TriggerNode("invalid target", NextAction::array(0, new NextAction("drop target", 99), nullptr)));
     triggers.push_back(
         new TriggerNode("mounted", NextAction::array(0, new NextAction("check mount state", 54), nullptr)));
     // triggers.push_back(new TriggerNode("out of react range", NextAction::array(0, new NextAction("flee to master",
@@ -22,7 +23,7 @@ void CombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("not facing target",
                                        NextAction::array(0, new NextAction("set facing", ACTION_MOVE + 7), nullptr)));
     triggers.push_back(
-        new TriggerNode("pet attack", NextAction::array(0, new NextAction("pet attack", ACTION_NORMAL), nullptr)));
+        new TriggerNode("pet attack", NextAction::array(0, new NextAction("pet attack", 40.0f), nullptr)));
     // triggers.push_back(new TriggerNode("combat long stuck", NextAction::array(0, new NextAction("hearthstone", 0.9f),
     // new NextAction("repop", 0.8f), nullptr)));
 }
@@ -75,9 +76,6 @@ NextAction** AvoidAoeStrategy::getDefaultActions()
 
 void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    // triggers.push_back(new TriggerNode(
-    //         "has area debuff",
-    //         NextAction::array(0, new NextAction("flee", ACTION_EMERGENCY + 5), NULL)));
 }
 
 void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

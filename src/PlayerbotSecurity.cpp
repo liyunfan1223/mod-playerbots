@@ -86,8 +86,8 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             }
         }
 
-        int32 botGS = (int32)botAI->GetEquipGearScore(bot, false, false);
-        int32 fromGS = (int32)botAI->GetEquipGearScore(from, false, false);
+        int32 botGS = (int32)botAI->GetEquipGearScore(bot/*, false, false*/);
+        int32 fromGS = (int32)botAI->GetEquipGearScore(from/*, false, false*/);
         if (sPlayerbotAIConfig->gearscorecheck)
         {
             if (botGS && bot->GetLevel() > 15 && botGS > fromGS &&
@@ -139,7 +139,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             return PLAYERBOT_SECURITY_INVITE;
         }
 
-        if (group->IsFull())
+        if (!ignoreGroup && group->IsFull())
         {
             if (reason)
                 *reason = PLAYERBOT_DENY_FULL_GROUP;
@@ -147,7 +147,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             return PLAYERBOT_SECURITY_TALK;
         }
 
-        if (group->GetLeaderGUID() != bot->GetGUID())
+        if (!ignoreGroup && group->GetLeaderGUID() != bot->GetGUID())
         {
             if (reason)
                 *reason = PLAYERBOT_DENY_NOT_LEADER;
@@ -181,7 +181,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
 {
     DenyReason reason = PLAYERBOT_DENY_NONE;
     PlayerbotSecurityLevel realLevel = LevelFor(from, &reason, ignoreGroup);
-    if (realLevel >= level)
+    if (realLevel >= level || from == bot)
         return true;
 
     PlayerbotAI* fromBotAI = GET_PLAYERBOT_AI(from);
@@ -211,8 +211,8 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                     break;
                 case PLAYERBOT_DENY_GEARSCORE:
                 {
-                    int botGS = (int)botAI->GetEquipGearScore(bot, false, false);
-                    int fromGS = (int)botAI->GetEquipGearScore(from, false, false);
+                    int botGS = (int)botAI->GetEquipGearScore(bot/*, false, false*/);
+                    int fromGS = (int)botAI->GetEquipGearScore(from/*, false, false*/);
                     int diff = (100 * (botGS - fromGS) / botGS);
                     int req = 12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel();
                     out << "Your gearscore is too low: |cffff0000" << fromGS << "|cffffffff/|cff00ff00" << botGS

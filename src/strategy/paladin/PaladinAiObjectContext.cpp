@@ -8,6 +8,7 @@
 #include "DpsPaladinStrategy.h"
 #include "GenericPaladinNonCombatStrategy.h"
 #include "HealPaladinStrategy.h"
+#include "OffhealRetPaladinStrategy.h"
 #include "NamedObjectContext.h"
 #include "PaladinActions.h"
 #include "PaladinBuffStrategies.h"
@@ -48,6 +49,7 @@ public:
         creators["baoe"] = &PaladinResistanceStrategyFactoryInternal::baoe;
         creators["barmor"] = &PaladinResistanceStrategyFactoryInternal::barmor;
         creators["bcast"] = &PaladinResistanceStrategyFactoryInternal::bcast;
+        creators["bspeed"] = &PaladinResistanceStrategyFactoryInternal::bspeed;
     }
 
 private:
@@ -57,6 +59,7 @@ private:
     static Strategy* baoe(PlayerbotAI* botAI) { return new PaladinBuffAoeStrategy(botAI); }
     static Strategy* barmor(PlayerbotAI* botAI) { return new PaladinBuffArmorStrategy(botAI); }
     static Strategy* bcast(PlayerbotAI* botAI) { return new PaladinBuffCastStrategy(botAI); }
+    static Strategy* bspeed(PlayerbotAI* botAI) { return new PaladinBuffSpeedStrategy(botAI); }
 };
 
 class PaladinBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -85,12 +88,14 @@ public:
         creators["tank"] = &PaladinCombatStrategyFactoryInternal::tank;
         creators["dps"] = &PaladinCombatStrategyFactoryInternal::dps;
         creators["heal"] = &PaladinCombatStrategyFactoryInternal::heal;
+        creators["offheal"] = &PaladinCombatStrategyFactoryInternal::offheal;
     }
 
 private:
     static Strategy* tank(PlayerbotAI* botAI) { return new TankPaladinStrategy(botAI); }
     static Strategy* dps(PlayerbotAI* botAI) { return new DpsPaladinStrategy(botAI); }
     static Strategy* heal(PlayerbotAI* botAI) { return new HealPaladinStrategy(botAI); }
+    static Strategy* offheal(PlayerbotAI* botAI) { return new OffhealRetPaladinStrategy(botAI); }
 };
 
 class PaladinTriggerFactoryInternal : public NamedObjectContext<Trigger>

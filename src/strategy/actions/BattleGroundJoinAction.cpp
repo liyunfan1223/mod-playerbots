@@ -424,7 +424,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     uint32 bgTypeId_ = bgTypeId;
     uint32 instanceId = 0;  // 0 = First Available
 
-    bool isPremade = false;
+    // bool isPremade = false; //not used, line marked for removal.
     bool isArena = false;
     bool isRated = false;
     uint8 arenaslot = 0;
@@ -454,7 +454,7 @@ bool BGJoinAction::JoinQueue(uint32 type)
     bool joinAsGroup = bot->GetGroup() && bot->GetGroup()->GetLeaderGUID() == bot->GetGUID();
 
     // in wotlk only arena requires battlemaster guid
-    ObjectGuid guid = isArena ? unit->GetGUID() : bot->GetGUID();
+    // ObjectGuid guid = isArena ? unit->GetGUID() : bot->GetGUID(); //not used, line marked for removal.
 
     switch (bgTypeId)
     {
@@ -543,12 +543,14 @@ bool BGJoinAction::JoinQueue(uint32 type)
     }
 
     botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
-
+    
     if (!isArena)
     {
-        WorldPacket packet(CMSG_BATTLEMASTER_JOIN, 20);
-        packet << bot->GetGUID() << bgTypeId_ << instanceId << joinAsGroup;
-        bot->GetSession()->HandleBattlemasterJoinOpcode(packet);
+        WorldPacket* packet = new WorldPacket(CMSG_BATTLEMASTER_JOIN, 20);
+        *packet << bot->GetGUID() << bgTypeId_ << instanceId << joinAsGroup;
+        /// FIX race condition
+        // bot->GetSession()->HandleBattlemasterJoinOpcode(packet);
+        bot->GetSession()->QueuePacket(packet);
     }
     else
     {
@@ -870,7 +872,7 @@ bool BGStatusAction::Execute(Event event)
             break;
     }
 
-    TeamId teamId = bot->GetTeamId();
+    //TeamId teamId = bot->GetTeamId(); //not used, line marked for removal.
 
     if (Time1 == TIME_TO_AUTOREMOVE)  // Battleground is over, bot needs to leave
     {
@@ -952,7 +954,7 @@ bool BGStatusAction::Execute(Event event)
         if (leaveQ && ((bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID())) ||
                        !(bot->GetGroup() || botAI->GetMaster())))
         {
-            TeamId teamId = bot->GetTeamId();
+            //TeamId teamId = bot->GetTeamId(); //not used, line marked for removal.
             bool realPlayers = false;
             if (isRated)
                 realPlayers = sRandomPlayerbotMgr->BattlegroundData[queueTypeId][bracketId].ratedArenaPlayerCount > 0;

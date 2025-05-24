@@ -68,6 +68,11 @@ bool CleanQuestLogAction::Execute(Event event)
         return false;
     }
 
+    if (!sPlayerbotAIConfig->dropObsoleteQuests)
+    {
+        return false;
+    }
+
     // Only output this message if "debug rpg" strategy is enabled
     if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
@@ -118,7 +123,7 @@ bool CleanQuestLogAction::Execute(Event event)
         }
 
         // Check if the quest is trivial (grey) for the bot
-        if ((botLevel - questLevel) >= trivialLevel)
+        if ((botLevel - questLevel) > trivialLevel)
         {
             // Output only if "debug rpg" strategy is enabled
             if (botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
@@ -127,6 +132,7 @@ bool CleanQuestLogAction::Execute(Event event)
             }
 
             // Remove quest
+            botAI->rpgStatistic.questDropped++;
             bot->SetQuestSlot(slot, 0);
             bot->TakeQuestSourceItem(questId, false);
             bot->SetQuestStatus(questId, QUEST_STATUS_NONE);

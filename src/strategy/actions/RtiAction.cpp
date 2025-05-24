@@ -80,7 +80,7 @@ bool MarkRtiAction::Execute(Event event)
         for (uint8 i = 0; i < 8; i++)
         {
             ObjectGuid iconGUID = group->GetTargetIcon(i);
-            if (guid == unit->GetGUID())
+            if (iconGUID == unit->GetGUID())
             {
                 marked = true;
                 break;

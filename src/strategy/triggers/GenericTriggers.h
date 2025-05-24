@@ -243,10 +243,18 @@ public:
     std::string const getName() override { return "my attacker count"; }
 };
 
+class BeingAttackedTrigger : public MyAttackerCountTrigger
+{
+public:
+    BeingAttackedTrigger(PlayerbotAI* botAI) : MyAttackerCountTrigger(botAI, 1) {}
+    std::string const getName() override { return "being attacked"; }
+};
+
 class MediumThreatTrigger : public MyAttackerCountTrigger
 {
 public:
     MediumThreatTrigger(PlayerbotAI* botAI) : MyAttackerCountTrigger(botAI, 2) {}
+    bool IsActive() override;
 };
 
 class LowTankThreatTrigger : public Trigger
@@ -596,6 +604,7 @@ public:
         : ItemCountTrigger(botAI, item, count, interval)
     {
     }
+    bool IsActive() override;
 };
 
 class HasAuraTrigger : public Trigger
@@ -618,8 +627,8 @@ public:
     {
     }
 
-    std::string const GetTargetName() { return "self target"; }
-    virtual bool IsActive();
+    std::string const GetTargetName() override { return "self target"; }
+    bool IsActive() override;
 
 private:
     int stack;
@@ -816,6 +825,14 @@ class SitTrigger : public StayTimeTrigger
 {
 public:
     SitTrigger(PlayerbotAI* botAI) : StayTimeTrigger(botAI, sPlayerbotAIConfig->sitDelay, "sit") {}
+};
+
+class ReturnToStayPositionTrigger : public Trigger
+{
+public:
+    ReturnToStayPositionTrigger(PlayerbotAI* ai) : Trigger(ai, "return to stay position", 2) {}
+
+    virtual bool IsActive() override;
 };
 
 class ReturnTrigger : public StayTimeTrigger

@@ -17,8 +17,8 @@ bool AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
-        LOG_INFO("playerbots", "{} => Quest [ {} ] accepted", bot->GetName(), quest->GetTitle());
-        bot->Say("Quest [ " + text_quest + " ] accepted", LANG_UNIVERSAL);
+        LOG_INFO("playerbots", "{} => Quest [{}] accepted", bot->GetName(), quest->GetTitle());
+        bot->Say("Quest [" + text_quest + "] accepted", LANG_UNIVERSAL);
     }
 
     return true;
@@ -86,8 +86,8 @@ bool AcceptQuestAction::Execute(Event event)
     if (hasAccept)
     {
         std::stringstream ss;
-        ss << "AcceptQuestAction {" << qInfo->GetTitle() << "} - {" << std::to_string(qInfo->GetQuestId()) << "}";
-        LOG_INFO("playerbots", "{}", ss.str().c_str());
+        ss << "AcceptQuestAction [" << qInfo->GetTitle() << "] - [" << std::to_string(qInfo->GetQuestId()) << "]";
+        LOG_DEBUG("playerbots", "{}", ss.str().c_str());
         // botAI->TellMaster(ss.str());
     }
 
@@ -166,6 +166,9 @@ bool ConfirmQuestAction::Execute(Event event)
     uint32 quest;
     p >> quest;
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest);
+
+    if (!qInfo)
+        return false;
 
     quest = qInfo->GetQuestId();
     if (!bot->CanTakeQuest(qInfo, false))

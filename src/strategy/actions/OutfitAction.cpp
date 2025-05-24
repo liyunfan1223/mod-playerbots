@@ -183,7 +183,7 @@ void OutfitAction::Update(std::string const name)
 {
     ListItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
-
+    
     ItemIds items;
     for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
         items.insert(i->first);

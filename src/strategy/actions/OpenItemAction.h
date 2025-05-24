@@ -21,9 +21,6 @@ public:
     bool Execute(Event event) override;
 
 private:
-    // Checks if the given item can be opened (i.e., has the openable flag)
-    bool CanOpenItem(Item* item);
-
     // Performs the action of opening the item
     void OpenItem(Item* item, uint8 bag, uint8 slot);
 };

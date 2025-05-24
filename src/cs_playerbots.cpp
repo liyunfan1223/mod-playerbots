@@ -33,12 +33,21 @@ public:
         static ChatCommandTable playerbotsDebugCommandTable = {
             {"bg", HandleDebugBGCommand, SEC_GAMEMASTER, Console::Yes},
         };
+
+        static ChatCommandTable playerbotsAccountCommandTable = {
+            {"setKey", HandleSetSecurityKeyCommand, SEC_PLAYER, Console::No},
+            {"link", HandleLinkAccountCommand, SEC_PLAYER, Console::No},
+            {"linkedAccounts", HandleViewLinkedAccountsCommand, SEC_PLAYER, Console::No},
+            {"unlink", HandleUnlinkAccountCommand, SEC_PLAYER, Console::No},
+        };
+
         static ChatCommandTable playerbotsCommandTable = {
             {"bot", HandlePlayerbotCommand, SEC_PLAYER, Console::No},
             {"gtask", HandleGuildTaskCommand, SEC_GAMEMASTER, Console::Yes},
             {"pmon", HandlePerfMonCommand, SEC_GAMEMASTER, Console::Yes},
             {"rndbot", HandleRandomPlayerbotCommand, SEC_GAMEMASTER, Console::Yes},
             {"debug", playerbotsDebugCommandTable},
+            {"account", playerbotsAccountCommandTable},
         };
 
         static ChatCommandTable commandTable = {
@@ -100,6 +109,103 @@ public:
     static bool HandleDebugBGCommand(ChatHandler* handler, char const* args)
     {
         return BGTactics::HandleConsoleCommand(handler, args);
+    }
+
+    static bool HandleSetSecurityKeyCommand(ChatHandler* handler, char const* args)
+    {
+        if (!args || !*args)
+        {
+            handler->PSendSysMessage("Usage: .playerbots account setKey <securityKey>");
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        std::string key = args;
+
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleSetSecurityKeyCommand(player, key);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
+    }
+
+    static bool HandleLinkAccountCommand(ChatHandler* handler, char const* args)
+    {
+        if (!args || !*args)
+            return false;
+
+        char* accountName = strtok((char*)args, " ");
+        char* key = strtok(nullptr, " ");
+
+        if (!accountName || !key)
+        {
+            handler->PSendSysMessage("Usage: .playerbots account link <accountName> <securityKey>");
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleLinkAccountCommand(player, accountName, key);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
+    }
+
+    static bool HandleViewLinkedAccountsCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleViewLinkedAccountsCommand(player);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
+    }
+
+    static bool HandleUnlinkAccountCommand(ChatHandler* handler, char const* args)
+    {
+        if (!args || !*args)
+            return false;
+
+        char* accountName = strtok((char*)args, " ");
+        if (!accountName)
+        {
+            handler->PSendSysMessage("Usage: .playerbots account unlink <accountName>");
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+
+        PlayerbotMgr* mgr = sPlayerbotsMgr->GetPlayerbotMgr(player);
+        if (mgr)
+        {
+            mgr->HandleUnlinkAccountCommand(player, accountName);
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage("PlayerbotMgr instance not found.");
+            return false;
+        }
     }
 };
 

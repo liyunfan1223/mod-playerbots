@@ -32,7 +32,7 @@ protected:
     bool MoveNear(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->contactDistance, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool MoveToLOS(WorldObject* target, bool ranged = false);
     bool MoveTo(uint32 mapId, float x, float y, float z, bool idle = false, bool react = false,
-                bool normal_only = false, bool exact_waypoint = false, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
+                bool normal_only = false, bool exact_waypoint = false, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL, bool lessDelay = false, bool backwards = false);
     bool MoveTo(WorldObject* target, float distance = 0.0f, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool MoveNear(WorldObject* target, float distance = sPlayerbotAIConfig->contactDistance, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     float GetFollowAngle();
@@ -40,7 +40,7 @@ protected:
     bool Follow(Unit* target, float distance, float angle);
     bool ChaseTo(WorldObject* obj, float distance = 0.0f, float angle = 0.0f);
     bool ReachCombatTo(Unit* target, float distance = 0.0f);
-    float MoveDelay(float distance);
+    float MoveDelay(float distance, bool backwards = false);
     void WaitForReach(float distance);
     void SetNextMovementDelay(float delayMillis);
     bool IsMovingAllowed(WorldObject* target);
@@ -51,14 +51,14 @@ protected:
     bool Flee(Unit* target);
     void ClearIdleState();
     void UpdateMovementState();
-    bool MoveAway(Unit* target, float distance = sPlayerbotAIConfig -> fleeDistance);
+    bool MoveAway(Unit* target, float distance = sPlayerbotAIConfig -> fleeDistance, bool backwards = false);
     bool MoveFromGroup(float distance);
     bool Move(float angle, float distance);
     bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig->followDistance, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
     Position BestPositionForMeleeToFlee(Position pos, float radius);
     Position BestPositionForRangedToFlee(Position pos, float radius);
-    bool FleePosition(Position pos, float radius);
+    bool FleePosition(Position pos, float radius, uint32 minInterval = 1000);
     bool CheckLastFlee(float curAngle, std::list<FleeInfo>& infoList);
 
 protected:
@@ -73,6 +73,7 @@ private:
     // normal_only = false, float step = 8.0f);
     const Movement::PointsArray SearchForBestPath(float x, float y, float z, float& modified_z, int maxSearchCount = 5,
                                                   bool normal_only = false, float step = 8.0f);
+    bool wasMovementRestricted = false;
 };
 
 class FleeAction : public MovementAction

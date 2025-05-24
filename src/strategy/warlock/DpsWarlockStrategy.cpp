@@ -25,14 +25,14 @@ private:
                               /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
                               /*C*/ nullptr);
     }
-    static ActionNode* unstable_affliction(PlayerbotAI* ai)
+    static ActionNode* unstable_affliction([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("unstable affliction",
                               /*P*/ NULL,
                               /*A*/ NextAction::array(0, new NextAction("immolate"), NULL),
                               /*C*/ NULL);
     }
-    static ActionNode* unstable_affliction_on_attacker(PlayerbotAI* ai)
+    static ActionNode* unstable_affliction_on_attacker([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("unstable affliction on attacker",
                               /*P*/ NULL,
@@ -49,8 +49,8 @@ DpsWarlockStrategy::DpsWarlockStrategy(PlayerbotAI* botAI) : GenericWarlockStrat
 NextAction** DpsWarlockStrategy::getDefaultActions()
 {
     return NextAction::array(
-        0, new NextAction("haunt", ACTION_DEFAULT + 0.3f), new NextAction("demonic empowerment", ACTION_DEFAULT + 0.2f),
-        new NextAction("shadow bolt", ACTION_DEFAULT + 0.1f), new NextAction("shoot", ACTION_DEFAULT), nullptr);
+        0, new NextAction("haunt", ACTION_DEFAULT + 0.4f), new NextAction("demonic empowerment", ACTION_DEFAULT + 0.3f),
+        new NextAction("shadow bolt", ACTION_DEFAULT + 0.2f), new NextAction("shoot", ACTION_DEFAULT), nullptr);
 }
 
 void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -71,6 +71,12 @@ void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("decimation", NextAction::array(0, new NextAction("soul fire", 16.0f), NULL)));
 
+    // cast during movement
+    triggers.push_back(
+        new TriggerNode("high mana", NextAction::array(0, new NextAction("life tap", ACTION_DEFAULT + 0.1f), nullptr)));
+        
+    triggers.push_back(new TriggerNode("life tap glyph buff", NextAction::array(0, new NextAction("life tap", 28.0f), NULL)));
+
     triggers.push_back(
         new TriggerNode("metamorphosis", NextAction::array(0, new NextAction("metamorphosis", 20.0f), NULL)));
 }
@@ -78,9 +84,9 @@ void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void DpsAoeWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
-        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("seed of corruption", 39.0f),
-                                                        new NextAction("seed of corruption on attacker", 38.0f),
-                                                        new NextAction("rain of fire", 37.0f), nullptr)));
+        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("seed of corruption", 33.0f),
+                                                        new NextAction("seed of corruption on attacker", 32.0f),
+                                                        new NextAction("rain of fire", 31.0f), nullptr)));
     triggers.push_back(new TriggerNode("corruption on attacker",
                                        NextAction::array(0, new NextAction("corruption on attacker", 27.0f), nullptr)));
     triggers.push_back(

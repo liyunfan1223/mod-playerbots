@@ -24,12 +24,12 @@ private:
                               /*A*/ nullptr,
                               /*C*/ NextAction::array(0, new NextAction("fire nova"), nullptr));
     }
-    static ActionNode* totem_of_wrath(PlayerbotAI* botAI)
+    static ActionNode* totem_of_wrath([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("totem of wrath",
-                              /*P*/ NULL,
-                              /*A*/ NextAction::array(0, new NextAction("flametongue totem"), NULL),
-                              /*C*/ NULL);
+                              /*P*/ nullptr,
+                              /*A*/ NextAction::array(0, new NextAction("flametongue totem"), nullptr),
+                              /*C*/ nullptr);
     }
 };
 
@@ -41,7 +41,9 @@ CasterShamanStrategy::CasterShamanStrategy(PlayerbotAI* botAI) : GenericShamanSt
 NextAction** CasterShamanStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction("lava burst", ACTION_DEFAULT + 0.2f),
-                             new NextAction("lightning bolt", ACTION_DEFAULT), NULL);
+                             new NextAction("lightning bolt", ACTION_DEFAULT + 0.1f),
+                            //  new NextAction("earth shock", ACTION_DEFAULT), // cast during movement
+                             nullptr);
 }
 
 void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -65,7 +67,11 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("frost shock snare", NextAction::array(0, new NextAction("frost
     // shock", 21.0f), nullptr)));
     triggers.push_back(
-        new TriggerNode("no fire totem", NextAction::array(0, new NextAction("totem of wrath", 15.0f), NULL)));
+        new TriggerNode("no fire totem", NextAction::array(0,
+            new NextAction("totem of wrath", 15.0f),
+            new NextAction("searing totem", 6.0f),
+             nullptr)));
+
     triggers.push_back(new TriggerNode("fire elemental totem",
                                        NextAction::array(0, new NextAction("fire elemental totem", 32.0f), nullptr)));
                                        
@@ -84,4 +90,7 @@ void CasterAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("light aoe", NextAction::array(0, new NextAction("chain lightning", 25.0f), nullptr)));
+    
+    triggers.push_back(
+        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("fire nova", 24.0f), nullptr)));
 }

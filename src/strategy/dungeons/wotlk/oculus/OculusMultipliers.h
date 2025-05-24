@@ -21,10 +21,10 @@ class MountingDrakeMultiplier : public Multiplier
         virtual float GetValue(Action* action);
 };
 
-class FlyingMultiplier : public Multiplier
+class OccFlyingMultiplier : public Multiplier
 {
     public:
-        FlyingMultiplier(PlayerbotAI* ai) : Multiplier(ai, "flying drake") {}
+        OccFlyingMultiplier(PlayerbotAI* ai) : Multiplier(ai, "occ flying drake") {}
 
     public:
         virtual float GetValue(Action* action);

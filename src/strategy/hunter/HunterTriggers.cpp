@@ -5,12 +5,22 @@
 
 #include "HunterTriggers.h"
 
+#include "GenericSpellActions.h"
 #include "GenericTriggers.h"
 #include "HunterActions.h"
+#include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
+
+bool BlackArrowTrigger::IsActive()
+{
+    if (botAI->HasStrategy("trap weave", BOT_STATE_COMBAT))
+        return false;
+
+    return DebuffTrigger::IsActive();
+}
 
 bool HunterAspectOfTheHawkTrigger::IsActive()
 {
@@ -56,7 +66,7 @@ bool HunterPetNotHappy::IsActive()
 bool HunterAspectOfTheViperTrigger::IsActive()
 {
     return SpellTrigger::IsActive() && !botAI->HasAura(spell, GetTarget()) &&
-           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;
+           AI_VALUE2(uint8, "mana", "self target") < (sPlayerbotAIConfig->lowMana / 2);
     ;
 }
 
@@ -87,4 +97,37 @@ bool SwitchToMeleeTrigger::IsActive()
     return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && target &&
            (target->GetVictim() == bot &&
             sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
+}
+
+bool NoTrackTrigger::IsActive()
+{
+    std::vector<std::string> track_list = {
+        "track beasts",
+        "track demons",
+        "track dragonkin",
+        "track elementals",
+        "track giants",
+        "track hidden",
+        "track humanoids"
+    };
+
+    for (auto &track: track_list)
+    {
+        if (botAI->HasAura(track, bot))
+            return false;
+    }
+    return true;
+}
+
+bool SerpentStingOnAttackerTrigger::IsActive()
+{
+    if (!DebuffOnAttackerTrigger::IsActive())
+        return false;
+    Unit* target = GetTarget();
+    if (!target)
+    {
+        return false;
+    }
+    return !botAI->HasAura("scorpid sting", target, false, true) &&
+           !botAI->HasAura("viper sting", target, false, true);
 }

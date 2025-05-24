@@ -12,10 +12,10 @@
 bool LootAvailableTrigger::IsActive()
 {
     return AI_VALUE(bool, "has available loot") &&
+            // if loot target if empty, always pass distance check
            (sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"),
-                                                     INTERACTION_DISTANCE) ||
-            AI_VALUE(GuidVector, "all targets").empty()) &&
-           !AI_VALUE2(bool, "combat", "self target") && !AI_VALUE2(bool, "mounted", "self target");
+                                                     INTERACTION_DISTANCE - 2.0f) ||
+            AI_VALUE(GuidVector, "all targets").empty());
 }
 
 bool FarFromCurrentLootTrigger::IsActive()
@@ -24,7 +24,7 @@ bool FarFromCurrentLootTrigger::IsActive()
     if (!loot.IsLootPossible(bot))
         return false;
 
-    return AI_VALUE2(float, "distance", "loot target") > INTERACTION_DISTANCE;
+    return AI_VALUE2(float, "distance", "loot target") >= INTERACTION_DISTANCE - 2.0f;
 }
 
 bool CanLootTrigger::IsActive() { return AI_VALUE(bool, "can loot"); }

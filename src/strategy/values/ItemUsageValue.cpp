@@ -8,6 +8,8 @@
 #include "AiFactory.h"
 #include "ChatHelper.h"
 #include "GuildTaskMgr.h"
+#include "Item.h"
+#include "LootObjectStack.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
@@ -17,7 +19,16 @@
 
 ItemUsage ItemUsageValue::Calculate()
 {
-    uint32 itemId = atoi(qualifier.c_str());
+    uint32 itemId = 0;
+    uint32 randomPropertyId = 0;
+    size_t pos = qualifier.find(",");
+    if (pos != std::string::npos) {
+        itemId = atoi(qualifier.substr(0, pos).c_str());
+        randomPropertyId = atoi(qualifier.substr(pos + 1).c_str());
+    } else {
+        itemId = atoi(qualifier.c_str());
+    }
+
     if (!itemId)
         return ITEM_USAGE_NONE;
 
@@ -64,8 +75,9 @@ ItemUsage ItemUsageValue::Calculate()
 
     if (proto->Class == ITEM_CLASS_KEY)
         return ITEM_USAGE_USE;
-
-    if (proto->Class == ITEM_CLASS_CONSUMABLE)
+    
+    if (proto->Class == ITEM_CLASS_CONSUMABLE && 
+        (proto->MaxCount == 0 || AI_VALUE2(uint32, "item count", proto->Name1) < proto->MaxCount))
     {
         std::string const foodType = GetConsumableType(proto, bot->GetPower(POWER_MANA));
 
@@ -87,60 +99,129 @@ ItemUsage ItemUsageValue::Calculate()
     if (bot->GetGuildId() && sGuildTaskMgr->IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
-    ItemUsage equip = QueryItemUsageForEquip(proto);
+    ItemUsage equip = QueryItemUsageForEquip(proto, randomPropertyId);
     if (equip != ITEM_USAGE_NONE)
         return equip;
 
+    // Get item instance to check if it's soulbound
+    Item* item = bot->GetItemByEntry(proto->ItemId);
+    bool isSoulbound = item && item->IsSoulBound();
+
     if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) &&
-        proto->Bonding != BIND_WHEN_PICKED_UP && botAI->HasSkill(SKILL_ENCHANTING) &&
+        botAI->HasSkill(SKILL_ENCHANTING) &&
         proto->Quality >= ITEM_QUALITY_UNCOMMON)
-        return ITEM_USAGE_DISENCHANT;
+    {
+        // Retrieve the bot's Enchanting skill level
+        uint32 enchantingSkill = bot->GetSkillValue(SKILL_ENCHANTING);
 
-    // While sync is on, do not loot quest items that are also Useful for master. Master
-    if (!botAI->GetMaster() || !sPlayerbotAIConfig->syncQuestWithPlayer ||
-        !IsItemUsefulForQuest(botAI->GetMaster(), proto))
-        if (IsItemUsefulForQuest(bot, proto))
-            return ITEM_USAGE_QUEST;
+        // Check if the bot has a high enough skill to disenchant this item
+        if (proto->RequiredDisenchantSkill > 0 && enchantingSkill < proto->RequiredDisenchantSkill)
+            return ITEM_USAGE_NONE; // Not skilled enough to disenchant
 
+        // BoE (Bind on Equip) items should NOT be disenchanted unless they are already bound
+        if (proto->Bonding == BIND_WHEN_PICKED_UP || (proto->Bonding == BIND_WHEN_EQUIPPED && isSoulbound))
+            return ITEM_USAGE_DISENCHANT;
+    }
+
+    Player* master = botAI->GetMaster();
+    bool isSelfBot = (master == bot);
+    bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
+    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig->syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
+    
+    // Identify the source of loot
+    LootObject lootObject = AI_VALUE(LootObject, "loot target");
+    
+    // Get GUID of loot source
+    ObjectGuid lootGuid = lootObject.guid;
+    
+    // Check if loot source is an item
+    bool isLootFromItem = lootGuid.IsItem();
+    
+    // If the loot is from an item in the bot’s bags, ignore syncQuestWithPlayer
+    if (isLootFromItem && botNeedsItemForQuest)
+    {
+        return ITEM_USAGE_QUEST;
+    }
+    
+    // If the bot is NOT acting alone and the master needs this quest item, defer to the master
+    if (!isSelfBot && masterNeedsItemForQuest)
+    {
+        return ITEM_USAGE_NONE;
+    }
+    
+    // If the bot itself needs the item for a quest, allow looting
+    if (botNeedsItemForQuest)
+    {
+        return ITEM_USAGE_QUEST;
+    }
+    
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
+    {
         if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
         {
-            if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+            Item* rangedWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            uint32 requiredSubClass = 0;
+
+            if (rangedWeapon)
             {
-                uint32 subClass = 0;
-                switch (pItem->GetTemplate()->SubClass)
+                switch (rangedWeapon->GetTemplate()->SubClass)
                 {
                     case ITEM_SUBCLASS_WEAPON_GUN:
-                        subClass = ITEM_SUBCLASS_BULLET;
+                        requiredSubClass = ITEM_SUBCLASS_BULLET;
                         break;
                     case ITEM_SUBCLASS_WEAPON_BOW:
                     case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-                        subClass = ITEM_SUBCLASS_ARROW;
+                        requiredSubClass = ITEM_SUBCLASS_ARROW;
                         break;
                 }
+            }
 
-                if (proto->SubClass == subClass)
+            // Ensure the item is the correct ammo type for the equipped ranged weapon
+            if (proto->SubClass == requiredSubClass)
+            {
+                float ammoCount = BetterStacks(proto, "ammo");
+                float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2; // Hunters get 8 stacks, others 2
+                uint32 currentAmmoId = bot->GetUInt32Value(PLAYER_AMMO_ID);
+
+                // Check if the bot has an ammo type assigned
+                if (currentAmmoId == 0)
                 {
-                    float ammo = BetterStacks(proto, "ammo");
-                    float needAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2;
-
-                    if (ammo < needAmmo)  // We already have enough of the current ammo.
+                    return ITEM_USAGE_EQUIP;  // Equip the ammo if no ammo
+                }
+                // Compare new ammo vs current equipped ammo
+                ItemTemplate const* currentAmmoProto = sObjectMgr->GetItemTemplate(currentAmmoId);
+                if (currentAmmoProto)
+                {
+                    uint32 currentAmmoDPS = (currentAmmoProto->Damage[0].DamageMin + currentAmmoProto->Damage[0].DamageMax) * 1000 / 2;
+                    uint32 newAmmoDPS = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2;
+    
+                    if (newAmmoDPS > currentAmmoDPS) // New ammo meets upgrade condition
                     {
-                        ammo += CurrentStacks(proto);
-
-                        if (ammo < needAmmo)  // Buy ammo to get to the proper supply
-                            return ITEM_USAGE_AMMO;
-                        else if (ammo < needAmmo + 1)
-                            return ITEM_USAGE_KEEP;  // Keep the ammo until we have too much.
+                        return ITEM_USAGE_EQUIP;
                     }
+                    if (newAmmoDPS < currentAmmoDPS) // New ammo is worse
+                    {
+                        return ITEM_USAGE_NONE;
+                    }
+                }
+                // Ensure we have enough ammo in the inventory
+                if (ammoCount < requiredAmmo)
+                {
+                    ammoCount += CurrentStacks(proto);
+    
+                    if (ammoCount < requiredAmmo)  // Buy ammo to reach the proper supply
+                        return ITEM_USAGE_AMMO;
+                    else if (ammoCount < requiredAmmo + 1)
+                        return ITEM_USAGE_KEEP;  // Keep the ammo if we don't have too much.
                 }
             }
         }
+    }
 
     // Need to add something like free bagspace or item value.
     if (proto->SellPrice > 0)
     {
-        if (proto->Quality > ITEM_QUALITY_NORMAL)
+        if (proto->Quality >= ITEM_QUALITY_NORMAL && !isSoulbound)
         {
             return ITEM_USAGE_AH;
         }
@@ -153,7 +234,7 @@ ItemUsage ItemUsageValue::Calculate()
     return ITEM_USAGE_NONE;
 }
 
-ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
+ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, int32 randomPropertyId)
 {
     if (bot->CanUseItem(itemProto) != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
@@ -170,8 +251,38 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     pItem->RemoveFromUpdateQueueOf(bot);
     delete pItem;
 
-    if (result != EQUIP_ERR_OK)
+    if (result != EQUIP_ERR_OK && result != EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+    {
         return ITEM_USAGE_NONE;
+    }
+    // Check is unique items are equipped or not
+    bool needToCheckUnique = false;
+    if (result == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+    {
+        needToCheckUnique = true;
+    }
+    else if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+    {
+        needToCheckUnique = true;
+    }
+    
+    if (needToCheckUnique)
+    {
+        // Count the total number of the item (equipped + in bags)
+        uint32 totalItemCount = bot->GetItemCount(itemProto->ItemId, true);
+        
+        // Count the number of the item in bags only
+        uint32 bagItemCount = bot->GetItemCount(itemProto->ItemId, false);
+        
+        // Determine if the unique item is already equipped
+        bool isEquipped = (totalItemCount > bagItemCount);
+        
+        if (isEquipped)
+        {
+            return ITEM_USAGE_NONE;  // Item is already equipped
+        }
+        // If not equipped, continue processing
+    }
 
     if (itemProto->Class == ITEM_CLASS_QUIVER)
         if (bot->getClass() != CLASS_HUNTER)
@@ -195,7 +306,8 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     calculator.SetItemSetBonus(false);
     calculator.SetOverflowPenalty(false);
     
-    float itemScore = calculator.CalculateItem(itemProto->ItemId);
+    float itemScore = calculator.CalculateItem(itemProto->ItemId, randomPropertyId);
+    
     if (itemScore)
         shouldEquip = true;
 
@@ -207,7 +319,17 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
 
     uint8 possibleSlots = 1;
     uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
-    
+    // Check if dest wasn't set correctly by CanEquipItem and use FindEquipSlot instead
+    // This occurs with unique items that are already in the bots bags when CanEquipItem is called
+    if (dest == 0)
+    {
+        if (dstSlot != NULL_SLOT)
+        {
+            // Construct dest from dstSlot
+            dest = (INVENTORY_SLOT_BAG_0 << 8) | dstSlot;
+        }
+    }
+
     if (dstSlot == EQUIPMENT_SLOT_FINGER1 || dstSlot == EQUIPMENT_SLOT_TRINKET1)
     {
         possibleSlots = 2;
@@ -216,19 +338,41 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     // Check weapon case separately to keep things a bit cleaner
     bool have2HWeapon = false;
     bool isValidTGWeapon = false;
+
     if (dstSlot == EQUIPMENT_SLOT_MAINHAND)
     {
         Item* currentWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
         have2HWeapon = currentWeapon && currentWeapon->GetTemplate()->InventoryType == INVTYPE_2HWEAPON;
-        isValidTGWeapon = itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
-                          itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
-                          itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2;
-        
-        if (bot->CanDualWield() && ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || (bot->CanTitanGrip() && isValidTGWeapon)))
+    
+        // Determine if the new weapon is a valid Titan Grip weapon
+        isValidTGWeapon = (itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
+                           itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+                           itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2);
+    
+        // If the bot can Titan Grip, ignore any 2H weapon that isn't a 2H sword, mace, or axe.
+        if (bot->CanTitanGrip())
+        {
+            // If this weapon is 2H but not one of the valid TG weapon types, do not equip it at all.
+            if (itemProto->InventoryType == INVTYPE_2HWEAPON && !isValidTGWeapon)
+            {
+                return ITEM_USAGE_NONE;
+            }
+        }
+    
+        // Now handle the logic for equipping and possible offhand slots
+        // If the bot can Dual Wield and:
+        // - The weapon is not 2H and we currently don't have a 2H weapon equipped
+        // OR
+        // - The bot can Titan Grip and it is a valid TG weapon
+        // Then we can consider the offhand slot as well.
+        if (bot->CanDualWield() && 
+            ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || 
+             (bot->CanTitanGrip() && isValidTGWeapon)))
         {
             possibleSlots = 2;
         }
     }
+
 
     for (uint8 i = 0; i < possibleSlots; i++)
     {
@@ -247,7 +391,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
         }
 
         ItemTemplate const* oldItemProto = oldItem->GetTemplate();
-        float oldScore = calculator.CalculateItem(oldItemProto->ItemId);
+        float oldScore = calculator.CalculateItem(oldItemProto->ItemId, oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
         if (oldItem)
         {
             // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
@@ -358,6 +502,10 @@ uint32 ItemUsageValue::GetSmallestBagSize()
 
 bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* proto)
 {
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+    if (!botAI)
+        return false;
+
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
         uint32 entry = player->GetQuestSlotQuestId(slot);
@@ -365,20 +513,52 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         if (!quest)
             continue;
 
+        // Check if the item itself is needed for the quest
         for (uint8 i = 0; i < 4; i++)
         {
-            if (quest->RequiredItemId[i] != proto->ItemId)
+            if (quest->RequiredItemId[i] == proto->ItemId)
+            {
+                if (AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+                    continue;
+
+                return true; // Item is directly required for a quest
+            }
+        }
+
+        // Check if the item has spells that create a required quest item
+        for (uint8 i = 0; i < MAX_ITEM_SPELLS; i++)
+        {
+            uint32 spellId = proto->Spells[i].SpellId;
+            if (!spellId)
                 continue;
 
-            if (GET_PLAYERBOT_AI(player) &&
-                AI_VALUE2(uint32, "item count", proto->Name1) >= quest->RequiredItemCount[i])
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
                 continue;
 
-            return true;
+            for (uint8 effectIndex = 0; effectIndex < MAX_SPELL_EFFECTS; effectIndex++)
+            {
+                if (spellInfo->Effects[effectIndex].Effect == SPELL_EFFECT_CREATE_ITEM)
+                {
+                    uint32 createdItemId = spellInfo->Effects[effectIndex].ItemType;
+
+                    // Check if the created item is required for a quest
+                    for (uint8 j = 0; j < 4; j++)
+                    {
+                        if (quest->RequiredItemId[j] == createdItemId)
+                        {
+                            if (AI_VALUE2(uint32, "item count", createdItemId) >= quest->RequiredItemCount[j])
+                                continue;
+
+                            return true; // Item is useful because it creates a required quest item
+                        }
+                    }
+                }
+            }
         }
     }
 
-    return false;
+    return false; // Item is not useful for any active quests
 }
 
 bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)

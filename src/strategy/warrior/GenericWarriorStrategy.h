@@ -20,6 +20,8 @@ public:
         creators["charge"] = &charge;
         creators["mocking blow"] = &mocking_blow;
         creators["overpower"] = &overpower;
+        creators["retaliation"] = &retaliation;
+        creators["shattering throw"] = &shattering_throw;
 
         // temp
         creators["mortal strike"] = &mortal_strike;
@@ -57,6 +59,8 @@ private:
     ACTION_NODE_P(intervene, "intervene", "defensive stance");
     // temp
     ACTION_NODE_P(mortal_strike, "mortal strike", "battle stance");
+    ACTION_NODE_P(retaliation, "retaliation", "battle stance");
+    ACTION_NODE_P(shattering_throw, "shattering throw", "battle stance");
 };
 
 class GenericWarriorStrategy : public CombatStrategy

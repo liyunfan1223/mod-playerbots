@@ -10,10 +10,12 @@
 #include "BattlegroundWS.h"
 #include "CreatureAI.h"
 #include "GameTime.h"
+#include "ItemVisitors.h"
 #include "LastSpellCastValue.h"
 #include "ObjectGuid.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "PositionValue.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
 #include "ThreatMgr.h"
@@ -197,6 +199,13 @@ bool MyAttackerCountTrigger::IsActive()
     return AI_VALUE2(bool, "combat", "self target") && AI_VALUE(uint8, "my attacker count") >= amount;
 }
 
+bool MediumThreatTrigger::IsActive()
+{
+    if (!AI_VALUE(Unit*, "main tank"))
+        return false;
+    return MyAttackerCountTrigger::IsActive();
+}
+
 bool LowTankThreatTrigger::IsActive()
 {
     Unit* mt = AI_VALUE(Unit*, "main tank");
@@ -227,8 +236,7 @@ bool AoeTrigger::IsActive()
         Unit* unit = botAI->GetUnit(guid);
         if (!unit || !unit->IsAlive())
             continue;
-
-        if (unit->GetExactDist2d(current_target) <= range)
+        if (unit->GetDistance(current_target->GetPosition()) <= range)
         {
             attackers_count++;
         }
@@ -500,11 +508,22 @@ bool IsBehindTargetTrigger::IsActive()
 
 bool IsNotBehindTargetTrigger::IsActive()
 {
+    if (botAI->HasStrategy("stay", botAI->GetState()))
+    {
+        return false;
+    }
     Unit* target = AI_VALUE(Unit*, "current target");
     return target && !AI_VALUE2(bool, "behind", "current target");
 }
 
-bool IsNotFacingTargetTrigger::IsActive() { return !AI_VALUE2(bool, "facing", "current target"); }
+bool IsNotFacingTargetTrigger::IsActive()
+{
+    if (botAI->HasStrategy("stay", botAI->GetState()))
+    {
+        return false;
+    }
+    return !AI_VALUE2(bool, "facing", "current target");
+}
 
 bool HasCcTargetTrigger::IsActive()
 {
@@ -592,6 +611,18 @@ bool NewPlayerNearbyTrigger::IsActive() { return AI_VALUE(ObjectGuid, "new playe
 
 bool CollisionTrigger::IsActive() { return AI_VALUE2(bool, "collision", "self target"); }
 
+bool ReturnToStayPositionTrigger::IsActive()
+{
+    PositionInfo stayPosition = AI_VALUE(PositionMap&, "position")["stay"];
+    if (stayPosition.isSet())
+    {
+        const float distance = bot->GetDistance(stayPosition.x, stayPosition.y, stayPosition.z);
+        return distance > sPlayerbotAIConfig->followDistance;
+    }
+
+    return false;
+}
+
 bool GiveItemTrigger::IsActive()
 {
     return AI_VALUE2(Unit*, "party member without item", item) && AI_VALUE2(uint32, "item count", item);
@@ -630,3 +661,14 @@ bool IsFallingFarTrigger::IsActive() { return bot->HasUnitMovementFlag(MOVEMENTF
 bool HasAreaDebuffTrigger::IsActive() { return AI_VALUE2(bool, "has area debuff", "self target"); }
 
 Value<Unit*>* BuffOnMainTankTrigger::GetTargetValue() { return context->GetValue<Unit*>("main tank", spell); }
+
+bool AmmoCountTrigger::IsActive()
+{
+    if (bot->GetUInt32Value(PLAYER_AMMO_ID) != 0)  
+        return ItemCountTrigger::IsActive();  // Ammo already equipped
+
+    if (botAI->FindAmmo())  
+        return true;  // Found ammo in inventory but not equipped
+
+    return ItemCountTrigger::IsActive();
+}

@@ -15,10 +15,10 @@ ShadowPriestStrategy::ShadowPriestStrategy(PlayerbotAI* botAI) : GenericPriestSt
 
 NextAction** ShadowPriestStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("mind blast", ACTION_DEFAULT + 0.2f),
-                             // new NextAction("shadow word: death", 12.0f),
-                             new NextAction("mind flay", ACTION_DEFAULT + 0.1f),
-                             new NextAction("shoot", ACTION_DEFAULT), NULL);
+    return NextAction::array(0, new NextAction("mind blast", ACTION_DEFAULT + 0.3f),
+                             new NextAction("mind flay", ACTION_DEFAULT + 0.2f),
+                             new NextAction("shadow word: death", ACTION_DEFAULT + 0.1f), // cast during movement
+                             new NextAction("shoot", ACTION_DEFAULT), nullptr);
 }
 
 void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -61,9 +61,9 @@ void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void ShadowPriestDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode(
-        "devouring plague", NextAction::array(0, new NextAction("devouring plague", ACTION_HIGH + 3), nullptr)));
+        "vampiric touch", NextAction::array(0, new NextAction("vampiric touch", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(new TriggerNode(
-        "vampiric touch", NextAction::array(0, new NextAction("vampiric touch", ACTION_HIGH + 2), nullptr)));
+        "devouring plague", NextAction::array(0, new NextAction("devouring plague", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode(
         "shadow word: pain", NextAction::array(0, new NextAction("shadow word: pain", ACTION_HIGH + 1), nullptr)));
     // triggers.push_back(new TriggerNode("feedback", NextAction::array(0, new NextAction("feedback", 80.0f),

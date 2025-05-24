@@ -33,7 +33,7 @@ bool FollowAction::Execute(Event event)
         
         MovementPriority priority = botAI->GetState() == BOT_STATE_COMBAT ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_NORMAL;
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), false, false, false,
-                       true, priority);
+                       true, priority, true);
     }
 
     if (Pet* pet = bot->GetPet())
@@ -100,6 +100,10 @@ bool FollowAction::isUseful()
 
 bool FollowAction::CanDeadFollow(Unit* target)
 {
+    // In battleground, wait for spirit healer
+    if (bot->InBattleground() && !bot->IsAlive())
+        return false;
+
     // Move to corpse when dead and player is alive or not a ghost.
     if (!bot->IsAlive() && (target->IsAlive() || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
         return false;

@@ -6,6 +6,9 @@
 #include "ChatHelper.h"
 
 #include "AiFactory.h"
+#include "Common.h"
+#include "ItemTemplate.h"
+#include "ObjectMgr.h"
 #include "Playerbots.h"
 #include "SpellInfo.h"
 
@@ -302,6 +305,49 @@ ItemIds ChatHelper::parseItems(std::string const text)
     return itemIds;
 }
 
+ItemWithRandomProperty ChatHelper::parseItemWithRandomProperty(std::string const text)
+{
+    ItemWithRandomProperty res;
+    
+    size_t itemStart = text.find("Hitem:");
+    if (itemStart == std::string::npos)
+        return res;
+    
+    itemStart += 6;
+    if (itemStart >= text.length())
+        return res;
+    
+    size_t colonPos = text.find(':', itemStart);
+    if (colonPos == std::string::npos)
+        return res;
+    
+    std::string itemIdStr = text.substr(itemStart, colonPos - itemStart);
+    res.itemId = atoi(itemIdStr.c_str());
+    
+    std::vector<std::string> params;
+    size_t currentPos = colonPos + 1;
+    
+    while (currentPos < text.length()) {
+        size_t nextColon = text.find(':', currentPos);
+        if (nextColon == std::string::npos) {
+            size_t hTag = text.find("|h", currentPos);
+            if (hTag != std::string::npos) {
+                params.push_back(text.substr(currentPos, hTag - currentPos));
+            }
+            break;
+        }
+        
+        params.push_back(text.substr(currentPos, nextColon - currentPos));
+        currentPos = nextColon + 1;
+    }
+    
+    if (params.size() >= 6) {
+        res.randomPropertyId = atoi(params[5].c_str());
+    }
+    
+    return res;
+}
+
 std::string const ChatHelper::FormatQuest(Quest const* quest)
 {
     if (!quest)
@@ -310,7 +356,16 @@ std::string const ChatHelper::FormatQuest(Quest const* quest)
     }
 
     std::ostringstream out;
-    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << quest->GetTitle() << "]|h|r";
+    QuestLocale const* locale = sObjectMgr->GetQuestLocale(quest->GetQuestId());
+    std::string questTitle;
+
+    if (locale && locale->Title.size() > sWorld->GetDefaultDbcLocale())
+        questTitle = locale->Title[sWorld->GetDefaultDbcLocale()];
+
+    if (questTitle.empty())
+        questTitle = quest->GetTitle();
+    
+    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << questTitle << "]|h|r";
     return out.str();
 }
 
@@ -318,7 +373,7 @@ std::string const ChatHelper::FormatGameobject(GameObject* go)
 {
     std::ostringstream out;
     out << "|cFFFFFF00|Hfound:" << go->GetGUID().GetRawValue() << ":" << go->GetEntry() << ":"
-        << "|h[" << go->GetNameForLocaleIdx(LOCALE_enUS) << "]|h|r";
+        << "|h[" << go->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) << "]|h|r";
     return out.str();
 }
 
@@ -327,8 +382,8 @@ std::string const ChatHelper::FormatWorldobject(WorldObject* wo)
     std::ostringstream out;
     out << "|cFFFFFF00|Hfound:" << wo->GetGUID().GetRawValue() << ":" << wo->GetEntry() << ":"
         << "|h[";
-    out << (wo->ToGameObject() ? ((GameObject*)wo)->GetNameForLocaleIdx(LOCALE_enUS)
-                               : wo->GetNameForLocaleIdx(LOCALE_enUS))
+    out << (wo->ToGameObject() ? ((GameObject*)wo)->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale())
+                               : wo->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()))
         << "]|h|r";
     return out.str();
 }
@@ -361,20 +416,29 @@ std::string const ChatHelper::FormatWorldEntry(int32 entry)
 std::string const ChatHelper::FormatSpell(SpellInfo const* spellInfo)
 {
     std::ostringstream out;
-    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h[" << spellInfo->SpellName[LOCALE_enUS] << "]|h|r";
+    std::string spellName = spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] ?
+        spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] : spellInfo->SpellName[LOCALE_enUS];
+    out << "|cffffffff|Hspell:" << spellInfo->Id << "|h[" << spellName << "]|h|r";
     return out.str();
 }
 
 std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count, uint32 total)
 {
     char color[32];
-    sprintf(color, "%x", ItemQualityColors[proto->Quality]);
+    snprintf(color, sizeof(color), "%x", ItemQualityColors[proto->Quality]);
 
-    // const std::string &name = sObjectMgr->GetItemLocale(proto->ItemId)->Name[LOCALE_enUS];
+    std::string itemName;
+    const ItemLocale* locale = sObjectMgr->GetItemLocale(proto->ItemId);
+
+    if (locale && locale->Name.size() > sWorld->GetDefaultDbcLocale())
+        itemName = locale->Name[sWorld->GetDefaultDbcLocale()];
+    
+    if (itemName.empty())
+        itemName = proto->Name1;
 
     std::ostringstream out;
     out << "|c" << color << "|Hitem:" << proto->ItemId << ":0:0:0:0:0:0:0"
-        << "|h[" << proto->Name1 << "]|h|r";
+        << "|h[" << itemName << "]|h|r";
 
     if (count > 1)
         out << "x" << count;
@@ -388,7 +452,7 @@ std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count
 std::string const ChatHelper::FormatQItem(uint32 itemId)
 {
     char color[32];
-    sprintf(color, "%x", ItemQualityColors[0]);
+    snprintf(color, sizeof(color), "%x", ItemQualityColors[0]);
 
     std::ostringstream out;
     out << "|c" << color << "|Hitem:" << itemId << ":0:0:0:0:0:0:0"
@@ -462,7 +526,7 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
             break;
 
         std::string const entryC = text.substr(pos, endPos - pos);  // get std::string const within window i.e entry
-        uint32 entry = atol(entryC.c_str());                        // convert ascii to float
+        //uint32 entry = atol(entryC.c_str());                        // convert ascii to float
 
         ObjectGuid lootCurrent = ObjectGuid(guid);
 

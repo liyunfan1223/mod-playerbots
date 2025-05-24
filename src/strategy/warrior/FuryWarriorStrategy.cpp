@@ -18,6 +18,7 @@ public:
         creators["piercing howl"] = &piercing_howl;
         // creators["bloodthirst"] = &bloodthirst;
         creators["pummel"] = &pummel;
+        creators["enraged regeneration"] = &enraged_regeneration;
     }
 
 private:
@@ -27,6 +28,14 @@ private:
     // ACTION_NODE_A(death_wish, "death wish", "berserker rage");
     // ACTION_NODE_A(bloodthirst, "bloodthirst", "melee");
     ACTION_NODE_A(pummel, "pummel", "intercept");
+
+    static ActionNode* enraged_regeneration(PlayerbotAI* botAI)
+    {
+        return new ActionNode("enraged regeneration",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
 };
 
 FuryWarriorStrategy::FuryWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStrategy(botAI)
@@ -69,11 +78,13 @@ void FuryWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("bloodthirst", NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 7), nullptr)));
     triggers.push_back(
+        new TriggerNode("whirlwind", NextAction::array(0, new NextAction("whirlwind", ACTION_HIGH + 6), nullptr)));
+    triggers.push_back(
         new TriggerNode("instant slam", NextAction::array(0, new NextAction("slam", ACTION_HIGH + 5), nullptr)));
     triggers.push_back(
         new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("medium rage available",
-                                       NextAction::array(0, new NextAction("heroic strike", ACTION_HIGH + 1), NULL)));
+                                       NextAction::array(0, new NextAction("heroic strike", ACTION_DEFAULT + 0.1f), NULL)));
     // triggers.push_back(new TriggerNode("berserker rage", NextAction::array(0, new NextAction("berserker rage",
     // ACTION_HIGH + 2), nullptr))); triggers.push_back(new TriggerNode("light aoe", NextAction::array(0,
     //     new NextAction("whirlwind", ACTION_HIGH + 2),
@@ -83,4 +94,6 @@ void FuryWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("death wish", NextAction::array(0, new NextAction("death wish", ACTION_HIGH), nullptr)));
     triggers.push_back(
         new TriggerNode("recklessness", NextAction::array(0, new NextAction("recklessness", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode("critical health",
+        NextAction::array(0, new NextAction("enraged regeneration", ACTION_EMERGENCY), nullptr)));
 }

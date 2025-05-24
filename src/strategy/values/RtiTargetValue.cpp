@@ -48,9 +48,6 @@ Unit* RtiTargetValue::Calculate()
     if (!guid)
         return nullptr;
 
-    if (!bot->IsInCombat())
-        return nullptr;
-
     //////////////////////////////////////////////////////begin: delete below check
     // Some units that need to be killed in battle are not on the list of attackers,
     // such as the Kor'kron Battle-Mage in Icecrown Citadel.
@@ -62,7 +59,7 @@ Unit* RtiTargetValue::Calculate()
     //////////////////////////////////////////////////////end: delete below check
 
     Unit* unit = botAI->GetUnit(guid);
-    if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) || !AttackersValue::IsValidTarget(unit, bot) || 
+    if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) || !AttackersValue::IsValidTarget(unit, bot) ||
         sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, unit),
                                              sPlayerbotAIConfig->sightDistance))
         return nullptr;
