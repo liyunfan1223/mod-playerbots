@@ -98,7 +98,7 @@ AiPlayerbot.DeleteRandomBotAccounts = 0
 
 # Disable randombots when no real players are logged in
 # Default: 0 (randombots will login when server starts)
-# If enabled, randombots will only login 30 seconds (default) after a real player logs in, and will logout 300 seconds (default) after all real players logout
+# If enabled, randombots will only log in 30 seconds (default) after a real player logs in, and will log out 300 seconds (default) after all real players log out
 AiPlayerbot.DisabledWithoutRealPlayer = 0
 AiPlayerbot.DisabledWithoutRealPlayerLoginDelay = 30
 AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay = 300
