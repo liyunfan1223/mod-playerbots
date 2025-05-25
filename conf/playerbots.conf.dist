@@ -130,6 +130,11 @@ AiPlayerbot.AddClassAccountPoolSize = 50
 # Default: 1 (accept based on level)
 AiPlayerbot.GroupInvitationPermission = 1
 
+# Keep alt bots in the party even when the master leaves
+# 0 = disabled (default behavior)
+# 1 = enabled (prevents bots from automatically leaving the group)
+AiPlayerbot.KeepAltsInGroup = 0
+
 # Auto-login all player alts as altbots on player login
 AiPlayerbot.BotAutologin = 0
 
