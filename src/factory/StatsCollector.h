@@ -66,7 +66,7 @@ public:
     void Reset();
     void CollectItemStats(ItemTemplate const* proto);
     void CollectSpellStats(uint32 spellId, float multiplier = 1.0f, int32 spellCooldown = -1);
-    void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant);
+    void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount = 0);
     bool CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags, bool strict = true);
     bool CheckSpellValidation(uint32 spellFamilyName, flag96 spelFalimyFlags, bool strict = true);
 

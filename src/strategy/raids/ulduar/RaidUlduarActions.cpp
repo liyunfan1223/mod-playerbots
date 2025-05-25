@@ -1485,6 +1485,23 @@ bool KologarnCrunchArmorAction::Execute(Event event)
     return true;
 }
 
+bool AuriayaFallFromFloorAction::Execute(Event event)
+{
+    Player* master = botAI->GetMaster();
+
+    if (!master)
+        return false;
+
+    return bot->TeleportTo(bot->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(),
+                           master->GetOrientation());
+}
+
+bool AuriayaFallFromFloorAction::isUseful()
+{
+    AuriayaFallFromFloorTrigger auriayaFallFromFloorTrigger(botAI);
+    return auriayaFallFromFloorTrigger.IsActive();
+}
+
 bool HodirMoveSnowpackedIcicleAction::isUseful()
 {
     // Check boss and it is alive
@@ -2095,6 +2112,9 @@ bool ThorimGauntletPositioningAction::Execute(Event event)
 bool ThorimFallFromFloorAction::Execute(Event event)
 {
     Player* master = botAI->GetMaster();
+
+    if (!master)
+        return false;
 
     return bot->TeleportTo(bot->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(),
                            master->GetOrientation());

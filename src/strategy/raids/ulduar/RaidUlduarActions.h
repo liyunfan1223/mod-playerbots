@@ -185,6 +185,14 @@ public:
     bool isUseful() override;
 };
 
+class AuriayaFallFromFloorAction : public Action
+{
+public:
+    AuriayaFallFromFloorAction(PlayerbotAI* botAI) : Action(botAI, "auriaya fall from floor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class HodirBitingColdJumpAction : public MovementAction
 {
 public:
