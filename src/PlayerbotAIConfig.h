@@ -297,6 +297,12 @@ public:
 
     bool freeMethodLoot;
     int32 lootRollLevel;
+    bool allowDisenchant;
+    bool deGreens;
+    bool deBlues;
+    bool dePurples;
+    bool deOranges;
+
     std::string autoPickReward;
     bool autoEquipUpgradeLoot;
     float equipUpgradeThreshold;
