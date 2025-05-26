@@ -96,6 +96,13 @@ AiPlayerbot.RandomBotAccountCount = 0
 # To apply this, set the number to 1 and run the Worldserver. Once deletion is complete, if you would like to recreate randombots, set the number back to 0 and rerun the Worldserver.
 AiPlayerbot.DeleteRandomBotAccounts = 0
 
+# Disable randombots when no real players are logged in
+# Default: 0 (randombots will login when server starts)
+# If enabled, randombots will only log in 30 seconds (default) after a real player logs in, and will log out 300 seconds (default) after all real players log out
+AiPlayerbot.DisabledWithoutRealPlayer = 0
+AiPlayerbot.DisabledWithoutRealPlayerLoginDelay = 30
+AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay = 300
+
 ####################################################################################################
 
 ###################################
@@ -124,6 +131,11 @@ AiPlayerbot.AddClassAccountPoolSize = 50
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
 # Default: 1 (accept based on level)
 AiPlayerbot.GroupInvitationPermission = 1
+
+# Keep alt bots in the party even when the master leaves
+# 0 = disabled (default behavior)
+# 1 = enabled (prevents bots from automatically leaving the group)
+AiPlayerbot.KeepAltsInGroup = 0
 
 # Auto-login all player alts as altbots on player login
 AiPlayerbot.BotAutologin = 0
