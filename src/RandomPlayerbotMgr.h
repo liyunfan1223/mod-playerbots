@@ -114,6 +114,7 @@ public:
     bool IsRandomBot(ObjectGuid::LowType bot);
     bool IsAddclassBot(Player* bot);
     bool IsAddclassBot(ObjectGuid::LowType bot);
+    bool GetDisabledWithoutRealPlayerLogoutInProgress() const { return disabledWithoutRealPlayerLogoutInProgress; }
     void Randomize(Player* bot);
     void Clear(Player* bot);
     void RandomizeFirst(Player* bot);
@@ -202,6 +203,7 @@ private:
     uint32 SetEventValue(uint32 bot, std::string const event, uint32 value, uint32 validIn,
                          std::string const data = "");
     void GetBots();
+    bool disabledWithoutRealPlayerLogoutInProgress = false;
     std::vector<uint32> GetBgBots(uint32 bracket);
     time_t BgCheckTimer;
     time_t LfgCheckTimer;
