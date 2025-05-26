@@ -15,8 +15,6 @@
 
 bool LootRollAction::Execute(Event event)
 {
-    Player* bot = QueryItemUsageAction::botAI->GetBot();
-
     Group* group = bot->GetGroup();
     if (!group)
         return false;
@@ -41,7 +39,7 @@ bool LootRollAction::Execute(Event event)
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
-            
+
     // Set up the check to allow loot rolls to have the disenchant option
     // if anyone in the group has the required skill level otherwise
     // greed on the item. 
@@ -70,7 +68,7 @@ bool LootRollAction::Execute(Event event)
             itemUsageParam = std::to_string(itemId);
         }
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
-        
+
         // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), luckily no other items I found have class bits and epic quality.
         if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK && proto->Quality == ITEM_QUALITY_EPIC)
         {
@@ -170,9 +168,10 @@ bool LootRollAction::Execute(Event event)
                 group->CountRollVote(bot->GetGUID(), guid, vote);
                 break;
         }
+        // One item at a time
+        return true;
     }
-	
-    return true;
+    return false;
 }
 
 
