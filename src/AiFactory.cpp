@@ -531,7 +531,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategiesNoInit("bthreat", "tank assist", "barmor", nullptr);
                 if (player->GetLevel() >= 20)
                 {
-                    nonCombatEngine->addStrategy("bstats", false);
+                    nonCombatEngine->addStrategy("bhealth", false);
                 }
                 else
                 {

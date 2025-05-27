@@ -14,19 +14,11 @@
 #include "SharedDefines.h"
 #include "../../../../../src/server/scripts/Spells/spell_generic.cpp"
 
-inline std::string const GetActualBlessingOfMight(Unit* target, PlayerbotAI* botAI, Player* bot)
+inline std::string const GetActualBlessingOfMight(Unit* target)
 {
-    Player* targetPlayer = target->ToPlayer();
-
-    if (!targetPlayer)
+    if (!target->ToPlayer())
     {
         return "blessing of might";
-    }
-
-    if (targetPlayer->HasTankSpec() && !targetPlayer->HasAura(SPELL_BLESSING_OF_SANCTUARY) &&
-        bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY))
-    {
-        return "blessing of sanctuary";
     }
 
     int tab = AiFactory::GetPlayerSpecTab(target->ToPlayer());
@@ -98,6 +90,23 @@ inline std::string const GetActualBlessingOfWisdom(Unit* target)
     return "blessing of wisdom";
 }
 
+inline std::string const GetActualBlessingOfSanctuary(Unit* target, Player* bot)
+{
+    Player* targetPlayer = target->ToPlayer();
+
+    if (!targetPlayer)
+    {
+        return "blessing of sanctuary";
+    }
+
+    if (targetPlayer->HasTankSpec() && bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY))
+    {
+        return "blessing of sanctuary";
+    }
+
+    return "blessing of kings";
+}
+
 Value<Unit*>* CastBlessingOnPartyAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member without aura", name);
@@ -109,7 +118,7 @@ bool CastBlessingOfMightAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfMight(target, botAI, bot), target);
+    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
 }
 
 Value<Unit*>* CastBlessingOfMightOnPartyAction::GetTargetValue()
@@ -123,7 +132,7 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfMight(target, botAI, bot), target);
+    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
 }
 
 bool CastBlessingOfWisdomAction::Execute(Event event)
@@ -147,6 +156,20 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
         return false;
 
     return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
+}
+
+Value<Unit*>* CastBlessingOfSanctuaryOnPartyAction::GetTargetValue()
+{
+    return context->GetValue<Unit*>("party member without aura", "blessing of sanctuary,blessing of kings");
+}
+
+bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+
+    return botAI->CastSpell(GetActualBlessingOfSanctuary(target, bot), target);
 }
 
 bool CastSealSpellAction::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }
