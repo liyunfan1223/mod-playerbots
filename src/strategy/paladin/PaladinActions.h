@@ -149,14 +149,16 @@ public:
     CastBlessingOfSanctuaryAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "blessing of sanctuary") {}
 };
 
-class CastBlessingOfSanctuaryOnPartyAction : public CastBlessingOnPartyAction
+class CastBlessingOfSanctuaryOnPartyAction : public BuffOnPartyAction
 {
 public:
-    CastBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "blessing of sanctuary")
+    CastBlessingOfSanctuaryOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "blessing of sanctuary")
     {
     }
 
     std::string const getName() override { return "blessing of sanctuary on party"; }
+    Value<Unit*>* GetTargetValue() override;
+    bool Execute(Event event) override;
 };
 
 class CastHolyLightAction : public CastHealingSpellAction
