@@ -11,7 +11,6 @@
 #include "Log.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
-#include <sstream>
 
 bool InviteToGroupAction::Invite(Player* inviter, Player* player)
 {
@@ -274,25 +273,14 @@ bool LfgAction::Execute(Event event)
 {
     Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
 
-    LOG_INFO("playerbots", "LfgAction::Execute started for bot {}", bot->GetName());
-
     if (bot->InBattleground())
-    {
-        LOG_INFO("playerbots", "LfgAction::Execute failed: bot is in battleground");
         return false;
-    }
 
     if (bot->InBattlegroundQueue())
-    {
-        LOG_INFO("playerbots", "LfgAction::Execute failed: bot is in battleground queue");
         return false;
-    }
 
     if (!botAI->IsSafe(requester))
-    {
-        LOG_INFO("playerbots", "LfgAction::Execute failed: requester is not safe");  // why?
         return false;
-    }
 
     if (requester->GetLevel() == DEFAULT_MAX_LEVEL && bot->GetLevel() != DEFAULT_MAX_LEVEL)
         return false;
@@ -303,13 +291,9 @@ bool LfgAction::Execute(Event event)
     std::string param = event.getParam();
 
     if (!param.empty() && param != "40" && param != "25" && param != "20" && param != "10" && param != "5")
-    {
-        LOG_INFO("playerbots", "Unknown group size. Valid sizes for lfg are 40, 25, 20, 10 and 5.");
         return false;
-    }
 
     Group* group = requester->GetGroup();
-    LOG_INFO("playerbots", "LfgAction::Execute: group is {}", group ? "present" : "null");
 
     std::unordered_map<Classes, std::unordered_map<BotRoles, uint32>> allowedClassNr;
     std::unordered_map<BotRoles, uint32> allowedRoles;
@@ -322,7 +306,6 @@ bool LfgAction::Execute(Event event)
                         ? BOT_ROLE_TANK
                         : (botAI->IsHeal(requester, false) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
     Classes cls = (Classes)requester->getClass();
-    LOG_INFO("playerbots", "LfgAction::Execute: requester role is {}, class is {}", role, cls);
 
     if (group)
     {
@@ -413,19 +396,12 @@ bool LfgAction::Execute(Event event)
 
     role = botAI->IsTank(bot, false) ? BOT_ROLE_TANK : (botAI->IsHeal(bot, false) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
     cls = (Classes)bot->getClass();
-    LOG_INFO("playerbots", "LfgAction::Execute: bot role is {}, class is {}", role, cls);
 
     if (allowedRoles[role] == 0)
-    {
-        LOG_INFO("playerbots", "LfgAction::Execute failed: no slots for role {}", role);
         return false;
-    }
 
     if (allowedClassNr[cls].find(role) != allowedClassNr[cls].end() && allowedClassNr[cls][role] == 0)
-    {
-        LOG_INFO("playerbots", "LfgAction::Execute failed: no slots for class {} and role {}", cls, role);
         return false;
-    }
 
     if (bot->GetGroup())
     {
@@ -437,19 +413,15 @@ bool LfgAction::Execute(Event event)
     }
 
     bool invite = Invite(requester, bot);
-    LOG_INFO("playerbots", "LfgAction::Execute: Invite result is {}", invite ? "success" : "failure");
 
     if (invite)
     {
         Event acceptEvent("accept invitation", requester ? requester->GetGUID() : ObjectGuid::Empty);
         if (!botAI->DoSpecificAction("accept invitation", acceptEvent, true))
-        {
-            LOG_INFO("playerbots", "LfgAction::Execute failed: could not accept invitation");
             return false;
-        }
 
         std::map<std::string, std::string> placeholders;
-        placeholders["%role"] = (role == BOT_ROLE_TANK ? "tank" : (role == BOT_ROLE_HEALER ? "healer" : "dps"));
+        placeholders["%role"] = (role & BOT_ROLE_TANK ? "tank" : (role & BOT_ROLE_HEALER ? "healer" : "dps"));
         placeholders["%spotsleft"] = std::to_string(allowedRoles[role] - 1);
 
         std::ostringstream out;
@@ -458,16 +430,21 @@ bool LfgAction::Execute(Event event)
             out << "Joining as " << placeholders["%role"] << ", " << placeholders["%spotsleft"] << " "
                 << placeholders["%role"] << " spots left.";
             botAI->TellMasterNoFacing(out.str());
+
+            //botAI->DoSpecificAction("autogear");
+            //botAI->DoSpecificAction("maintenance");
         }
         else
         {
             out << "Joining as " << placeholders["%role"] << ".";
             botAI->TellMasterNoFacing(out.str());
+
+            //botAI->DoSpecificAction("autogear");
+            //botAI->DoSpecificAction("maintenance");
         }
 
         return true;
     }
 
-    LOG_INFO("playerbots", "LfgAction::Execute failed: invite unsuccessful");
     return false;
 }
