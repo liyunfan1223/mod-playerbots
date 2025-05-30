@@ -22,8 +22,7 @@ bool AcceptInvitationAction::Execute(Event event)
     std::string name;
     packet >> flag >> name;
 
-    // Player* inviter = ObjectAccessor::FindPlayer(grp->GetLeaderGUID());
-    Player* inviter = ObjectAccessor::FindPlayerByName(name, true);
+    Player* inviter = ObjectAccessor::FindPlayer(grp->GetLeaderGUID());
     if (!inviter)
         return false;
 
@@ -36,10 +35,16 @@ bool AcceptInvitationAction::Execute(Event event)
         return false;
     }
 
+    if (bot->isAFK())
+        bot->ToggleAFK();
+
     WorldPacket p;
     uint32 roles_mask = 0;
     p << roles_mask;
     bot->GetSession()->HandleGroupAcceptOpcode(p);
+
+    if (!bot->GetGroup() || !bot->GetGroup()->IsMember(inviter->GetGUID()))
+        return false;
 
     if (sRandomPlayerbotMgr->IsRandomBot(bot))
         botAI->SetMaster(inviter);
