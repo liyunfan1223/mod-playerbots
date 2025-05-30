@@ -40,15 +40,15 @@ bool XpGainAction::Execute(Event event)
         BroadcastHelper::BroadcastKill(botAI, bot, creature);
     }
 
-    // playerbotsXPrate is now implemented in OnPlayerGiveXP script
-    // if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->playerbotsXPrate == 1)
+    // randomBotXPRate is now implemented in OnPlayerGiveXP script
+    // if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->randomBotXPRate == 1)
     //     return true;
     
     // Unit* victim = nullptr;
     // if (guid)
     //     victim = botAI->GetUnit(guid);
 
-    // xpgain = xpgain * (sPlayerbotAIConfig->playerbotsXPrate - 1);
+    // xpgain = xpgain * (sPlayerbotAIConfig->randomBotXPRate - 1);
     // GiveXP(xpgain, victim);
 
     return true;

@@ -185,6 +185,14 @@ public:
     bool isUseful() override;
 };
 
+class AuriayaFallFromFloorAction : public Action
+{
+public:
+    AuriayaFallFromFloorAction(PlayerbotAI* botAI) : Action(botAI, "auriaya fall from floor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class HodirBitingColdJumpAction : public MovementAction
 {
 public:
@@ -212,6 +220,59 @@ class FreyaMoveToHealingSporeAction : public MovementAction
 {
 public:
     FreyaMoveToHealingSporeAction(PlayerbotAI* ai) : MovementAction(ai, "freya move to healing spore action") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class ThorimUnbalancingStrikeAction : public Action
+{
+public:
+    ThorimUnbalancingStrikeAction(PlayerbotAI* ai) : Action(ai, "thorim unbalancing strike action") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class ThorimMarkDpsTargetAction : public Action
+{
+public:
+    ThorimMarkDpsTargetAction(PlayerbotAI* ai) : Action(ai, "thorim mark dps target action") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class ThorimArenaPositioningAction : public MovementAction
+{
+public:
+    ThorimArenaPositioningAction(PlayerbotAI* ai) : MovementAction(ai, "thorim arena positioning action") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class ThorimGauntletPositioningAction : public MovementAction
+{
+public:
+    ThorimGauntletPositioningAction(PlayerbotAI* ai) : MovementAction(ai, "thorim gauntlet positioning action") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class ThorimFallFromFloorAction : public Action
+{
+public:
+    ThorimFallFromFloorAction(PlayerbotAI* botAI) : Action(botAI, "thorim fall from floor action") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class ThorimPhase2PositioningAction : public MovementAction
+{
+public:
+    ThorimPhase2PositioningAction(PlayerbotAI* ai) : MovementAction(ai, "thorim phase 2 positioning action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;

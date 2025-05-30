@@ -219,9 +219,12 @@ public:
         if (!player->GetSession()->IsBot())
             return;
         
-        if (sPlayerbotAIConfig->playerbotsXPrate != 1.0)
+        if (!sRandomPlayerbotMgr->IsRandomBot(player))
+            return;
+
+        if (sPlayerbotAIConfig->randomBotXPRate != 1.0)
         {
-            amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->playerbotsXPrate));
+            amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
         }
     }
 };

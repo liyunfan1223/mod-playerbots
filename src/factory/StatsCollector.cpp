@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "DBCStores.h"
+#include "ItemEnchantmentMgr.h"
 #include "ItemTemplate.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAI.h"
@@ -205,7 +206,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 s
     }
 }
 
-void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchant)
+void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount)
 {
     for (int s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
     {
@@ -231,6 +232,10 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
             }
             case ITEM_ENCHANTMENT_TYPE_STAT:
             {
+                // for item random suffix
+                if (!enchant_amount)
+                    enchant_amount = default_enchant_amount;
+
                 if (!enchant_amount)
                 {
                     break;
@@ -250,7 +255,7 @@ bool StatsCollector::SpecialSpellFilter(uint32 spellId)
     // trinket
     switch (spellId)
     {
-        case 60764: // Totem of Splintering
+        case 60764:  // Totem of Splintering
             if (type_ & (CollectorType::SPELL))
                 return true;
             break;
@@ -744,7 +749,7 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
 
 int32 StatsCollector::AverageValue(const SpellEffectInfo& effectInfo)
 {
-    //float basePointsPerLevel = effectInfo.RealPointsPerLevel; //not used, line marked for removal.
+    // float basePointsPerLevel = effectInfo.RealPointsPerLevel; //not used, line marked for removal.
     int32 basePoints = effectInfo.BasePoints;
     int32 randomPoints = int32(effectInfo.DieSides);
 
@@ -767,7 +772,7 @@ bool StatsCollector::CheckSpellValidation(uint32 spellFamilyName, flag96 spelFal
 {
     if (PlayerbotAI::Class2SpellFamilyName(cls_) != spellFamilyName)
         return false;
-    
+
     bool isHealingSpell = PlayerbotAI::IsHealingSpell(spellFamilyName, spelFalimyFlags);
     // strict to healer
     if (strict && (type_ & CollectorType::SPELL_HEAL))

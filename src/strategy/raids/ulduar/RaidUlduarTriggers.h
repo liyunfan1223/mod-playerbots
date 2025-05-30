@@ -44,6 +44,24 @@ enum UlduarIDs
     NPC_EONARS_GIFT = 33228,
     GOBJECT_NATURE_BOMB = 194902,
 
+    //Thorim
+    NPC_DARK_RUNE_ACOLYTE_I = 32886,
+    NPC_CAPTURED_MERCENARY_SOLDIER_ALLY = 32885,
+    NPC_CAPTURED_MERCENARY_SOLDIER_HORDE = 32883,
+    NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY = 32908,
+    NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE = 32907,
+    NPC_JORMUNGAR_BEHEMOT = 32882,
+    NPC_DARK_RUNE_WARBRINGER = 32877,
+    NPC_DARK_RUNE_EVOKER = 32878,
+    NPC_DARK_RUNE_CHAMPION = 32876,
+    NPC_DARK_RUNE_COMMONER = 32904,
+    NPC_IRON_RING_GUARD = 32874,
+    NPC_RUNIC_COLOSSUS = 32872,
+    NPC_ANCIENT_RUNE_GIANT = 32873,
+    NPC_DARK_RUNE_ACOLYTE_G = 33110,
+    NPC_IRON_HONOR_GUARD = 32875,
+    SPELL_UNBALANCING_STRIKE = 62130,
+    
     // Buffs
     SPELL_FROST_TRAP = 13809
 };
@@ -54,6 +72,28 @@ const int8 moonIndex = 4;   // Moon
 
 const float ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT = 420.0f;
 const float ULDUAR_KOLOGARN_EYEBEAM_RADIUS = 3.0f;
+const float ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD = 429.6094f;
+const float ULDUAR_THORIM_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
+const float ULDUAR_AURIAYA_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
+
+const Position ULDUAR_THORIM_NEAR_ARENA_CENTER = Position(2134.9854f, -263.11853f, 419.8465f);
+const Position ULDUAR_THORIM_NEAR_ENTRANCE_POSITION = Position(2172.4355f, -258.27957f, 418.47162f);
+const Position ULDUAR_THORIM_GAUNTLET_LEFT_SIDE_6_YARDS_1 = Position(2237.6187f, -265.08844f, 412.17548f);
+const Position ULDUAR_THORIM_GAUNTLET_LEFT_SIDE_6_YARDS_2 = Position(2237.2498f, -275.81122f, 412.17548f);
+const Position ULDUAR_THORIM_GAUNTLET_LEFT_SIDE_5_YARDS_1 = Position(2236.895f, -294.62448f, 412.1348f);
+const Position ULDUAR_THORIM_GAUNTLET_LEFT_SIDE_10_YARDS_1 = Position(2242.1162f, -310.15308f, 412.1348f);
+const Position ULDUAR_THORIM_GAUNTLET_LEFT_SIDE_10_YARDS_2 = Position(2242.018f, -318.66003f, 412.1348f);
+const Position ULDUAR_THORIM_GAUNTLET_LEFT_SIDE_10_YARDS_3 = Position(2242.1904f, -329.0533f, 412.1348f);
+const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_6_YARDS_1 = Position(2219.5417f, -264.77167f, 412.17548f);
+const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_6_YARDS_2 = Position(2217.446f, -275.85248f, 412.17548f);
+const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_5_YARDS_1 = Position(2217.8877f, -295.01193f, 412.13434f);
+const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_1 = Position(2212.193f, -307.44992f, 412.1348f);
+const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_2 = Position(2212.1353f, -318.20795f, 412.1348f);
+const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_3 = Position(2212.1956f, -328.0144f, 412.1348f);
+const Position ULDUAR_THORIM_PHASE2_TANK_SPOT = Position(2134.8572f, -287.0291f, 419.4935f);
+const Position ULDUAR_THORIM_PHASE2_RANGE1_SPOT = Position(2112.8752f, -267.69305f, 419.52814f);
+const Position ULDUAR_THORIM_PHASE2_RANGE2_SPOT = Position(2129.09f, -277.142f, 419.67462f);
+const Position ULDUAR_THORIM_PHASE2_RANGE3_SPOT = Position(2156.798f, -267.57434f, 419.52722f);
 
 //
 // Flame Levi
@@ -201,6 +241,16 @@ public:
 };
 
 //
+// Auriaya
+//
+class AuriayaFallFromFloorTrigger : public Trigger
+{
+public:
+    AuriayaFallFromFloorTrigger(PlayerbotAI* ai) : Trigger(ai, "auriaya fall from floor trigger") {}
+    bool IsActive() override;
+};
+
+//
 // Hodir
 //
 class HodirBitingColdTrigger : public Trigger
@@ -238,6 +288,51 @@ class FreyaMoveToHealingSporeTrigger : public Trigger
 {
 public:
     FreyaMoveToHealingSporeTrigger(PlayerbotAI* ai) : Trigger(ai, "freya move to healing spore trigger") {}
+    bool IsActive() override;
+};
+
+//
+// Thorim
+//
+class ThorimUnbalancingStrikeTrigger : public Trigger
+{
+public:
+    ThorimUnbalancingStrikeTrigger(PlayerbotAI* ai) : Trigger(ai, "thorim unbalancing strike trigger") {}
+    bool IsActive() override;
+};
+
+class ThorimMarkDpsTargetTrigger : public Trigger
+{
+public:
+    ThorimMarkDpsTargetTrigger(PlayerbotAI* ai) : Trigger(ai, "thorim mark dps target trigger") {}
+    bool IsActive() override;
+};
+
+class ThorimGauntletPositioningTrigger : public Trigger
+{
+public:
+    ThorimGauntletPositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "thorim gauntlet positioning trigger") {}
+    bool IsActive() override;
+};
+
+class ThorimArenaPositioningTrigger : public Trigger
+{
+public:
+    ThorimArenaPositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "thorim arena positioning trigger") {}
+    bool IsActive() override;
+};
+
+class ThorimFallFromFloorTrigger : public Trigger
+{
+public:
+    ThorimFallFromFloorTrigger(PlayerbotAI* ai) : Trigger(ai, "thorim fall from floor trigger") {}
+    bool IsActive() override;
+};
+
+class ThorimPhase2PositioningTrigger : public Trigger
+{
+public:
+    ThorimPhase2PositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "thorim phase 2 positioning trigger") {}
     bool IsActive() override;
 };
 

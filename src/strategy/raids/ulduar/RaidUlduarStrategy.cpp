@@ -108,6 +108,13 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("kologarn crunch armor action", ACTION_RAID), nullptr)));
 
     //
+    // Auriaya
+    //
+    triggers.push_back(new TriggerNode(
+        "auriaya fall from floor trigger",
+        NextAction::array(0, new NextAction("auriaya fall from floor action", ACTION_RAID), nullptr)));
+
+    //
     // Hodir
     //
     triggers.push_back(new TriggerNode(
@@ -151,6 +158,34 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "thorim nature resistance trigger",
         NextAction::array(0, new NextAction("thorim nature resistance action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "thorim frost resistance trigger",
+        NextAction::array(0, new NextAction("thorim frost resistance action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "thorim unbalancing strike trigger",
+        NextAction::array(0, new NextAction("thorim unbalancing strike action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "thorim mark dps target trigger",
+        NextAction::array(0, new NextAction("thorim mark dps target action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "thorim gauntlet positioning trigger",
+        NextAction::array(0, new NextAction("thorim gauntlet positioning action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "thorim arena positioning trigger",
+        NextAction::array(0, new NextAction("thorim arena positioning action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "thorim fall from floor trigger",
+        NextAction::array(0, new NextAction("thorim fall from floor action", ACTION_RAID + 1), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "thorim phase 2 positioning trigger",
+        NextAction::array(0, new NextAction("thorim phase 2 positioning action", ACTION_RAID), nullptr)));
 
     //
     // Mimiron

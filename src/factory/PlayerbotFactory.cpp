@@ -813,6 +813,10 @@ void PlayerbotFactory::InitPetTalents()
 void PlayerbotFactory::InitPet()
 {
     Pet* pet = bot->GetPet();
+
+    if (!pet && bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
+        return;
+
     if (!pet)
     {
         if (bot->getClass() != CLASS_HUNTER || bot->GetLevel() < 10)
@@ -861,7 +865,8 @@ void PlayerbotFactory::InitPet()
             uint32 pet_number = sObjectMgr->GeneratePetNumber();
             if (bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
             {
-                bot->GetPetStable()->CurrentPet.value();
+                auto petGuid = bot->GetPetStable()->CurrentPet.value(); // To correct the build warnin in VS
+                // bot->GetPetStable()->CurrentPet.value();
                 // bot->GetPetStable()->CurrentPet.reset();
                 bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
                 bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
@@ -1738,7 +1743,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
         if (incremental && oldItem)
         {
-            float old_score = calculator.CalculateItem(oldItem->GetEntry());
+            float old_score = calculator.CalculateItem(oldItem->GetEntry(), oldItem->GetItemRandomPropertyId());
             if (bestScoreForSlot < 1.2f * old_score)
                 continue;
         }
@@ -2200,33 +2205,15 @@ void PlayerbotFactory::InitSkills()
     //uint32 maxValue = level * 5; //not used, line marked for removal.
     bot->UpdateSkillsForLevel();
 
-    auto SafeLearn = [this](uint32 spellId)
-    {
-        if (!bot->HasSpell(spellId))
-            bot->learnSpell(spellId, false, true); // Avoid duplicate attempts in DB
-    };
-
-    // Define Riding skill according to level
-    if (bot->GetLevel() >= 70)
-        bot->SetSkill(SKILL_RIDING, 300, 300, 300);
-    else if (bot->GetLevel() >= 60)
-        bot->SetSkill(SKILL_RIDING, 225, 225, 225);
-    else if (bot->GetLevel() >= 40)
-        bot->SetSkill(SKILL_RIDING, 150, 150, 150);
-    else if (bot->GetLevel() >= 20)
-        bot->SetSkill(SKILL_RIDING, 75, 75, 75);
-    else
-        bot->SetSkill(SKILL_RIDING, 0, 0, 0);
-    
-    // Safe learning of mount spells
+    bot->SetSkill(SKILL_RIDING, 0, 0, 0);
     if (bot->GetLevel() >= sPlayerbotAIConfig->useGroundMountAtMinLevel)
-        SafeLearn(33388); // Apprentice
+        bot->learnSpell(33388);
     if (bot->GetLevel() >= sPlayerbotAIConfig->useFastGroundMountAtMinLevel)
-        SafeLearn(33391); // Journeyman
+        bot->learnSpell(33391);
     if (bot->GetLevel() >= sPlayerbotAIConfig->useFlyMountAtMinLevel)
-        SafeLearn(34090); // Expert
+        bot->learnSpell(34090);
     if (bot->GetLevel() >= sPlayerbotAIConfig->useFastFlyMountAtMinLevel)
-        SafeLearn(34091); // Artisan
+        bot->learnSpell(34091);
 
     uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;
