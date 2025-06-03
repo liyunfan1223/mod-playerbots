@@ -18,7 +18,7 @@ void NearestNpcsValue::FindUnits(std::list<Unit*>& targets)
     Cell::VisitAllObjects(bot, searcher, range);
 }
 
-bool NearestNpcsValue::AcceptUnit(Unit* unit) { return !unit->IsHostileTo(bot) && !unit->IsPlayer(); }
+bool NearestNpcsValue::AcceptUnit(Unit* unit) { return !unit->IsPlayer(); }
 
 void NearestHostileNpcsValue::FindUnits(std::list<Unit*>& targets)
 {

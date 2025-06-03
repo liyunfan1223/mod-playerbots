@@ -54,6 +54,14 @@ public:
         creators["thorim gauntlet positioning action"] = &RaidUlduarActionContext::thorim_gauntlet_positioning_action;
         creators["thorim phase 2 positioning action"] = &RaidUlduarActionContext::thorim_phase2_positioning_action;
         creators["mimiron fire resistance action"] = &RaidUlduarActionContext::mimiron_fire_resistance_action;
+        creators["mimiron shock blast action"] = &RaidUlduarActionContext::mimiron_shock_blast_action;
+        creators["mimiron phase 1 positioning action"] = &RaidUlduarActionContext::mimiron_phase_1_positioning_action;
+        creators["mimiron p3wx2 laser barrage action"] = &RaidUlduarActionContext::mimiron_p3wx2_laser_barrage_action;
+        creators["mimiron rapid burst action"] = &RaidUlduarActionContext::mimiron_rapid_burst_action;
+        creators["mimiron aerial command unit action"] = &RaidUlduarActionContext::mimiron_aerial_command_unit_action;
+        creators["mimiron rocket strike action"] = &RaidUlduarActionContext::mimiron_rocket_strike_action;
+        creators["mimiron phase 4 mark dps action"] = &RaidUlduarActionContext::mimiron_phase_4_mark_dps_action;
+        creators["mimiron cheat action"] = &RaidUlduarActionContext::mimiron_cheat_action;
     }
 
 private:
@@ -95,6 +103,14 @@ private:
     static Action* thorim_gauntlet_positioning_action(PlayerbotAI* ai) { return new ThorimGauntletPositioningAction(ai); }
     static Action* thorim_phase2_positioning_action(PlayerbotAI* ai) { return new ThorimPhase2PositioningAction(ai); }
     static Action* mimiron_fire_resistance_action(PlayerbotAI* ai) { return new BossFireResistanceAction(ai, "mimiron"); }
+    static Action* mimiron_shock_blast_action(PlayerbotAI* ai) { return new MimironShockBlastAction(ai); }
+    static Action* mimiron_phase_1_positioning_action(PlayerbotAI* ai) { return new MimironPhase1PositioningAction(ai); }
+    static Action* mimiron_p3wx2_laser_barrage_action(PlayerbotAI* ai) { return new MimironP3Wx2LaserBarrageAction(ai); }
+    static Action* mimiron_rapid_burst_action(PlayerbotAI* ai) { return new MimironRapidBurstAction(ai); }
+    static Action* mimiron_aerial_command_unit_action(PlayerbotAI* ai) { return new MimironAerialCommandUnitAction(ai); }
+    static Action* mimiron_rocket_strike_action(PlayerbotAI* ai) { return new MimironRocketStrikeAction(ai); }
+    static Action* mimiron_phase_4_mark_dps_action(PlayerbotAI* ai) { return new MimironPhase4MarkDpsAction(ai); }
+    static Action* mimiron_cheat_action(PlayerbotAI* ai) { return new MimironCheatAction(ai); }
 };
 
 #endif
