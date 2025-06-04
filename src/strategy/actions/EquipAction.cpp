@@ -8,6 +8,7 @@
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "ItemUsageValue.h"
+#include "ItemVisitors.h"
 #include "Playerbots.h"
 #include "StatsWeightCalculator.h"
 
@@ -67,19 +68,6 @@ void EquipAction::EquipItem(Item* item)
     uint32 itemId = itemProto->ItemId;
     uint8 invType = itemProto->InventoryType;
 
-    // Ensure only the correct classes attempt to equip relics
-    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && bot->getClass() != CLASS_DRUID)
-        return;
-
-    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && bot->getClass() != CLASS_DEATH_KNIGHT)
-        return;
-    
-    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && bot->getClass() != CLASS_PALADIN)
-        return;
-
-    if (itemProto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && bot->getClass() != CLASS_SHAMAN)
-        return;
-
     // Handle ammunition separately
     if (invType == INVTYPE_AMMO)
     {
@@ -95,6 +83,7 @@ void EquipAction::EquipItem(Item* item)
     if (itemProto->Class == ITEM_CLASS_CONTAINER)
     {
         // Attempt to equip as a bag
+        Bag* pBag = reinterpret_cast<Bag*>(item);
         uint8 newBagSlot = GetSmallestBagSlot();
         if (newBagSlot > 0)
         {
@@ -323,19 +312,28 @@ bool EquipUpgradesAction::Execute(Event event)
             return false;
     }
 
-    ListItemsVisitor visitor;
+    CollectItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
 
     ItemIds items;
-    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
+    for (auto i = visitor.items.begin(); i != visitor.items.end(); ++i)
     {
-        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", i->first);
+        Item* item = *i;
+        if (!item)
+            break;
+        int32 randomProperty = item->GetItemRandomPropertyId();
+        uint32 itemId = item->GetTemplate()->ItemId;
+        std::string itemUsageParam;
+        if (randomProperty != 0) {
+            itemUsageParam = std::to_string(itemId) + "," + std::to_string(randomProperty);
+        } else {
+            itemUsageParam = std::to_string(itemId);
+        }
+        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
+
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
-            // LOG_INFO("playerbots", "Bot {} <{}> EquipUpgradesAction {} ({})", bot->GetGUID().ToString().c_str(),
-            //    bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ?
-            //    "wrong item but empty slot" : "");
-            items.insert(i->first);
+            items.insert(itemId);
         }
     }
 
@@ -343,23 +341,33 @@ bool EquipUpgradesAction::Execute(Event event)
     return true;
 }
 
-bool EquipUpgradeAction::Execute(Event /*event*/)
+bool EquipUpgradeAction::Execute(Event event)
 {
-    ListItemsVisitor visitor;
+    CollectItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
 
     ItemIds items;
-    for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
+    for (auto i = visitor.items.begin(); i != visitor.items.end(); ++i)
     {
-        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", i->first);
+        Item* item = *i;
+        if (!item)
+            break;
+        int32 randomProperty = item->GetItemRandomPropertyId();
+        uint32 itemId = item->GetTemplate()->ItemId;
+        std::string itemUsageParam;
+        if (randomProperty != 0) {
+            itemUsageParam = std::to_string(itemId) + "," + std::to_string(randomProperty);
+        } else {
+            itemUsageParam = std::to_string(itemId);
+        }
+        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
+
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
-            // LOG_INFO("playerbots", "Bot {} <{}> EquipUpgradeAction item {} ({})", bot->GetGUID().ToString().c_str(),
-            //    bot->GetName().c_str(), i->first, usage == 1 ? "no item in slot" : usage == 2 ? "replace" : usage == 3 ?
-            //    "wrong item but empty slot" : "");
-            items.insert(i->first);
+            items.insert(itemId);
         }
     }
+
     EquipItems(items);
     return true;
 }

@@ -13,7 +13,7 @@ class PlayerbotAI;
 class AcceptBgInvitationAction : public Action
 {
 public:
-    AcceptBgInvitationAction(PlayerbotAI* botAI) : Action(botAI, "accept bg invitatio") {}
+    AcceptBgInvitationAction(PlayerbotAI* botAI) : Action(botAI, "accept bg invitation") {}
 
     bool Execute(Event event) override;
 };

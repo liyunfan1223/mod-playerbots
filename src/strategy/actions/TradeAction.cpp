@@ -15,6 +15,16 @@ bool TradeAction::Execute(Event event)
 {
     std::string const text = event.getParam();
 
+    // Table with prefixes to be excluded from analysis
+    static const std::vector<std::string> excludedPrefixes = {"RPLL_H_"};
+
+    // If text starts with any excluded prefix, don't process it further.
+    for (const auto& prefix : excludedPrefixes)
+    {
+        if (text.find(prefix) == 0)
+            return false;
+    }
+
     if (!bot->GetTrader())
     {
         GuidVector guids = chat->parseGameobjects(text);

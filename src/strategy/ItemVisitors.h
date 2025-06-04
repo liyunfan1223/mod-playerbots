@@ -232,6 +232,20 @@ public:
     }
 };
 
+class CollectItemsVisitor : public IterateItemsVisitor
+{
+public:
+    CollectItemsVisitor() : IterateItemsVisitor() {}
+
+    std::vector<Item*> items;
+
+    bool Visit(Item* item) override
+    {
+        items.push_back(item);
+        return true;
+    }
+};
+
 class ItemCountByQuality : public IterateItemsVisitor
 {
 public:

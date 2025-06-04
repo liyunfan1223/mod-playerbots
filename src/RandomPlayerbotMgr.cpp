@@ -49,6 +49,7 @@
 #include "UpdateTime.h"
 #include "World.h"
 #include "RandomPlayerbotFactory.h"
+#include <WorldSessionMgr.h>
 
 struct GuidClassRaceInfo {
     ObjectGuid::LowType guid;
@@ -355,7 +356,43 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         PERF_MON_TOTAL,
         onlineBotCount < maxAllowedBotCount ? "RandomPlayerbotMgr::Login" : "RandomPlayerbotMgr::UpdateAIInternal");
 
-    if (availableBotCount < maxAllowedBotCount)
+    bool realPlayerIsLogged = false;
+    if (sPlayerbotAIConfig->disabledWithoutRealPlayer)
+    {
+        if (sWorldSessionMgr->GetActiveAndQueuedSessionCount() > 0)
+        {
+            RealPlayerLastTimeSeen = time(nullptr);
+            realPlayerIsLogged = true;
+
+            if (DelayLoginBotsTimer == 0)
+            {
+                DelayLoginBotsTimer = time(nullptr) + sPlayerbotAIConfig->disabledWithoutRealPlayerLoginDelay;
+            }
+        }
+        else 
+        {
+            if (DelayLoginBotsTimer)
+            {
+                DelayLoginBotsTimer = 0;
+            }
+
+            if (RealPlayerLastTimeSeen != 0 && onlineBotCount > 0 &&
+                time(nullptr) > RealPlayerLastTimeSeen + sPlayerbotAIConfig->disabledWithoutRealPlayerLogoutDelay)
+            {
+                LogoutAllBots();
+                LOG_INFO("playerbots",
+                         "Logout all bots due no real player session.");
+            }
+        }
+
+        if (availableBotCount < maxAllowedBotCount &&
+            (sPlayerbotAIConfig->disabledWithoutRealPlayer == false ||
+             (realPlayerIsLogged && DelayLoginBotsTimer != 0 && time(nullptr) >= DelayLoginBotsTimer)))
+        {
+            AddRandomBots();
+        }
+    }
+    else if (availableBotCount < maxAllowedBotCount)
     {
         AddRandomBots();
     }
@@ -391,7 +428,11 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         }
     }
     uint32 updateBots = sPlayerbotAIConfig->randomBotsPerInterval * onlineBotFocus / 100;
-    uint32 maxNewBots = onlineBotCount < maxAllowedBotCount ? maxAllowedBotCount - onlineBotCount : 0;
+    uint32 maxNewBots = onlineBotCount < maxAllowedBotCount &&
+                (sPlayerbotAIConfig->disabledWithoutRealPlayer == false ||
+                 (realPlayerIsLogged && DelayLoginBotsTimer != 0 && time(nullptr) >= DelayLoginBotsTimer))
+                            ? maxAllowedBotCount - onlineBotCount
+                            : 0;
     uint32 loginBots = std::min(sPlayerbotAIConfig->randomBotsPerInterval - updateBots, maxNewBots);
 
     if (!availableBots.empty())
@@ -432,6 +473,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
                 if (!loginBots)
                     break;
             }
+
+            DelayLoginBotsTimer = 0;
         }
     }
 
@@ -1563,7 +1606,12 @@ void RandomPlayerbotMgr::PrepareZone2LevelBracket()
     zone2LevelBracket[2817] = {77, 80}; // Crystalsong Forest
     zone2LevelBracket[3537] = {68, 75}; // Borean Tundra
     zone2LevelBracket[3711] = {75, 80}; // Sholazar Basin
-    zone2LevelBracket[4197] = {79, 80}; // Wintergrasp
+    zone2LevelBracket[4197] = {79, 80}; // Wintergrasp    
+    
+    // Override with values from config
+    for (auto const& [zoneId, bracketPair] : sPlayerbotAIConfig->zoneBrackets) {
+        zone2LevelBracket[zoneId] = {bracketPair.first, bracketPair.second};
+    }
 }
 
 void RandomPlayerbotMgr::PrepareTeleportCache()
@@ -1627,8 +1675,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             uint32 level = (min_level + max_level + 1) / 2;
             WorldLocation loc(mapId, x, y, z, 0);
             collected_locs++;
-            for (int32 l = (int32)level - (int32)sPlayerbotAIConfig->randomBotTeleHigherLevel;
-                 l <= (int32)level + (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel; l++)
+            for (int32 l = (int32)level - (int32)sPlayerbotAIConfig->randomBotTeleLowerLevel;
+                 l <= (int32)level + (int32)sPlayerbotAIConfig->randomBotTeleHigherLevel; l++)
             {
                 if (l < 1 || l > maxLevel)
                 {
