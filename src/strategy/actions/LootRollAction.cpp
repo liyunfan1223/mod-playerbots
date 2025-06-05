@@ -65,7 +65,7 @@ bool LootRollAction::Execute(Event event)
             switch (proto->Class)
             {
                 case ITEM_CLASS_WEAPON:
-                case ITEM_CLASS_ARMOR:   
+                case ITEM_CLASS_ARMOR:
                     if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
                     {
                         vote = NEED;
@@ -223,5 +223,4 @@ bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
         return true; // Unique item already in bag, don't roll for it
     }
     return false; // Item is not equipped or in bags, roll for it
-
 }
