@@ -65,7 +65,7 @@ bool LootRollAction::Execute(Event event)
             switch (proto->Class)
             {
                 case ITEM_CLASS_WEAPON:
-                case ITEM_CLASS_ARMOR:
+                case ITEM_CLASS_ARMOR:   
                     if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
                     {
                         vote = NEED;
@@ -89,7 +89,14 @@ bool LootRollAction::Execute(Event event)
         {
             if (vote == NEED)
             {
-                vote = GREED;
+                if (RollUniqueCheck(proto, bot))
+                    {
+                        vote = PASS;
+                    }
+                else 
+                    {
+                        vote = GREED;
+                    }
             }
             else if (vote == GREED)
             {
@@ -195,4 +202,22 @@ bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
     }
 
     return false; // Bot's class cannot use this token
+}
+
+bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
+{
+    // Count the total number of the item (equipped + in bags)
+    uint32 totalItemCount = bot->GetItemCount(proto->ItemId, true);
+
+    // Count the number of the item in bags only
+    uint32 bagItemCount = bot->GetItemCount(proto->ItemId, false);
+
+    // Determine if the unique item is already equipped
+    bool isEquipped = (totalItemCount > bagItemCount);
+    if (isEquipped)
+    {
+        return true;  // Item is already equipped
+    }
+    return false; // Item is not equipped
+
 }
