@@ -10,19 +10,14 @@
 #include "ItemCountValue.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
+#include <PlayerbotAIConfig.cpp>
 
 bool TradeAction::Execute(Event event)
 {
     std::string const text = event.getParam();
 
-    // Table with prefixes to be excluded from analysis
-    static const std::vector<std::string> excludedPrefixes =
-    {
-        "RPLL_H_",                      //AdvancedWotLkCombatLog
-        "DBMv4",                        //DBM
-        "{звезда} Questie",             //Questie
-        "{rt1} Questie"                 //Questie
-    };
+    std::vector<std::string> excludedPrefixes;
+    LoadListString<std::vector<std::string>>(sPlayerbotAIConfig->tradeActionExcludedPrefixes, excludedPrefixes);
 
     // If text starts with any excluded prefix, don't process it further.
     for (const auto& prefix : excludedPrefixes)
