@@ -1,6 +1,7 @@
 
 #include "RaidUlduarActions.h"
 
+#include <CombatStrategy.h>
 #include <FollowMasterStrategy.h>
 
 #include <cmath>
@@ -62,7 +63,7 @@ bool FlameLeviathanVehicleAction::Execute(Event event)
             continue;
         if (unit->GetEntry() == 33142)  // Leviathan Defense Turret
             continue;
-        if (unit->GetEntry() == 33113) // Flame Leviathan
+        if (unit->GetEntry() == 33113)  // Flame Leviathan
         {
             flame = unit;
             continue;
@@ -1851,7 +1852,7 @@ bool ThorimMarkDpsTargetAction::Execute(Event event)
             (!currentSkullUnit || currentSkullUnit->GetEntry() != acolyte->GetEntry()))
             targetToMark = acolyte;
         else if (evoker && evoker->IsAlive() && bot->GetDistance(evoker) < 50.0f &&
-            (!currentSkullUnit || currentSkullUnit->GetEntry() != evoker->GetEntry()))
+                 (!currentSkullUnit || currentSkullUnit->GetEntry() != evoker->GetEntry()))
             targetToMark = evoker;
         else
             return false;
@@ -2095,8 +2096,8 @@ bool ThorimGauntletPositioningAction::Execute(Event event)
         boss->GetPositionZ() < ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD)
     {
         MoveTo(bot->GetMapId(), ULDUAR_THORIM_JUMP_START_POINT.GetPositionX(),
-                    ULDUAR_THORIM_JUMP_START_POINT.GetPositionY(), ULDUAR_THORIM_JUMP_START_POINT.GetPositionZ(), false,
-                    false, false, true, MovementPriority::MOVEMENT_NORMAL, true);
+               ULDUAR_THORIM_JUMP_START_POINT.GetPositionY(), ULDUAR_THORIM_JUMP_START_POINT.GetPositionZ(), false,
+               false, false, true, MovementPriority::MOVEMENT_NORMAL, true);
 
         if (bot->GetDistance(ULDUAR_THORIM_JUMP_START_POINT) > 0.5f)
             return false;
@@ -2171,9 +2172,8 @@ bool ThorimPhase2PositioningAction::Execute(Event event)
             targetPosition = ULDUAR_THORIM_PHASE2_RANGE3_SPOT;
     }
 
-    MoveTo(bot->GetMapId(), targetPosition.GetPositionX(), targetPosition.GetPositionY(),
-            targetPosition.GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_COMBAT, true,
-            backward);
+    MoveTo(bot->GetMapId(), targetPosition.GetPositionX(), targetPosition.GetPositionY(), targetPosition.GetPositionZ(),
+           false, false, false, true, MovementPriority::MOVEMENT_COMBAT, true, backward);
 
     if (bot->GetDistance(targetPosition) > 1.0f)
         return false;
@@ -2185,4 +2185,465 @@ bool ThorimPhase2PositioningAction::isUseful()
 {
     ThorimPhase2PositioningTrigger thorimPhase2PositioningTrigger(botAI);
     return thorimPhase2PositioningTrigger.IsActive();
+}
+
+bool MimironShockBlastAction::Execute(Event event)
+{
+    Unit* leviathanMkII = nullptr;
+    Unit* vx001 = nullptr;
+    Unit* aerialCommandUnit = nullptr;
+
+    float radius = 20.0f;
+
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target || !target->IsAlive())
+            continue;
+
+        if (target->GetEntry() == NPC_LEVIATHAN_MKII)
+        {
+            leviathanMkII = target;
+        }
+        else if (target->GetEntry() == NPC_VX001)
+        {
+            vx001 = target;
+        }
+        else if (target->GetEntry() == NPC_AERIAL_COMMAND_UNIT)
+        {
+            aerialCommandUnit = target;
+        }
+    }
+
+    if (!leviathanMkII)
+    {
+        return false;
+    }
+
+    if (!vx001 && !aerialCommandUnit)
+    {
+        float currentDistance = bot->GetDistance2d(leviathanMkII);
+
+        MoveAway(leviathanMkII, radius - currentDistance);
+
+        if (botAI->IsMelee(bot))
+        {
+            botAI->SetNextCheckDelay(100);
+        }
+        return true;
+    }
+    else
+    {
+        float init_angle = leviathanMkII->GetAngle(bot);
+        float distance = radius - bot->GetDistance2d(leviathanMkII);
+        for (float delta = 0; delta <= M_PI / 2; delta += M_PI / 8)
+        {
+            float angle = init_angle + delta;
+            float dx = bot->GetPositionX() + cos(angle) * distance;
+            float dy = bot->GetPositionY() + sin(angle) * distance;
+            float dz = bot->GetPositionZ();
+            if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                                bot->GetPositionZ(), dx, dy, dz))
+            {
+                bot->TeleportTo(target->GetMapId(), dx, dy, dz, target->GetOrientation());
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+bool MimironShockBlastAction::isUseful()
+{
+    MimironShockBlastTrigger mimironShockBlastTrigger(botAI);
+    return mimironShockBlastTrigger.IsActive();
+}
+
+bool MimironPhase1PositioningAction::Execute(Event event)
+{
+    SET_AI_VALUE(float, "disperse distance", 6.0f);
+    return true;
+}
+
+bool MimironPhase1PositioningAction::isUseful()
+{
+    MimironPhase1PositioningTrigger mimironPhase1PositioningTrigger(botAI);
+    return mimironPhase1PositioningTrigger.IsActive();
+}
+
+bool MimironP3Wx2LaserBarrageAction::Execute(Event event)
+{
+    auto master = botAI->GetMaster();
+    if (!master || !master->IsAlive())
+    {
+        return false;
+    }
+
+    if (bot->GetDistance2d(master) > 15.0f)
+    {
+        return bot->TeleportTo(master->GetMapId(), master->GetPositionX(), master->GetPositionY(),
+                               master->GetPositionZ(), master->GetOrientation());
+    }
+
+    return MoveTo(master->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), false,
+                  false, false, true, MovementPriority::MOVEMENT_COMBAT, true);
+}
+
+bool MimironRapidBurstAction::isUseful()
+{
+    MimironRapidBurstTrigger mimironRapidBurstTrigger(botAI);
+    return mimironRapidBurstTrigger.IsActive();
+}
+
+bool MimironRapidBurstAction::Execute(Event event)
+{
+    Unit* leviathanMkII = nullptr;
+
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target || !target->IsAlive())
+            continue;
+
+        if (target->GetEntry() == NPC_LEVIATHAN_MKII)
+        {
+            leviathanMkII = target;
+        }
+    }
+
+    Position targetPosition;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
+    uint32 memberSpotNumber = 0;
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member)
+            continue;
+
+        if (bot->GetGUID() == member->GetGUID())
+        {
+            if (botAI->IsRanged(bot))
+            {
+                switch (memberSpotNumber)
+                {
+                    case 0:
+                        targetPosition = ULDUAR_MIMIRON_PHASE2_SIDE1RANGE_SPOT;
+                        break;
+                    case 1:
+                        targetPosition = ULDUAR_MIMIRON_PHASE2_SIDE2RANGE_SPOT;
+                        break;
+                    case 2:
+                        targetPosition = ULDUAR_MIMIRON_PHASE2_SIDE3RANGE_SPOT;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (botAI->IsMainTank(bot) && leviathanMkII)
+            {
+                targetPosition = ULDUAR_MIMIRON_PHASE4_TANK_SPOT;
+            }
+            else
+            {
+                switch (memberSpotNumber)
+                {
+                    case 0:
+                        targetPosition = ULDUAR_MIMIRON_PHASE2_SIDE1MELEE_SPOT;
+                        break;
+                    case 1:
+                        targetPosition = ULDUAR_MIMIRON_PHASE2_SIDE2MELEE_SPOT;
+                        break;
+                    case 2:
+                        targetPosition = ULDUAR_MIMIRON_PHASE2_SIDE3MELEE_SPOT;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        memberSpotNumber++;
+
+        if (memberSpotNumber == 3)
+        {
+            memberSpotNumber = 0;
+        }
+    }
+
+    MoveTo(bot->GetMapId(), targetPosition.GetPositionX(), targetPosition.GetPositionY(), targetPosition.GetPositionZ(),
+           false, false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
+
+    if (AI_VALUE(float, "disperse distance") != 0.0f)
+    {
+        SET_AI_VALUE(float, "disperse distance", 0.0f);
+    }
+
+    TankFaceStrategy tankFaceStrategy(botAI);
+    if (botAI->HasStrategy(tankFaceStrategy.getName(), BotState::BOT_STATE_COMBAT))
+    {
+        botAI->ChangeStrategy(REMOVE_STRATEGY_CHAR + tankFaceStrategy.getName(), BotState::BOT_STATE_COMBAT);
+    }
+    if (botAI->HasStrategy(tankFaceStrategy.getName(), BotState::BOT_STATE_NON_COMBAT))
+    {
+        botAI->ChangeStrategy(REMOVE_STRATEGY_CHAR + tankFaceStrategy.getName(), BotState::BOT_STATE_NON_COMBAT);
+    }
+
+    if (bot->GetDistance(targetPosition) > 1.0f)
+        return false;
+
+    return true;
+}
+
+bool MimironAerialCommandUnitAction::Execute(Event event)
+{
+    Unit* boss = nullptr;
+    Unit* bombBot = nullptr;
+    Unit* assaultBot = nullptr;
+
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target || !target->IsAlive())
+            continue;
+
+        if (target->GetEntry() == NPC_AERIAL_COMMAND_UNIT)
+        {
+            boss = target;
+        }
+        else if (target->GetEntry() == NPC_BOMB_BOT)
+        {
+            bombBot = target;
+        }
+        else if (target->GetEntry() == NPC_ASSAULT_BOT)
+        {
+            assaultBot = target;
+        }
+    }
+
+    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+        {
+            return false;
+        }
+
+        if (bombBot)
+        {
+            group->SetTargetIcon(crossIndex, bot->GetGUID(), bombBot->GetGUID());
+        }
+        else if (boss)
+        {
+            group->SetTargetIcon(crossIndex, bot->GetGUID(), boss->GetGUID());
+        }
+        
+        if (assaultBot)
+        {
+            ObjectGuid skullTarget = group->GetTargetIcon(skullIndex);
+            Unit* skullUnit = botAI->GetUnit(skullTarget);
+            if (!skullTarget || !skullUnit || !skullUnit->IsAlive())
+            {
+                group->SetTargetIcon(skullIndex, bot->GetGUID(), assaultBot->GetGUID());
+            }
+        }
+
+        return true;
+    }
+
+    if (AI_VALUE(float, "disperse distance") != 5.0f)
+    {
+        SET_AI_VALUE(float, "disperse distance", 5.0f);
+    }
+    botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("cross");
+    return true;
+}
+
+bool MimironRocketStrikeAction::isUseful()
+{
+    MimironRocketStrikeTrigger mimironRocketStrikeTrigger(botAI);
+    return mimironRocketStrikeTrigger.IsActive();
+}
+
+bool MimironRocketStrikeAction::Execute(Event event)
+{
+    Unit* leviathanMkII = nullptr;
+    Unit* vx001 = nullptr;
+    Unit* aerialCommandUnit = nullptr;
+
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target || !target->IsAlive())
+            continue;
+
+        if (target->GetEntry() == NPC_LEVIATHAN_MKII)
+        {
+            leviathanMkII = target;
+        }
+        else if (target->GetEntry() == NPC_VX001)
+        {
+            vx001 = target;
+        }
+        else if (target->GetEntry() == NPC_AERIAL_COMMAND_UNIT)
+        {
+            aerialCommandUnit = target;
+        }
+    }
+
+    Creature* rocketStrikeN = bot->FindNearestCreature(NPC_ROCKET_STRIKE_N, 100.0f);
+
+    if (!rocketStrikeN)
+    {
+        return false;
+    }
+
+    if (!vx001 && !aerialCommandUnit)
+    {
+        MoveAway(rocketStrikeN, 10.0f);
+        return true;
+    }
+    else
+    {
+        float init_angle = rocketStrikeN->GetAngle(bot);
+        float distance = 10.0f - bot->GetDistance2d(rocketStrikeN);
+        for (float delta = 0; delta <= M_PI / 2; delta += M_PI / 8)
+        {
+            float angle = init_angle + delta;
+            float dx = bot->GetPositionX() + cos(angle) * distance;
+            float dy = bot->GetPositionY() + sin(angle) * distance;
+            float dz = bot->GetPositionZ();
+            if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                               bot->GetPositionZ(), dx, dy, dz))
+            {
+                bot->TeleportTo(target->GetMapId(), dx, dy, dz, target->GetOrientation());
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+bool MimironPhase4MarkDpsAction::Execute(Event event)
+{
+    Unit* leviathanMkII = nullptr;
+    Unit* vx001 = nullptr;
+    Unit* aerialCommandUnit = nullptr;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    Unit* target = nullptr;
+    for (auto i = targets.begin(); i != targets.end(); ++i)
+    {
+        target = botAI->GetUnit(*i);
+        if (!target || !target->IsAlive())
+            continue;
+
+        if (target->GetEntry() == NPC_LEVIATHAN_MKII)
+        {
+            leviathanMkII = target;
+        }
+        else if (target->GetEntry() == NPC_VX001)
+        {
+            vx001 = target;
+        }
+        else if (target->GetEntry() == NPC_AERIAL_COMMAND_UNIT)
+        {
+            aerialCommandUnit = target;
+        }
+    }
+
+    if (!leviathanMkII || !vx001 || !aerialCommandUnit)
+    {
+        return false;
+    }
+
+    if (botAI->IsMainTank(bot))
+    {
+        Unit* highestHealthUnit = nullptr;
+        uint32 highestHealth = 0;
+        if (leviathanMkII && leviathanMkII->GetHealth() > highestHealth)
+        {
+            highestHealth = leviathanMkII->GetHealth();
+            highestHealthUnit = leviathanMkII;
+        }
+        if (vx001 && vx001->GetHealth() > highestHealth)
+        {
+            highestHealth = vx001->GetHealth();
+            highestHealthUnit = vx001;
+        }
+        if (aerialCommandUnit && aerialCommandUnit->GetHealth() > highestHealth)
+        {
+            highestHealthUnit = aerialCommandUnit;
+        }
+
+        group->SetTargetIcon(skullIndex, bot->GetGUID(), highestHealthUnit->GetGUID());
+        if (highestHealthUnit == leviathanMkII)
+        {
+            if (AI_VALUE(std::string, "rti") == "skull")
+            {
+                botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("skull");
+            }
+        }
+        else
+        {
+            group->SetTargetIcon(crossIndex, bot->GetGUID(), leviathanMkII->GetGUID());
+            if (AI_VALUE(std::string, "rti") != "cross")
+            {
+                botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("cross");
+            }
+        }
+
+        botAI->DoSpecificAction("attack rti target");
+        return true;
+    }
+    else
+    {
+        /*if (AI_VALUE(float, "disperse distance") != 0.0f)
+        {
+            SET_AI_VALUE(float, "disperse distance", 0.0f);
+        }*/
+        botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("skull");
+        return true;
+    }
+}
+
+bool MimironCheatAction::Execute(Event event)
+{
+    GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
+    for (const ObjectGuid& guid : targets)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsAlive())
+            continue;
+
+        if (unit->GetEntry() == NPC_PROXIMITY_MINE)
+        {
+            unit->Kill(bot, unit);
+        }
+        else if (unit->GetEntry() == NPC_BOMB_BOT)
+        {
+            unit->Kill(bot, unit);
+        }
+    }
+
+    return true;
 }

@@ -191,8 +191,40 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // Mimiron
     //
     triggers.push_back(new TriggerNode(
+        "mimiron p3wx2 laser barrage trigger",
+        NextAction::array(0, new NextAction("mimiron p3wx2 laser barrage action", ACTION_RAID + 2), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "mimiron shock blast trigger",
+        NextAction::array(0, new NextAction("mimiron shock blast action", ACTION_RAID + 1), nullptr)));
+
+    triggers.push_back(new TriggerNode(
         "mimiron fire resistance trigger",
         NextAction::array(0, new NextAction("mimiron fire resistance action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "mimiron phase 1 positioning trigger",
+        NextAction::array(0, new NextAction("mimiron phase 1 positioning action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "mimiron rapid burst trigger",
+        NextAction::array(0, new NextAction("mimiron rapid burst action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "mimiron aerial command unit trigger",
+        NextAction::array(0, new NextAction("mimiron aerial command unit action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "mimiron rocket strike trigger",
+        NextAction::array(0, new NextAction("mimiron rocket strike action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "mimiron phase 4 mark dps trigger",
+        NextAction::array(0, new NextAction("mimiron phase 4 mark dps action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "mimiron cheat trigger",
+        NextAction::array(0, new NextAction("mimiron cheat action", ACTION_RAID), nullptr)));
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
