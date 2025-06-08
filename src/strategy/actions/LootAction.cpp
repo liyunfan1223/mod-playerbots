@@ -156,7 +156,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;
-
+    
     return botAI->CastSpell(spellId, bot);
 }
 
