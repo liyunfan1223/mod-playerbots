@@ -89,7 +89,14 @@ bool LootRollAction::Execute(Event event)
         {
             if (vote == NEED)
             {
-                vote = GREED;
+                if (RollUniqueCheck(proto, bot))
+                    {
+                        vote = PASS;
+                    }
+                else 
+                    {
+                        vote = GREED;
+                    }
             }
             else if (vote == GREED)
             {
@@ -195,4 +202,25 @@ bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
     }
 
     return false; // Bot's class cannot use this token
+}
+
+bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
+{
+    // Count the total number of the item (equipped + in bags)
+    uint32 totalItemCount = bot->GetItemCount(proto->ItemId, true);
+
+    // Count the number of the item in bags only
+    uint32 bagItemCount = bot->GetItemCount(proto->ItemId, false);
+
+    // Determine if the unique item is already equipped
+    bool isEquipped = (totalItemCount > bagItemCount);
+    if (isEquipped && proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE))
+    {
+        return true;  // Unique Item is already equipped
+    }
+    else if (proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE) && (bagItemCount > 1))
+    {
+        return true; // Unique item already in bag, don't roll for it
+    }
+    return false; // Item is not equipped or in bags, roll for it
 }

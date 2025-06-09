@@ -35,8 +35,17 @@ bool LootAction::Execute(Event /*event*/)
         // bot->GetSession()->HandleLootReleaseOpcode(packet);
     }
 
-    context->GetValue<LootObject>("loot target")->Set(lootObject);
-    return true;
+    // Provide a system to check if the game object id is disallowed in the user configurable list or not.
+    // Check if the game object id is disallowed in the user configurable list or not.
+    if (sPlayerbotAIConfig->disallowedGameObjects.find(lootObject.guid.GetEntry()) != sPlayerbotAIConfig->disallowedGameObjects.end())
+    {
+        return false;  // Game object ID is disallowed, so do not proceed
+    }
+    else
+    {
+        context->GetValue<LootObject>("loot target")->Set(lootObject);
+        return true;
+    }
 }
 
 bool LootAction::isUseful()
@@ -147,7 +156,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;
-
+    
     return botAI->CastSpell(spellId, bot);
 }
 
