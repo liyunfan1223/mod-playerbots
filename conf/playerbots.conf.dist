@@ -1888,3 +1888,9 @@ AiPlayerbot.TargetPosRecalcDistance = 0.1
 
 # Allow bots to be summoned near innkeepers
 AiPlayerbot.SummonAtInnkeepersEnabled = 1
+
+# Enable buffs in ICC to make Heroic easier and more casual.
+# 50% more damage, 40% damage reduction (tank bots), increased all resistances, reduced threat for non tank bots, increased threat for tank bots.
+# Buffs will be applied on PP, Sindragosa and Lich King
+
+AiPlayerbot.EnableICCBuffs = 1
