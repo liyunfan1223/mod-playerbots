@@ -525,6 +525,11 @@ uint32 GuildTaskMgr::GetMaxItemTaskCount(uint32 itemId)
 
 bool GuildTaskMgr::IsGuildTaskItem(uint32 itemId, uint32 guildId)
 {
+    if (!sPlayerbotAIConfig->guildTaskEnabled)
+    {
+        return 0;
+    }
+
     uint32 value = 0;
 
     PlayerbotsDatabasePreparedStatement* stmt =
@@ -548,6 +553,11 @@ bool GuildTaskMgr::IsGuildTaskItem(uint32 itemId, uint32 guildId)
 std::map<uint32, uint32> GuildTaskMgr::GetTaskValues(uint32 owner, std::string const type,
                                                      [[maybe_unused]] uint32* validIn /* = nullptr */)
 {
+    if (!sPlayerbotAIConfig->guildTaskEnabled)
+    {
+        return std::map<uint32, uint32>();
+    }
+
     std::map<uint32, uint32> results;
 
     PlayerbotsDatabasePreparedStatement* stmt =
@@ -576,6 +586,11 @@ std::map<uint32, uint32> GuildTaskMgr::GetTaskValues(uint32 owner, std::string c
 
 uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string const type, [[maybe_unused]] uint32* validIn /* = nullptr */)
 {
+    if (!sPlayerbotAIConfig->guildTaskEnabled)
+    {
+        return 0;
+    }
+    
     uint32 value = 0;
 
     PlayerbotsDatabasePreparedStatement* stmt =

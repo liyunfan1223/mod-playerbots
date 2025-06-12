@@ -40,6 +40,11 @@ bool IsDeadValue::Calculate()
 
 bool PetIsDeadValue::Calculate()
 {
+    if ((bot->GetLevel() < 10 && bot->getClass() == CLASS_HUNTER) || bot->IsMounted())
+    {
+        return false;
+    }
+
     if (!bot->GetPet())
     {
         uint32 ownerid = bot->GetGUID().GetCounter();
