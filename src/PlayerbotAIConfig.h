@@ -56,6 +56,7 @@ public:
 
     bool enabled;
     bool disabledWithoutRealPlayer;
+    bool EnableICCBuffs;
     bool allowAccountBots, allowGuildBots, allowTrustedAccountBots;
     bool randomBotGuildNearby, randomBotInvitePlayer, inviteChat;
     uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime, expireActionTime,
@@ -72,6 +73,7 @@ public:
     float maxAoeAvoidRadius;
     std::set<uint32> aoeAvoidSpellWhitelist;
     bool tellWhenAvoidAoe;
+    std::set<uint32> disallowedGameObjects;
 
     uint32 openGoSpell;
     bool randomBotAutologin;

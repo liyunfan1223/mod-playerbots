@@ -61,6 +61,22 @@ enum UlduarIDs
     NPC_DARK_RUNE_ACOLYTE_G = 33110,
     NPC_IRON_HONOR_GUARD = 32875,
     SPELL_UNBALANCING_STRIKE = 62130,
+
+    //Mimiron
+    NPC_LEVIATHAN_MKII = 33432,
+    NPC_VX001 = 33651,
+    NPC_AERIAL_COMMAND_UNIT = 33670,
+    NPC_BOMB_BOT = 33836,
+    NPC_ROCKET_STRIKE_N = 34047,
+    NPC_ASSAULT_BOT = 34057,
+    NPC_PROXIMITY_MINE = 34362,
+    SPELL_P3WX2_LASER_BARRAGE_1 = 63293,
+    SPELL_P3WX2_LASER_BARRAGE_2 = 63297,
+    SPELL_SPINNING_UP = 63414,
+    SPELL_SHOCK_BLAST = 63631,
+    SPELL_P3WX2_LASER_BARRAGE_3 = 64042,
+    SPELL_P3WX2_LASER_BARRAGE_AURA_1 = 63274,
+    SPELL_P3WX2_LASER_BARRAGE_AURA_2 = 63300,
     
     // Buffs
     SPELL_FROST_TRAP = 13809
@@ -92,8 +108,15 @@ const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_2 = Position(2212.1353
 const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_3 = Position(2212.1956f, -328.0144f, 412.1348f);
 const Position ULDUAR_THORIM_PHASE2_TANK_SPOT = Position(2134.8572f, -287.0291f, 419.4935f);
 const Position ULDUAR_THORIM_PHASE2_RANGE1_SPOT = Position(2112.8752f, -267.69305f, 419.52814f);
-const Position ULDUAR_THORIM_PHASE2_RANGE2_SPOT = Position(2129.09f, -277.142f, 419.67462f);
+const Position ULDUAR_THORIM_PHASE2_RANGE2_SPOT = Position(2134.1296f, -257.3316f, 419.8462f);
 const Position ULDUAR_THORIM_PHASE2_RANGE3_SPOT = Position(2156.798f, -267.57434f, 419.52722f);
+const Position ULDUAR_MIMIRON_PHASE2_SIDE1RANGE_SPOT = Position(2753.708f, 2583.9617f, 364.31357f);
+const Position ULDUAR_MIMIRON_PHASE2_SIDE1MELEE_SPOT = Position(2746.9792f, 2573.6716f, 364.31357f);
+const Position ULDUAR_MIMIRON_PHASE2_SIDE2RANGE_SPOT = Position(2727.7224f, 2569.527f, 364.31357f);
+const Position ULDUAR_MIMIRON_PHASE2_SIDE2MELEE_SPOT = Position(2739.4746f, 2569.4106f, 364.31357f);
+const Position ULDUAR_MIMIRON_PHASE2_SIDE3RANGE_SPOT = Position(2754.1294f, 2553.9954f, 364.31357f);
+const Position ULDUAR_MIMIRON_PHASE2_SIDE3MELEE_SPOT = Position(2746.8513f, 2565.4263f, 364.31357f);
+const Position ULDUAR_MIMIRON_PHASE4_TANK_SPOT = Position(2744.5754f, 2570.8657f, 364.3138f);
 
 //
 // Flame Levi
@@ -333,6 +356,65 @@ class ThorimPhase2PositioningTrigger : public Trigger
 {
 public:
     ThorimPhase2PositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "thorim phase 2 positioning trigger") {}
+    bool IsActive() override;
+};
+
+//
+// Mimiron
+//
+class MimironShockBlastTrigger : public Trigger
+{
+public:
+    MimironShockBlastTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron shock blast trigger") {}
+    bool IsActive() override;
+};
+
+class MimironPhase1PositioningTrigger : public Trigger
+{
+public:
+    MimironPhase1PositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron phase 1 positioning trigger") {}
+    bool IsActive() override;
+};
+
+class MimironP3Wx2LaserBarrageTrigger : public Trigger
+{
+public:
+    MimironP3Wx2LaserBarrageTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron p3wx2 laser barrage trigger") {}
+    bool IsActive() override;
+};
+
+class MimironRapidBurstTrigger : public Trigger
+{
+public:
+    MimironRapidBurstTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron rapid burst trigger") {}
+    bool IsActive() override;
+};
+
+class MimironAerialCommandUnitTrigger : public Trigger
+{
+public:
+    MimironAerialCommandUnitTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron aerial command unit trigger") {}
+    bool IsActive() override;
+};
+
+class MimironRocketStrikeTrigger : public Trigger
+{
+public:
+    MimironRocketStrikeTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron rocket strike trigger") {}
+    bool IsActive() override;
+};
+
+class MimironPhase4MarkDpsTrigger : public Trigger
+{
+public:
+    MimironPhase4MarkDpsTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron phase 4 mark dps trigger") {}
+    bool IsActive() override;
+};
+
+class MimironCheatTrigger : public Trigger
+{
+public:
+    MimironCheatTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron cheat trigger") {}
     bool IsActive() override;
 };
 

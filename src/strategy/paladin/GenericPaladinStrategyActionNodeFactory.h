@@ -39,6 +39,7 @@ public:
         creators["blessing of wisdom"] = &blessing_of_wisdom;
         creators["blessing of kings on party"] = &blessing_of_kings_on_party;
         creators["blessing of wisdom on party"] = &blessing_of_wisdom_on_party;
+        creators["blessing of sanctuary on party"] = &blessing_of_sanctuary_on_party;
         creators["blessing of sanctuary"] = &blessing_of_sanctuary;
         creators["seal of command"] = &seal_of_command;
         creators["taunt spell"] = &hand_of_reckoning;
@@ -79,6 +80,13 @@ private:
     static ActionNode* blessing_of_wisdom_on_party(PlayerbotAI* /* ai */)
     {
         return new ActionNode("blessing of wisdom on party",
+                              /*P*/ nullptr,
+                              /*A*/ nullptr,
+                              /*C*/ nullptr);
+    }
+    static ActionNode* blessing_of_sanctuary_on_party(PlayerbotAI* /* ai */)
+    {
+        return new ActionNode("blessing of sanctuary on party",
                               /*P*/ nullptr,
                               /*A*/ nullptr,
                               /*C*/ nullptr);
