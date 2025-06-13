@@ -397,6 +397,36 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
     }
 }
 
+void LogoutAltBot(ObjectGuid guid)
+{
+    // Try to get the bot object and its master directly
+    if (Player* bot = ObjectAccessor::FindPlayer(guid))
+    {
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+        {
+            Player* master = botAI->GetMaster();
+            if (master)
+            {
+                PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(master);
+                if (mgr && mgr->GetPlayerBot(guid))
+                {
+                    LOG_INFO("playerbots", "Real player logging in, logging out bot for character {}", bot->GetName());
+                    mgr->LogoutPlayerBot(guid);
+
+                    // Remove from master's PlayerbotMgr map
+                    mgr->RemoveFromPlayerbotsMap(guid);
+
+                    // Set AI master pointer to player (named "bot" in this instance)
+                    botAI->SetMaster(bot);
+
+                    return;
+                }
+            }
+        }
+    }
+}
+
 void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
 {
     if (Player* bot = GetPlayerBot(guid))
@@ -677,8 +707,13 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (cmd == "add" || cmd == "addaccount" || cmd == "login")
     {
-        if (ObjectAccessor::FindPlayer(guid))
-            return "player already logged in";
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+        {
+            if (!player->GetSession()->IsBot())
+                return "Cannot add bot: character is currently being played by a real player.";
+            else
+                return "player already logged in as bot";
+        }
 
         // For addaccount command, verify it's an account name
         if (cmd == "addaccount")
