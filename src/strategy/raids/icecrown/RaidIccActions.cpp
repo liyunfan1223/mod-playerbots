@@ -1662,7 +1662,9 @@ void IccRotfaceTankPositionAction::MarkBossWithSkull(Unit* boss)
 
 bool IccRotfaceTankPositionAction::PositionMainTankAndMelee(Unit* boss)
 {
-    bool isBossCasting = boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY);
+    bool isBossCasting = false;
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY))
+        bool isBossCasting = true;
 
     if (bot->GetExactDist2d(ICC_ROTFACE_CENTER_POSITION) > 7.0f && botAI->HasAggro(boss) && botAI->IsMainTank(bot))
         MoveTo(bot->GetMapId(), ICC_ROTFACE_CENTER_POSITION.GetPositionX(),
@@ -1744,8 +1746,8 @@ bool IccRotfaceTankPositionAction::HandleBigOozePositioning(Unit* boss)
         // If we have the ooze's aggro, kite it in a larger circular pattern between 20f and 30f from the center
         if (bigOoze->GetVictim() == bot)
         {
-            const float minRadius = 17.0f;
-            const float maxRadius = 25.0f;
+            const float minRadius = 24.0f;
+            const float maxRadius = 34.0f;
             const float safeDistanceFromOoze = 13.0f;
             const float puddleSafeDistance = 30.0f;
             const Position centerPosition = ICC_ROTFACE_CENTER_POSITION;
@@ -2017,7 +2019,10 @@ bool IccRotfaceGroupPositionAction::PositionRangedAndHealers(Unit* boss,Unit *sm
         return false;
 
     Difficulty diff = bot->GetRaidDifficulty();
-    bool isBossCasting = boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY);
+    bool isBossCasting = false;
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY))
+        bool isBossCasting = true;
+
     bool isHeroic = (diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC);
 
    // Move to the exact same position as the boss during slime spray
@@ -3240,7 +3245,9 @@ bool IccBpcKelesethTankAction::Execute(Event event)
     if (!boss)
         return false;
 
-    bool isBossVictim = boss && boss->GetVictim() == bot;
+    bool isBossVictim = false;
+    if (boss && boss->GetVictim() == bot)
+        isBossVictim = true;
 
     // If not actively tanking, attack the boss
     if (boss->GetVictim() != bot)
@@ -3319,8 +3326,13 @@ bool IccBpcMainTankAction::Execute(Event event)
         auto* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
 
         // Check if we're the target of both princes
-        const bool isVictimOfValanar = valanar && valanar->GetVictim() == bot;
-        const bool isVictimOfTaldaram = taldaram && taldaram->GetVictim() == bot;
+        bool isVictimOfValanar = false;
+        if (valanar && valanar->GetVictim() == bot)
+            isVictimOfValanar = true;
+
+        bool isVictimOfTaldaram = false;
+        if (taldaram && taldaram->GetVictim() == bot)
+            isVictimOfTaldaram = true;
 
         // Move to MT position if targeted by both princes and not already close
         if (isVictimOfValanar && isVictimOfTaldaram && bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 15.0f)
@@ -3428,11 +3440,13 @@ bool IccBpcEmpoweredVortexAction::Execute(Event event)
         return false;
 
     // Check if boss is casting empowered vortex
-    bool isCastingVortex = valanar->HasUnitState(UNIT_STATE_CASTING) &&
-                           (valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX1) ||
-                            valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX2) ||
-                            valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX3) ||
-                            valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX4));
+    bool isCastingVortex = false;
+    if (valanar && valanar->HasUnitState(UNIT_STATE_CASTING) &&
+       (valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX1) ||
+        valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX2) ||
+        valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX3) ||
+        valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX4)))
+        isCastingVortex = true;
 
     if (isCastingVortex)
     {
@@ -6269,7 +6283,9 @@ bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(const Unit* boss)
         if (!bot->HasAura(FROST_BEACON_AURA_ID))
         {
             const Difficulty diff = bot->GetRaidDifficulty();
-            const bool is25Man = (diff == RAID_DIFFICULTY_25MAN_NORMAL) || (diff == RAID_DIFFICULTY_25MAN_HEROIC);
+            bool is25Man = false;
+            if (diff && (diff == RAID_DIFFICULTY_25MAN_NORMAL || diff == RAID_DIFFICULTY_25MAN_HEROIC))
+                is25Man = true;
 
             const Position& safePosition = is25Man ? ICC_SINDRAGOSA_FBOMB_POSITION : ICC_SINDRAGOSA_FBOMB10_POSITION;
 
@@ -6981,7 +6997,9 @@ bool IccLichKingWinterAction::Execute(Event event)
 
     Unit* iceSphere = AI_VALUE2(Unit*, "find target", "ice sphere");
 
-    bool isVictim = iceSphere && iceSphere->GetVictim() == bot && !botAI->IsTank(bot);
+    bool isVictim = false;
+    if (iceSphere && iceSphere->GetVictim() == bot && !botAI->IsTank(bot))
+        isVictim = true;
 
     // First priority: Get out of Defile if we're in one
     if (!IsPositionSafeFromDefile(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 3.0f))
@@ -7827,10 +7845,15 @@ bool IccLichKingAddsAction::Execute(Event event)
         }
     }
 
-    bool hasWinterAura = boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) || boss->HasAura(SPELL_REMORSELESS_WINTER3) ||
-    boss->HasAura(SPELL_REMORSELESS_WINTER4));
-    bool hasWinter2Aura = boss && (boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) || boss->HasAura(SPELL_REMORSELESS_WINTER7) ||
-    boss->HasAura(SPELL_REMORSELESS_WINTER8));
+    bool hasWinterAura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) ||
+                 boss->HasAura(SPELL_REMORSELESS_WINTER3) || boss->HasAura(SPELL_REMORSELESS_WINTER4)))
+        hasWinterAura = true;
+
+    bool hasWinter2Aura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) ||
+                 boss->HasAura(SPELL_REMORSELESS_WINTER7) || boss->HasAura(SPELL_REMORSELESS_WINTER8)))
+        hasWinter2Aura = true;
 
     if (boss && boss->GetHealthPct() < 70 && boss->GetHealthPct() > 40 && !hasWinterAura &&
         !hasWinter2Aura)  // If boss is in p2, check if bot has been thrown off platform
